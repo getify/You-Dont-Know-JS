@@ -60,7 +60,7 @@ function foo() {
 	var a = 2;
 
 	function bar() {
-		console.log(a); // 2
+		console.log(a);
 	}
 
 	return bar;
@@ -68,7 +68,7 @@ function foo() {
 
 var baz = foo();
 
-baz(); // whoa. closure was just observed, man.
+baz(); //logs 2, whoa. closure was just observed, man.
 ```
 
 DJ, break it down.
