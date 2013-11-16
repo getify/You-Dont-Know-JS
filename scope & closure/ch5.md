@@ -535,7 +535,7 @@ module "bar" {
 }
 
 module "foo" {
-	var bar = import "bar";
+	import "bar" as bar;
 	var hungry = "hippo";
 
 	function awesome() {
