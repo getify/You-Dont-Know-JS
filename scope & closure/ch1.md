@@ -9,11 +9,11 @@ But the inclusion of variables into our program begets the most interesting ques
 
 These questions speak to the need for a well-defined set of rules for storing variables in some location, and for finding those variables at a later time. We'll call that set of rules: *Scope*.
 
-The way we will approach learning about scope is to think of the process in terms of a conversation, a dialogue. A 1-sided conversation isn't really a conversation at all, so we need to first understand *who* is having the conversation.
+The way we will approach learning about scope is to think of the process in terms of a conversation, a dialogue. A one-sided conversation isn't really a conversation at all, so we need to first understand *who* is having the conversation.
 
 ## Compiler Theory
 
-It may be self-obvious, or it may be surprising, depending on your level of interaction with various languages, but despite the fact that JavaScript falls under the general category of "dynamic" or "interpreted" languages, it is in fact a compiled language. It is *not* compiled well in advance, as are many traditionally-compiled languages, nor are the results of compilation portable among various distributed systems.
+It may be self-evident, or it may be surprising, depending on your level of interaction with various languages, but despite the fact that JavaScript falls under the general category of "dynamic" or "interpreted" languages, it is in fact a compiled language. It is *not* compiled well in advance, as are many traditionally-compiled languages, nor are the results of compilation portable among various distributed systems.
 
 But, nevertheless, the JavaScript engine performs many of the same steps, albeit in more sophisticated ways than we may commonly be aware, of any traditional language-compiler.
 
@@ -29,23 +29,23 @@ In traditional compiled-language process, a chunk of source code, your program, 
 
 2. **Parsing:** taking a stream (array) of tokens and turning it into a tree of nested elements, which collectively represent the grammatical structure of the program. This tree is called an "AST" (**A**bstract **S**yntax **T**ree).
 
-    The tree for `var a = 2;` might be a top-level element called `VariableDeclaration`, with a child element called `Identifier` (whose value is `a`), and another child called `AssignmentExpression` who itself has a child called `NumberLiteral` (whose value is `2`).
+    The tree for `var a = 2;` might be a top-level node called `VariableDeclaration`, with a child node called `Identifier` (whose value is `a`), and another child called `AssignmentExpression` which itself has a child called `NumberLiteral` (whose value is `2`).
 
     OK, I know, that's confusing and way too deep! Sorry, I promised we'd explore only what's necessary to learn *Scope*. Stick with me!
 
 3. **Code Generation:** the process of taking an AST and turning it into executable code. This part varies greatly depending on the language, the platform it's targeting, etc.
 
-    So, rather than get mired in details, we'll just hand-waive and say that there's a way to take our above described AST for `var a = 2;` and turn it into a set of machine instructions to actually *create* a variable called `a`, and then store a value into `a`.
+    So, rather than get mired in details, we'll just handwave and say that there's a way to take our above described AST for `var a = 2;` and turn it into a set of machine instructions to actually *create* a variable called `a`, and then store a value into `a`.
 
 The JavaScript engine is vastly more complex than that, as are most other language compilers. For instance, in the process of parsing and code generation, there is almost certainly processes to optimize the performance of the execution, including collapsing redundant elements, etc.
 
-So, I'm painting only with broad strokes, here. But I think you'll see shortly why *these* details, even at a high level, are relevant.
+So, I'm painting only with broad strokes here. But I think you'll see shortly why *these* details, even at a high level, are relevant.
 
 For one thing, JavaScript engines don't get the luxury (like other language compilers) of taking their "sweet time" to optimize. JavaScript compilation doesn't happen ahead of time, in a build step.
 
 For JavaScript, the compilation that occurs happens, in many cases, mere microseconds (or less!) before the code is executed. To ensure the fastest performance, JS engines use all kinds of tricks (like JITs, which lazy compile and even hot re-compile, etc) which are well beyond the "scope" of our discussion here.
 
-Let's just say for simplicity sake that any snippet of JavaScript has to be compiled before (usually *right* before!) it's executed. So, the JS compiler will take `var a = 2;` and compile it *first*, and then be ready to execute it, usually right away.
+Let's just say, for simplicity sake, that any snippet of JavaScript has to be compiled before (usually *right* before!) it's executed. So, the JS compiler will take `var a = 2;` and compile it *first*, and then be ready to execute it, usually right away.
 
 **Wait a minute!** What's all this got to do with the *scope conversation*? Great question.
 
@@ -65,13 +65,13 @@ So, let's break down how *Engine* will approach the program `var a = 2;`.
 
 The first thing *Engine*'s compiler will do with this program is perform lexing to break it down into tokens, then it will parse those tokens into a tree. But next, when the compiler does code generation, it will treat this program somewhat differently than you or I may have assumed.
 
-We might tend to think that it will produce code that could be summed up by this pseudo-code'ish: "allocate space for a variable, call it `a`, then stick the value `3` into that variable."
+We might tend to think that it will produce code that could be summed up by this pseudo-code'ish: "allocate space for a variable, call it `a`, then stick the value `2` into that variable."
 
 *Engine* will instead act like this:
 
 1. Produce code at the beginning of the program (technically at the beginning of the appropriate *Scope*), from the `var a`, that checks the scope to see if a variable `a` already exists. If so, ignore this declaration. Otherwise, declare a new variable called `a` in the current scope.
 
-2. Produce code for the `a = 3` assignment, wherever it appears normally in code flow, which first checks to see if there is a variable called `a` in the current scope. If so, it uses it. If not, it looks *elsewhere* (see *Nested Scope* below). If it eventually finds a variable, it assigns the value `3` to it. If not, it will raise its hand and yell out an error!
+2. Produce code for the `a = 2` assignment, wherever it appears normally in code flow, which first checks to see if there is a variable called `a` in the current scope. If so, it uses it. If not, it looks *elsewhere* (see *Nested Scope* below). If it eventually finds a variable, it assigns the value `2` to it. If not, it will raise its hand and yell out an error!
 
 Hopefully you caught the two distinct actions/statements that *Engine* performs. It first declares a variable (if not previously declared), and then, when executing, it looks up the variable and assigns to it, if found.
 
