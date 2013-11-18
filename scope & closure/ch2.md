@@ -38,11 +38,11 @@ There are three nested scopes inherent in this code example. It may be helpful t
 
 <img src="fig2.png">
 
-Bubble 1 encompasses the global scope, and has just one identifier in it: `foo`.
+**Bubble 1** encompasses the global scope, and has just one identifier in it: `foo`.
 
-Bubble 2 encompasses the scope of `foo`, which includes the two identifiers: `bar` and `b`.
+**Bubble 2** encompasses the scope of `foo`, which includes the two identifiers: `bar` and `b`.
 
-Bubble 3 encompasses the scope of `bar`, and it includes just one identifier: `c`.
+**Bubble 3** encompasses the scope of `bar`, and it includes just one identifier: `c`.
 
 Scope bubbles are defined by where the blocks of scope are written, which one is nested inside the other, etc. In the next chapter, we'll discuss different units of scope, but for now, let's just assume that each function creates a new bubble of scope.
 
