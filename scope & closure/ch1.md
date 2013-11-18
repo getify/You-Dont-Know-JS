@@ -139,33 +139,35 @@ So, what's this whole deal about the conversation?
 
 Let's imagine the above exchange as a conversation. To process that above code snippet, the conversation would go a little something like this:
 
-> *Engine*: Hey *Scope*, I have an RHS reference for `foo`. Ever heard of him?
+> ***Engine***: Hey *Scope*, I have an RHS reference for `foo`. Ever heard of him?
 
-> *Scope*: Why yes, I have. *Compiler* declared him just a second ago. He's a function. Here you go.
+> ***Scope***: Why yes, I have. *Compiler* declared him just a second ago. He's a function. Here you go.
 
-> *Engine*: Great, thanks! OK, I'm executing `foo`.
+> ***Engine***: Great, thanks! OK, I'm executing `foo`.
 
-> *Engine*: Hey, *Scope*, I've got an LHS reference for `a`, ever heard of him?
+> ***Engine***: Hey, *Scope*, I've got an LHS reference for `a`, ever heard of him?
 
-> *Scope*: Why yes, I have. *Compiler declared him as a formal parameter to `foo` just recently. Here you go.
+> ***Scope***: Why yes, I have. *Compiler* declared him as a formal parameter to `foo` just recently. Here you go.
 
-> *Engine*: Helpful as always, *Scope*. Thanks again. Now, time to assign `2` to `a`.
+> ***Engine***: Helpful as always, *Scope*. Thanks again. Now, time to assign `2` to `a`.
 
-> *Engine*: Hey, *Scope*, sorry to bother you again. I need an RHS look-up for `console`. Ever heard of him?
+> ***Engine***: Hey, *Scope*, sorry to bother you again. I need an RHS look-up for `console`. Ever heard of him?
 
-> *Scope*: No problem, *Engine*, this is what I do all day. Yes, I've got `console`. He's built-in. Here ya go.
+> ***Scope***: No problem, *Engine*, this is what I do all day. Yes, I've got `console`. He's built-in. Here ya go.
 
-> *Engine*: Perfect. Looking up `log(..)`. OK, great, it's a function.
+> ***Engine***: Perfect. Looking up `log(..)`. OK, great, it's a function.
 
-> *Engine*: Yo, *Scope*. Can you help me out with an RHS reference to `a`. I think I remember him, but just want to double-check.
+> ***Engine***: Yo, *Scope*. Can you help me out with an RHS reference to `a`. I think I remember him, but just want to double-check.
 
-> *Scope*: You're right, *Engine*. Same guy, hasn't changed. Here ya go.
+> ***Scope***: You're right, *Engine*. Same guy, hasn't changed. Here ya go.
 
-> *Engine*: Cool. Passing the value of `a`, which is `2`, into `log(..)`.
+> ***Engine***: Cool. Passing the value of `a`, which is `2`, into `log(..)`.
 
-> *Engine*: I need to LHS reference `arg1`. You dig?
+> ***Engine***: I need to LHS reference `arg1`. You dig?
 
-> *Scope*: As always, here you go.
+> ***Scope***: As always, here you go.
+
+> ...
 
 ## Quiz
 Check your understanding so far. Make sure to play the part of *Engine* and have a "conversation" with the *Scope*:
@@ -204,13 +206,14 @@ foo(2); // 4
 The RHS reference for `b` cannot be resolved inside the function `foo`, but it can be resolved in the *Scope* surrounding it (in this case, the global, but could just be another *Nested Scope* cousin!).
 
 So, the conversation between *Engine* and *Scope* is:
-> *Engine*: "Hey, *Scope* of `foo`, ever heard of `b`, got an RHS reference for him."
 
-> *Scope*: "Nope, never heard of him. Go fish."
+> ***Engine***: "Hey, *Scope* of `foo`, ever heard of `b`? Got an RHS reference for him."
 
-> *Engine*: "Hey, *Scope* outside of `foo`, oh you're the global *Scope*, ok cool. Ever heard of `b`? Got an RHS reference for him."
+> ***Scope***: "Nope, never heard of him. Go fish."
 
-> *Scope*: "Yep, sure have. Here ya go."
+> ***Engine***: "Hey, *Scope* outside of `foo`, oh you're the global *Scope*, ok cool. Ever heard of `b`? Got an RHS reference for him."
+
+> ***Scope***: "Yep, sure have. Here ya go."
 
 *Nested Scope*'s rules simply are that you start at the inner-most *Scope* you are currently executing, look for a variable there, then if you don't find it, keep going up one level, and looking there, and on up. Once you get to the global *Scope*, nowhere else to go, either you find it, or stop.
 
