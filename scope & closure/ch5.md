@@ -60,7 +60,7 @@ function foo() {
 	var a = 2;
 
 	function bar() {
-		console.log(a); // 2
+		console.log(a);
 	}
 
 	return bar;
@@ -68,7 +68,7 @@ function foo() {
 
 var baz = foo();
 
-baz(); // whoa. closure was just observed, man.
+baz(); //logs 2, whoa. closure was just observed, man.
 ```
 
 DJ, break it down.
@@ -118,7 +118,7 @@ function foo() {
 	var a = 2;
 
 	function baz() {
-		console.log(a); // 2
+		console.log(a); // when invoked logs 2
 	}
 
 	fn = baz;
@@ -130,7 +130,7 @@ function bar() {
 
 foo();
 
-bar();
+bar(); //logs, 2
 ```
 
 Whatever facility we use to *transport* an inner function outside of his lexical scope, he will maintain a scope reference to where he was originally declared, and wherever we execute him, that closure will be exercised.
