@@ -180,6 +180,8 @@ Neither the "scope" of `o2`, nor the scope of `foo(..)`, nor the global scope ev
 
 It is a strange sort of mind-bending thought to see `with` turning, at runtime, an object and its properties into a "scope" *with* "identifiers". But that is the clearest explanation I can give for the results we see.
 
+**Note:** `with` is not allowed if you use `"use strict"`. Which is very much aligned to the fact that Strict mode do not allow automatic/implicit global variable creation.
+
 ### Performance
 
 Both `eval(..)` and `with` cheat the otherwise author-time defined lexical scope by modifying or creating new lexical scope at runtime.
