@@ -29,7 +29,7 @@ In traditional compiled-language process, a chunk of source code, your program, 
 
 2. **Parsing:** taking a stream (array) of tokens and turning it into a tree of nested elements, which collectively represent the grammatical structure of the program. This tree is called an "AST" (**A**bstract **S**yntax **T**ree).
 
-    The tree for `var a = 2;` might be a top-level node called `VariableDeclaration`, with a child node called `Identifier` (whose value is `a`), and another child called `AssignmentExpression` which itself has a child called `NumberLiteral` (whose value is `2`).
+    The tree for `var a = 2;` might be a top-level node called `VariableDeclaration`, with a child node called `Identifier` (whose value is `a`), and another child called `AssignmentExpression` which itself has a child called `NumericLiteral` (whose value is `2`).
 
     OK, I know, that's confusing and way too deep! Sorry, I promised we'd explore only what's necessary to learn *Scope*. Stick with me!
 
@@ -203,13 +203,13 @@ foo(2); // 4
 
 The RHS reference for `b` cannot be resolved inside the function `foo`, but it can be resolved in the *Scope* surrounding it (in this case, the global, but could just be another *Nested Scope* cousin!).
 
-So, the conversation between *Engine* and *Scope* is: 
-> *Engine*: "Hey, *Scope* of `foo`, ever heard of `b`, got an RHS reference for him." 
+So, the conversation between *Engine* and *Scope* is:
+> *Engine*: "Hey, *Scope* of `foo`, ever heard of `b`, got an RHS reference for him."
 
-> *Scope*: "Nope, never heard of him. Go fish." 
+> *Scope*: "Nope, never heard of him. Go fish."
 
 > *Engine*: "Hey, *Scope* outside of `foo`, oh you're the global *Scope*, ok cool. Ever heard of `b`? Got an RHS reference for him."
- 
+
 > *Scope*: "Yep, sure have. Here ya go."
 
 *Nested Scope*'s rules simply are that you start at the inner-most *Scope* you are currently executing, look for a variable there, then if you don't find it, keep going up one level, and looking there, and on up. Once you get to the global *Scope*, nowhere else to go, either you find it, or stop.
