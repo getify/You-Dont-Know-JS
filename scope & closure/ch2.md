@@ -62,7 +62,7 @@ Had there been a `c` both inside of `bar(..)` and inside of `foo(..)`, the `cons
 
 **Scope look-up stops once it finds the first match**. The same identifier name can be specified at multiple layers of nested scope, which is called "shadowing" (the inner identifer "shadows" the outer identifier). Regardless of shadowing, scope look-up always starts at the innermost scope being executed at the time, and works its way outward/upward until the first match, and stops.
 
-**Note:** Global variables automatically become properties of the global object (`window` in browsers, etc), so it *is* possible to reference a global variable not directly by its lexical name, but instead indirectly as a property reference of the global object. 
+**Note:** Global variables automatically become properties of the global object (`window` in browsers, etc), so it *is* possible to reference a global variable not directly by its lexical name, but instead indirectly as a property reference of the global object.
 
 ```js
 window.a
@@ -179,6 +179,8 @@ Understood in this way, the "scope" declared by the `with` statement when we pas
 Neither the "scope" of `o2`, nor the scope of `foo(..)`, nor the global scope even, had an `a` identifier to be found, so when `a = 2` was executed, it resulted in the automatic-global being created.
 
 It is a strange sort of mind-bending thought to see `with` turning, at runtime, an object and its properties into a "scope" *with* "identifiers". But that is the clearest explanation I can give for the results we see.
+
+**Note:** In addition to being a bad idea to use, both `eval(..)` and `with` are affected (restricted) by Strict Mode. `with` is outright disallowed, whereas various forms of indirect or unsafe `eval(..)` are disallowed while retaining the core functionality. Don't use them.
 
 ### Performance
 
