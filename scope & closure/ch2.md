@@ -38,11 +38,11 @@ There are three nested scopes inherent in this code example. It may be helpful t
 
 <img src="fig2.png">
 
-Bubble 1 encompasses the global scope, and has just one identifier in it: `foo`.
+**Bubble 1** encompasses the global scope, and has just one identifier in it: `foo`.
 
-Bubble 2 encompasses the scope of `foo`, which includes the two identifiers: `bar` and `b`.
+**Bubble 2** encompasses the scope of `foo`, which includes the two identifiers: `bar` and `b`.
 
-Bubble 3 encompasses the scope of `bar`, and it includes just one identifier: `c`.
+**Bubble 3** encompasses the scope of `bar`, and it includes just one identifier: `c`.
 
 Scope bubbles are defined by where the blocks of scope are written, which one is nested inside the other, etc. In the next chapter, we'll discuss different units of scope, but for now, let's just assume that each function creates a new bubble of scope.
 
@@ -62,7 +62,13 @@ Had there been a `c` both inside of `bar(..)` and inside of `foo(..)`, the `cons
 
 **Scope look-up stops once it finds the first match**. The same identifier name can be specified at multiple layers of nested scope, which is called "shadowing" (the inner identifer "shadows" the outer identifier). Regardless of shadowing, scope look-up always starts at the innermost scope being executed at the time, and works its way outward/upward until the first match, and stops.
 
-**Note:** Global variables automatically become properties of the global object (`window` in browsers, etc), so it *is* possible to reference a global variable not directly by its lexical name, but instead indirectly as a property reference of the global object. This technique gives access to a global variable which would otherwise be inaccessible due to it being shadowed. However, non-global shadowed variables cannot be accessed.
+**Note:** Global variables automatically become properties of the global object (`window` in browsers, etc), so it *is* possible to reference a global variable not directly by its lexical name, but instead indirectly as a property reference of the global object. 
+
+```js
+window.a
+```
+
+This technique gives access to a global variable which would otherwise be inaccessible due to it being shadowed. However, non-global shadowed variables cannot be accessed.
 
 No matter *where* a function is invoked from, or even *how* it is invoked, its lexical scope is **only** defined by where the function was declared.
 
@@ -173,6 +179,8 @@ Understood in this way, the "scope" declared by the `with` statement when we pas
 Neither the "scope" of `o2`, nor the scope of `foo(..)`, nor the global scope even, had an `a` identifier to be found, so when `a = 2` was executed, it resulted in the automatic-global being created.
 
 It is a strange sort of mind-bending thought to see `with` turning, at runtime, an object and its properties into a "scope" *with* "identifiers". But that is the clearest explanation I can give for the results we see.
+
+**Note:** `with` is not allowed if you use `"use strict"`. Which is very much aligned to the fact that Strict mode do not allow automatic/implicit global variable creation.
 
 ### Performance
 
