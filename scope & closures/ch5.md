@@ -439,6 +439,7 @@ var foo = (function CoolModule(id) {
 	}
 
 	var publicAPI = {
+		change: change,
 		identify: identify1
 	};
 
