@@ -617,7 +617,7 @@ var obj = {
 	a: 2
 };
 
-foo.call(this); // 2
+foo.call(obj); // 2
 ```
 
 While arrow-functions provide an alternative to using `bind(..)` on a function to ensure its `this`, which can seem attractive, it's important to note that they essentially are disabling the traditional `this` mechanism in favor of the more widely-understood lexical scoping. Pre ES-6, we already have a fairly common pattern for doing so, which is basically almost indistinguishable from the spirit of ES6 arrow-functions:
@@ -634,7 +634,7 @@ var obj = {
 	a: 2
 };
 
-foo.call(this); // 2
+foo.call(obj); // 2
 ```
 
 While `self = this` and arrow-functions both seem like good "solutions" to not wanting to use `bind(..)`, they are essentially fleeing from `this` instead of understanding and embracing it.
