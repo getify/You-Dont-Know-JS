@@ -483,7 +483,7 @@ console.log(obj1.a); // 2
 console.log(baz.a); // 3
 ```
 
-Whoa! Look at how `new bar(3)` did **not** overwrite `obj1.a` to be `3` as you ight have expected. Instead, the *hard bound* (to `obj1`) call to `bar(..)` ***is*** able to be overriden with `new`, which is how `baz.a` instead ends up as the value `3`.
+Whoa! Look at how `new bar(3)` did **not** overwrite `obj1.a` to be `3` as you might have expected. Instead, the *hard bound* (to `obj1`) call to `bar(..)` ***is*** able to be overriden with `new`, which is how `baz.a` instead ends up as the value `3`.
 
 This is surprising if you go back to our "fake" bind helper:
 
