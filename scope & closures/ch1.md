@@ -131,7 +131,7 @@ You may have missed the implied `a = 2` in this code snippet. It happens when th
 
 There's another RHS reference, for the value of `a`, and that value is passed to `console.log(..)`. But then, `console.log(..)` needs a reference. It's an RHS, first for the `console` object, then a property-resolution occurs to see if it has a method called `log`.
 
-Finally, we can conceptualize that there's an LHS/RHS exchange of passing the value `2` (by way of variable `a`'s RHS look-up) into `log(..)`. Inside of the native implementation of `log(..)`, we can assume it has parameters, the first of which (perhaps called `arg1`) is has an LHS reference look-up, before assigning `2` to it.
+Finally, we can conceptualize that there's an LHS/RHS exchange of passing the value `2` (by way of variable `a`'s RHS look-up) into `log(..)`. Inside of the native implementation of `log(..)`, we can assume it has parameters, the first of which (perhaps called `arg1`) has an LHS reference look-up, before assigning `2` to it.
 
 ### Conversation?
 
