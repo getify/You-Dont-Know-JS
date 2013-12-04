@@ -40,7 +40,7 @@ There are three nested scopes inherent in this code example. It may be helpful t
 
 **Bubble 1** encompasses the global scope, and has just one identifier in it: `foo`.
 
-**Bubble 2** encompasses the scope of `foo`, which includes the two identifiers: `bar` and `b`.
+**Bubble 2** encompasses the scope of `foo`, which includes the three identifiers: `a`, `bar` and `b`.
 
 **Bubble 3** encompasses the scope of `bar`, and it includes just one identifier: `c`.
 
