@@ -85,7 +85,7 @@ But the "magic" of closures does not let this happen. Because the inner function
 
 **`bar()` still has a reference to that scope, and that reference is called closure.**
 
-So, a few microseconds later, when the variable `baz` is invoked, being just another reference to the inner function we initially labeled `bar`, this inner function executes, and duly has *access* to his normal lexical scope, so he can access the variable `a` just as we'd see before.
+So, a few microseconds later, when the variable `baz` is invoked, being just another reference to the inner function we initially labeled `bar`, this inner function executes, and duly has *access* to his normal lexical scope, so he can access the variable `a` just as we'd seen before.
 
 But the inner function is being invoked well outside of his lexical scope. The "magic" that allows him to maintain a reference to access his lexical scope even though he's no longer *acting inside* that scope is... you guessed it: **closure**.
 
