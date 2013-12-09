@@ -12,3 +12,8 @@
 	* Nothing But Rules
 	* Everything In Order
 	* Lexical `this`
+* Chapter 3: Objects
+	* Syntax
+	* Type
+	* Contents
+* Chapter 4: Prototype
