@@ -42,7 +42,7 @@ baz(); // <-- call-site for `baz`
 
 Take care when analyzing code to find the actual call-site (from the call-stack), because it's the only thing that matters for `this` binding.
 
-## Rules, Nothing But Rules
+## Nothing But Rules
 
 We turn our attention now to *how* the call-site determines where `this` will point during the execution of a function.
 
@@ -403,7 +403,7 @@ console.log(bar.a); // 2
 
 By calling `foo(..)` with `new` in front of it, we've constructed a new object and set that new object as the `this` for the call of `foo(..)`. **So `new` is the final way that a function call's `this` can be bound.** We'll call this *new binding*.
 
-## Ordered Rules
+## Everything In Order
 
 So, now we've uncovered the 4 rules for binding `this` in function calls. *All* you need to do is find the call-site and inspect it to see which rule applies. But, what if the call-site has multiple eligible rules? There must be an order of precedence to these rules, and so we will next demonstrate what order to ask the rules in.
 

@@ -9,6 +9,6 @@
 	* What's `this`?
 * Chapter 2: `this` All Makes Sense Now!
 	* Call-site
-	* Rules, Nothing But Rules
-	* Ordered Rules
+	* Nothing But Rules
+	* Everything In Order
 	* Lexical `this`
