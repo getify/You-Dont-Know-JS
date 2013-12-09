@@ -351,7 +351,7 @@ myObject.a; // 4
 
 ### Existence
 
-We showed earlier that a property access like `myObject.a` may result in an `undefined` value if either the explicit `undefined` is stored there or the the `a` property doesn't exist at all. So, if the value is the same in both cases, how else do we distinguish them?
+We showed earlier that a property access like `myObject.a` may result in an `undefined` value if either the explicit `undefined` is stored there or the `a` property doesn't exist at all. So, if the value is the same in both cases, how else do we distinguish them?
 
 We can ask an object if it has a certain property *without* asking to get that property's value:
 
