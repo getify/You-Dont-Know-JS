@@ -25,7 +25,7 @@ The constructed form and the literal form result in exactly the same sort of obj
 
 ## Type
 
-Objects are the general building block upon which a lot of the rest of JS is built. They are one of the 7 primary (primitive) types in JS:
+Objects are the general building block upon which much of JS is built. They are one of the 6 primary types (called "language types" in the specification) in JS:
 
 * `string`
 * `number`
@@ -33,7 +33,6 @@ Objects are the general building block upon which a lot of the rest of JS is bui
 * `null`
 * `undefined`
 * `object`
-* `function`
 
 Note that the *simple primitives* (`string`, `boolean`, `number`, `null`, and `undefined`) are **not** themselves `objects`. `null` is sometimes referred to as an object type, but this misconception stems from a bug in the language which causes `typeof null` to return the string `"object"` incorrectly (and confusingly). In fact, `null` is its own primitive type.
 
@@ -43,11 +42,11 @@ By contrast, there *are* a few special object sub-types, which we can refer to a
 
 `function` is a sub-type of objects (technically, a "callable object"). Functions in JS are said to be "first class" in that they are basically just normal objects (with callable behavior semantics bolted on), and so they can be handled like any other plain object.
 
-Arrays are also a form of objects, with special-case behavior. The organization of contents in arrays is slightly more structured than in general objects.
+Arrays are also a form of objects, with extra behavior. The organization of contents in arrays is slightly more structured than for general objects.
 
 ### Built-in Objects
 
-There are several other object sub-types, usually referred to as built-in objects. For some of them, their names seem to imply they are directly related to the simple primitives counter-parts, but in fact, their relationship is more complicated, which we'll explore shortly.
+There are several other object sub-types, usually referred to as built-in objects. For some of them, their names seem to imply they are directly related to their simple primitives counter-parts, but in fact, their relationship is more complicated, which we'll explore shortly.
 
 * `String`
 * `Number`
@@ -61,7 +60,7 @@ There are several other object sub-types, usually referred to as built-in object
 
 These built-ins have the appearance of being actual types, even classes, if you rely on the similarity to other languages such as Java's `String` class.
 
-But in JS, these are actually just built-in functions. Each of these functions can be used as a constructor (that is, a function call with the `new` operator), with the result being a newly *constructed* object of the object sub-type in question. For instance:
+But in JS, these are actually just built-in functions. Each of these functions can be used as a constructor (that is, a function call with the `new` operator), with the result being a newly *constructed* object of the sub-type in question. For instance:
 
 ```js
 var strPrimitive = "I am a string";
@@ -76,7 +75,7 @@ strObject instanceof String; // true
 Object.prototype.toString.call( strObject ); // [object String]
 ```
 
-We'll see in detail in a later chapter exactly how the `Object.prototype.toString...` bit works, but briefly, we can inspect the internal sub-type (known in the language specification as ``[[Class]]``) by borrowing the base default `toString()` method, and you can see it reveals that `strObject` is an object that was in fact created by the `String` constructor.
+We'll see in detail in a later chapter exactly how the `Object.prototype.toString...` bit works, but briefly, we can inspect the internal sub-type (known in the specification as ``[[Class]]``) by borrowing the base default `toString()` method, and you can see it reveals that `strObject` is an object that was in fact created by the `String` constructor.
 
 The primitive value `"I am a string"` is not an object, it's a primitive literal and immutable value. To perform operations on it, such as checking its length, modifying its contents, etc, a `String` object is required.
 
