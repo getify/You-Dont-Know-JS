@@ -448,7 +448,7 @@ var foo = (function CoolModule(id) {
 
 foo.identify(); // foo module
 foo.change();
-foo.idenfify(); // FOO MODULE
+foo.identify(); // FOO MODULE
 ```
 
 By retaining an inner reference to the public API object inside your module instance, you can modify that instance, including adding and removing methods, properties, and changing their values.
