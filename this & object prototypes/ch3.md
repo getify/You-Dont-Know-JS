@@ -502,7 +502,7 @@ var myObjectIterator = (function(){
 
 			return ret;
 		}
-	}
+	};
 })();
 
 // for (var v of myObject) {
