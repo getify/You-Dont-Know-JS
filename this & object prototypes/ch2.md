@@ -31,7 +31,7 @@ function bar() {
 
 function baz() {
 	// call-stack is: `baz`
-	// so, our call-size is in the global scope
+	// so, our call-site is in the global scope
 
 	console.log("baz");
 	bar(); // <-- call-site for `bar`
