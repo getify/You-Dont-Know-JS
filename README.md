@@ -10,8 +10,8 @@ Please feel free to contribute to the quality of this content by submitting PR's
 
 * ["Scope & Closures"](scope & closures/README.md) (draft complete)
 * ["this & Object Prototypes"](this & object prototypes/README.md) (draft in progress)
-* "Grammar & Types" (planned)
-* "Performance" (planned)
+* "Types & Grammar" (planned)
+* "Async & Performance" (planned)
 
 ## Publishing
 
