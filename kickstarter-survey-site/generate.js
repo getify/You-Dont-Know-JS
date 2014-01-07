@@ -155,6 +155,59 @@ function setRewardLevelFlags(level,record) {
 	}
 }
 
+function emailUser(userID,userData) {
+	return ASQ(function(done){
+		var email_subject = grips.render("email-invite#subject",{
+			name: userData["Backer Name"]
+		});
+		var email_body = grips.render("email-invite#body",{
+			name: userData["Backer Name"],
+			email: userData["Email"],
+			user_id: userID
+		});
+
+		smtpTransport.sendMail({
+			from: "'You Don't Know JS' Kickstarter <getify+ydkjs@gmail.com>",
+			to: userData["Email"],
+			subject: email_subject,
+			text: email_body
+		},function(err,res){
+			if (err) {
+				done.fail("Error emailing " + userData["Email"] +": " + err);
+			}
+			else {
+				console.log("Email sent: " + userData["Email"]);
+				done();
+			}
+		});
+	});
+}
+
+function reEmailUser(emailAddress) {
+	var email_hash = sha1(emailAddress);
+
+	return getFromDB(
+		/*key=*/"email:" + email_hash,
+		/*fields=*/"user_id"
+	)
+	.seq(function(emailData){
+		return getFromDB(
+			/*key=*/"user:" + emailData.user_id,
+			/*fields=*/["name","email"]
+		)
+		.val(function(userData){
+			return ASQ.messages(
+				/*userID=*/emailData.user_id,
+				/*userData=*/{
+					"Backer Name": userData.name,
+					"Email": userData.email
+				}
+			);
+		});
+	})
+	.seq(emailUser);
+}
+
 function runGeneration() {
 	getCSVRecords(path.join(__dirname,"csv"))
 	.seq(function(rewardLevels){
@@ -182,29 +235,8 @@ function runGeneration() {
 		var segments = Array.prototype.slice.call(arguments)
 		.map(function(arg){
 			return function __segment__(done) {
-				var email_subject = grips.render("email-invite#subject",{
-					name: arg[1]["Backer Name"]
-				});
-				var email_body = grips.render("email-invite#body",{
-					name: arg[1]["Backer Name"],
-					email: arg[1]["Email"],
-					user_id: arg[0]
-				});
-
-				smtpTransport.sendMail({
-					from: "'You Don't Know JS' Kickstarter <getify+ydkjs@gmail.com>",
-					to: arg[1]["Email"],
-					subject: email_subject,
-					text: email_body
-				},function(err,res){
-					if (err) {
-						done.fail("Error: " + err);
-					}
-					else {
-						console.log("Email sent: " + arg[1]["Email"]);
-						done();
-					}
-				});
+				emailUser(arg[0],arg[1])
+				.pipe(done);
 			};
 		});
 
@@ -212,6 +244,7 @@ function runGeneration() {
 		.gate.apply(ø,segments)
 		.val(function(){
 			DB_store.connection.end();
+			smtpTransport.close();
 			console.log("All done");
 		});
 	})
@@ -471,6 +504,16 @@ redis.connect({
 		DB_store = db;
 
 		runGeneration();
+
+		/*reEmailUser("..")
+		.val(function(){
+			DB_store.connection.end();
+			smtpTransport.close();
+		})
+		.or(function(){
+			DB_store.connection.end();
+			smtpTransport.close();
+		});*/
 	},
 	// connection error
 	function(err){
