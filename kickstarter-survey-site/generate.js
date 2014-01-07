@@ -109,13 +109,13 @@ function setRewardLevelFlags(level,record) {
 			record["pick_shirt"] = "true";
 			break;
 		case "reward=35 1":
+			record["reward_level"] = "$35: EbookMe(x) + BookMe(1)";
+			record["pick_shipping"] = "true";
+			break;
+		case "reward=35 2":
 			record["reward_level"] = "$35: EbookMe(x) + TshirtMe(1)";
 			record["pick_shipping"] = "true";
 			record["pick_shirt"] = "true";
-			break;
-		case "reward=35 2":
-			record["reward_level"] = "$35: EbookMe(x) + BookMe(1)";
-			record["pick_shipping"] = "true";
 			break;
 		case "reward=38":
 			record["reward_level"] = "$38: AvatarMe(1) + EbookMe(x)";
