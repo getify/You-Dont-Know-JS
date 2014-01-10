@@ -5,4 +5,7 @@
 * [Chapter 1: *this* Or That?](ch1.md)
 * [Chapter 2: *this* All Makes Sense Now!](ch2.md)
 * [Chapter 3: Objects](ch3.md)
-* Chapter 4: Prototype
+* Chapter 4: Class Copies
+* Chapter 5: Prototypes
+* Chapter 6: Behavior Delegation
+* Appendix A: *class* Keyword
