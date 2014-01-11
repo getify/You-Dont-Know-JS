@@ -252,7 +252,7 @@ The `myObject.a` is a property access, but it doesn't *just* look in `myObject` 
 
 According to the spec, the code above actually performs a `[[Get]]` operation (kinda like a function call: `[[Get]]()`) on the `myObject`. The default built-in `[[Get]]` operation for an object *first* inspects the object for a property of the requested name, and if it finds it, it will return the value accordingly.
 
-However, the `[[Get]]` algorithm defines other important behavior if it does *not* find a property of the requested name. We will examine in a subsequent chapter what happens *next* (traversal of the `[[Prototype]]` chain, if any).
+However, the `[[Get]]` algorithm defines other important behavior if it does *not* find a property of the requested name. We will examine in Chapter 5 what happens *next* (traversal of the `[[Prototype]]` chain, if any).
 
 But one important result of this `[[Get]]` operation is that if it cannot through any means come up with a value for the requested property, it instead returns the value `undefined`.
 

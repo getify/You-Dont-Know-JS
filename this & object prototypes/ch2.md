@@ -388,7 +388,7 @@ When a function is invoked with `new` in front of it, otherwise known as a const
 3. the newly constructed object is set as the `this` binding for that function call
 4. unless the function returns its own alternate **object**, the `new`-invoked function call will *automatically* return the newly constructed object.
 
-Steps 1, 3, and 4 apply to our current discussion. We'll skip over step 2 for now and come back to it shortly.
+Steps 1, 3, and 4 apply to our current discussion. We'll skip over step 2 for now and come back to in Chapter 5.
 
 Consider this code:
 
