@@ -17,11 +17,9 @@ It may be self-evident, or it may be surprising, depending on your level of inte
 
 But, nevertheless, the JavaScript engine performs many of the same steps, albeit in more sophisticated ways than we may commonly be aware, of any traditional language-compiler.
 
-As this is not really a book on compiler theory, I will try to keep our discussion here brief and not too overwhelming. But it is important for you to understand some of the ways the engine works, so that you can understand that *conversation* that occurs about scope.
-
 ### Compilation
 
-In traditional compiled-language process, a chunk of source code, your program, would undergo typically three steps *before* it is executed, roughly called "compilation":
+In traditional compiled-language process, a chunk of source code, your program, will undergo typically three steps *before* it is executed, roughly called "compilation":
 
 1. **Tokenizing/Lexing:** breaking up a string of characters into meaningful (to the language) chunks, called tokens. For instance, consider the program: `var a = 2;`. This program would likely be broken up into the following tokens: `var`, `a`, `=`, `2`, and `;`. Whitespace may or may not be persisted as a token, depending on whether its meaningful or not.
 
@@ -31,17 +29,15 @@ In traditional compiled-language process, a chunk of source code, your program, 
 
     The tree for `var a = 2;` might be a top-level node called `VariableDeclaration`, with a child node called `Identifier` (whose value is `a`), and another child called `AssignmentExpression` which itself has a child called `NumericLiteral` (whose value is `2`).
 
-    OK, I know, that's confusing and way too deep! Sorry, I promised we'd explore only what's necessary to learn *Scope*. Stick with me!
-
 3. **Code-Generation:** the process of taking an AST and turning it into executable code. This part varies greatly depending on the language, the platform it's targeting, etc.
 
     So, rather than get mired in details, we'll just handwave and say that there's a way to take our above described AST for `var a = 2;` and turn it into a set of machine instructions to actually *create* a variable called `a`, and then store a value into `a`.
 
-The JavaScript engine is vastly more complex than that, as are most other language compilers. For instance, in the process of parsing and code-generation, there is almost certainly processes to optimize the performance of the execution, including collapsing redundant elements, etc.
+The JavaScript engine is vastly more complex than that, as are most other language compilers. For instance, in the process of parsing and code-generation, there is almost certainly steps to optimize the performance of the execution, including collapsing redundant elements, etc.
 
 So, I'm painting only with broad strokes here. But I think you'll see shortly why *these* details, even at a high level, are relevant.
 
-For one thing, JavaScript engines don't get the luxury (like other language compilers) of taking their "sweet time" to optimize. JavaScript compilation doesn't happen ahead of time, in a build step.
+For one thing, JavaScript engines don't get the luxury (like other language compilers) of "taking their sweet time" to optimize. JavaScript compilation doesn't happen ahead of time, in a build step.
 
 For JavaScript, the compilation that occurs happens, in many cases, mere microseconds (or less!) before the code is executed. To ensure the fastest performance, JS engines use all kinds of tricks (like JITs, which lazy compile and even hot re-compile, etc) which are well beyond the "scope" of our discussion here.
 
@@ -51,11 +47,11 @@ Let's just say, for simplicity sake, that any snippet of JavaScript has to be co
 
 ### The Cast
 
-Let's meet the cast of characters that interact in the conversations we'll listen in on shortly:
+Let's meet the cast of characters that interact to handle code like `var a = 2;`, so we understand their conversations that we'll listen in on shortly:
 
-1. *Engine*: handles start-to-finish compilation and execution of our JavaScript program.
+1. *Engine*: responsible for start-to-finish compilation and execution of our JavaScript program.
 
-2. *Compiler*: one *Engine*'s friends; handles all the dirty work of parsing and code-generation (see previous section).
+2. *Compiler*: one of *Engine*'s friends; handles all the dirty work of parsing and code-generation (see previous section).
 
 3. *Scope*: another friend of *Engine*; collects and maintains a look-up list of all the declared identifiers (variables), and enforces a strict set of rules as to how these are accessible to currently executing code.
 
