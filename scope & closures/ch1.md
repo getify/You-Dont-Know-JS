@@ -33,11 +33,11 @@ In traditional compiled-language process, a chunk of source code, your program, 
 
     OK, I know, that's confusing and way too deep! Sorry, I promised we'd explore only what's necessary to learn *Scope*. Stick with me!
 
-3. **Code Generation:** the process of taking an AST and turning it into executable code. This part varies greatly depending on the language, the platform it's targeting, etc.
+3. **Code-Generation:** the process of taking an AST and turning it into executable code. This part varies greatly depending on the language, the platform it's targeting, etc.
 
     So, rather than get mired in details, we'll just handwave and say that there's a way to take our above described AST for `var a = 2;` and turn it into a set of machine instructions to actually *create* a variable called `a`, and then store a value into `a`.
 
-The JavaScript engine is vastly more complex than that, as are most other language compilers. For instance, in the process of parsing and code generation, there is almost certainly processes to optimize the performance of the execution, including collapsing redundant elements, etc.
+The JavaScript engine is vastly more complex than that, as are most other language compilers. For instance, in the process of parsing and code-generation, there is almost certainly processes to optimize the performance of the execution, including collapsing redundant elements, etc.
 
 So, I'm painting only with broad strokes here. But I think you'll see shortly why *these* details, even at a high level, are relevant.
 
@@ -47,37 +47,43 @@ For JavaScript, the compilation that occurs happens, in many cases, mere microse
 
 Let's just say, for simplicity sake, that any snippet of JavaScript has to be compiled before (usually *right* before!) it's executed. So, the JS compiler will take `var a = 2;` and compile it *first*, and then be ready to execute it, usually right away.
 
-**Wait a minute!** What's all this got to do with the *scope conversation*? Great question.
+**Wait a minute!** What's all this got to do with the *scope conversation*?
 
-### Meet: *Engine*
+### The Cast
 
-For our purposes, we are going to anthropomorphize the JavaScript engine. In other words, we're going to treat it like someone we *can* actually have a conversation with.
+Let's meet the cast of characters that interact in the conversations we'll listen in on shortly:
 
-So, Reader, meet *Engine*, *Engine*, meet our Reader. Shake hands.
+1. *Engine*: handles start-to-finish compilation and execution of our JavaScript program.
 
-For you to *fully understand* how JavaScript works, you need to begin to *think* like *Engine* thinks, ask the questions *Engine* asks, and answer those questions how *Engine* answers them.
+2. *Compiler*: one *Engine*'s friends; handles all the dirty work of parsing and code-generation (see previous section).
+
+3. *Scope*: another friend of *Engine*; collects and maintains a look-up list of all the declared identifiers (variables), and enforces a strict set of rules as to how these are accessible to currently executing code.
+
+For you to *fully understand* how JavaScript works, you need to begin to *think* like *Engine* (and friends) think, ask the questions they ask, and answer those questions the same.
 
 ## Scope Conversations
 
-When you see the program `var a = 2;`, you most likely see that as one statement. But that is not how our new friend *Engine* sees it. In fact, *Engine* sees two distinct statements, one which it will handle in compilation, and one which it will handle in execution.
+When you see the program `var a = 2;`, you most likely think of that as one statement. But that's not how our new friend *Engine* sees it. In fact, *Engine* sees two distinct statements, one which *Compiler* will handle during compilation, and one which *Engine* will handle during execution.
 
-So, let's break down how *Engine* will approach the program `var a = 2;`.
+So, let's break down how *Engine* and friends will approach the program `var a = 2;`.
 
-The first thing *Engine*'s compiler will do with this program is perform lexing to break it down into tokens, then it will parse those tokens into a tree. But next, when the compiler does code generation, it will treat this program somewhat differently than you or I may have assumed.
+The first thing *Compiler* will do with this program is perform lexing to break it down into tokens, which it will then parse into a tree. But when *Compiler* gets to code-generation, it will treat this program somewhat differently than perhaps assumed.
 
-We might tend to think that it will produce code that could be summed up by this pseudo-code'ish: "allocate space for a variable, call it `a`, then stick the value `2` into that variable."
+A reasonable assumption would be that *Compiler* will produce code that could be summed up by this pseudo-code: "Allocate memory for a variable, label it `a`, then stick the value `2` into that variable." Unfortunately, that's not quite accurate.
 
-*Engine* will instead act like this:
+*Compiler* will instead proceed as:
 
-1. Produce code at the beginning of the program (technically at the beginning of the appropriate *Scope*), from the `var a`, that checks the scope to see if a variable `a` already exists. If so, ignore this declaration. Otherwise, declare a new variable called `a` in the current scope.
+1. Encountering `var a`, *Compiler* asks *Scope* to see if a variable `a` already exists for that particular scope collection. If so, *Compiler* ignores this declaration and moves on. Otherwise, *Compiler* asks *Scope* to declare a new variable called `a` for that scope collection.
 
-2. Produce code for the `a = 2` assignment, wherever it appears normally in code flow, which first checks to see if there is a variable called `a` in the current scope. If so, it uses it. If not, it looks *elsewhere* (see *Nested Scope* below). If it eventually finds a variable, it assigns the value `2` to it. If not, it will raise its hand and yell out an error!
+2. *Compiler* then produces code for *Engine* to later execute, to handle the `a = 2` assignment. The code *Engine* runs will first ask *Scope* if there is a variable called `a` accessible in the current scope collection. If so, *Engine* uses that variable. If not, *Engine* looks *elsewhere* (see *Nested Scope* section below).
 
-Hopefully you caught the two distinct actions/statements that *Engine* performs. It first declares a variable (if not previously declared), and then, when executing, it looks up the variable and assigns to it, if found.
+If *Engine* eventually finds a variable, it assigns the value `2` to it. If not, *Engine* will raise its hand and yell out an error!
+
+To summaraize: two distinct actions are taken for a variable assignment: First, *Compiler* declares a variable (if not previously declared), and second, when executing, *Engine* looks up the variable in *Scope* and assigns to it, if found.
 
 ### Compiler Speak
 
-OK, I have to introduce a little bit more compiler-talk. I promise, it's important.
+We need a little bit more compiler terminology to proceed further with understanding.
 
 When *Engine* executes the code that *Compiler* produced for step (2), he has to look-up the variable `a` to see if it has been declared, and this look-up is exercising *Scope*. But the type of look-up he performs affects the outcome of the look-up.
 
@@ -91,7 +97,7 @@ In other words, an LHS look-up is done when a variable appears on the left-hand 
 
 Actually, let's be a little more precise. An RHS look-up is indistiguishable, for our purposes, from simply a look-up of the value of some variable, whereas the LHS look-up is trying to find the variable container itself, so that it can assign. In this way, RHS doesn't *really* mean "right-hand side of an assignment" per se, it just, more accurately, means "not left-hand side".
 
-Being slightly glib for a moment, you could say "RHS" instead means "retrieve his source (value)", implying that RHS means "go get the value of...".
+Being slightly glib for a moment, you could also say "RHS" instead means "retrieve his/her source (value)", implying that RHS means "go get the value of...".
 
 Let's dig into that deeper.
 
@@ -111,9 +117,9 @@ a = 2;
 
 The reference to `a` here is an LHS reference, because we don't actually care what the current value is, we simply want to find the variable as a target for the `= 2` assignment operation.
 
-**Note:** LHS and RHS meaning "left/right-hand side of an assigment" doesn't necessarily literally imply "... side of the `=` assignment operator". There are several other ways that assignments happen, and so you have to conceptually think about it as: "who's the target of the assignment (LHS)" and "who's the source of the assignment (RHS)".
+**Note:** LHS and RHS meaning "left/right-hand side of an assigment" doesn't necessarily literally mean "left/right side of the `=` assignment operator". There are several other ways that assignments happen, and so it's better to conceptually think about it as: "who's the target of the assignment (LHS)" and "who's the source of the assignment (RHS)".
 
-Consider this program. There are both LHS and RHS references going on here.
+Consider this program, which has both LHS and RHS references:
 
 ```js
 function foo(a) {
@@ -123,21 +129,31 @@ function foo(a) {
 foo(2);
 ```
 
-Firstly, `foo(..)` is an RHS reference to `foo`, meaning, "go look-up the value of `foo`, and give it to me." Moreover, `(..)` means I want to execute it, so it'd better actually be a function!
+The line that invokes `foo(..)` as a function call requires an RHS reference to `foo`, meaning, "go look-up the value of `foo`, and give it to me." Moreover, `(..)` means the value of `foo` should be executed, so it'd better actually be a function!
 
-There's a subtle but important assignment here. Did you spot it?
+There's a subtle but important assignment here. **Did you spot it?**
 
-You may have missed the implied `a = 2` in this code snippet. It happens when the value `2` is passed as an argument to the `foo(..)` function, in which case that value is **assigned** to the parameter `a`. The `LHS` reference look-up here is the parameter `a`.
+You may have missed the implied `a = 2` in this code snippet. It happens when the value `2` is passed as an argument to the `foo(..)` function, in which case the `2` value is **assigned** to the parameter `a`. To (implicitly) assign to parameter `a`, an LHS look-up is performed.
 
-There's another RHS reference, for the value of `a`, and that value is passed to `console.log(..)`. But then, `console.log(..)` needs a reference. It's an RHS, first for the `console` object, then a property-resolution occurs to see if it has a method called `log`.
+There's also an RHS reference for the value of `a`, and that resulting value is passed to `console.log(..)`. `console.log(..)` needs a reference to execute. It's an RHS look-up for the `console` object, then a property-resolution occurs to see if it has a method called `log`.
 
 Finally, we can conceptualize that there's an LHS/RHS exchange of passing the value `2` (by way of variable `a`'s RHS look-up) into `log(..)`. Inside of the native implementation of `log(..)`, we can assume it has parameters, the first of which (perhaps called `arg1`) has an LHS reference look-up, before assigning `2` to it.
 
+**Note:** You might be tempted to conceptualize the function declaration `function foo(a) {...` as a normal variable declaration and assignment, such as `var foo` and `foo = function(a){...`. In so doing, it would be tempting to think of this function declaration as involving an LHS look-up.
+
+However, the subtle but important difference is that *Compiler* handles both the declaration and the value definition during code-generation, such that when *Engine* is executing code, there's no processing necessary to "assign" a function value to `foo`. Thus, it's not really appropriate to think of a function declaration as an LHS look-up assignment.
+
 ### Conversation?
 
-So, what's this whole deal about the conversation?
+```js
+function foo(a) {
+	console.log(a); // 2
+}
 
-Let's imagine the above exchange as a conversation. To process that above code snippet, the conversation would go a little something like this:
+foo(2);
+```
+
+Let's imagine the above exchange (which processes this code snippet) as a conversation. The conversation would go a little something like this:
 
 > ***Engine***: Hey *Scope*, I have an RHS reference for `foo`. Ever heard of him?
 
