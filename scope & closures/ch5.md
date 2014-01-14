@@ -522,7 +522,11 @@ In other words, modules are just modules, even if you put a friendly wrapper too
 
 ### Future Modules
 
-ES6 adds first-class syntax support for the concept of modules. They are not, in large part, new functionality, but rather better syntax than the function patterns we just examined.
+ES6 adds first-class syntax support for the concept of modules. They are not, in large part, new functionality, but rather mostly just nicer syntax (sugar) than the function patterns we just examined.
+
+There's one distinction that's worth briefly mentioning. Function-based modules aren't a statically recognized pattern (something the compiler knows about), so their API semantics aren't considered until run-time. That is, you can actually modify a module's API during the run-time (see earlier `publicAPI` discussion).
+
+ES6 Module APIs are static (they don't change at run-time). Since the compiler knows *that*, it can (and does!) check during compilation that a reference to a member of an imported module's public API *actually exists*. If the API reference doesn't exist, the compiler throws an "early" error at compile-time, rather than waiting for traditional dynamic run-time resolution (and errors, if any).
 
 At the time of this writing, ES6 modules (using the "inline module declaration" syntax) look like this:
 
