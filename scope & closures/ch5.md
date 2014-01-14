@@ -522,42 +522,54 @@ In other words, modules are just modules, even if you put a friendly wrapper too
 
 ### Future Modules
 
-ES6 adds first-class syntax support for the concept of modules. They are not, in large part, new functionality, but rather mostly just nicer syntax (sugar) than the function patterns we just examined.
+ES6 adds first-class syntax support for the concept of modules. They essentially treat each file as a separate module, which can both import other modules or their API members, as well export their own public API members.
 
-There's one distinction that's worth briefly mentioning. Function-based modules aren't a statically recognized pattern (something the compiler knows about), so their API semantics aren't considered until run-time. That is, you can actually modify a module's API during the run-time (see earlier `publicAPI` discussion).
+**Note:** Function-based modules aren't a statically recognized pattern (something the compiler knows about), so their API semantics aren't considered until run-time. That is, you can actually modify a module's API during the run-time (see earlier `publicAPI` discussion).
 
-ES6 Module APIs are static (they don't change at run-time). Since the compiler knows *that*, it can (and does!) check during compilation that a reference to a member of an imported module's public API *actually exists*. If the API reference doesn't exist, the compiler throws an "early" error at compile-time, rather than waiting for traditional dynamic run-time resolution (and errors, if any).
+By contrast, ES6 Module APIs are static (the APIs don't change at run-time). Since the compiler knows *that*, it can (and does!) check during (file loading and) compilation that a reference to a member of an imported module's API *actually exists*. If the API reference doesn't exist, the compiler throws an "early" error at compile-time, rather than waiting for traditional dynamic run-time resolution (and errors, if any).
 
-At the time of this writing, ES6 modules (using the "inline module declaration" syntax) look like this:
+ES6 modules **do not** have an "inline" format, they must be defined in separate files (one per module). The browsers/engines have a default "module loader" (which is overridable, but that's well-beyond our discussion here) which synchronously loads a module file when it's imported.
+
+Consider:
+
+**bar.js**
+```js
+function hello(who) {
+	return "Let me introduce: " + who;
+}
+
+export hello;
+```
+
+**foo.js**
+```js
+// import only `hello()` from the "bar" module
+import hello from "bar";
+
+var hungry = "hippo";
+
+function awesome() {
+	console.log(
+		hello( hungry ).toUpperCase()
+	);
+}
+
+export awesome;
+```
 
 ```js
-module "bar" {
-	function hello(who) {
-		return "Let me introduce: " + who;
-	}
+// import the entire "foo" and "bar" modules
+module foo from "foo";
+module bar from "bar";
 
-	export hello;
-}
-
-module "foo" {
-	import "bar" as bar;
-	var hungry = "hippo";
-
-	function awesome() {
-		console.log( bar.hello( hungry ).toUpperCase() );
-	}
-
-	export awesome;
-}
-
-bar.hello("hippo"); // Let me introduce: hippo
+bar.hello( "rhino" ); // Let me introduce: rhino
 
 foo.awesome(); // LET ME INTRODUCE: HIPPO
 ```
 
-`import` imports one module into another, by name. `export` exports an identifier (variable, function) to the public API for the module. Both statements can be used as many times in a module's definition as is necessary.
+`import` imports one or more members from a module's API into the current scope, each to a bound variable (`hello`). `module` imports an entire module API to a bound variable (`foo`, `bar`). `export` exports an identifier (variable, function) to the public API for the module. These statements can be used as many times in a module's definition as is necessary.
 
-**Note:** The contents inside the `module .. { .. }` are treated as if enclosed in a closure, just like with the function-closure modules seen earlier. While there is definitely some nicer sugar syntax, under the covers, `module` is still a closure-based system.
+**Note:** The contents inside the *module file* are treated as if enclosed in a scope closure, just like with the function-closure modules seen earlier.
 
 ## Review (TL;DR)
 
