@@ -524,7 +524,7 @@ In other words, modules are just modules, even if you put a friendly wrapper too
 
 ES6 adds first-class syntax support for the concept of modules. They are not, in large part, new functionality, but rather better syntax than the function patterns we just examined.
 
-At the time of this writing, ES6 modules (should) look something like this:
+At the time of this writing, ES6 modules (using the "inline module declaration" syntax) look like this:
 
 ```js
 module "bar" {
@@ -540,7 +540,7 @@ module "foo" {
 	var hungry = "hippo";
 
 	function awesome() {
-		console.log( bar.hello(hungry).toUpperCase() );
+		console.log( bar.hello( hungry ).toUpperCase() );
 	}
 
 	export awesome;
@@ -552,6 +552,8 @@ foo.awesome(); // LET ME INTRODUCE: HIPPO
 ```
 
 `import` imports one module into another, by name. `export` exports an identifier (variable, function) to the public API for the module. Both statements can be used as many times in a module's definition as is necessary.
+
+**Note:** The contents inside the `module .. { .. }` are treated as if enclosed in a closure, just like with the function-closure modules seen earlier. While there is definitely some nicer sugar syntax, under the covers, `module` is still a closure-based system.
 
 ## Review (TL;DR)
 
