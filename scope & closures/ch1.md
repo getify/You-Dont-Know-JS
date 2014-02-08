@@ -27,21 +27,23 @@ In traditional compiled-language process, a chunk of source code, your program, 
 
 2. **Parsing:** taking a stream (array) of tokens and turning it into a tree of nested elements, which collectively represent the grammatical structure of the program. This tree is called an "AST" (**A**bstract **S**yntax **T**ree).
 
-    The tree for `var a = 2;` might be a top-level node called `VariableDeclaration`, with a child node called `Identifier` (whose value is `a`), and another child called `AssignmentExpression` which itself has a child called `NumericLiteral` (whose value is `2`).
+    The tree for `var a = 2;` might start with a top-level node called `VariableDeclaration`, with a child node called `Identifier` (whose value is `a`), and another child called `AssignmentExpression` which itself has a child called `NumericLiteral` (whose value is `2`).
 
 3. **Code-Generation:** the process of taking an AST and turning it into executable code. This part varies greatly depending on the language, the platform it's targeting, etc.
 
-    So, rather than get mired in details, we'll just handwave and say that there's a way to take our above described AST for `var a = 2;` and turn it into a set of machine instructions to actually *create* a variable called `a`, and then store a value into `a`.
+    So, rather than get mired in details, we'll just handwave and say that there's a way to take our above described AST for `var a = 2;` and turn it into a set of machine instructions to actually *create* a variable called `a` (including reserving memory, etc), and then store a value into `a`.
 
-The JavaScript engine is vastly more complex than that, as are most other language compilers. For instance, in the process of parsing and code-generation, there is almost certainly steps to optimize the performance of the execution, including collapsing redundant elements, etc.
+    **Note:** The details of how the engine manages system resources are deeper than we will dig, so we'll just take it for granted that the engine is able to create and store variables as needed.
 
-So, I'm painting only with broad strokes here. But I think you'll see shortly why *these* details, even at a high level, are relevant.
+The JavaScript engine is vastly more complex than *just* those three steps, as are most other language compilers. For instance, in the process of parsing and code-generation, there are certainly steps to optimize the performance of the execution, including collapsing redundant elements, etc.
 
-For one thing, JavaScript engines don't get the luxury (like other language compilers) of "taking their sweet time" to optimize. JavaScript compilation doesn't happen ahead of time, in a build step.
+So, I'm painting only with broad strokes here. But I think you'll see shortly why *these* details we *do* cover, even at a high level, are relevant.
+
+For one thing, JavaScript engines don't get the luxury (like other language compilers) of having plenty of time to optimize, because JavaScript compilation doesn't happen in a build step ahead of time, as with other languages.
 
 For JavaScript, the compilation that occurs happens, in many cases, mere microseconds (or less!) before the code is executed. To ensure the fastest performance, JS engines use all kinds of tricks (like JITs, which lazy compile and even hot re-compile, etc) which are well beyond the "scope" of our discussion here.
 
-Let's just say, for simplicity sake, that any snippet of JavaScript has to be compiled before (usually *right* before!) it's executed. So, the JS compiler will take `var a = 2;` and compile it *first*, and then be ready to execute it, usually right away.
+Let's just say, for simplicity sake, that any snippet of JavaScript has to be compiled before (usually *right* before!) it's executed. So, the JS compiler will take the program `var a = 2;` and compile it *first*, and then be ready to execute it, usually right away.
 
 **Wait a minute!** What's all this got to do with the *scope conversation*?
 
@@ -71,7 +73,7 @@ A reasonable assumption would be that *Compiler* will produce code that could be
 
 1. Encountering `var a`, *Compiler* asks *Scope* to see if a variable `a` already exists for that particular scope collection. If so, *Compiler* ignores this declaration and moves on. Otherwise, *Compiler* asks *Scope* to declare a new variable called `a` for that scope collection.
 
-2. *Compiler* then produces code for *Engine* to later execute, to handle the `a = 2` assignment. The code *Engine* runs will first ask *Scope* if there is a variable called `a` accessible in the current scope collection. If so, *Engine* uses that variable. If not, *Engine* looks *elsewhere* (see *Nested Scope* section below).
+2. *Compiler* then produces code for *Engine* to later execute, to handle the `a = 2` assignment. The code *Engine* runs will first ask *Scope* if there is a variable called `a` accessible in the current scope collection. If so, *Engine* uses that variable. If not, *Engine* looks *elsewhere* (see nested *Scope* section below).
 
 If *Engine* eventually finds a variable, it assigns the value `2` to it. If not, *Engine* will raise its hand and yell out an error!
 
@@ -137,7 +139,7 @@ Finally, we can conceptualize that there's an LHS/RHS exchange of passing the va
 
 **Note:** You might be tempted to conceptualize the function declaration `function foo(a) {...` as a normal variable declaration and assignment, such as `var foo` and `foo = function(a){...`. In so doing, it would be tempting to think of this function declaration as involving an LHS look-up.
 
-However, the subtle but important difference is that *Compiler* handles both the declaration and the value definition during code-generation, such that when *Engine* is executing code, there's no processing necessary to "assign" a function value to `foo`. Thus, it's not really appropriate to think of a function declaration as an LHS look-up assignment.
+However, the subtle but important difference is that *Compiler* handles both the declaration and the value definition during code-generation, such that when *Engine* is executing code, there's no processing necessary to "assign" a function value to `foo`. Thus, it's not really appropriate to think of a function declaration as an LHS look-up assignment in the way we're discussing them here.
 
 ### Conversation?
 
@@ -175,10 +177,6 @@ Let's imagine the above exchange (which processes this code snippet) as a conver
 
 > ***Engine***: Cool. Passing the value of `a`, which is `2`, into `log(..)`.
 
-> ***Engine***: I need to LHS reference `arg1`. You dig?
-
-> ***Scope***: As always, here you go.
-
 > ...
 
 ## Quiz
@@ -197,11 +195,13 @@ var c = foo(2);
 
 2. Identify all the RHS look-ups (there are 4!).
 
+**Note:** See the chapter review for the quiz answers!
+
 ## Nested Scope
 
-We said that *Scope* is a set of rules for looking up variables by their identifier name. Sometimes, you will look up a variable, and it won't exist in the most immediate *Scope* you are currently executing in.
+We said that *Scope* is a set of rules for looking up variables by their identifier name. There's usually more than one *Scope* to consider, however.
 
-But, never fear. *Nested Scope* is *Scope*'s friendly cousin, and he rescues us.
+Just as a block or function is nested inside another block or function, scopes are nested inside other scopes. So, if a variable cannot be found in the immediate scope, *Engine* looks consults the next containing scope, continuning until found or until the outermost (aka, global) scope has been reached.
 
 Consider:
 
@@ -215,7 +215,7 @@ var b = 2;
 foo(2); // 4
 ```
 
-The RHS reference for `b` cannot be resolved inside the function `foo`, but it can be resolved in the *Scope* surrounding it (in this case, the global, but could just be another *Nested Scope* cousin!).
+The RHS reference for `b` cannot be resolved inside the function `foo`, but it can be resolved in the *Scope* surrounding it (in this case, the global).
 
 So, the conversation between *Engine* and *Scope* is:
 
@@ -227,23 +227,23 @@ So, the conversation between *Engine* and *Scope* is:
 
 > ***Scope***: "Yep, sure have. Here ya go."
 
-*Nested Scope*'s rules simply are that you start at the inner-most *Scope* you are currently executing, look for a variable there, then if you don't find it, keep going up one level, and looking there, and on up. Once you get to the global *Scope*, nowhere else to go, either you find it, or stop.
+The simple rules for traversing nested *Scope*: *Engine* starts at the currently executing *Scope*, looks for the variable there, then if not found, keeps going up one level, and so on. If the outermost global scope is reached, the search stops, whether it finds the variable or not.
 
 ### Building on Metaphors
 
-To visualize the process of *Nested Scope* resolution, I want you to think of this tall building.
+To visualize the process of nested *Scope* resolution, I want you to think of this tall building.
 
 <img src="fig1.png">
 
-The building represents our program's *Nested Scope* rule set. The first floor of the building represents your currently executing *Scope*, wherever you are. The top level of the building is the global *Scope*.
+The building represents our program's nested *Scope* rule set. The first floor of the building represents your currently executing *Scope*, wherever you are. The top level of the building is the global *Scope*.
 
-You resolve LHS and RHS references by looking on your current floor, and if you don't find it, taking the elevator to the next floor, looking there, then the next, and so on. Once you get to the top floor, you either find what you're looking for, or you don't. But you have to stop regardless.
+You resolve LHS and RHS references by looking on your current floor, and if you don't find it, taking the elevator to the next floor, looking there, then the next, and so on. Once you get to the top floor (the global *Scope*), you either find what you're looking for, or you don't. But you have to stop regardless.
 
 ## Errors
 
 Why does it matter whether we call it LHS or RHS?
 
-Because these two types of look-ups behave differently in the circumstance where the variable has not yet been declared.
+Because these two types of look-ups behave differently in the circumstance where the variable has not yet been declared (is not found in any *Scope*).
 
 Consider:
 
@@ -258,13 +258,15 @@ foo(2);
 
 When the RHS look-up occurs for `b` the first time, it will not be found. This is said to be an "undeclared" variable, because it is not found in the scope.
 
-If an RHS look-up fails to ever find a variable, anyhwere in the *Nested Scope*, this results in a `ReferenceError` being thrown by the *Engine*. It's important to note that the error is of the type `ReferenceError`, as distinct from another error type we'll talk about in a moment.
+If an RHS look-up fails to ever find a variable, anyhwere in the nested *Scope*s, this results in a `ReferenceError` being thrown by the *Engine*. It's important to note that the error is of the type `ReferenceError`.
 
-By contrast, if you are performing an LHS look-up, and you arrive at the top floor (global *Scope*) without finding it, if you are not running your program in "Strict Mode" [^note-strictmode], then the global *Scope* will create a new variable of that name **in the global scope**, and hand it back to you. "No, there wasn't one before, but I was helpful and created one for you."
+By contrast, if the *Engine* is performing an LHS look-up, and it arrives at the top floor (global *Scope*) without finding it, if the program is not running in "Strict Mode" [^note-strictmode], then the global *Scope* will create a new variable of that name **in the global scope**, and hand it back to *Engine*.
 
-"Strict Mode" [^note-strictmode], which was added as a feature in ES5, has a number of different behaviors from normal/relaxed/lazy mode. One such behavior is that it disallows the automatic/implicit global variable creation. In that case, there would be no global *Scope*'d variable to hand back from an LHS look-up, and you'd get a `ReferenceError` similarly to the RHS case.
+*"No, there wasn't one before, but I was helpful and created one for you."*
 
-Now, if a variable is found for an RHS look-up, but you try to do something with its value that is impossible, such as trying to execute-as-function a non-function value, or reference a property on a `null` or `undefined` value, then you get a different kind of error, called a `TypeError`.
+"Strict Mode" [^note-strictmode], which was added in ES5, has a number of different behaviors from normal/relaxed/lazy mode. One such behavior is that it disallows the automatic/implicit global variable creation. In that case, there would be no global *Scope*'d variable to hand back from an LHS look-up, and *Engine* would throw a `ReferenceError` similarly to the RHS case.
+
+Now, if a variable is found for an RHS look-up, but you try to do something with its value that is impossible, such as trying to execute-as-function a non-function value, or reference a property on a `null` or `undefined` value, then *Engine* throws a different kind of error, called a `TypeError`.
 
 `ReferenceError` is *Scope* resolution-failure related, whereas `TypeError` implies that *Scope* resolution was successful, but that there was an illegal/impossible action attempted against the result.
 
@@ -282,7 +284,7 @@ The JavaScript *Engine* first compiles code before it executes, and in so doing,
 
 2. Later, `a = 2` to look up the variable (LHS reference) and assign to it if found.
 
-Both LHS and RHS reference look-ups start at the currently executing *Scope*, and if need be (that is, they don't find what they're looking for there), they work their way up the *Nested Scope*, one scope (floor) at a time, looking for the identifier, until they get to the global (top floor) and stop, and either find it, or don't.
+Both LHS and RHS reference look-ups start at the currently executing *Scope*, and if need be (that is, they don't find what they're looking for there), they work their way up the nested *Scope*, one scope (floor) at a time, looking for the identifier, until they get to the global (top floor) and stop, and either find it, or don't.
 
 Unfulfilled RHS references result in `ReferenceError`s being thrown. Unfulfilled LHS references result in an automatic, implicitly-created global of that name (if not in "Strict Mode" [^note-strictmode]), or a `ReferenceError` (if in "Strict Mode" [^note-strictmode]).
 
