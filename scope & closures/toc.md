@@ -5,7 +5,7 @@
 * Preface
 * Chapter 1: What is Scope?
 	* Compiler Theory
-	* Engine/Scope "Conversation"
+	* Understanding Scope
 	* Nested Scope
 	* Errors
 * Chapter 2: Lexical Scope

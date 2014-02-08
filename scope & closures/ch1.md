@@ -9,15 +9,13 @@ But the inclusion of variables into our program begets the most interesting ques
 
 These questions speak to the need for a well-defined set of rules for storing variables in some location, and for finding those variables at a later time. We'll call that set of rules: *Scope*.
 
-The way we will approach learning about scope is to think of the process in terms of a conversation, a dialogue. A one-sided conversation isn't really a conversation at all, so we need to first understand *who* is having the conversation.
+But, where and how do these *Scope* rules get set?
 
 ## Compiler Theory
 
 It may be self-evident, or it may be surprising, depending on your level of interaction with various languages, but despite the fact that JavaScript falls under the general category of "dynamic" or "interpreted" languages, it is in fact a compiled language. It is *not* compiled well in advance, as are many traditionally-compiled languages, nor are the results of compilation portable among various distributed systems.
 
 But, nevertheless, the JavaScript engine performs many of the same steps, albeit in more sophisticated ways than we may commonly be aware, of any traditional language-compiler.
-
-### Compilation
 
 In traditional compiled-language process, a chunk of source code, your program, will undergo typically three steps *before* it is executed, roughly called "compilation":
 
@@ -45,11 +43,13 @@ For JavaScript, the compilation that occurs happens, in many cases, mere microse
 
 Let's just say, for simplicity sake, that any snippet of JavaScript has to be compiled before (usually *right* before!) it's executed. So, the JS compiler will take the program `var a = 2;` and compile it *first*, and then be ready to execute it, usually right away.
 
-**Wait a minute!** What's all this got to do with the *scope conversation*?
+## Understanding Scope
+
+The way we will approach learning about scope is to think of the process in terms of a conversation. But, *who* is having the conversation?
 
 ### The Cast
 
-Let's meet the cast of characters that interact to handle code like `var a = 2;`, so we understand their conversations that we'll listen in on shortly:
+Let's meet the cast of characters that interact to process the program `var a = 2;`, so we understand their conversations that we'll listen in on shortly:
 
 1. *Engine*: responsible for start-to-finish compilation and execution of our JavaScript program.
 
@@ -59,7 +59,7 @@ Let's meet the cast of characters that interact to handle code like `var a = 2;`
 
 For you to *fully understand* how JavaScript works, you need to begin to *think* like *Engine* (and friends) think, ask the questions they ask, and answer those questions the same.
 
-## Scope Conversations
+### Back & Forth
 
 When you see the program `var a = 2;`, you most likely think of that as one statement. But that's not how our new friend *Engine* sees it. In fact, *Engine* sees two distinct statements, one which *Compiler* will handle during compilation, and one which *Engine* will handle during execution.
 
@@ -141,7 +141,7 @@ Finally, we can conceptualize that there's an LHS/RHS exchange of passing the va
 
 However, the subtle but important difference is that *Compiler* handles both the declaration and the value definition during code-generation, such that when *Engine* is executing code, there's no processing necessary to "assign" a function value to `foo`. Thus, it's not really appropriate to think of a function declaration as an LHS look-up assignment in the way we're discussing them here.
 
-### Conversation?
+### Engine/Scope Conversation
 
 ```js
 function foo(a) {
@@ -179,7 +179,8 @@ Let's imagine the above exchange (which processes this code snippet) as a conver
 
 > ...
 
-## Quiz
+### Quiz
+
 Check your understanding so far. Make sure to play the part of *Engine* and have a "conversation" with the *Scope*:
 
 ```js
@@ -217,7 +218,7 @@ foo(2); // 4
 
 The RHS reference for `b` cannot be resolved inside the function `foo`, but it can be resolved in the *Scope* surrounding it (in this case, the global).
 
-So, the conversation between *Engine* and *Scope* is:
+So, revisiting the conversations between *Engine* and *Scope*, we'd overhear:
 
 > ***Engine***: "Hey, *Scope* of `foo`, ever heard of `b`? Got an RHS reference for him."
 
@@ -287,5 +288,25 @@ The JavaScript *Engine* first compiles code before it executes, and in so doing,
 Both LHS and RHS reference look-ups start at the currently executing *Scope*, and if need be (that is, they don't find what they're looking for there), they work their way up the nested *Scope*, one scope (floor) at a time, looking for the identifier, until they get to the global (top floor) and stop, and either find it, or don't.
 
 Unfulfilled RHS references result in `ReferenceError`s being thrown. Unfulfilled LHS references result in an automatic, implicitly-created global of that name (if not in "Strict Mode" [^note-strictmode]), or a `ReferenceError` (if in "Strict Mode" [^note-strictmode]).
+
+### Quiz Answers
+
+```js
+function foo(a) {
+	var b = a;
+	return a + b;
+}
+
+var c = foo(2);
+```
+
+1. Identify all the LHS look-ups (there are 3!).
+
+	**`c = ..`, `a = 2` (implicit param assignment) and `b = ..`**
+
+2. Identify all the RHS look-ups (there are 4!).
+
+    **`foo(2..`, `= a;`, `a + ..` and `.. + b`**
+
 
 [^note-strictmode]: MDN: [Strict Mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode)
