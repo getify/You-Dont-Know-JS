@@ -7,10 +7,10 @@ ES6 adds a special syntactic form of function declaration called the "arrow func
 
 ```js
 var foo = a => {
-	console.log(a);
+	console.log( a );
 };
 
-foo(2); // 2
+foo( 2 ); // 2
 ```
 
 The so-called "fat arrow" is often mentioned as a short-hand for the *tediously verbose* (sarcasm) `function` keyword.
@@ -24,7 +24,7 @@ Briefly, this code suffers a problem:
 var obj = {
 	id: "awesome",
 	cool: function() {
-		console.log(this.id);
+		console.log( this.id );
 	}
 };
 
@@ -32,7 +32,7 @@ var id = "not awesome"
 
 obj.cool(); // awesome
 
-setTimeout(obj.cool, 100); // not awesome
+setTimeout( obj.cool, 100 ); // not awesome
 ```
 
 The problem is the loss of `this` binding on the `cool()` function. There are various ways to address that problem, but one often-repeated solution is `var self = this;`.
@@ -46,10 +46,10 @@ var obj = {
 		var self = this;
 
 		if (self.count < 1) {
-			setTimeout(function(){
+			setTimeout( function(){
 				self.count++;
-				console.log("awesome?");
-			},100);
+				console.log( "awesome?" );
+			}, 100 );
 		}
 	}
 };
@@ -70,10 +70,10 @@ var obj = {
 		var self = this;
 
 		if (self.count < 1) {
-			setTimeout(() => { // arrow-function ftw?
+			setTimeout( () => { // arrow-function ftw?
 				this.count++;
-				console.log("awesome?");
-			},100);
+				console.log( "awesome?" );
+			}, 100 );
 		}
 	}
 };
@@ -96,10 +96,10 @@ var obj = {
 		var self = this;
 
 		if (self.count < 1) {
-			setTimeout(function(){
+			setTimeout( function(){
 				this.count++;
-				console.log("more awesome");
-			}.bind(this),100); // look, `bind()`!
+				console.log( "more awesome" );
+			}.bind( this ), 100 ); // look, `bind()`!
 		}
 	}
 };

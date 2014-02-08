@@ -11,7 +11,7 @@ Dynamic scope seems to imply, and for good reason, that there's a model whereby 
 
 ```js
 function foo() {
-	console.log(a); // 2
+	console.log( a ); // 2
 }
 
 function bar() {
@@ -32,7 +32,7 @@ So, if JavaScript had dynamic scope, when `foo()` is executed, **theoretically**
 
 ```js
 function foo() {
-	console.log(a); // 3  !!?!
+	console.log( a ); // 3  (not 2!)
 }
 
 function bar() {
@@ -49,8 +49,8 @@ How can this be? Because when `foo()` cannot resolve the variable reference for 
 
 Strange? Probably you're thinking so, at the moment.
 
-But that's just because you've probably only ever worked on (or at least deeply considered) code which is lexically scoped. So dynamic scoping seems foreign. If you had only ever written code in a dynamically scoped language, it would seem natural and lexical scope would be the odd-ball.
+But that's just because you've probably only ever worked on (or at least deeply considered) code which is lexically scoped. So dynamic scoping seems foreign. If you had only ever written code in a dynamically scoped language, it would seem natural, and lexical scope would be the odd-ball.
 
-To be clear, JavaScript does not, in fact, have dynamic scope. It has lexical scope. Plain and simple. But the `this` mechanism is kind of like dynamic scope.
+To be clear, JavaScript **does not, in fact, have dynamic scope**. It has lexical scope. Plain and simple. But the `this` mechanism is kind of like dynamic scope.
 
-The key contrast: **lexical scope is write-time, whereas dynamic scope (and `this`!) are runtime**. Lexical scope cares *where a function was declared*, dynamic scope cares where a function was *called from*, and (not to spoil the other book title) `this` cares *how a function was called*. To dig more into `this`, go read the title "*this & Object Prototypes*".
+The key contrast: **lexical scope is write-time, whereas dynamic scope (and `this`!) are runtime**. Lexical scope cares *where a function was declared*, dynamic scope cares where a function was *called from*, and `this` cares *how a function was called*. To dig more into `this`, read the title "*this & Object Prototypes*".

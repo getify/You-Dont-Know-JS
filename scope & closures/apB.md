@@ -12,20 +12,20 @@ Consider this code:
 ```js
 {
 	let a = 2;
-	console.log(a); // 2
+	console.log( a ); // 2
 }
 
-console.log(a); // ReferenceError
+console.log( a ); // ReferenceError
 ```
 
 This will work great in ES6 environments. But can we do so pre-ES6? `catch` is the answer.
 
 ```js
 try{throw 2}catch(a){
-	console.log(a); // 2
+	console.log( a ); // 2
 }
 
-console.log(a); // ReferenceError
+console.log( a ); // ReferenceError
 ```
 
 Whoa, man! That's some ugly, weird looking code. We see a `try/catch` that appears to forcibly throw an error, but the "error" it throws is just a value `2`, and then the variable declaration that receives it is in the `catch(a)` clause. Mind blown.
@@ -50,11 +50,11 @@ What does Traceur produce from our snippet? You guessed it!
 		throw undefined;
 	} catch (a) {
 		a = 2;
-		console.log(a);
+		console.log( a );
 	}
 }
 
-console.log(a);
+console.log( a );
 ```
 
 So, with the use of such tools, we can start taking advantage of block scope regardless of if we are targeting ES6 or not, because `try/catch` has been around (and worked this way) from ES3 days.
@@ -67,10 +67,10 @@ Consider this alternate form of `let`, called the "let block" or "let statement"
 
 ```js
 let (a = 2) {
-	console.log(a); // 2
+	console.log( a ); // 2
 }
 
-console.log(a); // ReferenceError
+console.log( a ); // ReferenceError
 ```
 
 Instead of implicitly hijacking an existing block, the let-statement creates an explicit block for its scope binding. Not only does the explicit block stand out more, and perhaps fare more robustly in code refactoring, it produces somewhat cleaner code by, grammatically, forcing all the declarations to the top of the block. This makes it easier to look at any block and know what's scoped to it and not.
@@ -86,10 +86,10 @@ Moreover, *let-er* has a configuration flag `--es6`, which when turned on, chang
 ```js
 {
 	let a = 2;
-	console.log(a);
+	console.log( a );
 }
 
-console.log(a); // ReferenceError
+console.log( a ); // ReferenceError
 ```
 
 So, you can start using *let-er* right away, and target all pre-ES6 environments, and when you only care about ES6, you can add the flag and instantly target only ES6.
