@@ -12,7 +12,7 @@
 	* Lex-time
 	* Cheating Lexical
 * Chapter 3: Function vs. Block Scope
-	* Scope Units
+	* Scope From Functions
 	* Hiding In Plain Scope
 	* Functions As Scopes
 	* Block Scope

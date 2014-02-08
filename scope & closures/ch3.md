@@ -5,7 +5,7 @@ As we explored in Chapter 2, scope consists of a series of "bubbles" that each a
 
 But what exactly makes a new bubble? Is it only the function? Can other structures in JavaScript create bubbles of scope?
 
-## Scope Units
+## Scope From Functions
 
 The most common answer to those questions is that JavaScript has function-based scope. That is, each function you declare creates a bubble for itself, but no other structures create their own scope bubbles. As we'll see in just a little bit, this is not quite true.
 
@@ -65,7 +65,7 @@ For example:
 function doSomething(a) {
 	b = a + doSomethingElse( a * 2 );
 
-	return b * 3;
+	console.log( (b * 3) );
 }
 
 function doSomethingElse(a) {
@@ -91,7 +91,7 @@ function doSomething(a) {
 
 	b = a + doSomethingElse( a * 2 );
 
-	return b * 3;
+	console.log( (b * 3) );
 }
 
 doSomething( 2 ); // 15
@@ -201,7 +201,7 @@ The key difference we can observe here between a function declaration and a func
 
 Compare the previous two snippets. In the first snippet, the name `foo` is bound in the enclosing scope, and we call it directly with `foo()`. In the second snippet, the name `foo` is not bound in the enclosing scope, but instead is bound only inside of its own function.
 
-In other words, `(function foo(){ .. })` as an expression means the identifier `foo` is found *only* in the scope where the `..` indicates, not in the outer scope. Hiding the name `foo` inside itself means
+In other words, `(function foo(){ .. })` as an expression means the identifier `foo` is found *only* in the scope where the `..` indicates, not in the outer scope. Hiding the name `foo` inside itself means it does not pollute the enclosing scope unnecessarily.
 
 ### Anonymous vs. Named
 
@@ -248,7 +248,7 @@ console.log( a ); // 2
 
 Now that we have a function as an expression by virtue of wrapping it in a `( )` pair, we can execute that function by adding another `()` on the end, like `(function foo(){ .. })()`. The first enclosing `( )` pair makes the function an expression, and the second `()` executes the function.
 
-This pattern is so common, a few years ago the community agreed on a term for it: IIFE, which stands for **I**mmediately **I**nvoked **F**unction **E**xpression.
+This pattern is so common, a few years ago the community agreed on a term for it: **IIFE**, which stands for **I**mmediately **I**nvoked **F**unction **E**xpression.
 
 Of course, IIFE's don't need names, necessarily -- the most common form of IIFE is to use an anonymous function expression. While certainly less common, naming an IIFE has all the aforementioned benefits over anonymous function expressions, so it's a good practice to adopt.
 
@@ -289,6 +289,21 @@ console.log( a ); // 2
 
 We pass in the `window` object reference, but we name the parameter `global`, so that we have a clear stylistic delineation for global vs. non-global references. Of course, you can pass in anything from an enclosing scope you want, and you can name the parameter(s) anything that suits you. This is mostly just stylistic choice.
 
+Another application of this pattern addresses the (minor niche) concern that the default `undefined` identifier might have its value incorrectly overwritten, causing unexpected results. By naming a parameter `undefined`, but not passing any value for that argument, we can guarantee that the `undefined` identifier is in fact the undefined value in a block of code:
+
+```js
+(function IIFE( undefined ){
+
+	var a;
+	if (a === undefined) {
+		console.log( "Undefined is safe here!" );
+	}
+
+})();
+
+undefined = true; // setting a land-mine for other code! avoid!
+```
+
 Still another variation of the IIFE inverts the order of things, where the function to execute is given second, *after* the invocation and parameters to pass to it. This pattern is used in the UMD (Universal Module Definition) project. Some people find it a little cleaner to understand, though it is slightly more verbose.
 
 ```js
@@ -326,15 +341,13 @@ We declare the variable `i` directly inside the for-loop head, most likely becau
 That's what block-scoping is all about. Declaring variables as close as possible, as local as possible, to where they will be used. Another example:
 
 ```js
-// some code
+var foo = true;
 
 if (foo) {
 	var bar = foo * 2;
 	bar = something( bar );
 	console.log( bar );
 }
-
-// more code
 ```
 
 We are using a `bar` variable only in the context of the if-statement, so it makes a kind of sense that we would declare it inside the if-block. However, where we declare variables is not relevant when using `var`, because they will always belong to the enclosing scope. This snippet is essentially "fake" block-scoping, for stylistic reasons, and relying on self-enforcement not to accidentally use `bar` in another place in that scope.
@@ -359,11 +372,11 @@ That is, until you dig a little further.
 
 ### `with`
 
-We learned about `with` in Chapter 2. While it is a frowned upon construct, it *is* an example of (a form of) block scope, in that the scope that is created from the object only exists for the lifetime of that `with` statement, and not anywhere else in the enclosing scope.
+We learned about `with` in Chapter 2. While it is a frowned upon construct, it *is* an example of (a form of) block scope, in that the scope that is created from the object only exists for the lifetime of that `with` statement, and not in the enclosing scope.
 
 ### `try/catch`
 
-It's a very little known fact that JavaScript, way back in ES3 days, specified the variable declaration in the `catch` clause of a `try/catch` to be block-scoped to the `catch` block.
+It's a *very* little known fact that JavaScript in ES3 specified the variable declaration in the `catch` clause of a `try/catch` to be block-scoped to the `catch` block.
 
 For instance:
 
@@ -395,7 +408,7 @@ Fortunately, ES6 changes that, and introduces a new keyword `let` which sits alo
 The `let` keyword attaches the variable declaration to the scope of whatever block (commonly a `{ .. }` pair) it's contained in. In other words, `let` implicitly hijacks any block's scope for its variable declaration.
 
 ```js
-// some code
+var foo = true;
 
 if (foo) {
 	let bar = foo * 2;
@@ -404,21 +417,24 @@ if (foo) {
 }
 
 console.log( bar ); // ReferenceError
-
-// more code
 ```
 
-Some developers prefer a more explicit block-scoping, with dedicated blocks for scoping rather than implicitly hijacked blocks. This style is easy to achieve:
+Using `let` to attach a variable to an existing block is somewhat implicit. It can confuse if you're not paying close attention to which blocks have variables scoped to them, and are in the habit of moving blocks around, wrapping them in other blocks, etc, as you develop and evolve code.
+
+Creating explicit blocks for block-scoping can address some of these concerns, making it more obvious where variables are attached and not. Usually, explicit code is preferable over implicit or subtle code. This explicit block-scoping style is easy to achieve, and fits more naturally with how block-scoping works in other languages:
 
 ```js
+var foo = true;
+
 if (foo) {
-	{
+	{ // <-- explicit block
 		let bar = foo * 2;
 		bar = something( bar );
 		console.log( bar );
 	}
 }
 
+console.log( bar ); // ReferenceError
 ```
 
 We can create an arbitrary block for `let` to bind to by simply including a `{ .. }` pair anywhere a statement is valid grammar. In this case, we've made an explicit block *inside* the if-statement, which may be easier as a whole block to move around later in refactoring, without affecting the position and semantics of the enclosing if-statment.
@@ -484,7 +500,7 @@ for (let i=0; i<10; i++) {
 console.log( i ); // ReferenceError
 ```
 
-Not only does `let` in the for-loop header bind the `i` to the for-loop body, but in fact, it re-binds it to each *iteration* of the loop, making sure to re-assign it the value that it had at the end of the previous loop iteration.
+Not only does `let` in the for-loop header bind the `i` to the for-loop body, but in fact, it **re-binds it** to each *iteration* of the loop, making sure to re-assign it the value that from the end of the previous loop iteration.
 
 Here's another way of illustrating the per-iteration binding behavior that occurs:
 
@@ -505,6 +521,8 @@ The reason why this per-iteration binding is interesting will become clear in Ch
 Consider:
 
 ```js
+var foo = true, baz = 10;
+
 if (foo) {
 	var bar = 3;
 
@@ -519,6 +537,8 @@ if (foo) {
 This code is fairly easily re-factored as:
 
 ```js
+var foo = true, baz = 10;
+
 if (foo) {
 	var bar = 3;
 
@@ -533,14 +553,14 @@ if (baz > bar) {
 But, be careful of such changes when using block-scoped variables:
 
 ```js
+var foo = true, baz = 10;
+
 if (foo) {
 	let bar = 3;
 
-	if (baz > bar) { // <-- don't forget `bar`!
+	if (baz > bar) { // <-- don't forget `bar` when moving!
 		console.log( baz );
 	}
-
-	// ...
 }
 ```
 
@@ -548,9 +568,11 @@ See Appendix B for an alternate (more explicit) style of block-scoping which may
 
 ### `const`
 
-In addition to `let`, ES6 also introduces `const`, which creates a block-scoped variable whose value is fixed (constant). Any attempt to change that value at a later time results in an error.
+In addition to `let`, ES6 also introduces `const`, which also creates a block-scoped variable, but whose value is fixed (constant). Any attempt to change that value at a later time results in an error.
 
 ```js
+var foo = true;
+
 if (foo) {
 	var a = 2;
 	const b = 3; // block-scoped to the containing `if`
