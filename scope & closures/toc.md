@@ -19,6 +19,7 @@
 * Chapter 4: Hoisting
 	* Chicken Or The Egg?
 	* The Compiler Strikes Again
+	* Functions First
 * Chapter 5: Scope Closures
 	* Enlightenment
 	* Nitty Gritty

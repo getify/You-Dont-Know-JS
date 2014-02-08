@@ -35,7 +35,7 @@ You might be tempted to assume that, since the previous snippet exhibited some l
 
 Unfortunately, both guesses are incorrect. `undefined` is the output.
 
-**So, what's going on here?** It would appear we have a chicken-and-the-egg question. Which comes first, the declaration, or the assignment?
+**So, what's going on here?** It would appear we have a chicken-and-the-egg question. Which comes first, the declaration ("egg"), or the assignment ("chicken")?
 
 ## The Compiler Strikes Again
 
@@ -71,7 +71,7 @@ a = 2;
 
 So, one way of thinking, sort of metaphorically, about this process, is that variable and function declarations are "moved" from where they appear in the flow of the code to the top of the code. This gives rise to the name "Hoisting".
 
-In other words, **the egg comes before the chicken**.
+In other words, **the egg (declaration) comes before the chicken (assignment)**.
 
 **Note:** Only the declarations themselves are hoisted, while any assignments or other executable logic are left *in place*. If hoisting were to re-arrange the executable logic of our code, that could really wreak havoc.
 
@@ -92,10 +92,7 @@ It's also important to note that hoisting is **per-scope**. So while our previou
 ```js
 function foo() {
 	var a;
-}
-```
-```js
-function foo() {
+
 	console.log( a ); // undefined
 
 	a = 2;
@@ -140,6 +137,44 @@ foo = function() {
 	// ...
 }
 ```
+
+## Functions First
+
+Both function declarations and variable declarations are hoisted. But a subtle detail (that *can* show up in code with multiple "duplicate" declarations) is that functions are hoisted first, and then variables.
+
+Consider:
+
+```js
+foo(); // 1
+
+var foo;
+
+function foo() {
+	console.log( 1 );
+}
+
+foo = function() {
+	console.log( 2 );
+};
+```
+
+`1` is printed instead of `2`. This snippet is interpreted by JavaScript's *Engine* as:
+
+```js
+function foo() {
+	console.log( 1 );
+}
+
+foo();
+
+foo = function() {
+	console.log( 2 );
+};
+```
+
+Notice that `var foo` was the duplicate (and thus ignored) declaration, even though it came before the `function foo()...` declaration, because function declarations are hoisted before normal variables.
+
+While this may sound like interesting academic trivia, it highlights the fact that duplicate definitions in the same scope is a really bad idea and will often lead to confusing results.
 
 ## Review (TL;DR)
 
