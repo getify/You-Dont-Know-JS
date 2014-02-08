@@ -165,7 +165,7 @@ function foo() {
 	console.log( 1 );
 }
 
-foo();
+foo(); // 1
 
 foo = function() {
 	console.log( 2 );
@@ -174,7 +174,25 @@ foo = function() {
 
 Notice that `var foo` was the duplicate (and thus ignored) declaration, even though it came before the `function foo()...` declaration, because function declarations are hoisted before normal variables.
 
-While this may sound like interesting academic trivia, it highlights the fact that duplicate definitions in the same scope is a really bad idea and will often lead to confusing results.
+While multiple/duplicate `var` declarations are effectively ignored, subsequent function declarations *do* override previous ones.
+
+```js
+foo(); // 3
+
+function foo() {
+	console.log( 1 );
+}
+
+var foo = function() {
+	console.log( 2 );
+};
+
+function foo() {
+	console.log( 3 );
+}
+```
+
+While this all may sound like nothing more than interesting academic trivia, it highlights the fact that duplicate definitions in the same scope is a really bad idea and will often lead to confusing results.
 
 ## Review (TL;DR)
 
