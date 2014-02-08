@@ -12,9 +12,9 @@
 	* Lex-time
 	* Cheating Lexical
 * Chapter 3: Function vs. Block Scope
-	* Function Scope
+	* Scope Units
 	* Hiding In Plain Scope
-	* IIFE
+	* Functions As Scopes
 	* Block Scope
 * Chapter 4: Hoisting
 	* Chicken Or The Egg?

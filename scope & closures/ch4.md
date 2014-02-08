@@ -16,7 +16,7 @@ a = 2;
 
 var a;
 
-console.log(a);
+console.log( a );
 ```
 
 What do you expect to be printed in the `console.log(..)` statement?
@@ -26,7 +26,7 @@ Many developers would expect `undefined`, since the `var a` statement comes afte
 Consider another piece of code:
 
 ```js
-console.log(a);
+console.log( a );
 
 var a = 2;
 ```
@@ -53,7 +53,7 @@ var a;
 ```js
 a = 2;
 
-console.log(a);
+console.log( a );
 ```
 
 ...where the first part is the compilation and the second part is the execution.
@@ -64,7 +64,7 @@ Similarly, our second snippet is actually processed as:
 var a;
 ```
 ```js
-console.log(a);
+console.log( a );
 
 a = 2;
 ```
@@ -79,7 +79,7 @@ In other words, **the egg comes before the chicken**.
 foo();
 
 function foo() {
-	console.log(a); // undefined
+	console.log( a ); // undefined
 
 	var a = 2;
 }
@@ -96,7 +96,7 @@ function foo() {
 ```
 ```js
 function foo() {
-	console.log(a); // undefined
+	console.log( a ); // undefined
 
 	a = 2;
 }

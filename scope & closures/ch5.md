@@ -34,7 +34,7 @@ function foo() {
 	var a = 2;
 
 	function bar() {
-		console.log(a); // 2
+		console.log( a ); // 2
 	}
 
 	bar();
@@ -60,7 +60,7 @@ function foo() {
 	var a = 2;
 
 	function bar() {
-		console.log(a);
+		console.log( a );
 	}
 
 	return bar;
@@ -96,10 +96,10 @@ function foo() {
 	var a = 2;
 
 	function baz() {
-		console.log(a); // 2
+		console.log( a ); // 2
 	}
 
-	bar(baz);
+	bar( baz );
 }
 
 function bar(fn) {
@@ -118,7 +118,7 @@ function foo() {
 	var a = 2;
 
 	function baz() {
-		console.log(a); // when invoked logs 2
+		console.log( a ); // when invoked logs 2
 	}
 
 	fn = baz;
@@ -142,13 +142,13 @@ The previous code snippets are somewhat academic and artifically constructed to 
 ```js
 function wait(message) {
 
-	setTimeout(function(){
-		console.log(message);
-	},1000);
+	setTimeout( function(){
+		console.log( message );
+	}, 1000 );
 
 }
 
-wait("Hello, closure!");
+wait( "Hello, closure!" );
 ```
 
 We take an inner function (shame on me for making it anonymous -- see Chapter 3!) and pass it to `setTimeout(..)`. But our inner function has a scope closure over `wait(..)`, indeed keeping and using a reference to the variable `message`.
@@ -161,13 +161,13 @@ Or, if you're of the jQuery persuasion (or any JS framework, for that matter):
 
 ```js
 function activateBot(name,selector) {
-	$(selector).click(function(){
-		console.log("Activating: " + name);
-	});
+	$( selector ).click( function(){
+		console.log( "Activating: " + name );
+	} );
 }
 
-activateBot("Closure Bot 1", "#bot_1");
-activateBot("Closure Bot 2", "#bot_2");
+activateBot( "Closure Bot 1", "#bot_1" );
+activateBot( "Closure Bot 2", "#bot_2" );
 ```
 
 I am not sure what kind of code you write, but I regularly write code which is responsible for controlling an entire global drone army of closure bots, so this is totally realistic!
@@ -180,13 +180,13 @@ I am not sure what kind of code you write, but I regularly write code which is r
 var a = 2;
 
 (function IIFE(){
-	console.log(a);
+	console.log( a );
 })();
 ```
 
-This code "works", but it's not strictly an observation of closure. Why? Because the function (which we labeled "IIFE" here) is not executed outside his lexical scope. He's still invoked right there in the same scope as he was declared. While closure might technically be happening at declaration time, it is *not*, strictly, observable, and so, as they say, *it's a tree falling in the forest with no one around to hear it.*
+This code "works", but it's not strictly an observation of closure. Why? Because the function (which we named "IIFE" here) is not executed outside his lexical scope. It's still invoked right there in the same scope as it was declared. While closure might technically be happening at declaration time, it is *not*, strictly, observable, and so, as they say, *it's a tree falling in the forest with no one around to hear it.*
 
-Though an IIFE is not *itself* an example of closure, because it absolutely creates scope, it's one of the most common tools we use to create scope which can be closed over. So IIFEs are indeed heavily related to closure, even if not closure themselves.
+Though an IIFE is not *itself* an example of closure, it absolutely creates scope, and it's one of the most common tools we use to create scope which can be closed over. So IIFEs are indeed heavily related to closure, even if not closure examples themselves.
 
 Put this book down right now, dear reader. I have a task for you. Go open up some of your recent JavaScript code. Look for your functions-as-values and identify where you are already using closure and maybe didn't even know it before.
 
@@ -200,9 +200,9 @@ The most common canonical example used to illustrate closure involves the humble
 
 ```js
 for (var i=1; i<=5; i++) {
-	setTimeout(function(){
-		console.log(i);
-	},i*1000);
+	setTimeout( function(){
+		console.log( i );
+	}, i*1000 );
 }
 ```
 
@@ -231,9 +231,9 @@ Let's try:
 ```js
 for (var i=1; i<=5; i++) {
 	(function(){
-		setTimeout(function(){
-			console.log(i);
-		},i*1000);
+		setTimeout( function(){
+			console.log( i );
+		}, i*1000 );
 	})();
 }
 ```
@@ -250,9 +250,9 @@ It needs its own variable, with a copy of the `i` value at each iteration.
 for (var i=1; i<=5; i++) {
 	(function(){
 		var j = i;
-		setTimeout(function(){
-			console.log(j);
-		},j*1000);
+		setTimeout( function(){
+			console.log( j );
+		}, j*1000 );
 	})();
 }
 ```
@@ -264,10 +264,10 @@ A slight variation some prefer is:
 ```js
 for (var i=1; i<=5; i++) {
 	(function(j){
-		setTimeout(function(){
-			console.log(j);
-		},j*1000);
-	})(i);
+		setTimeout( function(){
+			console.log( j );
+		}, j*1000 );
+	})( i );
 }
 ```
 
@@ -286,9 +286,9 @@ Look carefully at our analysis of the previous solution. We used an IIFE to crea
 ```js
 for (var i=1; i<=5; i++) {
 	let j = i; // yay, block-scope for closure!
-	setTimeout(function(){
-		console.log(j);
-	},j*1000);
+	setTimeout( function(){
+		console.log( j );
+	}, j*1000 );
 }
 ```
 
@@ -296,9 +296,9 @@ for (var i=1; i<=5; i++) {
 
 ```js
 for (let i=1; i<=5; i++) {
-	setTimeout(function(){
-		console.log(i);
-	},i*1000);
+	setTimeout( function(){
+		console.log( i );
+	}, i*1000 );
 }
 ```
 
@@ -314,11 +314,11 @@ function foo() {
 	var another = [1, 2, 3];
 
 	function doSomething() {
-		console.log(something);
+		console.log( something );
 	}
 
 	function doAnother() {
-		console.log(another.join(" ! "));
+		console.log( another.join( " ! " ) );
 	}
 }
 ```
@@ -333,11 +333,11 @@ function CoolModule() {
 	var another = [1, 2, 3];
 
 	function doSomething() {
-		console.log(something);
+		console.log( something );
 	}
 
 	function doAnother() {
-		console.log(another.join(" ! "));
+		console.log( another.join( " ! " ) );
 	}
 
 	return {
@@ -382,11 +382,11 @@ var foo = (function CoolModule() {
 	var another = [1, 2, 3];
 
 	function doSomething() {
-		console.log(something);
+		console.log( something );
 	}
 
 	function doAnother() {
-		console.log(another.join(" ! "));
+		console.log( another.join( " ! " ) );
 	}
 
 	return {
@@ -406,7 +406,7 @@ Modules are just functions, so they can receive parameters:
 ```js
 function CoolModule(id) {
 	function identify() {
-		console.log(id);
+		console.log( id );
 	}
 
 	return {
@@ -414,8 +414,8 @@ function CoolModule(id) {
 	};
 }
 
-var foo1 = CoolModule("foo 1");
-var foo2 = CoolModule("foo 2");
+var foo1 = CoolModule( "foo 1" );
+var foo2 = CoolModule( "foo 2" );
 
 foo1.identify(); // "foo 1"
 foo2.identify(); // "foo 2"
@@ -431,11 +431,11 @@ var foo = (function CoolModule(id) {
 	}
 
 	function identify1() {
-		console.log(id);
+		console.log( id );
 	}
 
 	function identify2() {
-		console.log(id.toUpperCase());
+		console.log( id.toUpperCase() );
 	}
 
 	var publicAPI = {
@@ -444,7 +444,7 @@ var foo = (function CoolModule(id) {
 	};
 
 	return publicAPI;
-})("foo module");
+})( "foo module" );
 
 foo.identify(); // foo module
 foo.change();
@@ -465,7 +465,7 @@ var MyModules = (function Manager() {
 		for (var i=0; i<deps.length; i++) {
 			deps[i] = modules[deps[i]];
 		}
-		modules[name] = impl.apply(impl, deps);
+		modules[name] = impl.apply( impl, deps );
 	}
 
 	function get(name) {
@@ -484,7 +484,7 @@ The key part of this code is `modules[name] = impl.apply(impl, deps)`. This is i
 And here's how I might use it to define some modules:
 
 ```js
-MyModules.define("bar", [], function(){
+MyModules.define( "bar", [], function(){
 	function hello(who) {
 		return "Let me introduce: " + who;
 	}
@@ -492,24 +492,24 @@ MyModules.define("bar", [], function(){
 	return {
 		hello: hello
 	};
-});
+} );
 
-MyModules.define("foo", ["bar"], function(bar){
+MyModules.define( "foo", ["bar"], function(bar){
 	var hungry = "hippo";
 
 	function awesome() {
-		console.log( bar.hello(hungry).toUpperCase() );
+		console.log( bar.hello( hungry ).toUpperCase() );
 	}
 
 	return {
 		awesome: awesome
 	};
-});
+} );
 
-var bar = MyModules.get("bar");
-var foo = MyModules.get("foo");
+var bar = MyModules.get( "bar" );
+var foo = MyModules.get( "foo" );
 
-bar.hello("hippo"); // Let me introduce: hippo
+bar.hello( "hippo" ); // Let me introduce: hippo
 
 foo.awesome(); // LET ME INTRODUCE: HIPPO
 ```

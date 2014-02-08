@@ -102,7 +102,7 @@ Let's dig into that deeper.
 When I say:
 
 ```js
-console.log(a);
+console.log( a );
 ```
 
 The reference to `a` is an RHS reference, because nothing is being assigned to `a` here. Instead, we're looking-up to retrieve the value of `a`, so that the value can be passed to `console.log(..)`.
@@ -121,10 +121,10 @@ Consider this program, which has both LHS and RHS references:
 
 ```js
 function foo(a) {
-	console.log(a); // 2
+	console.log( a ); // 2
 }
 
-foo(2);
+foo( 2 );
 ```
 
 The line that invokes `foo(..)` as a function call requires an RHS reference to `foo`, meaning, "go look-up the value of `foo`, and give it to me." Moreover, `(..)` means the value of `foo` should be executed, so it'd better actually be a function!
@@ -145,10 +145,10 @@ However, the subtle but important difference is that *Compiler* handles both the
 
 ```js
 function foo(a) {
-	console.log(a); // 2
+	console.log( a ); // 2
 }
 
-foo(2);
+foo( 2 );
 ```
 
 Let's imagine the above exchange (which processes this code snippet) as a conversation. The conversation would go a little something like this:
@@ -189,7 +189,7 @@ function foo(a) {
 	return a + b;
 }
 
-var c = foo(2);
+var c = foo( 2 );
 ```
 
 1. Identify all the LHS look-ups (there are 3!).
@@ -208,12 +208,12 @@ Consider:
 
 ```js
 function foo(a) {
-	console.log(a + b);
+	console.log( a + b );
 }
 
 var b = 2;
 
-foo(2); // 4
+foo( 2 ); // 4
 ```
 
 The RHS reference for `b` cannot be resolved inside the function `foo`, but it can be resolved in the *Scope* surrounding it (in this case, the global).
@@ -250,11 +250,11 @@ Consider:
 
 ```js
 function foo(a) {
-	console.log(a + b);
+	console.log( a + b );
 	b = a;
 }
 
-foo(2);
+foo( 2 );
 ```
 
 When the RHS look-up occurs for `b` the first time, it will not be found. This is said to be an "undeclared" variable, because it is not found in the scope.
@@ -297,7 +297,7 @@ function foo(a) {
 	return a + b;
 }
 
-var c = foo(2);
+var c = foo( 2 );
 ```
 
 1. Identify all the LHS look-ups (there are 3!).
