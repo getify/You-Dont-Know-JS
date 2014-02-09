@@ -195,7 +195,7 @@ Let's break down what's happening here.
 
 First, notice that the wrapping function statement starts with `(function...` as opposed to just `function...`. While this may seem like a minor detail, it's actually a major change. Instead of treating the function as a standard declaration, the function is treated as a function-expression.
 
-**Note:** The easiest way to distinguish declaration vs. expression is the position of the word "function" in the statement (not just a line, but a distinct statement). If "function" is the very first thin in the statement, then it's a function declaration. Otherwise, it's a function expression.
+**Note:** The easiest way to distinguish declaration vs. expression is the position of the word "function" in the statement (not just a line, but a distinct statement). If "function" is the very first thing in the statement, then it's a function declaration. Otherwise, it's a function expression.
 
 The key difference we can observe here between a function declaration and a function expression relates to where its name is bound as an identifier.
 
