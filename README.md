@@ -8,7 +8,7 @@ Please feel free to contribute to the quality of this content by submitting PR's
 
 ## Titles
 
-* ["Scope & Closures"](scope & closures/README.md) (draft complete)
+* ["Scope & Closures"](scope & closures/README.md) (in production)
 * ["this & Object Prototypes"](this & object prototypes/README.md) (draft in progress)
 * "Types & Grammar" (planned)
 * "Async & Performance" (planned)
