@@ -23,7 +23,7 @@ Briefly, this code suffers a problem:
 
 var obj = {
 	id: "awesome",
-	cool: function() {
+	cool: function coolFn() {
 		console.log( this.id );
 	}
 };
@@ -42,11 +42,11 @@ That might look like:
 ```js
 var obj = {
 	count: 0,
-	cool: function() {
+	cool: function coolFn() {
 		var self = this;
 
 		if (self.count < 1) {
-			setTimeout( function(){
+			setTimeout( function timer(){
 				self.count++;
 				console.log( "awesome?" );
 			}, 100 );
@@ -66,10 +66,8 @@ The ES6 solution, the arrow-function, introduces a behavior called "lexical this
 ```js
 var obj = {
 	count: 0,
-	cool: function() {
-		var self = this;
-
-		if (self.count < 1) {
+	cool: function coolFn() {
+		if (this.count < 1) {
 			setTimeout( () => { // arrow-function ftw?
 				this.count++;
 				console.log( "awesome?" );
@@ -87,17 +85,19 @@ So, in that snippet, the arrow-function doesn't get its `this` unbound in some u
 
 While this makes for shorter code, my perspective is that arrow-functions are really just codifying into the language syntax a common *mistake* of developers, which is to confuse and conflate "this binding" rules with "lexical scope" rules.
 
-A more appropriate approach, in my perspective, to this "problem", is to use the `this` mechanism correctly.
+Put another way: why go to the trouble and verbosity of using the `this` style coding paradigm, only to cut it off at the knees by mixing it with lexical references. It seems natural to embrace one approach or the other for any given piece of code, and not mix them in the same piece of code.
+
+**Note:** one other detraction from arrow-functions is that they are anonymous, not named. See Chapter 3 for the reasons why anonymous functions are less desirable than named functions.
+
+A more appropriate approach, in my perspective, to this "problem", is to use and embrace the `this` mechanism correctly.
 
 ```js
 var obj = {
 	count: 0,
-	cool: function() {
-		var self = this;
-
-		if (self.count < 1) {
-			setTimeout( function(){
-				this.count++;
+	cool: function coolFn() {
+		if (this.count < 1) {
+			setTimeout( function timer(){
+				this.count++; // `this` is safe because of `bind(..)`
 				console.log( "more awesome" );
 			}.bind( this ), 100 ); // look, `bind()`!
 		}

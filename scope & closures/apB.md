@@ -3,7 +3,7 @@
 
 In Chapter 3, we explored Block Scope. We saw that `with` and the `catch` clause are both tiny examples of block scope that have existed in JavaScript since at least the introduction of ES3.
 
-But it's ES6's introduction of `let` that finally gives full, unfettered block-scoping capability to our code. There are many exciting things, both functionally and code stylistically, that block scope will enable.
+But it's ES6's introduction of `let` that finally gives full, unfettered block-scoping capability to our code. There are many exciting things, both functionally and code-stylistically, that block scope will enable.
 
 But what if we wanted to use block scope in pre-ES6 environments?
 
@@ -28,7 +28,7 @@ try{throw 2}catch(a){
 console.log( a ); // ReferenceError
 ```
 
-Whoa, man! That's some ugly, weird looking code. We see a `try/catch` that appears to forcibly throw an error, but the "error" it throws is just a value `2`, and then the variable declaration that receives it is in the `catch(a)` clause. Mind blown.
+Whoa! That's some ugly, weird looking code. We see a `try/catch` that appears to forcibly throw an error, but the "error" it throws is just a value `2`, and then the variable declaration that receives it is in the `catch(a)` clause. Mind: blown.
 
 That's right, the `catch` clause has block-scoping to it, which means it can be used as a polyfill for block scope in pre-ES6 environments.
 
@@ -79,9 +79,21 @@ As a pattern, it mirrors the approach many people take in function-scoping when 
 
 But, there's a problem. The let-statement form is not included in ES6. Neither does the official Traceur compiler accept that form of code.
 
-Tools are meant to solve our problems. So, I built a tool called "let-er" [^note-let_er] to address just this issue. *let-er* is a build-step code transpiler, but its only task is to find let-statement forms and transpile them. It will leave alone any of the rest of your code, including any let-declarations. You can safely use *let-er* as the first ES6 transpiler step, and then pass your code through something like Traceur if necessary.
+We have two options. We can format using ES6-valid syntax and a little sprinkle of code discipline:
 
-Moreover, *let-er* has a configuration flag `--es6`, which when turned on, changes the kind of code produced. Instead of the `try/catch` ES3 polyfill hack, *let-er* would take our snippet and produce the fully ES6-compliant, non-hacky:
+```js
+/*let*/ { let a = 2;
+	console.log( a );
+}
+
+console.log( a ); // ReferenceError
+```
+
+But, tools are meant to solve our problems. So the other option is to write explicit let statement blocks, and let a tool convert them to valid, working code.
+
+So, I built a tool called "let-er" [^note-let_er] to address just this issue. *let-er* is a build-step code transpiler, but its only task is to find let-statement forms and transpile them. It will leave alone any of the rest of your code, including any let-declarations. You can safely use *let-er* as the first ES6 transpiler step, and then pass your code through something like Traceur if necessary.
+
+Moreover, *let-er* has a configuration flag `--es6`, which when turned on (off by default), changes the kind of code produced. Instead of the `try/catch` ES3 polyfill hack, *let-er* would take our snippet and produce the fully ES6-compliant, non-hacky:
 
 ```js
 {
@@ -94,7 +106,7 @@ console.log( a ); // ReferenceError
 
 So, you can start using *let-er* right away, and target all pre-ES6 environments, and when you only care about ES6, you can add the flag and instantly target only ES6.
 
-And most importantly, you can use the more preferable let-statement form even though it is not an official part of any ES version (yet).
+And most importantly, **you can use the more preferable and more explicit let-statement form** even though it is not an official part of any ES version (yet).
 
 ## Performance
 
