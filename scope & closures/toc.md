@@ -15,7 +15,7 @@
 	* Scope From Functions
 	* Hiding In Plain Scope
 	* Functions As Scopes
-	* Block Scope
+	* Blocks As Scopes
 * Chapter 4: Hoisting
 	* Chicken Or The Egg?
 	* The Compiler Strikes Again
