@@ -2,6 +2,7 @@
 
 [Table of Contents](toc.md)
 
+* [Preface](../preface.md)
 * [Chapter 1: What is Scope?](ch1.md)
 * [Chapter 2: Lexical Scope](ch2.md)
 * [Chapter 3: Function vs. Block Scope](ch3.md)
