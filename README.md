@@ -31,6 +31,6 @@ If you like this content and would like to contact me regarding conducting train
 
 ## License & Copyright
 
-The materials herein are all (c) 2013 Kyle Simpson, and are licensed under Creative Commons CC BY-NC-ND 3.0.
+The materials herein are all (c) 2013-2014 Kyle Simpson, and are licensed under Creative Commons CC BY-NC-ND 3.0.
 
 http://creativecommons.org/licenses/by-nc-nd/3.0/
