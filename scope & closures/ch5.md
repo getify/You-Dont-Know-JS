@@ -1,9 +1,9 @@
 # You Don't Know JS: Scope & Closures
 # Chapter 5: Scope Closure
 
-We arrive at this point of the book with hopefully a very healthy, solid understanding of how scope works. In fact, we should see that scope was always something we almost intuitively understood, even without the formality and rigor of understanding we have now explored.
+We arrive at this point of the book with hopefully a very healthy, solid understanding of how scope works. In fact, we should see that scope was always something we almost intuitively understood, even without the formality and rigor of understanding (not to mention, compiler terminology!) we have now explored.
 
-We turn our attention to an incredibly important, but persistently elusive, *almost mythological*, part of the language: closure. If you have followed our discussion of lexical scope thus far, the payoff is that closure is going to be, largely, anti-climatic, almost self-obvious. *There's a man behind the wizard's curtain, and we're about to see him*. No, his name is not Crockford!
+We turn our attention to an incredibly important, but persistently elusive, *almost mythological*, part of the language: **closure**. If you have followed our discussion of lexical scope thus far, the payoff is that closure is going to be, largely, anti-climatic, almost self-obvious. *There's a man behind the wizard's curtain, and we're about to see him*. No, his name is not Crockford!
 
 If however you have nagging questions about lexical scope, now would be a good time to go back and review Chapter 2 before proceeding.
 
@@ -68,12 +68,10 @@ function foo() {
 
 var baz = foo();
 
-baz(); //logs 2, whoa. closure was just observed, man.
+baz(); // 2 -- Whoa, closure was just observed, man.
 ```
 
-DJ, break it down.
-
-The function `bar()` has lexical scope access to the inner scope of `foo()`. But then, we take `bar()` and pass it *as* a value. We actually pass the function itself around. In this case, we `return` the variable `bar` itself, which of course has the value of the function in question.
+The function `bar()` has lexical scope access to the inner scope of `foo()`. But then, we take `bar()`, the function itself, and pass it *as* a value. In this case, we `return` the function object itself that `bar` references.
 
 After we execute `foo()`, we assign the value it returned (our inner `bar()` function) to a variable called `baz`, and then we actually invoke `baz()`, which of course is invoking our inner function `bar()`, just by a different identifier reference.
 
@@ -81,13 +79,15 @@ After we execute `foo()`, we assign the value it returned (our inner `bar()` fun
 
 After `foo()` executed, normally we would expect that the entirety of the inner scope of `foo()` would go away, because we know that the *Engine* employs a *Garbage Collector* that comes along and frees up memory once it's no longer in use. Since it would appear that the contents of `foo()` are no longer in use, it would seem natural that they should be considered *gone*.
 
-But the "magic" of closures does not let this happen. Because the inner function `bar()` has, by virtue of where it was declared, a lexical scope closure over that inner scope of `foo()`, that inner scope is in fact *still* "in use"... **by the function `bar()`**. The scope doesn't go away.
+But the "magic" of closures does not let this happen. That inner scope is in fact *still* "in use", and thus does not go away. Who's using it? **The function `bar()` itself**.
+
+By virtue of where it was declared, `bar()` has a lexical scope closure over that inner scope of `foo()`, which keeps that scope alive for `bar()` to reference at any later time.
 
 **`bar()` still has a reference to that scope, and that reference is called closure.**
 
-So, a few microseconds later, when the variable `baz` is invoked, being just another reference to the inner function we initially labeled `bar`, this inner function executes, and duly has *access* to its normal lexical scope, so it can access the variable `a` just as we'd seen before.
+So, a few microseconds later, when the variable `baz` is invoked (invoking the inner function we initially labeled `bar`), it duly has *access* to author-time lexical scope, so it can access the variable `a` just as we'd expect.
 
-But the inner function is being invoked well outside of its lexical scope. The "magic" that allows him to maintain a reference to access its lexical scope even though it's no longer *acting inside* that scope is... you guessed it: **closure**.
+The function is being invoked well outside of its author-time lexical scope. **Closure** lets the function continue to access the lexical scope it was defined in at author-time.
 
 Of course, any of the various ways that functions can be *passed around* as values, and indeed invoked in other locations, are all examples of observing/exercising closure.
 
@@ -107,7 +107,7 @@ function bar(fn) {
 }
 ```
 
-We pass the inner function `baz` over to `bar`, and call that inner function `fn` now, and when we execute `fn()`, its closure over the inner scope of `foo()` is observed.
+We pass the inner function `baz` over to `bar`, and call that inner function (labeled `fn` now), and when we do, its closure over the inner scope of `foo()` is observed, by accessing `a`.
 
 These passings-around of functions can be indirect, too.
 
@@ -118,7 +118,7 @@ function foo() {
 	var a = 2;
 
 	function baz() {
-		console.log( a ); // when invoked logs 2
+		console.log( a );
 	}
 
 	fn = baz;
@@ -130,7 +130,7 @@ function bar() {
 
 foo();
 
-bar(); //logs, 2
+bar(); // 2
 ```
 
 Whatever facility we use to *transport* an inner function outside of its lexical scope, it will maintain a scope reference to where it was originally declared, and wherever we execute him, that closure will be exercised.
@@ -142,7 +142,7 @@ The previous code snippets are somewhat academic and artifically constructed to 
 ```js
 function wait(message) {
 
-	setTimeout( function(){
+	setTimeout( function timer(){
 		console.log( message );
 	}, 1000 );
 
@@ -151,30 +151,32 @@ function wait(message) {
 wait( "Hello, closure!" );
 ```
 
-We take an inner function (shame on me for making it anonymous -- see Chapter 3!) and pass it to `setTimeout(..)`. But our inner function has a scope closure over `wait(..)`, indeed keeping and using a reference to the variable `message`.
+We take an inner function (named `timer`) and pass it to `setTimeout(..)`. But `timer` has a scope closure over the scope of `wait(..)`, indeed keeping and using a reference to the variable `message`.
 
-A full thousand milliseconds after we have executed `wait(..)`, and its inner scope should otherwise be long gone, that anonymous function still has closure over that scope. Deep down in the guts of the *Engine*, the built-in utility `setTimeout(..)` has reference to some parameter, probably called `fn` or `func` or something like that. *Engine* goes to invoke that function, which is invoking our inner (anonymous) function, and the lexical scope reference is still intact.
+A thousand milliseconds after we have executed `wait(..)`, and its inner scope should otherwise be long gone, that anonymous function still has closure over that scope.
+
+Deep down in the guts of the *Engine*, the built-in utility `setTimeout(..)` has reference to some parameter, probably called `fn` or `func` or something like that. *Engine* goes to invoke that function, which is invoking our inner `timer` function, and the lexical scope reference is still intact.
 
 **Closure.**
 
 Or, if you're of the jQuery persuasion (or any JS framework, for that matter):
 
 ```js
-function activateBot(name,selector) {
-	$( selector ).click( function(){
+function setupBot(name,selector) {
+	$( selector ).click( function activator(){
 		console.log( "Activating: " + name );
 	} );
 }
 
-activateBot( "Closure Bot 1", "#bot_1" );
-activateBot( "Closure Bot 2", "#bot_2" );
+setupBot( "Closure Bot 1", "#bot_1" );
+setupBot( "Closure Bot 2", "#bot_2" );
 ```
 
 I am not sure what kind of code you write, but I regularly write code which is responsible for controlling an entire global drone army of closure bots, so this is totally realistic!
 
 (Some) joking aside, essentially *whenever* and *wherever* you treat functions (which access their own respective lexical scopes) as first-class values and pass them around, you are likely to see those functions exercising closure. Be that timers, event handlers, Ajax requests, cross-window messaging, web workers, or any of the other asynchronous (or synchronous!) tasks, when you pass in a *callback function*, get ready to sling some closure around!
 
-**Note:** Chapter 3 introduced the IIFE pattern. While it is often said that IIFE (alone) is an example of closure, I would somewhat disagree by our definition above.
+**Note:** Chapter 3 introduced the IIFE pattern. While it is often said that IIFE (alone) is an example of closure, I would somewhat disagree, by our definition above.
 
 ```js
 var a = 2;
@@ -184,7 +186,7 @@ var a = 2;
 })();
 ```
 
-This code "works", but it's not strictly an observation of closure. Why? Because the function (which we named "IIFE" here) is not executed outside its lexical scope. It's still invoked right there in the same scope as it was declared. While closure might technically be happening at declaration time, it is *not*, strictly, observable, and so, as they say, *it's a tree falling in the forest with no one around to hear it.*
+This code "works", but it's not strictly an observation of closure. Why? Because the function (which we named "IIFE" here) is not executed outside its lexical scope. It's still invoked right there in the same scope as it was declared (then enclosing/global scope that also holds `a`). While closure might technically be happening at declaration time, it is *not* strictly observable, and so, as they say, *it's a tree falling in the forest with no one around to hear it.*
 
 Though an IIFE is not *itself* an example of closure, it absolutely creates scope, and it's one of the most common tools we use to create scope which can be closed over. So IIFEs are indeed heavily related to closure, even if not closure examples themselves.
 
@@ -200,11 +202,13 @@ The most common canonical example used to illustrate closure involves the humble
 
 ```js
 for (var i=1; i<=5; i++) {
-	setTimeout( function(){
+	setTimeout( function timer(){
 		console.log( i );
 	}, i*1000 );
 }
 ```
+
+**Note:** Linters often complain when you put functions inside of loops, because the mistakes of not understanding closure are **so common among developers**. We explain how to do so properly here, leveraging the full power of closure. But that subtlety is often lost on linters and they will complain regardless, assuming you don't *actually* know what you're doing.
 
 The spirit of this code snippet is that we would normally *expect* for the behavior to be that the numbers "1", "2", .. "5" would be printed out, one at a time, one per second, respectively.
 
@@ -212,17 +216,17 @@ In fact, if you run this code, you get "6" printed out 5 times, at the one-secon
 
 **Huh?**
 
-Firstly, let's explain where `6` comes from. The terminating condition of the loop is when `i` is *not* `<=5`. The first time that's true is when `i` is 6. So, the output is reflecting the final value of the `i` after the loop terminates.
+Firstly, let's explain where `6` comes from. The terminating condition of the loop is when `i` is *not* `<=5`. The first time that's the case is when `i` is 6. So, the output is reflecting the final value of the `i` after the loop terminates.
 
 This actually seems obvious on second glance. The timeout function callbacks are all running well after the completion of the loop. In fact, as timers go, even if it was `setTimeout(.., 0)` on each iteration, all those function callbacks would still run strictly after the completion of the loop, and thus print `6` each time.
 
 But there's a deeper question at play here. What's *missing* from our code to actually have it behave as we semantically have implied?
 
-What's missing is that we are trying to *imply* that each iteration of the loop "captures" its own copy of `i`, at the time of the iteration. But, the way closure works, all 5 of those functions, though they are defined separately in each loop iteration, all **are closed over the same shared global scope**, which has, in fact, only one `i` in it.
+What's missing is that we are trying to *imply* that each iteration of the loop "captures" its own copy of `i`, at the time of the iteration. But, the way scope works, all 5 of those functions, though they are defined separately in each loop iteration, all **are closed over the same shared global scope**, which has, in fact, only one `i` in it.
 
 Put that way, *of course* all functions share a reference to the same `i`. Something about the loop structure tends to confuse us into thinking there's something else more sophisticated at work. There is not. There's no difference than if each of the 5 timeout callbacks were just declared one right after the other, with no loop at all.
 
-OK, so, back to our burning question. What's missing? We need more ~~cowbell~~ closured scope. Specifically, we need a new closured scope for each iteration.
+OK, so, back to our burning question. What's missing? We need more ~~cowbell~~ closured scope. Specifically, we need a new closured scope for each iteration of the loop.
 
 We learned in Chapter 3 that the IIFE creates scope by declaring a function and immediately executing it.
 
@@ -231,7 +235,7 @@ Let's try:
 ```js
 for (var i=1; i<=5; i++) {
 	(function(){
-		setTimeout( function(){
+		setTimeout( function timer(){
 			console.log( i );
 		}, i*1000 );
 	})();
@@ -240,9 +244,9 @@ for (var i=1; i<=5; i++) {
 
 Does that work? Try it. Again, I'll wait.
 
-I'll end the suspense for you. **Nope.** But why? We now obviously have more lexical scope. Each timeout function callback is indeed closing over its own per-iteration scope.
+I'll end the suspense for you. **Nope.** But why? We now obviously have more lexical scope. Each timeout function callback is indeed closing over its own per-iteration scope created respectively by each IIFE.
 
-It's not enough to have a scope to close over if that scope is empty. Look closely. Our IIFE is just an empty do-nothing scope. It needs *something* in it to be useful to us.
+It's not enough to have a scope to close over **if that scope is empty**. Look closely. Our IIFE is just an empty do-nothing scope. It needs *something* in it to be useful to us.
 
 It needs its own variable, with a copy of the `i` value at each iteration.
 
@@ -250,7 +254,7 @@ It needs its own variable, with a copy of the `i` value at each iteration.
 for (var i=1; i<=5; i++) {
 	(function(){
 		var j = i;
-		setTimeout( function(){
+		setTimeout( function timer(){
 			console.log( j );
 		}, j*1000 );
 	})();
@@ -264,7 +268,7 @@ A slight variation some prefer is:
 ```js
 for (var i=1; i<=5; i++) {
 	(function(j){
-		setTimeout( function(){
+		setTimeout( function timer(){
 			console.log( j );
 		}, j*1000 );
 	})( i );
@@ -286,17 +290,17 @@ Look carefully at our analysis of the previous solution. We used an IIFE to crea
 ```js
 for (var i=1; i<=5; i++) {
 	let j = i; // yay, block-scope for closure!
-	setTimeout( function(){
+	setTimeout( function timer(){
 		console.log( j );
 	}, j*1000 );
 }
 ```
 
-*But, that's not all!* (in my best Bob Barker voice). There's a special behavior defined for `let` declarations used in the head of a for-loop. This behavior says that the variable will be declared not just once for the loop, but each iteration. And, it will, helpfully, be initialized at each subsequent iteration with the value at the end of the previous iteration.
+*But, that's not all!* (in my best Bob Barker voice). There's a special behavior defined for `let` declarations used in the head of a for-loop. This behavior says that the variable will be declared not just once for the loop, but each iteration. And, it will, helpfully, be initialized at each subsequent iteration with the value from the end of the previous iteration.
 
 ```js
 for (let i=1; i<=5; i++) {
-	setTimeout( function(){
+	setTimeout( function timer(){
 		console.log( i );
 	}, i*1000 );
 }
@@ -306,7 +310,7 @@ How cool is that? Block scoping and closure working hand-in-hand, solving all th
 
 ## Modules
 
-There are other code patterns which leverage the power of closure but which do not on the surface to appear to be about callbacks. Let's examine the most powerful of them: *the module*.
+There are other code patterns which leverage the power of closure but which do not on the surface appear to be about callbacks. Let's examine the most powerful of them: *the module*.
 
 ```js
 function foo() {
@@ -352,13 +356,13 @@ foo.doSomething(); // cool
 foo.doAnother(); // 1 ! 2 ! 3
 ```
 
-This is the pattern in JavaScript we call *module*. Other common names for it include "Revealing Module".
+This is the pattern in JavaScript we call *module*. The most common way of implementing the module pattern is often called "Revealiing Module", and it's the variation we present here.
 
 Let's examine some things about this code.
 
-Firstly, `CoolModule()` is just a function, but it *has to be invoked* for there to be a module. Without the execution of the outer function, the creation of the inner scope and the closures would not occur.
+Firstly, `CoolModule()` is just a function, but it *has to be invoked* for there to be a module instance created. Without the execution of the outer function, the creation of the inner scope and the closures would not occur.
 
-Secondly, the `CoolModule()` function returns an object, denoted by the object-literal syntax `{ key: value, ... }`. The object we return has references on it to our inner functions, but *not* to our inner data variables. We keep those hidden and private. It's appropriate to think of this object return value as essentially a public API for our module.
+Secondly, the `CoolModule()` function returns an object, denoted by the object-literal syntax `{ key: value, ... }`. The object we return has references on it to our inner functions, but *not* to our inner data variables. We keep those hidden and private. It's appropriate to think of this object return value as essentially a **public API for our module**.
 
 This object return value is ultimately assigned to the outer variable `foo`, and then we can access those property methods on the API, like `foo.doSomething()`.
 
@@ -372,9 +376,9 @@ To state it more simply, there are two "requirements" for the module pattern to 
 
 2. The enclosing function must return back at least one inner function, so that this inner function has closure over the private scope, and can access and/or modify that private state.
 
-An object with a function property on it alone is not *really* a module. An object which is returned from a function invocation which only has data properties on it and no closure-functions is not *really* a module.
+An object with a function property on it alone is not *really* a module. An object which is returned from a function invocation which only has data properties on it and no closure-functions is not *really* a module, in the observable sense.
 
-The code snippet above shows a standalone module function called `CoolModule()` which can be invoked any number of times, each time creating a new module instance. A slight variation on this pattern is when you only care to have one instance, a "singleton" of sorts:
+The code snippet above shows a standalone module creator called `CoolModule()` which can be invoked any number of times, each time creating a new module instance. A slight variation on this pattern is when you only care to have one instance, a "singleton" of sorts:
 
 ```js
 var foo = (function CoolModule() {
@@ -399,7 +403,7 @@ foo.doSomething(); // cool
 foo.doAnother(); // 1 ! 2 ! 3
 ```
 
-Here, we turned our module function into an IIFE (see Chapter 3), and we *immediately* invoked it and assigned its return value directly to our single module instance `foo`.
+Here, we turned our module function into an IIFE (see Chapter 3), and we *immediately* invoked it and assigned its return value directly to our single module instance identifier `foo`.
 
 Modules are just functions, so they can receive parameters:
 
@@ -451,11 +455,11 @@ foo.change();
 foo.identify(); // FOO MODULE
 ```
 
-By retaining an inner reference to the public API object inside your module instance, you can modify that instance, including adding and removing methods, properties, and changing their values.
+By retaining an inner reference to the public API object inside your module instance, you can modify that module instance **from the inside**, including adding and removing methods, properties, *and* changing their values.
 
 ### Modern Modules
 
-Various module dependency loaders/managers essentially wrap up this pattern of module definition into a friendly API. Rather than examine any one particular library, let me present a *very simple* proof of concept for illustration purposes (only):
+Various module dependency loaders/managers essentially wrap up this pattern of module definition into a friendly API. Rather than examine any one particular library, let me present a *very simple* proof of concept **for illustration purposes (only)**:
 
 ```js
 var MyModules = (function Manager() {
@@ -509,7 +513,9 @@ MyModules.define( "foo", ["bar"], function(bar){
 var bar = MyModules.get( "bar" );
 var foo = MyModules.get( "foo" );
 
-bar.hello( "hippo" ); // Let me introduce: hippo
+console.log(
+	bar.hello( "hippo" )
+); // Let me introduce: hippo
 
 foo.awesome(); // LET ME INTRODUCE: HIPPO
 ```
@@ -522,7 +528,7 @@ In other words, modules are just modules, even if you put a friendly wrapper too
 
 ### Future Modules
 
-ES6 adds first-class syntax support for the concept of modules. They essentially treat each file as a separate module, which can both import other modules or their API members, as well export their own public API members.
+ES6 adds first-class syntax support for the concept of modules. When loaded via the module system, ES6 treats a file as a separate module. Each module can both import other modules or specific API members, as well export their own public API members.
 
 **Note:** Function-based modules aren't a statically recognized pattern (something the compiler knows about), so their API semantics aren't considered until run-time. That is, you can actually modify a module's API during the run-time (see earlier `publicAPI` discussion).
 
@@ -562,23 +568,27 @@ export awesome;
 module foo from "foo";
 module bar from "bar";
 
-bar.hello( "rhino" ); // Let me introduce: rhino
+console.log(
+	bar.hello( "rhino" )
+); // Let me introduce: rhino
 
 foo.awesome(); // LET ME INTRODUCE: HIPPO
 ```
 
-`import` imports one or more members from a module's API into the current scope, each to a bound variable (`hello`). `module` imports an entire module API to a bound variable (`foo`, `bar`). `export` exports an identifier (variable, function) to the public API for the module. These statements can be used as many times in a module's definition as is necessary.
+**Note:** Separate files **"foo.js"** and **"bar.js"** would be need to be created, with the contents as shown in the first two snippets, respectively. Then, your program would load/import those modules to use them, as shown in the third snippet.
 
-**Note:** The contents inside the *module file* are treated as if enclosed in a scope closure, just like with the function-closure modules seen earlier.
+`import` imports one or more members from a module's API into the current scope, each to a bound variable (`hello` in our case). `module` imports an entire module API to a bound variable (`foo`, `bar` in our case). `export` exports an identifier (variable, function) to the public API for the current module. These statements can be used as many times in a module's definition as is necessary.
+
+The contents inside the *module file* are treated as if enclosed in a scope closure, just like with the function-closure modules seen earlier.
 
 ## Review (TL;DR)
 
 Closure seems to the un-enlightened like a mystical world set apart inside of JavaScript which only the few bravest souls can reach. But it's actually just a standard and almost obvious fact of how we write code in a lexically scoped environment, where functions are values and can be passed around at will.
 
-Closure is when a function can remember and access its lexical scope even when it's invoked outside its lexical scope.
-
-They require two key characteristics: 1) an outer wrapping function being invoked, to create the enclosing scope 2) the return value of the wrapping function must include reference to at least one inner function that then has closure over the private inner scope of the wrapper.
+**Closure is when a function can remember and access its lexical scope even when it's invoked outside its lexical scope.**
 
 Closures can trip us up, for instance with loops, if we're not careful to recognize them and how they work. But they are also an immensely powerful tool, enabling patterns like *modules* in their various forms.
+
+Modules require two key characteristics: 1) an outer wrapping function being invoked, to create the enclosing scope 2) the return value of the wrapping function must include reference to at least one inner function that then has closure over the private inner scope of the wrapper.
 
 Now we can see closures all around our existing code, and we have the ability to recognize and leverage them to our own benefit!
