@@ -25,7 +25,7 @@ OK, enough hyperbole and shameless movie references.
 
 Here's a down-n-dirty definition of what you need to know to understand and recognize closures:
 
-> Closure is when a function is able to remember and access his lexical scope even when that function is executing outside his lexical scope.
+> Closure is when a function is able to remember and access its lexical scope even when that function is executing outside its lexical scope.
 
 Let's jump into some code to illustrate that definition.
 
@@ -77,17 +77,17 @@ The function `bar()` has lexical scope access to the inner scope of `foo()`. But
 
 After we execute `foo()`, we assign the value it returned (our inner `bar()` function) to a variable called `baz`, and then we actually invoke `baz()`, which of course is invoking our inner function `bar()`, just by a different identifier reference.
 
-`bar()` is executed, for sure. But in this case, it's executed *outside* of his declared lexical scope.
+`bar()` is executed, for sure. But in this case, it's executed *outside* of its declared lexical scope.
 
 After `foo()` executed, normally we would expect that the entirety of the inner scope of `foo()` would go away, because we know that the *Engine* employs a *Garbage Collector* that comes along and frees up memory once it's no longer in use. Since it would appear that the contents of `foo()` are no longer in use, it would seem natural that they should be considered *gone*.
 
-But the "magic" of closures does not let this happen. Because the inner function `bar()` has, by virtue of where he was declared, a lexical scope closure over that inner scope of `foo()`, that inner scope is in fact *still* "in use"... **by the function `bar()`**. The scope doesn't go away.
+But the "magic" of closures does not let this happen. Because the inner function `bar()` has, by virtue of where it was declared, a lexical scope closure over that inner scope of `foo()`, that inner scope is in fact *still* "in use"... **by the function `bar()`**. The scope doesn't go away.
 
 **`bar()` still has a reference to that scope, and that reference is called closure.**
 
-So, a few microseconds later, when the variable `baz` is invoked, being just another reference to the inner function we initially labeled `bar`, this inner function executes, and duly has *access* to his normal lexical scope, so he can access the variable `a` just as we'd seen before.
+So, a few microseconds later, when the variable `baz` is invoked, being just another reference to the inner function we initially labeled `bar`, this inner function executes, and duly has *access* to its normal lexical scope, so it can access the variable `a` just as we'd seen before.
 
-But the inner function is being invoked well outside of his lexical scope. The "magic" that allows him to maintain a reference to access his lexical scope even though he's no longer *acting inside* that scope is... you guessed it: **closure**.
+But the inner function is being invoked well outside of its lexical scope. The "magic" that allows him to maintain a reference to access its lexical scope even though it's no longer *acting inside* that scope is... you guessed it: **closure**.
 
 Of course, any of the various ways that functions can be *passed around* as values, and indeed invoked in other locations, are all examples of observing/exercising closure.
 
@@ -133,7 +133,7 @@ foo();
 bar(); //logs, 2
 ```
 
-Whatever facility we use to *transport* an inner function outside of his lexical scope, he will maintain a scope reference to where he was originally declared, and wherever we execute him, that closure will be exercised.
+Whatever facility we use to *transport* an inner function outside of its lexical scope, it will maintain a scope reference to where it was originally declared, and wherever we execute him, that closure will be exercised.
 
 ## Now I Can See
 
@@ -153,7 +153,7 @@ wait( "Hello, closure!" );
 
 We take an inner function (shame on me for making it anonymous -- see Chapter 3!) and pass it to `setTimeout(..)`. But our inner function has a scope closure over `wait(..)`, indeed keeping and using a reference to the variable `message`.
 
-A full thousand milliseconds after we have executed `wait(..)`, and his inner scope should otherwise be long gone, that anonymous function still has closure over that scope. Deep down in the guts of the *Engine*, the built-in utility `setTimeout(..)` has reference to some parameter, probably called `fn` or `func` or something like that. He goes to invoke that function, which is invoking our inner (anonymous) function, and the lexical scope reference is still intact.
+A full thousand milliseconds after we have executed `wait(..)`, and its inner scope should otherwise be long gone, that anonymous function still has closure over that scope. Deep down in the guts of the *Engine*, the built-in utility `setTimeout(..)` has reference to some parameter, probably called `fn` or `func` or something like that. *Engine* goes to invoke that function, which is invoking our inner (anonymous) function, and the lexical scope reference is still intact.
 
 **Closure.**
 
@@ -184,7 +184,7 @@ var a = 2;
 })();
 ```
 
-This code "works", but it's not strictly an observation of closure. Why? Because the function (which we named "IIFE" here) is not executed outside his lexical scope. It's still invoked right there in the same scope as it was declared. While closure might technically be happening at declaration time, it is *not*, strictly, observable, and so, as they say, *it's a tree falling in the forest with no one around to hear it.*
+This code "works", but it's not strictly an observation of closure. Why? Because the function (which we named "IIFE" here) is not executed outside its lexical scope. It's still invoked right there in the same scope as it was declared. While closure might technically be happening at declaration time, it is *not*, strictly, observable, and so, as they say, *it's a tree falling in the forest with no one around to hear it.*
 
 Though an IIFE is not *itself* an example of closure, it absolutely creates scope, and it's one of the most common tools we use to create scope which can be closed over. So IIFEs are indeed heavily related to closure, even if not closure examples themselves.
 
@@ -575,7 +575,7 @@ foo.awesome(); // LET ME INTRODUCE: HIPPO
 
 Closure seems to the un-enlightened like a mystical world set apart inside of JavaScript which only the few bravest souls can reach. But it's actually just a standard and almost obvious fact of how we write code in a lexically scoped environment, where functions are values and can be passed around at will.
 
-Closure is when a function can remember and access his lexical scope even when he's invoked outside his lexical scope.
+Closure is when a function can remember and access its lexical scope even when it's invoked outside its lexical scope.
 
 They require two key characteristics: 1) an outer wrapping function being invoked, to create the enclosing scope 2) the return value of the wrapping function must include reference to at least one inner function that then has closure over the private inner scope of the wrapper.
 

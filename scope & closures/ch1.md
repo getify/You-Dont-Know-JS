@@ -83,7 +83,7 @@ To summaraize: two distinct actions are taken for a variable assignment: First, 
 
 We need a little bit more compiler terminology to proceed further with understanding.
 
-When *Engine* executes the code that *Compiler* produced for step (2), he has to look-up the variable `a` to see if it has been declared, and this look-up is exercising *Scope*. But the type of look-up he performs affects the outcome of the look-up.
+When *Engine* executes the code that *Compiler* produced for step (2), it has to look-up the variable `a` to see if it has been declared, and this look-up is consulting *Scope*. But the type of look-up *Engine* performs affects the outcome of the look-up.
 
 In our case, it is said that *Engine* would be performing an "LHS" look-up for the variable `a`. The other type of look-up is called "RHS".
 
