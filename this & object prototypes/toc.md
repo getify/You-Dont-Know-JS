@@ -16,4 +16,11 @@
 	* Syntax
 	* Type
 	* Contents
-* Chapter 4: Prototype
+* Chapter 4: Class Copies
+	* Class
+	* Inheritance
+	* Mixins
+* Chapter 5: Prototypes
+	* Links
+	* "Class"
+	* "(Prototypal) Inheritance"
