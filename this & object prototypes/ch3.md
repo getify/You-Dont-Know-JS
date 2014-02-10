@@ -75,7 +75,7 @@ strObject instanceof String; // true
 Object.prototype.toString.call( strObject ); // [object String]
 ```
 
-We'll see in detail in a later chapter exactly how the `Object.prototype.toString...` bit works, but briefly, we can inspect the internal sub-type (known in the specification as ``[[Class]]``) by borrowing the base default `toString()` method, and you can see it reveals that `strObject` is an object that was in fact created by the `String` constructor.
+We'll see in detail in a later chapter exactly how the `Object.prototype.toString...` bit works, but briefly, we can inspect the internal sub-type by borrowing the base default `toString()` method, and you can see it reveals that `strObject` is an object that was in fact created by the `String` constructor.
 
 The primitive value `"I am a string"` is not an object, it's a primitive literal and immutable value. To perform operations on it, such as checking its length, modifying its contents, etc, a `String` object is required.
 
@@ -95,7 +95,7 @@ In both cases, we call a property or method on a string primitive, and the engin
 
 The same sort of coercion happens between the number literal primitive `42` and the `new Number(42)` object wrapper, when using methods like `42.359.toFixed(2)`. Likewise for `Boolean` objects from `"boolean"` primitives.
 
-`null` and `undefined` have no object wrapper form, only their primitive values. By contrast, Date values can *only* be created with their constructed object form, as they have no literal form counter-part.
+`null` and `undefined` have no object wrapper form, only their primitive values. By contrast, `Date` values can *only* be created with their constructed object form, as they have no literal form counter-part.
 
 `Object`s, `Array`s, `Function`s, and `RegExp`s (regular expressions) are all objects regardless of whether the literal or constructed form is used. The constructed form does offer, in some cases, more options in creation than the literal form counterpart. Since objects are created either way, the simpler literal form is almost universally preferred. **Only use the constructed form if you need the extra options.**
 
@@ -165,7 +165,7 @@ Technically, functions never "belong" to objects, so saying that a function that
 
 It *is* true that some functions have `this` references in them, and that *sometimes* these `this` references refer to the object reference at the call-site. But this usage really does not make that function any more a "method" than any other function, as `this` is dynamically bound at run-time, at the call-site, and thus its relationship to the object is indirect, at best.
 
-Every time you access a property on an object, that is a **property access**, regardless of the type of value you get back. If you *happen* to get a function from that property access, it's not magically a "method" at that point. There's nothing special (outside of possible `this` binding as explained earlier) about a function that comes from a property access.
+Every time you access a property on an object, that is a **property access**, regardless of the type of value you get back. If you *happen* to get a function from that property access, it's not magically a "method" at that point. There's nothing special (outside of possible implicit `this` binding as explained earlier) about a function that comes from a property access.
 
 For instance:
 
@@ -276,17 +276,17 @@ myObject.a; // undefined
 myObject.b; // undefined
 ```
 
-From a *value* perspective, there is no difference between these two references -- they both result in `undefined`. However, the `[[Get]]` operation underneath, though subtle at a glance, potentially performed quite a bit more "work" for `myObject.b` than for `myObject.a`.
+From a *value* perspective, there is no difference between these two references -- they both result in `undefined`. However, the `[[Get]]` operation underneath, though subtle at a glance, potentially performed a bit more "work" for `myObject.b` than for `myObject.a`.
 
-Inspecting the value results, you cannot distinguish whether a property exists and holds the explicit value `undefined`, or whether ther property does *not* exist and `undefined` was the default return value after `[[Get]]` failed to return something explicitly. However, we will see in a moment how you *can* distinguish these two situations.
+Inspecting the value results, you cannot distinguish whether a property exists and holds the explicit value `undefined`, or whether ther property does *not* exist and `undefined` was the default return value after `[[Get]]` failed to return something explicitly. However, we will see shortly how you *can* distinguish these two scenarios.
 
 ### Getters & Setters
 
-The reason it's important to think of a property access in terms of a `[[Get]]` operation is because in a future version of JavaScript, it's likely that the default built-in `[[Get]]` operation for an object will actually be overridable. You could, for instance, specify that unfulfilled property accesses result in a `null` instead of an `undefined`, if you so chose.
+The reason it's important to think of a property access in terms of a `[[Get]]` operation is because in a future version of JavaScript, it's likely that the default built-in `[[Get]]` operation for an object will actually be overridable. You could in theory specify that unfulfilled property accesses result in a `null` instead of an `undefined`, if you so chose.
 
-**Note:** When we examine the `[[Prototype]]` chain traversal as part of the default object-level `[[Get]]` operation in the next chapter, it will become clear that overriding this operation allows you to actually redefine how `[[Prototype]]` look-ups work, or even not at all.
+**Note:** When we examine the `[[Prototype]]` chain traversal as part of the default object-level `[[Get]]` operation in Chapter 5, it will become clear that overriding this operation allows you to actually redefine how `[[Prototype]]` look-ups work, or even change to not occur at all!
 
-ES5 introduced a limited form of this future `[[Get]]` override capability with "getters", which are specified per-property, rather than across the entire object (which is likely coming in a future revision of the language).
+ES5 introduced a limited form of this future `[[Get]]` override capability with "getters", which are specified per-property, rather than across the entire object (which is potentially coming in a future revision of the language).
 
 Consider:
 
@@ -352,7 +352,7 @@ myObject.a = 2;
 myObject.a; // 4
 ```
 
-**Note:** In this example, we actually store the specified value `2` of the assigment (`[[Put]]` operation) into another variable `_a_`. The `_a_` name is purely by convention for this example and implies nothing special about its behavior -- it's a standard property like any other.
+**Note:** In this example, we actually store the specified value `2` of the assigment (`[[Put]]` operation) into another variable `_a_`. The `_a_` name is purely by convention for this example and implies nothing special about its behavior -- it's a normal property like any other.
 
 ### Existence
 
@@ -372,7 +372,7 @@ myObject.hasOwnProperty( "a" ); // true
 myObject.hasOwnProperty( "b" ); // false
 ```
 
-The `in` operator will check to see if the property is *in* the object, or if it exists at any higher level of the ``[[Prototype]]` chain object traversal. By contrast, `hasOwnProperty(..)` checks to see if *only* `myObject` has the property or not, and will *not* consult the `[[Prototype]]` chain. We'll come back to the important differences between these two operations in the next chapter when we explore `[[Prototype]]`s in detail.
+The `in` operator will check to see if the property is *in* the object, or if it exists at any higher level of the ``[[Prototype]]` chain object traversal (see Chapter 5). By contrast, `hasOwnProperty(..)` checks to see if *only* `myObject` has the property or not, and will *not* consult the `[[Prototype]]` chain. We'll come back to the important differences between these two operations in the Chapter 5 when we explore `[[Prototype]]`s in detail.
 
 **Note:** The `in` operator has the appearance that it will check for the existence of a *value* inside a container, but it actually checks for the existence of a property name. This difference is important to note with respect to arrays, as the temptation to try a check like `2 in [1, 2, 3]` is strong, but this will not behave as expected.
 
@@ -441,7 +441,7 @@ Object.getOwnPropertyNames( myObject ); // ["a", "b"]
 
 `Object.keys(..)` returns an array of all enumerable properties, whereas `Object.getOwnPropertyNames(..)` returns an array of *all* properties, enumerable or not.
 
-**Note:** Whereas `in` vs. `Object.hasOwnProperty(..)` differ in whether they consult the `[[Prototype]]` chain or not, respectively, `Object.keys(..)` and `Object.getOwnPropertyNames(..)` both inspect *only* the direct object specified. There's no built-in way to get a list of all properties which the `in` operator would find (traversing all properties on the entire `[[Prototype]]` chain, as explained in the next chapter).
+**Note:** Whereas `in` vs. `Object.hasOwnProperty(..)` differ in whether they consult the `[[Prototype]]` chain or not, respectively, `Object.keys(..)` and `Object.getOwnPropertyNames(..)` both inspect *only* the direct object specified. There's no built-in way to get a list of all properties which the `in` operator would find (traversing all properties on the entire `[[Prototype]]` chain, as explained in Chapter 5).
 
 #### Iteration
 
@@ -458,7 +458,7 @@ for (var i = 0; i < myArray.length; i++) {
 // 1 2 3
 ```
 
-Technically, this isn't iterating over the values, but iterating over the indices, where you then use the index to reference the value with `myArray[i]`.
+Technically, this isn't iterating over the values, but iterating over the indices, where you then use the index to reference the value, as `myArray[i]`.
 
 In the same way, if you iterate on an object with a `for-in` loop, you're getting at the values indirectly, because it's actually iterating only over the enumerable properties of the object, leaving you to access the properties manually to get the values.
 
@@ -522,7 +522,7 @@ for (var n, v;
 
 Objects in JS have both a literal form (such as `var a = { .. }`) and a constructed form (such as `var a = new Array(..)`). The literal form is almost always preferred, but the constructed form offers, in some cases, more creation options.
 
-Many people mistakingly claim "everything in JavaScript is an object", but this is incorrect. Objects are one of the 6 (or 7, depending on your perspective) primitive types. Objects have sub-types, including `function`, and also can be behavior-specialized, like `[object Array]` as the internal `[[Class]]` representing the array object-type.
+Many people mistakingly claim "everything in JavaScript is an object", but this is incorrect. Objects are one of the 6 (or 7, depending on your perspective) primitive types. Objects have sub-types, including `function`, and also can be behavior-specialized, like `[object Array]` as the internal label representing the array object sub-type.
 
 Objects are collections of key/value pairs. The values can be accessed as properties, via `.propName` or `["propName"]` syntax. Whenever a property is accessed, the engine actually invokes the internal default `[[Get]]` operation, which not only looks for the property directly on the object, but which will traverse the `[[Prototype]]` chain if not found.
 
