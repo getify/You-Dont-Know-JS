@@ -197,7 +197,7 @@ Let's revisit our `Vehicle` and `Car` example from before. Since JavaScript will
 function mixin( sourceObj, targetObj ) {
 	for (var key in sourceObj) {
 		// only copy if not already present
-		if (!(key in sourceObj)) {
+		if (!(key in targetObj)) {
 			targetObj[key] = sourceObj[key];
 		}
 	}
