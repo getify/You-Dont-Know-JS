@@ -29,6 +29,12 @@ If you like this content and would like to contact me regarding conducting train
 
 [http://getify.me](http://getify.me)
 
+## Contributions
+
+Any contributions you make to this effort **are of course greatly appreciated**.
+
+However, if you choose to contribute content (not just typo corrections) to this repo, you agree that you're giving me a non-exclusive license to use that content for the book series, as I (and O'Reilly) deem appropriate. You probably guessed that already, but we just have to make the lawyers happy by explicitly stating it. So: blah, blah, blah... :)
+
 ## License & Copyright
 
 The materials herein are all (c) 2013-2014 Kyle Simpson, and are licensed under Creative Commons CC BY-NC-ND 3.0.
