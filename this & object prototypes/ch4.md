@@ -287,15 +287,19 @@ Either way, we have explicitly copied the non-overlapping contents of `Vehicle` 
 
 As a result of the copy operation, `Car` will operate somewhat separately from `Vehicle`. If you add a property onto `Car`, it will not affect `Vehicle`, and vice versa.
 
-**Note:** A few minor details have been skimmed over here. There are still some subtle ways the two objects can "affect" each other, such as if they both share a reference to a common object (such as an array). They also share references to the functions (which are objects!), so if you modifed a **function object** by adding properties on top of it, both `Vehicle` and `Car` would be "affected".
+**Note:** A few minor details have been skimmed over here. There are still some subtle ways the two objects can "affect" each other even after copying, such as if they both share a reference to a common object (such as an array).
 
-Explicit mixins are a fine mechanism in JavaScript. But they appear more powerful than they really are. Not much benefit is *actually* derived from copying a property from one object to another, **as opposed to just defining the properties twice**, once on each object.
+Since the two objects also share references to their common functions, that means that **even manual copying of functions (aka, mixins) from one object to another doesn't *actually emulate* the real duplication from class to instance that occurs in class-oriented languages**.
 
-If you explicitly mix-in two or more objects into your target object, you can emulate the behavior of "multiple inheritance", but there's no direct way to handle collisions if the same method or property is being copied from more than one source. Some have constructed "late binding" techniques and other exotic work-arounds, but fundamentally these "tricks" are *usually* more effort than the pay-off.
+JavaScript functions can't really be duplicated, so what you end up with instead is a **duplicated reference** to the same shared function object (functions are objects; see Chapter 3). If you modifed one of the shared **function objects** by adding properties on top of it, for instance, both `Vehicle` and `Car` would be "affected" via the shared reference.
+
+Explicit mixins are a fine mechanism in JavaScript. But they appear more powerful than they really are. Not much benefit is *actually* derived from copying a property from one object to another, **as opposed to just defining the properties twice**, once on each object. And that's especially true given the function-object reference nuance we just mentioned.
+
+If you explicitly mix-in two or more objects into your target object, you can **partially emulate** the behavior of "multiple inheritance", but there's no direct way to handle collisions if the same method or property is being copied from more than one source. Some have constructed "late binding" techniques and other exotic work-arounds, but fundamentally these "tricks" are *usually* more effort (and lesser performance!) than the pay-off.
 
 Take care only to use explicit mixins where it actually helps make more readable code, and avoid the pattern if you find it making code that's harder to trace, or if you find it creates unnecessary or unweildy dependencies between objects.
 
-**If it starts to get *harder* to properly use mixins than before you used them**, you should probably stop using mixins.
+**If it starts to get *harder* to properly use mixins than before you used them**, you should probably stop using mixins. In fact, in you have to use a complex library/utility to work out all these details, it might be a sign that you're going about it the harder way, perhaps unnecessarily. In Chapter 5, we'll try to distill a simpler way that accomplishes the desired outcomes without all the fuss.
 
 ### Implicit Mixins
 
@@ -344,4 +348,6 @@ Traditional classes make relative references to different functions of the same 
 
 **JavaScript does not have classes**, only objects. And JavaScript does not automatically create copies (as classes imply) between objects.
 
-The mixin pattern (both explicit and implicit) is often used to emulate class copy behavior, but this usually leads to ugly and brittle syntax like explicit pseudo-polymorphism (`OtherObj.methodName.call(this, ...)`), which is often a cause of harder to maintain code.
+The mixin pattern (both explicit and implicit) is often used to *sort of* emulate class copy behavior, but this usually leads to ugly and brittle syntax like explicit pseudo-polymorphism (`OtherObj.methodName.call(this, ...)`), which is often a cause of harder to understand and maintain code.
+
+Explicit mixins are also not exactly the same as class *copy* as objects (and functions!) only have shared references duplicated, not the objects/functions themselves. Not paying attention to such nuance is the source of a variety of gotchas. In general, this style of code often sets more landmines for future coding than solving present problems.
