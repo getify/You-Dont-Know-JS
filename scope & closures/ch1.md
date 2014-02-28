@@ -77,7 +77,7 @@ A reasonable assumption would be that *Compiler* will produce code that could be
 
 If *Engine* eventually finds a variable, it assigns the value `2` to it. If not, *Engine* will raise its hand and yell out an error!
 
-To summaraize: two distinct actions are taken for a variable assignment: First, *Compiler* declares a variable (if not previously declared), and second, when executing, *Engine* looks up the variable in *Scope* and assigns to it, if found.
+To summaraize: two distinct actions are taken for a variable assignment: First, *Compiler* declares a variable (if not previously declared in the current scope), and second, when executing, *Engine* looks up the variable in *Scope* and assigns to it, if found.
 
 ### Compiler Speak
 
@@ -93,9 +93,9 @@ Side... of what? **Of an assignment operation.**
 
 In other words, an LHS look-up is done when a variable appears on the left-hand side of an assignment operation, and an RHS look-up is done when a variable appears on the right-hand side of an assignment operation.
 
-Actually, let's be a little more precise. An RHS look-up is indistinguishable, for our purposes, from simply a look-up of the value of some variable, whereas the LHS look-up is trying to find the variable container itself, so that it can assign. In this way, RHS doesn't *really* mean "right-hand side of an assignment" per se, it just, more accurately, means "not left-hand side".
+Actually, let's be a little more precise. An RHS look-up is indistiguishable, for our purposes, from simply a look-up of the value of some variable, whereas the LHS look-up is trying to find the variable container itself, so that it can assign. In this way, RHS doesn't *really* mean "right-hand side of an assignment" per se, it just, more accurately, means "not left-hand side".
 
-Being slightly glib for a moment, you could also say "RHS" instead means "retrieve his/her source (value)", implying that RHS means "go get the value of...".
+Being slightly glib for a moment, you could also think "RHS" instead means "retrieve his/her source (value)", implying that RHS means "go get the value of...".
 
 Let's dig into that deeper.
 
@@ -127,7 +127,7 @@ function foo(a) {
 foo( 2 );
 ```
 
-The line that invokes `foo(..)` as a function call requires an RHS reference to `foo`, meaning, "go look-up the value of `foo`, and give it to me." Moreover, `(..)` means the value of `foo` should be executed, so it'd better actually be a function!
+The last line that invokes `foo(..)` as a function call requires an RHS reference to `foo`, meaning, "go look-up the value of `foo`, and give it to me." Moreover, `(..)` means the value of `foo` should be executed, so it'd better actually be a function!
 
 There's a subtle but important assignment here. **Did you spot it?**
 
@@ -153,25 +153,25 @@ foo( 2 );
 
 Let's imagine the above exchange (which processes this code snippet) as a conversation. The conversation would go a little something like this:
 
-> ***Engine***: Hey *Scope*, I have an RHS reference for `foo`. Ever heard of him?
+> ***Engine***: Hey *Scope*, I have an RHS reference for `foo`. Ever heard of it?
 
-> ***Scope***: Why yes, I have. *Compiler* declared him just a second ago. He's a function. Here you go.
+> ***Scope***: Why yes, I have. *Compiler* declared it just a second ago. He's a function. Here you go.
 
 > ***Engine***: Great, thanks! OK, I'm executing `foo`.
 
-> ***Engine***: Hey, *Scope*, I've got an LHS reference for `a`, ever heard of him?
+> ***Engine***: Hey, *Scope*, I've got an LHS reference for `a`, ever heard of it?
 
-> ***Scope***: Why yes, I have. *Compiler* declared him as a formal parameter to `foo` just recently. Here you go.
+> ***Scope***: Why yes, I have. *Compiler* declared it as a formal parameter to `foo` just recently. Here you go.
 
 > ***Engine***: Helpful as always, *Scope*. Thanks again. Now, time to assign `2` to `a`.
 
-> ***Engine***: Hey, *Scope*, sorry to bother you again. I need an RHS look-up for `console`. Ever heard of him?
+> ***Engine***: Hey, *Scope*, sorry to bother you again. I need an RHS look-up for `console`. Ever heard of it?
 
 > ***Scope***: No problem, *Engine*, this is what I do all day. Yes, I've got `console`. He's built-in. Here ya go.
 
 > ***Engine***: Perfect. Looking up `log(..)`. OK, great, it's a function.
 
-> ***Engine***: Yo, *Scope*. Can you help me out with an RHS reference to `a`. I think I remember him, but just want to double-check.
+> ***Engine***: Yo, *Scope*. Can you help me out with an RHS reference to `a`. I think I remember it, but just want to double-check.
 
 > ***Scope***: You're right, *Engine*. Same guy, hasn't changed. Here ya go.
 
@@ -202,7 +202,7 @@ var c = foo( 2 );
 
 We said that *Scope* is a set of rules for looking up variables by their identifier name. There's usually more than one *Scope* to consider, however.
 
-Just as a block or function is nested inside another block or function, scopes are nested inside other scopes. So, if a variable cannot be found in the immediate scope, *Engine* looks consults the next containing scope, continuning until found or until the outermost (aka, global) scope has been reached.
+Just as a block or function is nested inside another block or function, scopes are nested inside other scopes. So, if a variable cannot be found in the immediate scope, *Engine* consults the next outer containing scope, continuning until found or until the outermost (aka, global) scope has been reached.
 
 Consider:
 
@@ -220,11 +220,11 @@ The RHS reference for `b` cannot be resolved inside the function `foo`, but it c
 
 So, revisiting the conversations between *Engine* and *Scope*, we'd overhear:
 
-> ***Engine***: "Hey, *Scope* of `foo`, ever heard of `b`? Got an RHS reference for him."
+> ***Engine***: "Hey, *Scope* of `foo`, ever heard of `b`? Got an RHS reference for it."
 
-> ***Scope***: "Nope, never heard of him. Go fish."
+> ***Scope***: "Nope, never heard of it. Go fish."
 
-> ***Engine***: "Hey, *Scope* outside of `foo`, oh you're the global *Scope*, ok cool. Ever heard of `b`? Got an RHS reference for him."
+> ***Engine***: "Hey, *Scope* outside of `foo`, oh you're the global *Scope*, ok cool. Ever heard of `b`? Got an RHS reference for it."
 
 > ***Scope***: "Yep, sure have. Here ya go."
 
@@ -244,7 +244,7 @@ You resolve LHS and RHS references by looking on your current floor, and if you 
 
 Why does it matter whether we call it LHS or RHS?
 
-Because these two types of look-ups behave differently in the circumstance where the variable has not yet been declared (is not found in any *Scope*).
+Because these two types of look-ups behave differently in the circumstance where the variable has not yet been declared (is not found in any consulted *Scope*).
 
 Consider:
 
@@ -259,7 +259,7 @@ foo( 2 );
 
 When the RHS look-up occurs for `b` the first time, it will not be found. This is said to be an "undeclared" variable, because it is not found in the scope.
 
-If an RHS look-up fails to ever find a variable, anywhere in the nested *Scope*s, this results in a `ReferenceError` being thrown by the *Engine*. It's important to note that the error is of the type `ReferenceError`.
+If an RHS look-up fails to ever find a variable, anyhwere in the nested *Scope*s, this results in a `ReferenceError` being thrown by the *Engine*. It's important to note that the error is of the type `ReferenceError`.
 
 By contrast, if the *Engine* is performing an LHS look-up, and it arrives at the top floor (global *Scope*) without finding it, if the program is not running in "Strict Mode" [^note-strictmode], then the global *Scope* will create a new variable of that name **in the global scope**, and hand it back to *Engine*.
 
@@ -272,8 +272,6 @@ Now, if a variable is found for an RHS look-up, but you try to do something with
 `ReferenceError` is *Scope* resolution-failure related, whereas `TypeError` implies that *Scope* resolution was successful, but that there was an illegal/impossible action attempted against the result.
 
 ## Review (TL;DR)
-
-So, what is scope?
 
 Scope is the set of rules that determines where and how a variable (identifier) can be looked-up. This look-up may be for the purposes of assigning to the variable, which is an LHS (left-hand-side) reference, or it may be for the purposes of retrieving its value, which is an RHS (right-hand-side) reference.
 

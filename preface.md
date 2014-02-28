@@ -1,7 +1,7 @@
 # You Don't Know JS
 # Preface
 
-Before I begin, let me first dispel (or perhaps start!) a rumor. The "JS" in this book series title is "not" an abbreviation for a common curse-word, though said curse-word is often used when talking *about* the topic which "JS" actually stands for: JavaScript.
+I'm sure you noticed, but "JS" in the book series title is not an abbreviation for words used to curse about JavaScript, though cursing at the language's quirks is something we can probably all identify with!
 
 From the earliest days of the web, JavaScript has been a foundational technology that drives interactive experience around the content we consume. While flickering mouse trails and annoying pop-up prompts may be where JavaScript started, nearly 2 decades later, the technology and capability of JavaScript has grown many orders of magnitude, and few doubt its importance at the heart of the world's most widely available software platform: the web.
 
@@ -36,3 +36,5 @@ The JavaScript you know *right now* is probably *parts* handed down to you by ot
 ## Review (TL;DR)
 
 JavaScript is awesome. It's easy to learn partially, and much harder to learn completely (or even *sufficiently*). When developers encounter confusion, they usually blame the language instead of their lack of understanding. These books aim to fix that, inspiring a strong appreciation for the language you can now, and *should*, deeply *know*.
+
+Note: Many of the examples in this book assume modern (and future-reaching) JavaScript engine environments, such as ES6. Some code may not work as described if run in older (pre-ES6) engines.
