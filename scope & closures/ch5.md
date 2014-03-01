@@ -1,7 +1,7 @@
 # You Don't Know JS: Scope & Closures
 # Chapter 5: Scope Closure
 
-We arrive at this point of the book with hopefully a very healthy, solid understanding of how scope works. In fact, we should see that scope was always something we almost intuitively understood, even without the formality and rigor of understanding (not to mention, compiler terminology!) we have now explored.
+We arrive at this point with hopefully a very healthy, solid understanding of how scope works.
 
 We turn our attention to an incredibly important, but persistently elusive, *almost mythological*, part of the language: **closure**. If you have followed our discussion of lexical scope thus far, the payoff is that closure is going to be, largely, anti-climatic, almost self-obvious. *There's a man behind the wizard's curtain, and we're about to see him*. No, his name is not Crockford!
 
@@ -121,7 +121,7 @@ function foo() {
 		console.log( a );
 	}
 
-	fn = baz;
+	fn = baz; // assign `baz` to global variable
 }
 
 function bar() {
@@ -176,7 +176,7 @@ I am not sure what kind of code you write, but I regularly write code which is r
 
 (Some) joking aside, essentially *whenever* and *wherever* you treat functions (which access their own respective lexical scopes) as first-class values and pass them around, you are likely to see those functions exercising closure. Be that timers, event handlers, Ajax requests, cross-window messaging, web workers, or any of the other asynchronous (or synchronous!) tasks, when you pass in a *callback function*, get ready to sling some closure around!
 
-**Note:** Chapter 3 introduced the IIFE pattern. While it is often said that IIFE (alone) is an example of closure, I would somewhat disagree, by our definition above.
+**Note:** Chapter 3 introduced the IIFE pattern. While it is often said that IIFE (alone) is an example of observed closure, I would somewhat disagree, by our definition above.
 
 ```js
 var a = 2;
@@ -577,7 +577,7 @@ foo.awesome(); // LET ME INTRODUCE: HIPPO
 
 **Note:** Separate files **"foo.js"** and **"bar.js"** would be need to be created, with the contents as shown in the first two snippets, respectively. Then, your program would load/import those modules to use them, as shown in the third snippet.
 
-`import` imports one or more members from a module's API into the current scope, each to a bound variable (`hello` in our case). `module` imports an entire module API to a bound variable (`foo`, `bar` in our case). `export` exports an identifier (variable, function) to the public API for the current module. These statements can be used as many times in a module's definition as is necessary.
+`import` imports one or more members from a module's API into the current scope, each to a bound variable (`hello` in our case). `module` imports an entire module API to a bound variable (`foo`, `bar` in our case). `export` exports an identifier (variable, function) to the public API for the current module. These operators can be used as many times in a module's definition as is necessary.
 
 The contents inside the *module file* are treated as if enclosed in a scope closure, just like with the function-closure modules seen earlier.
 

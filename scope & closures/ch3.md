@@ -65,7 +65,7 @@ For example:
 function doSomething(a) {
 	b = a + doSomethingElse( a * 2 );
 
-	console.log( (b * 3) );
+	console.log( b * 3 );
 }
 
 function doSomethingElse(a) {
@@ -141,7 +141,7 @@ var MyReallyCoolLibrary = {
 	doAnotherThing: function() {
 		// ...
 	}
-}
+};
 ```
 
 #### Module Management
@@ -221,7 +221,7 @@ Anonymous function expressions are quick and easy to type, and many libraries an
 
 2. Without a name, if the function needs to refer to itself, for recursion, etc, the **deprecated** `arguments.callee` reference is unfortunately required. Another example of needing to self-reference is when an event handler function wants to unbind itself after it fires.
 
-3. Anonymous functions omit a name which is often helpful in providing more readable/understandable code. A descriptive name acts to self-document the code in question.
+3. Anonymous functions omit a name which is often helpful in providing more readable/understandable code. A descriptive name helps self-document the code in question.
 
 **Inline function expressions** are powerful and useful -- the question of anonymous vs. named doesn't detract from that. Providing a name for your function expression quite effectively addresses all these draw-backs, but has no tangible downsides. The best practice is to always name your function expressions:
 
@@ -265,7 +265,7 @@ var a = 2;
 console.log( a ); // 2
 ```
 
-There's a slight variation on the traditional IIFE form (`(function(){ .. })()`), which some prefer: `(function(){ .. }())`. Look closely to see the difference. In the first form, the function expression is wrapped in `( )`, and then the invoking `()` pair is on the outside right after it. In the second form, the invoking `()` pair is moved to the inside of the outer `( )` wrapping pair.
+There's a slight variation on the traditional IIFE form, which some prefer: `(function(){ .. }())`. Look closely to see the difference. In the first form, the function expression is wrapped in `( )`, and then the invoking `()` pair is on the outside right after it. In the second form, the invoking `()` pair is moved to the inside of the outer `( )` wrapping pair.
 
 These two forms are identical in functionality. **It's purely a stylistic choice which you prefer.**
 
@@ -292,6 +292,8 @@ We pass in the `window` object reference, but we name the parameter `global`, so
 Another application of this pattern addresses the (minor niche) concern that the default `undefined` identifier might have its value incorrectly overwritten, causing unexpected results. By naming a parameter `undefined`, but not passing any value for that argument, we can guarantee that the `undefined` identifier is in fact the undefined value in a block of code:
 
 ```js
+undefined = true; // setting a land-mine for other code! avoid!
+
 (function IIFE( undefined ){
 
 	var a;
@@ -300,8 +302,6 @@ Another application of this pattern addresses the (minor niche) concern that the
 	}
 
 })();
-
-undefined = true; // setting a land-mine for other code! avoid!
 ```
 
 Still another variation of the IIFE inverts the order of things, where the function to execute is given second, *after* the invocation and parameters to pass to it. This pattern is used in the UMD (Universal Module Definition) project. Some people find it a little cleaner to understand, though it is slightly more verbose.
@@ -336,7 +336,7 @@ for (var i=0; i<10; i++) {
 }
 ```
 
-We declare the variable `i` directly inside the for-loop head, most likely because our *intent* as developers is to use `i` only within the context of that for-loop, and essentially ignore the fact that the variable actually scopes itself to the enclosing scope (function or global).
+We declare the variable `i` directly inside the for-loop head, most likely because our *intent* is to use `i` only within the context of that for-loop, and essentially ignore the fact that the variable actually scopes itself to the enclosing scope (function or global).
 
 That's what block-scoping is all about. Declaring variables as close as possible, as local as possible, to where they will be used. Another example:
 
@@ -393,7 +393,7 @@ console.log( err ); // ReferenceError: `err` not found
 
 As you can see, `err` exists only in the `catch` clause, and throws an error when you try to reference it elsewhere.
 
-**Note:** While this behavior has been specified and true of practically all standard JS environments (except perhaps old-n-busted IE), many linters seem to still complain if you have two or more `catch` clauses in the same scope which each declare their error variable with the same identifier name. This is not actually a re-definition, since the variables are safely block-scoped, but the linters still seem to, annoyingly, complain about this fact.
+**Note:** While this behavior has been specified and true of practically all standard JS environments (except perhaps old IE), many linters seem to still complain if you have two or more `catch` clauses in the same scope which each declare their error variable with the same identifier name. This is not actually a re-definition, since the variables are safely block-scoped, but the linters still seem to, annoyingly, complain about this fact.
 
 To avoid these unnecessary warnings, some devs will name their `catch` variables `err1`, `err2`, etc. Other devs will simply turn off the linting check for duplicate variable names.
 
@@ -441,9 +441,20 @@ We can create an arbitrary block for `let` to bind to by simply including a `{ .
 
 **Note:** For another way to express explicit block scopes, see Appendix B.
 
+In Chapter 4, we will address hoisting, which talks about declarations being taken as existing for the entire scope in which they occur.
+
+However, declarations made with `let` will *not* hoist to the entire scope of the block they appear in. Such declarations will not observably "exist" in the block until the declaration statement.
+
+```js
+{
+   console.log( bar ); // ReferenceError!
+   let bar = 2;
+}
+```
+
 #### Garbage Collection
 
-Another reason block-scoping is useful relates to closures  and garbage collection to reclaim memory. We'll briefly illustrate here, but the closure mechanism is explained in detail in Chapter 5.
+Another reason block-scoping is useful relates to closures and garbage collection to reclaim memory. We'll briefly illustrate here, but the closure mechanism is explained in detail in Chapter 5.
 
 Consider:
 
@@ -465,7 +476,7 @@ btn.addEventListener( "click", function click(evt){
 
 The `click` function click handler callback doesn't *need* the `someReallyBigData` variable at all. That means, theoretically, after `process(..)` runs, the big memory-heavy data structure could be garbage collected. However, it's quite likely (though implementation dependent) that the JS engine will still have to keep the structure around, since the `click` function has a closure over the entire scope.
 
-Block-scoping addresses this concern, making it clear to the engine that it does not need to keep `someReallyBigData` around:
+Block-scoping can address this concern, making it clearer to the engine that it does not need to keep `someReallyBigData` around:
 
 ```js
 function process(data) {
