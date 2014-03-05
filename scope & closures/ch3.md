@@ -527,7 +527,7 @@ Here's another way of illustrating the per-iteration binding behavior that occur
 
 The reason why this per-iteration binding is interesting will become clear in Chapter 5 when we discuss closures.
 
-**Note:** Because `let` declarations attach to arbitrary blocks rather than to the enclosing function's scope (or global), there can be gotchas where existing code has a hidden reliance on function-scoped `var` declarations, and replacing the `var` with `let` may require additional care when refactoring code.
+Because `let` declarations attach to arbitrary blocks rather than to the enclosing function's scope (or global), there can be gotchas where existing code has a hidden reliance on function-scoped `var` declarations, and replacing the `var` with `let` may require additional care when refactoring code.
 
 Consider:
 
@@ -579,7 +579,7 @@ See Appendix B for an alternate (more explicit) style of block-scoping which may
 
 ### `const`
 
-In addition to `let`, ES6 also introduces `const`, which also creates a block-scoped variable, but whose value is fixed (constant). Any attempt to change that value at a later time results in an error.
+In addition to `let`, ES6 introduces `const`, which also creates a block-scoped variable, but whose value is fixed (constant). Any attempt to change that value at a later time results in an error.
 
 ```js
 var foo = true;
@@ -602,10 +602,10 @@ Functions are the most common unit of scope in JavaScript. Variables and functio
 
 But functions are by no means the only unit of scope. Block-scope refers to the idea that variables and functions can belong to an arbitrary block (generally, any `{ .. }` pair) of code, rather than only to the enclosing function.
 
-Starting with ES3, the `try/catch` structure has block-scope in the `catch` clause. Also, though frowned-upon for its negative performance (and other) side-effects, the `with` block is also a form of block-scoping.
+Starting with ES3, the `try/catch` structure has block-scope in the `catch` clause.
 
 In ES6, the `let` keyword (a cousin to the `var` keyword) is introduced to allow declarations of variables in any arbitrary block of code. `if (..) { let a = 2; }` will declare a variable `a` that essentially hijacks the scope of the `if`'s `{ .. }` block and attaches itself there.
 
-Though some seem to believe so, block scope should not be taken as an outright replacement of function scope. Both functionalities co-exist, and developers can and should use both function-scope and block-scope techniques where respectively appropriate to produce better, more readable/maintainable code.
+Though some seem to believe so, block scope should not be taken as an outright replacement of `var` function scope. Both functionalities co-exist, and developers can and should use both function-scope and block-scope techniques where respectively appropriate to produce better, more readable/maintainable code.
 
 [^note-leastprivilege]: [Principle of Least Privilege](http://en.wikipedia.org/wiki/Principle_of_least_privilege)

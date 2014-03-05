@@ -158,7 +158,7 @@ foo = function() {
 };
 ```
 
-`1` is printed instead of `2`! This snippet is interpreted by JavaScript's *Engine* as:
+`1` is printed instead of `2`! This snippet is interpreted by the *Engine* as:
 
 ```js
 function foo() {
