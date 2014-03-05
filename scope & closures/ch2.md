@@ -36,7 +36,7 @@ foo( 2 ); // 2, 4, 12
 
 There are three nested scopes inherent in this code example. It may be helpful to think about these scopes as bubbles inside of each other.
 
-<img src="fig2.png">
+<img src="fig2.png" width="500">
 
 **Bubble 1** encompasses the global scope, and has just one identifier in it: `foo`.
 
