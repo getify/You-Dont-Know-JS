@@ -196,6 +196,7 @@ While this all may sound like nothing more than interesting academic trivia, it 
 
 Function declarations that appear inside of normal blocks typically hoist to the enclosing scope, rather than being conditional as this code implies:
 
+```js
 foo(); // "b"
 
 var a = true;
@@ -205,6 +206,7 @@ if (a) {
 else {
    function foo() { console.log( "b" ); }
 }
+```
 
 However, it's important to note that this behavior is not reliable and is subject to change in future versions of JavaScript, so it's probably best to avoid declaring functions in blocks.
 
