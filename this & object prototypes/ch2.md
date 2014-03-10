@@ -649,7 +649,7 @@ A program can effectively use both styles of code (lexical and `this`), but insi
 
 ## Review (TL;DR)
 
-Determining the `this` binding for an executing function requires finding the direct call-site of that function. Once examined, four rules can be applied to the call-site, in order *this* of precedence:
+Determining the `this` binding for an executing function requires finding the direct call-site of that function. Once examined, four rules can be applied to the call-site, in *this* order of precedence:
 
 1. Called with `new`? Use the newly constructed object.
 
