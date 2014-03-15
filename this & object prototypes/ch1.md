@@ -56,7 +56,7 @@ The name "this" creates confusion when developers try to think about it too lite
 
 ### Itself
 
-The first common temptation is to assume `this` refers to the function itself. That's a reasonable grammatical inference, at least. For instance, one may write code like *this*, and expect it to work, but be frustrated when it does not:
+The first common temptation is to assume `this` refers to the function itself. That's a reasonable grammatical inference, at least. For instance, one may write code like *this*, and expect it to work, but dont be frustrated when it does not:
 
 ```js
 function foo(num) {
