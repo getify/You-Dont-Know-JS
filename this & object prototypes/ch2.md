@@ -388,7 +388,7 @@ When a function is invoked with `new` in front of it, otherwise known as a const
 3. the newly constructed object is set as the `this` binding for that function call
 4. unless the function returns its own alternate **object**, the `new`-invoked function call will *automatically* return the newly constructed object.
 
-Steps 1, 3, and 4 apply to our current discussion. We'll skip over step 2 for now and come back to in Chapter 5.
+Steps 1, 3, and 4 apply to our current discussion. We'll skip over step 2 for now and come back to it in Chapter 5.
 
 Consider this code:
 
@@ -649,7 +649,7 @@ A program can effectively use both styles of code (lexical and `this`), but insi
 
 ## Review (TL;DR)
 
-Determining the `this` binding for an executing function requires finding the direct call-site of that function. Once examined, four rules can be applied to the call-site, in order *this* of precedence:
+Determining the `this` binding for an executing function requires finding the direct call-site of that function. Once examined, four rules can be applied to the call-site, in *this* order of precedence:
 
 1. Called with `new`? Use the newly constructed object.
 

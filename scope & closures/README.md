@@ -1,5 +1,7 @@
 # You Don't Know JS: Scope & Closures
 
+<img src="cover.jpg" width="300">
+
 [Table of Contents](toc.md)
 
 * [Preface](../preface.md)

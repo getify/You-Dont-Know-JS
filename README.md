@@ -8,10 +8,11 @@ Please feel free to contribute to the quality of this content by submitting PR's
 
 ## Titles
 
-* ["Scope & Closures"](scope & closures/README.md) (in production)
+* ["Scope & Closures"](scope & closures/README.md) (<a href="http://shop.oreilly.com/product/0636920026327.do">published</a>!)
 * ["this & Object Prototypes"](this & object prototypes/README.md) (draft in progress)
 * "Types & Grammar" (planned)
 * "Async & Performance" (planned)
+* "++Version" (planned)
 
 ## Publishing
 
@@ -28,6 +29,12 @@ The content for these books derives heavily from a series of training materials 
 If you like this content and would like to contact me regarding conducting training on these, or other various JS/HTML5/node.js topics, please reach out to me through any of these channels listed here:
 
 [http://getify.me](http://getify.me)
+
+## Contributions
+
+Any contributions you make to this effort **are of course greatly appreciated**.
+
+However, if you choose to contribute content (not just typo corrections) to this repo, you agree that you're giving me a non-exclusive license to use that content for the book series, as I (and O'Reilly) deem appropriate. You probably guessed that already, but we just have to make the lawyers happy by explicitly stating it. So: blah, blah, blah... :)
 
 ## License & Copyright
 
