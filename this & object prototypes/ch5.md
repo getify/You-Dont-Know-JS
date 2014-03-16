@@ -29,7 +29,7 @@ var anotherObject = {
 };
 
 // create an object linked to `anotherObject`
-var myObject = Object.create(anotherObject);
+var myObject = Object.create( anotherObject );
 
 myObject.a; // 42
 ```
@@ -76,7 +76,7 @@ This object is often called "foo's prototype", because we access it via an unfor
 
 What exactly is this *arbitrary* object?
 
-The most direct way to explain it is that each object created from calling the `foo()` function with the `new` operator (see Chapter 2) will end up (somewhat aribitrarily) `[[Prototyped]]`-linked to this "foo dot prototype" object.
+The most direct way to explain it is that each object created from calling the `foo()` function with the `new` operator (see Chapter 2) will end up (somewhat aribitrarily) `[[Prototype]]`-linked to this "foo dot prototype" object.
 
 Let's illustrate:
 
@@ -124,15 +124,15 @@ Because of the confusion and conflation of terms, I believe the label "prototypa
 
 "Inheritance" implies a *copy* operation, and JavaScript doesn't copy object properties (natively, by default). Instead, JS creates a link between two objects, where one object can essentially *delegate* property/function access to another object. "Delegation" (see Chapter 6) is a much more accurate term for JavaScript's object-linking mechanism.
 
-Another term which is sometimes thrown around in JavaScript is "differential inheritance". The idea here is that we describe an object's behavior in terms of what is different from a more general descriptor. For example, you explain that a car is a vehicle but one that has exactly 4 wheels, rather than re-describing all the specifics of what makes up a general vehicle (engine, etc).
+Another term which is sometimes thrown around in JavaScript is "differential inheritance". The idea here is that we describe an object's behavior in terms of what is *different* from a more general descriptor. For example, you explain that a car is a vehicle but one that has exactly 4 wheels, rather than re-describing all the specifics of what makes up a general vehicle (engine, etc).
 
 If you try to think of any given object in JS as the sum total of all behavior that is *available* via delegation, and **in your mind you flatten** all that behavior into one tangible *thing*, then you can (sorta) see how "differential inheritance" might fit.
 
-But just like with "prototypal inheritance", "differential inheritance" pretends that your mental model is more important than what is physcially happening in the language. It overlooks the fact that object `B` is not actually differentially constructed, but is instead built with specific characteristics defined, alongside "holes" where nothing is defined. It is in these "holes" (gaps in definition) that delegation takes over and, on the fly, "fills them in" with delegated behavior.
+But just like with "prototypal inheritance", "differential inheritance" pretends that your mental model is more important than what is physcially happening in the language. It overlooks the fact that object `B` is not actually differentially constructed, but is instead built with specific characteristics defined, alongside "holes" where nothing is defined. It is in these "holes" (gaps in, or lack of, definition) that delegation *can* take over and, on the fly, "fills them in" with delegated behavior.
 
 The object is not, by native default, flattened into the single differential object, **through copying**, that the mental model of "differential inheritance" implies. As such, "differential inheritance" is just not as natural a fit for describing how JavaScript's `[[Prototype]]` mechanism actually works.
 
-You *can choose* to prefer "differential inheritance" terminology as a matter of taste, but there's no denying the fact that it *only* fits the mental acrobatics in your mind, not the physical behavior in the code.
+You *can choose* to prefer "differential inheritance" terminology as a matter of taste, but there's no denying the fact that it *only* fits the mental acrobatics in your mind, not the physical behavior in the engine.
 
 ### "Constructors"
 
@@ -297,10 +297,10 @@ When `function Bar() { .. }` is declared, `Bar`, like any other function, has a 
 **Note:** A common mis-conception/confusion here is that either of these approaches would *also* work, but they do not work as you'd expect:
 
 ```js
-// doesn't work like you want
+// doesn't work like you want!
 Bar.prototype = Foo.prototype;
 
-// works like you want, but with side-effects you don't want
+// works kinda like you want, but with side-effects you don't want :(
 Bar.prototype = new Foo();
 ```
 
@@ -309,6 +309,8 @@ Bar.prototype = new Foo();
 `Bar.prototype = new Foo()` **does in fact** create a new object which is duly linked to `Foo.prototype` as we'd want. But, it used the `Foo(..)` "constructor" function to do it. If that function has any side-effects (such as logging, changing state, registering against other objects, **adding data properties to `this`**, etc), those side-effects happen at the time of this linking (and likely against the wrong object!), rather than only when the eventual `Bar()` "descendents" are created, as would likely be expected.
 
 So, we're left with using `Object.create(..)` to make a new object that's properly linked, but without having the side-effects of calling `Foo(..)`. The slight downside is that we have to create a new object, throwing the old one away, instead of modifying the existing default object we're provided.
+
+**Note:** `Object.create( null )` creates an object that has an empty (aka, `null`) `[[Prototype]]` linkage, and thus the object can't delegate anywhere. Since such an object has no prototype chain, the `instanceof` operator (explained in the next section) has nothing to check, so it will always return `false`. These special empty-`[[Prototype]]` objects are often called "dictionaries" as they are typically used purely for storing data in properties, mostly because they have no possible surprise effects from delegated properties/functions on the `[[Prototype]]` chain.
 
 It would be *nice* if there was a standard and reliable way to modify the linkage of an existing object. Prior to ES6, there's a non-standard and not fully-cross-browser way, via the `.__proto__` property. ES6 adds a `Object.setPrototypeOf(..)`, which does the trick.
 
@@ -360,9 +362,9 @@ function isRelatedTo(o1, o2) {
 }
 
 var a = {};
-var b = Object.create(a);
+var b = Object.create( a );
 
-isRelatedTo(b, a); // true
+isRelatedTo( b, a ); // true
 ```
 
 Inside `isRelatedTo(..)`, we borrow a throw-away function `F`, reassign its `.prototype` to arbitrarily point to some object `o2`, then ask if `o1` is an "instance of" `F`. Obviously `o1` wasn't *actually* inherited or descended or constructed from `F`, so it should be clear why this kind of exercise is silly and confusing. **The problem comes down to the awkwardness of class semantics forced onto JavaScript**, in this case as revealed by the indirect semantics of `instanceof`.
@@ -398,7 +400,7 @@ And you'll notice that object reference is what we'd expect:
 Object.getPrototypeOf( a ) === Foo.prototype; // true
 ```
 
-Prior to ES5, most browsers (not all!) supported a (then) non-standard alternate way of accessing the internal `[[Prototype]]`:
+Prior to ES5, most browsers (not all!) supported a (then)u non-standard alternate way of accessing the internal `[[Prototype]]`:
 
 ```js
 a.__proto__ === Foo.prototype; // true
@@ -428,6 +430,8 @@ Object.defineProperty( Object.prototype, "__proto__", {
 So, when we access (retrieve the value of) `a.__proto__`, it's like saying `a.__proto__()` (calling the getter function). *That* function call has `a` as its `this` even though the getter function exists way up on the `Object.prototype` object (see Chapter 2 for `this` binding rules), so it's just like saying `Object.getPrototypeOf( a )`.
 
 Yes, `.__proto__` is also a set'able property, just like `Object.setPrototypeOf(..)`. However, generally you **should not change the `[[Prototype]]` of an existing object**. There are some extremely complex advanced techniques used deep in some frameworks that allow tricks like "subclassing" an `Array`, but this is usually frowned on in general programming practice, as it usually leads to harder to understand/maintain code.
+
+**Note:** As of ES6, the `class` keyword will allow something that approximates "subclassing" of built-in's like `Array`. See Appendix A for discussion of the `class` mechanism added in ES6.
 
 The only other narrow exception (as seen earlier) would be setting a default function `.prototype` object's `[[Prototype]]` to some other object, instead of replacing the default object entirely with a new linked object. Other than this, **it's best to treat object `[[Prototype]] linkage as a read-only characteristic** for ease-of-reading of your code.
 
