@@ -175,6 +175,31 @@ Oh, yeah, also... by convention in the JavaScript world, "class"es are named wit
 
 **Note:** This convention is so strong that many JS linters actually *complain* if you call `new` on a method with a lowercase name, or if we don't call `new` on a function that happens to start with a capital letter. That sort of boggles the mind that we struggle so much to get (fake) "class-orientation" *right* in JavaScript that we create linter rules to ensure we use capital letters, even though the capital letter doesn't mean ***anything* at all** to the JS engine.
 
+#### Constructor Or Call?
+
+In the above snippet, it's tempting to think that `Foo` is a "constructor", because we call it with `new` and we observer it "constructs" an object.
+
+In reality, `Foo` is no more a "constructor" than any other function in your program. Functions themselves are **not** constructors. However, when you put the `new` keyword in front of a normal function call, that makes that function call a "constructor call". In fact, `new` sort of hijacks any normal function and calls it in a fashion that constructs an object, **in addition to whatever else it was going to do**.
+
+For example:
+
+```js
+function NothingSpecial() {
+	console.log( "Don't mind me!" );
+}
+
+var a = new NothingSpecial();
+// "Don't mind me!"
+
+a; // {}
+```
+
+`NothingSpecial` is just a plain old normal function, but when called with `new`, it *constructs* an object, almost as a side-effect, which we happen to assign to `a`. The **call** was a *constructor call*, but `NothingSpecial` is not, in and of itself, a *constructor*.
+
+In other words, in JavaScript, it's most appropriate to say that a "constructor" is **any function called with the `new` keyword** in front of it.
+
+Functions aren't constructors, but function calls are if and only if `new` is used.
+
 ### Mechanics
 
 Are *those* the only common triggers for ill-fated "class" discussions in JavaScript?
@@ -190,8 +215,8 @@ Foo.prototype.myName = function() {
 	return this.name;
 };
 
-var a = new Foo("a");
-var b = new Foo("b");
+var a = new Foo( "a" );
+var b = new Foo( "b" );
 
 a.myName(); // "a"
 b.myName(); // "b"
