@@ -297,9 +297,9 @@ Explicit mixins are a fine mechanism in JavaScript. But they appear more powerfu
 
 If you explicitly mix-in two or more objects into your target object, you can **partially emulate** the behavior of "multiple inheritance", but there's no direct way to handle collisions if the same method or property is being copied from more than one source. Some have constructed "late binding" techniques and other exotic work-arounds, but fundamentally these "tricks" are *usually* more effort (and lesser performance!) than the pay-off.
 
-Take care only to use explicit mixins where it actually helps make more readable code, and avoid the pattern if you find it making code that's harder to trace, or if you find it creates unnecessary or unweildy dependencies between objects.
+Take care only to use explicit mixins where it actually helps make more readable code, and avoid the pattern if you find it making code that's harder to trace, or if you find it creates unnecessary or unwieldy dependencies between objects.
 
-**If it starts to get *harder* to properly use mixins than before you used them**, you should probably stop using mixins. In fact, in you have to use a complex library/utility to work out all these details, it might be a sign that you're going about it the harder way, perhaps unnecessarily. In Chapter 5, we'll try to distill a simpler way that accomplishes the desired outcomes without all the fuss.
+**If it starts to get *harder* to properly use mixins than before you used them**, you should probably stop using mixins. In fact, if you have to use a complex library/utility to work out all these details, it might be a sign that you're going about it the harder way, perhaps unnecessarily. In Chapter 5, we'll try to distill a simpler way that accomplishes the desired outcomes without all the fuss.
 
 ### Implicit Mixins
 
