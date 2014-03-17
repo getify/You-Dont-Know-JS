@@ -400,7 +400,7 @@ And you'll notice that object reference is what we'd expect:
 Object.getPrototypeOf( a ) === Foo.prototype; // true
 ```
 
-Prior to ES5, most browsers (not all!) supported a (then)u non-standard alternate way of accessing the internal `[[Prototype]]`:
+Prior to ES5, most browsers (not all!) supported a (then) non-standard alternate way of accessing the internal `[[Prototype]]`:
 
 ```js
 a.__proto__ === Foo.prototype; // true
@@ -427,9 +427,9 @@ Object.defineProperty( Object.prototype, "__proto__", {
 } );
 ```
 
-So, when we access (retrieve the value of) `a.__proto__`, it's like saying `a.__proto__()` (calling the getter function). *That* function call has `a` as its `this` even though the getter function exists way up on the `Object.prototype` object (see Chapter 2 for `this` binding rules), so it's just like saying `Object.getPrototypeOf( a )`.
+So, when we access (retrieve the value of) `a.__proto__`, it's like saying `a.__proto__()` (calling the getter function). *That* function call has `a` as its `this` even though the getter function exists on the `Object.prototype` object (see Chapter 2 for `this` binding rules), so it's just like saying `Object.getPrototypeOf( a )`.
 
-Yes, `.__proto__` is also a set'able property, just like `Object.setPrototypeOf(..)`. However, generally you **should not change the `[[Prototype]]` of an existing object**. There are some extremely complex advanced techniques used deep in some frameworks that allow tricks like "subclassing" an `Array`, but this is usually frowned on in general programming practice, as it usually leads to harder to understand/maintain code.
+Notice that `.__proto__` is also a set'able property, just like using `Object.setPrototypeOf(..)`. However, generally you **should not change the `[[Prototype]]` of an existing object**. There are some very complex advanced techniques used deep in some frameworks that allow tricks like "subclassing" an `Array`, but this is usually frowned on in general programming practice, as it usually leads to *much* harder to understand/maintain code.
 
 **Note:** As of ES6, the `class` keyword will allow something that approximates "subclassing" of built-in's like `Array`. See Appendix A for discussion of the `class` mechanism added in ES6.
 
