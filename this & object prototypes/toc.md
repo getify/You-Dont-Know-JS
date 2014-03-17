@@ -16,7 +16,7 @@
 	* Syntax
 	* Type
 	* Contents
-* Chapter 4: Class Copies
+* Chapter 4: Mixing Class Copies
 	* Class
 	* Inheritance
 	* Mixins
@@ -24,3 +24,5 @@
 	* Links
 	* "Class"
 	* "(Prototypal) Inheritance"
+* Chapter 6: Behavior Delegation
+	* Objects: Linked
