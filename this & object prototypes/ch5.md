@@ -377,7 +377,9 @@ Foo.prototype.isPrototypeOf( a ); // true
 
 Notice that in this case, we don't really care (or even *need*) `Foo`, we just need an **object** (in our case, arbitrarily labeled `Foo.prototype`) to test against another **object**. The question `isPrototypeOf(..)` answers is: **in the entire `[[Prototype]]` chain of `a`, does `Foo.prototype` ever appear?**
 
-Same question, and exact same answer. But in this second approach, we don't need the indirection of referencing **function** whose `.prototype` property will automatically be consulted. We *just need* two **objects**, for example:
+Same question, and exact same answer. But in this second approach, we don't need the indirection of referencing a **function** (`Foo`) whose `.prototype` property will automatically be consulted.
+
+We *just need* the two **objects** to inspect a relationship between them. For example:
 
 ```js
 // Simply: does `b` appear in `c`s [[Prototype]] chain?
@@ -386,7 +388,7 @@ b.isPrototypeOf( c );
 
 Notice, this approach doesn't require a `Foo` function. It just uses object references directly to `b` and `c`, and inquires about their relationship.
 
-In either case, though, what's happening implicitly is that the internal `[[Prototype]]` of an object is retrieved, and compared against another object for equality.
+In either case, though, what's happening implicitly is that the internal `[[Prototype]]` of an object is retrieved, and compared against another object for a match.
 
 We can also directly retrieve the `[[Prototype]]` of an object. As of ES5, the standard way to do this is:
 
@@ -400,13 +402,13 @@ And you'll notice that object reference is what we'd expect:
 Object.getPrototypeOf( a ) === Foo.prototype; // true
 ```
 
-Prior to ES5, most browsers (not all!) supported a (then) non-standard alternate way of accessing the internal `[[Prototype]]`:
+Most browsers (not all!) have also long supported a non-standard alternate way of accessing the internal `[[Prototype]]`:
 
 ```js
 a.__proto__ === Foo.prototype; // true
 ```
 
-The strange `.__proto__` property "magically" retrieves the internal `[[Prototype]]` as an object reference, which is quite helpful if you want to directly inspect (or even traverse: `.__proto__.__proto__...`) the chain.
+The strange `.__proto__` (not standardized until ES6!) property "magically" retrieves the internal `[[Prototype]]` as an object reference, which is quite helpful if you want to directly inspect (or even traverse: `.__proto__.__proto__...`) the chain.
 
 Just as we saw earlier with `.constructor`, `.__proto__` doesn't actually exist on the object you're inspecting (`a` in our running example). In fact, it exists (non-enumerable; see Chapter 2) on the built-in `Object.prototype`, along with other common utilities (`.toString()`, `.isPrototypeOf(..)`, etc).
 
