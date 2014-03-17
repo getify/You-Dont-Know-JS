@@ -8,5 +8,5 @@
 * [Chapter 3: Objects](ch3.md)
 * [Chapter 4: Class Copies](ch4.md)
 * [Chapter 5: Prototypes](ch5.md)
-* Chapter 6: Behavior Delegation
+* [Chapter 6: Behavior Delegation](ch6.md)
 * Appendix A: *class* Keyword

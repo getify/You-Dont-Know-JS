@@ -1,17 +1,17 @@
 # You Don't Know JS: *this* & Object Prototypes
-# Chapter 4: Class Copies
+# Chapter 4: Mixing Class Copies
 
 We won't be exhaustive here on the topic of "object oriented" programming with "classes", "instantiation", "inheritance" and "(relative) polymorphism". However, we will briefly survey these topics, as we draw contrasts between traditional classes and JavaScript's `[[Prototype]]` (often mistakingly called "class") mechanism.
 
-We'll look first, in detail, how and why traditional classes imply copies of behavior, and then we'll look at how manual copy behavior is used to emulate such class behavior in JavaScript.
+We'll look first, in detail, at how and why traditional classes imply copies of behavior, and then we'll look at how manual copy behavior (aka, "mixins") is used to emulate such class behavior in JavaScript.
 
 ## Class
 
-In traditional class-oriented languages, a collection of definitions of functionality wrapped up in a tidy package is called a `class`.
+In traditional class-oriented languages, a collection of data and definitions of behavior for that data is wrapped up in a tidy package called a "class".
 
-For instance, in many languages, a "Stack" data structure would be implemented by a `Stack` class. This class would have an internal set of variables that stores the data, and it would have a set of publicly accessible functions ("methods") provided by the class, which gives your code the ability to interact with the data structure (adding & removing data, etc).
+For instance, in many languages, a "stack" data structure would be implemented by a `Stack` class. This class would have an internal set of variables that stores the data, and it would have a set of publicly accessible functions ("methods") provided by the class, which gives your code the ability to interact with the data structure (adding & removing data, etc).
 
-But in such languages, you don't often operate directly on a `Stack` (unless making a **Static** reference, which is outside the scope of our discussion). The `Stack` class is merely an abstract representation of what *a* "Stack" should do, but it's not itself *a* "Stack". You must **instantiate** the `Stack` class before you have a concrete data structure *thing* to operate against.
+But in such languages, you don't often operate directly on a `Stack` (unless making a **Static** reference, which is outside the scope of our discussion). The `Stack` class is merely an abstract representation of what *any* "stack" should do, but it's not itself *a* "stack". You must **instantiate** the `Stack` class before you have a concrete data structure *thing* to operate against.
 
 ### Building
 
@@ -170,23 +170,25 @@ Don't let polymorphism confuse you into thinking a child class is linked to its 
 
 ### Multiple Inheritance
 
-Recall our earlier discussion of parent(s) and children and DNA? We said that the metaphor was a bit weird because biologically most offspring come from two parents. Let's revisit.
+Recall our earlier discussion of parent(s) and children and DNA? We said that the metaphor was a bit weird because biologically most offspring come from two parents. If a class could inherit from two other classes, it would more closely fit the parent/child metaphor.
 
-Some class-oriented languages allow you to specify more than one "parent" class to "inherit" from. Conceptually, the *copy* that occurs from parent to class just happens from each parent to the common child.
+Some class-oriented languages allow you to specify more than one "parent" class to "inherit" from. Multiple-inheritance means that each parent class definition is copied into the child class.
 
-On the surface, this seems like a powerful addition to class-orientation. However, there are certainly some complicating questions that arise. If both parent classes provide a method called `drive()`, which version would a `drive()` reference resolve to?
+On the surface, this seems like a powerful addition to class-orientation, giving us the ability to compose more functionality together. However, there are certainly some complicating questions that arise. If both parent classes provide a method called `drive()`, which version would a `drive()` reference in the child resolve to? Would you always have to manually specify which parent's `drive()` you meant, thus losing some of the gracefulness of polymorphic inheritance?
 
 There's another variation, the so called "Diamond Problem", which refers to the scenario where a child class "D" inherits from two parent classes ("B" and "C"), and each of those in turn inherits from a common "A" parent. If "A" provides a method `drive()`, and both "B" and "C" override (polymorph) that method, when `D` references `drive()`, which version should it use (`B:drive()` or `C:drive()`)?
 
+<img src="fig2.png">
+
 These complications go even much deeper than this quick glance. We address them here only so we can contrast to how JavaScript's mechanisms work.
 
-JavaScript is simpler: it does not provide a native mechanism for "multiple inheritance". Many see this is a good thing, because the complexity savings more than make up for the lesser functionality. But this doesn't stop developers from trying to fake it in various ways, as we'll see shortly.
+JavaScript is simpler: it does not provide a native mechanism for "multiple inheritance". Many see this is a good thing, because the complexity savings more than make up for the "reduced" functionality. But this doesn't stop developers from trying to fake it in various ways, as we'll see shortly.
 
 ## Mixins
 
 JavaScript's object mechanism does not *automatically* perform copy behavior when you "inherit" or "instantiate". Plainly, there's no "classes" in JavaScript to instantiate, only objects. And objects don't get copied to other objects, they get *linked together* (more on that in Chapter 5).
 
-Since JavaScript objects aren't copies, but observed class behaviors in other languages imply copies, let's examine how developers **fake** the copy behavior of classes in JavaScript: mixins. We'll look at two types of "mixin": **explicit** and **implicit**.
+Since observed class behaviors in other languages imply copies, let's examine how JS developers **fake** the *missing* copy behavior of classes in JavaScript: mixins. We'll look at two types of "mixin": **explicit** and **implicit**.
 
 ### Explicit Mixins
 
@@ -223,7 +225,7 @@ var Car = mixin( Vehicle, {
 
 	drive: function() {
 		Vehicle.drive.call( this );
-		console.log( "Rolling on all ", this.wheels, " wheels!" );
+		console.log( "Rolling on all " + this.wheels + " wheels!" );
 	}
 } );
 ```
@@ -232,32 +234,48 @@ var Car = mixin( Vehicle, {
 
 `Car` now has a copy of the properties and functions from `Vehicle`. Technically, functions are not actually duplicated, but rather *references* to the functions are copied. So, `Car` now has a property called `ignition`, which is a copied reference to the `ignition()` function, as well as a property called `engines` with the copied value of `1` from `Vehicle`.
 
-`Car` *already* had a `drive` property (function), so that property reference was not overriden.
+`Car` *already* had a `drive` property (function), so that property reference was not overriden (see the `if` statement in `mixin(..)` above).
 
 #### "Polymorphism" Revisited
 
 Let's examine this statement: `Vehicle.drive.call( this )`. This is what we'll call "explicit pseudo-polymorphism". Recall in our previous pseudo-code this line was `inherited:drive()`, which we called "relative polymorphism".
 
-JavaScript does not have (prior to ES6; see Appendix A) a facility for relative polymorphism. So, **because both `Car` and `Vehicle` had a function of the same name: `drive()`**, to distinguish to call one from the other, we must make an absolute (not relative, aka `this`) reference. We explicitly specify the `Vehicle` object by name, and call the `drive()` function on it.
+JavaScript does not have (prior to ES6; see Appendix A) a facility for relative polymorphism. So, **because both `Car` and `Vehicle` had a function of the same name: `drive()`**, to distinguish a call to one or the other, we must make an absolute (not relative) reference. We explicitly specify the `Vehicle` object by name, and call the `drive()` function on it.
 
-But if we said `Vehicle.drive()`, the `this` binding for that function call would be `Vehicle` instead of `Car` (see Chapter 2), which is not what we want. So, instead we use `.call( this )` (Chapter 2) to ensure that `drive()` is executed in the context of the `Car` object.
+But if we said `Vehicle.drive()`, the `this` binding for that function call would be the `Vehicle` object instead of the `Car` object (see Chapter 2), which is not what we want. So, instead we use `.call( this )` (Chapter 2) to ensure that `drive()` is executed in the context of the `Car` object.
 
-**Note:** If the function name identifier for `Car.drive()` hadn't overlapped with (aka, "shadowed"; see Chapter 6) `Vehicle.drive()`, we wouldn't have been exercising "method polymorphism". So, a reference to `Vehicle.drive()` would have been copied over by the `mixin(..)` call, and we could have accessed directly with `this.drive()`. The chosen identifier overlap is *why* we have to use the more complex explicit pseudo-polymorphism approach.
+**Note:** If the function name identifier for `Car.drive()` hadn't overlapped with (aka, "shadowed"; see Chapter 6) `Vehicle.drive()`, we wouldn't have been exercising "method polymorphism". So, a reference to `Vehicle.drive()` would have been copied over by the `mixin(..)` call, and we could have accessed directly with `this.drive()`. The chosen identifier overlap **shadowing** is *why* we have to use the more complex explicit pseudo-polymorphism approach.
 
 In class-oriented languages, which have relative polymorphism, the linkage between `Car` and `Vehicle` is established once, at the top of the class definition, which makes for only one place to maintain such relationships.
 
-But because of JavaScript's peculiarities, explicit pseudo-polymorphism creates brittle manual/explicit linkage **in every single function where you need such a (pseudo-)polymorphic reference**, which can significantly increase the maintenance cost. Moreover, explicit pseudo-polymorphism can emulate the behavior of "multiple inheritance", but that only multiples the complexity and brittleness.
+But because of JavaScript's peculiarities, explicit pseudo-polymorphism (because of shadowing!) creates brittle manual/explicit linkage **in every single function where you need such a (pseudo-)polymorphic reference**. This can significantly increase the maintenance cost. Moreover, while explicit pseudo-polymorphism can emulate the behavior of "multiple inheritance", it only increases the complexity and brittleness.
 
-The result of such approaches is usually more complex, harder-to-read, *and* harder-to-maintain code. **Explicit pseudo-polymorphism should be avoided wherever possible**, because the cost outweighs the benefit.
+The result of such approaches is usually more complex, harder-to-read, *and* harder-to-maintain code. **Explicit pseudo-polymorphism should be avoided wherever possible**, because the cost outweighs the benefit in most respects.
 
 #### Mixing Copies
+
+Recall the `mixin(..)` utility from above:
+
+```js
+// vastly simplified `mixin()` example:
+function mixin( sourceObj, targetObj ) {
+	for (var key in sourceObj) {
+		// only copy if not already present
+		if (!(key in targetObj)) {
+			targetObj[key] = sourceObj[key];
+		}
+	}
+
+	return targetObj;
+}
+```
 
 Now, let's examine how `mixin(..)` works. It iterates over the properties of `sourceObj` (`Vehicle` in our example) and if there's no matching property of that name in `targetObj` (`Car` in our example), it makes a copy. Since we're making the copy after the initial object exists, we are careful to not copy over a target property.
 
 If we made the copies first, before specifying the `Car` specific contents, we could omit this check against `targetObj`, but that's a little more clunky and less efficient, so it's generally less preferred:
 
 ```js
-// vastly simplified `mixin()` example:
+// alternate mixin, less "safe" to overwrites
 function mixin( sourceObj, targetObj ) {
 	for (var key in sourceObj) {
 		targetObj[key] = sourceObj[key];
@@ -270,7 +288,8 @@ var Vehicle = {
 	// ...
 };
 
-// first, create an empty object with Vehicle's stuff copied
+// first, create an empty object with
+// Vehicle's stuff copied in
 var Car = mixin( Vehicle, { } );
 
 // now copy the intended contents into Car
@@ -283,7 +302,7 @@ mixin( {
 }, Car );
 ```
 
-Either way, we have explicitly copied the non-overlapping contents of `Vehicle` into `Car`. The label "mixins" comes from this alternate way of stating it: `Car` has `Vehicle`s contents **mixed-in**.
+Either approach, we have explicitly copied the non-overlapping contents of `Vehicle` into `Car`. The name "mixin" comes from an alternate way of explaining the task: `Car` has `Vehicle`s contents **mixed-in**, just like you mix in chocolate chips into your favorite cookie dough.
 
 As a result of the copy operation, `Car` will operate somewhat separately from `Vehicle`. If you add a property onto `Car`, it will not affect `Vehicle`, and vice versa.
 
@@ -299,7 +318,58 @@ If you explicitly mix-in two or more objects into your target object, you can **
 
 Take care only to use explicit mixins where it actually helps make more readable code, and avoid the pattern if you find it making code that's harder to trace, or if you find it creates unnecessary or unwieldy dependencies between objects.
 
-**If it starts to get *harder* to properly use mixins than before you used them**, you should probably stop using mixins. In fact, if you have to use a complex library/utility to work out all these details, it might be a sign that you're going about it the harder way, perhaps unnecessarily. In Chapter 5, we'll try to distill a simpler way that accomplishes the desired outcomes without all the fuss.
+**If it starts to get *harder* to properly use mixins than before you used them**, you should probably stop using mixins. In fact, if you have to use a complex library/utility to work out all these details, it might be a sign that you're going about it the harder way, perhaps unnecessarily. In Chapter 6, we'll try to distill a simpler way that accomplishes the desired outcomes without all the fuss.
+
+#### Parasitic Inheritance
+
+A variation on this explicit mixin pattern, which is both in some ways explicit and in other ways implicit, is called "parasitic inheritance", popularized mainly by Douglas Crockford.
+
+Here's how it can work:
+
+```js
+// "Traditional JS Class" `Vehicle`
+function Vehicle() {
+	this.engines = 1;
+}
+Vehicle.prototype.ignition = function() {
+	console.log( "Turning on my engine." );
+};
+Vehicle.prototype.drive = function() {
+	this.ignition();
+	console.log( "Steering and moving forward!" );
+};
+
+// "Parasitic Class" `Car`
+function Car() {
+	// first, `car` is a `Vehicle`
+	var car = new Vehicle();
+
+	// now, let's modify our `car` to specialize it
+	car.wheels = 4;
+
+	// save a privileged reference to `Vehicle::drive()`
+	var vehDrive = car.drive;
+
+	// override `Vehicle::drive()`
+	car.drive = function() {
+		vehDrive.call( this );
+		console.log( "Rolling on all " + this.wheels + " wheels!" );
+	};
+
+	return car;
+}
+
+var myCar = new Car();
+
+myCar.drive();
+// Turning on my engine.
+// Steering and moving forward!
+// Rolling on all 4 wheels!
+```
+
+As you can see, we initially make a copy of the definition from the `Vehicle` "parent class" (object), then mixin our "child class" (object) definition (preserving privileged parent-class references as needed), and pass off this composed object `car` as our child instance.
+
+**Note: when we call `new Car()`, a new object is created and referenced by `Car`s `this` reference (see Chapter 2). But since we don't use that object, and instead return our own `car` object, the initially created object is just discarded. So, `Car()` could be called without the `new` keyword, and the functinonality above would be identical, but without the wasted object creation/garbage-collection.
 
 ### Implicit Mixins
 
@@ -321,6 +391,7 @@ Something.count; // 1
 
 var Another = {
 	cool: function() {
+		// implicit mixin of `Something` to `Another`
 		Something.cool.call( this );
 	}
 };
@@ -330,7 +401,7 @@ Another.greeting; // "Hello World"
 Another.count; // 1 (not shared state with `Something`)
 ```
 
-With `Something.cool.call( this )`, we essentially "borrow" the function `Something.cool()` and call it in the context of `Another` (via its `this` binding; see Chapter 2) instead of `Something`. The end result is that the assignments that `Something.cool()` makes are applied against the `Another` object rather than the `Something` object.
+With `Something.cool.call( this )`, which can happen either in a "constructor" call (most common) or in a method call (shown here), we essentially "borrow" the function `Something.cool()` and call it in the context of `Another` (via its `this` binding; see Chapter 2) instead of `Something`. The end result is that the assignments that `Something.cool()` makes are applied against the `Another` object rather than the `Something` object.
 
 So, it is said that we "mixed in" `Something`s behavior with (or into) `Another`.
 

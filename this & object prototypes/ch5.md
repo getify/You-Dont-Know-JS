@@ -3,9 +3,13 @@
 
 In the Chapters 3 and 4, we mentioned the `[[Prototype]]` chain several times, but haven't said what exactly it is. We will now examine prototypes in detail.
 
+**Note: All of the attempts to emulate class-copy behavior, as described previously in Chapter 4, labeled as variations of "mixins", completely circument the `[[Prototype]]` chain mechanism we examine here in this chapter.
+
 ## Links
 
-Objects in JavaScript have an internal property, denoted in the specification as `[[Prototype]]`, which is simply a reference to another object. Almost all objects are given a non-`null` value for this property, at the time of their creation. However, we will see shortly that it *is* possible to have an empty `[[Prototype]]` linkage.
+Objects in JavaScript have an internal property, denoted in the specification as `[[Prototype]]`, which is simply a reference to another object. Almost all objects are given a non-`null` value for this property, at the time of their creation.
+
+Note: We will see shortly that it *is* possible for an object to have an empty `[[Prototype]]` linkage, though this is somewhat less common.
 
 Consider:
 
@@ -110,7 +114,7 @@ Can we get what we want in a more *direct* way? **Yes!** The hero is `Object.cre
 
 In JavaScript, we don't make *copies* from one object ("class") to another ("instance"). We make *links* between objects. For the `[[Prototype]]` mechanism, visually, the arrows move from right to left, and from bottom to top.
 
-<img src="fig2.png">
+<img src="fig3.png">
 
 This mechanism is often called "prototypal inheritance" (we'll explore the code in detail shortly), which is commonly said to be the dynamic-language version of "classical inheritance". It's an attempt to piggy-back on the common understanding of what "inheritance" means in the class-oriented world, but *tweak* (**read: pave over**) the understood semantics, to fit dynamic scripting.
 
@@ -118,7 +122,7 @@ The word "inheritance" has a very strong meaning, with plenty of mental preceden
 
 I like to say that sticking "prototypal" in front "inheritance" to drastically reverse its actual meaning is like me holding an orange in one hand, an apple in the other, and insisting on calling the apple a "red orange". No matter what confusing label I put in front of it, that doesn't change the *fact* that one is an apple and one is an orange.
 
-The better approach is to plainly call an apple an apple. That makes it easier to understand both their similarities and their **many differences**, because we all have a simple, shared understanding of what "apple" meaning.
+The better approach is to plainly call an apple an apple. That makes it easier to understand both their similarities and their **many differences**, because we all have a simple, shared understanding of what "apple" means.
 
 Because of the confusion and conflation of terms, I believe the label "prototypal inheritance" itself (and trying to mis-apply all its associated class-orientation terminology, like "class", "constructor", "instance", "polymorphism", etc) has done **more harm than good** in explaining how JavaScript's mechanism *really* works.
 
@@ -251,7 +255,7 @@ We've seen some approximations of "class" mechanics as typically hacked into Jav
 
 Actually, we've already seen the mechanism which is commonly called "prototypal inheritance" at work when `a` was able to "inherit from" `Foo.prototype`, and thus get access to the `myName()` function. But we traditionally think of "inheritance" as being a relationship between two "classes", rather than between "class" and "instance".
 
-<img src="fig2.png">
+<img src="fig3.png">
 
 Recall this figure from earlier, which shows not only delegation from an object (aka, "instance") `a1` to object `Foo.prototype`, but from `Bar.prototype` to `Foo.prototype`, which somewhat resembles the concept of Parent-Child class inheritance. *Resembles*, except of course for the direction of the arrows, which show these are delegation links rather than copy operations.
 
@@ -312,7 +316,7 @@ So, we're left with using `Object.create(..)` to make a new object that's proper
 
 **Note:** `Object.create( null )` creates an object that has an empty (aka, `null`) `[[Prototype]]` linkage, and thus the object can't delegate anywhere. Since such an object has no prototype chain, the `instanceof` operator (explained in the next section) has nothing to check, so it will always return `false`. These special empty-`[[Prototype]]` objects are often called "dictionaries" as they are typically used purely for storing data in properties, mostly because they have no possible surprise effects from delegated properties/functions on the `[[Prototype]]` chain.
 
-It would be *nice* if there was a standard and reliable way to modify the linkage of an existing object. Prior to ES6, there's a non-standard and not fully-cross-browser way, via the `.__proto__` property. ES6 adds a `Object.setPrototypeOf(..)`, which does the trick.
+It would be *nice* if there was a standard and reliable way to modify the linkage of an existing object. Prior to ES6, there's a non-standard and not fully-cross-browser way, via the `.__proto__` property, which is setable. ES6 adds a `Object.setPrototypeOf(..)` helper utility, which does the trick.
 
 Compare the pre-ES6 and ES6-standardized techniques, side-by-side:
 
@@ -324,7 +328,7 @@ Bar.prototype = Object.create( Foo.prototype );
 Object.setPrototypeOf( Bar.prototype, Foo.prototype );
 ```
 
-Ignoring the slight performance disadvantage of the `Object.create(..)` approach, it's a little bit shorter and may be perhaps a little easier to read than the ES6+ approach. But it's probably a wash either way.
+Ignoring the slight performance disadvantage (throwing away an object that's later GC'd) of the `Object.create(..)` approach, it's a little bit shorter and may be perhaps a little easier to read than the ES6+ approach. But it's probably a wash either way.
 
 ### Reflection
 
