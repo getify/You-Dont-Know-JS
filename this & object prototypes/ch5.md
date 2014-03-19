@@ -58,7 +58,7 @@ At this point, you might be wondering: "*Why* does one object need to link to an
 
 As we explained in Chapter 4, in JavaScript, there are no abstract patterns/blueprints for objects called "classes" as there are in class-oriented languages. JavaScript **just** has objects.
 
-In fact, JavaScript is **almost unique among languages as perhaps the only language with the right to use the label "object oriented", because it's one of a very short list of languages where an object can be created directly, without a class at all.
+In fact, JavaScript is **almost unique** among languages as perhaps the only language with the right to use the label "object oriented", because it's one of a very short list of languages where an object can be created directly, without a class at all.
 
 In JavaScript, classes can't (being that they don't exist!) describe what an object can do. The object defines its own behavior directly. **There's *just* the object.**
 
@@ -104,7 +104,7 @@ But in JavaScript, there are no such copy-actions performed. You don't create mu
 
 `new Foo()` results in a new object (we called it `a`), and **that** new object `a` is internally `[[Prototype]]` linked to the `Foo.prototype` object.
 
-**We ended up with two objects, linked to each other. **That's *it*. We didn't instantiate a class. We certainly didn't do any copying of behavior from one "class" into a concrete object. We just caused two objects to be linked to each other.
+**We ended up with two objects, linked to each other.** That's *it*. We didn't instantiate a class. We certainly didn't do any copying of behavior from one "class" into a concrete object. We just caused two objects to be linked to each other.
 
 In fact, the secret, which eludes most JS developers, is that the `new Foo()` function calling had really almost nothing *direct* to do with the process of creating the link. **It was sort of an accidental side-effect.** `new Foo()` is an indirect, round-about way to end up with what we want: **a new object linked to another object**.
 
