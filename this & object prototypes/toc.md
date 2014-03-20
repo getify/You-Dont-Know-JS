@@ -24,5 +24,9 @@
 	* Links
 	* "Class"
 	* "(Prototypal) Inheritance"
+	* Linked Objects
 * Chapter 6: Behavior Delegation
 	* Objects: Linked
+	* Class Oriented
+	* Delegation Oriented
+
