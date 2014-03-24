@@ -16,15 +16,17 @@
 	* Syntax
 	* Type
 	* Contents
-* Chapter 4: Mixing Class Copies
-	* Class
-	* Inheritance
+* Chapter 4: Mixing (Up) "Class" Objects
+	* Class Theory
+	* Class Mechanics
+	* Class Inheritance
 	* Mixins
 * Chapter 5: Prototypes
 	* Links
 	* "Class"
 	* "(Prototypal) Inheritance"
-	* Linked Objects
+	* Object Links
+	* Creating Linked Objects
 * Chapter 6: Behavior Delegation
 	* Objects: Linked
 	* Class Oriented

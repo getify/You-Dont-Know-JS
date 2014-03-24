@@ -1,27 +1,73 @@
 # You Don't Know JS: *this* & Object Prototypes
-# Chapter 4: Mixing Class Copies
+# Chapter 4: Mixing (Up) "Class" Objects
 
-We won't be exhaustive here on the topic of "object oriented" programming with "classes", "instantiation", "inheritance" and "(relative) polymorphism". However, we will briefly survey these topics, as we draw contrasts between traditional classes and JavaScript's `[[Prototype]]` (often mistakingly called "class") mechanism.
+Following our exploration of objects from the previous chapter, it's natural that we now turn our attention to "object oriented (OO) programming", with "classes". We'll first look at "class orientation" as a design pattern, before examining the mechanics of "classes": "instantiation", "inheritance" and "(relative) polymorphism".
 
-We'll look first, in detail, at how and why traditional classes imply copies of behavior, and then we'll look at how manual copy behavior (aka, "mixins") is used to emulate such class behavior in JavaScript.
+We'll see that these concepts don't really map very naturally to the object mechanism in JS, and the lengths (mixins, etc) many JavaScript developers go to overcome such challenges.
 
-## Class
+## Class Theory
 
-In traditional class-oriented languages, a collection of data and definitions of behavior for that data is wrapped up in a tidy package called a "class".
+"Class/Inheritance" describes a certain form of code organization and architecture -- a way of modeling real world problem domains in our software.
 
-For instance, in many languages, a "stack" data structure would be implemented by a `Stack` class. This class would have an internal set of variables that stores the data, and it would have a set of publicly accessible functions ("methods") provided by the class, which gives your code the ability to interact with the data structure (adding & removing data, etc).
+OO or class oriented programming stresses that data intrinsically has associated behavior (of course, different depending on the type and nature of the data!) that operates on it, so proper design is to package up (aka, encapsulate) the data and the behavior together. This is sometimes called "data structures" in formal computer science.
 
-But in such languages, you don't often operate directly on a `Stack` (unless making a **Static** reference, which is outside the scope of our discussion). The `Stack` class is merely an abstract representation of what *any* "stack" should do, but it's not itself *a* "stack". You must **instantiate** the `Stack` class before you have a concrete data structure *thing* to operate against.
+For example, a series of characters that represents a word or phrase is usually called a "string". The characters are the data. But you almost never just care about the data, you usually want to *do things* with the data, so the behaviors that can apply *to* that data (calculating its length, appending data, searching, etc) are all designed as methods of a `String` class.
+
+Any given string is just an instance of this class, which means that it's a neatly collected packaging of both the character data and the functionality we can perform on it.
+
+Classes also imply a way of *classifying* a certain data structure. The way we do this is to think about any given structure as a specific variation of a more general base definition.
+
+Let's explore this classification process by looking at a commonly cited example. A *car* can be described as a specific implementation of a more general "class" of thing, called a *vehicle*.
+
+We model this relationship in software with classes by defining a `Vehicle` class and a `Car` class.
+
+The definition of `Vehicle` might include things like propulsion (engines, etc), the ability to carry people, etc. What we define in `Vehicle` is all the stuff that is common to all (or most of) the different types of vehicles (the "planes, trains, and automobiles").
+
+It might not make sense in our software to re-define the basic essence of "ability to carry people" over and over again for each different type of vehicle. Instead, we define that capability once in `Vehicle`, and then when we define `Car`, we simply indicate that it "inherits" (or "extends") the base definition from `Vehicle`. The definition of `Car` is said to specialize the general `Vehicle` definition.
+
+**And thus, classes and inheritance emerge.**
+
+Another key concept with classes is "polymorphism", which describes the idea that a general behavior from a parent class can be overriden in a child class to give it more specifics. In fact, relative polymorphism let's us reference the base behavior from the overriden behavior.
+
+Class theory strongly suggests that a parent class and a child class share the same method name for a certain behavior, so that the child overrides the parent (differentially). As we'll see later, doing so in your JavaScript code is opting into frustration and code brittleness.
+
+### "Class" Design Pattern
+
+You may never have thought about classes as a "design pattern", since it's most common to see discussion of popular "OO Design Patterns", like "Iterator", "Observer", "Factory", "Singleton", etc. As presented this way, it's almost an assumption that OO classes are the lower-level mechanics by which we implement all (higher level) design patterns, as if OO is a given foundation for *all* (proper) code.
+
+Depending on your level of formal education in programming, you may have heard of "procedural programming" as a way of describing code which only consists of procedures (aka, functions) calling other functions, without any higher abstractions. It you may have been taught that classes were the *proper* way to transform procedural-style "spaghetti code" into well-formed, well-organized code.
+
+Of course, if you have experience with "functional programming" (Monads, etc), you know very well that classes are just one of many several common design patterns. But for others, this may be the first time you've asked yourself if classes really are a fundamental foundation for code, or if they are an optional abstraction on top of code.
+
+Some languages (like Java) don't give you the choice, so it's not very *optional* at all -- everything's a class. Other languages like C/C++ or PHP give you a both procedural and class-oriented syntaxes, and it's left more to the developer's choice which style or mixture of styles is appropriate.
+
+### JavaScript "Classes"
+
+Where does JavaScript fall in this regard? JS has had *some* class-like syntactic elements (like `new` and `instanceof`) for quite awhile, and more recently in ES6, some additions, like the `class` keyword (see Appendix A).
+
+But does that mean JavaScript actually *has* classes? Plain and simple: **No.**
+
+Since classes are a design pattern, you *can*, with quite a bit of effort (as we'll see throughout the rest of this chapter), implement approximations for much of classical class functionality. JS tries to satisfy the extremely pervasive *desire* to design with classes by providing seemingly class-like syntax.
+
+While we may have a syntax that looks like classes, it's as if JavaScript mechanics are fighting against you using the *class design pattern*, because behind the curtain, the mechanisms that you build on are operating quite differently. Syntactic sugar and (extremely widely used) JS "Class" libraries go a long way toward hiding this reality from you, but sooner or later you will face the fact that the *classes* you have in other languages are not like the "classes" you're faking in JS.
+
+What this boils down to is that classes are an optional pattern in software design, and you have the choice to use them in JavaScript or not. Since many developers have a strong affinity to class oriented software design, we'll spend the rest of this chapter exploring what it takes to maintain the illusion of classes with what JS provides, and the pain points we experience.
+
+## Class Mechanics
+
+In many class-oriented languages, the "standard library" provides a "stack" data structure (push, pop, etc) as a `Stack` class. This class would have an internal set of variables that stores the data, and it would have a set of publicly accessible behaviors ("methods") provided by the class, which gives your code the ability to interact with the (hidden) data (adding & removing data, etc).
+
+But in such languages, you don't really operate directly on `Stack` (unless making a **Static** class member reference, which is outside the scope of our discussion). The `Stack` class is merely an abstract explanation of what *any* "stack" should do, but it's not itself *a* "stack". You must **instantiate** the `Stack` class before you have a concrete data structure *thing* to operate against.
 
 ### Building
 
 The traditional metaphor for "class" and "instance" based thinking comes from a building construction.
 
-An architect plans out all the characteristics of a building: how wide, how tall, how many windows and in what locations, even what type of material to use for the walls and roof. He doesn't necessarily care, at this point, *where* the building will be built, nor does he care *how many* copies of that building will be built.
+An architect plans out all the characteristics of a building: how wide, how tall, how many windows and in what locations, even what type of material to use for the walls and roof. She doesn't necessarily care, at this point, *where* the building will be built, nor does she care *how many* copies of that building will be built.
 
-He also doesn't care very much about the contents of the building -- the furniture, wall paper, ceiling fans, etc -- only what type of structure they will be contained by.
+She also doesn't care very much about the contents of the building -- the furniture, wall paper, ceiling fans, etc -- only what type of structure they will be contained by.
 
-The architectural blue-prints he produces are only *plans* for a building. They don't actually constitute a building we can walk into and sit down. We need a builder for that task. A builder will take those plans and follow them, exactly, as he *builds* the building. In a very real sense, he is *copying* the intended characteristics from the plans to the physical building.
+The architectural blue-prints she produces are only *plans* for a building. They don't actually constitute a building we can walk into and sit down. We need a builder for that task. A builder will take those plans and follow them, exactly, as he *builds* the building. In a very real sense, he is *copying* the intended characteristics from the plans to the physical building.
 
 Once complete, the building is a physical instantiation of the blue-print plans, hopefully an essentially perfect *copy*. And then the builder can move to the open lot next door and do it all over again, creating yet another *copy*.
 
@@ -73,7 +119,7 @@ Notice that the `CoolGuy` class has a constructor `CoolGuy()`, which is actually
 
 The constructor of a class *belongs* to the class, almost universally with the same name as the class. Also, constructors pretty much always need to be called with `new` to let the language engine know you want to construct a *new* class instance.
 
-## Inheritance
+## Class Inheritance
 
 In class-oriented languages, not only can you define a class which can be instantiated itself, but you can define another class that **inherits** from the first class.
 
@@ -89,7 +135,7 @@ It's important to remember that we're talking about parent and child **classes**
 
 Let's set aside biological parents and children, and look at inheritance through a slightly different lens: different types of vehicles. That's one of the most canonical (and often groan-worthy) metaphors to understand inheritance.
 
-Consider some more loose pseudo-code (invented syntax) for inherited classes:
+Let's revisit the `Vehicle` and `Car` discussion from earlier in this chapter. Consider this loose pseudo-code (invented syntax) for inherited classes:
 
 ```js
 class Vehicle {
@@ -192,7 +238,7 @@ Since observed class behaviors in other languages imply copies, let's examine ho
 
 ### Explicit Mixins
 
-Let's revisit our `Vehicle` and `Car` example from before. Since JavaScript will not automatically copy behavior from `Vehicle` to `Car`, we can instead create a utility that manually copies. Such a utility is often called `extend` by many libraries/frameworks, but we will call it `mixin()` here for descriptive purposes.
+Let's again revisit our `Vehicle` and `Car` example from before. Since JavaScript will not automatically copy behavior from `Vehicle` to `Car`, we can instead create a utility that manually copies. Such a utility is often called `extend` by many libraries/frameworks, but we will call it `mixin()` here for illustrative purposes.
 
 ```js
 // vastly simplified `mixin()` example:
@@ -310,7 +356,7 @@ As a result of the copy operation, `Car` will operate somewhat separately from `
 
 Since the two objects also share references to their common functions, that means that **even manual copying of functions (aka, mixins) from one object to another doesn't *actually emulate* the real duplication from class to instance that occurs in class-oriented languages**.
 
-JavaScript functions can't really be duplicated, so what you end up with instead is a **duplicated reference** to the same shared function object (functions are objects; see Chapter 3). If you modifed one of the shared **function objects** by adding properties on top of it, for instance, both `Vehicle` and `Car` would be "affected" via the shared reference.
+JavaScript functions can't really be duplicated (in a standard, reliable way), so what you end up with instead is a **duplicated reference** to the same shared function object (functions are objects; see Chapter 3). If you modified one of the shared **function objects** (like `ignition()`) by adding properties on top of it, for instance, both `Vehicle` and `Car` would be "affected" via the shared reference.
 
 Explicit mixins are a fine mechanism in JavaScript. But they appear more powerful than they really are. Not much benefit is *actually* derived from copying a property from one object to another, **as opposed to just defining the properties twice**, once on each object. And that's especially true given the function-object reference nuance we just mentioned.
 
@@ -409,16 +455,18 @@ While this sort of technique seems to take useful advantage of `this` rebinding 
 
 ## Review (TL;DR)
 
+Classes are a design pattern. Many languages provide syntax which enables natural class-oriented software design. JS also has a similar syntax, but it behaves **very differently** from what you're used to with classes in those other languages.
+
 **Classes mean copies.**
 
 When traditional classes are instantiated, a copy of behavior from class to instance occurs. When classes are inherited, a copy of behavior from parent to child also occurs.
 
 Polymorphism (having different functions at multiple levels of an inheritance chain with the same name) may seem like it implies a referential relative link from child back to parent, but it's still just a result of copy behavior.
 
-Traditional classes make relative references to different functions of the same name via relative polymorphism, usually through a `super` keyword.
+JavaScript **does not automatically** create copies (as classes imply) between objects.
 
-**JavaScript does not have classes**, only objects. And JavaScript does not automatically create copies (as classes imply) between objects.
+The mixin pattern (both explicit and implicit) is often used to *sort of* emulate class copy behavior, but this usually leads to ugly and brittle syntax like explicit pseudo-polymorphism (`OtherObj.methodName.call(this, ...)`), which often results in harder to understand and maintain code.
 
-The mixin pattern (both explicit and implicit) is often used to *sort of* emulate class copy behavior, but this usually leads to ugly and brittle syntax like explicit pseudo-polymorphism (`OtherObj.methodName.call(this, ...)`), which is often a cause of harder to understand and maintain code.
+Explicit mixins are also not exactly the same as class *copy*, since objects (and functions!) only have shared references duplicated, not the objects/functions duplicated themselves. Not paying attention to such nuance is the source of a variety of gotchas.
 
-Explicit mixins are also not exactly the same as class *copy*, since objects (and functions!) only have shared references duplicated, not the objects/functions duplicated themselves. Not paying attention to such nuance is the source of a variety of gotchas. In general, this style of code often sets more landmines for future coding than solving present *real* problems.
+In general, faking classes in JS often sets more landmines for future coding than solving present *real* problems.
