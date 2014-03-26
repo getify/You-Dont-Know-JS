@@ -19,3 +19,4 @@ To properly focus our thoughts on how to use `[[Prototype]]` in the most straigh
 
 That is **not** to say that every principle from class oriented design is moot and inappropriate. For example, *encapsulation* is a very important design principle, and is compatible (if not as common) with delegation.
 
+To understand delegation, we must set aside the notion from the class/inheritance design pattern (see Chapter 4), and model software not with "parent" / "child" semantics, but instead with "peer" to "peer" semantics.
