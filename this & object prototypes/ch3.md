@@ -234,6 +234,223 @@ myArray.length; // 4
 myArray[3]; // "baz"
 ```
 
+### Property Descriptors
+
+Prior to ES5, the JavaScript language gave no direct way for your code to inspect or draw any distinction between the characteristics of properties, such as whether the property was read-only or not.
+
+But as of ES5, all properties are described in terms of a **property descriptor**.
+
+Consider this code:
+
+```js
+var myObject = {
+	a: 2
+};
+
+Object.getOwnPropertyDescriptor( myObject, "a" );
+// {
+//    value: 2,
+//    writable: true,
+//    enumerable: true,
+//    configurable: true
+// }
+```
+
+As you can see, the property descriptor (called a "data descriptor" since it's only for holding a data value) for our normal object property `a` is much more than just its `value` of `2`. It includes 3 other characteristics: `writable`, `enumerable`, and `configurable`.
+
+While we can see what the default values for the property descriptor characteristics are when we create a normal property, we can use `Object.defineProperty(..)` to add a new property, or modify an existing one (if it's `configurable`!), with the desired characteristics.
+
+For example:
+
+```js
+var myObject = {};
+
+Object.defineProperty( myObject, "a", {
+	value: 2,
+	writable: true,
+	configurable: true,
+	enumerable: false
+} );
+
+myObject.a; // 2
+```
+
+Using `defineProperty(..)`, we added the plain, normal `a` property to `myObject` in a manually explicit way. However, you generally wouldn't use this manual approach unless you wanted to modify one of the descriptor characteristics from its normal behavior.
+
+#### Writable
+
+The ability for you to change the value of a property is controlled by `writable`.
+
+Consider:
+
+```js
+var myObject = {};
+
+Object.defineProperty( myObject, "a", {
+	value: 2,
+	writable: false, // not writable!
+	configurable: true,
+	enumerable: false
+} );
+
+myObject.a = 3;
+
+myObject.a; // 2
+```
+
+As you can see, our modification of the `value` silently failed. If we try in `strict mode`, we get an error:
+
+```js
+"use strict";
+
+var myObject = {};
+
+Object.defineProperty( myObject, "a", {
+	value: 2,
+	writable: false, // not writable!
+	configurable: true,
+	enumerable: false
+} );
+
+myObject.a = 3; // TypeError
+```
+
+The `TypeError` tells us we cannot change a non-writable property.
+
+**Note:** We will discuss getters/setters shortly, but briefly, you can observe that `writable:false` means a value cannot be changed, which is somewhat equivalent to if you defined a no-op setter. Actually, your no-op setter would need throw a `TypeError` when called, to be truly conformant to `writable:false`.
+
+#### Configurable
+
+As long as a property is currently configurable, we can modify its descriptor definition, using the same `defineProperty(..)` utility.
+
+```js
+var myObject = {
+	a: 2
+};
+
+myObject.a = 3;
+myObject.a; // 3
+
+Object.defineProperty( myObject, "a", {
+	value: 4,
+	writable: true,
+	configurable: false, // not configurable!
+	enumerable: true
+} );
+
+myObject.a; // 4
+myObject.a = 5;
+myObject.a; // 5
+
+Object.defineProperty( myObject, "a", {
+	value: 6,
+	writable: true,
+	configurable: true,
+	enumerable: true
+} ); // TypeError
+```
+
+The final `defineProperty(..)` call results in a TypeError, regardless of `strict mode`, if you attempt to change the descriptor definition of a non-configurable property. Be careful: as you can see, changing `configurable` to `false` is a **one-way action, and cannot be undone!**
+
+Another thing `configurable:false` prevents is the ability to use the `delete` operator to remove an existing property.
+
+```js
+var myObject = {
+	a: 2
+};
+
+myObject.a; // 2
+delete myObject.a;
+myObject.a; // undefined
+
+Object.defineProperty( myObject, "a", {
+	value: 2,
+	writable: true,
+	configurable: false,
+	enumerable: true
+} );
+
+myObject.a; // 2
+delete myObject.a;
+myObject.a; // 2
+```
+
+As you can see, the last `delete` call failed because we made the `a` property non-configurable.
+
+`delete` is only used to remove object properties (which can be removed) directly from the object in question. If an object property is the last remaining *reference* to some object/function, and you `delete` it, that removes the reference and now that unreferenced object/function can be garbage collected. But, it is **not** proper to think of `delete` as a tool to free up allocated memory as it does in other languages (like C/C++). `delete` is just an object property removal operation -- nothing more.
+
+#### Enumerable
+
+The final descriptor characteristic we will mention here (there are two others, which we deal with shortly when we discuss getter/setters) is `enumerable`.
+
+The name probably makes it obvious, but this characteristic controls if a property will show up in certain object-property enumerations, such as the `for-in` loop. Set to `false` to keep it from showing up in such enumerations, even though it's still completely accessible. Set to `true` to keep it present.
+
+All normal user-defined properties are defaulted to `enumerable`, as this is most commonly what you want. But if you have a special property you want to hide from enumeration, set it to `enumerable:false`.
+
+We'll demonstrate enumerability in much more detail shortly, so keep a mental bookmark on this topic.
+
+### Immutability
+
+It is sometimes desired to make properties or objects that cannot be changed (either by accident or intentionally). ES5 adds support for handling that in a variety of different nuanced ways.
+
+It's important to note that **all** of these approaches create shallow immutability. That is, they affect only the object and its direct property characteristics. If an object has a reference to another object (array, object, function, etc), the *contents* of that object are not affected, and remain mutable.
+
+```js
+myImmutableObject.foo; // [1,2,3]
+myImmutableObject.foo.push(4);
+myImmutableObject.foo; // [1,2,3,4]
+```
+
+We assume in this snippet that `myImmutableObject` is already created and protected as immutable. But, to also protect the contents of `myImmutableObject.foo` (which is its own object -- array), you would also need to make `foo` immutable, using one or more of the following functionalities.
+
+**Note:** It is not terribly common to create deeply entrenched immutable objects in JS programs. Special cases can certainly call for it, but as a general design pattern, if you find yourself wanting to *seal* or *freeze* all your objects, you may want to take a step back and reconsider your program design to be more robust to potential changes in objects' values.
+
+#### Object Constant
+
+By combining `writable:false` and `configurable:false`, you can essentially create a *constant* (cannot be changed, redefined or deleted) as an object property, like:
+
+```js
+var myObject = {};
+
+Object.defineProperty( myObject, "FAVORITE_NUMBER", {
+	value: 42,
+	writable: false,
+	configurable: false
+} );
+```
+
+#### Prevent Extensions
+
+If you want to prevent an object from having new properties added to it, but otherwise leave the rest of the object's properties alone, call `Object.preventExtensions(..)`:
+
+```js
+var myObject = {
+	a: 2
+};
+
+Object.preventExtensions( myObject );
+
+myObject.b = 3;
+myObject.b; // undefined
+```
+
+In non-`strict mode`, the creation of `b` fails silently. In `strict mode`, it throws a `TypeError`.
+
+#### Seal
+
+`Object.seal(..)` creates a "sealed" object, which means it takes an existing object and essentially calls `Object.preventExtensions(..)` on it, but also marks all its existing properties as `configurable:false`.
+
+So, not only can you not add anymore properties, but you also cannot reconfigure or delete any existing properties (though you *can* still modify their values).
+
+#### Freeze
+
+`Object.freeze(..)` creates a frozen object, which means it takes an existing object and essentially calls `Object.seal(..)` on it, but it also marks all "data accessor" properties as `writable:false`, so that their values cannot be changed.
+
+This approach is the highest level of immutability that you can attain for an object itself, as it prevents any changes to the object or to any of its direct properties (though, as mentioned above, the contents of any referenced other objects are unaffected).
+
+You could "deep freeze" an object by calling `Object.freeze(..)` on the object, and then recursively iterating over all objects it references (which would have been unaffected thus far), and calling `Object.freeze(..)` on them as well. Be careful, though, as that could affect other (shared) objects you're not intending to affect.
+
+
 ### `[[Get]]`
 
 There's a subtle, but important, detail about how property accesses are performed.
@@ -276,17 +493,35 @@ myObject.a; // undefined
 myObject.b; // undefined
 ```
 
-From a *value* perspective, there is no difference between these two references -- they both result in `undefined`. However, the `[[Get]]` operation underneath, though subtle at a glance, potentially performed a bit more "work" for `myObject.b` than for `myObject.a`.
+From a *value* perspective, there is no difference between these two references -- they both result in `undefined`. However, the `[[Get]]` operation underneath, though subtle at a glance, potentially performed a bit more "work" for the reference `myObject.b` than for the reference `myObject.a`.
 
-Inspecting the value results, you cannot distinguish whether a property exists and holds the explicit value `undefined`, or whether ther property does *not* exist and `undefined` was the default return value after `[[Get]]` failed to return something explicitly. However, we will see shortly how you *can* distinguish these two scenarios.
+Inspecting only the value results, you cannot distinguish whether a property exists and holds the explicit value `undefined`, or whether ther property does *not* exist and `undefined` was the default return value after `[[Get]]` failed to return something explicitly. However, we will see shortly how you *can* distinguish these two scenarios.
+
+### `[[Put]]`
+
+Since there's an internally defined `[[Get]]` operation for getting a value from a property, it should be obvious there's also a default `[[Put]]` operation.
+
+It may be tempting to think that an assignment to a property on an object would just invoke `[[Put]]` to set or create that property on the object in question. But the situation is more nuanced than that.
+
+When invoking `[[Put]]`, how it behaves differs based on a number of factors, including (most impactfully) whether the property is already present on the object or not.
+
+If the property is present, the `[[Put]]` algorithm will roughly check:
+
+1. Is the property an accessor descriptor (see "Getters & Setters" section below)? **If so, call the setter, if any.**
+2. Is the property a data descriptor with `writable` of `false`? **If so, silently fail in non-`strict mode`, or throw `TypeError` in `strict mode`.**
+3. Otherwise, set the value to the existing property as normal.
+
+If the property is not yet present on the object in question, the `[[Put]]` operation is even more nuanced and complex. We will revisit this scenario in Chapter 5 when we discuss `[[Prototype]]` to give it more clarity.
 
 ### Getters & Setters
 
-The reason it's important to think of a property access in terms of a `[[Get]]` operation is because in a future version of JavaScript, it's likely that the default built-in `[[Get]]` operation for an object will actually be overridable. You could in theory specify that unfulfilled property accesses result in a `null` instead of an `undefined`, if you so chose.
+The default `[[Put]]` and `[[Get]]` operations for objects completely control how values are set to existing or new properties, or retrieved from existing properties, respectively.
 
-**Note:** When we examine the `[[Prototype]]` chain traversal as part of the default object-level `[[Get]]` operation in Chapter 5, it will become clear that overriding this operation allows you to actually redefine how `[[Prototype]]` look-ups work, or even change to not occur at all!
+**Note:** Using future/advanced capabilities of the language, it may be possible to override the default `[[Get]]` or `[[Put]]` operations for an entire object (not just per property). This is beyond the scope of our discussion in this book, but will be covered later in the "You Don't Know JS" series.
 
-ES5 introduced a limited form of this future `[[Get]]` override capability with "getters", which are specified per-property, rather than across the entire object (which is potentially coming in a future revision of the language).
+ES5 introduced a way to override part of these default operations, not on an object level but a per-property level, through the use of getters and setters. Getters are properties which actually call a hidden function to retrieve a value. Setters are properties which actually call a hidden function to set a value.
+
+When you define a property to have either a getter or a setter or both, its definition becomes an "accessor descriptor" (as opposed to a "data descriptor"). For accessor-desciptors, the `value` and `writable` characteristics of the descriptor are moot and ignored, and instead JS considers the `set` and `get` characteristics of the property (as well as `configurable` and `enumerable`).
 
 Consider:
 
@@ -315,9 +550,7 @@ myObject.a; // 2
 myObject.b; // 4
 ```
 
-Either through object-literal syntax with `get a() { .. }` or through explicit definition with `defineProperty(..)`, in both cases we created a property on the object that actually doesn't hold a value, but whose access automatically results in a kind of hidden function call to the getter function, with whatever value it returns being the result of the property access.
-
-Since we only defined a getter for `a`, if we try to set the value of `a` later, the set operation (called `[[Put]]` in the spec) will occur without error, but our custom getter will effectively make that set moot, because the getter will still always return what we specified:
+Either through object-literal syntax with `get a() { .. }` or through explicit definition with `defineProperty(..)`, in both cases we created a property on the object that actually doesn't hold a value, but whose access automatically results in a hidden function call to the getter function, with whatever value it returns being the result of the property access.
 
 ```js
 var myObject = {
@@ -332,7 +565,9 @@ myObject.a = 3;
 myObject.a; // 2
 ```
 
-To make this scenario more sensible, properties can also be defined with setters, which override the default `[[Put]]` operation (aka, assignment), per-property, just as you'd expect. You will almost certainly want to always declare both getter and setter, as having only one or the other often leads to unexpected/surprising behavior.
+Since we only defined a getter for `a`, if we try to set the value of `a` later, the set operation won't throw an error but will just silently throw the assignment away. Even if there was a valid setter, our custom getter is hard-coded to return only `2`, so the set operation would be moot.
+
+To make this scenario more sensible, properties should also be defined with setters, which override the default `[[Put]]` operation (aka, assignment), per-property, just as you'd expect. You will almost certainly want to always declare both getter and setter, as having only one or the other often leads to unexpected/surprising behavior.
 
 ```js
 var myObject = {
@@ -378,7 +613,7 @@ The `in` operator will check to see if the property is *in* the object, or if it
 
 #### Enumeration
 
-Previously, we demonstrated the use of `Object.defineProperty(..)` utility to create property definitions imperatively rather than the literal/declarative form. The example set an `enumerable` descriptor, but did not explain what that actually does, so we will now examine *enumerability*.
+Previously, we explained briefly the idea of "enumerability" when we looked at the `enumerable` property descriptor characteristic. Let's revisit that and examine it in more close detail.
 
 ```js
 var myObject = { };
@@ -524,6 +759,8 @@ Objects in JS have both a literal form (such as `var a = { .. }`) and a construc
 
 Many people mistakingly claim "everything in JavaScript is an object", but this is incorrect. Objects are one of the 6 (or 7, depending on your perspective) primitive types. Objects have sub-types, including `function`, and also can be behavior-specialized, like `[object Array]` as the internal label representing the array object sub-type.
 
-Objects are collections of key/value pairs. The values can be accessed as properties, via `.propName` or `["propName"]` syntax. Whenever a property is accessed, the engine actually invokes the internal default `[[Get]]` operation, which not only looks for the property directly on the object, but which will traverse the `[[Prototype]]` chain if not found.
+Objects are collections of key/value pairs. The values can be accessed as properties, via `.propName` or `["propName"]` syntax. Whenever a property is accessed, the engine actually invokes the internal default `[[Get]]` operation (and `[[Put]]` for setting values), which not only looks for the property directly on the object, but which will traverse the `[[Prototype]]` chain (see Chapter 5) if not found.
 
-Properties don't have to contain values -- they can be getters/setters instead. They can also be either *enumerable* or not, which controls if they show up in `for-in` loop iterations, for instance.
+Properties have certain characteristics that can be controlled through property descriptors, such as `writable` and `configurable`. In addition, objects can have their mutability (and that of their properties) controlled to various levels of immutability using `Object.preventExtensions(..)`, `Object.seal(..)`, and `Object.freeze(..)`.
+
+Properties don't have to contain values -- they can be "accessor properties" as well, with getters/setters. They can also be either *enumerable* or not, which controls if they show up in `for-in` loop iterations, for instance.
