@@ -584,6 +584,56 @@ Lastly, we avoided the polymorphism pitfalls of class-oriented design by not hav
 
 **Bottom line**: we end up with the same capability, but a simpler design. That's the power of OLOO-style code and the power of the *behavior delegation* design pattern.
 
+### Concise Methods
+
+One of the nicer things that makes `class` so deceptively attractive (see Appendix A on why to avoid it!) is the short-hand syntax for declaring class methods:
+
+```js
+class Foo {
+	method() { /* .. */ }
+}
+```
+
+We get to drop the word `function` from the declaration, so that makes people cheer!
+
+You may have noticed and been frustrated that the suggested OLOO syntax above has lots of `function` appearing, which seems like a bit of a detractor. **But it doesn't have to be that way!**
+
+As of ES6, we have *concise method declarations* in object literals, so an object in OLOO style can be declared this way (same sugar as with `class` body syntax):
+
+```js
+var LoginController = {
+	errors: [],
+	getUser() { // Look ma, no `function`!
+		// ...
+	},
+	getPassword() {
+		// ...
+	}
+	// ...
+}
+```
+
+Moreover, as of ES6, the clunkier syntax you use (like for the `AuthController` definition), where you're assigning properties individually and not using an object literal, can be re-written using an object literal (so that you can use concise methods), and you can just modify that object's `[[Prototype]]`, like this:
+
+```js
+// use nicer object literal syntax w/ concise methods!
+var AuthController = {
+	errors: [],
+	checkAuth() {
+		// ...
+	},
+	server(url,data) {
+		// ...
+	}
+	// ...
+};
+
+// NOW, link `AuthController` to delegate to `LoginController`
+Object.setPrototypeOf( AuthController, LoginController );
+```
+
+OLOO-style as of ES6, with concise methods, **is a lot friendlier** than it was before (and even then, it was much simpler and nicer than classical prototype-style code). **You don't have to opt for class** (complexity) to get nice clean object syntax!
+
 ## Review (TL;DR)
 
 Classes and inheritance are a design pattern you can choose, or not choose, in your software architecture. Most developers take for granted that classes are the only (proper) way to organize code, but there's another lesser talked about pattern that's actually quite powerful: **behavior delegation**.
