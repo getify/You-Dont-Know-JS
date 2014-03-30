@@ -509,10 +509,10 @@ But, **do we really need to model this problem** with a parent `Controller` clas
 var LoginController = {
 	errors: [],
 	getUser: function() {
-		return document.getElementById( "login_username" );
+		return document.getElementById( "login_username" ).value;
 	},
 	getPassword: function() {
-		return document.getElementById( "login_password" );
+		return document.getElementById( "login_password" ).value;
 	},
 	validateEntry: function(user,pw) {
 		user = user || this.getUser();
