@@ -427,10 +427,10 @@ function LoginController() {
 // Link child class to parent
 LoginController.prototype = Object.create( Controller.prototype );
 LoginController.prototype.getUser = function() {
-	return document.getElementById( "login_username" );
+	return document.getElementById( "login_username" ).value;
 };
 LoginController.prototype.getPassword = function() {
-	return document.getElementById( "login_password" );
+	return document.getElementById( "login_password" ).value;
 };
 LoginController.prototype.validateEntry = function(user,pw) {
 	user = user || this.getUser();
