@@ -28,7 +28,7 @@
 	* Object Links
 	* Creating Linked Objects
 * Chapter 6: Behavior Delegation
-	* Objects: Linked
-	* Delegation Oriented Design
-	* OO vs. OLOO (Objects Linked to Other Objects)
+	* Towards Delegation-Oriented Design
+	* Classes vs. Objects
+	* Simpler Design
 

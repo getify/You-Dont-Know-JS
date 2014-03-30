@@ -198,7 +198,7 @@ a; // {}
 
 In other words, in JavaScript, it's most appropriate to say that a "constructor" is **any function called with the `new` keyword** in front of it.
 
-Functions aren't constructors, but function calls are if and only if `new` is used.
+Functions aren't constructors, but function calls are "constructor calls" if and only if `new` is used.
 
 ### Mechanics
 
@@ -242,7 +242,27 @@ This is just unfortunate confusion. In actuality, the `.constructor` reference i
 
 It *seems* awfully convenient that an object `a` "constructed by" `Foo` would have access to a `.constructor` property that points to `Foo`. But that's nothing more than a false sense of security. It's a happy accident, almost tangentially, that `a.constructor` *happens* to point at `Foo` via this default `[[Prototype]]` delegation. There's actually several ways that the ill-fated assumption of `.constructor` meaning "was constructed by" can come back to bite you.
 
-For one, the `.constructor` property on `Foo.prototype` is only there by default on the object created when `Foo` the function is declared. If you create a new object, and replace a function's default `.prototype` object reference, the new object will not by default magically get a `.constructor` on it. You can add one, but this takes manual work, especially if you want to match native behavior and have it be non-enumerable (see Chapter 3).
+For one, the `.constructor` property on `Foo.prototype` is only there by default on the object created when `Foo` the function is declared. If you create a new object, and replace a function's default `.prototype` object reference, the new object will not by default magically get a `.constructor` on it.
+
+Consider:
+
+```js
+function Foo() { /* .. */ }
+
+Foo.prototype = { /* .. */ }; // create a new prototype object
+
+var a1 = new Foo();
+a1.constructor === Foo; // false!
+a1.constructor === Object; // true!
+```
+
+`Object(..)` didn't "construct" `a1` did it? It sure seems like `Foo()` "constructed" it. It's most appropriate to think of `Foo()` as doing the construction, but where everything falls apart is when you think "constructor" means "was constructed by", because by that reasoning, `a1.constructor` should be `Foo`, which it isn't!
+
+What's happening? `a1` has no `.constructor` property, so it delegates up the `[[Prototype]]` chain to `Foo.prototype`. But that object doesn't have a `.constructor` either (like the default `Foo.prototype` object would have had!), so it keeps delegating, this time up to `Object.prototype`, the top of the delegation chain. *That* object indeed has a `.constructor` on it, which points to the built-in `Object(..)` function.
+
+**Misconception, busted.**
+
+Of course, you can add `.constructor` back to the `.prototype` object, but this takes manual work, especially if you want to match native behavior and have it be non-enumerable (see Chapter 3).
 
 For example:
 
@@ -272,9 +292,9 @@ By virtue of how the `[[Get]]` algorithm traverses the `[[Prototype]]` chain, a 
 
 See how arbitrary its meaning actually is?
 
-The result? Some arbitrary object-property reference like `a.constructor` cannot actually be *trusted* to have the assumed default function reference. Moreover, as we'll see shortly, just by simple omission, `a.constructor` can even end up pointing somewhere quite surprising and insensible.
+The result? Some arbitrary object-property reference like `a1.constructor` cannot actually be *trusted* to have the assumed default function reference. Moreover, as we'll see shortly, just by simple omission, `a1.constructor` can even end up pointing somewhere quite surprising and insensible.
 
-`a.constructor` is extremely unreliable, and an unsafe reference to rely upon in your code. **Generally, such references should be avoided where possible.**
+`a1.constructor` is extremely unreliable, and an unsafe reference to rely upon in your code. **Generally, such references should be avoided where possible.**
 
 ## "(Prototypal) Inheritance"
 
@@ -471,7 +491,7 @@ Notice that `.__proto__` is also a set'able property, just like using ES6's `Obj
 
 There are some very complex, advanced techniques used deep in some frameworks that allow tricks like "subclassing" an `Array`, but this is commonly frowned on in general programming practice, as it usually leads to *much* harder to understand/maintain code.
 
-**Note:** As of ES6, the `class` keyword will allow something that approximates "subclassing" of built-in's like `Array`. See Appendix A for discussion of the `class` mechanism added in ES6.
+**Note:** As of ES6, the `class` keyword will allow something that approximates "subclassing" of built-in's like `Array`. See Appendix A for discussion of the `class` syntax added in ES6.
 
 The only other narrow exception (as mentioned earlier) would be setting the `[[Prototype]]` of a default function's `.prototype` object to reference some other object (besides `Object.prototype`). That would avoid replacing that default object entirely with a new linked object, but otherwise, **it's best to treat object `[[Prototype]] linkage as a read-only characteristic** for ease-of-reading of your code.
 
