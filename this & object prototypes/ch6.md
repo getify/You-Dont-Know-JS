@@ -61,7 +61,7 @@ Now, you can instantiate one or more **copies** of the `XYZ` child class, and us
 
 ### Delegation Theory
 
-But now let's try to think about the problem in *behavior delegation*.
+But now let's try to think about the same problem domain, but using *behavior delegation* instead of *classes*.
 
 You will first define an **object** (not a class, nor a `function` as most JS'rs would lead you to believe) called `Task`, and it will have concrete behavior on it that includes utility methods that various tasks can use (read: *delegate to*!). Then, for each task ("XYZ", "ABC"), you define an **object** to hold that task-specific data/behavior. You **link** your task-specific object(s) to the `Task` utility object, allowing them to delegate to it when they need to.
 
@@ -183,7 +183,7 @@ We take exactly the same advantage of `[[Prototype]]` delegation from `b1` to `B
 
 But, importantly, we've greatly simplified *all the other stuff* going on, because now we just set up **objects** linked to each other, without needing all the cruft and confusion of things that look (but don't behave!) like classes, with constructors and prototypes and `new` calls.
 
-Ask yourself: if I can get the same functionality with OLOO style code as I do with "class" style code, but OLOO is simpler and has less things to think about, isn't OLOO better?
+Ask yourself: if I can get the same functionality with OLOO style code as I do with "class" style code, but OLOO is simpler and has less things to think about, **isn't OLOO better**?
 
 Let's examine the mental models involved between these two snippets.
 
@@ -197,7 +197,7 @@ Now, let's look at the mental model for OLOO-style code:
 
 As you can see comparing them, it's quite obvious that OLOO-style code has vastly less stuff to worry about, because OLOO-style code embraces the **fact** that the only thing we ever really cared about was the **objects linked to other objects**.
 
-All the other "class" cruft was a confusing and complex way of getting the same thing.
+All the other "class" cruft was a confusing and complex way of getting the same end result.
 
 ## Classes vs. Objects
 
@@ -209,7 +209,7 @@ We'll first examine a typical scenario in front-end web dev: creating UI widgets
 
 Because you're probably still so used to the OO design pattern, you'll likely immediately think of this problem domain in terms of a parent class (perhaps called `Widget`) with all the common base widget behavior, and then child derived classes for specific widget types (like `Button`).
 
-**Note:** We're going to show the use of jQuery here for DOM and CSS manipulation, only because it's a detail we don't really care about for the purposes of our current discussion. Of course, nothing we're discussing here has anything to do with which JS framework (jQuery, Dojo, YUI, etc), if any, you might solve such tasks with.
+**Note:** We're going to use of jQuery here for DOM and CSS manipulation, only because it's a detail we don't really care about for the purposes of our current discussion. Of course, nothing we're discussing here has anything to do with which JS framework (jQuery, Dojo, YUI, etc), if any, you might solve such tasks with.
 
 Let's examine how we'd implement the "class" design in classic-style pure JS without any "class" helper library or syntax:
 
@@ -499,9 +499,9 @@ auth.checkAuth( new LoginController() );
 
 We won't belabor lots of explanation about this example, as it should be fairly straightforward to understand.
 
-We have base behaviors that all controllers share, which are `success(..)`, `failure(..)` and `showDialog(..)`. Our child classes `LoginController` and `AuthController` override `success(..)` and `showDialog(..)` to augment the default base class behavior. Also note that `AuthController` needs an instance of `LoginController` to interact with the login form, so that becomes a member data property.
+We have base behaviors that all controllers share, which are `success(..)`, `failure(..)` and `showDialog(..)`. Our child classes `LoginController` and `AuthController` override `failure(..)` and `success(..)` to augment the default base class behavior. Also note that `AuthController` needs an instance of `LoginController` to interact with the login form, so that becomes a member data property.
 
-If you're well familiar with class-oriented (OO) design, this should look pretty familiar and natural.
+If you're familiar with class-oriented (OO) design, this should look pretty familiar and natural.
 
 But, **do we really need to model this problem** with a parent `Controller` class and two child classes? Is there a way to take advantage of OLOO-style behavior delegation and have a simpler design? **Yes!**
 
@@ -541,6 +541,7 @@ var LoginController = {
 ```js
 // Link `AuthController` to delegate to `LoginController`
 var AuthController = Object.create( LoginController );
+
 AuthController.errors = [];
 AuthController.checkAuth = function() {
 	var user = this.getUser();
@@ -569,16 +570,24 @@ AuthController.rejected = function(err) {
 };
 ```
 
-Since `AuthController` is just an object (so is `LoginController`), we don't need to instantiate. We could just simply do `AuthController.checkAuth()`. But, to maintain symmetry with the previous code listing:
+Since `AuthController` is just an object (so is `LoginController`), we don't need to instantiate (like `new AuthController()`) to perform our task. All we need to do is:
 
 ```js
-var auth = Object.create( AuthController );
-auth.checkAuth();
+AuthController.checkAuth();
 ```
 
-From behavior delegation, `AuthController` and `LoginController` are **just objects**, *horizontal* peers of each other, and not arranged or related as parents and children in class-orientation. We somewhat arbitrarily chose to have `AuthController` delegate to `LoginController` -- it would have been just as vaild for the delegation to go the reverse direction.
+Of course, with OLOO, if you do need to create one or more additional objects in the delegation chain, that's easy, and still doesn't require anything like class instantiation:
 
-The main takeaway from this code snippet is that we have two entities (`LoginController` and `AuthController`), **not three**. We didn't need a base `Controller` class to "share" behavior between the two, because delegation is a powerful enough mechanism to give us the functionality we need. We also, as noted before, don't need to instantiate our classes to work with them, because there are no classes, **just the objects themselves.**
+```js
+var controller1 = Object.create( AuthController );
+var controller2 = Object.create( AuthController );
+```
+
+With behavior delegation, `AuthController` and `LoginController` are **just objects**, *horizontal* peers of each other, and are not arranged or related as parents and children in class-orientation. We somewhat arbitrarily chose to have `AuthController` delegate to `LoginController` -- it would have been just as vaild for the delegation to go the reverse direction.
+
+The main takeaway from this second code listing is that we only have two entities (`LoginController` and `AuthController`), **not three** as before.
+
+We didn't need a base `Controller` class to "share" behavior between the two, because delegation is a powerful enough mechanism to give us the functionality we need. We also, as noted before, don't need to instantiate our classes to work with them, because there are no classes, **just the objects themselves.**
 
 Lastly, we avoided the polymorphism pitfalls of class-oriented design by not having the names `success(..)` and `failure(..)` be the same on both objects, which would have required ugly explicit pseduo-polymorphism. Instead, we called them `accepted()` and `rejected(..)` on `AuthController` -- slightly more descriptive names for their specific tasks.
 
