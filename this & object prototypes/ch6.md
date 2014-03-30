@@ -595,7 +595,7 @@ Lastly, we avoided the polymorphism pitfalls of class-oriented design by not hav
 
 ### Concise Methods
 
-One of the nicer things that makes `class` so deceptively attractive (see Appendix A on why to avoid it!) is the short-hand syntax for declaring class methods:
+One of the nicer things that makes ES6's `class` so deceptively attractive (see Appendix A on why to avoid it!) is the short-hand syntax for declaring class methods:
 
 ```js
 class Foo {
@@ -603,11 +603,11 @@ class Foo {
 }
 ```
 
-We get to drop the word `function` from the declaration, so that makes people cheer!
+We get to drop the word `function` from the declaration, which makes JS developers everywhere cheer!
 
-You may have noticed and been frustrated that the suggested OLOO syntax above has lots of `function` appearing, which seems like a bit of a detractor. **But it doesn't have to be that way!**
+And you may have noticed and been frustrated that the suggested OLOO syntax above has lots of `function` appearances, which seems like a bit of a detractor to the goal of OLOO simplification. **But it doesn't have to be that way!**
 
-As of ES6, we have *concise method declarations* in object literals, so an object in OLOO style can be declared this way (same sugar as with `class` body syntax):
+As of ES6, we can use *concise method declarations* in any object literal, so an object in OLOO style can be declared this way (same short-hand sugar as with `class` body syntax):
 
 ```js
 var LoginController = {
