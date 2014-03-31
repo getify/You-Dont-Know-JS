@@ -3,7 +3,7 @@
 
 In Chapters 3 and 4, we mentioned the `[[Prototype]]` chain several times, but haven't said what exactly it is. We will now examine prototypes in detail.
 
-**Note: All of the attempts to emulate class-copy behavior, as described previously in Chapter 4, labeled as variations of "mixins", completely circument the `[[Prototype]]` chain mechanism we examine here in this chapter.
+**Note:** All of the attempts to emulate class-copy behavior, as described previously in Chapter 4, labeled as variations of "mixins", completely circument the `[[Prototype]]` chain mechanism we examine here in this chapter.
 
 ## Links
 
@@ -22,6 +22,8 @@ myObject.a; // 2
 ```
 
 What is the `[[Prototype]]` reference used for? In Chapter 3, we examined the `[[Get]]` operation that is invoked when you reference a property on an object, such as `myObject.a`. For that default `[[Get]]` operation, the first step is to check if the object itself has a property `a` on it, and if so, it's used.
+
+**Note:** ES6 Proxies are outside of our discussion scope in this book (will be covered in a later book in the series!), but everything we discuss here about normal `[[Get]]` and `[[Put]]` behavior does not apply if a `Proxy` is involved.
 
 But it's what happens if `a` **isn't** present on `myObject` that brings our attention now to the `[[Prototype]]` link of the object.
 
@@ -52,9 +54,33 @@ The top-end of every *normal* `[[Prototype]]` chain is the built-in `Object.prot
 
 Some utilities found here you may be familiar with include `.toString()` and `.valueOf()`. In Chapter 3, we introduced another: `.hasOwnProperty(..)`. And yet another function on `Object.prototype` you may not be familiar with, but which we'll address later in this chapter, is `.isPrototypeOf(..)`.
 
-At this point, you might be wondering: "*Why* does one object need to link to another object?" What's the real benefit? That is a very appropriate question to ask, but we must first understand what `[[Prototype]]` is **not** before we can fully understand and appreciate what it *is* and how it's useful.
+### Setting & Shadowing Properties
+
+Back in Chapter 3, we mentioned that setting properties on an object was more nuanced than just adding a new property to the object or changing an existing property's value. We will now revisit this situation more completely.
+
+```js
+myObject.foo = "bar";
+```
+
+If the `myObject` object already has a normal data accessor property called `foo` directly present on it, the assignment is as simple as changing the value of the existing property.
+
+If `foo` is not already present directly on `myObject`, the `[[Prototype]]` chain is traversed, just like for the `[[Get]]` operation. If `foo` is not found anywhere in the chain, the property `foo` is added directly to `myObject` with the specified value, as expected.
+
+However, the nuanced (and perhaps unexpected) behavior occurs if `foo` is found already present on some object in the `[[Prototype]]` chain of `myObject`. We will examine three cases:
+
+1. If a normal data accessor property named `foo` is found anywhere on the `[[Prototype]]` chain, **and it's not marked as read-only (`writable:false`)** then a new property called `foo` is added directly to `myObject`, resulting in a **shadowed property** (the same property name at two or more levels of the `[[Prototype]]` chain).
+2. If a `foo` is found on the `[[Prototype]]` chain, but it's marked as **read-only (`writable:false`)**, then both the setting of the existing property as well as the creation of a shadowed property on `myObject` **are disallowed**. If the code is running in `strict mode`, an error will be thrown. Otherwise, the setting of the property value will silently be ignored. **No shadowing** occurs.
+3. If a `foo` is found on the `[[Prototype]]` chain and it's a setter (see Chapter 3), then the setter will always be called. No `foo` will be added to (shadowed on) `myObject`, nor will the `foo` setter be redefined.
+
+Most developers assume that assignment of a property (`[[Put]]`) will always result in shadowing if the property already exists on the `[[Prototype]]` chain, but as you can see, that's only true in one (#1) of the three situations just described.
+
+If you want to create shadowing in cases #2 and #3, you cannot use `=` assignment, but must instead use `Object.definePropert(..)` (see Chapter 3).
+
+Keep in mind, though, that shadowing with methods leads to the ugly *explicit pseudo-polymorphism* (see Chapter 4) if you need to delegate between them. In general, shadowing is more complicated and nuanced than it's worth, **so you should try to avoid it if possible** (see Chapter 6 for an alternative design pattern that discourages shadowing).
 
 ## "Class"
+
+At this point, you might be wondering: "*Why* does one object need to link to another object?" What's the real benefit? That is a very appropriate question to ask, but we must first understand what `[[Prototype]]` is **not** before we can fully understand and appreciate what it *is* and how it's useful.
 
 As we explained in Chapter 4, in JavaScript, there are no abstract patterns/blueprints for objects called "classes" as there are in class-oriented languages. JavaScript **just** has objects.
 
