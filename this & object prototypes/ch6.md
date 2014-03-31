@@ -453,10 +453,11 @@ AuthController.prototype.failure = function(err) {
 };
 ```
 
-```
+```js
 // Child class
 function AuthController(login) {
 	Controller.call( this );
+	// in addition to inheritance, we also need composition
 	this.login = login;
 }
 // Link child class to parent
@@ -492,18 +493,25 @@ AuthController.prototype.failure = function(err) {
 };
 ```
 
-```
+```js
 var auth = new AuthController();
-auth.checkAuth( new LoginController() );
+auth.checkAuth(
+	// in addition to inheritance, we also need composition
+	new LoginController()
+);
 ```
 
 We won't belabor lots of explanation about this example, as it should be fairly straightforward to understand.
 
 We have base behaviors that all controllers share, which are `success(..)`, `failure(..)` and `showDialog(..)`. Our child classes `LoginController` and `AuthController` override `failure(..)` and `success(..)` to augment the default base class behavior. Also note that `AuthController` needs an instance of `LoginController` to interact with the login form, so that becomes a member data property.
 
-If you're familiar with class-oriented (OO) design, this should look pretty familiar and natural.
+The other thing to mention is that we chose some *composition* to sprinkle in on top of the inheritance. `AuthController` needed to know about `LoginController`, so we instantiated it (`new LoginController()`) and kept a class member property called `this.login` to reference it, so that `AuthController` could invoke behavior on `LoginController`.
 
-But, **do we really need to model this problem** with a parent `Controller` class and two child classes? Is there a way to take advantage of OLOO-style behavior delegation and have a simpler design? **Yes!**
+**Note:** There *might* have been a slight temptation to make `AuthController` inherit from `LoginController`, or vice versa, such that we had *virtual composition* through the inheritance chain. But this is a strongly clear example of what's wrong with class inheritance as *the* model for the problem domain, because neither `AuthController` nor `LoginController` are specializing base behavior of the other, so inheritance between them makes little sense except if classes are your only design pattern. Instead, we layered in some simple *composition* and now they can cooperate, while still both benefiting from the inheritance from the parent base `Controller`.
+
+If you're familiar with class-oriented (OO) design, this should all look pretty familiar and natural.
+
+But, **do we really need to model this problem** with a parent `Controller` class, two child classes, **and some composition**? Is there a way to take advantage of OLOO-style behavior delegation and have a *much* simpler design? **Yes!**
 
 ```js
 var LoginController = {
@@ -587,11 +595,11 @@ With behavior delegation, `AuthController` and `LoginController` are **just obje
 
 The main takeaway from this second code listing is that we only have two entities (`LoginController` and `AuthController`), **not three** as before.
 
-We didn't need a base `Controller` class to "share" behavior between the two, because delegation is a powerful enough mechanism to give us the functionality we need. We also, as noted before, don't need to instantiate our classes to work with them, because there are no classes, **just the objects themselves.**
+We didn't need a base `Controller` class to "share" behavior between the two, because delegation is a powerful enough mechanism to give us the functionality we need. We also, as noted before, don't need to instantiate our classes to work with them, because there are no classes, **just the objects themselves.** Furthermore, there's no need for *composition* as delegation gives the two objects the ability to cooperate *differentially* as needed.
 
 Lastly, we avoided the polymorphism pitfalls of class-oriented design by not having the names `success(..)` and `failure(..)` be the same on both objects, which would have required ugly explicit pseduo-polymorphism. Instead, we called them `accepted()` and `rejected(..)` on `AuthController` -- slightly more descriptive names for their specific tasks.
 
-**Bottom line**: we end up with the same capability, but a simpler design. That's the power of OLOO-style code and the power of the *behavior delegation* design pattern.
+**Bottom line**: we end up with the same capability, but a (significantly) simpler design. That's the power of OLOO-style code and the power of the *behavior delegation* design pattern.
 
 ### Concise Methods
 
