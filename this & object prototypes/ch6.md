@@ -48,7 +48,7 @@ class XYZ inherits Task {
 	label;
 
 	// constructor `XYZ()`
-	XYZ(ID,Label) { super(ID); label = Label; }
+	XYZ(ID,Label) { super( ID ); label = Label; }
 	outputTask() { super(); output( label ); }
 }
 
@@ -135,7 +135,7 @@ Foo.prototype.identify = function() {
 };
 
 function Bar(who) {
-	Foo.call(this,who);
+	Foo.call( this, who );
 }
 Bar.prototype = Object.create( Foo.prototype );
 
@@ -360,7 +360,7 @@ Button.onClick = function(evt) {
 	console.log( "Button '" + this.label + "' clicked!" );
 };
 
-$(document).ready( function(){
+$( document ).ready( function(){
 	var $body = $( document.body );
 
 	var btn1 = Object.create( Button );

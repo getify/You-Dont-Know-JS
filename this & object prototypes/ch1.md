@@ -21,8 +21,8 @@ function identify() {
 }
 
 function speak() {
-	var greeting = "Hello, I'm " + identify.call(this);
-	console.log(greeting);
+	var greeting = "Hello, I'm " + identify.call( this );
+	console.log( greeting );
 }
 
 var me = {
@@ -33,11 +33,11 @@ var you = {
 	name: "Reader"
 };
 
-identify.call(me); // KYLE
-identify.call(you); // READER
+identify.call( me ); // KYLE
+identify.call( you ); // READER
 
-speak.call(me); // Hello, I'm KYLE
-speak.call(you); // Hello, I'm READER
+speak.call( me ); // Hello, I'm KYLE
+speak.call( you ); // Hello, I'm READER
 ```
 
 If the *how* of this snippet confuses you, don't worry! We'll get to that shortly. Just set those questions aside briefly so we can look into the *why* more clearly.
@@ -60,7 +60,7 @@ The first common temptation is to assume `this` refers to the function itself. T
 
 ```js
 function foo(num) {
-	console.log("foo: " + num);
+	console.log( "foo: " + num );
 
 	// have `foo` keep track of how many times called
 	this.count++;
@@ -73,12 +73,12 @@ var i, tmp;
 for (i=0; i<10; i++) {
 	tmp = Math.random();
 	if (tmp > 0.5) {
-		foo(tmp);
+		foo( tmp );
 	}
 }
 
 // how many times was `foo` called?
-console.log(foo.count); // 0 -- WTF?
+console.log( foo.count ); // 0 -- WTF?
 ```
 
 The developer observes `foo.count` is *always* `0`, even though some `console.log` statements were clearly made indicating `foo` was in fact called. Their frustration stems from their *too literal* interpretation of what `this` means.
@@ -91,7 +91,7 @@ Instead of stopping at this point and digging into why the `this` reference does
 
 ```js
 function foo(num) {
-	console.log("foo: " + num);
+	console.log( "foo: " + num );
 
 	// have `foo` keep track of how many times it's called
 	data.count++;
@@ -106,12 +106,12 @@ var i, tmp;
 for (i=0; i<10; i++) {
 	tmp = Math.random();
 	if (tmp > 0.5) {
-		foo(tmp);
+		foo( tmp );
 	}
 }
 
 // how many times was `foo` called?
-console.log(data.count); // will be correct now! yay?
+console.log( data.count ); // will be correct now! yay?
 ```
 
 While it is true that this approach "solves" their problem, unfortunately it simply ignores the real problem -- lack of understanding what `this` means and how it works -- and instead falls back to the comfort zone of a more familiar mechanism: lexical scope.
@@ -126,7 +126,7 @@ Another solution to the above snippet then would have been to use the `foo` iden
 
 ```js
 function foo(num) {
-	console.log("foo: " + num);
+	console.log( "foo: " + num );
 
 	// have `foo` keep track of how many times it's called
 	foo.count++;
@@ -139,19 +139,19 @@ var i, tmp;
 for (i=0; i<10; i++) {
 	tmp = Math.random();
 	if (tmp > 0.5) {
-		foo(tmp);
+		foo( tmp );
 	}
 }
 
 // how many times was `foo` called?
-console.log(foo.count); // Works! Forget `this`!
+console.log( foo.count ); // Works! Forget `this`!
 ```
 
 However, that approach similarly side-steps *actual* understanding of `this`. Instead, we could make sure `this` is pointing at the `foo` function object:
 
 ```js
 function foo(num) {
-	console.log("foo: " + num);
+	console.log( "foo: " + num );
 
 	// have `foo` keep track of how many times it's called
 	this.count++;
@@ -164,12 +164,12 @@ var i, tmp;
 for (i=0; i<10; i++) {
 	tmp = Math.random();
 	if (tmp > 0.5) {
-		foo.call(foo, tmp);
+		foo.call( foo, tmp );
 	}
 }
 
 // how many times was `foo` called?
-console.log(foo.count); // Works! `this` FTW!
+console.log( foo.count ); // Works! `this` FTW!
 ```
 
 Instead of avoiding `this`, we embrace it. We'll explain in a little bit *how* it works, so don't worry!
@@ -189,7 +189,7 @@ function foo() {
 }
 
 function bar() {
-	console.log(a);
+	console.log( a );
 }
 
 foo(); //ReferenceError: a is not defined

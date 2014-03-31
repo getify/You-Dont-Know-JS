@@ -397,7 +397,7 @@ It's important to note that **all** of these approaches create shallow immutabil
 
 ```js
 myImmutableObject.foo; // [1,2,3]
-myImmutableObject.foo.push(4);
+myImmutableObject.foo.push( 4 );
 myImmutableObject.foo; // [1,2,3,4]
 ```
 

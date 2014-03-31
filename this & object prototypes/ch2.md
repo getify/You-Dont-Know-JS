@@ -18,14 +18,14 @@ function foo() {
 	// call-stack is: `baz` -> `bar` -> `foo`
 	// so, our call-site is in `bar`
 
-	console.log("foo");
+	console.log( "foo" );
 }
 
 function bar() {
 	// call-stack is: `baz` -> `bar`
 	// so, our call-site is in `baz`
 
-	console.log("bar");
+	console.log( "bar" );
 	foo(); // <-- call-site for `foo`
 }
 
@@ -33,7 +33,7 @@ function baz() {
 	// call-stack is: `baz`
 	// so, our call-site is in the global scope
 
-	console.log("baz");
+	console.log( "baz" );
 	bar(); // <-- call-site for `bar`
 }
 
@@ -56,7 +56,7 @@ Consider this code:
 
 ```js
 function foo() {
-	console.log(this.a);
+	console.log( this.a );
 }
 
 var a = 2;
@@ -70,13 +70,13 @@ Secondly, we see that when `foo()` is called, `this.a` resolves to our global va
 
 How do we know that the *default binding* rule applies here? We examine the call-site to see how `foo()` is called. In our snippet, `foo()` is called with a plain, un-decorated function reference. None of the other rules we will demonstrate will apply here, so the *default binding* applies instead.
 
-**Note:** If Strict Mode is in effect, the global object is not eligible for the *default binding*, so the `this` is instead set to `undefined`.
+**Note:** If `strict mode` is in effect, the global object is not eligible for the *default binding*, so the `this` is instead set to `undefined`.
 
 ```js
 function foo() {
 	"use strict";
 
-	console.log(this.a);
+	console.log( this.a );
 }
 
 var a = 2;
@@ -84,11 +84,11 @@ var a = 2;
 foo(); // TypeError: `this` is `undefined`
 ```
 
-A subtle but important detail is: even though the overall `this` binding rules are entirely based on the call-site, the global object is **only** eligible for the *default binding* if the **contents** of `foo()` are **not** running in Strict Mode; the Strict Mode state of the `foo()` call-site is irrelevant.
+A subtle but important detail is: even though the overall `this` binding rules are entirely based on the call-site, the global object is **only** eligible for the *default binding* if the **contents** of `foo()` are **not** running in `strict mode`; the `strict mode` state of the call-site of `foo()` is irrelevant.
 
 ```js
 function foo() {
-	console.log(this.a);
+	console.log( this.a );
 }
 
 var a = 2;
@@ -100,7 +100,7 @@ var a = 2;
 })();
 ```
 
-**Note:** Intentionally mixing Strict Mode and non-Strict Mode together in your own code is generally frowned upon. Your entire program should probably either be Strict or non-Strict. However, sometimes you include a third-party library that has different Strict'ness than your own code, so care must be taken over these subtle details.
+**Note:** Intentionally mixing `strict mode` and non-`strict mode` together in your own code is generally frowned upon. Your entire program should probably either be Strict or non-Strict. However, sometimes you include a third-party library that has different Strict'ness than your own code, so care must be taken over these subtle details.
 
 ### Implicit Binding
 
@@ -110,7 +110,7 @@ Consider:
 
 ```js
 function foo() {
-	console.log(this.a);
+	console.log( this.a );
 }
 
 var obj = {
@@ -133,7 +133,7 @@ Only the top/last level of an object property reference chain matters to the cal
 
 ```js
 function foo() {
-	console.log(this.a);
+	console.log( this.a );
 }
 
 var obj2 = {
@@ -151,13 +151,13 @@ obj1.obj2.foo(); // 42
 
 #### Implicitly Lost
 
-One of the most common frustrations that `this` binding creates is when an *implicitly bound* function loses that binding, which usually means it falls back to the *default binding*, of either the global object or `undefined`, depending on Strict Mode.
+One of the most common frustrations that `this` binding creates is when an *implicitly bound* function loses that binding, which usually means it falls back to the *default binding*, of either the global object or `undefined`, depending on `strict mode`.
 
 Consider:
 
 ```js
 function foo() {
-	console.log(this.a);
+	console.log( this.a );
 }
 
 var obj = {
@@ -176,7 +176,7 @@ The more subtle, more common, and more unexpected way this occurs is when we con
 
 ```js
 function foo() {
-	console.log(this.a);
+	console.log( this.a );
 }
 
 function doFoo(fn) {
@@ -190,7 +190,7 @@ var obj = {
 	foo: foo
 };
 
-doFoo(obj.foo); // undefined
+doFoo( obj.foo ); // undefined
 ```
 
 Parameter passing is just an implicit assignment, and since we're passing a function, it's an implicit reference assignment, so the end result is the same as the previous snippet.
@@ -199,7 +199,7 @@ What if the function you're passing your callback to is not your own, but built-
 
 ```js
 function foo() {
-	console.log(this.a);
+	console.log( this.a );
 }
 
 var obj = {
@@ -207,13 +207,13 @@ var obj = {
 	foo: foo
 };
 
-setTimeout(obj.foo, 100); // undefined
+setTimeout( obj.foo, 100 ); // undefined
 ```
 
 Think about this crude theoretical pseudo-implementation of `setTimeout()` provided as a built-in from the JavaScript environment:
 
 ```js
-function setTimeout(fn, delay) {
+function setTimeout(fn,delay) {
 	// wait (somehow) for `delay` milliseconds
 	fn(); // <-- call-site!
 }
@@ -237,14 +237,14 @@ Consider:
 
 ```js
 function foo() {
-	console.log(this.a);
+	console.log( this.a );
 }
 
 var obj = {
 	a: 2
 };
 
-foo.call(obj); // 2
+foo.call( obj ); // 2
 ```
 
 Invoking `foo` with *explicit binding* by `foo.call(..)` allows us to force its `this` to be `obj`.
@@ -259,7 +259,7 @@ But a variation pattern around *explicit binding* actually does the trick. Consi
 
 ```js
 function foo() {
-	console.log(this.a);
+	console.log( this.a );
 }
 
 var obj = {
@@ -267,14 +267,14 @@ var obj = {
 };
 
 var bar = function() {
-	foo.call(obj);
+	foo.call( obj );
 };
 
 bar(); // 2
-setTimeout(bar, 100); // 2
+setTimeout( bar, 100 ); // 2
 
 // hard-bound `bar` can no longer have its `this` overriden
-bar.call(window); // 2
+bar.call( window ); // 2
 ```
 
 Let's examine how this variation works. We create a function `bar()` which, internally, manually calls `foo.call(obj)`, thereby forcibly invoking `foo` with `obj` binding for `this`. No matter how you later invoke the function `bar`, he will always manually invoke `foo` with `obj`. This binding is both explicit and strong, so we call it *hard binding*.
@@ -283,7 +283,7 @@ The most typical way to wrap a function with a *hard binding* creates a pass-thr
 
 ```js
 function foo(something) {
-	console.log(this.a, something);
+	console.log( this.a, something );
 	return this.a + something;
 }
 
@@ -292,25 +292,25 @@ var obj = {
 };
 
 var bar = function() {
-	return foo.apply(obj, arguments);
+	return foo.apply( obj, arguments );
 };
 
-var b = bar(3); // 2 3
-console.log(b); // 5
+var b = bar( 3 ); // 2 3
+console.log( b ); // 5
 ```
 
 Another way to express this pattern is to create a re-usable helper:
 
 ```js
 function foo(something) {
-	console.log(this.a, something);
+	console.log( this.a, something );
 	return this.a + something;
 }
 
 // simple PoC `bind` helper
 function bind(fn, obj) {
 	return function() {
-		fn.apply(obj, arguments);
+		fn.apply( obj, arguments );
 	};
 }
 
@@ -318,17 +318,17 @@ var obj = {
 	a: 2
 };
 
-var bar = bind(foo, obj);
+var bar = bind( foo, obj );
 
-var b = bar(3); // 2 3
-console.log(b); // 5
+var b = bar( 3 ); // 2 3
+console.log( b ); // 5
 ```
 
 Since *hard binding* is such a common pattern, it's provided with a built-in utility as of ES5: `Function.prototype.bind`, and it's used like this:
 
 ```js
 function foo(something) {
-	console.log(this.a, something);
+	console.log( this.a, something );
 	return this.a + something;
 }
 
@@ -336,10 +336,10 @@ var obj = {
 	a: 2
 };
 
-var bar = foo.bind(obj);
+var bar = foo.bind( obj );
 
-var b = bar(3); // 2 3
-console.log(b); // 5
+var b = bar( 3 ); // 2 3
+console.log( b ); // 5
 ```
 
 `bind(..)` returns a new function that is hard-coded to call the original function with the `this` context set as you specified.
@@ -352,7 +352,7 @@ For instance:
 
 ```js
 function foo(el) {
-	console.log(el, this.id);
+	console.log( el, this.id );
 }
 
 var obj = {
@@ -360,7 +360,7 @@ var obj = {
 };
 
 // use `obj` as `this` for `foo(..)` calls
-[1, 2, 3].forEach(foo, obj); // 1 awesome  2 awesome  3 awesome
+[1, 2, 3].forEach( foo, obj ); // 1 awesome  2 awesome  3 awesome
 ```
 
 Internally, these various functions almost certainly use *explicit binding* via `call(..)` or `apply(..)`, saving you the trouble.
@@ -397,8 +397,8 @@ function foo(a) {
 	this.a = a;
 }
 
-var bar = new foo(2);
-console.log(bar.a); // 2
+var bar = new foo( 2 );
+console.log( bar.a ); // 2
 ```
 
 By calling `foo(..)` with `new` in front of it, we've constructed a new object and set that new object as the `this` for the call of `foo(..)`. **So `new` is the final way that a function call's `this` can be bound.** We'll call this *new binding*.
@@ -413,7 +413,7 @@ Which is more precedent, *implicit binding* or *explicit binding*? Let's test it
 
 ```js
 function foo() {
-	console.log(this.a);
+	console.log( this.a );
 }
 
 var obj1 = {
@@ -429,8 +429,8 @@ var obj2 = {
 obj1.foo(); // 2
 obj2.foo(); // 3
 
-obj1.foo.call(obj2); // 3
-obj2.foo.call(obj1); // 2
+obj1.foo.call( obj2 ); // 3
+obj2.foo.call( obj1 ); // 2
 ```
 
 So, *explicit binding* takes precedence over *implicit binding*, which means you should ask **first** if *explicit binding* applies before checking for *implicit binding*.
@@ -448,15 +448,15 @@ var obj1 = {
 
 var obj2 = {};
 
-obj1.foo(2);
-console.log(obj1.a); // 2
+obj1.foo( 2 );
+console.log( obj1.a ); // 2
 
-obj1.foo.call(obj2,3);
-console.log(obj2.a); // 3
+obj1.foo.call( obj2, 3 );
+console.log( obj2.a ); // 3
 
-var bar = new obj1.foo(4);
-console.log(obj1.a); // 2
-console.log(bar.a); // 4
+var bar = new obj1.foo( 4 );
+console.log( obj1.a ); // 2
+console.log( bar.a ); // 4
 ```
 
 OK, *new binding* is more precedent than *implicit binding*. But do you think *new binding* is more or less precedent than *explicit binding*?
@@ -474,13 +474,13 @@ function foo(something) {
 
 var obj1 = {};
 
-var bar = foo.bind(obj1);
-bar(2);
-console.log(obj1.a); // 2
+var bar = foo.bind( obj1 );
+bar( 2 );
+console.log( obj1.a ); // 2
 
-var baz = new bar(3);
-console.log(obj1.a); // 2
-console.log(baz.a); // 3
+var baz = new bar( 3 );
+console.log( obj1.a ); // 2
+console.log( baz.a ); // 3
 ```
 
 Whoa! Look at how `new bar(3)` did **not** overwrite `obj1.a` to be `3` as you might have expected. Instead, the *hard bound* (to `obj1`) call to `bar(..)` ***is*** able to be overriden with `new`, which is how `baz.a` instead ends up as the value `3`.
@@ -490,7 +490,7 @@ This is surprising if you go back to our "fake" bind helper:
 ```js
 function bind(fn, obj) {
 	return function() {
-		fn.apply(obj, arguments);
+		fn.apply( obj, arguments );
 	};
 }
 ```
@@ -505,12 +505,12 @@ if (!Function.prototype.bind) {
 		if (typeof this !== "function") {
 			// closest thing possible to the ECMAScript 5
 			// internal IsCallable function
-			throw new TypeError("Function.prototype.bind - what " +
+			throw new TypeError( "Function.prototype.bind - what " +
 				"is trying to be bound is not callable"
 			);
 		}
 
-		var aArgs = Array.prototype.slice.call(arguments, 1),
+		var aArgs = Array.prototype.slice.call( arguments, 1 ),
 			fToBind = this,
 			fNOP = function(){},
 			fBound = function(){
@@ -519,7 +519,7 @@ if (!Function.prototype.bind) {
 						this instanceof fNOP &&
 						oThis ? this : oThis
 					),
-					aArgs.concat(Array.prototype.slice.call(arguments))
+					aArgs.concat( Array.prototype.slice.call( arguments ) )
 				);
 			}
 		;
@@ -560,17 +560,51 @@ Now, we can summarize the rules for determining `this` from a function call's ca
 
 2. Is the function called with `call` or `apply` (*explicit binding*), even hidden inside *hard binding*? If so, `this` is the explicitly specified object.
 
-    `var bar = foo.call(obj2)`
+    `var bar = foo.call( obj2 )`
 
 3. Is the function called with a context (*implicit binding*), otherwise known as an owning or containing object? If so, `this` is *that* context object.
 
     `var bar = obj1.foo()`
 
-4. Otherwise, default the `this`. If in Strict Mode, pick `undefined`, otherwise pick the global object.
+4. Otherwise, default the `this`. If in `strict mode`, pick `undefined`, otherwise pick the global object.
 
     `var bar = foo()`
 
 That's it. That's all it takes to understand the traditional rules of `this` binding for function calls.
+
+### Caveats
+
+As usual, there are some exceptions to normal `this` behavior which may seem surprising at first.
+
+For one, if you pass any non-object value (`null`, `undefined`, `false`, `0`, etc) as a `this` binding to `call`, `apply`, or `bind`, those values are ignored, and the *default binding* rule will apply.
+
+```js
+function foo() {
+	console.log( this.a );
+}
+
+var a = 2;
+
+foo.call( null ); // 2
+```
+
+Another thing to be aware of is that there are a number of ways in which (intentionally or not!) you can create "indirect references" to functions, and in all of those cases, the binding rule that will apply is the *default binding* rule.
+
+```js
+function foo() {
+	console.log( this.a );
+}
+
+var a = 2;
+var o = { a: 3, foo: foo };
+
+o.foo(); // 3
+(o.foo = o.foo)(); // 2
+```
+
+One of the most common ways that *indirect references* occur is from an assignment. `o.foo = o.foo` results in just the underlying `foo` function object, so the effective call-site is just `foo()`, not `o.foo()` as you might expect, thus the *default binding* rule applies.
+
+Regardless of how the *default binding* rule gets invoked, recall from earlier that the `strict mode` status of the code making the `this` reference (that is, the contents of the function), not of the code containing the function call-site, determines the *default binding* value -- either global object if in non-`strict mode` or `undefined` if in `strict mode`.
 
 ## Lexical `this`
 
@@ -585,7 +619,7 @@ function foo() {
 	// return an arrow function
 	return (a) => {
 		// `this` here is lexically inherited from `foo()`
-		console.log(this.a);
+		console.log( this.a );
 	};
 }
 
@@ -597,8 +631,8 @@ var obj2 = {
 	a: 3
 };
 
-var bar = foo.call(obj1);
-bar.call(obj2);
+var bar = foo.call( obj1 );
+bar.call( obj2 );
 ```
 
 The arrow-function created in `foo()` lexically captures whatever `foo()`s `this` is, and that's what is used, regardless of trying to subsequently override the `this`.
@@ -609,7 +643,7 @@ The most common use-case will likely be in the use of callbacks, such as event h
 function foo() {
 	setTimeout(() => {
 		// `this` here is lexically inherited from `foo()`
-		console.log(this.a);
+		console.log( this.a );
 	},100);
 }
 
@@ -617,7 +651,7 @@ var obj = {
 	a: 2
 };
 
-foo.call(obj); // 2
+foo.call( obj ); // 2
 ```
 
 While arrow-functions provide an alternative to using `bind(..)` on a function to ensure its `this`, which can seem attractive, it's important to note that they essentially are disabling the traditional `this` mechanism in favor of the more widely-understood lexical scoping. Pre ES-6, we already have a fairly common pattern for doing so, which is basically almost indistinguishable from the spirit of ES6 arrow-functions:
@@ -625,16 +659,16 @@ While arrow-functions provide an alternative to using `bind(..)` on a function t
 ```js
 function foo() {
 	var self = this; // lexical capture of `this`
-	setTimeout(function(){
-		console.log(self.a);
-	},100);
+	setTimeout( function(){
+		console.log( self.a );
+	}, 100 );
 }
 
 var obj = {
 	a: 2
 };
 
-foo.call(obj); // 2
+foo.call( obj ); // 2
 ```
 
 While `self = this` and arrow-functions both seem like good "solutions" to not wanting to use `bind(..)`, they are essentially fleeing from `this` instead of understanding and embracing it.
@@ -657,6 +691,6 @@ Determining the `this` binding for an executing function requires finding the di
 
 3. Called with a context object owning the call? Use that context object.
 
-4. Default: `undefined` in Strict Mode, global object otherwise.
+4. Default: `undefined` in `strict mode`, global object otherwise.
 
 Instead of these four rules, ES6 arrow-functions use lexical scoping for `this` binding, which means they inherit the `this` binding (whatever it is) from its enclosing function. They are essentially a syntactic embrace of `self = this` in pre-ES6 code patterns.
