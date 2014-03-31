@@ -234,6 +234,62 @@ myArray.length; // 4
 myArray[3]; // "baz"
 ```
 
+### Duplicating Objects
+
+One of the most commonly requested features when developers newly take up the JavaScript language is how to duplicate an object. It would seem like there should just be a built-in `copy()` method, right? It turns out that it's a little more complicated than that, because it's not fully clear what, by default, should be the algorithm for the duplication.
+
+For example, consider this object:
+
+```js
+function anotherFunction() { /*..*/ }
+
+var anotherObject = {
+	c: true
+};
+
+var anotherArray = [];
+
+var myObject = {
+	a: 2,
+	b: anotherObject, // reference, not a copy!
+	c: anotherArray, // another reference!
+	d: anotherFunction
+};
+
+anotherArray.push( anotherObject, myObject );
+```
+
+What exactly should be the representation of a *copy* of `myObject`?
+
+Firstly, we should answer if it should be a *shallow* or *deep* copy? A *shallow copy* would end up with `a` on the new object as a copy of the value `2`, but `b`, `c`, and `d` properties as just references to the same places as the references in the original object. A *deep copy* would duplicate not only `myObject`, but `anotherObject` and `anotherArray`. But then we have issues that `anotherArray` has references to `anotherObject` and `myObject` in it, so *those* should also be duplicated rather than reference-preserved. Now we have an infinite circular duplication problem because of the circular reference.
+
+Should we detect a circular reference and just break the circular traversal (leaving the deep element not fully duplicated)? Should we error out completely? Something in between?
+
+Moreover, it's not really clear what "duplicating" a function would mean? There are some hacks like pulling out the `toString()` serialization of a function's source code (which varies across implementations and is not even reliable in all engines depending on the type of function being inspected).
+
+So how do we resolve all these tricky questions? Various JS frameworks have each picked their own interpretations and made their own decisions. But which of these (if any) should JS adopt as *the* standard. For a long time, there was no clear answer.
+
+One subset solution is that objects which are JSON-safe (that is, can be serialized to a JSON string and then re-parsed to the same object) can easily be *duplicated* with:
+
+```js
+var newObj = JSON.parse( JSON.stringify( someObj ) );
+```
+
+Of course, that requires you to ensure your object is JSON safe. For some domains, that's trivial. For others, it's insufficient.
+
+At the same time, a shallow copy is fairly understandable and has far less issues, so ES6 has now defined `Object.assign(..)` for this task. At time of writing (discussion ongoing), `Object.assign(..)` takes a *target* object as its first parameter, and a *source* as its second parameter. It iterates over all the keys (even non-enumerable -- see below!) on the *source* and copies them (via `=` assignment only) to *target*. It also, helpfully, returns *target*, as you can see below:
+
+```js
+var newObj = Object.assign( {}, myObject );
+
+foobar.a; // 2
+foobar.b === anotherObject; // true
+foobar.c === anotherArray; // true
+foobar.d === anotherFunction; // true
+```
+
+**Note:** In the next section, we describe "property descriptors" (property characteristics) and show the use of `Object.defineProperty(..)`. The duplication that occurs for `Object.assign(..)` however is purely `=` style assignment, so any special characteristics of a property (like `enumerable` or `writable`) on a source object **are not preserved** on the target object.
+
 ### Property Descriptors
 
 Prior to ES5, the JavaScript language gave no direct way for your code to inspect or draw any distinction between the characteristics of properties, such as whether the property was read-only or not.
