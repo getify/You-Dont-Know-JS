@@ -21,7 +21,7 @@ Therein lies the paradox of JavaScript, the Achilles' Heel of the language, the 
 
 If at every point that you encounter a surprise or frustration in JavaScript, your response is to add it to the blacklist, as some are accustomed to doing, you soon will be relegated to a hollow shell of the richness of JavaScript.
 
-While this subset has been famoulsy dubbed "The Good Parts", I would implore you, dear reader, to instead consider it the "The Easy Parts", "The Safe Parts", or even "The Incomplete Parts".
+While this subset has been famously dubbed "The Good Parts", I would implore you, dear reader, to instead consider it the "The Easy Parts", "The Safe Parts", or even "The Incomplete Parts".
 
 This "You Don't Know JavaScript" book series offers a contrary challenge: learn and deeply understand *all* of JavaScript, even and especially "The Tough Parts".
 
