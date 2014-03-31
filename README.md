@@ -9,10 +9,10 @@ Please feel free to contribute to the quality of this content by submitting PR's
 ## Titles
 
 * ["Scope & Closures"](scope & closures/README.md) (<a href="http://shop.oreilly.com/product/0636920026327.do">published</a>!)
-* ["this & Object Prototypes"](this & object prototypes/README.md) (draft in progress)
+* ["this & Object Prototypes"](this & object prototypes/README.md) (draft complete)
 * "Types & Grammar" (planned)
 * "Async & Performance" (planned)
-* "++Version" (planned)
+* "ES6++" (planned)
 
 ## Publishing
 

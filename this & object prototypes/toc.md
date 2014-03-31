@@ -31,4 +31,6 @@
 	* Towards Delegation-Oriented Design
 	* Classes vs. Objects
 	* Simpler Design
+* Appendix A: ES6 `class`
+* Appendix B: Thank You's!
 
