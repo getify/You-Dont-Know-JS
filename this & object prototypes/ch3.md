@@ -282,10 +282,10 @@ At the same time, a shallow copy is fairly understandable and has far less issue
 ```js
 var newObj = Object.assign( {}, myObject );
 
-foobar.a; // 2
-foobar.b === anotherObject; // true
-foobar.c === anotherArray; // true
-foobar.d === anotherFunction; // true
+newObj.a; // 2
+newObj.b === anotherObject; // true
+newObj.c === anotherArray; // true
+newObj.d === anotherFunction; // true
 ```
 
 **Note:** In the next section, we describe "property descriptors" (property characteristics) and show the use of `Object.defineProperty(..)`. The duplication that occurs for `Object.assign(..)` however is purely `=` style assignment, so any special characteristics of a property (like `enumerable` or `writable`) on a source object **are not preserved** on the target object.
