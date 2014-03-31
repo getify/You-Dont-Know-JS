@@ -695,11 +695,13 @@ for (var i = 0; i < myArray.length; i++) {
 
 Technically, this isn't iterating over the values, but iterating over the indices, where you then use the index to reference the value, as `myArray[i]`.
 
-In the same way, if you iterate on an object with a `for-in` loop, you're getting at the values indirectly, because it's actually iterating only over the enumerable properties of the object, leaving you to access the properties manually to get the values.
+**Note:** ES5 also added several iteration helpers for arrays, including `forEach(..)`, `every(..)`, and `some(..)`. Each of these helpers accepts a function callback to apply to each element in the array, differing only in they respectively respond to a return value from the callback. `forEach(..)` will iterate over all values in the array, and ignores any callback return values. `every(..)` keeps going until the end *or* the callback returns a `false` (or "falsy") value, whereas `some(..)` keeps going until the end *or* the callback returns a `true` (or "truthy") value.
+
+If you iterate on an object with a `for-in` loop, you're also only getting at the values indirectly, because it's actually iterating only over the enumerable properties of the object, leaving you to access the properties manually to get the values.
 
 **Note:** As contrasted with iterating over an array's indices in a numerically ordered way (`for`-loop or other iterators), the order of iteration over an object's properties is **not guaranteed** and may vary between different JS engines. **Do not rely** on any observed ordering for anything that requires consistency among environments, as any observed agreement is unreliable.
 
-Helpfully, ES6 adds a `for-of` loop syntax for iterating over arrays and objects (if the object defines its own iterator):
+But what if you want to iterate over the values directly instead of the array indicies (or object properties)? Helpfully, ES6 adds a `for-of` loop syntax for iterating over arrays (and objects, if the object defines its own iterator):
 
 ```js
 var myArray = [ 1, 2, 3 ];
@@ -712,11 +714,11 @@ for (var v of myArray) {
 // 3
 ```
 
-Technically, the `for..of` loop asks for an iterator object (from a default internal function known as `@@iterator` in spec-speak) of the thing to be iterated, and the loop iterates over the successive return values from calling that iterator object's `next()` method, once for each loop iteration.
+Technically, the `for..of` loop asks for an iterator object (from a default internal function known as `@@iterator` in spec-speak) of the thing to be iterated, and the loop iterates over the successive return values from calling that iterator object's `next()` method, once for each loop iteration. Arrays have a built-in `@@iterator`, so `for..of` works easily on them.
 
 While arrays do automatically iterate in `for..of` loops, regular objects **do not have a built-in `@@iterator`**. The reasons for this intentional omission are more complex than we will examine here, but in general it was better to not include some implementation that could prove troublesome for future types of objects.
 
-While it's not present by default, it *is* possible to define your own default `@@iterator` for any object that you care to iterate over. For example:
+It *is* possible to define your own default `@@iterator` for any object that you care to iterate over. For example:
 
 ```js
 var myObject = {
@@ -748,11 +750,13 @@ for (var v of myObject) {
 // 3
 ```
 
+**Note:** Despite the name's implications, `@@iterator` is not the iterator object itself, but a function that *returns* the iterator object. This is quite easy to get confused!
+
 Each time the `for..of` loop calls `next()` on `myObject`'s iterator object, the internal pointer will advance and return back the next value from the object's properties list (see a previous note about iteration ordering on object properties/values).
 
 The return value from the `next()` call is an object, structured like this: `{ done: .. , value: .. }`, where `done` is a boolean that is `false` if there are still more values to iterate, and `true` once you retrieve the final value. The `value` property holds the value from the iteration. The `for..of` loop keeps going until it receives a `done:true` in the returned object.
 
-The iteration we just demonstrated is a simple ordered iteration, but you can of course define arbitrarily complex iterations for your custom data structures, as you see fit. As long as your iterator can return new values from `next()` calls, ES6's `for..of` can iterate over it.
+The iteration we just demonstrated is a simple ordered iteration, but you can of course define arbitrarily complex iterations for your custom data structures, as you see fit. As long as your iterator returns new values from `next()` calls, ES6's `for..of` can iterate over it.
 
 In fact, you can even generate "infinite" iterators which never "finish" and always return a new value (such as a random number, an incremented value, a unique identifier, etc), though you probably will not use such iterators with an unbounded `for..of` loop, as it would never end and would hang your program.
 
