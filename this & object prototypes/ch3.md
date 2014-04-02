@@ -170,7 +170,6 @@ Every time you access a property on an object, that is a **property access**, re
 For instance:
 
 ```js
-
 function foo() {
 	console.log( "foo" );
 }
@@ -191,6 +190,8 @@ myObject.someFoo; // function foo()
 **Perhaps one could argue** that a function *becomes a method*, not at definition time, but during run-time just for that invocation, depending on how it's called at its call-site (with an object reference context or not -- see Chapter 2 for more details). Even this interpretation is a bit of a stretch.
 
 The safest conclusion is probably that "function" and "method" are interchangeable in JavaScript.
+
+**Note:** ES6 adds a `super` reference, which is typically going to be used with `class` (see Appendix A). The way `super` behaves (static binding rather than late binding as `this` is) gives further weight to the idea that a function which is `super` bound somewhere is more a "method" than "function". But again, these are just subtle semantic (and mechanical) nuances.
 
 ### Arrays
 
