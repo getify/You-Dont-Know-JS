@@ -151,11 +151,11 @@ However, for performance reasons (`this` binding is already expensive), `super` 
 
 Ehh... maybe, maybe not. If you, like most JS devs, start assigning functions around to different objects (which came from `class` definitions), in various different ways, you probably won't be very aware that in all those cases, the `super` mechanism under the covers is having to be re-bound each time.
 
-And depending on what sorts of syntactic approaches you take to these assignments, there may very well be cases where the `super` can't be properly bound (at least, not where you suspect), so you may (at time of writing, TC39 discussion is ongoing on the topic) have to do something like `toMethod(..)` or `bindSuper(..)` (kinda like you have to do `bind(..)` for `this` -- see Chapter 2).
+And depending on what sorts of syntactic approaches you take to these assignments, there may very well be cases where the `super` can't be properly bound (at least, not where you suspect), so you may (at time of writing, TC39 discussion is ongoing on the topic) have to manually bind `super` with `toMethod(..)` (kinda like you have to do `bind(..)` for `this` -- see Chapter 2).
 
-You're used to being able to assign around methods to different objects to take advantage of the dynamicism of `this`. But the same may not be true with methods that use `super`.
+You're used to being able to assign around methods to different objects to *automatically* take advantage of the dynamicism of `this` via the *implicit binding* rule (see Chapter 2). But the same will likely not be true with methods that use `super`.
 
-Consider what `super` should do here:
+Consider what `super` should do here (against `D` and `E`):
 
 ```js
 class P {
@@ -182,12 +182,16 @@ var E = {
 // Link E to D for delegation
 Object.setPrototypeOf( E, D );
 
-E.foo(); // TypeError: undefined is not a function
+E.foo(); // "P.foo"
 ```
 
-If you were thinking (quite reasonably!) that `super` could be bound dynamically at call-time, you might expect that `super()` would automatically recognize that `E` delegates to `D`, so `E.foo()` using `super()` should call to `D.foo()`. **Not so.** `super` is `undefined` in this particular case, thus the `TypeError` occurs.
+If you were thinking (quite reasonably!) that `super` would be bound dynamically at call-time, you might expect that `super()` would automatically recognize that `E` delegates to `D`, so `E.foo()` using `super()` should call to `D.foo()`.
 
-There will probably be ways to mitigate such gotchas. At time of writing, using `toMethod(..)` to rebind a method's `super` appears to work in this case:
+**Not so.** For performance pragmatism reasons, `super` is not *late bound* (aka, dynamically bound) like `this` is, but instead is statically bound at creation/assignment time.
+
+In this particular case, `super` is still bound to `P`, thus the `super()` still refers to `P.foo()`.
+
+There will *probably* be ways to manually address such gotchas. At time of writing, using `toMethod(..)` to bind/rebind a method's `super` appears to work in this scenario:
 
 ```js
 var D = {
@@ -195,6 +199,7 @@ var D = {
 };
 
 var E = {
+	// manually bind `super` to `D`
 	foo: C.prototype.foo.toMethod( D, "foo" )
 };
 
@@ -204,7 +209,9 @@ Object.setPrototypeOf( E, D );
 E.foo(); // "D.foo"
 ```
 
-It remains to be seen if there are other corner case gotchas that devs will run into. Regardless, you will have to keep aware of which places the engine automatically figures out `super` for you, and which places you have to manually take care of it. **Ugh!**
+It remains to be seen if there are other corner case gotchas that devs will run into. Regardless, you will have to be diligent and stay aware of which places the engine automatically figures out `super` for you, and which places you have to manually take care of it. **Ugh!**
+
+# Static > Dynamic?
 
 But the biggest problem of all about ES6 `class` is that all these various gotchas mean `class` sorta opts you into a syntax which seems to imply (like traditional classes) that once you declare a `class`, it's a static definition of a (future instantiated) thing. You completely lose sight of the fact `C` is an object, a concrete thing, which you can directly interact with.
 
