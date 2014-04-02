@@ -191,13 +191,23 @@ First, the class-style code snippet implies this mental model of entities and th
 
 <img src="fig4.png">
 
-Now, let's look at the mental model for OLOO-style code:
+Actually, that's a little unfair/misleading, because it's showing a lot of extra detail that you don't *technically* need to know at all times (though you *do* need to understand it!). One take-away is that it's quite a complex series of relationships. But another take-away: if you spend the time to follow those relationship arrows around, **there's an amazing amount of internal consistency** in JS's mechanisms.
+
+For instance, the ability of a JS function to access `call(..)`, `apply(..)`, and `bind(..)` (see Chapter 2) is because functions themselves are objects, and function-objects also have a `[[Prototype]]` linkage, to the `Function.prototype` object, which defines those default methods that any function-object can delegate to. JS can do those things, *and you can too!*.
+
+OK, let's now look at a *slightly* simplified version of that diagram which is a little more "fair" for comparison -- it shows only the *relevant* entities and relationships.
 
 <img src="fig5.png">
 
+Still pretty complex, eh? The dotted lines are depicting the implied relatinoships when you setup the "inheritance" between `Foo.prototype` and `Bar.prototype` and haven't yet *fixed* the **missing** `.constructor` property reference (see "Constructor Redux" in Chapter 5). Even with those removed, the mental model is still an awful lot to juggle every time you work with object linkages.
+
+Now, let's look at the mental model for OLOO-style code:
+
+<img src="fig6.png">
+
 As you can see comparing them, it's quite obvious that OLOO-style code has vastly less stuff to worry about, because OLOO-style code embraces the **fact** that the only thing we ever really cared about was the **objects linked to other objects**.
 
-All the other "class" cruft was a confusing and complex way of getting the same end result.
+All the other "class" cruft was a confusing and complex way of getting the same end result. Remove that stuff, and things get much simpler (without losing any capability).
 
 ## Classes vs. Objects
 

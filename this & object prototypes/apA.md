@@ -151,7 +151,7 @@ However, for performance reasons (`this` binding is already expensive), `super` 
 
 Ehh... maybe, maybe not. If you, like most JS devs, start assigning functions around to different objects (which came from `class` definitions), in various different ways, you probably won't be very aware that in all those cases, the `super` mechanism under the covers is having to be re-bound each time.
 
-And depending on what sorts of syntactic approaches you take to these assignments, there may very well be cases where the `super` can't be properly bound (at least, not where you suspect), so you may (at time of writing, TC39 discussion is ongoing on the topic) have to do something like `bindSuper(..)` (kinda like you have to do `bind(..)` for `this` -- see Chapter 2).
+And depending on what sorts of syntactic approaches you take to these assignments, there may very well be cases where the `super` can't be properly bound (at least, not where you suspect), so you may (at time of writing, TC39 discussion is ongoing on the topic) have to do something like `toMethod(..)` or `bindSuper(..)` (kinda like you have to do `bind(..)` for `this` -- see Chapter 2).
 
 You're used to being able to assign around methods to different objects to take advantage of the dynamicism of `this`. But the same may not be true with methods that use `super`.
 
@@ -159,7 +159,7 @@ Consider what `super` should do here:
 
 ```js
 class P {
-	foo() { console.log( "Parent 'foo'" ); }
+	foo() { console.log( "P.foo" ); }
 }
 
 class C extends P {
@@ -169,14 +169,14 @@ class C extends P {
 }
 
 var c1 = new C();
-c1.foo(); // "Parent 'foo'"
+c1.foo(); // "P.foo"
 
 var D = {
-	foo: function() { console.log( "D 'foo'" ); }
+	foo: function() { console.log( "D.foo" ); }
 };
 
 var E = {
-	foo: C.foo
+	foo: C.prototype.foo
 };
 
 // Link E to D for delegation
@@ -187,7 +187,24 @@ E.foo(); // TypeError: undefined is not a function
 
 If you were thinking (quite reasonably!) that `super` could be bound dynamically at call-time, you might expect that `super()` would automatically recognize that `E` delegates to `D`, so `E.foo()` using `super()` should call to `D.foo()`. **Not so.** `super` is `undefined` in this particular case, thus the `TypeError` occurs.
 
-There will probably be various ways to mitigate such gotchas (like perhaps `bindSuper(..)`), but you will have to keep in your head which places the language automatically figures out `super` for you, and which places you have to manually take care of it. **Ugh!**
+There will probably be ways to mitigate such gotchas. At time of writing, using `toMethod(..)` to rebind a method's `super` appears to work in this case:
+
+```js
+var D = {
+	foo: function() { console.log( "D.foo" ); }
+};
+
+var E = {
+	foo: C.prototype.foo.toMethod( D, "foo" )
+};
+
+// Link E to D for delegation
+Object.setPrototypeOf( E, D );
+
+E.foo(); // "D.foo"
+```
+
+It remains to be seen if there are other corner case gotchas that devs will run into. Regardless, you will have to keep aware of which places the engine automatically figures out `super` for you, and which places you have to manually take care of it. **Ugh!**
 
 But the biggest problem of all about ES6 `class` is that all these various gotchas mean `class` sorta opts you into a syntax which seems to imply (like traditional classes) that once you declare a `class`, it's a static definition of a (future instantiated) thing. You completely lose sight of the fact `C` is an object, a concrete thing, which you can directly interact with.
 
