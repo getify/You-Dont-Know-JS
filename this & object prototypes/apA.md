@@ -7,7 +7,7 @@ This awkwardness is *not* just about syntax, although that's a big part of it. C
 
 But the problems with class design are much deeper. Chapter 4 points out that classes in traditional class-oriented languages actually produce a *copy* action from parent to child to instance, whereas in `[[Prototype]]`, the action is **not** a copy, but rather the opposite -- a delegation link.
 
-When compared to the simplicity of OLOO-style code and behavior delegation, which embrace `[[Prototype]]` rather than hide from it, classes stand out as a sore thumb in JS.
+When compared to the simplicity of OLOO-style code and behavior delegation (see Chapter 6), which embrace `[[Prototype]]` rather than hide from it, classes stand out as a sore thumb in JS.
 
 ## `class`
 
