@@ -198,15 +198,13 @@ var D = {
 	foo: function() { console.log( "D.foo" ); }
 };
 
-var E = {};
+// Link E to D for delegation
+var E = Object.create( D );
 
 // manually bind `foo`s `[[HomeObject]]` as
-// `E`, so `E.[[Prototype]]` is `D`, and thus
+// `E`, and `E.[[Prototype]]` is `D`, so thus
 // `super()` is `D.foo()`
 E.foo = C.prototype.foo.toMethod( E, "foo" );
-
-// Link E to D for delegation
-Object.setPrototypeOf( E, D );
 
 E.foo(); // "D.foo"
 ```
@@ -221,7 +219,7 @@ But the biggest problem of all about ES6 `class` is that all these various gotch
 
 In traditional class-oriented languages, you never adjust the definition of a class later, so the class design pattern doesn't suggest such capabilities. But **one of the most powerful parts** of JS is that it *is* dynamic, and the definition of any object is (unless you make it immutable) a fluid and mutable *thing*.
 
-`class` seems to imply you shouldn't do such things, by forcing you into the uglier `.prototype` syntax to do so, or forcing you think about `super` gotchas, etc. It also offers absolutely **no** support for any of the pitfalls that this dynamicism can bring.
+`class` seems to imply you shouldn't do such things, by forcing you into the uglier `.prototype` syntax to do so, or forcing you think about `super` gotchas, etc. It also offers *very little* support for any of the pitfalls that this dynamicism can bring.
 
 In other words, it's as if `class` is telling you: "dynamic is too hard, so it's probably not a good idea. Here's a static-looking syntax, so code your stuff statically."
 
