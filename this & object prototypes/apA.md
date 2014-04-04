@@ -198,12 +198,12 @@ var D = {
 	foo: function() { console.log( "D.foo" ); }
 };
 
-var E = {
-	// manually bind `foo`s `[[HomeObject]]` as
-	// `E`, so `E.[[Prototype]]` is `D`, and thus
-	// `super()` is `D.foo()`
-	foo: C.prototype.foo.toMethod( E, "foo" )
-};
+var E = {};
+
+// manually bind `foo`s `[[HomeObject]]` as
+// `E`, so `E.[[Prototype]]` is `D`, and thus
+// `super()` is `D.foo()`
+E.foo = C.prototype.foo.toMethod( E, "foo" );
 
 // Link E to D for delegation
 Object.setPrototypeOf( E, D );
