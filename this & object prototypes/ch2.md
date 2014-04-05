@@ -632,10 +632,10 @@ var obj2 = {
 };
 
 var bar = foo.call( obj1 );
-bar.call( obj2 );
+bar.call( obj2 ); // 2, not 3!
 ```
 
-The arrow-function created in `foo()` lexically captures whatever `foo()`s `this` is, and that's what is used, regardless of trying to subsequently override the `this`.
+The arrow-function created in `foo()` lexically captures whatever `foo()`s `this` is at its call-time. Since `foo()` was `this`-bound to `obj1`, `bar` (a reference to the returned arrow-function) will also be `this`-bound to `obj1`. The lexical binding of an arrow-function cannot be overriden (even with `new`!).
 
 The most common use-case will likely be in the use of callbacks, such as event handlers or timers:
 
