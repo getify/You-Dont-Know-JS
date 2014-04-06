@@ -461,9 +461,11 @@ console.log( bar.a ); // 4
 
 OK, *new binding* is more precedent than *implicit binding*. But do you think *new binding* is more or less precedent than *explicit binding*?
 
-**Note:** It's not grammatically valid to try `new foo.call(obj1)` to test *new binding* directly against *explicit binding*. `new` and `call`/`apply` cannot be used together. But we can still use a *hard binding* to test the precedence of the two rules.
+**Note:** `new` and `call`/`apply` cannot be used together, so `new foo.call(obj1)` is not allowed, to test *new binding* directly against *explicit binding*. But we can still use a *hard binding* to test the precedence of the two rules.
 
-Before we explore that in a snippet, think back to how *hard binding* works, which is that `Function.prototype.bind(..)` creates a new wrapper function that is hard-coded to ignore its own `this` binding (whatever it may be), and use a manual one we provide. By that reasoning, it would seem obvious to assume that *hard binding* (which is a form of *explicit binding*) is more precedent than *new binding*, and thus cannot be overriden with `new`.
+Before we explore that in a code listing, think back to how *hard binding* physically works, which is that `Function.prototype.bind(..)` creates a new wrapper function that is hard-coded to ignore its own `this` binding (whatever it may be), and use a manual one we provide.
+
+By that reasoning, it would seem obvious to assume that *hard binding* (which is a form of *explicit binding*) is more precedent than *new binding*, and thus cannot be overriden with `new`.
 
 Let's check:
 
@@ -483,9 +485,9 @@ console.log( obj1.a ); // 2
 console.log( baz.a ); // 3
 ```
 
-Whoa! Look at how `new bar(3)` did **not** overwrite `obj1.a` to be `3` as you might have expected. Instead, the *hard bound* (to `obj1`) call to `bar(..)` ***is*** able to be overriden with `new`, which is how `baz.a` instead ends up as the value `3`.
+Whoa! `bar` is hard-bound against `obj1`, but `new bar(3)` did **not** change `obj1.a` to be `3` as we would have expected. Instead, the *hard bound* (to `obj1`) call to `bar(..)` ***is*** able to be overriden with `new`. Since `new` was applied, we got the newly created object back, which we named `baz`, and we see in fact that  `baz.a` has the value `3`.
 
-This is surprising if you go back to our "fake" bind helper:
+This should be surprising if you go back to our "fake" bind helper:
 
 ```js
 function bind(fn, obj) {
@@ -495,7 +497,7 @@ function bind(fn, obj) {
 }
 ```
 
-This simple helper clearly cannot provide a way for a `new` operator call to override the hard-binding to `obj`.
+If you reason about how the helper's code works, it does not have a way for a `new` operator call to override the hard-binding to `obj` as we just observed.
 
 But the built-in `Function.prototype.bind(..)` as of ES5 is more sophisticated, quite a bit so in fact. Here is the (slightly reformatted) polyfill provided by the MDN page for `bind(..)`:
 
@@ -532,7 +534,7 @@ if (!Function.prototype.bind) {
 }
 ```
 
-The part that's doing the task (allowing `new` overriding) is:
+The part that's allowing `new` overriding is:
 
 ```
 this instanceof fNOP &&
@@ -544,39 +546,45 @@ fNOP.prototype = this.prototype;
 fBound.prototype = new fNOP();
 ```
 
-We won't actually dive into explaining how this trickery works (it's complicated and beyond our scope here), but essentially the snippet determines whether or not the bound function has been called with `new` (resulting in a newly constructed object being its `this`), and if so, it uses *that* new `this` rather than the previously specified *hard binding* for `this`.
+We won't actually dive into explaining how this trickery works (it's complicated and beyond our scope here), but essentially the utility determines whether or not the hard-bound function has been called with `new` (resulting in a newly constructed object being its `this`), and if so, it uses *that* newly created `this` rather than the previously specified *hard binding* for `this`.
 
-Why is `new` being able to override *hard binding* useful? Imagine a function that you are given (might be hard-bound, might not, you don't know), and you want to use that function but *not* cause any side-effects on any object it may have been hard-bound to. Call it with `new`, and you **always** get the newly constructed object back, regardless of if the function was previously hard-bound.
+Why is `new` being able to override *hard binding* useful?
 
-While that distinction may not be a terribly common need everyday coding, it's important to fully understand how all these parts of the mechanism interact, so we have an accurate set of rules to analyze and predict its outcome.
+Imagine a function that you are given (might be hard-bound, might not, you don't know), and you want to use that function but *not* cause any side-effects on any object it may have been hard-bound to. Call it with `new`, and you **always** get the newly constructed object back, regardless of if the function was previously hard-bound.
+
+While that distinction may not be a terribly common need in everyday coding, it's important to fully understand how all these parts of the mechanism interact, so we have an accurate set of rules to analyze and predict its outcome.
 
 ### Determining `this`
 
 Now, we can summarize the rules for determining `this` from a function call's call-site, in their order of precedence. Ask these questions in this order, and stop when the first rule applies.
 
-1. Is the function called with `new` (*new binding*)? If so, `this` is the newly constructed object.
+1. Is the function called with `new` (**new binding**)? If so, `this` is the newly constructed object.
 
     `var bar = new foo()`
 
-2. Is the function called with `call` or `apply` (*explicit binding*), even hidden inside *hard binding*? If so, `this` is the explicitly specified object.
+2. Is the function called with `call` or `apply` (**explicit binding**), even hidden inside a `bind` *hard binding*? If so, `this` is the explicitly specified object.
 
     `var bar = foo.call( obj2 )`
 
-3. Is the function called with a context (*implicit binding*), otherwise known as an owning or containing object? If so, `this` is *that* context object.
+3. Is the function called with a context (**implicit binding**), otherwise known as an owning or containing object? If so, `this` is *that* context object.
 
     `var bar = obj1.foo()`
 
-4. Otherwise, default the `this`. If in `strict mode`, pick `undefined`, otherwise pick the global object.
+4. Otherwise, default the `this` (**default binding**). If in `strict mode`, pick `undefined`, otherwise pick the `global` object.
 
     `var bar = foo()`
 
-That's it. That's all it takes to understand the traditional rules of `this` binding for function calls.
+That's it. That's *all it takes* to understand the rules of `this` binding for normal function calls.
 
-### Caveats
+## Binding Exceptions
 
-As usual, there are some exceptions to normal `this` behavior which may seem surprising at first.
+As usual, there are some *exceptions* to the "rules".
 
-For one, if you pass any non-object value (`null`, `undefined`, `false`, `0`, etc) as a `this` binding to `call`, `apply`, or `bind`, those values are ignored, and the *default binding* rule will apply.
+The `this`-binding behavior can in some scenarios be surprising, where you intended a different binding but you end up with binding behavior from the *default binding* rule (see previous).
+
+### Ignored `this`
+
+If you pass any non-object value (`null`, `undefined`, `false`, `0`, etc) as a `this` binding parameter to `call`, `apply`, or `bind`, those values are effectively ignored, and instead the *default binding* rule applies to the invocation.
 
 ```js
 function foo() {
@@ -588,7 +596,62 @@ var a = 2;
 foo.call( null ); // 2
 ```
 
-Another thing to be aware of is that there are a number of ways in which (intentionally or not!) you can create "indirect references" to functions, and in all of those cases, the binding rule that will apply is the *default binding* rule.
+Why would you intentionally pass something like `null` for a `this` binding?
+
+It's quite common to use `apply(..)` for spreading out arrays of values as parameters to a function call. Similarly, `bind(..)` can curry parameters (pre-set values), which can be very helpful.
+
+```js
+function foo(a,b) {
+	console.log( "a:" + a + ", b:" + b );
+}
+
+// spreading out array as parameters
+foo.apply( null, [2, 3] ); // a:2, b:3
+
+// currying with `bind(..)`
+var bar = foo.bind( null, 2 );
+bar( 3 ); // a:2, b:3
+```
+
+Both these utilities require a `this` binding for the first parameter. If the functions in question don't care about `this`, you need a placeholder value, and `null` might seem like a reasonable choice as shown in this snippet.
+
+**Note:** We don't cover it in this book, but ES6 has the `...` spread operator which will let you syntactically "spread out" an array as parameters without needing `apply(..)`, such as `foo(...[1,2])`, which amounts to `foo(1,2)` -- syntactically avoiding a `this` binding if it's unnecessary. Unfortunately, there's no ES6 syntactic substitute for currying, so the `this` parameter of the `bind(..)` call still needs attention.
+
+However, there's a slight hidden "danger" in always using `null` when you don't care about the `this` binding. If you ever use that against a function call (for instance, a third-party library function that you don't control), and that function *does* make a `this` reference, the *default binding* rule means it might inadvertently reference (or worse, mutate!) the `global` object (`window` in the browser).
+
+Obviously, such a pitfall can lead to a variety of *very difficult* to diagnose/track-down bugs.
+
+Perhaps a somewhat "safer" practice is to pass a specifically set up object for `this` which is guaranteed not to be an object that can create problematic side effects in your program. Borrowing terminology from networking (and the military), we can create a "DMZ" (de-militarized zone) object -- nothing more special than a completely empty, non-delegated (see Chapters 5 and 6) object.
+
+If we always pass a DMZ object for ignored `this` bindings we don't think we need to care about, we're sure any hidden/unexpected usage of `this` will be restricted to the empty object, which insulates our program's `global` object from side-effects.
+
+Since this object is totally empty, I personally like to give it the variable name `ø` (the lowercase mathematical symbol for the empty set). On many keyboards (like US-layout on Mac), this symbol is easily typed with `⌥`+`o` (option+`o`). Some systems also let you set up hotkeys for specificy symbols. If you don't like the `ø` symbol, or your keyboard doesn't make that as easy to type, you can of course call it whatever you want.
+
+Whatever you call it, the easiest way to set it up as **totally empty** is `Object.create(null)` (see Chapter 5). `Object.create(null)` is similar to `{ }`, but without the delegation to `Object.prototype`, so it's "more empty" than just `{ }`.
+
+```js
+function foo(a,b) {
+	console.log( "a:" + a + ", b:" + b );
+}
+
+// our DMZ empty object
+var ø = Object.create( null );
+
+// spreading out array as parameters
+foo.apply( ø, [2, 3] ); // a:2, b:3
+
+// currying with `bind(..)`
+var bar = foo.bind( ø, 2 );
+bar( 3 ); // a:2, b:3
+```
+
+Not only functionally "safer", there's a sort of stylistic benefit to `ø`, in that it semantically conveys "I want the `this` to be empty" a little more clearly than `null` might. But again, name your DMZ object whatever you prefer.
+
+### Indirection
+
+Another thing to be aware of is you can (intentionally or not!) create "indirect references" to functions, and in those cases, the when that function reference is invoked, the *default binding* rule also applies.
+
+One of the most common ways that *indirect references* occur is from an assignment:
 
 ```js
 function foo() {
@@ -597,14 +660,15 @@ function foo() {
 
 var a = 2;
 var o = { a: 3, foo: foo };
+var p = { a: 4 };
 
 o.foo(); // 3
-(o.foo = o.foo)(); // 2
+(p.foo = o.foo)(); // 2
 ```
 
-One of the most common ways that *indirect references* occur is from an assignment. `o.foo = o.foo` results in just the underlying `foo` function object, so the effective call-site is just `foo()`, not `o.foo()` as you might expect, thus the *default binding* rule applies.
+The *result value* of the assignment expression `p.foo = o.foo` is a reference to just the underlying function object. As such, the effective call-site is just `foo()`, not `p.foo()` or `o.foo()` as you might expect. Per the rules above, the *default binding* rule applies.
 
-Regardless of how the *default binding* rule gets invoked, recall from earlier that the `strict mode` status of the code making the `this` reference (that is, the contents of the function), not of the code containing the function call-site, determines the *default binding* value -- either global object if in non-`strict mode` or `undefined` if in `strict mode`.
+Reminder: regardless of how you get to a function invocation using the *default binding* rule, the `strict mode` status of the **contents** of the invoked function making the `this` reference -- not the function call-site -- determines the *default binding* value: either the `global` object if in non-`strict mode` or `undefined` if in `strict mode`.
 
 ## Lexical `this`
 
@@ -687,10 +751,12 @@ Determining the `this` binding for an executing function requires finding the di
 
 1. Called with `new`? Use the newly constructed object.
 
-2. Called with `call` or `apply`? Use the specified object.
+2. Called with `call` or `apply` (or `bind`)? Use the specified object.
 
 3. Called with a context object owning the call? Use that context object.
 
 4. Default: `undefined` in `strict mode`, global object otherwise.
 
-Instead of these four rules, ES6 arrow-functions use lexical scoping for `this` binding, which means they inherit the `this` binding (whatever it is) from its enclosing function. They are essentially a syntactic embrace of `self = this` in pre-ES6 code patterns.
+Be careful of accidental/unintentional invoking of the *default binding* rule. In cases where you want to "safely" ignore a `this` binding, a "DMZ" object like `ø = Object.create(null)` is a good placeholder value that protects the `global` object from unintended side-effects.
+
+Instead of the four standard binding rules, ES6 arrow-functions use lexical scoping for `this` binding, which means they inherit the `this` binding (whatever it is) from its enclosing function call. They are essentially a syntactic embrace of `self = this` in pre-ES6 coding.

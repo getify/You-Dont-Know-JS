@@ -11,6 +11,7 @@
 	* Call-site
 	* Nothing But Rules
 	* Everything In Order
+	* Binding Exceptions
 	* Lexical `this`
 * Chapter 3: Objects
 	* Syntax
