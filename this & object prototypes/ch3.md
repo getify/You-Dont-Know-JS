@@ -191,7 +191,7 @@ myObject.someFoo; // function foo()
 
 The safest conclusion is probably that "function" and "method" are interchangeable in JavaScript.
 
-**Note:** ES6 adds a `super` reference, which is typically going to be used with `class` (see Appendix A). The way `super` behaves (static binding rather than late binding as `this` is) gives further weight to the idea that a function which is `super` bound somewhere is more a "method" than "function". But again, these are just subtle semantic (and mechanical) nuances.
+**Note:** ES6 adds a `super` reference, which is typically going to be used with `class` (see Appendix A). The way `super` behaves (static binding rather than late binding as `this`) gives further weight to the idea that a function which is `super` bound somewhere is more a "method" than "function". But again, these are just subtle semantic (and mechanical) nuances.
 
 ### Arrays
 
