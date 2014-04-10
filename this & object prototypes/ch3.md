@@ -278,7 +278,7 @@ var newObj = JSON.parse( JSON.stringify( someObj ) );
 
 Of course, that requires you to ensure your object is JSON safe. For some domains, that's trivial. For others, it's insufficient.
 
-At the same time, a shallow copy is fairly understandable and has far less issues, so ES6 has now defined `Object.assign(..)` for this task. `Object.assign(..)` takes a *target* object as its first parameter, and one or more *source* objects as its subsequent parameters. It iterates over all the keys (even non-enumerable -- see below!) on the *source* object(s) and copies them (via `=` assignment only) to *target*. It also, helpfully, returns *target*, as you can see below:
+At the same time, a shallow copy is fairly understandable and has far less issues, so ES6 has now defined `Object.assign(..)` for this task. `Object.assign(..)` takes a *target* object as its first parameter, and one or more *source* objects as its subsequent parameters. It iterates over all the *owned keys* (all keys **directly present** on the object, even non-enumerable keys -- see below) on the *source* object(s) and copies them (via `=` assignment only) to *target*. It also, helpfully, returns *target*, as you can see below:
 
 ```js
 var newObj = Object.assign( {}, myObject );
