@@ -42,11 +42,27 @@ speak.call( you ); // Hello, I'm READER
 
 If the *how* of this snippet confuses you, don't worry! We'll get to that shortly. Just set those questions aside briefly so we can look into the *why* more clearly.
 
-This code snippet allows the `identify()` and `speak()` functions to be re-used against multiple "contexts", rather than needing a separate version of the function for each object.
+This code snippet allows the `identify()` and `speak()` functions to be re-used against multiple *context* (`me` and `you`) objects, rather than needing a separate version of the function for each object.
 
-The astute reader will notice that in our simple example, instead of relying on `this`, you could have explicitly passed in a context object to both `identify()` and `speak()`. However, the `this` mechanism provides a more elegant way of "passing along" an object reference, leading to cleaner API design and easier re-use.
+Instead of relying on `this`, you could have explicitly passed in a context object to both `identify()` and `speak()`.
 
-The more complex your usage pattern is, the more clearly you'll see that passing context around as an explicit parameter is sometimes messier than passing around a `this` context. When we explore objects and prototypes, you will see the helpfulness of a collection of functions being able to automatically reference the proper context object.
+```js
+function identify(context) {
+	return context.name.toUpperCase();
+}
+
+function speak(context) {
+	var greeting = "Hello, I'm " + identify( context );
+	console.log( greeting );
+}
+
+identify( you ); // READER
+speak( me ); // Hello, I'm KYLE
+```
+
+However, the `this` mechanism provides a more elegant way of implicitly "passing along" an object reference, leading to cleaner API design and easier re-use.
+
+The more complex your usage pattern is, the more clearly you'll see that passing context around as an explicit parameter is often messier than passing around a `this` context. When we explore objects and prototypes, you will see the helpfulness of a collection of functions being able to automatically reference the proper context object.
 
 ## Confusions
 
