@@ -5,6 +5,8 @@ Following our exploration of objects from the previous chapter, it's natural tha
 
 We'll see that these concepts don't really map very naturally to the object mechanism in JS, and the lengths (mixins, etc) many JavaScript developers go to overcome such challenges.
 
+**Note:** This chapter spends quite a bit of time (the first half!) on heavy "objected oriented programming" theory. We eventually relate these ideas to real concrete JavaScript code in the second half, when we talk about "Mixins". But there's a lot of concept and pseudo-code to wade through first, so don't get lost -- just stick with it!
+
 ## Class Theory
 
 "Class/Inheritance" describes a certain form of code organization and architecture -- a way of modeling real world problem domains in our software.
