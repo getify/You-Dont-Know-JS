@@ -157,6 +157,32 @@ myObject["3"]; // "bar"
 myObject["[object Object]"]; // "baz"
 ```
 
+### Computed Property Names
+
+The `myObject[..]` property access syntax we just described is useful if you need to use a computed expression value *as* the key name, like `myObject[prefix + name]`. But that's not really helpful when declaring objects using the object-literal syntax.
+
+ES6 adds *computed property names*, where you can specify an expression, surrounded by a `[ ]` pair, in the key-name position of an object-literal declaration:
+
+```js
+var prefix = "foo";
+
+var myObject = {
+	[prefix + "bar"]: "hello",
+	[prefix + "baz"]: "world"
+};
+
+myObject["foobar"]; // hello
+myObject["foobaz"]; // world
+```
+
+The most common usage of *computed property names* will probably be for ES6 `Symbol`s, which we will not be covering in detail in this book. In short, they're a new primitive data type which has an opaque unguessable value (technically a `string` value). You will be strongly discouraged from working with the *actual value* of a `Symbol` (which can theoretically be different between different JS engines), so the name of the `Symbol`, like `Symbol.Something` (just a made up name!), will be what you use:
+
+```js
+var myObject = {
+	[Symbol.Something]: "hello world"
+};
+```
+
 ### Property vs. Method
 
 Some developers like to make a distinction when talking about a property access on an object, if the value being accessed happens to be a function. Because it's tempting to think of the function as *belonging* to the object, and in other languages, functions which belong to objects (aka, "classes") are referred to as "methods", it's not uncommon to hear, "method access" as opposed to "property access".
@@ -787,7 +813,7 @@ it.next(); // { value:3, done:false }
 it.next(); // { done:true }
 ```
 
-**Note:** We get at the internal `@@iterator` slot using ES6 Symbols, specifically `Symbol.iterator`, which will have a special unguessable value that you should treat opaquely (always reference `Symbol.iterator`, not the value it may hold). Also, despite the name's implications, `@@iterator` is **not the iterator object itself**, but a function that *returns* the iterator object.
+**Note:** We get at the `@@iterator` *internal property* of an object using an ES6 `Symbol`: `Symbol.iterator`. We briefly mentioned `Symbol` semantics earlier in the chapter (see "Computed Property Names"), so the same reasoning applies here. You'll always want to reference such special properties by `Symbol` name instead of by the value it may hold. Also, despite the name's implications, `@@iterator` is **not the iterator object** itself, but a **function that returns** the iterator object -- a subtle but important nuance!
 
 As the above snippet reveals, the return value from an iterator's `next()` call is an object of the form `{ value: .. , done: .. }`, where `value` is the current iteration value, and `done` is a `boolean` that indicates if there's more to iterate.
 
@@ -835,6 +861,8 @@ for (var v of myObject) {
 // 2
 // 3
 ```
+
+**Note:** We used `Object.defineProperty(..)` to define our custom `@@iterator` (mostly so we could make it non-enumerable), but using the `Symbol` as a *computed property name* (covered earlier in this chapter), we could have declared it directly, like `var myObject = { a:2, b:3, [Symbol.iterator]: function(){ /* .. */ } }`.
 
 Each time the `for..of` loop calls `next()` on `myObject`'s iterator object, the internal pointer will advance and return back the next value from the object's properties list (see a previous note about iteration ordering on object properties/values).
 
