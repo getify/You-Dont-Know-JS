@@ -5,7 +5,7 @@ In Chapters 3 and 4, we mentioned the `[[Prototype]]` chain several times, but h
 
 **Note:** All of the attempts to emulate class-copy behavior, as described previously in Chapter 4, labeled as variations of "mixins", completely circument the `[[Prototype]]` chain mechanism we examine here in this chapter.
 
-## Links
+## `[[Prototype]]`
 
 Objects in JavaScript have an internal property, denoted in the specification as `[[Prototype]]`, which is simply a reference to another object. Almost all objects are given a non-`null` value for this property, at the time of their creation.
 
@@ -74,7 +74,7 @@ However, the nuanced (and perhaps unexpected) behavior occurs if `foo` is found 
 
 Most developers assume that assignment of a property (`[[Put]]`) will always result in shadowing if the property already exists on the `[[Prototype]]` chain, but as you can see, that's only true in one (#1) of the three situations just described.
 
-If you want to create shadowing in cases #2 and #3, you cannot use `=` assignment, but must instead use `Object.definePropert(..)` (see Chapter 3).
+If you want to create shadowing in cases #2 and #3, you cannot use `=` assignment, but must instead use `Object.defineProperty(..)` (see Chapter 3).
 
 Keep in mind, though, that shadowing with methods leads to the ugly *explicit pseudo-polymorphism* (see Chapter 4) if you need to delegate between them. In general, shadowing is more complicated and nuanced than it's worth, **so you should try to avoid it if possible** (see Chapter 6 for an alternative design pattern that discourages shadowing).
 
@@ -529,9 +529,35 @@ As we've now seen, the `[[Prototype]]` mechanism is an internal link that exists
 
 This linkage is (primarily) exercised when a property/method reference is made against the first object, and no such property/method exists. In that case, the `[[Prototype]]` linkage tells the engine to look for the property/method on the linked-to object. In turn, if that object cannot fulfill the look-up, its `[[Prototype]]` is followed, and so on. This series of links between objects forms what is called the "prototype chain".
 
-### Fallbacks?
+### `Create()`ing Links
 
-It may be tempting to think that these links provide a sort of fallback for "missing" properties or methods. While that may be an observed outcome, I don't think it represents the right way of thinking about `[[Prototype]]`.
+We've thoroughly debunked why JavaScript's `[[Prototype]]` mechanism is **not** like *classes*, and we've seen how it instead creates **links** between proper objects.
+
+What's the point of the `[[Prototype]]` mechanism? Why is it so common for JS developers to go to so much effort (emulating classes) in their code to wire up these linkages?
+
+Remember we said much earlier in this chapter that `Object.create(..)` would be a hero? Now, we're ready to see how.
+
+```js
+var foo = {
+	something: function() {
+		console.log( "Tell me something good..." );
+	}
+};
+
+var bar = Object.create( foo );
+
+bar.something(); // Tell me something good...
+```
+
+`Object.create(..)` creates a new object (`bar`) linked to the object you specify (`foo`), which gives you all the power (delegation) of the `[[Prototype]]` mechanism, but without any of the unnecessary complication of `new` functions acting as classes and constructor calls, confusing `.prototype` and `.constructor` references, or any of that extra stuff.
+
+**Note:** `Object.create( null )` creates an object that has an empty (aka, `null`) `[[Prototype]]` linkage, and thus the object can't delegate anywhere. Since such an object has no prototype chain, the `instanceof` operator (explained earlier) has nothing to check, so it will always return `false`. These special empty-`[[Prototype]]` objects are often called "dictionaries" as they are typically used purely for storing data in properties, mostly because they have no possible surprise effects from any delegated properties/functions on the `[[Prototype]]` chain, and are thus purely flat data storage.
+
+We don't need classes to create meaningful relationships between two objects. The only thing we should **really care about** is objects linked together for delegation, and `Object.create(..)` gives us that linkage without all the class cruft.
+
+### Links As Fallbacks?
+
+It may be tempting to think that these links *primarily* provide a sort of fallback for "missing" properties or methods. While that may be an observed outcome, I don't think it represents the right way of thinking about `[[Prototype]]`.
 
 Consider:
 
@@ -551,35 +577,9 @@ That code will work by virtue of `[[Prototype]]`, but if you wrote it that way s
 
 That's not to say there aren't cases where fallbacks are an appropriate design pattern, but it's not very common or idiomatic in JS, so if you find yourself doing so, you might want to take a step back and reconsider if that's really appropriate and sensible design.
 
-**Note:** In ES6, an advanced functionality called `Proxy` is introduced which can provide something of a "method not found" type of behavior. `Proxy` is well beyond the scope of this book, but will be covered in detail in a later book in the *"You Don't Know JS"* series.
+**Note:** In ES6, an advanced functionality called `Proxy` is introduced which can provide something of a "method not found" type of behavior. `Proxy` is beyond the scope of this book, but will likely be covered in detail in a later book in the *"You Don't Know JS"* series.
 
-To understand how we *should* think about `[[Prototype]]`, the next chapter is going to explore a very different design pattern: **Delegation**.
-
-## Creating Linked Objects
-
-We've thoroughly debunked why JavaScript's `[[Prototype]]` mechanism is **not** like *classes*, and we've seen how it instead creates **links** between proper objects.
-
-What's the point of the `[[Prototype]]` mechanism? Is it just a bunch of confusion without much purpose? Why is it so common for JS developers to go to so much effort in their code to wire up these linkages?
-
-Remember we said much earlier in this chapter that `Object.create(..)` would be the hero? Now, we're ready to see how!
-
-```js
-var foo = {
-	something: function() {
-		console.log( "Tell me something good..." );
-	}
-};
-
-var bar = Object.create( foo );
-
-bar.something(); // Tell me something good...
-```
-
-`Object.create(..)` creates a new object (`bar`) linked to the object you specify (`foo`), which gives you all the power (delegation) of the `[[Prototype]]` mechanism, but without any of the unnecessary complication of `new` functions acting as classes and constructor calls, confusing `.prototype` and `.constructor` references, or any of that nonsense.
-
-**Note:** `Object.create( null )` creates an object that has an empty (aka, `null`) `[[Prototype]]` linkage, and thus the object can't delegate anywhere. Since such an object has no prototype chain, the `instanceof` operator (explained earlier) has nothing to check, so it will always return `false`. These special empty-`[[Prototype]]` objects are often called "dictionaries" as they are typically used purely for storing data in properties, mostly because they have no possible surprise effects from any delegated properties/functions on the `[[Prototype]]` chain, and are thus purely flat data storage.
-
-We don't need classes to create meaningful relationships between two objects. The only thing we should **really care about** is objects linked together for delegation, and `Object.create(..)` gives us that linkage without all the class cruft. Now we're finally ready to design software with delegation!
+Instead of fallbacks, the next chapter is going to explore a very different design pattern: **Delegation**, to help us understand a more appropriate way of designing our software with `[[Prototype]]`.
 
 ## Review (TL;DR)
 

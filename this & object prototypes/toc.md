@@ -23,11 +23,10 @@
 	* Class Inheritance
 	* Mixins
 * Chapter 5: Prototypes
-	* Links
+	* `[[Prototype]]`
 	* "Class"
 	* "(Prototypal) Inheritance"
 	* Object Links
-	* Creating Linked Objects
 * Chapter 6: Behavior Delegation
 	* Towards Delegation-Oriented Design
 	* Classes vs. Objects
