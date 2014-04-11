@@ -306,7 +306,7 @@ var newObj = JSON.parse( JSON.stringify( someObj ) );
 
 Of course, that requires you to ensure your object is JSON safe. For some domains, that's trivial. For others, it's insufficient.
 
-At the same time, a shallow copy is fairly understandable and has far less issues, so ES6 has now defined `Object.assign(..)` for this task. `Object.assign(..)` takes a *target* object as its first parameter, and one or more *source* objects as its subsequent parameters. It iterates over all the *owned keys* (all keys **directly present** on the object, even non-enumerable keys -- see below) on the *source* object(s) and copies them (via `=` assignment only) to *target*. It also, helpfully, returns *target*, as you can see below:
+At the same time, a shallow copy is fairly understandable and has far less issues, so ES6 has now defined `Object.assign(..)` for this task. `Object.assign(..)` takes a *target* object as its first parameter, and one or more *source* objects as its subsequent parameters. It iterates over all the *enumerable* (see below), *owned keys* (**immediately present**) on the *source* object(s) and copies them (via `=` assignment only) to *target*. It also, helpfully, returns *target*, as you can see below:
 
 ```js
 var newObj = Object.assign( {}, myObject );
@@ -317,7 +317,7 @@ newObj.c === anotherArray; // true
 newObj.d === anotherFunction; // true
 ```
 
-**Note:** In the next section, we describe "property descriptors" (property characteristics) and show the use of `Object.defineProperty(..)`. The duplication that occurs for `Object.assign(..)` however is purely `=` style assignment, so any special characteristics of a property (like `enumerable` or `writable`) on a source object **are not preserved** on the target object.
+**Note:** In the next section, we describe "property descriptors" (property characteristics) and show the use of `Object.defineProperty(..)`. The duplication that occurs for `Object.assign(..)` however is purely `=` style assignment, so any special characteristics of a property (like `writable`) on a source object **are not preserved** on the target object.
 
 ### Property Descriptors
 
