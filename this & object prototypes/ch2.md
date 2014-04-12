@@ -672,6 +672,59 @@ The *result value* of the assignment expression `p.foo = o.foo` is a reference t
 
 Reminder: regardless of how you get to a function invocation using the *default binding* rule, the `strict mode` status of the **contents** of the invoked function making the `this` reference -- not the function call-site -- determines the *default binding* value: either the `global` object if in non-`strict mode` or `undefined` if in `strict mode`.
 
+### Softening Binding
+
+We saw earlier that *hard binding* was one strategy for preventing a function call falling back to the *default binding* rule inadvertently, by forcing it to be bound to a specific `this` (unless you use `new` to override it!). The problem is, *hard-binding* greatly reduces the flexibility of a function, preventing manual `this` override with either the *implicit binding* or even subsequent *explicit binding* attempts.
+
+It would be nice if there was a way to provide a different default for *default binding* (not `global` or `undefined`), while still leaving the function able to be manually `this` bound via *implicit binding* and *explicit binding* techniques.
+
+We can construct a so-called *soft binding* mechanism which emulates our desired behavior.
+
+```js
+if (!Function.prototype.softBind) {
+	Function.prototype.softBind = function(obj) {
+		var fn = this;
+		// capture any curried parameters
+		var curried = [].slice.call( arguments, 1 );
+		var bound = function() {
+			return fn.apply(
+				(!this || this === (window || global)) ? obj : this,
+				curried.concat.apply( curried, arguments )
+			);
+		};
+		bound.prototype = Object.create( fn.prototype );
+		return bound;
+	};
+}
+```
+
+The `softBind(..)` utility provided here works similarly to the built-in ES5 `bind(..)` utility, except with our *soft binding* behavior. It wraps the specified function in logic that checks the `this` at call-time and if it's `global` or `undefined`, uses a pre-specified alternate *default* (`obj`). Otherwise the `this` is left untouched. It also provides optional currying (see the `bind(..)` discussion earlier).
+
+Let's demonstrate its usage:
+
+```js
+function foo() {
+   console.log("name: " + this.name);
+}
+
+var obj = { name: "obj" },
+    obj2 = { name: "obj2" },
+    obj3 = { name: "obj3" };
+
+var fooOBJ = foo.softBind( obj );
+
+fooOBJ(); // name: obj
+
+obj2.foo = foo.softBind(obj);
+obj2.foo(); // name: obj2   <---- look!!!
+
+fooOBJ.call( obj3 ); // name: obj3   <---- look!
+
+setTimeout( obj2.foo, 10 ); // name: obj   <---- falls back to soft-binding
+```
+
+The soft-bound version of the `foo()` function can be manually `this`-bound to `obj2` or `obj3` as shown, but it falls back to `obj` if the *default binding* would otherwise apply.
+
 ## Lexical `this`
 
 Normal functions abide by the 4 rules we just covered. But ES6 introduces a special kind of function that does not use these rules: arrow-function.
