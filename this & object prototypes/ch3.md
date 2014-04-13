@@ -11,6 +11,7 @@ The literal syntax for an object looks like this:
 
 ```js
 var myObj = {
+	key: value
 	// ...
 };
 ```
@@ -19,6 +20,7 @@ The constructed form looks like this:
 
 ```js
 var myObj = new Object();
+myObj.key = value;
 ```
 
 The constructed form and the literal form result in exactly the same sort of object. The only difference really is that you can add one or more key/value pairs to the literal declaration, whereas with constructed-form objects, you must add the properties one-by-one.
@@ -208,9 +210,11 @@ var myObject = {
 	someFoo: foo
 };
 
-someFoo; // function foo()
+foo; // function foo(){..}
 
-myObject.someFoo; // function foo()
+someFoo; // function foo(){..}
+
+myObject.someFoo; // function foo(){..}
 ```
 
 `someFoo` and `myObject.someFoo` are just two separate references to the same function, and neither implies anything about the function being special or "owned" by any other object. If `foo()` above was defined to have a `this` reference inside it, that `myObject.someFoo` *implicit binding* would be the **only** observable difference between the two references. Neither reference really makes sense to be called a "method".
@@ -220,6 +224,24 @@ myObject.someFoo; // function foo()
 The safest conclusion is probably that "function" and "method" are interchangeable in JavaScript.
 
 **Note:** ES6 adds a `super` reference, which is typically going to be used with `class` (see Appendix A). The way `super` behaves (static binding rather than late binding as `this`) gives further weight to the idea that a function which is `super` bound somewhere is more a "method" than "function". But again, these are just subtle semantic (and mechanical) nuances.
+
+Even when you declare a function expression as part of the object-literal, that function doesn't magically *belong* more to the object -- still just multiple references to the same function object:
+
+```js
+var myObject = {
+	foo: function() {
+		console.log( "foo" );
+	}
+};
+
+var someFoo = myObject.foo;
+
+someFoo; // function foo(){..}
+
+myObject.foo; // function foo(){..}
+```
+
+**Note:** In Chapter 6, we will cover an ES6 short-hand for that `foo: function(){ .. }` declaration syntax in our object-literal.
 
 ### Arrays
 
