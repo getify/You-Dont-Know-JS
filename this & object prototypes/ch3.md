@@ -694,7 +694,7 @@ myObject.hasOwnProperty( "b" ); // false
 
 The `in` operator will check to see if the property is *in* the object, or if it exists at any higher level of the ``[[Prototype]]` chain object traversal (see Chapter 5). By contrast, `hasOwnProperty(..)` checks to see if *only* `myObject` has the property or not, and will *not* consult the `[[Prototype]]` chain. We'll come back to the important differences between these two operations in the Chapter 5 when we explore `[[Prototype]]`s in detail.
 
-**Note:** The `in` operator has the appearance that it will check for the existence of a *value* inside a container, but it actually checks for the existence of a property name. This difference is important to note with respect to arrays, as the temptation to try a check like `2 in [1, 2, 3]` is strong, but this will not behave as expected.
+**Note:** The `in` operator has the appearance that it will check for the existence of a *value* inside a container, but it actually checks for the existence of a property name. This difference is important to note with respect to arrays, as the temptation to try a check like `4 in [2, 4, 6]` is strong, but this will not behave as expected.
 
 #### Enumeration
 
@@ -733,7 +733,7 @@ for (var k in myObject) {
 
 You'll notice that `myObject.b` in fact **exists** and has an accessible value, but it doesn't show up in a `for..in` loop (though, surprisingly, it **is** revealed by the `in` operator existence check). That's because "enumerable" basically means "will be included if the object's properties are iterated through".
 
-**Note:** `for..in` loops applied to arrays can give somewhat unexpected results, in that the enumeration of an array will include not only all the numeric indices, but also any enumerable properties. It's a good idea to use `for..in` loops *only* on objects, and traditional `for` loops with numeric iteration for the values stored in arrays.
+**Note:** `for..in` loops applied to arrays can give somewhat unexpected results, in that the enumeration of an array will include not only all the numeric indices, but also any enumerable properties. It's a good idea to use `for..in` loops *only* on objects, and traditional `for` loops with numeric index iteration for the values stored in arrays.
 
 Another way that enumerable and non-enumerable properties can be distinguished:
 
@@ -761,13 +761,15 @@ Object.getOwnPropertyNames( myObject ); // ["a", "b"]
 
 `Object.keys(..)` returns an array of all enumerable properties, whereas `Object.getOwnPropertyNames(..)` returns an array of *all* properties, enumerable or not.
 
-**Note:** Whereas `in` vs. `Object.hasOwnProperty(..)` differ in whether they consult the `[[Prototype]]` chain or not, respectively, `Object.keys(..)` and `Object.getOwnPropertyNames(..)` both inspect *only* the direct object specified. There's no built-in way to get a list of all properties which the `in` operator would find (traversing all properties on the entire `[[Prototype]]` chain, as explained in Chapter 5).
+Whereas `in` vs. `Object.hasOwnProperty(..)` differ in whether they consult the `[[Prototype]]` chain or not, respectively, `Object.keys(..)` and `Object.getOwnPropertyNames(..)` both inspect *only* the direct object specified.
+
+There's (currently) no built-in way to get a list of **all properties** which is equivalent to what the `in` operator test would consult (traversing all properties on the entire `[[Prototype]]` chain, as explained in Chapter 5). You could approximate such a utility by recursively traversing the `[[Prototype]]` chain of an object, and for each level, capturing the list from `Object.getOwnPropertyNames(..)`.
 
 #### Iteration
 
-As we just explained, the `for..in` loop iterates over the list of enumerable properties on an object (including its `[[Prototype]]` chain). But what if you instead want to iterate over the values?
+The `for..in` loop iterates over the list of enumerable properties on an object (including its `[[Prototype]]` chain). But what if you instead want to iterate over the values?
 
-For arrays, iterating over the values is typically done with a standard `for` loop, like:
+With numerically-indexed arrays, iterating over the values is typically done with a standard `for` loop, like:
 
 ```js
 var myArray = [1, 2, 3];
@@ -778,9 +780,13 @@ for (var i = 0; i < myArray.length; i++) {
 // 1 2 3
 ```
 
-Technically, this isn't iterating over the values, but iterating over the indices, where you then use the index to reference the value, as `myArray[i]`.
+This isn't iterating over the values, though, but iterating over the indices, where you then use the index to reference the value, as `myArray[i]`.
 
-**Note:** ES5 also added several iteration helpers for arrays, including `forEach(..)`, `every(..)`, and `some(..)`. Each of these helpers accepts a function callback to apply to each element in the array, differing only in they respectively respond to a return value from the callback. `forEach(..)` will iterate over all values in the array, and ignores any callback return values. `every(..)` keeps going until the end *or* the callback returns a `false` (or "falsy") value, whereas `some(..)` keeps going until the end *or* the callback returns a `true` (or "truthy") value.
+ES5 also added several iteration helpers for arrays, including `forEach(..)`, `every(..)`, and `some(..)`. Each of these helpers accepts a function callback to apply to each element in the array, differing only in they respectively respond to a return value from the callback.
+
+`forEach(..)` will iterate over all values in the array, and ignores any callback return values. `every(..)` keeps going until the end *or* the callback returns a `false` (or "falsy") value, whereas `some(..)` keeps going until the end *or* the callback returns a `true` (or "truthy") value.
+
+These special return values from `every(..)` and `some(..)` act somewhat like a `break` statment inside a normal `for` loop, in that they stop the iteration early before it reaches the end.
 
 If you iterate on an object with a `for..in` loop, you're also only getting at the values indirectly, because it's actually iterating only over the enumerable properties of the object, leaving you to access the properties manually to get the values.
 
@@ -799,9 +805,9 @@ for (var v of myArray) {
 // 3
 ```
 
-Technically, the `for..of` loop asks for an iterator object (from a default internal function known as `@@iterator` in spec-speak) of the thing to be iterated, and the loop iterates over the successive return values from calling that iterator object's `next()` method, once for each loop iteration. Arrays have a built-in `@@iterator`, so `for..of` works easily on them.
+The `for..of` loop asks for an iterator object (from a default internal function known as `@@iterator` in spec-speak) of the *thing* to be iterated, and the loop then iterates over the successive return values from calling that iterator object's `next()` method, once for each loop iteration.
 
-Let's manually iterate the array, using the built-in `@@iterator`, to see how it works:
+Arrays have a built-in `@@iterator`, so `for..of` works easily on them, as shown. But let's manually iterate the array, using the built-in `@@iterator`, to see how it works:
 
 ```js
 var myArray = [ 1, 2, 3 ];
@@ -813,7 +819,7 @@ it.next(); // { value:3, done:false }
 it.next(); // { done:true }
 ```
 
-**Note:** We get at the `@@iterator` *internal property* of an object using an ES6 `Symbol`: `Symbol.iterator`. We briefly mentioned `Symbol` semantics earlier in the chapter (see "Computed Property Names"), so the same reasoning applies here. You'll always want to reference such special properties by `Symbol` name instead of by the value it may hold. Also, despite the name's implications, `@@iterator` is **not the iterator object** itself, but a **function that returns** the iterator object -- a subtle but important nuance!
+**Note:** We get at the `@@iterator` *internal property* of an object using an ES6 `Symbol`: `Symbol.iterator`. We briefly mentioned `Symbol` semantics earlier in the chapter (see "Computed Property Names"), so the same reasoning applies here. You'll always want to reference such special properties by `Symbol` name reference instead of by the special value it may hold. Also, despite the name's implications, `@@iterator` is **not the iterator object** itself, but a **function that returns** the iterator object -- a subtle but important detail!
 
 As the above snippet reveals, the return value from an iterator's `next()` call is an object of the form `{ value: .. , done: .. }`, where `value` is the current iteration value, and `done` is a `boolean` that indicates if there's more to iterate.
 
@@ -866,7 +872,9 @@ for (var v of myObject) {
 
 Each time the `for..of` loop calls `next()` on `myObject`'s iterator object, the internal pointer will advance and return back the next value from the object's properties list (see a previous note about iteration ordering on object properties/values).
 
-The iteration we just demonstrated is a simple value-by-value iteration, but you can of course define arbitrarily complex iterations for your custom data structures, as you see fit. As long as your iterator returns new values from `next()` calls, ES6's `for..of` can iterate over it.
+The iteration we just demonstrated is a simple value-by-value iteration, but you can of course define arbitrarily complex iterations for your custom data structures, as you see fit. Custom iterators combined with ES6's `for..of` loop are a powerful new syntactic tool for manipulating user-defined objects.
+
+For example, a list of `Pixel` objects (with `x` and `y` coordinate values) could decide to order its iteration based on the linear distance from the `(0,0)` origin, or filter out points that are "too far away", etc. As long as your iterator returns the expected `{ value: .. }` return values from `next()` calls, and a `{ done: true }` after the iteration is complete, ES6's `for..of` can iterate over it.
 
 In fact, you can even generate "infinite" iterators which never "finish" and always return a new value (such as a random number, an incremented value, a unique identifier, etc), though you probably will not use such iterators with an unbounded `for..of` loop, as it would never end and would hang your program.
 
@@ -876,7 +884,7 @@ var randoms = (function(){
 	publicAPI[Symbol.iterator] = function() {
 		return {
 			next: function() {
-				return { done: false, value: Math.random() };
+				return { value: Math.random() };
 			}
 		};
 	};
