@@ -120,6 +120,81 @@ It's a shame (not terribly surprising, but mildly annoying) that this is disallo
 
 But it's disallowed because engine implementors have observed that it's more performant to check for (and reject!) the infinite circular reference once at set-time rather than needing to have the performance hit of that guard check every time you look-up a property on an object.
 
+#### Debugged
+
+We'll briefly cover a subtle detail that can be confusing to developers. In general, the JS specification does not control how browser developer tools should represent specific values/structures to a developer, so each browser/engine is free to interpret such things as they see fit. As such, browsers/tools *don't always agree*. Specifically, the behavior we will now examine is currently observed only in Chrome's Developer Tools.
+
+Consider this traditional "class constructor" style JS code, as it would appear in the *console* of Chrome Developer Tools:
+
+```js
+function Foo() {}
+
+var a1 = new Foo();
+
+a1; // Foo {}
+```
+
+Let's look at the last line of that snippet: the output of evaluating the `a1` expression, which prints `Foo {}`. If you try this same code in Firefox, you will likely see `Object {}`. Why the difference? What do these outputs mean?
+
+Chrome is essentially saying "{} is an empty object that was constructed by a function with name 'Foo'". Firefox is saying "{} is an empty object of general construction from Object". The subtle difference is that Chrome is actively tracking, as an *internal property*, the name of the actual function that did the construction, whereas other browsers don't track that additional information.
+
+It would be tempting to attempt to explain this with JavaScript mechanisms:
+
+```js
+function Foo() {}
+
+var a1 = new Foo();
+
+a1.constructor; // Foo(){}
+a1.constructor.name; // "Foo"
+```
+
+So, is that how Chrome is outputting "Foo", by simply examining the object's `.constructor.name`? Confusingly, the answer is both "yes" and "no".
+
+Consider this code:
+
+```js
+function Foo() {}
+
+var a1 = new Foo();
+
+Foo.prototype.constructor = function Gotcha(){};
+
+a1.constructor; // Gotcha(){}
+a1.constructor.name; // "Gotcha"
+
+a1; // Foo {}
+```
+
+Even though we change `a1.constructor.name` to legitimately be something else ("Gotcha"), Chrome's console still uses the "Foo" name.
+
+So, it would appear the answer to previous question (does it use `.constructor.name`?) is **no**, it must track it somewhere else, internally.
+
+But, Not so fast! Let's see how this kind of behavior works with OLOO-style code:
+
+```js
+var Foo = {};
+
+var a1 = Object.create( Foo );
+
+a1; // Object {}
+
+Object.defineProperty( Foo, "constructor", {
+	enumerable: false,
+	value: function Gotcha(){}
+});
+
+a1; // Gotcha {}
+```
+
+Ah-ha! **Gotcha!** Here, Chrome's console **did** find and use the `.constructor.name`. Actually, while writing this book, this exact behavior was identified as a bug in Chrome, and by the time you're reading this, it may have already been fixed. So you may instead have seen the corrected `a1; // Object {}`.
+
+Aside from that bug, the internal tracking (apparently only for debug output purposes) of the "constructor name" that Chrome does (shown in the earlier snippets) is an intentional Chrome-only extension of behavior beyond what the JS specification calls for.
+
+If you don't use a "constructor" to make your objects, as we've discouraged with OLOO-style code here in this chapter, then you'll get objects that Chrome does *not* track an internal "constructor name" for, and such objects will correctly only be outputted as "Object {}", meaning "object generated from Object() construction".
+
+**Don't think** this represents a drawback of OLOO-style coding. When you code with OLOO and behavior delegation as your design pattern, *who* "constructed" (that is, *which function* was called with `new`?) some object is an irrelevant point. Chrome's specific internal "constructor name" tracking is really only useful if you're fully embracing "class-style" coding, but is moot if you're instead embracing OLOO delegation.
+
 ### Mental Models Compared
 
 Now that you can see a difference between "class" and "delegation" design patterns, at least theoretically, let's see the implications these design patterns have on the mental models we use to reason about our code.
