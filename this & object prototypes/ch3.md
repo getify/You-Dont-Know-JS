@@ -64,7 +64,7 @@ There are several other object sub-types, usually referred to as built-in object
 
 These built-ins have the appearance of being actual types, even classes, if you rely on the similarity to other languages such as Java's `String` class.
 
-But in JS, these are actually just built-in functions. Each of these functions can be used as a constructor (that is, a function call with the `new` operator), with the result being a newly *constructed* object of the sub-type in question. For instance:
+But in JS, these are actually just built-in functions. Each of these built-in functions can be used as a constructor (that is, a function call with the `new` operator -- see Chapter 2), with the result being a newly *constructed* object of the sub-type in question. For instance:
 
 ```js
 var strPrimitive = "I am a string";
