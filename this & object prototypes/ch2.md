@@ -381,7 +381,13 @@ JavaScript has a `new` operator, and the code pattern to use it looks basically 
 
 First, let's re-define what a "constructor" in JavaScript is. In JS, constructors are **just functions** that happen to be called with the `new` operator in front of them. They are not attached to classes, nor are they instantiating a class. They are not even special types of functions. They're just regular functions that are, in essence, hijacked by the use of `new` in their invocation.
 
-So, pretty much any ol' function can be called with `new` in front of it, and that makes that function call a *constructor call*. This is an important but subtle distinction: there's really no such thing as "constructor functions", but rather construction calls *of* functions.
+For example, the `Number(..)` function acting as a constructor, quoting from the ES5.1 spec:
+
+> 15.7.2 The Number Constructor
+>
+> When Number is called as part of a new expression it is a constructor: it initialises the newly created object.
+
+So, pretty much any ol' function, including the built-in object functions like `Number(..)` (see Chapter 3) can be called with `new` in front of it, and that makes that function call a *constructor call*. This is an important but subtle distinction: there's really no such thing as "constructor functions", but rather construction calls *of* functions.
 
 When a function is invoked with `new` in front of it, otherwise known as a constructor call, the following things are done automatically:
 
