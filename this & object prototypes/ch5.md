@@ -498,7 +498,7 @@ Moreover, `.__proto__` looks like a property, but it's actually more appropriate
 
 Roughly, we could envision `.__proto__` implemented (see Chapter 3 for object property definitions) like this:
 
-```
+```js
 Object.defineProperty( Object.prototype, "__proto__", {
 	get: function() {
 		return Object.getPrototypeOf( this );

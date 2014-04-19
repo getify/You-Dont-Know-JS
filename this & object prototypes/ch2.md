@@ -544,7 +544,7 @@ if (!Function.prototype.bind) {
 
 The part that's allowing `new` overriding is:
 
-```
+```js
 this instanceof fNOP &&
 oThis ? this : oThis
 
