@@ -78,6 +78,33 @@ If you want to create shadowing in cases #2 and #3, you cannot use `=` assignmen
 
 Keep in mind, though, that shadowing with methods leads to the ugly *explicit pseudo-polymorphism* (see Chapter 4) if you need to delegate between them. In general, shadowing is more complicated and nuanced than it's worth, **so you should try to avoid it if possible** (see Chapter 6 for an alternative design pattern that discourages shadowing).
 
+Shadowing can occur implicitly in subtle ways. Consider:
+
+```js
+var myObject = {
+	a: 2
+};
+
+var anotherObject = Object.create( myObject );
+
+myObject.a; // 2
+anotherObject.a; // 2
+
+myObject.hasOwnProperty( "a" ); // true
+anotherObject.hasOwnProperty( "a" ); // false
+
+anotherObject.a++; // oops, implicit shadowing!
+
+myObject.a; // 2
+anotherObject.a; // 3
+
+anotherObject.hasOwnProperty( "a" ); // true
+```
+
+Though it may appear that `anotherObject.a++` should just increment the `myObject.a` property *in place* (even via the delegation), it corresponds to `anotherObject.a = anotherObject.a + 1`. This operation results in a `[[Get]]` look-up via `[[Prototype]]` to get the current value, increments that value by one, then using `[[Put]]` assigns the `3` value to a new shadowed property `a` on `anotherObject`.
+
+Be very careful when dealing with delegated properties that you modify. If you wanted to increment `myObject.a`, the proper way is `myObject.a++`.
+
 ## "Class"
 
 At this point, you might be wondering: "*Why* does one object need to link to another object?" What's the real benefit? That is a very appropriate question to ask, but we must first understand what `[[Prototype]]` is **not** before we can fully understand and appreciate what it *is* and how it's useful.
