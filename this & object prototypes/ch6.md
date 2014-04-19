@@ -294,7 +294,7 @@ We'll first examine a typical scenario in front-end web dev: creating UI widgets
 
 Because you're probably still so used to the OO design pattern, you'll likely immediately think of this problem domain in terms of a parent class (perhaps called `Widget`) with all the common base widget behavior, and then child derived classes for specific widget types (like `Button`).
 
-**Note:** We're going to use of jQuery here for DOM and CSS manipulation, only because it's a detail we don't really care about for the purposes of our current discussion. Of course, nothing we're discussing here has anything to do with which JS framework (jQuery, Dojo, YUI, etc), if any, you might solve such tasks with.
+**Note:** We're going to use jQuery here for DOM and CSS manipulation, only because it's a detail we don't really care about for the purposes of our current discussion. None of this code cares which JS framework (jQuery, Dojo, YUI, etc), if any, you might solve such mundane tasks with.
 
 Let's examine how we'd implement the "class" design in classic-style pure JS without any "class" helper library or syntax:
 
@@ -406,8 +406,6 @@ Whether you use the classic prototypal syntax or the new ES6 sugar, you've still
 
 ### Delegating Widget Objects
 
-The complexity (not just syntactic, but caveats and quirks of underlying mechanics) is a *choice*, one that's inferior to designing with **behavior delegation** (using OLOO-style code).
-
 Here's our simpler `Widget` / `Button` example, using **OLOO style delegation**:
 
 ```js
@@ -484,6 +482,8 @@ In addition to OLOO providing ostensibly simpler (and more flexible!) code, beha
 The scenario we'll examine is two controller objects, one for handling the login form of a web page, and another for actually handling the authentication (communication) with the server.
 
 We'll need a utility helper for making the Ajax communication to the server. We'll use jQuery (though any framework would do fine), since it handles not only the Ajax for us, but it returns a promise-like answer so that we can listen for the response in our calling code with `.then(..)`.
+
+**Note:** We don't cover Promises here, but we will cover them in a future title of the *"You Don't Know JS"* series.
 
 Following the typical class design pattern, we'll break up the task into base functionality in a class called `Controller`, and then we'll derive two child classes, `LoginController` and `AuthController`, which both inherit from `Controller` and specialize some of those base behaviors.
 
@@ -596,6 +596,8 @@ The other thing to mention is that we chose some *composition* to sprinkle in on
 
 If you're familiar with class-oriented (OO) design, this should all look pretty familiar and natural.
 
+### Declassified
+
 But, **do we really need to model this problem** with a parent `Controller` class, two child classes, **and some composition**? Is there a way to take advantage of OLOO-style behavior delegation and have a *much* simpler design? **Yes!**
 
 ```js
@@ -686,7 +688,7 @@ Lastly, we avoided the polymorphism pitfalls of class-oriented design by not hav
 
 **Bottom line**: we end up with the same capability, but a (significantly) simpler design. That's the power of OLOO-style code and the power of the *behavior delegation* design pattern.
 
-### Concise Methods
+## Nicer Syntax
 
 One of the nicer things that makes ES6's `class` so deceptively attractive (see Appendix A on why to avoid it!) is the short-hand syntax for declaring class methods:
 
@@ -712,7 +714,7 @@ var LoginController = {
 		// ...
 	}
 	// ...
-}
+};
 ```
 
 About the only difference is that object literals will still require `,` comma separators between elements whereas `class` syntax doesn't. Pretty minor concesssion in the whole scheme of things.
@@ -738,7 +740,7 @@ Object.setPrototypeOf( AuthController, LoginController );
 
 OLOO-style as of ES6, with concise methods, **is a lot friendlier** than it was before (and even then, it was much simpler and nicer than classical prototype-style code). **You don't have to opt for class** (complexity) to get nice clean object syntax!
 
-#### Unlexical
+### Unlexical
 
 There *is* one drawback to concise methods that's subtle but important to note. Consider this code:
 
@@ -760,11 +762,13 @@ var Foo = {
 
 See the difference? The `bar()` short-hand became an *anonymous function expression* (`function()..`) attached to the `bar` property, because the function object itself has no name identifier. Compare that to the manually specified *named function expression* (`function baz()..`) which has a lexical name identifier `baz` in addition to being attached to a `.baz` property.
 
-So what? In the *"Scope & Closures"* title of this *"You Don't Know JS"* book series, we cover the three main downsides of *anonymous function expressions* in detail. We'll just briefly repeat them so we can compare to the concise method short-hand:
+So what? In the *"Scope & Closures"* title of this *"You Don't Know JS"* book series, we cover the three main downsides of *anonymous function expressions* in detail. We'll just briefly repeat them so we can compare to the concise method short-hand.
 
-1. Lack of `name` makes debugging stack traces harder
-2. Lack of an identifier makes self-referencing (recursion, event (un)binding, etc) harder
-3. Lack of `name` makes code harder to understand
+Lack of a `name` identifier on an anonymous function:
+
+1. makes debugging stack traces harder
+2. makes self-referencing (recursion, event (un)binding, etc) harder
+3. makes code (a little bit) harder to understand
 
 Items 1 and 3 don't apply to concise methods.
 
@@ -789,16 +793,125 @@ var Foo = {
 };
 ```
 
-The manual `Foo.bar` reference above kind of suffices in this example, but there are many cases where a function wouldn't necessarily be able to do that, such as cases where the function is being shared in delegation across different objects, using `this` binding, etc. You would want to use a real self-reference, and the function object identifier is the best way to accomplish that.
+The manual `Foo.bar(x*2)` reference above kind of suffices in this example, but there are many cases where a function wouldn't necessarily be able to do that, such as cases where the function is being shared in delegation across different objects, using `this` binding, etc. You would want to use a real self-reference, and the function object's `name` identifier is the best way to accomplish that.
 
-Just be aware of this caveat to concise methods, and if you run into such issues with lack of self-reference, make sure to forgo the concise method syntax **just for that declaration** in favor of the manual *named function expression* declaration (`baz: function baz(){}`).
+Just be aware of this caveat to concise methods, and if you run into such issues with lack of self-reference, make sure to forgo the concise method syntax **just for that declaration** in favor of the manual *named function expression* declaration form: `baz: function baz(){..}`.
+
+## Introspection
+
+If you've spent much time with class oriented programming (either in JS or other languages), you're probably familiar with *type introspection*: inspecting an instance to find out what *kind* of object it is. The primary goal of *type introspection* with class instances is to reason about the structure/capabilities of the object based on *how is was created*.
+
+Consider this code which uses `instanceof` (see Chapter 5) for introspecting on an object `a1` to infer its capability:
+
+```js
+function Foo() {
+	// ...
+}
+Foo.prototype.something = function(){
+	// ...
+}
+
+var a1 = new Foo();
+
+// later
+
+if (a1 instanceof Foo) {
+	a1.something();
+}
+```
+
+Because `Foo.prototype` (not `Foo`!) is in the `[[Prototype]]` chain (see Chapter 5) of `a1`, the `instanceof` operator (confusingly) pretends to tell us that `a1` is an instance of the `Foo` "class". With this knowledge, we then assume that `a1` has the capabilities described by the `Foo` "class".
+
+Of course, there is no `Foo` class, only a plain old normal function `Foo`, which happens to have a reference to an arbitrary object (`Foo.prototype`) that `a1` happens to be delegation-linked to. By its syntax, `instanceof` pretends to be inspecting the relationship between `a1` and `Foo`, but it's actually telling us whether `a1` and (the arbitrary object referenced by) `Foo.prototype` are related.
+
+The semantic confusion (and indirection) of `instanceof` syntax  means that to use `instanceof`-based introspection to ask if object `a1` is related to the capabilities object in question, you *have to* have a function that holds a reference to that object -- you can't just directly ask if the two objects are related.
+
+Recall the abstract `Foo` / `Bar` / `b1` example from earlier in this chapter, which we'll abbreviate here:
+
+```js
+function Foo() { /* .. */ }
+Foo.prototype...
+
+function Bar() { /* .. */ }
+Bar.prototype = Object.create( Foo.prototype );
+
+var b1 = new Bar( "b1" );
+```
+
+For *type introspection* purposes on the entities in that example, using `instanceof` and `.prototype` semantics, here are the various checks you might need to perform:
+
+```js
+// relating `Foo` and `Bar` to each other
+Bar.prototype instanceof Foo; // true
+Object.getPrototypeOf( Bar.prototype ) === Foo.prototype; // true
+Foo.prototype.isPrototypeOf( Bar.prototype ); // true
+
+// relating `b1` to both `Foo` and `Bar`
+b1 instanceof Foo; // true
+b1 instanceof Bar; // true
+Object.getPrototypeOf( b1 ) === Bar.prototype; // true
+Foo.prototype.isPrototypeOf( b1 ); // true
+Bar.prototype.isPrototypeOf( b1 ); // true
+```
+
+It's fair to say that some of that kinda sucks. For instance, intuitively (with classes) you'd might want to be able to say something like `Bar instanceof Foo` (because it's easy to mix up what "instance" means to think it includes "inheritance"), but that's not a sensible comparison in JS. You have to do `Bar.prototype instanceof Foo` instead.
+
+Another common, but perhaps less robust, pattern for *type introspection*, which many devs seem to prefer over `instanceof`, is called "duck typing". This term comes from the adage, "if it looks like a duck, and it quacks like a duck, it must be a duck".
+
+Example:
+
+```js
+if (a1.something) {
+	a1.something();
+}
+```
+
+Rather than inspecting for a relationship between `a1` and an object that holds the delegatable `something()` function, we assume that the test for `a1.something` passing means `a1` has the capability to call `.something()` (regardless of if it found the method directly on `a1` or delegated to some other object). In and of itself, that assumption isn't so risky.
+
+But "duck typing" is often extended to make **other assumptions about the object's capabilities** besides what's being tested, which of course introduces more risk (aka, brittle design) into the test.
+
+One notable example of "duck typing" comes with ES6 Promises (as an earlier note explained is not being covered in this book).
+
+For various reasons, there's a need to determine if any arbitrary object reference *is a Promise*, but the way that test is done is to check if the object happens to have a `then()` function present on it. In other words, **if any object** happens to have a `then()` method, ES6 Promises will assume unconditionally that the object **is a Promise** and therefore will expect it to behave conformantly to all standard behaviors of Promises.
+
+If you have any non-Promise object that happens for whatever reason to have a `then()` method on it, you are strongly advised to keep it far away from the ES6 Promise mechanism to avoid broken assumptions.
+
+That example clearly illustrates the perils of "duck typing". You should only use such approaches sparingly and in controlled conditions.
+
+Turning our attention once again back to OLOO-style code as presented here in this chapter, *type introspection* turns out to be much cleaner. Let's recall (and abbreviate) the `Foo` / `Bar` / `b1` OLOO example from earlier in the chapter:
+
+```js
+var Foo = { /* .. */ };
+
+var Bar = Object.create( Foo );
+Bar...
+
+var b1 = Object.create( Bar );
+```
+
+Using this OLOO approach, where all we have are plain objects that are related via `[[Prototype]]` delegation, here's the quite simplified *type introspection* we might use:
+
+```js
+// relating `Foo` and `Bar` to each other
+Foo.isPrototypeOf( Bar ); // true
+Object.getPrototypeOf( Bar ) === Foo; // true
+
+// relating `b1` to both `Foo` and `Bar`
+Foo.isPrototypeOf( b1 ); // true
+Bar.isPrototypeOf( b1 ); // true
+Object.getPrototypeOf( b1 ) === Bar; // true
+```
+
+We're not using `instanceof` anymore, because it's confusingly pretending to have something to do with classes. Now, we just ask the (informally stated) question, "are you *a* prototype of me?" There's no more indirection necessary with stuff like `Foo.prototype` or the painfully verbose `Foo.prototype.isPrototypeOf(..)`.
+
+I think it's fair to say these checks are significantly less complicated/confusing that the previous set of introspection checks. **Yet again, we see that OLOO is simpler than (but with all the same power of) class-style coding in JavaScript.**
 
 ## Review (TL;DR)
 
-Classes and inheritance are a design pattern you can choose, or not choose, in your software architecture. Most developers take for granted that classes are the only (proper) way to organize code, but there's another lesser talked about pattern that's actually quite powerful: **behavior delegation**.
+Classes and inheritance are a design pattern you can *choose*, or *not choose*, in your software architecture. Most developers take for granted that classes are the only (proper) way to organize code, but here we've seen there's another less-commonly talked about pattern that's actually quite powerful: **behavior delegation**.
 
-Behavior delegation stresses objects as peers of each other, which delegate between them, rather than parent and child classes. JavaScript's `[[Prototype]]` mechanism is, by its very design nature, a behavior delegation mechanism. That means we can either choose to struggle to implement class mechanics on top of JS, or we can just embrace the natural state of `[[Prototype]]`.
+Behavior delegation suggests objects as peers of each other, which delegate amongst themselves, rather than parent and child class relationships. JavaScript's `[[Prototype]]` mechanism is, by its very designed nature, a behavior delegation mechanism. That means we can either choose to struggle to implement class mechanics on top of JS (see Chapters 4 and 5), or we can just embrace the natural state of `[[Prototype]]` as a delegation mechanism.
 
 When you design code with objects only, not only does it simplify the syntax you use, but it can actually lead to simpler code architecture design.
 
-**OLOO** (objects-linked-to-other-objects) is the code style I've delineated here which fits perfectly to objects-only code that leverages `[[Prototype]]` links for delegation.
+**OLOO** (objects-linked-to-other-objects) is a code style which creates and relates objects directly without the abstraction of classes. OLOO quite naturally implements `[[Prototype]]`-based behavior delegation.

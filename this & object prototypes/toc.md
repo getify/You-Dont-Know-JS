@@ -17,6 +17,7 @@
 	* Syntax
 	* Type
 	* Contents
+	* Iteration
 * Chapter 4: Mixing (Up) "Class" Objects
 	* Class Theory
 	* Class Mechanics
@@ -31,6 +32,8 @@
 	* Towards Delegation-Oriented Design
 	* Classes vs. Objects
 	* Simpler Design
+	* Nicer Syntax
+	* Introspection
 * Appendix A: ES6 `class`
 * Appendix B: Thank You's!
 

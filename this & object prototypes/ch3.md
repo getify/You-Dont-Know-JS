@@ -787,7 +787,7 @@ Whereas `in` vs. `Object.hasOwnProperty(..)` differ in whether they consult the 
 
 There's (currently) no built-in way to get a list of **all properties** which is equivalent to what the `in` operator test would consult (traversing all properties on the entire `[[Prototype]]` chain, as explained in Chapter 5). You could approximate such a utility by recursively traversing the `[[Prototype]]` chain of an object, and for each level, capturing the list from `Object.getOwnPropertyNames(..)`.
 
-#### Iteration
+## Iteration
 
 The `for..in` loop iterates over the list of enumerable properties on an object (including its `[[Prototype]]` chain). But what if you instead want to iterate over the values?
 
