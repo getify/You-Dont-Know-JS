@@ -101,7 +101,7 @@ anotherObject.a; // 3
 anotherObject.hasOwnProperty( "a" ); // true
 ```
 
-Though it may appear that `anotherObject.a++` should just increment the `myObject.a` property *in place* (even via the delegation), it corresponds to `anotherObject.a = anotherObject.a + 1`. This operation results in a `[[Get]]` look-up via `[[Prototype]]` to get the current value, increments that value by one, then using `[[Put]]` assigns the `3` value to a new shadowed property `a` on `anotherObject`.
+Though it may appear that `anotherObject.a++` should (via delegation) look-up and just increment the `myObject.a` property itself *in place*, instead the `++` operation corresponds to `anotherObject.a = anotherObject.a + 1`. The result is `[[Get]]` looking up `a` property via `[[Prototype]]` to get the current value `2`, incrementing the value by one, then `[[Put]]` assigning the `3` value to a new shadowed property `a` on `anotherObject`. Oops!
 
 Be very careful when dealing with delegated properties that you modify. If you wanted to increment `myObject.a`, the proper way is `myObject.a++`.
 
