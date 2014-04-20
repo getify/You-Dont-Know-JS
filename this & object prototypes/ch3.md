@@ -740,9 +740,7 @@ Object.defineProperty(
 );
 
 myObject.b; // 3
-
 ("b" in myObject); // true
-
 myObject.hasOwnProperty( "b" ); // true
 
 // .......
@@ -776,10 +774,14 @@ Object.defineProperty(
 	{ enumerable: false, value: 3 }
 );
 
-Object.keys( myObject ); // ["a"]
+myObject.propertyIsEnumerable( "a" ); // true
+myObject.propertyIsEnumerable( "b" ); // false
 
+Object.keys( myObject ); // ["a"]
 Object.getOwnPropertyNames( myObject ); // ["a", "b"]
 ```
+
+`propertyIsEnumerable(..)` tests whether the given property name exists *directly* on the object and is also `enumerable:true`.
 
 `Object.keys(..)` returns an array of all enumerable properties, whereas `Object.getOwnPropertyNames(..)` returns an array of *all* properties, enumerable or not.
 

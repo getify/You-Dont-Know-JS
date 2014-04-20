@@ -27,24 +27,46 @@ What is the `[[Prototype]]` reference used for? In Chapter 3, we examined the `[
 
 But it's what happens if `a` **isn't** present on `myObject` that brings our attention now to the `[[Prototype]]` link of the object.
 
-The default `[[Get]]` operation proceeds to follow the `[[Prototype]]` **link** of the object if it cannot find the requested property on the object directly. So, if for instance `a` is not present on `myObject`, but `myObject` has an internal `[[Prototype]]` link to another object `anotherObject`, the look-up will follow the linkage chain to `anotherObject` and inquire whether *it* has the property `a`.
+The default `[[Get]]` operation proceeds to follow the `[[Prototype]]` **link** of the object if it cannot find the requested property on the object directly.
 
 ```js
 var anotherObject = {
-	a: 42
+	a: 2
 };
 
 // create an object linked to `anotherObject`
 var myObject = Object.create( anotherObject );
 
-myObject.a; // 42
+myObject.a; // 2
 ```
 
-**Note:** We will explain what `Object.create(..)` does, and how it operates, shortly. For now, just assume it creates an object with the `[[Prototype]]` linkage we're examining.
+**Note:** We will explain what `Object.create(..)` does, and how it operates, shortly. For now, just assume it creates an object with the `[[Prototype]]` linkage we're examining to the object specified.
 
-If `a` weren't found on `anotherObject` either, the `[[Prototype]]` chain, if non-empty, is again consulted and followed.
+So, we have `myObject` that is now `[[Prototype]]` linked to `anotherObject`. Clearly `myObject.a` doesn't actually exist, but nevertheless, the property access succeeds (being found on `anotherObject` instead) and indeed finds the value `2`.
 
-This process continues until either a matching property name is found, or the `[[Prototype]]` chain ends. If no matching property is found, the return result from the `[[Get]]` operation is `undefined`.
+But, if `a` weren't found on `anotherObject` either, its `[[Prototype]]` chain, if non-empty, is again consulted and followed.
+
+This process continues until either a matching property name is found, or the `[[Prototype]]` chain ends. If no matching property is *ever* found by the end of the chain, the return result from the `[[Get]]` operation is `undefined`.
+
+Similar to this `[[Prototype]]` chain look-up process, if you use a `for..in` loop to iterate over an object, any property that can be reached via its chain (and is also `enumerable` -- see Chapter 3) will be enumerated. If you use the `in` operator to test for the existence of a property on an object, `in` will check the entire chain of the object (regardless of *enumerability*).
+
+```js
+var anotherObject = {
+	a: 2
+};
+
+// create an object linked to `anotherObject`
+var myObject = Object.create( anotherObject );
+
+for (var k in myObject) {
+	console.log("found: " + k);
+}
+// found: a
+
+("a" in myObject); // true
+```
+
+So, the `[[Prototype]]` chain is consulted, one link at a time, when you perform property look-ups in various fashions. The look-up stops once the property is found or the chain ends.
 
 ### `Object.prototype`
 
