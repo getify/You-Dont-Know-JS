@@ -98,34 +98,34 @@ Most developers assume that assignment of a property (`[[Put]]`) will always res
 
 If you want to create shadowing in cases #2 and #3, you cannot use `=` assignment, but must instead use `Object.defineProperty(..)` (see Chapter 3).
 
-Keep in mind, though, that shadowing with methods leads to the ugly *explicit pseudo-polymorphism* (see Chapter 4) if you need to delegate between them. In general, shadowing is more complicated and nuanced than it's worth, **so you should try to avoid it if possible** (see Chapter 6 for an alternative design pattern that discourages shadowing).
+Keep in mind, though, that shadowing with methods leads to the ugly *explicit pseudo-polymorphism* (see Chapter 4) if you need to delegate between them. In general, shadowing is more complicated and nuanced than it's worth, **so you should try to avoid it if possible** (see Chapter 6 for an alternative design pattern, which among other things discourages shadowing).
 
 Shadowing can occur implicitly in subtle ways. Consider:
 
 ```js
-var myObject = {
+var anotherObject = {
 	a: 2
 };
 
-var anotherObject = Object.create( myObject );
+var myObject = Object.create( anotherObject );
 
-myObject.a; // 2
 anotherObject.a; // 2
-
-myObject.hasOwnProperty( "a" ); // true
-anotherObject.hasOwnProperty( "a" ); // false
-
-anotherObject.a++; // oops, implicit shadowing!
-
 myObject.a; // 2
-anotherObject.a; // 3
 
 anotherObject.hasOwnProperty( "a" ); // true
+myObject.hasOwnProperty( "a" ); // false
+
+myObject.a++; // oops, implicit shadowing!
+
+anotherObject.a; // 2
+myObject.a; // 3
+
+myObject.hasOwnProperty( "a" ); // true
 ```
 
-Though it may appear that `anotherObject.a++` should (via delegation) look-up and just increment the `myObject.a` property itself *in place*, instead the `++` operation corresponds to `anotherObject.a = anotherObject.a + 1`. The result is `[[Get]]` looking up `a` property via `[[Prototype]]` to get the current value `2`, incrementing the value by one, then `[[Put]]` assigning the `3` value to a new shadowed property `a` on `anotherObject`. Oops!
+Though it may appear that `myObject.a++` should (via delegation) look-up and just increment the `anotherObject.a` property itself *in place*, instead the `++` operation corresponds to `myObject.a = myObject.a + 1`. The result is `[[Get]]` looking up `a` property via `[[Prototype]]` to get the current value `2` from `anotherObject.a`, incrementing the value by one, then `[[Put]]` assigning the `3` value to a new shadowed property `a` on `myObject`. Oops!
 
-Be very careful when dealing with delegated properties that you modify. If you wanted to increment `myObject.a`, the proper way is `myObject.a++`.
+Be very careful when dealing with delegated properties that you modify. If you wanted to increment `anotherObject.a`, the proper way is `anotherObject.a++`.
 
 ## "Class"
 
@@ -598,37 +598,132 @@ var bar = Object.create( foo );
 bar.something(); // Tell me something good...
 ```
 
-`Object.create(..)` creates a new object (`bar`) linked to the object you specify (`foo`), which gives you all the power (delegation) of the `[[Prototype]]` mechanism, but without any of the unnecessary complication of `new` functions acting as classes and constructor calls, confusing `.prototype` and `.constructor` references, or any of that extra stuff.
+`Object.create(..)` creates a new object (`bar`) linked to the object we specified (`foo`), which gives us all the power (delegation) of the `[[Prototype]]` mechanism, but without any of the unnecessary complication of `new` functions acting as classes and constructor calls, confusing `.prototype` and `.constructor` references, or any of that extra stuff.
 
 **Note:** `Object.create(null)` creates an object that has an empty (aka, `null`) `[[Prototype]]` linkage, and thus the object can't delegate anywhere. Since such an object has no prototype chain, the `instanceof` operator (explained earlier) has nothing to check, so it will always return `false`. These special empty-`[[Prototype]]` objects are often called "dictionaries" as they are typically used purely for storing data in properties, mostly because they have no possible surprise effects from any delegated properties/functions on the `[[Prototype]]` chain, and are thus purely flat data storage.
 
-We don't need classes to create meaningful relationships between two objects. The only thing we should **really care about** is objects linked together for delegation, and `Object.create(..)` gives us that linkage without all the class cruft.
+We don't *need* classes to create meaningful relationships between two objects. The only thing we should **really care about** is objects linked together for delegation, and `Object.create(..)` gives us that linkage without all the class cruft.
+
+#### `Object.create()` Polyfilled
+
+`Object.create(..)` was added in ES5. You may need to support pre-ES5 environments (like older IE's), so let's take a look at a simple **partial** polyfill for `Object.create(..)` that gives us the capability that we need even in those older JS environments:
+
+```js
+if (!Object.create) {
+	Object.create = function(o) {
+		function F(){}
+		F.prototype = o;
+		return new F();
+	};
+}
+```
+
+This polyfill works by using a throw-away `F` function, which we override its `.prototype` property to point to the object we want to link to. Then we use `new F()` construction to make a new object that will be linked as we specified.
+
+This usage of `Object.create(..)` is by far the most common usage of it, because it's the part that *can be* polyfilled. There's an additional set of functionality that the standard ES5 built-in `Object.create(..)` provides, which is **not polyfillable** for pre-ES5. As such, this capability is far-less commonly used. For completeness sake, let's look at that additional functionality:
+
+```js
+var anotherObject = {
+	a: 2
+};
+
+var myObject = Object.create( anotherObject, {
+	b: {
+		enumerable: false,
+		writable: true,
+		configurable: false,
+		value: 3
+	},
+	c: {
+		enumerable: true,
+		writable: false,
+		configurable: false,
+		value: 4
+	}
+} );
+
+myObject.hasOwnProperty( "a" ); // false
+myObject.hasOwnProperty( "b" ); // true
+myObject.hasOwnProperty( "c" ); // true
+
+myObject.a; // 2
+myObject.b; // 3
+myObject.c; // 4
+```
+
+The second argument to `Object.create(..)` specifies property names to add to the newly created object, via declaring each new property's *property descriptor* (see Chapter 3). Because polyfilling property descriptors into pre-ES5 is not possible, this additional functionality on `Object.create(..)` also can't be polyfilled.
+
+The vast majority of usage of `Object.create(..)` uses the polyfill-safe subset of functionality, so most developers are fine with using the **partial polyfill** in pre-ES5 environments.
+
+Some developers take a much stricter view, which is that no function should be polyfilled unless it can be *fully* polyfilled. Since `Object.create(..)` is one of those partial-polyfill'able utilities, this narrower perspective says that if you need to use any of the functionality of `Object.create(..)` in a pre-ES5 environment, instead of polyfilling, you should use a custom utility, and stay away from using the name `Object.create` entirely. You could instead define your own utility, like:
+
+```js
+function createObject(o) {
+	function F(){}
+	F.prototype = o;
+	return new F();
+}
+
+var anotherObject = {
+	a: 2
+};
+
+var myObject = createObject( anotherObject );
+
+myObject.a; // 2
+```
+
+I do not share this strict opinion. I fully endorse the common partial-polyfill of `Object.create(..)` as shown above, and using it in your code even in pre-ES5. I'll leave it to you reader to make your own decision.
 
 ### Links As Fallbacks?
 
-It may be tempting to think that these links *primarily* provide a sort of fallback for "missing" properties or methods. While that may be an observed outcome, I don't think it represents the right way of thinking about `[[Prototype]]`.
+It may be tempting to think that these links between object *primarily* provide a sort of fallback for "missing" properties or methods. While that may be an observed outcome, I don't think it represents the right way of thinking about `[[Prototype]]`.
 
 Consider:
 
 ```js
-var myObject = {
+var anotherObject = {
 	cool: function() {
 		console.log( "cool!" );
 	}
 };
 
-var yourObject = Object.create( myObject );
+var myObject = Object.create( anotherObject );
 
-yourObject.cool(); // "cool!"
+myObject.cool(); // "cool!"
 ```
 
-That code will work by virtue of `[[Prototype]]`, but if you wrote it that way so that `myObject` was acting as a fallback in case `yourObject` couldn't handle some property/method, odds are that your software is going to be harder to understand and maintain.
+That code will work by virtue of `[[Prototype]]`, but if you wrote it that way so that `anotherObject` was acting as a fallback **just in case** `myObject` couldn't handle some property/method that some developer may try to call, odds are that your software is going to be a bit more "magical" and harder to understand and maintain.
 
 That's not to say there aren't cases where fallbacks are an appropriate design pattern, but it's not very common or idiomatic in JS, so if you find yourself doing so, you might want to take a step back and reconsider if that's really appropriate and sensible design.
 
-**Note:** In ES6, an advanced functionality called `Proxy` is introduced which can provide something of a "method not found" type of behavior. `Proxy` is beyond the scope of this book, but will likely be covered in detail in a later book in the *"You Don't Know JS"* series.
+**Note:** In ES6, an advanced functionality called `Proxy` is introduced which can provide something of a "method not found" type of behavior. `Proxy` is beyond the scope of this book, but will be covered in detail in a later book in the *"You Don't Know JS"* series.
 
-Instead of fallbacks, the next chapter is going to explore a very different design pattern: **Delegation**, to help us understand a more appropriate way of designing our software with `[[Prototype]]`.
+**Don't miss an important but nuanced point here.**
+
+Designing software where you intend for a developer to for instance call `myObject.cool()` and have that work even though there is no `cool()` method on `myObject` introduces some "magic" into your API design that can be surprising for future developers who maintain your software.
+
+You can however design your API with less "magic" to it, but still take advantage of the power of `[[Prototype]]` linkage.
+
+```js
+var anotherObject = {
+	cool: function() {
+		console.log( "cool!" );
+	}
+};
+
+var myObject = Object.create( anotherObject );
+
+myObject.doCool = function() {
+	this.cool(); // internal delegation!
+};
+
+myObject.doCool(); // "cool!"
+```
+
+Here, we call `myObject.doCool()`, which is a method that *actually exists* on `myObject`, making our API design more explicit (less "magical"). *Internally*, our implementation follows the **delegation design pattern** (see Chapter 6), taking advantage of `[[Prototype]]` delegation to `anotherObject.cool`.
+
+In other words, delegation will tend to be less surprising/confusing if it's an internal implementation detail rather than plainly obvious in your API interface design. We will expound on **delegation** in great detail in the next chapter.
 
 ## Review (TL;DR)
 
