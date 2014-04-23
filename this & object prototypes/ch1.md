@@ -92,27 +92,27 @@ function foo(num) {
 
 foo.count = 0;
 
-var i, tmp;
+var i;
 
 for (i=0; i<10; i++) {
-	tmp = Math.random();
-	if (tmp > 0.5) {
-		foo( tmp );
+	if (i > 5) {
+		foo( i );
 	}
 }
-// foo: 0....
-// foo: 0....
-// ...
+// foo: 6
+// foo: 7
+// foo: 8
+// foo: 9
 
 // how many times was `foo` called?
 console.log( foo.count ); // 0 -- WTF?
 ```
 
-`foo.count` is *still* `0`, even though it's pretty unlikely that all ten generated random numbers were less than `0.5`, and indeed several `console.log` statements clearly indicate `foo` was in fact called. The frustration stems from a *too literal* interpretation of what `this` (in `this.count++`) means.
+`foo.count` is *still* `0`, even though the four `console.log` statements clearly indicate `foo(..)` was in fact called four times. The frustration stems from a *too literal* interpretation of what `this` (in `this.count++`) means.
 
-When the code does `foo.count = 0`, indeed it's adding a property `count` to the function object `foo`. But for the `this.count` reference inside of the function, `this` is not in fact pointing at all to that function object, and so even though the property names are the same, the root objects are different, and confusion ensues.
+When the code executes `foo.count = 0`, indeed it's adding a property `count` to the function object `foo`. But for the `this.count` reference inside of the function, `this` is not in fact pointing *at all* to that function object, and so even though the property names are the same, the root objects are different, and confusion ensues.
 
-**Note:** A responsible developer *should* ask at this moment, "If I was incrementing a `count` property but it wasn't the one I expected, which one *was* I incrementing?" In fact, were he to dig deeper, he would find that he had accidentally created a global variable `count` (see Chapter 2 for *how* that happened!), and it currently has the value `NaN`. Of course, once he identifies this peculiar outcome, he then has a whole other set of questions. "How was it global, and why did it end up `NaN` instead of some proper count value?" (see Chapter 2)
+**Note:** A responsible developer *should* ask at this moment, "If I was incrementing a `count` property but it wasn't the one I expected, which `count` *was* I incrementing?" In fact, were she to dig deeper, she would find that she had accidentally created a global variable `count` (see Chapter 2 for *how* that happened!), and it currently has the value `NaN`. Of course, once she identifies this peculiar outcome, she then has a whole other set of questions: "How was it global, and why did it end up `NaN` instead of some proper count value?" (see Chapter 2).
 
 Instead of stopping at this point and digging into why the `this` reference doesn't seem to be behaving as *expected*, and answering those tough but important questions, many developers simply avoid the issue altogether, and hack toward some other solution, such as creating another object to hold the `count` property:
 
@@ -128,25 +128,25 @@ var data = {
 	count: 0
 };
 
-var i, tmp;
+var i;
 
 for (i=0; i<10; i++) {
-	tmp = Math.random();
-	if (tmp > 0.5) {
-		foo( tmp );
+	if (i > 5) {
+		foo( i );
 	}
 }
-// foo: 0....
-// foo: 0....
-// ...
+// foo: 6
+// foo: 7
+// foo: 8
+// foo: 9
 
 // how many times was `foo` called?
-console.log( data.count ); // will be correct now! yay?
+console.log( data.count ); // 4
 ```
 
-While it is true that this approach "solves" their problem, unfortunately it simply ignores the real problem -- lack of understanding what `this` means and how it works -- and instead falls back to the comfort zone of a more familiar mechanism: lexical scope.
+While it is true that this approach "solves" the problem, unfortunately it simply ignores the real problem -- lack of understanding what `this` means and how it works -- and instead falls back to the comfort zone of a more familiar mechanism: lexical scope.
 
-**Note:** Lexical scope is a perfectly fine and useful mechanism; I am not belittling the use of it, by any means (see *"Scope & Closures" title of this book series). But constantly *guessing* at how to use `this`, and usually being *wrong*, is not a good reason to retreat back to lexical scope and never learn *why* `this` eludes you.
+**Note:** Lexical scope is a perfectly fine and useful mechanism; I am not belittling the use of it, by any means (see *"Scope & Closures"* title of this book series). But constantly *guessing* at how to use `this`, and usually being *wrong*, is not a good reason to retreat back to lexical scope and never learn *why* `this` eludes you.
 
 To reference a function object from inside itself, `this` by itself will typically be insufficient. You generally need a reference to the function object via a lexical identifier (variable) that points at it.
 
@@ -181,23 +181,23 @@ function foo(num) {
 
 foo.count = 0;
 
-var i, tmp;
+var i;
 
 for (i=0; i<10; i++) {
-	tmp = Math.random();
-	if (tmp > 0.5) {
-		foo( tmp );
+	if (i > 5) {
+		foo( i );
 	}
 }
-// foo: 0....
-// foo: 0....
-// ...
+// foo: 6
+// foo: 7
+// foo: 8
+// foo: 9
 
 // how many times was `foo` called?
-console.log( foo.count ); // Works! Forget `this`!
+console.log( foo.count ); // 4
 ```
 
-However, that approach similarly side-steps *actual* understanding of `this` and relies entirely on the variable name `foo`.
+However, that approach similarly side-steps *actual* understanding of `this` and relies entirely on the lexical scoping of variable `foo`.
 
 Yet another way of approaching the issue is to force `this` to actually point at the `foo` function object:
 
@@ -213,19 +213,22 @@ function foo(num) {
 
 foo.count = 0;
 
-var i, tmp;
+var i;
 
 for (i=0; i<10; i++) {
-	tmp = Math.random();
-	if (tmp > 0.5) {
+	if (i > 5) {
 		// using `call(..)`, we ensure the `this`
 		// points at the function object (`foo`) itself
-		foo.call( foo, tmp );
+		foo.call( foo, i );
 	}
 }
+// foo: 6
+// foo: 7
+// foo: 8
+// foo: 9
 
 // how many times was `foo` called?
-console.log( foo.count ); // Works! `this` FTW!
+console.log( foo.count ); // 4
 ```
 
 **Instead of avoiding `this`, we embrace it.** We'll explain in a little bit *how* such techniques work much more completely, so don't worry if you're still a bit confused!
