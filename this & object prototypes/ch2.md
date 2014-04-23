@@ -169,7 +169,9 @@ var obj = {
 
 var bar = obj.foo; // function reference/alias!
 
-bar(); // undefined
+var a = "oops, global"; // `a` also property on global object
+
+bar(); // "oops, global"
 ```
 
 Even though `bar` appears to be a reference to `obj.foo`, in fact, it's really just another reference to `foo` itself. Moreover, the call-site is what matters, and the call-site is `bar()`, which is a plain, un-decorated call and thus the *default binding* applies.
@@ -192,7 +194,9 @@ var obj = {
 	foo: foo
 };
 
-doFoo( obj.foo ); // undefined
+var a = "oops, global"; // `a` also property on global object
+
+doFoo( obj.foo ); // "oops, global"
 ```
 
 Parameter passing is just an implicit assignment, and since we're passing a function, it's an implicit reference assignment, so the end result is the same as the previous snippet.
@@ -209,7 +213,9 @@ var obj = {
 	foo: foo
 };
 
-setTimeout( obj.foo, 100 ); // undefined
+var a = "oops, global"; // `a` also property on global object
+
+setTimeout( obj.foo, 100 ); // "oops, global"
 ```
 
 Think about this crude theoretical pseudo-implementation of `setTimeout()` provided as a built-in from the JavaScript environment:
