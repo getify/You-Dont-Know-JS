@@ -318,7 +318,7 @@ function foo(something) {
 // simple PoC `bind` helper
 function bind(fn, obj) {
 	return function() {
-		fn.apply( obj, arguments );
+		return fn.apply( obj, arguments );
 	};
 }
 
