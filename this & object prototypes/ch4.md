@@ -23,11 +23,13 @@ Let's explore this classification process by looking at a commonly cited example
 
 We model this relationship in software with classes by defining a `Vehicle` class and a `Car` class.
 
-The definition of `Vehicle` might include things like propulsion (engines, etc), the ability to carry people, etc. What we define in `Vehicle` is all the stuff that is common to all (or most of) the different types of vehicles (the "planes, trains, and automobiles").
+The definition of `Vehicle` might include things like propulsion (engines, etc), the ability to carry people, etc, which would all be the behaviors. What we define in `Vehicle` is all the stuff that is common to all (or most of) the different types of vehicles (the "planes, trains, and automobiles").
 
 It might not make sense in our software to re-define the basic essence of "ability to carry people" over and over again for each different type of vehicle. Instead, we define that capability once in `Vehicle`, and then when we define `Car`, we simply indicate that it "inherits" (or "extends") the base definition from `Vehicle`. The definition of `Car` is said to specialize the general `Vehicle` definition.
 
-**And thus, classes and inheritance emerge.**
+While `Vehicle` and `Car` collectively define the behavior by way of methods, the data in an instance would be things like the unique VIN of a specific car, etc.
+
+**And thus, classes, inheritance, and instantiation emerge.**
 
 Another key concept with classes is "polymorphism", which describes the idea that a general behavior from a parent class can be overriden in a child class to give it more specifics. In fact, relative polymorphism let's us reference the base behavior from the overriden behavior.
 
