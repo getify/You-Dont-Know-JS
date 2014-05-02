@@ -541,7 +541,7 @@ myObject.b = 3;
 myObject.b; // undefined
 ```
 
-In non-`strict mode`, the creation of `b` fails silently. In `strict mode`, it throws a `TypeError`.
+In `non-strict mode`, the creation of `b` fails silently. In `strict mode`, it throws a `TypeError`.
 
 #### Seal
 
