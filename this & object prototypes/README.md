@@ -1,5 +1,11 @@
 # You Don't Know JS: *this* & Object Prototypes
 
+-----
+
+**[Purchase digital/print copy from O'Reilly](http://shop.oreilly.com/product/0636920033738.do)**
+
+-----
+
 [Table of Contents](toc.md)
 
 * [Preface](../preface.md)
