@@ -248,7 +248,7 @@ function foo() {
 }
 
 function bar() {
-	console.log( a );
+	console.log( this.a );
 }
 
 foo(); //ReferenceError: a is not defined
