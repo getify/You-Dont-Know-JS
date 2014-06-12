@@ -229,7 +229,7 @@ var b = -1 / 0; // -Infinity
 
 As you can see, `-Infinity` results from a divide-by-zero where either (but not both!) of the divide operands is negative.
 
-Contrary to mathematics, because JS uses finite number representations (IEEE-754 foating point, which will be covered later), it *is* possible to overflow (or underflow) with an operation even like addition or subtraction, in which case you'd respectively get `Infinity` or `-Infinity`.
+Contrary to mathematics, because JS uses finite number representations (IEEE-754 foating point, which will be covered later), it *is* possible to overflow (or underflow) even with an operation like addition or subtraction, in which case you'd respectively get `Infinity` or `-Infinity`.
 
 For example:
 
