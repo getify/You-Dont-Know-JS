@@ -3,7 +3,7 @@
 
 Most developers would tell you that a dynamic language (like JS) does not have *types*. Let's see what the authors of the ES5.1 specification have to say on the topic:
 
-> Algorithms within this specification manipulate values each of which has an associated type. The possible value types are exactly those defined in this clause. Types are further subclassified into ECMAScript language types and specification types.
+> Algorithms within this specification manipulate values each of which has an associated type. The possible value types are exactly those defined in this clause. Types are further sub classified into ECMAScript language types and specification types.
 >
 > An ECMAScript language type corresponds to values that are directly manipulated by an ECMAScript programmer using the ECMAScript language. The ECMAScript language types are Undefined, Null, Boolean, String, Number, and Object.
 
@@ -84,7 +84,7 @@ There are several special values spread across the various types which the *aler
 
 For the `undefined` type, there is one and only one value: `undefined`. For the `null` type, there is one and only one value: `null`. So for both of them, the label is both its type and its value.
 
-Both `undefined` and `null` are often taken to be interchanable as either "empty" values or "non" values. Other developers prefer to distinguish between them with nuance, like for instance:
+Both `undefined` and `null` are often taken to be interchangeable as either "empty" values or "non" values. Other developers prefer to distinguish between them with nuance, like for instance:
 
 * `null` is an empty value
 * `undefined` is a missing value
