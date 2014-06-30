@@ -354,7 +354,9 @@ console.log( b ); // 5
 
 `bind(..)` returns a new function that is hard-coded to call the original function with the `this` context set as you specified.
 
-#### API call "contexts"
+**Note:** As of ES6, the hard-bound function produced by `bind(..)` has a `.name` property that derives from the original *target function*. For example: `bar = foo.bind(..)` should have a `bar.name` value of `"bound foo"`, which is the function call name that should show up in a stack trace.
+
+#### API Call "Contexts"
 
 Many libraries' functions, and indeed many new built-in functions in the JavaScript language and host environment, provide an optional parameter, usually called "context", which is designed as a work-around for you not having to use `bind(..)` to ensure your callback function uses a particular `this`.
 
