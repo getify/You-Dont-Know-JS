@@ -125,7 +125,7 @@ c1.count === c2.count; // true
 
 The biggest problem here is that it betrays the `class` syntax by exposing (leakage!) `.prototype` as an implementation detail.
 
-But, we also still have the surprise gotcha that `this.count++` would implicitly creates a separate shadowed `.count` property on both `c1` and `c2` objects, rather than updating the shared state. `class` offers us no consolation from that issue, except (presumably) to imply by lack of syntactic support that you shouldn't be doing that *at all*.
+But, we also still have the surprise gotcha that `this.count++` would implicitly create a separate shadowed `.count` property on both `c1` and `c2` objects, rather than updating the shared state. `class` offers us no consolation from that issue, except (presumably) to imply by lack of syntactic support that you shouldn't be doing that *at all*.
 
 Moreover, accidental shadowing is still a hazard:
 

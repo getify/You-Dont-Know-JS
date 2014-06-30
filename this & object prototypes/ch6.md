@@ -592,7 +592,7 @@ We won't belabor lots of explanation about this example, as it should be fairly 
 
 We have base behaviors that all controllers share, which are `success(..)`, `failure(..)` and `showDialog(..)`. Our child classes `LoginController` and `AuthController` override `failure(..)` and `success(..)` to augment the default base class behavior. Also note that `AuthController` needs an instance of `LoginController` to interact with the login form, so that becomes a member data property.
 
-The other thing to mention is that we chose some *composition* to sprinkle in on top of the inheritance. `AuthController` needed to know about `LoginController`, so we instantiated it (`new LoginController()`) and kept a class member property called `this.login` to reference it, so that `AuthController` could invoke behavior on `LoginController`.
+The other thing to mention is that we chose some *composition* to sprinkle in on top of the inheritance. `AuthController` needs to know about `LoginController`, so we instantiate it (`new LoginController()`) and keep a class member property called `this.login` to reference it, so that `AuthController` can invoke behavior on `LoginController`.
 
 **Note:** There *might* have been a slight temptation to make `AuthController` inherit from `LoginController`, or vice versa, such that we had *virtual composition* through the inheritance chain. But this is a strongly clear example of what's wrong with class inheritance as *the* model for the problem domain, because neither `AuthController` nor `LoginController` are specializing base behavior of the other, so inheritance between them makes little sense except if classes are your only design pattern. Instead, we layered in some simple *composition* and now they can cooperate, while still both benefiting from the inheritance from the parent base `Controller`.
 
@@ -696,7 +696,7 @@ One of the nicer things that makes ES6's `class` so deceptively attractive (see 
 
 ```js
 class Foo {
-	method() { /* .. */ }
+	methodName() { /* .. */ }
 }
 ```
 
@@ -872,7 +872,7 @@ Rather than inspecting for a relationship between `a1` and an object that holds 
 
 But "duck typing" is often extended to make **other assumptions about the object's capabilities** besides what's being tested, which of course introduces more risk (aka, brittle design) into the test.
 
-One notable example of "duck typing" comes with ES6 Promises (as an earlier note explained is not being covered in this book).
+One notable example of "duck typing" comes with ES6 Promises (which as an earlier note explained are not being covered in this book).
 
 For various reasons, there's a need to determine if any arbitrary object reference *is a Promise*, but the way that test is done is to check if the object happens to have a `then()` function present on it. In other words, **if any object** happens to have a `then()` method, ES6 Promises will assume unconditionally that the object **is a Promise** and therefore will expect it to behave conformantly to all standard behaviors of Promises.
 
