@@ -550,6 +550,8 @@ if (!Function.prototype.bind) {
 }
 ```
 
+**Note:** The `bind(..)` polyfill shown above differs from the built-in `bind(..)` in ES5 with respect to hard-bound functions that will be used with `new` (see below for why that's useful). Because the polyfill cannot create a function without a `.prototype` as the built-in utility does, there's some nuanced indirection to approximate the same behavior. Tread carefully if you plan to use `new` with a hard-bound function and you rely on this polyfill.
+
 The part that's allowing `new` overriding is:
 
 ```js
@@ -566,9 +568,24 @@ We won't actually dive into explaining how this trickery works (it's complicated
 
 Why is `new` being able to override *hard binding* useful?
 
-Imagine a function that you are given (might be hard-bound, might not, you don't know), and you want to use that function but *not* cause any side-effects on any object it may have been hard-bound to. Call it with `new`, and you **always** get the newly constructed object back, regardless of if the function was previously hard-bound.
+The primary reason for this behavior is to create a function (that can be used with `new` for constructing objects) that essentially ignores the `this` *hard binding* but which presets some or all of the function's arguments. One of the capabilities of `bind(..)` is that any arguments passed after the first `this` binding argument are defaulted as standard arguments to the underlying function (technically called "partial application", which is a subset of "currying").
 
-While that distinction may not be a terribly common need in everyday coding, it's important to fully understand how all these parts of the mechanism interact, so we have an accurate set of rules to analyze and predict its outcome.
+For example:
+
+```js
+function foo(p1,p2) {
+	this.val = p1 + p2;
+}
+
+// using `null` here because we don't care about
+// the `this` hard-binding in this scenario, and
+// it will be overriden by the `new` call anyway!
+var bar = foo.bind( null, "p1" );
+
+var baz = new bar( "p2" );
+
+baz.val; // p1p2
+```
 
 ### Determining `this`
 
@@ -636,6 +653,8 @@ Both these utilities require a `this` binding for the first parameter. If the fu
 However, there's a slight hidden "danger" in always using `null` when you don't care about the `this` binding. If you ever use that against a function call (for instance, a third-party library function that you don't control), and that function *does* make a `this` reference, the *default binding* rule means it might inadvertently reference (or worse, mutate!) the `global` object (`window` in the browser).
 
 Obviously, such a pitfall can lead to a variety of *very difficult* to diagnose/track-down bugs.
+
+#### Safer `this`
 
 Perhaps a somewhat "safer" practice is to pass a specifically set up object for `this` which is guaranteed not to be an object that can create problematic side effects in your program. Borrowing terminology from networking (and the military), we can create a "DMZ" (de-militarized zone) object -- nothing more special than a completely empty, non-delegated (see Chapters 5 and 6) object.
 
