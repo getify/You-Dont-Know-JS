@@ -459,6 +459,8 @@ Object.defineProperty( myObject, "a", {
 
 The final `defineProperty(..)` call results in a TypeError, regardless of `strict mode`, if you attempt to change the descriptor definition of a non-configurable property. Be careful: as you can see, changing `configurable` to `false` is a **one-way action, and cannot be undone!**
 
+**Note:** There's a nuanced exception to be aware of: even if the property is already `configurable:false`, `writable` can always be changed from `true` to `false` without error, but not back to `true` if already `false`.
+
 Another thing `configurable:false` prevents is the ability to use the `delete` operator to remove an existing property.
 
 ```js
