@@ -680,7 +680,7 @@ var controller1 = Object.create( AuthController );
 var controller2 = Object.create( AuthController );
 ```
 
-With behavior delegation, `AuthController` and `LoginController` are **just objects**, *horizontal* peers of each other, and are not arranged or related as parents and children in class-orientation. We somewhat arbitrarily chose to have `AuthController` delegate to `LoginController` -- it would have been just as vaild for the delegation to go the reverse direction.
+With behavior delegation, `AuthController` and `LoginController` are **just objects**, *horizontal* peers of each other, and are not arranged or related as parents and children in class-orientation. We somewhat arbitrarily chose to have `AuthController` delegate to `LoginController` -- it would have been just as valid for the delegation to go the reverse direction.
 
 The main takeaway from this second code listing is that we only have two entities (`LoginController` and `AuthController`), **not three** as before.
 
