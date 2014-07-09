@@ -41,7 +41,7 @@ You may never have thought about classes as a "design pattern", since it's most 
 
 Depending on your level of formal education in programming, you may have heard of "procedural programming" as a way of describing code which only consists of procedures (aka, functions) calling other functions, without any higher abstractions. You may have been taught that classes were the *proper* way to transform procedural-style "spaghetti code" into well-formed, well-organized code.
 
-Of course, if you have experience with "functional programming" (Monads, etc), you know very well that classes are just one of many several common design patterns. But for others, this may be the first time you've asked yourself if classes really are a fundamental foundation for code, or if they are an optional abstraction on top of code.
+Of course, if you have experience with "functional programming" (Monads, etc), you know very well that classes are just one of several common design patterns. But for others, this may be the first time you've asked yourself if classes really are a fundamental foundation for code, or if they are an optional abstraction on top of code.
 
 Some languages (like Java) don't give you the choice, so it's not very *optional* at all -- everything's a class. Other languages like C/C++ or PHP give you a both procedural and class-oriented syntaxes, and it's left more to the developer's choice which style or mixture of styles is appropriate.
 
@@ -190,7 +190,7 @@ So then we define two specific kinds of vehicle: `Car` and `SpeedBoat`. They eac
 
 This technique is called "polymorphism", or "virtual polymorphism". More specifically to our current point, we'll call it "relative polymorphism".
 
-Polymorphism is a much broader topic than we will exhaust here, but our current "relative" semantics refers to one particular aspect: the idea that any method can reference another method (of the same or different name) at a higher level of the inheritance heirarchy. We say "relative" because we don't absolutely define which inheritance level (aka, class) we want to access, but rather relatively reference it by essentially saying "one level up".
+Polymorphism is a much broader topic than we will exhaust here, but our current "relative" semantics refers to one particular aspect: the idea that any method can reference another method (of the same or different name) at a higher level of the inheritance heirarchy. We say "relative" because we don't absolutely define which inheritance level (aka, class) we want to access, but rather relatively reference it by essentially saying "look one level up".
 
 In many languages, the keyword `super` is used, in place of this example's `inherited:`, which leans on the idea that a "super class" is the parent/ancestor of the current class.
 
@@ -202,11 +202,11 @@ We see two occurrences of that behavior in our example above: `drive()` is defin
 
 An interesting implication of polymorphism can be seen specifically with `ignition()`. Inside `pilot()`, a relative-polymorphic reference is made to (the inherited) `Vehicle`s version of `drive()`. But that `drive()` references an `ignition()` method just by name (no relative reference).
 
-Which version of `ignition()` will the language engine use, the one from `Vehicle` or the one from `SpeedBoat`? **It uses the `SpeedBoat` version of `ignition()`.** Moreover, if you *were* to instantiate `Vehicle` class itself, and then call its `drive()`, the language engine would instead just use `Vehicle`s `ignition()` method definition.
+Which version of `ignition()` will the language engine use, the one from `Vehicle` or the one from `SpeedBoat`? **It uses the `SpeedBoat` version of `ignition()`.** If you *were* to instantiate `Vehicle` class itself, and then call its `drive()`, the language engine would instead just use `Vehicle`s `ignition()` method definition.
 
 Put another way, the definition for the method `ignition()` *polymorphs* (changes) depending on which class (level of inheritance) you are referencing an instance of.
 
-This may seem like overly deep academic detail. But understanding these details is necessary to properly contrast similar (but different) behaviors in JavaScript's `[[Prototype]]` mechanism.
+This may seem like overly deep academic detail. But understanding these details is necessary to properly contrast similar (but distinct) behaviors in JavaScript's `[[Prototype]]` mechanism.
 
 When classes are inherited, there is a way **for the classes themselves** (not the object instances created from them!) to *relatively* reference the class inherited from, and this relative reference is usually called `super`.
 
@@ -234,7 +234,7 @@ There's another variation, the so called "Diamond Problem", which refers to the 
 
 These complications go even much deeper than this quick glance. We address them here only so we can contrast to how JavaScript's mechanisms work.
 
-JavaScript is simpler: it does not provide a native mechanism for "multiple inheritance". Many see this is a good thing, because the complexity savings more than make up for the "reduced" functionality. But this doesn't stop developers from trying to fake it in various ways, as we'll see shortly.
+JavaScript is simpler: it does not provide a native mechanism for "multiple inheritance". Many see this is a good thing, because the complexity savings more than make up for the "reduced" functionality. But this doesn't stop developers from trying to fake it in various ways, as we'll see next.
 
 ## Mixins
 
@@ -244,10 +244,10 @@ Since observed class behaviors in other languages imply copies, let's examine ho
 
 ### Explicit Mixins
 
-Let's again revisit our `Vehicle` and `Car` example from before. Since JavaScript will not automatically copy behavior from `Vehicle` to `Car`, we can instead create a utility that manually copies. Such a utility is often called `extend` by many libraries/frameworks, but we will call it `mixin()` here for illustrative purposes.
+Let's again revisit our `Vehicle` and `Car` example from before. Since JavaScript will not automatically copy behavior from `Vehicle` to `Car`, we can instead create a utility that manually copies. Such a utility is often called `extend(..)` by many libraries/frameworks, but we will call it `mixin(..)` here for illustrative purposes.
 
 ```js
-// vastly simplified `mixin()` example:
+// vastly simplified `mixin(..)` example:
 function mixin( sourceObj, targetObj ) {
 	for (var key in sourceObj) {
 		// only copy if not already present
@@ -290,7 +290,7 @@ var Car = mixin( Vehicle, {
 
 #### "Polymorphism" Revisited
 
-Let's examine this statement: `Vehicle.drive.call( this )`. This is what we'll call "explicit pseudo-polymorphism". Recall in our previous pseudo-code this line was `inherited:drive()`, which we called "relative polymorphism".
+Let's examine this statement: `Vehicle.drive.call( this )`. This is what I call "explicit pseudo-polymorphism". Recall in our previous pseudo-code this line was `inherited:drive()`, which we called "relative polymorphism".
 
 JavaScript does not have (prior to ES6; see Appendix A) a facility for relative polymorphism. So, **because both `Car` and `Vehicle` had a function of the same name: `drive()`**, to distinguish a call to one or the other, we must make an absolute (not relative) reference. We explicitly specify the `Vehicle` object by name, and call the `drive()` function on it.
 
@@ -457,7 +457,7 @@ With `Something.cool.call( this )`, which can happen either in a "constructor" c
 
 So, it is said that we "mixed in" `Something`s behavior with (or into) `Another`.
 
-While this sort of technique seems to take useful advantage of `this` rebinding functionality, it is the brittle `Something.cool.call( this )` call, which cannot be made into a relative (and thus more flexible) reference, which you should **heed with caution**. Generally, **avoid such constructs where possible** to keep cleaner and more maintainable code.
+While this sort of technique seems to take useful advantage of `this` rebinding functionality, it is the brittle `Something.cool.call( this )` call, which cannot be made into a relative (and thus more flexible) reference, that you should **heed with caution**. Generally, **avoid such constructs where possible** to keep cleaner and more maintainable code.
 
 ## Review (TL;DR)
 

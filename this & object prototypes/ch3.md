@@ -81,7 +81,7 @@ Object.prototype.toString.call( strObject ); // [object String]
 
 We'll see in detail in a later chapter exactly how the `Object.prototype.toString...` bit works, but briefly, we can inspect the internal sub-type by borrowing the base default `toString()` method, and you can see it reveals that `strObject` is an object that was in fact created by the `String` constructor.
 
-The primitive value `"I am a string"` is not an object, it's a primitive literal and immutable value. To perform operations on it, such as checking its length, modifying its contents, etc, a `String` object is required.
+The primitive value `"I am a string"` is not an object, it's a primitive literal and immutable value. To perform operations on it, such as checking its length, accessing its individual character contents, etc, a `String` object is required.
 
 Luckily, the language automatically coerces a `"string"` primitive to a `String` object when necessary, which means you almost never need to explicitly create the Object form. It is **strongly preferred** by the majority of the JS community to use the literal form for a value, where possible, rather than the constructed object form.
 
@@ -320,13 +320,13 @@ Moreover, it's not really clear what "duplicating" a function would mean? There 
 
 So how do we resolve all these tricky questions? Various JS frameworks have each picked their own interpretations and made their own decisions. But which of these (if any) should JS adopt as *the* standard. For a long time, there was no clear answer.
 
-One subset solution is that objects which are JSON-safe (that is, can be serialized to a JSON string and then re-parsed to the same object) can easily be *duplicated* with:
+One subset solution is that objects which are JSON-safe (that is, can be serialized to a JSON string and then re-parsed to an object with the same structure and values) can easily be *duplicated* with:
 
 ```js
 var newObj = JSON.parse( JSON.stringify( someObj ) );
 ```
 
-Of course, that requires you to ensure your object is JSON safe. For some domains, that's trivial. For others, it's insufficient.
+Of course, that requires you to ensure your object is JSON safe. For some situations, that's trivial. For others, it's insufficient.
 
 At the same time, a shallow copy is fairly understandable and has far less issues, so ES6 has now defined `Object.assign(..)` for this task. `Object.assign(..)` takes a *target* object as its first parameter, and one or more *source* objects as its subsequent parameters. It iterates over all the *enumerable* (see below), *owned keys* (**immediately present**) on the *source* object(s) and copies them (via `=` assignment only) to *target*. It also, helpfully, returns *target*, as you can see below:
 
@@ -376,7 +376,7 @@ Object.defineProperty( myObject, "a", {
 	value: 2,
 	writable: true,
 	configurable: true,
-	enumerable: false
+	enumerable: true
 } );
 
 myObject.a; // 2
@@ -397,7 +397,7 @@ Object.defineProperty( myObject, "a", {
 	value: 2,
 	writable: false, // not writable!
 	configurable: true,
-	enumerable: false
+	enumerable: true
 } );
 
 myObject.a = 3;
@@ -416,7 +416,7 @@ Object.defineProperty( myObject, "a", {
 	value: 2,
 	writable: false, // not writable!
 	configurable: true,
-	enumerable: false
+	enumerable: true
 } );
 
 myObject.a = 3; // TypeError
@@ -484,7 +484,7 @@ delete myObject.a;
 myObject.a; // 2
 ```
 
-As you can see, the last `delete` call failed because we made the `a` property non-configurable.
+As you can see, the last `delete` call failed (silently) because we made the `a` property non-configurable.
 
 `delete` is only used to remove object properties (which can be removed) directly from the object in question. If an object property is the last remaining *reference* to some object/function, and you `delete` it, that removes the reference and now that unreferenced object/function can be garbage collected. But, it is **not** proper to think of `delete` as a tool to free up allocated memory as it does in other languages (like C/C++). `delete` is just an object property removal operation -- nothing more.
 
@@ -676,7 +676,7 @@ myObject.a; // 2
 
 Since we only defined a getter for `a`, if we try to set the value of `a` later, the set operation won't throw an error but will just silently throw the assignment away. Even if there was a valid setter, our custom getter is hard-coded to return only `2`, so the set operation would be moot.
 
-To make this scenario more sensible, properties should also be defined with setters, which override the default `[[Put]]` operation (aka, assignment), per-property, just as you'd expect. You will almost certainly want to always declare both getter and setter, as having only one or the other often leads to unexpected/surprising behavior.
+To make this scenario more sensible, properties should also be defined with setters, which override the default `[[Put]]` operation (aka, assignment), per-property, just as you'd expect. You will almost certainly want to always declare both getter and setter (having only one or the other often leads to unexpected/surprising behavior):
 
 ```js
 var myObject = {
@@ -791,9 +791,9 @@ Object.getOwnPropertyNames( myObject ); // ["a", "b"]
 
 `Object.keys(..)` returns an array of all enumerable properties, whereas `Object.getOwnPropertyNames(..)` returns an array of *all* properties, enumerable or not.
 
-Whereas `in` vs. `hasOwnProperty(..)` differ in whether they consult the `[[Prototype]]` chain or not, respectively, `Object.keys(..)` and `Object.getOwnPropertyNames(..)` both inspect *only* the direct object specified.
+Whereas `in` vs. `hasOwnProperty(..)` differ in whether they consult the `[[Prototype]]` chain or not, `Object.keys(..)` and `Object.getOwnPropertyNames(..)` both inspect *only* the direct object specified.
 
-There's (currently) no built-in way to get a list of **all properties** which is equivalent to what the `in` operator test would consult (traversing all properties on the entire `[[Prototype]]` chain, as explained in Chapter 5). You could approximate such a utility by recursively traversing the `[[Prototype]]` chain of an object, and for each level, capturing the list from `Object.getOwnPropertyNames(..)`.
+There's (currently) no built-in way to get a list of **all properties** which is equivalent to what the `in` operator test would consult (traversing all properties on the entire `[[Prototype]]` chain, as explained in Chapter 5). You could approximate such a utility by recursively traversing the `[[Prototype]]` chain of an object, and for each level, capturing the list from `Object.keys(..)` -- only enumerable properties.
 
 ## Iteration
 
@@ -816,13 +816,13 @@ ES5 also added several iteration helpers for arrays, including `forEach(..)`, `e
 
 `forEach(..)` will iterate over all values in the array, and ignores any callback return values. `every(..)` keeps going until the end *or* the callback returns a `false` (or "falsy") value, whereas `some(..)` keeps going until the end *or* the callback returns a `true` (or "truthy") value.
 
-These special return values from `every(..)` and `some(..)` act somewhat like a `break` statment inside a normal `for` loop, in that they stop the iteration early before it reaches the end.
+These special return values inside `every(..)` and `some(..)` act somewhat like a `break` statment inside a normal `for` loop, in that they stop the iteration early before it reaches the end.
 
 If you iterate on an object with a `for..in` loop, you're also only getting at the values indirectly, because it's actually iterating only over the enumerable properties of the object, leaving you to access the properties manually to get the values.
 
 **Note:** As contrasted with iterating over an array's indices in a numerically ordered way (`for` loop or other iterators), the order of iteration over an object's properties is **not guaranteed** and may vary between different JS engines. **Do not rely** on any observed ordering for anything that requires consistency among environments, as any observed agreement is unreliable.
 
-But what if you want to iterate over the values directly instead of the array indicies (or object properties)? Helpfully, ES6 adds a `for..of` loop syntax for iterating over arrays (and objects, if the object defines its own iterator):
+But what if you want to iterate over the values directly instead of the array indicies (or object properties)? Helpfully, ES6 adds a `for..of` loop syntax for iterating over arrays (and objects, if the object defines its own custom iterator):
 
 ```js
 var myArray = [ 1, 2, 3 ];
@@ -909,17 +909,15 @@ For example, a list of `Pixel` objects (with `x` and `y` coordinate values) coul
 In fact, you can even generate "infinite" iterators which never "finish" and always return a new value (such as a random number, an incremented value, a unique identifier, etc), though you probably will not use such iterators with an unbounded `for..of` loop, as it would never end and would hang your program.
 
 ```js
-var randoms = (function(){
-	var publicAPI = {};
-	publicAPI[Symbol.iterator] = function() {
+var randoms = {
+	[Symbol.iterator]: function() {
 		return {
 			next: function() {
 				return { value: Math.random() };
 			}
 		};
-	};
-	return publicAPI;
-})();
+	}
+};
 
 var randoms_pool = [];
 for (var n of randoms) {

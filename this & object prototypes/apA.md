@@ -223,9 +223,11 @@ In traditional class-oriented languages, you never adjust the definition of a cl
 
 In other words, it's as if `class` is telling you: "dynamic is too hard, so it's probably not a good idea. Here's a static-looking syntax, so code your stuff statically."
 
-What an awful commentary on JavaScript: **dynamic is too hard, let's pretend to be (but not actually be!) static**.
+What a sad commentary on JavaScript: **dynamic is too hard, let's pretend to be (but not actually be!) static**.
 
 These are the reasons why ES6 `class` is masquerading as a nice solution to syntactic headaches, but it's actually muddying the waters further and making things worse for JS and for clear and concise understanding.
+
+**Note:** If you use the `.bind(..)` utility to make a hard-bound function (see Chapter 2), the function created is not subclassable with ES6 `extend` like normal functions are.
 
 ## Review (TL;DR)
 
@@ -235,4 +237,4 @@ These are the reasons why ES6 `class` is masquerading as a nice solution to synt
 
 Bottom line: if ES6 `class` makes it harder to robustly leverage `[[Prototype]]`, and hides the most important nature of the JS object mechanism -- **the live delegation links between objects** -- shouldn't we see `class` as creating more troubles than it solves, and just relegate it to an anti-pattern?
 
-I can't really answer that question for you, dear reader. But I hope this book has fully explored the issue at a deeper level than you've ever gone before, and has given you the information you need *to answer it yourself*.
+I can't really answer that question for you. But I hope this book has fully explored the issue at a deeper level than you've ever gone before, and has given you the information you need *to answer it yourself*.

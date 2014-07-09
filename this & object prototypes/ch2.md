@@ -317,7 +317,7 @@ function foo(something) {
 	return this.a + something;
 }
 
-// simple PoC `bind` helper
+// simple `bind` helper
 function bind(fn, obj) {
 	return function() {
 		return fn.apply( obj, arguments );
@@ -423,7 +423,7 @@ By calling `foo(..)` with `new` in front of it, we've constructed a new object a
 
 ## Everything In Order
 
-So, now we've uncovered the 4 rules for binding `this` in function calls. *All* you need to do is find the call-site and inspect it to see which rule applies. But, what if the call-site has multiple eligible rules? There must be an order of precedence to these rules, and so we will next demonstrate what order to ask the rules in.
+So, now we've uncovered the 4 rules for binding `this` in function calls. *All* you need to do is find the call-site and inspect it to see which rule applies. But, what if the call-site has multiple eligible rules? There must be an order of precedence to these rules, and so we will next demonstrate what order to apply the rules.
 
 It should be clear that the *default binding* is the lowest priority rule of the 4. So we'll just set that one aside.
 
@@ -609,7 +609,7 @@ Now, we can summarize the rules for determining `this` from a function call's ca
 
     `var bar = foo()`
 
-That's it. That's *all it takes* to understand the rules of `this` binding for normal function calls.
+That's it. That's *all it takes* to understand the rules of `this` binding for normal function calls. Well... almost.
 
 ## Binding Exceptions
 
@@ -711,9 +711,9 @@ Reminder: regardless of how you get to a function invocation using the *default 
 
 We saw earlier that *hard binding* was one strategy for preventing a function call falling back to the *default binding* rule inadvertently, by forcing it to be bound to a specific `this` (unless you use `new` to override it!). The problem is, *hard-binding* greatly reduces the flexibility of a function, preventing manual `this` override with either the *implicit binding* or even subsequent *explicit binding* attempts.
 
-It would be nice if there was a way to provide a different default for *default binding* (not `global` or `undefined`), while still leaving the function able to be manually `this` bound via *implicit binding* and *explicit binding* techniques.
+It would be nice if there was a way to provide a different default for *default binding* (not `global` or `undefined`), while still leaving the function able to be manually `this` bound via *implicit binding* or *explicit binding* techniques.
 
-We can construct a so-called *soft binding* mechanism which emulates our desired behavior.
+We can construct a so-called *soft binding* utility which emulates our desired behavior.
 
 ```js
 if (!Function.prototype.softBind) {
@@ -764,7 +764,7 @@ The soft-bound version of the `foo()` function can be manually `this`-bound to `
 
 Normal functions abide by the 4 rules we just covered. But ES6 introduces a special kind of function that does not use these rules: arrow-function.
 
-Arrow-functions are signified not by the `function` keyword, but by the `=>` so called "fat arrow" operator. Instead of using the four standard `this` rules, arrow-functions inherit (lexically speaking) the `this` binding from the enclosing (function or global) scope.
+Arrow-functions are signified not by the `function` keyword, but by the `=>` so called "fat arrow" operator. Instead of using the four standard `this` rules, arrow-functions adopt the `this` binding from the enclosing (function or global) scope.
 
 Let's illustrate arrow-function lexical scope:
 
@@ -772,7 +772,7 @@ Let's illustrate arrow-function lexical scope:
 function foo() {
 	// return an arrow function
 	return (a) => {
-		// `this` here is lexically inherited from `foo()`
+		// `this` here is lexically adopted from `foo()`
 		console.log( this.a );
 	};
 }
@@ -796,7 +796,7 @@ The most common use-case will likely be in the use of callbacks, such as event h
 ```js
 function foo() {
 	setTimeout(() => {
-		// `this` here is lexically inherited from `foo()`
+		// `this` here is lexically adopted from `foo()`
 		console.log( this.a );
 	},100);
 }
@@ -808,7 +808,7 @@ var obj = {
 foo.call( obj ); // 2
 ```
 
-While arrow-functions provide an alternative to using `bind(..)` on a function to ensure its `this`, which can seem attractive, it's important to note that they essentially are disabling the traditional `this` mechanism in favor of the more widely-understood lexical scoping. Pre ES-6, we already have a fairly common pattern for doing so, which is basically almost indistinguishable from the spirit of ES6 arrow-functions:
+While arrow-functions provide an alternative to using `bind(..)` on a function to ensure its `this`, which can seem attractive, it's important to note that they essentially are disabling the traditional `this` mechanism in favor of more widely-understood lexical scoping. Pre ES-6, we already have a fairly common pattern for doing so, which is basically almost indistinguishable from the spirit of ES6 arrow-functions:
 
 ```js
 function foo() {
@@ -833,7 +833,7 @@ If you find yourself writing `this`-style code, but most or all the time, you de
 
 2. Embrace `this`-style mechanisms completely, including using `bind(..)` where necessary, and try to avoid `self = this` and arrow-function "lexical this" tricks.
 
-A program can effectively use both styles of code (lexical and `this`), but inside of the same function, and indeed for the same sorts of look-ups, mixing the two mechanisms is usually asking for harder-to-maintain code, and probably working too hard to be too clever.
+A program can effectively use both styles of code (lexical and `this`), but inside of the same function, and indeed for the same sorts of look-ups, mixing the two mechanisms is usually asking for harder-to-maintain code, and probably working too hard to be clever.
 
 ## Review (TL;DR)
 
@@ -849,4 +849,4 @@ Determining the `this` binding for an executing function requires finding the di
 
 Be careful of accidental/unintentional invoking of the *default binding* rule. In cases where you want to "safely" ignore a `this` binding, a "DMZ" object like `ø = Object.create(null)` is a good placeholder value that protects the `global` object from unintended side-effects.
 
-Instead of the four standard binding rules, ES6 arrow-functions use lexical scoping for `this` binding, which means they inherit the `this` binding (whatever it is) from its enclosing function call. They are essentially a syntactic embrace of `self = this` in pre-ES6 coding.
+Instead of the four standard binding rules, ES6 arrow-functions use lexical scoping for `this` binding, which means they adopt the `this` binding (whatever it is) from its enclosing function call. They are essentially a syntactic replacement of `self = this` in pre-ES6 coding.
