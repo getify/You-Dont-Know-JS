@@ -76,6 +76,16 @@ typeof [1,2,3] === "object"; // true
 
 Nope, just objects. It's most appropriate to think of them also as a "sub-type" of object, in this case with the additional characteristics of being numerically indexed (as opposed to just being string-keyed like plain objects) and maintaining an automatically updated `.length` property.
 
+### Internal "Class"
+
+Values that are the `typeof` of `"object"` (such as array) are additionally tagged with an internal `[[Class]]`, which generally can be revealed by borrowing the default `Object.prototype.toString(..)` to be called against the value. For example:
+
+```js
+Object.prototype.toString.call( [1,2,3] ); // "[object Array]"
+
+Object.prototype.toString.call( /regex-literal/i ); // "[object RegExp]"
+```
+
 ## Special Values
 
 There are several special values spread across the various types which the *alert* JS developer needs to be aware of, and use properly.
@@ -268,7 +278,7 @@ However, if you try to stringify a negative zero value, it will always be report
 ```js
 var a = 0 / -3;
 
-// consoles at least get it right
+// (some browser) consoles at least get it right
 a; // -0
 
 // but the spec insists on lying to you!
