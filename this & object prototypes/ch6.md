@@ -616,7 +616,7 @@ var LoginController = {
 		if (!(user && pw)) {
 			return this.failure( "Please enter a username & password!" );
 		}
-		else if (user.length < 5) {
+		else if (pw.length < 5) {
 			return this.failure( "Password must be 5+ characters!" );
 		}
 
