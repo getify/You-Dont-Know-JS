@@ -136,7 +136,53 @@ foo();
 
 Friends don't let friends override `undefined`. Ever.
 
-While `undefined` is an actual identifier that represents (unless modified -- see above!) the built-in `undefined` value. Another way to get this value is the `void` operator.
+While `undefined` is an actual identifier that represents (unless modified -- see above!) the built-in `undefined` value, another way to get this value is the `void` operator.
+
+The expression `void ___` "voids" out any value, so that the result of that `void`-expression is always the `undefined` value. It doesn't modify the existing value; it just ensures that no value comes back from the operator expression.
+
+```js
+var a = 42;
+
+console.log(void a, a); // undefined 42
+```
+
+By convention (mostly from C-language programming), to represent the `undefined` value stand-alone by using `void`, you'd use `void 0` (though clearly even `void true` or any other `void`-expression does the same thing). There's no practical difference between `void 0` and `void 1` and `undefined`.
+
+But `void` can be useful in a few other circumstances, if you need to ensure that an expression has no result value (even if it has side effects).
+
+For example:
+
+```js
+function doSomething() {
+	// note: `APP.ready` is provided by our application
+	if (!APP.ready) {
+		// try again later
+		return void setTimeout(doSomething,100);
+	}
+
+	var result;
+
+	// do some other stuff
+	return result;
+}
+
+// were we able to do it right away?
+if (doSomething()) {
+	// handle next tasks right away
+}
+```
+
+Here, the `setTimeout(..)` function returns a numeric value, but we want to `void` that out so that the return value of our function doesn't give a false-positive to the `if` statement.
+
+Many devs prefer to just do something like this, which works the same but avoids the `void` operator:
+
+```js
+if (!APP.ready) {
+	// try again later
+	setTimeout(doSomething,100);
+	return;
+}
+```
 
 // TODO cover:
 // typeof foo === "undefined"
@@ -144,7 +190,7 @@ While `undefined` is an actual identifier that represents (unless modified -- se
 
 ### Special Numbers
 
-The `number` type has several special values. We'll take a look at each in detail.
+The `number` type includes several special values. We'll take a look at each in detail.
 
 #### The Not Number, Number
 
@@ -155,16 +201,16 @@ Any mathematic operation you perform without both operands being numbers (or val
 For example:
 
 ```js
-var a = 2 / "foo"; NaN
+var a = 2 / "foo"; // NaN
 
 typeof a === "number"; // true
 ```
 
 In other words, "the type of not-a-number is 'number'!" Hooray for confusing names and semantics.
 
-`NaN` is a special "sentinel value" that represents a special kind of error condition within the number set. The error condition is in essence: "tried to perform a mathematic operation but failed, so here's the failed number result instead".
+`NaN` is a "sentinel value" that represents a special kind of error condition within the number set. The error condition is, in essence: "I tried to perform a mathematic operation but failed, so here's the failed number result instead."
 
-So, if you have a value in some variable and want to test to see if it's this special failed-number `NaN`, you might think you could compare to `NaN` itself, as you can with other values like `null` and `undefined`. Nope.
+So, if you have a value in some variable and want to test to see if it's this special failed-number `NaN`, you might think you could compare to `NaN` itself, as you can with any other value, like `null` or `undefined`. Nope.
 
 ```js
 var a = 2 / "foo";
@@ -173,21 +219,21 @@ a == NaN; // false
 a === NaN; // false
 ```
 
-`NaN` is a very special number in that it's never equal to another `NaN` value. It's the only number in fact without the Identity operation `x === x`.
+`NaN` is a very special value in that it's never equal to another `NaN` value. It's the only number in fact without the Identity operation `x === x`. In other words, `NaN !== NaN`. A bit strange, huh?
 
-So how *do* we test for it?
+So how *do* we test for it, if we can't compare to `NaN` (since that comparison would always fail)?
 
 ```js
 var a = 2 / "foo";
 
-window.isNaN( a ); // true
+isNaN( a ); // true
 ```
 
-Easy enough, right? Seems like windowWe use a built-in utility called `isNaN(..)` and it tells us if the value is `NaN` or not. Problem solved!
+Easy enough, right? We use a built-in utility called `isNaN(..)` and it tells us if the value is `NaN` or not. Problem solved!
 
 Not so fast.
 
-The built-in `window.isNaN(..)` utility has a fatal flaw. It tried to take the name of `NaN` way too literally. It interpreted its job as, basically: "return the negation of an 'is it a number?' test."
+The built-in `isNaN(..)` utility (which is technically `window.isNaN(..)`) has a fatal flaw. It appears it tried to take the name of `NaN` ("not a number") too literally -- that its job is, basically: "return the negation of an 'is it a number?' test."
 
 ```js
 var a = 2 / "foo";
@@ -200,9 +246,9 @@ window.isNaN( a ); // true
 window.isNaN( b ); // true -- ouch!
 ```
 
-Clearly, `"foo"` is *not a number*, but it's definitely not the `NaN` value either.
+Clearly, `"foo"` is *not a number*, but it's definitely not the `NaN` value either. This bug has been in JS since the very beginning (so, over 19 years of *ouch*).
 
-As of ES6, a replacement utility has been provided, with `Number.isNaN(..)`. A simple polyfill for it so that you can safely check `NaN` values in ES5 and below browsers is:
+As of ES6, finally a replacement utility has been provided, with `Number.isNaN(..)`. A simple polyfill for it so that you can safely check `NaN` values *now* in ES5 and below browsers is:
 
 ```js
 if (!Number.isNaN) {
@@ -221,7 +267,21 @@ Number.isNaN( a ); // true
 Number.isNaN( b ); // false -- phew!
 ```
 
-`NaN`s will probably a reality in a lot of real-world JS programs, either on purpose or by accident. It's a good idea to use a reliable test, like `Number.isNaN(..)` as provided, to recognize them properly.
+Actually, we can implement a `Number.isNaN(..)` polyfill even easier, by taking advantage of that peculiar fact that `NaN` isn't equal to itself. `NaN` is the *only* value in the whole language where that's true; every other value is always **equal to itself**.
+
+So:
+
+```js
+if (!Number.isNaN) {
+	Number.isNaN = function(n) {
+		return n !== n;
+	};
+}
+```
+
+`NaN`s are probably a reality in a lot of real-world JS programs, either on purpose or by accident. It's a good idea to use a reliable test, like `Number.isNaN(..)` as provided (or polyfilled), to recognize them properly.
+
+If you're currently using just `isNaN(..)` in any program, the sad reality is your program *has a bug*, even if you haven't been bitten by it yet!
 
 #### Infinities
 
