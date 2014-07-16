@@ -10,5 +10,4 @@
 
 * [Preface](../preface.md)
 * [Chapter 1: Wait... Types?](ch1.md)
-* [Chapter 2: Coercion](ch2.md)
 * [Appendix A: Thank You's!](apA.md)
