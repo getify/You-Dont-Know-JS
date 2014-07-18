@@ -427,7 +427,7 @@ b; // 3
 var c = [1,2,3];
 var d = c; // `d` is always a reference to the shared `[1,2,3]` array value
 d.push( 4 );
-c; // [1,2,3]
+c; // [1,2,3,4]
 d; // [1,2,3,4]
 ```
 
