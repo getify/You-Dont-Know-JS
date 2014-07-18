@@ -62,7 +62,7 @@ Object.prototype.toString.call( [1,2,3] );			// "[object Array]"
 Object.prototype.toString.call( /regex-literal/i );	// "[object RegExp]"
 ```
 
-So, for the array in this example, the internal `[[Class]]` is `Array`, and for the regular expression, it's `RegExp`. In most cases, this internal ``[Class]]` value corresponds to the built-in native (see below) that's related to the value, but that's not always the case.
+So, for the array in this example, the internal `[[Class]]` value is `"Array"`, and for the regular expression, it's `"RegExp"`. In most cases, this internal ``[Class]]` value corresponds to the built-in native constructor (see below) that's related to the value, but that's not always the case.
 
 What about primitive values? First, `null` and `undefined`:
 
@@ -71,7 +71,7 @@ Object.prototype.toString.call( null );			// "[object Null]"
 Object.prototype.toString.call( undefined );	// "[object Undefined]"
 ```
 
-You'll note that there is no `Null()` or `Undefined()` native constructors, but nevertheless the `Null` and `Undefined` are the internal `[[Class]]` values as exposed.
+You'll note that there is no `Null()` or `Undefined()` native constructors, but nevertheless the `"Null"` and `"Undefined"` are the internal `[[Class]]` values exposed.
 
 But for the other simple primitives like `string`, `number`, and `boolean`, another behavior actually kicks in, which is usually called "boxing" (see below).
 
@@ -81,7 +81,7 @@ Object.prototype.toString.call( 42 );		// "[object Number]"
 Object.prototype.toString.call( true );		// "[object Boolean]"
 ```
 
-In this snippet, each of the simple primitives are automatically boxed by their respective object wrappers, which is why `String`, `Number`, and `Boolean` are revealed as the internal `[[Class]]` values.
+In this snippet, each of the simple primitives are automatically boxed by their respective object wrappers, which is why `"String"`, `"Number"`, and `"Boolean"` are revealed as the internal `[[Class]]` values.
 
 ## Boxing
 
@@ -362,7 +362,26 @@ a.toUpperCase(); // " ABC "
 a.trim(); // "abc"
 ```
 
-The other constructor prototypes contain behaviors appropriate to their types, such as `Number.toFixed(..)` (stringifying a number with a fixed number of decimal digits) and `Array#concat(..)` (merging arrays).
+The other constructor prototypes contain behaviors appropriate to their types, such as `Number#toFixed(..)` (stringifying a number with a fixed number of decimal digits) and `Array#concat(..)` (merging arrays). All functions have access to `apply(..)`, `call(..)`, and `bind(..)` because `Function.prototype` defines them.
+
+But, some of the native prototypes aren't *just* plain objects:
+
+```js
+typeof Function.prototype;			// "function"
+Function.prototype();				// no error, it's a no-op function!
+
+Array.isArray( Array.prototype );	// true
+Array.prototype.push( 1, 2, 3 );	// 3
+Array.prototype;					// [1,2,3]
+
+"abc".match( RegExp.prototype );	// [""] -- no error, it's a regular expression!
+```
+
+`Function.prototype` is a function, `Array.prototype` is an array, and `RegExp.prototype` is a regular expression.
+
+Interesting and cool, huh?
+
+There have definitely been times when I've needed a placeholder no-op function like `function(){}`, but `Function.prototype` is already there for use!
 
 ## Value vs. Reference
 
