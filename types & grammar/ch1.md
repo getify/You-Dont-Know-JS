@@ -1,5 +1,5 @@
 # You Don't Know JS: Types & Grammar
-# Chapter 1: Wait... Types?
+# Chapter 1: Types
 
 Most developers would say that a dynamic language (like JS) does not have *types*. Let's see what the ES5.1 specification has to say on the topic:
 
@@ -7,11 +7,11 @@ Most developers would say that a dynamic language (like JS) does not have *types
 >
 > An ECMAScript language type corresponds to values that are directly manipulated by an ECMAScript programmer using the ECMAScript language. The ECMAScript language types are Undefined, Null, Boolean, String, Number, and Object.
 
-Now, if you're a fan of strongly-typed (statically-typed) languages, you probably object to this usage of the word "type". In those languages, "type" means a whole lot *more* than it does here in JS.
+Now, if you're a fan of strongly-typed (statically-typed) languages, you may object to this usage of the word "type". In those languages, "type" means a whole lot *more* than it does here in JS.
 
 Some people say JS shouldn't claim to have "types", and they should instead be called "tags" or perhaps "sub types".
 
-Bah. We're going to use this rough definition (the same one that seems to drive the wording of the spec!): a *type* is an intrinsic, built-in set of characteristics that uniquely identifies the behavior of a particular value and distinguishes it from other values, both to the engine **and to the developer**.
+Bah! We're going to use this rough definition (the same one that seems to drive the wording of the spec): a *type* is an intrinsic, built-in set of characteristics that uniquely identifies the behavior of a particular value and distinguishes it from other values, both to the engine **and to the developer**.
 
 In other words, if both the engine and the developer treat value `42` (the number) differently than they treat value `"42"` (the string), then those two values have different *types* -- `number` and `string`, respectively. When you use `42`, you are *intending* to do something numeric, like math. But when you use `"42"`, you are *intending* to do something string'ish, like outputting to the page, etc. **These two values have different types.**
 
@@ -52,13 +52,39 @@ typeof null === "object"; // true
 
 It would have been nice (and correct!) if it returned `"null"`, but this original bug in JS has persisted for nearly 2 decades, and will likely never be fixed because there's too much existing web content that relies on its buggy behavior that "fixing" the bug would *create* "more bugs" and break a lot of web software.
 
-So what's the seventh string value that `typeof` can return? And why is it not actually a real primitive type?
+If you want to test for a `null` value using its type, you need a compound condition:
+
+```js
+var a = null;
+
+(!a && typeof a === "object"); // true
+```
+
+`null` is the only value which is "falsy" (aka false-like; see Chapter 4) but which also returns `"object"` from the `typeof` check.
+
+So what's the seventh string value that `typeof` can return? And why is it not actually a top-level type?
 
 ```js
 typeof function a(){ /* .. */ } === "function"; // true
 ```
 
-It's easy to think that `function` would be a primitive type in JS, especially given this behavior of the `typeof` operator. However, if you read the spec, you'll see it's actually somewhat of a "sub-type" of object. Specifically, a function is referred to as a "callable object" -- an object that has an internal `[[Call]]` property that allows it to be invoked.
+It's easy to think that `function` would be a top-level primitive type in JS, especially given this behavior of the `typeof` operator. However, if you read the spec, you'll see it's actually somewhat of a "sub-type" of object. Specifically, a function is referred to as a "callable object" -- an object that has an internal `[[Call]]` property that allows it to be invoked.
+
+The fact that functions are actually objects is quite useful. Most importantly, they can have properties. For example:
+
+```js
+function a(b,c) {
+	/* .. */
+}
+```
+
+The function object has a `length` property set to the number of formal parameters it is declared with.
+
+```js
+a.length; // 2
+```
+
+Since you declared the function with two formal named parameters (`b` and `c`), the "length of the function" is `2`.
 
 What about arrays? They're pretty native to JS, so are they a special type?
 
@@ -66,15 +92,15 @@ What about arrays? They're pretty native to JS, so are they a special type?
 typeof [1,2,3] === "object"; // true
 ```
 
-Nope, just objects. It's most appropriate to think of them also as a "sub-type" of object (see Chapter 2), in this case with the additional characteristics of being numerically indexed (as opposed to just being string-keyed like plain objects) and maintaining an automatically updated `.length` property.
+Nope, just objects. It's most appropriate to think of them also as a "sub-type" of object (see Chapter 3), in this case with the additional characteristics of being numerically indexed (as opposed to just being string-keyed like plain objects) and maintaining an automatically updated `.length` property.
 
-### Values As Types
+## Values As Types
 
 In JavaScript, variables don't have types -- **values have types**. Variables can hold any value, at any time.
 
 Another way to think about JS types is that JS doesn't have "type enforcement", in that the engine doesn't insist that a *variable* always holds values of the *same initial type* that it starts out with. A variable can, in one assignment statement, hold a `string`, and in the next hold a `number`, and so on.
 
-The *value* `42` has an intrinsic type of `number`, and its *type* cannot be changed. Another value, like `"42"` with the `string` type, can be created *from* the `number` value `42`, through a process called **coercion** (see Chapter 3).
+The *value* `42` has an intrinsic type of `number`, and its *type* cannot be changed. Another value, like `"42"` with the `string` type, can be created *from* the `number` value `42`, through a process called **coercion** (see Chapter 4).
 
 If you use `typeof` against a variable, it's not asking "what's the type of the variable?" as it may seem, since JS variables have no types. Instead, it's asking "what's the type of the value *in* the variable?"
 
@@ -94,110 +120,9 @@ typeof typeof 42; // "string"
 
 The first `typeof 42` returns `"number"`, and then `typeof "number"` is `"string"`.
 
-## Special Values
+### `undefined` vs "undeclared"
 
-There are several special values spread across the various types which the *alert* JS developer needs to be aware of, and use properly.
-
-### The Non-Value Values
-
-For the `undefined` type, there is one and only one value: `undefined`. For the `null` type, there is one and only one value: `null`. So for both of them, the label is both its type and its value.
-
-Both `undefined` and `null` are often taken to be interchangeable as either "empty" values or "non" values. Other developers prefer to distinguish between them with nuance, like for instance:
-
-* `null` is an empty value
-* `undefined` is a missing value
-
-Or:
-
-* `undefined` hasn't had a value yet
-* `null` had a value and doesn't anymore
-
-Regardless of how you choose to "define" and use these two values, `null` is a special keyword, not an identifier, and thus you cannot treat it as a variable to assign to (why would you!?). However, `undefined` *is* (unfortunately) an identifier. Uh oh.
-
-### Undefined
-
-In non-`strict mode`, it's actually possible (though incredibly ill-advised!) to assign a value to the globally provided `undefined` identifier:
-
-```js
-function foo() {
-	undefined = 2; // really bad idea!
-}
-
-foo();
-```
-
-```js
-function foo() {
-	"use strict";
-	undefined = 2; // TypeError!
-}
-
-foo();
-```
-
-In both non-`strict mode` and `strict mode`, however, you can create a local variable of the name `undefined`. But again, this is a terrible idea!
-
-```js
-function foo() {
-	"use strict";
-	var undefined = 2;
-	console.log( undefined ); // 2
-}
-
-foo();
-```
-
-**Friends don't let friends override `undefined`.** Ever.
-
-While `undefined` is a built-in identifier that holds (unless modified -- see above!) the built-in `undefined` value, another way to get this value is the `void` operator.
-
-The expression `void ___` "voids" out any value, so that the result of that `void`-expression is always the `undefined` value. It doesn't modify the existing value; it just ensures that no value comes back from the operator expression.
-
-```js
-var a = 42;
-
-console.log(void a, a); // undefined 42
-```
-
-By convention (mostly from C-language programming), to represent the `undefined` value stand-alone by using `void`, you'd use `void 0` (though clearly even `void true` or any other `void`-expression does the same thing). There's no practical difference between `void 0` and `void 1` and `undefined`.
-
-But `void` can be useful in a few other circumstances, if you need to ensure that an expression has no result value (even if it has side effects).
-
-For example:
-
-```js
-function doSomething() {
-	// note: `APP.ready` is provided by our application
-	if (!APP.ready) {
-		// try again later
-		return void setTimeout(doSomething,100);
-	}
-
-	var result;
-
-	// do some other stuff
-	return result;
-}
-
-// were we able to do it right away?
-if (doSomething()) {
-	// handle next tasks right away
-}
-```
-
-Here, the `setTimeout(..)` function returns a numeric value, but we want to `void` that out so that the return value of our function doesn't give a false-positive to the `if` statement.
-
-Many devs prefer to just do something like this, which works the same but doesn't use the `void` operator:
-
-```js
-if (!APP.ready) {
-	// try again later
-	setTimeout(doSomething,100);
-	return;
-}
-```
-
-Variables which have no value *currently* actually have the `undefined` value. Calling `typeof` against such variables will return `"undefined"`:
+Variables which have no value *currently*, actually have the `undefined` value. Calling `typeof` against such variables will return `"undefined"`:
 
 ```js
 var a;
@@ -205,6 +130,8 @@ var a;
 typeof a; // "undefined"
 
 var b = 42;
+
+// later
 b = void 0;
 
 typeof b; // "undefined"
@@ -223,7 +150,7 @@ a; // undefined
 b; // ReferenceError: b is not defined
 ```
 
-An annoying confusion is the error message that browsers assign to this condition. As you can see, the message is "b is not defined", which is of course very easy and reasonable to confuse with "b is undefined". Yet again, "undefined" and "is not defined" are very different things. It'd be nice if the browsers said something like "b is not found" or "b is not declared".
+An annoying confusion is the error message that browsers assign to this condition. As you can see, the message is "b is not defined", which is of course very easy and reasonable to confuse with "b is undefined". Yet again, "undefined" and "is not defined" are very different things. It'd be nice if the browsers said something like "b is not found" or "b is not declared", to reduce the confusion!
 
 There's also a special behavior associated with `typeof` as it relates to undeclared variables that even further reinforces the confusion. Consider:
 
@@ -237,224 +164,116 @@ typeof b; // "undefined"
 
 The `typeof` operator returns `"undefined"` even for "undeclared" (or "not defined") variables. Notice that there was no error thrown when we executed `typeof b`, even though `b` is an undeclared variable. This is a special safety guard in the behavior of `typeof`.
 
-### Special Numbers
+Similar to above, it would have been nice if `typeof` used with an undeclared variable returned "undeclared" instead of conflating the result value with the different "undefined" case.
 
-The `number` type includes several special values. We'll take a look at each in detail.
+### `typeof` Undeclared
 
-#### The Not Number, Number
+Nevertheless, this safety guard is a useful feature when dealing with JavaScript in the browser, where multiple script files can load variables into the shared global namespace.
 
-Any mathematic operation you perform without both operands being numbers (or values that can be interpreted as regular numbers in base 10 or base 16) will result in the operation failing to produce a valid number, in which case you will get the `NaN` value.
+**Note:** Many developers believe there should never be any variables in the global namespace, and that everything should be contained in modules and private/separate namespaces. This is great in theory but nearly impossible in practicality; still its a good goal to strive toward! Fortunately, ES6 added first-class support for modules, which will eventually make that much more practical.
 
-`NaN` literally stands for "not a number", though this label/description is very poor and misleading, as we'll see shortly. It would be much more accurate to think of `NaN` as being "invalid number", "failed number", or even "bad number", than to think of it as "not a number".
+As a simple example, imagine having a "debug mode" in your program that is controlled by a global variable (flag) called `DEBUG`. You'd want to check if that variable was declared before performing some debug task like logging a message to the console. A top-level global `var DEBUG = true` declaration would only be included in a "debug.js" file, that you only load into the browser when you're in development/testing, but not in production.
 
-For example:
-
-```js
-var a = 2 / "foo"; // NaN
-
-typeof a === "number"; // true
-```
-
-In other words: "the type of not-a-number is 'number'!" Hooray for confusing names and semantics.
-
-`NaN` is a kind of "sentinel value" (an otherwise normal value that's assigned a special meaning) that represents a special kind of error condition within the number set. The error condition is, in essence: "I tried to perform a mathematic operation but failed, so here's the failed number result instead."
-
-So, if you have a value in some variable and want to test to see if it's this special failed-number `NaN`, you might think you could directly compare to `NaN` itself, as you can with any other value, like `null` or `undefined`. Nope.
+However, you have to take care in how you check for the global `DEBUG` variable in the rest of your application code, so that you don't throw a `ReferenceError`. The safety guard on `typeof` is our friend in this case.
 
 ```js
-var a = 2 / "foo";
-
-a == NaN; // false
-a === NaN; // false
-```
-
-`NaN` is a very special value in that it's never equal to another `NaN` value (aka, it's not equal to itself). It's the only number in fact without the Identity characteristic `x === x`. So, `NaN !== NaN`. A bit strange, huh?
-
-So how *do* we test for it, if we can't compare to `NaN` (since that comparison would always fail)?
-
-```js
-var a = 2 / "foo";
-
-isNaN( a ); // true
-```
-
-Easy enough, right? We use a built-in utility called `isNaN(..)` and it tells us if the value is `NaN` or not. Problem solved!
-
-Not so fast.
-
-The built-in `isNaN(..)` utility (which is technically `window.isNaN(..)`) has a fatal flaw. It appears it tried to take the name of `NaN` ("not a number") too literally -- that its job is, basically: "test if the thing passed in is either not a number or is a number."
-
-```js
-var a = 2 / "foo";
-var b = "foo";
-
-a; // NaN
-b; "foo"
-
-window.isNaN( a ); // true
-window.isNaN( b ); // true -- ouch!
-```
-
-Clearly, `"foo"` is *not a number*, but it's definitely not the `NaN` value either. This bug has been in JS since the very beginning (so, over 19 years of *ouch*).
-
-As of ES6, finally a replacement utility has been provided, with `Number.isNaN(..)`. A simple polyfill for it so that you can safely check `NaN` values *now* in pre-ES6 browsers is:
-
-```js
-if (!Number.isNaN) {
-	Number.isNaN = function(n) {
-		return (
-			typeof n === "number" &&
-			window.isNaN( n )
-		);
-	};
+// oops, this would throw an error!
+if (DEBUG) {
+	console.log( "Debugging is starting" );
 }
 
-var a = 2 / "foo";
-var b = "foo";
-
-Number.isNaN( a ); // true
-Number.isNaN( b ); // false -- phew!
-```
-
-Actually, we can implement a `Number.isNaN(..)` polyfill even easier, by taking advantage of that peculiar fact that `NaN` isn't equal to itself. `NaN` is the *only* value in the whole language where that's true; every other value is always **equal to itself**.
-
-So:
-
-```js
-if (!Number.isNaN) {
-	Number.isNaN = function(n) {
-		return n !== n;
-	};
+// this is a safe existence check
+if (typeof DEBUG !== "undefined") {
+	console.log( "Debugging is starting" );
 }
 ```
 
-Weird, huh? But it works!
-
-`NaN`s are probably a reality in a lot of real-world JS programs, either on purpose or by accident. It's a really good idea to use a reliable test, like `Number.isNaN(..)` as provided (or polyfilled), to recognize them properly.
-
-If you're currently using just `isNaN(..)` in a program, the sad reality is your program *has a bug*, even if you haven't been bitten by it yet!
-
-#### Infinities
-
-Developers from traditional compiled languages like C are probably used to seeing either a compiler error or run-time exception, like "Divide by zero", for an operation like:
+This sort of check is useful even if you're not dealing with user-defined variables (like `DEBUG`). If you are doing a feature check for a built-in API, you may also find it helpful to check without throwing an error:
 
 ```js
-var a = 1 / 0;
+if (typeof atob === "undefined") {
+	atob = function() { /*..*/ };
+}
 ```
 
-However, in JS, this operation is well-defined and results in the value `Infinity`. Unsurprisingly:
+**Note:** In this scenario, where you're defining a "polyfill" for a feature if it doesn't already exist (but should!), you probably want to avoid using `var` to make the `atob` declaration. If you declare `var atob` inside the `if` statement, this declaration is hoisted (see *"Scope & Closures"* title of this series) to the top of the scope, even if the `if` condition doesn't pass (because the global `atob` already exists!). In some browsers and for some special types of global built-in variables (often called "host objects"), this duplicate declaration may throw an error. Omitting the `var` prevents this hoisted declaration.
+
+Another way of doing these checks against global variables but without the safety guard feature of `typeof` is to observe that all global variables are also properties of the global object, which in the browser is basically the `window` object. So, the above checks could have been done (quite safely) as:
 
 ```js
-var a = 1 / 0; // Infinity
-var b = -1 / 0; // -Infinity
-```
-
-As you can see, `-Infinity` results from a divide-by-zero where either (but not both!) of the divide operands is negative.
-
-JS uses finite number representations (IEEE-754 foating point, which will be covered later), so contrary to pure mathematics, it seems it *is* possible to overflow (or underflow) even with an operation like addition or subtraction, in which case you'd respectively get `Infinity` or `-Infinity`.
-
-For example:
-
-```js
-var a = Number.MAX_VALUE; // 1.7976931348623157e+308
-a + a; // Infinity
-a + 1E292; // Infinity
-a + 1E291; // 1.7976931348623157e+308
-```
-
-If you think too much about that, it's going to make your head hurt. So don't. We'll cover more of the specifics of IEEE-754 numbers and how they work later.
-
-Once you overflow or underflow to either one of the *infinities*, however, there's no going back. In other words, in an almost poetic sense, you can go from finite to infinite but not from infinite back to finite.
-
-It's almost philosophical to ask: "What is Infinity divided by Infinity". Our naive brains would likely say "1" or maybe "Infinity". Turns out neither is true. Both mathematically and in JavaScript, `Infinity / Infinity` is not a defined operation. In JS, this results in `NaN` as explained above.
-
-But what about any positive non-infinite (that is, finite) number divided by infinity? That's easy! `0`. And what about a negative finite number divided by infinity? Keep reading!
-
-#### Zeros
-
-While it may confuse the mathematician-minded reader, JavaScript has both a normal zero `0` (otherwise known as a positive zero `+0`) *and* a negative zero `-0`. Before we explain why the `-0` exists, we should examine how JS handles it, because it can be quite confusing.
-
-Besides being specified directly, negative zero results from certain mathematic operations. For example:
-
-```js
-var a = 0 / -3; // -0
-var b = 0 * -3; // -0
-```
-
-Addition and subtraction cannot result in a negative zero.
-
-A negative zero when examined in the developer console will usually reveal `-0`, though that was not the common case until fairly recently, so some older browsers may still report it as `0`.
-
-However, if you try to stringify a negative zero value, it will always be reported as `"0"`, according to the spec.
-
-```js
-var a = 0 / -3;
-
-// (some browser) consoles at least get it right
-a; // -0
-
-// but the spec insists on lying to you!
-a.toString(); // "0"
-a + ""; // "0"
-String( a ); // "0"
-
-// strangely, even JSON gets in on the deception
-JSON.stringify( 0 / -3 ); // "0"
-```
-
-Interestingly, the reverse operations (going from string to number) don't lie:
-
-```js
-+"-0"; // -0
-Number( "-0" ); // -0
-JSON.parse( "-0" ); // -0
-```
-
-**Note:** The `JSON.stringify( -0 )` behavior is particularly strange when you consider the reverse: `JSON.parse( "-0" )`, which indeed reports `-0` as you'd correctly expect, despite the inconsistency with its inverse `JSON.stringify(..)`.
-
-In addition to stringification of negative zero being deceptive to hide its true value, the comparison operators are also (intentionally) configured to *lie*.
-
-```js
-var a = 0;
-var b = 0 / -3;
-
-a == b; // true
--0 == 0; // true
-
-a === b; // true
--0 === 0; // true
-
-0 > -0; // false
-a > b; // false
-```
-
-Clearly, if you want to distinguish a `-0` from a `0` in your code, you can't just rely on what the developer console outputs, so you're going to have to be a bit more clever:
-
-```js
-function isNegZero(n) {
-	n = Number( n );
-	return (n === 0) && (1 / n === -Infinity);
+if (window.DEBUG) {
+	// ..
 }
 
-isNegZero( -0 ); // true
-isNegZero( 0 / -3 ); // true
-isNegZero( 0 ); // false
+if (!window.atob) {
+	// ..
+}
 ```
 
-Now, why do we need a negative zero, besides academic trivia?
+Unlike referencing undeclared variables, there is no `ReferenceError` thrown if you try to access an object property (even on the global `window` object) that doesn't exist.
 
-There are certain applications where developers use the magnitude of a value to represent one piece of information (like speed of movement per animation frame) and the sign of that number to represent another piece of information (like the direction of that movement).
+On the other hand, manually referencing the global variable with a `window` reference is something some developers prefer to avoid, especially if your code needs to run in multiple JS environments (not just browsers, but server-side node.js, for instance), where the global variable may not always be called `window`.
 
-In those applications, as one example, if a variable arrives at zero and it loses its sign, then you would lose the information of what direction it was moving in before it arrived at zero. Preserving the sign of the zero prevents potentially unwanted information loss.
+Technically, this safety guard on `typeof` is useful even if you're not using global variables, though these circumstances are less common, and some developers may find this design approach less desirable. Imagine a utility function that you want others to copy-n-paste into their programs or modules, in which you want to check to see if including program has defined a certain variable (so that you can use it) or not:
+
+```js
+function doSomethingCool() {
+	var helper =
+		(typeof FeatureXYZ !== "undefined") ?
+		FeatureXYZ :
+		function() { /*.. default feature ..*/ };
+
+	var val = helper();
+	// ..
+}
+```
+
+`doSomethingCool()` tests for a variable called `FeatureXYZ`, and if found, uses it, if not, uses its own. Now, if someone includes this utility into their module/program, it safely checks if they've defined `FeatureXYZ` or not:
+
+```js
+// an IIFE (see "Scope & Closures" title of this series)
+(function(){
+	function FeatureXYZ() { /*.. my XYZ feature ..*/ }
+
+	// include `doSomethingCool(..)`
+	function doSomethingCool() {
+		var helper =
+			(typeof FeatureXYZ !== "undefined") ?
+			FeatureXYZ :
+			function() { /*.. default feature ..*/ };
+
+		var val = helper();
+		// ..
+	}
+
+	doSomethingCool();
+})();
+```
+
+Here, `FeatureXYZ` is not at all a global variable, but we're still using the safety guard of `typeof` to make it safe to check for. And importantly, here there is *no* object we can use (like we did for global variables with `window.___`) to make the check, so `typeof` is quite helpful.
+
+Other developers would prefer a design pattern called "dependency injection", where instead of `doSomethingCool()` inspecting implicitly for `FeatureXYZ` to be defined outside/around it, it would need to have the dependency explicitly passed in, like:
+
+```js
+function doSomethingCool(FeatureXYZ) {
+	var helper = FeatureXYZ ||
+		function() { /*.. default feature ..*/ };
+
+	var val = helper();
+	// ..
+}
+```
+
+There's lots of options when designing such functionality. No one pattern here is "correct" or "wrong" -- there are various tradeoffs to each approach. But overall, it's nice that the `typeof` undeclared safety guard gives us more options.
 
 ## Summary
 
-JavaScript has seven built-in primitive *types*: `null`, `undefined`,  `boolean`, `number`, `string`, `object`, `symbol`. They can be identified by the `typeof` operator.
+JavaScript has seven built-in *types*: `null`, `undefined`,  `boolean`, `number`, `string`, `object`, `symbol`. They can be identified by the `typeof` operator.
 
 Variables don't have types, but the values in them do. These types define intrinsic behavior of the values.
 
-Several special values are defined within these primitive types.
+Many developers will assume "undefined" and "undeclared" are roughly the same thing, but in JavaScript, they've quite different. `undefined` is a value that a declared variable can hold. "Undeclared" means a variable has never been declared.
 
-The `null` type has just one value: `null`, and likewise the `undefined` type has just the `undefined` value. `undefined` is basically the default value in any variable or property if no other value is present.
+JavaScript unfortunately kind of conflates these two terms, not only in its error messages ("ReferenceError: a is not defined") but also in the return values of `typeof`, which is `"undefined"` for both cases.
 
-Numbers include several special values, like `NaN` (supposedly "Not-a-Number", but really more appropriately "invalid number"), `+Infinity` and `-Infinity`, and `-0`.
+However, the safety guard (preventing an error) on `typeof` when used against an undeclared variable can be helpful in certain cases.

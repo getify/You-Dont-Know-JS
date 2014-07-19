@@ -3,14 +3,17 @@
 ## Table of Contents
 
 * Preface
-* Chapter 1: Wait... Types?
+* Chapter 1: Types
 	* Primitives
+	* Values As Types
+* Chapter 2: Values
+	* Numbers
 	* Special Values
-* Chapter 2: Natives
+	* Value vs Reference
+* Chapter 3: Natives
 	* Internal `[[Class]]`
-	* Boxing
+	* Boxing Wrappers
 	* Natives As Constructors
-	* Value vs. Reference
-* Chapter 3: Coercion
+* Chapter 4: Coercion
 * Appendix A: Thank You's!
 

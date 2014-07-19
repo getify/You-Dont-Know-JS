@@ -9,7 +9,8 @@
 [Table of Contents](toc.md)
 
 * [Preface](../preface.md)
-* [Chapter 1: Wait... Types?](ch1.md)
-* [Chapter 2: Natives](ch2.md)
-* [Chapter 3: Coercion](ch3.md)
+* [Chapter 1: Types](ch1.md)
+* [Chapter 2: Values](ch2.md)
+* [Chapter 3: Natives](ch3.md)
+* [Chapter 4: Coercion](ch4.md)
 * [Appendix A: Thank You's!](apA.md)
