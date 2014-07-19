@@ -473,7 +473,7 @@ You *can* add properties on top of the `Number` object (just not change its inne
 
 This is not all that common, however; it probably would *not* be considered a good practice by most developers.
 
-Instead of using the wrapper object `Number` in this way, it's probably much better to use the manual object wrapper (`obj`) approach in the earlier snippet. That's not to say that there's *no* clever uses for the boxed object wrappers like `Number` -- just that you should probably use the scalar primitive value form in almost all cases.
+Instead of using the wrapper object `Number` in this way, it's probably much better to use the manual object wrapper (`obj`) approach in the earlier snippet. That's not to say that there's *no* clever uses for the boxed object wrappers like `Number` -- just that you should probably prefer the scalar primitive value form in most cases.
 
 References are quite powerful, but sometimes they get in your way, and sometimes you need them where they don't exist. The only control you have over reference vs. value-copy behavior is the type of the value itself, so you must indirectly influence the assignment/passing behavior by which value types you choose to use.
 
