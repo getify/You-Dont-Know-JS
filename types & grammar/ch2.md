@@ -330,7 +330,7 @@ For example, in C++ if you want to pass a number variable into a function and ha
 
 In JavaScript, there are no pointers, and references work fairly differently. You cannot have a reference from one JS variable to another variable. That's just not possible.
 
-A reference in JS is a reference to a (shared) value, so if you have 10 different references, they are all always references to a single shared value; none of them are references to each other.
+A reference in JS is a reference to a (shared) value, so if you have 10 different references, they are all always distinct references to a single shared value; **none of them are references to each other.**
 
 Moreover, in JavaScript, there are no syntactic hints that control value vs reference assignment/passing. Instead, the *type* of the value *solely* controls whether that value will be assigned through value-copy or by reference.
 
@@ -352,11 +352,11 @@ d; // [1,2,3,4]
 
 Simple values (aka scalar primitives) are *always* assigned/passed by value-copy: `null`, `undefined`, `string`, `number`, and `boolean`.
 
-Complex values (aka compound primitives) are *always* assigned/passed by reference: `object` (including arrays, and all boxed object wrappers -- see Chapter 3), `function`, and `symbol` (ES6+).
+Complex values (aka compound primitives) *always* create a new reference on assignment and a copy of the reference on passing: `object` (including arrays, and all boxed object wrappers -- see Chapter 3), `function`, and `symbol` (ES6+).
 
 In the above snippet, because `2` is a scalar primitive, `a` holds one initial copy of that value, and `b` is assigned another *copy* of the value. When changing `b`, you are in no way changing the value in `a`.
 
-But **both `c` and `d`** are references to the same shared value `[1,2,3]`, which is a compound primitive. It's important to note that neither `c` nor `d` more "owns" the `[1,2,3]` array value -- both are just equal peer references to the value. So, when using either reference to modify (`.push(4)`) the actual shared array value itself, it's affecting just the one shared value, and both reference variables will still reference the newly modified value `[1,2,3,4]`.
+But **both `c` and `d`** are seperate references to the same shared value `[1,2,3]`, which is a compound primitive. It's important to note that neither `c` nor `d` more "owns" the `[1,2,3]` array value -- both are just equal peer references to the value. So, when using either reference to modify (`.push(4)`) the actual shared array value itself, it's affecting just the one shared value, and both references will  reference the newly modified value `[1,2,3,4]`.
 
 Since references are to the values themselves and not to the variables, you cannot use one reference to change where another reference is pointed:
 
@@ -394,7 +394,7 @@ foo( a );
 a; // [1,2,3,4]  not  [4,5,6,7]
 ```
 
-When we pass in the argument `a`, it assigns `x` **by reference** to point at the `[1,2,3]` value. Now, inside the function, we can use that reference to mutate the value itself (`push(4)`). But, when we make the assignment `x = [4,5,6]`, this is in no way is affecting where the initial reference `a` is pointing -- still points at the (now modified) `[1,2,3,4]` value.
+When we pass in the argument `a`, it assigns a copy of the `a` reference to `x`. `x` and `a` are separate references pointing at the same `[1,2,3]` value. Now, inside the function, we can use that reference to mutate the value itself (`push(4)`). But, when we make the assignment `x = [4,5,6]`, this is in no way is affecting where the initial reference `a` is pointing -- still points at the (now modified) `[1,2,3,4]` value.
 
 There is no way using the `x` reference to change where `a` is pointing. We could only modify the contents of the shared value that both `a` and `x` are pointing to.
 
@@ -446,9 +446,11 @@ foo( obj );
 obj.a; // 42
 ```
 
-Here, `obj` acts as a passed-by-reference wrapper for the scalar primitive property `a`, so that the property's value can be updated in a persistent way that survives the end of the function call.
+Here, `obj` acts as a wrapper for the scalar primitive property `a`. When passed to `foo(..)`, a copy of the `obj` reference is passed in and set to the `wrapper` parameter. We now can use the `wrapper` reference to access the shared object, and update its property. After the function finishes, `obj.a` will see the updated value `42`.
 
-It may occur to you that if you wanted to pass *by reference* a scalar primitive value like `2`, you could box the value in its `Number` object wrapper (see Chapter 3). It *is* true that such an object value would instead be passed by reference. But it's not going to give you the ability to use the reference to modify the shared value, like you may hope:
+It may occur to you that if you wanted to pass in a reference to a scalar primitive value like `2`, you could just box the value in its `Number` object wrapper (see Chapter 3).
+
+It *is* true a copy of the reference to this `Number` object *will* be passed to the function, but unfortunately, having a reference to the shared object is not going to give you the ability to modify the shared value, like you may expect:
 
 ```js
 function foo(x) {
@@ -463,15 +465,17 @@ foo( b );
 console.log( b ); // 2  -- not 3
 ```
 
-The problem is that the underlying scalar primitive value is *not mutable* (same goes for `string` and `boolean`).
+The problem is that the underlying scalar primitive value is *not mutable* (same goes for `string` and `boolean`). If a `Number` object holds the value `2`, that exact `Number` object can never be changed to hold another value; you can only create a whole new `Number` object with a different value.
 
-When `x` is used in `x + 1`, the underlying scalar primitive `2` is unboxed automatically, so the line `x = x + 1` very subtly changed `x` from being a shared reference to the passed in `Number` object to just holding the scalar primitive value `3` as a result of the addition operation. Therefore, `b` still references the unmodified/immutable `Number` object holding the value `2`.
+When `x` is used in the expression `x + 1`, the underlying scalar primitive `2` is unboxed from the `Number` object automatically, so the line `x = x + 1` very subtly changed `x` from being a shared reference to the `Number` object, to just holding the scalar primitive value `3` as a result of the addition operation. Therefore, `b` still references the unmodified/immutable `Number` object holding the value `2`.
 
-You *can* add properties to the object (just not change its enclosed primitive value), so you could exchange information indirectly via those additional properties.
+You *can* add properties on top of the `Number` object (just not change its inner primitive value), so you could exchange information indirectly via those additional properties.
 
-This is not all that common, however; it probably would not be considered a good practice by most developers. Instead of using the  wrapper object `Number` in this way, it's probably much better to use the manual object wrapper (`obj`) approach in the earlier snippet. That's not to say that there's no clever uses for the object wrappers, just that your default should usually be the scalar primitive value form if possible.
+This is not all that common, however; it probably would *not* be considered a good practice by most developers.
 
-References are quite powerful, but sometimes they get in your way, and sometimes you need them but don't have them, so you have to fake them. The only control over reference vs. value-copy is the type of the value itself, so you must indirectly influence the assignment/passing behavior by which value types you choose to use.
+Instead of using the wrapper object `Number` in this way, it's probably much better to use the manual object wrapper (`obj`) approach in the earlier snippet. That's not to say that there's *no* clever uses for the boxed object wrappers like `Number` -- just that you should probably use the scalar primitive value form in almost all cases.
+
+References are quite powerful, but sometimes they get in your way, and sometimes you need them where they don't exist. The only control you have over reference vs. value-copy behavior is the type of the value itself, so you must indirectly influence the assignment/passing behavior by which value types you choose to use.
 
 ## Summary
 
