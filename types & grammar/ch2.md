@@ -1,7 +1,7 @@
 # You Don't Know JS: Types & Grammar
 # Chapter 2: Values
 
-In this chapter, we'll cover working with JS values.
+In this chapter, we'll cover working with JavaScript values.
 
 ## Numbers
 
