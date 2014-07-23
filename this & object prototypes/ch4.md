@@ -31,7 +31,7 @@ While `Vehicle` and `Car` collectively define the behavior by way of methods, th
 
 **And thus, classes, inheritance, and instantiation emerge.**
 
-Another key concept with classes is "polymorphism", which describes the idea that a general behavior from a parent class can be overriden in a child class to give it more specifics. In fact, relative polymorphism let's us reference the base behavior from the overriden behavior.
+Another key concept with classes is "polymorphism", which describes the idea that a general behavior from a parent class can be overridden in a child class to give it more specifics. In fact, relative polymorphism lets us reference the base behavior from the overridden behavior.
 
 Class theory strongly suggests that a parent class and a child class share the same method name for a certain behavior, so that the child overrides the parent (differentially). As we'll see later, doing so in your JavaScript code is opting into frustration and code brittleness.
 
@@ -186,7 +186,7 @@ So then we define two specific kinds of vehicle: `Car` and `SpeedBoat`. They eac
 
 ### Polymorphism
 
-`Car` defines its own `drive()` method, which overrides the method of the same name it inherited from `Vehicle`. But then, `Car`s `drive()` method calls `inherited:drive()`, which indicates that `Car` can reference the original pre-overriden `drive()` it inherited. `SpeedBoat`s `pilot()` method also makes a reference to its inherited copy of `drive()`.
+`Car` defines its own `drive()` method, which overrides the method of the same name it inherited from `Vehicle`. But then, `Car`s `drive()` method calls `inherited:drive()`, which indicates that `Car` can reference the original pre-overridden `drive()` it inherited. `SpeedBoat`s `pilot()` method also makes a reference to its inherited copy of `drive()`.
 
 This technique is called "polymorphism", or "virtual polymorphism". More specifically to our current point, we'll call it "relative polymorphism".
 
@@ -286,7 +286,7 @@ var Car = mixin( Vehicle, {
 
 `Car` now has a copy of the properties and functions from `Vehicle`. Technically, functions are not actually duplicated, but rather *references* to the functions are copied. So, `Car` now has a property called `ignition`, which is a copied reference to the `ignition()` function, as well as a property called `engines` with the copied value of `1` from `Vehicle`.
 
-`Car` *already* had a `drive` property (function), so that property reference was not overriden (see the `if` statement in `mixin(..)` above).
+`Car` *already* had a `drive` property (function), so that property reference was not overridden (see the `if` statement in `mixin(..)` above).
 
 #### "Polymorphism" Revisited
 
