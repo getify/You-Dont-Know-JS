@@ -494,7 +494,7 @@ Following the typical class design pattern, we'll break up the task into base fu
 function Controller() {
 	this.errors = [];
 }
-Controller.prototype.showDialog(title,msg) {
+Controller.prototype.showDialog = function(title,msg) {
 	// display title & message to user in dialog
 };
 Controller.prototype.success = function(msg) {
