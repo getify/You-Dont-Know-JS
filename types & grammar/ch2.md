@@ -5,7 +5,111 @@ In this chapter, we'll cover working with JavaScript values.
 
 ## Numbers
 
-JavaScript has just one numeric type: `number`. This type includes values we often call "integers" (whole numbers with no decimal fraction part), as well as values we often "floating point numbers" (numbers with decimal fractions).
+JavaScript has just one numeric type: `number`. This type includes both "integer" values and decimal numbers. I say "integer" in quotes because it's long been a criticism of JS that there's not true integers, as there are in other languages. That may change at some point in the future, but for now, we just have `number`s for everything.
+
+Like most modern languages, including practically all scripting languages, the implementation of JavaScript's `number`s is based on the "IEEE 754" standard, often called "floating point". JavaScript specifically uses the "double precision" format (aka "64-bit binary") of the standard.
+
+There are many, many great write-ups on the web about the nitty gritty details of how binary floating point numbers are stored in memory, and the implications of those choices. Rather than repeat that, we'll simply hand-waive over such details and leave it as an excercise for the interested reader if you'd like to dig further.
+
+### Numeric Syntax
+
+Number literals are expressed in JavaScript generally as base-10 decimals. For example:
+
+```js
+var a = 42;
+var b = 42.3;
+```
+
+The leading portion of a decimal value, if `0`, is optional:
+
+```js
+var a = 0.42;
+var b = .42;
+```
+
+Similarly, the trailing portion of a decimal value after the `.`, if `0`, is optional:
+
+```js
+var a = 42;
+var b = 42.;
+```
+
+**Note:** `42.` is pretty uncommon, and probably not a great idea if you're trying to avoid confusion when other people read your code. But it is, nevertheless, valid.
+
+Because number values can be boxed with the `Number` object wrapper (see Chapter 3), you can access methods directly on number values, but you have to be careful with the `.` operator. Since `.` is a valid numeric character, it will first be interpreted as part of a number literal, if possible, instead of being interpreted as a property accessor.
+
+```js
+// invalid syntax:
+42.toFixed( 3 );	// SyntaxError
+
+// these are all valid:
+(42).toFixed( 3 );	// "42.000"
+0.42.toFixed( 3 );	// "0.420"
+42..toFixed( 3 );	// "42.000"
+```
+
+`42.toFixed(3)` is invalid syntax, because the `.` is swallowed up to be part of the `42.` number (which is valid -- see above!), and so then there's no `.` property operator present to access the `toFixed(..)` method.
+
+`42..toFixed(3)` probably looks strange, and indeed it's very rare to see something like that in actual JavaScript code.
+
+However, there are libraries that extend the built-in `Number.prototype` to provide extra operations on/with numbers, and so in those cases, it's perfectly valid to say something like `10..makeItRain()` and have that set off a 10-second money raining animation, or something else silly like that.
+
+Larger numbers are sometimes specified in exponent form, such as:
+
+```var
+var onethousand = 1E3; // means 1 * 10^3
+var onemilliononehundredthousand = 1.1E6; // means 1.1 * 10^6
+```
+
+### Small Decimal Numbers
+
+The most (in)famous side effect of using binary floating point numbers (which, reminder, is true of **all** languages that use IEEE 754 -- not *just* JavaScript as many assume/pretend) is:
+
+```js
+0.1 + 0.2 === 0.3; // false
+```
+
+Mathematically, we know that statement should be `true`. Why is it `false`?
+
+Simply put, the representations for `0.1` and `0.2` in binary floating point are not exact, so when they are added, the result is not exactly `0.3`. It's **really** close: `0.30000000000000004`, but if you're comparison fails, "close" is irrelevant.
+
+**Note:** Should JavaScript switch to a different `number` implementation which has exact representations for all values? Some think so. There have been many alternatives presented over the years. None of them have been accepted yet, and perhaps never will. As easy as it may seem to just waive a hand and say, "fix that bug, already!", it's not nearly that easy. If it were, it most definitely would have been fixed long ago.
+
+Now, the question is, if numbers can't all be trusted to be exact, does that mean we can't use numbers at all? Of course not.
+
+What it means is, there are some applications where you need to be more careful, especially when dealing with decimal values. There are also lots and lots of applications that only deal with whole numbers ("integers"), and moreover, only deal with numbers in the millions or billions at maximum. These applications have been, and always will be, **perfectly safe** to use numeric operations in JS.
+
+What if we *did* need to compare two numbers, like `0.1 + 0.2` to `0.3`?
+
+The most commonly accepted practice is to use a tiny "rounding error" value as the *tolerance* for comparison. This tiny value is often called "machine epislon", which is commonly `2^-53` for the numbers in JavaScript. For example:
+
+```js
+function numbersEqual(n1,n2) {
+	return Math.abs( n1 - n2 ) < Math.pow( 2, -53 );
+}
+
+var a = 0.1 + 0.2;
+var b = 0.3;
+
+numbersEqual( a, b ); // true
+numbersEqual( 0.1, 0.2 ); // false
+```
+
+**Note:** The above `numbersEqual(..)` function is deliberately naive performance-wise, so as to maintain simplicity of explanation here. Calculating the `Math.pow(2,-53)` tolerance value every time (which never changes!) is very wasteful. You'd want to calculate this value once and re-use it. That's left as an exercise for the reader.
+
+The maximum floating point value that can be represented accurately is roughly `1.79E308` (which is really, really, really huge), predefined for you as `Number.MAX_VALUE`. `Number.MIN_VALUE` is roughly `5E-324`.
+
+### Safe "Integer" Ranges
+
+Think of your average task like sorting a list of records by numeric ID. IDs are almost always whole numbers, so comparisons with them will always be precise. It's rare that you'd do sorting on very large numbers which would be outside of "safe" ranges.
+
+But what are these safe ranges?
+
+The maximum integer that can "safely" be represented (that is, there's a guarantee that the requested value is actually representable) is `2^53 - 1`, which is `9007199254740991`. If you insert your commas, you'll see that this is roughly 9 quadrillion. So that's pretty darn big for numbers to range up to.
+
+This value is actually automatically declared as of ES6, as `Number.MAX_SAFE_INTEGER`. Unsurprisingly, there's a minimum value, `-9007199254740991`, and it's defined in ES6 as `Number.MIN_SAFE_INTEGER`.
+
+Odds are pretty good that your application is never going to get anywhere near either of these extremes. Unless you're sure that you need numbers near/beyond these ranges, I'd recommend not worrying too much about JS number implementation details. Being aware of them, as you now are, is usually more than enough *concern*.
 
 ## Special Values
 
@@ -226,7 +330,7 @@ var b = -1 / 0; // -Infinity
 
 As you can see, `-Infinity` results from a divide-by-zero where either (but not both!) of the divide operands is negative.
 
-JS uses finite number representations (IEEE-754 foating point, which will be covered later), so contrary to pure mathematics, it seems it *is* possible to overflow (or underflow) even with an operation like addition or subtraction, in which case you'd respectively get `Infinity` or `-Infinity`.
+JS uses finite number representations (IEEE 754 foating point, which we covered earlier), so contrary to pure mathematics, it seems it *is* possible to overflow (or underflow) even with an operation like addition or subtraction, in which case you'd respectively get `Infinity` or `-Infinity`.
 
 For example:
 
@@ -237,11 +341,11 @@ a + 1E292; // Infinity
 a + 1E291; // 1.7976931348623157e+308
 ```
 
-If you think too much about that, it's going to make your head hurt. So don't. We'll cover more of the specifics of IEEE-754 numbers and how they work later.
+If you think too much about that, it's going to make your head hurt. So don't.
 
 Once you overflow or underflow to either one of the *infinities*, however, there's no going back. In other words, in an almost poetic sense, you can go from finite to infinite but not from infinite back to finite.
 
-It's almost philosophical to ask: "What is Infinity divided by Infinity". Our naive brains would likely say "1" or maybe "Infinity". Turns out neither is true. Both mathematically and in JavaScript, `Infinity / Infinity` is not a defined operation. In JS, this results in `NaN` as explained above.
+It's almost philosophical to ask: "What is Infinity divided by Infinity". Our naive brains would likely say "1" or maybe "Infinity". Turns out neither is true. Both mathematically and in JavaScript, `Infinity / Infinity` is not a defined operation. In JS, this results in `NaN` (the invalid number value as explained above).
 
 But what about any positive non-infinite (that is, finite) number divided by infinity? That's easy! `0`. And what about a negative finite number divided by infinity? Keep reading!
 
