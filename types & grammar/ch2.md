@@ -106,7 +106,7 @@ You don't have to use a variable with the value in it to access these methods; y
 
 Numbers can also be specified in exponent form, which is common when representing larger numbers, such as:
 
-```var
+```js
 var onethousand = 1E3;						// means 1 * 10^3
 var onemilliononehundredthousand = 1.1E6;	// means 1.1 * 10^6
 ```
