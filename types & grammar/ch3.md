@@ -54,7 +54,7 @@ For example, at time of writing, Chrome prints this: `String {0: "a", 1: "b", 2:
 
 ## Internal `[[Class]]`
 
-Values that are the `typeof` of `"object"` (such as an array) are additionally tagged with an internal `[[Class]]` property (think of this more as an internal *class*ification rather than related to classes from traditional class-oriented coding). This property cannot be accessed directly, but can generally can be revealed indirectly by borrowing the default `Object.prototype.toString(..)` method called against the value. For example:
+Values that are `typeof` of `"object"` (such as an array) are additionally tagged with an internal `[[Class]]` property (think of this more as an internal *class*ification rather than related to classes from traditional class-oriented coding). This property cannot be accessed directly, but can generally can be revealed indirectly by borrowing the default `Object.prototype.toString(..)` method called against the value. For example:
 
 ```js
 Object.prototype.toString.call( [1,2,3] );			// "[object Array]"
@@ -62,7 +62,7 @@ Object.prototype.toString.call( [1,2,3] );			// "[object Array]"
 Object.prototype.toString.call( /regex-literal/i );	// "[object RegExp]"
 ```
 
-So, for the array in this example, the internal `[[Class]]` value is `"Array"`, and for the regular expression, it's `"RegExp"`. In most cases, this internal ``[Class]]` value corresponds to the built-in native constructor (see below) that's related to the value, but that's not always the case.
+So, for the array in this example, the internal `[[Class]]` value is `"Array"`, and for the regular expression, it's `"RegExp"`. In most cases, this internal `[Class]]` value corresponds to the built-in native constructor (see below) that's related to the value, but that's not always the case.
 
 What about primitive values? First, `null` and `undefined`:
 
@@ -81,7 +81,7 @@ Object.prototype.toString.call( 42 );		// "[object Number]"
 Object.prototype.toString.call( true );		// "[object Boolean]"
 ```
 
-In this snippet, each of the simple primitives are automatically boxed by their respective object wrappers, which is why `"String"`, `"Number"`, and `"Boolean"` are revealed as the internal `[[Class]]` values.
+In this snippet, each of the simple primitives are automatically boxed (see below) by their respective object wrappers, which is why `"String"`, `"Number"`, and `"Boolean"` are revealed as the internal `[[Class]]` values.
 
 ## Boxing Wrappers
 
@@ -131,6 +131,30 @@ Object.prototype.toString.call( c ); // "[object String]"
 ```
 
 Again, using the boxed object wrapper directly (like `b` and `c` above) is usually discouraged, but there are some rare occassions you'll run into where they may be useful.
+
+### Unboxing
+
+If you have an object wrapper and you want to get the underlying primitive value out, you can use the `valueOf()` method:
+
+```js
+var a = new String( "abc" );
+var b = new Number( 42 );
+var c = new Boolean( true );
+
+a.valueOf(); // "abc"
+b.valueOf(); // 42
+c.valueOf(); // true
+```
+
+Unboxing can also happen implicitly, when using an object wrapper value in a way that requires the primitive value. This process (coercion) will be covered in more detail in Chapter 4, but briefly:
+
+```js
+var a = new String( "abc" );
+var b = a + ""; // `b` has the unboxed primitive value "abc"
+
+typeof a; // "object"
+typeof b; // "string"
+```
 
 ## Natives As Constructors
 
