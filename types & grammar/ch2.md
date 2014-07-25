@@ -48,7 +48,7 @@ a; // 42.3
 b; // 42
 ```
 
-Very large numbers will by default be outputted in exponent form, the same as the output of the `toExponential()` method, like:
+Very large or very small numbers will by default be outputted in exponent form, the same as the output of the `toExponential()` method, like:
 
 ```js
 var a = 5E10;
@@ -57,6 +57,9 @@ a.toExponential();	// 5e+10
 
 var b = a * a;
 b;					// 2.5e+21
+
+var c = 1 / a;
+c;					// 2e-11
 ```
 
 Because number values can be boxed with the `Number` object wrapper (see Chapter 3), number values can access methods that are built in to the `Number.prototype` (see Chapter 3). For example, the `toFixed(..)` method allows you specify how many fractional decimal places you'd like the value to be represented with:
