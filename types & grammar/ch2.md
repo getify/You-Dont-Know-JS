@@ -107,12 +107,45 @@ You don't have to use a variable with the value in it to access these methods; y
 
 **Note:** There are libraries that extend the built-in `Number.prototype` (see Chapter 3) to provide extra operations on/with numbers, and so in those cases, it's perfectly valid to use something like `10..makeItRain()` to set off a 10-second money raining animation, or something else silly like that.
 
+This is also technically valid (notice the space):
+
+```js
+42 .toFixed(3); // "42.000"
+```
+
+However, with the number literal specifically, **this is particularly confusing coding style** and will serve no other purpose but to confuse other developers (and your future self). Avoid it.
+
 Numbers can also be specified in exponent form, which is common when representing larger numbers, such as:
 
 ```js
 var onethousand = 1E3;						// means 1 * 10^3
 var onemilliononehundredthousand = 1.1E6;	// means 1.1 * 10^6
 ```
+
+Numbers literals can also be expressed in other bases, like binary, octal, and hexidecimal.
+
+These formats work in current versions of JavaScript:
+
+```js
+0xf3; // hexidecimal for: 243
+0Xf3; // ditto
+
+0363; // octal for: 243
+```
+
+**Note:** Starting with ES6 + strict mode, the `0363` form of octal literals is no longer allowed (see below for the new form). The `0363` form is still allowed in non-strict mode, but you should stop using it anyway, to be future-friendly (and because you should be using strict mode by now!).
+
+As of ES6, the following new forms are also valid:
+
+```js
+0o363;		// octal for: 243
+0O363;		// ditto
+
+0b11110011;	// binary for: 243
+0B11110011; // ditto
+```
+
+Please do your fellow developers a favor: never use the `0O363` form. `0` next to capital `O` is just a bad idea asking for confusion. In fact, always use the lowercase predicates `0x`, `0b`, and `0o`.
 
 ### Small Decimal Values
 
