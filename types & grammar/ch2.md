@@ -170,13 +170,54 @@ This value is actually automatically predefined in ES6, as `Number.MAX_SAFE_INTE
 
 The main way that JS programs are confronted with dealing with such large numbers is when dealing with 64-bit IDs from databases, etc. 64-bit numbers cannot be represented accurately with the `number` type, so must be stored in (and transmitted to/from) JavaScript using `string` representation.
 
-Operations on such large ID number values (besides comparison, which will be fine with `string`s) aren't all that common, thankfully. But if you *do* need to perform math on these very large values, for now you'll need to use a *big number* utility. Big numbers may get official support in a future version of JavaScript.
+Numeric operations on such large ID number values (besides comparison, which will be fine with `string`s) aren't all that common, thankfully. But if you *do* need to perform math on these very large values, for now you'll need to use a *big number* utility. Big numbers may get official support in a future version of JavaScript.
 
-### 32-bit Integers
+### Testing For Integers
+
+To test if a value is an integer, you can use the ES6-specified `Number.isInteger(..)`:
+
+```js
+Number.isInteger( 42 );		// true
+Number.isInteger( 42.000 );	// true
+Number.isInteger( 42.3 );	// false
+```
+
+To polyfill `Number.isInteger(..)` for pre-ES6:
+
+```js
+if (!Number.isInteger) {
+	Number.isInteger = function(num) {
+		return typeof num == "number" && num % 1 == 0;
+	};
+}
+```
+
+To test if a value is a *safe integer*, use the ES6-specified `Number.isSafeInteger(..)`:
+
+```js
+Number.isSafeInteger( Number.MAX_SAFE_INTEGER );	// true
+Number.isSafeInteger( Math.pow( 2, 53 ) );			// false
+Number.isSafeInteger( Math.pow( 2, 53 ) - 1 );		// true
+```
+
+To polyfill `Number.isSafeInteger(..)` in pre-ES6 browsers:
+
+```js
+if (!Number.isSafeInteger) {
+	Number.isSafeInteger = function(num) {
+		return Number.isInteger( num ) &&
+			Math.abs( num ) <= Number.MAX_SAFE_INTEGER;
+	};
+}
+```
+
+### 32-bit (Signed) Integers
 
 While integers can range up to roughly 9 quadrillion safely (53 bits), there are some numeric operations (like the bitwise operators) which are only defined for 32-bit numbers, so the "safe range" for numbers used in that way must be much smaller.
 
 The range then is `Math.pow(-2,31)` (`-2147483648`, about -2.1 billion) up to `Math.pow(2,31)-1` (`2147483647`, about +2.1 billion).
+
+To force a number value in `a` to a 32-bit signed integer value, use `a | 0`. This works because the `|` bitwise operator only works for 32-bit values (meaning it discards any other bits), and "or'ing" with zero is otherwise a no-op.
 
 ## Special Values
 
