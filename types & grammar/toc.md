@@ -7,6 +7,7 @@
 	* Primitives
 	* Values As Types
 * Chapter 2: Values
+	* Strings
 	* Numbers
 	* Special Values
 	* Value vs Reference

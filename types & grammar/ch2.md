@@ -3,6 +3,108 @@
 
 In this chapter, we'll cover working with JavaScript values.
 
+## Strings
+
+It's a very common belief that strings are essentially just arrays of characters. While the implementation under the covers may or may not use arrays, it's important to realize that JavaScript strings are really not the same as arrays of characters. The similarity is mostly just skin-deep.
+
+For example, let's consider these two values:
+
+```js
+var a = "foo";
+var b = ["f","o","o"];
+```
+
+Strings do have a shallow resemblance to arrays -- for instance both of them having a `length` property, an `indexOf(..)` method (array version only as of ES5), and a `concat(..)` method:
+
+```js
+a.length;							// 3
+b.length;							// 3
+
+a.indexOf( "o" );					// 1
+b.indexOf( "o" );					// 1
+
+var c = a.concat( "bar" );			// "foobar"
+var d = b.concat( ["b","a","r"] );	// ["f","o","o","b","a","r"]
+
+a === c;							// false
+b !== d;							// false
+
+a;									// "foo"
+b;									// ["f","o","o"]
+```
+
+So, they're both basically just "arrays of characters", right? Not exactly:
+
+```js
+a[1] = "O";
+b[1] = "O";
+
+a; // "foo"
+b; // "fOo"
+```
+
+JavaScript strings are immutable, while arrays are quite mutable. Moreover, the `a[1]` character position access form was not always widely valid JavaScript. Older versions of IE did not allow that syntax (but now they do). Instead, the *correct* approach has been `a.charAt(1)`.
+
+A further consequence of immutable strings is that none of the string methods that alter string contents modify in-place, but rather create and return new strings. By contrast, many of the array methods that change array contents actually *do* modify in-place.
+
+```js
+c = a.toUpperCase();
+a === c;	// false
+a;			// "foo"
+c;			// "FOO"
+
+b.push( "!" );
+b;			// ["f","o","o","!"]
+```
+
+Also, many of the array methods that could be helpful when dealing with strings are not actually available for them, but we can "borrow" non-mutation array methods against our string:
+
+```js
+a.map;			// undefined
+
+var c = Array.prototype.map.call( a, function(v){
+	return v.toUpperCase() + ".";
+} ).join( "" );
+
+c;				// "F.O.O."
+```
+
+Let's take another example: reversing a string. Arrays have a `reverse()` in-place mutator method, but strings do not:
+
+```js
+a.reverse;		// undefined
+
+b.reverse();	// ["o","o","f"]
+b;				// ["o","o","f"]
+```
+
+Unfortunately, this "borrowing" doesn't work with array mutators (in large part because strings are immutable, and `reverse(..)` modifies in place):
+
+```js
+Array.prototype.reverse.call( a );
+// returns a String object wrapper for "foo" still :( -- see Chapter 3
+```
+
+Another workaround (aka hack) is to convert the `string` into an `array`, perform the operation, then convert it back to a `string`.
+
+```js
+var c = a
+	// split `a` into an array of characters
+	.split( "" )
+	// reverse the array of characters
+	.reverse()
+	// join the array of characters back to a string
+	.join( "" );
+
+c; // "oof"
+```
+
+If that feels ugly, it is. Nevertheless, "it works"&trade; for simple strings, so if you need something quick-n-dirty, often such an approach gets the job done.
+
+**Note:** Be careful! This approach **doesn't work** for strings with complex (unicode) characters in them (astral symbols, multi-byte characters, etc). You need more sophisticated library utilities that are unicode-aware for such operations to be handled accurately. Find Mathias Bynens' work on the subject: *Esrever*.
+
+The other way to look at this is: if you are more commonly doing tasks on your "strings" which treat them as basically *arrays of characters*, perhaps it's better to just actually store them as `array`s rather than as `string`s. You'll probably save yourself a lot of hassle of converting from `string` to `array` each time. You can always call `join("")` on the `array` *of characters* whenever you actually need the `string` representation.
+
 ## Numbers
 
 JavaScript has just one numeric type: `number`. This type includes both "integer" values and fractional decimal numbers. I say "integer" in quotes because it's long been a criticism of JS that there's not true integers, as there are in other languages. That may change at some point in the future, but for now, we just have `number`s for everything.
