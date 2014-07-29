@@ -14,7 +14,7 @@ var a = "foo";
 var b = ["f","o","o"];
 ```
 
-Strings do have a shallow resemblance to arrays -- for instance both of them having a `length` property, an `indexOf(..)` method (array version only as of ES5), and a `concat(..)` method:
+Strings do have a shallow resemblance to arrays -- sometimes called "array-likes" -- for instance, both of them having a `length` property, an `indexOf(..)` method (array version only as of ES5), and a `concat(..)` method:
 
 ```js
 a.length;							// 3
@@ -33,7 +33,7 @@ a;									// "foo"
 b;									// ["f","o","o"]
 ```
 
-So, they're both basically just "arrays of characters", right? Not exactly:
+So, they're both basically just "arrays of characters", right? **Not exactly**:
 
 ```js
 a[1] = "O";
@@ -60,16 +60,19 @@ b;			// ["f","o","o","!"]
 Also, many of the array methods that could be helpful when dealing with strings are not actually available for them, but we can "borrow" non-mutation array methods against our string:
 
 ```js
+a.join;			// undefined
 a.map;			// undefined
 
-var c = Array.prototype.map.call( a, function(v){
+var c = Array.prototype.join.call( a, "-" );
+var d = Array.prototype.map.call( a, function(v){
 	return v.toUpperCase() + ".";
 } ).join( "" );
 
-c;				// "F.O.O."
+c;				// "f-o-o"
+d;				// "F.O.O."
 ```
 
-Let's take another example: reversing a string. Arrays have a `reverse()` in-place mutator method, but strings do not:
+Let's take another example: reversing a string (incidentally, a common JavaScript interview trivia question!). Arrays have a `reverse()` in-place mutator method, but strings do not:
 
 ```js
 a.reverse;		// undefined
@@ -82,10 +85,10 @@ Unfortunately, this "borrowing" doesn't work with array mutators (in large part 
 
 ```js
 Array.prototype.reverse.call( a );
-// returns a String object wrapper for "foo" still :( -- see Chapter 3
+// still returns a String object wrapper (see Chapter 3) for "foo" :(
 ```
 
-Another workaround (aka hack) is to convert the `string` into an `array`, perform the operation, then convert it back to a `string`.
+Another workaround (aka hack) is to convert the `string` into an `array`, perform the desired array operation, then convert it back to a `string`.
 
 ```js
 var c = a
