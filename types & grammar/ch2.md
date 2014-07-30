@@ -3,6 +3,50 @@
 
 In this chapter, we'll cover working with JavaScript values.
 
+## Arrays
+
+As compared to other type-enforced languages, JavaScript `array`s are just containers for any type of value, from `string` to `number` to `object` to even another `array` (which is how you get multi-dimensional arrays).
+
+```js
+var a = [ 1, "2", [3] ];
+
+a.length;		// 3
+a[0] === 1;		// true
+a[2][0] === 3;	// true
+```
+
+You don't need to pre-size your arrays (see "Arrays" in Chapter 3), you can just declare them and add or remove values as you see fit:
+
+```js
+var a = [ ];
+
+a[0] = 1;
+a[1] = "2";
+a[2] = [ 3 ];
+
+a.length;	// 3
+
+delete a[2];
+
+a.length;	// 2
+```
+
+Be careful about assigning slots to an array in a "sparse" way:
+
+```js
+var a = [ ];
+
+a[0] = 1;
+// no `a[1]` slot set here
+a[2] = [ 3 ];
+
+a[1];		// undefined
+
+a.length;	// 3
+```
+
+While that works, it can lead to some confusing behavior with the "empty slots" you leave in between. While the slot appears to have the `undefined` value in it, it will not behave the same as if the slot is explicitly set (`a[1] = undefined`). See "Arrays" in Chapter 3 for more information.
+
 ## Strings
 
 It's a very common belief that strings are essentially just arrays of characters. While the implementation under the covers may or may not use arrays, it's important to realize that JavaScript strings are really not the same as arrays of characters. The similarity is mostly just skin-deep.
@@ -355,7 +399,7 @@ While integers can range up to roughly 9 quadrillion safely (53 bits), there are
 
 The range then is `Math.pow(-2,31)` (`-2147483648`, about -2.1 billion) up to `Math.pow(2,31)-1` (`2147483647`, about +2.1 billion).
 
-To force a number value in `a` to a 32-bit signed integer value, use `a | 0`. This works because the `|` bitwise operator only works for 32-bit values (meaning it discards any other bits), and "or'ing" with zero is otherwise a no-op.
+To force a number value in `a` to a 32-bit signed integer value, use `a | 0`. This works because the `|` bitwise operator only works for 32-bit integer values (meaning it discards any other bits), and "or'ing" with zero is otherwise a no-op.
 
 ## Special Values
 
