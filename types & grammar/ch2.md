@@ -47,6 +47,31 @@ a.length;	// 3
 
 While that works, it can lead to some confusing behavior with the "empty slots" you leave in between. While the slot appears to have the `undefined` value in it, it will not behave the same as if the slot is explicitly set (`a[1] = undefined`). See "Arrays" in Chapter 3 for more information.
 
+Arrays are numerically indexed (as you'd expect), but the tricky thing is that they also are objects which can have string keys/properties added to them (but which don't count toward the `length` of the array):
+
+```js
+var a = [ ];
+
+a[0] = 1;
+a["foobar"] = 2;
+
+a.length;		// 1
+a["foobar"];	// 2
+a.foobar;		// 2
+```
+
+However, a gotcha to be aware of is that if a `string` value intended as a key can be coerced to a standard base-10 number, then it is assumed that you wanted to use it as a `number` index rather than as a `string` key!
+
+```js
+var a = [ ];
+
+a["13"] = 42;
+
+a.length; // 14
+```
+
+Generally, it's not a great idea to add `string` keys/properties to arrays. Use `object`s for holding values in keys/properties, and save `array`s for strictly numerically indexed values.
+
 ## Strings
 
 It's a very common belief that strings are essentially just arrays of characters. While the implementation under the covers may or may not use arrays, it's important to realize that JavaScript strings are really not the same as arrays of characters. The similarity is mostly just skin-deep.
