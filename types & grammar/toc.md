@@ -4,6 +4,7 @@
 
 * Preface
 * Chapter 1: Types
+	* Type to Type
 	* Primitives
 	* Values As Types
 * Chapter 2: Values

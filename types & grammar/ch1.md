@@ -15,7 +15,23 @@ Bah! We're going to use this rough definition (the same one that seems to drive 
 
 In other words, if both the engine and the developer treat value `42` (the number) differently than they treat value `"42"` (the string), then those two values have different *types* -- `number` and `string`, respectively. When you use `42`, you are *intending* to do something numeric, like math. But when you use `"42"`, you are *intending* to do something string'ish, like outputting to the page, etc. **These two values have different types.**
 
-That's by no means a perfect definition. But it's good enough for us. And it's consistent with how JS describes itself.
+That's by no means a perfect definition. But it's good enough for this discussion. And it's consistent with how JS describes itself.
+
+# Type to Type
+
+Beyond academic definition disagreements, why does it matter if JavaScript has *types* or not?
+
+Having a proper understanding of each *type* and its intrinsic behavior is absolutely essential to understanding how to properly and accurately convert values to different types (See Coercion, Chapter 4). Nearly every JS program ever written will need to handle value coercion in some shape or form, so it's important you do so responsibly and with confidence.
+
+If you have the `number` value `42`, but you want to treat it like a `string`, such as pulling out the `"2"` as a character, you obviously must first convert (coerce) the value from `number` to `string`.
+
+That seems simple enough.
+
+But there are many different ways that such coercion can happen. Some of these ways are explicit, easy to reason about, and reliable. But if you're not careful, coercion can happen in very strange and surprising ways.
+
+Coercion confusion is perhaps one of the most profound frustrations for JavaScript developers. It has often been criticized as being so *dangerous* as to be considered a flaw in the design of the language, to be shunned and avoided.
+
+Armed with a full understanding of JavaScript types, we're aiming to illustrate why coercion's *bad reputation* is largely over-hyped and somewhat undeserved -- to flip your perspective, to seeing coercion's power and usefulness. But first, we have to get a much better grip on values and types.
 
 ## Primitives
 
