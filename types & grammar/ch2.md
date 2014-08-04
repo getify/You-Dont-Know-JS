@@ -72,6 +72,36 @@ a.length; // 14
 
 Generally, it's not a great idea to add `string` keys/properties to arrays. Use `object`s for holding values in keys/properties, and save `array`s for strictly numerically indexed values.
 
+### Array-Likes
+
+There will be occassions where you need to convert an array-like value (a numerically indexed collection of values) into a true array, usually so you can call array utilities (like `indexOf(..)`, `concat(..)`, `forEach(..)`, etc) against the collection of values.
+
+For example, various DOM query operations return lists of DOM elements that are not true arrays but are array-like enough for our conversion purposes. Another common example is the (as of ES6, deprecated) `arguments` (array-like) object that functions expose to access the arguments in a positional list.
+
+One very common way to make such a conversion is to borrow the `slice(..)` array utility against the value:
+
+```js
+function foo() {
+	var arr = Array.prototype.slice.call( arguments );
+	arr.push( "bam" );
+	console.log(arr);
+}
+
+foo( "bar", "baz" ); // ["bar","baz","bam"]
+```
+
+If `slice()` is called without any other parameters, as it effectively is in the above snippet, the default values for its parameters have the effect of duplicating the array (or, in this case, array-like).
+
+As of ES6, there's also a built-in utility called `Array.from(..)` which can do the same task:
+
+```js
+...
+var arr = Array.from( arguments );
+...
+```
+
+**Note:** `Array.from(..)` has several powerful capabilities, and will be covered in detail in a later book in this series.
+
 ## Strings
 
 It's a very common belief that strings are essentially just arrays of characters. While the implementation under the covers may or may not use arrays, it's important to realize that JavaScript strings are really not the same as arrays of characters. The similarity is mostly just skin-deep.
@@ -83,7 +113,7 @@ var a = "foo";
 var b = ["f","o","o"];
 ```
 
-Strings do have a shallow resemblance to arrays -- sometimes called "array-likes" -- for instance, both of them having a `length` property, an `indexOf(..)` method (array version only as of ES5), and a `concat(..)` method:
+Strings do have a shallow resemblance to arrays -- array-likes, as above -- for instance, both of them having a `length` property, an `indexOf(..)` method (array version only as of ES5), and a `concat(..)` method:
 
 ```js
 a.length;							// 3
