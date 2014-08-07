@@ -146,11 +146,13 @@ var a;
 typeof a; // "undefined"
 
 var b = 42;
+var c;
 
 // later
-b = void 0;
+b = c;
 
 typeof b; // "undefined"
+typeof c; // "undefined"
 ```
 
 It's tempting for most developers to think of the name "undefined" and think of it as a synonym for "undeclared". However, in JS, these two concepts are quite different.
