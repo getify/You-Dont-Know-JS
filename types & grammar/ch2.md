@@ -511,6 +511,8 @@ foo();
 
 **Friends don't let friends override `undefined`.** Ever.
 
+#### `void` Operator
+
 While `undefined` is a built-in identifier that holds (unless modified -- see above!) the built-in `undefined` value, another way to get this value is the `void` operator.
 
 The expression `void ___` "voids" out any value, so that the result of that `void`-expression is always the `undefined` value. It doesn't modify the existing value; it just ensures that no value comes back from the operator expression.
