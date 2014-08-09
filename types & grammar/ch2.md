@@ -1,9 +1,9 @@
 # You Don't Know JS: Types & Grammar
 # Chapter 2: Values
 
-As you no doubt know if you've done any programming before, properly handling values is crucial to good code. In this chapter, we're going to look at many of the built in value types in JS, and explore how we can best leverage each type's built-in behaviors.
+Arrays, strings, and numbers are the most basic buiding-blocks of any program, but JavaScript has some unique characteristics with these types that may either delight or confound you.
 
-Arrays, strings, and numbers are the most basic buiding-blocks of most programs, but JS has some unique characteristics of these types that may either fit well with your prior experiences or may downright surprise you.
+Let's look at several of the built-in value types in JS, and explore how we can more fully understand and correctly leverage their behaviors.
 
 ## Arrays
 
@@ -934,7 +934,7 @@ References are quite powerful, but sometimes they get in your way, and sometimes
 
 ## Summary
 
-Arrays are simply numerically-indexed collections of any value-type. Strings are somewhat "array-like", but they have distinict behaviors and care must be taken if you want to treat them as arrays. Numbers in JavaScript include both "integers" and floating point values.
+In JavaScript, arrays are simply numerically-indexed collections of any value-type. Strings are somewhat "array-like", but they have distinict behaviors and care must be taken if you want to treat them as arrays. Numbers in JavaScript include both "integers" and floating point values.
 
 Several special values are defined within the primitive types.
 
