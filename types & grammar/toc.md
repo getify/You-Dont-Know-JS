@@ -4,7 +4,7 @@
 
 * Preface
 * Chapter 1: Types
-	* Type to Type
+	* A Type By Any Other Name...
 	* Primitives
 	* Values As Types
 * Chapter 2: Values
@@ -17,5 +17,6 @@
 	* Boxing Wrappers
 	* Natives As Constructors
 * Chapter 4: Coercion
+	* Converting Values
 * Appendix A: Thank You's!
 
