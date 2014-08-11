@@ -128,7 +128,7 @@ var c = a.concat( "bar" );			// "foobar"
 var d = b.concat( ["b","a","r"] );	// ["f","o","o","b","a","r"]
 
 a === c;							// false
-b !== d;							// false
+b === d;							// false
 
 a;									// "foo"
 b;									// ["f","o","o"]
@@ -141,7 +141,7 @@ a[1] = "O";
 b[1] = "O";
 
 a; // "foo"
-b; // "fOo"
+b; // ["f","O","o"]
 ```
 
 JavaScript strings are immutable, while arrays are quite mutable. Moreover, the `a[1]` character position access form was not always widely valid JavaScript. Older versions of IE did not allow that syntax (but now they do). Instead, the *correct* approach has been `a.charAt(1)`.
