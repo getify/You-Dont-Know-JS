@@ -1,7 +1,7 @@
 # You Don't Know JS: *this* & Object Prototypes
 # Foreword
 
-While reading this book in preparation for writing this foreword, I was forced to reflect on how I learned JavaScript and how much it has changed over the last 15 years that I have been programming and de‐ veloping with it.
+While reading this book in preparation for writing this foreword, I was forced to reflect on how I learned JavaScript and how much it has changed over the last 15 years that I have been programming and developing with it.
 
 When I started using JavaScript 15 years ago, the practice of using non-HTML technologies such as CSS and JS in your web pages was called DHTML or Dynamic HTML. Back then, the usefulness of JavaScript varied greatly and seemed to be tilted toward adding animated snow‐ flakes to your web pages or dynamic clocks that told the time in the status bar. Suffice it to say, I didn’t really pay much attention to Java‐ Script in the early part of my career because of the novelty of the im‐ plementations that I often found on the Internet.
 
