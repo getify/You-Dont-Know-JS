@@ -378,7 +378,7 @@ The most commonly accepted practice is to use a tiny "rounding error" value as t
 As of ES6, `Number.EPSILON` is predefined with this tolerance value, so you'd want to use it, but you can safely polyfill the definition for pre-ES6:
 
 ```js
-If (!Number.EPSILON) {
+if (!Number.EPSILON) {
 	Number.EPSILON = Math.pow(2,-52);
 }
 ```
