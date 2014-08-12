@@ -155,7 +155,7 @@ a;			// "foo"
 c;			// "FOO"
 
 b.push( "!" );
-b;			// ["f","o","o","!"]
+b;			// ["f","O","o","!"]
 ```
 
 Also, many of the array methods that could be helpful when dealing with strings are not actually available for them, but we can "borrow" non-mutation array methods against our string:
@@ -178,11 +178,11 @@ Let's take another example: reversing a string (incidentally, a common JavaScrip
 ```js
 a.reverse;		// undefined
 
-b.reverse();	// ["o","o","f"]
-b;				// ["o","o","f"]
+b.reverse();	// ["!","o","O","f"]
+b;				// ["!","o","O","f"]
 ```
 
-Unfortunately, this "borrowing" doesn't work with array mutators (in large part because strings are immutable, and `reverse(..)` modifies in place):
+Unfortunately, this "borrowing" doesn't work with array mutators (in large part because strings are immutable, so they can't be modified in place):
 
 ```js
 Array.prototype.reverse.call( a );
