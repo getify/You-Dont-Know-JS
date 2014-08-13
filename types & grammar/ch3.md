@@ -23,7 +23,7 @@ If you're coming to JS from a language like Java, `String()` will look like the 
 ```js
 var s = new String( "Hello World!" );
 
-console.log( s ); // "Hello World"
+console.log( s ); // "Hello World!"
 ```
 
 It *is* true that each of these natives can be used as a native constructor. But what's being constructed may be different than you think.
@@ -50,7 +50,9 @@ console.log( a );
 
 The output of that statement varies depending on your browser, as developer consoles are free to choose however they feel it's appropriate to serialize the object for developer inspection.
 
-For example, at time of writing, Chrome prints this: `String {0: "a", 1: "b", 2: "c", length: 3, [[PrimitiveValue]]: "abc"}`. But Chrome used to just print this: `String {0: "a", 1: "b", 2: "c"}`. Firefox currently prints `"abc"` but it's in italics and is clickable to open the object inspector. Of course, these results are subject to change and your experience may vary.
+**Note:** At time of writing, latest Chrome prints something like this: `String {0: "a", 1: "b", 2: "c", length: 3, [[PrimitiveValue]]: "abc"}`. But older Chrome used to just print this: `String {0: "a", 1: "b", 2: "c"}`. Latest Firefox currently prints `String ["a","b","c"]`, but used to print `"abc"` in italics which was clickable to open the object inspector. Of course, these results are subject to rapid change and your experience may vary.
+
+The point is, `new String("abc")` creates a string wrapper object around `"abc"`, not just the primitive `"abc"` value itself.
 
 ## Internal `[[Class]]`
 
