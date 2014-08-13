@@ -418,20 +418,53 @@ But, some of the native prototypes aren't *just* plain objects:
 
 ```js
 typeof Function.prototype;			// "function"
-Function.prototype();				// no error, it's a no-op function!
+Function.prototype();				// it's an empty function!
 
+RegExp.prototype.toString();		// "/(?:)/" -- empty regex
+"abc".match( RegExp.prototype );	// [""]
+```
+
+A particularly bad idea, you can even modify these native prototypes (not just adding properties as you're probably familiar with):
+
+```js
 Array.isArray( Array.prototype );	// true
 Array.prototype.push( 1, 2, 3 );	// 3
 Array.prototype;					// [1,2,3]
 
-"abc".match( RegExp.prototype );	// [""] -- no error, it's a regular expression!
+// don't leave it that way, though, or expect weirdness!
+// reset the `Array.prototype` to empty
+Array.prototype.length = 0;
 ```
 
-`Function.prototype` is a function, `Array.prototype` is an array, and `RegExp.prototype` is a regular expression.
+`Function.prototype` is a function, `RegExp.prototype` is a regular expression, and `Array.prototype` is an array.
 
 Interesting and cool, huh?
 
-There have definitely been times when I've needed a placeholder no-op function like `function(){}`, but `Function.prototype` is already there for use!
+`Function.prototype` being an empty function, `RegExp.prototype` being an empty regex, and `Array.prototype` being an empty array, make them all good "default" values to assign to variables if those variables wouldn't already have had a value of the proper type.
+
+For example:
+
+```js
+function isThisCool(vals,fn,rx) {
+	vals = vals || Array.prototype;
+	fn = fn || Function.prototype;
+	rx = rx || RegExp.prototype;
+
+	return rx.test(
+		vals.map( fn ).join( "" )
+	);
+}
+
+isThisCool();		// true
+
+isThisCool(
+	["a","b","c"],
+	function(v){ return v.toUpperCase(); },
+	/D/
+);					// false
+```
+
+**Note:** As of ES6, we don't need to use the `vals = vals || ..` default value syntax trick (see Chapter 4) anymore, because default values can be set for parameters via native syntax in the function declaration (see Chapter 5).
 
 ## Summary
 
