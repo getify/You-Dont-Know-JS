@@ -75,7 +75,7 @@ Object.prototype.toString.call( undefined );	// "[object Undefined]"
 
 You'll note that there is no `Null()` or `Undefined()` native constructors, but nevertheless the `"Null"` and `"Undefined"` are the internal `[[Class]]` values exposed.
 
-But for the other simple primitives like `string`, `number`, and `boolean`, another behavior actually kicks in, which is usually called "boxing" (see below).
+But for the other simple primitives like `string`, `number`, and `boolean`, another behavior actually kicks in, which is usually called "boxing" (see below):
 
 ```js
 Object.prototype.toString.call( "abc" );	// "[object String]"
@@ -83,7 +83,7 @@ Object.prototype.toString.call( 42 );		// "[object Number]"
 Object.prototype.toString.call( true );		// "[object Boolean]"
 ```
 
-In this snippet, each of the simple primitives are automatically boxed (see below) by their respective object wrappers, which is why `"String"`, `"Number"`, and `"Boolean"` are revealed as the internal `[[Class]]` values.
+In this snippet, each of the simple primitives are automatically boxed (see below) by their respective object wrappers, which is why `"String"`, `"Number"`, and `"Boolean"` are revealed as the respective internal `[[Class]]` values.
 
 ## Boxing Wrappers
 
@@ -102,7 +102,11 @@ But it turns out that's a bad idea. Browsers long ago performance-optimized the 
 
 In general, there's basically no reason to use the object-form directly. It's better to just let the boxing happen implicitly where necessary. In other words, never do things like `new String("abc")`, `new Number(42)`, etc -- always prefer using the literal primitive values `"abc"` and `42`.
 
-There are some gotchas with using the object wrappers directly.
+### Object Wrapper Gotchas
+
+There are even some gotchas with using the object wrappers directly that you should be aware of if you *do* choose to ever use them.
+
+For example, consider `Boolean` wrapped values:
 
 ```js
 var a = new Boolean( false );
@@ -112,7 +116,7 @@ if (!a) {
 }
 ```
 
-The problem is that you've created an object wrapper around the `false` value, but objects themselves are "truthy" (see Chapter 4), so using the object behaves oppositely to using the `false` value itself, which is quite contrary to normal expectation.
+The problem is that you've created an object wrapper around the `false` value, but objects themselves are "truthy" (see Chapter 4), so using the object behaves oppositely to using the underlying `false` value itself, which is quite contrary to normal expectation.
 
 If you want to manually box a primitive value, you can use the `Object(..)` function (no `new` keyword):
 
@@ -132,9 +136,9 @@ Object.prototype.toString.call( b ); // "[object String]"
 Object.prototype.toString.call( c ); // "[object String]"
 ```
 
-Again, using the boxed object wrapper directly (like `b` and `c` above) is usually discouraged, but there are some rare occassions you'll run into where they may be useful.
+Again, using the boxed object wrapper directly (like `b` and `c` above) is usually discouraged, but there may be some rare occassions you'll run into where they may be useful.
 
-### Unboxing
+## Unboxing
 
 If you have an object wrapper and you want to get the underlying primitive value out, you can use the `valueOf()` method:
 

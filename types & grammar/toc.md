@@ -15,6 +15,7 @@
 * Chapter 3: Natives
 	* Internal `[[Class]]`
 	* Boxing Wrappers
+	* Unboxing
 	* Natives As Constructors
 * Chapter 4: Coercion
 	* Converting Values
