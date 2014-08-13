@@ -440,7 +440,7 @@ Array.prototype.length = 0;
 
 Interesting and cool, huh?
 
-`Function.prototype` being an empty function, `RegExp.prototype` being an empty regex, and `Array.prototype` being an empty array, make them all good "default" values to assign to variables if those variables wouldn't already have had a value of the proper type.
+`Function.prototype` being an empty function, `RegExp.prototype` being an empty regex, and `Array.prototype` being an empty array, make them all nice "default" values to assign to variables if those variables wouldn't already have had a value of the proper type.
 
 For example:
 
@@ -465,6 +465,8 @@ isThisCool(
 ```
 
 **Note:** As of ES6, we don't need to use the `vals = vals || ..` default value syntax trick (see Chapter 4) anymore, because default values can be set for parameters via native syntax in the function declaration (see Chapter 5).
+
+Be very careful not to use `Array.prototype` as a default value **that will subsequently be modified**. In this example, `vals` is used read-only, but if you were to instead make in-place changes to `vals`, you would actually be modifying `Array.prototype` itself, which would lead to the weirdnesses mentioned earlier!
 
 ## Summary
 
