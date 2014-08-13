@@ -436,11 +436,11 @@ Array.prototype;					// [1,2,3]
 Array.prototype.length = 0;
 ```
 
-`Function.prototype` is a function, `RegExp.prototype` is a regular expression, and `Array.prototype` is an array.
+As you can see, `Function.prototype` is a function, `RegExp.prototype` is a regular expression, and `Array.prototype` is an array. Interesting and cool, huh?
 
-Interesting and cool, huh?
+#### Prototypes As Defaults
 
-`Function.prototype` being an empty function, `RegExp.prototype` being an empty regex, and `Array.prototype` being an empty array, make them all nice "default" values to assign to variables if those variables wouldn't already have had a value of the proper type.
+`Function.prototype` being an empty function, `RegExp.prototype` being an "empty" (aka non-matching) regex, and `Array.prototype` being an empty array, make them all nice "default" values to assign to variables if those variables wouldn't already have had a value of the proper type.
 
 For example:
 
@@ -466,7 +466,9 @@ isThisCool(
 
 **Note:** As of ES6, we don't need to use the `vals = vals || ..` default value syntax trick (see Chapter 4) anymore, because default values can be set for parameters via native syntax in the function declaration (see Chapter 5).
 
-Be very careful not to use `Array.prototype` as a default value **that will subsequently be modified**. In this example, `vals` is used read-only, but if you were to instead make in-place changes to `vals`, you would actually be modifying `Array.prototype` itself, which would lead to the weirdnesses mentioned earlier!
+One minor side-benefit of this approach is that the `.prototype`s are already created and built-in, thus created *only once*. By contrast, using `[]`, `function(){}`, and `/(?:)/` values themselves for those defaults would (likely, depending on engine implementations) be recreating those values (and probably garbage-collecting them later) for *each call* of `isThisCool(..)`. That could be memory/CPU wasteful.
+
+Also, be very careful not to use `Array.prototype` as a default value **that will subsequently be modified**. In this example, `vals` is used read-only, but if you were to instead make in-place changes to `vals`, you would actually be modifying `Array.prototype` itself, which would lead to the weirdnesses mentioned earlier!
 
 ## Summary
 
