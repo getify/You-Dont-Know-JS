@@ -188,6 +188,8 @@ But more importantly, there's no such thing as actually pre-sizing the array. In
 
 An array which has no explicit values in its slots, but it has a `length` property that *implies* the slots exist, is a weird exotic type of data structure in JS with some very strange and confusing behavior. The capability to create such a value comes purely from old, deprecated, historical functionalities ("array-like objects" like the `arguments` object).
 
+**Note: An array with at least one "empty slot" in it is often called a "sparse array".
+
 It doesn't help matters that this is yet another example where browser developer consoles vary on how they represent such an object, which breeds more confusion.
 
 For example:
