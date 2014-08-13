@@ -23,7 +23,7 @@ If you're coming to JS from a language like Java, `String()` will look like the 
 ```js
 var s = new String( "Hello World!" );
 
-console.log( s ); // "Hello World!"
+console.log( s.toString() ); // "Hello World!"
 ```
 
 It *is* true that each of these natives can be used as a native constructor. But what's being constructed may be different than you think.
@@ -403,7 +403,7 @@ By virtue of prototype delegation (see the *"this & Object Prototypes" title in 
 ```js
 var a = " abc ";
 
-a.indexOf( "C" ); // 3
+a.indexOf( "c" ); // 3
 a.toUpperCase(); // " ABC "
 a.trim(); // "abc"
 ```
