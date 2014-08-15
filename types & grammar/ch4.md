@@ -176,8 +176,120 @@ The importance of truthy and falsy is in understanding how a value will behave i
 
 ## Explicit Coercion
 
-*Explicit Coercion:* type conversions that are obvious and explicit. There's a wide range of type conversion usage that clearly falls under the *explicit coercion* category.
+*Explicit Coercion:* type conversions that are obvious and explicit. There's a wide range of type conversion usage that clearly falls under the *explicit coercion* category for most developers.
+
+The goal here is to identify patterns in our code where we can make it clear and obvious that we're converting a value from one type to another, so as to not leave potholes for future developers to trip into. The more explicit we are, the more likely someone later will be able to read our code and understand without undue effort what our intent was.
+
+It would be hard to find any salient disagreements with *explicit coercion*, as it most closely aligns with the commonly accepted practices of type conversion works in statically-typed languages. As such, we'll take for granted (for now) that *explicit coercion* can be agreed upon to not be evil or controversial. We'll revisit this later, though.
+
+### Strings <-> Numbers
+
+Let's start with the simplest and perhaps most common: coercing values between `string` and `number` representation.
+
+Consider:
+
+```js
+var a = 42;
+var b = String( a );
+
+var c = "3.14";
+var d = Number( c );
+
+b; // "42"
+d; // 3.14
+```
+
+We use the built-in `String(..)` and `Number(..)` functions (which referred to as "native constructors" in Chapter 3), but **very importantly**, we do not use the `new` keyword in front of them. As such, we're not creating object wrappers.
+
+Instead, we're actually *explicitly coercing*. `String(..)` coerces from any other value to a primitive `string` value. `Number(..)` coerces from any other value to a primitive `number` value.
+
+I call this *explicit coercion* because in general, it's pretty obvious to most developers that the end result of these operations is the applicable type conversion.
+
+In fact, this usage actually looks a lot like it does in some other statically-typed languages.
+
+For example, in C/C++, you can say either `(int)x` or `int(x)`, and both will convert the value in `x` to an integer. Both forms are valid, but many prefer the latter, which kinda looks like a function call. In JavaScript, when you say `Number(x)`, it looks awfully similar. Does it matter that it's *actually* a function call in JS? Not really.
+
+Besides the above, there are other ways to "explicitly" convert these values between `string` and `number`:
+
+```js
+var a = 42;
+var b = a.toString();
+
+var c = "3.14";
+var d = +c;
+
+b; // "42"
+d; // 3.14
+```
+
+Calling `a.toString()` is ostensibly explicit (pretty clear that "toString" means "to a string"), but there's some hidden implicitness here. `toString()` cannot be called on a *primitive* value like `42`. So JS automatically "boxes" (see Chapter 3) `42` in an object wrapper, so that `toString()` can be called against the object. In other words, you might call it "explicitly implicit".
+
+`+c` here is showing the *unary operator* form (operator with only one operand) of the `+` operator. Instead of performing mathematic addition (or string concatenation -- see below), the unary `+` explicitly coerces its operand (`c`) to a `number` value.
+
+Is `+c` *explicit coercion*? Depends on your experience and perspective. If you know (which you do, now!) that unary `+` is explicitly intended for `number` coercion, then it's pretty explicit and obvious. However, if you've never seen it before, it can seem awfully confusing, implicit, hidden side-effect, etc.
+
+**Note:** The generally accepted perspective in the open-source JS community is that unary `+` is usually an accepted form of *explicit coercion*.
+
+Even if you really like the `+c` form, there are definitely places where it can look awfully confusing. Consider:
+
+```js
+var c = "3.14";
+var d = 5+ +c;
+
+d; // 8.14
+```
+
+You can probably dream up all sorts of hideous combinations of binary operators (like `+` for addition) next to the unary form of an operator. I'll leave such masochism as an exercise for the reader.
+
+The point I'm making is, you might want to consider avoiding unary `+` coercion when it's immediately adjacent to other operators. While the above works, it would almost universally be considered a bad idea. Even `d = +c` can easily be confused for `d += c`, which is entirely different!
 
 ## Implicit Coercion
 
 *Implicit Coercion:* type conversions that are hidden, non-obvious side-effects that implicitly occur from other actions. In other words, *implicit coercions* are any type conversions that aren't obvious (to you).
+
+While it's clear what the goal of *explicit coercion* would be (making code explicit and more understandable), it might seem *too obvious* that *implicit coercion* would fight against that goal and make code harder to understand.
+
+Taken at face value, that's where much of the ire towards coercion comes from. The majority of complaints about "JavaScript coercion" are actually aimed (whether they realize it or not) at *implicit coercion*.
+
+**Note:** When Doug Crockford says that JavaScript coercion is "dangerous" and a "flaw" in the design of the language, what he really means is that *implicit coercion* is bad (in his opinion). In fact, if you read Doug's code, you'll find plenty of examples of *explicit coercion*, so it's obvious just from that observation where his true angst is directed.
+
+So, **is implicit coercion** evil? Is it dangerous? Should we avoid it at all costs?
+
+I bet most of you readers are inclined to enthusiastically cheer, "Yes!"
+
+**Not so fast.** Hear me out throughout the rest of the chapter.
+
+Let's take a different perspective on what *implicit coercion* is, and can be, than just that it's "the opposite of the good explicit kind of coercion". That's far too narrow, and misses important nuance.
+
+Let's define the goal of *implicit coercion* as: to reduce verbosity, boilerplate, and/or unnecessary implementation detail which clutters up our code with noise that distracts from the more important intent.
+
+### Implicitly Simplifying
+
+Before we even get to JavaScript, let me suggest something pseudo-code'ish from some theoretical strongly-typed language to illustrate:
+
+```js
+SomeType x = SomeType( AnotherType( y ) )
+```
+
+In this example, I have some arbitrary type of value in `y` that I want to convert to the `SomeType` type. The problem is, this language can't go directly from whatever `y` currently is to `SomeType`. It has to have an intermediate step, where it first goes to `AnotherType`, and then from `AnotherType` to `SomeType`.
+
+Why? Who knows, who cares? If you're written code in statically-typed languages before, you know this stuff happens. I'm just giving a generic concept of the issue.
+
+Now, what if that language (or definition you could create yourself with the language) *did* just let you say:
+
+```js
+SomeType x = SomeType( y )
+```
+
+Wouldn't you generally agree that we simplified the type conversion here to remove the *obviousness* of the somewhat unnecessary "noise" of the intermediate conversion step? I mean, is it *really* all that important, right here at this point in the code, to see and deal with the fact that `y` goes to `AnotherType` first before then going to `SomeType`?
+
+Some would argue, at least in some circumstances, yes. But I think an equal argument can be made of many other circumstances that here, the simplification **actually aids in the understanding of code** by abstracting or hiding way such details, either in the language itself or in our own abstractions. Undoubtedly, behind the scenes, somewhere, the two-step conversion is happening. But if that detail is hidden from view here, we can just reason about getting `y` to type `SomeType` as an abstract operation, and leave the details out of it at present.
+
+While not a perfect analogy, what I'm going to argue throughout the rest of this chapter is that JS *implicit coercion* can be thought of as providing similar aid to your code.
+
+But, **and this is very important**, that is not an unbounded, absolute statement. There are most definitely plenty of *evils* lurking around *implicit coercion*. We have to learn how to avoid them so as to not poison our code with all manner of bugs.
+
+Many developers take the approach that if the mechanism by which we can do some useful thing **A** can also be abused or misused to do some awful thing **Z**, then we should throw out the mechanism altogether, just to be safe.
+
+My encouragement to you is, don't settle for that. Don't "throw the baby out with the bathwater". Don't assume *implicit coercion* is all bad because all you think you've ever seen is its "bad parts". There are "good parts" here, and I want to help and inspire more of you to find and embrace them!
+
