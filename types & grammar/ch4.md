@@ -43,13 +43,82 @@ But we're conducting this discussion of "explicit" vs "implicit" based on the li
 
 Just remember: it's often rare that we write our code and are the only ones who ever read it. Even if you're an expert on all the ins and outs of JS, consider how a less-experienced teammate of yours will *feel* when they read your code. Will it be "explicit" or "implicit" to them in the same way it is for you?
 
-## Falsy & Truthy
+## Abstract Value Operations
 
-Before we explore *explicit* and *implicit* coercion, we need to have a little chat about how `boolean`s behave in JS.
+Before we can explore *explicit* vs *implicit* coercion, we need to learn the basic rules that govern how values *become* either a `string`, `number`, or `boolean`.
+
+### `ToString`
+
+When any value that's not already a `string` is forced to represent itself as a `string` (either *explicitly* or *implicitly*), the abstract operation that's used is defined in the ES5 spec in section 9.8: `ToString`.
+
+Built-in primitive values like `null` are stringified to `"null"`. `true` becomes `"true"`. But objects are generally stringified by calling that value's `toString()` method. `number`s are generally represented in `string` form in the natural way you'd expect. But as we showed in Chapter 2, very small or very large `numbers` are stringified to their corresponding exponent form.
+
+For regular objects, unless you specify your own, the default `toString()` (located in `Object.prototype.toString()`) will return the *internal `[[Class]]`* (see Chapter 3), like for instance `"[object Object]"`.
+
+But as shown earlier, if an object has its own `toString()` method on it, and you use that object in a `string` like way, its `toString()` will automatically called, and the `string` result of that call will be used instead.
+
+Arrays have an overridden default `toString()` that stringifies as the (string) concatenation of all its values (each stringified themselves), with `","` in between each value:
+
+```js
+var a = [1,2,3];
+
+a.toString(); // "1,2,3"
+```
+
+Again, the key is that `toString()` can either be called explicitly, or it will automatically be called if a non-`string` needs to become a `string`.
+
+### `ToNumber`
+
+If any non-`number` value is used in a way that requires it to be a `number`, such as a mathematical operation, the ES5 spec defines in section 9.3 the abstract operation `ToNumber` with the rules for how that should occur.
+
+For example, `true` becomes `1` and `false` becomes `0`. `undefined` becomes `NaN`, but (curiously) `null` becomes `0`.
+
+`ToNumber` for a `string` value essentially works for the most part like the rules/syntax for numeric literals (see Chapter 3). If it fails, the result is `NaN` (instead of a syntax error with `number` literals). One example difference is that `0`-prefixed octal numbers are not handled as octals (just as normal base-10 decimals) in this operation, though such octals are valid as `number` literals (see Chapter 2).
+
+**Note:** The differences between `number` literal grammar and `ToNumber` on a `string` value are subtle and highly nuanced, and thus will not be covered further here. Consult section 9.3.1 of the ES5 spec for more information, if desired.
+
+Objects (and arrays) will first be converted to their primitive value equivalent, if possible, and then this value (if a primitive but not already a `number`) is coerced to a `number` according to the `ToNumber` rules just mentioned.
+
+To convert to this primitive value equivalent, the value in question will be consulted to see if it has a `valueOf()` method, and if so, what it returns (if a primitive value) will be used for the coercion. If no `valueOf()` is present, `toString()` is consulted, if present. If what it returns is a primitive, that will be used for the coercion.
+
+**Note:** We cover how to coerce to `number`s later in this chapter in detail, but for this present discussion just assume the `Number(..)` function does so.
+
+Consider:
+
+```js
+var a = {
+	valueOf: function(){
+		return "42";
+	}
+};
+
+var b = {
+	toString: function(){
+		return "42";
+	}
+};
+
+var c = [4,2];
+c.toString = function(){
+	return this.join( "" );	// "42"
+};
+
+Number( a );	// 42
+Number( b );	// 42
+Number( c );	// 42
+Number( "" );	// 0
+Number( [] );	// 0
+```
+
+If a primitive cannot be obtained, `NaN` will be the result.
+
+### `ToBoolean`
+
+Next, let's have a little chat about how `boolean`s behave in JS.
 
 First and foremost, JS has actual keywords `true` and `false`, and they behave exactly as you'd expect of `boolean` values. It's a common misconception that the values `1` and `0` are identical to `true` / `false`. While that may be true in other languages, in JS the `number`s are `number`s and the `boolean`s are `boolean`s. You can coerce `1` to `true` (and vice versa) or `0` to `false` (and vice versa). But they're not the same.
 
-### Falsy Values
+#### Falsy Values
 
 But that's not the end of the story. We need to discuss how values other than the two `boolean`s behave whenever you coerce *to* their `boolean` equivalent.
 
@@ -134,7 +203,7 @@ Ugh. That sucks. It's a crazy gotcha that most JS developers don't understand. B
 
 So... that's what we've got: crazy, non-standard "falsy objects" added to JavaScript by the browsers. Yay!
 
-### Truthy Values
+#### Truthy Values
 
 Back to the truthy list. What exactly are the truthy values? Remember: **a value is truthy if it's not on the falsy list.**
 
@@ -182,11 +251,13 @@ The goal here is to identify patterns in our code where we can make it clear and
 
 It would be hard to find any salient disagreements with *explicit coercion*, as it most closely aligns with the commonly accepted practices of type conversion works in statically-typed languages. As such, we'll take for granted (for now) that *explicit coercion* can be agreed upon to not be evil or controversial. We'll revisit this later, though.
 
-### Strings <-> Numbers
+### Strings <--> Numbers
 
-Let's start with the simplest and perhaps most common: coercing values between `string` and `number` representation.
+We'll start with the simplest and perhaps most common coercion operation: coercing values between `string` and `number` representation.
 
-Consider:
+To coerce between `string`s and `number`s, we use the built-in `String(..)` and `Number(..)` functions (which we referred to as "native constructors" in Chapter 3), but **very importantly**, we do not use the `new` keyword in front of them. As such, we're not creating object wrappers.
+
+Instead, we're actually *explicitly coercing* between the two types:
 
 ```js
 var a = 42;
@@ -199,9 +270,7 @@ b; // "42"
 d; // 3.14
 ```
 
-We use the built-in `String(..)` and `Number(..)` functions (which referred to as "native constructors" in Chapter 3), but **very importantly**, we do not use the `new` keyword in front of them. As such, we're not creating object wrappers.
-
-Instead, we're actually *explicitly coercing*. `String(..)` coerces from any other value to a primitive `string` value. `Number(..)` coerces from any other value to a primitive `number` value.
+`String(..)` coerces from any other value to a primitive `string` value, using the rules of the earlier discussed `ToString` operation. `Number(..)` coerces from any other value to a primitive `number` value, using the rules of the earlier discussed `ToNumber` operation.
 
 I call this *explicit coercion* because in general, it's pretty obvious to most developers that the end result of these operations is the applicable type conversion.
 
@@ -209,7 +278,7 @@ In fact, this usage actually looks a lot like it does in some other statically-t
 
 For example, in C/C++, you can say either `(int)x` or `int(x)`, and both will convert the value in `x` to an integer. Both forms are valid, but many prefer the latter, which kinda looks like a function call. In JavaScript, when you say `Number(x)`, it looks awfully similar. Does it matter that it's *actually* a function call in JS? Not really.
 
-Besides the above, there are other ways to "explicitly" convert these values between `string` and `number`:
+Besides `String(..)` and `Number(..)`, there are other ways to "explicitly" convert these values between `string` and `number`:
 
 ```js
 var a = 42;
@@ -228,7 +297,7 @@ Calling `a.toString()` is ostensibly explicit (pretty clear that "toString" mean
 
 Is `+c` *explicit coercion*? Depends on your experience and perspective. If you know (which you do, now!) that unary `+` is explicitly intended for `number` coercion, then it's pretty explicit and obvious. However, if you've never seen it before, it can seem awfully confusing, implicit, hidden side-effect, etc.
 
-**Note:** The generally accepted perspective in the open-source JS community is that unary `+` is usually an accepted form of *explicit coercion*.
+**Note:** The generally accepted perspective in the open-source JS community is that unary `+` is an accepted form of *explicit coercion*.
 
 Even if you really like the `+c` form, there are definitely places where it can look awfully confusing. Consider:
 
@@ -241,7 +310,111 @@ d; // 8.14
 
 You can probably dream up all sorts of hideous combinations of binary operators (like `+` for addition) next to the unary form of an operator. I'll leave such masochism as an exercise for the reader.
 
-The point I'm making is, you might want to consider avoiding unary `+` coercion when it's immediately adjacent to other operators. While the above works, it would almost universally be considered a bad idea. Even `d = +c` can easily be confused for `d += c`, which is entirely different!
+You might want to consider avoiding unary `+` coercion when it's immediately adjacent to other operators. While the above works, it would almost universally be considered a bad idea. Even `d = +c` (or `d =+ c` for that matter!) can far too easily be confused for `d += c`, which is entirely different!
+
+Remember, we're trying to be explicit and **reduce** confusion, not make it much worse!
+
+### Parsing Numeric Strings
+
+A similar outcome to coercing a `string` to a `number` can be achieved by parsing a `number` out of a `string`'s character contents. There are, however, distinct differences between this parsing and the type conversion we examined above.
+
+Consider:
+
+```js
+var a = "42";
+var b = "42px";
+
+Number( a );	// 42
+parseInt( a );	// 42
+
+Number( b );	// NaN
+parseInt( b );	// 42
+```
+
+Parsing a numeric value out a string is *tolerant* of non-numeric characters (just stops going left-to-right when encountered), whereas coercion is *not tolerant* and fails resulting in the `NaN` value.
+
+Parsing should not be seen as a substitute for coercion. These two tasks, while similar, have different purposes. Parse a `string` as a `number` when you don't know/care what other non-numeric characters there may be on the right-hand side. Coerce a `string` (to a `number`) when the only acceptable values are numeric and something like `"42px"` should be rejected as a `number`.
+
+**Note:** `parseInt(..)` has a a twin, `parseFloat(..)`, which (as it sounds) pulls out a floating point number from a string, whereas `parseInt(..)` only accepts integer characters (`0`-`9`).
+
+Don't forget that `parseInt(..)` operates on `string` values. It makes absolutely no sense to pay a `number` value to `parseInt(..)`. Nor would it make sense to pass any other type of value, like `true`, `function(){..}` or `[1,2,3]`.
+
+If you pass a non-`string`, the value you pass will automatically be coerced to a `string` first (see "`ToString`" earlier), which would clearly be a kind of hidden *implicit coercion*. It's a really bad idea to rely upon such a behavior in your program, so never use `parseInt(..)` with a non-`string` value.
+
+Prior to ES5, another gotcha existed with `parseInt(..)`, which was the source of many JS programs' bugs. If you didn't pass a second argument to indicate which numeric base (aka radix) to use for interpreting the numeric `string` contents, `parseInt(..)` would look at the first character to make a *guess*.
+
+If the first character was `x` or `X`, the guess (by convention) was that you wanted to interpret the `string` as a hexadecimal (base-16) `number`. If the first character was `0`, the guess (again, by convention) was that you wanted to interpret the `string` as an octal (base-8) `number`.
+
+Hexadecimal `string`s (with the leading `x` or `X`) aren't terribly easy to get mixed up. But the octal number guessing proved devilishly common. For example:
+
+```js
+var hour = parseInt( selectedHour.value );
+var minute = parseInt( selectedMiniute.value );
+
+console.log( "The time you selected was: " + hour + ":" + minute);
+```
+
+Seems harmless, right? Try selecting `08` for the hour and `09` for the minute. You'll get `0:0`. Why? because neither `8` nor `9` are valid characters in octal base-8.
+
+The pre-ES5 fix was simple, but so easy to forget: **always pass `10` as the second argument**. This was totally safe:
+
+```js
+var hour = parseInt( selectedHour.value, 10 );
+var minute = parseInt( selectedMiniute.value, 10 );
+```
+
+As of ES5, `parseInt(..)` no longer guesses. Unless you say otherwise, it assumes base-10. That's much nicer. Just be careful if your code has to run in pre-ES5 environments, in which case you still need to pass `10` for the radix.
+
+#### Parsing Non-Strings
+
+One somewhat infamous example of `parseInt(..)`'s behavior is highlighted in a sarcastic joke post a few years ago, poking fun at this JS behavior:
+
+```js
+parseInt( 1/0, 19 ); // 18
+```
+
+The assumptive (but totally invalid) assertion was, "If I pass in Infinity, and parse an integer out of that, I should get Infinity back, not 18." Surely, JS must be crazy for this outcome, right?
+
+Though this example is obviously contrived and unreal, let's indulge the madness for a moment and examine whether JS really is that crazy.
+
+First off, the most obvious sin committed here is to pass a non-`string` to `parseInt(..)`. That's a no-no. Do it and you're asking for trouble. But even if you do, JS politely coerces what you pass in to a `string` that it can try to parse.
+
+Some would argue that this is unreasonable behavior, and that `parseInt(..)` should refuse to operate on a non-`string` value. Should it perhaps throw an error? That would be very Java-like, frankly. I shudder at thinking JS should start throwing errors all over the place so that `try..catch` is needed around almost every line.
+
+Should it return `NaN`? Maybe. But... what about:
+
+```js
+parseInt( new String( "42") );
+```
+
+Should that fail, too? It's a non-`string` value. If you would want that `String` object wrapper to be unboxed to `"42"`, then is it really so unusual for `42` to first become `"42"` so that `42` can be parsed back out?
+
+I would argue that this *half-explicit, half-implicit coercion* that can occur (we'll get into more detail on such things later) can often be a very helpful thing. For example:
+
+```js
+var a = {
+	num: 21,
+	toString: function() { return String( this.num * 2 ); }
+};
+
+parseInt( a ); // 42
+```
+
+The fact that `parseInt(..)` forcibly coerces its value to a `string` to perform the parse on is quite sensible. If you pass in garbage, and you get garbage back out, don't blame the trash can -- it just did its job faithfully.
+
+So, if you pass in a value like `Infinity` (the result of `1 / 0` obviously), what sort `string` representation would make most sense for its coercion? Only two reasonable choices come to mind: `"Infinity"` and `"∞"`. JS chose `"Infinity"`. I'm glad it did.
+
+I think it's a good thing that **all values** in JS have some sort of default `string` representation, so that they aren't mysterious black boxes that we can't debug and reason about.
+
+Now, what about base-19? Obviously completely bogus and contrived. No real JS programs use base-19. It's absurd. But again, let's indulge the ridiulousness. In base-19, the valid numeric characters are `0` - `9` and `a` - `i` (case insensitive).
+
+So, back to our `parseInt( 1/0, 19 )` example. It's essentially `parseInt( "Infinity", 19 )`. How does it parse? The first character is `"I"`, which is value `18` in the silly base-19. The second character `"n"` is not in the valid set of numeric characters, and as such the parsing simply politely stops, just like when it ran across `"p"` in `"42px"`.
+
+The result? `18`. Exactly like it sensibly should. The behaviors involved to get us there, and not to an error or to `Infinity` itself, are **very important** to JS, and should not be so easily discarded.
+
+### * --> Boolean
+
+Now, let's examine coercing from any non-`boolean` value to a `boolean`.
 
 ## Implicit Coercion
 
@@ -292,4 +465,3 @@ But, **and this is very important**, that is not an unbounded, absolute statemen
 Many developers take the approach that if the mechanism by which we can do some useful thing **A** can also be abused or misused to do some awful thing **Z**, then we should throw out the mechanism altogether, just to be safe.
 
 My encouragement to you is, don't settle for that. Don't "throw the baby out with the bathwater". Don't assume *implicit coercion* is all bad because all you think you've ever seen is its "bad parts". There are "good parts" here, and I want to help and inspire more of you to find and embrace them!
-

@@ -19,5 +19,8 @@
 	* Natives As Constructors
 * Chapter 4: Coercion
 	* Converting Values
+	* Abstract Value Operations
+	* Explicit Coercion
+	* Implicit Coercion
 * Appendix A: Thank You's!
 
