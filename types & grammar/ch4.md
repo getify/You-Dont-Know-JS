@@ -77,7 +77,11 @@ Again, `toString()` can either be called explicitly, or it will automatically be
 
 #### JSON Stringification
 
-Another task that seems awfully related to `ToString` is when you use the `JSON.stringify(..)` utility to serialize a value to a JSON-compatible `string` value. For simple values, the above `ToString` rules apply:
+Another task that seems awfully related to `ToString` is when you use the `JSON.stringify(..)` utility to serialize a value to a JSON-compatible `string` value.
+
+It's important to note that this stringification is not exactly the same thing as coercion. But since it's related to the `ToString` rules above, we'll take a slight diversion to cover JSON stringification behaviors here.
+
+For most simple values, JSON stringification behaves bascially the same as `toString()` conversions, except that the serialization result is *always a `string`*:
 
 ```js
 JSON.stringify( 42 );	// "42"
