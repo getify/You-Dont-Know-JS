@@ -45,11 +45,11 @@ Just remember: it's often rare that we write our code and are the only ones who 
 
 ## Abstract Value Operations
 
-Before we can explore *explicit* vs *implicit* coercion, we need to learn the basic rules that govern how values *become* either a `string`, `number`, or `boolean`.
+Before we can explore *explicit* vs *implicit* coercion, we need to learn the basic rules that govern how values *become* either a `string`, `number`, or `boolean`. The ES5 spec defines three "abstract operations" (fancy spec-speak for "internal-only operation") with the rules of value conversion: `ToString`, `ToNumber`, and `ToBoolean`.
 
 ### `ToString`
 
-When any value that's not already a `string` is forced to represent itself as a `string` (either *explicitly* or *implicitly*), the abstract operation that's used is defined in the ES5 spec in section 9.8: `ToString`.
+When any value that's not already a `string` is forced to represent itself as a `string` (either *explicitly* or *implicitly*), the ES5 spec defines the `ToString` abstract operation in section 9.8.
 
 Built-in primitive values like `null` are stringified to `"null"`. `undefined` becomes `"undefined"` and `true` becomes `"true"`. `number`s are generally represented in `string` form in the natural way you'd expect. But as we discussed in Chapter 2, very small or very large `numbers` are stringified in exponent form:
 
@@ -174,7 +174,7 @@ In the second stringification, we stringified the returned `string` rather than 
 
 ### `ToNumber`
 
-If any non-`number` value is used in a way that requires it to be a `number`, such as a mathematical operation, the ES5 spec defines in section 9.3 the abstract operation `ToNumber` with the rules for how that should occur.
+If any non-`number` value is used in a way that requires it to be a `number`, such as a mathematical operation, the ES5 spec defines the `ToNumber` abstract operation in section 9.3.
 
 For example, `true` becomes `1` and `false` becomes `0`. `undefined` becomes `NaN`, but (curiously) `null` becomes `0`.
 
@@ -219,7 +219,7 @@ If a primitive cannot be obtained, `NaN` will be the result.
 
 ### `ToBoolean`
 
-Next, let's have a little chat about how `boolean`s behave in JS.
+Next, let's have a little chat about how `boolean`s behave in JS. There's **lots of confusion and misconception** floating out there around this topic, so pay close attention!
 
 First and foremost, JS has actual keywords `true` and `false`, and they behave exactly as you'd expect of `boolean` values. It's a common misconception that the values `1` and `0` are identical to `true` / `false`. While that may be true in other languages, in JS the `number`s are `number`s and the `boolean`s are `boolean`s. You can coerce `1` to `true` (and vice versa) or `0` to `false` (and vice versa). But they're not the same.
 
@@ -234,7 +234,7 @@ All of JavaScript's values can be divided into two categories:
 
 I'm not just being facetious. It's quite literally that the JS spec defines a specific, narrow list of values that will coerce to `false` when coerced to a `boolean` value.
 
-How do we know what the list of values is? In the ES5 spec, as of time of writing, section 9.2 defines a `ToBoolean` "abstract operation" (fancy spec-speak for "internal-only operation"), which says exactly what happens for all the possible values when you try to coerce them "to-boolean".
+How do we know what the list of values is? In the ES5 spec, section 9.2 defines a `ToBoolean` abstract operation, which says exactly what happens for all the possible values when you try to coerce them "to-boolean".
 
 From that table, we get the following as the so-called "falsy" values list:
 
