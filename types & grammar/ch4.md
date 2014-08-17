@@ -51,11 +51,19 @@ Before we can explore *explicit* vs *implicit* coercion, we need to learn the ba
 
 When any value that's not already a `string` is forced to represent itself as a `string` (either *explicitly* or *implicitly*), the abstract operation that's used is defined in the ES5 spec in section 9.8: `ToString`.
 
-Built-in primitive values like `null` are stringified to `"null"`. `true` becomes `"true"`. But objects are generally stringified by calling that value's `toString()` method. `number`s are generally represented in `string` form in the natural way you'd expect. But as we showed in Chapter 2, very small or very large `numbers` are stringified to their corresponding exponent form.
+Built-in primitive values like `null` are stringified to `"null"`. `undefined` becomes `"undefined"` and `true` becomes `"true"`. `number`s are generally represented in `string` form in the natural way you'd expect. But as we discussed in Chapter 2, very small or very large `numbers` are stringified in exponent form:
+
+```js
+// multiplying `1.07` by `1000`, seven times over
+var a = 1.07 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000;
+
+// seven times three digits => 21 digits
+a.toString(); // "1.07e21"
+```
 
 For regular objects, unless you specify your own, the default `toString()` (located in `Object.prototype.toString()`) will return the *internal `[[Class]]`* (see Chapter 3), like for instance `"[object Object]"`.
 
-But as shown earlier, if an object has its own `toString()` method on it, and you use that object in a `string` like way, its `toString()` will automatically called, and the `string` result of that call will be used instead.
+But as shown earlier, if an object has its own `toString()` method on it, and you use that object in a `string`-like way, its `toString()` will automatically called, and the `string` result of that call will be used instead.
 
 Arrays have an overridden default `toString()` that stringifies as the (string) concatenation of all its values (each stringified themselves), with `","` in between each value:
 
@@ -65,7 +73,100 @@ var a = [1,2,3];
 a.toString(); // "1,2,3"
 ```
 
-Again, the key is that `toString()` can either be called explicitly, or it will automatically be called if a non-`string` needs to become a `string`.
+Again, `toString()` can either be called explicitly, or it will automatically be called if a non-`string` is used in a `string` context.
+
+#### JSON Stringification
+
+Another task that seems awfully related to `ToString` is when you use the `JSON.stringify(..)` utility to serialize a value to a JSON-compatible `string` value. For simple values, the above `ToString` rules apply:
+
+```js
+JSON.stringify( 42 );	// "42"
+JSON.stringify( "42" );	// ""42"" (a string with a quoted string value in it)
+JSON.stringify( null );	// "null"
+JSON.stringify( true );	// "true"
+```
+
+Any *JSON-safe* value can be stringified by `JSON.stringify(..)`. But, what is *JSON-safe*? Any value that can be represented validly in a JSON representation.
+
+It may be easier to consider values which are **not** JSON-safe. Some examples: `undefined`s, `function`s, and `object`s with circular references (where a property references in an object structure create a never-ending cycle through each other). These are all illegal values for a standard JSON structure, mostly because they aren't portable to other languages which consume JSON values.
+
+The `JSON.stringify(..)` utility will automatically omit `undefined` and `function` values when it comes across them. If such a value is found in an `array`, that value is replaced by `null` (so that the array position information isn't altered). If found as a property of an `object`, that property will simply be excluded.
+
+Consider:
+
+```js
+JSON.stringify( undefined );					// undefined
+JSON.stringify( function(){} );					// undefined
+
+JSON.stringify( [1,undefined,function(){},4] );	// "[1,null,null,4]"
+JSON.stringify( { a:2, b:function(){} } );		// "{"a":2}"
+```
+
+But if you try to `JSON.stringify(..)` an `object` with circular reference(s) in it, an error will be thrown.
+
+JSON stringification has the special behavior that if an `object` value has a `toJSON()` method defined, this method will be called first to get a value to use for serialization.
+
+If you intend to JSON stringify an object which may contain illegal JSON value(s), or if you just have values in the `object` that aren't appropriate for the serialization, you should define a `toJSON()` method for it that returns a *JSON-safe* version of the `object`.
+
+For example:
+
+```js
+var o = { };
+
+var a = {
+	b: 42,
+	c: o,
+	d: function(){}
+};
+
+// create a circular reference inside `a`
+o.e = a;
+
+// would throw an error on the circular reference
+// JSON.stringify( a );
+
+// define a custom JSON value serialization
+a.toJSON = function() {
+	// only include the `b` property for serialization
+	return { b: this.b };
+};
+
+JSON.stringify( a ); // "{"b":42}"
+```
+
+It's a very common misconception that `toJSON()` should return a the JSON stringification representation. That's probably incorrect, unless you're wanting to actually stringify the `string` itself (usually not!). `toJSON()` should return the actual regular value (of whatever type) that's appropriate, and `JSON.stringify(..)` itself will handle the stringification.
+
+In other words, `toJSON()` should be interpreted as "to a JSON-safe value suitable for stringification", not "to a JSON string" as many developers mistakingly assume.
+
+Consider:
+
+```js
+var a = {
+	val: [1,2,3],
+
+	// probably correct!
+	toJSON: function(){
+		return this.val.slice( 1 );
+	}
+};
+
+var b = {
+	val: [1,2,3],
+
+	// probably incorrect!
+	toJSON: function(){
+		return "[" +
+			this.val.slice( 1 ).join() +
+		"]";
+	}
+};
+
+JSON.stringify( a ); // "[2,3]"
+
+JSON.stringify( b ); // ""[2,3]""
+```
+
+In the second stringification, we stringified the returned `string` rather than the `array` itself, which was probably not what we wanted to do.
 
 ### `ToNumber`
 
