@@ -611,9 +611,7 @@ Before we even get to JavaScript, let me suggest something pseudo-code'ish from 
 SomeType x = SomeType( AnotherType( y ) )
 ```
 
-In this example, I have some arbitrary type of value in `y` that I want to convert to the `SomeType` type. The problem is, this language can't go directly from whatever `y` currently is to `SomeType`. It has to have an intermediate step, where it first goes to `AnotherType`, and then from `AnotherType` to `SomeType`.
-
-Why? Who knows, who cares? If you're written code in statically-typed languages before, you know this stuff happens. I'm just giving a generic concept of the issue.
+In this example, I have some arbitrary type of value in `y` that I want to convert to the `SomeType` type. The problem is, this language can't go directly from whatever `y` currently is to `SomeType`. It needs an intermediate step, where it first converts to `AnotherType`, and then from `AnotherType` to `SomeType`.
 
 Now, what if that language (or definition you could create yourself with the language) *did* just let you say:
 
@@ -621,9 +619,11 @@ Now, what if that language (or definition you could create yourself with the lan
 SomeType x = SomeType( y )
 ```
 
-Wouldn't you generally agree that we simplified the type conversion here to remove the *obviousness* of the somewhat unnecessary "noise" of the intermediate conversion step? I mean, is it *really* all that important, right here at this point in the code, to see and deal with the fact that `y` goes to `AnotherType` first before then going to `SomeType`?
+Wouldn't you generally agree that we simplified the type conversion here to reduce the visibility of the somewhat unnecessary "noise" of the intermediate conversion step? I mean, is it *really* all that important, right here at this point in the code, to see and deal with the fact that `y` goes to `AnotherType` first before then going to `SomeType`?
 
-Some would argue, at least in some circumstances, yes. But I think an equal argument can be made of many other circumstances that here, the simplification **actually aids in the understanding of code** by abstracting or hiding way such details, either in the language itself or in our own abstractions. Undoubtedly, behind the scenes, somewhere, the two-step conversion is happening. But if that detail is hidden from view here, we can just reason about getting `y` to type `SomeType` as an abstract operation, and leave the details out of it at present.
+Some would argue, at least in some circumstances, yes. But I think an equal argument can be made of many other circumstances that here, the simplification **actually aids in the understanding of code** by abstracting or hiding way such details, either in the language itself or in our own abstractions.
+
+Undoubtedly, behind the scenes, somewhere, the intermediate conversion step is happening. But if that detail is hidden from view here, we can just reason about getting `y` to type `SomeType` as an generic operation, and omit the details.
 
 While not a perfect analogy, what I'm going to argue throughout the rest of this chapter is that JS *implicit coercion* can be thought of as providing similar aid to your code.
 
