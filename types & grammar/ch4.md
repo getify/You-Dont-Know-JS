@@ -504,7 +504,7 @@ Parsing should not be seen as a substitute for coercion. These two tasks, while 
 
 **Note:** `parseInt(..)` has a a twin, `parseFloat(..)`, which (as it sounds) pulls out a floating point number from a string, whereas `parseInt(..)` only accepts integer characters (`0`-`9`).
 
-Don't forget that `parseInt(..)` operates on `string` values. It makes absolutely no sense to pay a `number` value to `parseInt(..)`. Nor would it make sense to pass any other type of value, like `true`, `function(){..}` or `[1,2,3]`.
+Don't forget that `parseInt(..)` operates on `string` values. It makes absolutely no sense to pass a `number` value to `parseInt(..)`. Nor would it make sense to pass any other type of value, like `true`, `function(){..}` or `[1,2,3]`.
 
 If you pass a non-`string`, the value you pass will automatically be coerced to a `string` first (see "`ToString`" earlier), which would clearly be a kind of hidden *implicit coercion*. It's a really bad idea to rely upon such a behavior in your program, so never use `parseInt(..)` with a non-`string` value.
 
@@ -591,7 +591,7 @@ While it's clear what the goal of *explicit coercion* would be (making code expl
 
 Taken at face value, that's where much of the ire towards coercion comes from. The majority of complaints about "JavaScript coercion" are actually aimed (whether they realize it or not) at *implicit coercion*.
 
-**Note:** When Doug Crockford says that JavaScript coercion is "dangerous" and a "flaw" in the design of the language, what he really means is that *implicit coercion* is bad (in his opinion). In fact, if you read Doug's code, you'll find plenty of examples of *explicit coercion*, so it's obvious just from that observation where his true angst is directed.
+**Note:** Doug Crockford, author of *"JavaScript: The Good Parts"*, has claimed in many conference talks and writings that JavaScript coercion should be avoided. But what he really means is that *implicit coercion* is bad (in his opinion). In fact, if you read Doug's code, you'll find plenty of examples of *explicit coercion*, so it's clear just from that observation where his true angst is directed.
 
 So, **is implicit coercion** evil? Is it dangerous? Should we avoid it at all costs?
 
