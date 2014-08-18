@@ -546,7 +546,7 @@ Parsing a numeric value out a string is *tolerant* of non-numeric characters (ju
 
 Parsing should not be seen as a substitute for coercion. These two tasks, while similar, have different purposes. Parse a `string` as a `number` when you don't know/care what other non-numeric characters there may be on the right-hand side. Coerce a `string` (to a `number`) when the only acceptable values are numeric and something like `"42px"` should be rejected as a `number`.
 
-**Note:** `parseInt(..)` has a a twin, `parseFloat(..)`, which (as it sounds) pulls out a floating point number from a string, whereas `parseInt(..)` only accepts integer characters (`0`-`9`).
+**Note:** `parseInt(..)` has a a twin, `parseFloat(..)`, which (as it sounds) pulls out a floating point number from a string, whereas `parseInt(..)` only looks left-to-right for integer characters (`0`-`9`).
 
 Don't forget that `parseInt(..)` operates on `string` values. It makes absolutely no sense to pass a `number` value to `parseInt(..)`. Nor would it make sense to pass any other type of value, like `true`, `function(){..}` or `[1,2,3]`.
 
@@ -622,6 +622,20 @@ Now, what about base-19? Obviously completely bogus and contrived. No real JS pr
 So, back to our `parseInt( 1/0, 19 )` example. It's essentially `parseInt( "Infinity", 19 )`. How does it parse? The first character is `"I"`, which is value `18` in the silly base-19. The second character `"n"` is not in the valid set of numeric characters, and as such the parsing simply politely stops, just like when it ran across `"p"` in `"42px"`.
 
 The result? `18`. Exactly like it sensibly should. The behaviors involved to get us there, and not to an error or to `Infinity` itself, are **very important** to JS, and should not be so easily discarded.
+
+Other examples of this behavior with `parseInt(..)` which may be surprising (but should be quite expected!):
+
+```js
+parseInt( 0.000008 );		// 0 ("0" from "0.0...")
+parseInt( 0.0000008 );		// 8 ("8e-7")
+parseInt( false, 16 );		// 250 ("fa" from "false")
+parseInt( parseInt, 16 );	// 15 ("f" from "function..")
+
+parseInt( "0x10" );			// 16
+parseInt( "10", 2 );		// 2
+```
+
+`parseInt(..)` is actually pretty predictable and consistent in its behavior. If you use it correctly, you'll get sensible results. If you use it incorrectly, the crazy results you get are not the fault of JavaScript.
 
 ### * --> Boolean
 
