@@ -481,6 +481,50 @@ You might want to consider avoiding unary `+` coercion when it's immediately adj
 
 Remember, we're trying to be explicit and **reduce** confusion, not make it much worse!
 
+#### `Date` To `number`
+
+Another common usage of the unary `+` operator is to coerce a `Date` object into a `number`, because the result is the unix timestamp (milliseconds elapsed since 1 January 1970 00:00:00 UTC) representation of the date/time value:
+
+```js
+var d = new Date( "Mon, 18 Aug 2014 08:53:06 CDT" );
+
++d; // 1408369986000
+```
+
+The most common usage of this idiom is to get the current *now* moment as a timestamp, such as:
+
+```js
+var timestamp = +new Date();
+```
+
+**Note:** Some developers are aware of a peculiar syntactic "trick" in JavaScript, which is that the `()` set on a constructor call (a function called with `new`) is *optional* if any only if there are no arguments to pass. So you may run across the `var timestamp = +new Date;` form. However, most developers don't agree that omitting the `()` improves readability, as it's a strange and uncommon syntax exception that only applies to the `new fn()` call form and not the regular `fn()` call form.
+
+But coercion is not the only way to get the timestamp out of a `Date` object. A non-coercion approach is perhaps even preferable, as it's even more explicit:
+
+```js
+var timestamp = new Date().getTime();
+// var timestamp = (new Date()).getTime();
+// var timestamp = (new Date).getTime();
+```
+
+But an *even more* preferable non-coercion option is to use the ES5 added `Date.now()` static function:
+
+```js
+var timestamp = Date.now();
+```
+
+And if you want polyfill `Date.now()` into older browsers, it's pretty simple:
+
+```js
+if (!Date.now) {
+	Date.now = function() {
+		return +new Date();
+	};
+}
+```
+
+I'd recommend skipping the coercion forms related to dates. Use `Date.now()` for current *now* timestamps, and `new Date( .. ).getTime()` for getting a timestamp of a specific *non-now* date/time that you need to specify.
+
 ### Parsing Numeric Strings
 
 A similar outcome to coercing a `string` to a `number` can be achieved by parsing a `number` out of a `string`'s character contents. There are, however, distinct differences between this parsing and the type conversion we examined above.
@@ -582,6 +626,94 @@ The result? `18`. Exactly like it sensibly should. The behaviors involved to get
 ### * --> Boolean
 
 Now, let's examine coercing from any non-`boolean` value to a `boolean`.
+
+Just like with `String(..)` and `Number(..)` above, `Boolean(..)` (without the `new`, of course!) is an explicit way of forcing the `ToBoolean` coercion:
+
+```js
+var a = "0";
+var b = [];
+var c = {};
+
+var d = "";
+var e = 0;
+var f = null;
+var g;
+
+Boolean( a ); // true
+Boolean( b ); // true
+Boolean( c ); // true
+
+Boolean( d ); // false
+Boolean( e ); // false
+Boolean( f ); // false
+Boolean( g ); // false
+```
+
+While `Boolean(..)` is clearly explicit, it's not at all common or idiomatic.
+
+Just like the unary `+` operator coerces a value to a `number` (see above),
+
+The unary `!` operator (aka "negate") explicitly coerces a value to a `boolean` (just like the unary `+` operator for `number`s). The *problem* is that it also flips the value from truthy to falsy or vice versa. So, the most common way developers explicitly coerce to `boolean` is to use the `!!` ("double negate"):
+
+```js
+var a = "0";
+var b = [];
+var c = {};
+
+var d = "";
+var e = 0;
+var f = null;
+var g;
+
+!!a; // true
+!!b; // true
+!!c; // true
+
+!!d; // false
+!!e; // false
+!!f; // false
+!!g; // false
+```
+
+Any of these `ToBoolean` coercions would happen *implicitly* without the `Boolean(..)` or `!!`, if used in a `boolean` context such as an `if (..) ..` statement. But the goal here is to explicitly force the value to a `boolean` to make it clearer that the `ToBoolean` coercion is intended.
+
+Another example use-case for explicit `ToBoolean` coercion is if you want to force a `true` / `false` value coercion in the JSON serialization (see above) of a data structure:
+
+```js
+var a = [
+	1,
+	function(){ /*..*/ },
+	2,
+	function(){ /*..*/ }
+];
+
+JSON.stringify( a ); // "[1,null,2,null]"
+
+JSON.stringify( a, function(key,val){
+	if (typeof val == "function") {
+		// force `ToBoolean` coercion of the function
+		return !!val;
+	}
+	else {
+		return val;
+	}
+} );
+// "[1,true,2,true]"
+```
+
+If you come to JavaScript from Java, you may recognize this idiom:
+
+```js
+var a = 42;
+
+var b = a ? true : false;
+```
+
+The `? :` ternary operator will test `a` for truthiness, and based on that test will either assign `true` or `false` to `b`, accordingly.
+
+On its surface, this idiom looks like a form of *explicit* `ToBoolean`-type coercion, since it's obvious that either `true` or `false` come out of the operation.
+
+However, there's a hidden *implicit coercion*, in that the `a` expression has to first be coerced to `boolean` to perform the truthiness test. I'd call this idiom "explicitly implicit". **You should avoid this idiom completely** in JavaScript. It offers no real benefit, and worse, masquerades as something it's not.
 
 ## Implicit Coercion
 
