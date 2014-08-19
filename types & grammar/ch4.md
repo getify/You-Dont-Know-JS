@@ -546,7 +546,7 @@ Parsing a numeric value out a string is *tolerant* of non-numeric characters (ju
 
 Parsing should not be seen as a substitute for coercion. These two tasks, while similar, have different purposes. Parse a `string` as a `number` when you don't know/care what other non-numeric characters there may be on the right-hand side. Coerce a `string` (to a `number`) when the only acceptable values are numeric and something like `"42px"` should be rejected as a `number`.
 
-**Note:** `parseInt(..)` has a a twin, `parseFloat(..)`, which (as it sounds) pulls out a floating point number from a string, whereas `parseInt(..)` only looks left-to-right for integer characters (`0`-`9`).
+**Note:** `parseInt(..)` has a a twin, `parseFloat(..)`, which (as it sounds) pulls out a floating point number from a string.
 
 Don't forget that `parseInt(..)` operates on `string` values. It makes absolutely no sense to pass a `number` value to `parseInt(..)`. Nor would it make sense to pass any other type of value, like `true`, `function(){..}` or `[1,2,3]`.
 
