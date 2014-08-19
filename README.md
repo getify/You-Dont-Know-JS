@@ -2,7 +2,10 @@
 
 This is a series of books diving deep into the core mechanisms of the JavaScript language.
 
-Please feel free to contribute to the quality of this content by submitting PR's for improvements to code snippets, explanations, etc. While typo fixes are welcomed, they will be caught through normal editing processes, and are thus not necessarily important for this repository.
+<img src="scope %26 closures/cover.jpg" width="75">&nbsp;
+<img src="this %26 object prototypes/cover.jpg" width="75">
+
+Please feel free to contribute to the quality of this content by submitting PR's for improvements to code snippets, explanations, etc. While typo fixes are welcomed, they will likely be caught through normal editing processes, and are thus not necessarily as important for this repository.
 
 **To read more about the motivations and perspective behind this book series, check out the [Preface](preface.md).**
 
