@@ -22,5 +22,6 @@
 	* Abstract Value Operations
 	* Explicit Coercion
 	* Implicit Coercion
+	* Loose Equals vs Strict Equals
 * Appendix A: Thank You's!
 

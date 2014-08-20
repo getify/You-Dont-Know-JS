@@ -870,6 +870,219 @@ Compare `b = String(a)` (*explicit*) to `b = a + ""` (*implicit*). I think cases
 
 Now, let's turn our attention to *implicit coercion* to `boolean` values, as it's by far the most common and also by far the most potentially troublesome.
 
+Remember, *implicit coercion* is what kicks in when you use a value in such a way that it forces the value to be converted. For numeric and `string` operations, it's fairly easy to see how the coercions can occur.
+
+But, what sort of expression operations require/force a `boolean` coercion?
+
+1. The test expression in an `if (..)` statement.
+2. The test expression (second clause) in a `for ( .. ; .. ; .. )` header.
+3. The test expression in `while (..)` and `do..while(..)` loops.
+4. The test expression (first clause) in `? :` ternary expressions.
+5. The left-hand operand (which serves as a test expression) to the `||` ("logical or") and `&&` ("logical and") operators.
+
+Any value used in these contexts that is not already a `boolean` will be *implicitly* coerced to a `boolean` using the rules of the `ToBoolean` abstract operation covered earlier in this chapter.
+
+Let's look at some examples:
+
+```js
+var a = 42;
+var b = "abc";
+var c;
+var d = null;
+
+if (a) {
+	console.log( "yep" );		// yep
+}
+
+while (c) {
+	console.log( "nope, never runs" );
+}
+
+c = d ? a : b;
+c;								// "abc"
+
+if ((a && d) || c) {
+	console.log( "yep" );		// yep
+}
+```
+
+In all these contexts, the non-`boolean` values are *implicitly coerced* to their `boolean` equivalents to make the test decisions.
+
+### Operators `||` and `&&`
+
+It's quite likely that you have seen the `||` ("logical or") and `&&` ("logical and") operators in most or all other languages you've used. So it'd be natural to assume that they work basically the same in JavaScript as in other similar languages.
+
+There's some very little known, but very important, nuance here.
+
+In fact, I would argue these operators shouldn't even be called "logical ___ operators", as that name is incomplete in describing what they do. If I were to give them a more accurate (if more clumsy) name, I'd call them "selector operators", or more completely, "operand selector operators".
+
+Why? Because they don't actually result in a *logic* value (aka `boolean`) in JavaScript, as they do in all other languages.
+
+So what *do* they result in? They result in the value of one (and only one) of their two operands. In other words, **they select one of the two operand's values**.
+
+Let's illustrate:
+
+```js
+var a = 42;
+var b = "abc";
+var c = null;
+
+a || b;		// 42
+a && b;		// "abc"
+
+c || b;		// "abc"
+c && b;		// null
+```
+
+**Wait, what!?** Think about that. In most any other language you've seen besides JS, all those expressions actually result in `true` or `false`. Not so in JavaScript!
+
+Both `||` and `&&` operators perform a `boolean` test on the **first operand** (`a` or `c`). If the operand is not already `boolean` (as its not, here), a normal `ToBoolean` coercion occurs, so that the test can be performed.
+
+For the `||` operator, if the test is `true`, the `||` expression results in the value of the *first operand* (`a` or `c`). If the test is `false`, the `||` expression results in the value of the *second operand* (`b`).
+
+Inversely, for the `&&` operator, if the test is `true`, the `&&` expression results in the value of the *second operand* (`b`). If the test is `false`, the `&&` expression results in the value of the *first operand* (`a` or `c`).
+
+The result of a `||` or `&&` expression is always the underlying value of one of the operands, **not** the (possibly coerced) result of the test. In `c && b`, `c` is `null`, and thus falsy. But the `||` expression itself results in `null` (the value in `c`), not in the coerced `false` used in the test.
+
+Do you see how these operators act as "operand selectors", now?
+
+Another way of thinking about these operators:
+
+```js
+a || b;
+// roughly equivalent to:
+a ? a : b;
+
+a && b;
+// roughly equivalent to:
+a ? b : a;
+```
+
+**Note:** I call `a || b` "roughly equivalent" to `a ? a : b` because the outcome is identical, but there's a nuanced difference. In `a ? a : b`, if `a` was a more complex expression (like for instance one that might have side effects like calling a function, etc), then the `a` expression would possibly be evaluated twice (if the first evaluation was truthy). By contrast, for `a || b`, the `a` expression is evaluated only once, and that value is used both for the coercive test as well as the result value (if appropriate). The same nuance applies to the `a && b` and `a ? b : a` expressions.
+
+An extremely common usage of this behavior, which there's a good chance you may have used before and not fully understood, is:
+
+```js
+function foo(a,b) {
+	a = a || "hello";
+	b = b || "world";
+
+	console.log( a + " " + b );
+}
+
+foo();					// "hello world"
+foo( "yeah", "yeah!" );	// "yeah yeah!"
+```
+
+The `a = a || "hello"` idiom (sometimes said to be JavaScript's version of the "null coallescing operator" -- C#) acts to test `a` and if it has no value (or only an undesired falsy value) provide a backup default value (`"hello"`).
+
+**Be careful**, though!
+
+```js
+foo( "That's it!", "" ); // "That's it! world" <-- Oops!
+```
+
+See the problem? `""` as the second argument is a falsy value (see `ToBoolean` earlier in this chapter), so the `b = b || "world"` test fails, and the `"world"` default value is substituted.
+
+This `||` idiom is extremely common, and quite helpful, but you have to use it only in cases where *all falsy values* should be skipped. Otherwise, you'll need to be more explicit in your test, and probably use a `? :` ternary instead.
+
+This *default value assignment* idiom is so common (and useful!), even those who publicly and vehemently decry JavaScript coercion still often use it in their own code!
+
+What about `&&`? There's another idiom, which is quite a bit less common to see manually authored, but which is used by JS minifiers quite frequently. Since the `&&` operator "selects" the second operand if and only if the first operand tests as truthy, it's sometimes called the "guard operator":
+
+```js
+function foo() {
+	console.log( a );
+}
+
+var a = 42;
+
+a && foo(); // 42
+```
+
+`foo()` gets called only because `a` tests as truthy. If that test failed, this `a && foo()` expression statement would just silently stop (sometimes called "short circuiting") and never call `foo()`.
+
+Again, it's not nearly as common for people to author such things. Usually, they'd do `if (a) { foo(); }` instead. But JS minifiers choose `a && foo()` because it's much shorter. So, now, if you ever have to decipher such code, now you'll know what it's doing and why.
+
+OK, so `||` and `&&` have some neat tricks up their sleeve, as long as you're willing to allow the *implicit coercion* into the mix.
+
+But, the fact that these operators don't actually result in `true` and `false` is possibly messing with your head a little bit by now. You're probably wondering how all your `if` statements and `for` loops have been working, if they've included compound logical expressions like `a && (b || c)`.
+
+Don't worry! The sky is not falling. Your code is (probably) just fine. It's just that you probably never realized before that there was an *implicit coercion* to `boolean` going on **after** the compound expression was evaluated.
+
+Consider:
+
+```js
+var a = 42;
+var b = null;
+var c = "foo";
+
+if (a && (b || c)) {
+	console.log( "yep" );
+}
+```
+
+This code still works the way you always thought it did, except for one subtle extra detail. The `a && (b || c)` expression *actually* results in `"foo"`, not `true`. So, the `if` statement forces the `"foo"` value to coerce to a `boolean`, which of course will be `true`.
+
+See? No reason to panic. Your code is probably still safe. But, now you know more about how it does what it does.
+
+And now, you realize that such code is definitely using *implicit coercion*. If you're in the "avoid (implicit) coercion camp" still, you're going to need to go back and make all of those tests *explicit*:
+
+```js
+if (!!a && (!!b || !!c)) {
+	console.log( "yep" );
+}
+```
+
+Good luck with that! ... Sorry, just teasing.
+
+## Loose Equals vs Strict Equals
+
+Loose equals is the `==` operator, and strict equals is the `===` operator. Both operators are used for comparing two values for "equality", but the "loose" vs. "strict" indicates a **very important** difference in behavior between the two, specifically in how they decide "equality".
+
+A very common misconception about these two operators is: "`==` checks values for equality and `===` checks both values and types for equality". While that sounds nice and reasonable, it's inaccurate. Countless well-respected JavaScript books and blogs have said exactly that, but unfortunately they're all *wrong*.
+
+The correct explanation is: "`==` allows coercion in the equality comparison and `===` disallows coercion."
+
+### Abstract Equality
+
+The `==` operator's behavior is defined in the ES5 spec in section 11.9.3.
+
+### `null` <--> `undefined`
+
+Another example of *implicit coercion* can be seen with `null` and `undefined` values.
+
+These two values, when compared with `==` loose equals, equate to themselves, and each other, and no other values in the entire language. In other words, with `==`, `null` and `undefined` will coerce to each other and to nothing else.
+
+So, `null` and `undefined` can be treated as indistinguishable for comparison purposes, if you use the `==` loose equals operator to allow their mutual *implicit coercion*.
+
+```js
+var a = null;
+var b;
+
+a == b;		// true
+a == null;	// true
+b == null;	// true
+
+a == false;	// false
+b == false;	// false
+a == "";	// false
+b == "";	// false
+a == 0;		// false
+b == 0;		// false
+```
+
+So, `null` is "double equal" (aka "coercively equal") to `undefined`, and vice versa. But they're exlusive to each other, so you'll never get any false positives or negatives. They're totally safe to coerce to each other, which means they're safe (in the comparison sense) to treat as indistinguishably the same value. That's what I recommend.
+
+The *explicit* form of the check, which disallows any such coercion, is (I think) unnecessarily much uglier (and a tiny bit less performant!):
+
+```js
+a === null || a === undefined; // true
+b === null || b === undefined; // true
+```
+
+This is yet another example where *implicit coercion* improves code readability, in my opinion, but does so in a reliably safe way (if you know what you're doing).
+
 ## Summary
 
 After proving that JS has types, and that values can and do need to be converted between those different types, we have here turned our attention to how JavaScript type conversions happen, called **coercion**.
