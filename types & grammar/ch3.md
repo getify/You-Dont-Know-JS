@@ -362,7 +362,7 @@ Error object instances generally have at least a `message` property, and sometim
 
 New as of ES6, an additional primitive value type has been added, called "Symbol". Symbols are special "unique" (not strictly guaranteed!) values that can be used as properties on objects with little fear of any collision. They're primarily designed for special built-in behaviors of ES6 constructs, but you can also define your own symbols.
 
-Symbols can be used as property names, but you cannot see or access the actual value of a Symbol from your program, nor from the developer console. You cannot convert it to a string (doing so results in a `TypeError` being thrown), and if you output it to the developer console, what's shown is only a fake pseudo-serialization, like `Symbol(Symbol.create)`.
+Symbols can be used as property names, but you cannot see or access the actual value of a Symbol from your program, nor from the developer console. You cannot convert it to a string (doing so may result in a `TypeError` being thrown), and if you output it to the developer console, what's shown is only a fake pseudo-serialization, like `Symbol(Symbol.create)`.
 
 There are several pre-defined symbols in ES6, accessed as static properties of the `Symbol` function object, like `Symbol.create`, `Symbol.iterator`, etc. To use them, do something like:
 
@@ -374,17 +374,18 @@ To define your own custom symbols, use the `Symbol(..)` native. The `Symbol(..)`
 
 ```js
 var mysym = Symbol( "my own symbol" );
-mysym; // Symbol(my own symbol)
-mysym.toString(); // Symbol(my own symbol)
-typeof mysym; // "symbol"
+mysym;				// Symbol(my own symbol)
+mysym.toString();	// Symbol(my own symbol)
+typeof mysym; 		// "symbol"
 
 var a = { };
 a[mysym] = "foobar";
 
-Object.getOwnPropertySymbols( a ); // [ Symbol(my own symbol) ]
+Object.getOwnPropertySymbols( a );
+// [ Symbol(my own symbol) ]
 ```
 
-While symbols are not private (`Object.getOwnPropertySymbols(..)` reflects on the object and reveals the symbols), using them for private or special properties is their primary use-case. For most developers, they will probably take the place of property names with `__` prefixes, which are almost always by convention signals to say, "hey, this is a private property, leave it alone!"
+While symbols are not actually private (`Object.getOwnPropertySymbols(..)` reflects on the object and reveals the symbols quite publicly), using them for private or special properties is likely their primary use-case. For most developers, they may take the place of property names with `__` prefixes, which are almost always by convention signals to say, "hey, this is a private/special/internal property, so leave it alone!"
 
 ### Native Prototypes
 
