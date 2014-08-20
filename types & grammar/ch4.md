@@ -920,6 +920,10 @@ Why? Because they don't actually result in a *logic* value (aka `boolean`) in Ja
 
 So what *do* they result in? They result in the value of one (and only one) of their two operands. In other words, **they select one of the two operand's values**.
 
+Quoting the ES5 spec from section 11.11:
+
+> The value produced by a && or || operator is not necessarily of type Boolean. The value produced will always be the value of one of the two operand expressions.
+
 Let's illustrate:
 
 ```js
