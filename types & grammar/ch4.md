@@ -13,7 +13,7 @@ Our goal is to fully explore the pros and cons (yes, there *are* pros!) of coerc
 
 Converting a value from one type to another is often called "type casting", when done explicitly, and "coercion" when done implicitly (forced by the rules of how a value is used).
 
-**Note:** It may not be obvious, but JavaScript coercions always results in one of the scalar primitive (see Chapter 2) values, like `string`, `number`, or `boolean`. There is no coercion that results in a complex value like `object` or `function`. Chapter 3 covers "boxing", which wraps scalar primitive values in their `object` counterparts, but this is not really coercion in a reasonable sense.
+**Note:** It may not be obvious, but JavaScript coercions always results in one of the scalar primitive (see Chapter 2) values, like `string`, `number`, or `boolean`. There is no coercion that results in a complex value like `object` or `function`. Chapter 3 covers "boxing", which wraps scalar primitive values in their `object` counterparts, but this is not really coercion in an accurate sense.
 
 Another way these terms are often distinguished is: "type casting" (or "type conversion") occur in statically typed languages at compile time, while "type coercion" is a run-time conversion for dynamically typed languages.
 
@@ -47,7 +47,7 @@ Just remember: it's often rare that we write our code and are the only ones who 
 
 ## Abstract Value Operations
 
-Before we can explore *explicit* vs *implicit* coercion, we need to learn the basic rules that govern how values *become* either a `string`, `number`, or `boolean`. The ES5 spec defines three "abstract operations" (fancy spec-speak for "internal-only operation") with the rules of value conversion: `ToString`, `ToNumber`, and `ToBoolean`.
+Before we can explore *explicit* vs *implicit* coercion, we need to learn the basic rules that govern how values *become* either a `string`, `number`, or `boolean`. The ES5 spec in section 9 defines several "abstract operations" (fancy spec-speak for "internal-only operation") with the rules of value conversion. We will specifically pay attention to: `ToString`, `ToNumber`, and `ToBoolean`, and to a lesser included extent, `ToPrimitive`.
 
 ### `ToString`
 
@@ -65,7 +65,9 @@ a.toString(); // "1.07e21"
 
 For regular objects, unless you specify your own, the default `toString()` (located in `Object.prototype.toString()`) will return the *internal `[[Class]]`* (see Chapter 3), like for instance `"[object Object]"`.
 
-But as shown earlier, if an object has its own `toString()` method on it, and you use that object in a `string`-like way, its `toString()` will automatically called, and the `string` result of that call will be used instead.
+But as shown earlier, if an object has its own `toString()` method on it, and you use that object in a `string`-like way, its `toString()` will automatically be called, and the `string` result of that call will be used instead.
+
+**Note:** The way an object is coerced to a `string` technically goes through the `ToPrimitive` abstract operation (ES5 spec, section 9.1), but those nuanced details are covered in more detail in the `ToNumber` section later in this chapter, so we will skip over them here.
 
 Arrays have an overridden default `toString()` that stringifies as the (string) concatenation of all its values (each stringified themselves), with `","` in between each value:
 
@@ -246,11 +248,11 @@ For example, `true` becomes `1` and `false` becomes `0`. `undefined` becomes `Na
 
 **Note:** The differences between `number` literal grammar and `ToNumber` on a `string` value are subtle and highly nuanced, and thus will not be covered further here. Consult section 9.3.1 of the ES5 spec for more information, if desired.
 
-Objects (and arrays) will first be converted to their primitive value equivalent, if possible, and then this value (if a primitive but not already a `number`) is coerced to a `number` according to the `ToNumber` rules just mentioned.
+Objects (and arrays) will first be converted to their primitive value equivalent,  and then this value (if a primitive but not already a `number`) is coerced to a `number` according to the `ToNumber` rules just mentioned.
 
-To convert to this primitive value equivalent, the value in question will be consulted to see if it has a `valueOf()` method, and if so, what it returns (if a primitive value) will be used for the coercion. If no `valueOf()` is present, `toString()` is consulted, if present. If what it returns is a primitive, that will be used for the coercion.
+To convert to this primitive value equivalent, the `ToPrimitive` abstract operation (ES5 spec, section 9.1) will consult the value in question to see if it has a `valueOf()` method, and if so, what it returns (if a primitive value) will be used for the coercion. If no `valueOf()` is present, `toString()` is consulted, if present. If what it returns is a primitive, *that* value will be the result of the coercion.
 
-**Note:** We cover how to coerce to `number`s later in this chapter in detail, but for this present discussion just assume the `Number(..)` function does so.
+**Note:** We cover how to coerce to `number`s later in this chapter in detail, but for this next code snippet, just assume the `Number(..)` function does so.
 
 Consider:
 
@@ -811,13 +813,13 @@ a + b; // "1,23,4"
 
 Neither of these operands is a `string`, but clearly they were both coerced to `string`s and then the `string` concatenation kicked in. So what's really going on?
 
-(**Warning:** nitty gritty spec-speak coming, so skip the next two paragraphs if that intimidates you!)
+(**Warning:** deeply nitty gritty spec-speak coming, so skip the next two paragraphs if that intimidates you!)
 
 -----
 
 According to ES5 spec section 11.6.1, the `+` algorithm (when an `object` value is an operand) will concatenate if either operand is either already a `string`, or if the following steps produce a `string` representation. So, when `+` receives an `object` (including `array`) for either operand, it first calls the `ToPrimitive` abstract operation (section 9.1) on the value, which then calls the `[[DefaultValue]]` algorithm (section 8.12.8) with a context hint of `number`.
 
-If you're paying close attention, you'll notice that this operation is now is identical to how the `ToNumber` abstract operation handles `object`s, as we talked about above. So, just as above, the `valueOf()` operation on the `array` will fail to produce a simple primitive, so it then falls to a `toString()` representation. The two `array`s thus become `"1,2"` and `"3,4"`, respectively. Now, `+` concatenates the two `string`s as you'd normally expect: `"1,23,4"`.
+If you're paying close attention, you'll notice that this operation is now identical to how the `ToNumber` abstract operation handles `object`s (see earlier section of this chapter). The `valueOf()` operation on the `array` will fail to produce a simple primitive, so it then falls to a `toString()` representation. The two `array`s thus become `"1,2"` and `"3,4"`, respectively. Now, `+` concatenates the two `string`s as you'd normally expect: `"1,23,4"`.
 
 -----
 
