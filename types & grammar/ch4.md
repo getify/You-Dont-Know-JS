@@ -1048,11 +1048,23 @@ Loose equals is the `==` operator, and strict equals is the `===` operator. Both
 
 A very common misconception about these two operators is: "`==` checks values for equality and `===` checks both values and types for equality". While that sounds nice and reasonable, it's inaccurate. Countless well-respected JavaScript books and blogs have said exactly that, but unfortunately they're all *wrong*.
 
-The correct explanation is: "`==` allows coercion in the equality comparison and `===` disallows coercion."
+The correct description is: "`==` allows coercion in the equality comparison and `===` disallows coercion."
+
+### Equality Performance
+
+Stop and think about the difference between the first (incorrect) explanation and this second (accurate) one.
+
+In the first explanation, it seems obvious that `===` is *doing more work* than `==`, because it has to *also* check the type. In the second explanation, `==` is the one *doing more work* because it has to follow through the steps of coercion if the types are different.
+
+Don't fall into the trap, as many have, of thinking this has anything to do with performance, as if `==` is going to be slower than `===` in any relevant fashion. While it's measurable that coercion does take *a little bit* of processing time, it's mere microseconds (yes, that's millionths of a second!).
+
+If you're comparing two values of the same types, `==` and `===` use the identical algorithm, and so other than minor differences in engine implementation, they should do the same work.
 
 ### Abstract Equality
 
-The `==` operator's behavior is defined in the ES5 spec in section 11.9.3.
+The `==` operator's behavior is defined in the ES5 spec in section 11.9.3. What's listed there is a comprehensive but simple algorithm that explicitly states every possible combination of different types, and how that comparison should occur.
+
+In other words, if you compare two values of different types with `==` loose equality, one or both of them will need to be *implicitly coerced* so that they eventually end up as values of the same type, which can then directly be compared for equality or not.
 
 ### `null` <--> `undefined`
 
