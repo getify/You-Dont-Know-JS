@@ -1056,15 +1056,94 @@ Stop and think about the difference between the first (incorrect) explanation an
 
 In the first explanation, it seems obvious that `===` is *doing more work* than `==`, because it has to *also* check the type. In the second explanation, `==` is the one *doing more work* because it has to follow through the steps of coercion if the types are different.
 
-Don't fall into the trap, as many have, of thinking this has anything to do with performance, as if `==` is going to be slower than `===` in any relevant fashion. While it's measurable that coercion does take *a little bit* of processing time, it's mere microseconds (yes, that's millionths of a second!).
+Don't fall into the trap, as many have, of thinking this has anything to do with performance, though, as if `==` is going to be slower than `===` in any relevant way. While it's measurable that coercion does take *a little bit* of processing time, it's mere microseconds (yes, that's millionths of a second!).
 
 If you're comparing two values of the same types, `==` and `===` use the identical algorithm, and so other than minor differences in engine implementation, they should do the same work.
 
+If you're comparing two values of different types, the performance isn't the important factor. What you should be asking yourself is: when comparing these two values, do I want coercion or not?
+
+If you want coercion, use `==` loose equality, but if you don't want coercion, use `===` strict equality.
+
 ### Abstract Equality
 
-The `==` operator's behavior is defined in the ES5 spec in section 11.9.3. What's listed there is a comprehensive but simple algorithm that explicitly states every possible combination of different types, and how that comparison should occur.
+The `==` operator's coercion behavior is defined in the ES5 spec in section 11.9.3. What's listed there is a comprehensive but simple algorithm that explicitly states every possible combination of different types, and how the coercions should happen for each.
 
 In other words, if you compare two values of different types with `==` loose equality, one or both of them will need to be *implicitly coerced* so that they eventually end up as values of the same type, which can then directly be compared for equality or not.
+
+Let's build off the examples above of `string` and `number` values:
+
+```js
+var a = 42;
+var b = "42";
+
+a === b;	// false
+a == b;		// true
+```
+
+The second comparison uses `==` loose equality, which means the comparison algorithm is allowed to perform *implicit coercion* on one or both values, if the types happen to be different.
+
+But what kind of coercion happens here? Does the `a` value of `42` become a `string`, or does the `b` value of `"42"` become a `number`?
+
+In the ES5 spec 11.9.3.4-5, it tells us:
+
+> 4. If Type(x) is Number and Type(y) is String,
+>    return the result of the comparison x == ToNumber(y).
+> 5. If Type(x) is String and Type(y) is Number,
+>    return the result of the comparison ToNumber(x) == y.
+
+So clearly, the `"42"` value is coerced to a `number` for the comparison. The *how* of that coercion has already been covered above, specifically the `ToNumber` abstract operation. In this case, it's quite obvious then that `"42"` becomes `42`, so the two values are indeed "loose equals".
+
+### `true` and `false`
+
+One of the biggest gotchas to the *implicit coercion* of the `==` loose equality comes if you try to compare a value directly to `true` or `false`.
+
+Consider:
+
+```js
+var a = "42";
+var b = true;
+
+a == b;	// false
+```
+
+Wait, what happened here!? We know that `"42"` is a truthy value (see earlier in this chapter). How come it's not `==` loose equal to `true`?
+
+The reason is both simple and deceptively devilish. It's so easy to misunderstand, most JS developers never fully grasp it.
+
+Let's quote the spec, section 11.9.3.6-7:
+
+> 6. If Type(x) is Boolean,
+>    return the result of the comparison ToNumber(x) == y.
+> 7. If Type(y) is Boolean,
+>    return the result of the comparison x == ToNumber(y).
+
+Let's break that down. First:
+
+```js
+var x = true;
+var y = "42";
+
+x == y; // false
+```
+
+The `Type(x)` is indeed `Boolean`, so it performs `ToNumber(x)`, which coerces `true` to `1`. Now, `1 == "42"` is evaluated. The types are still different, so (essentially recursively) we reconsult the algorithm, which just as above will coerce `"42"` to `42`, and `1 == 42` is clearly `false`.
+
+Reverse it, same outcome:
+
+```js
+var x = "42";
+var y = false;
+
+x == y; // false
+```
+
+The `Type(y)` is `Boolean` this time, so `ToNumber(y)` yields `0`. `"42" == 0`, which recursively becomes `42 == 0`, which is of course `false`.
+
+In other words, **the value `"42"` is neither `== true` nor `== false`.**
+
+At first, that statement might seem crazy. How can a value be neither truthy or falsy?
+
+But that's the problem! You're asking the wrong question, entirely. `"42"` is indeed truthy, but `"42" == true` **is not performing a boolean test/coercion** at all, no matter how much your brain may try to convince you it *should*.
 
 ### `null` <--> `undefined`
 
