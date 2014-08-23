@@ -1143,7 +1143,45 @@ In other words, **the value `"42"` is neither `== true` nor `== false`.**
 
 At first, that statement might seem crazy. How can a value be neither truthy or falsy?
 
-But that's the problem! You're asking the wrong question, entirely. `"42"` is indeed truthy, but `"42" == true` **is not performing a boolean test/coercion** at all, no matter how much your brain may try to convince you it *should*.
+But that's the problem! You're asking the wrong question, entirely. It's not your fault, really. Your brain is tricking you.
+
+`"42"` is indeed truthy, but `"42" == true` **is not performing a boolean test/coercion** at all, no matter what your brain says. `"42"` *is not* being coerced to a `boolean` (`true`) at all, but instead `true` is being coerced to a `1`, and then `"42"` is being coerced to `42`.
+
+Whether we like it or not, `ToBoolean` is not even involved here, so the truthiness or falsiness of `"42"` is irrelevant to `==`!
+
+What *is* relevant is to understand how the `==` comparison algorithm behaves with all the different type combinations. As it regards a `boolean` value on either side of the `==`, a `boolean` always coerces to a `number` *first*.
+
+If that seems strange to you, you're not alone. I personally would recommend to never, ever, under any circumstances, do `== true` or `== false`. Ever.
+
+But remember, I'm only talking about `==` here. `=== true` and `=== false` wouldn't allow the coercion, so they're safe from this hidden `ToNumber` coercion.
+
+Consider:
+
+```js
+var a = "42";
+
+// bad (will fail!):
+if (a == true) {
+	// ..
+}
+
+// good enough (implicit):
+if (a) {
+	// ..
+}
+
+// better (explicit):
+if (!!a) {
+	// ..
+}
+
+// also great (explicit):
+if (Boolean(a)) {
+	// ..
+}
+```
+
+If you avoid ever using `== true` or `== false` (aka loose equality with `boolean`s) in your code, you'll never have to worry about this truthiness/falsiness mental gotcha.
 
 ### `null` <--> `undefined`
 
