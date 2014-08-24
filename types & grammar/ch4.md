@@ -1081,7 +1081,11 @@ Some minor exceptions to be aware of:
 
 Also, importantly, clause 11.9.3.1 has *no provision* for loose equality of two `object` values (including `function`s and `array`s), only for the simple scalar primitives. We'll come back to `==` comparison with two complex primitives in a bit.
 
+**Note:** The `===` strict equality comparison is roughly defined identically to 11.9.3.1, with the only exception being that its final clause allows for `===` to be used against two `object`s (including `function`s and `array`s) and thus only resulting in `true` if the two values compared are references to *the exact same value*.
+
 The rest of the algorithm in 11.9.3 specifies that if you instead use `==` loose equality to compare two values of different types, one or both of the values will need to be *implicitly coerced* so that they eventually end up as values of the same type, which can then directly be compared for equality or not, using the rules of clause 11.9.3.1 (as just explained).
+
+**Note:** The `!=` loose not-equality operation is defined exactly as you'd expect, in that it's literally the `==` operation comparison performed in its entirety, then the negation of the result. The same goes for the `!==` strict not-equality operation.
 
 #### `string`s and `number`s
 
