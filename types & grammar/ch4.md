@@ -1064,9 +1064,11 @@ If you're comparing two values of different types, the performance isn't the imp
 
 If you want coercion, use `==` loose equality, but if you don't want coercion, use `===` strict equality.
 
+**Note:** The implication here then is that both `==` and `===` check the types of their operands. The difference is in how they respond if the types don't match.
+
 ### Abstract Equality
 
-The `==` operator's coercion behavior is defined as "The Abstract Equality Comparison Algorithm", in the ES5 spec in section 11.9.3. What's listed there is a comprehensive but simple algorithm that explicitly states every possible combination of types, and how the coercions (if necessary) should happen for each combination.
+The `==` operator's behavior is defined as "The Abstract Equality Comparison Algorithm", in the ES5 spec in section 11.9.3. What's listed there is a comprehensive but simple algorithm that explicitly states every possible combination of types, and how the coercions (if necessary) should happen for each combination.
 
 **Note:** When (*implicit*) coercion is maligned as being too complicated and too flawed to be a *useful good part*, it is these rules of "abstract equality" which are being condemned. Generally, they are said to be too complex and too unintuitive for developers to practically learn and use, and that they are prone more to causing bugs in JS programs than to enabling greater code readability. I believe this is a flawed premise --that you readers are competent developers who write (and read and understand!) algorithms (aka code) all day long. So, what follows is a plain exposition of the "abstract equality" in simple terms. But I implore you to also read the ES5 spec section 11.9.3. I think you'll be surprised at just how reasonable it is.
 
@@ -1077,13 +1079,13 @@ Some minor exceptions to be aware of:
 * `NaN` is never equal to itself (see Chapter 2)
 * `+0` and `-0` are equal to each other (see Chapter 2)
 
-Also, importantly, clause 11.9.3.1 has *no provision* for loose equality of two `object` values (including arrays). We'll come back to that in a bit.
+Also, importantly, clause 11.9.3.1 has *no provision* for loose equality of two `object` values (including `function`s and `array`s), only for the simple scalar primitives. We'll come back to `==` comparison with two complex primitives in a bit.
 
-The rest of the algorithm in 11.9.3 specifies that if you instead use `==` loose equality to compare two values of different types,  says that one or both of the values will need to be *implicitly coerced* so that they eventually end up as values of the same type, which can then directly be compared for equality or not, using the rules of clause 11.9.3.1.
+The rest of the algorithm in 11.9.3 specifies that if you instead use `==` loose equality to compare two values of different types, one or both of the values will need to be *implicitly coerced* so that they eventually end up as values of the same type, which can then directly be compared for equality or not, using the rules of clause 11.9.3.1 (as just explained).
 
 #### `string`s and `number`s
 
-Let's first build off the `string` and `number` examples earlier in this chapter:
+To illustrate `==` coercion, let's first build off the `string` and `number` examples earlier in this chapter:
 
 ```js
 var a = 42;
@@ -1095,11 +1097,11 @@ a == b;		// true
 
 As we'd expect, `a === b` fails, because no coercion is allowed, and indeed the `42` and `"42"` values are different.
 
-However, the second comparison `a == b` uses loose equality, which means the comparison algorithm will perform *implicit coercion* on one or both values, if the types happen to be different.
+However, the second comparison `a == b` uses loose equality, which means that if the types happen to be different, the comparison algorithm will perform *implicit coercion* on one or both values.
 
 But exactly what kind of coercion happens here? Does the `a` value of `42` become a `string`, or does the `b` value of `"42"` become a `number`?
 
-In the ES5 spec, clauses 11.9.3.4-5, it says:
+In the ES5 spec, clauses 11.9.3.4-5 say:
 
 > 4. If Type(x) is Number and Type(y) is String,
 >    return the result of the comparison x == ToNumber(y).
@@ -1125,7 +1127,7 @@ Wait, what happened here!? We know that `"42"` is a truthy value (see earlier in
 
 The reason is both simple and deceptively tricky. It's so easy to misunderstand, many JS developers never pay close enough attention to fully grasp it.
 
-Let's quote the spec, clauses 11.9.3.6-7:
+Let's again quote the spec, clauses 11.9.3.6-7:
 
 > 6. If Type(x) is Boolean,
 >    return the result of the comparison ToNumber(x) == y.
@@ -1203,7 +1205,7 @@ If you avoid ever using `== true` or `== false` (aka loose equality with `boolea
 
 #### `null`s and `undefined`s
 
-Another example of *implicit coercion* can be seen with `==` loose equality between `null` and `undefined` values. Again quoting the ES5 spec, clauses 11.9.3.2-3:
+Another example of *implicit coercion* can be seen with `==` loose equality between `null` and `undefined` values. Yet again quoting the ES5 spec, clauses 11.9.3.2-3:
 
 > 2. If x is null and y is undefined, return true.
 > 3. If x is undefined and y is null, return true.
@@ -1240,7 +1242,7 @@ if (a == null) {
 }
 ```
 
-The `a == null` check safely will pass if `doSomething()` returns either `null` or `undefined`, and will fail with any other value, even other falsy values like `0`, `false`, and `""`.
+The `a == null` check will pass only if `doSomething()` returns either `null` or `undefined`, and will fail with any other value, even other falsy values like `0`, `false`, and `""`.
 
 The *explicit* form of the check, which disallows any such coercion, is (I think) unnecessarily much uglier (and perhaps a tiny bit less performant!):
 
@@ -1252,7 +1254,7 @@ if (a === undefined || a === null) {
 }
 ```
 
-In my opinion, this is yet another example where *implicit coercion* improves code readability, but does so in a reliably safe way.
+In my opinion, the form `a == null` is yet another example where *implicit coercion* improves code readability, but does so in a reliably safe way.
 
 ## Summary
 
