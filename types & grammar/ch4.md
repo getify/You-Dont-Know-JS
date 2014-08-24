@@ -1066,11 +1066,24 @@ If you want coercion, use `==` loose equality, but if you don't want coercion, u
 
 ### Abstract Equality
 
-The `==` operator's coercion behavior is defined in the ES5 spec in section 11.9.3. What's listed there is a comprehensive but simple algorithm that explicitly states every possible combination of different types, and how the coercions should happen for each.
+The `==` operator's coercion behavior is defined as "The Abstract Equality Comparison Algorithm", in the ES5 spec in section 11.9.3. What's listed there is a comprehensive but simple algorithm that explicitly states every possible combination of types, and how the coercions (if necessary) should happen for each combination.
 
-In other words, if you compare two values of different types with `==` loose equality, one or both of them will need to be *implicitly coerced* so that they eventually end up as values of the same type, which can then directly be compared for equality or not.
+**Note:** When (*implicit*) coercion is maligned as being too complicated and too flawed to be a *useful good part*, it is these rules of "abstract equality" which are being condemned. Generally, they are said to be too complex and too unintuitive for developers to practically learn and use, and that they are prone more to causing bugs in JS programs than to enabling greater code readability. I believe this is a flawed premise --that you readers are competent developers who write (and read and understand!) algorithms (aka code) all day long. So, what follows is a plain exposition of the "abstract equality" in simple terms. But I implore you to also read the ES5 spec section 11.9.3. I think you'll be surprised at just how reasonable it is.
 
-Let's build off the examples above of `string` and `number` values:
+Basically, the first clause (11.9.3.1) says, if the two values being compared are of the same type, what's defined for "equality" of the two values is pretty much what you'd intuitively expect, in that values are compared via Identity. For example, `42` is only equal to `42`, and `"abc"` is only equal to `"abc"`.
+
+Some minor exceptions to be aware of:
+
+* `NaN` is never equal to itself (see Chapter 2)
+* `+0` and `-0` are equal to each other (see Chapter 2)
+
+Also, importantly, clause 11.9.3.1 has *no provision* for loose equality of two `object` values (including arrays). We'll come back to that in a bit.
+
+The rest of the algorithm in 11.9.3 specifies that if you instead use `==` loose equality to compare two values of different types,  says that one or both of the values will need to be *implicitly coerced* so that they eventually end up as values of the same type, which can then directly be compared for equality or not, using the rules of clause 11.9.3.1.
+
+#### `string`s and `number`s
+
+Let's first build off the `string` and `number` examples earlier in this chapter:
 
 ```js
 var a = 42;
@@ -1080,22 +1093,24 @@ a === b;	// false
 a == b;		// true
 ```
 
-The second comparison uses `==` loose equality, which means the comparison algorithm is allowed to perform *implicit coercion* on one or both values, if the types happen to be different.
+As we'd expect, `a === b` fails, because no coercion is allowed, and indeed the `42` and `"42"` values are different.
 
-But what kind of coercion happens here? Does the `a` value of `42` become a `string`, or does the `b` value of `"42"` become a `number`?
+However, the second comparison `a == b` uses loose equality, which means the comparison algorithm will perform *implicit coercion* on one or both values, if the types happen to be different.
 
-In the ES5 spec 11.9.3.4-5, it tells us:
+But exactly what kind of coercion happens here? Does the `a` value of `42` become a `string`, or does the `b` value of `"42"` become a `number`?
+
+In the ES5 spec, clauses 11.9.3.4-5, it says:
 
 > 4. If Type(x) is Number and Type(y) is String,
 >    return the result of the comparison x == ToNumber(y).
 > 5. If Type(x) is String and Type(y) is Number,
 >    return the result of the comparison ToNumber(x) == y.
 
-So clearly, the `"42"` value is coerced to a `number` for the comparison. The *how* of that coercion has already been covered above, specifically the `ToNumber` abstract operation. In this case, it's quite obvious then that `"42"` becomes `42`, so the two values are indeed "loose equals".
+So clearly, the `"42"` value is coerced to a `number` for the comparison. The *how* of that coercion has already been covered earlier, specifically the `ToNumber` abstract operation. In this case, it's quite obvious then that `"42"` becomes `42`, so the two compared values are indeed "loose equals".
 
-### `true` and `false`
+#### `boolean`s
 
-One of the biggest gotchas to the *implicit coercion* of the `==` loose equality comes if you try to compare a value directly to `true` or `false`.
+One of the biggest gotchas with the *implicit coercion* of `==` loose equality pops up when you try to compare a value directly to `true` or `false`.
 
 Consider:
 
@@ -1106,11 +1121,11 @@ var b = true;
 a == b;	// false
 ```
 
-Wait, what happened here!? We know that `"42"` is a truthy value (see earlier in this chapter). How come it's not `==` loose equal to `true`?
+Wait, what happened here!? We know that `"42"` is a truthy value (see earlier in this chapter). So, how come it's not `==` loose equal to `true`?
 
-The reason is both simple and deceptively devilish. It's so easy to misunderstand, most JS developers never fully grasp it.
+The reason is both simple and deceptively tricky. It's so easy to misunderstand, many JS developers never pay close enough attention to fully grasp it.
 
-Let's quote the spec, section 11.9.3.6-7:
+Let's quote the spec, clauses 11.9.3.6-7:
 
 > 6. If Type(x) is Boolean,
 >    return the result of the comparison ToNumber(x) == y.
@@ -1128,7 +1143,7 @@ x == y; // false
 
 The `Type(x)` is indeed `Boolean`, so it performs `ToNumber(x)`, which coerces `true` to `1`. Now, `1 == "42"` is evaluated. The types are still different, so (essentially recursively) we reconsult the algorithm, which just as above will coerce `"42"` to `42`, and `1 == 42` is clearly `false`.
 
-Reverse it, same outcome:
+Reverse it -- still get the same outcome:
 
 ```js
 var x = "42";
@@ -1186,13 +1201,16 @@ if (Boolean( a )) {
 
 If you avoid ever using `== true` or `== false` (aka loose equality with `boolean`s) in your code, you'll never have to worry about this truthiness/falsiness mental gotcha.
 
-### `null` <--> `undefined`
+#### `null`s and `undefined`s
 
-Another example of *implicit coercion* can be seen with `null` and `undefined` values.
+Another example of *implicit coercion* can be seen with `==` loose equality between `null` and `undefined` values. Again quoting the ES5 spec, clauses 11.9.3.2-3:
 
-These two values, when compared with `==` loose equals, equate to themselves, and each other, and no other values in the entire language. In other words, with `==`, `null` and `undefined` will coerce to each other and to nothing else.
+> 2. If x is null and y is undefined, return true.
+> 3. If x is undefined and y is null, return true.
 
-So, `null` and `undefined` can be treated as indistinguishable for comparison purposes, if you use the `==` loose equals operator to allow their mutual *implicit coercion*.
+`null` and `undefined`, when compared with `==` loose equality, equate to (aka coerce to) each other (as well as themselves, obviously), and no other values in the entire language.
+
+What this means is that `null` and `undefined` can be treated as indistinguishable for comparison purposes, if you use the `==` loose equality operator to allow their mutual *implicit coercion*.
 
 ```js
 var a = null;
@@ -1210,16 +1228,31 @@ a == 0;		// false
 b == 0;		// false
 ```
 
-So, `null` is "double equal" (aka "coercively equal") to `undefined`, and vice versa. But they're exlusive to each other, so you'll never get any false positives or negatives. They're totally safe to coerce to each other, which means they're safe (in the comparison sense) to treat as indistinguishably the same value. That's what I recommend.
+The coercion between `null` and `undefined` is safe and predictable, and no other values can give false positives in such a check. I recommend using this coercion to allow `null` and `undefined` to be indistinguishable and thus treated as the same value.
 
-The *explicit* form of the check, which disallows any such coercion, is (I think) unnecessarily much uglier (and a tiny bit less performant!):
+For example:
 
 ```js
-a === null || a === undefined; // true
-b === null || b === undefined; // true
+var a = doSomething();
+
+if (a == null) {
+	// ..
+}
 ```
 
-This is yet another example where *implicit coercion* improves code readability, in my opinion, but does so in a reliably safe way (if you know what you're doing).
+The `a == null` check safely will pass if `doSomething()` returns either `null` or `undefined`, and will fail with any other value, even other falsy values like `0`, `false`, and `""`.
+
+The *explicit* form of the check, which disallows any such coercion, is (I think) unnecessarily much uglier (and perhaps a tiny bit less performant!):
+
+```js
+var a = doSomething();
+
+if (a === undefined || a === null) {
+	// ..
+}
+```
+
+In my opinion, this is yet another example where *implicit coercion* improves code readability, but does so in a reliably safe way.
 
 ## Summary
 
