@@ -1079,7 +1079,7 @@ Some minor exceptions to normal expecation to be aware of:
 * `NaN` is never equal to itself (see Chapter 2)
 * `+0` and `-0` are equal to each other (see Chapter 2)
 
-The final provision in clause 11.9.3.1 is for `==` loose equality comparison with `object`s (including `function`s and `array`s). Two such values are only *equal* if they are both references to *the exact same value*.
+The final provision in clause 11.9.3.1 is for `==` loose equality comparison with `object`s (including `function`s and `array`s). Two such values are only *equal* if they are both references to *the exact same value*. No coercion occurs here.
 
 **Note:** The `===` strict equality comparison is defined identically to 11.9.3.1, including the provision about two `object` values. It's a very little known fact that **`==` and `===` behave identically** in the case where two `object`s are being compared!
 
@@ -1087,7 +1087,7 @@ The rest of the algorithm in 11.9.3 specifies that if you instead use `==` loose
 
 **Note:** The `!=` loose not-equality operation is defined exactly as you'd expect, in that it's literally the `==` operation comparison performed in its entirety, then the negation of the result. The same goes for the `!==` strict not-equality operation.
 
-#### `string`s and `number`s
+#### Comparing: `string`s to `number`s
 
 To illustrate `==` coercion, let's first build off the `string` and `number` examples earlier in this chapter:
 
@@ -1112,9 +1112,11 @@ In the ES5 spec, clauses 11.9.3.4-5 say:
 > 5. If Type(x) is String and Type(y) is Number,
 >    return the result of the comparison ToNumber(x) == y.
 
-So clearly, the `"42"` value is coerced to a `number` for the comparison. The *how* of that coercion has already been covered earlier, specifically the `ToNumber` abstract operation. In this case, it's quite obvious then that `"42"` becomes `42`, so the two compared values are indeed "loose equals".
+**Note:** The spec uses `Number` and `String` as the formal names for the types, while this book prefers `number` and `string` for the primitive types. Do not let the capitalization of `Number` in the spec confuse you for the `Number()` native function. For our purposes, the capitalization of the type name or not is irrelevant -- they have basically the same meaning.
 
-#### `boolean`s
+Clearly, the spec says the `"42"` value is coerced to a `number` for the comparison. The *how* of that coercion has already been covered earlier, specifically with the `ToNumber` abstract operation. In this case, it's quite obvious then the resulting two `42` values are equal.
+
+#### Comparing: anything to `boolean`
 
 One of the biggest gotchas with the *implicit coercion* of `==` loose equality pops up when you try to compare a value directly to `true` or `false`.
 
@@ -1207,7 +1209,7 @@ if (Boolean( a )) {
 
 If you avoid ever using `== true` or `== false` (aka loose equality with `boolean`s) in your code, you'll never have to worry about this truthiness/falsiness mental gotcha.
 
-#### `null`s and `undefined`s
+#### Comparing: `null`s to `undefined`s
 
 Another example of *implicit coercion* can be seen with `==` loose equality between `null` and `undefined` values. Yet again quoting the ES5 spec, clauses 11.9.3.2-3:
 
@@ -1259,6 +1261,65 @@ if (a === undefined || a === null) {
 ```
 
 In my opinion, the form `a == null` is yet another example where *implicit coercion* improves code readability, but does so in a reliably safe way.
+
+#### Comparing: `object`s to non-`object`s
+
+If an `object` / `function` / `array` is compared to a simple scalar primitive (`string`, `number`, or `boolean`), the ES5 spec says in clauses 11.9.3.8-9:
+
+> 8. If Type(x) is either String or Number and Type(y) is Object,
+>    return the result of the comparison x == ToPrimitive(y).
+> 9. If Type(x) is Object and Type(y) is either String or Number,
+>    return the result of the comparison ToPrimitive(x) == y.
+
+**Note:** You may notice that these clauses only mention `String` and `Number`, but not `Boolean`. That's because, as quoted earlier, clauses 11.9.3.6-7 take care of coercing any `Boolean` operand presented to a `Number` first.
+
+Consider:
+
+```js
+var a = "42";
+var b = [ 42 ];
+
+a == b;	// true
+```
+
+The `[ 42 ]` value has its `ToPrimitive` abstract operation called (see earlier in this chapter), which results in the `42` value. From there, it's just `"42" == 42`, which as we've already covered becomes `42 == 42`, so they're coercively equal.
+
+**Note:** All the quirks of the `ToPrimitve` abstract operation that we discussed earlier in this chapter (`toString()`, `valueOf()`) apply here as you'd expect. This can be quite useful if you have a complex data structure that you want to define a custom `valueOf()` method on, to provide a simple value for equality comparison purposes.
+
+## "Abstract Relational Comparison"
+
+While this part of *implicit coercion* often gets a lot less attention, it's important nonetheless to think about what happens with `a < b` comparisons (similar to how we just examined `a == b`).
+
+The algorithm in ES5 section 11.8.5 essentially divides itself into two parts: what to do if the comparison is with two `string`s (second half), or not (first half).
+
+**Note:** The algorithm is only defined for `a < b`. So, `a > b` is just `b < a`. The `a <= b` variation performs a `b < a` relational comparison first, and then returns the opposite result. Same goes for `a >= b`: opposite of `a < b`.
+
+The algorithm first calls `ToPrimitive` coercion on both values, and if the return result of either call is not a `string`, then both values are coerced to `number` values using the `ToNumber` operation rules, and compared numerically.
+
+For example:
+
+```js
+var a = [ 42 ];
+var b = [ "43" ];
+
+a < b;	// true
+b < a;	// false
+```
+
+**Note:** Similar caveats for `-0` and `NaN` apply here as they did in the `==` algorithm discussed earlier.
+
+However, if both values are `string`s, simple lexographic comparison on the characters is performed:
+
+```js
+var a = [ "42" ];
+var b = [ "043" ];
+
+a < b;	// false
+```
+
+In this case, `a` and `b` are not coerced to `number`s, because both of them end up as `string`s after the `ToPrimitive` coercion on the two `array`s. So, `"42"` is compared character by character to `"043"`, starting with the first characters `"4"` and `"0"`, respectively. Since `"0"` is lexographically *less than* than `"4"`, the comparison returns `false`.
+
+There is no "strict relational comparison" as there is for equality. In other words, there's no way to prevent *implicit coercion* from occurring with relational comparisons like `a < b`, other than to ensure that `a` and `b` are of the same type explicitly before making the comparison.
 
 ## Summary
 

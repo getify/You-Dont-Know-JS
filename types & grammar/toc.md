@@ -23,5 +23,6 @@
 	* Explicit Coercion
 	* Implicit Coercion
 	* Loose Equals vs Strict Equals
+	* "Abstract Relational Comparison"
 * Appendix A: Thank You's!
 
