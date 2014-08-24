@@ -1074,14 +1074,14 @@ The `==` operator's behavior is defined as "The Abstract Equality Comparison Alg
 
 Basically, the first clause (11.9.3.1) says, if the two values being compared are of the same type, what's defined for "equality" of the two values is pretty much what you'd intuitively expect, in that values are compared via Identity. For example, `42` is only equal to `42`, and `"abc"` is only equal to `"abc"`.
 
-Some minor exceptions to be aware of:
+Some minor exceptions to normal expecation to be aware of:
 
 * `NaN` is never equal to itself (see Chapter 2)
 * `+0` and `-0` are equal to each other (see Chapter 2)
 
-Also, importantly, clause 11.9.3.1 has *no provision* for loose equality of two `object` values (including `function`s and `array`s), only for the simple scalar primitives. We'll come back to `==` comparison with two complex primitives in a bit.
+The final provision in clause 11.9.3.1 is for `==` loose equality comparison with `object`s (including `function`s and `array`s). Two such values are only *equal* if they are both references to *the exact same value*.
 
-**Note:** The `===` strict equality comparison is roughly defined identically to 11.9.3.1, with the only exception being that its final clause allows for `===` to be used against two `object`s (including `function`s and `array`s) and thus only resulting in `true` if the two values compared are references to *the exact same value*.
+**Note:** The `===` strict equality comparison is defined identically to 11.9.3.1, including the provision about two `object` values. It's a very little known fact that **`==` and `===` behave identically** in the case where two `object`s are being compared!
 
 The rest of the algorithm in 11.9.3 specifies that if you instead use `==` loose equality to compare two values of different types, one or both of the values will need to be *implicitly coerced* so that they eventually end up as values of the same type, which can then directly be compared for equality or not, using the rules of clause 11.9.3.1 (as just explained).
 
