@@ -1320,20 +1320,6 @@ var f = Object( e );	// same as `new Number( e )`
 e == f;					// false
 ```
 
-The ES6 spec, in clause 7.2.10.8 (the "Abstract Equality Comparison" algorithm), says:
-
-> 8. If Type(x) is Symbol or Type(y) is Symbol, return false.
-
-So, `symbol`s are simple scalar primitive values, but they can never be `==` loose equal to (aka coerced to) any other non-`symbol` value, **even a boxed wrapper** of itself (different from the `Object("abc")` type coercion shown above):
-
-```js
-var g = Symbol( "g" );	// `new Symbol(..)` is illegal
-var h = Object( g );	// ditto
-g == h;					// false
-```
-
-You can still manually unbox the `symbol` object wrapper by calling `h.valueOf()`, which would obviously be the same value as `g`, and thus `==` loose equals.
-
 ### (Crazy) Edge Cases
 
 Now that we've thoroughly examined how the *implicit coercion* of `==` loose equality works (in both sensible and surprising ways), let's try to call out the worst, craziest corner-cases so we can see what we need to avoid to not get bitten with coercion bugs.
