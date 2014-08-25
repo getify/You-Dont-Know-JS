@@ -1325,6 +1325,45 @@ a < b;	// false
 
 In this case, `a` and `b` are not coerced to `number`s, because both of them end up as `string`s after the `ToPrimitive` coercion on the two `array`s. So, `"42"` is compared character by character to `"043"`, starting with the first characters `"4"` and `"0"`, respectively. Since `"0"` is lexographically *less than* than `"4"`, the comparison returns `false`.
 
+The exact same behavior and reasoning goes for:
+
+```js
+var a = [ 4, 2 ];
+var b = [ 0, 4, 3 ];
+
+a < b;	// false
+```
+
+Here, `a` becomes `"4,2"` and `b` becomes `"0,4,3"`, and those lexographically compare identically to the previous snippet.
+
+What about:
+
+```js
+var a = { b: 42 };
+var b = { b: 43 };
+
+a < b;	// ??
+```
+
+`a < b` is also `false`, because `a` becomes `[object Object]` and `b` becomes `[object Object]`, and so clearly `a` is not lexographically less than `b`.
+
+But strangely:
+
+```js
+var a = { b: 42 };
+var b = { b: 43 };
+
+a < b;	// false
+a == b;	// false
+a <= b;	// true
+```
+
+Why is `a == b` not `true`? They're the same `string` value, so it seems they should be equal, right? Nope. Recall the previous discussion about how `==` works with `object` references.
+
+But then how is `a <= b` a `true` expression, if `a < b` **and** `a == b` are both `false`? Because the spec says it will actually evaluate `b < a` first, and negate that result. Since `b < a` is *also* `false`, the result of `a <= b` is `true`.
+
+That's probably contrary to how you might have explained what `<=` does, which would likely have been the literal: "less than or equal to". JS more accurately considers it "not greater than" (`!(a > b)`).
+
 There is no "strict relational comparison" as there is for equality. In other words, there's no way to prevent *implicit coercion* from occurring with relational comparisons like `a < b`, other than to ensure that `a` and `b` are of the same type explicitly before making the comparison.
 
 ## Summary
