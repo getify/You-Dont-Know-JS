@@ -805,9 +805,9 @@ c; // [1,2,3,4]
 d; // [1,2,3,4]
 ```
 
-Simple values (aka scalar primitives) are *always* assigned/passed by value-copy: `null`, `undefined`, `string`, `number`, and `boolean`.
+Simple values (aka scalar primitives) are *always* assigned/passed by value-copy: `null`, `undefined`, `string`, `number`, `boolean`, and ES6's `symbol`.
 
-Complex values (aka compound primitives) *always* create a new reference on assignment and a copy of the reference on passing: `object` (including arrays, and all boxed object wrappers -- see Chapter 3), `function`, and `symbol` (ES6+).
+Complex values (aka compound primitives) *always* create a new reference on assignment and a copy of the reference on passing: `object` (including arrays, and all boxed object wrappers -- see Chapter 3), and `function`.
 
 In the above snippet, because `2` is a scalar primitive, `a` holds one initial copy of that value, and `b` is assigned another *copy* of the value. When changing `b`, you are in no way changing the value in `a`.
 

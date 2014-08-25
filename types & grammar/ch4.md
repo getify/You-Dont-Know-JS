@@ -1324,15 +1324,15 @@ The ES6 spec, in clause 7.2.10.8 (the "Abstract Equality Comparison" algorithm),
 
 > 8. If Type(x) is Symbol or Type(y) is Symbol, return false.
 
-So, `Symbol`s are never unboxed with `ToPrimitive` during `==` loose equality comparison.
+So, `symbol`s are simple scalar primitive values, but they can never be `==` loose equal to (aka coerced to) any other non-`symbol` value, **even a boxed wrapper** of itself (different from the `Object("abc")` type coercion shown above):
 
 ```js
-var g = Symbol( "g" );	// no `new Symbol(..)` equivalent
-var h = Object( g );	// h --> Symbol {}
-g == h;					// false (different symbol references!)
+var g = Symbol( "g" );	// `new Symbol(..)` is illegal
+var h = Object( g );	// ditto
+g == h;					// false
 ```
 
-With any other `object` value in `g`, `Object(g)` would just have returned the same `object` reference, but interestingly this is not true of a `Symbol` value.
+You can still manually unbox the `symbol` object wrapper by calling `h.valueOf()`, which would obviously be the same value as `g`, and thus `==` loose equals.
 
 ### (Crazy) Edge Cases
 

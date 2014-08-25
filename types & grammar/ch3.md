@@ -387,6 +387,8 @@ Object.getOwnPropertySymbols( a );
 
 While symbols are not actually private (`Object.getOwnPropertySymbols(..)` reflects on the object and reveals the symbols quite publicly), using them for private or special properties is likely their primary use-case. For most developers, they may take the place of property names with `__` prefixes, which are almost always by convention signals to say, "hey, this is a private/special/internal property, so leave it alone!"
 
+**Note:** `Symbol`s are *not* `object`s, they are simple scalar primitives.
+
 ### Native Prototypes
 
 Each of the built-in native constructors has its own `.prototype` object -- `Array.prototype`, `String.prototype`, etc.
