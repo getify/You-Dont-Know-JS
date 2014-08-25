@@ -1298,7 +1298,7 @@ While this part of *implicit coercion* often gets a lot less attention, it's imp
 
 The algorithm in ES5 section 11.8.5 essentially divides itself into two parts: what to do if the comparison is with two `string`s (second half), or not (first half).
 
-**Note:** The algorithm is only defined for `a < b`. So, `a > b` is just `b < a`. The `a <= b` variation performs a `b < a` relational comparison first, and then returns the opposite result. Same goes for `a >= b`: opposite of `a < b`.
+**Note:** The algorithm is only defined for `a < b`. So, `a > b` is just `b < a`.
 
 The algorithm first calls `ToPrimitive` coercion on both values, and if the return result of either call is not a `string`, then both values are coerced to `number` values using the `ToNumber` operation rules, and compared numerically.
 
@@ -1355,14 +1355,19 @@ var b = { b: 43 };
 
 a < b;	// false
 a == b;	// false
+a > b;	// false
+
 a <= b;	// true
+a >= b;	// true
 ```
 
-Why is `a == b` not `true`? They're the same `string` value, so it seems they should be equal, right? Nope. Recall the previous discussion about how `==` works with `object` references.
+Why is `a == b` not `true`? They're the same `string` value (`"[object Object]"`), so it seems they should be equal, right? Nope. Recall the previous discussion about how `==` works with `object` references.
 
-But then how is `a <= b` a `true` expression, if `a < b` **and** `a == b` are both `false`? Because the spec says it will actually evaluate `b < a` first, and negate that result. Since `b < a` is *also* `false`, the result of `a <= b` is `true`.
+But then how are `a <= b` and `a >= b` resulting in `true`, if `a < b` **and** `a == b` **and** `a > b` are all `false`?
 
-That's probably contrary to how you might have explained what `<=` does, which would likely have been the literal: "less than or equal to". JS more accurately considers it "not greater than" (`!(a > b)`, which JS treats as `!(b < a)`).
+Because the spec says for `a <= b`, it will actually evaluate `b < a` first, and then negate that result. Since `b < a` is *also* `false`, the result of `a <= b` is `true`.
+
+That's probably awfully contrary to how you might have explained what `<=` does up to now, which would likely have been the literal: "less than *or* equal to". JS more accurately considers `<=` as "not greater than" (`!(a > b)`, which JS treats as `!(b < a)`). Moreover, `a >= b` is explained by first considering it as `b <= a`, and then applying the same reasoning.
 
 There is no "strict relational comparison" as there is for equality. In other words, there's no way to prevent *implicit coercion* from occurring with relational comparisons like `a < b`, other than to ensure that `a` and `b` are of the same type explicitly before making the comparison.
 
