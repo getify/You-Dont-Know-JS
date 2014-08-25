@@ -1362,7 +1362,7 @@ Why is `a == b` not `true`? They're the same `string` value, so it seems they sh
 
 But then how is `a <= b` a `true` expression, if `a < b` **and** `a == b` are both `false`? Because the spec says it will actually evaluate `b < a` first, and negate that result. Since `b < a` is *also* `false`, the result of `a <= b` is `true`.
 
-That's probably contrary to how you might have explained what `<=` does, which would likely have been the literal: "less than or equal to". JS more accurately considers it "not greater than" (`!(a > b)`).
+That's probably contrary to how you might have explained what `<=` does, which would likely have been the literal: "less than or equal to". JS more accurately considers it "not greater than" (`!(a > b)`, which JS treats as `!(b < a)`).
 
 There is no "strict relational comparison" as there is for equality. In other words, there's no way to prevent *implicit coercion* from occurring with relational comparisons like `a < b`, other than to ensure that `a` and `b` are of the same type explicitly before making the comparison.
 
