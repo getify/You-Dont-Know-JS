@@ -1292,13 +1292,59 @@ The `[ 42 ]` value has its `ToPrimitive` abstract operation called (see earlier 
 
 **Note:** All the quirks of the `ToPrimitve` abstract operation that we discussed earlier in this chapter (`toString()`, `valueOf()`) apply here as you'd expect. This can be quite useful if you have a complex data structure that you want to define a custom `valueOf()` method on, to provide a simple value for equality comparison purposes.
 
+In Chapter 3, we covered "unboxing", where an `object` wrapper around a primitive value (like from `new String("abc")`, for instance) is unwrapped, and the underlying primitive value (`"abce"`) is returned. This behavior is related to the `ToPrimitive` coercion in the `==` algorithm:
+
+```js
+var a = "abc";
+var b = Object( a );	// same as `new String( a )`
+
+a === b;				// false
+a == b;					// true
+```
+
+`a == b` because `b` is coerced (aka "unboxed", unwrapped) via `ToPrimitive` to its underlying `"abc"` simple scalar primitive value, so `a` and `b` are indeed found to be equal.
+
+There are some values where this is not the case, though, because of other overriding rules in the `==` algorithm. Consider:
+
+```js
+var a = null;
+var b = Object( a );	// same as `new Object()`
+a == b;					// false
+
+var c = undefined;
+var d = Object( c );	// same as `new Object()`
+c == d;					// false
+
+var e = NaN;
+var f = Object( e );	// same as `new Number( e )`
+e == f;					// false
+```
+
+The ES6 spec, in clause 7.2.10.8 (the "Abstract Equality Comparison" algorithm), says:
+
+> 8. If Type(x) is Symbol or Type(y) is Symbol, return false.
+
+So, `Symbol`s are never unboxed with `ToPrimitive` during `==` loose equality comparison.
+
+```js
+var g = Symbol( "g" );	// no `new Symbol(..)` equivalent
+var h = Object( g );	// h --> Symbol {}
+g == h;					// false (different symbol references!)
+```
+
+With any other `object` value in `g`, `Object(g)` would just have returned the same `object` reference, but interestingly this is not true of a `Symbol` value.
+
+### (Crazy) Edge Cases
+
+Now that we've thoroughly examined how the *implicit coercion* of `==` loose equality works (in both sensible and surprising ways), let's try to call out the worst, craziest corner-cases so we can see what we need to avoid to not get bitten with coercion bugs.
+
 ## "Abstract Relational Comparison"
 
-While this part of *implicit coercion* often gets a lot less attention, it's important nonetheless to think about what happens with `a < b` comparisons (similar to how we just examined `a == b`).
+While this part of *implicit coercion* often gets a lot less attention, it's important nonetheless to think about what happens with `a < b` comparisons (similar to how we just examined `a == b` in depth).
 
-The algorithm in ES5 section 11.8.5 essentially divides itself into two parts: what to do if the comparison is with two `string`s (second half), or not (first half).
+The algorithm in ES5 section 11.8.5 essentially divides itself into two parts: what to do if the comparison involves two `string` values (second half), or not (first half).
 
-**Note:** The algorithm is only defined for `a < b`. So, `a > b` is just `b < a`.
+**Note:** The algorithm is only defined for `a < b`. So, `a > b` is handled as `b < a`.
 
 The algorithm first calls `ToPrimitive` coercion on both values, and if the return result of either call is not a `string`, then both values are coerced to `number` values using the `ToNumber` operation rules, and compared numerically.
 
