@@ -1338,6 +1338,48 @@ You can still manually unbox the `symbol` object wrapper by calling `h.valueOf()
 
 Now that we've thoroughly examined how the *implicit coercion* of `==` loose equality works (in both sensible and surprising ways), let's try to call out the worst, craziest corner-cases so we can see what we need to avoid to not get bitten with coercion bugs.
 
+First, let's examine how modifying the built-in native prototypes can produce crazy results:
+
+```js
+Number.prototype.valueOf = function() {
+	return 3;
+};
+
+new Number( 2 ) == 3;	// true
+```
+
+**Note:** `2 == 3` would not have fallen into this trap, because neither `2` nor `3` would have invoked the built-in `Number.prototype.valueOf()` method because both are already primitive `number` values and can be compared directly. `new Number(2)` however must go through the `ToPrimitive` coercion, and thus invoke `valueOf()`.
+
+Evil, huh? Of course it is. No one should ever do such a thing. The fact that you *can* do this is sometimes used as a criticism of coercion and `==`. But that's misdirected frustration. JavaScript is not *bad* because you can do such things, a developer is *bad* **if they do such things**. Don't fall into the "my programming language should protect me from myself" fallacy.
+
+Next, let's consider another tricky example, which takes the evil from the previous example to another level:
+
+```js
+if (a == 2 && a == 3) {
+	// ..
+}
+```
+
+You might think this would be impossible, because `a` could never be equal to both `2` and `3` *at the same time*. But, "at the same time" is a mistake, since the first expression `a == 2` happens strictly *before* `a == 3`.
+
+So, what if we make `a.valueOf()` have side effects each time it's called, such that the first time it returns `2` and the second time it's called it returns `3`? Pretty easy:
+
+```js
+var i = 2;
+
+Number.prototype.valueOf = function() {
+	return i++;
+};
+
+var a = new Number( 42 );
+
+if (a == 2 && a == 3) {
+	console.log( "Yep, this happened." );
+}
+```
+
+Again, these are evil tricks. Don't do them. But also don't use them as complaints against coercion. Just avoid them, and stick only with valid and proper usage of coercion.
+
 ## "Abstract Relational Comparison"
 
 While this part of *implicit coercion* often gets a lot less attention, it's important nonetheless to think about what happens with `a < b` comparisons (similar to how we just examined `a == b` in depth).
