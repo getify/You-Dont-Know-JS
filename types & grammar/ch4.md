@@ -1326,6 +1326,8 @@ Now that we've thoroughly examined how the *implicit coercion* of `==` loose equ
 
 First, let's examine how modifying the built-in native prototypes can produce crazy results:
 
+#### A Number By Any Other Value Would...
+
 ```js
 Number.prototype.valueOf = function() {
 	return 3;
@@ -1346,7 +1348,7 @@ if (a == 2 && a == 3) {
 }
 ```
 
-You might think this would be impossible, because `a` could never be equal to both `2` and `3` *at the same time*. But, "at the same time" is a mistake, since the first expression `a == 2` happens strictly *before* `a == 3`.
+You might think this would be impossible, because `a` could never be equal to both `2` and `3` *at the same time*. But, "at the same time" is inaccurate, since the first expression `a == 2` happens strictly *before* `a == 3`.
 
 So, what if we make `a.valueOf()` have side effects each time it's called, such that the first time it returns `2` and the second time it's called it returns `3`? Pretty easy:
 
@@ -1364,7 +1366,155 @@ if (a == 2 && a == 3) {
 }
 ```
 
-Again, these are evil tricks. Don't do them. But also don't use them as complaints against coercion. Just avoid them, and stick only with valid and proper usage of coercion.
+Again, these are evil tricks. Don't do them. But also don't use them as complaints against coercion. Potential abuses of a mechanism are not sufficient evidence to condemn the mechanism. Just avoid these crazy tricks, and stick only with valid and proper usage of coercion.
+
+#### False-y Comparisons
+
+The most common complaint against *implicit coercion* in `==` comparisons comes from how falsy values behave surprisingly when compared to each other.
+
+To illustrate, let's look at a list of the corner-cases around falsy value comparisons, to see which ones are reasonable and which are troublesome:
+
+```js
+"0" == null;			// false
+"0" == undefined;		// false
+"0" == false;			// true -- UH OH!
+"0" == NaN;				// false
+"0" == 0;				// true
+"0" == "";				// false
+
+false == null;			// false
+false == undefined;		// false
+false == NaN;			// false
+false == 0;				// true -- UH OH!
+false == "";			// true -- UH OH!
+false == [];			// true -- UH OH!
+false == {};			// false
+
+"" == null;				// false
+"" == undefined;		// false
+"" == NaN;				// false
+"" == 0;				// true -- UH OH!
+"" == [];				// true -- UH OH!
+"" == {};				// false
+
+0 == null;				// false
+0 == undefined;			// false
+0 == NaN;				// false
+0 == [];				// true -- UH OH!
+0 == {};				// false
+```
+
+In this list of 24 comparisons, 17 of them are quite reasonable and predictable. For example, we know that `""` and `NaN` are not at all equatable values, and indeed they don't coerce to be loose equals, whereas `"0"` and `0` are reasonably equatable and *do* coerce to be loose equals.
+
+However, seven of the comparisons are marked with "UH OH!" because as false positives, they are much more likely gotchas that could trip you up. `""` and `0` are definitely distinctly different values, and it's rare you'd want to treat them as equateable, so their mutual coercion is troublesome. Note that there aren't any false negatives here.
+
+We don't have to stop there, though. We can keep looking for even more troublesome coercions:
+
+```js
+[] == ![];		// true
+```
+
+Oooo, that seems at a higher level of crazy, right!? Your brain may likely trick you that you're comparing a truthy to a falsy value, so the `true` result is surprising, as we *know* a value can never be truthy and falsy at the same time!
+
+But that's not what's actually happening. Let's break it down. What do we know about the `!` unary operator (see earlier in this chapter)? It explicitly coerces to a `boolean` using the `ToBoolean` rules (and it also flips the parity). So before `[] == ![]` is even processed, it's actually already `[] == false`. We already saw that one in our above list (`false == []`), so its surprise result is *not new* to us.
+
+Indeed, pretty much any crazy coercion between normal values (not `valueOf()` or `toString()` tricks as above) will boil down to this short list of gotcha coercions we've just identified.
+
+To contrast against these 24 likely suspects for coercion gotchas, consider another list like this:
+
+```js
+42 == "43";							// false
+"foo" == 42;						// false
+"true" == true;						// false
+
+42 == "42";							// true
+"foo" == [ "foo" ];					// true
+```
+
+In these non-falsy, non-corner cases (and there are literally an infinite number of comparisons we could put on this list), the coercion results are totally safe, reasonable, and explainable.
+
+#### Sanity Check
+
+OK, we've definitely found some crazy stuff when we've looked deeply into *implicit coercion*. No wonder that most developers claim coercion is evil and should be avoided, right!?
+
+But let's take a step back and sanity check.
+
+By way of magnitude comparison, we have *a list* of seven troublesome gotcha coercions, but we have *another list* of (at least 17, but actually infinite) coercions that are totally sane and explainable.
+
+If you're looking for a textbook example of "throwing the baby out with the bathwater", this is it: discarding the entirety of coercion (the infinitely large list of safe and useful behaviors) because of a list of literally just seven gotchas.
+
+The more prudent reaction would be to ask, "how can I use the countless *good parts* of coercion, but avoid the few *bad parts*?"
+
+Let's look again at the *bad* list:
+
+```js
+"0" == false;			// true -- UH OH!
+false == 0;				// true -- UH OH!
+false == "";			// true -- UH OH!
+false == [];			// true -- UH OH!
+"" == 0;				// true -- UH OH!
+"" == [];				// true -- UH OH!
+0 == [];				// true -- UH OH!
+```
+
+Four of the seven items on this list involve a `== false` comparison, which we said earlier you should **always, always** avoid. That's a pretty easy rule to remember.
+
+Now the list is down to three.
+
+```js
+"" == 0;				// true -- UH OH!
+"" == [];				// true -- UH OH!
+0 == [];				// true -- UH OH!
+```
+
+Are these reasonable coercions you'd do in a normal JavaScript program? Under what conditions would they really happen?
+
+I don't think it's terribly likely that you'd literally use `== []` in a `boolean` test in your program, at least not if you know what you're doing. You'd probably instead be doing `== ""` or `== 0`, like:
+
+```js
+function doSomething(a) {
+	if (a == "") {
+		// ..
+	}
+}
+```
+
+You'd have an oops if you accidentally called `doSomething(0)` or `doSomething([])`. Another scenario:
+
+```js
+function doSomething(a,b) {
+	if (a == b) {
+		// ..
+	}
+}
+```
+
+Again, this could break if you did something like `doSomething("",0)` or `doSomething([],"")`.
+
+So, while the situations *can* exist where these coercions will bite you, and you'll want to be careful around them, they're probably not super common on the whole of your code base.
+
+The most important advice I can give you on this topic: examine your program and reason about what values can show up on either side of an `==` comparison.
+
+To effectively avoid issues, here's some heuristic rules to consider:
+
+1. An equality comparison that *could* have a `""` or `0` on *both* sides
+2. An equality comparison that *could* have a `[]` on either side.
+
+In these scenarios, it's almost certainly better to use `===` instead of `==`, to avoid unwanted coercion. Combined with our earlier rule about **always avoiding `== true` and `== false`**, pretty much all the coercion gotchas that could reasonably hurt you will effectively be avoided.
+
+**Being more explicit/verbose in these cases will save you from a lot of headaches.**
+
+The question of `==` vs `===` is really appropriately framed as: do you want to allow coercion for a comparison, or not?
+
+There's lots of cases where such coercion can be helpful, allowing you to more tersely express some comparison logic (like with `null` and `undefined`, for example).
+
+In the overall scheme of things, there's relatively few cases where *implicit coercion* is truly dangerous. But in those places, for safety sake, definitely use `===`.
+
+**Note:** Another place where coercion is guaranteed *not* to bite you is with the `typeof` operator. `typeof` is always going to return you one of seven strings (see Chapter 1), and none of them are the empty `""` string. As such, there's no case where checking the type of some value is going to run afoul of *implicit coercion*. `typeof x == "function"` is 100% as safe and reliable as `typeof x === "function"`. Literally, the spec says the algorithm will be identical in this situation. So, don't just blindly use `===` everywhere simply because that's what your linter tells you, or (worst of all) because you've been told in some book to **not think about it**. You own the quality of your code.
+
+Is *implicit coercion* evil and dangerous? In a few cases, yes, but overwhelmingly, no.
+
+Be a responsible and mature developer. Learn how to use the power of coercion (both *explicit* and *implicit*) effectively and safely. And teach those around you to do the same.
 
 ## "Abstract Relational Comparison"
 
@@ -1388,7 +1538,7 @@ b < a;	// false
 
 **Note:** Similar caveats for `-0` and `NaN` apply here as they did in the `==` algorithm discussed earlier.
 
-However, if both values are `string`s, simple lexographic comparison on the characters is performed:
+However, if both values are `string`s for the `<` comparison, simple lexographic comparison on the characters is performed:
 
 ```js
 var a = [ "42" ];
@@ -1397,7 +1547,7 @@ var b = [ "043" ];
 a < b;	// false
 ```
 
-In this case, `a` and `b` are not coerced to `number`s, because both of them end up as `string`s after the `ToPrimitive` coercion on the two `array`s. So, `"42"` is compared character by character to `"043"`, starting with the first characters `"4"` and `"0"`, respectively. Since `"0"` is lexographically *less than* than `"4"`, the comparison returns `false`.
+`a` and `b` are *not* coerced to `number`s, because both of them end up as `string`s after the `ToPrimitive` coercion on the two `array`s. So, `"42"` is compared character by character to `"043"`, starting with the first characters `"4"` and `"0"`, respectively. Since `"0"` is lexographically *less than* than `"4"`, the comparison returns `false`.
 
 The exact same behavior and reasoning goes for:
 
@@ -1443,13 +1593,13 @@ Because the spec says for `a <= b`, it will actually evaluate `b < a` first, and
 
 That's probably awfully contrary to how you might have explained what `<=` does up to now, which would likely have been the literal: "less than *or* equal to". JS more accurately considers `<=` as "not greater than" (`!(a > b)`, which JS treats as `!(b < a)`). Moreover, `a >= b` is explained by first considering it as `b <= a`, and then applying the same reasoning.
 
-There is no "strict relational comparison" as there is for equality. In other words, there's no way to prevent *implicit coercion* from occurring with relational comparisons like `a < b`, other than to ensure that `a` and `b` are of the same type explicitly before making the comparison.
+Unfortunately, there is no "strict relational comparison" as there is for equality. In other words, there's no way to prevent *implicit coercion* from occurring with relational comparisons like `a < b`, other than to ensure that `a` and `b` are of the same type explicitly before making the comparison.
+
+Use the same reasoning from our earlier `==` vs `===` sanity check discussion. If coercion is helpful and reasonably safe, like in a `42 < "43"` comparison, **use it**. On the other hands, if you need to be safe about a relational comparison, *explicitly coerce* the values first, before using `<` (or its counterparts).
 
 ## Summary
 
-After proving that JS has types, and that values can and do need to be converted between those different types, we have here turned our attention to how JavaScript type conversions happen, called **coercion**.
-
-Coercion can be classified as either *explicit* or *implicit*.
+In this chapter, we turned our attention to how JavaScript type conversions happen, called **coercion**, which can be classified as either *explicit* or *implicit*.
 
 Coercion gets a bad rap, but it's actually quite useful in many cases. An important task for the responsible JS developer is to take the time to learn all the ins and outs of coercion to decide which parts will help improve their code, and which parts they really should avoid.
 
