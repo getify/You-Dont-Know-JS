@@ -1595,7 +1595,15 @@ That's probably awfully contrary to how you might have explained what `<=` does 
 
 Unfortunately, there is no "strict relational comparison" as there is for equality. In other words, there's no way to prevent *implicit coercion* from occurring with relational comparisons like `a < b`, other than to ensure that `a` and `b` are of the same type explicitly before making the comparison.
 
-Use the same reasoning from our earlier `==` vs `===` sanity check discussion. If coercion is helpful and reasonably safe, like in a `42 < "43"` comparison, **use it**. On the other hands, if you need to be safe about a relational comparison, *explicitly coerce* the values first, before using `<` (or its counterparts).
+Use the same reasoning from our earlier `==` vs `===` sanity check discussion. If coercion is helpful and reasonably safe, like in a `42 < "43"` comparison, **use it**. On the other hand, if you need to be safe about a relational comparison, *explicitly coerce* the values first, before using `<` (or its counterparts).
+
+```js
+var a = [ 42 ];
+var b = "043";
+
+a < b;						// false -- string comparison!
+Number( a ) < Number( b );	// true -- number comparison!
+```
 
 ## Summary
 
