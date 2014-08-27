@@ -23,6 +23,8 @@
 	* Explicit Coercion
 	* Implicit Coercion
 	* Loose Equals vs Strict Equals
-	* "Abstract Relational Comparison"
+	* Abstract Relational Comparison
+* Chapter 5: Grammar
+	* Operator Precedence
 * Appendix A: Thank You's!
 

@@ -1516,11 +1516,11 @@ Is *implicit coercion* evil and dangerous? In a few cases, yes, but overwhelming
 
 Be a responsible and mature developer. Learn how to use the power of coercion (both *explicit* and *implicit*) effectively and safely. And teach those around you to do the same.
 
-## "Abstract Relational Comparison"
+## Abstract Relational Comparison
 
 While this part of *implicit coercion* often gets a lot less attention, it's important nonetheless to think about what happens with `a < b` comparisons (similar to how we just examined `a == b` in depth).
 
-The algorithm in ES5 section 11.8.5 essentially divides itself into two parts: what to do if the comparison involves two `string` values (second half), or not (first half).
+The "Abstract Relational Comparison" algorithm in ES5 section 11.8.5 essentially divides itself into two parts: what to do if the comparison involves two `string` values (second half), or not (first half).
 
 **Note:** The algorithm is only defined for `a < b`. So, `a > b` is handled as `b < a`.
 
