@@ -1607,7 +1607,7 @@ Number( a ) < Number( b );	// true -- number comparison!
 
 ## Summary
 
-In this chapter, we turned our attention to how JavaScript type conversions happen, called **coercion**, which can be classified as either *explicit* or *implicit*.
+In this chapter, we turned our attention to how JavaScript type conversions happen, called **coercion**, which can be characterized as either *explicit* or *implicit*.
 
 Coercion gets a bad rap, but it's actually quite useful in many cases. An important task for the responsible JS developer is to take the time to learn all the ins and outs of coercion to decide which parts will help improve their code, and which parts they really should avoid.
 
