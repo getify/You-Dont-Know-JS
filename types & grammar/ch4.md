@@ -913,11 +913,11 @@ function onlyOne() {
 var a = true;
 var b = false;
 
-onlyOne(b,a);			// true
-onlyOne(b,a,b,b,b);		// true
+onlyOne( b, a );				// true
+onlyOne( b, a, b, b, b );		// true
 
-onlyOne(b,b);			// false
-onlyOne(b,a,b,b,b,a)	// false
+onlyOne( b, b );				// false
+onlyOne( b, a, b, b, b, a );	// false
 ```
 
 **Note:** Of course, instead of the `for` loop in `onlyOne(..)`, you could more tersely use the ES5 `reduce(..)` utility, but I didn't want to obscure the concepts.
