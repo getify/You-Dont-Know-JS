@@ -37,6 +37,8 @@ By contrast, the `String(..)` function makes it pretty obvious that it's explici
 
 Both approaches accomplish the same effect: `"42"` comes from `42`. But it's the *how* that is at the heart of the heated debates over JavaScript coercion.
 
+**Note:** Technically, there's some nuanced behavioral difference here beyond the stylistic difference. We cover that in more detail later in the chapter, in the "Implicitly: Strings <--> Numbers" section.
+
 The terms "explicit" and "implicit", or "obvious" and "hidden side-effect", are *relative*.
 
 If you know exactly what `a + ""` is doing and you're intentionally doing that to coerce to a `string`, you might feel the operation is sufficiently "explicit". Conversely, if you've never seen the `String(..)` function used for `string` coercion, its behavior might seem hidden enough as to feel "implicit" to you.
@@ -848,18 +850,24 @@ It's extremely common/idiomatic to (*implicitly*) coerce `number` to `string` wi
 
 **I think this is a great example** of a useful form in *implicit coercion*, despite how frequently the mechanism gets criticized!
 
-One additional quirk to note between `String(foo)` and `foo + ""` - the former invokes `valueOf()`, whereas the latter invokes `toString` - and in either case, the result is converted to a string before being returned. Consider this example:
+Comparing this *implicit coercion* of `a + ""` to our earlier example of `String(a)` *explicit coercion*, there's one additional quirk to be aware of. Because of how the `ToPrimitive` abstract operation works, `a + ""` invokes `valueOf()` on the `a` value, whose return value is then finally converted to a `string` via the internal `ToString` abstract operation. But `String(a)` just invokes `toString()` directly.
+
+Both approaches ultimately result in a `string`, but if you're using an `object` instead of a regular primitive `number` value, you may not necessarily get the *same* `string` value!
+
+Consider:
 
 ```js
 var a = {
-  valueOf: function () { return 42; },
-  toString: function () { return 4; }
+	valueOf: function() { return 42; },
+	toString: function() { return 4; }
 };
 
-var b = a + "";        // will produce the string "42"
+a + "";			// "42"
 
-var c = String(a);     // will produce the string "4"
+String( a );	// "4"
 ```
+
+Generally, this sort of gotcha won't bite you, but you should be careful if you're defining both your own `valueOf()` and `toString()` methods for some `object`, as how you coerce the value could affect the outcome.
 
 What about the other direction? How can we *implicitly coerce* from `string` to `number`?
 
