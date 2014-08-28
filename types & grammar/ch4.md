@@ -35,19 +35,6 @@ For `b`, the coercion that occurs happens implicitly, because the `+` operator c
 
 By contrast, the `String(..)` function makes it pretty obvious that it's explicitly taking the value in `a` and coercing it to a `string` representation.
 
-One additional quirk to note between `String(foo)` and `foo + ""` - the former invokes `valueOf()`, whereas the latter invokes `toString` - and in either case, the result is converted to a string before being returned. Consider this example:
-
-```js
-var a = {
-  valueOf: function () { return 42; },
-  toString: function () { return 4; }
-};
-
-var b = a + "";        // will produce the string "42"
-
-var c = String(a);     // will produce the string "4"
-```
-
 Both approaches accomplish the same effect: `"42"` comes from `42`. But it's the *how* that is at the heart of the heated debates over JavaScript coercion.
 
 The terms "explicit" and "implicit", or "obvious" and "hidden side-effect", are *relative*.
@@ -860,6 +847,19 @@ b; // "42"
 It's extremely common/idiomatic to (*implicitly*) coerce `number` to `string` with a `+ ""` operation. In fact, interestingly, even some of the most vocal crticics of *implicit coercion* still use that approach in their own code, instead of one of its *explicit* alternatives.
 
 **I think this is a great example** of a useful form in *implicit coercion*, despite how frequently the mechanism gets criticized!
+
+One additional quirk to note between `String(foo)` and `foo + ""` - the former invokes `valueOf()`, whereas the latter invokes `toString` - and in either case, the result is converted to a string before being returned. Consider this example:
+
+```js
+var a = {
+  valueOf: function () { return 42; },
+  toString: function () { return 4; }
+};
+
+var b = a + "";        // will produce the string "42"
+
+var c = String(a);     // will produce the string "4"
+```
 
 What about the other direction? How can we *implicitly coerce* from `string` to `number`?
 
