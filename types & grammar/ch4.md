@@ -422,7 +422,7 @@ The goal here is to identify patterns in our code where we can make it clear and
 
 It would be hard to find any salient disagreements with *explicit coercion*, as it most closely aligns with the commonly accepted practices of type conversion works in statically-typed languages. As such, we'll take for granted (for now) that *explicit coercion* can be agreed upon to not be evil or controversial. We'll revisit this later, though.
 
-### Strings <--> Numbers
+### Explicitly: Strings <--> Numbers
 
 We'll start with the simplest and perhaps most common coercion operation: coercing values between `string` and `number` representation.
 
@@ -535,7 +535,7 @@ if (!Date.now) {
 
 I'd recommend skipping the coercion forms related to dates. Use `Date.now()` for current *now* timestamps, and `new Date( .. ).getTime()` for getting a timestamp of a specific *non-now* date/time that you need to specify.
 
-### Parsing Numeric Strings
+### Explicitly: Parsing Numeric Strings
 
 A similar outcome to coercing a `string` to a `number` can be achieved by parsing a `number` out of a `string`'s character contents. There are, however, distinct differences between this parsing and the type conversion we examined above.
 
@@ -647,7 +647,7 @@ parseInt( "10", 2 );		// 2
 
 `parseInt(..)` is actually pretty predictable and consistent in its behavior. If you use it correctly, you'll get sensible results. If you use it incorrectly, the crazy results you get are not the fault of JavaScript.
 
-### * --> Boolean
+### Explicitly: * --> Boolean
 
 Now, let's examine coercing from any non-`boolean` value to a `boolean`.
 
@@ -759,7 +759,7 @@ Let's take a different perspective on what *implicit coercion* is, and can be, t
 
 Let's define the goal of *implicit coercion* as: to reduce verbosity, boilerplate, and/or unnecessary implementation detail which clutters up our code with noise that distracts from the more important intent.
 
-### Implicitly Simplifying
+### Simplifying Implicitly
 
 Before we even get to JavaScript, let me suggest something pseudo-code'ish from some theoretical strongly-typed language to illustrate:
 
@@ -789,7 +789,7 @@ Many developers believe that if a mechanism can do some useful thing **A** but c
 
 My encouragement to you is: don't settle for that. Don't "throw the baby out with the bathwater". Don't assume *implicit coercion* is all bad because all you think you've ever seen is its "bad parts". I think there are "good parts" here, and I want to help and inspire more of you to find and embrace them!
 
-### Strings <--> Numbers
+### Implicitly: Strings <--> Numbers
 
 Earlier in this chapter, we explored *explicitly* coercing between `string` and `number` values. Now, let's explore the same task but with *implicit coercion* approaches. But before we do, we have to examine some nuances of operations that will *implicitly* force coercion.
 
@@ -874,7 +874,77 @@ So, is *implicit coercion* of `string` and `number` values the ugly evil you've 
 
 Compare `b = String(a)` (*explicit*) to `b = a + ""` (*implicit*). I think cases can be made for both approaches being useful in your code. But, you be the judge.
 
-### * --> Boolean
+### Implicitly: Booleans --> Numbers
+
+I think a case where *implicit coercion* can really shine is in simplifying certain types of complicated `boolean` logic into simple numeric addition. Of course, this is not a general-purpose technique, but a specific solution for specific cases.
+
+Consider:
+
+```js
+function onlyOne(a,b,c) {
+	return !!((a && !b && !c) ||
+		(!a && b && !c) || (!a && !b && c));
+}
+
+var a = true;
+var b = false;
+
+onlyOne( a, b, b );	// true
+onlyOne( b, a, b );	// true
+
+onlyOne( a, b, a );	// false
+```
+
+This `onlyOne(..)` utility should only return `true` if exactly one of the arguments is `true` / truthy. It's using *implicit coercion* on the truthy checks and *explicit coercion* on the others, including the final return value.
+
+But what if we needed that utility to be able to handle four, fzzfive or twenty flags in the same way? It's pretty difficult to imagine implementing code that would handle all those permutations of comparisons.
+
+But here's where coercing the `boolean` values to `number`s (`0` or `1`, obviously) can greatly help:
+
+```js
+function onlyOne() {
+	var sum = 0;
+	for (var i=0; i < arguments.length; i++) {
+		sum += arguments[i];
+	}
+	return sum == 1;
+}
+
+var a = true;
+var b = false;
+
+onlyOne(b,a);			// true
+onlyOne(b,a,b,b,b);		// true
+
+onlyOne(b,b);			// false
+onlyOne(b,a,b,b,b,a)	// false
+```
+
+**Note:** Of course, instead of the `for` loop in `onlyOne(..)`, you could more tersely use the ES5 `reduce(..)` utility, but I didn't want to obscure the concepts.
+
+What we're doing here is relying on the `0` for `false` and `1` for `true` coercions, and numerically adding them all up. `sum += arguments[i]` uses *implicit coercion* to make that happen. If one and only one value in the `arguments` list is `true`, then the numeric sum will be `1`, otherwise the sum will not be `1` and thus the desired condition is not met.
+
+We could of course do this with *explicit coercion* instead:
+
+```js
+function onlyOne() {
+	var sum = 0;
+	for (var i=0; i < arguments.length; i++) {
+		sum += Number( !!arguments[i] );
+	}
+	return sum === 1;
+}
+```
+
+Notice here that we first use `!!arguments[i]` to force the coercion of the value to `true` or `false`. That's so you could pass non-`boolean` values in, like `onlyOne( "42", 0 )`, and it would still work as expected (otherwise you'd end up with `string` concatenation and the logic would be incorrect).
+
+Once we're sure it's a `boolean`, we do another *explicit coercion* with `Number(..)` to make sure the value is the `0` or `1`.
+
+Is the *explicit coercion* form of this utility "better"? Depends on your needs. I personally think the former version, relying on *implicit coercion* is more elegant, and the *explicit* version is needlessly more verbose. But as with almost everything we're discussing here, it's a judgment call.
+
+**Note:** Regardless of *implicit* or *explicit* approaches, you could easily make `onlyTwo(..)` or `onlyFive(..)` variations by simply changing the final comparison from `1` to `2` or `5`, respectively. That's drastically easier than changing a bunch of `&&` and `||` expressions. So, generally, coercion is very helpful in this case.
+
+### Implicitly: * --> Boolean
 
 Now, let's turn our attention to *implicit coercion* to `boolean` values, as it's by far the most common and also by far the most potentially troublesome.
 
