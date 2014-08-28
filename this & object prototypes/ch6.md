@@ -581,11 +581,11 @@ AuthController.prototype.failure = function(err) {
 ```
 
 ```js
-var auth = new AuthController();
-auth.checkAuth(
+var auth = new AuthController(
 	// in addition to inheritance, we also need composition
 	new LoginController()
 );
+auth.checkAuth();
 ```
 
 We have base behaviors that all controllers share, which are `success(..)`, `failure(..)` and `showDialog(..)`. Our child classes `LoginController` and `AuthController` override `failure(..)` and `success(..)` to augment the default base class behavior. Also note that `AuthController` needs an instance of `LoginController` to interact with the login form, so that becomes a member data property.
