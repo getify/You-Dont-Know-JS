@@ -1109,6 +1109,8 @@ Again, it's not nearly as common for people to author such things. Usually, they
 
 OK, so `||` and `&&` have some neat tricks up their sleeve, as long as you're willing to allow the *implicit coercion* into the mix.
 
+**Note:** Both the `a = b || "something"` and `a && b()` idioms rely on a behavior known as "short circuiting". We'll cover this in more detail in "Operator Precedence" in Chapter 5.
+
 But, the fact that these operators don't actually result in `true` and `false` is possibly messing with your head a little bit by now. You're probably wondering how all your `if` statements and `for` loops have been working, if they've included compound logical expressions like `a && (b || c)`.
 
 Don't worry! The sky is not falling. Your code is (probably) just fine. It's just that you probably never realized before that there was an *implicit coercion* to `boolean` going on **after** the compound expression was evaluated.
