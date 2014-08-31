@@ -107,27 +107,68 @@ So, the expression `(a && b || c)` is evaluated *first* before the `? :` it part
 
 ### Associativity
 
-So, the `&&` and `||` operators bind first, then the `? :` operator. But what about multiple operators of the same precedence? Do they always go left-to-right or right-to-left?
+So, the `&&` and `||` operators bind first, then the `? :` operator. But what about multiple operators of the same precedence? Do they always process left-to-right or right-to-left?
 
-Let's try this: does `a && b && c` behave more like `(a && b) && c` or `a && (b && c)`?
+In general, operators are either left-associative or right-associative, referring to whether **grouping happens from the left or from the right**.
 
-Simply, you could observe that `(true && false) && true` gives the same result as `true && (false && true)`, so it would seem like both are correct and the grouping doesn't matter.
+It's important to note that associativity is *not* the same thing as left-to-right or right-to-left processing.
 
-But technically, the correct answer is `(a && b) && c`. The `&&` and `||` operators are *left associative* (or left-to-right associative), such that grouping happens from the left.
-
-Why is this important?
-
-With `a && b && c`, since it behaves as `(a && b) && c`, it will first evaluate `a`, then if truthy, evaluate `b`, and then only if both were truthy will `c` be consulted, otherwise `c` is ignored.
-
-But what about the `? :` operator? How does something like this behave?
+But, why does it matter which side of the operator is evaluated first? Because expressions can have side effects, like for instance with function calls:
 
 ```js
-a ? c : b ? a : c;
+var a = foo() && bar();
 ```
 
-Is it one or the other or both?
+Here, `foo()` is evaluated first, and then possibly `bar()` depending on the result of the `foo()` expression. That definitely could result in different program behavior than if `bar()` was called before `foo()`.
 
-* `a ? c : (b ? a : c)`
-* `(a ? c : b) ? a : c`
+But this behavior is *just* left-to-right processing, it has nothing to do with the associativity of `&&`. In that example, since there's only one `&&` and thus no relevant grouping here, associativity doesn't even come into play.
 
+But with an expression like `a && b && c`, grouping *will* happen implicitly, meaning that either `a && b` or `b && c` will be evaluated first.
 
+Technically, `a && b && c` will be handled as `(a && b) && c`, because `&&` is left-associative (so is `||`, by the way). However, the right-associative alternative `a && (b && c)` behaves observably the same way. For the same values, the same expressions are evaluated in the same order.
+
+**Note:** If hypothetically `&&` was right-associative, it would be processed the same as if you manually used `( )` to create grouping like `a && (b && c)`. But that still **doesn't mean** that `c` would be processed before `b`. Right-associativity does **not** mean right-to-left evaluation, it means right-to-left **grouping**. Either way, regardless of the grouping/associativity, the strict ordering of evaluation will be `a`, then `b`, then `c` (aka left-to-right).
+
+So it doesn't really matter that much that `&&` and `||` are left-associative, other than to be accurate in how we discuss their definitions.
+
+But that's not always the case. Some operators would behave very differently depending on left-associativity versus right-associativity.
+
+Consider the `? :` ("ternary" or "conditional") operator:
+
+```js
+a ? b : c ? d : e;
+```
+
+`? :` is right-associative, so which grouping represents how it will be processed?
+
+* `a ? b : (c ? d : e)`
+* `(a ? b : c) ? d : e`
+
+The answer is `a ? b : (c ? d : e)`. Unlike with `&&` and `||` above, the right-associativity here actually matters, as `(a ? b : c) ? d : e` *will* behave differently for some (but not all!) values:
+
+```js
+true ? false : true ? true : true;		// false
+
+true ? false : (true ? true : true);	// false
+(true ? false : true) ? true : true;	// true
+```
+
+Besides the end result, there can be even more nuanced differences. Consider:
+
+```js
+true ? false : true ? true : false;		// false
+
+true ? false : (true ? true : false);	// false
+(true ? false : true) ? true : false;	// false
+```
+
+That scenario looks like the grouping is moot since the end result is the same regardless. However:
+
+```js
+var a = true, b = false, c = true, d = true, e = false;
+
+a ? b : (c ? d : e);	// false, will evaluate only `a` and `b`
+(a ? b : c) ? d : e;	// false, will evaluate `a`, `b` AND `e`
+```
+
+So, we've clearly proved that `? :` is right-associative, and that this fact actually matters with respect to how it behaves.
