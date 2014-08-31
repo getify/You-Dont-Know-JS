@@ -25,6 +25,7 @@
 	* Loose Equals vs Strict Equals
 	* Abstract Relational Comparison
 * Chapter 5: Grammar
+	* Statements & Expressions
 	* Operator Precedence
 * Appendix A: Thank You's!
 

@@ -33,6 +33,8 @@ delete a[2];
 a.length;	// 2
 ```
 
+**Note:** We'll cover the `delete` operator itself in more detail in Chapter 5, but for now, it's enough to know that it just removes a property from an `object`, or as in this case, a slot from an `array`.
+
 Be careful about assigning slots to an array in a "sparse" way:
 
 ```js

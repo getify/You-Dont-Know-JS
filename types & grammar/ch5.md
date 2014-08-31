@@ -3,11 +3,224 @@
 
 The last major topic we want to tackle is how JavaScript's language syntax works (aka its grammar). You may think you know how to write JS, but there's an awful lot of nuance to various parts of the language grammar that lead to confusion and misconception, so we want to dive into those parts and clear some things up.
 
-**Note:** The term "grammar" may be a little less familiar to readers than the term "syntax". In many ways, they are similar terms, describing the *rules* for how the language works. There are nuanced differences, but they mostly don't matter for our discussion here. In rough terms, the grammar for JavaScript is a structured way to describe how the syntax (operators, keywords, etc) fit together into well-formed, valid programs. In other words, discussing syntax without grammar would leave out a lot of the important details, so our focus here in this chapter is more accurately described as *grammar*, even though the raw syntax of the language is what you the developer actually interact with.
+**Note:** The term "grammar" may be a little less familiar to readers than the term "syntax". In many ways, they are similar terms, describing the *rules* for how the language works. There are nuanced differences, but they mostly don't matter for our discussion here. In rough terms, the grammar for JavaScript is a structured way to describe how the syntax (operators, keywords, etc) fits together into well-formed, valid programs. In other words, discussing syntax without grammar would leave out a lot of the important details, so our focus here in this chapter is more accurately described as *grammar*, even though the raw syntax of the language is what you developers directly interact with.
+
+## Statements & Expressions
+
+It's fairly common for developers to assume that the term "statement" and "expression" are roughly equivalent. But here we need to distinguish between the two, because there are some very important differences in our JS programs.
+
+To draw the distinction, let's borrow from terminology you may be more familiar with: the English language.
+
+A "sentence" is one complete formation of words that express a thought. It's comprised of one or more "phrases", each of which can be connected with punctuation marks or conjunction words ("and", "or", etc). A phrase can itself be made up of smaller phrases. Some phrases are incomplete and don't accomplish much of validity by themselves, while other phrases can stand on their own. These rules are collectively called the *grammar* for the English language.
+
+And so it goes with JavaScript grammar. Statements are sentences, expressions are phrases, and operators are conjunctions/punctuation.
+
+Every expression in JS can be evaluated down to a single, specific value result. For example:
+
+```js
+var a = 3 * 6;
+var b = a;
+b;
+```
+
+In this snippet, `3 * 6` is obviously an expression (which  evaluates to `18`). But `a` on the second line is also an expression, as is `b` on the third line. The `a` and `b` expressions both evaluate to the value stored in those variables at that moment, which also happens to be `18`.
+
+Moreover, each of the three lines are statements containing those expressions. `var a = 3 * 6` and `var b = a` are called "declaration statements" because, obviously, they each declare a variable (and optionally, as here, assign a value to it).
+
+The third line contains just the expression `b`, but it's also a statment all by itself (though not a terribly interesting one!). As such, this is generally referred to as an "expression statement".
+
+### Statement Completion Values
+
+It's a fairly little known fact that statements all have completion values (even if that value is just `undefined`).
+
+How would you even go about seeing the completion value of a statement?
+
+The most obvious answer that may occur to you is to type the statement into your browser's developer console, because when you execute it, the console by default reports the completion value of the most recent statement it executed.
+
+Let's consider `var b = a`. What's the completion value of that statement?
+
+It's `undefined`. Why? Because `var` statements are simply defined that way in the spec. Indeed, if you but `var a = 42;` into your console, it'll report back `undefined`.
+
+**Note:** Technically, it's a little more complex than that. In the ES5 spec, section 12.2 "Variable Statement", the `VariableDeclaration` algorithm actually *does* return a value (a `string` containing the name of the variable declared -- weird, huh!?), but that value is basically swallowed up (except for use by the `for..in` loop) by the `VariableStatement` algorithm, which forces an empty (aka `undefined`) result value.
+
+In fact, if you've done much code experimenting in your console (or in a JavaScript environment REPL -- read/evaluate/print/loop tool), you've probably seen `undefined` reported after many different statments, and perhaps never realized why or what that was. But, simply, the console is reporting the statement's completion value.
+
+But, what the console prints out doesn't mean anything in terms of what we could exercise inside our program. How could we capture it inside a JS program?
+
+That's a much more complicated task. Before we explain *how*, let's ask *why* would you want to do that?
+
+To answer that, we need to consider other types of statments' completion values. For example, any regular `{ .. }` block has a completion value of the completion value of its last contained statement/expression.
+
+Consider:
+
+```js
+if (true) {
+	4 + 38;
+}
+```
+
+If you typed that into your console/REPL, you'd probably see `42` reported, since `42` is the completion value of the `if` block, which took on the completion value of its last expression statement `4 + 38`.
+
+In other words, the completion value of a block is like an *implicit return* of the last statement-value in the block.
+
+**Note:** This is pretty conceptually familiar to languages like CoffeeScript, which have implicit `return` values from `function`s that are the same as the last statement-value in the function.
+
+But, there's an obvious problem. This kind of code doesn't work:
+
+```js
+var a = if (true) {
+	4 + 38;
+};
+```
+
+In other words, we can't take the completion value of a statement and capture it into another value in any easy syntactic/grammatical way (at least not yet!).
+
+So, what can we do?
+
+// TODO: answer this question!
+
+### Expression Side-Effects
+
+Most expressions don't have side-effects. For example:
+
+```js
+var a = 2;
+var b = a + 3;
+```
+
+The expression `a + 3` did not *itself* have a side-effect, like for instance changing `a`. It had a result, which is `5`, and that result was assigned to `b` in the statement `b = a + 3`.
+
+The most common example of an expression with (possible) side-effects is the function call expression:
+
+```js
+function foo() {
+	a = a + 1;
+}
+
+var a = 1;
+foo();		// result: `undefined`, side effect: changed `a`
+```
+
+There are other side-effecting expressions, though. For example:
+
+```js
+var a = 42;
+var b = a++;
+```
+
+The expression `a++` has two separate behaviors. *First*, it returns the current value of `a`, which is `42` (which then gets assigned to `b`). But *next*, it changes the value of `a` itself, incrementing it by one.
+
+```js
+var a = 42;
+var b = a++;
+
+a;	// 43
+b;	// 42
+```
+
+Many developers would mistakingly believe that `b` has value `43` just like `a` does. But the confusion comes from not fully considering the *when* of the side-effects of the `++` operator.
+
+The `++` operator (increment) and the `--` operator (decrement)  are both unary operators (see Chapter 4), which can be used in either a postfix (aka "after") position or prefix (aka "before") position.
+
+```js
+var a = 42;
+
+a++;	// 42
+a;		// 43
+
+++a;	// 44
+a;		// 44
+```
+
+When `++` is used in the prefix position as `++a`, it's side-effect (incrementing `a`) happens *before* the value is returned from the expression, rather than *after* as with `a++`.
+
+**Note:** Is `++a++` is legal? If you try it, you'll get a `ReferenceError` error. Why? Because side-effecting operators **require a variable reference** to target their side-effects to. In the case of `++a++`, the `a++` part is evaluated first (because of operator precedence -- see below), which gives back the value of `a` before the increment. But then it tries to evaluate `++42`, which (if you try it) gives the same `ReferenceError` error, since `++` can't have a side-effect directly on a value like `42`.
+
+It is sometimes mistakingly thought that you can encapsulate the *after* side-effect of `a++` by wrapping it in a `( )` pair, like:
+
+```js
+var a = 42;
+var b = (a++);
+
+a;	// 43
+b;	// 42
+```
+
+Unfortunately, `( )` doesn't define a new wrapped expression that would be evaluated *after* the *after* side-effect of `a++`, as we might have hoped. In fact, even if it did, `a++` returns `42` first, and unless you have another expression that re-evaluates `a` after the side-effect of `++`, you're not going to get `43` into that expression, so `b` will not be assigned `43`.
+
+// TODO: can this be worked-around (without ++a), with perhaps the comma operator?
+
+Another example of a side-effecting operator is `delete`. As we showed in Chapter 2, `delete` is used to remove a property from an `object` or a slot from an `array`. But it's usually just called as a standalone statement:
+
+```js
+var obj = {
+	a: 42
+};
+
+obj.a;			// 42
+delete obj.a;	// true
+obj.a;			// undefined
+```
+
+The result value of the `delete` operator is `true` if the requested operation is valid/allowable, or `false` otherwise. But the side-effect of the operator is that it removes the property
+
+**Note:** What do we mean by valid/allowable? Non-existent properties, or properties which exist but are non-configurable (see the "this & Object Prototypes" title, Chapter 3) will return `true` from the `delete` operator. `false` (or an error!) will be the result otherwise.
+
+One last example of a side-effecting operator, which may at once be both obvious and not-obvious, is the `=` assignment operator.
+
+Consider:
+
+```js
+var a;
+
+a = 42;		// 42
+a;			// 42
+```
+
+It may not seem like `=` in `a = 42` is a side-effecting operator for the expression. But if we examine the result value of the `a = 42` statement, it's the value that was just assigned (`42` here), so the assignment of that same value into `a` is technically a side-effect.
+
+**Note:** The same reasoning about side-effects goes for the the compound-assignment operators like `+=`, `-=`, etc. `a = b += 2` is processed first as `b += 2` (which is `b = b + 2`), and then that result is assigned to `a`.
+
+This behavior that an assignment expression (or statement) results in the assigned value is primarily useful for chained assignments, such as:
+
+```js
+var a, b, c;
+
+a = b = c = 42;
+```
+
+Here, `c = 42` is evaluated to `42` (with the side-effect of assigning `42` to `c`), then `b = 42` is evaluated to `42` (with the side effect of assigning `42` to `b`), and finally `a = 42` is evaluated (with the side-effect of assigning `42` to `a`).
 
 ## Operator Precedence
 
-Quick quiz to test your understanding:
+As we covered in Chapter 4, JavaScript's version of `&&` and `||` are interesting in that they select and return one of their operands, rather than just resulting in `true` or `false`. That's easy to reason about if there are only two operands and one operator.
+
+```js
+var a = 42;
+var b = "foo";
+
+a && b;	// "foo"
+a || b;	// 42
+```
+
+But what about when there's two operators involved, and three operands?
+
+```js
+var a = 42;
+var b = "foo";
+var c = [1,2,3];
+
+a && b || c; // ???
+a || b && c; // ???
+```
+
+To understand what those expressions result in, we're going to need to understand what rules govern how the operators are processed when there's more than one present in an expression.
+
+These rules are called "operator precedence".
+
+I bet many readers feel they have a decent grasp on operator precedence. But as with everything else we've covered in this book series, we're going to poke and prod at that understanding to see just how solid it really is, and hopefully learn a few new things along the way.
+
+Let's start with a quick quiz (which we'll carry throughout the next several sections of this chapter) to *really* test your understanding:
 
 ```js
 var a = 42;
