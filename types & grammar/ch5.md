@@ -144,7 +144,9 @@ a ? b : c ? d : e;
 * `a ? b : (c ? d : e)`
 * `(a ? b : c) ? d : e`
 
-The answer is `a ? b : (c ? d : e)`. Unlike with `&&` and `||` above, the right-associativity here actually matters, as `(a ? b : c) ? d : e` *will* behave differently for some (but not all!) values:
+The answer is `a ? b : (c ? d : e)`. Unlike with `&&` and `||` above, the right-associativity here actually matters, as `(a ? b : c) ? d : e` *will* behave differently for some (but not all!) combinations of values.
+
+One such example:
 
 ```js
 true ? false : true ? true : true;		// false
@@ -153,7 +155,7 @@ true ? false : (true ? true : true);	// false
 (true ? false : true) ? true : true;	// true
 ```
 
-Besides the end result, there can be even more nuanced differences. Consider:
+Even more nuanced differences lurk with other value combinations, even if the end result is the same. Consider:
 
 ```js
 true ? false : true ? true : false;		// false
@@ -162,13 +164,13 @@ true ? false : (true ? true : false);	// false
 (true ? false : true) ? true : false;	// false
 ```
 
-That scenario looks like the grouping is moot since the end result is the same regardless. However:
+From that scenario, the same end result implies that the grouping is moot. However:
 
 ```js
 var a = true, b = false, c = true, d = true, e = false;
 
-a ? b : (c ? d : e);	// false, will evaluate only `a` and `b`
-(a ? b : c) ? d : e;	// false, will evaluate `a`, `b` AND `e`
+a ? b : (c ? d : e); // false, evaluates only `a` and `b`
+(a ? b : c) ? d : e; // false, evaluates `a`, `b` AND `e`
 ```
 
-So, we've clearly proved that `? :` is right-associative, and that this fact actually matters with respect to how it behaves.
+So, we've clearly proved that `? :` is right-associative, and that it actually matters with respect to how the operator behaves if chained with itself.
