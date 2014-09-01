@@ -438,6 +438,55 @@ a = b = c = 42;
 
 We asserted earlier that `a = b = c = 42` is processed by first evaluating the `c = 42` assignment, then `b = ..`, and finally `a = ..`. Why? Because of the right-associativity, which actually treats the statement like this: `a = (b = (c = 42))`.
 
+Remember our running complex assignment expression example from earlier in the chapter?
+
+```js
+var a = 42;
+var b = "foo";
+var c = false;
+
+var d = a && b || c ? c || b ? a : c && b : a;
+
+d;		// 42
+```
+
+Armed with our knowledge of precedence and associativity, we should now be able to break down into its grouping behavior like this:
+
+```js
+((a && b) || c) ? ((c || b) ? a : (c && b)) : a
+```
+
+Or, to present it indented if that's easier to understand:
+
+```js
+(
+  (a && b)
+    ||
+  c
+)
+  ?
+(
+  (c || b)
+    ?
+  a
+    :
+  (c && b)
+)
+  :
+a
+```
+
+Let's solve it:
+
+1. `(a && b)` is `"foo"`.
+2. `"foo" || c` is `"foo"`.
+3. For the first `?` test, `"foo"` is truthy.
+4. `(c || b)` is `"foo"`.
+5. For the second `?` test, `"foo"` is truthy.
+6. `a` is `42`.
+
+That's it, we're done! The answer is `42`, just as we saw earlier. That actually wasn't so hard, was it?
+
 ## Summary
 
 JavaScript grammar has plenty of nuance that we as developers should spend a little more time paying closer attention to.
