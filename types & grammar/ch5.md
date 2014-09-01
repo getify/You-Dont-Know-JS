@@ -146,9 +146,21 @@ a;	// 43
 b;	// 42
 ```
 
-Unfortunately, `( )` doesn't define a new wrapped expression that would be evaluated *after* the *after* side-effect of `a++`, as we might have hoped. In fact, even if it did, `a++` returns `42` first, and unless you have another expression that re-evaluates `a` after the side-effect of `++`, you're not going to get `43` into that expression, so `b` will not be assigned `43`.
+Unfortunately, `( )` itself doesn't define a new wrapped expression that would be evaluated *after* the *after* side-effect of the `a++` expression, as we might have hoped. In fact, even if it did, `a++` returns `42` first, and unless you have another expression that re-evaluates `a` after the side-effect of `++`, you're not going to get `43` into that expression, so `b` will not be assigned `43`.
 
-// TODO: can this be worked-around (without ++a), with perhaps the comma operator?
+There's an option, though -- the `,` statement comma operator. This operator allows you to string together multiple standalone expressions into a single statement:
+
+```js
+var a = 42;
+var b = ( a++, a );
+
+a;	// 43
+b;	// 43
+```
+
+As we suggested above, `a++, a` means that the second `a` expression gets evaluated *after* the *after* side-effects of the `a++` expression, which means it captures the `43` value.
+
+**Note:** The `( .. )` around `a++, a` is required here. The reason is operator precedence, which we'll cover later in this chapter.
 
 Another example of a side-effecting operator is `delete`. As we showed in Chapter 2, `delete` is used to remove a property from an `object` or a slot from an `array`. But it's usually just called as a standalone statement:
 
@@ -177,7 +189,7 @@ a = 42;		// 42
 a;			// 42
 ```
 
-It may not seem like `=` in `a = 42` is a side-effecting operator for the expression. But if we examine the result value of the `a = 42` statement, it's the value that was just assigned (`42` here), so the assignment of that same value into `a` is technically a side-effect.
+It may not seem like `=` in `a = 42` is a side-effecting operator for the expression. But if we examine the result value of the `a = 42` statement, it's the value that was just assigned (`42`), so the assignment of that same value into `a` is technically a side-effect.
 
 **Note:** The same reasoning about side-effects goes for the the compound-assignment operators like `+=`, `-=`, etc. `a = b += 2` is processed first as `b += 2` (which is `b = b + 2`), and then that result is assigned to `a`.
 
@@ -190,6 +202,8 @@ a = b = c = 42;
 ```
 
 Here, `c = 42` is evaluated to `42` (with the side-effect of assigning `42` to `c`), then `b = 42` is evaluated to `42` (with the side effect of assigning `42` to `b`), and finally `a = 42` is evaluated (with the side-effect of assigning `42` to `a`).
+
+**Note:** A common mistake developers make with chained assignments is like `var a = b = 42`. While this looks like the same thing, it's not. If that statement were to happen without there also being a separate `var b` (somewhere in the scope) to formally declare `b`, then `var a = b = 42` would not create the `b`. Depending on `strict` mode, that'd either be an error or creating an accidental global (see the "Scope & Closures" title in this series).
 
 ## Operator Precedence
 
