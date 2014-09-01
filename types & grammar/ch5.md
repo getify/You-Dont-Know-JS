@@ -77,7 +77,37 @@ In other words, we can't take the completion value of a statement and capture it
 
 So, what can we do?
 
-// TODO: answer this question!
+**Disclaimer: For demo purposes only, don't really do this in code!**
+
+We could use the much aligned `eval(..)` (aka "evil") function to capture this completion value.
+
+```js
+var a = eval( "if (true) { 4 + 38; }" );
+
+a;	// 42
+```
+
+Yeeeaaahhhh. That's terribly ugly. But it works! And it illustrates the point that statement completion values are a real thing that can be captured not just in our console but in our programs.
+
+There's a proposal for a future addition to the JS language, which (at time of writing) is nothing more tangible than just a "possible for ES7+", but it's interesting to consider nonetheless. The feature is called "do expressions". Here's how it would work:
+
+```js
+var a = do {
+	if (true) {
+		4 + 38;
+	}
+};
+
+a;	// 42
+```
+
+The `do { .. }` expression executes a block (with one or many statements in it), and the final statement completion value inside the block becomes the completion value *of* the `do` block, which can then be assigned to `a` as shown.
+
+The general idea is to be able to treat statements more like expressions (meaning they can show up inside other statements), without needing to wrap the set of statements in an inline function expression and perform an explicit `return ..`.
+
+Bottom line: for now, statement completion values are not much more than trivia. But they're probably going to take on more significance as JS evolves, and hopefully `do { .. }` expressions will alleviate the need to use crazy stuff like `eval(..)`.
+
+**Note:** Don't ever use `eval(..)`. Seriously. See the *"Scope & Closures"* title of this series for more info.
 
 ### Expression Side-Effects
 
@@ -176,7 +206,7 @@ obj.a;			// undefined
 
 The result value of the `delete` operator is `true` if the requested operation is valid/allowable, or `false` otherwise. But the side-effect of the operator is that it removes the property
 
-**Note:** What do we mean by valid/allowable? Non-existent properties, or properties which exist but are non-configurable (see the "this & Object Prototypes" title, Chapter 3) will return `true` from the `delete` operator. `false` (or an error!) will be the result otherwise.
+**Note:** What do we mean by valid/allowable? Non-existent properties, or properties which exist but are non-configurable (see the *"this & Object Prototypes"* title of this series, Chapter 3) will return `true` from the `delete` operator. `false` (or an error!) will be the result otherwise.
 
 One last example of a side-effecting operator, which may at once be both obvious and not-obvious, is the `=` assignment operator.
 
@@ -203,7 +233,7 @@ a = b = c = 42;
 
 Here, `c = 42` is evaluated to `42` (with the side-effect of assigning `42` to `c`), then `b = 42` is evaluated to `42` (with the side effect of assigning `42` to `b`), and finally `a = 42` is evaluated (with the side-effect of assigning `42` to `a`).
 
-**Note:** A common mistake developers make with chained assignments is like `var a = b = 42`. While this looks like the same thing, it's not. If that statement were to happen without there also being a separate `var b` (somewhere in the scope) to formally declare `b`, then `var a = b = 42` would not create the `b`. Depending on `strict` mode, that'd either be an error or creating an accidental global (see the "Scope & Closures" title in this series).
+**Note:** A common mistake developers make with chained assignments is like `var a = b = 42`. While this looks like the same thing, it's not. If that statement were to happen without there also being a separate `var b` (somewhere in the scope) to formally declare `b`, then `var a = b = 42` would not create the `b`. Depending on `strict` mode, that'd either be an error or creating an accidental global (see the *"Scope & Closures"* title of this series).
 
 ## Operator Precedence
 
@@ -476,7 +506,7 @@ Or, to present it indented if that's easier to understand:
 a
 ```
 
-Let's solve it:
+Let's solve it now:
 
 1. `(a && b)` is `"foo"`.
 2. `"foo" || c` is `"foo"`.
