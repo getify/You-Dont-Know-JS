@@ -233,7 +233,7 @@ a = b = c = 42;
 
 Here, `c = 42` is evaluated to `42` (with the side-effect of assigning `42` to `c`), then `b = 42` is evaluated to `42` (with the side effect of assigning `42` to `b`), and finally `a = 42` is evaluated (with the side-effect of assigning `42` to `a`).
 
-**Note:** A common mistake developers make with chained assignments is like `var a = b = 42`. While this looks like the same thing, it's not. If that statement were to happen without there also being a separate `var b` (somewhere in the scope) to formally declare `b`, then `var a = b = 42` would not create the `b`. Depending on `strict` mode, that'd either be an error or creating an accidental global (see the *"Scope & Closures"* title of this series).
+**Note:** A common mistake developers make with chained assignments is like `var a = b = 42`. While this looks like the same thing, it's not. If that statement were to happen without there also being a separate `var b` (somewhere in the scope) to formally declare `b`, then `var a = b = 42` would not create the `b`. Depending on `strict mode`, that'd either be an error or creating an accidental global (see the *"Scope & Closures"* title of this series).
 
 Another scenario to consider:
 
@@ -402,13 +402,15 @@ var { a, b } = getData();
 console.log( a, b ); // 42 "foo"
 ```
 
-As you can probably tell, `var { a , b } = ..` is a form of the new destructuring assignment, which is rougly equivalent to:
+As you can probably tell, `var { a , b } = ..` is a form of ES6 destructuring assignment, which is rougly equivalent to:
 
 ```js
 var res = getData();
 var a = res.a;
 var b = res.b;
 ```
+
+**Note:** `{ a, b }` is ES6 destructuring shorthand for `{ a: a, b: b }`, so either will work, but it's expected that `{ a, b }` will be vastly superior and become the accepted idiom.
 
 Object destructuring with a `{ .. }` pair can also be used for named function parameters, which is sugar for the same sort of implicit object property assignment:
 
@@ -787,6 +789,87 @@ That's it, we're done! The answer is `42`, just as we saw earlier. That actually
 ASI ("Automatic Semicolon Insertion") is when JavaScript assumes a `;` in certain places in your JS program even if you didn't put one there.
 
 Why would it do that? Because if you omit even a single required `;` your program would fail. Not very forgiving. ASI allows JS to be tolerant of certain places where `;` aren't commonly thought of to be needed.
+
+## Errors
+
+Not only does JavaScript have different *types* of errors (`TypeError`, `ReferenceError`, `SyntaxError`, etc), but also the grammar defines certain errors to be enforced at compile time, as compared to all other errors which happen during run-time.
+
+In particular, there have long been a number of specific conditions which should be caught and reported as "early errors" (during compilation). Any straight-up syntax error is an early error, like `a = ,`, but also the grammar defines things which are syntactically valid but disallowed nonetheless.
+
+Since execution of your code has not begun yet, these errors are not catchable with `try..catch`, they will just fail the parsing/compilation of your program.
+
+One simple example is with syntax inside a regular expression literal. There's nothing JS syntax wrong here, but the invalid regex will throw an early error:
+
+```js
+var a = /*foo/;		// SyntaxError (inside ther regex)
+```
+
+The target of an assignment must be an identifier (or an ES6 destructuring expression which produces one or more identifiers), so a value like `42` in that position is illegal and can be reported right away:
+
+```js
+var a;
+42 = a;		// SyntaxError
+```
+
+ES5's `strict mode` defines even more early errors. For example, in `strict mode`, function parameter names cannot be duplicated:
+
+```js
+function foo(a,b,a) { .. }					// just fine
+
+function bar(a,b,a) { "use strict"; .. }	// SyntaxError!
+```
+
+Another `strict mode` early error is an object literal having more than one property of the same name:
+
+```js
+"use strict";
+
+var a = {
+	b: 42,
+	b: 43
+};			// SyntaxError!
+```
+
+**Note:** Semantically speaking, such errors aren't technically *syntax* errors but more *grammar* errors -- the above snippets are syntactically valid. But since there is no `GrammarError` type, `SyntaxError` is used instead.
+
+### Using Variables Too Early
+
+ES6 defines a (frankly confusingly named) new concept called the TDZ ("Temporal Dead Zone").
+
+The TDZ refers to places in code where a variable reference cannot yet be made, because it hasn't reached its required initialization.
+
+The most clear example of this is with ES6 `let` block-scoping:
+
+```js
+{
+	a = 2;		// ReferenceError!
+	let a;
+}
+```
+
+The assigment `a = 2` is accessing the `a` variable (which is indeed block-scoped to the `{ .. }` block) before it's been initialized by the `let a` declaration, so it's in the TDZ for `a` and throws an error.
+
+Interestingly, while `typeof` has an exception to be safe for undeclared variables (see Chapter 1), no such safety exception is made for TDZ references:
+
+```js
+{
+	typeof a;	// undefined
+	typeof b;	// ReferenceError! (TDZ)
+	let b;
+}
+```
+
+Another example of a TDZ violation can be seen with ES6 default parameter values:
+
+```js
+var b = 3;
+
+function foo( a = 42, b = a + b + 5 ) {
+	// ..
+}
+```
+
+The `b` reference in the assignment would happen in the TDZ for the parameter `b` (not pull in the outer `b` reference), so it should throw an error. However, the `a` is fine since by that *time* we're past the TDZ for parameter `a`.
 
 ## Summary
 

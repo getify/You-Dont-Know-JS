@@ -28,5 +28,6 @@
 	* Statements & Expressions
 	* Operator Precedence
 	* Automatic Semicolons
+	* Errors
 * Appendix A: Thank You's!
 
