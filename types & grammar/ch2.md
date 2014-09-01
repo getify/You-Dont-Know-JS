@@ -779,6 +779,43 @@ There are certain applications where developers use the magnitude of a value to 
 
 In those applications, as one example, if a variable arrives at zero and it loses its sign, then you would lose the information of what direction it was moving in before it arrived at zero. Preserving the sign of the zero prevents potentially unwanted information loss.
 
+### Special Equality
+
+As we saw above, the `NaN` value and the `-0` value have special behavior when it comes to equality comparison. `NaN` is never equal to itself, so you have to use ES6's `Number.isNaN(..)` (or a polyfill). Simlarly, `-0` lies and pretends that it's equal (even `===`) to regular `0`, so you have to use the somewhat hackish `isNegZero(..)` utility we suggested above.
+
+As of ES6, there's a new utility which can be used to test two values for absolute equality, without any of these exceptions. It's called `Object.is(..)`:
+
+```js
+var a = 2 / "foo";
+var b = -3 * 0;
+
+Object.is( a, NaN );	// true
+Object.is( b, -0 );		// true
+
+Object.is( b, 0 );		// false
+```
+
+There's a pretty simple polyfill for `Object.is(..)` for pre-ES6 environments:
+
+```js
+if (!Object.is) {
+	Object.is = function(v1, v2) {
+		// test for `-0`
+		if (v1 === 0 && v2 === 0) {
+			return 1 / v1 === 1 / v2;
+		}
+		// test for `NaN`
+		if (v1 !== v1) {
+			return v2 !== v2;
+		}
+		// everything else
+		return v1 === v2;
+	};
+}
+```
+
+`Object.is(..)` probably shouldn't be used in cases where `==` or `===` are known to be *safe* (see Chapter 4 "Coercion"), as the operators are likely much more efficient and certainly are more idiomatic/common. `Object.is(..)` is mostly for these special cases of equality.
+
 ## Value vs Reference
 
 In many other languages, values can either be assigned/passed by value or by reference depending on the syntax you use.
