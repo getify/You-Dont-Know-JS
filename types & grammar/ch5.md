@@ -164,7 +164,7 @@ a;		// 44
 
 When `++` is used in the prefix position as `++a`, it's side-effect (incrementing `a`) happens *before* the value is returned from the expression, rather than *after* as with `a++`.
 
-**Note:** Is `++a++` is legal? If you try it, you'll get a `ReferenceError` error. Why? Because side-effecting operators **require a variable reference** to target their side-effects to. In the case of `++a++`, the `a++` part is evaluated first (because of operator precedence -- see below), which gives back the value of `a` before the increment. But then it tries to evaluate `++42`, which (if you try it) gives the same `ReferenceError` error, since `++` can't have a side-effect directly on a value like `42`.
+**Note:** Is `++a++` legal? If you try it, you'll get a `ReferenceError` error. Why? Because side-effecting operators **require a variable reference** to target their side-effects to. In the case of `++a++`, the `a++` part is evaluated first (because of operator precedence -- see below), which gives back the value of `a` before the increment. But then it tries to evaluate `++42`, which (if you try it) gives the same `ReferenceError` error, since `++` can't have a side-effect directly on a value like `42`.
 
 It is sometimes mistakingly thought that you can encapsulate the *after* side-effect of `a++` by wrapping it in a `( )` pair, like:
 
@@ -204,11 +204,11 @@ delete obj.a;	// true
 obj.a;			// undefined
 ```
 
-The result value of the `delete` operator is `true` if the requested operation is valid/allowable, or `false` otherwise. But the side-effect of the operator is that it removes the property
+The result value of the `delete` operator is `true` if the requested operation is valid/allowable, or `false` otherwise. But the side-effect of the operator is that it removes the property (or array slot).
 
-**Note:** What do we mean by valid/allowable? Non-existent properties, or properties which exist but are non-configurable (see the *"this & Object Prototypes"* title of this series, Chapter 3) will return `true` from the `delete` operator. `false` (or an error!) will be the result otherwise.
+**Note:** What do we mean by valid/allowable? Non-existent properties, or properties which exist but are non-configurable (see the *"this & Object Prototypes"* title of this series, Chapter 3) will return `true` from the `delete` operator. `false` (or an error!) will result otherwise.
 
-One last example of a side-effecting operator, which may at once be both obvious and not-obvious, is the `=` assignment operator.
+One last example of a side-effecting operator, which may at once be both obvious and non-obvious, is the `=` assignment operator.
 
 Consider:
 
@@ -221,7 +221,7 @@ a;			// 42
 
 It may not seem like `=` in `a = 42` is a side-effecting operator for the expression. But if we examine the result value of the `a = 42` statement, it's the value that was just assigned (`42`), so the assignment of that same value into `a` is technically a side-effect.
 
-**Note:** The same reasoning about side-effects goes for the the compound-assignment operators like `+=`, `-=`, etc. `a = b += 2` is processed first as `b += 2` (which is `b = b + 2`), and then that result is assigned to `a`.
+**Note:** The same reasoning about side-effects goes for the the compound-assignment operators like `+=`, `-=`, etc. `a = b += 2` is processed first as `b += 2` (which is `b = b + 2`), and then the result of that `=` assignment is also assigned to `a`.
 
 This behavior that an assignment expression (or statement) results in the assigned value is primarily useful for chained assignments, such as:
 
@@ -234,6 +234,44 @@ a = b = c = 42;
 Here, `c = 42` is evaluated to `42` (with the side-effect of assigning `42` to `c`), then `b = 42` is evaluated to `42` (with the side effect of assigning `42` to `b`), and finally `a = 42` is evaluated (with the side-effect of assigning `42` to `a`).
 
 **Note:** A common mistake developers make with chained assignments is like `var a = b = 42`. While this looks like the same thing, it's not. If that statement were to happen without there also being a separate `var b` (somewhere in the scope) to formally declare `b`, then `var a = b = 42` would not create the `b`. Depending on `strict` mode, that'd either be an error or creating an accidental global (see the *"Scope & Closures"* title of this series).
+
+Another scenario to consider:
+
+```js
+function vowels(str) {
+	var matches;
+
+	if (str) {
+		// pull out all the vowels
+		matches = str.match( /[aeiou]/g );
+
+		if (matches) {
+			return matches;
+		}
+	}
+}
+
+vowels( "Hello World" ); // ["e","o","o"]
+```
+
+This works, and many developers prefer such. But using an idiom where we take advantage of the assignment side-effect, we can simplify by combining the two `if` statements into one:
+
+```js
+function vowels(str) {
+	var matches;
+
+	// pull out all the vowels
+	if (str && (matches = str.match( /[aeiou]/g ))) {
+		return matches;
+	}
+}
+
+vowels( "Hello World" ); // ["e","o","o"]
+```
+
+**Note:** The `( )` around `matches = str.match..` is required. The reason is operator precedence, which we'll cover in the next section.
+
+I prefer this shorter style, as I think it makes it clearer that the two conditionals are in fact related rather than separate. But as with most things in JS, it's purely opinion which one is *better*.
 
 ## Operator Precedence
 
@@ -284,9 +322,19 @@ a;	// 43
 b;	// 42
 ```
 
-Wait! Why did that change `b`? Because the `,` operator has a lower precedence than the `=` operator. So, `b = a++, a` is interpreted as `(b = a++), a`. Because (as we explained earlier) `a++` has *after* side-effects, the assigned value to `b` is the value `42` before the `++` changes `a`.
+Wait! Why did that change the value assigned to `b`? Because the `,` operator has a lower precedence than the `=` operator. So, `b = a++, a` is interpreted as `(b = a++), a`. Because (as we explained earlier) `a++` has *after* side-effects, the assigned value to `b` is the value `42` before the `++` changes `a`.
 
 This is just a simple matter of needing to understand operator precedence. If you're going to use `,` as a statement-series operator, it's important to know that it actually has the lowest precedence. Every other operator will more tightly-bind than `,` will.
+
+Now, recall this example from above:
+
+```js
+if (str && (matches = str.match( /[aeiou]/g ))) {
+	// ..
+}
+```
+
+We said the `( )` around the assignment is required, but why? Because `&&` has higher precedence than `=`, so without the `( )` to force the binding, the expression would instead be treated as `(str && matches) = str.match..`. But this would be an error, because the result of `(str && matches)` isn't going to be a variable, but instead a value (in this case `undefined`), and so it can't be the left-hand side of an `=` assignment!
 
 OK, so you probably think you've got this operator precedence thing down.
 
@@ -302,9 +350,9 @@ var d = a && b || c ? c || b ? a : c && b : a;
 d;		// ??
 ```
 
-OK, evil, I admit it. No one would write a string of expressions like that, right?
+OK, evil, I admit it. No one would write a string of expressions like that, right? *Probably* not, but we're going to use it to examine various issues around chaining multiple operators together, which *is* a very common task.
 
-The result is `42`. But, that's not nearly as interesting as how we can figure out that answer without just plugging it into a JS program to let JavaScript sort it out.
+The result above is `42`. But, that's not nearly as interesting as how we can figure out that answer without just plugging it into a JS program to let JavaScript sort it out.
 
 Let's dig in.
 
@@ -322,9 +370,9 @@ false && true || true;		// true
 (false && true) || true;	// true
 ```
 
-So there we have our answer. The `&&` operator is evaluated first, and then the `||` operator is evaluated.
+So there we have our answer. The `&&` operator is evaluated first, and then the `||` operator is evaluated second.
 
-But is that just a side-effect of processing left-to-right? Let's reverse the order of operators:
+But is that just because of left-to-right processing? Let's reverse the order of operators:
 
 ```js
 true || false && false;		// true
@@ -333,11 +381,13 @@ true || false && false;		// true
 true || (false && false);	// true -- winner, winner!
 ```
 
-So here, we proved that `&&` is evaluated first and then `||`, and not just because of left-to-right processing. So what caused the behavior? **Operator Precedence**.
+Now we've proved that `&&` is evaluated first and then `||`, and in this case that was actually counter to generally expected left-to-right processing.
+
+So what caused the behavior? **Operator Precedence**.
 
 Every language defines its own *operator precedence* list. It's dismaying, though, just how uncommon it is that JS developers have ever read JS's list. If you knew it well, the above examples wouldn't have tripped you up in the slightest, because you'd already know that `&&` is more precedent than `||`. But I bet a fair amount of you readers had to think about it a little bit.
 
-**Note:** Unfortunately, the JS spec doesn't really have its operator precedence list in a convenient, single location. You have to parse through and understand all the grammar rules. So we'll try to lay it out here in a more convenient and usable fashion.
+**Note:** Unfortunately, the JS spec doesn't really have its operator precedence list in a convenient, single location. You have to parse through and understand all the grammar rules. So we'll try to lay out the more common and useful bits here in a more convenient format. For a complete list of operator precedence, see "Operator Precedence" on the MDN site (* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence).
 
 ### Short-Circuited
 
