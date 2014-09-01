@@ -27,5 +27,6 @@
 * Chapter 5: Grammar
 	* Statements & Expressions
 	* Operator Precedence
+	* Automatic Semicolons
 * Appendix A: Thank You's!
 

@@ -273,6 +273,221 @@ vowels( "Hello World" ); // ["e","o","o"]
 
 I prefer this shorter style, as I think it makes it clearer that the two conditionals are in fact related rather than separate. But as with most things in JS, it's purely opinion which one is *better*.
 
+### Contextual Rules
+
+There are quite a few places in the JavaScript grammar rules where the same syntax means different things depending on where/how it's used. This kind of thing can, in isolation, cause quite a bit of confusion.
+
+We won't exhaustively list all such cases here, but just call out a few of the common ones.
+
+#### `{ .. }`
+
+There's two main places (and more coming as JS evolves!) that a pair of `{ .. }` curly braces will show up in your code. Let's take a look at each of them.
+
+First, as an `object` literal:
+
+```js
+// let's assume there's a `bar()` function defined
+
+var a = {
+	foo: bar()
+};
+```
+
+How do we know this is an `object` literal? Because the `{ .. }` pair is used a value that's getting assigned to `a`.
+
+**Note:** The `a` reference is called an "l-value" (aka left-hand value) since it's the target of an assignment. The `{ .. }` pair is an "r-value" (aka right-hand value) since it's used *just* as a value (in this case as the source of an assignment).
+
+What happens if we remove the `var a =` part of the above snippet?
+
+```js
+// let's assume there's a `bar()` function defined
+
+{
+	foo: bar()
+}
+```
+
+A lot of developers assume that the `{ .. }` pair is just a standalone `object` literal that doesn't get assigned anywhere. But it's actually entirely different.
+
+Here, `{ .. }` is just a regular code block. It's not very idiomatic in JavaScript (but much more so in other languages!) to have a standalone `{ .. }` block like that, but it's perfectly valid JS grammar. It can be especially helpful when combined with `let` block-scoping declarations (see the *"Scope & Closures"* title in this series).
+
+The `{ .. }` code block here is functionally pretty much identical to if the code block was attached to some statement, like a `for` / `while` loop, `if` conditional, etc.
+
+But if it's a normal block of code, what's that bizarre looking `foo: bar()` syntax, and how is that legal?
+
+It's because of a little known (and, frankly, a discouraged) feature in JavaScript called "labeled statements". `foo` is a label for the statement `bar()` (which has skipped its trailing `;` -- see "Automatic Semicolons" later in this chapter). But what's the point of a labeled statement?
+
+If JavaScript had a `goto` statement, you'd theoretically be able to say `goto foo` and have execution jump to that location in code. `goto`s are usually considered terrible coding idioms as they make code much harder to understand (aka "spaghetti code"), so it's a *very good thing* that JavaScript doesn't have a general `goto`.
+
+However, JS *does* support a specialized form of `goto`: labeled-loop jumps. Both the `continue` and `break` statements can optionally accept a specified label (as long as the label is attached to a currently executing loop!), in which case the jump occurs at that point kind of like a `goto`. Consider:
+
+```js
+foo: for (var i=0; i<4; i++) {
+	for (var j=0; j<4; j++) {
+		// whenever the loops meet, continue outer loop
+		if (j == i) {
+			// jump to the next iteration of
+			// the `foo` labeled-loop
+			continue foo;
+		}
+
+		// skip odd multiples
+		if ((j * i) % 2 == 1) {
+			// normal (non-labeled) `continue` of inner loop
+			continue;
+		}
+
+		console.log( i, j );
+	}
+}
+// 1 0
+// 2 0
+// 2 1
+// 3 0
+// 3 2
+```
+
+As you can see, we skipped over the odd-multiple `3 1` iteration, but the labeled-loop jump also skipped iterations `1 1` and `2 2`.
+
+Perhaps a slightly more useful form of the labeled-loop jump is with `break __` from inside an inner loop where you want to break out of the outer loop. Without a labeled-`break`, this same logic could sometimes be rather awkward to write:
+
+```js
+foo: for (var i=0; i<4; i++) {
+	for (var j=0; j<4; j++) {
+		if ((i * j) >= 3) {
+			console.log( "stopping!", i, j );
+			break foo;
+		}
+
+		console.log( i, j );
+	}
+}
+// 0 0
+// 0 1
+// 0 2
+// 0 3
+// 1 0
+// 1 1
+// 1 2
+// stopping! 1 3
+```
+
+The non-labeled `break` alternative to the above would probably need to involve one or more functions, shared scope variable access, etc. It would quite likely be more confusing than labeled-`break`.
+
+Labeled loops are extremely uncommon, and often frowned upon. It's best to avoid them if possible, for example using function calls instead of the loop jumps. But there are perhaps some limited cases where they might be useful. If you're going to use a labeled-loop jump, make sure to document what you're doing with plenty of comments!
+
+It's a very common belief that JSON is a proper subset of JS, so a string of JSON (like `{"a":42}` -- notice the quotes around the property name as JSON requires!) is thought to be a valid JavaScript program. **Not true!** Try putting `{"a":42}` into your JS console, and you'll get an error about an unexpected `:`.
+
+That's because statement labels cannot have quotes around them, so `"a"` is not a valid label, and thus `:` can't come right after it.
+
+So, JSON is a subset of JS syntax, but JSON is not valid JS grammar by itself.
+
+One extremely common misconception along these lines is that if you were to load a JS file into a `<script src=..>` tag that only has JSON content in it (like from an API call), that the data would be read as valid JavaScript but just be inaccessible to the program. JSON-P (the practice of wrapping the JSON data in a function call, like `foo({"a":42})`) is usually said to solve this inaccessibility by sending the value to your program's logic.
+
+**Not true!** `{"a":42}` would actually throw a JS error because it'd be interpreted as a statement block with an invalid label. But `foo({"a":42})` is valid because there `{"a":42}` is an `object` literal value being passed to `foo(..)`. So, properly said, **JSON-P makes JSON into valid JS grammar!**
+
+Starting with ES6, another place that you'll see `{ .. }` pairs showing up is with "destructuring assignments" (see the *"ES6 & Beyond"* title of this series for more info), specifically `object` destructuring. Consider:
+
+```js
+function getData() {
+	// ..
+	return {
+		a: 42,
+		b: "foo"
+	};
+}
+
+var { a, b } = getData();
+
+console.log( a, b ); // 42 "foo"
+```
+
+As you can probably tell, `var { a , b } = ..` is a form of the new destructuring assignment, which is rougly equivalent to:
+
+```js
+var res = getData();
+var a = res.a;
+var b = res.b;
+```
+
+Object destructuring with a `{ .. }` pair can also be used for named function parameters, which is sugar for the same sort of implicit object property assignment:
+
+```js
+function foo({ a, b, c }) {
+	// no need for: `var a = obj.a, b = obj.b, c = obj.c`
+	console.log( a, b, c );
+}
+
+foo( {
+	c: [1,2,3],
+	a: 42,
+	b: "foo"
+} );	// 42 "foo" [1, 2, 3]
+```
+
+Another commonly cited JS gotcha is:
+
+```js
+[] + {}; // "[object Object]"
+{} + []; // 0
+```
+
+This seems to imply the `+` operator gives different results depending on whether the first operand is the `[]` or the `{}`. But that's actually got nothing to do with it!
+
+On the first line, `{}` appears in the `+` operator's expression, and is therefore interpreted as an actual value (an empty `object`). Chapter 4 explained that `[]` is coerced to `""` and thus `{}` is coerced to a `string` value as well: `"[object Object]"`.
+
+But on the second line, `{}` is interpreted as a standalone `{}` empty block (which does nothing). There's then an assumed `;` inserted right after (see "Automatic Semicolons" later in this chapter). Finally, `+ []` is an expression that *explicitly coerces* (see Chapter 4) the `[]` to a `number`, which is the `0` value.
+
+So, how we use `{ .. }` pairs (aka the context) entirely determines what they mean. That illustrates the difference between syntax and grammar. It's very important to understand these nuances to avoid unexpected interpretations by the JS engine.
+
+#### `else if` And Optional Blocks
+
+It's a common misconception that JavaScript has an `else if` clause, because you can do:
+
+```js
+if (a) {
+	// ..
+}
+else if (b) {
+	// ..
+}
+else {
+	// ..
+}
+```
+
+But there's a hidden characteristic of the JS grammar here. There is no `else if` in the grammar. But `if` and `else` statements are allowed to omit the `{ }` around their attached block if they would only contain a single statement. You've seen this many times before, undoubtedly:
+
+```js
+if (a) doSomething( a );
+```
+
+Many JS style guides will insist that you always use `{ }` around a single statement block, so:
+
+```js
+if (a) { doSomething( a ); }
+```
+
+However, the exact same grammar rule applies to the `else` clause, so the `else if` you've always coded is actually parsed as:
+
+```js
+if (a) {
+	// ..
+}
+else {
+	if (b) {
+		// ..
+	}
+	else {
+		// ..
+	}
+}
+```
+
+The `if (b) { .. } else { .. }` is a single statement that follows the `else`, so you can either put the surrounding `{ }` in or not. In other words, when you use `else if`, you're technically breaking that common style guide rule and just using `else` with a single `if` statement.
+
+Of course, the idiom of `else if` is extremely common, and used in that way implies one less level of indentation, so it's attractive. Whichever way you do it, just call out explicitly in your own style guide/rules and don't assume things like `else if` are direct grammar rules.
+
 ## Operator Precedence
 
 As we covered in Chapter 4, JavaScript's version of `&&` and `||` are interesting in that they select and return one of their operands, rather than just resulting in `true` or `false`. That's easy to reason about if there are only two operands and one operator.
@@ -566,6 +781,12 @@ Let's solve it now:
 6. `a` is `42`.
 
 That's it, we're done! The answer is `42`, just as we saw earlier. That actually wasn't so hard, was it?
+
+## Automatic Semicolons
+
+ASI ("Automatic Semicolon Insertion") is when JavaScript assumes a `;` in certain places in your JS program even if you didn't put one there.
+
+Why would it do that? Because if you omit even a single required `;` your program would fail. Not very forgiving. ASI allows JS to be tolerant of certain places where `;` aren't commonly thought of to be needed.
 
 ## Summary
 
