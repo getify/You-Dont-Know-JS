@@ -148,11 +148,11 @@ b;	// 42
 
 Unfortunately, `( )` itself doesn't define a new wrapped expression that would be evaluated *after* the *after* side-effect of the `a++` expression, as we might have hoped. In fact, even if it did, `a++` returns `42` first, and unless you have another expression that re-evaluates `a` after the side-effect of `++`, you're not going to get `43` into that expression, so `b` will not be assigned `43`.
 
-There's an option, though -- the `,` statement comma operator. This operator allows you to string together multiple standalone expressions into a single statement:
+There's an option, though: the `,` statement-series comma operator. This operator allows you to string together multiple standalone expression statements into a single statement:
 
 ```js
-var a = 42;
-var b = ( a++, a );
+var a = 42, b;
+b = ( a++, a );
 
 a;	// 43
 b;	// 43
@@ -234,7 +234,33 @@ These rules are called "operator precedence".
 
 I bet many readers feel they have a decent grasp on operator precedence. But as with everything else we've covered in this book series, we're going to poke and prod at that understanding to see just how solid it really is, and hopefully learn a few new things along the way.
 
-Let's start with a quick quiz (which we'll carry throughout the next several sections of this chapter) to *really* test your understanding:
+Recall the example from above:
+
+```js
+var a = 42, b;
+b = ( a++, a );
+
+a;	// 43
+b;	// 43
+```
+
+But what would happen if we remove the `( )`?
+
+```js
+var a = 42, b;
+b = a++, a;
+
+a;	// 43
+b;	// 42
+```
+
+Wait! Why did that change `b`? Because the `,` operator has a lower precedence than the `=` operator. So, `b = a++, a` is interpreted as `(b = a++), a`. Because (as we explained earlier) `a++` has *after* side-effects, the assigned value to `b` is the value `42` before the `++` changes `a`.
+
+This is just a simple matter of needing to understand operator precedence. If you're going to use `,` as a statement-series operator, it's important to know that it actually has the lowest precedence. Every other operator will more tightly-bind than `,` will.
+
+OK, so you probably think you've got this operator precedence thing down.
+
+Let's move on to a more complex example (which we'll carry throughout the next several sections of this chapter) to *really* test your understanding:
 
 ```js
 var a = 42;
@@ -317,7 +343,7 @@ Here, we're checking for `opts.cache` first, and if it's present, we don't call 
 
 ### Tighter Binding
 
-But let's turn our attention back to the original quiz question, specifically the `? :` ternary operator parts. Does the `? :` operator have more or less precedence than the `&&` and `||` operators?
+But let's turn our attention back to that earlier complex statement example with all the chained operators, specifically the `? :` ternary operator parts. Does the `? :` operator have more or less precedence than the `&&` and `||` operators?
 
 ```js
 a && b || c ? c || b ? a : c && b : a
@@ -340,7 +366,7 @@ In general, operators are either left-associative or right-associative, referrin
 
 It's important to note that associativity is *not* the same thing as left-to-right or right-to-left processing.
 
-But, why does it matter which side of the operator is evaluated first? Because expressions can have side effects, like for instance with function calls:
+But, why does it matter whether processing is left-to-right or right-to-left? Because expressions can have side effects, like for instance with function calls:
 
 ```js
 var a = foo() && bar();
@@ -348,7 +374,7 @@ var a = foo() && bar();
 
 Here, `foo()` is evaluated first, and then possibly `bar()` depending on the result of the `foo()` expression. That definitely could result in different program behavior than if `bar()` was called before `foo()`.
 
-But this behavior is *just* left-to-right processing, it has nothing to do with the associativity of `&&`. In that example, since there's only one `&&` and thus no relevant grouping here, associativity doesn't even come into play.
+But this behavior is *just* left-to-right processing (the default behavior in JavaScript!) -- it has nothing to do with the associativity of `&&`. In that example, since there's only one `&&` and thus no relevant grouping here, associativity doesn't even come into play.
 
 But with an expression like `a && b && c`, grouping *will* happen implicitly, meaning that either `a && b` or `b && c` will be evaluated first.
 
@@ -401,3 +427,17 @@ a ? b : (c ? d : e); // false, evaluates only `a` and `b`
 ```
 
 So, we've clearly proved that `? :` is right-associative, and that it actually matters with respect to how the operator behaves if chained with itself.
+
+Another example of right-associativity (grouping) is the `=` operator. Recall the chained assignment example from earlier in the chapter:
+
+```js
+var a, b, c;
+
+a = b = c = 42;
+```
+
+We asserted earlier that `a = b = c = 42` is processed by first evaluating the `c = 42` assignment, then `b = ..`, and finally `a = ..`. Why? Because of the right-associativity, which actually treats the statement like this: `a = (b = (c = 42))`.
+
+## Summary
+
+JavaScript grammar has plenty of nuance that we as developers should spend a little more time paying closer attention to.
