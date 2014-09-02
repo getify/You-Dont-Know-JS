@@ -5,7 +5,7 @@ I have many people to thank for making this book title and the overall series ha
 
 Firstly, I must thank my wife **Christen Simpson**, and my two kids **Ethan** and **Emily**, for putting up with Dad always pecking away at the computer. Even when not writing books, my obsession with JavaScript glues my eyes to the screen far more than it should. That time I borrow from my family is the reason these books can so deeply and completely explain JavaScript to you, the reader. I owe my family everything.
 
-I'd like to thank my editors at O'Reilly, namely **Simon St.Laurent** and **Brian MacDonald**, as well as the rest of the editorial and marketing staff. They are fantastic to work with, and have been especially accomodating during this experiment into "open source" book writing, editing, and production.
+I'd like to thank my editors at O'Reilly, namely **Simon St.Laurent** and **Brian MacDonald**, as well as the rest of the editorial and marketing staff. They are fantastic to work with, and have been especially accommodating during this experiment into "open source" book writing, editing, and production.
 
 Thank you to the many folks who have participated in making this book series better by providing editorial suggestions and corrections, including **Shelley Powers, Tim Ferro, Evan Borden, Forrest L Norvell, Jennifer Davis, Jesse Harlin, Nick Berardi**, and many others.
 
