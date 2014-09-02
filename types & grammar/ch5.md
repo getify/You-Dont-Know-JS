@@ -412,7 +412,7 @@ var b = res.b;
 
 **Note:** `{ a, b }` is ES6 destructuring shorthand for `{ a: a, b: b }`, so either will work, but it's expected that `{ a, b }` will be vastly superior and become the accepted idiom.
 
-Object destructuring with a `{ .. }` pair can also be used for named function parameters, which is sugar for the same sort of implicit object property assignment:
+Object destructuring with a `{ .. }` pair can also be used for named function arguments, which is sugar for the same sort of implicit object property assignment:
 
 ```js
 function foo({ a, b, c }) {
@@ -438,7 +438,7 @@ This seems to imply the `+` operator gives different results depending on whethe
 
 On the first line, `{}` appears in the `+` operator's expression, and is therefore interpreted as an actual value (an empty `object`). Chapter 4 explained that `[]` is coerced to `""` and thus `{}` is coerced to a `string` value as well: `"[object Object]"`.
 
-But on the second line, `{}` is interpreted as a standalone `{}` empty block (which does nothing). There's then an assumed `;` inserted right after (see "Automatic Semicolons" later in this chapter). Finally, `+ []` is an expression that *explicitly coerces* (see Chapter 4) the `[]` to a `number`, which is the `0` value.
+But on the second line, `{}` is interpreted as a standalone `{}` empty block (which does nothing). Blocks don't need semicolons to terminate them, so the lack of one here isn't a problem. Finally, `+ []` is an expression that *explicitly coerces* (see Chapter 4) the `[]` to a `number`, which is the `0` value.
 
 So, how we use `{ .. }` pairs (aka the context) entirely determines what they mean. That illustrates the difference between syntax and grammar. It's very important to understand these nuances to avoid unexpected interpretations by the JS engine.
 
@@ -784,11 +784,123 @@ Let's solve it now:
 
 That's it, we're done! The answer is `42`, just as we saw earlier. That actually wasn't so hard, was it?
 
+### Disambiguation
+
+You should now have a much better grasp on operator precedence (and associativity) and feel much more comfortable understanding how code with multiple chained operators will behave.
+
+But an important question remains: should we all write code understanding and perfectly relying on all the rules of operator precedence/associativity? Should we only use `( )` manual grouping when it's necessary to force a different processing binding/order?
+
+Or, on the other hand, should we recognize that even though such rules *are in fact* learnable, there's enough gotchas to warrant ignoring automatic precedence/associativity? If so, should we thus always use `( )` manual grouping and remove all reliance on these automatic behaviors?
+
+This debate is highly subjective, and heavily related to the debate in Chapter 4 over *implicit coercion*. Most developers feel the same way about both debates: either they accept both behaviors and code expecting them, or they discard both behaviors and stick to manual/explicit idioms.
+
+Of course, I cannot answer this question definitively for the reader here anymore than I could in Chapter 4. But we've presented you the pros and cons, and hopefully forced enough deeper understanding that you can make informed rather than hype-driven decisions.
+
+In my opinion, there's an important middle ground. We should mix both operator precedence/associativity *and* `( )` manual grouping into our programs (in the same way that I argue in Chapter 4 for healthy/safe usage of *implicit coercion*, but certainly don't endorse it exclusively without bounds).
+
+For example, this is perfectly OK to me: `if (a && b && c) ..` I wouldn't do `if ((a && b) && c) ..` just to explicitly reflect the associativity, because I think it's overly verbose.
+
+On the other hand, if I needed to chain two `? :` conditional operators together, I'd probably use `( )` manual grouping to make it absolutely clear what my intended logic is.
+
+Thus, my advice here is similar to that of Chapter 4: **use operator precedence/associativity where it leads to shorter and cleaner code, but use `( )` manual grouping in places where it helps create clarity and reduce confusion.**
+
 ## Automatic Semicolons
 
 ASI ("Automatic Semicolon Insertion") is when JavaScript assumes a `;` in certain places in your JS program even if you didn't put one there.
 
-Why would it do that? Because if you omit even a single required `;` your program would fail. Not very forgiving. ASI allows JS to be tolerant of certain places where `;` aren't commonly thought of to be needed.
+Why would it do that? Because if you omit even a single required `;`, your program would fail. Not very forgiving. ASI allows JS to be tolerant of certain places where `;` aren't commonly thought  to be needed.
+
+It's important to note that ASI will only take effect in the presence of a new-line (aka line-break). Semicolons are not inserted in the middle of a line.
+
+Basically, if the JS parser parses a line where a parser error would occur (a missing expected `;`), and it can reasonably insert one, it does so. What's reasonable for insertion? Only if there's nothing but whitespace and/or comments between the end of some statement and that line's new-line/line break.
+
+Consider:
+
+```js
+var a = 42, b
+c;
+```
+
+Should JS treat the `c` on the next line as part of the `var` statement? It certainly would if a `,` had come anywhere (even another line) between `b` and `c`. But since there isn't one, JS assumes instead that there's an implied `;` (at the new-line) after `b`. Thus, `c;` is left as a standalone expression statement.
+
+Similarly:
+
+```js
+var a = 42, b = "foo";
+
+a
+b	// "foo"
+```
+
+That's still a valid program without error, because expression statements also accept ASI.
+
+There's certain places where ASI is helpful, like for instance:
+
+```js
+var a = 42;
+
+do {
+	// ..
+} while (a)	// <-- ; expected here!
+a;
+```
+
+The grammar requires a `;` after a `do..while` loop, but not after `while` or `for` loops. But most developers don't remember that! So, ASI helpfully steps in and inserts one.
+
+As we said earlier in the chapter, statement blocks do not require `;` termination, so ASI isn't necessary:
+
+```js
+var a = 42;
+
+while (a) {
+	// ..
+} // <-- no ; expected here
+a;
+```
+
+The other major case where ASI kicks in is with the `break`, `continue`, `return`, and (ES6) `yield` keywords:
+
+```js
+function foo(a) {
+	if (!a) return
+	a *= 2;
+	// ..
+}
+```
+
+The `return` statement doesn't carry over the new-line to the `a *= 2` expression, as ASI assumes the `;` terminating the `return` statement. Of course, `return` statements *can* easily break across multiple lines, just not when there's nothing after `return` but the new-line/line break.
+
+```js
+function foo(a) {
+	return (
+		a * 2 + 3 / 12
+	);
+}
+```
+
+Identical reasoning applies to `break`, `continue`, and `yield`.
+
+### Error Correction
+
+One of the most hotly contested *religious wars* in the JS community (besides tabs vs spaces) is whether to rely heavily/exclusively on ASI or not. Most, but not all, semicolons are optional.
+
+The two `;`s in the `for ( .. ) ..` loop header are required.
+
+On the pro side of this debate, many developers believe that ASI is a useful mechanism that allows them to write more terse (and more "beautiful") code, by omitting all but the strictly-required `;`s (which are very few). It is often asserted that ASI makes many `;`s optional, so a correctly written program *without them* is no different than a corretly written program *with them*.
+
+On the con side of the debate, many other developers will assert that there are *too many* places that can be accidental gotchas, especially for newer, less experience developers, where unintended `;`s being magically inserted change the meaning. Similarly, some developers will argue that if they omit a semicolon, it's a flat-out mistake, and they want their tools (linters, etc) to catch it before the JS engine *corrects* the mistake under the covers.
+
+Let me just share my perspective. A strict reading of the spec implies that ASI is an "error correction" routine. What kind of error, you may ask? Specifically, a **parser error**. In other words, in an attempt to have the parser fail less, ASI lets it be more tolerant.
+
+But tolerant of what? In my view, the only way a **parser error** occurs is if it's given an incorrect/errored program to parse. So, while ASI is strictly correcting parser errors, the only way it can get such errors to correct is if there were first program authoring errors -- omitting semicolons where the grammar rules require them.
+
+So, to state it more bluntly, when I hear someone claim that they want to omit "optional semicolons", my brain translates that claim to "I want to write the most parser-broken program I can that can still work."
+
+I find that to be a ludicrous position to take. I find the counter-arguments of saving keystrokes and having more "beautiful code" to be weak at best.
+
+Furthermore, I don't agree that this is the same thing as the spaces vs tabs debate -- that it's purely cosmetic -- but rather I believe it's a fundamental question of writing code that adheres to grammar requirements vs code that relies on grammar exceptions to just barely skate through.
+
+My take: **use semicolons wherever you know they are "required", and limit your assumptions about ASI to a minimum.**
 
 ## Errors
 
@@ -952,4 +1064,16 @@ foo( 10, 32 );	// 42
 
 ## Summary
 
-JavaScript grammar has plenty of nuance that we as developers should spend a little more time paying closer attention to.
+JavaScript grammar has plenty of nuance that we as developers should spend a little more time paying closer attention to than we typically do. A little bit of effort goes a long way to solidifying your deeper knowledge of the language.
+
+Statements and expressions have analogs in English language -- statements are like sentences and expressions are like phrases. Expressions can be pure/self-contained, or they can have side-effects.
+
+The JavaScript grammar layers semantic usage rules (aka context) on top of the pure syntax. For example, `{ }` pairs used in various places in your program can mean statement blocks, `object` literals, (ES6) destructuring assignments, or (ES6) named function arguments.
+
+JavaScript operators all have well-defined rules for precedence (which ones bind first before others) and associativity (how multiple operator expressions are implicitly grouped). Once you learn these rules, it's up to you to decide if precedence/associativity are *too implicit* for their own good, or if they will aid in writing shorter, clearer code.
+
+ASI (Automatic Semicolon Insertion) is a parser-error-correction mechanism built-in to the JS engine, which allows it under certain circumstances to insert an assumed `;` in places where it is required, was omitted, *and* insertion fixes the parser error. The debate rages over whether this behavior implies that most `;` are optional (and can/should be omitted for cleaner code) or whether it means that omitting them is making mistakes that the JS engine merely cleans up for you.
+
+JavaScript has several types of errors, but it's less known that it has two classifications for errors: "early" (compiler thrown, uncatchable) and "runtime" (`try..catch`able). All syntax errors are obviously early errors that stop the program before it runs, but there are others, too.
+
+Function arguments have an interesting relationship to their formal declared named parameters. Specifically, the `arguments` array has a number of gotchas of leaky abstraction behavior if you're not careful. Avoid `arguments` if you can, but if you must use it, by all means avoid using the positional slot in `arguments` at the same time as using a named parameter for that same argument.
