@@ -7,7 +7,7 @@ Firstly, I must thank my wife **Christen Simpson**, and my two kids **Ethan** an
 
 I'd like to thank my editors at O'Reilly, namely **Simon St.Laurent** and **Brian MacDonald**, as well as the rest of the editorial and marketing staff. They are fantastic to work with, and have been especially accommodating during this experiment into "open source" book writing, editing, and production.
 
-Thank you to the many folks who have participated in making this book series better by providing editorial suggestions and corrections, including **Shelley Powers, Tim Ferro, Evan Borden, Forrest L Norvell, Jennifer Davis, Jesse Harlin**, and many others.
+Thank you to the many folks who have participated in making this book series better by providing editorial suggestions and corrections, including **Shelley Powers, Tim Ferro, Evan Borden, Forrest L Norvell, Jennifer Davis, Jesse Harlin**, and many others. A big thank you to **David Walsh** for writing the Foreword for this title.
 
 Thank you to the countless folks in the community, including members of the TC39 committee, who have shared so much knowledge with the rest of us, and especially tolerated my incessant questions and explorations with patience and detail. **John-David Dalton, Juriy "kangax" Zaytsev, Mathias Bynens, Rick Waldron, Axel Rauschmayer, Nicholas Zakas, Angus Croll, Jordan Harband, Reginald Braithwaite, Dave Herman, Brendan Eich, Allen Wirfs-Brock, Bradley Meck, Domenic Denicola, David Walsh, Tim Disney, Kris Kowal, Peter van der Zee, Andrea Giammarchi, Kit Cambridge**, and so many others, I can't even scratch the surface.
 
