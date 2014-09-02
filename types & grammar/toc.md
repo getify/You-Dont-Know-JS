@@ -29,5 +29,6 @@
 	* Operator Precedence
 	* Automatic Semicolons
 	* Errors
+	* Function Arguments
 * Appendix A: Thank You's!
 
