@@ -30,5 +30,6 @@
 	* Automatic Semicolons
 	* Errors
 	* Function Arguments
-* Appendix A: Thank You's!
+* Appendix A: Mixed Environment JavaScript
+* Appendix B: Thank You's!
 
