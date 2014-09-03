@@ -1613,7 +1613,7 @@ Be a responsible and mature developer. Learn how to use the power of coercion (b
 
 While this part of *implicit coercion* often gets a lot less attention, it's important nonetheless to think about what happens with `a < b` comparisons (similar to how we just examined `a == b` in depth).
 
-The "Abstract Relational Comparison" algorithm in ES5 section 11.8.5 essentially divides itself into two parts: what to do if the comparison involves two `string` values (second half), or not (first half).
+The "Abstract Relational Comparison" algorithm in ES5 section 11.8.5 essentially divides itself into two parts: what to do if the comparison involves both `string` values (second half), or anything else (first half).
 
 **Note:** The algorithm is only defined for `a < b`. So, `a > b` is handled as `b < a`.
 
@@ -1631,7 +1631,7 @@ b < a;	// false
 
 **Note:** Similar caveats for `-0` and `NaN` apply here as they did in the `==` algorithm discussed earlier.
 
-However, if both values are `string`s for the `<` comparison, simple lexographic comparison on the characters is performed:
+However, if both values are `string`s for the `<` comparison, simple lexicographic (natural alphabetic) comparison on the characters is performed:
 
 ```js
 var a = [ "42" ];
@@ -1640,7 +1640,7 @@ var b = [ "043" ];
 a < b;	// false
 ```
 
-`a` and `b` are *not* coerced to `number`s, because both of them end up as `string`s after the `ToPrimitive` coercion on the two `array`s. So, `"42"` is compared character by character to `"043"`, starting with the first characters `"4"` and `"0"`, respectively. Since `"0"` is lexographically *less than* than `"4"`, the comparison returns `false`.
+`a` and `b` are *not* coerced to `number`s, because both of them end up as `string`s after the `ToPrimitive` coercion on the two `array`s. So, `"42"` is compared character by character to `"043"`, starting with the first characters `"4"` and `"0"`, respectively. Since `"0"` is lexicographically *less than* than `"4"`, the comparison returns `false`.
 
 The exact same behavior and reasoning goes for:
 
@@ -1651,7 +1651,7 @@ var b = [ 0, 4, 3 ];
 a < b;	// false
 ```
 
-Here, `a` becomes `"4,2"` and `b` becomes `"0,4,3"`, and those lexographically compare identically to the previous snippet.
+Here, `a` becomes `"4,2"` and `b` becomes `"0,4,3"`, and those lexicographically compare identically to the previous snippet.
 
 What about:
 
@@ -1662,7 +1662,7 @@ var b = { b: 43 };
 a < b;	// ??
 ```
 
-`a < b` is also `false`, because `a` becomes `[object Object]` and `b` becomes `[object Object]`, and so clearly `a` is not lexographically less than `b`.
+`a < b` is also `false`, because `a` becomes `[object Object]` and `b` becomes `[object Object]`, and so clearly `a` is not lexicographically less than `b`.
 
 But strangely:
 
