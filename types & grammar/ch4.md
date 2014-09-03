@@ -755,7 +755,7 @@ So, **is implicit coercion** evil? Is it dangerous? Is it a flaw in JavaScript's
 
 I bet most of you readers are inclined to enthusiastically cheer, "Yes!"
 
-**Not so fast.** Hear me out, throughout the rest of this chapter.
+**Not so fast.** Hear me out.
 
 Let's take a different perspective on what *implicit coercion* is, and can be, than just that it's "the opposite of the good explicit kind of coercion". That's far too narrow, and misses important nuance.
 
@@ -918,7 +918,7 @@ onlyOne( a, b, a );	// false
 
 This `onlyOne(..)` utility should only return `true` if exactly one of the arguments is `true` / truthy. It's using *implicit coercion* on the truthy checks and *explicit coercion* on the others, including the final return value.
 
-But what if we needed that utility to be able to handle four, fzzfive or twenty flags in the same way? It's pretty difficult to imagine implementing code that would handle all those permutations of comparisons.
+But what if we needed that utility to be able to handle four, five or twenty flags in the same way? It's pretty difficult to imagine implementing code that would handle all those permutations of comparisons.
 
 But here's where coercing the `boolean` values to `number`s (`0` or `1`, obviously) can greatly help:
 
@@ -1603,7 +1603,7 @@ There's lots of cases where such coercion can be helpful, allowing you to more t
 
 In the overall scheme of things, there's relatively few cases where *implicit coercion* is truly dangerous. But in those places, for safety sake, definitely use `===`.
 
-**Note:** Another place where coercion is guaranteed *not* to bite you is with the `typeof` operator. `typeof` is always going to return you one of seven strings (see Chapter 1), and none of them are the empty `""` string. As such, there's no case where checking the type of some value is going to run afoul of *implicit coercion*. `typeof x == "function"` is 100% as safe and reliable as `typeof x === "function"`. Literally, the spec says the algorithm will be identical in this situation. So, don't just blindly use `===` everywhere simply because that's what your linter tells you, or (worst of all) because you've been told in some book to **not think about it**. You own the quality of your code.
+**Note:** Another place where coercion is guaranteed *not* to bite you is with the `typeof` operator. `typeof` is always going to return you one of seven strings (see Chapter 1), and none of them are the empty `""` string. As such, there's no case where checking the type of some value is going to run afoul of *implicit coercion*. `typeof x == "function"` is 100% as safe and reliable as `typeof x === "function"`. Literally, the spec says the algorithm will be identical in this situation. So, don't just blindly use `===` everywhere simply because that's what your code tools tell you to do, or (worst of all) because you've been told in some book to **not think about it**. You own the quality of your code.
 
 Is *implicit coercion* evil and dangerous? In a few cases, yes, but overwhelmingly, no.
 
