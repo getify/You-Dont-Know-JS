@@ -39,7 +39,7 @@ The most obvious answer that may occur to you is to type the statement into your
 
 Let's consider `var b = a`. What's the completion value of that statement?
 
-It's `undefined`. Why? Because `var` statements are simply defined that way in the spec. Indeed, if you but `var a = 42;` into your console, it'll report back `undefined`.
+It's `undefined`. Why? Because `var` statements are simply defined that way in the spec. Indeed, if you put `var a = 42;` into your console, it'll report back `undefined`.
 
 **Note:** Technically, it's a little more complex than that. In the ES5 spec, section 12.2 "Variable Statement", the `VariableDeclaration` algorithm actually *does* return a value (a `string` containing the name of the variable declared -- weird, huh!?), but that value is basically swallowed up (except for use by the `for..in` loop) by the `VariableStatement` algorithm, which forces an empty (aka `undefined`) result value.
 
@@ -376,7 +376,7 @@ The non-labeled `break` alternative to the above would probably need to involve 
 
 Labeled loops are extremely uncommon, and often frowned upon. It's best to avoid them if possible, for example using function calls instead of the loop jumps. But there are perhaps some limited cases where they might be useful. If you're going to use a labeled-loop jump, make sure to document what you're doing with plenty of comments!
 
-It's a very common belief that JSON is a proper subset of JS, so a string of JSON (like `{"a":42}` -- notice the quotes around the property name as JSON requires!) is thought to be a valid JavaScript program. **Not true!** Try putting `{"a":42}` into your JS console, and you'll get an error about an unexpected `:`.
+It's a very common belief that JSON is a proper subset of JS, so a string of JSON (like `{"a":42}` -- notice the quotes around the property name as JSON requires!) is thought to be a valid JavaScript program. **Not true!** Try putting `{"a":42}` into your JS console, and you'll get an error.
 
 That's because statement labels cannot have quotes around them, so `"a"` is not a valid label, and thus `:` can't come right after it.
 
@@ -904,45 +904,49 @@ My take: **use semicolons wherever you know they are "required", and limit your 
 
 ## Errors
 
-Not only does JavaScript have different *types* of errors (`TypeError`, `ReferenceError`, `SyntaxError`, etc), but also the grammar defines certain errors to be enforced at compile time, as compared to all other errors which happen during run-time.
+Not only does JavaScript have different *sub-types* of errors (`TypeError`, `ReferenceError`, `SyntaxError`, etc), but also the grammar defines certain errors to be enforced at compile time, as compared to all other errors which happen during run-time.
 
 In particular, there have long been a number of specific conditions which should be caught and reported as "early errors" (during compilation). Any straight-up syntax error is an early error, like `a = ,`, but also the grammar defines things which are syntactically valid but disallowed nonetheless.
 
 Since execution of your code has not begun yet, these errors are not catchable with `try..catch`, they will just fail the parsing/compilation of your program.
 
+**Note:** There's no requirement in the spec about exactly how browsers (and developer tools) should report errors. So you may see variations across browsers in the below error examples, in what specific sub-type of error is reported or what the included error message text will be.
+
 One simple example is with syntax inside a regular expression literal. There's nothing JS syntax wrong here, but the invalid regex will throw an early error:
 
 ```js
-var a = /*foo/;		// SyntaxError (inside ther regex)
+var a = /+foo/;		// Error!
 ```
 
 The target of an assignment must be an identifier (or an ES6 destructuring expression which produces one or more identifiers), so a value like `42` in that position is illegal and can be reported right away:
 
 ```js
 var a;
-42 = a;		// SyntaxError
+42 = a;		// Error!
 ```
 
 ES5's `strict mode` defines even more early errors. For example, in `strict mode`, function parameter names cannot be duplicated:
 
 ```js
-function foo(a,b,a) { .. }					// just fine
+function foo(a,b,a) { }					// just fine
 
-function bar(a,b,a) { "use strict"; .. }	// SyntaxError!
+function bar(a,b,a) { "use strict"; }	// Error!
 ```
 
 Another `strict mode` early error is an object literal having more than one property of the same name:
 
 ```js
-"use strict";
+(function(){
+	"use strict";
 
-var a = {
-	b: 42,
-	b: 43
-};			// SyntaxError!
+	var a = {
+		b: 42,
+		b: 43
+	};			// Error!
+})();
 ```
 
-**Note:** Semantically speaking, such errors aren't technically *syntax* errors but more *grammar* errors -- the above snippets are syntactically valid. But since there is no `GrammarError` type, `SyntaxError` is used instead.
+**Note:** Semantically speaking, such errors aren't technically *syntax* errors but more *grammar* errors -- the above snippets are syntactically valid. But since there is no `GrammarError` type, some browsers use `SyntaxError` instead.
 
 ### Using Variables Too Early
 
