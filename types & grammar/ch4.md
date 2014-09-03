@@ -1586,11 +1586,11 @@ Again, this could break if you did something like `doSomething("",0)` or `doSome
 
 So, while the situations *can* exist where these coercions will bite you, and you'll want to be careful around them, they're probably not super common on the whole of your code base.
 
-The most important advice I can give you on this topic: examine your program and reason about what values can show up on either side of an `==` comparison.
+#### Safely Using Implicit Coercion
 
-To effectively avoid issues with `==` coercion, here's some heuristic rules to consider:
+The most important advice I can give you: examine your program and reason about what values can show up on either side of an `==` comparison. To effectively avoid issues with such comparisons, here's some heuristic rules to follow:
 
-1. If either side of the comparison can have the `true` or `false` value, don't ever, EVER use `==`.
+1. If either side of the comparison can have `true` or `false` values, don't ever, EVER use `==`.
 2. If either side of the comparison can have `[]`, `""`, or `0` values, seriously consider not using `==`.
 
 In these scenarios, it's almost certainly better to use `===` instead of `==`, to avoid unwanted coercion. Follow those two simple rules, and pretty much all the coercion gotchas that could reasonably hurt you will effectively be avoided.
