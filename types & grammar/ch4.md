@@ -1588,12 +1588,12 @@ So, while the situations *can* exist where these coercions will bite you, and yo
 
 The most important advice I can give you on this topic: examine your program and reason about what values can show up on either side of an `==` comparison.
 
-To effectively avoid issues, here's some heuristic rules to consider:
+To effectively avoid issues with `==` coercion, here's some heuristic rules to consider:
 
-1. An equality comparison that *could* have a `""` or `0` on *both* sides
-2. An equality comparison that *could* have a `[]` on either side.
+1. If either side of the comparison can have the `true` or `false` value, don't ever, EVER use `==`.
+2. If either side of the comparison can have `[]`, `""`, or `0` values, seriously consider not using `==`.
 
-In these scenarios, it's almost certainly better to use `===` instead of `==`, to avoid unwanted coercion. Combined with our earlier rule about **always avoiding `== true` and `== false`**, pretty much all the coercion gotchas that could reasonably hurt you will effectively be avoided.
+In these scenarios, it's almost certainly better to use `===` instead of `==`, to avoid unwanted coercion. Follow those two simple rules, and pretty much all the coercion gotchas that could reasonably hurt you will effectively be avoided.
 
 **Being more explicit/verbose in these cases will save you from a lot of headaches.**
 
