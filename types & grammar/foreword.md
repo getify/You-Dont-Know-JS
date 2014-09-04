@@ -13,4 +13,4 @@ Types and Grammar, the third installment of Kyle Simpson's "You Don't Know JS" s
 
 David Walsh<br>
 [http://davidwalsh.name](http://davidwalsh.name), [@davidwalshblog](http://twitter.com/davidwalshblog)<br>
-Web Developer, Mozilla
+Senior Web Developer, Mozilla
