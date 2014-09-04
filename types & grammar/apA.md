@@ -11,7 +11,7 @@ We'll briefly explore some of these concerns.
 
 ## Host Objects
 
-## DOM ID's As Global Variables
+## Global DOM Variables
 
 ## Native Prototypes
 
