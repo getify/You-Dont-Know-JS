@@ -9,7 +9,11 @@ I still remember my first high school website project.  The task was to create a
 
 I tell that story because I did back then what many developers are doing today:  copy and pasted chunks of JavaScript code into my project without having a clue what's actually happening.  The widespread use of JavaScript toolkits like jQuery have, in their own small way, perpetuated this pattern of non-learning of core JavaScript.
 
-Types and Grammar, the third installment of Kyle Simpson's "You Don't Know JS" series, is an excellent look at the core JavaScript fundamentals that copy and paste and JavaScript toolkits don't and could never teach you.
+I'm not disparaging JavaScript toolkit use, after all I'm a member of the MooTools JavaScript team.  But the reason JavaScript toolkits are as powerful as they are is because their developers know the fundamentals, and their "gotchas", and apply them magnificently.  As useful as these toolkits are, it's still incredibly important to know the basics of the language, and with books like Kyle Simpson's "You Don't Know JS" series, there's  no excuse not to learn them.
+
+Types and Grammar, the third installment of Kyle Simpson's "You Don't Know JS" series, is an excellent look at the core JavaScript fundamentals that copy and paste and JavaScript toolkits don't and could never teach you.  Coersion and its pitfalls, natives as constructors, and the whole gammit of JavaScript basics are thoroughly explained with focused code examples.  Like the other books in this series, Kyle cuts straight to the point: no fluff and word-smithing -- exactly the type of tech book I love.
+
+Enjoy Types and Grammer and don't let it get too far away from your desk!  
 
 David Walsh<br>
 [http://davidwalsh.name](http://davidwalsh.name), [@davidwalshblog](http://twitter.com/davidwalshblog)<br>
