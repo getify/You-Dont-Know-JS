@@ -9,6 +9,16 @@ We'll briefly explore some of these concerns.
 
 ## Multiple `<script>` Elements
 
+Most web sites and web applications have more than one script file that comprises their code, and it's common for there two be a few or several `<script src=..>` elements in the page which load these files separately.
+
+But do these separate files constitute separate programs or are they collectively one JS program?
+
+The reality is they act more like indepdendent JS programs in most respects. The one thing they *share* is the single `global` object (`window` in the browser), which means multiple files can append their code to the shared namespace(s) and they can all interact.
+
+If "script1.js" includes a global function `foo()` in it, when "script2.js" later runs, it can access and call `foo()` just as if "script2.js" had defined the function.
+
+But if an error occurs in "script2.js", only "script2.js" as a separate standalone JS program will fail and stop, and any subsequent files/programs like "script3.js" will run (still with the shared `global`) unimpeded.
+
 ## Host Objects
 
 ## Global DOM Variables
@@ -21,6 +31,6 @@ We'll briefly explore some of these concerns.
 
 We know and can rely upon the fact that the JS language itself has one standard and is predictably implemented by all the modern browsers/engines. This is a very good thing!
 
-But JavaScript rarely runs in isolation. It runs in an environment mixed in with code from third-party libraries, and sometimes it even runs in engines/environments that differ from browsers.
+But JavaScript rarely runs in isolation. It runs in an environment mixed in with code from third-party libraries, and sometimes it even runs in engines/environments that differ from those found in browsers.
 
 Paying close attention to these issues improves the reliability and robustness of your code!
