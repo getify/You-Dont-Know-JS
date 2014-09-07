@@ -9,15 +9,59 @@ We'll briefly explore some of these concerns.
 
 ## Multiple `<script>` Elements
 
-Most web sites and web applications have more than one script file that comprises their code, and it's common for there two be a few or several `<script src=..>` elements in the page which load these files separately.
+Most browser-viewed web sites/applications have more than one script file that comprises their code, and it's common for there two be a few or several `<script src=..></script>` elements in the page which load these files separately, and even a few inline-code `<script> .. </script>` elements as well.
 
-But do these separate files constitute separate programs or are they collectively one JS program?
+But do these separate files/code snippets constitute separate programs or are they collectively one JS program?
 
-The reality is they act more like indepdendent JS programs in most respects. The one thing they *share* is the single `global` object (`window` in the browser), which means multiple files can append their code to the shared namespace(s) and they can all interact.
+The reality is they act more like indepdendent JS programs in many, but not all, respects.
+
+The one thing they *share* is the single `global` object (`window` in the browser), which means multiple files can append their code to the shared namespace(s) and they can all interact.
 
 If "script1.js" includes a global function `foo()` in it, when "script2.js" later runs, it can access and call `foo()` just as if "script2.js" had defined the function.
 
-But if an error occurs in "script2.js", only "script2.js" as a separate standalone JS program will fail and stop, and any subsequent files/programs like "script3.js" will run (still with the shared `global`) unimpeded.
+But global variable scope *hoisting* (see the *"Scope & Closures"* title of this series) does not occur across these boundaries, so this would not work (because `foo()`'s declaration isn't yet declared), regardless of if they are inline `<script> .. </script>` elements or externally-loaded `<script src=..></script>` files:
+
+```html
+<script>foo();</script>
+
+<script>
+  function foo() { .. }
+</script>
+```
+
+But, either of these *would* work:
+
+```html
+<script>
+  foo();
+  function foo() { .. }
+</script>
+```
+
+Or:
+
+```html
+<script>
+  function foo() { .. }
+</script>
+
+<script>foo();</script>
+```
+
+Also, if an error occurs in "script2.js", only "script2.js" as a separate standalone JS program will fail and stop, and any subsequent files/programs like "script3.js" will run (still with the shared `global`) unimpeded.
+
+You can create `script` elements dynamically from your code, and inject them into the DOM of the page, and the code in them will behave basically as if loaded normally from a separate file:
+
+```js
+var greeting = "Hello World";
+
+var el = document.createElement( "script" );
+
+el.text = "function foo(){ alert( greeting );\
+ } setTimeout( foo, 1000 );";
+
+document.body.appendChild( el );
+```
 
 ## Host Objects
 
