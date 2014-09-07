@@ -63,6 +63,8 @@ el.text = "function foo(){ alert( greeting );\
 document.body.appendChild( el );
 ```
 
+**Note:** Of course, if you tried the above snippet but set `el.src` to some file URL instead of setting `el.text`, you'd be dynamically creating an externally-loaded `<script src=..></script>` element.
+
 ## Host Objects
 
 ## Global DOM Variables
