@@ -38,7 +38,56 @@ Generally speaking, all these differences are rarely used, so the deviations fro
 
 ## Host Objects
 
+The well-covered rules for how variables behave in JS have exceptions to them when it comes to variables that are auto-defined, or otherwise created and provided to JS by the environment that hosts your code (browser, etc) -- so called, "host objects" (which include both built-in `object`s and `function`s).
+
+For example:
+
+```js
+var a = document.createElement( "div" );
+
+typeof a;								// "object" -- as expected
+Object.prototype.toString.call( a );	// "[object HTMLDivElement]"
+
+a.tagName;								// "DIV"
+```
+
+`a` is not just an `object`, but a special host object because it's a DOM element. It has a different internal `[[Class]]` value (`"HTMLDivElement"`) and comes with pre-defined (and often unchangeable) properties.
+
+Another such quirk has already been covered, in the "Falsy Objects" section in Chapter 4: some objects can exist but when coerced to `boolean` they (confoundingly) will coerce to `false` instead of the expected `true`.
+
+Other behavior variations with host objects to be aware of can include:
+
+* not having access to normal `object` built-in's like `toString()`
+* not being overwritable
+* having certain pre-defined read-only properties
+* having methods which cannot be `this` overriden to other objects
+* and more...
+
+Host objects are critical to making our JS code work with its surrounding environment. But it's important to note when you're interacting with a host object and be careful of assuming its behaviors, as they will quite often not conform to regular JS `object`s.
+
 ## Global DOM Variables
+
+You're probably aware that declaring a variable in the global scope (with or without `var`) creates not only a global variable, but also its mirror: a property of the same name on the `global` object (`window` in the browser).
+
+But what may be lesser common knowledge is that (because of legacy browser behavior) creating DOM elements with `id` attributes creates global variables of those same names. For example:
+
+```html
+<div id="foo"></div>
+```
+
+And:
+
+```js
+if (typeof foo == "undefined") {
+	foo = 42;	// will never run
+}
+
+console.log( foo );	 // HTML element
+```
+
+You're perhaps used to managing global variable tests (using `typeof` or `in window` checks) under the assumption that only JS code creates such variables, but as you can see, the contents of your hosting HTML page can also create them, which can easily throw off your existence checks logic if you're not careful.
+
+This is yet one more reason why you should, if at all possible, avoid using global variables, and if you have to, use variables with unique names that won't likely collide. But now you know you need to make sure not to collide with the HTML content as well as any other code.
 
 ## Native Prototypes
 
