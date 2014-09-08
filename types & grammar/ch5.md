@@ -279,9 +279,11 @@ There are quite a few places in the JavaScript grammar rules where the same synt
 
 We won't exhaustively list all such cases here, but just call out a few of the common ones.
 
-#### `{ .. }`
+#### `{ .. }` Curly Braces
 
 There's two main places (and more coming as JS evolves!) that a pair of `{ .. }` curly braces will show up in your code. Let's take a look at each of them.
+
+##### Object Literals
 
 First, as an `object` literal:
 
@@ -293,14 +295,16 @@ var a = {
 };
 ```
 
-How do we know this is an `object` literal? Because the `{ .. }` pair is used a value that's getting assigned to `a`.
+How do we know this is an `object` literal? Because the `{ .. }` pair is a value that's getting assigned to `a`.
 
 **Note:** The `a` reference is called an "l-value" (aka left-hand value) since it's the target of an assignment. The `{ .. }` pair is an "r-value" (aka right-hand value) since it's used *just* as a value (in this case as the source of an assignment).
+
+##### Labels
 
 What happens if we remove the `var a =` part of the above snippet?
 
 ```js
-// let's assume there's a `bar()` function defined
+// let's assume there's a `bar()` function already defined
 
 {
 	foo: bar()
@@ -386,6 +390,23 @@ One extremely common misconception along these lines is that if you were to load
 
 **Not true!** `{"a":42}` would actually throw a JS error because it'd be interpreted as a statement block with an invalid label. But `foo({"a":42})` is valid because there `{"a":42}` is an `object` literal value being passed to `foo(..)`. So, properly said, **JSON-P makes JSON into valid JS grammar!**
 
+##### Blocks
+
+Another commonly cited JS gotcha is:
+
+```js
+[] + {}; // "[object Object]"
+{} + []; // 0
+```
+
+This seems to imply the `+` operator gives different results depending on whether the first operand is the `[]` or the `{}`. But that's actually got nothing to do with it!
+
+On the first line, `{}` appears in the `+` operator's expression, and is therefore interpreted as an actual value (an empty `object`). Chapter 4 explained that `[]` is coerced to `""` and thus `{}` is coerced to a `string` value as well: `"[object Object]"`.
+
+But on the second line, `{}` is interpreted as a standalone `{}` empty block (which does nothing). Blocks don't need semicolons to terminate them, so the lack of one here isn't a problem. Finally, `+ []` is an expression that *explicitly coerces* (see Chapter 4) the `[]` to a `number`, which is the `0` value.
+
+##### Object Destructuring
+
 Starting with ES6, another place that you'll see `{ .. }` pairs showing up is with "destructuring assignments" (see the *"ES6 & Beyond"* title of this series for more info), specifically `object` destructuring. Consider:
 
 ```js
@@ -426,19 +447,6 @@ foo( {
 	b: "foo"
 } );	// 42 "foo" [1, 2, 3]
 ```
-
-Another commonly cited JS gotcha is:
-
-```js
-[] + {}; // "[object Object]"
-{} + []; // 0
-```
-
-This seems to imply the `+` operator gives different results depending on whether the first operand is the `[]` or the `{}`. But that's actually got nothing to do with it!
-
-On the first line, `{}` appears in the `+` operator's expression, and is therefore interpreted as an actual value (an empty `object`). Chapter 4 explained that `[]` is coerced to `""` and thus `{}` is coerced to a `string` value as well: `"[object Object]"`.
-
-But on the second line, `{}` is interpreted as a standalone `{}` empty block (which does nothing). Blocks don't need semicolons to terminate them, so the lack of one here isn't a problem. Finally, `+ []` is an expression that *explicitly coerces* (see Chapter 4) the `[]` to a `number`, which is the `0` value.
 
 So, how we use `{ .. }` pairs (aka the context) entirely determines what they mean. That illustrates the difference between syntax and grammar. It's very important to understand these nuances to avoid unexpected interpretations by the JS engine.
 
