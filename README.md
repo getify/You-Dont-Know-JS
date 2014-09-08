@@ -13,7 +13,7 @@ Please feel free to contribute to the quality of this content by submitting PR's
 
 * ["Scope & Closures"](scope & closures/README.md) (<a href="http://shop.oreilly.com/product/0636920026327.do">published</a>!)
 * ["this & Object Prototypes"](this & object prototypes/README.md) (<a href="http://shop.oreilly.com/product/0636920033738.do">published</a>!)
-* ["Types & Grammar"](types & grammar/README.md) (draft in progress)
+* ["Types & Grammar"](types & grammar/README.md) (draft complete)
 * "Async & Performance" (planned)
 * "ES6 & Beyond" (planned)
 
