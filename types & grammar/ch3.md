@@ -407,7 +407,7 @@ For example, all string objects, and by extension (via boxing) `string` primitiv
 
 None of the methods modify the string *in place*. Modifications (like case coversion or trimming) create a new value from the existing value.
 
-By virtue of prototype delegation (see the *"this & Object Prototypes" title in this series), any string value can access these methods:
+By virtue of prototype delegation (see the *"this & Object Prototypes"* title in this series), any string value can access these methods:
 
 ```js
 var a = " abc ";
@@ -474,6 +474,8 @@ isThisCool(
 One minor side-benefit of this approach is that the `.prototype`s are already created and built-in, thus created *only once*. By contrast, using `[]`, `function(){}`, and `/(?:)/` values themselves for those defaults would (likely, depending on engine implementations) be recreating those values (and probably garbage-collecting them later) for *each call* of `isThisCool(..)`. That could be memory/CPU wasteful.
 
 Also, be very careful not to use `Array.prototype` as a default value **that will subsequently be modified**. In this example, `vals` is used read-only, but if you were to instead make in-place changes to `vals`, you would actually be modifying `Array.prototype` itself, which would lead to the weirdnesses mentioned earlier!
+
+**Note:** While we're pointing out these native prototypes and some usefulness, be cautious of relying on them and even more wary of modifying them in anyway. See Appendix A "Native Prototypes" for more discussion.
 
 ## Summary
 
