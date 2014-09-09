@@ -1507,6 +1507,8 @@ In this list of 24 comparisons, 17 of them are quite reasonable and predictable.
 
 However, seven of the comparisons are marked with "UH OH!" because as false positives, they are much more likely gotchas that could trip you up. `""` and `0` are definitely distinctly different values, and it's rare you'd want to treat them as equateable, so their mutual coercion is troublesome. Note that there aren't any false negatives here.
 
+#### The Crazy Ones
+
 We don't have to stop there, though. We can keep looking for even more troublesome coercions:
 
 ```js
@@ -1517,7 +1519,38 @@ Oooo, that seems at a higher level of crazy, right!? Your brain may likely trick
 
 But that's not what's actually happening. Let's break it down. What do we know about the `!` unary operator (see earlier in this chapter)? It explicitly coerces to a `boolean` using the `ToBoolean` rules (and it also flips the parity). So before `[] == ![]` is even processed, it's actually already `[] == false`. We already saw that one in our above list (`false == []`), so its surprise result is *not new* to us.
 
-Indeed, pretty much any crazy coercion between normal values (not `valueOf()` or `toString()` tricks as above) will boil down to this short list of gotcha coercions we've just identified.
+How about other corner cases?
+
+```js
+2 == [2];		// true
+"" == [null];	// true
+```
+
+As we said earlier in our `ToNumber` discussion, the right-hand side `[2]` and `[null]` values will go through a `ToPrimitive` coercion so they can be more readily compared to the simple primitives (`2` and `""`, respectively) on the left-hand side. Since the `valueOf()` for `array` values just returns the `array` itself, coercion falls to stringifying the `array`.
+
+`[2]` will become `"2"`, which then is `ToNumber` coerced to `2` for the right-hand side value in the first comparison. `[null]` just straight becomes `""`.
+
+So, `2 == 2` and `"" == ""` are completely understandable.
+
+If your instinct is to still dislike these results, your frustration is not actually with coercion like you probably think it is. It's actually a complaint against the default `array` values' `ToPrimitive` behavior of going to a `string` value. More likely, you'd just wish that `[2].toString()` didn't return `"2"`, or that `[null].toString()` didn't return `""`.
+
+But what exactly *should* these `string` coercions result in? I can't really think of any other appropriate `string` coercion of `[2]` than `"2"`, except perhaps `"[2]"` -- but that could be very strange in other contexts!
+
+You could rightly make the case that since `String(null)` becomes `"null"`, then `String([null])` should also become `"null"`. That's a reasonable assertion. So, that's the real culprit.
+
+*Implicit coercion* itself isn't the evil, here. Even an *explicit coercion* of `[null]` to a `string` results in `""`. What's at odds is whether it's sensible at all for `array` values to stringify to the equivalent of their contents, and exactly how that happens. So, direct your frustration at the rules for `String( [..] )`, because that's where the craziness stems from.
+
+Another famously cited gotcha:
+
+```js
+0 == "\n";		// true
+```
+
+As we discussed earlier with empty `""`, `"\n"` (or `"    "` or any other whitespace combination) is coerced via `ToNumber`, and the result is `0`. What other `number` value would you expect whitespace to coerce to? Does it bother you that *explicit* `Number("  ")` yields `0`? Really the only other reasonable `number` value that empty strings or whitespace strings could coerce to is the `NaN`. But would that *really* be better?
+
+`NaN` values are never equal, so in that case both sides of `" " == [" "]` would be `NaN`, and the comparison would fail (though most would expect it to pass. The `NaN` alternative to `0` coercion of empty or whitespace `string`s seems worse and *even more likely* to confuse.
+
+Bottom line: almost any crazy coercion between *normal values* (not intentionally tricky `valueOf()` or `toString()` hacks as earlier) will boil down to the short seven-item list of gotcha coercions we've identified above.
 
 To contrast against these 24 likely suspects for coercion gotchas, consider another list like this:
 
