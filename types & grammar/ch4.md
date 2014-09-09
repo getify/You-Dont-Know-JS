@@ -1548,7 +1548,7 @@ Another famously cited gotcha:
 
 As we discussed earlier with empty `""`, `"\n"` (or `"    "` or any other whitespace combination) is coerced via `ToNumber`, and the result is `0`. What other `number` value would you expect whitespace to coerce to? Does it bother you that *explicit* `Number("  ")` yields `0`? Really the only other reasonable `number` value that empty strings or whitespace strings could coerce to is the `NaN`. But would that *really* be better?
 
-`NaN` values are never equal, so in that case both sides of `" " == [" "]` would be `NaN`, and the comparison would fail (though most would expect it to pass. The `NaN` alternative to `0` coercion of empty or whitespace `string`s seems worse and *even more likely* to confuse.
+`NaN` values are never equal, so in that case both sides of `" " == [" "]` would be `NaN`, and the comparison would fail (though most would expect it to pass). The `NaN` alternative to `0` coercion of empty or whitespace `string`s seems worse and *even more likely* to confuse.
 
 Bottom line: almost any crazy coercion between *normal values* (not intentionally tricky `valueOf()` or `toString()` hacks as earlier) will boil down to the short seven-item list of gotcha coercions we've identified above.
 
