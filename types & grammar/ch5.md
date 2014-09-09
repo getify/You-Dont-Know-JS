@@ -392,14 +392,14 @@ One extremely common misconception along these lines is that if you were to load
 
 ##### Blocks
 
-Another commonly cited JS gotcha is:
+Another commonly cited JS gotcha (related to coercion -- see Chapter 4) is:
 
 ```js
 [] + {}; // "[object Object]"
 {} + []; // 0
 ```
 
-This seems to imply the `+` operator gives different results depending on whether the first operand is the `[]` or the `{}`. But that's actually got nothing to do with it!
+This seems to imply the `+` operator gives different results depending on whether the first operand is the `[]` or the `{}`. But that actually has nothing to do with it!
 
 On the first line, `{}` appears in the `+` operator's expression, and is therefore interpreted as an actual value (an empty `object`). Chapter 4 explained that `[]` is coerced to `""` and thus `{}` is coerced to a `string` value as well: `"[object Object]"`.
 

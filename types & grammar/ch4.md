@@ -491,6 +491,8 @@ You can probably dream up all sorts of hideous combinations of binary operators 
 
 You should strongly consider avoiding unary `+` (or `-`) coercion when it's immediately adjacent to other operators. While the above works, it would almost universally be considered a bad idea. Even `d = +c` (or `d =+ c` for that matter!) can far too easily be confused for `d += c`, which is entirely different!
 
+**Note:** Another extremely confusing place for unary `+` to be used adjacent to another operator would be the `++` increment operator and `--` decrement operator. For example: `a +++b`, `a + ++b`, and `a + + +b`. See "Expression Side-Effects" in Chapter 5 for more about `++`.
+
 Remember, we're trying to be explicit and **reduce** confusion, not make it much worse!
 
 #### `Date` To `number`
@@ -572,7 +574,7 @@ Hexadecimal `string`s (with the leading `x` or `X`) aren't terribly easy to get 
 
 ```js
 var hour = parseInt( selectedHour.value );
-var minute = parseInt( selectedMiniute.value );
+var minute = parseInt( selectedMinute.value );
 
 console.log( "The time you selected was: " + hour + ":" + minute);
 ```
@@ -741,6 +743,8 @@ On its surface, this idiom looks like a form of *explicit* `ToBoolean`-type coer
 
 However, there's a hidden *implicit coercion*, in that the `a` expression has to first be coerced to `boolean` to perform the truthiness test. I'd call this idiom "explicitly implicit". Furthermore, I'd suggest **you should avoid this idiom completely** in JavaScript. It offers no real benefit, and worse, masquerades as something it's not.
 
+`Boolean(a)` and `!!a` instead are far better as *explicit coercion* options.
+
 ## Implicit Coercion
 
 *Implicit Coercion:* type conversions that are hidden, non-obvious side-effects that implicitly occur from other actions. In other words, *implicit coercions* are any type conversions that aren't obvious (to you).
@@ -833,6 +837,8 @@ If you're paying close attention, you'll notice that this operation is now ident
 
 Let's set aside those messy details and go back to an earlier, simplified explanation: if either or both operands to `+` are a `string` (or become one with the above steps!), the operation will be `string` concatenation. Otherwise, it's numeric addition.
 
+**Note:** A commonly cited coercion gotcha is `[] + {}` vs `{} + []`, as those two expressions result respectively in `"[object Object]"` and `0`. There's more to it, though, and we cover the details in "Blocks" in Chapter 5.
+
 What's that mean for *implicit coercion*?
 
 You can coerce a `number` to a `string` simply by "adding" the `number` and the `""` empty `string`:
@@ -867,7 +873,7 @@ a + "";			// "42"
 String( a );	// "4"
 ```
 
-Generally, this sort of gotcha won't bite you, but you should be careful if you're defining both your own `valueOf()` and `toString()` methods for some `object`, as how you coerce the value could affect the outcome.
+Generally, this sort of gotcha won't bite you unless you're really trying to create confusing data structures and operations, but you should be careful if you're defining both your own `valueOf()` and `toString()` methods for some `object`, as how you coerce the value could affect the outcome.
 
 What about the other direction? How can we *implicitly coerce* from `string` to `number`?
 
@@ -893,7 +899,7 @@ Both `array` values have to become `number`s, so they end up first being coerced
 
 So, is *implicit coercion* of `string` and `number` values the ugly evil you've always heard horror stories about? I don't personally think so.
 
-Compare `b = String(a)` (*explicit*) to `b = a + ""` (*implicit*). I think cases can be made for both approaches being useful in your code. But, you be the judge.
+Compare `b = String(a)` (*explicit*) to `b = a + ""` (*implicit*). I think cases can be made for both approaches being useful in your code. Certainly `b = a + ""` is quite a bit more common in JS programs, proving its own utility regardless of *feelings* about the the merits or hazards of *implicit coercion* in general.
 
 ### Implicitly: Booleans --> Numbers
 
@@ -971,13 +977,13 @@ Now, let's turn our attention to *implicit coercion* to `boolean` values, as it'
 
 Remember, *implicit coercion* is what kicks in when you use a value in such a way that it forces the value to be converted. For numeric and `string` operations, it's fairly easy to see how the coercions can occur.
 
-But, what sort of expression operations require/force a `boolean` coercion?
+But, what sort of expression operations require/force (*implicitly*) a `boolean` coercion?
 
 1. The test expression in an `if (..)` statement.
 2. The test expression (second clause) in a `for ( .. ; .. ; .. )` header.
 3. The test expression in `while (..)` and `do..while(..)` loops.
 4. The test expression (first clause) in `? :` ternary expressions.
-5. The left-hand operand (which serves as a test expression) to the `||` ("logical or") and `&&` ("logical and") operators.
+5. The left-hand operand (which serves as a test expression -- see below!) to the `||` ("logical or") and `&&` ("logical and") operators.
 
 Any value used in these contexts that is not already a `boolean` will be *implicitly* coerced to a `boolean` using the rules of the `ToBoolean` abstract operation covered earlier in this chapter.
 
@@ -1061,9 +1067,9 @@ a && b;
 a ? b : a;
 ```
 
-**Note:** I call `a || b` "roughly equivalent" to `a ? a : b` because the outcome is identical, but there's a nuanced difference. In `a ? a : b`, if `a` was a more complex expression (like for instance one that might have side effects like calling a function, etc), then the `a` expression would possibly be evaluated twice (if the first evaluation was truthy). By contrast, for `a || b`, the `a` expression is evaluated only once, and that value is used both for the coercive test as well as the result value (if appropriate). The same nuance applies to the `a && b` and `a ? b : a` expressions.
+**Note:** I call `a || b` "roughly equivalent" to `a ? a : b` because the outcome is identical, but there's a nuanced difference. In `a ? a : b`, if `a` was a more complex expression (like for instance one that might have side effects like calling a `function`, etc), then the `a` expression would possibly be evaluated twice (if the first evaluation was truthy). By contrast, for `a || b`, the `a` expression is evaluated only once, and that value is used both for the coercive test as well as the result value (if appropriate). The same nuance applies to the `a && b` and `a ? b : a` expressions.
 
-An extremely common usage of this behavior, which there's a good chance you may have used before and not fully understood, is:
+An extremely common and helpful usage of this behavior, which there's a good chance you may have used before and not fully understood, is:
 
 ```js
 function foo(a,b) {
@@ -1077,7 +1083,7 @@ foo();					// "hello world"
 foo( "yeah", "yeah!" );	// "yeah yeah!"
 ```
 
-The `a = a || "hello"` idiom (sometimes said to be JavaScript's version of the "null coallescing operator" -- C#) acts to test `a` and if it has no value (or only an undesired falsy value) provide a backup default value (`"hello"`).
+The `a = a || "hello"` idiom (sometimes said to be JavaScript's version of the C# "null coallescing operator") acts to test `a` and if it has no value (or only an undesired falsy value) provide a backup default value (`"hello"`).
 
 **Be careful**, though!
 
@@ -1085,7 +1091,7 @@ The `a = a || "hello"` idiom (sometimes said to be JavaScript's version of the "
 foo( "That's it!", "" ); // "That's it! world" <-- Oops!
 ```
 
-See the problem? `""` as the second argument is a falsy value (see `ToBoolean` earlier in this chapter), so the `b = b || "world"` test fails, and the `"world"` default value is substituted.
+See the problem? `""` as the second argument is a falsy value (see `ToBoolean` earlier in this chapter), so the `b = b || "world"` test fails, and the `"world"` default value is substituted, even though the intent probably was to have the explicitly passed `""` be the used `b` value.
 
 This `||` idiom is extremely common, and quite helpful, but you have to use it only in cases where *all falsy values* should be skipped. Otherwise, you'll need to be more explicit in your test, and probably use a `? :` ternary instead.
 
@@ -1127,7 +1133,7 @@ if (a && (b || c)) {
 }
 ```
 
-This code still works the way you always thought it did, except for one subtle extra detail. The `a && (b || c)` expression *actually* results in `"foo"`, not `true`. So, the `if` statement forces the `"foo"` value to coerce to a `boolean`, which of course will be `true`.
+This code still works the way you always thought it did, except for one subtle extra detail. The `a && (b || c)` expression *actually* results in `"foo"`, not `true`. So, the `if` statement *then* forces the `"foo"` value to coerce to a `boolean`, which of course will be `true`.
 
 See? No reason to panic. Your code is probably still safe. But, now you know more about how it does what it does.
 
