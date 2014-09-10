@@ -1550,9 +1550,11 @@ As we discussed earlier with empty `""`, `"\n"` (or `" "` or any other whitespac
 
 Really the only other reasonable `number` value that empty strings or whitespace strings could coerce to is the `NaN`. But would that *really* be better? The comparison `" " == NaN` would of course fail, but it's unclear that we'd have really *fixed* any of the underlying concerns.
 
-Type conversions **always** have corner cases, in any language -- nothing specifically to do with coercion. The issues here are about second-guessing a certain set of corner cases, but that's not a salient argument against the greater coercion mechanism. The chances that a real-world JS program fails because `0 == "\n"` are awfully rare, and such corner cases are easy to avoid.
+The chances that a real-world JS program fails because `0 == "\n"` are awfully rare, and such corner cases are easy to avoid.
 
-Bottom line: almost any crazy coercion between *normal values* (not intentionally tricky `valueOf()` or `toString()` hacks as earlier) will boil down to the short seven-item list of gotcha coercions we've identified above.
+Type conversions **always** have corner cases, in any language -- nothing specific to coercion. The issues here are about second-guessing a certain set of corner cases (and perhaps rightly so!?), but that's not a salient argument against the overall coercion mechanism.
+
+Bottom line: almost any crazy coercion between *normal values* that you're likely to run into (aside from intentionally tricky `valueOf()` or `toString()` hacks as earlier) will boil down to the short seven-item list of gotcha coercions we've identified above.
 
 To contrast against these 24 likely suspects for coercion gotchas, consider another list like this:
 
