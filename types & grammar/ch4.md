@@ -1538,7 +1538,7 @@ But what exactly *should* these `string` coercions result in? I can't really thi
 
 You could rightly make the case that since `String(null)` becomes `"null"`, then `String([null])` should also become `"null"`. That's a reasonable assertion. So, that's the real culprit.
 
-*Implicit coercion* itself isn't the evil, here. Even an *explicit coercion* of `[null]` to a `string` results in `""`. What's at odds is whether it's sensible at all for `array` values to stringify to the equivalent of their contents, and exactly how that happens. So, direct your frustration at the rules for `String( [..] )`, because that's where the craziness stems from.
+*Implicit coercion* itself isn't the evil, here. Even an *explicit coercion* of `[null]` to a `string` results in `""`. What's at odds is whether it's sensible at all for `array` values to stringify to the equivalent of their contents, and exactly how that happens. So, direct your frustration at the rules for `String( [..] )`, because that's where the craziness stems from. Perhaps there should be no stringification coercion of `array`s at all? But that would have lots of other downsides in other parts of the language.
 
 Another famously cited gotcha:
 
@@ -1546,9 +1546,11 @@ Another famously cited gotcha:
 0 == "\n";		// true
 ```
 
-As we discussed earlier with empty `""`, `"\n"` (or `"    "` or any other whitespace combination) is coerced via `ToNumber`, and the result is `0`. What other `number` value would you expect whitespace to coerce to? Does it bother you that *explicit* `Number("  ")` yields `0`? Really the only other reasonable `number` value that empty strings or whitespace strings could coerce to is the `NaN`. But would that *really* be better?
+As we discussed earlier with empty `""`, `"\n"` (or `" "` or any other whitespace combination) is coerced via `ToNumber`, and the result is `0`. What other `number` value would you expect whitespace to coerce to? Does it bother you that *explicit* `Number(" ")` yields `0`?
 
-`NaN` values are never equal, so in that case both sides of `" " == [" "]` would be `NaN`, and the comparison would fail (though most would expect it to pass). The `NaN` alternative to `0` coercion of empty or whitespace `string`s seems worse and *even more likely* to confuse.
+Really the only other reasonable `number` value that empty strings or whitespace strings could coerce to is the `NaN`. But would that *really* be better? The comparison `" " == NaN` would of course fail, but it's unclear that we'd have really *fixed* any of the underlying concerns.
+
+Type conversions **always** have corner cases, in any language -- nothing specifically to do with coercion. The issues here are about second-guessing a certain set of corner cases, but that's not a salient argument against the greater coercion mechanism. The chances that a real-world JS program fails because `0 == "\n"` are awfully rare, and such corner cases are easy to avoid.
 
 Bottom line: almost any crazy coercion between *normal values* (not intentionally tricky `valueOf()` or `toString()` hacks as earlier) will boil down to the short seven-item list of gotcha coercions we've identified above.
 
