@@ -1419,7 +1419,7 @@ var f = Object( e );	// same as `new Number( e )`
 e == f;					// false
 ```
 
-### (Crazy) Edge Cases
+### Edge Cases
 
 Now that we've thoroughly examined how the *implicit coercion* of `==` loose equality works (in both sensible and surprising ways), let's try to call out the worst, craziest corner-cases so we can see what we need to avoid to not get bitten with coercion bugs.
 
