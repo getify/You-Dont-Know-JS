@@ -549,7 +549,7 @@ In the "32-bit (Signed) Integers" section of Chapter 2, we covered how bitwise o
 
 While not *technically* coercion itself (since the type doesn't change!), using bitwise operators (like `|` or `~`) with certain special `number` values produces a coercive effect that results in a different `number` value.
 
-For example, let's first consider the no-op `|` "bitwise OR" operator, which (as Chapter 2 showed) essentially only does the `ToInt32` conversion:
+For example, let's first consider the `|` "bitwise OR" operator used in the otherwise no-op idiom `0 | x`, which (as Chapter 2 showed) essentially only does the `ToInt32` conversion:
 
 ```js
 0 | -0;			// 0
