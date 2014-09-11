@@ -460,7 +460,7 @@ The range then is `Math.pow(-2,31)` (`-2147483648`, about -2.1 billion) up to `M
 
 To force a number value in `a` to a 32-bit signed integer value, use `a | 0`. This works because the `|` bitwise operator only works for 32-bit integer values (meaning it can only pay attention to 32 bits and any other bits will be lost). Then, "or'ing" with zero is essentially a no-op bitwise speaking.
 
-**Note:** Certain special values (which will cover in the next section) such as `NaN` and `Infinity` are not "32-bit safe", in that those values when passed to a bitwise operator will pass through the abstract operation `ToInt32` (see Chapter 4) and come out as simply the `+0` value.
+**Note:** Certain special values (which we will cover in the next section) such as `NaN` and `Infinity` are not "32-bit safe", in that those values when passed to a bitwise operator will pass through the abstract operation `ToInt32` (see Chapter 4) and come out as simply the `+0` value.
 
 ## Special Values
 
