@@ -578,7 +578,7 @@ Let's try again: `~x` is roughly the same as `-(x+1)`. That's weird, but slightl
 
 You're probably still wondering what the heck all this `~` stuff is about, or why it really matters for a coercion discussion. Let's quickly get to the point.
 
-Consider `-(x+1)`. What's the only value that can you can perform that operation on which will produce a `0` (or `-0` technically!) result? `-1`. In other words, `~` used with a range of `number` values will produce a falsy (easily coercible to `false`) `-0` value for the `-1` input value, and any other truthy `number` otherwise.
+Consider `-(x+1)`. What's the only value that can you can perform that operation on which will produce a `0` (or `-0` technically!) result? `-1`. In other words, `~` used with a range of `number` values will produce a falsy (easily coercible to `false`) `0` value for the `-1` input value, and any other truthy `number` otherwise.
 
 Why is that relevant?
 
@@ -591,50 +591,77 @@ It's pretty common to try to use `indexOf(..)` not just as an operation to get t
 ```js
 var a = "Hello World";
 
-if (a.indexOf( "lo" ) >= 0) {
+if (a.indexOf( "lo" ) >= 0) {	// true
 	// found it!
 }
-if (a.indexOf( "lo" ) != -1) {
+if (a.indexOf( "lo" ) != -1) {	// true
 	// found it
 }
 
-if (a.indexOf( "ol" ) < 0) {
+if (a.indexOf( "ol" ) < 0) {	// true
 	// not found!
 }
-if (a.indexOf( "ol" ) == -1) {
+if (a.indexOf( "ol" ) == -1) {	// true
 	// not found!
 }
 ```
 
 I find that kind of gross to look at `>= 0` or `== -1`. It's basically a "leaky abstraction", in that it's leaking underlying implementation behavior -- the usage of sentinel `-1` for "failure" -- into my code. I would prefer to hide such a detail.
 
-And now, finally, we see why `~` could help us! Using `~` with `indexOf()` "coerces" (actually just transforms) the value to be appropriately `boolean`-coercible:
+And now, finally, we see why `~` could help us! Using `~` with `indexOf()` "coerces" (actually just transforms) the value **to be appropriately `boolean`-coercible**:
 
 ```js
 var a = "Hello World";
 
-if (~a.indexOf( "lo" )) {
+~a.indexOf( "lo" );			// -4   <-- truthy!
+
+if (~a.indexOf( "lo" )) {	// true
 	// found it!
 }
 
-if (!~a.indexOf( "ol" )) {
+~a.indexOf( "ol" );			// 0    <-- falsy!
+!~a.indexOf( "ol" );		// true
+
+if (!~a.indexOf( "ol" )) {	// true
 	// not found!
 }
 ```
 
-`~` takes the return value of `indexOf(..)` and performs the `-(x+1)` operation on it, which makes the "failure" `-1` into the falsy `-0`, and any values from `0` and above into truthy values.
+`~` takes the return value of `indexOf(..)` and transforms it: for the "failure" `-1` we get the falsy `0`, and every other value is truthy.
 
-Technically, `if (~a.indexOf(..))` is relying on *implicit coercion* of `-0` to `false` or `1` and above to `true`. But, overall, `~` feels more like an *explicit coercion* mechanism, as long as you know what it's intended to do in this idiom.
+**Note:** The `-(x+1)` pseudo-algorithm for `~` would imply that `~-1` is `-0`, but actually it produces `0` because the underlying operation is actually bitwise, not mathematic.
+
+Technically, `if (~a.indexOf(..))` is relying on *implicit coercion* of `0` to `false` or non-zero to `true`. But, overall, `~` still feels more like an *explicit coercion* mechanism, as long as you know what it's intended to do in this idiom.
 
 I find this to be much cleaner code than the previous `>= 0` / `== -1` clutter.
 
-But there's one more place `~` may show up in code you run accross: we can use `~~` in front of a value to produce the same effect as calling `Math.floor(..)`, which is that we "round-toward-zero" a floating point value.
+##### Truncating Bits
+
+There's one more place `~` may show up in code you run accross: some developers use `~~` to truncate the decimal part of a `number` (aka "coerce" it to an integer). It's commonly though mistakingly said this is the same effect as calling `Math.floor(..)`.
 
 How it works is that `~~` first "coerces" (via `ToInt32`) including the bitwise flip, but the second `~` does another bitwise flip, which ends up flipping all the bits back to the original state, leaving only the `ToInt32` "coercion" as the end result.
 
 **Note:** The double-flip of `~~` is basically identical to the double-negate `!!` behavior -- see below.
 
-However, while you'll see `~~x` from time to time in performance-optimized JS, it seems like a wasteful way to go about `Math.floor(x)`, because `x | 0` would do exactly the same thing but with seemingly *less effort*.
+However, `~~` needs some caution/clarification. First, it only works reliably on 32-bit values. But more importantly, it doesn't work the same on negative numbers as `Math.round(..)` does!
+
+```js
+Math.round( -49.6 );	// -50
+~~-49.6;				// -49
+```
+
+Setting the `Math.floor(..)` difference aside, `~~x` can truncate to a (32-bit) integer. But so does `x | 0`, and seemingly with (slightly) *less effort*.
+
+So, why might you choose `~~x` over `x | 0`, then? Operator precedence (see Chapter 5):
+
+```js
+~~1E20 / 10;		// 166199296
+
+1E20 | 0 / 10;		// 1661992960
+(1E20 | 0) / 10;	// 166199296
+```
+
+Just as with all other advice here, use `~` and `~~` as explicit mechanisms for "coercion" and value transformation only if everyone who reads/writes such code is properly aware of how these operators work!
 
 ### Explicitly: Parsing Numeric Strings
 
