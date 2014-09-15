@@ -17,25 +17,23 @@ a[0] === 1;		// true
 a[2][0] === 3;	// true
 ```
 
-You don't need to pre-size your arrays (see "Arrays" in Chapter 3), you can just declare them and add or remove values as you see fit:
+You don't need to pre-size your arrays (see "Arrays" in Chapter 3), you can just declare them and add values as you see fit:
 
 ```js
 var a = [ ];
+
+a.length;	// 0
 
 a[0] = 1;
 a[1] = "2";
 a[2] = [ 3 ];
 
 a.length;	// 3
-
-delete a[2];
-
-a.length;	// 2
 ```
 
-**Note:** We'll cover the `delete` operator itself in more detail in Chapter 5, but for now, it's enough to know that it just removes a property from an `object`, or as in this case, a slot from an `array`.
+**Note:** Using `delete` on an `array` value will remove that slot from the `array`, but even if you remove the final element, it does **not** update the `length` property, so be careful! We'll cover the `delete` operator itself in more detail in Chapter 5.
 
-Be careful about assigning slots to an array in a "sparse" way:
+Be careful about creating "sparse" `array`s (leaving or creating empty/missing slots):
 
 ```js
 var a = [ ];
