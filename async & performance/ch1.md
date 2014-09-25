@@ -29,6 +29,35 @@ But the one common "thread" (that's a not-so-subtle asynchronous joke, btw) of a
 
 In other words, the JS engine has had no inate sense of *time*, but has instead been an on-demand execution environment for any arbitrary snippet of JS. It's the surrouding environment which has always *scheduled* "events" (JS code executions).
 
-So, for example, when your JS program makes an Ajax request to fetch some data from a server, you set up the "response" code in a function (commonly called a "callback"), and the JS engine tells the hosting environment basically, "hey, I'm going to suspend execution for now, but whenever you finish with that network request, and you have some data, please *call back* to this function."
+So, for example, when your JS program makes an Ajax request to fetch some data from a server, you set up the "response" code in a function (commonly called a "callback"), and the JS engine tells the hosting environment basically, "hey, I'm going to suspend execution for now, but whenever you finish with that network request, and you have some data, please *call-back* to this function."
 
 The browser then is set up to listen for the response from the network, and when it has something to give you, it schedules the callback function to be executed by inserting it into the *event loop*.
+
+So what is the *event loop*?
+
+Let's conceptualize it first through some fake'ish code:
+
+```js
+// `eventLoop` is an array that acts as a queue (first-in-first-out)
+var eventLoop = [ ];
+var event;
+
+// keep going "forever"
+while (true) {
+	// perform a "tick"
+	if (eventLoop.length > 0) {
+		// get the next event in the queue
+		event = eventLoop.shift();
+
+		// now, execute the next event
+		try {
+			event();
+		}
+		catch (err) {
+			reportError(err);
+		}
+	}
+}
+```
+
+This is of course vastly simplified code to illustrate the concepts. As you can see, there's a continuously running loop represented by the `while` loop, and each iteration of this loop is called a "tick".
