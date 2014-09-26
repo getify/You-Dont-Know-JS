@@ -9,6 +9,6 @@
 [Table of Contents](toc.md)
 
 * [Preface](../preface.md)
-* [Chapter 1: // TODO](ch1.md)
+* [Chapter 1: Asynchrony: Now & Later](ch1.md)
 * [Appendix A: // TODO](apA.md)
 * [Appendix B: Thank You's!](apB.md)
