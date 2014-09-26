@@ -1,5 +1,5 @@
 # You Don't Know JS: Async & Performance
-# Chapter 1: Asynchrony
+# Chapter 1: Asynchrony: Now & Later
 
 One of the most important and yet often misunderstood parts of programming in a language like JavaScript is understanding how to express and manipulate program behavior spread out over a period of time.
 
@@ -17,13 +17,61 @@ While this all may seem rather abstract right now, I assure you we're tackle it 
 
 But before we can get there, we're going to have to understand much more deeply what asynchrony is and how it operates in JS.
 
+## A Program In Chunks
+
+You may write your JS program in one .js file, but your program is almost certainly comprised of several chunks, only one of which is going to execute *now*, and the rest of which will execute *later*. The most common unit of *chunk* is the `function`.
+
+For example, consider this code:
+
+```js
+function now() {
+	return 21;
+}
+
+function later() {
+	a = a * 2;
+	console.log( "Meaning of life:", a );
+}
+
+var answer = now();
+
+setTimeout( later, 1000 ); // Meaning of life: 42
+```
+
+There are two chunks to this program: the stuff that will run *now*, and the stuff that will run *later*. It should be fairly obvious what those two chunks are, but let's be super explicit:
+
+Now:
+```js
+function now() {
+	return 21;
+}
+
+function later() { .. }
+
+var answer = now();
+
+setTimeout( later, 1000 );
+```
+
+Later:
+```js
+a = a * 2;
+console.log( "Meaning of life:", a );
+```
+
+The *now* chunk runs right away, as soon as you execute your program. But `setTimeout(..)` also sets up an event (a timeout) to happen *later*, so the contents of the `later()` function will be executed at a later time (1000 milliseconds from now).
+
+Any time you wrap a portion of code into a `function` and specify that it should be executed in response to some event (timer, mouse click, Ajax response, etc), you are creating a *later* chunk of your code, and thus introducing asynchrony to your program.
+
 ## Event Loop
 
-Let's start off with the first (perhaps shocking) claim: up until recently (ES6), JavaScript itself has actually never had any direct notion of asynchrony built into it.
+Let's make a (perhaps shocking) claim: despite you clearly being able to write asynchronous JS code (like the timeout above), up until recently (ES6), JavaScript itself has actually never had any direct notion of asynchrony built into it.
 
-**What!?** That seems like a crazy claim, right? In fact, it's quite true. The JS engine itself has never done anything more than execute a single section of your program at any given moment, when asked to.
+**What!?** That seems like a crazy claim, right? In fact, it's quite true. The JS engine itself has never done anything more than execute a single chunk of your program at any given moment, when asked to.
 
-"Asked to." By whom? That's the important part. The JS engine doesn't run in isolation. It runs inside a *hosting environment*, which is for most developers the typical web browser. Over the last several years (but by no means exlusively), JS has expanded beyond the browser into other environments, such as servers, via things like node.js. In fact, JavaScript gets embedded into all kinds of devices these days, from robots to lightbulbs.
+"Asked to." By whom? That's the important part!
+
+The JS engine doesn't run in isolation. It runs inside a *hosting environment*, which is for most developers the typical web browser. Over the last several years (but by no means exlusively), JS has expanded beyond the browser into other environments, such as servers, via things like node.js. In fact, JavaScript gets embedded into all kinds of devices these days, from robots to lightbulbs.
 
 But the one common "thread" (that's a not-so-subtle asynchronous joke, btw) of all these environments is that they have a mechanism in them that handles executing multiple chunks of your program *over time*, at each moment invoking the JS engine, called the "event loop".
 
@@ -38,7 +86,7 @@ So what is the *event loop*?
 Let's conceptualize it first through some fake'ish code:
 
 ```js
-// `eventLoop` is an array that acts as a queue (first-in-first-out)
+// `eventLoop` is an array that acts as a queue (first-in, first-out)
 var eventLoop = [ ];
 var event;
 
