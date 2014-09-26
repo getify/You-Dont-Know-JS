@@ -108,4 +108,18 @@ while (true) {
 }
 ```
 
-This is of course vastly simplified code to illustrate the concepts. As you can see, there's a continuously running loop represented by the `while` loop, and each iteration of this loop is called a "tick".
+This is of course vastly simplified pseduo-code to illustrate the concepts. But it should be enough to help get a better understanding.
+
+As you can see, there's a continuously running loop represented by the `while` loop, and each iteration of this loop is called a "tick". For each tick, if an event is waiting on the queue, it's taken off and executed. These events are your function callbacks.
+
+It's important to note that `setTimeout(..)` doesn't put your callback on the event loop queue. What it does is set up a timer that once that fires, will insert your callback into the event loop, such that some future tick will pick it up and execute it.
+
+What if there's already 20 items in the event loop at that moment? Your callback waits. It gets in line behind the others -- there's not normally a path to pre-empting the queue and skipping ahead in line.
+
+## Summary
+
+A JavaScript program is always broken up into two or more chunks, where the first chunk runs *now* and the next chunk runs *later*, in response to an event. Even though the program is executed chunk-by-chunk, all of them share the same access to the program scope and state, so each modification to state is made on top of the previous state.
+
+The *event loop* spins continuously, with each iteration ("tick") handling whatever the next waiting event on the queue is, if any.
+
+At any given moment, only one event can be processed from the queue at a time. While an event is executing, it can cause one or more subsequent events to be scheduled (added onto the event queue).
