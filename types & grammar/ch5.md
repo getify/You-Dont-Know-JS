@@ -914,7 +914,7 @@ My take: **use semicolons wherever you know they are "required", and limit your 
 
 Not only does JavaScript have different *sub-types* of errors (`TypeError`, `ReferenceError`, `SyntaxError`, etc), but also the grammar defines certain errors to be enforced at compile time, as compared to all other errors which happen during run-time.
 
-In particular, there have long been a number of specific conditions which should be caught and reported as "early errors" (during compilation). Any straight-up syntax error is an early error, like `a = ,`, but also the grammar defines things which are syntactically valid but disallowed nonetheless.
+In particular, there have long been a number of specific conditions which should be caught and reported as "early errors" (during compilation). Any straight-up syntax error is an early error (e.g., `a = ,`), but also the grammar defines things which are syntactically valid but disallowed nonetheless.
 
 Since execution of your code has not begun yet, these errors are not catchable with `try..catch`, they will just fail the parsing/compilation of your program.
 
