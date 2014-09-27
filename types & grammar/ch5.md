@@ -206,7 +206,7 @@ obj.a;			// undefined
 
 The result value of the `delete` operator is `true` if the requested operation is valid/allowable, or `false` otherwise. But the side-effect of the operator is that it removes the property (or array slot).
 
-**Note:** What do we mean by valid/allowable? Non-existent properties, or properties which exist but are non-configurable (see the *"this & Object Prototypes"* title of this series, Chapter 3) will return `true` from the `delete` operator. `false` (or an error!) will result otherwise.
+**Note:** What do we mean by valid/allowable? Non-existent properties, or properties which exist and are configurable (see the *"this & Object Prototypes"* title of this series, Chapter 3) will return `true` from the `delete` operator. `false` (or an error!) will result otherwise.
 
 One last example of a side-effecting operator, which may at once be both obvious and non-obvious, is the `=` assignment operator.
 

@@ -1515,7 +1515,7 @@ The `[ 42 ]` value has its `ToPrimitive` abstract operation called (see earlier 
 
 **Note:** All the quirks of the `ToPrimitive` abstract operation that we discussed earlier in this chapter (`toString()`, `valueOf()`) apply here as you'd expect. This can be quite useful if you have a complex data structure that you want to define a custom `valueOf()` method on, to provide a simple value for equality comparison purposes.
 
-In Chapter 3, we covered "unboxing", where an `object` wrapper around a primitive value (like from `new String("abc")`, for instance) is unwrapped, and the underlying primitive value (`"abce"`) is returned. This behavior is related to the `ToPrimitive` coercion in the `==` algorithm:
+In Chapter 3, we covered "unboxing", where an `object` wrapper around a primitive value (like from `new String("abc")`, for instance) is unwrapped, and the underlying primitive value (`"abc"`) is returned. This behavior is related to the `ToPrimitive` coercion in the `==` algorithm:
 
 ```js
 var a = "abc";
