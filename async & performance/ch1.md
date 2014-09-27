@@ -29,8 +29,8 @@ function now() {
 }
 
 function later() {
-	a = a * 2;
-	console.log( "Meaning of life:", a );
+	answer = answer * 2;
+	console.log( "Meaning of life:", answer );
 }
 
 var answer = now();
@@ -55,8 +55,8 @@ setTimeout( later, 1000 );
 
 Later:
 ```js
-a = a * 2;
-console.log( "Meaning of life:", a );
+answer = answer * 2;
+console.log( "Meaning of life:", answer );
 ```
 
 The *now* chunk runs right away, as soon as you execute your program. But `setTimeout(..)` also sets up an event (a timeout) to happen *later*, so the contents of the `later()` function will be executed at a later time (1000 milliseconds from now).
@@ -130,12 +130,12 @@ For example:
 
 ```js
 function later() {
-	a = a * 2;
-	console.log( "Meaning of life:", a );
+	answer = answer * 2;
+	console.log( "Meaning of life:", answer );
 }
 ```
 
-While the contents of that function would be regarded as a single event loop queue entry, when thinking about the thread this code would run on, there's actually perhaps a dozen different low level operations. For example, `a = a * 2` requires first loading the current value of `a`, then putting `2` somewhere, then performing the multiplication, then taking the result and storing it back into `a`.
+While the contents of that function would be regarded as a single event loop queue entry, when thinking about the thread this code would run on, there's actually perhaps a dozen different low level operations. For example, `answer = answer * 2` requires first loading the current value of `answer`, then putting `2` somewhere, then performing the multiplication, then taking the result and storing it back into `answer`.
 
 In a single-threaded environment, it really doesn't matter how low level the items in the thread queue are, because nothing can interrupt the thread. But if you have a parallel system, where two different threads were operating in the same program, you could very easily see problems.
 
@@ -302,13 +302,13 @@ a; // 183
 b; // 180
 ```
 
-Two outcomes from the same code means we still have non-determinism! But it's at the function ordering level, rather than at the statement ordering level (or, in fact, the expression operation ordering level) as it is with threads.
+Two outcomes from the same code means we still have non-determinism! But it's at the function ordering level, rather than at the statement ordering level (or, in fact, the expression operation ordering level) as it is with threads. In other words, it's much *more deterministic* than threads would have been.
 
 If there was a function in JS which did not have the run-to-completion behavior, all such bets would be off, right? It turns out ES6 introduces just such a thing (see Chapter ? for Generators), but don't worry right now, we'll come back to that!
 
 ## Summary
 
-A JavaScript program is always broken up into two or more chunks, where the first chunk runs *now* and the next chunk runs *later*, in response to an event. Even though the program is executed chunk-by-chunk, all of them share the same access to the program scope and state, so each modification to state is made on top of the previous state.
+A JavaScript program is (practically) always broken up into two or more chunks, where the first chunk runs *now* and the next chunk runs *later*, in response to an event. Even though the program is executed chunk-by-chunk, all of them share the same access to the program scope and state, so each modification to state is made on top of the previous state.
 
 The *event loop* spins continuously, with each iteration ("tick") handling whatever the next waiting event on the queue is, if any.
 
