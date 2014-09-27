@@ -135,11 +135,11 @@ function later() {
 }
 ```
 
-While the contents of that function would be regarded as a single event loop queue entry, when thinking about the thread this code would run on, there's actually perhaps a dozen different low level operations. For example, `answer = answer * 2` requires first loading the current value of `answer`, then putting `2` somewhere, then performing the multiplication, then taking the result and storing it back into `answer`.
+While the entire contents of `later()` would be regarded as a single event loop queue entry, when thinking about a thread this code would run on, there's actually perhaps a dozen different low level operations. For example, `answer = answer * 2` requires first loading the current value of `answer`, then putting `2` somewhere, then performing the multiplication, then taking the result and storing it back into `answer`.
 
-In a single-threaded environment, it really doesn't matter how low level the items in the thread queue are, because nothing can interrupt the thread. But if you have a parallel system, where two different threads were operating in the same program, you could very easily see problems.
+In a single-threaded environment, it really doesn't matter how low level the items in the thread queue are, because nothing can interrupt the thread. But if you have a parallel system, where two different threads are operating in the same program, you could very easily see problems.
 
-Consider, for example:
+Consider:
 
 ```js
 var a = 20;
@@ -159,7 +159,7 @@ ajax( "..url 2..", bar );
 
 At a high level, it's easy to see that if `foo()` runs before `bar()`, the result will be that `a` has `42`, but if `bar()` runs before `foo()` the result in `a` will be `41`.
 
-With threaded programming, though, the problems are much more subtle. Consider these two lists of pseduo-code tasks as the threads that could respectively run `foo()` and `bar()`, and consider what happens if they are running at exactly the same time:
+With threaded programming, though, the problems are much more subtle. Consider these two lists of pseduo-code tasks as the threads that could respectively run the code in `foo()` and `bar()`, and consider what happens if they are running at exactly the same time:
 
 Thread 1:
 ```
@@ -181,7 +181,7 @@ bar():
 
 Now, let's say that the two threads are running truly in parallel. You can probably spot the problem, right? They use shared memory locations `X` and `Y` for their temporary steps.
 
-What's the end result in `a` if things happen like this?
+What's the end result in `a` if the steps happen like this?
 
 ```
 1a
@@ -240,7 +240,7 @@ ajax( "..url 2..", bar );
 
 Since `foo()` can't be interrupted by `bar()`, nor can `bar()` be interruptd by `foo()`, this program only has two possible outcomes depending only on which starts running first.
 
-Asynchrony means that these three chunks are going to happen separated by gaps of time. Furthermore, chunk 1 will always happen first, but chunks 2 and 3 may happen in either-first order:
+Asynchrony means that these three chunks are going to happen separated by gaps of time:
 
 Chunk 1:
 ```js
@@ -262,7 +262,7 @@ a = 8 + b;
 b = a * 2;
 ```
 
-So, there are two possible outcomes for this program, as illustrated here:
+Chunk 1 will always happen first, but chunks 2 and 3 may happen in either-first order, so there are two possible outcomes for this program, as illustrated here:
 
 Outcome 1:
 ```js
