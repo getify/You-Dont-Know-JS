@@ -32,7 +32,7 @@ In other words, these items are "required" of browsers (to be compatible with ea
 * `RegExp` extensions: `RegExp.$1` .. `RegExp.$9` (match-groups) and `RegExp.lastMatch` / `RegExp["$&"]` (most recent match).
 * `Function.prototype` additions: `Function.prototype.arguments` (aliases internal `arguments` object), `Function.caller` (aliases internal `arguments.caller`). **Note:** `arguments` and thus `arguments.caller` are deprecated, so you should avoid using them if possible. That goes doubly so for these aliases; don't use them!
 
-**Note:** Some other minor and rarely used deviations are not included in our list here. See "Annex B" and "Web ECMAScript" for more detailed information as needed.
+**Note:** Some other minor and rarely used deviations are not included in our list here. See the external "Annex B" and "Web ECMAScript" documents for more detailed information as needed.
 
 Generally speaking, all these differences are rarely used, so the deviations from the specification are not significant concerns. **Just be careful** if you rely on any of them.
 
