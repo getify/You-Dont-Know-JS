@@ -27,7 +27,7 @@ In this snippet, `3 * 6` is obviously an expression (which  evaluates to `18`). 
 
 Moreover, each of the three lines are statements containing those expressions. `var a = 3 * 6` and `var b = a` are called "declaration statements" because, obviously, they each declare a variable (and optionally, as here, assign a value to it).
 
-The third line contains just the expression `b`, but it's also a statment all by itself (though not a terribly interesting one!). As such, this is generally referred to as an "expression statement".
+The third line contains just the expression `b`, but it's also a statement all by itself (though not a terribly interesting one!). As such, this is generally referred to as an "expression statement".
 
 ### Statement Completion Values
 
