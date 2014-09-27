@@ -1221,7 +1221,7 @@ This `||` idiom is extremely common, and quite helpful, but you have to use it o
 
 This *default value assignment* idiom is so common (and useful!), even those who publicly and vehemently decry JavaScript coercion still often use it in their own code!
 
-What about `&&`? There's another idiom, which is quite a bit less common to see manually authored, but which is used by JS minifiers quite frequently. Since the `&&` operator "selects" the second operand if and only if the first operand tests as truthy, it's sometimes called the "guard operator":
+What about `&&`? There's another idiom, which is quite a bit less common to see manually authored, but which is used by JS minifiers quite frequently. Since the `&&` operator "selects" the second operand if and only if the first operand tests as truthy, it's sometimes called the "guard operator" (also see "Short-Circuited" in Chapter 4):
 
 ```js
 function foo() {
