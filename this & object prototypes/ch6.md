@@ -23,7 +23,7 @@ To properly focus our thoughts on how to use `[[Prototype]]` in the most straigh
 
 We need to try to change our thinking from the class/inheritance design pattern to the behavior delegation design pattern. If you have done most or all of your programming in your education/career thinking in classes, this may be uncomfortable or feel unnatural. You may need to try this mental exercise quite a few times to get the hang of this very different way of thinking.
 
-I'm going to walk you though some theoretical exercises first, then we'll look side-by-side at a more concrete example to give you practical context for your own code.
+I'm going to walk you through some theoretical exercises first, then we'll look side-by-side at a more concrete example to give you practical context for your own code.
 
 ### Class Theory
 
