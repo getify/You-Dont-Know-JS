@@ -5,7 +5,7 @@ One of the most important and yet often misunderstood parts of programming in a 
 
 This is not just about what happens from the beginning of a `for` loop to the end of a `for` loop, which of course takes *some time* (microseconds to milliseconds) to complete. It's about what happens when part of your program runs *now*, and another part of your program runs *later* -- there's a gap between *now* and *later* where your program isn't actively executing.
 
-Practically all non-trivial programs ever written (especially in JS) have had in some way or another had to manage this gap, whether that be in waiting for user input, requesting data from a database or file system, sending data across the network and waiting for a response, or performing a repeated task at a fixed interval of time (like animation). In all these various ways, your program has to manage state across the gap in time. As they famously say in London (of the subway system): "mind the gap".
+Practically all non-trivial programs ever written (especially in JS) have in some way or another had to manage this gap, whether that be in waiting for user input, requesting data from a database or file system, sending data across the network and waiting for a response, or performing a repeated task at a fixed interval of time (like animation). In all these various ways, your program has to manage state across the gap in time. As they famously say in London (of the subway system): "mind the gap".
 
 In fact, the relationships between the *now* and *later* parts of your program is at the heart of asynchronous programming.
 
@@ -13,7 +13,7 @@ Asynchronous programming has been around since the beginning of JS, for sure. Bu
 
 But as JS continues to grow in both scope and complexity, to meet the ever widening demands of a first-class programming language that runs in browsers and servers and every conceivable device in between, the pains by which we manage asynchrony are becoming increasingly crippling, and they cry out for approaches that are both more capable and more reason-able.
 
-While this all may seem rather abstract right now, I assure you we're tackle it more completely and concretely as we go on through this book. We'll explore a variety of emerging techniques for async JavaScript programming over the next several chapters.
+While this all may seem rather abstract right now, I assure you we'll tackle it more completely and concretely as we go on through this book. We'll explore a variety of emerging techniques for async JavaScript programming over the next several chapters.
 
 But before we can get there, we're going to have to understand much more deeply what asynchrony is and how it operates in JS.
 
@@ -213,7 +213,7 @@ So, this may have already been obvious to you, but threaded programming can be v
 
 ### Run-to-completion
 
-Because JavaScript is single-threaded, you cannot suffer from that level of non-determinisim. The code inside of `foo()` (and `bar()`) is atomic, which means that once `foo()` starts running, the entirety of its code will finish before any of the code in `bar()` can run, or vice versa. This is what we call "run-to-completion" behavior.
+Because JavaScript is single-threaded, you cannot suffer from *that* level of non-determinisim. The code inside of `foo()` (and `bar()`) is atomic, which means that once `foo()` starts running, the entirety of its code will finish before any of the code in `bar()` can run, or vice versa. This is what we call "run-to-completion" behavior.
 
 In fact, the run-to-completion semantic is more obvious when `foo()` and `bar()` have more code in them, such as:
 
@@ -302,9 +302,89 @@ a; // 183
 b; // 180
 ```
 
-Two outcomes from the same code means we still have non-determinism! But it's at the function ordering level, rather than at the statement ordering level (or, in fact, the expression operation ordering level) as it is with threads. In other words, it's much *more deterministic* than threads would have been.
+Two outcomes from the same code means we still have non-determinism! But it's at the function (event) ordering level, rather than at the statement ordering level (or, in fact, the expression operation ordering level) as it is with threads. In other words, it's much *more deterministic* than threads would have been.
 
-If there was a function in JS which did not have the run-to-completion behavior, all such bets would be off, right? It turns out ES6 introduces just such a thing (see Chapter ? for Generators), but don't worry right now, we'll come back to that!
+If there was a function in JS which did not have this run-to-completion behavior, all such bets would be off, right? It turns out ES6 introduces just such a thing (see Chapter ? for Generators), but don't worry right now, we'll come back to that!
+
+## Concurrency
+
+Let's imagine a site that displays a list of status updates (like a social network news feed) that progressively loads as the user scrolls down the list. To make such a feature work correctly, (at least) two separate "processes" will need to be executing *simultaneously* (i.e., during the same window of time, but not necessarily at the same instant).
+
+**Note:** We're using "process" in quotes here because they aren't true operating system level processes in the computer science sense. They are virtual processes, or tasks, that represent a logically connected, sequential series of operations. We'll simply prefer "process" over "task" since terminology-wise, it will match the definitions of the concepts we're exploring.
+
+The first "process" will be responding to `onscroll` events as they fire when the user has scrolled the page further down. The second "process" will be making an Ajax request to fetch new data, and receiving the response back to render onto the page.
+
+Obviously, if a user scrolls fast enough, you may see two or more `onscroll` events fired during the time it takes to get the first response back and processes, and thus you're going to have `onscroll` events and Ajax response events firing rapidly, interleaved with each other.
+
+Concurrency is when two or more "processes" are executing simultaneously over the same period, regardless of whether their individual constituent operations happen *in parallel* (at the same instant on separate processors or cores) or not. You can think of concurrency then as "process"-level (or task-level) parallelism, as opposed to operation-level parallelism (separate-processor threads).
+
+**Note:** Concurrency also introduces an optional notion of these "processes" interacting with each other. We will come back to that later.
+
+For a given window of time (a few seconds worth of a user scrolling), let's visualize each independent "process" as a series of events/operations:
+
+"Process" 1 (`onscroll` events):
+```
+onscroll, request 1
+onscroll, request 2
+onscroll, request 3
+onscroll, request 4
+onscroll, request 5
+onscroll, request 6
+onscroll, request 7
+```
+
+"Process" 2 (Ajax response events):
+```
+response 1
+response 2
+response 3
+response 4
+response 5
+response 6
+response 7
+```
+
+It's quite possible that an `onscroll` event and an Ajax response event could be ready to be processed at exactly the same moment. For example let's visualize the above events in a timeline (each line is a subsequent "time slice"):
+
+```
+onscroll, request 1
+onscroll, request 2          response 1
+onscroll, request 3          response 2
+response 3
+onscroll, request 4
+onscroll, request 5
+onscroll, request 6          response 4
+onscroll, request 7
+response 5
+response 6
+response 7
+```
+
+But, going back to our notion of the event loop from eariler in the chapter, JS is only going to be able to handle one event at a time, so either `onscroll, request 2` is going to happen first or `response 1` is going to happen first, but they cannot happen at literally the same moment. Just like kids in the school cafeteria, no matter what crowd they make outside the doors, they will have to merge into a single line to get their food!
+
+So, let's visualize the interleaving of all these events onto the single event loop queue, such as:
+
+Event Loop Queue:
+```
+onscroll, request 1   <--- Process 1 starts
+onscroll, request 2
+response 1            <--- Process 2 starts
+onscroll, request 3
+response 2
+response 3
+onscroll, request 4
+onscroll, request 5
+onscroll, request 6
+response 4
+onscroll, request 7   <--- Process 1 finishes
+response 5
+response 6
+response 7            <--- Process 2 finishes
+```
+
+"Process 1" and "Process 2" run concurrently (task-level parallel), but their individual events run sequentially on the event loop queue.
+
+Another way of looking at this is that the single-threaded event loop is one form of concurrency (there are certainly others, some of which we'll come back to later!).
 
 ## Summary
 

@@ -7,6 +7,7 @@
 	* A Program In Chunks
 	* Event Loop
 	* Parallel Threading
+	* Concurrency
 * Appendix A: // TODO
 * Appendix B: Thank You's!
 
