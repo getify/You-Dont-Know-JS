@@ -304,7 +304,9 @@ b; // 180
 
 Two outcomes from the same code means we still have non-determinism! But it's at the function (event) ordering level, rather than at the statement ordering level (or, in fact, the expression operation ordering level) as it is with threads. In other words, it's much *more deterministic* than threads would have been.
 
-If there was a function in JS which did not have this run-to-completion behavior, all such bets would be off, right? It turns out ES6 introduces just such a thing (see Chapter ? for Generators), but don't worry right now, we'll come back to that!
+As applied to JavaScript's behavior, this function-ordering non-determinism is the common term "race condition", as `foo()` and `bar()` are racing against each other to see which runs first.
+
+If there was a function in JS which did not have run-to-completion behavior, all such bets would be off, right? It turns out ES6 introduces just such a thing (see Chapter ? for Generators), but don't worry right now, we'll come back to that!
 
 ## Concurrency
 
@@ -384,7 +386,47 @@ response 7            <--- Process 2 finishes
 
 "Process 1" and "Process 2" run concurrently (task-level parallel), but their individual events run sequentially on the event loop queue.
 
-Another way of looking at this is that the single-threaded event loop is one form of concurrency (there are certainly others, some of which we'll come back to later!).
+Another way of looking at this is that the single-threaded event loop is one expression of concurrency (there are certainly others, which we'll come back to later!).
+
+### Interaction
+
+As two or more "processes" are interleaving their steps/events concurrently within the same program, they don't necessarily need to interact with each other if the tasks are unrelated.
+
+But, often they will interact, indirectly through scope and/or the DOM. When such interaction is going to occur, you will need to orchestrate these interactions to prevent "race conditions" (see above).
+
+For example:
+
+```js
+var res;
+
+function foo(results) {
+	if (!res) {
+		res = {};
+	}
+
+	res.foo = results;
+}
+
+function bar(results) {
+	if (!res) {
+		res = {};
+	}
+
+	res.bar = results;
+}
+
+// ajax(..) is some arbitrary Ajax function given by some library
+ajax( "..url 1..", foo );
+ajax( "..url 2..", bar );
+```
+
+`foo()` and `bar()` are assuming the presence of a single variable `res` that's in scope to both of them. But it's indeterminate whether `foo()` or `bar()` will run first, so they both have to be careful to check for `res` and if it's not yet set, create the initial empty object to add their `results` data onto.
+
+**Note:** While `res` in this example is a global variable, there's nothing about this scenario which requires it. As long as `res` is in a scope that's accessible to both `foo()` and `bar()`, they will have a closure over `res` (see the *"Scope & Closures"* title of this book series) and thus be able to access/modify it.
+
+The same reasoning from this scenario would apply if `foo()` and `bar()` were interacting with each other through the shared DOM, like `foo()` updating the contents of a `<div>` and `bar()` updating the style or attributes of the `<div>` (e.g., to make it the DOM element visible once it has content).
+
+### Cooperation
 
 ## Summary
 
