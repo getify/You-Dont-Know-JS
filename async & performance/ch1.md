@@ -21,6 +21,34 @@ But before we can get there, we're going to have to understand much more deeply 
 
 You may write your JS program in one .js file, but your program is almost certainly comprised of several chunks, only one of which is going to execute *now*, and the rest of which will execute *later*. The most common unit of *chunk* is the `function`.
 
+The problem most developers new to JS seem to have is that *later* doesn't happen strictly and immediately after *now*. In other words, tasks which cannot complete *now* are, by definition, going to complete asynchronously, and thus we will not have blocking behavior as you might intuitively expect or want.
+
+Consider:
+
+```js
+// ajax(..) is some arbitrary Ajax function given by some library
+var data = ajax( "..url 1.." );
+
+console.log( data ); // Oops! `data` generally won't have the Ajax results
+```
+
+You're probably aware that standard Ajax requests don't complete synchronously, which means the `ajax(..)` function does not yet have any value to return back to be assigned to `data` variable. If `ajax(..)` *could* block until the response came back, then the `data = ..` assignment would work fine.
+
+But that's not how we do Ajax. We make an asynchronous Ajax request *now*, and we won't get the results back until *later*.
+
+The simplest (but definitely not only, or necessarily even best!) way of "waiting" from *now* until *later* is to use a function:
+
+```js
+// ajax(..) is some arbitrary Ajax function given by some library
+ajax( "..url 1..", function(data){
+
+	console.log( data ); // Yay, I gots me some `data`!
+
+});
+```
+
+**Note:** You may have heard that it's possible to make synchronous Ajax requests. While that's technically true, you should never, ever do it, under any circumstances, because it locks the browser UI (buttons, menus, scrolling, etc) and prevents any user interaction whatsoever. This is a terrible idea, and should always be avoided. Before you disagree, **no, your desire to avoid callbacks is not justification for blocking, synchronous Ajax**.
+
 For example, consider this code:
 
 ```js
