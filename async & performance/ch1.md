@@ -165,7 +165,7 @@ function later() {
 
 While the entire contents of `later()` would be regarded as a single event loop queue entry, when thinking about a thread this code would run on, there's actually perhaps a dozen different low level operations. For example, `answer = answer * 2` requires first loading the current value of `answer`, then putting `2` somewhere, then performing the multiplication, then taking the result and storing it back into `answer`.
 
-In a single-threaded environment, it really doesn't matter how low level the items in the thread queue are, because nothing can interrupt the thread. But if you have a parallel system, where two different threads are operating in the same program, you could very easily see problems.
+In a single-threaded environment, it really doesn't matter that the items in the thread queue are low-level operations, because nothing can interrupt the thread. But if you have a parallel system, where two different threads are operating in the same program, you could very likely have unpredictable behavior.
 
 Consider:
 
@@ -185,26 +185,26 @@ ajax( "..url 1..", foo );
 ajax( "..url 2..", bar );
 ```
 
-At a high level, it's easy to see that if `foo()` runs before `bar()`, the result will be that `a` has `42`, but if `bar()` runs before `foo()` the result in `a` will be `41`.
+In JavaScript's single-threaded behavior, if `foo()` runs before `bar()`, the result is that `a` has `42`, but if `bar()` runs before `foo()` the result in `a` will be `41`.
 
-With threaded programming, though, the problems are much more subtle. Consider these two lists of pseduo-code tasks as the threads that could respectively run the code in `foo()` and `bar()`, and consider what happens if they are running at exactly the same time:
+If JS had threaded programming, though, the problems would be much more subtle. Consider these two lists of pseduo-code tasks as the threads that could respectively run the code in `foo()` and `bar()`, and consider what happens if they are running at exactly the same time:
 
-Thread 1:
+Thread 1 (`X` and `Y` are temporary memory locations):
 ```
 foo():
-  a. load value of `a` into X
-  b. store 1 into Y
-  c. add X and Y and store that into X
-  d. store the value of X in `a`
+  a. load value of `a` in `X`
+  b. store `1` in `Y`
+  c. add `X` and `Y`, store result in `X`
+  d. store value of `X` in `a`
 ```
 
-Thread 2:
+Thread 2 (`X` and `Y` are temporary memory locations):
 ```
 bar():
-  a. load value of `a` into X
-  b. store 2 into Y
-  c. multiply X and Y and store that into X
-  d. store the value of X in `a`
+  a. load value of `a` in `X`
+  b. store `2` in `Y`
+  c. multiply `X` and `Y`, store result in `X`
+  d. store value of `X` in `a`
 ```
 
 Now, let's say that the two threads are running truly in parallel. You can probably spot the problem, right? They use shared memory locations `X` and `Y` for their temporary steps.
@@ -212,36 +212,38 @@ Now, let's say that the two threads are running truly in parallel. You can proba
 What's the end result in `a` if the steps happen like this?
 
 ```
-1a
-2a
-1b
-2b
-1c
-1d
-2c
-2d
+1a  (load value of `a` in `X`   ==> `20`)
+2a  (load value of `a` in `X`   ==> `20`)
+1b  (store `1` in `Y`   ==> `1`)
+2b  (store `2` in `Y`   ==> `2`)
+1c  (add `X` and `Y`, store result in `X`   ==> `22`)
+1d  (store value of `X` in `a`   ==> `22`)
+2c  (multiply `X` and `Y`, store result in `X`   ==> `44`)
+2d  (store value of `X` in `a`   ==> `44`)
 ```
 
-The result in `a` will be `484`. But what about this ordering?
+The result in `a` will be `44`. But what about this ordering?
 
 ```
-1a
-2a
-2b
-1b
-2c
-1c
-1d
-2d
+1a  (load value of `a` in `X`   ==> `20`)
+2a  (load value of `a` in `X`   ==> `20`)
+2b  (store `2` in `Y`   ==> `2`)
+1b  (store `1` in `Y`   ==> `1`)
+2c  (multiply `X` and `Y`, store result in `X`   ==> `20`)
+1c  (add `X` and `Y`, store result in `X`   ==> `21`)
+1d  (store value of `X` in `a`   ==> `21`)
+2d  (store value of `X` in `a`   ==> `21`)
 ```
 
-The result will now be `40`.
+The result in `a` will be `21`.
 
-So, this may have already been obvious to you, but threaded programming can be very dangerous, because if you don't take special steps to prevent this kind of interruption/interleaving from happening, you can get very surprising, non-deterministic behavior, and that usually leads to headaches for developers.
+So, threaded programming is very tricky, because if you don't take special steps to prevent this kind of interruption/interleaving from happening, you can get very surprising, non-deterministic behavior, and that usually leads to headaches for developers.
+
+JavaScript is single-threaded, which means *that* level of non-determinism isn't a concern. But that doesn't mean JS is always deterministic. Remember above, where the relative ordering of `foo()` and `bar()` produces two different results (`41` or `42`)?
 
 ### Run-to-completion
 
-Because JavaScript is single-threaded, you cannot suffer from *that* level of non-determinisim. The code inside of `foo()` (and `bar()`) is atomic, which means that once `foo()` starts running, the entirety of its code will finish before any of the code in `bar()` can run, or vice versa. This is what we call "run-to-completion" behavior.
+Because of JavaScript's single-threading, the code inside of `foo()` (and `bar()`) is atomic, which means that once `foo()` starts running, the entirety of its code will finish before any of the code in `bar()` can run, or vice versa. This is called "run-to-completion" behavior.
 
 In fact, the run-to-completion semantic is more obvious when `foo()` and `bar()` have more code in them, such as:
 
@@ -266,9 +268,9 @@ ajax( "..url 1..", foo );
 ajax( "..url 2..", bar );
 ```
 
-Since `foo()` can't be interrupted by `bar()`, nor can `bar()` be interruptd by `foo()`, this program only has two possible outcomes depending only on which starts running first.
+Since `foo()` can't be interrupted by `bar()`, nor can `bar()` be interruptd by `foo()`, this program only has two possible outcomes depending on which starts running first -- if threading were present, and the individual statements in `foo()` and `bar()` could be interleaved, the number of possible outcomes would be greatly increased!
 
-Asynchrony means that these three chunks are going to happen separated by gaps of time:
+Chunk 1 is synchronous (happens *now*), but chunks 2 and 3 are asynchronous (happen *later*), which means their execution will be separated by a gap of time.
 
 Chunk 1:
 ```js
@@ -290,7 +292,7 @@ a = 8 + b;
 b = a * 2;
 ```
 
-Chunk 1 will always happen first, but chunks 2 and 3 may happen in either-first order, so there are two possible outcomes for this program, as illustrated here:
+Chunks 2 and 3 may happen in either-first order, so there are two possible outcomes for this program, as illustrated here:
 
 Outcome 1:
 ```js
@@ -330,25 +332,25 @@ a; // 183
 b; // 180
 ```
 
-Two outcomes from the same code means we still have non-determinism! But it's at the function (event) ordering level, rather than at the statement ordering level (or, in fact, the expression operation ordering level) as it is with threads. In other words, it's much *more deterministic* than threads would have been.
+Two outcomes from the same code means we still have non-determinism! But it's at the function (event) ordering level, rather than at the statement ordering level (or, in fact, the expression operation ordering level) as it is with threads. In other words, it's *more deterministic* than threads would have been.
 
-As applied to JavaScript's behavior, this function-ordering non-determinism is the common term "race condition", as `foo()` and `bar()` are racing against each other to see which runs first.
+As applied to JavaScript's behavior, this function-ordering non-determinism is the common term "race condition", as `foo()` and `bar()` are racing against each other to see which runs first. Specifically, it's a "race condition" because you cannot predict reliably how `a` and `b` will turn out.
 
-If there was a function in JS which did not have run-to-completion behavior, all such bets would be off, right? It turns out ES6 introduces just such a thing (see Chapter ? for Generators), but don't worry right now, we'll come back to that!
+**Note:** If there was a function in JS which somehow did not have run-to-completion behavior, we could have many more possible outcomes, right? It turns out ES6 introduces just such a thing (see Chapter ? for Generators), but don't worry right now, we'll come back to that!
 
 ## Concurrency
 
 Let's imagine a site that displays a list of status updates (like a social network news feed) that progressively loads as the user scrolls down the list. To make such a feature work correctly, (at least) two separate "processes" will need to be executing *simultaneously* (i.e., during the same window of time, but not necessarily at the same instant).
 
-**Note:** We're using "process" in quotes here because they aren't true operating system level processes in the computer science sense. They are virtual processes, or tasks, that represent a logically connected, sequential series of operations. We'll simply prefer "process" over "task" since terminology-wise, it will match the definitions of the concepts we're exploring.
+**Note:** We're using "process" in quotes here because they aren't true operating system level processes in the computer science sense. They're virtual processes, or tasks, that represent a logically connected, sequential series of operations. We'll simply prefer "process" over "task" since terminology-wise, it will match the definitions of the concepts we're exploring.
 
-The first "process" will be responding to `onscroll` events as they fire when the user has scrolled the page further down. The second "process" will be making an Ajax request to fetch new data, and receiving the response back to render onto the page.
+The first "process" will respond to `onscroll` events (making Ajax requests for new content) as they fire when the user has scrolled the page further down. The second "process" will receive Ajax responses back (to render content onto the page).
 
-Obviously, if a user scrolls fast enough, you may see two or more `onscroll` events fired during the time it takes to get the first response back and processes, and thus you're going to have `onscroll` events and Ajax response events firing rapidly, interleaved with each other.
+Obviously, if a user scrolls fast enough, you may see two or more `onscroll` events fired during the time it takes to get the first response back and process, and thus you're going to have `onscroll` events and Ajax response events firing rapidly, interleaved with each other.
 
 Concurrency is when two or more "processes" are executing simultaneously over the same period, regardless of whether their individual constituent operations happen *in parallel* (at the same instant on separate processors or cores) or not. You can think of concurrency then as "process"-level (or task-level) parallelism, as opposed to operation-level parallelism (separate-processor threads).
 
-**Note:** Concurrency also introduces an optional notion of these "processes" interacting with each other. We will come back to that later.
+**Note:** Concurrency also introduces an optional notion of these "processes" interacting with each other. We'll come back to that later.
 
 For a given window of time (a few seconds worth of a user scrolling), let's visualize each independent "process" as a series of events/operations:
 
@@ -374,7 +376,7 @@ response 6
 response 7
 ```
 
-It's quite possible that an `onscroll` event and an Ajax response event could be ready to be processed at exactly the same moment. For example let's visualize the above events in a timeline (each line is a subsequent "time slice"):
+It's quite possible that an `onscroll` event and an Ajax response event could be ready to be processed at exactly the same *moment*. For example let's visualize the above events in a timeline:
 
 ```
 onscroll, request 1
@@ -385,14 +387,14 @@ onscroll, request 4
 onscroll, request 5
 onscroll, request 6          response 4
 onscroll, request 7
-response 5
 response 6
+response 5
 response 7
 ```
 
-But, going back to our notion of the event loop from eariler in the chapter, JS is only going to be able to handle one event at a time, so either `onscroll, request 2` is going to happen first or `response 1` is going to happen first, but they cannot happen at literally the same moment. Just like kids in the school cafeteria, no matter what crowd they make outside the doors, they will have to merge into a single line to get their food!
+But, going back to our notion of the event loop from eariler in the chapter, JS is only going to be able to handle one event at a time, so either `onscroll, request 2` is going to happen first or `response 1` is going to happen first, but they cannot happen at literally the same moment. Just like kids at a school cafeteria, no matter what crowd they form outside the doors, they'll have to merge into a single line to get their lunch!
 
-So, let's visualize the interleaving of all these events onto the single event loop queue, such as:
+Let's visualize the interleaving of all these events onto the event loop queue.
 
 Event Loop Queue:
 ```
@@ -407,39 +409,31 @@ onscroll, request 5
 onscroll, request 6
 response 4
 onscroll, request 7   <--- Process 1 finishes
-response 5
 response 6
+response 5
 response 7            <--- Process 2 finishes
 ```
 
 "Process 1" and "Process 2" run concurrently (task-level parallel), but their individual events run sequentially on the event loop queue.
 
-Another way of looking at this is that the single-threaded event loop is one expression of concurrency (there are certainly others, which we'll come back to later!).
+By the way, notice how `response 6` and `response 5` came back out of expected order?
 
-### Interaction
+The single-threaded event loop is one expression of concurrency (there are certainly others, which we'll come back to later).
 
-As two or more "processes" are interleaving their steps/events concurrently within the same program, they don't necessarily need to interact with each other if the tasks are unrelated.
+### Non-interacting
 
-But, often they will interact, indirectly through scope and/or the DOM. When such interaction is going to occur, you will need to orchestrate these interactions to prevent "race conditions" (see above).
+As two or more "processes" are interleaving their steps/events concurrently within the same program, they don't necessarily need to interact with each other if the tasks are unrelated. **If they don't interact, non-determinism is perfectly acceptable.**
 
 For example:
 
 ```js
-var res;
+var res = {};
 
 function foo(results) {
-	if (!res) {
-		res = {};
-	}
-
 	res.foo = results;
 }
 
 function bar(results) {
-	if (!res) {
-		res = {};
-	}
-
 	res.bar = results;
 }
 
@@ -448,11 +442,66 @@ ajax( "..url 1..", foo );
 ajax( "..url 2..", bar );
 ```
 
-`foo()` and `bar()` are assuming the presence of a single variable `res` that's in scope to both of them. But it's indeterminate whether `foo()` or `bar()` will run first, so they both have to be careful to check for `res` and if it's not yet set, create the initial empty object to add their `results` data onto.
+`foo()` and `bar()` are two concurrent "processes", and it's non-determinate which order they will be fired in. But we've constructed the program so it doesn't matter what order they fire in, because they act independently and as such don't need to interact.
 
-**Note:** While `res` in this example is a global variable, there's nothing about this scenario which requires it. As long as `res` is in a scope that's accessible to both `foo()` and `bar()`, they will have a closure over `res` (see the *"Scope & Closures"* title of this book series) and thus be able to access/modify it.
+This is not a "race condition" bug, since the code will always work correctly, regardless of the ordering.
 
-The same reasoning from this scenario would apply if `foo()` and `bar()` were interacting with each other through the shared DOM, like `foo()` updating the contents of a `<div>` and `bar()` updating the style or attributes of the `<div>` (e.g., to make it the DOM element visible once it has content).
+### Interaction
+
+More commonly, concurrent "processes" will interact, indirectly through scope and/or the DOM. When such interaction will occur, you need to coordinate these interactions to prevent "race conditions" (see above).
+
+A simple example of two concurrent "processes" that interact because of implied ordering, which is only *sometimes broken*.
+
+```js
+var res = [];
+
+function response(data) {
+	res.push( data );
+}
+
+// ajax(..) is some arbitrary Ajax function given by some library
+ajax( "..url 1..", response );
+ajax( "..url 2..", response );
+```
+
+The concurrent "processes" are the two `response()` calls that will be made to handle the Ajax responses. They can happen in either-first order.
+
+Let's assume the expected behavior is that `res[0]` has the results of the `"..url 1.."` call, and `res[1]` has the results of the `"..url 2.."` call. Sometimes that will be the case, but sometimes they'll be flipped, depending on which call finishes first. There's a pretty good likelihood that this non-determinism is a "race condition" bug.
+
+**Note:** Be extremely wary of assumptions you might tend to make in these situations. For example, it's not uncommon for a developer to observe that `"..url 2.."` is "always" much slower to respond than `"..url 1.."`, perhaps by virtue of what tasks they're doing (e.g., one performing a database task and the other just fetching a static file), so the observed ordering seems to always be as expected. Even if both requests go to the same server, and *it* intentionally responds in a certain order, there's no *real* guarantee of what order the responses will arrive back in the browser.
+
+So, to address such a race condition, you can coordinate ordering interaction:
+
+```js
+var res = [];
+
+function response(data) {
+	if (data.url == "..url 1..") {
+		res[0] = data;
+	}
+	else if (data.url == "..url 2..") {
+		res[1] = data;
+	}
+}
+
+// ajax(..) is some arbitrary Ajax function given by some library
+ajax( "..url 1..", response );
+ajax( "..url 2..", response );
+```
+
+Regardless of which Ajax response comes back first, we inspect the `data.url` (assuming one is returned from the server, of course!) to figure out which position the response data should occupy in the `res` array. `res[0]` will always hold the `"..url 1.."` results and `res[1]` will always hold the `"..url 2.."` results. Through simple coordination, we eliminated the "race condition" non-determinism.
+
+**Note:** While `res` in this example is a global variable, there's nothing about this scenario which requires it. As long as `res` is in a scope that's accessible to the `response()` calls, there will be a closure over `res` (see the *"Scope & Closures"* title of this book series) and `response()` will be able to access/modify it as many times as necessary.
+
+The same reasoning from this scenario would apply if multiple concurrent function calls were interacting with each other through the shared DOM, like one updating the contents of a `<div>` and the other updating the style or attributes of the `<div>` (e.g., to make the DOM element visible once it has content). You probably wouldn't want to show the DOM element before it had content, so the coordination must ensure proper ordering interaction.
+
+Some concurrency tasks are *always broken* (not just *sometimes*) without coordinated interaction. Consider:
+
+```js
+function foo() {
+
+}
+```
 
 ### Cooperation
 
