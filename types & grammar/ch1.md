@@ -249,7 +249,7 @@ function doSomethingCool() {
 `doSomethingCool()` tests for a variable called `FeatureXYZ`, and if found, uses it, if not, uses its own. Now, if someone includes this utility into their module/program, it safely checks if they've defined `FeatureXYZ` or not:
 
 ```js
-// an IIFE (see "Scope & Closures" title of this series)
+// an IIFE (see "Immediately Invoked Function Expressions" discussion in the *"Scope & Closures"* title of this series)
 (function(){
 	function FeatureXYZ() { /*.. my XYZ feature ..*/ }
 
