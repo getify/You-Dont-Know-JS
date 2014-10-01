@@ -8,6 +8,9 @@
 	* Event Loop
 	* Parallel Threading
 	* Concurrency
+	* Statement Ordering
+* Chapter 2: Callbacks
+	* ..
 * Appendix A: // TODO
 * Appendix B: Thank You's!
 
