@@ -241,6 +241,8 @@ So, threaded programming is very tricky, because if you don't take special steps
 
 JavaScript is single-threaded, which means *that* level of non-determinism isn't a concern. But that doesn't mean JS is always deterministic. Remember above, where the relative ordering of `foo()` and `bar()` produces two different results (`41` or `42`)?
 
+**Note:** It may not be obvious yet, but not all non-determinism is bad. Sometimes it's irrelevant, and sometimes it's intentional. We'll see more examples of that throughout this and the next few chapters.
+
 ### Run-to-completion
 
 Because of JavaScript's single-threading, the code inside of `foo()` (and `bar()`) is atomic, which means that once `foo()` starts running, the entirety of its code will finish before any of the code in `bar()` can run, or vice versa. This is called "run-to-completion" behavior.
@@ -448,7 +450,7 @@ This is not a "race condition" bug, since the code will always work correctly, r
 
 ### Interaction
 
-More commonly, concurrent "processes" will interact, indirectly through scope and/or the DOM. When such interaction will occur, you need to coordinate these interactions to prevent "race conditions" (see above).
+More commonly, concurrent "processes" will by necessity interact, indirectly through scope and/or the DOM. When such interaction will occur, you need to coordinate these interactions to prevent "race conditions" (see above).
 
 A simple example of two concurrent "processes" that interact because of implied ordering, which is only *sometimes broken*.
 
@@ -491,19 +493,194 @@ ajax( "..url 2..", response );
 
 Regardless of which Ajax response comes back first, we inspect the `data.url` (assuming one is returned from the server, of course!) to figure out which position the response data should occupy in the `res` array. `res[0]` will always hold the `"..url 1.."` results and `res[1]` will always hold the `"..url 2.."` results. Through simple coordination, we eliminated the "race condition" non-determinism.
 
-**Note:** While `res` in this example is a global variable, there's nothing about this scenario which requires it. As long as `res` is in a scope that's accessible to the `response()` calls, there will be a closure over `res` (see the *"Scope & Closures"* title of this book series) and `response()` will be able to access/modify it as many times as necessary.
-
 The same reasoning from this scenario would apply if multiple concurrent function calls were interacting with each other through the shared DOM, like one updating the contents of a `<div>` and the other updating the style or attributes of the `<div>` (e.g., to make the DOM element visible once it has content). You probably wouldn't want to show the DOM element before it had content, so the coordination must ensure proper ordering interaction.
 
-Some concurrency tasks are *always broken* (not just *sometimes*) without coordinated interaction. Consider:
+Some concurrency scenarios are *always broken* (not just *sometimes*) without coordinated interaction. Consider:
 
 ```js
-function foo() {
+var a, b;
 
+function foo(x) {
+	a = x * 2;
+	baz();
 }
+
+function bar(y) {
+	b = y * 2;
+	baz();
+}
+
+function baz() {
+	console.log(a + b);
+}
+
+// ajax(..) is some arbitrary Ajax function given by some library
+ajax( "..url 1..", foo );
+ajax( "..url 2..", bar );
 ```
 
+In this example, whether `foo()` or `bar()` fires first, it will always cause `baz()` to run too early (either `a` or `b` will still be `undefined`), but the second invocation of `baz()` will work, since both `a` and `b` will be available.
+
+There are different ways to address such a condition. Here's one simple way:
+
+```js
+var a, b;
+
+function foo(x) {
+	a = x * 2;
+	if (a && b) {
+		baz();
+	}
+}
+
+function bar(y) {
+	b = y * 2;
+	if (a && b) {
+		baz();
+	}
+}
+
+function baz() {
+	console.log( a + b );
+}
+
+// ajax(..) is some arbitrary Ajax function given by some library
+ajax( "..url 1..", foo );
+ajax( "..url 2..", bar );
+```
+
+The `if (a && b)` conditional around the `baz()` call is traditionally called a "gate", because we're not sure what order `a` and `b` will arrive, but we wait for both of them to get there before we proceed to open the gate (call `baz()`).
+
+Another concurrency interaction condition you may run into is sometimes called a "race", but more correctly called a "latch". It's characterized by "only the first one wins" behavior. Here, non-determinism is acceptable, in that you are explicitly saying it's OK for the "race" to the finish line to have only one winner.
+
+Consider this broken code:
+
+```js
+var a;
+
+function foo(x) {
+	a = x * 2;
+	baz();
+}
+
+function bar(x) {
+	a = x / 2;
+	baz();
+}
+
+function baz() {
+	console.log( a );
+}
+
+// ajax(..) is some arbitrary Ajax function given by some library
+ajax( "..url 1..", foo );
+ajax( "..url 2..", bar );
+```
+
+Whichever one (`foo()` or `bar()`) fires last will not only overwrite the assigned `a` value from the other, but it will also duplicate the call to `baz()` (likely undesired).
+
+So, we can coordinate the interaction with a simple latch, to let only the first one through:
+
+```js
+var a;
+
+function foo(x) {
+	if (!a) {
+		a = x * 2;
+		baz();
+	}
+}
+
+function bar(x) {
+	if (!a) {
+		a = x / 2;
+		baz();
+	}
+}
+
+function baz() {
+	console.log( a );
+}
+
+// ajax(..) is some arbitrary Ajax function given by some library
+ajax( "..url 1..", foo );
+ajax( "..url 2..", bar );
+```
+
+The `if (!a)` conditional allows only the first of `foo()` or `bar()` through, and the second (and indeed any subsequent) calls would just be ignored. There's just no virtue in coming in second place!
+
+**Note:** In all these scenarios, we've been using global variables for simplistic illustration purposes, but there's nothing about our reasoning here which requires it. As long as the functions in question can access the variables (via scope), they'll work as intended. Relying on lexically scoped variables (see the *"Scope & Closures"* title of this book series), and in fact global variables as in these examples, is one obvious downside to these forms of concurrency coordination. As we go through the next few chapters, we'll see other ways of coordination which are much cleaner in that respect.
+
 ### Cooperation
+
+Another expression of concurrency coordination is called "cooperative concurrency". Here, the focus isn't so much on interacting via value sharing in scopes (though that's obviously still allowed!). The goal is to take a long-running "process" and break it up into steps or batches so that other concurrent "processes" have a chance to interleave their operations into the event loop queue.
+
+For example, consider an Ajax response handler that needs to run through a long list of results to transform the values. We'll use `Array#map(..)` to keep the code shorter:
+
+```js
+var res = [];
+
+// `response(..)` receives an array of results from the Ajax call
+function response(data) {
+	// add onto existing `res` array
+	res = res.concat(
+		// make a new transformed array with all `data` values doubled
+		data.map( function(val){
+			return val * 2;
+		} )
+	);
+}
+
+// ajax(..) is some arbitrary Ajax function given by some library
+ajax( "..url 1..", response );
+ajax( "..url 2..", response );
+```
+
+If `"..url 1.."` gets its results back first, the entire list will be mapped into `res` all at once. If it's a few thousand or less records, this is not generally a big deal. But if it's say 10m records, that can take awhile to run (several seconds on a powerful laptop, much longer on a mobile device, etc).
+
+While such a "process" is running, nothing else in the page can happen, including no other `response(..)` calls, no UI updates, not even user events like scrolling, typing, button clicking, etc. That's pretty painful.
+
+So, to make a more cooperatively concurrent system, one that's friendlier and doesn't hog the event loop queue, you can process these results in asynchronous batches, after each one "yielding" back to the event loop to let other waiting events happen.
+
+Here's a very simple approach:
+
+```js
+var res = [];
+
+// `response(..)` receives an array of results from the Ajax call
+function response(data) {
+	// let's just do 1000 at a time
+	var chunk = data.splice( 0, 1000 );
+
+	// add onto existing `res` array
+	res = res.concat(
+		// make a new transformed array with all `chunk` values doubled
+		chunk.map( function(val){
+			return val * 2;
+		} )
+	);
+
+	// anything left to process?
+	if (data.length > 0) {
+		// async schedule next batch
+		setTimeout( function(){
+			response( data );
+		}, 0 );
+	}
+}
+
+// ajax(..) is some arbitrary Ajax function given by some library
+ajax( "..url 1..", response );
+ajax( "..url 2..", response );
+```
+
+We process the data set in maximum sized chunks of 1000 items. By doing so, we ensure a short running "process", even if that means many more subsequent "processes", as the interleaving onto the event loop queue will give us a much more responsive (performance) site/app.
+
+Of course, we're not interaction-coordinating the ordering of any of these "processes", so the order of results in `res` won't be predictable. If ordering was required, you'd need to use interaction techniques like those we discussed earlier, or ones we will cover in later chapters of this book.
+
+We use the `setTimeout(..0)` (hack) for async scheduling, which basically just means "stick this function at the end of the current event loop queue".
+
+**Note:** `setTimeout(..0)` is not technically inserting an item directly onto the event loop queue. The timer will insert the event at its next opportunity. For example, two subsequent `setTimeout(..0)` calls would not be strictly guaranteed to be processed in call order, so it *is* possible to see various conditions like timer drift where the ordering of such events isn't predictable. Despite how convenient (and usually more performant) it would be, there's not a direct way (at least yet) to ensure event ordering by scheduling a "process" on the event loop queue (aka "microtask scheduling") from user JS code. As of ES6, there are however some mechanisms which implicitly do that for you. We'll revisit this topic later in the book.
 
 ## Summary
 
@@ -511,4 +688,8 @@ A JavaScript program is (practically) always broken up into two or more chunks, 
 
 The *event loop* spins continuously, with each iteration ("tick") handling whatever the next waiting event on the queue is, if any.
 
-At any given moment, only one event can be processed from the queue at a time. While an event is executing, it can cause one or more subsequent events to be scheduled (added onto the event queue).
+At any given moment, only one event can be processed from the queue at a time. While an event is executing, it can indirectly cause one or more subsequent events to be scheduled (added onto the event queue).
+
+Concurrency is when two or more "processes" (basically function calls as events) interleave themselves onto the event loop queue, such that from a high level perspective, they appear to be running *simultaneously* (even though at any given moment only one event is being processes).
+
+It's often necessary to do some form of interaction coordination between these concurrent "processes", for instance to ensure ordering or to prevent "race conditions". These "processes" can also *cooperate* by breaking themselves into smaller chunks and to allow other "process" interleaving.
