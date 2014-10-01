@@ -65,6 +65,10 @@ Other behavior variations with host objects to be aware of can include:
 
 Host objects are critical to making our JS code work with its surrounding environment. But it's important to note when you're interacting with a host object and be careful of assuming its behaviors, as they will quite often not conform to regular JS `object`s.
 
+One notable example of a host object that you probably interact with regularly is the `console` object and its various functions (`log(..)`, `error(..)`, etc). The `console` object is provided by the *hosting environment* specifically so your code can interact with it for various development-related output tasks.
+
+In browsers, `console` hooks up to the developer tools' console display, whereas in node.js and other server-side JS environments, `console` is generally connected to the standard-output (`stdout`) and standard-error (`stderr`) streams of the JavaScript environment system process.
+
 ## Global DOM Variables
 
 You're probably aware that declaring a variable in the global scope (with or without `var`) creates not only a global variable, but also its mirror: a property of the same name on the `global` object (`window` in the browser).
