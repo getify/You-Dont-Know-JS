@@ -47,7 +47,9 @@ ajax( "..url 1..", function(data){
 });
 ```
 
-**Note:** You may have heard that it's possible to make synchronous Ajax requests. While that's technically true, you should never, ever do it, under any circumstances, because it locks the browser UI (buttons, menus, scrolling, etc) and prevents any user interaction whatsoever. This is a terrible idea, and should always be avoided. Before you disagree, **no, your desire to avoid callbacks is not justification for blocking, synchronous Ajax**.
+**Note:** You may have heard that it's possible to make synchronous Ajax requests. While that's technically true, you should never, ever do it, under any circumstances, because it locks the browser UI (buttons, menus, scrolling, etc) and prevents any user interaction whatsoever. This is a terrible idea, and should always be avoided.
+
+Before you protest in disagreement, **no, your desire to avoid callbacks is NOT justification for blocking, synchronous Ajax**.
 
 For example, consider this code:
 
@@ -145,6 +147,8 @@ It's important to note that `setTimeout(..)` doesn't put your callback on the ev
 What if there's already 20 items in the event loop at that moment? Your callback waits. It gets in line behind the others -- there's not normally a path to pre-empting the queue and skipping ahead in line. So, it should be obvious how timers for example don't actually with much temporal accuracy. Basically, you're guaranteed (roughly speaking) that your callback won't fire *before* the time interval you specify, but it can happen at or after that totally dependent on the state of the event queue at the time.
 
 So, in other words, your program is generally broken up into lots of small chunks, which happen one after the other in the event loop queue. And technically, other events not related directly to your program can be interspersed into the queue, as well.
+
+**Note:** We mentioned "up until recently" in relation to ES6 changing the nature of where the event loop queue is managed. It's mostly a formal technicality, but ES6 now specifies exactly how the event loop works, which means technically it's within the purview of the JS engine, rather than just the *hosting environment*. One main reason for this change is the introduction of ES6 promises, which we'll discuss in chapter ??, because they require the ability to have direct, fine-grained control over scheduling operations on the event loop queue (see the discussion of `setTimeout(..0)` towards the end of this chapter).
 
 ## Parallel Threading
 
