@@ -11,6 +11,8 @@
 	* Statement Ordering
 * Chapter 2: Callbacks
 	* Continuations
+	* Sequential Brain
+	* ..
 * Appendix A: // TODO
 * Appendix B: Thank You's!
 
