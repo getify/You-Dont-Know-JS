@@ -10,7 +10,7 @@
 	* Concurrency
 	* Statement Ordering
 * Chapter 2: Callbacks
-	* ..
+	* Continuations
 * Appendix A: // TODO
 * Appendix B: Thank You's!
 

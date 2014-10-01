@@ -44,7 +44,7 @@ ajax( "..url 1..", function(data){
 
 	console.log( data ); // Yay, I gots me some `data`!
 
-});
+} );
 ```
 
 **Note:** You may have heard that it's possible to make synchronous Ajax requests. While that's technically true, you should never, ever do it, under any circumstances, because it locks the browser UI (buttons, menus, scrolling, etc) and prevents any user interaction whatsoever. This is a terrible idea, and should always be avoided.
