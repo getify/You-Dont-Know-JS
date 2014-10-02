@@ -100,7 +100,7 @@ These three assignment statements are synchronous, so `x = y` waits for `z = x` 
 
 So if synchronous brain planning maps well to synchronous code statements, how well do our brains do at planning out asynchronous code?
 
-It turns out that how we expression asynchrony (with callbacks) in our code doesn't map very well at all to that synchronous brain planning behavior.
+It turns out that how we express asynchrony (with callbacks) in our code doesn't map very well at all to that synchronous brain planning behavior.
 
 Can you actually imagine having a line of thinking that plans out your todo errands like this?
 
@@ -112,7 +112,7 @@ The reason it's difficult for us as developers to write async evented code, espe
 
 We think in step-by-step terms, but the tools we have available to us in code are not expressed in a step-by-step fashion once we move from synchronous to asynchronous.
 
-And **that** is why it's so hard to accurately author and reason about async JS code with callbacks: because it's not how our brains planning works.
+And **that** is why it's so hard to accurately author and reason about async JS code with callbacks: because it's not how our brain planning works.
 
 ### Nested/Chained Callbacks
 
@@ -133,11 +133,9 @@ listen( "click", function handler(evt){
 } );
 ```
 
-There's a good chance code like that is recognizable to you.
+There's a good chance code like that is recognizable to you. We've got a chain of 3 functions nested together, each one representing a step in an asynchronous series (task, "process").
 
-We've got a chain of 3 functions nested together, each one representing a step in an asynchronous series (task, "process").
-
-First we're waiting for the "click" event, then we're waiting for the timer to fire, then we're waiting for the Ajax response to come back, at which point you might do it all again.
+First we're waiting for the "click" event, then we're waiting for the timer to fire, then we're waiting for the Ajax response to come back, at which point it might do it all again.
 
 At first glance, this code may seem to map its asynchrony naturally to sequential brain planning.
 
@@ -231,7 +229,7 @@ That sound you just heard faintly in the background is the sighs of a thousand J
 
 Is nesting the problem? Is that what makes it so hard to trace the async flow? That's part of it, certainly.
 
-But, let me rewrite the previous Ajax example not using nesting:
+But, let me rewrite the previous nested event/timeout/Ajax example without using nesting:
 
 ```js
 listen( "click", handler );
@@ -256,9 +254,103 @@ function response(text){
 
 Again, as we go to linearly (sequentially) reason about this code, we have to skip from one function, to the next, to the next, and bounce all around the code base to "see" the sequence flow. And remember, this is simplified code in sort of best-case fashion. We all know that real async JS program code bases are often fantastically more jumbled, which makes such reasoning orders of magnitude more difficult.
 
-And as if that's not enough, we haven't even touched what happens when two or more chains of these callback continuations are happening *simultaneously*, or when the third step branches out into "parallel" callbacks with races or latches or... OMG, my brain hurts, how about yours!?
+Another thing to notice: to get steps 2, 3, and 4 linked together so they happen in succession, the only affordance callbacks alone gives us is to hard-code step 2 into step 1, step 3 into step 2, step 4 into step 3, and so on. The hard-coding isn't necessarily a bad thing, if it really is a fixed condition that step 2 should always lead to step 3.
 
-Are you catching the notion here that our sequential, blocking brain planning functionalities just don't map well onto callback-oriented async code? That's the first major deficiency to articulate about callbacks: they express asynchrony in ways our brains have to fight just to keep up with.
+But the hard-coding definitely makes the code a bit more brittle, as it doesn't account for anything going wrong which might cause a deviation in the progression of steps. For example, if step 2 fails, step 3 never gets reached, nor does step 2 retry, or move to an alternate error-handling flow, etc.
+
+All of these issues are things you *can* manually hard-code into each step, but that code is often very repetitive and not reusable in other steps or in other async flows in your program.
+
+Even though our brains might plan out a series of tasks in sequential (this, then this, then this) type of way, the evented nature of our brain operation makes recovery/retry/forking of flow control almost effortless. If you're out running errands, and you realize you left a shopping list at home, it doesn't end the day because you didn't plan that ahead of time. Your brain plans around this easily, and you go home, get the list, then head right back out to shop.
+
+But the brittle nature of manually hard-coded callbacks (even with hard-coded error-handling) is often far less graceful. Once you end up specifying (aka pre-planning) all the various eventualities/paths, the code becomes so convoluted that it's hard to ever maintain or update it.
+
+And as if all that's not enough, we haven't even touched what happens when two or more chains of these callback continuations are happening *simultaneously*, or when the third step branches out into "parallel" callbacks with gates or latches, or... OMG, my brain hurts, how about yours!?
+
+Are you catching the notion here that our sequential, blocking brain planning behaviors just don't map well onto callback-oriented async code? That's the first major deficiency to articulate about callbacks: they express asynchrony in code in ways our brains have to fight just to keep in sync (pun intended!) with.
+
+## Trust Issues
+
+The mismatch between sequential brain planning and callback-driven async JS code is only part of the problem with callbacks. There's something much deeper to be concerned about.
+
+Let's once again revisit the notion of a callback function as the continuation (aka the second half) of our program:
+
+```js
+// A
+ajax( "..", function(..){
+	// C
+} );
+// B
+```
+
+`// A` and `// B` happen *now*, under the direct control of the main JS program. But `// C` gets deferred to happen *later*, and under the control of another party -- in this case, the `ajax(..)` function. In a basic sense, that sort of hand-off of control doesn't regularly cause lots of problems for programs.
+
+But don't be fooled by its infrequency that this control switch isn't a big deal. In fact, it's one of the worst (and yet most subtle) problems about callback-driven design. It revolves around the idea that sometimes `ajax(..)` (i.e., the "party" you hand your callback continuation to) is not a function that you wrote, or that you directly control. Many times it's a utility provided by some third-party.
+
+We call this "inversion of control", when you take part of your program and give over control of its execution to another third party. There's an unspoken "contract" that exists between your code and the third party utility -- a set of things you expect to be maintained.
+
+### Tale Of Five Callbacks
+
+It might not be terribly obvious why this is such a big deal. Let me construct an exaggerated scenario to illustrate the hazards of trust at play.
+
+Imagine you're a developer tasked with building out an e-commerce checkout system for a site that sells expensive TVs. You already have all the various pages of the checkout system built out just fine. On the last page just before the user clicks "confirm" to buy the TV, you need to call a third-party function (provided say by some analytics tracking company) so that the sale can be tracked.
+
+You notice that they've provided what looks like an async tracking utility, probably for performance best-practices' sake, which means you need to pass in a callback function. In this continuation that you pass in, you will have the final code that charges the customer's credit card and displays the thank you page.
+
+This code might look like:
+
+```js
+analytics.trackPurchase( purchaseData, function(){
+	chargeCreditCard();
+	displayThankyouPage();
+} );
+```
+
+Easy enough, right? You write the code, test it, everything works, and you deploy to production. Everyone's happy!
+
+Six months go by and no issues. You've almost forgotten you even wrote that code. One morning, you're at a coffee shop before work, causally enjoying your latte, when you get a panicked call from your boss insisting you drop the coffee and rush into work right away.
+
+When you arrive, you find out that apparently, some high profile client has had their credit card charged five times for the same TV, and they're really upset. Customer service has already issued an apology and processed a refund. But your boss demands to know how this could possibly have happened. "Don't we have tests for stuff like this!?"
+
+You don't even remember the code you wrote. But you dig back in and start trying to find out how this could have happened.
+
+After digging through some logs, you come to the conclusion that the only explanation is that the analytics utility somehow, for some reason, called your callback five times instead of once. Nothing in their documentation mentions anything about this.
+
+Frustrated, you contact their customer support, who of course is as astonished as you are. After some back and forth discussion, they agree to escalate it to their developers, and promise to get back to you. The next day, you receive a lengthy email explaining what they found, which you promptly forward to your boss.
+
+Apparently, the developers at the analytics company had been working on some experimental code that, under certain conditions, would retry the provided callback once per second, for five seconds, before failing with a timeout. They had never intended to push that into production, but somehow they did, and they're totally embarrassed and apologetic. They go into plenty of detail about how they've identified the breakdown and what they'll do to ensure it never happens again. Yadda, yadda.
+
+What's next?
+
+You talk it over with your boss, but he's not feeling particularly comfortable with the state of things. He insists, and you reluctantly agree, that you can't trust *them* (that's what bit you), and that you'll need to figure out how to protect your code from such a vulnerability again.
+
+After some tinkering, you implement some simple ad hoc code like the following, which he seems happy with:
+
+```js
+var tracked = false;
+
+analytics.trackPurchase( purchaseData, function(){
+	if (!tracked) {
+		tracked = true;
+		chargeCreditCard();
+		displayThankyouPage();
+	}
+} );
+```
+
+But then one of your QA engineers asks, "what happens if they never call the callback?" Oops. Neither of you had thought about that.
+
+You begin to chase down the rabbit hole, and think of all the possible things that could go wrong with them calling your callback. Here's roughly the list you come up with:
+
+* call the callback too early (before it's been tracked)
+* call the callback too late (or never)
+* call the callback too few or too many times (like the problem you encountered!)
+* forget to pass along any necessary environment/parameters to your callback
+* swallow any errors that may happen
+* ...
+
+That should look like a troubling list.
+
+
 
 
 

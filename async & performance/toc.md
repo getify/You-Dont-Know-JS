@@ -12,6 +12,7 @@
 * Chapter 2: Callbacks
 	* Continuations
 	* Sequential Brain
+	* Trust Issues
 	* ..
 * Appendix A: // TODO
 * Appendix B: Thank You's!
