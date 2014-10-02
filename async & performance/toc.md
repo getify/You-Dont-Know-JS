@@ -13,7 +13,7 @@
 	* Continuations
 	* Sequential Brain
 	* Trust Issues
-	* ..
+	* Callback Variations
 * Appendix A: // TODO
 * Appendix B: Thank You's!
 

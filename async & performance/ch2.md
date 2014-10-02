@@ -350,14 +350,83 @@ You begin to chase down the rabbit hole, and think of all the possible things th
 * swallow any errors/exceptions that may happen
 * ...
 
-That should feel like a troubling list, because it is.
+That should feel like a troubling list, because it is. You're probably slowly starting to realize that you're going to have to invent an awful lot of ad hoc logic **in each and every single callback** that's passed to a utility you're not positive you can trust.
 
+### Not Just Others' Code
 
+Some of you may be skeptical at this point whether this is as big a deal as I'm making it out to be. Perhaps you don't interact with truly third-party utilities much if at all. Perhaps you use versioned APIs or self-host such libraries, so that its behavior can't be changed out from underneath you.
 
+So, contemplate this: can you even *really* trust utilities that you do theoretically control (in your own code base)?
 
+Think of it this way: most of us agree that at least to some extent we should build our own internal functions with some defensive checks on the input parameters, to reduce/prevent unexpected issues.
 
+Overly trusting of input:
+```js
+function addNumbers(x,y) {
+	// + is overloaded with coercion to also be
+	// string concatenation, so this operation
+	// isn't strictly safe depending on what's
+	// passed in.
+	return x + y;
+}
 
+addNumbers( 21, 21 );	// 42
+addNumbers( 21, "21" );	// "2121"
+```
 
+Defensive against untrusted input:
+```js
+function addNumbers(x,y) {
+	// ensure numerical input
+	if (typeof x != "number" || typeof y != "number") {
+		throw Error( "Bad parameters" );
+	}
 
+	// if we get here, + will safely do numeric addition
+	return x + y;
+}
 
+addNumbers( 21, 21 );	// 42
+addNumbers( 21, "21" );	// Error: "Bad parameters"
+```
 
+Or perhaps still safe but friendlier:
+```js
+function addNumbers(x,y) {
+	// ensure numerical input
+	x = Number( x );
+	y = Number( y );
+
+	// + will safely do numeric addition
+	return x + y;
+}
+
+addNumbers( 21, 21 );	// 42
+addNumbers( 21, "21" );	// 42
+```
+
+However you go about it, these sorts of checks/normalizations are fairly common on function inputs, even with code we theoretically entirely trust. In a crude sort of way, it's like the programming equivalent of the geopolitical principle of "Trust But Verify".
+
+So, doesn't it stand to reason that we should do the same thing about composition of async function callbacks, not just with truly external code but even with code we know is generally "under our own control"? **Of course we should.**
+
+But callbacks don't really offer anything to assist us. We have to construct all that machinery ourselves, and it often ends up being a lot of boilerplate/overhead that we repeat for every single async callback.
+
+The most troublesome problem with callbacks is *inversion of control* leading to a complete break down along all those trust issues.
+
+If you have code that uses callbacks, especially but not exclusively with third-party utilities, and you're not already applying some sort of mitigation logic for all these *inversion of control* trust issues, your code *has* bugs in it right now even though they may not have bitten you yet. Latent bugs are still bugs.
+
+## Callback Variations
+
+There are several variations of callback design which have been attempted to address some (not all!) of the trust issues we've just looked at.
+
+## Summary
+
+Callbacks are the fundamental unit of asynchrony in JS. But they're not enough for the evolving landscape of async programming as JS matures.
+
+Firstly, our brains plan things out in sequential, blocking, single-threaded semantic ways, but callbacks express asynchronous flow in a rather non-linear, non-sequential way, which makes reasoning properly about such code much harder. Bad to reason about code is bad code that leads to bad bugs.
+
+Secondly, and more importantly, callbacks suffer from *inversion of control* in that they implicitly give control over to another party (often a third-party utility not in your control!) to invoke the *continuation* of your program. This control transfer leads us to a troubling list of trust issues, such as whether the callback is called more times than we expect.
+
+Inventing ad hoc logic to solve these trust issues is possible, but it's more difficult than it should be, and it produces clunkier and harder to maintain code, as well as likely code that is insufficiently protected from these hazards until you get visibly bitten by the bugs.
+
+We need something better than callbacks. They've served us well to this point, but the *future* of JavaScript demands more sophisticated and capable async patterns. The subsequent chapters in this book will dive into those emerging evolutions.
