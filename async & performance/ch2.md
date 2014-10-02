@@ -292,7 +292,7 @@ We call this "inversion of control", when you take part of your program and give
 
 It might not be terribly obvious why this is such a big deal. Let me construct an exaggerated scenario to illustrate the hazards of trust at play.
 
-Imagine you're a developer tasked with building out an e-commerce checkout system for a site that sells expensive TVs. You already have all the various pages of the checkout system built out just fine. On the last page just before the user clicks "confirm" to buy the TV, you need to call a third-party function (provided say by some analytics tracking company) so that the sale can be tracked.
+Imagine you're a developer tasked with building out an e-commerce checkout system for a site that sells expensive TVs. You already have all the various pages of the checkout system built out just fine. On the last page, when the user clicks "confirm" to buy the TV, you need to call a third-party function (provided say by some analytics tracking company) so that the sale can be tracked.
 
 You notice that they've provided what looks like an async tracking utility, probably for performance best-practices' sake, which means you need to pass in a callback function. In this continuation that you pass in, you will have the final code that charges the customer's credit card and displays the thank you page.
 
@@ -309,21 +309,21 @@ Easy enough, right? You write the code, test it, everything works, and you deplo
 
 Six months go by and no issues. You've almost forgotten you even wrote that code. One morning, you're at a coffee shop before work, causally enjoying your latte, when you get a panicked call from your boss insisting you drop the coffee and rush into work right away.
 
-When you arrive, you find out that apparently, some high profile client has had their credit card charged five times for the same TV, and they're really upset. Customer service has already issued an apology and processed a refund. But your boss demands to know how this could possibly have happened. "Don't we have tests for stuff like this!?"
+When you arrive, you find out that apparently, some high profile customer has had their credit card charged five times for the same TV, and they're really upset. Customer service has already issued an apology and processed a refund. But your boss demands to know how this could possibly have happened? "Don't we have tests for stuff like this!?"
 
-You don't even remember the code you wrote. But you dig back in and start trying to find out how this could have happened.
+You don't even remember the code you wrote. But you dig back in and start trying to find out what could have gone awry.
 
 After digging through some logs, you come to the conclusion that the only explanation is that the analytics utility somehow, for some reason, called your callback five times instead of once. Nothing in their documentation mentions anything about this.
 
-Frustrated, you contact their customer support, who of course is as astonished as you are. After some back and forth discussion, they agree to escalate it to their developers, and promise to get back to you. The next day, you receive a lengthy email explaining what they found, which you promptly forward to your boss.
+Frustrated, you contact their customer support, who of course is as astonished as you are. They agree to escalate it to their developers, and promise to get back to you. The next day, you receive a lengthy email explaining what they found, which you promptly forward to your boss.
 
 Apparently, the developers at the analytics company had been working on some experimental code that, under certain conditions, would retry the provided callback once per second, for five seconds, before failing with a timeout. They had never intended to push that into production, but somehow they did, and they're totally embarrassed and apologetic. They go into plenty of detail about how they've identified the breakdown and what they'll do to ensure it never happens again. Yadda, yadda.
 
 What's next?
 
-You talk it over with your boss, but he's not feeling particularly comfortable with the state of things. He insists, and you reluctantly agree, that you can't trust *them* (that's what bit you), and that you'll need to figure out how to protect your code from such a vulnerability again.
+You talk it over with your boss, but he's not feeling particularly comfortable with the state of things. He insists, and you reluctantly agree, that you can't trust *them* anymore (that's what bit you), and that you'll need to figure out how to protect the checkout code from such a vulnerability again.
 
-After some tinkering, you implement some simple ad hoc code like the following, which he seems happy with:
+After some tinkering, you implement some simple ad hoc code like the following, which the team seems happy with:
 
 ```js
 var tracked = false;
@@ -337,18 +337,20 @@ analytics.trackPurchase( purchaseData, function(){
 } );
 ```
 
+**Note:** This should look familiar to you from Chapter 1, because we're essentially creating a latch to handle if there happen to be multiple concurrent invocations of our callback.
+
 But then one of your QA engineers asks, "what happens if they never call the callback?" Oops. Neither of you had thought about that.
 
-You begin to chase down the rabbit hole, and think of all the possible things that could go wrong with them calling your callback. Here's roughly the list you come up with:
+You begin to chase down the rabbit hole, and think of all the possible things that could go wrong with them calling your callback. Here's roughly the list you come up with of ways the analytics utility could misbehave:
 
 * call the callback too early (before it's been tracked)
 * call the callback too late (or never)
 * call the callback too few or too many times (like the problem you encountered!)
 * forget to pass along any necessary environment/parameters to your callback
-* swallow any errors that may happen
+* swallow any errors/exceptions that may happen
 * ...
 
-That should look like a troubling list.
+That should feel like a troubling list, because it is.
 
 
 
