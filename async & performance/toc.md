@@ -14,6 +14,9 @@
 	* Sequential Brain
 	* Trust Issues
 	* Trying To Save Callbacks
+* Chapter 3: Promises
+	* Future Value
+	* Continuation Event
 * Appendix A: // TODO
 * Appendix B: Thank You's!
 
