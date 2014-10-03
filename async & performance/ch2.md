@@ -415,9 +415,161 @@ The most troublesome problem with callbacks is *inversion of control* leading to
 
 If you have code that uses callbacks, especially but not exclusively with third-party utilities, and you're not already applying some sort of mitigation logic for all these *inversion of control* trust issues, your code *has* bugs in it right now even though they may not have bitten you yet. Latent bugs are still bugs.
 
-## Callback Variations
+## Trying To Save Callbacks
 
-There are several variations of callback design which have been attempted to address some (not all!) of the trust issues we've just looked at.
+There are several variations of callback design which have attempted to address some (not all!) of the trust issues we've just looked at. It's a valiant, but doomed, effort to save the callback pattern from imploding on itself.
+
+For example, regarding more graceful error handling, some API designs provide for split callbacks (one for the success notification, one for the error notification):
+
+```js
+function success(data) {
+	console.log( data );
+}
+
+function failure(err) {
+	console.error( err );
+}
+
+ajax( "..url..", success, failure );
+```
+
+In APIs of this design, often the `failure()` error handler is optional, and if not provided it will be assumed you want the errors swallowed. Ugh.
+
+**Note:** This split-callback design is what the ES6 Promise API uses. We'll cover ES6 Promises in much more detail in the next chapter.
+
+Another common callback pattern is called "error-first style" (sometimes called "node style"), where the first argument of a single callback is reserved for an error object (if any). If success, this argument will be empty/falsy (and any subsequent arguments will be the success data), but if an error result is being signaled, the first argument is set/truthy (and usually nothing else is passed).
+
+```js
+function response(err,data) {
+	// error?
+	if (err) {
+		console.error( err );
+	}
+	// otherwise, assume success
+	else {
+		console.log( data );
+	}
+}
+
+ajax( "..url..", success, failure );
+```
+
+In both of these cases, several things should be observed.
+
+First, it's not really resolved the majority of trust issues like it may appear. There's nothing about either callback which prevents or filters unwanted repeated invocations. Moreover, things are worse now, because you may get both success and error signals, or neither, and you still have to code around either of those conditions.
+
+Also, don't miss the fact that while it's a standard pattern you can employ, it's definitely more verbose and boilerplate'ish without much reuse, so you're going to get weary of typing all that out for every single callback in your application.
+
+What about the trust issue of never being called? If this is a concern (and it probably should be!), you likely will need to set up a timeout that cancels the event. You could make a utility (proof-of-concept only shown) to help you with that:
+
+```js
+function timeoutify(fn,delay) {
+	var intv = setTimeout( function(){
+			intv = null;
+			fn( new Error( "Timeout!" ) );
+		}, delay );
+	;
+
+	return function() {
+		// timeout hasn't happened yet?
+		if (intv) {
+			fn.apply( this, arguments );
+		}
+	};
+}
+```
+
+Here's how you use it:
+
+```js
+// using "error-first style" callback design
+function foo(err,data) {
+	if (err) {
+		console.error( err );
+	}
+	else {
+		console.log( data );
+	}
+}
+
+ajax( "..url..", timeoutify( foo ) );
+```
+
+Another trust issue is being called "too early". In application-specific terms, this may actually be being called before some critical task is complete. But more generally, the problem is evident in utilities which can either invoke the callback you provide *now* (synchronously), or *later* (asynchronously).
+
+This non-determinism around the sync-or-async behavior is almost always going to lead to very difficult to track down bugs. In some circles, the metaphor of a man-eating monster named Zalgo is used to describe the sync/async nightmares. "Never release Zalgo" is a common cry, and it leads to very sound advice: always invoke callbacks asynchronously, even if that's "right away" on the next turn of the event loop, so that all callbacks are predictably async.
+
+Consider:
+
+```js
+function result(data) {
+	console.log( a );
+}
+
+var a = 0;
+
+ajax( "..pre-cached-url..", result );
+a++;
+```
+
+Will this code print `0` (sync callback invocation) or `1` (async callback invocation)? Depends... on the conditions.
+
+You can see just how quickly the unpredicatbility of Zalgo can threaten any JS program. So the silly sounding "never release Zalgo" is actually incredibly common and solid advice. Always be asyncing.
+
+What if you don't know whether the API in question will always execute async? You could invent a utility like this `asyncify(..)` proof-of-concept:
+
+```js
+function asyncify(fn) {
+	var orig_fn = fn,
+		intv = setTimeout( function(){
+			intv = null;
+			if (fn) fn();
+		}, 0 );
+	;
+
+	fn = null;
+
+	return function() {
+		// firing too quickly, before `intv` timer has fired to
+		// indicate async turn has passed?
+		if (intv) {
+			fn = orig_fn.bind.apply(
+				orig_fn,
+				// add the wrapper's `this` to the `bind(..)`
+				// call parameters, as well as currying any
+				// passed in parameters
+				[this].concat( [].slice.call( arguments ) )
+			);
+		}
+		// already async
+		else {
+			// invoke original function
+			orig_fn.apply( this, arguments );
+		}
+	};
+}
+```
+
+You use `asyncify(..)` like this:
+
+```js
+function result(data) {
+	console.log( a );
+}
+
+var a = 0;
+
+ajax( "..pre-cached-url..", asyncify( result ) );
+a++;
+```
+
+Whether the Ajax request is in the cache and resolves right away, or must be fetched over the wire and thus complete asynchronously, this code will always output `1` instead of `0`, because `foo()` cannot help but invoked asynchronously, which means the `a++` has a chance to run before `foo()` does.
+
+Yay, another trust issued "solved"! But it's inefficient, and yet again more bloated boilerplate to weigh your project down.
+
+That's just the story, over and over again, with callbacks. They can do pretty much anything you want, but you have to be willing to work hard to get it, and often times this effort is much more than you can or should spend on such code reasoning.
+
+You might find yourself wishing for built-in APIs or other language mechanics to address these issues. Finally ES6 has arrived on the scene with some great answers, so keep reading!
 
 ## Summary
 
@@ -425,8 +577,12 @@ Callbacks are the fundamental unit of asynchrony in JS. But they're not enough f
 
 Firstly, our brains plan things out in sequential, blocking, single-threaded semantic ways, but callbacks express asynchronous flow in a rather non-linear, non-sequential way, which makes reasoning properly about such code much harder. Bad to reason about code is bad code that leads to bad bugs.
 
+We need a way to express asynchrony in a more synchronous, sequential, blocking manner, just like our brains do.
+
 Secondly, and more importantly, callbacks suffer from *inversion of control* in that they implicitly give control over to another party (often a third-party utility not in your control!) to invoke the *continuation* of your program. This control transfer leads us to a troubling list of trust issues, such as whether the callback is called more times than we expect.
 
 Inventing ad hoc logic to solve these trust issues is possible, but it's more difficult than it should be, and it produces clunkier and harder to maintain code, as well as likely code that is insufficiently protected from these hazards until you get visibly bitten by the bugs.
+
+We need a generalized solution to **all of the trust issues**, one that can be reused for as many callbacks as we create without all the extra boilerplate overhead.
 
 We need something better than callbacks. They've served us well to this point, but the *future* of JavaScript demands more sophisticated and capable async patterns. The subsequent chapters in this book will dive into those emerging evolutions.
