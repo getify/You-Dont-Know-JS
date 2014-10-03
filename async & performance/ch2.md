@@ -11,7 +11,7 @@ As you no doubt have observed, callbacks are by far the most common way that asy
 
 Countless JS programs, even very sophisticated and complex ones, have been written upon no other async foundation than the callback (with of course the concurrency interaction patterns we explored in Chapter 1). The callback function is the async work horse for JavaScript, and it does its job respectably.
 
-Except... callbacks are not without their shortcomings. In this chapter, we're going to explore a few of those in depth, as motivation for why more sophisticated async patterns (explored in subsequent chapters of this book) are necessary and desired.
+Except... callbacks are not without their shortcomings. In this chapter, we're going to explore a couple of those in depth, as motivation for why more sophisticated async patterns (explored in subsequent chapters of this book) are necessary and desired.
 
 ## Continuations
 
@@ -110,9 +110,11 @@ As ridiculous as that sounds as a formulation for how we plan our day out and th
 
 The reason it's difficult for us as developers to write async evented code, especially when all we have is the callback to do it, is that stream of consciousness thinking/planning is unnatural for most of us.
 
-We think in step-by-step terms, but the tools we have available to us in code are not expressed in a step-by-step fashion once we move from synchronous to asynchronous.
+We think in step-by-step terms, but the tools (callbacks) we have available to us in code are not expressed in a step-by-step fashion once we move from synchronous to asynchronous.
 
 And **that** is why it's so hard to accurately author and reason about async JS code with callbacks: because it's not how our brain planning works.
+
+**Note:** The only thing worse than not knowing why some code breaks is not knowing why it worked in the first place! It's the classic "house of cards" mentality: "it works, but not sure why, so nobody touch it!". You may have heard, "Hell is other people" (Sartre), and the programmer meme twist, "Hell is other people's code." I believe truly: "Hell is not understanding my own code." And callbacks are the main culprit.
 
 ### Nested/Chained Callbacks
 
@@ -134,6 +136,10 @@ listen( "click", function handler(evt){
 ```
 
 There's a good chance code like that is recognizable to you. We've got a chain of 3 functions nested together, each one representing a step in an asynchronous series (task, "process").
+
+This kind of code is often called "callback hell", and sometimes also referred to as the "pyramid of doom" (for its sideways-facing triangular shape due to the nested indentation).
+
+But, "callback hell" actually has almost nothing to do with the nesting/indentation. It's a far deeper problem than that. We'll see how and why as we go throughout the rest of this chapter.
 
 First we're waiting for the "click" event, then we're waiting for the timer to fire, then we're waiting for the Ajax response to come back, at which point it might do it all again.
 
@@ -252,7 +258,9 @@ function response(text){
 }
 ```
 
-Again, as we go to linearly (sequentially) reason about this code, we have to skip from one function, to the next, to the next, and bounce all around the code base to "see" the sequence flow. And remember, this is simplified code in sort of best-case fashion. We all know that real async JS program code bases are often fantastically more jumbled, which makes such reasoning orders of magnitude more difficult.
+This formulation of the code is not hardly as recognizable of having the nesting/indentation woes of its previous form, and yet it's every bit as susceptible to "callback hell". Why?
+
+As we go to linearly (sequentially) reason about this code, we have to skip from one function, to the next, to the next, and bounce all around the code base to "see" the sequence flow. And remember, this is simplified code in sort of best-case fashion. We all know that real async JS program code bases are often fantastically more jumbled, which makes such reasoning orders of magnitude more difficult.
 
 Another thing to notice: to get steps 2, 3, and 4 linked together so they happen in succession, the only affordance callbacks alone gives us is to hard-code step 2 into step 1, step 3 into step 2, step 4 into step 3, and so on. The hard-coding isn't necessarily a bad thing, if it really is a fixed condition that step 2 should always lead to step 3.
 
@@ -263,6 +271,8 @@ All of these issues are things you *can* manually hard-code into each step, but 
 Even though our brains might plan out a series of tasks in sequential (this, then this, then this) type of way, the evented nature of our brain operation makes recovery/retry/forking of flow control almost effortless. If you're out running errands, and you realize you left a shopping list at home, it doesn't end the day because you didn't plan that ahead of time. Your brain plans around this easily, and you go home, get the list, then head right back out to shop.
 
 But the brittle nature of manually hard-coded callbacks (even with hard-coded error-handling) is often far less graceful. Once you end up specifying (aka pre-planning) all the various eventualities/paths, the code becomes so convoluted that it's hard to ever maintain or update it.
+
+**That** is what "callback hell" is all about! The nesting/indentation are basically a side show, a red herring.
 
 And as if all that's not enough, we haven't even touched what happens when two or more chains of these callback continuations are happening *simultaneously*, or when the third step branches out into "parallel" callbacks with gates or latches, or... OMG, my brain hurts, how about yours!?
 
@@ -352,6 +362,8 @@ You begin to chase down the rabbit hole, and think of all the possible things th
 
 That should feel like a troubling list, because it is. You're probably slowly starting to realize that you're going to have to invent an awful lot of ad hoc logic **in each and every single callback** that's passed to a utility you're not positive you can trust.
 
+Now you realize a bit more completely just how hellish "callback hell" is.
+
 ### Not Just Others' Code
 
 Some of you may be skeptical at this point whether this is as big a deal as I'm making it out to be. Perhaps you don't interact with truly third-party utilities much if at all. Perhaps you use versioned APIs or self-host such libraries, so that its behavior can't be changed out from underneath you.
@@ -414,6 +426,8 @@ But callbacks don't really offer anything to assist us. We have to construct all
 The most troublesome problem with callbacks is *inversion of control* leading to a complete break down along all those trust issues.
 
 If you have code that uses callbacks, especially but not exclusively with third-party utilities, and you're not already applying some sort of mitigation logic for all these *inversion of control* trust issues, your code *has* bugs in it right now even though they may not have bitten you yet. Latent bugs are still bugs.
+
+Hell indeed.
 
 ## Trying To Save Callbacks
 
