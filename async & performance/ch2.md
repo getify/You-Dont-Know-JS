@@ -467,12 +467,13 @@ function timeoutify(fn,delay) {
 	var intv = setTimeout( function(){
 			intv = null;
 			fn( new Error( "Timeout!" ) );
-		}, delay );
+		}, delay )
 	;
 
 	return function() {
 		// timeout hasn't happened yet?
 		if (intv) {
+			clearTimeout( intv );
 			fn.apply( this, arguments );
 		}
 	};
@@ -524,7 +525,7 @@ function asyncify(fn) {
 		intv = setTimeout( function(){
 			intv = null;
 			if (fn) fn();
-		}, 0 );
+		}, 0 )
 	;
 
 	fn = null;
