@@ -512,7 +512,7 @@ ajax( "..url..", timeoutify( foo ) );
 
 Another trust issue is being called "too early". In application-specific terms, this may actually be being called before some critical task is complete. But more generally, the problem is evident in utilities which can either invoke the callback you provide *now* (synchronously), or *later* (asynchronously).
 
-This non-determinism around the sync-or-async behavior is almost always going to lead to very difficult to track down bugs. In some circles, the metaphor of a man-eating monster named Zalgo is used to describe the sync/async nightmares. "Never release Zalgo" is a common cry, and it leads to very sound advice: always invoke callbacks asynchronously, even if that's "right away" on the next turn of the event loop, so that all callbacks are predictably async.
+This non-determinism around the sync-or-async behavior is almost always going to lead to very difficult to track down bugs. In some circles, the fictional insanity-inducing monster named Zalgo is used to describe the sync/async nightmares. "Don't release Zalgo!" (https://github.com/oren/oren.github.io/blob/master/posts/zalgo.md) is a common cry, and it leads to very sound advice: always invoke callbacks asynchronously, even if that's "right away" on the next turn of the event loop, so that all callbacks are predictably async.
 
 Consider:
 
