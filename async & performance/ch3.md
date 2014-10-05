@@ -21,6 +21,22 @@ A promise is a future value. // TODO
 
 A promise is a continuation event. // TODO
 
+## Promise Trust
+
+Promises are trustworthy. // TODO
+
+## Chain Flow
+
+Promise chains for async flow control. // TODO
+
+## Error Handling
+
+Promise errors must be handled in an intentional way. // TODO
+
+## Promise Patterns
+
+Promises have lots of various patterns for solving async tasks. // TODO
+
 ## Summary
 
 Promises are awesome. Use them. They solve all the *inversion of control* issues that plague us with callbacks-only code.

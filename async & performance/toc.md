@@ -17,6 +17,10 @@
 * Chapter 3: Promises
 	* Future Value
 	* Continuation Event
+	* Promise Trust
+	* Chain Flow
+	* Error Handling
+	* Promise Patterns
 * Appendix A: // TODO
 * Appendix B: Thank You's!
 
