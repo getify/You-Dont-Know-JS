@@ -13,11 +13,21 @@ But what if we could uninvert that *inversion of control*? What if instead of ha
 
 We can do just that, and it's called **Promises**.
 
-## Future Value
+## What is a Promise?
+
+When developers decide to learn a new technology or pattern, usually their first step is, "Show me the code!" It's quite natural for us to just jump in feet first and learn as we go.
+
+But it turns out that some abstractions get lost on the APIs alone. Promises are one of those tools where it can be painfully obvious from how someone uses it whether they understand what it's for and about versus just learning and using the API.
+
+So, before I show the Promise code, I want to explain what really is a Promise, conceptually. I hope this will then guide you better as you explore integrating promise theory into your own async flow.
+
+With that in mind, let's look at two different metaphors for what a Promise *is*.
+
+### Future Value
 
 A promise is a future value. // TODO
 
-## Continuation Event
+### Continuation Event
 
 A promise is a continuation event. // TODO
 

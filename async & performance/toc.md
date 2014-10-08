@@ -15,8 +15,7 @@
 	* Trust Issues
 	* Trying To Save Callbacks
 * Chapter 3: Promises
-	* Future Value
-	* Continuation Event
+	* What is a Promise?
 	* Promise Trust
 	* Chain Flow
 	* Error Handling
