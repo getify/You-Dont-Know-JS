@@ -25,7 +25,21 @@ With that in mind, let's look at two different metaphors for what a Promise *is*
 
 ### Future Value
 
-A promise is a future value. // TODO
+When you write code to reason about a value, such as performing math on a `number`, whether you realize it or not, you've been assuming something very fundamental about that value, which is that it's a concrete *now* value already.
+
+```js
+var x, y = 2;
+
+console.log( x + y ); // NaN  <-- because `x` isn't set yet
+```
+
+The `x + y` operations assumes both `x` and `y` are already set, or in other words (to borrow a term we'll shortly rely on), that those values are already *resolved*.
+
+It would seem like nonsense to expect that the `+` operator would somehow be magically capable of waiting around until both `x` and `y` are resolved (aka ready), and then do the operation. That would cause chaos in the program if different statements finished *now* and others finished *later*, right?
+
+How could you possibly reason about the relationships between two statements if either one (or both) of them might not be finished yet. If statement 2 relies on statement 1 being finished, there's two outcomes: either statement 1 finished right *now*, or statement 1 didn't finish yet, and thus statement 2 is going to fail.
+
+If this sort of thing sounds familiar from Chapter 1, good!
 
 ### Continuation Event
 
