@@ -41,6 +41,40 @@ How could you possibly reason about the relationships between two statements if 
 
 If this sort of thing sounds familiar from Chapter 1, good!
 
+Let's go back to our `x + y` math operation. Imagine if there was a way to say, "add `x` and `y`, and if either of them isn't ready yet, just wait until they are, but regardless, add them when you can."
+
+Your brain might have just jumped to callbacks. OK, so...
+
+```js
+function add(getX,getY,cb) {
+	var x, y;
+	getX( function(xVal){
+		x = xVal;
+		// both are ready?
+		if (y != undefined) {
+			cb(x + y);
+		}
+	} );
+	getY( function(yVal){
+		y = yVal;
+		// both are ready?
+		if (x != undefined) {
+			cb(x + y);
+		}
+	} );
+}
+
+// fetchX and fetchY are sync or async
+// functions
+add( fetchX, fetchY, function(sum){
+	console.log( sum ); // that was easy, huh?
+})
+```
+
+Take just a moment to let the beauty (or lack thereof) of that snippet sink in.
+
+**Note:** Whistles patiently.
+
 ### Continuation Event
 
 A promise is a continuation event. // TODO
