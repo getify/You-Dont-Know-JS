@@ -373,7 +373,7 @@ There are some applications where you need to be more careful, especially when d
 
 What if we *did* need to compare two numbers, like `0.1 + 0.2` to `0.3`, knowing that the simple equality test fails?
 
-The most commonly accepted practice is to use a tiny "rounding error" value as the *tolerance* for comparison. This tiny value is often called "machine epislon", which is commonly `2^-52` (`2.220446049250313e-16`) for the kind of numbers in JavaScript.
+The most commonly accepted practice is to use a tiny "rounding error" value as the *tolerance* for comparison. This tiny value is often called "machine epsilon", which is commonly `2^-52` (`2.220446049250313e-16`) for the kind of numbers in JavaScript.
 
 As of ES6, `Number.EPSILON` is predefined with this tolerance value, so you'd want to use it, but you can safely polyfill the definition for pre-ES6:
 
