@@ -1303,7 +1303,7 @@ The `==` operator's behavior is defined as "The Abstract Equality Comparison Alg
 
 Basically, the first clause (11.9.3.1) says, if the two values being compared are of the same type, what's defined for "equality" of the two values is pretty much what you'd intuitively expect, in that values are compared via Identity. For example, `42` is only equal to `42`, and `"abc"` is only equal to `"abc"`.
 
-Some minor exceptions to normal expecation to be aware of:
+Some minor exceptions to normal expectation to be aware of:
 
 * `NaN` is never equal to itself (see Chapter 2)
 * `+0` and `-0` are equal to each other (see Chapter 2)
