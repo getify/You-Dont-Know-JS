@@ -52,14 +52,14 @@ function add(getX,getY,cb) {
 		x = xVal;
 		// both are ready?
 		if (y != undefined) {
-			cb(x + y);
+			cb( x + y );	// send along sum
 		}
 	} );
 	getY( function(yVal){
 		y = yVal;
 		// both are ready?
 		if (x != undefined) {
-			cb(x + y);
+			cb( x + y );	// send along sum
 		}
 	} );
 }
@@ -68,12 +68,20 @@ function add(getX,getY,cb) {
 // functions
 add( fetchX, fetchY, function(sum){
 	console.log( sum ); // that was easy, huh?
-})
+});
 ```
 
 Take just a moment to let the beauty (or lack thereof) of that snippet sink in.
 
 **Note:** Whistles patiently.
+
+While the ugliness is undeniable, there's something very important to notice about this async pattern.
+
+In that snippet, we treated `x` and `y` as future values, and we expressed an operation `add(..)` which (from the outside) did not care whether `x` or `y` or both were available right away or not. In otherwise, it normalized the *now* and *later*, such that we'd have a predictable outcome of the `add(..)` operation.
+
+By using an `add(..)` that is temporally consistent -- behaving the same across *now* and *later* -- the async code is much easier to reason about.
+
+Of course, this rough callbacks-based approach leaves much to be desired. It's just a first tiny step toward realizing the benefits of reasoning about future values without worrying about the *time* aspect of when it's available or not.
 
 ### Continuation Event
 
