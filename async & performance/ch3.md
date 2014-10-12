@@ -117,11 +117,12 @@ function add(xPromise,yPromise) {
 	// and returns a new promise that waits on them
 	// all to finish
 	return Promise.all( [xPromise, yPromise] )
+
 	// when that promise is resolved, let's take the
 	// received `X` and `Y` values and add them together.
-	// Note: technically, `then(..)` makes a new promise
-	// to return.
 	.then( function(values){
+		// `values` is an array of the messages from the
+		// previously resolved promises
 		return values[0] + values[1];
 	} );
 }
@@ -144,11 +145,13 @@ There are two layers of promises in this snippet.
 
 `fetchX()` and `fetchY()` are called directly, and the values they return (promises!) are passed into `add(..)`. The underlying values those promises represent may be ready *now* or *later*, but each promise normalizes the behavior to be the same regardless. We reason about `X` and `Y` values in a time independent way. They are *future values*.
 
-The second layer is the promise that `add(..)` creates (via `Promise.all(..)`) and returns, which we wait on by calling `then(..)`. When the `add(..)` operation completes, our `sum` *future value* is ready and we can print it out. We hid inside of `add(..)` the waiting on the `X` and `Y` *future values*.
+The second layer is the promise that `add(..)` creates (via `Promise.all(..)`) and returns, which we wait on by calling `then(..)`. When the `add(..)` operation completes, our `sum` *future value* is ready and we can print it out. We hide inside of `add(..)` the logic for waiting on the `X` and `Y` *future values*.
 
-Because promises encapsulate the time-dependent state of waiting on the resolution of the underlying value, the promise itself is time-independent, and thus promises can be composed (combined) in predictable ways regardless of the underlying resolution state.
+**Note:** Inside `add(..)`, the `Promise.all(..)` call creates a promise (which is waiting on `promiseX` and `promiseY` to resolve). The chained call to `.then(..)` creates another promise, which the `return values[0] + values[1]` line immediately resolves. Thus, the `.then(..)` call we chain off the end of the `add(..)` call -- at the end of the snippet -- is actually operating on that second promise returned, rather than the first one created by `Promise.all(..)`. Also, though we are not chaining off that second `.then(..)`, it too has created another promise, had we chosen to observe it. All this promise chaining stuff will be explained in much greater detail later in this chapter.
 
-That's one of the most poweful and important concepts to understand about promises. With a fair amount of work, you can ad hoc create the same effects with nothing but ugly callback composition, but that's not really an effective strategy, especially since you have to do it over and over again.
+Because promises encapsulate the time-dependent state -- waiting on the resolution of the underlying value -- from the outside, the promise itself is time-independent, and thus promises can be composed (combined) in predictable ways regardless of the timing underneath.
+
+That's one of the most poweful and important concepts to understand about promises. With a fair amount of work, you could ad hoc create the same effects with nothing but ugly callback composition, but that's not really an effective strategy, especially since you have to do it over and over again.
 
 Promises are an easily repeatable mechanism for encapsulating and composing *future values*.
 
