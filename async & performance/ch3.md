@@ -113,10 +113,14 @@ We'll definitely explain a lot more details about promises later in the chapter 
 
 ```js
 function add(xPromise,yPromise) {
-	// `Promise.all(..)` takes an array or promises,
+	// `Promise.all(..)` takes an array of promises,
 	// and returns a new promise that waits on them
 	// all to finish
 	return Promise.all( [xPromise, yPromise] )
+	// when that promise is resolved, let's take the
+	// received `X` and `Y` values and add them together.
+	// Note: technically, `then(..)` makes a new promise
+	// to return.
 	.then( function(values){
 		return values[0] + values[1];
 	} );
@@ -129,16 +133,24 @@ add( fetchX(), fetchY() )
 
 // we get a promise back for the sum of those
 // two numbers.
-// we call `then(..)` to wait for the resolution
-// of that promise.
+// now we chain-call `then(..)` to wait for the
+// resolution of that returned promise.
 .then( function(sum){
 	console.log( sum ); // that was easier!
 } );
 ```
 
-There are two layers of promises in this code. `fetchX()` and `fetchY()` are called directly, and what they return (promises!) is passed into `add(..)`. The values those promises represent may be ready *now* or *later*, but the promise normalizes the behavior to be the same regardless. We reason about `X` and `Y` values in a time independent way. They are *future values*.
+There are two layers of promises in this snippet.
 
-The second layer is the promise that `add(..)` creates and returns, which we wait on by calling `then(..)`. When the `add(..)` operation completes, our `sum` *future value* is ready and we can print it out. We hid inside of `add(..)` the waiting on the `X` and `Y` *future values*.
+`fetchX()` and `fetchY()` are called directly, and the values they return (promises!) are passed into `add(..)`. The underlying values those promises represent may be ready *now* or *later*, but each promise normalizes the behavior to be the same regardless. We reason about `X` and `Y` values in a time independent way. They are *future values*.
+
+The second layer is the promise that `add(..)` creates (via `Promise.all(..)`) and returns, which we wait on by calling `then(..)`. When the `add(..)` operation completes, our `sum` *future value* is ready and we can print it out. We hid inside of `add(..)` the waiting on the `X` and `Y` *future values*.
+
+Because promises encapsulate the time-dependent state of waiting on the resolution of the underlying value, the promise itself is time-independent, and thus promises can be composed (combined) in predictable ways regardless of the underlying resolution state.
+
+That's one of the most poweful and important concepts to understand about promises. With a fair amount of work, you can ad hoc create the same effects with nothing but ugly callback composition, but that's not really an effective strategy, especially since you have to do it over and over again.
+
+Promises are an easily repeatable mechanism for encapsulating and composing *future values*.
 
 ### Continuation Event
 
