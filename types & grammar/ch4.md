@@ -1505,13 +1505,13 @@ If an `object` / `function` / `array` is compared to a simple scalar primitive (
 Consider:
 
 ```js
-var a = "42";
+var a = 42;
 var b = [ 42 ];
 
 a == b;	// true
 ```
 
-The `[ 42 ]` value has its `ToPrimitive` abstract operation called (see earlier in this chapter), which results in the `42` value. From there, it's just `"42" == 42`, which as we've already covered becomes `42 == 42`, so they're coercively equal.
+The `[ 42 ]` value has its `ToPrimitive` abstract operation called (see earlier in this chapter), which results in the `"42"` value. From there, it's just `42 == "42"`, which as we've already covered becomes `42 == 42`, so they're coercively equal.
 
 **Note:** All the quirks of the `ToPrimitive` abstract operation that we discussed earlier in this chapter (`toString()`, `valueOf()`) apply here as you'd expect. This can be quite useful if you have a complex data structure that you want to define a custom `valueOf()` method on, to provide a simple value for equality comparison purposes.
 
