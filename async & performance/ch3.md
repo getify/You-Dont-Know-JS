@@ -21,7 +21,7 @@ But it turns out that some abstractions get lost on the APIs alone. Promises are
 
 So, before I show the Promise code, I want to explain what really is a Promise, conceptually. I hope this will then guide you better as you explore integrating promise theory into your own async flow.
 
-With that in mind, let's look at two different metaphors for what a Promise *is*.
+With that in mind, let's look at two different analogies for what a Promise *is*.
 
 ### Future Value
 
@@ -179,43 +179,163 @@ That's one of the most powerful and important concepts to understand about promi
 
 Promises are an easily repeatable mechanism for encapsulating and composing *future values*.
 
-### Continuation Event
+### Completion Event
 
-As we just saw, an individual promise behaves as a *future value*. But there's another way to think of the resolution of a promise.
+As we just saw, an individual promise behaves as a *future value*. But there's another way to think of the resolution of a promise: as a flow-control mechanism -- a temporal this-then-that -- for two or more steps in an asynchronous task.
 
 Let's imagine calling a function `foo(..)` to perform some task. We don't know about any of its details, nor do we care. It may complete the task right away, or it may take awhile.
 
-What we do care about is that we just simply need to know when `foo(..)` finishes, whether that be *now* or *later*, so that we can move on to our next task. In other words, we'd like a way to simply be notified of `foo(..)`'s completion so that we can *continue*.
+We just simply need to know when `foo(..)` finishes so that we can move on to our next task. In other words, we'd like a way to be notified of `foo(..)`'s completion so that we can *continue*.
 
-In general JavaScript programming terms, if you have the need to listen for a notification, you would probably think of that in terms of events. So we could restate our desire for notification as a desire to listen for a *completion* or *continuation* event emitted by `foo(..)`.
+In typical JavaScript fashion, if you need to listen for a notification, you'd likely think of that in terms of events. So we could reframe our need for notification as a need to listen for a *completion* (or *continuation*) event emitted by `foo(..)`.
 
-With callbacks, the "notification" is that our callback is called by the task (`foo(..)` in this example). But with promises, we turn the relationship around, and expect that `foo(..)` will instead provide us with an event listening capability, which we can choose (or not!) to subscribe to.
+**Note:** Whether you call it a "completion event" or a "continuation event" depends on your perspective. Is the focus more on what happens with `foo(..)`, or what happens *after* `foo(..)` finishes. Both perspectives are accurate and useful. The event notification tells us that `foo(..)` has *completed*, but also that it's OK to *continue* with the next step. Indeed, the callback you pass to be called for the event notification is itself what we've previously called a *continuation*. Since *completion event* is a bit more focused on the `foo()`, which more has our attention at present, we slightly favor *completion event* for the rest of this text.
 
-Consider:
+With callbacks, the "notification" would be our callback invoked by the task (`foo(..)`). But with promises, we turn the relationship around, and expect that we can listen for an event from `foo(..)`, and when notified, proceed accordingly.
+
+First, consider some pseudo-code:
+
+```js
+foo(x) {
+	// start doing something that could take awhile
+}
+
+foo( 42 )
+
+on (foo "completion") {
+	// now we can do the next step!
+}
+
+on (foo "error") {
+	// oops, something went wrong in `foo(..)`
+}
+```
+
+We call `foo(..)` and then we set up two event listeners, one for `"completion"` and one for `"error"` -- the two possible *final* outcomes of the `foo(..)` call. In essence, `foo(..)` doesn't even appear to be aware that the calling code has subscribed to these events, which makes for a very nice *separation of concerns*.
+
+Unfortunately, such code would require some "magic" of the JS environment that doesn't exist (and would likely be a bit impratical). Here's the more natural way we could express that in JS:
 
 ```js
 function foo(x) {
-	// start doing something with `x`
+	// start doing something that could take awhile
 
 	// make a `listener` event notification
-	// value to pass back
+	// capability to return
+
 	return listener;
 }
 
 var evt = foo( 42 );
 
-evt.on( "completion", function(y){
-	// now we can do the next step, with `y`!
+evt.on( "completion", function(){
+	// now we can do the next step!
+} );
+
+evt.on( "failure", function(err){
+	// oops, something went wrong in `foo(..)`
 } );
 ```
 
-While we're at it, let's listen for an error event (the `foo(..)` task failing):
+`foo(..)` expressly creates an event subscription capability to return back, and the calling code receives and registers the two event handlers against it.
+
+The inversion from normal callback-oriented code should be obvious, and it's intentional. Instead of passing the callbacks to `foo(..)`, it returns an event capability we call `evt`, which receives the callbacks.
+
+But if you recall from Chapter 2, callbacks themselves represent an *inversion of control*. So inverting the callback pattern is actually an *inversion of inversion*, or an *uninversion of control* -- restoring control back to the calling code where we wanted it to be in the first place.
+
+One important benefit is that multiple separate parts of the code can be given the event listening capability, and they can all independently be notified of when `foo(..)` completes to perform subsequent steps after its completion.
 
 ```js
-evt.on( "failure", function(err){
+var evt = foo( 42 );
 
-} );
+// let `bar(..)` listen to `foo(..)`'s completion
+bar( evt );
+
+// also, let `baz(..)` listen to `foo(..)`'s completion
+baz( evt );
 ```
+
+*Uninversion of control* enables a nicer *separation of concerns*, where `bar(..)` and `baz(..)` don't need to be involved in how `foo(..)` is called. Similarly, `foo(..)` doesn't need to know or care that `bar(..)` and `baz(..)` exist or are waiting to be notified when `foo(..)` completes.
+
+Essentially, this `evt` object is a neutral third-party negotiation between the separate concerns.
+
+#### Promise "Events"
+
+As you may have guessed by now, the `evt` event listening capability is an analogy for a promise.
+
+In a promise-based approach, the previous snippet would have `foo(..)` creating and returning a `Promise` instance, and that promise would then be passed to `bar(..)` and `baz(..)`.
+
+**Note:** The promise resolution "events" we listen for aren't strictly events (though they certainly behave like events for these purposes), and they're not typically called `"completion"` or `"error"`. Instead, we use `then(..)` to register a `"then"` event. Or perhaps more precisely, `then(..)` registers `"fulfillment"` and/or `"rejection"` event(s), though we don't see those terms used explicitly in the code.
+
+Consider:
+
+```js
+function foo(x) {
+	// start doing something that could take awhile
+
+	return new Promise( function(resolve,reject){
+		// eventually, call `resolve(..)` or `reject(..)`
+	} );
+}
+
+var p = foo( 42 );
+
+bar( p );
+
+baz( p );
+```
+
+You can probably guess what the internals of `bar(..)` and `baz(..)` might look like:
+
+```js
+function bar(fooPromise) {
+	// listen for `foo(..)` to complete
+	fooPromise.then(
+		function(){
+			// `foo(..)` has now finished, so
+			// do `bar(..)`'s task
+		},
+		function(){
+			// oops, something went wrong in `foo(..)`
+		}
+	);
+}
+
+// ditto for `baz(..)`
+```
+
+Another way to approach this is:
+
+```js
+function bar() {
+	// `foo(..)` has definitely finished, so
+	// do `bar(..)`'s task
+}
+
+function oopsBar() {
+	// oops, something went wrong in `foo(..)`,
+	// so `bar(..)` didn't run
+}
+
+// ditto for `baz()` and `oopsBaz()`
+
+var p = foo( 42 );
+
+p.then( bar, oopsBar );
+
+p.then( baz, oopsBaz );
+```
+
+**Note:** If you've seen promise-based coding before, you might be tempted to believe that the last two lines of that code could be written as `p.then( .. ).then( .. )`, using chaining, rather than `p.then(..); p.then(..)`. That would have an entirely different behavior, so be careful! It won't be clear right now why the difference, but it's actually a different async pattern than we've seen thus far: splitting/forking. Don't worry! We'll come back to this point later in this chapter.
+
+Instead of passing the `p` promise to `bar(..)` and `baz(..)`, we use the promise to control when `bar(..)` and `baz(..)` will get executed, if ever. The primary difference is in the error handling.
+
+In the first snippet's approach, `bar(..)` is called regardless of whether `foo(..)` succeeds or fails, and it handles its own fallback logic if it's notified that `foo(..)` failed. The same is true for `baz(..)`, obviously.
+
+In the second snippet, `bar(..)` only gets called if `foo(..)` succeeds, and otherwise `oopsBar(..)` gets called. Ditto for `baz(..)`.
+
+Neither approach is *correct* per se. There will be cases where one is more preferable than the other.
+
+In either case, the promise `p` that comes back from `foo(..)` is used to control, via "event notifications", what happens next.
 
 ## Promise Trust
 
