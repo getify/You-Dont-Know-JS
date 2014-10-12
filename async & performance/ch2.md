@@ -358,7 +358,7 @@ You begin to chase down the rabbit hole, and think of all the possible things th
 * call the callback too early (before it's been tracked)
 * call the callback too late (or never)
 * call the callback too few or too many times (like the problem you encountered!)
-* forget to pass along any necessary environment/parameters to your callback
+* fail to pass along any necessary environment/parameters to your callback
 * swallow any errors/exceptions that may happen
 * ...
 

@@ -175,6 +175,8 @@ If something went wrong getting `X` or `Y`, or something somehow failed during t
 
 Because promises encapsulate the time-dependent state -- waiting on the resolution/rejection of the underlying value -- from the outside, the promise itself is time-independent, and thus promises can be composed (combined) in predictable ways regardless of the timing or outcome underneath.
 
+Moreover, once a promise is resolved or rejected, it stays that way forever -- it becomes an *immutable value* at that point -- and can be *observed* as many times as necessary.
+
 That's one of the most powerful and important concepts to understand about promises. With a fair amount of work, you could ad hoc create the same effects with nothing but ugly callback composition, but that's not really an effective strategy, especially since you have to do it over and over again.
 
 Promises are an easily repeatable mechanism for encapsulating and composing *future values*.
@@ -303,6 +305,8 @@ function bar(fooPromise) {
 // ditto for `baz(..)`
 ```
 
+**Note:** Promise resolution doesn't necessarily need to involve sending along a message, as it did when we were examining promises as *future values*. It can just be a flow control signal, as above.
+
 Another way to approach this is:
 
 ```js
@@ -337,9 +341,257 @@ Neither approach is *correct* per se. There will be cases where one is more pref
 
 In either case, the promise `p` that comes back from `foo(..)` is used to control, via "event notifications", what happens next.
 
+Moreover, the fact that both snippets end up calling `then(..)` twice against the same promise `p` illustrates the point made earlier, which is that promises (once resolved) retain their same resolution (fulfillment or rejection) forever, and can subsequently be observed as many times as necessary.
+
+Whenever `p` is resolved, the next step will always be the same, both *now* and *later*.
+
 ## Promise Trust
 
-Promises are trustworthy. // TODO
+So, now we've seen two strong analogies that explain different aspects of what promises can do for our async code. But if we stop there, we've missed perhaps the single most important characteristic that the promise pattern establishes: trust.
+
+Whereas the *future values* and *completion events* analogies play out explicitly in the code patterns we've explored, it won't be entirely obvious why/how promises are designed to solve all of the *inversion of control* trust issues we laid out in Chapter 2 "Trust Issues". But with a little digging, we can uncover some important guarantees that restore the confidence in async coding that Chapter 2 tore down!
+
+Let's start by reviewing the trust issues with callbacks-only coding. When you pass a callback to a utility `foo(..)`, it might:
+
+* call the callback too early
+* call the callback too late (or never)
+* call the callback too few or too many times
+* fail to pass along any necessary environment/parameters
+* swallow any errors/exceptions that may happen
+
+The characteristics of promises are intentionally designed to provide useful, repeatable answers to all these concerns.
+
+### Calling too early
+
+Primarily, this is a concern of whether code can introduce Zalgo-like effects (see Chapter 2), where sometimes a task finishes synchronously and sometimes asynchronously, which can lead to race conditions.
+
+Promises by definition cannot be susceptible to this concern, because even an immediately-fulfilled promise (like `new Promise(function(resolve){ resolve(42); })`) cannot be *observed* synchronously.
+
+That is, when you call `then(..)` on a promise, even if that promise was already resolved, the callback you provide to `then(..)` will **always** be called asynchronously (on the next event loop tick).
+
+No more need to insert your own `setTimeout(..,0)` hacks. Promises prevent Zalgo automatically.
+
+### Calling too late
+
+Similar to point the previous point, promise observation callbacks are automatically scheduled when either `resolve(..)` or `reject(..)` are called by the promise creation capability. Those `then(..)` callbacks will predictably be fired on the next event loop tick.
+
+It's not possible for synchronous observation, so it's not possible for a synchronous chain of tasks to run in such a way to in effect "delay" another callback from happening as expected. That is, when a promise is resolved, all `then(..)` registered callbacks on it will be called, in order, immediately at the next event loop opportunity, and nothing that happens inside of one of those callbacks can affect/delay the calling of the other callbacks.
+
+For example:
+
+```js
+p.then( function(){
+	p.then( function(){
+		console.log( "C" );
+	} );
+	console.log( "A" );
+} );
+p.then( function(){
+	console.log( "B" );
+} );
+// A B C
+```
+
+Here, `"C"` cannot interrupt and precede `"B"`, by virtue of how promises are defined to operate.
+
+-----
+**It's important to note**, though, that there are lots of nuances of scheduling where the relative ordering between callbacks chained off two separate promises is not reliably predictable.
+
+If two promises `p1` and `p2` are both already resolved, it should be true that `p1.then(..); p2.then(..)` would end up calling the callback(s) for `p1` before the ones for `p2`. But there are subtle cases where that might not be true, such as:
+
+```js
+var p3 = new Promise( function(resolve){
+	resolve( "B" );
+} );
+
+var p1 = new Promise( function(resolve){
+	resolve( p3 );
+} );
+
+p2 = new Promise( function(resolve){
+	resolve( "A" );
+} );
+
+p1.then( function(v){
+	console.log( v );
+} );
+
+p2.then( function(v){
+	console.log( v );
+} );
+
+// A B  <-- not  B A  as you might expect
+```
+
+We'll cover this more later, but as you can see, `p1` is resolved not with an immediate value, but with another promise `p3` which is itself resolved with the value `"B"`. The specified behavior is to *unwrap* `p3` into `p1`, but asynchronously, so `p1`'s callback(s) aren't ready to be called on the same event loop tick as `p2`'s.
+
+To avoid such nuanced nightmares, you should never rely on anything about the the ordering/scheduling of callbacks across promises. In fact, a good practice is not to code in such a way where the ordering of multiple callbacks matters at all. Avoid that if you can.
+-----
+
+### Never calling the callback
+
+This is a very common concern. It's addressable in several ways with promises.
+
+First, nothing (not even a JS error) can prevent a promise from notifying you of its resolution (if it's resolved). If you register both fulfillment and rejection callbacks for a promise, and the promise gets resolved, one of the two callbacks will always be called.
+
+Of course, if your callbacks themselves have JS errors, you may not see the outcome you expect, but the callback will in fact have been called. We'll cover later how to be notified of an error in your callback, because even those don't get swallowed.
+
+But what if the promise itself never gets resolved either way? Even that is a condition that promises provide an answer for, using a higher-level abstraction called a "race":
+
+```js
+// a utility for timing out a promise
+function timeoutPromise(delay) {
+	return new Promise( function(resolve,reject){
+		setTimeout( function(){
+			reject( "Timeout!" );
+		}, delay );
+	} );
+}
+
+// setup a timeout for `foo()`
+Promise.race( [
+	foo(),					// attempt `foo()`
+	timeoutPromise( 3000 )	// give it three seconds
+] )
+.then(
+	function(){
+		// `foo(..)` succeeded in time!
+	},
+	function(err){
+		// either `foo()` failed, or it just
+		// didn't finish in time, so inspect
+		// `err` to know which
+	}
+);
+```
+
+There's more details to consider with this promise timeout pattern, but we'll come back to it later.
+
+Importantly, we can ensure *a* signal as to the outcome of `foo()`, to prevent it from hanging our program indefinitely.
+
+### Calling too few or too many times
+
+By definition, one is the appropriate number of times for the callback to be called. The "too few" case would be zero calls, which is the same as the "never" case we just examined.
+
+The "too many" case is easy to explain. Promises are defined so that they can only be resolved once. If for some reason the promise creation code tries to call `resolve(..)` or `reject(..)` multiple times, or tries to call both in either-first order, the promise will accept only the first resolution, and will silently ignore any subsequent attempts.
+
+Since a promise can only be resolved once, any `then(..)` registered callbacks will only ever be called once (each).
+
+Of course, if you register the same callback more than once, it'll be called as many times as you requested, though you probably wouldn't want to do that if it was possible to avoid.
+
+### Failing to pass along any parameters/environment
+
+Promises can have, at most, one resolution value (success or failure).
+
+If you don't explicitly resolve with a value either way, the value is `undefined`, as is typical in JS. But whatever the value, it will always be passed to all registered (and appropriate -- fulfillment or rejection)callbacks, either *now* or in the future.
+
+**Something to be aware of:** If you call `resolve(..)` or `reject(..)` with multiple parameters, all subsequent parameters beyond the first will be silently ignored. While that might seem a violation of the guarantee we just described, it's not exactly, because it constitutes an invalid usage of the Promise mechanism. Other invalid usages of the API (such as calling `resolve(..)` multiple times) are similarly *protected*, so the Promise behavior here is consistent (if not a tiny bit frustrating).
+
+If you want to pass along multiple values, you must wrap them in another single value that you pass, such as an `array` or an `object`.
+
+As for environment, functions in JS always retain their closure of the scope in which they're defined (see the *"Scope & Closures"* title of this series), so they of course would continue have access to whatever surrounding state you provide. Of course, the same is true of callbacks-only design, so this isn't a specific augmentation of benefit from promises -- but it's a guarantee we can rely on nonetheless.
+
+### Swallowing any errors/exceptions
+
+In the base sense, this is a restatement of the previous point. If you reject a promise with a *reason* (aka error message), that value is passed to the rejection callback(s).
+
+But there's something much bigger at play here. If at any point in the creation of a promise, or in the observation of its resolution, a JS exception error occurs, such as a `TypeError` or `ReferenceError`, that exception will be caught, and it will force the promise in question to become rejected.
+
+For example:
+
+```js
+var p = new Promise( function(resolve,reject){
+	foo.bar();		// `foo` is not defined, so error!
+	resolve( 42 );	// never gets here :(
+} );
+
+p.then(
+	function(){
+		// never gets here :(
+	},
+	function(err){
+		// `err` will be a `TypeError` exception object
+		// from the `foo.bar()` line.
+	}
+);
+```
+
+The JS exception that occurs from `foo.bar()` becomes a promise rejection that you can catch and respond to.
+
+**This is an important detail**, because it effectively solves another potential Zalgo moment, which is that errors could create a synchronous reaction whereas non-errors would be asynchronous. Promises turn even JS exceptions into asynchronous behavior, thereby reducing the race condition chances greatly.
+
+But what happens if a promise is fulfilled successfully, but there's a JS exception error during the observation (in a `then(..)` registered callback)? Even those aren't lost, but you may find how they're handled a bit surprising, until you dig in a little deeper.
+
+```js
+var p = new Promise( function(resolve,reject){
+	resolve( 42 );
+} );
+
+p.then(
+	function(msg){
+		foo.bar();
+		console.log( msg );	// never gets here :(
+	},
+	function(err){
+		// never gets here either :(
+	}
+);
+```
+
+Wait, that makes it seem like the exception from `foo.bar()` really did get swallowed. Never fear, it didn't. But something deeper is wrong, which is that we've failed to listen for it. The `p.then(..)` call itself returns another promise, and it's *that* promise that will be rejected with the `TypeError` exception.
+
+Why couldn't it just call the error handler we have defined there? Seems like a logical behavior on the surface. But it would violate the fundamental principle that promises are **immutable** once resolved. `p` was already resolved to the value `42`, so it can't later be changed to a rejection just because there's an error in observing `p`'s resolution.
+
+Besides the principle violation, such behavior could wreak havoc, if say there were multiple `then(..)` registered callbacks on the promise `p`, because some would get called and others wouldn't, and it would be very opaque as to why.
+
+### Trustable Promise?
+
+There's one last detail to examine to establish trust based on the promise pattern.
+
+You've no doubt noticed that promises don't get rid of callbacks at all. They just change where the callback is passed to. Instead of passing a callback to `foo(..)`, I get *something* (ostensibly a genuine promise) back from `foo(..)`, and I pass my callback to that *something* instead.
+
+But why is that any more trustable than just callbacks alone? How can we be sure the *something* we get back is in fact a trustable promise? Isn't it basically all just a house of cards where we can trust because we already trusted?
+
+One of the most important, but often overlooked, details of promises is that they have a solution to this issue as well. Included with the native ES6 `Promise` implementation is `Promise.resolve(..)`.
+
+If you pass an immediate, non-promise-like value to `Promise.resolve(..)`, you get a promise that's fulfilled with that value. In other words, these two promises `p1` and `p2` will behave basically identically:
+
+```js
+var p1 = new Promise( function(resolve,reject){
+	resolve( 42 );
+} );
+
+var p2 = Promise.resolve( 42 );
+```
+
+But, if you pass a promise-like value to `Promise.resolve(..)`, it will attempt to unwrap that value until it gets a concrete final non-promise-like value.
+
+What do we mean by "promise-like" and "non-promise-like"? Frankly, this is a fuzzy and somewhat weak point in the promises system. In promise theory and standard terminology, any `object` (or `function`) that has a `then(..)` function on it is called a "thenable", which is another way of saying "promise-like" value. All promises are of course thenables, but not all thenables are genuine promises.
+
+Consider:
+
+```js
+var p = {
+	then: function(cb) {
+		cb( 42 );
+	}
+};
+```
+
+Here, `p` is a thenable, but it's not exactly a genuine promise. Nonetheless, we can pass it to `Promise.resolve(..)`, and we'll get the result we'd expect:
+
+```js
+Promise.resolve( p )
+.then(
+	function(val){
+		console.log( val ); // 42
+	}
+);
+```
+
+### Trust built
+
+Hopefully that discussion now fully "resolves" (pun intended) in your mind why the promise is trustable, and more importantly, why that trust is so critical in building robust,
 
 ## Chain Flow
 
