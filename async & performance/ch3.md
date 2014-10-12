@@ -63,7 +63,7 @@ How could you possibly reason about the relationships between two statements if 
 
 If this sort of thing sounds familiar from Chapter 1, good!
 
-Let's go back to our `x + y` math operation. Imagine if there was a way to say, "add `x` and `y`, and if either of them isn't ready yet, just wait until they are, but regardless, add them when you can."
+Let's go back to our `x + y` math operation. Imagine if there was a way to say, "Add `x` and `y`, but if either of them isn't ready yet, just wait until they are. Regardless, add them when you can."
 
 Your brain might have just jumped to callbacks. OK, so...
 
@@ -99,13 +99,13 @@ Take just a moment to let the beauty (or lack thereof) of that snippet sink in.
 
 While the ugliness is undeniable, there's something very important to notice about this async pattern.
 
-In that snippet, we treated `x` and `y` as future values, and we expressed an operation `add(..)` which (from the outside) did not care whether `x` or `y` or both were available right away or not. In otherwise, it normalized the *now* and *later*, such that we'd have a predictable outcome of the `add(..)` operation.
+In that snippet, we treated `x` and `y` as future values, and we express an operation `add(..)` which (from the outside) does not care whether `x` or `y` or both are available right away or not. In otherwise, it normalizes the *now* and *later*, such that we can rely on a predictable outcome of the `add(..)` operation.
 
 By using an `add(..)` that is temporally consistent -- behaving the same across *now* and *later* -- the async code is much easier to reason about.
 
 To put it more plainly: to normalize both *now* and *later*, we make both of them *later*, such that all operations are async.
 
-Of course, this rough callbacks-based approach leaves much to be desired. It's just a first tiny step toward realizing the benefits of reasoning about future values without worrying about the *time* aspect of when it's available or not.
+Of course, this rough callbacks-based approach leaves much to be desired. It's just a first tiny step toward realizing the benefits of reasoning about *future values* without worrying about the time aspect of when it's available or not.
 
 #### Promise Value
 
