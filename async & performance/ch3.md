@@ -25,6 +25,28 @@ With that in mind, let's look at two different metaphors for what a Promise *is*
 
 ### Future Value
 
+Imagine this scenario:
+
+I walk up to the counter at a fast food restaurant, and place an order for a cheeseburger. I hand the cashier $1.47. By placing my order and paying for it, I've made a request for a *value* back (the cheeseburger). I've started a transaction.
+
+But often, the chesseburger is not immediately available for me. The cashier hands me something in place of my cheeseburger: a receipt with an order number on it. This order number is an IOU ("I owe you") *promise* that ensures that eventually, I should receive my cheeseburger.
+
+So I hold onto my receipt and order number. I know it represents my *future cheeseburger*, so I don't need to worry about it anymore -- aside from being hungry!
+
+While I wait, I can do other things, like send a text message to a friend that says, "Hey, can you come join me for lunch? I'm going to eat a cheeseburger."
+
+I am reasoning about my *future cheeseburger* already, even though I don't have it in my hands yet. My brain is able to do this because it's treating the order number as a placeholder for the cheeseburger. The placeholder essentially makes the value *time independent*. It's a **future value**.
+
+Eventually, I hear, "Order 113!", and I gleefully walk back up to the counter with receipt in hand. I hand my receipt to the cashier, and I take my cheeseburger in return.
+
+In other words, once my *future value* was ready, I exchanged my promise for the value for the value itself.
+
+#### Values *Now* & *Later*
+
+But this might sound too abstract to apply it mentally to your code. So, let's be more concrete.
+
+However, before we can introduce how promises work, we're going to derive in code we already understand -- callbacks! -- how to handle these *future values*.
+
 When you write code to reason about a value, such as performing math on a `number`, whether you realize it or not, you've been assuming something very fundamental about that value, which is that it's a concrete *now* value already.
 
 ```js
@@ -64,11 +86,11 @@ function add(getX,getY,cb) {
 	} );
 }
 
-// fetchX and fetchY are sync or async
+// `fetchX()` and `fetchY()` are sync or async
 // functions
 add( fetchX, fetchY, function(sum){
 	console.log( sum ); // that was easy, huh?
-});
+} );
 ```
 
 Take just a moment to let the beauty (or lack thereof) of that snippet sink in.
@@ -81,7 +103,42 @@ In that snippet, we treated `x` and `y` as future values, and we expressed an op
 
 By using an `add(..)` that is temporally consistent -- behaving the same across *now* and *later* -- the async code is much easier to reason about.
 
+To put it more plainly: to normalize both *now* and *later*, we make both of them *later*, such that all operations are async.
+
 Of course, this rough callbacks-based approach leaves much to be desired. It's just a first tiny step toward realizing the benefits of reasoning about future values without worrying about the *time* aspect of when it's available or not.
+
+#### Promise Value
+
+We'll definitely explain a lot more details about promises later in the chapter -- so don't worry if some of this is confusing -- but let's just briefly glimpse at how we can express the above `x + y` example via `Promise`s:
+
+```js
+function add(xPromise,yPromise) {
+	// `Promise.all(..)` takes an array or promises,
+	// and returns a new promise that waits on them
+	// all to finish
+	return Promise.all( [xPromise, yPromise] )
+	.then( function(values){
+		return values[0] + values[1];
+	} );
+}
+
+// `fetchX()` and `fetchY()` return promises for
+// their respective values, which may be ready
+// *now* or *later*.
+add( fetchX(), fetchY() )
+
+// we get a promise back for the sum of those
+// two numbers.
+// we call `then(..)` to wait for the resolution
+// of that promise.
+.then( function(sum){
+	console.log( sum ); // that was easier!
+} );
+```
+
+There are two layers of promises in this code. `fetchX()` and `fetchY()` are called directly, and what they return (promises!) is passed into `add(..)`. The values those promises represent may be ready *now* or *later*, but the promise normalizes the behavior to be the same regardless. We reason about `X` and `Y` values in a time independent way. They are *future values*.
+
+The second layer is the promise that `add(..)` creates and returns, which we wait on by calling `then(..)`. When the `add(..)` operation completes, our `sum` *future value* is ready and we can print it out. We hid inside of `add(..)` the waiting on the `X` and `Y` *future values*.
 
 ### Continuation Event
 
