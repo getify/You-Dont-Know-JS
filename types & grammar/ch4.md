@@ -250,9 +250,11 @@ For example, `true` becomes `1` and `false` becomes `0`. `undefined` becomes `Na
 
 **Note:** The differences between `number` literal grammar and `ToNumber` on a `string` value are subtle and highly nuanced, and thus will not be covered further here. Consult section 9.3.1 of the ES5 spec for more information, if desired.
 
-Objects (and arrays) will first be converted to their primitive value equivalent,  and then this value (if a primitive but not already a `number`) is coerced to a `number` according to the `ToNumber` rules just mentioned.
+Objects (and arrays) will first be converted to their primitive value equivalent, and then this value (if a primitive but not already a `number`) is coerced to a `number` according to the `ToNumber` rules just mentioned.
 
-To convert to this primitive value equivalent, the `ToPrimitive` abstract operation (ES5 spec, section 9.1) will consult the value in question to see if it has a `valueOf()` method, and if so, what it returns (if a primitive value) will be used for the coercion. If no `valueOf()` is present, `toString()` is consulted, if present. If what it returns is a primitive, *that* value will be the result of the coercion.
+To convert to this primitive value equivalent, the `ToPrimitive` abstract operation (ES5 spec, section 9.1) will consult the value (using the internal `DefaultValue` operation -- ES5 spec, section 8.12.8) in question to see if it has a `valueOf()` method, and if so, what it returns (if a primitive value) will be used for the coercion. If no `valueOf()` is present, or `valueOf()` didn't return a primitive, `toString()` is consulted, if present. If what it returns is a primitive, *that* value will be the result of the coercion.
+
+If no primitive can eventually be obtained from the `ToPrimitive` operations just described, a `TypeError` is thrown.
 
 **Note:** We cover how to coerce to `number`s later in this chapter in detail, but for this next code snippet, just assume the `Number(..)` function does so.
 
@@ -276,14 +278,13 @@ c.toString = function(){
 	return this.join( "" );	// "42"
 };
 
-Number( a );	// 42
-Number( b );	// 42
-Number( c );	// 42
-Number( "" );	// 0
-Number( [] );	// 0
+Number( a );			// 42
+Number( b );			// 42
+Number( c );			// 42
+Number( "" );			// 0
+Number( [] );			// 0
+Number( [ "abc" ] );	// NaN
 ```
-
-If a primitive cannot be obtained, `NaN` will be the result.
 
 ### `ToBoolean`
 
@@ -1056,7 +1057,11 @@ But here's where coercing the `boolean` values to `number`s (`0` or `1`, obvious
 function onlyOne() {
 	var sum = 0;
 	for (var i=0; i < arguments.length; i++) {
-		sum += arguments[i];
+		// skip falsy values. same as treating
+		// them as 0's, but avoids NaN's.
+		if (arguments[i]) {
+			sum += arguments[i];
+		}
 	}
 	return sum == 1;
 }
@@ -1073,7 +1078,7 @@ onlyOne( b, a, b, b, b, a );	// false
 
 **Note:** Of course, instead of the `for` loop in `onlyOne(..)`, you could more tersely use the ES5 `reduce(..)` utility, but I didn't want to obscure the concepts.
 
-What we're doing here is relying on the `0` for `false` and `1` for `true` coercions, and numerically adding them all up. `sum += arguments[i]` uses *implicit coercion* to make that happen. If one and only one value in the `arguments` list is `true`, then the numeric sum will be `1`, otherwise the sum will not be `1` and thus the desired condition is not met.
+What we're doing here is relying on the `1` for `true` / truthy coercions, and numerically adding them all up. `sum += arguments[i]` uses *implicit coercion* to make that happen. If one and only one value in the `arguments` list is `true`, then the numeric sum will be `1`, otherwise the sum will not be `1` and thus the desired condition is not met.
 
 We could of course do this with *explicit coercion* instead:
 
@@ -1087,13 +1092,13 @@ function onlyOne() {
 }
 ```
 
-Notice here that we first use `!!arguments[i]` to force the coercion of the value to `true` or `false`. That's so you could pass non-`boolean` values in, like `onlyOne( "42", 0 )`, and it would still work as expected (otherwise you'd end up with `string` concatenation and the logic would be incorrect).
+We first use `!!arguments[i]` to force the coercion of the value to `true` or `false`. That's so you could pass non-`boolean` values in, like `onlyOne( "42", 0 )`, and it would still work as expected (otherwise you'd end up with `string` concatenation and the logic would be incorrect).
 
-Once we're sure it's a `boolean`, we do another *explicit coercion* with `Number(..)` to make sure the value is the `0` or `1`.
+Once we're sure it's a `boolean`, we do another *explicit coercion* with `Number(..)` to make sure the value is `0` or `1`.
 
-Is the *explicit coercion* form of this utility "better"? Depends on your needs. I personally think the former version, relying on *implicit coercion* is more elegant, and the *explicit* version is needlessly more verbose. But as with almost everything we're discussing here, it's a judgment call.
+Is the *explicit coercion* form of this utility "better"? It does avoid the `NaN` trap as explained in the code comments. But, ultimately, it depends on your needs. I personally think the former version, relying on *implicit coercion* is more elegant (if you won't be passing `undefined` or `NaN`), and the *explicit* version is needlessly more verbose. But as with almost everything we're discussing here, it's a judgment call.
 
-**Note:** Regardless of *implicit* or *explicit* approaches, you could easily make `onlyTwo(..)` or `onlyFive(..)` variations by simply changing the final comparison from `1` to `2` or `5`, respectively. That's drastically easier than changing a bunch of `&&` and `||` expressions. So, generally, coercion is very helpful in this case.
+**Note:** Regardless of *implicit* or *explicit* approaches, you could easily make `onlyTwo(..)` or `onlyFive(..)` variations by simply changing the final comparison from `1`, to `2` or `5`, respectively. That's drastically easier than changing a bunch of `&&` and `||` expressions. So, generally, coercion is very helpful in this case.
 
 ### Implicitly: * --> Boolean
 
