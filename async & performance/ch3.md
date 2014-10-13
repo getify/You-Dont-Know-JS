@@ -578,22 +578,60 @@ var p = {
 		cb( 42 );
 	}
 };
+
+// this works OK, but only by good fortune
+p
+.then(
+	function(val){
+		console.log( val ); // 42
+	},
+	function(err){
+		// never gets here
+	}
+);
 ```
 
-Here, `p` is a thenable, but it's not a genuine promise. Nonetheless, we can pass it to `Promise.resolve(..)`, and we'll get the result we'd expect:
+This `p` is a thenable, but it's not a genuine promise. Luckily, it's reasonable, as most will be. But what if you got back instead something that looked like:
+
+```js
+var p = {
+	then: function(cb,errcb) {
+		cb( 42 );
+		errcb( "evil laugh" );
+	}
+};
+
+p
+.then(
+	function(val){
+		console.log( val ); // 42
+	},
+	function(err){
+		// oops, shouldn't have run
+		console.log( err ); // evil laugh
+	}
+);
+```
+
+This one is not so well-behaved of a promise. Is it malicious? Or is it just ignorant of how promises should work? It doesn't really matter, to be honest. In either case, it's not trustable as-is.
+
+Nonetheless, we can pass either of these versions of `p` to `Promise.resolve(..)`, and we'll get the normalized, safe result we'd expect:
 
 ```js
 Promise.resolve( p )
 .then(
 	function(val){
 		console.log( val ); // 42
+	},
+	function(err){
+		// never gets here
 	}
 );
 ```
 
-`Promise.resolve(..)` will accept any standard promise or any promise-like thenable, and will unwrap it to its non-thenable value, but you get back a real, genuine promise in its place, **one that you can trust**.
+`Promise.resolve(..)` will accept any standard promise or any promise-like thenable, and will unwrap it to its non-thenable value. But you get back from `Promise.resolve(..)` a real, genuine promise in its place, **one that you can trust**.
 
-So, let's say we're calling a `foo(..)` and we're not sure we can trust its return value to be a well-behaving promise, but we know it's at least a thenable. `Promise.resolve(..)` will give us a trustable promise wrapper to chain off of:
+So, let's say we're calling a `foo(..)` utility and we're not sure we can trust its return value to be a well-behaving promise, but we know it's at least a thenable. `Promise.resolve(..)` will give us a trustable promise wrapper to chain off of:
 
 ```js
 // don't just do this:
