@@ -548,9 +548,9 @@ Besides the principle violation, such behavior could wreak havoc, if say there w
 
 There's one last detail to examine to establish trust based on the promise pattern.
 
-You've no doubt noticed that promises don't get rid of callbacks at all. They just change where the callback is passed to. Instead of passing a callback to `foo(..)`, I get *something* (ostensibly a genuine promise) back from `foo(..)`, and I pass my callback to that *something* instead.
+You've no doubt noticed that promises don't get rid of callbacks at all. They just change where the callback is passed to. Instead of passing a callback to `foo(..)`, we get *something* (ostensibly a genuine promise) back from `foo(..)`, and we pass the callback to that *something* instead.
 
-But why is that any more trustable than just callbacks alone? How can we be sure the *something* we get back is in fact a trustable promise? Isn't it basically all just a house of cards where we can trust because we already trusted?
+But why would this be any more trustable than just callbacks alone? How can we be sure the *something* we get back is in fact a trustable promise? Isn't it basically all just a house of cards where we can trust only because we already trusted?
 
 One of the most important, but often overlooked, details of promises is that they have a solution to this issue as well. Included with the native ES6 `Promise` implementation is `Promise.resolve(..)`.
 
@@ -564,9 +564,11 @@ var p1 = new Promise( function(resolve,reject){
 var p2 = Promise.resolve( 42 );
 ```
 
-But, if you pass a promise-like value to `Promise.resolve(..)`, it will attempt to unwrap that value until it gets a concrete final non-promise-like value.
+But, if you pass a promise-like value to `Promise.resolve(..)`, it will attempt to unwrap that value, and the unwrapping will keep going until a concrete final non-promise-like value is extracted.
 
-What do we mean by "promise-like" and "non-promise-like"? Frankly, this is a fuzzy and somewhat weak point in the promises system. In promise theory and standard terminology, any `object` (or `function`) that has a `then(..)` function on it is called a "thenable", which is another way of saying "promise-like" value. All promises are of course thenables, but not all thenables are genuine promises.
+What do we mean by "promise-like" and "non-promise-like"? To be honest, this is a fuzzy and somewhat weak point in the promises system.
+
+In promise theory and standard terminology, any `object` (or `function`) that has a `then(..)` function on it is called a "thenable", which is another way of saying "promise-like" value. All promises are of course thenables, but not all thenables are genuine promises.
 
 Consider:
 
@@ -578,7 +580,7 @@ var p = {
 };
 ```
 
-Here, `p` is a thenable, but it's not exactly a genuine promise. Nonetheless, we can pass it to `Promise.resolve(..)`, and we'll get the result we'd expect:
+Here, `p` is a thenable, but it's not a genuine promise. Nonetheless, we can pass it to `Promise.resolve(..)`, and we'll get the result we'd expect:
 
 ```js
 Promise.resolve( p )
@@ -589,9 +591,35 @@ Promise.resolve( p )
 );
 ```
 
+`Promise.resolve(..)` will accept any standard promise or any promise-like thenable, and will unwrap it to its non-thenable value, but you get back a real, genuine promise in its place, **one that you can trust**.
+
+So, let's say we're calling a `foo(..)` and we're not sure we can trust its return value to be a well-behaving promise, but we know it's at least a thenable. `Promise.resolve(..)` will give us a trustable promise wrapper to chain off of:
+
+```js
+// don't just do this:
+foo( 42 )
+.then( function(v){
+	console.log( v );
+} );
+
+// instead, do this:
+Promise.resolve( foo( 42 ) )
+.then( function(v){
+	console.log( v );
+} );
+```
+
+**Note:** Wrapping `Promise.resolve(..)` around any function's return value (thenable or not) is an easy way to normalize that function call into a well-behaving async promise resolution. If `foo(42)` returns an immediate value sometimes, or a promise other times, `Promise.resolve( foo(42) )` makes sure it's always a promise result. Avoiding Zalgo makes for much better code.
+
 ### Trust built
 
-Hopefully that discussion now fully "resolves" (pun intended) in your mind why the promise is trustable, and more importantly, why that trust is so critical in building robust,
+Hopefully the previous discussion now fully "resolves" (pun intended) in your mind why the promise is trustable, and more importantly, why that trust is so critical in building robust, maintainable software.
+
+Can you async code in JS without trust? Of course you can. We developers have been coding async with nothing but callbacks for nearly two decades.
+
+But once you start questioning just how much you can trust the mechanisms you build upon to actually be predictable and reliable, you start to realize it's a pretty shaky foundation when it comes to callbacks.
+
+Promises are a pattern that augments callbacks with trustable semantics, so that the behavior is more reason-able and more reliable. By uninverting the *inversion of control* of callbacks, we place the control with a trustable system (promises) that was designed specifically to bring sanity to our async.
 
 ## Chain Flow
 
