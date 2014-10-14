@@ -811,7 +811,7 @@ We first define a `request(..)` utility that constructs a promise to represent t
 **Note:** It will be very common for developers to face the situation that they want to do promise-aware async flow control with utilities that are not themselves promise-enabled (like `ajax(..)` here, which expects a callback). While the native ES6 `Promise` mechanism doesn't automatically solve this pattern for us, practically all promise libraries *do*. They usually call this process "lifting" or "promisifying" or some variation thereof. We'll come back to that topic later.
 
 ```js
-request( "http://some.url.1" )
+request( "http://some.url.1/" )
 .then( function(response1){
 	return request( "http://some.url.2/?v=" + response1 );
 } )
@@ -820,7 +820,48 @@ request( "http://some.url.1" )
 } );
 ```
 
-Using the promise-returning `request(..)`, we create the first step in our chain implicitly by calling it with the first URL. Once `response1` comes back, we use that value to construct a second URL, and make a second `request(..)` call. That second `request(..)` promise is `return`ed so that the second step in our async flow control waits for the ajax call to complete. Finally, we print `response2`.
+Using the promise-returning `request(..)`, we create the first step in our chain implicitly by calling it with the first URL, and chain off that returned promise with the first `then(..)`.
+
+Once `response1` comes back, we use that value to construct a second URL, and make a second `request(..)` call. That second `request(..)` promise is `return`ed so that the second step in our async flow control waits for that ajax call to complete. Finally, we print `response2` once it returns.
+
+The promise chain we construct is not only a flow control that expresses a multi-step async sequence, but it also acts as a message channel to propagate messages from step to step.
+
+What if something went wrong in one of the steps of the promise chain? An error/exception is on a per-promise basis, which means it's possible to catch such an error at some point in the chain, and that catching acts to sort of "reset" the chain back to normal operation at that point.
+
+```js
+// step 1:
+request( "http://some.url.1/" )
+
+// step 2:
+.then( function(response1){
+	foo.bar(); // undefined, error!
+
+	// never gets here
+	return request( "http://some.url.2/?v=" + response1 );
+} )
+
+// step 3:
+.then(
+	function(response2){
+		// never gets here
+	},
+	function(err){
+		console.log( err );	// `TypeError` from `foo.bar()` error
+		return 42;
+	}
+)
+
+// step 4:
+.then( function(msg){
+	console.log( msg );		// 42
+} );
+```
+
+When the error occurs in step 2, the failure handler in step 3 catches it. The return value (`42` in this snippet), if any, from that failure handler successfully resolves the promise for the next step (4), such that the chain is now back in a success state.
+
+**Note:** As we discussed earlier, when returning a promise from a fulfillment handler, it's unwrapped and can delay the next step. But that's not true for returning promises from failure handlers. If you return a promise from a failure handler (instead of `return 42` in the above snippet, that promise value would be passed through untouched (without being unwrapped) as a message to the next step, and thus cannot delay that next step.
+
+We'll cover more details of error handling with promises in the next section, because there are other nuanced details to be concerned about.
 
 ## Error Handling
 
