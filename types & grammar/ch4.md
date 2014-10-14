@@ -1180,7 +1180,7 @@ For the `||` operator, if the test is `true`, the `||` expression results in the
 
 Inversely, for the `&&` operator, if the test is `true`, the `&&` expression results in the value of the *second operand* (`b`). If the test is `false`, the `&&` expression results in the value of the *first operand* (`a` or `c`).
 
-The result of a `||` or `&&` expression is always the underlying value of one of the operands, **not** the (possibly coerced) result of the test. In `c && b`, `c` is `null`, and thus falsy. But the `||` expression itself results in `null` (the value in `c`), not in the coerced `false` used in the test.
+The result of a `||` or `&&` expression is always the underlying value of one of the operands, **not** the (possibly coerced) result of the test. In `c && b`, `c` is `null`, and thus falsy. But the `&&` expression itself results in `null` (the value in `c`), not in the coerced `false` used in the test.
 
 Do you see how these operators act as "operand selectors", now?
 
@@ -1308,7 +1308,7 @@ The `==` operator's behavior is defined as "The Abstract Equality Comparison Alg
 
 Basically, the first clause (11.9.3.1) says, if the two values being compared are of the same type, what's defined for "equality" of the two values is pretty much what you'd intuitively expect, in that values are compared via Identity. For example, `42` is only equal to `42`, and `"abc"` is only equal to `"abc"`.
 
-Some minor exceptions to normal expecation to be aware of:
+Some minor exceptions to normal expectation to be aware of:
 
 * `NaN` is never equal to itself (see Chapter 2)
 * `+0` and `-0` are equal to each other (see Chapter 2)
