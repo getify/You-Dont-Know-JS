@@ -653,15 +653,172 @@ Promise.resolve( foo( 42 ) )
 
 Hopefully the previous discussion now fully "resolves" (pun intended) in your mind why the promise is trustable, and more importantly, why that trust is so critical in building robust, maintainable software.
 
-Can you async code in JS without trust? Of course you can. We developers have been coding async with nothing but callbacks for nearly two decades.
+Can you async code in JS without trust? Of course you can. We JS developers have been coding async with nothing but callbacks for nearly two decades.
 
-But once you start questioning just how much you can trust the mechanisms you build upon to actually be predictable and reliable, you start to realize it's a pretty shaky foundation when it comes to callbacks.
+But once you start questioning just how much you can trust the mechanisms you build upon to actually be predictable and reliable, you start to realize callbacks have a pretty shaky trust foundation.
 
 Promises are a pattern that augments callbacks with trustable semantics, so that the behavior is more reason-able and more reliable. By uninverting the *inversion of control* of callbacks, we place the control with a trustable system (promises) that was designed specifically to bring sanity to our async.
 
 ## Chain Flow
 
-Promise chains for async flow control. // TODO
+We've hinted at this a couple of times already, but promises do not have to be considered only as a mechanism for a single step *this-then-that* sort of operation. That's the building block, of course, but it turns out we can string multiple promises together to represent a sequence of async steps.
+
+The key to making this work is built on two behaviors intrinsic to promises:
+
+1. every time you call `then(..)` on a promise, it creates and returns a new promise, which we can *chain* with.
+2. whatever value you return from the `then(..)` call's fulfillment callback (the first one provided) is automatically set as the fulfillment of the *chained* promise (from point #1).
+
+Let's first illustrate what that means, and *then* we'll derive how that helps us create async sequences of flow control.
+
+```js
+var p = Promise.resolve( 21 );
+
+var p2 = p.then( function(v){
+	console.log( v );	// 21
+
+	// resolve `p2` with value `42`
+	return v * 2;
+} );
+
+// chain off `p2`
+p2.then( function(v){
+	console.log( v );	// 42
+} );
+```
+
+By returning `v * 2` (i.e., `42`), we resolve (successfully) the `p2` promise that the first `then(..)` call created and returned. When `p2`'s `then(..)` call runs, it's receiving the resolution from that `return v * 2` statement. Of course, `p2.then(..)` creates yet another promise, which we could have stored in a `p3` variable.
+
+But it's a little annoying to have to create an intermediate variable `p2` (or `p3`, etc). Thankfully, we can easily just chain these together:
+
+```js
+var p = Promise.resolve( 21 );
+
+p
+.then( function(v){
+	console.log( v );	// 21
+
+	// resolve the chained promise with value `42`
+	return v * 2;
+} )
+// here's the chained promise
+.then( function(v){
+	console.log( v );	// 42
+} );
+```
+
+So now the first `then(..)` is the first step in an async sequence, and the second `then(..)` is the second step. This could keep going for as long as you needed it to extend. Just keep chaining off the previous `then(..)` with the automatically created promise.
+
+But, there's something missing here. What if we want step 2 to wait for step 1 to do something asynchronous? We're using an immediate `return` statement, which immediately resolves the chained promise.
+
+The key to making a promise sequence truly async-capable at every step is to recall from above how `Promise.resolve(..)` operates when what you pass to it is a promise (or thenable) instead of a final value. `Promise.resolve(..)` unwraps the value of the received promise, and keeps going recursively while it keeps unwrapping promises.
+
+The same sort of promise-unwrapping happens if you `return` a promise from the fulfillment callback.
+
+Consider:
+
+```js
+var p = Promise.resolve( 21 );
+
+p.then( function(v){
+	console.log( v );	// 21
+
+	// create a promise to return
+	return new Promise( function(resolve,reject){
+		// resolve with value `42`
+		resolve( v * 2 );
+	} );
+} )
+.then( function(v){
+	console.log( v );	// 42
+} );
+```
+
+Even though we wrapped `42` up in a promise that we returned, it still got unwrapped as ended up as the resolution of the chained promise, such that the second `then(..)` still received `42`. If we then introduce asynchrony to that wrapping promise, everything still nicely works the same:
+
+```js
+var p = Promise.resolve( 21 );
+
+p.then( function(v){
+	console.log( v );	// 21
+
+	// create a promise to return
+	return new Promise( function(resolve,reject){
+		// introduce asynchrony!
+		setTimeout( function(){
+			// resolve with value `42`
+			resolve( v * 2 );
+		}, 100 );
+	} );
+} )
+.then( function(v){
+	// runs after the 100ms delay in the previous step
+	console.log( v );	// 42
+} );
+```
+
+That's incredibly powerful! Now, we can construct a sequence of how ever many async steps we want, and each step can make the next step wait (or not!), as necessary.
+
+Of course, the value passing from step to step in the above examples is optional. If you don't return an explicit value, an implicit `undefined` is assumed, and the promises still chain together the same way. Each promise resolution then is just a signal to proceed to the next step.
+
+To further the chain illustration, let's generalize a delay promise creation (without resolution messages) into a utility we can re-use for multiple steps:
+
+```js
+function delay(time) {
+	return new Promise( function(resolve,reject){
+		setTimeout( resolve, time );
+	} );
+}
+
+delay( 100 )
+.then( function(){
+	console.log( "step 1 (after 100ms)" );
+	return delay( 200 );
+} )
+.then( function(){
+	console.log( "step 2 (after another 200ms)" );
+} )
+.then( function(){
+	console.log( "step 3 (next event loop tick)" );
+	return delay( 50 );
+} )
+.then( function(){
+	console.log( "step 4 (after another 50ms)" );
+} )
+...
+```
+
+Calling `delay(200)` creates a promise that will resolve in 200ms, and then we return that from the first `then(..)` fulfillment callback, which causes the second `then(..)`'s promise to wait on that 200ms promise.
+
+**Note:** As described, technically there are two promises in that interchange: the 200ms delay promise and the chained promise that the second `then(..)` hangs off of. But you may find it easier to mentally combine these two promises together, since the promise mechanism automatically merges them. In that respect, you could think of `return delay(200)` as creating a promise that replaces or hijacks the chained promise.
+
+Sequences of delays with no message passing isn't a terribly useful example of promise flow control. Let's try to look at a scenario that's a little more practical.
+
+```js
+// assume an `ajax( {url}, {callback} )` utility
+
+// promise-aware ajax
+function request(url) {
+	return new Promise( function(resolve,reject){
+		// the `ajax(..)` callback should be our
+		// promise's `resolve(..)` function
+		ajax( url, resolve );
+	} );
+}
+
+request( "http://some.url.1" )
+.then( function(response1){
+	return request( "http://some.url.2/?v=" + response1 );
+} )
+.then( function(response2){
+	console.log( response2 );
+} );
+```
+
+We first define a `request(..)` utility that constructs a promise to represent the completion of the `ajax(..)` call.
+
+**Note:** It will be very common for developers to face the situation that they want to do promise-aware async flow control with utilities that are not themselves promise-enabled (like `ajax(..)` here, which expects a callback). While the native ES6 `Promise` mechanism doesn't automatically solve this pattern for us, practically all promise libraries *do*. They usually call this process "lifting" or "promisifying" or some variation thereof. We'll come back to that topic later.
+
+Now that we have `request(..)` defined, we create the first step in our chain implicitly by calling it with the first URL. Once `response1` comes back, we use that value to construct a second URL, and make a second `request(..)` call. That second `request(..)` promise is `return`ed so that the second step in our async flow control waits for the ajax call to complete. Finally, we print `response2`.
 
 ## Error Handling
 
