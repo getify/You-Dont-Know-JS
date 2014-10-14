@@ -804,7 +804,13 @@ function request(url) {
 		ajax( url, resolve );
 	} );
 }
+```
 
+We first define a `request(..)` utility that constructs a promise to represent the completion of the `ajax(..)` call.
+
+**Note:** It will be very common for developers to face the situation that they want to do promise-aware async flow control with utilities that are not themselves promise-enabled (like `ajax(..)` here, which expects a callback). While the native ES6 `Promise` mechanism doesn't automatically solve this pattern for us, practically all promise libraries *do*. They usually call this process "lifting" or "promisifying" or some variation thereof. We'll come back to that topic later.
+
+```js
 request( "http://some.url.1" )
 .then( function(response1){
 	return request( "http://some.url.2/?v=" + response1 );
@@ -814,11 +820,7 @@ request( "http://some.url.1" )
 } );
 ```
 
-We first define a `request(..)` utility that constructs a promise to represent the completion of the `ajax(..)` call.
-
-**Note:** It will be very common for developers to face the situation that they want to do promise-aware async flow control with utilities that are not themselves promise-enabled (like `ajax(..)` here, which expects a callback). While the native ES6 `Promise` mechanism doesn't automatically solve this pattern for us, practically all promise libraries *do*. They usually call this process "lifting" or "promisifying" or some variation thereof. We'll come back to that topic later.
-
-Now that we have `request(..)` defined, we create the first step in our chain implicitly by calling it with the first URL. Once `response1` comes back, we use that value to construct a second URL, and make a second `request(..)` call. That second `request(..)` promise is `return`ed so that the second step in our async flow control waits for the ajax call to complete. Finally, we print `response2`.
+Using the promise-returning `request(..)`, we create the first step in our chain implicitly by calling it with the first URL. Once `response1` comes back, we use that value to construct a second URL, and make a second `request(..)` call. That second `request(..)` promise is `return`ed so that the second step in our async flow control waits for the ajax call to complete. Finally, we print `response2`.
 
 ## Error Handling
 
