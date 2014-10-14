@@ -177,6 +177,8 @@ Because promises encapsulate the time-dependent state -- waiting on the resoluti
 
 Moreover, once a promise is resolved or rejected, it stays that way forever -- it becomes an *immutable value* at that point -- and can be *observed* as many times as necessary.
 
+**Note:** Because a promise is externally immutable once resolved, it's now safe to pass that value around to any party and know that it cannot be modified accidentally or maliciously. This is especially true in relation to multiple parties observing the resolution of a promise. It is not possible for one party to affect another party's ability to observe the promise resolution. Immutability may sound like an academic topic, but it's actually one of the most fundamental and important aspects of promise design, and shouldn't be casually passed over.
+
 That's one of the most powerful and important concepts to understand about promises. With a fair amount of work, you could ad hoc create the same effects with nothing but ugly callback composition, but that's not really an effective strategy, especially since you have to do it over and over again.
 
 Promises are an easily repeatable mechanism for encapsulating and composing *future values*.
@@ -395,6 +397,7 @@ p.then( function(){
 Here, `"C"` cannot interrupt and precede `"B"`, by virtue of how promises are defined to operate.
 
 -----
+
 **It's important to note**, though, that there are lots of nuances of scheduling where the relative ordering between callbacks chained off two separate promises is not reliably predictable.
 
 If two promises `p1` and `p2` are both already resolved, it should be true that `p1.then(..); p2.then(..)` would end up calling the callback(s) for `p1` before the ones for `p2`. But there are subtle cases where that might not be true, such as:
@@ -426,6 +429,7 @@ p2.then( function(v){
 We'll cover this more later, but as you can see, `p1` is resolved not with an immediate value, but with another promise `p3` which is itself resolved with the value `"B"`. The specified behavior is to *unwrap* `p3` into `p1`, but asynchronously, so `p1`'s callback(s) aren't ready to be called on the same event loop tick as `p2`'s.
 
 To avoid such nuanced nightmares, you should never rely on anything about the the ordering/scheduling of callbacks across promises. In fact, a good practice is not to code in such a way where the ordering of multiple callbacks matters at all. Avoid that if you can.
+
 -----
 
 ### Never calling the callback
@@ -845,6 +849,7 @@ request( "http://some.url.1/" )
 	function(response2){
 		// never gets here
 	},
+	// failure handler to catch the error
 	function(err){
 		console.log( err );	// `TypeError` from `foo.bar()` error
 		return 42;
@@ -859,9 +864,60 @@ request( "http://some.url.1/" )
 
 When the error occurs in step 2, the failure handler in step 3 catches it. The return value (`42` in this snippet), if any, from that failure handler successfully resolves the promise for the next step (4), such that the chain is now back in a success state.
 
-**Note:** As we discussed earlier, when returning a promise from a fulfillment handler, it's unwrapped and can delay the next step. But that's not true for returning promises from failure handlers. If you return a promise from a failure handler (instead of `return 42` in the above snippet, that promise value would be passed through untouched (without being unwrapped) as a message to the next step, and thus cannot delay that next step.
+**Note:** As we discussed earlier, when returning a promise from a fulfillment handler, it's unwrapped and can delay the next step. But that's not true for returning promises from failure handlers. If you return a promise from a failure handler (instead of `return 42` in the above snippet, that promise value would be passed through untouched (without being unwrapped) as a message to the next step, and thus cannot delay that next step. A thrown exception inside either the fulfillment or failure handler of a `then(..)` call causes the next (chained) promise to be immediately rejected with that exception.
 
-We'll cover more details of error handling with promises in the next section, because there are other nuanced details to be concerned about.
+If you call `then(..)` on a promise, and you only pass a fulfillment handler to it, an assumed failure handler is substituted:
+
+```js
+var p = new Promise( function(resolve,reject){
+	reject( "Oops" );
+} );
+
+var p2 = p.then(
+	function(){
+		// never gets here
+	}
+	// assumed failure handler, if omitted or
+	// any other non-function value passed
+	// function(err) {
+	//     throw err;
+	// }
+);
+```
+
+As you can see, the assumed failure handler simply re-throws the error, which ends up forcing `p2` (the chained promise) to reject with the same error reason. In essences, this allows the error to continue propagating along a promise chain until a failure handler is explicitly registered to handle it.
+
+**Note:** We'll cover more details of error handling with promises in the next section, because there are other nuanced details to be concerned about.
+
+If a proper valid function is not passed as the fulfillment handler parameter to `then(..)`, there's also a default handler substituted:
+
+```js
+var p = Promise.resolve( 42 );
+
+p.then(
+	// assumed failure handler, if omitted or
+	// any other non-function value passed
+	// function(v) {
+	//     return v;
+	// }
+	null,
+	function(err){
+		// never gets here
+	}
+);
+```
+
+As you can see, the default fulfillment handler simply passes whatever value it receives along to the next step (promise).
+
+**Note:** `then(null,function(err){ .. })`, for only handling errors (if any) but letting success messages pass through, actually has a shortcut in the API. Instead, you can use `catch(function(err){ .. })`. We'll cover `catch(..)` more in the next section.
+
+Let's review briefly the intrinsic behaviors of promises that enable chaining flow control:
+
+1. A `then(..)` call against one promise automatically produces a new promise to return from the call.
+2. Inside the fulfillment/failure handlers, if you return a value or an exception is thrown, the new returned (chainable) promise is resolved accordingly.
+3. If the fulfillment handler returns a promise, it is unwrapped, so that whatever its resolution is will become the resolution of the chainable promise returned from the `then(..)`.
+
+While chaining flow control is helpful, it's probably most accurate to think of it as a side benefit of how promises compose (combine) together, rather than the main intent. As we've discussed in detail several times already, promises normalize asynchrony and encapsulate time-dependent value state, and *that* is what lets us chain them together in this nice way.
 
 ## Error Handling
 
