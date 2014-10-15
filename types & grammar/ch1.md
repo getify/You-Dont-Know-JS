@@ -7,7 +7,7 @@ Most developers would say that a dynamic language (like JS) does not have *types
 >
 > An ECMAScript language type corresponds to values that are directly manipulated by an ECMAScript programmer using the ECMAScript language. The ECMAScript language types are Undefined, Null, Boolean, String, Number, and Object.
 
-Now, if you're a fan of strongly-typed (statically-typed) languages, you may object to this usage of the word "type". In those languages, "type" means a whole lot *more* than it does here in JS.
+Now, if you're a fan of strongly typed (statically typed) languages, you may object to this usage of the word "type". In those languages, "type" means a whole lot *more* than it does here in JS.
 
 Some people say JS shouldn't claim to have "types", and they should instead be called "tags" or perhaps "sub types".
 
@@ -35,7 +35,7 @@ Armed with a full understanding of JavaScript types, we're aiming to illustrate 
 
 ## Primitives
 
-JavaScript defines seven built-in types, which we often call "primitives". These are:
+JavaScript defines seven built-in types, that we often call "primitives". These are:
 
 * `null`
 * `undefined`
@@ -76,7 +76,7 @@ var a = null;
 (!a && typeof a === "object"); // true
 ```
 
-`null` is the only value which is "falsy" (aka false-like; see Chapter 4) but which also returns `"object"` from the `typeof` check.
+`null` is the only value that is "falsy" (aka false-like; see Chapter 4) but that also returns `"object"` from the `typeof` check.
 
 So what's the seventh string value that `typeof` can return? And why is it not actually a top-level type?
 
@@ -84,7 +84,7 @@ So what's the seventh string value that `typeof` can return? And why is it not a
 typeof function a(){ /* .. */ } === "function"; // true
 ```
 
-It's easy to think that `function` would be a top-level primitive type in JS, especially given this behavior of the `typeof` operator. However, if you read the spec, you'll see it's actually somewhat of a "sub-type" of object. Specifically, a function is referred to as a "callable object" -- an object that has an internal `[[Call]]` property that allows it to be invoked.
+It's easy to think that `function` would be a top-level primitive type in JS, especially given this behavior of the `typeof` operator. However, if you read the spec, you'll see it's actually somewhat of a "subtype" of object. Specifically, a function is referred to as a "callable object" -- an object that has an internal `[[Call]]` property that allows it to be invoked.
 
 The fact that functions are actually objects is quite useful. Most importantly, they can have properties. For example:
 
@@ -108,9 +108,9 @@ What about arrays? They're pretty native to JS, so are they a special type?
 typeof [1,2,3] === "object"; // true
 ```
 
-Nope, just objects. It's most appropriate to think of them also as a "sub-type" of object (see Chapter 3), in this case with the additional characteristics of being numerically indexed (as opposed to just being string-keyed like plain objects) and maintaining an automatically updated `.length` property.
+Nope, just objects. It's most appropriate to think of them also as a "subtype" of object (see Chapter 3), in this case with the additional characteristics of being numerically indexed (as opposed to just being string-keyed like plain objects) and maintaining an automatically updated `.length` property.
 
-## Values As Types
+## Values as Types
 
 In JavaScript, variables don't have types -- **values have types**. Variables can hold any value, at any time.
 
@@ -138,7 +138,7 @@ The first `typeof 42` returns `"number"`, and then `typeof "number"` is `"string
 
 ### `undefined` vs "undeclared"
 
-Variables which have no value *currently*, actually have the `undefined` value. Calling `typeof` against such variables will return `"undefined"`:
+Variables that have no value *currently*, actually have the `undefined` value. Calling `typeof` against such variables will return `"undefined"`:
 
 ```js
 var a;
@@ -157,7 +157,7 @@ typeof c; // "undefined"
 
 It's tempting for most developers to think of the name "undefined" and think of it as a synonym for "undeclared". However, in JS, these two concepts are quite different.
 
-An "undefined" variable is one that has been declared in the accessible scope, but *at the moment* has no other value in it. By contrast, an "undeclared" variable is one which has not been formally declared in the accessible scope.
+An "undefined" variable is one that has been declared in the accessible scope, but *at the moment* has no other value in it. By contrast, an "undeclared" variable is one that has not been formally declared in the accessible scope.
 
 Consider:
 
@@ -214,7 +214,7 @@ if (typeof atob === "undefined") {
 }
 ```
 
-**Note:** In this scenario, where you're defining a "polyfill" for a feature if it doesn't already exist (but should!), you probably want to avoid using `var` to make the `atob` declaration. If you declare `var atob` inside the `if` statement, this declaration is hoisted (see *"Scope & Closures"* title of this series) to the top of the scope, even if the `if` condition doesn't pass (because the global `atob` already exists!). In some browsers and for some special types of global built-in variables (often called "host objects"), this duplicate declaration may throw an error. Omitting the `var` prevents this hoisted declaration.
+**Note:** If you're defining a "polyfill" for a feature if it doesn't already exist (but should!), you probably want to avoid using `var` to make the `atob` declaration. If you declare `var atob` inside the `if` statement, this declaration is hoisted (see the *"Scope & Closures"* title of this series) to the top of the scope, even if the `if` condition doesn't pass (because the global `atob` already exists!). In some browsers and for some special types of global built-in variables (often called "host objects"), this duplicate declaration may throw an error. Omitting the `var` prevents this hoisted declaration.
 
 Another way of doing these checks against global variables but without the safety guard feature of `typeof` is to observe that all global variables are also properties of the global object, which in the browser is basically the `window` object. So, the above checks could have been done (quite safely) as:
 
@@ -232,7 +232,7 @@ Unlike referencing undeclared variables, there is no `ReferenceError` thrown if 
 
 On the other hand, manually referencing the global variable with a `window` reference is something some developers prefer to avoid, especially if your code needs to run in multiple JS environments (not just browsers, but server-side node.js, for instance), where the global variable may not always be called `window`.
 
-Technically, this safety guard on `typeof` is useful even if you're not using global variables, though these circumstances are less common, and some developers may find this design approach less desirable. Imagine a utility function that you want others to copy-n-paste into their programs or modules, in which you want to check to see if including program has defined a certain variable (so that you can use it) or not:
+Technically, this safety guard on `typeof` is useful even if you're not using global variables, though these circumstances are less common, and some developers may find this design approach less desirable. Imagine a utility function that you want others to copy-and-paste into their programs or modules, in which you want to check to see if the including program has defined a certain variable (so that you can use it) or not:
 
 ```js
 function doSomethingCool() {
@@ -246,7 +246,7 @@ function doSomethingCool() {
 }
 ```
 
-`doSomethingCool()` tests for a variable called `FeatureXYZ`, and if found, uses it, if not, uses its own. Now, if someone includes this utility into their module/program, it safely checks if they've defined `FeatureXYZ` or not:
+`doSomethingCool()` tests for a variable called `FeatureXYZ`, and if found, uses it, but if not, uses its own. Now, if someone includes this utility into their module/program, it safely checks if they've defined `FeatureXYZ` or not:
 
 ```js
 // an IIFE (see "Immediately Invoked Function Expressions" discussion in the *"Scope & Closures"* title of this series)

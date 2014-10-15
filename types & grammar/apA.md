@@ -13,7 +13,7 @@ It's a little known fact that the official name of the language is ECMAScript (r
 
 The official ECMAScript specification includes "Annex B" which discusses specific deviations from the official spec for the purposes of JS compatibility in browsers.
 
-The proper way to consider these deviations is that they are only reliably present/valid if your code is running in a browser. If your code always runs in browsers, you won't see any observable difference. If not (like if it can run in node.js, Rhino, etc), or you're not sure, *tread carefully*.
+The proper way to consider these deviations is that they are only reliably present/valid if your code is running in a browser. If your code always runs in browsers, you won't see any observable difference. If not (like if it can run in node.js, Rhino, etc.), or you're not sure, *tread carefully*.
 
 The main compatibility differences:
 
@@ -38,7 +38,7 @@ Generally speaking, all these differences are rarely used, so the deviations fro
 
 ## Host Objects
 
-The well-covered rules for how variables behave in JS have exceptions to them when it comes to variables that are auto-defined, or otherwise created and provided to JS by the environment that hosts your code (browser, etc) -- so called, "host objects" (which include both built-in `object`s and `function`s).
+The well-covered rules for how variables behave in JS have exceptions to them when it comes to variables that are auto-defined, or otherwise created and provided to JS by the environment that hosts your code (browser, etc.) -- so called, "host objects" (which include both built-in `object`s and `function`s).
 
 For example:
 
@@ -65,7 +65,7 @@ Other behavior variations with host objects to be aware of can include:
 
 Host objects are critical to making our JS code work with its surrounding environment. But it's important to note when you're interacting with a host object and be careful of assuming its behaviors, as they will quite often not conform to regular JS `object`s.
 
-One notable example of a host object that you probably interact with regularly is the `console` object and its various functions (`log(..)`, `error(..)`, etc). The `console` object is provided by the *hosting environment* specifically so your code can interact with it for various development-related output tasks.
+One notable example of a host object that you probably interact with regularly is the `console` object and its various functions (`log(..)`, `error(..)`, etc.). The `console` object is provided by the *hosting environment* specifically so your code can interact with it for various development-related output tasks.
 
 In browsers, `console` hooks up to the developer tools' console display, whereas in node.js and other server-side JS environments, `console` is generally connected to the standard-output (`stdout`) and standard-error (`stderr`) streams of the JavaScript environment system process.
 
@@ -281,7 +281,7 @@ It looks harmless, but the `</script>` appearing inside the `string` literal wil
 "</sc" + "ript>";
 ```
 
-Also, beware that code inside an external file will be interpreted in the character-set (UTF-8, ISO-8859-8, etc) the file is served with (or the default), but that same code in an inline `script` element in your HTML page will be interpreted by the character-set of the page (or its default). **Note:** The `charset` attribute will not work on inline script elements.
+Also, beware that code inside an external file will be interpreted in the character-set (UTF-8, ISO-8859-8, etc.) the file is served with (or the default), but that same code in an inline `script` element in your HTML page will be interpreted by the character-set of the page (or its default). **Note:** The `charset` attribute will not work on inline script elements.
 
 Another deprecated practice with inline `script` elements is including HTML-style or X(HT)ML-style comments around inline code, like:
 
