@@ -923,7 +923,58 @@ Certainly, the sequential expressiveness of the chain (this-then-this-then-this.
 
 ## Error Handling
 
-Promise errors must be handled in an intentional way. // TODO
+We've already seen several examples of how promise rejection -- either intentional through calling `reject(..)` or accidental through JS exceptions -- allows saner error handling in asynchronous programming. Let's circle back though and be explicit about some of the details that we glossed over.
+
+The most natural form of error handling for most developers is the synchronous `try..catch` construct. Unfortunately, it's synchronous-only, so it fails to help in async code patterns:
+
+```js
+function foo() {
+	setTimeout( function(){
+		baz.bar();
+	}, 100 );
+}
+
+try {
+	foo();
+	// later throws global error from `baz.bar()`
+}
+catch (err) {
+	// never gets here
+}
+```
+
+`try..catch` would certainly be nice to have, but it doesn't work across async operations. That is, unless there's some additional environmental support, which we'll come back to in the next chapter.
+
+In callbacks, some standards have emerged for patterned error-handling, most notably the "error-first callback" style:
+
+```js
+function foo(cb) {
+	setTimeout( function(){
+		try {
+			var x = baz.bar();
+			cb( null, x ); // success!
+		}
+		catch (err) {
+			cb( err );
+		}
+	}, 100 );
+}
+
+foo( function(err,val){
+	if (err) {
+		console.error( err ); // bummer :(
+	}
+	else {
+		console.log( val );
+	}
+} );
+```
+
+**Note:** The `try..catch` here works only from the perspective that the `baz.bar()` call will either succeed or fail immediately, synchronously. If `baz.bar()` was itself its own async completing function, any async errors inside it would not be catchable.
+
+The callback we pass to `foo(..)` expects to receive a signal of an error by the reserved first parameter `err`. If present, error is assumed. If not, success is assumed.
+
+This sort of error handling is technically *async-capable*, but it doesn't compose well at all. Multiple levels of error-first callbacks woven together with these ubiquitous `if` statement checks inevitably will lead you the perils of callback hell (see Chapter 2).
 
 ## Promise Patterns
 
