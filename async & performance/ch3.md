@@ -917,7 +917,9 @@ Let's review briefly the intrinsic behaviors of promises that enable chaining fl
 2. Inside the fulfillment/failure handlers, if you return a value or an exception is thrown, the new returned (chainable) promise is resolved accordingly.
 3. If the fulfillment handler returns a promise, it is unwrapped, so that whatever its resolution is will become the resolution of the chainable promise returned from the `then(..)`.
 
-While chaining flow control is helpful, it's probably most accurate to think of it as a side benefit of how promises compose (combine) together, rather than the main intent. As we've discussed in detail several times already, promises normalize asynchrony and encapsulate time-dependent value state, and *that* is what lets us chain them together in this nice way.
+While chaining flow control is helpful, it's probably most accurate to think of it as a side benefit of how promises compose (combine) together, rather than the main intent. As we've discussed in detail several times already, promises normalize asynchrony and encapsulate time-dependent value state, and *that* is what lets us chain them together in this useful way.
+
+Certainly, the sequential expressiveness of the chain (this-then-this-then-this...) is a big improvement over the tangled mess of callbacks as we identified in Chapter 2. But there's still a fair amount of boilerplate (`then(..)` and `function(){ .. }`) to wade through. In the next chapter, we'll see a significantly nicer pattern for sequential flow control expressivity, with generators.
 
 ## Error Handling
 
