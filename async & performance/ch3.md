@@ -175,7 +175,7 @@ If something went wrong getting `X` or `Y`, or something somehow failed during t
 
 Because promises encapsulate the time-dependent state -- waiting on the resolution/rejection of the underlying value -- from the outside, the promise itself is time-independent, and thus promises can be composed (combined) in predictable ways regardless of the timing or outcome underneath.
 
-Moreover, once a promise is resolved or rejected, it stays that way forever -- it becomes an *immutable value* at that point -- and can be *observed* as many times as necessary.
+Moreover, once a promise is resolved (fulfilled or rejected), it stays that way forever -- it becomes an *immutable value* at that point -- and can then be *observed* as many times as necessary.
 
 **Note:** Because a promise is externally immutable once resolved, it's now safe to pass that value around to any party and know that it cannot be modified accidentally or maliciously. This is especially true in relation to multiple parties observing the resolution of a promise. It is not possible for one party to affect another party's ability to observe the promise resolution. Immutability may sound like an academic topic, but it's actually one of the most fundamental and important aspects of promise design, and shouldn't be casually passed over.
 
@@ -276,8 +276,11 @@ Consider:
 function foo(x) {
 	// start doing something that could take awhile
 
-	return new Promise( function(resolve,reject){
-		// eventually, call `resolve(..)` or `reject(..)`
+	// construct and return a promise
+	return new Promise( function(fulfill,reject){
+		// eventually, call `fulfill(..)` or `reject(..)`,
+		// which are the resolution triggers for
+		// the promise.
 	} );
 }
 
@@ -287,6 +290,8 @@ bar( p );
 
 baz( p );
 ```
+
+**Note:** The pattern shown with `new Promise( function(..){ .. } )` is generally called the ["revealing constructor"](http://domenic.me/2014/02/13/the-revealing-constructor-pattern/). The function passed in is executed immediately (not async deferred, as callbacks to `then(..)` are), and it's provided two parameters, which we named here `fullfill` and `reject`. These are the resolution functions for the promise. `fulfill(..)` triggers fulfillment resolution, and `reject(..)` triggers rejection resolution.
 
 You can probably guess what the internals of `bar(..)` and `baz(..)` might look like:
 
@@ -367,7 +372,7 @@ The characteristics of promises are intentionally designed to provide useful, re
 
 Primarily, this is a concern of whether code can introduce Zalgo-like effects (see Chapter 2), where sometimes a task finishes synchronously and sometimes asynchronously, which can lead to race conditions.
 
-Promises by definition cannot be susceptible to this concern, because even an immediately-fulfilled promise (like `new Promise(function(resolve){ resolve(42); })`) cannot be *observed* synchronously.
+Promises by definition cannot be susceptible to this concern, because even an immediately-fulfilled promise (like `new Promise(function(fulfill){ fulfill(42); })`) cannot be *observed* synchronously.
 
 That is, when you call `then(..)` on a promise, even if that promise was already resolved, the callback you provide to `then(..)` will **always** be called asynchronously (on the next event loop tick).
 
@@ -375,7 +380,7 @@ No more need to insert your own `setTimeout(..,0)` hacks. Promises prevent Zalgo
 
 ### Calling too late
 
-Similar to point the previous point, promise observation callbacks are automatically scheduled when either `resolve(..)` or `reject(..)` are called by the promise creation capability. Those `then(..)` callbacks will predictably be fired on the next event loop tick.
+Similar to point the previous point, promise observation callbacks are automatically scheduled when either `fulfill(..)` or `reject(..)` are called by the promise creation capability. Those `then(..)` callbacks will predictably be fired on the next event loop tick.
 
 It's not possible for synchronous observation, so it's not possible for a synchronous chain of tasks to run in such a way to in effect "delay" another callback from happening as expected. That is, when a promise is resolved, all `then(..)` registered callbacks on it will be called, in order, immediately at the next event loop opportunity, and nothing that happens inside of one of those callbacks can affect/delay the calling of the other callbacks.
 
@@ -403,16 +408,16 @@ Here, `"C"` cannot interrupt and precede `"B"`, by virtue of how promises are de
 If two promises `p1` and `p2` are both already resolved, it should be true that `p1.then(..); p2.then(..)` would end up calling the callback(s) for `p1` before the ones for `p2`. But there are subtle cases where that might not be true, such as:
 
 ```js
-var p3 = new Promise( function(resolve){
-	resolve( "B" );
+var p3 = new Promise( function(fulfill,reject){
+	fulfill( "B" );
 } );
 
-var p1 = new Promise( function(resolve){
-	resolve( p3 );
+var p1 = new Promise( function(fulfill,reject){
+	fulfill( p3 );
 } );
 
-p2 = new Promise( function(resolve){
-	resolve( "A" );
+p2 = new Promise( function(fulfill,reject){
+	fulfill( "A" );
 } );
 
 p1.then( function(v){
@@ -445,7 +450,7 @@ But what if the promise itself never gets resolved either way? Even that is a co
 ```js
 // a utility for timing out a promise
 function timeoutPromise(delay) {
-	return new Promise( function(resolve,reject){
+	return new Promise( function(fulfill,reject){
 		setTimeout( function(){
 			reject( "Timeout!" );
 		}, delay );
@@ -477,7 +482,7 @@ Importantly, we can ensure *a* signal as to the outcome of `foo()`, to prevent i
 
 By definition, one is the appropriate number of times for the callback to be called. The "too few" case would be zero calls, which is the same as the "never" case we just examined.
 
-The "too many" case is easy to explain. Promises are defined so that they can only be resolved once. If for some reason the promise creation code tries to call `resolve(..)` or `reject(..)` multiple times, or tries to call both in either-first order, the promise will accept only the first resolution, and will silently ignore any subsequent attempts.
+The "too many" case is easy to explain. Promises are defined so that they can only be resolved once. If for some reason the promise creation code tries to call `fulfill(..)` or `reject(..)` multiple times, or tries to call both in either-first order, the promise will accept only the first resolution, and will silently ignore any subsequent attempts.
 
 Since a promise can only be resolved once, any `then(..)` registered callbacks will only ever be called once (each).
 
@@ -489,7 +494,7 @@ Promises can have, at most, one resolution value (success or failure).
 
 If you don't explicitly resolve with a value either way, the value is `undefined`, as is typical in JS. But whatever the value, it will always be passed to all registered (and appropriate -- fulfillment or rejection)callbacks, either *now* or in the future.
 
-**Something to be aware of:** If you call `resolve(..)` or `reject(..)` with multiple parameters, all subsequent parameters beyond the first will be silently ignored. While that might seem a violation of the guarantee we just described, it's not exactly, because it constitutes an invalid usage of the Promise mechanism. Other invalid usages of the API (such as calling `resolve(..)` multiple times) are similarly *protected*, so the Promise behavior here is consistent (if not a tiny bit frustrating).
+**Something to be aware of:** If you call `fulfill(..)` or `reject(..)` with multiple parameters, all subsequent parameters beyond the first will be silently ignored. While that might seem a violation of the guarantee we just described, it's not exactly, because it constitutes an invalid usage of the Promise mechanism. Other invalid usages of the API (such as calling `fulfill(..)` multiple times) are similarly *protected*, so the Promise behavior here is consistent (if not a tiny bit frustrating).
 
 If you want to pass along multiple values, you must wrap them in another single value that you pass, such as an `array` or an `object`.
 
@@ -504,9 +509,9 @@ But there's something much bigger at play here. If at any point in the creation 
 For example:
 
 ```js
-var p = new Promise( function(resolve,reject){
+var p = new Promise( function(fulfill,reject){
 	foo.bar();		// `foo` is not defined, so error!
-	resolve( 42 );	// never gets here :(
+	fulfill( 42 );	// never gets here :(
 } );
 
 p.then(
@@ -527,8 +532,8 @@ The JS exception that occurs from `foo.bar()` becomes a promise rejection that y
 But what happens if a promise is fulfilled successfully, but there's a JS exception error during the observation (in a `then(..)` registered callback)? Even those aren't lost, but you may find how they're handled a bit surprising, until you dig in a little deeper.
 
 ```js
-var p = new Promise( function(resolve,reject){
-	resolve( 42 );
+var p = new Promise( function(fulfill,reject){
+	fulfill( 42 );
 } );
 
 p.then(
@@ -544,7 +549,7 @@ p.then(
 
 Wait, that makes it seem like the exception from `foo.bar()` really did get swallowed. Never fear, it didn't. But something deeper is wrong, which is that we've failed to listen for it. The `p.then(..)` call itself returns another promise, and it's *that* promise that will be rejected with the `TypeError` exception.
 
-Why couldn't it just call the error handler we have defined there? Seems like a logical behavior on the surface. But it would violate the fundamental principle that promises are **immutable** once resolved. `p` was already resolved to the value `42`, so it can't later be changed to a rejection just because there's an error in observing `p`'s resolution.
+Why couldn't it just call the error handler we have defined there? Seems like a logical behavior on the surface. But it would violate the fundamental principle that promises are **immutable** once resolved. `p` was already fulfilled to the value `42`, so it can't later be changed to a rejection just because there's an error in observing `p`'s resolution.
 
 Besides the principle violation, such behavior could wreak havoc, if say there were multiple `then(..)` registered callbacks on the promise `p`, because some would get called and others wouldn't, and it would be very opaque as to why.
 
@@ -561,8 +566,8 @@ One of the most important, but often overlooked, details of promises is that the
 If you pass an immediate, non-promise-like value to `Promise.resolve(..)`, you get a promise that's fulfilled with that value. In other words, these two promises `p1` and `p2` will behave basically identically:
 
 ```js
-var p1 = new Promise( function(resolve,reject){
-	resolve( 42 );
+var p1 = new Promise( function(fulfill,reject){
+	fulfill( 42 );
 } );
 
 var p2 = Promise.resolve( 42 );
@@ -680,7 +685,7 @@ var p = Promise.resolve( 21 );
 var p2 = p.then( function(v){
 	console.log( v );	// 21
 
-	// resolve `p2` with value `42`
+	// fulfill `p2` with value `42`
 	return v * 2;
 } );
 
@@ -690,7 +695,7 @@ p2.then( function(v){
 } );
 ```
 
-By returning `v * 2` (i.e., `42`), we resolve (successfully) the `p2` promise that the first `then(..)` call created and returned. When `p2`'s `then(..)` call runs, it's receiving the resolution from that `return v * 2` statement. Of course, `p2.then(..)` creates yet another promise, which we could have stored in a `p3` variable.
+By returning `v * 2` (i.e., `42`), we fulfill the `p2` promise that the first `then(..)` call created and returned. When `p2`'s `then(..)` call runs, it's receiving the fulfillment from the `return v * 2` statement. Of course, `p2.then(..)` creates yet another promise, which we could have stored in a `p3` variable.
 
 But it's a little annoying to have to create an intermediate variable `p2` (or `p3`, etc). Thankfully, we can easily just chain these together:
 
@@ -701,7 +706,7 @@ p
 .then( function(v){
 	console.log( v );	// 21
 
-	// resolve the chained promise with value `42`
+	// fulfill the chained promise with value `42`
 	return v * 2;
 } )
 // here's the chained promise
@@ -712,7 +717,7 @@ p
 
 So now the first `then(..)` is the first step in an async sequence, and the second `then(..)` is the second step. This could keep going for as long as you needed it to extend. Just keep chaining off the previous `then(..)` with the automatically created promise.
 
-But, there's something missing here. What if we want step 2 to wait for step 1 to do something asynchronous? We're using an immediate `return` statement, which immediately resolves the chained promise.
+But, there's something missing here. What if we want step 2 to wait for step 1 to do something asynchronous? We're using an immediate `return` statement, which immediately fulfills the chained promise.
 
 The key to making a promise sequence truly async-capable at every step is to recall from above how `Promise.resolve(..)` operates when what you pass to it is a promise (or thenable) instead of a final value. `Promise.resolve(..)` unwraps the value of the received promise, and keeps going recursively while it keeps unwrapping promises.
 
@@ -727,9 +732,9 @@ p.then( function(v){
 	console.log( v );	// 21
 
 	// create a promise to return
-	return new Promise( function(resolve,reject){
-		// resolve with value `42`
-		resolve( v * 2 );
+	return new Promise( function(fulfill,reject){
+		// fulfill with value `42`
+		fulfill( v * 2 );
 	} );
 } )
 .then( function(v){
@@ -746,11 +751,11 @@ p.then( function(v){
 	console.log( v );	// 21
 
 	// create a promise to return
-	return new Promise( function(resolve,reject){
+	return new Promise( function(fulfill,reject){
 		// introduce asynchrony!
 		setTimeout( function(){
-			// resolve with value `42`
-			resolve( v * 2 );
+			// fulfill with value `42`
+			fulfill( v * 2 );
 		}, 100 );
 	} );
 } )
@@ -768,8 +773,8 @@ To further the chain illustration, let's generalize a delay promise creation (wi
 
 ```js
 function delay(time) {
-	return new Promise( function(resolve,reject){
-		setTimeout( resolve, time );
+	return new Promise( function(fulfill,reject){
+		setTimeout( fulfill, time );
 	} );
 }
 
@@ -791,7 +796,7 @@ delay( 100 )
 ...
 ```
 
-Calling `delay(200)` creates a promise that will resolve in 200ms, and then we return that from the first `then(..)` fulfillment callback, which causes the second `then(..)`'s promise to wait on that 200ms promise.
+Calling `delay(200)` creates a promise that will fulfill in 200ms, and then we return that from the first `then(..)` fulfillment callback, which causes the second `then(..)`'s promise to wait on that 200ms promise.
 
 **Note:** As described, technically there are two promises in that interchange: the 200ms delay promise and the chained promise that the second `then(..)` hangs off of. But you may find it easier to mentally combine these two promises together, since the promise mechanism automatically merges them. In that respect, you could think of `return delay(200)` as creating a promise that replaces or hijacks the chained promise.
 
@@ -802,10 +807,10 @@ Sequences of delays with no message passing isn't a terribly useful example of p
 
 // promise-aware ajax
 function request(url) {
-	return new Promise( function(resolve,reject){
+	return new Promise( function(fulfill,reject){
 		// the `ajax(..)` callback should be our
-		// promise's `resolve(..)` function
-		ajax( url, resolve );
+		// promise's `fulfill(..)` function
+		ajax( url, fulfill );
 	} );
 }
 ```
@@ -862,14 +867,14 @@ request( "http://some.url.1/" )
 } );
 ```
 
-When the error occurs in step 2, the failure handler in step 3 catches it. The return value (`42` in this snippet), if any, from that failure handler successfully resolves the promise for the next step (4), such that the chain is now back in a success state.
+When the error occurs in step 2, the failure handler in step 3 catches it. The return value (`42` in this snippet), if any, from that failure handler fulfills the promise for the next step (4), such that the chain is now back in a success state.
 
 **Note:** As we discussed earlier, when returning a promise from a fulfillment handler, it's unwrapped and can delay the next step. But that's not true for returning promises from failure handlers. If you return a promise from a failure handler (instead of `return 42` in the above snippet, that promise value would be passed through untouched (without being unwrapped) as a message to the next step, and thus cannot delay that next step. A thrown exception inside either the fulfillment or failure handler of a `then(..)` call causes the next (chained) promise to be immediately rejected with that exception.
 
 If you call `then(..)` on a promise, and you only pass a fulfillment handler to it, an assumed failure handler is substituted:
 
 ```js
-var p = new Promise( function(resolve,reject){
+var p = new Promise( function(fulfill,reject){
 	reject( "Oops" );
 } );
 
@@ -974,7 +979,26 @@ foo( function(err,val){
 
 The callback we pass to `foo(..)` expects to receive a signal of an error by the reserved first parameter `err`. If present, error is assumed. If not, success is assumed.
 
-This sort of error handling is technically *async-capable*, but it doesn't compose well at all. Multiple levels of error-first callbacks woven together with these ubiquitous `if` statement checks inevitably will lead you the perils of callback hell (see Chapter 2).
+This sort of error handling is technically *async capable*, but it doesn't compose well at all. Multiple levels of error-first callbacks woven together with these ubiquitous `if` statement checks inevitably will lead you the perils of callback hell (see Chapter 2).
+
+So we come back to the failure handlers in promise `then(..)` calls. Promises don't use the "error-first callback", but instead use "split callbacks" style, which is that there's one callback for success and another one for failure.
+
+```js
+var p = new Promise( function(fulfill,reject){
+	reject( "Oops" );
+} );
+
+p.then(
+	// fulfillment/success handler
+	function(){
+		// never gets here
+	},
+	// rejection/failure handler
+	function(err){
+		console.log( err ); // "Oops"
+	}
+);
+```
 
 ## Promise Patterns
 
