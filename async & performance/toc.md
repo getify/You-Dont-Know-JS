@@ -22,6 +22,7 @@
 	* Error Handling
 	* Promise Patterns
 	* Promise API Recap
+	* Promise Limitations
 * Appendix A: // TODO
 * Appendix B: Thank You's!
 

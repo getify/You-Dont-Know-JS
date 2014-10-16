@@ -155,7 +155,7 @@ The second layer is the promise that `add(..)` creates (via `Promise.all(..)`) a
 
 **Note:** Inside `add(..)`, the `Promise.all(..)` call creates a promise (which is waiting on `promiseX` and `promiseY` to resolve). The chained call to `.then(..)` creates another promise, which the `return values[0] + values[1]` line immediately resolves (with the result of the addition). Thus, the `then(..)` call we chain off the end of the `add(..)` call -- at the end of the snippet -- is actually operating on that second promise returned, rather than the first one created by `Promise.all(..)`. Also, though we are not chaining off the end of that second `then(..)`, it too has created another promise, had we chosen to observe/use it. This promise chaining stuff will be explained in much greater detail later in this chapter.
 
-Just like with cheeseburger orders, it's possible that the resolution of a promise is not fulfillment, but instead failure (aka rejection). Unlike a successfully filled promise, where the resolution value is always programmatic, rejection values can either be set directly by the program logic, or they can result automatically from a JS runtime error.
+Just like with cheeseburger orders, it's possible that the resolution of a promise is not fulfillment, but instead failure (aka rejection). Unlike a successfully filled promise, where the fulfillment value is always programmatic, a rejection value (commonly called a "reason") can either be set directly by the program logic, or it can result automatically from a JS runtime error.
 
 With promises, the `then(..)` call can actually take two functions, the first for success (as shown above), and the second for failure:
 
@@ -563,7 +563,7 @@ But why would this be any more trustable than just callbacks alone? How can we b
 
 One of the most important, but often overlooked, details of promises is that they have a solution to this issue as well. Included with the native ES6 `Promise` implementation is `Promise.resolve(..)`.
 
-If you pass an immediate, non-promise-like value to `Promise.resolve(..)`, you get a promise that's fulfilled with that value. In other words, these two promises `p1` and `p2` will behave basically identically:
+If you pass an immediate, non-promise, non-thenable value to `Promise.resolve(..)`, you get a promise that's fulfilled with that value. In other words, these two promises `p1` and `p2` will behave basically identically:
 
 ```js
 var p1 = new Promise( function(resolve,reject){
@@ -573,7 +573,17 @@ var p1 = new Promise( function(resolve,reject){
 var p2 = Promise.resolve( 42 );
 ```
 
-But, if you pass a promise-like value to `Promise.resolve(..)`, it will attempt to unwrap that value, and the unwrapping will keep going until a concrete final non-promise-like value is extracted.
+But if you pass a genuine promise to `Promise.resolve(..)`, you just get the same promise back:
+
+```js
+var p1 = Promise.resolve( 42 );
+
+var p2 = Promise.resolve( p1 );
+
+p1 === p2; // true
+```
+
+Even more importantly, if you pass a non-promise thenable value to `Promise.resolve(..)`, it will attempt to unwrap that value, and the unwrapping will keep going until a concrete final non-promise-like value is extracted.
 
 What do we mean by "promise-like" and "non-promise-like"? To be honest, this is a fuzzy and somewhat weak point in the promises system.
 
@@ -638,7 +648,7 @@ Promise.resolve( p )
 );
 ```
 
-`Promise.resolve(..)` will accept any standard promise or any promise-like thenable, and will unwrap it to its non-thenable value. But you get back from `Promise.resolve(..)` a real, genuine promise in its place, **one that you can trust**.
+`Promise.resolve(..)` will accept any thenable, and will unwrap it to its non-thenable value. But you get back from `Promise.resolve(..)` a real, genuine promise in its place, **one that you can trust**. If what you passed in is already a genuine promise, you just get it right back, so there's no downside at all to filtering through `Promise.resolve(..)` to gain trust.
 
 So, let's say we're calling a `foo(..)` utility and we're not sure we can trust its return value to be a well-behaving promise, but we know it's at least a thenable. `Promise.resolve(..)` will give us a trustable promise wrapper to chain off of:
 
@@ -656,7 +666,7 @@ Promise.resolve( foo( 42 ) )
 } );
 ```
 
-**Note:** Wrapping `Promise.resolve(..)` around any function's return value (thenable or not) is an easy way to normalize that function call into a well-behaving async promise resolution. If `foo(42)` returns an immediate value sometimes, or a promise other times, `Promise.resolve( foo(42) )` makes sure it's always a promise result. Avoiding Zalgo makes for much better code.
+**Note:** Another side-effect benefit of wrapping `Promise.resolve(..)` around any function's return value (thenable or not) is that it's an easy way to normalize that function call into a well-behaving async task. If `foo(42)` returns an immediate value sometimes, or a promise other times, `Promise.resolve( foo(42) )` makes sure it's always a promise result. And avoiding Zalgo makes for much better code.
 
 ### Trust built
 
@@ -719,9 +729,9 @@ So now the first `then(..)` is the first step in an async sequence, and the seco
 
 But, there's something missing here. What if we want step 2 to wait for step 1 to do something asynchronous? We're using an immediate `return` statement, which immediately fulfills the chained promise.
 
-The key to making a promise sequence truly async-capable at every step is to recall from above how `Promise.resolve(..)` operates when what you pass to it is a promise (or thenable) instead of a final value. `Promise.resolve(..)` unwraps the value of the received promise, and keeps going recursively while it keeps unwrapping promises.
+The key to making a promise sequence truly async-capable at every step is to recall from above how `Promise.resolve(..)` operates when what you pass to it is a promise or thenable instead of a final value. `Promise.resolve(..)` directly returns a received genuine promise, or it unwraps the value of a received thenable -- and keeps going recursively while it keeps unwrapping thenables.
 
-The same sort of promise-unwrapping happens if you `return` a promise from the fulfillment callback. Consider:
+The same sort of unwrapping happens if you `return` a thenable or promise from the fulfillment callback. Consider:
 
 ```js
 var p = Promise.resolve( 21 );
@@ -740,7 +750,7 @@ p.then( function(v){
 } );
 ```
 
-Even though we wrapped `42` up in a promise that we returned, it still got unwrapped as ended up as the resolution of the chained promise, such that the second `then(..)` still received `42`. If we then introduce asynchrony to that wrapping promise, everything still nicely works the same:
+Even though we wrapped `42` up in a promise that we returned, it still got unwrapped and ended up as the resolution of the chained promise, such that the second `then(..)` still received `42`. If we introduce asynchrony to that wrapping promise, everything still nicely works the same:
 
 ```js
 var p = Promise.resolve( 21 );
@@ -763,9 +773,9 @@ p.then( function(v){
 } );
 ```
 
-That's incredibly powerful! Now, we can construct a sequence of how ever many async steps we want, and each step can make the next step wait (or not!), as necessary.
+That's incredibly powerful! Now, we can construct a sequence of how ever many async steps we want, and each step can delay the next step (or not!), as necessary.
 
-Of course, the value passing from step to step in the above examples is optional. If you don't return an explicit value, an implicit `undefined` is assumed, and the promises still chain together the same way. Each promise resolution then is just a signal to proceed to the next step.
+Of course, the value passing from step to step in the above examples is optional. If you don't return an explicit value, an implicit `undefined` is assumed, and the promises still chain together the same way. Each promise resolution is thus just a signal to proceed to the next step.
 
 To further the chain illustration, let's generalize a delay promise creation (without resolution messages) into a utility we can re-use for multiple steps:
 
@@ -796,9 +806,11 @@ delay( 100 )
 
 Calling `delay(200)` creates a promise that will fulfill in 200ms, and then we return that from the first `then(..)` fulfillment callback, which causes the second `then(..)`'s promise to wait on that 200ms promise.
 
-**Note:** As described, technically there are two promises in that interchange: the 200ms delay promise and the chained promise that the second `then(..)` hangs off of. But you may find it easier to mentally combine these two promises together, since the promise mechanism automatically merges them. In that respect, you could think of `return delay(200)` as creating a promise that replaces or hijacks the chained promise.
+**Note:** As described, technically there are two promises in that interchange: the 200ms delay promise and the chained promise that the second `then(..)` connects to. But you may find it easier to mentally combine these two promises together, since the promise mechanism automatically merges them. In that respect, you could think of `return delay(200)` as creating a promise that replaces or hijacks the chained promise.
 
-Sequences of delays with no message passing isn't a terribly useful example of promise flow control. Let's try to look at a scenario that's a little more practical.
+To be honest, though, sequences of delays with no message passing isn't a terribly useful example of promise flow control. Let's look at a scenario that's a little more practical.
+
+Instead of timers, let's consider making Ajax requests:
 
 ```js
 // assume an `ajax( {url}, {callback} )` utility
@@ -815,7 +827,7 @@ function request(url) {
 
 We first define a `request(..)` utility that constructs a promise to represent the completion of the `ajax(..)` call.
 
-**Note:** It will be very common for developers to face the situation that they want to do promise-aware async flow control with utilities that are not themselves promise-enabled (like `ajax(..)` here, which expects a callback). While the native ES6 `Promise` mechanism doesn't automatically solve this pattern for us, practically all promise libraries *do*. They usually call this process "lifting" or "promisifying" or some variation thereof. We'll come back to that topic later.
+**Note:** It will be very common for developers to face the situation that they want to do promise-aware async flow control with utilities that are not themselves promise-enabled (like `ajax(..)` here, which expects a callback). While the native ES6 `Promise` mechanism doesn't automatically solve this pattern for us, practically all promise libraries *do*. They usually call this process "lifting" or "promisifying" or some variation thereof. We'll come back to that pattern later.
 
 ```js
 request( "http://some.url.1/" )
@@ -961,9 +973,11 @@ var failurePr = Promise.reject( "Oops" );
 var anotherFailurePr = Promise.resolve( failurePr );
 ```
 
-As we discussed earlier in this chapter, `Promise.resolve(..)` will attempt to unwrap a promise or thenable, and if that unwrapping reveals a rejected state, the promise returned from `Promise.resolve(..)` is in fact in that same rejected state.
+As we discussed earlier in this chapter, `Promise.resolve(..)` will return a genuine promise directly, or unwrap a thenable. If that unwrapping reveals a rejected state, the promise returned from `Promise.resolve(..)` is in fact in that same rejected state.
 
-So `Promise.resolve(..)` is a good, accurate name for the API method, because it can actually result in either fulfillment or rejection. The fulfillment callback parameter of the `Promise(..)` constructor has *the exact same* promise-unwrapping behavior as `Promise.resolve(..)`:
+So `Promise.resolve(..)` is a good, accurate name for the API method, because it can actually result in either fulfillment or rejection.
+
+The fulfillment callback parameter of the `Promise(..)` constructor will unwrap either a thenable (identical to `Promise.resolve(..)`) or a genuine promise:
 
 ```js
 var failurePr = new Promise( function(resolve,reject){
@@ -1093,9 +1107,9 @@ var p = new Promise( function(resolve,reject){
 } );
 ```
 
-`reject(..)` only rejects the promise, but `resolve(..)` can either fulfill the promise or reject it, depending on what it's passed. If `resolve(..)` is passed an immediate, non-promise, non-thenable value, then the promise is fulfilled with that value.
+`reject(..)` simply rejects the promise, but `resolve(..)` can either fulfill the promise or reject it, depending on what it's passed. If `resolve(..)` is passed an immediate, non-promise, non-thenable value, then the promise is fulfilled with that value.
 
-If `resolve(..)` is passed a promise or thenable value, that value is unwrapped recursively, and whatever its (eventual) resolution/state is will be adopted by the promise.
+But if `resolve(..)` is passed a promise or thenable value, that value is unwrapped recursively, and whatever its (eventual) resolution/state is will be adopted by the promise.
 
 ### `Promise.resolve(..)` and `Promise.reject(..)`
 
@@ -1109,18 +1123,26 @@ var p1 = new Promise( function(resolve,reject){
 var p2 = Promise.reject( "Oops" );
 ```
 
-`Promise.resolve(..)` is usually used to create an already-fulfilled promise in a similar way to `Promise.reject(..)`. However, `Promise.resolve(..)` also has the unwrapping behavior, if what you pass to it is a promise or thenable value. In that case, the promise returned adopts the (eventual) resolution of the value you passed in, which could either be fulfillment or rejection.
+`Promise.resolve(..)` is usually used to create an already-fulfilled promise in a similar way to `Promise.reject(..)`. However, `Promise.resolve(..)` also unwraps thenable values (as discusssed several times already). In that case, the promise returned adopts the (eventual) resolution of the value you passed in, which could either be fulfillment or rejection.
 
 ```js
-var successPr = Promise.resolve( 42 );
-var failedPr = Promise.reject( "Oops" );
+var successTh = {
+	then: function(cb) { cb( 42 ); }
+};
+var failedTh = {
+	then: function(cb,errCb) {
+		errCb( "Oops" );
+	}
+};
 
-var p1 = Promise.resolve( successPr );
-var p2 = Promise.resolve( failedPr );
+var p1 = Promise.resolve( successTh );
+var p2 = Promise.resolve( failedTh );
 
 // `p1` will be a fulfilled promise
 // `p2` will be a rejected promise
 ```
+
+And remember, `Promise.resolve(..)` doesn't do anything if what you pass is already a genuine promise; it just returns the value directly. So there's no overhead if you're calling `Promise.resolve(..)` on values that you don't know the nature of, and one happens to already be a genuine promise.
 
 ### `then(..)` and `catch(..)`
 
@@ -1168,6 +1190,14 @@ Promise.all( [p1,p2] )
 	console.log( msgs );	// [42,"Hello World"]
 } );
 ```
+
+The ES6 `Promise` API is pretty simple and straightforward. It's at least good enough to serve the most basic of async cases, and is a good place to start when rearranging your code from callback hell to something better.
+
+But there's a whole lot of async sophistication that apps often demand which promises themselves will expose limitations to addressing. In the next section, we'll dive into those limitations as motivations for how promise library abstractions are quite useful for modern JS async programming based on promise theory.
+
+## `Promise` Limitations
+
+// TODO
 
 ## Summary
 
