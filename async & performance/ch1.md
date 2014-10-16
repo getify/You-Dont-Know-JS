@@ -714,11 +714,46 @@ Of course, we're not interaction-coordinating the ordering of any of these "proc
 
 We use the `setTimeout(..0)` (hack) for async scheduling, which basically just means "stick this function at the end of the current event loop queue".
 
-**Note:** `setTimeout(..0)` is not technically inserting an item directly onto the event loop queue. The timer will insert the event at its next opportunity. For example, two subsequent `setTimeout(..0)` calls would not be strictly guaranteed to be processed in call order, so it *is* possible to see various conditions like timer drift where the ordering of such events isn't predictable. In node.js, a similar approach is `process.nextTick(..)`. Despite how convenient (and usually more performant) it would be, there's not a single direct way (at least yet) across all environments to ensure event ordering. We cover this topic in more detail in the next section.
+**Note:** `setTimeout(..0)` is not technically inserting an item directly onto the event loop queue. The timer will insert the event at its next opportunity. For example, two subsequent `setTimeout(..0)` calls would not be strictly guaranteed to be processed in call order, so it *is* possible to see various conditions like timer drift where the ordering of such events isn't predictable. In node.js, a similar approach is `process.nextTick(..)`. Despite how convenient (and usually more performant) it would be, there's not a single direct way (at least yet) across all environments to ensure async event ordering. We cover this topic in more detail in the next section.
 
 ## Microtasks
 
-// TODO
+As of ES6, there's a new concept layered on top of the event loop queue, called the "microtask queue". The most likely exposure you'll have to it is with the asynchronous behavior of promises (see Chapter 3).
+
+Unfortunately, at the moment it's a mechanism without an exposed API, and thus demonstrating it is a bit more convoluted. So we're going to have to just describe it conceptually, such that when we discuss async behavior with promises in Chapter 3, you'll understand how those actions are being scheduled and processed.
+
+So, the best way to think about this that I've found is that the "microtask queue" is a queue hanging off the end of every tick in the event loop queue. Certain async-implied actions that may occur during a tick of the event loop will not cause a whole new event to be added to the event loop queue, but will instead add an item (aka microtask) to the end of the current tick's microtask queue.
+
+It's kinda like saying, "oh, here's this other thing I need to do *later*, but make sure it happens right away before anything else can happen."
+
+Or, to use a metaphor: the event loop queue is like an amusement park ride, where once you finish the ride, you have to go to the back of the line to ride again. But the microtask queue is like finishing the ride, but then cutting in line and getting right back on.
+
+A microtask can also cause more microtasks to be added to the end of the same queue. So, it's theoretically possible that a microtask "loop" (a microtask that keeps adding another microtask, and so on...) could spin indefinitely, thus starving the program of the ability to move on to the next event loop tick. This would conceptually be almost the same as just expressing a long-running or infinite loop (like `while (true) ..`) in your code.
+
+Microtasks are kind of like the spirit of the `setTimeout(..0)` hack, but implemented in such a way as to have a much more well-defined and guaranteed ordering: **later, but as soon as possible**.
+
+Let's pretend for a moment there was an API for scheduling microtasks (directly, without hacks), and let's call that API `schedule(..)`. Consider:
+
+```js
+console.log( "A" );
+
+setTimeout( function(){
+	console.log( "B" );
+}, 0 );
+
+// theoretical "microtask API"
+schedule( function(){
+	console.log( "C" );
+
+	schedule( function(){
+		console.log( "D" );
+	} );
+} );
+```
+
+You might expect this to print out `A B C D`, but instead it would print out `A C D B`, because the microtasks happen at the end of the current event loop tick, and the timer fires to schedule for the *next* event loop tick (if available!).
+
+In Chapter 3, we'll see that the asynchronous behaviors of promises are microtasks, so it's important to keep clear how that relates to event loop behavior.
 
 ## Statement Ordering
 
