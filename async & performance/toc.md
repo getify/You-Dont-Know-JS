@@ -8,6 +8,7 @@
 	* Event Loop
 	* Parallel Threading
 	* Concurrency
+	* Microtasks
 	* Statement Ordering
 * Chapter 2: Callbacks
 	* Continuations
@@ -20,6 +21,7 @@
 	* Chain Flow
 	* Error Handling
 	* Promise Patterns
+	* Promise API Recap
 * Appendix A: // TODO
 * Appendix B: Thank You's!
 

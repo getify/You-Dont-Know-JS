@@ -714,7 +714,11 @@ Of course, we're not interaction-coordinating the ordering of any of these "proc
 
 We use the `setTimeout(..0)` (hack) for async scheduling, which basically just means "stick this function at the end of the current event loop queue".
 
-**Note:** `setTimeout(..0)` is not technically inserting an item directly onto the event loop queue. The timer will insert the event at its next opportunity. For example, two subsequent `setTimeout(..0)` calls would not be strictly guaranteed to be processed in call order, so it *is* possible to see various conditions like timer drift where the ordering of such events isn't predictable. In node.js, a similar approach is `process.nextTick(..)`. Despite how convenient (and usually more performant) it would be, there's not a direct way (at least yet) to ensure event ordering by scheduling a "process" on the event loop queue (aka "microtask scheduling") from user JS code. As of ES6, there are however some mechanisms which implicitly do that for you. We'll revisit this topic later in the book.
+**Note:** `setTimeout(..0)` is not technically inserting an item directly onto the event loop queue. The timer will insert the event at its next opportunity. For example, two subsequent `setTimeout(..0)` calls would not be strictly guaranteed to be processed in call order, so it *is* possible to see various conditions like timer drift where the ordering of such events isn't predictable. In node.js, a similar approach is `process.nextTick(..)`. Despite how convenient (and usually more performant) it would be, there's not a single direct way (at least yet) across all environments to ensure event ordering. We cover this topic in more detail in the next section.
+
+## Microtasks
+
+// TODO
 
 ## Statement Ordering
 

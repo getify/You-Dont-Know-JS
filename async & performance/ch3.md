@@ -374,15 +374,15 @@ Primarily, this is a concern of whether code can introduce Zalgo-like effects (s
 
 Promises by definition cannot be susceptible to this concern, because even an immediately-fulfilled promise (like `new Promise(function(resolve){ resolve(42); })`) cannot be *observed* synchronously.
 
-That is, when you call `then(..)` on a promise, even if that promise was already resolved, the callback you provide to `then(..)` will **always** be called asynchronously (on the next event loop tick).
+That is, when you call `then(..)` on a promise, even if that promise was already resolved, the callback you provide to `then(..)` will **always** be called asynchronously (as microtasks -- see Chapter 1).
 
 No more need to insert your own `setTimeout(..,0)` hacks. Promises prevent Zalgo automatically.
 
 ### Calling too late
 
-Similar to the previous point, a promise's `then(..)` registered observation callbacks are automatically scheduled when either `fulfill(..)` or `reject(..)` are called by the promise creation capability. Those scheduled callbacks will predictably be fired on the next event loop tick.
+Similar to the previous point, a promise's `then(..)` registered observation callbacks are automatically scheduled when either `fulfill(..)` or `reject(..)` are called by the promise creation capability. Those scheduled callbacks will predictably be fired at the next asynchronous moment (see "Microtasks" in Chapter 1).
 
-It's not possible for synchronous observation, so it's not possible for a synchronous chain of tasks to run in such a way to in effect "delay" another callback from happening as expected. That is, when a promise is resolved, all `then(..)` registered callbacks on it will be called, in order, immediately at the next event loop opportunity, and nothing that happens inside of one of those callbacks can affect/delay the calling of the other callbacks.
+It's not possible for synchronous observation, so it's not possible for a synchronous chain of tasks to run in such a way to in effect "delay" another callback from happening as expected. That is, when a promise is resolved, all `then(..)` registered callbacks on it will be called, in order, immediately at the next asynchronous opportunity (see "Microtasks" in Chapter 1), and nothing that happens inside of one of those callbacks can affect/delay the calling of the other callbacks.
 
 For example:
 
@@ -431,7 +431,7 @@ p2.then( function(v){
 // A B  <-- not  B A  as you might expect
 ```
 
-We'll cover this more later, but as you can see, `p1` is resolved not with an immediate value, but with another promise `p3` which is itself resolved with the value `"B"`. The specified behavior is to *unwrap* `p3` into `p1`, but asynchronously, so `p1`'s callback(s) aren't ready to be called on the same event loop tick as `p2`'s.
+We'll cover this more later, but as you can see, `p1` is resolved not with an immediate value, but with another promise `p3` which is itself resolved with the value `"B"`. The specified behavior is to *unwrap* `p3` into `p1`, but asynchronously, so `p1`'s callback(s) are *behind* `p2`'s callback(s) in the asynchronus microtask queue (see Chapter 1).
 
 To avoid such nuanced nightmares, you should never rely on anything about the the ordering/scheduling of callbacks across promises. In fact, a good practice is not to code in such a way where the ordering of multiple callbacks matters at all. Avoid that if you can.
 
@@ -785,7 +785,7 @@ delay( 100 )
 	console.log( "step 2 (after another 200ms)" );
 } )
 .then( function(){
-	console.log( "step 3 (next event loop tick)" );
+	console.log( "step 3 (next microtask)" );
 	return delay( 50 );
 } )
 .then( function(){
@@ -1057,7 +1057,7 @@ The callback we pass to `foo(..)` expects to receive a signal of an error by the
 
 This sort of error handling is technically *async capable*, but it doesn't compose well at all. Multiple levels of error-first callbacks woven together with these ubiquitous `if` statement checks inevitably will lead you the perils of callback hell (see Chapter 2).
 
-So we come back to error handling in promises, with the failure handler passed to `then(..)`. Promises don't use the popular "error-first callback" design style, but instead use "split callbacks" style -- there's one callback for success and one for failure.
+So we come back to error handling in promises, with the failure handler passed to `then(..)`. Promises don't use the popular "error-first callback" design style, but instead use "split callbacks" style; there's one callback for success and one for failure.
 
 ```js
 var p = Promise.reject( "Oops" );
@@ -1077,6 +1077,97 @@ p.then(
 ## Promise Patterns
 
 Promises have lots of various patterns for solving async tasks. // TODO
+
+## Promise API Recap
+
+Let's quickly review the ES6 `Promise` API that we've already seen unfold in bits and pieces throughout this chapter.
+
+### `new Promise(..)` Constructor
+
+The *revealing constructor* `Promise(..)` must be used with `new`, and must be provided a function callback that is synchronously/immediately called. This function is passed two function callbacks that act as resolution capabilities for the promise. We commonly label these `resolve(..)` and `reject(..)`.
+
+```js
+var p = new Promise( function(resolve,reject){
+	// `resolve(..)` to resolve/fulfill the promise
+	// `reject(..)` to reject the promise
+} );
+```
+
+`reject(..)` only rejects the promise, but `resolve(..)` can either fulfill the promise or reject it, depending on what it's passed. If `resolve(..)` is passed an immediate, non-promise, non-thenable value, then the promise is fulfilled with that value.
+
+If `resolve(..)` is passed a promise or thenable value, that value is unwrapped recursively, and whatever its (eventual) resolution/state is will be adopted by the promise.
+
+### `Promise.resolve(..)` and `Promise.reject(..)`
+
+A shortcut for creating an already-rejected promise is `Promise.reject(..)`, so these two promises are equivalent:
+
+```js
+var p1 = new Promise( function(resolve,reject){
+	reject( "Oops" );
+} );
+
+var p2 = Promise.reject( "Oops" );
+```
+
+`Promise.resolve(..)` is usually used to create an already-fulfilled promise in a similar way to `Promise.reject(..)`. However, `Promise.resolve(..)` also has the unwrapping behavior, if what you pass to it is a promise or thenable value. In that case, the promise returned adopts the (eventual) resolution of the value you passed in, which could either be fulfillment or rejection.
+
+```js
+var successPr = Promise.resolve( 42 );
+var failedPr = Promise.reject( "Oops" );
+
+var p1 = Promise.resolve( successPr );
+var p2 = Promise.resolve( failedPr );
+
+// `p1` will be a fulfilled promise
+// `p2` will be a rejected promise
+```
+
+### `then(..)` and `catch(..)`
+
+Each promise instance (**not** the `Promise` API namespace) has `then(..)` and `catch(..)` methods, which allow registering of fulfillment and rejection handlers for the promise. Once the promise is resolved, one or the other of these methods will be called, but not both, and it will always be called asynchronously (microtasks -- see Chapter 1).
+
+`then(..)` takes one or two parameters, the first for the fulfillment callback, and the second for the rejection callback. If either is omitted or is otherwise passed as a non-function value, a default callback is substituted respectively. The default fulfillment callback simply passes the message along, while the default rejection callback simply rethrows (propagates) the error reason it receives.
+
+`catch(..)` takes only the rejection callback as a parameter, and automatically substitutes the default fulfillment callback, as just discussed. In other words, it's equivalent to `then(null,..)`.
+
+```js
+p.then( success );
+
+p.then( success, failure );
+
+p.catch( failure ); // or `p.then( null, failure )`
+```
+
+`then(..)` and `catch(..)` also create and return a new promise, which can be used to express promise chain flow control. If the fulfillment or rejection callbacks have an exception thrown, the returned promise is rejected. If either callback returns an immediate, non-promise, non-thenable value, that value is set as the fulfillment for the returned promise. If the fulfillment handler specifically returns a promise or thenable value, that value is unwrapped and becomes the resolution of the returned promise.
+
+### `Promise.all(..)` and `Promise.race(..)`
+
+Both of these static helpers on the ES6 `Promise` API create a promise as their return value. The resolution of that promise is controlled entirely by the array of promises that you pass in.
+
+For `Promise.all([ .. ])`, all the promises you pass in must fulfill for the returned promise to fulfill. If any promise is rejected, the returned promise is immediately rejected, too (discarding the results of any of the other promises). For fulfillment, you receive an array of all the passed in promises' fulfillment values. For rejection, you receive just the first promise rejection reason value. This pattern is classically called a "gate" -- all must cross the finish line.
+
+For `Promise.race([ .. ])`, only the first promise to resolve (fulfillment or rejection) "wins", and whatever that resolution is becomes the resolution of the returned promise. This pattern is classically called a "latch" -- first one across the finish line wins.
+
+```js
+var p1 = Promise.resolve( 42 );
+var p2 = Promise.resolve( "Hello World" );
+var p3 = Promise.reject( "Oops" );
+
+Promise.race( [p1,p2,p3] )
+.then( function(msg){
+	console.log( msg );		// 42
+} );
+
+Promise.all( [p1,p2,p3] )
+.catch( function(err){
+	console.error( err );	// "Oops"
+} );
+
+Promise.all( [p1,p2] )
+.then( function(msgs){
+	console.log( msgs );	// [42,"Hello World"]
+} );
+```
 
 ## Summary
 
