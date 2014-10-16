@@ -279,7 +279,7 @@ function foo(x) {
 	// construct and return a promise
 	return new Promise( function(resolve,reject){
 		// eventually, call `resolve(..)` or `reject(..)`,
-		// which are the resolution triggers for
+		// which are the resolution callbacks for
 		// the promise.
 	} );
 }
@@ -291,7 +291,7 @@ bar( p );
 baz( p );
 ```
 
-**Note:** The pattern shown with `new Promise( function(..){ .. } )` is generally called the ["revealing constructor"](http://domenic.me/2014/02/13/the-revealing-constructor-pattern/). The function passed in is executed immediately (not async deferred, as callbacks to `then(..)` are), and it's provided two parameters, which we named here `resolve` and `reject`. These are the resolution functions for the promise. `resolve(..)` usually triggers fulfillment resolution, and `reject(..)` triggers rejection resolution.
+**Note:** The pattern shown with `new Promise( function(..){ .. } )` is generally called the ["revealing constructor"](http://domenic.me/2014/02/13/the-revealing-constructor-pattern/). The function passed in is executed immediately (not async deferred, as callbacks to `then(..)` are), and it's provided two parameters, which we named here `resolve` and `reject`. These are the resolution functions for the promise. `resolve(..)` usually signals fulfillment resolution, and `reject(..)` signals rejection resolution.
 
 You can probably guess what the internals of `bar(..)` and `baz(..)` might look like:
 
@@ -492,7 +492,7 @@ Of course, if you register the same callback more than once, it'll be called as 
 
 Promises can have, at most, one resolution value (success or failure).
 
-If you don't explicitly resolve with a value either way, the value is `undefined`, as is typical in JS. But whatever the value, it will always be passed to all registered (and appropriate -- fulfillment or rejection)callbacks, either *now* or in the future.
+If you don't explicitly resolve with a value either way, the value is `undefined`, as is typical in JS. But whatever the value, it will always be passed to all registered (and appropriate -- fulfillment or rejection) callbacks, either *now* or in the future.
 
 **Something to be aware of:** If you call `resolve(..)` or `reject(..)` with multiple parameters, all subsequent parameters beyond the first will be silently ignored. While that might seem a violation of the guarantee we just described, it's not exactly, because it constitutes an invalid usage of the Promise mechanism. Other invalid usages of the API (such as calling `resolve(..)` multiple times) are similarly *protected*, so the Promise behavior here is consistent (if not a tiny bit frustrating).
 
@@ -721,9 +721,7 @@ But, there's something missing here. What if we want step 2 to wait for step 1 t
 
 The key to making a promise sequence truly async-capable at every step is to recall from above how `Promise.resolve(..)` operates when what you pass to it is a promise (or thenable) instead of a final value. `Promise.resolve(..)` unwraps the value of the received promise, and keeps going recursively while it keeps unwrapping promises.
 
-The same sort of promise-unwrapping happens if you `return` a promise from the fulfillment callback.
-
-Consider:
+The same sort of promise-unwrapping happens if you `return` a promise from the fulfillment callback. Consider:
 
 ```js
 var p = Promise.resolve( 21 );
@@ -731,7 +729,7 @@ var p = Promise.resolve( 21 );
 p.then( function(v){
 	console.log( v );	// 21
 
-	// create a promise to return
+	// create a promise and return it
 	return new Promise( function(resolve,reject){
 		// fulfill with value `42`
 		resolve( v * 2 );
@@ -1002,7 +1000,7 @@ p.then(
 );
 ```
 
-In the case of the first parameter to `then(..)`, it's unambiguously always the fulfillment success case, so there's no need for the generality of "resolve" to apply.
+In the case of the first parameter to `then(..)`, it's unambiguously always the fulfillment success case, so there's no need for the generality of "resolve" to apply. And as a side note, the ES6 specification uses `onFulfilled(..)` and `onRejected(..)` to label these two callbacks.
 
 ## Error Handling
 
