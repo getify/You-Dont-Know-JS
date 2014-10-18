@@ -1433,9 +1433,9 @@ if (!Promise.first) {
 
 Sometimes you want to iterate over a list of promises and perform some task against all of them, much like you can do with synchronous `array`s (e.g., `forEach(..)`, `map(..)`, `some(..)`, and `every(..)`). If the task to perform against each promise is fundamentally synchronous, these work fine, just as we used `forEach(..)` in the previous snippet.
 
-But if the tasks are fundamentally asynchronous, or can/should otherwise be performed concurrently, you can use async versions of these as provided by many libraries.
+But if the tasks are fundamentally asynchronous, or can/should otherwise be performed concurrently, you can use async versions of these utilities as provided by many libraries.
 
-For example, let's consider an asynchronous `map(..)` utility that takes an `array` of values (could be promises or anything else), plus a function (task) to perform against each. It returns a promise whose fulfillment value is another `array` that holds (in the same mapping order) the async completion value from each task.
+For example, let's consider an asynchronous `map(..)` utility that takes an `array` of values (could be promises or anything else), plus a function (task) to perform against each. `map(..)` returns a promise whose fulfillment value is an `array` that holds (in the same mapping order) the async completion value from each task.
 
 ```js
 if (!Promise.map) {
@@ -1457,7 +1457,7 @@ if (!Promise.map) {
 
 **Note:** In this implementation of `map(..)`, you can't signal async rejection, but if a synchronous exception/error occurs inside of the mapping callback (`cb(..)`), the main `Promise.map(..)` returned promise would reject.
 
-To illustrate using `map(..)` with a list of promises (instead of simple values):
+Let's illustrate using `map(..)` with a list of promises (instead of simple values):
 
 ```js
 var p1 = Promise.resolve( 21 );
@@ -1466,9 +1466,9 @@ var p3 = Promise.reject( "Oops" );
 
 // extract promise values and double them
 Promise.map( [p1,p2,p3], function(pr,done){
-	// the mapping item itself happens to be a promise
+	// the item itself happens to be a promise
 	pr.then(
-		// extract value from promise as `v`
+		// extract value as `v`
 		function(v){
 			// map to new value
 			done( v * 2 );
@@ -1484,7 +1484,7 @@ Promise.map( [p1,p2,p3], function(pr,done){
 
 ## Promise API Recap
 
-Let's quickly review the ES6 `Promise` API that we've already seen unfold in bits and pieces throughout this chapter.
+Let's review the ES6 `Promise` API that we've already seen unfold in bits and pieces throughout this chapter.
 
 ### `new Promise(..)` Constructor
 
