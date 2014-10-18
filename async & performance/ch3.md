@@ -1337,26 +1337,39 @@ This timeout pattern works well in most cases. But there are some nuances to con
 
 #### "Finally"
 
-The key question to ask is, "what happens to the promises that get discarded/ignored?" We're not asking that question from the performance perspective -- they would otherwise end up garbage collection eligible -- but from the behavioral perspective (side effects, etc.). Promises cannot be canceled -- that would destroy the external immutability trust -- so they can only be silently ignored.
+The key question to ask is, "What happens to the promises that get discarded/ignored?" We're not asking that question from the performance perspective -- they would otherwise end up garbage collection eligible -- but from the behavioral perspective (side effects, etc.). Promises cannot be canceled -- that would destroy the external immutability trust -- so they can only be silently ignored.
 
-But what if `foo()` in the above example is reserving some sort of resource for usage, but the timeout fires first and causes that promise to be ignored? Is there anything in this pattern that proactively frees the reserved resource, or otherwise cancels any side effects it may have had? What if all you wanted was to log the fact that `foo()` timed out?
+But what if `foo()` in the above example is reserving some sort of resource for usage, but the timeout fires first and causes that promise to be ignored? Is there anything in this pattern that proactively frees the reserved resource after the timeout, or otherwise cancels any side effects it may have had? What if all you wanted was to log the fact that `foo()` timed out?
 
 Some developers have proposed that promises need a `finally(..)` callback registration, which is always called when a promise resolves, and allows you to specify any cleanup that may be necessary. This doesn't exist in the specification at the moment, but it may come in ES7+. We'll have to wait and see.
 
-In the meantime, we could make a static helper utility that lets us observe (without interfering) the completion of a promise, and we could even call it `Promise.finally(..)` for consistency sake:
+It might look like:
 
 ```js
-// use a polyfill-safe guard check
-if (!Promise.finally) {
-	Promise.finally = function(pr,cb) {
-		// side-observe promise resolution
+var p = Promise.resolve( 42 );
+
+p.then( something )
+.finally( cleanup );
+.then( another )
+.finally( cleanup );
+```
+
+**Note:** In various promise libraries, `finally(..)` still creates and returns a new promise (to keep the chain going). If the `cleanup(..)` function were to return a promise, it would be linked into the chain, which means you could still have the unhandled rejection issues we discussed earlier.
+
+In the meantime, we could make a static helper utility that lets us observe (without interfering) the resolution of a promise:
+
+```js
+// polyfill-safe guard check
+if (!Promise.observe) {
+	Promise.observe = function(pr,cb) {
+		// side-observe `pr`'s resolution
 		pr.then(
 			function(msg){
-				// schedule callback as microtask
+				// schedule callback async (as microtask)
 				Promise.resolve( msg ).then( cb );
 			},
 			function(err){
-				// schedule callback as microtask
+				// schedule callback async (as microtask)
 				Promise.resolve( err ).then( cb );
 			}
 		);
@@ -1371,7 +1384,7 @@ Here's how we'd use it in the timeout example from before:
 
 ```js
 Promise.race( [
-	Promise.finally(
+	Promise.observe(
 		foo(),					// attempt `foo()`
 		function cleanup(msg){
 			// clean up after `foo()`, even if it
@@ -1382,7 +1395,92 @@ Promise.race( [
 ] )
 ```
 
-This `Promise.finally(..)` helper is just an illustration of how you could observe the completions of promises without interfering with them. Other promise libraries have their own solutions. Regardless of how you do it, you'll likely have places where you want to make sure your promises aren't *just* silently ignored.
+This `Promise.observe(..)` helper is just an illustration of how you could observe the completions of promises without interfering with them. Other promise libraries have their own solutions. Regardless of how you do it, you'll likely have places where you want to make sure your promises aren't *just* silently ignored.
+
+### Variations on `all([ .. ])` and `race([ .. ])`
+
+While native ES6 promises come with built-in `Promise.all([ .. ])` and `Promise.race([ .. ])`, there are several other commonly used patterns with variances on those semantics:
+
+* `none([ .. ])` is like `all([ .. ])`, but fulfillments and rejections are transposed. All promises need to be rejected -- rejections become the fulfillment values and vice versa.
+* `any([ .. ])` is like `all([ .. ])`, but it ignores any rejections, so only one needs to fulfill instead of *all* of them.
+* `first([ .. ])` is a like a race with `any([ .. ])`, which is that it ignores any rejections and fulfills as soon as the first promise fulfills.
+* `last([ .. ])` is like `first([ .. ])`, but only the latest fulfillment wins.
+
+Many promise abstraction libraries provide these, but you could also define them yourself using the mechanics of promises, `race([ .. ])` and `all([ .. ])`.
+
+For example, here's how we could define `first([ .. ])`:
+
+```js
+// polyfill-safe guard check
+if (!Promise.first) {
+	Promise.first = function(prs) {
+		return new Promise( function(resolve,reject){
+			// loop through all promises
+			prs.forEach( function(pr){
+				// normalize the value
+				Promise.resolve( pr )
+
+				// whichever one fulfills first wins, and
+				// gets to resolve the main promise
+				.then( resolve );
+			} );
+		} );
+	};
+}
+```
+
+### Concurrent Iterations
+
+Sometimes you want to iterate over a list of promises and perform some task against all of them, much like you can do with synchronous `array`s (e.g., `forEach(..)`, `map(..)`, `some(..)`, and `every(..)`). If the task to perform against each promise is fundamentally synchronous, these work fine, just as we used `forEach(..)` in the previous snippet.
+
+But if the tasks are fundamentally asynchronous, or can/should otherwise be performed concurrently, you can use async versions of these as provided by many libraries.
+
+For example, let's consider an asynchronous `map(..)` utility that takes an `array` of values (could be promises or anything else), plus a function (task) to perform against each. It returns a promise whose fulfillment value is another `array` that holds (in the same mapping order) the async completion value from each task.
+
+```js
+if (!Promise.map) {
+	Promise.map = function(vals,cb) {
+		// new promise that waits for all mapped promises
+		return Promise.all(
+			// note: regular array `map(..)`
+			vals.map( function(val){
+				// replace `val` with a new promise that
+				// resolves after `val` is async mapped
+				return new Promise( function(resolve){
+					cb( val, resolve );
+				} );
+			} )
+		);
+	};
+}
+```
+
+**Note:** In this implementation of `map(..)`, you can't signal async rejection, but if a synchronous exception/error occurs inside of the mapping callback (`cb(..)`), the main `Promise.map(..)` returned promise would reject.
+
+To illustrate using `map(..)` with a list of promises (instead of simple values):
+
+```js
+var p1 = Promise.resolve( 21 );
+var p2 = Promise.resolve( 42 );
+var p3 = Promise.reject( "Oops" );
+
+// extract promise values and double them
+Promise.map( [p1,p2,p3], function(pr,done){
+	// the mapping item itself happens to be a promise
+	pr.then(
+		// extract value from promise as `v`
+		function(v){
+			// map to new value
+			done( v * 2 );
+		},
+		// or, map to promise rejection message
+		done
+	);
+} )
+.then( function(vals){
+	console.log( vals );	// [42,84,"Oops"]
+} );
+```
 
 ## Promise API Recap
 
