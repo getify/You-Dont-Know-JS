@@ -13,6 +13,8 @@ But what if we could uninvert that *inversion of control*? What if instead of ha
 
 We can do just that, and it's called **Promises**.
 
+**Note:** The word "immediately" will be used frequently in this chapter, generally to refer to some promise resolution action. However, in essentially all cases, "immediately" means in terms of the microtask queue behavior (see Chapter 1), not in the strictly synchronous *now* sense.
+
 ## What is a Promise?
 
 When developers decide to learn a new technology or pattern, usually their first step is, "Show me the code!" It's quite natural for us to just jump in feet first and learn as we go.
@@ -119,7 +121,7 @@ We'll definitely explain a lot more details about promises later in the chapter 
 
 ```js
 function add(xPromise,yPromise) {
-	// `Promise.all(..)` takes an array of promises,
+	// `Promise.all([ .. ])` takes an array of promises,
 	// and returns a new promise that waits on them
 	// all to finish
 	return Promise.all( [xPromise, yPromise] )
@@ -151,9 +153,9 @@ There are two layers of promises in this snippet.
 
 `fetchX()` and `fetchY()` are called directly, and the values they return (promises!) are passed into `add(..)`. The underlying values those promises represent may be ready *now* or *later*, but each promise normalizes the behavior to be the same regardless. We reason about `X` and `Y` values in a time independent way. They are *future values*.
 
-The second layer is the promise that `add(..)` creates (via `Promise.all(..)`) and returns, which we wait on by calling `then(..)`. When the `add(..)` operation completes, our `sum` *future value* is ready and we can print it out. We hide inside of `add(..)` the logic for waiting on the `X` and `Y` *future values*.
+The second layer is the promise that `add(..)` creates (via `Promise.all([ .. ])`) and returns, which we wait on by calling `then(..)`. When the `add(..)` operation completes, our `sum` *future value* is ready and we can print it out. We hide inside of `add(..)` the logic for waiting on the `X` and `Y` *future values*.
 
-**Note:** Inside `add(..)`, the `Promise.all(..)` call creates a promise (which is waiting on `promiseX` and `promiseY` to resolve). The chained call to `.then(..)` creates another promise, which the `return values[0] + values[1]` line immediately resolves (with the result of the addition). Thus, the `then(..)` call we chain off the end of the `add(..)` call -- at the end of the snippet -- is actually operating on that second promise returned, rather than the first one created by `Promise.all(..)`. Also, though we are not chaining off the end of that second `then(..)`, it too has created another promise, had we chosen to observe/use it. This promise chaining stuff will be explained in much greater detail later in this chapter.
+**Note:** Inside `add(..)`, the `Promise.all([ .. ])` call creates a promise (which is waiting on `promiseX` and `promiseY` to resolve). The chained call to `.then(..)` creates another promise, which the `return values[0] + values[1]` line immediately resolves (with the result of the addition). Thus, the `then(..)` call we chain off the end of the `add(..)` call -- at the end of the snippet -- is actually operating on that second promise returned, rather than the first one created by `Promise.all([ .. ])`. Also, though we are not chaining off the end of that second `then(..)`, it too has created another promise, had we chosen to observe/use it. This promise chaining stuff will be explained in much greater detail later in this chapter.
 
 Just like with cheeseburger orders, it's possible that the resolution of a promise is not fulfillment, but instead failure (aka rejection). Unlike a successfully filled promise, where the fulfillment value is always programmatic, a rejection value (commonly called a "reason") can either be set directly by the program logic, or it can result automatically from a JS runtime error.
 
@@ -841,7 +843,7 @@ request( "http://some.url.1/" )
 
 Using the promise-returning `request(..)`, we create the first step in our chain implicitly by calling it with the first URL, and chain off that returned promise with the first `then(..)`.
 
-Once `response1` comes back, we use that value to construct a second URL, and make a second `request(..)` call. That second `request(..)` promise is `return`ed so that the second step in our async flow control waits for that ajax call to complete. Finally, we print `response2` once it returns.
+Once `response1` comes back, we use that value to construct a second URL, and make a second `request(..)` call. That second `request(..)` promise is `return`ed so that the second step in our async flow control waits for that Ajax call to complete. Finally, we print `response2` once it returns.
 
 The promise chain we construct is not only a flow control that expresses a multi-step async sequence, but it also acts as a message channel to propagate messages from step to step.
 
@@ -1213,7 +1215,7 @@ When we create `p`, we know we're going to wait awhile to use/observe its reject
 
 But the promise returned from the `then(..)` call has no `defer()` or error handler attached, so if it rejects (from inside either resolution handler), then *it* will be reported to the developer console as an uncaught error.
 
-This design is a pit of success. By default all errors are either handled or reported -- what almost all developers in almost all cases would expect. You have to intentionally opt-out, and indicate you intend to defer error handling until *later*; you're opting for the extra responsibility in just that specific case.
+**This design is a pit of success.** By default all errors are either handled or reported -- what almost all developers in almost all cases would expect. You have to intentionally opt-out, and indicate you intend to defer error handling until *later*; you're opting for the extra responsibility in just that specific case.
 
 The only real downside to this strategy is if you `defer()` a promise and then fail to actually ever observe/handle its rejection.
 
@@ -1225,7 +1227,162 @@ I think there's still hope for promise error handling (post-ES6). I hope the pow
 
 ## Promise Patterns
 
-Promises have lots of various patterns for solving async tasks. // TODO
+We've already seen the sequence pattern with promise chains (this-then-this-then-that flow control) but there are lots of variations on asynchronous patterns that we can build as abstractions on top of promises. These patterns serve to simplify the expression of async flow control -- which helps make our code more reason-able and more maintainable -- even in the most complex parts of our programs.
+
+Two such patterns are codified directly into the native ES6 `Promise` implementation, so we get them for free, to use as building blocks for other patterns.
+
+### `Promise.all([ .. ])`
+
+In an async sequence (promise chain), only one async task is being coordinated at any given moment -- step 2 strictly follows step 1, and step 3 strictly follows step 2. But what about doing two or more steps concurrently (aka "in parallel")?
+
+In classic programming terminology, a "gate" is a mechanism that waits on two or more parallel/concurrent tasks to complete before continuing. It doesn't matter what order they finish in, just that all of them have to complete for the gate to open and let them the flow control through.
+
+In the promise API, we call this pattern `all([ .. ])`.
+
+Say you wanted to make two Ajax requests at the same time, and wait for both to finish, regardless of their order, before making a third Ajax request. Consider:
+
+```js
+// `request(..)` is a promise-aware Ajax utility,
+// like we defined earlier in the chapter
+
+var p1 = request( "http://some.url.1/" );
+var p2 = request( "http://some.url.2/" );
+
+Promise.all( [p1,p2] )
+.then( function(msgs){
+	// both `p1` and `p2` fulfill and pass in
+	// their messages here
+	return request(
+		"http://some.url.3/?v=" + msgs.join(",")
+	);
+} )
+.then( function(msg){
+	console.log( msg );
+} );
+```
+
+`Promise.all([ .. ])` expects a single argument, an `array`, consisting generally of promise instances. The promise returned from the `Promise.all([ .. ])` call will receive a fulfillment message (`msgs` in this snippet) that is an `array` of all the fulfillment messages from the passed in promises, in the same order as specified (regardless of fulfillment order).
+
+**Note:** Technically, the `array` of values passed into `Promise.all([ .. ])` can include promises, thenables, or even immediate values. Each value in the list is essentially passed through `Promise.resolve(..)` to make sure it's a genuine promise to be waited on, so an immediate value will just be normalized into a promise for that value. If the `array` is empty, the main promise is immediately fulfilled.
+
+The promise returned from `Promise.all([ .. ])` will only be fulfilled if and when all its constituent promises are successfully fulfilled. If any one of those promises instead is rejected, the main `Promise.all([ .. ])` promise is immediately rejected, discarding all results from any other promises.
+
+Remember to always attach a rejection/error handler to every promise, even and especially the one that comes back from `Promise.all([ .. ])`.
+
+### `Promise.race([ .. ])`
+
+While `Promise.all([ .. ])` coordinates multiple promises concurrently and assumes all are needed for fulfillment, sometimes you only want to respond to the first promise to "cross the finish line", letting the other promises fall away.
+
+This pattern is classically called a "latch", but in promises we call it a "race".
+
+**Note:** While the metaphor of "only the first across the finish line wins" fits the behavior well, unfortunately "race" is kind of a loaded term, because "race conditions" are generally taken as bugs in programs (see Chapter 1).
+
+`Promise.race([ .. ])` also expects a single `array` argument, containing one or more promises, thenables, or immediate values. It doesn't make much practical sense to have a race with immediate values, because the first one will obviously win -- like a foot race where one runner starts at the finish line!
+
+Similar to `Promise.all([ .. ])`, `Promise.race([ .. ])` will fulfill if and when the first promise resolution is a fulfillment, and it will reject if and when the first promise resolution is a rejection.
+
+**Note:** A "race" requires at least one "runner", so if you pass an empty `array`, instead of immediately resolving, the main promise will never resolve. This is a footgun! ES6 should have specified that it either fulfills, rejects, or just throws some sort of synchronous error. Unfortunately, because of precedence in promise libraries predating ES6 `Promise`, they had to leave this gotcha in there, so be careful never to send in an empty `array`.
+
+Let's revisit our previous concurrent Ajax example, but in the context of a race between `p1` and `p2`:
+
+```js
+// `request(..)` is a promise-aware Ajax utility,
+// like we defined earlier in the chapter
+
+var p1 = request( "http://some.url.1/" );
+var p2 = request( "http://some.url.2/" );
+
+Promise.race( [p1,p2] )
+.then( function(msg){
+	// either `p1` or `p2` will win the race
+	return request(
+		"http://some.url.3/?v=" + msg
+	);
+} )
+.then( function(msg){
+	console.log( msg );
+} );
+```
+
+Since only one promise wins, the fulfillment value is a single message, not an `array` as it was for `Promise.all([ .. ])`.
+
+#### Timeout Race
+
+We saw this example earlier, illustrating how `Promise.race([ .. ])` can be used to express the "promise timeout" pattern:
+
+```js
+// `foo()` is any random promise-aware function
+
+// `timeoutPromise(..)`, defined ealier, returns
+// a promise that rejects after a specified delay
+
+// setup a timeout for `foo()`
+Promise.race( [
+	foo(),					// attempt `foo()`
+	timeoutPromise( 3000 )	// give it three seconds
+] )
+.then(
+	function(){
+		// `foo(..)` succeeded in time!
+	},
+	function(err){
+		// either `foo()` failed, or it just
+		// didn't finish in time, so inspect
+		// `err` to know which
+	}
+);
+```
+
+This timeout pattern works well in most cases. But there are some nuances to consider, and frankly they apply to both `Promise.race([ .. ])` and `Promise.all([ .. ])` equally.
+
+#### "Finally"
+
+The key question to ask is, "what happens to the promises that get discarded/ignored?" We're not asking that question from the performance perspective -- they would otherwise end up garbage collection eligible -- but from the behavioral perspective (side effects, etc.). Promises cannot be canceled -- that would destroy the external immutability trust -- so they can only be silently ignored.
+
+But what if `foo()` in the above example is reserving some sort of resource for usage, but the timeout fires first and causes that promise to be ignored? Is there anything in this pattern that proactively frees the reserved resource, or otherwise cancels any side effects it may have had? What if all you wanted was to log the fact that `foo()` timed out?
+
+Some developers have proposed that promises need a `finally(..)` callback registration, which is always called when a promise resolves, and allows you to specify any cleanup that may be necessary. This doesn't exist in the specification at the moment, but it may come in ES7+. We'll have to wait and see.
+
+In the meantime, we could make a static helper utility that lets us observe (without interfering) the completion of a promise, and we could even call it `Promise.finally(..)` for consistency sake:
+
+```js
+// use a polyfill-safe guard check
+if (!Promise.finally) {
+	Promise.finally = function(pr,cb) {
+		// side-observe promise resolution
+		pr.then(
+			function(msg){
+				// schedule callback as microtask
+				Promise.resolve( msg ).then( cb );
+			},
+			function(err){
+				// schedule callback as microtask
+				Promise.resolve( err ).then( cb );
+			}
+		);
+
+		// return original promise
+		return pr;
+	};
+}
+```
+
+Here's how we'd use it in the timeout example from before:
+
+```js
+Promise.race( [
+	Promise.finally(
+		foo(),					// attempt `foo()`
+		function cleanup(msg){
+			// clean up after `foo()`, even if it
+			// didn't finish before the timeout
+		}
+	),
+	timeoutPromise( 3000 )	// give it three seconds
+] )
+```
+
+This `Promise.finally(..)` helper is just an illustration of how you could observe the completions of promises without interfering with them. Other promise libraries have their own solutions. Regardless of how you do it, you'll likely have places where you want to make sure your promises aren't *just* silently ignored.
 
 ## Promise API Recap
 
@@ -1297,7 +1454,7 @@ p.catch( failure ); // or `p.then( null, failure )`
 
 `then(..)` and `catch(..)` also create and return a new promise, which can be used to express promise chain flow control. If the fulfillment or rejection callbacks have an exception thrown, the returned promise is rejected. If either callback returns an immediate, non-promise, non-thenable value, that value is set as the fulfillment for the returned promise. If the fulfillment handler specifically returns a promise or thenable value, that value is unwrapped and becomes the resolution of the returned promise.
 
-### `Promise.all(..)` and `Promise.race(..)`
+### `Promise.all([ .. ])` and `Promise.race([ .. ])`
 
 Both of these static helpers on the ES6 `Promise` API create a promise as their return value. The resolution of that promise is controlled entirely by the array of promises that you pass in.
 
