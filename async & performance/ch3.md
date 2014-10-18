@@ -1209,11 +1209,11 @@ foo( 42 )
 ...
 ```
 
-When we create `p`, we know we're going to wait awhile to use/observe its rejection, so we call `defer()`; thus no global reporting. The promise returned from `foo(..)` gets an error handler attached *right away*, so it's implicitly opted-out and no global reporting for it occurs either.
+When we create `p`, we know we're going to wait awhile to use/observe its rejection, so we call `defer()` -- thus no global reporting. The promise returned from `foo(..)` gets an error handler attached *right away*, so it's implicitly opted-out and no global reporting for it occurs either.
 
-But the promise returned from the `then(..)` call has no `defer()` or error handler attached, so if it rejects (from inside either resolution handler), then *it* will report to the developer console as an uncaught error.
+But the promise returned from the `then(..)` call has no `defer()` or error handler attached, so if it rejects (from inside either resolution handler), then *it* will be reported to the developer console as an uncaught error.
 
-This design is a pit of success. By default all errors are either handled or reported -- what almost all developers in almost all cases would expect. You have to intentionally opt-out, and indicate you intend to defer error handling until *later*; you're opting for the responsibility in that specific case.
+This design is a pit of success. By default all errors are either handled or reported -- what almost all developers in almost all cases would expect. You have to intentionally opt-out, and indicate you intend to defer error handling until *later*; you're opting for the extra responsibility in just that specific case.
 
 The only real downside to this strategy is if you `defer()` a promise and then fail to actually ever observe/handle its rejection.
 
