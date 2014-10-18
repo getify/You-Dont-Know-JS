@@ -1088,6 +1088,141 @@ p.then(
 );
 ```
 
+While this pattern of error handling makes fine sense on the surface, the nuances of promise error handling are often a fair bit more difficult to fully grasp.
+
+Consider:
+
+```js
+var p = Promise.resolve( 42 );
+
+p.then(
+	function(msg){
+		// numbers don't have string functions,
+		// so will throw an error
+		console.log( msg.toLowerCase() );
+	},
+	function(err){
+		// never gets here
+	}
+);
+```
+
+If the `msg.toLowerCase()` legitimately throws an error (it does!), why doesn't our error handler get notified? As we explained earlier, it's because *that* error handler is for the `p` promise, which has already been fulfilled with value `42`. Since the `p` promise is immutable, the only promise which can be notified of the error is the one returned from `p.then(..)`, which in this case we don't capture.
+
+That should paint an obvious picture of why error handling with promises is error-prone (pun intended). It's far too easy to have errors swallowed, as this is very rarely what you'd intend.
+
+### Pit of Despair
+
+Jeff Atwood noted years ago: programming languages are often set up in such a way that by default, developers fall into the "pit of despair" (http://blog.codinghorror.com/falling-into-the-pit-of-success/) -- where accidents are punished -- and that you have to try harder to get it right. He implored us to instead create a "pit of success", where by default you fall into expected (successful) action, and thus would have to try hard to fail.
+
+Promise error handling is unquestionably "pit of despair" design. By default, it assumes that you want the error to be swallowed by the promise state, and if you forget to observe that, the error silently languishes/dies in obscurity -- usually despair.
+
+To avoid losing an error to the silence of a forgotten/discarded promise instance, some developers have claimed that a "best practice" for promise chains is to always end your chain with a final `catch(..)`, like:
+
+```js
+var p = Promise.resolve( 42 );
+
+p.then(
+	function(msg){
+		// numbers don't have string functions,
+		// so will throw an error
+		console.log( msg.toLowerCase() );
+	}
+)
+.catch( handleErrors );
+```
+
+Because we didn't pass a rejection handler to the `then(..)`, the default handler was substituted, which simply propagates the error to the next promise in the chain. As such, both errors that come into `p`, and errors that come *after* `p` in its resolution (like the `msg.toLowerCase()` one) will filter down to that final `handleErrors(..)` function reference.
+
+Problem solved, right? Not so fast!
+
+What happens if `handleErrors(..)` itself also has an error in it? Who catches that? There's still yet another unattended promise: the one `catch(..)` returns, which we don't capture and don't register an error handler for.
+
+You can't just stick another `catch(..)` on the end of that chain, because it too could fail. The last step in the chain, whatever it is, always has the possibility, even decreasingly so, of dangling an uncaught error.
+
+Sound like an impossible conundrum yet?
+
+### Uncaught Handling
+
+It's not exactly an easy problem to solve completely. There are other ways to approach it which many would say are *better*.
+
+Some promise libraries have added methods for registering something like a "global unhandled rejection" handler, which would be called instead of a globally thrown error. But their solution for how to identify an error as "uncaught" is to have an arbitrary-length timer, say 3 seconds, running from time of rejection. If a promise is rejected but no error handler is registered before the timer fires, then it's assumed that you won't ever be registering a handler, so it's "uncaught".
+
+In practice, this has worked well for many libraries, as most patterns don't call for significant delay between promise rejection and observation of that rejection. But this pattern is troublesome because 3 seconds is so arbitrary (if empirical), and also because there are indeed some cases where you want a promise to hold on to its rejectedness for some longer period of time, and you don't really want to have your "uncaught" handler called for all those false positives (not-yet-caught "uncaught errors").
+
+Another more common suggestion is that promises should have a `done(..)` added to them, which essentially marks the promise chain as "done". `done(..)` doesn't create and return a new promise, and thus the callbacks passed to `done(..)` are not wired up to report problems to that next promise which doesn't exist.
+
+So what instead? It's treated as you might usually expect in uncaught error conditions: an error inside a `done(..)` rejection/failure handler would be thrown as a global uncaught error (in the developer console, basically).
+
+```js
+var p = Promise.resolve( 42 );
+
+p.then(
+	function(msg){
+		// numbers don't have string functions,
+		// so will throw an error
+		console.log( msg.toLowerCase() );
+	}
+)
+.done( null, handleErrors );
+
+// if `handleErrors(..)` had its own exception, would
+// be thrown globally here
+```
+
+This might sound more attractive that the never-ending chain or the arbitrary timeouts. But the biggest problem is that it's not part of the ES6 standard, so no matter how good it sounds, at best it's a lot longer way off from being a reliable and ubiquitous solution.
+
+Are we just stuck, then? Not entirely.
+
+Browsers have a unique capability that our code does not have: they can track and know for sure when any object gets thrown away and garbage collected. So, browsers can track promise objects, and whenever they get garbage collected, if they have a rejection in them, the browser knows for sure this was a legitimate "uncaught error", and can thus confidently know it should report it to the developer console.
+
+**Note:** At time of writing, both Chrome and Firefox have attempts at that sort of "uncaught rejection" logic in them, though support is situational at best.
+
+However, if your promise doesn't get garbage collected (and that's exceedingly easy to accidentally happen through lots of different coding patterns), then the browser's garbage collection sniffing won't help you know and diagnose that you have a silently-rejected promise laying around.
+
+Is there any other alternative? Yes.
+
+### Pit of Success
+
+The following is just theoretical -- it's how promises *could* be someday changed to work. I believe it would be far superior to what we currently have. And I think this change would be possible even post-ES6 because I don't think it would break web compatibility with ES6 promises. Moreover, it can be polyfilled/prollyfilled in, if you're careful.
+
+1. Promises could default to reporting (to the developer console) any rejection, on the next microtask or event loop tick, if at that exact moment no error handler has been registered for the promise.
+2. For the cases where you want a rejected promise to hold onto its rejected state for an arbitrary amount of time before observing, a `defer()` could be added, that can be called on any promise, which marks it as not being eligible for the automatic error reporting.
+
+In other words, if a promise is rejected, it defaults to noisly reporting that fact to the developer console (instead of defaulting to silence). You can opt-out of that reporting either implicitly (by registering an error handler before rejection), or explicitly (with `defer()`). In either case, *you* control the false positives.
+
+Consider:
+
+```js
+var p = Promise.reject( "Oops" ).defer();
+
+// `foo(..)` is promise-aware
+foo( 42 )
+.then(
+	function(){
+		return p;
+	},
+	function(err){
+		// handle `foo(..)` error
+	}
+);
+...
+```
+
+When we create `p`, we know we're going to wait awhile to use/observe its rejection, so we call `defer()`; thus no global reporting. The promise returned from `foo(..)` gets an error handler attached *right away*, so it's implicitly opted-out and no global reporting for it occurs either.
+
+But the promise returned from the `then(..)` call has no `defer()` or error handler attached, so if it rejects (from inside either resolution handler), then *it* will report to the developer console as an uncaught error.
+
+This design is a pit of success. By default all errors are either handled or reported -- what almost all developers in almost all cases would expect. You have to intentionally opt-out, and indicate you intend to defer error handling until *later*; you're opting for the responsibility in that specific case.
+
+The only real downside to this strategy is if you `defer()` a promise and then fail to actually ever observe/handle its rejection.
+
+But you had to intentionally call `defer()` to opt-in to that pit of despair -- the default was the pit of success -- so there's not much else we could do to save you from your own mistakes.
+
+I think there's still hope for promise error handling (post-ES6). I hope the powers that be will rethink this situation and consider this alternative. In the meantime, you can implement this yourself, or use a smarter promise library that does so for you!
+
+**Note:** This exact model for error handling/reporting is implemented in my *asynquence* promise abstraction library, which will be discussed in (??? // TODO) of this book.
+
 ## Promise Patterns
 
 Promises have lots of various patterns for solving async tasks. // TODO
