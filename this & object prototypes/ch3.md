@@ -696,7 +696,7 @@ myObject.a = 2;
 myObject.a; // 4
 ```
 
-**Note:** In this example, we actually store the specified value `2` of the assigment (`[[Put]]` operation) into another variable `_a_`. The `_a_` name is purely by convention for this example and implies nothing special about its behavior -- it's a normal property like any other.
+**Note:** In this example, we actually store the specified value `2` of the assignment (`[[Put]]` operation) into another variable `_a_`. The `_a_` name is purely by convention for this example and implies nothing special about its behavior -- it's a normal property like any other.
 
 ### Existence
 
