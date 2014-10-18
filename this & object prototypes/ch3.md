@@ -816,7 +816,7 @@ ES5 also added several iteration helpers for arrays, including `forEach(..)`, `e
 
 `forEach(..)` will iterate over all values in the array, and ignores any callback return values. `every(..)` keeps going until the end *or* the callback returns a `false` (or "falsy") value, whereas `some(..)` keeps going until the end *or* the callback returns a `true` (or "truthy") value.
 
-These special return values inside `every(..)` and `some(..)` act somewhat like a `break` statment inside a normal `for` loop, in that they stop the iteration early before it reaches the end.
+These special return values inside `every(..)` and `some(..)` act somewhat like a `break` statement inside a normal `for` loop, in that they stop the iteration early before it reaches the end.
 
 If you iterate on an object with a `for..in` loop, you're also only getting at the values indirectly, because it's actually iterating only over the enumerable properties of the object, leaving you to access the properties manually to get the values.
 
