@@ -1581,13 +1581,136 @@ Promise.all( [p1,p2] )
 } );
 ```
 
+**Note:** Be careful! If an empty `array` is passed to `Promise.all([ .. ])`, it will fulfill immediately, but `Promise.race([ .. ])` will hang forever and never resolve.
+
 The ES6 `Promise` API is pretty simple and straightforward. It's at least good enough to serve the most basic of async cases, and is a good place to start when rearranging your code from callback hell to something better.
 
-But there's a whole lot of async sophistication that apps often demand which promises themselves will expose limitations to addressing. In the next section, we'll dive into those limitations as motivations for how promise library abstractions are quite useful for modern JS async programming based on promise theory.
+But there's a whole lot of async sophistication that apps often demand which promises themselves will be limited in addressing. In the next section, we'll dive into those limitations as motivations for the benefit of promise libraries.
 
 ## `Promise` Limitations
 
-// TODO
+Much of the details we'll discuss in this section has already been alluded to already in this chapter, but we'll just make sure to review these limitations specifically.
+
+### Single Value
+
+Promises by definition only have a single fulfillment value or a single rejection reason. In simple examples, this isn't that big of a deal, but in more sophisticated scenarios, you may find this limiting.
+
+The typical advice is to construct a values wrapper (such as an `object` or `array`) to contain these multiple messages. This solution works, but it can be quite awkward and tedious to wrap and unwrap your messages with every single step of your promise chain.
+
+Sometimes, you can take this as a signal that you could/should decompose the problem into two or more promises.
+
+Imagine you have a utility `foo(..)` which produces two values (`x` and `y`) asynchronously:
+
+```js
+// `getY(..)` asynchronously calculates `y`
+
+function foo(bar,baz) {
+	var x = bar * baz;
+
+	return getY( x )
+	.then( function(y){
+		// wrap both values into container
+		return [x,y];
+	} );
+}
+
+foo( 10, 20 )
+.then( function(msgs){
+	var x = msgs[0];
+	var y = msgs[1];
+
+	console.log( x, y );
+} );
+```
+
+First, let's rearrange what `foo(..)` returns so that we don't have to wrap `x` and `y` into a single `array` value to transport through one promise. Instead, we can wrap each value into its own promise:
+
+```js
+// `getY(..)` asynchronously calculates `y`
+
+function foo(bar,baz) {
+	var x = bar * baz;
+
+	// return both promises
+	return [
+		Promise.resolve( x ),
+		getY( x )
+	];
+}
+
+Promise.all(
+	foo( 10, 20 )
+)
+.then( function(msgs){
+	var x = msgs[0];
+	var y = msgs[1];
+
+	console.log( x, y );
+} );
+```
+
+Is an `array` of promises really better than an `array` of values passed through a single promise? Syntactically, not much.
+
+But this approach more closely embraces the promise design theory. It's now easier in the future to refactor to split the calculation of `x` and `y` into separate functions. It's cleaner and more flexible to let the calling code decide how to orchestrate the two promises -- using `Promise.all([ .. ])` here, but certainly not the only option -- rather than to abstract such details away inside of `foo(..)`.
+
+#### Unwrap/Spread Arguments
+
+The `var x = ..` and `var y = ..` assignments are still awkward overhead. We can employ some functional trickery (hat tip @raganwald) in a helper utility:
+
+```js
+function spread(fn) {
+	return Function.apply.bind( fn, null );
+}
+
+Promise.all(
+	foo( 10, 20 )
+)
+.then(
+	spread( function(x,y){
+		console.log( x, y );
+	} )
+)
+```
+
+That's a bit nicer! Of course, you can inline the functional magic to avoid the extra helper:
+
+```js
+Promise.all(
+	foo( 10, 20 )
+)
+.then( Function.apply.bind(
+	function(x,y){
+		console.log( x, y );
+	},
+	null
+) );
+```
+
+These tricks may be neat, but ES6 has an even better answer for us: destructuring. The array destructuring-assignment form looks like:
+
+```js
+Promise.all(
+	foo( 10, 20 )
+)
+.then( function(msgs){
+	var [x,y] = msgs;
+
+	console.log( x, y );
+} );
+```
+
+But best of all, ES6 offers the array parameter-destructuring form:
+
+```js
+Promise.all(
+	foo( 10, 20 )
+)
+.then( function([x,y]){
+	console.log( x, y );
+} );
+```
+
+We've now embraced the one-value-per-promise mantra, but kept our supporting boilerplate to a minimum!
 
 ## Summary
 
