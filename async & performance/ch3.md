@@ -1597,6 +1597,8 @@ Promises by definition only have a single fulfillment value or a single rejectio
 
 The typical advice is to construct a values wrapper (such as an `object` or `array`) to contain these multiple messages. This solution works, but it can be quite awkward and tedious to wrap and unwrap your messages with every single step of your promise chain.
 
+#### Splitting Values
+
 Sometimes, you can take this as a signal that you could/should decompose the problem into two or more promises.
 
 Imagine you have a utility `foo(..)` which produces two values (`x` and `y`) asynchronously:
@@ -1711,6 +1713,54 @@ Promise.all(
 ```
 
 We've now embraced the one-value-per-promise mantra, but kept our supporting boilerplate to a minimum!
+
+### Single Resolution
+
+One of the most intrinsic behaviors of promises is that a promise can only be resolved once (fulfillment or rejection). For many async use-cases, you're only retrieving a single value, so this works fine.
+
+But there's also a lot of async cases which fit into a different model, one that's more akin to events and/or streams of data. It's not clear on the surface how well promises can fit into such use-cases, if at all. Without a significant abstraction on top of promises, they will completely fall short for handling multiple value resolution.
+
+Imagine a scenario where you might want to fire off a sequence of async steps in response to a stimuli (like an event) that can in fact happen multiple times, like a button click.
+
+This probably won't work the way you want:
+
+```js
+// `click(..)` binds the `"click"` event to a DOM element
+// `request(..)` is the previously defined promise-aware Ajax
+
+var p = new Promise( function(resolve,reject){
+	click( "#mybtn", resolve );
+} );
+
+p.then( function(evt){
+	var btnID = evt.currentTarget.id;
+	return request( "http://some.url.1/?id=" + btnID );
+} )
+.then( function(text){
+	console.log( text );
+} );
+```
+
+The behavior here only works if your application calls for the button to be clicked just once. If the button is clicked a second time, the `p` promise has already been resolved, so the second `resolve(..)` call would be ignored.
+
+Instead, you'd probably need to invert the paradigm, creating a whole new promise chain for each event firing:
+
+```js
+click( "#mybtn", function(evt){
+	var btnID = evt.currentTarget.id;
+
+	request( "http://some.url.1/?id=" + btnID )
+	.then( function(text){
+		console.log( text );
+	} );
+} );
+```
+
+This approach will *work* in that a whole new promise sequence will be fired off for each `"click"` event on the button.
+
+But beyond just the ugliness of having to define the entire promise chain inside the event handler, this design actually violates in some respects the idea of SoC (separation-of-concerns -- or capabilities). You might very well want to define your event handler in a different place in your code from where you define the *response* to the event (the promise chain). That's pretty awkward to do in this pattern, without helper mechanisms.
+
+**Note:** Another way of articulating this limitation is that it'd be nice if we could construct some sort of "observable" that we can subscribe a promise chain to. There are libraries that have created these abstractions (such as RxJS -- http://rxjs.codeplex.com/), but the abstractions can be so heavy that you can't even see the nature of promises anymore. Such heavy abstraction brings important questions to mind such as whether (sans promises) these mechanisms are as *trustable* as promises have been designed to be.
 
 ## Summary
 
