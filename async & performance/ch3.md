@@ -13,6 +13,8 @@ But what if we could uninvert that *inversion of control*? What if instead of ha
 
 We can do just that, and it's called **Promises**.
 
+Promises are starting to take the JS world by storm, as developers and specification writers alike desperately seek to untangle the insanity of callback hell in their code/design. In fact, most new async APIs being added to JS/DOM platform are being built on promises. So, it's probably a good idea to dig in and learn them, don't you think!?
+
 **Note:** The word "immediately" will be used frequently in this chapter, generally to refer to some promise resolution action. However, in essentially all cases, "immediately" means in terms of the microtask queue behavior (see Chapter 1), not in the strictly synchronous *now* sense.
 
 ## What is a Promise?
@@ -1591,6 +1593,37 @@ But there's a whole lot of async sophistication that apps often demand which pro
 
 Much of the details we'll discuss in this section has already been alluded to already in this chapter, but we'll just make sure to review these limitations specifically.
 
+### Sequence Error Handling
+
+We covered promise-flavored error handling in detail earlier in this chapter. The limitations of how promises are designed -- how they chain, specifically -- creates a very easy pitfall where an error in a promise chain can be silently ignored accidentally.
+
+But there's something else to consider with promise errors. Because a promise chain is nothing more than its constituent promises wired together, there's no entity to refer to the entire chain as a single *thing*, which means there's no external way to observe any errors that may occur.
+
+If you construct a promise chain which has no error handling in it, any error anywhere in the chain will propagate indefinitely down the chain, until observed (by registering a rejection handler at some step). So, in that specific case, having a reference to the *last* promise in the chain is enough, because you can register a rejection handler there, and it will be notified of any propagated errors:
+
+```js
+// `foo(..)`, `step1(..)` and `step(..)` are
+// all promise-returning utilities
+
+var p = foo( 42 )
+.then( step2 )
+.then( step3 );
+```
+
+Firstly, while it may seem sneakily confusing, `p` here doesn't point to the first promise in the chain (the one from the `foo(42)` call), but instead from the last promise, the one that comes from the `then(step3)` call.
+
+Also, no step in the promise chain is observably doing its own error handling. That means that you could then register a rejection error handler on `p`, and it would be notified if any errors occur anywhere in the chain:
+
+```
+p.catch( handleErrors );
+```
+
+But if any step of the chain in fact does its own error handling (perhaps hidden/abstracted away from what you can see), your `handleErrors(..)` won't be notified. This may be what you want -- it was, after all, a "handled rejection" -- but it also may *not* be what you want. The complete lack of ability to be notified (of "already handled" rejection errors) is a limitation that restricts some the capabilities in some use-cases.
+
+It's basically the same limitation that exists with a `try..catch` that can catch an exception and simply swallow it. So this isn't a limitation **unique to promises**, but it *is* something we might wish to have a way to work around.
+
+Unfortunately, many times there is no reference kept for the intermediate steps in a promise-chain sequence, so without such references, you cannot attach error handlers to reliably observe the errors.
+
 ### Single Value
 
 Promises by definition only have a single fulfillment value or a single rejection reason. In simple examples, this isn't that big of a deal, but in more sophisticated scenarios, you may find this limiting.
@@ -1762,10 +1795,225 @@ But beyond just the ugliness of having to define the entire promise chain inside
 
 **Note:** Another way of articulating this limitation is that it'd be nice if we could construct some sort of "observable" that we can subscribe a promise chain to. There are libraries that have created these abstractions (such as RxJS -- http://rxjs.codeplex.com/), but the abstractions can be so heavy that you can't even see the nature of promises anymore. Such heavy abstraction brings important questions to mind such as whether (sans promises) these mechanisms are as *trustable* as promises have been designed to be.
 
+### Inertia
+
+One concrete barrier to starting to use promises in your own code is all the code that currently exists which is not already promise-aware. If you have lots of callback-based code, it's far easier to just keep coding in that same style.
+
+"A code base in motion (with callbacks) will remain in motion (with callbacks) unless acted upon by a smart, promises-aware developer."
+
+Promises offer a different paradigm, and as such, the approach to the code can be anywhere from just a little different to, in some cases, being radically different. You have to be intentional about it, because promises will not just naturally shake out from the same ol' ways of doing code that have served you well thus far.
+
+Consider a callback-based scenario like:
+
+```js
+function foo(x,y,cb) {
+	ajax(
+		"http://some.url.1/?x=" + x + "&y=" + y,
+		cb
+	);
+}
+
+foo( 11, 31, function(err,text) {
+	if (err) {
+		console.error( err );
+	}
+	else {
+		console.log( text );
+	}
+} );
+```
+
+Is it immediately obvious what the first steps are to convert this callback-based code to promise-aware code? Depends on your experience. It comes more naturally, the more you have practice with it. But certainly, promises don't just advertise on the label exactly how to do it -- there's no one-size-fits-all answer -- so the responsibility is up to you.
+
+As we've covered before, we definitely need an Ajax utility that is promise-aware instead of callback-based, which we could call `request(..)`. You can make your own, as we have already. But the overhead of having to manually define promise-aware wrappers for every callback-based utility makes it less likely you'll choose to refactor to promise-aware coding at all.
+
+Promises offer no direct answer to that limitation. Most promise libraries however do offer a helper. But even without a library, imagine a helper like this:
+
+```js
+// polyfill-safe guard check
+if (!Promise.wrap) {
+	Promise.wrap = function(fn) {
+		return function() {
+			var args = [].slice.call( arguments );
+
+			return new Promise( function(resolve,reject){
+				fn.apply(
+					null,
+					args.concat( function(err,v){
+						if (err) {
+							reject( err );
+						}
+						else {
+							resolve( v );
+						}
+					} )
+				);
+			} );
+		};
+	};
+}
+```
+
+OK, that's more than just a tiny trivial utility. It may look a bit intimidating. It's not as bad as you'd think. It takes a function that expects an error-first style callback as its last parameter, and returns a new one that automatically creates a promise to return, and substitutes the callback for you, wired up to the promise fulfillment/rejection.
+
+Rather than waste too much time talking about *how* this `promiseWrap(..)` helper works, let's just look at how we use it:
+
+```js
+var request = Promise.wrap( ajax );
+
+request( "http://some.url.1/" )
+.then( .. )
+..
+```
+
+Wow, that was pretty easy!
+
+Still a shame to have to create a wrapper, but at least the wrapping pattern is (usually) repeatable so we can put it into a helper to reduce the limitation's effects on our promise coding.
+
+So back to our earlier example, we need to promise-wrap both `ajax(..)` and `foo(..)`:
+
+```js
+// make a promise-aware Ajax wrapper
+var request = Promise.wrap( ajax );
+
+// refactor `foo(..)`, but keep it externally
+// callback-based for compatibility with other
+// parts of the code for now -- only use
+// `request(..)`'s promise internally.
+function foo(x,y,cb) {
+	request(
+		"http://some.url.1/?x=" + x + "&y=" + y
+	)
+	.then(
+		function(text){
+			cb( null, text );
+		},
+		cb
+	);
+}
+
+// now, for this code's purposes, make a
+// promise-aware wrapper for `foo(..)`
+var betterFoo = Promise.wrap( foo );
+
+// use the promise-aware wrapper
+betterFoo( 11, 31 )
+.then(
+	function(text){
+		console.log( text );
+	},
+	function(err){
+		console.error( err );
+	}
+);
+```
+
+Of course, while we're refactoring `foo(..)` to use our new `request(..)`, we could just make it fully promise-aware, instead of remaining callback-based and needing the subsequent `betterFoo(..)` wrapper. It just depends on whether `foo(..)` needs to stay callback-based compatible with other parts of the code base or not.
+
+```js
+function foo(x,y) {
+	return request(
+		"http://some.url.1/?x=" + x + "&y=" + y
+	);
+}
+
+foo( 11, 31 )
+.then( .. )
+..
+```
+
+While promises don't natively ship with helpers for such wrapping, libraries provide them, or you can make your own. Either way, this particular limitation of promises is addressable without too much pain (certainly compared to the pain of callback hell!).
+
+### Promise Uncancelable
+
+Once you create a promise and register a fulfillment and/or rejection handler for it, there's nothing external you can do to stop that progression if something else happens to make that task moot.
+
+**Note:** Many promise abstraction libraries provide facilities to cancel promises, but this is a terrible idea! It violates the principle of external immutability, and morever of effects at a distance, both of which can create surprises.
+
+Consider our promise timeout scenario from earlier:
+
+```js
+var p = foo( 42 );
+
+Promise.race(
+	p,
+	timeoutPromise( 3000 )
+)
+.then(
+	doSomething,
+	handleError
+);
+
+p.then( function(){
+	// still happens even in the timeout case :(
+} );
+```
+
+One option is to invasively define your resolution callbacks:
+
+```js
+var OK = true;
+
+var p = foo( 42 );
+
+Promise.race(
+	p,
+	timeoutPromise( 3000 )
+	.catch( function(err){
+		OK = false;
+		throw err;
+	} )
+)
+.then(
+	doSomething,
+	handleError
+);
+
+p.then( function(){
+	if (OK) {
+		// only happens if no timeout! :)
+	}
+} );
+```
+
+This is ugly. It works, but it's far from ideal. Generally, you should try to avoid such scenarios.
+
+But if you can't, the ugliness of this solution should be a clue that *cancelation* is a functionality that belongs at a higher level of abstraction on top of promises. Look to promise abstraction libraries for assistance rather than hacking it yourself.
+
+**Note:** My *asynquence* promise abstraction library provides just such an abstraction, which will be discussed in (??? // TODO) of this book.
+
+### Promise Performance
+
+This particular limitation is both simple and complex.
+
+Comparing how many pieces are moving with a basic callback-based async task chain vs. a promise chain, it's clear promises have a fair bit more going on, which means they are naturally at least a tiny bit slower. Think back to just the simple list of *trust guarantees* that promises solve over callbacks, as compared to the ad hoc solution code you'd have to layer on top of callbacks
+
+More work to do, more guards to protect, means that promises *are* slower as compared to naked, untrustable callbacks. That much is obvious, and probably simple to wrap your brain around.
+
+But how much slower? Well... that's actually proving to be an incredibly difficult question to answer absolutely, across the board.
+
+Frankly, it's kind of an apples-to-oranges comparison, so it's probably the wrong question to ask. You should actually compare whether an ad-hoc callback system with all the guards manually layered in is faster than a promise system with the same protections.
+
+If promises have a genuine limitation, it's more that they don't really offer a line-item choice as to which trustability protections you want/need or not -- you get them all, always.
+
+Nevertheless, if we grant that a promise is generally a *little bit slower* than its non-promise, non-trustable callback equivalent -- in places where you feel you can justify the lack of trustability -- does that mean that promises should be avoided across the board, as if your entire application is riddled with nothing but must-be-utterly-the-fastest code possible?
+
+Sanity check: if your code is legitimately like that, **is JavaScript even the right language for such tasks?**
+
+Another subtle issue is that promises make *everything* async, which means that some immediately (synchronously) complete steps still defer advancement of the next sequence step to a microtask. That means that it's possible that a sequence of promise tasks could complete ever-so-slightly slower than the same sequence wired up with callbacks.
+
+Of course, the question here is whether these potential slips in small amounts of performance are *worth* all the other articulated benefits of promises we've laid out across this chapter?
+
+My take is that in virtually all cases where you think the performance of promises makes them slow enough to avoid, it's actually an anti-pattern to optimize away the value of promise trustability and composability by avoiding them in the first place.
+
+Instead, you should default to using them across the code base, and then profile and analyze your application's hot (critical) paths. Are promises *really* a bottleneck, or are they just a theoretical slowdown. Only *then* is it responsible and prudent to factor out the promises in just those identified areas.
+
+Promises are a little slower, but you're getting a lot of trustability, non-Zalgo predictability, and composability built-in, in exchange. So maybe the limitation is not actually their performance, but your lack of perception of their benefits?
+
 ## Summary
 
 Promises are awesome. Use them. They solve all the *inversion of control* issues that plague us with callbacks-only code.
 
-They don't get rid of callbacks, they just redirect the orchestration of those callbacks to a trustable intermediary mechanism that sits between us and the other party utility -- namely, the Promise mechanism.
+They don't get rid of callbacks, they just redirect the orchestration of those callbacks to a trustable intermediary mechanism that sits between us and the other party utility.
 
-Promise chains also begin to address (though certainly not perfectly) a better way of expressing async flow in sequential fashion, which helps our brains plan and maintain async JS code better.
+Promise chains also begin to address (though certainly not perfectly) a better way of expressing async flow in sequential fashion, which helps our brains plan and maintain async JS code better. We'll see an even better solution to *that* problem in the next chapter!
