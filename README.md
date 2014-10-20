@@ -3,7 +3,8 @@
 This is a series of books diving deep into the core mechanisms of the JavaScript language.
 
 <img src="scope %26 closures/cover.jpg" width="75">&nbsp;
-<img src="this %26 object prototypes/cover.jpg" width="75">
+<img src="this %26 object prototypes/cover.jpg" width="75">&nbsp;
+<span>...(more coming soon!)</span>
 
 Please feel free to contribute to the quality of this content by submitting PR's for improvements to code snippets, explanations, etc. While typo fixes are welcomed, they will likely be caught through normal editing processes, and are thus not necessarily as important for this repository.
 
