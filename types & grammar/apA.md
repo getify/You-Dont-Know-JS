@@ -149,7 +149,7 @@ So, should you feature-test for the built-in behavior as well as compliance-test
 ```js
 // don't trust Array.prototype.push
 (function(){
-	if (!Array.prototype.push) {
+	if (Array.prototype.push) {
 		var a = [];
 		a.push(1,2);
 		if (a[0] === 1 && a[1] === 2) {
