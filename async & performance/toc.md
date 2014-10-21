@@ -23,6 +23,9 @@
 	* Promise Patterns
 	* Promise API Recap
 	* Promise Limitations
+* Chapter 4: Generators
+	* Breaking Run-to-completion
+	* // TODO
 * Appendix A: // TODO
 * Appendix B: Thank You's!
 
