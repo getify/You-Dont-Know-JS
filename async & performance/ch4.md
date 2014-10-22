@@ -85,7 +85,7 @@ So, a generator is a special kind of function that can start and stop one or mor
 
 ### Input & Output
 
-A generator function is a special function with the special processing model we just alluded to. But it's still a function, which means it still has some basic tenets that haven't changed -- namely, that it still accepts arguments, and that it can still return a value.
+A generator function is a special function with the new processing model we just alluded to. But it's still a function, which means it still has some basic tenets that haven't changed -- namely, that it still accepts arguments, and that it can still return a value.
 
 ```js
 function *foo(x,y) {
@@ -101,7 +101,7 @@ res.value;		// 42
 
 We pass in the arguments `6` and `7` to `*foo(..)` as the parameters `x` and `y` respectively. And `*foo(..)` returns the value `42` back to the calling code.
 
-Now we start to see a difference with how the generator is invoked compared to normal function. The `foo(6,7)` obviously looks familiar. But subtly, `*foo(..)` hasn't actually run yet. Instead, we're just creating an iterator object, which we assign to `it`, to control the `*foo(..)` generator. Then we call `it.next()`, which forces the `*foo(..)` generator to advance one step. The result of that call is an object that has a `value` property on it holding whatever value (if anything) was returned from `*foo(..)`.
+We now see a difference with how the generator is invoked compared to a normal function. `foo(6,7)` obviously looks familiar. But subtly, `*foo(..)` hasn't actually run yet as it would have with a function. Instead, we're just creating an iterator object, which we assign to the variable `it`, to control the `*foo(..)` generator. Then we call `it.next()`, which instructs the `*foo(..)` generator to advance one step. The result of that call is an object with a `value` property on it holding whatever value (if anything) was returned from `*foo(..)`.
 
 Again, it won't be obvious why we need this whole indirect iterator object to control the generator yet. We'll get there, I *promise*.
 
@@ -132,6 +132,68 @@ First, we pass in `6` as the parameter `x`. Then we call `it.next()`, and it sta
 Inside `*foo(..)`, the `var y = x ..` statement starts to be processed, but then it runs across a `yield` expression. At that point, it pauses `*foo(..)` (in the middle of the assignment statement!), and essentially requests the calling code to provide a result value for the `yield` expression. Next, we call `it.next( 7 )`, which is passing the `7` value back in to *be* that result of the paused `yield` expression.
 
 So, at this point, the assignment statement is essentially `var y = 6 * 7`. Now, `return y` returns that `42` value back as the result of the `it.next( 7 )` call.
+
+Notice something very important but also so easily confusing, even to seasoned JS developers: depending on your perspective, there's a mismatch between the `yield` and the `next(..)` call. In general, you're going to have one more `next(..)` call than you have `yield` statements -- the above snippet has one `yield` and two `next(..)` calls.
+
+Why the mismatch?
+
+Because the first `next(..)` always starts a generator, and runs to the first `yield`. But it's the second `next(..)` call that fulfills the first paused `yield` expression, and the third `next(..)` would fulfill the second `yield`, and so on.
+
+##### Tale of two questions
+
+Actually, which code you're thinking about primarily will affect whether there's a perceived mismatch or not.
+
+Look only at the generator code:
+
+```js
+var y = x * (yield);
+return y;
+```
+
+Here, we've got a `yield` that's basically *asking a question*: "what value should I resolve to?" Who's going to answer that question? Well, the first `next()` has already run to get the generator running to this point, so obviously it can't answer the question. So, it must be the second `next(..)` call which can answer the question *posed* by the first `yield`.
+
+See the mismatch?
+
+But let's flip our perspective. Let's look at it not from the generator's point of view, but from the calling code (with the iterator) point of view.
+
+To properly illustrate this perspective, we also need to explain that `yield ..` as an expression can send out messages in response to `next(..)` calls. Consider:
+
+```js
+function *foo(x) {
+	var y = x * (yield "Hello");
+	return y;
+}
+
+var it = foo( 6 );
+
+var res = it.next();	// first `next()`, don't pass anything
+res.value;				// "Hello"
+
+res = it.next( 7 );		// pass `7` to waiting `yield`
+res.value;				// 42
+```
+
+So, `yield ..` and `next(..)` act as a two-way message passing system. Let's get back to looking at this code from the perspective of the iterator. Look only at the iterator code:
+
+```js
+var res = it.next();	// first `next()`, don't pass anything
+res.value;				// "Hello"
+
+res = it.next( 7 );		// pass `7` to waiting `yield`
+res.value;				// 42
+```
+
+The first `next()` call (with nothing passed to it) is basically *asking a question*: "what *next* value does the `*foo(..)` generator have to give me?" And who answers this question? The first `yield "hello"` expression.
+
+See? No mismatch there.
+
+Depending on *who* you think about asking the question, there is either a mismatch between the `yield` and `next(..)` calls, or not.
+
+But wait!? There's still an extra `next()` compared to the number of `yield` statements. So, that final `it.next(7)` call is again asking the question about what *next* value the generator will produce. But there's no more `yield` statements left to answer, is there? So who answers?
+
+The `return` statement answers the question!
+
+And if there **is no `return`** in your generator -- they are certainly not any more required in generators than in regular functions -- there's always an assumed/implicit `return;` (aka `return undefined;`), which serves the purpose of answering the question *posed* by that final `it.next(7)` call.
 
 ## Summary
 
