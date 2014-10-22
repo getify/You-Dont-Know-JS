@@ -143,24 +143,26 @@ Because the first `next(..)` always starts a generator, and runs to the first `y
 
 Actually, which code you're thinking about primarily will affect whether there's a perceived mismatch or not.
 
-Look only at the generator code:
+Consider only the generator code:
 
 ```js
 var y = x * (yield);
 return y;
 ```
 
-Here, we've got a `yield` that's basically *asking a question*: "what value should I resolve to?" Who's going to answer that question? Well, the first `next()` has already run to get the generator running to this point, so obviously it can't answer the question. So, it must be the second `next(..)` call which can answer the question *posed* by the first `yield`.
+This **first** `yield` is basically *asking a question*: "What value should I insert here?"
 
-See the mismatch?
+Who's going to answer that question? Well, the **first** `next()` has already run to get the generator up to this point, so obviously *it* can't answer the question. So, the **second** `next(..)` call must answer the question *posed* by the **first** `yield`.
 
-But let's flip our perspective. Let's look at it not from the generator's point of view, but from the calling code (with the iterator) point of view.
+See the mismatch -- second-to-first?
 
-To properly illustrate this perspective, we also need to explain that `yield ..` as an expression can send out messages in response to `next(..)` calls. Consider:
+But let's flip our perspective. Let's look at it not from the generator's point of view, but from the iterator's point of view.
+
+To properly illustrate this perspective, we also need to explain that messages can go in both directions -- `yield ..` as an expression can send out messages in response to `next(..)` calls, and `next(..)` can send values to a paused `yield` expression. Consider this slightly adjusted code from above:
 
 ```js
 function *foo(x) {
-	var y = x * (yield "Hello");
+	var y = x * (yield "Hello");	// <-- yield a value!
 	return y;
 }
 
@@ -173,7 +175,9 @@ res = it.next( 7 );		// pass `7` to waiting `yield`
 res.value;				// 42
 ```
 
-So, `yield ..` and `next(..)` act as a two-way message passing system. Let's get back to looking at this code from the perspective of the iterator. Look only at the iterator code:
+`yield ..` and `next(..)` pair together as a two-way message passing system **during the execution of the generator**.
+
+So, looking only at the iterator code:
 
 ```js
 var res = it.next();	// first `next()`, don't pass anything
@@ -183,7 +187,9 @@ res = it.next( 7 );		// pass `7` to waiting `yield`
 res.value;				// 42
 ```
 
-The first `next()` call (with nothing passed to it) is basically *asking a question*: "what *next* value does the `*foo(..)` generator have to give me?" And who answers this question? The first `yield "hello"` expression.
+**Note:** We don't pass a value to the first `next()` call, and that's on purpose. Only a paused `yield` could accept such a value passed by a `next(..)`, and at the beginning of the generator when we call the first `next()`, there **is no paused `yield`** to accept such a value. In early drafts of the ES6 standard -- and thus some transitive versions of browsers like Firefox and Chrome -- passing a value to the first `next()` would cause an exception. Now, the specification and all compliant browsers just silently **discard** anything passed to the first `next()`. It's still a bad idea to pass a value, as you're just creating silently "failing" code that's confusing. So, always start a generator with an argument-free `next()`.
+
+The first `next()` call (with nothing passed to it) is basically *asking a question*: "What *next* value does the `*foo(..)` generator have to give me?" And who answers this question? The first `yield "hello"` expression.
 
 See? No mismatch there.
 
@@ -194,6 +200,8 @@ But wait!? There's still an extra `next()` compared to the number of `yield` sta
 The `return` statement answers the question!
 
 And if there **is no `return`** in your generator -- they are certainly not any more required in generators than in regular functions -- there's always an assumed/implicit `return;` (aka `return undefined;`), which serves the purpose of answering the question *posed* by that final `it.next(7)` call.
+
+These questions and answers -- the two-way message passing with `yield` and `next(..)` -- are quite powerful, but it's not obvious at all how these mechanisms is connected to async flow control. We're getting there!
 
 ## Summary
 
