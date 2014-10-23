@@ -25,6 +25,7 @@
 	* Promise Limitations
 * Chapter 4: Generators
 	* Breaking Run-to-completion
+	* Generator'ing Values
 	* // TODO
 * Appendix A: // TODO
 * Appendix B: Thank You's!
