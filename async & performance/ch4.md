@@ -217,16 +217,17 @@ You can implement something like that straightforwardly using a function closure
 
 ```js
 var gimmeSomething = (function(){
-	var last;
+	var nextVal;
 
 	return function(){
-		if (last === undefined) {
-			return (last = 1);
+		if (nextVal === undefined) {
+			nextVal = 1;
+		}
+		else {
+			nextVal = (3 * nextVal) + 6;
 		}
 
-		last = (3 * last) + 6;
-
-		return last;
+		return nextVal;
 	};
 })();
 
@@ -236,6 +237,8 @@ gimmeSomething();		// 33
 gimmeSomething();		// 105
 ```
 
+**Note:** The `nextVal` computation logic above could have been simplified, but conceptually, we don't want to calculate the *next value* (aka `nextVal`) until the *next* `gimmeSomething()` call happens, because in general that could be a resource-leaky design for producers of more persistent or resource-limited values than simple `number`s.
+
 Generating an arbitrary number series isn't a terribly realistic example. But what if you were generating records from a data source? You could imagine much the same code.
 
 In fact, this task is a very common design pattern, usually solved by iterators. An *iterator* is a well-defined interface for stepping through a series of values from a producer. The JS interface for iterators, as it is in most languages, is to call `next()` each time you want the next value from the producer.
@@ -244,7 +247,7 @@ We could implement the standard iterator interface for our number series produce
 
 ```js
 var something = (function(){
-	var last;
+	var nextVal;
 
 	return {
 		// needed for `for..of` loops
@@ -252,13 +255,14 @@ var something = (function(){
 
 		// standard iterator interface method
 		next: function(){
-			if (last === undefined) {
-				return { done:false, value:(last = 1) };
+			if (nextVal === undefined) {
+				nextVal = 1;
+			}
+			else {
+				nextVal = (3 * nextVal) + 6;
 			}
 
-			last = (3 * last) + 6;
-
-			return { done:false, value:last };
+			return { done:false, value:nextVal };
 		}
 	};
 })();
@@ -372,15 +376,28 @@ We can implement the `something` infinite number series producer from earlier wi
 
 ```js
 function *something() {
-	var last = 1;
+	var nextVal;
+
 	while (true) {
-		yield last;
-		last = (3 * last) + 6;
+		if (nextVal === undefined) {
+			nextVal = 1;
+		}
+		else {
+			nextVal = (3 * nextVal) + 6;
+		}
+
+		yield nextVal;
 	}
 }
 ```
 
-That's significantly cleaner and simpler, right!? And now we can use this `*something()` generator with a `for..of` loop:
+**Note:** A `while..true` loop would normally be a very bad thing to include in a real JS program, at least if it doesn't have a `break` in it, as it would likely run forever, synchronously, and block/lock-up the browser UI. However, in a generator, such a loop is generally totally OK if it has a `yield` in it, as the generator will pause at each iteration, yielding back to the main program and/or to the event loop queue. To put it glibly, "generators put the `while..true` back in JS programming!"
+
+That's a fair bit cleaner and simpler, right!? Because the generator pauses at each `yield`, the simple scope of the function `*something()` is kept around, meaning there's no need for the closure boilerplate to preserve variable state across calls.
+
+Not only is it simpler code -- no need to make our own *iterator* interface -- it actually is more reason-able code, because it more clearly expresses the intent. For example, the `while..true` loop tells us the generator is intended to run forever -- to keep *generating* values as long as we keep asking for them.
+
+And now we can use our shiny new `*something()` generator with a `for..of` loop, and you'll see it works basically identically:
 
 ```js
 for (var v of something()) {
@@ -394,12 +411,16 @@ for (var v of something()) {
 // 1 9 33 105 321 969
 ```
 
-Pay close attention to `for (var v of something()) ..`. We didn't just reference `something` as a value like in earlier snippets, but instead called the `*something()` generator to get its *iterator* for the `for..of` loop to use.
+But don't skip over `for (var v of something()) ..`! We didn't just reference `something` as a value like in earlier examples, but instead called the `*something()` generator to get its *iterator* for the `for..of` loop to use.
 
 If you're paying close attention, two questions may arise from this interaction between the generator and the loop:
 
-1. Why couldn't we say `for (var v of something) ..`? Because `something` here is a generator, which is not an *iterable*.
+1. Why couldn't we say `for (var v of something) ..`? Because `something` here is a generator, which is not an *iterable*. We have to call `something()` to construct a producer for the `for..of` loop to iterate over.
 2. The `something()` call produces an *iterator*, but the `for..of` loop wants an *iterable*, right? Yep. The generator *iterator* also has a `Symbol.iterator` function on it, which basically does a `return this` like ours did. In other words, the generator *iterator* is also an *iterable*!
+
+Generators owe their namesake mostly to this *producing values* type of use-case. But again, it's only one of the use-cases for generators, and frankly not the main one we're concerned with in this chapter.
+
+Now that we more fully understand some of the mechanics of how they work, we'll *next* turn our attention to how generators apply to the async concurrency use-case.
 
 ## Summary
 
