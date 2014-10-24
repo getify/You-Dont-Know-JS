@@ -26,6 +26,8 @@
 * Chapter 4: Generators
 	* Breaking Run-to-completion
 	* Generator'ing Values
+	* Iterating Generators Asynchronously
+	* Generators + Promises
 	* // TODO
 * Appendix A: // TODO
 * Appendix B: Thank You's!

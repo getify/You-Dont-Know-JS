@@ -101,9 +101,9 @@ res.value;		// 42
 
 We pass in the arguments `6` and `7` to `*foo(..)` as the parameters `x` and `y` respectively. And `*foo(..)` returns the value `42` back to the calling code.
 
-We now see a difference with how the generator is invoked compared to a normal function. `foo(6,7)` obviously looks familiar. But subtly, `*foo(..)` hasn't actually run yet as it would have with a function. Instead, we're just creating an iterator object, which we assign to the variable `it`, to control the `*foo(..)` generator. Then we call `it.next()`, which instructs the `*foo(..)` generator to advance one step. The result of that call is an object with a `value` property on it holding whatever value (if anything) was returned from `*foo(..)`.
+We now see a difference with how the generator is invoked compared to a normal function. `foo(6,7)` obviously looks familiar. But subtly, `*foo(..)` hasn't actually run yet as it would have with a function. Instead, we're just creating an *iterator* object, which we assign to the variable `it`, to control the `*foo(..)` generator. Then we call `it.next()`, which instructs the `*foo(..)` generator to advance one step. The result of that call is an object with a `value` property on it holding whatever value (if anything) was returned from `*foo(..)`.
 
-Again, it won't be obvious why we need this whole indirect iterator object to control the generator yet. We'll get there, I *promise*.
+Again, it won't be obvious why we need this whole indirect *iterator* object to control the generator yet. We'll get there, I *promise*.
 
 #### Iteration Messaging
 
@@ -177,7 +177,7 @@ res.value;				// 42
 
 `yield ..` and `next(..)` pair together as a two-way message passing system **during the execution of the generator**.
 
-So, looking only at the iterator code:
+So, looking only at the *iterator* code:
 
 ```js
 var res = it.next();	// first `next()`, don't pass anything
@@ -243,7 +243,7 @@ Generating an arbitrary number series isn't a terribly realistic example. But wh
 
 In fact, this task is a very common design pattern, usually solved by iterators. An *iterator* is a well-defined interface for stepping through a series of values from a producer. The JS interface for iterators, as it is in most languages, is to call `next()` each time you want the next value from the producer.
 
-We could implement the standard iterator interface for our number series producer above:
+We could implement the standard *iterator* interface for our number series producer above:
 
 ```js
 var something = (function(){
@@ -277,7 +277,7 @@ something.next().value;		// 105
 
 The `next()` call returns an object with two properties: `done` is a boolean signaling the iteration is complete status; `value` holds the iteration value.
 
-ES6 also adds the `for..of` loop, which means that a standard iterator can automatically be consumed with native loop support:
+ES6 also adds the `for..of` loop, which means that a standard *iterator* can automatically be consumed with native loop support:
 
 ```js
 for (var v of something) {
@@ -291,7 +291,7 @@ for (var v of something) {
 // 1 9 33 105 321 969
 ```
 
-**Note:** Because our `something` iterator always returns `done:false`, this `for..of` loop would run forever, which is why we put the `break` conditional in. It's totally OK for iterators to be never-ending, but there are also plenty of cases where the iterator will run over a finite set of values and eventually return a `done:true`.
+**Note:** Because our `something` *iterator* always returns `done:false`, this `for..of` loop would run forever, which is why we put the `break` conditional in. It's totally OK for iterators to be never-ending, but there are also plenty of cases where the *iterator* will run over a finite set of values and eventually return a `done:true`.
 
 The `for..of` loop automatically calls `next()` for each iteration -- note that it doesn't pass any values in -- and it will automatically terminate on receiving a `done:true`. Of course, you could manually loop over iterators, calling `next()` and checking for the `done:true` condition to know when to stop.
 
@@ -422,14 +422,165 @@ Generators owe their namesake mostly to this *producing values* type of use-case
 
 Now that we more fully understand some of the mechanics of how they work, we'll *next* turn our attention to how generators apply to the async concurrency use-case.
 
+## Iterating Generators Asynchronously
+
+Hopefully by now, you've caught on to a hint that generators are a pretty awesome addition to JS. But you're still probably wondering what any of this has to do with async coding patterns, fixing problems with callbacks, etc. Let's get to answering that important question.
+
+We should revisit one of our scenarios from Chapter 3. Let's first recall the callback approach:
+
+```js
+function foo(x,y,cb) {
+	ajax(
+		"http://some.url.1/?x=" + x + "&y=" + y,
+		cb
+	);
+}
+
+foo( 11, 31, function(err,text) {
+	if (err) {
+		console.error( err );
+	}
+	else {
+		console.log( text );
+	}
+} );
+```
+
+If we wanted to express this same task flow control with a generator, we could do:
+
+```js
+function foo(x,y) {
+	ajax(
+		"http://some.url.1/?x=" + x + "&y=" + y,
+		function(err,data){
+			if (err) {
+				// throw an error into `*main()`
+				it.throw( err );
+			}
+			else {
+				// resume `*main()` with received `data`
+				it.next( data );
+			}
+		}
+	);
+}
+
+function *main() {
+	try {
+		var text = yield foo( 11, 31 );
+		console.log( text );
+	}
+	catch (err) {
+		console.error( err );
+	}
+}
+
+var it = main();
+
+// start it all up!
+it.next();
+```
+
+At first glance, this snippet is longer, and perhaps a little more complex looking, than the callback snippet before it. But don't let that impression get you off track. The generator snippet is actually **much** better! But there's a lot going on for us to explain.
+
+First, let's look at this part of the code, which is the most important:
+
+```js
+var text = yield foo( 11, 31 );
+console.log( text );
+```
+
+Think about how that code works for a moment. We're calling a normal function `foo(..)` and we're apparently able to get back the `text` from the Ajax call, even though it's asynchronous.
+
+How is that possible? If you recall the beginning of Chapter 1, we had almost identical code:
+
+```js
+var data = ajax( "..url 1.." );
+console.log( data );
+```
+
+And that code didn't work! Can you spot the difference? The `yield`, combined with the fact that the former statement is in a generator.
+
+That's the magic! That's what allows us to have what appears to be blocking, synchronous code, but it's not actually really blocking in the whole program sense -- it only pauses/blocks the code in the generator itself, not the whole program!
+
+In `yield foo(11,31)`, first the `foo(11,31)` call is made, which -- at the moment! -- returns nothing (aka `undefined`), so we're making a call to request data, but we're actually then doing `yield undefined`. That's OK, because the code is not currently relying on a yielded value to do anything interesting.
+
+We're not using `yield` in a message passing sense here, only in a flow control sense to pause/block. Actually, it will have message passing, but only in one direction, after the generator is resumed.
+
+So, the generator pauses at the `yield`, essentially asking the question, "what value should I return to assign to the variable `text`?" Who's going to answer that question?
+
+Look at `foo(..)`. If the Ajax request is successful, we call:
+
+```js
+it.next( data );
+```
+
+That's resuming the generator with the response data, which means that our paused `yield` expression receives that value directly, and then as it restarts the generator code, that value gets assigned to the local variable `text`.
+
+Pretty cool, huh!?
+
+Take a step back and consider the implications. We have totally synchronous-looking code inside the generator (other than the `yield` keyword itself), but hidden behind the scenes, inside of `foo(..)`, the operations can complete asynchronously.
+
+**That's huge!** That's a nearly perfect solution to our previously stated problem with callbacks not being able to express asynchrony in a sequential, synchronous fashion that our brains can relate to.
+
+In essence, we are abstracting the asynchrony away as an implementation detail, so that we can reason synchronously/sequentially about our flow control: "Make an Ajax request, and when it finishes print out the response." And of course, we just expressed two steps in the flow control, but this same capabililty extends without bounds, to let us express however many steps we need to.
+
+This is such an important realization, just go back and read the last three paragraphs again to let it sink in!
+
+### Synchronous Error Handling
+
+But the above code has even more goodness to *yield* to us. Let's turn our attention to the `try..catch` in the generator.
+
+// TODO
+
+## Generators + Promises
+
+In our previous discussion, we showed how generators can be iterated asynchronously, which is a huge step forward. But we lost something very important. We lost the trustability and composability of promises (see Chapter 3)!
+
+But don't worry, we can get that back. The best of all worlds is to combine generators -- they allow synchronous-looking async code -- with promises -- they are trustable and composable.
+
+But how?
+
+Recall from Chapter 3 the promise-based approach to the running example:
+
+```js
+function foo(x,y) {
+	return request(
+		"http://some.url.1/?x=" + x + "&y=" + y
+	);
+}
+
+foo( 11, 31 )
+.then(
+	function(text){
+		console.log( text );
+	},
+	function(err){
+		console.error( err );
+	}
+);
+```
+
+Recall earlier in our generator example that `foo(..)` returned nothing (`undefined`), and our *iterator* control code didn't care about that `yield`ed value.
+
+But here the promise-aware `foo(..)` returns a promise. That suggests that we could `yield` a promise from a generator, and we could have the *iterator* control code receive that promise and do something useful with.
+
+But what should it do with the promise?
+
+That's easy! It should listen for the promise to resolve (fulfillment or rejection), and it should either resume the generator with the fulfillment message or throw an error into the generator with the rejection reason.
+
+Let me repeat that, because it's so important. The natural way to get the most out of promises and generators is to `yield` a promise, and use that promise to control the generator's *iterator*.
+
+// TODO
+
 ## Summary
 
 Generators are a new ES6 function type which does not run-to-completion like normal functions. Instead, the generator can be paused in mid-completion (entirely preserving its state), and it can be resumed from where it left off.
 
-This pause/resume interchange is cooperative rather than preemptive, which means that the generator has the sole capability to pause itself, using the `yield` keyword, and yet the iterator that controls the generator has the sole capability (via `next(..)`) to resume the generator.
+This pause/resume interchange is cooperative rather than preemptive, which means that the generator has the sole capability to pause itself, using the `yield` keyword, and yet the *iterator* that controls the generator has the sole capability (via `next(..)`) to resume the generator.
 
 The `yield` / `next(..)` duality is not just a control mechanism, it's actually a two-way message passing mechanism. A `yield ..` expression essentially pausing waiting for a value, and the next `next(..)` call passes a value (or implicit `undefined`) back to that paused `yield` expression.
 
-The key benefit of generators related to async flow control is that the code inside a generator expresses a sequence of steps for the task in a naturally sync/sequential fashion. The trick is that we essentially hide potential asynchrony behind the `yield` keyword -- moving the asynchrony to the code where the generator's iterator is controlled.
+The key benefit of generators related to async flow control is that the code inside a generator expresses a sequence of steps for the task in a naturally sync/sequential fashion. The trick is that we essentially hide potential asynchrony behind the `yield` keyword -- moving the asynchrony to the code where the generator's *iterator* is controlled.
 
 In other words, generators preserve a sequential, synchronous, blocking code pattern for async code, which lets our brains reason about the code much more naturally, addressing one of the two key drawbacks of callback-based async.
