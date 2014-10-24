@@ -283,7 +283,7 @@ var bar = function() {
 bar(); // 2
 setTimeout( bar, 100 ); // 2
 
-// hard-bound `bar` can no longer have its `this` overriden
+// hard-bound `bar` can no longer have its `this` overridden
 bar.call( window ); // 2
 ```
 
@@ -483,7 +483,7 @@ OK, *new binding* is more precedent than *implicit binding*. But do you think *n
 
 Before we explore that in a code listing, think back to how *hard binding* physically works, which is that `Function.prototype.bind(..)` creates a new wrapper function that is hard-coded to ignore its own `this` binding (whatever it may be), and use a manual one we provide.
 
-By that reasoning, it would seem obvious to assume that *hard binding* (which is a form of *explicit binding*) is more precedent than *new binding*, and thus cannot be overriden with `new`.
+By that reasoning, it would seem obvious to assume that *hard binding* (which is a form of *explicit binding*) is more precedent than *new binding*, and thus cannot be overridden with `new`.
 
 Let's check:
 
@@ -503,7 +503,7 @@ console.log( obj1.a ); // 2
 console.log( baz.a ); // 3
 ```
 
-Whoa! `bar` is hard-bound against `obj1`, but `new bar(3)` did **not** change `obj1.a` to be `3` as we would have expected. Instead, the *hard bound* (to `obj1`) call to `bar(..)` ***is*** able to be overriden with `new`. Since `new` was applied, we got the newly created object back, which we named `baz`, and we see in fact that  `baz.a` has the value `3`.
+Whoa! `bar` is hard-bound against `obj1`, but `new bar(3)` did **not** change `obj1.a` to be `3` as we would have expected. Instead, the *hard bound* (to `obj1`) call to `bar(..)` ***is*** able to be overridden with `new`. Since `new` was applied, we got the newly created object back, which we named `baz`, and we see in fact that  `baz.a` has the value `3`.
 
 This should be surprising if you go back to our "fake" bind helper:
 
@@ -581,7 +581,7 @@ function foo(p1,p2) {
 
 // using `null` here because we don't care about
 // the `this` hard-binding in this scenario, and
-// it will be overriden by the `new` call anyway!
+// it will be overridden by the `new` call anyway!
 var bar = foo.bind( null, "p1" );
 
 var baz = new bar( "p2" );
@@ -793,7 +793,7 @@ var bar = foo.call( obj1 );
 bar.call( obj2 ); // 2, not 3!
 ```
 
-The arrow-function created in `foo()` lexically captures whatever `foo()`s `this` is at its call-time. Since `foo()` was `this`-bound to `obj1`, `bar` (a reference to the returned arrow-function) will also be `this`-bound to `obj1`. The lexical binding of an arrow-function cannot be overriden (even with `new`!).
+The arrow-function created in `foo()` lexically captures whatever `foo()`s `this` is at its call-time. Since `foo()` was `this`-bound to `obj1`, `bar` (a reference to the returned arrow-function) will also be `this`-bound to `obj1`. The lexical binding of an arrow-function cannot be overridden (even with `new`!).
 
 The most common use-case will likely be in the use of callbacks, such as event handlers or timers:
 

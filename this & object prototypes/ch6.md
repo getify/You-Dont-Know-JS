@@ -717,7 +717,7 @@ var LoginController = {
 };
 ```
 
-About the only difference is that object literals will still require `,` comma separators between elements whereas `class` syntax doesn't. Pretty minor concesssion in the whole scheme of things.
+About the only difference is that object literals will still require `,` comma separators between elements whereas `class` syntax doesn't. Pretty minor concession in the whole scheme of things.
 
 Moreover, as of ES6, the clunkier syntax you use (like for the `AuthController` definition), where you're assigning properties individually and not using an object literal, can be re-written using an object literal (so that you can use concise methods), and you can just modify that object's `[[Prototype]]` with `Object.setPrototypeOf(..)`, like this:
 

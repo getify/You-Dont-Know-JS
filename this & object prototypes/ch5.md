@@ -161,7 +161,7 @@ This object is often called "Foo's prototype", because we access it via an unfor
 
 Whatever we call it, what exactly is this object?
 
-The most direct way to explain it is that each object created from calling `new Foo()` (see Chapter 2) will end up (somewhat aribitrarily) `[[Prototype]]`-linked to this "Foo dot prototype" object.
+The most direct way to explain it is that each object created from calling `new Foo()` (see Chapter 2) will end up (somewhat arbitrarily) `[[Prototype]]`-linked to this "Foo dot prototype" object.
 
 Let's illustrate:
 

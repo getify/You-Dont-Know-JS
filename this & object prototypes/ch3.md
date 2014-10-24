@@ -604,7 +604,7 @@ myObject.b; // undefined
 
 From a *value* perspective, there is no difference between these two references -- they both result in `undefined`. However, the `[[Get]]` operation underneath, though subtle at a glance, potentially performed a bit more "work" for the reference `myObject.b` than for the reference `myObject.a`.
 
-Inspecting only the value results, you cannot distinguish whether a property exists and holds the explicit value `undefined`, or whether ther property does *not* exist and `undefined` was the default return value after `[[Get]]` failed to return something explicitly. However, we will see shortly how you *can* distinguish these two scenarios.
+Inspecting only the value results, you cannot distinguish whether a property exists and holds the explicit value `undefined`, or whether the property does *not* exist and `undefined` was the default return value after `[[Get]]` failed to return something explicitly. However, we will see shortly how you *can* distinguish these two scenarios.
 
 ### `[[Put]]`
 
@@ -696,7 +696,7 @@ myObject.a = 2;
 myObject.a; // 4
 ```
 
-**Note:** In this example, we actually store the specified value `2` of the assigment (`[[Put]]` operation) into another variable `_a_`. The `_a_` name is purely by convention for this example and implies nothing special about its behavior -- it's a normal property like any other.
+**Note:** In this example, we actually store the specified value `2` of the assignment (`[[Put]]` operation) into another variable `_a_`. The `_a_` name is purely by convention for this example and implies nothing special about its behavior -- it's a normal property like any other.
 
 ### Existence
 
@@ -816,7 +816,7 @@ ES5 also added several iteration helpers for arrays, including `forEach(..)`, `e
 
 `forEach(..)` will iterate over all values in the array, and ignores any callback return values. `every(..)` keeps going until the end *or* the callback returns a `false` (or "falsy") value, whereas `some(..)` keeps going until the end *or* the callback returns a `true` (or "truthy") value.
 
-These special return values inside `every(..)` and `some(..)` act somewhat like a `break` statment inside a normal `for` loop, in that they stop the iteration early before it reaches the end.
+These special return values inside `every(..)` and `some(..)` act somewhat like a `break` statement inside a normal `for` loop, in that they stop the iteration early before it reaches the end.
 
 If you iterate on an object with a `for..in` loop, you're also only getting at the values indirectly, because it's actually iterating only over the enumerable properties of the object, leaving you to access the properties manually to get the values.
 
