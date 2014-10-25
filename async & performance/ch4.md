@@ -664,17 +664,156 @@ foo( 11, 31 )
 );
 ```
 
-In our earlier generator example, `foo(..)` returned nothing (`undefined`), and our *iterator* control code didn't care about that `yield`ed value.
+In our earlier generator code for the running Ajax example, `foo(..)` returned nothing (`undefined`), and our *iterator* control code didn't care about that `yield`ed value.
 
-But here the promise-aware `foo(..)` returns a promise. That suggests that we could `yield` a promise from a generator, and we could have the *iterator* control code receive that promise and do something useful with it.
+But here the promise-aware `foo(..)` returns a promise after making the Ajax call. That suggests that we could construct a promise with `foo(..)` and then `yield` it from the generator, and then the *iterator* control code would receive that promise.
 
-But what should it do with the promise?
+But what should the *iterator* do with the promise?
 
 It should listen for the promise to resolve (fulfillment or rejection), and then either resume the generator with the fulfillment message or throw an error into the generator with the rejection reason.
 
 Let me repeat that, because it's so important. The natural way to get the most out of promises and generators is **to `yield` a promise**, and wire that promise to control the generator's *iterator*.
 
-// TODO
+Let's give it a try! First, we'll put the promise-aware `foo(..)` together with the generator `*main()`:
+
+```js
+function foo(x,y) {
+	return request(
+		"http://some.url.1/?x=" + x + "&y=" + y
+	);
+}
+
+function *main() {
+	try {
+		var text = yield foo( 11, 31 );
+		console.log( text );
+	}
+	catch (err) {
+		console.error( err );
+	}
+}
+```
+
+The most powerful revelation in this refactor is that the code inside `*main()` **did not have to change at all!** Inside the generator, whatever values are `yield`ed out is just an opaque implementation detail, so we're not even aware it's happening, nor do we need to worry about it.
+
+But how are we going to run `*main()` now? We still have some of the implementation plumbing work to do, to receive and wire up the `yield`ed promise so that it resumes the generator upon resolution. We'll start by trying that manually:
+
+```js
+var it = main();
+
+var p = it.next().value;
+
+// wait for the `p` promise to resolve
+p.then(
+	function(text){
+		it.next( text );
+	},
+	function(err){
+		it.throw( err );
+	}
+);
+```
+
+Actually, that wasn't so painful at all, was it!?
+
+This snippet should look very similar to what we did earlier with the manually-wired generator controlled by the error-first callback. Instead of an `if (err) { it.throw..`, the promise already splits success (fulfillment) and failure (rejection) for us, but the *iterator* control is identical.
+
+Now, we've glossed over some important details.
+
+Most importantly, we took advantage of the fact that we knew that `*main()` only had one promise-aware step in it. What if we wanted to be able to promise-control a generator no matter how many steps it has? We certainly don't want to manually write out the promise chain differently for each generator! What would be much nicer is if there was a way to repeat (aka "loop" over) the iteration control, and each time a promise comes out, wait on its resolution before continuing.
+
+Also, what if the generator throws out an error (intentionally or accidentally) during the `it.next(..)` call? Should we quit, or should we `catch` it and send it right back in? Similarly, what if we `it.throw(..)` a promise rejection into the generator, but it's not handled, and comes right back out?
+
+### Promise-aware Generator Runner
+
+The more you start to explore this path, the more you realize, "wow, it'd be great if there was just some utility to do it for me." And you're absolutely correct. This is such an important pattern, and you don't want to get it wrong (or exhaust yourself repeating it over and over), so your best bet is to use a utility that is specifically designed to *run* promise-`yield`ing generators in the manner we've illustrated.
+
+Several promise abstraction libraries provide just such a utility, including my *asynquence* library, which will be discussed in (??? // TODO) of this book.
+
+But for the sake of learning and illustration, let's just demonstrate a basic standalone utility that I'll call `run(..)`:
+
+```js
+function run(gen) {
+	var it = gen(), ret, val, err;
+
+	(function handleNext(){
+		try {
+			if (!err) {
+				ret = it.next( val );
+			}
+			else {
+				ret = it.throw( err );
+			}
+
+			// reset for next loop
+			err = null;
+			val = ret.value;
+		}
+		catch (e) {
+			if (!err) {
+				// capture exception to send right back in
+				err = e;
+
+				// async "loop"
+				setTimeout( handleNext, 0 );
+			}
+			else {
+				// bail, because generator didn't properly
+				// handle the error thrown to it
+				console.error( "Unhandled:", err );
+				console.error( "Reason:", e );
+			}
+
+			return;
+		}
+
+		// did we get a promise yielded out?
+		// note: thenable duck-typing check... ugh.
+		if (
+			(
+				typeof val === "object" ||
+				typeof val === "function"
+			) &&
+			"then" in val
+		) {
+			val.then(
+				function(msg){
+					val = msg;
+
+					// async "loop"
+					handleNext();
+				},
+				function(e){
+					err = e;
+
+					// async "loop"
+					handleNext();
+				}
+			);
+		}
+		// immediate value yielded out, so send
+		// it right back in
+		else {
+			// async "loop"
+			setTimeout( handleNext, 0 );
+		}
+	})();
+}
+```
+
+As you can see, it's a quite a bit more complex than you'd probably want to author yourself, and you especially wouldn't want to repeat this code for each generator you use. So, a utility or library helper is definitely the way to go.
+
+How would you use `run(..)` with `*main()` in our *running* Ajax example?
+
+```js
+function *main() {
+	// ..
+}
+
+run(main);
+```
+
+That's it! Neat, huh?
 
 ## Summary
 
