@@ -525,23 +525,93 @@ Take a step back and consider the implications. We have totally synchronous-look
 
 In essence, we are abstracting the asynchrony away as an implementation detail, so that we can reason synchronously/sequentially about our flow control: "Make an Ajax request, and when it finishes print out the response." And of course, we just expressed two steps in the flow control, but this same capabililty extends without bounds, to let us express however many steps we need to.
 
-This is such an important realization, just go back and read the last three paragraphs again to let it sink in!
+**Note:** This is such an important realization, just go back and read the last three paragraphs again to let it sink in!
 
 ### Synchronous Error Handling
 
-But the above code has even more goodness to *yield* to us. Let's turn our attention to the `try..catch` in the generator.
+But the above generator code has even more goodness to *yield* to us. Let's turn our attention to the `try..catch` inside the generator:
 
-// TODO
+```js
+try {
+	var text = yield foo( 11, 31 );
+	console.log( text );
+}
+catch (err) {
+	console.error( err );
+}
+```
+
+How does this work? The `foo(..)` call is asynchronously completing, and doesn't `try..catch` fail to catch asynchronous errors, as we looked at in the middle of Chapter 3?
+
+We already saw how the `yield` lets the assignment statement pause to wait for `foo(..)` to finish, so that the completed response can be assigned to `text`. The awesome part is that this `yield` pausing *also* allows the generator to `catch` an error. We throw that error into the generator with this part of the earlier code listing:
+
+```js
+if (err) {
+	// throw an error into `*main()`
+	it.throw( err );
+}
+```
+
+The `yield`-pause nature of generators means that not only do we get synchronous-looking `return` values from async function calls, but we can also synchronously `catch` errors from those async function calls!
+
+So we've seen we can throw errors *into* a generator, but what about throwing errors *out of* a generator? Exactly as you'd expect:
+
+```js
+function *main() {
+	var x = yield "Hello World";
+
+	yield x.toLowerCase();	// will throw!
+}
+
+var it = main();
+
+it.next().value;			// Hello World
+
+try {
+	it.next( 42 );
+}
+catch (err) {
+	console.error( err );	// TypeError
+}
+```
+
+Of course, we could have manually thrown an error with `throw ..` instead of causing an exception.
+
+We can even `catch` the same error that we `throw(..)` into the generator, essentially giving the generator a chance to handle it but if it doesn't, the *iterator* code must handle it:
+
+```js
+function *main() {
+	var x = yield "Hello World";
+
+	// never gets here
+	console.log( x );
+}
+
+var it = main();
+
+it.next();
+
+try {
+	// will `*main()` handle this error? we'll see!
+	it.throw( "Oops" );
+}
+catch (err) {
+	// nope, didn't handle it!
+	console.error( err );			// Oops
+}
+```
+
+Synchronous-looking error handling (via `try..catch`) with async code is a huge win for readability and reason-ability.
 
 ## Generators + Promises
 
-In our previous discussion, we showed how generators can be iterated asynchronously, which is a huge step forward. But we lost something very important. We lost the trustability and composability of promises (see Chapter 3)!
+In our previous discussion, we showed how generators can be iterated asynchronously, which is a huge step forward. But we lost something very important: the trustability and composability of promises (see Chapter 3)!
 
-But don't worry, we can get that back. The best of all worlds is to combine generators -- they allow synchronous-looking async code -- with promises -- they are trustable and composable.
+But don't worry, we can get that back. The best of all worlds is to combine generators (synchronous-looking async code) with promises (trustable and composable).
 
 But how?
 
-Recall from Chapter 3 the promise-based approach to the running example:
+Recall from Chapter 3 the promise-based approach to our running example:
 
 ```js
 function foo(x,y) {
@@ -561,13 +631,13 @@ foo( 11, 31 )
 );
 ```
 
-Recall earlier in our generator example that `foo(..)` returned nothing (`undefined`), and our *iterator* control code didn't care about that `yield`ed value.
+In our earlier generator example, `foo(..)` returned nothing (`undefined`), and our *iterator* control code didn't care about that `yield`ed value.
 
-But here the promise-aware `foo(..)` returns a promise. That suggests that we could `yield` a promise from a generator, and we could have the *iterator* control code receive that promise and do something useful with.
+But here the promise-aware `foo(..)` returns a promise. That suggests that we could `yield` a promise from a generator, and we could have the *iterator* control code receive that promise and do something useful with it.
 
 But what should it do with the promise?
 
-That's easy! It should listen for the promise to resolve (fulfillment or rejection), and it should either resume the generator with the fulfillment message or throw an error into the generator with the rejection reason.
+It should listen for the promise to resolve (fulfillment or rejection), and then either resume the generator with the fulfillment message or throw an error into the generator with the rejection reason.
 
 Let me repeat that, because it's so important. The natural way to get the most out of promises and generators is to `yield` a promise, and use that promise to control the generator's *iterator*.
 
