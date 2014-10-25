@@ -203,15 +203,48 @@ And if there **is no `return`** in your generator -- `return` is certainly not a
 
 These questions and answers -- the two-way message passing with `yield` and `next(..)` -- are quite powerful, but it's not obvious at all how these mechanisms is connected to async flow control. We're getting there!
 
+### Multiple Iterators
+
+It may appear from the syntactic usage that when you use an *iterator* to control a generator, you're controlling the declared generator function itself. But there's a subtlety that easy to miss: each time you construct an *iterator*, you are implicitly constructing an instance of the generator which that *iterator* will control.
+
+You can have multiple instances of the same generator running at the same time, and they can even interact:
+
+```js
+function *foo() {
+	var x = yield 2;
+	z++;
+	var y = yield (x * z);
+	console.log( x, y, z );
+}
+
+var z = 1;
+
+var it1 = foo();
+var it2 = foo();
+
+var val1 = it1.next().value;
+var val2 = it2.next().value;
+
+val1 = it1.next( val2 * 10 ).value;
+val2 = it2.next( val1 * 5 ).value;
+
+it1.next( val2 / 2 );		// 20 300 3
+it2.next( val1 / 4 );		// 200 10 3
+```
+
+That's a fun example to run through in your mind. Did you keep it straight?
+
+**Note:** The most common usage of multiple instances of the same generator running concurrently is not such interactions, but when the generator is producing its own values without input, perhaps from some independently-connected resource. We'll talk more about value production in the next section.
+
 ## Generator'ing Values
 
-In the previous section, we alluded to an interesting use-case for generators. This use-case is **not** the main use-case we're concerned with in this chapter, but I'd be remiss if we didn't cover it in brief, especially since it essentially belies the origin of the name: generators.
+In the previous section, we mentioned an interesting use-case for generators, as a way to produce values. This is **not** the main use-case we're concerned with in this chapter, but we'd be remiss if we didn't cover the basics, especially since this use-case is essentially the origin of the name: generators.
 
 We're going to take a slight diversion into the topic of *iterators* for a bit, but we'll circle back to how they relate to generators and to the use-case of using a generator to *generate* values.
 
 ### Producers and Iterators
 
-Imagine you're *generating* a series of values where each value has a definable relationship to the previous value. To do this, you're going to need a stateful producer that remembers the last value it gave out.
+Imagine you're producing a series of values where each value has a definable relationship to the previous value. To do this, you're going to need a stateful producer that remembers the last value it gave out.
 
 You can implement something like that straightforwardly using a function closure (see the *"Scope & Closures"* title of this series):
 
@@ -605,13 +638,13 @@ Synchronous-looking error handling (via `try..catch`) with async code is a huge 
 
 ## Generators + Promises
 
-In our previous discussion, we showed how generators can be iterated asynchronously, which is a huge step forward. But we lost something very important: the trustability and composability of promises (see Chapter 3)!
+In our previous discussion, we showed how generators can be iterated asynchronously, which is a huge step forward in sequential reason-ability over the spaghetti mess of callbacks. But we lost something very important: the trustability and composability of promises (see Chapter 3)!
 
-But don't worry, we can get that back. The best of all worlds is to combine generators (synchronous-looking async code) with promises (trustable and composable).
+Don't worry -- we can get that back. The best of all worlds is to combine generators (synchronous-looking async code) with promises (trustable and composable).
 
 But how?
 
-Recall from Chapter 3 the promise-based approach to our running example:
+Recall from Chapter 3 the promise-based approach to our running Ajax example:
 
 ```js
 function foo(x,y) {
@@ -639,13 +672,13 @@ But what should it do with the promise?
 
 It should listen for the promise to resolve (fulfillment or rejection), and then either resume the generator with the fulfillment message or throw an error into the generator with the rejection reason.
 
-Let me repeat that, because it's so important. The natural way to get the most out of promises and generators is to `yield` a promise, and use that promise to control the generator's *iterator*.
+Let me repeat that, because it's so important. The natural way to get the most out of promises and generators is **to `yield` a promise**, and wire that promise to control the generator's *iterator*.
 
 // TODO
 
 ## Summary
 
-Generators are a new ES6 function type which does not run-to-completion like normal functions. Instead, the generator can be paused in mid-completion (entirely preserving its state), and it can be resumed from where it left off.
+Generators are a new ES6 function type which does not run-to-completion like normal functions. Instead, the generator can be paused in mid-completion (entirely preserving its state), and it can later be resumed from where it left off.
 
 This pause/resume interchange is cooperative rather than preemptive, which means that the generator has the sole capability to pause itself, using the `yield` keyword, and yet the *iterator* that controls the generator has the sole capability (via `next(..)`) to resume the generator.
 
