@@ -1935,10 +1935,10 @@ Consider our promise timeout scenario from earlier:
 ```js
 var p = foo( 42 );
 
-Promise.race(
+Promise.race( [
 	p,
 	timeoutPromise( 3000 )
-)
+] )
 .then(
 	doSomething,
 	handleError
@@ -1956,14 +1956,14 @@ var OK = true;
 
 var p = foo( 42 );
 
-Promise.race(
+Promise.race( [
 	p,
 	timeoutPromise( 3000 )
 	.catch( function(err){
 		OK = false;
 		throw err;
 	} )
-)
+] )
 .then(
 	doSomething,
 	handleError
