@@ -914,7 +914,7 @@ If a proper valid function is not passed as the fulfillment handler parameter to
 var p = Promise.resolve( 42 );
 
 p.then(
-	// assumed failure handler, if omitted or
+	// assumed fulfillment handler, if omitted or
 	// any other non-function value passed
 	// function(v) {
 	//     return v;
