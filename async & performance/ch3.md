@@ -187,6 +187,84 @@ That's one of the most powerful and important concepts to understand about promi
 
 Promises are an easily repeatable mechanism for encapsulating and composing *future values*.
 
+#### Thenable Duck-Typing
+
+In promises-land, an important detail is how to know for sure if some value is a genuine promise or not? Or more directly, is it a value that will behave like a promise?
+
+Given that promises seem to be constructed by the `new Promise(..)` syntax, you might think that `p instanceof Promise` would be an acceptable check. But unfortunately, there are a number of reasons that's not totally sufficient.
+
+Mainly, you can receive a promise value from another browser window (iframe, etc), which would have its own `Promise` different from the one in the current window/frame, and that check would fail to identify the promise instance.
+
+Moreover, a library or framework may choose to vend its own promises and not use the native ES6 `Promise` implementation to do so. In fact, you may very well be using promises with libraries in older browsers which have no `Promise` at all.
+
+When we discuss promise resolution processes later in this chapter, it will become more obvious why a non-genuine-but-promise-like value would still be very important to be able to recognize and assimilate. But for now, just take my word for it that it's a critical piece of the puzzle.
+
+As such, it was decided that the way to recognize a promise (or something that behaves like a promise) would be to define something called a "thenable" as any object (or function) which has a `then(..)` function on it. It is assumed that any such object is actually a promise-behaving thenable.
+
+The general term for "type checks" which make assumptions about a value's "type" based on its shape (what properties are present) is called "duck-typing" -- "If it looks like a duck, and quacks like a duck, it must be a duck" (see the *"Types & Grammar"* title of this book series). So, the duck-typing check for a thenable would roughly be:
+
+```js
+if (
+	p !== null &&
+	(
+		typeof p === "object" ||
+		typeof p === "function"
+	) &&
+	typeof p.then === "function"
+) {
+	// assume it's a thenable!
+}
+else {
+	// not a thenable
+}
+```
+
+Yuck.
+
+Setting aside the fact that this logic is a bit ugly to have to implement in various places, there's something deeper and more troubling going on.
+
+If you try to fulfill a promise with any object/function value that happens to have a `then(..)` function on it, but you weren't intending it to be treated as a promise/thenable, you're out of luck, because it will automatically be recognized as thenable and treated with special rules (see later in the chapter).
+
+This is even true if you didn't realize the value has a `then(..)` on it. For example:
+
+```js
+var o = { then: function(){} };
+
+// make `p` be `[[Prototype]]`-linked to `o`
+var v = Object.create( o );
+
+v.someStuff = "cool";
+v.otherStuff = "not so cool";
+
+v.hasOwnProperty( "then" );		// false
+```
+
+`v` doesn't look like a promise or thenable at all. It's just plain object with some properties on it. You're probably just intending to send that value around like any other object.
+
+But unknown to you, `v` is also `[[Prototype]]`-linked (see the *"this & Object Prototypes"* title of this book series) to another object `o`, which happens to have a `then(..)` on it. So, the thenable duck-typing checks will think and assume `v` is a thenable. Uh oh.
+
+It doesn't even need to be something as directly intentional as that:
+
+```js
+Object.prototype.then = function(){};
+Array.prototype.then = function(){};
+
+var v1 = { hello: "world" };
+var v2 = [ "Hello", "World" ];
+```
+
+Both `v1` and `v2` will be assumed to be thenables. You can't control or predict if any other code accidentally or maliciously adds `then()` to `Object.prototype`, `Array.prototype`, or any of the other native prototypes. And if what's specified is a function that doesn't call either of its parameters as callbacks, then any promise resolved with such a value will just silently hang forever! Crazy.
+
+Sound implausible or unlikely? Perhaps.
+
+But keep in mind that there were several well-known non-promise libraries preexisting in the community prior to ES6 which happened to already have a method on them called `then()`. Some of those libraries chose to rename their own methods to avoid collision (that sucks!). Others have simply been relegated to the unfortunate status of "incompatible with promise-based coding" in reward for their inability to change to get out of the way.
+
+The unilateral standards decision to essentially hijack the previously non-reserved -- and completely general purpose -- `then` property name means that no value (or any of its delegates), either past, present, or future, can have a `then(..)` function present, either on purpose or by accident, or that value will be confused for a thenable in promises systems, which will probably create bugs that are really hard to track down.
+
+**Note:** I consider this to be one of the worst mistakes made in the whole process of standardizing promises. It was hostile, non-conservative, and non-inclusive in its approach. And there were other options. One option was to say that all thenables must have a *brand* (a more unique property name than the extremely general "then") present (e.g., `PromiseValue`) to pass the check. Another option was to have an *anti-brand* (e.g., `NotAPromise`) which if present on a value would tell the promise mechanism to skip the thenable duck-typing check and treat the value as non-special. These, and other possible options, were rejected because of existing library adoption and perceived web compatibility difficulties. But the duck-typing approach they chose was much worse. Oh well; we just have to deal with it.
+
+This is not all doom-and-gloom. Thenable duck-typing can be helpful, as we'll see later. It can just be hazardous as well, so keep these issues close in mind.
+
 ### Completion Event
 
 As we just saw, an individual promise behaves as a *future value*. But there's another way to think of the resolution of a promise: as a flow-control mechanism -- a temporal this-then-that -- for two or more steps in an asynchronous task.
@@ -1487,6 +1565,8 @@ Promise.map( [p1,p2,p3], function(pr,done){
 ## Promise API Recap
 
 Let's review the ES6 `Promise` API that we've already seen unfold in bits and pieces throughout this chapter.
+
+**Note:** The following API is native only to ES6, but there are specification-compliant polyfills (not just extended promise libraries) which can define `Promise` and all its associated behavior so that you can use native promises even in pre-ES6 browsers. One such polyfill is "Native-Promise-Only" (http://github.com/getify/native-promise-only), which I wrote!
 
 ### `new Promise(..)` Constructor
 

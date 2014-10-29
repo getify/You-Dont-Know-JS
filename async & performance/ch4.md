@@ -784,7 +784,7 @@ function run(gen) {
 				typeof val === "object" ||
 				typeof val === "function"
 			) &&
-			"then" in val
+			typeof val.then === "function"
 		) {
 			// listen for promise resolution
 			val.then(
