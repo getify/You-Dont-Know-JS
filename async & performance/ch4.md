@@ -730,18 +730,22 @@ The more you start to explore this path, the more you realize, "wow, it'd be gre
 
 Several promise abstraction libraries provide just such a utility, including my *asynquence* library, which will be discussed in (??? // TODO) of this book.
 
-But for the sake of learning and illustration, let's just demonstrate a basic standalone utility that I'll call `run(..)`:
+But for the sake of learning and illustration, let's just examine a basic standalone utility that I'll call `run(..)`:
 
 ```js
 function run(gen) {
 	var it = gen(), ret, val, err;
 
+	// the async "iteration loop"
 	(function handleNext(){
 		try {
+			// not in an error state from previous step?
 			if (!err) {
+				// resume generator with fulfilled value
 				ret = it.next( val );
 			}
 			else {
+				// error state thrown into generator
 				ret = it.throw( err );
 			}
 
@@ -750,6 +754,7 @@ function run(gen) {
 			val = ret.value;
 		}
 		catch (e) {
+			// exception occurred for success resumption?
 			if (!err) {
 				// capture exception to send right back in
 				err = e;
@@ -759,9 +764,14 @@ function run(gen) {
 			}
 			else {
 				// bail, because generator didn't properly
-				// handle the error thrown to it
-				console.error( "Unhandled:", err );
-				console.error( "Reason:", e );
+				// handle the error already thrown to it
+
+				// note: different libraries handle this
+				// case in various ways, but our simple
+				// approach is to just bail to the console
+				// messaging
+				console.error( "Rejection reason:", e );
+				console.error( "Unhandled exception:", err );
 			}
 
 			return;
@@ -776,6 +786,7 @@ function run(gen) {
 			) &&
 			"then" in val
 		) {
+			// listen for promise resolution
 			val.then(
 				function(msg){
 					val = msg;
@@ -801,7 +812,7 @@ function run(gen) {
 }
 ```
 
-As you can see, it's a quite a bit more complex than you'd probably want to author yourself, and you especially wouldn't want to repeat this code for each generator you use. So, a utility or library helper is definitely the way to go.
+As you can see, it's a quite a bit more complex than you'd probably want to author yourself, and you especially wouldn't want to repeat this code for each generator you use. So, a utility/library helper is definitely the way to go. Nevertheless, I encourage you to spend a few minutes studying that code listing to get a better sense of how to manage the promise+generator negotiation.
 
 How would you use `run(..)` with `*main()` in our *running* Ajax example?
 
@@ -810,10 +821,46 @@ function *main() {
 	// ..
 }
 
-run(main);
+run( main );
 ```
 
-That's it! Neat, huh?
+That's it! The way we wired `run(..)`, it will automatically advance the generator you pass to it, asynchronously until completion.
+
+#### ES7: `async` and `await`?
+
+The above pattern -- generators yielding promises that then control the generator's *iterator* to advance it to completion -- is such a powerful and useful approach, it would be nicer if we could do it without the clutter of the library utility helper (aka `run(..)`).
+
+There's probably good news on that front. As of time of writing, there's early but strong support for a proposal for more syntactic addition in this realm for the post-ES6, ES7'ish timeframe. Obviously, it's too early to guarantee the details, but there's a pretty decent chance it will shake out like the following:
+
+```js
+function foo(x,y) {
+	return request(
+		"http://some.url.1/?x=" + x + "&y=" + y
+	);
+}
+
+async function main() {
+	try {
+		var text = await foo( 11, 31 );
+		console.log( text );
+	}
+	catch (err) {
+		console.error( err );
+	}
+}
+
+main();
+```
+
+As you can see, there's no `run(..)` call to invoke and drive `main()`. Also, `main()` isn't a generator anymore, it's an `async function`. And finally, instead of `yield`ing a promise, we `await` on it.
+
+When defined in this way, the `async function` automatically knows what to do if you `await` a promise -- it will pause the function (just like with generators) until the promise resolves.
+
+The `async` / `await` syntax should look very familiar to readers with any experience in C#, since it's practically identical.
+
+The proposal essentically codifies into a syntactic mechanism support for the pattern we've already derived, which is combining async promises with sync-looking flow control code. That's the best of both worlds combined, to effectively address practically all of the major concerns we outlined with promises.
+
+The mere fact that such a ES7'ish proposal exists and has so much early support and enthusiasm is a major vote of confidence in the future importance of this approach.
 
 ## Summary
 
