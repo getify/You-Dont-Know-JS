@@ -730,11 +730,22 @@ The more you start to explore this path, the more you realize, "wow, it'd be gre
 
 Several promise abstraction libraries provide just such a utility, including my *asynquence* library, which will be discussed in (??? // TODO) of this book.
 
-But for the sake of learning and illustration, let's just examine a basic standalone utility that I'll call `run(..)`:
+But for the sake of learning and illustration, let's just examine a standalone utility that I'll call `run(..)`:
 
 ```js
 function run(gen) {
-	var it = gen(), ret, val, err;
+	var args = [].slice.call( arguments, 1),
+		it = gen.apply( null, args ), ret, val,
+		err, done, p, resolveP, rejectP
+	;
+
+	// return a promise that's resolved when the
+	// generator is complete
+	p = new Promise( function(res,rej){
+		// extract promise resolution/rejection capabilities
+		resolveP = res;
+		rejectP = rej;
+	} );
 
 	// the async "iteration loop"
 	(function handleNext(){
@@ -751,6 +762,7 @@ function run(gen) {
 
 			// reset for next loop
 			err = null;
+			done = ret.done;
 			val = ret.value;
 		}
 		catch (e) {
@@ -763,23 +775,31 @@ function run(gen) {
 				setTimeout( handleNext, 0 );
 			}
 			else {
+				// note: different libraries handle this
+				// case in various ways
+
 				// bail, because generator didn't properly
 				// handle the error already thrown to it
 
-				// note: different libraries handle this
-				// case in various ways, but our simple
-				// approach is to just bail to the console
-				// messaging
-				console.error( "Rejection reason:", e );
-				console.error( "Unhandled exception:", err );
+				// did we get a different exception thrown
+				// out than we sent in?
+				if (err !== e) {
+					err = [e,err];
+				}
+
+				rejectP( err );
 			}
 
 			return;
 		}
 
+		// is the generator complete?
+		if (done) {
+			resolveP( val );
+		}
 		// did we get a promise yielded out?
 		// note: thenable duck-typing check... ugh.
-		if (
+		else if (
 			(
 				typeof val === "object" ||
 				typeof val === "function"
@@ -809,6 +829,9 @@ function run(gen) {
 			setTimeout( handleNext, 0 );
 		}
 	})();
+
+	// return the run-completion promise
+	return p;
 }
 ```
 
@@ -825,6 +848,8 @@ run( main );
 ```
 
 That's it! The way we wired `run(..)`, it will automatically advance the generator you pass to it, asynchronously until completion.
+
+**Note:** The `run(..)` we defined returns a promise which is wired to resolve once the generator is complete, or receive an uncaught exception if the generator doesn't handle it. We don't show here using that capability, but we'll come back to it later in the chapter.
 
 #### ES7: `async` and `await`?
 
@@ -1011,6 +1036,194 @@ That kind of logic is sometimes required, and if you dump it directly inside you
 Beyond creating code that is both functional and performant, you should also strive to make code that is as reason-able and maintainable as possible.
 
 **Note:** Abstraction is not *always* a healthy thing for programming -- many times it can increase complexity in exchange for terseness. But in this case, I believe it's much healthier for your generator+promise async code than the alternatives. As with all such advice, though, pay attention to your specific situations and make proper decisions for you and your team.
+
+## Generator Delegation
+
+In the previous section, we showed calling regular functions from inside a generator, and how that remains a useful technique for abstracting away implementation details (like async promise flow). But the main drawback of using a normal function for this task is that it has to behave by the normal function rules, which means it cannot pause itself with `yield` like a generator can.
+
+It may then occur to you that you might try to call one generator from another generator, using our `run(..)` helper, such as:
+
+```js
+function *foo() {
+	var r2 = yield request( "http://some.url.2" );
+	var r3 = yield request( "http://some.url.3/?v=" + r2 );
+
+	return r3;
+}
+
+function *bar() {
+	var r1 = yield request( "http://some.url.1" );
+
+	var r3 = yield run( foo );
+
+	console.log( r3 );
+}
+
+run( bar );
+```
+
+You'll see we run `*foo()` inside of `*bar()` by using our `run(..)` utility again. We take advantage here of the fact that the `run(..)` we defined earlier returns a promise which is resolved when its generator is run to completion (or errors out).
+
+But there's an even better way to integrate `*foo()` calling into `*bar()`, and it's called `yield`-delegation. The syntax for `yield`-delegation is: `yield *`. Before we see how it can work in our previous example, let's look at a simpler expression of the syntax:
+
+```js
+function *foo() {
+	console.log( "`*foo()` starting" );
+	yield 3;
+	yield 4;
+	console.log( "`*foo()` finished" );
+}
+
+function *bar() {
+	yield 1;
+	yield 2;
+	yield *foo();	// `yield`-delegation!
+	yield 5;
+}
+
+var it = bar();
+
+it.next().value;	// 1
+it.next().value;	// 2
+it.next().value;	// `*foo()` starting
+					// 3
+it.next().value;	// 4
+it.next().value;	// `*foo()` finished
+					// 5
+```
+
+**Note:** Similar to a note earlier in the chapter where I explained why I prefer `function *foo() ..` instead of `function* foo() ..`, for the same reason I also prefer -- contrary to most other documentation on the topic -- to say `yield *foo()` instead of `yield* foo()`. The placement of the `*` is purely stylistic and up to your best judgment.
+
+Notice the `yield *foo()` -- the `yield`-delegation call. How does it work?
+
+First, calling `foo()` creates an *iterator* exactly as we've already seen. Then, `yield *` delegates/transfers the *iterator* instance control (of the present `*bar()` generator) over to this other `*foo()` *iterator*.
+
+So, the first two `it.next()` calls are controlling `*bar()`, but when we make the third `it.next()` call, now `*foo()` starts up, and now we're controlling `*foo()` instead of `*bar()`. That's why it's called delegation -- `*bar()` delegated its iteration to `*foo()`.
+
+As soon as the `it` *iterator* control exhausts the entire `*foo()` *iterator*, it automatically returns to controlling `*bar()`.
+
+### Delegating Messages
+
+You may wonder how this `yield`-delegation works not just with *iterator* control but with the two-way message passing. Carefully follow the flow of messages in and out, through the `yield`-delegation:
+
+```js
+function *foo() {
+	console.log( "inside `*foo()`:", yield "B" );
+
+	console.log( "inside `*foo()`:", yield "C" );
+
+	return "D";
+}
+
+function *bar() {
+	console.log( "inside `*bar()`:", yield "A" );
+
+	// `yield`-delegation!
+	console.log( "inside `*bar()`:", yield *foo() );
+
+	console.log( "inside `*bar()`:", yield "E" );
+
+	return "F";
+}
+
+var it = bar();
+
+console.log( "outside:", it.next().value );
+// outside: A
+
+console.log( "outside:", it.next( 1 ).value );
+// inside `*bar()`: 1
+// outside: B
+
+console.log( "outside:", it.next( 2 ).value );
+// inside `*foo()`: 2
+// outside: C
+
+console.log( "outside:", it.next( 3 ).value );
+// inside `*foo()`: 3
+// inside `*bar()`: D
+// outside: E
+
+console.log( "outside:", it.next( 4 ).value );
+// inside `*bar()`: 4
+// outside: F
+```
+
+Pay particular attention to the processing steps when after the `it.next(3)` call:
+
+1. The `3` value is passed (through the `yield`-delegation in `*bar()`) into the waiting `yield "C"` expression inside of `*foo()`.
+2. `*foo()` then calls `return "D"`, but this value doesn't get returned all the way back to the outside `it.next(3)` call.
+3. Instead, the `"D"` value is sent as the result of the waiting `yield *foo()` expression inside of `*bar()` -- this `yield`-delegation expression has essentially been paused while all of `*foo()` was exhausted. So `"D"` ends up inside of `*bar()` for it to print out.
+4. `yield "E"` is called inside of `*bar()`, and the `"E"` value is yielded to the outside as the result of the `it.next(3)` call.
+
+### Delegating Asynchrony
+
+Let's finally get back to our earlier `yield`-delegation example with the multiple "in parallel" Ajax requests:
+
+```js
+function *foo() {
+	var r2 = yield request( "http://some.url.2" );
+	var r3 = yield request( "http://some.url.3/?v=" + r2 );
+
+	return r3;
+}
+
+function *bar() {
+	var r1 = yield request( "http://some.url.1" );
+
+	var r3 = yield *foo();
+
+	console.log( r3 );
+}
+
+run( bar );
+```
+
+Instead of calling `yield run(foo)` inside of `*bar()`, we just call `yield *foo()`.
+
+In the previous version of this example, the promise mechanism (controlled by `run(..)`) was used to transport the value from `return r3` in `*foo()` to the local variable `r3` inside `*bar()`. Now, that value is just returned back directly via the `yield *` mechanics.
+
+Otherwise, the behavior is pretty much identical.
+
+### Delegating "Recursion"
+
+Of course, `yield`-delegation can keep following as many delegation steps as you wire up. You could even use `yield`-delegation for async-capable generator "recursion" -- a generator `yield`-delegating to itself:
+
+```js
+function *foo(val) {
+	if (val > 1) {
+		// generator recursion
+		val = yield *foo( val - 1 );
+	}
+
+	return yield request( "http://some.url/?v=" + val );
+}
+
+function *bar() {
+	var r1 = yield *foo( 3 );
+	console.log( r1 );
+}
+
+run( bar );
+```
+
+**Note:** Our `run(..)` utility could have been called with `run( foo, 3 )`, since it supports additional parameters being passed along to the initialization of the generator. However, we used a parameter-free `*bar()` here to reinforce the flexibility of `yield *`.
+
+What processing steps follow from that code? Hang out, this is going to be quite intricate to describe in detail:
+
+1. `run(bar)` starts up the `*bar()` generator.
+2. `foo(3)` creates an *iterator* for `*foo(..)` and passes `3` as its `val` parameter.
+3. Since `3 > 1`, `foo(2)` creates another *iterator* and passes in `2` as its `val` parameter.
+4. Since `2 > 1`, `foo(1)` creates yet another *iterator* and passes in `1` as its `val` parameter.
+5. Since `1 > 1` is `false`, we next call `request(..)` with the `1` value, and get a promise back for that firs Ajax call.
+6. That promise is `yield`ed out, which comes back to the `*foo(2)` generator instance.
+7. The `yield *` passes that promise back out to the `*foo(3)` generator instance. Another `yield *` passes the promise out to the `*bar()` generator instance. And yet again another `yield *` passes the promise out to the `run(..)` utility, which will wait on that promise (for the first Ajax request) to proceed.
+8. When the promise resolves, its fulfillment message is sent to resume `*bar()`, which passes through the `yield *` into the `*foo(3)` instance, which then passes through the `yield *` to the `*foo(2)` generator instance, which then passes through the `yield *` to the normal `yield` that's waiting in the `*foo(3)` generator instance.
+9. That first call's Ajax response is now immediately `return`ed from the `*foo(3)` generator instance, which sends that value back as the result of the `yield *` expression in the `*foo(2)` instance, and assigned to its local `val` variable.
+10. Inside `*foo(2)`, a second Ajax request is made with `request(..)`, whose promise is `yield`ed back to the `*foo(1)` instance, and then `yield *` propagates all the way out to `run(..)` (step 7 again). When the promise resolves, the second Ajax response propagates all the way back into the `*foo(2)` generator instance, and is assigned to its local `val` variable.
+11. Finally, the third Ajax request is made with `request(..)`, its promise goes out to `run(..)`, and then its resolution value comes all the way back, which is then `return`ed so that it comes back to the waiting `yield *` expression in `*bar()`.
+
+Phew! A lot of crazy mental juggling, huh? You might want to read through that a few more times, and then go grab a snack to clear your head!
 
 ## Summary
 

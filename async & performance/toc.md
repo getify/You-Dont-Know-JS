@@ -28,6 +28,7 @@
 	* Generator'ing Values
 	* Iterating Generators Asynchronously
 	* Generators + Promises
+	* Generator Delegation
 	* // TODO
 * Appendix A: // TODO
 * Appendix B: Thank You's!
