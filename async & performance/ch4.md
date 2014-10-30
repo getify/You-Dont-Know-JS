@@ -852,15 +852,165 @@ async function main() {
 main();
 ```
 
-As you can see, there's no `run(..)` call to invoke and drive `main()`. Also, `main()` isn't a generator anymore, it's an `async function`. And finally, instead of `yield`ing a promise, we `await` on it.
+As you can see, there's no `run(..)` call (meaning no need for a library utility!) to invoke and drive `main()` -- it's just called as a normal function. Also, `main()` isn't declared as a generator function anymore; it's a new kind of function: `async function`. And finally, instead of `yield`ing a promise, we `await` for it to resolve.
 
 When defined in this way, the `async function` automatically knows what to do if you `await` a promise -- it will pause the function (just like with generators) until the promise resolves.
 
 The `async` / `await` syntax should look very familiar to readers with any experience in C#, since it's practically identical.
 
-The proposal essentically codifies into a syntactic mechanism support for the pattern we've already derived, which is combining async promises with sync-looking flow control code. That's the best of both worlds combined, to effectively address practically all of the major concerns we outlined with promises.
+The proposal essentially codifies into a syntactic mechanism support for the pattern we've already derived, which is combining async promises with sync-looking flow control code. That's the best of both worlds combined, to effectively address practically all of the major concerns we outlined with promises.
 
 The mere fact that such a ES7'ish proposal exists and has so much early support and enthusiasm is a major vote of confidence in the future importance of this approach.
+
+### Promise Concurrency In Generators
+
+So far, all we've demonstrated is a single-step async flow with generators+promises. But real world code will often have many async steps. If you're not careful, the sync-looking style of generators may lull you into complacency with how you structure your async concurrency, leading to suboptimal performance patterns. So we want to spend a little time exploring the options.
+
+Imagine a scenario where you need to fetch data from two different sources, then combine those responses to make a third request, and finally print out the response. We explored scenarios like that in Chapter 3 with promises, but let's re-consider them in the context of generators.
+
+Your first instinct might be something like:
+
+```js
+function *foo() {
+	var r1 = yield request( "http://some.url.1" );
+	var r2 = yield request( "http://some.url.2" );
+
+	var r3 = yield request(
+		"http://some.url.3/?v=" + r1 + "," + r2
+	);
+
+	console.log( r3 );
+}
+
+// use previously-defined `run(..)` utility
+run( foo );
+```
+
+This code will work, but in the details of our scenario, it's not optimal. Can you spot why?
+
+Because the `r1` and `r2` requests can -- and for performance reasons, *should* -- run concurrently, but in this code they will run sequentially; The `"http://some.url.2"` URL isn't Ajax fetched until after the `"http://some.url.1"` is finished. Since these two requests are independent, the better performance approach would likely be to have them run at the same time.
+
+But, how exactly would you do that with a generator and `yield`? We know that `yield` is only a single pause point in the code, so you can't really do two pauses at the same time.
+
+The most natural and effective answer is to base the async flow on promises, specifically on their capability to manage state in a time-independent fashion (see "Future Value" in Chapter 3).
+
+The simplest approach:
+
+```js
+function *foo() {
+	// make both requests "in parallel"
+	var p1 = request( "http://some.url.1" );
+	var p2 = request( "http://some.url.2" );
+
+	// wait until both promises resolve
+	var r1 = yield p1;
+	var r2 = yield p2;
+
+	var r3 = yield request(
+		"http://some.url.3/?v=" + r1 + "," + r2
+	);
+
+	console.log( r3 );
+}
+
+// use previously-defined `run(..)` utility
+run( foo );
+```
+
+Why is this different from the previous snippet? Look at where the `yield` is and is not. `p1` and `p2` are promises for Ajax requests made concurrently (aka "in parallel"). It doesn't matter which one finishes first, because promises will hold onto their resolved state for as long as necessary.
+
+Then we use two subsequent `yield` statements to wait for and retrieve the resolutions from the promises (into `r1` and `r2`, respectively). If `p1` resolves first, the `yield p1` resumes first then waits on the `yield p2` to resume. If `p2` resolves first, it will just patiently hold onto that resolution value until asked, but the `yield p1` will hold on first, until `p1` resolves.
+
+Either way, both `p1` and `p2` will run concurrently, and both have to finish, in either order, before the `r3 = yield request..` Ajax request will be made.
+
+If that flow control processing model sounds familiar, it's basically the same as what we identified in Chapter 3 as the "gate" pattern, enabled by the `Promise.all([ .. ])` utility. So, we could also express the flow control like this:
+
+```js
+function *foo() {
+	// make both requests "in parallel", and
+	// wait until both promises resolve
+	var results = yield Promise.all( [
+		request( "http://some.url.1" ),
+		request( "http://some.url.2" )
+	] );
+
+	var r1 = results[0];
+	var r2 = results[1];
+
+	var r3 = yield request(
+		"http://some.url.3/?v=" + r1 + "," + r2
+	);
+
+	console.log( r3 );
+}
+
+// use previously-defined `run(..)` utility
+run( foo );
+```
+
+**Note:** As we discussed in Chapter 3, we can even use ES6 destructuring assignment to simplify the `var r1 = .. var r2 = ..` assignments, with `var [r1,r2] = results`.
+
+In other words, all of the concurrency capabilities of promises are available to us in the generator+promise approach. So in any place where you need more than sequential this-then-that async flow control steps, promises are likely your best bet.
+
+#### Promises, Hidden
+
+As a word of stylistic caution, be careful about how much promise logic you include **inside your generators**. The whole point of using generators for asynchrony in the way we've described is to create simple, sequential, sync-looking code, and to hide as much of the details of asynchrony away from that code as possible.
+
+For example, this might be a cleaner approach:
+
+```js
+// note: normal function, not generator
+function bar(url1,url2) {
+	return Promise.all( [
+		request( url1 ),
+		request( url2 )
+	] );
+}
+
+function *foo() {
+	// hide the promise-based concurrency details
+	// inside `bar(..)`
+	var results = yield bar(
+		"http://some.url.1",
+		"http://some.url.2"
+	);
+
+	var r1 = results[0];
+	var r2 = results[1];
+
+	var r3 = yield request(
+		"http://some.url.3/?v=" + r1 + "," + r2
+	);
+
+	console.log( r3 );
+}
+
+// use previously-defined `run(..)` utility
+run( foo );
+```
+
+Inside `*foo()`, it's cleaner and clearer that all we're doing is just asking `bar(..)` to get us some `results`, and we'll `yield`-wait on that to happen. We don't have to care that under the covers, a `Promise.all([ .. ])` promise composition will be used to make that happen.
+
+**We treat asynchrony, and indeed promises, as an implementation detail.**
+
+Hiding your promise logic inside a function that you merely call from your generator is especially useful if you're going to do a sophisticated series flow-control. For example:
+
+```js
+function bar() {
+	Promise.all( [
+		baz( .. )
+		.then( .. ),
+		Promise.race( [ .. ] )
+	] )
+	.then( .. )
+}
+```
+
+That kind of logic is sometimes required, and if you dump it directly inside your generator(s), you've defeated most of the reason why you would want to use generators in the first place. We *should* intentionally abstract such details away from our generator code so that they don't clutter up the higher-level task expression.
+
+Beyond creating code that is both functional and performant, you should also strive to make code that is as reason-able and maintainable as possible.
+
+**Note:** Abstraction is not *always* a healthy thing for programming -- many times it can increase complexity in exchange for terseness. But in this case, I believe it's much healthier for your generator+promise async code than the alternatives. As with all such advice, though, pay attention to your specific situations and make proper decisions for you and your team.
 
 ## Summary
 
