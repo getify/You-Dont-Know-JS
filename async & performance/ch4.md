@@ -879,19 +879,21 @@ main();
 
 As you can see, there's no `run(..)` call (meaning no need for a library utility!) to invoke and drive `main()` -- it's just called as a normal function. Also, `main()` isn't declared as a generator function anymore; it's a new kind of function: `async function`. And finally, instead of `yield`ing a promise, we `await` for it to resolve.
 
-When defined in this way, the `async function` automatically knows what to do if you `await` a promise -- it will pause the function (just like with generators) until the promise resolves.
+The `async function` automatically knows what to do if you `await` a promise -- it will pause the function (just like with generators) until the promise resolves.
 
-The `async` / `await` syntax should look very familiar to readers with any experience in C#, since it's practically identical.
+**Note:** The `async` / `await` syntax should look very familiar to readers with any experience in C#, since it's practically identical.
 
-The proposal essentially codifies into a syntactic mechanism support for the pattern we've already derived, which is combining async promises with sync-looking flow control code. That's the best of both worlds combined, to effectively address practically all of the major concerns we outlined with promises.
+The proposal essentially codifies into a syntactic mechanism support for the pattern we've already derived, which is combining async promises with sync-looking flow control code. That's the best of both worlds combined, to effectively address practically all of the major concerns we outlined with callbacks.
 
-The mere fact that such a ES7'ish proposal exists and has so much early support and enthusiasm is a major vote of confidence in the future importance of this approach.
+The mere fact that such a ES7'ish proposal already exists and has so much early support and enthusiasm is a major vote of confidence in the future importance of this async pattern.
 
 ### Promise Concurrency In Generators
 
-So far, all we've demonstrated is a single-step async flow with generators+promises. But real world code will often have many async steps. If you're not careful, the sync-looking style of generators may lull you into complacency with how you structure your async concurrency, leading to suboptimal performance patterns. So we want to spend a little time exploring the options.
+So far, all we've demonstrated is a single-step async flow with generators+promises. But real world code will often have many async steps.
 
-Imagine a scenario where you need to fetch data from two different sources, then combine those responses to make a third request, and finally print out the response. We explored scenarios like that in Chapter 3 with promises, but let's re-consider them in the context of generators.
+If you're not careful, the sync-looking style of generators may lull you into complacency with how you structure your async concurrency, leading to suboptimal performance patterns. So we want to spend a little time exploring the options.
+
+Imagine a scenario where you need to fetch data from two different sources, then combine those responses to make a third request, and finally print out the last response. We explored a similar scenario with promises in Chapter 3, but let's re-consider it in the context of generators.
 
 Your first instinct might be something like:
 
@@ -911,7 +913,7 @@ function *foo() {
 run( foo );
 ```
 
-This code will work, but in the details of our scenario, it's not optimal. Can you spot why?
+This code will work, but in the specifics of our scenario, it's not optimal. Can you spot why?
 
 Because the `r1` and `r2` requests can -- and for performance reasons, *should* -- run concurrently, but in this code they will run sequentially; The `"http://some.url.2"` URL isn't Ajax fetched until after the `"http://some.url.1"` is finished. Since these two requests are independent, the better performance approach would likely be to have them run at the same time.
 
