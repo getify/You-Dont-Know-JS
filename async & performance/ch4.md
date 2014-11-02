@@ -1271,9 +1271,9 @@ Some things to note from this snippet:
 
 1. When we call `it.throw(2)`, it sends the error message `2` into `*bar()`, which delegates that `*foo()`, which then `catch`es it and handles it gracefully. Then, the `yield "C"` sends `"C"` back out as the return `value` from the `it.throw(2)` call.
 2. The `"D"` value that's next `throw`n from inside `*foo()` propagates out to `*bar()`, which `catch`es it and handles it gracefully. Then the `yield "E"` sends `"E"` back out as the return `value` from the `it.next(3)` call.
-3. Next, the exception `throw`n from `*baz()` isn't caught in `*bar()` -- though we did `catch` it outside -- so `*bar()` was left in an abnormal termination state. So after this snippet, you would not be able to subsequently call `it.next(..)` again to try to get the `"G"` value out. If you try, you'll see you get an error like "Error: Generator is already running" in Chrome.
+3. Next, the exception `throw`n from `*baz()` isn't caught in `*bar()` -- though we did `catch` it outside -- so both `*baz()` and `*bar()` are set to a completed state. After this snippet, you would not be able to get the `"G"` value out with any subsequent `next(..)` call(s) -- they will just return `undefined` for `value`.
 
-**Note:** At time of writing, Chrome and FF differ on how they handle that last point #3. Chrome throws an error, FF silently finishes (without sending out `"G"`).
+**Note:** At time of writing, Chrome throws an error in the case of point #3, which is contrary to the spec. FF is correct in that it just returns `undefined`.
 
 ### Delegating Asynchrony
 
