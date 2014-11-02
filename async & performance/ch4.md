@@ -1158,6 +1158,123 @@ Pay particular attention to the processing steps when after the `it.next(3)` cal
 3. Instead, the `"D"` value is sent as the result of the waiting `yield *foo()` expression inside of `*bar()` -- this `yield`-delegation expression has essentially been paused while all of `*foo()` was exhausted. So `"D"` ends up inside of `*bar()` for it to print out.
 4. `yield "E"` is called inside of `*bar()`, and the `"E"` value is yielded to the outside as the result of the `it.next(3)` call.
 
+From the perspective of the external *iterator* (`it`), it doesn't appear any differently between controlling the initial generator or a delegated one.
+
+In fact, `yield`-delegation doesn't even have to be directed to another generator; it can just be directed to a non-generator, general *iterator*. For example:
+
+```js
+function *bar() {
+	console.log( "inside `*bar()`:", yield "A" );
+
+	// `yield`-delegation to a non-generator!
+	console.log( "inside `*bar()`:", yield *[ "B", "C", "D" ] );
+
+	console.log( "inside `*bar()`:", yield "E" );
+
+	return "F";
+}
+
+var it = bar();
+
+console.log( "outside:", it.next().value );
+// outside: A
+
+console.log( "outside:", it.next( 1 ).value );
+// inside `*bar()`: 1
+// outside: B
+
+console.log( "outside:", it.next( 2 ).value );
+// outside: C
+
+console.log( "outside:", it.next( 3 ).value );
+// outside: D
+
+console.log( "outside:", it.next( 4 ).value );
+// inside `*bar()`: undefined
+// outside: E
+
+console.log( "outside:", it.next( 5 ).value );
+// inside `*bar()`: 5
+// outside: F
+```
+
+Notice the differences in where the messages were received/reported between this example and the one previous.
+
+Most strikingly, the default `array` *iterator* doesn't care about any messages sent in via `next(..)` calls, so the values `2`, `3`, and `4` are essentially ignored. Also, since that *iterator* has no explicit `return` value (unlike `*foo()` above), the `yield *` expression gets an `undefined` when it finishes.
+
+#### Exceptions Delegated, Too!
+
+In the same way that `yield`-delegation transparently passes messages through in both directions, errors/exceptions also pass in both directions:
+
+```js
+function *foo() {
+	try {
+		yield "B";
+	}
+	catch (err) {
+		console.log( "error caught inside `*foo()`:", err );
+	}
+
+	yield "C";
+
+	throw "D";
+}
+
+function *bar() {
+	yield "A";
+
+	try {
+		yield *foo();
+	}
+	catch (err) {
+		console.log( "error caught inside `*bar()`:", err );
+	}
+
+	yield "E";
+
+	yield *baz();
+
+	// note: can't get here!
+	yield "G";
+}
+
+function *baz() {
+	throw "F";
+}
+
+var it = bar();
+
+console.log( "outside:", it.next().value );
+// outside: A
+
+console.log( "outside:", it.next( 1 ).value );
+// outside: B
+
+console.log( "outside:", it.throw( 2 ).value );
+// error caught inside `*foo()`: 2
+// outside: C
+
+console.log( "outside:", it.next( 3 ).value );
+// error caught inside `*bar()`: D
+// outside: E
+
+try {
+	console.log( "outside:", it.next( 4 ).value );
+}
+catch (err) {
+	console.log( "error caught outside:", err );
+}
+// error caught outside: F
+```
+
+Some things to note from this snippet:
+
+1. When we call `it.throw(2)`, it sends the error message `2` into `*bar()`, which delegates that `*foo()`, which then `catch`es it and handles it gracefully. Then, the `yield "C"` sends `"C"` back out as the return `value` from the `it.throw(2)` call.
+2. The `"D"` value that's next `throw`n from inside `*foo()` propagates out to `*bar()`, which `catch`es it and handles it gracefully. Then the `yield "E"` sends `"E"` back out as the return `value` from the `it.next(3)` call.
+3. Next, the exception `throw`n from `*baz()` isn't caught in `*bar()` -- though we did `catch` it outside -- so `*bar()` was left in an abnormal termination state. So after this snippet, you would not be able to subsequently call `it.next(..)` again to try to get the `"G"` value out. If you try, you'll see you get an error like "Error: Generator is already running" in Chrome.
+
+**Note:** At time of writing, Chrome and FF differ on how they handle that last point #3. Chrome throws an error, FF silently finishes (without sending out `"G"`).
+
 ### Delegating Asynchrony
 
 Let's finally get back to our earlier `yield`-delegation example with the multiple "in parallel" Ajax requests:
