@@ -716,7 +716,7 @@ p.then(
 
 Actually, that wasn't so painful at all, was it!?
 
-This snippet should look very similar to what we did earlier with the manually-wired generator controlled by the error-first callback. Instead of an `if (err) { it.throw..`, the promise already splits success (fulfillment) and failure (rejection) for us, but the *iterator* control is identical.
+This snippet should look very similar to what we did earlier with the manually-wired generator controlled by the error-first callback. Instead of an `if (err) { it.throw..`, the promise already splits fulfillment (success) and rejection (failure) for us, but otherwise the *iterator* control is identical.
 
 Now, we've glossed over some important details.
 
@@ -766,7 +766,7 @@ function run(gen) {
 			val = ret.value;
 		}
 		catch (e) {
-			// exception occurred for success resumption?
+			// exception occurred during success resumption?
 			if (!err) {
 				// capture exception to send right back in
 				err = e;
@@ -1056,6 +1056,7 @@ function *foo() {
 function *bar() {
 	var r1 = yield request( "http://some.url.1" );
 
+	// "delegating" to `*foo()` via `run(..)`
 	var r3 = yield run( foo );
 
 	console.log( r3 );
@@ -1064,9 +1065,9 @@ function *bar() {
 run( bar );
 ```
 
-You'll see we run `*foo()` inside of `*bar()` by using our `run(..)` utility again. We take advantage here of the fact that the `run(..)` we defined earlier returns a promise which is resolved when its generator is run to completion (or errors out).
+We run `*foo()` inside of `*bar()` by using our `run(..)` utility again. We take advantage here of the fact that the `run(..)` we defined earlier returns a promise which is resolved when its generator is run to completion (or errors out), so if we `yield` out to a `run(..)` instance the promise from another `run(..)` call, it automatically pauses `*bar()` until `*foo()` finishes.
 
-But there's an even better way to integrate `*foo()` calling into `*bar()`, and it's called `yield`-delegation. The syntax for `yield`-delegation is: `yield *`. Before we see how it can work in our previous example, let's look at a simpler expression of the syntax:
+But there's an even better way to integrate calling `*foo()` into `*bar()`, and it's called `yield`-delegation. The special syntax for `yield`-delegation is: `yield * __` (notice the extra `*`). Before we see it work in our previous example, let's look at a simpler scenario:
 
 ```js
 function *foo() {
@@ -1094,15 +1095,19 @@ it.next().value;	// `*foo()` finished
 					// 5
 ```
 
-**Note:** Similar to a note earlier in the chapter where I explained why I prefer `function *foo() ..` instead of `function* foo() ..`, for the same reason I also prefer -- contrary to most other documentation on the topic -- to say `yield *foo()` instead of `yield* foo()`. The placement of the `*` is purely stylistic and up to your best judgment.
+**Note:** Similar to a note earlier in the chapter where I explained why I prefer `function *foo() ..` instead of `function* foo() ..`, I also prefer -- contrary to most other documentation on the topic -- to say `yield *foo()` instead of `yield* foo()`. The placement of the `*` is purely stylistic and up to your best judgment.
 
-Notice the `yield *foo()` -- the `yield`-delegation call. How does it work?
+How does the `yield *foo()` delegation work?
 
 First, calling `foo()` creates an *iterator* exactly as we've already seen. Then, `yield *` delegates/transfers the *iterator* instance control (of the present `*bar()` generator) over to this other `*foo()` *iterator*.
 
-So, the first two `it.next()` calls are controlling `*bar()`, but when we make the third `it.next()` call, now `*foo()` starts up, and now we're controlling `*foo()` instead of `*bar()`. That's why it's called delegation -- `*bar()` delegated its iteration to `*foo()`.
+So, the first two `it.next()` calls are controlling `*bar()`, but when we make the third `it.next()` call, now `*foo()` starts up, and now we're controlling `*foo()` instead of `*bar()`. That's why it's called delegation -- `*bar()` delegated its iteration control to `*foo()`.
 
 As soon as the `it` *iterator* control exhausts the entire `*foo()` *iterator*, it automatically returns to controlling `*bar()`.
+
+### Why Delegate?
+
+// TODO
 
 ### Delegating Messages
 
@@ -1273,7 +1278,7 @@ Some things to note from this snippet:
 2. The `"D"` value that's next `throw`n from inside `*foo()` propagates out to `*bar()`, which `catch`es it and handles it gracefully. Then the `yield "E"` sends `"E"` back out as the return `value` from the `it.next(3)` call.
 3. Next, the exception `throw`n from `*baz()` isn't caught in `*bar()` -- though we did `catch` it outside -- so both `*baz()` and `*bar()` are set to a completed state. After this snippet, you would not be able to get the `"G"` value out with any subsequent `next(..)` call(s) -- they will just return `undefined` for `value`.
 
-**Note:** At time of writing, Chrome throws an error in the case of point #3, which is contrary to the spec. FF is correct in that it just returns `undefined`.
+**Note:** At time of writing, Chrome `throws an error in the case of point #3, which is contrary to the spec. FF is correct in that it just returns `undefined`.
 
 ### Delegating Asynchrony
 

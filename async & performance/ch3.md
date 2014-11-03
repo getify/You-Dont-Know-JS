@@ -45,7 +45,7 @@ Eventually, I hear, "Order 113!", and I gleefully walk back up to the counter wi
 
 In other words, once my *future value* was ready, I exchanged my promise for the value for the value itself.
 
-But there's another possible outcome. They call my order number, but when I go to retrieve my cheeseburger, the cashier regretfully informs me, "I'm sorry, but we appear to be all out of cheeseburgers." Setting aside the customer frustration of this scenario for a moment, we can see an important characteristic of *future values*: they can either be a success message, or a failure/error.
+But there's another possible outcome. They call my order number, but when I go to retrieve my cheeseburger, the cashier regretfully informs me, "I'm sorry, but we appear to be all out of cheeseburgers." Setting aside the customer frustration of this scenario for a moment, we can see an important characteristic of *future values*: they can either indicate a success or failure.
 
 Every time I order a cheeseburger, I know that I'll either get a cheeseburger eventually, or I'll get the sad news of the cheeseburger shortage, and I'll have to figure out something else to eat for lunch.
 
@@ -159,16 +159,18 @@ The second layer is the promise that `add(..)` creates (via `Promise.all([ .. ])
 
 **Note:** Inside `add(..)`, the `Promise.all([ .. ])` call creates a promise (which is waiting on `promiseX` and `promiseY` to resolve). The chained call to `.then(..)` creates another promise, which the `return values[0] + values[1]` line immediately resolves (with the result of the addition). Thus, the `then(..)` call we chain off the end of the `add(..)` call -- at the end of the snippet -- is actually operating on that second promise returned, rather than the first one created by `Promise.all([ .. ])`. Also, though we are not chaining off the end of that second `then(..)`, it too has created another promise, had we chosen to observe/use it. This promise chaining stuff will be explained in much greater detail later in this chapter.
 
-Just like with cheeseburger orders, it's possible that the resolution of a promise is not fulfillment, but instead failure (aka rejection). Unlike a successfully filled promise, where the fulfillment value is always programmatic, a rejection value (commonly called a "reason") can either be set directly by the program logic, or it can result automatically from a JS runtime error.
+Just like with cheeseburger orders, it's possible that the resolution of a promise is rejection instead of fulfillment. Unlike a fulfilled promise, where the value is always programmatic, a rejection value -- commonly called a "rejection reason" -- can either be set directly by the program logic, or it can result implicitly from a runtime exception.
 
-With promises, the `then(..)` call can actually take two functions, the first for success (as shown above), and the second for failure:
+With promises, the `then(..)` call can actually take two functions, the first for fulfillment (as shown above), and the second for rejection:
 
 ```js
 add( fetchX(), fetchY() )
 .then(
+	// fullfillment handler
 	function(sum) {
 		console.log( sum );
 	},
+	// rejection handler
 	function(err) {
 		console.error( err ); // bummer!
 	}
@@ -177,9 +179,9 @@ add( fetchX(), fetchY() )
 
 If something went wrong getting `X` or `Y`, or something somehow failed during the addition, the promise `add(..)` returns is rejected, and the second callback error handler passed to `then(..)` would receive the rejection value from the promise.
 
-Because promises encapsulate the time-dependent state -- waiting on the resolution/rejection of the underlying value -- from the outside, the promise itself is time-independent, and thus promises can be composed (combined) in predictable ways regardless of the timing or outcome underneath.
+Because promises encapsulate the time-dependent state -- waiting on the fulfillment or rejection of the underlying value -- from the outside, the promise itself is time-independent, and thus promises can be composed (combined) in predictable ways regardless of the timing or outcome underneath.
 
-Moreover, once a promise is resolved (fulfilled or rejected), it stays that way forever -- it becomes an *immutable value* at that point -- and can then be *observed* as many times as necessary.
+Moreover, once a promise is resolved, it stays that way forever -- it becomes an *immutable value* at that point -- and can then be *observed* as many times as necessary.
 
 **Note:** Because a promise is externally immutable once resolved, it's now safe to pass that value around to any party and know that it cannot be modified accidentally or maliciously. This is especially true in relation to multiple parties observing the resolution of a promise. It is not possible for one party to affect another party's ability to observe the promise resolution. Immutability may sound like an academic topic, but it's actually one of the most fundamental and important aspects of promise design, and shouldn't be casually passed over.
 
@@ -546,10 +548,10 @@ Promise.race( [
 ] )
 .then(
 	function(){
-		// `foo(..)` succeeded in time!
+		// `foo(..)` fulfilled in time!
 	},
 	function(err){
-		// either `foo()` failed, or it just
+		// either `foo()` rejected, or it just
 		// didn't finish in time, so inspect
 		// `err` to know which
 	}
@@ -572,7 +574,7 @@ Of course, if you register the same callback more than once, it'll be called as 
 
 ### Failing to pass along any parameters/environment
 
-Promises can have, at most, one resolution value (success or failure).
+Promises can have, at most, one resolution value (fulfillment or rejection).
 
 If you don't explicitly resolve with a value either way, the value is `undefined`, as is typical in JS. But whatever the value, it will always be passed to all registered (and appropriate -- fulfillment or rejection) callbacks, either *now* or in the future.
 
@@ -611,7 +613,7 @@ The JS exception that occurs from `foo.bar()` becomes a promise rejection that y
 
 **This is an important detail**, because it effectively solves another potential Zalgo moment, which is that errors could create a synchronous reaction whereas non-errors would be asynchronous. Promises turn even JS exceptions into asynchronous behavior, thereby reducing the race condition chances greatly.
 
-But what happens if a promise is fulfilled successfully, but there's a JS exception error during the observation (in a `then(..)` registered callback)? Even those aren't lost, but you may find how they're handled a bit surprising, until you dig in a little deeper.
+But what happens if a promise is fulfilled, but there's a JS exception error during the observation (in a `then(..)` registered callback)? Even those aren't lost, but you may find how they're handled a bit surprising, until you dig in a little deeper.
 
 ```js
 var p = new Promise( function(resolve,reject){
@@ -946,7 +948,7 @@ request( "http://some.url.1/" )
 	function(response2){
 		// never gets here
 	},
-	// failure handler to catch the error
+	// rejection handler to catch the error
 	function(err){
 		console.log( err );	// `TypeError` from `foo.bar()` error
 		return 42;
@@ -959,11 +961,11 @@ request( "http://some.url.1/" )
 } );
 ```
 
-When the error occurs in step 2, the failure handler in step 3 catches it. The return value (`42` in this snippet), if any, from that failure handler fulfills the promise for the next step (4), such that the chain is now back in a success state.
+When the error occurs in step 2, the rejection handler in step 3 catches it. The return value (`42` in this snippet), if any, from that rejection handler fulfills the promise for the next step (4), such that the chain is now back in a fulfillment state.
 
-**Note:** As we discussed earlier, when returning a promise from a fulfillment handler, it's unwrapped and can delay the next step. But that's not true for returning promises from failure handlers. If you return a promise from a failure handler (instead of `return 42` in the above snippet), that promise value would be passed through untouched (without being unwrapped) as a message to the next step, and thus cannot delay that next step. A thrown exception inside either the fulfillment or failure handler of a `then(..)` call causes the next (chained) promise to be immediately rejected with that exception.
+**Note:** As we discussed earlier, when returning a promise from a fulfillment handler, it's unwrapped and can delay the next step. But that's not true for returning promises from rejection handlers. If you return a promise from a rejection handler (instead of `return 42` in the above snippet), that promise value would be passed through untouched (without being unwrapped) as a message to the next step, and thus cannot delay that next step. A thrown exception inside either the fulfillment or rejection handler of a `then(..)` call causes the next (chained) promise to be immediately rejected with that exception.
 
-If you call `then(..)` on a promise, and you only pass a fulfillment handler to it, an assumed failure handler is substituted:
+If you call `then(..)` on a promise, and you only pass a fulfillment handler to it, an assumed rejection handler is substituted:
 
 ```js
 var p = new Promise( function(resolve,reject){
@@ -974,7 +976,7 @@ var p2 = p.then(
 	function(){
 		// never gets here
 	}
-	// assumed failure handler, if omitted or
+	// assumed rejection handler, if omitted or
 	// any other non-function value passed
 	// function(err) {
 	//     throw err;
@@ -982,7 +984,7 @@ var p2 = p.then(
 );
 ```
 
-As you can see, the assumed failure handler simply re-throws the error, which ends up forcing `p2` (the chained promise) to reject with the same error reason. In essences, this allows the error to continue propagating along a promise chain until a failure handler is explicitly registered to handle it.
+As you can see, the assumed rejection handler simply re-throws the error, which ends up forcing `p2` (the chained promise) to reject with the same error reason. In essence, this allows the error to continue propagating along a promise chain until an explicitly defined rejection handler is encountered.
 
 **Note:** We'll cover more details of error handling with promises in the next section, because there are other nuanced details to be concerned about.
 
@@ -1006,12 +1008,12 @@ p.then(
 
 As you can see, the default fulfillment handler simply passes whatever value it receives along to the next step (promise).
 
-**Note:** `then(null,function(err){ .. })`, for only handling errors (if any) but letting success messages pass through, actually has a shortcut in the API. Instead, you can use `catch(function(err){ .. })`. We'll cover `catch(..)` more in the next section.
+**Note:** The `then(null,function(err){ .. })` pattern -- only handling rejections (if any) but letting fulfillments pass through -- has a shortcut in the API: `catch(function(err){ .. })`. We'll cover `catch(..)` more in the next section.
 
 Let's review briefly the intrinsic behaviors of promises that enable chaining flow control:
 
 1. A `then(..)` call against one promise automatically produces a new promise to return from the call.
-2. Inside the fulfillment/failure handlers, if you return a value or an exception is thrown, the new returned (chainable) promise is resolved accordingly.
+2. Inside the fulfillment/rejection handlers, if you return a value or an exception is thrown, the new returned (chainable) promise is resolved accordingly.
 3. If the fulfillment handler returns a promise, it is unwrapped, so that whatever its resolution is will become the resolution of the chainable promise returned from the `then(..)`.
 
 While chaining flow control is helpful, it's probably most accurate to think of it as a side benefit of how promises compose (combine) together, rather than the main intent. As we've discussed in detail several times already, promises normalize asynchrony and encapsulate time-dependent value state, and *that* is what lets us chain them together in this useful way.
@@ -1024,50 +1026,52 @@ There's some slight confusion around the terms "resolve", "fulfill", and "reject
 
 ```js
 var p = new Promise( function(X,Y){
-	// X() for success
-	// Y() for failure
+	// X() for fulfillment
+	// Y() for rejection
 } );
 ```
 
-As you can see, two callbacks (here labeled `X` and `Y`) are provided. The first usually is used to mark the promise as fulfilled successfully, but the second always marks the promise as rejected with failure. But what's the "usually" about? And what you should you accurately name those parameters?
+As you can see, two callbacks (here labeled `X` and `Y`) are provided. The first usually is used to mark the promise as fulfilled, and the second always marks the promise as rejected. But what's the "usually" about, and and what does that imply about accurately naming those parameters?
 
-Ultimately, it's your code, so it doesn't *really* matter. But the words you use can affect not only how you are thinking about the code, but how other developers on your team will think about it. So, it does kind of actually matter.
+Ultimately, it's your user code and the identifier names aren't interpreted by the engine to mean anything, so it doesn't *technically* matter; `foo(..)` and `bar(..)` are equally functional. But the words you use can affect not only how you are thinking about the code, but how other developers on your team will think about it. Thinking wrongly about carefully orchestrated async code is almost surely going to be worse than the spaghetti callback alternatives.
+
+So, it actually does kind of matter what you call them.
 
 The second parameter is easy to decide. Almost all literature uses `reject(..)` as its name, and because that's exactly (and only!) what it does, that's a very good choice for the name. I'd strongly recommend you always use `reject(..)`.
 
-But there's a little more ambiguity around the first parameter, which is often in promise literature labeled `resolve(..)`. That word is obviously related to "resolution", which is what's used across the literature (including this book) to describe the general case when a promise has its final value/state set (regardless of success or failure) -- you have already seen several times "resolve the promise" to mean completing it either as success or as failure.
+But there's a little more ambiguity around the first parameter, which is often in promise literature labeled `resolve(..)`. That word is obviously related to "resolution", which is what's used across the literature (including this book) to describe setting a final value/state to a promise. We've already used "resolve the promise" several times to mean either fulfilling or rejecting the promise.
 
-But if this parameter seems to be used to specifically fulfill the promise, why shouldn't we call it `fulfill(..)` to be more accurate? Before we answer that, let's also take a look at two of the `Promise` API methods:
+But if this parameter seems to be used to specifically fulfill the promise, why shouldn't we call it `fulfill(..)` instead of `resolve(..)` to be more accurate? To answer that question, let's also take a look at two of the `Promise` API methods:
 
 ```js
-var successPr = Promise.resolve( 42 );
+var fulfilledPr = Promise.resolve( 42 );
 
-var failurePr = Promise.reject( "Oops" );
+var rejectedPr = Promise.reject( "Oops" );
 ```
 
-`Promise.resolve(..)` creates a promise that's resolved to the value given to it. In this example, `42` is a normal, non-promise, non-thenable value, so a successful/fulfilled promise is created for the value `42`. `Promise.reject("Oops")` creates a failed/rejected promise for the value `"Oops"`.
+`Promise.resolve(..)` creates a promise that's resolved to the value given to it. In this example, `42` is a normal, non-promise, non-thenable value, so a fulfilled promise is created for the value `42`. `Promise.reject("Oops")` creates a rejected promise for the value `"Oops"`.
 
 Let's now illustrate why the word "resolve" (such as in `Promoise.resolve(..)`) is unambiguous and indeed more accurate, if used explicitly in a context that could result in either fulfillment or rejection:
 
 ```js
-var failurePr = Promise.reject( "Oops" );
+var rejectedPr = Promise.reject( "Oops" );
 
-var anotherFailurePr = Promise.resolve( failurePr );
+var anotherRejectedPr = Promise.resolve( rejectedPr );
 ```
 
-As we discussed earlier in this chapter, `Promise.resolve(..)` will return a genuine promise directly, or unwrap a thenable. If that unwrapping reveals a rejected state, the promise returned from `Promise.resolve(..)` is in fact in that same rejected state.
+As we discussed earlier in this chapter, `Promise.resolve(..)` will return a genuine promise directly, or unwrap a thenable. If that thenable unwrapping reveals a rejected state, the promise returned from `Promise.resolve(..)` is in fact in that same rejected state.
 
 So `Promise.resolve(..)` is a good, accurate name for the API method, because it can actually result in either fulfillment or rejection.
 
-The fulfillment callback parameter of the `Promise(..)` constructor will unwrap either a thenable (identical to `Promise.resolve(..)`) or a genuine promise:
+The first callback parameter of the `Promise(..)` constructor will unwrap either a thenable (identical to `Promise.resolve(..)`) or a genuine promise:
 
 ```js
-var failurePr = new Promise( function(resolve,reject){
+var rejectedPr = new Promise( function(resolve,reject){
 	// resolve this promise with a rejected promise
 	resolve( Promise.reject( "Oops" ) );
 } );
 
-failurePr.then(
+rejectedPr.then(
 	function(){
 		// never gets here
 	},
@@ -1077,7 +1081,7 @@ failurePr.then(
 );
 ```
 
-So, it should be clear now that `resolve(..)` is the appropriate name for the fulfillment callback parameter of the `Promise(..)` constructor.
+So, it should be clear now that `resolve(..)` is the appropriate name for the first callback parameter of the `Promise(..)` constructor.
 
 But now let's turn our attention to the callbacks provided to `then(..)`. What should they be called (both in literature and in code)? I would suggest `fulfilled(..)` and `rejected(..)`:
 
@@ -1096,7 +1100,7 @@ p.then(
 );
 ```
 
-In the case of the first parameter to `then(..)`, it's unambiguously always the fulfillment success case, so there's no need for the generality of "resolve" to apply. And as a side note, the ES6 specification uses `onFulfilled(..)` and `onRejected(..)` to label these two callbacks.
+In the case of the first parameter to `then(..)`, it's unambiguously always the fulfillment case, so there's no need for the duality of "resolve" terminology. As a side note, the ES6 specification uses `onFulfilled(..)` and `onRejected(..)` to label these two callbacks, so they are accurate terms.
 
 ## Error Handling
 
@@ -1120,7 +1124,7 @@ catch (err) {
 }
 ```
 
-`try..catch` would certainly be nice to have, but it doesn't work across async operations. That is, unless there's some additional environmental support, which we'll come back to in the next chapter.
+`try..catch` would certainly be nice to have, but it doesn't work across async operations. That is, unless there's some additional environmental support, which we'll come back to with generators in Chapter 4.
 
 In callbacks, some standards have emerged for patterned error-handling, most notably the "error-first callback" style:
 
@@ -1153,7 +1157,7 @@ The callback we pass to `foo(..)` expects to receive a signal of an error by the
 
 This sort of error handling is technically *async capable*, but it doesn't compose well at all. Multiple levels of error-first callbacks woven together with these ubiquitous `if` statement checks inevitably will lead you the perils of callback hell (see Chapter 2).
 
-So we come back to error handling in promises, with the failure handler passed to `then(..)`. Promises don't use the popular "error-first callback" design style, but instead use "split callbacks" style; there's one callback for success and one for failure.
+So we come back to error handling in promises, with the rejection handler passed to `then(..)`. Promises don't use the popular "error-first callback" design style, but instead use "split callbacks" style; there's one callback for fulfillment and one for rejection.
 
 ```js
 var p = Promise.reject( "Oops" );
@@ -1232,9 +1236,9 @@ Some promise libraries have added methods for registering something like a "glob
 
 In practice, this has worked well for many libraries, as most patterns don't call for significant delay between promise rejection and observation of that rejection. But this pattern is troublesome because 3 seconds is so arbitrary (if empirical), and also because there are indeed some cases where you want a promise to hold on to its rejectedness for some longer period of time, and you don't really want to have your "uncaught" handler called for all those false positives (not-yet-caught "uncaught errors").
 
-Another more common suggestion is that promises should have a `done(..)` added to them, which essentially marks the promise chain as "done". `done(..)` doesn't create and return a new promise, and thus the callbacks passed to `done(..)` are not wired up to report problems to that next promise which doesn't exist.
+Another more common suggestion is that promises should have a `done(..)` added to them, which essentially marks the promise chain as "done". `done(..)` doesn't create and return a new promise, and thus the callbacks passed to `done(..)` are obviously not wired up to report problems to a next promise that doesn't exist.
 
-So what instead? It's treated as you might usually expect in uncaught error conditions: an error inside a `done(..)` rejection/failure handler would be thrown as a global uncaught error (in the developer console, basically).
+So what happens instead? It's treated as you might usually expect in uncaught error conditions: an error inside a `done(..)` rejection handler would be thrown as a global uncaught error (in the developer console, basically).
 
 ```js
 var p = Promise.resolve( 42 );
@@ -1248,7 +1252,7 @@ p.then(
 )
 .done( null, handleErrors );
 
-// if `handleErrors(..)` had its own exception, would
+// if `handleErrors(..)` had its own exception, it would
 // be thrown globally here
 ```
 
@@ -1345,7 +1349,7 @@ Promise.all( [p1,p2] )
 
 **Note:** Technically, the `array` of values passed into `Promise.all([ .. ])` can include promises, thenables, or even immediate values. Each value in the list is essentially passed through `Promise.resolve(..)` to make sure it's a genuine promise to be waited on, so an immediate value will just be normalized into a promise for that value. If the `array` is empty, the main promise is immediately fulfilled.
 
-The promise returned from `Promise.all([ .. ])` will only be fulfilled if and when all its constituent promises are successfully fulfilled. If any one of those promises instead is rejected, the main `Promise.all([ .. ])` promise is immediately rejected, discarding all results from any other promises.
+The promise returned from `Promise.all([ .. ])` will only be fulfilled if and when all its constituent promises are fulfilled. If any one of those promises instead is rejected, the main `Promise.all([ .. ])` promise is immediately rejected, discarding all results from any other promises.
 
 Remember to always attach a rejection/error handler to every promise, even and especially the one that comes back from `Promise.all([ .. ])`.
 
@@ -1403,10 +1407,10 @@ Promise.race( [
 ] )
 .then(
 	function(){
-		// `foo(..)` succeeded in time!
+		// `foo(..)` fulfilled in time!
 	},
 	function(err){
-		// either `foo()` failed, or it just
+		// either `foo()` rejected, or it just
 		// didn't finish in time, so inspect
 		// `err` to know which
 	}
@@ -1598,17 +1602,17 @@ var p2 = Promise.reject( "Oops" );
 `Promise.resolve(..)` is usually used to create an already-fulfilled promise in a similar way to `Promise.reject(..)`. However, `Promise.resolve(..)` also unwraps thenable values (as discusssed several times already). In that case, the promise returned adopts the (eventual) resolution of the value you passed in, which could either be fulfillment or rejection.
 
 ```js
-var successTh = {
+var fulfilledTh = {
 	then: function(cb) { cb( 42 ); }
 };
-var failedTh = {
+var rejectedTh = {
 	then: function(cb,errCb) {
 		errCb( "Oops" );
 	}
 };
 
-var p1 = Promise.resolve( successTh );
-var p2 = Promise.resolve( failedTh );
+var p1 = Promise.resolve( fulfilledTh );
+var p2 = Promise.resolve( rejectedTh );
 
 // `p1` will be a fulfilled promise
 // `p2` will be a rejected promise
@@ -1625,11 +1629,11 @@ Each promise instance (**not** the `Promise` API namespace) has `then(..)` and `
 `catch(..)` takes only the rejection callback as a parameter, and automatically substitutes the default fulfillment callback, as just discussed. In other words, it's equivalent to `then(null,..)`.
 
 ```js
-p.then( success );
+p.then( fulfilled );
 
-p.then( success, failure );
+p.then( fulfilled, rejected );
 
-p.catch( failure ); // or `p.then( null, failure )`
+p.catch( rejected ); // or `p.then( null, rejected )`
 ```
 
 `then(..)` and `catch(..)` also create and return a new promise, which can be used to express promise chain flow control. If the fulfillment or rejection callbacks have an exception thrown, the returned promise is rejected. If either callback returns an immediate, non-promise, non-thenable value, that value is set as the fulfillment for the returned promise. If the fulfillment handler specifically returns a promise or thenable value, that value is unwrapped and becomes the resolution of the returned promise.
