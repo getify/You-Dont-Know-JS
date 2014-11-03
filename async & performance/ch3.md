@@ -961,7 +961,7 @@ request( "http://some.url.1/" )
 
 When the error occurs in step 2, the failure handler in step 3 catches it. The return value (`42` in this snippet), if any, from that failure handler fulfills the promise for the next step (4), such that the chain is now back in a success state.
 
-**Note:** As we discussed earlier, when returning a promise from a fulfillment handler, it's unwrapped and can delay the next step. But that's not true for returning promises from failure handlers. If you return a promise from a failure handler (instead of `return 42` in the above snippet, that promise value would be passed through untouched (without being unwrapped) as a message to the next step, and thus cannot delay that next step. A thrown exception inside either the fulfillment or failure handler of a `then(..)` call causes the next (chained) promise to be immediately rejected with that exception.
+**Note:** As we discussed earlier, when returning a promise from a fulfillment handler, it's unwrapped and can delay the next step. But that's not true for returning promises from failure handlers. If you return a promise from a failure handler (instead of `return 42` in the above snippet), that promise value would be passed through untouched (without being unwrapped) as a message to the next step, and thus cannot delay that next step. A thrown exception inside either the fulfillment or failure handler of a `then(..)` call causes the next (chained) promise to be immediately rejected with that exception.
 
 If you call `then(..)` on a promise, and you only pass a fulfillment handler to it, an assumed failure handler is substituted:
 
