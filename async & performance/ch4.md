@@ -6,9 +6,9 @@ In Chapter 2, we identified two key drawbacks to expressing async flow control w
 1. Callback-based async doesn't fit how our brain plans out steps of a task.
 2. Callbacks aren't trustable or composable because of *inversion of control*.
 
-In Chapter 3, we detailed how promises uninvert the *inversion of control*, restoring trustability/composability.
+In Chapter 3, we detailed how promises uninvert the *inversion of control* of callbacks, restoring trustability/composability.
 
-Now we turn out attention to expressing async flow control in a sequential, synchronous-looking fashion -- the "magic" that makes it possible is ES6 **generators**.
+Now we turn out attention to expressing async flow control in a sequential, synchronous-looking fashion. The "magic" that makes it possible is ES6 **generators**.
 
 ## Breaking Run-to-completion
 
@@ -1348,6 +1348,96 @@ What processing steps follow from that code? Hang out, this is going to be quite
 11. Finally, the third Ajax request is made with `request(..)`, its promise goes out to `run(..)`, and then its resolution value comes all the way back, which is then `return`ed so that it comes back to the waiting `yield *` expression in `*bar()`.
 
 Phew! A lot of crazy mental juggling, huh? You might want to read through that a few more times, and then go grab a snack to clear your head!
+
+## Pre-ES6 Generators
+
+You're hopefully convinced now that generators are a very important addition to the async programming toolbox. But it's a new syntax in ES6, which means you can't just polyfill generators like you can promises (which are just a new API). So what can we do to bring generators to our browser JS if we don't have the luxury of ignoring pre-ES6 browsers?
+
+For all new syntax extensions in ES6, there are tools -- the most common term for them is transpilers, for trans-compilers -- which can take your ES6 syntax and transform it into equivalent (but obviously uglier!) pre-ES6 code. So, generators can be transpiled into code that will have the same behavior but works in ES5 and below browsers.
+
+But how? The "magic" of `yield` doesn't obviously sound like code that's easy to transpile. We actually hinted at a solution in our earlier discussion of closure-based *iterators*.
+
+### Manual Transformation
+
+Before we discuss the transpilers, let's derive how manual transpilation would work in the case of generators. This isn't just an academic exercise, because doing so will actually help further reinforce how they work.
+
+Consider:
+
+```js
+// `request(..)` is a promise-aware Ajax utility
+
+function *foo(url) {
+	try {
+		console.log( "requesting:", url );
+		var val = yield request( url );
+		console.log( val );
+	}
+	catch (err) {
+		console.log( err );
+	}
+}
+
+var it = foo( "http://some.url.1" );
+```
+
+The first thing to observe is that we'll still need a normal `foo()` function that can be called, and it will still need to return an *iterator*. So, let's sketch out the non-generator transformation:
+
+```js
+function foo(url) {
+
+	// ..
+
+	// make and return an iterator
+	return {
+		next: function(v) {
+			// ..
+		},
+		throw: function(e) {
+			// ..
+		}
+	};
+}
+
+var it = foo( "http://some.url.1" );
+```
+
+The next thing to observe is that a generator does its "magic" by suspending its scope/state, but we can emulate that with function closure. To see how to code such a thing, let's label different parts of our generator with state values:
+
+```js
+function *foo(url) {
+	// STATE *1*
+
+	try {
+		console.log( "requesting:", url );
+
+		var TMP1 = request( url );
+
+		// STATE *2*
+		var val = yield TMP1;
+
+		console.log( val );
+	}
+	catch (err) {
+		// STATE *3*
+		console.log( err );
+	}
+}
+```
+
+**Note:** For more accurate illustration, we split up the `val = yield request..` statement into two parts, using the temporary `TMP1` variable. `request(..)` happens in state `*1*`, and the assignment of its completion value to `val` happens in state `*2*`.
+
+In other words, `*1*` is the beginning state, `*2*` is the state if the `request(..)` succeeds, and `*3*` is the state if the `request(..)` fails. You can probably imagine how any extra `yield` steps would just be encoded as extra states.
+
+Back to our transpiled generator, let's define a variable `state` in the closure we can use to keep track of the state:
+
+```js
+function foo(url) {
+	// initial state
+	var state = 1;
+
+	// ..
+}
+```
 
 ## Summary
 
