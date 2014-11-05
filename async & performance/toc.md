@@ -30,6 +30,7 @@
 	* Generators + Promises
 	* Generator Delegation
 	* Pre-ES6 Generators
+	* Generator Concurrency
 * Appendix A: // TODO
 * Appendix B: Thank You's!
 

@@ -125,7 +125,7 @@ Consider:
 ```js
 listen( "click", function handler(evt){
 	setTimeout( function request(){
-		ajax( "..url 1..", function response(text){
+		ajax( "http://some.url.1", function response(text){
 			if (text == "hello") {
 				handler();
 			}
@@ -247,7 +247,7 @@ function handler() {
 }
 
 function request(){
-	ajax( "..url 1..", response );
+	ajax( "http://some.url.1", response );
 }
 
 function response(text){

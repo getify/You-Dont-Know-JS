@@ -27,7 +27,7 @@ Consider:
 
 ```js
 // ajax(..) is some arbitrary Ajax function given by some library
-var data = ajax( "..url 1.." );
+var data = ajax( "http://some.url.1" );
 
 console.log( data ); // Oops! `data` generally won't have the Ajax results
 ```
@@ -40,7 +40,7 @@ The simplest (but definitely not only, or necessarily even best!) way of "waitin
 
 ```js
 // ajax(..) is some arbitrary Ajax function given by some library
-ajax( "..url 1..", function(data){
+ajax( "http://some.url.1", function(data){
 
 	console.log( data ); // Yay, I gots me some `data`!
 
@@ -215,8 +215,8 @@ function bar() {
 }
 
 // ajax(..) is some arbitrary Ajax function given by some library
-ajax( "..url 1..", foo );
-ajax( "..url 2..", bar );
+ajax( "http://some.url.1", foo );
+ajax( "http://some.url.2", bar );
 ```
 
 In JavaScript's single-threaded behavior, if `foo()` runs before `bar()`, the result is that `a` has `42`, but if `bar()` runs before `foo()` the result in `a` will be `41`.
@@ -300,8 +300,8 @@ function bar() {
 }
 
 // ajax(..) is some arbitrary Ajax function given by some library
-ajax( "..url 1..", foo );
-ajax( "..url 2..", bar );
+ajax( "http://some.url.1", foo );
+ajax( "http://some.url.2", bar );
 ```
 
 Since `foo()` can't be interrupted by `bar()`, nor can `bar()` be interruptd by `foo()`, this program only has two possible outcomes depending on which starts running first -- if threading were present, and the individual statements in `foo()` and `bar()` could be interleaved, the number of possible outcomes would be greatly increased!
@@ -474,8 +474,8 @@ function bar(results) {
 }
 
 // ajax(..) is some arbitrary Ajax function given by some library
-ajax( "..url 1..", foo );
-ajax( "..url 2..", bar );
+ajax( "http://some.url.1", foo );
+ajax( "http://some.url.2", bar );
 ```
 
 `foo()` and `bar()` are two concurrent "processes", and it's non-determinate which order they will be fired in. But we've constructed the program so it doesn't matter what order they fire in, because they act independently and as such don't need to interact.
@@ -496,15 +496,15 @@ function response(data) {
 }
 
 // ajax(..) is some arbitrary Ajax function given by some library
-ajax( "..url 1..", response );
-ajax( "..url 2..", response );
+ajax( "http://some.url.1", response );
+ajax( "http://some.url.2", response );
 ```
 
 The concurrent "processes" are the two `response()` calls that will be made to handle the Ajax responses. They can happen in either-first order.
 
-Let's assume the expected behavior is that `res[0]` has the results of the `"..url 1.."` call, and `res[1]` has the results of the `"..url 2.."` call. Sometimes that will be the case, but sometimes they'll be flipped, depending on which call finishes first. There's a pretty good likelihood that this non-determinism is a "race condition" bug.
+Let's assume the expected behavior is that `res[0]` has the results of the `"http://some.url.1"` call, and `res[1]` has the results of the `"http://some.url.2"` call. Sometimes that will be the case, but sometimes they'll be flipped, depending on which call finishes first. There's a pretty good likelihood that this non-determinism is a "race condition" bug.
 
-**Note:** Be extremely wary of assumptions you might tend to make in these situations. For example, it's not uncommon for a developer to observe that `"..url 2.."` is "always" much slower to respond than `"..url 1.."`, perhaps by virtue of what tasks they're doing (e.g., one performing a database task and the other just fetching a static file), so the observed ordering seems to always be as expected. Even if both requests go to the same server, and *it* intentionally responds in a certain order, there's no *real* guarantee of what order the responses will arrive back in the browser.
+**Note:** Be extremely wary of assumptions you might tend to make in these situations. For example, it's not uncommon for a developer to observe that `"http://some.url.2"` is "always" much slower to respond than `"http://some.url.1"`, perhaps by virtue of what tasks they're doing (e.g., one performing a database task and the other just fetching a static file), so the observed ordering seems to always be as expected. Even if both requests go to the same server, and *it* intentionally responds in a certain order, there's no *real* guarantee of what order the responses will arrive back in the browser.
 
 So, to address such a race condition, you can coordinate ordering interaction:
 
@@ -512,20 +512,20 @@ So, to address such a race condition, you can coordinate ordering interaction:
 var res = [];
 
 function response(data) {
-	if (data.url == "..url 1..") {
+	if (data.url == "http://some.url.1") {
 		res[0] = data;
 	}
-	else if (data.url == "..url 2..") {
+	else if (data.url == "http://some.url.2") {
 		res[1] = data;
 	}
 }
 
 // ajax(..) is some arbitrary Ajax function given by some library
-ajax( "..url 1..", response );
-ajax( "..url 2..", response );
+ajax( "http://some.url.1", response );
+ajax( "http://some.url.2", response );
 ```
 
-Regardless of which Ajax response comes back first, we inspect the `data.url` (assuming one is returned from the server, of course!) to figure out which position the response data should occupy in the `res` array. `res[0]` will always hold the `"..url 1.."` results and `res[1]` will always hold the `"..url 2.."` results. Through simple coordination, we eliminated the "race condition" non-determinism.
+Regardless of which Ajax response comes back first, we inspect the `data.url` (assuming one is returned from the server, of course!) to figure out which position the response data should occupy in the `res` array. `res[0]` will always hold the `"http://some.url.1"` results and `res[1]` will always hold the `"http://some.url.2"` results. Through simple coordination, we eliminated the "race condition" non-determinism.
 
 The same reasoning from this scenario would apply if multiple concurrent function calls were interacting with each other through the shared DOM, like one updating the contents of a `<div>` and the other updating the style or attributes of the `<div>` (e.g., to make the DOM element visible once it has content). You probably wouldn't want to show the DOM element before it had content, so the coordination must ensure proper ordering interaction.
 
@@ -549,8 +549,8 @@ function baz() {
 }
 
 // ajax(..) is some arbitrary Ajax function given by some library
-ajax( "..url 1..", foo );
-ajax( "..url 2..", bar );
+ajax( "http://some.url.1", foo );
+ajax( "http://some.url.2", bar );
 ```
 
 In this example, whether `foo()` or `bar()` fires first, it will always cause `baz()` to run too early (either `a` or `b` will still be `undefined`), but the second invocation of `baz()` will work, since both `a` and `b` will be available.
@@ -579,8 +579,8 @@ function baz() {
 }
 
 // ajax(..) is some arbitrary Ajax function given by some library
-ajax( "..url 1..", foo );
-ajax( "..url 2..", bar );
+ajax( "http://some.url.1", foo );
+ajax( "http://some.url.2", bar );
 ```
 
 The `if (a && b)` conditional around the `baz()` call is traditionally called a "gate", because we're not sure what order `a` and `b` will arrive, but we wait for both of them to get there before we proceed to open the gate (call `baz()`).
@@ -607,8 +607,8 @@ function baz() {
 }
 
 // ajax(..) is some arbitrary Ajax function given by some library
-ajax( "..url 1..", foo );
-ajax( "..url 2..", bar );
+ajax( "http://some.url.1", foo );
+ajax( "http://some.url.2", bar );
 ```
 
 Whichever one (`foo()` or `bar()`) fires last will not only overwrite the assigned `a` value from the other, but it will also duplicate the call to `baz()` (likely undesired).
@@ -637,8 +637,8 @@ function baz() {
 }
 
 // ajax(..) is some arbitrary Ajax function given by some library
-ajax( "..url 1..", foo );
-ajax( "..url 2..", bar );
+ajax( "http://some.url.1", foo );
+ajax( "http://some.url.2", bar );
 ```
 
 The `if (!a)` conditional allows only the first of `foo()` or `bar()` through, and the second (and indeed any subsequent) calls would just be ignored. There's just no virtue in coming in second place!
@@ -666,11 +666,11 @@ function response(data) {
 }
 
 // ajax(..) is some arbitrary Ajax function given by some library
-ajax( "..url 1..", response );
-ajax( "..url 2..", response );
+ajax( "http://some.url.1", response );
+ajax( "http://some.url.2", response );
 ```
 
-If `"..url 1.."` gets its results back first, the entire list will be mapped into `res` all at once. If it's a few thousand or less records, this is not generally a big deal. But if it's say 10m records, that can take awhile to run (several seconds on a powerful laptop, much longer on a mobile device, etc).
+If `"http://some.url.1"` gets its results back first, the entire list will be mapped into `res` all at once. If it's a few thousand or less records, this is not generally a big deal. But if it's say 10m records, that can take awhile to run (several seconds on a powerful laptop, much longer on a mobile device, etc).
 
 While such a "process" is running, nothing else in the page can happen, including no other `response(..)` calls, no UI updates, not even user events like scrolling, typing, button clicking, etc. That's pretty painful.
 
@@ -704,8 +704,8 @@ function response(data) {
 }
 
 // ajax(..) is some arbitrary Ajax function given by some library
-ajax( "..url 1..", response );
-ajax( "..url 2..", response );
+ajax( "http://some.url.1", response );
+ajax( "http://some.url.2", response );
 ```
 
 We process the data set in maximum sized chunks of 1000 items. By doing so, we ensure a short running "process", even if that means many more subsequent "processes", as the interleaving onto the event loop queue will give us a much more responsive (performance) site/app.
