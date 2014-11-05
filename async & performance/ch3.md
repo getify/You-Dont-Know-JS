@@ -1421,7 +1421,7 @@ This timeout pattern works well in most cases. But there are some nuances to con
 
 #### "Finally"
 
-The key question to ask is, "What happens to the promises that get discarded/ignored?" We're not asking that question from the performance perspective -- they would otherwise end up garbage collection eligible -- but from the behavioral perspective (side effects, etc.). Promises cannot be canceled -- that would destroy the external immutability trust -- so they can only be silently ignored.
+The key question to ask is, "What happens to the promises that get discarded/ignored?" We're not asking that question from the performance perspective -- they would otherwise end up garbage collection eligible -- but from the behavioral perspective (side effects, etc.). Promises cannot be canceled -- and shouldn't be, as that would destroy the external immutability trust (see the "Promise Uncancelable" section toward the end of this chapter!) -- so they can only be silently ignored.
 
 But what if `foo()` in the above example is reserving some sort of resource for usage, but the timeout fires first and causes that promise to be ignored? Is there anything in this pattern that proactively frees the reserved resource after the timeout, or otherwise cancels any side effects it may have had? What if all you wanted was to log the fact that `foo()` timed out?
 
@@ -2012,7 +2012,7 @@ While promises don't natively ship with helpers for such wrapping, libraries pro
 
 Once you create a promise and register a fulfillment and/or rejection handler for it, there's nothing external you can do to stop that progression if something else happens to make that task moot.
 
-**Note:** Many promise abstraction libraries provide facilities to cancel promises, but this is a terrible idea! It violates the principle of external immutability, and morever of effects at a distance, both of which can create surprises.
+**Note:** Many promise abstraction libraries provide facilities to cancel promises, but this is a terrible idea! Many developers wish promises had natively been designed with external cancelation capability, but the problem is that it would let one consumer/observer of a promise affect some other consumer's ability to observe that same promise. This violates the future-value's trustability (external immutability), but morever is the embodiment of the "Action at a distance" anti-pattern (http://en.wikipedia.org/wiki/Action_at_a_distance_%28computer_programming%29). Regardless of how useful it seems, it will actually lead you straight back into the nightmares of callbacks.
 
 Consider our promise timeout scenario from earlier:
 
@@ -2064,7 +2064,11 @@ This is ugly. It works, but it's far from ideal. Generally, you should try to av
 
 But if you can't, the ugliness of this solution should be a clue that *cancelation* is a functionality that belongs at a higher level of abstraction on top of promises. Look to promise abstraction libraries for assistance rather than hacking it yourself.
 
-**Note:** My *asynquence* promise abstraction library provides just such an abstraction, which will be discussed in (??? // TODO) of this book.
+**Note:** My *asynquence* promise abstraction library provides just such an abstraction and an `abort()` capability for the sequence, all of which will be discussed in (??? // TODO) of this book.
+
+A single promise is not really a flow control mechanism (at least not in a very meaningful sense), which is exactly what *cancelation* relates to. A chain of promises taken collectively together -- what I like to call a "sequence" -- *is* a flow control expression, and thus it's appropriate for cancelation to be defined at that level of abstraction.
+
+No individual promise should be cancelable, but it's sensible for a *sequence* to be cancelable, because you don't pass around a sequence as a single immutable value like you do with promises.
 
 ### Promise Performance
 
