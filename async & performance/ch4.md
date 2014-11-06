@@ -236,6 +236,126 @@ That's a fun example to run through in your mind. Did you keep it straight?
 
 **Note:** The most common usage of multiple instances of the same generator running concurrently is not such interactions, but when the generator is producing its own values without input, perhaps from some independently-connected resource. We'll talk more about value production in the next section.
 
+#### Interleaving
+
+Recall this scenario from Chapter 1, "Run-to-completion":
+
+```js
+var a = 1;
+var b = 2;
+
+function foo() {
+	a++;
+	b = b * a;
+	a = b + 3;
+}
+
+function bar() {
+	b--;
+	a = 8 + b;
+	b = a * 2;
+}
+```
+
+With normal JS functions, of course either `foo()` can run completely first, or `bar()` can run completely first, but `foo()` cannot interleave its individual statements with `bar()`. So, there are only two possible outcomes to the above program.
+
+However, with generators, clearly interleaving (even in the middle of statements!) is possible:
+
+```js
+var a = 1;
+var b = 2;
+
+function *foo() {
+	a++;
+	yield;
+	b = b * a;
+	a = (yield b) + 3;
+}
+
+function *bar() {
+	b--;
+	yield;
+	a = (yield 8) + b;
+	b = a * (yield 2);
+}
+```
+
+Depending on what respective order the *iterators* controlling `*foo()` and `*bar()` are called, the above program could produce several different results. In other words, we can actually illustrate (in a sort of fake'ish way) the theoretical "threaded race conditions" circumstances discussed in Chapter 1, by interleaving the two generator interations over the same shared variables.
+
+First, let's make a helper called `step(..)` that controls an *iterator*:
+
+```js
+function step(gen) {
+	var it = gen();
+	var last;
+
+	return function() {
+		// whatever is `yield`ed out, just
+		// send it right back in the next time!
+		last = it.next( last ).value;
+	};
+}
+```
+
+`step(..)` initializes a generator to create its `it` *iterator*, then returns a function which, when called, advances the *iterator* by one step. Additionally, the previously `yield`ed out value is sent right back in at the *next* step. So, `yield 8` will just become `8` and `yield b` will just be `b` (whatever it was at the time of `yield`).
+
+Now, just for fun, let's experiment to see the effects of interleaving these different chunks of `*foo()` and `*bar()`. We'll start with the boring base case, making sure `*foo()` totally finishes before `*bar()` (just like we did in Chapter 1):
+
+```js
+// make sure to reset `a` and `b`
+a = 1;
+b = 2;
+
+var s1 = step( foo );
+var s2 = step( bar );
+
+// run `*foo()` completely first
+s1();
+s1();
+s1();
+
+// now run `*bar()`
+s2();
+s2();
+s2();
+s2();
+
+console.log( a, b );	// 11 22
+```
+
+The end result is `11` and `22`, just as it was in the Chapter 1 version. Now let's mix up the interleaving ordering and see how it changes the final values of `a` and `b`:
+
+```js
+// make sure to reset `a` and `b`
+a = 1;
+b = 2;
+
+var s1 = step( foo );
+var s2 = step( bar );
+
+s2();		// b--;
+s2();		// yield 8
+s1();		// a++;
+s2();		// a = 8 + b;
+			// yield 2
+s1();		// b = b * a;
+			// yield b
+s1();		// a = b + 3;
+s2();		// b = a * 2;
+```
+
+Before I tell you the results, can you figure out what `a` and `b` are after the above program? No cheating!
+
+```js
+console.log( a, b );	// 12 18
+```
+
+**Note:** As an exercise for the reader, try to see how many other combinations of results you can get back rearranging the order of the `s1()` and `s2()` calls. Don't forget you'll always need three `s1()` calls and four `s2()` calls. Recall the discussion earlier about matching `next()` with `yield` for the reasons why.
+
+You almost certainly won't want to intentionally create *this* level of interleaving confusion, as it creates incredibly difficult to understand code. But the exercise is interesting and instructive to understand more about how multiple generators can run concurrently in the same shared scope, because there will be places where this capability is quite useful.
+
+We'll discuss generator concurrency in more detail at the end of this chapter.
+
 ## Generator'ing Values
 
 In the previous section, we mentioned an interesting use-case for generators, as a way to produce values. This is **not** the main use-case we're concerned with in this chapter, but we'd be remiss if we didn't cover the basics, especially since this use-case is essentially the origin of the name: generators.
@@ -1615,11 +1735,11 @@ Once you get hooked on generators, you'll never want to go back to the hell of a
 
 ## Generator Concurrency
 
-We talked about this earlier in the chapter, but one last detail to call out explicitly about generators is that there's no restriction whatsoever that prevents more than one generator (instance) from running concurrently (aka "at the same time").
+As we discussed in both Chapter 1 and earlier in this chapter, two simultaneously running "processes" can cooperatively interleave their operations, and many times this can *yield* (pun intended) very powerful asynchrony expressions.
 
-As we discussed in Chapter 1 at length, two simultaneously running "processes" can cooperatively interleave their operations, and many times this can *yield* (pun intended) very powerful asynchrony expressions. It should then be no big surprise that we can do exactly that with generators.
+Frankly, our earlier examples of concurrency interleaving of multiple generators showed how to make it really confusing. But we hinted that there's places where this capability is quite useful.
 
-Recall a scenario we looked at in Chapter 1, where two different simultaneous Ajax response handlers needed to coordinate with each other to make sure that the data communication was not a race condition. We slotted the responses like this:
+Recall a scenario we looked at in Chapter 1, where two different simultaneous Ajax response handlers needed to coordinate with each other to make sure that the data communication was not a race condition. We slotted the responses into the `res` array like this:
 
 ```js
 function response(data) {
@@ -1632,7 +1752,7 @@ function response(data) {
 }
 ```
 
-How can we use multiple generators concurrently for this scenario?
+But how can we use multiple generators concurrently for this scenario?
 
 ```js
 // `request(..)` is a promise-aware Ajax utility
@@ -1646,7 +1766,11 @@ function *reqData(url) {
 }
 ```
 
-We can run two instances of the `*reqData(..)` generator together, concurrently. The expressed logic seems a bit cleaner. But how will we actually orchestrate this interaction? First, let's just do it manually, with promises:
+**Note:** We're going to use two instances of the `*reqData(..)` generator here, but there's no difference to running a single instance of two different generators; both approaches are reasoned about identically. We'll see two different generators coordinating in just a bit.
+
+Instead of having to manually sort out `res[0]` and `res[1]` assignments, we'll use coordinated ordering so that `res.push(..)` properly slots the values in the expected and predictable order. The expressed logic thus should feel a bit cleaner.
+
+But how will we actually orchestrate this interaction? First, let's just do it manually, with promises:
 
 ```js
 var it1 = reqData( "http://some.url.1" );

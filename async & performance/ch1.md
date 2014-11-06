@@ -372,7 +372,7 @@ Two outcomes from the same code means we still have non-determinism! But it's at
 
 As applied to JavaScript's behavior, this function-ordering non-determinism is the common term "race condition", as `foo()` and `bar()` are racing against each other to see which runs first. Specifically, it's a "race condition" because you cannot predict reliably how `a` and `b` will turn out.
 
-**Note:** If there was a function in JS which somehow did not have run-to-completion behavior, we could have many more possible outcomes, right? It turns out ES6 introduces just such a thing (see Chapter ? for Generators), but don't worry right now, we'll come back to that!
+**Note:** If there was a function in JS which somehow did not have run-to-completion behavior, we could have many more possible outcomes, right? It turns out ES6 introduces just such a thing (see Chapter 4 "Generators"), but don't worry right now, we'll come back to that!
 
 ## Concurrency
 
