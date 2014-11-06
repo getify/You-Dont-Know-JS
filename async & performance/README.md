@@ -13,5 +13,7 @@
 * [Chapter 2: Callbacks](ch2.md)
 * [Chapter 3: Promises](ch3.md)
 * [Chapter 4: Generators](ch4.md)
+* [Chapter 5: Program Performance](ch5.md)
+* [Chapter 6: Tuning & Benchmarking](ch6.md)
 * [Appendix A: // TODO](apA.md)
 * [Appendix B: Thank You's!](apB.md)

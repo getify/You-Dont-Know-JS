@@ -31,6 +31,13 @@
 	* Generator Delegation
 	* Pre-ES6 Generators
 	* Generator Concurrency
+* Chapter 5: Program Performance
+	* Web Workers
+	* Parallel JS
+	* SIMD
+* Chapter 6: Tuning & Benchmarking
+	* Benchmarking
+	* Microperformance
 * Appendix A: // TODO
 * Appendix B: Thank You's!
 
