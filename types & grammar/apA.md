@@ -7,7 +7,7 @@ For example, when your code runs alongside code from other sources, or when your
 
 We'll briefly explore some of these concerns.
 
-## Annex B (ECMASCript)
+## Annex B (ECMAScript)
 
 It's a little known fact that the official name of the language is ECMAScript (referring to the ECMA standards body that manages it). What then is "JavaScript"? JavaScript is the common tradename of the language, of course, but more appropriately, JavaScript is basically the browser implementation of the spec.
 
