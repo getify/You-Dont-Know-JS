@@ -7,7 +7,7 @@ For example, when your code runs alongside code from other sources, or when your
 
 We'll briefly explore some of these concerns.
 
-## Annex B (ECMASCript)
+## Annex B (ECMAScript)
 
 It's a little known fact that the official name of the language is ECMAScript (referring to the ECMA standards body that manages it). What then is "JavaScript"? JavaScript is the common tradename of the language, of course, but more appropriately, JavaScript is basically the browser implementation of the spec.
 
@@ -118,7 +118,7 @@ The problem is, `Array.prototype.push` was added to the spec sometime subsequent
 
 Basically all JS frameworks have code that relies on `push(..)` with multiple elements. In my case, it was code around the CSS selector engine that was completely busted. But there could conceivably be dozens of other places susceptible.
 
-The developer who originally wrote that `push(..)` hack had the right instinct to call it `push`, but didn't forsee pushing multiple elements. They were certainly acting in good faith, but they created a landmine that didn't go off until almost ten years later when I unwittingly came along.
+The developer who originally wrote that `push(..)` hack had the right instinct to call it `push`, but didn't foresee pushing multiple elements. They were certainly acting in good faith, but they created a landmine that didn't go off until almost ten years later when I unwittingly came along.
 
 There's multiple lessons to take away on all sides.
 
