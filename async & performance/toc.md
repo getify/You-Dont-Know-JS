@@ -31,6 +31,7 @@
 	* Generator Delegation
 	* Pre-ES6 Generators
 	* Generator Concurrency
+	* s/Promises/Thunks/
 * Chapter 5: Program Performance
 	* Web Workers
 	* Parallel JS

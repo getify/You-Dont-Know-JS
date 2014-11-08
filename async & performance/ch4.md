@@ -1909,6 +1909,34 @@ In this formulation, the two generators are not just coordinating control transf
 
 Such realization also serves as a conceptual base for a more sophisticated asynchrony technique called CSP (Communicating Sequential Processes), which we will cover in (??? // TODO) of this book.
 
+## s/Promises/Thunks/
+
+So far, we've made the assumption that `yield`ing a promise from a generator -- and having that promise resume the generator via a helper utility like `run(..)` -- was the best possible way manage asynchrony with generators. To be clear, it is.
+
+But, we skipped over another pattern that has some mildly widespread adoption, so in the interest of completeness we'll take a brief look at it.
+
+A thunk is a function that only takes one parameter, a callback. In particular, a thunk is generally produced as a wrapper around an async, callback-accepting function, which already has all the other expected parameters pre-specified.
+
+Consider:
+
+```js
+function foo(x,y,cb) {
+	setTimeout( function(){
+		cb( x + y );
+	}, 1000 );
+}
+```
+
+A manually-created thunk for `foo(..)` would be:
+
+```js
+function fooThunk(cb) {
+	foo( 3, 4, cb );
+}
+```
+
+As you can see, `fooThunk(..)` only expects a `cb()` parameter, as it already has values `3` and `4` (for `x` and `y`, respectively) pre-specified and ready to pass to `foo(..)`. A thunk is just waiting around patiently for the last piece it needs to do its job: the callback.
+
 ## Summary
 
 Generators are a new ES6 function type which does not run-to-completion like normal functions. Instead, the generator can be paused in mid-completion (entirely preserving its state), and it can later be resumed from where it left off.
