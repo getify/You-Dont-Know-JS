@@ -1937,6 +1937,34 @@ function fooThunk(cb) {
 
 As you can see, `fooThunk(..)` only expects a `cb()` parameter, as it already has values `3` and `4` (for `x` and `y`, respectively) pre-specified and ready to pass to `foo(..)`. A thunk is just waiting around patiently for the last piece it needs to do its job: the callback.
 
+You don't want to make thunks manually, though. So, let's invent a utility that does this wrapping for us. We'll just have to assume that the original function signature specifies the callback as the last expected parameter.
+
+Consider:
+
+```js
+function thunkify(fn) {
+	var args = [].slice.call( arguments, 1 );
+	return function(cb) {
+		args.push( cb );
+		fn.apply( null, args );
+	};
+}
+```
+
+And then we use it like this:
+
+```js
+var fooThunk = thunkify( foo, 3, 4 );
+
+// later
+
+fooThunk( function(sum) {
+	console.log( sum );		// 7
+} );
+```
+
+So what's this thunk stuff have to do with generators? Thunks can partially be thought of as a stand-in for promises.
+
 ## Summary
 
 Generators are a new ES6 function type which does not run-to-completion like normal functions. Instead, the generator can be paused in mid-completion (entirely preserving its state), and it can later be resumed from where it left off.
