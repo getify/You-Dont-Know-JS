@@ -1940,7 +1940,7 @@ if (!Promise.wrap) {
 
 OK, that's more than just a tiny trivial utility. It may look a bit intimidating. It's not as bad as you'd think. It takes a function that expects an error-first style callback as its last parameter, and returns a new one that automatically creates a promise to return, and substitutes the callback for you, wired up to the promise fulfillment/rejection.
 
-Rather than waste too much time talking about *how* this `promiseWrap(..)` helper works, let's just look at how we use it:
+Rather than waste too much time talking about *how* this `Promise.wrap(..)` helper works, let's just look at how we use it:
 
 ```js
 var request = Promise.wrap( ajax );
@@ -1952,12 +1952,18 @@ request( "http://some.url.1/" )
 
 Wow, that was pretty easy!
 
-Still a shame to have to create a wrapper, but at least the wrapping pattern is (usually) repeatable so we can put it into a helper to reduce the limitation's effects on our promise coding.
+`Promise.wrap(..)` doesn't produce a promise. It produces a function that will produce promises. In a sense, such a function could be seen as a "promise factory". I propose the name for such a thing as "promisory" ("promise" + "factory").
 
-So back to our earlier example, we need to promise-wrap both `ajax(..)` and `foo(..)`:
+**Note:** Promisory isn't a made up term. It's a real word, and its definition means to contain or convey a promise. Which is exactly what these things are doing, so it turns out its a perfect fit!
+
+So, `Promise.wrap(ajax)` produces an `ajax(..)` promisory we call `request(..)`, and that promisory produces promises for Ajax responses.
+
+If all functions were already promisories, we wouldn't need to make them, so the extra step is a tad bit of a shame. But at least the wrapping pattern is (usually) repeatable so we can put it into the `Promise.wrap(..)` helper to reduce the limitation's effects on our promise coding.
+
+So back to our earlier example, we need a promisory for both `ajax(..)` and `foo(..)`:
 
 ```js
-// make a promise-aware Ajax wrapper
+// make a promisory for `ajax(..)`
 var request = Promise.wrap( ajax );
 
 // refactor `foo(..)`, but keep it externally
@@ -1977,10 +1983,10 @@ function foo(x,y,cb) {
 }
 
 // now, for this code's purposes, make a
-// promise-aware wrapper for `foo(..)`
+// promisory for `foo(..)`
 var betterFoo = Promise.wrap( foo );
 
-// use the promise-aware wrapper
+// and use the promisory
 betterFoo( 11, 31 )
 .then(
 	function(text){
@@ -1992,9 +1998,13 @@ betterFoo( 11, 31 )
 );
 ```
 
-Of course, while we're refactoring `foo(..)` to use our new `request(..)`, we could just make it fully promise-aware, instead of remaining callback-based and needing the subsequent `betterFoo(..)` wrapper. It just depends on whether `foo(..)` needs to stay callback-based compatible with other parts of the code base or not.
+Of course, while we're refactoring `foo(..)` to use our new `request(..)` promisory, we could just make `foo(..)` a promisory itself, instead of remaining callback-based and needing to use the subsequent `betterFoo(..)` promisory. It just depends on whether `foo(..)` needs to stay callback-based compatible with other parts of the code base or not.
+
+Consider:
 
 ```js
+`foo(..)` is now also a promisory because it
+delegates to the `request(..)` promisory
 function foo(x,y) {
 	return request(
 		"http://some.url.1/?x=" + x + "&y=" + y
@@ -2006,7 +2016,7 @@ foo( 11, 31 )
 ..
 ```
 
-While promises don't natively ship with helpers for such wrapping, libraries provide them, or you can make your own. Either way, this particular limitation of promises is addressable without too much pain (certainly compared to the pain of callback hell!).
+While ES6 promises don't natively ship with helpers for such promisory wrapping, most libraries provide them, or you can make your own. Either way, this particular limitation of promises is addressable without too much pain (certainly compared to the pain of callback hell!).
 
 ### Promise Uncancelable
 
