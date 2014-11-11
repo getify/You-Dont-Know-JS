@@ -570,7 +570,7 @@ The "too many" case is easy to explain. Promises are defined so that they can on
 
 Since a promise can only be resolved once, any `then(..)` registered callbacks will only ever be called once (each).
 
-Of course, if you register the same callback more than once, it'll be called as many times as you requested, though you probably wouldn't want to do that if it was possible to avoid.
+Of course, if you register the same callback more than once, (e.g., `p.then(f); p.then(f);`), it'll be called as many times as it was registered.  The guarantee that a response function is called only once does not prevent you from shooting yourself in the foot.
 
 ### Failing to pass along any parameters/environment
 
