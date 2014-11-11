@@ -304,7 +304,7 @@ ajax( "http://some.url.1", foo );
 ajax( "http://some.url.2", bar );
 ```
 
-Since `foo()` can't be interrupted by `bar()`, nor can `bar()` be interruptd by `foo()`, this program only has two possible outcomes depending on which starts running first -- if threading were present, and the individual statements in `foo()` and `bar()` could be interleaved, the number of possible outcomes would be greatly increased!
+Since `foo()` can't be interrupted by `bar()`, nor can `bar()` be interrupted by `foo()`, this program only has two possible outcomes depending on which starts running first -- if threading were present, and the individual statements in `foo()` and `bar()` could be interleaved, the number of possible outcomes would be greatly increased!
 
 Chunk 1 is synchronous (happens *now*), but chunks 2 and 3 are asynchronous (happen *later*), which means their execution will be separated by a gap of time.
 
