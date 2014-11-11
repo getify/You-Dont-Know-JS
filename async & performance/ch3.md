@@ -637,6 +637,8 @@ Why couldn't it just call the error handler we have defined there? Seems like a 
 
 Besides the principle violation, such behavior could wreak havoc, if say there were multiple `then(..)` registered callbacks on the promise `p`, because some would get called and others wouldn't, and it would be very opaque as to why.
 
+**Note:** Usually, if a Promise object can be created, an exception will lead to the Promise being rejected. But if a Promise cannot be created, an exception will be thrown from the Promise constructor expression.
+
 ### Trustable Promise?
 
 There's one last detail to examine to establish trust based on the promise pattern.
