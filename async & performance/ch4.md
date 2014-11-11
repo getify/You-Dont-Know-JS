@@ -476,7 +476,13 @@ for (var v of a) {
 
 The `for..of` loop asks `a` for its *iterator*, and automatically uses it to iterate over `a`'s values.
 
-**Note:** It may seem a strange omission, but regular `object`s intentionally do not come with a default *iterator* the way `array`s do. The reasons go deeper than we will cover here. Of course, you could easily define an *iterator* for an object by making a function that looped over the list of properties returned from `getOwnPropertyNames()`, and pulled out each respective property's value as `next()` was called.
+**Note:** It may seem a strange omission, but regular `object`s intentionally do not come with a default *iterator* the way `array`s do. The reasons go deeper than we will cover here. If what you want is to iterate over the properties of an object, you can use Object.keys:
+
+```js
+for (var k of Object.keys(obj)) {
+   console.log(k + ": " + obj[k])
+}
+```
 
 ### Iterables
 
