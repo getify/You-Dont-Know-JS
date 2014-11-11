@@ -845,7 +845,7 @@ function foo() {
 
 var a, b, c;
 
-// ES5 getter literal syntax
+// ES6 getter literal syntax
 c = {
 	get bar() {
 		console.log( a );
