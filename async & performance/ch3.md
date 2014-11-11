@@ -428,7 +428,7 @@ In the first snippet's approach, `bar(..)` is called regardless of whether `foo(
 
 In the second snippet, `bar(..)` only gets called if `foo(..)` succeeds, and otherwise `oopsBar(..)` gets called. Ditto for `baz(..)`.
 
-Neither approach is *correct* per se. There will be cases where one is more preferable than the other.
+Neither approach is *correct* per se. There will be cases where one is preferred over the other.
 
 In either case, the promise `p` that comes back from `foo(..)` is used to control, via "event notifications", what happens next.
 
