@@ -428,7 +428,7 @@ In the first snippet's approach, `bar(..)` is called regardless of whether `foo(
 
 In the second snippet, `bar(..)` only gets called if `foo(..)` succeeds, and otherwise `oopsBar(..)` gets called. Ditto for `baz(..)`.
 
-Neither approach is *correct* per se. There will be cases where one is more preferable than the other.
+Neither approach is *correct* per se. There will be cases where one is preferred over the other.
 
 In either case, the promise `p` that comes back from `foo(..)` is used to control, via "event notifications", what happens next.
 
@@ -570,7 +570,7 @@ The "too many" case is easy to explain. Promises are defined so that they can on
 
 Since a promise can only be resolved once, any `then(..)` registered callbacks will only ever be called once (each).
 
-Of course, if you register the same callback more than once, it'll be called as many times as you requested, though you probably wouldn't want to do that if it was possible to avoid.
+Of course, if you register the same callback more than once, (e.g., `p.then(f); p.then(f);`), it'll be called as many times as it was registered.  The guarantee that a response function is called only once does not prevent you from shooting yourself in the foot.
 
 ### Failing to pass along any parameters/environment
 
@@ -636,6 +636,8 @@ Wait, that makes it seem like the exception from `foo.bar()` really did get swal
 Why couldn't it just call the error handler we have defined there? Seems like a logical behavior on the surface. But it would violate the fundamental principle that promises are **immutable** once resolved. `p` was already fulfilled to the value `42`, so it can't later be changed to a rejection just because there's an error in observing `p`'s resolution.
 
 Besides the principle violation, such behavior could wreak havoc, if say there were multiple `then(..)` registered callbacks on the promise `p`, because some would get called and others wouldn't, and it would be very opaque as to why.
+
+**Note:** Usually, if a Promise object can be created, an exception will lead to the Promise being rejected. But if a Promise cannot be created, an exception will be thrown from the Promise constructor expression.
 
 ### Trustable Promise?
 
