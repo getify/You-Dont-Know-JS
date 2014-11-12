@@ -1197,7 +1197,7 @@ If the `msg.toLowerCase()` legitimately throws an error (it does!), why doesn't 
 
 That should paint an obvious picture of why error handling with promises is error-prone (pun intended). It's far too easy to have errors swallowed, as this is very rarely what you'd intend.
 
-**Note:** If an error occurs during promise construction -- an exception is thrown inside the promise constructor -- the result will be an immediately thrown error at the point of promise construction, not a rejected promise.
+**Note:** If you use the promise API in an invalid way and an error occurs that prevents proper promise construction, the result will be an immediately thrown exception, **not a rejected promise**. Some examples of incorrect usage that fail promise construction: `new Promise(null)`, `Promise.all()`, `Promise.race(42)`, etc. Obviously, you can't get a rejected promise if you don't use the promise API validly enough to actually construct a promise!
 
 ### Pit of Despair
 
