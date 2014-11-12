@@ -135,7 +135,7 @@ The JS engine doesn't run in isolation. It runs inside a *hosting environment*, 
 
 But the one common "thread" (that's a not-so-subtle asynchronous joke, btw) of all these environments is that they have a mechanism in them that handles executing multiple chunks of your program *over time*, at each moment invoking the JS engine, called the "event loop".
 
-In other words, the JS engine has had no inate sense of *time*, but has instead been an on-demand execution environment for any arbitrary snippet of JS. It's the surrouding environment which has always *scheduled* "events" (JS code executions).
+In other words, the JS engine has had no innate sense of *time*, but has instead been an on-demand execution environment for any arbitrary snippet of JS. It's the surrouding environment which has always *scheduled* "events" (JS code executions).
 
 So, for example, when your JS program makes an Ajax request to fetch some data from a server, you set up the "response" code in a function (commonly called a "callback"), and the JS engine tells the hosting environment basically, "hey, I'm going to suspend execution for now, but whenever you finish with that network request, and you have some data, please *call-back* to this function."
 
@@ -172,9 +172,9 @@ This is of course vastly simplified pseduo-code to illustrate the concepts. But 
 
 As you can see, there's a continuously running loop represented by the `while` loop, and each iteration of this loop is called a "tick". For each tick, if an event is waiting on the queue, it's taken off and executed. These events are your function callbacks.
 
-It's important to note that `setTimeout(..)` doesn't put your callback on the event loop queue. What it does is set up a timer that once that fires, will insert your callback into the event loop, such that some future tick will pick it up and execute it.
+It's important to note that `setTimeout(..)` doesn't put your callback on the event loop queue. What it does is set up a timer; when the timer expires, the environment places your callback into the event loop, such that some future tick will pick it up and execute it.
 
-What if there's already 20 items in the event loop at that moment? Your callback waits. It gets in line behind the others -- there's not normally a path to pre-empting the queue and skipping ahead in line. So, it should be obvious how timers for example don't actually with much temporal accuracy. Basically, you're guaranteed (roughly speaking) that your callback won't fire *before* the time interval you specify, but it can happen at or after that totally dependent on the state of the event queue at the time.
+What if there's already 20 items in the event loop at that moment? Your callback waits. It gets in line behind the others -- there's not normally a path to pre-empting the queue and skipping ahead in line. This explains why `setTimeout(..)` timers may not fire with perfect temporal accuracy. Basically, you're guaranteed (roughly speaking) that your callback won't fire *before* the time interval you specify, but it can happen at or after that time, depending on the state of the event queue.
 
 So, in other words, your program is generally broken up into lots of small chunks, which happen one after the other in the event loop queue. And technically, other events not related directly to your program can be interspersed into the queue, as well.
 
@@ -304,7 +304,7 @@ ajax( "http://some.url.1", foo );
 ajax( "http://some.url.2", bar );
 ```
 
-Since `foo()` can't be interrupted by `bar()`, nor can `bar()` be interruptd by `foo()`, this program only has two possible outcomes depending on which starts running first -- if threading were present, and the individual statements in `foo()` and `bar()` could be interleaved, the number of possible outcomes would be greatly increased!
+Since `foo()` can't be interrupted by `bar()`, nor can `bar()` be interrupted by `foo()`, this program only has two possible outcomes depending on which starts running first -- if threading were present, and the individual statements in `foo()` and `bar()` could be interleaved, the number of possible outcomes would be greatly increased!
 
 Chunk 1 is synchronous (happens *now*), but chunks 2 and 3 are asynchronous (happen *later*), which means their execution will be separated by a gap of time.
 

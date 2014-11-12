@@ -187,7 +187,7 @@ res = it.next( 7 );		// pass `7` to waiting `yield`
 res.value;				// 42
 ```
 
-**Note:** We don't pass a value to the first `next()` call, and that's on purpose. Only a paused `yield` could accept such a value passed by a `next(..)`, and at the beginning of the generator when we call the first `next()`, there **is no paused `yield`** to accept such a value. In early drafts of the ES6 standard -- and thus some transitive versions of browsers like Firefox and Chrome -- passing a value to the first `next()` would cause an exception. Now, the specification and all compliant browsers just silently **discard** anything passed to the first `next()`. It's still a bad idea to pass a value, as you're just creating silently "failing" code that's confusing. So, always start a generator with an argument-free `next()`.
+**Note:** We don't pass a value to the first `next()` call, and that's on purpose. Only a paused `yield` could accept such a value passed by a `next(..)`, and at the beginning of the generator when we call the first `next()`, there **is no paused `yield`** to accept such a value. In early drafts of the ES6 standard -- and thus some transient versions of browsers like Firefox and Chrome -- passing a value to the first `next()` would cause an exception. Now, the specification and all compliant browsers just silently **discard** anything passed to the first `next()`. It's still a bad idea to pass a value, as you're just creating silently "failing" code that's confusing. So, always start a generator with an argument-free `next()`.
 
 The first `next()` call (with nothing passed to it) is basically *asking a question*: "What *next* value does the `*foo(..)` generator have to give me?" And who answers this question? The first `yield "hello"` expression.
 
@@ -476,7 +476,7 @@ for (var v of a) {
 
 The `for..of` loop asks `a` for its *iterator*, and automatically uses it to iterate over `a`'s values.
 
-**Note:** It may seem a strange omission, but regular `object`s intentionally do not come with a default *iterator* the way `array`s do. The reasons go deeper than we will cover here. Of course, you could easily define an *iterator* for an object by making a function that looped over the list of properties returned from `getOwnPropertyNames()`, and pulled out each respective property's value as `next()` was called.
+**Note:** It may seem a strange omission by ES6, but regular `object`s intentionally do not come with a default *iterator* the way `array`s do. The reasons go deeper than we will cover here. If all you want is to iterate over the properties of an object (with no particular guarantee of ordering), `Object.keys(..)` returns an `array`, which can then be used as `for (var k of Object.keys(obj)) { ..`.
 
 ### Iterables
 

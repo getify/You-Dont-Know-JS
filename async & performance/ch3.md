@@ -428,7 +428,7 @@ In the first snippet's approach, `bar(..)` is called regardless of whether `foo(
 
 In the second snippet, `bar(..)` only gets called if `foo(..)` succeeds, and otherwise `oopsBar(..)` gets called. Ditto for `baz(..)`.
 
-Neither approach is *correct* per se. There will be cases where one is more preferable than the other.
+Neither approach is *correct* per se. There will be cases where one is preferred over the other.
 
 In either case, the promise `p` that comes back from `foo(..)` is used to control, via "event notifications", what happens next.
 
@@ -570,7 +570,7 @@ The "too many" case is easy to explain. Promises are defined so that they can on
 
 Since a promise can only be resolved once, any `then(..)` registered callbacks will only ever be called once (each).
 
-Of course, if you register the same callback more than once, it'll be called as many times as you requested, though you probably wouldn't want to do that if it was possible to avoid.
+Of course, if you register the same callback more than once, (e.g., `p.then(f); p.then(f);`), it'll be called as many times as it was registered.  The guarantee that a response function is called only once does not prevent you from shooting yourself in the foot.
 
 ### Failing to pass along any parameters/environment
 
@@ -1196,6 +1196,8 @@ p.then(
 If the `msg.toLowerCase()` legitimately throws an error (it does!), why doesn't our error handler get notified? As we explained earlier, it's because *that* error handler is for the `p` promise, which has already been fulfilled with value `42`. Since the `p` promise is immutable, the only promise which can be notified of the error is the one returned from `p.then(..)`, which in this case we don't capture.
 
 That should paint an obvious picture of why error handling with promises is error-prone (pun intended). It's far too easy to have errors swallowed, as this is very rarely what you'd intend.
+
+**Note:** If an error occurs during promise construction -- an exception is thrown inside the promise constructor -- the result will be an immediately thrown error at the point of promise construction, not a rejected promise.
 
 ### Pit of Despair
 
