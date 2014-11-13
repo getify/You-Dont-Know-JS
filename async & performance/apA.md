@@ -253,7 +253,7 @@ new Promise( function(resolve,reject){
 			}, 100 );
 		} )
 	] );
-)
+} )
 .then( function(msgs){
 	console.log( msgs[0] );	// Hello
 	console.log( msgs[1] );	// [ "World", "!" ]
@@ -261,6 +261,114 @@ new Promise( function(resolve,reject){
 ```
 
 Yuck. Promises require a lot more boilerplate overhead to express the same asynchronous flow control. That's a great illustration of why the *asynquence* API and abstraction make dealing with promise steps a lot nicer. The improvement only goes higher the more complex your asynchrony is.
+
+#### Variations
+
+There are several variations in the contrib plugins on *asynquence*'s `gate(..)` step type which can be quite helpful:
+
+* `any(..)` is like `gate(..)`, except just one segment has to eventually succeed to proceed on the main sequence.
+* `first(..)` is like `any(..)`, except as soon as any segment succeeds, the main sequence proceeds (ignoring subsequent results from other segments).
+* `race(..)` (symmetric with `Promise.race([..])`) is like `first(..)`, except the main sequence proceeds as soon as any segment completes (either success or failure).
+* `last(..)` is like `any(..)`, except only the latest segment to complete successfully sends its message(s) along to the main sequence.
+* `none(..)` is the inverse of `gate(..)`: the main sequence proceeds only if all the segments fail (with all segment error message(s) transposed as success message(s) and vice versa).
+
+Let's first define some helpers to make illustration cleaner:
+
+```js
+function success1(done) {
+	setTimeout( function(){
+		done( 1 );
+	}, 100 );
+}
+
+function success2(done) {
+	setTimeout( function(){
+		done( 2 );
+	}, 100 );
+}
+
+function failure3(done) {
+	setTimeout( function(){
+		done.fail( 3 );
+	}, 100 );
+}
+
+function output(msg) {
+	console.log( msg );
+}
+```
+
+Now, let's demonstrate the above `gate(..)` step variations:
+
+```js
+ASQ().race(
+	failure3,
+	success1
+)
+.or( output );		// 3
+
+
+ASQ().any(
+	failure3,
+	success1,
+	success2
+)
+.val( output );		// [ 1, 2 ]
+
+
+ASQ().first(
+	failure3,
+	success1,
+	success2
+)
+.val( output );		// 1
+
+
+ASQ().last(
+	failure3,
+	success1,
+	success2
+)
+.val( output );		// 2
+
+ASQ().none(
+	failure3
+)
+.val( output )		// 3
+.none(
+	failure3
+	success1
+)
+.or( output );		// 1
+```
+
+Another step variation is `map(..)`, which lets you asynchronously map elements of an array to different values, and the step doesn't proceed until all the mappings are complete. `map(..)` is very similar to `gate(..)`, except it gets the initial values from an array instead of from separately specified functions, and also because you define a single function callback to operate on each value:
+
+```js
+function double(x,done) {
+	setTimeout( function(){
+		done( x * 2 );
+	}, 100 );
+}
+
+ASQ().map( [1,2,3], double )
+.val( output );					// [2,4,6]
+```
+
+Also, `map(..)` can get either of its parameters from the messages passed from the previous step:
+
+```js
+function plusOne(x,done) {
+	setTimeout( function(){
+		done( x + 1 );
+	}, 100 );
+}
+
+ASQ( [1,2,3] )
+.map( double )					// message `[1,2,3]` comes in
+.map( plusOne )					// message `[2,4,6]` comes in
+.val( output );					// [3,5,7]
+```
 
 ### Forking
 
