@@ -39,6 +39,6 @@
 * Chapter 6: Tuning & Benchmarking
 	* Benchmarking
 	* Microperformance
-* Appendix A: // TODO
+* Appendix A: Advanced Async Patterns
 * Appendix B: Thank You's!
 
