@@ -39,6 +39,7 @@
 * Chapter 6: Tuning & Benchmarking
 	* Benchmarking
 	* Microperformance
-* Appendix A: Advanced Async Patterns
-* Appendix B: Thank You's!
+* Appendix A: Library: asynquence
+* Appendix B: Advanced Async Patterns
+* Appendix C: Thank You's!
 
