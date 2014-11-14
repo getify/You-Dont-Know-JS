@@ -209,6 +209,8 @@ This is better error handling behavior than promises themselves have, because it
 
 Not all steps in your sequences will have just a single (async) task to perform; some will need to perform multiple steps "in parallel" (concurrently). A step in a sequence in which multiple sub-steps are processing concurrently is called a `gate(..)` -- there's an `all(..)` alias if you prefer -- and is directly symmetric to native `Promise.all([..])`.
 
+If all the steps in the `gate(..)` complete successfully, all success messages will be passed to the next sequence step. If any of them errors, the whole sequence immediately goes into an error state.
+
 Consider:
 
 ```js
@@ -262,7 +264,7 @@ new Promise( function(resolve,reject){
 
 Yuck. Promises require a lot more boilerplate overhead to express the same asynchronous flow control. That's a great illustration of why the *asynquence* API and abstraction make dealing with promise steps a lot nicer. The improvement only goes higher the more complex your asynchrony is.
 
-#### Variations
+#### Step Variations
 
 There are several variations in the contrib plugins on *asynquence*'s `gate(..)` step type which can be quite helpful:
 
@@ -298,7 +300,7 @@ function output(msg) {
 }
 ```
 
-Now, let's demonstrate the above `gate(..)` step variations:
+Now, let's demonstrate these `gate(..)` step variations:
 
 ```js
 ASQ().race(
@@ -309,11 +311,16 @@ ASQ().race(
 
 
 ASQ().any(
-	failure3,
 	success1,
+	failure3,
 	success2
 )
-.val( output );		// [ 1, 2 ]
+.val( function(){
+	var args = [].slice.call( arguments );
+	console.log(
+		args		// [ 1, undefined, 2 ]
+	);
+} );
 
 
 ASQ().first(
@@ -355,7 +362,7 @@ ASQ().map( [1,2,3], double )
 .val( output );					// [2,4,6]
 ```
 
-Also, `map(..)` can get either of its parameters from the messages passed from the previous step:
+Also, `map(..)` can receive either of its parameters (the array or the callback) from messages passed from the previous step:
 
 ```js
 function plusOne(x,done) {
@@ -365,12 +372,114 @@ function plusOne(x,done) {
 }
 
 ASQ( [1,2,3] )
-.map( double )					// message `[1,2,3]` comes in
-.map( plusOne )					// message `[2,4,6]` comes in
-.val( output );					// [3,5,7]
+.map( double )			// message `[1,2,3]` comes in
+.map( plusOne )			// message `[2,4,6]` comes in
+.val( output );			// [3,5,7]
 ```
 
-### Forking
+Another variation is `waterfall(..)`, which is kind of like a mixture between `gate(..)`'s message collection behavior but `then(..)`'s sequential processing.
+
+Step 1 is first executed, then the success message from step 1 is given to step 2, and then both success messages go to step 3, and then all three success messages go to step 4, and so on, such that the messages sort of collect and cascade down the "waterfall".
+
+Consider:
+
+```js
+function double(done) {
+	var args = [].slice.call( arguments, 1 );
+	console.log( args );
+
+	setTimeout( function(){
+		done( args[args.length - 1] * 2 );
+	}, 100 );
+}
+
+ASQ( 3 )
+.waterfall(
+	double,					// [ 3 ]
+	double,					// [ 6 ]
+	double,					// [ 6, 12 ]
+	double					// [ 6, 12, 24 ]
+)
+.val( function(){
+	var args = [].slice.call( arguments );
+	console.log( args );	// [ 6, 12, 24, 48 ]
+} );
+```
+
+If at any point in the "waterfall" an error occurs, the whole sequence immediately goes into an error state.
+
+#### Error Tolerance
+
+Sometimes you want to manage errors at the step-level and not let them necessarily send the whole sequence into the error state. *asynquence* offers two step variations for that purpose.
+
+`try(..)` attempts a step, and if it succeeds, the sequence proceeds as normal, but if the step fails, the failure is turned into a success message formated as `{ catch: .. }` with the error message(s) filled in:
+
+```js
+ASQ()
+.try( success1 )
+.val( output )			// 1
+.try( failure3 )
+.val( output )			// { catch: 3 }
+.or( function(err){
+	// never gets here
+} );
+```
+
+You could instead set up a retry loop using `until(..)`, which tries the step and if it fails, retries the step again on the next event loop tick, and so on.
+
+This retry loop can continue indefinitely, but if you want to break out of the loop, you can call the `break()` flag on the completion trigger, which sends the main sequence into an error state:
+
+```js
+var count = 0;
+
+ASQ( 3 )
+.until( double )
+.val( output )					// 6
+.until( function(done){
+	count++;
+
+	setTimeout( function(){
+		if (count < 5) {
+			done.fail();
+		}
+		else {
+			// break out of the `until(..)` retry loop
+			done.break( "Oops" );
+		}
+	}, 100 );
+} )
+.or( output );					// Oops
+```
+
+#### Promise-style Steps
+
+If you would prefer to have, inline in your sequence, promise-style semantics like promises' `then(..)` and `catch(..)` (see Chapter 3), you can use the `pThen` and `pCatch` plugins:
+
+```js
+ASQ( 21 )
+.pThen( function(msg){
+	return msg * 2;
+} )
+.pThen( output )				// 42
+.pThen( function(){
+	// throw an exception
+	doesnt.Exist();
+} )
+.pCatch( function(err){
+	// caught the exception (rejection)
+	console.log( err );			// ReferenceError
+} )
+.val( function(){
+	// main sequence is back in a
+	// success state because previous
+	// exception was caught by
+	// `pCatch(..)`
+} );
+```
+
+`pThen(..)` and `pCatch(..)` are designed to run in the sequence, but behave as if it was a normal promise chain. As such, you can either resolve genuine promises or *asynquence* sequences from the "fulfillment" handler passed to `pThen(..)` (see Chapter 3).
+
+### Forking Sequences
 
 One feature that can be quite useful about promises is that you can attach multiple `then(..)` handler registrations to the same promise, effectively "forking" the flow-control at that promise:
 
@@ -405,7 +514,7 @@ sq.then(..)..;
 sq2.then(..)..;
 ```
 
-### Combining
+### Combining Sequences
 
 The reverse of `fork()`ing, you can combine two sequences by subsuming one into another, using the `seq(..)` instance method:
 
@@ -573,4 +682,4 @@ But if you're still fuzzy on how it works (or why!), you'll want to spend a litt
 
 ## Summary
 
-*asynquence* is an easy to understand abstraction -- sequence as a series of (async) steps -- on top of promises, aimed at making working with various asynchronous patterns very easy, but without any compromise in capability.
+*asynquence* is an easy to understand abstraction -- sequence as a series of (async) steps -- on top of promises, aimed at making working with various asynchronous patterns simpler, but without any compromise in capability.
