@@ -5,15 +5,15 @@ Chapters 1 and 2 went into quite a bit of detail about typical asynchronous prog
 
 I referenced my own asynchronous library *asynquence* (http://github.com/getify/asynquence) -- "async" + "sequence" = "asynquence" -- several times in this book, and I want to now briefly explain how it works and why it's unique design is important and helpful.
 
-Then in Appendix B, we'll examine several advanced async patterns, but libraries are necessary to make those palatable enough to be useful. We'll also use *asynquence* to express those patterns, so you'll want to spend a little time in here getting to know the library.
+In the next appendix, we'll explore some advanced async patterns, but you'll probably want a library to make those palatable enough to be useful. We'll use *asynquence* to express those patterns, so you'll want to spend a little time here getting to know the library first.
 
-*asynquence* is obviously not the only option for good async coding; certainly there are many great libraries in this space. But *asynquence* provides a unique perspective by combining the best of all these patterns into a single library, and moreover built on a single basic async abstraction: the sequence.
+*asynquence* is obviously not the only option for good async coding; certainly there are many great libraries in this space. But *asynquence* provides a unique perspective by combining the best of all these patterns into a single library, and moreover is built on a single basic abstraction: the (async) sequence.
 
 My premise is that sophisticated JS programs often need bits and pieces of various different asynchronous patterns woven together, and this is usually left entirely up to each developer to figure out. Instead of having to bring in two or more different async libraries that focus on different aspects of asynchrony, *asynquence* unifies them into variated sequence steps, with just one core library to learn and deploy.
 
 I believe the value is strong enough with *asynquence* to make async flow control programming with promise-style semantics super easy to accomplish, so that's why we'll exclusively focus on that library here.
 
-To begin, we'll explore the design principles behind *asynquence*, and then we'll bound through a primer on how *asynquence* works.
+To begin, I'll explain the design principles behind *asynquence*, and then we'll illustrate how its API works with code examples.
 
 ## Sequences, Abstraction Design
 
@@ -744,9 +744,9 @@ There's more to iterable sequences than what we see in this scenario. We'll come
 
 ### Running Generators
 
-In Chapter 4, we derived a utility called `run(..)` which can run generators to completion, listening for `yield`ed promises and using them to async resume the generator.
+In Chapter 4, we derived a utility called `run(..)` which can run generators to completion, listening for `yield`ed promises and using them to async resume the generator. *asynquence* has just such a utility built in, called `runner(..)`.
 
-*asynquence* has just such a utility built in, called `runner(..)`. Let's first set up some helpers for illustration:
+Let's first set up some helpers for illustration:
 
 ```js
 function doublePr(x) {
