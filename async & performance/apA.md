@@ -1,5 +1,5 @@
 # You Don't Know JS: Async & Performance
-# Appendix A: Library: asynquence
+# Appendix A: *asynquence* Library
 
 Chapters 1 and 2 went into quite a bit of detail about typical asynchronous programming patterns and how they're commonly solved with callbacks. But we also saw why callbacks are fatally limited in capability, which led us to Chapters 3 and 4, with promises and generators offering a much more solid, trustable, and reason-able base to build your asynchrony on.
 
@@ -49,7 +49,7 @@ Thirdly, sequences can more easily be twisted to adapt to different modes of thi
 
 Another alternate mode of thinking inverts the resolution/control capability in a pattern I call "iterable sequences". Instead of each individual step internally controlling its own completion (and thus advancement of the sequence), the sequence is inverted so the advancement control is through an external iterator, and each step in the *iterable sequence* just responds to the `next(..)` *iterator* control.
 
-We'll explore all of these different variations as we go throughout the rest of this Appendix, so don't worry if we ran over those bits far too quickly just now.
+We'll explore all of these different variations as we go throughout the rest of this appendix, so don't worry if we ran over those bits far too quickly just now.
 
 The take away is that sequences are a more powerful and sensible abstraction for complex asynchrony than just promises (promise chains) or just generators, and *asynquence* is designed to express that abstraction with just the right level of sugar to make async programming more understandable and more enjoyable.
 
@@ -635,7 +635,7 @@ And to go the opposite direction and fork/vend a promise from a sequence at a ce
 var sq = ASQ.after( 100, "Hello World" );
 
 sq.toPromise()
-// promise now
+// this is a standard promise chain now
 .then( function(msg){
 	return msg.toUpperCase();
 } )
@@ -676,10 +676,151 @@ coolUtility( 1, 2 )
 } );
 ```
 
-There's quite a bit of other goodies in the *asynquence* core API and its contrib plugins, but we'll leave that as an exercise for the reader to go check the rest of the capabilities out. What we've seen here so far is a good base exposure to the essence and spirit of *asynquence*. So if these snippets have made a bit of sense to you, you're now pretty well up to speed on the library; it doesn't take that much to learn, actually!
+### Iterable Sequences
 
-But if you're still fuzzy on how it works (or why!), you'll want to spend a little more time examining the previous snippets/examples and/or playing around with *asynquence* yourself, before going onto the next Appendix.
+The normal paradigm for a sequence is that each step is responsible for completing itself, which is what advances the sequence. Promises work the same way.
+
+The unfortunate part is that sometimes you need external control over a promise/step, which leads to awkward "capability extraction".
+
+Consider this promises example:
+
+```js
+var domready = new Promise( function(resolve,reject){
+	// don't want to put this here, because
+	// it belongs logically in another part
+	// of the code
+	document.addEventListener( "DOMContentLoaded", resolve );
+} );
+
+// ..
+
+domready.then( function(){
+	// DOM is ready!
+} );
+```
+
+The "capability extraction" anti-pattern with promises looks like this:
+
+```js
+var ready;
+
+var domready = new Promise( function(resolve,reject){
+	// extract the `resolve()` capability
+	ready = resolve;
+} );
+
+// ..
+
+domready.then( function(){
+	// DOM is ready!
+} );
+
+// ..
+
+document.addEventListener( "DOMContentLoaded", ready );
+```
+
+**Note:** This anti-pattern is an awkward code smell, in my opinion, but some developers like it, for reasons I can't grasp.
+
+*asynquence* offers an inverted sequence type I call "iterable sequences", which externalizes the control capability; it's quite useful in use cases like the `domready` above.
+
+```js
+// note: `domready` here is an *iterator* that
+// controls the sequence
+var domready = ASQ.iterable();
+
+// ..
+
+domready.val( function(){
+	// DOM is ready
+} );
+
+// ..
+
+document.addEventListener( "DOMContentLoaded", domready.next );
+```
+
+There's more to iterable sequences than what we see in this scenario. We'll come back to them in the next appendix.
+
+### Running Generators
+
+In Chapter 4, we derived a utility called `run(..)` which can run generators to completion, listening for `yield`ed promises and using them to async resume the generator.
+
+*asynquence* has just such a utility built in, called `runner(..)`. Let's first set up some helpers for illustration:
+
+```js
+function doublePr(x) {
+	return new Promise( function(resolve,reject){
+		setTimeout( function(){
+			resolve( x * 2 );
+		}, 100 );
+	} );
+}
+
+function doubleSeq(x) {
+	return ASQ( function(done){
+		setTimeout( function(){
+			done( x * 2)
+		}, 100 );
+	} );
+}
+```
+
+Now, we can use `runner(..)` as a step in the middle of a sequence:
+
+```js
+ASQ( 10, 11 )
+.runner( function*(token){
+	var x = token.messages[0] + token.messages[1];
+
+	// yield a real promise
+	x = yield doublePr( x );
+
+	// yield a sequence
+	x = yield doubleSeq( x );
+
+	return x;
+} )
+.val( function(msg){
+	console.log( msg );			// 84
+} );
+```
+
+#### Wrapped Generators
+
+You can also create a self-packaged generator -- that is, a normal function that runs your specified generator and returns a sequence for its completion -- by `ASQ.wrap(..)`ing it:
+
+```js
+var foo = ASQ.wrap( function*(token){
+	var x = token.messages[0] + token.messages[1];
+
+	// yield a real promise
+	x = yield doublePr( x );
+
+	// yield a sequence
+	x = yield doubleSeq( x );
+
+	return x;
+}, { gen: true } );
+
+// ..
+
+foo( 8, 9 )
+.val( function(msg){
+	console.log( msg );			// 68
+} );
+```
+
+There's a lot more awesome that `runner(..)` is capable of, but we'll come back to that in the next appendix.
 
 ## Summary
 
-*asynquence* is an easy to understand abstraction -- sequence as a series of (async) steps -- on top of promises, aimed at making working with various asynchronous patterns simpler, but without any compromise in capability.
+*asynquence* is a simple abstraction -- a sequence is a series of (async) steps -- on top of promises, aimed at making working with various asynchronous patterns much easier, without any compromise in capability.
+
+There's other goodies in the *asynquence* core API and its contrib plugins beyond what we saw in this appendix, but we'll leave that as an exercise for the reader to go check the rest of the capabilities out.
+
+You've now seen the essence and spirit of *asynquence*. The key take away is that a sequence is comprised of steps, and those steps can be any of dozens of different variations on promises, or they can be a generator-run, or... The choice is up to you, you have all the freedom to weave together whatever async flow control logic is appropriate for your tasks. No more library switching to catch different async patterns.
+
+If these *asynquence* snippets have made sense to you, you're now pretty well up to speed on the library; it doesn't take that much to learn, actually!
+
+If you're still a little fuzzy on how it works (or why!), you'll want to spend a little more time examining the previous snippets/examples and/or playing around with *asynquence* yourself, before going onto the next appendix. Appendix B will push *asynquence* into several more advanced and powerful async patterns.
