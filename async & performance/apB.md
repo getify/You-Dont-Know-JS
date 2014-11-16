@@ -28,38 +28,38 @@ document.addEventListener( "DOMContentLoaded", domready.next );
 Now, let's define a sequence of multiple steps as an iterable sequence:
 
 ```js
-var isq = ASQ.iterable();
+var steps = ASQ.iterable();
 
-isq
+steps
 .then( function STEP1(x){
 	return x * 2;
 } )
-.then( function STEP2(x){
+.steps( function STEP2(x){
 	return x + 3;
 } )
-.then( function STEP3(x){
+.steps( function STEP3(x){
 	return x * 4;
 } );
 
-isq.next( 8 ).value;	// 16
-isq.next( 16 ).value;	// 19
-isq.next( 19 ).value;	// 76
-isq.next().done;		// true
+steps.next( 8 ).value;	// 16
+steps.next( 16 ).value;	// 19
+steps.next( 19 ).value;	// 76
+steps.next().done;		// true
 ```
 
 As you can see, an iterable sequence is a standard-compliant *iterator* (see Chapter 4). So, it can be iterated with an ES6 `for..of` loop, just like a generator (or any other *iterable*) can:
 
 ```js
-var isq = ASQ.iterable();
+var steps = ASQ.iterable();
 
-isq
+steps
 .then( function STEP1(){ return 2; } )
 .then( function STEP2(){ return 4; } )
 .then( function STEP3(){ return 6; } )
 .then( function STEP4(){ return 8; } )
 .then( function STEP5(){ return 10; } );
 
-for (var v of isq) {
+for (var v of steps) {
 	console.log( v );
 }
 // 2 4 6 8 10
@@ -96,13 +96,15 @@ ASQ( "http://some.url.1" )
 } );
 ```
 
-The iterable sequence expresses a sequential series of (potentially async) steps that looks awfully similar to a promise chain -- in other words, it's much cleaner looking than just plain nested callbacks, but not quite as nice as the `yield`-based sequential syntax of generators.
+The iterable sequence expresses a sequential series of (sync or async) steps that looks awfully similar to a promise chain -- in other words, it's much cleaner looking than just plain nested callbacks, but not quite as nice as the `yield`-based sequential syntax of generators.
 
 But we pass the iterable sequence into `runner(..)`, which runs it to completion the same as if it was a generator. The fact that an iterable sequence behaves essentially the same as a generator is notable for a couple of reasons.
 
-First, iterable sequences are kind of a pre-ES6 equivalent to ES6 generators, which means you can either author them directly (to run anywhere), or you can author ES6 generators and transpile/convert them to iterable sequences (or promise chains for that matter!). Thinking of a run-to-completion generator as just syntactic sugar for a promise chain is an important recognition of their isomorphic relationship.
+First, iterable sequences are kind of a pre-ES6 equivalent to a certain subset of ES6 generators, which means you can either author them directly (to run anywhere), or you can author ES6 generators and transpile/convert them to iterable sequences (or promise chains for that matter!).
 
-Before we move on, we should note that the above snippet could have been expressed in *asynquence* more simply, as:
+Thinking of an async-run-to-completion generator as just syntactic sugar for a promise chain is an important recognition of their isomorphic relationship.
+
+Before we move on, we should note that the above snippet could have been expressed in *asynquence* as:
 
 ```js
 ASQ( "http://some.url.1" )
@@ -119,7 +121,7 @@ ASQ( "http://some.url.1" )
 } );
 ```
 
-Moreover, step 2 could have been expressed as:
+Moreover, step 2 could have even been expressed as:
 
 ```js
 .gate(
@@ -136,9 +138,11 @@ Moreover, step 2 could have been expressed as:
 
 So, why would we go to the trouble of expressing our flow control as an iterable sequence in a `runner(..)` step, when it seems like a simpler/flatter *asyquence* chain does the job well?
 
-Generators, normal *asynquence* sequences, and promise chains, are all **eagerly evaluated** -- whatever flow control is expressed initially *is* the fixed flow that will be followed.
+Because the iterable sequence form has an important trick up its sleeve that gives us more capability. Read on.
 
 ### Extending Iterable Sequences
+
+Generators, normal *asynquence* sequences, and promise chains, are all **eagerly evaluated** -- whatever flow control is expressed initially *is* the fixed flow that will be followed.
 
 However, iterable sequences are **lazily evaluated**, which means that during execution of the iterable sequence, you can extend the sequence with more steps if desired.
 
@@ -208,9 +212,12 @@ var steps = ASQ.iterable()
 } )
 
 .then( function STEP3(r1,r2){ return r1 + r2; } );
+```
 
+You can see in two different places where we conditionally extend `steps` with `steps.then(..)`. And to run this `steps` iterable sequence, we just wire it into our main program flow with an *asynquence* sequence (called `main` here) using `runner(..)`:
 
-ASQ( {
+```js
+var main = ASQ( {
 	url: "http://some.url.1",
 	format: function STEP4(text){
 		return text.toUpperCase();
@@ -259,9 +266,9 @@ function *steps(token) {
 // as `steps` was previously
 ```
 
-Setting aside the already identified benefits of the sequential, synchronous-looking syntax of generators (see Chapter 4), the `steps` logic had to be reordered in `*steps()`, to fake the dynamicism of the extendable iterable sequence `steps`.
+Setting aside the already identified benefits of the sequential, synchronous-looking syntax of generators (see Chapter 4), the `steps` logic had to be reordered in the `*steps()` generator form, to fake the dynamicism of the extendable iterable sequence `steps`.
 
-What about promises or sequences, though? You *can* do something like this:
+What about expressing the functionality with promises or sequences, though? You *can* do something like this:
 
 ```js
 var steps = something( .. )
@@ -277,7 +284,7 @@ var steps = something( .. )
 .then( .. );
 ```
 
-The problem is subtle but important to grasp. So, consider trying to wire up our `steps` promise-chain into our main program flow (this time expressed with promises instead of *asynquence*):
+The problem is subtle but important to grasp. So, consider trying to wire up our `steps` promise-chain into our main program flow -- this time expressed with promises instead of *asynquence*:
 
 ```js
 var main = Promise.resolve( {
@@ -296,14 +303,14 @@ var main = Promise.resolve( {
 
 Can you spot the problem now? Look closely!
 
-There's a race condition for sequence steps ordering. When you `return steps`, at that moment `steps` *might* be the originally defined promise chain, or it might now point to the extended promise chain via `steps = steps.then(..)`, depending on what order things happen.
+There's a race condition for sequence steps ordering. When you `return steps`, at that moment `steps` *might* be the originally defined promise chain, or it might now point to the extended promise chain via the `steps = steps.then(..)` call, depending on what order things happen.
 
 Here are the two possible outcomes:
 
-1. If `steps` is still the original promise chain, once it's "extended" by `steps = steps.then(..)`, that extended promise on the end of the chain is **not** considered by `main`, as it's already tapped the `steps` chain.
-2. If `steps` is already the extended promise chain, it works as we expect in that the extension promise is what `main` taps to wire in the `steps` chain.
+1. If `steps` is still the original promise chain, once it's later "extended" by `steps = steps.then(..)`, that extended promise on the end of the chain is **not** considered by the `main` flow, as it's already tapped the `steps` chain. This is the unfortunately limiting **eager evaluation**.
+2. If `steps` is already the extended promise chain, it works as we expect in that the extended promise is what `main` taps.
 
-Other than the obvious fact that a race condition is intolerable, case #1 is the concern; it illustrates **eager evaluation** of the promise chain. We easily extended the iterable sequence without issue, because iterable sequences are **lazy evaluated**.
+Other than the obvious fact that a race condition is intolerable, case #1 is the concern; it illustrates **eager evaluation** of the promise chain. By contrast, we easily extended the iterable sequence without such issues, because iterable sequences are **lazily evaluated**.
 
 The more dynamic you need your flow control, the more iterable sequences will shine.
 
