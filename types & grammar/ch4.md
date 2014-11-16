@@ -1530,23 +1530,27 @@ a === b;				// false
 a == b;					// true
 ```
 
-`a == b` because `b` is coerced (aka "unboxed", unwrapped) via `ToPrimitive` to its underlying `"abc"` simple scalar primitive value, so `a` and `b` are indeed found to be equal.
+`a == b` because `b` is coerced (aka "unboxed", unwrapped) via `ToPrimitive` to its underlying `"abc"` simple scalar primitive value, which is the same as the value in `a`.
 
 There are some values where this is not the case, though, because of other overriding rules in the `==` algorithm. Consider:
 
 ```js
 var a = null;
-var b = Object( a );	// same as `new Object()`
+var b = Object( a );	// same as `Object()`
 a == b;					// false
 
 var c = undefined;
-var d = Object( c );	// same as `new Object()`
+var d = Object( c );	// same as `Object()`
 c == d;					// false
 
 var e = NaN;
 var f = Object( e );	// same as `new Number( e )`
 e == f;					// false
 ```
+
+The `null` and `undefined` values cannot be boxed -- they have no object wrapper equivalent -- so `Object(null)` is just like `Object()` in that both just produce a normal object.
+
+`NaN` can be boxed to its `Number` object wrapper equivalent, but when `==` causes an unboxing, the `NaN == NaN` comparison fails because `NaN` is never equal to itself (see Chapter 2).
 
 ### Edge Cases
 
