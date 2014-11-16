@@ -1174,7 +1174,7 @@ c && b;		// null
 
 **Wait, what!?** Think about that. In most any other language you've seen besides JS, all those expressions actually result in `true` or `false`. Not so in JavaScript!
 
-Both `||` and `&&` operators perform a `boolean` test on the **first operand** (`a` or `c`). If the operand is not already `boolean` (as its not, here), a normal `ToBoolean` coercion occurs, so that the test can be performed.
+Both `||` and `&&` operators perform a `boolean` test on the **first operand** (`a` or `c`). If the operand is not already `boolean` (as it's not, here), a normal `ToBoolean` coercion occurs, so that the test can be performed.
 
 For the `||` operator, if the test is `true`, the `||` expression results in the value of the *first operand* (`a` or `c`). If the test is `false`, the `||` expression results in the value of the *second operand* (`b`).
 
