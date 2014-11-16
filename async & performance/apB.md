@@ -71,7 +71,7 @@ Consider a multiple Ajax request example -- we've seen the same scenario in Chap
 
 ```js
 // sequence-aware ajax
-var request = Promise.wrap( ajax );
+var request = ASQ.wrap( ajax );
 
 ASQ( "http://some.url.1" )
 .runner(
@@ -131,7 +131,7 @@ Moreover, step 2 could have been expressed as:
 		request( "http://some.url.3/?v=" + resp )
 		.pipe( done );
 	}
-} )
+)
 ```
 
 So, why would we go to the trouble of expressing our flow control as an iterable sequence in a `runner(..)` step, when it seems like a simpler/flatter *asyquence* chain does the job well?
@@ -142,7 +142,7 @@ Generators, normal *asynquence* sequences, and promise chains, are all **eagerly
 
 However, iterable sequences are **lazily evaluated**, which means that during execution of the iterable sequence, you can extend the sequence with more steps if desired.
 
-**Note:** You can only append to the end of an iterable sequence, not injecting into the middle of the sequence.
+**Note:** You can only append to the end of an iterable sequence, not inject into the middle of the sequence.
 
 Let's first look at a simpler (synchronous) example of that capability to get familiar with it:
 
@@ -169,9 +169,9 @@ for (var v = 10, ret;
 }
 ```
 
-The iterable sequence starts out with only one defined step (`isq.then(double)`), but the sequence keeps extending itself under certain conditions (`x < 500`). Both *asynquence* sequences and promise chains technically could do something similar, but we'll see in a little bit why their capability is more limited than that of iterable sequences.
+The iterable sequence starts out with only one defined step (`isq.then(double)`), but the sequence keeps extending itself under certain conditions (`x < 500`). Both *asynquence* sequences and promise chains technically *can* do something similar, but we'll see in a little bit why their capability is insufficient.
 
-Though this example is rather trivial and could otherwise be expressed with a `while` loop in a generator, consider more sophisticated usages of this flexibility.
+Though this example is rather trivial and could otherwise be expressed with a `while` loop in a generator, we'll consider more sophisticated cases.
 
 For instance, you could examine the response from an Ajax request and if it indicates that more data is needed, you conditionally insert more steps into the iterable sequence to make the additional request(s). Or you could conditionally add a value-formatting step to the end of your Ajax handling.
 
@@ -259,7 +259,53 @@ function *steps(token) {
 // as `steps` was previously
 ```
 
-Setting aside the already identified benefits of the sequential, synchronous-looking syntax of generators (see Chapter 4), the `steps` logic had to be reordered in `*steps()`, to fake the dynamicism of the extendable iterable sequence `steps`. The more dynamic you need your flow control, the more the **lazy evaluation** of the iterable sequence will shine.
+Setting aside the already identified benefits of the sequential, synchronous-looking syntax of generators (see Chapter 4), the `steps` logic had to be reordered in `*steps()`, to fake the dynamicism of the extendable iterable sequence `steps`.
+
+What about promises or sequences, though? You *can* do something like this:
+
+```js
+var steps = something( .. )
+.then( .. )
+.then( function(..){
+	// ..
+
+	// extending the chain, right?
+	steps = steps.then( .. );
+
+	// ..
+})
+.then( .. );
+```
+
+The problem is subtle but important to grasp. So, consider trying to wire up our `steps` promise-chain into our main program flow (this time expressed with promises instead of *asynquence*):
+
+```js
+var main = Promise.resolve( {
+	url: "http://some.url.1",
+	format: function STEP4(text){
+		return text.toUpperCase();
+	}
+} )
+.then( function(..){
+	return steps;			// hint!
+} )
+.val( function(msg){
+	console.log( msg );
+} );
+```
+
+Can you spot the problem now? Look closely!
+
+There's a race condition for sequence steps ordering. When you `return steps`, at that moment `steps` *might* be the originally defined promise chain, or it might now point to the extended promise chain via `steps = steps.then(..)`, depending on what order things happen.
+
+Here are the two possible outcomes:
+
+1. If `steps` is still the original promise chain, once it's "extended" by `steps = steps.then(..)`, that extended promise on the end of the chain is **not** considered by `main`, as it's already tapped the `steps` chain.
+2. If `steps` is already the extended promise chain, it works as we expect in that the extension promise is what `main` taps to wire in the `steps` chain.
+
+Other than the obvious fact that a race condition is intolerable, case #1 is the concern; it illustrates **eager evaluation** of the promise chain. We easily extended the iterable sequence without issue, because iterable sequences are **lazy evaluated**.
+
+The more dynamic you need your flow control, the more iterable sequences will shine.
 
 ## Summary
 
