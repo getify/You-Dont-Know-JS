@@ -333,7 +333,9 @@ listener.on( "foobar", function(data){
 } );
 ```
 
-The base functionality we need is present in this approach, but it's far from a desirable way to express our intended logic. There are two separate capabilities conflated in this paradigm: the event listening, and responding to the event. In essence, this problem is quite symmetrical to the problems we detailed with callbacks in Chapter 2; it's an inversion of control problem.
+The base functionality we need is present in this approach, but it's far from a desirable way to express our intended logic. There are two separate capabilities conflated in this paradigm: the event listening, and responding to the event; separation of concerns would implore us to separate out these capabilities.
+
+The carefully observant reader will see this problem as somewhat symmetrical to the problems we detailed with callbacks in Chapter 2; it's kind of an inversion of control problem.
 
 Imagine uninverting this paradigm, like so:
 
@@ -351,13 +353,13 @@ observable
 .then( .. );
 ```
 
-The `observable` here is not quite a promise, but you can *observe* it much like you can observe a promise. In fact, it can be observed many times, and it will send out notifications every time its event (`"foobar"`) occurs.
+The `observable` here is not exactly a promise, but you can *observe* it much like you can observe a promise, so it's closely related. In fact, it can be observed many times, and it will send out notifications every time its event (`"foobar"`) occurs.
 
-**Note:** This pattern I've just illustrated is a **massive simplification** of the concepts and motivations behind "(Functional) Reactive Programming" (aka "FRP"), which has been implemented/expounded upon by several great projects and languages. "Functional" refers to applying functional programming techniques to streams of data, and "Reactive" refers to spreading this functionality out over time in response to events. The interested reader should consider studying "Reactive Observables" in the fantastic "Reactive Extensions" library ("RxJS" for JavaScript) by Microsoft (http://reactive-extensions.github.io/RxJS/); it's much more sophisticated and powerful than I've just shown.
+**Note:** This pattern I've just illustrated is a **massive simplification** of the concepts and motivations behind "Reactive Programming" (aka "RP"), which has been implemented/expounded upon by several great projects and languages. A variation on RP is FRP ("Functional"), which refers to applying Functional programming techniques (immutability, referential integrity, etc) to streams of data. "Reactive" refers to spreading this functionality out over time in response to events. The interested reader should consider studying "Reactive Observables" in the fantastic "Reactive Extensions" library ("RxJS" for JavaScript) by Microsoft (http://reactive-extensions.github.io/RxJS/); it's much more sophisticated and powerful than I've just shown. Also, Andre Staltz has an excellent write-up (https://gist.github.com/staltz/868e7e9bc2a7b8c1f754) that pragmatically lays out RP in concrete examples.
 
 ### Reactive Sequences
 
-With that crazy brief summary of observables (and FRP) as our inspiration/motivation, I will now illustrate an adaptation of a small subset of "reactive observables" in *asynquence*, which I call "reactive sequences".
+With that crazy brief summary of observables (and RP/FRP) as our inspiration/motivation, I will now illustrate an adaptation of a small subset of "reactive observables", which I call "reactive sequences".
 
 First, let's start with how to create an "observable", using an *asynquence* plugin utility called `react`:
 
