@@ -885,6 +885,6 @@ The *event loop* spins continuously, with each iteration ("tick") handling whate
 
 At any given moment, only one event can be processed from the queue at a time. While an event is executing, it can indirectly cause one or more subsequent events to be scheduled (added onto the event queue).
 
-Concurrency is when two or more "processes" (basically function calls as events) interleave themselves onto the event loop queue, such that from a high level perspective, they appear to be running *simultaneously* (even though at any given moment only one event is being processes).
+Concurrency is when two or more "processes" (basically function calls as events) interleave themselves onto the event loop queue, such that from a high level perspective, they appear to be running *simultaneously* (even though at any given moment only one event is being processed).
 
 It's often necessary to do some form of interaction coordination between these concurrent "processes", for instance to ensure ordering or to prevent "race conditions". These "processes" can also *cooperate* by breaking themselves into smaller chunks and to allow other "process" interleaving.
