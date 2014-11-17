@@ -314,6 +314,94 @@ Other than the obvious fact that a race condition is intolerable, case #1 is the
 
 The more dynamic you need your flow control, the more iterable sequences will shine.
 
+## Event Reactive
+
+It should be obvious from (at least!) Chapter 3 that promises are a very powerful tool in your async toolbox. But one thing that's clearly lacking is in their capability to handle streams of events, since a promise can only be resolved once. And frankly, this exact same weakness is true of *asynquence* sequences, as well.
+
+Consider a scenario where you want to fire off a series of steps every time a certain event is fired. A single promise or sequence cannot represent the waiting for all occurrences of that event. So, you have to create a whole new promise chain (or sequence) for *each* event occurrence, such as:
+
+```js
+listener.on( "foobar", function(data){
+
+	// create a new event handling promise chain
+	new Promise( function(resolve,reject){
+		// ..
+	} )
+	.then( .. )
+	.then( .. );
+
+} );
+```
+
+The base functionality we need is present in this approach, but it's far from a desirable way to express the  there are two separate capabilities that are conflated in this paradigm: the event listening, and what happens after the event fires. In essence, this problem is quite symmetrical to the problems we detailed with callbacks in Chapter 2; it's an inversion of control.
+
+Imagine uninverting this paradigm, like so:
+
+```js
+var observable = listener.on( "foobar" );
+
+// later
+observable
+.then( .. )
+.then( .. );
+
+// elsewhere
+observable
+.then( .. )
+.then( .. );
+```
+
+The `observable` here is not quite a promise, but you can *observe* it much like you can observe a promise. In fact, it can be observed many times, and it will send out notifications every time its event (`"foobar"`) occurs.
+
+**Note:** This pattern I've just illustrated is a **massive simplification** of the concepts and motivations behind "(Functional) Reactive Programming" (aka "FRP"), which has been implemented/expounded upon by several great projects and languages. "Functional" refers to applying functional programming techniques to streams of data, and "Reactive" refers to spreading this functionality out over time in response to events. The interested reader should consider studying "Reactive Observables" in the fantastic "Reactive Extensions" library ("RxJS" for JavaScript) by Microsoft (http://reactive-extensions.github.io/RxJS/); it's much more sophisticated and powerful than I've just shown.
+
+### Reactive Sequences
+
+With that crazy brief summary of observables (and FRP) as our inspiration/motivation, I will now illustrate an adaptation of a small subset of "reactive observables" in *asynquence*, which I call "reactive sequences".
+
+First, let's start with how to create an "observable", using an *asynquence* plugin utility called `react`:
+
+```js
+var observable = ASQ.react( function(proceed){
+	listener.on( "foobar", proceed );
+} );
+```
+
+Now, let's see how to define a sequence that "reacts" -- in FRP this is typically called "subscribing" -- to that `observable`:
+
+```js
+observable
+.then( function(..){
+	// ..
+} )
+.val( .. )
+..
+```
+
+So, you just define the sequence by chaining off the observable. That's easy, huh?
+
+In FRP, the stream of events typically channels through a set of functional transforms, like `map(..)`, `reduce(..)`, etc. With reactive sequences, each event channels through a new instance of the sequence. Let's provide a more concrete example:
+
+```js
+ASQ.react( function(proceed){
+	document.getElementById( "mybtn" )
+	.addEventListener( "click", proceed, false );
+} )
+.seq( function(evt){
+	var btnID = evt.target.id;
+	return request(
+		"http://some.url.1/?id=" + btnID
+	);
+} )
+.val( function(text){
+	console.log( text );
+} );
+```
+
+The "reactive" portion of the reactive sequence is assigning one or more event handlers to invoke the event trigger (called `proceed` above).
+
+The "sequence" portion of the reactive sequence is exactly like any sequence we've already explored. Each step can be whatever asynchronous technique makes sense, from continuation callback to promise-style to generator.
+
 ## Summary
 
 Promises and generators provide the foundational building blocks upon which we can build much more sophisticated and capable asynchrony.
