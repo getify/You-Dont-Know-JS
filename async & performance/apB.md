@@ -318,7 +318,7 @@ The more dynamic you need your flow control, the more iterable sequences will sh
 
 It should be obvious from (at least!) Chapter 3 that promises are a very powerful tool in your async toolbox. But one thing that's clearly lacking is in their capability to handle streams of events, since a promise can only be resolved once. And frankly, this exact same weakness is true of *asynquence* sequences, as well.
 
-Consider a scenario where you want to fire off a series of steps every time a certain event is fired. A single promise or sequence cannot represent the waiting for all occurrences of that event. So, you have to create a whole new promise chain (or sequence) for *each* event occurrence, such as:
+Consider a scenario where you want to fire off a series of steps every time a certain event is fired. A single promise or sequence cannot represent all occurrences of that event. So, you have to create a whole new promise chain (or sequence) for *each* event occurrence, such as:
 
 ```js
 listener.on( "foobar", function(data){
@@ -333,7 +333,7 @@ listener.on( "foobar", function(data){
 } );
 ```
 
-The base functionality we need is present in this approach, but it's far from a desirable way to express the  there are two separate capabilities that are conflated in this paradigm: the event listening, and what happens after the event fires. In essence, this problem is quite symmetrical to the problems we detailed with callbacks in Chapter 2; it's an inversion of control.
+The base functionality we need is present in this approach, but it's far from a desirable way to express our intended logic. There are two separate capabilities conflated in this paradigm: the event listening, and responding to the event. In essence, this problem is quite symmetrical to the problems we detailed with callbacks in Chapter 2; it's an inversion of control problem.
 
 Imagine uninverting this paradigm, like so:
 
@@ -400,7 +400,7 @@ ASQ.react( function(proceed){
 
 The "reactive" portion of the reactive sequence is assigning one or more event handlers to invoke the event trigger (called `proceed` above).
 
-The "sequence" portion of the reactive sequence is exactly like any sequence we've already explored. Each step can be whatever asynchronous technique makes sense, from continuation callback to promise-style to generator.
+The "sequence" portion of the reactive sequence is exactly like any sequence we've already explored. Each step can be whatever asynchronous technique makes sense, from continuation callback to promise to generator.
 
 ## Summary
 
