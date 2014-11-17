@@ -509,7 +509,7 @@ function foo(err,data) {
 	}
 }
 
-ajax( "..url..", timeoutify( foo ) );
+ajax( "..url..", timeoutify( foo, 500 ) );
 ```
 
 Another trust issue is being called "too early". In application-specific terms, this may actually be being called before some critical task is complete. But more generally, the problem is evident in utilities which can either invoke the callback you provide *now* (synchronously), or *later* (asynchronously).
