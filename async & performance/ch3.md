@@ -232,7 +232,7 @@ This is even true if you didn't realize the value has a `then(..)` on it. For ex
 ```js
 var o = { then: function(){} };
 
-// make `p` be `[[Prototype]]`-linked to `o`
+// make `v` be `[[Prototype]]`-linked to `o`
 var v = Object.create( o );
 
 v.someStuff = "cool";
