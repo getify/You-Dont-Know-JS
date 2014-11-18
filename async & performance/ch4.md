@@ -848,7 +848,7 @@ Also, what if the generator throws out an error (intentionally or accidentally) 
 
 The more you start to explore this path, the more you realize, "wow, it'd be great if there was just some utility to do it for me." And you're absolutely correct. This is such an important pattern, and you don't want to get it wrong (or exhaust yourself repeating it over and over), so your best bet is to use a utility that is specifically designed to *run* promise-`yield`ing generators in the manner we've illustrated.
 
-Several promise abstraction libraries provide just such a utility, including my *asynquence* library and its `runner(..)`, which will be discussed in (??? // TODO) of this book.
+Several promise abstraction libraries provide just such a utility, including my *asynquence* library and its `runner(..)`, which will be discussed in Appendix A of this book.
 
 But for the sake of learning and illustration, let's just examine a standalone utility that I'll call `run(..)`:
 
@@ -1859,7 +1859,7 @@ runAll(
 );
 ```
 
-**Note:** We're not including a code listing for `runAll(..)` as it's not only long enough to bog down the text, but is an extension of the logic we've already implemented in `run(..)` earlier. So, as a good extra credit exercise for the reader, try your hand at evolving the code from `run(..)` to work like the imagined `runAll(..)`. Also, my asynquence library provides a previously mentioned `runner(..)` utility with this kind of capability already built in, and will be discussed in (??? // TODO) of this book.
+**Note:** We're not including a code listing for `runAll(..)` as it's not only long enough to bog down the text, but is an extension of the logic we've already implemented in `run(..)` earlier. So, as a good extra credit exercise for the reader, try your hand at evolving the code from `run(..)` to work like the imagined `runAll(..)`. Also, my *asynquence* library provides a previously mentioned `runner(..)` utility with this kind of capability already built in, and will be discussed in Appendix A of this book.
 
 Here's how the processing inside `runAll(..)` would operate:
 
@@ -1907,7 +1907,7 @@ runAll(
 
 In this formulation, the two generators are not just coordinating control transfer, but actually communicating with each other, both through `data.res` and the `yield`ed messages that trade `url1` and `url2` values. That's incredibly powerful!
 
-Such realization also serves as a conceptual base for a more sophisticated asynchrony technique called CSP (Communicating Sequential Processes), which we will cover in (??? // TODO) of this book.
+Such realization also serves as a conceptual base for a more sophisticated asynchrony technique called CSP (Communicating Sequential Processes), which we will cover in Appendix B of this book.
 
 ## Thunks
 
@@ -2179,7 +2179,7 @@ Symmetry wise, these two approaches look identical. However, we should point out
 
 From the larger perspective, thunks do not in and of themselves have hardly any of the trustability or composability guarantees that promises are architected with. Using a thunk as a stand-in for a promise in this particular generator asynchrony usage scenario is workable but should be seen as less than ideal when compared to all the benefits that promises bring to the equation (see Chapter 3).
 
-If you have the option, prefer `yield pr` rather than `yield th`. But there's nothing wrong with having a `run(..)` utility which can handle both value types. The `runner(..)` built into my *asynquence* library, which will be discussed in (??? // TODO) of this book.
+If you have the option, prefer `yield pr` rather than `yield th`. But there's nothing wrong with having a `run(..)` utility which can handle both value types. The `runner(..)` built into my *asynquence* library, which will be discussed in Appendix A of this book.
 
 ## Summary
 

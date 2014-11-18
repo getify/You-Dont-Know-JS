@@ -1309,7 +1309,7 @@ But you had to intentionally call `defer()` to opt-in to that pit of despair -- 
 
 I think there's still hope for promise error handling (post-ES6). I hope the powers that be will rethink this situation and consider this alternative. In the meantime, you can implement this yourself, or use a smarter promise library that does so for you!
 
-**Note:** This exact model for error handling/reporting is implemented in my *asynquence* promise abstraction library, which will be discussed in (??? // TODO) of this book.
+**Note:** This exact model for error handling/reporting is implemented in my *asynquence* promise abstraction library, which will be discussed in Appendix A of this book.
 
 ## Promise Patterns
 
@@ -2080,7 +2080,7 @@ This is ugly. It works, but it's far from ideal. Generally, you should try to av
 
 But if you can't, the ugliness of this solution should be a clue that *cancelation* is a functionality that belongs at a higher level of abstraction on top of promises. Look to promise abstraction libraries for assistance rather than hacking it yourself.
 
-**Note:** My *asynquence* promise abstraction library provides just such an abstraction and an `abort()` capability for the sequence, all of which will be discussed in (??? // TODO) of this book.
+**Note:** My *asynquence* promise abstraction library provides just such an abstraction and an `abort()` capability for the sequence, all of which will be discussed in Appendix A of this book.
 
 A single promise is not really a flow control mechanism (at least not in a very meaningful sense), which is exactly what *cancelation* relates to. A chain of promises taken collectively together -- what I like to call a "sequence" -- *is* a flow control expression, and thus it's appropriate for cancelation to be defined at that level of abstraction.
 
