@@ -43,7 +43,7 @@ I am reasoning about my *future cheeseburger* already, even though I don't have 
 
 Eventually, I hear, "Order 113!", and I gleefully walk back up to the counter with receipt in hand. I hand my receipt to the cashier, and I take my cheeseburger in return.
 
-In other words, once my *future value* was ready, I exchanged my promise for the value for the value itself.
+In other words, once my *future value* was ready, I exchanged my value-promise for the value itself.
 
 But there's another possible outcome. They call my order number, but when I go to retrieve my cheeseburger, the cashier regretfully informs me, "I'm sorry, but we appear to be all out of cheeseburgers." Setting aside the customer frustration of this scenario for a moment, we can see an important characteristic of *future values*: they can either indicate a success or failure.
 
