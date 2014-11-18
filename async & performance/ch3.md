@@ -1723,7 +1723,13 @@ Sometimes, you can take this as a signal that you could/should decompose the pro
 Imagine you have a utility `foo(..)` which produces two values (`x` and `y`) asynchronously:
 
 ```js
-// `getY(..)` asynchronously calculates `y`
+function getY(x) {
+	return new Promise( function(resolve,reject){
+		setTimeout( function(){
+			resolve( (3 * x) - 1 );
+		}, 100 );
+	} );
+}
 
 function foo(bar,baz) {
 	var x = bar * baz;
@@ -1740,15 +1746,13 @@ foo( 10, 20 )
 	var x = msgs[0];
 	var y = msgs[1];
 
-	console.log( x, y );
+	console.log( x, y );	// 200 599
 } );
 ```
 
 First, let's rearrange what `foo(..)` returns so that we don't have to wrap `x` and `y` into a single `array` value to transport through one promise. Instead, we can wrap each value into its own promise:
 
 ```js
-// `getY(..)` asynchronously calculates `y`
-
 function foo(bar,baz) {
 	var x = bar * baz;
 
@@ -1788,12 +1792,12 @@ Promise.all(
 )
 .then(
 	spread( function(x,y){
-		console.log( x, y );
+		console.log( x, y );	// 200 599
 	} )
 )
 ```
 
-That's a bit nicer! Of course, you can inline the functional magic to avoid the extra helper:
+That's a bit nicer! Of course, you could inline the functional magic to avoid the extra helper:
 
 ```js
 Promise.all(
@@ -1801,7 +1805,7 @@ Promise.all(
 )
 .then( Function.apply.bind(
 	function(x,y){
-		console.log( x, y );
+		console.log( x, y );	// 200 599
 	},
 	null
 ) );
@@ -1816,7 +1820,7 @@ Promise.all(
 .then( function(msgs){
 	var [x,y] = msgs;
 
-	console.log( x, y );
+	console.log( x, y );	// 200 599
 } );
 ```
 
@@ -1827,7 +1831,7 @@ Promise.all(
 	foo( 10, 20 )
 )
 .then( function([x,y]){
-	console.log( x, y );
+	console.log( x, y );	// 200 599
 } );
 ```
 
