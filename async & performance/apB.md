@@ -359,7 +359,7 @@ The `observable` here is not exactly a promise, but you can *observe* it much li
 
 ### Reactive Sequences
 
-With that crazy brief summary of observables (and RP/FRP) as our inspiration/motivation, I will now illustrate an adaptation of a small subset of "reactive observables", which I call "reactive sequences".
+With that crazy brief summary of observables (and F/RP) as our inspiration and motivation, I will now illustrate an adaptation of a small subset of "reactive observables", which I call "reactive sequences".
 
 First, let's start with how to create an "observable", using an *asynquence* plugin utility called `react`:
 
@@ -369,7 +369,7 @@ var observable = ASQ.react( function setup(next){
 } );
 ```
 
-Now, let's see how to define a sequence that "reacts" -- in FRP this is typically called "subscribing" -- to that `observable`:
+Now, let's see how to define a sequence that "reacts" -- in F/RP this is typically called "subscribing" -- to that `observable`:
 
 ```js
 observable
@@ -488,7 +488,7 @@ var sq3 = ASQ.react(..)
 .then( .. );
 ```
 
-The main takeaway is that `ASQ.react(..)` is a lightweight adaptation of F/RP concepts, enabling the wiring of an event stream to a sequence, hence the term "reactive sequence". Reactive sequences are generally capable enough for a lot of basic use-cases. If you're looking for more advanced reactive programming, check out RxJS and other similar libraries.
+The main takeaway is that `ASQ.react(..)` is a lightweight adaptation of F/RP concepts, enabling the wiring of an event stream to a sequence, hence the term "reactive sequence". Reactive sequences are generally capable enough for basic reactive use-cases.
 
 ## Summary
 
