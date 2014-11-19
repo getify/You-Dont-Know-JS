@@ -364,8 +364,8 @@ With that crazy brief summary of observables (and RP/FRP) as our inspiration/mot
 First, let's start with how to create an "observable", using an *asynquence* plugin utility called `react`:
 
 ```js
-var observable = ASQ.react( function(proceed){
-	listener.on( "foobar", proceed );
+var observable = ASQ.react( function setup(next){
+	listener.on( "foobar", next );
 } );
 ```
 
@@ -373,21 +373,19 @@ Now, let's see how to define a sequence that "reacts" -- in FRP this is typicall
 
 ```js
 observable
-.then( function(..){
-	// ..
-} )
-.val( .. )
-..
+.seq( .. )
+.then( .. )
+.val( .. );
 ```
 
 So, you just define the sequence by chaining off the observable. That's easy, huh?
 
-In FRP, the stream of events typically channels through a set of functional transforms, like `map(..)`, `reduce(..)`, etc. With reactive sequences, each event channels through a new instance of the sequence. Let's provide a more concrete example:
+In F/RP, the stream of events typically channels through a set of functional transforms, like `scan(..)`, `map(..)`, `reduce(..)`, etc. With reactive sequences, each event channels through a new instance of the sequence. Let's provide a more concrete example:
 
 ```js
-ASQ.react( function(proceed){
+ASQ.react( function setup(next){
 	document.getElementById( "mybtn" )
-	.addEventListener( "click", proceed, false );
+	.addEventListener( "click", next, false );
 } )
 .seq( function(evt){
 	var btnID = evt.target.id;
@@ -400,9 +398,97 @@ ASQ.react( function(proceed){
 } );
 ```
 
-The "reactive" portion of the reactive sequence is assigning one or more event handlers to invoke the event trigger (called `proceed` above).
+The "reactive" portion of the reactive sequence comes from assigning one or more event handlers to invoke the event trigger (calling `next(..)` above).
 
-The "sequence" portion of the reactive sequence is exactly like any sequence we've already explored. Each step can be whatever asynchronous technique makes sense, from continuation callback to promise to generator.
+The "sequence" portion of the reactive sequence is exactly like the sequences we've already explored: each step can be whatever asynchronous technique makes sense, from continuation callback to promise to generator.
+
+Once you set up a reactive sequence, it will continue to initiate instances of the sequence as long as the events keep firing. If you want to stop a reactive sequence, you can call `stop()`.
+
+If a reactive sequence is `stop()`'d, you likely want the event handler(s) to be unregistered as well; you can register a teardown handler for this purpose:
+
+```js
+var sq = ASQ.react( function setup(next,registerTeardown){
+	var btn = document.getElementById( "mybtn" );
+
+	btn.addEventListener( "click", next, false );
+
+	// will be called once `sq.stop()` is called
+	registerTeardown( function(){
+		btn.removeEventListener( "click", next, false );
+	} );
+} )
+.seq( .. )
+.then( .. )
+.val( .. );
+
+// later
+sq.stop();
+```
+
+**Note:** The `this` binding reference inside the `setup(..)` handler is the same `sq` reactive sequence, so you can use the `this` reference to add to the reactive sequence definition, call methods like `stop()`, etc.
+
+Here's an example from the node.js world, using reactive sequences to handle incoming HTTP requests:
+
+```js
+var server = http.createServer();
+server.listen(8000);
+
+// reactive observer
+var request = ASQ.react( function setup(next,registerTeardown){
+	server.addListener( "request", next );
+	server.addListener( "close", this.stop );
+
+	registerTeardown( function(){
+		server.removeListener( "request", next );
+		server.removeListener( "close", request.stop );
+	} );
+});
+
+// respond to requests
+request
+.seq( pullFromDatabase )
+.val( function(data,res){
+	res.end( data );
+} );
+
+// node teardown
+process.on( "SIGINT", request.stop );
+```
+
+The `next(..)` trigger can also adapt to node streams easily, using `onStream(..)` and `unStream(..)`:
+
+```js
+ASQ.react( function setup(next){
+	var fstream = fs.createReadStream( "/some/file" );
+
+	// pipe the stream's "data" event to `next(..)`
+	next.onStream( fstream );
+
+	// listen for the end of the stream
+	fstream.on( "end", function(){
+		next.unStream( fstream );
+	} );
+} )
+.seq( .. )
+.then( .. )
+.val( .. );
+```
+
+You can also use sequence combinations to compose multiple reactive sequence streams:
+
+```js
+var sq1 = ASQ.react( .. ).seq( .. ).then( .. );
+var sq2 = ASQ.react( .. ).seq( .. ).then( .. );
+
+var sq3 = ASQ.react(..)
+.gate(
+	sq1,
+	sq2
+)
+.then( .. );
+```
+
+The main takeaway is that `ASQ.react(..)` is a lightweight adaptation of F/RP concepts, enabling the wiring of an event stream to a sequence, hence the term "reactive sequence". Reactive sequences are generally capable enough for a lot of basic use-cases. If you're looking for more advanced reactive programming, check out RxJS and other similar libraries.
 
 ## Summary
 
