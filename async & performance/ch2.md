@@ -467,7 +467,7 @@ function response(err,data) {
 	}
 }
 
-ajax( "..url..", success, failure );
+ajax( "..url..", response );
 ```
 
 In both of these cases, several things should be observed.
