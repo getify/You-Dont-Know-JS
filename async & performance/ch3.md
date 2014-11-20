@@ -1031,7 +1031,7 @@ var p = new Promise( function(X,Y){
 } );
 ```
 
-As you can see, two callbacks (here labeled `X` and `Y`) are provided. The first usually is used to mark the promise as fulfilled, and the second always marks the promise as rejected. But what's the "usually" about, and and what does that imply about accurately naming those parameters?
+As you can see, two callbacks (here labeled `X` and `Y`) are provided. The first usually is used to mark the promise as fulfilled, and the second always marks the promise as rejected. But what's the "usually" about, and what does that imply about accurately naming those parameters?
 
 Ultimately, it's your user code and the identifier names aren't interpreted by the engine to mean anything, so it doesn't *technically* matter; `foo(..)` and `bar(..)` are equally functional. But the words you use can affect not only how you are thinking about the code, but how other developers on your team will think about it. Thinking wrongly about carefully orchestrated async code is almost surely going to be worse than the spaghetti callback alternatives.
 
