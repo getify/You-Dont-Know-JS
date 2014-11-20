@@ -426,7 +426,7 @@ something.next().value;		// 33
 something.next().value;		// 105
 ```
 
-**Note:** We'll explain the purpose of the `[Symbol.iterator]: ..` part of this code snippet in just a moment. But syntactically, two ES6 features are at play. First, the `[ .. ]` syntax is called a *computed property name* (see the *"this * Object Prototypes"* title of this series). It's a way in object literal definition to specify an expression and use the result of that expression as the name for the property. Next, `Symbol.iterator` refers to one of ES6's predefined symbol values (which will be covered in a later book in this series).
+**Note:** We'll explain the purpose of the `[Symbol.iterator]: ..` part of this code snippet in just a moment. But syntactically, two ES6 features are at play. First, the `[ .. ]` syntax is called a *computed property name* (see the *"this & Object Prototypes"* title of this series). It's a way in object literal definition to specify an expression and use the result of that expression as the name for the property. Next, `Symbol.iterator` refers to one of ES6's predefined symbol values (which will be covered in a later book in this series).
 
 The `next()` call returns an object with two properties: `done` is a boolean signaling the iteration is complete status; `value` holds the iteration value.
 
