@@ -1459,7 +1459,7 @@ What processing steps follow from that code? Hang out, this is going to be quite
 2. `foo(3)` creates an *iterator* for `*foo(..)` and passes `3` as its `val` parameter.
 3. Since `3 > 1`, `foo(2)` creates another *iterator* and passes in `2` as its `val` parameter.
 4. Since `2 > 1`, `foo(1)` creates yet another *iterator* and passes in `1` as its `val` parameter.
-5. Since `1 > 1` is `false`, we next call `request(..)` with the `1` value, and get a promise back for that firs Ajax call.
+5. Since `1 > 1` is `false`, we next call `request(..)` with the `1` value, and get a promise back for that first Ajax call.
 6. That promise is `yield`ed out, which comes back to the `*foo(2)` generator instance.
 7. The `yield *` passes that promise back out to the `*foo(3)` generator instance. Another `yield *` passes the promise out to the `*bar()` generator instance. And yet again another `yield *` passes the promise out to the `run(..)` utility, which will wait on that promise (for the first Ajax request) to proceed.
 8. When the promise resolves, its fulfillment message is sent to resume `*bar()`, which passes through the `yield *` into the `*foo(3)` instance, which then passes through the `yield *` to the `*foo(2)` generator instance, which then passes through the `yield *` to the normal `yield` that's waiting in the `*foo(3)` generator instance.
