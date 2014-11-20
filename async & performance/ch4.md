@@ -2179,7 +2179,7 @@ Symmetry wise, these two approaches look identical. However, we should point out
 
 From the larger perspective, thunks do not in and of themselves have hardly any of the trustability or composability guarantees that promises are architected with. Using a thunk as a stand-in for a promise in this particular generator asynchrony usage scenario is workable but should be seen as less than ideal when compared to all the benefits that promises bring to the equation (see Chapter 3).
 
-If you have the option, prefer `yield pr` rather than `yield th`. But there's nothing wrong with having a `run(..)` utility which can handle both value types. The `runner(..)` built into my *asynquence* library, which will be discussed in Appendix A of this book.
+If you have the option, prefer `yield pr` rather than `yield th`. But there's nothing wrong with having a `run(..)` utility which can handle both value types. The `runner(..)` utility in my *asynquence* library, which will be discussed in Appendix A of this book, handles `yield`s of promises, sequences, and thunks.
 
 ## Summary
 
