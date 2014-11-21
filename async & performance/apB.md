@@ -357,6 +357,33 @@ The `observable` here is not exactly a promise, but you can *observe* it much li
 
 **Note:** This pattern I've just illustrated is a **massive simplification** of the concepts and motivations behind "Reactive Programming" (aka "RP"), which has been implemented/expounded upon by several great projects and languages. A variation on RP is FRP ("Functional"), which refers to applying Functional programming techniques (immutability, referential integrity, etc) to streams of data. "Reactive" refers to spreading this functionality out over time in response to events. The interested reader should consider studying "Reactive Observables" in the fantastic "Reactive Extensions" library ("RxJS" for JavaScript) by Microsoft (http://reactive-extensions.github.io/RxJS/); it's much more sophisticated and powerful than I've just shown. Also, Andre Staltz has an excellent write-up (https://gist.github.com/staltz/868e7e9bc2a7b8c1f754) that pragmatically lays out RP in concrete examples.
 
+### ES7 Observables
+
+As of time of writing, there's an early ES7 proposal for a new data type called "Observable" (https://github.com/jhusain/asyncgenerator#introducing-observable), which in spirit is similar to what we've laid out here, but is definitely more sophisticated.
+
+The notion of this kind of Observable is that the way you "subscribe" to the events from a stream is to pass in a generator -- actually the *iterator* is the interested party -- whose `next(..)` method will be called for each event.
+
+You could imagine it sort of like this:
+
+```js
+// `someEventStream` is a stream of events, like from
+// mouse clicks, etc.
+
+var observer = new Observer( someEventStream, function*(){
+	while (var evt = yield) {
+		console.log( evt );
+	}
+} );
+```
+
+The generator you pass in will `yield` pause the `while` loop waiting for the next event. The *iterator* attached to the generator instance will have its `next(..)` called each time `someEventStream` has a new event published, and so that event data will resume your generator/*iterator* with the `evt` data.
+
+In the subscription to events functionality here, it's the *iterator* part that matters, not the generator. So conceptually you could pass in practically any iterable, including `ASQ.iterable()` iterable sequences.
+
+Interestingly, there are also proposed adapters to make it easy to construct Observables from certain types of streams, such as `fromEvent(..)` for DOM events. If you look at a suggested implementation of `fromEvent(..)` in the above linked ES7 proposal, it looks an awful lot like the `ASQ.react(..)` we'll see in the next section.
+
+Of course, these are all early proposals, so what shakes out may very well look/behave differently than shown here. But it's exciting to see the early alignments of concepts across different libraries and language proposals!
+
 ### Reactive Sequences
 
 With that crazy brief summary of observables (and F/RP) as our inspiration and motivation, I will now illustrate an adaptation of a small subset of "reactive observables", which I call "reactive sequences".
@@ -489,6 +516,166 @@ var sq3 = ASQ.react(..)
 ```
 
 The main takeaway is that `ASQ.react(..)` is a lightweight adaptation of F/RP concepts, enabling the wiring of an event stream to a sequence, hence the term "reactive sequence". Reactive sequences are generally capable enough for basic reactive use-cases.
+
+## Generator Coroutine
+
+Hopefully Chapter 4 helped you get pretty familiar with ES6 generators. In particular, we want to revisit the "Generator Concurrency" discussion, and push it even further.
+
+We imagined a `runAll(..)` utility that could take two or more generators and run them concurrently, letting them cooperatively `yield` control from one to the next, with optional message passing.
+
+The *asynquence* `runner(..)` we discussed in Appendix A is a similar implementation of the concepts of `runAll(..)`, so let's see how we can implement the scenario from Chapter 4:
+
+```js
+ASQ(
+	"http://some.url.2"
+)
+.runner(
+	function*(token){
+		// transfer control
+		yield token;
+
+		var url1 = token.messages[0]; // "http://some.url.1"
+
+		// clear out messages to start fresh
+		token.messages = [];
+
+		var p1 = request( url1 );
+
+		// transfer control
+		yield token;
+
+		token.messages.push( yield p1 );
+	},
+	function*(token){
+		var url2 = token.messages[0]; // "http://some.url.2"
+
+		// message pass and transfer control
+		token.messages[0] = "http://some.url.1";
+		yield token;
+
+		var p2 = request( url2 );
+
+		// transfer control
+		yield token;
+
+		token.messages.push( yield p2 );
+
+		// pass along results to next sequence step
+		return token.messages;
+	}
+)
+.val( function(res){
+	// `res[0]` comes from "http://some.url.1"
+	// `res[1]` comes from "http://some.url.2"
+} );
+```
+
+The main differences between `runner(..)` and `runAll(..)`:
+
+1. Each generator (coroutine) is provided an argument we call `token`, which is the special value to `yield` when you want to explicitly transfer control to the next coroutine.
+2. `token.messages` is an array that holds any messages passed in from the previous sequence step. It's also a data structure that you can use to share messages between coroutines.
+3. `yield`ing a promise (or sequence) value does not transfer control, but instead pauses the coroutine processing until that value is ready.
+4. The last `return`ed or `yield`ed value from the coroutine processing run will be forward passed to the next step in the sequence.
+
+It's also easy to layer helpers on top of the base `runner(..)` functionality to suit different use-cases.
+
+### State Machines
+
+One example that may be familiar to many programmers is state machines. You can, with the help of a simple cosmetic utility, create an easy-to-express state machine processor.
+
+Let's imagine such a utility. We'll call it `state(..)`. You will pass it two arguments: a state value and a generator that handles that state. `state(..)` will do the dirty work of creating and returning an adapter generator to pass to `runner(..)`.
+
+Consider:
+
+```js
+function state(val,handler) {
+	// make a coroutine handler for this state
+	return function*(token) {
+		// state transition handler
+		function transition(to) {
+			token.messages[0] = to;
+		}
+
+		// set initial state (if none set yet)
+		if (token.messages.length < 1) {
+			token.messages[0] = val;
+		}
+
+		// keep going until final state (false) is reached
+		while (token.messages[0] !== false) {
+			// current state matches this handler?
+			if (token.messages[0] === val) {
+				// delegate to state handler
+				yield *handler( transition );
+			}
+
+			// transfer control to another state handler?
+			if (token.messages[0] !== false) {
+				yield token;
+			}
+		}
+	};
+}
+```
+
+If you look closely, you'll see that `state(..)` returns back a generator that accepts a `token`, and then it sets up a `while` loop that will run until the state machine reaches its final state (which we arbitrarily pick as the `false` value); that's exactly the kind of generator we want to pass to `runner(..)`!
+
+We also arbitrarily reserve the `token.messages[0]` slot as the place where the current state of our state machine will be tracked, which means we can even seed the initial state as the value passed in from the previous step in the sequence.
+
+How do we use the `state(..)` helper along with *asynquence* `runner(..)`?
+
+```js
+var prevState;
+
+ASQ(
+	/* optional: initial state value */
+	2
+)
+// run our state machine
+// transitions: 2 -> 3 -> 1 -> 3 -> false
+.runner(
+	// state `1` handler
+	state( 1, function *stateOne(transition){
+		console.log( "in state 1" );
+
+		prevState = 1;
+		yield transition( 3 );	// goto state `3`
+	} ),
+
+	// state `2` handler
+	state( 2, function *stateTwo(transition){
+		console.log( "in state 2" );
+
+		prevState = 2;
+		yield transition( 3 );	// goto state `3`
+	} ),
+
+	// state `3` handler
+	state( 3, function *stateThree(transition){
+		console.log( "in state 3" );
+
+		if (prevState === 2) {
+			prevState = 3;
+			yield transition( 1 ); // goto state `1`
+		}
+		// all done!
+		else {
+			yield "That's all folks!";
+
+			prevState = 3;
+			yield transition( false ); // terminal state
+		}
+	} )
+)
+// state machine complete, so move on
+.val( function(msg){
+	console.log( msg );	// That's all folks!
+} );
+```
+
+It's important to note that the `*stateOne(..)`, `*stateTwo(..)`, and `*stateThree(..)` generators themselves are re-invoked each time that state is entered, and they finish when you `transition(..)` to another value. While not shown here, of course these state generator handlers can be asynchronously paused by `yield`ing promises/sequences/thunks.
+
+The underneath hidden generators produced by the `state(..)` helper and actually passed to `runner(..)` are the ones that continue to run concurrently for the length of the state machine, and each of them handles cooperatively `yield`ing control to the next, etc.
 
 ## Summary
 
