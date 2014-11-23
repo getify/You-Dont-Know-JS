@@ -1958,9 +1958,9 @@ request( "http://some.url.1/" )
 
 Wow, that was pretty easy!
 
-`Promise.wrap(..)` doesn't produce a promise. It produces a function that will produce promises. In a sense, such a function could be seen as a "promise factory". I propose the name for such a thing as "promisory" ("promise" + "factory").
+`Promise.wrap(..)` doesn't produce a promise. It produces a function that will produce promises. In a sense, promise-producing function could be seen as a "promise factory". I propose the name for such a thing as "promisory" ("promise" + "factory").
 
-**Note:** Promisory isn't a made up term. It's a real word, and its definition means to contain or convey a promise. Which is exactly what these things are doing, so it turns out its a perfect fit!
+**Note:** Promisory isn't a made up term. It's a real word, and its definition means to contain or convey a promise. That's exactly what these functions are doing, so it turns out its a pretty perfect terminology match!
 
 So, `Promise.wrap(ajax)` produces an `ajax(..)` promisory we call `request(..)`, and that promisory produces promises for Ajax responses.
 
