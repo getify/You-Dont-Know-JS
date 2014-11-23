@@ -677,6 +677,71 @@ It's important to note that the `*stateOne(..)`, `*stateTwo(..)`, and `*stateThr
 
 The underneath hidden generators produced by the `state(..)` helper and actually passed to `runner(..)` are the ones that continue to run concurrently for the length of the state machine, and each of them handles cooperatively `yield`ing control to the next, etc.
 
+## Communicating Sequential Processes (CSP)
+
+"Communicating Sequential Processes" (CSP) was first described by C. A. R. Hoare in a 1978 academic paper (http://dl.acm.org/citation.cfm?doid=359576.359585), and later in a 1985 book (http://www.usingcsp.com/) of the same name. CSP describes a formal method for concurrent "processes" to interact (aka "communicate") during processing.
+
+You may recall that we examined concurrent "processes" back in Chapter 1, so our exploration of CSP here will build upon that understanding.
+
+Like most great concepts in Computer Science, CSP is heavily steeped in academic formalism, expressed as a process algebra. However, I suspect symbolic algebra theorems won't seem to make much practical difference to the reader, so we will want to find some other way of wrapping our brains around CSP.
+
+I will leave much of the formal description and proof of CSP to Hoare's writing, and to many other fantastic writings since. Instead, we will try to just briefly explain the idea of CSP in as un-academic and hopefully intuitively understandable a way as possible.
+
+### Message Passing
+
+The core principle in CSP is that all communication/interaction between otherwise independent processes must be through formal message passing. Perhaps counter to your expectations, CSP message passing is described as a synchronous action, where the sender process and the receiver process have to mutually be ready for the message to be passed.
+
+How could such synchronous messaging possibly be related to asynchronous programming in JavaScript?
+
+The concreteness of relationship comes from the nature of how ES6 generators are used to produce synchronous-looking actions that under the covers can indeed either be synchronous or (more likely) asynchronous.
+
+In other words, two concurrently running generators can appear to synchronously message one to the other while preserving the fundamental asynchrony of the system because the generator's code is paused (aka "blocked") waiting on resumption of the asynchronous action.
+
+How does this work?
+
+Imagine a generator (aka "process") called "A" that wants to send a message to generator "B". First, "A" `yield`s the message (thus pausing "A") to be sent to "B". When "B" is ready and takes the message, "A" is then resumed (unblocked).
+
+Symmetrically, imagine a generator "A" that wants a message **from** "B". "A" `yield`s its request (thus pausing "A") for the message from "B", and once "B" sends a message, "A" takes the message and is resumed.
+
+One of the more popular expressions of this CSP message passing theory comes from ClojureScript's core.async library, and also from the *go* language. These takes on CSP embody the described communication semantics in a conduit that is opened between processes called a "channel". This term channel is used in part because there are modes in which more than one value can be sent at once into the "buffer" of the channel; this is similar to what you may think of as a stream.
+
+In the simplest notion of CSP, a "channel" that we create between "A" and "B" would have a method called `take(..)` for blocking to receive a value, and a method called `put(..)` for blocking to send a value.
+
+This might look like:
+
+```js
+var ch = channel();
+
+function *foo() {
+	var msg = yield take( ch );
+
+	console.log( msg );
+}
+
+function *bar() {
+	yield put( ch, "Hello World" );
+
+	console.log( "message sent" );
+}
+
+run( foo );
+run( bar );
+// Hello World
+// "message sent"
+```
+
+Compare this structured, synchronous(-looking) message passing interaction to the informal and unstructured message sharing that `ASQ.runner(..)` provides through the `token.messages` array and cooperative `yield`ing. In essence, `yield put(..)` is a single operation that both sends the value and pauses execution to transfer control, whereas in earlier examples we did those as separate steps.
+
+There are several great libraries which have implemented this flavor of CSP in JavaScript, including "js-csp" (https://github.com/jlongster/js-csp).
+
+However, since we've been discussing async patterns in the context of my *asynquence* library, you might be interested to see that we can add an emulation layer -- much like the `state(..)` helper/adapter -- on top of `ASQ.runner(..)` style generator handling with a nearly perfect porting of CSP API's and behavior. This emulation layer ships as an optional part of the "contrib" package which is itself optional with *asynquence*.
+
+Here's our earlier concurrency example using *asyquence*-flavored CSP:
+
+```js
+...
+```
+
 ## Summary
 
 Promises and generators provide the foundational building blocks upon which we can build much more sophisticated and capable asynchrony.
