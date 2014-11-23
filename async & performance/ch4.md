@@ -850,7 +850,7 @@ The more you start to explore this path, the more you realize, "wow, it'd be gre
 
 Several promise abstraction libraries provide just such a utility, including my *asynquence* library and its `runner(..)`, which will be discussed in Appendix A of this book.
 
-But for the sake of learning and illustration, let's just examine a standalone utility that I'll call `run(..)`:
+But for the sake of learning and illustration, let's for now just examine a standalone utility that I'll call `run(..)`:
 
 ```js
 function run(gen) {

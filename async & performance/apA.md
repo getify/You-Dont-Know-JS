@@ -662,7 +662,7 @@ var sq = ASQ( function(done){
 anotherAsyncFuncWithCB( 1, 2, sq.errfcb() );
 ```
 
-You also may want to create a sequence-wrapped version of a utility (see Chapter 3), and *asynquence* provides `ASQ.wrap(..)` for that purpose:
+You also may want to create a sequence-wrapped version of a utility -- compare to "promisory" in Chapter 3 and "thunkory" in Chapter 4 -- and *asynquence* provides `ASQ.wrap(..)` for that purpose:
 
 ```js
 var coolUtility = ASQ.wrap( someAsyncFuncWithCB );
@@ -675,6 +675,8 @@ coolUtility( 1, 2 )
 	// ..
 } );
 ```
+
+**Note:** For clarity (and fun!) sake, let's coin yet another term, for a sequence-producing function that comes from `ASQ.wrap(..)`, like `coolUtility` here. I propose "sequory" ("sequence" + "factory").
 
 ### Iterable Sequences
 
