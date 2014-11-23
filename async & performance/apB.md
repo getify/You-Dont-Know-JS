@@ -3,7 +3,7 @@
 
 Appendix A introduced the *asynquence* library for sequence oriented async flow control, primarily based on promises and generators.
 
-Now we'll explore other advanced asynchronous patterns built on top of our existing understanding and functionality.
+Now we'll explore other advanced asynchronous patterns built on top of that existing understanding and functionality, and see how *asynquence* makes those sophisticated async techniques easy to mix-n-match in our programs without needing lots of separate libraries.
 
 ## Iteratable Sequences
 
@@ -98,7 +98,7 @@ ASQ( "http://some.url.1" )
 
 The iterable sequence expresses a sequential series of (sync or async) steps that looks awfully similar to a promise chain -- in other words, it's much cleaner looking than just plain nested callbacks, but not quite as nice as the `yield`-based sequential syntax of generators.
 
-But we pass the iterable sequence into `runner(..)`, which runs it to completion the same as if it was a generator. The fact that an iterable sequence behaves essentially the same as a generator is notable for a couple of reasons.
+But we pass the iterable sequence into `ASQ#runner(..)`, which runs it to completion the same as if it was a generator. The fact that an iterable sequence behaves essentially the same as a generator is notable for a couple of reasons.
 
 First, iterable sequences are kind of a pre-ES6 equivalent to a certain subset of ES6 generators, which means you can either author them directly (to run anywhere), or you can author ES6 generators and transpile/convert them to iterable sequences (or promise chains for that matter!).
 
@@ -136,7 +136,7 @@ Moreover, step 2 could have even been expressed as:
 )
 ```
 
-So, why would we go to the trouble of expressing our flow control as an iterable sequence in a `runner(..)` step, when it seems like a simpler/flatter *asyquence* chain does the job well?
+So, why would we go to the trouble of expressing our flow control as an iterable sequence in a `ASQ#runner(..)` step, when it seems like a simpler/flatter *asyquence* chain does the job well?
 
 Because the iterable sequence form has an important trick up its sleeve that gives us more capability. Read on.
 
@@ -214,7 +214,7 @@ var steps = ASQ.iterable()
 .then( function STEP3(r1,r2){ return r1 + r2; } );
 ```
 
-You can see in two different places where we conditionally extend `steps` with `steps.then(..)`. And to run this `steps` iterable sequence, we just wire it into our main program flow with an *asynquence* sequence (called `main` here) using `runner(..)`:
+You can see in two different places where we conditionally extend `steps` with `steps.then(..)`. And to run this `steps` iterable sequence, we just wire it into our main program flow with an *asynquence* sequence (called `main` here) using `ASQ#runner(..)`:
 
 ```js
 var main = ASQ( {
@@ -313,6 +313,8 @@ Here are the two possible outcomes:
 Other than the obvious fact that a race condition is intolerable, case #1 is the concern; it illustrates **eager evaluation** of the promise chain. By contrast, we easily extended the iterable sequence without such issues, because iterable sequences are **lazily evaluated**.
 
 The more dynamic you need your flow control, the more iterable sequences will shine.
+
+**Note:** Check out more information and examples of iterable sequences (https://github.com/getify/asynquence/blob/master/README.md#iterable-sequences).
 
 ## Event Reactive
 
@@ -517,13 +519,17 @@ var sq3 = ASQ.react(..)
 
 The main takeaway is that `ASQ.react(..)` is a lightweight adaptation of F/RP concepts, enabling the wiring of an event stream to a sequence, hence the term "reactive sequence". Reactive sequences are generally capable enough for basic reactive use-cases.
 
+**Note:** Here's an example of using `ASQ.react(..)` in managing UI state (http://jsbin.com/rozipaki/6/edit?js,output), and another example of handling HTTP request/response streams with `ASQ.react(..)` (https://gist.github.com/getify/bba5ec0de9d6047b720e).
+
 ## Generator Coroutine
 
 Hopefully Chapter 4 helped you get pretty familiar with ES6 generators. In particular, we want to revisit the "Generator Concurrency" discussion, and push it even further.
 
 We imagined a `runAll(..)` utility that could take two or more generators and run them concurrently, letting them cooperatively `yield` control from one to the next, with optional message passing.
 
-The *asynquence* `runner(..)` we discussed in Appendix A is a similar implementation of the concepts of `runAll(..)`, so let's see how we can implement the scenario from Chapter 4:
+In addition to being able to run a single generator to completeion, the `ASQ#runner(..)` we discussed in Appendix A is a similar implementation of the concepts of `runAll(..)` which can run multiple generators concurrently to completion.
+
+So let's see how we can implement the concurrent Ajax scenario from Chapter 4:
 
 ```js
 ASQ(
@@ -570,20 +576,20 @@ ASQ(
 } );
 ```
 
-The main differences between `runner(..)` and `runAll(..)`:
+The main differences between `ASQ#runner(..)` and `runAll(..)`:
 
 1. Each generator (coroutine) is provided an argument we call `token`, which is the special value to `yield` when you want to explicitly transfer control to the next coroutine.
 2. `token.messages` is an array that holds any messages passed in from the previous sequence step. It's also a data structure that you can use to share messages between coroutines.
 3. `yield`ing a promise (or sequence) value does not transfer control, but instead pauses the coroutine processing until that value is ready.
 4. The last `return`ed or `yield`ed value from the coroutine processing run will be forward passed to the next step in the sequence.
 
-It's also easy to layer helpers on top of the base `runner(..)` functionality to suit different use-cases.
+It's also easy to layer helpers on top of the base `ASQ#runner(..)` functionality to suit different use-cases.
 
 ### State Machines
 
 One example that may be familiar to many programmers is state machines. You can, with the help of a simple cosmetic utility, create an easy-to-express state machine processor.
 
-Let's imagine such a utility. We'll call it `state(..)`. You will pass it two arguments: a state value and a generator that handles that state. `state(..)` will do the dirty work of creating and returning an adapter generator to pass to `runner(..)`.
+Let's imagine such a utility. We'll call it `state(..)`. You will pass it two arguments: a state value and a generator that handles that state. `state(..)` will do the dirty work of creating and returning an adapter generator to pass to `ASQ#runner(..)`.
 
 Consider:
 
@@ -618,11 +624,11 @@ function state(val,handler) {
 }
 ```
 
-If you look closely, you'll see that `state(..)` returns back a generator that accepts a `token`, and then it sets up a `while` loop that will run until the state machine reaches its final state (which we arbitrarily pick as the `false` value); that's exactly the kind of generator we want to pass to `runner(..)`!
+If you look closely, you'll see that `state(..)` returns back a generator that accepts a `token`, and then it sets up a `while` loop that will run until the state machine reaches its final state (which we arbitrarily pick as the `false` value); that's exactly the kind of generator we want to pass to `ASQ#runner(..)`!
 
 We also arbitrarily reserve the `token.messages[0]` slot as the place where the current state of our state machine will be tracked, which means we can even seed the initial state as the value passed in from the previous step in the sequence.
 
-How do we use the `state(..)` helper along with *asynquence* `runner(..)`?
+How do we use the `state(..)` helper along with `ASQ#runner(..)`?
 
 ```js
 var prevState;
@@ -675,7 +681,9 @@ ASQ(
 
 It's important to note that the `*stateOne(..)`, `*stateTwo(..)`, and `*stateThree(..)` generators themselves are re-invoked each time that state is entered, and they finish when you `transition(..)` to another value. While not shown here, of course these state generator handlers can be asynchronously paused by `yield`ing promises/sequences/thunks.
 
-The underneath hidden generators produced by the `state(..)` helper and actually passed to `runner(..)` are the ones that continue to run concurrently for the length of the state machine, and each of them handles cooperatively `yield`ing control to the next, etc.
+The underneath hidden generators produced by the `state(..)` helper and actually passed to `ASQ#runner(..)` are the ones that continue to run concurrently for the length of the state machine, and each of them handles cooperatively `yield`ing control to the next, etc.
+
+**Note:** See this "ping pong" (http://jsbin.com/qutabu/1/edit?js,output) example for more illustration of using cooperative concurrency with generators driven by `ASQ#runner(..)`.
 
 ## Communicating Sequential Processes (CSP)
 
@@ -695,7 +703,7 @@ How could such synchronous messaging possibly be related to asynchronous program
 
 The concreteness of relationship comes from the nature of how ES6 generators are used to produce synchronous-looking actions that under the covers can indeed either be synchronous or (more likely) asynchronous.
 
-In other words, two concurrently running generators can appear to synchronously message one to the other while preserving the fundamental asynchrony of the system because the generator's code is paused (aka "blocked") waiting on resumption of the asynchronous action.
+In other words, two or more concurrently running generators can appear to synchronously message each other while preserving the fundamental asynchrony of the system because each generator's code is paused (aka "blocked") waiting on resumption of an asynchronous action.
 
 How does this work?
 
@@ -703,9 +711,11 @@ Imagine a generator (aka "process") called "A" that wants to send a message to g
 
 Symmetrically, imagine a generator "A" that wants a message **from** "B". "A" `yield`s its request (thus pausing "A") for the message from "B", and once "B" sends a message, "A" takes the message and is resumed.
 
-One of the more popular expressions of this CSP message passing theory comes from ClojureScript's core.async library, and also from the *go* language. These takes on CSP embody the described communication semantics in a conduit that is opened between processes called a "channel". This term channel is used in part because there are modes in which more than one value can be sent at once into the "buffer" of the channel; this is similar to what you may think of as a stream.
+One of the more popular expressions of this CSP message passing theory comes from ClojureScript's core.async library, and also from the *go* language. These takes on CSP embody the described communication semantics in a conduit that is opened between processes called a "channel".
 
-In the simplest notion of CSP, a "channel" that we create between "A" and "B" would have a method called `take(..)` for blocking to receive a value, and a method called `put(..)` for blocking to send a value.
+**Note:** The term *channel* is used in part because there are modes in which more than one value can be sent at once into the "buffer" of the channel; this is similar to what you may think of as a stream. We won't get into that depth here, but it can be a very powerful technique for managing streams of data.
+
+In the simplest notion of CSP, a channel that we create between "A" and "B" would have a method called `take(..)` for blocking to receive a value, and a method called `put(..)` for blocking to send a value.
 
 This might look like:
 
@@ -730,18 +740,90 @@ run( bar );
 // "message sent"
 ```
 
-Compare this structured, synchronous(-looking) message passing interaction to the informal and unstructured message sharing that `ASQ.runner(..)` provides through the `token.messages` array and cooperative `yield`ing. In essence, `yield put(..)` is a single operation that both sends the value and pauses execution to transfer control, whereas in earlier examples we did those as separate steps.
+Compare this structured, synchronous(-looking) message passing interaction to the informal and unstructured message sharing that `ASQ#runner(..)` provides through the `token.messages` array and cooperative `yield`ing. In essence, `yield put(..)` is a single operation that both sends the value and pauses execution to transfer control, whereas in earlier examples we did those as separate steps.
 
-There are several great libraries which have implemented this flavor of CSP in JavaScript, including "js-csp" (https://github.com/jlongster/js-csp).
+Moreover, CSP stresses that you don't really explicitly "transfer control", but rather you design your concurrent routines to block expecting either a value received from the channel, or to block expecting to try to send a message on the channel. The blocking around receiving or sending messages is how you coordinate sequencing of behavior between the coroutines.
 
-However, since we've been discussing async patterns in the context of my *asynquence* library, you might be interested to see that we can add an emulation layer -- much like the `state(..)` helper/adapter -- on top of `ASQ.runner(..)` style generator handling with a nearly perfect porting of CSP API's and behavior. This emulation layer ships as an optional part of the "contrib" package which is itself optional with *asynquence*.
+**Note:** Fair warning: this pattern is very powerful but it's also a little mind twisting to get used to at first. You will want to practice this a bit to get used to this new way of thinking about coordinating your concurrency.
 
-Here's our earlier concurrency example using *asyquence*-flavored CSP:
+There are several great libraries which have implemented this flavor of CSP in JavaScript, most notably "js-csp" (https://github.com/ubolonton/js-csp) which James Long (http://twitter.com/jlongster) forked (https://github.com/jlongster/js-csp) and has written extensively about (http://jlongster.com/Taming-the-Asynchronous-Beast-with-CSP-in-JavaScript). Also, it cannot be stressed enough how amazing the many writings of David Nolen (http://twitter.com/swannodette) are on the topic of adapting ClojureScript's go-style core.async CSP into JS generators (http://swannodette.github.io/2013/08/24/es6-generators-and-csp/).
+
+### *asynquence* CSP emulation
+
+Since we've been discussing async patterns here in the context of my *asynquence* library, you might be interested to see that we can fairly easily add an emulation layer on top of `ASQ#runner(..)` generator handling as a nearly perfect porting of the CSP API and behavior. This emulation layer ships as an optional part of the "asynquence-contrib" package alongside *asynquence*.
+
+Very similar to the `state(..)` helper from earlier, `ASQ.csp.go(..)` takes a generator -- in go/core.async terms it's known as a goroutine -- and adapts it to use with `ASQ#runner(..)` by returning a new generator.
+
+Instead of being passed a `token`, your goroutine receives an initially created channel (`ch` below) which all goroutines in this run will share. You can create more channels (which is often quite helpful!) with `ASQ.csp.chan(..)`.
+
+In CSP, we model all asynchrony in terms of blocking on channel messages, rather than blocking waiting for a promise/sequence/thunk to complete.
+
+So, instead of `yield`ing the promise returned from `request(..)`, `request(..)` should return a channel that you `take(..)` a value from. In other words, a single-value channel is roughly equivalent in this context/usage to a promise/sequence.
+
+So let's make a channel-aware version of `request(..)`:
 
 ```js
-...
+function request(url) {
+	var ch = ASQ.csp.channel();
+	ajax( url ).then( function(content){
+		// `putAsync(..)` is a version of `put(..)` that
+		// can be used outside of a generator. It returns
+		// a promise for the operation's completion. We
+		// don't use that promise here, but we could if
+		// we needed to be notified when the value had
+		// been `take(..)`n.
+		ASQ.csp.putAsync( ch, content );
+	} );
+	return ch;
+}
 ```
+
+**Note:** From Chapter 3, "promisory" is a promise-producing utility, "thunkory" from Chapter 4 is a thunk-producing utility, and finally, from Appendix A we invented "sequory" for a sequence-producing utility. Naturally, we need to coin a matching term here for a channel-producing utility. So let's call it a "chanory" ("channel" + "factory"). As an exercise for the reader, try your hand at defining a `channelify(..)` utility similar to `promisify(..)` (Chapter 3), `thunkify(..)` (Chapter 4), and `ASQ.wrap(..)` (Appendix A).
+
+Now consider the concurrent Ajax example using *asyquence*-flavored CSP:
+
+```js
+ASQ()
+.runner(
+	ASQ.csp.go( function*(ch){
+		yield ASQ.csp.put( ch, "http://some.url.2" );
+
+		var url1 = yield ASQ.csp.take( ch );
+		// "http://some.url.1"
+
+		var res1 = yield ASQ.csp.take( request( url1 ) );
+
+		yield ASQ.csp.put( ch, res1 );
+	} ),
+	ASQ.csp.go( function*(ch){
+		var url2 = yield ASQ.csp.take( ch );
+		// "http://some.url.2"
+
+		yield ASQ.csp.put( ch, "http://some.url.1" );
+
+		var res2 = yield ASQ.csp.take( request( url2 ) );
+		var res1 = yield ASQ.csp.take( ch );
+
+		// pass along results to next sequence step
+		ch.buffer_size = 2;
+		ASQ.csp.put( ch, res1 );
+		ASQ.csp.put( ch, res2 );
+	} )
+)
+.val( function(res1,res2){
+	// `res1` comes from "http://some.url.1"
+	// `res2` comes from "http://some.url.2"
+} );
+```
+
+The message passing that trades the URL strings between the two goroutines is pretty straightforward. The first goroutine makes an Ajax request for the first URL, and that response is put onto the `ch` channel. The second goroutine makes an Ajax request for the second URL, then gets the first response `res1` off the `ch` channel. At that point, both responses `res1` and `res2` are completed and ready.
+
+If there are any remaining values in the `ch` channel at the end of the goroutine run, they will be passed along to the next step in the sequence. So, to pass out message(s) from the final goroutine, `put(..)` them into `ch`. As shown, to avoid the blocking of those final `put(..)`s, we switch `ch` into buffering mode by setting its `buffer_size` to `2` (default: `0`).
+
+**Note:** See many more examples of using *asynquence*-flavored CSP here (https://gist.github.com/getify/e0d04f1f5aa24b1947ae).
 
 ## Summary
 
 Promises and generators provide the foundational building blocks upon which we can build much more sophisticated and capable asynchrony.
+
+*asynquence* has utilities for implementing *iterable sequences*, *reactive sequences* (aka "observables"), *concurrent coroutines*, and even *CSP goroutines*. Those patterns, combined with the continuation-callback and promise capabilities, gives *asynquence* a powerful mix of lots of different asynchronous functionalities, all integrated in one clean async flow control abstraction: the sequence.
