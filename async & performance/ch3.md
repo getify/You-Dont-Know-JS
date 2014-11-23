@@ -49,7 +49,7 @@ But there's another possible outcome. They call my order number, but when I go t
 
 Every time I order a cheeseburger, I know that I'll either get a cheeseburger eventually, or I'll get the sad news of the cheeseburger shortage, and I'll have to figure out something else to eat for lunch.
 
-**Note:** In code, things are not quite as simple, because methaphorically, the order number may never be called, in which case we're left indefinitely in an unresolved state. We'll come back to dealing with that case later.
+**Note:** In code, things are not quite as simple, because metaphorically the order number may never be called, in which case we're left indefinitely in an unresolved state. We'll come back to dealing with that case later.
 
 #### Values *Now* & *Later*
 

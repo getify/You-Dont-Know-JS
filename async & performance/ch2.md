@@ -453,7 +453,7 @@ In APIs of this design, often the `failure()` error handler is optional, and if 
 
 **Note:** This split-callback design is what the ES6 Promise API uses. We'll cover ES6 Promises in much more detail in the next chapter.
 
-Another common callback pattern is called "error-first style" (sometimes called "node style"), where the first argument of a single callback is reserved for an error object (if any). If success, this argument will be empty/falsy (and any subsequent arguments will be the success data), but if an error result is being signaled, the first argument is set/truthy (and usually nothing else is passed).
+Another common callback pattern is called "error-first style" (sometimes called "node style" since it's also the convention used across nearly all node.js APIs), where the first argument of a single callback is reserved for an error object (if any). If success, this argument will be empty/falsy (and any subsequent arguments will be the success data), but if an error result is being signaled, the first argument is set/truthy (and usually nothing else is passed).
 
 ```js
 function response(err,data) {
