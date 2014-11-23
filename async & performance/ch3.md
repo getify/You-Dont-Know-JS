@@ -375,7 +375,7 @@ bar( p );
 baz( p );
 ```
 
-**Note:** The pattern shown with `new Promise( function(..){ .. } )` is generally called the ["revealing constructor"](http://domenic.me/2014/02/13/the-revealing-constructor-pattern/). The function passed in is executed immediately (not async deferred, as callbacks to `then(..)` are), and it's provided two parameters, which we named here `resolve` and `reject`. These are the resolution functions for the promise. `resolve(..)` usually signals fulfillment resolution, and `reject(..)` signals rejection resolution.
+**Note:** The pattern shown with `new Promise( function(..){ .. } )` is generally called the ["revealing constructor"](http://domenic.me/2014/02/13/the-revealing-constructor-pattern/). The function passed in is executed immediately (not async deferred, as callbacks to `then(..)` are), and it's provided two parameters, which we named here `resolve` and `reject`. These are the resolution functions for the promise. `resolve(..)` generally signals fulfillment, and `reject(..)` signals rejection.
 
 You can probably guess what the internals of `bar(..)` and `baz(..)` might look like:
 
@@ -464,7 +464,7 @@ No more need to insert your own `setTimeout(..,0)` hacks. Promises prevent Zalgo
 
 ### Calling too late
 
-Similar to the previous point, a promise's `then(..)` registered observation callbacks are automatically scheduled when either `fulfill(..)` or `reject(..)` are called by the promise creation capability. Those scheduled callbacks will predictably be fired at the next asynchronous moment (see "Microtasks" in Chapter 1).
+Similar to the previous point, a promise's `then(..)` registered observation callbacks are automatically scheduled when either `resolve(..)` or `reject(..)` are called by the promise creation capability. Those scheduled callbacks will predictably be fired at the next asynchronous moment (see "Microtasks" in Chapter 1).
 
 It's not possible for synchronous observation, so it's not possible for a synchronous chain of tasks to run in such a way to in effect "delay" another callback from happening as expected. That is, when a promise is resolved, all `then(..)` registered callbacks on it will be called, in order, immediately at the next asynchronous opportunity (see "Microtasks" in Chapter 1), and nothing that happens inside of one of those callbacks can affect/delay the calling of the other callbacks.
 
@@ -815,7 +815,7 @@ But, there's something missing here. What if we want step 2 to wait for step 1 t
 
 The key to making a promise sequence truly async-capable at every step is to recall from above how `Promise.resolve(..)` operates when what you pass to it is a promise or thenable instead of a final value. `Promise.resolve(..)` directly returns a received genuine promise, or it unwraps the value of a received thenable -- and keeps going recursively while it keeps unwrapping thenables.
 
-The same sort of unwrapping happens if you `return` a thenable or promise from the fulfillment callback. Consider:
+The same sort of unwrapping happens if you `return` a thenable or promise from the fulfillment (or rejection) callback. Consider:
 
 ```js
 var p = Promise.resolve( 21 );
@@ -963,7 +963,7 @@ request( "http://some.url.1/" )
 
 When the error occurs in step 2, the rejection handler in step 3 catches it. The return value (`42` in this snippet), if any, from that rejection handler fulfills the promise for the next step (4), such that the chain is now back in a fulfillment state.
 
-**Note:** As we discussed earlier, when returning a promise from a fulfillment handler, it's unwrapped and can delay the next step. But that's not true for returning promises from rejection handlers. If you return a promise from a rejection handler (instead of `return 42` in the above snippet), that promise value would be passed through untouched (without being unwrapped) as a message to the next step, and thus cannot delay that next step. A thrown exception inside either the fulfillment or rejection handler of a `then(..)` call causes the next (chained) promise to be immediately rejected with that exception.
+**Note:** As we discussed earlier, when returning a promise from a fulfillment handler, it's unwrapped and can delay the next step. That's also true for returning promises from rejection handlers, such that if `return 42` was instead returning a promise, that promise could delay step 4. A thrown exception inside either the fulfillment or rejection handler of a `then(..)` call causes the next (chained) promise to be immediately rejected with that exception.
 
 If you call `then(..)` on a promise, and you only pass a fulfillment handler to it, an assumed rejection handler is substituted:
 
@@ -986,7 +986,7 @@ var p2 = p.then(
 
 As you can see, the assumed rejection handler simply re-throws the error, which ends up forcing `p2` (the chained promise) to reject with the same error reason. In essence, this allows the error to continue propagating along a promise chain until an explicitly defined rejection handler is encountered.
 
-**Note:** We'll cover more details of error handling with promises in the next section, because there are other nuanced details to be concerned about.
+**Note:** We'll cover more details of error handling with promises a little later, because there are other nuanced details to be concerned about.
 
 If a proper valid function is not passed as the fulfillment handler parameter to `then(..)`, there's also a default handler substituted:
 
@@ -1014,7 +1014,7 @@ Let's review briefly the intrinsic behaviors of promises that enable chaining fl
 
 1. A `then(..)` call against one promise automatically produces a new promise to return from the call.
 2. Inside the fulfillment/rejection handlers, if you return a value or an exception is thrown, the new returned (chainable) promise is resolved accordingly.
-3. If the fulfillment handler returns a promise, it is unwrapped, so that whatever its resolution is will become the resolution of the chainable promise returned from the `then(..)`.
+3. If the fulfillment or rejection handler returns a promise, it is unwrapped, so that whatever its resolution is will become the resolution of the chained promise returned from the current `then(..)`.
 
 While chaining flow control is helpful, it's probably most accurate to think of it as a side benefit of how promises compose (combine) together, rather than the main intent. As we've discussed in detail several times already, promises normalize asynchrony and encapsulate time-dependent value state, and *that* is what lets us chain them together in this useful way.
 
@@ -1059,11 +1059,11 @@ var rejectedPr = Promise.reject( "Oops" );
 var anotherRejectedPr = Promise.resolve( rejectedPr );
 ```
 
-As we discussed earlier in this chapter, `Promise.resolve(..)` will return a genuine promise directly, or unwrap a thenable. If that thenable unwrapping reveals a rejected state, the promise returned from `Promise.resolve(..)` is in fact in that same rejected state.
+As we discussed earlier in this chapter, `Promise.resolve(..)` will return a received genuine promise directly, or unwrap a received thenable. If that thenable unwrapping reveals a rejected state, the promise returned from `Promise.resolve(..)` is in fact in that same rejected state.
 
 So `Promise.resolve(..)` is a good, accurate name for the API method, because it can actually result in either fulfillment or rejection.
 
-The first callback parameter of the `Promise(..)` constructor will unwrap either a thenable (identical to `Promise.resolve(..)`) or a genuine promise:
+The first callback parameter of the `Promise(..)` constructor will unwrap either a thenable (identically to `Promise.resolve(..)`) or a genuine promise:
 
 ```js
 var rejectedPr = new Promise( function(resolve,reject){
@@ -1082,6 +1082,8 @@ rejectedPr.then(
 ```
 
 So, it should be clear now that `resolve(..)` is the appropriate name for the first callback parameter of the `Promise(..)` constructor.
+
+**Note:** The previously mentioned `reject(..)` does **not** do the unwrapping that `resolve(..)` does. If you pass a promise/thenable to `reject(..)`, that whole promise/thenable value will be set as the rejection reason, not unwrapped to its underlying immediate value.
 
 But now let's turn our attention to the callbacks provided to `then(..)`. What should they be called (both in literature and in code)? I would suggest `fulfilled(..)` and `rejected(..)`:
 
@@ -1258,13 +1260,13 @@ p.then(
 // be thrown globally here
 ```
 
-This might sound more attractive that the never-ending chain or the arbitrary timeouts. But the biggest problem is that it's not part of the ES6 standard, so no matter how good it sounds, at best it's a lot longer way off from being a reliable and ubiquitous solution.
+This might sound more attractive than the never-ending chain or the arbitrary timeouts. But the biggest problem is that it's not part of the ES6 standard, so no matter how good it sounds, at best it's a lot longer way off from being a reliable and ubiquitous solution.
 
 Are we just stuck, then? Not entirely.
 
 Browsers have a unique capability that our code does not have: they can track and know for sure when any object gets thrown away and garbage collected. So, browsers can track promise objects, and whenever they get garbage collected, if they have a rejection in them, the browser knows for sure this was a legitimate "uncaught error", and can thus confidently know it should report it to the developer console.
 
-**Note:** At time of writing, both Chrome and Firefox have attempts at that sort of "uncaught rejection" logic in them, though support is situational at best.
+**Note:** At time of writing, both Chrome and Firefox have early attempts at that sort of "uncaught rejection" capability in them, though support is situational at best.
 
 However, if your promise doesn't get garbage collected (and that's exceedingly easy to accidentally happen through lots of different coding patterns), then the browser's garbage collection sniffing won't help you know and diagnose that you have a silently-rejected promise laying around.
 
