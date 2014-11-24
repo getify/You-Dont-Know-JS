@@ -1215,7 +1215,7 @@ it.next().value;	// `*foo()` finished
 					// 5
 ```
 
-**Note:** Similar to a note earlier in the chapter where I explained why I prefer `function *foo() ..` instead of `function* foo() ..`, I also prefer -- contrary to most other documentation on the topic -- to say `yield *foo()` instead of `yield* foo()`. The placement of the `*` is purely stylistic and up to your best judgment.
+**Note:** Similar to a note earlier in the chapter where I explained why I prefer `function *foo() ..` instead of `function* foo() ..`, I also prefer -- differing from most other documentation on the topic -- to say `yield *foo()` instead of `yield* foo()`. The placement of the `*` is purely stylistic and up to your best judgment. But I find the consistency of styling attractive.
 
 How does the `yield *foo()` delegation work?
 
@@ -1225,9 +1225,41 @@ So, the first two `it.next()` calls are controlling `*bar()`, but when we make t
 
 As soon as the `it` *iterator* control exhausts the entire `*foo()` *iterator*, it automatically returns to controlling `*bar()`.
 
-### Why Delegate?
+So now back to the previous example with the Ajax requests:
 
-// TODO
+```js
+function *foo() {
+	var r2 = yield request( "http://some.url.2" );
+	var r3 = yield request( "http://some.url.3/?v=" + r2 );
+
+	return r3;
+}
+
+function *bar() {
+	var r1 = yield request( "http://some.url.1" );
+
+	// "delegating" to `*foo()` via `yield*`
+	var r3 = yield *foo();
+
+	console.log( r3 );
+}
+
+run( bar );
+```
+
+The only difference between this snippet and its previous version above is the use of `yield *foo()` instead of the previous `yield run(foo)`.
+
+**Note:** `yield *` yields iteration control, not generator control; when you invoke the `*foo()` generator, you're now `yield`-delegating to its *iterator*. But you can actually `yield`-delegate to any *iterator*; `yield *[1,2,3]` would `yield`-delegate to the default *iterator* for the `[1,2,3]` array value.
+
+### Why Delegation?
+
+The purpose of `yield`-delegation is mostly code organization, and in that way is symmetrical with normal function calling.
+
+Imagine two modules that respectively provide methods `foo()` and `bar()`, where `bar()` calls `foo()`. The reason the two are separate is generally because the proper organziation of code for the program calls for them to be in separate functions. For example, there may be cases where `foo()` is called standalone, and other places where `bar()` calls `foo()`.
+
+For all these exact same reasons, keeping generators separate aids in program readability/maintenance/debuggability. In that respect, `yield *` is a syntactic shortcut then for manually iterating over the steps of `*foo()` while inside of `*bar()`.
+
+Such manual approach would be especially complex if the steps in `*foo()` were asynchronous, which is why you'd probably need to use that `run(..)` utility to do it. And as we've shown, `yield *foo()` eliminates the need for a sub-instance of the `run(..)` utility (like `run(foo)`).
 
 ### Delegating Messages
 
