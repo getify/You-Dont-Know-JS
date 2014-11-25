@@ -15,7 +15,7 @@ We can do just that, and it's called **Promises**.
 
 Promises are starting to take the JS world by storm, as developers and specification writers alike desperately seek to untangle the insanity of callback hell in their code/design. In fact, most new async APIs being added to JS/DOM platform are being built on promises. So, it's probably a good idea to dig in and learn them, don't you think!?
 
-**Note:** The word "immediately" will be used frequently in this chapter, generally to refer to some promise resolution action. However, in essentially all cases, "immediately" means in terms of the microtask queue behavior (see Chapter 1), not in the strictly synchronous *now* sense.
+**Note:** The word "immediately" will be used frequently in this chapter, generally to refer to some promise resolution action. However, in essentially all cases, "immediately" means in terms of the Job queue behavior (see Chapter 1), not in the strictly synchronous *now* sense.
 
 ## What is a Promise?
 
@@ -458,15 +458,15 @@ Primarily, this is a concern of whether code can introduce Zalgo-like effects (s
 
 Promises by definition cannot be susceptible to this concern, because even an immediately-fulfilled promise (like `new Promise(function(resolve){ resolve(42); })`) cannot be *observed* synchronously.
 
-That is, when you call `then(..)` on a promise, even if that promise was already resolved, the callback you provide to `then(..)` will **always** be called asynchronously (as microtasks -- see Chapter 1).
+That is, when you call `then(..)` on a promise, even if that promise was already resolved, the callback you provide to `then(..)` will **always** be called asynchronously (as Jobs -- see Chapter 1).
 
 No more need to insert your own `setTimeout(..,0)` hacks. Promises prevent Zalgo automatically.
 
 ### Calling too late
 
-Similar to the previous point, a promise's `then(..)` registered observation callbacks are automatically scheduled when either `resolve(..)` or `reject(..)` are called by the promise creation capability. Those scheduled callbacks will predictably be fired at the next asynchronous moment (see "Microtasks" in Chapter 1).
+Similar to the previous point, a promise's `then(..)` registered observation callbacks are automatically scheduled when either `resolve(..)` or `reject(..)` are called by the promise creation capability. Those scheduled callbacks will predictably be fired at the next asynchronous moment (see "Jobs" in Chapter 1).
 
-It's not possible for synchronous observation, so it's not possible for a synchronous chain of tasks to run in such a way to in effect "delay" another callback from happening as expected. That is, when a promise is resolved, all `then(..)` registered callbacks on it will be called, in order, immediately at the next asynchronous opportunity (see "Microtasks" in Chapter 1), and nothing that happens inside of one of those callbacks can affect/delay the calling of the other callbacks.
+It's not possible for synchronous observation, so it's not possible for a synchronous chain of tasks to run in such a way to in effect "delay" another callback from happening as expected. That is, when a promise is resolved, all `then(..)` registered callbacks on it will be called, in order, immediately at the next asynchronous opportunity (see "Jobs" in Chapter 1), and nothing that happens inside of one of those callbacks can affect/delay the calling of the other callbacks.
 
 For example:
 
@@ -515,7 +515,7 @@ p2.then( function(v){
 // A B  <-- not  B A  as you might expect
 ```
 
-We'll cover this more later, but as you can see, `p1` is resolved not with an immediate value, but with another promise `p3` which is itself resolved with the value `"B"`. The specified behavior is to *unwrap* `p3` into `p1`, but asynchronously, so `p1`'s callback(s) are *behind* `p2`'s callback(s) in the asynchronus microtask queue (see Chapter 1).
+We'll cover this more later, but as you can see, `p1` is resolved not with an immediate value, but with another promise `p3` which is itself resolved with the value `"B"`. The specified behavior is to *unwrap* `p3` into `p1`, but asynchronously, so `p1`'s callback(s) are *behind* `p2`'s callback(s) in the asynchronus Job queue (see Chapter 1).
 
 To avoid such nuanced nightmares, you should never rely on anything about the the ordering/scheduling of callbacks across promises. In fact, a good practice is not to code in such a way where the ordering of multiple callbacks matters at all. Avoid that if you can.
 
@@ -879,7 +879,7 @@ delay( 100 )
 	console.log( "step 2 (after another 200ms)" );
 } )
 .then( function(){
-	console.log( "step 3 (next microtask)" );
+	console.log( "step 3 (next Job)" );
 	return delay( 50 );
 } )
 .then( function(){
@@ -1276,7 +1276,7 @@ Is there any other alternative? Yes.
 
 The following is just theoretical -- it's how promises *could* be someday changed to work. I believe it would be far superior to what we currently have. And I think this change would be possible even post-ES6 because I don't think it would break web compatibility with ES6 promises. Moreover, it can be polyfilled/prollyfilled in, if you're careful.
 
-1. Promises could default to reporting (to the developer console) any rejection, on the next microtask or event loop tick, if at that exact moment no error handler has been registered for the promise.
+1. Promises could default to reporting (to the developer console) any rejection, on the next Job or event loop tick, if at that exact moment no error handler has been registered for the promise.
 2. For the cases where you want a rejected promise to hold onto its rejected state for an arbitrary amount of time before observing, a `defer()` could be added, that can be called on any promise, which marks it as not being eligible for the automatic error reporting.
 
 In other words, if a promise is rejected, it defaults to noisly reporting that fact to the developer console (instead of defaulting to silence). You can opt-out of that reporting either implicitly (by registering an error handler before rejection), or explicitly (with `defer()`). In either case, *you* control the false positives.
@@ -1453,11 +1453,11 @@ if (!Promise.observe) {
 		// side-observe `pr`'s resolution
 		pr.then(
 			function(msg){
-				// schedule callback async (as microtask)
+				// schedule callback async (as Job)
 				Promise.resolve( msg ).then( cb );
 			},
 			function(err){
-				// schedule callback async (as microtask)
+				// schedule callback async (as Job)
 				Promise.resolve( err ).then( cb );
 			}
 		);
@@ -1626,7 +1626,7 @@ And remember, `Promise.resolve(..)` doesn't do anything if what you pass is alre
 
 ### `then(..)` and `catch(..)`
 
-Each promise instance (**not** the `Promise` API namespace) has `then(..)` and `catch(..)` methods, which allow registering of fulfillment and rejection handlers for the promise. Once the promise is resolved, one or the other of these methods will be called, but not both, and it will always be called asynchronously (microtasks -- see Chapter 1).
+Each promise instance (**not** the `Promise` API namespace) has `then(..)` and `catch(..)` methods, which allow registering of fulfillment and rejection handlers for the promise. Once the promise is resolved, one or the other of these methods will be called, but not both, and it will always be called asynchronously (Jobs -- see Chapter 1).
 
 `then(..)` takes one or two parameters, the first for the fulfillment callback, and the second for the rejection callback. If either is omitted or is otherwise passed as a non-function value, a default callback is substituted respectively. The default fulfillment callback simply passes the message along, while the default rejection callback simply rethrows (propagates) the error reason it receives.
 
@@ -2102,11 +2102,11 @@ Frankly, it's kind of an apples-to-oranges comparison, so it's probably the wron
 
 If promises have a genuine limitation, it's more that they don't really offer a line-item choice as to which trustability protections you want/need or not -- you get them all, always.
 
-Nevertheless, if we grant that a promise is generally a *little bit slower* than its non-promise, non-trustable callback equivalent -- in places where you feel you can justify the lack of trustability -- does that mean that promises should be avoided across the board, as if your entire application is riddled with nothing but must-be-utterly-the-fastest code possible?
+Nevertheless, if we grant that a promise is generally a *little bit slower* than its non-promise, non-trustable callback equivalent -- assuming there are places where you feel you can justify the lack of trustability -- does that mean that promises should be avoided across the board, as if your entire application is riddled with nothing but must-be-utterly-the-fastest code possible?
 
 Sanity check: if your code is legitimately like that, **is JavaScript even the right language for such tasks?**
 
-Another subtle issue is that promises make *everything* async, which means that some immediately (synchronously) complete steps still defer advancement of the next sequence step to a microtask. That means that it's possible that a sequence of promise tasks could complete ever-so-slightly slower than the same sequence wired up with callbacks.
+Another subtle issue is that promises make *everything* async, which means that some immediately (synchronously) complete steps still defer advancement of the next step to a Job (see Chapter 1). That means that it's possible that a sequence of promise tasks could complete ever-so-slightly slower than the same sequence wired up with callbacks.
 
 Of course, the question here is whether these potential slips in small amounts of performance are *worth* all the other articulated benefits of promises we've laid out across this chapter?
 

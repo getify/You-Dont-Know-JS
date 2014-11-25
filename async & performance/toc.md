@@ -8,7 +8,7 @@
 	* Event Loop
 	* Parallel Threading
 	* Concurrency
-	* Microtasks
+	* Jobs
 	* Statement Ordering
 * Chapter 2: Callbacks
 	* Continuations
