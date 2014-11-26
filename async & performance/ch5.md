@@ -75,13 +75,52 @@ addEventListener( "message", function(evt){
 postMessage( "a really cool reply" );
 ```
 
-Notice that a dedicated worker is in a one-to-one relationship with the program that created it. That is, the `"message"` event doesn't need any disambiguation here, because we're sure that it could only have come from this one-to-one relationship -- either it came from the Worker or the main page.
+Notice that a dedicated Worker is in a one-to-one relationship with the program that created it. That is, the `"message"` event doesn't need any disambiguation here, because we're sure that it could only have come from this one-to-one relationship -- either it came from the Worker or the main page.
 
-Usually the main page application creates the Workers, but a Worker can instantiate its own child Worker(s) as necessary. Sometimes this is useful to delegate such details to a sort of "master" Worker that spawns other Workers to process parts of a task.
+Usually the main page application creates the Workers, but a Worker can instantiate its own child Worker(s) as necessary. Sometimes this is useful to delegate such details to a sort of "master" Worker that spawns other Workers to process parts of a task. Unfortunately, at time of writing, Chrome still does not support these "nested Workers", while Firefox does.
 
 If you have two or more pages (or tabs with the same page!) in the browser that try to create a Worker from the same file URL, those will actually end up as completely separate Workers. Shortly, we'll discuss a way to "share" a Worker.
 
 **Note:** It may seem like a malicious or ignorant JS program could easily perform a denial-of-service attack on a system by spawning hundreds of Workers, seemingly each with their own thread. While it's true that it's somewhat of a guarantee that a Worker will end up on a separate thread, this guarantee is not unlimited. The system is free to decide how many actual threads/CPUs/cores it really wants to create. There's no way to predict or guarantee how many you'll have access to, though many people assume it's at least as many as the number of CPUs/cores available. I think the safest assumption is that there's at least one other thread besides the main UI thread, but that's about it.
+
+What are some common use-cases for Web Workers?
+
+* Processing intensive math calculations
+* Sorting large data sets
+* Data operations: compression, audio analysis, image pixel manipulations, etc
+* High traffic network communications: Ajax, Web Sockets
+
+### Data Transfer
+
+You may notice a common characteristic of most of these use-cases, which is that it requires a large amount of information to be transferred across the event mechanism, perhaps in both directions.
+
+In the early days of Workers, serializing all data to a string value was the only option. In addition to the speed penalty of the two way string serializations, the other major negative was that the data was being copied which meant a doubling of memory usage (and the subsequent churn of garbage collection).
+
+Thankfully, we now have several better options.
+
+If you pass an object, a so-called "Structured Cloning Algorithm" (https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/The_structured_clone_algorithm) is used to copy/duplicate the object on the other side. This algorithm is fairly sophisticated and can even handle duplicating objects with circular references. The to-string/from-string performance penalty is not paid, but we still have duplication of memory using this approach. Support: IE10 and above, as well as all the other major browsers.
+
+An even better option, especially for larger data sets, is "Transferable Objects" (http://updates.html5rocks.com/2011/12/Transferable-Objects-Lightning-Fast). What happens is that the object's "ownership" is transferred, but the data itself is not moved. Once you transfer away an object to a Worker, it's empty or inaccessible in the the originating location -- that eliminates the hazards of threaded programming over a shared scope. Of course, transfer of ownership can go in both directions.
+
+You don't really have to do much special to opt-in to a Transferable Object; any data structure which implements the Transferable interface (https://developer.mozilla.org/en-US/docs/Web/API/Transferable) will automatically be transferred this way.
+
+For example, typed arrays like `Uint8Array` are Transferable. This is how you'd send a Transferable Object using `postMessage(..)`:
+
+```js
+// `foo` is a `Uint8Array` for instance
+
+postMessage( foo, [ foo] );
+```
+
+The first parameter is the raw buffer, the second parameter is a list of what to transfer.
+
+Browsers which don't support Transferable Objects simply degrade to structured cloning, which means performance is the suffering factor rather than feature breakage.
+
+### Shared Workers
+
+If your site/app has the common use-case that someone may load it into multiple tabs on the same page, you may very well want to reduce the resource usage of your system by preventing duplicate dedicated workers. In this case, creating a single centralized Worker that all the page instances of your site/app can *share* is quite useful.
+
+That's called a `SharedWorker`.
 
 ## Parallel JS
 
