@@ -126,5 +126,9 @@ That's called a `SharedWorker`.
 
 ## SIMD
 
+## asm.js
+
+"asm.js" (http://asmjs.org/) is a highly optimizable subset of the JavaScript language. By carefully avoiding certain mechanisms and patterns and sticking to this subset, asm.js styled code can be recognized by the JS engine and given special attention in terms of performing aggressive low-level optimizations.
+
 ## Summary
 
