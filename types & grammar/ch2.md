@@ -328,12 +328,12 @@ var onethousand = 1E3;						// means 1 * 10^3
 var onemilliononehundredthousand = 1.1E6;	// means 1.1 * 10^6
 ```
 
-`number`s literals can also be expressed in other bases, like binary, octal, and hexidecimal.
+`number`s literals can also be expressed in other bases, like binary, octal, and hexadecimal.
 
 These formats work in current versions of JavaScript:
 
 ```js
-0xf3; // hexidecimal for: 243
+0xf3; // hexadecimal for: 243
 0Xf3; // ditto
 
 0363; // octal for: 243
