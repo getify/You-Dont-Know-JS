@@ -151,15 +151,19 @@ Since a shared Worker can be connected to from more than one program instance or
 
 ```js
 w1.port.addEventListener( "message", handleMessages );
+
+// ..
+
+w1.port.postMessage( "something cool" );
 ```
 
-Also, the port must be initialized, as:
+Also, the port connection must be initialized, as:
 
 ```js
 w1.port.start();
 ```
 
-Inside the shared Worker, an extra event must be handled: `"connect"`:
+Inside the shared Worker, an extra event must be handled: `"connect"`. This event provides the port `object` for that particular connection. The most convenient way to keep multiple connections separate is to use closure (see *"Scope & Closures"* title of this series) over the `port` as shown below, with the event listening and transmitting for that connection defined inside the handler for the `"connect"` event:
 
 ```js
 // inside the shared Worker
@@ -169,6 +173,10 @@ addEventListener( "connect", function(evt){
 
 	port.addEventListener( "message", function(evt){
 		// ..
+
+		port.postMessage( .. );
+
+		// ..
 	} );
 
 	// initialize the port connection
@@ -176,7 +184,7 @@ addEventListener( "connect", function(evt){
 } );
 ```
 
-Other than that, shared and dedicated Workers have the same capabilities and semantics.
+Other than that difference, shared and dedicated Workers have the same capabilities and semantics.
 
 **Note:** Shared Workers survive the termination of a port connection if other port connections are still alive, whereas dedicated Workers are terminated whenever the connection to their initiating program is terminated.
 
