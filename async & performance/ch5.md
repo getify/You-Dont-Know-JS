@@ -77,26 +77,45 @@ postMessage( "a really cool reply" );
 
 Notice that a dedicated Worker is in a one-to-one relationship with the program that created it. That is, the `"message"` event doesn't need any disambiguation here, because we're sure that it could only have come from this one-to-one relationship -- either it came from the Worker or the main page.
 
-Usually the main page application creates the Workers, but a Worker can instantiate its own child Worker(s) as necessary. Sometimes this is useful to delegate such details to a sort of "master" Worker that spawns other Workers to process parts of a task. Unfortunately, at time of writing, Chrome still does not support these "nested Workers", while Firefox does.
+Usually the main page application creates the Workers, but a Worker can instantiate its own child Worker(s) -- known as sub workers -- as necessary. Sometimes this is useful to delegate such details to a sort of "master" Worker that spawns other Workers to process parts of a task. Unfortunately, at time of writing, Chrome still does not support sub workers, while Firefox does.
+
+To kill a worker immediately from the program which created it, call `terminate()` on the worker object (like `w1` in the above snippets). Terminating a worker thread abruptly does not give it any chance to finish up its work or clean up any resources. It's akin to you closing a browser tab to kill a page.
 
 If you have two or more pages (or tabs with the same page!) in the browser that try to create a Worker from the same file URL, those will actually end up as completely separate Workers. Shortly, we'll discuss a way to "share" a Worker.
 
 **Note:** It may seem like a malicious or ignorant JS program could easily perform a denial-of-service attack on a system by spawning hundreds of Workers, seemingly each with their own thread. While it's true that it's somewhat of a guarantee that a Worker will end up on a separate thread, this guarantee is not unlimited. The system is free to decide how many actual threads/CPUs/cores it really wants to create. There's no way to predict or guarantee how many you'll have access to, though many people assume it's at least as many as the number of CPUs/cores available. I think the safest assumption is that there's at least one other thread besides the main UI thread, but that's about it.
+
+### Worker Environment
+
+Inside the Worker, you do not have access to any of the main program's resources. That means you cannot access any of its global variables, nor can you access the page's DOM, etc. Remember: it's a totally separate thread.
+
+You can however perform network operations (Ajax, WebSockets) and set timers. Also, the Worker has access to its own copy of several important global variables/features, including `navigator`, `location`, `JSON`, and `applicationCache`.
+
+You can also load extra JS scripts into your worker, using `importScripts(..)`:
+
+```js
+// inside the worker
+importScripts( "foo.js", "bar.js" );
+```
+
+These scripts are loaded synchronously, which means the `importScripts(..)` call will block the rest of the Worker's execution until the file(s) are finished loading and executing.
+
+**Note:** There have also been some discussions about exposing the `<canvas>` API to Workers, which combined with having canvases be Transferables (see "Data Transfer" below), would allow workers to perform more sophisticated off-thread graphics processing, which can be useful for high performance gaming (WebGL) and other similar applications. While this doesn't exist yet in any browsers, it's likely to happen in the near future.
 
 What are some common use-cases for Web Workers?
 
 * Processing intensive math calculations
 * Sorting large data sets
 * Data operations: compression, audio analysis, image pixel manipulations, etc
-* High traffic network communications: Ajax, Web Sockets
+* High traffic network communications
 
 ### Data Transfer
 
-You may notice a common characteristic of most of these use-cases, which is that it requires a large amount of information to be transferred across the event mechanism, perhaps in both directions.
+You may notice a common characteristic of most of those use-cases, which is that it requires a large amount of information to be transferred across the barrier between threads using the event mechanism, perhaps in both directions.
 
-In the early days of Workers, serializing all data to a string value was the only option. In addition to the speed penalty of the two way string serializations, the other major negative was that the data was being copied which meant a doubling of memory usage (and the subsequent churn of garbage collection).
+In the early days of Workers, serializing all data to a string value was the only option. In addition to the speed penalty of the two-way serializations, the other major negative was that the data was being copied which meant a doubling of memory usage (and the subsequent churn of garbage collection).
 
-Thankfully, we now have several better options.
+Thankfully, we now have a few better options.
 
 If you pass an object, a so-called "Structured Cloning Algorithm" (https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/The_structured_clone_algorithm) is used to copy/duplicate the object on the other side. This algorithm is fairly sophisticated and can even handle duplicating objects with circular references. The to-string/from-string performance penalty is not paid, but we still have duplication of memory using this approach. Support: IE10 and above, as well as all the other major browsers.
 
@@ -104,23 +123,62 @@ An even better option, especially for larger data sets, is "Transferable Objects
 
 You don't really have to do much special to opt-in to a Transferable Object; any data structure which implements the Transferable interface (https://developer.mozilla.org/en-US/docs/Web/API/Transferable) will automatically be transferred this way.
 
-For example, typed arrays like `Uint8Array` are Transferable. This is how you'd send a Transferable Object using `postMessage(..)`:
+For example, typed arrays like `Uint8Array` (see the *"ES6 & Beyond"* title of this series) are "Transferables". This is how you'd send a Transferable Object using `postMessage(..)`:
 
 ```js
 // `foo` is a `Uint8Array` for instance
 
-postMessage( foo, [ foo] );
+postMessage( foo.buffer, [ foo.buffer ] );
 ```
 
-The first parameter is the raw buffer, the second parameter is a list of what to transfer.
+The first parameter is the raw buffer and the second parameter is a list of what to transfer.
 
-Browsers which don't support Transferable Objects simply degrade to structured cloning, which means performance is the suffering factor rather than feature breakage.
+Browsers which don't support Transferable Objects simply degrade to structured cloning, which means performance reduction rather than outright feature breakage.
 
 ### Shared Workers
 
-If your site/app has the common use-case that someone may load it into multiple tabs on the same page, you may very well want to reduce the resource usage of your system by preventing duplicate dedicated workers. In this case, creating a single centralized Worker that all the page instances of your site/app can *share* is quite useful.
+If your site/app has the common use-case that someone may load multiple tabs of the same page, you may very well want to reduce the resource usage of your system by preventing duplicate dedicated workers; the most common limited resource in this respect is a socket network connection, as browsers limit the number of simulataneous connections to a single host.
 
-That's called a `SharedWorker`.
+In this case, creating a single centralized Worker that all the page instances of your site/app can *share* is quite useful.
+
+That's called a `SharedWorker`, which you create like so (support: Firefox & Chrome):
+
+```js
+var w1 = new SharedWorker( "http://some.url.1/mycoolworker.js" );
+```
+
+Since a shared Worker can be connected to from more than one program instance or page on your site, the Worker needs a way to know which program a message comes from. This unique identification is called a "port" -- think network socket ports. So the calling program must use the `port` object of the Worker for communication:
+
+```js
+w1.port.addEventListener( "message", handleMessages );
+```
+
+Also, the port must be initialized, as:
+
+```js
+w1.port.start();
+```
+
+Inside the shared Worker, an extra event must be handled: `"connect"`:
+
+```js
+// inside the shared Worker
+addEventListener( "connect", function(evt){
+	// the assigned port for this connection
+	var port = evt.ports[0];
+
+	port.addEventListener( "message", function(evt){
+		// ..
+	} );
+
+	// initialize the port connection
+	port.start();
+} );
+```
+
+Other than that, shared and dedicated Workers have the same capabilities and semantics.
+
+**Note:** Shared Workers survive the termination of a port connection if other port connections are still alive, whereas dedicated Workers are terminated whenever the connection to their initiating program is terminated.
 
 ## Parallel JS
 
