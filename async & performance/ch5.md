@@ -121,7 +121,7 @@ If you pass an object, a so-called "Structured Cloning Algorithm" (https://devel
 
 An even better option, especially for larger data sets, is "Transferable Objects" (http://updates.html5rocks.com/2011/12/Transferable-Objects-Lightning-Fast). What happens is that the object's "ownership" is transferred, but the data itself is not moved. Once you transfer away an object to a Worker, it's empty or inaccessible in the the originating location -- that eliminates the hazards of threaded programming over a shared scope. Of course, transfer of ownership can go in both directions.
 
-You don't really have to do much special to opt-in to a Transferable Object; any data structure which implements the Transferable interface (https://developer.mozilla.org/en-US/docs/Web/API/Transferable) will automatically be transferred this way.
+You don't really have to do much special to opt-in to a Transferable Object; any data structure which implements the Transferable interface (https://developer.mozilla.org/en-US/docs/Web/API/Transferable) will automatically be transferred this way (support Firefox & Chrome).
 
 For example, typed arrays like `Uint8Array` (see the *"ES6 & Beyond"* title of this series) are "Transferables". This is how you'd send a Transferable Object using `postMessage(..)`:
 
@@ -196,7 +196,9 @@ If a browser doesn't support Workers, there's simply no way to fake multi-thread
 
 As we detailed in Chapter 1, JS's asynchronicity (not parallelism) comes from the event loop queue, so you can force faked Workers to be asynchronous using timers (`setTimeout(..)`, etc). Then you just need to provide a polyfill for the Worker API. There are some listed here (https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills#web-workers), but frankly none of them look great.
 
-I've written a sketch of a polyfill for `Worker` here (// TODO).
+I've written a sketch of a polyfill for `Worker` here (https://gist.github.com/getify/1b26accb1a09aa53ad25). It's basic, but it should get the job done for simple `Worker` support, given that the 2-way messaging works correctly as well as `"onerror"` handling. You could probably also extend it with more features, such as `terminate()` or faked Shared Workers, as you see fit.
+
+**Note:** Since you can't fake synchronous blocking, this polyfill just disallows use of `importScripts(..)`. Another option might have been to parse and transform the worker's code (once Ajax loaded) to handle rewriting to some asynchronous form of an `importScripts(..)` polyfill, perhaps with a promise-aware interface.
 
 ## Parallel JS
 
