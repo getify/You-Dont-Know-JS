@@ -196,7 +196,7 @@ If a browser doesn't support Workers, there's simply no way to fake multi-thread
 
 As we detailed in Chapter 1, JS's asynchronicity (not parallelism) comes from the event loop queue, so you can force faked Workers to be asynchronous using timers (`setTimeout(..)`, etc). Then you just need to provide a polyfill for the Worker API. There are some listed here (https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills#web-workers), but frankly none of them look great.
 
-You could sketch out your own custom `Worker` polyfill without too much effort, similar to one I've done here (..).
+I've written a sketch of a polyfill for `Worker` here (// TODO).
 
 ## Parallel JS
 
