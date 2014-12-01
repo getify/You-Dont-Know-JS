@@ -241,7 +241,7 @@ Current proposals include `mapPar(..)` (parallel `map(..)`), `reducePar(..)` (pa
 
 ## SIMD
 
-Similar to Parallel JS, Single-Instruction-Multiple-Data (SIMD) is a another early experiment/proposal in "data parallelism", spearheaded by Intel (https://01.org/blogs/tlcounts/2014/bringing-simd-javascript), namely by Mohammad Haghighat (at time of writing), in cooperation with Firefox and Chrome teams.
+Similar to Parallel JS, Single-Instruction-Multiple-Data (SIMD) is a another early experiment/proposal in "data parallelism", spearheaded by Intel (https://01.org/node/1495), namely by Mohammad Haghighat (at time of writing), in cooperation with Firefox and Chrome teams.
 
 SIMD consists of data structures exposed in JavaScript with operations that automatically take advantage of system-level parallelism. SIMD is also on an early standards track with a good chance of making it into JavaScript in a future revision, perhaps in ES7 or ES8 timeframes.
 
@@ -262,7 +262,7 @@ SIMD.float32x4.mul( v1, v2 );	// [ 6.597339, 67.2, 138.89, 299.97 ]
 SIMD.uint32x4.add( v3, v4 );	// [ 20, 121, 1031, 10041 ]
 ```
 
-Shown here are two different vector data types, 32-bit floating points and 32-bit unsigned integers. You can see that these vectors are sized exactly to four elements, as this matches most CPUs. It's also possible we may see a `x8` (or larger) version of these vectors in the future.
+Shown here are two different vector data types, 32-bit floating points and 32-bit unsigned integers. You can see that these vectors are sized exactly to four elements, as this matches the SIMD in (Intel) CPUs. It's also possible we may see an `x8` or `x16` (or even larger!) version of these vectors in the future.
 
 Besides `mul(..)` and `add(..)` shown, other operations likely to be defined include: `equal(..)` (comparison), `sqrt(..)` (square root), `neg(..)` (numeric negation), and `abs(..)` (absolute value).
 
