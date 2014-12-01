@@ -31,9 +31,9 @@ And you'd want to know if these two pieces of the program have access to the sam
 
 Alternatively, you'd want to know how these two pieces could "communicate" if they couldn't share scope/resources.
 
-All these are great questions to consider as we explore a feature added to the web platform circa HTML5 called "Web Workers". This is a feature of the browser (aka host environment) and actually has almost nothing to do with the JS language itself. That is, JavaScript does not currently have any features that support threaded execution.
+All these are great questions to consider as we explore a feature added to the web platform circa HTML5 called "Web Workers". This is a feature of the browser (aka host environment) and actually has almost nothing to do with the JS language itself. That is, JavaScript does not *currently* have any features that support threaded execution.
 
-But an environment like your browser can easily provide multiple instances of the JavaScript engine, each on its own thread, and let you run a different program in each thread. Each of those separate threaded pieces of your program is called a "(Web) Worker".
+But an environment like your browser can easily provide multiple instances of the JavaScript engine, each on its own thread, and let you run a different program in each thread. Each of those separate threaded pieces of your program is called a "(Web) Worker". This type of parallelism is called "task parallelism", as the emphasis is on splitting up chunks of your program to run in parallel.
 
 From your main JS program (or another Worker), you instantiate a Worker like so:
 
@@ -235,15 +235,36 @@ However, there's a lot of nuanced caveat involved in Parallel JS. `mapPar(..)` w
 
 If any of those constraints is not fulfilled, the `mapPar(..)` operation will just continue to run sequentially on a single thread just as `map(..)` does. But if the callback doesn't violate any of them, on subsequent runs of `mapPar(..)` with the same callback, the JS engine may decide under the covers to switch into parallel threaded mode for execution, which on large data sets should show a huge improvement in performance.
 
-Current proposals include `mapPar(..)` (parallel `map(..)`), `reducePar(..)` (parallel `reduce(..)`), and `filterPar(..)` (parallel `filter(..)`), all on the `Array.prototype`. All of these operations are traditionally conceived of as independent, which means if you write your callbacks to adhere to those conventional rules/behaviors, Parallel JS should kick in and ramp up your program's performance.
+Current proposals include `mapPar(..)` (parallel `map(..)`), `reducePar(..)` (parallel `reduce(..)`), and `filterPar(..)` (parallel `filter(..)`), all on the `Array.prototype`. All of these operations are traditionally conceived of as independent (no side effects), which means if you write your callbacks to adhere to those conventions/behaviors, Parallel JS should kick in and ramp up your program's performance.
+
+**Note:** Parallel JS is considered "data parallelism" (as opposed to "task parallelism" like Web Workers), because the emphasis is not as much on program chunks being parallelized, but rather built-in data being spread out among the threads and operating independently on the data.
 
 ## SIMD
 
-Similar to Parallel JS, Single-Instruction-Multiple-Data (SIMD) is a another early experiment/proposal for a primitive data structure exposed in JavaScript that automatically takes advantage of system-level threading parallelism for its underlying operations. SIMD is also being spearheaded by Intel, namely by
+Similar to Parallel JS, Single-Instruction-Multiple-Data (SIMD) is a another early experiment/proposal in "data parallelism", spearheaded by Intel (https://01.org/blogs/tlcounts/2014/bringing-simd-javascript), namely by Mohammad Haghighat (at time of writing), in cooperation with Firefox and Chrome teams.
 
-In the case of SIMD, the system level capability revolves around "vectors" (specialized arrays) of numbers, where you specify a single mathematic operation to perform in parallel across all the numbers in the vector.
+SIMD consists of data structures exposed in JavaScript with operations that automatically take advantage of system-level parallelism. SIMD is also on an early standards track with a good chance of making it into JavaScript in a future revision, perhaps in ES7 or ES8 timeframes.
 
-Many modern CPUs have SIMD operations built-in and exposed to the operating system, so SIMD JavaScript proposes to expose APIs which on those systems would map the operations directly through to the CPU equivalents, but fallback to non-parallelized operation "shims" on non-SIMD systems.
+With SIMD, threads don't provide the parallelism. Instead, the CPU level capability revolves around "vectors" (type specialized arrays) of numbers, where you specify a single mathematic operation to perform in parallel across all the numbers in the vector, and what you get back is another vector of the same size with all the operations having been performed.
+
+Many modern CPUs have SIMD capabilities built-in and exposed to the operating system, so SIMD JavaScript proposes to expose APIs which on those systems would map the operations directly through to the CPU equivalents, with fallback to non-parallelized operation "shims" on non-SIMD systems. The obvious performance benefits for data intensive applications (signal analysis, matrix operations on graphics, etc) which expect such parallel math processing cannot be understated.
+
+Early proposal forms of the SIMD API at time of writing look like this:
+
+```js
+var v1 = SIMD.float32x4( 3.14159, 21.0, 32.3, 55.55 );
+var v2 = SIMD.float32x4( 2.1, 3.2, 4.3, 5.4 );
+
+var v3 = SIMD.uint32x4( 10, 101, 1001, 10001 );
+var v4 = SIMD.uint32x4( 10, 20, 30, 40 );
+
+SIMD.float32x4.mul( v1, v2 );	// [ 6.597339, 67.2, 138.89, 299.97 ]
+SIMD.uint32x4.add( v3, v4 );	// [ 20, 121, 1031, 10041 ]
+```
+
+Shown here are two different vector data types, 32-bit floating points and 32-bit unsigned integers. You can see that these vectors are sized exactly to four elements, as this matches most CPUs. It's also possible we may see a `x8` (or larger) version of these vectors in the future.
+
+Besides `mul(..)` and `add(..)` shown, other operations likely to be defined include: `equal(..)` (comparison), `sqrt(..)` (square root), `neg(..)` (numeric negation), and `abs(..)` (absolute value).
 
 ## asm.js
 
@@ -260,3 +281,5 @@ Web Workers let you run a JS file (aka program) in a separate thread using async
 Parallel JS is an experimental proposal for bringing parallelizable operations to large data sets (arrays, etc) using threads behind the scenes, assuming the operation callbacks behave in thread-safe ways. SIMD is similar, but proposes to map CPU-level parallel math operations to JavaScript APIs for high performance number processing in large data sets.
 
 Finally, asm.js describes a small subset of JavaScript which avoids the hard-to-optimize parts of JS (like garbage collection and coercion) and lets the JS engine recognize and run such code through aggressive optimizations. asm.js could be hand authored, but that's extremely tedious and error-prone, akin to hand authoring assembly language (hence the name). Instead, the main intent is that asm.js would be a good target for cross-compilation from other highly optimized program languages -- for example, Emscripten transpiling C/C++ to JavaScript.
+
+While not covered explicitly in this chapter, there are even more radical ideas under very early discussion for JavaScript, including approximations of direct threaded functionality (not just hidden behind data structure APIs). Whether that happens explicitly, or we just see more parallelism creep into JS behind the scenes, the future of more optimized program-level performance in JS looks really optimistic.
