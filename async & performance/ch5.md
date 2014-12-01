@@ -188,6 +188,16 @@ Other than that difference, shared and dedicated Workers have the same capabilit
 
 **Note:** Shared Workers survive the termination of a port connection if other port connections are still alive, whereas dedicated Workers are terminated whenever the connection to their initiating program is terminated.
 
+### Polyfilling Web Workers
+
+Web Workers are very attractive performance-wise for running JS programs in parallel. However, you may be in a position where your code needs to run in older browsers which lack support. Since Workers are an API and not a syntax, they can be polyfilled, to an extent.
+
+If a browser doesn't support Workers, there's simply no way to fake multi-threading from the performance perspective. Iframes are commonly thought of to provide a parallel environment, but in all modern browsers they actually run on the same thread as the main page, so they're not sufficient for faking parallelism.
+
+As we detailed in Chapter 1, JS's asynchronicity (not parallelism) comes from the event loop queue, so you can force faked Workers to be asynchronous using timers (`setTimeout(..)`, etc). Then you just need to provide a polyfill for the Worker API. There are some listed here (https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills#web-workers), but frankly none of them look great.
+
+You could sketch out your own custom `Worker` polyfill without too much effort, similar to one I've done here (..).
+
 ## Parallel JS
 
 ## SIMD
