@@ -280,11 +280,11 @@ There's been some disagreement between browser vendors over exactly how asm.js s
 
 ### How To Optimize With asm.js
 
-**Note:** We're going to illustrate asm.js style code here for learning/understanding purposes, but please be aware that it's not commonly expected that you'll hand author such code. asm.js is more intended to a compliation target from other tools, such as Emscripten (https://github.com/kripken/emscripten/wiki). It's of course possible to write your own asm.js code, but that's usually a bad idea because the code is very low-level and managing it can be very time consuming and error prone. Nevertheless, there may be cases where you'd want to hand tweak your code for asm.js purposes,
-
 The first thing to understand about asm.js optimizations is around types and coercion (see the *"Types & Grammar"* title of this series). If the JS engine has to track multiple different types of values in a variable through various operations, so that it can handle coercions between types as necessary, that's a lot of extra work that keeps the program optimization from being optimal.
 
-However, there are some "tricks" you can do which can hint to the JS engine what the intended type is for variables/operations, so that it can skip these coercion tracking steps.
+**Note:** We're going to illustrate asm.js style code here for learning/understanding purposes, but please be aware that it's not commonly expected that you'll hand author such code. asm.js is more intended to a compliation target from other tools, such as Emscripten (https://github.com/kripken/emscripten/wiki). It's of course possible to write your own asm.js code, but that's usually a bad idea because the code is very low-level and managing it can be very time consuming and error prone. Nevertheless, there may be cases where you'd want to hand tweak your code for asm.js optimization purposes.
+
+There are some "tricks" you can do which can hint to an asm.js aware JS engine what the intended type is for variables/operations, so that it can skip these coercion tracking steps.
 
 For example:
 
