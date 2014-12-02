@@ -266,7 +266,7 @@ Shown here are two different vector data types, 32-bit floating point numbers an
 
 Besides `mul()` and `add()` shown, many other operations are likely to be included, such as: `sub(), div(), abs(), neg(), sqrt(), reciprocal(), reciprocalSqrt()` (arithmetic), `shuffle()` (rearrange vector elements), `and(), or(), xor(), not()` (logical), `equal(), greaterThan(), lessThan()` (comparison), `shiftLeft(), shiftRightLogical(), shiftRightArithmetic()` (shifts), `fromFloat32x4(), fromInt32x4()` (conversions).
 
-**Note:** There's an official "prolyfill" (expectant future-leaning polyfill) for the SIMD functionality available here (https://github.com/johnmccutchan/ecmascript_simd), which illustrates a lot more of the planned SIMD capability than we've illustrated here.
+**Note:** There's an official "polyfill" (expectant future-leaning polyfill) for the SIMD functionality available here (https://github.com/johnmccutchan/ecmascript_simd), which illustrates a lot more of the planned SIMD capability than we've illustrated here.
 
 ## asm.js
 
