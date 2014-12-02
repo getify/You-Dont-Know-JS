@@ -243,11 +243,11 @@ Current proposals include `mapPar(..)` (parallel `map(..)`), `reducePar(..)` (pa
 
 Similar to Parallel JS, Single-Instruction-Multiple-Data (SIMD) is a another early experiment/proposal in "data parallelism", spearheaded by Intel (https://01.org/node/1495), namely by Mohammad Haghighat (at time of writing), in cooperation with Firefox and Chrome teams.
 
-SIMD consists of data structures exposed in JavaScript with operations that automatically take advantage of system-level parallelism. SIMD is also on an early standards track with a good chance of making it into JavaScript in a future revision, perhaps in ES7 or ES8 timeframes.
+SIMD consists of short vector types and operations exposed in JavaScript. The operations are low level operations that will take advantage of instruction-level parallelism available in modern CPUs. SIMD is also on an early standards track with a good chance of making it into a future revision of JavaScript, likely in an early revision of ES7.
 
 With SIMD, threads don't provide the parallelism. Instead, the CPU level capability revolves around "vectors" (type specialized arrays) of numbers, where you specify a single mathematic operation to perform in parallel across all the numbers in the vector, and what you get back is another vector of the same size with all the operations having been performed.
 
-Many modern CPUs have SIMD capabilities built-in and exposed to the operating system, so SIMD JavaScript proposes to expose APIs which on those systems would map the operations directly through to the CPU equivalents, with fallback to non-parallelized operation "shims" on non-SIMD systems. The obvious performance benefits for data intensive applications (signal analysis, matrix operations on graphics, etc) which expect such parallel math processing cannot be understated.
+Many modern CPUs have SIMD capabilities, i.e. special vector registers and special vector instructions.  SIMD JavaScript proposes to expose APIs which on those CPUs would map the operations directly through to the CPU equivalents, with fallback to non-parallelized operation "shims" on non-SIMD systems. The obvious performance benefits for data intensive applications (signal analysis, matrix operations on graphics, etc) which expect such parallel math processing cannot be understated.
 
 Early proposal forms of the SIMD API at time of writing look like this:
 
@@ -255,16 +255,16 @@ Early proposal forms of the SIMD API at time of writing look like this:
 var v1 = SIMD.float32x4( 3.14159, 21.0, 32.3, 55.55 );
 var v2 = SIMD.float32x4( 2.1, 3.2, 4.3, 5.4 );
 
-var v3 = SIMD.uint32x4( 10, 101, 1001, 10001 );
-var v4 = SIMD.uint32x4( 10, 20, 30, 40 );
+var v3 = SIMD.int32x4( 10, 101, 1001, 10001 );
+var v4 = SIMD.int32x4( 10, 20, 30, 40 );
 
 SIMD.float32x4.mul( v1, v2 );	// [ 6.597339, 67.2, 138.89, 299.97 ]
-SIMD.uint32x4.add( v3, v4 );	// [ 20, 121, 1031, 10041 ]
+SIMD.int32x4.add( v3, v4 );	// [ 20, 121, 1031, 10041 ]
 ```
 
-Shown here are two different vector data types, 32-bit floating points and 32-bit unsigned integers. You can see that these vectors are sized exactly to four elements, as this matches the SIMD in (Intel) CPUs. It's also possible we may see an `x8` or `x16` (or even larger!) version of these vectors in the future.
+Shown here are two different vector data types, 32-bit floating points and 32-bit integers. You can see that these vectors are sized exactly to four 32-bit elements, as this matches the SIMD vector sizes (128-bit) available in most modern CPUs. It's also possible we may see an `x8` or `x16` (or even larger!) version of these vectors in the future.
 
-Besides `mul(..)` and `add(..)` shown, other operations likely to be defined include: `equal(..)` (comparison), `sqrt(..)` (square root), `neg(..)` (numeric negation), and `abs(..)` (absolute value).
+Besides `mul()` and `add()` shown, many other operations are likely to be included, for example: `sub(), div(), abs(), neg(), sqrt(), reciprocal(), reciprocalSqrt()` (arithmetic), `shuffle()` (rearrange vector elements), `and(), or(), xor(), not()` (logical), `equal(), greaterThan(), lessThan()` (comparison), `shiftLeft(), shiftRightLogical(), shiftRightArithmetic()` (shifts), `fromFloat32x4(), fromInt32x4()` (conversions).
 
 ## asm.js
 
