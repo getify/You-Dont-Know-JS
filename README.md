@@ -12,9 +12,10 @@ Please feel free to contribute to the quality of this content by submitting PR's
 
 ## Titles
 
+* "Up & Going" (planned)
 * ["Scope & Closures"](scope & closures/README.md#you-dont-know-js-scope--closures) (<a href="http://shop.oreilly.com/product/0636920026327.do">published</a>!)
 * ["this & Object Prototypes"](this & object prototypes/README.md#you-dont-know-js-this--object-prototypes) (<a href="http://shop.oreilly.com/product/0636920033738.do">published</a>!)
-* ["Types & Grammar"](types & grammar/README.md#you-dont-know-js-types--grammar) (draft complete)
+* ["Types & Grammar"](types & grammar/README.md#you-dont-know-js-types--grammar) (in editing)
 * ["Async & Performance"](async & performance/README.md#you-dont-know-js-async--performance) (draft in progress)
 * "ES6 & Beyond" (planned)
 
