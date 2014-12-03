@@ -14,7 +14,7 @@
 * [Chapter 3: Promises](ch3.md)
 * [Chapter 4: Generators](ch4.md)
 * [Chapter 5: Program Performance](ch5.md)
-* [Chapter 6: Tuning & Benchmarking](ch6.md)
+* [Chapter 6: Benchmarking & Tuning](ch6.md)
 * [Appendix A: Library: asynquence](apA.md)
 * [Appendix B: Advanced Async Patterns](apB.md)
 * [Appendix C: Thank You's!](apC.md)

@@ -36,6 +36,7 @@
 	* Web Workers
 	* Parallel JS
 	* SIMD
+	* asm.js
 * Chapter 6: Tuning & Benchmarking
 	* Benchmarking
 	* Microperformance
