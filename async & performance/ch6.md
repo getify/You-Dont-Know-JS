@@ -86,9 +86,25 @@ bench.stats.variance;		// variance across samples
 
 There's *lots* more to learn about Benchmark.js besides this glance I'm including here. But the point is that it's handling all of the complexities of setting up a fair and reliable and valid performance benchmark for a piece of JavaScript code. If you're going to try to test and benchmark your code, this library is the first place you should turn.
 
+We're showing here the usage to test a single operation like X, but it's fairly common that you want to compare X to Y. This is easy to do by simply setting up two different tests in a "Suite" (a Benchmark.js organizational feature). Then, you run them head-to-head, and compare the statistics to conclude whether X or Y was faster.
+
+Benchmark.js can of course be used to test JavaScript in a browser, but it can also run in non-browser environments (node.js, etc).
+
+One largely untapped potential use-case for Benchmark.js is to use it in your Dev or QA environments to run automated performance regression tests against critical path parts of your application's JavaScript. Similar to how you might run unit test suites before deployment, you can also compare the performance against previous benchmarks to monitor if you are improving or degrading application performance.
+
+#### Context Is King
+
+Don't forget to check the context of a particular performance benchmark, especially a comparison between X and Y tasks. Just because your test reveals that X is faster than Y doesn't mean that the conclusion "X is faster than Y" is actually relevant.
+
 ### jsPerf.com
 
-There's an awesome website called jsPerf (http://jsperf.com).
+While Benchmark.js is useful for testing the performance of your code in whatever JS environment you're running, it cannot be stressed enough that you need to compile test results from lots of different environments (desktop browsers, mobile devices, etc) if you want to have any hope of reliable test conclusions.
+
+For example, Chrome on a high end desktop machine is not likely to perform anywhere near the same as Chrome mobile on a smartphone. And a smartphone with a full battery charge is not likely to perform anywhere near the same as a smartphone with 2% battery life left, when the device is starting to power down the radio and processor.
+
+If you want to make assertions like "X is faster than Y" in any reasonable sense across more than just a single environment, you're going to need to actually test as many of those real world environments as possible. Just because Chrome executes some X operation faster than Y doesn't mean that all browsers do. And of course you also probably will want to cross-reference the results of multiple browser test runs with the demographics of your users.
+
+There's an awesome website for this purpose called jsPerf (http://jsperf.com).
 
 ## Microperformance
 
