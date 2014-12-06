@@ -96,6 +96,22 @@ One largely untapped potential use-case for Benchmark.js is to use it in your De
 
 Don't forget to check the context of a particular performance benchmark, especially a comparison between X and Y tasks. Just because your test reveals that X is faster than Y doesn't mean that the conclusion "X is faster than Y" is actually relevant.
 
+For example, let's say a performance test reveals that X runs 10,000,000 operations per second, and Y runs at 8,000,000 operations per second. You could claim that Y is 20% slower than X, and you'd be mathematically correct, but your assertion doesn't hold as much water as you'd think.
+
+Let's think about the results more critically. 10,000,000 operations per second is 10,000 operations per millisecond, and 10 operations per microsecond. In other words, a single operation takes 0.1 microseconds, or 100 nanoseconds. It's hard to fathom just how small 100ns is, but for comparison, it's often cited that the human eye isn't generally capable of distinguishing anything less than 100ms, which is one million times slower than the 100ns speed of the X operation.
+
+Even recent scientific studies showing that maybe the brain can process as quick as 13ms (about 8x faster than previously asserted) would mean that X is still running 125,000 times faster than the human brain can perceive a distinct thing happening. **X is going really, really fast.**
+
+But more importantly, let's talk about the difference between X and Y, the 2,000,000 operations per second difference. If X takes 100ns, and Y takes 80ns, the difference is 20ns, which in the best case is still one 650-thousandth of the interval the human brain can perceive.
+
+What's my point? **None of this performance difference matters, at all.**
+
+But wait, what if this operation is going to happen a whole bunch of times in a row? Then the difference could add up. OK, so what we're asking then is, how likely is it that operation X is going to be run over and over again, one right after the other, and that this has to happen 650,000 times just to get a sliver of a hope the human brain could perceive it. More likely, it'd have to happen 5,000,000 to 10,000,000 times right in a tight loop to even approach mattering.
+
+While the computer scientist in you might protest that this is possible, the realist in you should sanity check just how unlikely that really is. Even if it is relevant in rare occasions, it's irrelevant in almost all situations.
+
+The fact is, the vast majority of your benchmark results on tiny operations -- recall the `++x` vs `x++` myths -- **are just totally bogus** for supporting the conclusion that X should be favored over Y on a performance basis.
+
 ### jsPerf.com
 
 While Benchmark.js is useful for testing the performance of your code in whatever JS environment you're running, it cannot be stressed enough that you need to compile test results from lots of different environments (desktop browsers, mobile devices, etc) if you want to have any hope of reliable test conclusions.
