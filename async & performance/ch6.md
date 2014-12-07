@@ -110,7 +110,7 @@ But wait, what if this operation is going to happen a whole bunch of times in a 
 
 While the computer scientist in you might protest that this is possible, the realist in you should sanity check just how unlikely that really is. Even if it is relevant in rare occasions, it's irrelevant in almost all situations.
 
-The fact is, the vast majority of your benchmark results on tiny operations -- recall the `++x` vs `x++` myths -- **are just totally bogus** for supporting the conclusion that X should be favored over Y on a performance basis.
+The fact is, the vast majority of your benchmark results on tiny operations -- recall the `++x` vs `x++` myths mentioned earlier -- **are just totally bogus** for supporting the conclusion that X should be favored over Y on a performance basis.
 
 ### jsPerf.com
 
