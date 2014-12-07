@@ -182,7 +182,7 @@ else ..
 
 But there's several problems with reasoning about this code linearly in such a fashion.
 
-First, it's an accident of the example that our steps are on subsequent lines (1, 2, 3, and 4..). In real async JS programs, there's often a lot more noise cluttering things up, noise which we have to deftly maneuver past in our brains as we jump from one function to the next. Pulling out the async flow from such callback-laden code is not impossible, but it's certainly not natural or easy, even with lots of practice.
+First, it's an accident of the example that our steps are on subsequent lines (1, 2, 3, and 4..). In real async JS programs, there's often a lot more noise cluttering things up, noise that we have to deftly maneuver past in our brains as we jump from one function to the next. Pulling out the async flow from such callback-laden code is not impossible, but it's certainly not natural or easy, even with lots of practice.
 
 But also, there's something deeper wrong, which isn't evident just in that code example. Let me make up another scenario (pseudo-code'ish) to illustrate it:
 
@@ -433,7 +433,7 @@ Hell indeed.
 
 ## Trying To Save Callbacks
 
-There are several variations of callback design which have attempted to address some (not all!) of the trust issues we've just looked at. It's a valiant, but doomed, effort to save the callback pattern from imploding on itself.
+There are several variations of callback design that have attempted to address some (not all!) of the trust issues we've just looked at. It's a valiant, but doomed, effort to save the callback pattern from imploding on itself.
 
 For example, regarding more graceful error handling, some API designs provide for split callbacks (one for the success notification, one for the error notification):
 
@@ -472,7 +472,7 @@ ajax( "http://some.url.1", response );
 
 In both of these cases, several things should be observed.
 
-First, it's not really resolved the majority of trust issues like it may appear. There's nothing about either callback which prevents or filters unwanted repeated invocations. Moreover, things are worse now, because you may get both success and error signals, or neither, and you still have to code around either of those conditions.
+First, it's not really resolved the majority of trust issues like it may appear. There's nothing about either callback that prevents or filters unwanted repeated invocations. Moreover, things are worse now, because you may get both success and error signals, or neither, and you still have to code around either of those conditions.
 
 Also, don't miss the fact that while it's a standard pattern you can employ, it's definitely more verbose and boilerplate'ish without much reuse, so you're going to get weary of typing all that out for every single callback in your application.
 
@@ -512,7 +512,7 @@ function foo(err,data) {
 ajax( "http://some.url.1", timeoutify( foo, 500 ) );
 ```
 
-Another trust issue is being called "too early". In application-specific terms, this may actually be being called before some critical task is complete. But more generally, the problem is evident in utilities which can either invoke the callback you provide *now* (synchronously), or *later* (asynchronously).
+Another trust issue is being called "too early". In application-specific terms, this may actually be being called before some critical task is complete. But more generally, the problem is evident in utilities that can either invoke the callback you provide *now* (synchronously), or *later* (asynchronously).
 
 This non-determinism around the sync-or-async behavior is almost always going to lead to very difficult to track down bugs. In some circles, the fictional insanity-inducing monster named Zalgo is used to describe the sync/async nightmares. "Don't release Zalgo!" (https://github.com/oren/oren.github.io/blob/master/posts/zalgo.md) is a common cry, and it leads to very sound advice: always invoke callbacks asynchronously, even if that's "right away" on the next turn of the event loop, so that all callbacks are predictably async.
 
