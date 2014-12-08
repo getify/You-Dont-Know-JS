@@ -25,11 +25,11 @@ Moreover, a sequence will always proceed linearly from step to step, meaning tha
 
 Of course, a new sequence can be forked off an existing sequence, meaning the fork only occurs once the main sequence reaches that point in the flow. Sequences can also be combined in various ways, including having one sequence subsumed by another sequence at a particular point in the flow.
 
-A sequence is kind of like a promise chain. However, with promise chains, there is no "handle" to grab which references the entire chain. Whichever promise you have a reference to only represents the current step in the chain plus any other steps hanging off it. Essentially, you cannot hold a reference to a promise chain unless you hold a reference to the first promise in the chain.
+A sequence is kind of like a promise chain. However, with promise chains, there is no "handle" to grab that references the entire chain. Whichever promise you have a reference to only represents the current step in the chain plus any other steps hanging off it. Essentially, you cannot hold a reference to a promise chain unless you hold a reference to the first promise in the chain.
 
 There are many cases where it turns out to be quite useful to have a handle that references the entire sequence collectively. The most important of those cases is with sequence abort/cancel. As we covered extensively in Chapter 3, promises themselves should never be able to be canceled, as this violates a fundamental design imperative: external immutability.
 
-But sequences have no such immutability design principle, mostly because sequences are not passed around as future-value containers which need immutable value semantics. So sequences are the proper level of abstraction to handle abort/cancel behavior. *asynquence* sequences can be `abort()`ed at any time, and the sequence will stop at that point and not go for any reason.
+But sequences have no such immutability design principle, mostly because sequences are not passed around as future-value containers that need immutable value semantics. So sequences are the proper level of abstraction to handle abort/cancel behavior. *asynquence* sequences can be `abort()`ed at any time, and the sequence will stop at that point and not go for any reason.
 
 There's plenty more reasons to prefer a sequence abstraction on top of promise chains, for flow control purposes.
 
@@ -39,13 +39,13 @@ Abstractions are meant to reduce boilerplate and tedium, so the sequence abstrac
 
 This abstraction complexity reduction is especially powerful when you start thinking about higher-order promise patterns (beyond `race([..])` and `all([..])`.
 
-For example, in the middle of a sequence, you may want to express a step which conceptually is like a `try..catch` in that the step will always result in success, either the intended main success resolution or a positive non-error signal for the caught error. Or, you might want to express a step that is like a retry/until loop, where it keeps trying the same step over and over until success occurs.
+For example, in the middle of a sequence, you may want to express a step that is conceptually like a `try..catch` in that the step will always result in success, either the intended main success resolution or a positive non-error signal for the caught error. Or, you might want to express a step that is like a retry/until loop, where it keeps trying the same step over and over until success occurs.
 
 These sorts of abstractions are quite non-trivial to express using only promise primitives, and doing so in the middle of an existing promise chain is not pretty. But if you abstract your thinking to a sequence, and consider a step as a wrapper around a promise, that step wrapper can hide such details, freeing you to think about the flow control in the most sensible way without being bothered by the details.
 
 Secondly, and perhaps more importantly, thinking of async flow control in terms of steps in a sequence allows you to abstract out the details of what types of asynchronicity are involved with each individual step. Under the covers, a promise will always control the step, but above the covers, that step can look either like a continuation callback (the simple default), or like a real promise, or as a run-to-completion generator, or ... Hopefully, you get the picture.
 
-Thirdly, sequences can more easily be twisted to adapt to different modes of thinking, such as event/stream/reactive based coding. *asynquence* provides a pattern I call "reactive sequences" (which we'll cover later) as a variation on the "reactive observable" ideas in RxJS ("Reactive Extensions"), which lets a repeatable event fire of a new sequence instance each time. Promises are one-shot-only, so it's quite awkward to express repetitious asynchrony with promises alone.
+Thirdly, sequences can more easily be twisted to adapt to different modes of thinking, such as event/stream/reactive based coding. *asynquence* provides a pattern I call "reactive sequences" (which we'll cover later) as a variation on the "reactive observable" ideas in RxJS ("Reactive Extensions"), that lets a repeatable event fire off a new sequence instance each time. Promises are one-shot-only, so it's quite awkward to express repetitious asynchrony with promises alone.
 
 Another alternate mode of thinking inverts the resolution/control capability in a pattern I call "iterable sequences". Instead of each individual step internally controlling its own completion (and thus advancement of the sequence), the sequence is inverted so the advancement control is through an external iterator, and each step in the *iterable sequence* just responds to the `next(..)` *iterator* control.
 
@@ -266,7 +266,7 @@ Yuck. Promises require a lot more boilerplate overhead to express the same async
 
 #### Step Variations
 
-There are several variations in the contrib plugins on *asynquence*'s `gate(..)` step type which can be quite helpful:
+There are several variations in the contrib plugins on *asynquence*'s `gate(..)` step type that can be quite helpful:
 
 * `any(..)` is like `gate(..)`, except just one segment has to eventually succeed to proceed on the main sequence.
 * `first(..)` is like `any(..)`, except as soon as any segment succeeds, the main sequence proceeds (ignoring subsequent results from other segments).
