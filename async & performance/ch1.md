@@ -5,7 +5,7 @@ One of the most important and yet often misunderstood parts of programming in a 
 
 This is not just about what happens from the beginning of a `for` loop to the end of a `for` loop, which of course takes *some time* (microseconds to milliseconds) to complete. It's about what happens when part of your program runs *now*, and another part of your program runs *later* -- there's a gap between *now* and *later* where your program isn't actively executing.
 
-Practically all non-trivial programs ever written (especially in JS) have in some way or another had to manage this gap, whether that be in waiting for user input, requesting data from a database or file system, sending data across the network and waiting for a response, or performing a repeated task at a fixed interval of time (like animation). In all these various ways, your program has to manage state across the gap in time. As they famously say in London (of the subway system): "mind the gap".
+Practically all non-trivial programs ever written (especially in JS) have in some way or another had to manage this gap, whether that be in waiting for user input, requesting data from a database or file system, sending data across the network and waiting for a response, or performing a repeated task at a fixed interval of time (like animation). In all these various ways, your program has to manage state across the gap in time. As they famously say in London (of the chasm between the subway door and the platform): "mind the gap".
 
 In fact, the relationships between the *now* and *later* parts of your program is at the heart of asynchronous programming.
 
@@ -99,7 +99,7 @@ There is no specification or set of requirements around how the `console.*` meth
 
 So, different browsers and JS environments do as they please, which can sometimes lead to confusing behavior.
 
-In particular, there are some browsers and some conditions that `console.log(..)` does not actually immediately output what it's given. The main reason this may happen is because I/O is a very slow and blocking part of many programs (not just JS). So, it may be more performant (from the page/UI perspective) for a browser to handle `console` I/O asynchronously in the background, without you perhaps even knowing that occurred.
+In particular, there are some browsers and some conditions that `console.log(..)` does not actually immediately output what it's given. The main reason this may happen is because I/O is a very slow and blocking part of many programs (not just JS). So, it may perform better (from the page/UI perspective) for a browser to handle `console` I/O asynchronously in the background, without you perhaps even knowing that occurred.
 
 A not terribly common, but possible, scenario where this could be *observable* (not from code itself but from the outside):
 
@@ -117,7 +117,7 @@ a.index++;
 
 We'd normally expect to see the `a` object be snapshotted at the exact moment of the `console.log(..)` statement, printing something like `{ index: 1 }`, such that in the next statment when `a.index++` happens, it's modifying something different than, or just strictly after, the output of `a`.
 
-Most of the time, the above code will probably produce an object representation in your developer tools' console that's essentially what you'd expect. But it's possible this same code could run in a situation where the browser felt it needed to defer the console I/O to the background, in which case it's *possible* that by the time the object is represented in the browser console, the `a.index++` has already happened, and it shows `{ index: 2 }`.
+Most of the time, the above code will probably produce an object representation in your developer tools' console that's what you'd expect. But it's possible this same code could run in a situation where the browser felt it needed to defer the console I/O to the background, in which case it's *possible* that by the time the object is represented in the browser console, the `a.index++` has already happened, and it shows `{ index: 2 }`.
 
 It's a moving target under what conditions exactly `console` I/O will be deferred, or even whether it will be observable. Just be aware of this possible asynchronicity in I/O in case you ever run into issues in debugging where objects have been modified *after* a `console.log(..)` statement and yet you see the unexpected modifications show up.
 
@@ -131,19 +131,19 @@ Let's make a (perhaps shocking) claim: despite you clearly being able to write a
 
 "Asked to." By whom? That's the important part!
 
-The JS engine doesn't run in isolation. It runs inside a *hosting environment*, which is for most developers the typical web browser. Over the last several years (but by no means exlusively), JS has expanded beyond the browser into other environments, such as servers, via things like node.js. In fact, JavaScript gets embedded into all kinds of devices these days, from robots to lightbulbs.
+The JS engine doesn't run in isolation. It runs inside a *hosting environment*, which is for most developers the typical web browser. Over the last several years (but by no means exlusively), JS has expanded beyond the browser into other environments, such as servers, via things like Node.js. In fact, JavaScript gets embedded into all kinds of devices these days, from robots to lightbulbs.
 
-But the one common "thread" (that's a not-so-subtle asynchronous joke, btw) of all these environments is that they have a mechanism in them that handles executing multiple chunks of your program *over time*, at each moment invoking the JS engine, called the "event loop".
+But the one common "thread" (that's a not-so-subtle asynchronous joke, for what it's worth) of all these environments is that they have a mechanism in them that handles executing multiple chunks of your program *over time*, at each moment invoking the JS engine, called the "event loop".
 
 In other words, the JS engine has had no innate sense of *time*, but has instead been an on-demand execution environment for any arbitrary snippet of JS. It's the surrouding environment that has always *scheduled* "events" (JS code executions).
 
-So, for example, when your JS program makes an Ajax request to fetch some data from a server, you set up the "response" code in a function (commonly called a "callback"), and the JS engine tells the hosting environment basically, "hey, I'm going to suspend execution for now, but whenever you finish with that network request, and you have some data, please *call-back* to this function."
+So, for example, when your JS program makes an Ajax request to fetch some data from a server, you set up the "response" code in a function (commonly called a "callback"), and the JS engine tells the hosting environment, "Hey, I'm going to suspend execution for now, but whenever you finish with that network request, and you have some data, please *call* this function *back*."
 
-The browser then is set up to listen for the response from the network, and when it has something to give you, it schedules the callback function to be executed by inserting it into the *event loop*.
+The browser is then set up to listen for the response from the network, and when it has something to give you, it schedules the callback function to be executed by inserting it into the *event loop*.
 
 So what is the *event loop*?
 
-Let's conceptualize it first through some fake'ish code:
+Let's conceptualize it first through some fake-ish code:
 
 ```js
 // `eventLoop` is an array that acts as a queue (first-in, first-out)
@@ -174,9 +174,9 @@ As you can see, there's a continuously running loop represented by the `while` l
 
 It's important to note that `setTimeout(..)` doesn't put your callback on the event loop queue. What it does is set up a timer; when the timer expires, the environment places your callback into the event loop, such that some future tick will pick it up and execute it.
 
-What if there's already 20 items in the event loop at that moment? Your callback waits. It gets in line behind the others -- there's not normally a path to pre-empting the queue and skipping ahead in line. This explains why `setTimeout(..)` timers may not fire with perfect temporal accuracy. Basically, you're guaranteed (roughly speaking) that your callback won't fire *before* the time interval you specify, but it can happen at or after that time, depending on the state of the event queue.
+What if there are already 20 items in the event loop at that moment? Your callback waits. It gets in line behind the others -- there's not normally a path for pre-empting the queue and skipping ahead in line. This explains why `setTimeout(..)` timers may not fire with perfect temporal accuracy. You're guaranteed (roughly speaking) that your callback won't fire *before* the time interval you specify, but it can happen at or after that time, depending on the state of the event queue.
 
-So, in other words, your program is generally broken up into lots of small chunks, which happen one after the other in the event loop queue. And technically, other events not related directly to your program can be interspersed into the queue, as well.
+So, in other words, your program is generally broken up into lots of small chunks, which happen one after the other in the event loop queue. And technically, other events not related directly to your program can be interleaved within the queue as well.
 
 **Note:** We mentioned "up until recently" in relation to ES6 changing the nature of where the event loop queue is managed. It's mostly a formal technicality, but ES6 now specifies exactly how the event loop works, which means technically it's within the purview of the JS engine, rather than just the *hosting environment*. One main reason for this change is the introduction of ES6 promises, which we'll discuss in Chapter 3, because they require the ability to have direct, fine-grained control over scheduling operations on the event loop queue (see the discussion of `setTimeout(..0)` towards the end of this chapter).
 
@@ -184,9 +184,17 @@ So, in other words, your program is generally broken up into lots of small chunk
 
 It's very common to conflate the terms "async" and "parallel", but they are actually quite different. Remember, async is about the gap between *now* and *later*. But parallel is about things being able to occur simultaneously.
 
-The most common programming expression for parallel processing is threads. A thread is essentially a queue of operations, not totally dissimilar from the event loop queue we saw previously. But, there are some important differences.
+The most common tools for parallel computing are processes and threads.
+Processes and threads execute independently and may execute simultaneously: on
+separate processors, or even separate computers, but multiple threads can share
+the memory of a single process.
+An event loop, by contrast, breaks its work into tasks and executes them in
+serial, disallowing parallel access and changes to shared memory.
+Parallelism and "serialism" can co-exist in the form of cooperating event loops
+in separate threads.
 
-Primarily, a thread handles much lower level tasks than you would traditionally think about as existing in the event loop queue.
+The interleaving of parallel threads of execution and the interleaving of
+asynchronous events occur at very different levels of granularity.
 
 For example:
 
@@ -221,7 +229,7 @@ ajax( "http://some.url.2", bar );
 
 In JavaScript's single-threaded behavior, if `foo()` runs before `bar()`, the result is that `a` has `42`, but if `bar()` runs before `foo()` the result in `a` will be `41`.
 
-If JS had threaded programming, though, the problems would be much more subtle. Consider these two lists of pseduo-code tasks as the threads that could respectively run the code in `foo()` and `bar()`, and consider what happens if they are running at exactly the same time:
+If JS events sharing the same data executed in parallel, though, the problems would be much more subtle. Consider these two lists of pseduo-code tasks as the threads that could respectively run the code in `foo()` and `bar()`, and consider what happens if they are running at exactly the same time:
 
 Thread 1 (`X` and `Y` are temporary memory locations):
 ```
@@ -271,9 +279,9 @@ The result in `a` will be `44`. But what about this ordering?
 
 The result in `a` will be `21`.
 
-So, threaded programming is very tricky, because if you don't take special steps to prevent this kind of interruption/interleaving from happening, you can get very surprising, non-deterministic behavior, and that usually leads to headaches for developers.
+So, threaded programming is very tricky, because if you don't take special steps to prevent this kind of interruption/interleaving from happening, you can get very surprising, non-deterministic behavior that frequently lead to headaches.
 
-JavaScript is single-threaded, which means *that* level of non-determinism isn't a concern. But that doesn't mean JS is always deterministic. Remember above, where the relative ordering of `foo()` and `bar()` produces two different results (`41` or `42`)?
+JavaScript never shares data accross threads, which means *that* level of non-determinism isn't a concern. But that doesn't mean JS is always deterministic. Remember above, where the relative ordering of `foo()` and `bar()` produces two different results (`41` or `42`)?
 
 **Note:** It may not be obvious yet, but not all non-determinism is bad. Sometimes it's irrelevant, and sometimes it's intentional. We'll see more examples of that throughout this and the next few chapters.
 
@@ -281,7 +289,7 @@ JavaScript is single-threaded, which means *that* level of non-determinism isn't
 
 Because of JavaScript's single-threading, the code inside of `foo()` (and `bar()`) is atomic, which means that once `foo()` starts running, the entirety of its code will finish before any of the code in `bar()` can run, or vice versa. This is called "run-to-completion" behavior.
 
-In fact, the run-to-completion semantic is more obvious when `foo()` and `bar()` have more code in them, such as:
+In fact, the run-to-completion semantics are more obvious when `foo()` and `bar()` have more code in them, such as:
 
 ```js
 var a = 1;
@@ -830,7 +838,7 @@ console.log( a * b ); // 300
 a = a + 1;
 b = b + 1;
 
-console.log( a + b ); // 42
+console.log( a + b ); // 363
 ```
 
 Other examples where the compiler reordering could create observable side-effects (and thus must be disallowed) would include things like any function call with side effects (even and especially getter functions), or ES6 Proxy objects (see the *"ES6 & Beyond"* title of this book series).
@@ -845,7 +853,7 @@ function foo() {
 
 var a, b, c;
 
-// ES5 getter literal syntax
+// ES5.1 getter literal syntax
 c = {
 	get bar() {
 		console.log( a );
@@ -881,10 +889,10 @@ Compiler statement reordering is almost a micro-metaphor for concurrency and int
 
 A JavaScript program is (practically) always broken up into two or more chunks, where the first chunk runs *now* and the next chunk runs *later*, in response to an event. Even though the program is executed chunk-by-chunk, all of them share the same access to the program scope and state, so each modification to state is made on top of the previous state.
 
-The *event loop* spins continuously, with each iteration ("tick") handling whatever the next waiting event on the queue is, if any.
+Whenever there are events to run, the *event loop* runs until the queues are empty. Each iteration of the event loop is a "tick". User interaction, IO, and timers enqueue events on the event queues.  
 
-At any given moment, only one event can be processed from the queue at a time. While an event is executing, it can indirectly cause one or more subsequent events to be scheduled (added onto the event queue).
+At any given moment, only one event can be processed from the queue at a time. While an event is executing, it can directly or indirectly cause one or more subsequent events.
 
-Concurrency is when two or more "processes" (basically function calls as events) interleave themselves onto the event loop queue, such that from a high level perspective, they appear to be running *simultaneously* (even though at any given moment only one event is being processed).
+Concurrency is when two or more chains of events interleave over time, such that from a high level perspective, they appear to be running *simultaneously* (even though at any given moment only one event is being processed).
 
-It's often necessary to do some form of interaction coordination between these concurrent "processes", for instance to ensure ordering or to prevent "race conditions". These "processes" can also *cooperate* by breaking themselves into smaller chunks and to allow other "process" interleaving.
+It's often necessary to do some form of interaction coordination between these concurrent "processes" (as distinct from operating system processes), for instance to ensure ordering or to prevent "race conditions". These "processes" can also *cooperate* by breaking themselves into smaller chunks and to allow other "process" interleaving.
