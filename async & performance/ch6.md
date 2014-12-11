@@ -167,6 +167,12 @@ If you want to make assertions like "X is faster than Y" in any reasonable sense
 
 There's an awesome website for this purpose called jsPerf (http://jsperf.com).
 
+Setting up a test on the site, you start out with two test cases to fill in, but you can add as many as you need. You also have the ability to set up `setup` code which is run at the beginning of each test cycle and `teardown` code run at the end of each cycle.
+
+**Note:** The trick to doing just one test case (if you're benchmarking a single approach instead of a head-to-head) is to just leave the second case empty. You can always add more test cases later.
+
+It's incredibly important to understand that your `setup` and `teardown` code **does not run for each test iteration**. The best way to think about it is that there's an outer loop (repeating cycles), and an inner loop (repeating test iterations). `setup` and `teardown` are run at the beginning and end of each loop iteration of the *outer* loop (aka cycle), but not inside the inner loop.
+
 ## Microperformance
 
 ## Summary
