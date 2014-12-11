@@ -165,13 +165,34 @@ For example, Chrome on a high end desktop machine is not likely to perform anywh
 
 If you want to make assertions like "X is faster than Y" in any reasonable sense across more than just a single environment, you're going to need to actually test as many of those real world environments as possible. Just because Chrome executes some X operation faster than Y doesn't mean that all browsers do. And of course you also probably will want to cross-reference the results of multiple browser test runs with the demographics of your users.
 
-There's an awesome website for this purpose called jsPerf (http://jsperf.com).
+There's an awesome website for this purpose called jsPerf (http://jsperf.com). It uses the Benchmark.js library we talked about earlier to run statistically accurate and reliable tests, and makes the test on an openly-available URL that you can pass around to others.
+
+Each time a test is run, the results are collected and persisted with the test, and the cumulative test results are graphed on the page for anyone to see.
 
 Setting up a test on the site, you start out with two test cases to fill in, but you can add as many as you need. You also have the ability to set up `setup` code which is run at the beginning of each test cycle and `teardown` code run at the end of each cycle.
 
 **Note:** The trick to doing just one test case (if you're benchmarking a single approach instead of a head-to-head) is to just leave the second case empty. You can always add more test cases later.
 
 It's incredibly important to understand that your `setup` and `teardown` code **does not run for each test iteration**. The best way to think about it is that there's an outer loop (repeating cycles), and an inner loop (repeating test iterations). `setup` and `teardown` are run at the beginning and end of each loop iteration of the *outer* loop (aka cycle), but not inside the inner loop.
+
+Why does this matter? Let's imagine you have a test case that looks like this:
+
+```js
+a = a + "w";
+b = a.charAt( 1 );
+```
+
+Then, you set up your test `setup` as follows:
+
+```js
+var a = "x";
+```
+
+Your temptation is probably to believe that `a` is starting out as `"x"` for each test iteration.
+
+But it's not! It's starting `a` at `"x"` for each test cycle, and then your repeated `+ "w"` concatenations will be making a larger and larger `a` value, even though you're only ever accessing the charater `"w"` at the `1` position.
+
+Where this most commonly bites you is when you make side effect changes to something like the DOM, like appending a child element. You may think your parent element is set as empty each time, but it's actually getting lots of elements added, and that can significantly sway the results of your tests.
 
 ## Microperformance
 
