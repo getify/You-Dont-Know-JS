@@ -196,15 +196,15 @@ There's an awesome website for this purpose called jsPerf (http://jsperf.com). I
 
 Each time a test is run, the results are collected and persisted with the test, and the cumulative test results are graphed on the page for anyone to see.
 
-Setting up a test on the site, you start out with two test cases to fill in, but you can add as many as you need. You also have the ability to set up `setup` code which is run at the beginning of each test cycle and `teardown` code run at the end of each cycle.
+When creating a test on the site, you start out with two test cases to fill in, but you can add as many as you need. You also have the ability to set up `setup` code which is run at the beginning of each test cycle and `teardown` code run at the end of each cycle.
 
-**Note:** The trick to doing just one test case (if you're benchmarking a single approach instead of a head-to-head) is to just leave the second case empty. You can always add more test cases later.
+**Note:** A trick dor doing just one test case (if you're benchmarking a single approach instead of a head-to-head) is to fill in the second test input boxes with placeholder text on first creation, then edit the test and leave the second test blank, which will delete it. You can always add more test cases later.
 
 You can define the initial page setup (importing libraries, definiing utility helper functions, declaring variables, etc). There's also options for defining setup and teardown behavior if needed -- consult the "Setup/Teardown" section in the Benchmark.js discussion earlier.
 
 #### Sanity Check
 
-jsPerf.com is a fantastic resource, but there's an awful lot of tests published which when you analyze them are quite bogus, for any of a variety of reasons as outlined earlier in this chapter.
+jsPerf is a fantastic resource, but there's an awful lot of tests published that when you analyze them are quite bogus, for any of a variety of reasons as outlined earlier in this chapter.
 
 Many tests will compare apples to oranges, like for instance:
 
@@ -224,7 +224,7 @@ for (var i=0; i<10; i++) {
 
 Whether this test is bogus or not depends partially on the intent.
 
-Is the goal to find out whether or not "pre-sizing" your `x` array improves the performance over letting it auto extend? The tests map somewhat closely to that intent, but there's still something a little unfair here. There's an extra property access `x.length` and an extra math operation `- 1`. Are those major? Most likely not. But they *are* a difference between the two snippets, a difference which according to intent you weren't trying to test.
+Is the goal to find out whether or not "pre-sizing" your `x` array improves the performance over letting it auto-extend? The tests map somewhat closely to that intent, but there's still something a little unfair here. There's an extra property access `x.length` and an extra math operation `- 1`. Are those major? Almost certainly not. But they *are* a difference between the two snippets, a difference which according to intent you weren't trying to test.
 
 By contrast, if the intent is to figure out if `x.length` property access hurts performance too noticeably, the difference in `x = ..` initialization is a secondary difference between the two snippets.
 
