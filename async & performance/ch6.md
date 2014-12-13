@@ -88,9 +88,36 @@ There's *lots* more to learn about Benchmark.js besides this glance I'm includin
 
 We're showing here the usage to test a single operation like X, but it's fairly common that you want to compare X to Y. This is easy to do by simply setting up two different tests in a "Suite" (a Benchmark.js organizational feature). Then, you run them head-to-head, and compare the statistics to conclude whether X or Y was faster.
 
-Benchmark.js can of course be used to test JavaScript in a browser, but it can also run in non-browser environments (node.js, etc).
+Benchmark.js can of course be used to test JavaScript in a browser (see "jsPerf.com" section below), but it can also run in non-browser environments (node.js, etc).
 
 One largely untapped potential use-case for Benchmark.js is to use it in your Dev or QA environments to run automated performance regression tests against critical path parts of your application's JavaScript. Similar to how you might run unit test suites before deployment, you can also compare the performance against previous benchmarks to monitor if you are improving or degrading application performance.
+
+#### Setup/Teardown
+
+In the code snippet above, we glossed over the "extra options" `{ .. }` object -- the docs (http://benchmarkjs.com/docs) are the best place to go further. But there are two options we should discuss: `setup` and `teardown`.
+
+These two options let you define functions to be called before and after your test case runs.
+
+It's incredibly important to understand that your `setup` and `teardown` code **does not run for each test iteration**. The best way to think about it is that there's an outer loop (repeating cycles), and an inner loop (repeating test iterations). `setup` and `teardown` are run at the beginning and end of each *outer* loop (aka cycle) iteration, but not inside the inner loop.
+
+Why does this matter? Let's imagine you have a test case that looks like this:
+
+```js
+a = a + "w";
+b = a.charAt( 1 );
+```
+
+Then, you set up your test `setup` as follows:
+
+```js
+var a = "x";
+```
+
+Your temptation is probably to believe that `a` is starting out as `"x"` for each test iteration.
+
+But it's not! It's starting `a` at `"x"` for each test cycle, and then your repeated `+ "w"` concatenations will be making a larger and larger `a` value, even though you're only ever accessing the charater `"w"` at the `1` position.
+
+Where this most commonly bites you is when you make side effect changes to something like the DOM, like appending a child element. You may think your parent element is set as empty each time, but it's actually getting lots of elements added, and that can significantly sway the results of your tests.
 
 #### Context Is King
 
@@ -173,26 +200,7 @@ Setting up a test on the site, you start out with two test cases to fill in, but
 
 **Note:** The trick to doing just one test case (if you're benchmarking a single approach instead of a head-to-head) is to just leave the second case empty. You can always add more test cases later.
 
-It's incredibly important to understand that your `setup` and `teardown` code **does not run for each test iteration**. The best way to think about it is that there's an outer loop (repeating cycles), and an inner loop (repeating test iterations). `setup` and `teardown` are run at the beginning and end of each loop iteration of the *outer* loop (aka cycle), but not inside the inner loop.
-
-Why does this matter? Let's imagine you have a test case that looks like this:
-
-```js
-a = a + "w";
-b = a.charAt( 1 );
-```
-
-Then, you set up your test `setup` as follows:
-
-```js
-var a = "x";
-```
-
-Your temptation is probably to believe that `a` is starting out as `"x"` for each test iteration.
-
-But it's not! It's starting `a` at `"x"` for each test cycle, and then your repeated `+ "w"` concatenations will be making a larger and larger `a` value, even though you're only ever accessing the charater `"w"` at the `1` position.
-
-Where this most commonly bites you is when you make side effect changes to something like the DOM, like appending a child element. You may think your parent element is set as empty each time, but it's actually getting lots of elements added, and that can significantly sway the results of your tests.
+You can define the initial page setup (importing libraries, definiing utility helper functions, declaring variables, etc). There's also options for defining setup and teardown behavior if needed -- consult the "Setup/Teardown" section in the Benchmark.js discussion earlier.
 
 ## Microperformance
 
