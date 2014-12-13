@@ -202,6 +202,52 @@ Setting up a test on the site, you start out with two test cases to fill in, but
 
 You can define the initial page setup (importing libraries, definiing utility helper functions, declaring variables, etc). There's also options for defining setup and teardown behavior if needed -- consult the "Setup/Teardown" section in the Benchmark.js discussion earlier.
 
+#### Sanity Check
+
+jsPerf.com is a fantastic resource, but there's an awful lot of tests published which when you analyze them are quite bogus, for any of a variety of reasons as outlined earlier in this chapter.
+
+Many tests will compare apples to oranges, like for instance:
+
+```js
+// Case 1
+var x = [];
+for (var i=0; i<10; i++) {
+	x[x.length - 1] = "x";
+}
+
+// Case 2
+var x = Array( 10 );
+for (var i=0; i<10; i++) {
+	x[i] = "x";
+}
+```
+
+Whether this test is bogus or not depends partially on the intent.
+
+Is the goal to find out whether or not "pre-sizing" your `x` array improves the performance over letting it auto extend? The tests map somewhat closely to that intent, but there's still something a little unfair here. There's an extra property access `x.length` and an extra math operation `- 1`. Are those major? Most likely not. But they *are* a difference between the two snippets, a difference which according to intent you weren't trying to test.
+
+By contrast, if the intent is to figure out if `x.length` property access hurts performance too noticeably, the difference in `x = ..` initialization is a secondary difference between the two snippets.
+
+Of course, in either scenario, the declaring and initializing of `x` is included in the test, probably unnecessarily. That should be factored out.
+
+Another example:
+
+```js
+// Case 1
+var x = [];
+for (var i=0; i<10; i++) {
+	x[i] = "x";
+}
+
+// Case 2
+var x = [];
+for (var i=9; i>=0; i--) {
+	x[i] = "x";
+}
+```
+
+Wherever possible, you should strive to create tests that isolate the difference you are actually caring about testing.
+
 ## Microperformance
 
 ## Summary
