@@ -226,10 +226,37 @@ for (var i=0; i<10; i++) {
 }
 ```
 
-Some observations:
+Some observations to ponder about this test scenario:
 
-1. It's extremely common for devs to put their own loops into test cases, and they forget that Benchmark.js already does all the repetition you need. There's a really strong change that the `for` loops in these cases are totally unnecessary noise.
+1. It's extremely common for devs to put their own loops into test cases, and they forget that Benchmark.js already does all the repetition you need. There's a really strong chance that the `for` loops in these cases are totally unnecessary noise.
 2. The declaring and initializing of `x` is included in each test case, possibly unnecessarily. Recall from earlier that if `x = []` were in the `setup` code, it wouldn't actually be run before each test iteration, but instead once at the beginning of each cycle. That means `x` would continue growing quite large, not just the size `10` implied by the `for` loops.
+
+   So is the intent to make sure the tests are constrained only to how the JS engine behaves with very small arrays (size `10`)? That *could* be the intent, but if it is, you have to consider if that's not focusing far too much on nuanced internal implementation details?
+
+   On the other hand, does the intent of the test embrace the context that the arrays will actually be growing quite large? Is the JS engines' behavior with larger arrays relevant and accurate when compared with the intended real world usage?
+3. Is the intent to find out how much `x.length` or `x.push(..)` add to the performance of the operation to append to the `x` array? OK, that might be a valid thing to test. But then again, `push(..)` is a function call, so of course it's going to be slower than `[..]` access. Arguably, cases 1 and 2 are fairer than case 3.
+
+Here's another example that illustrates a common apples-to-oranges flaw:
+
+```js
+// Case 1
+var x = ["John","Albert","Sue","Frank","Bob"];
+x.sort();
+
+// Case 2
+var x = ["John","Albert","Sue","Frank","Bob"];
+x.sort( function mySort(a,b){
+	if (a < b) return -1;
+	if (a > b) return 1;
+	return 0;
+} );
+```
+
+Here, the ostensible intent is to find out how much slower the custom `mySort(..)` comparator is than the built-in default compartor. But by specifying the function `mySort(..)` as inline function expression, you've created an unfair/bogus test. Here, the second case is not only testing a custom user JS function, but it's also testing creating a new function expression for each iteration.
+
+Would it surprise you to find out that if you run a test like the above but to isolate only for inline function expression versus a pre-declared function, the inline function expression can be 2-20% slower!?
+
+Unless your intent with this test *is* to consider the inline function expression "cost", a better/fairer test would put `mySort(..)`'s declaration in the page setup -- don't put it in the test `setup` as that's unnecessary redeclaration for each cycle -- and simply reference it by name in the test case: `x.sort(mySort)`.
 
 ## Microperformance
 
