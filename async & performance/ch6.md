@@ -35,7 +35,7 @@ What if the duration reported is `4`? Are you more sure it took about four milli
 
 More troublingly, you also don't know that the circumstances of this operation test aren't overly optimistic. It's possible that the JS engine figured out a way to optimize your isolated test case, but in a more real program such optimization would be diluted or impossible, such that the operation would run slower than your test.
 
-So... what do we know? Unfortunately, with those realizations stated, we know very little. Something of such low confidence isn't even remotely good enough to build your determinations on. Your "benchmark" is basically useless. And worse, it's dangerous in that it implies false confidence, not just to you but to others who don't think critically about the conditions.
+So... what do we know? Unfortunately, with those realizations stated, we know very little. Something of such low confidence isn't even remotely good enough to build your determinations on. Your "benchmark" is basically useless. And worse, it's dangerous in that it implies false confidence, not just to you but also to others who don't think critically about the conditions.
 
 ### Repetition
 
@@ -115,7 +115,7 @@ var a = "x";
 
 Your temptation is probably to believe that `a` is starting out as `"x"` for each test iteration.
 
-But it's not! It's starting `a` at `"x"` for each test cycle, and then your repeated `+ "w"` concatenations will be making a larger and larger `a` value, even though you're only ever accessing the charater `"w"` at the `1` position.
+But it's not! It's starting `a` at `"x"` for each test cycle, and then your repeated `+ "w"` concatenations will be making a larger and larger `a` value, even though you're only ever accessing the character `"w"` at the `1` position.
 
 Where this most commonly bites you is when you make side effect changes to something like the DOM, like appending a child element. You may think your parent element is set as empty each time, but it's actually getting lots of elements added, and that can significantly sway the results of your tests.
 
@@ -174,7 +174,7 @@ And all that's just made with the mindset of assumptions about a single test run
 
 What if it optimizes a certain way because of the fixed input, but in your real program you give more varied input and the optimization decisions shake out differently (or not at all!)? Or what if the engine kicks in optimizations because it sees the code being run tens of thousands of times by the benchmarking utility, but in your real program it will only run a hundred times in near proximity, and under those conditions the engine determines the optimizations are not worth it?
 
-And all those optimizations we just hypothesized about might happen in our constrained test but maybe the engine wouldn't do in a more complex program (for various reasons), or it could be reversed -- the engine might not optimize such trivial code but may be more inclined to optimize it more aggresively (aka differently) when the system is more taxed by a more sophisticated program.
+And all those optimizations we just hypothesized about might happen in our constrained test but maybe the engine wouldn't do in a more complex program (for various reasons), or it could be reversed -- the engine might not optimize such trivial code but may be more inclined to optimize it more aggressively (aka differently) when the system is more taxed by a more sophisticated program.
 
 The point I'm trying to make is that you really don't know for sure exactly what's going on under the covers. All the guesses and hypothesis you can muster don't amount to hardly anything concrete for really making such decisions.
 
@@ -196,11 +196,11 @@ There's an awesome website for this purpose called jsPerf (http://jsperf.com). I
 
 Each time a test is run, the results are collected and persisted with the test, and the cumulative test results are graphed on the page for anyone to see.
 
-Setting up a test on the site, you start out with two test cases to fill in, but you can add as many as you need. You also have the ability to set up `setup` code which is run at the beginning of each test cycle and `teardown` code run at the end of each cycle.
+Setting up a test on the site, you start out with two test cases to fill in, but you can add as many as you need. You also have the ability to set up `setup` code that is run at the beginning of each test cycle and `teardown` code run at the end of each cycle.
 
 **Note:** The trick to doing just one test case (if you're benchmarking a single approach instead of a head-to-head) is to just leave the second case empty. You can always add more test cases later.
 
-You can define the initial page setup (importing libraries, definiing utility helper functions, declaring variables, etc). There's also options for defining setup and teardown behavior if needed -- consult the "Setup/Teardown" section in the Benchmark.js discussion earlier.
+You can define the initial page setup (importing libraries, defining utility helper functions, declaring variables, etc). There are also options for defining setup and teardown behavior if needed -- consult the "Setup/Teardown" section in the Benchmark.js discussion earlier.
 
 #### Sanity Check
 
