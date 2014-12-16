@@ -254,9 +254,65 @@ x.sort( function mySort(a,b){
 
 Here, the ostensible intent is to find out how much slower the custom `mySort(..)` comparator is than the built-in default compartor. But by specifying the function `mySort(..)` as inline function expression, you've created an unfair/bogus test. Here, the second case is not only testing a custom user JS function, but it's also testing creating a new function expression for each iteration.
 
-Would it surprise you to find out that if you run a test like the above but to isolate only for inline function expression versus a pre-declared function, the inline function expression can be 2-20% slower!?
+Would it surprise you to find out that if you run a test like the above but to isolate only for inline function expression versus a pre-declared function, the inline function expression can be from 2% to 20% slower!?
 
 Unless your intent with this test *is* to consider the inline function expression "cost", a better/fairer test would put `mySort(..)`'s declaration in the page setup -- don't put it in the test `setup` as that's unnecessary redeclaration for each cycle -- and simply reference it by name in the test case: `x.sort(mySort)`.
+
+Building on the previous example, another pitfall is in opaquely avoiding or adding "extra work" to one test case that creates an apples-to-oranges scenario:
+
+```js
+// Case 1
+var x = [12,-14,0,3,18,0,2.9];
+x.sort();
+
+// Case 2
+var x = [12,-14,0,3,18,0,2.9];
+x.sort( function mySort(a,b){
+	return a - b;
+} );
+```
+
+Setting aside the previously mentioned inline function expression pitfall, the second case's `mySort(..)` works in this case because you have provided it numbers, but would have of course failed with strings. The first case doesn't throw an error, but it actually works differently and has a different outcome! It should be obvious, but: **a different outcome between two test cases almost certainly invalidates the entire test!**
+
+But beyond the different outcomes, in this case, the built in `sort(..)`'s compartor is actually doing "extra work" in that it coerces the compared values to strings and does lexicographic comparison. The first snippet results in `[-14, 0, 0, 12, 18, 2.9, 3]` while the second snippet results (likely more accurately based on intent) in `[-14, 0, 0, 2.9, 3, 12, 18]`.
+
+These same pitfalls can be much more subtle:
+
+```js
+// Case 1
+var x = false;
+var y = x ? 1 : 2;
+
+// Case 2
+var x;
+var y = x ? 1 : 2;
+```
+
+Here, the intent might be to test the performance impact of the coercion to a boolean that the `? :` operator will do if the `x` expression is not already a boolean (see the *"Types & Grammar"* title of this book series). So, you're ostensibly OK with the fact that there is extra work to do the coercion in the second case.
+
+The subtle problem? You're setting `x`'s value in the first case and not setting it in the other, so you're actually doing work in the first case that you're not doing in the second. To eliminate any potential (minor) skew, just do:
+
+```js
+// Case 1
+var x = false;
+var y = x ? 1 : 2;
+
+// Case 2
+var x = undefined;
+var y = x ? 1 : 2;
+```
+
+#### Writing Good Tests
+
+Let me see if I can articulate the bigger point I'm trying to make here.
+
+Good test authoring requires careful analytical thinking about what differences exist between two test cases and whether the differences between them are *intentional* or *unintentional*.
+
+Intentional differences are of course normal and OK, but it's so easy to create unintentional differences which skew your results. You have to be really, really careful to avoid that skew.
+
+Moreover, you may intend a difference but it may not be obvious to other readers of your test what your intent was, so they may doubt (or trust!) your test incorrectly. How do you fix that?
+
+**Write better, clearer tests.** But also, take the time to document (using the jsPerf.com "Description" field and/or code comments) exactly what the intent of your test is, even to the nuanced detail. Call out the intentional differences, which will help others and your future self to better identify unintentional differences that could be skewing the test results. Isolate things which aren't relevant to your test by pre-declaring them in the page or test setup settings.
 
 ## Microperformance
 
