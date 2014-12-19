@@ -88,7 +88,7 @@ There's *lots* more to learn about Benchmark.js besides this glance I'm includin
 
 We're showing here the usage to test a single operation like X, but it's fairly common that you want to compare X to Y. This is easy to do by simply setting up two different tests in a "Suite" (a Benchmark.js organizational feature). Then, you run them head-to-head, and compare the statistics to conclude whether X or Y was faster.
 
-Benchmark.js can of course be used to test JavaScript in a browser (see "jsPerf.com" section below), but it can also run in non-browser environments (node.js, etc).
+Benchmark.js can of course be used to test JavaScript in a browser (see "jsPerf.com" section below), but it can also run in non-browser environments (Node.js, etc).
 
 One largely untapped potential use-case for Benchmark.js is to use it in your Dev or QA environments to run automated performance regression tests against critical path parts of your application's JavaScript. Similar to how you might run unit test suites before deployment, you can also compare the performance against previous benchmarks to monitor if you are improving or degrading application performance.
 
@@ -333,12 +333,208 @@ var foo = 41;
 	(function(){
 		(function(baz){
 			var bar = foo + baz;
+			// ..
 		})(1);
 	})();
 })();
 ```
 
 You may think about the `foo` reference in the innermost function as needing to do a 3-level scope lookup. We covered in the *"Scope & Closures"* title of this book series how lexical scope works, and the fact that the compiler generally caches such lookups so that referencing `foo` from different scopes doesn't really practically "cost" anything extra.
+
+But there's something deeper to consider. What if the compiler realizes that `foo` isn't referenced anywhere else but that one location, and it further notices that the value never is anything except the `41` as shown?
+
+Isn't it quite possible and acceptable that the JS compiler could decide to just remove the `foo` variable entirely, and *inline* the value, such as this:
+
+```js
+(function(){
+	(function(){
+		(function(baz){
+			var bar = 41 + baz;
+			// ..
+		})(1);
+	})();
+})();
+```
+
+**Note:** Of course, the compiler could probably also do a similar analysis and rewrite with the `baz` variable here, too.
+
+When you begin to think about your JS code as being a hint or suggestion to the engine of what to do, rather than a literal requirement, you realize that a lot of the obsession over discrete syntactic minutia is most likely unfounded.
+
+Another example:
+
+```js
+function factorial(n) {
+	if (n < 2) return 1;
+	return n * factorial( n - 1 );
+}
+
+factorial( 5 );		// 120
+```
+
+Ah, the good ol' fashioned "factorial" algorithm! You might assume that the JS engine will run that code mostly as-is. And to be honest, it might, I'm not really sure.
+
+But as an anecdote, the same code expressed in C and compiled with advanced optimizations would result in the compiler realizing that the call `factorial(5)` can just be replaced with the constant value `120`, eliminating the function and call entirely!
+
+Moreover, some engines have a practice of called "unrolling recursion", where it can realize that the recursion you've expressed can actually be done "easier" (that is, more optimally) with a loop. It's possible the above code could be *rewritten* by a JS engine to run as:
+
+```js
+function factorial(n) {
+	if (n < 2) return 1;
+
+	var res = 1;
+	for (var i=n; i>1; i--) {
+		res *= i;
+	}
+	return res;
+}
+
+factorial( 5 );		// 120
+```
+
+Now, let's imagine that in the earlier snippet you had been worried about whether `n * factorial(n-1)` or `n *= factorial(--n)` runs faster. Maybe you even did a performance benchmark to try to figure out which was better. But you miss the fact that in the bigger context, the engine may not run either line of code because it may unroll the recursion!
+
+Speaking of `--`, `--n` vs `n--` is often cited as one of those places where you can optimize by choosing the `--n` version, since theoretically it requires less effort down at the assembly level of processing.
+
+That sort of obsession is basically nonsense in modern JavaScript. That's the kind of thing you should be letting the engine take care of. You should write the code that makes the most sense. Compare these two for loops:
+
+```js
+// Option 1
+for (var i=0; i<10; i++) {
+	console.log( i );
+}
+
+// Option 2
+for (var i=-1; ++i<10; ) {
+	console.log( i );
+}
+```
+
+Even if you have some theory where the second option is more performant than the first option by a tiny bit, which is dubious at best, the second loop is more confusing since you have to start with `-1` for `i` to account for the fact that `++i` pre-increment is used.
+
+### Not all engines are alike
+
+You might not have realized it before now, but the different JS engines in various browsers can all be "spec compliant" while having radically different ways of handling code. The JS specification doesn't require anything performance related -- well, except ES6's "tail call optimization" covered later in this chapter.
+
+The JS engines are free to decide that one operation will receive its attention to optimize, trading off for lesser performance on another operation. There's quite a bit of difference in a lot of parts of JavaScript, so it can be very tenuous to try to find an operation that always runs faster in all browsers.
+
+There's a movement among some in the JS dev community, especially those who work with Node.js, to analyze internal implementation details of the v8 JavaScript engine and make decisions about writing JS code that is tailored to take best advantage of these potential optimizations. You can actually achieve a surprisingly high degree of performance optimization in such activities, so the payoff for the effort is quite attractive.
+
+But let's sanity check that approach. Are you genuinely writing code that only needs to run in one JS engine? Even if your code is entirely intended for Node.js, is the assumption that v8 will *always* be the used JS engine reliable? Is it possible that someday a few years from now, there's another server-side JS platform besides Node.js that you choose to run your code on? Furthermore, what if what you optimized for before is now a much slower way of doing that operation on the new engine?
+
+Or what if your code always stays running on v8 from here on out, but v8 decides at some point to change the way some set of operations works such that what used to be fast is now slow, and vice versa?
+
+These scenarios aren't just theoretical, either. It used to be that it was faster to put multiple string values into an array and then call `join("")` on the array to concatenate the values than to just use `+` concatenation directly with the values. The historical reason for this is nuanced, but it has to do with internal implementation details about how string values are stored and managed in memory.
+
+There was lots of "best practice" advice that disseminated across the industry telling devs to always use the array `join(..)` approach. And many people did.
+
+Except, somewhere along the way, the JS engines changed details about how they managed strings, and they specifically put in optimizations to make `+` concatenation faster. They didn't de-optimize `join(..)` per se, but they put more effort into special case optimizing the `+` usage, since it was still quite a bit more wide spread.
+
+**Note:** The practice of standardizing or optimizing some particular approach based mostly on its existing wide spread usage is often called metaphorically "paving the cowpath".
+
+Once that new approach to handling strings and concatenation took hold, all the code across the web that was using array `join(..)` to concatenate strings became sub-optimal, simply because it was *now* not using the most optimal approach based on engine changes alone.
+
+I think these various gotchas are at least possible, if not likely, for our code. So I'm very cautious about making wide ranging performance optimizations in my JS code based purely on engine implementation details, **especially if those details are only true of a single engine**.
+
+### Big Picture
+
+We should instead be looking at big-picture types of optimizations.
+
+How do you know what's big picture or not? You have to first understand if your code is running on a critical path or not. If it's not on the critical path, chances are your optimizations are not worth much.
+
+If it's on the critical path, such as a "hot" piece of code that's going to be run over and over again, or in UX critical places where users will notice, like an animation loop, CSS style updates, etc, then you should't spare any effort in trying to find and employ relevant and measurably significant optimizations.
+
+For example, consider an animation loop that needs to coerce a string value to a number repeatedly. There are of course multiple ways to do that (see the *"Types & Grammar"* title of this book series).
+
+```js
+var x = "42";	// need number `42`
+
+// Option 1: let implicit coercion automatically happen
+var y = x / 2;
+
+// Option 2: use `parseInt(..)`
+var y = parseInt( x, 0 ) / 2;
+
+// Option 3: use `Number(..)`
+var y = Number( x ) / 2;
+
+// Option 4: use `+` unary operator
+var y = +x / 2;
+
+// Option 5: use `|` unary operator
+var y = (x | 0) / 2;
+```
+
+I will leave it as an exercise to the reader to set up a test if you're interested in examining the minute differences in performance among these options.
+
+When considering these different options, as they say, "One of these things is not like the others." `parseInt(..)` does the job, but it also does a lot more -- it parses the string rather than just coercing. You can probably guess, correctly, that `parseInt(..)` is a slower option, and you should probably avoid it.
+
+**Note:** Of course, if `x` can ever be a value that **needs parsing**, such as `42px` (like from a CSS style lookup), then `parseInt(..)` is really the only suitable option!
+
+`Number(..)` is also a function call. From a behavioral perspective, it's identical to the `+` unary operator option, but it may in fact be a little slower requiring more machinery to execute the function. Of course, it's also possible that the JS engine recognizes this behavioral symmetry and just handles the inlining of `Number(..)`'s behavior (aka `+x`) for you!
+
+But remember, obsessing about `+x` versus `x | 0` is in most cases likely a foolish waste of time. This is a microperformance issue, and one that you shouldn't let degrade the readability of your program.
+
+While performance is very important in critical paths of your program, it's not the only factor. Among several options which are roughly similar in performance, readability should be another important concern.
+
+### Tail Call Optimization (TCO)
+
+As we briefly mentioned earlier, ES6 includes a specific requirement that ventures into the world of performance. It's related to a specific form of optimization that can occur with recursive functions: *tail call optimization*.
+
+Briefly, a "tail call" is a function call that appears at the "tail" of another function, such that after the call finishes, there's nothing left to do (except perhaps return its result value).
+
+For example, here's a non-recursive setup with tail calls:
+
+```js
+function foo(x) {
+	return x;
+}
+
+function bar(y) {
+	return foo( y + 1 );	// tail call
+}
+
+function baz() {
+	return 1 + bar( 40 );	// not tail call
+}
+
+baz();						// 42
+```
+
+`foo(y+1)` is a tail call in `bar(..)` because after `foo(..)` finishes, `bar(..)` is also finished except in this case returning the result of the `foo(..)` call. However, `bar(40)` is *not* a tail call because after it completes, its result value must be added to `1` before `baz()` can return it.
+
+Without getting into too much nitty gritty detail, calling a new function requires an extra amount of reserved memory to manage the call stack, called a "stack frame". So the above snippet would generally require a stack frame for each of `baz()`, `bar(..)`, and `foo(..)` all at the same time.
+
+However, if a TCO-capable engine can realize that the `foo(y+1)` call is in *tail position* meaning `bar(..)` is basically complete, then when calling `foo(..)`, it doesn't need to create a new stack frame, but can instead re-use the existing stack frame from `bar(..)`. That's not only faster, but it also uses less memory.
+
+That sort of optimization isn't a big deal in a simple snippet, but it becomes a *much bigger deal* when dealing with recursion, especially if the recursion could have resulted in hundreds or thousands of stack frames, but with TCO the engine can perform all those calls with a single stack frame.
+
+Recursion is a hairy topic in JS because without TCO, engines have had to implement arbitrary (and different!) limits to how deep they will let the recursion stack get before they stop it, to prevent running out of memory. With TCO, recursive functions with *tail position* calls can essentially run unbounded, because there's never any extra usage of memory!
+
+Consider that recursive `factorial(..)` from before, but rewritten to make it TCO friendly:
+
+```js
+function factorial(n) {
+	function fact(n,res) {
+		if (n < 2) return res;
+
+		return fact( n - 1, n * res );
+	}
+
+	return fact( n, 1 );
+}
+
+factorial( 5 );		// 120
+```
+
+This version of `factorial(..)` is still recursive, but it's also optimizable with TCO, because both inner `fact(..)` calls are in *tail position*.
+
+**Note:** It's important to note that TCO only applies if there's actually a tail call. If you write recursive functions without tail calls, the performance will still fall back to normal stack frame allocation, and the engines' limits on such recursive call stacks will still apply. Many recursive functions can be rewritten as we just showed with `factorial(..)`, but it takes careful attention to detail.
+
+One reason that ES6 requires engines to handle TCO rather than leaving it up to their decision is because the *lack of TCO* actually tends to reduce the chances that certain algorithms will be implemented in JS using recursion, for fear of the call stack limits.
+
+If the lack of TCO would just degrade to slower performance, it wouldn't probably have been something that ES6 needed to *require*. But since the lack of TCO can actually make certain programs unrunnable, it's a more important feature of the language rather than just a hidden implementation detail.
+
+ES6 guarantees that from now on, JS developers will be able to rely on this optimization across all ES6+ compliant browsers. That's a big win for JS performance!
 
 ## Summary
 
