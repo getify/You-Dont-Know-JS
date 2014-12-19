@@ -37,8 +37,11 @@
 	* Parallel JS
 	* SIMD
 	* asm.js
-* Chapter 6: Tuning & Benchmarking
+* Chapter 6: Benchmarking & Tuning
 	* Benchmarking
+	* Context Is King
+	* jsPerf.com
+	* Writing Good Tests
 	* Microperformance
 * Appendix A: *asynquence* Library
 * Appendix B: Advanced Async Patterns

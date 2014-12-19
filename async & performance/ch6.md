@@ -119,7 +119,7 @@ But it's not! It's starting `a` at `"x"` for each test cycle, and then your repe
 
 Where this most commonly bites you is when you make side effect changes to something like the DOM, like appending a child element. You may think your parent element is set as empty each time, but it's actually getting lots of elements added, and that can significantly sway the results of your tests.
 
-#### Context Is King
+## Context Is King
 
 Don't forget to check the context of a particular performance benchmark, especially a comparison between X and Y tasks. Just because your test reveals that X is faster than Y doesn't mean that the conclusion "X is faster than Y" is actually relevant.
 
@@ -184,7 +184,7 @@ What this boils down to is that testing *not real* code basically gives you *not
 
 Microbenchmarks like `++x` vs `x++` are so incredibly likely to be bogus, we might as well just flatly assume them as such.
 
-### jsPerf.com
+## jsPerf.com
 
 While Benchmark.js is useful for testing the performance of your code in whatever JS environment you're running, it cannot be stressed enough that you need to compile test results from lots of different environments (desktop browsers, mobile devices, etc) if you want to have any hope of reliable test conclusions.
 
@@ -202,7 +202,7 @@ When creating a test on the site, you start out with two test cases to fill in, 
 
 You can define the initial page setup (importing libraries, defining utility helper functions, declaring variables, etc). There are also options for defining setup and teardown behavior if needed -- consult the "Setup/Teardown" section in the Benchmark.js discussion earlier.
 
-#### Sanity Check
+### Sanity Check
 
 jsPerf is a fantastic resource, but there's an awful lot of tests published that when you analyze them are quite flawed or bogus, for any of a variety of reasons as outlined earlier in this chapter.
 
@@ -302,7 +302,7 @@ var x = undefined;
 var y = x ? 1 : 2;
 ```
 
-#### Writing Good Tests
+## Writing Good Tests
 
 Let me see if I can articulate the bigger point I'm trying to make here.
 
@@ -312,9 +312,33 @@ Intentional differences are of course normal and OK, but it's so easy to create 
 
 Moreover, you may intend a difference but it may not be obvious to other readers of your test what your intent was, so they may doubt (or trust!) your test incorrectly. How do you fix that?
 
-**Write better, clearer tests.** But also, take the time to document (using the jsPerf.com "Description" field and/or code comments) exactly what the intent of your test is, even to the nuanced detail. Call out the intentional differences, which will help others and your future self to better identify unintentional differences that could be skewing the test results. Isolate things which aren't relevant to your test by pre-declaring them in the page or test setup settings.
+**Write better, clearer tests.** But also, take the time to document (using the jsPerf.com "Description" field and/or code comments) exactly what the intent of your test is, even to the nuanced detail. Call out the intentional differences, which will help others and your future self to better identify unintentional differences that could be skewing the test results.
+
+Isolate things which aren't relevant to your test by pre-declaring them in the page or test setup settings so they're outside the timed parts of the test.
+
+But also, instead of trying to narrow in on a single piece of your real code and trying to benchmark just that piece out of context, tests and benchmarks are better when they include a larger (while still relevant) context.
 
 ## Microperformance
+
+OK, so to this point we've been dancing around various microperformance issues and generally looking disfavorably upon obsessing about them. I want to take just a moment to address them directly.
+
+The first thing you need to get more comfortable with when thinking about performance benchmarking your code is that the code you write is not always the code the engine actually runs. We briefly looked at that topic back in Chapter 1 about statement reordering by the compiler, but here we're going to suggest the compiler can sometimes decide to run different code than you wrote, not just in different orders but different in substance.
+
+Let's consider this piece of code:
+
+```js
+var foo = 41;
+
+(function(){
+	(function(){
+		(function(baz){
+			var bar = foo + baz;
+		})(1);
+	})();
+})();
+```
+
+You may think about the `foo` reference in the innermost function as needing to do a 3-level scope lookup. We covered in the *"Scope & Closures"* title of this book series how lexical scope works, and the fact that the compiler generally caches such lookups so that referencing `foo` from different scopes doesn't really practically "cost" anything extra.
 
 ## Summary
 
