@@ -36,11 +36,11 @@ You're probably aware that standard Ajax requests don't complete synchronously, 
 
 But that's not how we do Ajax. We make an asynchronous Ajax request *now*, and we won't get the results back until *later*.
 
-The simplest (but definitely not only, or necessarily even best!) way of "waiting" from *now* until *later* is to use a function:
+The simplest (but definitely not only, or necessarily even best!) way of "waiting" from *now* until *later* is to use a function, commonly called a callback function:
 
 ```js
 // ajax(..) is some arbitrary Ajax function given by some library
-ajax( "http://some.url.1", function(data){
+ajax( "http://some.url.1", function myCallbackFunction(data){
 
 	console.log( data ); // Yay, I gots me some `data`!
 
@@ -49,7 +49,7 @@ ajax( "http://some.url.1", function(data){
 
 **Note:** You may have heard that it's possible to make synchronous Ajax requests. While that's technically true, you should never, ever do it, under any circumstances, because it locks the browser UI (buttons, menus, scrolling, etc) and prevents any user interaction whatsoever. This is a terrible idea, and should always be avoided.
 
-Before you protest in disagreement, **no, your desire to avoid callbacks is NOT justification for blocking, synchronous Ajax**.
+Before you protest in disagreement, **no, your desire to avoid the mess of callbacks is NOT justification for blocking, synchronous Ajax**.
 
 For example, consider this code:
 

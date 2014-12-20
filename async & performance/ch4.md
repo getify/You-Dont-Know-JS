@@ -40,7 +40,7 @@ Now let's twist your brain. What if `bar()` wasn't present, but it could still s
 
 In **preemptive** multi-threaded languages, it would essentially be possible for `bar()` to "interrupt" and run at exactly the right moment between those two statements. But JS is not preemptive, nor is it (currently) multi-threaded. And yet, a **cooperative** form of this "interruption" (concurrency) is possible, if `foo()` itself could somehow indicate a "pause" at that part in the code.
 
-I use the word "cooperative" not only because of the connection to classical concurrency terminology, but because the ES6 syntax for indicating the pause point inside a generator is `yield`, and thus the generator has to "play nice" and *cooperate* by politely yielding control at the pause point.
+**Note:** I use the word "cooperative" not only because of the connection to classical concurrency terminology (see Chapter 1), but because as you'll see in the next snippet, the ES6 syntax for indicating a pause point in code is `yield` -- suggesting a politely *cooperative* yielding of control.
 
 Here's the ES6 code to accomplish such cooperative concurrency:
 
@@ -56,7 +56,13 @@ function *foo() {
 function bar() {
 	x++;
 }
+```
 
+**Note:** You will likely see most other JS documentation/code that will format a generator declaration as `function* foo() { .. }` instead of as I've done here with `function *foo() { .. }` -- the only difference being the stylistic positioning of the `*`. The two forms are functionally/syntactically identical, as is a third `function*foo() { .. }` (no space) form. There are arguments for both styles, but I basically prefer `function *foo..` because it then matches when I reference a generator in writing with `*foo()`. If I said only `foo()`, you wouldn't know as clearly if I was talking about a generator or a regular function. It's purely a stylistic preference.
+
+Now, how can we run the code in that previous snippet such that `bar()` executes at the point of the `yield` inside of `*foo()`?
+
+```js
 // construct an iterator `it` to control the generator
 var it = foo();
 
@@ -68,16 +74,15 @@ x;						// 3
 it.next();				// x: 3
 ```
 
-**Note:** You will likely see most other JS documentation/code that will format a generator declaration as `function* foo() { .. }` instead of as I've done here with `function *foo() { .. }` -- the only difference being the stylistic positioning of the `*`. The two forms are functionally/syntactically identical, as is a third `function*foo() { .. }` (no space) form. There are arguments for both styles, but I basically prefer `function *foo..` because it then matches when I reference a generator in writing with `*foo()`. If I said only `foo()`, you wouldn't know as clearly if I was talking about a generator or a regular function. It's purely a stylistic preference.
+OK, there's quite a bit of new and potentially confusing stuff in those two code snippets, so we've got plenty to wade through. But before we explain the different mechanics/syntax with ES6 generators, let's walk through the behavior flow:
 
-OK, there's quite a bit of new and potentially confusing stuff in that code snippet, so we've got plenty to wade through. But before we explain the different mechanics/syntax with ES6 generators, let's walk through the behavior flow:
-
-1. The first `it.next()` starts the `*foo()` generator, and runs the `x++` on the first line of `*foo()`.
-2. `*foo()` pauses at the `yield` statement, at which point that first `it.next()` call finishes. At the moment, `*foo()` is still running and active, but it's in a paused state.
-3. We inspect the value of `x`, and it's now `2`.
-4. We call `bar()`, which increments `x` again with `x++`.
-5. We inspect the value of `x` again, and it's now `3`.
-6. The final `it.next()` call resumes the `*foo()` generator from where it was paused, and runs the `console.log(..)` statement, which uses the current value of `x` of `3`.
+1. The `it = foo()` operation does *not* execute the `*foo()` generator yet, but it merely constructs an *iterator* that will control its execution. More on *iterator*s in a bit.
+2. The first `it.next()` starts the `*foo()` generator, and runs the `x++` on the first line of `*foo()`.
+3. `*foo()` pauses at the `yield` statement, at which point that first `it.next()` call finishes. At the moment, `*foo()` is still running and active, but it's in a paused state.
+4. We inspect the value of `x`, and it's now `2`.
+5. We call `bar()`, which increments `x` again with `x++`.
+6. We inspect the value of `x` again, and it's now `3`.
+7. The final `it.next()` call resumes the `*foo()` generator from where it was paused, and runs the `console.log(..)` statement, which uses the current value of `x` of `3`.
 
 Clearly, `foo()` started, but did *not* run-to-completion -- it paused at the `yield`. We resumed `foo()` later, and let it finish, but that wasn't even required.
 
@@ -85,7 +90,7 @@ So, a generator is a special kind of function that can start and stop one or mor
 
 ### Input & Output
 
-A generator function is a special function with the new processing model we just alluded to. But it's still a function, which means it still has some basic tenets that haven't changed -- namely, that it still accepts arguments, and that it can still return a value.
+A generator function is a special function with the new processing model we just alluded to. But it's still a function, which means it still has some basic tenets that haven't changed -- namely, that it still accepts arguments (aka "Input"), and that it can still return a value (aka "Output").
 
 ```js
 function *foo(x,y) {
@@ -101,9 +106,13 @@ res.value;		// 42
 
 We pass in the arguments `6` and `7` to `*foo(..)` as the parameters `x` and `y` respectively. And `*foo(..)` returns the value `42` back to the calling code.
 
-We now see a difference with how the generator is invoked compared to a normal function. `foo(6,7)` obviously looks familiar. But subtly, `*foo(..)` hasn't actually run yet as it would have with a function. Instead, we're just creating an *iterator* object, which we assign to the variable `it`, to control the `*foo(..)` generator. Then we call `it.next()`, which instructs the `*foo(..)` generator to advance one step. The result of that call is an object with a `value` property on it holding whatever value (if anything) was returned from `*foo(..)`.
+We now see a difference with how the generator is invoked compared to a normal function. `foo(6,7)` obviously looks familiar. But subtly, the `*foo(..)` generator hasn't actually run yet as it would have with a function.
 
-Again, it won't be obvious why we need this whole indirect *iterator* object to control the generator yet. We'll get there, I *promise*.
+Instead, we're just creating an *iterator* object, which we assign to the variable `it`, to control the `*foo(..)` generator. Then we call `it.next()`, which instructs the `*foo(..)` generator to advance from its current location, stopping either at the next `yield` or end of the generator.
+
+The result of that `next(..)` call is an object with a `value` property on it holding whatever value (if anything) was returned from `*foo(..)`. In other words, `yield` caused a value to be sent out from the generator during the middle of its execution, kind of like an intermediate `return`.
+
+Again, it won't be obvious yet why we need this whole indirect *iterator* object to control the generator. We'll get there, I *promise*.
 
 #### Iteration Messaging
 
@@ -222,19 +231,29 @@ var z = 1;
 var it1 = foo();
 var it2 = foo();
 
-var val1 = it1.next().value;
-var val2 = it2.next().value;
+var val1 = it1.next().value;			// 2 <-- yield 2
+var val2 = it2.next().value;			// 2 <-- yield 2
 
-val1 = it1.next( val2 * 10 ).value;
-val2 = it2.next( val1 * 5 ).value;
+val1 = it1.next( val2 * 10 ).value;		// 40  <-- x:20,  z:2
+val2 = it2.next( val1 * 5 ).value;		// 600 <-- x:200, z:3
 
-it1.next( val2 / 2 );		// 20 300 3
-it2.next( val1 / 4 );		// 200 10 3
+it1.next( val2 / 2 );					// y:300
+										// 20 300 3
+it2.next( val1 / 4 );					// y:10
+										// 200 10 3
 ```
 
-That's a fun example to run through in your mind. Did you keep it straight?
-
 **Note:** The most common usage of multiple instances of the same generator running concurrently is not such interactions, but when the generator is producing its own values without input, perhaps from some independently-connected resource. We'll talk more about value production in the next section.
+
+Let's briefly walk through the processing:
+
+1. Both instances of `*foo()` are started at the same time, and both `next()` calls reveal a `value` of `2` from the `yield 2` statements, respectively.
+2. `val2 * 10` is `2 * 10`, which is sent into the first generator instance `it1`, so that `x` gets value `20`. `z` is incremented from `1` to `2`, and then `20 * 2` is `yield`ed out, setting `val1` to `40`.
+3. `val1 * 5` is `40 * 5`, which is sent into the second generator instance `it2`, so that `x` gets value `200`. `z` is incremented again, from `2` to `3`, and then `200 * 3` is `yield`ed out, setting `val2` to `600`.
+4. `val2 / 2` is `600 / 2`, which is sent into the first generator instance `it1`, so that `y` gets value `300`, then printing out `20 300 3` for its `x y z` values, respectively.
+5. `val1 / 4` is `40 / 4`, which is sent into the second generator instance `it2`, so that `y` gets value `10`, then printing out `200 10 3` for its `x y z` values, respectively.
+
+That's a "fun" example to run through in your mind. Did you keep it straight?
 
 #### Interleaving
 
@@ -426,11 +445,11 @@ something.next().value;		// 33
 something.next().value;		// 105
 ```
 
-**Note:** We'll explain the purpose of the `[Symbol.iterator]: ..` part of this code snippet in just a moment. But syntactically, two ES6 features are at play. First, the `[ .. ]` syntax is called a *computed property name* (see the *"this & Object Prototypes"* title of this series). It's a way in object literal definition to specify an expression and use the result of that expression as the name for the property. Next, `Symbol.iterator` refers to one of ES6's predefined symbol values (which will be covered in a later book in this series).
+**Note:** We'll explain why we need the `[Symbol.iterator]: ..` part of this code snippet in the next section. Syntactically, two ES6 features are at play. First, the `[ .. ]` syntax is called a *computed property name* (see the *"this & Object Prototypes"* title of this series). It's a way in an object literal definition to specify an expression and use the result of that expression as the name for the property. Next, `Symbol.iterator` is one of ES6's predefined special Symbol values (see the *"ES6 & Beyond"* title of this book series).
 
 The `next()` call returns an object with two properties: `done` is a boolean signaling the iteration is complete status; `value` holds the iteration value.
 
-ES6 also adds the `for..of` loop, which means that a standard *iterator* can automatically be consumed with native loop support:
+ES6 also adds the `for..of` loop, which means that a standard *iterator* can automatically be consumed with native loop syntax:
 
 ```js
 for (var v of something) {
@@ -444,9 +463,11 @@ for (var v of something) {
 // 1 9 33 105 321 969
 ```
 
-**Note:** Because our `something` *iterator* always returns `done:false`, this `for..of` loop would run forever, which is why we put the `break` conditional in. It's totally OK for iterators to be never-ending, but there are also plenty of cases where the *iterator* will run over a finite set of values and eventually return a `done:true`.
+**Note:** Because our `something` *iterator* always returns `done:false`, this `for..of` loop would run forever, which is why we put the `break` conditional in. It's totally OK for iterators to be never-ending, but there are also cases where the *iterator* will run over a finite set of values and eventually return a `done:true`.
 
-The `for..of` loop automatically calls `next()` for each iteration -- note that it doesn't pass any values in -- and it will automatically terminate on receiving a `done:true`. Of course, you could manually loop over iterators, calling `next()` and checking for the `done:true` condition to know when to stop.
+The `for..of` loop automatically calls `next()` for each iteration -- it doesn't pass any values in to the `next()` -- and it will automatically terminate on receiving a `done:true`. It's quite handy for looping over a set of data.
+
+Of course, you could manually loop over iterators, calling `next()` and checking for the `done:true` condition to know when to stop.
 
 ```js
 for (
@@ -463,6 +484,8 @@ for (
 // 1 9 33 105 321 969
 ```
 
+**Note:** This manual `for` approach is certainly uglier than the ES6 `for..of` loop syntax, but its advantage is that it affords you the opportunity to pass in values to the `next(..)` calls if necessary.
+
 In addition to making your own *iterators*, many built-in data structures in JS (as of ES6), like `array`s, also have default *iterators*:
 
 ```js
@@ -476,7 +499,7 @@ for (var v of a) {
 
 The `for..of` loop asks `a` for its *iterator*, and automatically uses it to iterate over `a`'s values.
 
-**Note:** It may seem a strange omission by ES6, but regular `object`s intentionally do not come with a default *iterator* the way `array`s do. The reasons go deeper than we will cover here. If all you want is to iterate over the properties of an object (with no particular guarantee of ordering), `Object.keys(..)` returns an `array`, which can then be used as `for (var k of Object.keys(obj)) { ..`.
+**Note:** It may seem a strange omission by ES6, but regular `object`s intentionally do not come with a default *iterator* the way `array`s do. The reasons go deeper than we will cover here. If all you want is to iterate over the properties of an object (with no particular guarantee of ordering), `Object.keys(..)` returns an `array`, which can then be used like `for (var k of Object.keys(obj)) { ..`.
 
 ### Iterables
 
@@ -1501,270 +1524,6 @@ What processing steps follow from that code? Hang out, this is going to be quite
 
 Phew! A lot of crazy mental juggling, huh? You might want to read through that a few more times, and then go grab a snack to clear your head!
 
-## Pre-ES6 Generators
-
-You're hopefully convinced now that generators are a very important addition to the async programming toolbox. But it's a new syntax in ES6, which means you can't just polyfill generators like you can promises (which are just a new API). So what can we do to bring generators to our browser JS if we don't have the luxury of ignoring pre-ES6 browsers?
-
-For all new syntax extensions in ES6, there are tools -- the most common term for them is transpilers, for trans-compilers -- which can take your ES6 syntax and transform it into equivalent (but obviously uglier!) pre-ES6 code. So, generators can be transpiled into code that will have the same behavior but works in ES5 and below browsers.
-
-But how? The "magic" of `yield` doesn't obviously sound like code that's easy to transpile. We actually hinted at a solution in our earlier discussion of closure-based *iterators*.
-
-### Manual Transformation
-
-Before we discuss the transpilers, let's derive how manual transpilation would work in the case of generators. This isn't just an academic exercise, because doing so will actually help further reinforce how they work.
-
-Consider:
-
-```js
-// `request(..)` is a promise-aware Ajax utility
-
-function *foo(url) {
-	try {
-		console.log( "requesting:", url );
-		var val = yield request( url );
-		console.log( val );
-	}
-	catch (err) {
-		console.log( "Oops:", err );
-		return false;
-	}
-}
-
-var it = foo( "http://some.url.1" );
-```
-
-The first thing to observe is that we'll still need a normal `foo()` function that can be called, and it will still need to return an *iterator*. So, let's sketch out the non-generator transformation:
-
-```js
-function foo(url) {
-
-	// ..
-
-	// make and return an iterator
-	return {
-		next: function(v) {
-			// ..
-		},
-		throw: function(e) {
-			// ..
-		}
-	};
-}
-
-var it = foo( "http://some.url.1" );
-```
-
-The next thing to observe is that a generator does its "magic" by suspending its scope/state, but we can emulate that with function closure (see the *"Scope & Closures"* title of this series). To understand how to write such code, we'll first annotate different parts of our generator with state values:
-
-```js
-// `request(..)` is a promise-aware Ajax utility
-
-function *foo(url) {
-	// STATE *1*
-
-	try {
-		console.log( "requesting:", url );
-		var TMP1 = request( url );
-
-		// STATE *2*
-		var val = yield TMP1;
-		console.log( val );
-	}
-	catch (err) {
-		// STATE *3*
-		console.log( "Oops:", err );
-		return false;
-	}
-}
-```
-
-**Note:** For more accurate illustration, we split up the `val = yield request..` statement into two parts, using the temporary `TMP1` variable. `request(..)` happens in state `*1*`, and the assignment of its completion value to `val` happens in state `*2*`. We'll get rid of that intermediate `TMP1` when we convert the code to its non-generator equivalent.
-
-In other words, `*1*` is the beginning state, `*2*` is the state if the `request(..)` succeeds, and `*3*` is the state if the `request(..)` fails. You can probably imagine how any extra `yield` steps would just be encoded as extra states.
-
-Back to our transpiled generator, let's define a variable `state` in the closure we can use to keep track of the state:
-
-```js
-function foo(url) {
-	// manage generator state
-	var state;
-
-	// ..
-}
-```
-
-Now, let's define an inner function called `process(..)` inside the closure which handles each state, using a `switch` statement:
-
-```js
-// `request(..)` is a promise-aware Ajax utility
-
-function foo(url) {
-	// manage generator state
-	var state;
-
-	// generator-wide variable declarations
-	var val;
-
-	function process(v) {
-		switch (state) {
-			case 1:
-				console.log( "requesting:", url );
-				return request( url );
-			case 2:
-				val = v;
-				console.log( val );
-				return;
-			case 3:
-				var err = v;
-				console.log( "Oops:", err );
-				return false;
-		}
-	}
-
-	// ..
-}
-```
-
-Each state in our generator is represented by its own `case` in the `switch` statement. `process(..)` will be called each time we need to process a new state. We'll come back to how that works in just a moment.
-
-For any generator-wide variable declarations (`val`), we move those to a `var` declaration outside of `process(..)` so they can survive multiple calls to `process(..)`. But the "block scoped" `err` variable is only needed for the `*3*` state, so we leave it in place.
-
-In state `*1*`, instead of `yield resolve(..)`, we did `return resolve(..)`. In terminal state `*2*`, there was no explicit `return`, so we just do a `return;` which is the same as `return undefined`. In terminal state `*3*`, there was a `return false`, so we preserve that.
-
-Now we need to define the code in the *iterator* functions so they call `process(..)` appropriately:
-
-```js
-function foo(url) {
-	// manage generator state
-	var state;
-
-	// generator-wide variable declarations
-	var val;
-
-	function process(v) {
-		switch (state) {
-			case 1:
-				console.log( "requesting:", url );
-				return request( url );
-			case 2:
-				val = v;
-				console.log( val );
-				return;
-			case 3:
-				var err = v;
-				console.log( "Oops:", err );
-				return false;
-		}
-	}
-
-	// make and return an iterator
-	return {
-		next: function(v) {
-			// initial state
-			if (!state) {
-				state = 1;
-				return {
-					done: false,
-					value: process()
-				};
-			}
-			// yield resumed successfully
-			else if (state == 1) {
-				state = 2;
-				return {
-					done: true,
-					value: process( v )
-				};
-			}
-			// generator already completed
-			else {
-				return {
-					done: true,
-					value: undefined
-				};
-			}
-		},
-		"throw": function(e) {
-			// the only explicit error handling is in
-			// state *1*
-			if (state == 1) {
-				state = 3;
-				return {
-					done: true,
-					value: process( e )
-				};
-			}
-			// otherwise, an error won't be handled,
-			// so just throw it right back out
-			else {
-				throw e;
-			}
-		}
-	};
-}
-```
-
-How does this code work?
-
-1. The first call to the *iterator*'s `next()` call would move the generator from the unitialized state to state `1`, and then calling `process()` to handle that state. The return value from `request(..)`, which is the promise for the Ajax response, is returned back as the `value` property from the `next()` call.
-2. If the Ajax request succeeds, the second call to `next(..)` should send in the Ajax response value, which moves our state to `2`. `process(..)` is again called (this time with the passed in Ajax response value), and the `value` property returned from `next(..)` will be `undefined`.
-3. However, if the Ajax request fails, `throw(..)` should be called with the error, which would move the state from `1` to `3` (instead of `2`). Again `process(..)` is called, this time with the error value. That `case` returns `false`, which is set as the `value` property returned from the `throw(..)` call.
-
-From the outside -- that is, interacting only with the *iterator* -- this `foo(.)` normal function works pretty much the same as the `*foo(..)` generator would have worked. So we've effectively "transpiled" our ES6 generator to pre-ES6 compatibility!
-
-We could then manually instantiate our generator and control its iterator -- calling `var it = foo("..")` and `it.next(..)` and such -- or better, we could pass it to our previously defined `run(..)` utility as `run(foo,"..")`.
-
-### Automatic Transpilation
-
-The above exercise of manually deriving a transformation of our ES6 generator to pre-ES6 equivalent teaches us how generators work conceptually. But that transformation was really intricate and very non-portable to other generators in our code. It would be quite impractical to do this work by hand, and would completely obviate all the benefit of generators.
-
-But luckily, several tools already exist which can automatically conver ES6 generators to things like what we derived above. Not only do they do the heavy lifting work for us, but they also handle several complications that we glossed over.
-
-One such tool is regenerator (https://facebook.github.io/regenerator/), from the smart folks at Facebook.
-
-If we use regenerator to transpile our previous generator, here's the code produced (at time of writing):
-
-```js
-// `request(..)` is a promise-aware Ajax utility
-
-var foo = regeneratorRuntime.mark(function foo(url) {
-    var val;
-
-    return regeneratorRuntime.wrap(function foo$(context$1$0) {
-        while (1) switch (context$1$0.prev = context$1$0.next) {
-        case 0:
-            context$1$0.prev = 0;
-            console.log( "requesting:", url );
-            context$1$0.next = 4;
-            return request( url );
-        case 4:
-            val = context$1$0.sent;
-            console.log( val );
-            context$1$0.next = 12;
-            break;
-        case 8:
-            context$1$0.prev = 8;
-            context$1$0.t0 = context$1$0.catch(0);
-            console.log("Oops:", context$1$0.t0);
-            return context$1$0.abrupt("return", false);
-        case 12:
-        case "end":
-            return context$1$0.stop();
-        }
-    }, foo, this, [[0, 8]]);
-});
-```
-
-There's some obvious similarities here to our manual derivation, such as the `switch` / `case` statements, and we even see `val` pulled out of the closure just as we did.
-
-Of course, one tradeoff is that regenerator's transpilation requires a helper library `regeneratorRuntime` that holds all the reusable logic for managing general generator / *iterator*. A lot of that boilerplate looks different than our version, but even then, the concepts can be seen, like with `context$1$0.next = 4` keeping track of the next state for the generator, etc.
-
-The main takeaway is that generators are not restricted to only being useful in ES6+ environments. Once you understand the concepts, you can employ them throughout your code, and use tools to transform the code to be compatible with older environments.
-
-This is more work than just using a `Promise` API polyfill for pre-ES6 promises, but the effort is totally worth it, because generators are so much better at expressing async flow control in a reason-able, sensible, synchronous-looking, sequential fashion.
-
-Once you get hooked on generators, you'll never want to go back to the hell of async spaghetti callbacks!
-
 ## Generator Concurrency
 
 As we discussed in both Chapter 1 and earlier in this chapter, two simultaneously running "processes" can cooperatively interleave their operations, and many times this can *yield* (pun intended) very powerful asynchrony expressions.
@@ -2212,6 +1971,270 @@ Symmetry wise, these two approaches look identical. However, we should point out
 From the larger perspective, thunks do not in and of themselves have hardly any of the trustability or composability guarantees that promises are architected with. Using a thunk as a stand-in for a promise in this particular generator asynchrony usage scenario is workable but should be seen as less than ideal when compared to all the benefits that promises bring to the equation (see Chapter 3).
 
 If you have the option, prefer `yield pr` rather than `yield th`. But there's nothing wrong with having a `run(..)` utility which can handle both value types. The `runner(..)` utility in my *asynquence* library, which will be discussed in Appendix A of this book, handles `yield`s of promises, sequences, and thunks.
+
+## Pre-ES6 Generators
+
+You're hopefully convinced now that generators are a very important addition to the async programming toolbox. But it's a new syntax in ES6, which means you can't just polyfill generators like you can promises (which are just a new API). So what can we do to bring generators to our browser JS if we don't have the luxury of ignoring pre-ES6 browsers?
+
+For all new syntax extensions in ES6, there are tools -- the most common term for them is transpilers, for trans-compilers -- which can take your ES6 syntax and transform it into equivalent (but obviously uglier!) pre-ES6 code. So, generators can be transpiled into code that will have the same behavior but works in ES5 and below browsers.
+
+But how? The "magic" of `yield` doesn't obviously sound like code that's easy to transpile. We actually hinted at a solution in our earlier discussion of closure-based *iterators*.
+
+### Manual Transformation
+
+Before we discuss the transpilers, let's derive how manual transpilation would work in the case of generators. This isn't just an academic exercise, because doing so will actually help further reinforce how they work.
+
+Consider:
+
+```js
+// `request(..)` is a promise-aware Ajax utility
+
+function *foo(url) {
+	try {
+		console.log( "requesting:", url );
+		var val = yield request( url );
+		console.log( val );
+	}
+	catch (err) {
+		console.log( "Oops:", err );
+		return false;
+	}
+}
+
+var it = foo( "http://some.url.1" );
+```
+
+The first thing to observe is that we'll still need a normal `foo()` function that can be called, and it will still need to return an *iterator*. So, let's sketch out the non-generator transformation:
+
+```js
+function foo(url) {
+
+	// ..
+
+	// make and return an iterator
+	return {
+		next: function(v) {
+			// ..
+		},
+		throw: function(e) {
+			// ..
+		}
+	};
+}
+
+var it = foo( "http://some.url.1" );
+```
+
+The next thing to observe is that a generator does its "magic" by suspending its scope/state, but we can emulate that with function closure (see the *"Scope & Closures"* title of this series). To understand how to write such code, we'll first annotate different parts of our generator with state values:
+
+```js
+// `request(..)` is a promise-aware Ajax utility
+
+function *foo(url) {
+	// STATE *1*
+
+	try {
+		console.log( "requesting:", url );
+		var TMP1 = request( url );
+
+		// STATE *2*
+		var val = yield TMP1;
+		console.log( val );
+	}
+	catch (err) {
+		// STATE *3*
+		console.log( "Oops:", err );
+		return false;
+	}
+}
+```
+
+**Note:** For more accurate illustration, we split up the `val = yield request..` statement into two parts, using the temporary `TMP1` variable. `request(..)` happens in state `*1*`, and the assignment of its completion value to `val` happens in state `*2*`. We'll get rid of that intermediate `TMP1` when we convert the code to its non-generator equivalent.
+
+In other words, `*1*` is the beginning state, `*2*` is the state if the `request(..)` succeeds, and `*3*` is the state if the `request(..)` fails. You can probably imagine how any extra `yield` steps would just be encoded as extra states.
+
+Back to our transpiled generator, let's define a variable `state` in the closure we can use to keep track of the state:
+
+```js
+function foo(url) {
+	// manage generator state
+	var state;
+
+	// ..
+}
+```
+
+Now, let's define an inner function called `process(..)` inside the closure which handles each state, using a `switch` statement:
+
+```js
+// `request(..)` is a promise-aware Ajax utility
+
+function foo(url) {
+	// manage generator state
+	var state;
+
+	// generator-wide variable declarations
+	var val;
+
+	function process(v) {
+		switch (state) {
+			case 1:
+				console.log( "requesting:", url );
+				return request( url );
+			case 2:
+				val = v;
+				console.log( val );
+				return;
+			case 3:
+				var err = v;
+				console.log( "Oops:", err );
+				return false;
+		}
+	}
+
+	// ..
+}
+```
+
+Each state in our generator is represented by its own `case` in the `switch` statement. `process(..)` will be called each time we need to process a new state. We'll come back to how that works in just a moment.
+
+For any generator-wide variable declarations (`val`), we move those to a `var` declaration outside of `process(..)` so they can survive multiple calls to `process(..)`. But the "block scoped" `err` variable is only needed for the `*3*` state, so we leave it in place.
+
+In state `*1*`, instead of `yield resolve(..)`, we did `return resolve(..)`. In terminal state `*2*`, there was no explicit `return`, so we just do a `return;` which is the same as `return undefined`. In terminal state `*3*`, there was a `return false`, so we preserve that.
+
+Now we need to define the code in the *iterator* functions so they call `process(..)` appropriately:
+
+```js
+function foo(url) {
+	// manage generator state
+	var state;
+
+	// generator-wide variable declarations
+	var val;
+
+	function process(v) {
+		switch (state) {
+			case 1:
+				console.log( "requesting:", url );
+				return request( url );
+			case 2:
+				val = v;
+				console.log( val );
+				return;
+			case 3:
+				var err = v;
+				console.log( "Oops:", err );
+				return false;
+		}
+	}
+
+	// make and return an iterator
+	return {
+		next: function(v) {
+			// initial state
+			if (!state) {
+				state = 1;
+				return {
+					done: false,
+					value: process()
+				};
+			}
+			// yield resumed successfully
+			else if (state == 1) {
+				state = 2;
+				return {
+					done: true,
+					value: process( v )
+				};
+			}
+			// generator already completed
+			else {
+				return {
+					done: true,
+					value: undefined
+				};
+			}
+		},
+		"throw": function(e) {
+			// the only explicit error handling is in
+			// state *1*
+			if (state == 1) {
+				state = 3;
+				return {
+					done: true,
+					value: process( e )
+				};
+			}
+			// otherwise, an error won't be handled,
+			// so just throw it right back out
+			else {
+				throw e;
+			}
+		}
+	};
+}
+```
+
+How does this code work?
+
+1. The first call to the *iterator*'s `next()` call would move the generator from the unitialized state to state `1`, and then calling `process()` to handle that state. The return value from `request(..)`, which is the promise for the Ajax response, is returned back as the `value` property from the `next()` call.
+2. If the Ajax request succeeds, the second call to `next(..)` should send in the Ajax response value, which moves our state to `2`. `process(..)` is again called (this time with the passed in Ajax response value), and the `value` property returned from `next(..)` will be `undefined`.
+3. However, if the Ajax request fails, `throw(..)` should be called with the error, which would move the state from `1` to `3` (instead of `2`). Again `process(..)` is called, this time with the error value. That `case` returns `false`, which is set as the `value` property returned from the `throw(..)` call.
+
+From the outside -- that is, interacting only with the *iterator* -- this `foo(.)` normal function works pretty much the same as the `*foo(..)` generator would have worked. So we've effectively "transpiled" our ES6 generator to pre-ES6 compatibility!
+
+We could then manually instantiate our generator and control its iterator -- calling `var it = foo("..")` and `it.next(..)` and such -- or better, we could pass it to our previously defined `run(..)` utility as `run(foo,"..")`.
+
+### Automatic Transpilation
+
+The above exercise of manually deriving a transformation of our ES6 generator to pre-ES6 equivalent teaches us how generators work conceptually. But that transformation was really intricate and very non-portable to other generators in our code. It would be quite impractical to do this work by hand, and would completely obviate all the benefit of generators.
+
+But luckily, several tools already exist which can automatically conver ES6 generators to things like what we derived above. Not only do they do the heavy lifting work for us, but they also handle several complications that we glossed over.
+
+One such tool is regenerator (https://facebook.github.io/regenerator/), from the smart folks at Facebook.
+
+If we use regenerator to transpile our previous generator, here's the code produced (at time of writing):
+
+```js
+// `request(..)` is a promise-aware Ajax utility
+
+var foo = regeneratorRuntime.mark(function foo(url) {
+    var val;
+
+    return regeneratorRuntime.wrap(function foo$(context$1$0) {
+        while (1) switch (context$1$0.prev = context$1$0.next) {
+        case 0:
+            context$1$0.prev = 0;
+            console.log( "requesting:", url );
+            context$1$0.next = 4;
+            return request( url );
+        case 4:
+            val = context$1$0.sent;
+            console.log( val );
+            context$1$0.next = 12;
+            break;
+        case 8:
+            context$1$0.prev = 8;
+            context$1$0.t0 = context$1$0.catch(0);
+            console.log("Oops:", context$1$0.t0);
+            return context$1$0.abrupt("return", false);
+        case 12:
+        case "end":
+            return context$1$0.stop();
+        }
+    }, foo, this, [[0, 8]]);
+});
+```
+
+There's some obvious similarities here to our manual derivation, such as the `switch` / `case` statements, and we even see `val` pulled out of the closure just as we did.
+
+Of course, one tradeoff is that regenerator's transpilation requires a helper library `regeneratorRuntime` that holds all the reusable logic for managing general generator / *iterator*. A lot of that boilerplate looks different than our version, but even then, the concepts can be seen, like with `context$1$0.next = 4` keeping track of the next state for the generator, etc.
+
+The main takeaway is that generators are not restricted to only being useful in ES6+ environments. Once you understand the concepts, you can employ them throughout your code, and use tools to transform the code to be compatible with older environments.
+
+This is more work than just using a `Promise` API polyfill for pre-ES6 promises, but the effort is totally worth it, because generators are so much better at expressing async flow control in a reason-able, sensible, synchronous-looking, sequential fashion.
+
+Once you get hooked on generators, you'll never want to go back to the hell of async spaghetti callbacks!
 
 ## Summary
 

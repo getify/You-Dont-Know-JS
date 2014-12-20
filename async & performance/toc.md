@@ -17,6 +17,7 @@
 	* Trying To Save Callbacks
 * Chapter 3: Promises
 	* What is a Promise?
+	* Thenable Duck-Typing
 	* Promise Trust
 	* Chain Flow
 	* Error Handling
@@ -29,9 +30,9 @@
 	* Iterating Generators Asynchronously
 	* Generators + Promises
 	* Generator Delegation
-	* Pre-ES6 Generators
 	* Generator Concurrency
 	* Thunks
+	* Pre-ES6 Generators
 * Chapter 5: Program Performance
 	* Web Workers
 	* Parallel JS

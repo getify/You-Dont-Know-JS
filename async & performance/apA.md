@@ -613,7 +613,7 @@ ASQ( 42 )
 } );
 ```
 
-### Promises & Callbacks
+## Promises & Callbacks
 
 I think *asynquence* sequences provide a lot of value on top of native promises, and for the most part you'll find it more pleasant and more powerful to work at that level of abstration. However, integrating *asynquence* with other non-*asynquence* code will be a reality.
 
@@ -678,7 +678,7 @@ coolUtility( 1, 2 )
 
 **Note:** For clarity (and fun!) sake, let's coin yet another term, for a sequence-producing function that comes from `ASQ.wrap(..)`, like `coolUtility` here. I propose "sequory" ("sequence" + "factory").
 
-### Iterable Sequences
+## Iterable Sequences
 
 The normal paradigm for a sequence is that each step is responsible for completing itself, which is what advances the sequence. Promises work the same way.
 
@@ -744,7 +744,7 @@ document.addEventListener( "DOMContentLoaded", domready.next );
 
 There's more to iterable sequences than what we see in this scenario. We'll come back to them in the next appendix.
 
-### Running Generators
+## Running Generators
 
 In Chapter 4, we derived a utility called `run(..)` which can run generators to completion, listening for `yield`ed promises and using them to async resume the generator. *asynquence* has just such a utility built in, called `runner(..)`.
 
@@ -788,7 +788,7 @@ ASQ( 10, 11 )
 } );
 ```
 
-#### Wrapped Generators
+### Wrapped Generators
 
 You can also create a self-packaged generator -- that is, a normal function that runs your specified generator and returns a sequence for its completion -- by `ASQ.wrap(..)`ing it:
 
