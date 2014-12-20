@@ -395,7 +395,7 @@ Now, let's imagine that in the earlier snippet you had been worried about whethe
 
 Speaking of `--`, `--n` vs `n--` is often cited as one of those places where you can optimize by choosing the `--n` version, since theoretically it requires less effort down at the assembly level of processing.
 
-That sort of obsession is basically nonsense in modern JavaScript. That's the kind of thing you should be letting the engine take care of. You should write the code that makes the most sense. Compare these two for loops:
+That sort of obsession is basically nonsense in modern JavaScript. That's the kind of thing you should be letting the engine take care of. You should write the code that makes the most sense. Compare these three `for` loops:
 
 ```js
 // Option 1
@@ -404,46 +404,96 @@ for (var i=0; i<10; i++) {
 }
 
 // Option 2
+for (var i=0; i<10; ++i) {
+	console.log( i );
+}
+
+// Option 3
 for (var i=-1; ++i<10; ) {
 	console.log( i );
 }
 ```
 
-Even if you have some theory where the second option is more performant than the first option by a tiny bit, which is dubious at best, the second loop is more confusing since you have to start with `-1` for `i` to account for the fact that `++i` pre-increment is used.
+Even if you have some theory where the second or third option is more performant than the first option by a tiny bit, which is dubious at best, the third loop is more confusing since you have to start with `-1` for `i` to account for the fact that `++i` pre-increment is used. And the difference between the first and second options is really quite irrelevant.
+
+It's entirely possible that a JS engine may see a place where `i++`
+
+Here's another common example of silly microperformance obsession:
+
+```js
+var x = [ .. ];
+
+// Option 1
+for (var i=0; i < x.length; i++) {
+	// ..
+}
+
+// Option 2
+for (var i=0, len = x.length; i < len; i++) {
+	// ..
+}
+```
+
+The theory here goes that you should cache the length of the `x` array in the variable `len`, since ostensibly it doesn't change, to avoid paying the price of `x.length` being consulted for each iteration of the loop.
+
+If you run performance benchmarks around `x.length` usage compared to caching it in a `len` variable, you'll find that while the theory sounds nice, in practice any measured differences are statistically completely irrelevant.
 
 ### Not all engines are alike
 
-You might not have realized it before now, but the different JS engines in various browsers can all be "spec compliant" while having radically different ways of handling code. The JS specification doesn't require anything performance related -- well, except ES6's "tail call optimization" covered later in this chapter.
+The different JS engines in various browsers can all be "spec compliant" while having radically different ways of handling code. The JS specification doesn't require anything performance related -- well, except ES6's "tail call optimization" covered later in this chapter.
 
-The JS engines are free to decide that one operation will receive its attention to optimize, trading off for lesser performance on another operation. There's quite a bit of difference in a lot of parts of JavaScript, so it can be very tenuous to try to find an operation that always runs faster in all browsers.
+The engines are free to decide that one operation will receive its attention to optimize, perhaps trading off for lesser performance on another operation. It can be very tenuous to find an approach for an operation that always runs faster in all browsers.
 
-There's a movement among some in the JS dev community, especially those who work with Node.js, to analyze internal implementation details of the v8 JavaScript engine and make decisions about writing JS code that is tailored to take best advantage of these potential optimizations. You can actually achieve a surprisingly high degree of performance optimization in such activities, so the payoff for the effort is quite attractive.
+There's a movement among some in the JS dev community, especially those who work with Node.js, to analyze the specific internal implementation details of the v8 JavaScript engine and make decisions about writing JS code that is tailored to take best advantage of how v8 works. You can actually achieve a surprisingly high degree of performance optimization in such activities, so the payoff for the effort is quite attractive.
 
-But let's sanity check that approach. Are you genuinely writing code that only needs to run in one JS engine? Even if your code is entirely intended for Node.js, is the assumption that v8 will *always* be the used JS engine reliable? Is it possible that someday a few years from now, there's another server-side JS platform besides Node.js that you choose to run your code on? Furthermore, what if what you optimized for before is now a much slower way of doing that operation on the new engine?
+Some commonly cited examples (https://github.com/petkaantonov/bluebird/wiki/Optimization-killers) for v8:
+
+1. Don't pass the `arguments` variable from one function to any other function, as such "leakage" slows down the function implementation.
+2. Isolate a `try..catch` in its own function. Browsers struggle with optimizing any function with a `try..catch` in it, so moving that construct to its own function means you contain the de-optimization harm while letting the surrounding code be optimizable.
+
+But let's sanity check this approach from the general sense.
+
+Are you genuinely writing code that only needs to run in one JS engine? Even if your code is entirely intended for Node.js, is the assumption that v8 will *always* be the used JS engine reliable? Is it possible that someday a few years from now, there's another server-side JS platform besides Node.js that you choose to run your code on? What if what you optimized for before is now a much slower way of doing that operation on the new engine?
 
 Or what if your code always stays running on v8 from here on out, but v8 decides at some point to change the way some set of operations works such that what used to be fast is now slow, and vice versa?
 
-These scenarios aren't just theoretical, either. It used to be that it was faster to put multiple string values into an array and then call `join("")` on the array to concatenate the values than to just use `+` concatenation directly with the values. The historical reason for this is nuanced, but it has to do with internal implementation details about how string values are stored and managed in memory.
+These scenarios aren't just theoretical, either. It used to be that it was faster to put multiple string values into an array and then call `join("")` on the array to concatenate the values than to just use `+` concatenation directly with the values. The historical reason for this is nuanced, but it has to do with internal implementation details about how string values were stored and managed in memory.
 
-There was lots of "best practice" advice that disseminated across the industry telling devs to always use the array `join(..)` approach. And many people did.
+As a result, "best practice" advice at the time disseminated across the industry suggesting devs always use the array `join(..)` approach. And many people followed.
 
-Except, somewhere along the way, the JS engines changed details about how they managed strings, and they specifically put in optimizations to make `+` concatenation faster. They didn't de-optimize `join(..)` per se, but they put more effort into special case optimizing the `+` usage, since it was still quite a bit more wide spread.
+Except, somewhere along the way, the JS engines changed details about how they managed strings, and they specifically put in optimizations to optimize `+` concatenation. They didn't de-optimize `join(..)` per se, but they put more effort into helping `+` usage, since it was still quite a bit more wide spread.
 
-**Note:** The practice of standardizing or optimizing some particular approach based mostly on its existing wide spread usage is often called metaphorically "paving the cowpath".
+**Note:** The practice of standardizing or optimizing some particular approach based mostly on its existing wide spread usage is often called (metaphorically) "paving the cowpath".
 
-Once that new approach to handling strings and concatenation took hold, all the code across the web that was using array `join(..)` to concatenate strings became sub-optimal, simply because it was *now* not using the most optimal approach based on engine changes alone.
+Once that new approach to handling strings and concatenation took hold, unfortunately all the code across the web that was using array `join(..)` to concatenate strings was then sub-optimal.
 
-I think these various gotchas are at least possible, if not likely, for our code. So I'm very cautious about making wide ranging performance optimizations in my JS code based purely on engine implementation details, **especially if those details are only true of a single engine**.
+Another example: the Opera browser differed from other browsers in how it handled the boxing/unboxing of primitive wrapper objects (see the *"Types & Grammar"* title of this book series). As such, their advice to developers was to use a `String` object instead of the primitive string value if properties like `length` or methods like `charAt(..)` needed to be accessed. This advice may have been correct for Opera, but it was literally completely opposite for other major browsers, as they had optimizations specifically for the string primitives and not their object wrapper counterparts.
+
+I think these various gotchas are at least possible, if not likely, for our code even today. So I'm very cautious about making wide ranging performance optimizations in my JS code based purely on engine implementation details, **especially if those details are only true of a single engine**.
+
+The reverse is also something to be wary of: you shouldn't necessarily change a piece of code to work around one engine's difficulty with running a piece of code in an acceptably performant way.
+
+Historically, IE has been the brunt of many such frustrations, given that there have been plenty of scenarios in older IE versions where it struggled with some performance aspect that other major browsers of the time seemed not to have much trouble with. The string concatenation discussion we just had was actually a real concern back in the IE6 and IE7 days, where it was possible to get better performance out of `join(..)` than `+`.
+
+But it's troublesome to suggest that just one browser's trouble with performance is justifcation for using a code approach which quite possibly could be sub-optimial in all other browsers. Even if the browser in question has a large market share for your site's audience, it may be more practical to write the proper code and rely on the browser to update itself with better optimizations eventually.
+
+"There is nothing more permanent than a temporary hack." Chances are, the code you write now to work around some performance bug will probably outlive the performance bug in the browser itself.
+
+In the days when a browser only updated once every 5 years, that was a tougher call to make. But as it stands now, browsers across the board are updating at a much more rapid interval (though obviously the mobile world still lags), and they're all competing to optimize web features better and better.
+
+If you run across a case where a browser *does* have a performance wart that others don't suffer from, make sure to report it to them through whatever means you have available. Most browsers have open public bug trackers suitable for this purpose. Browsers generally take performance issues pretty seriously.
+
+**Note:** I'd only suggest working around a performance issue in a browser if it was a really drastic show-stopper, not just an annoyance or frustration. And I'd be very careful to check that the performance hack didn't have noticeable negative side-effects in another browser.
 
 ### Big Picture
 
-We should instead be looking at big-picture types of optimizations.
+Instead of worrying about all these microperformance nuances, we should instead be looking at big-picture types of optimizations.
 
 How do you know what's big picture or not? You have to first understand if your code is running on a critical path or not. If it's not on the critical path, chances are your optimizations are not worth much.
 
-If it's on the critical path, such as a "hot" piece of code that's going to be run over and over again, or in UX critical places where users will notice, like an animation loop, CSS style updates, etc, then you should't spare any effort in trying to find and employ relevant and measurably significant optimizations.
+If it's on the critical path, such as a "hot" piece of code that's going to be run over and over again, or in UX critical places where users will notice, like an animation loop, CSS style updates, etc, then you should spare no effort in trying to employ relevant, measurably significant optimizations.
 
-For example, consider an animation loop that needs to coerce a string value to a number repeatedly. There are of course multiple ways to do that (see the *"Types & Grammar"* title of this book series).
+For example, consider a critical path animation loop that needs to coerce a string value to a number. There are of course multiple ways to do that (see the *"Types & Grammar"* title of this book series), but which one if any is the fastest?
 
 ```js
 var x = "42";	// need number `42`
@@ -464,19 +514,19 @@ var y = +x / 2;
 var y = (x | 0) / 2;
 ```
 
-I will leave it as an exercise to the reader to set up a test if you're interested in examining the minute differences in performance among these options.
+**Note:** I will leave it as an exercise to the reader to set up a test if you're interested in examining the minute differences in performance among these options.
 
 When considering these different options, as they say, "One of these things is not like the others." `parseInt(..)` does the job, but it also does a lot more -- it parses the string rather than just coercing. You can probably guess, correctly, that `parseInt(..)` is a slower option, and you should probably avoid it.
 
-**Note:** Of course, if `x` can ever be a value that **needs parsing**, such as `42px` (like from a CSS style lookup), then `parseInt(..)` is really the only suitable option!
+Of course, if `x` can ever be a value that **needs parsing**, such as `"42px"` (like from a CSS style lookup), then `parseInt(..)` really is the only suitable option!
 
-`Number(..)` is also a function call. From a behavioral perspective, it's identical to the `+` unary operator option, but it may in fact be a little slower requiring more machinery to execute the function. Of course, it's also possible that the JS engine recognizes this behavioral symmetry and just handles the inlining of `Number(..)`'s behavior (aka `+x`) for you!
+`Number(..)` is also a function call. From a behavioral perspective, it's identical to the `+` unary operator option, but it may in fact be a little slower, requiring more machinery to execute the function. Of course, it's also possible that the JS engine recognizes this behavioral symmetry and just handles the inlining of `Number(..)`'s behavior (aka `+x`) for you!
 
-But remember, obsessing about `+x` versus `x | 0` is in most cases likely a foolish waste of time. This is a microperformance issue, and one that you shouldn't let degrade the readability of your program.
+But remember, obsessing about `+x` versus `x | 0` is in most cases likely a waste of effort. This is a microperformance issue, and one that you shouldn't let dictate/degrade the readability of your program.
 
 While performance is very important in critical paths of your program, it's not the only factor. Among several options which are roughly similar in performance, readability should be another important concern.
 
-### Tail Call Optimization (TCO)
+## Tail Call Optimization (TCO)
 
 As we briefly mentioned earlier, ES6 includes a specific requirement that ventures into the world of performance. It's related to a specific form of optimization that can occur with recursive functions: *tail call optimization*.
 
@@ -530,11 +580,20 @@ This version of `factorial(..)` is still recursive, but it's also optimizable wi
 
 **Note:** It's important to note that TCO only applies if there's actually a tail call. If you write recursive functions without tail calls, the performance will still fall back to normal stack frame allocation, and the engines' limits on such recursive call stacks will still apply. Many recursive functions can be rewritten as we just showed with `factorial(..)`, but it takes careful attention to detail.
 
-One reason that ES6 requires engines to handle TCO rather than leaving it up to their decision is because the *lack of TCO* actually tends to reduce the chances that certain algorithms will be implemented in JS using recursion, for fear of the call stack limits.
+One reason that ES6 requires engines to implement TCO rather than leaving it up to their discretion is because the *lack of TCO* actually tends to reduce the chances that certain algorithms will be implemented in JS using recursion, for fear of the call stack limits.
 
-If the lack of TCO would just degrade to slower performance, it wouldn't probably have been something that ES6 needed to *require*. But since the lack of TCO can actually make certain programs unrunnable, it's a more important feature of the language rather than just a hidden implementation detail.
+If the lack of TCO in the engine would just gracefully degrade to slower performance in all cases, it wouldn't probably have been something that ES6 needed to *require*. But since the lack of TCO can actually make certain programs unrunnable, it's more an important feature of the language than just a hidden implementation detail.
 
-ES6 guarantees that from now on, JS developers will be able to rely on this optimization across all ES6+ compliant browsers. That's a big win for JS performance!
+ES6 guarantees that from now on, JS developers will be able to rely on this optimization across all ES6+ compliant browsers. That's a win for JS performance!
 
 ## Summary
 
+Effectively benchmarking performance of a piece of code, especially to compare it to another option for that same code to see which approach is faster, requires careful attention to detail.
+
+Rather than rolling your own statistically valid benchmarking logic, just use the Benchmark.js library which does that for you. But be careful about how you author tests, because it's far too easy to construct a test which seems valid but that's actually flawed -- even tiny differences can skew the results to be completely unreliable.
+
+It's important to get as many test results from as many different environments as possible, to eliminate hardware/device bias, etc. jsPerf.com is a fantastic website for crowdsourcing performance benchmark test runs.
+
+Many common performance tests unfortunately obsess about irrelevant microperformance details like `x++` vs `++x`. Writing good tests means understanding how to focus on big picture concerns, like optimizing on the critical path, and avoiding falling into traps like different JS engines' implementation details.
+
+Tail Call Optimization (TCO) is a required optimization as of ES6 that will make some recursive patterns pratical in JS where they would have been impossible otherwise. TCO allows a function call in the *tail position* of another function to happen without needing any extra resources, which means the engine no longer needs arbitrary restrictions on call stack depth for recursive algorithms.

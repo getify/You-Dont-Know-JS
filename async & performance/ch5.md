@@ -274,9 +274,9 @@ Besides `mul()` and `add()` shown, many other operations are likely to be includ
 
 Distinct from other program perfomance patterns discussed in this chapter, asm.js isn't necessarily something that needs to be adopted into the JS language specification. There *is* an asm.js specification (http://asmjs.org/spec/latest/) but it's mostly for tracking an agreed upon set of candidate inferences for optimization rather than a set of requirements of JS engines.
 
-There's not currently any new syntax being suggested. Instead, asm.js suggests ways to recognize existing standard JS syntax that conforms to the rules of asm.js and let engines implement their own optimizations accordingly.
+There's not currently any new syntax being proposed. Instead, asm.js suggests ways to recognize existing standard JS syntax that conforms to the rules of asm.js and let engines implement their own optimizations accordingly.
 
-There's been some disagreement between browser vendors over exactly how asm.js should be activated in a program. Early versions of the asm.js experiment suggested a `"use asm";` pragma (similar to strict mode's `"use strict";`) to help clue the JS engine to be looking for asm.js optimization opportunities and hints. Others have suggested that asm.js should just be a set of heuristics that engines automatically recognize without the author having to do anything extra, meaning that theoretically *all* (existing) programs could benefit from asm.js style optimizations.
+There's been some disagreement between browser vendors over exactly how asm.js should be activated in a program. Early versions of the asm.js experiment required a `"use asm";` pragma (similar to strict mode's `"use strict";`) to help clue the JS engine to be looking for asm.js optimization opportunities and hints. Others have asserted that asm.js should just be a set of heuristics that engines automatically recognize without the author having to do anything extra, meaning that theoretically existing programs could benefit from asm.js style optimizations without doing anything special.
 
 ### How To Optimize With asm.js
 

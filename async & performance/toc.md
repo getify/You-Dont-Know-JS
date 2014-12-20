@@ -43,6 +43,7 @@
 	* jsPerf.com
 	* Writing Good Tests
 	* Microperformance
+	* Tail Call Optimization (TCO)
 * Appendix A: *asynquence* Library
 * Appendix B: Advanced Async Patterns
 * Appendix C: Thank You's!
