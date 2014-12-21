@@ -447,7 +447,7 @@ something.next().value;		// 105
 
 **Note:** We'll explain why we need the `[Symbol.iterator]: ..` part of this code snippet in the next section on "Iterables". Syntactically though, two ES6 features are at play. First, the `[ .. ]` syntax is called a *computed property name* (see the *"this & Object Prototypes"* title of this series). It's a way in an object literal definition to specify an expression and use the result of that expression as the name for the property. Next, `Symbol.iterator` is one of ES6's predefined special `Symbol` values (see the *"ES6 & Beyond"* title of this book series).
 
-The `next()` call returns an object with two properties: `done` is a boolean signaling the iteration is complete status; `value` holds the iteration value.
+The `next()` call returns an object with two properties: `done` is a boolean signaling the iteration's complete status; `value` holds the iteration value.
 
 ES6 also adds the `for..of` loop, which means that a standard *iterator* can automatically be consumed with native loop syntax:
 
@@ -503,7 +503,7 @@ The `for..of` loop asks `a` for its *iterator*, and automatically uses it to ite
 
 ### Iterables
 
-The `something` object in our running example is called an *iterator*, as it has the `next()` method on its interface. But a closely related term is *iterable*, which is an `object` that **contains** an *iterator* that can iterate over the values.
+The `something` object in our running example is called an *iterator*, as it has the `next()` method on its interface. But a closely related term is *iterable*, which is an `object` that **contains** an *iterator* that can iterate over its values.
 
 As of ES6, the way to retrieve an *iterator* from an *iterable* is that the *iterable* must have a function on it, with the name being the special ES6 symbol value `Symbol.iterator`. When this function is called, it returns an *iterator*. Though not required, generally each call should return a fresh new *iterator*.
 
@@ -543,7 +543,7 @@ Let's turn our attention back to generators, in the context of *iterators*. A ge
 So, a generator itself is not technically an *iterable*, though it's very similar -- when you execute the generator, you get an *iterator* back.
 
 ```js
-function *foo(){}
+function *foo(){ .. }
 
 var it = foo();
 ```
@@ -567,11 +567,11 @@ function *something() {
 }
 ```
 
-**Note:** A `while..true` loop would normally be a very bad thing to include in a real JS program, at least if it doesn't have a `break` in it, as it would likely run forever, synchronously, and block/lock-up the browser UI. However, in a generator, such a loop is generally totally OK if it has a `yield` in it, as the generator will pause at each iteration, yielding back to the main program and/or to the event loop queue. To put it glibly, "generators put the `while..true` back in JS programming!"
+**Note:** A `while..true` loop would normally be a very bad thing to include in a real JS program, at least if it doesn't have a `break` or `return` in it, as it would likely run forever, synchronously, and block/lock-up the browser UI. However, in a generator, such a loop is generally totally OK if it has a `yield` in it, as the generator will pause at each iteration, `yield`ing back to the main program and/or to the event loop queue. To put it glibly, "generators put the `while..true` back in JS programming!"
 
-That's a fair bit cleaner and simpler, right!? Because the generator pauses at each `yield`, the simple scope of the function `*something()` is kept around, meaning there's no need for the closure boilerplate to preserve variable state across calls.
+That's a fair bit cleaner and simpler, right!? Because the generator pauses at each `yield`, the state (scope) of the function `*something()` is kept around, meaning there's no need for the closure boilerplate to preserve variable state across calls.
 
-Not only is it simpler code -- no need to make our own *iterator* interface -- it actually is more reason-able code, because it more clearly expresses the intent. For example, the `while..true` loop tells us the generator is intended to run forever -- to keep *generating* values as long as we keep asking for them.
+Not only is it simpler code -- we don't have to make our own *iterator* interface -- it actually is more reason-able code, because it more clearly expresses the intent. For example, the `while..true` loop tells us the generator is intended to run forever -- to keep *generating* values as long as we keep asking for them.
 
 And now we can use our shiny new `*something()` generator with a `for..of` loop, and you'll see it works basically identically:
 
@@ -594,7 +594,57 @@ If you're paying close attention, two questions may arise from this interaction 
 1. Why couldn't we say `for (var v of something) ..`? Because `something` here is a generator, which is not an *iterable*. We have to call `something()` to construct a producer for the `for..of` loop to iterate over.
 2. The `something()` call produces an *iterator*, but the `for..of` loop wants an *iterable*, right? Yep. The generator's *iterator* also has a `Symbol.iterator` function on it, which basically does a `return this`, just like the `something` *iterable* we defined earlier. In other words, a generator's *iterator* is also an *iterable*!
 
-Generators owe their namesake mostly to this *producing values* type of use-case. But again, it's only one of the use-cases for generators, and frankly not the main one we're concerned with in this chapter.
+#### Stopping The Generator
+
+In the previous example, the *iterator* instance for the `*something()` generator was basically left in a suspended state forever after the `break` in the loop was called. There may however be cases where you need to signal to a generator for it to terminate, especially if the generator may be holding onto resources (database connections, etc) that you need to free up when the consumer of the generator is done with it.
+
+You can use a `try..finally` clause inside an otherwise infinite generator, like so:
+
+```js
+function *something() {
+	try {
+		var nextVal;
+
+		while (true) {
+			if (nextVal === undefined) {
+				nextVal = 1;
+			}
+			else {
+				nextVal = (3 * nextVal) + 6;
+			}
+
+			yield nextVal;
+		}
+	}
+	finally {
+		console.log( "cleaning up!" );
+	}
+}
+```
+
+Here, the `finally` clause is essentially a cleanup clause for the generator. Now, you can manually terminate the generator's *iterator* instance by calling `return(..)` on it:
+
+```js
+var it = something();
+for (var v of it) {
+	console.log( v );
+
+	// don't let the loop run forever!
+	if (v > 500) {
+		console.log(
+			it.return( "Hello World" ).value
+		);
+		// no `break` needed here
+	}
+}
+// 1 9 33 105 321 969
+// cleaning up!
+// Hello World
+```
+
+When we call `it.return(..)`, it immediately terminates the generator, which of course runs the `finally` clause. Also, it sets the `value` to whatever you passed in to `return(..)`, which how `"Hello World"` comes right back out. We also don't need to include a `break` because the generator's *iterator* is now set to `done:true`, so the `for..of` loop will terminate on its next iteration.
+
+Generators owe their namesake mostly to this *consuming produced values* type of use-case. But again, that's just one of the use-cases for generators, and frankly not even the main one we're concerned with in the context of this book.
 
 Now that we more fully understand some of the mechanics of how they work, we'll *next* turn our attention to how generators apply to the async concurrency use-case.
 
