@@ -76,7 +76,7 @@ it.next();				// x: 3
 
 OK, there's quite a bit of new and potentially confusing stuff in those two code snippets, so we've got plenty to wade through. But before we explain the different mechanics/syntax with ES6 generators, let's walk through the behavior flow:
 
-1. The `it = foo()` operation does *not* execute the `*foo()` generator yet, but it merely constructs an *iterator* that will control its execution. More on *iterator*s in a bit.
+1. The `it = foo()` operation does *not* execute the `*foo()` generator yet, but it merely constructs an *iterator* that will control its execution. More on *iterators* in a bit.
 2. The first `it.next()` starts the `*foo()` generator, and runs the `x++` on the first line of `*foo()`.
 3. `*foo()` pauses at the `yield` statement, at which point that first `it.next()` call finishes. At the moment, `*foo()` is still running and active, but it's in a paused state.
 4. We inspect the value of `x`, and it's now `2`.
@@ -596,9 +596,15 @@ If you're paying close attention, two questions may arise from this interaction 
 
 #### Stopping The Generator
 
-In the previous example, the *iterator* instance for the `*something()` generator was basically left in a suspended state forever after the `break` in the loop was called. There may however be cases where you need to signal to a generator for it to terminate, especially if the generator may be holding onto resources (database connections, etc) that you need to free up when the consumer of the generator is done with it.
+In the previous example, it would appear the *iterator* instance for the `*something()` generator was basically left in a suspended state forever after the `break` in the loop was called.
 
-You can use a `try..finally` clause inside an otherwise infinite generator, like so:
+But there's a hidden behavior which takes care of that for you. "Abnormal completion" (i.e., "early termination") of the `for..of` loop -- generally caused by a `break`, `return`, or an uncaught exception -- sends a signal to the generator's *iterator* for it to terminate.
+
+**Note:** Technically, the `for..of` loop also sends this signal to the *iterator* at the normal completion of the loop. For a generator, that's essentially a moot operation since the generator's *iterator* had to complete first so the `for..of` loop completed. However, custom *iterators* might desire to receive this additional signal from `for..of` loop consumers.
+
+While a `for..of` loop will automatically send this signal, you may wish to send the signal manually to an *iterator*; you do this by calling `return(..)`.
+
+If you specify a `try..finally` clause inside the generator, it will always be run even when the generator is externally completed. This is useful if you need to clean up resources (database connections, etc).
 
 ```js
 function *something() {
@@ -623,7 +629,7 @@ function *something() {
 }
 ```
 
-The `finally` clause in this snippet essentially acts as a cleanup clause for the generator. Now, you can manually terminate the generator's *iterator* instance from the outside by calling `return(..)`:
+The earlier example with `break` in the `for..of` loop will trigger the `finally` clause. But you could instead manually terminate the generator's *iterator* instance from the outside with `return(..)`:
 
 ```js
 var it = something();
@@ -633,6 +639,7 @@ for (var v of it) {
 	// don't let the loop run forever!
 	if (v > 500) {
 		console.log(
+			// complete the generator's iterator
 			it.return( "Hello World" ).value
 		);
 		// no `break` needed here
@@ -643,7 +650,7 @@ for (var v of it) {
 // Hello World
 ```
 
-When we call `it.return(..)`, it immediately terminates the generator, which of course runs the `finally` clause. Also, it sets the returned `value` to whatever you passed in to `return(..)`, which is how `"Hello World"` comes right back out. We also don't need to include a `break` because the generator's *iterator* is now set to `done:true`, so the `for..of` loop will terminate on its next iteration.
+When we call `it.return(..)`, it immediately terminates the generator, which of course runs the `finally` clause. Also, it sets the returned `value` to whatever you passed in to `return(..)`, which is how `"Hello World"` comes right back out. We also don't need to include a `break` now because the generator's *iterator* is set to `done:true`, so the `for..of` loop will terminate on its next iteration.
 
 Generators owe their namesake mostly to this *consuming produced values* use-case. But again, that's just one of the use-cases for generators, and frankly not even the main one we're concerned with in the context of this book.
 
