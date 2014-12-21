@@ -616,13 +616,14 @@ function *something() {
 			yield nextVal;
 		}
 	}
+	// cleanup clause
 	finally {
 		console.log( "cleaning up!" );
 	}
 }
 ```
 
-Here, the `finally` clause is essentially a cleanup clause for the generator. Now, you can manually terminate the generator's *iterator* instance by calling `return(..)` on it:
+The `finally` clause in this snippet essentially acts as a cleanup clause for the generator. Now, you can manually terminate the generator's *iterator* instance from the outside by calling `return(..)`:
 
 ```js
 var it = something();
@@ -642,11 +643,11 @@ for (var v of it) {
 // Hello World
 ```
 
-When we call `it.return(..)`, it immediately terminates the generator, which of course runs the `finally` clause. Also, it sets the `value` to whatever you passed in to `return(..)`, which how `"Hello World"` comes right back out. We also don't need to include a `break` because the generator's *iterator* is now set to `done:true`, so the `for..of` loop will terminate on its next iteration.
+When we call `it.return(..)`, it immediately terminates the generator, which of course runs the `finally` clause. Also, it sets the returned `value` to whatever you passed in to `return(..)`, which is how `"Hello World"` comes right back out. We also don't need to include a `break` because the generator's *iterator* is now set to `done:true`, so the `for..of` loop will terminate on its next iteration.
 
-Generators owe their namesake mostly to this *consuming produced values* type of use-case. But again, that's just one of the use-cases for generators, and frankly not even the main one we're concerned with in the context of this book.
+Generators owe their namesake mostly to this *consuming produced values* use-case. But again, that's just one of the use-cases for generators, and frankly not even the main one we're concerned with in the context of this book.
 
-Now that we more fully understand some of the mechanics of how they work, we'll *next* turn our attention to how generators apply to the async concurrency use-case.
+But now that we more fully understand some of the mechanics of how they work, we can *next* turn our attention to how generators apply to the async concurrency use-case.
 
 ## Iterating Generators Asynchronously
 
