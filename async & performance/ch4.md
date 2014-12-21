@@ -445,7 +445,7 @@ something.next().value;		// 33
 something.next().value;		// 105
 ```
 
-**Note:** We'll explain why we need the `[Symbol.iterator]: ..` part of this code snippet in the next section. Syntactically, two ES6 features are at play. First, the `[ .. ]` syntax is called a *computed property name* (see the *"this & Object Prototypes"* title of this series). It's a way in an object literal definition to specify an expression and use the result of that expression as the name for the property. Next, `Symbol.iterator` is one of ES6's predefined special Symbol values (see the *"ES6 & Beyond"* title of this book series).
+**Note:** We'll explain why we need the `[Symbol.iterator]: ..` part of this code snippet in the next section on "Iterables". Syntactically though, two ES6 features are at play. First, the `[ .. ]` syntax is called a *computed property name* (see the *"this & Object Prototypes"* title of this series). It's a way in an object literal definition to specify an expression and use the result of that expression as the name for the property. Next, `Symbol.iterator` is one of ES6's predefined special `Symbol` values (see the *"ES6 & Beyond"* title of this book series).
 
 The `next()` call returns an object with two properties: `done` is a boolean signaling the iteration is complete status; `value` holds the iteration value.
 
@@ -592,7 +592,7 @@ But don't skip over `for (var v of something()) ..`! We didn't just reference `s
 If you're paying close attention, two questions may arise from this interaction between the generator and the loop:
 
 1. Why couldn't we say `for (var v of something) ..`? Because `something` here is a generator, which is not an *iterable*. We have to call `something()` to construct a producer for the `for..of` loop to iterate over.
-2. The `something()` call produces an *iterator*, but the `for..of` loop wants an *iterable*, right? Yep. The generator *iterator* also has a `Symbol.iterator` function on it, which basically does a `return this` like ours did. In other words, the generator *iterator* is also an *iterable*!
+2. The `something()` call produces an *iterator*, but the `for..of` loop wants an *iterable*, right? Yep. The generator's *iterator* also has a `Symbol.iterator` function on it, which basically does a `return this`, just like the `something` *iterable* we defined earlier. In other words, a generator's *iterator* is also an *iterable*!
 
 Generators owe their namesake mostly to this *producing values* type of use-case. But again, it's only one of the use-cases for generators, and frankly not the main one we're concerned with in this chapter.
 
@@ -600,9 +600,9 @@ Now that we more fully understand some of the mechanics of how they work, we'll 
 
 ## Iterating Generators Asynchronously
 
-Hopefully by now, you've caught on to a hint that generators are a pretty awesome addition to JS. But you're still probably wondering what any of this has to do with async coding patterns, fixing problems with callbacks, etc. Let's get to answering that important question.
+What do generators have to do with async coding patterns, fixing problems with callbacks, etc? Let's get to answering that important question.
 
-We should revisit one of our scenarios from Chapter 3. Let's first recall the callback approach:
+We should first revisit one of our scenarios from Chapter 3. Let's first recall the callback approach:
 
 ```js
 function foo(x,y,cb) {
@@ -675,11 +675,11 @@ var data = ajax( "..url 1.." );
 console.log( data );
 ```
 
-And that code didn't work! Can you spot the difference? The `yield`, combined with the fact that the former statement is in a generator.
+And that code didn't work! Can you spot the difference? It's the `yield` used in a generator.
 
-That's the magic! That's what allows us to have what appears to be blocking, synchronous code, but it's not actually really blocking in the whole program sense -- it only pauses/blocks the code in the generator itself, not the whole program!
+That's the magic! That's what allows us to have what appears to be blocking, synchronous code, but it doesn't actually block the whole program; it only pauses/blocks the code in the generator itself.
 
-In `yield foo(11,31)`, first the `foo(11,31)` call is made, which -- at the moment! -- returns nothing (aka `undefined`), so we're making a call to request data, but we're actually then doing `yield undefined`. That's OK, because the code is not currently relying on a yielded value to do anything interesting.
+In `yield foo(11,31)`, first the `foo(11,31)` call is made, which returns nothing (aka `undefined`), so we're making a call to request data, but we're actually then doing `yield undefined`. That's OK, because the code is not currently relying on a `yield`ed value to do anything interesting. We'll revisit this point later in the chapter.
 
 We're not using `yield` in a message passing sense here, only in a flow control sense to pause/block. Actually, it will have message passing, but only in one direction, after the generator is resumed.
 
@@ -873,7 +873,7 @@ The more you start to explore this path, the more you realize, "wow, it'd be gre
 
 Several promise abstraction libraries provide just such a utility, including my *asynquence* library and its `runner(..)`, which will be discussed in Appendix A of this book.
 
-But for the sake of learning and illustration, let's for now just examine a standalone utility that I'll call `run(..)`:
+But for the sake of learning and illustration, let's just define our own standalone utility that we'll call `run(..)`:
 
 ```js
 function run(gen) {
@@ -1022,11 +1022,11 @@ main();
 
 As you can see, there's no `run(..)` call (meaning no need for a library utility!) to invoke and drive `main()` -- it's just called as a normal function. Also, `main()` isn't declared as a generator function anymore; it's a new kind of function: `async function`. And finally, instead of `yield`ing a promise, we `await` for it to resolve.
 
-The `async function` automatically knows what to do if you `await` a promise -- it will pause the function (just like with generators) until the promise resolves.
+The `async function` automatically knows what to do if you `await` a promise -- it will pause the function (just like with generators) until the promise resolves. We didn't illustrate it in this snippet, but calling an async function like `main()` automatically returns a promise that's resolved whenever the function finishes completely.
 
-**Note:** The `async` / `await` syntax should look very familiar to readers with any experience in C#, since it's practically identical.
+**Note:** The `async` / `await` syntax should look very familiar to readers with  experience in C#, since it's basically identical.
 
-The proposal essentially codifies into a syntactic mechanism support for the pattern we've already derived, which is combining async promises with sync-looking flow control code. That's the best of both worlds combined, to effectively address practically all of the major concerns we outlined with callbacks.
+The proposal essentially codifies support for the pattern we've already derived into a syntactic mechanism, which is combining promises with sync-looking flow control code. That's the best of both worlds combined, to effectively address practically all of the major concerns we outlined with callbacks.
 
 The mere fact that such a ES7'ish proposal already exists and has so much early support and enthusiasm is a major vote of confidence in the future importance of this async pattern.
 
@@ -1831,7 +1831,7 @@ fooThunk2( function(sum) {
 
 **Note:** The running `foo(..)` example expects a style of callback that's not "error-first style". Of course, "error-first style" is much more common. If `foo(..)` had some sort of legitimate error producing expectation, we could change it to expect and use an error-first callback. None of the subsequent `thunkify(..)` machinery cares what style of callback is assumed. The only difference in usage would be `fooThunk1(function(err,sum){..`.
 
-Exposing the thunkory method -- instead of how the earlier `thunkify(..)`  hides this intermediary step -- may seem like unnecessary complication. But in general, it's quite useful to make thunkories at the beginning of your program to wrap existing API methods, and then be able to pass around and call those thunkories when you need thunks. The two distinct steps preserve a cleaner separation of capability.
+Exposing the thunkory method -- instead of how the earlier `thunkify(..)` hides this intermediary step -- may seem like unnecessary complication. But in general, it's quite useful to make thunkories at the beginning of your program to wrap existing API methods, and then be able to pass around and call those thunkories when you need thunks. The two distinct steps preserve a cleaner separation of capability.
 
 To illustrate:
 
