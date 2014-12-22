@@ -908,7 +908,17 @@ I find that to be a ludicrous position to take. I find the counter-arguments of 
 
 Furthermore, I don't agree that this is the same thing as the spaces vs tabs debate -- that it's purely cosmetic -- but rather I believe it's a fundamental question of writing code that adheres to grammar requirements vs code that relies on grammar exceptions to just barely skate through.
 
+Another way of looking at it is that relying on ASI is essentially considering newlines to be significant "whitespace". Other languages like Python have true significant whitespace. But is it really appropriate to think of JavaScript as having significant newlines as it stands today?
+
 My take: **use semicolons wherever you know they are "required", and limit your assumptions about ASI to a minimum.**
+
+But don't just take my word for it. Back in 2012, creator of JavaScript Brendan Eich said (brendaneich.com/2012/04/the-infernal-semicolon/) the following:
+
+> The moral of this story: ASI is (formally speaking) a syntactic error correction procedure. If you start to code as if it were a universal significant-newline rule, you will get into trouble.
+> ..
+> I wish I had made newlines more significant in JS back in those ten days in May, 1995.
+> ..
+> Be careful not to use ASI as if it gave JS significant newlines.
 
 ## Errors
 
