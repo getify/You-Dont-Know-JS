@@ -30,6 +30,7 @@
 	* Automatic Semicolons
 	* Errors
 	* Function Arguments
+	* `try..finally`
 * Appendix A: Mixed Environment JavaScript
 * Appendix B: Thank You's!
 

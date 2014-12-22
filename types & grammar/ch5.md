@@ -1005,7 +1005,7 @@ function foo( a = 42, b = a + b + 5 ) {
 }
 ```
 
-The `b` reference in the assignment would happen in the TDZ for the parameter `b` (not pull in the outer `b` reference), so it should throw an error. However, the `a` is fine since by that *time* it's past the TDZ for parameter `a`.
+The `b` reference in the assignment would happen in the TDZ for the parameter `b` (not pull in the outer `b` reference), so it will throw an error. However, the `a` in the assignment is fine since by that *time* it's past the TDZ for parameter `a`.
 
 When using ES6's default parameter values, the default value is applied to the parameter if you either omit an argument, or you pass an `undefined` value in its place:
 
@@ -1083,6 +1083,68 @@ function foo(a) {
 
 foo( 10, 32 );	// 42
 ```
+
+## `try..finally`
+
+You're probably familiar with how the `try..catch` block works. But have you ever stopped to consider the `finally` clause that can be paired with it? In fact, were you aware that `try` only requires either `catch` or `finally`, though both can be present if needed.
+
+The code in the `finally` clause *always* runs (no matter what), and it always runs right after the `try` (and `catch` if present) finish, before any other code runs. In one sense, you can kind of think of the code in a `finally` clause as being in a callback function which will always be called regardless of how the rest of the block behaves.
+
+So what happens if there's a `return` statement inside a `try` clause? It obviously will return a value, right? But does the calling code that receives that value go before or after the `finally`?
+
+```js
+function foo() {
+	try {
+		return 42;
+	}
+	finally {
+		console.log( "Hello" );
+	}
+
+	console.log( "never runs" );
+}
+
+console.log( foo() );
+// Hello
+// 42
+```
+
+The `return 42` runs right away, which sets up the completion value from the `foo()` call. This action completes the `try` clause, and the `finally` clause immediately runs next. Only then is the `foo()` function complete, so that its completion value is returned back for the `console.log(..)` statement to use.
+
+The exact same behavior is true of a `throw` inside `try`:
+
+```js
+ function foo() {
+	try {
+		throw 42;
+	}
+	finally {
+		console.log( "Hello" );
+	}
+
+	console.log( "never runs" );
+}
+
+console.log( foo() );
+// Hello
+// Uncaught Exception: 42
+```
+
+It shouldn't be surprising that other non-linear control statements like `continue` and `break` exhibit the same behavior:
+
+```js
+for (var i=0; i<10; i++) {
+   try {
+      continue;
+   }
+   finally {
+      console.log(i);
+   }
+}
+// 0 1 2 3 4 5 6 7 8 9
+```
+
+**Note:** ES6 adds a `yield` statement, in generators (see the *"Async & Performance"*) which in some ways can be seen as an intermediate `return` statement. However, unlike a `return`, a `yield` isn't complete until the generator is resumed, which means a `try { .. yield .. }` has not completed, so a `finally` clause attached to it will not run right after the `yield` like it does with `return`.
 
 ## Summary
 
