@@ -1130,7 +1130,25 @@ console.log( foo() );
 // Uncaught Exception: 42
 ```
 
-It shouldn't be surprising that other non-linear control statements like `continue` and `break` exhibit the same behavior:
+Now, if an exception is thrown (accidentally or intentionally) inside a `finally` clause, it will override as the primary completion of that function. If a previous `return` in the `try` had set a completion value for the function, that value will be abandoned.
+
+```js
+function foo() {
+	try {
+		return 42;
+	}
+	finally {
+		throw "Oops!";
+	}
+
+	console.log( "never runs" );
+}
+
+console.log( foo() );
+// Uncaught Exception: Oops!
+```
+
+It shouldn't be surprising that other non-linear control statements like `continue` and `break` exhibit similar behavior to `return` and `throw`:
 
 ```js
 for (var i=0; i<10; i++) {
