@@ -351,6 +351,8 @@ foo: for (var i=0; i<4; i++) {
 // 3 2
 ```
 
+**Note:** `continue foo` does not really mean "go to the 'foo' labeled position to continue", but rather, "continue the loop that is labeled 'foo' with its next iteration".
+
 As you can see, we skipped over the odd-multiple `3 1` iteration, but the labeled-loop jump also skipped iterations `1 1` and `2 2`.
 
 Perhaps a slightly more useful form of the labeled-loop jump is with `break __` from inside an inner loop where you want to break out of the outer loop. Without a labeled-`break`, this same logic could sometimes be rather awkward to write:
@@ -375,6 +377,8 @@ foo: for (var i=0; i<4; i++) {
 // 1 2
 // stopping! 1 3
 ```
+
+**Note:** `break foo` does not mean "break and go to the 'foo' labeled position to continue", but rather, "break out of the loop that is labeled 'foo' and continue *after* it."
 
 The non-labeled `break` alternative to the above would probably need to involve one or more functions, shared scope variable access, etc. It would quite likely be more confusing than labeled-`break`.
 
