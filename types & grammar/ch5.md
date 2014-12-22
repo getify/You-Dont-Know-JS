@@ -304,7 +304,7 @@ How do we know this is an `object` literal? Because the `{ .. }` pair is a value
 What happens if we remove the `var a =` part of the above snippet?
 
 ```js
-// let's assume there's a `bar()` function already defined
+// assume there's a `bar()` function already defined
 
 {
 	foo: bar()
@@ -323,7 +323,7 @@ It's because of a little known (and, frankly, a discouraged) feature in JavaScri
 
 If JavaScript had a `goto` statement, you'd theoretically be able to say `goto foo` and have execution jump to that location in code. `goto`s are usually considered terrible coding idioms as they make code much harder to understand (aka "spaghetti code"), so it's a *very good thing* that JavaScript doesn't have a general `goto`.
 
-However, JS *does* support a specialized form of `goto`: labeled-loop jumps. Both the `continue` and `break` statements can optionally accept a specified label (as long as the label is attached to a currently executing loop!), in which case the jump occurs at that point kind of like a `goto`. Consider:
+However, JS *does* support a specialized form of `goto`: labeled jumps. Both the `continue` and `break` statements can optionally accept a specified label (as long as the label is attached to a currently executing loop!), in which case the jump occurs at that point kind of like a `goto`. Consider:
 
 ```js
 foo: for (var i=0; i<4; i++) {
@@ -362,6 +362,7 @@ foo: for (var i=0; i<4; i++) {
 	for (var j=0; j<4; j++) {
 		if ((i * j) >= 3) {
 			console.log( "stopping!", i, j );
+			// break out of the `foo` labeled loop
 			break foo;
 		}
 
@@ -378,11 +379,28 @@ foo: for (var i=0; i<4; i++) {
 // stopping! 1 3
 ```
 
-**Note:** `break foo` does not mean "break and go to the 'foo' labeled position to continue", but rather, "break out of the loop that is labeled 'foo' and continue *after* it."
+**Note:** `break foo` does not mean "break and go to the 'foo' labeled position to continue", but rather, "break out of the loop/block that is labeled 'foo' and continue *after* it."
 
-The non-labeled `break` alternative to the above would probably need to involve one or more functions, shared scope variable access, etc. It would quite likely be more confusing than labeled-`break`.
+The non-labeled `break` alternative to the above would probably need to involve one or more functions, shared scope variable access, etc. It would quite likely be more confusing than labeled-`break`, so here using a labeled `break` is perhaps the better option.
 
-Labeled loops are extremely uncommon, and often frowned upon. It's best to avoid them if possible, for example using function calls instead of the loop jumps. But there are perhaps some limited cases where they might be useful. If you're going to use a labeled-loop jump, make sure to document what you're doing with plenty of comments!
+A label can apply to a non-loop block, but only `break` can reference a non-loop label. That is, you can do a labeled `break ___` out of any labeled block, but you cannot `continue` a non-loop, nor can you do a non-labeled `break` out of a block.
+
+```js
+function foo() {
+	bar: {
+		console.log( "Hello" );
+		break bar;
+		console.log( "never runs" );
+	}
+	console.log( "World" );
+}
+
+foo();
+// Hello
+// World
+```
+
+Labeled loops/blocks are extremely uncommon, and often frowned upon. It's best to avoid them if possible, for example using function calls instead of the loop jumps. But there are perhaps some limited cases where they might be useful. If you're going to use a labeled jump, make sure to document what you're doing with plenty of comments!
 
 It's a very common belief that JSON is a proper subset of JS, so a string of JSON (like `{"a":42}` -- notice the quotes around the property name as JSON requires!) is thought to be a valid JavaScript program. **Not true!** Try putting `{"a":42}` into your JS console, and you'll get an error.
 
