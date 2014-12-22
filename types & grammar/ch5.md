@@ -1166,6 +1166,45 @@ The `console.log(i)` statement runs at the end of the loop iteration, which is c
 
 **Note:** ES6 adds a `yield` statement, in generators (see the *"Async & Performance"* title of this book series) which in some ways can be seen as an intermediate `return` statement. However, unlike a `return`, a `yield` isn't complete until the generator is resumed, which means a `try { .. yield .. }` has not completed. So an attached `finally` clause will not run right after the `yield` like it does with `return`.
 
+One *final* point on `finally`: a `return` inside a `finally` has the special ability to override a previous `return` from the `try` or `catch` clause, but only if `return` is explicitly called:
+
+```js
+function foo() {
+	try {
+		return 42;
+	}
+	finally {
+		// no `return ..` here, so no override
+	}
+}
+
+function bar() {
+	try {
+		return 42;
+	}
+	finally {
+		// override previous `return 42`
+		return;
+	}
+}
+
+function baz() {
+	try {
+		return 42;
+	}
+	finally {
+		// override previous `return 42`
+		return "Hello";
+	}
+}
+
+foo();	// 42
+bar();	// undefined
+baz();	// Hello
+```
+
+Normally, the omission of `return` in a function is the same as `return;` or even `return undefined;`, but inside a `finally` block the omission of `return` does not act like an overriding `return undefined`; it just lets the previous `return` stand.
+
 ## Summary
 
 JavaScript grammar has plenty of nuance that we as developers should spend a little more time paying closer attention to than we typically do. A little bit of effort goes a long way to solidifying your deeper knowledge of the language.
