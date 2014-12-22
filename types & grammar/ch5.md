@@ -1134,17 +1134,19 @@ It shouldn't be surprising that other non-linear control statements like `contin
 
 ```js
 for (var i=0; i<10; i++) {
-   try {
-      continue;
-   }
-   finally {
-      console.log(i);
-   }
+	try {
+		continue;
+	}
+	finally {
+		console.log( i );
+	}
 }
 // 0 1 2 3 4 5 6 7 8 9
 ```
 
-**Note:** ES6 adds a `yield` statement, in generators (see the *"Async & Performance"*) which in some ways can be seen as an intermediate `return` statement. However, unlike a `return`, a `yield` isn't complete until the generator is resumed, which means a `try { .. yield .. }` has not completed, so a `finally` clause attached to it will not run right after the `yield` like it does with `return`.
+The `console.log(i)` statement runs at the end of the loop iteration, which is caused by the `continue` statement. However, it still runs before the `i++` iteration update statement, which is why the values printed are `0..9` instead of `1..10`.
+
+**Note:** ES6 adds a `yield` statement, in generators (see the *"Async & Performance"* title of this book series) which in some ways can be seen as an intermediate `return` statement. However, unlike a `return`, a `yield` isn't complete until the generator is resumed, which means a `try { .. yield .. }` has not completed. So an attached `finally` clause will not run right after the `yield` like it does with `return`.
 
 ## Summary
 
