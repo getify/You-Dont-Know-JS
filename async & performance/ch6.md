@@ -5,13 +5,13 @@ If the first four chapters of this book were all about performance as a coding p
 
 One of the most common areas of curiosity -- indeed, some developers can get quite obsessed about it -- is in analyzing and testing various options for how to write a line or chunk of code, and which one is faster.
 
-We're going to look at some of these issues, but it's important to understand from the outset that this chapter is **not** about the obsession of micro-performance issues, like whether some given browser can run `++a` faster than `a++`. The more important goal of this chapter is to figure out what kinds of JS performance matter and which ones don't.
+We're going to look at some of these issues, but it's important to understand from the outset that this chapter is **not** about feeding the obsession of micro-performance issues, like whether some given JS engine can run `++a` faster than `a++`. The more important goal of this chapter is to figure out what kinds of JS performance matter and which ones don't, *and how to tell the difference*.
 
 But even before we get there, we need to explore how to most accurately and reliably test JS performance, because there's tons of misconceptions and myths that have flooded our collective cult knowledge base. We've got to sift through all that junk to find some clarity.
 
 ## Benchmarking
 
-OK, time to start dispelling some misconceptions. I'd wager the vast majority of JS devs, if asked to benchmark the speed (execution time) of a certain operation, would go about it something like this:
+OK, time to start dispelling some misconceptions. I'd wager the vast majority of JS developers, if asked to benchmark the speed (execution time) of a certain operation, would initially go about it something like this:
 
 ```js
 var start = (new Date()).getTime();	// or `Date.now()`
@@ -23,19 +23,19 @@ var end = (new Date()).getTime();
 console.log( "Duration:", (end - start) );
 ```
 
-Raise your hand if that's roughly what came to your mind. Yep, I thought so. There's a lot wrong with this approach, but don't feel bad; we've all been there.
+Raise your hand if that's roughly what came to your mind. Yep, I thought so. There's a lot wrong with this approach, but don't feel bad; **we've all been there.**
 
 What did that measurement tell you, exactly? Understanding what it does and doesn't say about the execution time of the operation in question is key to learning how to appropriately benchmark performance in JavaScript.
 
 If the duration reported is `0`, you may be tempted to believe that it took less than a millisecond. But that's not very accurate. Some platforms don't have single millisecond precision, but instead only update the timer in larger increments. For example, older versions of windows (and thus IE) had only 15ms precision, which means the operation has to take at least that long for anything other than `0` to be reported!
 
-Moreover, whatever duration is reported, the only thing you really know is that the operation took approximately that long on that exact single run. You have zero confidence that it will always run at that speed. You have no idea if the engine or system had some sort of interference at that exact moment, and that at other times the operation could run faster.
+Moreover, whatever duration is reported, the only thing you really know is that the operation took approximately that long on that exact single run. You have near-zero confidence that it will always run at that speed. You have no idea if the engine or system had some sort of interference at that exact moment, and that at other times the operation could run faster.
 
 What if the duration reported is `4`? Are you more sure it took about four milliseconds? Nope. It might have taken less time, and there may have been some other delay in getting either `start` or `end` timestamps.
 
 More troublingly, you also don't know that the circumstances of this operation test aren't overly optimistic. It's possible that the JS engine figured out a way to optimize your isolated test case, but in a more real program such optimization would be diluted or impossible, such that the operation would run slower than your test.
 
-So... what do we know? Unfortunately, with those realizations stated, we know very little. Something of such low confidence isn't even remotely good enough to build your determinations on. Your "benchmark" is basically useless. And worse, it's dangerous in that it implies false confidence, not just to you but also to others who don't think critically about the conditions.
+So... what do we know? Unfortunately, with those realizations stated, **we know very little.** Something of such low confidence isn't even remotely good enough to build your determinations on. Your "benchmark" is basically useless. And worse, it's dangerous in that it implies false confidence, not just to you but also to others who don't think critically about the conditions that led to those results.
 
 ### Repetition
 
@@ -47,13 +47,13 @@ A straight mathematical average by itself is definitely not sufficient for makin
 
 Instead of just running for a fixed number of iterations, you can instead choose to run the loop of tests until a certain amount of time has passed. That might be more reliable, but how do you decide how long to run? You might guess that it should be some multiple of how long your operation should take to run once. Wrong.
 
-Actually, the length of time to repeat across should be based on the accuracy of the timer you're using, specifically to minimize the chances of inaccuracy (aka "error"). The less precise your timer, the longer you need to run to make sure you've minimized the error percentage. A 15ms timer is pretty bad for accurate benchmarking; to minimize its uncertainty (aka "error rate") to say less than 1%, you need to run your test iterations for 750ms. A 1ms timer only needs to run for 50ms to get the same confidence.
+Actually, the length of time to repeat across should be based on the accuracy of the timer you're using, specifically to minimize the chances of inaccuracy. The less precise your timer, the longer you need to run to make sure you've minimized the error percentage. A 15ms timer is pretty bad for accurate benchmarking; to minimize its uncertainty (aka "error rate") to less than 1%, you need to run your each cycle of test iterations for 750ms. A 1ms timer only needs a cycle to run for 50ms to get the same confidence.
 
-But then, that's just a single sample. To be sure you're factoring out the skew, you'll want lots of samples to average across. You'll also want to understand something about just how slow the worst sample is, how fast the best sample is, etc. You'll want to know not just a number that tells you how fast something ran, but also to have some quantifiable measure of how trustable that number is.
+But then, that's just a single sample. To be sure you're factoring out the skew, you'll want lots of samples to average across. You'll also want to understand something about just how slow the worst sample is, how fast the best sample is, how far apart those best and worse cases were, etc. You'll want to know not just a number that tells you how fast something ran, but also to have some quantifiable measure of how trustable that number is.
 
 Also, you probably want to combine these different techniques (as well as others), so that you get the best balance of all the possible approaches.
 
-That's all bare minimum just to get started. If you've been approaching benchmarking with anything less serious than what I just glossed over, well... "you don't know: proper benchmarking."
+That's all bare minimum just to get started. If you've been approaching performance benchmarking with anything less serious than what I just glossed over, well... "you don't know: proper benchmarking."
 
 ### Benchmark.js
 
@@ -61,9 +61,9 @@ Any relevant and reliable benchmark should be based on statistically sound pract
 
 Luckily, smart folks like John-David Dalton and Mathias Bynens do understand these concepts, and wrote a statistically sound benchmarking tool called Benchmark.js (http://benchmarkjs.com/). So I can end the suspense by simply saying: "just use that tool."
 
-I am not going to write a whole manual documenting how Benchmark.js works. They have fantastic API Docs (http://benchmarkjs.com/docs) you should read, and also there are some great (http://calendar.perfplanet.com/2010/bulletproof-javascript-benchmarks/) writeups (http://monsur.hossa.in/2012/12/11/benchmarkjs.html) on more of the details and methodology.
+I won't repeat their whole documentation for how Benchmark.js works; they have fantastic API Docs (http://benchmarkjs.com/docs) you should read. Also there are some great (http://calendar.perfplanet.com/2010/bulletproof-javascript-benchmarks/) writeups (http://monsur.hossa.in/2012/12/11/benchmarkjs.html) on more of the details and methodology.
 
-But just for quick illustration purposes, here's how you could use it to run a quick test:
+But just for quick illustration purposes, here's how you could use Benchmark.js to run a quick performance test:
 
 ```js
 function foo() {
@@ -84,7 +84,7 @@ bench.stats.variance;		// variance across samples
 // ..
 ```
 
-There's *lots* more to learn about Benchmark.js besides this glance I'm including here. But the point is that it's handling all of the complexities of setting up a fair and reliable and valid performance benchmark for a piece of JavaScript code. If you're going to try to test and benchmark your code, this library is the first place you should turn.
+There's *lots* more to learn about using Benchmark.js besides this glance I'm including here. But the point is that it's handling all of the complexities of setting up a fair, reliable, and valid performance benchmark for a given piece of JavaScript code. If you're going to try to test and benchmark your code, this library is the first place you should turn.
 
 We're showing here the usage to test a single operation like X, but it's fairly common that you want to compare X to Y. This is easy to do by simply setting up two different tests in a "Suite" (a Benchmark.js organizational feature). Then, you run them head-to-head, and compare the statistics to conclude whether X or Y was faster.
 
@@ -94,7 +94,7 @@ One largely untapped potential use-case for Benchmark.js is to use it in your De
 
 #### Setup/Teardown
 
-In the code snippet above, we glossed over the "extra options" `{ .. }` object -- the docs (http://benchmarkjs.com/docs) are the best place to go further. But there are two options we should discuss: `setup` and `teardown`.
+In the code snippet above, we glossed over the "extra options" `{ .. }` object. But there are two options we should discuss: `setup` and `teardown`.
 
 These two options let you define functions to be called before and after your test case runs.
 
@@ -131,13 +131,15 @@ Even recent scientific studies showing that maybe the brain can process as quick
 
 But more importantly, let's talk about the difference between X and Y, the 2,000,000 operations per second difference. If X takes 100ns, and Y takes 80ns, the difference is 20ns, which in the best case is still one 650-thousandth of the interval the human brain can perceive.
 
-What's my point? **None of this performance difference matters, at all.**
+What's my point? **None of this performance difference matters, at all!**
 
-But wait, what if this operation is going to happen a whole bunch of times in a row? Then the difference could add up. OK, so what we're asking then is, how likely is it that operation X is going to be run over and over again, one right after the other, and that this has to happen 650,000 times just to get a sliver of a hope the human brain could perceive it. More likely, it'd have to happen 5,000,000 to 10,000,000 times right in a tight loop to even approach mattering.
+But wait, what if this operation is going to happen a whole bunch of times in a row? Then the difference could add up, right?
 
-While the computer scientist in you might protest that this is possible, the realist in you should sanity check just how likely or unlikely that really is. Even if it is relevant in rare occasions, it's irrelevant in most situations.
+OK, so what we're asking then is, how likely is it that operation X is going to be run over and over again, one right after the other, and that this has to happen 650,000 times just to get a sliver of a hope the human brain could perceive it. More likely, it'd have to happen 5,000,000 to 10,000,000 times together in a tight loop to even approach relevance.
 
-The vast majority of your benchmark results on tiny operations -- recall the `++x` vs `x++` myths mentioned earlier -- **are just totally bogus** for supporting the conclusion that X should be favored over Y on a performance basis.
+While the computer scientist in you might protest that this is possible, the louder voice of realism in you should sanity check just how likely or unlikely that really is. Even if it is relevant in rare occasions, it's irrelevant in most situations.
+
+The vast majority of your benchmark results on tiny operations -- like the `++x` vs `x++` myth -- **are just totally bogus** for supporting the conclusion that X should be favored over Y on a performance basis.
 
 ### Engine Optimizations
 
@@ -160,9 +162,7 @@ var Y2 = Number( foo );
 
 If you understand what `parseInt(..)` does compared to `Number(..)`, you might intuit that `parseInt(..)` potentially has "more work" to do, especially in the `foo` case. Or you might intuit that they should have the same amount of work to do in the `foo` case since both should be able to stop at the first character `"f"`.
 
-Which intuition is correct? I honestly don't know. But I'll make the case it doesn't matter what your intuition is.
-
-What might the results be when you test it? Again, I'm making up a pure hypothetical here, I haven't actually tried, nor do I care.
+Which intuition is correct? I honestly don't know. But I'll make the case it doesn't matter what your intuition is. What might the results be when you test it? Again, I'm making up a pure hypothetical here, I haven't actually tried, nor do I care.
 
 Let's pretend the test comes back that `X` and `Y` are statistically identical. Have you then confirmed your intuition about the `"f"` character thing? Nope.
 
@@ -172,15 +172,15 @@ Or an engine's dead-code removal heuristic could kick in, and it could realize t
 
 And all that's just made with the mindset of assumptions about a single test run. Modern engines are fantastically more complicated than what we're intuiting here. They do all sorts of tricks, like tracing and tracking how a piece of code behaves over a short period of time, or with a particularly constrained set of inputs.
 
-What if it optimizes a certain way because of the fixed input, but in your real program you give more varied input and the optimization decisions shake out differently (or not at all!)? Or what if the engine kicks in optimizations because it sees the code being run tens of thousands of times by the benchmarking utility, but in your real program it will only run a hundred times in near proximity, and under those conditions the engine determines the optimizations are not worth it?
+What if the engine optimizes a certain way because of the fixed input, but in your real program you give more varied input and the optimization decisions shake out differently (or not at all!)? Or what if the engine kicks in optimizations because it sees the code being run tens of thousands of times by the benchmarking utility, but in your real program it will only run a hundred times in near proximity, and under those conditions the engine determines the optimizations are not worth it?
 
-And all those optimizations we just hypothesized about might happen in our constrained test but maybe the engine wouldn't do in a more complex program (for various reasons), or it could be reversed -- the engine might not optimize such trivial code but may be more inclined to optimize it more aggressively (aka differently) when the system is more taxed by a more sophisticated program.
+And all those optimizations we just hypothesized about might happen in our constrained test but maybe the engine wouldn't do them in a more complex program (for various reasons). Or it could be reversed -- the engine might not optimize such trivial code but may be more inclined to optimize it more aggressively when the system is already more taxed by a more sophisticated program.
 
 The point I'm trying to make is that you really don't know for sure exactly what's going on under the covers. All the guesses and hypothesis you can muster don't amount to hardly anything concrete for really making such decisions.
 
-Does that mean you can't really do any useful testing? Definitely not!
+Does that mean you can't really do any useful testing? **Definitely not!**
 
-What this boils down to is that testing *not real* code basically gives you *not real* results. In so much as is possible and practical, you should test actual, real non-trivial snippets of your code, and under as best of real conditions as you can actually hope to. Only then will the results you get have a chance to approximate reality.
+What this boils down to is that testing *not real* code gives you *not real* results. In so much as is possible and practical, you should test actual real, non-trivial snippets of your code, and under as best of real conditions as you can actually hope to. Only then will the results you get have a chance to approximate reality.
 
 Microbenchmarks like `++x` vs `x++` are so incredibly likely to be bogus, we might as well just flatly assume them as such.
 
@@ -198,13 +198,15 @@ Each time a test is run, the results are collected and persisted with the test, 
 
 When creating a test on the site, you start out with two test cases to fill in, but you can add as many as you need. You also have the ability to set up `setup` code that is run at the beginning of each test cycle and `teardown` code run at the end of each cycle.
 
-**Note:** A trick dor doing just one test case (if you're benchmarking a single approach instead of a head-to-head) is to fill in the second test input boxes with placeholder text on first creation, then edit the test and leave the second test blank, which will delete it. You can always add more test cases later.
+**Note:** A trick for doing just one test case (if you're benchmarking a single approach instead of a head-to-head) is to fill in the second test input boxes with placeholder text on first creation, then edit the test and leave the second test blank, which will delete it. You can always add more test cases later.
 
 You can define the initial page setup (importing libraries, defining utility helper functions, declaring variables, etc). There are also options for defining setup and teardown behavior if needed -- consult the "Setup/Teardown" section in the Benchmark.js discussion earlier.
 
 ### Sanity Check
 
-jsPerf is a fantastic resource, but there's an awful lot of tests published that when you analyze them are quite flawed or bogus, for any of a variety of reasons as outlined earlier in this chapter.
+jsPerf is a fantastic resource, but there's an awful lot of tests published that when you analyze them are quite flawed or bogus, for any of a variety of reasons as outlined so far in this chapter.
+
+Consider:
 
 ```js
 // Case 1
@@ -252,11 +254,11 @@ x.sort( function mySort(a,b){
 } );
 ```
 
-Here, the ostensible intent is to find out how much slower the custom `mySort(..)` comparator is than the built-in default compartor. But by specifying the function `mySort(..)` as inline function expression, you've created an unfair/bogus test. Here, the second case is not only testing a custom user JS function, but it's also testing creating a new function expression for each iteration.
+Here, the obvious intent is to find out how much slower the custom `mySort(..)` comparator is than the built-in default compartor. But by specifying the function `mySort(..)` as inline function expression, you've created an unfair/bogus test. Here, the second case is not only testing a custom user JS function, **but it's also testing creating a new function expression for each iteration.**
 
-Would it surprise you to find out that if you run a test like the above but to isolate only for inline function expression versus a pre-declared function, the inline function expression can be from 2% to 20% slower!?
+Would it surprise you to find out that if you run a test like the above but to isolate only for creating an inline function expression versus using a pre-declared function, the inline function expression creation can be from 2% to 20% slower!?
 
-Unless your intent with this test *is* to consider the inline function expression "cost", a better/fairer test would put `mySort(..)`'s declaration in the page setup -- don't put it in the test `setup` as that's unnecessary redeclaration for each cycle -- and simply reference it by name in the test case: `x.sort(mySort)`.
+Unless your intent with this test *is* to consider the inline function expression creation "cost", a better/fairer test would put `mySort(..)`'s declaration in the page setup -- don't put it in the test `setup` as that's unnecessary redeclaration for each cycle -- and simply reference it by name in the test case: `x.sort(mySort)`.
 
 Building on the previous example, another pitfall is in opaquely avoiding or adding "extra work" to one test case that creates an apples-to-oranges scenario:
 
@@ -272,11 +274,13 @@ x.sort( function mySort(a,b){
 } );
 ```
 
-Setting aside the previously mentioned inline function expression pitfall, the second case's `mySort(..)` works in this case because you have provided it numbers, but would have of course failed with strings. The first case doesn't throw an error, but it actually works differently and has a different outcome! It should be obvious, but: **a different outcome between two test cases almost certainly invalidates the entire test!**
+Setting aside the previously mentioned inline function expression pitfall, the second case's `mySort(..)` works in this case because you have provided it numbers, but would have of course failed with strings. The first case doesn't throw an error, but it actually behaves differently and has a different outcome! It should be obvious, but: **a different outcome between two test cases almost certainly invalidates the entire test!**
 
-But beyond the different outcomes, in this case, the built in `sort(..)`'s compartor is actually doing "extra work" in that it coerces the compared values to strings and does lexicographic comparison. The first snippet results in `[-14, 0, 0, 12, 18, 2.9, 3]` while the second snippet results (likely more accurately based on intent) in `[-14, 0, 0, 2.9, 3, 12, 18]`.
+But beyond the different outcomes, in this case, the built in `sort(..)`'s comparator is actually doing "extra work" that `mySort()` does not, in that the built-in one coerces the compared values to strings and does lexicographic comparison. The first snippet results in `[-14, 0, 0, 12, 18, 2.9, 3]` while the second snippet results (likely more accurately based on intent) in `[-14, 0, 0, 2.9, 3, 12, 18]`.
 
-These same pitfalls can be much more subtle:
+So that test is unfair because it's not actually doing the same task between the cases. Any results you get are bogus.
+
+These same pitfalls can even be much more subtle:
 
 ```js
 // Case 1
@@ -288,9 +292,9 @@ var x;
 var y = x ? 1 : 2;
 ```
 
-Here, the intent might be to test the performance impact of the coercion to a boolean that the `? :` operator will do if the `x` expression is not already a boolean (see the *"Types & Grammar"* title of this book series). So, you're ostensibly OK with the fact that there is extra work to do the coercion in the second case.
+Here, the intent might be to test the performance impact of the coercion to a boolean that the `? :` operator will do if the `x` expression is not already a boolean (see the *"Types & Grammar"* title of this book series). So, you're apparently OK with the fact that there is extra work to do the coercion in the second case.
 
-The subtle problem? You're setting `x`'s value in the first case and not setting it in the other, so you're actually doing work in the first case that you're not doing in the second. To eliminate any potential (minor) skew, just do:
+The subtle problem? You're setting `x`'s value in the first case and not setting it in the other, so you're actually doing work in the first case that you're not doing in the second. To eliminate any potential (albeit minor) skew, try:
 
 ```js
 // Case 1
@@ -302,21 +306,21 @@ var x = undefined;
 var y = x ? 1 : 2;
 ```
 
+Now there's an assignment in both cases, so the thing you want to test -- the coercion of `x` or not -- has likely been more accurately isolated and tested.
+
 ## Writing Good Tests
 
 Let me see if I can articulate the bigger point I'm trying to make here.
 
 Good test authoring requires careful analytical thinking about what differences exist between two test cases and whether the differences between them are *intentional* or *unintentional*.
 
-Intentional differences are of course normal and OK, but it's so easy to create unintentional differences which skew your results. You have to be really, really careful to avoid that skew.
-
-Moreover, you may intend a difference but it may not be obvious to other readers of your test what your intent was, so they may doubt (or trust!) your test incorrectly. How do you fix that?
+Intentional differences are of course normal and OK, but it's so easy to create unintentional differences which skew your results. You have to be really, really careful to avoid that skew. Moreover, you may intend a difference but it may not be obvious to other readers of your test what your intent was, so they may doubt (or trust!) your test incorrectly. How do you fix that?
 
 **Write better, clearer tests.** But also, take the time to document (using the jsPerf.com "Description" field and/or code comments) exactly what the intent of your test is, even to the nuanced detail. Call out the intentional differences, which will help others and your future self to better identify unintentional differences that could be skewing the test results.
 
 Isolate things which aren't relevant to your test by pre-declaring them in the page or test setup settings so they're outside the timed parts of the test.
 
-But also, instead of trying to narrow in on a single piece of your real code and trying to benchmark just that piece out of context, tests and benchmarks are better when they include a larger (while still relevant) context.
+Instead of trying to narrow in on a tiny snippet of your real code and benchmarking just that piece out of context, tests and benchmarks are better when they include a larger (while still relevant) context. Those tests also tend to run slower, which means any differences you spot are more relevant in context.
 
 ## Microperformance
 
@@ -416,7 +420,7 @@ for (var i=-1; ++i<10; ) {
 
 Even if you have some theory where the second or third option is more performant than the first option by a tiny bit, which is dubious at best, the third loop is more confusing since you have to start with `-1` for `i` to account for the fact that `++i` pre-increment is used. And the difference between the first and second options is really quite irrelevant.
 
-It's entirely possible that a JS engine may see a place where `i++`
+It's entirely possible that a JS engine may see a place where `i++` is used and realize that it can safely replace it with the `--i` equivalent, which means your time spent deciding which one to pick was completely wasted and the outcome moot.
 
 Here's another common example of silly microperformance obsession:
 
@@ -438,38 +442,40 @@ The theory here goes that you should cache the length of the `x` array in the va
 
 If you run performance benchmarks around `x.length` usage compared to caching it in a `len` variable, you'll find that while the theory sounds nice, in practice any measured differences are statistically completely irrelevant.
 
+In fact, in some engines like v8, it can be shown (http://mrale.ph/blog/2014/12/24/array-length-caching.html) that you could make things slightly worse by pre-caching the length instead of letting the engine figure it out for you. Don't try to outsmart your JavaScript engine, you'll probably lose when it comes to performance optimizations.
+
 ### Not all engines are alike
 
 The different JS engines in various browsers can all be "spec compliant" while having radically different ways of handling code. The JS specification doesn't require anything performance related -- well, except ES6's "tail call optimization" covered later in this chapter.
 
 The engines are free to decide that one operation will receive its attention to optimize, perhaps trading off for lesser performance on another operation. It can be very tenuous to find an approach for an operation that always runs faster in all browsers.
 
-There's a movement among some in the JS dev community, especially those who work with Node.js, to analyze the specific internal implementation details of the v8 JavaScript engine and make decisions about writing JS code that is tailored to take best advantage of how v8 works. You can actually achieve a surprisingly high degree of performance optimization in such activities, so the payoff for the effort is quite attractive.
+There's a movement among some in the JS dev community, especially those who work with Node.js, to analyze the specific internal implementation details of the v8 JavaScript engine and make decisions about writing JS code that is tailored to take best advantage of how v8 works. You can actually achieve a surprisingly high degree of performance optimization with such endeavors, so the payoff for the effort can be quite high.
 
 Some commonly cited examples (https://github.com/petkaantonov/bluebird/wiki/Optimization-killers) for v8:
 
 1. Don't pass the `arguments` variable from one function to any other function, as such "leakage" slows down the function implementation.
 2. Isolate a `try..catch` in its own function. Browsers struggle with optimizing any function with a `try..catch` in it, so moving that construct to its own function means you contain the de-optimization harm while letting the surrounding code be optimizable.
 
-But let's sanity check this approach from the general sense.
+But rather than focus on those tips specifically, let's sanity check the v8-only optimization approach in a general sense.
 
-Are you genuinely writing code that only needs to run in one JS engine? Even if your code is entirely intended for Node.js, is the assumption that v8 will *always* be the used JS engine reliable? Is it possible that someday a few years from now, there's another server-side JS platform besides Node.js that you choose to run your code on? What if what you optimized for before is now a much slower way of doing that operation on the new engine?
+Are you genuinely writing code that only needs to run in one JS engine? Even if your code is entirely intended for Node.js *right now*, is the assumption that v8 will *always* be the used JS engine reliable? Is it possible that someday a few years from now, there's another server-side JS platform besides Node.js that you choose to run your code on? What if what you optimized for before is now a much slower way of doing that operation on the new engine?
 
 Or what if your code always stays running on v8 from here on out, but v8 decides at some point to change the way some set of operations works such that what used to be fast is now slow, and vice versa?
 
 These scenarios aren't just theoretical, either. It used to be that it was faster to put multiple string values into an array and then call `join("")` on the array to concatenate the values than to just use `+` concatenation directly with the values. The historical reason for this is nuanced, but it has to do with internal implementation details about how string values were stored and managed in memory.
 
-As a result, "best practice" advice at the time disseminated across the industry suggesting devs always use the array `join(..)` approach. And many people followed.
+As a result, "best practice" advice at the time disseminated across the industry suggesting developers always use the array `join(..)` approach. And many followed.
 
-Except, somewhere along the way, the JS engines changed details about how they managed strings, and they specifically put in optimizations to optimize `+` concatenation. They didn't de-optimize `join(..)` per se, but they put more effort into helping `+` usage, since it was still quite a bit more wide spread.
+Except, somewhere along the way, the JS engines changed approaches for internally managing strings, and specifically put in optimizations for `+` concatenation. They didn't slow down `join(..)` per se, but they put more effort into helping `+` usage, since it was still quite a bit more wide spread.
 
 **Note:** The practice of standardizing or optimizing some particular approach based mostly on its existing wide spread usage is often called (metaphorically) "paving the cowpath".
 
-Once that new approach to handling strings and concatenation took hold, unfortunately all the code across the web that was using array `join(..)` to concatenate strings was then sub-optimal.
+Once that new approach to handling strings and concatenation took hold, unfortunately all the code out in the wild that was using array `join(..)` to concatenate strings was then sub-optimal.
 
-Another example: the Opera browser differed from other browsers in how it handled the boxing/unboxing of primitive wrapper objects (see the *"Types & Grammar"* title of this book series). As such, their advice to developers was to use a `String` object instead of the primitive string value if properties like `length` or methods like `charAt(..)` needed to be accessed. This advice may have been correct for Opera, but it was literally completely opposite for other major browsers, as they had optimizations specifically for the string primitives and not their object wrapper counterparts.
+Another example: the Opera browser differed from other browsers in how it handled the boxing/unboxing of primitive wrapper objects (see the *"Types & Grammar"* title of this book series). As such, their advice to developers was to use a `String` object instead of the primitive `string` value if properties like `length` or methods like `charAt(..)` needed to be accessed. This advice may have been correct for Opera at the time, but it was literally completely opposite for other major contemporary browsers, as they had optimizations specifically for the `string` primitives and not their object wrapper counterparts.
 
-I think these various gotchas are at least possible, if not likely, for our code even today. So I'm very cautious about making wide ranging performance optimizations in my JS code based purely on engine implementation details, **especially if those details are only true of a single engine**.
+I think these various gotchas are at least possible, if not likely, for code even today. So I'm very cautious about making wide ranging performance optimizations in my JS code based purely on engine implementation details, **especially if those details are only true of a single engine**.
 
 The reverse is also something to be wary of: you shouldn't necessarily change a piece of code to work around one engine's difficulty with running a piece of code in an acceptably performant way.
 
@@ -556,7 +562,7 @@ Without getting into too much nitty gritty detail, calling a new function requir
 
 However, if a TCO-capable engine can realize that the `foo(y+1)` call is in *tail position* meaning `bar(..)` is basically complete, then when calling `foo(..)`, it doesn't need to create a new stack frame, but can instead re-use the existing stack frame from `bar(..)`. That's not only faster, but it also uses less memory.
 
-That sort of optimization isn't a big deal in a simple snippet, but it becomes a *much bigger deal* when dealing with recursion, especially if the recursion could have resulted in hundreds or thousands of stack frames, but with TCO the engine can perform all those calls with a single stack frame.
+That sort of optimization isn't a big deal in a simple snippet, but it becomes a *much bigger deal* when dealing with recursion, especially if the recursion could have resulted in hundreds or thousands of stack frames. With TCO the engine can perform all those calls with a single stack frame!
 
 Recursion is a hairy topic in JS because without TCO, engines have had to implement arbitrary (and different!) limits to how deep they will let the recursion stack get before they stop it, to prevent running out of memory. With TCO, recursive functions with *tail position* calls can essentially run unbounded, because there's never any extra usage of memory!
 
