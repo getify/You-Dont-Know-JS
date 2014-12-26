@@ -1277,7 +1277,7 @@ The following is just theoretical -- it's how promises *could* be someday change
 1. Promises could default to reporting (to the developer console) any rejection, on the next Job or event loop tick, if at that exact moment no error handler has been registered for the promise.
 2. For the cases where you want a rejected promise to hold onto its rejected state for an arbitrary amount of time before observing, a `defer()` could be added, that can be called on any promise, which marks it as not being eligible for the automatic error reporting.
 
-In other words, if a promise is rejected, it defaults to noisly reporting that fact to the developer console (instead of defaulting to silence). You can opt-out of that reporting either implicitly (by registering an error handler before rejection), or explicitly (with `defer()`). In either case, *you* control the false positives.
+In other words, if a promise is rejected, it defaults to noisily reporting that fact to the developer console (instead of defaulting to silence). You can opt-out of that reporting either implicitly (by registering an error handler before rejection), or explicitly (with `defer()`). In either case, *you* control the false positives.
 
 Consider:
 
