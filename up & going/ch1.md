@@ -123,6 +123,37 @@ One last thing to say explicitly about variables as we've seen them used so far:
 
 ## Conditionals
 
+"Do you want to add on the extra screen protectors to your purchase, for 9.99?" The helpful phone store employee has asked you to make a decision. And you may need to first consult the current *state* of your wallet or bank account to answer that question.
+
+There are quite a few ways we can express conditionals (aka decisions) in our programs.
+
+The most common one is the `if` statement. Essentially, you're saying "IF this condition is true, do the following". You can even provide an alternate if the condition isn't true, called an `else`.
+
+Consider this program:
+
+```js
+var amount = 99.99;
+
+amount = amount * 2;
+
+// can we afford the extra purchase?
+if ( amount < BANK_ACCOUNT_BALANCE ) {
+	console.log( "Sure!" );
+	amount += 9.99;
+}
+else {
+	console.log( "No, thanks." );
+}
+```
+
+The `if` statement requires an expression in between the `( )` parentheses that can be treated as either `true` or `false`. In this program, we provided the expression `amount < BANK_ACCOUNT_BALANCE`, which indeed will either evaluate to `true` or `false` depending on the amount in our bank account. If `true`, we'll print out `"Sure!"` and add the `9.99` to our `amount` variable. Otherwise, the `else` clause says we'll just politley respond with `"No, thanks."`.
+
+As we mentioned earlier, values which aren't already of an expected type are often coerced to that type. The `if` statement expects a `boolean`, but if you pass it something that's not already `boolean`, coercion will occur.
+
+Certain values in JavaScript are considered "falsy" if when asked to coerce to a `boolean`, they become `false` -- they include values like `0` and `""`. Other values are called "truthy" because when asked to coerce to a `boolean`, they become `true` -- they include values like `99.99` and `"free"`.
+
+Conditionals exist in other forms, too. For example, the `switch` statement is like a short-hand for a series of `if..else` statements. Loops (covered in the next section) use a conditional to determine if the loop should keep going or stop.
+
 ## Loops
 
 ## Functions
