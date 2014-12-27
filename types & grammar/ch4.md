@@ -1785,6 +1785,12 @@ Is *implicit coercion* evil and dangerous? In a few cases, yes, but overwhelming
 
 Be a responsible and mature developer. Learn how to use the power of coercion (both *explicit* and *implicit*) effectively and safely. And teach those around you to do the same.
 
+Here's a handy table made by GitHub user @dorey to visualize a variety of comparisons:
+
+[Figure 1](http://dorey.github.io/JavaScript-Equality-Table/unified/) // TODO: recreate image
+
+Source: https://github.com/dorey/JavaScript-Equality-Table
+
 ## Abstract Relational Comparison
 
 While this part of *implicit coercion* often gets a lot less attention, it's important nonetheless to think about what happens with `a < b` comparisons (similar to how we just examined `a == b` in depth).
