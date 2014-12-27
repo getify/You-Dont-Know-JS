@@ -9,5 +9,5 @@
 [Table of Contents](toc.md)
 
 * [Preface](../preface.md)
-* [Chapter 1: TODO](ch1.md)
+* [Chapter 1: Into Programming](ch1.md)
 * [Appendix A: Thank You's!](apA.md)
