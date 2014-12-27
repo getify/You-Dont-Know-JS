@@ -4,6 +4,8 @@
 
 * Preface
 * Chapter 1: Into Programming
+	* Code
+	* Value Types
 	* Variables
 	* Conditionals
 	* Loops
