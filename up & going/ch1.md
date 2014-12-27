@@ -47,6 +47,80 @@ However, *implicit coercion* is something that **can be learned**, and moreover 
 
 ## Variables
 
+Most useful programs need to track a value as it changes over the course of the program, undergoing different operations as called for by your program's intended tasks.
+
+The easiest way to go about that in your program is to assign a value to a symbolic container, called a "variable" -- so called because the value in this container can *vary* over time as needed.
+
+In some programming languages, you declare a variable (container) to hold a specific *type* of value, such as `number` or `string`. This type of functionality is often called "static typing", and is typically cited as a benefit for program veracity by allowing the compiler/engine to verify that a variable only ever has one *type* representation of the value and doesn't accidentally get converted in a way that can produce unexpected outcomes. Another way of explaining this behavior is "type enforcement".
+
+Other languages don't emphasize *types* for variables, but rather for the values themselves. That behavior allows a variable to hold any *type* of value, and in fact for that *type* to change from operation to operation. This type of functionality is often called "dynamic typing" (aka "weak typing"), and is typically cited as a benefit for program flexibility by allowing a single container to represent a value no matter what *type* form that value may take at any given moment in the program's logic flow. Another way of explaining this behavior is "no type enforcement".
+
+Neither of these approaches is *right* or *wrong* -- they both have strong advantages. Experienced developers often make language choices based on their preferences about such issues.
+
+JavaScript is dynamically typed, meaning variables can hold any value of any *type* as you see fit.
+
+For example, consider this simple program:
+
+```js
+var amount = 99.99;
+
+amount = amount * 2;
+
+// print the number
+console.log( amount );		// 199.98
+
+amount = "$" + amount;
+
+// print the string
+console.log( amount );		// $199.98
+```
+
+As you can see, declaring a variable in JS is done with `var`, and there's no other *type* information in the declaration. We additionally assign a value using the single `=` operator.
+
+The `amount` variable starts out holding the number `99.99`, and indeed holds the `number` result of `amount * 2`, which is `199.98`. The first `console.log(..)` command has to *implicitly coerce* that `number` value to a `string` to print it out. Then the statement `amount = "$" + amount` coerces the `199.98` value to a `string` and adds a `"$"` character to the beginning. At this point, `amount` now holds the `string` value `"$199.98"`, so the second `console.log(..)` statement doesn't need to do any coercion to print it out.
+
+JavaScript developers will note the flexibility of using the `amount` variable for all the `99.99`, `199.98`, and the `"$199.98"` values. Static-typing enthusiasts would prefer a separate variable like `amountStr` to hold the final `"$199.98"` representation of the value.
+
+Either way, you'll note that `amount` holds a running value that changes over the course of the program, illustrating the primary purpose of variables: managing program *state*.
+
+Another common usage of variables is for centralizing value setting. This is more typically called "constants", when you declare a variable with a value and intend for that value to *not change* throughout the program. You declare these constants, often at the top of a program, so that it's convenient for you to have one place to go to alter a value if you need to. By convention, JavaScript variables as constants are usually capitalized, with `_` underscores between multiple words.
+
+A silly example:
+
+```js
+var TAX_RATE = 0.08;	// 8% sales tax
+
+var amount = 99.99;
+
+amount = amount * 2;
+
+amount = amount + (amount * TAX_RATE);
+
+console.log( amount );				// 215.9784
+console.log( amount.toFixed( 2 ) );	// 215.98
+```
+
+**Note:** As you can see, JavaScript `number`s aren't automatically formatted for dollars -- the engine doesn't know what your *intent* is and there's no *type* for currency. In this case, the provided `toFixed(..)` method lets us specify how many decimal places we'd like the `number` rounded to.
+
+The `TAX_RATE` variable is only "constant" by convention -- there's nothing special in this program that prevents it from being changed. But if the city raises the sales tax rate to 9%, we can easily change our program by setting the `TAX_RATE` assigned value to `0.09` once, instead of finding many occurrences of `0.08` strewn throughout the program and updating all of them.
+
+The newest version of JavaScript, called ES6, includes a new way to declare constants which accomplishes the same benefits we've just shown, but also prevents accidentally changing the `TAX_RATE` variable somewhere else after the initial setting:
+
+```js
+// as of ES6:
+const TAX_RATE = 0.08;
+
+var amount = 99.99;
+
+// ..
+```
+
+If you tried to assign any different value to `TAX_RATE` after that first declaration, your program would fail with an error. That kind of "protection" against mistakes is similar to the static-typing type enforcement enthusiasm, so you can see why people like it in other languages!
+
+One last thing to say explicitly about variables as we've seen them used so far: they can be used as *targets* for assignment as well as *sources* for value look-up. When we say `amount = 99.99`, `amount` is on the left-hand side of the `=` assignment operator, so it's a *target* where a value will be stored. When we say `= amount * 2`, `amount` here is on the right-hand side, and is thus a *source* where its current value will be looked up at that moment.
+
+**Note:** For more information about how different values in variables can be used in your programs, see the *"Types & Grammar"* title of this book series.
+
 ## Conditionals
 
 ## Loops
