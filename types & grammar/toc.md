@@ -5,7 +5,7 @@
 * Preface
 * Chapter 1: Types
 	* A Type By Any Other Name...
-	* Primitives
+	* Built-in Types
 	* Values As Types
 * Chapter 2: Values
 	* Strings

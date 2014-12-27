@@ -846,11 +846,11 @@ d; // [1,2,3,4]
 
 Simple values (aka scalar primitives) are *always* assigned/passed by value-copy: `null`, `undefined`, `string`, `number`, `boolean`, and ES6's `symbol`.
 
-Compound primitives -- `object` (including `array`s, and all boxed object wrappers -- see Chapter 3) and `function` -- *always* create a copy of the reference on assignment or passing.
+Compound values -- `object` (including `array`s, and all boxed object wrappers -- see Chapter 3) and `function` -- *always* create a copy of the reference on assignment or passing.
 
 In the above snippet, because `2` is a scalar primitive, `a` holds one initial copy of that value, and `b` is assigned another *copy* of the value. When changing `b`, you are in no way changing the value in `a`.
 
-But **both `c` and `d`** are seperate references to the same shared value `[1,2,3]`, which is a compound primitive. It's important to note that neither `c` nor `d` more "owns" the `[1,2,3]` value -- both are just equal peer references to the value. So, when using either reference to modify (`.push(4)`) the actual shared `array` value itself, it's affecting just the one shared value, and both references will reference the newly modified value `[1,2,3,4]`.
+But **both `c` and `d`** are seperate references to the same shared value `[1,2,3]`, which is a compound value. It's important to note that neither `c` nor `d` more "owns" the `[1,2,3]` value -- both are just equal peer references to the value. So, when using either reference to modify (`.push(4)`) the actual shared `array` value itself, it's affecting just the one shared value, and both references will reference the newly modified value `[1,2,3,4]`.
 
 Since references point to the values themselves and not to the variables, you cannot use one reference to change where another reference is pointed:
 
@@ -916,7 +916,7 @@ As you can see, `x.length = 0` and `x.push(4,5,6,7)` were not creating a new `ar
 
 Remember: you cannot directly control/override value-copy vs. reference -- those semantics are controlled entirely by the type of the underlying value.
 
-To effectively pass a compound primitive (like an `array`) by value, you need to manually make a copy of it, so that the reference passing doesn't modify the original. For example:
+To effectively pass a compound value (like an `array`) by value, you need to manually make a copy of it, so that the reference passing doesn't modify the original. For example:
 
 ```js
 foo( a.slice() );
@@ -924,7 +924,7 @@ foo( a.slice() );
 
 `Array#slice(..)` with no parameters by default makes an entire (shallow) copy of the `array`. So, we pass in a reference only to the copied `array`, and thus `foo(..)` cannot affect the contents of `a`.
 
-To do the reverse -- pass a scalar primitive value in a way where its value updates can be seen, kinda like a reference -- you have to wrap the value in another compound primitive (`object`, `array`, etc) which *can* be passed by reference:
+To do the reverse -- pass a scalar primitive value in a way where its value updates can be seen, kinda like a reference -- you have to wrap the value in another compound value (`object`, `array`, etc) which *can* be passed by reference:
 
 ```js
 function foo(wrapper) {
@@ -981,4 +981,4 @@ The `null` type has just one value: `null`, and likewise the `undefined` type ha
 
 `number`s include several special values, like `NaN` (supposedly "not a `number`", but really more appropriately "invalid `number`"); `+Infinity` and `-Infinity`; and `-0`.
 
-Simple scalar primitives (`string`s, `number`s, etc.) are assigned/passed by value-copy, but compound primitives (`object`s, etc.) are assigned/passed by reference. References are **not** like references/pointers in other languages -- they're never pointed at other variables/references, only at the underlying values.
+Simple scalar primitives (`string`s, `number`s, etc.) are assigned/passed by value-copy, but compound values (`object`s, etc.) are assigned/passed by reference. References are **not** like references/pointers in other languages -- they're never pointed at other variables/references, only at the underlying values.

@@ -33,9 +33,9 @@ Coercion confusion is perhaps one of the most profound frustrations for JavaScri
 
 Armed with a full understanding of JavaScript types, we're aiming to illustrate why coercion's *bad reputation* is largely over-hyped and somewhat undeserved -- to flip your perspective, to seeing coercion's power and usefulness. But first, we have to get a much better grip on values and types.
 
-## Primitives
+## Built-in Types
 
-JavaScript defines seven built-in types, that we often call "primitives". These are:
+JavaScript defines seven built-in types. These are:
 
 * `null`
 * `undefined`
@@ -45,7 +45,9 @@ JavaScript defines seven built-in types, that we often call "primitives". These 
 * `object`
 * `symbol` -- added in ES6!
 
-The `typeof` operator inspects the type of the given value, and always returns one of seven string values (though, strangely, there's not an exact 1-to-1 match with the seven primitive types we just listed).
+**Note:** All of these types except `object` are called "primitives".
+
+The `typeof` operator inspects the type of the given value, and always returns one of seven string values -- surprisingly, there's not an exact 1-to-1 match with the seven built-in types we just listed.
 
 ```js
 typeof undefined     === "undefined"; // true
@@ -58,15 +60,15 @@ typeof { life: 42 }  === "object";    // true
 typeof Symbol()      === "symbol";    // true
 ```
 
-These 6 listed types have values of the corresponding type and return a string of the same name, as shown. `Symbol` is a new data type as of ES6, and will be covered later.
+These 6 listed types have values of the corresponding type and return a string value of the same name, as shown. `Symbol` is a new data type as of ES6, and will be covered in Chapter 3.
 
-As you may have noticed, I excluded `null` from the above listing. It's *special* -- special in the sense that it's buggy.
+As you may have noticed, I excluded `null` from the above listing. It's *special* -- special in the sense that it's buggy when combined with the `typeof` operator:
 
 ```js
 typeof null === "object"; // true
 ```
 
-It would have been nice (and correct!) if it returned `"null"`, but this original bug in JS has persisted for nearly 2 decades, and will likely never be fixed because there's too much existing web content that relies on its buggy behavior that "fixing" the bug would *create* "more bugs" and break a lot of web software.
+It would have been nice (and correct!) if it returned `"null"`, but this original bug in JS has persisted for nearly 2 decades, and will likely never be fixed because there's too much existing web content that relies on its buggy behavior that "fixing" the bug would *create* more "bugs" and break a lot of web software.
 
 If you want to test for a `null` value using its type, you need a compound condition:
 
@@ -78,13 +80,13 @@ var a = null;
 
 `null` is the only value that is "falsy" (aka false-like; see Chapter 4) but that also returns `"object"` from the `typeof` check.
 
-So what's the seventh string value that `typeof` can return? And why is it not actually a top-level type?
+So what's the seventh string value that `typeof` can return?
 
 ```js
 typeof function a(){ /* .. */ } === "function"; // true
 ```
 
-It's easy to think that `function` would be a top-level primitive type in JS, especially given this behavior of the `typeof` operator. However, if you read the spec, you'll see it's actually somewhat of a "subtype" of object. Specifically, a function is referred to as a "callable object" -- an object that has an internal `[[Call]]` property that allows it to be invoked.
+It's easy to think that `function` would be a top-level built-in type in JS, especially given this behavior of the `typeof` operator. However, if you read the spec, you'll see it's actually a "subtype" of object. Specifically, a function is referred to as a "callable object" -- an object that has an internal `[[Call]]` property that allows it to be invoked.
 
 The fact that functions are actually objects is quite useful. Most importantly, they can have properties. For example:
 
