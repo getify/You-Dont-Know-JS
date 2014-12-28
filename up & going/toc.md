@@ -10,6 +10,7 @@
 	* Conditionals
 	* Loops
 	* Functions
+	* Practice
 * Chapter 2: Into JavaScript
 * Chapter 3: The Rest of the Series
 * Appendix A: Thank You's!

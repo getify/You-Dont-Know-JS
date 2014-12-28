@@ -133,13 +133,15 @@ Consider this program:
 
 ```js
 var amount = 99.99;
+const BANK_BALANCE = 302.13;
+const ACCESSORY_PRICE = 9.99;
 
 amount = amount * 2;
 
 // can we afford the extra purchase?
-if ( amount < BANK_ACCOUNT_BALANCE ) {
+if ( amount < BANK_BALANCE ) {
 	console.log( "Sure!" );
-	amount += 9.99;
+	amount += ACCESSORY_PRICE;
 }
 else {
 	console.log( "No, thanks." );
@@ -221,5 +223,72 @@ The `for` loop has three clauses: the declaration clause (`var i=0`), the condit
 There are other specialized loop forms that are intended to iterate over specific values, such as the properties of an object (see Chapter 2) where the implied conditional test is whether all the properties have been processed. As you can see, the "loop until a condition fails" concept holds no matter what the form of the loop.
 
 ## Functions
+
+## Practice
+
+There is absolutely no substitute for practice in learning programming. No amount of articulate writing on my part is alone going to make you a programmer.
+
+With that in mind, let's try practicing some of the concepts we learned here in this chapter. I'll give the "requirements", and you try it first. Then consult the code listing below to see how I approached it.
+
+* Write a program to calculate the total price of your phone purchase. You will keep purchasing phones (hint: loop!) until you run out of money in your bank account. You'll also buy accessories for each phone as long as your purchase amount is below your mental spending threshold.
+* After you've calculated your purchase amount, add in the tax, then print out the calculated purchase amount, properly formatted.
+* Finally, check the amount against your bank account balance to see if you can afford it or not.
+* You should set up some constants for the "tax rate", "phone price", and "accessory price", as well as your current "bank balance" and your "spending threshold".
+* You should define functions for calculating the tax and for formatting the price with a "$" and rounding to two decimal places.
+
+OK, go ahead. Try it. Don't peek at my code listing until you've given a shot yourself!
+
+Now, I'm obviously going to solve the practice exercise in JavaScript, since this is a JavaScript book. But you can do it in another language if you feel more comfortable.
+
+```js
+const BANK_BALANCE = 303.91;
+const SPENDING_THRESHOLD = 200;
+
+const TAX_RATE = 0.08;
+const PHONE_PRICE = 99.99;
+const ACCESSORY_PRICE = 9.99;
+
+
+function calculateTax(amount) {
+	return amount * TAX_RATE;
+}
+
+function formatAmount(amount) {
+	return "$" + amount.toFixed(2);
+}
+
+var amount = 0;
+
+// keep buying phones while you still have money
+while (amount < BANK_BALANCE) {
+	// buy a new phone!
+	amount = amount + PHONE_PRICE;
+
+	// can we afford the accessory?
+	if (amount < SPENDING_THRESHOLD) {
+		amount = amount + ACCESSORY_PRICE;
+	}
+}
+
+// don't forget to pay the government, too
+amount = amount + calculateTax( amount );
+
+console.log(
+	"Your purchase: " + formatAmount( amount )
+);
+// Your purchase: $334.76
+
+// can you actually afford this purchase?
+if (amount > BANK_BALANCE) {
+	console.log(
+		"You can't afford this purchase. :("
+	);
+}
+// You can't afford this purchase. :(
+```
+
+**Note:** The simplest way to run this JavaScript program is to type it into the developer console of your nearest browser.
+
+How did you do? It wouldn't hurt to try it again now that you've seen my code. And play around with changing some of the constants to see how the program runs with different values.
 
 ## Summary
