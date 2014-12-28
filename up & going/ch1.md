@@ -154,7 +154,71 @@ Certain values in JavaScript are considered "falsy" if when asked to coerce to a
 
 Conditionals exist in other forms, too. For example, the `switch` statement is like a short-hand for a series of `if..else` statements. Loops (covered in the next section) use a conditional to determine if the loop should keep going or stop.
 
+**Note:** For more information about the coercions that can occur implicitly in conditionals' test expressions, see Chapter 4 of the *"Types & Grammar"* title of this book series.
+
 ## Loops
+
+Extending our running scenario of the phone store employee: during busy times, there's a waiting list for customers waiting to speak to the employee. While there's still people on that list, the employee just needs to keep serving the next customer.
+
+Repeating a set of actions until a certain condition is met is the job of programming loops; loops can take different forms, but they all satisfy this basic behavior.
+
+For example, the `while` loop and the `do..while` (some languages call it "until" instead of "while") loop forms are direct expressions of that idea:
+
+```js
+while (numOfCustomers > 0) {
+	console.log( "How may I help you?" );
+	// ..
+}
+
+// versus
+do {
+	console.log( "How may I help you?" );
+	// ..
+} while (numOfCustomers > 0);
+```
+
+The only practical difference between these loops is whether the conditional is tested before the first iteration (`while`) or after the first iteration (`do..while`). In either form, if the conditional tests as `false`, the next iteration will not run. That means if the condition is initially `false`, a `while` loop will never run, but a `do..while` loop will run just the first time.
+
+Sometimes you are looping for the intended purpose of counting a certain set of numbers, like from `0` to `9` (ten numbers). You can do that by setting a loop iteration variable like `i` at value `0` and incrementing it by `1` each iteration.
+
+The conditional is tested on each iteration, much as if there had been an implied `if` statement inside the loop. As an illlustration of this concept, we can see the use of JavaScript's `break` statement to stop a loop. We can also see that it's (too) easy to create a loop that would otherwise run forever.
+
+Consider:
+
+```js
+var i = 0;
+
+// a `while..true` loop would run forever, right?
+while (true) {
+	// keep the loop going?
+	if (i <= 9) {
+		console.log( i );
+		i++;
+	}
+	// time to stop the loop!
+	else {
+		break;
+	}
+}
+// 0 1 2 3 4 5 6 7 8 9
+```
+
+**Note:** `i++` in the above snippet is a short-hand operator notation for `i = i + 1`: simple incrementing by `1`.
+
+While a `while` (or `do..while`) can accomplish the task manually, there's another syntactic form called a `for` loop for just that purpose:
+
+```js
+for (var i=0; i <= 9; i++) {
+	console.log( i );
+}
+// 0 1 2 3 4 5 6 7 8 9
+```
+
+As you can see, in both cases the conditional `i <= 9` is `true` for the first ten iterations (`i` of values `0` through `9`) of either loop form, but becomes `false` once `i` is value `10`.
+
+The `for` loop has three clauses: the declaration clause (`var i=0`), the conditional test clause (`i <= 9`), and the loop increment clause (`i++`). So if you're going to do counting on your loop iterations, `for` is often a shorter, easier form to understand and write.
+
+There are other specialized loop forms that are intended to iterate over specific values, such as the properties of an object (see Chapter 2) where the implied conditional test is whether all the properties have been processed. As you can see, the "loop until a condition fails" concept holds no matter what the form of the loop.
 
 ## Functions
 
