@@ -261,6 +261,73 @@ There are other specialized loop forms that are intended to iterate over specifi
 
 ## Functions
 
+The phone store employee probably doesn't carry around a calculator to figure out the taxes and final purchase amount for your phones. That's a task he needs to define once and reuse over and over again. Odds are, the company has a checkout register with those "functions" built-in.
+
+Similarly, your program will almost certainly want to break up the code's tasks into reusable pieces. The way to do this is to define a `function`.
+
+A function is generally a named section of code which can be "called" by name, and the code inside it will be run each time. Functions can optionally take arguments (aka parameters) -- values you pass in. And they can also optionally return a value back.
+
+Functions are often used for code that you plan to call multiple times, but they can also be useful just to organize related bits of code into named collections, even if you only plan to call them once. Typically, that practice would be combined with passing in arguments and/or returning a value.
+
+Consider:
+
+```js
+const TAX_RATE = 0.08;
+
+function calculateFinalPurchaseAmount(amt) {
+	// calculate the new amount with the tax
+	amt = amt + (amt * TAX_RATE);
+
+	// return the new amount
+	return amt;
+}
+
+var amount = 99.99;
+
+amount = calculateFinalPurchaseAmount( amount );
+
+console.log( amount.toFixed( 2 ) );		// 107.99
+```
+
+As you can see, we defined a function called `calculateFinalPurchaseAmount(..)`. This function takes a single argument, which we named internally `amt`. It also has a `return` statement, which means it returns a value back.
+
+We later call this function, passing in the current purchase amount (`99.99`), and we get back the new purchase amount with tax added (`107.9892`), which we format to round to two digits (`107.99`).
+
+Another subtle point is that the `TAX_RATE` constant (variable) was accessible from inside the `calculateFinalPurchaseAmount(..)` function, even though we didn't pass it in. That's because of "lexical scope" which is the ability to find variables either in the current scope, or in any outer scope (see the first two chapters of the *"Scope & Closures"* title of this book series).
+
+### Closure
+
+Functions can be defined inside other functions (creating scopes inside other scopes), and they can even be passed around as values themselves. An extremely important feature of functions in languages like JavaScript is the idea of "closure", which is the ability of a function to remember and maintain access to variables.
+
+```js
+function makeAdd(x) {
+
+	// inner function `add()` has
+	// closure over variable `x`
+	function add(y) {
+		return x + y;
+	};
+
+	return add;
+}
+
+var plusOne = makeAdd( 1 );
+var plusTen = makeAdd( 10 );
+
+plusOne( 3 );		// 4
+plusOne( 41 );		// 42
+
+plusTen( 13 );		// 23
+```
+
+We won't get into all the nitty gritty of how this closure is working. But in a simple sense, the inner `add(..)` function is able to remember whatever `x` argument was passed to the outer `makeAdd(..)` function call.
+
+When we call `makeAdd(1)`, we get a new function back that we call `plusOne(..)`, and when we call `makeAdd(10)`, we get yet another new function back we call `plusTen(..)`.
+
+When we call `plusOne(3)`, it adds `3` (assigned to the inner `y`) to the remembered `1` (in `x`), and we get `4`. When we call `plusTen(13)`, it adds `13` to the remembered `10`, and we get `23`.
+
+**Note:** For more information about closures, see the *"Scope & Closures"* title of this book series, especially Chapter 5.
+
 ## Practice
 
 There is absolutely no substitute for practice in learning programming. No amount of articulate writing on my part is alone going to make you a programmer.
@@ -329,3 +396,5 @@ if (amount > BANK_BALANCE) {
 How did you do? It wouldn't hurt to try it again now that you've seen my code. And play around with changing some of the constants to see how the program runs with different values.
 
 ## Summary
+
+Programming is fun! You too can learn it! // TODO
