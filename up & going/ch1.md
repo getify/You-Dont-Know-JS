@@ -29,6 +29,18 @@ In very similar ways, when you express values in a programs, you choose differen
 
 These different representations for values are called "types" in programming terminology. JavaScript has built-in types for each of these so called "primitive" values.
 
+Examples:
+
+```js
+"I am a string";
+'I am also a string';
+
+42;
+
+true;
+false;
+```
+
 **Note:** For more information on "types" in JavaScript, see the first three chapters of the *"Types & Grammar"* title of this book series.
 
 ### Converting Between Types
