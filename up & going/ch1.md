@@ -45,6 +45,43 @@ However, *implicit coercion* is something that **can be learned**, and moreover 
 
 **Note:** For more information on coercion, see Chapter 4 of the *"Types & Grammar"* title of this book series.
 
+## Code Comments
+
+One of the most important lessons you can learn about writing code is that it's not just for the computer. Code is every bit as much, if not more, for the developer as it is for the compiler.
+
+Your computer only cares about machine code, binary 0's and 1's. There's a nearly infinite number of different programs you could write that could produce the same final series of 0's and 1's. So the way you write your program matters. It matters not only to you, but to your other team members and even to your future self.
+
+For that reason, you should strive to write not just programs that work, but programs that make sense when read. You can go a long way in that effort by choosing good names for your variables (see the next section) and functions (see later in the chapter).
+
+But another important part is code comments. These are bits of text in your program which are inserted purely to explain things to a human. The compiler will always ignore these comments.
+
+There's lots of opinions on what makes well commented code or not. We can't exactly define absolute rules. But some observations and guidelines are useful:
+
+* No comments is bad
+* Too many comments (like one per line) is probably a sign of poorly written code
+* Comments should explain WHY, not WHAT. They can optionally explain HOW if that's particularly confusing.
+
+In JavaScript, there are two types of comments possible: a single-line comment, and a multi-line comment.
+
+Consider:
+
+```js
+// This is a single line comment
+
+// This is another single line comment
+
+/* But this is
+       a multi-line
+             comment.
+                      */
+```
+
+The `//` single-line comment is appropriate if you're going to put a comment right about a single statement, or even at the end of a line. Everything on the line after the `//` is treated as the comment (and thus ignored by the compiler), all the way to the end of the line. There's no restriction to what can appear inside a comment.
+
+The `/* .. */` multi-line comment is appropriate if you have several sentences worth of explanation to make in your comment. It can appear anywhere on a line, even in the middle of a line, since the `*/` ends it. The only thing that cannot appear inside a multi-line comment is a `*/`, since that would be taken to end the comment.
+
+You will definitely want to begin your learning of programming by starting the habit of commenting code. Throughout the rest of this chapter, you'll see I use comments to explain things, so do the same in your own practice. Trust me, everyone who reads your code will thank you!
+
 ## Variables
 
 Most useful programs need to track a value as it changes over the course of the program, undergoing different operations as called for by your program's intended tasks.

@@ -6,6 +6,7 @@
 * Chapter 1: Into Programming
 	* Code
 	* Value Types
+	* Code Comments
 	* Variables
 	* Conditionals
 	* Loops
