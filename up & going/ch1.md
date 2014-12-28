@@ -334,9 +334,9 @@ plusTen( 13 );		// 23
 
 We won't get into all the nitty gritty of how this closure is working. But in a simple sense, the inner `add(..)` function is able to remember whatever `x` argument was passed to the outer `makeAdd(..)` function call.
 
-When we call `makeAdd(1)`, we get a new function back that we call `plusOne(..)`, and when we call `makeAdd(10)`, we get yet another new function back we call `plusTen(..)`.
+When we call `makeAdd(1)`, we get a new function back that we call `plusOne(..)` which will remember `1`, and when we call `makeAdd(10)`, we get yet another new function back we call `plusTen(..)` that will remember `10`.
 
-When we call `plusOne(3)`, it adds `3` (assigned to the inner `y`) to the remembered `1` (in `x`), and we get `4`. When we call `plusTen(13)`, it adds `13` to the remembered `10`, and we get `23`.
+When we call `plusOne(3)`, it adds `3` (assigned to the inner `y`) to the `1` (remembered in `x`), and we get `4`. When we call `plusTen(13)`, it adds `13` to the remembered `10`, and we get `23`.
 
 **Note:** For more information about closures, see the *"Scope & Closures"* title of this book series, especially Chapter 5.
 
@@ -409,4 +409,16 @@ How did you do? It wouldn't hurt to try it again now that you've seen my code. A
 
 ## Summary
 
-Programming is fun! You too can learn it! // TODO
+Learning programming doesn't have to be a complex and involved process. There are just a few basic concepts you need to wrap your head around. These act like building blocks. To build a tall tower, you start first by putting block on top of block on top of block. The same goes with programming.
+
+* You need values and types to differentiate different tasks, like performing math on numbers or output with strings.
+* You need variables to store data (aka "state") throughout your program's running.
+* You need conditionals like `if` statements to make decisions.
+* You need loops to repeat tasks until a condition stops being true.
+* You need functions to organize your code into logical and reusable chunks.
+
+Code comments are one effective way to write more readable code, which makes your program easier to understand, maintain, and fix later if there are problems.
+
+Finally, don't neglect the power of practice. The best way to learn how to write code is to write code.
+
+I'm excited you're well on your way to learning how to code, now! Keep it up. The next chapter will talk a lot more specifically about JavaScript, and introduce you to topics that will be covered in detail throughout the rest of the series.
