@@ -248,13 +248,15 @@ For example, `true` becomes `1` and `false` becomes `0`. `undefined` becomes `Na
 
 `ToNumber` for a `string` value essentially works for the most part like the rules/syntax for numeric literals (see Chapter 3). If it fails, the result is `NaN` (instead of a syntax error with `number` literals). One example difference is that `0`-prefixed octal numbers are not handled as octals (just as normal base-10 decimals) in this operation, though such octals are valid as `number` literals (see Chapter 2).
 
-**Note:** The differences between `number` literal grammar and `ToNumber` on a `string` value are subtle and highly nuanced, and thus will not be covered further here. Consult section 9.3.1 of the ES5 spec for more information, if desired.
+**Note:** The differences between `number` literal grammar and `ToNumber` on a `string` value are subtle and highly nuanced, and thus will not be covered further here. Consult section 9.3.1 of the ES5 spec for more information.
 
-Objects (and arrays) will first be converted to their primitive value equivalent, and then this value (if a primitive but not already a `number`) is coerced to a `number` according to the `ToNumber` rules just mentioned.
+Objects (and arrays) will first be converted to their primitive value equivalent, and the resulting value (if a primitive but not already a `number`) is coerced to a `number` according to the `ToNumber` rules just mentioned.
 
 To convert to this primitive value equivalent, the `ToPrimitive` abstract operation (ES5 spec, section 9.1) will consult the value (using the internal `DefaultValue` operation -- ES5 spec, section 8.12.8) in question to see if it has a `valueOf()` method, and if so, what it returns (if a primitive value) will be used for the coercion. If no `valueOf()` is present, or `valueOf()` didn't return a primitive, `toString()` is consulted, if present. If what it returns is a primitive, *that* value will be the result of the coercion.
 
 If no primitive can eventually be obtained from the `ToPrimitive` operations just described, a `TypeError` is thrown.
+
+You will force a `TypeError` from coercing an object value if the object is created so it does not have (access to) a `valueOf(..)` method, as the `ToPrimitive` operation will thus completely fail. As of ES5, you can create such an object with a `null` value for `[[Prototype]]` (see the *"this & Object Prototypes"* title of this book series), typically by using `Object.create(null)`.
 
 **Note:** We cover how to coerce to `number`s later in this chapter in detail, but for this next code snippet, just assume the `Number(..)` function does so.
 
