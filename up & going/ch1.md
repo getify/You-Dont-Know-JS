@@ -19,7 +19,7 @@ JavaScript is of the latter type: it is compiled (not interpreted!) during its e
 
 **Note:** For more information on how JavaScript is "compiled", see the first two chapters of the *"Scope & Closures"* title of this book series.
 
-## Value Types
+## Values & Types
 
 If you ask an employee at a phone store how much a certain phone costs, and they tell you "99.99", they're giving you an actual dollar figure that (plus taxes and fees) represents what you'll need to pay. If you wanted to buy two of those phones, you could easily do the mental math to double that value to get "199.98" for your base cost.
 

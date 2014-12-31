@@ -5,7 +5,7 @@
 * Preface
 * Chapter 1: Into Programming
 	* Code
-	* Value Types
+	* Values & Types
 	* Code Comments
 	* Variables
 	* Conditionals
@@ -13,5 +13,6 @@
 	* Functions
 	* Practice
 * Chapter 2: Into JavaScript
+	* Values & Types
 * Chapter 3: The Rest of the Series
 * Appendix A: Thank You's!
