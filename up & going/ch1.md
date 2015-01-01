@@ -146,7 +146,7 @@ amount = amount * 2;
 amount = amount + (amount * TAX_RATE);
 
 console.log( amount );				// 215.9784
-console.log( amount.toFixed( 2 ) );	// 215.98
+console.log( amount.toFixed( 2 ) );	// "215.98"
 ```
 
 **Note:** As you can see, JavaScript `number`s aren't automatically formatted for dollars -- the engine doesn't know what your *intent* is and there's no *type* for currency. In this case, the provided `toFixed(..)` method lets us specify how many decimal places we'd like the `number` rounded to.
@@ -298,7 +298,7 @@ var amount = 99.99;
 
 amount = calculateFinalPurchaseAmount( amount );
 
-console.log( amount.toFixed( 2 ) );		// 107.99
+console.log( amount.toFixed( 2 ) );		// "107.99"
 ```
 
 As you can see, we defined a function called `calculateFinalPurchaseAmount(..)`. This function takes a single argument, which we named internally `amt`. It also has a `return` statement, which means it returns a value back.

@@ -87,6 +87,8 @@ obj[b];			// "hello world"
 obj["b"];		// 42
 ```
 
+**Note:** For more information on JavaScript `object`s, see the *"this & Object Prototypes"* title of this book series, specifically Chapter 3.
+
 There are a couple of other values that you will commonly interact with in JavaScript programs: *array* and *function*. But rather than being proper built-in types, these should be thought of more like sub-types, specialized versions of the `object` type.
 
 An *array* is an `object` that holds values (of any type) not just in named properties/keys, but in numerically indexed positions. For example:
@@ -126,5 +128,30 @@ typeof foo.bar;		// "string"
 ```
 
 Again, *function*s are `objects` -- in this case `typeof` strangely gives `"function"` implying top-level status -- and can thus have properties, but you typically will not use function object properties broadly, just in limited cases.
+
+**Note:** For more information on JS values and their types, see the first two chapters of the *"Types & Grammar"* title of this book series.
+
+### Built-in Type Methods
+
+The built-in types and sub-types we've just discussed have built-in behaviors exposed as properties and methods that are quite powerful and useful.
+
+For example:
+
+```js
+var a = "hello world";
+var b = 3.14159;
+
+a.length;				// 11
+a.toUpperCase();		// "HELLO WORLD"
+b.toFixed(4);			// "3.1416"
+```
+
+The "how" behind being able to call `a.toUpperCase()` is more complicated than just that method existing on the value.
+
+Briefly, there is a `String` (capital `S`) `object` wrapper form, typically called a "native", that pairs with the primitive `string` value, and it's this value form that defines the `toUpperCase()` method on its prototype. When you use a primitive value like `"hello world"` as an `object` by referencing a property or method, JS automatically "boxes" the value to its `object` wrapper counterpart.
+
+A `string` value can be wrapped by a `String`, a `number` can be wrapped by a `Number`, a `boolean` can be wrapped by a `Boolean`, etc. For the most part, you don't need to worry about or use these `object` wrapper forms of the values -- prefer their primitive forms in practically all cases.
+
+**Note:** For more information on JS natives and "boxing", see Chapter 3 of the *"Types & Grammar"* title of this book series.
 
 ## Summary
