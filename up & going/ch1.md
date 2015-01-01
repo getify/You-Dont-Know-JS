@@ -69,8 +69,8 @@ But another important part is code comments. These are bits of text in your prog
 
 There's lots of opinions on what makes well commented code or not. We can't exactly define absolute rules. But some observations and guidelines are useful:
 
-* No comments is bad
-* Too many comments (like one per line) is probably a sign of poorly written code
+* No comments is bad.
+* Too many comments (like one per line) is probably a sign of poorly written code.
 * Comments should explain WHY, not WHAT. They can optionally explain HOW if that's particularly confusing.
 
 In JavaScript, there are two types of comments possible: a single-line comment, and a multi-line comment.
