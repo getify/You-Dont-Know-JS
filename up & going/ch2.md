@@ -148,10 +148,20 @@ b.toFixed(4);			// "3.1416"
 
 The "how" behind being able to call `a.toUpperCase()` is more complicated than just that method existing on the value.
 
-Briefly, there is a `String` (capital `S`) `object` wrapper form, typically called a "native", that pairs with the primitive `string` value, and it's this value form that defines the `toUpperCase()` method on its prototype. When you use a primitive value like `"hello world"` as an `object` by referencing a property or method, JS automatically "boxes" the value to its `object` wrapper counterpart.
+Briefly, there is a `String` (capital `S`) object-wrapper form, typically called a "native", that pairs with a primitive `string` value; it's this object-wrapper that defines the `toUpperCase()` method on its prototype. When you use a primitive value like `"hello world"` as an `object` by referencing a property or method, JS automatically "boxes" the value to that object-wrapper counterpart.
 
-A `string` value can be wrapped by a `String`, a `number` can be wrapped by a `Number`, a `boolean` can be wrapped by a `Boolean`, etc. For the most part, you don't need to worry about or use these `object` wrapper forms of the values -- prefer their primitive forms in practically all cases.
+A `string` value can be wrapped by a `String`, a `number` can be wrapped by a `Number`, a `boolean` can be wrapped by a `Boolean`, etc. For the most part, you don't need to worry about or directly use these object-wrapper forms of the values -- prefer the primitive value forms in practically all cases and JavaScript will take care of the rest for you.
 
-**Note:** For more information on JS natives and "boxing", see Chapter 3 of the *"Types & Grammar"* title of this book series.
+**Note:** For more information on JS natives and "boxing", see Chapter 3 of the *"Types & Grammar"* title of this book series. To better understand the prototype of an object, see Chapter 5 of the *"this & Object Prototypes"* title of this book series.
+
+### Comparing Values
+
+There two main types of value comparison that you will need to make in your JS programs: *equality* and *inequality*. The end result of any comparison is a strictly `boolean` value (`true` or `false`), regardless of what value types are compared.
+
+There are four *equality* operators: `==`, `===`, `!=`, and `!==`. The `!` forms are of course the symmetric "not equal" versions of their counterparts; non-*equality* should not be confused with *inequality*.
+
+The difference between `==` and `===` is usually characterized that `==` checks for value equality and `===` checks for both value and type equality. However, this is inaccurate. The proper way to characterize them is that `==` checks for value equality with *coercion* allowed, and `===` checks for value equality without allowing *coercion*.
+
+We talked briefly about *coercion* in Chapter 1, but let's revisit it here.
 
 ## Summary
