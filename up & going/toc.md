@@ -15,5 +15,6 @@
 * Chapter 2: Into JavaScript
 	* Values & Types
 	* Variables
+	* Strict Mode
 * Chapter 3: The Rest of the Series
 * Appendix A: Thank You's!
