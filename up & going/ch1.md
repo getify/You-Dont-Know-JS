@@ -197,7 +197,7 @@ else {
 }
 ```
 
-The `if` statement requires an expression in between the `( )` parentheses that can be treated as either `true` or `false`. In this program, we provided the expression `amount < BANK_ACCOUNT_BALANCE`, which indeed will either evaluate to `true` or `false` depending on the amount in our bank account. If `true`, we'll print out `"Sure!"` and add the `9.99` to our `amount` variable. Otherwise, the `else` clause says we'll just politley respond with `"No, thanks."`.
+The `if` statement requires an expression in between the `( )` parentheses that can be treated as either `true` or `false`. In this program, we provided the expression `amount < BANK_ACCOUNT_BALANCE`, which indeed will either evaluate to `true` or `false` depending on the amount in our bank account. If `true`, we'll print out `"Sure!"` and add the `9.99` to our `amount` variable. Otherwise, the `else` clause says we'll just politely respond with `"No, thanks."`.
 
 As we mentioned earlier, values which aren't already of an expected type are often coerced to that type. The `if` statement expects a `boolean`, but if you pass it something that's not already `boolean`, coercion will occur.
 
