@@ -229,7 +229,7 @@ Even when you declare a function expression as part of the object-literal, that 
 
 ```js
 var myObject = {
-	foo: function() {
+	foo: function foo() {
 		console.log( "foo" );
 	}
 };
@@ -241,7 +241,7 @@ someFoo; // function foo(){..}
 myObject.foo; // function foo(){..}
 ```
 
-**Note:** In Chapter 6, we will cover an ES6 short-hand for that `foo: function(){ .. }` declaration syntax in our object-literal.
+**Note:** In Chapter 6, we will cover an ES6 short-hand for that `foo: function foo(){ .. }` declaration syntax in our object-literal.
 
 ### Arrays
 
