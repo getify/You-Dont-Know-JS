@@ -14,5 +14,6 @@
 	* Practice
 * Chapter 2: Into JavaScript
 	* Values & Types
+	* Variables
 * Chapter 3: The Rest of the Series
 * Appendix A: Thank You's!

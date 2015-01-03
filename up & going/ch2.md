@@ -266,4 +266,87 @@ The `==` comparison fails for a different reason. `a == b` could fail either as 
 
 **Note:** For more information about the inequality comparison rules, see the specification (section 11.8.5) and also consult Chapter 4 of the *"Types & Grammar"* title of this book series.
 
+## Variables
+
+In JavaScript, variable names (as well as function names) must be valid *identifiers*. The strict and complete rules for valid characters in identifiers are a little complex when you consider non-traditional characters such as unicode. If you only consider typical ascii alphanumeric characters, though, the rules are simple.
+
+An identifier must start with `a`-`z`, `A`-`Z`, `$`, or `_`. It can then contain any of those characters plus the numerals `0`-`9`.
+
+Generally, the same rules apply to a property name as to a variable identifier. However, certain words cannot be used as variables, but are OK as property names. These words are called "reserved words", and include the JS keywords (`for`, `in`, `if`, etc) as well as `null`, `true`, and `false`.
+
+**Note:** For more information about reserved words, see Appendix A of the *"Types & Grammar"* title of this book series.
+
+### Scope & Functions
+
+You use the `var` keyword to declare a variable that will belong to the current function (or global, if top-level) scope.
+
+Wherever a `var` appears inside a function, that declaration is taken to belong to the function itself. Metaphorically, developers call this process "hoisting" when a `var` declaration is conceptually "moved" to the top of its enclosing function. Technically, this process is more related to how your code is compiled, but we can skim over those details for now.
+
+When you declare a variable, it is available anywhere inside that scope, as well as any lower/inner scopes.
+
+```js
+function foo() {
+	var a = 1;
+
+	function bar() {
+		var b = 2;
+
+		function baz() {
+			var c = 3;
+
+			console.log( a, b, c );	// 1 2 3
+		}
+
+		baz();
+		console.log( a, b );		// 1 2
+	}
+
+	bar();
+	console.log( a );				// 1
+}
+
+foo();
+```
+
+Notice that `c` is not available inside of `bar()`, since it's declared only inside the inner `baz()` scope, and that `b` is not available to `foo()` for the same reason.
+
+If you try to access a variable's value in a scope where it's not available, you'll get a `ReferenceError` thrown. If you try to set a variable that hasn't been declared, you'll either end up creating a global (bad!) or getting an error, depending on "strict mode" (see section below).
+
+```js
+function foo() {
+	a = 1;	// `a` not formally declared
+}
+
+foo();
+a;			// 1 -- oops, auto global :(
+```
+
+This is a very bad practice. Don't do it! Always formally declare your variables.
+
+In addition to creating declarations for variables at the function level, ES6 *lets* you declare variables to belong to individual blocks (pairs of `{ .. }`), using the `let` keyword. Besides some nuanced details, the scoping rules will behave roughly the same as we just saw with functions:
+
+```js
+function foo() {
+	var a = 1;
+
+	if (a >= 1) {
+		let b = 2;
+
+		while (b < 5) {
+			let c = b * 2;
+			b++;
+
+			console.log( a + c );
+		}
+	}
+}
+
+foo();
+// 5 7 9
+```
+
+Because of using `let` instead of `var`, `b` will belong only to the `if` statement and thus not to the whole `foo()` function's scope. Similarly, `c` belongs only to the `while` loop. Block scoping is very useful for managing your variable scopes more fine-grained, which can make your code much easier to maintain over time.
+
+**Note:** For more information about scope, see the first four chapters of the *"Scope & Closures"* title of this book series.
+
 ## Summary
