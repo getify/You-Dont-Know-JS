@@ -21,5 +21,10 @@
 	* Prototypes
 	* Old & New
 	* Non-JavaScript
-* Chapter 3: The Rest of the Series
+* Chapter 3: Into YDKJS
+	* Scope & Closures
+	* this & Object Prototypes
+	* Types & Grammar
+	* Async & Performance
+	* ES6 & Beyond
 * Appendix A: Thank You's!
