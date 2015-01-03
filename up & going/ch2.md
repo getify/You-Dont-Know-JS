@@ -162,7 +162,7 @@ There two main types of value comparison that you will need to make in your JS p
 
 There are four *equality* operators: `==`, `===`, `!=`, and `!==`. The `!` forms are of course the symmetric "not equal" versions of their counterparts; non-*equality* should not be confused with *inequality*.
 
-The difference between `==` and `===` is usually characterized that `==` checks for value equality and `===` checks for both value and type equality. However, this is inaccurate. The proper way to characterize them is that `==` checks for value equality with *coercion* allowed, and `===` checks for value equality without allowing *coercion*.
+The difference between `==` and `===` is usually characterized that `==` checks for value equality and `===` checks for both value and type equality. However, this is inaccurate. The proper way to characterize them is that `==` checks for value equality with *coercion* allowed, and `===` checks for value equality without allowing *coercion*; `===` is often called "strict equality" for this reason.
 
 We talked briefly about *coercion* in Chapter 1, but let's revisit it here.
 
@@ -233,6 +233,36 @@ You should take special note of the `==` and `===` comparison rules if you're co
 The `<`, `>`, `<=`, and `>=` operators are used for inequality, referred to in the specification as "relational comparison". Typically they will be used with ordinally comparable values like `number`s. It's easy to understand that `3 < 4`.
 
 But JavaScript `string` values can also be compared for inequality, using typical alphabetic rules (`"bar" < "foo"`).
+
+What about coercion? Similar (though not exactly identical!) rules to `==` comparison apply to the inequality operators. In fact, there are no "strict inequality" operators which would disallow coercion the same way `===` does with equality.
+
+Consider:
+
+```js
+var a = 41;
+var b = "42";
+var c = "43";
+
+a < b;		// true
+b < c;		// true
+```
+
+What happens here? The specification says (section 11.8.5) that if both values in the `<` comparison are `string`s, as it is with `b < c`, the comparison is made lexiographically (aka alphabetically like a dictionary). But if one or both is not a `string`, as it is with `a < b`, then both values are coerced to be `number`s, and a typical numeric comparison occurs.
+
+The biggest gotcha you may run into here with comparisons between potentially different value types -- remember, there are no strict inequality forms to use -- is when one of the values cannot be made into a valid number, such as:
+
+```js
+var a = 42;
+var b = "foo";
+
+a < b;		// false
+a > b;		// false
+a == b;		// false
+```
+
+Wait, how can all three of those comparisons be `false`? Because the `b` value is being coerced to the "invalid number value" `NaN` in the `<` and `>` comparisons, and the specification says that `NaN` is neither greater-than nor less-than any other value.
+
+The `==` comparison fails for a different reason. `a == b` could fail either as `42 == NaN` or `"42" == "foo"` -- as we explained earlier, the latter is the case.
 
 **Note:** For more information about the inequality comparison rules, see the specification (section 11.8.5) and also consult Chapter 4 of the *"Types & Grammar"* title of this book series.
 
