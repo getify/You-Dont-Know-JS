@@ -236,9 +236,9 @@ var myObject = {
 
 var someFoo = myObject.foo;
 
-someFoo; // function foo(){..}
+someFoo; // function (){..}
 
-myObject.foo; // function foo(){..}
+myObject.foo; // function (){..}
 ```
 
 **Note:** In Chapter 6, we will cover an ES6 short-hand for that `foo: function(){ .. }` declaration syntax in our object-literal.
