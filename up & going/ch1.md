@@ -9,11 +9,21 @@ If you have more than 1-2 months experience with programming in any modern langu
 
 ## Code
 
-Let's start from the very beginning.
+Let's start from the beginning.
 
-What does it mean to "write a program"? That's when you open up a text file and type a specific series of letters, numbers, and special characters (called operators). The rules for valid combinations of those typed characters is called a "computer language".
+What does it mean to "program" or "write a program"? That's when you open up a text file and type a specific series of letters, numbers, and special characters (called operators). The rules for valid combinations of those characters is called a "computer language", such as JavaScript, much the same as English tells you how to spell words and how to create sentences with words and punctuation.
 
-What about "executing a program"? A special program on your computer is responsible for reading your "program" from the text file and turning it into commands that your computer can recognize. Some computer languages are designed to be "compiled" ahead of time, which means the special program (aka compiler) reads your file and outputs another file, called an "executable", that can later run all by itself. Other languages are designed to be "compiled" while being run, or interpreted, which means there's no intermediate file created -- each execution is effectively re-compiling the program.
+In a computer language, a group of these words, numbers, and operators forms a statement, which is a set of instructions to the computer to perform some task. For example:
+
+```js
+a = b * 2;
+```
+
+This is a single statement (in JS syntax). It tells the computer, roughly, to get the current value stored in memory at a location that we call `b`, multiply that value by `2`, then store the result back into another area of memory we call `a`.
+
+What about "executing a program"? A special program on your computer is responsible for reading your "program" from the text file and turning it into commands that your computer can recognize.
+
+Some computer languages are designed to be "compiled" ahead of time, which means the special program (aka compiler) reads your file and outputs another file, called an "executable", that can later run all by itself. Other languages are designed to be "compiled" while being run, or interpreted, which means there's no intermediate file created -- each execution is effectively re-compiling the program.
 
 JavaScript is of the latter type: it is compiled (not interpreted!) during its execution by the JavaScript engine (inside the browser, typically).
 
