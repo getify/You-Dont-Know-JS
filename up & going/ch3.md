@@ -41,7 +41,7 @@ But the case I make regarding prototypes and delegation is a much more involved 
 
 ## Types & Grammar
 
-The third title in this book series primarily focuses on tackling yet another highly controversial topic: type coercion. Not topic in JavaScript raises more ire from developers than when you talk about the confusions surrounding implicit coercion.
+The third title in this book series primarily focuses on tackling yet another highly controversial topic: type coercion. No topic in JavaScript raises more ire from developers than when you talk about the confusions surrounding implicit coercion.
 
 By far the conventional wisdom is that implicit coercion is a "bad part" of the language and should be avoided at all costs. In fact, some have gone so far as to call it a "flaw" in the design of the language. Indeed, there are tools whose entire job is to do nothing but scan your code and complain if you're doing anything even remotely like coercion.
 
@@ -63,7 +63,7 @@ Then we move into examining callbacks as the primary method of enabling asynchro
 
 To address these two major deficiencies, ES6 introduces two new mechanisms (and indeed, patterns): promises and generators.
 
-Promises are a time-independent wrapper around a "future value", which lets you reason about adn compose them regardless of if the value is ready or not yet. Moreover, they effectively solve the IoC trust issues by routing callbacks through a trustable and composable promise mechanism.
+Promises are a time-independent wrapper around a "future value", which lets you reason about and compose them regardless of if the value is ready or not yet. Moreover, they effectively solve the IoC trust issues by routing callbacks through a trustable and composable promise mechanism.
 
 Generators introduce a new mode of execution for JS functions, whereby the generator can be paused at `yield` points and resumed asynchronously later. The pause-and-resume capability enables synchronous, sequential looking code in the generator to be processed asynchronously behind the scenes. By doing so, we address the non-linear, non-local-jump confusions of callbacks and thereby make our asynchronous code sync-looking so as to be more reason-able.
 
