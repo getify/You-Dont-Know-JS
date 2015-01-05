@@ -489,7 +489,7 @@ var User = (function(){
 
 	function doLogin(user,pw) {
 		username = user;
-		pw = password;
+		password = pw;
 
 		// do the rest of the login work
 	}
