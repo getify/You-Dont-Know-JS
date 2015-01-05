@@ -15,6 +15,7 @@
 * Chapter 2: Into JavaScript
 	* Values & Types
 	* Variables
+	* Conditionals
 	* Strict Mode
 	* Function Closure
 	* `this` Keyword
