@@ -2114,7 +2114,7 @@ Instead, you should default to using them across the code base, and then profile
 
 Promises are a little slower, but you're getting a lot of trustability, non-Zalgo predictability, and composability built-in, in exchange. So maybe the limitation is not actually their performance, but your lack of perception of their benefits?
 
-## Summary
+## Review
 
 Promises are awesome. Use them. They solve all the *inversion of control* issues that plague us with callbacks-only code.
 

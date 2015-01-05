@@ -815,7 +815,7 @@ foo( 8, 9 )
 
 There's a lot more awesome that `runner(..)` is capable of, but we'll come back to that in the next appendix.
 
-## Summary
+## Review
 
 *asynquence* is a simple abstraction -- a sequence is a series of (async) steps -- on top of promises, aimed at making working with various asynchronous patterns much easier, without any compromise in capability.
 

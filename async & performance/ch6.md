@@ -592,7 +592,7 @@ If the lack of TCO in the engine would just gracefully degrade to slower perform
 
 ES6 guarantees that from now on, JS developers will be able to rely on this optimization across all ES6+ compliant browsers. That's a win for JS performance!
 
-## Summary
+## Review
 
 Effectively benchmarking performance of a piece of code, especially to compare it to another option for that same code to see which approach is faster, requires careful attention to detail.
 

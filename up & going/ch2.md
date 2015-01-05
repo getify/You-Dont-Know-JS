@@ -715,7 +715,7 @@ The same goes with `console.log(..)`. Your browser provides such mechanisms and 
 
 This book, and this whole book series, focuses on JavaScript the language. That's why you don't see any substantial coverage of these non-JavaScript JavaScript mechanisms.
 
-## Summary
+## Review
 
 The first step to learning JavaScript's flavor of programming is to get a basic understandng of its core mechanisms like values, types, function closures, `this`, and prototypes.
 

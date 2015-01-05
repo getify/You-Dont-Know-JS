@@ -390,7 +390,7 @@ The first call to `fooASM(..)` is what sets up our asm.js module with its `heap`
 
 Obviously, the nature of restrictions that make asm.js code so optimizable reduces the use cases for such code significantly. asm.js won't necessarily be a general optimization set for any general JS program. Instead, it's intended to provide an optimized way of handling specialized tasks such as intensive math operations (like those used in graphics processing in games, for instance).
 
-## Summary
+## Review
 
 The first four chapters of this book are based on the premise that async coding patterns give you the ability to write more performant code, which is generally a very important improvement. But async behavior only gets you so far, because it's still fundamentally bound to a single event loop thread.
 

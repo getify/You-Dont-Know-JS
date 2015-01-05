@@ -822,7 +822,7 @@ If there are any remaining values in the `ch` channel at the end of the goroutin
 
 **Note:** See many more examples of using *asynquence*-flavored CSP here (https://gist.github.com/getify/e0d04f1f5aa24b1947ae).
 
-## Summary
+## Review
 
 Promises and generators provide the foundational building blocks upon which we can build much more sophisticated and capable asynchrony.
 

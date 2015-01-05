@@ -417,7 +417,7 @@ if (amount > BANK_BALANCE) {
 
 How did you do? It wouldn't hurt to try it again now that you've seen my code. And play around with changing some of the constants to see how the program runs with different values.
 
-## Summary
+## Review
 
 Learning programming doesn't have to be a complex and involved process. There are just a few basic concepts you need to wrap your head around. These act like building blocks. To build a tall tower, you start first by putting block on top of block on top of block. The same goes with programming.
 

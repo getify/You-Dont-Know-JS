@@ -588,7 +588,7 @@ That's just the story, over and over again, with callbacks. They can do pretty m
 
 You might find yourself wishing for built-in APIs or other language mechanics to address these issues. Finally ES6 has arrived on the scene with some great answers, so keep reading!
 
-## Summary
+## Review
 
 Callbacks are the fundamental unit of asynchrony in JS. But they're not enough for the evolving landscape of async programming as JS matures.
 
