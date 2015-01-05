@@ -518,7 +518,7 @@ else {
 
 The `if (b) { .. } else { .. }` is a single statement that follows the `else`, so you can either put the surrounding `{ }` in or not. In other words, when you use `else if`, you're technically breaking that common style guide rule and just using `else` with a single `if` statement.
 
-Of course, the idiom of `else if` is extremely common, and used in that way implies one less level of indentation, so it's attractive. Whichever way you do it, just call out explicitly in your own style guide/rules and don't assume things like `else if` are direct grammar rules.
+Of course, the idiom of `else if` is extremely common, and used in that way results in one less level of indentation, so it's attractive. Whichever way you do it, just call out explicitly in your own style guide/rules and don't assume things like `else if` are direct grammar rules.
 
 ## Operator Precedence
 
@@ -1253,6 +1253,94 @@ console.log( foo() );
 
 But... don't do this. Seriously. Using a `finally` + labeled `break` to effectively cancel a `return` is doing your best to create the most confusing code possible. I'd wager no amount of comments will redeem this code.
 
+## `switch`
+
+Let's briefly explore the `switch` statement, a sort-of syntactic shorthand for an `if..else if..else..` statement chain.
+
+```js
+switch (a) {
+	case 2:
+		// do something
+		break;
+	case 42:
+		// do another thing
+		break;
+	default:
+		// fallback to here
+}
+```
+
+As you can see, it evaluates `a` once, then matches the resulting value to each `case` expression (just simple value expressions here). If a match is found, execution will begin in that matched `case`, and will either go until a `break` is encountered or until the end of the `switch` block is found.
+
+That much may not surprise you, but there are several quirks about `switch` you may not have noticed before.
+
+First, the matching that occurs between the `a` expression and each `case` expression is identical to the `===` algorithm (see Chapter 4). Often times `switch`es are used with absolute values in `case` statements, as shown above, so strict matching is appropriate.
+
+However, you may wish to allow coercive equality (aka `==`, see Chapter 4), and to do so you'll need to sort of "hack" the `switch` statement a bit:
+
+```js
+var a = "42";
+
+switch (true) {
+	case a == 10:
+		console.log( "10 or '10'" );
+		break;
+	case a == 42:
+		console.log( "42 or '42'" );
+		break;
+	default:
+		// never gets here
+}
+// 42 or '42'
+```
+
+This works because the `case` clause can have any expression (not just simple values), which means it will strictly match that expression's result to the test expression (`true`). Since `a == 42` results in `true` here, the match is made.
+
+Despite `==`, the `switch` matching itself is still strict, between `true` and `true` here. If the `case` expression resulted in something that was truthy but not strictly `true` (see Chapter 4), it wouldn't work. This can bite you if you're for instance using a "logical operator" like `||` or `&&` in your expression:
+
+```js
+var a = "hello world";
+var b = 10;
+
+switch (true) {
+	case (a || b == 10):
+		// never gets here
+		break;
+	default:
+		console.log( "Oops" );
+}
+// Oops
+```
+
+Since the result of `(a || b == 10)` is `"hello world"` and not `true`, the strict match fails. In this case, the fix is to force the expression explicitly to be a `true` or `false`, such as `case !!(a || b == 10):` (see Chapter 4).
+
+Lastly, the `default` clause is optional, and it doesn't necessarily have to come at the end (although that's the strong convention). Even in the `default` clause, the same rules apply about encountering a `break` or not:
+
+```js
+var a = 10;
+
+switch (a) {
+	case 1:
+	case 2:
+		// never gets here
+	default:
+		console.log( "default" );
+	case 3:
+		console.log( "3" );
+		break;
+	case 4:
+		console.log( "4" );
+}
+// default
+// 3
+```
+
+**Note:** As discussed in the previously about labeled `break`s, the `break` inside a `case` clause can also be labeled.
+
+The way this snippet processes is that it passes through all the `case` clause matching first, finds no match, then goes to the `default` clause and starts executing. Since there's no `break` there, it continues executing in the already skipped over `case 3` block, before stopping once it hits that `break`.
+
+While this sort of round-about logic is clearly possible in JavaScript, there's almost no chance that it's going to make for reasonable or understandable code. Be very skeptical if you find yourself wanting to create such circular logic flow, and if you really do, make sure you include plenty of code comments to explain what you're up to!
+
 ## Summary
 
 JavaScript grammar has plenty of nuance that we as developers should spend a little more time paying closer attention to than we typically do. A little bit of effort goes a long way to solidifying your deeper knowledge of the language.
@@ -1270,3 +1358,5 @@ JavaScript has several types of errors, but it's less known that it has two clas
 Function arguments have an interesting relationship to their formal declared named parameters. Specifically, the `arguments` array has a number of gotchas of leaky abstraction behavior if you're not careful. Avoid `arguments` if you can, but if you must use it, by all means avoid using the positional slot in `arguments` at the same time as using a named parameter for that same argument.
 
 The `finally` clause attached to a `try` (or `try..catch`) offers some very interesting quirks in terms of execution processing order. Some of these quirks can be helpful, but it's possible to create lots of confusion, especially if combined with labeled blocks. As always, use `finally` to make code better and clearer, not more clever or confusing.
+
+The `switch` offers some nice shorthand for `if..else if..` statements, but beware of many common simplifying assumptions about its behavior. There are several quirks that can trip you up if you're not careful, but there's also some hidden tricks that `switch` has up its sleeve!
