@@ -1278,6 +1278,28 @@ if (!!a && (!!b || !!c)) {
 
 Good luck with that! ... Sorry, just teasing.
 
+### Symbol Coercion
+
+Up to this point, there's been almost no observable outcome difference between *explicit* and *implicit* coercion -- only the readability of code has been at stake.
+
+But ES6 Symbols introduce a gotcha into the coercion system that we need to discuss briefly. For reasons that go well beyond the scope of what we'll discuss in this chapter, *explicit coercion* of a `symbol` to a `string` is allowed, but *implicit coercion* of the same is disallowed and throws an error.
+
+Consider:
+
+```js
+var s1 = Symbol( "cool" );
+String( s1 );					// "Symbol(cool)"
+
+var s2 = Symbol( "not cool" );
+s2 + "";						// TypeError
+```
+
+`symbol` values cannot coerce to `number` at all (throws an error either way), but strangely can both *explicitly* and *implicitly* coerce to `boolean` (always `true`).
+
+Consistency is always easier to learn, and exceptions are never fun to deal with, but here we just need to be careful around the new ES6 `symbol` values and how we coerce them.
+
+The good news is, it's probably going to be exceedingly rare for you to need to coerce a `symbol` value. The way they're typically used (see Chapter 3) will probably not call for coercion on a normal basis.
+
 ## Loose Equals vs Strict Equals
 
 Loose equals is the `==` operator, and strict equals is the `===` operator. Both operators are used for comparing two values for "equality", but the "loose" vs. "strict" indicates a **very important** difference in behavior between the two, specifically in how they decide "equality".
