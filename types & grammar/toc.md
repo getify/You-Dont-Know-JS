@@ -6,7 +6,7 @@
 * Chapter 1: Types
 	* A Type By Any Other Name...
 	* Built-in Types
-	* Values As Types
+	* Values as Types
 * Chapter 2: Values
 	* Strings
 	* Numbers

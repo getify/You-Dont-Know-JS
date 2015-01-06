@@ -7,9 +7,9 @@ Most developers would say that a dynamic language (like JS) does not have *types
 >
 > An ECMAScript language type corresponds to values that are directly manipulated by an ECMAScript programmer using the ECMAScript language. The ECMAScript language types are Undefined, Null, Boolean, String, Number, and Object.
 
-Now, if you're a fan of strongly typed (statically typed) languages, you may object to this usage of the word "type". In those languages, "type" means a whole lot *more* than it does here in JS.
+Now, if you're a fan of strongly typed (statically typed) languages, you may object to this usage of the word "type." In those languages, "type" means a whole lot *more* than it does here in JS.
 
-Some people say JS shouldn't claim to have "types", and they should instead be called "tags" or perhaps "sub types".
+Some people say JS shouldn't claim to have "types," and they should instead be called "tags" or perhaps "subtypes".
 
 Bah! We're going to use this rough definition (the same one that seems to drive the wording of the spec): a *type* is an intrinsic, built-in set of characteristics that uniquely identifies the behavior of a particular value and distinguishes it from other values, both to the engine **and to the developer**.
 
@@ -21,7 +21,7 @@ That's by no means a perfect definition. But it's good enough for this discussio
 
 Beyond academic definition disagreements, why does it matter if JavaScript has *types* or not?
 
-Having a proper understanding of each *type* and its intrinsic behavior is absolutely essential to understanding how to properly and accurately convert values to different types (See Coercion, Chapter 4). Nearly every JS program ever written will need to handle value coercion in some shape or form, so it's important you do so responsibly and with confidence.
+Having a proper understanding of each *type* and its intrinsic behavior is absolutely essential to understanding how to properly and accurately convert values to different types (see Coercion, Chapter 4). Nearly every JS program ever written will need to handle value coercion in some shape or form, so it's important you do so responsibly and with confidence.
 
 If you have the `number` value `42`, but you want to treat it like a `string`, such as pulling out the `"2"` as a character in position `1`, you obviously must first convert (coerce) the value from `number` to `string`.
 
@@ -31,11 +31,11 @@ But there are many different ways that such coercion can happen. Some of these w
 
 Coercion confusion is perhaps one of the most profound frustrations for JavaScript developers. It has often been criticized as being so *dangerous* as to be considered a flaw in the design of the language, to be shunned and avoided.
 
-Armed with a full understanding of JavaScript types, we're aiming to illustrate why coercion's *bad reputation* is largely over-hyped and somewhat undeserved -- to flip your perspective, to seeing coercion's power and usefulness. But first, we have to get a much better grip on values and types.
+Armed with a full understanding of JavaScript types, we're aiming to illustrate why coercion's *bad reputation* is largely overhyped and somewhat undeserved -- to flip your perspective, to seeing coercion's power and usefulness. But first, we have to get a much better grip on values and types.
 
 ## Built-in Types
 
-JavaScript defines seven built-in types. These are:
+JavaScript defines seven built-in types:
 
 * `null`
 * `undefined`
@@ -60,7 +60,7 @@ typeof { life: 42 }  === "object";    // true
 typeof Symbol()      === "symbol";    // true
 ```
 
-These 6 listed types have values of the corresponding type and return a string value of the same name, as shown. `Symbol` is a new data type as of ES6, and will be covered in Chapter 3.
+These six listed types have values of the corresponding type and return a string value of the same name, as shown. `Symbol` is a new data type as of ES6, and will be covered in Chapter 3.
 
 As you may have noticed, I excluded `null` from the above listing. It's *special* -- special in the sense that it's buggy when combined with the `typeof` operator:
 
@@ -68,7 +68,7 @@ As you may have noticed, I excluded `null` from the above listing. It's *special
 typeof null === "object"; // true
 ```
 
-It would have been nice (and correct!) if it returned `"null"`, but this original bug in JS has persisted for nearly 2 decades, and will likely never be fixed because there's too much existing web content that relies on its buggy behavior that "fixing" the bug would *create* more "bugs" and break a lot of web software.
+It would have been nice (and correct!) if it returned `"null"`, but this original bug in JS has persisted for nearly two decades, and will likely never be fixed because there's too much existing web content that relies on its buggy behavior that "fixing" the bug would *create* more "bugs" and break a lot of web software.
 
 If you want to test for a `null` value using its type, you need a compound condition:
 
@@ -116,9 +116,9 @@ Nope, just objects. It's most appropriate to think of them also as a "subtype" o
 
 In JavaScript, variables don't have types -- **values have types**. Variables can hold any value, at any time.
 
-Another way to think about JS types is that JS doesn't have "type enforcement", in that the engine doesn't insist that a *variable* always holds values of the *same initial type* that it starts out with. A variable can, in one assignment statement, hold a `string`, and in the next hold a `number`, and so on.
+Another way to think about JS types is that JS doesn't have "type enforcement," in that the engine doesn't insist that a *variable* always holds values of the *same initial type* that it starts out with. A variable can, in one assignment statement, hold a `string`, and in the next hold a `number`, and so on.
 
-The *value* `42` has an intrinsic type of `number`, and its *type* cannot be changed. Another value, like `"42"` with the `string` type, can be created *from* the `number` value `42`, through a process called **coercion** (see Chapter 4).
+The *value* `42` has an intrinsic type of `number`, and its *type* cannot be changed. Another value, like `"42"` with the `string` type, can be created *from* the `number` value `42` through a process called **coercion** (see Chapter 4).
 
 If you use `typeof` against a variable, it's not asking "what's the type of the variable?" as it may seem, since JS variables have no types. Instead, it's asking "what's the type of the value *in* the variable?"
 
@@ -157,7 +157,7 @@ typeof b; // "undefined"
 typeof c; // "undefined"
 ```
 
-It's tempting for most developers to think of the name "undefined" and think of it as a synonym for "undeclared". However, in JS, these two concepts are quite different.
+It's tempting for most developers to think of the name "undefined" and think of it as a synonym for "undeclared." However, in JS, these two concepts are quite different.
 
 An "undefined" variable is one that has been declared in the accessible scope, but *at the moment* has no other value in it. By contrast, an "undeclared" variable is one that has not been formally declared in the accessible scope.
 
@@ -170,7 +170,7 @@ a; // undefined
 b; // ReferenceError: b is not defined
 ```
 
-An annoying confusion is the error message that browsers assign to this condition. As you can see, the message is "b is not defined", which is of course very easy and reasonable to confuse with "b is undefined". Yet again, "undefined" and "is not defined" are very different things. It'd be nice if the browsers said something like "b is not found" or "b is not declared", to reduce the confusion!
+An annoying confusion is the error message that browsers assign to this condition. As you can see, the message is "b is not defined," which is of course very easy and reasonable to confuse with "b is undefined." Yet again, "undefined" and "is not defined" are very different things. It'd be nice if the browsers said something like "b is not found" or "b is not declared," to reduce the confusion!
 
 There's also a special behavior associated with `typeof` as it relates to undeclared variables that even further reinforces the confusion. Consider:
 
@@ -190,9 +190,9 @@ Similar to above, it would have been nice if `typeof` used with an undeclared va
 
 Nevertheless, this safety guard is a useful feature when dealing with JavaScript in the browser, where multiple script files can load variables into the shared global namespace.
 
-**Note:** Many developers believe there should never be any variables in the global namespace, and that everything should be contained in modules and private/separate namespaces. This is great in theory but nearly impossible in practicality; still its a good goal to strive toward! Fortunately, ES6 added first-class support for modules, which will eventually make that much more practical.
+**Note:** Many developers believe there should never be any variables in the global namespace, and that everything should be contained in modules and private/separate namespaces. This is great in theory but nearly impossible in practicality; still it's a good goal to strive toward! Fortunately, ES6 added first-class support for modules, which will eventually make that much more practical.
 
-As a simple example, imagine having a "debug mode" in your program that is controlled by a global variable (flag) called `DEBUG`. You'd want to check if that variable was declared before performing some debug task like logging a message to the console. A top-level global `var DEBUG = true` declaration would only be included in a "debug.js" file, that you only load into the browser when you're in development/testing, but not in production.
+As a simple example, imagine having a "debug mode" in your program that is controlled by a global variable (flag) called `DEBUG`. You'd want to check if that variable was declared before performing a debug task like logging a message to the console. A top-level global `var DEBUG = true` declaration would only be included in a "debug.js" file, which you only load into the browser when you're in development/testing, but not in production.
 
 However, you have to take care in how you check for the global `DEBUG` variable in the rest of your application code, so that you don't throw a `ReferenceError`. The safety guard on `typeof` is our friend in this case.
 
@@ -216,7 +216,7 @@ if (typeof atob === "undefined") {
 }
 ```
 
-**Note:** If you're defining a "polyfill" for a feature if it doesn't already exist (but should!), you probably want to avoid using `var` to make the `atob` declaration. If you declare `var atob` inside the `if` statement, this declaration is hoisted (see the *"Scope & Closures"* title of this series) to the top of the scope, even if the `if` condition doesn't pass (because the global `atob` already exists!). In some browsers and for some special types of global built-in variables (often called "host objects"), this duplicate declaration may throw an error. Omitting the `var` prevents this hoisted declaration.
+**Note:** If you're defining a "polyfill" for a feature if it doesn't already exist, you probably want to avoid using `var` to make the `atob` declaration. If you declare `var atob` inside the `if` statement, this declaration is hoisted (see the *"Scope & Closures"* title of this series) to the top of the scope, even if the `if` condition doesn't pass (because the global `atob` already exists!). In some browsers and for some special types of global built-in variables (often called "host objects"), this duplicate declaration may throw an error. Omitting the `var` prevents this hoisted declaration.
 
 Another way of doing these checks against global variables but without the safety guard feature of `typeof` is to observe that all global variables are also properties of the global object, which in the browser is basically the `window` object. So, the above checks could have been done (quite safely) as:
 
@@ -251,7 +251,8 @@ function doSomethingCool() {
 `doSomethingCool()` tests for a variable called `FeatureXYZ`, and if found, uses it, but if not, uses its own. Now, if someone includes this utility into their module/program, it safely checks if they've defined `FeatureXYZ` or not:
 
 ```js
-// an IIFE (see "Immediately Invoked Function Expressions" discussion in the *"Scope & Closures"* title of this series)
+// an IIFE (see "Immediately Invoked Function Expressions"
+// discussion in the *"Scope & Closures"* title of this series)
 (function(){
 	function FeatureXYZ() { /*.. my XYZ feature ..*/ }
 
@@ -272,7 +273,7 @@ function doSomethingCool() {
 
 Here, `FeatureXYZ` is not at all a global variable, but we're still using the safety guard of `typeof` to make it safe to check for. And importantly, here there is *no* object we can use (like we did for global variables with `window.___`) to make the check, so `typeof` is quite helpful.
 
-Other developers would prefer a design pattern called "dependency injection", where instead of `doSomethingCool()` inspecting implicitly for `FeatureXYZ` to be defined outside/around it, it would need to have the dependency explicitly passed in, like:
+Other developers would prefer a design pattern called "dependency injection," where instead of `doSomethingCool()` inspecting implicitly for `FeatureXYZ` to be defined outside/around it, it would need to have the dependency explicitly passed in, like:
 
 ```js
 function doSomethingCool(FeatureXYZ) {
