@@ -580,7 +580,7 @@ ajax( "..pre-cached-url..", asyncify( result ) );
 a++;
 ```
 
-Whether the Ajax request is in the cache and resolves right away, or must be fetched over the wire and thus complete asynchronously, this code will always output `1` instead of `0`, because `foo()` cannot help but invoked asynchronously, which means the `a++` has a chance to run before `foo()` does.
+Whether the Ajax request is in the cache and resolves to try to call the callback right away, or must be fetched over the wire and thus complete later asynchronously, this code will always output `1` instead of `0` -- `result(..)` cannot help but be invoked asynchronously, which means the `a++` has a chance to run before `result(..)` does.
 
 Yay, another trust issued "solved"! But it's inefficient, and yet again more bloated boilerplate to weigh your project down.
 
