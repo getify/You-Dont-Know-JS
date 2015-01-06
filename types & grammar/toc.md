@@ -16,7 +16,7 @@
 	* Internal `[[Class]]`
 	* Boxing Wrappers
 	* Unboxing
-	* Natives As Constructors
+	* Natives as Constructors
 * Chapter 4: Coercion
 	* Converting Values
 	* Abstract Value Operations

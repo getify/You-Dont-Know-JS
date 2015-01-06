@@ -1,7 +1,7 @@
 # You Don't Know JS: Types & Grammar
 # Chapter 3: Natives
 
-Several times in Chapters 1 and 2, we alluded to various built-ins, usually called "natives", like `String` and `Number`. Let's examine those in detail now.
+Several times in Chapters 1 and 2, we alluded to various built-ins, usually called "natives," like `String` and `Number`. Let's examine those in detail now.
 
 Here's a list of the most commonly used natives:
 
@@ -18,7 +18,7 @@ Here's a list of the most commonly used natives:
 
 As you can see, these natives are actually built-in functions.
 
-If you're coming to JS from a language like Java, `String()` will look like the "String constructor" you're used to for creating string values. So, you'll quickly observe that you can do things like:
+If you're coming to JS from a language like Java, JavaScript's `String()` will look like the `String(..)` constructor you're used to for creating string values. So, you'll quickly observe that you can do things like:
 
 ```js
 var s = new String( "Hello World!" );
@@ -38,9 +38,9 @@ a instanceof String; // true
 Object.prototype.toString.call( a ); // "[object String]"
 ```
 
-The result of the constructor form of value creation (`new String("abc")`) is an object-wrapper around the primitive (`"abc"`) value.
+The result of the constructor form of value creation (`new String("abc")`) is an object wrapper around the primitive (`"abc"`) value.
 
-Importantly, `typeof` shows that these objects are not their own special *types*, but more appropriately they are sub-types of the `object` type.
+Importantly, `typeof` shows that these objects are not their own special *types*, but more appropriately they are subtypes of the `object` type.
 
 This object wrapper can further be observed with:
 
@@ -50,7 +50,7 @@ console.log( a );
 
 The output of that statement varies depending on your browser, as developer consoles are free to choose however they feel it's appropriate to serialize the object for developer inspection.
 
-**Note:** At time of writing, latest Chrome prints something like this: `String {0: "a", 1: "b", 2: "c", length: 3, [[PrimitiveValue]]: "abc"}`. But older Chrome used to just print this: `String {0: "a", 1: "b", 2: "c"}`. Latest Firefox currently prints `String ["a","b","c"]`, but used to print `"abc"` in italics which was clickable to open the object inspector. Of course, these results are subject to rapid change and your experience may vary.
+**Note:** At the time of writing, the latest Chrome prints something like this: `String {0: "a", 1: "b", 2: "c", length: 3, [[PrimitiveValue]]: "abc"}`. But older versions of Chrome used to just print this: `String {0: "a", 1: "b", 2: "c"}`. The latest Firefox currently prints `String ["a","b","c"]`, but used to print `"abc"` in italics, which was clickable to open the object inspector. Of course, these results are subject to rapid change and your experience may vary.
 
 The point is, `new String("abc")` creates a string wrapper object around `"abc"`, not just the primitive `"abc"` value itself.
 
@@ -85,6 +85,8 @@ Object.prototype.toString.call( true );		// "[object Boolean]"
 
 In this snippet, each of the simple primitives are automatically boxed (see below) by their respective object wrappers, which is why `"String"`, `"Number"`, and `"Boolean"` are revealed as the respective internal `[[Class]]` values.
 
+**Note:** The behavior of `toString()` and `[[Class]]` as illustrated here has changed a bit from ES5 to ES6, but we'll cover such details in the *"ES6 & Beyond"* title of this series.
+
 ## Boxing Wrappers
 
 These object wrappers serve a very important purpose. Primitive values don't have properties or methods, so to access `.length` or `.toString()` you need an object wrapper around the value. Thankfully, JS will automatically *box* (aka wrap) the primitive value to fulfill such accesses.
@@ -98,7 +100,7 @@ a.toUpperCase(); // "ABC"
 
 So, if you're going to be accessing these properties/methods on your string values regularly, like a `i < a.length` condition in a `for` loop for instance, it might seem to make sense to just have the object-form of the value from the start, so the JS engine doesn't need to implicitly create it for you.
 
-But it turns out that's a bad idea. Browsers long ago performance-optimized the common cases like `.length`, which means your program will *actually go slower* if you try to "pre-optimize" by directly using the object-form (which isn't on the optimized path).
+But it turns out that's a bad idea. Browsers long ago performance-optimized the common cases like `.length`, which means your program will *actually go slower* if you try to "preoptimize" by directly using the object-form (which isn't on the optimized path).
 
 In general, there's basically no reason to use the object-form directly. It's better to just let the boxing happen implicitly where necessary. In other words, never do things like `new String("abc")`, `new Number(42)`, etc -- always prefer using the literal primitive values `"abc"` and `42`.
 
@@ -136,7 +138,7 @@ Object.prototype.toString.call( b ); // "[object String]"
 Object.prototype.toString.call( c ); // "[object String]"
 ```
 
-Again, using the boxed object wrapper directly (like `b` and `c` above) is usually discouraged, but there may be some rare occassions you'll run into where they may be useful.
+Again, using the boxed object wrapper directly (like `b` and `c` above) is usually discouraged, but there may be some rare occasions you'll run into where they may be useful.
 
 ## Unboxing
 
@@ -162,9 +164,9 @@ typeof a; // "object"
 typeof b; // "string"
 ```
 
-## Natives As Constructors
+## Natives as Constructors
 
-For `array`, `object`, `function`, and regular-expression values, it's almost universally preferred that you use the literal form for creating the values, but the literal form creates the same sort of object as the constructor form does (that is, there is no non-wrapped value).
+For `array`, `object`, `function`, and regular-expression values, it's almost universally preferred that you use the literal form for creating the values, but the literal form creates the same sort of object as the constructor form does (that is, there is no nonwrapped value).
 
 Just as we've seen above with the other natives, these constructor forms should generally be avoided, unless you really know you need them, mostly because they introduce exceptions and gotchas that you probably don't really *want* to deal with.
 
@@ -178,17 +180,17 @@ var b = [1, 2, 3];
 b; // [1, 2, 3]
 ```
 
-**Note:** The `Array(..)` constructor does not require the `new` keyword in front of it. If you omit it, it will behave as if you has used it anyway. So `Array(1,2,3)` is the same outcome as `new Array(1,2,3)`.
+**Note:** The `Array(..)` constructor does not require the `new` keyword in front of it. If you omit it, it will behave as if you have used it anyway. So `Array(1,2,3)` is the same outcome as `new Array(1,2,3)`.
 
-The `Array` constructor has a special form that if there's only one argument passed, and it's a `number`, instead of providing that value as *contents* of the array, it's taken as a length to "pre-size the array" (well, sorta).
+The `Array` constructor has a special form where if only one `number` argument is passed, instead of providing that value as *contents* of the array, it's taken as a length to "presize the array" (well, sorta).
 
 This is a terrible idea. Firstly, you can trip over that form accidentally, as it's easy to forget.
 
-But more importantly, there's no such thing as actually pre-sizing the array. Instead, what you're creating is an otherwise empty array, but setting the `length` property of the array to the numeric value specified.
+But more importantly, there's no such thing as actually presizing the array. Instead, what you're creating is an otherwise empty array, but setting the `length` property of the array to the numeric value specified.
 
-An array which has no explicit values in its slots, but it has a `length` property that *implies* the slots exist, is a weird exotic type of data structure in JS with some very strange and confusing behavior. The capability to create such a value comes purely from old, deprecated, historical functionalities ("array-like objects" like the `arguments` object).
+An array that has no explicit values in its slots, but has a `length` property that *implies* the slots exist, is a weird exotic type of data structure in JS with some very strange and confusing behavior. The capability to create such a value comes purely from old, deprecated, historical functionalities ("array-like objects" like the `arguments` object).
 
-**Note: An array with at least one "empty slot" in it is often called a "sparse array".
+**Note:** An array with at least one "empty slot" in it is often called a "sparse array."
 
 It doesn't help matters that this is yet another example where browser developer consoles vary on how they represent such an object, which breeds more confusion.
 
@@ -201,7 +203,7 @@ a.length; // 3
 a;
 ```
 
-The serialization of `a` in Chrome is (at time of writing): `[ undefined x 3 ]`. **This is really unfortunate.** It implies that there are three `undefined` values in the slots of this array, when in fact the slots do not exist (so called "empty slots" -- also a bad name!).
+The serialization of `a` in Chrome is (at the time of writing): `[ undefined x 3 ]`. **This is really unfortunate.** It implies that there are three `undefined` values in the slots of this array, when in fact the slots do not exist (so-called "empty slots" -- also a bad name!).
 
 To visualize the difference, try this:
 
@@ -220,9 +222,9 @@ c;
 
 For `b` (in Chrome, currently), you'll find `[ undefined, undefined, undefined ]` as the serialization, as opposed to `[ undefined x 3 ]` for `a` and `c`. Confused? Yeah, so is everyone else.
 
-Worse than that, at time of writing, Firefox reports `[ , , , ]` for `a` and `c`. Did you catch why that's so confusing? Look closely. Three commas implies four slots, not three slots like we'd expect.
+Worse than that, at the time of writing, Firefox reports `[ , , , ]` for `a` and `c`. Did you catch why that's so confusing? Look closely. Three commas implies four slots, not three slots like we'd expect.
 
-**What!?** Firefox puts an extra `,` on the end of their serialization here because as of ES5, trailing commas in lists (arrays values, property lists, etc) are allowed (and thus dropped and ignored). So if you were to type in a `[ , , , ]` value into your program or the console, you'd actually get the underlying value that's like `[ , , ]` (that is, an array with three empty slots). This choice, while confusing if reading the developer console, is defended as instead making copy-n-paste behavior accurate.
+**What!?** Firefox puts an extra `,` on the end of their serialization here because as of ES5, trailing commas in lists (arrays values, property lists, etc.) are allowed (and thus dropped and ignored). So if you were to type in a `[ , , , ]` value into your program or the console, you'd actually get the underlying value that's like `[ , , ]` (that is, an array with three empty slots). This choice, while confusing if reading the developer console, is defended as instead making copy-n-paste behavior accurate.
 
 If you're shaking your head or rolling your eyes about now, you're not alone! Shrugs.
 
@@ -287,7 +289,7 @@ Bottom line: **never ever, under any circumstances**, should you intentionally c
 
 ### `Object(..)`, `Function(..)`, and `RegExp(..)`
 
-The `Object(..)` / `Function(..)` / `RegExp(..)` constructors are also generally optional (and thus should usually be avoided unless specifically called for):
+The `Object(..)`/`Function(..)`/`RegExp(..)` constructors are also generally optional (and thus should usually be avoided unless specifically called for):
 
 ```js
 var c = new Object();
@@ -308,7 +310,7 @@ There's practically no reason to ever use the `new Object()` constructor form, e
 
 The `Function` constructor is helpful only in the rarest of cases, where you need to dynamically define a function's parameters and/or its function body. **Do not just treat `Function(..)` as an alternate form of `eval(..)`.** You will almost never need to dynamically define a function in this way.
 
-Regular expressions defined in the literal form (`/^a*b+/g`) are strongly preferred, not just for ease of syntax but for performance reasons -- the JS engine pre-compiles and caches them before code execution. Unlike the other constructor forms we've seen so far, `RegExp(..)` has some reasonable utility: to dynamically define the pattern for a regular expression.
+Regular expressions defined in the literal form (`/^a*b+/g`) are strongly preferred, not just for ease of syntax but for performance reasons -- the JS engine precompiles and caches them before code execution. Unlike the other constructor forms we've seen so far, `RegExp(..)` has some reasonable utility: to dynamically define the pattern for a regular expression.
 
 ```js
 var name = "Kyle";
@@ -321,13 +323,13 @@ This kind of scenario legitimately occurs in JS programs from time to time, so y
 
 ### `Date(..)` and `Error(..)`
 
-The `Date(..)` and `Error(..)` native constructors are much more commonly useful than the other natives, because there is no literal form for either.
+The `Date(..)` and `Error(..)` native constructors are much more useful than the other natives, because there is no literal form for either.
 
 To create a date object value, you must use `new Date()`. The `Date(..)` constructor accepts optional arguments to specify the date/time to use, but if omitted, the current date/time is assumed.
 
 By far the most common reason you construct a date object is to get the current unix timestamp value (an integer number of seconds since Jan 1, 1970). You can do this by calling `getTime()` on a date object instance.
 
-An even easier way though is to just call the static helper function defined as of ES5: `Date.now()`. And to polyfill that for pre-ES5 is pretty easy:
+But an even easier way is to just call the static helper function defined as of ES5: `Date.now()`. And to polyfill that for pre-ES5 is pretty easy:
 
 ```js
 if (!Date.now) {
@@ -354,17 +356,17 @@ function foo(x) {
 }
 ```
 
-Error object instances generally have at least a `message` property, and sometimes other properties (which you should treat as read-only), like `type`. However, other than inspecting the above-mentioned `stack` property, it's usually best to just call `toString()` on the error object (either explicitly, or implicitly through coercion -- see Chapter 4), to get a friendly-formatted error message.
+Error object instances generally have at least a `message` property, and sometimes other properties (which you should treat as read-only), like `type`. However, other than inspecting the above-mentioned `stack` property, it's usually best to just call `toString()` on the error object (either explicitly, or implicitly through coercion -- see Chapter 4) to get a friendly-formatted error message.
 
-**Note:** Technically, in addition to the general `Error(..)` native, there are several other specific-error-type natives: `EvalError(..)`, `RangeError(..)`, `ReferenceError(..)`, `SyntaxError(..)`, `TypeError(..)`, and `URIError(..)`. It's very rare to manually use these specific error natives, however. They are automatically used if your program actually suffers from a real exception (such as referencing an undeclared variable and getting a `ReferenceError` error).
+**Tip:** Technically, in addition to the general `Error(..)` native, there are several other specific-error-type natives: `EvalError(..)`, `RangeError(..)`, `ReferenceError(..)`, `SyntaxError(..)`, `TypeError(..)`, and `URIError(..)`. But it's very rare to manually use these specific error natives. They are automatically used if your program actually suffers from a real exception (such as referencing an undeclared variable and getting a `ReferenceError` error).
 
 ### `Symbol(..)`
 
 New as of ES6, an additional primitive value type has been added, called "Symbol". Symbols are special "unique" (not strictly guaranteed!) values that can be used as properties on objects with little fear of any collision. They're primarily designed for special built-in behaviors of ES6 constructs, but you can also define your own symbols.
 
-Symbols can be used as property names, but you cannot see or access the actual value of a Symbol from your program, nor from the developer console. You cannot convert it to a string (doing so may result in a `TypeError` being thrown), and if you output it to the developer console, what's shown is only a fake pseudo-serialization, like `Symbol(Symbol.create)`.
+Symbols can be used as property names, but you cannot see or access the actual value of a symbol from your program, nor from the developer console. If you evaluate a symbol in the developer console, what's shown looks like `Symbol(Symbol.create)`, for example.
 
-There are several pre-defined symbols in ES6, accessed as static properties of the `Symbol` function object, like `Symbol.create`, `Symbol.iterator`, etc. To use them, do something like:
+There are several predefined symbols in ES6, accessed as static properties of the `Symbol` function object, like `Symbol.create`, `Symbol.iterator`, etc. To use them, do something like:
 
 ```js
 obj[Symbol.iterator] = function(){ /*..*/ };
@@ -393,7 +395,7 @@ While symbols are not actually private (`Object.getOwnPropertySymbols(..)` refle
 
 Each of the built-in native constructors has its own `.prototype` object -- `Array.prototype`, `String.prototype`, etc.
 
-These objects contain behavior unique to their particular object sub-type.
+These objects contain behavior unique to their particular object subtype.
 
 For example, all string objects, and by extension (via boxing) `string` primitives, have access to default behavior as methods defined on the `String.prototype` object.
 
@@ -473,12 +475,12 @@ isThisCool(
 
 One minor side-benefit of this approach is that the `.prototype`s are already created and built-in, thus created *only once*. By contrast, using `[]`, `function(){}`, and `/(?:)/` values themselves for those defaults would (likely, depending on engine implementations) be recreating those values (and probably garbage-collecting them later) for *each call* of `isThisCool(..)`. That could be memory/CPU wasteful.
 
-Also, be very careful not to use `Array.prototype` as a default value **that will subsequently be modified**. In this example, `vals` is used read-only, but if you were to instead make in-place changes to `vals`, you would actually be modifying `Array.prototype` itself, which would lead to the weirdnesses mentioned earlier!
+Also, be very careful not to use `Array.prototype` as a default value **that will subsequently be modified**. In this example, `vals` is used read-only, but if you were to instead make in-place changes to `vals`, you would actually be modifying `Array.prototype` itself, which would lead to the gotchas mentioned earlier!
 
 **Note:** While we're pointing out these native prototypes and some usefulness, be cautious of relying on them and even more wary of modifying them in anyway. See Appendix A "Native Prototypes" for more discussion.
 
 ## Review
 
-JavaScript provides object wrappers around primitive values, known as natives (`String`, `Number`, `Boolean`, etc). These object wrappers give the values access to behaviors appropriate for each object sub-type (`String#trim()` and `Array#concat(..)`).
+JavaScript provides object wrappers around primitive values, known as natives (`String`, `Number`, `Boolean`, etc). These object wrappers give the values access to behaviors appropriate for each object subtype (`String#trim()` and `Array#concat(..)`).
 
 If you have a simple scalar primitive value like `"abc"` and you access its `length` property or some `String.prototype` method, JS automatically "boxes" the value (wraps it in its respective object wrapper) so that the property/method accesses can be fulfilled.
