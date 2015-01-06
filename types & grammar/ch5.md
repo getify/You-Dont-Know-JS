@@ -79,7 +79,7 @@ So, what can we do?
 
 **Disclaimer: For demo purposes only, don't really do this in code!**
 
-We could use the much aligned `eval(..)` (aka "evil") function to capture this completion value.
+We could use the much maligned `eval(..)` (aka "evil") function to capture this completion value.
 
 ```js
 var a = eval( "if (true) { 4 + 38; }" );
@@ -89,7 +89,7 @@ a;	// 42
 
 Yeeeaaahhhh. That's terribly ugly. But it works! And it illustrates the point that statement completion values are a real thing that can be captured not just in our console but in our programs.
 
-There's a proposal for a future addition to the JS language, which (at time of writing) is nothing more tangible than just a "possible for ES7+", but it's interesting to consider nonetheless. The feature is called "do expressions". Here's how it would work:
+There's a proposal for a future addition to the JS language, which (at time of writing) is nothing more tangible than just a "possible for ES7+", but it's interesting to consider nonetheless. The feature is called "do expressions." Here's how it would work:
 
 ```js
 var a = do {
