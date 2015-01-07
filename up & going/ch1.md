@@ -41,7 +41,7 @@ It cannot be emphasized enough, that while you go through this chapter -- and yo
 
 The easiest way to do that is to open up the developer tools console in your nearest browser (Firefox, Chrome, IE, etc).
 
-For example, try to type this (even though its meaning is not yet understandable yet) and see how it runs:
+For example, try to type this (even though its meaning may not yet be understandable) and see how it runs:
 
 ```js
 var a = 21;
