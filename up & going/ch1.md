@@ -33,6 +33,32 @@ JavaScript is of the latter type: it is compiled (not interpreted!) during its e
 
 **Note:** For more information on how JavaScript is "compiled", see the first two chapters of the *"Scope & Closures"* title of this book series.
 
+### Try It Yourself
+
+This chapter is going to introduce each programming concept with simple snippets of code, all written in JavaScript (obviously!).
+
+It cannot be emphasized enough, that while you go through this chapter -- and you may need to spend the time to go over it several times -- that you should practice each of these concepts by typing the code yourself.
+
+The easiest way to do that is to open up the developer tools console in your nearest browser (Firefox, Chrome, IE, etc).
+
+For example, try to type this (even though its meaning is not yet understandable yet) and see how it runs:
+
+```js
+var a = 21;
+
+var b = a * 2;
+
+console.log( b );
+```
+
+**Tip:** To type multiple lines into the console at once, use `<shift> + <enter>` to get a new line. If you just hit `<enter>` by itself, it will run everything you've already typed.
+
+Typing that code into the console in Chrome would look something like this:
+
+<img src="fig1.png" width="500">
+
+Go on, try it. The best way to learn programming is to start programming!
+
 ## Values & Types
 
 If you ask an employee at a phone store how much a certain phone costs, and they tell you "99.99", they're giving you an actual dollar figure that (plus taxes and fees) represents what you'll need to pay. If you wanted to buy two of those phones, you could easily do the mental math to double that value to get "199.98" for your base cost.
