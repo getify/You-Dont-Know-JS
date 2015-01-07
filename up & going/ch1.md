@@ -315,17 +315,86 @@ As you can see, we defined a function called `calculateFinalPurchaseAmount(..)`.
 
 We later call this function, passing in the current purchase amount (`99.99`), and we get back the new purchase amount with tax added (`107.9892`), which we format as a `string`, rounded to two digits (`"107.99"`).
 
-Another subtle point is that the `TAX_RATE` constant (variable) was accessible from inside the `calculateFinalPurchaseAmount(..)` function, even though we didn't pass it in. That's because of "lexical scope" which is the ability to find variables either in the current scope, or in any outer scope (see the first two chapters of the *"Scope & Closures"* title of this book series).
+### Scope
+
+Functions introduce us to this idea of "scope" (technically called "lexical scope") -- each function gets its own scope. Scope is basically a collection of variables as well as the rules for how variables are accessed by name.
+
+For example, a variable name has to be unique within the same scope -- there can't be two different `a` variables sitting right next to each other. But the same variable name `a` could appear in different scopes.
+
+```js
+function one() {
+	// this `a` only belongs to the `one()` function
+	var a = 1;
+	console.log( a );
+}
+
+function two() {
+	// this `a` only belongs to the `two()` function
+	var a = 2;
+	console.log( a );
+}
+
+one();		// 1
+two();		// 2
+```
+
+Also, a scope can be nested inside another scope, just like if a clown at a birthday party blows up one balloon inside another balloon. If one scope is nested inside another, code inside the innermost scope can access variables from either scope.
+
+Consider:
+
+```js
+function outer() {
+	var a = 1;
+
+	function inner() {
+		var b = 2;
+
+		// we can access both `a` and `b` here
+		console.log( a + b );	// 3
+	}
+
+	// we can only access `a` here
+	console.log( a );			// 1
+}
+
+outer();
+```
+
+Lexical scope rules say that code in one scope can access variables of either that scope or any scope outside of it.
+
+So, code inside the `inner()` function has access to both variables `a` and `b`, but code only in `outer()` has access only to `a` -- it cannot access `b` since that variable is only inside `inner()`.
+
+Recall this code snippet from earlier:
+
+```js
+const TAX_RATE = 0.08;
+
+function calculateFinalPurchaseAmount(amt) {
+	// calculate the new amount with the tax
+	amt = amt + (amt * TAX_RATE);
+
+	// return the new amount
+	return amt;
+}
+```
+
+The `TAX_RATE` constant (variable) is accessible from inside the `calculateFinalPurchaseAmount(..)` function, even though we didn't pass it in, because of lexical scope.
+
+**Note:** For more information about lexical scope, see the first three chapters of the *"Scope & Closures"* title of this book series.
 
 ### Closure
 
-Functions can be defined inside other functions (creating scopes inside other scopes), and they can even be passed around as values themselves. An extremely important feature of functions in languages like JavaScript is the idea of "closure", which is the ability of a function to remember and maintain access to variables.
+As we just saw, functions can be defined inside other functions (creating scopes inside other scopes).
+
+But functions can also be passed around as values themselves. That may sound like a strange concept at first, so take a moment to ponder it. Not only can a function be passed a value (argument), but **a function itself can be a value** that's assigned to variables, passed to other functions, or returned from a function.
+
+An extremely important feature of functions and lexical scope in languages like JavaScript is the idea of "closure", which is the ability of a function to remember and maintain access to variables, even after that function has finished running!
 
 ```js
 function makeAdd(x) {
 
-	// inner function `add()` has
-	// closure over variable `x`
+	// inner function `add()` has closure
+	// over parameter variable `x`
 	function add(y) {
 		return x + y;
 	};
@@ -333,20 +402,28 @@ function makeAdd(x) {
 	return add;
 }
 
+// `plusOne(..)` is the inner `add(..)` function with closure
 var plusOne = makeAdd( 1 );
+
+// `plusTen(..)` is the inner `add(..)` function with closure
 var plusTen = makeAdd( 10 );
 
-plusOne( 3 );		// 4
-plusOne( 41 );		// 42
+plusOne( 3 );		// 4  <-- 1 + 3
+plusOne( 41 );		// 42 <-- 1 + 41
 
-plusTen( 13 );		// 23
+plusTen( 13 );		// 23 <-- 10 + 13
 ```
 
-We won't get into all the nitty gritty of how this closure is working. But in a simple sense, the inner `add(..)` function is able to remember whatever `x` argument was passed to the outer `makeAdd(..)` function call.
+We won't get into all the nitty gritty of how this closure is working. But in a simple sense, the inner `add(..)` function that gets returned is able to remember whatever `x` value was passed to its outer `makeAdd(..)` function call.
 
-When we call `makeAdd(1)`, we get a new function back that we call `plusOne(..)` which will remember `1`, and when we call `makeAdd(10)`, we get yet another new function back we call `plusTen(..)` that will remember `10`.
+Some observations:
 
-When we call `plusOne(3)`, it adds `3` (assigned to the inner `y`) to the `1` (remembered in `x`), and we get `4`. When we call `plusTen(13)`, it adds `13` to the remembered `10`, and we get `23`.
+1. When we call `makeAdd(1)`, we get a new function back, the inner `add(..)`, that we call `plusOne(..)`, which will remember `x` as `1`.
+2. When we call `makeAdd(10)`, we get yet another new function (again, the inner `add(..)`) back that we call `plusTen(..)`, which will remember `x` as `10`.
+3. When we call `plusOne(3)`, it adds `3` (assigned to the inner `y`) to the `1` (remembered in `x`), and we get `4`.
+4. When we call `plusTen(13)`, it adds `13` (the inner `y`) to the remembered `10` in `x`, and we get `23`.
+
+Don't worry if this seems strange and confusing -- it is! It'll take lots of practice to get it fully. But trust me, once you do, it's one of the most powerful and useful techniques in all of programming. It's definitely worth the effort to let your brain simmer on closures for a bit.
 
 **Note:** For more information about closures, see the *"Scope & Closures"* title of this book series, especially Chapter 5.
 
