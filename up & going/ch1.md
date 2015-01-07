@@ -200,7 +200,7 @@ amount = amount * 2;
 // can we afford the extra purchase?
 if ( amount < BANK_BALANCE ) {
 	console.log( "Sure!" );
-	amount += ACCESSORY_PRICE;
+	amount = amount + ACCESSORY_PRICE;
 }
 else {
 	console.log( "No, thanks." );
