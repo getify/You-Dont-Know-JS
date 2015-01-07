@@ -102,7 +102,7 @@ Consider:
                       */
 ```
 
-The `//` single-line comment is appropriate if you're going to put a comment right about a single statement, or even at the end of a line. Everything on the line after the `//` is treated as the comment (and thus ignored by the compiler), all the way to the end of the line. There's no restriction to what can appear inside a comment.
+The `//` single-line comment is appropriate if you're going to put a comment right above a single statement, or even at the end of a line. Everything on the line after the `//` is treated as the comment (and thus ignored by the compiler), all the way to the end of the line. There's no restriction to what can appear inside a comment.
 
 The `/* .. */` multi-line comment is appropriate if you have several sentences worth of explanation to make in your comment. It can appear anywhere on a line, even in the middle of a line, since the `*/` ends it. The only thing that cannot appear inside a multi-line comment is a `*/`, since that would be taken to end the comment.
 
@@ -114,7 +114,7 @@ Most useful programs need to track a value as it changes over the course of the 
 
 The easiest way to go about that in your program is to assign a value to a symbolic container, called a "variable" -- so called because the value in this container can *vary* over time as needed.
 
-In some programming languages, you declare a variable (container) to hold a specific *type* of value, such as `number` or `string`. This type of functionality is often called "static typing", and is typically cited as a benefit for program veracity by allowing the compiler/engine to verify that a variable only ever has one *type* representation of the value and doesn't accidentally get converted in a way that can produce unexpected outcomes. Another way of explaining this behavior is "type enforcement".
+In some programming languages, you declare a variable (container) to hold a specific *type* of value, such as `number` or `string`. This type of functionality is often called "static typing", and is typically cited as a benefit for program correctness by allowing the compiler to verify that a variable only ever has one *type* representation of the value and doesn't accidentally get converted in a way that can produce unexpected outcomes. Another way of explaining this behavior is "type enforcement".
 
 Other languages don't emphasize *types* for variables, but rather for the values themselves. That behavior allows a variable to hold any *type* of value, and in fact for that *type* to change from operation to operation. This type of functionality is often called "dynamic typing" (aka "weak typing"), and is typically cited as a benefit for program flexibility by allowing a single container to represent a value no matter what *type* form that value may take at any given moment in the program's logic flow. Another way of explaining this behavior is "no type enforcement".
 
