@@ -1,11 +1,15 @@
 # You Don't Know JS: Up & Going
 # Chapter 1: Into Programming
 
-Welcome to the *"You Don't Know JS"* (YDKJS) book series. This book serves as an introduction to important concepts in general programming, JavaScript specifically, and finally how to approach and understand the rest of the books in the series. This book is where you should start the series, especially if you're just getting into programming and/or JavaScript itself.
+Welcome to the *"You Don't Know JS"* (YDKJS) book series.
 
-This chapter will explain the basic principles of programming in modern languages, specifically JavaScript, but at a very high level. It's mostly intended if you are reading this with little to no prior programming experience, and are looking to the YDKJS books to help you along your path to understanding programming through the lens of JS.
+This title serves as an introduction to important concepts in general programming, JavaScript specifically, and finally how to approach and understand the rest of the titles in the YDKJS series. This is where you should start YDKJS, especially if you're just getting into programming and/or JavaScript itself.
 
-If you have more than 1-2 months experience with programming in any modern language, you can probably safely skip over this chapter and jump straight into Chapter 2 *"Into JavaScript"*.
+But if you're fairly comfortable with those topics, you can probably skip to Chapter 3.
+
+This first chapter will explain the basic principles of programming in modern languages, specifically JavaScript, but at a very high level. It's mostly intended if you are reading this with little to no prior programming experience, and are looking to the YDKJS books to help you along your path to understanding programming through the lens of JS.
+
+If you already have a couple months or more experience with programming in any modern language, you can probably safely skip to Chapter 2 to get more familiar with JavaScript's flavor.
 
 ## Code
 
