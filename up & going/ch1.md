@@ -313,7 +313,7 @@ console.log( amount.toFixed( 2 ) );		// "107.99"
 
 As you can see, we defined a function called `calculateFinalPurchaseAmount(..)`. This function takes a single argument, which we named internally `amt`. It also has a `return` statement, which means it returns a value back.
 
-We later call this function, passing in the current purchase amount (`99.99`), and we get back the new purchase amount with tax added (`107.9892`), which we format to round to two digits (`107.99`).
+We later call this function, passing in the current purchase amount (`99.99`), and we get back the new purchase amount with tax added (`107.9892`), which we format as a `string`, rounded to two digits (`"107.99"`).
 
 Another subtle point is that the `TAX_RATE` constant (variable) was accessible from inside the `calculateFinalPurchaseAmount(..)` function, even though we didn't pass it in. That's because of "lexical scope" which is the ability to find variables either in the current scope, or in any outer scope (see the first two chapters of the *"Scope & Closures"* title of this book series).
 
