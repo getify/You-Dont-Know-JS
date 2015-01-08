@@ -47,11 +47,13 @@ typeof a;				// "object"
 
 The return value from the `typeof` operator is always one of six (seven as of ES6!) string values. That is, `typeof "abc"` returns `"string"`, not `string`.
 
-Notice how the `a` variable holds every different type of value, and that despite appearances, `typeof a` is not asking for the "type of `a`", but rather for the "type of the value currently in `a`". That's because only values have types in JavaScript; variables are just simple containers for those values.
+Notice how in this snippet the `a` variable holds every different type of value, and that despite appearances, `typeof a` is not asking for the "type of `a`", but rather for the "type of the value currently in `a`". Only values have types in JavaScript; variables are just simple containers for those values.
 
 `typeof null` is an interesting case, because it errantly returns `"object"`, when you'd expect it to return `"null"`.
 
-Also, note `a = undefined`. There we're explicitly setting `a` to this `undefined` value, but that is behaviorally no different from a variable that has no value set yet, like with the `var a;` line. There's actually several ways that a variable can get to this "undefined" value state, including functions which return no values and usage of the `void` operator.
+**Warning:** This is a long-standing bug in JS, but one which is likely never going to be fixed. Too much code on the web relies on the bug and thus fixing it would cause a lot more bugs!
+
+Also, note `a = undefined`. We're explicitly setting `a` to this `undefined` value, but that is behaviorally no different from a variable that has no value set yet, like with the `var a;` line at the top of the snippet. A variable can get to this "undefined" value state in several different ways, including functions which return no values and usage of the `void` operator.
 
 The `object` type refers to a compound value where you can set properties that each hold their own values of any type. This is perhaps one of the most useful value types in all of JavaScript.
 
@@ -89,9 +91,9 @@ obj["b"];		// 42
 
 **Note:** For more information on JavaScript `object`s, see the *"this & Object Prototypes"* title of this book series, specifically Chapter 3.
 
-There are a couple of other values that you will commonly interact with in JavaScript programs: *array* and *function*. But rather than being proper built-in types, these should be thought of more like sub-types, specialized versions of the `object` type.
+There are a couple of other value types that you will commonly interact with in JavaScript programs: *array* and *function*. But rather than being proper built-in types, these should be thought of more like subtypes -- specialized versions of the `object` type.
 
-An *array* is an `object` that holds values (of any type) not just in named properties/keys, but in numerically indexed positions. For example:
+An *array* is an `object` that holds values (of any type) not particularly in named properties/keys, but rather in numerically indexed positions. For example:
 
 ```js
 var arr = [
@@ -109,11 +111,11 @@ typeof arr;		// "object"
 
 Since *array*s are special objects (as `typeof` implies), they can also have properties, including the automatically updated `length` property.
 
-You theoretically could use an *array* as a normal object with named properties, or you could use an `object` but only give it numeric properties (`0`, `1`, etc) similar to an *array*. However, such would generally be considered improper usage of the respective types.
+You theoretically could use an *array* as a normal object with your own named properties, or you could use an `object` but only give it numeric properties (`0`, `1`, etc) similar to an *array*. However, such would generally be considered improper usage of the respective types.
 
-Use *array*s for numerically positioned values and use `object`s for named properties.
+The best and most natural approach is to use *array*s for numerically positioned values and use `object`s for named properties.
 
-The other `object` sub-type you'll use all over your JS programs is *function*:
+The other `object` subtype you'll use all over your JS programs is *function*:
 
 ```js
 function foo() {
@@ -127,13 +129,13 @@ typeof foo();		// "number"
 typeof foo.bar;		// "string"
 ```
 
-Again, *function*s are `objects` -- in this case `typeof` strangely gives `"function"` implying top-level status -- and can thus have properties, but you typically will not use function object properties broadly, just in limited cases.
+Again, *function*s are a subtype of `objects` -- in this case `typeof` gives `"function"` implying top-level status -- and can thus have properties, but you typically will only use function object properties (like `foo.bar`) in limited cases.
 
 **Note:** For more information on JS values and their types, see the first two chapters of the *"Types & Grammar"* title of this book series.
 
 ### Built-in Type Methods
 
-The built-in types and sub-types we've just discussed have built-in behaviors exposed as properties and methods that are quite powerful and useful.
+The built-in types and subtypes we've just discussed have built-in behaviors exposed as properties and methods that are quite powerful and useful.
 
 For example:
 
@@ -148,15 +150,15 @@ b.toFixed(4);			// "3.1416"
 
 The "how" behind being able to call `a.toUpperCase()` is more complicated than just that method existing on the value.
 
-Briefly, there is a `String` (capital `S`) object-wrapper form, typically called a "native", that pairs with a primitive `string` value; it's this object-wrapper that defines the `toUpperCase()` method on its prototype. When you use a primitive value like `"hello world"` as an `object` by referencing a property or method, JS automatically "boxes" the value to that object-wrapper counterpart.
+Briefly, there is a `String` (capital `S`) object wrapper form, typically called a "native", that pairs with a primitive `string` value; it's this object wrapper that defines the `toUpperCase()` method on its prototype. When you use a primitive value like `"hello world"` as an `object` by referencing a property or method, JS automatically "boxes" the value to that object wrapper counterpart.
 
-A `string` value can be wrapped by a `String`, a `number` can be wrapped by a `Number`, a `boolean` can be wrapped by a `Boolean`, etc. For the most part, you don't need to worry about or directly use these object-wrapper forms of the values -- prefer the primitive value forms in practically all cases and JavaScript will take care of the rest for you.
+A `string` value can be wrapped by a `String`, a `number` can be wrapped by a `Number`, a `boolean` can be wrapped by a `Boolean`, etc. For the most part, you don't need to worry about or directly use these object wrapper forms of the values -- prefer the primitive value forms in practically all cases and JavaScript will take care of the rest for you.
 
 **Note:** For more information on JS natives and "boxing", see Chapter 3 of the *"Types & Grammar"* title of this book series. To better understand the prototype of an object, see Chapter 5 of the *"this & Object Prototypes"* title of this book series.
 
 ### Comparing Values
 
-There two main types of value comparison that you will need to make in your JS programs: *equality* and *inequality*. The end result of any comparison is a strictly `boolean` value (`true` or `false`), regardless of what value types are compared.
+There are two main types of value comparison that you will need to make in your JS programs: *equality* and *inequality*. The result of any comparison is a strictly `boolean` value (`true` or `false`), regardless of what value types are compared.
 
 #### Equality
 
@@ -224,9 +226,21 @@ What these rules boil down to is requiring you to think critically about your co
 
 The `!=` non-equality form pairs with `==`, and the `!==` form pairs with `===`. All the rules and observations we just discussed hold symmetrically for these non-equality comparisons.
 
-You should take special note of the `==` and `===` comparison rules if you're comparing with non-primitive values like `object`s (including `function` and `array`). Since those values are actually held by reference,
+You should take special note of the `==` and `===` comparison rules if you're comparing two non-primitive values, like `object`s (including `function` and `array`). Since those values are actually held by reference, both `==` and `===` comparisons will simply check whether the references match, not anything about the underlying values.
 
-**Note:** For more information about the `==` equality comparison rules, see the specification (section 11.9.3) and also consult Chapter 4 of the *"Types & Grammar"* title of this book series.
+For example, `array`s are by default coerced to `string`s by simply joining all the values with `,` commas in between. You might think that two `array`s with the same contents would be `==` equal, but they're not:
+
+```js
+var a = [1,2,3];
+var b = [1,2,3];
+var c = "1,2,3";
+
+a == c;		// true
+b == c;		// true
+a == b;		// false
+```
+
+**Note:** For more information about the `==` equality comparison rules, see the specification (section 11.9.3) and also consult Chapter 4 of the *"Types & Grammar"* title of this book series; see Chapter 2 for more information about values vs. references.
 
 #### Inequality
 
@@ -234,7 +248,7 @@ The `<`, `>`, `<=`, and `>=` operators are used for inequality, referred to in t
 
 But JavaScript `string` values can also be compared for inequality, using typical alphabetic rules (`"bar" < "foo"`).
 
-What about coercion? Similar (though not exactly identical!) rules to `==` comparison apply to the inequality operators. In fact, there are no "strict inequality" operators which would disallow coercion the same way `===` does with equality.
+What about coercion? Similar rules as `==` comparison (though not exactly identical!) apply to the inequality operators. Notably, there are no "strict inequality" operators which would disallow coercion the same way `===` "strict equality" does with equality.
 
 Consider:
 
@@ -262,7 +276,7 @@ a == b;		// false
 
 Wait, how can all three of those comparisons be `false`? Because the `b` value is being coerced to the "invalid number value" `NaN` in the `<` and `>` comparisons, and the specification says that `NaN` is neither greater-than nor less-than any other value.
 
-The `==` comparison fails for a different reason. `a == b` could fail either as `42 == NaN` or `"42" == "foo"` -- as we explained earlier, the latter is the case.
+The `==` comparison fails for a different reason. `a == b` could fail if it's intpreted either as `42 == NaN` or `"42" == "foo"` -- as we explained earlier, the former is the case.
 
 **Note:** For more information about the inequality comparison rules, see the specification (section 11.8.5) and also consult Chapter 4 of the *"Types & Grammar"* title of this book series.
 
