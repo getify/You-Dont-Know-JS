@@ -822,15 +822,15 @@ But an important question remains: should we all write code understanding and pe
 
 Or, on the other hand, should we recognize that even though such rules *are in fact* learnable, there's enough gotchas to warrant ignoring automatic precedence/associativity? If so, should we thus always use `( )` manual grouping and remove all reliance on these automatic behaviors?
 
-This debate is highly subjective, and heavily related to the debate in Chapter 4 over *implicit coercion*. Most developers feel the same way about both debates: either they accept both behaviors and code expecting them, or they discard both behaviors and stick to manual/explicit idioms.
+This debate is highly subjective, and heavily related to the debate in Chapter 4 over *implicit* coercion. Most developers feel the same way about both debates: either they accept both behaviors and code expecting them, or they discard both behaviors and stick to manual/explicit idioms.
 
 Of course, I cannot answer this question definitively for the reader here anymore than I could in Chapter 4. But we've presented you the pros and cons, and hopefully forced enough deeper understanding that you can make informed rather than hype-driven decisions.
 
-In my opinion, there's an important middle ground. We should mix both operator precedence/associativity *and* `( )` manual grouping into our programs (in the same way that I argue in Chapter 4 for healthy/safe usage of *implicit coercion*, but certainly don't endorse it exclusively without bounds).
+In my opinion, there's an important middle ground. We should mix both operator precedence/associativity *and* `( )` manual grouping into our programs (in the same way that I argue in Chapter 4 for healthy/safe usage of *implicit* coercion, but certainly don't endorse it exclusively without bounds).
 
 For example, this is perfectly OK to me: `if (a && b && c) ..` I wouldn't do `if ((a && b) && c) ..` just to explicitly reflect the associativity, because I think it's overly verbose.
 
-On the other hand, if I needed to chain two `? :` conditional operators together, I'd probably use `( )` manual grouping to make it absolutely clear what my intended logic is.
+On the other hand, if I needed to chain two `? :` conditional operators together, I'd certainly use `( )` manual grouping to make it absolutely clear what my intended logic is.
 
 Thus, my advice here is similar to that of Chapter 4: **use operator precedence/associativity where it leads to shorter and cleaner code, but use `( )` manual grouping in places where it helps create clarity and reduce confusion.**
 
