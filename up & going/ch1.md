@@ -17,7 +17,7 @@ Let's start from the beginning.
 
 What does it mean to "program" or "write a program"? That's when you open up a text file and type a specific series of letters, numbers, and special characters (called operators). The rules for valid combinations of those characters is called a "computer language", such as JavaScript, much the same as English tells you how to spell words and how to create sentences with words and punctuation.
 
-In a computer language, a group of these words, numbers, and operators forms a statement, which is a set of instructions to the computer to perform some task. For example:
+In a computer language, a group of these words, numbers, and operators is a statement, a set of instructions to the computer to perform some task. For example:
 
 ```js
 a = b * 2;
