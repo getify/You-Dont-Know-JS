@@ -190,13 +190,13 @@ Implicit coercion:
 ```js
 var a = "42";
 
-var b = a + 0;	// "42" implicitly coerced to 42 here
+var b = a * 1;	// "42" implicitly coerced to 42 here
 
 a;				// "42"
 b;				// 42 -- the number!
 ```
 
-It's the implicit flavor of coercion that best describes what happens with the coercion-enabled `==` equality. For example:
+It's this implicit flavor of coercion that best describes what happens with the coercion-enabled `==` equality. For example:
 
 ```js
 var a = "42";
