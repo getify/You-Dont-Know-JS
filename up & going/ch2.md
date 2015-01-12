@@ -9,6 +9,8 @@ Especially if you're new to JavaScript, you should expect to spend quite a bit o
 
 Your journey to deeply learn JavaScript starts here.
 
+**Note:** As I said in Chapter 1, you should definitely try all this code yourself as you read and work through this chapter. Be aware that some of the code here assumes ES6, so if you happen to be using an older pre-ES6 browser the code may not work. A recent update of a modern browser like Chrome or FF should be used.
+
 ## Values & Types
 
 As we asserted in Chapter 1, JavaScript has typed values, not typed variables. The following built-in types are available:
