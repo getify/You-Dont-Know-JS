@@ -276,7 +276,7 @@ a == b;		// false
 
 Wait, how can all three of those comparisons be `false`? Because the `b` value is being coerced to the "invalid number value" `NaN` in the `<` and `>` comparisons, and the specification says that `NaN` is neither greater-than nor less-than any other value.
 
-The `==` comparison fails for a different reason. `a == b` could fail if it's intpreted either as `42 == NaN` or `"42" == "foo"` -- as we explained earlier, the former is the case.
+The `==` comparison fails for a different reason. `a == b` could fail if it's interpreted either as `42 == NaN` or `"42" == "foo"` -- as we explained earlier, the former is the case.
 
 **Note:** For more information about the inequality comparison rules, see the specification (section 11.8.5) and also consult Chapter 4 of the *"Types & Grammar"* title of this book series.
 
@@ -292,7 +292,7 @@ Generally, the same rules apply to a property name as to a variable identifier. 
 
 ### Scope & Functions
 
-You use the `var` keyword to declare a variable that will belong to the current function (or global, if top-level) scope.
+You use the `var` keyword to declare a variable that will belong to the current function scope, or the global scope if at the top-level outside of any function.
 
 Wherever a `var` appears inside a function, that declaration is taken to belong to the function itself. Metaphorically, developers call this process "hoisting" when a `var` declaration is conceptually "moved" to the top of its enclosing function. Technically, this process is more related to how your code is compiled, but we can skim over those details for now.
 
@@ -324,7 +324,7 @@ foo();
 
 Notice that `c` is not available inside of `bar()`, since it's declared only inside the inner `baz()` scope, and that `b` is not available to `foo()` for the same reason.
 
-If you try to access a variable's value in a scope where it's not available, you'll get a `ReferenceError` thrown. If you try to set a variable that hasn't been declared, you'll either end up creating a global (bad!) or getting an error, depending on "strict mode" (see section below).
+If you try to access a variable's value in a scope where it's not available, you'll get a `ReferenceError` thrown. If you try to set a variable that hasn't been declared, you'll either end up creating a variable in the top-level global scope (bad!) or getting an error, depending on "strict mode" (see section below).
 
 ```js
 function foo() {
@@ -332,7 +332,7 @@ function foo() {
 }
 
 foo();
-a;			// 1 -- oops, auto global :(
+a;			// 1 -- oops, auto global variable :(
 ```
 
 This is a very bad practice. Don't do it! Always formally declare your variables.
@@ -470,12 +470,12 @@ function foo() {
 // this code is strict mode
 ```
 
-One key difference (improvement!) with strict mode is disallowing the implicit auto-global declaration, omitting the `var`:
+One key difference (improvement!) with strict mode is disallowing the implicit auto-global variable declaration from omitting the `var`:
 
 ```js
 function foo() {
-	"use strict";
-	a = 1;			// ReferenceError
+	"use strict";	// turn on strict mode
+	a = 1;			// `var` missing, ReferenceError
 }
 
 foo();
@@ -568,7 +568,7 @@ new foo();			// undefined
 
 There are four rules for how `this` gets set, and they're shown in those last four lines of that snippet.
 
-1. `foo()` ends up setting `this` to the global object in non-strict mode -- in strict mode, `this` would be `undefined` and you'd get an error -- so `"global"` is the value found.
+1. `foo()` ends up setting `this` to the global object in non-strict mode -- in strict mode, `this` would be `undefined` and you'd get an error -- so `"global"` is the value found for `this.bar`.
 2. `obj1.foo()` sets `this` to the `obj1` object.
 3. `foo.call(obj2)` sets `this` to the `obj2` object.
 4. `new foo()` sets `this` to a brand new empty object.
@@ -640,7 +640,7 @@ There's two main techniques you can use to "bring" the newer JavaScript stuff to
 
 The word "polyfill" is an invented term (by Remy Sharp) (https://remysharp.com/2010/10/08/what-is-a-polyfill) used to refer to taking a newer feature and producing a piece of code that's equivalent to the behavior, but which can run in older JS environments.
 
-For example, ES6 defines a utility called `Number.isNaN(..)` to provide an accurate non-buggy check for `NaN` values, replacing the original global `isNaN(..)` utility. But it's easy to polyfill that utility so that you can start using it in your code regardless of whether the end user is in an ES6 browser or not.
+For example, ES6 defines a utility called `Number.isNaN(..)` to provide an accurate non-buggy check for `NaN` values, replacing the original `isNaN(..)` utility. But it's easy to polyfill that utility so that you can start using it in your code regardless of whether the end user is in an ES6 browser or not.
 
 Consider:
 
