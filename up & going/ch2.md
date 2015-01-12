@@ -129,7 +129,7 @@ typeof foo();		// "number"
 typeof foo.bar;		// "string"
 ```
 
-Again, *function*s are a subtype of `objects` -- in this case `typeof` gives `"function"` implying top-level status -- and can thus have properties, but you typically will only use function object properties (like `foo.bar`) in limited cases.
+Again, *function*s are a subtype of `objects` -- `typeof` returns `"function"` which implies that a `function` is a main type -- and can thus have properties, but you typically will only use function object properties (like `foo.bar`) in limited cases.
 
 **Note:** For more information on JS values and their types, see the first two chapters of the *"Types & Grammar"* title of this book series.
 
@@ -170,7 +170,7 @@ We talked briefly about *coercion* in Chapter 1, but let's revisit it here.
 
 Coercion comes in two forms in JavaScript: *explicit* and *implicit*. Explicit coercion is simply that you can see obviously from the code that a conversion from one type to another will occur, whereas implicit coercion is when the type conversion can happen as more of a non-obvious side effect of some other operation.
 
-You've probably heard sentiments like "coercion is evil" drawn from the fact that there are clearly places where coercion can produce some surprising results. Perhaps nothing evokes ire from developers more than when the language surprises them.
+You've probably heard sentiments like "coercion is evil" drawn from the fact that there are clearly places where coercion can produce some surprising results. Perhaps nothing evokes frustration from developers more than when the language surprises them.
 
 Coercion is not evil, nor does it have to be surprising. In fact, the majority of cases you can construct around type coercion are quite sensible and understandable, and can even be used to **improve** the readability of your code. But we won't go much further into that debate -- Chapter 4 of the *"Types & Grammar"* title of this book series covers all sides.
 
