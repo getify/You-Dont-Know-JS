@@ -728,7 +728,7 @@ if (!Function.prototype.softBind) {
 						(typeof global !== "undefined" &&
 							this === global)
 					) ? obj : this,
-					curried.concat.apply( curried, arguments )
+					[].concat.apply( curried, arguments )
 				);
 			};
 		bound.prototype = Object.create( fn.prototype );
