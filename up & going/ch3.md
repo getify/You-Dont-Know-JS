@@ -27,7 +27,7 @@ Perhaps one of the most widespread and persistent mistruths about JavaScript is 
 
 The `this` keyword is dynamically bound based on how the function in question is executed, and it turns out there are four simple rules to understand and fully determine `this` binding.
 
-Closely related to the `this` keyword is the object prototype mechanism, which acts as a sort of property look-up chain (not totally unlike the lexical scope chain, actually). But wrapped up in the prototypes is the other huge miscue about JS: the idea of emulating (fake) classes and (so called "prototypal") inheritance.
+Closely related to the `this` keyword is the object prototype mechanism, which is a look-up chain for properties, similar to how lexical scope variables are found. But wrapped up in the prototypes is the other huge miscue about JS: the idea of emulating (fake) classes and (so called "prototypal") inheritance.
 
 Unfortunately, the desire to bring class and inheritance design pattern thinking to JavaScript is just about the worst thing you could try to do, because while the syntax may trick you into thinking there's something like classes present, in fact the prototype mechanism is fundamentally opposite in its behavior.
 
