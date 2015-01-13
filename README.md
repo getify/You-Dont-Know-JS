@@ -15,8 +15,8 @@ Please feel free to contribute to the quality of this content by submitting PR's
 * ["Up & Going"](up & going/README.md#you-dont-know-js-up--going) (draft complete)
 * ["Scope & Closures"](scope & closures/README.md#you-dont-know-js-scope--closures) ([published -- buy now!](http://shop.oreilly.com/product/0636920026327.do))
 * ["this & Object Prototypes"](this & object prototypes/README.md#you-dont-know-js-this--object-prototypes) ([published -- buy now!](http://shop.oreilly.com/product/0636920033738.do))
-* ["Types & Grammar"](types & grammar/README.md#you-dont-know-js-types--grammar) (in editing)
-* ["Async & Performance"](async & performance/README.md#you-dont-know-js-async--performance) (draft complete)
+* ["Types & Grammar"](types & grammar/README.md#you-dont-know-js-types--grammar) (in production)
+* ["Async & Performance"](async & performance/README.md#you-dont-know-js-async--performance) (in editing)
 * ["ES6 & Beyond"](es6 & beyond/README.md#you-dont-know-js-es6--beyond) (in progress)
 
 ## Publishing
