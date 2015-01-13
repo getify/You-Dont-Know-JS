@@ -85,7 +85,7 @@ This title is dedicated to both the short- and mid-term visions of where the lan
 
 While all the titles of this book series embrace the state of JavaScript at time of writing, which is mid-way through ES6 adoption, the primary focus in the series has been more on ES5. Now, we want to turn our attention to ES6, ES7, and ...
 
-Since ES6 is nearly complete at time of writing, *"ES6 & Beyond"* starts by dividing up the concrete stuff from the ES6 landscape into several key categories, including new syntax, new data structures (collections), and new processing capabilities and APIs. We cover each of these new ES6 features, in varying levels of detail, including reviewing details that were touched on in earlier books of the series.
+Since ES6 is nearly complete at time of writing, *"ES6 & Beyond"* starts by dividing up the concrete stuff from the ES6 landscape into several key categories, including new syntax, new data structures (collections), and new processing capabilities and APIs. We cover each of these new ES6 features, in varying levels of detail, including reviewing details that are touched on in other books of this series.
 
 Some exciting ES6 things to look forward to reading about: destructuring, default parameter values, symbols, concise methods, computed properties, arrow functions, block scoping, promises, generators, iterators, modules, proxies, weakmaps, and much, much more! Phew, ES6 packs quite a punch!
 
