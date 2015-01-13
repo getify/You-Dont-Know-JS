@@ -41,7 +41,7 @@ But the case I make regarding prototypes and delegation is a much more involved 
 
 ## Types & Grammar
 
-The third title in this book series primarily focuses on tackling yet another highly controversial topic: type coercion. No topic in JavaScript raises more ire from developers than when you talk about the confusions surrounding implicit coercion.
+The third title in this book series primarily focuses on tackling yet another highly controversial topic: type coercion. Perhaps no topic causes more frustration with JS developers than when you talk about the confusions surrounding implicit coercion.
 
 By far the conventional wisdom is that implicit coercion is a "bad part" of the language and should be avoided at all costs. In fact, some have gone so far as to call it a "flaw" in the design of the language. Indeed, there are tools whose entire job is to do nothing but scan your code and complain if you're doing anything even remotely like coercion.
 
