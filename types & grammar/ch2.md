@@ -260,7 +260,7 @@ Very large or very small `number`s will by default be outputted in exponent form
 ```js
 var a = 5E10;
 a;					// 50000000000
-a.toExponential();	// 5e+10
+a.toExponential();	// '5e+10'
 
 var b = a * a;
 b;					// 2.5e+21
