@@ -89,7 +89,7 @@ if (typeof foo == "undefined") {
 console.log( foo );	// HTML element
 ```
 
-You're perhaps used to managing global variable tests (using `typeof` or `.. in window` checks) under the assumption that only JS code creates such variables, but as you can see, the contents of your hosting HTML page can also create them, which can easily throw off your existence checks logic if you're not careful.
+You're perhaps used to managing global variable tests (using `typeof` or `.. in window` checks) under the assumption that only JS code creates such variables, but as you can see, the contents of your hosting HTML page can also create them, which can easily throw off your existence check logic if you're not careful.
 
 This is yet one more reason why you should, if at all possible, avoid using global variables, and if you have to, use variables with unique names that won't likely collide. But you also need to make sure not to collide with the HTML content as well as any other code.
 
@@ -114,7 +114,7 @@ Array.prototype.push = function(item) {
 
 Aside from the crazy comment (who cares about Netscape 4 anymore!?), this looks reasonable, right?
 
-The problem is, `Array.prototype.push` was added to the spec sometime subsequent to this Netscape 4 era coding, but what was added is not compatible to this code. The standard `push(..)` allows multiple items to be pushed at once. This hacked one ignores the subsequent items.
+The problem is, `Array.prototype.push` was added to the spec sometime subsequent to this Netscape 4 era coding, but what was added is not compatible with this code. The standard `push(..)` allows multiple items to be pushed at once. This hacked one ignores the subsequent items.
 
 Basically all JS frameworks have code that relies on `push(..)` with multiple elements. In my case, it was code around the CSS selector engine that was completely busted. But there could conceivably be dozens of other places susceptible.
 
@@ -281,7 +281,9 @@ It looks harmless, but the `</script>` appearing inside the `string` literal wil
 "</sc" + "ript>";
 ```
 
-Also, beware that code inside an external file will be interpreted in the character set (UTF-8, ISO-8859-8, etc.) the file is served with (or the default), but that same code in an inline `script` element in your HTML page will be interpreted by the character set of the page (or its default). **Note:** The `charset` attribute will not work on inline script elements.
+Also, beware that code inside an external file will be interpreted in the character set (UTF-8, ISO-8859-8, etc.) the file is served with (or the default), but that same code in an inline `script` element in your HTML page will be interpreted by the character set of the page (or its default).
+
+**Warning:** The `charset` attribute will not work on inline script elements.
 
 Another deprecated practice with inline `script` elements is including HTML-style or X(HT)ML-style comments around inline code, like:
 
@@ -309,7 +311,7 @@ The ES5 spec defines a set of "reserved words" in Section 7.6.1 that cannot be u
 
 Keywords are the obvious ones like `function` and `switch`. Future reserved words include things like `enum`, though many of the rest of them (`class`, `extends`, etc.) are all now actually used by ES6; there are other strict-mode only reserved words like `interface`.
 
-StackOverflow user "art4theSould" creatively worked them all these reserved words into a fun little poem (http://stackoverflow.com/questions/26255/reserved-keywords-in-javascript/12114140#12114140):
+StackOverflow user "art4theSould" creatively worked all these reserved words into a fun little poem (http://stackoverflow.com/questions/26255/reserved-keywords-in-javascript/12114140#12114140):
 
 > Let this long package float,
 > Goto private class if short.
