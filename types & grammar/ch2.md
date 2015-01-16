@@ -86,7 +86,7 @@ One very common way to make such a conversion is to borrow the `slice(..)` utili
 function foo() {
 	var arr = Array.prototype.slice.call( arguments );
 	arr.push( "bam" );
-	console.log(arr);
+	console.log( arr );
 }
 
 foo( "bar", "baz" ); // ["bar","baz","bam"]
@@ -102,7 +102,7 @@ var arr = Array.from( arguments );
 ...
 ```
 
-**Note:** `Array.from(..)` has several powerful capabilities, and will be covered in detail in a later book in this series.
+**Note:** `Array.from(..)` has several powerful capabilities, and will be covered in detail in the *"ES6 & Beyond"* title of this series.
 
 ## Strings
 
@@ -260,7 +260,7 @@ Very large or very small `number`s will by default be outputted in exponent form
 ```js
 var a = 5E10;
 a;					// 50000000000
-a.toExponential();	// '5e+10'
+a.toExponential();	// "5e+10"
 
 var b = a * a;
 b;					// 2.5e+21
@@ -329,7 +329,7 @@ var onethousand = 1E3;						// means 1 * 10^3
 var onemilliononehundredthousand = 1.1E6;	// means 1.1 * 10^6
 ```
 
-`number`s literals can also be expressed in other bases, like binary, octal, and hexadecimal.
+`number` literals can also be expressed in other bases, like binary, octal, and hexadecimal.
 
 These formats work in current versions of JavaScript:
 
@@ -398,7 +398,7 @@ numbersCloseEnoughToEqual( a, b );					// true
 numbersCloseEnoughToEqual( 0.0000001, 0.0000002 );	// false
 ```
 
-The maximum floating-point value that can be represented is roughly `1.798e+308` (which is really, really, really huge!), predefined for you as `Number.MAX_VALUE`. On the small end, `Number.MIN_VALUE` is roughly `5e-324`.
+The maximum floating-point value that can be represented is roughly `1.798e+308` (which is really, really, really huge!), predefined for you as `Number.MAX_VALUE`. On the small end, `Number.MIN_VALUE` is roughly `5e-324`, which isn't negative but is really close to zero!
 
 ### Safe Integer Ranges
 
@@ -525,7 +525,7 @@ The expression `void ___` "voids" out any value, so that the result of the expre
 ```js
 var a = 42;
 
-console.log(void a, a); // undefined 42
+console.log( void a, a ); // undefined 42
 ```
 
 By convention (mostly from C-language programming), to represent the `undefined` value stand-alone by using `void`, you'd use `void 0` (though clearly even `void true` or any other `void` expression does the same thing). There's no practical difference between `void 0`, `void 1`, and `undefined`.
@@ -539,7 +539,7 @@ function doSomething() {
 	// note: `APP.ready` is provided by our application
 	if (!APP.ready) {
 		// try again later
-		return void setTimeout(doSomething,100);
+		return void setTimeout( doSomething, 100 );
 	}
 
 	var result;
@@ -561,7 +561,7 @@ Many devs prefer to just do these actions separately, which works the same but d
 ```js
 if (!APP.ready) {
 	// try again later
-	setTimeout(doSomething,100);
+	setTimeout( doSomething, 100 );
 	return;
 }
 ```
@@ -599,7 +599,7 @@ a == NaN;	// false
 a === NaN;	// false
 ```
 
-`NaN` is a very special value in that it's never equal to another `NaN` value (i.e., it's never equal to itself). It's the only value, in fact, that is not reflexive (without the identity characteristic `x === x`). So, `NaN !== NaN`. A bit strange, huh?
+`NaN` is a very special value in that it's never equal to another `NaN` value (i.e., it's never equal to itself). It's the only value, in fact, that is not reflexive (without the Identity characteristic `x === x`). So, `NaN !== NaN`. A bit strange, huh?
 
 So how *do* we test for it, if we can't compare to `NaN` (since that comparison would always fail)?
 
@@ -705,7 +705,7 @@ But what about any positive finite `number` divided by `Infinity`? That's easy! 
 
 #### Zeros
 
-While it may confuse the mathematician-minded reader, JavaScript has both a normal zero `0` (otherwise known as a positive zero `+0`) *and* a negative zero `-0`. Before we explain why the `-0` exists, we should examine how JS handles it, because it can be quite confusing.
+While it may confuse the mathematics-minded reader, JavaScript has both a normal zero `0` (otherwise known as a positive zero `+0`) *and* a negative zero `-0`. Before we explain why the `-0` exists, we should examine how JS handles it, because it can be quite confusing.
 
 Besides being specified literally as `-0`, negative zero also results from certain mathematic operations. For example:
 
@@ -732,7 +732,7 @@ a + "";						// "0"
 String( a );				// "0"
 
 // strangely, even JSON gets in on the deception
-JSON.stringify( 0 / -3 );	// "0"
+JSON.stringify( a );		// "0"
 ```
 
 Interestingly, the reverse operations (going from `string` to `number`) don't lie:
@@ -923,7 +923,7 @@ To effectively pass a compound value (like an `array`) by value, you need to man
 foo( a.slice() );
 ```
 
-`Array#slice(..)` with no parameters by default makes an entirely new (shallow) copy of the `array`. So, we pass in a reference only to the copied `array`, and thus `foo(..)` cannot affect the contents of `a`.
+`slice(..)` with no parameters by default makes an entirely new (shallow) copy of the `array`. So, we pass in a reference only to the copied `array`, and thus `foo(..)` cannot affect the contents of `a`.
 
 To do the reverse -- pass a scalar primitive value in a way where its value updates can be seen, kinda like a reference -- you have to wrap the value in another compound value (`object`, `array`, etc) that *can* be passed by reference:
 
@@ -957,7 +957,7 @@ var a = 2;
 var b = new Number( a ); // or equivalently `Object(a)`
 
 foo( b );
-console.log( b ); // 2 -- not 3
+console.log( b ); // 2, not 3
 ```
 
 The problem is that the underlying scalar primitive value is *not mutable* (same goes for `String` and `Boolean`). If a `Number` object holds the scalar primitive value `2`, that exact `Number` object can never be changed to hold another value; you can only create a whole new `Number` object with a different value.
