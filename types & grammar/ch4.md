@@ -43,7 +43,7 @@ The terms "explicit" and "implicit," or "obvious" and "hidden side effect," are 
 
 If you know exactly what `a + ""` is doing and you're intentionally doing that to coerce to a `string`, you might feel the operation is sufficiently "explicit." Conversely, if you've never seen the `String(..)` function used for `string` coercion, its behavior might seem hidden enough as to feel "implicit" to you.
 
-But we're conducting this discussion of "explicit" vs. "implicit" based on the likely opinions of an *average, reasonably informed, but not expert or JS specification devotee* developer. To whatever extent you do or do not find yourself fitting neatly in that bucket, you will need to adjust your perspective on our observations here accordingly.
+But we're having this discussion of "explicit" vs. "implicit" based on the likely opinions of an *average, reasonably informed, but not expert or JS specification devotee* developer. To whatever extent you do or do not find yourself fitting neatly in that bucket, you will need to adjust your perspective on our observations here accordingly.
 
 Just remember: it's often rare that we write our code and are the only ones who ever read it. Even if you're an expert on all the ins and outs of JS, consider how a less experienced teammate of yours will feel when they read your code. Will it be "explicit" or "implicit" to them in the same way it is for you?
 
@@ -235,7 +235,7 @@ JSON.stringify( a, null, "-----" );
 // }"
 ```
 
-Remember, `JSON.stringify(..)` is not directly a form of coercion. We covered it here, however, because of two reasons, which  relate its behavior to `ToString` coercion:
+Remember, `JSON.stringify(..)` is not directly a form of coercion. We covered it here, however, for two reasons that relate its behavior to `ToString` coercion:
 
 1. `string`, `number`, `boolean`, and `null` values all stringify for JSON basically the same as how they coerce to `string` values via the rules of the `ToString` abstract operation.
 2. If you pass an `object` value to `JSON.stringify(..)`, and that `object` has a `toJSON()` method on it, `toJSON()` is automatically called to (sort of) "coerce" the value to be *JSON-safe* before stringification.
@@ -246,7 +246,7 @@ If any non-`number` value is used in a way that requires it to be a `number`, su
 
 For example, `true` becomes `1` and `false` becomes `0`. `undefined` becomes `NaN`, but (curiously) `null` becomes `0`.
 
-`ToNumber` for a `string` value essentially works for the most part like the rules/syntax for numeric literals (see Chapter 3). If it fails, the result is `NaN` (instead of a syntax error with `number` literals). One example difference is that `0`-prefixed octal numbers are not handled as octals (just as normal base-10 decimals) in this operation, though such octals are valid as `number` literals (see Chapter 2).
+`ToNumber` for a `string` value essentially works for the most part like the rules/syntax for numeric literals (see Chapter 3). If it fails, the result is `NaN` (instead of a syntax error as with `number` literals). One example difference is that `0`-prefixed octal numbers are not handled as octals (just as normal base-10 decimals) in this operation, though such octals are valid as `number` literals (see Chapter 2).
 
 **Note:** The differences between `number` literal grammar and `ToNumber` on a `string` value are subtle and highly nuanced, and thus will not be covered further here. Consult section 9.3.1 of the ES5 spec for more information.
 
@@ -256,7 +256,7 @@ To convert to this primitive value equivalent, the `ToPrimitive` abstract operat
 
 If neither operation can provide a primitive value, a `TypeError` is thrown.
 
-As of ES5, you can create such a noncoercible object -- one without `valueOf()` and `toString()` -- if it has a `null` value for its `[[Prototype]]`, typically created with `Object.create(null)`. See the *"this & Object Prototypes"* title of this book series for more information on `[[Prototype]]`s.
+As of ES5, you can create such a noncoercible object -- one without `valueOf()` and `toString()` -- if it has a `null` value for its `[[Prototype]]`, typically created with `Object.create(null)`. See the *"this & Object Prototypes"* title of this series for more information on `[[Prototype]]`s.
 
 **Note:** We cover how to coerce to `number`s later in this chapter in detail, but for this next code snippet, just assume the `Number(..)` function does so.
 
@@ -303,7 +303,7 @@ All of JavaScript's values can be divided into two categories:
 1. values that will become `false` if coerced to `boolean`
 2. everything else (which will obviously become `true`)
 
-I'm not just being facetious. It's quite literally that the JS spec defines a specific, narrow list of values that will coerce to `false` when coerced to a `boolean` value.
+I'm not just being facetious. The JS spec defines a specific, narrow list of values that will coerce to `false` when coerced to a `boolean` value.
 
 How do we know what the list of values is? In the ES5 spec, section 9.2 defines a `ToBoolean` abstract operation, which says exactly what happens for all the possible values when you try to coerce them "to boolean."
 
@@ -321,13 +321,13 @@ By logical conclusion, if a value is *not* on that list, it must be on *another 
 
 #### Falsy Objects
 
-Wait a minute, that section title even sounds contradictory. We literally *just said* the spec calls all objects truthy, right? There should be no such thing as a "falsy object."
+Wait a minute, that section title even sounds contradictory. I literally *just said* the spec calls all objects truthy, right? There should be no such thing as a "falsy object."
 
 What could that possibly even mean?
 
 You might be tempted to think it means an object wrapper (see Chapter 3) around a falsy value (such as `""`, `0` or `false`). But don't fall into that *trap*.
 
-**Note:** I had a smirk on my face when I wrote that last sentence, because it's a subtle specification joke only some of you may get. Chuckle along with me if you do!
+**Note:** That's a subtle specification joke some of you may get.
 
 Consider:
 
@@ -361,7 +361,7 @@ A "falsy object" is a value that looks and acts like a normal object (properties
 
 **Why!?**
 
-The most well-known case is `document.all`: an array (object) provided to your JS program *by the DOM* (not the JS engine itself), which exposes elements in your page to your JS program. It *used* to behave like a normal object--it would act truthy. But not anymore.
+The most well-known case is `document.all`: an array-like (object) provided to your JS program *by the DOM* (not the JS engine itself), which exposes elements in your page to your JS program. It *used* to behave like a normal object--it would act truthy. But not anymore.
 
 `document.all` itself was never really "standard" and has long since been deprecated/abandoned.
 
@@ -369,7 +369,7 @@ The most well-known case is `document.all`: an array (object) provided to your J
 
 So, why make it act falsy? Because coercions of `document.all` to `boolean` (like in `if` statements) were almost always used as a means of detecting old, nonstandard IE.
 
-IE has long since come up to standards compliance, and in many cases is pushing the web forward as much or more than any other browser. But all that old `if (document.all) { /* it's IE */ }` code is still out there, and is probably never going away. All this legacy code is still assuming it's running in decade-old IE, which just leads to bad browsing experience for IE users.
+IE has long since come up to standards compliance, and in many cases is pushing the web forward as much or more than any other browser. But all that old `if (document.all) { /* it's IE */ }` code is still out there, and much of it is probably never going away. All this legacy code is still assuming it's running in decade-old IE, which just leads to bad browsing experience for IE users.
 
 So, we can't remove `document.all` completely, but IE doesn't want `if (document.all) { .. }` code to work anymore, so that users in modern IE get new, standards-compliant code logic.
 
@@ -530,7 +530,7 @@ But an *even more* preferable noncoercion option is to use the ES5 added `Date.n
 var timestamp = Date.now();
 ```
 
-And if you want polyfill `Date.now()` into older browsers, it's pretty simple:
+And if you want to polyfill `Date.now()` into older browsers, it's pretty simple:
 
 ```js
 if (!Date.now) {
@@ -546,7 +546,7 @@ I'd recommend skipping the coercion forms related to dates. Use `Date.now()` for
 
 One coercive JS operator that is often overlooked and usually very confused is the tilde `~` operator (aka "bitwise NOT"). Many of those who even understand what it does will often times still want to avoid it. But sticking to the spirit of our approach in this book and series, let's dig into it to find out if `~` has anything useful to give us.
 
-In the "32-bit (Signed) Integers" section of Chapter 2, we covered how bitwise operators in JS are defined only for 32-bit operations, which means they force their operands to conform to 32-bit value representations. The rules for how this happens are controlled by the `ToInt32` abstract operation.
+In the "32-bit (Signed) Integers" section of Chapter 2, we covered how bitwise operators in JS are defined only for 32-bit operations, which means they force their operands to conform to 32-bit value representations. The rules for how this happens are controlled by the `ToInt32` abstract operation (ES5 spec, section 9.5).
 
 `ToInt32` first does a `ToNumber` coercion, which means if the value is `"123"`, it's going to first become `123` before the `ToInt32` rules are applied.
 
@@ -567,7 +567,7 @@ It's debatable if `0 | __` is an *explicit* form of this coercive `ToInt32` oper
 
 So, let's turn our attention back to `~`. The `~` operator first "coerces" to a 32-bit `number` value, and then performs a bitwise negation (flipping each bit's parity).
 
-**Note:** This is very similar to how `!` not only coerces its value to `boolean` but also flips its parity (see "unary `!`" below).
+**Note:** This is very similar to how `!` not only coerces its value to `boolean` but also flips its parity (see discussion of the "unary `!`" later).
 
 But... what!? Why do we care about bits being flipped? That's some pretty specialized, nuanced stuff. It's pretty rare for JS developers to need to reason about individual bits.
 
@@ -644,7 +644,7 @@ There's one more place `~` may show up in code you run accross: some developers 
 
 How `~~` works is that the first `~` applies the `ToInt32` "coercion" and does the the bitwise flip, and then the second `~` does another bitwise flip, flipping all the bits back to the original state. The end result is just the `ToInt32` "coercion" (aka truncation).
 
-**Note:** The bitwise double-flip of `~~` is very similar to the parity double-negate `!!` behavior, explained below.
+**Note:** The bitwise double-flip of `~~` is very similar to the parity double-negate `!!` behavior, explained in the "Explicitly: * --> Boolean" section later.
 
 However, `~~` needs some caution/clarification. First, it only works reliably on 32-bit values. But more importantly, it doesn't work the same on negative numbers as `Math.round(..)` does!
 
@@ -937,7 +937,7 @@ a + b; // "420"
 c + d; // 42
 ```
 
-What's different that causes `"420"` vs "42"? It's a common misconception that the difference is whether one or both of the operands is a `string`, as that means `+` will assume `string` concatenation. While that's partially true, it's more complicated than that.
+What's different that causes `"420"` vs `42`? It's a common misconception that the difference is whether one or both of the operands is a `string`, as that means `+` will assume `string` concatenation. While that's partially true, it's more complicated than that.
 
 Consider:
 
@@ -960,7 +960,7 @@ If you're paying close attention, you'll notice that this operation is now ident
 
 -----
 
-Let's set aside those messy details and go back to an earlier, simplified explanation: if either or both operands to `+` are a `string` (or become one with the above steps!), the operation will be `string` concatenation. Otherwise, it's numeric addition.
+Let's set aside those messy details and go back to an earlier, simplified explanation: if either operand to `+` is a `string` (or becomes one with the above steps!), the operation will be `string` concatenation. Otherwise, it's always numeric addition.
 
 **Note:** A commonly cited coercion gotcha is `[] + {}` vs. `{} + []`, as those two expressions result, respectively, in `"[object Object]"` and `0`. There's more to it, though, and we cover those details in "Blocks" in Chapter 5.
 
@@ -1020,7 +1020,7 @@ var b = [1];
 a - b; // 2
 ```
 
-Both `array` values have to become `number`s, so they end up first being coerced to `strings` (using the expected `toString()` serialization), and then are coerced to `number`s, for the `-` subtraction to perform on.
+Both `array` values have to become `number`s, but they end up first being coerced to `strings` (using the expected `toString()` serialization), and then are coerced to `number`s, for the `-` subtraction to perform on.
 
 So, is *implicit* coercion of `string` and `number` values the ugly evil you've always heard horror stories about? I don't personally think so.
 
@@ -1152,7 +1152,7 @@ There's some very little known, but very important, nuance here.
 
 In fact, I would argue these operators shouldn't even be called "logical ___ operators", as that name is incomplete in describing what they do. If I were to give them a more accurate (if more clumsy) name, I'd call them "selector operators," or more completely, "operand selector operators."
 
-Why? Because they don't actually result in a *logic* value (aka `boolean`) in JavaScript, as they do in all other languages.
+Why? Because they don't actually result in a *logic* value (aka `boolean`) in JavaScript, as they do in some other languages.
 
 So what *do* they result in? They result in the value of one (and only one) of their two operands. In other words, **they select one of the two operand's values**.
 
@@ -1174,7 +1174,7 @@ c || b;		// "abc"
 c && b;		// null
 ```
 
-**Wait, what!?** Think about that. In most any other language you've seen besides JS, all those expressions actually result in `true` or `false`. Not so in JavaScript!
+**Wait, what!?** Think about that. In languages like C and PHP, those expressions result in `true` or `false`, but in JS (and Python and Ruby, for that matter!), the result comes from the values themselves.
 
 Both `||` and `&&` operators perform a `boolean` test on the **first operand** (`a` or `c`). If the operand is not already `boolean` (as it's not, here), a normal `ToBoolean` coercion occurs, so that the test can be performed.
 
@@ -1244,7 +1244,7 @@ a && foo(); // 42
 
 `foo()` gets called only because `a` tests as truthy. If that test failed, this `a && foo()` expression statement would just silently stop -- this is known as "short circuiting" -- and never call `foo()`.
 
-Again, it's not nearly as common for people to author such things. Usually, they'd do `if (a) { foo(); }` instead. But JS minifiers choose `a && foo()` because it's much shorter. So, now, if you ever have to decipher such code, now you'll know what it's doing and why.
+Again, it's not nearly as common for people to author such things. Usually, they'd do `if (a) { foo(); }` instead. But JS minifiers choose `a && foo()` because it's much shorter. So, now, if you ever have to decipher such code, you'll know what it's doing and why.
 
 OK, so `||` and `&&` have some neat tricks up their sleeve, as long as you're willing to allow the *implicit* coercion into the mix.
 
@@ -1284,7 +1284,7 @@ Good luck with that! ... Sorry, just teasing.
 
 Up to this point, there's been almost no observable outcome difference between *explicit* and *implicit* coercion -- only the readability of code has been at stake.
 
-But ES6 Symbols introduce a gotcha into the coercion system that we need to discuss briefly. For reasons that go well beyond the scope of what we'll discuss in this chapter, *explicit* coercion of a `symbol` to a `string` is allowed, but *implicit* coercion of the same is disallowed and throws an error.
+But ES6 Symbols introduce a gotcha into the coercion system that we need to discuss briefly. For reasons that go well beyond the scope of what we'll discuss in this book, *explicit* coercion of a `symbol` to a `string` is allowed, but *implicit* coercion of the same is disallowed and throws an error.
 
 Consider:
 
@@ -1312,7 +1312,7 @@ The correct description is: "`==` allows coercion in the equality comparison and
 
 ### Equality Performance
 
-Stop and think about the difference between the first (incorrect) explanation and this second (accurate) one.
+Stop and think about the difference between the first (inaccurate) explanation and this second (accurate) one.
 
 In the first explanation, it seems obvious that `===` is *doing more work* than `==`, because it has to *also* check the type. In the second explanation, `==` is the one *doing more work* because it has to follow through the steps of coercion if the types are different.
 
@@ -1372,7 +1372,7 @@ In the ES5 spec, clauses 11.9.3.4-5 say:
 > 5. If Type(x) is String and Type(y) is Number,
 >    return the result of the comparison ToNumber(x) == y.
 
-**Note:** The spec uses `Number` and `String` as the formal names for the types, while this book prefers `number` and `string` for the primitive types. Do not let the capitalization of `Number` in the spec confuse you for the `Number()` native function. For our purposes, the capitalization of the type name is irrelevant -- they have basically the same meaning.
+**Warning:** The spec uses `Number` and `String` as the formal names for the types, while this book prefers `number` and `string` for the primitive types. Do not let the capitalization of `Number` in the spec confuse you for the `Number()` native function. For our purposes, the capitalization of the type name is irrelevant -- they have basically the same meaning.
 
 Clearly, the spec says the `"42"` value is coerced to a `number` for the comparison. The *how* of that coercion has already been covered earlier, specifically with the `ToNumber` abstract operation. In this case, it's quite obvious then that the resulting two `42` values are equal.
 
@@ -1542,7 +1542,7 @@ var b = [ 42 ];
 a == b;	// true
 ```
 
-The `[ 42 ]` value has its `ToPrimitive` abstract operation called (see the "`ToPrimitive`" section earlier), which results in the `"42"` value. From there, it's just `42 == "42"`, which as we've already covered becomes `42 == 42`, so `a` and `b` are found to be coercively equal.
+The `[ 42 ]` value has its `ToPrimitive` abstract operation called (see the "Abstract Value Operations" section earlier), which results in the `"42"` value. From there, it's just `42 == "42"`, which as we've already covered becomes `42 == 42`, so `a` and `b` are found to be coercively equal.
 
 **Tip:** All the quirks of the `ToPrimitive` abstract operation that we discussed earlier in this chapter (`toString()`, `valueOf()`) apply here as you'd expect. This can be quite useful if you have a complex data structure that you want to define a custom `valueOf()` method on, to provide a simple value for equality comparison purposes.
 
@@ -1556,7 +1556,7 @@ a === b;				// false
 a == b;					// true
 ```
 
-`a == b` because `b` is coerced (aka "unboxed," unwrapped) via `ToPrimitive` to its underlying `"abc"` simple scalar primitive value, which is the same as the value in `a`.
+`a == b` is `true` because `b` is coerced (aka "unboxed," unwrapped) via `ToPrimitive` to its underlying `"abc"` simple scalar primitive value, which is the same as the value in `a`.
 
 There are some values where this is not the case, though, because of other overriding rules in the `==` algorithm. Consider:
 
@@ -1752,7 +1752,7 @@ false == [];			// true -- UH OH!
 0 == [];				// true -- UH OH!
 ```
 
-Four of the seven items on this list involve a `== false` comparison, which we said earlier you should **always, always** avoid. That's a pretty easy rule to remember.
+Four of the seven items on this list involve `== false` comparison, which we said earlier you should **always, always** avoid. That's a pretty easy rule to remember.
 
 Now the list is down to three.
 
@@ -1811,9 +1811,9 @@ Is *implicit* coercion evil and dangerous? In a few cases, yes, but overwhelming
 
 Be a responsible and mature developer. Learn how to use the power of coercion (both *explicit* and *implicit*) effectively and safely. And teach those around you to do the same.
 
-Here's a handy table made by GitHub user @dorey to visualize a variety of comparisons:
+Here's a handy table made by Alex Dorey (@dorey on GitHub) to visualize a variety of comparisons:
 
-[Figure 1](http://dorey.github.io/JavaScript-Equality-Table/unified/) // TODO: recreate image
+[!Equality in JavaScript](fig1.png)
 
 Source: https://github.com/dorey/JavaScript-Equality-Table
 
