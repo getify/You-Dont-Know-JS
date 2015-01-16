@@ -73,9 +73,9 @@ Object.prototype.toString.call( null );			// "[object Null]"
 Object.prototype.toString.call( undefined );	// "[object Undefined]"
 ```
 
-You'll note that there is no `Null()` or `Undefined()` native constructors, but nevertheless the `"Null"` and `"Undefined"` are the internal `[[Class]]` values exposed.
+You'll note that there are no `Null()` or `Undefined()` native constructors, but nevertheless the `"Null"` and `"Undefined"` are the internal `[[Class]]` values exposed.
 
-But for the other simple primitives like `string`, `number`, and `boolean`, another behavior actually kicks in, which is usually called "boxing" (see below):
+But for the other simple primitives like `string`, `number`, and `boolean`, another behavior actually kicks in, which is usually called "boxing" (see "Boxing Wrappers" section next):
 
 ```js
 Object.prototype.toString.call( "abc" );	// "[object String]"
@@ -83,9 +83,9 @@ Object.prototype.toString.call( 42 );		// "[object Number]"
 Object.prototype.toString.call( true );		// "[object Boolean]"
 ```
 
-In this snippet, each of the simple primitives are automatically boxed (see below) by their respective object wrappers, which is why `"String"`, `"Number"`, and `"Boolean"` are revealed as the respective internal `[[Class]]` values.
+In this snippet, each of the simple primitives are automatically boxed by their respective object wrappers, which is why `"String"`, `"Number"`, and `"Boolean"` are revealed as the respective internal `[[Class]]` values.
 
-**Note:** The behavior of `toString()` and `[[Class]]` as illustrated here has changed a bit from ES5 to ES6, but we'll cover such details in the *"ES6 & Beyond"* title of this series.
+**Note:** The behavior of `toString()` and `[[Class]]` as illustrated here has changed a bit from ES5 to ES6, but we cover those details in the *"ES6 & Beyond"* title of this series.
 
 ## Boxing Wrappers
 
@@ -98,15 +98,15 @@ a.length; // 3
 a.toUpperCase(); // "ABC"
 ```
 
-So, if you're going to be accessing these properties/methods on your string values regularly, like a `i < a.length` condition in a `for` loop for instance, it might seem to make sense to just have the object-form of the value from the start, so the JS engine doesn't need to implicitly create it for you.
+So, if you're going to be accessing these properties/methods on your string values regularly, like a `i < a.length` condition in a `for` loop for instance, it might seem to make sense to just have the object form of the value from the start, so the JS engine doesn't need to implicitly create it for you.
 
-But it turns out that's a bad idea. Browsers long ago performance-optimized the common cases like `.length`, which means your program will *actually go slower* if you try to "preoptimize" by directly using the object-form (which isn't on the optimized path).
+But it turns out that's a bad idea. Browsers long ago performance-optimized the common cases like `.length`, which means your program will *actually go slower* if you try to "preoptimize" by directly using the object form (which isn't on the optimized path).
 
-In general, there's basically no reason to use the object-form directly. It's better to just let the boxing happen implicitly where necessary. In other words, never do things like `new String("abc")`, `new Number(42)`, etc -- always prefer using the literal primitive values `"abc"` and `42`.
+In general, there's basically no reason to use the object form directly. It's better to just let the boxing happen implicitly where necessary. In other words, never do things like `new String("abc")`, `new Number(42)`, etc -- always prefer using the literal primitive values `"abc"` and `42`.
 
 ### Object Wrapper Gotchas
 
-There are even some gotchas with using the object wrappers directly that you should be aware of if you *do* choose to ever use them.
+There are some gotchas with using the object wrappers directly that you should be aware of if you *do* choose to ever use them.
 
 For example, consider `Boolean` wrapped values:
 
@@ -224,7 +224,7 @@ For `b` (in Chrome, currently), you'll find `[ undefined, undefined, undefined ]
 
 Worse than that, at the time of writing, Firefox reports `[ , , , ]` for `a` and `c`. Did you catch why that's so confusing? Look closely. Three commas implies four slots, not three slots like we'd expect.
 
-**What!?** Firefox puts an extra `,` on the end of their serialization here because as of ES5, trailing commas in lists (arrays values, property lists, etc.) are allowed (and thus dropped and ignored). So if you were to type in a `[ , , , ]` value into your program or the console, you'd actually get the underlying value that's like `[ , , ]` (that is, an array with three empty slots). This choice, while confusing if reading the developer console, is defended as instead making copy-n-paste behavior accurate.
+**What!?** Firefox puts an extra `,` on the end of their serialization here because as of ES5, trailing commas in lists (array values, property lists, etc.) are allowed (and thus dropped and ignored). So if you were to type in a `[ , , , ]` value into your program or the console, you'd actually get the underlying value that's like `[ , , ]` (that is, an array with three empty slots). This choice, while confusing if reading the developer console, is defended as instead making copy-n-paste behavior accurate.
 
 If you're shaking your head or rolling your eyes about now, you're not alone! Shrugs.
 
@@ -273,11 +273,11 @@ Confused? Yeah. Here's roughly how it works.
 
 `apply(..)` is a utility available to all functions, which calls the function it's used with but in a special way.
 
-The first argument is a `this` object binding (covered in the *"this & Object Prototypes"* title), which we don't care about here, so we set it to `null`. The second argument is supposed to be an array (or something *like* an array -- aka an "array-like object"). The contents of this "array" are "spread" out as arguments to the function in question.
+The first argument is a `this` object binding (covered in the *"this & Object Prototypes"* title of this series), which we don't care about here, so we set it to `null`. The second argument is supposed to be an array (or something *like* an array -- aka an "array-like object"). The contents of this "array" are "spread" out as arguments to the function in question.
 
 So, `Array.apply(..)` is calling the `Array(..)` function and spreading out the values (of the `{ length: 3 }` object value) as its arguments.
 
-Inside of `apply(..)`, we can envision there's another `for` loop (kinda like `join(..)` from above) that goes from `0` up to `length` (`3` in our case).
+Inside of `apply(..)`, we can envision there's another `for` loop (kinda like `join(..)` from above) that goes from `0` up to, but not including, `length` (`3` in our case).
 
 For each index, it retrieves that key from the object. So if the array-object parameter was named `arr` internally inside of the `apply(..)` function, the property access would effectively be `arr[0]`, `arr[1]`, and `arr[2]`. Of course, none of those properties exist on the `{ length: 3 }` object value, so all three of those property accesses would return the value `undefined`.
 
@@ -300,10 +300,11 @@ var d = { foo: "bar" };
 d; // { foo: "bar" }
 
 var e = new Function( "a", "return a * 2;" );
-function f(a) { return a * 2; }
+var f = function(a) { return a * 2; }
+function g(a) { return a * 2; }
 
-var g = new RegExp( "^a*b+", "g" );
-var h = /^a*b+/g;
+var h = new RegExp( "^a*b+", "g" );
+var i = /^a*b+/g;
 ```
 
 There's practically no reason to ever use the `new Object()` constructor form, especially since it forces you to add properties one-by-one instead of many at once in the object literal form.
@@ -377,7 +378,7 @@ To define your own custom symbols, use the `Symbol(..)` native. The `Symbol(..)`
 ```js
 var mysym = Symbol( "my own symbol" );
 mysym;				// Symbol(my own symbol)
-mysym.toString();	// Symbol(my own symbol)
+mysym.toString();	// "Symbol(my own symbol)"
 typeof mysym; 		// "symbol"
 
 var a = { };
@@ -387,7 +388,7 @@ Object.getOwnPropertySymbols( a );
 // [ Symbol(my own symbol) ]
 ```
 
-While symbols are not actually private (`Object.getOwnPropertySymbols(..)` reflects on the object and reveals the symbols quite publicly), using them for private or special properties is likely their primary use-case. For most developers, they may take the place of property names with `__` prefixes, which are almost always by convention signals to say, "hey, this is a private/special/internal property, so leave it alone!"
+While symbols are not actually private (`Object.getOwnPropertySymbols(..)` reflects on the object and reveals the symbols quite publicly), using them for private or special properties is likely their primary use-case. For most developers, they may take the place of property names with `_` underscore prefixes, which are almost always by convention signals to say, "hey, this is a private/special/internal property, so leave it alone!"
 
 **Note:** `Symbol`s are *not* `object`s, they are simple scalar primitives.
 
@@ -407,7 +408,7 @@ For example, all string objects, and by extension (via boxing) `string` primitiv
 * `String#toUpperCase()` and `String#toLowerCase()`: create a new string that's converted to either uppercase or lowercase
 * `String#trim()`: create a new string that's stripped of any trailing or leading whitespace
 
-None of the methods modify the string *in place*. Modifications (like case coversion or trimming) create a new value from the existing value.
+None of the methods modify the string *in place*. Modifications (like case conversion or trimming) create a new value from the existing value.
 
 By virtue of prototype delegation (see the *"this & Object Prototypes"* title in this series), any string value can access these methods:
 
