@@ -25,7 +25,7 @@ b;
 
 In this snippet, `3 * 6` is an expression (evaluates to the value `18`). But `a` on the second line is also an expression, as is `b` on the third line. The `a` and `b` expressions both evaluate to the values stored in those variables at that moment, which also happens to be `18`.
 
-Moreover, each of the three lines is a statement containing expressions. `var a = 3 * 6` and `var b = a` are called "declaration statements" because they each declare a variable (and optionally assign a value to it).
+Moreover, each of the three lines is a statement containing expressions. `var a = 3 * 6` and `var b = a` are called "declaration statements" because they each declare a variable (and optionally assign a value to it). The `a = 3 * 6` and `b = a` assignments (minus the `var`s) are called assignment expressions.
 
 The third line contains just the expression `b`, but it's also a statement all by itself (though not a terribly interesting one!). This is generally referred to as an "expression statement."
 
@@ -35,31 +35,33 @@ It's a fairly little known fact that statements all have completion values (even
 
 How would you even go about seeing the completion value of a statement?
 
-The most obvious answer that may occur to you is to type the statement into your browser's developer console, because when you execute it, the console by default reports the completion value of the most recent statement it executed.
+The most obvious answer is to type the statement into your browser's developer console, because when you execute it, the console by default reports the completion value of the most recent statement it executed.
 
 Let's consider `var b = a`. What's the completion value of that statement?
 
-It's `undefined`. Why? Because `var` statements are simply defined that way in the spec. Indeed, if you put `var a = 42;` into your console, it'll report back `undefined`.
+The `b = a` assignment expression results in the value that was assigned (`18` above), but the `var` statement itself results in `undefined`. Why? Because `var` statements are defined that way in the spec. If you put `var a = 42;` into your console, you'll see `undefined` reported back instead of `42`.
 
 **Note:** Technically, it's a little more complex than that. In the ES5 spec, section 12.2 "Variable Statement," the `VariableDeclaration` algorithm actually *does* return a value (a `string` containing the name of the variable declared -- weird, huh!?), but that value is basically swallowed up (except for use by the `for..in` loop) by the `VariableStatement` algorithm, which forces an empty (aka `undefined`) completion value.
 
 In fact, if you've done much code experimenting in your console (or in a JavaScript environment REPL -- read/evaluate/print/loop tool), you've probably seen `undefined` reported after many different statments, and perhaps never realized why or what that was. Put simply, the console is just reporting the statement's completion value.
 
-But what the console prints out for the completion value isn't something we could use inside our program. So how could we capture the completion value?
+But what the console prints out for the completion value isn't something we can use inside our program. So how can we capture the completion value?
 
-That's a much more complicated task. Before we explain *how*, let's ask *why* would you want to do that?
+That's a much more complicated task. Before we explain *how*, let's explore *why* would you want to do that?
 
-To answer that, we need to consider other types of statements' completion values. For example, any regular `{ .. }` block has a completion value of the completion value of its last contained statement/expression.
+We need to consider other types of statement completion values. For example, any regular `{ .. }` block has a completion value of the completion value of its last contained statement/expression.
 
 Consider:
 
 ```js
+var b;
+
 if (true) {
-	4 + 38;
+	b = 4 + 38;
 }
 ```
 
-If you typed that into your console/REPL, you'd probably see `42` reported, since `42` is the completion value of the `if` block, which took on the completion value of its last expression statement `4 + 38`.
+If you typed that into your console/REPL, you'd probably see `42` reported, since `42` is the completion value of the `if` block, which took on the completion value of its last assignment expression statement `b = 4 + 38`.
 
 In other words, the completion value of a block is like an *implicit return* of the last statement value in the block.
 
@@ -68,8 +70,10 @@ In other words, the completion value of a block is like an *implicit return* of 
 But there's an obvious problem. This kind of code doesn't work:
 
 ```js
-var a = if (true) {
-	4 + 38;
+var a, b;
+
+a = if (true) {
+	b = 4 + 38;
 };
 ```
 
@@ -82,7 +86,9 @@ So, what can we do?
 We could use the much maligned `eval(..)` (sometimes pronounced "evil") function to capture this completion value.
 
 ```js
-var a = eval( "if (true) { 4 + 38; }" );
+var a, b;
+
+a = eval( "if (true) { b = 4 + 38; }" );
 
 a;	// 42
 ```
@@ -92,9 +98,11 @@ Yeeeaaahhhh. That's terribly ugly. But it works! And it illustrates the point th
 There's a proposal for ES7 called "do expression." Here's how it might work:
 
 ```js
-var a = do {
+var a, b;
+
+a = do {
 	if (true) {
-		4 + 38;
+		b = 4 + 38;
 	}
 };
 
@@ -176,7 +184,7 @@ a;	// 43
 b;	// 42
 ```
 
-Unfortunately, `( )` itself doesn't define a new wrapped expression that would be evaluated *after* the *after side effect* of the `a++` expression, as we might have hoped. In fact, even if it did, `a++` returns `42` first, and unless you have another expression that reevaluates `a` after the side effect of `++`, you're not going to get `43` into that expression, so `b` will not be assigned `43`.
+Unfortunately, `( )` itself doesn't define a new wrapped expression that would be evaluated *after* the *after side effect* of the `a++` expression, as we might have hoped. In fact, even if it did, `a++` returns `42` first, and unless you have another expression that reevaluates `a` after the side effect of `++`, you're not going to get `43` from that expression, so `b` will not be assigned `43`.
 
 There's an option, though: the `,` statement-series comma operator. This operator allows you to string together multiple standalone expression statements into a single statement:
 
@@ -269,7 +277,7 @@ function vowels(str) {
 vowels( "Hello World" ); // ["e","o","o"]
 ```
 
-**Note:** The `( .. )` around `matches = str.match..` is required. The reason is operator precedence, which we'll cover in the next section.
+**Note:** The `( .. )` around `matches = str.match..` is required. The reason is operator precedence, which we'll cover in the "Operator Precedence" section later in this chapter.
 
 I prefer this shorter style, as I think it makes it clearer that the two conditionals are in fact related rather than separate. But as with most stylistic choices in JS, it's purely opinion which one is *better*.
 
@@ -288,7 +296,7 @@ There's two main places (and more coming as JS evolves!) that a pair of `{ .. }`
 First, as an `object` literal:
 
 ```js
-// let's assume there's a `bar()` function defined
+// assume there's a `bar()` function defined
 
 var a = {
 	foo: bar()
@@ -304,7 +312,7 @@ How do we know this is an `object` literal? Because the `{ .. }` pair is a value
 What happens if we remove the `var a =` part of the above snippet?
 
 ```js
-// assume there's a `bar()` function already defined
+// assume there's a `bar()` function defined
 
 {
 	foo: bar()
@@ -313,19 +321,20 @@ What happens if we remove the `var a =` part of the above snippet?
 
 A lot of developers assume that the `{ .. }` pair is just a standalone `object` literal that doesn't get assigned anywhere. But it's actually entirely different.
 
-Here, `{ .. }` is just a regular code block. It's not very idiomatic in JavaScript (but much more so in other languages!) to have a standalone `{ .. }` block like that, but it's perfectly valid JS grammar. It can be especially helpful when combined with `let` block-scoping declarations (see the *"Scope & Closures"* title in this series).
+Here, `{ .. }` is just a regular code block. It's not very idiomatic in JavaScript (much more so in other languages!) to have a standalone `{ .. }` block like that, but it's perfectly valid JS grammar. It can be especially helpful when combined with `let` block-scoping declarations (see the *"Scope & Closures"* title in this series).
 
 The `{ .. }` code block here is functionally pretty much identical to the code block being attached to some statement, like a `for`/`while` loop, `if` conditional, etc.
 
 But if it's a normal block of code, what's that bizarre looking `foo: bar()` syntax, and how is that legal?
 
-It's because of a little known (and, frankly, a discouraged) feature in JavaScript called "labeled statements." `foo` is a label for the statement `bar()` (which has omitted its trailing `;` -- see "Automatic Semicolons" later in this chapter). But what's the point of a labeled statement?
+It's because of a little known (and, frankly, discouraged) feature in JavaScript called "labeled statements." `foo` is a label for the statement `bar()` (which has omitted its trailing `;` -- see "Automatic Semicolons" later in this chapter). But what's the point of a labeled statement?
 
 If JavaScript had a `goto` statement, you'd theoretically be able to say `goto foo` and have execution jump to that location in code. `goto`s are usually considered terrible coding idioms as they make code much harder to understand (aka "spaghetti code"), so it's a *very good thing* that JavaScript doesn't have a general `goto`.
 
 However, JS *does* support a limited, special form of `goto`: labeled jumps. Both the `continue` and `break` statements can optionally accept a specified label, in which case the program flow "jumps" kind of like a `goto`. Consider:
 
 ```js
+// `foo` labeled-loop
 foo: for (var i=0; i<4; i++) {
 	for (var j=0; j<4; j++) {
 		// whenever the loops meet, continue outer loop
@@ -358,6 +367,7 @@ As you can see, we skipped over the odd-multiple `3 1` iteration, but the labele
 Perhaps a slightly more useful form of the labeled jump is with `break __` from inside an inner loop where you want to break out of the outer loop. Without a labeled `break`, this same logic could sometimes be rather awkward to write:
 
 ```js
+// `foo` labeled-loop
 foo: for (var i=0; i<4; i++) {
 	for (var j=0; j<4; j++) {
 		if ((i * j) >= 3) {
@@ -387,6 +397,7 @@ A label can apply to a non-loop block, but only `break` can reference such a non
 
 ```js
 function foo() {
+	// `bar` labeled-block
 	bar: {
 		console.log( "Hello" );
 		break bar;
@@ -948,7 +959,7 @@ Another way of looking at it is that relying on ASI is essentially considering n
 
 My take: **use semicolons wherever you know they are "required," and limit your assumptions about ASI to a minimum.**
 
-But don't just take my word for it. Back in 2012, creator of JavaScript Brendan Eich said (brendaneich.com/2012/04/the-infernal-semicolon/) the following:
+But don't just take my word for it. Back in 2012, creator of JavaScript Brendan Eich said (http://brendaneich.com/2012/04/the-infernal-semicolon/) the following:
 
 > The moral of this story: ASI is (formally speaking) a syntactic error correction procedure. If you start to code as if it were a universal significant-newline rule, you will get into trouble.
 > ..
@@ -962,7 +973,7 @@ Not only does JavaScript have different *subtypes* of errors (`TypeError`, `Refe
 
 In particular, there have long been a number of specific conditions that should be caught and reported as "early errors" (during compilation). Any straight-up syntax error is an early error (e.g., `a = ,`), but also the grammar defines things that are syntactically valid but disallowed nonetheless.
 
-Since execution of your code has not begun yet, these errors are not catchable with `try..catch`, they will just fail the parsing/compilation of your program.
+Since execution of your code has not begun yet, these errors are not catchable with `try..catch`; they will just fail the parsing/compilation of your program.
 
 **Tip:** There's no requirement in the spec about exactly how browsers (and developer tools) should report errors. So you may see variations across browsers in the following error examples, in what specific subtype of error is reported or what the included error message text will be.
 
@@ -979,7 +990,7 @@ var a;
 42 = a;		// Error!
 ```
 
-ES5's `strict mode` defines even more early errors. For example, in `strict mode`, function parameter names cannot be duplicated:
+ES5's `strict` mode defines even more early errors. For example, in `strict` mode, function parameter names cannot be duplicated:
 
 ```js
 function foo(a,b,a) { }					// just fine
@@ -987,7 +998,7 @@ function foo(a,b,a) { }					// just fine
 function bar(a,b,a) { "use strict"; }	// Error!
 ```
 
-Another `strict mode` early error is an object literal having more than one property of the same name:
+Another `strict` mode early error is an object literal having more than one property of the same name:
 
 ```js
 (function(){
@@ -1093,7 +1104,7 @@ foo();		// undefined (not linked)
 
 If you pass an argument, the `arguments` slot and the named parameter are linked to always have the same value. If you omit the argument, no such linkage occurs.
 
-But in `strict mode`, the linkage doesn't exist regardless:
+But in `strict` mode, the linkage doesn't exist regardless:
 
 ```js
 function foo(a) {
@@ -1126,7 +1137,7 @@ You're probably familiar with how the `try..catch` block works. But have you eve
 
 The code in the `finally` clause *always* runs (no matter what), and it always runs right after the `try` (and `catch` if present) finish, before any other code runs. In one sense, you can kind of think of the code in a `finally` clause as being in a callback function that will always be called regardless of how the rest of the block behaves.
 
-So what happens if there's a `return` statement inside a `try` clause? It obviously will return a value, right? But does the calling code that receives that value go before or after the `finally`?
+So what happens if there's a `return` statement inside a `try` clause? It obviously will return a value, right? But does the calling code that receives that value run before or after the `finally`?
 
 ```js
 function foo() {
@@ -1200,7 +1211,7 @@ for (var i=0; i<10; i++) {
 
 The `console.log(i)` statement runs at the end of the loop iteration, which is caused by the `continue` statement. However, it still runs before the `i++` iteration update statement, which is why the values printed are `0..9` instead of `1..10`.
 
-**Note:** ES6 adds a `yield` statement, in generators (see the *"Async & Performance"* title of this book series) which in some ways can be seen as an intermediate `return` statement. However, unlike a `return`, a `yield` isn't complete until the generator is resumed, which means a `try { .. yield .. }` has not completed. So an attached `finally` clause will not run right after the `yield` like it does with `return`.
+**Note:** ES6 adds a `yield` statement, in generators (see the *"Async & Performance"* title of this series) which in some ways can be seen as an intermediate `return` statement. However, unlike a `return`, a `yield` isn't complete until the generator is resumed, which means a `try { .. yield .. }` has not completed. So an attached `finally` clause will not run right after the `yield` like it does with `return`.
 
 A `return` inside a `finally` has the special ability to override a previous `return` from the `try` or `catch` clause, but only if `return` is explicitly called:
 
