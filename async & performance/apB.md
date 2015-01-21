@@ -1,7 +1,7 @@
 # You Don't Know JS: Async & Performance
 # Appendix B: Advanced Async Patterns
 
-Appendix A introduced the *asynquence* library for sequence-oriented async flow control, primarily based on promises and generators.
+Appendix A introduced the *asynquence* library for sequence-oriented async flow control, primarily based on Promises and generators.
 
 Now we'll explore other advanced asynchronous patterns built on top of that existing understanding and functionality, and see how *asynquence* makes those sophisticated async techniques easy to mix and match in our programs without needing lots of separate libraries.
 
@@ -65,9 +65,9 @@ for (var v of steps) {
 // 2 4 6 8 10
 ```
 
-Beyond the event triggering example shown in the previous appendix, iterable sequences are interesting because in essence they can be seen as a stand-in for generators or promise chains, but with even more flexibility.
+Beyond the event triggering example shown in the previous appendix, iterable sequences are interesting because in essence they can be seen as a stand-in for generators or Promise chains, but with even more flexibility.
 
-Consider a multiple Ajax request example -- we've seen the same scenario in Chapters 3 and 4, both as a promise chain and as a generator, respectively -- expressed as an iterable sequence:
+Consider a multiple Ajax request example -- we've seen the same scenario in Chapters 3 and 4, both as a Promise chain and as a generator, respectively -- expressed as an iterable sequence:
 
 ```js
 // sequence-aware ajax
@@ -96,13 +96,13 @@ ASQ( "http://some.url.1" )
 } );
 ```
 
-The iterable sequence expresses a sequential series of (sync or async) steps that looks awfully similar to a promise chain -- in other words, it's much cleaner looking than just plain nested callbacks, but not quite as nice as the `yield`-based sequential syntax of generators.
+The iterable sequence expresses a sequential series of (sync or async) steps that looks awfully similar to a Promise chain -- in other words, it's much cleaner looking than just plain nested callbacks, but not quite as nice as the `yield`-based sequential syntax of generators.
 
 But we pass the iterable sequence into `ASQ#runner(..)`, which runs it to completion the same as if it was a generator. The fact that an iterable sequence behaves essentially the same as a generator is notable for a couple of reasons.
 
-First, iterable sequences are kind of a pre-ES6 equivalent to a certain subset of ES6 generators, which means you can either author them directly (to run anywhere), or you can author ES6 generators and transpile/convert them to iterable sequences (or promise chains for that matter!).
+First, iterable sequences are kind of a pre-ES6 equivalent to a certain subset of ES6 generators, which means you can either author them directly (to run anywhere), or you can author ES6 generators and transpile/convert them to iterable sequences (or Promise chains for that matter!).
 
-Thinking of an async-run-to-completion generator as just syntactic sugar for a promise chain is an important recognition of their isomorphic relationship.
+Thinking of an async-run-to-completion generator as just syntactic sugar for a Promise chain is an important recognition of their isomorphic relationship.
 
 Before we move on, we should note that the previous snippet could have been expressed in *asynquence* as:
 
@@ -142,7 +142,7 @@ Because the iterable sequence form has an important trick up its sleeve that giv
 
 ### Extending Iterable Sequences
 
-Generators, normal *asynquence* sequences, and promise chains, are all **eagerly evaluated** -- whatever flow control is expressed initially *is* the fixed flow that will be followed.
+Generators, normal *asynquence* sequences, and Promise chains, are all **eagerly evaluated** -- whatever flow control is expressed initially *is* the fixed flow that will be followed.
 
 However, iterable sequences are **lazily evaluated**, which means that during execution of the iterable sequence, you can extend the sequence with more steps if desired.
 
@@ -173,7 +173,7 @@ for (var v = 10, ret;
 }
 ```
 
-The iterable sequence starts out with only one defined step (`isq.then(double)`), but the sequence keeps extending itself under certain conditions (`x < 500`). Both *asynquence* sequences and promise chains technically *can* do something similar, but we'll see in a little bit why their capability is insufficient.
+The iterable sequence starts out with only one defined step (`isq.then(double)`), but the sequence keeps extending itself under certain conditions (`x < 500`). Both *asynquence* sequences and Promise chains technically *can* do something similar, but we'll see in a little bit why their capability is insufficient.
 
 Though this example is rather trivial and could otherwise be expressed with a `while` loop in a generator, we'll consider more sophisticated cases.
 
@@ -268,7 +268,7 @@ function *steps(token) {
 
 Setting aside the already identified benefits of the sequential, synchronous-looking syntax of generators (see Chapter 4), the `steps` logic had to be reordered in the `*steps()` generator form, to fake the dynamicism of the extendable iterable sequence `steps`.
 
-What about expressing the functionality with promises or sequences, though? You *can* do something like this:
+What about expressing the functionality with Promises or sequences, though? You *can* do something like this:
 
 ```js
 var steps = something( .. )
@@ -284,7 +284,7 @@ var steps = something( .. )
 .then( .. );
 ```
 
-The problem is subtle but important to grasp. So, consider trying to wire up our `steps` promise chain into our main program flow -- this time expressed with promises instead of *asynquence*:
+The problem is subtle but important to grasp. So, consider trying to wire up our `steps` Promise chain into our main program flow -- this time expressed with Promises instead of *asynquence*:
 
 ```js
 var main = Promise.resolve( {
@@ -310,7 +310,7 @@ Here are the two possible outcomes:
 * If `steps` is still the original promise chain, once it's later "extended" by `steps = steps.then(..)`, that extended promise on the end of the chain is **not** considered by the `main` flow, as it's already tapped the `steps` chain. This is the unfortunately limiting **eager evaluation**.
 * If `steps` is already the extended promise chain, it works as we expect in that the extended promise is what `main` taps.
 
-Other than the obvious fact that a race condition is intolerable, case #1 is the concern; it illustrates **eager evaluation** of the promise chain. By contrast, we easily extended the iterable sequence without such issues, because iterable sequences are **lazily evaluated**.
+Other than the obvious fact that a race condition is intolerable, the first case is the concern; it illustrates **eager evaluation** of the promise chain. By contrast, we easily extended the iterable sequence without such issues, because iterable sequences are **lazily evaluated**.
 
 The more dynamic you need your flow control, the more iterable sequences will shine.
 
@@ -318,9 +318,9 @@ The more dynamic you need your flow control, the more iterable sequences will sh
 
 ## Event Reactive
 
-It should be obvious from (at least!) Chapter 3 that promises are a very powerful tool in your async toolbox. But one thing that's clearly lacking is in their capability to handle streams of events, as a promise can only be resolved once. And frankly, this exact same weakness is true of *asynquence* sequences, as well.
+It should be obvious from (at least!) Chapter 3 that Promises are a very powerful tool in your async toolbox. But one thing that's clearly lacking is in their capability to handle streams of events, as a Promise can only be resolved once. And frankly, this exact same weakness is true of plain *asynquence* sequences, as well.
 
-Consider a scenario where you want to fire off a series of steps every time a certain event is fired. A single promise or sequence cannot represent all occurrences of that event. So, you have to create a whole new promise chain (or sequence) for *each* event occurrence, such as:
+Consider a scenario where you want to fire off a series of steps every time a certain event is fired. A single Promise or sequence cannot represent all occurrences of that event. So, you have to create a whole new Promise chain (or sequence) for *each* event occurrence, such as:
 
 ```js
 listener.on( "foobar", function(data){
@@ -355,7 +355,7 @@ observable
 .then( .. );
 ```
 
-The `observable` here is not exactly a promise, but you can *observe* it much like you can observe a promise, so it's closely related. In fact, it can be observed many times, and it will send out notifications every time its event (`"foobar"`) occurs.
+The `observable` value is not exactly a Promise, but you can *observe* it much like you can observe a Promise, so it's closely related. In fact, it can be observed many times, and it will send out notifications every time its event (`"foobar"`) occurs.
 
 **Note:** This pattern I've just illustrated is a **massive simplification** of the concepts and motivations behind reactive programming (aka RP), which has been implemented/expounded upon by several great projects and languages. A variation on RP is functional reactive programming (FRP), which refers to applying functional programming techniques (immutability, referential integrity, etc.) to streams of data. "Reactive" refers to spreading this functionality out over time in response to events. The interested reader should consider studying "Reactive Observables" in the fantastic "Reactive Extensions" library ("RxJS" for JavaScript) by Microsoft (http://reactive-extensions.github.io/RxJS/); it's much more sophisticated and powerful than I've just shown. Also, Andre Staltz has an excellent write-up (https://gist.github.com/staltz/868e7e9bc2a7b8c1f754) that pragmatically lays out RP in concrete examples.
 
@@ -429,7 +429,7 @@ ASQ.react( function setup(next){
 
 The "reactive" portion of the reactive sequence comes from assigning one or more event handlers to invoke the event trigger (calling `next(..)`).
 
-The "sequence" portion of the reactive sequence is exactly like the sequences we've already explored: each step can be whatever asynchronous technique makes sense, from continuation callback to promise to generator.
+The "sequence" portion of the reactive sequence is exactly like the sequences we've already explored: each step can be whatever asynchronous technique makes sense, from continuation callback to Promise to generator.
 
 Once you set up a reactive sequence, it will continue to initiate instances of the sequence as long as the events keep firing. If you want to stop a reactive sequence, you can call `stop()`.
 
@@ -580,7 +580,7 @@ The main differences between `ASQ#runner(..)` and `runAll(..)` are as follows:
 
 * Each generator (coroutine) is provided an argument we call `token`, which is the special value to `yield` when you want to explicitly transfer control to the next coroutine.
 * `token.messages` is an array that holds any messages passed in from the previous sequence step. It's also a data structure that you can use to share messages between coroutines.
-* `yield`ing a promise (or sequence) value does not transfer control, but instead pauses the coroutine processing until that value is ready.
+* `yield`ing a Promise (or sequence) value does not transfer control, but instead pauses the coroutine processing until that value is ready.
 * The last `return`ed or `yield`ed value from the coroutine processing run will be forward passed to the next step in the sequence.
 
 It's also easy to layer helpers on top of the base `ASQ#runner(..)` functionality to suit different uses.
@@ -679,7 +679,7 @@ ASQ(
 } );
 ```
 
-It's important to note that the `*stateOne(..)`, `*stateTwo(..)`, and `*stateThree(..)` generators themselves are reinvoked each time that state is entered, and they finish when you `transition(..)` to another value. While not shown here, of course these state generator handlers can be asynchronously paused by `yield`ing promises/sequences/thunks.
+It's important to note that the `*stateOne(..)`, `*stateTwo(..)`, and `*stateThree(..)` generators themselves are reinvoked each time that state is entered, and they finish when you `transition(..)` to another value. While not shown here, of course these state generator handlers can be asynchronously paused by `yield`ing Promises/sequences/thunks.
 
 The underneath hidden generators produced by the `state(..)` helper and actually passed to `ASQ#runner(..)` are the ones that continue to run concurrently for the length of the state machine, and each of them handles cooperatively `yield`ing control to the next, and so on.
 
@@ -756,11 +756,11 @@ Very similar to the `state(..)` helper from earlier, `ASQ.csp.go(..)` takes a ge
 
 Instead of being passed a `token`, your goroutine receives an initially created channel (`ch` below) that all goroutines in this run will share. You can create more channels (which is often quite helpful!) with `ASQ.csp.chan(..)`.
 
-In CSP, we model all asynchrony in terms of blocking on channel messages, rather than blocking waiting for a promise/sequence/thunk to complete.
+In CSP, we model all asynchrony in terms of blocking on channel messages, rather than blocking waiting for a Promise/sequence/thunk to complete.
 
-So, instead of `yield`ing the promise returned from `request(..)`, `request(..)` should return a channel that you `take(..)` a value from. In other words, a single-value channel is roughly equivalent in this context/usage to a promise/sequence.
+So, instead of `yield`ing the Promise returned from `request(..)`, `request(..)` should return a channel that you `take(..)` a value from. In other words, a single-value channel is roughly equivalent in this context/usage to a Promise/sequence.
 
-So let's make a channel-aware version of `request(..)`:
+Let's first make a channel-aware version of `request(..)`:
 
 ```js
 function request(url) {
@@ -778,7 +778,7 @@ function request(url) {
 }
 ```
 
-**Note:** From Chapter 3, "promisory" is a promise-producing utility, "thunkory" from Chapter 4 is a thunk-producing utility, and finally, from Appendix A we invented "sequory" for a sequence-producing utility. Naturally, we need to coin a matching term here for a channel-producing utility. So let's call it a "chanory" ("channel" + "factory"). As an exercise for the reader, try your hand at defining a `channelify(..)` utility similar to `promisify(..)` (Chapter 3), `thunkify(..)` (Chapter 4), and `ASQ.wrap(..)` (Appendix A).
+**Note:** From Chapter 3, "promisory" is a Promise-producing utility, "thunkory" from Chapter 4 is a thunk-producing utility, and finally, in Appendix A we invented "sequory" for a sequence-producing utility. Naturally, we need to coin a symmetric term here for a channel-producing utility. So let's unsurprisingly call it a "chanory" ("channel" + "factory"). As an exercise for the reader, try your hand at defining a `channelify(..)` utility similar to `Promise.wrap(..)`/`promisify(..)` (Chapter 3), `thunkify(..)` (Chapter 4), and `ASQ.wrap(..)` (Appendix A).
 
 Now consider the concurrent Ajax example using *asyquence*-flavored CSP:
 
@@ -826,4 +826,4 @@ If there are any remaining values in the `ch` channel at the end of the goroutin
 
 Promises and generators provide the foundational building blocks upon which we can build much more sophisticated and capable asynchrony.
 
-*asynquence* has utilities for implementing *iterable sequences*, *reactive sequences* (aka "Observables"), *concurrent coroutines*, and even *CSP goroutines*. Those patterns, combined with the continuation-callback and promise capabilities, gives *asynquence* a powerful mix of lots of different asynchronous functionalities, all integrated in one clean async flow control abstraction: the sequence.
+*asynquence* has utilities for implementing *iterable sequences*, *reactive sequences* (aka "Observables"), *concurrent coroutines*, and even *CSP goroutines*. Those patterns, combined with the continuation-callback and Promise capabilities, gives *asynquence* a powerful mix of lots of different asynchronous functionalities, all integrated in one clean async flow control abstraction: the sequence.
