@@ -3,7 +3,7 @@
 
 Chapters 1 and 2 went into quite a bit of detail about typical asynchronous programming patterns and how they're commonly solved with callbacks. But we also saw why callbacks are fatally limited in capability, which led us to Chapters 3 and 4, with promises and generators offering a much more solid, trustable, and reason-able base to build your asynchrony on.
 
-I referenced my own asynchronous library *asynquence* (http://github.com/getify/asynquence) -- "async" + "sequence" = "asynquence" -- several times in this book, and I want to now briefly explain how it works and why it's unique design is important and helpful.
+I referenced my own asynchronous library *asynquence* (http://github.com/getify/asynquence) -- "async" + "sequence" = "asynquence" -- several times in this book, and I want to now briefly explain how it works and why its unique design is important and helpful.
 
 In the next appendix, we'll explore some advanced async patterns, but you'll probably want a library to make those palatable enough to be useful. We'll use *asynquence* to express those patterns, so you'll want to spend a little time here getting to know the library first.
 
@@ -21,7 +21,7 @@ Understanding *asynquence* begins with understanding a fundamental abstraction: 
 
 Each step in the sequence is controlled under the covers by a promise (see Chapter 3). That is, every step you add to a sequence implicitly creates a promise that is wired to the previous end of the sequence. Because of the semantics of promises, every single step advancement in a sequence is asynchronous, even if you synchronously complete the step.
 
-Moreover, a sequence will always proceed linearly from step to step, meaning that step 2 always comes after step 1 finishes, etc.
+Moreover, a sequence will always proceed linearly from step to step, meaning that step 2 always comes after step 1 finishes, and so on.
 
 Of course, a new sequence can be forked off an existing sequence, meaning the fork only occurs once the main sequence reaches that point in the flow. Sequences can also be combined in various ways, including having one sequence subsumed by another sequence at a particular point in the flow.
 
@@ -33,25 +33,25 @@ But sequences have no such immutability design principle, mostly because sequenc
 
 There's plenty more reasons to prefer a sequence abstraction on top of promise chains, for flow control purposes.
 
-First, promise chaining is a rather manual process -- one that can get pretty tedious once you start creating and chaining promises across a wide swath of your programs -- and this tedium can act counterproductively to dissuage the developer from using promises in places where they are quite appropriate.
+First, promise chaining is a rather manual process -- one that can get pretty tedious once you start creating and chaining promises across a wide swath of your programs -- and this tedium can act counterproductively to dissuade the developer from using promises in places where they are quite appropriate.
 
 Abstractions are meant to reduce boilerplate and tedium, so the sequence abstraction is a good solution to this problem. With promises, your focus is on the individual step, and there's little assumption that you will keep the chain going. With sequences, the opposite approach is taken, assuming the sequence will keep having more steps added indefinitely.
 
 This abstraction complexity reduction is especially powerful when you start thinking about higher-order promise patterns (beyond `race([..])` and `all([..])`.
 
-For example, in the middle of a sequence, you may want to express a step that is conceptually like a `try..catch` in that the step will always result in success, either the intended main success resolution or a positive non-error signal for the caught error. Or, you might want to express a step that is like a retry/until loop, where it keeps trying the same step over and over until success occurs.
+For example, in the middle of a sequence, you may want to express a step that is conceptually like a `try..catch` in that the step will always result in success, either the intended main success resolution or a positive nonerror signal for the caught error. Or, you might want to express a step that is like a retry/until loop, where it keeps trying the same step over and over until success occurs.
 
-These sorts of abstractions are quite non-trivial to express using only promise primitives, and doing so in the middle of an existing promise chain is not pretty. But if you abstract your thinking to a sequence, and consider a step as a wrapper around a promise, that step wrapper can hide such details, freeing you to think about the flow control in the most sensible way without being bothered by the details.
+These sorts of abstractions are quite nontrivial to express using only promise primitives, and doing so in the middle of an existing promise chain is not pretty. But if you abstract your thinking to a sequence, and consider a step as a wrapper around a promise, that step wrapper can hide such details, freeing you to think about the flow control in the most sensible way without being bothered by the details.
 
-Secondly, and perhaps more importantly, thinking of async flow control in terms of steps in a sequence allows you to abstract out the details of what types of asynchronicity are involved with each individual step. Under the covers, a promise will always control the step, but above the covers, that step can look either like a continuation callback (the simple default), or like a real promise, or as a run-to-completion generator, or ... Hopefully, you get the picture.
+Second, and perhaps more importantly, thinking of async flow control in terms of steps in a sequence allows you to abstract out the details of what types of asynchronicity are involved with each individual step. Under the covers, a promise will always control the step, but above the covers, that step can look either like a continuation callback (the simple default), or like a real promise, or as a run-to-completion generator, or ... Hopefully, you get the picture.
 
-Thirdly, sequences can more easily be twisted to adapt to different modes of thinking, such as event/stream/reactive based coding. *asynquence* provides a pattern I call "reactive sequences" (which we'll cover later) as a variation on the "reactive observable" ideas in RxJS ("Reactive Extensions"), that lets a repeatable event fire off a new sequence instance each time. Promises are one-shot-only, so it's quite awkward to express repetitious asynchrony with promises alone.
+Third, sequences can more easily be twisted to adapt to different modes of thinking, such as event-, stream-, or reactive-based coding. *asynquence* provides a pattern I call "reactive sequences" (which we'll cover later) as a variation on the "reactive observable" ideas in RxJS ("Reactive Extensions"), that lets a repeatable event fire off a new sequence instance each time. Promises are one-shot-only, so it's quite awkward to express repetitious asynchrony with promises alone.
 
 Another alternate mode of thinking inverts the resolution/control capability in a pattern I call "iterable sequences". Instead of each individual step internally controlling its own completion (and thus advancement of the sequence), the sequence is inverted so the advancement control is through an external iterator, and each step in the *iterable sequence* just responds to the `next(..)` *iterator* control.
 
 We'll explore all of these different variations as we go throughout the rest of this appendix, so don't worry if we ran over those bits far too quickly just now.
 
-The take away is that sequences are a more powerful and sensible abstraction for complex asynchrony than just promises (promise chains) or just generators, and *asynquence* is designed to express that abstraction with just the right level of sugar to make async programming more understandable and more enjoyable.
+The takeaway is that sequences are a more powerful and sensible abstraction for complex asynchrony than just promises (promise chains) or just generators, and *asynquence* is designed to express that abstraction with just the right level of sugar to make async programming more understandable and more enjoyable.
 
 ## *asynquence* API
 
@@ -59,13 +59,13 @@ To start off, the way you create a sequence (an *asynquence* instance) is with t
 
 **Note:** For the purposes of all code examples here, I will use the *asynquence* top-level identifier in global browser usage: `ASQ`. If you include and use *asynquence* through a module system (browser or server), you of course can define whichever symbol you prefer, and *asynquence* won't care!
 
-Many of the API methods discussed here are built into the core of *asynquence*, but others are provided through including the optional "contrib" plugins package. See the documentation for *asynquence* for whether a method is built-in or defined via plugin: http://github.com/getify/asynquence
+Many of the API methods discussed here are built into the core of *asynquence*, but others are provided through including the optional "contrib" plug-ins package. See the documentation for *asynquence* for whether a method is built in or defined via plug-in: http://github.com/getify/asynquence
 
 ### Steps
 
 If a function represents a normal step in the sequence, that function is invoked with the first parameter being the continuation callback, and any subsequent parameters being any messages passed on from the previous step. The step will not complete until the continuation callback is called. Once it's called, any arguments you pass to it will be sent along as messages to the next step in the sequence.
 
-To add an additional normal step to the sequence, call `then(..)` (which has essentially the exact same semantics as the `ASQ(..)` call).
+To add an additional normal step to the sequence, call `then(..)` (which has essentially the exact same semantics as the `ASQ(..)` call):
 
 ```js
 ASQ(
@@ -121,9 +121,9 @@ ASQ( function(done){
 } );
 ```
 
-As you can see, `val(..)` invoked steps don't receive a continuation callback, as that part is assumed for you -- and the parameter list is less cluttered as a result! To send a message along to the next step, you simply use `return`.
+As you can see, `val(..)`-invoked steps don't receive a continuation callback, as that part is assumed for you -- and the parameter list is less cluttered as a result! To send a message along to the next step, you simply use `return`.
 
-Think of `val(..)` as representing a synchronous "value-only" step, which is useful for synchronous value operations, logging, etc.
+Think of `val(..)` as representing a synchronous "value-only" step, which is useful for synchronous value operations, logging, and the like.
 
 ### Errors
 
@@ -169,13 +169,13 @@ Another really important difference with error handling in *asynquence* compared
 
 In *asynquence*, the assumption is reversed.
 
-If an error occurs on a sequence, and it **at that moment** has no error handlers registered, the error is reported to the `console`. In other words, by default unhandled rejections are always reported so as not to be swallowed and missed.
+If an error occurs on a sequence, and it **at that moment** has no error handlers registered, the error is reported to the `console`. In other words, unhandled rejections are by default always reported so as not to be swallowed and missed.
 
 As soon as you register an error handler against a sequence, it opts that sequence out of such reporting, to prevent duplicate noise.
 
-There may in fact be cases where you want to create a sequence that may go into the error state before you have a chance to register the handler. This isn't common, but it may happen from time to time.
+There may, in fact, be cases where you want to create a sequence that may go into the error state before you have a chance to register the handler. This isn't common, but it can happen from time to time.
 
-In those cases, you can also **opt a sequence instance out** of error reporting by calling `defer()` on the sequence. You should only opt out of error reporting if you are sure that you're going to eventually handle such errors.
+In those cases, you can also **opt a sequence instance out** of error reporting by calling `defer()` on the sequence. You should only opt out of error reporting if you are sure that you're going to eventually handle such errors:
 
 ```js
 var sq1 = ASQ( function(done){
@@ -203,13 +203,13 @@ setTimeout( function(){
 
 This is better error handling behavior than promises themselves have, because it's the Pit of Success, not the Pit of Failure (see Chapter 3).
 
-**Note:** If a sequence is piped into (aka subsumed by) another sequence -- see "Combining" below for a complete description -- then the source sequence is opted out of error reporting, but now the target sequence's error reporting status or not must be considered.
+**Note:** If a sequence is piped into (aka subsumed by) another sequence -- see "Combining Sequences"  for a complete description -- then the source sequence is opted out of error reporting, but now the target sequence's error reporting or lack thereof must be considered.
 
 ### Parallel Steps
 
-Not all steps in your sequences will have just a single (async) task to perform; some will need to perform multiple steps "in parallel" (concurrently). A step in a sequence in which multiple sub-steps are processing concurrently is called a `gate(..)` -- there's an `all(..)` alias if you prefer -- and is directly symmetric to native `Promise.all([..])`.
+Not all steps in your sequences will have just a single (async) task to perform; some will need to perform multiple steps "in parallel" (concurrently). A step in a sequence in which multiple substeps are processing concurrently is called a `gate(..)` -- there's an `all(..)` alias if you prefer -- and is directly symmetric to native `Promise.all([..])`.
 
-If all the steps in the `gate(..)` complete successfully, all success messages will be passed to the next sequence step. If any of them errors, the whole sequence immediately goes into an error state.
+If all the steps in the `gate(..)` complete successfully, all success messages will be passed to the next sequence step. If any of them generate errors, the whole sequence immediately goes into an error state.
 
 Consider:
 
@@ -266,7 +266,7 @@ Yuck. Promises require a lot more boilerplate overhead to express the same async
 
 #### Step Variations
 
-There are several variations in the contrib plugins on *asynquence*'s `gate(..)` step type that can be quite helpful:
+There are several variations in the contrib plug-ins on *asynquence*'s `gate(..)` step type that can be quite helpful:
 
 * `any(..)` is like `gate(..)`, except just one segment has to eventually succeed to proceed on the main sequence.
 * `first(..)` is like `any(..)`, except as soon as any segment succeeds, the main sequence proceeds (ignoring subsequent results from other segments).
@@ -410,7 +410,7 @@ If at any point in the "waterfall" an error occurs, the whole sequence immediate
 
 #### Error Tolerance
 
-Sometimes you want to manage errors at the step-level and not let them necessarily send the whole sequence into the error state. *asynquence* offers two step variations for that purpose.
+Sometimes you want to manage errors at the step level and not let them necessarily send the whole sequence into the error state. *asynquence* offers two step variations for that purpose.
 
 `try(..)` attempts a step, and if it succeeds, the sequence proceeds as normal, but if the step fails, the failure is turned into a success message formated as `{ catch: .. }` with the error message(s) filled in:
 
@@ -451,9 +451,9 @@ ASQ( 3 )
 .or( output );					// Oops
 ```
 
-#### Promise-style Steps
+#### Promise-Style Steps
 
-If you would prefer to have, inline in your sequence, promise-style semantics like promises' `then(..)` and `catch(..)` (see Chapter 3), you can use the `pThen` and `pCatch` plugins:
+If you would prefer to have, inline in your sequence, promise-style semantics like promises' `then(..)` and `catch(..)` (see Chapter 3), you can use the `pThen` and `pCatch` plug-ins:
 
 ```js
 ASQ( 21 )
@@ -535,7 +535,7 @@ ASQ( function(done){
 } )
 ```
 
-`seq(..)` can either accept a sequence itself, as shown here, or a function. If a function, it's expected that the function when called will return a sequence, so the above could have been done with:
+`seq(..)` can either accept a sequence itself, as shown here, or a function. If a function, it's expected that the function when called will return a sequence, so the preceding code could have been done with:
 
 ```js
 // ..
@@ -560,7 +560,7 @@ When a sequence is subsumed, both its success message stream and its error strea
 
 **Note:** As mentioned in an earlier note, piping (manually with `pipe(..)` or automatically with `seq(..)`) opts the source sequence out of error-reporting, but doesn't affect the error reporting status of the target sequence.
 
-## Value & Error Sequences
+## Value and Error Sequences
 
 If any step of a sequence is just a normal value, that value is just mapped to that step's completion message:
 
@@ -587,7 +587,7 @@ ASQ()
 } );
 ```
 
-You also may want to automatically create a delayed-value or a delayed-error sequence. Using the `after` and `failAfter` contrib plugins, this is easy:
+You also may want to automatically create a delayed-value or a delayed-error sequence. Using the `after` and `failAfter` contrib plug-ins, this is easy:
 
 ```js
 var sq1 = ASQ.after( 100, "Hello", "World" );
@@ -613,7 +613,7 @@ ASQ( 42 )
 } );
 ```
 
-## Promises & Callbacks
+## Promises and Callbacks
 
 I think *asynquence* sequences provide a lot of value on top of native promises, and for the most part you'll find it more pleasant and more powerful to work at that level of abstration. However, integrating *asynquence* with other non-*asynquence* code will be a reality.
 
@@ -629,7 +629,7 @@ ASQ()
 } );
 ```
 
-And to go the opposite direction and fork/vend a promise from a sequence at a certain step, use the `toPromise` contrib plugin:
+And to go the opposite direction and fork/vend a promise from a sequence at a certain step, use the `toPromise` contrib plug-in:
 
 ```js
 var sq = ASQ.after( 100, "Hello World" );
@@ -676,7 +676,7 @@ coolUtility( 1, 2 )
 } );
 ```
 
-**Note:** For clarity (and fun!) sake, let's coin yet another term, for a sequence-producing function that comes from `ASQ.wrap(..)`, like `coolUtility` here. I propose "sequory" ("sequence" + "factory").
+**Note:** For the sake of clarity (and for fun!), let's coin yet another term, for a sequence-producing function that comes from `ASQ.wrap(..)`, like `coolUtility` here. I propose "sequory" ("sequence" + "factory").
 
 ## Iterable Sequences
 
@@ -724,7 +724,7 @@ document.addEventListener( "DOMContentLoaded", ready );
 
 **Note:** This anti-pattern is an awkward code smell, in my opinion, but some developers like it, for reasons I can't grasp.
 
-*asynquence* offers an inverted sequence type I call "iterable sequences", which externalizes the control capability; it's quite useful in use cases like the `domready` above.
+*asynquence* offers an inverted sequence type I call "iterable sequences", which externalizes the control capability (it's quite useful in use cases like the `domready`):
 
 ```js
 // note: `domready` here is an *iterator* that
@@ -742,7 +742,7 @@ domready.val( function(){
 document.addEventListener( "DOMContentLoaded", domready.next );
 ```
 
-There's more to iterable sequences than what we see in this scenario. We'll come back to them in the next appendix.
+There's more to iterable sequences than what we see in this scenario. We'll come back to them in Appendix B.
 
 ## Running Generators
 
@@ -813,16 +813,16 @@ foo( 8, 9 )
 } );
 ```
 
-There's a lot more awesome that `runner(..)` is capable of, but we'll come back to that in the next appendix.
+There's a lot more awesome that `runner(..)` is capable of, but we'll come back to that in Appendix B.
 
 ## Review
 
 *asynquence* is a simple abstraction -- a sequence is a series of (async) steps -- on top of promises, aimed at making working with various asynchronous patterns much easier, without any compromise in capability.
 
-There's other goodies in the *asynquence* core API and its contrib plugins beyond what we saw in this appendix, but we'll leave that as an exercise for the reader to go check the rest of the capabilities out.
+There are other goodies in the *asynquence* core API and its contrib plug-ins beyond what we saw in this appendix, but we'll leave that as an exercise for the reader to go check the rest of the capabilities out.
 
 You've now seen the essence and spirit of *asynquence*. The key take away is that a sequence is comprised of steps, and those steps can be any of dozens of different variations on promises, or they can be a generator-run, or... The choice is up to you, you have all the freedom to weave together whatever async flow control logic is appropriate for your tasks. No more library switching to catch different async patterns.
 
 If these *asynquence* snippets have made sense to you, you're now pretty well up to speed on the library; it doesn't take that much to learn, actually!
 
-If you're still a little fuzzy on how it works (or why!), you'll want to spend a little more time examining the previous snippets/examples and/or playing around with *asynquence* yourself, before going onto the next appendix. Appendix B will push *asynquence* into several more advanced and powerful async patterns.
+If you're still a little fuzzy on how it works (or why!), you'll want to spend a little more time examining the previous examples and playing around with *asynquence* yourself, before going on to the next appendix. Appendix B will push *asynquence* into several more advanced and powerful async patterns.
