@@ -200,48 +200,11 @@ I've written a sketch of a polyfill for `Worker` here (https://gist.github.com/g
 
 **Note:** You can't fake synchronous blocking, so this polyfill just disallows use of `importScripts(..)`. Another option might have been to parse and transform the Worker's code (once Ajax loaded) to handle rewriting to some asynchronous form of an `importScripts(..)` polyfill, perhaps with a promise-aware interface.
 
-## Parallel JS
-
-Some types of intensive operations are defined in terms of assuming (for performance sake) multiple threads to parallelize certain sets of independent operations.
-
-For example, if you wanted to perform a `map(..)` operation over a large list of values, the slowest way to do it is to iterate over the items in order using a single thread. But you could instead imagine breaking up the list into several chunks, handing each chunk off to a separate thread, and letting each thread run its set of `map(..)` operations in parallel with the other threads. If the list is broken up into eight roughly equally sized chunks, and each is processed on one of eight threads, you could expect the overall job to run in roughly 1/8th the time (minus some overhead).
-
-You could imagine doing this kind of task manually using Workers, as discussed in the previous section. But that's awfully tedious if you're going to do lots of those kinds of operations. It could certainly stand for some dedicated optimizations for such instances.
-
-That's essentially the motivation behind a set of experimental additions to JavaScript, under the general label of "Parallel JavaScript." Initially, these experiments were developed with the code name "River Trail" (as a plug-in) and pioneered by some folks at Intel. The early experiments proved very fruitful in terms of performance improvement for heavily parallelizable tasks, such as the matrix math operations common in graphically sophisticated games.
-
-Excitingly, Parallel JS is now moving along a track toward eventual standardization (perhaps in the ES8-ish time frame) in the language itself, though no guarantees are present at the time of this writing.
-
-The original idea was to create a specific kind of data structure (like `ParallelArray(..)`) that had parallel operations defined on it. As Parallel JS has evolved though, these operations have migrated to normal JS data structures (arrays, etc.).
-
-Consider:
-
-```js
-// a silly trivially small array
-var arr = [1,2,3,4,5,6,7,8,9,10];
-
-var arr2 = arr.mapPar( function squareEm(val){
-	return val * val;
-} );
-
-arr2; // [1,4,9,16,25,36,49,64,81,100]
-```
-
-That should look exactly like the non-Parallel JS way of doing an array `map(..)`, because the interface is essentially the same.
-
-The interface is synchronous (e.g., not callback or promise based), though behind the API the JS engine may execute the operations non-synchronously (i.e., parallel, not async/concurrent per se).
-
-However, there's a lot of nuanced caveat involved in Parallel JS. `mapPar(..)` will most likely first run sequentially, checking a variety of constraints on the behavior of the callback. For example, parallelizable callbacks cannot mutate any shared external values (including DOM operations, closured variables, etc.), as this would cause observable thread race conditions -- a big no-no!
-
-If any of those constraints is not fulfilled, the `mapPar(..)` operation will just continue to run sequentially on a single thread just as `map(..)` does. But if the callback doesn't violate any of them, on subsequent runs of `mapPar(..)` with the same callback, the JS engine may decide under the covers to switch into parallel-threaded mode for execution, which on large data sets should show a huge improvement in performance.
-
-Current proposals include `mapPar(..)` (parallel `map(..)`), `reducePar(..)` (parallel `reduce(..)`), and `filterPar(..)` (parallel `filter(..)`), all on the `Array.prototype`. All of these operations are traditionally conceived of as independent (no side effects), which means if you write your callbacks to adhere to those conventions/behaviors, Parallel JS should kick in and ramp up your program's performance.
-
-**Note:** Parallel JS is considered "data parallelism" (as opposed to "task parallelism" like Web Workers), because the emphasis is not as much on program chunks being parallelized, but rather built-in data being spread out among the threads and operating independently on the data.
-
 ## SIMD
 
-Single instruction, multiple data (SIMD) is a another form of "data parallelism." With SIMD, threads don't provide the parallelism. Instead, modern CPUs provide SIMD capability with "vectors" of numbers -- think: type specialized arrays -- as well as instructions that can operate in parallel across all the numbers; these are low-level operations leveraging instruction-level parallelism.
+Single instruction, multiple data (SIMD) is a form of "data parallelism," as contrasted to "task parallelism" like with Web Workers, because the emphasis is not really on program logic chunks being parallelized, but rather multiple bits of data being processed in parallel.
+
+With SIMD, threads don't provide the parallelism. Instead, modern CPUs provide SIMD capability with "vectors" of numbers -- think: type specialized arrays -- as well as instructions that can operate in parallel across all the numbers; these are low-level operations leveraging instruction-level parallelism.
 
 The effort to expose SIMD capability to JavaScript is primarily spearheaded by Intel (https://01.org/node/1495), namely by Mohammad Haghighat (at the time of this writing), in cooperation with Firefox and Chrome teams. SIMD is on an early standards track with a good chance of making it into a future revision of JavaScript, likely in the ES7 timeframe.
 
@@ -398,7 +361,7 @@ So in this chapter we've covered several program-level mechanisms for improving 
 
 Web Workers let you run a JS file (aka program) in a separate thread using async events to message between the threads. They're wonderful for offloading long-running or resource-intensive tasks to a different thread, leaving the main UI thread more resposive.
 
-Parallel JS is an experimental proposal for bringing parallelizable operations to large data sets (arrays, etc.) using threads behind the scenes, assuming the operation callbacks behave in thread-safe ways. SIMD is similar, but proposes to map CPU-level parallel math operations to JavaScript APIs for high-performance number processing in large data sets.
+SIMD proposes to map CPU-level parallel math operations to JavaScript APIs for high-performance data-parallel (using threads behind the scenes) operations, like number processing on large data sets.
 
 Finally, asm.js describes a small subset of JavaScript that avoids the hard-to-optimize parts of JS (like garbage collection and coercion) and lets the JS engine recognize and run such code through aggressive optimizations. asm.js could be hand authored, but that's extremely tedious and error prone, akin to hand authoring assembly language (hence the name). Instead, the main intent is that asm.js would be a good target for cross-compilation from other highly optimized program languages -- for example, Emscripten transpiling C/C++ to JavaScript.
 
