@@ -819,7 +819,7 @@ if (!Object.is) {
 
 ## Value vs. Reference
 
-In many other languages, values can either be assigned/passed by value or by reference depending on the syntax you use.
+In many other languages, values can either be assigned/passed by value-copy or by reference-copy depending on the syntax you use.
 
 For example, in C++ if you want to pass a `number` variable into a function and have that variable's value updated, you can declare the function parameter like `int& myNum`, and when you pass in a variable like `x`, `myNum` will be a **reference to `x`**; references are like a special form of pointers, where you obtain a pointer to another variable (like an *alias*). If you don't declare a reference parameter, the value passed in will *always* be copied, even if it's a complex object.
 
@@ -827,7 +827,7 @@ In JavaScript, there are no pointers, and references work a bit differently. You
 
 A reference in JS points at a (shared) **value**, so if you have 10 different references, they are all always distinct references to a single shared value; **none of them are references/pointers to each other.**
 
-Moreover, in JavaScript, there are no syntactic hints that control value vs. reference assignment/passing. Instead, the *type* of the value *solely* controls whether that value will be assigned through value-copy or by reference.
+Moreover, in JavaScript, there are no syntactic hints that control value vs. reference assignment/passing. Instead, the *type* of the value *solely* controls whether that value will be assigned by value-copy or by reference-copy.
 
 Let's illustrate:
 
@@ -917,7 +917,7 @@ As you can see, `x.length = 0` and `x.push(4,5,6,7)` were not creating a new `ar
 
 Remember: you cannot directly control/override value-copy vs. reference -- those semantics are controlled entirely by the type of the underlying value.
 
-To effectively pass a compound value (like an `array`) by value, you need to manually make a copy of it, so that the reference passed doesn't still point to the original. For example:
+To effectively pass a compound value (like an `array`) by value-copy, you need to manually make a copy of it, so that the reference passed doesn't still point to the original. For example:
 
 ```js
 foo( a.slice() );
@@ -925,7 +925,7 @@ foo( a.slice() );
 
 `slice(..)` with no parameters by default makes an entirely new (shallow) copy of the `array`. So, we pass in a reference only to the copied `array`, and thus `foo(..)` cannot affect the contents of `a`.
 
-To do the reverse -- pass a scalar primitive value in a way where its value updates can be seen, kinda like a reference -- you have to wrap the value in another compound value (`object`, `array`, etc) that *can* be passed by reference:
+To do the reverse -- pass a scalar primitive value in a way where its value updates can be seen, kinda like a reference -- you have to wrap the value in another compound value (`object`, `array`, etc) that *can* be passed by reference-copy:
 
 ```js
 function foo(wrapper) {
@@ -982,4 +982,4 @@ The `null` type has just one value: `null`, and likewise the `undefined` type ha
 
 `number`s include several special values, like `NaN` (supposedly "Not a Number", but really more appropriately "invalid number"); `+Infinity` and `-Infinity`; and `-0`.
 
-Simple scalar primitives (`string`s, `number`s, etc.) are assigned/passed by value-copy, but compound values (`object`s, etc.) are assigned/passed by reference. References are not like references/pointers in other languages -- they're never pointed at other variables/references, only at the underlying values.
+Simple scalar primitives (`string`s, `number`s, etc.) are assigned/passed by value-copy, but compound values (`object`s, etc.) are assigned/passed by reference-copy. References are not like references/pointers in other languages -- they're never pointed at other variables/references, only at the underlying values.

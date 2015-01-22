@@ -448,7 +448,7 @@ As you can see, `Function.prototype` is a function, `RegExp.prototype` is a regu
 
 #### Prototypes As Defaults
 
-`Function.prototype` being an empty function, `RegExp.prototype` being an "empty" (aka non-matching) regex, and `Array.prototype` being an empty array, make them all nice "default" values to assign to variables if those variables wouldn't already have had a value of the proper type.
+`Function.prototype` being an empty function, `RegExp.prototype` being an "empty" (e.g., non-matching) regex, and `Array.prototype` being an empty array, make them all nice "default" values to assign to variables if those variables wouldn't already have had a value of the proper type.
 
 For example:
 
