@@ -17,23 +17,37 @@ If you're already somewhat comfortable with JavaScript and are ready to get star
 
 Let's start from the beginning.
 
-What does it mean to "program" or "write a program"? That's when you open up a text file and type a specific series of letters, numbers, and special characters (called operators). The rules for valid combinations of those characters is called a "computer language", such as JavaScript, much the same as English tells you how to spell words and how to create sentences with words and punctuation.
+A program, often referred to as *code* or *source code*, is a set of special instructions to tell the computer what tasks to perform. Usually code is saved in a text file, although with JavaScript you can type code directly into a developer console in a browser, which we'll cover shortly.
 
-In a computer language, a group of these words, numbers, and operators is a statement, a set of instructions to the computer to perform some task. For example:
+The rules for valid format and combinations of instructions is called a *computer language*, sometimes referred to as its *syntax*, much the same as English tells you how to spell words and how to create valid sentences using words and punctuation.
+
+In a computer language, a group of words, numbers, and operators is a statement. In JavaScript, a statement might look like this:
 
 ```js
 a = b * 2;
 ```
 
-This is a single statement (in JS syntax). It tells the computer, roughly, to get the current value stored in memory at a location that we call `b`, multiply that value by `2`, then store the result back into another area of memory we call `a`.
+The characters `a` and `b` are called variables (see "Variables" later in this chapter), which are like cardboard boxes you can store your stuff in -- in programs, variables hold values (like the number `42`) to be used by the program. The `2` is just a value itself, called a *literal value*, because it stands alone without being stored in a variable.
 
-What about "executing a program"? A special program on your computer is responsible for reading your "program" from the text file and turning it into commands that your computer can recognize.
+The `=` and `*` characters are operators (see "Operators" later in this chapter) -- they perform actions with the values and variables such as assignment and mathematic multiplication. Most statments in JavaScript end with a `;` semicolon on the end.
 
-Some computer languages are designed to be "compiled" ahead of time, which means the special program (aka compiler) reads your file and outputs another file, called an "executable", that can later run all by itself. Other languages are designed to be "compiled" while being run, or interpreted, which means there's no intermediate file created -- each execution is effectively re-compiling the program.
+The statement `a = b * 2` tells the computer, roughly, to get the current value stored in the variable `b`, multiply that value by `2`, then store the result back into another variable we call `a`.
 
-JavaScript is of the latter type: it is compiled (not interpreted!) during its execution by the JavaScript engine (inside the browser, typically).
+Programs are nothing more than collections of many such statements, which taken together describe all the steps that it takes to perform a set of tasks.
 
-**Note:** For more information on how JavaScript is "compiled", see the first two chapters of the *"Scope & Closures"* title of this book series.
+### Executing a Program
+
+How do those collections of programming statements tell the computer what to do? The program needs to be *executed*, also referred to as *running the program*.
+
+Statements like `a = b * 2` are more for intended for developers to read and write, but are not actually in a form the computer can directly understand. So a special utility on the computer is used to translate the code you write into commands a computer can understand.
+
+For some computer languages, this translation of commands is typically done from top to bottom, line by line, every time the program is run, which is usually called *interpreting* the code.
+
+For other languages, the translation is done ahead of time, called *compiling* the code, so when the program *runs* later, what's running is actually the already compiled computer instructions.
+
+It's typically asserted that JavaScript is *interpreted*, because your JavaScript source code is processed each time it's run. But that's not entirely accurate. The JavaScript engine actually *compiles* the program on-the-fly and then immediately runs the compiled code.
+
+**Note:** For more information on JavaScript compiling, see the first two chapters of the *"Scope & Closures"* title of this book series.
 
 ### Try It Yourself
 
