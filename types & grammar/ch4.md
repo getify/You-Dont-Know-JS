@@ -646,10 +646,10 @@ How `~~` works is that the first `~` applies the `ToInt32` "coercion" and does t
 
 **Note:** The bitwise double-flip of `~~` is very similar to the parity double-negate `!!` behavior, explained in the "Explicitly: * --> Boolean" section later.
 
-However, `~~` needs some caution/clarification. First, it only works reliably on 32-bit values. But more importantly, it doesn't work the same on negative numbers as `Math.round(..)` does!
+However, `~~` needs some caution/clarification. First, it only works reliably on 32-bit values. But more importantly, it doesn't work the same on negative numbers as `Math.floor(..)` does!
 
 ```js
-Math.round( -49.6 );	// -50
+Math.floor( -49.6 );	// -50
 ~~-49.6;				// -49
 ```
 
