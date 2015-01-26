@@ -121,11 +121,37 @@ And then once you submit the *input* text, you'll see that it's put into the `ag
 
 <img src="fig3.png" width="500">
 
-To keep things simple while we're learning basic programming concepts, the examples in this book will not require on input. But now that you've seen how to use `prompt(..)`, if you want to challenge yourself you can try to include input in your attempts with the examples.
+To keep things simple while we're learning basic programming concepts, the examples in this book will not require input. But now that you've seen how to use `prompt(..)`, if you want to challenge yourself you can try to include input in your attempts with the examples.
 
 ## Operators
 
 Operators are how we perform actions on variables and values.
+
+We've already seen two JavaScript operators, the `=` and the `*`. The `=` equals operator is used for *assignment*. That means we calculate some value on the *right-hand side* of the `=` and put it into the variable that we specify on the *left-hand side*.
+
+**Warning:** This may seem like a strange reverse order to specify assignment, where the target is on the left and the source is on the right. Instead of `a = 42;`, some might prefer to flip the order so the source value is on the left and the target variable is on the right, like `42 -> a;` (this is not valid JavaScript!). Unfortunately, the `a = 42` form, and similar variations, is quite prevalent in modern programming languages. You'll want to just spend some time practicing that ordering in your mind to get used to it.
+
+So:
+
+```js
+a = 2;
+b = a + 1;
+```
+
+Here, we assign the `2` value to the `a` variable. Then, we get the value of the `a` variable (`2`), add `1` to it, then assign that value (`3`) to the `b` variable.
+
+Let's briefly introduce some of the common operators in JavaScript that you'll likely see:
+
+* Assignment: `=` as in `a = 2`
+* Math: `+` (addition), `-` (subtraction), `*` (multiplication), and `/` (division), as in `a * 3`
+* Compound Assignment: `+=`, `-=`, `*=`, and `/=` are compound operators that combine a math operation with assignment, as in `a += 2` (same as `a = a + 2`)
+* Increment/Decrement: `++` (increment), `--` (decrement), as in `a--` (similar to `a = a - 1`)
+* Object Property Access: `.` as in `console.log()`.
+* Equality: `==` (loose equals), `===` (strict equals), `!=` (loose not-equals), `!==` (strict not-equals), as in `a == b`
+* Comparison: `<` (less than), `>` (greater than), `<=` (less than or loose equals), `>=` (greater than or loose equals), as in `a <= b`
+* Logical: `&&` (and), `||` (or), as in `a || b`
+
+For much more information and more operators not mentioned here, see MDN's "Expressions and Operators" (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators).
 
 ## Values & Types
 
