@@ -157,11 +157,11 @@ For much more detail and operators not mentioned here, see MDN's "Expressions an
 
 ## Values & Types
 
-If you ask an employee at a phone store how much a certain phone costs, and they say "ninety-nine, ninety-nine" (`99.99`), they're giving you an actual dollar figure that represents what you'll need to pay (plus taxes). If you wanted to buy two of those phones, you could easily do the mental math to double that value to get `199.98` for your base cost.
+If you ask an employee at a phone store how much a certain phone costs, and they say "ninety-nine, ninety-nine" (`99.99`), they're giving you an actual numeric dollar figure that represents what you'll need to pay (plus taxes). If you wanted to buy two of those phones, you could easily do the mental math to double that value to get `199.98` for your base cost.
 
-If that same employee picks up another similar phone but says it's "free" (and perhaps uses air quotes), they're not giving you a number, but instead they're giving you another kind of representation of your expected cost (`0.00`) -- the word "free".
+If that same employee picks up another similar phone but says it's "free" (perhaps with air quotes), they're not giving you a number, but instead they're giving you another kind of representation of your expected cost (`0.00`) -- the word "free".
 
-When you later ask if the phone includes a charger, and the employee says "yes", they've provided an answer to a question that can only have one of two values, "yes" or "no" (in computer terms `true` and `false`, respectively).
+When you later ask if the phone includes a charger, and the employee says "yes", that answer could only have been either "yes" or "no" (just like `true` and `false`, respectively).
 
 In very similar ways, when you express values in a programs, you choose different representations for those values based on what you plan to do with them. If you need to do math, you want a `number`. If you need to print a value on the screen, you need a `string` (one or more characters, words, sentences). And if you need to decide if something is a fact or not, you need a `boolean` (`true` or `false`).
 
@@ -185,30 +185,46 @@ false;
 
 If you have a `number` but need to print it on the screen, you need to convert the value to a `string`, and in JavaScript this conversion is called "coercion". Similarly, if someone enters a series of numeric characters into a form on a ecommerce page, that's a `string`, but if you need to then use that value to do math operations, you need to *coerce* it to a `number`.
 
-In JavaScript, a controversial topic is what happens when you try to compare two values to determine if they're "equal", and those values are not already of the same type. For example, if you try to compare the string `"99.99"` to the number `99.99`, they *seem* to be equivalent, if not equal.
+JavaScript provides several different facilities for forcibly coercing between types. For example:
 
-To help you out in these common situations (like comparison), JavaScript will sometimes kick in and automatically (aka implicitly) coerce a value to a matching type. So if you use the `==` loose equals operator to make the comparison `"99.99" == 99.99`, JavaScript will convert the left-hand side `"99.99"` to its `number` equivalent `99.99`. So the comparison then becomes `99.99 == 99.99`, which is of course `true`.
+```js
+var a = "42";
+var b = Number( a );
+
+console.log( a );	// "42"
+console.log( b );	// 42
+```
+
+Using `Number(..)` as shown is an *explicit* coercion from any other type to the `number` type. But a controversial topic is what happens when you try to compare two values that are not already of the same type, which would require *implicit* coercion.
+
+When comparing the string `"99.99"` to the number `99.99`, most people would agree they are equivalent, if not equal. But they're not exactly the same, are they? It's the same value in two different representations, two different *types*. You could say they're "loosely equal", couldn't you?
+
+To help you out in these common situations, JavaScript will sometimes kick in and *implicitly* coerce values to the matching types.
+
+So if you use the `==` loose equals operator to make the comparison `"99.99" == 99.99`, JavaScript will convert the left-hand side `"99.99"` to its `number` equivalent `99.99`. The comparison then becomes `99.99 == 99.99`, which is of course `true`.
 
 While designed to help, *implicit* coercion can create lots of confusion if you haven't taken the time to learn the rules that govern its behavior. Most JS developers never have, so the common feeling is that *implicit* coercion is confusing and harms programs with unexpected bugs, and should thus be avoided. It's even sometimes called a "flaw" in the design of the language.
 
-However, *implicit* coercion is something that **can be learned**, and moreover **should be learned** by anyone wishing to take JavaScript programming seriously. Not only is it not confusing once you learn the rules, it can actually make your programs better! The effort is well worth it.
+However, *implicit* coercion is a mechanism that **can be learned**, and moreover **should be learned** by anyone wishing to take JavaScript programming seriously. Not only is it not confusing once you learn the rules, it can actually make your programs better! The effort is well worth it.
 
 **Note:** For more information on coercion, see Chapter 4 of the *"Types & Grammar"* title of this book series.
 
 ## Code Comments
 
+The phone store employee might jot down some notes on the features of a newly released phone or on the new plans her company offers. These notes are only for the employee -- they're not for customer to read. Nevertheless, these notes help the employee do her job better by documenting the hows and whys of what she should tell customers.
+
 One of the most important lessons you can learn about writing code is that it's not just for the computer. Code is every bit as much, if not more, for the developer as it is for the compiler.
 
 Your computer only cares about machine code, binary 0's and 1's, that comes from *compilation*. There's a nearly infinite number programs you could write that yield the same series of 0's and 1's. The choices you make about how to write your program matter -- not only to you, but to your other team members and even to your future self.
 
-For that reason, you should strive not just to write programs that work, but programs that make sense when read. You can go a long way in that effort by choosing good names for your variables (see "Variables") and functions (see "Functions").
+You should strive not just to write programs that work correctly, but programs that make sense when examined. You can go a long way in that effort by choosing good names for your variables (see "Variables") and functions (see "Functions").
 
-But another important part is code comments. These are bits of text in your program which are inserted purely to explain things to a human. The compiler will always ignore these comments.
+But another important part is code comments. These are bits of text in your program which are inserted purely to explain things to a human. The interpreter/compiler will always ignore these comments.
 
-There's lots of opinions on what makes well commented code or not. We can't exactly define absolute rules. But some observations and guidelines are useful:
+There's lots of opinions on what makes well commented code or not; we can't really define absolute universal rules. But some observations and guidelines are quite useful:
 
-* No comments is bad.
-* Too many comments (like one per line) is probably a sign of poorly written code.
+* Code without comments is suboptimal.
+* Too many comments (one per line, for example) is probably a sign of poorly written code.
 * Comments should explain WHY, not WHAT. They can optionally explain HOW if that's particularly confusing.
 
 In JavaScript, there are two types of comments possible: a single-line comment, and a multi-line comment.
@@ -228,23 +244,34 @@ Consider:
 
 The `//` single-line comment is appropriate if you're going to put a comment right above a single statement, or even at the end of a line. Everything on the line after the `//` is treated as the comment (and thus ignored by the compiler), all the way to the end of the line. There's no restriction to what can appear inside a comment.
 
+Consider:
+
+```js
+var a = 42;		// 42 is the meaning of life
+```
+
 The `/* .. */` multi-line comment is appropriate if you have several sentences worth of explanation to make in your comment. It can appear anywhere on a line, even in the middle of a line, since the `*/` ends it. The only thing that cannot appear inside a multi-line comment is a `*/`, since that would be taken to end the comment.
 
-You will definitely want to begin your learning of programming by starting the habit of commenting code. Throughout the rest of this chapter, you'll see I use comments to explain things, so do the same in your own practice. Trust me, everyone who reads your code will thank you!
+```js
+/* The following value is used because
+   it has been shown that it answers
+   every question in the universe. */
+var a = 42;
+```
+
+You will definitely want to begin your learning of programming by starting off with the habit of commenting code. Throughout the rest of this chapter, you'll see I use comments to explain things, so do the same in your own practice. Trust me, everyone who reads your code will thank you!
 
 ## Variables
 
 Most useful programs need to track a value as it changes over the course of the program, undergoing different operations as called for by your program's intended tasks.
 
-The easiest way to go about that in your program is to assign a value to a symbolic container, called a "variable" -- so called because the value in this container can *vary* over time as needed.
+The easiest way to go about that in your program is to assign a value to a symbolic container, called a *variable* -- so called because the value in this container can *vary* over time as needed.
 
-In some programming languages, you declare a variable (container) to hold a specific *type* of value, such as `number` or `string`. This type of functionality is often called "static typing", and is typically cited as a benefit for program correctness by allowing the compiler to verify that a variable only ever has one *type* representation of the value and doesn't accidentally get converted in a way that can produce unexpected outcomes. Another way of explaining this behavior is "type enforcement".
+In some programming languages, you declare a variable (container) to hold a specific *type* of value, such as `number` or `string`. *Static typing*, otherwise known as *type enforcement*, is typically cited as a benefit for program correctness by preventing unintended value conversions.
 
-Other languages don't emphasize *types* for variables, but rather for the values themselves. That behavior allows a variable to hold any *type* of value, and in fact for that *type* to change from operation to operation. This type of functionality is often called "dynamic typing" (aka "weak typing"), and is typically cited as a benefit for program flexibility by allowing a single container to represent a value no matter what *type* form that value may take at any given moment in the program's logic flow. Another way of explaining this behavior is "no type enforcement".
+Other languages emphasize *types* for values instead of variables. *Weak typing*, otherwise known as *dynamic typing*, allows a variable to hold any *type* of value at any time. It's typically cited as a benefit for program flexibility by allowing a single variable to represent a value no matter what *type* form that value may take at any given moment in the program's logic flow.
 
-Neither of these approaches is *right* or *wrong* -- they both have strong advantages. Experienced developers often make language choices based on their preferences about such issues.
-
-JavaScript is dynamically typed, meaning variables can hold any value of any *type* as you see fit.
+JavaScript uses the latter approach, *dynamic typing*, meaning variables can hold values of any *type* without any type enforcement.
 
 For example, consider this simple program:
 
@@ -253,24 +280,30 @@ var amount = 99.99;
 
 amount = amount * 2;
 
-// print the number
 console.log( amount );		// 199.98
 
-amount = "$" + amount;
+// convert `amount` to a string, and
+// add "$" on the beginning
+amount = "$" + String( amount );
 
-// print the string
-console.log( amount );		// $199.98
+console.log( amount );		// "$199.98"
 ```
 
-As you can see, declaring a variable in JS is done with `var`, and there's no other *type* information in the declaration. We additionally assign a value using the single `=` operator.
+As you can see, declaring a variable in JS is done with `var`, and there's no other *type* information in the declaration.
 
-The `amount` variable starts out holding the number `99.99`, and indeed holds the `number` result of `amount * 2`, which is `199.98`. The first `console.log(..)` command has to *implicitly coerce* that `number` value to a `string` to print it out. Then the statement `amount = "$" + amount` coerces the `199.98` value to a `string` and adds a `"$"` character to the beginning. At this point, `amount` now holds the `string` value `"$199.98"`, so the second `console.log(..)` statement doesn't need to do any coercion to print it out.
+The `amount` variable starts out holding the number `99.99`, and then holds the `number` result of `amount * 2`, which is `199.98`. The first `console.log(..)` command has to *implicitly* coerce that `number` value to a `string` to print it out.
 
-JavaScript developers will note the flexibility of using the `amount` variable for all the `99.99`, `199.98`, and the `"$199.98"` values. Static-typing enthusiasts would prefer a separate variable like `amountStr` to hold the final `"$199.98"` representation of the value.
+Then the statement `amount = "$" + String(amount)` *explicitly* coerces the `199.98` value to a `string` and adds a `"$"` character to the beginning. At this point, `amount` now holds the `string` value `"$199.98"`, so the second `console.log(..)` statement doesn't need to do any coercion to print it out.
+
+JavaScript developers will note the flexibility of using the `amount` variable for each of the `99.99`, `199.98`, and the `"$199.98"` values. Static-typing enthusiasts would prefer a separate variable like `amountStr` to hold the final `"$199.98"` representation of the value, since it's a different type.
 
 Either way, you'll note that `amount` holds a running value that changes over the course of the program, illustrating the primary purpose of variables: managing program *state*.
 
-Another common usage of variables is for centralizing value setting. This is more typically called "constants", when you declare a variable with a value and intend for that value to *not change* throughout the program. You declare these constants, often at the top of a program, so that it's convenient for you to have one place to go to alter a value if you need to. By convention, JavaScript variables as constants are usually capitalized, with `_` underscores between multiple words.
+In other words, *state* is tracking the changes to values as your program runs.
+
+Another common usage of variables is for centralizing value setting. This is more typically called *constants*, when you declare a variable with a value and intend for that value to *not change* throughout the program.
+
+You declare these *constants*, often at the top of a program, so that it's convenient for you to have one place to go to alter a value if you need to. By convention, JavaScript variables as constants are usually capitalized, with `_` underscores between multiple words.
 
 A silly example:
 
@@ -287,11 +320,11 @@ console.log( amount );				// 215.9784
 console.log( amount.toFixed( 2 ) );	// "215.98"
 ```
 
-**Note:** As you can see, JavaScript `number`s aren't automatically formatted for dollars -- the engine doesn't know what your *intent* is and there's no *type* for currency. In this case, the provided `toFixed(..)` method lets us specify how many decimal places we'd like the `number` rounded to.
+**Note:** Similar to how `console.log(..)` is a function `log(..)` accessed as an object property on the `console` value, `toFixed(..)` here is a function that can be accessed on `number` values. JavaScript `number`s aren't automatically formatted for dollars -- the engine doesn't know what your *intent* is and there's no *type* for currency. `toFixed(..)` lets us specify how many decimal places we'd like the `number` rounded to, and it produces the `string` as necessary.
 
-The `TAX_RATE` variable is only "constant" by convention -- there's nothing special in this program that prevents it from being changed. But if the city raises the sales tax rate to 9%, we can easily change our program by setting the `TAX_RATE` assigned value to `0.09` once, instead of finding many occurrences of `0.08` strewn throughout the program and updating all of them.
+The `TAX_RATE` variable is only *constant* by convention -- there's nothing special in this program that prevents it from being changed. But if the city raises the sales tax rate to 9%, we can still easily update our program by setting the `TAX_RATE` assigned value to `0.09` in one place, instead of finding many occurrences of the value `0.08` strewn throughout the program and updating all of them.
 
-The newest version of JavaScript, called ES6, includes a new way to declare constants which accomplishes the same benefits we've just shown, but also prevents accidentally changing the `TAX_RATE` variable somewhere else after the initial setting:
+The newest version of JavaScript at the time of this writing (often called ES6) includes a new way to declare *constants* which accomplishes the same benefits we've just shown, but also prevents accidentally changing the `TAX_RATE` variable somewhere else after the initial setting, by using `const` instead of `var`:
 
 ```js
 // as of ES6:
@@ -302,32 +335,42 @@ var amount = 99.99;
 // ..
 ```
 
-If you tried to assign any different value to `TAX_RATE` after that first declaration, your program would fail with an error. That kind of "protection" against mistakes is similar to the static-typing type enforcement enthusiasm, so you can see why people like it in other languages!
-
-One last thing to say explicitly about variables as we've seen them used so far: they can be used as *targets* for assignment as well as *sources* for value look-up. When we say `amount = 99.99`, `amount` is on the left-hand side of the `=` assignment operator, so it's a *target* where a value will be stored. When we say `= amount * 2`, `amount` here is on the right-hand side, and is thus a *source* where its current value will be looked up at that moment.
+If you tried to assign any different value to `TAX_RATE` after that first declaration, your program would fail with an error. That kind of "protection" against mistakes is similar to the static-typing type enforcement enthusiasm, so you can see why it's attractive in other languages!
 
 **Note:** For more information about how different values in variables can be used in your programs, see the *"Types & Grammar"* title of this book series.
 
 ## Conditionals
 
-"Do you want to add on the extra screen protectors to your purchase, for 9.99?" The helpful phone store employee has asked you to make a decision. And you may need to first consult the current *state* of your wallet or bank account to answer that question.
+"Do you want to add on the extra screen protectors to your purchase, for 9.99?" The helpful phone store employee has asked you to make a decision. And you may need to first consult the current *state* of your wallet or bank account to answer that question. Obviously, this is just a simple "yes or no" question.
 
-There are quite a few ways we can express conditionals (aka decisions) in our programs.
+There are quite a few ways we can express *conditionals* (aka decisions) in our programs.
 
-The most common one is the `if` statement. Essentially, you're saying "IF this condition is true, do the following". You can even provide an alternate if the condition isn't true, called an `else`.
-
-Consider this program:
+The most common one is the `if` statement. Essentially, you're saying "IF this condition is true, do the following..." For example:
 
 ```js
 var amount = 99.99;
-const BANK_BALANCE = 302.13;
+var bank_balance = 302.13;
+
+if (amount < bank_balance) {
+	console.log( "I want to buy this phone!" );
+}
+```
+
+The `if` statement requires an expression in between the `( )` parentheses that can be treated as either `true` or `false`. In this program, we provided the expression `amount < bank_balance`, which indeed will either evaluate to `true` or `false` depending on the amount in our bank account.
+
+You can even provide an alternate if the condition isn't true, called an `else` clause. Consider:
+
+```js
 const ACCESSORY_PRICE = 9.99;
+
+var amount = 99.99;
+var bank_balance = 302.13;
 
 amount = amount * 2;
 
 // can we afford the extra purchase?
-if ( amount < BANK_BALANCE ) {
-	console.log( "Sure!" );
+if ( amount < bank_balance ) {
+	console.log( "I'll take the accessory!" );
 	amount = amount + ACCESSORY_PRICE;
 }
 else {
@@ -335,23 +378,23 @@ else {
 }
 ```
 
-The `if` statement requires an expression in between the `( )` parentheses that can be treated as either `true` or `false`. In this program, we provided the expression `amount < BANK_ACCOUNT_BALANCE`, which indeed will either evaluate to `true` or `false` depending on the amount in our bank account. If `true`, we'll print out `"Sure!"` and add the `9.99` to our `amount` variable. Otherwise, the `else` clause says we'll just politely respond with `"No, thanks."`.
+Here, if `amount < bank_balance` is `true`, we'll print out `"I'll take the accessory!"` and add the `9.99` to our `amount` variable. Otherwise, the `else` clause says we'll just politely respond with `"No, thanks."` and leave `amount` unchanged.
 
-As we mentioned earlier, values which aren't already of an expected type are often coerced to that type. The `if` statement expects a `boolean`, but if you pass it something that's not already `boolean`, coercion will occur.
+As we discussed in "Values & Types", values which aren't already of an expected type are often coerced to that type. The `if` statement expects a `boolean`, but if you pass it something that's not already `boolean`, coercion will occur.
 
-Certain values in JavaScript are considered "falsy" if when asked to coerce to a `boolean`, they become `false` -- they include values like `0` and `""`. Other values are called "truthy" because when asked to coerce to a `boolean`, they become `true` -- they include values like `99.99` and `"free"`.
+Certain values in JavaScript are considered "falsy" if when asked to coerce to a `boolean`, they become `false` -- these include values like `0` and `""`. Other values are called "truthy" because when asked to coerce to a `boolean` they become `true` -- these include values like `99.99` and `"free"`.
 
-Conditionals exist in other forms, too. For example, the `switch` statement is like a short-hand for a series of `if..else` statements. Loops (covered in the next section) use a conditional to determine if the loop should keep going or stop.
+*Conditionals* exist in other forms, too. For example, the `switch` statement is like a short-hand for a series of `if..else` statements (see Chapter 2). Loops (see "Loops") use a *conditional* to determine if the loop should keep going or stop.
 
-**Note:** For more information about the coercions that can occur implicitly in conditionals' test expressions, see Chapter 4 of the *"Types & Grammar"* title of this book series.
+**Note:** For more information about the coercions that can occur implicitly in conditionals' test expressions, see Chapter 4 of the *"Types & Grammar"* title of this series.
 
 ## Loops
 
-Extending our running scenario of the phone store employee: during busy times, there's a waiting list for customers waiting to speak to the employee. While there's still people on that list, the employee just needs to keep serving the next customer.
+During busy times, there's a waiting list for customers waiting to speak to the phone store employee. While there's still people on that list, she just needs to keep serving the next customer.
 
 Repeating a set of actions until a certain condition is met is the job of programming loops; loops can take different forms, but they all satisfy this basic behavior.
 
-For example, the `while` loop and the `do..while` (some languages call it "until" instead of "while") loop forms are direct expressions of that idea:
+For example, the `while` loop and the `do..while` (some languages call it `until` instead of `while`) loop forms are direct expressions of that idea:
 
 ```js
 while (numOfCustomers > 0) {
@@ -359,18 +402,25 @@ while (numOfCustomers > 0) {
 	// ..
 }
 
-// versus
+// versus:
+
 do {
 	console.log( "How may I help you?" );
 	// ..
 } while (numOfCustomers > 0);
 ```
 
-The only practical difference between these loops is whether the conditional is tested before the first iteration (`while`) or after the first iteration (`do..while`). In either form, if the conditional tests as `false`, the next iteration will not run. That means if the condition is initially `false`, a `while` loop will never run, but a `do..while` loop will run just the first time.
+The only practical difference between these loops is whether the conditional is tested before the first iteration (`while`) or after the first iteration (`do..while`).
+
+In either form, if the conditional tests as `false`, the next iteration will not run. That means if the condition is initially `false`, a `while` loop will never run, but a `do..while` loop will run just the first time.
 
 Sometimes you are looping for the intended purpose of counting a certain set of numbers, like from `0` to `9` (ten numbers). You can do that by setting a loop iteration variable like `i` at value `0` and incrementing it by `1` each iteration.
 
-The conditional is tested on each iteration, much as if there had been an implied `if` statement inside the loop. As an illlustration of this concept, we can see the use of JavaScript's `break` statement to stop a loop. We can also see that it's (too) easy to create a loop that would otherwise run forever.
+The conditional is tested on each iteration, much as if there is an implied `if` statement inside the loop.
+
+We can use JavaScript's `break` statement to stop a loop. Also, we can observe that it's awfully easy to create a loop that would otherwise run forever without a `break`ing mechanism.
+
+**Warning:** This is not necessarily a practical form you'd want to use for your loops, but it's presented here for illustration purposes only.
 
 Consider:
 
@@ -382,7 +432,7 @@ while (true) {
 	// keep the loop going?
 	if (i <= 9) {
 		console.log( i );
-		i++;
+		i = i + 1;
 	}
 	// time to stop the loop!
 	else {
@@ -392,12 +442,10 @@ while (true) {
 // 0 1 2 3 4 5 6 7 8 9
 ```
 
-**Note:** `i++` in the above snippet is a short-hand operator notation for `i = i + 1`: simple incrementing by `1`.
-
 While a `while` (or `do..while`) can accomplish the task manually, there's another syntactic form called a `for` loop for just that purpose:
 
 ```js
-for (var i=0; i <= 9; i++) {
+for (var i = 0; i <= 9; i = i + 1) {
 	console.log( i );
 }
 // 0 1 2 3 4 5 6 7 8 9
@@ -405,9 +453,9 @@ for (var i=0; i <= 9; i++) {
 
 As you can see, in both cases the conditional `i <= 9` is `true` for the first ten iterations (`i` of values `0` through `9`) of either loop form, but becomes `false` once `i` is value `10`.
 
-The `for` loop has three clauses: the declaration clause (`var i=0`), the conditional test clause (`i <= 9`), and the loop increment clause (`i++`). So if you're going to do counting on your loop iterations, `for` is often a shorter, easier form to understand and write.
+The `for` loop has three clauses: the declaration clause (`var i=0`), the conditional test clause (`i <= 9`), and the loop increment clause (`i = i + 1`). So if you're going to do counting with your loop iterations, `for` is a more compact and often easier form to understand and write.
 
-There are other specialized loop forms that are intended to iterate over specific values, such as the properties of an object (see Chapter 2) where the implied conditional test is whether all the properties have been processed. As you can see, the "loop until a condition fails" concept holds no matter what the form of the loop.
+There are other specialized loop forms that are intended to iterate over specific values, such as the properties of an object (see Chapter 2) where the implied conditional test is just whether all the properties have been processed. The "loop until a condition fails" concept holds no matter what the form of the loop.
 
 ## Functions
 
@@ -415,9 +463,44 @@ The phone store employee probably doesn't carry around a calculator to figure ou
 
 Similarly, your program will almost certainly want to break up the code's tasks into reusable pieces. The way to do this is to define a `function`.
 
-A function is generally a named section of code which can be "called" by name, and the code inside it will be run each time. Functions can optionally take arguments (aka parameters) -- values you pass in. And they can also optionally return a value back.
+A function is generally a named section of code which can be "called" by name, and the code inside it will be run each time. Consider:
 
-Functions are often used for code that you plan to call multiple times, but they can also be useful just to organize related bits of code into named collections, even if you only plan to call them once. Typically, that practice would be combined with passing in arguments and/or returning a value.
+```js
+function printAmount() {
+	console.log( amount.toFixed( 2 ) );
+}
+
+var amount = 99.99;
+
+printAmount(); // "99.99"
+
+amount = amount * 2;
+
+printAmount(); // "199.98"
+```
+
+Functions can optionally take arguments (aka parameters) -- values you pass in. And they can also optionally return a value back.
+
+```js
+function printAmount(amt) {
+	console.log( amt.toFixed( 2 ) );
+}
+
+function formatAmount() {
+	return amount.toFixed( 2 );
+}
+
+var amount = 99.99;
+
+printAmount( amount * 2 );		// "199.98"
+
+amount = formatAmount();
+console.log( "$" + amount );	// "$99.99"
+```
+
+The function `printAmount(..)` takes a parameter that we call `amt`. The function `formatAmount()` returns a value. Of course, you can also combine those two techniques in the same function.
+
+Functions are often used for code that you plan to call multiple times, but they can also be useful just to organize related bits of code into named collections, even if you only plan to call them once.
 
 Consider:
 
@@ -439,15 +522,15 @@ amount = calculateFinalPurchaseAmount( amount );
 console.log( amount.toFixed( 2 ) );		// "107.99"
 ```
 
-As you can see, we defined a function called `calculateFinalPurchaseAmount(..)`. This function takes a single argument, which we named internally `amt`. It also has a `return` statement, which means it returns a value back.
-
-We later call this function, passing in the current purchase amount (`99.99`), and we get back the new purchase amount with tax added (`107.9892`), which we format as a `string`, rounded to two digits (`"107.99"`).
+Even though `calculateFinalPurchaseAmount(..)` is only called once, organizing its behavior into a separate named function makes the code that uses its logic (the `amount = calculateFinal...` statement) cleaner. If the function had more statements in it, the benefits would be even more pronounced.
 
 ### Scope
 
-Functions introduce us to this idea of "scope" (technically called "lexical scope") -- each function gets its own scope. Scope is basically a collection of variables as well as the rules for how variables are accessed by name.
+If you ask the phone store employee for a phone model that this store doesn't carry, she will not be able to sell you the phone you want. She only has access to the phones in her store's inventory. You'll have to try another store to see if you can find the phone you're looking for.
 
-For example, a variable name has to be unique within the same scope -- there can't be two different `a` variables sitting right next to each other. But the same variable name `a` could appear in different scopes.
+Programming has a term for this concept: *scope* (technically called *lexical scope*). In JavaScript, each function gets its own scope. Scope is basically a collection of variables as well as the rules for how those variables are accessed by name. Only code inside that function can access that function's *scoped* variables.
+
+A variable name has to be unique within the same scope -- there can't be two different `a` variables sitting right next to each other. But the same variable name `a` could appear in different scopes.
 
 ```js
 function one() {
@@ -510,51 +593,6 @@ The `TAX_RATE` constant (variable) is accessible from inside the `calculateFinal
 
 **Note:** For more information about lexical scope, see the first three chapters of the *"Scope & Closures"* title of this book series.
 
-### Closure
-
-As we just saw, functions can be defined inside other functions (creating scopes inside other scopes).
-
-But functions can also be passed around as values themselves. That may sound like a strange concept at first, so take a moment to ponder it. Not only can a function be passed a value (argument), but **a function itself can be a value** that's assigned to variables, passed to other functions, or returned from a function.
-
-An extremely important feature of functions and lexical scope in languages like JavaScript is the idea of "closure", which is the ability of a function to remember and maintain access to variables, even after that function has finished running!
-
-```js
-function makeAdd(x) {
-
-	// inner function `add()` has closure
-	// over parameter variable `x`
-	function add(y) {
-		return x + y;
-	};
-
-	return add;
-}
-
-// `plusOne(..)` is the inner `add(..)` function with closure
-var plusOne = makeAdd( 1 );
-
-// `plusTen(..)` is the inner `add(..)` function with closure
-var plusTen = makeAdd( 10 );
-
-plusOne( 3 );		// 4  <-- 1 + 3
-plusOne( 41 );		// 42 <-- 1 + 41
-
-plusTen( 13 );		// 23 <-- 10 + 13
-```
-
-We won't get into all the nitty gritty of how this closure is working. But in a simple sense, the inner `add(..)` function that gets returned is able to remember whatever `x` value was passed to its outer `makeAdd(..)` function call.
-
-Some observations:
-
-1. When we call `makeAdd(1)`, we get a new function back, the inner `add(..)`, that we call `plusOne(..)`, which will remember `x` as `1`.
-2. When we call `makeAdd(10)`, we get yet another new function (again, the inner `add(..)`) back that we call `plusTen(..)`, which will remember `x` as `10`.
-3. When we call `plusOne(3)`, it adds `3` (assigned to the inner `y`) to the `1` (remembered in `x`), and we get `4`.
-4. When we call `plusTen(13)`, it adds `13` (the inner `y`) to the remembered `10` in `x`, and we get `23`.
-
-Don't worry if this seems strange and confusing -- it is! It'll take lots of practice to get it fully. But trust me, once you do, it's one of the most powerful and useful techniques in all of programming. It's definitely worth the effort to let your brain simmer on closures for a bit.
-
-**Note:** For more information about closures, see the *"Scope & Closures"* title of this book series, especially Chapter 5.
-
 ## Practice
 
 There is absolutely no substitute for practice in learning programming. No amount of articulate writing on my part is alone going to make you a programmer.
@@ -572,9 +610,9 @@ OK, go ahead. Try it. Don't peek at my code listing until you've given a shot yo
 Now, I'm obviously going to solve the practice exercise in JavaScript, since this is a JavaScript book. But you can do it in another language if you feel more comfortable.
 
 ```js
-const BANK_BALANCE = 303.91;
-const SPENDING_THRESHOLD = 200;
+var bank_balance = 303.91;
 
+const SPENDING_THRESHOLD = 200;
 const TAX_RATE = 0.08;
 const PHONE_PRICE = 99.99;
 const ACCESSORY_PRICE = 9.99;
@@ -591,7 +629,7 @@ function formatAmount(amount) {
 var amount = 0;
 
 // keep buying phones while you still have money
-while (amount < BANK_BALANCE) {
+while (amount < bank_balance) {
 	// buy a new phone!
 	amount = amount + PHONE_PRICE;
 
@@ -610,7 +648,7 @@ console.log(
 // Your purchase: $334.76
 
 // can you actually afford this purchase?
-if (amount > BANK_BALANCE) {
+if (amount > bank_balance) {
 	console.log(
 		"You can't afford this purchase. :("
 	);
@@ -626,8 +664,9 @@ How did you do? It wouldn't hurt to try it again now that you've seen my code. A
 
 Learning programming doesn't have to be a complex and involved process. There are just a few basic concepts you need to wrap your head around. These act like building blocks. To build a tall tower, you start first by putting block on top of block on top of block. The same goes with programming.
 
+* You need operators to perform actions on
 * You need values and types to differentiate different tasks, like performing math on numbers or output with strings.
-* You need variables to store data (aka "state") throughout your program's running.
+* You need variables to store data (aka *state*) throughout your program's execution.
 * You need conditionals like `if` statements to make decisions.
 * You need loops to repeat tasks until a condition stops being true.
 * You need functions to organize your code into logical and reusable chunks.

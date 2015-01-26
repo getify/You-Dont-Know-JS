@@ -491,11 +491,50 @@ Not only will strict mode keep your code to a safer path, and not only will it m
 
 ## Function Closure
 
-Closure is one of the most important, and often least understood, concepts in JavaScript. I won't cover it in detail here, since the *"Scope & Closures"* title in this book series does so. But we want to say a few things about it so you understand the general concept.
+*Closure* is one of the most important, and often least understood, concepts in JavaScript. I won't cover it in deep detail here, since the *"Scope & Closures"* title in this book series does so. But we want to say a few things about it so you understand the general concept.
+
+Functions can be passed around as values themselves. That may sound like a strange concept at first, so take a moment to ponder it. Not only can a function be passed a value (argument), but **a function itself can be a value** that's assigned to variables, passed to other functions, or returned from a function.
 
 You can think of closure as a way to "remember" and continue to access a function's scope (its inner variables) even once the function has finished running.
 
-The most common example of using closure is with the "module pattern", so that's how we'll illustrate it. This pattern is a way for you to define private implementation details (variables, functions) that are hidden from the outside world (similar to `private` members of a class), as well as a public API that is accessible from the outside.
+Consider:
+
+```js
+function makeAdder(x) {
+
+	// inner function `add()` has closure
+	// over parameter variable `x`
+	function add(y) {
+		return x + y;
+	};
+
+	return add;
+}
+
+// `plusOne(..)` is the inner `add(..)` function with closure
+var plusOne = makeAdder( 1 );
+
+// `plusTen(..)` is the inner `add(..)` function with closure
+var plusTen = makeAdder( 10 );
+
+plusOne( 3 );		// 4  <-- 1 + 3
+plusOne( 41 );		// 42 <-- 1 + 41
+
+plusTen( 13 );		// 23 <-- 10 + 13
+```
+
+We won't get into all the nitty gritty of how this closure is working. But in a simple sense, the inner `add(..)` function that gets returned with each call to the outer `makeAdder(..)` is able to remember whatever `x` value was passed in.
+
+Some observations:
+
+1. When we call `makeAdd(1)`, we get a new function back, the inner `add(..)`, that we call `plusOne(..)`, which will remember `x` as `1`.
+2. When we call `makeAdd(10)`, we get yet another new function (again, the inner `add(..)`) back that we call `plusTen(..)`, which will remember `x` as `10`.
+3. When we call `plusOne(3)`, it adds `3` (assigned to the inner `y`) to the `1` (remembered in `x`), and we get `4`.
+4. When we call `plusTen(13)`, it adds `13` (the inner `y`) to the remembered `10` in `x`, and we get `23`.
+
+Don't worry if this seems strange and confusing -- it is! It'll take lots of practice to get it fully. But trust me, once you do, it's one of the most powerful and useful techniques in all of programming. It's definitely worth the effort to let your brain simmer on closures for a bit.
+
+The most common example of using closure in JavaScript is with the "module pattern", so that's how we'll illustrate it. This pattern is a way for you to define private implementation details (variables, functions) that are hidden from the outside world (similar to `private` members of a class), as well as a public API that is accessible from the outside.
 
 Consider:
 
@@ -522,15 +561,15 @@ User.login( "fred", "12Battery34!" );
 
 Let's briefly break down what's going on here.
 
-First, the `(function(){ .. })()` part is called an IIFE (Immediately-Invoked-Function-Expression). For our purposes, it's just serving as the surrounding function so we can get closure with it.
+First, the `(function(){ .. })()` part is called an IIFE (Immediately-Invoked-Function-Expression). For our purposes, it's just serving as the surrounding function so functions like `doLogin()` inside it can get closure over its variables `username` and `password`.
 
-The `username`, `password`, and `doLogin()` are all private inner details of this `User` module; they cannot be accessed from the outside world.
+`username`, `password`, and `doLogin()` are all private inner details of this `User` module; they cannot be accessed from the outside world.
 
-`publicAPI` is an object with one property/method on it `login`, which is a reference to the inner `doLogin()` function. When we return `publicAPI` from this outer IIFE being executed, that `object` is assigned to the variable `User`.
+`publicAPI` is an object with one property/method on it `login`, which is just a reference to the inner `doLogin()` function. When we return `publicAPI` from this outer IIFE being executed, that `object` is assigned to the variable `User`.
 
-At this point, the outer function has finished executing. Normally, you'd think the inner variables like `username` and `password` have gone away. But they have not, because there's a closure keeping them alive.
+At this point, the outer function has finished executing. Normally, you'd think the inner variables like `username` and `password` have gone away. But here they have not, because there's a closure keeping the scope alive.
 
-That's why we can later call `User.login(..)`, which is like calling the inner `doLogin(..)`, and *that* function can still access `username` and `password` inner variables. Why? Because that scope is still around, because of closure.
+That's why we can later call `User.login(..)`, which is the same as calling the inner `doLogin(..)`, and *that* function can still access `username` and `password` inner variables. Why? Because that scope is still around, because of closure.
 
 There's a good chance that with just this brief glimpse at closure and the module pattern, some of it is still a bit confusing. That's OK! It takes some work to wrap your brain around it. From here, go read the *"Scope & Closures"* title of this book series for a much more in-depth exploration.
 
