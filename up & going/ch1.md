@@ -27,11 +27,11 @@ In a computer language, a group of words, numbers, and operators is a statement.
 a = b * 2;
 ```
 
-The characters `a` and `b` are called variables (see "Variables" later in this chapter), which are like cardboard boxes you can store your stuff in -- in programs, variables hold values (like the number `42`) to be used by the program. Think of them as symbolic replacements for values.
+The characters `a` and `b` are called variables (see "Variables"), which are like cardboard boxes you can store your stuff in -- in programs, variables hold values (like the number `42`) to be used by the program. Think of them as symbolic replacements for values.
 
 By contrast, the `2` is just a value itself, called a *literal value*, because it stands alone without being stored in a variable.
 
-The `=` and `*` characters are operators (see "Operators" later in this chapter) -- they perform actions with the values and variables such as assignment and mathematic multiplication. Most statments in JavaScript end with a `;` semicolon on the end.
+The `=` and `*` characters are operators (see "Operators") -- they perform actions with the values and variables such as assignment and mathematic multiplication. Most statments in JavaScript end with a `;` semicolon on the end.
 
 The statement `a = b * 2` tells the computer, roughly, to get the current value stored in the variable `b`, multiply that value by `2`, then store the result back into another variable we call `a`.
 
@@ -41,7 +41,7 @@ Programs are just collections of many such statements, which grouped together de
 
 How do those collections of programming statements tell the computer what to do? The program needs to be *executed*, also referred to as *running the program*.
 
-Statements like `a = b * 2` are more for intended for developers to read and write, but are not actually in a form the computer can directly understand. So a special utility on the computer is used to translate the code you write into commands a computer can understand.
+Statements like `a = b * 2` are more for intended for developers to read and write, but are not actually in a form the computer can directly understand. So a special utility on the computer (either an *interpreter* or a *compiler*) is used to translate the code you write into commands a computer can understand.
 
 For some computer languages, this translation of commands is typically done from top to bottom, line by line, every time the program is run, which is usually called *interpreting* the code.
 
@@ -55,7 +55,7 @@ It's typically asserted that JavaScript is *interpreted*, because your JavaScrip
 
 This chapter is going to introduce each programming concept with simple snippets of code, all written in JavaScript (obviously!).
 
-It cannot be emphasized enough, that while you go through this chapter -- and you may need to spend the time to go over it several times -- that you should practice each of these concepts by typing the code yourself. The easiest way to do that is to open up the developer tools console in your nearest browser (Firefox, Chrome, IE, etc).
+It cannot be emphasized enough: while you go through this chapter -- and you may need to spend the time to go over it several times -- you should practice each of these concepts by typing the code yourself. The easiest way to do that is to open up the developer tools console in your nearest browser (Firefox, Chrome, IE, etc).
 
 **Tip:** Typically, you can launch the developer console with a keyboard shortcut or from a menu item. For more detailed information about launching and using the console in your favorite browser, see "Mastering The Developer Tools Console" (http://blog.teamtreehouse.com/mastering-developer-tools-console).
 
@@ -83,9 +83,9 @@ Go on, try it. The best way to learn programming is to start coding!
 
 In the previous code snippet, we used `console.log(..)`. Briefly, let's look at what the line of code is all about.
 
-You may have guessed, but that's exactly how we print text (aka *output*) in the developer console. There are two characteristics of that statement that we should explain.
+You may have guessed, but that's exactly how we print text (aka *output* to the user) in the developer console. There are two characteristics of that statement that we should explain.
 
-First, the `log( b )` part is referred to as a function call (see "Functions" later in this chapter). What's happening is we're handing the `b` variable to that function, which asks it to take the value in `b` and print it to the console.
+First, the `log( b )` part is referred to as a function call (see "Functions"). What's happening is we're handing the `b` variable to that function, which asks it to take the value in `b` and print it to the console.
 
 Second, the `console.` part is an object reference where the `log(..)` function is located. We cover objects and their properties in more detail in Chapter 2.
 
@@ -95,7 +95,7 @@ Another way of creating output that you can see is to run an `alert(..)` stateme
 alert( b );
 ```
 
-If you run that, you'll notice that instead of printing the output to the console, it pops up an "OK" box with the contents of the `b` variable (`42` in this case). However, using `console.log(..)` is generally going to make learning about coding and running your programs easier than using `alert(..)`, since you can output many values at once without interrupting the browser interface.
+If you run that, you'll notice that instead of printing the output to the console, it shows a popup "OK" box with the contents of the `b` variable. However, using `console.log(..)` is generally going to make learning about coding and running your programs in the console easier than using `alert(..)`, since you can output many values at once without interrupting the browser interface.
 
 For this book, we'll use `console.log(..)` for output.
 
@@ -113,32 +113,34 @@ var age = prompt( "Please tell me your age:" );
 console.log( age );
 ```
 
+As you may have guessed, the message you pass to `prompt(..)`, in this case `"Please tell me your age:"`, is printed into the popup.
+
 This should look similar to the following:
 
 <img src="fig2.png" width="500">
 
-And then once you submit the *input* text, you'll see that it's put into the `age` variable that we then *output* with `console.log(..)`:
+Once you submit the *input* text by clicking "OK", you'll observe that the value you typed is stored in the `age` variable, which we then *output* with `console.log(..)`:
 
 <img src="fig3.png" width="500">
 
-To keep things simple while we're learning basic programming concepts, the examples in this book will not require input. But now that you've seen how to use `prompt(..)`, if you want to challenge yourself you can try to include input in your attempts with the examples.
+To keep things simple while we're learning basic programming concepts, the examples in this book will not require *input*. But now that you've seen how to use `prompt(..)`, if you want to challenge yourself you can try to use *input* in your explorations of the examples.
 
 ## Operators
 
 Operators are how we perform actions on variables and values.
 
-We've already seen two JavaScript operators, the `=` and the `*`. The `=` equals operator is used for *assignment*. That means we calculate some value on the *right-hand side* of the `=` and put it into the variable that we specify on the *left-hand side*.
+We've already seen two JavaScript operators, the `=` and the `*`. The `*` operator performs mathematic multiplication. The `=` equals operator is used for *assignment* -- we calculate a value on the *right-hand side* (source value) of the `=` and put it into the variable that we specify on the *left-hand side* (target variable).
 
-**Warning:** This may seem like a strange reverse order to specify assignment, where the target is on the left and the source is on the right. Instead of `a = 42;`, some might prefer to flip the order so the source value is on the left and the target variable is on the right, like `42 -> a;` (this is not valid JavaScript!). Unfortunately, the `a = 42` form, and similar variations, is quite prevalent in modern programming languages. You'll want to just spend some time practicing that ordering in your mind to get used to it.
+**Warning:** This may seem like a strange reverse order to specify assignment. Instead of `a = 42`, some might prefer to flip the order so the source value is on the left and the target variable is on the right, like `42 -> a` (this is not valid JavaScript!). Unfortunately, the `a = 42` ordered form, and similar variations, is quite prevalent in modern programming languages. If it feels unnatural, just spend some time rehearsing that ordering in your mind to get used to it.
 
-So:
+Consider:
 
 ```js
 a = 2;
 b = a + 1;
 ```
 
-Here, we assign the `2` value to the `a` variable. Then, we get the value of the `a` variable (`2`), add `1` to it, then assign that value (`3`) to the `b` variable.
+Here, we assign the `2` value to the `a` variable. Then, we get the value of the `a` variable (`2`), add `1` to it, computing the value `3`, then assign that value to the `b` variable.
 
 Let's briefly introduce some of the common operators in JavaScript that you'll likely see:
 
@@ -151,17 +153,19 @@ Let's briefly introduce some of the common operators in JavaScript that you'll l
 * Comparison: `<` (less than), `>` (greater than), `<=` (less than or loose equals), `>=` (greater than or loose equals), as in `a <= b`
 * Logical: `&&` (and), `||` (or), as in `a || b`
 
-For much more information and more operators not mentioned here, see MDN's "Expressions and Operators" (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators).
+For much more detail and operators not mentioned here, see MDN's "Expressions and Operators" (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators).
 
 ## Values & Types
 
-If you ask an employee at a phone store how much a certain phone costs, and they tell you "99.99", they're giving you an actual dollar figure that (plus taxes and fees) represents what you'll need to pay. If you wanted to buy two of those phones, you could easily do the mental math to double that value to get "199.98" for your base cost.
+If you ask an employee at a phone store how much a certain phone costs, and they say "ninety-nine, ninety-nine" (`99.99`), they're giving you an actual dollar figure that represents what you'll need to pay (plus taxes). If you wanted to buy two of those phones, you could easily do the mental math to double that value to get `199.98` for your base cost.
 
-If that same employee picks up another similar phone but says it's "free" (and perhaps uses air quotes), they're not giving you a number, but instead they're giving you another kind of representation of your expected cost -- the word "free". And if you later ask if the phone includes a charger, and the employee says "yes", they've provided an answer to a question that can only have one of two values, "yes" or "no" (in computer terms "true" and "false", respectively).
+If that same employee picks up another similar phone but says it's "free" (and perhaps uses air quotes), they're not giving you a number, but instead they're giving you another kind of representation of your expected cost (`0.00`) -- the word "free".
 
-In very similar ways, when you express values in a programs, you choose different representations for those values based on what you plan to do with the values. If you need to do math, you represent a value as a `number`. If you need to print a value to read on the screen, you need a `string` (one or more characters, words, sentences). And if you need to decide if something is a fact or not, you need a `boolean` (`true` or `false`).
+When you later ask if the phone includes a charger, and the employee says "yes", they've provided an answer to a question that can only have one of two values, "yes" or "no" (in computer terms `true` and `false`, respectively).
 
-These different representations for values are called "types" in programming terminology. JavaScript has built-in types for each of these so called "primitive" values.
+In very similar ways, when you express values in a programs, you choose different representations for those values based on what you plan to do with them. If you need to do math, you want a `number`. If you need to print a value on the screen, you need a `string` (one or more characters, words, sentences). And if you need to decide if something is a fact or not, you need a `boolean` (`true` or `false`).
+
+These different representations for values are called *types* in programming terminology. JavaScript has built-in *types* for each of these so called *primitive* values.
 
 Examples:
 
@@ -175,17 +179,17 @@ true;
 false;
 ```
 
-**Note:** For more information on "types" in JavaScript, see the first three chapters of the *"Types & Grammar"* title of this book series.
+**Note:** For more information on values and *types* in JavaScript, see the first three chapters of the *"Types & Grammar"* title of this book series.
 
 ### Converting Between Types
 
 If you have a `number` but need to print it on the screen, you need to convert the value to a `string`, and in JavaScript this conversion is called "coercion". Similarly, if someone enters a series of numeric characters into a form on a ecommerce page, that's a `string`, but if you need to then use that value to do math operations, you need to *coerce* it to a `number`.
 
-In JavaScript, a controversial topic is what happens when you try to compare two values to see if they're "equal", and those values are not already of the same type. For example, if you try to compare the string `"99.99"` to the number `99.99`, they *seem* to be equivalent, if not equal.
+In JavaScript, a controversial topic is what happens when you try to compare two values to determine if they're "equal", and those values are not already of the same type. For example, if you try to compare the string `"99.99"` to the number `99.99`, they *seem* to be equivalent, if not equal.
 
-To help you out in these common situations (like comparison), JavaScript will sometimes kick in and automatically (aka implicitly) coerce a value to a matching type. So if you make the comparison `"99.99" == 99.99`, JavaScript will convert the left-hand side, the `"99.99"` to its `number` equivalent `99.99`, so the comparison then becomes `99.99 == 99.99`, which is of course `true`.
+To help you out in these common situations (like comparison), JavaScript will sometimes kick in and automatically (aka implicitly) coerce a value to a matching type. So if you use the `==` loose equals operator to make the comparison `"99.99" == 99.99`, JavaScript will convert the left-hand side `"99.99"` to its `number` equivalent `99.99`. So the comparison then becomes `99.99 == 99.99`, which is of course `true`.
 
-While designed to help, *implicit* coercion can create lots of confusion if you haven't taken the time to learn the rules that govern its behavior. Most JS developers never have, so the common feeling is that *implicit* coercion is confusing and makes programs have unexpected bugs, and should thus be avoided. It's even sometimes called a "flaw" in the design of the language.
+While designed to help, *implicit* coercion can create lots of confusion if you haven't taken the time to learn the rules that govern its behavior. Most JS developers never have, so the common feeling is that *implicit* coercion is confusing and harms programs with unexpected bugs, and should thus be avoided. It's even sometimes called a "flaw" in the design of the language.
 
 However, *implicit* coercion is something that **can be learned**, and moreover **should be learned** by anyone wishing to take JavaScript programming seriously. Not only is it not confusing once you learn the rules, it can actually make your programs better! The effort is well worth it.
 
@@ -195,9 +199,9 @@ However, *implicit* coercion is something that **can be learned**, and moreover 
 
 One of the most important lessons you can learn about writing code is that it's not just for the computer. Code is every bit as much, if not more, for the developer as it is for the compiler.
 
-Your computer only cares about machine code, binary 0's and 1's. There's a nearly infinite number of different programs you could write that could produce the same final series of 0's and 1's. So the way you write your program matters. It matters not only to you, but to your other team members and even to your future self.
+Your computer only cares about machine code, binary 0's and 1's, that comes from *compilation*. There's a nearly infinite number programs you could write that yield the same series of 0's and 1's. The choices you make about how to write your program matter -- not only to you, but to your other team members and even to your future self.
 
-For that reason, you should strive to write not just programs that work, but programs that make sense when read. You can go a long way in that effort by choosing good names for your variables (see the next section) and functions (see later in the chapter).
+For that reason, you should strive not just to write programs that work, but programs that make sense when read. You can go a long way in that effort by choosing good names for your variables (see "Variables") and functions (see "Functions").
 
 But another important part is code comments. These are bits of text in your program which are inserted purely to explain things to a human. The compiler will always ignore these comments.
 
