@@ -5,6 +5,8 @@
 * Preface
 * Chapter 1: Into Programming
 	* Code
+	* Try It Yourself
+	* Operators
 	* Values & Types
 	* Code Comments
 	* Variables

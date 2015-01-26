@@ -27,13 +27,15 @@ In a computer language, a group of words, numbers, and operators is a statement.
 a = b * 2;
 ```
 
-The characters `a` and `b` are called variables (see "Variables" later in this chapter), which are like cardboard boxes you can store your stuff in -- in programs, variables hold values (like the number `42`) to be used by the program. The `2` is just a value itself, called a *literal value*, because it stands alone without being stored in a variable.
+The characters `a` and `b` are called variables (see "Variables" later in this chapter), which are like cardboard boxes you can store your stuff in -- in programs, variables hold values (like the number `42`) to be used by the program. Think of them as symbolic replacements for values.
+
+By contrast, the `2` is just a value itself, called a *literal value*, because it stands alone without being stored in a variable.
 
 The `=` and `*` characters are operators (see "Operators" later in this chapter) -- they perform actions with the values and variables such as assignment and mathematic multiplication. Most statments in JavaScript end with a `;` semicolon on the end.
 
 The statement `a = b * 2` tells the computer, roughly, to get the current value stored in the variable `b`, multiply that value by `2`, then store the result back into another variable we call `a`.
 
-Programs are nothing more than collections of many such statements, which taken together describe all the steps that it takes to perform a set of tasks.
+Programs are just collections of many such statements, which grouped together describe all the steps that it takes to perform a set of tasks.
 
 ### Executing a Program
 
@@ -43,21 +45,23 @@ Statements like `a = b * 2` are more for intended for developers to read and wri
 
 For some computer languages, this translation of commands is typically done from top to bottom, line by line, every time the program is run, which is usually called *interpreting* the code.
 
-For other languages, the translation is done ahead of time, called *compiling* the code, so when the program *runs* later, what's running is actually the already compiled computer instructions.
+For other languages, the translation is done ahead of time, called *compiling* the code, so when the program *runs* later, what's running is actually the already compiled computer instructions ready to go.
 
 It's typically asserted that JavaScript is *interpreted*, because your JavaScript source code is processed each time it's run. But that's not entirely accurate. The JavaScript engine actually *compiles* the program on-the-fly and then immediately runs the compiled code.
 
 **Note:** For more information on JavaScript compiling, see the first two chapters of the *"Scope & Closures"* title of this book series.
 
-### Try It Yourself
+## Try It Yourself
 
 This chapter is going to introduce each programming concept with simple snippets of code, all written in JavaScript (obviously!).
 
-It cannot be emphasized enough, that while you go through this chapter -- and you may need to spend the time to go over it several times -- that you should practice each of these concepts by typing the code yourself.
+It cannot be emphasized enough, that while you go through this chapter -- and you may need to spend the time to go over it several times -- that you should practice each of these concepts by typing the code yourself. The easiest way to do that is to open up the developer tools console in your nearest browser (Firefox, Chrome, IE, etc).
 
-The easiest way to do that is to open up the developer tools console in your nearest browser (Firefox, Chrome, IE, etc).
+**Tip:** Typically, you can launch the developer console with a keyboard shortcut or from a menu item. For more detailed information about launching and using the console in your favorite browser, see "Mastering The Developer Tools Console" (http://blog.teamtreehouse.com/mastering-developer-tools-console).
 
-For example, try to type this (even though its meaning may not yet be understandable) and see how it runs:
+Let's get familiar with the process of running code in the console. First, I suggest opening up an empty tab in your browser. I prefer to do this by typing `about:blank` into the address bar. Then, make sure your developer console is open, as we just mentioned.
+
+Now, type this code and see how it runs:
 
 ```js
 var a = 21;
@@ -67,13 +71,61 @@ var b = a * 2;
 console.log( b );
 ```
 
-**Tip:** To type multiple lines into the console at once, use `<shift> + <enter>` to get a new line. If you just hit `<enter>` by itself, it will run everything you've already typed.
+**Tip:** To type multiple lines into the console at once, use `<shift> + <enter>` to move to the next new line. Once you hit `<enter>` by itself, the console will run everything you've just typed.
 
-Typing that code into the console in Chrome would look something like this:
+Typing that code into the console in Chrome should look something like this:
 
 <img src="fig1.png" width="500">
 
-Go on, try it. The best way to learn programming is to start programming!
+Go on, try it. The best way to learn programming is to start coding!
+
+### Output
+
+In the previous code snippet, we used `console.log(..)`. Briefly, let's look at what the line of code is all about.
+
+You may have guessed, but that's exactly how we print text (aka *output*) in the developer console. There are two characteristics of that statement that we should explain.
+
+First, the `log( b )` part is referred to as a function call (see "Functions" later in this chapter). What's happening is we're handing the `b` variable to that function, which asks it to take the value in `b` and print it to the console.
+
+Second, the `console.` part is an object reference where the `log(..)` function is located. We cover objects and their properties in more detail in Chapter 2.
+
+Another way of creating output that you can see is to run an `alert(..)` statement, like:
+
+```js
+alert( b );
+```
+
+If you run that, you'll notice that instead of printing the output to the console, it pops up an "OK" box with the contents of the `b` variable (`42` in this case). However, using `console.log(..)` is generally going to make learning about coding and running your programs easier than using `alert(..)`, since you can output many values at once without interrupting the browser interface.
+
+For this book, we'll use `console.log(..)` for output.
+
+### Input
+
+While we're discussing output, you may also wonder about *input* -- that is, receiving information from the user.
+
+The most common way that happens is for the HTML page to show form elements (like text boxes) to a user that they can type into, and then using JS to read those values into your program's variables.
+
+But there's an easier way to get *input* for simple learning and demonstration purposes such as what you'll be doing throughout this book. Use the `prompt(..)` function:
+
+```js
+var age = prompt( "Please tell me your age:" );
+
+console.log( age );
+```
+
+This should look similar to the following:
+
+<img src="fig2.png" width="500">
+
+And then once you submit the *input* text, you'll see that it's put into the `age` variable that we then *output* with `console.log(..)`:
+
+<img src="fig3.png" width="500">
+
+To keep things simple while we're learning basic programming concepts, the examples in this book will not require on input. But now that you've seen how to use `prompt(..)`, if you want to challenge yourself you can try to include input in your attempts with the examples.
+
+## Operators
+
+Operators are how we perform actions on variables and values.
 
 ## Values & Types
 
