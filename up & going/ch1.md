@@ -9,7 +9,7 @@ This first chapter explains the basic principles of programming at a very high l
 
 Chapter 1 should be approached as a quick overview of the things you'll want to learn more about and practice to get *into programming*. There are also many other fantastic programming introduction resources which can help you dig into these topics further, and I encourage you to learn from them in addition to this chapter.
 
-Once you feel comfortable with general programming basics, Chapter 2 will help guide you to a familiarity with JavaScript's flavor of programming. Chapter 2 introduces what JavaScript is about, but it's not a comprehensive guide -- that's what the rest of the YDKJS books are for!
+Once you feel comfortable with general programming basics, Chapter 2 will help guide you to a familiarity with JavaScript's flavor of programming. Chapter 2 introduces what JavaScript is about, but again, it's not a comprehensive guide -- that's what the rest of the YDKJS books are for!
 
 If you're already somewhat comfortable with JavaScript and are ready to get started with the rest of the series, check out Chapter 3 as a brief glimpse of what to expect from YDKJS.
 
@@ -21,21 +21,56 @@ A program, often referred to as *code* or *source code*, is a set of special ins
 
 The rules for valid format and combinations of instructions is called a *computer language*, sometimes referred to as its *syntax*, much the same as English tells you how to spell words and how to create valid sentences using words and punctuation.
 
-In a computer language, a group of words, numbers, and operators is a statement. In JavaScript, a statement might look like this:
+### Statements
+
+In a computer language, a group of words, numbers, and operators that performs a specific task is a *statement*. In JavaScript, a *statement* might look like:
 
 ```js
 a = b * 2;
 ```
 
-The characters `a` and `b` are called variables (see "Variables"), which are like cardboard boxes you can store your stuff in -- in programs, variables hold values (like the number `42`) to be used by the program. Think of them as symbolic replacements for values.
+The characters `a` and `b` are called *variables* (see "Variables"), which are like simple boxes you can store any of your stuff in. In programs, variables hold values (like the number `42`) to be used by the program. Think of them as symbolic placeholders for the values themselves.
 
 By contrast, the `2` is just a value itself, called a *literal value*, because it stands alone without being stored in a variable.
 
-The `=` and `*` characters are operators (see "Operators") -- they perform actions with the values and variables such as assignment and mathematic multiplication. Most statments in JavaScript end with a `;` semicolon on the end.
+The `=` and `*` characters are *operators* (see "Operators") -- they perform actions with the values and variables such as assignment and mathematic multiplication.
 
-The statement `a = b * 2` tells the computer, roughly, to get the current value stored in the variable `b`, multiply that value by `2`, then store the result back into another variable we call `a`.
+Most statements in JavaScript end with a `;` semicolon on the end.
 
-Programs are just collections of many such statements, which grouped together describe all the steps that it takes to perform a set of tasks.
+The statement `a = b * 2;` tells the computer, roughly, to get the current value stored in the variable `b`, multiply that value by `2`, then store the result back into another variable we call `a`.
+
+Programs are just collections of many such statements, which together describe all the steps that it takes to perform your program's purpose.
+
+### Expressions
+
+Statements are made up of one or more *expressions*. An *expression* is any reference to a variable or value, or a set of variable(s) and value(s) combined with operators.
+
+For example:
+
+```js
+a = b * 2;
+```
+
+This statement has four expressions in it:
+
+* `2` is a *literal value expression*
+* `b` is a *variable expression*, which means to retrieve its current value.
+* `b * 2` is an *arithmetic expression*, which means to do the multiplication.
+* `a = b * 2` is an *assignment expression*, which means to assign the result of the `b * 2` expression to the variable `a` (more on assignments later).
+
+A general expression that stands alone is also called an *expression statement*, such as:
+
+```js
+b * 2;
+```
+
+This flavor of *expression statement* is not very common or useful, as generally it wouldn't have any affect on the running of the program -- it would retrive the value of `b` and multiply it by `2`, but then wouldn't do anything with that result.
+
+A more common *expression statement* is a *call expression* statement (see "Functions"), since the entire statement is the is the function call expression itself:
+
+```js
+console.log( a );
+```
 
 ### Executing a Program
 
@@ -142,9 +177,11 @@ a = 2;
 b = a + 1;
 ```
 
-Here, we assign the `2` value to the `a` variable. Then, we get the value of the `a` variable (`2`), add `1` to it, computing the value `3`, then assign that value to the `b` variable.
+Here, we assign the `2` value to the `a` variable. Then, we get the value of the `a` variable (still `2`), add `1` to it resulting in the value `3`, then store that value in the `b` variable.
 
-While not technically an operator, you'll need the keyword `var` right from the start, as it's used to declare *var*iables (see "Variables"). You only need to declare a variable once for each scope (see "Scope"); it can be used as many times after that as needed. For example:
+While not technically an operator, you'll need the keyword `var` in every program, as it's the primary way you *declare* (aka *create*) *var*iables (see "Variables").
+
+You only need to *declare* a variable once for each *scope* (see "Scope"); it can be used as many times after that as needed. For example:
 
 ```js
 var a = 20;
@@ -400,7 +437,9 @@ if (amount > 10) {
 }
 ```
 
-We'll explain `if` statements in the next section, but as you can see, the `{ .. }` block with its two statements is attached to `if (amount > 10)`. The statements inside the block will only be processed if the conditional passes.
+We'll explain `if` statements in the next section, but as you can see, the `{ .. }` block with its two statements is attached to `if (amount > 10)`; the statements inside the block will only be processed if the conditional passes.
+
+**Note:** Unlike most other statements like `console.log(amount);`, a block statement does not need a `;` semicolon to end it.
 
 ## Conditionals
 
