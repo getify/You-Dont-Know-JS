@@ -9,7 +9,7 @@ Especially if you're new to JavaScript, you should expect to spend quite a bit o
 
 Your journey to deeply learn JavaScript starts here.
 
-**Note:** As I said in Chapter 1, you should definitely try all this code yourself as you read and work through this chapter. Be aware that some of the code here assumes ES6, so if you happen to be using an older pre-ES6 browser the code may not work. A recent update of a modern browser like Chrome or FF should be used.
+**Note:** As I said in Chapter 1, you should definitely try all this code yourself as you read and work through this chapter. Be aware that some of the code here assumes capabilities introduced in the newest version of JavaScript at the time of this writing (commonly referred to as "ES6" for the 6th edition of ECMAScript -- the official name of the JS specification). If you happen to be using an older pre-ES6 browser the code may not work. A recent update of a modern browser (like Chrome or FF) should be used.
 
 ## Values & Types
 
@@ -57,7 +57,7 @@ Notice how in this snippet the `a` variable holds every different type of value,
 
 Also, note `a = undefined`. We're explicitly setting `a` to this `undefined` value, but that is behaviorally no different from a variable that has no value set yet, like with the `var a;` line at the top of the snippet. A variable can get to this "undefined" value state in several different ways, including functions which return no values and usage of the `void` operator.
 
-The `object` type refers to a compound value where you can set properties that each hold their own values of any type. This is perhaps one of the most useful value types in all of JavaScript.
+The `object` type refers to a compound value where you can set properties (named locations to store values) that each hold their own values of any type. This is perhaps one of the most useful value types in all of JavaScript.
 
 ```js
 var obj = {
@@ -75,9 +75,9 @@ obj["b"];	// 42
 obj["c"];	// true
 ```
 
-Properties can either be accessed with "dot notation" `obj.a` or "bracket notation" `obj["a"]`. Dot notation is shorter and generally easier to read, and is thus preferred. Bracket notation is useful if you have a property name that has special characters in it, like `obj["hello world!"]` -- such properties are often referred to as *keys* when accessed via bracket notation.
+Properties can either be accessed with "dot notation" `obj.a` or "bracket notation" `obj["a"]`. Dot notation is shorter and generally easier to read, and is thus preferred. Bracket notation is useful if you have a property name that has special characters in it, like `obj["hello world!"]` -- such properties are often referred to as *keys* when accessed via bracket notation. The `[ ]` notation requires either a variable (explained next) or a `string` *literal* (which needs to be wrapped in `" .. "` or `' .. '`).
 
-Of course, bracket notation is also required if you want to access a property/key but the name is stored in another variable, such as:
+Of course, bracket notation is also useful if you want to access a property/key but the name is stored in another variable, such as:
 
 ```js
 var obj = {
@@ -95,6 +95,8 @@ obj["b"];		// 42
 
 There are a couple of other value types that you will commonly interact with in JavaScript programs: *array* and *function*. But rather than being proper built-in types, these should be thought of more like subtypes -- specialized versions of the `object` type.
 
+### Arrays
+
 An *array* is an `object` that holds values (of any type) not particularly in named properties/keys, but rather in numerically indexed positions. For example:
 
 ```js
@@ -111,11 +113,15 @@ arr.length;		// 3
 typeof arr;		// "object"
 ```
 
+**Note:** Languages which start counting at zero, like JS does, use `0` as the index of the first element in the array.
+
 Since *array*s are special objects (as `typeof` implies), they can also have properties, including the automatically updated `length` property.
 
 You theoretically could use an *array* as a normal object with your own named properties, or you could use an `object` but only give it numeric properties (`0`, `1`, etc) similar to an *array*. However, such would generally be considered improper usage of the respective types.
 
 The best and most natural approach is to use *array*s for numerically positioned values and use `object`s for named properties.
+
+### Functions
 
 The other `object` subtype you'll use all over your JS programs is *function*:
 
@@ -152,9 +158,11 @@ b.toFixed(4);			// "3.1416"
 
 The "how" behind being able to call `a.toUpperCase()` is more complicated than just that method existing on the value.
 
-Briefly, there is a `String` (capital `S`) object wrapper form, typically called a "native", that pairs with a primitive `string` value; it's this object wrapper that defines the `toUpperCase()` method on its prototype. When you use a primitive value like `"hello world"` as an `object` by referencing a property or method, JS automatically "boxes" the value to that object wrapper counterpart.
+Briefly, there is a `String` (capital `S`) object wrapper form, typically called a "native", that pairs with a primitive `string` value; it's this object wrapper that defines the `toUpperCase()` method on its prototype.
 
-A `string` value can be wrapped by a `String`, a `number` can be wrapped by a `Number`, a `boolean` can be wrapped by a `Boolean`, etc. For the most part, you don't need to worry about or directly use these object wrapper forms of the values -- prefer the primitive value forms in practically all cases and JavaScript will take care of the rest for you.
+When you use a primitive value like `"hello world"` as an `object` by referencing a property or method -- for example: `a.toUpperCase()` in the previous snippet -- JS automatically "boxes" the value to its object wrapper counterpart (hidden under the covers).
+
+A `string` value is wrapped by a `String` object, a `number` can is wrapped by a `Number` object, a `boolean` is be wrapped by a `Boolean` object, etc. For the most part, you don't need to worry about or directly use these object wrapper forms of the values -- prefer the primitive value forms in practically all cases and JavaScript will take care of the rest for you.
 
 **Note:** For more information on JS natives and "boxing", see Chapter 3 of the *"Types & Grammar"* title of this book series. To better understand the prototype of an object, see Chapter 5 of the *"this & Object Prototypes"* title of this book series.
 
@@ -162,21 +170,17 @@ A `string` value can be wrapped by a `String`, a `number` can be wrapped by a `N
 
 There are two main types of value comparison that you will need to make in your JS programs: *equality* and *inequality*. The result of any comparison is a strictly `boolean` value (`true` or `false`), regardless of what value types are compared.
 
-#### Equality
-
-There are four *equality* operators: `==`, `===`, `!=`, and `!==`. The `!` forms are of course the symmetric "not equal" versions of their counterparts; non-*equality* should not be confused with *inequality*.
-
-The difference between `==` and `===` is usually characterized that `==` checks for value equality and `===` checks for both value and type equality. However, this is inaccurate. The proper way to characterize them is that `==` checks for value equality with *coercion* allowed, and `===` checks for value equality without allowing *coercion*; `===` is often called "strict equality" for this reason.
+#### Coercion
 
 We talked briefly about *coercion* in Chapter 1, but let's revisit it here.
 
-Coercion comes in two forms in JavaScript: *explicit* and *implicit*. Explicit coercion is simply that you can see obviously from the code that a conversion from one type to another will occur, whereas implicit coercion is when the type conversion can happen as more of a non-obvious side effect of some other operation.
+Coercion comes in two forms in JavaScript: *explicit* and *implicit*. *Explicit* coercion is simply that you can see obviously from the code that a conversion from one type to another will occur, whereas *implicit* coercion is when the type conversion can happen as more of a non-obvious side effect of some other operation.
 
 You've probably heard sentiments like "coercion is evil" drawn from the fact that there are clearly places where coercion can produce some surprising results. Perhaps nothing evokes frustration from developers more than when the language surprises them.
 
-Coercion is not evil, nor does it have to be surprising. In fact, the majority of cases you can construct around type coercion are quite sensible and understandable, and can even be used to **improve** the readability of your code. But we won't go much further into that debate -- Chapter 4 of the *"Types & Grammar"* title of this book series covers all sides.
+Coercion is not evil, nor does it have to be surprising. In fact, the majority of cases you can construct with type coercion are quite sensible and understandable, and can even be used to **improve** the readability of your code. But we won't go much further into that debate -- Chapter 4 of the *"Types & Grammar"* title of this book series covers all sides.
 
-Explicit coercion:
+*Explicit* coercion:
 
 ```js
 var a = "42";
@@ -187,7 +191,7 @@ a;				// "42"
 b;				// 42 -- the number!
 ```
 
-Implicit coercion:
+*Implicit* coercion:
 
 ```js
 var a = "42";
@@ -198,7 +202,35 @@ a;				// "42"
 b;				// 42 -- the number!
 ```
 
-It's this implicit flavor of coercion that best describes what happens with the coercion-enabled `==` equality. For example:
+##### Truthy & Falsy
+
+In Chapter 1, we briefly mentioned the "truthy" and "falsy" nature of values: when a non-`boolean` value is coerced to a `boolean`, does it become `true` or `false`, respectively?
+
+The specific list of "falsy" values in JavaScript is:
+
+* `""` (empty string)
+* `0`, `-0`, `NaN` (invalid `number`)
+* `null`, `undefined`
+* `false`
+
+Any value that's not on this "falsy" list is "truthy". Examples of those would be:
+
+* `"hello"`
+* `42`
+* `true`
+* `[ ]`, `[ 1, "2", 3 ]` (arrays)
+* `{ }`, `{ a: 42 }` (objects)
+* `function foo() { .. }` (functions)
+
+It's important to remember that a non-`boolean` value only follows this "truthy"/"falsy" coercion if its actually coerced to a `boolean`. It's not all that difficult to confuse yourself with a situation which seems like it's coercing to a value to a `boolean` when it's not.
+
+#### Equality
+
+There are four *equality* operators: `==`, `===`, `!=`, and `!==`. The `!` forms are of course the symmetric "not equal" versions of their counterparts; non-*equality* should not be confused with *inequality*.
+
+The difference between `==` and `===` is usually characterized that `==` checks for value equality and `===` checks for both value and type equality. However, this is inaccurate. The proper way to characterize them is that `==` checks for value equality with *coercion* allowed, and `===` checks for value equality without allowing *coercion*; `===` is often called "strict equality" for this reason.
+
+Consider the *implicit* coercion that's allowed by the `==` loose-equality comparison and not allowed with the `===` strict-equality.
 
 ```js
 var a = "42";

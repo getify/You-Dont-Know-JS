@@ -181,7 +181,7 @@ Here, we assign the `2` value to the `a` variable. Then, we get the value of the
 
 While not technically an operator, you'll need the keyword `var` in every program, as it's the primary way you *declare* (aka *create*) *var*iables (see "Variables").
 
-You only need to *declare* a variable once for each *scope* (see "Scope"); it can be used as many times after that as needed. For example:
+You need to *declare* the variable by name before you can use it. But you only need to *declare* a variable once for each *scope* (see "Scope"); it can be used as many times after that as needed. For example:
 
 ```js
 var a = 20;
@@ -221,11 +221,15 @@ If that same employee picks up another similar phone but says it's "free" (perha
 
 When you later ask if the phone includes a charger, and the employee says "yes", that answer could only have been either "yes" or "no" (just like `true` and `false`, respectively).
 
-In very similar ways, when you express values in a programs, you choose different representations for those values based on what you plan to do with them. If you need to do math, you want a `number`. If you need to print a value on the screen, you need a `string` (one or more characters, words, sentences). And if you need to decide if something is a fact or not, you need a `boolean` (`true` or `false`).
+In very similar ways, when you express values in a programs, you choose different representations for those values based on what you plan to do with them.
 
-These different representations for values are called *types* in programming terminology. JavaScript has built-in *types* for each of these so called *primitive* values.
+These different representations for values are called *types* in programming terminology. JavaScript has built-in *types* for each of these so called *primitive* values:
 
-Expressing values directly in the program is called value *literals*. `string` *literals* are surrounded by `" .. "` double-quotes or `' .. '` single-quotes. `number` and `boolean` literals are just presented as is (i.e., `42`, `true`, etc.).
+* When you need to do math, you want a `number`.
+* When you need to print a value on the screen, you need a `string` (one or more characters, words, sentences).
+* When you need to make a decision in your program, you need a `boolean` (`true` or `false`).
+
+Values that are included directly in the source code are called *literals*. `string` *literals* are surrounded by `" .. "` double-quotes or `' .. '` single-quotes. `number` and `boolean` literals are just presented as is (i.e., `42`, `true`, etc.).
 
 Consider:
 
@@ -239,13 +243,13 @@ true;
 false;
 ```
 
-**Note:** For more information on values and *types* in JavaScript, see the first three chapters of the *"Types & Grammar"* title of this book series.
+Beyond `string`/`number`/`boolean` value *types*, it's common for programming languages to provide *arrays*, *objects*, *functions*, and more. We'll cover much more about values and *types* throughout this chapter and the next.
 
 ### Converting Between Types
 
 If you have a `number` but need to print it on the screen, you need to convert the value to a `string`, and in JavaScript this conversion is called "coercion". Similarly, if someone enters a series of numeric characters into a form on a ecommerce page, that's a `string`, but if you need to then use that value to do math operations, you need to *coerce* it to a `number`.
 
-JavaScript provides several different facilities for forcibly coercing between types. For example:
+JavaScript provides several different facilities for forcibly coercing between *types*. For example:
 
 ```js
 var a = "42";
@@ -255,11 +259,11 @@ console.log( a );	// "42"
 console.log( b );	// 42
 ```
 
-Using `Number(..)` as shown is an *explicit* coercion from any other type to the `number` type. But a controversial topic is what happens when you try to compare two values that are not already of the same type, which would require *implicit* coercion.
+Using `Number(..)` as shown is an *explicit* coercion from any other *type* to the `number` *type*. But a controversial topic is what happens when you try to compare two values that are not already of the same *type*, which would require *implicit* coercion.
 
 When comparing the string `"99.99"` to the number `99.99`, most people would agree they are equivalent, if not equal. But they're not exactly the same, are they? It's the same value in two different representations, two different *types*. You could say they're "loosely equal", couldn't you?
 
-To help you out in these common situations, JavaScript will sometimes kick in and *implicitly* coerce values to the matching types.
+To help you out in these common situations, JavaScript will sometimes kick in and *implicitly* coerce values to the matching *types*.
 
 So if you use the `==` loose equals operator to make the comparison `"99.99" == 99.99`, JavaScript will convert the left-hand side `"99.99"` to its `number` equivalent `99.99`. The comparison then becomes `99.99 == 99.99`, which is of course `true`.
 
@@ -341,7 +345,7 @@ In some programming languages, you declare a variable (container) to hold a spec
 
 Other languages emphasize *types* for values instead of variables. *Weak typing*, otherwise known as *dynamic typing*, allows a variable to hold any *type* of value at any time. It's typically cited as a benefit for program flexibility by allowing a single variable to represent a value no matter what *type* form that value may take at any given moment in the program's logic flow.
 
-JavaScript uses the latter approach, *dynamic typing*, meaning variables can hold values of any *type* without any type enforcement.
+JavaScript uses the latter approach, *dynamic typing*, meaning variables can hold values of any *type* without any *type* enforcement.
 
 As mentioned earlier, we declare a variable using the `var` statement -- notice there's no other *type* information in the declaration. Consider this simple program:
 
@@ -365,7 +369,7 @@ The first `console.log(..)` command has to *implicitly* coerce that `number` val
 
 Then the statement `amount = "$" + String(amount)` *explicitly* coerces the `199.98` value to a `string` and adds a `"$"` character to the beginning. At this point, `amount` now holds the `string` value `"$199.98"`, so the second `console.log(..)` statement doesn't need to do any coercion to print it out.
 
-JavaScript developers will note the flexibility of using the `amount` variable for each of the `99.99`, `199.98`, and the `"$199.98"` values. Static-typing enthusiasts would prefer a separate variable like `amountStr` to hold the final `"$199.98"` representation of the value, since it's a different type.
+JavaScript developers will note the flexibility of using the `amount` variable for each of the `99.99`, `199.98`, and the `"$199.98"` values. Static-typing enthusiasts would prefer a separate variable like `amountStr` to hold the final `"$199.98"` representation of the value, since it's a different *type*.
 
 Either way, you'll note that `amount` holds a running value that changes over the course of the program, illustrating the primary purpose of variables: managing program *state*.
 
@@ -405,7 +409,7 @@ var amount = 99.99;
 // ..
 ```
 
-If you tried to assign any different value to `TAX_RATE` after that first declaration, your program would fail with an error. That kind of "protection" against mistakes is similar to the static-typing type enforcement enthusiasm, so you can see why it's attractive in other languages!
+If you tried to assign any different value to `TAX_RATE` after that first declaration, your program would fail with an error. That kind of "protection" against mistakes is similar to the static-typing *type* enforcement enthusiasm, so you can see why it's attractive in other languages!
 
 **Note:** For more information about how different values in variables can be used in your programs, see the *"Types & Grammar"* title of this book series.
 
@@ -475,6 +479,7 @@ if ( amount < bank_balance ) {
 	console.log( "I'll take the accessory!" );
 	amount = amount + ACCESSORY_PRICE;
 }
+// otherwise:
 else {
 	console.log( "No, thanks." );
 }
@@ -482,13 +487,13 @@ else {
 
 Here, if `amount < bank_balance` is `true`, we'll print out `"I'll take the accessory!"` and add the `9.99` to our `amount` variable. Otherwise, the `else` clause says we'll just politely respond with `"No, thanks."` and leave `amount` unchanged.
 
-As we discussed in "Values & Types", values which aren't already of an expected type are often coerced to that type. The `if` statement expects a `boolean`, but if you pass it something that's not already `boolean`, coercion will occur.
+As we discussed in "Values & Types" earlier, values which aren't already of an expected *type* are often coerced to that *type*. The `if` statement expects a `boolean`, but if you pass it something that's not already `boolean`, coercion will occur.
 
-Certain values in JavaScript are considered "falsy" if when asked to coerce to a `boolean`, they become `false` -- these include values like `0` and `""`. Other values are called "truthy" because when asked to coerce to a `boolean` they become `true` -- these include values like `99.99` and `"free"`.
+JavaScript defines a list of specific values that are considered "falsy" because when coerced to a `boolean`, they become `false` -- these include values like `0` and `""`. Any other value not on the "falsy" list is automatically "truthy" -- when coerced to a `boolean` they become `true`. Truthy values include things like `99.99` and `"free"`. See "Truthy & Falsy" in Chapter 2 for more information.
 
-*Conditionals* exist in other forms, too. For example, the `switch` statement is like a short-hand for a series of `if..else` statements (see Chapter 2). Loops (see "Loops") use a *conditional* to determine if the loop should keep going or stop.
+*Conditionals* exist in other forms besides the `if`. For example, the `switch` statement can be used as a short-hand for a series of `if..else` statements (see Chapter 2). Loops (see "Loops") use a *conditional* to determine if the loop should keep going or stop.
 
-**Note:** For more information about the coercions that can occur implicitly in conditionals' test expressions, see Chapter 4 of the *"Types & Grammar"* title of this series.
+**Note:** For deeper information about the coercions that can occur implicitly in *conditionals*' test expressions, see Chapter 4 of the *"Types & Grammar"* title of this series.
 
 ## Loops
 
@@ -496,19 +501,27 @@ During busy times, there's a waiting list for customers waiting to speak to the 
 
 Repeating a set of actions until a certain condition is met is the job of programming loops; loops can take different forms, but they all satisfy this basic behavior.
 
-For example, the `while` loop and the `do..while` (some languages call it `until` instead of `while`) loop forms are direct expressions of that idea:
+A loop includes the test condition as well as a block (typically as `{ .. }`). Each time the loop block executes, that's called an *iteration*.
+
+For example, the `while` loop and the `do..while` loop forms illustrate the concept of repeating a block of statements until a condition no longer evaluates to `true`:
 
 ```js
 while (numOfCustomers > 0) {
 	console.log( "How may I help you?" );
-	// ..
+
+	// help the customer...
+
+	numOfCustomers = numOfCustomers - 1;
 }
 
 // versus:
 
 do {
 	console.log( "How may I help you?" );
-	// ..
+
+	// help the customer...
+
+	numOfCustomers = numOfCustomers - 1;
 } while (numOfCustomers > 0);
 ```
 
@@ -518,13 +531,15 @@ In either form, if the conditional tests as `false`, the next iteration will not
 
 Sometimes you are looping for the intended purpose of counting a certain set of numbers, like from `0` to `9` (ten numbers). You can do that by setting a loop iteration variable like `i` at value `0` and incrementing it by `1` each iteration.
 
+**Warning:** For a variety of historical reasons, programming languages almost always count things zero-based, meaning starting with `0` instead of `1`. If you're not used to that mode of thinking, it can be quite confusing at first. Take some time to practice and rehearse counting starting with `0` to get used to it!
+
 The conditional is tested on each iteration, much as if there is an implied `if` statement inside the loop.
 
 We can use JavaScript's `break` statement to stop a loop. Also, we can observe that it's awfully easy to create a loop that would otherwise run forever without a `break`ing mechanism.
 
 **Warning:** This is not necessarily a practical form you'd want to use for your loops, but it's presented here for illustration purposes only.
 
-Consider:
+Let's illustrate:
 
 ```js
 var i = 0;
@@ -766,15 +781,17 @@ How did you do? It wouldn't hurt to try it again now that you've seen my code. A
 
 Learning programming doesn't have to be a complex and involved process. There are just a few basic concepts you need to wrap your head around. These act like building blocks. To build a tall tower, you start first by putting block on top of block on top of block. The same goes with programming.
 
-* You need operators to perform actions on
-* You need values and types to differentiate different tasks, like performing math on numbers or output with strings.
-* You need variables to store data (aka *state*) throughout your program's execution.
-* You need conditionals like `if` statements to make decisions.
-* You need loops to repeat tasks until a condition stops being true.
-* You need functions to organize your code into logical and reusable chunks.
+* You need *operators* to perform actions on
+* You need values and *types* to perform different kinds of actions like math on `number`s or output with `string`s.
+* You need *variables* to store data (aka *state*) during your program's execution.
+* You need *conditionals* like `if` statements to make decisions.
+* You need *loops* to repeat tasks until a condition stops being true.
+* You need *functions* to organize your code into logical and reusable chunks.
 
 Code comments are one effective way to write more readable code, which makes your program easier to understand, maintain, and fix later if there are problems.
 
 Finally, don't neglect the power of practice. The best way to learn how to write code is to write code.
 
-I'm excited you're well on your way to learning how to code, now! Keep it up. The next chapter will talk a lot more specifically about JavaScript, and introduce you to topics that will be covered in detail throughout the rest of the series.
+I'm excited you're well on your way to learning how to code, now! Keep it up. Don't forget to check out other beginner programming resources (books, blogs, online training, etc.). This chapter and this book are a great start but they're certainly just a brief introduction.
+
+The next chapter will review many of the concepts from this chapter, but in a JavaScript-specific perspective, which will highlight most of the major topics that are addressed in deeper detail throughout the rest of the series.
