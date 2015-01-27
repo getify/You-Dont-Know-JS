@@ -10,6 +10,7 @@
 	* Values & Types
 	* Code Comments
 	* Variables
+	* Blocks
 	* Conditionals
 	* Loops
 	* Functions

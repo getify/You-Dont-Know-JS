@@ -129,7 +129,9 @@ To keep things simple while we're learning basic programming concepts, the examp
 
 Operators are how we perform actions on variables and values.
 
-We've already seen two JavaScript operators, the `=` and the `*`. The `*` operator performs mathematic multiplication. The `=` equals operator is used for *assignment* -- we calculate a value on the *right-hand side* (source value) of the `=` and put it into the variable that we specify on the *left-hand side* (target variable).
+We've already seen two JavaScript operators, the `=` and the `*`. The `*` operator performs mathematic multiplication.
+
+The `=` equals operator is used for *assignment* -- we first calculate the value on the *right-hand side* (source value) of the `=` and then put it into the variable that we specify on the *left-hand side* (target variable).
 
 **Warning:** This may seem like a strange reverse order to specify assignment. Instead of `a = 42`, some might prefer to flip the order so the source value is on the left and the target variable is on the right, like `42 -> a` (this is not valid JavaScript!). Unfortunately, the `a = 42` ordered form, and similar variations, is quite prevalent in modern programming languages. If it feels unnatural, just spend some time rehearsing that ordering in your mind to get used to it.
 
@@ -142,18 +144,37 @@ b = a + 1;
 
 Here, we assign the `2` value to the `a` variable. Then, we get the value of the `a` variable (`2`), add `1` to it, computing the value `3`, then assign that value to the `b` variable.
 
-Let's briefly introduce some of the common operators in JavaScript that you'll likely see:
+While not technically an operator, you'll need the keyword `var` right from the start, as it's used to declare *var*iables (see "Variables"). You only need to declare a variable once for each scope (see "Scope"); it can be used as many times after that as needed. For example:
 
-* Assignment: `=` as in `a = 2`
-* Math: `+` (addition), `-` (subtraction), `*` (multiplication), and `/` (division), as in `a * 3`
-* Compound Assignment: `+=`, `-=`, `*=`, and `/=` are compound operators that combine a math operation with assignment, as in `a += 2` (same as `a = a + 2`)
-* Increment/Decrement: `++` (increment), `--` (decrement), as in `a--` (similar to `a = a - 1`)
+```js
+var a = 20;
+
+a = a + 1;
+a = a * 2;
+
+console.log( a );	// 42
+```
+
+Some of the most common operators in JavaScript:
+
+* Assignment: `=` as in `a = 2`.
+* Math: `+` (addition), `-` (subtraction), `*` (multiplication), and `/` (division), as in `a * 3`.
+* Compound Assignment: `+=`, `-=`, `*=`, and `/=` are compound operators that combine a math operation with assignment, as in `a += 2` (same as `a = a + 2`).
+* Increment/Decrement: `++` (increment), `--` (decrement), as in `a++` (similar to `a = a + 1`).
 * Object Property Access: `.` as in `console.log()`.
-* Equality: `==` (loose equals), `===` (strict equals), `!=` (loose not-equals), `!==` (strict not-equals), as in `a == b`
-* Comparison: `<` (less than), `>` (greater than), `<=` (less than or loose equals), `>=` (greater than or loose equals), as in `a <= b`
-* Logical: `&&` (and), `||` (or), as in `a || b`
 
-For much more detail and operators not mentioned here, see MDN's "Expressions and Operators" (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators).
+   Objects are values which hold other values at specific named locations called properties. `obj.a` means an object value called `obj` with a property of the name `a`. Properties can alternately be accessed as `obj["a"]`. See Chapter 2.
+* Equality: `==` (loose-equals), `===` (strict-equals), `!=` (loose not-equals), `!==` (strict not-equals), as in `a == b`.
+
+   See "Values & Types" and Chapter 2.
+* Comparison: `<` (less than), `>` (greater than), `<=` (less than or loose-equals), `>=` (greater than or loose-equals), as in `a <= b`.
+
+   See "Values & Types" and Chapter 2.
+* Logical: `&&` (and), `||` (or), as in `a || b` that selects either `a` *or* `b`.
+
+   These operators are used to express compound conditionals (see "Conditionals"), like if either `a` *or* `b` is true.
+
+**Note:** For much more detail and operators not mentioned here, see MDN's "Expressions and Operators" (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators).
 
 ## Values & Types
 
@@ -167,7 +188,9 @@ In very similar ways, when you express values in a programs, you choose differen
 
 These different representations for values are called *types* in programming terminology. JavaScript has built-in *types* for each of these so called *primitive* values.
 
-Examples:
+Expressing values directly in the program is called value *literals*. `string` *literals* are surrounded by `" .. "` double-quotes or `' .. '` single-quotes. `number` and `boolean` literals are just presented as is (i.e., `42`, `true`, etc.).
+
+Consider:
 
 ```js
 "I am a string";
@@ -227,22 +250,22 @@ There's lots of opinions on what makes well commented code or not; we can't real
 * Too many comments (one per line, for example) is probably a sign of poorly written code.
 * Comments should explain WHY, not WHAT. They can optionally explain HOW if that's particularly confusing.
 
-In JavaScript, there are two types of comments possible: a single-line comment, and a multi-line comment.
+In JavaScript, there are two types of comments possible: a single-line comment, and a multiline comment.
 
 Consider:
 
 ```js
-// This is a single line comment
+// This is a single-line comment
 
-// This is another single line comment
+// This is another single-line comment
 
 /* But this is
-       a multi-line
+       a multiline
              comment.
                       */
 ```
 
-The `//` single-line comment is appropriate if you're going to put a comment right above a single statement, or even at the end of a line. Everything on the line after the `//` is treated as the comment (and thus ignored by the compiler), all the way to the end of the line. There's no restriction to what can appear inside a comment.
+The `//` single-line comment is appropriate if you're going to put a comment right above a single statement, or even at the end of a line. Everything on the line after the `//` is treated as the comment (and thus ignored by the compiler), all the way to the end of the line. There's no restriction to what can appear inside a single-line comment.
 
 Consider:
 
@@ -250,13 +273,23 @@ Consider:
 var a = 42;		// 42 is the meaning of life
 ```
 
-The `/* .. */` multi-line comment is appropriate if you have several sentences worth of explanation to make in your comment. It can appear anywhere on a line, even in the middle of a line, since the `*/` ends it. The only thing that cannot appear inside a multi-line comment is a `*/`, since that would be taken to end the comment.
+The `/* .. */` multiline comment is appropriate if you have several lines worth of explanation to make in your comment.
+
+Here's a common usage of multiline comments:
 
 ```js
 /* The following value is used because
    it has been shown that it answers
    every question in the universe. */
 var a = 42;
+```
+
+It can also appear anywhere on a line, even in the middle of a line, since the `*/` ends it. The only thing that cannot appear inside a multiline comment is a `*/`, since that would be interpreted to end the comment. For example
+
+```js
+var a = /* arbitrary value */ 42;
+
+console.log( a );	// 42
 ```
 
 You will definitely want to begin your learning of programming by starting off with the habit of commenting code. Throughout the rest of this chapter, you'll see I use comments to explain things, so do the same in your own practice. Trust me, everyone who reads your code will thank you!
@@ -273,7 +306,7 @@ Other languages emphasize *types* for values instead of variables. *Weak typing*
 
 JavaScript uses the latter approach, *dynamic typing*, meaning variables can hold values of any *type* without any type enforcement.
 
-For example, consider this simple program:
+As mentioned earlier, we declare a variable using the `var` statement -- notice there's no other *type* information in the declaration. Consider this simple program:
 
 ```js
 var amount = 99.99;
@@ -289,9 +322,9 @@ amount = "$" + String( amount );
 console.log( amount );		// "$199.98"
 ```
 
-As you can see, declaring a variable in JS is done with `var`, and there's no other *type* information in the declaration.
+The `amount` variable starts out holding the number `99.99`, and then holds the `number` result of `amount * 2`, which is `199.98`.
 
-The `amount` variable starts out holding the number `99.99`, and then holds the `number` result of `amount * 2`, which is `199.98`. The first `console.log(..)` command has to *implicitly* coerce that `number` value to a `string` to print it out.
+The first `console.log(..)` command has to *implicitly* coerce that `number` value to a `string` to print it out.
 
 Then the statement `amount = "$" + String(amount)` *explicitly* coerces the `199.98` value to a `string` and adds a `"$"` character to the beginning. At this point, `amount` now holds the `string` value `"$199.98"`, so the second `console.log(..)` statement doesn't need to do any coercion to print it out.
 
@@ -338,6 +371,36 @@ var amount = 99.99;
 If you tried to assign any different value to `TAX_RATE` after that first declaration, your program would fail with an error. That kind of "protection" against mistakes is similar to the static-typing type enforcement enthusiasm, so you can see why it's attractive in other languages!
 
 **Note:** For more information about how different values in variables can be used in your programs, see the *"Types & Grammar"* title of this book series.
+
+## Blocks
+
+The phone store employee must go through a series of steps to complete the checkout as you buy your new phone.
+
+Similarly, in code we often need to group a series of statements together, which we often call a *block*. In JavaScript, a *block* is defined by wrapping one or more statements inside a `{ .. }` curly-brace pair. Consider:
+
+```js
+var amount = 99.99;
+
+// a general block
+{
+	amount = amount * 2;
+	console.log( amount );	// 199.98
+}
+```
+
+This kind of standalone `{ .. }` block is totally valid, but isn't as common in JS. Typically, blocks are attached to some other control statement, such as an `if` statement (see "Conditionals") or a loop (see "Loops"). For example:
+
+```js
+var amount = 99.99;
+
+// is amount big enough?
+if (amount > 10) {
+	amount = amount * 2;
+	console.log( amount );	// 199.98
+}
+```
+
+We'll explain `if` statements in the next section, but as you can see, the `{ .. }` block with its two statements is attached to `if (amount > 10)`. The statements inside the block will only be processed if the conditional passes.
 
 ## Conditionals
 
