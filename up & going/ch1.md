@@ -721,10 +721,11 @@ With that in mind, let's try practicing some of the concepts we learned here in 
 * Finally, check the amount against your bank account balance to see if you can afford it or not.
 * You should set up some constants for the "tax rate", "phone price", and "accessory price", as well as your current "bank balance" and your "spending threshold".
 * You should define functions for calculating the tax and for formatting the price with a "$" and rounding to two decimal places.
+* **Bonus Challenge:** Try to incorporate *input* into this program, perhaps with the `prompt(..)` covered in "Input" earlier. You may prompt the user for their bank account balance, for example. Have fun and be creative!
 
 OK, go ahead. Try it. Don't peek at my code listing until you've given a shot yourself!
 
-Now, I'm obviously going to solve the practice exercise in JavaScript, since this is a JavaScript book. But you can do it in another language if you feel more comfortable.
+Now, I'm obviously going to solve the practice exercise in JavaScript, since this is a JavaScript book. But you can do it in another language for now if you feel more comfortable.
 
 ```js
 var bank_balance = 303.91;
