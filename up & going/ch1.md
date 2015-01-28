@@ -99,9 +99,9 @@ Let's get familiar with the process of running code in the console. First, I sug
 Now, type this code and see how it runs:
 
 ```js
-var a = 21;
+a = 21;
 
-var b = a * 2;
+b = a * 2;
 
 console.log( b );
 ```
@@ -116,7 +116,7 @@ Go on, try it. The best way to learn programming is to start coding!
 
 ### Output
 
-In the previous code snippet, we used `console.log(..)`. Briefly, let's look at what the line of code is all about.
+In the previous code snippet, we used `console.log(..)`. Briefly, let's look at what that line of code is all about.
 
 You may have guessed, but that's exactly how we print text (aka *output* to the user) in the developer console. There are two characteristics of that statement that we should explain.
 
@@ -143,7 +143,7 @@ The most common way that happens is for the HTML page to show form elements (lik
 But there's an easier way to get *input* for simple learning and demonstration purposes such as what you'll be doing throughout this book. Use the `prompt(..)` function:
 
 ```js
-var age = prompt( "Please tell me your age:" );
+age = prompt( "Please tell me your age:" );
 
 console.log( age );
 ```
@@ -162,9 +162,9 @@ To keep things simple while we're learning basic programming concepts, the examp
 
 ## Operators
 
-Operators are how we perform actions on variables and values.
+Operators are how we perform actions on variables and values. We've already seen two JavaScript operators, the `=` and the `*`.
 
-We've already seen two JavaScript operators, the `=` and the `*`. The `*` operator performs mathematic multiplication.
+The `*` operator performs mathematic multiplication. Simple enough, right?
 
 The `=` equals operator is used for *assignment* -- we first calculate the value on the *right-hand side* (source value) of the `=` and then put it into the variable that we specify on the *left-hand side* (target variable).
 
@@ -181,7 +181,7 @@ Here, we assign the `2` value to the `a` variable. Then, we get the value of the
 
 While not technically an operator, you'll need the keyword `var` in every program, as it's the primary way you *declare* (aka *create*) *var*iables (see "Variables").
 
-You need to *declare* the variable by name before you can use it. But you only need to *declare* a variable once for each *scope* (see "Scope"); it can be used as many times after that as needed. For example:
+You should always *declare* the variable by name before you use it. But you only need to *declare* a variable once for each *scope* (see "Scope"); it can be used as many times after that as needed. For example:
 
 ```js
 var a = 20;
@@ -211,15 +211,15 @@ Some of the most common operators in JavaScript:
 
    These operators are used to express compound conditionals (see "Conditionals"), like if either `a` *or* `b` is true.
 
-**Note:** For much more detail and operators not mentioned here, see MDN's "Expressions and Operators" (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators).
+**Note:** For much more detail, and coverage of operators not mentioned here, see MDN's "Expressions and Operators" (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators).
 
 ## Values & Types
 
-If you ask an employee at a phone store how much a certain phone costs, and they say "ninety-nine, ninety-nine" (`99.99`), they're giving you an actual numeric dollar figure that represents what you'll need to pay (plus taxes). If you wanted to buy two of those phones, you could easily do the mental math to double that value to get `199.98` for your base cost.
+If you ask an employee at a phone store how much a certain phone costs, and they say "ninety-nine, ninety-nine" (`99.99`), they're giving you an actual numeric dollar figure that represents what you'll need to pay (plus taxes) to buy it. If you want to buy two of those phones, you can easily do the mental math to double that value to get `199.98` for your base cost.
 
 If that same employee picks up another similar phone but says it's "free" (perhaps with air quotes), they're not giving you a number, but instead they're giving you another kind of representation of your expected cost (`0.00`) -- the word "free".
 
-When you later ask if the phone includes a charger, and the employee says "yes", that answer could only have been either "yes" or "no" (just like `true` and `false`, respectively).
+When you later ask if the phone includes a charger, and the employee says "yes", that answer could only have been either "yes" or "no".
 
 In very similar ways, when you express values in a programs, you choose different representations for those values based on what you plan to do with them.
 
@@ -259,15 +259,17 @@ console.log( a );	// "42"
 console.log( b );	// 42
 ```
 
-Using `Number(..)` as shown is an *explicit* coercion from any other *type* to the `number` *type*. But a controversial topic is what happens when you try to compare two values that are not already of the same *type*, which would require *implicit* coercion.
+Using `Number(..)` (a built-in function) as shown is an *explicit* coercion from any other *type* to the `number` *type*. That should be pretty straightforward.
 
-When comparing the string `"99.99"` to the number `99.99`, most people would agree they are equivalent, if not equal. But they're not exactly the same, are they? It's the same value in two different representations, two different *types*. You could say they're "loosely equal", couldn't you?
+But a controversial topic is what happens when you try to compare two values that are not already of the same *type*, which would require *implicit* coercion.
+
+When comparing the string `"99.99"` to the number `99.99`, most people would agree they are equivalent. But they're not exactly the same, are they? It's the same value in two different representations, two different *types*. You could say they're "loosely equal", couldn't you?
 
 To help you out in these common situations, JavaScript will sometimes kick in and *implicitly* coerce values to the matching *types*.
 
 So if you use the `==` loose equals operator to make the comparison `"99.99" == 99.99`, JavaScript will convert the left-hand side `"99.99"` to its `number` equivalent `99.99`. The comparison then becomes `99.99 == 99.99`, which is of course `true`.
 
-While designed to help, *implicit* coercion can create lots of confusion if you haven't taken the time to learn the rules that govern its behavior. Most JS developers never have, so the common feeling is that *implicit* coercion is confusing and harms programs with unexpected bugs, and should thus be avoided. It's even sometimes called a "flaw" in the design of the language.
+While designed to help you, *implicit* coercion can create confusion if you haven't taken the time to learn the rules that govern its behavior. Most JS developers never have, so the common feeling is that *implicit* coercion is confusing and harms programs with unexpected bugs, and should thus be avoided. It's even sometimes called a flaw in the design of the language.
 
 However, *implicit* coercion is a mechanism that **can be learned**, and moreover **should be learned** by anyone wishing to take JavaScript programming seriously. Not only is it not confusing once you learn the rules, it can actually make your programs better! The effort is well worth it.
 
@@ -298,8 +300,6 @@ Consider:
 ```js
 // This is a single-line comment
 
-// This is another single-line comment
-
 /* But this is
        a multiline
              comment.
@@ -325,7 +325,7 @@ Here's a common usage of multiline comments:
 var a = 42;
 ```
 
-It can also appear anywhere on a line, even in the middle of a line, since the `*/` ends it. The only thing that cannot appear inside a multiline comment is a `*/`, since that would be interpreted to end the comment. For example
+It can also appear anywhere on a line, even in the middle of a line, since the `*/` ends it. The only thing that cannot appear inside a multiline comment is a `*/`, since that would be interpreted to end the comment. For example:
 
 ```js
 var a = /* arbitrary value */ 42;
