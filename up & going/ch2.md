@@ -684,7 +684,7 @@ There's a good chance that with just this brief glimpse at closure and the modul
 
 Another very commonly misunderstood concept in JavaScript is the `this` keyword. Again, there's a whole set of book chapters on it in the *"this & Object Prototypes"* title of this book series, so here we'll just briefly introduce the concept.
 
-While it may often seem that `this` is related to "object orientned" patterns, in JS `this` is a different mechanism.
+While it may often seem that `this` is related to "object oriented" patterns, in JS `this` is a different mechanism.
 
 If a function has a `this` keyword reference inside it, that `this` keyword usually points to an `object`. But which `object` it points to depends on how the function was called.
 
