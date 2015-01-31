@@ -20,7 +20,7 @@
 	* Variables
 	* Conditionals
 	* Strict Mode
-	* Functions
+	* Functions As Values
 	* `this` Keyword
 	* Prototypes
 	* Old & New

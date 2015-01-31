@@ -324,11 +324,39 @@ Generally, the same rules apply to a property name as to a variable identifier. 
 
 **Note:** For more information about reserved words, see Appendix A of the *"Types & Grammar"* title of this book series.
 
-### Scope & Functions
+### Function Scopes
 
 You use the `var` keyword to declare a variable that will belong to the current function scope, or the global scope if at the top-level outside of any function.
 
-Wherever a `var` appears inside a function, that declaration is taken to belong to the function itself. Metaphorically, developers call this process "hoisting" when a `var` declaration is conceptually "moved" to the top of its enclosing function. Technically, this process is more related to how your code is compiled, but we can skim over those details for now.
+#### Hoisting
+
+Wherever a `var` appears inside a function, that declaration is taken to belong to the entire function and accessible everywhere throughout.
+
+Metaphorically, this behavior is called *hoisting*, when a `var` declaration is conceptually "moved" to the top of its enclosing function. Technically, this process is more explained by how code is compiled, but we can skip over those details for now.
+
+Consider:
+
+```js
+var a = 2;
+
+foo();					// works since `foo()`
+						// declaration is "hoisted"
+
+function foo() {
+	a = 3;
+
+	console.log( a );	// 3
+
+	var a;				// declaration is "hoisted"
+						// to the top of `foo()`
+}
+
+console.log( a );	// 2
+```
+
+**Warning:** It's not common or a good idea to rely on variable *hoisting* to use a variable earlier in its scope than its `var` declaration appears; it can be quite confusing. It's much more common and accepted to use *hoisted* function declarations, as we do with `foo()` appearing before its formal declaration.
+
+#### Nested Scopes
 
 When you declare a variable, it is available anywhere inside that scope, as well as any lower/inner scopes.
 
@@ -530,9 +558,9 @@ Not only will strict mode keep your code to a safer path, and not only will it m
 
 **Note:** For more information about strict mode, see the Chapter 5 of the *"Types & Grammar"* title of this book series.
 
-## Functions
+## Functions As Values
 
-In Chapter 1, we discussed functions as the primary mechanism of *scope* in JavaScript. You recall typical `function` declarations such as:
+So far we've discussed functions as the primary mechanism of *scope* in JavaScript. You recall typical `function` declaration syntax like:
 
 ```js
 function foo() {
@@ -544,7 +572,9 @@ Though it may not seem obvious from that syntax, `foo` is basically just a varia
 
 This may sound like a strange concept at first, so take a moment to ponder it. Not only can you pass a value (argument) *to* a function, but *a function itself can be a value* that's assigned to variables, or passed to or returned from other functions.
 
-As such, a function value should be thought of as an expression, much like any other value or expression:
+As such, a function value should be thought of as an expression, much like any other value or expression.
+
+Consider:
 
 ```js
 var foo = function() {
@@ -558,7 +588,9 @@ var x = function bar(){
 
 The first function expression assigned to the `foo` variable is called *anonymous* since it has no `name`.
 
-The second function expression is *named* (`bar`), even as a reference to it is also assigned to the `x` variable. *Named function expressions* are generally more preferable, though *anonymous function expressions* are extremely common. For more information, see the *"Scope & Closures"* title of this series.
+The second function expression is *named* (`bar`), even as a reference to it is also assigned to the `x` variable. *Named function expressions* are generally more preferable, though *anonymous function expressions* are still extremely common.
+
+For more information, see the *"Scope & Closures"* title of this series.
 
 ### Immediately Invoked Function Expressions (IIFE)
 
