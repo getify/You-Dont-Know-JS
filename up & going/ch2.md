@@ -57,7 +57,9 @@ Notice how in this snippet the `a` variable holds every different type of value,
 
 Also, note `a = undefined`. We're explicitly setting `a` to this `undefined` value, but that is behaviorally no different from a variable that has no value set yet, like with the `var a;` line at the top of the snippet. A variable can get to this "undefined" value state in several different ways, including functions which return no values and usage of the `void` operator.
 
-The `object` type refers to a compound value where you can set properties (named locations to store values) that each hold their own values of any type. This is perhaps one of the most useful value types in all of JavaScript.
+### Objects
+
+The `object` type refers to a compound value where you can set properties (named locations) that each hold their own values of any type. This is perhaps one of the most useful value types in all of JavaScript.
 
 ```js
 var obj = {
@@ -75,7 +77,13 @@ obj["b"];	// 42
 obj["c"];	// true
 ```
 
-Properties can either be accessed with "dot notation" `obj.a` or "bracket notation" `obj["a"]`. Dot notation is shorter and generally easier to read, and is thus preferred. Bracket notation is useful if you have a property name that has special characters in it, like `obj["hello world!"]` -- such properties are often referred to as *keys* when accessed via bracket notation. The `[ ]` notation requires either a variable (explained next) or a `string` *literal* (which needs to be wrapped in `" .. "` or `' .. '`).
+It may be helpful to think of this `obj` value visually:
+
+<img src="fig4.png">
+
+Properties can either be accessed with "dot notation" `obj.a` or "bracket notation" `obj["a"]`. Dot notation is shorter and generally easier to read, and is thus preferred when possible.
+
+Bracket notation is useful if you have a property name that has special characters in it, like `obj["hello world!"]` -- such properties are often referred to as *keys* when accessed via bracket notation. The `[ ]` notation requires either a variable (explained next) or a `string` *literal* (which needs to be wrapped in `" .. "` or `' .. '`).
 
 Of course, bracket notation is also useful if you want to access a property/key but the name is stored in another variable, such as:
 
@@ -95,7 +103,7 @@ obj["b"];		// 42
 
 There are a couple of other value types that you will commonly interact with in JavaScript programs: *array* and *function*. But rather than being proper built-in types, these should be thought of more like subtypes -- specialized versions of the `object` type.
 
-### Arrays
+#### Arrays
 
 An *array* is an `object` that holds values (of any type) not particularly in named properties/keys, but rather in numerically indexed positions. For example:
 
@@ -115,13 +123,17 @@ typeof arr;		// "object"
 
 **Note:** Languages which start counting at zero, like JS does, use `0` as the index of the first element in the array.
 
+It may be helpful to think of `arr` visually:
+
+<img src="fig5.png">
+
 Since *array*s are special objects (as `typeof` implies), they can also have properties, including the automatically updated `length` property.
 
 You theoretically could use an *array* as a normal object with your own named properties, or you could use an `object` but only give it numeric properties (`0`, `1`, etc) similar to an *array*. However, such would generally be considered improper usage of the respective types.
 
 The best and most natural approach is to use *array*s for numerically positioned values and use `object`s for named properties.
 
-### Functions
+#### Functions
 
 The other `object` subtype you'll use all over your JS programs is *function*:
 
@@ -819,7 +831,7 @@ bar.a;		// 42 <-- delegated to `foo`
 
 It may help to visualize the `foo` and `bar` objects and their relationship:
 
-<img src="fig4.png" width="202">
+<img src="fig6.png">
 
 The `a` property doesn't actually exist on the `bar` object, but since `bar` is prototype-linked to `foo`, JavaScript automatically falls back to looking for `a` on the `foo` object, where it's found.
 
