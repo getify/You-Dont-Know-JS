@@ -537,8 +537,6 @@ The conditional is tested on each iteration, much as if there is an implied `if`
 
 We can use JavaScript's `break` statement to stop a loop. Also, we can observe that it's awfully easy to create a loop that would otherwise run forever without a `break`ing mechanism.
 
-**Warning:** This is not necessarily a practical form you'd want to use for your loops, but it's presented here for illustration purposes only.
-
 Let's illustrate:
 
 ```js
@@ -558,6 +556,8 @@ while (true) {
 }
 // 0 1 2 3 4 5 6 7 8 9
 ```
+
+**Warning:** This is not necessarily a practical form you'd want to use for your loops, but it's presented here for illustration purposes only.
 
 While a `while` (or `do..while`) can accomplish the task manually, there's another syntactic form called a `for` loop for just that purpose:
 
