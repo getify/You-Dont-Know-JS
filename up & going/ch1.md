@@ -576,7 +576,7 @@ There are other specialized loop forms that are intended to iterate over specifi
 
 ## Functions
 
-The phone store employee probably doesn't carry around a calculator to figure out the taxes and final purchase amount for your phones. That's a task he needs to define once and reuse over and over again. Odds are, the company has a checkout register with those "functions" built-in.
+The phone store employee probably doesn't carry around a calculator to figure out the taxes and final purchase amount for your phones. That's a task she needs to define once and reuse over and over again. Odds are, the company has a checkout register with those "functions" built-in.
 
 Similarly, your program will almost certainly want to break up the code's tasks into reusable pieces. The way to do this is to define a `function`.
 
