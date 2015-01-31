@@ -621,7 +621,7 @@ The outer `( .. )` that surrounds the `(function IIFE(){ .. })` function express
 
 The final `()` on the end of the expression -- the `})();` line -- is what actually executes the function expression referenced immediately before it.
 
-That may seem strange, but it's not as bad as first glance. Consider the similarities between `foo` and `bar` here:
+That may seem strange, but it's not as foreign as first glance. Consider the similarities between `foo` and `bar` here:
 
 ```js
 function foo() { .. }
@@ -635,7 +635,7 @@ foo();
 (function IIFE(){ .. })();
 ```
 
-As you can see, listing the `(function IIFE(){ .. })` before its executing `()` is kinda the same as putting `foo` before its executing `()`.
+As you can see, listing the `(function IIFE(){ .. })` before its executing `()` is essentially the same as including `foo` before its executing `()`; in both cases, the function reference is executed with `()` immediately after it.
 
 Since an IIFE is just a function, and functions create variable *scope*, using an IIFE in this fashion is often used to declare variables that won't affect the surrounding code outside the IIFE:
 
