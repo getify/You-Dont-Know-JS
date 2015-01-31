@@ -681,6 +681,8 @@ function outer() {
 		console.log( a + b );	// 3
 	}
 
+	inner();
+
 	// we can only access `a` here
 	console.log( a );			// 1
 }
