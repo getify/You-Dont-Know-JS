@@ -3,7 +3,7 @@
 
 If you've been writing JS for any length of time, odds are the syntax is pretty familiar to you. There are certainly many quirks, but overall it's a fairly reasonable and straightforward syntax that draws many similarities from other languages.
 
-However, ES6 adds quite a bit of new syntactic forms which are going to take some getting used to. In this chapter we'll take a tour through most of them.
+However, ES6 adds quite a few new syntactic forms which are going to take some getting used to. In this chapter we'll take a tour through most of them.
 
 ## Block-Scoped Declarations
 
@@ -47,7 +47,7 @@ Stylistically, I even prefer to put the `let` on the same line as the opening `{
 }
 ```
 
-Now, that's going to look strange and it's not likely going to match the recommendations by most other ES6 literature. But I have a reason for my madness.
+Now, that's going to look strange and it's not likely going to match the recommendations by most other ES6 literature. But I have reasons for my madness.
 
 There's another proposed form of the `let` declaration called the `let`-block, which looks like:
 
@@ -85,11 +85,11 @@ Quick quiz without looking back at that snippet: which variable(s) exist only in
 
 The answers: the `if` statement contains `b` and `c` block-scoped variables, and the `for` loop contains `i` and `j` block-scoped variables.
 
-Did you have to think about it for a moment? Does it surprise you that `i` isn't added to the enclosing `if` statement scope? That mental pause and questioning, what I call a "mental tax", comes from the fact that this `let` mechanism is not only new to us, but it's also *implicit*.
+Did you have to think about it for a moment? Does it surprise you that `i` isn't added to the enclosing `if` statement scope? That mental pause and questioning -- I call it a "mental tax" -- comes from the fact that this `let` mechanism is not only new to us, but it's also *implicit*.
 
 There's also hazard in the `let c = ..` declaration appearing so far down in the scope. Unlike traditional `var`-declared variables, which are attached to the entire enclosing function scope regardless of where they appear, `let` declarations attach to the block scope but are not initialized until they appear in the block.
 
-Accessing a `let`-declared variable earlier than its `let ..` declaration causes an error, whereas with `var` declarations the ordering doesn't matter (except stylistically).
+Accessing a `let`-declared variable earlier than its `let ..` declaration/initialization causes an error, whereas with `var` declarations the ordering doesn't matter (except stylistically).
 
 Consider:
 
@@ -103,9 +103,9 @@ Consider:
 }
 ```
 
-**Warning:** This `ReferenceError` with too-early `let`-declared references is technically called a *TDZ* (temporal dead zone) error, in that you're accessing a variable that's been declared but not initialized. This will not be the only time we see *TDZ* errors. Also, note that "initialized" doesn't require explicitly assigning a value in your code, as `let b;` is totally valid. A variable that's not given an assignment at declaration time is assumed to have been assigned the `undefined` value, so `let b;` is the same as `let b = undefined;`. Explicit assignment or not, you cannot access `b` until the `let b` statement is run.
+**Warning:** This `ReferenceError` from accessing too-early `let`-declared references is technically called a *TDZ* (temporal dead zone) error -- you're accessing a variable that's been declared but not yet initialized. This will not be the only time we see *TDZ* errors -- they crop up in several places in ES6. Also, note that "initialized" doesn't require explicitly assigning a value in your code, as `let b;` is totally valid. A variable that's not given an assignment at declaration time is assumed to have been assigned the `undefined` value, so `let b;` is the same as `let b = undefined;`. Explicit assignment or not, you cannot access `b` until the `let b` statement is run.
 
-Now it should be clearer why I prefer the `let` declarations to all be at the top of the scope. It totally avoids the accidental error of accessing too early. It also makes it more *explicit* when you look at the start of a block, any block, what variables it contains.
+Now it should be clearer why I strongly prefer -- no, I insist -- the `let` declarations to all be at the top of the scope. It totally avoids the accidental error of accessing too early. It also makes it more *explicit* when you look at the start of a block, any block, what variables it contains.
 
 That explicitness on your part, which is up to you to maintain with discipline, will save you lots of refactor headaches and footguns down the line.
 
