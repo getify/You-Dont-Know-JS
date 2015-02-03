@@ -105,9 +105,31 @@ Consider:
 
 **Warning:** This `ReferenceError` from accessing too-early `let`-declared references is technically called a *TDZ* (temporal dead zone) error -- you're accessing a variable that's been declared but not yet initialized. This will not be the only time we see *TDZ* errors -- they crop up in several places in ES6. Also, note that "initialized" doesn't require explicitly assigning a value in your code, as `let b;` is totally valid. A variable that's not given an assignment at declaration time is assumed to have been assigned the `undefined` value, so `let b;` is the same as `let b = undefined;`. Explicit assignment or not, you cannot access `b` until the `let b` statement is run.
 
-Now it should be clearer why I strongly prefer -- no, I insist -- the `let` declarations to all be at the top of the scope. It totally avoids the accidental error of accessing too early. It also makes it more *explicit* when you look at the start of a block, any block, what variables it contains.
+One last gotcha: `typeof` behaves differently with *TDZ* variables than it does with undeclared (or declared!) variables.
 
-That explicitness on your part, which is up to you to maintain with discipline, will save you lots of refactor headaches and footguns down the line.
+```js
+{
+	if (typeof a === "undefined") {
+		console.log( "cool" );
+	}
+
+	if (typeof b === "undefined") {		// TypeError!
+		// ..
+	}
+
+	// ..
+
+	let b;
+}
+```
+
+The `a` is not declared, so `typeof` is the only safe way to check for its existence or not. But `typeof b` throws the *TDZ* error because much farther down in the code there happens to be a `let b` declaration. Oops.
+
+Now it should be clearer why I strongly prefer -- no, I insist -- `let` declarations must all be at the top of the scope. That totally avoids the accidental errors of accessing too early. It also makes it more *explicit* when you look at the start of a block, any block, what variables it contains.
+
+Your blocks don't have to share their original behavior with scoping behavior.
+
+This explicitness on your part, which is up to you to maintain with discipline, will save you lots of refactor headaches and footguns down the line.
 
 **Note:** For more information on `let` and block scoping, see Chapter 3 of the *"Scope & Closures"* title of this series.
 
