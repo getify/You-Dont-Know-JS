@@ -21,7 +21,7 @@ ES6 is a radical jump forward for the language. Even if you think you *do know J
 
 ## Versioning
 
-The JavaScript standard is referred to officially as "ECMAScript" (abbreviated "ES"), and up until recently has been versioned entirely by ordinal number ("5th edition", etc.).
+The JavaScript standard is referred to officially as "ECMAScript" (abbreviated "ES"), and up until just recently has been versioned entirely by ordinal number (i.e., "5" for "5th edition").
 
 The earliest versions ES1 and ES2 were not widely known or implemented, but ES3 was the first widespread baseline for JavaScript. ES3 constitutes the JavaScript standard for browsers like IE6-8 and older Android 2.x mobile browsers. For politicial reasons beyond what we'll cover here, the ill-fated ES4 never came about.
 
