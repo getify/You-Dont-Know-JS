@@ -196,7 +196,7 @@ res = it.next( 7 );		// pass `7` to waiting `yield`
 res.value;				// 42
 ```
 
-**Note:** We don't pass a value to the first `next()` call, and that's on purpose. Only a paused `yield` could accept such a value passed by a `next(..)`, and at the beginning of the generator when we call the first `next()`, there **is no paused `yield`** to accept such a value. In early drafts of the ES6 standard -- and thus some transient versions of browsers like Firefox and Chrome -- passing a value to the first `next()` would cause an exception. Now, the specification and all compliant browsers just silently **discard** anything passed to the first `next()`. It's still a bad idea to pass a value, as you're just creating silently "failing" code that's confusing. So, always start a generator with an argument-free `next()`.
+**Note:** We don't pass a value to the first `next()` call, and that's on purpose. Only a paused `yield` could accept such a value passed by a `next(..)`, and at the beginning of the generator when we call the first `next()`, there **is no paused `yield`** to accept such a value. The specification and all compliant browsers just silently **discard** anything passed to the first `next()`. It's still a bad idea to pass a value, as you're just creating silently "failing" code that's confusing. So, always start a generator with an argument-free `next()`.
 
 The first `next()` call (with nothing passed to it) is basically *asking a question*: "What *next* value does the `*foo(..)` generator have to give me?" And who answers this question? The first `yield "hello"` expression.
 
@@ -660,7 +660,7 @@ But now that we more fully understand some of the mechanics of how they work, we
 
 What do generators have to do with async coding patterns, fixing problems with callbacks, and the like? Let's get to answering that important question.
 
-We should first revisit one of our scenarios from Chapter 3. Let's first recall the callback approach:
+We should revisit one of our scenarios from Chapter 3. Let's recall the callback approach:
 
 ```js
 function foo(x,y,cb) {
@@ -759,7 +759,7 @@ Take a step back and consider the implications. We have totally synchronous-look
 
 In essence, we are abstracting the asynchrony away as an implementation detail, so that we can reason synchronously/sequentially about our flow control: "Make an Ajax request, and when it finishes print out the response." And of course, we just expressed two steps in the flow control, but this same capabililty extends without bounds, to let us express however many steps we need to.
 
-**Note:** This is such an important realization, just go back and read the last three paragraphs again to let it sink in!
+**Tip:** This is such an important realization, just go back and read the last three paragraphs again to let it sink in!
 
 ### Synchronous Error Handling
 
@@ -775,7 +775,7 @@ catch (err) {
 }
 ```
 
-How does this work? The `foo(..)` call is asynchronously completing, and doesn't `try..catch` fail to catch asynchronous errors, as we looked at in the middle of Chapter 3?
+How does this work? The `foo(..)` call is asynchronously completing, and doesn't `try..catch` fail to catch asynchronous errors, as we looked at in Chapter 3?
 
 We already saw how the `yield` lets the assignment statement pause to wait for `foo(..)` to finish, so that the completed response can be assigned to `text`. The awesome part is that this `yield` pausing *also* allows the generator to `catch` an error. We throw that error into the generator with this part of the earlier code listing:
 
@@ -841,7 +841,7 @@ Synchronous-looking error handling (via `try..catch`) with async code is a huge 
 
 In our previous discussion, we showed how generators can be iterated asynchronously, which is a huge step forward in sequential reason-ability over the spaghetti mess of callbacks. But we lost something very important: the trustability and composability of Promises (see Chapter 3)!
 
-Don't worry -- we can get that back. The best of all worlds is to combine generators (synchronous-looking async code) with Promises (trustable and composable).
+Don't worry -- we can get that back. The best of all worlds in ES6 is to combine generators (synchronous-looking async code) with Promises (trustable and composable).
 
 But how?
 
@@ -1389,7 +1389,7 @@ console.log( "outside:", it.next( 4 ).value );
 // outside: F
 ```
 
-Pay particular attention to the processing steps when after the `it.next(3)` call:
+Pay particular attention to the processing steps after the `it.next(3)` call:
 
 1. The `3` value is passed (through the `yield`-delegation in `*bar()`) into the waiting `yield "C"` expression inside of `*foo()`.
 2. `*foo()` then calls `return "D"`, but this value doesn't get returned all the way back to the outside `it.next(3)` call.
@@ -1507,11 +1507,9 @@ catch (err) {
 
 Some things to note from this snippet:
 
-1. When we call `it.throw(2)`, it sends the error message `2` into `*bar()`, which delegates that `*foo()`, which then `catch`es it and handles it gracefully. Then, the `yield "C"` sends `"C"` back out as the return `value` from the `it.throw(2)` call.
+1. When we call `it.throw(2)`, it sends the error message `2` into `*bar()`, which delegates that to `*foo()`, which then `catch`es it and handles it gracefully. Then, the `yield "C"` sends `"C"` back out as the return `value` from the `it.throw(2)` call.
 2. The `"D"` value that's next `throw`n from inside `*foo()` propagates out to `*bar()`, which `catch`es it and handles it gracefully. Then the `yield "E"` sends `"E"` back out as the return `value` from the `it.next(3)` call.
 3. Next, the exception `throw`n from `*baz()` isn't caught in `*bar()` -- though we did `catch` it outside -- so both `*baz()` and `*bar()` are set to a completed state. After this snippet, you would not be able to get the `"G"` value out with any subsequent `next(..)` call(s) -- they will just return `undefined` for `value`.
-
-**Note:** At the time of this writing, Chrome `throw`s an error in the case of point #3, which is contrary to the spec. FF is correct in that it just returns `undefined`.
 
 ### Delegating Asynchrony
 
@@ -1566,7 +1564,7 @@ run( bar );
 
 **Note:** Our `run(..)` utility could have been called with `run( foo, 3 )`, because it supports additional parameters being passed along to the initialization of the generator. However, we used a parameter-free `*bar()` here to reinforce the flexibility of `yield *`.
 
-What processing steps follow from that code? Hang out, this is going to be quite intricate to describe in detail:
+What processing steps follow from that code? Hang on, this is going to be quite intricate to describe in detail:
 
 1. `run(bar)` starts up the `*bar()` generator.
 2. `foo(3)` creates an *iterator* for `*foo(..)` and passes `3` as its `val` parameter.
@@ -1681,7 +1679,7 @@ OK, this is a bit better (though still manual!), because now the two instances o
 
 In the previous snippet, the second instance was not given its data until after the first instance was totally finished. But here, both instances receive their data as soon as their respective responses come back, and then each instance does another `yield` for control transfer purposes. We then choose what order to resume them in the `Promise.all([ .. ])` handler.
 
-What may not be as obvious is that this approach hints at an easier form for a reusable utility, because of the symmetry. We can do even better. Let's imagine a utility called `runAll(..)`:
+What may not be as obvious is that this approach hints at an easier form for a reusable utility, because of the symmetry. We can do even better. Let's imagine using a utility called `runAll(..)`:
 
 ```js
 // `request(..)` is a Promise-aware Ajax utility
@@ -1708,7 +1706,7 @@ runAll(
 );
 ```
 
-**Note:** We're not including a code listing for `runAll(..)` as it's not only long enough to bog down the text, but is an extension of the logic we've already implemented in `run(..)` earlier. So, as a good supplementary exercise for the reader, try your hand at evolving the code from `run(..)` to work like the imagined `runAll(..)`. Also, my *asynquence* library provides a previously mentioned `runner(..)` utility with this kind of capability already built in, and will be discussed in Appendix A of this book.
+**Note:** We're not including a code listing for `runAll(..)` as it's not only so long as to bog down the text, but is an extension of the logic we've already implemented in `run(..)` earlier. So, as a good supplementary exercise for the reader, try your hand at evolving the code from `run(..)` to work like the imagined `runAll(..)`. Also, my *asynquence* library provides a previously mentioned `runner(..)` utility with this kind of capability already built in, and will be discussed in Appendix A of this book.
 
 Here's how the processing inside `runAll(..)` would operate:
 
@@ -1760,7 +1758,7 @@ Such realization also serves as a conceptual base for a more sophisticated async
 
 ## Thunks
 
-So far, we've made the assumption that `yield`ing a Promise from a generator -- and having that Promise resume the generator via a helper utility like `run(..)` -- was the best possible way manage asynchrony with generators. To be clear, it is.
+So far, we've made the assumption that `yield`ing a Promise from a generator -- and having that Promise resume the generator via a helper utility like `run(..)` -- was the best possible way to manage asynchrony with generators. To be clear, it is.
 
 But we skipped over another pattern that has some mildly widespread adoption, so in the interest of completeness we'll take a brief look at it.
 
@@ -1817,7 +1815,7 @@ function thunkify(fn) {
 	var args = [].slice.call( arguments, 1 );
 	return function(cb) {
 		args.push( cb );
-		fn.apply( null, args );
+		return fn.apply( null, args );
 	};
 }
 
@@ -1830,7 +1828,7 @@ fooThunk( function(sum) {
 } );
 ```
 
-**Note:** Here we assume that the original (`foo(..)`) function signature expects its callback in the last position, with any other parameters coming before it. This is a pretty ubiquitous "standard" for async JS function standards. You might call it "callback-last style." If for some reason you had a need to handle "callback-first style" signatures, you would just make a utility that used `args.unshift(..)` instead of `args.push(..)`.
+**Tip:** Here we assume that the original (`foo(..)`) function signature expects its callback in the last position, with any other parameters coming before it. This is a pretty ubiquitous "standard" for async JS function standards. You might call it "callback-last style." If for some reason you had a need to handle "callback-first style" signatures, you would just make a utility that used `args.unshift(..)` instead of `args.push(..)`.
 
 The preceding formulation of `thunkify(..)` takes both the `foo(..)` function reference, and any parameters it needs, and returns back the thunk itself (`fooThunk(..)`). However, that's not the typical approach you'll find to thunks in JS.
 
@@ -1846,7 +1844,7 @@ function thunkify(fn) {
 		var args = [].slice.call( arguments );
 		return function(cb) {
 			args.push( cb );
-			fn.apply( null, args );
+			return fn.apply( null, args );
 		};
 	};
 }
@@ -2036,7 +2034,7 @@ If you have the option, prefer `yield pr` rather than `yield th`. But there's no
 
 You're hopefully convinced now that generators are a very important addition to the async programming toolbox. But it's a new syntax in ES6, which means you can't just polyfill generators like you can Promises (which are just a new API). So what can we do to bring generators to our browser JS if we don't have the luxury of ignoring pre-ES6 browsers?
 
-For all new syntax extensions in ES6, there are tools -- the most common term for them is transpilers, for trans-compilers -- which can take your ES6 syntax and transform it into equivalent (but obviously uglier!) pre-ES6 code. So, generators can be transpiled into code that will have the same behavior but works in ES5 and below.
+For all new syntax extensions in ES6, there are tools -- the most common term for them is transpilers, for trans-compilers -- which can take your ES6 syntax and transform it into equivalent (but obviously uglier!) pre-ES6 code. So, generators can be transpiled into code that will have the same behavior but work in ES5 and below.
 
 But how? The "magic" of `yield` doesn't obviously sound like code that's easy to transpile. We actually hinted at a solution in our earlier discussion of closure-based *iterators*.
 
@@ -2237,11 +2235,11 @@ function foo(url) {
 
 How does this code work?
 
-1. The first call to the *iterator*'s `next()` call would move the generator from the unitialized state to state `1`, and then calling `process()` to handle that state. The return value from `request(..)`, which is the promise for the Ajax response, is returned back as the `value` property from the `next()` call.
+1. The first call to the *iterator*'s `next()` call would move the generator from the unitialized state to state `1`, and then call `process()` to handle that state. The return value from `request(..)`, which is the promise for the Ajax response, is returned back as the `value` property from the `next()` call.
 2. If the Ajax request succeeds, the second call to `next(..)` should send in the Ajax response value, which moves our state to `2`. `process(..)` is again called (this time with the passed in Ajax response value), and the `value` property returned from `next(..)` will be `undefined`.
 3. However, if the Ajax request fails, `throw(..)` should be called with the error, which would move the state from `1` to `3` (instead of `2`). Again `process(..)` is called, this time with the error value. That `case` returns `false`, which is set as the `value` property returned from the `throw(..)` call.
 
-From the outside -- that is, interacting only with the *iterator* -- this `foo(.)` normal function works pretty much the same as the `*foo(..)` generator would have worked. So we've effectively "transpiled" our ES6 generator to pre-ES6 compatibility!
+From the outside -- that is, interacting only with the *iterator* -- this `foo(..)` normal function works pretty much the same as the `*foo(..)` generator would have worked. So we've effectively "transpiled" our ES6 generator to pre-ES6 compatibility!
 
 We could then manually instantiate our generator and control its iterator -- calling `var it = foo("..")` and `it.next(..)` and such -- or better, we could pass it to our previously defined `run(..)` utility as `run(foo,"..")`.
 
@@ -2288,7 +2286,7 @@ var foo = regeneratorRuntime.mark(function foo(url) {
 
 There's some obvious similarities here to our manual derivation, such as the `switch` / `case` statements, and we even see `val` pulled out of the closure just as we did.
 
-Of course, one trade-off is that regenerator's transpilation requires a helper library `regeneratorRuntime` that holds all the reusable logic for managing general generator / *iterator*. A lot of that boilerplate looks different than our version, but even then, the concepts can be seen, like with `context$1$0.next = 4` keeping track of the next state for the generator.
+Of course, one trade-off is that regenerator's transpilation requires a helper library `regeneratorRuntime` that holds all the reusable logic for managing a general generator / *iterator*. A lot of that boilerplate looks different than our version, but even then, the concepts can be seen, like with `context$1$0.next = 4` keeping track of the next state for the generator.
 
 The main takeaway is that generators are not restricted to only being useful in ES6+ environments. Once you understand the concepts, you can employ them throughout your code, and use tools to transform the code to be compatible with older environments.
 
@@ -2302,7 +2300,7 @@ Generators are a new ES6 function type that does not run-to-completion like norm
 
 This pause/resume interchange is cooperative rather than preemptive, which means that the generator has the sole capability to pause itself, using the `yield` keyword, and yet the *iterator* that controls the generator has the sole capability (via `next(..)`) to resume the generator.
 
-The `yield` / `next(..)` duality is not just a control mechanism, it's actually a two-way message passing mechanism. A `yield ..` expression essentially pausing waiting for a value, and the next `next(..)` call passes a value (or implicit `undefined`) back to that paused `yield` expression.
+The `yield` / `next(..)` duality is not just a control mechanism, it's actually a two-way message passing mechanism. A `yield ..` expression essentially pauses waiting for a value, and the next `next(..)` call passes a value (or implicit `undefined`) back to that paused `yield` expression.
 
 The key benefit of generators related to async flow control is that the code inside a generator expresses a sequence of steps for the task in a naturally sync/sequential fashion. The trick is that we essentially hide potential asynchrony behind the `yield` keyword -- moving the asynchrony to the code where the generator's *iterator* is controlled.
 
