@@ -816,7 +816,7 @@ ASQ()
 } );
 ```
 
-The message passing that trades the URL strings between the two goroutines is pretty straightforward. The first goroutine makes an Ajax request for the first URL, and that response is put onto the `ch` channel. The second goroutine makes an Ajax request for the second URL, then gets the first response `res1` off the `ch` channel. At that point, both responses `res1` and `res2` are completed and ready.
+The message passing that trades the URL strings between the two goroutines is pretty straightforward. The first goroutine makes an Ajax request to the first URL, and that response is put onto the `ch` channel. The second goroutine makes an Ajax request to the second URL, then gets the first response `res1` off the `ch` channel. At that point, both responses `res1` and `res2` are completed and ready.
 
 If there are any remaining values in the `ch` channel at the end of the goroutine run, they will be passed along to the next step in the sequence. So, to pass out message(s) from the final goroutine, `put(..)` them into `ch`. As shown, to avoid the blocking of those final `put(..)`s, we switch `ch` into buffering mode by setting its `buffer_size` to `2` (default: `0`).
 
@@ -826,4 +826,4 @@ If there are any remaining values in the `ch` channel at the end of the goroutin
 
 Promises and generators provide the foundational building blocks upon which we can build much more sophisticated and capable asynchrony.
 
-*asynquence* has utilities for implementing *iterable sequences*, *reactive sequences* (aka "Observables"), *concurrent coroutines*, and even *CSP goroutines*. Those patterns, combined with the continuation-callback and Promise capabilities, gives *asynquence* a powerful mix of lots of different asynchronous functionalities, all integrated in one clean async flow control abstraction: the sequence.
+*asynquence* has utilities for implementing *iterable sequences*, *reactive sequences* (aka "Observables"), *concurrent coroutines*, and even *CSP goroutines*. Those patterns, combined with the continuation-callback and Promise capabilities, gives *asynquence* a powerful mix of different asynchronous functionalities, all integrated in one clean async flow control abstraction: the sequence.
