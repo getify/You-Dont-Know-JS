@@ -623,7 +623,7 @@ You can easily subsume a promise (e.g., thenable -- see Chapter 3) into a sequen
 var p = Promise.resolve( 42 );
 
 ASQ()
-.promise( p )			// could also be: `function(){ return p; }`
+.promise( p )			// could also: `function(){ return p; }`
 .val( function(msg){
 	console.log( msg );	// 42
 } );
