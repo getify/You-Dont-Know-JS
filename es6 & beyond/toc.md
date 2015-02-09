@@ -32,6 +32,7 @@
 	* WeakMap
 	* Set
 	* WeakSet
+	* Typed Arrays
 * Chapter 6: New APIs
 	* `Object`
 	* `Math`
