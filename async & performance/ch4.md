@@ -934,105 +934,48 @@ Several Promise abstraction libraries provide just such a utility, including my 
 But for the sake of learning and illustration, let's just define our own standalone utility that we'll call `run(..)`:
 
 ```js
+// thanks to Benjamin Gruenbaum (@benjamingr on GitHub) for
+// big improvements here!
 function run(gen) {
-	var args = [].slice.call( arguments, 1),
-		it = gen.apply( null, args ), ret, val,
-		err, done, p, resolveP, rejectP
-	;
+	var args = [].slice.call( arguments, 1), it;
 
-	// return a promise that's resolved when the
-	// generator is complete
-	p = new Promise( function(res,rej){
-		// extract promise resolution/rejection capabilities
-		resolveP = res;
-		rejectP = rej;
-	} );
+	// initialize the generator in the current context
+	it = gen.apply( this, args );
 
-	// the async "iteration loop"
-	(function handleNext(){
-		try {
-			// not in an error state from previous step?
-			if (!err) {
-				// resume generator with fulfilled value
-				ret = it.next( val );
-			}
-			else {
-				// error state thrown into generator
-				ret = it.throw( err );
-			}
+	// return a promise for the generator completing
+	return Promise.resolve()
+		.then( function handleNext(value){
+			// run to the next yielded value
+			var next = it.next( value );
 
-			// reset for next loop
-			err = null;
-			done = ret.done;
-			val = ret.value;
-		}
-		catch (e) {
-			// exception occurred during success resumption?
-			if (!err) {
-				// capture exception to send right back in
-				err = e;
-
-				// async "loop"
-				setTimeout( handleNext, 0 );
-			}
-			else {
-				// note: different libraries handle this
-				// case in various ways
-
-				// bail, because generator didn't properly
-				// handle the error already thrown to it
-
-				// did we get a different exception thrown
-				// out than we sent in?
-				if (err !== e) {
-					err = [e,err];
+			return (function handleResult(next){
+				// generator has completed running?
+				if (next.done) {
+					return next.value;
 				}
+				// otherwise keep going
+				else {
+					return Promise.resolve( next.value )
+						.then(
+							// resume the async loop on
+							// success, sending the resolved
+							// value back into the generator
+							handleNext,
 
-				rejectP( err );
-			}
-
-			return;
-		}
-
-		// is the generator complete?
-		if (done) {
-			resolveP( val );
-		}
-		// did we get a promise yielded out?
-		// note: thenable duck-typing check... ugh.
-		else if (
-			(
-				typeof val === "object" ||
-				typeof val === "function"
-			) &&
-			typeof val.then === "function"
-		) {
-			// listen for promise resolution
-			val.then(
-				function(msg){
-					val = msg;
-
-					// async "loop"
-					handleNext();
-				},
-				function(e){
-					err = e;
-
-					// async "loop"
-					handleNext();
+							// if `value` is a rejected
+							// promise, propagate error back
+							// into the generator for its own
+							// error handling
+							function handleErr(err) {
+								return Promise.resolve(
+									it.throw( err )
+								)
+								.then( handleResult );
+							}
+						);
 				}
-			);
-		}
-		// immediate value yielded out, so send
-		// it right back in
-		else {
-			// async "loop"
-			setTimeout( handleNext, 0 );
-		}
-	})();
-
-	// return the run-completion promise
-	return p;
+			})(next);
+		} );
 }
 ```
 
@@ -1992,31 +1935,28 @@ Finally, as a thunk-aware patch to our earlier `run(..)` utility, we would need 
 
 ```js
 // ..
-else if (typeof val === "function") {
-	// assume `val` is a thunk which expects
-	// an "error-first style" callback
-	try {
-		val( function(e,msg){
+// did we receive a thunk back?
+else if (typeof next.value == "function") {
+	return new Promise( function(resolve,reject){
+		// call the thunk with an error-first callback
+		next.value( function(err,msg) {
 			if (err) {
-				val = msg;
-
-				// async "loop"
-				handleNext();
+				reject( err );
 			}
 			else {
-				err = e;
-
-				// async "loop"
-				handleNext();
+				resolve( msg );
 			}
 		} );
-	}
-	catch (e) {
-		err = e;
-
-		// async "loop"
-		handleNext();
-	}
+	} )
+	.then(
+		handleNext,
+		function handleErr(err) {
+			return Promise.resolve(
+				it.throw( err )
+			)
+			.then( handleResult );
+		}
+	);
 }
 ```
 
