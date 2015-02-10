@@ -14,4 +14,4 @@ For dessert, well, I won't spoil the surprise, but prepare to gaze into the futu
 
 Well, I won't block your enjoyment of the book any longer, on with the show! If you've already read part of the book before reading this Foreword, give yourself 10 asynchronous points! You deserve them!
 
---Jake Archibald, Developer Advocate at Google
+--Jake Archibald, Developer Advocate at Google Chrome
