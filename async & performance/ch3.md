@@ -492,7 +492,7 @@ var p1 = new Promise( function(resolve,reject){
 	resolve( p3 );
 } );
 
-p2 = new Promise( function(resolve,reject){
+var p2 = new Promise( function(resolve,reject){
 	resolve( "A" );
 } );
 
