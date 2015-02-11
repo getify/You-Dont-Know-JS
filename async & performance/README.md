@@ -8,8 +8,8 @@
 
 [Table of Contents](toc.md)
 
+* [Foreword](foreword.md) (by [Jake Archibald](http://jakearchibald.com))
 * [Preface](../preface.md)
-* [Foreword](foreword.md)
 * [Chapter 1: Asynchrony: Now & Later](ch1.md)
 * [Chapter 2: Callbacks](ch2.md)
 * [Chapter 3: Promises](ch3.md)
