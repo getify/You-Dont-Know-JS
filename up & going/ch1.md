@@ -98,6 +98,8 @@ Let's get familiar with the process of running code in the console. First, I sug
 
 Now, type this code and see how it runs:
 
+**Tip:** To type multiple lines into the console at once, use `<shift> + <enter>` to move to the next new line. Once you hit `<enter>` by itself, the console will run everything you've just typed.
+
 ```js
 a = 21;
 
@@ -105,8 +107,6 @@ b = a * 2;
 
 console.log( b );
 ```
-
-**Tip:** To type multiple lines into the console at once, use `<shift> + <enter>` to move to the next new line. Once you hit `<enter>` by itself, the console will run everything you've just typed.
 
 Typing that code into the console in Chrome should look something like this:
 
@@ -325,13 +325,15 @@ Here's a common usage of multiline comments:
 var a = 42;
 ```
 
-It can also appear anywhere on a line, even in the middle of a line, since the `*/` ends it. The only thing that cannot appear inside a multiline comment is a `*/`, since that would be interpreted to end the comment. For example:
+It can also appear anywhere on a line, even in the middle of a line, since the `*/` ends it. For example:
 
 ```js
 var a = /* arbitrary value */ 42;
 
 console.log( a );	// 42
 ```
+
+The only thing that cannot appear inside a multiline comment is a `*/`, since that would be interpreted to end the comment.
 
 You will definitely want to begin your learning of programming by starting off with the habit of commenting code. Throughout the rest of this chapter, you'll see I use comments to explain things, so do the same in your own practice. Trust me, everyone who reads your code will thank you!
 
