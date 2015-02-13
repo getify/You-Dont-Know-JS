@@ -6,9 +6,9 @@ If I want to get a picture of someone's core JavaScript skill, I'm most interest
 
 For starters, you'll be taken through callbacks, the bread and butter of asynchronous programming. Of course, bread and butter does not make for a particularly satisfying meal, but the next course is full of tasty tasty promises!
 
-If you don't know promises, now is the time to learn. Promises are now the official way to provide async return values in both JavaScript and the DOM. All future async DOM APIs will use them, many already do, so be prepared! At the time of writing, Promises have shipped in most major browsers, with IE shipping soon.. Once you've finished that, I hope you left room for the next course, Generators.
+If you don't know promises, now is the time to learn. Promises are now the official way to provide async return values in both JavaScript and the DOM. All future async DOM APIs will use them, many already do, so be prepared! At the time of writing, Promises have shipped in most major browsers, with IE shipping soon. Once you've finished that, I hope you left room for the next course, Generators.
 
-Generators snuck their way into stable versions of Chrome & Firefox without too much pomp and ceremony, because, frankly, they're more "complicated" than they are "interesting". Or, that's what I thought until I saw them combined with promises. There, they become an important tool in readability and maintenance.
+Generators snuck their way into stable versions of Chrome and Firefox without too much pomp and ceremony, because, frankly, they're more "complicated" than they are "interesting." Or, that's what I thought until I saw them combined with promises. There, they become an important tool in readability and maintenance.
 
 For dessert, well, I won't spoil the surprise, but prepare to gaze into the future of JavaScript! Features that give you more and more control over concurrency and asynchronicity.
 
