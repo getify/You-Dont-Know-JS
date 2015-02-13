@@ -56,7 +56,7 @@ The point is, `new String("abc")` creates a string wrapper object around `"abc"`
 
 ## Internal `[[Class]]`
 
-Values that are `typeof` of `"object"` (such as an array) are additionally tagged with an internal `[[Class]]` property (think of this more as an internal *class*ification rather than related to classes from traditional class-oriented coding). This property cannot be accessed directly, but can generally can be revealed indirectly by borrowing the default `Object.prototype.toString(..)` method called against the value. For example:
+Values that are `typeof` of `"object"` (such as an array) are additionally tagged with an internal `[[Class]]` property (think of this more as an internal *class*ification rather than related to classes from traditional class-oriented coding). This property cannot be accessed directly, but can generally be revealed indirectly by borrowing the default `Object.prototype.toString(..)` method called against the value. For example:
 
 ```js
 Object.prototype.toString.call( [1,2,3] );			// "[object Array]"
