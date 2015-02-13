@@ -3,7 +3,7 @@
 
 In the previous chapter, I introduced the basic building blocks of programming, such as variables, loops, conditionals, and functions. Of course, all the code shown has been in JavaScript. But in this chapter, we want to focus specifically on things you need to know about JavaScript to get up and going as a JS developer.
 
-You should be aware that we will introduce quite a few concepts in this chapter which we will not fully explore here, but rather give you just a preview of them. You can think then of this chapter as an overview for the topics covered in detail throughout the rest of this book series.
+You should be aware that we will introduce quite a few concepts in this chapter which we will not fully explore here, but rather give you just a preview of them. You can think then of this chapter as an overview for the topics covered in detail throughout the rest of this series.
 
 Especially if you're new to JavaScript, you should expect to spend quite a bit of time going over the concepts and code examples here multiple times. Any good foundation is laid brick by brick, so don't expect that you'll get it all at once the first pass through.
 
@@ -99,7 +99,7 @@ obj[b];			// "hello world"
 obj["b"];		// 42
 ```
 
-**Note:** For more information on JavaScript `object`s, see the *"this & Object Prototypes"* title of this book series, specifically Chapter 3.
+**Note:** For more information on JavaScript `object`s, see the *this & Object Prototypes* title of this series, specifically Chapter 3.
 
 There are a couple of other value types that you will commonly interact with in JavaScript programs: *array* and *function*. But rather than being proper built-in types, these should be thought of more like subtypes -- specialized versions of the `object` type.
 
@@ -151,7 +151,7 @@ typeof foo.bar;		// "string"
 
 Again, *function*s are a subtype of `objects` -- `typeof` returns `"function"` which implies that a `function` is a main type -- and can thus have properties, but you typically will only use function object properties (like `foo.bar`) in limited cases.
 
-**Note:** For more information on JS values and their types, see the first two chapters of the *"Types & Grammar"* title of this book series.
+**Note:** For more information on JS values and their types, see the first two chapters of the *Types & Grammar* title of this series.
 
 ### Built-in Type Methods
 
@@ -176,7 +176,7 @@ When you use a primitive value like `"hello world"` as an `object` by referencin
 
 A `string` value is wrapped by a `String` object, a `number` can is wrapped by a `Number` object, a `boolean` is be wrapped by a `Boolean` object, etc. For the most part, you don't need to worry about or directly use these object wrapper forms of the values -- prefer the primitive value forms in practically all cases and JavaScript will take care of the rest for you.
 
-**Note:** For more information on JS natives and "boxing", see Chapter 3 of the *"Types & Grammar"* title of this book series. To better understand the prototype of an object, see Chapter 5 of the *"this & Object Prototypes"* title of this book series.
+**Note:** For more information on JS natives and "boxing", see Chapter 3 of the *Types & Grammar* title of this series. To better understand the prototype of an object, see Chapter 5 of the *this & Object Prototypes* title of this series.
 
 ### Comparing Values
 
@@ -190,7 +190,7 @@ Coercion comes in two forms in JavaScript: *explicit* and *implicit*. *Explicit*
 
 You've probably heard sentiments like "coercion is evil" drawn from the fact that there are clearly places where coercion can produce some surprising results. Perhaps nothing evokes frustration from developers more than when the language surprises them.
 
-Coercion is not evil, nor does it have to be surprising. In fact, the majority of cases you can construct with type coercion are quite sensible and understandable, and can even be used to **improve** the readability of your code. But we won't go much further into that debate -- Chapter 4 of the *"Types & Grammar"* title of this book series covers all sides.
+Coercion is not evil, nor does it have to be surprising. In fact, the majority of cases you can construct with type coercion are quite sensible and understandable, and can even be used to **improve** the readability of your code. But we won't go much further into that debate -- Chapter 4 of the *Types & Grammar* title of this series covers all sides.
 
 *Explicit* coercion:
 
@@ -286,7 +286,7 @@ b == c;		// true
 a == b;		// false
 ```
 
-**Note:** For more information about the `==` equality comparison rules, see the specification (section 11.9.3) and also consult Chapter 4 of the *"Types & Grammar"* title of this book series; see Chapter 2 for more information about values vs. references.
+**Note:** For more information about the `==` equality comparison rules, see the specification (section 11.9.3) and also consult Chapter 4 of the *Types & Grammar* title of this series; see Chapter 2 for more information about values vs. references.
 
 #### Inequality
 
@@ -324,7 +324,7 @@ Wait, how can all three of those comparisons be `false`? Because the `b` value i
 
 The `==` comparison fails for a different reason. `a == b` could fail if it's interpreted either as `42 == NaN` or `"42" == "foo"` -- as we explained earlier, the former is the case.
 
-**Note:** For more information about the inequality comparison rules, see the specification (section 11.8.5) and also consult Chapter 4 of the *"Types & Grammar"* title of this book series.
+**Note:** For more information about the inequality comparison rules, see the specification (section 11.8.5) and also consult Chapter 4 of the *Types & Grammar* title of this series.
 
 ## Variables
 
@@ -334,7 +334,7 @@ An identifier must start with `a`-`z`, `A`-`Z`, `$`, or `_`. It can then contain
 
 Generally, the same rules apply to a property name as to a variable identifier. However, certain words cannot be used as variables, but are OK as property names. These words are called "reserved words", and include the JS keywords (`for`, `in`, `if`, etc) as well as `null`, `true`, and `false`.
 
-**Note:** For more information about reserved words, see Appendix A of the *"Types & Grammar"* title of this book series.
+**Note:** For more information about reserved words, see Appendix A of the *Types & Grammar* title of this series.
 
 ### Function Scopes
 
@@ -435,7 +435,7 @@ foo();
 
 Because of using `let` instead of `var`, `b` will belong only to the `if` statement and thus not to the whole `foo()` function's scope. Similarly, `c` belongs only to the `while` loop. Block scoping is very useful for managing your variable scopes more fine-grained, which can make your code much easier to maintain over time.
 
-**Note:** For more information about scope, see the first four chapters of the *"Scope & Closures"* title of this book series.
+**Note:** For more information about scope, see the first four chapters of the *Scope & Closures* title of this series.
 
 ## Conditionals
 
@@ -515,7 +515,7 @@ If the test expression (`a > 41` here) evaluates as `true`, the first clause (`"
 
 The conditional operator doesn't have to be used in an assignment, but that's definitely the most common usage.
 
-**Note:** For more information about testing conditions and other patterns for `switch` and `? :`, see the *"Types & Grammar"* title of this series.
+**Note:** For more information about testing conditions and other patterns for `switch` and `? :`, see the *Types & Grammar* title of this series.
 
 ## Strict Mode
 
@@ -568,7 +568,7 @@ If you turn on strict mode in your code, and you get errors, or code starts beha
 
 Not only will strict mode keep your code to a safer path, and not only will it make your code more optimizable, but it also represents the future direction of the language. It'd be easier on you to get used to strict mode now than to keep putting it off -- it'll only get harder to convert later!
 
-**Note:** For more information about strict mode, see the Chapter 5 of the *"Types & Grammar"* title of this book series.
+**Note:** For more information about strict mode, see the Chapter 5 of the *Types & Grammar* title of this series.
 
 ## Functions As Values
 
@@ -602,7 +602,7 @@ The first function expression assigned to the `foo` variable is called *anonymou
 
 The second function expression is *named* (`bar`), even as a reference to it is also assigned to the `x` variable. *Named function expressions* are generally more preferable, though *anonymous function expressions* are still extremely common.
 
-For more information, see the *"Scope & Closures"* title of this series.
+For more information, see the *Scope & Closures* title of this series.
 
 ### Immediately Invoked Function Expressions (IIFE)
 
@@ -664,7 +664,7 @@ The `42` value gets `return`ed from the `IIFE`-named function being executed, an
 
 ### Closure
 
-*Closure* is one of the most important, and often least understood, concepts in JavaScript. I won't cover it in deep detail here, since the *"Scope & Closures"* title in this series does so. But we want to say a few things about it so you understand the general concept. It will be one of the most important techniques in your JS skillset.
+*Closure* is one of the most important, and often least understood, concepts in JavaScript. I won't cover it in deep detail here, since the *Scope & Closures* title in this series does so. But we want to say a few things about it so you understand the general concept. It will be one of the most important techniques in your JS skillset.
 
 You can think of *closure* as a way to "remember" and continue to access a function's scope (its variables) even once the function has finished running.
 
@@ -756,11 +756,11 @@ That's why we can call `fred.login(..)` -- the same as calling the inner `doLogi
 
 There's a good chance that with just this brief glimpse at *closure* and the module pattern, some of it is still a bit confusing. That's OK! It takes some work to wrap your brain around it.
 
-From here, go read the *"Scope & Closures"* title of this series for a much more in-depth exploration.
+From here, go read the *Scope & Closures* title of this series for a much more in-depth exploration.
 
 ## `this` Keyword
 
-Another very commonly misunderstood concept in JavaScript is the `this` keyword. Again, there's a whole set of book chapters on it in the *"this & Object Prototypes"* title of this book series, so here we'll just briefly introduce the concept.
+Another very commonly misunderstood concept in JavaScript is the `this` keyword. Again, there's a whole set of book chapters on it in the *this & Object Prototypes* title of this series, so here we'll just briefly introduce the concept.
 
 While it may often seem that `this` is related to "object oriented" patterns, in JS `this` is a different mechanism.
 
@@ -803,11 +803,11 @@ There are four rules for how `this` gets set, and they're shown in those last fo
 
 Bottom line: to understand what `this` points to, you have to examine how the function in question was called. It will be one of those four ways just shown, and that will then answer what `this` is.
 
-**Note:** For more information about `this`, see the first two chapters of the *"this & Object Prototypes"* title of this book series.
+**Note:** For more information about `this`, see the first two chapters of the *this & Object Prototypes* title of this series.
 
 ## Prototypes
 
-The prototype mechanism in JavaScript is quite complicated. We will only glance at it here. You will want to spend plenty of time on the last three chapters of the *"this & Object Prototypes"* title of this book series to get all the details down.
+The prototype mechanism in JavaScript is quite complicated. We will only glance at it here. You will want to spend plenty of time on the last three chapters of the *this & Object Prototypes* title of this series to get all the details down.
 
 When you reference a property on an object, if that property doesn't exist, JavaScript will automatically use that object's internal prototype reference to find another object to look for the property on. You could think of this almost as a fallback if the property is missing.
 
@@ -839,11 +839,11 @@ This linkage may seem like a strange feature of the language. The most common wa
 
 But a more natural way of applying prototypes is a pattern called "behavior delegation", where you intentionally design your linked objects to be able to **delegate** from one to the other for parts of the needed behavior.
 
-**Note:** For more information about prototypes and behavior delegation, see Chapters 3-6 of the *"this & Object Prototypes"* title of this book series.
+**Note:** For more information about prototypes and behavior delegation, see Chapters 3-6 of the *this & Object Prototypes* title of this series.
 
 ## Old & New
 
-Some of the JS features we've already covered, and certainly many of the features covered in the rest of this book series, are newer additions and will not necessarily be available in older browsers. In fact, some of the newest features in the specification aren't even implemented in any stable browsers yet.
+Some of the JS features we've already covered, and certainly many of the features covered in the rest of this series, are newer additions and will not necessarily be available in older browsers. In fact, some of the newest features in the specification aren't even implemented in any stable browsers yet.
 
 So, what do you do with the new stuff? Do you just have to wait around for years or decades for all the old browsers to fade into obscurity?
 
@@ -946,7 +946,7 @@ Everyone's favorite `alert(..)` pops up a message box in the user's browser wind
 
 The same goes with `console.log(..)`; your browser provides such mechanisms and hooks them up to the developer tools.
 
-This book, and this whole book series, focuses on JavaScript the language. That's why you don't see any substantial coverage of these non-JavaScript JavaScript mechanisms. Nevertheless, you need to be aware of them as they'll be in every JS program you write!
+This book, and this whole series, focuses on JavaScript the language. That's why you don't see any substantial coverage of these non-JavaScript JavaScript mechanisms. Nevertheless, you need to be aware of them as they'll be in every JS program you write!
 
 ## Review
 

@@ -1,9 +1,9 @@
 # You Don't Know JS: Up & Going
 # Chapter 1: Into Programming
 
-Welcome to the *"You Don't Know JS"* (YDKJS) book series.
+Welcome to the *You Don't Know JS* (YDKJS) series.
 
-*"Up & Going"* is an introduction to several basic concepts of programming -- of course we lean toward JavaScript (often abbreviated JS) specifically -- and how to approach and understand the rest of the titles in this series. Especially if you're just getting into programming and/or JavaScript, this book will briefly explore what you need to get *up and going*.
+*Up & Going* is an introduction to several basic concepts of programming -- of course we lean toward JavaScript (often abbreviated JS) specifically -- and how to approach and understand the rest of the titles in this series. Especially if you're just getting into programming and/or JavaScript, this book will briefly explore what you need to get *up and going*.
 
 This first chapter explains the basic principles of programming at a very high level. It's mostly intended if you are starting YDKJS with little to no prior programming experience, and are looking to these books to help get you started along a path to understanding programming through the lens of JavaScript.
 
@@ -84,7 +84,7 @@ For other languages, the translation is done ahead of time, called *compiling* t
 
 It's typically asserted that JavaScript is *interpreted*, because your JavaScript source code is processed each time it's run. But that's not entirely accurate. The JavaScript engine actually *compiles* the program on-the-fly and then immediately runs the compiled code.
 
-**Note:** For more information on JavaScript compiling, see the first two chapters of the *"Scope & Closures"* title of this book series.
+**Note:** For more information on JavaScript compiling, see the first two chapters of the *Scope & Closures* title of this series.
 
 ## Try It Yourself
 
@@ -273,7 +273,7 @@ While designed to help you, *implicit* coercion can create confusion if you have
 
 However, *implicit* coercion is a mechanism that **can be learned**, and moreover **should be learned** by anyone wishing to take JavaScript programming seriously. Not only is it not confusing once you learn the rules, it can actually make your programs better! The effort is well worth it.
 
-**Note:** For more information on coercion, see Chapter 4 of the *"Types & Grammar"* title of this book series.
+**Note:** For more information on coercion, see Chapter 4 of the *Types & Grammar* title of this series.
 
 ## Code Comments
 
@@ -411,7 +411,7 @@ var amount = 99.99;
 
 If you tried to assign any different value to `TAX_RATE` after that first declaration, your program would fail with an error. That kind of "protection" against mistakes is similar to the static-typing *type* enforcement enthusiasm, so you can see why it's attractive in other languages!
 
-**Note:** For more information about how different values in variables can be used in your programs, see the *"Types & Grammar"* title of this book series.
+**Note:** For more information about how different values in variables can be used in your programs, see the *Types & Grammar* title of this series.
 
 ## Blocks
 
@@ -493,7 +493,7 @@ JavaScript defines a list of specific values that are considered "falsy" because
 
 *Conditionals* exist in other forms besides the `if`. For example, the `switch` statement can be used as a short-hand for a series of `if..else` statements (see Chapter 2). Loops (see "Loops") use a *conditional* to determine if the loop should keep going or stop.
 
-**Note:** For deeper information about the coercions that can occur implicitly in *conditionals*' test expressions, see Chapter 4 of the *"Types & Grammar"* title of this series.
+**Note:** For deeper information about the coercions that can occur implicitly in *conditionals*' test expressions, see Chapter 4 of the *Types & Grammar* title of this series.
 
 ## Loops
 
@@ -710,7 +710,7 @@ function calculateFinalPurchaseAmount(amt) {
 
 The `TAX_RATE` constant (variable) is accessible from inside the `calculateFinalPurchaseAmount(..)` function, even though we didn't pass it in, because of lexical scope.
 
-**Note:** For more information about lexical scope, see the first three chapters of the *"Scope & Closures"* title of this book series.
+**Note:** For more information about lexical scope, see the first three chapters of the *Scope & Closures* title of this series.
 
 ## Practice
 
