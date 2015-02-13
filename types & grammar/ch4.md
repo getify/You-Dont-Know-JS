@@ -256,7 +256,7 @@ To convert to this primitive value equivalent, the `ToPrimitive` abstract operat
 
 If neither operation can provide a primitive value, a `TypeError` is thrown.
 
-As of ES5, you can create such a noncoercible object -- one without `valueOf()` and `toString()` -- if it has a `null` value for its `[[Prototype]]`, typically created with `Object.create(null)`. See the *"this & Object Prototypes"* title of this series for more information on `[[Prototype]]`s.
+As of ES5, you can create such a noncoercible object -- one without `valueOf()` and `toString()` -- if it has a `null` value for its `[[Prototype]]`, typically created with `Object.create(null)`. See the *this & Object Prototypes* title of this series for more information on `[[Prototype]]`s.
 
 **Note:** We cover how to coerce to `number`s later in this chapter in detail, but for this next code snippet, just assume the `Number(..)` function does so.
 

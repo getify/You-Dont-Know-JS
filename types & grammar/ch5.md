@@ -115,7 +115,7 @@ The general idea is to be able to treat statements as expressions -- they can sh
 
 For now, statement completion values are not much more than trivia. But they're probably going to take on more significance as JS evolves, and hopefully `do { .. }` expressions will reduce the temptation to use stuff like `eval(..)`.
 
-**Warning:** Repeating my earlier admonition: avoid `eval(..)`. Seriously. See the *"Scope & Closures"* title of this series for more explanation.
+**Warning:** Repeating my earlier admonition: avoid `eval(..)`. Seriously. See the *Scope & Closures* title of this series for more explanation.
 
 ### Expression Side Effects
 
@@ -214,7 +214,7 @@ obj.a;			// undefined
 
 The result value of the `delete` operator is `true` if the requested operation is valid/allowable, or `false` otherwise. But the side effect of the operator is that it removes the property (or array slot).
 
-**Note:** What do we mean by valid/allowable? Nonexistent properties, or properties that exist and are configurable (see Chapter 3 of the *"this & Object Prototypes"* title of this series) will return `true` from the `delete` operator. Otherwise, the result will be `false` or an error.
+**Note:** What do we mean by valid/allowable? Nonexistent properties, or properties that exist and are configurable (see Chapter 3 of the *this & Object Prototypes* title of this series) will return `true` from the `delete` operator. Otherwise, the result will be `false` or an error.
 
 One last example of a side-effecting operator, which may at once be both obvious and nonobvious, is the `=` assignment operator.
 
@@ -241,7 +241,7 @@ a = b = c = 42;
 
 Here, `c = 42` is evaluated to `42` (with the side effect of assigning `42` to `c`), then `b = 42` is evaluated to `42` (with the side effect of assigning `42` to `b`), and finally `a = 42` is evaluated (with the side effect of assigning `42` to `a`).
 
-**Warning:** A common mistake developers make with chained assignments is like `var a = b = 42`. While this looks like the same thing, it's not. If that statement were to happen without there also being a separate `var b` (somewhere in the scope) to formally declare `b`, then `var a = b = 42` would not declare `b` directly. Depending on `strict` mode, that would either throw an error or create an accidental global (see the *"Scope & Closures"* title of this series).
+**Warning:** A common mistake developers make with chained assignments is like `var a = b = 42`. While this looks like the same thing, it's not. If that statement were to happen without there also being a separate `var b` (somewhere in the scope) to formally declare `b`, then `var a = b = 42` would not declare `b` directly. Depending on `strict` mode, that would either throw an error or create an accidental global (see the *Scope & Closures* title of this series).
 
 Another scenario to consider:
 
@@ -321,7 +321,7 @@ What happens if we remove the `var a =` part of the above snippet?
 
 A lot of developers assume that the `{ .. }` pair is just a standalone `object` literal that doesn't get assigned anywhere. But it's actually entirely different.
 
-Here, `{ .. }` is just a regular code block. It's not very idiomatic in JavaScript (much more so in other languages!) to have a standalone `{ .. }` block like that, but it's perfectly valid JS grammar. It can be especially helpful when combined with `let` block-scoping declarations (see the *"Scope & Closures"* title in this series).
+Here, `{ .. }` is just a regular code block. It's not very idiomatic in JavaScript (much more so in other languages!) to have a standalone `{ .. }` block like that, but it's perfectly valid JS grammar. It can be especially helpful when combined with `let` block-scoping declarations (see the *Scope & Closures* title in this series).
 
 The `{ .. }` code block here is functionally pretty much identical to the code block being attached to some statement, like a `for`/`while` loop, `if` conditional, etc.
 
@@ -440,7 +440,7 @@ But on the second line, `{}` is interpreted as a standalone `{}` empty block (wh
 
 ##### Object Destructuring
 
-Starting with ES6, another place that you'll see `{ .. }` pairs showing up is with "destructuring assignments" (see the *"ES6 & Beyond"* title of this series for more info), specifically `object` destructuring. Consider:
+Starting with ES6, another place that you'll see `{ .. }` pairs showing up is with "destructuring assignments" (see the *ES6 & Beyond* title of this series for more info), specifically `object` destructuring. Consider:
 
 ```js
 function getData() {
@@ -1042,7 +1042,7 @@ Interestingly, while `typeof` has an exception to be safe for undeclared variabl
 
 ## Function Arguments
 
-Another example of a TDZ violation can be seen with ES6 default parameter values (see the *"ES6 & Beyond"* title of this series):
+Another example of a TDZ violation can be seen with ES6 default parameter values (see the *ES6 & Beyond* title of this series):
 
 ```js
 var b = 3;
@@ -1119,7 +1119,7 @@ foo();		// undefined (not linked)
 
 It's almost certainly a bad idea to ever rely on any such linkage, and in fact the linkage itself is a leaky abstraction that's exposing an underlying implementation detail of the engine, rather than a properly designed feature.
 
-Use of the `arguments` array has been deprecated (especially in favor of ES6 `...` rest parameters -- see the *"ES6 & Beyond"* title of this series), but that doesn't mean that it's all bad.
+Use of the `arguments` array has been deprecated (especially in favor of ES6 `...` rest parameters -- see the *ES6 & Beyond* title of this series), but that doesn't mean that it's all bad.
 
 Prior to ES6, `arguments` is the only way to get an array of all passed arguments to pass along to other functions, which turns out to be quite useful. You can also mix named parameters with the `arguments` array and be safe, as long as you follow one simple rule: **never refer to a named parameter *and* its corresponding `arguments` slot at the same time.** If you avoid that bad practice, you'll never expose the leaky linkage behavior.
 
@@ -1211,7 +1211,7 @@ for (var i=0; i<10; i++) {
 
 The `console.log(i)` statement runs at the end of the loop iteration, which is caused by the `continue` statement. However, it still runs before the `i++` iteration update statement, which is why the values printed are `0..9` instead of `1..10`.
 
-**Note:** ES6 adds a `yield` statement, in generators (see the *"Async & Performance"* title of this series) which in some ways can be seen as an intermediate `return` statement. However, unlike a `return`, a `yield` isn't complete until the generator is resumed, which means a `try { .. yield .. }` has not completed. So an attached `finally` clause will not run right after the `yield` like it does with `return`.
+**Note:** ES6 adds a `yield` statement, in generators (see the *Async & Performance* title of this series) which in some ways can be seen as an intermediate `return` statement. However, unlike a `return`, a `yield` isn't complete until the generator is resumed, which means a `try { .. yield .. }` has not completed. So an attached `finally` clause will not run right after the `yield` like it does with `return`.
 
 A `return` inside a `finally` has the special ability to override a previous `return` from the `try` or `catch` clause, but only if `return` is explicitly called:
 

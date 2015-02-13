@@ -85,7 +85,7 @@ Object.prototype.toString.call( true );		// "[object Boolean]"
 
 In this snippet, each of the simple primitives are automatically boxed by their respective object wrappers, which is why `"String"`, `"Number"`, and `"Boolean"` are revealed as the respective internal `[[Class]]` values.
 
-**Note:** The behavior of `toString()` and `[[Class]]` as illustrated here has changed a bit from ES5 to ES6, but we cover those details in the *"ES6 & Beyond"* title of this series.
+**Note:** The behavior of `toString()` and `[[Class]]` as illustrated here has changed a bit from ES5 to ES6, but we cover those details in the *ES6 & Beyond* title of this series.
 
 ## Boxing Wrappers
 
@@ -273,7 +273,7 @@ Confused? Yeah. Here's roughly how it works.
 
 `apply(..)` is a utility available to all functions, which calls the function it's used with but in a special way.
 
-The first argument is a `this` object binding (covered in the *"this & Object Prototypes"* title of this series), which we don't care about here, so we set it to `null`. The second argument is supposed to be an array (or something *like* an array -- aka an "array-like object"). The contents of this "array" are "spread" out as arguments to the function in question.
+The first argument is a `this` object binding (covered in the *this & Object Prototypes* title of this series), which we don't care about here, so we set it to `null`. The second argument is supposed to be an array (or something *like* an array -- aka an "array-like object"). The contents of this "array" are "spread" out as arguments to the function in question.
 
 So, `Array.apply(..)` is calling the `Array(..)` function and spreading out the values (of the `{ length: 3 }` object value) as its arguments.
 
@@ -410,7 +410,7 @@ For example, all string objects, and by extension (via boxing) `string` primitiv
 
 None of the methods modify the string *in place*. Modifications (like case conversion or trimming) create a new value from the existing value.
 
-By virtue of prototype delegation (see the *"this & Object Prototypes"* title in this series), any string value can access these methods:
+By virtue of prototype delegation (see the *this & Object Prototypes* title in this series), any string value can access these methods:
 
 ```js
 var a = " abc ";
