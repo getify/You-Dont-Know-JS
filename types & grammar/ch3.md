@@ -64,7 +64,7 @@ Object.prototype.toString.call( [1,2,3] );			// "[object Array]"
 Object.prototype.toString.call( /regex-literal/i );	// "[object RegExp]"
 ```
 
-So, for the array in this example, the internal `[[Class]]` value is `"Array"`, and for the regular expression, it's `"RegExp"`. In most cases, this internal `[Class]]` value corresponds to the built-in native constructor (see below) that's related to the value, but that's not always the case.
+So, for the array in this example, the internal `[[Class]]` value is `"Array"`, and for the regular expression, it's `"RegExp"`. In most cases, this internal `[[Class]]` value corresponds to the built-in native constructor (see below) that's related to the value, but that's not always the case.
 
 What about primitive values? First, `null` and `undefined`:
 
