@@ -243,7 +243,7 @@ it2.next( val1 / 4 );					// y:10
 										// 200 10 3
 ```
 
-**Note:** The most common usage of multiple instances of the same generator running concurrently is not such interactions, but when the generator is producing its own values without input, perhaps from some independently connected resource. We'll talk more about value production in the next section.
+**Warning:** The most common usage of multiple instances of the same generator running concurrently is not such interactions, but when the generator is producing its own values without input, perhaps from some independently connected resource. We'll talk more about value production in the next section.
 
 Let's briefly walk through the processing:
 
@@ -472,7 +472,7 @@ Of course, you could manually loop over iterators, calling `next()` and checking
 ```js
 for (
 	var ret;
-	(!ret || !ret.done) && (ret = something.next());
+	(ret = something.next()) && !ret.done;
 ) {
 	console.log( ret.value );
 
@@ -499,7 +499,7 @@ for (var v of a) {
 
 The `for..of` loop asks `a` for its *iterator*, and automatically uses it to iterate over `a`'s values.
 
-**Note:** It may seem a strange omission by ES6, but regular `object`s intentionally do not come with a default *iterator* the way `array`s do. The reasons go deeper than we will cover here. If all you want is to iterate over the properties of an object (with no particular guarantee of ordering), `Object.keys(..)` returns an `array`, which can then be used like `for (var k of Object.keys(obj)) { ..`.
+**Note:** It may seem a strange omission by ES6, but regular `object`s intentionally do not come with a default *iterator* the way `array`s do. The reasons go deeper than we will cover here. If all you want is to iterate over the properties of an object (with no particular guarantee of ordering), `Object.keys(..)` returns an `array`, which can then be used like `for (var k of Object.keys(obj)) { ..`. Such a `for..of` loop over an object's keys would be similar to a `for..in` loop, except that `Object.keys(..)` does not include properties from the `[[Prototype]]` chain while `for..in` does (see the *this & Object Prototypes* title of this series).
 
 ### Iterables
 
@@ -794,7 +794,7 @@ So we've seen we can throw errors *into* a generator, but what about throwing er
 function *main() {
 	var x = yield "Hello World";
 
-	yield x.toLowerCase();	// will throw!
+	yield x.toLowerCase();	// cause an exception!
 }
 
 var it = main();
@@ -999,7 +999,7 @@ That's it! The way we wired `run(..)`, it will automatically advance the generat
 
 The preceding pattern -- generators yielding Promises that then control the generator's *iterator* to advance it to completion -- is such a powerful and useful approach, it would be nicer if we could do it without the clutter of the library utility helper (aka `run(..)`).
 
-There's probably good news on that front. As of time of writing, there's early but strong support for a proposal for more syntactic addition in this realm for the post-ES6, ES7-ish timeframe. Obviously, it's too early to guarantee the details, but there's a pretty decent chance it will shake out like the following:
+There's probably good news on that front. At the time of this writing, there's early but strong support for a proposal for more syntactic addition in this realm for the post-ES6, ES7-ish timeframe. Obviously, it's too early to guarantee the details, but there's a pretty decent chance it will shake out similar to the following:
 
 ```js
 function foo(x,y) {
@@ -1025,11 +1025,11 @@ As you can see, there's no `run(..)` call (meaning no need for a library utility
 
 The `async function` automatically knows what to do if you `await` a Promise -- it will pause the function (just like with generators) until the Promise resolves. We didn't illustrate it in this snippet, but calling an async function like `main()` automatically returns a promise that's resolved whenever the function finishes completely.
 
-**Note:** The `async` / `await` syntax should look very familiar to readers with  experience in C#, because it's basically identical.
+**Tip:** The `async` / `await` syntax should look very familiar to readers with  experience in C#, because it's basically identical.
 
 The proposal essentially codifies support for the pattern we've already derived, into a syntactic mechanism: combining Promises with sync-looking flow control code. That's the best of both worlds combined, to effectively address practically all of the major concerns we outlined with callbacks.
 
-The mere fact that such a ES7-ish proposal already exists and has so much early support and enthusiasm is a major vote of confidence in the future importance of this async pattern.
+The mere fact that such a ES7-ish proposal already exists and has early support and enthusiasm is a major vote of confidence in the future importance of this async pattern.
 
 ### Promise Concurrency in Generators
 
@@ -1059,7 +1059,7 @@ run( foo );
 
 This code will work, but in the specifics of our scenario, it's not optimal. Can you spot why?
 
-Because the `r1` and `r2` requests can -- and for performance reasons, *should* -- run concurrently, but in this code they will run sequentially; the `"http://some.url.2"` URL isn't Ajax fetched until after the `"http://some.url.1"` is finished. These two requests are independent, so the better performance approach would likely be to have them run at the same time.
+Because the `r1` and `r2` requests can -- and for performance reasons, *should* -- run concurrently, but in this code they will run sequentially; the `"http://some.url.2"` URL isn't Ajax fetched until after the `"http://some.url.1"` request is finished. These two requests are independent, so the better performance approach would likely be to have them run at the same time.
 
 But how exactly would you do that with a generator and `yield`? We know that `yield` is only a single pause point in the code, so you can't really do two pauses at the same time.
 
@@ -1249,7 +1249,7 @@ So, the first two `it.next()` calls are controlling `*bar()`, but when we make t
 
 As soon as the `it` *iterator* control exhausts the entire `*foo()` *iterator*, it automatically returns to controlling `*bar()`.
 
-So now back to the previous example with the Ajax requests:
+So now back to the previous example with the three sequential Ajax requests:
 
 ```js
 function *foo() {
@@ -1273,7 +1273,7 @@ run( bar );
 
 The only difference between this snippet and the version used earlier is the use of `yield *foo()` instead of the previous `yield run(foo)`.
 
-**Note:** `yield *` yields iteration control, not generator control; when you invoke the `*foo()` generator, you're now `yield`-delegating to its *iterator*. But you can actually `yield`-delegate to any *iterator*; `yield *[1,2,3]` would `yield`-delegate to the default *iterator* for the `[1,2,3]` array value.
+**Note:** `yield *` yields iteration control, not generator control; when you invoke the `*foo()` generator, you're now `yield`-delegating to its *iterator*. But you can actually `yield`-delegate to any *iterable*; `yield *[1,2,3]` would consume the default *iterator* for the `[1,2,3]` array value.
 
 ### Why Delegation?
 
@@ -1341,7 +1341,7 @@ Pay particular attention to the processing steps after the `it.next(3)` call:
 
 From the perspective of the external *iterator* (`it`), it doesn't appear any differently between controlling the initial generator or a delegated one.
 
-In fact, `yield`-delegation doesn't even have to be directed to another generator; it can just be directed to a non-generator, general *iterator*. For example:
+In fact, `yield`-delegation doesn't even have to be directed to another generator; it can just be directed to a non-generator, general *iterable*. For example:
 
 ```js
 function *bar() {
@@ -1456,7 +1456,7 @@ Some things to note from this snippet:
 
 ### Delegating Asynchrony
 
-Let's finally get back to our earlier `yield`-delegation example with the multiple "in parallel" Ajax requests:
+Let's finally get back to our earlier `yield`-delegation example with the multiple sequential Ajax requests:
 
 ```js
 function *foo() {
@@ -1505,7 +1505,7 @@ function *bar() {
 run( bar );
 ```
 
-**Note:** Our `run(..)` utility could have been called with `run( foo, 3 )`, because it supports additional parameters being passed along to the initialization of the generator. However, we used a parameter-free `*bar()` here to reinforce the flexibility of `yield *`.
+**Note:** Our `run(..)` utility could have been called with `run( foo, 3 )`, because it supports additional parameters being passed along to the initialization of the generator. However, we used a parameter-free `*bar()` here to highlight the flexibility of `yield *`.
 
 What processing steps follow from that code? Hang on, this is going to be quite intricate to describe in detail:
 
@@ -1649,7 +1649,7 @@ runAll(
 );
 ```
 
-**Note:** We're not including a code listing for `runAll(..)` as it's not only so long as to bog down the text, but is an extension of the logic we've already implemented in `run(..)` earlier. So, as a good supplementary exercise for the reader, try your hand at evolving the code from `run(..)` to work like the imagined `runAll(..)`. Also, my *asynquence* library provides a previously mentioned `runner(..)` utility with this kind of capability already built in, and will be discussed in Appendix A of this book.
+**Note:** We're not including a code listing for `runAll(..)` as it is not only long enough to bog down the text, but is an extension of the logic we've already implemented in `run(..)` earlier. So, as a good supplementary exercise for the reader, try your hand at evolving the code from `run(..)` to work like the imagined `runAll(..)`. Also, my *asynquence* library provides a previously mentioned `runner(..)` utility with this kind of capability already built in, and will be discussed in Appendix A of this book.
 
 Here's how the processing inside `runAll(..)` would operate:
 
@@ -1856,7 +1856,7 @@ Comparing thunks to promises generally: they're not directly interchangable as t
 
 But in another sense, they both can be seen as a request for a value, which may be async in its answering.
 
-Recall from Chapter 3 we defined a utility for promisifying a function, which we called `Promise.wrap(..)` -- we could have called it `promisify(..)`, too! This Promise-wrapping utility doesn't produce Promises; it produces promisories which in turn produce Promises. This is completely symmetric to the thunkories and thunks presently being discussed.
+Recall from Chapter 3 we defined a utility for promisifying a function, which we called `Promise.wrap(..)` -- we could have called it `promisify(..)`, too! This Promise-wrapping utility doesn't produce Promises; it produces promisories that in turn produce Promises. This is completely symmetric to the thunkories and thunks presently being discussed.
 
 To illustrate the symmetry, let's first alter the running `foo(..)` example from earlier to assume an "error-first style" callback:
 
@@ -1964,7 +1964,7 @@ Now, our generators can either call promisories to `yield` Promises, or call thu
 
 Symmetry wise, these two approaches look identical. However, we should point out that's true only from the perspective of Promises or thunks representing the future value continuation of a generator.
 
-From the larger perspective, thunks do not in and of themselves have hardly any of the trustability or composability guarantees that Promises are architected with. Using a thunk as a stand-in for a Promise in this particular generator asynchrony pattern is workable but should be seen as less than ideal when compared to all the benefits that Promises offer (see Chapter 3).
+From the larger perspective, thunks do not in and of themselves have hardly any of the trustability or composability guarantees that Promises are designed with. Using a thunk as a stand-in for a Promise in this particular generator asynchrony pattern is workable but should be seen as less than ideal when compared to all the benefits that Promises offer (see Chapter 3).
 
 If you have the option, prefer `yield pr` rather than `yield th`. But there's nothing wrong with having a `run(..)` utility which can handle both value types.
 
