@@ -174,7 +174,7 @@ Briefly, there is a `String` (capital `S`) object wrapper form, typically called
 
 When you use a primitive value like `"hello world"` as an `object` by referencing a property or method -- for example: `a.toUpperCase()` in the previous snippet -- JS automatically "boxes" the value to its object wrapper counterpart (hidden under the covers).
 
-A `string` value is wrapped by a `String` object, a `number` can is wrapped by a `Number` object, a `boolean` is be wrapped by a `Boolean` object, etc. For the most part, you don't need to worry about or directly use these object wrapper forms of the values -- prefer the primitive value forms in practically all cases and JavaScript will take care of the rest for you.
+A `string` value is wrapped by a `String` object, a `number` can is wrapped by a `Number` object, a `boolean` is being wrapped by a `Boolean` object, etc. For the most part, you don't need to worry about or directly use these object wrapper forms of the values -- prefer the primitive value forms in practically all cases and JavaScript will take care of the rest for you.
 
 **Note:** For more information on JS natives and "boxing", see Chapter 3 of the *Types & Grammar* title of this series. To better understand the prototype of an object, see Chapter 5 of the *this & Object Prototypes* title of this series.
 
