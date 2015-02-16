@@ -137,7 +137,7 @@ Browsers that don't support Transferable Objects simply degrade to structured cl
 
 ### Shared Workers
 
-If your site or app allows for loading multiple tabs of the same page (a common feature), you may very well want to reduce the resource usage of their system by preventing duplicate dedicated Workers; the most common limited resource in this respect is a socket network connection, as browsers limit the number of simulataneous connections to a single host. Of course, limiting multiple connections from a client also eases your server resource requirements.
+If your site or app allows for loading multiple tabs of the same page (a common feature), you may very well want to reduce the resource usage of their system by preventing duplicate dedicated Workers; the most common limited resource in this respect is a socket network connection, as browsers limit the number of simultaneous connections to a single host. Of course, limiting multiple connections from a client also eases your server resource requirements.
 
 In this case, creating a single centralized Worker that all the page instances of your site or app can *share* is quite useful.
 
