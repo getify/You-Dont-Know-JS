@@ -96,7 +96,7 @@ Consider:
 ```js
 {
 	console.log( a );	// undefined
-	console.log( b );	// ReferenecError!
+	console.log( b );	// ReferenceError!
 
 	var a;
 	let b;
