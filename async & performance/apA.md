@@ -179,7 +179,7 @@ In those cases, you can also **opt a sequence instance out** of error reporting 
 
 ```js
 var sq1 = ASQ( function(done){
-	doesnt.Exist();			// will throw an exception to console
+	doesnt.Exist();			// will throw exception to console
 } );
 
 var sq2 = ASQ( function(done){
