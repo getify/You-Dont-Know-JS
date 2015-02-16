@@ -72,7 +72,7 @@ function foo() {
 
 var bench = new Benchmark(
 	"foo test",				// test name
-	foo,					// function to test (just its contents)
+	foo,					// function to test (just contents)
 	{
 		// ..				// optional extra options (see docs)
 	}
@@ -491,7 +491,7 @@ In the days when a browser only updated once every five years, that was a toughe
 
 If you run across a case where a browser *does* have a performance wart that others don't suffer from, make sure to report it to them through whatever means you have available. Most browsers have open public bug trackers suitable for this purpose.
 
-**Note:** I'd only suggest working around a performance issue in a browser if it was a really drastic show-stopper, not just an annoyance or frustration. And I'd be very careful to check that the performance hack didn't have noticeable negative side effects in another browser.
+**Tip:** I'd only suggest working around a performance issue in a browser if it was a really drastic show-stopper, not just an annoyance or frustration. And I'd be very careful to check that the performance hack didn't have noticeable negative side effects in another browser.
 
 ### Big Picture
 
