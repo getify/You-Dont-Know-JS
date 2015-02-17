@@ -66,7 +66,7 @@ b * 2;
 
 This flavor of *expression statement* is not very common or useful, as generally it wouldn't have any affect on the running of the program -- it would retrive the value of `b` and multiply it by `2`, but then wouldn't do anything with that result.
 
-A more common *expression statement* is a *call expression* statement (see "Functions"), since the entire statement is the is the function call expression itself:
+A more common *expression statement* is a *call expression* statement (see "Functions"), since the entire statement is the function call expression itself:
 
 ```js
 console.log( a );
