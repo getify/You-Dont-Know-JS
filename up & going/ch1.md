@@ -76,7 +76,7 @@ console.log( a );
 
 How do those collections of programming statements tell the computer what to do? The program needs to be *executed*, also referred to as *running the program*.
 
-Statements like `a = b * 2` are more for intended for developers to read and write, but are not actually in a form the computer can directly understand. So a special utility on the computer (either an *interpreter* or a *compiler*) is used to translate the code you write into commands a computer can understand.
+Statements like `a = b * 2` are helpful for developers when reading and writing, but are not actually in a form the computer can directly understand. So a special utility on the computer (either an *interpreter* or a *compiler*) is used to translate the code you write into commands a computer can understand.
 
 For some computer languages, this translation of commands is typically done from top to bottom, line by line, every time the program is run, which is usually called *interpreting* the code.
 
