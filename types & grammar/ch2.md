@@ -620,7 +620,7 @@ var a = 2 / "foo";
 var b = "foo";
 
 a; // NaN
-b; "foo"
+b; // "foo"
 
 window.isNaN( a ); // true
 window.isNaN( b ); // true -- ouch!
