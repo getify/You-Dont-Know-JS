@@ -923,7 +923,7 @@ If you use a transpiler by default, you'll always be able to make that switch to
 
 There are quite a few great transpilers for you to choose from. Here are some good options at the time of this writing:
 
-* 6to5 (https://github.com/6to5/6to5): transpiles ES6 into ES5
+* Babel (https://babeljs.io): transpiles ES6+ into ES5 (formerly 6to5)
 * Traceur (https://github.com/google/traceur-compiler): transpiles ES6, ES7, .. into ES5.
 
 ## Non-JavaScript
