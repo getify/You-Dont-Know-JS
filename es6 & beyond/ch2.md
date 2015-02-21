@@ -211,4 +211,93 @@ There's some rumored assumptions that a `const` likely will be more optimizable 
 
 Whether that is the case or just our own fantasies and intuitions, the much more important decision to make is if you intend *constant* behavior or not. Don't just use `const` on variables that otherwise don't obviously appear to be treated as *constants* in the code, as that will just lead to more confusion.
 
+## Default Parameter Values
+
+Perhaps one of the most common idioms in JavaScript relates to setting a default value for a function parameter. The way we've done this for years should look quite familiar:
+
+```js
+function foo(x,y) {
+	x = x || 11;
+	y = y || 31;
+
+	console.log( x + y );
+}
+
+foo();				// 42
+foo( 5, 6 );		// 11
+foo( 5 );			// 36
+foo( null, 6 );		// 17
+```
+
+Of course, if you've used this pattern before, you know that it's both helpful and a little bit dangerous, if for example you need to be able to pass in what would otherwise be considered a falsy value for one of the parameters. Consider:
+
+```js
+foo( 0, 42 );		// 53 <-- Oops, not 42
+```
+
+Why? Because the `0` is falsy, and so the `x || 11` results in `11`, not the directly passed in `0`.
+
+To fix this gotcha, some people will instead write the check more verbosely like this:
+
+```js
+function foo(x,y) {
+	x = (x !== undefined) ? x : 11;
+	y = (y !== undefined) ? y : 31;
+
+	console.log( x + y );
+}
+
+foo( 0, 42 );			// 42
+foo( undefined, 6 );	// 17
+```
+
+Of course, that means that any value except `undefined` can be directly passed in, but `undefined` will be assumed to be, "I didn't pass this in." That works great unless you actually need to be able to pass `undefined` in.
+
+In that case, you could test to see if the argument is actually omitted, by it actually not being present in the `arguments` array, perhaps like this:
+
+```js
+function foo(x,y) {
+	x = (0 in arguments) ? x : 11;
+	y = (1 in arguments) ? y : 31;
+
+	console.log( x + y );
+}
+
+foo( 5 );				// 36
+foo( 5, undefined );	// NaN
+```
+
+But how would you omit the first `x` argument without the ability to pass in any kind of value (not even `undefined`) that signals, "I'm omitting this argument."?
+
+`foo(,5)` is tempting, but it's invalid syntax. `foo.apply(null,[,5])` seems like it should do the trick, but `apply(..)`'s quirks here mean that the arguments are treated as `[undefined,5]`, which of course doesn't omit.
+
+If you investigate further, you'll find you can only omit arguments on the end (i.e., righthand side) by simply passing fewer arguments than "expected", but you cannot omit arguments in the middle or at the beginning of the arguments list. It's just not possible.
+
+There's a principle applied to JavaScript's design here which is important to remember: *`undefined` means missing*. That is, there's no difference between `undefined` and *missing*, at least as far as function arguments go.
+
+**Warning:** There are, confusingly, other places in JS where this particular design principle doesn't apply, such as for arrays with empty slots. See the *Types & Grammar* title of this series for more information.
+
+With all this mind, we can now examine a nice helpful syntax added as of ES6 to streamline the assignment of default values to missing arguments:
+
+```js
+function foo(x = 11, y = 31) {
+	console.log( x + y );
+}
+
+foo();					// 42
+foo( 5, 6 );			// 11
+foo( 0, 42 );			// 42
+
+foo( 5 );				// 36
+foo( 5, undefined );	// 36 <-- `undefined` is missing
+foo( 5, null );			// 5  <-- null coerces to `0`
+
+foo( undefined, 6 );	// 17 <-- `undefined` is missing
+foo( null, 6 );			// 6  <-- null coerces to `0`
+```
+
+Notice the results and how they imply both subtle differences and similarities to the earlier approaches.
+
+`x = 11` in a function declaration is more like `x !== undefined ? x : 11` than the much more common idiom `x || 11`, so you'll need to be careful in converting your pre-ES6 code to this ES6 default parameter value syntax.
+
 # Review
