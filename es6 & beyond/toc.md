@@ -27,7 +27,6 @@
 * Chapter 4: Async Flow Control
 	* Promises
 	* Generators + Promises
-	* `async` Functions
 * Chapter 5: Collections
 	* Map
 	* WeakMap
@@ -45,4 +44,8 @@
 	* `Reflect` API
 	* Proxies
 	* Tail Call Optimization
+* Chapter 8: Beyond ES6
+	* `async` Functions
+	* `Object.observe(..)`
+	* Other Stuff
 * Appendix A: Thank You's!
