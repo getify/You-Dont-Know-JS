@@ -460,8 +460,8 @@ There are quite a few ways we can express *conditionals* (aka decisions) in our 
 The most common one is the `if` statement. Essentially, you're saying, "*If* this condition is true, do the following...". For example:
 
 ```js
-var amount = 99.99;
 var bank_balance = 302.13;
+var amount = 99.99;
 
 if (amount < bank_balance) {
 	console.log( "I want to buy this phone!" );
@@ -475,8 +475,8 @@ You can even provide an alternative if the condition isn't true, called an `else
 ```js
 const ACCESSORY_PRICE = 9.99;
 
-var amount = 99.99;
 var bank_balance = 302.13;
+var amount = 99.99;
 
 amount = amount * 2;
 
@@ -727,7 +727,7 @@ With that in mind, let's try practicing some of the concepts we learned here in 
 * Write a program to calculate the total price of your phone purchase. You will keep purchasing phones (hint: loop!) until you run out of money in your bank account. You'll also buy accessories for each phone as long as your purchase amount is below your mental spending threshold.
 * After you've calculated your purchase amount, add in the tax, then print out the calculated purchase amount, properly formatted.
 * Finally, check the amount against your bank account balance to see if you can afford it or not.
-* You should set up some constants for the "tax rate," "phone price," and "accessory price," as well as your current "bank balance" and your "spending threshold."
+* You should set up some constants for the "tax rate," "phone price," "accessory price," and "spending threshold," as well as a variable for your "bank account balance.""
 * You should define functions for calculating the tax and for formatting the price with a "$" and rounding to two decimal places.
 * **Bonus Challenge:** Try to incorporate input into this program, perhaps with the `prompt(..)` covered in "Input" earlier. You may prompt the user for their bank account balance, for example. Have fun and be creative!
 
@@ -738,13 +738,12 @@ OK, go ahead. Try it. Don't peek at my code listing until you've given it a shot
 Here's my JavaScript solution for this exercise:
 
 ```js
-var bank_balance = 303.91;
-
 const SPENDING_THRESHOLD = 200;
 const TAX_RATE = 0.08;
 const PHONE_PRICE = 99.99;
 const ACCESSORY_PRICE = 9.99;
 
+var bank_balance = 303.91;
 
 function calculateTax(amount) {
 	return amount * TAX_RATE;
