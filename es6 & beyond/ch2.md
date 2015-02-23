@@ -300,4 +300,153 @@ Notice the results and how they imply both subtle differences and similarities t
 
 `x = 11` in a function declaration is more like `x !== undefined ? x : 11` than the much more common idiom `x || 11`, so you'll need to be careful in converting your pre-ES6 code to this ES6 default parameter value syntax.
 
+## Destructuring
+
+ES6 introduces a new syntactic feature called *destructuring*, which may be a little less confusing sounding if you instead think of it as *structured assignment*. To understand this meaning, consider:
+
+```js
+function foo() {
+	return [1,2,3];
+}
+
+var tmp = foo(),
+	a = tmp[0], b = tmp[1], c = tmp[2];
+
+console.log( a, b, c );		// 1 2 3
+```
+
+As you can see, we created a manual assignment of the values in the array that `foo()` returns to individual variables `a`, `b`, and `c`, and to do so we (unfortunately) needed the `tmp` variable.
+
+This pattern is widely called *array destructuring assignment*, or as I prefer, *structured array assignment*.
+
+We can do similar with objects:
+
+```js
+function bar() {
+	return {
+		x: 4,
+		y: 5,
+		z: 6
+	};
+}
+
+var tmp = bar(),
+	x = tmp.x, y = tmp.y, z = tmp.z;
+
+console.log( x, y, z );		// 4 5 6
+```
+
+The `tmp.x` property value is assigned to the `x` variable, and likewise for `tmp.y` to `y` and `tmp.z` to `z`. Of course, this is generally referred to as *object destructuring assignment*, or my alternate description: *structured object assignment*.
+
+ES6 introduces a destructuring syntax which eliminates the need for the `tmp` variable in the previous snippets, making them much cleaner. Consider:
+
+```js
+var [ a, b, c ] = foo();
+var { x: x, y: y, z: z } = bar();
+
+console.log( a, b, c );		// 1 2 3
+console.log( x, y, z );		// 4 5 6
+```
+
+You're likely more used to seeing syntax like `[a,b,c]` on the righthand side of an `=` assignment, as the value being assigned.
+
+Destructuring symmetrically flips that pattern, so that `[a,b,c]` on the lefthand side of the `=` assignment is treated as a kind of "pattern" for decomposing the righthand side array value into separate variable assignments.
+
+Similarly, `{ x: x, y: y, z: z }` specifies a "pattern" to decompose the object value from `bar()` into separate variable assignments.
+
+### Object Property Assignment Pattern
+
+Let's dig into that `{ x: x, ... }` syntax from the previous snippet. If the property name being matched is the same as the variable you want to declare, you can actually shorten the syntax:
+
+```js
+var { x, y, z } = bar();
+
+console.log( x, y, z );		// 4 5 6
+```
+
+If you can write the shorter form, why would you ever write out the longer form? Because that form actually allows you to assign a property to a different variable name, which can sometimes be quite useful:
+
+```js
+var { x: bam, y: baz, z: bap } = bar();
+
+console.log( bam, baz, bap );		// 4 5 6
+console.log( x, y, z );				// ReferenceError
+```
+
+There's a subtle but super important quirk to understand about this variation of the object destructuring form. To illustrate why it can be a gotcha you need to be careful of, let's consider the "pattern" of how normal object literals operate:
+
+```js
+var X = 10, Y = 20;
+
+var o = { a: X, b: Y };
+
+console.log( o.a, o.b );	// 10 20
+```
+
+In `{ a: X, b: Y }`, we know that `a` is the object property
+
+
+
+
+### Not Just Declarations
+
+So far, we've used destructuring assignment with `var` declarations --of course, they could also use `let` and `const` -- but destructuring is a general assignment operation, not just a declaration.
+
+Consider:
+
+```js
+var a, b, c, x, y, z;
+
+[a,b,c] = foo();
+( { x: x, y: y, z: z } ) = bar();
+
+console.log( a, b, c );		// 1 2 3
+console.log( x, y, z );		// 4 5 6
+```
+
+The variables can already be declared, and then the destructuring only does assignments, exactly as described before.
+
+**Note:** For the object destructuring form, we had to surround it in `( )`, because `{ .. }` all by itself is taken to be a statement block.
+
+In fact, the assignment expressions (`a`, `y`, etc.) don't actually need to be just variable identifiers. Anything that's a valid assignment expression is valid. For example:
+
+```js
+var o = {};
+
+[o.a, o.b, o.c] = foo();
+
+
+
+
+### Too Many, Too Few
+
+With both array destructuring assignment and object destructuring assignment, you do not have to assign all the values that are present. For example:
+
+```js
+var [,b] = foo();
+var { x: x, z: z } = bar();
+
+console.log( b, x, z );		// 2 4 6
+```
+
+Similarly, if you try to assign to more values than are present in the value you're destructuring/decomposing, you get graceful fallback to `undefined`, as you'd expect:
+
+```js
+var [,,c,d] = foo();
+var { w: w, z: z } = bar();
+
+console.log( c, z );	// 3 6
+console.log( d, w );	// undefined undefined
+```
+
+This behavior follows symmetrically from the earlier stated *`undefined` is missing* principle.
+
+### Default Value Assignment
+
+Both forms of destructuring can offer a default value option for each assignment. Consider:
+
+var [a = 3, b = 6, c = 9, d = 12 ] = foo();
+var { x: x, ,,,
+
+
 # Review
