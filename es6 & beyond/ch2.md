@@ -356,7 +356,7 @@ Similarly, `{ x: x, y: y, z: z }` specifies a "pattern" to decompose the object 
 
 ### Object Property Assignment Pattern
 
-Let's dig into that `{ x: x, ... }` syntax from the previous snippet. If the property name being matched is the same as the variable you want to declare, you can actually shorten the syntax:
+Let's dig into that `{ x: x, .. }` syntax from the previous snippet. If the property name being matched is the same as the variable you want to declare, you can actually shorten the syntax:
 
 ```js
 var { x, y, z } = bar();
@@ -364,7 +364,9 @@ var { x, y, z } = bar();
 console.log( x, y, z );		// 4 5 6
 ```
 
-If you can write the shorter form, why would you ever write out the longer form? Because that form actually allows you to assign a property to a different variable name, which can sometimes be quite useful:
+Cool, huh!?
+
+But if you can write the shorter form, why would you ever write out the longer form? Because that form actually allows you to assign a property to a different variable name, which can sometimes be quite useful:
 
 ```js
 var { x: bam, y: baz, z: bap } = bar();
@@ -373,7 +375,7 @@ console.log( bam, baz, bap );		// 4 5 6
 console.log( x, y, z );				// ReferenceError
 ```
 
-There's a subtle but super important quirk to understand about this variation of the object destructuring form. To illustrate why it can be a gotcha you need to be careful of, let's consider the "pattern" of how normal object literals operate:
+There's a subtle but super important quirk to understand about this variation of the object destructuring form. To illustrate why it can be a gotcha you need to be careful of, let's consider the "pattern" of how normal object literals are specified:
 
 ```js
 var X = 10, Y = 20;
@@ -383,10 +385,32 @@ var o = { a: X, b: Y };
 console.log( o.a, o.b );	// 10 20
 ```
 
-In `{ a: X, b: Y }`, we know that `a` is the object property
+In `{ a: X, b: Y }`, we know that `a` is the object property, and `X` is the source value that gets assigned to it. In other words, the syntactic pattern is `target: source`, or more obviously, `property-alias: value`. We intuitively understand this because it's the same as `=` assignment, where the pattern is `target = source`.
 
+However, when you use object destructuring assignment -- that is, putting the `{ .. }` object literal looking syntax on the lefthand side of the `=` operator -- you invert that `target: source` pattern.
 
+Recall:
 
+```js
+var { x: bam, y: baz, z: bap } = bar();
+```
+
+The syntactic pattern here is `source: target` (or `value: variable-alias`). `x: bam` means the `x` property is the source value and `bam` is the target variable to assign to. In other words, object literals are `target <= source`, and object destructuring assignments are `source => target`. See how that's flipped?
+
+There's another way to think about this syntax though, which may help ease the confusion. Consider:
+
+```js
+var aa = 10, bb = 20;
+
+var o = { x: aa, y: bb };
+var     { x: AA, y: BB } = o;
+
+console.log( AA, BB );		// 10 20
+```
+
+In the `{ x: aa, y: bb }` line, the `x` and `y` represent the object properties. In the `{ x: AA, y: BB }` line, the `x` and the `y` *also* represent the object properties. That symmetry may help to explain why the syntactic pattern was flipped.
+
+**Note:** Personally, I would have preferred the syntax to be `{ AA: x , BB: y }` for the destructuring assignment, since that would have preserved the more familiar `target: source` pattern for both usages. Alas, I'm having to train my brain for the inversion, as some readers may have to do.
 
 ### Not Just Declarations
 
@@ -398,15 +422,15 @@ Consider:
 var a, b, c, x, y, z;
 
 [a,b,c] = foo();
-( { x: x, y: y, z: z } ) = bar();
+( { x, y, z } ) = bar();
 
 console.log( a, b, c );		// 1 2 3
 console.log( x, y, z );		// 4 5 6
 ```
 
-The variables can already be declared, and then the destructuring only does assignments, exactly as described before.
+The variables can already be declared, and then the destructuring only does assignments, exactly as we've already seen.
 
-**Note:** For the object destructuring form, we had to surround it in `( )`, because `{ .. }` all by itself is taken to be a statement block.
+**Note:** For the object destructuring form specifically, when leaving off a `var`/`let`/`const` declarator, we had to surround the `{ .. }` value in `( )`, because `{ .. }` all by itself is taken to be a statement block.
 
 In fact, the assignment expressions (`a`, `y`, etc.) don't actually need to be just variable identifiers. Anything that's a valid assignment expression is valid. For example:
 
@@ -414,9 +438,11 @@ In fact, the assignment expressions (`a`, `y`, etc.) don't actually need to be j
 var o = {};
 
 [o.a, o.b, o.c] = foo();
+( { x: o.x, y: o.y, z: o.z } ) = bar();
 
-
-
+console.log( o.a, o.b, o.c );	// 1 2 3
+console.log( o.x, o.y, o.z );	// 4 5 6
+```
 
 ### Too Many, Too Few
 
