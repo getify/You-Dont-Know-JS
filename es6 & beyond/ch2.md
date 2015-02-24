@@ -685,7 +685,7 @@ var o1 = { x: { y: 42 }, z: { y: z } };
 ( { x: z = { y: x } } ) = o1;
 ```
 
-Can you tell from that snippet what values `x`, `y`, and `z` have at the end? Takes a moment ponder, I would imagine. I'll end the suspense:
+Can you tell from that snippet what values `x`, `y`, and `z` have at the end? Takes a moment to ponder, I would imagine. I'll end the suspense:
 
 ```js
 console.log( x.y, y.y, z.y );		// 300 100 42
@@ -788,7 +788,7 @@ f3( [] );							// undefined undefined [] []
 f3( [1,2,3,4], 5, 6 );				// 1 2 [3,4] [5,6]
 ```
 
-There are two `...` operators in use here, and they're both gathering of values in arrays (`z` and `w`), though `...z` gathers from the rest of the values left over in the first array argument, while `...w` fathers from the rest of the main arguments left over after the first.
+There are two `...` operators in use here, and they're both gathering values in arrays (`z` and `w`), though `...z` gathers from the rest of the values left over in the first array argument, while `...w` gathers from the rest of the main arguments left over after the first.
 
 #### Destructuring Defaults + Parameter Defaults
 
