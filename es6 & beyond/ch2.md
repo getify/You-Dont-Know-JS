@@ -211,6 +211,103 @@ There's some rumored assumptions that a `const` likely will be more optimizable 
 
 Whether that is the case or just our own fantasies and intuitions, the much more important decision to make is if you intend *constant* behavior or not. Don't just use `const` on variables that otherwise don't obviously appear to be treated as *constants* in the code, as that will just lead to more confusion.
 
+## Spread / Rest
+
+ES6 introduces a new `...` operator that's typically referred to as the *spread* or *rest* operator, depending on where/how it's used. Let's take a look:
+
+```js
+function foo(x,y,z) {
+	console.log( x, y, z );
+}
+
+foo( ...[1,2,3] );				// 1 2 3
+```
+
+When `...` is used in front of an array (actually, any *iterable*, which we cover in Chapter 3), it acts to "spread" it out into its individual values.
+
+You'll typically see that usage as is shown in that previous snippet, when spreading out an array as a set of arguments to a function call. In this usage, `...` acts to give us a simpler syntactic replacement for the `apply(..)` method, which we would typically have used pre-ES6 as:
+
+```js
+foo.apply( null, [1,2,3] );		// 1 2 3
+```
+
+But `...` can be used to spread out/expand a value in other contexts as well, such as inside another array declaration:
+
+```js
+var a = [2,3,4];
+var b = [ 1, ...a, 5 ];
+
+console.log( b );					// [1,2,3,4,5]
+```
+
+In this usage, `...` is basically replacing `concat(..)`, as the above behaves like `[1].concat( a, [5] )`.
+
+The other common usage of `...` can be seen as almost the opposite; instead of spreading a value out, the `...` *gathers* a set of values together into an array. Consider:
+
+```js
+function foo(x, y, ...z) {
+	console.log( x, y, z );
+}
+
+foo( 1, 2, 3, 4, 5 );			// 1 2 [3,4,5]
+```
+
+The `...z` in this snippet is essentially saying: "gather the *rest* of the arguments (if any) into an array called `z`." Since `x` was assigned `1`, and `y` was assigned `2`, the rest of the arguments `3`, `4`, and `5` were gathered into `z`.
+
+Of course, if you don't have any named parameters, the `...` gathers all arguments:
+
+```js
+function foo(...args) {
+	console.log( args );
+}
+
+foo( 1, 2, 3, 4, 5);			// [1,2,3,4,5]
+```
+
+**Note:** The `...args` in the `foo(..)` function declaration is usually called "rest parameters", since you're collecting the rest of the parameters. I prefer "gather", since it's more descriptive of what it does, not what it contains.
+
+The best part about this usage is that is provides a very solid alternative to using the long-since deprecated `arguments` array -- actually, it's not really an array, but an array-like object. Since `args` (or whatever you call it -- a lot of people prefer `r` or `rest`) is a real array, we can get rid of lots of silly pre-ES6 tricks we jumped through to make `arguments` into something we can treat as an array.
+
+Consider:
+
+```js
+// doing things the new ES6 way
+function foo(...args) {
+	// `args` is already a real array
+
+	// discard first element in `args`
+	args.shift();
+
+	// pass along all of `args` as arguments
+	// to `console.log(..)`
+	console.log( ...args );
+}
+
+// doing things the old-school pre-ES6 way
+function bar() {
+	// turn `arguments` into a real array
+	var args = Array.prototype.slice.call( arguments );
+
+	// add some elements on the end
+	args.push( 4, 5 );
+
+	// filter out odd numbers
+	args = args.filter( function(v){
+		return v % 2 == 0;
+	} );
+
+	// pass along all of `args` as arguments
+	// to `foo(..)`
+	foo.apply( null, args );
+}
+
+bar( 0, 1, 2, 3 );					// 2 4
+```
+
+The `...args` in the `foo(..)` function declaration gathers arguments, and the `...args` in the `console.log(..)` call spreads them out. That's a good illustration of the symmetric but opposite uses of the `...` operator.
+
+Besides the `...` usage in a function declaration, there's another case where `...` is used for gathering values, and we'll look at it in the "Too Many, Too Few, Just Enough" section later in this chapter.
+
 ## Default Parameter Values
 
 Perhaps one of the most common idioms in JavaScript relates to setting a default value for a function parameter. The way we've done this for years should look quite familiar:
@@ -312,7 +409,7 @@ function foo() {
 var tmp = foo(),
 	a = tmp[0], b = tmp[1], c = tmp[2];
 
-console.log( a, b, c );		// 1 2 3
+console.log( a, b, c );				// 1 2 3
 ```
 
 As you can see, we created a manual assignment of the values in the array that `foo()` returns to individual variables `a`, `b`, and `c`, and to do so we (unfortunately) needed the `tmp` variable.
@@ -333,7 +430,7 @@ function bar() {
 var tmp = bar(),
 	x = tmp.x, y = tmp.y, z = tmp.z;
 
-console.log( x, y, z );		// 4 5 6
+console.log( x, y, z );				// 4 5 6
 ```
 
 The `tmp.x` property value is assigned to the `x` variable, and likewise for `tmp.y` to `y` and `tmp.z` to `z`. Of course, this is generally referred to as *object destructuring assignment*, or my alternate description: *structured object assignment*.
@@ -344,8 +441,8 @@ ES6 introduces a destructuring syntax which eliminates the need for the `tmp` va
 var [ a, b, c ] = foo();
 var { x: x, y: y, z: z } = bar();
 
-console.log( a, b, c );		// 1 2 3
-console.log( x, y, z );		// 4 5 6
+console.log( a, b, c );				// 1 2 3
+console.log( x, y, z );				// 4 5 6
 ```
 
 You're likely more used to seeing syntax like `[a,b,c]` on the righthand side of an `=` assignment, as the value being assigned.
@@ -361,12 +458,14 @@ Let's dig into that `{ x: x, .. }` syntax from the previous snippet. If the prop
 ```js
 var { x, y, z } = bar();
 
-console.log( x, y, z );		// 4 5 6
+console.log( x, y, z );				// 4 5 6
 ```
 
 Cool, huh!?
 
-But if you can write the shorter form, why would you ever write out the longer form? Because that form actually allows you to assign a property to a different variable name, which can sometimes be quite useful:
+But is `{ x, .. }` leaving off the `x: ` part or leaving off the `: x` part? As we'll see shortly, we're actually leaving off the `x: ` part when we use the shorter syntax. That may not seem like an important detail, but you'll understand its importance.
+
+If you can write the shorter form, why would you ever write out the longer form? Because that longer form actually allows you to assign a property to a different variable name, which can sometimes be quite useful:
 
 ```js
 var { x: bam, y: baz, z: bap } = bar();
@@ -382,7 +481,7 @@ var X = 10, Y = 20;
 
 var o = { a: X, b: Y };
 
-console.log( o.a, o.b );	// 10 20
+console.log( o.a, o.b );			// 10 20
 ```
 
 In `{ a: X, b: Y }`, we know that `a` is the object property, and `X` is the source value that gets assigned to it. In other words, the syntactic pattern is `target: source`, or more obviously, `property-alias: value`. We intuitively understand this because it's the same as `=` assignment, where the pattern is `target = source`.
@@ -405,10 +504,14 @@ var aa = 10, bb = 20;
 var o = { x: aa, y: bb };
 var     { x: AA, y: BB } = o;
 
-console.log( AA, BB );		// 10 20
+console.log( AA, BB );				// 10 20
 ```
 
-In the `{ x: aa, y: bb }` line, the `x` and `y` represent the object properties. In the `{ x: AA, y: BB }` line, the `x` and the `y` *also* represent the object properties. That symmetry may help to explain why the syntactic pattern was flipped.
+In the `{ x: aa, y: bb }` line, the `x` and `y` represent the object properties. In the `{ x: AA, y: BB }` line, the `x` and the `y` *also* represent the object properties.
+
+Recall earlier I asserted that `{ x, .. }` was leaving off the `x: ` part? In those two lines, if you erase the `x: ` and `y: ` parts in that snippet, you're left only with `aa`, `bb`, `AA`, and `BB`, which in effect are assignments from `aa` to `AA` and from `bb` to `BB`. That's actually what we've accomplished with the snippet.
+
+So, that symmetry may help to explain why the syntactic pattern was intentionally flipped for this ES6 feature.
 
 **Note:** Personally, I would have preferred the syntax to be `{ AA: x , BB: y }` for the destructuring assignment, since that would have preserved the more familiar `target: source` pattern for both usages. Alas, I'm having to train my brain for the inversion, as some readers may have to do.
 
@@ -424,8 +527,8 @@ var a, b, c, x, y, z;
 [a,b,c] = foo();
 ( { x, y, z } ) = bar();
 
-console.log( a, b, c );		// 1 2 3
-console.log( x, y, z );		// 4 5 6
+console.log( a, b, c );				// 1 2 3
+console.log( x, y, z );				// 4 5 6
 ```
 
 The variables can already be declared, and then the destructuring only does assignments, exactly as we've already seen.
@@ -440,39 +543,302 @@ var o = {};
 [o.a, o.b, o.c] = foo();
 ( { x: o.x, y: o.y, z: o.z } ) = bar();
 
-console.log( o.a, o.b, o.c );	// 1 2 3
-console.log( o.x, o.y, o.z );	// 4 5 6
+console.log( o.a, o.b, o.c );		// 1 2 3
+console.log( o.x, o.y, o.z );		// 4 5 6
 ```
 
-### Too Many, Too Few
+You can use the general assignments to create object mappings/transformations, such as:
+
+```js
+var o1 = { a: 1, b: 2, c: 3 },
+	o2 = {};
+
+( { a: o2.x, b: o2.y, c: o2.z } ) = o1;
+
+console.log( o2.x, o2.y, o2.z );	// 1 2 3
+```
+
+Or you can map an object to an array, such as:
+
+```js
+var o1 = { a: 1, b: 2, c: 3 },
+	a2 = [];
+
+( { a: a2[0], b: a2[1], c: a2[2] } ) = o1;
+
+console.log( a2 );					// [1,2,3]
+```
+
+Or the other way around:
+
+```js
+var a1 = [ 1, 2, 3 ],
+	o2 = {};
+
+[ o2.a, o2.b, o2.c ] = a1;
+
+console.log( o2.a, o2.b, o2.c );	// 1 2 3
+```
+
+Or you could reorder one array to another:
+
+```js
+var a1 = [ 1, 2, 3 ],
+	a2 = [];
+
+[ a2[2], a2[0], a2[1] ] = a1;
+
+console.log( a2 );					// [2,3,1]
+```
+
+You can even solve the traditional "swap two variables" task without a temporary variable:
+
+```js
+var x = 10, y = 20;
+
+[ y, x ] = [ x, y ];
+
+console.log( x, y );				// 20 10
+```
+
+**Warning:** Be careful not try to mix in declaration with assignment unless you want all of the assignment expressions *also* to be treated as declarations. Otherwise, you'll get syntax errors. That's why in the earlier example I had to do `var a2 = []` separately from the `[ a2[0], .. ] = ..` destructuring assignment. It wouldn't make any sense to try `var [ a2[0], .. ] = ..`, since `a2[0]` isn't a valid declaration identifier; it also obviously couldn't implicitly create a `var a2 = []` declaration.
+
+### Too Many, Too Few, Just Enough
 
 With both array destructuring assignment and object destructuring assignment, you do not have to assign all the values that are present. For example:
 
 ```js
 var [,b] = foo();
-var { x: x, z: z } = bar();
+var { x, z } = bar();
 
-console.log( b, x, z );		// 2 4 6
+console.log( b, x, z );				// 2 4 6
 ```
 
-Similarly, if you try to assign to more values than are present in the value you're destructuring/decomposing, you get graceful fallback to `undefined`, as you'd expect:
+The `1` and `3` values that came back from `foo()` are discarded, as is the `5` value from `bar()`.
+
+Similarly, if you try to assign more values than are present in the value you're destructuring/decomposing, you get graceful fallback to `undefined`, as you'd expect:
 
 ```js
 var [,,c,d] = foo();
-var { w: w, z: z } = bar();
+var { w, z } = bar();
 
-console.log( c, z );	// 3 6
-console.log( d, w );	// undefined undefined
+console.log( c, z );				// 3 6
+console.log( d, w );				// undefined undefined
 ```
 
 This behavior follows symmetrically from the earlier stated *`undefined` is missing* principle.
 
+We examined the `...` operator earlier in this Chapter, and saw that it can sometimes be used to spread an array value out into its separate values, and sometimes it can be used to do the opposite: to gather a set of values together into an array.
+
+In addition to the gather/rest usage in function declarations, `...` can perform the same behavior in destructuring assignments. To illustrate, let's recall a snippet from earlier in this chapter:
+
+```js
+var a = [2,3,4];
+var b = [ 1, ...a, 5 ];
+
+console.log( b );					// [1,2,3,4,5]
+```
+
+Here we see that `...a` is spreading `a` out, since it appears in the array `[ .. ]` value position. If `...a` appears in an array destructuring position, it performs the gather behavior:
+
+```js
+var a = [2,3,4];
+var [b, ...c] = a;
+
+console.log( b, c );				// 2 [3,4]
+```
+
+The `var [ .. ] = a` destructuring assignment spreads `a` out to be assigned to the pattern described inside the `[ .. ]`. The first part names `b` for the first value in `a` (`2`). But then `...c` gathers the rest of the values (`3` and `4`) into an array and calls it `c`.
+
+**Note:** We've seen how `...` works with arrays, but what about with objects? It's not an ES6 feature, but see Chapter 8 for discussion of a possible "beyond ES6" feature where `...` works with spreading or gathering objects.
+
 ### Default Value Assignment
 
-Both forms of destructuring can offer a default value option for each assignment. Consider:
+Both forms of destructuring can offer a default value option for an assignment, using the `=` syntax similar to the default function argument values discussed earlier.
 
-var [a = 3, b = 6, c = 9, d = 12 ] = foo();
-var { x: x, ,,,
+Consider:
 
+```js
+var [ a = 3, b = 6, c = 9, d = 12 ] = foo();
+var { x = 5, y = 10, z = 15, w = 20 } = bar();
 
-# Review
+console.log( a, b, c, d );			// 1 2 3 12
+console.log( x, y, z, w );			// 4 5 6 20
+```
+
+You can combine the default value assignment with the alternate assignment expression syntax covered earlier. For example:
+
+```js
+var { x, y, z, w: WW = 20 } = bar();
+
+console.log( x, y, z, WW );			// 4 5 6 20
+```
+
+Be careful about confusing yourself (or other developers who read your code) if use an object or array as the default value in a destructuring. You can create some really hard to understand code:
+
+```js
+var x = 200, y = 300, z = 100;
+var o1 = { x: { y: 42 }, z: { y: z } };
+
+( { y: x = { y: y } } ) = o1;
+( { z: y = { y: z } } ) = o1;
+( { x: z = { y: x } } ) = o1;
+```
+
+Can you tell from that snippet what values `x`, `y`, and `z` have at the end? Takes a moment ponder, I would imagine. I'll end the suspense:
+
+```js
+console.log( x.y, y.y, z.y );		// 300 100 42
+```
+
+The takeaway here: destructuring is great and can be very useful, but it's also a sharp sword that used unwisely can end up injuring (someone's brain).
+
+### Nested Destructuring
+
+If the values you're destructuring have nested objects or arrays, you can destructure those nested values as well:
+
+```js
+var a1 = [ 1, [2, 3, 4], 5 ];
+var o1 = { x: { y: { z: 6 } } };
+
+var [ a, [ b, c, d ], e ] = a1;
+var { x: { y: { z: w } } } = o1;
+
+console.log( a, b, c, d, e );		// 1 2 3 4 5
+console.log( w );					// 6
+```
+
+Nested destructuring can be a simple way to flatten out object namespaces. For example:
+
+```js
+var App = {
+	model: {
+		User: function(){ .. }
+	}
+};
+
+// instead of:
+// var User = App.model.User;
+
+var { model: { User } } = App;
+```
+
+### Destructuring Parameters
+
+In the following snippet, can you spot the assignment?
+
+```js
+function foo(x) {
+	console.log( x );
+}
+
+foo( 42 );
+```
+
+The assignment is kinda hidden: the *argument* `42` is assigned to the *parameter* `x` when `foo(42)` is executed. If parameter/argument pairing is an assignment, then it stands to reason that it's an assignment that could be destructured, right? Of course!
+
+Consider array destructuring for parameters:
+
+```js
+function foo( [ x, y ] ) {
+	console.log( x, y );
+}
+
+foo( [ 1, 2 ] );					// 1 2
+foo( [ 1 ] );						// 1 undefined
+foo( [] );							// undefined undefined
+```
+
+Object destructuring for parameters works, too:
+
+```js
+function foo( { x, y } ) {
+	console.log( x, y );
+}
+
+foo( { y: 1, x: 2 } );				// 1 2
+foo( { y: 42 } );					// undefined 42
+foo( {} );							// undefined undefined
+```
+
+This technique is an approximation of named arguments (a long requested feature for JS!), in that the properties on the object map to the destructured parameters of the same names. That also means that we get optional parameters (in any position) for free, as you can see leaving off the `x` "parameter" worked as we'd expect.
+
+Of course, all the previously discussed variations of destructuring are available to us with parameter destructuring, including nested destructuring, default values, etc. Destructuring also mixes fine with other ES6 function parameter capabilities, like default parameter values and rest/gather parameters.
+
+Consider these quick illustrations (certainly not exhaustive of the possible variations):
+
+```js
+function f1([ x=2, y=3, z ]) { .. }
+function f2([ x, y, ...z], w) { .. }
+function f3([ x, y, ...z], ...w) { .. }
+
+function f4({ x: X, y }) { .. }
+function f5({ x: X = 10, y = 20 }) { .. }
+function f6({ x = 10 } = {}, { y } = { y: 10 }) { .. }
+```
+
+Let's take one example from this snippet and examine it, for illustration purposes:
+
+```js
+function f3([ x, y, ...z], ...w) {
+	console.log( x, y, z, w );
+}
+
+f3( [] );							// undefined undefined [] []
+f3( [1,2,3,4], 5, 6 );				// 1 2 [3,4] [5,6]
+```
+
+There are two `...` operators in use here, and they're both gathering of values in arrays (`z` and `w`), though `...z` gathers from the rest of the values left over in the first array argument, while `...w` fathers from the rest of the main arguments left over after the first.
+
+#### Destructuring Defaults + Parameter Defaults
+
+There's one subtle point you should be particularly careful to notice, the difference in behavior between a destructuring default value and a function parameter default value.
+
+```js
+function f6({ x = 10 } = {}, { y } = { y: 10 }) {
+	console.log( x, y );
+}
+
+f6();								// 10 10
+```
+
+As first, it would seem that we've declared a default value of `10` for both the `x` and `y` parameters, but in two different ways. However, these two different approaches will behave differently in certain cases, and the difference is awfully subtle.
+
+Consider:
+
+```js
+f6( {}, {} );						// 10 undefined
+```
+
+Wait, why did that happen? It's pretty clear that named parameter `x` is defaulting to `10` if not passed as a property of that same name in the first argument's object.
+
+But what about `y` being `undefined`? The `{ y: 10 }` value is an object as a function parameter default value, not a destructuring default value. As such, it only applies if the second argument is not passed at all, or is passed as `undefined`.
+
+In the previous snippet, we *are* passing a second argument (`{}`), so the default `{ y: 10 }` value is not used, and the `{ y }` destructuring occurs against the passed in `{}` empty object value.
+
+Now, compare `{ y } = { y: 10 }` to `{ x = 10 } = {}`.
+
+For the `x`'s form usage, if the first function argument is omitted or `undefined`, the `{}` empty object default applies. *Then*, whatever value is in the first argument position -- either the default `{}` or whatever you passed in -- is destructured with the `{ x = 10 }`, which checks to see if an `x` property is found, and if not found (or `undefined`), the `10` default value is applied to the `x` named parameter.
+
+Deep breath. Read back over those last few paragraphs a couple of times. Let's review via code:
+
+```js
+function f6({ x = 10 } = {}, { y } = { y: 10 }) {
+	console.log( x, y );
+}
+
+f6();								// 10 10
+f6( undefined, undefined );			// 10 10
+f6( {}, undefined );				// 10 10
+
+f6( {}, {} );						// 10 undefined
+f6( undefined, {} );				// 10 undefined
+
+f6( { x: 2 }, { y: 3 } );			// 2 3
+```
+
+It would generally seem that the defaulting behavior of the `x` parameter is probably the more desirable and sensible case compared to that of `y`. As such, it's important to understand why and how `{ x = 10 } = {}` form is different from `{ y } = { y: 10 }` form.
+
+If that's still a bit fuzzy, go back and read it again, and play with this yourself. Your future self will thank you for taking the time to get this very subtle gotcha nuance detail straight.
+
+## Review
