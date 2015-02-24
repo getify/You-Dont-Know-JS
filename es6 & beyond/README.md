@@ -17,4 +17,5 @@
 * Chapter 5: Collections
 * Chapter 6: New APIs
 * Chapter 7: Meta
+* [Chapter 8: Beyond ES6](ch8.md)
 * [Appendix A: Thank You's!](apA.md)

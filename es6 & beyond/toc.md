@@ -9,10 +9,11 @@
 	* Transpiling
 * Chapter 2: Syntax
 	* Block-Scoped Declarations
+	* Spread / Rest
 	* Default Parameter Values
 	* Destructuring
 	* Object Literal Extensions
-	* Interpolated String Literals
+	* Template Literals
 	* Arrow Functions
 	* `for..of` Loops
 	* Regular Expression Extensions
