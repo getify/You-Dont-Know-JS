@@ -1200,6 +1200,226 @@ var o2 = Object.assign(
 
 ## Template Literals
 
-// TODO
+At the very outset of this section, I'm going to have to call out the name of this ES6 feature as being awfully... misleading, depending on your experiences with what the word *template* means.
+
+Many developers think of templates as being reusable renderable pieces of text, such as the capability provided by most template engines (Mustache, Handlebars, etc.). ES6's use of the word Template would imply something similar, like a way to declare inline template literals that can be re-rendered. However, that's not at all the right way to think about this feature.
+
+So, before we go on, I'm renaming this feature what it should have been called: *Interpolated String Literals*.
+
+You're already well aware of declaring string literals with `"` or `'` delimiters, and you also know that these are not *smart strings* in any sense (as some languages have), where the contents can be parsed for interpolation expressions.
+
+ES6 introduces a new type of string literal, using the `` ` `` back-tick as the delimiter. These string literals do allow basic string interpolation expressions to be embedded, which are then automatically parsed and evaluated.
+
+The old pre-ES6 way:
+
+```js
+var name = "Kyle";
+
+var greeting = "Hello " + name + "!";
+
+console.log( greeting );			// "Hello Kyle!"
+console.log( typeof greeting );		// "string"
+```
+
+Now, consider the new ES6 way:
+
+```js
+var name = "Kyle";
+
+var greeting = `Hello ${name}!`;
+
+console.log( greeting );			// "Hello Kyle!"
+console.log( typeof greeting );		// "string"
+```
+
+As you can see, we used the ```..``` around a series of characters, which are interpreted as a string literal, but any expressions of the form `${..}` are parsed and evaluated inline immediately. The fancy term for such parsing and evaluating is *interpolation*.
+
+The result of the interpolated string literal declaration is just a plain ol' normal string, assigned to the `greeting` variable.
+
+**Warning:** `typeof greeting == "string"` illustrates why it's important not to think of these entities as some special template value, since you cannot assign the unevaluated form of the literal to something and reuse it. The ```..``` string literal is more like an IIFE in the sense that it's automatically evaluated inline. The result of a ```..``` string literal is, simply, just a string.
+
+One really nice benefit of interpolated string literals is they are allowed to split across multiple lines:
+
+```js
+var text =
+`Now is the time for all good men
+to come to the aid of their
+country!`;
+
+console.log( text );
+// Now is the time for all good men
+// to come to the aid of their
+// country!
+```
+
+As you can see, the new-lines we inserted into the string literal were preserved and kept in the string value, just as we'd hope.
+
+### Interpolated Expressions
+
+Any valid expression is allowed to appear between `${..}` in an interpolated string literal, including function calls, inline function expression calls, and even other interpolated string literals!
+
+**Warning:** As a word of caution, be very careful about the readability of your code with such new found power. Just like with default value expressions and destructuring assignment expressions, just because you *can* do something doesn't mean you *should* do it. Never get so overboard with new ES6 tricks that your code becomes more clever than you or your other team members.
+
+Consider:
+
+```js
+function upper(s) {
+	return s.toUpperCase();
+}
+
+var who = "reader"
+
+var text =
+`A very ${upper("warm")} welcome
+to all of you ${upper(`${who}s`)}!`;
+
+console.log( text );
+// A very WARM welcome
+// to all of you READERS!
+```
+
+Here, the inner ```..``` interpolated string literal was a little bit nicer convenience for us when combining the `who` variable with the `"s"` string, as opposed to `who + "s"`. There will be cases that nesting interpolated string literals is helpful, but be wary if you find yourself doing that kind of thing often, or if you find yourself nesting several levels deep.
+
+Odds are, your string value production could benefit from some abstractions if that's the case.
+
+#### Expression Scope
+
+One quick note about the scope that is used to resolve variables in expressions. I mentioned earlier that an interpolated string literal is kind of like an IIFE, and it turns out thinking about it like that explains the scoping behavior as well.
+
+Consider:
+
+```js
+function foo(str) {
+	var name = "foo";
+	console.log( str );
+}
+
+function bar() {
+	var name = "bar";
+	foo( `Hello from ${name}!` );
+}
+
+var name = "global";
+
+bar();					// "Hello from bar!"
+```
+
+At the moment the ```..``` string literal is expressed, inside the `bar()` function, the scope available to it has `bar()`'s `name` variable with value `"bar"`. Neither the global `name` nor `foo(..)`'s `name` matter. In other words, an interpolated string literal is just lexically scoped where it appears, not dynamically scoped in any way.
+
+### Tagged Template Literals
+
+Again, renaming the feature for sanity sake: *Tagged String Literals*.
+
+To be honest, this is one of the cooler tricks that ES6 offers. It may seem a little strange, and perhaps not all that generally practical, at first. But once you've spent some time with it, tagged string literals may just surprise you in their usefulness.
+
+For example:
+
+```js
+function foo(strings, ...values) {
+	console.log( strings );
+	console.log( values );
+}
+
+var describeIt = "awesome";
+
+foo`Everything is ${describeIt}!`;
+// [ "Everything is ", "!"]
+// [ "awesome" ]
+```
+
+Let's take a moment to consider what's happening in the previous snippet.
+
+First, the most jarring thing that jumps out is ``foo`Everything...`;``. That doesn't look like anything we've seen before. But what is it?
+
+It's essentially a special kind of function call, where the *tag* -- the `foo` part before the ```..``` string literal -- is treated as the name of a function that should be called. But what gets passed to the `foo(..)` function when invoked as a tag for a string literal?
+
+The first argument is an array of all the plain strings (the stuff not in interpolated expressions). So, we get `"Everything is "` and `"!"` as those two strings.
+
+For convenience sake in our discussion, we then collect up all subsequent arguments into an array called `values` using the `...` gather/rest operator (see the "Spread / Rest" section earlier in this chapter), though you could of course have left them as individual named parameters.
+
+The arguments gathered into our `values` array are all the results of the already-evaluated interpolation expressions found in the string literal. So, the only value present is `"awesome"`.
+
+You can think of these two arrays as the values in `values` being the separators if you were to splice them in between the values in `strings`, and then if you joined all those elements, you'd get the complete interpolated string value.
+
+In a sense, a tagged string literal is like a processing step after the interpolations are evaluated but before the final string value is compiled, allowing you to customize the behavior of generating the string from the literal.
+
+Typically, the string literal tag function (`foo(..)` in the previous snippet) should compute whatever appropriate string value and return it, so that you can use the tagged string literal in assignments just like untagged string literals:
+
+```js
+function tag(strings, ...values) {
+	return strings.reduce( function(s,v,idx){
+		return s + (idx > 0 ? values[idx-1] : "") + v;
+	}, "" );
+}
+
+var desc = "awesome";
+
+var text = tag`Everything is ${desc}!`;
+
+console.log( text );			// Everything is awesome!
+```
+
+In this snippet, `tag(..)` is sort of a do-nothing operation, in that it doesn't perform any special actions, but uses the *magic* of `reduce(..)` to just splice `strings` and `values` together the same way an untagged string literal would have done.
+
+So what are some practical uses? There are many advanced ones that are beyond our scope to discuss here. But here's a simple idea that formats numbers as US dollars (sort of like basic localization):
+
+```js
+function dollabillsyall(strings, ...values) {
+	return strings.reduce( function(s,v,idx){
+		if (idx > 0) {
+			if (typeof values[idx-1] == "number") {
+				// look, also using interpolated
+				// string literals!
+				s += `$${values[idx-1].toFixed(2)}`;
+			}
+			else {
+				s += values[idx-1];
+			}
+		}
+
+		return s + v;
+	}, "" );
+}
+
+var amt1 = 11.99,
+	amt2 = amt1 * 1.08,
+	name = "Kyle";
+
+var text = dollabillsyall
+`Thanks for your purchase, ${name}! Your
+product cost was ${amt1}, which with tax
+comes out to ${amt2}.`
+
+console.log( text );
+// Thanks for your purchase, Kyle! Your
+// product cost was $11.99, which with tax
+// comes out to $12.95.
+```
+
+#### Raw Strings
+
+In the previous snippets, our tag functions receive a first argument we called `strings`, which is an array. But there's an additional bit of data included: the raw unprocessed versions of all the strings. You can access those raw string values like this:
+
+```js
+function showraw(strings, ...values) {
+	console.log( strings );
+	console.log( strings.raw );
+}
+
+showraw`Hello\nWorld`;
+// [ "Hello\nWorld" ]
+// [ "Hello\\nWorld" ]
+```
+
+As you can see, the raw version of the string preserves the `\n` sequence, while the processed version of the string treats it like a real new-line.
+
+ES6 comes with a built-in function that can be used as a string literal tag: `String.raw(..)`. It simply passes through the raw versions of the `strings`:
+
+```js
+console.log( String.raw`Hello\nWorld` );
+// "Hello\nWorld"
+```
+
+Other uses for string literal tags included special processing for internationalization, localization, and more!
 
 ## Review
