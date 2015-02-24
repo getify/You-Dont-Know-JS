@@ -397,6 +397,81 @@ Notice the results and how they imply both subtle differences and similarities t
 
 `x = 11` in a function declaration is more like `x !== undefined ? x : 11` than the much more common idiom `x || 11`, so you'll need to be careful in converting your pre-ES6 code to this ES6 default parameter value syntax.
 
+### Default Value Expressions
+
+Function default values can be more than just simple values like `31`; they can be any valid expression, even a function call:
+
+```js
+function bar(val) {
+	console.log( "bar called!" );
+	return y + val;
+}
+
+function foo(x = y + 3, z = bar( x )) {
+	console.log( x, z );
+}
+
+var y = 5;
+foo();								// "bar called"
+									// 8 13
+foo( 10 );							// "bar called"
+									// 10 15
+y = 6;
+foo( undefined, 10 );				// 9 10
+```
+
+As you can see, the default value expressions are lazily evaluated, meaning they're only run if and when they're needed -- that is, when a parameter's argument is omitted or is `undefined`.
+
+It's a subtle detail, but the formal parameters in a function declaration are in their own scope -- think of it as a scope bubble wrapped around just the `( .. )` of the function declaration -- not in the function body's scope. That means a reference to an identifier in a default value expression first matches the formal parameters' scope before looking to an outer scope. See the *Scope & Closures* title of this series for more information.
+
+Consider:
+
+```js
+var w = 1, z = 2;
+
+function foo( x = w + 1, y = x + 1, z = z + 1 ) {
+	console.log( x, y, z );
+}
+
+foo();					// ReferenceError
+```
+
+The `w` in the `w + 1` default value expression looks for `w` in the formal parameters' scope, but does not find it, so the outer scope's `w` is used. Next, The `x` in the `x + 1` default value expression finds `x` in the formal parameters' scope, and luckily `x` has already been initialized, so the assignment to `y` works fine.
+
+However, the `z` in `z + 1` finds `z` as a not-yet-initialized-at-that-moment parameter variable, so it never tries to find the `z` from the outer scope.
+
+As we mentioned in the "`let` Declarations" section earlier in this chapter, ES6 has a TDZ which prevents a variable from being accessed in its uninitialized state. As such, the `z + 1` default value expression throws a TDZ `ReferenceError` error.
+
+Though it's not necessarily a good idea for code clarity, a default value expression can even be an inline function expression call -- commonly referred to as an Immediately Invoked Function Expression (IIFE):
+
+```js
+function foo( x =
+	(function(v){ return v + 11; })( 31 )
+) {
+	console.log( x );
+}
+
+foo();			// 42
+```
+
+There will very rarely be any cases where an IIFE (or any other executed inline function expression) will be appropriate for default value expressions. If you find yourself want to do this, take a step back and reevaluate!
+
+**Warning:** If the IIFE had tried to access the `x` identifier and had not declared its own `x`, this would also have been a TDZ error, just as discussed before.
+
+The default value expression in the previous snippet is an IIFE in that in its a function that's executed right inline, via `(31)`. If we had left that part off, the default value assigned to `x` would have just been a function reference itself, perhaps like a default callback. There will probably be cases where that pattern will be quite useful, such as:
+
+```js
+function ajax(url, cb = function(){}) {
+	// ..
+}
+
+ajax( "http://some.url.1" );
+```
+
+In this case, we essentially want to default `cb` to be a no-op empty function call if not otherwise specified. The function expression is just a function reference, not a function call itself (no invoking `()` on the end of it), which accomplishes that goal.
+
+Since the early days of JS, there's been a little known but useful quirk available to us: `Function.prototype` is itself an empty no-op function. So, the declaration could have been `cb = Function.prototype` and saved the inline function expression creation.
+
 ## Destructuring
 
 ES6 introduces a new syntactic feature called *destructuring*, which may be a little less confusing sounding if you instead think of it as *structured assignment*. To understand this meaning, consider:
