@@ -1591,4 +1591,6 @@ Bottom line: `=>` is about lexical binding of `this`, `arguments`, and `super`. 
 
 Don't believe any hype that `=>` is primarily, or even mostly, about fewer keystrokes. Whether you save keystrokes or waste them, you should know what you are intentionally doing with exactly what you've typed.
 
+**Tip:** If you have a function that for any of these articulated reasons should not be an `=>` arrow function, but it's being declared as part of an object literal nonetheless, remember from earlier in the chapter that concise methods may be an appropriate and attractive option.
+
 ## Review
