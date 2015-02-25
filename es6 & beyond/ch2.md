@@ -1589,8 +1589,8 @@ In much the same method of reasoning as I just presented for `this`, if you have
 
 Bottom line: `=>` is about lexical binding of `this`, `arguments`, and `super`. These are intentional features designed to fix some common problems, not bugs, quirks, or mistakes in ES6.
 
-Don't believe any hype that `=>` is primarily, or even mostly, about fewer keystrokes. Whether you save keystrokes or waste them, you should know what you are intentionally doing with exactly what you've typed.
+Don't believe any hype that `=>` is primarily, or even mostly, about fewer keystrokes. Whether you save keystrokes or waste them, you should know exactly what you are intentionally doing with every character typed.
 
-**Tip:** If you have a function that for any of these articulated reasons should not be an `=>` arrow function, but it's being declared as part of an object literal nonetheless, remember from earlier in the chapter that concise methods may be an appropriate and attractive option.
+**Tip:** If you have a function that for any of these articulated reasons is not a good match for an `=>` arrow function, but it's being declared as part of an object literal, recall from "Concise Methods" earlier in this chapter that there's another option for shorter function syntax.
 
 ## Review
