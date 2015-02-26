@@ -1665,6 +1665,22 @@ for (var c of "hello") {
 // "h" "e" "l" "l" "o"
 ```
 
-`for..of` loops can be prematurely stopped, just like other loops, with `break`, `continue`, `return` (if in a function), and thrown exceptions. In any of these cases, the iterator's `return(..)` function is automatically called, if one exists, to let the iterator know, if it wants to perform cleanup tasks.
+In `for (XYZ of ABC)..`, the `XYZ` clause can either be an assignment expression or a declaration, identical to that same clause in `for` and `for..in` loops. So you can do stuff like this:
+
+```js
+var o = {};
+
+for (o.a of [1,2,3]) {
+	console.log( o.a );
+}
+// 1 2 3
+
+for ({x: o.a} of [ {x: 1}, {x: 2}, {x: 3} ]) {
+  console.log( o.a );
+}
+// 1 2 3
+```
+
+`for..of` loops can be prematurely stopped, just like other loops, with `break`, `continue`, `return` (if in a function), and thrown exceptions. In any of these cases, the iterator's `return(..)` function is automatically called (if one exists) to let the iterator perform cleanup tasks, if necessary.
 
 ## Review
