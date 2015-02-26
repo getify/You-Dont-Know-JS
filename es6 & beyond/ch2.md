@@ -1592,4 +1592,79 @@ Don't believe any hype that `=>` is primarily, or even mostly, about fewer keyst
 
 **Tip:** If you have a function that for any of these articulated reasons is not a good match for an `=>` arrow function, but it's being declared as part of an object literal, recall from "Concise Methods" earlier in this chapter that there's another option for shorter function syntax.
 
+## `for..of` Loops
+
+Joining the `for` and `for..in` loops from the JavaScript we're all familiar with, ES6 adds a `for..of` loop, which loops over the set of values produced by an *iterator*.
+
+The value you loop over with `for..of` must be an *iterable*, or it must be a value which can be coerced/boxed to an object (see the *Types & Grammar* title of this series) that is an iterable. An iterable is simply an object that is able to produce an iterator, which the loop then uses.
+
+**Note:** See "Iterators" in Chapter 3 for more complete coverage on iterables and iterators.
+
+Let's compare `for..of` to `for..in` to illustrate the difference:
+
+```js
+var a = ["a","b","c","d","e"];
+
+for (var idx in a) {
+	console.log( idx );
+}
+// 0 1 2 3 4
+
+for (var val of a) {
+	console.log( val );
+}
+// "a" "b" "c" "d" "e"
+```
+
+As you can see, `for..in` loops over the keys/indexes in the `a` array, while `for..of` loops over the values in `a`.
+
+Here's the pre-ES6 version of the `for..of` from that previous snippet:
+
+```js
+var a = ["a","b","c","d","e"],
+	k = Object.keys( a );
+
+for (var val, i = 0; i < k.length; i++) {
+	val = a[ k[i] ];
+	console.log( val );
+}
+// "a" "b" "c" "d" "e"
+```
+
+And here's the ES6 but non-`for..of` equivalent, which also gives a glimpse at manually iterating an iterator:
+
+```js
+var a = ["a","b","c","d","e"];
+
+for (var val, ret, it = a[Symbol.iterator]();
+	!(ret = it.next()) && !ret.done;
+) {
+	val = ret.value;
+	console.log( val );
+}
+// "a" "b" "c" "d" "e"
+```
+
+Under the covers, the `for..of` loop asks the iterable for an iterator, then it repeatedly calls the iterator and assigns its produced value to the loop iteration variable.
+
+Standard built-in values in JavaScript that are by default iterables (or provide them) include:
+
+* arrays
+* strings
+* generators (see Chapter 4)
+* collections / TypedArrays (see Chapter 5)
+
+**Warning:** Plain objects are not by default suitable for `for..of` looping. That's because they don't have a default iterator, which is intentional, not a mistake. However, we won't go any further into those nuanced reasonings here. In "Iterators" in Chapter 3, we'll see how to define iterators for our own objects, which lets `for..of` loop over any object to get a set of values we define.
+
+Here's how to loop over the characters in a primitive string:
+
+```js
+for (var c of "hello") {
+	console.log( c );
+}
+// "h" "e" "l" "l" "o"
+```
+
+`for..of` loops can be prematurely stopped, just like other loops, with `break`, `continue`, `return` (if in a function), and thrown exceptions. In any of these cases, the iterator's `return(..)` function is automatically called, if one exists, to let the iterator know, if it wants to perform cleanup tasks.
+
 ## Review
