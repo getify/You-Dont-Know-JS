@@ -1768,7 +1768,7 @@ var re = /o+./g,	// <-- look, `g`!
 str.match( re );	// ["oot","ook","or"]
 ```
 
-See how all the matches were returned at once? Sometimes that's OK, but sometimes that's not at all what you want. So, the `y` sticky flag gives you what you want. And that will be true for the various other matching/testing methods besides `exec(..)` and without a `g` global flag mucking up the works:
+See how all the matches were returned at once? Sometimes that's OK, but sometimes that's not at all what you want. So, the `y` sticky flag becomes your friend. And that will be true for the various other matching/testing methods besides `exec(..)` and without a `g` global flag mucking up the works:
 
 ```js
 var re = /o+./y,	// <-- look, `y` now!
@@ -1787,8 +1787,34 @@ str.test( str );	// false -- no more matches!
 re.lastIndex;		// 0 -- starts over now!
 ```
 
-The ability for the sticky matching (based on `lastIndex` position as the start) means that even patterns with a `^` start-of-string anchor in them can still match within the string, almost as if the `^` is ignored, or rather is anchored to *next-starting-position* instead.
+**Note:** A regular expression pattern such as `/^foo/` (unconditionally anchored to the beginning of the string with `^`) is not going to be able to match subsequent places in the string, so its sticky mode wouldn't do much.
 
-That's similar to how the `m` multiline flag allows the `^` to be anchored to the beginning of each "line" -- the next text after each newline -- instead of just the beginning of the string itself.
+Per specification, the `String#split(..)` method ignores the sticky flag, as it does not have a mode where it works progressively match to match -- it always does all the splitting all at once. In other words, sticky doesn't mean anything in the context of string splitting.
+
+### Regular Expression `flags`
+
+Prior to ES6, if you wanted to examine a regular expression object to see what flags it had applied, you needed to parse them out -- ironically, probably with another regular expression -- from the content of the `source` property, such as:
+
+```js
+var re = /foo/ig;
+
+re.toString();			// "/foo/ig"
+
+var flags = re.toString().match( /\/([gim]*)$/ )[1];
+
+flags;					// "ig"
+```
+
+As of ES6, you can now get these values directly, with the new `flags` property:
+
+```js
+var re = /foo/ig;
+
+re.flags;				// "gi"
+```
+
+It's a small nuance, but the ES6 specification calls for the expression's flags to be listed in this order: `"gimuy"`, regardless of what order the original pattern was specified with. That's the difference between `/ig` and `"gi"`.
+
+No, the order of flags doesn't matter.
 
 ## Review
