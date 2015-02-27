@@ -1683,4 +1683,112 @@ for ({x: o.a} of [ {x: 1}, {x: 2}, {x: 3} ]) {
 
 `for..of` loops can be prematurely stopped, just like other loops, with `break`, `continue`, `return` (if in a function), and thrown exceptions. In any of these cases, the iterator's `return(..)` function is automatically called (if one exists) to let the iterator perform cleanup tasks, if necessary.
 
+## Regular Expressions
+
+Let's face it: regular expressions haven't changed much in JS in a long time. So it's a great thing that they've finally learned a couple of new tricks in ES6. We'll briefly cover the additions here, but regular expressions in general is a topic so dense that it really needs dedicated chapters/books (of which there are many!).
+
+### Unicode Flag
+
+We'll cover the topic of unicode in more detail in "Unicode" later in this chapter. Here, we'll just look briefly at the new `u` flag for ES6+ regular expressions, which turns on unicode matching for that expression.
+
+JavaScript strings are typically interpreted as sequences of 16-bit characters, which correspond to the characters in the *Basic Multilingual Plane* (*BMP*) (http://en.wikipedia.org/wiki/Plane_%28Unicode%29). But there are many UTF-16 characters that fall outside this range, and so strings may have these multibyte characters in them.
+
+Prior to ES6, regular expressions could only match based on BMP characters, which means that those extended characters were treated as two separate characters for matching purposes. This is often not ideal.
+
+So, as of ES6, the `u` flag tells a regular expression to process a string with the intepretation of unicode (UTF-16) characters, such that such an extended character will be matched as a single entity.
+
+**Warning:** Despite the name implication, "UTF-16" doesn't strictly mean strictly. Modern unicode uses 21 bits, and standards like UTF-8 and UTF-16 refer roughly to how many bits are used in the representation of a character.
+
+An example (straight from the ES6 specification): 𝄞 (the musical symbol G-clef) is unicode point U+1D11E (0x1D11E).
+
+If this character appears in a regular expression pattern (like `/𝄞/`), the standard BMP interpretation would be that it's two separate characters (0xD834 and 0xDD1E) to match with. But the new ES6 unicode-aware mode means that `/𝄞/u` will match `"𝄞"` in a string as a single matched character.
+
+You might be wondering why this matters? In non-unicode BMP mode, the pattern is treated as two separate characters, but would still find the match in a string with the `"𝄞"` character in it, as you can see if you try:
+
+```js
+/𝄞/.test("𝄞-clef");				// true
+```
+
+The length of the match is what matters. For example:
+
+```js
+/^.-clef/ .test("𝄞-clef");		// false
+/^.-clef/u.test("𝄞-clef");		// true
+```
+
+The `^.-clef` in the pattern says to match only a single character at the beginning before the normal `"-clef"` text. In standard BMP mode, the match fails (2 characters), but with `u` unicode mode flagged on, the match succeeds (1 character).
+
+### Sticky Flag
+
+Another flag mode added to ES6 regular expressions is `y`, which is often called "sticky mode".
+
+"Sticky" refers to the regular expression remembering the position of the last match (actually its end position). This means that if you run another match with the same pattern instance against the same string, the match starts where it left off previously.
+
+Consider this non-sticky behavior:
+
+```js
+var re = /o+./,
+	str = "foot book more";
+
+str.match( re );	// ["oot"]
+str.match( re );	// ["oot"]
+
+// let's try `lastIndex`?
+re.lastIndex = 4;
+str.match( re );	// ["oot"]
+```
+
+As you can see, we keep starting from the first position, and finding the first `"oot"` match. We never get `"ook"` or `"or"` matches.
+
+Some readers may be aware that you can do this with the `g` global match flag and the `exec(..)` method:
+
+```js
+var re = /o+./g,	// <-- look, `g`!
+	str = "foot book more";
+
+re.exec( str );		// ["oot"]
+re.lastIndex;		// 4
+
+re.exec( str );		// ["ook"]
+re.lastIndex;		// 9
+
+re.exec( str );		// ["or"]
+re.lastIndex;		// 13
+
+re.exec( str );		// null -- no more matches!
+re.lastIndex;		// 0 -- starts over now!
+```
+
+The problem is that the `g` global flag changes the behavior of some string matching methods, like `match(..)`. Consider:
+
+```js
+var re = /o+./g,	// <-- look, `g`!
+	str = "foot book more";
+
+str.match( re );	// ["oot","ook","or"]
+```
+
+See how all the matches were returned at once? Sometimes that's OK, but sometimes that's not at all what you want. So, the `y` sticky flag gives you what you want. And that will be true for the various other matching/testing methods besides `exec(..)` and without a `g` global flag mucking up the works:
+
+```js
+var re = /o+./y,	// <-- look, `y` now!
+	str = "foot book more";
+
+str.match( re );	// ["oot"]
+re.lastIndex;		// 4
+
+re.test( str );		// true
+re.lastIndex;		// 9
+
+str.match( re );	// ["or"]
+re.lastIndex;		// 13
+
+str.test( str );	// false -- no more matches!
+re.lastIndex;		// 0 -- starts over now!
+```
+
+The ability for the sticky matching (based on `lastIndex` position as the start) means that even patterns with a `^` start-of-string anchor in them can still match within the string, almost as if the `^` is ignored, or rather is anchored to *next-starting-position* instead.
+
+That's similar to how the `m` multiline flag allows the `^` to be anchored to the beginning of each "line" -- the next text after each newline -- instead of just the beginning of the string itself.
+
 ## Review
