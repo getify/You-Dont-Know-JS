@@ -1783,7 +1783,7 @@ re.lastIndex;		// 9
 str.match( re );	// ["or"]
 re.lastIndex;		// 13
 
-str.test( str );	// false -- no more matches!
+re.test( str );		// false -- no more matches!
 re.lastIndex;		// 0 -- starts over now!
 ```
 
@@ -1816,5 +1816,7 @@ re.flags;				// "gi"
 It's a small nuance, but the ES6 specification calls for the expression's flags to be listed in this order: `"gimuy"`, regardless of what order the original pattern was specified with. That's the difference between `/ig` and `"gi"`.
 
 No, the order of flags doesn't matter.
+
+## Numeric Literal Extensions
 
 ## Review
