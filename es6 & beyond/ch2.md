@@ -1720,76 +1720,176 @@ The `^.-clef` in the pattern says to match only a single character at the beginn
 
 ### Sticky Flag
 
-Another flag mode added to ES6 regular expressions is `y`, which is often called "sticky mode".
+Another flag mode added to ES6 regular expressions is `y`, which is often called "sticky mode". *Sticky* essentially means the regular expression has a virtual anchor at its beginning that keeps it rooted to matching at only the position indicated by the regular expression's `lastIndex` property.
 
-"Sticky" refers to the regular expression remembering the position of the last match (actually its end position). This means that if you run another match with the same pattern instance against the same string, the match starts where it left off previously.
-
-Consider this non-sticky behavior:
+To illustrate, let's consider two regular expressions, the first without sticky mode and the second with:
 
 ```js
-var re = /o+./,
-	str = "foot book more";
+var re1 = /foo/,
+	str = "++foo++";
 
-str.match( re );	// ["oot"]
-str.match( re );	// ["oot"]
+re1.lastIndex;			// 0
+re1.test( str );		// true
+re1.lastIndex;			// 0 -- not updated
 
-// let's try `lastIndex`?
-re.lastIndex = 4;
-str.match( re );	// ["oot"]
+re1.lastIndex = 4;
+re1.test( str );		// true -- ignored `lastIndex`
+re1.lastIndex;			// 4 -- not updated
 ```
 
-As you can see, we keep starting from the first position, and finding the first `"oot"` match. We never get `"ook"` or `"or"` matches.
+Three things to observe about this snippet:
 
-Some readers may be aware that you can do this with the `g` global match flag and the `exec(..)` method:
+* `test(..)` doesn't pay any attention to `lastIndex`'s value, and always just performs its match from the beginning of the input string.
+* Since our pattern does not have a `^` start-of-input anchor, the search for `"foo"` is free to move ahead through the whole string looking for a match.
+* `lastIndex` is not updated by `test(..)`.
+
+Now, let's try a sticky mode regular expression:
 
 ```js
-var re = /o+./g,	// <-- look, `g`!
-	str = "foot book more";
+var re2 = /foo/y,		// <-- notice the `y` sticky flag
+	str = "++foo++";
 
-re.exec( str );		// ["oot"]
-re.lastIndex;		// 4
+re2.lastIndex;			// 0
+re2.test( str );		// false -- "foo" not found at `0`
+re2.lastIndex;			// 0
 
-re.exec( str );		// ["ook"]
-re.lastIndex;		// 9
+re2.lastIndex = 2;
+re2.test( str );		// true
+re2.lastIndex;			// 5 -- updated to after previous match
 
-re.exec( str );		// ["or"]
-re.lastIndex;		// 13
-
-re.exec( str );		// null -- no more matches!
-re.lastIndex;		// 0 -- starts over now!
+re2.test( str );		// false
+re2.lastIndex;			// 0 -- reset after previous match failure
 ```
 
-The problem is that the `g` global flag changes the behavior of some string matching methods, like `match(..)`. Consider:
+And so our new observations about sticky mode:
+
+* `test(..)` uses `lastIndex` as the exact and only position in `str` to look to make a match. There is no moving ahead to look for the match -- it's either there at the `lastIndex` position or not.
+* If a match is made, `test(..)` updates `lastIndex` to point to the character immediately following the match. If a match fails, `test(..)` resets `lastIndex` back to `0`.
+
+Normal non-sticky patterns that aren't otherwise `^`-rooted to the start-of-input are free to move ahead in the input string looking for a match. But sticky mode restricts the pattern to matching just at  the position of `lastIndex`.
+
+As I suggested at the beginning of this section, another way of looking at this is that `y` implies a virtual anchor at the beginning of the pattern that is relative (aka constrains the start of the match) to exactly the `lastIndex` position.
+
+**Warning:** It has alternately been asserted in other literature on the topic that this behavior is like `y` implying a `^` in the pattern. This is inaccuate. We'll explain in further detail in "Anchored Sticky" later.
+
+#### Sticky Positioning
+
+It may seem strangely limiting that to use `y` for repeated matches, you have to manually ensure `lastIndex` is in the exact right position, since it has no move-ahead capability for matching.
+
+One possible scenario is if you knew that the match you care about is always going to be at a position that's a multiple of a number, like `0`, `10`, `20`, etc., you can just construct a limited pattern matching what you care about, but then manually set `lastIndex` each time before match to those fixed positions.
+
+Consider:
 
 ```js
-var re = /o+./g,	// <-- look, `g`!
-	str = "foot book more";
+var re = /f../y,
+	str = "foo       far       fad";
 
-str.match( re );	// ["oot","ook","or"]
+str.match( re );		// ["foo"]
+
+re.lastIndex = 10;
+str.match( re );		// ["far"]
+
+re.lastIndex = 20;
+str.match( re );		// ["fad"]
 ```
 
-See how all the matches were returned at once? Sometimes that's OK, but sometimes that's not at all what you want. So, the `y` sticky flag becomes your friend. And that will be true for the various other matching/testing methods besides `exec(..)` and without a `g` global flag mucking up the works:
+However, if you're parsing a string that isn't formatted in fixed positions like that, figuring out what to set `lastIndex` to before each match is likely going to be untenable.
+
+There's a saving nuance to consider here. `y` requires that `lastIndex` be in the exact position for your a match to occur, yes. But it doesn't strictly require that *you* manually set `lastIndex`.
+
+Instead, you can construct your expressions in such a way that they capture in each main match everything before and after the thing you care about, up to right before the next thing you'll care to match.
+
+Since `lastIndex` will set to the next character beyond the end of a match, if you've matched everything up to that point, `lastIndex` will always be in the correct position for the `y` pattern to start from the next time.
+
+**Warning:** If you can't predict the structure of the input string in a sufficiently patterned way like that, this technique may not be suitable and you may not be able to use `y`.
+
+Having structured string input is likely the most practical scenario where `y` will be capable of performing repeated matching throughout a string. Consider:
 
 ```js
-var re = /o+./y,	// <-- look, `y` now!
-	str = "foot book more";
+var re = /\d+\.\s(.*?)(?:\s|$)/y
+	str = "1. foo 2. bar 3. baz";
 
-str.match( re );	// ["oot"]
-re.lastIndex;		// 4
+str.match( re );		// [ "1. foo ", "foo" ]
 
-re.test( str );		// true
-re.lastIndex;		// 9
+re.lastIndex;			// 7 -- correct position!
+str.match( re );		// [ "2. bar ", "bar" ]
 
-str.match( re );	// ["or"]
-re.lastIndex;		// 13
-
-re.test( str );		// false -- no more matches!
-re.lastIndex;		// 0 -- starts over now!
+re.lastIndex;			// 14 -- correct position!
+str.match( re );		// ["3. baz", "baz"]
 ```
 
-**Note:** A regular expression pattern such as `/^foo/` (unconditionally anchored to the beginning of the string with `^`) is not going to be able to match subsequent places in the string, so its sticky mode wouldn't do much.
+This works because I knew something ahead of time about the structure of the input string: there is always a numeral prefix like `"1. "` before the desired match (`"foo"`, etc.), and either a space after or the end of the string (`$` anchor). So the regular expression I constructed captures all of that in each main match, and then I use a matching group `( )` so that the stuff I really care about it separated out for convenience.
 
-Per specification, the `String#split(..)` method ignores the sticky flag, as it does not have a mode where it works progressively match to match -- it always does all the splitting all at once. In other words, sticky doesn't mean anything in the context of string splitting.
+After the first match (`"1. foo "`), the `lastIndex` is `7`, which is already the position needed to start the next match, for `"2. bar "`, and so on.
+
+If you're going to use `y` sticky mode for repeated matches, you'll probably want to look for opportunities to have `lastIndex` automatically positioned as we've just demonstrated.
+
+#### Sticky versus Global
+
+Some readers may be aware that you can emulate something like this `lastIndex`-relative matching with the `g` global match flag and the `exec(..)` method, as so:
+
+```js
+var re = /o+./g,		// <-- look, `g`!
+	str = "foot book more";
+
+re.exec( str );			// ["oot"]
+re.lastIndex;			// 4
+
+re.exec( str );			// ["ook"]
+re.lastIndex;			// 9
+
+re.exec( str );			// ["or"]
+re.lastIndex;			// 13
+
+re.exec( str );			// null -- no more matches!
+re.lastIndex;			// 0 -- starts over now!
+```
+
+While it's true that `g` pattern matches with `exec(..)` start their matching from `lastIndex`'s current value, and also update `lastIndex` after each match (or failure), this is not the same thing as `y`'s behavior.
+
+Notice in the previous snippet that `"ook"`, located at position `6`, was matched and found by the second `exec(..)` call, even though at the time, `lastIndex` was `4` (from the end of the previous match). Why? Because as we said earlier, non-sticky matches are free to move ahead in their matching. A sticky mode expression would have failed here, because it would not be allowed to move ahead.
+
+In addition to perhaps undesired move-ahead matching behavior, another downside to just using `g` instead of `y` is that `g` changes the behavior of some matching methods, like `str.match(re)`.
+
+Consider:
+
+```js
+var re = /o+./g,		// <-- look, `g`!
+	str = "foot book more";
+
+str.match( re );		// ["oot","ook","or"]
+```
+
+See how all the matches were returned at once? Sometimes that's OK, but sometimes that's not what you want.
+
+The `y` sticky flag will give you one-at-a-time progressive matching with utilities like `test(..)` and `match(..)`. Just make sure the `lastIndex` is always in the right position for each match!
+
+#### Anchored Sticky
+
+As we warned earlier, it's inaccurate to think of sticky mode as implying a pattern starts with `^`. The `^` anchor has a distinct meaning in regular expressions, which is *not altered* by sticky mode. `^` is an anchor that *always* refers to the beginning of the input, and *is not* in any way relative to `lastIndex`.
+
+Besides poor/inaccurate documentation on this topic, the confusion is unfortunately strengthened further because an older pre-ES6 experiment with sticky mode in Firefox *did* make `^` relative to `lastIndex`, so that behavior has been around for years.
+
+ES6 elected not to do it that way. `^` in a pattern means start-of-input absolutely and only.
+
+As a consequence, a pattern like `/^foo/y` will always and only find a `"foo"` match at the beginning of a string, *if it's allowed to match there*. If `lastIndex` is not `0`, the match will fail. Consider:
+
+```js
+var re = /^foo/y,
+	str = "foo";
+
+re.test( str );			// true
+re.test( str );			// false
+re.lastIndex;			// 0 -- reset after failure
+
+re.lastIndex = 1;
+re.test( str );			// false -- failed for positioning
+re.lastIndex;			// 0 -- reset after failure
+```
+
+Bottom line: `y` plus `^` plus `lastIndex > 0` is an incompatible combination that will always cause a failed match.
+
+**Note:** While `y` does not alter the meaning of `^` in any way, the `m` multiline mode *does*, such that `^` means start-of-input *or* start of text after a newline. So, if you combine `y` and `m` flags together for a pattern, you can find multiple `^`-rooted matches in a string. But remember: since it's `y` sticky, you'll have to make sure `lastIndex` is pointing at the correct new line position (likely by matching to the end of the line) each subsequent time, or no subsequent matches will be made.
 
 ### Regular Expression `flags`
 
