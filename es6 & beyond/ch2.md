@@ -1915,7 +1915,25 @@ re.flags;				// "gi"
 
 It's a small nuance, but the ES6 specification calls for the expression's flags to be listed in this order: `"gimuy"`, regardless of what order the original pattern was specified with. That's the difference between `/ig` and `"gi"`.
 
-No, the order of flags doesn't matter.
+No, the order of flags specified or listed doesn't matter.
+
+Another tweak from ES6 is that the `RegExp(..)` constructor is now `flags`-aware if you pass it an existing regular expression:
+
+```js
+var re1 = /foo*/y;
+re1.source;							// "foo*"
+re1.flags;							// "y"
+
+var re2 = new RegExp( re1 );
+re2.source;							// "foo*"
+re2.flags;							// "y"
+
+var re3 = new RegExp( re1, "ig" );
+re3.source;							// "foo*"
+re3.flags;							// "gi"
+```
+
+Prior to ES6, the `re3` construction would throw an error, but as of ES6 you can override the flags when duplicating.
 
 ## Number Literal Extensions
 
