@@ -1701,22 +1701,26 @@ So, as of ES6, the `u` flag tells a regular expression to process a string with 
 
 An example (straight from the ES6 specification): 𝄞 (the musical symbol G-clef) is unicode point U+1D11E (0x1D11E).
 
-If this character appears in a regular expression pattern (like `/𝄞/`), the standard BMP interpretation would be that it's two separate characters (0xD834 and 0xDD1E) to match with. But the new ES6 unicode-aware mode means that `/𝄞/u` will match `"𝄞"` in a string as a single matched character.
+If this character appears in a regular expression pattern (like `/𝄞/`), the standard BMP interpretation would be that it's two separate characters (0xD834 and 0xDD1E) to match with. But the new ES6 unicode-aware mode means that `/𝄞/u` (or the escaped unicode form `/\u{1D11E}/u`) will match `"𝄞"` in a string as a single matched character.
 
 You might be wondering why this matters? In non-unicode BMP mode, the pattern is treated as two separate characters, but would still find the match in a string with the `"𝄞"` character in it, as you can see if you try:
 
 ```js
-/𝄞/.test("𝄞-clef");				// true
+/𝄞/.test( "𝄞-clef" );			// true
 ```
 
 The length of the match is what matters. For example:
 
 ```js
-/^.-clef/ .test("𝄞-clef");		// false
-/^.-clef/u.test("𝄞-clef");		// true
+/^.-clef/ .test( "𝄞-clef" );		// false
+/^.-clef/u.test( "𝄞-clef" );		// true
 ```
 
 The `^.-clef` in the pattern says to match only a single character at the beginning before the normal `"-clef"` text. In standard BMP mode, the match fails (2 characters), but with `u` unicode mode flagged on, the match succeeds (1 character).
+
+It's also important to note that `u` makes quantifiers like `+` and `*` apply to the entire unicode code point as a single character, not just the *lower surrogate* (aka rightmost half of the symbol, in BMP terms) of the character. The same goes for unicode characters appearing in character classes, like `/[💩-💫]/u`.
+
+**Note:** There's plenty more nitty gritty details about `u` behavior in regular expressions, which Mathias Bynens (http://twitter.com/mathias) has written extensively about (https://mathiasbynens.be/notes/es6-unicode-regex).
 
 ### Sticky Flag
 
