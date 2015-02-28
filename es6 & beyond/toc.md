@@ -17,7 +17,7 @@
 	* Arrow Functions
 	* `for..of` Loops
 	* Regular Expression Extensions
-	* Numeric Literals Extensions
+	* Number Literal Extensions
 	* Unicode
 	* Symbols
 * Chapter 3: Organization
