@@ -1,5 +1,5 @@
 # You Don't Know JS: Async & Performance
-# Appendix C: Thank Yous!
+# Appendix C: Acknowledgments
 
 I have many people to thank for making this book title and the overall series happen.
 

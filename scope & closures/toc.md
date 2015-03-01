@@ -30,4 +30,4 @@
 * Appendix A: Dynamic Scope
 * Appendix B: Polyfilling Block Scope
 * Appendix C: Lexical-this
-* Appendix D: Thank You's!
+* Appendix D: Acknowledgments

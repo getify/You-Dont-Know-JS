@@ -49,4 +49,4 @@
 	* `async` Functions
 	* `Object.observe(..)`
 	* Other Stuff
-* Appendix A: Thank You's!
+* Appendix A: Acknowledgments

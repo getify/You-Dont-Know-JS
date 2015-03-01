@@ -34,5 +34,5 @@
 	* `try..finally`
 	* `switch`
 * Appendix A: Mixed Environment JavaScript
-* Appendix B: Thank You's!
+* Appendix B: Acknowledgments
 

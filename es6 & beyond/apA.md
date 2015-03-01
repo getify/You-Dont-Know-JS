@@ -1,5 +1,5 @@
 # You Don't Know JS: ES6 & Beyond
-# Appendix A: Thank Yous!
+# Appendix A: Acknowledgments
 
 I have many people to thank for making this book title and the overall series happen.
 

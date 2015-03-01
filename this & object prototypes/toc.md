@@ -36,5 +36,5 @@
 	* Nicer Syntax
 	* Introspection
 * Appendix A: ES6 `class`
-* Appendix B: Thank You's!
+* Appendix B: Acknowledgments
 
