@@ -424,7 +424,7 @@ myObject.a = 3; // TypeError
 
 The `TypeError` tells us we cannot change a non-writable property.
 
-**Note:** We will discuss getters/setters shortly, but briefly, you can observe that `writable:false` means a value cannot be changed, which is somewhat equivalent to if you defined a no-op setter. Actually, your no-op setter would need throw a `TypeError` when called, to be truly conformant to `writable:false`.
+**Note:** We will discuss getters/setters shortly, but briefly, you can observe that `writable:false` means a value cannot be changed, which is somewhat equivalent to if you defined a no-op setter. Actually, your no-op setter would need to throw a `TypeError` when called, to be truly conformant to `writable:false`.
 
 #### Configurable
 
