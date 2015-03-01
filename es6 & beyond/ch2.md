@@ -1699,7 +1699,7 @@ Prior to ES6, regular expressions could only match based on BMP characters, whic
 
 So, as of ES6, the `u` flag tells a regular expression to process a string with the intepretation of unicode (UTF-16) characters, such that such an extended character will be matched as a single entity.
 
-**Warning:** Despite the name implication, "UTF-16" doesn't strictly mean strictly. Modern unicode uses 21 bits, and standards like UTF-8 and UTF-16 refer roughly to how many bits are used in the representation of a character.
+**Warning:** Despite the name implication, "UTF-16" doesn't strictly mean 16 bits. Modern unicode uses 21 bits, and standards like UTF-8 and UTF-16 refer roughly to how many bits are used in the representation of a character.
 
 An example (straight from the ES6 specification): 𝄞 (the musical symbol G-clef) is unicode point U+1D11E (0x1D11E).
 
