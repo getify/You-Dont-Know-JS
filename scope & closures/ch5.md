@@ -109,7 +109,7 @@ function bar(fn) {
 
 We pass the inner function `baz` over to `bar`, and call that inner function (labeled `fn` now), and when we do, its closure over the inner scope of `foo()` is observed, by accessing `a`.
 
-These passings-around of functions can be indirect, too.
+These passing-arounds of functions can be indirect, too.
 
 ```js
 var fn;
