@@ -229,13 +229,18 @@ These different representations for values are called *types* in programming ter
 * When you need to print a value on the screen, you need a `string` (one or more characters, words, sentences).
 * When you need to make a decision in your program, you need a `boolean` (`true` or `false`).
 
-Values that are included directly in the source code are called *literals*. `string` literals are surrounded by double quotes (`"..."`)  or single quotes (`'...'`) -- the only difference is stylistic preference. `number` and `boolean` literals are just presented as is (i.e., `42`, `true`, etc.).
+Values that are included directly in the source code are called *literals*. `string` literals are surrounded by double quotes (`"..."`)  or single quotes (`'...'`) -- the only difference is stylistic preference. However in ES6, a new kind of strings is available, surrounded by backticks (``...``). These strings, often called *template strings*, extend basic strings by providing interpolation and multiline spanning amongst other features. For more information, refer to the book *ES6 and beyond* of these series. `number` and `boolean` literals are just presented as is (i.e., `42`, `true`, etc.).
 
 Consider:
 
 ```js
 "I am a string";
 'I am also a string';
+
+// ES6
+`I am an interpolated string with
+interpolated ${variables} and spanning multiple
+lines`
 
 42;
 
