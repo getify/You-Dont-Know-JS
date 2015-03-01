@@ -219,7 +219,7 @@ Anonymous function expressions are quick and easy to type, and many libraries an
 
 1. Anonymous functions have no useful name to display in stack traces, which can make debugging more difficult.
 
-2. Without a name, if the function needs to refer to itself, for recursion, etc, the **deprecated** `arguments.callee` reference is unfortunately required. Another example of needing to self-reference is when an event handler function wants to unbind itself after it fires.
+2. Without a name, if the function needs to refer to itself, for recursion, etc., the **deprecated** `arguments.callee` reference is unfortunately required. Another example of needing to self-reference is when an event handler function wants to unbind itself after it fires.
 
 3. Anonymous functions omit a name which is often helpful in providing more readable/understandable code. A descriptive name helps self-document the code in question.
 
@@ -419,7 +419,7 @@ if (foo) {
 console.log( bar ); // ReferenceError
 ```
 
-Using `let` to attach a variable to an existing block is somewhat implicit. It can confuse if you're not paying close attention to which blocks have variables scoped to them, and are in the habit of moving blocks around, wrapping them in other blocks, etc, as you develop and evolve code.
+Using `let` to attach a variable to an existing block is somewhat implicit. It can confuse if you're not paying close attention to which blocks have variables scoped to them, and are in the habit of moving blocks around, wrapping them in other blocks, etc., as you develop and evolve code.
 
 Creating explicit blocks for block-scoping can address some of these concerns, making it more obvious where variables are attached and not. Usually, explicit code is preferable over implicit or subtle code. This explicit block-scoping style is easy to achieve, and fits more naturally with how block-scoping works in other languages:
 
@@ -437,7 +437,7 @@ if (foo) {
 console.log( bar ); // ReferenceError
 ```
 
-We can create an arbitrary block for `let` to bind to by simply including a `{ .. }` pair anywhere a statement is valid grammar. In this case, we've made an explicit block *inside* the if-statement, which may be easier as a whole block to move around later in refactoring, without affecting the position and semantics of the enclosing if-statment.
+We can create an arbitrary block for `let` to bind to by simply including a `{ .. }` pair anywhere a statement is valid grammar. In this case, we've made an explicit block *inside* the if-statement, which may be easier as a whole block to move around later in refactoring, without affecting the position and semantics of the enclosing if-statement.
 
 **Note:** For another way to express explicit block scopes, see Appendix B.
 
