@@ -308,7 +308,7 @@ a < b;		// true
 b < c;		// true
 ```
 
-What happens here? In section 11.8.5 of the specification, it says that if both values in the `<` comparison are `string`s, as it is with `b < c`, the comparison is made lexiographically (aka alphabetically like a dictionary). But if one or both is not a `string`, as it is with `a < b`, then both values are coerced to be `number`s, and a typical numeric comparison occurs.
+What happens here? In section 11.8.5 of the specification, it says that if both values in the `<` comparison are `string`s, as it is with `b < c`, the comparison is made lexicographically (aka alphabetically like a dictionary). But if one or both is not a `string`, as it is with `a < b`, then both values are coerced to be `number`s, and a typical numeric comparison occurs.
 
 The biggest gotcha you may run into here with comparisons between potentially different value types -- remember, there are no "strict inequality" forms to use -- is when one of the values cannot be made into a valid number, such as:
 
@@ -882,14 +882,14 @@ There's no way to polyfill new syntax that has been added to the language. The n
 
 So the better option is to use a tool that converts your newer code into older code equivalents. This process is commonly called "transpiling," a term for transforming + compiling.
 
-Essentially, your source code is authored in the new sytnax form, but what you deploy to the browser is the transpiled code in old syntax form. You typically insert the transpiler into your build process, similar to your code linter or your minifier.
+Essentially, your source code is authored in the new syntax form, but what you deploy to the browser is the transpiled code in old syntax form. You typically insert the transpiler into your build process, similar to your code linter or your minifier.
 
 You might wonder why you'd go to the trouble to write new syntax only to have it transpiled away to older code -- why not just write the older code directly?
 
 There are several important reasons you should care about transpiling:
 
 * The new syntax added to the language is designed to make your code more readable and maintainable. The older equivalents are often much more convoluted. You should prefer writing newer and cleaner syntax, not only for yourself but for all other members of the development team.
-* If you transpile only for older browsers, but serve the new syntax to the newest browsers, you get to take advantage of browser performance optimizations with the new sytnax. This also lets browser makers have more real-world code to test their implementations and optimizations on.
+* If you transpile only for older browsers, but serve the new syntax to the newest browsers, you get to take advantage of browser performance optimizations with the new syntax. This also lets browser makers have more real-world code to test their implementations and optimizations on.
 * Using the new syntax earlier allows it to be tested more robustly in the real world, which provides earlier feedback to the JavaScript committee (TC39). If issues are found early enough, they can be changed/fixed before those language design mistakes become permanent.
 
 Here's a quick example of transpiling. ES6 adds a feature called "default parameter values." It looks like this:
@@ -951,7 +951,7 @@ This book, and this whole series, focuses on JavaScript the language. That's why
 
 ## Review
 
-The first step to learning JavaScript's flavor of programming is to get a basic understandng of its core mechanisms like values, types, function closures, `this`, and prototypes.
+The first step to learning JavaScript's flavor of programming is to get a basic understanding of its core mechanisms like values, types, function closures, `this`, and prototypes.
 
 Of course, each of these topics deserves much greater coverage than you've seen here, but that's why they have chapters and books dedicated to them throughout the rest of this series. After you feel pretty comfortable with the concepts and code samples in this chapter, the rest of the series awaits you to really dig in and get to know the language.
 
