@@ -1691,21 +1691,21 @@ Let's face it: regular expressions haven't changed much in JS in a long time. So
 
 ### Unicode Flag
 
-We'll cover the topic of unicode in more detail in "Unicode" later in this chapter. Here, we'll just look briefly at the new `u` flag for ES6+ regular expressions, which turns on unicode matching for that expression.
+We'll cover the topic of Unicode in more detail in "Unicode" later in this chapter. Here, we'll just look briefly at the new `u` flag for ES6+ regular expressions, which turns on Unicode matching for that expression.
 
 JavaScript strings are typically interpreted as sequences of 16-bit characters, which correspond to the characters in the *Basic Multilingual Plane* (*BMP*) (http://en.wikipedia.org/wiki/Plane_%28Unicode%29). But there are many UTF-16 characters that fall outside this range, and so strings may have these multibyte characters in them.
 
 Prior to ES6, regular expressions could only match based on BMP characters, which means that those extended characters were treated as two separate characters for matching purposes. This is often not ideal.
 
-So, as of ES6, the `u` flag tells a regular expression to process a string with the intepretation of unicode (UTF-16) characters, such that such an extended character will be matched as a single entity.
+So, as of ES6, the `u` flag tells a regular expression to process a string with the intepretation of Unicode (UTF-16) characters, such that such an extended character will be matched as a single entity.
 
-**Warning:** Despite the name implication, "UTF-16" doesn't strictly mean 16 bits. Modern unicode uses 21 bits, and standards like UTF-8 and UTF-16 refer roughly to how many bits are used in the representation of a character.
+**Warning:** Despite the name implication, "UTF-16" doesn't strictly mean 16 bits. Modern Unicode uses 21 bits, and standards like UTF-8 and UTF-16 refer roughly to how many bits are used in the representation of a character.
 
-An example (straight from the ES6 specification): 𝄞 (the musical symbol G-clef) is unicode point U+1D11E (0x1D11E).
+An example (straight from the ES6 specification): 𝄞(the musical symbol G-clef) is Unicode point U+1D11E (0x1D11E).
 
-If this character appears in a regular expression pattern (like `/𝄞/`), the standard BMP interpretation would be that it's two separate characters (0xD834 and 0xDD1E) to match with. But the new ES6 unicode-aware mode means that `/𝄞/u` (or the escaped unicode form `/\u{1D11E}/u`) will match `"𝄞"` in a string as a single matched character.
+If this character appears in a regular expression pattern (like `/𝄞/`), the standard BMP interpretation would be that it's two separate characters (0xD834 and 0xDD1E) to match with. But the new ES6 Unicode-aware mode means that `/𝄞/u` (or the escaped Unicode form `/\u{1D11E}/u`) will match `"𝄞"` in a string as a single matched character.
 
-You might be wondering why this matters? In non-unicode BMP mode, the pattern is treated as two separate characters, but would still find the match in a string with the `"𝄞"` character in it, as you can see if you try:
+You might be wondering why this matters? In non-Unicode BMP mode, the pattern is treated as two separate characters, but would still find the match in a string with the `"𝄞"` character in it, as you can see if you try:
 
 ```js
 /𝄞/.test( "𝄞-clef" );			// true
@@ -1718,11 +1718,11 @@ The length of the match is what matters. For example:
 /^.-clef/u.test( "𝄞-clef" );		// true
 ```
 
-The `^.-clef` in the pattern says to match only a single character at the beginning before the normal `"-clef"` text. In standard BMP mode, the match fails (2 characters), but with `u` unicode mode flagged on, the match succeeds (1 character).
+The `^.-clef` in the pattern says to match only a single character at the beginning before the normal `"-clef"` text. In standard BMP mode, the match fails (2 characters), but with `u` Unicode mode flagged on, the match succeeds (1 character).
 
-It's also important to note that `u` makes quantifiers like `+` and `*` apply to the entire unicode code point as a single character, not just the *lower surrogate* (aka rightmost halve of the symbol) of the character. The same goes for unicode characters appearing in character classes, like `/[💩-💫]/u`.
+It's also important to note that `u` makes quantifiers like `+` and `*` apply to the entire Unicode code point as a single character, not just the *lower surrogate* (aka rightmost halve of the symbol) of the character. The same goes for Unicode characters appearing in character classes, like `/[💩-💫]/u`.
 
-**Note:** There's plenty more nitty gritty details about `u` behavior in regular expressions, which Mathias Bynens (http://twitter.com/mathias) has written extensively about (https://mathiasbynens.be/notes/es6-unicode-regex).
+**Note:** There's plenty more nitty gritty details about `u` behavior in regular expressions, which Mathias Bynens (https://twitter.com/mathias) has written extensively about (https://mathiasbynens.be/notes/es6-Unicode-regex).
 
 ### Sticky Flag
 
@@ -2000,34 +2000,34 @@ In fact, you can represent a number this way in any base from `2` to `36`, thoug
 
 ## Unicode
 
-Let me just say that this section is not an exhaustive everything-you-ever-wanted-to-know-about-unicode resource. I want to cover what you need to know that's *changing* for unicode in ES6, but we won't go much deeper than that. Mathias Bynens (http://twitter.com/mathias) has written/spoken extensively and brilliantly about JS and unicode (https://mathiasbynens.be/notes/javascript-unicode) (http://fluentconf.com/javascript-html-2015/public/content/2015/02/18-javascript-loves-unicode).
+Let me just say that this section is not an exhaustive everything-you-ever-wanted-to-know-about-Unicode resource. I want to cover what you need to know that's *changing* for Unicode in ES6, but we won't go much deeper than that. Mathias Bynens (http://twitter.com/mathias) has written/spoken extensively and brilliantly about JS and Unicode (https://mathiasbynens.be/notes/javascript-Unicode) (http://fluentconf.com/javascript-html-2015/public/content/2015/02/18-javascript-loves-Unicode).
 
-The unicode characters that range from `0x0000` to `0xFFFF` contain all the standard printed characters (in various languages) that you're likely to have seen or interacted with. This group of characters is called the *Basic Multilingual Plane* (*BMP*). The BMP even contains fun symbols like this cool snowman ☃ (U+2603).
+The Unicode characters that range from `0x0000` to `0xFFFF` contain all the standard printed characters (in various languages) that you're likely to have seen or interacted with. This group of characters is called the *Basic Multilingual Plane* (*BMP*). The BMP even contains fun symbols like this cool snowman ☃ (U+2603).
 
-There are lots of other extended unicode characters beyond this BMP set, which range up to `0x10FFFF`. These symbols are often referred to as *astral* symbols, since that's the name given to set of 16 *planes* (e.g., layers/groupings) of characters beyond the BMP. Examples of astral symbols include 𝄞 (U+1D11E) and 💩 (U+1F4A9).
+There are lots of other extended Unicode characters beyond this BMP set, which range up to `0x10FFFF`. These symbols are often referred to as *astral* symbols, since that's the name given to set of 16 *planes* (e.g., layers/groupings) of characters beyond the BMP. Examples of astral symbols include 𝄞 (U+1D11E) and 💩 (U+1F4A9).
 
-Prior to ES6, JavaScript strings could specify unicode characters using unicode escaping, such as:
+Prior to ES6, JavaScript strings could specify Unicode characters using Unicode escaping, such as:
 
 ```js
 var snowman = "\u2603";
 console.log( snowman );			// "☃"
 ```
 
-However, the `\uXXXX` unicode escaping only supports four hexadecimal characters, so you can only represent the BMP set of characters in this way. To represent an astral character using unicode escaping prior to ES6, you need to use a *surrogate pair* -- basically two specially calculated unicode-escaped characters side-by-side, which JS interprets together as a single astral character:
+However, the `\uXXXX` Unicode escaping only supports four hexadecimal characters, so you can only represent the BMP set of characters in this way. To represent an astral character using Unicode escaping prior to ES6, you need to use a *surrogate pair* -- basically two specially calculated Unicode-escaped characters side-by-side, which JS interprets together as a single astral character:
 
 ```js
 var gclef = "\uD834\uDD1E";
 console.log( gclef );			// "𝄞"
 ```
 
-As of ES6, we now have a new form for unicode escaping (in strings and regular expressions), called unicode *code point escaping*:
+As of ES6, we now have a new form for Unicode escaping (in strings and regular expressions), called Unicode *code point escaping*:
 
 ```js
 var gclef = "\u{1D11E}";
 console.log( gclef );			// "𝄞"
 ```
 
-As you can see, the difference is the presence of the `{ }` in the escape sequence, which allows it to contain up to 6 hexadecimal characters, giving us the entire range of unicode.
+As you can see, the difference is the presence of the `{ }` in the escape sequence, which allows it to contain any number of hexadecimal characters. Since you only need six to represent the highest possible code point value in Unicode (i.e. 0x10FFFF) this is plenty.
 
 ### Unicode-Aware String Operations
 
@@ -2050,11 +2050,11 @@ var gclef = "𝄞";
 Array.from( gclef ).length;		// 1
 ```
 
-Recall from the "`for..of` Loops" section earlier in this chapter that ES6 strings have built-in iterators. This iterator happens to be unicode-aware, meaning it will automatically output an astral symbol as a single value. We take advantage of that using the `...` spread operator in an array literal, which creates an array of the string's symbols. Then we just inspect the length of that resultant array. ES6's `Array.from(..)` does basically the same thing as `[...XYZ]`, but we'll cover that utility in detail in Chapter 6.
+Recall from the "`for..of` Loops" section earlier in this chapter that ES6 strings have built-in iterators. This iterator happens to be Unicode-aware, meaning it will automatically output an astral symbol as a single value. We take advantage of that using the `...` spread operator in an array literal, which creates an array of the string's symbols. Then we just inspect the length of that resultant array. ES6's `Array.from(..)` does basically the same thing as `[...XYZ]`, but we'll cover that utility in detail in Chapter 6.
 
 **Warning:** It should be noted that constructing and exhausting an iterator just to get the length of a string is quite expensive on performance, relatively speaking, compared to what a theoretically optimized native utility/property would do.
 
-Unfortunately, the full answer is not as simple or straightforward. In addition to the surrogate pairs (which the string iterator takes care of), there are special unicode code points which behave in other special ways, which is much harder to account for. For example, there's a set of code points which modify the previous adjacent character, known as the *Combining Diacritical Marks*.
+Unfortunately, the full answer is not as simple or straightforward. In addition to the surrogate pairs (which the string iterator takes care of), there are special Unicode code points which behave in other special ways, which is much harder to account for. For example, there's a set of code points which modify the previous adjacent character, known as the *Combining Diacritical Marks*.
 
 Consider these two string outputs:
 
@@ -2077,7 +2077,7 @@ As you can probably guess, our previous `length` trick doesn't work with `s2`:
 [...s2].length;					// 2
 ```
 
-So what can we do? In this case, we can perform a *unicode normalization* on the value before inquiring about its length, using the ES6 `String#normalize(..)` utility (which we'll cover more in Chapter 6):
+So what can we do? In this case, we can perform a *Unicode normalization* on the value before inquiring about its length, using the ES6 `String#normalize(..)` utility (which we'll cover more in Chapter 6):
 
 ```js
 var s1 = "\xE9",
@@ -2104,7 +2104,7 @@ console.log( s1 );				// "ḛ́"
 
 The further you go down this rabbit hole, the more you realize that there it's difficult to get one precise definition for "length". What we see visually rendered as a single character -- more precisely called a *grapheme* -- doesn't always strictly relate to a single "character" in the program processing sense.
 
-**Tip:** If you want to see just how deep this rabbit hole goes, check out the "Grapheme Cluster Boundaries" algorithm (http://www.unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries).
+**Tip:** If you want to see just how deep this rabbit hole goes, check out the "Grapheme Cluster Boundaries" algorithm (http://www.Unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries).
 
 ### Character Positioning
 
@@ -2127,7 +2127,7 @@ s3.charAt( 2 );					// "" <-- unprintable surrogate
 s3.charAt( 3 );					// "" <-- unprintable surrogate
 ```
 
-So, is ES6 giving us a unicode-aware verison of `charAt(..)`? Unfortunately, no. At the time of this writing, there's a proposal for such a utility that's under consideration for post-ES6.
+So, is ES6 giving us a Unicode-aware verison of `charAt(..)`? Unfortunately, no. At the time of this writing, there's a proposal for such a utility that's under consideration for post-ES6.
 
 But with what we explored in the previous section (and of course with the limitations noted thereof!), we can hack an ES6 answer:
 
@@ -2143,7 +2143,7 @@ var s1 = "abc\u0301d",
 
 **Warning:** Reminder of an earlier warning: constructing and exhausting an iterator each time you want to get at a single character is... very not ideal performance wise. Let's hope we get a built-in and optimized utility for this soon, post-ES6.
 
-What about a unicode-aware version of the `charCodeAt(..)` utility? ES6 gives us `codePointAt(..)`:
+What about a Unicode-aware version of the `charCodeAt(..)` utility? ES6 gives us `codePointAt(..)`:
 
 ```js
 var s1 = "abc\u0301d",
@@ -2160,7 +2160,7 @@ s3.normalize().codePointAt( 2 ).toString( 16 );
 // "1d49e"
 ```
 
-What about the other direction? A unicode-aware version of `String.fromCharCode(..)` is ES6's `String.fromCodePoint(..)`:
+What about the other direction? A Unicode-aware version of `String.fromCharCode(..)` is ES6's `String.fromCodePoint(..)`:
 
 ```js
 String.fromCodePoint( 0x107 );		// "ć"
@@ -2168,7 +2168,7 @@ String.fromCodePoint( 0x107 );		// "ć"
 String.fromCodePoint( 0x1d49e );	// "𝒞"
 ```
 
-So wait, can we just combine `String.fromCodePoint(..)` and `codePointAt(..)` to get a better version of a unicode-aware `charAt(..)` from earlier? Yep!
+So wait, can we just combine `String.fromCodePoint(..)` and `codePointAt(..)` to get a better version of a Unicode-aware `charAt(..)` from earlier? Yep!
 
 ```js
 var s1 = "abc\u0301d",
@@ -2185,10 +2185,10 @@ String.fromCodePoint( s3.normalize().codePointAt( 2 ) );
 // "𝒞"
 ```
 
-There's a whole slew of other string methods we haven't addressed here, including `toUpperCase()`, `toLowerCase()`, `substring(..)`, `indexOf(..)`, `slice(..)`, and a dozen others. None of these have been changed or augmented for full unicode awareness, so you should be very careful -- probably just avoid them! -- on strings with astral symbols contained.
+There's a whole slew of other string methods we haven't addressed here, including `toUpperCase()`, `toLowerCase()`, `substring(..)`, `indexOf(..)`, `slice(..)`, and a dozen others. None of these have been changed or augmented for full Unicode awareness, so you should be very careful -- probably just avoid them! -- on strings with astral symbols contained.
 
-There are also several string methods which use regular expressions for their behavior, like `replace(..)` and `match(..)`. Thankfully, ES6 brings unicode awareness to regular expressions, as we covered in "Unicode Flag" earlier in this chapter.
+There are also several string methods which use regular expressions for their behavior, like `replace(..)` and `match(..)`. Thankfully, ES6 brings Unicode awareness to regular expressions, as we covered in "Unicode Flag" earlier in this chapter.
 
-OK, there we have it! JavaScript's unicode string support is significantly better over pre-ES6 (though still not perfect) with the various additions we've just covered.
+OK, there we have it! JavaScript's Unicode string support is significantly better over pre-ES6 (though still not perfect) with the various additions we've just covered.
 
 ## Review
