@@ -64,7 +64,7 @@ A general expression that stands alone is also called an *expression statement*,
 b * 2;
 ```
 
-This flavor of expression statement is not very common or useful, as generally it wouldn't have any affect on the running of the program -- it would retrive the value of `b` and multiply it by `2`, but then wouldn't do anything with that result.
+This flavor of expression statement is not very common or useful, as generally it wouldn't have any effect on the running of the program -- it would retrieve the value of `b` and multiply it by `2`, but then wouldn't do anything with that result.
 
 A more common expression statement is a *call expression* statement (see "Functions"), as the entire statement is the function call expression itself:
 
@@ -166,7 +166,7 @@ Operators are how we perform actions on variables and values. We've already seen
 
 The `*` operator performs mathematic multiplication. Simple enough, right?
 
-The `=` equals operator is used for *assignment* -- we first calculate the value on the *righthand side* (source value) of the `=` and then put it into the variable that we specify on the *lefthand side* (target variable).
+The `=` equals operator is used for *assignment* -- we first calculate the value on the *right-hand side* (source value) of the `=` and then put it into the variable that we specify on the *left-hand side* (target variable).
 
 **Warning:** This may seem like a strange reverse order to specify assignment. Instead of `a = 42`, some might prefer to flip the order so the source value is on the left and the target variable is on the right, like `42 -> a` (this is not valid JavaScript!). Unfortunately, the `a = 42` ordered form, and similar variations, is quite prevalent in modern programming languages. If it feels unnatural, just spend some time rehearsing that ordering in your mind to get accustomed to it.
 
@@ -269,7 +269,7 @@ To help you out in these common situations, JavaScript will sometimes kick in an
 
 //TODO Kyle: The preceding paras frequently italicized "types," but I think some of it was unnecessary.  Just calling to your attention in case you disagree.
 
-So if you use the `==` loose equals operator to make the comparison `"99.99" == 99.99`, JavaScript will convert the lefthand side `"99.99"` to its `number` equivalent `99.99`. The comparison then becomes `99.99 == 99.99`, which is of course `true`.
+So if you use the `==` loose equals operator to make the comparison `"99.99" == 99.99`, JavaScript will convert the left-hand side `"99.99"` to its `number` equivalent `99.99`. The comparison then becomes `99.99 == 99.99`, which is of course `true`.
 
 While designed to help you, implicit coercion can create confusion if you haven't taken the time to learn the rules that govern its behavior. Most JS developers never have, so the common feeling is that implicit coercion is confusing and harms programs with unexpected bugs, and should thus be avoided. It's even sometimes called a flaw in the design of the language.
 
