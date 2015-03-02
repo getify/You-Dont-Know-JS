@@ -918,6 +918,122 @@ It would generally seem that the defaulting behavior of the `x` parameter is pro
 
 If that's still a bit fuzzy, go back and read it again, and play with this yourself. Your future self will thank you for taking the time to get this very subtle gotcha nuance detail straight.
 
+#### Nested Defaults: Destructured and Restructured
+
+An interesting idiom emerges -- though it may be confusing to get used to -- for setting defaults for a nested object's properties, using object destructuring with what I'd call *restructuring*.
+
+Imagine a set of defaults in a nested object structure, like the following:
+
+```js
+// taken from: http://es-discourse.com/t/partial-default-arguments/120/7
+
+var defaults = {
+	options: {
+		remove: true,
+		enable: false,
+		instance: {}
+	},
+	log: {
+		warn: true,
+		error: true
+	}
+};
+```
+
+Now, let's say that you have an object called `config`, which has some of these applied, but perhaps not all, and you'd like to set all the defaults into this object in the missing spots, but not override specific settings already present:
+
+```js
+var config = {
+	options: {
+		remove: false,
+		instance: null
+	}
+};
+```
+
+You can of course do so manually, as probably some of you have done in the past:
+
+```js
+config.options = config.options || {};
+config.options.remove = (config.options.remove !== undefined) ?
+	config.options.remove : default.options.remove;
+config.options.enable = (config.options.enable !== undefined) ?
+	config.options.enable : default.options.enable;
+...
+```
+
+Yuck.
+
+Others may prefer the assign-overwrite approach to this task. You might be tempted by the ES6 `Object.assign(..)` (see Chapter 6) utility to clone the properties first from `defaults` and then overwritten with the cloned properties from `config`, as so:
+
+```js
+config = Object.assign( {}, defaults, config );
+```
+
+That looks way nicer, huh? But there's a major problem! `Object.assign(..)` is shallow, which means when it copies `defaults.options`, it just copies that object reference, not deep cloning that object's properties to a `config.options` object. `Object.assign(..)` would need to be applied (sort of "recursively") at all levels of your object's tree to get the deep cloning you're expecting.
+
+**Note:** Many JS utility libraries/frameworks provide their own option for deep cloning of an object, but those approaches and their gotchas are beyond our scope to discuss here.
+
+So let's examine if ES6 object destructuring with defaults can help at all:
+
+```js
+config.options = config.options || {};
+config.log = config.log || {};
+{
+	options: {
+		remove: config.options.remove = default.options.remove,
+		enable: config.options.enable = default.options.enable,
+		instance: config.options.instance = default.options.instance
+	} = {},
+	log: {
+		warn: config.log.warn = default.log.warn,
+		error: config.log.error = default.log.error
+	} = {}
+} = config;
+```
+
+Not as nice as the false promise of `Object.assign(..)` (being that it's shallow only), but it's better than the earlier shown manual approach by a fair bit, I think. Still unfortunately verbose and repetitive.
+
+The previous snippet's approach works because I'm hacking the destructuring and defaults mechansim to do the property `=== undefined` checks and assignment decisions for me. It's a trick in that I'm destructuring `config` (see the `= config` at the end of the snippet), but I'm re-assigning all the destructured values right back into `config`, with the `config.options.enable` assignment references.
+
+Still too much, though. Let's see if we can make anything better.
+
+The following trick works best if you know that all the various properties you're destructuring are uniquely named. You can still do it even if that's not the case, but it's not as nice -- you'll have to do the destructuring in stages, or create unique local variables as temporary aliases.
+
+If we fully destructure all the properties into top level variables, we can then immediately restructure to reconstitute the original nested object structure.
+
+But all those temporary variables hanging around would pollute scope. So, let's use block scoping (see "Block-Scoped Declarations" earlier in this chapter) with a general `{ }` enclosing block:
+
+```js
+// apply `defaults` to `config`
+{
+	// destructure (with default value assignments)
+	let {
+		options: {
+			remove = defaults.options.remove,
+			enable = defaults.options.enable,
+			instance = defaults.options.instance
+		} = {},
+		log: {
+			warn = defaults.log.warn,
+			error = defaults.log.error
+		} = {}
+	} = config;
+
+	// restructure
+	config = {
+		options: { remove, enable, instance },
+		log: { warn, error }
+	};
+}
+```
+
+That seems a fair bit nicer, huh?
+
+**Note:** You could also accomplish the scope enclosure with an arrow IIFE instead of the general `{ }` block and `let` declarations. Your destructuring assignments/defaults would be in the parameter list and your restructuring would be the `return` statement in the function body.
+
+The `{ warn, error }` syntax in the restructuring part may look new to you; that's called "concise properties" and we cover it in the next section!
+
 ## Object Literal Extensions
 
 ES6 adds a number of important convenience extensions to the humble `{ .. }` object literal.
