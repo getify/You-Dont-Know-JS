@@ -1005,7 +1005,7 @@ If we fully destructure all the properties into top level variables, we can then
 But all those temporary variables hanging around would pollute scope. So, let's use block scoping (see "Block-Scoped Declarations" earlier in this chapter) with a general `{ }` enclosing block:
 
 ```js
-// apply `defaults` to `config`
+// merge `defaults` into `config`
 {
 	// destructure (with default value assignments)
 	let {
@@ -2116,7 +2116,7 @@ In fact, you can represent a number this way in any base from `2` to `36`, thoug
 
 ## Unicode
 
-Let me just say that this section is not an exhaustive everything-you-ever-wanted-to-know-about-Unicode resource. I want to cover what you need to know that's *changing* for Unicode in ES6, but we won't go much deeper than that. Mathias Bynens (http://twitter.com/mathias) has written/spoken extensively and brilliantly about JS and Unicode (https://mathiasbynens.be/notes/javascript-Unicode) (http://fluentconf.com/javascript-html-2015/public/content/2015/02/18-javascript-loves-Unicode).
+Let me just say that this section is not an exhaustive everything-you-ever-wanted-to-know-about-Unicode resource. I want to cover what you need to know that's *changing* for Unicode in ES6, but we won't go much deeper than that. Mathias Bynens (http://twitter.com/mathias) has written/spoken extensively and brilliantly about JS and Unicode (https://mathiasbynens.be/notes/javascript-unicode) (http://fluentconf.com/javascript-html-2015/public/content/2015/02/18-javascript-loves-unicode).
 
 The Unicode characters that range from `0x0000` to `0xFFFF` contain all the standard printed characters (in various languages) that you're likely to have seen or interacted with. This group of characters is called the *Basic Multilingual Plane* (*BMP*). The BMP even contains fun symbols like this cool snowman ☃ (U+2603).
 
@@ -2306,5 +2306,25 @@ There's a whole slew of other string methods we haven't addressed here, includin
 There are also several string methods which use regular expressions for their behavior, like `replace(..)` and `match(..)`. Thankfully, ES6 brings Unicode awareness to regular expressions, as we covered in "Unicode Flag" earlier in this chapter.
 
 OK, there we have it! JavaScript's Unicode string support is significantly better over pre-ES6 (though still not perfect) with the various additions we've just covered.
+
+### Unicode Identifier Names
+
+Unicode can also be used in identifier names (variables, properties, etc.). Prior to ES6, you could do this with Unicode-escapes, like:
+
+```js
+var \u03A9 = 42;
+
+// same as: var Ω = 42;
+```
+
+As of ES6, you can also use the earlier explained code point escape syntax:
+
+```js
+var \u{2B400} = 42;
+
+// same as: var 𫐀 = 42;
+```
+
+// TODO: fill in a lot more detail once @mathias helps :)
 
 ## Review
