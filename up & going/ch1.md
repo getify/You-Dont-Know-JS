@@ -5,19 +5,19 @@ Welcome to the *You Don't Know JS* (*YDKJS*) series.
 
 *Up & Going* is an introduction to several basic concepts of programming -- of course we lean toward JavaScript (often abbreviated JS) specifically -- and how to approach and understand the rest of the titles in this series. Especially if you're just getting into programming and/or JavaScript, this book will briefly explore what you need to get *up and going*.
 
-This first chapter explains the basic principles of programming at a very high level. It's mostly intended if you are starting *YDKJS* with little to no prior programming experience, and are looking to these books to help get you started along a path to understanding programming through the lens of JavaScript.
+This book starts off explaining the basic principles of programming at a very high level. It's mostly intended if you are starting *YDKJS* with little to no prior programming experience, and are looking to these books to help get you started along a path to understanding programming through the lens of JavaScript.
 
 Chapter 1 should be approached as a quick overview of the things you'll want to learn more about and practice to get *into programming*. There are also many other fantastic programming introduction resources that can help you dig into these topics further, and I encourage you to learn from them in addition to this chapter.
 
 Once you feel comfortable with general programming basics, Chapter 2 will help guide you to a familiarity with JavaScript's flavor of programming. Chapter 2 introduces what JavaScript is about, but again, it's not a comprehensive guide -- that's what the rest of the *YDKJS* books are for!
 
-If you're already somewhat comfortable with JavaScript and are ready to get started with the rest of the series, check out Chapter 3 as a brief glimpse of what to expect from *YDKJS*.
+If you're already fairly comfortable with JavaScript, first check out Chapter 3 as a brief glimpse of what to expect from *YDKJS*, then jump right in!
 
 ## Code
 
 Let's start from the beginning.
 
-A program, often referred to as *code* or *source code*, is a set of special instructions to tell the computer what tasks to perform. Usually code is saved in a text file, although with JavaScript you can type code directly into a developer console in a browser, which we'll cover shortly.
+A program, often referred to as *code* or *source code*, is a set of special instructions to tell the computer what tasks to perform. Usually code is saved in a text file, although with JavaScript you can also type code directly into a developer console in a browser, which we'll cover shortly.
 
 The rules for valid format and combinations of instructions is called a *computer language*, sometimes referred to as its *syntax*, much the same as English tells you how to spell words and how to create valid sentences using words and punctuation.
 
@@ -69,7 +69,7 @@ This flavor of expression statement is not very common or useful, as generally i
 A more common expression statement is a *call expression* statement (see "Functions"), as the entire statement is the function call expression itself:
 
 ```js
-console.log( a );
+alert( a );
 ```
 
 ### Executing a Program
@@ -148,7 +148,7 @@ age = prompt( "Please tell me your age:" );
 console.log( age );
 ```
 
-As you may have guessed, the message you pass to `prompt(..)`  (in this case, `"Please tell me your age:"`) is printed into the popup.
+As you may have guessed, the message you pass to `prompt(..)` (in this case, `"Please tell me your age:"`) is printed into the popup.
 
 This should look similar to the following:
 
@@ -229,7 +229,7 @@ These different representations for values are called *types* in programming ter
 * When you need to print a value on the screen, you need a `string` (one or more characters, words, sentences).
 * When you need to make a decision in your program, you need a `boolean` (`true` or `false`).
 
-Values that are included directly in the source code are called *literals*. `string` literals are surrounded by double quotes (`"..."`)  or single quotes (`'...'`) -- the only difference is stylistic preference. `number` and `boolean` literals are just presented as is (i.e., `42`, `true`, etc.).
+Values that are included directly in the source code are called *literals*. `string` literals are surrounded by double quotes `"..."` or single quotes (`'...'`) -- the only difference is stylistic preference. `number` and `boolean` literals are just presented as is (i.e., `42`, `true`, etc.).
 
 Consider:
 
@@ -266,8 +266,6 @@ But a controversial topic is what happens when you try to compare two values tha
 When comparing the string `"99.99"` to the number `99.99`, most people would agree they are equivalent. But they're not exactly the same, are they? It's the same value in two different representations, two different *types*. You could say they're "loosely equal," couldn't you?
 
 To help you out in these common situations, JavaScript will sometimes kick in and *implicitly* coerce values to the matching types.
-
-//TODO Kyle: The preceding paras frequently italicized "types," but I think some of it was unnecessary.  Just calling to your attention in case you disagree.
 
 So if you use the `==` loose equals operator to make the comparison `"99.99" == 99.99`, JavaScript will convert the left-hand side `"99.99"` to its `number` equivalent `99.99`. The comparison then becomes `99.99 == 99.99`, which is of course `true`.
 
@@ -381,7 +379,7 @@ In other words, *state* is tracking the changes to values as your program runs.
 
 Another common usage of variables is for centralizing value setting. This is more typically called *constants*, when you declare a variable with a value and intend for that value to *not change* throughout the program.
 
-You declare these *constants*, often at the top of a program, so that it's convenient for you to have one place to go to alter a value if you need to. By convention, JavaScript variables as constants are usually capitalized, with underscores (`_`)  between multiple words.
+You declare these *constants*, often at the top of a program, so that it's convenient for you to have one place to go to alter a value if you need to. By convention, JavaScript variables as constants are usually capitalized, with underscores `_` between multiple words.
 
 Here's a silly example:
 
@@ -423,7 +421,7 @@ By the way, that kind of "protection" against mistakes is similar to the static-
 
 The phone store employee must go through a series of steps to complete the checkout as you buy your new phone.
 
-Similarly, in code we often need to group a series of statements together, which we often call a *block*. In JavaScript, a block is defined by wrapping one or more statements inside a curly-brace pair (`{ .. }`). Consider:
+Similarly, in code we often need to group a series of statements together, which we often call a *block*. In JavaScript, a block is defined by wrapping one or more statements inside a curly-brace pair `{ .. }`. Consider:
 
 ```js
 var amount = 99.99;
@@ -468,7 +466,7 @@ if (amount < bank_balance) {
 }
 ```
 
-The `if` statement requires an expression in between the parentheses  (`( )`) that can be treated as either `true` or `false`. In this program, we provided the expression `amount < bank_balance`, which indeed will either evaluate to `true` or `false` depending on the amount in the `bank_balance` variable.
+The `if` statement requires an expression in between the parentheses `( )` that can be treated as either `true` or `false`. In this program, we provided the expression `amount < bank_balance`, which indeed will either evaluate to `true` or `false` depending on the amount in the `bank_balance` variable.
 
 You can even provide an alternative if the condition isn't true, called an `else` clause. Consider:
 
@@ -505,7 +503,7 @@ JavaScript defines a list of specific values that are considered "falsy" because
 
 During busy times, there's a waiting list for customers who need to speak to the phone store employee. While there's still people on that list, she just needs to keep serving the next customer.
 
-Repeating a set of actions until a certain condition is met is the job of programming loops; loops can take different forms, but they all satisfy this basic behavior.
+Repeating a set of actions until a certain condition fails -- in other words, repeating only while the condition holds -- is the job of programming loops; loops can take different forms, but they all satisfy this basic behavior.
 
 A loop includes the test condition as well as a block (typically as `{ .. }`). Each time the loop block executes, that's called an *iteration*.
 
@@ -576,15 +574,15 @@ for (var i = 0; i <= 9; i = i + 1) {
 
 As you can see, in both cases the conditional `i <= 9` is `true` for the first 10 iterations (`i` of values `0` through `9`) of either loop form, but becomes `false` once `i` is value `10`.
 
-The `for` loop has three clauses: the declaration clause (`var i=0`), the conditional test clause (`i <= 9`), and the loop increment clause (`i = i + 1`). So if you're going to do counting with your loop iterations, `for` is a more compact and often easier form to understand and write.
+The `for` loop has three clauses: the initialization clause (`var i=0`), the conditional test clause (`i <= 9`), and the update clause (`i = i + 1`). So if you're going to do counting with your loop iterations, `for` is a more compact and often easier form to understand and write.
 
 There are other specialized loop forms that are intended to iterate over specific values, such as the properties of an object (see Chapter 2) where the implied conditional test is just whether all the properties have been processed. The "loop until a condition fails" concept holds no matter what the form of the loop.
 
 ## Functions
 
-The phone store employee probably doesn't carry around a calculator to figure out the taxes and final purchase amount. That's a task she needs to define once and reuse over and over again. Odds are, the company has a checkout register with those "functions" built in.
+The phone store employee probably doesn't carry around a calculator to figure out the taxes and final purchase amount. That's a task she needs to define once and reuse over and over again. Odds are, the company has a checkout register (computer, tablet, etc.) with those "functions" built in.
 
-Similarly, your program will almost certainly want to break up the code's tasks into reusable pieces. The way to do this is to define a `function`.
+Similarly, your program will almost certainly want to break up the code's tasks into reusable pieces, instead of repeatedly repeating yourself repetitiously (pun intended!). The way to do this is to define a `function`.
 
 A function is generally a named section of code that can be "called" by name, and the code inside it will be run each time. Consider:
 
@@ -610,7 +608,7 @@ function printAmount(amt) {
 }
 
 function formatAmount() {
-	return amount.toFixed( 2 );
+	return "$" + amount.toFixed( 2 );
 }
 
 var amount = 99.99;
@@ -618,7 +616,7 @@ var amount = 99.99;
 printAmount( amount * 2 );		// "199.98"
 
 amount = formatAmount();
-console.log( "$" + amount );	// "$99.99"
+console.log( amount );			// "$99.99"
 ```
 
 The function `printAmount(..)` takes a parameter that we call `amt`. The function `formatAmount()` returns a value. Of course, you can also combine those two techniques in the same function.
@@ -744,16 +742,15 @@ const PHONE_PRICE = 99.99;
 const ACCESSORY_PRICE = 9.99;
 
 var bank_balance = 303.91;
+var amount = 0;
 
 function calculateTax(amount) {
 	return amount * TAX_RATE;
 }
 
 function formatAmount(amount) {
-	return "$" + amount.toFixed(2);
+	return "$" + amount.toFixed( 2 );
 }
-
-var amount = 0;
 
 // keep buying phones while you still have money
 while (amount < bank_balance) {
@@ -789,7 +786,9 @@ How did you do? It wouldn't hurt to try it again now that you've seen my code. A
 
 ## Review
 
-Learning programming doesn't have to be a complex and involved process. There are just a few basic concepts you need to wrap your head around. These act like building blocks. To build a tall tower, you start first by putting block on top of block on top of block. The same goes with programming. Here are some of the essential programming building blocks:
+Learning programming doesn't have to be a complex and overwhelming process. There are just a few basic concepts you need to wrap your head around.
+
+These act like building blocks. To build a tall tower, you start first by putting block on top of block on top of block. The same goes with programming. Here are some of the essential programming building blocks:
 
 * You need *operators* to perform actions on
 * You need values and *types* to perform different kinds of actions like math on `number`s or output with `string`s.
