@@ -49,13 +49,13 @@ typeof a;				// "object"
 
 The return value from the `typeof` operator is always one of six (seven as of ES6!) string values. That is, `typeof "abc"` returns `"string"`, not `string`.
 
-Notice how in this snippet the `a` variable holds every different type of value, and that despite appearances, `typeof a` is not asking for the "type of `a`", but rather for the "type of the value currently in `a`". Only values have types in JavaScript; variables are just simple containers for those values.
+Notice how in this snippet the `a` variable holds every different type of value, and that despite appearances, `typeof a` is not asking for the "type of `a`", but rather for the "type of the value currently in `a`." Only values have types in JavaScript; variables are just simple containers for those values.
 
 `typeof null` is an interesting case, because it errantly returns `"object"`, when you'd expect it to return `"null"`.
 
 **Warning:** This is a long-standing bug in JS, but one that is likely never going to be fixed. Too much code on the Web relies on the bug and thus fixing it would cause a lot more bugs!
 
-Also, note `a = undefined`. We're explicitly setting `a` to this `undefined` value, but that is behaviorally no different from a variable that has no value set yet, like with the `var a;` line at the top of the snippet. A variable can get to this "undefined" value state in several different ways, including functions that return no values and usage of the `void` operator.
+Also, note `a = undefined`. We're explicitly setting `a` to the `undefined` value, but that is behaviorally no different from a variable that has no value set yet, like with the `var a;` line at the top of the snippet. A variable can get to this "undefined" value state in several different ways, including functions that return no values and usage of the `void` operator.
 
 ### Objects
 
@@ -156,7 +156,7 @@ Again, functions are a subtype of `objects` -- `typeof` returns `"function"`, wh
 
 ### Built-In Type Methods
 
-The built-in types and subtypes we've just discussed have built-in behaviors exposed as properties and methods that are quite powerful and useful.
+The built-in types and subtypes we've just discussed have behaviors exposed as properties and methods that are quite powerful and useful.
 
 For example:
 
@@ -235,7 +235,7 @@ Any value that's not on this "falsy" list is "truthy." Here are some examples of
 * `{ }`, `{ a: 42 }` (objects)
 * `function foo() { .. }` (functions)
 
-It's important to remember that a non-`boolean` value only follows this "truthy"/"falsy" coercion if it's actually coerced to a `boolean`. It's not all that difficult to confuse yourself with a situation that seems like it's coercing to a value to a `boolean` when it's not.
+It's important to remember that a non-`boolean` value only follows this "truthy"/"falsy" coercion if it's actually coerced to a `boolean`. It's not all that difficult to confuse yourself with a situation that seems like it's coercing a value to a `boolean` when it's not.
 
 #### Equality
 
@@ -329,7 +329,7 @@ The `==` comparison fails for a different reason. `a == b` could fail if it's in
 
 ## Variables
 
-In JavaScript, variable names (as well as function names) must be valid *identifiers*. The strict and complete rules for valid characters in identifiers are a little complex when you consider nontraditional characters such as Unicode. If you only consider typical ASCII alphanumeric characters, though, the rules are simple.
+In JavaScript, variable names (including function names) must be valid *identifiers*. The strict and complete rules for valid characters in identifiers are a little complex when you consider nontraditional characters such as Unicode. If you only consider typical ASCII alphanumeric characters, though, the rules are simple.
 
 An identifier must start with `a`-`z`, `A`-`Z`, `$`, or `_`. It can then contain any of those characters plus the numerals `0`-`9`.
 
@@ -535,7 +535,7 @@ function foo() {
 	}
 }
 
-// this code is not stict mode
+// this code is not strict mode
 ```
 
 Compare that to:
@@ -683,13 +683,17 @@ function makeAdder(x) {
 
 	return add;
 }
+```
 
-// `plusOne(..)` is a reference to the inner `add(..)`
+The reference to the inner `add(..)` function that gets returned with each call to the outer `makeAdder(..)` is able to remember whatever `x` value was passed in to `makeAdder(..)`. Now, let's use `makeAdder(..)`:
+
+```js
+// `plusOne` gets a reference to the inner `add(..)`
 // function with closure over the `x` parameter of
 // the outer `makeAdder(..)`
 var plusOne = makeAdder( 1 );
 
-// `plusTen(..)` is a reference to the inner `add(..)`
+// `plusTen` gets a reference to the inner `add(..)`
 // function with closure over the `x` parameter of
 // the outer `makeAdder(..)`
 var plusTen = makeAdder( 10 );
@@ -700,12 +704,10 @@ plusOne( 41 );		// 42 <-- 1 + 41
 plusTen( 13 );		// 23 <-- 10 + 13
 ```
 
-The reference to the inner `add(..)` function that gets returned with each call to the outer `makeAdder(..)` is able to remember whatever `x` value was passed in to `makeAdder(..)`.
-
 More on how this code works:
 
-1. When we call `makeAdder(1)`, we get back a reference to its inner `add(..)` that remembers `x` as `1`, which we call `plusOne`.
-2. When we call `makeAdder(10)`, we get back another reference to its inner `add(..)` that remembers `x` as `10`, which we call `plusTen`.
+1. When we call `makeAdder(1)`, we get back a reference to its inner `add(..)` that remembers `x` as `1`. We call this function reference `plusOne(..)`.
+2. When we call `makeAdder(10)`, we get back another reference to its inner `add(..)` that remembers `x` as `10`. We call this function reference `plusTen(..)`.
 3. When we call `plusOne(3)`, it adds `3` (its inner `y`) to the `1` (remembered by `x`), and we get `4` as the result.
 4. When we call `plusTen(13)`, it adds `13` (its inner `y`) to the `10` (remembered by `x`), and we get `23` as the result.
 
@@ -745,6 +747,8 @@ fred.login( "fred", "12Battery34!" );
 
 The `User()` function serves as an outer scope that holds the variables `username` and `password`, as well as the inner `doLogin()` function; these are all private inner details of this `User` module that cannot be accessed from the outside world.
 
+**Warning:** We are not callling `new User()` here, on purpose, despite the fact that probably seems more common to most readers. `User()` is just a function, not a class to be instantiated, so it's just called normally. Using `new` would be inappropriate.
+
 Executing `User()` creates an *instance* of the `User` module -- a whole new scope is created, and thus a whole new copy of each of these inner variables/functions. We assign this instance to `fred`. If we run `User()` again, we'd get a new instance entirely separate from `fred`.
 
 The inner `doLogin()` function has a closure over `username` and `password`, meaning it will retain its access to them even after the `User()` function finishes running.
@@ -759,13 +763,13 @@ There's a good chance that with just this brief glimpse at closure and the modul
 
 From here, go read the *Scope & Closures* title of this series for a much more in-depth exploration.
 
-## `this` Keyword
+## `this` Identifier
 
-Another very commonly misunderstood concept in JavaScript is the `this` keyword. Again, there's a whole set of book chapters on it in the *this & Object Prototypes* title of this series, so here we'll just briefly introduce the concept.
+Another very commonly misunderstood concept in JavaScript is the `this` identifier. Again, there's a whole set of book chapters on it in the *this & Object Prototypes* title of this series, so here we'll just briefly introduce the concept.
 
 While it may often seem that `this` is related to "object-oriented patterns," in JS `this` is a different mechanism.
 
-If a function has a `this` keyword reference inside it, that `this` keyword usually points to an `object`. But which `object` it points to depends on how the function was called.
+If a function has a `this` reference inside it, that `this` reference usually points to an `object`. But which `object` it points to depends on how the function was called.
 
 It's important to realize that `this` *does not* refer to the function itself, as is the most common misconception.
 
@@ -797,7 +801,7 @@ new foo();			// undefined
 
 There are four rules for how `this` gets set, and they're shown in those last four lines of that snippet.
 
-1. `foo()` ends up setting `this` to the global object in non-strict mode -- in strict mode, `this` would be `undefined` and you'd get an error -- so `"global"` is the value found for `this.bar`.
+1. `foo()` ends up setting `this` to the global object in non-strict mode -- in strict mode, `this` would be `undefined` and you'd get an error in accessing the `bar` property -- so `"global"` is the value found for `this.bar`.
 2. `obj1.foo()` sets `this` to the `obj1` object.
 3. `foo.call(obj2)` sets `this` to the `obj2` object.
 4. `new foo()` sets `this` to a brand new empty object.
