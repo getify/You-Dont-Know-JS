@@ -5,6 +5,7 @@ This is a series of books diving deep into the core mechanisms of the JavaScript
 <a href="http://shop.oreilly.com/product/0636920026327.do"><img src="scope %26 closures/cover.jpg" width="75"></a>&nbsp;
 <a href="http://shop.oreilly.com/product/0636920033738.do"><img src="this %26 object prototypes/cover.jpg" width="75"></a>&nbsp;
 <a href="http://shop.oreilly.com/product/0636920033745.do"><img src="types %26 grammar/cover.jpg" width="75"></a>&nbsp;
+<a href="http://shop.oreilly.com/product/0636920033752.do"><img src="async %26 performance/cover.jpg" width="75"></a>&nbsp;
 <span>...(more coming soon!)</span>
 
 Please feel free to contribute to the quality of this content by submitting PR's for improvements to code snippets, explanations, etc. While typo fixes are welcomed, they will likely be caught through normal editing processes, and are thus not necessarily as important for this repository.
@@ -13,11 +14,11 @@ Please feel free to contribute to the quality of this content by submitting PR's
 
 ## Titles
 
-* ["Up & Going"](up & going/README.md#you-dont-know-js-up--going) (in editing)
+* ["Up & Going"](up & going/README.md#you-dont-know-js-up--going) (in production)
 * ["Scope & Closures"](scope & closures/README.md#you-dont-know-js-scope--closures) ([published -- buy now!](http://shop.oreilly.com/product/0636920026327.do))
 * ["this & Object Prototypes"](this & object prototypes/README.md#you-dont-know-js-this--object-prototypes) ([published -- buy now!](http://shop.oreilly.com/product/0636920033738.do))
 * ["Types & Grammar"](types & grammar/README.md#you-dont-know-js-types--grammar) ([published -- buy now!](http://shop.oreilly.com/product/0636920033745.do))
-* ["Async & Performance"](async & performance/README.md#you-dont-know-js-async--performance) (in production)
+* ["Async & Performance"](async & performance/README.md#you-dont-know-js-async--performance) ([published -- buy now!](http://shop.oreilly.com/product/0636920033752.do))
 * ["ES6 & Beyond"](es6 & beyond/README.md#you-dont-know-js-es6--beyond) (in progress)
 
 ## Publishing
