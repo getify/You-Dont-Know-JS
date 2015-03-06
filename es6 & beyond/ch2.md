@@ -2331,4 +2331,69 @@ There's a complex set of rules around exactly which unicode characters are allow
 
 The reasons for using such unusual characters in identifier names are rather rare and academic. You typically won't be best served by writing code which relies on these esoteric capabilities.
 
+## Symbols
+
+For the first time in quite awhile, JavaScript is getting a new primitive type with ES6: the `symbol`. Unlike the other primitive types, however, symbols don't have a literal form.
+
+Here's how you create a symbol:
+
+```js
+var s = Symbol( "some optional description" );
+```
+
+Some things to note:
+
+* You cannot and should not use `new` with `Symbol(..)`. It's not a constructor, nor are you producing an object.
+* The parameter passed to `Symbol(..)` is optional. If passed, it should be a string that gives a friendly description for the symbol's purpose.
+
+The description, if provided, is solely used for the stringification representation of the symbol:
+
+```js
+s.toString();	// "Symbol(some optional description)"
+```
+
+The symbol value itself -- technically referred to as its `name` -- is hidden from you and cannot be obtained. You can think of this symbol value as an automatically generated, completely unique (within your application) string value.
+
+If the value is hidden and unobtainable, what's the point of having a symbol at all?
+
+You will almost certainly use a symbol as a property name/key in an object. Most likely, you'll do so for a special property that you want to treat as hidden or meta. It's important to know that it is not *actually* a hidden or untouchable property, but more a property that you intend to treat as such.
+
+For example, imagine a utility like:
+
+```js
+function extractValues(str) {
+	var values = [], match,
+		re = extractValues.match;
+
+	while (match = re.exec( str )) {
+		values.push( match[1] );
+	}
+	return values;
+}
+
+extractValues.match = /[^=&]+?=([^&]+?)(?=&|$)/g;
+
+extractValues( "foo=42&bar=hello" );	// [42,"hello"]
+```
+
+The `extractValues.match` is a property on the `extractValues(..)` function which holds a default regular expression definition for parsing values out of strings. It's exposed publicly so that you can modify it if you so choose.
+
+Is it appropriate though to store this special regular expression value as a general property name like `match`? It might make more sense to store it under a symbol property:
+
+```js
+function extractValues(str) {
+	var values = [], match,
+		re = extractValues[sym];
+
+	while (match = re.exec( str )) {
+		values.push( match[1] );
+	}
+	return values;
+}
+
+var sym = Symbol( "default parse regex" );
+
+extractValues[sym] = /[^=&]+?=([^&]+?)(?=&|$)/g;
+```
+
 ## Review
