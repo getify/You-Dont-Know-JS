@@ -2325,6 +2325,10 @@ var \u{2B400} = 42;
 // same as: var 𫐀 = 42;
 ```
 
-// TODO: fill in a lot more detail once @mathias helps :)
+There's a complex set of rules around exactly which unicode characters are allowed. Furthermore, some are allowed only if they're not the first character of the identifier name.
+
+**Note:** Mathias Bynens has a great post (https://mathiasbynens.be/notes/javascript-identifiers-es6) on all the nitty gritty details.
+
+The reasons for using such unusual characters in identifier names are rather rare and academic. You typically won't be best served by writing code which relies on these esoteric capabilities.
 
 ## Review
