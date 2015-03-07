@@ -2521,12 +2521,11 @@ So it's clear that a property symbol is not actually hidden or inaccessible, as 
 
 #### Built-in Symbols
 
-ES6 comes with a number of predefined built-in symbols that expose various meta behaviors on JavaScript object values. As one might assume, these symbols are registered in the global symbol registry, with the `"Symbol."` prefix in the description text.
+ES6 comes with a number of predefined built-in symbols that expose various meta behaviors on JavaScript object values. However, these symbols are *not* registered in the global symbol registry, as one might expect.
 
-For convenience, they're also stored as properties on the `Symbol` function object. For example, in the "`for..of`" section earlier in this chapter, we introduced the `Symbol.iterator` value:
+Instead, they're stored as properties on the `Symbol` function object. For example, in the "`for..of`" section earlier in this chapter, we introduced the `Symbol.iterator` value:
 
 ```js
-Symbol.iterator === Symbol.for( "Symbol.iterator" );	// true
 
 var a = [1,2,3];
 
