@@ -2333,18 +2333,21 @@ The reasons for using such unusual characters in identifier names are rather rar
 
 ## Symbols
 
-For the first time in quite awhile, JavaScript is getting a new primitive type with ES6: the `symbol`. Unlike the other primitive types, however, symbols don't have a literal form.
+For the first time in quite awhile, a new primitive type has been added to JavaScript, in ES6: the `symbol`. Unlike the other primitive types, however, symbols don't have a literal form.
 
 Here's how you create a symbol:
 
 ```js
 var s = Symbol( "some optional description" );
+
+typeof s;		// "symbol"
 ```
 
 Some things to note:
 
 * You cannot and should not use `new` with `Symbol(..)`. It's not a constructor, nor are you producing an object.
 * The parameter passed to `Symbol(..)` is optional. If passed, it should be a string that gives a friendly description for the symbol's purpose.
+* The `typeof` output is a new value (`"symbol"`) that is the primary way to identify a symbol.
 
 The description, if provided, is solely used for the stringification representation of the symbol:
 
@@ -2352,11 +2355,40 @@ The description, if provided, is solely used for the stringification representat
 s.toString();	// "Symbol(some optional description)"
 ```
 
-The symbol value itself -- technically referred to as its `name` -- is hidden from you and cannot be obtained. You can think of this symbol value as an automatically generated, completely unique (within your application) string value.
+Similar to how primitive string values are not instances of `String`, symbols are also not instances of `Symbol`. If for some reason you want to construct the boxed wrapper object form of a symbol value, you can do the following:
+
+```js
+s instanceof Symbol;		// false
+
+var symObj = Object( s );
+symObj instanceof Symbol;	// true
+```
+
+The internal symbol value itself -- technically referred to as its `name` -- is hidden from you and cannot be obtained. You can think of this symbol value as an automatically generated, completely unique (within your application) string value.
 
 If the value is hidden and unobtainable, what's the point of having a symbol at all?
 
-You will almost certainly use a symbol as a property name/key in an object. Most likely, you'll do so for a special property that you want to treat as hidden or meta. It's important to know that it is not *actually* a hidden or untouchable property, but more a property that you intend to treat as such.
+The main point of a symbol value is to create a string-like value that can't collide with any other symbol.
+
+For example, imagine a symbol as a constant representing an event name:
+
+```js
+const EVT_LOGIN = Symbol( "event.login" );
+```
+
+You'd then use `EVT_LOGIN` in place of a generic string literal like `"event.login"`:
+
+```js
+evthub.listen( EVT_LOGIN, function(data){
+	// ..
+} );
+```
+
+The benefit here is that `EVT_LOGIN` holds a value that cannot be duplicated (accidentally or otherwise) by any other value, so it is impossible for there to be any confusion of which event is being dispatched or handled.
+
+**Note:** Under the covers, the `evthub` utility assumed in the previous snippet would almost certainly be taking the symbol value from the `EVT_LOGIN` argument and using that as the property/key in some internal object (hash). If `evthub` needed to use that symbol value as a real string, it would need to explicitly use `String(..)` or `toString()` to perform the coercion, as implicit string coercion of symbols causes errors.
+
+You may use a symbol directly as a property name/key in an object, such as a special property that you want to treat as hidden or meta in usage. It's important to know that it is not *actually* a hidden or untouchable property, but more a property that you just intend to treat as such.
 
 For example, imagine a utility like:
 
@@ -2383,7 +2415,7 @@ Is it appropriate though to store this special regular expression value as a gen
 ```js
 function extractValues(str) {
 	var values = [], match,
-		re = extractValues[sym];
+		re = extractValues[RE];
 
 	while (match = re.exec( str )) {
 		values.push( match[1] );
@@ -2391,9 +2423,11 @@ function extractValues(str) {
 	return values;
 }
 
-var sym = Symbol( "default parse regex" );
+var RE = Symbol( "parse regex" );
 
-extractValues[sym] = /[^=&]+?=([^&]+?)(?=&|$)/g;
+extractValues[RE] = /[^=&]+?=([^&]+?)(?=&|$)/g;
 ```
+
+Of course, this means that the `RE` symbol value needs to be in some shared accessible location, if you want the user of `extractValues(..)` to be able to set the parsing regex to some other custom value.
 
 ## Review
