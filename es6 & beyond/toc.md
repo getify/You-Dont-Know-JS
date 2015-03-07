@@ -41,6 +41,7 @@
 	* `String`
 	* `Array`
 * Chapter 7: Meta
+	* Realms
 	* Function Names
 	* Built-in Object Symbols
 	* `Reflect` API

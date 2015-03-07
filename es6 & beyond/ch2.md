@@ -922,7 +922,7 @@ If that's still a bit fuzzy, go back and read it again, and play with this yours
 
 An interesting idiom emerges -- though it may be confusing to get used to -- for setting defaults for a nested object's properties, using object destructuring with what I'd call *restructuring*.
 
-Imagine a set of defaults in a nested object structure, like the following:
+Consider a set of defaults in a nested object structure, like the following:
 
 ```js
 // taken from: http://es-discourse.com/t/partial-default-arguments/120/7
@@ -2372,13 +2372,13 @@ The internal value of a symbol itself -- referred to as its `name` -- is hidden 
 
 But if the value is hidden and unobtainable, what's the point of having a symbol at all?
 
-The main point of a symbol is to create a string-like value that can't collide with any other value. So, for example, imagine using a symbol as a constant representing an event name:
+The main point of a symbol is to create a string-like value that can't collide with any other value. So for example, consider using a symbol as a constant representing an event name:
 
 ```js
 const EVT_LOGIN = Symbol( "event.login" );
 ```
 
-You'd then use `EVT_LOGIN` in place of the generic string literal `"event.login"`:
+You'd then use `EVT_LOGIN` in place of a generic string literal like `"event.login"`:
 
 ```js
 evthub.listen( EVT_LOGIN, function(data){
@@ -2419,7 +2419,7 @@ It could alternately have been a plain old property like `__instance`, and the b
 
 ### Symbol Registry
 
-One mild downside to using symbols as in the few examples is that the `EVT_LOGIN` and `INSTANCE` variables had to be kept out in an outer scope (even the global), or otherwise somehow stored in a publicly available location, so that all parts of the code which need to use the symbols can access them.
+One mild downside to using symbols as in the last few examples is that the `EVT_LOGIN` and `INSTANCE` variables had to be stored in an outer scope (perhaps even the global scope), or otherwise somehow stored in a publicly available location, so that all parts of the code which need to use the symbols can access them.
 
 To aid in organizing code with access to these symbols, you can create symbol values with the *global symbol registry*. For example:
 
@@ -2451,7 +2451,7 @@ Ironically, symbols are basically intended to replace the use of *magic strings*
 
 To avoid accidental collisions, you'll probably want to make your symbol descriptions quite unique. One easy way of doing that is to include prefix/context/namespacing information in them.
 
-For example, imagine a utility like:
+For example, consider a utility like:
 
 ```js
 function extractValues(str) {
@@ -2526,7 +2526,6 @@ ES6 comes with a number of predefined built-in symbols that expose various meta 
 Instead, they're stored as properties on the `Symbol` function object. For example, in the "`for..of`" section earlier in this chapter, we introduced the `Symbol.iterator` value:
 
 ```js
-
 var a = [1,2,3];
 
 a[Symbol.iterator];			// native function
