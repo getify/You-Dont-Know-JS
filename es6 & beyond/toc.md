@@ -42,6 +42,7 @@
 	* `Array`
 * Chapter 7: Meta
 	* Function Names
+	* Built-in Object Symbols
 	* `Reflect` API
 	* Proxies
 	* Tail Call Optimization

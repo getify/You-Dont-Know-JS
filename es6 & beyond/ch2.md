@@ -2338,9 +2338,9 @@ For the first time in quite awhile, a new primitive type has been added to JavaS
 Here's how you create a symbol:
 
 ```js
-var s = Symbol( "some optional description" );
+var sym = Symbol( "some optional description" );
 
-typeof s;		// "symbol"
+typeof sym;		// "symbol"
 ```
 
 Some things to note:
@@ -2352,31 +2352,33 @@ Some things to note:
 The description, if provided, is solely used for the stringification representation of the symbol:
 
 ```js
-s.toString();	// "Symbol(some optional description)"
+sym.toString();		// "Symbol(some optional description)"
 ```
 
-Similar to how primitive string values are not instances of `String`, symbols are also not instances of `Symbol`. If for some reason you want to construct the boxed wrapper object form of a symbol value, you can do the following:
+Similar to how primitive string values are not instances of `String`, symbols are also not instances of `Symbol`. If for some reason you want to construct a boxed wrapper object form of a symbol value, you can do the following:
 
 ```js
-s instanceof Symbol;		// false
+sym instanceof Symbol;		// false
 
-var symObj = Object( s );
+var symObj = Object( sym );
 symObj instanceof Symbol;	// true
+
+symObj.valueOf() === sym;	// true
 ```
 
-The internal symbol value itself -- technically referred to as its `name` -- is hidden from you and cannot be obtained. You can think of this symbol value as an automatically generated, completely unique (within your application) string value.
+**Note:** `symObj` in this snippet is interchangeable with `sym`; either form can be used in all places symbols are utilized. There's not much reason to use the boxed wrapper object form (`symObj`) instead of the primitive form (`sym`). Keeping with similar advice for other primitives, it's probably best to prefer `sym` over `symObj`.
 
-If the value is hidden and unobtainable, what's the point of having a symbol at all?
+The internal value of a symbol itself -- referred to as its `name` -- is hidden from the code and cannot be obtained. You can think of this symbol value as an automatically generated, unique (within your application) string value.
 
-The main point of a symbol value is to create a string-like value that can't collide with any other symbol.
+But if the value is hidden and unobtainable, what's the point of having a symbol at all?
 
-For example, imagine a symbol as a constant representing an event name:
+The main point of a symbol is to create a string-like value that can't collide with any other value. So, for example, imagine using a symbol as a constant representing an event name:
 
 ```js
 const EVT_LOGIN = Symbol( "event.login" );
 ```
 
-You'd then use `EVT_LOGIN` in place of a generic string literal like `"event.login"`:
+You'd then use `EVT_LOGIN` in place of the generic string literal `"event.login"`:
 
 ```js
 evthub.listen( EVT_LOGIN, function(data){
@@ -2386,48 +2388,151 @@ evthub.listen( EVT_LOGIN, function(data){
 
 The benefit here is that `EVT_LOGIN` holds a value that cannot be duplicated (accidentally or otherwise) by any other value, so it is impossible for there to be any confusion of which event is being dispatched or handled.
 
-**Note:** Under the covers, the `evthub` utility assumed in the previous snippet would almost certainly be taking the symbol value from the `EVT_LOGIN` argument and using that as the property/key in some internal object (hash). If `evthub` needed to use that symbol value as a real string, it would need to explicitly use `String(..)` or `toString()` to perform the coercion, as implicit string coercion of symbols causes errors.
+**Note:** Under the covers, the `evthub` utility assumed in the previous snippet would almost certainly be using the symbol value from the `EVT_LOGIN` argument directly as the property/key in some internal object (hash) that tracks event handlers. If `evthub` instead needed to use the symbol value as a real string, it would need to explicitly coerce with `String(..)` or `toString()`, as implicit string coercion of symbols is not allowed.
 
 You may use a symbol directly as a property name/key in an object, such as a special property that you want to treat as hidden or meta in usage. It's important to know that it is not *actually* a hidden or untouchable property, but more a property that you just intend to treat as such.
+
+Consider this module that implements the *singleton* pattern behavior -- that is, it only allows itself to be created once:
+
+```js
+const INSTANCE = Symbol( "instance" );
+
+function HappyFace() {
+	if (HappyFace[INSTANCE]) return HappyFace[INSTANCE];
+
+	function smile() { .. }
+
+	return HappyFace[INSTANCE] = {
+		smile: smile
+	};
+}
+
+var me = HappyFace(),
+	you = HappyFace();
+
+me === you;
+```
+
+The `INSTANCE` symbol value here is a special, almost hidden, meta-like property stored statically on the `HappyFace()` function object.
+
+It could alternately have been a plain old property like `__instance`, and the behavior would have been identical. The usage of a symbol simply improves the metaprogramming style, keeping this `INSTANCE` property set apart from any other normal properties.
+
+### Symbol Registry
+
+One mild downside to using symbols as in the few examples is that the `EVT_LOGIN` and `INSTANCE` variables had to be kept out in an outer scope (even the global), or otherwise somehow stored in a publicly available location, so that all parts of the code which need to use the symbols can access them.
+
+To aid in organizing code with access to these symbols, you can create symbol values with the *global symbol registry*. For example:
+
+```js
+const EVT_LOGIN = Symbol.for( "event.login" );
+
+console.log( EVT_LOGIN );		// Symbol(event.login)
+```
+
+And:
+
+```js
+function HappyFace() {
+	const INSTANCE = Symbol.for( "instance" );
+
+	if (HappyFace[INSTANCE]) return HappyFace[INSTANCE];
+
+	// ..
+
+	return HappyFace[INSTANCE] = { .. };
+}
+```
+
+`Symbol.for(..)` looks in the global symbol registry to see if a symbol is already stored with the provided description text, and returns it if so. If not, it creates one to return. In other words, the global symbol registry treats symbol values, by description text, as singletons themselves.
+
+But that also means that any part of your application can retrieve the symbol from the registry using `Symbol.for(..)`, as long as the matching description name is used.
+
+Ironically, symbols are basically intended to replace the use of *magic strings* (arbitrary string values given special meaning) in your application. But you precisely use *magic* description string values to uniquely identify/locate them in the global symbol registry!
+
+To avoid accidental collisions, you'll probably want to make your symbol descriptions quite unique. One easy way of doing that is to include prefix/context/namespacing information in them.
 
 For example, imagine a utility like:
 
 ```js
 function extractValues(str) {
-	var values = [], match,
-		re = extractValues.match;
+	var key = Symbol.for( "extractValues.parse" ),
+		re = extractValues[key] ||
+			/[^=&]+?=([^&]+?)(?=&|$)/g,
+		values = [], match;
 
 	while (match = re.exec( str )) {
 		values.push( match[1] );
 	}
+
 	return values;
 }
-
-extractValues.match = /[^=&]+?=([^&]+?)(?=&|$)/g;
-
-extractValues( "foo=42&bar=hello" );	// [42,"hello"]
 ```
 
-The `extractValues.match` is a property on the `extractValues(..)` function which holds a default regular expression definition for parsing values out of strings. It's exposed publicly so that you can modify it if you so choose.
+We use the magic string value `"extractValues.parse"` because it's quite unlikely that any other symbol in the registry would ever collide with that description.
 
-Is it appropriate though to store this special regular expression value as a general property name like `match`? It might make more sense to store it under a symbol property:
+If a user of this utility wants to override the parsing regular expression, they can also use the symbol registry:
 
 ```js
-function extractValues(str) {
-	var values = [], match,
-		re = extractValues[RE];
+extractValues[Symbol.for( "extractValues.parse" )] =
+	/..some pattern../g;
 
-	while (match = re.exec( str )) {
-		values.push( match[1] );
-	}
-	return values;
-}
-
-var RE = Symbol( "parse regex" );
-
-extractValues[RE] = /[^=&]+?=([^&]+?)(?=&|$)/g;
+extractValues( "..some string.." );
 ```
 
-Of course, this means that the `RE` symbol value needs to be in some shared accessible location, if you want the user of `extractValues(..)` to be able to set the parsing regex to some other custom value.
+Aside from the assistance the symbol registry provides in globally storing these values, nothing we're seeing here couldn't have been done by just actually using the magic string `"extractValues.parse"` as the key, rather than the symbol. The improvements exist at the metaprogramming level more than the functional level.
+
+You may have occassion to use a symbol value that has been stored in the registry to look up what description text (key) it's stored under. For example, you may need to signal to another part of your application how to locate a symbol in the registry because you cannot pass the symbol value itself.
+
+You can retrieve a registered symbol's description text (key) using `Symbol.keyFor(..)`:
+
+```js
+var s = Symbol.for( "something cool" );
+
+var desc = Symbol.keyFor( s );
+console.log( desc );			// "something cool"
+
+// get the symbol from the registry again
+var s2 = Symbol.for( desc );
+
+s2 === s;						// true
+```
+
+### Symbols as Object Properties
+
+If a symbol is used as a property/key of an object, it's stored in a special way that the property will not show up in a normal enumeration of the object's properties:
+
+```js
+var o = {
+	foo: 42,
+	[ Symbol( "bar" ) ]: "hello world",
+	baz: true
+};
+
+Object.getOwnPropertyNames( o );	// [ "foo","baz" ]
+```
+
+To retrieve an object's symbol properties:
+
+```js
+Object.getOwnPropertySymbols( o );	// [ Symbol(bar) ]
+```
+
+So it's clear that a property symbol is not actually hidden or inaccessible, as you can always see it in the `Object.getOwnPropertySymbols(..)` enumeration.
+
+#### Built-in Symbols
+
+ES6 comes with a number of predefined built-in symbols that expose various meta behaviors on JavaScript object values. As one might assume, these symbols are registered in the global symbol registry, with the `"Symbol."` prefix in the description text.
+
+For convenience, they're also stored as properties on the `Symbol` function object. For example, in the "`for..of`" section earlier in this chapter, we introduced the `Symbol.iterator` value:
+
+```js
+Symbol.iterator === Symbol.for( "Symbol.iterator" );	// true
+
+var a = [1,2,3];
+
+a[Symbol.iterator];			// native function
+```
+
+The specification uses the `@@` prefix notation to refer to the built-in symbols, the most common ones being: `@@iterator`, `@@toStringTag`, `@@toPrimitive`. Several others are defined as well, though they probably won't be used as often. See "Built-in Object Symbols" in Chapter 7 for detailed information about how these are used for metaprogramming purposes.
 
 ## Review
