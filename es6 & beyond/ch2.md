@@ -3,9 +3,9 @@
 
 If you've been writing JS for any length of time, odds are the syntax is pretty familiar to you. There are certainly many quirks, but overall it's a fairly reasonable and straightforward syntax that draws many similarities from other languages.
 
-However, ES6 adds quite a few new syntactic forms which are going to take some getting used to. In this chapter we'll take a tour through most of them.
+However, ES6 adds quite a few new syntactic forms which are going to take some getting used to. In this chapter we'll tour through them to find out what's in store.
 
-**Warning:** At the time of this writing, many of the features in this chapter (and indeed this whole book!) have been implemented in various browsers (Firefox, Chrome, etc.), but many others have not. Your experience may be mixed trying these examples directly. If so, look to try them out with transpilers, as most of these features are covered by those tools. ES6Fiddle (http://www.es6fiddle.net/) is a great, easy-to-use playground for trying out ES6, as is the online REPL for the Babel transpiler (http://babeljs.io/repl/).
+**Warning:** At the time of this writing, some of the features in this book have been implemented in various browsers (Firefox, Chrome, etc.), but many others have not, or the features are only partially implemented. Your experience may be mixed trying these examples directly. If so, try them out with transpilers, as most of these features are covered by those tools. ES6Fiddle (http://www.es6fiddle.net/) is a great, easy-to-use playground for trying out ES6, as is the online REPL for the Babel transpiler (http://babeljs.io/repl/).
 
 ## Block-Scoped Declarations
 
