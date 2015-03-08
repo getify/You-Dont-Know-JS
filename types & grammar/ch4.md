@@ -977,7 +977,7 @@ b; // "42"
 
 **Tip:** Numeric addition with the `+` operator is commutative, which means `2 + 3` is the same as `3 + 2`. String concatenation with `+` is obviously not generally commutative, **but** with the specific case of `""`, it's effectively commutative, as `a + ""` and `"" + a` will produce the same result.
 
-It's extremely common/idiomatic to (*implicitly*) coerce `number` to `string` with a `+ ""` operation. In fact, interestingly, even some of the most vocal crticics of *implicit* coercion still use that approach in their own code, instead of one of its *explicit* alternatives.
+It's extremely common/idiomatic to (*implicitly*) coerce `number` to `string` with a `+ ""` operation. In fact, interestingly, even some of the most vocal critics of *implicit* coercion still use that approach in their own code, instead of one of its *explicit* alternatives.
 
 **I think this is a great example** of a useful form in *implicit* coercion, despite how frequently the mechanism gets criticized!
 
