@@ -9,38 +9,39 @@ An *iterator* is a structured pattern for pulling information from a source in o
 
 What ES6 has done is introduce an implicit standardized interface for iterators. Many of the built in data structures in JavaScript will now expose an iterator implementing this standard. And you can also construct your own iterators adhering to the same standard, for maximal interoperability.
 
-Iterators are a way of organizing ordered, sequential pull-consumption of data.
+Iterators are a way of organizing ordered, sequential, pull-based consumption of data.
 
 For example, you may implement a utility that produces a new unique identifier each time it's requested. Or you may produce an infinite series of values that rotate through a fixed list, in round-robbin fashion. Or you could attach an iterator to a database query result to pull out new rows one at a time.
 
-Though not as common a usage of iterators to this point in JS, iterators can also be thought of as controlling behavior one step at a time. This can be illustrated quite clearly when considering generators (see "Generators" later in this chapter).
+Though not as common a usage of iterators to this point in JS, iterators can also be thought of as controlling behavior one step at a time. This can be illustrated quite clearly when considering generators (see "Generators" later in this chapter), though you can certainly do the same without generators.
 
 ### Interfaces
 
-At the time of this writing, ES6 section 25.1.1.2 (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-iterator-interface) details the `Iterator` interface as having just one required member:
+At the time of this writing, ES6 section 25.1.1.2 (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-iterator-interface) details the `Iterator` interface as having the following requirement:
 
 ```
 Iterator [required]
-	next(); method: retrieves next IteratorResult
+	next() {method}: retrieves next IteratorResult
 ```
 
-And there are two optional members which some iterators are extended with:
+There are two optional members which some iterators are extended with:
 
 ```
 Iterator [optional]
 	return() {method}: stops iterator and returns IteratorResult
-	throw() {method}: injects error and returns IteratorResult
+	throw() {method}: signals error and returns IteratorResult
 ```
 
 The `IteratorResult` interface is specified as:
 
 ```
 IteratorResult
-	done {property}: boolean, indicates completion status
 	value {property}: current iteration value or final return value
+		(optional if `undefined`)
+	done {property}: boolean, indicates completion status
 ```
 
-**Note:** I call these interfaces implicit not because they're not explicitly called out in the specification -- they are! -- but because they are not exposed as direct objects accessible to code. JavaScript does not, in ES6, support any notion of "interfaces", so adherence for your own code is purely conventional. However, where JS expects an iterator -- a `for..of` loop, for instance -- what you provide must adhere to these interfaces or exceptions will be thrown.
+**Note:** I call these interfaces implicit not because they're not explicitly called out in the specification -- they are! -- but because they're not exposed as direct objects accessible to code. JavaScript does not, in ES6, support any notion of "interfaces", so adherence for your own code is purely conventional. However, wherever JS expects an iterator -- a `for..of` loop, for instance -- what you provide must adhere to these interfaces or the code will fail.
 
 There's also an `Iterable` interface, which describes objects that must be able to produce iterators:
 
@@ -49,14 +50,14 @@ Iterable
 	@@iterator() {method}: produces an Iterator
 ```
 
-If you recall from "Built-in Symbols" in Chapter 2, `@@iterator` is the special built-in symbol representing the method that will produce iterator(s) for the object.
+If you recall from "Built-in Symbols" in Chapter 2, `@@iterator` is the special built-in symbol representing the method that can produce iterator(s) for the object.
 
 #### IteratorResult
 
 The `IteratorResult` interface specifies that the return value from any iterator operation will be an object of the form:
 
 ```js
-{ value: .., done: true / false }
+{ value: .. , done: true / false }
 ```
 
 Built-in iterators will always return values of this form, but it is of course allowed that more properties be present on the return value, as necessary.
@@ -70,15 +71,13 @@ For example, a custom iterator may add additional metadata to the result object,
 Let's look at an array, which is an iterable, and the iterator it can produce to consume its values:
 
 ```js
-var arr = [1,2,3,4,5];
+var arr = [1,2,3];
 
 var it = arr[Symbol.iterator]();
 
 it.next();		// { value: 1, done: false }
 it.next();		// { value: 2, done: false }
 it.next();		// { value: 3, done: false }
-it.next();		// { value: 4, done: false }
-it.next();		// { value: 5, done: false }
 
 it.next();		// { value: undefined, done: true }
 ```
@@ -87,7 +86,7 @@ Each time the method at `Symbol.iterator` is invoked on this `arr` value, it wil
 
 However, it *is* possible to conceive of a structure which could only produce a single iterator (singleton pattern), or perhaps only allow one unique iterator at a time, requiring the current one to be
 
-You'll notice that the `it` iterator in the previous snippet doesn't report `done: true` when you received the `5` value. You have to call `next()` again, in essence going beyond the end of the array's values, to get the completed signal `done: true`. It may not be clear why until later in this section, but that design decision will typically be considered a best practice.
+You'll notice that the `it` iterator in the previous snippet doesn't report `done: true` when you received the `3` value. You have to call `next()` again, in essence going beyond the end of the array's values, to get the completed signal `done: true`. It may not be clear why until later in this section, but that design decision will typically be considered a best practice.
 
 Primitive string values are also iterables by default:
 
@@ -116,7 +115,7 @@ it2.next();		// { value: [ "foo", 42 ], done: false }
 ..
 ```
 
-The `next(..)` method of an iterator can optionally be allowed to take one or more arguments. The built-in iterators mostly do not exercise this capability, though a generator's iterator definitely does (see "Generators" later in this chapter).
+The `next(..)` method of an iterator can optionally take one or more arguments. The built-in iterators mostly do not exercise this capability, though a generator's iterator definitely does (see "Generators" later in this chapter).
 
 By general convention, including all the built-in iterators, calling `next(..)` on an iterator that's already been exhausted is not an error, but will simply continue to return the result `{ value: undefined, done: true }`.
 
@@ -132,15 +131,15 @@ If an iterator has a `return(..)` present and any condition occurs which can aut
 
 `throw(..)` is used to signal an exception/error to an iterator, which possibly may be used differently by the iterator than the completion signal implied by `return(..)`. It does not necessarily imply a complete stop of the iterator as `return(..)` generally does.
 
-For example, with generator iterators, `throw(..)` actually injects a thrown exception into the generator's context, which can be caught with a `try..catch`. An uncaught `throw(..)` exception would end up abnormally aborting the generator's iterator, but
+For example, with generator iterators, `throw(..)` actually injects a thrown exception into the generator's paused execution context, which can be caught with a `try..catch`. An uncaught `throw(..)` exception would end up abnormally aborting the generator's iterator.
 
 **Note:** By general convention, an iterator should not produce any more results after having called `return(..)` or `throw(..)`.
 
 ### Iterator Loop
 
-As we covered in the "`for..of`" section in Chapter 2, the ES6 `for..of` loop is able to directly consume a conforming iterable.
+As we covered in the "`for..of`" section in Chapter 2, the ES6 `for..of` loop directly consumes a conforming iterable.
 
-If an iterator is also an iterable, it can also be used with the `for..of` loop. You make an iterator an iterable by giving it a `Symbol.iterator` method that simply returns the iterator itself:
+If an iterator is also an iterable, it can be used directly with the `for..of` loop. You make an iterator an iterable by giving it a `Symbol.iterator` method that simply returns the iterator itself:
 
 ```js
 var it = {
@@ -177,7 +176,7 @@ Recall earlier that we suggested iterators should in general not return `done: t
 
 If an iterator returned `{ done: true, value: 42 }`, the `for..of` loop would completely discard the `42` value and it'd be unavailable. For this reason -- to assume that your iterator may be consumed by such patterns as the `for..of` loop or its manual equivalent -- you should probably wait to return `done: true` for signaling completion until after you've already returned all relevant iteration values.
 
-**Warning:** You can of course intentionally design your iterator to return some relevant `value` when you return `done: true`. Don't do this unless you've documented that as the case, and thus implicitly forced consumers of your iterator to use a different pattern for iteration than is implied by `for..of` and the manual equivalent we depicted.
+**Warning:** You can of course intentionally design your iterator to return some relevant `value` at the same time as returning `done: true`. Don't do this unless you've documented that as the case, and thus implicitly forced consumers of your iterator to use a different pattern for iteration than is implied by `for..of` or its manual equivalent we depicted.
 
 ### Custom Iterators
 
