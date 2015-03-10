@@ -1716,8 +1716,6 @@ Joining the `for` and `for..in` loops from the JavaScript we're all familiar wit
 
 The value you loop over with `for..of` must be an *iterable*, or it must be a value which can be coerced/boxed to an object (see the *Types & Grammar* title of this series) that is an iterable. An iterable is simply an object that is able to produce an iterator, which the loop then uses.
 
-**Note:** See "Iterators" in Chapter 3 for more complete coverage on iterables and iterators.
-
 Let's compare `for..of` to `for..in` to illustrate the difference:
 
 ```js
@@ -1769,7 +1767,7 @@ Standard built-in values in JavaScript that are by default iterables (or provide
 
 * arrays
 * strings
-* generators (see Chapter 4)
+* generators (see Chapter 3)
 * collections / TypedArrays (see Chapter 5)
 
 **Warning:** Plain objects are not by default suitable for `for..of` looping. That's because they don't have a default iterator, which is intentional, not a mistake. However, we won't go any further into those nuanced reasonings here. In "Iterators" in Chapter 3, we'll see how to define iterators for our own objects, which lets `for..of` loop over any object to get a set of values we define.
@@ -1800,6 +1798,8 @@ for ({x: o.a} of [ {x: 1}, {x: 2}, {x: 3} ]) {
 ```
 
 `for..of` loops can be prematurely stopped, just like other loops, with `break`, `continue`, `return` (if in a function), and thrown exceptions. In any of these cases, the iterator's `return(..)` function is automatically called (if one exists) to let the iterator perform cleanup tasks, if necessary.
+
+**Note:** See "Iterators" in Chapter 3 for more complete coverage on iterables and iterators.
 
 ## Regular Expressions
 
