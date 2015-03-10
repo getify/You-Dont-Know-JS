@@ -144,9 +144,9 @@ If an iterator is also an iterable, it can be used directly with the `for..of` l
 ```js
 var it = {
 	// make the `it` iterator an iterable
-	[Symbol.iterator]: function() { return this; },
+	[Symbol.iterator]() { return this; },
 
-	next: function() { .. },
+	next() { .. },
 	..
 };
 
@@ -180,7 +180,188 @@ If an iterator returned `{ done: true, value: 42 }`, the `for..of` loop would co
 
 ### Custom Iterators
 
-// TODO
+In addition to the standard built-in iterators, you can make your own! All it takes to make them interoperate with ES6's consumption facilities (e.g., the `for..of` loop and the `...` operator) is to adhere to the proper interface(s).
+
+Let's try constructing an iterator that produces the infinite series of numbers in the Fibonacci sequence:
+
+```js
+var Fib = {
+	[Symbol.iterator]() {
+		var n1 = 1, n2 = 1;
+
+		return {
+			// make the iterator an iterable
+			[Symbol.iterator]() { return this; },
+
+			next() {
+				var current = n2;
+				n2 = n1;
+				n1 = n1 + current;
+				return { value: current, done: false };
+			},
+
+			return(v) {
+				console.log(
+					"Fibonacci sequence abandoned."
+				);
+				return { value: v, done: true };
+			}
+		};
+	}
+};
+
+for (var v of Fib) {
+	console.log( v );
+
+	if (v > 50) break;
+}
+// 1 1 2 3 5 8 13 21 34 55
+// Fibonacci sequence abandoned.
+```
+
+**Warning:** If we hadn't inserted the `break` condition, this `for..of` loop would have run forever, which is probably not the desired result in terms of breaking your program!
+
+The `Fib[Symbol.iterator]()` method when called returns the iterator object with `next()` and `return(..)` methods on it. State is maintained via `n1` and `n2` variables, which are kept by the closure.
+
+Let's *next* consider an iterator which is designed to run through a series (aka a queue) of actions, one item at a time:
+
+```js
+var tasks = {
+	[Symbol.iterator]() {
+		var steps = this.actions.slice();
+
+		return {
+			// make the iterator an iterable
+			[Symbol.iterator]() { return this; },
+
+			next(...args) {
+				if (steps.length > 0) {
+					let res = steps.shift()( ...args );
+					return { value: res, done: false };
+				}
+				else {
+					return { done: true }
+				}
+			},
+
+			return(v) {
+				steps.length = 0;
+				return { value: v, done: true };
+			}
+		};
+	},
+	actions: []
+};
+```
+
+The iterator on `tasks` steps through functions found in the `actions` array property, if any, and executes them one at a time, passing in whatever arguments you pass to `next(..)`, and returning any return value to you in the standard `IteratorResult` object.
+
+Here's how we could could use this `tasks` queue:
+
+```js
+tasks.actions.push(
+	function step1(x){
+		console.log( "step 1:", x );
+		return x * 2;
+	},
+	function step2(x,y){
+		console.log( "step 2:", x, y );
+		return x + (y * 2);
+	},
+	function step3(x,y,z){
+		console.log( "step 3:", x, y, z );
+		return (x * y) + z;
+	}
+);
+
+var it = tasks[Symbol.iterator]();
+
+it.next( 10 );			// step 1: 10
+						// { value:   20, done: false }
+
+it.next( 20, 50 );		// step 2: 20 50
+						// { value:  120, done: false }
+
+it.next( 20, 50, 120 );	// step 3: 20 50 120
+						// { value: 1120, done: false }
+
+it.next();				// { done: true }
+```
+
+This particular usage reinforces that iterators can be a pattern for organizing functionality, not just data. It's also reminiscent of what we'll see with generators in the next section.
+
+You could even get creative and define an iterator that represents meta operations on a single piece of data. For example, we could define an iterator for numbers which by default ranges from `0` up to (or down to, for negative numbers) the number in question.
+
+Consider:
+
+```js
+if (!Number.prototype[Symbol.iterator]) {
+	Object.defineProperty(
+		Number.prototype,
+		Symbol.iterator,
+		{
+			writable: true,
+			configurable: true,
+			enumerable: false,
+			value: function iterator(){
+				var i, inc, done = false, top = +this;
+
+				// iterate positively or negatively?
+				inc = 1 * (top < 0 ? -1 : 1);
+
+				return {
+					// make the iterator itself an iterable!
+					[Symbol.iterator](){ return this; },
+
+					next() {
+						if (!done) {
+							// initial iteration always 0
+							if (i == null) {
+								i = 0;
+							}
+							// iterating positively
+							else if (top >= 0) {
+								i = Math.min(top,i + inc);
+							}
+							// iterating negatively
+							else {
+								i = Math.max(top,i + inc);
+							}
+
+							// done after this iteration?
+							if (i == top) done = true;
+
+							return { value: i, done: false };
+						}
+						else {
+							return { done: true };
+						}
+					}
+				};
+			}
+		}
+	);
+}
+```
+
+Now, what tricks does this creativity afford us?
+
+```js
+for (var i of 3) {
+	console.log( i );
+}
+// 0 1 2 3
+
+[...-3];		// [0,-1,-2,-3]
+```
+
+Those are some fun tricks, though the practical utility is somewhat debatable. But then again, one might wonder why ES6 didn't just ship with such a minor feature easter egg!?
+
+I'd be remiss if I didn't at least remind you that extending native prototypes as I'm doing in the previous snippet is something you should only do with caution and awareness of potential hazards.
+
+In this case, the chances that you'll have a collision with other code or even a future JS feature is probably exceedingly low. But just beware of the slight possibility. And document what you're doing verbosely for posterity sake.
+
+**Note:** I've expounded on this particular technique in this blog post (http://blog.getify.com/iterating-es6-numbers/) if you want more details. And this comment (http://blog.getify.com/iterating-es6-numbers/comment-page-1/#comment-535294) even suggests a similar trick but for making string character ranges.
 
 ## Generators
 
