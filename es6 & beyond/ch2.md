@@ -1095,14 +1095,14 @@ var o = {
 While that convenience shorthand is quite attractive, there's a subtle gotcha to be aware of. To illustrate, let's examine pre-ES6 code like the following, which you might try to refactor to use concise methods:
 
 ```js
-function doSomething(o) {
+function runSomething(o) {
 	var x = Math.random(),
 		y = Math.random();
 
 	return o.something( x, y );
 }
 
-doSomething( {
+runSomething( {
 	something: function something(x,y){
 		if (x > y) {
 			// recursively call with `x`
@@ -1118,11 +1118,11 @@ doSomething( {
 This obviously silly code just generates two random numbers and subtracts the smaller from the bigger. But what it does isn't the important part, rather how it's defined. Let's focus on the object literal and function definition, as we see here:
 
 ```js
-{
+runSomething( {
 	something: function something(x,y) {
 		// ..
 	}
-}
+} );
 ```
 
 Why do we say both `something:` and `function something`? Isn't that redundant? Actually, no, both are needed for different purposes. The property `something` is how we can call `o.something(..)`, sort of like its public name. But the second `something` is a lexical name to refer to the function from inside itself, for recursion purposes.
@@ -1183,11 +1183,11 @@ More yuck.
 OK, what does all this have to do with concise methods? Recall our `something(..)` method definition:
 
 ```js
-{
+runSomething( {
 	something: function something(x,y) {
 		// ..
 	}
-}
+} );
 ```
 
 The second `something` here provides a super convenient lexical identifier that will always point to the function itself, giving us the perfect reference for recursion, event binding/unbinding, etc -- no messing around with `this` or trying to use an untrustable object reference.
@@ -1197,7 +1197,7 @@ Great!
 So, now we try to refactor that function reference to this ES6 concise method form:
 
 ```js
-{
+runSomething( {
 	something(x,y) {
 		if (x > y) {
 			return something( y, x );
@@ -1205,7 +1205,7 @@ So, now we try to refactor that function reference to this ES6 concise method fo
 
 		return y - x;
 	}
-}
+} );
 ```
 
 Seems fine at first glance, except this code will break. The `return something(..)` call will not find a `something` identifier, so you'll get a `ReferenceError`. Oops. But why?
@@ -1213,7 +1213,7 @@ Seems fine at first glance, except this code will break. The `return something(.
 The above ES6 snippet is interpreted as meaning:
 
 ```js
-{
+runSomething( {
 	something: function(x,y) {
 		if (x > y) {
 			return something( y, x );
@@ -1221,7 +1221,7 @@ The above ES6 snippet is interpreted as meaning:
 
 		return y - x;
 	}
-}
+} );
 ```
 
 Look closely. Do you see the problem? The concise method definition implies `something: function(x,y)`. See how the second `something` we were relying on has been omitted? In other words, concise methods imply anonymous function expressions.
