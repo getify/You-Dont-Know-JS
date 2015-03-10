@@ -1297,9 +1297,41 @@ var o2 = {
 
 `o2` is declared with a normal object literal, but it's also `[[Prototype]]`-linked to `o1`. The `__proto__` property name here can also be a string `"__proto__"`, but note that it *cannot* be the result of a computed property name (see the previous section).
 
-`__proto__` is controversial, to say the least. It's a decades-old proprietary extension to JS that is finally standardized, somewhat begrudgingly it seems, in ES6. Many developers feel it shouldn't ever be used.
+`__proto__` is controversial, to say the least. It's a decades-old proprietary extension to JS that is finally standardized, somewhat begrudgingly it seems, in ES6. Many developers feel it shouldn't ever be used. In fact, it's in "Annex B" of ES6, which is the section that lists things JS feels it has to standardize for compatibility reasons only.
 
-So, there's a slightly more verbose alternative to the previous snippet, which still lets you use the convenience of object literals:
+**Warning:** Though I'm narrowly endorsing `__proto__` as a key in an object literal definition, I definitely do not endorse using it in its object property form, like `o.__proto__`. That form is both a getter and setter (again for compat reasons), but there are definitely better options. See the *this & Object Prototypes* title of this series for more information.
+
+For setting the `[[Prototype]]` of an existing object, you can use the ES6 utility `Object.setPrototypeOf(..)`. Consider:
+
+```js
+var o1 = {
+	// ..
+};
+
+var o2 = Object.setPrototypeOf( {
+	// .. o2's definition ..
+}, o1 );
+```
+
+Alternatively:
+
+```js
+var o1 = {
+	// ..
+};
+
+var o2 = {
+	// ..
+};
+
+Object.setPrototypeOf( o2, o1 );
+```
+
+In both these cases, the relationship between `o2` and `o1` is moved from generally being specified at the top of the `o2` object literal definition to appearing at the end.
+
+I'd consider setting a `[[Prototype]]` right after object creation reasonable, as shown in the previous two snippets. But changing it much later is generally not a good idea, which I'd suggest will often lead to more confusion rather than clarity.
+
+There's another slightly more verbose alternative to the previous snippets, which still lets you use the convenience of object literals:
 
 ```js
 var o1 = {
