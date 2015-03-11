@@ -552,7 +552,135 @@ Now, since `x < 3` fails, the recursion stops, and `return 3 * 2` gives `6` back
 
 ### Iterator Control
 
-// TODO
+We briefly introduced the concept a few sections ago that generators are controlled by iterators. Let's fully dig into that now.
+
+Recall the recursive `*foo(..)` from the previous section. Here's how we'd run it:
+
+```js
+function *foo(x) {
+	if (x < 3) {
+		x = yield *foo( x + 1 );
+	}
+	return x * 2;
+}
+
+var it = foo( 1 );
+it.next();				// { value: 24, done: true }
+```
+
+In this case, the generator doesn't really ever pause, as there's no `yield ..` expression. Instead, `yield *` just keeps the current iteration step going via the recursive call. So, just one call to the iterator's `next()` function fully runs the generator.
+
+Now let's consider a generator which will have multiple steps and thus multiple produced values:
+
+```js
+function *foo() {
+	yield 1;
+	yield 2;
+	yield 3;
+}
+```
+
+We already know we can consume an iterator, even one attached to a generator like `*foo()`, with a `for..of` loop:
+
+```js
+for (var v of foo()) {
+	console.log( v );
+}
+// 1 2 3
+```
+
+**Note:** The `for..of` loop requires an iterable. A generator function reference (like `foo`) by itself is not an iterable; you must execute it with `foo()` to get the iterator (which is also an iterable, as we explained earlier in this chapter). You could theoretically extend the `GeneratorPrototype` (the prototype of all generator functions) with a `Symbol.iterator` function which essentially just did `return this()`. That would make the `foo` reference itself an iterable, which means `for (var v of foo) { .. }` -- notice no `()` on `foo` -- works.
+
+Let's instead iterate the generator manually:
+
+```js
+function *foo() {
+	yield 1;
+	yield 2;
+	yield 3;
+}
+
+var it = foo();
+
+it.next();		// { value: 1, done: false }
+it.next();		// { value: 2, done: false }
+it.next();		// { value: 3, done: false }
+
+it.next();		// { value: undefined, done: true }
+```
+
+If you look closely, there are 3 `yield` statements and 4 `next()` calls. That may seem like a strange mismatch. In fact, there will always be one more `next()` call than `yield` expression, assuming all are evaluated and the generator is fully run to completion.
+
+But if you look at it from the opposite perspective (inside-out instead of outside-in), the matching between `yield` and `next()` makes more sense.
+
+Recall that the `yield ..` expression will be completed by the value you resume the generator with. That means the argument you pass to `next(..)` completes whatever `yield ..` expression is currently paused waiting for a completion.
+
+Let's illustrate this perspective this way:
+
+```js
+function *foo() {
+	var x = yield 1;
+	var y = yield 2;
+	var z = yield 3;
+	console.log( x, y, z );
+}
+```
+
+In this snippet, each `yield ..` is sending a value out (`1`, `2`, `3`), but more directly, it's pausing the generator to wait for a value. In other words, it's almost like asking the question, "What value should I use here? I'll wait to hear back."
+
+Now, here's how we control `*foo()` to start it up:
+
+```js
+var it = foo();
+
+it.next();			// { value: 1, done: false }
+```
+
+That first `next()` call is starting up the generator from its initial paused state, and running it to the first `yield`. At the moment you call that first `next()`, there's no `yield ..` expression waiting for a completion. If you passed a value to that first `next()` call, it would just be thrown away, because nobody is waiting to receive such value.
+
+Now, let's answer the currently pending question, "What value should I assign to `x`?" We'll answer it by sending a value to the *next* `next(..)` call:
+
+```js
+it.next( "foo" );	// { value: 2, done: false }
+```
+
+Now, the `x` will have the value `"foo"`, but we've also asked a new question, "What value should I assign to `y`?" And we answer:
+
+```js
+it.next( "bar" );	// { value: 3, done: false }
+```
+
+Answer given, another question asked. Final answer:
+
+```js
+it.next( "baz" );	// "foo" "bar" "baz"
+					// { value: undefined, done: true }
+```
+
+Now it should be clearer how each `yield ..` "question" is answered by the *next* `next(..)` call, and so the "extra" `next()` call we observed is always just the initial one that starts everything going.
+
+Let's put all those steps together:
+
+```js
+var it = foo();
+
+// start up the generator
+it.next();			// { value: 1, done: false }
+
+// answer first question
+it.next( "foo" );	// { value: 2, done: false }
+
+// answer second question
+it.next( "bar" );	// { value: 3, done: false }
+
+// answer third question
+it.next( "baz" );	// "foo" "bar" "baz"
+					// { value: undefined, done: true }
+```
+
+You can think of a generator as a producer of values, in which case its iteration is simply producing and consuming those values. But in a more general sense, perhaps it's appropriate to think of generators as controlled code execution, much like the `tasks` queue example from the earlier "Custom Iterators" section.
+
+**Note:** That perspective is exactly the motivation for how we'll revisit generators in Chapter 4, when we consider expressing asynchronous steps in a generator and using the pause/resume capabilities to drive our async flow.
 
 ## Modules
 
