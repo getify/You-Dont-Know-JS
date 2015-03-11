@@ -365,6 +365,93 @@ In this case, the chances that you'll have a collision with other code or even a
 
 ## Generators
 
+All functions run-to-completion, right? That is, once a function starts running, it finishes before anything else can interrupt.
+
+Or, so it's been for the whole history of JavaScript up to this point. As of ES6, a new somewhat exotic form of function is being introduced, called a generator. A generator can pause itself in mid-execution, and can be resumed either right away or at a later time. So, it clearly does not hold the run-to-completion guarantee that normal functions do.
+
+Moreover, each pause/resume cycle in mid-execution is an opportunity for two-way message passing, where the generator can return a value, and the controlling code that resumes it can send a value back in.
+
+As with iterators in the previous section, there are multiple ways to think about what a generator is, or rather what it's most useful for. There's no one right answer, but we'll try to consider several angles.
+
+**Note:** See the *Async & Performance* title of this series for more information about generators, and also see Chapter 4 of this title.
+
+### Syntax
+
+The generator function is declared with this new syntax:
+
+```js
+function *foo() {
+	// ..
+}
+```
+
+The position of the `*` is not functionally relevant. The same declaration could be written as any of the following:
+
+```js
+function *foo()  { .. }
+function* foo()  { .. }
+function*foo()   { .. }
+function * foo() { .. }
+..
+```
+
+The *only* difference here is stylistic preference. Most other literature seems to prefer `function* foo(..) { .. }`. I prefer `function *foo(..) { .. }`, so that's how I'll present them for the rest of this title.
+
+My reason is purely didactic in nature. In this text, when referring to a generator function, I will say `*foo(..)`, as opposed to `foo(..)` for a normal function. I observe that `*foo(..)` more closely matches the `*` positioning of `function *foo(..) { .. }`. Consistency eases understanding and learning.
+
+#### `yield`
+
+Generators also have a new keyword you can use inside them, to signal the pause point: `yield`. Consider:
+
+```js
+function *foo() {
+	var x = 10;
+	var y = 20;
+
+	yield;
+
+	var z = x + y;
+}
+```
+
+In this `*foo()` generator, the operations on the first two lines would run at the beginning, then `yield` would pause the generator. If and when resumed, the last line of `*foo()` would run. `yield` can appear any number of times (or not at all, technically!) in a generator.
+
+You can even put `yield` inside a loop, and it can represent a repeated pause point. In fact, a loop that never completes just means a generator that never completes, which is completely valid, and sometimes entirely what you need.
+
+`yield` represents not just a pause point. It's an expression that both sends out a value -- called "yielding a value" -- and receives (aka, is replaced by) the resume value message. Consider:
+
+```js
+function *foo() {
+	var x = yield 10;
+	console.log( x );
+}
+```
+
+This generator will, at first run, `yield` out the value `10` when pausing itself. When you resume the generator, whatever value (if any) you resume with will replace the whole `yield 10` expression, meaning whatever value that is, will be assigned to the `x` variable.
+
+A `yield ..` expression can appear anywhere a normal expression can. For example:
+
+```js
+function *foo() {
+	var arr = [ yield 1, yield 2, yield 3 ];
+	console.log( arr, yield 4 );
+}
+```
+
+`*foo()` here has four `yield ..` expressions, each of which will result in a pause of the generator waiting for a resumption value, which will then be used in the various expression contexts as shown.
+
+It's important to be aware of the operator precedence and associativity of `yield` so you understand what happens with other operators (including multiple `yield`s).
+
+`yield` has the third-to-least operator precedence, only being more precedent than the `...` spread operator and the `,` comma operator. That means almost any expression after a `yield ..` will be computed first before being sent with `yield`.
+
+`yield` is right-associative, which means that multiple `yield`s in succession are treated as having been `( .. )` grouped from right to left. So, `yield yield yield 3` is treated as `yield (yield (yield 3))`. Of course, a left-associative `((yield) yield) yield 3` would be nonsense.
+
+Just like with any other operator, it's a good idea to use `( .. )` grouping, even if not strictly required, to disambiguate your intent if `yield` is combined with other operators (including itself).
+
+**Note:** See the *Types & Grammar* title of this series for more information on precedence/associativity.
+
+### Iterator Control
+
 // TODO
 
 ## Modules
