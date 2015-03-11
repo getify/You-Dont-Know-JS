@@ -399,6 +399,39 @@ The *only* difference here is stylistic preference. Most other literature seems 
 
 My reason is purely didactic in nature. In this text, when referring to a generator function, I will say `*foo(..)`, as opposed to `foo(..)` for a normal function. I observe that `*foo(..)` more closely matches the `*` positioning of `function *foo(..) { .. }`. Consistency eases understanding and learning.
 
+#### Executing a Generator
+
+Though a generator is declared with `*`, you still execute it like a normal function:
+
+```js
+foo();
+```
+
+You can still pass it arguments, as in:
+
+```js
+function *foo(x,y) {
+	// ..
+}
+
+foo( 5, 10 );
+```
+
+The major difference is that executing a generator, like `foo(5,10)` doesn't actually run the code in the generator. Instead, it produces an iterator which will control the generator to execute its code.
+
+We'll come back to this a few sections from now, but briefly:
+
+```js
+function *foo() {
+	// ..
+}
+
+var it = foo();
+
+// to start/advanced `*foo()`, call
+// `it.next(..)`
+```
+
 #### `yield`
 
 Generators also have a new keyword you can use inside them, to signal the pause point: `yield`. Consider:
@@ -427,7 +460,7 @@ function *foo() {
 }
 ```
 
-This generator will, at first run, `yield` out the value `10` when pausing itself. When you resume the generator, whatever value (if any) you resume with will replace the whole `yield 10` expression, meaning whatever value that is, will be assigned to the `x` variable.
+This generator will, at first run, `yield` out the value `10` when pausing itself. When you resume the generator -- using the `it.next(..)` we referred to earlier -- whatever value (if any) you resume with will replace the whole `yield 10` expression, meaning whatever value that is, will be assigned to the `x` variable.
 
 A `yield ..` expression can appear anywhere a normal expression can. For example:
 
@@ -449,6 +482,73 @@ It's important to be aware of the operator precedence and associativity of `yiel
 Just like with any other operator, it's a good idea to use `( .. )` grouping, even if not strictly required, to disambiguate your intent if `yield` is combined with other operators (including itself).
 
 **Note:** See the *Types & Grammar* title of this series for more information on precedence/associativity.
+
+#### `yield *`
+
+In the same way that the `*` makes a `function` declaration into `function *` generator declaration, a `*` makes `yield` into `yield *`, which is a very different mechanism, called *yield delegation*.
+
+`yield * ..` requires an iterable; it then invokes that iterable's iterator, and delegates its own control until that iterator is exhausted. Consider:
+
+```js
+function *foo() {
+	yield *[1,2,3];
+}
+```
+
+**Note:** Exactly the same as earlier discussion of `*` position within a generator's declaration, the `*` positioning in `yield *` expressions is stylistically up to you. Most other literature prefers `yield* ..`, but I prefer `yield *..`, for very symmetrical reasons as already discussed.
+
+The `[1,2,3]` value produces an iterator which will step through its values, so the `*foo()` generator will yield those values out at its consumed. Another way to illustrate the behavior is in yield delegating to another generator:
+
+```js
+function *foo() {
+	yield 1;
+	yield 2;
+	yield 3;
+}
+
+function *bar() {
+	yield *foo();
+}
+```
+
+The iterator produced from calling `foo()` is delegated to by the `*bar()` generator, meaning whatever value `*foo()` produces will be produced by `*bar()`.
+
+Whereas with `yield ..` where the completion value of the expression comes from resuming the generator with `it.next(..)`, the completion value of the `yield *..` expression comes from the return value (if any) from the delegated-to iterator.
+
+Built-in iterators generally don't have return values, as we covered at the end of the "Iterator Loop" section earlier in this chapter. But if you define your own custom iterator (or generator), you can design it to `return` a value, which `yield *..` would capture:
+
+```js
+function *foo() {
+	yield 1;
+	yield 2;
+	yield 3;
+	return 4;
+}
+
+function *bar() {
+	var x = yield *foo();
+	console.log( x );		// 4
+}
+```
+
+While the `1`, `2`, and `3` values would be `yield`ed out of `*foo()` and then out of `*bar()`, the `4` value returned from `*foo()` is the completion value of the `yield *foo()` expression, which then gets assigned to `x`.
+
+Since `yield *` can call another generator (by way of delegating to its iterator), it can also perform a sort of generator recursion by calling itself:
+
+```js
+function *foo(x) {
+	if (x < 3) {
+		x = yield *foo( x + 1 );
+	}
+	return x * 2;
+}
+
+foo( 1 );
+```
+
+The result from `foo(1)` and then calling the iterator's `next()` to run it through its recursive steps will be `24`. The first `*foo(..)` run has `x` at value `1`, which is `x < 3`. `x + 1` is passed recursively to `*foo(..)`, so `x` is then `2`. One more recursive call results in `x` of `3`.
+
+Now, since `x < 3` fails, the recursion stops, and `return 3 * 2` gives `6` back to the previous call's `yield *..` expression, which is then assigned to `x`. Another `return 6 * 2` returns `12` back to the previous call's `x`. Finally `12 * 2`, or `24`, is returned from the completed run of the `*foo(..)` generator.
 
 ### Iterator Control
 
