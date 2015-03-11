@@ -473,15 +473,17 @@ function *foo() {
 
 `*foo()` here has four `yield ..` expressions, each of which will result in a pause of the generator waiting for a resumption value, which will then be used in the various expression contexts as shown.
 
-It's important to be aware of the operator precedence and associativity of `yield` so you understand what happens with other operators (including multiple `yield`s).
+`yield` is not an operator, though when used like `yield 1` it sure looks like it. Since `yield` can be used all by itself as in `var x = yield;`, thinking of it as an operator can sometimes be misleading. It's more of a contextual keyword. But its behavior is special and unique compared to all previously seen operators and keywords.
 
-`yield` has the third-to-least operator precedence, only being more precedent than the `...` spread operator and the `,` comma operator. That means almost any expression after a `yield ..` will be computed first before being sent with `yield`.
+Nevertheless, `yield` is defined in such a way as to have a sort of "operator precedence" and "associativity" the way other operators are. It's important to be aware of these behaviors so you understand what happens when `yield` is present with other operators (or other	`yield`s).
 
-`yield` is right-associative, which means that multiple `yield`s in succession are treated as having been `( .. )` grouped from right to left. So, `yield yield yield 3` is treated as `yield (yield (yield 3))`. Of course, a left-associative `((yield) yield) yield 3` would be nonsense.
+`yield` has the third-to-least "operator precedence", only being more precedent than the `...` spread operator and `,` comma operator. That means almost any expression after a `yield ..` will be computed first before being sent with `yield`.
 
-Just like with any other operator, it's a good idea to use `( .. )` grouping, even if not strictly required, to disambiguate your intent if `yield` is combined with other operators (including itself).
+`yield` is "right-associative", which means that multiple `yield`s in succession are treated as having been `( .. )` grouped from right to left. So, `yield yield yield 3` is treated as `yield (yield (yield 3))`. Of course, a left-associative `((yield) yield) yield 3` would be nonsense.
 
-**Note:** See the *Types & Grammar* title of this series for more information on precedence/associativity.
+Just like with regular operators, it's a good idea to use `( .. )` grouping, even if not strictly required, to disambiguate your intent if `yield` is combined with other operators or `yield`s.
+
+**Note:** See the *Types & Grammar* title of this series for more information on operator precedence and associativity.
 
 #### `yield *`
 
