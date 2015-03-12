@@ -451,7 +451,17 @@ In this `*foo()` generator, the operations on the first two lines would run at t
 
 You can even put `yield` inside a loop, and it can represent a repeated pause point. In fact, a loop that never completes just means a generator that never completes, which is completely valid, and sometimes entirely what you need.
 
-`yield` represents not just a pause point. It's an expression that both sends out a value -- called "yielding a value" -- and receives (aka, is replaced by) the resume value message. Consider:
+`yield` is not just a pause point. It's an expression that sends out a value when pausing the generator. Here's a `while..true` loop in a generator that for each iteration `yield`s a new random number:
+
+```js
+function *foo() {
+	while (true) {
+		yield Math.random();
+	}
+}
+```
+
+The `yield ..` expression not only sends a value -- `yield` without a value is the same as `yield undefined` -- but also receives (e.g., is replaced by) the resumption value message. Consider:
 
 ```js
 function *foo() {
@@ -460,7 +470,7 @@ function *foo() {
 }
 ```
 
-This generator will, at first run, `yield` out the value `10` when pausing itself. When you resume the generator -- using the `it.next(..)` we referred to earlier -- whatever value (if any) you resume with will replace the whole `yield 10` expression, meaning whatever value that is, will be assigned to the `x` variable.
+This generator will, at first run, `yield` out the value `10` when pausing itself. When you resume the generator -- using the `it.next(..)` we referred to earlier -- whatever value (if any) you resume with will replace/complete the whole `yield 10` expression, meaning whatever value that is will be assigned to the `x` variable.
 
 A `yield ..` expression can appear anywhere a normal expression can. For example:
 
@@ -473,23 +483,49 @@ function *foo() {
 
 `*foo()` here has four `yield ..` expressions, each of which will result in a pause of the generator waiting for a resumption value, which will then be used in the various expression contexts as shown.
 
-`yield` is not an operator, though when used like `yield 1` it sure looks like it. Since `yield` can be used all by itself as in `var x = yield;`, thinking of it as an operator can sometimes be misleading. It's more of a contextual keyword. But its behavior is special and unique compared to all previously seen operators and keywords.
+`yield` is not an operator, though when used like `yield 1` it sure looks like it. Since `yield` can be used all by itself as in `var x = yield;`, thinking of it as an operator can sometimes be misleading.
 
-Nevertheless, `yield` is defined in such a way as to have a sort of "operator precedence" and "associativity" the way other operators are. It's important to be aware of these behaviors so you understand what happens when `yield` is present with other operators (or other	`yield`s).
+Technically `yield ..` is of the same "expression precedence" --similar conceptually to operator precedence -- as an assignment expression like `a = 3`. That means `yield ..` can basically appear anywhere `a = 3` can validly appear.
 
-`yield` has the third-to-least "operator precedence", only being more precedent than the `...` spread operator and `,` comma operator. That means almost any expression after a `yield ..` will be computed first before being sent with `yield`.
+Let's illustrate the symmetry:
 
-`yield` is "right-associative", which means that multiple `yield`s in succession are treated as having been `( .. )` grouped from right to left. So, `yield yield yield 3` is treated as `yield (yield (yield 3))`. Of course, a left-associative `((yield) yield) yield 3` would be nonsense.
+```js
+var a, b;
 
-Just like with regular operators, it's a good idea to use `( .. )` grouping, even if not strictly required, to disambiguate your intent if `yield` is combined with other operators or `yield`s.
+a = 3;				// valid
+b = 2 + a = 3;		// invalid
+b = 2 + (a = 3);	// valid
 
-**Note:** See the *Types & Grammar* title of this series for more information on operator precedence and associativity.
+yield 3;			// valid
+a = 2 + yield 3;	// invalid
+a = 2 + (yield 3);	// valid
+```
+
+**Note:** If you think about it, it makes a sort of conceptual sense that a `yield ..` expression would behave similar to an assignment expression. When a paused `yield` expression is resumed, it's completed/replaced by the resumption value in a way that's not terribly dissimilar from being "assigned" that value.
+
+The takeaway: if you need `yield ..` to appear in a position where an assignment like `a = 3` would not itself be allowed, it needs to be wrapped in a `( )`.
+
+Because of the low precedence of the `yield` keyword, almost any expression after a `yield ..` will be computed first before being sent with `yield`. Only the `...` spread operator and the `,` comma operator have lower precedence, meaning they'd bind after the `yield` has been evaluated.
+
+So just like with multiple operators in normal statements, another case where `( )` might be needed is to override (elevate) the low precedence of `yield`, such as the difference between these expressions:
+
+```js
+yield 2 + 3;		// same as `yield (2 + 3)`
+
+(yield 2) + 3;		// `yield 2` first, then `+ 3`
+```
+
+Just like `=` assignment, `yield` is also "right-associative", which means that multiple `yield` expressions in succession are treated as having been `( .. )` grouped from right to left. So, `yield yield yield 3` is treated as `yield (yield (yield 3))`. Of course, a "left-associative" interpretation like `((yield) yield) yield 3` would make no sense.
+
+Just like with operators, it's a good idea to use `( .. )` grouping, even if not strictly required, to disambiguate your intent if `yield` is combined with other operators or `yield`s.
+
+**Note:** See the *Types & Grammar* title of this series for more information about operator precedence and associativity.
 
 #### `yield *`
 
-In the same way that the `*` makes a `function` declaration into `function *` generator declaration, a `*` makes `yield` into `yield *`, which is a very different mechanism, called *yield delegation*.
+In the same way that the `*` makes a `function` declaration into `function *` generator declaration, a `*` makes `yield` into `yield *`, which is a very different mechanism, called *yield delegation*. Grammatically, `yield *..` is will behave the same as a `yield ..`, as discussed in the previous section.
 
-`yield * ..` requires an iterable; it then invokes that iterable's iterator, and delegates its own control until that iterator is exhausted. Consider:
+`yield * ..` requires an iterable; it then invokes that iterable's iterator, and delegates its own host generator's control to that iterator until it's exhausted. Consider:
 
 ```js
 function *foo() {
@@ -497,7 +533,7 @@ function *foo() {
 }
 ```
 
-**Note:** Exactly the same as earlier discussion of `*` position within a generator's declaration, the `*` positioning in `yield *` expressions is stylistically up to you. Most other literature prefers `yield* ..`, but I prefer `yield *..`, for very symmetrical reasons as already discussed.
+**Note:** Exactly the same as earlier discussion of `*` position in a generator's declaration, the `*` positioning in `yield *` expressions is stylistically up to you. Most other literature prefers `yield* ..`, but I prefer `yield *..`, for very symmetrical reasons as already discussed.
 
 The `[1,2,3]` value produces an iterator which will step through its values, so the `*foo()` generator will yield those values out at its consumed. Another way to illustrate the behavior is in yield delegating to another generator:
 
