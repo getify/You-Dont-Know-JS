@@ -590,11 +590,11 @@ Recall earlier I asserted that `{ x, .. }` was leaving off the `x: ` part? In th
 
 So, that symmetry may help to explain why the syntactic pattern was intentionally flipped for this ES6 feature.
 
-**Note:** Personally, I would have preferred the syntax to be `{ AA: x , BB: y }` for the destructuring assignment, since that would have preserved the more familiar `target: source` pattern for both usages. Alas, I'm having to train my brain for the inversion, as some readers may have to do.
+**Note:** I would have preferred the syntax to be `{ AA: x , BB: y }` for the destructuring assignment, since that would have preserved consistency of the more familiar `target: source` pattern for both usages. Alas, I'm having to train my brain for the inversion, as some readers may also have to do.
 
 ### Not Just Declarations
 
-So far, we've used destructuring assignment with `var` declarations --of course, they could also use `let` and `const` -- but destructuring is a general assignment operation, not just a declaration.
+So far, we've used destructuring assignment with `var` declarations -- of course, they could also use `let` and `const` -- but destructuring is a general assignment operation, not just a declaration.
 
 Consider:
 
@@ -610,7 +610,7 @@ console.log( x, y, z );				// 4 5 6
 
 The variables can already be declared, and then the destructuring only does assignments, exactly as we've already seen.
 
-**Note:** For the object destructuring form specifically, when leaving off a `var`/`let`/`const` declarator, we had to surround the `{ .. }` value in `( )`, because `{ .. }` all by itself is taken to be a statement block.
+**Note:** For the object destructuring form specifically, when leaving off a `var`/`let`/`const` declarator, we had to surround the `{ .. }` value in `( )`, because `{ .. }` all by itself is taken to be a statement block instead of an object.
 
 In fact, the assignment expressions (`a`, `y`, etc.) don't actually need to be just variable identifiers. Anything that's a valid assignment expression is valid. For example:
 
@@ -623,6 +623,19 @@ var o = {};
 console.log( o.a, o.b, o.c );		// 1 2 3
 console.log( o.x, o.y, o.z );		// 4 5 6
 ```
+
+You can even use computed property expressions in the destructuring. Consider:
+
+```js
+var which = "x",
+	o = {};
+
+({ [which]: o[which] }) = bar();
+
+console.log( o.x );					// 4
+```
+
+The `[which]:` part is the computed property, which results in `x` -- the property to destructure from the object in question as the source of the assignment. The `o[which]` part is just a normal object key reference, which equates to `o.x` as the target of the assignment.
 
 You can use the general assignments to create object mappings/transformations, such as:
 
