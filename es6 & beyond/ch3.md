@@ -1025,6 +1025,95 @@ When generators are viewed in light of these uses, they become a lot more than j
 
 ## Modules
 
+I don't think it's an exaggeration to suggest that the single most important code organization pattern in all of JavaScript is, and always has been, the module. For myself, and I think for a larg cross-section of the community, the module pattern drives the vast majority of code.
+
+### The Old Way
+
+The traditional module pattern is based on an outer function with inner variables and functions, and a returned "public API" with methods that have closure over the inner data and capabilities. It's often expressed like this:
+
+```js
+function Hello(name) {
+	function greeting() {
+		console.log( "Hello " + name + "!" );
+	}
+
+	// public API
+	return {
+		greeting: greeting
+	};
+}
+
+var me = Hello( "Kyle" );
+me.greeting();			// Hello Kyle!
+```
+
+This `Hello(..)` module can produce multiple instances by being called subsequent times. Sometimes, a module is only called for as a singleton -- just needs one instance -- in which case a slight variation on the previous snippet, using an IIFE, is common:
+
+```js
+var me = (function Hello(name){
+	function greeting() {
+		console.log( "Hello " + name + "!" );
+	}
+
+	// public API
+	return {
+		greeting: greeting
+	};
+})( "Kyle" );
+
+me.greeting();			// Hello Kyle!
+```
+
+This pattern is tried and tested. It's also flexible enough to have a wide assortment of variations for a number of different scenarios.
+
+One of the most common is the Asynchronous Module Definition (AMD), and another is the Universal Module Definition (UMD). We won't cover the particulars of these patterns and techniques here, but they're explained extensively in many places online.
+
+### Moving Forward
+
+As of ES6, we no longer need to rely on the enclosing function and closure to provide us with module support. ES6 modules have first class syntactic and functional support.
+
+Before we get into the specific syntax, it's important to understand some fairly significant conceptual differences with ES6 modules compared to how you may have dealt with modules in the past:
+
+* ES6 modules are file-based, meaning one module per file. At this time, there is no standardized way of combining multiple modules into a single file.
+
+   That means that if you are going to load ES6 modules directly into a browser web application, you will be loading them individually, not as a large bundle in a single file as has been common in performance optimization efforts.
+
+   It's expected that the contemporaneous advent of HTTP/2 will significantly mitigate any such performance concerns, as it operates on a persistent socket connection and thus can very efficiently load many smaller files in parallel and interleaved with each other.
+* The API of an ES6 module is static. That is, you define statically what all the top-level exports are on your module's public API, and those cannot be amended later.
+
+   Some uses are accustomed to being able to provide dynamic API definitions, where methods can be added/removed/replaced in response to run-time conditions. Either these uses will have to change to fit with ES6 static APIs, or they will have to restrain the dynamic changes to properties/methods of a second-level object.
+* ES6 modules are singletons. That is, there's only one instance of the module, which maintains its state. Every time you import that module into another module, you get a reference to the one centralized instance.
+* The properties and methods you expose on a module's public API are not just normal assignments of values or references. They are actual bindings (almost like pointers) to the actual elements in your inner module definition.
+
+   In pre-ES6 modules, if you put a property on your public API that holds a primitive value like a number or string, that property assignment was by value-copy, and any internal update of a corresponding variable would be separate and not affect the copy on the API object.
+
+   With ES6, if you export a local private variable, even if it currently holds a primitive string or number, you are actually exporting a binding/pointer to your actual variable, and if either your inner module code or the outer consumer of the API change that value, both sides will see the change.
+* Importing a module is the same thing as statically requesting it to load (if it hasn't already). If you're in a browser, that implies a blocking load over the network. If you're on a server (i.e., Node.js), it's a blocking load from the filesystem.
+
+   However, don't panic about the performance implications. Because ES6 modules have static definitions, the import requirements can be statically scanned, and loads will happen preemptively, even before you've used the module.
+
+   ES6 doesn't actually specify or handle the mechanics of how these load requests work. There's a separate notion of a Module Loader, where each hosting environment (browser, Node.js, etc.) provides a default Loader appropriate to the environment. The importing of a module uses a string value to represent where to get the module (URL, file path, etc), but this value is opaque in your program and only meaningful to the Loader itself.
+
+   You can define your own custom Loader if you want more fine-grained control than the default Loader affords -- which is basically none, since it's totally hidden from your program's code.
+
+As you can see, ES6 modules will serve the overall use-case of organizing code with encapsulation, controll public APIs, and dependency imports. But they have a very particular way of doing so, and that may or may not fit very closely with how you've already been doing modules for years.
+
+#### CommonJS
+
+There's a similar, but not fully compatible, module syntax called CommonJS, which is familiar to those in the Node.js ecosystem.
+
+For lack of a more tactful way to say this, in the long run, ES6 modules essentially are bound to supercede all previous formats and standards for modules, even CommonJS, as they are built on syntactic support in the language. This will, in time, inevitably win out as the superior approach, if for no other reason than ubiquity.
+
+We face a fairly long road to get to that point, though. There are literally hundreds of thousands of CommonJS style modules in the server-side JavaScript world, and ten times that many modules of varying format standards (UMD, AMD, ad hoc) in the browser world. It will take many years for the transitions to make any significant progress.
+
+In the interim, module transpilers/converters will be an absolute necessity. You might as well just get used to that new reality. Whether you author in regular modules, AMD, UMD, CommonJS, or ES6, these tools will have to parse and convert to a format that is suitable for whatever environment your code will run in.
+
+For Node.js, that probably means (for now) that the target is CommonJS. For the browser, it's probably UMD or AMD. Expect lots of flux on this over the next few years as these tools mature and best practices emerge.
+
+From here on out, my best advice on modules is this: whatever format you've been religiously attached to with strong affinity, also develop an appreciation for and understanding of ES6 modules, such as they are. They *are* the future of modules in JS, even if that reality is a bit of a ways off.
+
+### The New Way
+
 // TODO
 
 ## Classes
