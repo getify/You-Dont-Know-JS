@@ -17,7 +17,7 @@ If you're already fairly comfortable with JavaScript, first check out Chapter 3 
 
 Let's start from the beginning.
 
-A program, often referred to as *code* or *source code*, is a set of special instructions to tell the computer what tasks to perform. Usually code is saved in a text file, although with JavaScript you can also type code directly into a developer console in a browser, which we'll cover shortly.
+A program, often referred to as *source code* or just *code*, is a set of special instructions to tell the computer what tasks to perform. Usually code is saved in a text file, although with JavaScript you can also type code directly into a developer console in a browser, which we'll cover shortly.
 
 The rules for valid format and combinations of instructions is called a *computer language*, sometimes referred to as its *syntax*, much the same as English tells you how to spell words and how to create valid sentences using words and punctuation.
 
@@ -92,11 +92,9 @@ This chapter is going to introduce each programming concept with simple snippets
 
 It cannot be emphasized enough: while you go through this chapter -- and you may need to spend the time to go over it several times -- you should practice each of these concepts by typing the code yourself. The easiest way to do that is to open up the developer tools console in your nearest browser (Firefox, Chrome, IE, etc.).
 
-**Tip:** Typically, you can launch the developer console with a keyboard shortcut or from a menu item. For more detailed information about launching and using the console in your favorite browser, see "Mastering The Developer Tools Console" (http://blog.teamtreehouse.com/mastering-developer-tools-console).
+**Tip:** Typically, you can launch the developer console with a keyboard shortcut or from a menu item. For more detailed information about launching and using the console in your favorite browser, see "Mastering The Developer Tools Console" (http://blog.teamtreehouse.com/mastering-developer-tools-console). To type multiple lines into the console at once, use `<shift> + <enter>` to move to the next new line. Once you hit `<enter>` by itself, the console will run everything you've just typed.
 
 Let's get familiar with the process of running code in the console. First, I suggest opening up an empty tab in your browser. I prefer to do this by typing `about:blank` into the address bar. Then, make sure your developer console is open, as we just mentioned.
-
-**Tip:** To type multiple lines into the console at once, use `<shift> + <enter>` to move to the next new line. Once you hit `<enter>` by itself, the console will run everything you've just typed.
 
 Now, type this code and see how it runs:
 
@@ -148,7 +146,7 @@ age = prompt( "Please tell me your age:" );
 console.log( age );
 ```
 
-As you may have guessed, the message you pass to `prompt(..)` (in this case, `"Please tell me your age:"`) is printed into the popup.
+As you may have guessed, the message you pass to `prompt(..)` -- in this case, `"Please tell me your age:"` -- is printed into the popup.
 
 This should look similar to the following:
 
@@ -219,7 +217,7 @@ If you ask an employee at a phone store how much a certain phone costs, and they
 
 If that same employee picks up another similar phone but says it's "free" (perhaps with air quotes), they're not giving you a number, but instead another kind of representation of your expected cost ($0.00) -- the word "free."
 
-When you later ask if the phone includes a charger, and the employee says "yes," that answer could only have been either "yes" or "no."
+When you later ask if the phone includes a charger, that answer could only have been either "yes" or "no."
 
 In very similar ways, when you express values in a programs, you choose different representations for those values based on what you plan to do with them.
 
@@ -273,7 +271,7 @@ While designed to help you, implicit coercion can create confusion if you haven'
 
 However, implicit coercion is a mechanism that *can be learned*, and moreover *should be learned* by anyone wishing to take JavaScript programming seriously. Not only is it not confusing once you learn the rules, it can actually make your programs better! The effort is well worth it.
 
-**Note:** For more information on coercion, see Chapter 4 of the *Types & Grammar* title of this series.
+**Note:** For more information on coercion, see Chapter 2 of this title and Chapter 4 of the *Types & Grammar* title of this series.
 
 ## Code Comments
 
@@ -281,7 +279,7 @@ The phone store employee might jot down some notes on the features of a newly re
 
 One of the most important lessons you can learn about writing code is that it's not just for the computer. Code is every bit as much, if not more, for the developer as it is for the compiler.
 
-Your computer only cares about machine code, binary 0s and 1s, that comes from *compilation*. There's a nearly infinite number of programs you could write that yield the same series of 0s and 1s. The choices you make about how to write your program matter -- not only to you, but to your other team members and even to your future self.
+Your computer only cares about machine code, a series of binary 0s and 1s, that comes from *compilation*. There's a nearly infinite number of programs you could write that yield the same series of 0s and 1s. The choices you make about how to write your program matter -- not only to you, but to your other team members and even to your future self.
 
 You should strive not just to write programs that work correctly, but programs that make sense when examined. You can go a long way in that effort by choosing good names for your variables (see "Variables") and functions (see "Functions").
 
