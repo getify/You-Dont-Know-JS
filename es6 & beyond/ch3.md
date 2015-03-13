@@ -352,7 +352,7 @@ for (var i of 3) {
 }
 // 0 1 2 3
 
-[...-3];		// [0,-1,-2,-3]
+[...-3];				// [0,-1,-2,-3]
 ```
 
 Those are some fun tricks, though the practical utility is somewhat debatable. But then again, one might wonder why ES6 didn't just ship with such a minor feature easter egg!?
@@ -492,13 +492,13 @@ Let's illustrate the symmetry:
 ```js
 var a, b;
 
-a = 3;				// valid
-b = 2 + a = 3;		// invalid
-b = 2 + (a = 3);	// valid
+a = 3;					// valid
+b = 2 + a = 3;			// invalid
+b = 2 + (a = 3);		// valid
 
-yield 3;			// valid
-a = 2 + yield 3;	// invalid
-a = 2 + (yield 3);	// valid
+yield 3;				// valid
+a = 2 + yield 3;		// invalid
+a = 2 + (yield 3);		// valid
 ```
 
 **Note:** If you think about it, it makes a sort of conceptual sense that a `yield ..` expression would behave similar to an assignment expression. When a paused `yield` expression is resumed, it's completed/replaced by the resumption value in a way that's not terribly dissimilar from being "assigned" that value.
@@ -510,9 +510,9 @@ Because of the low precedence of the `yield` keyword, almost any expression afte
 So just like with multiple operators in normal statements, another case where `( )` might be needed is to override (elevate) the low precedence of `yield`, such as the difference between these expressions:
 
 ```js
-yield 2 + 3;		// same as `yield (2 + 3)`
+yield 2 + 3;			// same as `yield (2 + 3)`
 
-(yield 2) + 3;		// `yield 2` first, then `+ 3`
+(yield 2) + 3;			// `yield 2` first, then `+ 3`
 ```
 
 Just like `=` assignment, `yield` is also "right-associative", which means that multiple `yield` expressions in succession are treated as having been `( .. )` grouped from right to left. So, `yield yield yield 3` is treated as `yield (yield (yield 3))`. Of course, a "left-associative" interpretation like `((yield) yield) yield 3` would make no sense.
@@ -565,7 +565,7 @@ function *foo() {
 
 function *bar() {
 	var x = yield *foo();
-	console.log( x );		// 4
+	console.log( x );	// 4
 }
 ```
 
@@ -640,11 +640,11 @@ function *foo() {
 
 var it = foo();
 
-it.next();		// { value: 1, done: false }
-it.next();		// { value: 2, done: false }
-it.next();		// { value: 3, done: false }
+it.next();				// { value: 1, done: false }
+it.next();				// { value: 2, done: false }
+it.next();				// { value: 3, done: false }
 
-it.next();		// { value: undefined, done: true }
+it.next();				// { value: undefined, done: true }
 ```
 
 If you look closely, there are 3 `yield` statements and 4 `next()` calls. That may seem like a strange mismatch. In fact, there will always be one more `next()` call than `yield` expression, assuming all are evaluated and the generator is fully run to completion.
@@ -671,7 +671,7 @@ Now, here's how we control `*foo()` to start it up:
 ```js
 var it = foo();
 
-it.next();			// { value: 1, done: false }
+it.next();				// { value: 1, done: false }
 ```
 
 That first `next()` call is starting up the generator from its initial paused state, and running it to the first `yield`. At the moment you call that first `next()`, there's no `yield ..` expression waiting for a completion. If you passed a value to that first `next()` call, it would just be thrown away, because nobody is waiting to receive such value.
@@ -679,20 +679,20 @@ That first `next()` call is starting up the generator from its initial paused st
 Now, let's answer the currently pending question, "What value should I assign to `x`?" We'll answer it by sending a value to the *next* `next(..)` call:
 
 ```js
-it.next( "foo" );	// { value: 2, done: false }
+it.next( "foo" );		// { value: 2, done: false }
 ```
 
 Now, the `x` will have the value `"foo"`, but we've also asked a new question, "What value should I assign to `y`?" And we answer:
 
 ```js
-it.next( "bar" );	// { value: 3, done: false }
+it.next( "bar" );		// { value: 3, done: false }
 ```
 
 Answer given, another question asked. Final answer:
 
 ```js
-it.next( "baz" );	// "foo" "bar" "baz"
-					// { value: undefined, done: true }
+it.next( "baz" );		// "foo" "bar" "baz"
+						// { value: undefined, done: true }
 ```
 
 Now it should be clearer how each `yield ..` "question" is answered by the *next* `next(..)` call, and so the "extra" `next()` call we observed is always just the initial one that starts everything going.
@@ -703,22 +703,325 @@ Let's put all those steps together:
 var it = foo();
 
 // start up the generator
-it.next();			// { value: 1, done: false }
+it.next();				// { value: 1, done: false }
 
 // answer first question
-it.next( "foo" );	// { value: 2, done: false }
+it.next( "foo" );		// { value: 2, done: false }
 
 // answer second question
-it.next( "bar" );	// { value: 3, done: false }
+it.next( "bar" );		// { value: 3, done: false }
 
 // answer third question
-it.next( "baz" );	// "foo" "bar" "baz"
-					// { value: undefined, done: true }
+it.next( "baz" );		// "foo" "bar" "baz"
+						// { value: undefined, done: true }
 ```
 
-You can think of a generator as a producer of values, in which case its iteration is simply producing and consuming those values. But in a more general sense, perhaps it's appropriate to think of generators as controlled code execution, much like the `tasks` queue example from the earlier "Custom Iterators" section.
+You can think of a generator as a producer of values, in which case each iteration is simply producing a value to be consumed.
 
-**Note:** That perspective is exactly the motivation for how we'll revisit generators in Chapter 4, when we consider expressing asynchronous steps in a generator and using the pause/resume capabilities to drive our async flow.
+But in a more general sense, perhaps it's appropriate to think of generators as controlled, progressive code execution, much like the `tasks` queue example from the earlier "Custom Iterators" section.
+
+**Note:** That perspective is exactly the motivation for how we'll revisit generators in Chapter 4. Specifically, there's no reason that `next(..)` has to be called right away after the previous `next(..)` finishes. While the generator's inner execution context is paused, the rest of the program continues unabated, including the ability for asynchrony to control when the generator is resumed.
+
+### Early Completion
+
+As we covered earlier in this chapter, the iterator attached to a generator supports the optional `return(..)` and `throw(..)` methods. Both of them have the effect of aborting a paused generator immediately.
+
+Consider:
+
+```js
+function *foo() {
+	yield 1;
+	yield 2;
+	yield 3;
+}
+
+var it = foo();
+
+it.next();				// { value: 1, done: false }
+
+it.return( 42 );		// { value: 42, done: true }
+
+it.next();				// { value: undefined, done: true }
+```
+
+`return(x)` is kind of like forcing a `return x` to be processed at exactly that moment, such that you get the specified value right back. Once a generator is completed, either normally or early as shown, it no longer processes any code or returns any values.
+
+In addition to `return(..)` being callable manually, it's also called automatically at the end of iteration by any of the ES6 constructs that consume iterators, such as the `for..of` loop and the `...` spread operator.
+
+The purpose for this capability is so the generator can be notified if the controlling code is no longer going to iterate over it anymore, so that it can perhaps do any cleanup tasks (freeing up resources, resetting status, etc.). Identical to a normal function cleanup pattern, the main way to accomplish this is to use a `finally` clause:
+
+```js
+function *foo() {
+	try {
+		yield 1;
+		yield 2;
+		yield 3;
+	}
+	finally {
+		console.log( "cleanup!" );
+	}
+}
+
+for (var v of foo()) {
+	console.log( v );
+}
+// 1 2 3
+// cleanup!
+
+var it = foo();
+
+it.next();				// { value: 1, done: false }
+it.return( 42 );		// cleanup!
+						// { value: 42, done: true }
+```
+
+**Warning:** Do not put a `yield` statement inside the `finally` clause! It's valid and legal, but it's a really terrible idea. It acts in a sense as deferring the completion of the `return(..)` call you made, as any `yield ..` expressions in the `finally` clause are respected to pause and send messages; you don't immediately get a completed generator as expected. There's basically no good reason to opt-in to that crazy *bad part*, so avoid doing so!
+
+In addition to the previous snippet showing how `return(..)` aborts the generator while still triggering the `finally` clause, it also demonstrates that a generator produces a whole new iterator each time it's called. In fact, you can use multiple iterators attached to the same generator concurrently:
+
+```js
+function *foo() {
+	yield 1;
+	yield 2;
+	yield 3;
+}
+
+var it1 = foo();
+it1.next();				// { value: 1, done: false }
+it1.next();				// { value: 2, done: false }
+
+var it2 = foo();
+it2.next();				// { value: 1, done: false }
+
+it1.next();				// { value: 3, done: false }
+
+it2.next();				// { value: 2, done: false }
+it2.next();				// { value: 3, done: false }
+
+it2.next();				// { value: undefined, done: true }
+it1.next();				// { value: undefined, done: true }
+```
+
+#### Early Abort
+
+Instead of calling `return(..)`, you can call `throw(..)`. Just like `return(x)` is essentially injecting a `return x` into the generator at its current pause point, calling `throw(x)` is essentially like injecting a `throw x` at the pause point.
+
+Other than the exception behavior -- we cover what that means to `try` clauses in the next section -- `throw(..)` produces the same sort of early completion that aborts the generator's run at its current pause point.
+
+```js
+function *foo() {
+	yield 1;
+	yield 2;
+	yield 3;
+}
+
+var it = foo();
+
+it.next();				// { value: 1, done: false }
+
+try {
+	it.throw( "Oops!" );
+}
+catch (err) {
+	console.log( err );	// Exception: Oops!
+}
+
+it.next();				// { value: undefined, done: true }
+```
+
+Since `throw(..)` basically injects a `throw ..` in replacement of the `yield 1` line of the generator, and nothing handles this exception, it immediately propagates back out to the calling code, which handles it with a `try..catch`.
+
+Unlike `return(..)`, the iterator's `throw(..)` method is never called automatically.
+
+Of course, though not shown in the previous snippet, if a `try..finally` clause was waiting inside the generator when you call `throw(..)`, the `finally` clause would be given a chance to complete before the exception is propagated back to the calling code.
+
+### Error Handling
+
+As we've already hinted, error handling with generators can be expressed with `try..catch`, which works in both inbound and outbound directions:
+
+```js
+function *foo() {
+	try {
+		yield 1;
+	}
+	catch (err) {
+		console.log( err );
+	}
+
+	yield 2;
+
+	throw "Hello!";
+}
+
+var it = foo();
+
+it.next();				// { value: 1, done: false }
+
+try {
+	it.throw( "Hi!" );	// Hi!
+						// { value: 2, done: false }
+	it.next();
+
+	console.log( "never gets here" );
+}
+catch (err) {
+	console.log( err );	// Hello!
+}
+```
+
+Errors can also propagate in both directions through `yield *` delegation:
+
+```js
+function *foo() {
+	try {
+		yield 1;
+	}
+	catch (err) {
+		console.log( err );
+	}
+
+	yield 2;
+
+	throw "foo: e2";
+}
+
+function *bar() {
+	try {
+		yield *foo();
+
+		console.log( "never gets here" );
+	}
+	catch (err) {
+		console.log( err );
+	}
+}
+
+var it = bar();
+
+try {
+	it.next();			// { value: 1, done: false }
+
+	it.throw( "e1" );	// e1
+						// { value: 2, done: false }
+
+	it.next();			// foo: e2
+						// { value: undefined, done: true }
+}
+catch (err) {
+	console.log( "never gets here" );
+}
+
+it.next();				// { value: undefined, done: true }
+```
+
+When `*foo()` calls `yield 1`, the `1` value passes through `*bar()` untouched, as we've already seen.
+
+But what's most interesting about this snippet is that when `*foo()` calls `throw "foo: e2"`, this error propagates to `*bar()` and is immediately caught by `*bar()`'s `try..catch` block. The error doesn't pass through `*bar()` like the `1` value did.
+
+`*bar()`'s `catch` then does a normal output of `err` (`"foo: e2"`) and then `*bar()` finishes normally, which is why the `{ value: undefined, done: true }` iterator result comes back from `it.next()`.
+
+If `*bar()` didn't have a `try..catch` around the `yield *..` expression, the error would of course propagate all the way out, and on the way through it still would complete (abort) `*bar()`.
+
+### Transpiling a Generator
+
+Is it possible to represent a generator's capabilities prior to ES6? It turns out it is, and there are several great tools which do so, including most notably the Regenerator (https://facebook.github.io/regenerator/) tool from Facebook.
+
+But just to better understand generators, let's try our hand at manually converting. Basically, we're going to create a simple closure-based state machine.
+
+We'll keep our source generator really simple:
+
+```js
+function *foo() {
+	var x = yield 42;
+	console.log( x );
+}
+```
+
+To start, we'll need a function called `foo()` that we can execute, which needs to return an iterator:
+
+```js
+function foo() {
+	// ..
+
+	return {
+		next: function(v) {
+			// ..
+		}
+
+		// we'll skip `return(..)` and `throw(..)`
+	};
+}
+```
+
+Now, we need some inner variable to keep track of where we are in the steps of our "generator's" logic. We'll call it `state`. There will be three states: `0` initially, `1` while waiting to fulfill the `yield` expression, and `2` once the generator is complete.
+
+Each time `next(..)` is called, we need to process the next step, and then increment `state`. For convenience, we'll put each step into a `case` clause of a `switch` statement, and we'll hold that in an inner function called `nextState(..)` that `next(..)` can call. Also, since `x` is a variable across the overall scope of the "generator", it needs to live outside the `nextState(..)` function.
+
+Here it is all together (obviously somewhat simplified, to keep the conceptual illustration clearer):
+
+```js
+function foo() {
+	function nextState(v) {
+		switch (state) {
+			case 0:
+				state++;
+
+				// the `yield` expression
+				return 42;
+			case 1:
+				state++;
+
+				// `yield` expression fulfilled
+				x = v;
+				console.log( x );
+
+				// the implicit `return`
+				return undefined;
+
+			// no need to handle state `2`
+		}
+	}
+
+	var state = 0, x;
+
+	return {
+		next: function(v) {
+			var ret = nextState( v );
+
+			return { value: ret, done: (state == 2) };
+		}
+
+		// we'll skip `return(..)` and `throw(..)`
+	};
+}
+```
+
+And finally, let's test our pre-ES6 "generator":
+
+```js
+var it = foo();
+
+it.next();				// { value: 42, done: false }
+
+it.next( 10 );			// { value: undefined, done: true }
+```
+
+Not bad, huh!? Hopefully this exercise solidifies in your mind that generators are actually just simple syntax for state machine logic. That makes them widely applicable.
+
+### Generator Uses
+
+So, now that we much more deeply understand how generators work, what are they useful for?
+
+We've seen two major patterns:
+
+* *Producing a series of values:* This usage can be simple like random strings or incremented numbers, or it can represent more structured data access, such as iterating over rows returned from a database query.
+
+   Either way, we use the iterator to control a generator so that some logic can be invoked for each call to `next(..)`. Normal iterators on data structures merely pull values without any controlling logic.
+* *Queue of tasks to perform serially:* This usage often represents flow control for the steps in an algorithm, where each step requires retrieval of data from some external source. The fulfillment of each piece of data may be immediate, or may be asynchronously delayed.
+
+   From the perspective of the code inside the generator, the details of sync or async at a `yield` point are entirely opaque. Moreover, these details are intentionally abstracted away, such as not to obscure the natural sequential expression of steps with such implementation complications. Abstraction also means the implementations can be swapped/refactored often without touching the code in the generator at all.
+
+When generators are viewed in light of these uses, they become a lot more than just a different or nicer syntax for a manual state machine. They are a powerful abstraction tool for organizing and controlling orderly production and consumption of data.
 
 ## Modules
 
