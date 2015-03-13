@@ -1110,11 +1110,100 @@ In the interim, module transpilers/converters will be an absolute necessity. You
 
 For Node.js, that probably means (for now) that the target is CommonJS. For the browser, it's probably UMD or AMD. Expect lots of flux on this over the next few years as these tools mature and best practices emerge.
 
-From here on out, my best advice on modules is this: whatever format you've been religiously attached to with strong affinity, also develop an appreciation for and understanding of ES6 modules, such as they are. They *are* the future of modules in JS, even if that reality is a bit of a ways off.
+From here on out, my best advice on modules is this: whatever format you've been religiously attached to with strong affinity, also develop an appreciation for and understanding of ES6 modules, such as they are, and let your other module tendencies fade. They *are* the future of modules in JS, even if that reality is a bit of a ways off.
 
 ### The New Way
 
-// TODO
+The two main new keywords that enable ES6 classes are `import` and `export`. I imagine their overall purposes are obvious enough I don't need to waste ink explaining. However, there's lots of nuance to the syntax, so let's take a deeper look.
+
+#### `export`ing The API
+
+The `export` keyword is either put in front of a declaration or expression, or used as an operator (of sorts) with a special list of bindings to export. Consider:
+
+```js
+export function foo() {
+	// ..
+}
+
+export var awesome = 42;
+
+var bar = [1,2,3];
+
+export bar;
+
+// or:
+export { foo, awesome, bar };
+```
+
+These are all called *named exports*, since you are in effect exporting the name bindings of the variables/functions/etc.
+
+Anything you don't *label* with `export` stays private inside the scope of the module. That is, even though something like `var bar = ..` looks like it's declaring at the top-level global scope, the top-level scope is actually the module itself; there is no global scope in modules.
+
+You can also "rename" (aka alias) a module member during export:
+
+```js
+function foo() { .. }
+
+export { foo as bar };
+```
+
+When this module is imported, only the `bar` member name is available to import; `foo` stays hidden inside the module.
+
+Though you can clearly use `export` multiple times, ES6 definitely prefers the idiom that a module has a single export, which is known as a "default export". In the words of some members of the TC39 committee, you're "rewarded with simpler `import` syntax" if you follow that pattern, and consequently you require more verbose syntax if you don't.
+
+Here's how you declare a *default export*:
+
+```js
+export default function foo(..) {
+	// ..
+}
+
+// or:
+export { foo as default }
+```
+
+If it's not already obvious, there can only be one `default` per module definition. We'll cover `import` in the next section, and you'll see how the `import` syntax is more concise if the module has a default export.
+
+You may be tempted to design your module with one default export that is an object with your API methods on it, such as:
+
+```js
+export default {
+	foo() { .. },
+	bar() { .. },
+	..
+};
+```
+
+That maps closest to how a lot of people have already structured their modules, so it seems like a natural idiom. Unfortunately, this approach has some downsides and is thus officially discouraged.
+
+In particular, the JS engine cannot statically analyze the contents of a normal object, which means it cannot do some optimizations for static `import` performance. The advantage of having each member individually and explicitly exported is that the engine *can* do the static analysis and optimization.
+
+It seems like these principles -- one default export per module, and all API members as named exports -- are in conflict, huh? You *can* have a single `default` export as well as other named exports.
+
+So, instead of:
+
+```js
+export default function foo() { .. }
+
+foo.bar = function() { .. };
+foo.baz = function() { .. };
+..
+```
+
+You could do:
+
+```js
+export default function foo() { .. }
+
+export function bar() { .. }
+export function baz() { .. }
+```
+
+The effects of that design decision will be more clear when we cover `import` in the next section. But essentially it means that the concise default import would only retrieve `foo`, and the user could additionally manually list `bar` and `baz` as named imports, if they want them.
+
+You can probably imagine how tedious that's going to be for consumers of your module if you have lots of export bindings. Again, the ES6 design is intentionally designed to discourage such module design; they want such things to be painful, as a sort of social engineering to encourage simple module design in favor of large/complex module design.
+
+I would probably recommend you not mix default export with named exports, especially if you have a large API and refactoring to separate modules isn't practical or desired. In that case, just use all named exports, and document that consumers of your module should probably use the `import * as ..` (discussed in the next section) approach to bring the whole API in at once on a single binding.
 
 ## Classes
 
