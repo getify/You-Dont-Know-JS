@@ -51,7 +51,7 @@ I say no. After having built up an understanding of how types and values really 
 
 But I'm not merely suggesting that coercion is sensible and learnable, I'm asserting that coercion is an incredibly useful and totally underestimated tool that *you should be using in your code.* I'm saying that coercion, when used properly, not only works, but makes your code better. All the naysayers and doubters will surely scoff at such a position, but I believe it's one of the main keys to upping your JS game.
 
-Do you want to just keep following what the crowd says, or are you willing to set all the assumptions aside and look at coercion with a fresh perspective? The *Types & Grammar* title of this series will be your guide.
+Do you want to just keep following what the crowd says, or are you willing to set all the assumptions aside and look at coercion with a fresh perspective? The *Types & Grammar* title of this series will coerce your thinking.
 
 ## Async & Performance
 
@@ -75,7 +75,7 @@ Chapter 5 delves into topics like program parallelism with Web Workers and data 
 
 Writing JavaScript effectively means writing code that can break the constraint barriers of being run dynamically in a wide range of browsers and other environments. It requires a lot of intricate and detailed planning and effort on our parts to take a program from "it works" to "it works well."
 
-The *Async & Performance* title is designed to give you all the tools and skills you need to write performant JavaScript code.
+The *Async & Performance* title is designed to give you all the tools and skills you need to write reasonable and performant JavaScript code.
 
 ## ES6 & Beyond
 

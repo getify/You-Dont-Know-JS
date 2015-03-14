@@ -3,9 +3,9 @@
 
 If you've been writing JS for any length of time, odds are the syntax is pretty familiar to you. There are certainly many quirks, but overall it's a fairly reasonable and straightforward syntax that draws many similarities from other languages.
 
-However, ES6 adds quite a few new syntactic forms which are going to take some getting used to. In this chapter we'll take a tour through most of them.
+However, ES6 adds quite a few new syntactic forms which are going to take some getting used to. In this chapter we'll tour through them to find out what's in store.
 
-**Warning:** At the time of this writing, many of the features in this chapter (and indeed this whole book!) have been implemented in various browsers (Firefox, Chrome, etc.), but many others have not. Your experience may be mixed trying these examples directly. If so, look to try them out with transpilers, as most of these features are covered by those tools. ES6Fiddle (http://www.es6fiddle.net/) is a great, easy-to-use playground for trying out ES6, as is the online REPL for the Babel transpiler (http://babeljs.io/repl/).
+**Warning:** At the time of this writing, some of the features in this book have been implemented in various browsers (Firefox, Chrome, etc.), but many others have not, or the features are only partially implemented. Your experience may be mixed trying these examples directly. If so, try them out with transpilers, as most of these features are covered by those tools. ES6Fiddle (http://www.es6fiddle.net/) is a great, easy-to-use playground for trying out ES6, as is the online REPL for the Babel transpiler (http://babeljs.io/repl/).
 
 ## Block-Scoped Declarations
 
@@ -590,11 +590,11 @@ Recall earlier I asserted that `{ x, .. }` was leaving off the `x: ` part? In th
 
 So, that symmetry may help to explain why the syntactic pattern was intentionally flipped for this ES6 feature.
 
-**Note:** Personally, I would have preferred the syntax to be `{ AA: x , BB: y }` for the destructuring assignment, since that would have preserved the more familiar `target: source` pattern for both usages. Alas, I'm having to train my brain for the inversion, as some readers may have to do.
+**Note:** I would have preferred the syntax to be `{ AA: x , BB: y }` for the destructuring assignment, since that would have preserved consistency of the more familiar `target: source` pattern for both usages. Alas, I'm having to train my brain for the inversion, as some readers may also have to do.
 
 ### Not Just Declarations
 
-So far, we've used destructuring assignment with `var` declarations --of course, they could also use `let` and `const` -- but destructuring is a general assignment operation, not just a declaration.
+So far, we've used destructuring assignment with `var` declarations -- of course, they could also use `let` and `const` -- but destructuring is a general assignment operation, not just a declaration.
 
 Consider:
 
@@ -610,7 +610,7 @@ console.log( x, y, z );				// 4 5 6
 
 The variables can already be declared, and then the destructuring only does assignments, exactly as we've already seen.
 
-**Note:** For the object destructuring form specifically, when leaving off a `var`/`let`/`const` declarator, we had to surround the `{ .. }` value in `( )`, because `{ .. }` all by itself is taken to be a statement block.
+**Note:** For the object destructuring form specifically, when leaving off a `var`/`let`/`const` declarator, we had to surround the `{ .. }` value in `( )`, because `{ .. }` all by itself is taken to be a statement block instead of an object.
 
 In fact, the assignment expressions (`a`, `y`, etc.) don't actually need to be just variable identifiers. Anything that's a valid assignment expression is valid. For example:
 
@@ -623,6 +623,19 @@ var o = {};
 console.log( o.a, o.b, o.c );		// 1 2 3
 console.log( o.x, o.y, o.z );		// 4 5 6
 ```
+
+You can even use computed property expressions in the destructuring. Consider:
+
+```js
+var which = "x",
+	o = {};
+
+({ [which]: o[which] }) = bar();
+
+console.log( o.x );					// 4
+```
+
+The `[which]:` part is the computed property, which results in `x` -- the property to destructure from the object in question as the source of the assignment. The `o[which]` part is just a normal object key reference, which equates to `o.x` as the target of the assignment.
 
 You can use the general assignments to create object mappings/transformations, such as:
 
@@ -833,7 +846,7 @@ function foo( { x, y } ) {
 	console.log( x, y );
 }
 
-foo( { y: 1, x: 2 } );				// 1 2
+foo( { y: 1, x: 2 } );				// 2 1
 foo( { y: 42 } );					// undefined 42
 foo( {} );							// undefined undefined
 ```
@@ -922,7 +935,7 @@ If that's still a bit fuzzy, go back and read it again, and play with this yours
 
 An interesting idiom emerges -- though it may be confusing to get used to -- for setting defaults for a nested object's properties, using object destructuring with what I'd call *restructuring*.
 
-Imagine a set of defaults in a nested object structure, like the following:
+Consider a set of defaults in a nested object structure, like the following:
 
 ```js
 // taken from: http://es-discourse.com/t/partial-default-arguments/120/7
@@ -1095,14 +1108,14 @@ var o = {
 While that convenience shorthand is quite attractive, there's a subtle gotcha to be aware of. To illustrate, let's examine pre-ES6 code like the following, which you might try to refactor to use concise methods:
 
 ```js
-function doSomething(o) {
+function runSomething(o) {
 	var x = Math.random(),
 		y = Math.random();
 
 	return o.something( x, y );
 }
 
-doSomething( {
+runSomething( {
 	something: function something(x,y){
 		if (x > y) {
 			// recursively call with `x`
@@ -1118,11 +1131,11 @@ doSomething( {
 This obviously silly code just generates two random numbers and subtracts the smaller from the bigger. But what it does isn't the important part, rather how it's defined. Let's focus on the object literal and function definition, as we see here:
 
 ```js
-{
+runSomething( {
 	something: function something(x,y) {
 		// ..
 	}
-}
+} );
 ```
 
 Why do we say both `something:` and `function something`? Isn't that redundant? Actually, no, both are needed for different purposes. The property `something` is how we can call `o.something(..)`, sort of like its public name. But the second `something` is a lexical name to refer to the function from inside itself, for recursion purposes.
@@ -1183,11 +1196,11 @@ More yuck.
 OK, what does all this have to do with concise methods? Recall our `something(..)` method definition:
 
 ```js
-{
+runSomething( {
 	something: function something(x,y) {
 		// ..
 	}
-}
+} );
 ```
 
 The second `something` here provides a super convenient lexical identifier that will always point to the function itself, giving us the perfect reference for recursion, event binding/unbinding, etc -- no messing around with `this` or trying to use an untrustable object reference.
@@ -1197,7 +1210,7 @@ Great!
 So, now we try to refactor that function reference to this ES6 concise method form:
 
 ```js
-{
+runSomething( {
 	something(x,y) {
 		if (x > y) {
 			return something( y, x );
@@ -1205,7 +1218,7 @@ So, now we try to refactor that function reference to this ES6 concise method fo
 
 		return y - x;
 	}
-}
+} );
 ```
 
 Seems fine at first glance, except this code will break. The `return something(..)` call will not find a `something` identifier, so you'll get a `ReferenceError`. Oops. But why?
@@ -1213,7 +1226,7 @@ Seems fine at first glance, except this code will break. The `return something(.
 The above ES6 snippet is interpreted as meaning:
 
 ```js
-{
+runSomething( {
 	something: function(x,y) {
 		if (x > y) {
 			return something( y, x );
@@ -1221,7 +1234,7 @@ The above ES6 snippet is interpreted as meaning:
 
 		return y - x;
 	}
-}
+} );
 ```
 
 Look closely. Do you see the problem? The concise method definition implies `something: function(x,y)`. See how the second `something` we were relying on has been omitted? In other words, concise methods imply anonymous function expressions.
@@ -1297,9 +1310,41 @@ var o2 = {
 
 `o2` is declared with a normal object literal, but it's also `[[Prototype]]`-linked to `o1`. The `__proto__` property name here can also be a string `"__proto__"`, but note that it *cannot* be the result of a computed property name (see the previous section).
 
-`__proto__` is controversial, to say the least. It's a decades-old proprietary extension to JS that is finally standardized, somewhat begrudgingly it seems, in ES6. Many developers feel it shouldn't ever be used.
+`__proto__` is controversial, to say the least. It's a decades-old proprietary extension to JS that is finally standardized, somewhat begrudgingly it seems, in ES6. Many developers feel it shouldn't ever be used. In fact, it's in "Annex B" of ES6, which is the section that lists things JS feels it has to standardize for compatibility reasons only.
 
-So, there's a slightly more verbose alternative to the previous snippet, which still lets you use the convenience of object literals:
+**Warning:** Though I'm narrowly endorsing `__proto__` as a key in an object literal definition, I definitely do not endorse using it in its object property form, like `o.__proto__`. That form is both a getter and setter (again for compat reasons), but there are definitely better options. See the *this & Object Prototypes* title of this series for more information.
+
+For setting the `[[Prototype]]` of an existing object, you can use the ES6 utility `Object.setPrototypeOf(..)`. Consider:
+
+```js
+var o1 = {
+	// ..
+};
+
+var o2 = Object.setPrototypeOf( {
+	// .. o2's definition ..
+}, o1 );
+```
+
+Alternatively:
+
+```js
+var o1 = {
+	// ..
+};
+
+var o2 = {
+	// ..
+};
+
+Object.setPrototypeOf( o2, o1 );
+```
+
+In both these cases, the relationship between `o2` and `o1` is moved from generally being specified at the top of the `o2` object literal definition to appearing at the end.
+
+I'd consider setting a `[[Prototype]]` right after object creation reasonable, as shown in the previous two snippets. But changing it much later is generally not a good idea, which I'd suggest will often lead to more confusion rather than clarity.
+
+There's another slightly more verbose alternative to the previous snippets, which still lets you use the convenience of object literals:
 
 ```js
 var o1 = {
@@ -1716,8 +1761,6 @@ Joining the `for` and `for..in` loops from the JavaScript we're all familiar wit
 
 The value you loop over with `for..of` must be an *iterable*, or it must be a value which can be coerced/boxed to an object (see the *Types & Grammar* title of this series) that is an iterable. An iterable is simply an object that is able to produce an iterator, which the loop then uses.
 
-**Note:** See "Iterators" in Chapter 3 for more complete coverage on iterables and iterators.
-
 Let's compare `for..of` to `for..in` to illustrate the difference:
 
 ```js
@@ -1769,7 +1812,7 @@ Standard built-in values in JavaScript that are by default iterables (or provide
 
 * arrays
 * strings
-* generators (see Chapter 4)
+* generators (see Chapter 3)
 * collections / TypedArrays (see Chapter 5)
 
 **Warning:** Plain objects are not by default suitable for `for..of` looping. That's because they don't have a default iterator, which is intentional, not a mistake. However, we won't go any further into those nuanced reasonings here. In "Iterators" in Chapter 3, we'll see how to define iterators for our own objects, which lets `for..of` loop over any object to get a set of values we define.
@@ -1800,6 +1843,8 @@ for ({x: o.a} of [ {x: 1}, {x: 2}, {x: 3} ]) {
 ```
 
 `for..of` loops can be prematurely stopped, just like other loops, with `break`, `continue`, `return` (if in a function), and thrown exceptions. In any of these cases, the iterator's `return(..)` function is automatically called (if one exists) to let the iterator perform cleanup tasks, if necessary.
+
+**Note:** See "Iterators" in Chapter 3 for more complete coverage on iterables and iterators.
 
 ## Regular Expressions
 
@@ -2372,13 +2417,13 @@ The internal value of a symbol itself -- referred to as its `name` -- is hidden 
 
 But if the value is hidden and unobtainable, what's the point of having a symbol at all?
 
-The main point of a symbol is to create a string-like value that can't collide with any other value. So, for example, imagine using a symbol as a constant representing an event name:
+The main point of a symbol is to create a string-like value that can't collide with any other value. So for example, consider using a symbol as a constant representing an event name:
 
 ```js
 const EVT_LOGIN = Symbol( "event.login" );
 ```
 
-You'd then use `EVT_LOGIN` in place of the generic string literal `"event.login"`:
+You'd then use `EVT_LOGIN` in place of a generic string literal like `"event.login"`:
 
 ```js
 evthub.listen( EVT_LOGIN, function(data){
@@ -2419,7 +2464,7 @@ It could alternately have been a plain old property like `__instance`, and the b
 
 ### Symbol Registry
 
-One mild downside to using symbols as in the few examples is that the `EVT_LOGIN` and `INSTANCE` variables had to be kept out in an outer scope (even the global), or otherwise somehow stored in a publicly available location, so that all parts of the code which need to use the symbols can access them.
+One mild downside to using symbols as in the last few examples is that the `EVT_LOGIN` and `INSTANCE` variables had to be stored in an outer scope (perhaps even the global scope), or otherwise somehow stored in a publicly available location, so that all parts of the code which need to use the symbols can access them.
 
 To aid in organizing code with access to these symbols, you can create symbol values with the *global symbol registry*. For example:
 
@@ -2451,7 +2496,7 @@ Ironically, symbols are basically intended to replace the use of *magic strings*
 
 To avoid accidental collisions, you'll probably want to make your symbol descriptions quite unique. One easy way of doing that is to include prefix/context/namespacing information in them.
 
-For example, imagine a utility like:
+For example, consider a utility like:
 
 ```js
 function extractValues(str) {
@@ -2521,13 +2566,11 @@ So it's clear that a property symbol is not actually hidden or inaccessible, as 
 
 #### Built-in Symbols
 
-ES6 comes with a number of predefined built-in symbols that expose various meta behaviors on JavaScript object values. As one might assume, these symbols are registered in the global symbol registry, with the `"Symbol."` prefix in the description text.
+ES6 comes with a number of predefined built-in symbols that expose various meta behaviors on JavaScript object values. However, these symbols are *not* registered in the global symbol registry, as one might expect.
 
-For convenience, they're also stored as properties on the `Symbol` function object. For example, in the "`for..of`" section earlier in this chapter, we introduced the `Symbol.iterator` value:
+Instead, they're stored as properties on the `Symbol` function object. For example, in the "`for..of`" section earlier in this chapter, we introduced the `Symbol.iterator` value:
 
 ```js
-Symbol.iterator === Symbol.for( "Symbol.iterator" );	// true
-
 var a = [1,2,3];
 
 a[Symbol.iterator];			// native function
@@ -2537,7 +2580,7 @@ The specification uses the `@@` prefix notation to refer to the built-in symbols
 
 ## Review
 
-ES6 adds a whole slew of new syntax forms to JavaScript, so there's plenty to learn!
+ES6 adds a heap of new syntax forms to JavaScript, so there's plenty to learn!
 
 Most of these are designed to ease the pain points of common programming idioms, such as setting default values to function parameters and gathering the "rest" of the parameters into an array. Destructuring is a powerful tool for more concisely expressing assignments of values from arrays and nested objects.
 
