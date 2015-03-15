@@ -1025,7 +1025,7 @@ When generators are viewed in light of these uses, they become a lot more than j
 
 ## Modules
 
-I don't think it's an exaggeration to suggest that the single most important code organization pattern in all of JavaScript is, and always has been, the module. For myself, and I think for a larg cross-section of the community, the module pattern drives the vast majority of code.
+I don't think it's an exaggeration to suggest that the single most important code organization pattern in all of JavaScript is, and always has been, the module. For myself, and I think for a large cross-section of the community, the module pattern drives the vast majority of code.
 
 ### The Old Way
 
