@@ -108,7 +108,7 @@ After almost a week of analysis/debugging, I found that the site in question had
 ```js
 // Netscape 4 doesn't have Array.push
 Array.prototype.push = function(item) {
-	this[this.length-1] = item;
+	this[this.length] = item;
 };
 ```
 
@@ -130,7 +130,7 @@ Next, don't unconditionally define extensions (because you can overwrite natives
 if (!Array.prototype.push) {
 	// Netscape 4 doesn't have Array.push
 	Array.prototype.push = function(item) {
-		this[this.length-1] = item;
+		this[this.length] = item;
 	};
 }
 ```
