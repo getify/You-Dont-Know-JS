@@ -1083,11 +1083,11 @@ Before we get into the specific syntax, it's important to understand some fairly
 
    Some uses are accustomed to being able to provide dynamic API definitions, where methods can be added/removed/replaced in response to run-time conditions. Either these uses will have to change to fit with ES6 static APIs, or they will have to restrain the dynamic changes to properties/methods of a second-level object.
 * ES6 modules are singletons. That is, there's only one instance of the module, which maintains its state. Every time you import that module into another module, you get a reference to the one centralized instance. If you want to be able to produce multiple module instances, your module will need to provide some sort of factory to do it.
-* The properties and methods you expose on a module's public API are not just normal assignments of values or references. They are actual bindings (almost like pointers) to the actual elements in your inner module definition.
+* The properties and methods you expose on a module's public API are not just normal assignments of values or references. They are actual bindings (almost like pointers) to the identifiers in your inner module definition.
 
-   In pre-ES6 modules, if you put a property on your public API that holds a primitive value like a number or string, that property assignment was by value-copy, and any internal update of a corresponding variable would be separate and not affect the copy on the API object.
+   In pre-ES6 modules, if you put a property on your public API that holds a primitive value like a number or string, that property assignment was by value-copy, and any internal update of a corresponding variable would be separate and not affect the public copy on the API object.
 
-   With ES6, if you export a local private variable, even if it currently holds a primitive string or number, you are actually exporting a binding/pointer to your actual variable, and if either your inner module code or the outer consumer of the API change that value, both sides will see the change.
+   With ES6, exporting a local private variable, even if it currently holds a primitive string/number/etc, exports a binding to to the variable. If the module changes the  variable's value, the external import binding now resolves to that new value.
 * Importing a module is the same thing as statically requesting it to load (if it hasn't already). If you're in a browser, that implies a blocking load over the network. If you're on a server (i.e., Node.js), it's a blocking load from the filesystem.
 
    However, don't panic about the performance implications. Because ES6 modules have static definitions, the import requirements can be statically scanned, and loads will happen preemptively, even before you've used the module.
@@ -1096,7 +1096,7 @@ Before we get into the specific syntax, it's important to understand some fairly
 
    You can define your own custom Loader if you want more fine-grained control than the default Loader affords -- which is basically none, since it's totally hidden from your program's code.
 
-As you can see, ES6 modules will serve the overall use-case of organizing code with encapsulation, controll public APIs, and dependency imports. But they have a very particular way of doing so, and that may or may not fit very closely with how you've already been doing modules for years.
+As you can see, ES6 modules will serve the overall use-case of organizing code with encapsulation, controlling public APIs, and referencing dependency imports. But they have a very particular way of doing so, and that may or may not fit very closely with how you've already been doing modules for years.
 
 #### CommonJS
 
