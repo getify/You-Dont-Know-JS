@@ -1120,7 +1120,7 @@ The two main new keywords that enable ES6 classes are `import` and `export`. I i
 
 #### `export`ing API Members
 
-The `export` keyword is either put in front of a declaration or expression, or used as an operator (of sorts) with a special list of bindings to export. Consider:
+The `export` keyword is either put in front of a declaration, or used as an operator (of sorts) with a special list of bindings to export. Consider:
 
 ```js
 export function foo() {
@@ -1131,14 +1131,26 @@ export var awesome = 42;
 
 var bar = [1,2,3];
 export { bar };
+```
 
-// or:
+Another way of expressing the same exports:
+
+```js
+function foo() {
+	// ..
+}
+
+var awesome = 42;
+var bar = [1,2,3];
+
 export { foo, awesome, bar };
 ```
 
 These are all called *named exports*, since you are in effect exporting the name bindings of the variables/functions/etc.
 
 Anything you don't *label* with `export` stays private inside the scope of the module. That is, even though something like `var bar = ..` looks like it's declaring at the top-level global scope, the top-level scope is actually the module itself; there is no global scope in modules.
+
+**Note:** Modules *do* still have access to `window` and all the "globals" that hang off it, just not as lexical top-level scope. However, you really should stay away from the globals in your modules if at all possible.
 
 You can also "rename" (aka alias) a module member during named export:
 
@@ -1150,9 +1162,9 @@ export { foo as bar };
 
 When this module is imported, only the `bar` member name is available to import; `foo` stays hidden inside the module.
 
-Module exports are not just normal assignments of values or references, as you're accustomed to with the `=` assignment operator. Actually, when you export something, you're creating a binding (almost like a pointer) to that thing (variable, etc) that you exported.
+Module exports are not just normal assignments of values or references, as you're accustomed to with the `=` assignment operator. Actually, when you export something, you're exporting a binding (kinda like a pointer) to that thing (variable, etc).
 
-That means that if you change the value inside your module of an variable you already bound for export, even if it's already been imported (see the next section), the binding will expose the new current value.
+That means that if you change the value inside your module of an variable you already exported a binding to, even if it's already been imported (see the next section), the imported binding will resolve to the current value.
 
 Consider:
 
@@ -1164,11 +1176,11 @@ export { awesome };
 awesome = 100;
 ```
 
-When this module is imported, regardless of before or after the `awesome = 100` setting, once that setting has happened, the imported binding is then seeing the `100` value, not `42`. That's because the binding is in essence a reference to, or a pointer to, the `awesome` variable itself, rather than a copy of its value.
+When this module is imported, regardless of before or after the `awesome = 100` setting, once that assignment has happened, the imported binding the resolves the `100` value, not `42`.
 
-This is a farily new and unprecendented concept for JS introduced with ES6 module bindings.
+That's because the binding is in essence a reference to, or a pointer to, the `awesome` variable itself, rather than a copy of its value. This is a mostly unprecedented concept for JS introduced with ES6 module bindings.
 
-Though you can clearly use `export` multiple times inside a module's definition, ES6 definitely prefers the idiom that a module has a single export, which is known as a *default export*. In the words of some members of the TC39 committee, you're "rewarded with simpler `import` syntax" if you follow that pattern, and conversely need more verbose syntax if you don't.
+Though you can clearly use `export` multiple times inside a module's definition, ES6 definitely prefers the approach that a module has a single export, which is known as a *default export*. In the words of some members of the TC39 committee, you're "rewarded with simpler `import` syntax" if you follow that pattern, and conversely need more verbose syntax if you don't.
 
 A default export sets a particular exported binding to be the default when importing the module. The name of the binding is literally `default`. As you'll see later, when importing module bindings you can also rename them, as you commonly will with a default export.
 
@@ -1204,9 +1216,9 @@ export default function foo(..) {
 }
 ```
 
-**Warning:** Even though the `function foo..` part here is technically a function expression, for the purposes of the internal scope of the module, it's treated like a function declaration, in that the `foo` name is bound in the module's inner scope. The same is true if you do `export default class Foo..`. However, while you *can* do `export var foo = ..`, you currently cannot do `export default var foo = ..` (or `let` or `const`), in a frustrating case of inconsistency. There's already talk of adding that capability in soon, post-ES6, for consistency sake.
+**Warning:** Even though the `function foo..` part here is technically a function expression, for the purposes of the internal scope of the module, it's treated like a function declaration, in that the `foo` name is bound in the module's top-level scope (often called "hoisting"). The same is true for `export default class Foo..`. However, while you *can* do `export var foo = ..`, you currently cannot do `export default var foo = ..` (or `let` or `const`), in a frustrating case of inconsistency. At the time of this writing, there's already discussion of adding that capability in soon, post-ES6, for consistency sake.
 
-Now, the second snippet again:
+Recall the second snippet again:
 
 ```js
 function foo(..) {
@@ -1220,7 +1232,7 @@ In this version of the module export, the default export binding is actually to 
 
 Be very careful of this subtle gotcha in default export syntax, especially if your logic calls for export values to be updated. If you never plan to update a default export's value, `export default ..` is fine. If you do plan to update the value, you must use `export { .. as default }`. Either way, make sure to comment your code to explain your intent!
 
-Since there can only be one `default` per module, you may be tempted to design your module with one default export of  an object with all your API methods on it, such as:
+Since there can only be one `default` per module, you may be tempted to design your module with one default export of a plain object with all your API methods on it, such as:
 
 ```js
 export default {
@@ -1243,7 +1255,6 @@ export default function foo() { .. }
 
 foo.bar = function() { .. };
 foo.baz = function() { .. };
-..
 ```
 
 You can do:
@@ -1255,13 +1266,23 @@ export function bar() { .. }
 export function baz() { .. }
 ```
 
-**Note:** In this previous snippet, I used the name `foo` for the function that `default` labels. That `foo` name however is ignored for the purposes of export -- `default` is actually the name. When you import this default binding, you can give it whatever name you want, as you'll see in the next section.
+**Note:** In this previous snippet, I used the name `foo` for the function that `default` labels. That `foo` name however is ignored for the purposes of export -- `default` is actually the exported name. When you import this default binding, you can give it whatever name you want, as you'll see in the next section.
 
-The effects of this particular module export pattern will be more clear when we cover `import` shortly. But essentially it means that the concise default import would only retrieve that `foo()` function. The user could additionally manually list `bar` and `baz` as named imports, if they want them.
+Alternatively, some will prefer:
 
-You can probably imagine how tedious that's going to be for consumers of your module if you have lots of named export bindings. There is a wildcard import form where you import all of a module's exports to a single namespace, but there's no way to wildcard import to top-level bindings.
+```js
+function foo() { .. }
+function bar() { .. }
+function baz() { .. }
 
-Again, the ES6 module mechanism is intentionally designed to discourage such module design; it's desired that such approaches be relatively a little more difficult, as a sort of social engineering to encourage simple module design in favor of large/complex module design.
+export { foo as default, bar, baz, .. };
+```
+
+The effects of mixing default and named exports will be more clear when we cover `import` shortly. But essentially it means that the most concise default import form would only retrieve the `foo()` function. The user could additionally manually list `bar` and `baz` as named imports, if they want them.
+
+You can probably imagine how tedious that's going to be for consumers of your module if you have lots of named export bindings. There is a wildcard import form where you import all of a module's exports within a single namespace object, but there's no way to wildcard import to top-level bindings.
+
+Again, the ES6 module mechanism is intentionally designed to discourage modules with lots of exports; it's desired that such approaches be relatively a little more difficult, as a sort of social engineering to encourage simple module design in favor of large/complex module design.
 
 I would probably recommend you not mix default export with named exports, especially if you have a large API and refactoring to separate modules isn't practical or desired. In that case, just use all named exports, and document that consumers of your module should probably use the `import * as ..` (namespace import, discussed in the next section) approach to bring the whole API in at once on a single namespace.
 
@@ -1277,9 +1298,9 @@ foo = 10;
 bar = "cool";
 ```
 
-When you import this module, the `default` and `bar` exports will be pointing to the local variables `foo` and `bar`, meaning they will reveal the updated `10` and `"cool"` values. The values at time of export are irrelevant. The values at time of import are irrelevant. The bindings are live links, so all that matters is what the current value is when you access the binding.
+When you import this module, the `default` and `bar` exports will be bound to the local variables `foo` and `bar`, meaning they will reveal the updated `10` and `"cool"` values. The values at time of export are irrelevant. The values at time of import are irrelevant. The bindings are live links, so all that matters is what the current value is when you access the binding.
 
-**Warning:** These bindings are not allowed to be 2-way! If you import a `foo` from a module, and try to change the value of your imported `foo` variable, an error will be thrown! We'll revisit that in the next section.
+**Warning:** These bindings are not allowed to be 2-way. If you import a `foo` from a module, and try to change the value of your imported `foo` variable, an error will be thrown! We'll revisit that in the next section.
 
 You can also re-export another module's exports, such as:
 
@@ -1295,7 +1316,7 @@ Those forms are similar to just first importing from the `"baz"` module then lis
 
 To import a module, unsurprisingly you use the `import` statement. Just as `export` has several nuanced variations, so does `import`, so spend plenty of time considering the following issues and experimenting with your options.
 
-If you want to import certain specific named members of a module's API into your top-level scope namespace, you use this syntax:
+If you want to import certain specific named members of a module's API into your top-level scope, you use this syntax:
 
 ```js
 import { foo, bar, baz } from "foo";
@@ -1305,7 +1326,7 @@ import { foo, bar, baz } from "foo";
 
 The `"foo"` string is called a *module specifier*. Because the whole goal is statically analyzable syntax, the module specifier must be a string literal; it cannot be a variable holding the string value.
 
-From the perspective of your ES6 code and the JS engine itself, the contents of this string literal are completely opaque and meaningless. The module loader will interpret this string as an instruction on where to find the desired module, either as a URL path or a local filesystem path.
+From the perspective of your ES6 code and the JS engine itself, the contents of this string literal are completely opaque and meaningless. The module loader will interpret this string as an instruction of where to find the desired module, either as a URL path or a local filesystem path.
 
 The `foo`, `bar`, and `baz` identifiers listed must match named exports on the module's API (static analysis and error assertion apply). They are bound as top-level identifiers in your current scope:
 
@@ -1323,7 +1344,7 @@ import { foo as theFooFunc } from "foo";
 theFooFunc();
 ```
 
-If the module has just a default export that you want to import and bind to an identifier, you can opt to skip the `{ .. }` surrounding syntax for that binding. The `import` in this preferred case gets the nicest and most concise of syntaxes:
+If the module has just a default export that you want to import and bind to an identifier, you can opt to skip the `{ .. }` surrounding syntax for that binding. The `import` in this preferred case gets the nicest and most concise of the `import` syntax forms:
 
 ```js
 import foo from "foo";
@@ -1332,7 +1353,7 @@ import foo from "foo";
 import { default as foo } from "foo";
 ```
 
-**Note:** Essentially, the `default` keyword in a module's `export` specifies a named export where the name is exactly `default`, as is illustrated by the second more verbose syntax option. The renaming from `default` to, in this case, `foo`, is explicit in the latter syntax but is identical yet implicit in the former syntax.
+**Note:** As explained in the previous section, the `default` keyword in a module's `export` specifies a named export where the name is actually `default`, as is illustrated by the second more verbose syntax option. The renaming from `default` to, in this case, `foo`, is explicit in the latter syntax and is identical yet implicit in the former syntax.
 
 You can also import a default export along with other named exports, if the module has such a definition. Recall this module definition from earlier:
 
@@ -1353,9 +1374,9 @@ bar();
 BAZ();
 ```
 
-The strongly suggested approach from ES6's module philosophy is that you only import the specific bindings from a module that you need. If a module provides 10 API methods, but you only need two of them, it's perhaps thought of as wasteful to bring in the entire set of API bindings.
+The strongly suggested approach from ES6's module philosophy is that you only import the specific bindings from a module that you need. If a module provides 10 API methods, but you only need two of them, some believe it wasteful to bring in the entire set of API bindings.
 
-One benefit, besides code being more explicit, is that it makes static analysis and error detection (accidentally using the wrong binding name, for instance) more robust.
+One benefit, besides code being more explicit, is that narrow imports makes static analysis and error detection (accidentally using the wrong binding name, for instance) more robust.
 
 Of course, that's just the standard position influenced by ES6 design philosophy; there's nothing that requires adherence to that approach.
 
@@ -1426,7 +1447,19 @@ Moreover, though a module *can* change its API members from the inside, you shou
 
 **Warning:** There are module design philosophies where you actually intend to let a consumer change the value of a property on your API, or module APIs are designed to be "extended" by having other "plugins" add to the API namespace. As we just asserted, ES6 module APIs should be thought of and designed as static and unchangeable, which strongly restricts and discourages these alternate module design patterns. You can get around these limitations by exporting a plain object, which of course can then be changed at will. But be careful and think twice before going down that road.
 
+Finally, the most basic form of the `import` looks like this:
 
+```js
+import "foo";
+```
+
+This form does not actually import any of the module's bindings into your scope. It loads (if not already loaded), compiles (if not already compiled), and evaluates (if not already run) the `"foo"` module.
+
+In general, that sort of import is probably not going to be terribly useful. There may be niche cases where a module's definition has side effects (such as assigning things to the `window`/global object). You could also envision using `import "foo"` as a sort of preload for a module that may be needed later.
+
+### Module Loader
+
+// TODO
 
 ## Classes
 
