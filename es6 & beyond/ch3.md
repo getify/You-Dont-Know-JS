@@ -1457,6 +1457,73 @@ This form does not actually import any of the module's bindings into your scope.
 
 In general, that sort of import is probably not going to be terribly useful. There may be niche cases where a module's definition has side effects (such as assigning things to the `window`/global object). You could also envision using `import "foo"` as a sort of preload for a module that may be needed later.
 
+### Circular Module Dependency
+
+A imports B. B imports A. How does this actually work?
+
+I'll state off the bat that designing systems with intentional circular dependency is generally something I try to avoid. That having been said, I recognize there are reasons people do this and it can solve some sticky design situations.
+
+Let's consider how ES6 handles this. First, module `"A"`:
+
+```js
+import bar from "B";
+
+export default function foo(x) {
+	if (x > 10) return bar( x - 1 );
+	return x * 2;
+}
+```
+
+Now, module `"B"`:
+
+```js
+import foo from "A";
+
+export default function bar(y) {
+	if (y > 5) return foo( y / 2 );
+	return y * 3;
+}
+```
+
+These two functions, `foo(..)` and `bar(..)`, would work as standard function declarations if they were in the same scope, since the declarations are "hoisted" to the whole scope and thus available to each other regardless of authoring order.
+
+With modules, you have declarations in entirely different scopes, so ES6 has to do extra work to help make these circular references work.
+
+In a rough conceptual sense, this is how circular `import` dependencies are validated and resolved:
+
+* If the `"A"` module is loaded first, the first step is to scan the file and analyze all the exports, so it can register all those bindings available for import. Then it processes the `import .. from "B"`, which signals that it needs to go fetch `"B"`.
+* Once the engine loads `"B"`, it does the same analysis of its export bindings. When it sees the `import .. from "A"`, it knows the API of `"A"` already, so it can verify the `import` is valid. Now that it knows the `"B"` API, it can also validate the `import .. from "B"` in the waiting `"A"` module.
+
+In essence, the mutual imports, along with the static verification that's done to validate both `import` statements, virtually composes the two separate module scopes (via the bindings), such that `foo(..)` can call `bar(..)` and vice versa. This is symmetric to if they had originally been declared in the same scope.
+
+Now let's try using the two modules together. First, we'll try `foo(..)`:
+
+```js
+import foo from "foo";
+foo( 25 );				// 11
+```
+
+Or we can try `bar(..)`:
+
+```js
+import bar from "bar";
+bar( 25 );				// 11.5
+```
+
+By the time either the `foo(25)` or `bar(25)` calls are executed, all the analysis/compilation of all modules has completed. That means `foo(..)` internally knows directly about `bar(..)` and `bar(..)` interanlly knows directly about `foo(..)`.
+
+If all we need is to interact with `foo(..)`, then we only need to import the `"foo"` module. Likewise with `bar(..)` and the `"bar"` module.
+
+Of course, we *can* import and use both of them if we want to:
+
+```js
+import foo from "foo";
+import bar from "bar";
+
+foo( 25 );				// 11
+bar( 25 );				// 11.5
+```
+
 ### Module Loader
 
 // TODO
