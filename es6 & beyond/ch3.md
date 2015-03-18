@@ -1524,6 +1524,8 @@ foo( 25 );				// 11
 bar( 25 );				// 11.5
 ```
 
+The static loading semantics of the `import` statement mean that a `"foo"` and `"bar"` which mutually depend on each other via `import` will ensure that both are loaded, parsed, and compiled before either of them runs. So their circular dependency is statically resolved and this work as you'd expect.
+
 ### Module Loader
 
 // TODO
