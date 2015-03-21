@@ -1440,11 +1440,23 @@ hello.baz = 42;		// (runtime) TypeError!
 
 Recall earlier in the "`export`ing API Members" section that we talked about how the `bar` and `baz` bindings are bound to the actual identifiers inside the `"world"` module. That means if the module changes those values, `hello.bar` and `hello.baz` now reference the updated values.
 
-But the immutable/read-only nature of your local imported bindings enforces that you cannot change them from the importing code, hence the `TypeError`s. That's pretty important, because without those protections, your changes would end up affecting all other consumers of the module (remember: singleton), which could create some very surprising side-effects.
+But the immutable/read-only nature of your local imported bindings enforces that you cannot change them from the imported bindings, hence the `TypeError`s. That's pretty important, because without those protections, your changes would end up affecting all other consumers of the module (remember: singleton), which could create some very surprising side-effects!
 
 Moreover, though a module *can* change its API members from the inside, you should be very cautious of intentionally designing your modules in that fashion. ES6 modules are *supposed to be* static, so deviations from that principle should be rare and should be carefully and verbosely documented.
 
 **Warning:** There are module design philosophies where you actually intend to let a consumer change the value of a property on your API, or module APIs are designed to be "extended" by having other "plugins" add to the API namespace. As we just asserted, ES6 module APIs should be thought of and designed as static and unchangeable, which strongly restricts and discourages these alternate module design patterns. You can get around these limitations by exporting a plain object, which of course can then be changed at will. But be careful and think twice before going down that road.
+
+From inside a module, you can access its own metadata information using the `this module` target in place of a string module specifier:
+
+```js
+import { url as moduleURL } from this module;
+import * as meta from this module;
+
+console.log( moduleURL );	// ..
+
+console.log( meta.url );	// ..
+console.log( meta.name );	// ..
+```
 
 Finally, the most basic form of the `import` looks like this:
 
@@ -1525,13 +1537,15 @@ bar( 25 );				// 11.5
 
 The static loading semantics of the `import` statement mean that a `"foo"` and `"bar"` which mutually depend on each other via `import` will ensure that both are loaded, parsed, and compiled before either of them runs. So their circular dependency is statically resolved and this works as you'd expect.
 
-### Module Loader
+### Module Loading
 
-We asserted at the beginning of this "Modules" section that the `import` statement uses a separate mechanism, provided by the hosting environment (browser, Node.js, etc.) to actually resolve the module specifier string into some useful instruction for finding and loading the desired module. That process is handled by a *Module Loader*.
+We asserted at the beginning of this "Modules" section that the `import` statement uses a separate mechanism, provided by the hosting environment (browser, Node.js, etc.), to actually resolve the module specifier string into some useful instruction for finding and loading the desired module. That mechanism is the system *Module Loader*.
 
 The default module loader provided by the environment will interpret a module specifier as a URL if in the browser, and (generally) as a local file system path if on a server such as Node.js. The default behavior is to assume the loaded file is authored in the ES6 standard module format.
 
 For the vast majority of users and uses, the default loader will be sufficient.
+
+The module loader is not specified by ES6. It is a separate, parallel standard (http://whatwg.github.io/loader/) controlled by the WHATWG browser standards group. At the time of this writing, the following is the expected API design, but of course things are subject to change.
 
 #### Loading Modules Outside Of Modules
 
@@ -1544,11 +1558,13 @@ One use for the module loader is if your main program (non-module) needs to load
 System.import( "foo" )
 // returns a promise
 .then( function(foo){
-
+	foo.bar();
 } );
-
 ```
 
+The `System.import(..)` utility imports the entire module into the named parameter as a namespace, just like the `import * as foo ..` namespace import we discussed earlier.
+
+**Note:** The `System.import(..)` utility returns a promise that is fulfilled once the module is ready. To import multiple modules, you can compose promises from multiple `System.import(..)` calls using `Promise.all([ .. ])`. For more information about promises, see "Promises" in Chapter 4.
 
 #### Customized Loading
 
