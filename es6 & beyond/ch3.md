@@ -1446,18 +1446,6 @@ Moreover, though a module *can* change its API members from the inside, you shou
 
 **Warning:** There are module design philosophies where you actually intend to let a consumer change the value of a property on your API, or module APIs are designed to be "extended" by having other "plugins" add to the API namespace. As we just asserted, ES6 module APIs should be thought of and designed as static and unchangeable, which strongly restricts and discourages these alternate module design patterns. You can get around these limitations by exporting a plain object, which of course can then be changed at will. But be careful and think twice before going down that road.
 
-From inside a module, you can access its own metadata information using the `this module` target in place of a string module specifier:
-
-```js
-import { url as moduleURL } from this module;
-import * as meta from this module;
-
-console.log( moduleURL );	// ..
-
-console.log( meta.url );	// ..
-console.log( meta.name );	// ..
-```
-
 Finally, the most basic form of the `import` looks like this:
 
 ```js
