@@ -1432,11 +1432,10 @@ All imported bindings are immutable and/or read-only. Consider the previous impo
 ```js
 import foofn, * as hello from "world";
 
-foofn = 42;			// static (compile-time) TypeError!
-
-hello.default = 42;	// dynamic (runtime) TypeError!
-hello.bar = 42;		// dynamic (runtime) TypeError!
-hello.baz = 42;		// dynamic (runtime) TypeError!
+foofn = 42;			// (runtime) TypeError!
+hello.default = 42;	// (runtime) TypeError!
+hello.bar = 42;		// (runtime) TypeError!
+hello.baz = 42;		// (runtime) TypeError!
 ```
 
 Recall earlier in the "`export`ing API Members" section that we talked about how the `bar` and `baz` bindings are bound to the actual identifiers inside the `"world"` module. That means if the module changes those values, `hello.bar` and `hello.baz` now reference the updated values.
@@ -1524,11 +1523,36 @@ foo( 25 );				// 11
 bar( 25 );				// 11.5
 ```
 
-The static loading semantics of the `import` statement mean that a `"foo"` and `"bar"` which mutually depend on each other via `import` will ensure that both are loaded, parsed, and compiled before either of them runs. So their circular dependency is statically resolved and this work as you'd expect.
+The static loading semantics of the `import` statement mean that a `"foo"` and `"bar"` which mutually depend on each other via `import` will ensure that both are loaded, parsed, and compiled before either of them runs. So their circular dependency is statically resolved and this works as you'd expect.
 
 ### Module Loader
 
-// TODO
+We asserted at the beginning of this "Modules" section that the `import` statement uses a separate mechanism, provided by the hosting environment (browser, Node.js, etc.) to actually resolve the module specifier string into some useful instruction for finding and loading the desired module. That process is handled by a *Module Loader*.
+
+The default module loader provided by the environment will interpret a module specifier as a URL if in the browser, and (generally) as a local file system path if on a server such as Node.js. The default behavior is to assume the loaded file is authored in the ES6 standard module format.
+
+For the vast majority of users and uses, the default loader will be sufficient.
+
+#### Loading Modules Outside Of Modules
+
+One use for the module loader is if your main program (non-module) needs to load a module. Consider:
+
+```js
+// normal script loaded in browser via `<script>`
+// `import` is illegal here
+
+System.import( "foo" )
+// returns a promise
+.then( function(foo){
+
+} );
+
+```
+
+
+#### Customized Loading
+
+Another use for the module loader is if you want to customize its behavior through configuration or even redefinition.
 
 ## Classes
 
