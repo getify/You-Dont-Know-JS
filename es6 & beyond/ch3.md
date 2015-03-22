@@ -1531,32 +1531,54 @@ We asserted at the beginning of this "Modules" section that the `import` stateme
 
 The default module loader provided by the environment will interpret a module specifier as a URL if in the browser, and (generally) as a local file system path if on a server such as Node.js. The default behavior is to assume the loaded file is authored in the ES6 standard module format.
 
-For the vast majority of users and uses, the default loader will be sufficient.
+Moreover, you will be able to load a module into the browser via an HTML tag, similar to how current script programs are loaded. At the time of this writing, it's not fully clear if this tag will be `<script type="module">` or `<module>`. ES6 doesn't control that decision, but discussions in the appropriate standards bodies are already well along in parallel of ES6.
 
-The module loader is not specified by ES6. It is a separate, parallel standard (http://whatwg.github.io/loader/) controlled by the WHATWG browser standards group. At the time of this writing, the following is the expected API design, but of course things are subject to change.
+Whatever the tag looks like, you can be sure that under the covers it will use the default loader (or a customized one you've pre-specified -- see below).
+
+Just like the tag you'll use in markup, the module loader itself is not specified by ES6. It is a separate, parallel standard (http://whatwg.github.io/loader/) controlled currently by the WHATWG browser standards group.
+
+At the time of this writing, the following discussions reflect the expected API design, but of course things are subject to change.
 
 #### Loading Modules Outside Of Modules
 
-One use for the module loader is if your main program (non-module) needs to load a module. Consider:
+One use for interacting directly with the module loader is if a non-module needs to load a module. Consider:
 
 ```js
-// normal script loaded in browser via `<script>`
+// normal script loaded in browser via `<script>`,
 // `import` is illegal here
 
-System.import( "foo" )
-// returns a promise
+System.import( "foo" ) // returns a promise for `"foo"`
 .then( function(foo){
 	foo.bar();
 } );
 ```
 
-The `System.import(..)` utility imports the entire module into the named parameter as a namespace, just like the `import * as foo ..` namespace import we discussed earlier.
+The `System.import(..)` utility imports the entire module onto the named parameter (as a namespace), just like the `import * as foo ..` namespace import we discussed earlier.
 
 **Note:** The `System.import(..)` utility returns a promise that is fulfilled once the module is ready. To import multiple modules, you can compose promises from multiple `System.import(..)` calls using `Promise.all([ .. ])`. For more information about promises, see "Promises" in Chapter 4.
 
+You can also use `System.import(..)` in a real module to dynamically/conditionally load a module, where `import` itself would not work. You might for instance choose to load a module containing a polyfill for some ES7+ feature if a feature test reveals it's not defined by the current engine.
+
+For performance reasons, you'll want to avoid dynamic loading whenever possible, as it hampers the ability of the JS engine to fire off early fetches from its static analysis.
+
 #### Customized Loading
 
-Another use for the module loader is if you want to customize its behavior through configuration or even redefinition.
+Another use for directly interacting with the module loader is if you want to customize its behavior through configuration or even redefinition.
+
+At the time of this writing, there's a polyfill for the module loader API being developed (https://github.com/ModuleLoader/es6-module-loader). While details are scarce and highly subject to change, we can take a glimpse at what possibilities may eventually land.
+
+The `System.import(..)` call may support a second argument for specifying various options to customize the import/load task. For example:
+
+```js
+System.import( "foo", { address: "/path/to/foo.js" } )
+.then( function(foo){
+	// ..
+} )
+```
+
+It's also expected that a customization will be provided (through some means) for hooking into the process of loading a module, where a translation/transpilation could occur after load but before the engine compiles the module.
+
+For example, you could load something that's not already an ES6-compliant module format (e.g., CoffeeScript, TypeScript, CommonJS, AMD). Your translation step could then convert it to an ES6-compliant module for the engine to then process.
 
 ## Classes
 
