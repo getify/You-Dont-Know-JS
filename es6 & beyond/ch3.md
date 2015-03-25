@@ -1423,7 +1423,7 @@ hello.bar();
 hello.baz();
 ```
 
-While this syntax is valid, it can be rather confusing that one method of the module (the default export) is bound at the top-level of your scope, whereas the rest of the named exports (and one called `default`) are bound as properties on a differently names (`hello`) identifier namespace.
+While this syntax is valid, it can be rather confusing that one method of the module (the default export) is bound at the top-level of your scope, whereas the rest of the named exports (and one called `default`) are bound as properties on a differently named (`hello`) identifier namespace.
 
 As I mentioned earlier, my suggestion would be to avoid designing your module exports in this way, to reduce the chances that your module's users will suffer these strange quirks.
 
@@ -1445,6 +1445,16 @@ But the immutable/read-only nature of your local imported bindings enforces that
 Moreover, though a module *can* change its API members from the inside, you should be very cautious of intentionally designing your modules in that fashion. ES6 modules are *supposed to be* static, so deviations from that principle should be rare and should be carefully and verbosely documented.
 
 **Warning:** There are module design philosophies where you actually intend to let a consumer change the value of a property on your API, or module APIs are designed to be "extended" by having other "plugins" add to the API namespace. As we just asserted, ES6 module APIs should be thought of and designed as static and unchangeable, which strongly restricts and discourages these alternate module design patterns. You can get around these limitations by exporting a plain object, which of course can then be changed at will. But be careful and think twice before going down that road.
+
+Declarations that occur as a result of an `import` are "hoisted" (see the *Scope & Closures* title of this series). Consider:
+
+```js
+foo();
+
+import { foo } from "foo";
+```
+
+`foo()` can run because not only did the static resolution of the `import ..` statement figure out what `foo` is during compilation, but it also "hoisted" the declaration to the top of the module's scope so it's available throughout the module.
 
 Finally, the most basic form of the `import` looks like this:
 
