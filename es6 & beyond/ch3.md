@@ -1827,6 +1827,36 @@ The `ouch` custom error object in this previous snippet will behave like any oth
 
 ### `new.target`
 
+ES6 introduces a new concept called a "metaproperty", in the form of `new.target`. If that looks strange, it is; pairing a keyword with a `.` and a property name is definitely out of the ordinary pattern for JS.
+
+`new.target` is a new "magical" value available in all functions, though in normal functions it will always be `null`. In any constructor, `new.target` always points at the constructor `new` directly invoked, even if the constructor is in a parent class and was delegated to by a `super(..)` call from a child constructor. Consider:
+
+```js
+class Foo {
+	constructor() {
+		console.log( "Foo: ", new.target.name );
+	}
+}
+
+class Bar extends Foo {
+	constructor() {
+		super();
+		console.log( "Bar: ", new.target.name );
+	}
+}
+
+var a = new Foo();
+// Foo: Foo
+
+var b = new Bar();
+// Foo: Bar
+// Bar: Bar
+```
+
+The `new.target` metaproperty doesn't seem to have much purpose in class constructors, except if you needed to access a static property/method (see the next section). In a regular function call, if it's `null`, you can tell the function wasn't called with `new`, which could be useful for forcing a `new` construction in the case of non-`new` invocation.
+
+### `static`
+
 // TODO
 
 ## Review
