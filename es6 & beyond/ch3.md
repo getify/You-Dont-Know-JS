@@ -1679,7 +1679,7 @@ Some things to note:
 
 * `class Foo` implies creating a (special) function of the name `Foo`, much like you did pre-ES6.
 * `constructor(..)` identifies the signature of that `Foo(..)` function, as well as its body contents.
-* Class methods use the same "concise method" syntax available to object literals, as discussed in Chapter 2. This also includes the concise generator form as discussed earlier in this chapter.
+* Class methods use the same "concise method" syntax available to object literals, as discussed in Chapter 2. This also includes the concise generator form as discussed earlier in this chapter, as well as the ES5 getter/setter syntax.
 * Unlike object literals, there are no commas separating members in a `class` body! In fact, they're not even allowed.
 
 The `class` syntax definition in the previous snippet can be roughly thought of as this pre-ES6 equivalent, which probably will look fairly familiar to those who've done prototype-style coding before:
@@ -1723,7 +1723,7 @@ class Bar extends Foo {
 	}
 }
 
-var b = new Bar(5,15,25);
+var b = new Bar( 5, 15, 25 );
 
 b.x;						// 5
 b.y;						// 15
@@ -1735,7 +1735,7 @@ A significant new addition is `super`, which is actually something not directly 
 
 `Bar extends Foo` of course means to link the `[[Prototype]]` of `Bar.prototype` to `Foo.prototype`. So, `super` in a method like `gimmeXYZ()` specifically means `Foo.prototype`, whereas `super` means `Foo` when used in the `Bar` constructor.
 
-**Note:** `super` is not limited to `class` declarations. It also works in object literals, in much the same way we're discussing here.
+**Note:** `super` is not limited to `class` declarations. It also works in object literals, in much the same way we're discussing here. See "Object `super`" in Chapter 2 for more information.
 
 #### There Be `super` Dragons
 
@@ -1941,6 +1941,53 @@ b.answer;					// undefined -- `answer` is static on `Foo`
 ```
 
 Be careful not to get confused that `static` members are on the class's prototype chain. They're actually on the dual/parallel chain between the function constructors.
+
+#### `Symbol.species` Constructor Getter
+
+One place where `static` can be useful is in setting the `Symbol.species` getter for a derived (child) class. This capability allows a child class to signal to a parent class what constructor should be used -- when not intending the child class's constructor itself -- if any parent class method needs to vend a new instance.
+
+For example, many methods on `Array` create and return a new `Array` instance. If you define a derived class from `Array`, but you want those methods to continue to vend actual `Array` instances instead of your derived class, this works:
+
+```js
+class MyCoolArray extends Array {
+	// force `species` to be parent constructor
+	static get [Symbol.species]() { return Array; }
+}
+
+var a = new MyCoolArray( 1, 2, 3 ),
+	b = a.map( function(v){ return v * 2; } );
+
+b instanceof MyCoolArray;	// false
+b instanceof Array;			// true
+```
+
+To illustrate how a parent class method can use a child's species declaration somewhat like `Array#map(..)` is doing, consider:
+
+```js
+class Foo {
+	// `return this` defers `species` to derived constructor
+	static get [Symbol.species]() { return this; }
+	spawn() {
+		return new this.constructor[Symbol.species]();
+	}
+}
+
+class Bar extends Foo {
+	// force `species` to be parent constructor
+	static get [Symbol.species]() { return Foo; }
+}
+
+var a = new Foo();
+var b = a.spawn();
+b instanceof Foo;					// true
+
+var x = new Bar();
+var y = x.spawn();
+y instanceof Bar;					// false
+y instanceof Foo;					// true
+```
+
+The parent class `Symbol.species` does `return this` to defer to any derived class, as you'd normally expect. `Bar` then overrides to manually declare `Foo` to be used for such instance creation. Of course, a derived class can still vend instances of itself using `new this.constructor(..)`.
 
 ## Review
 
