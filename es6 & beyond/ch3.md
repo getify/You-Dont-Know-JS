@@ -355,13 +355,57 @@ for (var i of 3) {
 [...-3];				// [0,-1,-2,-3]
 ```
 
-Those are some fun tricks, though the practical utility is somewhat debatable. But then again, one might wonder why ES6 didn't just ship with such a minor feature easter egg!?
+Those are some fun tricks, though the practical utility is somewhat debatable. But then again, one might wonder why ES6 didn't just ship with such a minor but delightful feature easter egg!?
 
 I'd be remiss if I didn't at least remind you that extending native prototypes as I'm doing in the previous snippet is something you should only do with caution and awareness of potential hazards.
 
 In this case, the chances that you'll have a collision with other code or even a future JS feature is probably exceedingly low. But just beware of the slight possibility. And document what you're doing verbosely for posterity sake.
 
 **Note:** I've expounded on this particular technique in this blog post (http://blog.getify.com/iterating-es6-numbers/) if you want more details. And this comment (http://blog.getify.com/iterating-es6-numbers/comment-page-1/#comment-535294) even suggests a similar trick but for making string character ranges.
+
+### Iterator Consumption
+
+We've already shown consuming an iterator item-by-item with the `for..of` loop. But there are other ES6 structures which can consume iterators.
+
+Let's consider the iterator attached to this array (though any iterator we choose would have the following behaviors):
+
+```js
+var a = [1,2,3,4,5];
+```
+
+The `...` spread operator fully exhausts an iterator. Consider:
+
+```js
+function foo(x,y,z,w,p) {
+	console.log( x + y + z + w + p );
+}
+
+foo( ...a );			// 15
+```
+
+`...` can also spread an iterator inside an array:
+
+```js
+var b = [ 0, ...a, 6 ];
+b;						// [0,1,2,3,4,5,6]
+```
+
+Array destructuring (see "Destructuring" in Chapter 2) can partially or completely (if paired with a `...` rest/gather operator) consume an iterator:
+
+```js
+var it = a[Symbol.iterator]();
+
+var [x,y] = it;			// take just the first two elements from `it`
+var [z, ...w] = it;		// take the third, then the rest all at once
+
+// is `it` is fully exhausted? Yep.
+it.next();				// { value: undefined, done: true }
+
+x;						// 1
+y;						// 2
+z;						// 3
+w;						// [4,5]
+```
 
 ## Generators
 
