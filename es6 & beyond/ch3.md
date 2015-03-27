@@ -390,14 +390,26 @@ The position of the `*` is not functionally relevant. The same declaration could
 ```js
 function *foo()  { .. }
 function* foo()  { .. }
-function*foo()   { .. }
 function * foo() { .. }
+function*foo()   { .. }
 ..
 ```
 
 The *only* difference here is stylistic preference. Most other literature seems to prefer `function* foo(..) { .. }`. I prefer `function *foo(..) { .. }`, so that's how I'll present them for the rest of this title.
 
-My reason is purely didactic in nature. In this text, when referring to a generator function, I will say `*foo(..)`, as opposed to `foo(..)` for a normal function. I observe that `*foo(..)` more closely matches the `*` positioning of `function *foo(..) { .. }`. Consistency eases understanding and learning.
+My reason is purely didactic in nature. In this text, when referring to a generator function, I will use `*foo(..)`, as opposed to `foo(..)` for a normal function. I observe that `*foo(..)` more closely matches the `*` positioning of `function *foo(..) { .. }`.
+
+Moreover, as we saw in Chapter 2 with concise methods, there's a concise generator form in object literals:
+
+```js
+var a = {
+	*foo() { .. }
+};
+```
+
+I would say that with concise generators, `*foo() { .. }` is rather more natural than `* foo() { .. }`. So that further argues for matching the consistency with `*foo()`.
+
+Consistency eases understanding and learning.
 
 #### Executing a Generator
 
