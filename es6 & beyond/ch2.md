@@ -1490,19 +1490,36 @@ foo`Everything is ${desc}!`;
 // [ "awesome" ]
 ```
 
-Let's take a moment to consider what's happening in the previous snippet. First, the most jarring thing that jumps out is ``foo`Everything...`;``. That doesn't look like anything we've seen before. But what is it?
+Let's take a moment to consider what's happening in the previous snippet. First, the most jarring thing that jumps out is ``foo`Everything...`;``. That doesn't look like anything we've seen before. What is it?
 
-It's essentially a special kind of function call, where the *tag* -- the `foo` part before the `` `..` `` string literal -- is a function that should be called. But what gets passed to the `foo(..)` function when invoked as a tag for a string literal?
+It's essentially a special kind of function call that doesn't need the `( .. )`. The *tag* -- the `foo` part before the `` `..` `` string literal -- is a function value that should be called. Actually, it can be any expression that results in a function, even a function call that returns another function, like:
 
-The first argument is an array of all the plain strings (the stuff not in interpolated expressions). We get `"Everything is "` and `"!"` as those two strings.
+```js
+function bar() {
+	return function foo(strings, ...values) {
+		console.log( strings );
+		console.log( values );
+	}
+}
 
-For convenience sake in our example, we gather up all subsequent arguments into an array called `values` using the `...` gather/rest operator (see the "Spread / Rest" section earlier in this chapter), though you could of course have left them as individual named parameters.
+var desc = "awesome";
 
-The arguments gathered into our `values` array are all the results of the already-evaluated interpolation expressions found in the string literal. So obviously the only value present is `"awesome"`.
+bar()`Everything is ${desc}!`;
+// [ "Everything is ", "!"]
+// [ "awesome" ]
+```
 
-You can think of these two arrays as the values in `values` being the separators if you were to splice them in between the values in `strings`, and then if you joined all those elements, you'd get the complete interpolated string value.
+But what gets passed to the `foo(..)` function when invoked as a tag for a string literal?
 
-In a sense, a tagged string literal is like a processing step after the interpolations are evaluated but before the final string value is compiled, allowing you more control over generating the string from the literal.
+The first argument -- we called it `strings` -- is an array of all the plain strings (the stuff between any interpolated expressions). We get two values in the `strings` array: `"Everything is "` and `"!"`.
+
+For convenience sake in our example, we then gather up all subsequent arguments into an array called `values` using the `...` gather/rest operator (see the "Spread / Rest" section earlier in this chapter), though you could of course have left them as individual named parameters following the `strings` parameter.
+
+The argument(s) gathered into our `values` array are the results of the already-evaluated interpolation expressions found in the string literal. So obviously the only element in `values` in our example is `"awesome"`.
+
+You can think of these two arrays as: the values in `values` are the separators if you were to splice them in between the values in `strings`, and then if you joined all those strings, you'd get the complete interpolated string value.
+
+A tagged string literal is like a processing step after the interpolations are evaluated but before the final string value is compiled, allowing you more control over generating the string from the literal.
 
 Typically, the string literal tag function (`foo(..)` in the previous snippets) should compute an appropriate string value and return it, so that you can use the tagged string literal as a value just like untagged string literals:
 
