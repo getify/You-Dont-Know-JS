@@ -1661,11 +1661,11 @@ f.y;						// 15
 f.gimmeXY();				// 75
 ```
 
-**Warning:** Though `class Foo` is much like `function Foo`, there are important differences. The `Foo(..)` call *must* be made with `new` -- a pre-ES6 approach `Foo.call( obj )` will *not* work. Also, while `function Foo` is "hoisted" (see the *Scope & Closures* title of this series), `class Foo` is not; the `extends ..` clause specifies an expression that must not be "hoisted".
+**Warning:** Though `class Foo` is much like `function Foo`, there are important differences. The `Foo(..)` call *must* be made with `new` -- a pre-ES6 approach of `Foo.call( obj )` will *not* work. Also, while `function Foo` is "hoisted" (see the *Scope & Closures* title of this series), `class Foo` is not; the `extends ..` clause specifies an expression that cannot be "hoisted". So, you must declare a `class` before you can instantiate it.
 
 ### `extends` and `super`
 
-ES6 classes also have syntax sugar for establishing the `[[Prototype]]` delegation link between two function prototypes, using the class-oriented familiar terminology `extends`:
+ES6 classes also have syntax sugar for establishing the `[[Prototype]]` delegation link between two function prototypes -- commonly mislabeled "inheritance" or confusingly labeled "prototype inheritance" -- using the class-oriented familiar terminology `extends`:
 
 ```js
 class Bar extends Foo {
@@ -1689,17 +1689,19 @@ b.gimmeXYZ();				// 1875
 
 A significant new addition is `super`, which is actually something not directly possible (without some unfortunate hack tradeoffs). In the constructor, `super` automatically refers to the "parent constructor", which in the previous example is `Foo(..)`. In a method, it refers to the "parent object", such that you can then make a property/method access off it, such as `super.gimmeXY()`.
 
-`Bar extends Foo` of course means to `[[Prototype]]` link `Bar.prototype` to `Foo.prototype`. So, `super` in a method like `gimmeXYZ()` specifically means `Foo.prototype`, whereas `super` means `Foo` when used in the constructor.
+`Bar extends Foo` of course means to link the `[[Prototype]]` of `Bar.prototype` to `Foo.prototype`. So, `super` in a method like `gimmeXYZ()` specifically means `Foo.prototype`, whereas `super` means `Foo` when used in the `Bar` constructor.
+
+**Note:** `super` is not limited to `class` declarations. It also works in object literals, in much the same way we're discussing here.
 
 #### There Be `super` Dragons
 
 It is not insignificant to note that `super` behaves differently depending on where it appears. In fairness, most of the time, that won't be a problem. But surprises await if you deviate from a narrow norm.
 
-There may be cases where in the constructor you would want to reference the `Foo.prototype`, such as to directly access one of its properties/methods. However, `super` in the constructor cannot be used in that way; `super.prototype` will not work. `super(..)` means roughly to call `new Foo(..)`, but isn't actually a reference to `Foo` itself.
+There may be cases where in the constructor you would want to reference the `Foo.prototype`, such as to directly access one of its properties/methods. However, `super` in the constructor cannot be used in that way; `super.prototype` will not work. `super(..)` means roughly to call `new Foo(..)`, but isn't actually a usable reference to `Foo` itself.
 
-Symmetrically, you may want to reference the `Foo(..)` function from inside a non-constructor method. `super.constructor` will point at `Foo(..)` the function, but beware that this function can *only* be invoked with `new`. `new super.constructor(..)` would be valid, but it wouldn't be terribly useful in most cases, because you can't make that use/reference the current `this` object context, which is likely what you'd want.
+Symmetrically, you may want to reference the `Foo(..)` function from inside a non-constructor method. `super.constructor` will point at `Foo(..)` the function, but beware that this function can *only* be invoked with `new`. `new super.constructor(..)` would be valid, but it wouldn't be terribly useful in most cases, because you can't make that call use or reference the current `this` object context, which is likely what you'd want.
 
-Also, `super` looks like it might be related to a function's context just like `this` -- that is, that they'd both be dynamically bound. However, `super` is not dynamic like `this` is. When a constructor or method makes a `super` reference inside it at declaration time, that `super` is statically bound to that specific class heirarchy, and cannot be overriden (at least in ES6).
+Also, `super` looks like it might be driven by a function's context just like `this` -- that is, that they'd both be dynamically bound. However, `super` is not dynamic like `this` is. When a constructor or method makes a `super` reference inside it at declaration time (in the `class` body), that `super` is statically bound to that specific class heirarchy, and cannot be overriden (at least in ES6).
 
 What does that mean? It means that if you're in the habit of taking a method from one "class" and "borrowing" it for another class by overriding its `this`, say with `call(..)` or `apply(..)`, that may very well create surprises if the method you're borrowing has a `super` in it. Consider this class heirarchy:
 

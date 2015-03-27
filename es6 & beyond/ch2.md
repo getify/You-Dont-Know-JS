@@ -1103,6 +1103,8 @@ var o = {
 }
 ```
 
+**Warning:** While `x() { .. }` seems to just be shorthand for `x: function(){ .. }`, concise methods have special behaviors that their older counterparts don't; specifically, the allowance for `super` (see "Object `super`" later in this chapter).
+
 #### Concisely Unnamed
 
 While that convenience shorthand is quite attractive, there's a subtle gotcha to be aware of. To illustrate, let's examine pre-ES6 code like the following, which you might try to refactor to use concise methods:
@@ -1359,7 +1361,39 @@ var o2 = Object.assign(
 );
 ```
 
-`Object.assign(..)` is a new ES6 utility -- basically it copies object properties -- and is covered in Chapter 6. `Object.create(..)` is the ES5 standard utility that creates an empty object that is `[[Prototype]]`-linked.
+`Object.assign(..)` is a new ES6 utility -- it copies object properties -- and is covered in Chapter 6. `Object.create(..)` is the ES5 standard utility that creates an empty object that is `[[Prototype]]`-linked.
+
+### Object `super`
+
+`super` is typically thought of as being only related to classes. However, due to JS's classless-objects-with-prototypes nature, `super` is equally effective, and nearly the same in behavior, with plain objects' concise methods.
+
+Consider:
+
+```js
+var o1 = {
+	foo() {
+		console.log( "o1:foo" );
+	}
+};
+
+var o2 = {
+	foo() {
+		super.foo();
+		console.log( "o2:foo" );
+	}
+};
+
+Object.setPrototypeOf( o2, o1 );
+
+o2.foo();		// o1:foo
+				// o2:foo
+```
+
+**Warning:** `super` is only allowed in concise methods, not regular function expression properties. It also is only allowed in `super.XXX` form (for property/method access), not in `super()` form.
+
+The `super` reference in the `o2.foo()` method is locked statically to `o2`, and specifically to the `[[Prototype]]` of `o2`. `super` here would basically be `Object.getPrototypeOf(o2)` -- resolves to `o1` of course -- which is how it finds and calls `o1.foo()`.
+
+For complete details on `super`, see "Classes" in Chapter 3.
 
 ## Template Literals
 
