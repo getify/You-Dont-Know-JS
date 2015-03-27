@@ -1251,6 +1251,33 @@ So what are we left to conclude about concise methods? They're short and sweet, 
 
 A lot of your methods are probably going to benefit from concise method definitions, so that's great news! Just be careful of the few where there's an un-naming hazard.
 
+#### ES5 Getter/Setter
+
+Technically, ES5 defined getter/setter literals forms, but they didn't seem to get used much, mostly due to the lack of transpilers to handle that new syntax (the only major new syntax added in ES5, really). So while it's not a new ES6 feature, we'll briefly refresh on that form, as it's probably going to be much more useful with ES6 going forward.
+
+Consider:
+
+```js
+var o = {
+	__id: 10,
+	get id() { return this.__id++; },
+	set id(v) { this.__id = v; }
+}
+
+o.id;			// 10
+o.id;			// 11
+o.id = 20;
+o.id;			// 20
+
+// and:
+o.__id;			// 21
+o.__id;			// 21 -- still!
+```
+
+These getter and setter literal forms are also present in classes; see Chapter 3.
+
+**Warning:** It may not be obvious, but the setter literal must have exactly one declared parameter; omitting it or listing others is illegal syntax. The single required parameter *can* use destructuring and defaults, like for example `set id({ id: v = 0 }) { .. }`, but the gather/rest `...` is not allowed (`set id(...v) { .. }`).
+
 ### Computed Property Names
 
 You've probably been in a situation like the following snippet, where you have one or more property names that come from some sort of expression and thus can't be put into the object literal:
