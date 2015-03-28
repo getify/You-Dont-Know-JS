@@ -36,7 +36,6 @@
 	* Pre-ES6 Generators
 * Chapter 5: Program Performance
 	* Web Workers
-	* Parallel JS
 	* SIMD
 	* asm.js
 * Chapter 6: Benchmarking & Tuning
