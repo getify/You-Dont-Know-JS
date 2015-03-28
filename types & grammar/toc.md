@@ -9,6 +9,7 @@
 	* Built-in Types
 	* Values as Types
 * Chapter 2: Values
+	* Arrays
 	* Strings
 	* Numbers
 	* Special Values
