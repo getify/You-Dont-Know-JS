@@ -622,14 +622,14 @@ So, we can coordinate the interaction with a simple latch, to let only the first
 var a;
 
 function foo(x) {
-	if (!a) {
+	if (a == undefined) {
 		a = x * 2;
 		baz();
 	}
 }
 
 function bar(x) {
-	if (!a) {
+	if (a == undefined) {
 		a = x / 2;
 		baz();
 	}
@@ -644,7 +644,7 @@ ajax( "http://some.url.1", foo );
 ajax( "http://some.url.2", bar );
 ```
 
-The `if (!a)` conditional allows only the first of `foo()` or `bar()` through, and the second (and indeed any subsequent) calls would just be ignored. There's just no virtue in coming in second place!
+The `if (a == undefined)` conditional allows only the first of `foo()` or `bar()` through, and the second (and indeed any subsequent) calls would just be ignored. There's just no virtue in coming in second place!
 
 **Note:** In all these scenarios, we've been using global variables for simplistic illustration purposes, but there's nothing about our reasoning here that requires it. As long as the functions in question can access the variables (via scope), they'll work as intended. Relying on lexically scoped variables (see the *Scope & Closures* title of this book series), and in fact global variables as in these examples, is one obvious downside to these forms of concurrency coordination. As we go through the next few chapters, we'll see other ways of coordination that are much cleaner in that respect.
 
