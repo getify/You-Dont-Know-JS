@@ -13,7 +13,7 @@
 * [Chapter 1: ES? Now & Future](ch1.md)
 * [Chapter 2: Syntax](ch2.md)
 * [Chapter 3: Organization](ch3.md)
-* Chapter 4: Async Flow Control
+* [Chapter 4: Async Flow Control](ch4.md)
 * Chapter 5: Collections
 * Chapter 6: New APIs
 * Chapter 7: Meta
