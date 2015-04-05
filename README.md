@@ -15,7 +15,7 @@ Please feel free to contribute to the quality of this content by submitting PR's
 
 ## Titles
 
-* ["Up & Going"](up & going/README.md#you-dont-know-js-up--going) ([published -- buy now!](http://shop.oreilly.com/product/0636920039303.do), ebook format is free!)
+* ["Up & Going"](up & going/README.md#you-dont-know-js-up--going) ([published -- buy now!](http://shop.oreilly.com/product/0636920039303.do)), ebook format is free!
 * ["Scope & Closures"](scope & closures/README.md#you-dont-know-js-scope--closures) ([published -- buy now!](http://shop.oreilly.com/product/0636920026327.do))
 * ["this & Object Prototypes"](this & object prototypes/README.md#you-dont-know-js-this--object-prototypes) ([published -- buy now!](http://shop.oreilly.com/product/0636920033738.do))
 * ["Types & Grammar"](types & grammar/README.md#you-dont-know-js-types--grammar) ([published -- buy now!](http://shop.oreilly.com/product/0636920033745.do))
