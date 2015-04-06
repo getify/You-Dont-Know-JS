@@ -5,8 +5,6 @@ It's no secret if you've written any significant amount of JavaScript that async
 
 However, ES6 adds a new feature which helps address significant shortcomings in the callbacks-only approach to async: *Promises*. In addition, we can revisit generators (from the previous chapter) and see a pattern for combining the two that's a major step forward in async flow control programming in JavaScript.
 
-**Note:** This chapter will only briefly overview Promises, as they are covered in-depth in the *Async & Performance* title of this series.
-
 ## Promises
 
 Let's clear up some misconceptions: Promises are not about replacing callbacks. Promises provide a trustable intermediary -- that is, between your calling code and the async code that will perform the task -- to manage callbacks.
@@ -17,7 +15,7 @@ Promises can be chained together, which can sequence a series of asychronously-c
 
 Yet another way of conceptualizing a Promise is that it's a *future value*, a time-independent container wrapped around a value. This container can be reasoned about identically whether the underlying value is final or not. Observing the resolution of a Promise extracts this value once available. In other words, a Promise is said to be the async version of a sync function's return value.
 
-A Promise can only have one of two possible resolution outcomes: fulfilled or rejected, with an optional single value. If a Promise is fulfilled, the final value is called a fulfillment. If it's rejected, the final value is called a reason (as in, a "reason for rejection").
+A Promise can only have one of two possible resolution outcomes: fulfilled or rejected, with an optional single value. If a Promise is fulfilled, the final value is called a fulfillment. If it's rejected, the final value is called a reason (as in, a "reason for rejection"). Promises can only be resolved (fulfillment or rejection) *once*. Any further attempts to fulfill or reject are simply ignored. Thus, once a promise is resolved, it's an immutable value that cannot be changed.
 
 Clearly, there's several different ways to think about what a Promise is. No single perspective is fully sufficient, but rather each provides a separate aspect of the whole. The big takeaway is that they offer a significant improvement over callbacks-only async, namely that they provide order, predictability, and trustability.
 
@@ -74,7 +72,7 @@ ajax( "http://some.url.1" )
 		// handle `contents` success
 	},
 	function rejected(reason){
-		// handle ajax error
+		// handle ajax error reason
 	}
 );
 ```
@@ -129,9 +127,136 @@ It's important to note that an exception (or rejected promise) in the first `ful
 
 In this previous snippet, we are not listening for that rejection, which means it will be silently held onto for future observation. If you never observe it by calling a `then(..)` or `catch(..)`, then it will go unhandled. Some browser developer consoles may detect these unhandled rejections and report them, but this is not reliably guaranteed; you should always observe promise rejections.
 
+**Note:** This was just a brief overview of Promise theory and behavior. For a much more in-depth exploration, see Chapter 3 of the *Async & Performance* title of this series.
+
+### Thenables
+
+Promises are genuine instances of the `Promise(..)` constructor. However, there are Promise-like objects which, generally, can interoperate with the Promise mechanisms, called *thenables*.
+
+Any object (or function) with a `then(..)` function on it is assumed to be a thenable. Any place where the Promise mechanisms can accept and adopt the state of a genuine Promise, they can also handle a thenable.
+
+Thenables are basically a general label for any Promise-like value that may have been created by some other system than the actual `Promise(..)` constructor. In that perspective, a thenable is generally less trustable than a genuine promise. Consider this misbehaving thenable, for example:
+
+```js
+var th = {
+	then: function thener( fulfilled ) {
+		// call `fulfilled(..)` once every 100ms forever
+		setInterval( fulfilled, 100 );
+	}
+};
+```
+
+If you received that thenable and chained off it with `th.then(..)`, you'd likely be surprised that your fulfillment handler is called repeatedly, when normal Promises are supposed to only ever be resolved once.
+
+Generally, if you're receiving what purports to be a Promise or thenable back from some other system, you shouldn't just trust it blindly. In the next section, we'll see a utility included with ES6 Promises that helps address this trust concern.
+
+But to further understand the perils of this issue, consider that *any* object in *any* piece of code that's ever been defined to have a method on it called `then(..)` can be potentially confused as a thenable -- if used with Promises, of course -- regardless of if that thing was ever intended to even remotely be related to Promise-like async coding.
+
+Prior to ES6 there was never any special reservation made on methods called `then(..)`, and as you can imagine there's been at least a few cases where that method name has been chosen prior to Promises ever showing up on the radar screen. The most likely case of mistaken-thenable will be async libraries which use `then(..)` but which are not strictly Promises-compliant -- there are several out in the wild.
+
+The onus will be on you to guard against directly using values with the Promise mechanism that would be incorrectly assumed to be a thenable.
+
 ### `Promise` API
 
-// TODO
+The `Promise` API also provides some static methods for working with Promises.
+
+`Promise.resolve(..)` creates a promise resolved to the value passed in. Let's compare how it works to the more manual approach:
+
+```js
+var p1 = Promise.resolve( 42 );
+
+var p2 = new Promise( function pr(resolve){
+	resolve( 42 );
+} );
+```
+
+`p1` and `p2` will essentially identical behavior. The same goes for resolving with a promise:
+
+```js
+var theP = ajax( .. );
+
+var p1 = Promise.resolve( theP );
+
+var p2 = new Promise( function pr(resolve){
+	resolve( theP );
+} );
+```
+
+**Tip:** `Promise.resolve(..)` is the solution to the thenable-trust issue raised in the previous section. Any value that you are not already certain is a trustable Promise -- even if it could be an immediate value -- can be normalized by passing it to `Promise.resolve(..)`. If the value is already a recognizable promise or thenable, its state/resolution will simply be adopted, insulating you from misbehavior. If it's instead an immediate value, it will be "wrapped" in a genuine promise, thereby normalizing its behavior to be async.
+
+`Promise.reject(..)` creates an immediately rejected promise, the same as its `Promise(..)` constructor counterpart:
+
+```js
+var p1 = Promise.reject( "Oops" );
+
+var p2 = new Promise( function pr(resolve,reject){
+	reject( "Oops" );
+} );
+```
+
+While `resolve(..)` and `Promise.resolve(..)` can accept a promise and adopt its state/resolution, `reject(..)` and `Promise.reject(..)` do not differentiate what value they receive. So, if you reject with a promise or thenable, the promise/thenable itself will be set as the rejection reason, not its underlying value.
+
+`Promise.all([ .. ])` accepts an array of one or more values (e.g., immediate values, promises, thenables). It returns a promise back which will be fulfilled if all the values fulfill, or reject immediately once the first of any of them rejects.
+
+Starting with these values/promises:
+
+```js
+var p1 = Promise.resolve( 42 );
+var p2 = new Promise( function pr(resolve){
+	setTimeout( function(){
+		resolve( 43 );
+	}, 100 );
+} );
+var v3 = 44;
+var p4 = new Promise( function pr(resolve,reject){
+	setTimeout( function(){
+		reject( "Oops" );
+	}, 10 );
+} );
+```
+
+Let's consider how `Promise.all([ .. ])` works with combinations of those values:
+
+```js
+Promise.all( [p1,p2,v3] )
+.then( function fulfilled(vals){
+	console.log( vals );			// [42,43,44]
+} );
+
+Promise.all( [p1,p2,v3,p4] )
+.then(
+	function fulfilled(vals){
+		// never gets here
+	},
+	function rejected(reason){
+		console.log( reason );		// Oops
+	}
+);
+```
+
+While `Promise.all([ .. ])` waits for all fulfillments (or the first rejection), `Promise.race([ .. ])` waits only for either the first fulfillment or rejection. Consider:
+
+```js
+// NOTE: re-setup all test values to
+// avoid timing issues misleading you!
+
+Promise.race( [p2,p1,v3] )
+.then( function fulfilled(val){
+	console.log( val );				// 42
+} );
+
+Promise.race( [p2,p1,v3,p4] )
+.then(
+	function fulfilled(val){
+		// never gets here
+	},
+	function rejected(reason){
+		console.log( reason );		// Oops
+	}
+);
+```
+
+**Warning:** While `Promise.all([])` will fulfill right away (with no values), `Promise.race([])` will hang forever. This is a strange inconsistency, and speaks to the suggestion that you should never use these methods with empty arrays.
 
 ## Generators + Promises
 
