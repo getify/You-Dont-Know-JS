@@ -14,7 +14,7 @@
 * [Chapter 2: Syntax](ch2.md)
 * [Chapter 3: Organization](ch3.md)
 * [Chapter 4: Async Flow Control](ch4.md)
-* Chapter 5: Collections
+* [Chapter 5: Collections](ch5.md)
 * Chapter 6: New APIs
 * Chapter 7: Meta
 * [Chapter 8: Beyond ES6](ch8.md)
