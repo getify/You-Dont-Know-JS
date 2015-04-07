@@ -140,19 +140,19 @@ Those with much JS experience know that objects are the primary mechanism for cr
 For example, consider:
 
 ```js
-var o = {};
+var m = {};
 
 var x = { id: 1 },
 	y = { id: 2 };
 
-o[x] = "foo";
-o[y] = "bar";
+m[x] = "foo";
+m[y] = "bar";
 
-o[x];							// "bar"
-o[y];							// "bar"
+m[x];							// "bar"
+m[y];							// "bar"
 ```
 
-What's going on here? The two objects `x` and `y` both stringify to `"[object Object]"`, so only that one key is being set in `o`.
+What's going on here? The two objects `x` and `y` both stringify to `"[object Object]"`, so only that one key is being set in `m`.
 
 Some have implemented fake maps by maintaining a parallel array of non-string keys alongside an array of the values, such as:
 
@@ -180,16 +180,16 @@ Of course, you wouldn't want to manage those parallel arrays yourself, so you co
 But as of ES6, there's no longer any need to do this! Just use `Map(..)`:
 
 ```js
-var o = new Map();
+var m = new Map();
 
 var x = { id: 1 },
 	y = { id: 2 };
 
-o.set( x, "foo" );
-o.set( y, "bar" );
+m.set( x, "foo" );
+m.set( y, "bar" );
 
-o.get( x );						// "foo"
-o.get( y );						// "bar"
+m.get( x );						// "foo"
+m.get( y );						// "bar"
 ```
 
 The only drawback is that you can't use the `[ ]` bracket access syntax for setting and retrieving values. But `get(..)` and `set(..)` work perfectly suitably instead.
@@ -197,10 +197,10 @@ The only drawback is that you can't use the `[ ]` bracket access syntax for sett
 To delete an element from a map, don't use the `delete` operator, but instead use the `delete(..)` method:
 
 ```js
-o.set( x, "foo" );
-o.set( y, "bar" );
+m.set( x, "foo" );
+m.set( y, "bar" );
 
-o.delete( y );
+m.delete( y );
 ```
 
 You can clear the entire map's contents with `clear()`.
@@ -208,19 +208,19 @@ You can clear the entire map's contents with `clear()`.
 To get the length of a map (that is, the number of keys), use the `size` property (not `length`):
 
 ```js
-o.set( x, "foo" );
-o.set( y, "bar" );
+m.set( x, "foo" );
+m.set( y, "bar" );
 
-o.size;							// 2
+m.size;							// 2
 ```
 
 The `Map(..)` constructor can also receive an iterable (see "Iterators" in Chapter 3), which must produce a list of arrays, where the first item in each array is the key and the second item is the value. This format for iteration is identical to that produced by the `entries()` method, explained in the next section. That makes it easy to make a copy of a map:
 
 ```js
-var o2 = new Map( o.entries() );
+var m2 = new Map( m.entries() );
 
 // same as:
-var o2 = new Map( o );
+var m2 = new Map( m );
 ```
 
 Since a map instance is an iterable, and its default iterator is the same as `entries()`, the second shorter form is more preferable.
@@ -230,15 +230,15 @@ Since a map instance is an iterable, and its default iterator is the same as `en
 To get the list of values from a map, use `values(..)`, which returns an iterator. In Chapters 2 and 3, we covered various ways to process an iterator sequentially (like an array), such as the `...` spread operator and the `for..of` loop. Also, "Arrays" in Chapter 6 covers the `Array.from(..)` method in detail.
 
 ```js
-var o = new Map();
+var m = new Map();
 
 var x = { id: 1 },
 	y = { id: 2 };
 
-o.set( x, "foo" );
-o.set( y, "bar" );
+m.set( x, "foo" );
+m.set( y, "bar" );
 
-var vals = [ ...o.values() ];
+var vals = [ ...m.values() ];
 
 vals;							// ["foo","bar"]
 ```
@@ -246,22 +246,22 @@ vals;							// ["foo","bar"]
 To determine if a value exists in a map, use the `includes(..)` method (which is the same as on standard arrays as of ES6):
 
 ```js
-o.includes( "foo" );			// true
-o.includes( "baz" );			// false
+m.includes( "foo" );			// true
+m.includes( "baz" );			// false
 ```
 
 As discussed in the previous section, you can iterate over a map's entries using `entries()` (or the default map iterator). Consider:
 
 ```js
-var o = new Map();
+var m = new Map();
 
 var x = { id: 1 },
 	y = { id: 2 };
 
-o.set( x, "foo" );
-o.set( y, "bar" );
+m.set( x, "foo" );
+m.set( y, "bar" );
 
-var vals = [ ...o.entries() ];
+var vals = [ ...m.entries() ];
 
 vals[0][0] === x;				// true
 vals[0][1];						// "foo"
@@ -275,15 +275,15 @@ vals[1][1];						// "bar"
 To get the list of keys, use `keys()`, which returns an iterator over the keys in the map:
 
 ```js
-var o = new Map();
+var m = new Map();
 
 var x = { id: 1 },
 	y = { id: 2 };
 
-o.set( x, "foo" );
-o.set( y, "bar" );
+m.set( x, "foo" );
+m.set( y, "bar" );
 
-var keys = [ ...o.keys() ];
+var keys = [ ...m.keys() ];
 
 keys[0] === x;					// true
 keys[0] === y;					// true
@@ -292,15 +292,15 @@ keys[0] === y;					// true
 To determine if a map has a given key, use `has(..)`:
 
 ```js
-var o = new Map();
+var m = new Map();
 
 var x = { id: 1 },
 	y = { id: 2 };
 
-o.set( x, "foo" );
+m.set( x, "foo" );
 
-o.has( x );						// true
-o.has( y );						// false
+m.has( x );						// true
+m.has( y );						// false
 ```
 
 Maps essentially let you associate some extra piece of information (the value) with an object (the key) without actually putting that information on the object itself.
@@ -318,30 +318,30 @@ WeakMaps take (only) objects as keys. Those objects are *held weakly*, which mea
 Otherwise, the API for WeakMap is similar, though limited:
 
 ```js
-var o = new WeakMap();
+var m = new WeakMap();
 
 var x = { id: 1 },
 	y = { id: 2 };
 
-o.set( x, "foo" );
+m.set( x, "foo" );
 
-o.has( x );						// true
-o.has( y );						// false
+m.has( x );						// true
+m.has( y );						// false
 ```
 
-WeakMaps do not have a `size` property or `clear()` method, nor do they expose any iterators over their keys, values, or entries. So even if you unset the `x` reference, which will remove its entry from `o` upon GC, there is no way to tell. You'll just have to take JavaScript's word for it!
+WeakMaps do not have a `size` property or `clear()` method, nor do they expose any iterators over their keys, values, or entries. So even if you unset the `x` reference, which will remove its entry from `m` upon GC, there is no way to tell. You'll just have to take JavaScript's word for it!
 
 Just like Maps, WeakMaps let you soft-associate information with an object. But they are particularly useful if the object is not one you completely control, such as a DOM element. If the object you're using as a map key can be deleted and should be GC-able when it is, then a WeakMap is a more appropriate option.
 
 It's important to note that a WeakMap only holds its keys weakly, not its values. Consider:
 
 ```js
-var o = new WeakMap();
+var m = new WeakMap();
 
 var x = { id: 1 },
 	y = { id: 2 };
 
-o.set( x, y );
+m.set( x, y );
 
 x = null;						// `x` is GC-able
 y = null;						// `y` is not GC-able
