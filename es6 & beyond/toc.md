@@ -30,10 +30,10 @@
 	* Generators + Promises
 * Chapter 5: Collections
 	* Typed Arrays
-	* Map
-	* WeakMap
-	* Set
-	* WeakSet
+	* Maps
+	* WeakMaps
+	* Sets
+	* WeakSets
 * Chapter 6: New APIs
 	* `Object`
 	* `Math`
