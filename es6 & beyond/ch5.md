@@ -7,7 +7,7 @@ As of ES6, some of the most useful (and performance-optimizing!) data structure 
 
 We'll start this chapter first by looking at *Typed Arrays*, which were technically contemporary to ES5 efforts, but which prior to ES6 were only standardized by the web platform and not JavaScript. As of ES6, these have been adopted directly by the language specification, which gives them first-class status.
 
-Then we'll look at Maps and Sets, as well as their weak-key ("weak" in relation to memory/garbage collection) counterparts.
+Then we'll look at Maps and Sets, as well as their weak ("weak" in relation to memory/garbage collection) counterparts.
 
 ## Typed Arrays
 
@@ -451,4 +451,10 @@ y = null;						// `y` is GC-able
 
 ## Review
 
-// TODO
+ES6 defines a number of useful collections that make working with data in structured ways more efficient and effective.
+
+TypedArrays provide "view"s of binary data buffers that align with various integer types, like 8-bit unsigned integers and 32-bit floats. The array access to binary data makes operations much easier to express and maintain, enabling working with complex data like video, audio, canvas data, etc.
+
+Maps are key-value pairs where the key can be an object instead of just a string/primitive. Sets are unique lists of values (of any type).
+
+WeakMaps are maps where the key (object) is weakly held, so that GC is free to collect the entry if it's the last reference to an object. WeakSets are sets where the value is weakly held, again so that GC can remove the entry if it's the last reference to that object.
