@@ -1059,7 +1059,8 @@ var it = foo();
 
 it.next();				// { value: 42, done: false }
 
-it.next( 10 );			// { value: undefined, done: true }
+it.next( 10 );			// 10
+						// { value: undefined, done: true }
 ```
 
 Not bad, huh!? Hopefully this exercise solidifies in your mind that generators are actually just simple syntax for state machine logic. That makes them widely applicable.
