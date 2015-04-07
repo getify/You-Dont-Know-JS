@@ -35,11 +35,11 @@
 	* Sets
 	* WeakSets
 * Chapter 6: New APIs
+	* `Array`
 	* `Object`
 	* `Math`
 	* `Number`
 	* `String`
-	* `Array`
 * Chapter 7: Meta
 	* Realms
 	* Function Names
