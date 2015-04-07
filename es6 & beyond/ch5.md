@@ -351,11 +351,103 @@ For this reason, WeakMaps are in my opinion better named "WeakKeyMaps".
 
 ## Sets
 
-// TODO
+A set is an a collection of unique values (duplicates are ignored).
+
+The API for a set is mostly identical to map. The `add(..)` method takes the place of the `set(..)` method (somewhat ironically), and there is no `get(..)` method.
+
+Consider:
+
+```js
+var s = new Set();
+
+var x = { id: 1 },
+	y = { id: 2 };
+
+s.add( x ).add( y ).add( x );
+
+s.size;							// 2
+
+s.delete( y );
+s.size;							// 1
+
+s.clear();
+s.size;							// 0
+```
+
+A set doesn't need a `get(..)` because you don't retrieve a value from a set, but rather test if it is present or not, using `has(..)`:
+
+```js
+var s = new Set();
+
+var x = { id: 1 },
+	y = { id: 2 };
+
+s.add( x );
+
+s.has( x );						// true
+s.has( y );						// false
+```
+
+**Note:** The comparison of set values is done with an algorithm almost identical to `Object.is(..)` (see Chapter 6), except that `-0` and `0` are treated as the same rather than distinct.
+
+### Set Iterators
+
+Sets have the same iterators as maps. Their behavior is different for sets, but symmetric with the behavior of map iterators. Consider:
+
+```js
+var s = new Set();
+
+var x = { id: 1 },
+	y = { id: 2 };
+
+s.add( x ).add( y );
+
+var keys = [ ...s.keys() ],
+	vals = [ ...s.values() ],
+	entries = [ ...s.entries() ];
+
+keys[0] === x;
+keys[1] === y;
+
+vals[0] === x;
+vals[1] === y;
+
+entries[0][0] === x;
+entries[0][1] === x;
+entries[1][0] === y;
+entries[1][1] === y;
+```
+
+The `keys()` and `values()` iterators both yield a list of the unique values in the set. The `entries()` iterator yields a list of entry arrays, where both items of the array are the unique set value. The default iterator for a set is its `values()` iterator.
+
+The inherent uniqueness of a set is its most useful trait. For example:
+
+```js
+var s = new Set( [1,2,3,4,"1",2,4,"5"] ),
+	uniques = [ ...s ];
+
+uniques;						// [1,2,3,4,"1","5"]
+```
+
+Notice that `1` and `"1"` are considered separate values, as no coercion of values happens.
 
 ## WeakSets
 
-// TODO
+Whereas a WeakMap holds its keys weakly (but its values strongly), a WeakSet holds its values weakly (there are no keys).
+
+```js
+var s = new WeakSet();
+
+var x = { id: 1 },
+	y = { id: 2 };
+
+s.add( x ).add( y );
+
+x = null;						// `x` is GC-able
+y = null;						// `y` is GC-able
+```
+
+**Warning:** WeakSet values must be objects, not primitive values as is allowed with sets.
 
 ## Review
 
