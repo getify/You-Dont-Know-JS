@@ -135,7 +135,7 @@ Array.from( arr );
 
 ## Maps
 
-Those with much JS experience know that objects are the primary mechanism for creating key/value pair data structures, otherwise known as maps. However, the major drawback with objects-as-maps is the inability to use a non-string value as the key.
+Those with much JS experience know that objects are the primary mechanism for creating unordered key/value-pair data structures, otherwise known as maps. However, the major drawback with objects-as-maps is the inability to use a non-string value as the key.
 
 For example, consider:
 
@@ -202,6 +202,8 @@ o.set( y, "bar" );
 
 o.delete( y );
 ```
+
+You can clear the entire map's contents with `clear()`.
 
 To get the length of a map (that is, the number of keys), use the `size` property (not `length`):
 
@@ -305,7 +307,7 @@ Maps essentially let you associate some extra piece of information (the value) w
 
 **Warning:** If you use an object as a Map key and that object is later discarded (all references unset) in attempt to have garbage collection (GC) reclaim its memory, the Map itself will still retain its entry. You will need to first remove the entry from the Map before unsetting the last reference, or the object will not be GC-able. In the next section, we'll see WeakMaps as a better option for GC-eligible object keys.
 
-While you can use any kind of value as a key, you typically will use objects with Maps, as strings and other primitives are already eligible for the keys of normal objects. In other words, you'll probably want to continue to use normal objects for maps unless some or all of the keys need to be objects, in which case Map is more appropriate.
+While you can use any kind of value as a key for a Map, you typically will use objects, as strings and other primitives are already eligible as keys of normal objects. In other words, you'll probably want to continue to use normal objects for maps unless some or all of the keys need to be objects, in which case Map is more appropriate.
 
 ## WeakMaps
 
@@ -327,9 +329,25 @@ o.has( x );						// true
 o.has( y );						// false
 ```
 
-WeakMaps do not have a `size` property, nor do they expose any iterators over their keys, values, or entries. So even if you unset the `x` reference, which will remove its entry from `o` upon GC, there is no way to tell. You'll just have to take JavaScript's word for it!
+WeakMaps do not have a `size` property or `clear()` method, nor do they expose any iterators over their keys, values, or entries. So even if you unset the `x` reference, which will remove its entry from `o` upon GC, there is no way to tell. You'll just have to take JavaScript's word for it!
 
-Just like Maps, WeakMaps let you soft-associate information with an object. But they are particularly useful if the object is not one you completely control, such as a DOM element. If the object you're using as a map key can be deleted and should be GC-able when it is, then a `WeakMap` is a more appropriate option.
+Just like Maps, WeakMaps let you soft-associate information with an object. But they are particularly useful if the object is not one you completely control, such as a DOM element. If the object you're using as a map key can be deleted and should be GC-able when it is, then a WeakMap is a more appropriate option.
+
+It's important to note that a WeakMap only holds its keys weakly, not its values. Consider:
+
+```js
+var o = new WeakMap();
+
+var x = { id: 1 },
+	y = { id: 2 };
+
+o.set( x, y );
+
+x = null;						// `x` is GC-able
+y = null;						// `y` is not GC-able
+```
+
+For this reason, WeakMaps are in my opinion better named "WeakKeyMaps".
 
 ## Sets
 
