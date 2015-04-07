@@ -187,7 +187,7 @@ It's very common to conflate the terms "async" and "parallel," but they are actu
 
 The most common tools for parallel computing are processes and threads. Processes and threads execute independently and may execute simultaneously: on separate processors, or even separate computers, but multiple threads can share the memory of a single process.
 
-An event loop, by contrast, breaks its work into tasks and executes them in serial, disallowing parallel access and changes to shared memory. Parallelism and "serialism" can coexist in the form of cooperating event loops in separate threads.
+An event loop, by contrast, breaks its work into tasks and executes them in series, disallowing parallel access and changes to shared memory. Parallelism and "serialism" can coexist in the form of cooperating event loops in separate threads.
 
 The interleaving of parallel threads of execution and the interleaving of asynchronous events occur at very different levels of granularity.
 
