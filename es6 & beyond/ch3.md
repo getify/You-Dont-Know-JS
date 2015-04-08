@@ -1144,7 +1144,7 @@ Before we get into the specific syntax, it's important to understand some fairly
 
    In pre-ES6 modules, if you put a property on your public API that holds a primitive value like a number or string, that property assignment was by value-copy, and any internal update of a corresponding variable would be separate and not affect the public copy on the API object.
 
-   With ES6, exporting a local private variable, even if it currently holds a primitive string/number/etc, exports a binding to to the variable. If the module changes the  variable's value, the external import binding now resolves to that new value.
+   With ES6, exporting a local private variable, even if it currently holds a primitive string/number/etc, exports a binding to the variable. If the module changes the  variable's value, the external import binding now resolves to that new value.
 * Importing a module is the same thing as statically requesting it to load (if it hasn't already). If you're in a browser, that implies a blocking load over the network. If you're on a server (i.e., Node.js), it's a blocking load from the filesystem.
 
    However, don't panic about the performance implications. Because ES6 modules have static definitions, the import requirements can be statically scanned, and loads will happen preemptively, even before you've used the module.
