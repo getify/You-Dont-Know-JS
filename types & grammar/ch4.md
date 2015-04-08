@@ -1060,7 +1060,7 @@ function onlyOne() {
 		// skip falsy values. same as treating
 		// them as 0's, but avoids NaN's.
 		if (arguments[i]) {
-			sum += arguments[i];
+			sum++;
 		}
 	}
 	return sum == 1;
