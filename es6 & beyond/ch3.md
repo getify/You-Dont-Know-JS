@@ -1613,17 +1613,17 @@ One use for interacting directly with the module loader is if a non-module needs
 // normal script loaded in browser via `<script>`,
 // `import` is illegal here
 
-System.import( "foo" ) // returns a promise for `"foo"`
+Reflect.Loader.import( "foo" ) // returns a promise for `"foo"`
 .then( function(foo){
 	foo.bar();
 } );
 ```
 
-The `System.import(..)` utility imports the entire module onto the named parameter (as a namespace), just like the `import * as foo ..` namespace import we discussed earlier.
+The `Reflect.Loader.import(..)` utility imports the entire module onto the named parameter (as a namespace), just like the `import * as foo ..` namespace import we discussed earlier.
 
-**Note:** The `System.import(..)` utility returns a promise that is fulfilled once the module is ready. To import multiple modules, you can compose promises from multiple `System.import(..)` calls using `Promise.all([ .. ])`. For more information about promises, see "Promises" in Chapter 4.
+**Note:** The `Reflect.Loader.import(..)` utility returns a promise that is fulfilled once the module is ready. To import multiple modules, you can compose promises from multiple `Reflect.Loader.import(..)` calls using `Promise.all([ .. ])`. For more information about promises, see "Promises" in Chapter 4.
 
-You can also use `System.import(..)` in a real module to dynamically/conditionally load a module, where `import` itself would not work. You might for instance choose to load a module containing a polyfill for some ES7+ feature if a feature test reveals it's not defined by the current engine.
+You can also use `Reflect.Loader.import(..)` in a real module to dynamically/conditionally load a module, where `import` itself would not work. You might for instance choose to load a module containing a polyfill for some ES7+ feature if a feature test reveals it's not defined by the current engine.
 
 For performance reasons, you'll want to avoid dynamic loading whenever possible, as it hampers the ability of the JS engine to fire off early fetches from its static analysis.
 
@@ -1633,10 +1633,10 @@ Another use for directly interacting with the module loader is if you want to cu
 
 At the time of this writing, there's a polyfill for the module loader API being developed (https://github.com/ModuleLoader/es6-module-loader). While details are scarce and highly subject to change, we can take a glimpse at what possibilities may eventually land.
 
-The `System.import(..)` call may support a second argument for specifying various options to customize the import/load task. For example:
+The `Reflect.Loader.import(..)` call may support a second argument for specifying various options to customize the import/load task. For example:
 
 ```js
-System.import( "foo", { address: "/path/to/foo.js" } )
+Reflect.Loader.import( "foo", { address: "/path/to/foo.js" } )
 .then( function(foo){
 	// ..
 } )
