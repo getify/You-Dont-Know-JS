@@ -27,7 +27,35 @@ c.length;						// 3
 c;								// [1,2,3]
 ```
 
-Under what circumstances would you want to use `Array.of(..)` instead of just creating an array with literal syntax, like `c = [1,2,3]`? // TODO
+Under what circumstances would you want to use `Array.of(..)` instead of just creating an array with literal syntax, like `c = [1,2,3]`? There's two possible cases.
+
+If you have a callback that's supposed to wrap argument(s) passed to it in an array, `Array.of(..)` fits the bill perfectly. That's probably not terribly common, but it may scratch an itch for you.
+
+The other scenario is if you subclass `Array` (see "Classes" in Chapter 3) and want to be able to create and initialize elements in an instance of your subclass, such as:
+
+```js
+class MyCoolArray extends Array {
+	sum() {
+		return this.reduce( function reducer(acc,curr){
+			return acc + curr;
+		}, 0 );
+	}
+}
+
+var x = new MyCoolArray( 3 );
+x.length;						// 3 -- oops!
+x.sum();						// 0 -- oops!
+
+var y = [3];					// Array, not MyCoolArray
+y.length;						// 1
+y.sum();						// `sum` is not a function
+
+var z = MyCoolArray.of( 3 );
+z.length;						// 1
+z.sum();						// 3
+```
+
+You can't just (easily) create a constructor for `MyCoolArray` that overrides the behavior of the `Array` parent constructor, since that constructor is necessary to actually create a well-behaving array value (initializing the `this`). The "inherited" static `of(..)` method on the `MyCoolArray` subclass provides a nice solution.
 
 ### `Array.from(..)` Static Function
 
