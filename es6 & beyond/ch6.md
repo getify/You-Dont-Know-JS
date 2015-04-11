@@ -59,7 +59,104 @@ You can't just (easily) create a constructor for `MyCoolArray` that overrides th
 
 ### `Array.from(..)` Static Function
 
-// TODO
+An "array-like object" in JavaScript is any object that has a `length` property on it, specifically with a value of zero or higher.
+
+These values have been notoriously frustrating to work with in JS; it's been quite common to need to transform them into an actual array, so that the various `Array.prototype` methods (`map(..)`, `indexOf(..)` etc.) are available to use with it. That process usually looks like:
+
+```js
+// array-like object
+var arrLike = {
+	length: 3,
+	0: "foo",
+	1: "bar"
+};
+
+var arr = Array.prototype.slice.call( arrLike );
+```
+
+Another common task where `slice(..)` is often used is in duplicating a real array:
+
+```js
+var arr2 = arr.slice();
+```
+
+In both cases, the new ES6 `Array.from(..)` method can be a more understandable and graceful -- if also less verbose -- approach:
+
+```js
+var arr = Array.from( arrLike );
+
+var arr2 = Array.from( arr );
+```
+
+`Array.from(..)` looks to see if the first argument is an iterable (see "Iterators" in Chapter 3), and if so, it uses the iterator to produce values to "copy" into the returned array. Since real arrays have an iterator for those values, that iterator is automatically used.
+
+But if you pass an array-like object as the first argument to `Array.from(..)`, it behaves basically the same as `slice()` (no arguments!) or `apply(..)` does, which is that it simply loops over the value and accesses numerically named properties from `0` up to whatever the value of `length` is.
+
+Consider:
+
+```js
+var arrLike = {
+	length: 4,
+	2: "foo"
+};
+
+Array.from( arrLike );
+// [ undefined, undefined, "foo", undefined ]
+```
+
+Since positions `0`, `1`, and `3` didn't exist on `arrLike`, the result was the `undefined` value for each of those slots.
+
+You could produce a similar outcome like this:
+
+```js
+var emptySlotsArr = [];
+emptySlotsArr.length = 4;
+emptySlotsArr[2] = "foo";
+
+Array.from( emptySlotsArr );
+// [ undefined, undefined, "foo", undefined ]
+```
+
+#### Avoiding Empty Slots
+
+There's a subtle but important difference in the previous snippet between the `emptySlotsArr` and the result of the `Array.from(..)` call. `Array.from(..)` never produces empty slots.
+
+Prior to ES6, if you wanted to produce an array initialized to a certain length with actual `undefined` values in each slot (no empty slots!), you had to do extra work:
+
+```js
+var a = Array( 4 );								// four empty slots!
+
+var b = Array.apply( null, { length: 4 } );		// four `undefined` values
+```
+
+But `Array.from(..)` now makes this easier:
+
+```js
+var c = Array.from( { length: 4 } );			// four `undefined` values
+```
+
+**Warning:** Using an empty slot array like `a` in the previous snippets would work with some array functions, but others ignore empty slots (like `map(..)`, etc.). You should never intentionally work with empty slots, as it will almost certainly lead to strange/unpredictable behavior in your programs.
+
+#### Mapping
+
+The `Array.from(..)` utility has another helpful trick up its sleeve. The second argument, if provided, is a mapping callback (almost the same as the regular `Array#map(..)` expects) which is called to map/transform each value from the source to the returned target. Consider:
+
+```js
+var arrLike = {
+	length: 4,
+	2: "foo"
+};
+
+Array.from( arrLike, function mapper(val,idx){
+	if (typeof val == "string") {
+		return val.toUpperCase();
+	}
+	else {
+		return idx;
+	}
+} );
+// [ 0, 1, "FOO", 3 ]
+```
 
 ### `copyWithin(..)` Prototype Method
 
