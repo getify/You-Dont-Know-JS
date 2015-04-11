@@ -59,7 +59,7 @@ You can't just (easily) create a constructor for `MyCoolArray` that overrides th
 
 ### `Array.from(..)` Static Function
 
-An "array-like object" in JavaScript is any object that has a `length` property on it, specifically with a value of zero or higher.
+An "array-like object" in JavaScript is an object that has a `length` property on it, specifically with an integer value of zero or higher.
 
 These values have been notoriously frustrating to work with in JS; it's been quite common to need to transform them into an actual array, so that the various `Array.prototype` methods (`map(..)`, `indexOf(..)` etc.) are available to use with it. That process usually looks like:
 
@@ -85,12 +85,12 @@ In both cases, the new ES6 `Array.from(..)` method can be a more understandable 
 ```js
 var arr = Array.from( arrLike );
 
-var arr2 = Array.from( arr );
+var arrCopy = Array.from( arr );
 ```
 
 `Array.from(..)` looks to see if the first argument is an iterable (see "Iterators" in Chapter 3), and if so, it uses the iterator to produce values to "copy" into the returned array. Since real arrays have an iterator for those values, that iterator is automatically used.
 
-But if you pass an array-like object as the first argument to `Array.from(..)`, it behaves basically the same as `slice()` (no arguments!) or `apply(..)` does, which is that it simply loops over the value and accesses numerically named properties from `0` up to whatever the value of `length` is.
+But if you pass an array-like object as the first argument to `Array.from(..)`, it behaves basically the same as `slice()` (no arguments!) or `apply(..)` does, which is that it simply loops over the value, accessing numerically named properties from `0` up to whatever the value of `length` is.
 
 Consider:
 
