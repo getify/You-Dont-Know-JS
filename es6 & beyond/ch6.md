@@ -158,6 +158,8 @@ Array.from( arrLike, function mapper(val,idx){
 // [ 0, 1, "FOO", 3 ]
 ```
 
+**Note:** As with other array methods that take callbacks, `Array.from(..)` has an optional third parameter that if set will specify the `this` binding for the callback passed to the second parameter.
+
 // TODO: talk about mapping between Typed Array values, bitwise truncation, etc
 
 ### `copyWithin(..)` Prototype Method
