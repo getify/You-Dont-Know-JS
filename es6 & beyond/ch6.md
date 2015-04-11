@@ -196,7 +196,21 @@ Instead, the copying algorithm reverses direction and copies `4` to overwrite `5
 
 ### `fill(..)` Prototype Method
 
-// TODO
+Filling an existing array entirely (or partially) with a specified value is natively supported as of ES6 with the `Array#fill(..)` method:
+
+```js
+var a = Array( 4 ).fill( undefined );
+a;
+// [undefined,undefined,undefined,undefined]
+```
+
+`fill(..)` optionally takes *start* and *end* parameters which indicate a subset portion of the array to fill, such as:
+
+```js
+var a = [ null, null, null, null ].fill( 42, 1, 3 );
+a;
+// [null,42,42,null]
+```
 
 ### `find(..)` Prototype Method
 
