@@ -599,7 +599,7 @@ Accurately working with numbers is very important to your program working correc
 
 * `Number.EPSILON` - the minimum value between any two numbers: `2^-52` (see Chapter 2 of the *Types & Grammar* title of this series regarding using this value as a tolerance for imprecision in floating point arithmetic)
 * `Number.MAX_SAFE_INTEGER` - The highest integer that can "safely" be represented unambiguously in a JS number value: `2^53 - 1`
-* `Number.MIN_SAFE_INTEGER` - The lowest integer that can "safely" be represented unambiguously in a JS number value: `-2^53 + 1`
+* `Number.MIN_SAFE_INTEGER` - The lowest integer that can "safely" be represented unambiguously in a JS number value: `-(2^53 - 1)` or `(-2)^53 + 1`.
 
 **Note:** See Chapter 2 of the *Types & Grammar* title of this series for more information about "safe" integers.
 
