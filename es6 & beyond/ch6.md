@@ -408,6 +408,42 @@ a[1] = 2;
 
 ## `Object`
 
+A few additional static helpers have been added to `Object`. Traditionally, functions of this sort have been seen as focused on the behaviors/capabilities of object values.
+
+However, starting with ES6, `Object` static functions will also be for general purpose global APIs of any sort that don't already belong more naturally in some other location (i.e., `Array.from(..)`).
+
+### `Object.is(..)` Static Function
+
+The `Object.is(..)` static function makes value comparisons in an even more strict fashion than the `===` comparison.
+
+`Object.is(..)` invokes the underlying `SameValue` algorithm (ES6 spec, section 7.2.9). The `SameValue` algorithm is basically the same as the `===` Strict Equality Comparison Algorithm (ES6 spec, section 7.2.13), with two important exceptions.
+
+Consider:
+
+```js
+var x = NaN, y = 0, z = -0;
+
+x === x;					// false
+y === z;					// true
+
+Object.is( x, x );			// true
+Object.is( y, z );			// false
+```
+
+You should continue to use `===` for strict equality comparisons; `Object.is(..)` shouldn't be thought of as a replacement for the operator. However, in cases where you're trying to strictly identify a `NaN` or `-0` value, `Object.is(..)` is now the preferred option.
+
+**Note:** ES6 also adds a `Number.isNaN(..)` utility (discussed later in this chapter) which may be a slightly more convenient test; you may prefer `Number.isNaN(x)` than `Object.is(x,NaN)`. You *can* accurately test for `-0` with a clumsy `x == 0 && 1 / x === -Infinity`, but in this case `Object.is(x,-0)` is much better.
+
+### `Object.getOwnPropertySymbols(..)` Static Function
+
+// TODO
+
+### `Object.setPrototypeOf(..)` Static Function
+
+// TODO
+
+### `Object.assign(..)` Static Function
+
 // TODO
 
 ## `Math`
