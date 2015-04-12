@@ -559,7 +559,35 @@ o2.foo();							// foo
 
 ## `Math`
 
-// TODO
+ES6 adds several new mathematic utilities that fill in holes or aid with common operations. All of these can be manually calculated, but most of them are now defined natively so that the JS engine can more optimally perform the calculations.
+
+It's likely that asm.js/transpiled JS code (see the *Async & Performance* title of this series) is the more likely consumer of these utilities rather than direct developers.
+
+Geometry:
+
+* `cosh(..)` - hyperbolic cosine
+* `acosh(..)` - hyperbolic arccosine
+* `sinh(..)` - hyperbolic sine
+* `asinh(..)` - hyperbolic arcsine
+* `tanh(..)` - hyperbolic tangent
+* `atanh(..)` - hyperbolic arctangent
+* `hypot(..)` - the squareroot of the sum of the squares (i.e., the generalized Pythagorean theorem)
+
+Arithmetic:
+
+* `cbrt(..)` - cube root
+* `clz32(..)` - count leading zeros in 32-bit binary representation
+* `expm1(..)` - the same as `exp(x) - 1`
+* `log2(..)` - binary logarithm (log base 2)
+* `log10(..)` - log base 10
+* `log1p(..)` - the same as `log(x + 1)`
+* `imul(..)` - 32-bit integer multiplication of two numbers
+
+Meta:
+
+* `sign(..)` - returns the sign of the number
+* `trunc(..)` - returns only the integer part of a number
+* `fround(..)` - rounds to nearest 32-bit (single precision) floating point value
 
 ## `Number`
 
