@@ -1,7 +1,9 @@
 # You Don't Know JS: ES6 & Beyond
-# Chapter 6: New APIs
+# Chapter 6: API Additions
 
-From conversions of values to mathematic calculations, ES6 adds many static methods to various built-in natives and objects to help with common tasks. In addition, instances of the natives have new capabilities from various new prototype methods.
+From conversions of values to mathematic calculations, ES6 adds many static properties and methods to various built-in natives and objects to help with common tasks. In addition, instances of some of the natives have new capabilities via various new prototype methods.
+
+**Note:** Many of these features can be faithfully polyfilled. We will not dive into those details here, but check out "ES6 Shim" (https://github.com/paulmillr/es6-shim/) for standards-compliant shims/polyfills.
 
 ## `Array`
 
@@ -590,6 +592,62 @@ Meta:
 * `fround(..)` - rounds to nearest 32-bit (single precision) floating point value
 
 ## `Number`
+
+Accurately working with numbers is very important to your program working correctly. ES6 adds some additional properties and functions to assist with common numeric operations.
+
+### Static Properties
+
+* `Number.EPSILON` - the minimum value between any two numbers: `2^-52` (see Chapter 2 of the *Types & Grammar* title of this series regarding using this value as a tolerance for imprecision in floating point arithmetic)
+* `Number.MAX_SAFE_INTEGER` - The highest integer that can "safely" be represented unambiguously in a JS number value: `2^53 - 1`
+* `Number.MIN_SAFE_INTEGER` - The lowest integer that can "safely" be represented unambiguously in a JS number value: `-2^53 + 1`
+
+**Note:** See Chapter 2 of the *Types & Grammar* title of this series for more information about "safe" integers.
+
+### `Number.isNaN(..)` Static Function
+
+The standard global `isNaN(..)` utility has been broken since its inception, in that it returns `true` for things that are not numbers, not just for the actual `NaN` value. ES6 adds a fixed utility `Number.isNaN(..)` that works as it should:
+
+```js
+var a = NaN, b = "NaN", c = 42;
+
+isNaN( a );							// true
+isNaN( b );							// true -- oops!
+isNaN( c );							// false
+
+Number.isNaN( a );					// true
+Number.isNaN( b );					// false -- fixed!
+Number.isNaN( c );					// false
+```
+
+### `Number.isFinite(..)` Static Function
+
+There's a temptation to look at a function name like `isFinite(..)` and assume it's simply "not infinite". That's not quite correct, though. There's more nuance to this new ES6 utility. Consider:
+
+```js
+var a = NaN, b = Infinity, c = 42;
+
+Number.isFinite( a );				// false
+Number.isFinite( b );				// false
+
+Number.isFinite( c );				// true
+```
+
+The standard global `isFinite(..)` coerces its argument, but `Number.isFinite(..)` omits the coercive behavior:
+
+```js
+var a = "42";
+
+isFinite( a );						// true
+Number.isFinite( a );				// false
+```
+
+You may still prefer the coercion, in which case using the global `isFinite(..)` is a valid choice. Alternately, and perhaps more sensibly, you can use `Number.isFinite(+x)`, which explicitly coerces `x` to a number before passing it in (see Chapter 4 of the *Types & Grammar* title of this series).
+
+### `Number.isInteger(..)` Static Function
+
+// TODO
+
+### `Number.isSafeInteger(..)` Static Function
 
 // TODO
 

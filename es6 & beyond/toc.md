@@ -34,7 +34,7 @@
 	* WeakMaps
 	* Sets
 	* WeakSets
-* Chapter 6: New APIs
+* Chapter 6: API Additions
 	* `Array`
 	* `Object`
 	* `Math`
