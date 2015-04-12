@@ -436,7 +436,19 @@ You should continue to use `===` for strict equality comparisons; `Object.is(..)
 
 ### `Object.getOwnPropertySymbols(..)` Static Function
 
-// TODO
+Chapter 2 "Symbols" discusses the new Symbol primitive value type in ES6.
+
+Symbols are likely going to be mostly used as special (meta) properties on objects. So the `Object.getOwnPropertySymbols(..)` utility was introduced, which retrieves only the symbol properties directly on an object.
+
+```js
+var o = {
+	foo: 42,
+	[ Symbol( "bar" ) ]: "hello world",
+	baz: true
+};
+
+Object.getOwnPropertySymbols( o );	// [ Symbol(bar) ]
+```
 
 ### `Object.setPrototypeOf(..)` Static Function
 
