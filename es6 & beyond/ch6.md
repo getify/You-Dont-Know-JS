@@ -162,38 +162,6 @@ Array.from( arrLike, function mapper(val,idx){
 
 // TODO: talk about mapping between Typed Array values, bitwise truncation, etc
 
-### `copyWithin(..)` Prototype Method
-
-`Array#copyWithin(..)` is a new mutator method available to all arrays (including Typed Arrays -- see Chapter 5). `copyWithin(..)` copies a portion of an array to another location in the same array, overwriting whatever was there before.
-
-The arguments are *target* (the index to copy to), *start* (the inclusive index to start the copying from), and optionally *end* (the exclusive index to stop copying). If any of the arguments are negative, they're taken to be relative from the end of the array.
-
-Consider:
-
-```js
-[1,2,3,4,5].copyWithin( 3, 0 );			// [1,2,3,1,2]
-
-[1,2,3,4,5].copyWithin( 3, 0, 1 );		// [1,2,3,1,5]
-
-[1,2,3,4,5].copyWithin( 0, -2 );		// [4,5,3,4,5]
-
-[1,2,3,4,5].copyWithin( 0, -2, -1 );	// [4,2,3,4,5]
-```
-
-The `copyWithin(..)` method does not extend the array's length, as the first example in the previous snippet shows. Copying simply stops when the end of the array is reached.
-
-The copying doesn't always go in left-to-right (ascending index) order as you might assume. It's possible this would result in repeatedly copying an already copied value if the from and target ranges overlap, which is presumably not desired behavior.
-
-So internally, the algorithm avoids this case by copying in reverse order to avoid that gotcha. Consider:
-
-```js
-[1,2,3,4,5].copyWithin( 2, 1 );			// ???
-```
-
-If the algorithm was strictly moving left-to-right, then the `2` should be copied overwrite the `3`, then *that* copied `2` should be copied to overwrite `4`, then *that* copied `2` should be copied to overwrite `5`, and you'd end up with `[1,2,2,2,2]`.
-
-Instead, the copying algorithm reverses direction and copies `4` to overwrite `5`, then copies `3` to overwrite `4`, then copies `2` to overwrite `3`, and the final result is `[1,2,2,3,4]`. That's probably more "correct" in terms of expectation, but it can be confusing if you're only thinking about the copying algorithm in a naive left-to-right fashion.
-
 ### Creating Arrays And Subtypes
 
 In the last couple of sections, we've discussed `Array.of(..)` and `Array.from(..)`, both of which create a new array in a similar way to a constructor. But what do they do in subclasses? Do they create instances of the base `Array` or the derived subclass?
@@ -255,6 +223,38 @@ MyCoolArray.of( [2, 3] ) instanceof Array;			// false
 MyCoolArray.from( x ) instanceof MyCoolArray;		// true
 MyCoolArray.of( [2, 3] ) instanceof MyCoolArray;	// true
 ```
+
+### `copyWithin(..)` Prototype Method
+
+`Array#copyWithin(..)` is a new mutator method available to all arrays (including Typed Arrays -- see Chapter 5). `copyWithin(..)` copies a portion of an array to another location in the same array, overwriting whatever was there before.
+
+The arguments are *target* (the index to copy to), *start* (the inclusive index to start the copying from), and optionally *end* (the exclusive index to stop copying). If any of the arguments are negative, they're taken to be relative from the end of the array.
+
+Consider:
+
+```js
+[1,2,3,4,5].copyWithin( 3, 0 );			// [1,2,3,1,2]
+
+[1,2,3,4,5].copyWithin( 3, 0, 1 );		// [1,2,3,1,5]
+
+[1,2,3,4,5].copyWithin( 0, -2 );		// [4,5,3,4,5]
+
+[1,2,3,4,5].copyWithin( 0, -2, -1 );	// [4,2,3,4,5]
+```
+
+The `copyWithin(..)` method does not extend the array's length, as the first example in the previous snippet shows. Copying simply stops when the end of the array is reached.
+
+The copying doesn't always go in left-to-right (ascending index) order as you might assume. It's possible this would result in repeatedly copying an already copied value if the from and target ranges overlap, which is presumably not desired behavior.
+
+So internally, the algorithm avoids this case by copying in reverse order to avoid that gotcha. Consider:
+
+```js
+[1,2,3,4,5].copyWithin( 2, 1 );			// ???
+```
+
+If the algorithm was strictly moving left-to-right, then the `2` should be copied overwrite the `3`, then *that* copied `2` should be copied to overwrite `4`, then *that* copied `2` should be copied to overwrite `5`, and you'd end up with `[1,2,2,2,2]`.
+
+Instead, the copying algorithm reverses direction and copies `4` to overwrite `5`, then copies `3` to overwrite `4`, then copies `2` to overwrite `3`, and the final result is `[1,2,2,3,4]`. That's probably more "correct" in terms of expectation, but it can be confusing if you're only thinking about the copying algorithm in a naive left-to-right fashion.
 
 ### `fill(..)` Prototype Method
 
