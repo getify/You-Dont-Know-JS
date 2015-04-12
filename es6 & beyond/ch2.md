@@ -1350,18 +1350,6 @@ var o1 = {
 	// ..
 };
 
-var o2 = Object.setPrototypeOf( {
-	// .. o2's definition ..
-}, o1 );
-```
-
-Alternatively:
-
-```js
-var o1 = {
-	// ..
-};
-
 var o2 = {
 	// ..
 };
@@ -1369,11 +1357,9 @@ var o2 = {
 Object.setPrototypeOf( o2, o1 );
 ```
 
-In both these cases, the relationship between `o2` and `o1` is moved from generally being specified at the top of the `o2` object literal definition to appearing at the end.
+**Note:** See Chapter 6 "`Object.setPrototypeOf(..)` Static Function" in Chapter 6 for more details on `Object.setPrototypeOf(..)`.
 
-I'd consider setting a `[[Prototype]]` right after object creation reasonable, as shown in the previous two snippets. But changing it much later is generally not a good idea, which I'd suggest will often lead to more confusion rather than clarity.
-
-There's another slightly more verbose alternative to the previous snippets, which still lets you use the convenience of object literals:
+There's another slightly more verbose alternative to the previous snippet, which still lets you use the convenience of object literals:
 
 ```js
 var o1 = {

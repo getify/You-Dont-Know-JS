@@ -434,11 +434,15 @@ You should continue to use `===` for strict equality comparisons; `Object.is(..)
 
 **Note:** ES6 also adds a `Number.isNaN(..)` utility (discussed later in this chapter) which may be a slightly more convenient test; you may prefer `Number.isNaN(x)` than `Object.is(x,NaN)`. You *can* accurately test for `-0` with a clumsy `x == 0 && 1 / x === -Infinity`, but in this case `Object.is(x,-0)` is much better.
 
+### `Object.assign(..)` Static Function
+
+// TODO
+
 ### `Object.getOwnPropertySymbols(..)` Static Function
 
 Chapter 2 "Symbols" discusses the new Symbol primitive value type in ES6.
 
-Symbols are likely going to be mostly used as special (meta) properties on objects. So the `Object.getOwnPropertySymbols(..)` utility was introduced, which retrieves only the symbol properties directly on an object.
+Symbols are likely going to be mostly used as special (meta) properties on objects. So the `Object.getOwnPropertySymbols(..)` utility was introduced, which retrieves only the symbol properties directly on an object:
 
 ```js
 var o = {
@@ -452,11 +456,40 @@ Object.getOwnPropertySymbols( o );	// [ Symbol(bar) ]
 
 ### `Object.setPrototypeOf(..)` Static Function
 
-// TODO
+Also in Chapter 2, we mentioned the `Object.setPrototypeOf(..)` utility, which (unsurprisingly) sets the `[[Prototype]]` of an object for the purposes of *behavior delegation* (see the *this & Object Prototypes* title of this series). Consider:
 
-### `Object.assign(..)` Static Function
+```js
+var o1 = {
+	foo() { console.log( "foo" ); }
+};
+var o2 = {
+	// .. o2's definition ..
+};
 
-// TODO
+Object.setPrototypeOf( o2, o1 );
+
+// delegates to `o1.foo()`
+o2.foo();							// foo
+```
+
+Alternatively:
+
+```js
+var o1 = {
+	foo() { console.log( "foo" ); }
+};
+
+var o2 = Object.setPrototypeOf( {
+	// .. o2's definition ..
+}, o1 );
+
+// delegates to `o1.foo()`
+o2.foo();							// foo
+```
+
+In both previous snippets, the relationship between `o2` and `o1` appears at the end of the `o2` definition. More commonly, the relationship between an `o2` and `o1` is specified at the top of the `o2` definition, as it is with classes, and also with `__proto__` in object literals (see "Setting `[[Prototype]]`" in Chapter 2).
+
+**Warning:** Setting a `[[Prototype]]` right after object creation is reasonable, as shown. But changing it much later is generally not a good idea and will usually lead to more confusion than clarity.
 
 ## `Math`
 
