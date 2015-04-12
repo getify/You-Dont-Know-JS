@@ -392,7 +392,7 @@ s.has( y );						// false
 
 ### Set Iterators
 
-Sets have the same iterators as maps. Their behavior is different for sets, but symmetric with the behavior of map iterators. Consider:
+Sets have the same iterator methods as maps. Their behavior is different for sets, but symmetric with the behavior of map iterators. Consider:
 
 ```js
 var s = new Set();

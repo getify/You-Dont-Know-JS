@@ -321,7 +321,7 @@ a.find( function matcher(v){
 });
 ```
 
-Using a custom `matcher(..)` function also lets you match against complex values, like objects:
+Using a custom `matcher(..)` function also lets you match against complex values like objects:
 
 ```js
 var points = [
@@ -378,7 +378,33 @@ Don't use `findIndex(..) != -1` (the way it's always been done with `indexOf(..)
 
 ### `entries()`, `values()`, `keys()` Prototype Methods
 
-// TODO
+In Chapter 3, we illustrated how data structures can provide a patterned item-by-item enumeration of their values, via an iterator. We then expounded on this approach in Chapter 5, as we explored how the new ES6 collections (Map, Set, etc.) provide several methods for producing different kinds of iterations.
+
+While `Array` might not be thought of traditionally as a "collection" since it's not new to ES6, it is one in the sense that it provides these same iterator methods: `entries()`, `values()`, and `keys()`. Consider:
+
+```js
+var a = [1,2,3];
+
+[ ...a.values() ];				// [1,2,3]
+[ ...a.keys() ];				// [0,1,2]
+[ ...a.entries() ];				// [ [0,1], [1,2], [2,3] ]
+
+[ ...a[Symbol.iterator]() ];	// [1,2,3]
+```
+
+Just like with `Set`, the default `Array` iterator is the same as what `values()` returns.
+
+In "Avoiding Empty Slots" earlier in this chapter, we illustrated how `Array.from(..)` treats empty slots in an array as just being present slots with `undefined` in them. That's actually because under the covers, the array iterators behave that way:
+
+```js
+var a = [];
+a.length = 3;
+a[1] = 2;
+
+[ ...a.values() ];		// [undefined,2,undefined]
+[ ...a.keys() ];		// [0,1,2]
+[ ...a.entries() ];		// [ [0,undefined], [1,2], [2,undefined] ]
+```
 
 ## `Object`
 
