@@ -1357,24 +1357,7 @@ var o2 = {
 Object.setPrototypeOf( o2, o1 );
 ```
 
-**Note:** See Chapter 6 "`Object.setPrototypeOf(..)` Static Function" in Chapter 6 for more details on `Object.setPrototypeOf(..)`.
-
-There's another slightly more verbose alternative to the previous snippet, which still lets you use the convenience of object literals:
-
-```js
-var o1 = {
-	// ..
-};
-
-var o2 = Object.assign(
-	Object.create( o1 ),
-	{
-		// .. o2's definition ..
-	}
-);
-```
-
-`Object.assign(..)` is a new ES6 utility -- it copies object properties -- and is covered in Chapter 6. `Object.create(..)` is the ES5 standard utility that creates an empty object that is `[[Prototype]]`-linked.
+**Note:** See Chapter 6 "`Object.setPrototypeOf(..)` Static Function" in Chapter 6 for more details on `Object.setPrototypeOf(..)`. Also see "`Object.assign(..)` Static Function" in Chapter 6 for another form that relates `o2` prototypically to `o1`.
 
 ### Object `super`
 
