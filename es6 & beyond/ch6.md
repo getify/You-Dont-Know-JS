@@ -158,7 +158,7 @@ Array.from( arrLike, function mapper(val,idx){
 // [ 0, 1, "FOO", 3 ]
 ```
 
-**Note:** As with other array methods that take callbacks, `Array.from(..)` has an optional third parameter that if set will specify the `this` binding for the callback passed to the second parameter.
+**Note:** As with other array methods that take callbacks, `Array.from(..)` takes an optional third argument that if set will specify the `this` binding for the callback passed as the second argument. Otherwise, `this` will be `undefined`.
 
 // TODO: talk about mapping between Typed Array values, bitwise truncation, etc
 
@@ -214,11 +214,105 @@ a;
 
 ### `find(..)` Prototype Method
 
-// TODO
+The most common way to search for a value in an array has generally been the `indexOf(..)` method, which returns the index the value is found at or `-1` if not found:
+
+```js
+var a = [1,2,3,4,5];
+
+(a.indexOf( 3 ) != -1);				// true
+(a.indexOf( 7 ) != -1);				// false
+
+(a.indexOf( "2" ) != -1);			// false
+```
+
+The `indexOf(..)` comparison requires a strict `===` match, so a search for `"2"` fails to find a value of `2`, and vice versa. There's no way to override the matching algorithm for `indexOf(..)`. It's also unfortunate/ungraceful to have to make the manual comparison to the `-1` value.
+
+**Tip:** See the *Types & Grammar* title of this series for an interesting (and controversially confusing) technique to work around the `-1` ugliness with the `~` operator.
+
+Since ES5, the most common workaround to have control over the matching logic  has been the `some(..)` method. It works by calling a function callback for each element, until one of those calls returns a `true`/truthy value, and then it stops. Since you get to define the callback function, you have full control over how a match is made:
+
+```js
+var a = [1,2,3,4,5];
+
+a.some( function matcher(v){
+	return v == "2";
+} );								// true
+
+a.some( function matcher(v){
+	return v == 7;
+} );								// false
+```
+
+But the downside to this approach is that you only get the `true`/`false` indicating if a suitably matched value was found, but not what the actual matched value was.
+
+ES6's `find(..)` addresses this. It works basically the same as `some(..)`, except that once the callback returns a `true`/truthy value, the actual array value is returned:
+
+```js
+var a = [1,2,3,4,5];
+
+a.find( function matcher(v){
+	return v == "2";
+} );								// 2
+
+a.find( function matcher(v){
+	return v == 7;					// undefined
+});
+```
+
+Using a custom `matcher(..)` function also lets you match against complex values, like objects:
+
+```js
+var points = [
+	{ x: 10, y: 20 },
+	{ x: 20, y: 30 },
+	{ x: 30, y: 40 },
+	{ x: 40, y: 50 },
+	{ x: 50, y: 60 }
+];
+
+points.find( function matcher(point) {
+	return (
+		point.x % 3 == 0 &&
+		point.y % 4 == 0
+	);
+} );								// { x: 30, y: 40 }
+```
+
+**Note:** As with other array methods that take callbacks, `find(..)` takes an optional second argument that if set will specify the `this` binding for the callback passed as the first argument. Otherwise, `this` will be `undefined`.
 
 ### `findIndex(..)` Prototype Method
 
-// TODO
+While the previous section illustrates how `some(..)` yields a boolean result for a search of an array, and `find(..)` yields the matched value itself from the array search, there's also a need for finding the positional index of the matched value.
+
+`indexOf(..)` does that, but there's no control over its matching logic; it always uses `===` strict equality. So ES6's `findIndex(..)` is the answer:
+
+```js
+var points = [
+	{ x: 10, y: 20 },
+	{ x: 20, y: 30 },
+	{ x: 30, y: 40 },
+	{ x: 40, y: 50 },
+	{ x: 50, y: 60 }
+];
+
+points.findIndex( function matcher(point) {
+	return (
+		point.x % 3 == 0 &&
+		point.y % 4 == 0
+	);
+} );								// 2
+
+points.findIndex( function matcher(point) {
+	return (
+		point.x % 6 == 0 &&
+		point.y % 7 == 0
+	);
+} );								// -1
+```
+
+Don't use `findIndex(..) != -1` (the way it's always been done with `indexOf(..)`) to get a boolean from the search, because `some(..)` already yields the `true`/`false` you want. And don't do `a[ a.findIndex(..) ]` to get the matched value, because that's what `find(..)` accomplishes. And finally, use `indexOf(..)` if you need the index of a strict match, or `findIndex(..)` if you need the index of a more customized match.
+
+**Note:** As with other array methods that take callbacks, `find(..)` takes an optional second argument that if set will specify the `this` binding for the callback passed as the first argument. Otherwise, `this` will be `undefined`.
 
 ### `entries()`, `values()`, `keys()` Prototype Methods
 
