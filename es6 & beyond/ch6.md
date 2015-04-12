@@ -194,6 +194,68 @@ If the algorithm was strictly moving left-to-right, then the `2` should be copie
 
 Instead, the copying algorithm reverses direction and copies `4` to overwrite `5`, then copies `3` to overwrite `4`, then copies `2` to overwrite `3`, and the final result is `[1,2,2,3,4]`. That's probably more "correct" in terms of expectation, but it can be confusing if you're only thinking about the copying algorithm in a naive left-to-right fashion.
 
+### Creating Arrays And Subtypes
+
+In the last couple of sections, we've discussed `Array.of(..)` and `Array.from(..)`, both of which create a new array in a similar way to a constructor. But what do they do in subclasses? Do they create instances of the base `Array` or the derived subclass?
+
+```js
+class MyCoolArray extends Array {
+	..
+}
+
+Array.of( 1, 2 ) instanceof Array;					// true
+Array.from( [1, 2] ) instanceof Array;				// true
+
+MyCoolArray.of( 1, 2 ) instanceof Array;			// false
+MyCoolArray.from( [1, 2] ) instanceof Array;		// false
+
+MyCoolArray.of( 1, 2 ) instanceof MyCoolArray;		// true
+MyCoolArray.from( [1, 2] ) instanceof MyCoolArray;	// true
+```
+
+Both `of(..)` and `from(..)` use the constructor that they're accessed from to construct the array. So if you use the base `Array.of(..)` you'll get an `Array` instance, but if you use `MyCoolArray.of(..)`, you'll get a `MyCoolArray` instance.
+
+In "Classes" in Chapter 3, we covered the `@@species` setting which all the built-in classes (like `Array`) have defined, which is used by any prototype methods if they create a new instance. `slice(..)` is a great example:
+
+```js
+var x = new MyCoolArray( 1, 2, 3 );
+
+x.slice( 1 ) instanceof MyCoolArray;				// true
+```
+
+Generally, that default behavior will probably be desired, but as we discussed in Chapter 3, you *can* override if you want:
+
+```js
+class MyCoolArray extends Array {
+	// force `species` to be parent constructor
+	static get [Symbol.species]() { return Array; }
+}
+
+var x = new MyCoolArray( 1, 2, 3 );
+
+x.slice( 1 ) instanceof MyCoolArray;				// false
+x.slice( 1 ) instanceof Array;						// true
+```
+
+It's important to note that the `@@species` setting is only used for the prototype methods, like `slice(..)`. It's not used by `of(..)` and `from(..)`; they both just use the `this` binding (whatever constructor is used to make the reference). Consider:
+
+```js
+class MyCoolArray extends Array {
+	// force `species` to be parent constructor
+	static get [Symbol.species]() { return Array; }
+}
+
+var x = new MyCoolArray( 1, 2, 3 );
+
+x.slice( 1 ) instanceof Array;						// true
+
+MyCoolArray.from( x ) instanceof Array;				// false
+MyCoolArray.of( [2, 3] ) instanceof Array;			// false
+
+MyCoolArray.from( x ) instanceof MyCoolArray;		// true
+MyCoolArray.of( [2, 3] ) instanceof MyCoolArray;	// true
+```
+
 ### `fill(..)` Prototype Method
 
 Filling an existing array entirely (or partially) with a specified value is natively supported as of ES6 with the `Array#fill(..)` method:

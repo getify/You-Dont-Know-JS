@@ -1944,7 +1944,7 @@ Be careful not to get confused that `static` members are on the class's prototyp
 
 #### `Symbol.species` Constructor Getter
 
-One place where `static` can be useful is in setting the `Symbol.species` getter for a derived (child) class. This capability allows a child class to signal to a parent class what constructor should be used -- when not intending the child class's constructor itself -- if any parent class method needs to vend a new instance.
+One place where `static` can be useful is in setting the `Symbol.species` getter (known internally in the specification as `@@species`) for a derived (child) class. This capability allows a child class to signal to a parent class what constructor should be used -- when not intending the child class's constructor itself -- if any parent class method needs to vend a new instance.
 
 For example, many methods on `Array` create and return a new `Array` instance. If you define a derived class from `Array`, but you want those methods to continue to vend actual `Array` instances instead of your derived class, this works:
 
