@@ -643,13 +643,62 @@ Number.isFinite( a );				// false
 
 You may still prefer the coercion, in which case using the global `isFinite(..)` is a valid choice. Alternately, and perhaps more sensibly, you can use `Number.isFinite(+x)`, which explicitly coerces `x` to a number before passing it in (see Chapter 4 of the *Types & Grammar* title of this series).
 
-### `Number.isInteger(..)` Static Function
+### Integer-related Static Functions
 
-// TODO
+JavaScript number valuess are always floating point (IEE-754). So the notion of determining if a number is an "integer" is not about checking its type, since JS makes no such distinction.
 
-### `Number.isSafeInteger(..)` Static Function
+Instead, you need to check if there's any non-zero decimal portion of the value. The easiest way to do that has commonly been:
 
-// TODO
+```js
+x === Math.floor( x );
+```
+
+ES6 adds a `Number.isInteger(..)` helper utility that potentially can determine this quality slightly more efficiently:
+
+```js
+Number.isInteger( 4 );				// true
+Number.isInteger( 4.2 );			// false
+```
+
+**Note:** In JavaScript, there's no difference between `4`, `4.`, `4.0`, or `4.0000`. All of these would be considered an "integer", and would thus yield `true` from `Number.isInteger(..)`.
+
+In addition, `Number.isInteger(..)` filters out some clearly not-integer values that `x === Math.floor(x)` could potentially mix up:
+
+```js
+Number.isInteger( NaN );			// false
+Number.isInteger( Infinity );		// false
+```
+
+Working with "integers" is sometimes an important bit of information, since it can simplify certain kinds of algorithms. JS code by itself will not run faster just from filtering for only integers, but there are optimization techniques the engine can take (e.g., asm.js) when only integers are being used.
+
+Because of `Number.isInteger(..)`'s handling of `NaN` and `Infinity` values, defining a `isFloat(..)` utility would not be just as simple as `!Number.isInteger(..)`. You'd need to do something like:
+
+```js
+function isFloat(x) {
+	return Number.isFinite( x ) && !Number.isInteger( x );
+}
+
+isFloat( 4.2 );						// true
+isFloat( 4 );						// false
+
+isFloat( NaN );						// false
+isFloat( Infinity );				// false
+```
+
+**Note:** It may seem strange, but Infinity should neither be considered an integer nor a float.
+
+ES6 also defines a `Number.isSafeInteger(..)` utility, which checks to make sure the value is both an integer and within the range of `Number.MIN_SAFE_INTEGER`-`Number.MAX_SAFE_INTEGER` (inclusive).
+
+```js
+var x = Math.pow( 2, 53 ),
+	y = Math.pow( -2, 53 );
+
+Number.isSafeInteger( x - 1 );		// true
+Number.isSafeInteger( y + 1 );		// true
+
+Number.isSafeInteger( x );			// false
+Number.isSafeInteger( y );			// false
+```
 
 ## `String`
 
