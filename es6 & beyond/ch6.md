@@ -561,11 +561,11 @@ o2.foo();							// foo
 
 ## `Math`
 
-ES6 adds several new mathematic utilities that fill in holes or aid with common operations. All of these can be manually calculated, but most of them are now defined natively so that the JS engine can more optimally perform the calculations.
+ES6 adds several new mathematic utilities that fill in holes or aid with common operations. All of these can be manually calculated, but most of them are now defined natively so that in some cases the JS engine can either more optimally perform the calculations, or perform them with better decimal precision than their manual counterparts.
 
-It's likely that asm.js/transpiled JS code (see the *Async & Performance* title of this series) is the more likely consumer of these utilities rather than direct developers.
+It's likely that asm.js/transpiled JS code (see the *Async & Performance* title of this series) is the more likely consumer of many of these utilities rather than direct developers.
 
-Geometry:
+Trigonometry:
 
 * `cosh(..)` - hyperbolic cosine
 * `acosh(..)` - hyperbolic arccosine
@@ -595,6 +595,8 @@ Meta:
 
 Accurately working with numbers is very important to your program working correctly. ES6 adds some additional properties and functions to assist with common numeric operations.
 
+Two additions to `Number` are just references to the preexisting globals: `Number.parseInt(..)` and `Number.parseFloat(..)`.
+
 ### Static Properties
 
 * `Number.EPSILON` - the minimum value between any two numbers: `2^-52` (see Chapter 2 of the *Types & Grammar* title of this series regarding using this value as a tolerance for imprecision in floating point arithmetic)
@@ -605,7 +607,7 @@ Accurately working with numbers is very important to your program working correc
 
 ### `Number.isNaN(..)` Static Function
 
-The standard global `isNaN(..)` utility has been broken since its inception, in that it returns `true` for things that are not numbers, not just for the actual `NaN` value. ES6 adds a fixed utility `Number.isNaN(..)` that works as it should:
+The standard global `isNaN(..)` utility has been broken since its inception, in that it returns `true` for things that are not numbers, not just for the actual `NaN` value, because it coerces the argument to a number type (which can falsely result in a NaN). ES6 adds a fixed utility `Number.isNaN(..)` that works as it should:
 
 ```js
 var a = NaN, b = "NaN", c = 42;
