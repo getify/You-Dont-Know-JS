@@ -3,7 +3,7 @@
 
 From conversions of values to mathematic calculations, ES6 adds many static properties and methods to various built-in natives and objects to help with common tasks. In addition, instances of some of the natives have new capabilities via various new prototype methods.
 
-**Note:** Many of these features can be faithfully polyfilled. We will not dive into those details here, but check out "ES6 Shim" (https://github.com/paulmillr/es6-shim/) for standards-compliant shims/polyfills.
+**Note:** Most of these features can be faithfully polyfilled. We will not dive into such details here, but check out "ES6 Shim" (https://github.com/paulmillr/es6-shim/) for standards-compliant shims/polyfills.
 
 ## `Array`
 
@@ -783,4 +783,12 @@ For all the string search/inspection methods, if you look for an empty string `"
 
 ## Review
 
-// TODO
+ES6 adds many extra API helpers on the various built-in native objects:
+
+* `Array` adds `of(..)` and `from(..)` static functions, as well as prototype functions like `copyWithin(..)` and `fill(..)`.
+* `Object` adds static functions like `is(..)` and `assign(..)`.
+* `Math` adds static functions like `acosh(..)` and `clz32(..)`.
+* `Number` adds static properties like `Number.EPSILON`, as well as static functions like `Number.isFinite(..)`.
+* `String` adds static functions like `String.fromCodePoint(..)` and `String.raw(..)`, as well as prototype functions like `repeat(..)` and `includes(..)`.
+
+Most of these additions can be polyfilled (see ES6 Shim), and were inspired by utilities in common JS libraries/frameworks.
