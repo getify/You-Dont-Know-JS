@@ -2291,14 +2291,26 @@ So what can we do? In this case, we can perform a *Unicode normalization* on the
 var s1 = "\xE9",
 	s2 = "e\u0301";
 
-[...s1.normalize()].length;		// 1
-[...s2.normalize()].length;		// 1
+s1.normalize().length;			// 1
+s2.normalize().length;			// 1
 
 s1 === s2;						// false
 s1 === s2.normalize();			// true
 ```
 
-Essentially, `normalize(..)` takes a sequence like `"e\u0301"` and normalizes it to `"\xE9"`.
+Essentially, `normalize(..)` takes a sequence like `"e\u0301"` and normalizes it to `"\xE9"`. Normalization can even combine multiple adjacent combining marks if there's a suitable Unicode character they combine to:
+
+```js
+var s1 = "o\u0302\u0300",
+	s2 = s1.normalize(),
+	s3 = "ồ";
+
+s1.length;						// 3
+s2.length;						// 1
+s3.length;						// 1
+
+s2 === s3;						// true
+```
 
 Unfortunately, normalization isn't fully perfect here, either. If you have multiple combining marks modifying a single character, you may not get the length count you'd expect, because there may not be a single defined normalized character that represents the combination of all the marks. For example:
 
@@ -2307,7 +2319,7 @@ var s1 = "e\u0301\u0330";
 
 console.log( s1 );				// "ḛ́"
 
-[...s1.normalize()].length;		// 2
+s1.normalize().length;			// 2
 ```
 
 The further you go down this rabbit hole, the more you realize that there it's difficult to get one precise definition for "length". What we see visually rendered as a single character -- more precisely called a *grapheme* -- doesn't always strictly relate to a single "character" in the program processing sense.
