@@ -387,11 +387,11 @@ While `Array` might not be thought of traditionally as a "collection" since it's
 ```js
 var a = [1,2,3];
 
-[ ...a.values() ];					// [1,2,3]
-[ ...a.keys() ];					// [0,1,2]
-[ ...a.entries() ];					// [ [0,1], [1,2], [2,3] ]
+[...a.values()];					// [1,2,3]
+[...a.keys()];						// [0,1,2]
+[...a.entries()];					// [ [0,1], [1,2], [2,3] ]
 
-[ ...a[Symbol.iterator]() ];		// [1,2,3]
+[...a[Symbol.iterator]()];			// [1,2,3]
 ```
 
 Just like with `Set`, the default `Array` iterator is the same as what `values()` returns.
@@ -403,9 +403,9 @@ var a = [];
 a.length = 3;
 a[1] = 2;
 
-[ ...a.values() ];		// [undefined,2,undefined]
-[ ...a.keys() ];		// [0,1,2]
-[ ...a.entries() ];		// [ [0,undefined], [1,2], [2,undefined] ]
+[...a.values()];		// [undefined,2,undefined]
+[...a.keys()];			// [0,1,2]
+[...a.entries()];		// [ [0,undefined], [1,2], [2,undefined] ]
 ```
 
 ## `Object`
@@ -702,7 +702,34 @@ Number.isSafeInteger( y );			// false
 
 ## `String`
 
-// TODO
+Strings already have quite a few helpers prior to ES6, but even more have been added to the mix.
+
+### Unicode Functions
+
+"Unicode-Aware String Operations" in Chapter 2 discusses `String.fromCodePoint(..)`, `String#codePointAt(..)`, and `String#normalize(..)` in detail. They have been added to improve Unicode support in JS string values.
+
+```js
+String.fromCodePoint( 0x1d49e );			// "𝒞"
+
+"ab𝒞d".codePointAt( 2 ).toString( 16 );		// "1d49e"
+```
+
+The `normalize(..)` string prototype method is used to perform Unicode normalizations that either combine characters with adjacent "combining marks" or decompose combined characters.
+
+Generally, the normalization won't create a visible effect on the contents of the string, but will change the contents of the string which can affect how things like the `length` property are reported, as well as how character access by position behave:
+
+```js
+var s1 = "e\u0301";
+s1.length;									// 2
+
+var s2 = s1.normalize();
+s2.length;									// 1
+s2 === "\xE9";								// true
+```
+
+`normalize(..)` takes an optional argument that specifies the normalization form to use. This argument must be one of the following four values: `"NFC"` (default), `"NFD"`, `"NFKC"`, or `"NFKD"`.
+
+**Note:** The topic of normalization forms and their effects on strings is well beyond the scope of what we'll discuss here. See "Unicode Normalization Forms" (http://www.unicode.org/reports/tr15/) for more information.
 
 ## Review
 
