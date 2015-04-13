@@ -1627,8 +1627,8 @@ ES6 comes with a built-in function that can be used as a string literal tag: `St
 
 ```js
 console.log( `Hello\nWorld` );
-// "Hello
-// World"
+/* "Hello
+World" */
 
 console.log( String.raw`Hello\nWorld` );
 // "Hello\nWorld"
