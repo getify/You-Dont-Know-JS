@@ -1887,7 +1887,7 @@ The `ouch` custom error object in this previous snippet will behave like any oth
 
 ES6 introduces a new concept called a "metaproperty", in the form of `new.target`. If that looks strange, it is; pairing a keyword with a `.` and a property name is definitely out of the ordinary pattern for JS.
 
-`new.target` is a new "magical" value available in all functions, though in normal functions it will always be `null`. In any constructor, `new.target` always points at the constructor `new` directly invoked, even if the constructor is in a parent class and was delegated to by a `super(..)` call from a child constructor. Consider:
+`new.target` is a new "magical" value available in all functions, though in normal functions it will always be `undefined`. In any constructor, `new.target` always points at the constructor `new` directly invoked, even if the constructor is in a parent class and was delegated to by a `super(..)` call from a child constructor. Consider:
 
 ```js
 class Foo {
@@ -1901,6 +1901,9 @@ class Bar extends Foo {
 		super();
 		console.log( "Bar: ", new.target.name );
 	}
+	baz() {
+		console.log( "baz: ", new.target );
+	}
 }
 
 var a = new Foo();
@@ -1909,9 +1912,14 @@ var a = new Foo();
 var b = new Bar();
 // Foo: Bar
 // Bar: Bar
+
+b.baz();
+// baz: undefined
 ```
 
-The `new.target` metaproperty doesn't seem to have much purpose in class constructors, except if you needed to access a static property/method (see the next section). In a regular function call, if it's `null`, you can tell the function wasn't called with `new`, which could be useful for forcing a `new` construction in the case of non-`new` invocation.
+The `new.target` metaproperty doesn't have much purpose in class constructors, except accessing a static property/method (see the next section).
+
+If `new.target` is `undefined`, you know the function was not called with `new`. You can then force a `new` invocation if that's necessary.
 
 ### `static`
 
