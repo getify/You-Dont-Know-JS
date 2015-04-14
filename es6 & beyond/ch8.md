@@ -7,6 +7,21 @@
 
 ## Other Stuff
 
+### Exponentiation Operator
+
+An operator has been proposed for JavaScript to perform exponentiation in the same way that `Math.pow(..)` does. Consider:
+
+```js
+var a = 2;
+
+a ** 4;			// Math.pow( a, 4 ) == 16
+
+a **= 3;		// a = Math.pow( a, 3 )
+a;				// 8
+```
+
+**Note:** `**` is essentially the same as it appears in Python, Ruby, Perl, and others.
+
 ### Objects and `...`
 
 As we saw in the "Too Many, Too Few, Just Enough" section of Chapter 2, the `...` operator is pretty obvious in how it relates to spreading or gathering arrays. But what about objects?
