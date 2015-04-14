@@ -16,6 +16,6 @@
 * [Chapter 4: Async Flow Control](ch4.md)
 * [Chapter 5: Collections](ch5.md)
 * [Chapter 6: API Additions](ch6.md)
-* Chapter 7: Meta
+* [Chapter 7: Meta Programming](ch7.md)
 * [Chapter 8: Beyond ES6](ch8.md)
 * [Appendix A: Thank You's!](apA.md)

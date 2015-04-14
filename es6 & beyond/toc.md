@@ -40,8 +40,7 @@
 	* `Math`
 	* `Number`
 	* `String`
-* Chapter 7: Meta
-	* Realms
+* Chapter 7: Meta Programming
 	* Function Names
 	* Built-in Object Symbols
 	* `Reflect` API
