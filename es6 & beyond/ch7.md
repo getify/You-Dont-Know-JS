@@ -11,7 +11,46 @@ ES6 adds a few new forms/features for meta programming which we'll briefly revie
 
 ## Function Names
 
-// TODO
+There are cases where your code may want to introspect on itself and ask what the name of some function is. For instance, you may need to notify some other part of the system what function to invoke at a later time, but you may not be able to just pass around a reference to the function itself.
+
+If you ask what a function's name is, the answer you get is surprisingly somewhat ambiguous. Consider:
+
+```js
+function daz() {
+	// ..
+}
+
+var obj = {
+	foo: function() {
+		// ..
+	},
+	bar: function baz() {
+		// ..
+	},
+	bam: daz,
+	zim() {
+		// ..
+	}
+};
+```
+
+In this previous snippet, "what is the name of `obj.foo()`" is slightly nuanced. Is it `"foo"` or is undefined? And what about `obj.bar()` -- is it named `"bar"` or `"baz"`? Is `obj.bam()` named `"bam"` or `"daz"`? What about `obj.zim()`?
+
+Moreover, what about functions which are passed as callbacks, like:
+
+```js
+function foo(cb) {
+	// what is the name of `cb()` here?
+}
+
+foo( function(){
+	// I'm anonymous!
+} );
+```
+
+There are quite a few ways that functions can be expressed in programs, and it's not always clear and unambiguous what the "name" of that function should be.
+
+More importantly, we need to distinguish whether the "name" of a function refers to its `name` property -- yes, functions have a property called `name` -- or whether it refers to the lexical binding name, such as `bar` in `function bar() { .. }`.
 
 ## Built-in Object Symbols
 
