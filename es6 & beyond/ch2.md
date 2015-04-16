@@ -602,7 +602,7 @@ Consider:
 var a, b, c, x, y, z;
 
 [a,b,c] = foo();
-( { x, y, z } ) = bar();
+( { x, y, z } = bar() );
 
 console.log( a, b, c );				// 1 2 3
 console.log( x, y, z );				// 4 5 6
@@ -610,7 +610,7 @@ console.log( x, y, z );				// 4 5 6
 
 The variables can already be declared, and then the destructuring only does assignments, exactly as we've already seen.
 
-**Note:** For the object destructuring form specifically, when leaving off a `var`/`let`/`const` declarator, we had to surround the `{ .. }` value in `( )`, because `{ .. }` all by itself is taken to be a statement block instead of an object.
+**Note:** For the object destructuring form specifically, when leaving off a `var`/`let`/`const` declarator, we had to surround the whole assignment expression in `( )`, because the `{ .. }` on the left-hand side is taken to be a statement block instead of an object.
 
 In fact, the assignment expressions (`a`, `y`, etc.) don't actually need to be just variable identifiers. Anything that's a valid assignment expression is valid. For example:
 
@@ -618,7 +618,7 @@ In fact, the assignment expressions (`a`, `y`, etc.) don't actually need to be j
 var o = {};
 
 [o.a, o.b, o.c] = foo();
-( { x: o.x, y: o.y, z: o.z } ) = bar();
+( { x: o.x, y: o.y, z: o.z } = bar() );
 
 console.log( o.a, o.b, o.c );		// 1 2 3
 console.log( o.x, o.y, o.z );		// 4 5 6
@@ -630,7 +630,7 @@ You can even use computed property expressions in the destructuring. Consider:
 var which = "x",
 	o = {};
 
-({ [which]: o[which] }) = bar();
+( { [which]: o[which] } = bar() );
 
 console.log( o.x );					// 4
 ```
@@ -643,7 +643,7 @@ You can use the general assignments to create object mappings/transformations, s
 var o1 = { a: 1, b: 2, c: 3 },
 	o2 = {};
 
-( { a: o2.x, b: o2.y, c: o2.z } ) = o1;
+( { a: o2.x, b: o2.y, c: o2.z } = o1 );
 
 console.log( o2.x, o2.y, o2.z );	// 1 2 3
 ```
@@ -654,7 +654,7 @@ Or you can map an object to an array, such as:
 var o1 = { a: 1, b: 2, c: 3 },
 	a2 = [];
 
-( { a: a2[0], b: a2[1], c: a2[2] } ) = o1;
+( { a: a2[0], b: a2[1], c: a2[2] } = o1 );
 
 console.log( a2 );					// [1,2,3]
 ```
@@ -770,9 +770,9 @@ Be careful about confusing yourself (or other developers who read your code) if 
 var x = 200, y = 300, z = 100;
 var o1 = { x: { y: 42 }, z: { y: z } };
 
-( { y: x = { y: y } } ) = o1;
-( { z: y = { y: z } } ) = o1;
-( { x: z = { y: x } } ) = o1;
+( { y: x = { y: y } } = o1 );
+( { z: y = { y: z } } = o1 );
+( { x: z = { y: x } } = o1 );
 ```
 
 Can you tell from that snippet what values `x`, `y`, and `z` have at the end? Takes a moment to ponder, I would imagine. I'll end the suspense:
