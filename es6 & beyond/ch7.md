@@ -52,6 +52,17 @@ There are quite a few ways that functions can be expressed in programs, and it's
 
 More importantly, we need to distinguish whether the "name" of a function refers to its `name` property -- yes, functions have a property called `name` -- or whether it refers to the lexical binding name, such as `bar` in `function bar() { .. }`.
 
+The lexical binding name is what you use for things like recursion:
+
+```js
+function foo(i) {
+	if (i < 10) return foo( i * 2 );
+	return i;
+}
+```
+
+The `name` property is what you'd use for meta programming purposes, so that's what we'll focus on in this discussion.
+
 ## Built-in Object Symbols
 
 // TODO
