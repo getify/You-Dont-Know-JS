@@ -63,6 +63,10 @@ function foo(i) {
 
 The `name` property is what you'd use for meta programming purposes, so that's what we'll focus on in this discussion.
 
+The confusion comes because by default, the lexical name a function has (if any) is also set as its `name` property. But what happens to the name property if a function has no lexical name? Prior to ES6, essentially nothing.
+
+But as of ES6, there are a set of inference rules which can determine a reasonable `name` property value to assign a function if that function doesn't have a lexical name to provide the value.
+
 ## Built-in Object Symbols
 
 // TODO
