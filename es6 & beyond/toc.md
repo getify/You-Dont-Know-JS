@@ -29,19 +29,18 @@
 	* Promises
 	* Generators + Promises
 * Chapter 5: Collections
-	* Map
-	* WeakMap
-	* Set
-	* WeakSet
 	* Typed Arrays
-* Chapter 6: New APIs
+	* Maps
+	* WeakMaps
+	* Sets
+	* WeakSets
+* Chapter 6: API Additions
+	* `Array`
 	* `Object`
 	* `Math`
 	* `Number`
 	* `String`
-	* `Array`
-* Chapter 7: Meta
-	* Realms
+* Chapter 7: Meta Programming
 	* Function Names
 	* Built-in Object Symbols
 	* `Reflect` API

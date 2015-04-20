@@ -28,7 +28,7 @@ var obj = {
 	}
 };
 
-var id = "not awesome"
+var id = "not awesome";
 
 obj.cool(); // awesome
 

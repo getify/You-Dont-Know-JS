@@ -602,7 +602,7 @@ Consider:
 var a, b, c, x, y, z;
 
 [a,b,c] = foo();
-( { x, y, z } ) = bar();
+( { x, y, z } = bar() );
 
 console.log( a, b, c );				// 1 2 3
 console.log( x, y, z );				// 4 5 6
@@ -610,7 +610,7 @@ console.log( x, y, z );				// 4 5 6
 
 The variables can already be declared, and then the destructuring only does assignments, exactly as we've already seen.
 
-**Note:** For the object destructuring form specifically, when leaving off a `var`/`let`/`const` declarator, we had to surround the `{ .. }` value in `( )`, because `{ .. }` all by itself is taken to be a statement block instead of an object.
+**Note:** For the object destructuring form specifically, when leaving off a `var`/`let`/`const` declarator, we had to surround the whole assignment expression in `( )`, because the `{ .. }` on the left-hand side is taken to be a statement block instead of an object.
 
 In fact, the assignment expressions (`a`, `y`, etc.) don't actually need to be just variable identifiers. Anything that's a valid assignment expression is valid. For example:
 
@@ -618,7 +618,7 @@ In fact, the assignment expressions (`a`, `y`, etc.) don't actually need to be j
 var o = {};
 
 [o.a, o.b, o.c] = foo();
-( { x: o.x, y: o.y, z: o.z } ) = bar();
+( { x: o.x, y: o.y, z: o.z } = bar() );
 
 console.log( o.a, o.b, o.c );		// 1 2 3
 console.log( o.x, o.y, o.z );		// 4 5 6
@@ -630,7 +630,7 @@ You can even use computed property expressions in the destructuring. Consider:
 var which = "x",
 	o = {};
 
-({ [which]: o[which] }) = bar();
+( { [which]: o[which] } = bar() );
 
 console.log( o.x );					// 4
 ```
@@ -643,7 +643,7 @@ You can use the general assignments to create object mappings/transformations, s
 var o1 = { a: 1, b: 2, c: 3 },
 	o2 = {};
 
-( { a: o2.x, b: o2.y, c: o2.z } ) = o1;
+( { a: o2.x, b: o2.y, c: o2.z } = o1 );
 
 console.log( o2.x, o2.y, o2.z );	// 1 2 3
 ```
@@ -654,7 +654,7 @@ Or you can map an object to an array, such as:
 var o1 = { a: 1, b: 2, c: 3 },
 	a2 = [];
 
-( { a: a2[0], b: a2[1], c: a2[2] } ) = o1;
+( { a: a2[0], b: a2[1], c: a2[2] } = o1 );
 
 console.log( a2 );					// [1,2,3]
 ```
@@ -770,9 +770,9 @@ Be careful about confusing yourself (or other developers who read your code) if 
 var x = 200, y = 300, z = 100;
 var o1 = { x: { y: 42 }, z: { y: z } };
 
-( { y: x = { y: y } } ) = o1;
-( { z: y = { y: z } } ) = o1;
-( { x: z = { y: x } } ) = o1;
+( { y: x = { y: y } } = o1 );
+( { z: y = { y: z } } = o1 );
+( { x: z = { y: x } } = o1 );
 ```
 
 Can you tell from that snippet what values `x`, `y`, and `z` have at the end? Takes a moment to ponder, I would imagine. I'll end the suspense:
@@ -1103,6 +1103,8 @@ var o = {
 }
 ```
 
+**Warning:** While `x() { .. }` seems to just be shorthand for `x: function(){ .. }`, concise methods have special behaviors that their older counterparts don't; specifically, the allowance for `super` (see "Object `super`" later in this chapter).
+
 #### Concisely Unnamed
 
 While that convenience shorthand is quite attractive, there's a subtle gotcha to be aware of. To illustrate, let's examine pre-ES6 code like the following, which you might try to refactor to use concise methods:
@@ -1249,6 +1251,33 @@ So what are we left to conclude about concise methods? They're short and sweet, 
 
 A lot of your methods are probably going to benefit from concise method definitions, so that's great news! Just be careful of the few where there's an un-naming hazard.
 
+#### ES5 Getter/Setter
+
+Technically, ES5 defined getter/setter literals forms, but they didn't seem to get used much, mostly due to the lack of transpilers to handle that new syntax (the only major new syntax added in ES5, really). So while it's not a new ES6 feature, we'll briefly refresh on that form, as it's probably going to be much more useful with ES6 going forward.
+
+Consider:
+
+```js
+var o = {
+	__id: 10,
+	get id() { return this.__id++; },
+	set id(v) { this.__id = v; }
+}
+
+o.id;			// 10
+o.id;			// 11
+o.id = 20;
+o.id;			// 20
+
+// and:
+o.__id;			// 21
+o.__id;			// 21 -- still!
+```
+
+These getter and setter literal forms are also present in classes; see Chapter 3.
+
+**Warning:** It may not be obvious, but the setter literal must have exactly one declared parameter; omitting it or listing others is illegal syntax. The single required parameter *can* use destructuring and defaults, like for example `set id({ id: v = 0 }) { .. }`, but the gather/rest `...` is not allowed (`set id(...v) { .. }`).
+
 ### Computed Property Names
 
 You've probably been in a situation like the following snippet, where you have one or more property names that come from some sort of expression and thus can't be put into the object literal:
@@ -1321,18 +1350,6 @@ var o1 = {
 	// ..
 };
 
-var o2 = Object.setPrototypeOf( {
-	// .. o2's definition ..
-}, o1 );
-```
-
-Alternatively:
-
-```js
-var o1 = {
-	// ..
-};
-
 var o2 = {
 	// ..
 };
@@ -1340,26 +1357,39 @@ var o2 = {
 Object.setPrototypeOf( o2, o1 );
 ```
 
-In both these cases, the relationship between `o2` and `o1` is moved from generally being specified at the top of the `o2` object literal definition to appearing at the end.
+**Note:** See Chapter 6 "`Object.setPrototypeOf(..)` Static Function" in Chapter 6 for more details on `Object.setPrototypeOf(..)`. Also see "`Object.assign(..)` Static Function" in Chapter 6 for another form that relates `o2` prototypically to `o1`.
 
-I'd consider setting a `[[Prototype]]` right after object creation reasonable, as shown in the previous two snippets. But changing it much later is generally not a good idea, which I'd suggest will often lead to more confusion rather than clarity.
+### Object `super`
 
-There's another slightly more verbose alternative to the previous snippets, which still lets you use the convenience of object literals:
+`super` is typically thought of as being only related to classes. However, due to JS's classless-objects-with-prototypes nature, `super` is equally effective, and nearly the same in behavior, with plain objects' concise methods.
+
+Consider:
 
 ```js
 var o1 = {
-	// ..
+	foo() {
+		console.log( "o1:foo" );
+	}
 };
 
-var o2 = Object.assign(
-	Object.create( o1 ),
-	{
-		// .. o2's definition ..
+var o2 = {
+	foo() {
+		super.foo();
+		console.log( "o2:foo" );
 	}
-);
+};
+
+Object.setPrototypeOf( o2, o1 );
+
+o2.foo();		// o1:foo
+				// o2:foo
 ```
 
-`Object.assign(..)` is a new ES6 utility -- basically it copies object properties -- and is covered in Chapter 6. `Object.create(..)` is the ES5 standard utility that creates an empty object that is `[[Prototype]]`-linked.
+**Warning:** `super` is only allowed in concise methods, not regular function expression properties. It also is only allowed in `super.XXX` form (for property/method access), not in `super()` form.
+
+The `super` reference in the `o2.foo()` method is locked statically to `o2`, and specifically to the `[[Prototype]]` of `o2`. `super` here would basically be `Object.getPrototypeOf(o2)` -- resolves to `o1` of course -- which is how it finds and calls `o1.foo()`.
+
+For complete details on `super`, see "Classes" in Chapter 3.
 
 ## Template Literals
 
@@ -1490,19 +1520,36 @@ foo`Everything is ${desc}!`;
 // [ "awesome" ]
 ```
 
-Let's take a moment to consider what's happening in the previous snippet. First, the most jarring thing that jumps out is ``foo`Everything...`;``. That doesn't look like anything we've seen before. But what is it?
+Let's take a moment to consider what's happening in the previous snippet. First, the most jarring thing that jumps out is ``foo`Everything...`;``. That doesn't look like anything we've seen before. What is it?
 
-It's essentially a special kind of function call, where the *tag* -- the `foo` part before the `` `..` `` string literal -- is a function that should be called. But what gets passed to the `foo(..)` function when invoked as a tag for a string literal?
+It's essentially a special kind of function call that doesn't need the `( .. )`. The *tag* -- the `foo` part before the `` `..` `` string literal -- is a function value that should be called. Actually, it can be any expression that results in a function, even a function call that returns another function, like:
 
-The first argument is an array of all the plain strings (the stuff not in interpolated expressions). We get `"Everything is "` and `"!"` as those two strings.
+```js
+function bar() {
+	return function foo(strings, ...values) {
+		console.log( strings );
+		console.log( values );
+	}
+}
 
-For convenience sake in our example, we gather up all subsequent arguments into an array called `values` using the `...` gather/rest operator (see the "Spread / Rest" section earlier in this chapter), though you could of course have left them as individual named parameters.
+var desc = "awesome";
 
-The arguments gathered into our `values` array are all the results of the already-evaluated interpolation expressions found in the string literal. So obviously the only value present is `"awesome"`.
+bar()`Everything is ${desc}!`;
+// [ "Everything is ", "!"]
+// [ "awesome" ]
+```
 
-You can think of these two arrays as the values in `values` being the separators if you were to splice them in between the values in `strings`, and then if you joined all those elements, you'd get the complete interpolated string value.
+But what gets passed to the `foo(..)` function when invoked as a tag for a string literal?
 
-In a sense, a tagged string literal is like a processing step after the interpolations are evaluated but before the final string value is compiled, allowing you more control over generating the string from the literal.
+The first argument -- we called it `strings` -- is an array of all the plain strings (the stuff between any interpolated expressions). We get two values in the `strings` array: `"Everything is "` and `"!"`.
+
+For convenience sake in our example, we then gather up all subsequent arguments into an array called `values` using the `...` gather/rest operator (see the "Spread / Rest" section earlier in this chapter), though you could of course have left them as individual named parameters following the `strings` parameter.
+
+The argument(s) gathered into our `values` array are the results of the already-evaluated interpolation expressions found in the string literal. So obviously the only element in `values` in our example is `"awesome"`.
+
+You can think of these two arrays as: the values in `values` are the separators if you were to splice them in between the values in `strings`, and then if you joined all those strings, you'd get the complete interpolated string value.
+
+A tagged string literal is like a processing step after the interpolations are evaluated but before the final string value is compiled, allowing you more control over generating the string from the literal.
 
 Typically, the string literal tag function (`foo(..)` in the previous snippets) should compute an appropriate string value and return it, so that you can use the tagged string literal as a value just like untagged string literals:
 
@@ -1580,8 +1627,8 @@ ES6 comes with a built-in function that can be used as a string literal tag: `St
 
 ```js
 console.log( `Hello\nWorld` );
-// "Hello
-// World"
+/* "Hello
+World" */
 
 console.log( String.raw`Hello\nWorld` );
 // "Hello\nWorld"
@@ -1740,7 +1787,7 @@ controller.makeRequest(..);
 
 Even though we invoke as `controller.makeRequest(..)`, the `this.helper` reference fails, because `this` here doesn't point to `controller` as it normally would. Where does it point? It lexically inherits `this` from the surrounding scope. In this previous snippet, that's the global scope, where `this` points to the global object. Ugh.
 
-In addition to lexical `this`, arrow functions also have lexical `arguments` -- they don't have their own `arguments` array but instead inherit from their parent -- and lexical `super` (see "Classes" in Chapter 3).
+In addition to lexical `this`, arrow functions also have lexical `arguments` -- they don't have their own `arguments` array but instead inherit from their parent -- as well as lexical `super` and `new.target` (see "Classes" in Chapter 3).
 
 So now we can conclude a more nuanced set of rules for when `=>` is appropriate and not:
 
@@ -2244,14 +2291,26 @@ So what can we do? In this case, we can perform a *Unicode normalization* on the
 var s1 = "\xE9",
 	s2 = "e\u0301";
 
-[...s1.normalize()].length;		// 1
-[...s2.normalize()].length;		// 1
+s1.normalize().length;			// 1
+s2.normalize().length;			// 1
 
 s1 === s2;						// false
 s1 === s2.normalize();			// true
 ```
 
-Essentially, `normalize(..)` takes a sequence like `"e\u0301"` and normalizes it to `"\xE9"`.
+Essentially, `normalize(..)` takes a sequence like `"e\u0301"` and normalizes it to `"\xE9"`. Normalization can even combine multiple adjacent combining marks if there's a suitable Unicode character they combine to:
+
+```js
+var s1 = "o\u0302\u0300",
+	s2 = s1.normalize(),
+	s3 = "ồ";
+
+s1.length;						// 3
+s2.length;						// 1
+s3.length;						// 1
+
+s2 === s3;						// true
+```
 
 Unfortunately, normalization isn't fully perfect here, either. If you have multiple combining marks modifying a single character, you may not get the length count you'd expect, because there may not be a single defined normalized character that represents the combination of all the marks. For example:
 
@@ -2260,7 +2319,7 @@ var s1 = "e\u0301\u0330";
 
 console.log( s1 );				// "ḛ́"
 
-[...s1.normalize()].length;		// 2
+s1.normalize().length;			// 2
 ```
 
 The further you go down this rabbit hole, the more you realize that there it's difficult to get one precise definition for "length". What we see visually rendered as a single character -- more precisely called a *grapheme* -- doesn't always strictly relate to a single "character" in the program processing sense.
@@ -2346,7 +2405,7 @@ String.fromCodePoint( s3.normalize().codePointAt( 2 ) );
 // "𝒞"
 ```
 
-There's a whole slew of other string methods we haven't addressed here, including `toUpperCase()`, `toLowerCase()`, `substring(..)`, `indexOf(..)`, `slice(..)`, and a dozen others. None of these have been changed or augmented for full Unicode awareness, so you should be very careful -- probably just avoid them! -- on strings with astral symbols contained.
+There's quite a few other string methods we haven't addressed here, including `toUpperCase()`, `toLowerCase()`, `substring(..)`, `indexOf(..)`, `slice(..)`, and a dozen others. None of these have been changed or augmented for full Unicode awareness, so you should be very careful -- probably just avoid them! -- on strings with astral symbols contained.
 
 There are also several string methods which use regular expressions for their behavior, like `replace(..)` and `match(..)`. Thankfully, ES6 brings Unicode awareness to regular expressions, as we covered in "Unicode Flag" earlier in this chapter.
 

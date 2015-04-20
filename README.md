@@ -2,6 +2,7 @@
 
 This is a series of books diving deep into the core mechanisms of the JavaScript language.
 
+<a href="http://shop.oreilly.com/product/0636920039303.do"><img src="up %26 going/cover.jpg" width="75"></a>&nbsp;
 <a href="http://shop.oreilly.com/product/0636920026327.do"><img src="scope %26 closures/cover.jpg" width="75"></a>&nbsp;
 <a href="http://shop.oreilly.com/product/0636920033738.do"><img src="this %26 object prototypes/cover.jpg" width="75"></a>&nbsp;
 <a href="http://shop.oreilly.com/product/0636920033745.do"><img src="types %26 grammar/cover.jpg" width="75"></a>&nbsp;
@@ -14,12 +15,12 @@ Please feel free to contribute to the quality of this content by submitting PR's
 
 ## Titles
 
-* ["Up & Going"](up & going/README.md#you-dont-know-js-up--going) (in production)
-* ["Scope & Closures"](scope & closures/README.md#you-dont-know-js-scope--closures) ([published -- buy now!](http://shop.oreilly.com/product/0636920026327.do))
-* ["this & Object Prototypes"](this & object prototypes/README.md#you-dont-know-js-this--object-prototypes) ([published -- buy now!](http://shop.oreilly.com/product/0636920033738.do))
-* ["Types & Grammar"](types & grammar/README.md#you-dont-know-js-types--grammar) ([published -- buy now!](http://shop.oreilly.com/product/0636920033745.do))
-* ["Async & Performance"](async & performance/README.md#you-dont-know-js-async--performance) ([published -- buy now!](http://shop.oreilly.com/product/0636920033752.do))
-* ["ES6 & Beyond"](es6 & beyond/README.md#you-dont-know-js-es6--beyond) (in progress)
+* Read online (free!): ["Up & Going"](up & going/README.md#you-dont-know-js-up--going), Published: [Buy Now](http://shop.oreilly.com/product/0636920039303.do), ebook format is free!
+* Read online (free!): ["Scope & Closures"](scope & closures/README.md#you-dont-know-js-scope--closures), Published: [Buy Now](http://shop.oreilly.com/product/0636920026327.do)
+* Read online (free!): ["this & Object Prototypes"](this & object prototypes/README.md#you-dont-know-js-this--object-prototypes), Published: [Buy Now](http://shop.oreilly.com/product/0636920033738.do)
+* Read online (free!): ["Types & Grammar"](types & grammar/README.md#you-dont-know-js-types--grammar), Published: [Buy Now](http://shop.oreilly.com/product/0636920033745.do)
+* Read online (free!): ["Async & Performance"](async & performance/README.md#you-dont-know-js-async--performance), Published: [Buy Now](http://shop.oreilly.com/product/0636920033752.do)
+* Read online (free!): ["ES6 & Beyond"](es6 & beyond/README.md#you-dont-know-js-es6--beyond) (in progress)
 
 ## Publishing
 
