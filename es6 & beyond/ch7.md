@@ -67,6 +67,10 @@ The confusion comes because by default, the lexical name a function has (if any)
 
 But as of ES6, there are a set of inference rules which can determine a reasonable `name` property value to assign a function if that function doesn't have a lexical name to provide the value.
 
+## Meta Properties
+
+// TODO
+
 ## Built-in Object Symbols
 
 // TODO

@@ -42,6 +42,7 @@
 	* `String`
 * Chapter 7: Meta Programming
 	* Function Names
+	* Meta Properties
 	* Built-in Object Symbols
 	* `Reflect` API
 	* Proxies
