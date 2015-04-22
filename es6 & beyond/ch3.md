@@ -1885,7 +1885,7 @@ The `ouch` custom error object in this previous snippet will behave like any oth
 
 ### `new.target`
 
-ES6 introduces a new concept called a "metaproperty", in the form of `new.target`. If that looks strange, it is; pairing a keyword with a `.` and a property name is definitely out of the ordinary pattern for JS.
+ES6 introduces a new concept called a "Meta Property", in the form of `new.target`. If that looks strange, it is; pairing a keyword with a `.` and a property name is definitely out of the ordinary pattern for JS.
 
 `new.target` is a new "magical" value available in all functions, though in normal functions it will always be `undefined`. In any constructor, `new.target` always points at the constructor `new` directly invoked, even if the constructor is in a parent class and was delegated to by a `super(..)` call from a child constructor. Consider:
 
@@ -1917,7 +1917,7 @@ b.baz();
 // baz: undefined
 ```
 
-The `new.target` metaproperty doesn't have much purpose in class constructors, except accessing a static property/method (see the next section).
+The `new.target` meta property doesn't have much purpose in class constructors, except accessing a static property/method (see the next section).
 
 If `new.target` is `undefined`, you know the function was not called with `new`. You can then force a `new` invocation if that's necessary.
 
