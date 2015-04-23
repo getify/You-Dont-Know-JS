@@ -1707,6 +1707,10 @@ f.gimmeXY();				// 75
 
 **Warning:** Though `class Foo` is much like `function Foo`, there are important differences. The `Foo(..)` call *must* be made with `new` -- a pre-ES6 approach of `Foo.call( obj )` will *not* work. Also, while `function Foo` is "hoisted" (see the *Scope & Closures* title of this series), `class Foo` is not; the `extends ..` clause specifies an expression that cannot be "hoisted". So, you must declare a `class` before you can instantiate it.
 
+Another way of thinking about `class`, which I find more convenient, is as a *macro* that is used to automatically populate a `prototype` object. Optionally, it also wires up the `[[Prototype]]` relationship if using `extends` (see the next section).
+
+An ES6 `class` isn't really an entity itself, but a meta concept that wraps around other concrete entities like functions and properties and ties them together.
+
 ### `extends` and `super`
 
 ES6 classes also have syntax sugar for establishing the `[[Prototype]]` delegation link between two function prototypes -- commonly mislabeled "inheritance" or confusingly labeled "prototype inheritance" -- using the class-oriented familiar terminology `extends`:
