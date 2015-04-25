@@ -1711,6 +1711,8 @@ Another way of thinking about `class`, which I find more convenient, is as a *ma
 
 An ES6 `class` isn't really an entity itself, but a meta concept that wraps around other concrete entities like functions and properties and ties them together.
 
+**Tip:** In addition to the declaration form, a `class` can also be an expression, as in: `var x = class Y { .. }`. This is primarily useful for passing a class definition (technically, the constructor itself) as a function argument or assigning it to an object property.
+
 ### `extends` and `super`
 
 ES6 classes also have syntax sugar for establishing the `[[Prototype]]` delegation link between two function prototypes -- commonly mislabeled "inheritance" or confusingly labeled "prototype inheritance" -- using the class-oriented familiar terminology `extends`:
