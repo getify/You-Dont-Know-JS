@@ -1105,6 +1105,14 @@ var o = {
 
 **Warning:** While `x() { .. }` seems to just be shorthand for `x: function(){ .. }`, concise methods have special behaviors that their older counterparts don't; specifically, the allowance for `super` (see "Object `super`" later in this chapter).
 
+Generators (see Chapter 4) also have a concise method form:
+
+```js
+var o = {
+	*foo() { .. }
+};
+```
+
 #### Concisely Unnamed
 
 While that convenience shorthand is quite attractive, there's a subtle gotcha to be aware of. To illustrate, let's examine pre-ES6 code like the following, which you might try to refactor to use concise methods:
@@ -1319,6 +1327,15 @@ var o = {
 ```
 
 `Symbol.toStringTag` is a special built-in value, which we evaluate with the `[ .. ]` syntax, so we can assign the `"really cool thing"` value to the special property name.
+
+Computed property names can also appear as the name of a concise method or a concise generator:
+
+```js
+var o = {
+	["f" + "oo"]() { .. }	// computed concise method
+	*["b" + "ar"]() { .. }	// computed concise generator
+};
+```
 
 ### Setting `[[Prototype]]`
 
