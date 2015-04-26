@@ -131,7 +131,7 @@ In the case of `new.target`, the keyword `new` serves as the context for a prope
 
 This is a clear example of a meta programming operation, as the intent is to determine from inside a constructor call what the original `new` target was, generally for the purposes of introspection (examining typing/structure) or static property access.
 
-For example, you want to have different behavior in a constructor depending on if its directly invoked or invoked via a child class:
+For example, you may want to have different behavior in a constructor depending on if its directly invoked or invoked via a child class:
 
 ```js
 class Parent {
