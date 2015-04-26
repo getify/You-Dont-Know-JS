@@ -170,9 +170,15 @@ There's a slight nuance here, which is that the `constructor()` inside the `Pare
 
 // TODO
 
-## Tail Call Optimization
+## Tail Call Optimization (TCO)
 
-// TODO
+Normally, when a function call is made from inside another function, a second *stack frame* is allocated to separately manage the variables/state of that function invocation. Not only does this allocation cost some processing time, but it also takes up some extra memory.
+
+When a typical call stack jumps from one function to another and then to another, the typical depth of that chain rarely exceeds 10-15, let's say. In those scenarios, the memory usage is never any kind of practical problem.
+
+However, when you consider recursive programming (a function calling itself repeatedly) -- or mutual recursion with two or more functions calling each other -- the call stack could easily be hundreds, thousands, or more levels deep. You can probably see the problems that could cause.
+
+JavaScript engines have to set an arbitrary limit to prevent such programming techniques from crashing by running the browser and device out of memory. That's how we get the infamous "RangeError: Maximum call stack size exceeded" thrown.
 
 ## Review
 
