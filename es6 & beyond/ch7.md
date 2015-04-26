@@ -172,13 +172,46 @@ There's a slight nuance here, which is that the `constructor()` inside the `Pare
 
 ## Tail Call Optimization (TCO)
 
-Normally, when a function call is made from inside another function, a second *stack frame* is allocated to separately manage the variables/state of that function invocation. Not only does this allocation cost some processing time, but it also takes up some extra memory.
+Normally, when a function call is made from inside another function, a second *stack frame* is allocated to separately manage the variables/state of that other function invocation. Not only does this allocation cost some processing time, but it also takes up some extra memory.
 
 When a typical call stack jumps from one function to another and then to another, the typical depth of that chain rarely exceeds 10-15, let's say. In those scenarios, the memory usage is never any kind of practical problem.
 
 However, when you consider recursive programming (a function calling itself repeatedly) -- or mutual recursion with two or more functions calling each other -- the call stack could easily be hundreds, thousands, or more levels deep. You can probably see the problems that could cause.
 
-JavaScript engines have to set an arbitrary limit to prevent such programming techniques from crashing by running the browser and device out of memory. That's how we get the infamous "RangeError: Maximum call stack size exceeded" thrown.
+JavaScript engines have to set an arbitrary limit to prevent such programming techniques from crashing by running the browser and device out of memory. That's how we get the frustrating "RangeError: Maximum call stack size exceeded" thrown.
+
+Certain patterns of function calls, called *tail calls*, can be optimized in a way to avoid . A tail call is a function call in the tail position -- at the end of a function's code -- where nothing has to happen after the call except (optionally) returning its value along to a previous function invocation.
+
+Consider:
+
+```js
+function foo(x) {
+	return x * 2;
+}
+
+function bar(x) {
+	x = x + 1;
+	if (x > 10) {
+		return foo( x );
+	}
+	else {
+		return bar( x + 1 );
+	}
+}
+
+bar( 5 );		// 24
+bar( 15 );		// 32
+```
+
+In this program, `bar(..)` is clearly recursive, but `foo(..)` is just another function call. In both cases, the function calls are in *proper tail position*. The `x + 1` is evaluated before the `bar(..)` call, and whenever that call finishes, all that happens is the `return`.
+
+Proper tail calls of these forms can be optimized -- called tail call optimization (TCO) -- so that the stack frame allocation is unnecessary, and instead just reuses the current stack frame.
+
+TCO means there's practically no limit to how deep the call stack can be. That trick slightly improves regular function calls in normal programs, but opens the door to using recursion for program expression even if the call stack could be tens of thousands of calls deep. **We're no longer restricted from theorizing about recursion** for problem solving, but can actually use it in real programs!
+
+As of ES6, all proper tail calls should be optimized in this way, recursion or not.
+
+The hitch however is that only tail calls can be optimized; non-tail calls will still work of course, but will cause stack frame allocation as they always did. You'll have to be careful about structuring your functions with tail calls if you expect the optimizations to kick in.
 
 ## Review
 
