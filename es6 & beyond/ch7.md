@@ -310,7 +310,7 @@ While this expression of the algorithm is simpler to read, and will likely perfo
 
    The farther you go down this rabbit hole, the more manual and intricate the *unrolling* optimizations are. You'll quickly lose all the perceived value of readability. The primary advantage of recursion, even in the *proper tail call* form, is that it preserves the algorithm readability, and offloads the performance optimization to the engine.
 
-If you write your algorithms with proper tail calls, the engine will apply TCO to let your code run in constant stack depth, which means you keep the readability of recursion with most of the performance benefits and no limitations of run length.
+If you write your algorithms with proper tail calls, the engine will apply TCO to let your code run in constant stack depth (by reusing stack frames). You keep the readability of recursion with most of the performance benefits and no limitations of run length.
 
 ### Meta?
 
