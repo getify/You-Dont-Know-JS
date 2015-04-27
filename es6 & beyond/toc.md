@@ -46,6 +46,7 @@
 	* Built-in Object Symbols
 	* `Reflect` API
 	* Proxies
+	* Feature Testing
 	* Tail Call Optimization (TCO)
 * Chapter 8: Beyond ES6
 	* `async` Functions
