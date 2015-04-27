@@ -78,7 +78,7 @@ var abc = function() {
 	// ..
 };
 
-abc.name;		// "abc"
+abc.name;				// "abc"
 ```
 
 Had we given the function a lexical name like `abc = function def() { .. }`, the `name` property would of course be `"def"`. But in the absence of the lexical name, intuitively the `"abc"` name seems appropriate.
@@ -199,8 +199,8 @@ function bar(x) {
 	}
 }
 
-bar( 5 );		// 24
-bar( 15 );		// 32
+bar( 5 );				// 24
+bar( 15 );				// 32
 ```
 
 In this program, `bar(..)` is clearly recursive, but `foo(..)` is just another function call. In both cases, the function calls are in *proper tail position*. The `x + 1` is evaluated before the `bar(..)` call, and whenever that call finishes, all that happens is the `return`.
@@ -211,7 +211,112 @@ TCO means there's practically no limit to how deep the call stack can be. That t
 
 As of ES6, all proper tail calls should be optimized in this way, recursion or not.
 
+### Tail Call Rewrite
+
 The hitch however is that only tail calls can be optimized; non-tail calls will still work of course, but will cause stack frame allocation as they always did. You'll have to be careful about structuring your functions with tail calls if you expect the optimizations to kick in.
+
+If you have a function that's not written with proper tail calls, you may find the need to manually optimize your program by rewriting it, so that the engine will be able to apply TCO when running it.
+
+Consider:
+
+```js
+function foo(x) {
+	if (x <= 1) return 1;
+	return (x / 2) + foo( x - 1 );
+}
+
+foo( 123456 );			// RangeError
+```
+
+The call to `foo(x-1)` isn't a proper tail call since its result has to be added to `(x / 2)` before `return`ing.
+
+However, we can reorganize this code to be eligible for TCO in an ES6 engine as:
+
+```js
+var foo = (function(){
+	function _foo(acc,x) {
+		if (x <= 1) return acc;
+		return _foo( (x / 2) + acc, x - 1 );
+	}
+
+	return function(x) {
+		return _foo( 1, x );
+	};
+})();
+
+foo( 123456 );			// 3810376848.5
+```
+
+If you run the previous snippet in an ES6 engine that implements TCO, you'll get the `3810376848.5` answer as shown. However, it'll still fail with a `RangeError` in non-TCO engines.
+
+### Non-TCO Optimizations
+
+There are other techniques to rewrite the code so that the call stack isn't growing with each call.
+
+One such technique is called *trampolining*, which amounts to having each partial result represented as a function that either returns a another partial result function or the final result. Then you can simply loop until you stop getting a function, and you'll have the result. Consider:
+
+```js
+function trampoline( res ) {
+	while (typeof res == "function") {
+		res = res();
+	}
+	return res;
+}
+
+var foo = (function(){
+	function _foo(acc,x) {
+		if (x <= 1) return acc;
+		return function partial(){
+			return _foo( (x / 2) + acc, x - 1 );
+		};
+	}
+
+	return function(x) {
+		return trampoline( _foo( 1, x ) );
+	};
+})();
+
+foo( 123456 );			// 3810376848.5
+```
+
+This reworking required minimal changes to factor out the recursion into the loop in `trampoline(..)`:
+
+1. First, we wrapped the `return _foo ..` line in the `partial()` function expression.
+2. Then we wrapped the `_foo(1,x)` call in the `trampoline(..)` call.
+
+The reason this technique doesn't suffer the call stack limitiation is that each of those inner `partial(..)` functions is just returned back to the `while` loop in `trampoline(..)`, which runs it and then loop iterates again. In other words, `partial(..)` doesn't recursively call itself, it just returns another function. The stack depth remains constant, so it can run as long as it needs to.
+
+Trampolining expressed in this way uses the closure that the inner `partial()` function has over the `x` and `acc` variables to keep the state from iteration to iteration. The advantage is that the looping logic is pulled out into a reusable `trampoline(..)` utility function, which many libraries provide versions of. You can reuse `trampoline(..)` multiple times in your program with different trampolined algorithms.
+
+Of course, if you really wanted to deeply optimize (and the reusability wasn't a concern), you could discard the closure state and inline the state tracking of `acc` into just one function's scope along with the loop. This technique is often called *recursion unrolling*:
+
+```js
+function foo(x) {
+	var acc = 1;
+	while (x > 1) {
+		acc = (x / 2) + acc;
+		x = x - 1;
+	}
+	return acc;
+}
+
+foo( 123456 );			// 3810376848.5
+```
+
+While this expression of the algorithm is simpler to read, and will likely perform the best of the various forms we've explored, there are some reasons why you might not want to always approach the code this way:
+
+* Instead of factoring out the trampolining (loop) logic for reusability, we've inlined it. This works great when there's only one example to consider, but as soon as you have a half dozen or more of these in your program, there's a good chance you'll want some reusabilty to keep things manageable.
+* The example here is deliberately simple enough to illustrate the different forms. In practice, there are many more complications in recursion algorithms, such as mutual recursion (more than just one function calling itself).
+
+   The farther you go down this rabbit hole, the more manual and intricate the *unrolling* optimizations are. You'll quickly lose all the perceived value of readability. The primary advantage of recursion, even in the *proper tail call* form, is that it preserves the algorithm readability, and offloads the performance optimization to the engine.
+
+If you write your algorithms with proper tail calls, the engine will apply TCO to let your code run in constant stack depth, which means you keep the readability of recursion with most of the performance benefits and no limitations of run length.
+
+### Meta?
+
+So TCO is cool, right? But what does any of this have to do with meta programming? Great question. You're totally right to ask that!
+
+Short answer: I'm bending the definition of "meta programming" to fit this topic into this chapter, as this is the best place I could fit it in.
 
 ## Review
 
