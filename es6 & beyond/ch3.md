@@ -82,7 +82,7 @@ it.next();		// { value: 3, done: false }
 it.next();		// { value: undefined, done: true }
 ```
 
-Each time the method at `Symbol.iterator` is invoked on this `arr` value, it will produce a new fresh iterator. Most structures will do the same, including all the built-in data structures in JS.
+Each time the method located at `Symbol.iterator` (see Chapter 2 and 7) is invoked on this `arr` value, it will produce a new fresh iterator. Most structures will do the same, including all the built-in data structures in JS.
 
 However, it *is* possible to conceive of a structure which could only produce a single iterator (singleton pattern), or perhaps only allow one unique iterator at a time, requiring the current one to be
 

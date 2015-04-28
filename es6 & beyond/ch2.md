@@ -1870,7 +1870,7 @@ for (var val, ret, it = a[Symbol.iterator]();
 // "a" "b" "c" "d" "e"
 ```
 
-Under the covers, the `for..of` loop asks the iterable for an iterator, then it repeatedly calls the iterator and assigns its produced value to the loop iteration variable.
+Under the covers, the `for..of` loop asks the iterable for an iterator (using the built-in `Symbol.iterator` -- see "Well Known Symbols" in Chapter 7), then it repeatedly calls the iterator and assigns its produced value to the loop iteration variable.
 
 Standard built-in values in JavaScript that are by default iterables (or provide them) include:
 
@@ -2652,7 +2652,9 @@ var a = [1,2,3];
 a[Symbol.iterator];			// native function
 ```
 
-The specification uses the `@@` prefix notation to refer to the built-in symbols, the most common ones being: `@@iterator`, `@@toStringTag`, `@@toPrimitive`. Several others are defined as well, though they probably won't be used as often. See "Built-in Object Symbols" in Chapter 7 for detailed information about how these are used for metaprogramming purposes.
+The specification uses the `@@` prefix notation to refer to the built-in symbols, the most common ones being: `@@iterator`, `@@toStringTag`, `@@toPrimitive`. Several others are defined as well, though they probably won't be used as often.
+
+**Note:** See "Well Known Symbols" in Chapter 7 for detailed information about how these built-in symbols are used for meta programming purposes.
 
 ## Review
 

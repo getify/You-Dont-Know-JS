@@ -43,7 +43,7 @@
 * Chapter 7: Meta Programming
 	* Function Names
 	* Meta Properties
-	* Built-in Object Symbols
+	* Well Known Symbols
 	* `Reflect` API
 	* Proxies
 	* Feature Testing

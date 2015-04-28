@@ -158,9 +158,46 @@ There's a slight nuance here, which is that the `constructor()` inside the `Pare
 
 **Warning:** As with all meta programming techniques, be careful of creating code that's too clever for your future self or others maintaining your code to understand. Use these tricks with caution.
 
-## Built-in Object Symbols
+## Well Known Symbols
 
-// TODO
+In Chapter 2 "Symbols", we covered the new ES6 primitive type `symbol`. In addition to symbols you can define in your own program, JS pre-defines a number of built-in symbols, referred to as *well known symbols* (WKS).
+
+These symbol values are defined primarily to expose special meta properties that are being exposed to your JS programs to give you more control over JS's behavior.
+
+We'll briefly introduce each and discuss their purpose.
+
+### `Symbol.iterator`
+
+In Chapters 2 and 3, we introduced and used the `Symbol.iterator` value, automatically used by `...` spreads and `for..of` loops. We also saw `Symbol.iterator` as defined on the new ES6 collections as defined in Chapter 5.
+
+`Symbol.iterator` represents the special location (property) on any object where the language mechanisms automatically look to find a method that will construct an iterator instance for consuming that object's values. Many objects come with a default one defined.
+
+However, we can define our own iterator logic for any object value by setting the `Symbol.iterator` property, even if that's overriding the default iterator. The meta programming aspect is that we are defining behavior which other parts of JS (namely, operators and looping constructs) use when processing an object value we define.
+
+Consider:
+
+```js
+var arr = [4,5,6,7,8,9];
+
+for (var v of arr) {
+	console.log( v );
+}
+// 4 5 6 7 8 9
+
+// define iterator that only produces values
+// from odd indexes
+arr[Symbol.iterator] = function*() {
+	var idx = 1;
+	do {
+		yield this[idx];
+	} while ((idx += 2) < this.length);
+};
+
+for (var v of arr) {
+	console.log( v );
+}
+// 5 7 9
+```
 
 ## `Reflect` API
 
