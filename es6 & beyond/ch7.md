@@ -199,6 +199,50 @@ for (var v of arr) {
 // 5 7 9
 ```
 
+### `Symbol.toStringTag` and `Symbol.hasInstance`
+
+One of the most common meta programming tasks is to introspect on a value to find out what *kind* it is, usually to decide what operations are appropriate to perform on it. With objects, the two most common inspection techniques are `toString()` and `instanceof`.
+
+Consider:
+
+```js
+function Foo() {}
+
+var a = new Foo();
+
+a.toString();				// [object Object]
+a instanceof Foo;			// true
+```
+
+As of ES6, you can control the behavior of these operations:
+
+```js
+function Foo(greeting) {
+	this.greeting = greeting;
+}
+
+Foo.prototype[Symbol.toStringTag] = "Foo";
+
+Foo[Symbol.hasInstance] = function(inst) {
+	return inst.greeting == "hello";
+};
+
+var a = new Foo( "hello" ),
+	b = new Foo( "world" );
+
+b[Symbol.toStringTag] = "cool";
+
+a.toString();				// [object Foo]
+String( b );				// [object cool]
+
+a instanceof Foo;			// true
+b instanceof Foo;			// false
+```
+
+The `@@toStringTag` symbol on the prototype (or instance itself) specifies a string value to use in the `[object ___]` stringification.
+
+The `@@hasInstance` symbol is a method on the constructor function which receives the instance object value and lets you decide by returning `true` or `false` if the value should be considered an instance or not.
+
 ## `Reflect` API
 
 // TODO
