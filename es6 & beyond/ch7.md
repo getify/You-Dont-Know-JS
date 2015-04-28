@@ -168,7 +168,7 @@ We'll briefly introduce each and discuss their purpose.
 
 ### `Symbol.iterator`
 
-In Chapters 2 and 3, we introduced and used the `Symbol.iterator` value, automatically used by `...` spreads and `for..of` loops. We also saw `Symbol.iterator` as defined on the new ES6 collections as defined in Chapter 5.
+In Chapters 2 and 3, we introduced and used the `@@iterator` symbol, automatically used by `...` spreads and `for..of` loops. We also saw `@@iterator` as defined on the new ES6 collections as defined in Chapter 5.
 
 `Symbol.iterator` represents the special location (property) on any object where the language mechanisms automatically look to find a method that will construct an iterator instance for consuming that object's values. Many objects come with a default one defined.
 
@@ -242,6 +242,45 @@ b instanceof Foo;			// false
 The `@@toStringTag` symbol on the prototype (or instance itself) specifies a string value to use in the `[object ___]` stringification.
 
 The `@@hasInstance` symbol is a method on the constructor function which receives the instance object value and lets you decide by returning `true` or `false` if the value should be considered an instance or not.
+
+### `Symbol.species`
+
+In "Classes" in Chapter 3, we introduced the `@@species` symbol, which controls which constructor is used by built-in methods of a class that needs to spawn new instances.
+
+The most common example is when subclassing `Array` and wanting to define which constructor (`Array(..)` or your subclass) inherited methods like `slice(..)` should use. By default, `slice(..)` called on an instance of a subclass of `Array` would produce a new instance of that subclass, which is frankly what you'll likely often want.
+
+However, you can meta program by overriding a class's default `@@species` definition:
+
+```js
+class Cool {
+	// defer `species` to derived constructor
+	static get [Symbol.species]() { return this; }
+
+	again() {
+		return new this.constructor[Symbol.species]();
+	}
+}
+
+class Fun extends Cool {}
+
+class Awesome extends Cool {
+	// force `species` to be parent constructor
+	static get [Symbol.species]() { return Cool; }
+}
+
+var a = new Fun(),
+	b = new Awesome(),
+	c = a.again(),
+	d = b.again();
+
+c instanceof Fun;			// true
+d instanceof Awesome;		// false
+d instanceof Cool;			// true
+```
+
+The `Symbol.species` setting defaults on the built-in native constructors to the `return this` behavior as illustrated in the previous snippet in the `Cool` definition. It has no default on user classes, but as shown that behaivor is easy to emulate.
+
+If you need to define methods that generate new instances, use the meta programming of the `new this.constructor[Symbol.species](..)` pattern instead of the hard-wiring of `new this.constructor(..)` or `new XYZ(..)`. Derived classes will then be able to customize `Symbol.species` to control which constructor vends those instances.
 
 ## `Reflect` API
 

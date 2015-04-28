@@ -1981,7 +1981,7 @@ To illustrate how a parent class method can use a child's species declaration so
 
 ```js
 class Foo {
-	// `return this` defers `species` to derived constructor
+	// defer `species` to derived constructor
 	static get [Symbol.species]() { return this; }
 	spawn() {
 		return new this.constructor[Symbol.species]();
