@@ -282,6 +282,33 @@ The `Symbol.species` setting defaults on the built-in native constructors to the
 
 If you need to define methods that generate new instances, use the meta programming of the `new this.constructor[Symbol.species](..)` pattern instead of the hard-wiring of `new this.constructor(..)` or `new XYZ(..)`. Derived classes will then be able to customize `Symbol.species` to control which constructor vends those instances.
 
+### `Symbol.toPrimitive`
+
+In the *Types & Grammar* title of this series, we discussed the `ToPrimitive` abstract coercion operation, which is used when an object must be coerced to a primitive value for some operation (such as `==` comparison or `+` addition). Prior to ES6, there was no way to control this behavior.
+
+As of ES6, the `@@toPrimitive` symbol as a property on any object value can define/override that coercion by specifying a method to handle it.
+
+Consider:
+
+```js
+var arr = [1,2,3,4,5];
+
+arr + 10;				// 1,2,3,4,510
+
+arr[Symbol.toPrimitive] = function(hint) {
+	if (hint == "number") {
+		// sum all numbers
+		return this.reduce( function(acc,curr){
+			return acc + curr;
+		}, 0 );
+	}
+};
+
+arr + 10;				// 25
+```
+
+**Warning:** While the `==` operator will invoke the `ToPrimitive` (and thus the `@@toPrimitive`) operation on an object if the other value being compared to is not an object, if both are objects, the behavior is identical to `===`, which is that the references are directly compared, and `ToPrimitive` is moot. See the *Types & Grammar* title of this series for more information about coercion and these abstract operations.
+
 ## `Reflect` API
 
 // TODO
