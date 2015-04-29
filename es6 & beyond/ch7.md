@@ -286,7 +286,7 @@ If you need to define methods that generate new instances, use the meta programm
 
 In the *Types & Grammar* title of this series, we discussed the `ToPrimitive` abstract coercion operation, which is used when an object must be coerced to a primitive value for some operation (such as `==` comparison or `+` addition). Prior to ES6, there was no way to control this behavior.
 
-As of ES6, the `@@toPrimitive` symbol as a property on any object value can define/override that coercion by specifying a method to handle it.
+As of ES6, the `@@toPrimitive` symbol as a property on any object value can customize that `ToPrimitve` coercion by specifying a method.
 
 Consider:
 
@@ -306,6 +306,8 @@ arr[Symbol.toPrimitive] = function(hint) {
 
 arr + 10;				// 25
 ```
+
+The `Symbol.toPrimitive` method will be provided with a *hint* of either `"string"` or `"number"`, depending on what type the operation invoking `ToPrimitive` is expecting. In the previous snippet, the `+ 10` operation hints `"number"`, where a `+ ""` operation would hint `"string"`.
 
 **Warning:** While the `==` operator will invoke the `ToPrimitive` (and thus the `@@toPrimitive`) operation on an object if the other value being compared to is not an object, if both are objects, the behavior is identical to `===`, which is that the references are directly compared, and `ToPrimitive` is moot. See the *Types & Grammar* title of this series for more information about coercion and these abstract operations.
 
