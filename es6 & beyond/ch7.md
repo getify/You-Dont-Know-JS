@@ -223,9 +223,11 @@ function Foo(greeting) {
 
 Foo.prototype[Symbol.toStringTag] = "Foo";
 
-Foo[Symbol.hasInstance] = function(inst) {
-	return inst.greeting == "hello";
-};
+Object.defineProperty( Foo, Symbol.hasInstance, {
+	value: function(inst) {
+		return inst.greeting == "hello";
+	}
+} );
 
 var a = new Foo( "hello" ),
 	b = new Foo( "world" );
@@ -242,6 +244,8 @@ b instanceof Foo;			// false
 The `@@toStringTag` symbol on the prototype (or instance itself) specifies a string value to use in the `[object ___]` stringification.
 
 The `@@hasInstance` symbol is a method on the constructor function which receives the instance object value and lets you decide by returning `true` or `false` if the value should be considered an instance or not.
+
+**Note:** To set `@@hasInstance` on a function, you must use `Object.defineProperty(..)`, since the default one on `Function.prototype` is `writable: false`. See the *this & Object Prototypes* title of this series for more information.
 
 ### `Symbol.species`
 
@@ -296,7 +300,7 @@ var arr = [1,2,3,4,5];
 arr + 10;				// 1,2,3,4,510
 
 arr[Symbol.toPrimitive] = function(hint) {
-	if (hint == "number") {
+	if (hint == "default" || hint == "number") {
 		// sum all numbers
 		return this.reduce( function(acc,curr){
 			return acc + curr;
@@ -307,9 +311,9 @@ arr[Symbol.toPrimitive] = function(hint) {
 arr + 10;				// 25
 ```
 
-The `Symbol.toPrimitive` method will be provided with a *hint* of either `"string"` or `"number"`, depending on what type the operation invoking `ToPrimitive` is expecting. In the previous snippet, the `+ 10` operation hints `"number"`, where a `+ ""` operation would hint `"string"`.
+The `Symbol.toPrimitive` method will be provided with a *hint* of `"string"`, `"number"`, or `"default"` (which should be interpreted as `"number"`), depending on what type the operation invoking `ToPrimitive` is expecting. In the previous snippet, the additive `+` operation has no hint (`"default"` is passed). A multiplicative `*` operation would hint `"number"` and a `String(arr)` would hint `"string"`.
 
-**Warning:** The `==` operator will invoke the `ToPrimitive` operation (and thus the `@@toPrimitive` method, if any) on an object if the other value being compared is not an object. However, if both comparison values are objects, the behavior of `==` is identical to `===`, which is that the references themselves are directly compared. In this case, `@@toPrimitive` is not invoked. See the *Types & Grammar* title of this series for more information about coercion and these abstract operations.
+**Warning:** The `==` operator will invoke the `ToPrimitive` operation with no hint -- the `@@toPrimitive` method, if any is called with hint `"default"` -- on an object if the other value being compared is not an object. However, if both comparison values are objects, the behavior of `==` is identical to `===`, which is that the references themselves are directly compared. In this case, `@@toPrimitive` is not invoked at all. See the *Types & Grammar* title of this series for more information about coercion and the abstract operations.
 
 ### Regular Expression Symbols
 
@@ -360,15 +364,17 @@ var o = { a:1, b:2, c:3 },
 	a = 10, b = 20, c = 30;
 
 o[Symbol.unscopables] = {
-	a: true,
-	b: false,
-	c: true
+	a: false,
+	b: true,
+	c: false
 };
 
 with (o) {
 	console.log( a, b, c );		// 1 20 3
 }
 ```
+
+A `true` in the `@@unscopables` object indicates the property should be *unscopable*, and thus filtered out from the lexical scope variables. `false` means it's OK to be included in the lexical scope variables.
 
 **Warning:** The `with` statement is disallowed entirely in `strict` mode, and as such should be considered deprecated from the language. Don't use it. See the *Scope & Closures* title of this series for more information. Since `with` should be avoided, the `@@unscopables` symbol is also moot.
 
@@ -390,23 +396,27 @@ Some of the functions will look familiar as functions of the same names on `Obje
 * `Reflect.setPrototypeOf(..)`
 * `Reflect.preventExtensions(..)`
 * `Reflect.isExtensible(..)`
-* `Reflect.ownKeys(..)` --> `Object.getOwnPropertyNames(..)`
 
 These utilities in general behave the same as their `Object.*` counterparts. However, one difference is that the `Object.*` counterparts attempt to coerce their first argument (the target object) to an object if it's not already one. The `Reflect.*` methods simply throw an error in that case.
 
-Also, `Reflect.has(..)` corresponds to the `Object.prototype.hasOwnProperty(..)` method. Essentially, `Reflect.has(o,"foo")` performs `o.hasOwnProperty("foo")`.
+An object's keys can be accessed/inspected using these utilities:
+
+* `Reflect.ownKeys(..)`: returns the set of all owned keys (not "inherited"), as returned by both `Object.getOwnPropertyNames(..)` and `Object.getOwnPropertySymbols(..)`.
+* `Reflect.enumerate(..)`: returns the set of all keys (owned and "inherited") that are *enumerable* (see the *this & Object Prototypes* title of this series). Essentially, this set of keys is the same as those processed by a `for..in` loop.
+* `Reflect.has(..)`: essentially the same as the `in` operator for checking if a property is on an object or its `[[Prototype]]` chain. For example, `Reflect.has(o,"foo")` essentially performs `"foo" in o`.
 
 Function calls and constructor invocations can be performed manually, separate of the normal syntax (e.g., `(..)` and `new`) using these utilities:
 
 * `Reflect.apply(..)`: For example, `Reflect.apply(foo,thisObj,[42,"bar"])` calls the `foo(..)` function with `thisObj` as its `this`, and passes in the `42` and `"bar"` arguments.
 * `Reflect.construct(..)`: For example, `Reflect.construct(foo,[42,"bar"])` essentially calls `new foo(42,"bar")`.
 
-Object property access and setting can be performed manually with the following utilities:
+Object property access, setting, and deletion can be performed manually using these utilities:
 
 * `Reflect.get(..)`: For example, `Reflect.get(o,"foo")` retrieves `o.foo`.
 * `Reflect.set(..)`: For example, `Reflect.set(o,"foo",42)` essentially performs `o.foo = 42`.
+* `Reflect.deleteProperty(..)`: For example, `Reflect.deleteProperty(o,"foo")` essentially performs `delete o.foo`.
 
-You can enumerate an object's values, essentially identical to consuming its `@@iterator` with `...` or `for..of`, with `Reflect.enumerate(..)`. For example, `Reflect.enumerate([1,2,3])` would consume the iterator of the array, and return the received values as another `[1,2,3]` array.
+The meta programming capabilities of `Reflect` give you programmtic equivalents to emulate various syntactic features, exposing previously hidden-only abstract operations. For example, you can use these capabilities to extend features and APIs for *domain specific languages* (DSLs).
 
 ## Feature Testing
 
@@ -506,11 +516,15 @@ JavaScript engines have to set an arbitrary limit to prevent such programming te
 
 Certain patterns of function calls, called *tail calls*, can be optimized in a way to avoid the extra allocation of stack frames. If the extra allocation can be avoided, there's no reason to arbitrarily limit the call stack depth, so the engines can let them run unbounded.
 
+It's important to note that this optimization can only be applied in `strict` mode. Yet another reason to always be writing all your code as `strict`!
+
 A tail call is a function call in the tail position -- at the end of a function's code path -- where nothing has to happen after the call except (optionally) returning its value along to a previous function invocation.
 
 Here's a function call that is *not* in tail position:
 
 ```js
+"use strict";
+
 function foo(x) {
 	return x * 2;
 }
@@ -528,6 +542,8 @@ bar( 10 );				// 21
 But the following snippet demonstrates calls to `foo(..)` and `bar(..)` where both *are* in tail position, since they're the last thing to happen in their code path (other than the `return`):
 
 ```js
+"use strict";
+
 function foo(x) {
 	return x * 2;
 }
@@ -565,6 +581,8 @@ If you have a function that's not written with proper tail calls, you may find t
 Consider:
 
 ```js
+"use strict";
+
 function foo(x) {
 	if (x <= 1) return 1;
 	return (x / 2) + foo( x - 1 );
@@ -578,6 +596,8 @@ The call to `foo(x-1)` isn't a proper tail call since its result has to be added
 However, we can reorganize this code to be eligible for TCO in an ES6 engine as:
 
 ```js
+"use strict";
+
 var foo = (function(){
 	function _foo(acc,x) {
 		if (x <= 1) return acc;
@@ -601,6 +621,8 @@ There are other techniques to rewrite the code so that the call stack isn't grow
 One such technique is called *trampolining*, which amounts to having each partial result represented as a function that either returns a another partial result function or the final result. Then you can simply loop until you stop getting a function, and you'll have the result. Consider:
 
 ```js
+"use strict";
+
 function trampoline( res ) {
 	while (typeof res == "function") {
 		res = res();
@@ -633,9 +655,11 @@ The reason this technique doesn't suffer the call stack limitiation is that each
 
 Trampolining expressed in this way uses the closure that the inner `partial()` function has over the `x` and `acc` variables to keep the state from iteration to iteration. The advantage is that the looping logic is pulled out into a reusable `trampoline(..)` utility function, which many libraries provide versions of. You can reuse `trampoline(..)` multiple times in your program with different trampolined algorithms.
 
-Of course, if you really wanted to deeply optimize (and the reusability wasn't a concern), you could discard the closure state and inline the state tracking of `acc` into just one function's scope along with the loop. This technique is often called *recursion unrolling*:
+Of course, if you really wanted to deeply optimize (and the reusability wasn't a concern), you could discard the closure state and inline the state tracking of `acc` into just one function's scope along with a loop. This technique is generally called *recursion unrolling*:
 
 ```js
+"use strict";
+
 function foo(x) {
 	var acc = 1;
 	while (x > 1) {
@@ -668,6 +692,8 @@ Short answer: I'm stretching the definition of "meta programming" to fit the TCO
 As we covered in the "Feature Testing" section earlier, you can determine at runtime what features an engine supports. This includes TCO, though determining it is quite brute force. Consider:
 
 ```js
+"use strict";
+
 try {
 	(function foo(x){
 		if (x < 5E5) foo( x + 1 );
@@ -687,6 +713,8 @@ But how could meta programming around the TCO feature (or rather, the lack there
 But here's another way of looking at the problem:
 
 ```js
+"use strict";
+
 function foo(x) {
 	function _foo() {
 		if (x > 1) {
@@ -713,15 +741,17 @@ foo( 123456 );			// 3810376848.5
 
 This algorithm works by attempting to do as much of the work with recursion as possible, but keeping track of the progress via scoped variables `x` and `acc`. If the entire problem can be solved with recursion without an error, great. If the engine kills the recursion at some point, we simply catch that with the `try..catch` and then try again, picking up where we left off.
 
-I consider this a form of meta programming in that you are probing during runtime the ability of the engine to fully recursively finish the task, and working around any engine limitations (non-TCO) that may restrict you.
+I consider this a form of meta programming in that you are probing during runtime the ability of the engine to fully (recursively) finish the task, and working around any engine limitations (non-TCO) that may restrict you.
 
-At first (or second!) glance, my bet is this code seems much uglier to you compared to some of the earlier versions. It also runs a fair bit slower (on larger runs in a non-TCO environment).
+At first (or even second!) glance, my bet is this code seems much uglier to you compared to some of the earlier versions. It also runs a fair bit slower (on larger runs in a non-TCO environment).
 
-The primary advantage, other than it being able to complete any size task even in non-TCO engines, is that this "solution" to the infinite recursion limitation is much more flexible than the trampolining or manual unrolling techniques shown previously. Essentially, `_foo()` in this case is a sort of stand-in for practically any recursive task, even mutual recursion. The rest is the boilerplate that should work for just about any task.
+The primary advantage, other than it being able to complete any size task even in non-TCO engines, is that this "solution" to the recursion stack limitation is much more flexible than the trampolining or manual unrolling techniques shown previously.
 
-The only "catch" is that to be able to resume in the event of a recursion limit being hit, the state of the recursion must be in scoped variables that exist outside the recursive functions. We did that by leaving `x` and `acc` outside of the `_foo()` function, instead of structuring them as arguments passed into `_foo()`.
+Essentially, `_foo()` in this case is a sort of stand-in for practically any recursive task, even mutual recursion. The rest is the boilerplate that should work for just about any algorithm.
 
-You'll notice that I was able to write the algorithm using a proper tail call, meaning that this code will "progressively enhance" from running using the loop many times in an older browser to fully leveraging TCO'd recursion in an ES6+ environment. I think that's pretty cool!
+The only "catch" is that to be able to resume in the event of a recursion limit being hit, the state of the recursion must be in scoped variables that exist outside the recursive function(s). We did that by leaving `x` and `acc` outside of the `_foo()` function, instead of passing them as arguments to `_foo()` as earlier.
+
+This approach still uses a proper tail call, meaning that this code will "progressively enhance" from running using the loop many times (recursion batches) in an older browser to fully leveraging TCO'd recursion in an ES6+ environment. I think that's pretty cool!
 
 ## Review
 
