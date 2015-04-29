@@ -253,7 +253,7 @@ However, you can meta program by overriding a class's default `@@species` defini
 
 ```js
 class Cool {
-	// defer `species` to derived constructor
+	// defer `@@species` to derived constructor
 	static get [Symbol.species]() { return this; }
 
 	again() {
@@ -264,7 +264,7 @@ class Cool {
 class Fun extends Cool {}
 
 class Awesome extends Cool {
-	// force `species` to be parent constructor
+	// force `@@species` to be parent constructor
 	static get [Symbol.species]() { return Cool; }
 }
 
@@ -333,6 +333,44 @@ There are four well known symbols that can be overridden for regular expression 
    The default algorithm for splitting is laid out in section 21.2.5.11 of the ES6 specification (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@split).
 
 Overriding the built-in regular expression algorithms is not for the faint of heart! JS ships with a highly optimized regular expression engine, so your own user code will likely be a lot slower. This kind of meta programming is neat and powerful, but it should only be used in cases where it's really necessary or beneficial.
+
+### `Symbol.isConcatSpreadable`
+
+The `@@isConcatSpreadable` symbol can be defined as a boolean property (`Symbol.isConcatSpreadable`) on any object (like an array or other iterable) to indicate if it should be *spread out* if passed to an array `concat(..)`.
+
+Consider:
+
+```js
+var a = [1,2,3],
+	b = [4,5,6];
+
+b[Symbol.isConcatSpreadable] = false;
+
+[].concat( a, b );		// [1,2,3,[4,5,6]]
+```
+
+### `Symbol.unscopables`
+
+The `@@unscopables` symbol can be defined as an object property (`Symbol.unscopables`) on any object to indicate which properties can and cannot be exposed as lexical variables in a `with` statement.
+
+Consider:
+
+```js
+var o = { a:1, b:2, c:3 },
+	a = 10, b = 20, c = 30;
+
+o[Symbol.unscopables] = {
+	a: true,
+	b: false,
+	c: true
+};
+
+with (o) {
+	console.log( a, b, c );		// 1 20 3
+}
+```
+
+**Warning:** The `with` statement is disallowed entirely in `strict` mode, and as such should be considered deprecated from the language. Don't use it. See the *Scope & Closures* title of this series for more information. Since `with` should be avoided, the `@@unscopables` symbol is also moot.
 
 ## `Reflect` API
 
