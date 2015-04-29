@@ -44,8 +44,8 @@
 	* Function Names
 	* Meta Properties
 	* Well Known Symbols
-	* `Reflect` API
 	* Proxies
+	* `Reflect` API
 	* Feature Testing
 	* Tail Call Optimization (TCO)
 * Chapter 8: Beyond ES6

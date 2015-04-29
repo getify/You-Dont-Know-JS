@@ -372,13 +372,41 @@ with (o) {
 
 **Warning:** The `with` statement is disallowed entirely in `strict` mode, and as such should be considered deprecated from the language. Don't use it. See the *Scope & Closures* title of this series for more information. Since `with` should be avoided, the `@@unscopables` symbol is also moot.
 
-## `Reflect` API
-
-// TODO
-
 ## Proxies
 
 // TODO
+
+## `Reflect` API
+
+The `Reflect` object is a plain object (like `Math`), not a function/constructor like the other built-in natives.
+
+It holds static functions which correspond to various meta programming tasks that you can control. These functions correspond one-to-one with the handler methods (*traps*) that Proxies can define.
+
+Some of the functions will look familiar as functions of the same names on `Object`:
+
+* `Reflect.getOwnPropertyDescriptor(..)`
+* `Reflect.defineProperty(..)`
+* `Reflect.getPrototypeOf(..)`
+* `Reflect.setPrototypeOf(..)`
+* `Reflect.preventExtensions(..)`
+* `Reflect.isExtensible(..)`
+* `Reflect.ownKeys(..)` --> `Object.getOwnPropertyNames(..)`
+
+These utilities in general behave the same as their `Object.*` counterparts. However, one difference is that the `Object.*` counterparts attempt to coerce their first argument (the target object) to an object if it's not already one. The `Reflect.*` methods simply throw an error in that case.
+
+Also, `Reflect.has(..)` corresponds to the `Object.prototype.hasOwnProperty(..)` method. Essentially, `Reflect.has(o,"foo")` performs `o.hasOwnProperty("foo")`.
+
+Function calls and constructor invocations can be performed manually, separate of the normal syntax (e.g., `(..)` and `new`) using these utilities:
+
+* `Reflect.apply(..)`: For example, `Reflect.apply(foo,thisObj,[42,"bar"])` calls the `foo(..)` function with `thisObj` as its `this`, and passes in the `42` and `"bar"` arguments.
+* `Reflect.construct(..)`: For example, `Reflect.construct(foo,[42,"bar"])` essentially calls `new foo(42,"bar")`.
+
+Object property access and setting can be performed manually with the following utilities:
+
+* `Reflect.get(..)`: For example, `Reflect.get(o,"foo")` retrieves `o.foo`.
+* `Reflect.set(..)`: For example, `Reflect.set(o,"foo",42)` essentially performs `o.foo = 42`.
+
+You can enumerate an object's values, essentially identical to consuming its `@@iterator` with `...` or `for..of`, with `Reflect.enumerate(..)`. For example, `Reflect.enumerate([1,2,3])` would consume the iterator of the array, and return the received values as another `[1,2,3]` array.
 
 ## Feature Testing
 
