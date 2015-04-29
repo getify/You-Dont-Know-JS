@@ -309,7 +309,7 @@ arr + 10;				// 25
 
 The `Symbol.toPrimitive` method will be provided with a *hint* of either `"string"` or `"number"`, depending on what type the operation invoking `ToPrimitive` is expecting. In the previous snippet, the `+ 10` operation hints `"number"`, where a `+ ""` operation would hint `"string"`.
 
-**Warning:** While the `==` operator will invoke the `ToPrimitive` (and thus the `@@toPrimitive`) operation on an object if the other value being compared to is not an object, if both are objects, the behavior is identical to `===`, which is that the references are directly compared, and `ToPrimitive` is moot. See the *Types & Grammar* title of this series for more information about coercion and these abstract operations.
+**Warning:** The `==` operator will invoke the `ToPrimitive` operation (and thus the `@@toPrimitive` method, if any) on an object if the other value being compared is not an object. However, if both comparison values are objects, the behavior of `==` is identical to `===`, which is that the references themselves are directly compared. In this case, `@@toPrimitive` is not invoked. See the *Types & Grammar* title of this series for more information about coercion and these abstract operations.
 
 ## `Reflect` API
 
