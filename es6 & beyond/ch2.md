@@ -491,8 +491,6 @@ console.log( a, b, c );				// 1 2 3
 
 As you can see, we created a manual assignment of the values in the array that `foo()` returns to individual variables `a`, `b`, and `c`, and to do so we (unfortunately) needed the `tmp` variable.
 
-This pattern is widely called *array destructuring assignment*, or as I prefer, *structured array assignment*.
-
 We can do similar with objects:
 
 ```js
@@ -510,9 +508,11 @@ var tmp = bar(),
 console.log( x, y, z );				// 4 5 6
 ```
 
-The `tmp.x` property value is assigned to the `x` variable, and likewise for `tmp.y` to `y` and `tmp.z` to `z`. Of course, this is generally referred to as *object destructuring assignment*, or my alternate description: *structured object assignment*.
+The `tmp.x` property value is assigned to the `x` variable, and likewise for `tmp.y` to `y` and `tmp.z` to `z`.
 
-ES6 introduces a destructuring syntax which eliminates the need for the `tmp` variable in the previous snippets, making them much cleaner. Consider:
+Manually assigning indexed values from an array or properties from an object can be thought of as *structured assignment*. To put this into ES6 terms, it's called *destructuring assignment*.
+
+Specifically, ES6 introduces dedicated syntax for *array destructuring* and *object destructuring*, which eliminates the need for the `tmp` variable in the previous snippets, making them much cleaner. Consider:
 
 ```js
 var [ a, b, c ] = foo();
