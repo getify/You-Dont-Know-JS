@@ -1,0 +1,113 @@
+*, *:before, *:after {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+html, body {
+	padding: 0px;
+	margin: 0px;
+}
+
+html, body, input[type=text], input[type=password],
+input[type=checkbox], input[type=radio], textarea {
+	font-size: 16px;
+	line-height: 23px;
+	font-family: Tahoma, sans-serif;
+	background-color: #bbb;
+	color: #000;
+	letter-spacing: 2px;
+	border: none;
+}
+
+input[type=text], input[type=password], textarea {
+	border: 2px solid #000;
+}
+
+input[type=text][readonly], input[type=password][readonly],
+input[type=checkbox][readonly], input[type=radio][readonly],
+textarea[readonly] {
+	color: #444;
+	background-color: #999;
+}
+
+::-webkit-input-placeholder { color: #777; }
+::-moz-placeholder { color: #777; }
+:-ms-input-placeholder { color: #777; }
+
+#content {
+	padding: 25px;
+}
+
+nav {
+	padding: 0px 10px;
+	background-color: #ddd;
+	color: black;
+	width: 100%;
+	height: 60px;
+	line-height: 60px;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+nav a {
+	color: black;
+	text-decoration: none;
+}
+
+#notifications {
+	display: none;
+	position: fixed;
+	top: 5px;
+	right: 10px;
+	width: 300px;
+	background-color: #000;
+	color: white;
+	border: 2px solid #fff;
+	padding: 10px;
+}
+
+#notifications .list {
+	min-height: 20px;
+	max-height: 100px;
+	overflow: scroll;
+}
+
+#notifications .close {
+	position: absolute;
+	right: -5px;
+	top: -5px;
+	background-color: #000;
+	color: white;
+	border: 2px solid #fff;
+	font-size: 12px;
+	line-height: 20px;
+	width: 20px;
+	font-weight: bold;
+	text-align: center;
+	letter-spacing: 0px;
+	cursor: pointer;
+}
+
+#notifications .list .notification {
+	padding-bottom: 10px;
+	margin-bottom: 10px;
+	border-bottom: 1px solid white;
+}
+
+#notifications .list .notification:last-child {
+	padding-bottom: 0px;
+	margin-bottom: 0px;
+	border-bottom: none;
+}
+
+#email_modal {
+	display: none;
+	position: fixed;
+	background-color: #aaa;
+	border: 2px solid #000;
+	padding: 50px;
+	left: 50%;
+	top: 50%;
+	-webkit-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+}

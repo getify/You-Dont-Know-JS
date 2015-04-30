@@ -7,10 +7,10 @@ ES6 adds a special syntactic form of function declaration called the "arrow func
 
 ```js
 var foo = a => {
-	console.log(a);
+	console.log( a );
 };
 
-foo(2); // 2
+foo( 2 ); // 2
 ```
 
 The so-called "fat arrow" is often mentioned as a short-hand for the *tediously verbose* (sarcasm) `function` keyword.
@@ -23,16 +23,16 @@ Briefly, this code suffers a problem:
 
 var obj = {
 	id: "awesome",
-	cool: function() {
-		console.log(this.id);
+	cool: function coolFn() {
+		console.log( this.id );
 	}
 };
 
-var id = "not awesome"
+var id = "not awesome";
 
 obj.cool(); // awesome
 
-setTimeout(obj.cool, 100); // not awesome
+setTimeout( obj.cool, 100 ); // not awesome
 ```
 
 The problem is the loss of `this` binding on the `cool()` function. There are various ways to address that problem, but one often-repeated solution is `var self = this;`.
@@ -42,14 +42,14 @@ That might look like:
 ```js
 var obj = {
 	count: 0,
-	cool: function() {
+	cool: function coolFn() {
 		var self = this;
 
 		if (self.count < 1) {
-			setTimeout(function(){
+			setTimeout( function timer(){
 				self.count++;
-				console.log("awesome?");
-			},100);
+				console.log( "awesome?" );
+			}, 100 );
 		}
 	}
 };
@@ -66,14 +66,12 @@ The ES6 solution, the arrow-function, introduces a behavior called "lexical this
 ```js
 var obj = {
 	count: 0,
-	cool: function() {
-		var self = this;
-
-		if (self.count < 1) {
-			setTimeout(() => { // arrow-function ftw?
+	cool: function coolFn() {
+		if (this.count < 1) {
+			setTimeout( () => { // arrow-function ftw?
 				this.count++;
-				console.log("awesome?");
-			},100);
+				console.log( "awesome?" );
+			}, 100 );
 		}
 	}
 };
@@ -87,19 +85,21 @@ So, in that snippet, the arrow-function doesn't get its `this` unbound in some u
 
 While this makes for shorter code, my perspective is that arrow-functions are really just codifying into the language syntax a common *mistake* of developers, which is to confuse and conflate "this binding" rules with "lexical scope" rules.
 
-A more appropriate approach, in my perspective, to this "problem", is to use the `this` mechanism correctly.
+Put another way: why go to the trouble and verbosity of using the `this` style coding paradigm, only to cut it off at the knees by mixing it with lexical references. It seems natural to embrace one approach or the other for any given piece of code, and not mix them in the same piece of code.
+
+**Note:** one other detraction from arrow-functions is that they are anonymous, not named. See Chapter 3 for the reasons why anonymous functions are less desirable than named functions.
+
+A more appropriate approach, in my perspective, to this "problem", is to use and embrace the `this` mechanism correctly.
 
 ```js
 var obj = {
 	count: 0,
-	cool: function() {
-		var self = this;
-
-		if (self.count < 1) {
-			setTimeout(function(){
-				this.count++;
-				console.log("more awesome");
-			}.bind(this),100); // look, `bind()`!
+	cool: function coolFn() {
+		if (this.count < 1) {
+			setTimeout( function timer(){
+				this.count++; // `this` is safe because of `bind(..)`
+				console.log( "more awesome" );
+			}.bind( this ), 100 ); // look, `bind()`!
 		}
 	}
 };
