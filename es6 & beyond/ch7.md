@@ -401,8 +401,8 @@ These utilities in general behave the same as their `Object.*` counterparts. How
 
 An object's keys can be accessed/inspected using these utilities:
 
-* `Reflect.ownKeys(..)`: returns the set of all owned keys (not "inherited"), as returned by both `Object.getOwnPropertyNames(..)` and `Object.getOwnPropertySymbols(..)`.
-* `Reflect.enumerate(..)`: returns the set of all keys (owned and "inherited") that are *enumerable* (see the *this & Object Prototypes* title of this series). Essentially, this set of keys is the same as those processed by a `for..in` loop.
+* `Reflect.ownKeys(..)`: returns the set of all owned keys (not "inherited"), as returned by both `Object.getOwnPropertyNames(..)` and `Object.getOwnPropertySymbols(..)`. See the next section for information about the order of keys.
+* `Reflect.enumerate(..)`: returns the set of all non-symbol keys (owned and "inherited") that are *enumerable* (see the *this & Object Prototypes* title of this series). Essentially, this set of keys is the same as those processed by a `for..in` loop. See the next section for information about the order of enumerated keys.
 * `Reflect.has(..)`: essentially the same as the `in` operator for checking if a property is on an object or its `[[Prototype]]` chain. For example, `Reflect.has(o,"foo")` essentially performs `"foo" in o`.
 
 Function calls and constructor invocations can be performed manually, separate of the normal syntax (e.g., `(..)` and `new`) using these utilities:
@@ -417,6 +417,28 @@ Object property access, setting, and deletion can be performed manually using th
 * `Reflect.deleteProperty(..)`: For example, `Reflect.deleteProperty(o,"foo")` essentially performs `delete o.foo`.
 
 The meta programming capabilities of `Reflect` give you programmtic equivalents to emulate various syntactic features, exposing previously hidden-only abstract operations. For example, you can use these capabilities to extend features and APIs for *domain specific languages* (DSLs).
+
+### Key Enumeration Order
+
+Prior to ES6, the order of enumeration of an object's keys/properties was implementation dependent and undefined by the specification. Generally, most engines have enumerated them in creation order, though developers have been strongly encouraged not to ever rely on this ordering.
+
+As of ES6, the order of enumeration is now defined in the specification (ES6 specification, section 9.1.12):
+
+1. First, enumerate any owned property names that are integer indexes, in ascending numeric order.
+2. Next, enumerate the rest of the owned string property names in creation order.
+3. Finally, enumerate owned symbol properities in creation order.
+
+For the `Reflect.enumerate(..)` utility, which enumerates keys not only from the target object but also its `[[Prototype]]` chain, the ordering will follow the above steps for each object level. Starting with the target object, and traversing up the `[[Prototype]]` chain, each object's enumerated keys will be added to the enumeration.
+
+Consider:
+
+```js
+var o = { a: 1, b: 2 };
+var p = Object.create( o );
+p.c = 3;
+
+Reflect.enumerate( p );			// ["c","a","b"]
+```
 
 ## Feature Testing
 
