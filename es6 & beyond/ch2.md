@@ -115,7 +115,7 @@ One last gotcha: `typeof` behaves differently with *TDZ* variables than it does 
 		console.log( "cool" );
 	}
 
-	if (typeof b === "undefined") {		// TypeError!
+	if (typeof b === "undefined") {		// ReferenceError!
 		// ..
 	}
 
