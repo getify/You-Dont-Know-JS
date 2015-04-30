@@ -382,6 +382,35 @@ A `true` in the `@@unscopables` object indicates the property should be *unscopa
 
 ## Proxies
 
+One of the most obviously meta programming features added to ES6 is the `Proxy` feature.
+
+A proxy is a special kind of object you create that "wraps" -- or sits in front of -- another normal object. You can register special handlers (aka *traps*) on the proxy object which are called when various operations are performed against the proxy. These handlers have the opportunity to perform extra logic in addition to *forwarding* the operations on to the original target/wrapped object.
+
+One example of the kind of *trap* handler you can define on a proxy is `get` that intercepts the `[[Get]]` operation -- performed when you try to access a property on an object. Consider:
+
+```js
+var obj = { a: 1 };
+
+var pobj = new Proxy( obj, {
+	get(target,key,self) {
+		// self === pobj
+		console.log( "accessing: ", key );
+		return Reflect.get( target, key );
+	}
+} );
+
+obj.a;
+// 1
+
+pobj.a;
+// accessing: a
+// 1
+```
+
+We declare a `get` handler as a named method on the *handler* object (second argument to `Proxy(..)`), which receives a reference to the *target* object (`obj`), the *key* property name (`"a"`), and the `self` receiver (`pobj`).
+
+After the `console.log(..)` tracing statement, we "forward" the operation onto `obj` via the `Reflect.get(..)` operation. We cover the `Reflect` API in the next section. You will note that each available Proxy trap has a corresponding `Reflect` function, generally of the same name.
+
 // TODO
 
 ## `Reflect` API
