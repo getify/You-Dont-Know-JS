@@ -389,15 +389,18 @@ A proxy is a special kind of object you create that "wraps" -- or sits in front 
 One example of the kind of *trap* handler you can define on a proxy is `get` that intercepts the `[[Get]]` operation -- performed when you try to access a property on an object. Consider:
 
 ```js
-var obj = { a: 1 };
+var obj = { a: 1 },
+	handlers = {
+		get(target,key,context) {
+			// note: target === obj,
+			// context === pobj
+			console.log( "accessing: ", key );
+			return Reflect.get( target, key, context );
+		}
 
-var pobj = new Proxy( obj, {
-	get(target,key,self) {
-		// self === pobj
-		console.log( "accessing: ", key );
-		return Reflect.get( target, key );
-	}
-} );
+	};
+
+var pobj = new Proxy( obj, handlers );
 
 obj.a;
 // 1
@@ -407,11 +410,32 @@ pobj.a;
 // 1
 ```
 
-We declare a `get` handler as a named method on the *handler* object (second argument to `Proxy(..)`), which receives a reference to the *target* object (`obj`), the *key* property name (`"a"`), and the `self` receiver (`pobj`).
+We declare a `get(..)` handler as a named method on the *handler* object (second argument to `Proxy(..)`), which receives a reference to the *target* object (`obj`), the *key* property name (`"a"`), and the `self`/receiver/proxy (`pobj`).
 
-After the `console.log(..)` tracing statement, we "forward" the operation onto `obj` via the `Reflect.get(..)` operation. We cover the `Reflect` API in the next section. You will note that each available Proxy trap has a corresponding `Reflect` function, generally of the same name.
+After the `console.log(..)` tracing statement, we "forward" the operation onto `obj` via `Reflect.get(..)`. We will cover the `Reflect` API in the next section, but note that each available proxy trap has a corresponding `Reflect` function of the same name.
 
-// TODO
+These mappings are symmetric on purpose. The proxy handlers each intercept when a respective meta programming task is performed, and the `Reflect` utilities each perform the respective meta programming task on an object. Each proxy handler has a default definition that automatically calls the corresponding `Reflect` utility. You will almost certainly use both `Proxy` and `Reflect` in tandem.
+
+Here's a list of handlers you can define on a proxy for a *target* object/function, and how/when they are triggered:
+
+* `get(..)`: via `[[Get]]`, a property is accessed on the proxy (`Reflect.get(..)`, `.` property operator, or `[ .. ]` property operator)
+* `set(..)`: via `[[Set]]`, a property value is set on the proxy (`Reflect.set(..)` or the `=` assignment operator)
+* `deleteProperty(..)`: via `[[Delete]]`, a property is deleted from the proxy (`Reflect.deleteProperty(..)` or `delete`)
+* `apply(..)` (if *target* is a function): via `[[Call]]`, the proxy is invoked as a normal function/method (`Reflect.apply(..)`, `call(..)`, `apply(..)`, or the `(..)` call operator)
+* `construct(..)` (if *target* is a constructor function): via `[[Construct]]`, the proxy is invoked as a constructor function (`Reflect.construct(..)` or `new`)
+* `getOwnPropertyDescriptor(..)`: via `[[GetOwnProperty]]`, a property descriptor is retrieved from the proxy (`Object.getOwnPropertyDescriptor(..)` or `Reflect.getOwnPropertyDescriptor(..)`)
+* `defineProperty(..)`: via `[[DefineOwnProperty]]`, a property descriptor is set on the proxy (`Object.defineProperty(..)` or `Reflect.defineProperty(..)`)
+* `getPrototypeOf(..)`: via `[[GetPrototypeOf]]`, the `[[Prototype]]` of the proxy is retrieved (`Object.getPrototypeOf(..)`, `Reflect.getPrototypeOf(..)`, or `__proto__`)
+* `setPrototypeOf(..)`: via `[[SetPrototypeOf]]`, the `[[Prototype]]` of the proxy is set (`Object.setPrototypeOf(..)`, `Reflect.setPrototypeOf(..)`, or `__proto__`)
+* `preventExtensions(..)`: via `[[PreventExtensions]]`, the proxy is made non-extensible (`Object.preventExtensions(..)` or `Reflect.preventExtensions(..)`)
+* `isExtensible(..)`: via `[[IsExtensible]]`, the extensibility of the proxy is probed (`Object.isExtensible(..)` or `Reflect.isExtensible(..)`)
+* `ownKeys(..)`: via `[[OwnPropertyKeys]]`, the set of owned properties and/or owned symbol properties of the proxy is retrieved (`Object.keys(..)`, `Object.getOwnPropertyNames(..)`, `Object.getOwnSymbolProperties(..)`, `Reflect.ownKeys(..)`, or `JSON.stringify(..)`)
+* `enumerate(..)`: via `[[Enumerate]]`, an iterator is requested for the proxy's enumerable owned and "inherited" properties (`Reflect.enumerate(..)` or `for..in`)
+* `has(..)`: via `[[HasProperty]]`, the proxy is probed to see if it has an owned or "inherited" property (`Reflect.has(..)` or `"prop" in obj`)
+
+**Tip:** For more information about each of these meta programming tasks, see the "Reflect" section below.
+
+The meta programming benefits of these Proxy handlers should be obvious.
 
 ## `Reflect` API
 
@@ -433,7 +457,7 @@ These utilities in general behave the same as their `Object.*` counterparts. How
 An object's keys can be accessed/inspected using these utilities:
 
 * `Reflect.ownKeys(..)`: returns the set of all owned keys (not "inherited"), as returned by both `Object.getOwnPropertyNames(..)` and `Object.getOwnPropertySymbols(..)`. See the next section for information about the order of keys.
-* `Reflect.enumerate(..)`: returns the set of all non-symbol keys (owned and "inherited") that are *enumerable* (see the *this & Object Prototypes* title of this series). Essentially, this set of keys is the same as those processed by a `for..in` loop. See the next section for information about the order of enumerated keys.
+* `Reflect.enumerate(..)`: returns an iterator that produces the set of all non-symbol keys (owned and "inherited") that are *enumerable* (see the *this & Object Prototypes* title of this series). Essentially, this set of keys is the same as those processed by a `for..in` loop. See the next section for information about the order of enumerated keys.
 * `Reflect.has(..)`: essentially the same as the `in` operator for checking if a property is on an object or its `[[Prototype]]` chain. For example, `Reflect.has(o,"foo")` essentially performs `"foo" in o`.
 
 Function calls and constructor invocations can be performed manually, separate of the normal syntax (e.g., `(..)` and `new`) using these utilities:
@@ -468,7 +492,15 @@ var o = { a: 1, b: 2 };
 var p = Object.create( o );
 p.c = 3;
 
-Reflect.enumerate( p );			// ["c","a","b"]
+for (var prop of Reflect.enumerate( p )) {
+	console.log( prop );
+}
+// c a b
+
+for (var prop in p) {
+	console.log( prop );
+}
+// c a b
 ```
 
 ## Feature Testing
