@@ -503,7 +503,7 @@ Object.getOwnPropertySymbols( o );	// [Symbol(c)]
 
 The `[[Enumerate]]` algorithm (ES6 specification, section 9.1.11) produces only enumerable properties, from the target object and its `[[Prototype]]` chain, and is used by both `Reflect.enumerate(..)` and `for..in`. The observable ordering is implementation dependent and not controlled by the specification.
 
-By contrast, `Object.keys(..)` invokes the `[[OwnPropertyKeys]]` algorithm to get the list of all owned keys, regardless of enumerability. However, it then reorders the list to match legacy implementation dependent behavior, specifically with `JSON.stringify(..)` and `for..in`. So, by extension the ordering also matches that of `Reflect.enumerate(..)`.
+By contrast, `Object.keys(..)` invokes the `[[OwnPropertyKeys]]` algorithm to get the list of all owned keys, regardless of enumerability. However, it filters out non-enumerable properties and then reorders the list to match legacy implementation dependent behavior, specifically with `JSON.stringify(..)` and `for..in`. So, by extension the ordering also matches that of `Reflect.enumerate(..)`.
 
 In other words, all four mechanisms will produce the same implementation dependent ordering, though they technically get there in different ways. You will typically see the following ordering behavior (though the ordering shown is not strictly required, except that they all match):
 
