@@ -489,11 +489,97 @@ The return value of `Proxy.revoke(..)` is not the proxy itself as with `new Prox
 
 Once a revocable proxy is revoked, any attempts to access it (trigger any of its traps) will throw a `TypeError`.
 
-### Proxy Examples
+### Using Proxies
 
-The meta programming benefits of these Proxy handlers should be obvious. We can almost fully intercept (and thus override) the behavior of our objects, meaning we can extend object behavior beyond core JS in some very powerful ways. We'll look at a few example patterns to get an idea.
+The meta programming benefits of these Proxy handlers should be obvious. We can almost fully intercept (and thus override) the behavior of objects, meaning we can extend object behavior beyond core JS in some very powerful ways. We'll look at a few example patterns to explore the possibilities.
 
-// TODO
+#### Proxy First, Proxy Last
+
+As we mentioned earlier, you typically think of a proxy as "wrapping" the target object. In that sense, the proxy becomes the primary object that the  code interfaces with, and the actual target object remains hidden/protected.
+
+You might do this because you want to pass the object somewhere that can't be fully "trusted", and so you need to enforce special rules around its access rather than passing the object itself.
+
+Consider:
+
+```js
+var messages = [],
+	handlers = {
+		get(target,key) {
+			// string value?
+			if (typeof target[key] == "string") {
+				// filter out punctuation
+				return target[key].replace( /[^\w]/g, "" );
+			}
+
+			// pass everything else through
+			return target[key];
+		},
+		set(target,key,val) {
+			// only set unique strings, lowercased
+			if (typeof val == "string") {
+				val = val.toLowerCase();
+				if (target.indexOf( val ) == -1) {
+					target.push( val.toLowerCase() );
+				}
+			}
+			return true;
+		}
+	},
+	messages_proxy =
+		new Proxy( results, handlers );
+
+// elsewhere:
+messages_proxy.push(
+	"heLLo...", 42, "wOrlD!!", "WoRld!!"
+);
+
+messages_proxy.forEach( function(val){
+	console.log(val);
+} );
+// hello world
+
+messages.forEach( function(val){
+	console.log(val);
+} );
+// hello... world!!
+```
+
+I call this *proxy first* design since we interact first (primarily, entirely) with the proxy.
+
+We enforce some special rules on interacting with `messages_proxy` that aren't enforced for `messages` itself. We only add elements if the value is a string and is also unique; we also lowercase the value. When retrieving values from `messages_proxy`, we filter out any punctuation in the strings.
+
+Alternately, we can completely invert this pattern, where the target interacts with the proxy instead of the proxy interacting with the target. Thus, code really only interacts with the main object. The easiest way to accomplish this fallback is to have the proxy object in the `[[Prototype]]` chain of the main object.
+
+Consider:
+
+```js
+var handlers = {
+		get(target,key,context) {
+			return function() {
+				context.speak(key + "!");
+			};
+		}
+	},
+	fallback = new Proxy( {}, handlers ),
+	greeter = {
+		speak(who = "someone") {
+			console.log( "hello", who );
+		}
+	};
+
+Object.setPrototypeOf( greeter, fallback );
+
+greeter.speak();				// hello someone
+greeter.speak( "world" );		// hello world
+
+greeter.everyone();				// hello everyone!
+```
+
+We interact directly with `greeter` instead of `fallback`. When we call `speak(..)`, it's found on `greeter` and used directly. But when we try to access a method like `everyone()`, that function doesn't exist on `person`. The default object property behavior is to check up the `[[Prototype]]` chain (see the *this & Object Prototypes* title of this series), so `fallback` is consulted for an `everyone` property.
+
+The proxy then kicks in and returns a function that calls `speak(..)` with the name of the property being accessed (`"everyone"`).
+
+I call this pattern *proxy last*, since the proxy is used only as a last resort.
 
 ## `Reflect` API
 
