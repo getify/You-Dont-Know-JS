@@ -433,9 +433,31 @@ Here's a list of handlers you can define on a proxy for a *target* object/functi
 
 **Tip:** For more information about each of these meta programming tasks, see the "Reflect" section below.
 
+### Proxy Limitations
+
+These meta programming handlers trap a wide array of fundamental operations you can perform against an object. However, there are some operations which are not (yet, at least) available to intercept.
+
+For example, none of these operations are trapped and forwarded from `pobj` proxy to `obj` target:
+
+```js
+var obj = { a:1, b:2 },
+	handlers = { .. },
+	pobj = new Proxy( o, handlers );
+
+typeof obj;
+String( obj );
+obj + "";
+obj == pobj;
+obj === pobj
+```
+
+Perhaps in the future, more of these underlying fundamental operations in the language will be interceptable, giving us even more power to extend JavaScript from within itself.
+
+**Warning:** There are certain *invariants* -- behaviors which cannot be overridden -- that apply to the use of proxy handlers. For example, the result from the `isExtensible(..)` handler is always coerced to a `boolean`. These invariants restrict some of your ability to customize behaviors with proxies, but they do so only to prevent you from creating strange and unusual (or inconsistent) behavior. The conditions for these invariants are complicated so we won't fully go into them here, but this post (http://www.2ality.com/2014/12/es6-proxies.html#invariants) does a great job of covering them.
+
 ### Revocable Proxies
 
-A regular proxy always traps for the target object, and cannot be modified after creation. However, there may be cases where you want to create a proxy that can be used only for a certain period of time and then disabled. The solution is to create a *revocable proxy*:
+A regular proxy always traps for the target object, and cannot be modified after creation -- as long as a reference is kept to the proxy, proxying remains possible. However, there may be cases where you want to create a proxy that can be used only for a certain period of time and then disabled. The solution is to create a *revocable proxy*:
 
 ```js
 var obj = { a: 1 },
@@ -469,7 +491,7 @@ Once a revocable proxy is revoked, any attempts to access it (trigger any of its
 
 ### Proxy Examples
 
-The meta programming benefits of these Proxy handlers should be obvious.
+The meta programming benefits of these Proxy handlers should be obvious. We can almost fully intercept (and thus override) the behavior of our objects, meaning we can extend object behavior beyond core JS in some very powerful ways. We'll look at a few example patterns to get an idea.
 
 // TODO
 
