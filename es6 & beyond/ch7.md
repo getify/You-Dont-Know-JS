@@ -456,8 +456,8 @@ These utilities in general behave the same as their `Object.*` counterparts. How
 
 An object's keys can be accessed/inspected using these utilities:
 
-* `Reflect.ownKeys(..)`: returns the set of all owned keys (not "inherited"), as returned by both `Object.getOwnPropertyNames(..)` and `Object.getOwnPropertySymbols(..)`. See the next section for information about the order of keys.
-* `Reflect.enumerate(..)`: returns an iterator that produces the set of all non-symbol keys (owned and "inherited") that are *enumerable* (see the *this & Object Prototypes* title of this series). Essentially, this set of keys is the same as those processed by a `for..in` loop. See the next section for information about the order of enumerated keys.
+* `Reflect.ownKeys(..)`: returns the list of all owned keys (not "inherited"), as returned by both `Object.getOwnPropertyNames(..)` and `Object.getOwnPropertySymbols(..)`. See the "Property Enumeration Order" section for information about the order of keys.
+* `Reflect.enumerate(..)`: returns an iterator that produces the set of all non-symbol keys (owned and "inherited") that are *enumerable* (see the *this & Object Prototypes* title of this series). Essentially, this set of keys is the same as those processed by a `for..in` loop. See the "Property Enumeration Order" section for information about the order of keys.
 * `Reflect.has(..)`: essentially the same as the `in` operator for checking if a property is on an object or its `[[Prototype]]` chain. For example, `Reflect.has(o,"foo")` essentially performs `"foo" in o`.
 
 Function calls and constructor invocations can be performed manually, separate of the normal syntax (e.g., `(..)` and `new`) using these utilities:
@@ -473,35 +473,66 @@ Object property access, setting, and deletion can be performed manually using th
 
 The meta programming capabilities of `Reflect` give you programmtic equivalents to emulate various syntactic features, exposing previously hidden-only abstract operations. For example, you can use these capabilities to extend features and APIs for *domain specific languages* (DSLs).
 
-### Key Enumeration Order
+### Property Enumeration Order
 
 Prior to ES6, the order of enumeration of an object's keys/properties was implementation dependent and undefined by the specification. Generally, most engines have enumerated them in creation order, though developers have been strongly encouraged not to ever rely on this ordering.
 
-As of ES6, the order of enumeration is now defined in the specification (ES6 specification, section 9.1.12):
+As of ES6, the order of enumeration is now defined in the specification (ES6 specification, section 9.1.12) as the `[[OwnPropertyKeys]]` algorithm, which produces all owned properties (strings or symbols) regardless of enumerability. However, this guaranteed ordering only holds observably for `Reflect.ownKeys(..)` (and by extension, `Object.getOwnPropertyNames(..)` and `Object.getOwnPropertySymbols(..)`).
 
-1. First, enumerate any owned property names that are integer indexes, in ascending numeric order.
+The ordering is:
+
+1. First, enumerate any owned properties that are integer indexes, in ascending numeric order.
 2. Next, enumerate the rest of the owned string property names in creation order.
 3. Finally, enumerate owned symbol properities in creation order.
 
-For the `Reflect.enumerate(..)` utility, which enumerates keys not only from the target object but also its `[[Prototype]]` chain, the ordering will follow the above steps for each object level. Starting with the target object, and traversing up the `[[Prototype]]` chain, each object's enumerated keys will be added to the enumeration.
-
 Consider:
+
+```js
+var o = {};
+
+o[Symbol("c")] = "yay";
+o[2] = true;
+o[1] = true;
+o.b = "awesome";
+o.a = "cool";
+
+Reflect.ownKeys( o );				// [1,2,"b","a",Symbol(c)]
+Object.getOwnPropertyNames( o );	// [1,2,"b","a"]
+Object.getOwnPropertySymbols( o );	// [Symbol(c)]
+```
+
+The `[[Enumerate]]` algorithm (ES6 specification, section 9.1.11) produces only enumerable properties, from the target object and its `[[Prototype]]` chain, and is used by both `Reflect.enumerate(..)` and `for..in`. The observable ordering is implementation dependent and not controlled by the specification.
+
+By contrast, `Object.keys(..)` invokes the `[[OwnPropertyKeys]]` algorithm to get the list of all owned keys, regardless of enumerability. However, it then reorders the list to match legacy implementation dependent behavior, specifically with `JSON.stringify(..)` and `for..in`. So, by extension the ordering also matches that of `Reflect.enumerate(..)`.
+
+In other words, all four mechanisms will produce the same implementation dependent ordering, though they technically get there in different ways. You will typically see the following ordering behavior (though the ordering shown is not strictly required, except that they all match):
 
 ```js
 var o = { a: 1, b: 2 };
 var p = Object.create( o );
 p.c = 3;
+p.d = 4;
 
 for (var prop of Reflect.enumerate( p )) {
 	console.log( prop );
 }
-// c a b
+// c d a b
 
 for (var prop in p) {
 	console.log( prop );
 }
-// c a b
+// c d a b
+
+JSON.stringify( p );
+// {"c":3,"d":4}
+
+Object.keys( p );
+// ["c","d"]
 ```
+
+Boiling this down: as of ES6, `Reflect.ownKeys(..)`, `Object.getOwnPropertyNames(..)`, and `Object.getOwnPropertySymbols(..)` all have predictable and reliable ordering guaranteed by the specification. So it's safe to build code that relies on this ordering.
+
+`Reflect.enumerate(..)`, `Object.keys(..)`, and `for..in` (as well as `JSON.stringification(..)` by extension) continue to share an observable ordering with each other, as they always have. But that ordering will not necessarily be the same as that of `Reflect.ownKeys(..)`. Care should still be taken in relying on this implementation dependent ordering.
 
 ## Feature Testing
 
