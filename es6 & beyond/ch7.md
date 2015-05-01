@@ -397,10 +397,8 @@ var obj = { a: 1 },
 			console.log( "accessing: ", key );
 			return Reflect.get( target, key, context );
 		}
-
-	};
-
-var pobj = new Proxy( obj, handlers );
+	},
+	pobj = new Proxy( obj, handlers );
 
 obj.a;
 // 1
@@ -431,11 +429,49 @@ Here's a list of handlers you can define on a proxy for a *target* object/functi
 * `isExtensible(..)`: via `[[IsExtensible]]`, the extensibility of the proxy is probed (`Object.isExtensible(..)` or `Reflect.isExtensible(..)`)
 * `ownKeys(..)`: via `[[OwnPropertyKeys]]`, the set of owned properties and/or owned symbol properties of the proxy is retrieved (`Object.keys(..)`, `Object.getOwnPropertyNames(..)`, `Object.getOwnSymbolProperties(..)`, `Reflect.ownKeys(..)`, or `JSON.stringify(..)`)
 * `enumerate(..)`: via `[[Enumerate]]`, an iterator is requested for the proxy's enumerable owned and "inherited" properties (`Reflect.enumerate(..)` or `for..in`)
-* `has(..)`: via `[[HasProperty]]`, the proxy is probed to see if it has an owned or "inherited" property (`Reflect.has(..)` or `"prop" in obj`)
+* `has(..)`: via `[[HasProperty]]`, the proxy is probed to see if it has an owned or "inherited" property (`Reflect.has(..)`, `Object#hasOwnProperty(..)`, or `"prop" in obj`)
 
 **Tip:** For more information about each of these meta programming tasks, see the "Reflect" section below.
 
+### Revocable Proxies
+
+A regular proxy always traps for the target object, and cannot be modified after creation. However, there may be cases where you want to create a proxy that can be used only for a certain period of time and then disabled. The solution is to create a *revocable proxy*:
+
+```js
+var obj = { a: 1 },
+	handlers = {
+		get(target,key,context) {
+			// note: target === obj,
+			// context === pobj
+			console.log( "accessing: ", key );
+			return target[key];
+		}
+	},
+	{ proxy: pobj, revoke: prevoke } =
+		Proxy.revocable( obj, handlers );
+
+pobj.a;
+// accessing: a
+// 1
+
+// later:
+prevoke();
+
+pobj.a;
+// TypeError
+```
+
+A revocable proxy is created with `Proxy.revocable(..)`, which is a regular function, not a constructor like `Proxy(..)`. Otherwise, it takes the same two arguments: *target* and *handlers*.
+
+The return value of `Proxy.revoke(..)` is not the proxy itself as with `new Proxy(..)`. Instead, it's an object with two properties: *proxy* and *revoke* -- we used object destructuring (see "Destructuring" in Chapter 2) to assign these properties to `pobj` and `prevoke()` variables, respectively.
+
+Once a revocable proxy is revoked, any attempts to access it (trigger any of its traps) will throw a `TypeError`.
+
+### Proxy Examples
+
 The meta programming benefits of these Proxy handlers should be obvious.
+
+// TODO
 
 ## `Reflect` API
 
