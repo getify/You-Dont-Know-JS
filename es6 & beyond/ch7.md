@@ -472,7 +472,7 @@ For example, none of these operations are trapped and forwarded from `pobj` prox
 ```js
 var obj = { a:1, b:2 },
 	handlers = { .. },
-	pobj = new Proxy( o, handlers );
+	pobj = new Proxy( obj, handlers );
 
 typeof obj;
 String( obj );
