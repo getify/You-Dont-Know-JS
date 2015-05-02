@@ -629,7 +629,7 @@ var obj = {
 		}
 	},
 	handlers = {
-		get(target,key) {
+		get(target,key,context) {
 			if (Reflect.has( target, key )) {
 				return Reflect.get(
 					target, key, context
@@ -639,9 +639,11 @@ var obj = {
 				throw "No such property/method!";
 			}
 		},
-		set(target,key,val) {
+		set(target,key,val,context) {
 			if (Reflect.has( target, key )) {
-				return Reflect.set( target, key );
+				return Reflect.set(
+					target, key, val, context
+				);
 			}
 			else {
 				throw "No such property/method!";
@@ -663,10 +665,10 @@ Now, let's consider inverting with *proxy last* design:
 
 ```js
 var handlers = {
-		get(target,key) {
+		get() {
 			throw "No such property/method!";
 		},
-		set(target,key,val) {
+		set() {
 			throw "No such property/method!";
 		}
 	},
@@ -689,6 +691,69 @@ obj.bar();			// Error: No such property/method!
 ```
 
 The *proxy last* design here is a fair bit simpler with respect to how the handlers are defined. Instead of needing to intercept the `[[Get]]` and `[[Set]]` operations and only forward them if the target property exists, we instead rely on the fact that if either `[[Get]]` or `[[Set]]` get to our `pobj` fallback, the action has already traversed the whole `[[Prototype]]` chain and not found a matching property. We are free at that point to unconditionally throw the error. Cool, huh?
+
+#### Proxy Hacking The `[[Prototype]]` Chain
+
+The `[[Get]]` operation is the primary channel by which the `[[Prototype]]` mechanism is invoked. When a property is not found on the immediate object, `[[Get]]` automatically hands off the operation to the `[[Prototype]]` object.
+
+That means you can use the `get(..)` trap of a proxy to emulate or extend the notion of this `[[Prototype]]` mechanism.
+
+The first hack we'll consider is creating two objects which are circularly linked via `[[Prototype]]` (or, at least it appears that way!). You cannot actually create a real circular `[[Prototype]]` chain, as the engine will throw an error. But a proxy can fake it!
+
+Consider:
+
+```js
+var handlers = {
+		get(target,key,context) {
+			if (Reflect.has( target, key )) {
+				return Reflect.get(
+					target, key, context
+				);
+			}
+			// using fake circular `[[Prototype]]`
+			else {
+				return Reflect.get(
+					target[
+						Symbol.for( "[[Prototype]]" )
+					],
+					key,
+					context
+				);
+			}
+		}
+	},
+	obj1 = new Proxy(
+		{
+			name: "obj-1",
+			foo() {
+				console.log( "foo:", this.name );
+			}
+		},
+		handlers
+	),
+	obj2 = Object.assign(
+		Object.create( obj1 ),
+		{
+			name: "obj-2",
+			bar() {
+				console.log( "bar:", this.name );
+				this.foo();
+			}
+		}
+	);
+
+// fake circular `[[Prototype]]` link
+obj1[ Symbol.for( "[[Prototype]]" ) ] = obj2;
+
+obj1.bar();
+// bar: obj-1 <-- through proxy faking [[Prototype]]
+// foo: obj-1 <-- `this` context still preserved
+
+obj2.foo();
+// foo: obj-2 <-- through [[Prototype]]
+```
+
+**Note:** We did't need to proxy/forward `[[Set]]` in this example, so we kept things simpler. To be fully `[[Prototype]]` emulation compliant, you'd want to implement a `set(..)` handler that searches the `[[Prototype]]` chain for a matching property and respects its descriptor behavior (e.g., set, writable). See the *this & Object Prototypes* title of this series.
 
 // TODO
 
