@@ -395,7 +395,9 @@ var obj = { a: 1 },
 			// note: target === obj,
 			// context === pobj
 			console.log( "accessing: ", key );
-			return Reflect.get( target, key, context );
+			return Reflect.get(
+				target, key, context
+			);
 		}
 	},
 	pobj = new Proxy( obj, handlers );
@@ -438,7 +440,9 @@ In addition to the notations in the above list about actions that will trigger t
 ```js
 var handlers = {
 		getOwnPropertyDescriptor(target,prop) {
-			console.log( "getOwnPropertyDescriptor" );
+			console.log(
+				"getOwnPropertyDescriptor"
+			);
 			return Object.getOwnPropertyDescriptor(
 				target, prop
 			);
@@ -534,7 +538,8 @@ var messages = [],
 			// string value?
 			if (typeof target[key] == "string") {
 				// filter out punctuation
-				return target[key].replace( /[^\w]/g, "" );
+				return target[key]
+					.replace( /[^\w]/g, "" );
 			}
 
 			// pass everything else through
@@ -545,7 +550,9 @@ var messages = [],
 			if (typeof val == "string") {
 				val = val.toLowerCase();
 				if (target.indexOf( val ) == -1) {
-					target.push( val.toLowerCase() );
+					target.push(
+						val.toLowerCase()
+					);
 				}
 			}
 			return true;
@@ -586,14 +593,15 @@ var handlers = {
 			};
 		}
 	},
-	fallback = new Proxy( {}, handlers ),
+	catchall = new Proxy( {}, handlers ),
 	greeter = {
 		speak(who = "someone") {
 			console.log( "hello", who );
 		}
 	};
 
-Object.setPrototypeOf( greeter, fallback );
+// setup `greeter` to fall back to `catchall`
+Object.setPrototypeOf( greeter, catchall );
 
 greeter.speak();				// hello someone
 greeter.speak( "world" );		// hello world
@@ -601,11 +609,86 @@ greeter.speak( "world" );		// hello world
 greeter.everyone();				// hello everyone!
 ```
 
-We interact directly with `greeter` instead of `fallback`. When we call `speak(..)`, it's found on `greeter` and used directly. But when we try to access a method like `everyone()`, that function doesn't exist on `person`.
+We interact directly with `greeter` instead of `catchall`. When we call `speak(..)`, it's found on `greeter` and used directly. But when we try to access a method like `everyone()`, that function doesn't exist on `person`.
 
-The default object property behavior is to check up the `[[Prototype]]` chain (see the *this & Object Prototypes* title of this series), so `fallback` is consulted for an `everyone` property. The proxy `get()` handler then kicks in and returns a function that calls `speak(..)` with the name of the property being accessed (`"everyone"`).
+The default object property behavior is to check up the `[[Prototype]]` chain (see the *this & Object Prototypes* title of this series), so `catchall` is consulted for an `everyone` property. The proxy `get()` handler then kicks in and returns a function that calls `speak(..)` with the name of the property being accessed (`"everyone"`).
 
 I call this pattern *proxy last*, since the proxy is used only as a last resort.
+
+#### "No Such Property/Method"
+
+A common complaint about JS is that objects aren't by default very defensive in the situation where you try to access or set a property that doesn't already exist. You way wish to pre-define all the properties/methods for an object, and have an error thrown if a non-existent property name is subsequently used.
+
+We can accomplish this with a proxy, either in *proxy first* or *proxy last* design. Let's consider both.
+
+```js
+var obj = {
+		a: 1,
+		foo() {
+			console.log( "a:", this.a );
+		}
+	},
+	handlers = {
+		get(target,key) {
+			if (Reflect.has( target, key )) {
+				return Reflect.get(
+					target, key, context
+				);
+			}
+			else {
+				throw "No such property/method!";
+			}
+		},
+		set(target,key,val) {
+			if (Reflect.has( target, key )) {
+				return Reflect.set( target, key );
+			}
+			else {
+				throw "No such property/method!";
+			}
+		}
+	},
+	pobj = new Proxy( obj, handlers );
+
+pobj.a = 3;
+pobj.foo();			// a: 3
+
+pobj.b = 4;			// Error: No such property/method!
+pobj.bar();			// Error: No such property/method!
+```
+
+For both `get(..)` and `set(..)`, we only forward the operation if the target object's property already exists; error thrown otherwise. The proxy object (`pobj`) is the main object code should interact with, as it intercepts these actions to provide the protections.
+
+Now, let's consider inverting with *proxy last* design:
+
+```js
+var handlers = {
+		get(target,key) {
+			throw "No such property/method!";
+		},
+		set(target,key,val) {
+			throw "No such property/method!";
+		}
+	},
+	pobj = new Proxy( {}, handlers ),
+	obj = {
+		a: 1,
+		foo() {
+			console.log( "a:", this.a );
+		}
+	};
+
+// setup `obj` to fall back to `pobj`
+Object.setPrototypeOf( obj, pobj );
+
+obj.a = 3;
+obj.foo();			// a: 3
+
+obj.b = 4;			// Error: No such property/method!
+obj.bar();			// Error: No such property/method!
+```
+
+The *proxy last* design here is a fair bit simpler with respect to how the handlers are defined. Instead of needing to intercept the `[[Get]]` and `[[Set]]` operations and only forward them if the target property exists, we instead rely on the fact that if either `[[Get]]` or `[[Set]]` get to our `pobj` fallback, the action has already traversed the whole `[[Prototype]]` chain and not found a matching property. We are free at that point to unconditionally throw the error. Cool, huh?
 
 // TODO
 
