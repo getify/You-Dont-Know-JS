@@ -433,6 +433,32 @@ Here's a list of handlers you can define on a proxy for a *target* object/functi
 
 **Tip:** For more information about each of these meta programming tasks, see the "Reflect" section below.
 
+In addition to the notations in the above list about actions that will trigger the various traps, some traps are triggered indirectly by the default actions of another trap. For example:
+
+```js
+var handlers = {
+		getOwnPropertyDescriptor(target,prop) {
+			console.log( "getOwnPropertyDescriptor" );
+			return Object.getOwnPropertyDescriptor(
+				target, prop
+			);
+		},
+		defineProperty(target,prop,desc){
+			console.log( "defineProperty" );
+			return Object.defineProperty(
+				target, prop, desc
+			);
+		}
+	},
+	proxy = new Proxy( {}, handlers );
+
+proxy.a = 2;
+// getOwnPropertyDescriptor
+// defineProperty
+```
+
+The `getOwnPropertyDescriptor(..)` and `defineProperty(..)` handlers are triggered by the default `set(..)` handler's steps when setting a property value (whether newly adding or updating). If you also define your own `set(..)` handler, you may or may not make the corresponding calls against `context` (not `target`!) which would trigger these proxy traps.
+
 ### Proxy Limitations
 
 These meta programming handlers trap a wide array of fundamental operations you can perform against an object. However, there are some operations which are not (yet, at least) available to intercept.
@@ -575,11 +601,13 @@ greeter.speak( "world" );		// hello world
 greeter.everyone();				// hello everyone!
 ```
 
-We interact directly with `greeter` instead of `fallback`. When we call `speak(..)`, it's found on `greeter` and used directly. But when we try to access a method like `everyone()`, that function doesn't exist on `person`. The default object property behavior is to check up the `[[Prototype]]` chain (see the *this & Object Prototypes* title of this series), so `fallback` is consulted for an `everyone` property.
+We interact directly with `greeter` instead of `fallback`. When we call `speak(..)`, it's found on `greeter` and used directly. But when we try to access a method like `everyone()`, that function doesn't exist on `person`.
 
-The proxy then kicks in and returns a function that calls `speak(..)` with the name of the property being accessed (`"everyone"`).
+The default object property behavior is to check up the `[[Prototype]]` chain (see the *this & Object Prototypes* title of this series), so `fallback` is consulted for an `everyone` property. The proxy `get()` handler then kicks in and returns a function that calls `speak(..)` with the name of the property being accessed (`"everyone"`).
 
 I call this pattern *proxy last*, since the proxy is used only as a last resort.
+
+// TODO
 
 ## `Reflect` API
 
