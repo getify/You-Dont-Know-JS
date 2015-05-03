@@ -710,7 +710,7 @@ var handlers = {
 					target, key, context
 				);
 			}
-			// using fake circular `[[Prototype]]`
+			// fake circular `[[Prototype]]`
 			else {
 				return Reflect.get(
 					target[
@@ -753,7 +753,7 @@ obj2.foo();
 // foo: obj-2 <-- through [[Prototype]]
 ```
 
-**Note:** We did't need to proxy/forward `[[Set]]` in this example, so we kept things simpler. To be fully `[[Prototype]]` emulation compliant, you'd want to implement a `set(..)` handler that searches the `[[Prototype]]` chain for a matching property and respects its descriptor behavior (e.g., set, writable). See the *this & Object Prototypes* title of this series.
+**Note:** We didn't need to proxy/forward `[[Set]]` in this example, so we kept things simpler. To be fully `[[Prototype]]` emulation compliant, you'd want to implement a `set(..)` handler that searches the `[[Prototype]]` chain for a matching property and respects its descriptor behavior (e.g., set, writable). See the *this & Object Prototypes* title of this series.
 
 In the previous snippet, `obj2` is `[[Prototype]]` linked to `obj1` by virtue of the `Object.create(..)` statement. But to create the reverse (circular) linkage, we create property on `obj1` at the symbol location `Symbol.for("[[Prototype]]")` (see "Symbols" in Chapter 2). This symbol may look sort of special/magical, but it isn't. It just allows me a conveniently named hook that semantically appears related to the task I'm performing.
 
@@ -761,7 +761,77 @@ Then, the proxy's `get(..)` handler looks first to see if a requested `key` is o
 
 One important plus of this pattern is that the definitions of `obj1` and `obj2` are mostly not intruded by the setting up of this circular relationship between them. Though the previous snippet has all the steps intertwined for brevity sake, if you look closely, the proxy handler logic is entirely generic (doesn't know about `obj1` or `obj2` specifically). So, that logic could be pulled out into a simple helper that wires them up, like a `setCircularPrototypeOf(..)` for example. We'll leave that as an exercise for the reader.
 
-// TODO
+Now that we've seen how we can use `get(..)` to emulate a `[[Prototype]]` link, let's push the hackery a bit further. Instead of a circular `[[Prototype]]`, what about multiple `[[Prototype]]` linkages (aka "multiple inheritance")? This turns out to be fairly straightforward:
+
+```js
+var obj1 = {
+		name: "obj-1",
+		foo() {
+			console.log( "obj1.foo:", this.name );
+		},
+	},
+	obj2 = {
+		name: "obj-2",
+		foo() {
+			console.log( "obj2.foo:", this.name );
+		},
+		bar() {
+			console.log( "obj2.bar:", this.name );
+		}
+	},
+	handlers = {
+		get(target,key,context) {
+			if (Reflect.has( target, key )) {
+				return Reflect.get(
+					target, key, context
+				);
+			}
+			// fake multiple `[[Prototype]]`
+			else {
+				for (var P of target[
+					Symbol.for( "[[Prototype]]" )
+				]) {
+					if (Reflect.has( P, key )) {
+						return Reflect.get(
+							P, key, context
+						);
+					}
+				}
+			}
+		}
+	},
+	obj3 = new Proxy(
+		{
+			name: "obj-3",
+			baz() {
+				this.foo();
+				this.bar();
+			}
+		},
+		handlers
+	);
+
+// fake multiple `[[Prototype]]` links
+obj3[ Symbol.for( "[[Prototype]]" ) ] = [
+	obj1, obj2
+];
+
+obj3.baz();
+// obj1.foo: obj-3
+// obj2.bar: obj-3
+```
+
+**Note:** As mentioned in the note after the earlier circular `[[Prototype]]` example, we didn't implement the `set(..)` handler, but it would be necessary for a complete solution that emulates `[[Set]]` actions as normal `[[Prototype]]`'s behave.
+
+`obj3` is set up to multiple-delegate to both `obj1` and `obj2`. In `obj3.baz()`, the `this.foo()` call ends up pulling `foo()` from `obj1` (first-come, first-served, even though there's also a `foo()` on `obj2`). If we reordered the linkage as `obj2, obj1`, the `obj2.foo()` would have been found and used.
+
+But as is, the `this.bar()` call doesn't find a `bar()` on `obj1`, so it falls over to check `obj2`, where it finds a match.
+
+`obj1` and `obj2` represent two parallel `[[Prototype]]` chains of `obj3`. `obj1` and/or `obj2` could themselves have normal `[[Prototype]]` delegation to other objects, or either could themself be a proxy (like `obj3` is) that can multiple-delegate.
+
+Just as with the circular `[[Prototype]]` example earlier, the definitions of `obj1`, `obj2`, and `obj3` are almost entirely separate from the generic proxy logic that handles the multiple-delegation. It would be trivial to define a utility like `setPrototypesOf(..)` (notice the "s"!) that takes a main object and a list of objects to fake the multiple `[[Prototype]]` linkage to. Again, we'll leave that as an exercise for the reader.
+
+Hopefully the power of proxies is now becoming clearer after these various examples. There are many other powerful meta programming tasks that proxies enable.
 
 ## `Reflect` API
 
