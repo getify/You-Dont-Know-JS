@@ -51,5 +51,6 @@
 * Chapter 8: Beyond ES6
 	* `async function`s
 	* `Object.observe(..)`
-	* Other Stuff
+	* Exponentiation Operator
+	* Objects and `...`
 * Appendix A: Acknowledgments

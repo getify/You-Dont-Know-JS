@@ -149,11 +149,7 @@ At the time of this writing, `async function`s return regular promises, so it's 
 
 // TODO
 
-## Other Stuff
-
-// TODO
-
-### Exponentiation Operator
+## Exponentiation Operator
 
 An operator has been proposed for JavaScript to perform exponentiation in the same way that `Math.pow(..)` does. Consider:
 
@@ -168,7 +164,7 @@ a;				// 8
 
 **Note:** `**` is essentially the same as it appears in Python, Ruby, Perl, and others.
 
-### Objects and `...`
+## Objects and `...`
 
 As we saw in the "Too Many, Too Few, Just Enough" section of Chapter 2, the `...` operator is pretty obvious in how it relates to spreading or gathering arrays. But what about objects?
 
