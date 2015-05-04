@@ -374,4 +374,26 @@ if (vals.includes( 42 )) {
 
 **Note:** `Array#includes(..)` uses matching logic that will find `NaN` values, but will not distinguish between `-0` and `0` (see the *Types & Grammar* title of this series). If you don't care about `-0` values in your programs, this will likely be exactly what you're hoping for. If you *do* care about `-0`, you'll need to do your own searching logic, likely using the `Object.is(..)` utility (see Chapter 6).
 
+## SIMD
+
+We cover SIMD (Single Instruction Multiple Data) in more detail in the *Async & Performance* title of this series, but it bears a brief mention here, as its one of the next likely features to land in a future JS.
+
+The SIMD API exposes various low-level (CPU) instructions which can operate on more than a single number value at a time. For example, you'll be able to specify two *vectors* of 4 or 8 numbers each, and multiply the respective elements all at once (data parallelism!).
+
+Consider:
+
+```js
+var v1 = SIMD.float32x4( 3.14159, 21.0, 32.3, 55.55 );
+var v2 = SIMD.float32x4( 2.1, 3.2, 4.3, 5.4 );
+
+SIMD.float32x4.mul( v1, v2 );
+// [ 6.597339, 67.2, 138.89, 299.97 ]
+```
+
+Parallel math operations are critical for the next generations of high performance JS applications, especially those being transpiled from other languages like C.
+
+One of the big focuses in future JS evolution is making the language more suitable as a *transpilation* target, and SIMD will play a central role in those efforts, along with other experiments like ASM.js.
+
+SIMD will include several other operations besides `mul(..)` (multiplication), such as `sub()`, `div()`, `abs()`, `neg()`, `sqrt()`, and many more.
+
 ## Review

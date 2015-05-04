@@ -54,4 +54,5 @@
 	* Exponentiation Operator
 	* Object Properties and `...`
 	* `Array#includes(..)`
+	* SIMD
 * Appendix A: Acknowledgments
