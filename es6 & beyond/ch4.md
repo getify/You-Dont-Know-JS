@@ -297,11 +297,11 @@ function *main() {
 		ret = yield step2Failed( err );
 	}
 
-	ret = yield Promise.all([
+	ret = yield Promise.all( [
 		step3a( ret ),
 		step3b( ret ),
 		step3c( ret )
-	]);
+	] );
 
 	yield step4( ret );
 }
@@ -354,14 +354,19 @@ So now, running `*main()` as listed in the earlier snippet is as easy as:
 
 ```js
 run( main )
-.then( function(msg){
-	// main is done!
-} );
+.then(
+	function fulfilled(){
+		// `*main()` completed successfully
+	},
+	function rejected(reason){
+		// Oops, something went wrong
+	}
+);
 ```
 
 Essentially, anywhere that you have more than two asynchronous steps of flow control logic in your program, you can *and should* use a promise-yielding generator driven by a run utility to express the flow control in a synchronous-fashion. This will make for much easier to understand and maintain code.
 
-This yield-a-promise-resume-the-generator pattern is going to be so common and so powerful, the next version of JavaScript is almost certainly going to get a new function type which will do it automatically without needing the run utility. We'll cover (expected name) `async function`s in Chapter 8 of this title.
+This yield-a-promise-resume-the-generator pattern is going to be so common and so powerful, the next version of JavaScript is almost certainly going to introduce a new function type which will do it automatically without needing the run utility. We'll cover (expected name) `async function`s in Chapter 8.
 
 ## Review
 
