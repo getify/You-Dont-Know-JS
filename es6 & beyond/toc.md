@@ -53,4 +53,5 @@
 	* `Object.observe(..)`
 	* Exponentiation Operator
 	* Object Properties and `...`
+	* `Array#includes(..)`
 * Appendix A: Acknowledgments
