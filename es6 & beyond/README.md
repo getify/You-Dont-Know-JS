@@ -8,7 +8,7 @@
 
 [Table of Contents](toc.md)
 
-* Foreword (by: TBA)
+* [Foreword](foreword.md) (by [Rick Waldron](http://bocoup.com/weblog/author/rick-waldron/))
 * [Preface](../preface.md)
 * [Chapter 1: ES? Now & Future](ch1.md)
 * [Chapter 2: Syntax](ch2.md)
