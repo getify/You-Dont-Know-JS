@@ -52,5 +52,5 @@
 	* `async function`s
 	* `Object.observe(..)`
 	* Exponentiation Operator
-	* Objects and `...`
+	* Object Properties and `...`
 * Appendix A: Acknowledgments
