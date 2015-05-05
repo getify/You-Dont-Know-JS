@@ -72,7 +72,7 @@ typeof strPrimitive;							// "string"
 strPrimitive instanceof String;					// false
 
 var strObject = new String( "I am a string" );
-typeof strObject; // "object"
+typeof strObject; 								// "object"
 strObject instanceof String;					// true
 
 // inspect the object sub-type
