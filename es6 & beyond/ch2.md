@@ -1009,9 +1009,9 @@ You can of course do so manually, as probably some of you have done in the past:
 ```js
 config.options = config.options || {};
 config.options.remove = (config.options.remove !== undefined) ?
-	config.options.remove : default.options.remove;
+	config.options.remove : defaults.options.remove;
 config.options.enable = (config.options.enable !== undefined) ?
-	config.options.enable : default.options.enable;
+	config.options.enable : defaults.options.enable;
 ...
 ```
 
