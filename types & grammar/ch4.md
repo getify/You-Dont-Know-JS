@@ -35,7 +35,7 @@ For `b`, the coercion that occurs happens implicitly, because the `+` operator c
 
 By contrast, the `String(..)` function makes it pretty obvious that it's explicitly taking the value in `a` and coercing it to a `string` representation.
 
-Both approaches accomplish the same effect: `"42"` comes from `42`. But it's the *how* that is at the heart of the heated debates over JavaScript coercion.
+Both approaches accomplish the same effect: `42` comes from `"42"`. But it's the *how* that is at the heart of the heated debates over JavaScript coercion.
 
 **Note:** Technically, there's some nuanced behavioral difference here beyond the stylistic difference. We cover that in more detail later in the chapter, in the "Implicitly: Strings <--> Numbers" section.
 
@@ -87,7 +87,7 @@ Another task that seems awfully related to `ToString` is when you use the `JSON.
 
 It's important to note that this stringification is not exactly the same thing as coercion. But since it's related to the `ToString` rules above, we'll take a slight diversion to cover JSON stringification behaviors here.
 
-For most simple values, JSON stringification behaves bascially the same as `toString()` conversions, except that the serialization result is *always a `string`*:
+For most simple values, JSON stringification behaves basically the same as `toString()` conversions, except that the serialization result is *always a `string`*:
 
 ```js
 JSON.stringify( 42 );	// "42"
