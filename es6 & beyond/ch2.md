@@ -1859,6 +1859,10 @@ Don't believe any hype that `=>` is primarily, or even mostly, about fewer keyst
 
 **Tip:** If you have a function that for any of these articulated reasons is not a good match for an `=>` arrow function, but it's being declared as part of an object literal, recall from "Concise Methods" earlier in this chapter that there's another option for shorter function syntax.
 
+If you prefer a visual decision chart for how/why to pick an arrow function:
+
+<img src="fig1.png">
+
 ## `for..of` Loops
 
 Joining the `for` and `for..in` loops from the JavaScript we're all familiar with, ES6 adds a `for..of` loop, which loops over the set of values produced by an *iterator*.
