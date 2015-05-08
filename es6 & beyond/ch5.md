@@ -286,7 +286,7 @@ m.set( y, "bar" );
 var keys = [ ...m.keys() ];
 
 keys[0] === x;					// true
-keys[0] === y;					// true
+keys[1] === y;					// true
 ```
 
 To determine if a map has a given key, use `has(..)`:
