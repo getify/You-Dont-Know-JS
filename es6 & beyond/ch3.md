@@ -1705,7 +1705,7 @@ f.y;						// 15
 f.gimmeXY();				// 75
 ```
 
-**Warning:** Though `class Foo` is much like `function Foo`, there are important differences. The `Foo(..)` call *must* be made with `new` -- a pre-ES6 approach of `Foo.call( obj )` will *not* work. Also, while `function Foo` is "hoisted" (see the *Scope & Closures* title of this series), `class Foo` is not; the `extends ..` clause specifies an expression that cannot be "hoisted". So, you must declare a `class` before you can instantiate it.
+**Warning:** Though `class Foo` is much like `function Foo`, there are important differences. The `Foo(..)` call *must* be made with `new` -- a pre-ES6 approach of `Foo.call( obj )` will *not* work. Also, while `function Foo` is "hoisted" (see the *Scope & Closures* title of this series), `class Foo` is not; the `extends ..` clause specifies an expression that cannot be "hoisted". So, you must declare a `class` before you can instantiate it. Lastly, `class Foo` in the top global scope creates a lexical `Foo` identifier in that scope, but unlike `function Foo` does not create a global object property of that name.
 
 The established `instanceof` operator still works with ES6 classes, since `class` just creates a constructor function of the same name. However, ES6 introduces a way to customize how `instanceof` works, using `Symbol.hasInstance` (see "Well Known Symbols" in Chapter 7).
 

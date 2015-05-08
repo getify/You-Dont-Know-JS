@@ -213,6 +213,47 @@ There's some rumored assumptions that a `const` likely will be more optimizable 
 
 Whether that is the case or just our own fantasies and intuitions, the much more important decision to make is if you intend *constant* behavior or not. Don't just use `const` on variables that otherwise don't obviously appear to be treated as *constants* in the code, as that will just lead to more confusion.
 
+### Block-scoped Functions
+
+Starting with ES6, function declarations that occur inside of blocks are now specified to be scoped to that block. Prior to ES6, the specification did not call for this, but many implementations did it anyway. So now the specification meets reality.
+
+Consider:
+
+```js
+{
+	foo();					// works!
+
+	function foo() {
+		// ..
+	}
+}
+
+foo();						// ReferenceError
+```
+
+The `foo()` function is declared inside the `{ .. }` block, and as of ES6 is block-scoped there. So it's not available outside that block. But also note that it is "hoisted" within the block, as opposed to `let` declarations which suffer the TDZ error trap mentioned earlier.
+
+Block-scoping of function declarations could be a problem if you've ever written code like this before, and relied on the old legacy non-block-scoped behavior:
+
+```js
+if (something) {
+	function foo() {
+		console.log( "1" );
+	}
+}
+else {
+	function foo() {
+		console.log( "2" );
+	}
+}
+
+foo();		// ??
+```
+
+In pre-ES6 compliant environments, `foo()` would print `"2"` regardless of the value of `something`, since both function declarations were hoisted out of the blocks, and the second one always wins.
+
+In ES6, that last line throws a `ReferenceError`.
+
 ## Spread / Rest
 
 ES6 introduces a new `...` operator that's typically referred to as the *spread* or *rest* operator, depending on where/how it's used. Let's take a look:
