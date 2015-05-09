@@ -1755,10 +1755,11 @@ Consider:
 
 ```js
 function thunkify(fn) {
-	var args = [].slice.call( arguments, 1 );
+	var args = arguments;
 	return function(cb) {
-		args.push( cb );
-		return fn.apply( null, args );
+		var thunk_args = [].slice.call( args );
+		thunk_args.push( cb );
+		return fn.apply( null, thunk_args );
 	};
 }
 
@@ -1784,10 +1785,11 @@ Consider:
 ```js
 function thunkify(fn) {
 	return function() {
-		var args = [].slice.call( arguments );
+		var args = arguments;
 		return function(cb) {
-			args.push( cb );
-			return fn.apply( null, args );
+			var thunk_args = [].slice.call( args );
+			thunk_args.push( cb );
+			return fn.apply( null, thunk_args );
 		};
 	};
 }
