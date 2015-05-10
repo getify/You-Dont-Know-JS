@@ -5,11 +5,11 @@ Structured collection and access to data is a critical component of just about a
 
 As of ES6, some of the most useful (and performance-optimizing!) data structure abstractions have been added as native components of the language.
 
-We'll start this chapter first by looking at *Typed Arrays*, which were technically contemporary to ES5 efforts, but which prior to ES6 were only standardized by the web platform and not JavaScript. As of ES6, these have been adopted directly by the language specification, which gives them first-class status.
+We'll start this chapter first by looking at *TypedArrays*, which were technically contemporary to ES5 efforts, but which prior to ES6 were only standardized by the web platform and not JavaScript. As of ES6, these have been adopted directly by the language specification, which gives them first-class status.
 
 Then we'll look at Maps and Sets, as well as their weak ("weak" in relation to memory/garbage collection) counterparts.
 
-## Typed Arrays
+## TypedArrays
 
 As we cover in the *Types & Grammar* title of this series, JS does have a set of built-in types, like `number` and `string`. It'd be tempting to look at a feature named "typed array" and assume it means an array of a specific type of values, like an array of only strings.
 
@@ -104,7 +104,7 @@ var first = new Uint16Array( buf, 0, 2 )[0],
 	fourth = new Float32Array( buf, 4, 4 )[0];
 ```
 
-### Typed Array Constructors
+### TypedArray Constructors
 
 In addition to the `(buffer,[offset, [length]])` form examined in the previous section, typed array constructors also support these forms:
 
@@ -121,17 +121,62 @@ The following typed array constructors are available as of ES6:
 * `Float32Array` (32-bit floating point, IEEE-754)
 * `Float64Array` (64-bit floating point, IEEE-754)
 
-Since instances of typed array constructors are array-like objects, it is trivial to convert them to a real array, such as:
+Instances of typed array constructors are almost the same as regular native arrays. Some differences include having a fixed length and the values all being of the same "type".
+
+However, they share most of the same `prototype` methods. As such, you likely will be able to use them as regular arrays without needing to convert.
+
+For example:
 
 ```js
-// ES5
-Array.prototype.slice( arr );
+var a = new Int32Array( 3 );
+a[0] = 10;
+a[1] = 20;
+a[2] = 30;
 
-// ES6
-Array.from( arr );
+a.map( function(v){
+	console.log( v );
+} );
+// 10 20 30
+
+a.join( "-" );
+// "10-20-30"
 ```
 
-**Note:** See "Array" in Chapter 6 for more information about `Array.from(..)`.
+**Warning:** You can't use certain `Array.prototype` methods with TypedArrays that don't make sense, such as the mutators (`splice(..)`, `push(..)`, etc.) and `concat(..)`.
+
+Be aware that the elements in TypedArrays really are constrained to the declared bit sizes. If you have a `Uint8Array` and try to assign something larger than an 8-bit value into one of its elements, the value wraps around so as to stay within the bit length.
+
+This could cause problems if you were trying to for instance square all the values in a TypedArray. Consider:
+
+```js
+var a = new Uint8Array( 3 );
+a[0] = 10;
+a[1] = 20;
+a[2] = 30;
+
+var b = a.map( function(v){
+	return v * v;
+} );
+
+b;				// [100, 144, 132]
+```
+
+The `20` and `30` values, when squared, resulted in bit overflow. To get around such a limitation, you can use the `TypedArray#from(..)` function:
+
+```js
+var a = new Uint8Array( 3 );
+a[0] = 10;
+a[1] = 20;
+a[2] = 30;
+
+var b = Uint16Array.from( a, function(v){
+	return v * v;
+} );
+
+b;				// [100, 400, 900]
+```
+
+See the "`Array.from(..)` Static Function" section in Chapter 6 for more information about the `Array.from(..)` that is shared with TypedArrays. Specifically, the "Mapping" section explains the mapping function accepted as its second argument.
 
 ## Maps
 

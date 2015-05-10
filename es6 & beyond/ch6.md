@@ -162,7 +162,7 @@ Array.from( arrLike, function mapper(val,idx){
 
 **Note:** As with other array methods that take callbacks, `Array.from(..)` takes an optional third argument that if set will specify the `this` binding for the callback passed as the second argument. Otherwise, `this` will be `undefined`.
 
-// TODO: talk about mapping between Typed Array values, bitwise truncation, etc
+See "TypedArrays" in Chapter 5 for an example of using `Array.from(..)` in translating values from an array of 8-bit values to an array of 16-bit values.
 
 ### Creating Arrays And Subtypes
 
