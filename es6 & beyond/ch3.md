@@ -1861,7 +1861,7 @@ One of the most heralded benefits to the new `class` and `extend` design is the 
 ```js
 class MyCoolArray extends Array {
 	first() { return this[0]; }
-	last() { return this[this.length]; }
+	last() { return this[this.length - 1]; }
 }
 
 var a = new MyCoolArray( 1, 2, 3 );
