@@ -2098,7 +2098,7 @@ Each state in our generator is represented by its own `case` in the `switch` sta
 
 For any generator-wide variable declarations (`val`), we move those to a `var` declaration outside of `process(..)` so they can survive multiple calls to `process(..)`. But the "block scoped" `err` variable is only needed for the `*3*` state, so we leave it in place.
 
-In state `*1*`, instead of `yield resolve(..)`, we did `return resolve(..)`. In terminal state `*2*`, there was no explicit `return`, so we just do a `return;` which is the same as `return undefined`. In terminal state `*3*`, there was a `return false`, so we preserve that.
+In state `*1*`, instead of `yield request(..)`, we did `return request(..)`. In terminal state `*2*`, there was no explicit `return`, so we just do a `return;` which is the same as `return undefined`. In terminal state `*3*`, there was a `return false`, so we preserve that.
 
 Now we need to define the code in the *iterator* functions so they call `process(..)` appropriately:
 
