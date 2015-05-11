@@ -196,11 +196,11 @@ There's an awesome website for this purpose called jsPerf (http://jsperf.com). I
 
 Each time a test is run, the results are collected and persisted with the test, and the cumulative test results are graphed on the page for anyone to see.
 
-When creating a test on the site, you start out with two test cases to fill in, but you can add as many as you need. You also have the ability to set up `setup` code that is run at the beginning of each test cycle and `teardown` code run at the end of each cycle.
+When creating a test on the site, you start out with two test cases to fill in, but you can add as many as you need.
 
 **Note:** A trick for doing just one test case (if you're benchmarking a single approach instead of a head-to-head) is to fill in the second test input boxes with placeholder text on first creation, then edit the test and leave the second test blank, which will delete it. You can always add more test cases later.
 
-You can define the initial page setup (importing libraries, defining utility helper functions, declaring variables, etc.). There are also options for defining setup and teardown behavior if needed -- consult the "Setup/Teardown" section in the Benchmark.js discussion earlier.
+You can define the initial page setup (importing libraries, defining utility helper functions, declaring variables, etc.). You can also set up `setup` code that is run at the beginning of each test cycle and `teardown` code run at the end of each cycle. -- consult the "Setup/Teardown" section in the Benchmark.js discussion earlier.
 
 ### Sanity Check
 
