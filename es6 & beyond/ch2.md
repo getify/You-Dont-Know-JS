@@ -2032,7 +2032,7 @@ The `^.-clef` in the pattern says to match only a single character at the beginn
 
 It's also important to note that `u` makes quantifiers like `+` and `*` apply to the entire Unicode code point as a single character, not just the *lower surrogate* (aka rightmost halve of the symbol) of the character. The same goes for Unicode characters appearing in character classes, like `/[💩-💫]/u`.
 
-**Note:** There's plenty more nitty gritty details about `u` behavior in regular expressions, which Mathias Bynens (https://twitter.com/mathias) has written extensively about (https://mathiasbynens.be/notes/es6-Unicode-regex).
+**Note:** There's plenty more nitty gritty details about `u` behavior in regular expressions, which Mathias Bynens (https://twitter.com/mathias) has written extensively about (https://mathiasbynens.be/notes/es6-unicode-regex).
 
 ### Sticky Flag
 
