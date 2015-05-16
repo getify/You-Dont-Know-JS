@@ -178,6 +178,18 @@ b;				// [100, 400, 900]
 
 See the "`Array.from(..)` Static Function" section in Chapter 6 for more information about the `Array.from(..)` that is shared with TypedArrays. Specifically, the "Mapping" section explains the mapping function accepted as its second argument.
 
+One interesting behavior to consider is that TypedArrays have a `sort(..)` method much like regular arrays, but this one defaults to numeric sort comparisons instead of coercing values to strings for lexicographic comparison. For example:
+
+```js
+var a = [ 10, 1, 2, ];
+a.sort();								// [1,10,2]
+
+var b = new Uint8Array( [ 10, 1, 2 ] );
+b.sort();								// [1,2,10]
+```
+
+The `TypedArray#sort(..)` takes an optional compare function argument just like `Array#sort(..)`, which works in exactly the same way.
+
 ## Maps
 
 Those with much JS experience know that objects are the primary mechanism for creating unordered key/value-pair data structures, otherwise known as maps. However, the major drawback with objects-as-maps is the inability to use a non-string value as the key.
