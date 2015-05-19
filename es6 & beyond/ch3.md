@@ -579,7 +579,7 @@ Just like with operators, it's a good idea to use `( .. )` grouping, even if not
 
 #### `yield *`
 
-In the same way that the `*` makes a `function` declaration into `function *` generator declaration, a `*` makes `yield` into `yield *`, which is a very different mechanism, called *yield delegation*. Grammatically, `yield *..` is will behave the same as a `yield ..`, as discussed in the previous section.
+In the same way that the `*` makes a `function` declaration into `function *` generator declaration, a `*` makes `yield` into `yield *`, which is a very different mechanism, called *yield delegation*. Grammatically, `yield *..` will behave the same as a `yield ..`, as discussed in the previous section.
 
 `yield * ..` requires an iterable; it then invokes that iterable's iterator, and delegates its own host generator's control to that iterator until it's exhausted. Consider:
 
@@ -1433,7 +1433,7 @@ BAZ();
 
 The strongly suggested approach from ES6's module philosophy is that you only import the specific bindings from a module that you need. If a module provides 10 API methods, but you only need two of them, some believe it wasteful to bring in the entire set of API bindings.
 
-One benefit, besides code being more explicit, is that narrow imports makes static analysis and error detection (accidentally using the wrong binding name, for instance) more robust.
+One benefit, besides code being more explicit, is that narrow imports make static analysis and error detection (accidentally using the wrong binding name, for instance) more robust.
 
 Of course, that's just the standard position influenced by ES6 design philosophy; there's nothing that requires adherence to that approach.
 
