@@ -219,7 +219,7 @@ If that same employee picks up another similar phone but says it's "free" (perha
 
 When you later ask if the phone includes a charger, that answer could only have been either "yes" or "no."
 
-In very similar ways, when you express values in a programs, you choose different representations for those values based on what you plan to do with them.
+In very similar ways, when you express values in a program, you choose different representations for those values based on what you plan to do with them.
 
 These different representations for values are called *types* in programming terminology. JavaScript has built-in types for each of these so called *primitive* values:
 
