@@ -7,26 +7,26 @@ As of ES6, some of the most useful (and performance-optimizing!) data structure 
 
 We'll start this chapter first by looking at *TypedArrays*, which were technically contemporary to ES5 efforts, but which prior to ES6 were only standardized by the web platform and not JavaScript. As of ES6, these have been adopted directly by the language specification, which gives them first-class status.
 
-Then we'll look at Maps and Sets, as well as their weak ("weak" in relation to memory/garbage collection) counterparts.
+Then we'll look at maps and sets, as well as their weak ("weak" in relation to memory/garbage collection) counterparts.
 
 ## TypedArrays
 
 As we cover in the *Types & Grammar* title of this series, JS does have a set of built-in types, like `number` and `string`. It'd be tempting to look at a feature named "typed array" and assume it means an array of a specific type of values, like an array of only strings.
 
-However, typed arrays are really more about providing structured access to binary data using array-like semantics (indexed access, etc.). The "type" in the name refers to a "view" layered on type of the bucket of bits, which is essentially a mapping of whether the bits should be viewed as an array of 8-bit signed integers, 16-bit signed integers, etc.
+However, typed arrays are really more about providing structured access to binary data using array-like semantics (indexed access, etc.). The "type" in the name refers to a "view" layered on type of the bucket of bits, which is essentially a mapping of whether the bits should be viewed as an array of 8-bit signed integers, 16-bit signed integers, and so on.
 
-How do you construct such a bit-bucket? It's called a "buffer", and you construct it most directly with the `ArrayBuffer(..)` constructor:
+How do you construct such a bit-bucket? It's called a "buffer," and you construct it most directly with the `ArrayBuffer(..)` constructor:
 
 ```js
 var buf = new ArrayBuffer( 32 );
 buf.byteLength;							// 32
 ```
 
-`buf` is now a binary buffer that is 32-bytes long (256-bits), that's pre-initialized to all `0`'s. A buffer by itself doesn't really allow you any interaction exception for checking its `byteLength` property.
+`buf` is now a binary buffer that is 32-bytes long (256-bits), that's pre-initialized to all `0`s. A buffer by itself doesn't really allow you any interaction exception for checking its `byteLength` property.
 
 **Tip:** Several web platform features use or return array buffers, such as `FileReader#readAsArrayBuffer(..)`, `XMLHttpRequest#send(..)`, and `ImageData` (canvas data).
 
-But on top of this array buffer, you can then layer a "view", which comes in the form of a typed array. Consider:
+But on top of this array buffer, you can then layer a "view," which comes in the form of a typed array. Consider:
 
 ```js
 var arr = new Uint16Array( buf );
@@ -64,7 +64,7 @@ var littleEndian = (function() {
 
 `littleEndian` will be `true` or `false`; for most browsers, it should return `true`. This test uses `DataView(..)`, which allows more low-level, fine-grained control over accessing (setting/getting) the bits from the view you layer over the buffer. The third parameter of the `setInt16(..)` method in the previous snippet is for telling the `DataView` what endianness you're wanting it to use for that operation.
 
-**Warning:** Do not confuse endianness of underlying binary storage in array buffers with how a given number is represented when exposed in a JS program. For example, `(3085).toString(2)` returns `"110000001101"`, which with an assumed leading four `"0"`'s appears to be the big-endian representation. In fact, this representation is based on a single 16-bit view, not a view of two 8-bit bytes. The `DataView` test above is the best way to determine endianness for your JS environment.
+**Warning:** Do not confuse endianness of underlying binary storage in array buffers with how a given number is represented when exposed in a JS program. For example, `(3085).toString(2)` returns `"110000001101"`, which with an assumed leading four `"0"`s appears to be the big-endian representation. In fact, this representation is based on a single 16-bit view, not a view of two 8-bit bytes. The `DataView` test above is the best way to determine endianness for your JS environment.
 
 ### Multiple Views
 
@@ -108,9 +108,9 @@ var first = new Uint16Array( buf, 0, 2 )[0],
 
 In addition to the `(buffer,[offset, [length]])` form examined in the previous section, typed array constructors also support these forms:
 
-* [constructor]`(length)`: creates a new view over a new buffer of `length` bytes
-* [constructor]`(typedArr)`: creates a new view and buffer, and copies the contents from the `typedArr` view
-* [constructor]`(obj)`: creates a new view and buffer, and iterates over the array-like or object `obj` to copy its contents
+* [constructor]`(length)`: Creates a new view over a new buffer of `length` bytes
+* [constructor]`(typedArr)`: Creates a new view and buffer, and copies the contents from the `typedArr` view
+* [constructor]`(obj)`: Creates a new view and buffer, and iterates over the array-like or object `obj` to copy its contents
 
 The following typed array constructors are available as of ES6:
 
@@ -121,7 +121,7 @@ The following typed array constructors are available as of ES6:
 * `Float32Array` (32-bit floating point, IEEE-754)
 * `Float64Array` (64-bit floating point, IEEE-754)
 
-Instances of typed array constructors are almost the same as regular native arrays. Some differences include having a fixed length and the values all being of the same "type".
+Instances of typed array constructors are almost the same as regular native arrays. Some differences include having a fixed length and the values all being of the same "type."
 
 However, they share most of the same `prototype` methods. As such, you likely will be able to use them as regular arrays without needing to convert.
 
@@ -146,7 +146,7 @@ a.join( "-" );
 
 Be aware that the elements in TypedArrays really are constrained to the declared bit sizes. If you have a `Uint8Array` and try to assign something larger than an 8-bit value into one of its elements, the value wraps around so as to stay within the bit length.
 
-This could cause problems if you were trying to for instance square all the values in a TypedArray. Consider:
+This could cause problems if you were trying to, for instance, square all the values in a TypedArray. Consider:
 
 ```js
 var a = new Uint8Array( 3 );
@@ -192,7 +192,7 @@ The `TypedArray#sort(..)` takes an optional compare function argument just like 
 
 ## Maps
 
-Those with much JS experience know that objects are the primary mechanism for creating unordered key/value-pair data structures, otherwise known as maps. However, the major drawback with objects-as-maps is the inability to use a non-string value as the key.
+If you have a lot of JS experience, you know that objects are the primary mechanism for creating unordered key/value-pair data structures, otherwise known as maps. However, the major drawback with objects-as-maps is the inability to use a non-string value as the key.
 
 For example, consider:
 
@@ -262,7 +262,7 @@ m.delete( y );
 
 You can clear the entire map's contents with `clear()`.
 
-To get the length of a map (that is, the number of keys), use the `size` property (not `length`):
+To get the length of a map (i.e., the number of keys), use the `size` property (not `length`):
 
 ```js
 m.set( x, "foo" );
@@ -280,11 +280,11 @@ var m2 = new Map( m.entries() );
 var m2 = new Map( m );
 ```
 
-Since a map instance is an iterable, and its default iterator is the same as `entries()`, the second shorter form is more preferable.
+Because a map instance is an iterable, and its default iterator is the same as `entries()`, the second shorter form is more preferable.
 
 ### Map Values
 
-To get the list of values from a map, use `values(..)`, which returns an iterator. In Chapters 2 and 3, we covered various ways to process an iterator sequentially (like an array), such as the `...` spread operator and the `for..of` loop. Also, "Arrays" in Chapter 6 covers the `Array.from(..)` method in detail.
+To get the list of values from a map, use `values(..)`, which returns an iterator. In Chapters 2 and 3, we covered various ways to process an iterator sequentially (like an array), such as the `...` spread operator and the `for..of` loop. Also, "Arrays" in Chapter 6 covers the `Array.from(..)` method in detail. Consider:
 
 ```js
 var m = new Map();
@@ -362,15 +362,15 @@ m.has( y );						// false
 
 Maps essentially let you associate some extra piece of information (the value) with an object (the key) without actually putting that information on the object itself.
 
-**Warning:** If you use an object as a Map key and that object is later discarded (all references unset) in attempt to have garbage collection (GC) reclaim its memory, the Map itself will still retain its entry. You will need to first remove the entry from the Map before unsetting the last reference, or the object will not be GC-able. In the next section, we'll see WeakMaps as a better option for GC-eligible object keys.
+**Warning:** If you use an object as a map key and that object is later discarded (all references unset) in attempt to have garbage collection (GC) reclaim its memory, the map itself will still retain its entry. You will need to first remove the entry from the map before unsetting the last reference, or the object will not be GC-able. In the next section, we'll see WeakMaps as a better option for GC-eligible object keys.
 
-While you can use any kind of value as a key for a Map, you typically will use objects, as strings and other primitives are already eligible as keys of normal objects. In other words, you'll probably want to continue to use normal objects for maps unless some or all of the keys need to be objects, in which case Map is more appropriate.
+While you can use any kind of value as a key for a map, you typically will use objects, as strings and other primitives are already eligible as keys of normal objects. In other words, you'll probably want to continue to use normal objects for maps unless some or all of the keys need to be objects, in which case map is more appropriate.
 
 ## WeakMaps
 
-WeakMaps are a variation on Maps, which has most of the same external behavior but differs underneath in how the memory allocation (specifically its GC) works.
+WeakMaps are a variation on maps, which has most of the same external behavior but differs underneath in how the memory allocation (specifically its GC) works.
 
-WeakMaps take (only) objects as keys. Those objects are *held weakly*, which means if the object itself is GC'd, the entry in the WeakMap is also removed. This isn't observable behavior, though, as the only way an object can be GC'd is if there's no more references to it, but once there are no more references to it, you have no object reference to check if it exists in the WeakMap.
+WeakMaps take (only) objects as keys. Those objects are held *weakly*, which means if the object itself is GC'd, the entry in the WeakMap is also removed. This isn't observable behavior, though, as the only way an object can be GC'd is if there's no more references to it, but once there are no more references to it, you have no object reference to check if it exists in the WeakMap.
 
 Otherwise, the API for WeakMap is similar, though limited:
 
@@ -404,7 +404,7 @@ x = null;						// `x` is GC-able
 y = null;						// `y` is not GC-able
 ```
 
-For this reason, WeakMaps are in my opinion better named "WeakKeyMaps".
+For this reason, WeakMaps are in my opinion better named "WeakKeyMaps."
 
 ## Sets
 
@@ -510,7 +510,7 @@ y = null;						// `y` is GC-able
 
 ES6 defines a number of useful collections that make working with data in structured ways more efficient and effective.
 
-TypedArrays provide "view"s of binary data buffers that align with various integer types, like 8-bit unsigned integers and 32-bit floats. The array access to binary data makes operations much easier to express and maintain, enabling working with complex data like video, audio, canvas data, etc.
+TypedArrays provide "view"s of binary data buffers that align with various integer types, like 8-bit unsigned integers and 32-bit floats. The array access to binary data makes operations much easier to express and maintain, which enables you to more easily work with complex data like video, audio, canvas data, and so on.
 
 Maps are key-value pairs where the key can be an object instead of just a string/primitive. Sets are unique lists of values (of any type).
 

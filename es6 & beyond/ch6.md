@@ -57,7 +57,7 @@ z.length;						// 1
 z.sum();						// 3
 ```
 
-You can't just (easily) create a constructor for `MyCoolArray` that overrides the behavior of the `Array` parent constructor, since that constructor is necessary to actually create a well-behaving array value (initializing the `this`). The "inherited" static `of(..)` method on the `MyCoolArray` subclass provides a nice solution.
+You can't just (easily) create a constructor for `MyCoolArray` that overrides the behavior of the `Array` parent constructor, because that constructor is necessary to actually create a well-behaving array value (initializing the `this`). The "inherited" static `of(..)` method on the `MyCoolArray` subclass provides a nice solution.
 
 ### `Array.from(..)` Static Function
 
@@ -90,7 +90,7 @@ var arr = Array.from( arrLike );
 var arrCopy = Array.from( arr );
 ```
 
-`Array.from(..)` looks to see if the first argument is an iterable (see "Iterators" in Chapter 3), and if so, it uses the iterator to produce values to "copy" into the returned array. Since real arrays have an iterator for those values, that iterator is automatically used.
+`Array.from(..)` looks to see if the first argument is an iterable (see "Iterators" in Chapter 3), and if so, it uses the iterator to produce values to "copy" into the returned array. Because real arrays have an iterator for those values, that iterator is automatically used.
 
 But if you pass an array-like object as the first argument to `Array.from(..)`, it behaves basically the same as `slice()` (no arguments!) or `apply(..)` does, which is that it simply loops over the value, accessing numerically named properties from `0` up to whatever the value of `length` is.
 
@@ -106,7 +106,7 @@ Array.from( arrLike );
 // [ undefined, undefined, "foo", undefined ]
 ```
 
-Since positions `0`, `1`, and `3` didn't exist on `arrLike`, the result was the `undefined` value for each of those slots.
+Because positions `0`, `1`, and `3` didn't exist on `arrLike`, the result was the `undefined` value for each of those slots.
 
 You could produce a similar outcome like this:
 
@@ -164,7 +164,7 @@ Array.from( arrLike, function mapper(val,idx){
 
 See "TypedArrays" in Chapter 5 for an example of using `Array.from(..)` in translating values from an array of 8-bit values to an array of 16-bit values.
 
-### Creating Arrays And Subtypes
+### Creating Arrays and Subtypes
 
 In the last couple of sections, we've discussed `Array.of(..)` and `Array.from(..)`, both of which create a new array in a similar way to a constructor. But what do they do in subclasses? Do they create instances of the base `Array` or the derived subclass?
 
@@ -228,7 +228,7 @@ MyCoolArray.of( [2, 3] ) instanceof MyCoolArray;	// true
 
 ### `copyWithin(..)` Prototype Method
 
-`Array#copyWithin(..)` is a new mutator method available to all arrays (including Typed Arrays -- see Chapter 5). `copyWithin(..)` copies a portion of an array to another location in the same array, overwriting whatever was there before.
+`Array#copyWithin(..)` is a new mutator method available to all arrays (including Typed Arrays; see Chapter 5). `copyWithin(..)` copies a portion of an array to another location in the same array, overwriting whatever was there before.
 
 The arguments are *target* (the index to copy to), *start* (the inclusive index to start the copying from), and optionally *end* (the exclusive index to stop copying). If any of the arguments are negative, they're taken to be relative from the end of the array.
 
@@ -246,7 +246,7 @@ Consider:
 
 The `copyWithin(..)` method does not extend the array's length, as the first example in the previous snippet shows. Copying simply stops when the end of the array is reached.
 
-The copying doesn't always go in left-to-right (ascending index) order as you might assume. It's possible this would result in repeatedly copying an already copied value if the from and target ranges overlap, which is presumably not desired behavior.
+Contrary to what you might think, the copying doesn't always go in left-to-right (ascending index) order. It's possible this would result in repeatedly copying an already copied value if the from and target ranges overlap, which is presumably not desired behavior.
 
 So internally, the algorithm avoids this case by copying in reverse order to avoid that gotcha. Consider:
 
@@ -254,7 +254,7 @@ So internally, the algorithm avoids this case by copying in reverse order to avo
 [1,2,3,4,5].copyWithin( 2, 1 );		// ???
 ```
 
-If the algorithm was strictly moving left-to-right, then the `2` should be copied overwrite the `3`, then *that* copied `2` should be copied to overwrite `4`, then *that* copied `2` should be copied to overwrite `5`, and you'd end up with `[1,2,2,2,2]`.
+If the algorithm was strictly moving left to right, then the `2` should be copied to overwrite the `3`, then *that* copied `2` should be copied to overwrite `4`, then *that* copied `2` should be copied to overwrite `5`, and you'd end up with `[1,2,2,2,2]`.
 
 Instead, the copying algorithm reverses direction and copies `4` to overwrite `5`, then copies `3` to overwrite `4`, then copies `2` to overwrite `3`, and the final result is `[1,2,2,3,4]`. That's probably more "correct" in terms of expectation, but it can be confusing if you're only thinking about the copying algorithm in a naive left-to-right fashion.
 
@@ -268,7 +268,7 @@ a;
 // [undefined,undefined,undefined,undefined]
 ```
 
-`fill(..)` optionally takes *start* and *end* parameters which indicate a subset portion of the array to fill, such as:
+`fill(..)` optionally takes *start* and *end* parameters, which indicate a subset portion of the array to fill, such as:
 
 ```js
 var a = [ null, null, null, null ].fill( 42, 1, 3 );
@@ -293,7 +293,7 @@ The `indexOf(..)` comparison requires a strict `===` match, so a search for `"2"
 
 **Tip:** See the *Types & Grammar* title of this series for an interesting (and controversially confusing) technique to work around the `-1` ugliness with the `~` operator.
 
-Since ES5, the most common workaround to have control over the matching logic  has been the `some(..)` method. It works by calling a function callback for each element, until one of those calls returns a `true`/truthy value, and then it stops. Since you get to define the callback function, you have full control over how a match is made:
+Since ES5, the most common workaround to have control over the matching logic has been the `some(..)` method. It works by calling a function callback for each element, until one of those calls returns a `true`/truthy value, and then it stops. Because you get to define the callback function, you have full control over how a match is made:
 
 ```js
 var a = [1,2,3,4,5];
@@ -382,7 +382,7 @@ Don't use `findIndex(..) != -1` (the way it's always been done with `indexOf(..)
 
 In Chapter 3, we illustrated how data structures can provide a patterned item-by-item enumeration of their values, via an iterator. We then expounded on this approach in Chapter 5, as we explored how the new ES6 collections (Map, Set, etc.) provide several methods for producing different kinds of iterations.
 
-While `Array` might not be thought of traditionally as a "collection" since it's not new to ES6, it is one in the sense that it provides these same iterator methods: `entries()`, `values()`, and `keys()`. Consider:
+Because it's not new to ES6, `Array` might not be thought of traditionally as a "collection," but it is one in the sense that it provides these same iterator methods: `entries()`, `values()`, and `keys()`. Consider:
 
 ```js
 var a = [1,2,3];
@@ -412,7 +412,7 @@ a[1] = 2;
 
 A few additional static helpers have been added to `Object`. Traditionally, functions of this sort have been seen as focused on the behaviors/capabilities of object values.
 
-However, starting with ES6, `Object` static functions will also be for general purpose global APIs of any sort that don't already belong more naturally in some other location (i.e., `Array.from(..)`).
+However, starting with ES6, `Object` static functions will also be for general-purpose global APIs of any sort that don't already belong more naturally in some other location (i.e., `Array.from(..)`).
 
 ### `Object.is(..)` Static Function
 
@@ -434,11 +434,11 @@ Object.is( y, z );					// false
 
 You should continue to use `===` for strict equality comparisons; `Object.is(..)` shouldn't be thought of as a replacement for the operator. However, in cases where you're trying to strictly identify a `NaN` or `-0` value, `Object.is(..)` is now the preferred option.
 
-**Note:** ES6 also adds a `Number.isNaN(..)` utility (discussed later in this chapter) which may be a slightly more convenient test; you may prefer `Number.isNaN(x)` than `Object.is(x,NaN)`. You *can* accurately test for `-0` with a clumsy `x == 0 && 1 / x === -Infinity`, but in this case `Object.is(x,-0)` is much better.
+**Note:** ES6 also adds a `Number.isNaN(..)` utility (discussed later in this chapter) which may be a slightly more convenient test; you may prefer `Number.isNaN(x)` over `Object.is(x,NaN)`. You *can* accurately test for `-0` with a clumsy `x == 0 && 1 / x === -Infinity`, but in this case `Object.is(x,-0)` is much better.
 
 ### `Object.getOwnPropertySymbols(..)` Static Function
 
-Chapter 2 "Symbols" discusses the new Symbol primitive value type in ES6.
+The "Symbols" section in Chapter 2 discusses the new Symbol primitive value type in ES6.
 
 Symbols are likely going to be mostly used as special (meta) properties on objects. So the `Object.getOwnPropertySymbols(..)` utility was introduced, which retrieves only the symbol properties directly on an object:
 
@@ -491,7 +491,7 @@ In both previous snippets, the relationship between `o2` and `o1` appears at the
 
 ### `Object.assign(..)` Static Function
 
-Many JavaScript libraries/frameworks provide utilities for copying/mixing one object's properties into another; for example: jQuery's `extend(..)`. There are various nuanced differences between these different utilities, such as whether a property with value `undefined` is ignored or not.
+Many JavaScript libraries/frameworks provide utilities for copying/mixing one object's properties into another (e.g., jQuery's `extend(..)`). There are various nuanced differences between these different utilities, such as whether a property with value `undefined` is ignored or not.
 
 ES6 adds `Object.assign(..)`, which is a simplified version of these algorithms. The first argument is the *target*, and any other arguments passed are the *sources*, which will be processed in listed order. For each source, its enumerable and own (e.g., not "inherited") keys, not symbols, are copied as if by plain `=` assignment. `Object.assign(..)` returns the target object.
 
@@ -538,7 +538,7 @@ Object.getOwnPropertyDescriptor( target, "e" );
 
 The `d`, `f`, and `Symbol("g")` properties are omitted from copying; symbols, non-enumerable properties, and non-owned properties are all excluded from the assignment. Also, `e` is copied as a normal property assignment, not duplicated as a read-only property.
 
-In an earlier section, we showed using `setPrototypeOf(..)` to setup a `[[Prototype]]` relationship between an `o2` and `o1` object. There's another form that leverages `Object.assign(..)`:
+In an earlier section, we showed using `setPrototypeOf(..)` to set up a `[[Prototype]]` relationship between an `o2` and `o1` object. There's another form that leverages `Object.assign(..)`:
 
 ```js
 var o1 = {
@@ -567,39 +567,41 @@ It's likely that asm.js/transpiled JS code (see the *Async & Performance* title 
 
 Trigonometry:
 
-* `cosh(..)` - hyperbolic cosine
-* `acosh(..)` - hyperbolic arccosine
-* `sinh(..)` - hyperbolic sine
-* `asinh(..)` - hyperbolic arcsine
-* `tanh(..)` - hyperbolic tangent
-* `atanh(..)` - hyperbolic arctangent
-* `hypot(..)` - the squareroot of the sum of the squares (i.e., the generalized Pythagorean theorem)
+* `cosh(..)` - Hyperbolic cosine
+* `acosh(..)` - Hyperbolic arccosine
+* `sinh(..)` - Hyperbolic sine
+* `asinh(..)` - Hyperbolic arcsine
+* `tanh(..)` - Hyperbolic tangent
+* `atanh(..)` - Hyperbolic arctangent
+* `hypot(..)` - The squareroot of the sum of the squares (i.e., the generalized Pythagorean theorem)
 
 Arithmetic:
 
-* `cbrt(..)` - cube root
-* `clz32(..)` - count leading zeros in 32-bit binary representation
-* `expm1(..)` - the same as `exp(x) - 1`
-* `log2(..)` - binary logarithm (log base 2)
-* `log10(..)` - log base 10
-* `log1p(..)` - the same as `log(x + 1)`
+* `cbrt(..)` - Cube root
+* `clz32(..)` - Count leading zeros in 32-bit binary representation
+* `expm1(..)` - The same as `exp(x) - 1`
+* `log2(..)` - Binary logarithm (log base 2)
+* `log10(..)` - Log base 10
+* `log1p(..)` - The same as `log(x + 1)`
 * `imul(..)` - 32-bit integer multiplication of two numbers
 
 Meta:
 
-* `sign(..)` - returns the sign of the number
-* `trunc(..)` - returns only the integer part of a number
-* `fround(..)` - rounds to nearest 32-bit (single precision) floating point value
+* `sign(..)` - Returns the sign of the number
+* `trunc(..)` - Returns only the integer part of a number
+* `fround(..)` - Rounds to nearest 32-bit (single precision) floating-point value
 
 ## `Number`
 
-Accurately working with numbers is very important to your program working correctly. ES6 adds some additional properties and functions to assist with common numeric operations.
+Importantly, for your program to properly work, it must accurately handle numbers. ES6 adds some additional properties and functions to assist with common numeric operations.
 
 Two additions to `Number` are just references to the preexisting globals: `Number.parseInt(..)` and `Number.parseFloat(..)`.
 
 ### Static Properties
 
-* `Number.EPSILON` - the minimum value between any two numbers: `2^-52` (see Chapter 2 of the *Types & Grammar* title of this series regarding using this value as a tolerance for imprecision in floating point arithmetic)
+ES6 adds some helpful numeric constants as static properties:
+
+* `Number.EPSILON` - The minimum value between any two numbers: `2^-52` (see Chapter 2 of the *Types & Grammar* title of this series regarding using this value as a tolerance for imprecision in floating-point arithmetic)
 * `Number.MAX_SAFE_INTEGER` - The highest integer that can "safely" be represented unambiguously in a JS number value: `2^53 - 1`
 * `Number.MIN_SAFE_INTEGER` - The lowest integer that can "safely" be represented unambiguously in a JS number value: `-(2^53 - 1)` or `(-2)^53 + 1`.
 
@@ -643,11 +645,11 @@ isFinite( a );						// true
 Number.isFinite( a );				// false
 ```
 
-You may still prefer the coercion, in which case using the global `isFinite(..)` is a valid choice. Alternately, and perhaps more sensibly, you can use `Number.isFinite(+x)`, which explicitly coerces `x` to a number before passing it in (see Chapter 4 of the *Types & Grammar* title of this series).
+You may still prefer the coercion, in which case using the global `isFinite(..)` is a valid choice. Alternatively, and perhaps more sensibly, you can use `Number.isFinite(+x)`, which explicitly coerces `x` to a number before passing it in (see Chapter 4 of the *Types & Grammar* title of this series).
 
-### Integer-related Static Functions
+### Integer-Related Static Functions
 
-JavaScript number valuess are always floating point (IEE-754). So the notion of determining if a number is an "integer" is not about checking its type, since JS makes no such distinction.
+JavaScript number valuess are always floating point (IEE-754). So the notion of determining if a number is an "integer" is not about checking its type, because JS makes no such distinction.
 
 Instead, you need to check if there's any non-zero decimal portion of the value. The easiest way to do that has commonly been:
 
@@ -671,7 +673,7 @@ Number.isInteger( NaN );			// false
 Number.isInteger( Infinity );		// false
 ```
 
-Working with "integers" is sometimes an important bit of information, since it can simplify certain kinds of algorithms. JS code by itself will not run faster just from filtering for only integers, but there are optimization techniques the engine can take (e.g., asm.js) when only integers are being used.
+Working with "integers" is sometimes an important bit of information, as it can simplify certain kinds of algorithms. JS code by itself will not run faster just from filtering for only integers, but there are optimization techniques the engine can take (e.g., asm.js) when only integers are being used.
 
 Because of `Number.isInteger(..)`'s handling of `NaN` and `Infinity` values, defining a `isFloat(..)` utility would not be just as simple as `!Number.isInteger(..)`. You'd need to do something like:
 
@@ -718,7 +720,7 @@ String.fromCodePoint( 0x1d49e );			// "𝒞"
 
 The `normalize(..)` string prototype method is used to perform Unicode normalizations that either combine characters with adjacent "combining marks" or decompose combined characters.
 
-Generally, the normalization won't create a visible effect on the contents of the string, but will change the contents of the string which can affect how things like the `length` property are reported, as well as how character access by position behave:
+Generally, the normalization won't create a visible effect on the contents of the string, but will change the contents of the string, which can affect how things like the `length` property are reported, as well as how character access by position behave:
 
 ```js
 var s1 = "e\u0301";
@@ -756,7 +758,7 @@ In languages like Python and Ruby, you can repeat a string as:
 "foo" * 3;							// "foofoofoo"
 ```
 
-That doesn't work in JS, since `*` multiplication is only defined for numbers, and thus `"foo"` coerces to the `NaN` number.
+That doesn't work in JS, because `*` multiplication is only defined for numbers, and thus `"foo"` coerces to the `NaN` number.
 
 However, ES6 defines a string prototype method `repeat(..)` to accomplish the task:
 
