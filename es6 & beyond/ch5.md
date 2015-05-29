@@ -408,7 +408,7 @@ For this reason, WeakMaps are in my opinion better named "WeakKeyMaps."
 
 ## Sets
 
-A set is an a collection of unique values (duplicates are ignored).
+A set is a collection of unique values (duplicates are ignored).
 
 The API for a set is mostly identical to map. The `add(..)` method takes the place of the `set(..)` method (somewhat ironically), and there is no `get(..)` method.
 
