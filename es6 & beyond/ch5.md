@@ -300,13 +300,6 @@ var vals = [ ...m.values() ];
 vals;							// ["foo","bar"]
 ```
 
-To determine if a value exists in a map, use the `includes(..)` method (which is the same as on standard arrays as of ES6):
-
-```js
-m.includes( "foo" );			// true
-m.includes( "baz" );			// false
-```
-
 As discussed in the previous section, you can iterate over a map's entries using `entries()` (or the default map iterator). Consider:
 
 ```js
