@@ -9,7 +9,7 @@ However, ES6 adds quite a few new syntactic forms that take some getting used to
 
 ## Block-Scoped Declarations
 
-You're probably aware that the fundamental unit of variable scoping in JavaScript has always been the `function`. If you needed to create a block of scope, the most prevalent way to do so was the immediately invoked function expression (IIFE). For example:
+You're probably aware that the fundamental unit of variable scoping in JavaScript has always been the `function`. If you needed to create a block of scope, the most prevalent way to do so other than a regular function declaration was the immediately invoked function expression (IIFE). For example:
 
 ```js
 var a = 2;
@@ -37,9 +37,9 @@ var a = 2;
 console.log( a );		// 2
 ```
 
-It's not very common or idiomatic thus far in JS to use a standalone `{ .. }` block as shown there, but it's always been totally valid. And developers from other languages that have *block scoping* will readily recognize that pattern.
+It's not very common or idiomatic thus far in JS to use a standalone `{ .. }` block, but it's always been valid. And developers from other languages that have *block scoping* will readily recognize that pattern.
 
-I'm going to suggest that this is the far better way to create block-scoped variables, with a dedicated `{ .. }` block. Moreover, I will also strongly suggest you should always put the `let` declaration(s) at the very top of that block. If you have more than one to declare, I'd recommend using just one `let`.
+I believe this is the best way to create block-scoped variables, with a dedicated `{ .. }` block. Moreover, you should always put the `let` declaration(s) at the very top of that block. If you have more than one to declare, I'd recommend using just one `let`.
 
 Stylistically, I even prefer to put the `let` on the same line as the opening `{`, to make it clearer that this block is only for the purpose of declaring the scope for those variables.
 
@@ -51,7 +51,7 @@ Stylistically, I even prefer to put the `let` on the same line as the opening `{
 
 Now, that's going to look strange and it's not likely going to match the recommendations given in most other ES6 literature. But I have reasons for my madness.
 
-There's another proposed form of the `let` declaration called the `let`-block, which looks like:
+There's another experimental (not standardized) form of the `let` declaration called the `let`-block, which looks like:
 
 ```js
 let (a = 2, b, c) {
@@ -83,7 +83,7 @@ if (a > 1) {
 }
 ```
 
-Quick quiz without looking back at that snippet: which variable(s) exist only inside the `if` statement, and which variable(s) existing only inside the `for` loop?
+Quick quiz without looking back at that snippet: which variable(s) exist only inside the `if` statement, and which variable(s) exist only inside the `for` loop?
 
 The answers: the `if` statement contains `b` and `c` block-scoped variables, and the `for` loop contains `i` and `j` block-scoped variables.
 
@@ -111,10 +111,12 @@ One last gotcha: `typeof` behaves differently with TDZ variables than it does wi
 
 ```js
 {
+	// `a` is not declared
 	if (typeof a === "undefined") {
 		console.log( "cool" );
 	}
 
+	// `b` is declared, but in its TDZ
 	if (typeof b === "undefined") {		// ReferenceError!
 		// ..
 	}
@@ -125,11 +127,11 @@ One last gotcha: `typeof` behaves differently with TDZ variables than it does wi
 }
 ```
 
-The `a` is not declared, so `typeof` is the only safe way to check for its existence or not. But `typeof b` throws the TDZ error because much farther down in the code there happens to be a `let b` declaration. Oops.
+The `a` is not declared, so `typeof` is the only safe way to check for its existence or not. But `typeof b` throws the TDZ error because farther down in the code there happens to be a `let b` declaration. Oops.
 
-Now it should be clearer why I strongly prefer and even insist that `let` declarations must all be at the top of the scope. That totally avoids the accidental errors of accessing too early. It also makes it more *explicit* when you look at the start of a block, any block, what variables it contains.
+Now it should be clearer why I insist that `let` declarations should all be at the top of their scope. That totally avoids the accidental errors of accessing too early. It also makes it more *explicit* when you look at the start of a block, any block, what variables it contains.
 
-Your blocks don't have to share their original behavior with scoping behavior.
+Your blocks (`if` statements, `while` loops, etc.) don't have to share their original behavior with scoping behavior.
 
 This explicitness on your part, which is up to you to maintain with discipline, will save you lots of refactor headaches and footguns down the line.
 
@@ -189,9 +191,9 @@ What exactly is a constant? It's a variable that's read-only after its initial v
 }
 ```
 
-You are not allowed to change the value of the variable once it's been set, at declaration time. A `const` declaration must have an explicit initialization. If you wanted a *constant* with the `undefined` value, you'd have to declare `const a = undefined` to get it.
+You are not allowed to change the value the variable holds once it's been set, at declaration time. A `const` declaration must have an explicit initialization. If you wanted a *constant* with the `undefined` value, you'd have to declare `const a = undefined` to get it.
 
-Constants are not a restriction on the value itself, but on the variable assignment of that value. In other words, the value is not frozen, just the assignment of it. If the value is complex, such as an object or array, the contents of the value can still be modified:
+Constants are not a restriction on the value itself, but on the variable's assignment of that value. In other words, the value is not frozen or immutable because of `const`, just the assignment of it. If the value is complex, such as an object or array, the contents of the value can still be modified:
 
 ```js
 {
@@ -209,9 +211,17 @@ The `a` variable doesn't actually hold a constant array; rather, it holds a cons
 
 Essentially, `const` declarations enforce what we've stylistically signaled with our code for years, where we declared a variable name of all uppercase letters and assigned it some literal value that we took care never to change. There's no enforcement on a `var` assignment, but there is now with a `const` assignment, which can help you catch unintended changes.
 
-There's some rumored assumptions that a `const` likely will be more optimizable for the JS engine than a `let` or `var` would be, because the engine knows the variable will never change so it can eliminate some possible tracking.
+#### `const` Or Not
 
-Whether that is the case or just our own fantasies and intuitions, the much more important decision to make is if you intend constant behavior or not. Don't just use `const` on variables that otherwise don't obviously appear to be treated as constants in the code, as that will just lead to more confusion.
+There's some rumored assumptions that a `const` could be more optimizable by the JS engine in certain scenarios than a `let` or `var` would be. Theoretically, the engine more easily knows the variable's value/type will never change, so it can eliminate some possible tracking.
+
+Whether `const` really helps here or this is just our own fantasies and intuitions, the much more important decision to make is if you intend constant behavior or not. Remember: one of the most important roles for source code is to communicate clearly, not only to you, but your future self and other code collaborators, what your intent is.
+
+Some developers prefer to start out every variable declaration as a `const` and then relax a declaration back to a `let` if it becomes necessary for its value to change in the code. This is an interesting perspective, but it's not clear that it genuinely improves the readability or reason-ability of code.
+
+It's not really a *protection*, as many believe, because any later developer who wants to change a value of a `const` can just blindly change `const` to `let` on the declaration. At best, it protects accidental change. But again, other than our intuitions and sensibilities, there doesn't appear to be objective and clear measure of what constitutes "accidents" or prevention thereof. Similar mindsets exist around type enforcement.
+
+My advice: to avoid potentially confusing code, only use `const` for variables that you're intentionally and obviously signaling will not change. In other words, don't *rely on* `const` for code behavior, but instead use it as a tool for signaling intent, when intent can be signaled clearly.
 
 ### Block-scoped Functions
 
