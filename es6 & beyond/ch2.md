@@ -295,7 +295,7 @@ console.log( b );					// [1,2,3,4,5]
 
 In this usage, `...` is basically replacing `concat(..)`, as it behaves like `[1].concat( a, [5] )` here.
 
-The other common usage of `...` can be seen as almost the opposite; instead of spreading a value out, the `...` *gathers* a set of values together into an array. Consider:
+The other common usage of `...` can be seen as essentially the opposite; instead of spreading a value out, the `...` *gathers* a set of values together into an array. Consider:
 
 ```js
 function foo(x, y, ...z) {
@@ -449,6 +449,8 @@ foo( null, 6 );			// 6  <-- null coerces to `0`
 Notice the results and how they imply both subtle differences and similarities to the earlier approaches.
 
 `x = 11` in a function declaration is more like `x !== undefined ? x : 11` than the much more common idiom `x || 11`, so you'll need to be careful in converting your pre-ES6 code to this ES6 default parameter value syntax.
+
+**Note:** A rest/gather parameter (see "Spread/Rest") cannot have a default value. So, while `function foo(...vals=[1,2,3]) {` might seem an intriguing capability, it's not valid syntax. You'll need to continue to apply that sort of logic manually if necessary.
 
 ### Default Value Expressions
 
