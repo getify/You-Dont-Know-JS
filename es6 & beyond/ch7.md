@@ -617,7 +617,7 @@ I call this pattern *proxy last*, as the proxy is used only as a last resort.
 
 #### "No Such Property/Method"
 
-A common complaint about JS is that objects aren't by default very defensive in the situation where you try to access or set a property that doesn't already exist. You way wish to predefine all the properties/methods for an object, and have an error thrown if a nonexistent property name is subsequently used.
+A common complaint about JS is that objects aren't by default very defensive in the situation where you try to access or set a property that doesn't already exist. You may wish to predefine all the properties/methods for an object, and have an error thrown if a nonexistent property name is subsequently used.
 
 We can accomplish this with a proxy, either in *proxy first* or *proxy last* design. Let's consider both.
 
