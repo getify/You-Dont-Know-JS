@@ -513,7 +513,7 @@ There will very rarely be any cases where an IIFE (or any other executed inline 
 
 **Warning:** If the IIFE had tried to access the `x` identifier and had not declared its own `x`, this would also have been a TDZ error, just as discussed before.
 
-The default value expression in the previous snippet is an IIFE in that in the sense that its a function that's executed right inline, via `(31)`. If we had left that part off, the default value assigned to `x` would have just been a function reference itself, perhaps like a default callback. There will probably be cases where that pattern will be quite useful, such as:
+The default value expression in the previous snippet is an IIFE in that in the sense that it's a function that's executed right inline, via `(31)`. If we had left that part off, the default value assigned to `x` would have just been a function reference itself, perhaps like a default callback. There will probably be cases where that pattern will be quite useful, such as:
 
 ```js
 function ajax(url, cb = function(){}) {
@@ -663,7 +663,7 @@ console.log( x, y, z );				// 4 5 6
 
 The variables can already be declared, and then the destructuring only does assignments, exactly as we've already seen.
 
-**Note:** For the object destructuring form specifically, when leaving off a `var`/`let`/`const` declarator, we had to surround the whole assignment expression in `( )`, because otherwise the `{ .. }` on the lefthand side as the first element in the statement is taken to be a statement block instead of an object.
+**Note:** For the object destructuring form specifically, when leaving off a `var`/`let`/`const` declarator, we had to surround the whole assignment expression in `( )`, because otherwise the `{ .. }` on the lefthand side as the first element in the statement is taken to be a block statement instead of an object.
 
 In fact, the assignment expressions (`a`, `y`, etc.) don't actually need to be just variable identifiers. Anything that's a valid assignment expression is valid. For example:
 
@@ -1555,13 +1555,13 @@ console.log( text );
 // country!
 ```
 
-As you can see, the newlines we inserted into the string literal were preserved and kept in the string value, just as we'd hope.
+The line breaks (newlines) in the interpolated string literal were preserved in the string value.
+
+Unless appearing as explicit escape sequences in the literal value, the value of the `\r` carriage return character (code point `U+000D`) or the value of the `\r\n` carriage return + line feed sequence (code points `U+000D` and `U+000A`) are both normalized to a `\n` line feed character (code point `U+000A`). Don't worry though; this normalization is rare and would likely only happen if copy-pasting text into your JS file.
 
 ### Interpolated Expressions
 
 Any valid expression is allowed to appear inside `${..}` in an interpolated string literal, including function calls, inline function expression calls, and even other interpolated string literals!
-
-**Warning:** As a word of caution, be very careful about the readability of your code with such new found power. Just like with default value expressions and destructuring assignment expressions, just because you *can* do something doesn't mean you *should* do it. Never go so overboard with new ES6 tricks that your code becomes more clever than you or your other team members.
 
 Consider:
 
@@ -1570,7 +1570,7 @@ function upper(s) {
 	return s.toUpperCase();
 }
 
-var who = "reader"
+var who = "reader";
 
 var text =
 `A very ${upper( "warm" )} welcome
@@ -1584,6 +1584,8 @@ console.log( text );
 Here, the inner `` `${who}s` `` interpolated string literal was a little bit nicer convenience for us when combining the `who` variable with the `"s"` string, as opposed to `who + "s"`. There will be cases that nesting interpolated string literals is helpful, but be wary if you find yourself doing that kind of thing often, or if you find yourself nesting several levels deep.
 
 If that's the case, the odds are good that your string value production could benefit from some abstractions.
+
+**Warning:** As a word of caution, be very careful about the readability of your code with such new found power. Just like with default value expressions and destructuring assignment expressions, just because you *can* do something doesn't mean you *should* do it. Never go so overboard with new ES6 tricks that your code becomes more clever than you or your other team members.
 
 #### Expression Scope
 
@@ -1657,9 +1659,9 @@ For convenience sake in our example, we then gather up all subsequent arguments 
 
 The argument(s) gathered into our `values` array are the results of the already-evaluated interpolation expressions found in the string literal. So obviously the only element in `values` in our example is `"awesome"`.
 
-You can think of these two arrays as: the values in `values` are the separators if you were to splice them in between the values in `strings`, and then if you joined all those strings, you'd get the complete interpolated string value.
+You can think of these two arrays as: the values in `values` are the separators if you were to splice them in between the values in `strings`, and then if you joined everything together, you'd get the complete interpolated string value.
 
-A tagged string literal is like a processing step after the interpolations are evaluated but before the final string value is compiled, allowing you more control over generating the string from the literal.
+A tagged string literal is like a processing step after the interpolation expressions are evaluated but before the final string value is compiled, allowing you more control over generating the string from the literal.
 
 Typically, the string literal tag function (`foo(..)` in the previous snippets) should compute an appropriate string value and return it, so that you can use the tagged string literal as a value just like untagged string literals:
 
@@ -1677,7 +1679,7 @@ var text = tag`Everything is ${desc}!`;
 console.log( text );			// Everything is awesome!
 ```
 
-In this snippet, `tag(..)` is a pass-through operation, in that it doesn't perform any special modifications, but just uses `reduce(..)` to splice/interleave `strings` and `values` together the same way an untagged string literal would have done.
+In this snippet, `tag(..)` is a pass-through operation, in that it doesn't perform any special modifications, but just uses `reduce(..)` to loop over and splice/interleave `strings` and `values` together the same way an untagged string literal would have done.
 
 So what are some practical uses? There are many advanced ones that are beyond our scope to discuss here. But here's a simple idea that formats numbers as U.S. dollars (sort of like basic localization):
 
@@ -1727,21 +1729,25 @@ function showraw(strings, ...values) {
 }
 
 showraw`Hello\nWorld`;
+// [ "Hello
+// World" ]
 // [ "Hello\nWorld" ]
-// [ "Hello\\nWorld" ]
 ```
 
-As you can see, the raw version of the string preserves the escaped `\n` sequence, while the processed version of the string treats it like an unescaped real newline.
+The raw version of the value preserves the raw escaped `\n` sequence (the `\` and the `n` are separate characters), while the processed version considers it a single newline character. However, the earlier mentioned line-ending normalization is applied to both values.
 
-ES6 comes with a built-in function that can be used as a string literal tag: `String.raw(..)`. It simply passes through the raw versions of the `strings`:
+ES6 comes with a built-in function that can be used as a string literal tag: `String.raw(..)`. It simply passes through the raw versions of the `strings` values:
 
 ```js
 console.log( `Hello\nWorld` );
-/* "Hello
-World" */
+// Hello
+// World
 
 console.log( String.raw`Hello\nWorld` );
-// "Hello\nWorld"
+// Hello\nWorld
+
+String.raw`Hello\nWorld`.length;
+// 12
 ```
 
 Other uses for string literal tags included special processing for internationalization, localization, and more!
@@ -1803,7 +1809,7 @@ Most people tend to *ooh and aah* at nice terse examples like that, as I imagine
 
 However, I would caution you that it would seem to me somewhat a misapplication of this feature to use arrow function syntax with otherwise normal, multistatement functions, especially those that would otherwise be naturally expressed as function declarations.
 
-Recall the `dollabillyall(..)` string literal tag function from earlier in this chapter -- let's change it to use `=>` syntax:
+Recall the `dollabillsyall(..)` string literal tag function from earlier in this chapter -- let's change it to use `=>` syntax:
 
 ```js
 var dollabillsyall = (strings, ...values) =>
@@ -1986,6 +1992,8 @@ for (var c of "hello") {
 }
 // "h" "e" "l" "l" "o"
 ```
+
+The `"hello"` primitive string value is coerced/boxed to the `String` object wrapper equivalent, which is an iterable by default.
 
 In `for (XYZ of ABC)..`, the `XYZ` clause can either be an assignment expression or a declaration, identical to that same clause in `for` and `for..in` loops. So you can do stuff like this:
 
@@ -2241,7 +2249,7 @@ var re = /foo/ig;
 re.flags;				// "gi"
 ```
 
-It's a small nuance, but the ES6 specification calls for the expression's flags to be listed in this order: `"gimuy"`, regardless of what order the original pattern was specified with. That's the difference between `/ig` and `"gi"`.
+It's a small nuance, but the ES6 specification calls for the expression's flags to be listed in this order: `"gimuy"`, regardless of what order the original pattern was specified with. That's the reason for the difference between `/ig` and `"gi"`.
 
 No, the order of flags specified or listed doesn't matter.
 
@@ -2442,7 +2450,7 @@ The further you go down this rabbit hole, the more you realize that it's difficu
 
 ### Character Positioning
 
-In addition to length complications, what does it actually mean to ask, "what is the character as position 2?" The naive pre-ES6 JavaScript answer comes from `charAt(..)`, which will not respect the atomicity of an astral character, nor will it take into account combining marks.
+Similar to length complications, what does it actually mean to ask, "what is the character as position 2?" The naive pre-ES6 answer comes from `charAt(..)`, which will not respect the atomicity of an astral character, nor will it take into account combining marks.
 
 Consider:
 
@@ -2628,7 +2636,7 @@ function HappyFace() {
 var me = HappyFace(),
 	you = HappyFace();
 
-me === you;
+me === you;			// true
 ```
 
 The `INSTANCE` symbol value here is a special, almost hidden, meta-like property stored statically on the `HappyFace()` function object.
@@ -2697,7 +2705,7 @@ extractValues[Symbol.for( "extractValues.parse" )] =
 extractValues( "..some string.." );
 ```
 
-Aside from the assistance the symbol registry provides in globally storing these values, nothing we're seeing here couldn't have been done by just actually using the magic string `"extractValues.parse"` as the key, rather than the symbol. The improvements exist at the metaprogramming level more than the functional level.
+Aside from the assistance the symbol registry provides in globally storing these values, everything we're seeing here could have been done by just actually using the magic string `"extractValues.parse"` as the key, rather than the symbol. The improvements exist at the metaprogramming level more than the functional level.
 
 You may have occasion to use a symbol value that has been stored in the registry to look up what description text (key) it's stored under. For example, you may need to signal to another part of your application how to locate a symbol in the registry because you cannot pass the symbol value itself.
 
