@@ -9,9 +9,9 @@ However, ES6 adds a new feature that helps address significant shortcomings in t
 
 Let's clear up some misconceptions: Promises are not about replacing callbacks. Promises provide a trustable intermediary -- that is, between your calling code and the async code that will perform the task -- to manage callbacks.
 
-Another way of thinking about a Promise is as an event listener, upon which you can register to listen for an event that lets you know when a task has completed. It's an event that will only ever fire once, but it can be thought of as an event nonetheless.
+Another way of thinking about a Promise is as an event listener, on which you can register to listen for an event that lets you know when a task has completed. It's an event that will only ever fire once, but it can be thought of as an event nonetheless.
 
-Promises can be chained together, which can sequence a series of asychronously completing steps. Together with higher-level abstractions like the `all(..)` method (in classic terms, a "gate") and the `race(..)` method (in classic terms, a "latch"), promise chains provide an approximation of async flow control.
+Promises can be chained together, which can sequence a series of asychronously completing steps. Together with higher-level abstractions like the `all(..)` method (in classic terms, a "gate") and the `race(..)` method (in classic terms, a "latch"), promise chains provide a mechanism for async flow control.
 
 Yet another way of conceptualizing a Promise is that it's a *future value*, a time-independent container wrapped around a value. This container can be reasoned about identically whether the underlying value is final or not. Observing the resolution of a Promise extracts this value once available. In other words, a Promise is said to be the async version of a sync function's return value.
 
@@ -24,12 +24,12 @@ Clearly, there are several different ways to think about what a Promise is. No s
 To construct a promise instance, use the `Promise(..)` constructor:
 
 ```js
-var p = new Promise( function(resolve,reject){
+var p = new Promise( function pr(resolve,reject){
 	// ..
 } );
 ```
 
-The two parameters provided to the `Promise(..)` constructor are functions, and are generally named `resolve(..)` and `reject(..)`, respectively. They are used as:
+The `Promise(..)` constructor takes a single function (`pr(..)`), which is called immediately and receives two control functions as arguments, usually named `resolve(..)` and `reject(..)`. They are used as:
 
 * If you call `reject(..)`, the promise is rejected, and if any value is passed to `reject(..)`, it is set as the reason for rejection.
 * If you call `resolve(..)` with no value, or any non-promise value, the promise is fulfilled.
@@ -269,7 +269,7 @@ step1()
 	step2Failed
 )
 .then(
-	function(msg) {
+	function step3(msg) {
 		return Promise.all( [
 			step3a( msg ),
 			step3b( msg ),
@@ -297,6 +297,7 @@ function *main() {
 		ret = yield step2Failed( err );
 	}
 
+	// step 3
 	ret = yield Promise.all( [
 		step3a( ret ),
 		step3b( ret ),
@@ -366,7 +367,7 @@ run( main )
 
 Essentially, anywhere that you have more than two asynchronous steps of flow control logic in your program, you can *and should* use a promise-yielding generator driven by a run utility to express the flow control in a synchronous fashion. This will make for much easier to understand and maintain code.
 
-This yield-a-promise-resume-the-generator pattern is going to be so common and so powerful, the next version of JavaScript is almost certainly going to introduce a new function type that will do it automatically without needing the run utility. We'll cover `async function`s (as they're expected to be called) in Chapter 8.
+This yield-a-promise-resume-the-generator pattern is going to be so common and so powerful, the next version of JavaScript after ES6 is almost certainly going to introduce a new function type that will do it automatically without needing the run utility. We'll cover `async function`s (as they're expected to be called) in Chapter 8.
 
 ## Review
 
