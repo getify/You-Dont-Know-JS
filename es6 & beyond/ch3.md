@@ -1690,7 +1690,7 @@ Some things to note:
 
 * `class Foo` implies creating a (special) function of the name `Foo`, much like you did pre-ES6.
 * `constructor(..)` identifies the signature of that `Foo(..)` function, as well as its body contents.
-* Class methods use the same "concise method" syntax available to object literals, as discussed in Chapter 2. This also includes the concise generator form as discussed earlier in this chapter, as well as the ES5 getter/setter syntax.
+* Class methods use the same "concise method" syntax available to object literals, as discussed in Chapter 2. This also includes the concise generator form as discussed earlier in this chapter, as well as the ES5 getter/setter syntax. However, class methods are non-enumerable whereas object methods are by default enumerable.
 * Unlike object literals, there are no commas separating members in a `class` body! In fact, they're not even allowed.
 
 The `class` syntax definition in the previous snippet can be roughly thought of as this pre-ES6 equivalent, which probably will look fairly familiar to those who've done prototype-style coding before:
