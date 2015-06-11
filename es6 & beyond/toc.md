@@ -29,7 +29,7 @@
 	* Promises
 	* Generators + Promises
 * Chapter 5: Collections
-	* Typed Arrays
+	* TypedArrays
 	* Maps
 	* WeakMaps
 	* Sets

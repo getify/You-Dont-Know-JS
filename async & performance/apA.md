@@ -615,7 +615,7 @@ ASQ( 42 )
 
 ## Promises and Callbacks
 
-I think *asynquence* sequences provide a lot of value on top of native Promises, and for the most part you'll find it more pleasant and more powerful to work at that level of abstration. However, integrating *asynquence* with other non-*asynquence* code will be a reality.
+I think *asynquence* sequences provide a lot of value on top of native Promises, and for the most part you'll find it more pleasant and more powerful to work at that level of abstraction. However, integrating *asynquence* with other non-*asynquence* code will be a reality.
 
 You can easily subsume a promise (e.g., thenable -- see Chapter 3) into a sequence using the `promise(..)` instance method:
 

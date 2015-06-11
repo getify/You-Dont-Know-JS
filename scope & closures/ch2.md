@@ -31,7 +31,7 @@ function foo(a) {
 	bar(b * 3);
 }
 
-foo( 2 ); // 2, 4, 12
+foo( 2 ); // 2 4 12
 ```
 
 There are three nested scopes inherent in this code example. It may be helpful to think about these scopes as bubbles inside of each other.
