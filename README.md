@@ -32,7 +32,7 @@ If you'd like to contribute financially towards the effort (or any of my other O
 
 <a href="https://www.patreon.com/getify"><img src="http://blog.getify.com/wp-content/uploads/patreon.png"></a>
 
-## Training
+## In-person Training
 
 The content for these books derives heavily from a series of training materials I teach professionally (in both public and private-corporate workshop format), called "Advanced JS: The 'What You Need To Know' Parts".
 
@@ -40,11 +40,19 @@ If you like this content and would like to contact me regarding conducting train
 
 [http://getify.me](http://getify.me)
 
-## Contributions
+## Online Video Training
+
+I also have some JS training material available in on-demand video format. I teach courses through [Frontend Masters](https://FrontendMasters.com), like my [Advanced JS](https://frontendmasters.com/courses/advanced-javascript/) workshop (more courses coming soon!).
+
+That same course is also [available through Pluralsight](http://www.pluralsight.com/courses/advanced-javascript).
+
+## Content Contributions
 
 Any contributions you make to this effort **are of course greatly appreciated**.
 
-However, if you choose to contribute content (not just typo corrections) to this repo, you agree that you're giving me a non-exclusive license to use that content for the book series, as I (and O'Reilly) deem appropriate. You probably guessed that already, but we just have to make the lawyers happy by explicitly stating it. So: blah, blah, blah... :)
+However, if you choose to contribute content (not just typo corrections) to this repo, you agree that you're giving me a non-exclusive license to use that content for the book series, as I (and O'Reilly) deem appropriate. You probably guessed that already, but we just have to make the lawyers happy by explicitly stating it.
+
+So: blah, blah, blah... :)
 
 ## License & Copyright
 
