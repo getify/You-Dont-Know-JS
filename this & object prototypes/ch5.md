@@ -711,7 +711,7 @@ That's not to say there aren't cases where fallbacks are an appropriate design p
 
 **Don't miss an important but nuanced point here.**
 
-Designing software where you intend for a developer to for instance call `myObject.cool()` and have that work even though there is no `cool()` method on `myObject` introduces some "magic" into your API design that can be surprising for future developers who maintain your software.
+Designing software where you intend for a developer to, for instance, call `myObject.cool()` and have that work even though there is no `cool()` method on `myObject` introduces some "magic" into your API design that can be surprising for future developers who maintain your software.
 
 You can however design your API with less "magic" to it, but still take advantage of the power of `[[Prototype]]` linkage.
 
