@@ -176,6 +176,8 @@ funcs[3]();		// 3
 
 Here, we forcibly create a new `j` for each iteration, and then the closure works the same way. I prefer the former approach; that extra special capability is why I endorse the `for (let .. ) ..` form. It could be argued it's somewhat more *implicit*, but it's *explicit* enough, and useful enough, for my tastes.
 
+`let` also works the same way with `for..in` and `for..of` loops (see "`for..of` Loops").
+
 ### `const` Declarations
 
 There's one other form of block-scoped declaration to consider: the `const`, which creates *constants*.
@@ -210,6 +212,8 @@ The `a` variable doesn't actually hold a constant array; rather, it holds a cons
 **Warning:** Assigning an object or array as a constant means that value will not be able to be garbage collected until that constant's lexical scope goes away, as the reference to the value can never be unset. That may be desirable, but be careful if it's not your intent!
 
 Essentially, `const` declarations enforce what we've stylistically signaled with our code for years, where we declared a variable name of all uppercase letters and assigned it some literal value that we took care never to change. There's no enforcement on a `var` assignment, but there is now with a `const` assignment, which can help you catch unintended changes.
+
+`const` *can* be used with variable declarations of `for`, `for..in`, and `for..of` loops (see "`for..of` Loops"). However, an error will be thrown if there's any attempt to reassign, such as the typical `i++` clause of a `for` loop.
 
 #### `const` Or Not
 
