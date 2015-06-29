@@ -1030,9 +1030,9 @@ JavaScript engines have to set an arbitrary limit to prevent such programming te
 
 Certain patterns of function calls, called *tail calls*, can be optimized in a way to avoid the extra allocation of stack frames. If the extra allocation can be avoided, there's no reason to arbitrarily limit the call stack depth, so the engines can let them run unbounded.
 
-It's important to note that this optimization can only be applied in `strict` mode. Yet another reason to always be writing all your code as `strict`!
+A tail call is a `return` statement with a function call, where nothing has to happen after the call except returning its value.
 
-A tail call is a function call in the tail position -- at the end of a function's code path -- where nothing has to happen after the call except (optionally) returning its value along to a previous function invocation.
+This optimization can only be applied in `strict` mode. Yet another reason to always be writing all your code as `strict`!
 
 Here's a function call that is *not* in tail position:
 
@@ -1210,7 +1210,7 @@ As we covered in the "Feature Testing" section earlier, you can determine at run
 
 try {
 	(function foo(x){
-		if (x < 5E5) foo( x + 1 );
+		if (x < 5E5) return foo( x + 1 );
 	})( 1 );
 
 	TCO_ENABLED = true;
@@ -1238,7 +1238,7 @@ function foo(x) {
 		if (x > 1) {
 			acc = acc + (x / 2);
 			x = x - 1;
-			_foo();
+			return _foo();
 		}
 	}
 
