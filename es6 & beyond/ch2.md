@@ -567,9 +567,7 @@ console.log( x, y, z );				// 4 5 6
 
 The `tmp.x` property value is assigned to the `x` variable, and likewise for `tmp.y` to `y` and `tmp.z` to `z`.
 
-Manually assigning indexed values from an array or properties from an object can be thought of as *structured assignment*. To put this into ES6 terms, it's called *destructuring assignment*.
-
-Specifically, ES6 introduces dedicated syntax for *array destructuring* and *object destructuring*, which eliminates the need for the `tmp` variable in the previous snippets, making them much cleaner. Consider:
+Manually assigning indexed values from an array or properties from an object can be thought of as *structured assignment*. ES6 adds a dedicated syntax for *destructuring*, specifically *array destructuring* and *object destructuring*. This syntax eliminates the need for the `tmp` variable in the previous snippets, making them much cleaner. Consider:
 
 ```js
 var [ a, b, c ] = foo();
