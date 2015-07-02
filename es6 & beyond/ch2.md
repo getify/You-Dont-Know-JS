@@ -595,7 +595,7 @@ console.log( x, y, z );				// 4 5 6
 
 Pretty cool, right?
 
-But is `{ x, .. }` leaving off the `x: ` part or leaving off the `: x` part? As we'll see shortly, we're actually leaving off the `x: ` part when we use the shorter syntax. That may not seem like an important detail, but you'll understand its importance.
+But is `{ x, .. }` leaving off the `x: ` part or leaving off the `: x` part? We're actually leaving off the `x: ` part when we use the shorter syntax. That may not seem like an important detail, but you'll understand its importance in just a moment.
 
 If you can write the shorter form, why would you ever write out the longer form? Because that longer form actually allows you to assign a property to a different variable name, which can sometimes be quite useful:
 
@@ -641,7 +641,7 @@ console.log( AA, BB );				// 10 20
 
 In the `{ x: aa, y: bb }` line, the `x` and `y` represent the object properties. In the `{ x: AA, y: BB }` line, the `x` and the `y` *also* represent the object properties.
 
-Recall how earlier I asserted that `{ x, .. }` was leaving off the `x: ` part? In those two lines, if you erase the `x: ` and `y: ` parts in that snippet, you're left only with `aa`, `bb`, `AA`, and `BB`, which in effect are assignments from `aa` to `AA` and from `bb` to `BB`. That's actually what we've accomplished with the snippet.
+Recall how earlier I asserted that `{ x, .. }` was leaving off the `x: ` part? In those two lines, if you erase the `x: ` and `y: ` parts in that snippet, you're left only with `aa`, `bb`, `AA`, and `BB`, which in effect -- only conceptually, not actually -- are assignments from `aa` to `AA` and from `bb` to `BB`. That's actually what we've accomplished with the snippet.
 
 So, that symmetry may help to explain why the syntactic pattern was intentionally flipped for this ES6 feature.
 
