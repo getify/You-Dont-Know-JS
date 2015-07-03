@@ -5,9 +5,9 @@ Structured collection and access to data is a critical component of just about a
 
 As of ES6, some of the most useful (and performance-optimizing!) data structure abstractions have been added as native components of the language.
 
-We'll start this chapter first by looking at *TypedArrays*, which were technically contemporary to ES5 efforts, but which prior to ES6 were only standardized by the web platform and not JavaScript. As of ES6, these have been adopted directly by the language specification, which gives them first-class status.
+We'll start this chapter first by looking at *TypedArrays*, technically contemporary to ES5 efforts several years ago, but only standardized as companions to WebGL and not JavaScript itself. As of ES6, these have been adopted directly by the language specification, which gives them first-class status.
 
-Then we'll look at maps and sets, as well as their weak ("weak" in relation to memory/garbage collection) counterparts.
+Maps are like objects (key/value pairs), but instead of just a string for the key, you can use any value -- even another object or map! Sets are similar to arrays (lists of values), but the values are unique; if you add a duplicate, it's ignored. There are also weak (in relation to memory/garbage collection) counterparts: WeakMap and WeakSet.
 
 ## TypedArrays
 
@@ -260,15 +260,15 @@ m.set( y, "bar" );
 m.delete( y );
 ```
 
-You can clear the entire map's contents with `clear()`.
-
-To get the length of a map (i.e., the number of keys), use the `size` property (not `length`):
+You can clear the entire map's contents with `clear()`. To get the length of a map (i.e., the number of keys), use the `size` property (not `length`):
 
 ```js
 m.set( x, "foo" );
 m.set( y, "bar" );
-
 m.size;							// 2
+
+m.clear();
+m.size;							// 0
 ```
 
 The `Map(..)` constructor can also receive an iterable (see "Iterators" in Chapter 3), which must produce a list of arrays, where the first item in each array is the key and the second item is the value. This format for iteration is identical to that produced by the `entries()` method, explained in the next section. That makes it easy to make a copy of a map:
@@ -281,6 +281,21 @@ var m2 = new Map( m );
 ```
 
 Because a map instance is an iterable, and its default iterator is the same as `entries()`, the second shorter form is more preferable.
+
+Of course, you can just manually specify an *entries* list (array of key/value arrays) in the `Map(..)` constructor form:
+
+```js
+var x = { id: 1 },
+	y = { id: 2 };
+
+var m = new Map( [
+	[ x, "foo" ],
+	[ y, "bar" ]
+] );
+
+m.get( x );						// "foo"
+m.get( y );						// "bar"
+```
 
 ### Map Values
 
@@ -298,6 +313,7 @@ m.set( y, "bar" );
 var vals = [ ...m.values() ];
 
 vals;							// ["foo","bar"]
+Array.from( m.values() );		// ["foo","bar"]
 ```
 
 As discussed in the previous section, you can iterate over a map's entries using `entries()` (or the default map iterator). Consider:
@@ -355,17 +371,17 @@ m.has( y );						// false
 
 Maps essentially let you associate some extra piece of information (the value) with an object (the key) without actually putting that information on the object itself.
 
-**Warning:** If you use an object as a map key and that object is later discarded (all references unset) in attempt to have garbage collection (GC) reclaim its memory, the map itself will still retain its entry. You will need to first remove the entry from the map before unsetting the last reference, or the object will not be GC-able. In the next section, we'll see WeakMaps as a better option for GC-eligible object keys.
-
 While you can use any kind of value as a key for a map, you typically will use objects, as strings and other primitives are already eligible as keys of normal objects. In other words, you'll probably want to continue to use normal objects for maps unless some or all of the keys need to be objects, in which case map is more appropriate.
+
+**Warning:** If you use an object as a map key and that object is later discarded (all references unset) in attempt to have garbage collection (GC) reclaim its memory, the map itself will still retain its entry. You will need to remove the entry from the map for it to be GC-eligible. In the next section, we'll see WeakMaps as a better option for object keys and GC.
 
 ## WeakMaps
 
 WeakMaps are a variation on maps, which has most of the same external behavior but differs underneath in how the memory allocation (specifically its GC) works.
 
-WeakMaps take (only) objects as keys. Those objects are held *weakly*, which means if the object itself is GC'd, the entry in the WeakMap is also removed. This isn't observable behavior, though, as the only way an object can be GC'd is if there's no more references to it, but once there are no more references to it, you have no object reference to check if it exists in the WeakMap.
+WeakMaps take (only) objects as keys. Those objects are held *weakly*, which means if the object itself is GC'd, the entry in the WeakMap is also removed. This isn't observable behavior, though, as the only way an object can be GC'd is if there's no more references to it -- once there are no more references to it, you have no object reference to check if it exists in the WeakMap.
 
-Otherwise, the API for WeakMap is similar, though limited:
+Otherwise, the API for WeakMap is similar, though more limited:
 
 ```js
 var m = new WeakMap();
@@ -381,20 +397,27 @@ m.has( y );						// false
 
 WeakMaps do not have a `size` property or `clear()` method, nor do they expose any iterators over their keys, values, or entries. So even if you unset the `x` reference, which will remove its entry from `m` upon GC, there is no way to tell. You'll just have to take JavaScript's word for it!
 
-Just like Maps, WeakMaps let you soft-associate information with an object. But they are particularly useful if the object is not one you completely control, such as a DOM element. If the object you're using as a map key can be deleted and should be GC-able when it is, then a WeakMap is a more appropriate option.
+Just like Maps, WeakMaps let you soft-associate information with an object. But they are particularly useful if the object is not one you completely control, such as a DOM element. If the object you're using as a map key can be deleted and should be GC-eligible when it is, then a WeakMap is a more appropriate option.
 
-It's important to note that a WeakMap only holds its keys weakly, not its values. Consider:
+It's important to note that a WeakMap only holds its *keys* weakly, not its values. Consider:
 
 ```js
 var m = new WeakMap();
 
 var x = { id: 1 },
-	y = { id: 2 };
+	y = { id: 2 },
+	z = { id: 3 },
+	w = { id: 4 };
 
 m.set( x, y );
 
-x = null;						// `x` is GC-able
-y = null;						// `y` is not GC-able
+x = null;						// { id: 1 } is GC-eligible
+y = null;						// { id: 2 } is GC-eligible
+								// only because { id: 1 } is
+
+m.set( z, w );
+
+w = null;						// { id: 4 } is not GC-eligible
 ```
 
 For this reason, WeakMaps are in my opinion better named "WeakKeyMaps."
@@ -403,7 +426,7 @@ For this reason, WeakMaps are in my opinion better named "WeakKeyMaps."
 
 A set is a collection of unique values (duplicates are ignored).
 
-The API for a set is mostly identical to map. The `add(..)` method takes the place of the `set(..)` method (somewhat ironically), and there is no `get(..)` method.
+The API for a set is similar to map. The `add(..)` method takes the place of the `set(..)` method (somewhat ironically), and there is no `get(..)` method.
 
 Consider:
 
@@ -413,7 +436,9 @@ var s = new Set();
 var x = { id: 1 },
 	y = { id: 2 };
 
-s.add( x ).add( y ).add( x );
+s.add( x );
+s.add( y );
+s.add( x );
 
 s.size;							// 2
 
@@ -422,6 +447,15 @@ s.size;							// 1
 
 s.clear();
 s.size;							// 0
+```
+
+The `Set(..)` constructor form is similar to `Map(..)`, in that it can receive an iterable, like another set or simply an array of values. However, unlike how `Map(..)` expects *entries* list (array of key/value arrays), `Set(..)` expects a *values* list (array of values):
+
+```js
+var x = { id: 1 },
+	y = { id: 2 };
+
+var s = new Set( [x,y] );
 ```
 
 A set doesn't need a `get(..)` because you don't retrieve a value from a set, but rather test if it is present or not, using `has(..)`:
@@ -438,7 +472,7 @@ s.has( x );						// true
 s.has( y );						// false
 ```
 
-**Note:** The comparison of set values is done with an algorithm almost identical to `Object.is(..)` (see Chapter 6), except that `-0` and `0` are treated as the same rather than distinct.
+**Note:** The comparison algorithm in `has(..)` is almost identical to `Object.is(..)` (see Chapter 6), except that `-0` and `0` are treated as the same rather than distinct.
 
 ### Set Iterators
 
@@ -479,11 +513,11 @@ var s = new Set( [1,2,3,4,"1",2,4,"5"] ),
 uniques;						// [1,2,3,4,"1","5"]
 ```
 
-Notice that `1` and `"1"` are considered separate values, as no coercion of values happens.
+Set uniqueness does not allow coercion, so `1` and `"1"` are considered distinct values.
 
 ## WeakSets
 
-Whereas a WeakMap holds its keys weakly (but its values strongly), a WeakSet holds its values weakly (there are no keys).
+Whereas a WeakMap holds its keys weakly (but its values strongly), a WeakSet holds its values weakly (there aren't really keys).
 
 ```js
 var s = new WeakSet();
@@ -491,10 +525,11 @@ var s = new WeakSet();
 var x = { id: 1 },
 	y = { id: 2 };
 
-s.add( x ).add( y );
+s.add( x );
+s.add( y );
 
-x = null;						// `x` is GC-able
-y = null;						// `y` is GC-able
+x = null;						// `x` is GC-eligible
+y = null;						// `y` is GC-eligible
 ```
 
 **Warning:** WeakSet values must be objects, not primitive values as is allowed with sets.
