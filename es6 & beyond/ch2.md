@@ -746,7 +746,39 @@ var x = 10, y = 20;
 console.log( x, y );				// 20 10
 ```
 
-**Warning:** Be careful: you shouldn't to mix in declaration with assignment unless you want all of the assignment expressions *also* to be treated as declarations. Otherwise, you'll get syntax errors. That's why in the earlier example I had to do `var a2 = []` separately from the `[ a2[0], .. ] = ..` destructuring assignment. It wouldn't make any sense to try `var [ a2[0], .. ] = ..`, because `a2[0]` isn't a valid declaration identifier; it also obviously couldn't implicitly create a `var a2 = []` declaration.
+**Warning:** Be careful: you shouldn't mix in declaration with assignment unless you want all of the assignment expressions *also* to be treated as declarations. Otherwise, you'll get syntax errors. That's why in the earlier example I had to do `var a2 = []` separately from the `[ a2[0], .. ] = ..` destructuring assignment. It wouldn't make any sense to try `var [ a2[0], .. ] = ..`, because `a2[0]` isn't a valid declaration identifier; it also obviously couldn't implicitly create a `var a2 = []` declaration.
+
+### Repeated Assignments
+
+The object destructuring form allows a source property (holding any value type) to be listed multiple times. For example:
+
+```js
+var { a: X, a: Y } = { a: 1 };
+
+X;	// 1
+Y;	// 1
+```
+
+That also means you can both destructure a sub-object/array property and also capture the sub-object/array's value itself. Consider:
+
+```js
+var { a: { x: X, x: Y }, a } = { a: { x: 1 } };
+
+X;	// 1
+Y;	// 1
+a;	// { x: 1 }
+
+({ a: X, a: Y, a: [ Z ] } = { a: [ 1 ] });
+
+X.push( 2 );
+Y[0] = 10;
+
+X;	// [10,2]
+Y;	// [10,2]
+Z;	// 1
+```
+
+**Warning:** A word of caution about destructuring: it may be tempting to list destructuring assignments all on a single line as has been done thus far in our discussion. However, it's a much better idea to spread destructuring assignment patterns over multiple lines, using proper indentation -- much like you would in JSON or with an object literal value -- for readability sake. Remember: **the purpose of destructuring is not just less typing, but more declarative readability.**
 
 #### Destructuring Assignment Expressions
 
