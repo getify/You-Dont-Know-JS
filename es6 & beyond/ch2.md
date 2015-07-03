@@ -626,7 +626,7 @@ Recall:
 var { x: bam, y: baz, z: bap } = bar();
 ```
 
-The syntactic pattern here is `source: target` (or `value: variable-alias`). `x: bam` means the `x` property is the source value and `bam` is the target variable to assign to. In other words, object literals are `target <= source`, and object destructuring assignments are `source => target`. See how that's flipped?
+The syntactic pattern here is `source: target` (or `value: variable-alias`). `x: bam` means the `x` property is the source value and `bam` is the target variable to assign to. In other words, object literals are `target <-- source`, and object destructuring assignments are `source --> target`. See how that's flipped?
 
 There's another way to think about this syntax though, which may help ease the confusion. Consider:
 
@@ -641,7 +641,7 @@ console.log( AA, BB );				// 10 20
 
 In the `{ x: aa, y: bb }` line, the `x` and `y` represent the object properties. In the `{ x: AA, y: BB }` line, the `x` and the `y` *also* represent the object properties.
 
-Recall how earlier I asserted that `{ x, .. }` was leaving off the `x: ` part? In those two lines, if you erase the `x: ` and `y: ` parts in that snippet, you're left only with `aa`, `bb`, `AA`, and `BB`, which in effect -- only conceptually, not actually -- are assignments from `aa` to `AA` and from `bb` to `BB`. That's actually what we've accomplished with the snippet.
+Recall how earlier I asserted that `{ x, .. }` was leaving off the `x: ` part? In those two lines, if you erase the `x: ` and `y: ` parts in that snippet, you're left only with `aa, bb` and `AA, BB`, which in effect -- only conceptually, not actually -- are assignments from `aa` to `AA` and from `bb` to `BB`.
 
 So, that symmetry may help to explain why the syntactic pattern was intentionally flipped for this ES6 feature.
 
@@ -667,7 +667,7 @@ The variables can already be declared, and then the destructuring only does assi
 
 **Note:** For the object destructuring form specifically, when leaving off a `var`/`let`/`const` declarator, we had to surround the whole assignment expression in `( )`, because otherwise the `{ .. }` on the lefthand side as the first element in the statement is taken to be a block statement instead of an object.
 
-In fact, the assignment expressions (`a`, `y`, etc.) don't actually need to be just variable identifiers. Anything that's a valid assignment expression is valid. For example:
+In fact, the assignment expressions (`a`, `y`, etc.) don't actually need to be just variable identifiers. Anything that's a valid assignment expression is allowed. For example:
 
 ```js
 var o = {};
@@ -746,7 +746,7 @@ var x = 10, y = 20;
 console.log( x, y );				// 20 10
 ```
 
-**Warning:** Be careful: you shouldn't mix in declaration with assignment unless you want all of the assignment expressions *also* to be treated as declarations. Otherwise, you'll get syntax errors. That's why in the earlier example I had to do `var a2 = []` separately from the `[ a2[0], .. ] = ..` destructuring assignment. It wouldn't make any sense to try `var [ a2[0], .. ] = ..`, because `a2[0]` isn't a valid declaration identifier; it also obviously couldn't implicitly create a `var a2 = []` declaration.
+**Warning:** Be careful: you shouldn't mix in declaration with assignment unless you want all of the assignment expressions *also* to be treated as declarations. Otherwise, you'll get syntax errors. That's why in the earlier example I had to do `var a2 = []` separately from the `[ a2[0], .. ] = ..` destructuring assignment. It wouldn't make any sense to try `var [ a2[0], .. ] = ..`, because `a2[0]` isn't a valid declaration identifier; it also obviously couldn't implicitly create a `var a2 = []` declaration to use.
 
 ### Repeated Assignments
 
@@ -768,7 +768,7 @@ X;	// 1
 Y;	// 1
 a;	// { x: 1 }
 
-({ a: X, a: Y, a: [ Z ] } = { a: [ 1 ] });
+( { a: X, a: Y, a: [ Z ] } = { a: [ 1 ] } );
 
 X.push( 2 );
 Y[0] = 10;
@@ -778,7 +778,23 @@ Y;	// [10,2]
 Z;	// 1
 ```
 
-**Warning:** A word of caution about destructuring: it may be tempting to list destructuring assignments all on a single line as has been done thus far in our discussion. However, it's a much better idea to spread destructuring assignment patterns over multiple lines, using proper indentation -- much like you would in JSON or with an object literal value -- for readability sake. Remember: **the purpose of destructuring is not just less typing, but more declarative readability.**
+A word of caution about destructuring: it may be tempting to list destructuring assignments all on a single line as has been done thus far in our discussion. However, it's a much better idea to spread destructuring assignment patterns over multiple lines, using proper indentation -- much like you would in JSON or with an object literal value -- for readability sake.
+
+```js
+// harder to read:
+var { a: { b: [ c, d ], e: { f } }, g } = obj;
+
+// better:
+var {
+	a: {
+		b: [ c, d ],
+		e: { f }
+	},
+	g
+} = obj;
+```
+
+Remember: **the purpose of destructuring is not just less typing, but more declarative readability.**
 
 #### Destructuring Assignment Expressions
 
@@ -788,7 +804,7 @@ The assignment expression with object or array destructuring has as its completi
 var o = { a:1, b:2, c:3 },
 	a, b, c, p;
 
-p = {a,b,c} = o;
+p = { a, b, c } = o;
 
 console.log( a, b, c );			// 1 2 3
 p === o;						// true
@@ -800,7 +816,7 @@ In the previous snippet, `p` was assigned the `o` object reference, not one of t
 var o = [1,2,3],
 	a, b, c, p;
 
-p = [a,b,c] = o;
+p = [ a, b, c ] = o;
 
 console.log( a, b, c );			// 1 2 3
 p === o;						// true
@@ -813,7 +829,7 @@ var o = { a:1, b:2, c:3 },
 	p = [4,5,6],
 	a, b, c, x, y, z;
 
-({a} = {b,c} = o);
+( {a} = {b,c} = o );
 [x,y] = [z] = p;
 
 console.log( a, b, c );			// 1 2 3
@@ -860,7 +876,7 @@ Here we see that `...a` is spreading `a` out, because it appears in the array `[
 
 ```js
 var a = [2,3,4];
-var [b, ...c] = a;
+var [ b, ...c ] = a;
 
 console.log( b, c );				// 2 [3,4]
 ```
