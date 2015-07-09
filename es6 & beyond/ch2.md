@@ -2015,7 +2015,7 @@ And here's the ES6 but non-`for..of` equivalent, which also gives a glimpse at m
 var a = ["a","b","c","d","e"];
 
 for (var val, ret, it = a[Symbol.iterator]();
-	!(ret = it.next()) && !ret.done;
+	(ret = it.next()) && !ret.done;
 ) {
 	val = ret.value;
 	console.log( val );
