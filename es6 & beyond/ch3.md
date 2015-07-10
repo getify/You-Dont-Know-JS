@@ -1954,27 +1954,36 @@ If `new.target` is `undefined`, you know the function was not called with `new`.
 
 When a subclass `Bar` extends a parent class `Foo`, we already observed that `Bar.prototype` is `[[Prototype]]`-linked to `Foo.prototype`. But additionally, `Bar()` is `[[Prototype]]`-linked to `Foo()`. That part may not have such an obvious reasoning.
 
-However, it's quite useful in the case where you declare `static` properties or methods for a class, as these are added directly to that class's function object, not to the function object's `prototype` object. Consider:
+However, it's quite useful in the case where you declare `static` methods (not just properties) for a class, as these are added directly to that class's function object, not to the function object's `prototype` object. Consider:
 
 ```js
 class Foo {
-	static answer = 42;
 	static cool() { console.log( "cool" ); }
-	// ..
+	wow() { console.log( "wow" ); }
 }
 
 class Bar extends Foo {
-	constructor() {
-		console.log( new.target.answer );
+	static awesome() {
+		super.cool();
+		console.log( "awesome" );
+	}
+	neat() {
+		super.wow();
+		console.log( "neat" );
 	}
 }
 
-Foo.answer;					// 42
-Bar.answer;					// 42
+Foo.cool();					// "cool"
+Bar.cool();					// "cool"
+Bar.awesome();				// "cool"
+							// "awesome"
 
-var b = new Bar();			// 42
-b.cool();					// "cool"
-b.answer;					// undefined -- `answer` is static on `Foo`
+var b = new Bar();
+b.neat();					// "wow"
+							// "neat"
+
+b.awesome;					// undefined
+b.cool;						// undefined
 ```
 
 Be careful not to get confused that `static` members are on the class's prototype chain. They're actually on the dual/parallel chain between the function constructors.
