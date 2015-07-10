@@ -168,7 +168,7 @@ for (var v of it) {
 To fully understand how such a loop works, let's consider this more manual version of the previous snippet's loop:
 
 ```js
-for (var v, res; !(res = it.next()) && !res.done; ) {
+for (var v, res; (res = it.next()) && !res.done; ) {
 	v = res.value;
 	console.log( v );
 }
