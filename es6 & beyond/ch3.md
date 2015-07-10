@@ -165,7 +165,7 @@ for (var v of it) {
 }
 ```
 
-To fully understand how such a loop works, let's consider this more manual version of the previous snippet's loop:
+To fully understand how such a loop works, recall the `for` equivalent of a `for..of` loop from Chapter 2:
 
 ```js
 for (var v, res; (res = it.next()) && !res.done; ) {
@@ -176,9 +176,9 @@ for (var v, res; (res = it.next()) && !res.done; ) {
 
 If you look closely, you'll see that `it.next()` is called before each iteration, and then `res.done` is consulted. If `res.done` is `false`, the iteration doesn't occur.
 
-Recall earlier that we suggested iterators should in general not return `done: true` along with the final intended value from the iterator. Here you can see why.
+Recall earlier that we suggested iterators should in general not return `done: true` along with the final intended value from the iterator. Now you can see why.
 
-If an iterator returned `{ done: true, value: 42 }`, the `for..of` loop would completely discard the `42` value and it'd be unavailable. For this reason, assuming that your iterator may be consumed by patterns like the `for..of` loop or its manual equivalent, you should probably wait to return `done: true` for signaling completion until after you've already returned all relevant iteration values.
+If an iterator returned `{ done: true, value: 42 }`, the `for..of` loop would completely discard the `42` value and it'd be lost. For this reason, assuming that your iterator may be consumed by patterns like the `for..of` loop or its manual `for` equivalent, you should probably wait to return `done: true` for signaling completion until after you've already returned all relevant iteration values.
 
 **Warning:** You can, of course, intentionally design your iterator to return some relevant `value` at the same time as returning `done: true`. But don't do this unless you've documented that as the case, and thus implicitly forced consumers of your iterator to use a different pattern for iteration than is implied by `for..of` or its manual equivalent we depicted.
 

@@ -2009,7 +2009,7 @@ for (var val, i = 0; i < k.length; i++) {
 // "a" "b" "c" "d" "e"
 ```
 
-And here's the ES6 but non-`for..of` equivalent, which also gives a glimpse at manually iterating an iterator:
+And here's the ES6 but non-`for..of` equivalent, which also gives a glimpse at manually iterating an iterator (see "Iterators" in Chapter 3):
 
 ```js
 var a = ["a","b","c","d","e"];
