@@ -461,7 +461,7 @@ The final `defineProperty(..)` call results in a TypeError, regardless of `stric
 
 **Note:** There's a nuanced exception to be aware of: even if the property is already `configurable:false`, `writable` can always be changed from `true` to `false` without error, but not back to `true` if already `false`.
 
-Another thing `configurable:false` prevents its ability to use the `delete` operator to remove an existing property.
+Also, configurable:false prevents you from using the delete operator to remove an existing property.
 
 ```js
 var myObject = {
