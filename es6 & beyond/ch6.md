@@ -493,7 +493,7 @@ In both previous snippets, the relationship between `o2` and `o1` appears at the
 
 Many JavaScript libraries/frameworks provide utilities for copying/mixing one object's properties into another (e.g., jQuery's `extend(..)`). There are various nuanced differences between these different utilities, such as whether a property with value `undefined` is ignored or not.
 
-ES6 adds `Object.assign(..)`, which is a simplified version of these algorithms. The first argument is the *target*, and any other arguments passed are the *sources*, which will be processed in listed order. For each source, its enumerable and own (e.g., not "inherited") keys, not symbols, are copied as if by plain `=` assignment. `Object.assign(..)` returns the target object.
+ES6 adds `Object.assign(..)`, which is a simplified version of these algorithms. The first argument is the *target*, and any other arguments passed are the *sources*, which will be processed in listed order. For each source, its enumerable and own (e.g., not "inherited") keys, including symbols, are copied as if by plain `=` assignment. `Object.assign(..)` returns the target object.
 
 Consider this object setup:
 
@@ -518,10 +518,16 @@ Object.defineProperty( o3, "f", {
 
 o3[ Symbol( "g" ) ] = 7;
 
+// setup non-enumerable symbol
+Object.defineProperty( o3, Symbol( "h" ), {
+	value: 8,
+	enumerable: false
+} );
+
 Object.setPrototypeOf( o3, o4 );
 ```
 
-Only the properties `a`, `b`, `c`, and `e` will be copied to `target`:
+Only the properties `a`, `b`, `c`, `e`, and `Symbol("g")` will be copied to `target`:
 
 ```js
 Object.assign( target, o1, o2, o3 );
@@ -529,14 +535,16 @@ Object.assign( target, o1, o2, o3 );
 target.a;							// 1
 target.b;							// 2
 target.c;							// 3
-target.e;							// 5
 
 Object.getOwnPropertyDescriptor( target, "e" );
 // { value: 5, writable: true, enumerable: true,
 //   configurable: true }
+
+Object.getOwnPropertySymbols( target );
+// [Symbol("g")]
 ```
 
-The `d`, `f`, and `Symbol("g")` properties are omitted from copying; symbols, non-enumerable properties, and non-owned properties are all excluded from the assignment. Also, `e` is copied as a normal property assignment, not duplicated as a read-only property.
+The `d`, `f`, and `Symbol("h")` properties are omitted from copying; non-enumerable properties and non-owned properties are all excluded from the assignment. Also, `e` is copied as a normal property assignment, not duplicated as a read-only property.
 
 In an earlier section, we showed using `setPrototypeOf(..)` to set up a `[[Prototype]]` relationship between an `o2` and `o1` object. There's another form that leverages `Object.assign(..)`:
 
@@ -551,7 +559,6 @@ var o2 = Object.assign(
 		// .. o2's definition ..
 	}
 );
-
 
 // delegates to `o1.foo()`
 o2.foo();							// foo
