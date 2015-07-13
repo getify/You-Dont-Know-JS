@@ -292,7 +292,7 @@ If you need to define methods that generate new instances, use the meta programm
 
 In the *Types & Grammar* title of this series, we discussed the `ToPrimitive` abstract coercion operation, which is used when an object must be coerced to a primitive value for some operation (such as `==` comparison or `+` addition). Prior to ES6, there was no way to control this behavior.
 
-As of ES6, the `@@toPrimitive` symbol as a property on any object value can customize that `ToPrimitve` coercion by specifying a method.
+As of ES6, the `@@toPrimitive` symbol as a property on any object value can customize that `ToPrimitive` coercion by specifying a method.
 
 Consider:
 
