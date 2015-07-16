@@ -390,11 +390,17 @@ SIMD.float32x4.mul( v1, v2 );
 // [ 6.597339, 67.2, 138.89, 299.97 ]
 ```
 
-Parallel math operations are critical for the next generations of high performance JS applications, especially those being transpiled from other languages like C.
-
-One of the big focuses in future JS evolution is making the language more suitable as a *transpilation* target, and SIMD will play a central role in those efforts, along with other experiments like ASM.js.
-
 SIMD will include several other operations besides `mul(..)` (multiplication), such as `sub()`, `div()`, `abs()`, `neg()`, `sqrt()`, and many more.
+
+Parallel math operations are critical for the next generations of high performance JS applications.
+
+## WebAssembly (WASM)
+
+Brendan Eich made a late breaking announcement near the completion of the first edition of this title that has the potential to significantly impact the future path of JavaScript: WebAssembly (WASM). We will not be able to cover WASM in detail here, as it's extremely early at the time of this writing. But this title would be incomplete without at least a brief mention of it.
+
+One of the strongest pressures on the recent (and near future) design changes of the JS language has been the desire that it become a more suitable target for transpilation/cross-compilation from other languages (like C/C++, ClojureScript, etc.). Obviously, performance of code running as JavaScript has been a primary concern.
+
+As discussed in the *Async & Performance* title of this series, a few years ago a group of developers at Mozilla introduced an idea to JavaScript called ASM.js. ASM.js is a subset of valid JS that most signficantly restricts certain actions that make code hard for the JS engine to optimize. The result is that ASM.js compatible code running in an ASM-aware engine can run remarkably faster, nearly on par with native optimized C equivalents. Many viewed ASM.js as the most likely backbone on which performance-hungry applications would ride in JavaScript.
 
 ## Review
 
