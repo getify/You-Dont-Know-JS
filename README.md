@@ -28,7 +28,7 @@ These books are being released here as drafts, free to read, but are also being 
 
 If you like the content you find here, and want to support more content like it, please purchase the books once they are available for sale, through your normal book sources. :)
 
-If you'd like to contribute financially towards the effort (or any of my other OSS work) aside from purchasing the books, I do have a [patreon](https://www.patreon.com/getify/) that I would always appreciate your generosity towards.
+If you'd like to contribute financially towards the effort (or any of my other OSS work) aside from purchasing the books, I do have a [patreon](https://www.patreon.com/getify) that I would always appreciate your generosity towards.
 
 <a href="https://www.patreon.com/getify"><img src="http://blog.getify.com/wp-content/uploads/patreon.png"></a>
 
