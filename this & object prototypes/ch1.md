@@ -251,7 +251,7 @@ function bar() {
 	console.log( this.a );
 }
 
-foo(); //ReferenceError: a is not defined
+foo(); //undefined
 ```
 
 There's more than one mistake in this snippet. While it may seem contrived, the code you see is a distillation of actual real-world code that has been exchanged in public community help forums. It's a wonderful (if not sad) illustration of just how misguided `this` assumptions can be.
