@@ -561,7 +561,7 @@ var messages = [],
 		}
 	},
 	messages_proxy =
-		new Proxy( results, handlers );
+		new Proxy( messages, handlers );
 
 // elsewhere:
 messages_proxy.push(
