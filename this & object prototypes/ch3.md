@@ -38,7 +38,7 @@ Objects are the general building block upon which much of JS is built. They are 
 * `undefined`
 * `object`
 
-Note that the *simple primitives* (`string`, `boolean`, `number`, `null`, and `undefined`) are **not** themselves `objects`. `null` is sometimes referred to as an object type, but this misconception stems from a bug in the language which causes `typeof null` to return the string `"object"` incorrectly (and confusingly). In fact, `null` is its own primitive type.
+Note that the *simple primitives* (`string`, `number`, `boolean`, `null`, and `undefined`) are **not** themselves `objects`. `null` is sometimes referred to as an object type, but this misconception stems from a bug in the language which causes `typeof null` to return the string `"object"` incorrectly (and confusingly). In fact, `null` is its own primitive type.
 
 **It's a common mis-statement that "everything in JavaScript is an object". This is clearly not true.**
 
