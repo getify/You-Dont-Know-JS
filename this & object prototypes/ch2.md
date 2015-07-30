@@ -283,7 +283,7 @@ var bar = function() {
 bar(); // 2
 setTimeout( bar, 100 ); // 2
 
-// inside `bar`, `foo` is hard-bound to `obj` and can no longer have its `this` overridden
+// `bar` is a hard-bound version of `foo`. Any attempt to bind a different `this` will fail.
 bar.call( window ); // 2
 ```
 
