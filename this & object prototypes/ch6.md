@@ -799,7 +799,7 @@ Just be aware of this caveat for concise methods, and if you run into such issue
 
 ## Introspection
 
-If you've spent much time with class oriented programming (either in JS or other languages), you're probably familiar with *type introspection*: inspecting an instance to find out what *kind* of object it is. The primary goal of *type introspection* with class instances is to reason about the structure/capabilities of the object based on *how is was created*.
+If you've spent much time with class oriented programming (either in JS or other languages), you're probably familiar with *type introspection*: inspecting an instance to find out what *kind* of object it is. The primary goal of *type introspection* with class instances is to reason about the structure/capabilities of the object based on *how it was created*.
 
 Consider this code which uses `instanceof` (see Chapter 5) for introspecting on an object `a1` to infer its capability:
 
