@@ -43,7 +43,7 @@ Depending on your level of formal education in programming, you may have heard o
 
 Of course, if you have experience with "functional programming" (Monads, etc.), you know very well that classes are just one of several common design patterns. But for others, this may be the first time you've asked yourself if classes really are a fundamental foundation for code, or if they are an optional abstraction on top of code.
 
-Some languages (like Java) don't give you the choice, so it's not very *optional* at all -- everything's a class. Other languages like C/C++ or PHP give you a both procedural and class-oriented syntaxes, and it's left more to the developer's choice which style or mixture of styles is appropriate.
+Some languages (like Java) don't give you the choice, so it's not very *optional* at all -- everything's a class. Other languages like C/C++ or PHP give you both procedural and class-oriented syntaxes, and it's left more to the developer's choice which style or mixture of styles is appropriate.
 
 ### JavaScript "Classes"
 
