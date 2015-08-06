@@ -166,7 +166,7 @@ var b = {
 	// probably incorrect!
 	toJSON: function(){
 		return "[" +
-			this.val.slice( 1 ).join() +
+			this.val.slice( 1 ).join(", ") +
 		"]";
 	}
 };
