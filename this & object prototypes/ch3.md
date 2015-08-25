@@ -130,6 +130,7 @@ The main difference between the two syntaxes is that the `.` operator requires a
 Also, since the `[".."]` syntax uses a string's **value** to specify the location, this means the program can programmatically build up the value of the string, such as:
 
 ```js
+var wantA = true;
 var myObject = {
 	a: 2
 };
