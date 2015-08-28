@@ -147,7 +147,7 @@ Consider:
 var funcs = [];
 
 for (let i = 0; i < 5; i++) {
-	funcs.push( function(){
+	funcs.push( function() {
 		console.log( i );
 	} );
 }
@@ -166,7 +166,7 @@ var funcs = [];
 
 for (var i = 0; i < 5; i++) {
 	let j = i;
-	funcs.push( function(){
+	funcs.push( function() {
 		console.log( j );
 	} );
 }
@@ -349,7 +349,7 @@ function bar() {
 	args.push( 4, 5 );
 
 	// filter out odd numbers
-	args = args.filter( function(v){
+	args = args.filter( function(v) {
 		return v % 2 == 0;
 	} );
 
@@ -431,7 +431,7 @@ There's a principle applied to JavaScript's design here that is important to rem
 
 **Note:** There are, confusingly, other places in JS where this particular design principle doesn't apply, such as for arrays with empty slots. See the *Types & Grammar* title of this series for more information.
 
-With all this mind, we can now examine a nice helpful syntax added as of ES6 to streamline the assignment of default values to missing arguments:
+With all this in mind, we can now examine a nice helpful syntax added as of ES6 to streamline the assignment of default values to missing arguments:
 
 ```js
 function foo(x = 11, y = 31) {
@@ -505,7 +505,7 @@ Though it's not necessarily a good idea for code clarity, a default value expres
 
 ```js
 function foo( x =
-	(function(v){ return v + 11; })( 31 )
+	(function(v) { return v + 11; })( 31 )
 ) {
 	console.log( x );
 }
@@ -907,7 +907,7 @@ var { x, y, z, w: WW = 20 } = bar();
 console.log( x, y, z, WW );			// 4 5 6 20
 ```
 
-Be careful about confusing yourself (or other developers who read your code) if use an object or array as the default value in a destructuring. You can create some really hard to understand code:
+Be careful about confusing yourself (or other developers who read your code) if you use an object or array as the default value in a destructuring. You can create some really hard to understand code:
 
 ```js
 var x = 200, y = 300, z = 100;
@@ -946,7 +946,7 @@ Nested destructuring can be a simple way to flatten out object namespaces. For e
 ```js
 var App = {
 	model: {
-		User: function(){ .. }
+		User: function() { .. }
 	}
 };
 
@@ -1035,7 +1035,7 @@ function f6({ x = 10 } = {}, { y } = { y: 10 }) {
 f6();								// 10 10
 ```
 
-As first, it would seem that we've declared a default value of `10` for both the `x` and `y` parameters, but in two different ways. However, these two different approaches will behave differently in certain cases, and the difference is awfully subtle.
+At first, it would seem that we've declared a default value of `10` for both the `x` and `y` parameters, but in two different ways. However, these two different approaches will behave differently in certain cases, and the difference is awfully subtle.
 
 Consider:
 
@@ -1246,7 +1246,7 @@ var o = {
 }
 ```
 
-**Warning:** While `x() { .. }` seems to just be shorthand for `x: function(){ .. }`, concise methods have special behaviors that their older counterparts don't; specifically, the allowance for `super` (see "Object `super`" later in this chapter).
+**Warning:** While `x() { .. }` seems to just be shorthand for `x: function() { .. }`, concise methods have special behaviors that their older counterparts don't; specifically, the allowance for `super` (see "Object `super`" later in this chapter).
 
 Generators (see Chapter 4) also have a concise method form:
 
@@ -1269,7 +1269,7 @@ function runSomething(o) {
 }
 
 runSomething( {
-	something: function something(x,y){
+	something: function something(x,y) {
 		if (x > y) {
 			// recursively call with `x`
 			// and `y` swapped
@@ -1334,7 +1334,7 @@ var controller = {
 	makeRequest: function(..) {
 		var self = this;
 
-		btn.addEventListener( "click", function(){
+		btn.addEventListener( "click", function() {
 			// ..
 			self.makeRequest(..);
 		}, false );
@@ -1717,7 +1717,7 @@ Typically, the string literal tag function (`foo(..)` in the previous snippets) 
 
 ```js
 function tag(strings, ...values) {
-	return strings.reduce( function(s,v,idx){
+	return strings.reduce( function(s,v,idx) {
 		return s + (idx > 0 ? values[idx-1] : "") + v;
 	}, "" );
 }
@@ -1735,7 +1735,7 @@ So what are some practical uses? There are many advanced ones that are beyond ou
 
 ```js
 function dollabillsyall(strings, ...values) {
-	return strings.reduce( function(s,v,idx){
+	return strings.reduce( function(s,v,idx) {
 		if (idx > 0) {
 			if (typeof values[idx-1] == "number") {
 				// look, also using interpolated
@@ -1902,7 +1902,7 @@ var controller = {
 	makeRequest: function(..) {
 		var self = this;
 
-		btn.addEventListener( "click", function(){
+		btn.addEventListener( "click", function() {
 			// ..
 			self.makeRequest(..);
 		}, false );
@@ -2500,7 +2500,7 @@ The further you go down this rabbit hole, the more you realize that it's difficu
 
 ### Character Positioning
 
-Similar to length complications, what does it actually mean to ask, "what is the character as position 2?" The naive pre-ES6 answer comes from `charAt(..)`, which will not respect the atomicity of an astral character, nor will it take into account combining marks.
+Similar to length complications, what does it actually mean to ask, "what is the character at position 2?" The naive pre-ES6 answer comes from `charAt(..)`, which will not respect the atomicity of an astral character, nor will it take into account combining marks.
 
 Consider:
 
@@ -2657,7 +2657,7 @@ const EVT_LOGIN = Symbol( "event.login" );
 You'd then use `EVT_LOGIN` in place of a generic string literal like `"event.login"`:
 
 ```js
-evthub.listen( EVT_LOGIN, function(data){
+evthub.listen( EVT_LOGIN, function(data) {
 	// ..
 } );
 ```
