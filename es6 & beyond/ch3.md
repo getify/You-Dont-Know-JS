@@ -174,7 +174,7 @@ for (var v, res; (res = it.next()) && !res.done; ) {
 }
 ```
 
-If you look closely, you'll see that `it.next()` is called before each iteration, and then `res.done` is consulted. If `res.done` is `false`, the iteration doesn't occur.
+If you look closely, you'll see that `it.next()` is called before each iteration, and then `res.done` is consulted. If `res.done` is `true`, the expression evaluates to `false` and the iteration doesn't occur.
 
 Recall earlier that we suggested iterators should in general not return `done: true` along with the final intended value from the iterator. Now you can see why.
 

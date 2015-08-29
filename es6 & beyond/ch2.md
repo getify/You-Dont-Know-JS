@@ -431,7 +431,7 @@ There's a principle applied to JavaScript's design here that is important to rem
 
 **Note:** There are, confusingly, other places in JS where this particular design principle doesn't apply, such as for arrays with empty slots. See the *Types & Grammar* title of this series for more information.
 
-With all this mind, we can now examine a nice helpful syntax added as of ES6 to streamline the assignment of default values to missing arguments:
+With all this in mind, we can now examine a nice helpful syntax added as of ES6 to streamline the assignment of default values to missing arguments:
 
 ```js
 function foo(x = 11, y = 31) {
@@ -907,7 +907,7 @@ var { x, y, z, w: WW = 20 } = bar();
 console.log( x, y, z, WW );			// 4 5 6 20
 ```
 
-Be careful about confusing yourself (or other developers who read your code) if use an object or array as the default value in a destructuring. You can create some really hard to understand code:
+Be careful about confusing yourself (or other developers who read your code) if you use an object or array as the default value in a destructuring. You can create some really hard to understand code:
 
 ```js
 var x = 200, y = 300, z = 100;
@@ -1035,7 +1035,7 @@ function f6({ x = 10 } = {}, { y } = { y: 10 }) {
 f6();								// 10 10
 ```
 
-As first, it would seem that we've declared a default value of `10` for both the `x` and `y` parameters, but in two different ways. However, these two different approaches will behave differently in certain cases, and the difference is awfully subtle.
+At first, it would seem that we've declared a default value of `10` for both the `x` and `y` parameters, but in two different ways. However, these two different approaches will behave differently in certain cases, and the difference is awfully subtle.
 
 Consider:
 
@@ -1224,10 +1224,10 @@ The old way:
 
 ```js
 var o = {
-	x: function() {
+	x: function(){
 		// ..
 	},
-	y: function() {
+	y: function(){
 		// ..
 	}
 }
@@ -1269,7 +1269,7 @@ function runSomething(o) {
 }
 
 runSomething( {
-	something: function something(x,y){
+	something: function something(x,y) {
 		if (x > y) {
 			// recursively call with `x`
 			// and `y` swapped
@@ -1299,7 +1299,7 @@ That's actually a pretty common practice when the object literal does have an id
 
 ```js
 var controller = {
-	makeRequest: function(..) {
+	makeRequest: function(..){
 		// ..
 		controller.makeRequest(..);
 	}
@@ -1312,7 +1312,7 @@ Others prefer to use `this` to define such things:
 
 ```js
 var controller = {
-	makeRequest: function(..) {
+	makeRequest: function(..){
 		// ..
 		this.makeRequest(..);
 	}
@@ -1331,7 +1331,7 @@ Or what if your inner `this.makeRequest(..)` call needs to be made from a nested
 
 ```js
 var controller = {
-	makeRequest: function(..) {
+	makeRequest: function(..){
 		var self = this;
 
 		btn.addEventListener( "click", function(){
@@ -1380,7 +1380,7 @@ The above ES6 snippet is interpreted as meaning:
 
 ```js
 runSomething( {
-	something: function(x,y) {
+	something: function(x,y){
 		if (x > y) {
 			return something( y, x );
 		}
@@ -1437,11 +1437,11 @@ You've probably been in a situation like the following snippet, where you have o
 var prefix = "user_";
 
 var o = {
-	baz: function(..) { .. }
+	baz: function(..){ .. }
 };
 
-o[ prefix + "foo" ] = function(..) { .. };
-o[ prefix + "bar" ] = function(..) { .. };
+o[ prefix + "foo" ] = function(..){ .. };
+o[ prefix + "bar" ] = function(..){ .. };
 ..
 ```
 
@@ -1451,9 +1451,9 @@ ES6 adds a syntax to the object literal definition which allows you to specify a
 var prefix = "user_";
 
 var o = {
-	baz: function(..) { .. },
-	[ prefix + "foo" ]: function(..) { .. },
-	[ prefix + "bar" ]: function(..) { .. }
+	baz: function(..){ .. },
+	[ prefix + "foo" ]: function(..){ .. },
+	[ prefix + "bar" ]: function(..){ .. }
 	..
 };
 ```
@@ -1899,7 +1899,7 @@ Let's revisit another example from earlier in this chapter:
 
 ```js
 var controller = {
-	makeRequest: function(..) {
+	makeRequest: function(..){
 		var self = this;
 
 		btn.addEventListener( "click", function(){
@@ -1918,7 +1918,7 @@ Consider:
 
 ```js
 var controller = {
-	makeRequest: function(..) {
+	makeRequest: function(..){
 		btn.addEventListener( "click", () => {
 			// ..
 			this.makeRequest(..);
@@ -2500,7 +2500,7 @@ The further you go down this rabbit hole, the more you realize that it's difficu
 
 ### Character Positioning
 
-Similar to length complications, what does it actually mean to ask, "what is the character as position 2?" The naive pre-ES6 answer comes from `charAt(..)`, which will not respect the atomicity of an astral character, nor will it take into account combining marks.
+Similar to length complications, what does it actually mean to ask, "what is the character at position 2?" The naive pre-ES6 answer comes from `charAt(..)`, which will not respect the atomicity of an astral character, nor will it take into account combining marks.
 
 Consider:
 
