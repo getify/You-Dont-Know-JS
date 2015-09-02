@@ -786,7 +786,7 @@ Learning programming doesn't have to be a complex and overwhelming process. Ther
 
 These act like building blocks. To build a tall tower, you start first by putting block on top of block on top of block. The same goes with programming. Here are some of the essential programming building blocks:
 
-* You need *operators* to perform actions on
+* You need *operators* to perform actions on values.
 * You need values and *types* to perform different kinds of actions like math on `number`s or output with `string`s.
 * You need *variables* to store data (aka *state*) during your program's execution.
 * You need *conditionals* like `if` statements to make decisions.
