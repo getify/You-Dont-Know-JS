@@ -1150,7 +1150,7 @@ config.log = config.log || {};
 
 Not as nice as the false promise of `Object.assign(..)` (being that it's shallow only), but it's better than the manual approach by a fair bit, I think. It is still unfortunately verbose and repetitive, though.
 
-The previous snippet's approach works because I'm hacking the destructuring and defaults mechansim to do the property `=== undefined` checks and assignment decisions for me. It's a trick in that I'm destructuring `config` (see the `= config` at the end of the snippet), but I'm reassigning all the destructured values right back into `config`, with the `config.options.enable` assignment references.
+The previous snippet's approach works because I'm hacking the destructuring and defaults mechanism to do the property `=== undefined` checks and assignment decisions for me. It's a trick in that I'm destructuring `config` (see the `= config` at the end of the snippet), but I'm reassigning all the destructured values right back into `config`, with the `config.options.enable` assignment references.
 
 Still too much, though. Let's see if we can make anything better.
 
@@ -2077,7 +2077,7 @@ JavaScript strings are typically interpreted as sequences of 16-bit characters, 
 
 Prior to ES6, regular expressions could only match based on BMP characters, which means that those extended characters were treated as two separate characters for matching purposes. This is often not ideal.
 
-So, as of ES6, the `u` flag tells a regular expression to process a string with the intepretation of Unicode (UTF-16) characters, such that such an extended character will be matched as a single entity.
+So, as of ES6, the `u` flag tells a regular expression to process a string with the interpretation of Unicode (UTF-16) characters, such that such an extended character will be matched as a single entity.
 
 **Warning:** Despite the name implication, "UTF-16" doesn't strictly mean 16 bits. Modern Unicode uses 21 bits, and standards like UTF-8 and UTF-16 refer roughly to how many bits are used in the representation of a character.
 
@@ -2519,7 +2519,7 @@ s3.charAt( 2 );					// "" <-- unprintable surrogate
 s3.charAt( 3 );					// "" <-- unprintable surrogate
 ```
 
-So, is ES6 giving us a Unicode-aware verison of `charAt(..)`? Unfortunately, no. At the time of this writing, there's a proposal for such a utility that's under consideration for post-ES6.
+So, is ES6 giving us a Unicode-aware version of `charAt(..)`? Unfortunately, no. At the time of this writing, there's a proposal for such a utility that's under consideration for post-ES6.
 
 But with what we explored in the previous section (and of course with the limitations noted thereof!), we can hack an ES6 answer:
 
