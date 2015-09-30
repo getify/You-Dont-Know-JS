@@ -477,7 +477,7 @@ var amount = 99.99;
 amount = amount * 2;
 
 // can we afford the extra purchase?
-if ( amount < bank_balance ) {
+if ( amount + ACCESSORY_PRICE < bank_balance ) {
 	console.log( "I'll take the accessory!" );
 	amount = amount + ACCESSORY_PRICE;
 }
