@@ -1906,7 +1906,7 @@ a < b;						// false -- string comparison!
 Number( a ) < Number( b );	// true -- number comparison!
 ```
 
-## Review
+## Review (TL;DR)
 
 In this chapter, we turned our attention to how JavaScript type conversions happen, called **coercion**, which can be characterized as either *explicit* or *implicit*.
 

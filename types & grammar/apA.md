@@ -386,7 +386,7 @@ Examples of other limits known to exist:
 
 It's not very common at all to run into these limits, but you should be aware that limits can and do exist, and importantly that they vary between engines.
 
-## Review
+## Review (TL;DR)
 
 We know and can rely upon the fact that the JS language itself has one standard and is predictably implemented by all the modern browsers/engines. This is a very good thing!
 

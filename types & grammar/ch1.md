@@ -287,7 +287,7 @@ function doSomethingCool(FeatureXYZ) {
 
 There's lots of options when designing such functionality. No one pattern here is "correct" or "wrong" -- there are various tradeoffs to each approach. But overall, it's nice that the `typeof` undeclared safety guard gives us more options.
 
-## Review
+## Review (TL;DR)
 
 JavaScript has seven built-in *types*: `null`, `undefined`,  `boolean`, `number`, `string`, `object`, `symbol`. They can be identified by the `typeof` operator.
 
