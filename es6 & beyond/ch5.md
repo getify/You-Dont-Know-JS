@@ -534,7 +534,7 @@ y = null;						// `y` is GC-eligible
 
 **Warning:** WeakSet values must be objects, not primitive values as is allowed with sets.
 
-## Review
+## Review (TL;DR)
 
 ES6 defines a number of useful collections that make working with data in structured ways more efficient and effective.
 

@@ -1273,7 +1273,7 @@ Almost any recursive algorithm can be adapted to work this way. That means it's 
 
 This approach still uses a PTC, meaning that this code will *progressively enhance* from running using the loop many times (recursion batches) in an older browser to fully leveraging TCO'd recursion in an ES6+ environment. I think that's pretty cool!
 
-## Review
+## Review (TL;DR)
 
 Meta programming is when you turn the logic of your program to focus on itself (or its runtime environment), either to inspect its own structure or to modify it. The primary value of meta programming is to extend the normal mechanisms of the language to provide additional capabilities.
 

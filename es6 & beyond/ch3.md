@@ -2035,7 +2035,7 @@ y instanceof Foo;					// true
 
 The parent class `Symbol.species` does `return this` to defer to any derived class, as you'd normally expect. `Bar` then overrides to manually declare `Foo` to be used for such instance creation. Of course, a derived class can still vend instances of itself using `new this.constructor(..)`.
 
-## Review
+## Review (TL;DR)
 
 ES6 introduces several new features that aid in code organization:
 

@@ -2811,7 +2811,7 @@ The specification uses the `@@` prefix notation to refer to the built-in symbols
 
 **Note:** See "Well Known Symbols" in Chapter 7 for detailed information about how these built-in symbols are used for meta programming purposes.
 
-## Review
+## Review (TL;DR)
 
 ES6 adds a heap of new syntax forms to JavaScript, so there's plenty to learn!
 
