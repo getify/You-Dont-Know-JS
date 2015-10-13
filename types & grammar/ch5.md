@@ -456,7 +456,7 @@ var { a, b } = getData();
 console.log( a, b ); // 42 "foo"
 ```
 
-As you can probably tell, `var { a , b } = ..` is a form of ES6 destructuring assignment, which is rougly equivalent to:
+As you can probably tell, `var { a , b } = ..` is a form of ES6 destructuring assignment, which is roughly equivalent to:
 
 ```js
 var res = getData();
@@ -1028,7 +1028,7 @@ The most clear example of this is with ES6 `let` block-scoping:
 }
 ```
 
-The assigment `a = 2` is accessing the `a` variable (which is indeed block-scoped to the `{ .. }` block) before it's been initialized by the `let a` declaration, so it's in the TDZ for `a` and throws an error.
+The assignment `a = 2` is accessing the `a` variable (which is indeed block-scoped to the `{ .. }` block) before it's been initialized by the `let a` declaration, so it's in the TDZ for `a` and throws an error.
 
 Interestingly, while `typeof` has an exception to be safe for undeclared variables (see Chapter 1), no such safety exception is made for TDZ references:
 
