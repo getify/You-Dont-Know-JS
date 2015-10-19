@@ -261,7 +261,7 @@ When the RHS look-up occurs for `b` the first time, it will not be found. This i
 
 If an RHS look-up fails to ever find a variable, anywhere in the nested *Scope*s, this results in a `ReferenceError` being thrown by the *Engine*. It's important to note that the error is of the type `ReferenceError`.
 
-By contrast, if the *Engine* is performing an LHS look-up, and it arrives at the top floor (global *Scope*) without finding it, if the program is not running in "Strict Mode" [^note-strictmode], then the global *Scope* will create a new variable of that name **in the global scope**, and hand it back to *Engine*.
+By contrast, if the *Engine* is performing an LHS look-up and arrives at the top floor (global *Scope*) without finding it, and if the program is not running in "Strict Mode" [^note-strictmode], then the global *Scope* will create a new variable of that name **in the global scope**, and hand it back to *Engine*.
 
 *"No, there wasn't one before, but I was helpful and created one for you."*
 
