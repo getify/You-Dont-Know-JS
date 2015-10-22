@@ -1183,7 +1183,7 @@ From here on out, my best advice on modules is this: whatever format you've been
 
 ### The New Way
 
-The two main new keywords that enable ES6 classes are `import` and `export`. There's lots of nuance to the syntax, so let's take a deeper look.
+The two main new keywords that enable ES6 modules are `import` and `export`. There's lots of nuance to the syntax, so let's take a deeper look.
 
 **Warning:** An important detail that's easy to overlook: both `import` and `export` must always appear in the top-level scope of their respective usage. For example, you cannot put either an `import` or `export` inside an `if` conditional; they must appear outside of all blocks and functions.
 
