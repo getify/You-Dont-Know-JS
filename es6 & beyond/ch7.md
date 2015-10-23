@@ -881,7 +881,7 @@ The ordering is:
 
 1. First, enumerate any owned properties that are integer indexes, in ascending numeric order.
 2. Next, enumerate the rest of the owned string property names in creation order.
-3. Finally, enumerate owned symbol properities in creation order.
+3. Finally, enumerate owned symbol properties in creation order.
 
 Consider:
 
