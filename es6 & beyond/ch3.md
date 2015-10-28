@@ -1183,7 +1183,7 @@ From here on out, my best advice on modules is this: whatever format you've been
 
 ### The New Way
 
-The two main new keywords that enable ES6 classes are `import` and `export`. There's lots of nuance to the syntax, so let's take a deeper look.
+The two main new keywords that enable ES6 modules are `import` and `export`. There's lots of nuance to the syntax, so let's take a deeper look.
 
 **Warning:** An important detail that's easy to overlook: both `import` and `export` must always appear in the top-level scope of their respective usage. For example, you cannot put either an `import` or `export` inside an `if` conditional; they must appear outside of all blocks and functions.
 
@@ -1473,7 +1473,7 @@ foo.baz();
 
 **Note:** The `* as ..` clause requires the `*` wildcard. In other words, you cannot do something like `import { bar, x } as foo from "foo"` to bring in only part of the API but still bind to the `foo` namespace. I would have liked something like that, but for ES6 it's all or nothing with the namespace import.
 
-If the module you're importing with `* as ..` has a default export, it is named `default` in the namespace specified. You can additionaly name the default import outside of the namespace binding, as a top-level identifier. Consider a `"world"` module exported as:
+If the module you're importing with `* as ..` has a default export, it is named `default` in the namespace specified. You can additionally name the default import outside of the namespace binding, as a top-level identifier. Consider a `"world"` module exported as:
 
 ```js
 export default function foo() { .. }
