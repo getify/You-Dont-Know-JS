@@ -245,7 +245,7 @@ Promise.race( [p2,p1,v3] )
 	console.log( val );				// 42
 } );
 
-Promise.race( [p2,p1,v3,p4] )
+Promise.race( [p2,p4] )
 .then(
 	function fulfilled(val){
 		// never gets here
