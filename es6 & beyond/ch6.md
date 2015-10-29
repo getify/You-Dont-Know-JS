@@ -173,14 +173,11 @@ class MyCoolArray extends Array {
 	..
 }
 
-Array.of( 1, 2 ) instanceof Array;					// true
-Array.from( [1, 2] ) instanceof Array;				// true
-
-MyCoolArray.of( 1, 2 ) instanceof Array;			// false
-MyCoolArray.from( [1, 2] ) instanceof Array;		// false
-
-MyCoolArray.of( 1, 2 ) instanceof MyCoolArray;		// true
 MyCoolArray.from( [1, 2] ) instanceof MyCoolArray;	// true
+
+Array.from(
+	MyCoolArray.from( [1, 2] )
+) instanceof MyCoolArray;							// false
 ```
 
 Both `of(..)` and `from(..)` use the constructor that they're accessed from to construct the array. So if you use the base `Array.of(..)` you'll get an `Array` instance, but if you use `MyCoolArray.of(..)`, you'll get a `MyCoolArray` instance.
