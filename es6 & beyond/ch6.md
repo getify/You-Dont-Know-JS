@@ -214,11 +214,6 @@ class MyCoolArray extends Array {
 
 var x = new MyCoolArray( 1, 2, 3 );
 
-x.slice( 1 ) instanceof Array;						// true
-
-MyCoolArray.from( x ) instanceof Array;				// false
-MyCoolArray.of( [2, 3] ) instanceof Array;			// false
-
 MyCoolArray.from( x ) instanceof MyCoolArray;		// true
 MyCoolArray.of( [2, 3] ) instanceof MyCoolArray;	// true
 ```
