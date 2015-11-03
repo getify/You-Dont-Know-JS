@@ -214,7 +214,7 @@ These questions and answers -- the two-way message passing with `yield` and `nex
 
 ### Multiple Iterators
 
-It may appear from the syntactic usage that when you use an *iterator* to control a generator, you're controlling the declared generator function itself. But there's a subtlety that easy to miss: each time you construct an *iterator*, you are implicitly constructing an instance of the generator which that *iterator* will control.
+It may appear from the syntactic usage that when you use an *iterator* to control a generator, you're controlling the declared generator function itself. But there's a subtlety that's easy to miss: each time you construct an *iterator*, you are implicitly constructing an instance of the generator which that *iterator* will control.
 
 You can have multiple instances of the same generator running at the same time, and they can even interact:
 
