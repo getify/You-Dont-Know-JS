@@ -382,7 +382,7 @@ class Button extends Widget {
 		this.$elem = $( "<button>" ).text( this.label );
 	}
 	render($where) {
-		super( $where );
+		super.render( $where );
 		this.$elem.click( this.onClick.bind( this ) );
 	}
 	onClick(evt) {
