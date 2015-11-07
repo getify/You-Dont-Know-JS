@@ -490,7 +490,7 @@ function timeoutify(fn,delay) {
 		// timeout hasn't happened yet?
 		if (intv) {
 			clearTimeout( intv );
-			fn.apply( this, arguments );
+			fn.apply( this, [ null ].concat( [].slice.call( arguments ) ) );
 		}
 	};
 }
