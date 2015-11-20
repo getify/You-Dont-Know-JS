@@ -77,7 +77,7 @@ I don't get interrupted and pulled to another "process" at every opportunity tha
 
 ### Doing Versus Planning
 
-OK, so our brains can be thought of as operating in single-threaded event loop queue like ways, as can the JS engine. That sounds like good match.
+OK, so our brains can be thought of as operating in single-threaded event loop queue like ways, as can the JS engine. That sounds like a good match.
 
 But we need to be more nuanced than that in our analysis. There's a big, observable difference between how we plan various tasks, and how our brains actually operate those tasks.
 
