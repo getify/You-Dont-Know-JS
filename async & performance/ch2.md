@@ -180,7 +180,7 @@ if ( .. ) {
 else ..
 ```
 
-But there's several problems with reasoning about this code linearly in such a fashion.
+But there're several problems with reasoning about this code linearly in such a fashion.
 
 First, it's an accident of the example that our steps are on subsequent lines (1, 2, 3, and 4...). In real async JS programs, there's often a lot more noise cluttering things up, noise that we have to deftly maneuver past in our brains as we jump from one function to the next. Understanding the async flow in such callback-laden code is not impossible, but it's certainly not natural or easy, even with lots of practice.
 
