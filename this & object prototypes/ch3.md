@@ -188,7 +188,7 @@ var myObject = {
 
 ### Property vs. Method
 
-Some developers like to make a distinction when talking about a property access on an object, if the value being accessed happens to be a function. Because it's tempting to think of that the function *belongs* to the object, and because, in other languages, functions that belong to objects (aka "classes") are referred to as "methods", it's not uncommon to hear "method access" as opposed to "property access".
+Some developers like to make a distinction when talking about a property access on an object, if the value being accessed happens to be a function. Because it's tempting to think that the function *belongs* to the object, and because, in other languages, functions that belong to objects (aka "classes") are referred to as "methods", it's not uncommon to hear "method access" as opposed to "property access".
 
 **The specification makes this same distinction**, interestingly.
 
