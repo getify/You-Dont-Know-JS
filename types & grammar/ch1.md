@@ -60,7 +60,7 @@ typeof { life: 42 }  === "object";    // true
 typeof Symbol()      === "symbol";    // true
 ```
 
-**Note:** Type names written in lowercase. `string` is the type name of the `String` object.
+**Note:** the string values returned from `typeof` are all lowercase.
 
 These six listed types have values of the corresponding type and return a string value of the same name, as shown. `Symbol` is a new data type as of ES6, and will be covered in Chapter 3.
 
