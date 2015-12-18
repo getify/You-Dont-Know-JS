@@ -356,8 +356,8 @@ amount = amount * 2;
 
 console.log( amount );		// 199.98
 
-// convert `amount` to a string, and
-// add "$" on the beginning
+// to demo explicit coercion of a number to a string, and
+// then the ability to manipulate that string
 amount = "$" + String( amount );
 
 console.log( amount );		// "$199.98"
