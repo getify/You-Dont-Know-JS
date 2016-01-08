@@ -146,11 +146,11 @@ class Vehicle {
 	engines = 1
 
 	ignition() {
-		output( "Turning on my engine." );
+		output( "Turning on my engine." )
 	}
 
 	drive() {
-		ignition();
+		ignition()
 		output( "Steering and moving forward!" )
 	}
 }
