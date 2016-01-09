@@ -146,11 +146,11 @@ class Vehicle {
 	engines = 1
 
 	ignition() {
-		output( "Turning on my engine." );
+		output( "Turning on my engine." )
 	}
 
 	drive() {
-		ignition();
+		ignition()
 		output( "Steering and moving forward!" )
 	}
 }
@@ -421,7 +421,7 @@ myCar.drive();
 
 As you can see, we initially make a copy of the definition from the `Vehicle` "parent class" (object), then mixin our "child class" (object) definition (preserving privileged parent-class references as needed), and pass off this composed object `car` as our child instance.
 
-**Note: when we call `new Car()`, a new object is created and referenced by `Car`s `this` reference (see Chapter 2). But since we don't use that object, and instead return our own `car` object, the initially created object is just discarded. So, `Car()` could be called without the `new` keyword, and the functionality above would be identical, but without the wasted object creation/garbage-collection.
+**Note:** when we call `new Car()`, a new object is created and referenced by `Car`s `this` reference (see Chapter 2). But since we don't use that object, and instead return our own `car` object, the initially created object is just discarded. So, `Car()` could be called without the `new` keyword, and the functionality above would be identical, but without the wasted object creation/garbage-collection.
 
 ### Implicit Mixins
 
