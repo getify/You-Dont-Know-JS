@@ -1,3 +1,5 @@
+#### [⇐ Previous Chapter](ch3.md) | [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch5.md)
+
 # You Don't Know JS: Scope & Closures
 # Chapter 4: Hoisting
 
@@ -219,3 +221,5 @@ What this leads to is that all declarations in a scope, regardless of where they
 Declarations themselves are hoisted, but assignments, even assignments of function expressions, are *not* hoisted.
 
 Be careful about duplicate declarations, especially mixed between normal var declarations and function declarations -- peril awaits if you do!
+
+#### [⇐ Previous Chapter](ch3.md) | [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch5.md)

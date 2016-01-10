@@ -1,3 +1,5 @@
+#### [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch2.md)
+
 # You Don't Know JS: Scope & Closures
 # Chapter 1: What is Scope?
 
@@ -308,3 +310,5 @@ var c = foo( 2 );
 
 
 [^note-strictmode]: MDN: [Strict Mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode)
+
+#### [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch2.md)

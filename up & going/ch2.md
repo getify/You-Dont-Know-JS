@@ -1,3 +1,5 @@
+#### [⇐ Previous Chapter](ch1.md) | [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch3.md)
+
 # You Don't Know JS: Up & Going
 # Chapter 2: Into JavaScript
 
@@ -960,3 +962,5 @@ The first step to learning JavaScript's flavor of programming is to get a basic 
 Of course, each of these topics deserves much greater coverage than you've seen here, but that's why they have chapters and books dedicated to them throughout the rest of this series. After you feel pretty comfortable with the concepts and code samples in this chapter, the rest of the series awaits you to really dig in and get to know the language deeply.
 
 The final chapter of this book will briefly summarize each of the other titles in the series and the other concepts they cover besides what we've already explored.
+
+#### [⇐ Previous Chapter](ch1.md) | [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch3.md)

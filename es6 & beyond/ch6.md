@@ -1,3 +1,5 @@
+#### [⇐ Previous Chapter](ch5.md) | [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch7.md)
+
 # You Don't Know JS: ES6 & Beyond
 # Chapter 6: API Additions
 
@@ -797,3 +799,5 @@ ES6 adds many extra API helpers on the various built-in native objects:
 * `String` adds static functions like `String.fromCodePoint(..)` and `String.raw(..)`, as well as prototype functions like `repeat(..)` and `includes(..)`.
 
 Most of these additions can be polyfilled (see ES6 Shim), and were inspired by utilities in common JS libraries/frameworks.
+
+#### [⇐ Previous Chapter](ch5.md) | [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch7.md)

@@ -1,3 +1,5 @@
+#### [⇐ Previous Chapter](ch5.md) | [Table of Contents](toc.md#table-of-contents) 
+
 # You Don't Know JS: *this* & Object Prototypes
 # Chapter 6: Behavior Delegation
 
@@ -915,3 +917,5 @@ Behavior delegation suggests objects as peers of each other, which delegate amon
 When you design code with objects only, not only does it simplify the syntax you use, but it can actually lead to simpler code architecture design.
 
 **OLOO** (objects-linked-to-other-objects) is a code style which creates and relates objects directly without the abstraction of classes. OLOO quite naturally implements `[[Prototype]]`-based behavior delegation.
+
+#### [⇐ Previous Chapter](ch5.md) | [Table of Contents](toc.md#table-of-contents) 
