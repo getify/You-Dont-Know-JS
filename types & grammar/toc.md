@@ -2,38 +2,44 @@
 
 ## Table of Contents
 
-* Foreword
-* Preface
-* Chapter 1: Types
-	* A Type By Any Other Name...
-	* Built-in Types
-	* Values as Types
-* Chapter 2: Values
-	* Arrays
-	* Strings
-	* Numbers
-	* Special Values
-	* Value vs Reference
-* Chapter 3: Natives
-	* Internal `[[Class]]`
-	* Boxing Wrappers
-	* Unboxing
-	* Natives as Constructors
-* Chapter 4: Coercion
-	* Converting Values
-	* Abstract Value Operations
-	* Explicit Coercion
-	* Implicit Coercion
-	* Loose Equals vs Strict Equals
-	* Abstract Relational Comparison
-* Chapter 5: Grammar
-	* Statements & Expressions
-	* Operator Precedence
-	* Automatic Semicolons
-	* Errors
-	* Function Arguments
-	* `try..finally`
-	* `switch`
-* Appendix A: Mixed Environment JavaScript
-* Appendix B: Acknowledgments
-
+* [Foreword](foreword.md)
+* [Preface](../preface.md)
+* [Chapter 1: Types](ch1.md#chapter-1-types)
+	- [A Type By Any Other Name...](ch1.md#a-type-by-any-other-name)
+	  - [Built-in Types](ch1.md#built-in-types)
+	  - [Values as Types](ch1.md#values-as-types)
+	    - [`undefined` vs "undeclared"](ch1.md#undefined-vs-undeclared)
+	    - [`typeof` Undeclared](ch1.md#typeof-undeclared)
+	  - [Review](ch1.md#review)
+* [Chapter 2: Values](ch2.md#chapter-2-values)
+	- [Arrays](ch2.md#arrays)
+	- [Strings](ch2.md#strings)
+	- [Numbers](ch2.md#numbers)
+	- [Special Values](ch2.md#special-values)
+	- [Value vs. Reference](ch2.md#value-vs-reference)
+	- [Review](ch2.md#review)
+* [Chapter 3: Natives](ch3.md#chapter-3-natives)
+  - [Internal `[[Class]]`](ch3.md#internal-class)
+  - [Boxing Wrappers](ch3.md#boxing-wrappers)
+  - [Unboxing](ch3.md#unboxing)
+  - [Natives as Constructors](ch3.md#natives-as-constructors)
+  - [Review](ch3.md#review)
+* [Chapter 4: Coercion](ch4.md#chapter-4-coercion)
+  - [Converting Values](ch4.md#converting-values)
+  - [Abstract Value Operations](ch4.md#abstract-value-operations)
+  - [Explicit Coercion](ch4.md#explicit-coercion)
+  - [Implicit Coercion](ch4.md#implicit-coercion)
+  - [Loose Equals vs. Strict Equals](ch4.md#loose-equals-vs-strict-equals)
+  - [Abstract Relational Comparison](ch4.md#abstract-relational-comparison)
+  - [Review](ch4.md#review)
+* [Chapter 5: Grammar](ch5.md#chapter-5-grammar)
+  - [Statements & Expressions](ch5.md#statements-&-expressions)
+  - [Operator Precedence](ch5.md#operator-precedence)
+  - [Automatic Semicolons](ch5.md#automatic-semicolons)
+  - [Errors](ch5.md#errors)
+  - [Function Arguments](ch5.md#function-arguments)
+  - [`try..finally`](ch5.md#tryfinally)
+  - [`switch`](ch5.md#switch)
+  - [Review](ch5.md#review)
+* [Appendix A: Mixed Environment JavaScript](#apA.md)
+* [Appendix B: Acknowledgments](#apB.md)

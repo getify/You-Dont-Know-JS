@@ -2,32 +2,37 @@
 
 ## Table of Contents
 
-* Foreword
-* Preface
-* Chapter 1: What is Scope?
-	* Compiler Theory
-	* Understanding Scope
-	* Nested Scope
-	* Errors
-* Chapter 2: Lexical Scope
-	* Lex-time
-	* Cheating Lexical
-* Chapter 3: Function vs. Block Scope
-	* Scope From Functions
-	* Hiding In Plain Scope
-	* Functions As Scopes
-	* Blocks As Scopes
-* Chapter 4: Hoisting
-	* Chicken Or The Egg?
-	* The Compiler Strikes Again
-	* Functions First
-* Chapter 5: Scope Closures
-	* Enlightenment
-	* Nitty Gritty
-	* Now I Can See
-	* Loops + Closure
-	* Modules
-* Appendix A: Dynamic Scope
-* Appendix B: Polyfilling Block Scope
-* Appendix C: Lexical-this
-* Appendix D: Acknowledgments
+* [Foreword](foreword.md)
+* [Preface](../preface.md)
+- [Chapter 1: What is Scope?](ch1.md#chapter-1-what-is-scope)
+  - [Compiler Theory](ch1.md#compiler-theory)
+  - [Understanding Scope](ch1.md#understanding-scope)
+  - [Nested Scope](ch1.md#nested-scope)
+  - [Errors](ch1.md#errors)
+  - [Review](ch1.md#review-tldr)
+- [Chapter 2: Lexical Scope](ch2.md#chapter-2-lexical-scope)
+  - [Lex-time](ch2.md#lex-time)
+  - [Cheating Lexical](ch2.md#cheating-lexical)
+  - [Review](ch2.md#review-tldr)
+- [Chapter 3: Function vs. Block Scope](ch3.md#chapter-3-function-vs-block-scope)
+  - [Scope From Functions](ch3.md#scope-from-functions)
+  - [Hiding In Plain Scope](ch3.md#hiding-in-plain-scope)
+  - [Functions As Scopes](ch3.md#functions-as-scopes)
+  - [Blocks As Scopes](ch3.md#blocks-as-scopes)
+  - [Review](ch3.md#review-tldr)
+- [Chapter 4: Hoisting](ch4.md#chapter-4-hoisting)
+  - [Chicken Or The Egg?](ch4.md#chicken-or-the-egg)
+  - [The Compiler Strikes Again](ch4.md#the-compiler-strikes-again)
+  - [Functions First](ch4.md#functions-first)
+  - [Review](ch4.md#review-tldr)
+- [Chapter 5: Scope Closure](ch5.md#chapter-5-scope-closure)
+  - [Enlightenment](ch5.md#enlightenment)
+  - [Nitty Gritty](ch5.md#nitty-gritty)
+  - [Now I Can See](ch5.md#now-i-can-see)
+  - [Loops + Closure](ch5.md#loops--closure)
+  - [Modules](ch5.md#modules)
+  - [Review](ch5.md#review-tldr)
+* [Appendix A: Dynamic Scope](#apA.md)
+* [Appendix B: Polyfilling Block Scope](#apB.md)
+* [Appendix C: Lexical-this](#apC.md)
+* [Appendix D: Acknowledgments](#apD.md)
