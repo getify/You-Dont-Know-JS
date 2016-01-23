@@ -1,18 +1,6 @@
 # You Don't Know JS: Up & Going
 # Chapter 3: Into YDKJS
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-What is this series all about? Put simply, it's about taking seriously the task of learning *all parts of JavaScript*, not just some subset of the language that someone called "the good parts," and not just whatever minimal amount you need to get your job done at work.
-
-- [Scope & Closures](#scope-&-closures)
-- [this & Object Prototypes](#this-&-object-prototypes)
-- [Types & Grammar](#types-&-grammar)
-- [Async & Performance](#async-&-performance)
-- [ES6 & Beyond](#es6-&-beyond)
-- [Review](#review)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 What is this series all about? Put simply, it's about taking seriously the task of learning *all parts of JavaScript*, not just some subset of the language that someone called "the good parts," and not just whatever minimal amount you need to get your job done at work.
 
 Serious developers in other languages expect to put in the effort to learn most or all of the language(s) they primarily write in, but JS developers seem to stand out from the crowd in the sense of typically not learning very much of the language. This is not a good thing, and it's not something we should continue to allow to be the norm.
