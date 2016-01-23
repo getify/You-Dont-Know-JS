@@ -2,8 +2,8 @@
 
 ## Table of Contents
 
-* [Foreword](foreword.md)
-* [Preface](../preface)
+- [Foreword](foreword.md)
+- [Preface](../preface)
 - [Chapter 1: Asynchrony: Now & Later](#chapter-1-asynchrony-now-&-later)
   - [A Program in Chunks](#a-program-in-chunks)
   - [Event Loop](#event-loop)
@@ -51,6 +51,6 @@
   - [Microperformance](#microperformance)
   - [Tail Call Optimization (TCO)](#tail-call-optimization-tco)
   - [Review](#review)
-* [Appendix A: *asynquence* Library](apA.md)
-* [Appendix B: Advanced Async Patterns](apB.md)
-* [Appendix C: Acknowledgments](apC.md)
+- [Appendix A: -asynquence- Library](apA.md)
+- [Appendix B: Advanced Async Patterns](apB.md)
+- [Appendix C: Acknowledgments](apC.md)

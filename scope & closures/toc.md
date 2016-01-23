@@ -2,8 +2,8 @@
 
 ## Table of Contents
 
-* [Foreword](foreword.md)
-* [Preface](../preface.md)
+- [Foreword](foreword.md)
+- [Preface](../preface.md)
 - [Chapter 1: What is Scope?](ch1.md#chapter-1-what-is-scope)
   - [Compiler Theory](ch1.md#compiler-theory)
   - [Understanding Scope](ch1.md#understanding-scope)
@@ -32,7 +32,7 @@
   - [Loops + Closure](ch5.md#loops--closure)
   - [Modules](ch5.md#modules)
   - [Review](ch5.md#review-tldr)
-* [Appendix A: Dynamic Scope](#apA.md)
-* [Appendix B: Polyfilling Block Scope](#apB.md)
-* [Appendix C: Lexical-this](#apC.md)
-* [Appendix D: Acknowledgments](#apD.md)
+- [Appendix A: Dynamic Scope](#apA.md)
+- [Appendix B: Polyfilling Block Scope](#apB.md)
+- [Appendix C: Lexical-this](#apC.md)
+- [Appendix D: Acknowledgments](#apD.md)
