@@ -41,5 +41,5 @@
   - [`try..finally`](ch5.md#tryfinally)
   - [`switch`](ch5.md#switch)
   - [Review](ch5.md#review)
-- [Appendix A: Mixed Environment JavaScript](#apA.md)
-- [Appendix B: Acknowledgments](#apB.md)
+- [Appendix A: Mixed Environment JavaScript](apA.md)
+- [Appendix B: Acknowledgments](apB.md)

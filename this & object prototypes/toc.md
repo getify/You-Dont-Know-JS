@@ -41,5 +41,5 @@
   - [Nicer Syntax](ch6.md#nicer-syntax)
   - [Introspection](ch6.md#introspection)
   - [Review](ch6.md#review-tldr)
--  [Appendix A: ES6 `class`](#apA.md)
--  [Appendix B: Acknowledgments](#apB.md)
+-  [Appendix A: ES6 `class`](apA.md)
+-  [Appendix B: Acknowledgments](apB.md)
