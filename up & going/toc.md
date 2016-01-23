@@ -2,34 +2,61 @@
 
 ## Table of Contents
 
-* Foreword
-* Preface
-* Chapter 1: Into Programming
-	* Code
-	* Try It Yourself
-	* Operators
-	* Values & Types
-	* Code Comments
-	* Variables
-	* Blocks
-	* Conditionals
-	* Loops
-	* Functions
-	* Practice
-* Chapter 2: Into JavaScript
-	* Values & Types
-	* Variables
-	* Conditionals
-	* Strict Mode
-	* Functions As Values
-	* `this` Keyword
-	* Prototypes
-	* Old & New
-	* Non-JavaScript
-* Chapter 3: Into YDKJS
-	* Scope & Closures
-	* this & Object Prototypes
-	* Types & Grammar
-	* Async & Performance
-	* ES6 & Beyond
+* [Foreword](foreword.md)
+* [Preface](..preface.md)
+* [Chapter 1: Into Programming](ch1.md)
+	- [Code](ch1.md#code)
+	  - [Statements](ch1.md#statements)
+	  - [Expressions](ch1.md#expressions)
+	  - [Executing a Program](ch1.md#executing-a-program)
+	- [Try It Yourself](ch1.md#try-it-yourself)
+	  - [Output](ch1.md#output)
+	  - [Input](ch1.md#input)
+	- [Operators](ch1.md#operators)
+	- [Values & Types](ch1.md#values-&-types)
+	  - [Converting Between Types](ch1.md#converting-between-types)
+	- [Code Comments](ch1.md#code-comments)
+	- [Variables](ch1.md#variables)
+	- [Blocks](ch1.md#blocks)
+	- [Conditionals](ch1.md#conditionals)
+	- [Loops](ch1.md#loops)
+	- [Functions](ch1.md#functions)
+	  - [Scope](ch1.md#scope)
+	- [Practice](ch1.md#practice)
+	- [Review](ch1.md#review)
+* [Chapter 2: Into JavaScript](#ch2.md)
+	- [Values & Types](ch2.md#values-types)
+	  - [Objects](ch2.md#objects)
+		- [Arrays](ch2.md#arrays)
+		- [Functions](ch2.md#functions)
+	  - [Built-In Type Methods](ch2.md#built-in-type-methods)
+	  - [Comparing Values](ch2.md#comparing-values)
+		- [Coercion](ch2.md#coercion)
+		- [Truthy & Falsy](ch2.md#truthy-falsy)
+		- [Equality](ch2.md#equality)
+		- [Inequality](ch2.md#inequality)
+	- [Variables](ch2.md#variables)
+	  - [Function Scopes](ch2.md#function-scopes)
+		- [Hoisting](ch2.md#hoisting)
+		- [Nested Scopes](ch2.md#nested-scopes)
+	- [Conditionals](ch2.md#conditionals)
+	- [Strict Mode](ch2.md#strict-mode)
+	- [Functions As Values](ch2.md#functions-as-values)
+	  - [Immediately Invoked Function Expressions (IIFEs)](ch2.md#immediately-invoked-function-expressions-iifes-)
+	  - [Closure](ch2.md#closure)
+		- [Modules](ch2.md#modules)
+	- [`this` Identifier](ch2.md#-this-identifier)
+	- [Prototypes](ch2.md#prototypes)
+	- [Old & New](ch2.md#old-new)
+	  - [Polyfilling](ch2.md#polyfilling)
+	  - [Transpiling](ch2.md#transpiling)
+	- [Non-JavaScript](ch2.md#non-javascript)
+	- [Review](ch2.md#review)
+* [Chapter 3: Into YDKJS](#ch3.md)
+	- [Scope & Closures](#scope-closures)
+	- [this & Object Prototypes](#this-object-prototypes)
+	- [Types & Grammar](#types-grammar)
+	- [Async & Performance](#async-performance)
+	- [ES6 & Beyond](#es6-beyond)
+	- [Review](#review)
 * Appendix A: Acknowledgments

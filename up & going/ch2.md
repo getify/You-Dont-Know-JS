@@ -1,6 +1,39 @@
 # You Don't Know JS: Up & Going
 # Chapter 2: Into JavaScript
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+In the previous chapter, I introduced the basic building blocks of programming, such as variables, loops, conditionals, and functions. Of course, all the code shown has been in JavaScript. But in this chapter, we want to focus specifically on things you need to know about JavaScript to get up and going as a JS developer.
+
+- [Values & Types](#values-&-types)
+  - [Objects](#objects)
+    - [Arrays](#arrays)
+    - [Functions](#functions)
+  - [Built-In Type Methods](#built-in-type-methods)
+  - [Comparing Values](#comparing-values)
+    - [Coercion](#coercion)
+    - [Truthy & Falsy](#truthy-&-falsy)
+    - [Equality](#equality)
+    - [Inequality](#inequality)
+- [Variables](#variables)
+  - [Function Scopes](#function-scopes)
+    - [Hoisting](#hoisting)
+    - [Nested Scopes](#nested-scopes)
+- [Conditionals](#conditionals)
+- [Strict Mode](#strict-mode)
+- [Functions As Values](#functions-as-values)
+  - [Immediately Invoked Function Expressions (IIFEs)](#immediately-invoked-function-expressions-iifes)
+  - [Closure](#closure)
+    - [Modules](#modules)
+- [`this` Identifier](#this-identifier)
+- [Prototypes](#prototypes)
+- [Old & New](#old-&-new)
+  - [Polyfilling](#polyfilling)
+  - [Transpiling](#transpiling)
+- [Non-JavaScript](#non-javascript)
+- [Review](#review)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 In the previous chapter, I introduced the basic building blocks of programming, such as variables, loops, conditionals, and functions. Of course, all the code shown has been in JavaScript. But in this chapter, we want to focus specifically on things you need to know about JavaScript to get up and going as a JS developer.
 
 We will introduce quite a few concepts in this chapter that will not be fully explored until subsequent *YDKJS* books. You can think of this chapter as an overview of the topics covered in detail throughout the rest of this series.
