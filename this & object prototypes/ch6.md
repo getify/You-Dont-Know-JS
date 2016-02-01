@@ -70,13 +70,13 @@ Basically, you think about performing task "XYZ" as needing behaviors from two s
 Here's some simple code to suggest how you accomplish that:
 
 ```js
-Task = {
+var Task = {
 	setID: function(ID) { this.id = ID; },
 	outputID: function() { console.log( this.id ); }
 };
 
 // make `XYZ` delegate to `Task`
-XYZ = Object.create( Task );
+var XYZ = Object.create( Task );
 
 XYZ.prepareTask = function(ID,Label) {
 	this.setID( ID );
@@ -232,7 +232,7 @@ Parent class `Foo`, inherited by child class `Bar`, which is then instantiated t
 Now, let's implement **the exact same functionality** using *OLOO* style code:
 
 ```js
-Foo = {
+var Foo = {
 	init: function(who) {
 		this.me = who;
 	},
@@ -241,7 +241,7 @@ Foo = {
 	}
 };
 
-Bar = Object.create( Foo );
+var Bar = Object.create( Foo );
 
 Bar.speak = function() {
 	alert( "Hello, " + this.identify() + "." );
