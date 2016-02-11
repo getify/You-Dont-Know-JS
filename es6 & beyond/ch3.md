@@ -1899,6 +1899,7 @@ ES6 to the rescue:
 ```js
 class Oops extends Error {
 	constructor(reason) {
+		super(reason);
 		this.oops = reason;
 	}
 }
