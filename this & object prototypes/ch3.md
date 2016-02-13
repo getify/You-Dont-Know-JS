@@ -550,7 +550,7 @@ In `non-strict mode`, the creation of `b` fails silently. In `strict mode`, it t
 
 `Object.seal(..)` creates a "sealed" object, which means it takes an existing object and essentially calls `Object.preventExtensions(..)` on it, but also marks all its existing properties as `configurable:false`.
 
-So, not only can you not add anymore properties, but you also cannot reconfigure or delete any existing properties (though you *can* still modify their values).
+So, not only can you not add any more properties, but you also cannot reconfigure or delete any existing properties (though you *can* still modify their values).
 
 #### Freeze
 
