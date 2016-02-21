@@ -1566,8 +1566,8 @@ But how will we actually orchestrate this interaction? First, let's just do it m
 var it1 = reqData( "http://some.url.1" );
 var it2 = reqData( "http://some.url.2" );
 
-var p1 = it1.next();
-var p2 = it2.next();
+var p1 = it1.next().value;
+var p2 = it2.next().value;
 
 p1
 .then( function(data){
@@ -1600,8 +1600,8 @@ function *reqData(url) {
 var it1 = reqData( "http://some.url.1" );
 var it2 = reqData( "http://some.url.2" );
 
-var p1 = it1.next();
-var p2 = it2.next();
+var p1 = it1.next().value;
+var p2 = it2.next().value;
 
 p1.then( function(data){
 	it1.next( data );
