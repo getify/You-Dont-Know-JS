@@ -260,7 +260,7 @@ var tasks = {
 
 The iterator on `tasks` steps through functions found in the `actions` array property, if any, and executes them one at a time, passing in whatever arguments you pass to `next(..)`, and returning any return value to you in the standard `IteratorResult` object.
 
-Here's how we could could use this `tasks` queue:
+Here's how we could use this `tasks` queue:
 
 ```js
 tasks.actions.push(
