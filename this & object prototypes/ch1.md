@@ -1,19 +1,34 @@
 # You Don't Know JS: *this* & Object Prototypes
 # Chapter 1: `this` Or That?
 
+# 你不懂JS: *this* & Object Prototypes
+# 第一章: `this` 还是 That？
+
 One of the most confused mechanisms in JavaScript is the `this` keyword. It's a special identifier keyword that's automatically defined in the scope of every function, but what exactly it refers to bedevils even seasoned JavaScript developers.
 
+Javascript中最令人困惑的机制之一就是`this`关键字。它是一个自动定义每个函数作用域的特殊识别符，但是即便是一些老练的开发者也感到困扰——它到底指向哪里。
+
 > Any sufficiently *advanced* technology is indistinguishable from magic. -- Arthur C. Clarke
+> 任何足够“先进”的技术都跟魔法没有区别。-- Arthur C. Clarke
 
 JavaScript's `this` mechanism isn't actually *that* advanced, but developers often paraphrase that quote in their own mind by inserting "complex" or "confusing", and there's no question that without lack of clear understanding, `this` can seem downright magical in *your* confusion.
 
+实际上Javascript的`this`机制没有“那么”先进，但是开发者们总是引用这句话来表达“复杂”和“混乱”，毫无疑问，如果没有清晰的认识，在*你的*混乱中`this`看起来就是彻头彻尾的魔法。
+
 **Note:** The word "this" is a terribly common pronoun in general discourse. So, it can be very difficult, especially verbally, to determine whether we are using "this" as a pronoun or using it to refer to the actual keyword identifier. For clarity, I will always use `this` to refer to the special keyword, and "this" or *this* or this otherwise.
 
+**注意：** `this`这个词是在一般的论述中极其通用的代词。所以——特别是在口头论述中——很难确定我们是在用`this`作为一个代词，还是在将它作为一个实际的关键字识别符。为了表意清晰，我会总是用`this`来代表那个特殊的关键字，而在其他情况下使用“this”或*this*。
+
 ## Why `this`?
+## 为什么用 `this`？
 
 If the `this` mechanism is so confusing, even to seasoned JavaScript developers, one may wonder why it's even useful? Is it more trouble than it's worth? Before we jump into the *how*, we should examine the *why*.
 
+如果对于那些老练的Javascript开发者来说`this`机制都是如此的令人费解，那人们会问为什么这种机制会有用？它带来的好处会比麻烦多吗？在解释*如何*有用之前，我们应当先来看看*为什么*有用。
+
 Let's try to illustrate the motivation and utility of `this`:
+
+让我试着描绘一下`this`的动机和效用：
 
 ```js
 function identify() {
@@ -42,9 +57,15 @@ speak.call( you ); // Hello, I'm READER
 
 If the *how* of this snippet confuses you, don't worry! We'll get to that shortly. Just set those questions aside briefly so we can look into the *why* more clearly.
 
+如果这个代码片段的工作方式让你困惑，不要担心！我们很快就会解释它。我只是简略地将这些问题放在旁边，以便于我们可以更清晰的研究*为什么*。
+
 This code snippet allows the `identify()` and `speak()` functions to be re-used against multiple *context* (`me` and `you`) objects, rather than needing a separate version of the function for each object.
 
+这个代码片段允许`identify()`和`speak()`函数对多个**环境**对象（`me`和`you`）进行复用，而不是针对每个对象定义函数的不同版本。
+
 Instead of relying on `this`, you could have explicitly passed in a context object to both `identify()` and `speak()`.
+
+通过使用`this`，你可以明确地将环境对象传递给`identify()`和`speak()`函数。
 
 ```js
 function identify(context) {
@@ -62,25 +83,45 @@ speak( me ); // Hello, I'm KYLE
 
 However, the `this` mechanism provides a more elegant way of implicitly "passing along" an object reference, leading to cleaner API design and easier re-use.
 
+然而，`this`机制提供了更优雅的方式来隐含地“传入”一个对象引用，发展出更加干净的API设计和更容易的复用。
+
 The more complex your usage pattern is, the more clearly you'll see that passing context around as an explicit parameter is often messier than passing around a `this` context. When we explore objects and prototypes, you will see the helpfulness of a collection of functions being able to automatically reference the proper context object.
 
+你的使用模式越复杂，你就会越清晰地感觉到：将执行环境作为一个参数传递，通常比传递`this`执行环境要乱。当我们探索objects和prototypes时，你将会看到一组可以自动指向合适的执行环境的函数，以及它们是多么有用。
+
 ## Confusions
+## 困惑
 
 We'll soon begin to explain how `this` *actually* works, but first we must  dispel some misconceptions about how it *doesn't* actually work.
 
+我们很快就要开始解释`this`是如何**实际**工作的，但我们首先要抛弃一些错误概念——它实际上**不是**如何工作的。
+
 The name "this" creates confusion when developers try to think about it too literally. There are two meanings often assumed, but both are incorrect.
 
+在开发者们用太过于字面的方式考虑`this`这个名字时，困惑就产生了。这通常会产生两种臆测，但都是不对的。
+
 ### Itself
+### 它自己
 
 The first common temptation is to assume `this` refers to the function itself. That's a reasonable grammatical inference, at least.
 
+第一种通常的倾向是，臆测`this`指向函数自己。这至少是一种语法上的合理推测。
+
 Why would you want to refer to a function from inside itself? The most common reasons would be things like recursion (calling a function from inside itself) or having an event handler that can unbind itself when it's first called.
+
+为什么你想要在函数内部引用它自己？最通常的理由是递归（在函数内部调用它自己），或者是有一个在第一次别调用时会解除自己绑定的事件处理器。（TODO）
 
 Developers new to JS's mechanisms often think that referencing the function as an object (all functions in JavaScript are objects!) lets you store *state* (values in properties) between function calls. While this is certainly possible and has some limited uses, the rest of the book will expound on many other patterns for *better* places to store state besides the function object.
 
+初次接触JS机制的开发者们通常认为，将函数作为一个对象引用，可以让你在方法调用之间储存一些**状态**（值和属性）。这当然是可能的，而且有一些有限的用处，但这本书的其余部分将会阐述许多其他的模式，来找到比函数对象**更好**的地方来存储状态。
+
 But for just a moment, we'll explore that pattern, to illustrate how `this` doesn't let a function get a reference to itself like we might have assumed.
 
+我们来看看一个模式，来展示`this`是如何不让一个函数向我们想象的那样，得到它自身的引用的。
+
 Consider the following code, where we attempt to track how many times a function (`foo`) was called:
+
+考虑下面的代码，我们试图追踪函数(`foo`)被调用的多少次：
 
 ```js
 function foo(num) {
@@ -105,14 +146,21 @@ for (i=0; i<10; i++) {
 // foo: 9
 
 // how many times was `foo` called?
-console.log( foo.count ); // 0 -- WTF?
+// `foo`别调用了多少次？
+console.log( foo.count ); // 0 -- 这他妈怎么回事……？
 ```
 
 `foo.count` is *still* `0`, even though the four `console.log` statements clearly indicate `foo(..)` was in fact called four times. The frustration stems from a *too literal* interpretation of what `this` (in `this.count++`) means.
 
+`foo.count`**依然**是`0`, 即便四个`console.log`语句明明告诉我们`foo(..)`实际上被调用了四次。这种尝试的失败来源于对于`this` (在`this.count++`中)的含义的过于字面化的理解。
+
 When the code executes `foo.count = 0`, indeed it's adding a property `count` to the function object `foo`. But for the `this.count` reference inside of the function, `this` is not in fact pointing *at all* to that function object, and so even though the property names are the same, the root objects are different, and confusion ensues.
 
+当执行代码`foo.count = 0`时，确实在函数对象`foo`中加入了一个`count`属性。但是对于函数内部的`this.count`引用，`this`其实**根本就不**指向那个函数对象，即便属性名称一样，但根对象也不同，困惑应运而生。
+
 **Note:** A responsible developer *should* ask at this point, "If I was incrementing a `count` property but it wasn't the one I expected, which `count` *was* I incrementing?" In fact, were she to dig deeper, she would find that she had accidentally created a global variable `count` (see Chapter 2 for *how* that happened!), and it currently has the value `NaN`. Of course, once she identifies this peculiar outcome, she then has a whole other set of questions: "How was it global, and why did it end up `NaN` instead of some proper count value?" (see Chapter 2).
+
+**注意：** 一个负责任的开发者应当在这里提出一个问题：“如果我递增的`count`属性不是我以为的那个，那是哪个`count`被我递增了？”。实际上——如果他再挖的深一些——他会发现自己不小心创建了一个全局变量`count`（第二章解释了这是如何发生的），而且它当前的值是`NaN`。当然，一旦他发现这个不寻常的结果后，他会有一堆其他的问题：“它怎么是全局的？为什么它是`NaN`而不是某个合适的值？”。
 
 Instead of stopping at this point and digging into why the `this` reference doesn't seem to be behaving as *expected*, and answering those tough but important questions, many developers simply avoid the issue altogether, and hack toward some other solution, such as creating another object to hold the `count` property:
 
