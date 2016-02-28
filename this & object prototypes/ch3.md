@@ -1,13 +1,20 @@
-# You Don't Know JS: *this* & Object Prototypes
-# Chapter 3: Objects
+# 你不懂JS: *this* & Object Prototypes
+# 第三章：对象
 
 In Chapters 1 and 2, we explained how the `this` binding points to various objects depending on the call-site of the function invocation. But what exactly are objects, and why do we need to point to them? We will explore objects in detail in this chapter.
 
+在第一和第二种中，我们解释了`this`绑定如何根据函数调用的call-site指向不同的对象。但究竟什么事对象，为什么我们需要指向它们？这一章我们就来详细探索一下对象。
+
 ## Syntax
+## 语法
 
 Objects come in two forms: the declarative (literal) form, and the constructed form.
 
+对象来自于两种形式：声明（字面）形式，和构造形式。
+
 The literal syntax for an object looks like this:
+
+一个对象的字面语法看起来像这样：
 
 ```js
 var myObj = {
@@ -18,6 +25,8 @@ var myObj = {
 
 The constructed form looks like this:
 
+构造形式看起来像这样：
+
 ```js
 var myObj = new Object();
 myObj.key = value;
@@ -25,11 +34,18 @@ myObj.key = value;
 
 The constructed form and the literal form result in exactly the same sort of object. The only difference really is that you can add one or more key/value pairs to the literal declaration, whereas with constructed-form objects, you must add the properties one-by-one.
 
+构造形式和字面形式都会得到完全同种类的对象。唯一真正的区别在于你可以向字面声明一次性添加一个或多个键/值对，而对于构造形式，你必须一个一个地添加属性。
+
 **Note:** It's extremely uncommon to use the "constructed form" for creating objects as just shown. You would pretty much always want to use the literal syntax form. The same will be true of most of the built-in objects (see below).
 
+**注意：** 像刚才展示的那样使用“构造形式”来创建对象是极其少见的。你很有可能总是想使用字面语法形式。对大多数内建的对象也一样（后述）。
+
 ## Type
+## 类型
 
 Objects are the general building block upon which much of JS is built. They are one of the 6 primary types (called "language types" in the specification) in JS:
+
+对象是大多数JS工程依赖的基本构建块儿（TODO）。它们是JS的6中主要类型（在语言规范中称为“语言类型”）中的一种。
 
 * `string`
 * `number`
@@ -40,11 +56,19 @@ Objects are the general building block upon which much of JS is built. They are 
 
 Note that the *simple primitives* (`string`, `number`, `boolean`, `null`, and `undefined`) are **not** themselves `objects`. `null` is sometimes referred to as an object type, but this misconception stems from a bug in the language which causes `typeof null` to return the string `"object"` incorrectly (and confusingly). In fact, `null` is its own primitive type.
 
+注意 *简单原基本型* （`string`，`number`，`boolean`，`null`，和`undefined`）自身 **不是** `object`。`null`有事会被当成一个对象类型，但是这种误解源自与一个语言中的Bug，它使得`typeof null`错误地（令人困惑地）返回字符串`"object"`。实际上，`null`是它自己的基本类型
+
 **It's a common mis-statement that "everything in JavaScript is an object". This is clearly not true.**
+
+**一个常见的错误声明：“JavaScript中的一切都是对象”。这明显是不对的。**
 
 By contrast, there *are* a few special object sub-types, which we can refer to as *complex primitives*.
 
+对比来看，存在几种特殊的对象子类型，我们称之为 *复杂基本类型*。
+
 `function` is a sub-type of object (technically, a "callable object"). Functions in JS are said to be "first class" in that they are basically just normal objects (with callable behavior semantics bolted on), and so they can be handled like any other plain object.
+
+`function`是对象的一种子类型（技术上讲，叫做“可调用对象”）。函数在JS中被称为“头等”类型，就因为它们基本上仅仅是一般的对象（带有），而且它们可以向其他普通的对象那样被处理。
 
 Arrays are also a form of objects, with extra behavior. The organization of contents in arrays is slightly more structured than for general objects.
 
