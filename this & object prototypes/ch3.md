@@ -68,13 +68,18 @@ By contrast, there *are* a few special object sub-types, which we can refer to a
 
 `function` is a sub-type of object (technically, a "callable object"). Functions in JS are said to be "first class" in that they are basically just normal objects (with callable behavior semantics bolted on), and so they can be handled like any other plain object.
 
-`function`是对象的一种子类型（技术上讲，叫做“可调用对象”）。函数在JS中被称为“头等”类型，就因为它们基本上仅仅是一般的对象（带有），而且它们可以向其他普通的对象那样被处理。
+`function`是对象的一种子类型（技术上讲，叫做“可调用对象”）。函数在JS中被称为“头等”类型，就因为它们基本上仅仅是一般的对象（带有），而且它们可以像其他普通的对象那样被处理。
 
 Arrays are also a form of objects, with extra behavior. The organization of contents in arrays is slightly more structured than for general objects.
 
+数组也是一种特殊形式的对象，带有特别的行为。数组在内容的组织上要稍稍比一般的对象更加结构化。
+
 ### Built-in Objects
+### 内建对象
 
 There are several other object sub-types, usually referred to as built-in objects. For some of them, their names seem to imply they are directly related to their simple primitives counter-parts, but in fact, their relationship is more complicated, which we'll explore shortly.
+
+有几种其他的对象子类型，通常称为内建对象。对于它们中的一些来说，它们的名称看起来暗示着它们和它们对应的基本类型有着直接的联系，但事实上，它们的关系更复杂，我们一会儿就开始探索。
 
 * `String`
 * `Number`
@@ -88,7 +93,11 @@ There are several other object sub-types, usually referred to as built-in object
 
 These built-ins have the appearance of being actual types, even classes, if you rely on the similarity to other languages such as Java's `String` class.
 
+如果你依照和其他语言的相似性来看的话，比如Java语言的`String`类，这些内建类型有着实际类型的外观，甚至是class（类）的外观，
+
 But in JS, these are actually just built-in functions. Each of these built-in functions can be used as a constructor (that is, a function call with the `new` operator -- see Chapter 2), with the result being a newly *constructed* object of the sub-type in question. For instance:
+
+但是在JS中，它们实际上仅仅是内建的函数。这些内建函数的每一个都可以被用作构造器（也就是，一个函数可以和`new`操作符调用——参照第二章），其结果是一个新 *构建* 的相应子类型的对象。比如：
 
 ```js
 var strPrimitive = "I am a string";
@@ -105,11 +114,18 @@ Object.prototype.toString.call( strObject );	// [object String]
 
 We'll see in detail in a later chapter exactly how the `Object.prototype.toString...` bit works, but briefly, we can inspect the internal sub-type by borrowing the base default `toString()` method, and you can see it reveals that `strObject` is an object that was in fact created by the `String` constructor.
 
+我们会在本章稍后详细地看到`Object.prototype.toString...`到底是如何工作的，但简单地说，我们可以通过借用基本的默认`toString()`方法来考察子类型的内部，而且你可以看到它揭示了`strObject`实际上是由`String`构造器创建的对象。
+
 The primitive value `"I am a string"` is not an object, it's a primitive literal and immutable value. To perform operations on it, such as checking its length, accessing its individual character contents, etc, a `String` object is required.
+
+基本类型值`"I am a string"`不是一个对象，它是一个不可变的基本字面值。为了对它进行操作，比如检查它的长度，访问它的各个独立字符内容等等，都需要一个`String`对象。
 
 Luckily, the language automatically coerces a `"string"` primitive to a `String` object when necessary, which means you almost never need to explicitly create the Object form. It is **strongly preferred** by the majority of the JS community to use the literal form for a value, where possible, rather than the constructed object form.
 
+幸运的是，在必要的时候，语言本身会自动将`"string"`基本类型强制转换为`String`对象类型。这意味着你几乎从不需要明确地创建对象。主流的JS社区都 **强烈推荐** 你尽可能地使用字面形式的值，而非使用构造的对象形式。
+
 Consider:
+考虑：
 
 ```js
 var strPrimitive = "I am a string";
@@ -121,21 +137,37 @@ console.log( strPrimitive.charAt( 3 ) );	// "m"
 
 In both cases, we call a property or method on a string primitive, and the engine automatically coerces it to a `String` object, so that the property/method access works.
 
+在这两个例子中，我们在字符串的基本类型上调用属性和方法，引擎会自动地将它强制转换为`String`对象，所以这些属性/方法的访问可以工作。
+
 The same sort of coercion happens between the number literal primitive `42` and the `new Number(42)` object wrapper, when using methods like `42.359.toFixed(2)`. Likewise for `Boolean` objects from `"boolean"` primitives.
+
+当使用如`42.359.toFixed(2)`这样的方法时，同样的强制转换也发生在数字基本字面量`42`和包装对象`new Nubmer(42)`之间。同样的还有`Boolean`对象和`"boolean"`基本类型。
 
 `null` and `undefined` have no object wrapper form, only their primitive values. By contrast, `Date` values can *only* be created with their constructed object form, as they have no literal form counter-part.
 
+`null`和`undefined`没有包装对象的形式，仅有它们的基本类型值。相比之下，`Date`的值仅仅可以由它们的构造对象形式创建，因为它们没有对应的字面形式。
+
 `Object`s, `Array`s, `Function`s, and `RegExp`s (regular expressions) are all objects regardless of whether the literal or constructed form is used. The constructed form does offer, in some cases, more options in creation than the literal form counterpart. Since objects are created either way, the simpler literal form is almost universally preferred. **Only use the constructed form if you need the extra options.**
+
+无论使用字面还是构造形式，`Object`，`Array`，`Function`，和`RegExp`（正则表达式）都是对象。在某些情况下，构造形式确实会比对应的字面形式提供更多的创建选项。因为对象可以被任意一种方式创建，更简单的字面形式几乎是所有人的首选。**仅仅在你需要使用额外的选项时使用构建形式**。
 
 `Error` objects are rarely created explicitly in code, but usually created automatically when exceptions are thrown. They can be created with the constructed form `new Error(..)`, but it's often unnecessary.
 
+`Error`对象很少在代码中明示地被创建，它们通常在抛出异常时自动地被创建。它们可以由`new Error(..)`构造形式创建，但通常是不必要的。
+
 ## Contents
+## 内容
 
 As mentioned earlier, the contents of an object consist of values (any type) stored at specifically named *locations*, which we call properties.
 
+正如刚才提到的，对象的内容由存储在特定命名的 *位置* 上的（任意类型的）值组成，我们称这些值为属性。
+
 It's important to note that while we say "contents" which implies that these values are *actually* stored inside the object, that's merely an appearance. The engine stores values in implementation-dependent ways, and may very well not store them *in* some object container. What *is* stored in the container are these property names, which act as pointers (technically, *references*) to where the values are stored.
 
+有一个重要的事情需要注意：当我们说“内容”时，似乎暗示这这些值 *实际上* 存储在对象内部，但那只不过是表面现象。引擎会根据自己的实现来存储这些值，而且通常都不是把它们存储在容器对象 *内容*。在容器存储的是这些属性的名称，它们像指针（技术上讲，叫 *reference*）一样指向值存储的地方。
+
 Consider:
+考虑：
 
 ```js
 var myObject = {
@@ -149,9 +181,15 @@ myObject["a"];	// 2
 
 To access the value at the *location* `a` in `myObject`, we need to use either the `.` operator or the `[ ]` operator. The `.a` syntax is usually referred to as "property" access, whereas the `["a"]` syntax is usually referred to as "key" access. In reality, they both access the same *location*, and will pull out the same value, `2`, so the terms can be used interchangeably. We will use the most common term, "property access" from here on.
 
+为了访问在`myObject`的位置`a`的值，我们需要使用`.`或`[ ]`操作符。`.a`语法通常称为“属性”访问，而`["a"]`语法通常称为“key（键）”访问。在现实中，它们俩都访问相同的 *位置*，而且会拿出相同的值，`2`，所以这些名词可以互换使用。从现在起，我们将使用最常见的名词——“属性访问”。
+
 The main difference between the two syntaxes is that the `.` operator requires an `Identifier` compatible property name after it, whereas the `[".."]` syntax can take basically any UTF-8/unicode compatible string as the name for the property. To reference a property of the name "Super-Fun!", for instance, you would have to use the `["Super-Fun!"]` access syntax, as `Super-Fun!` is not a valid `Identifier` property name.
 
+两种语法的主要区别在于，`.`操作符后面需要一个`Identifier（标识符）`兼容的属性名，而`[".."]`语法基本可以接收任何兼容UTF-8/unicode的字符串作为属性名。举个例子，为了引用一个名为“Super-Fun”的属性，你不得不使用`["Super-Fun"]`语法访问，因为`Super-Fun`不是一个合法的`Identifier`属性名。
+
 Also, since the `[".."]` syntax uses a string's **value** to specify the location, this means the program can programmatically build up the value of the string, such as:
+
+而且，由于`[".."]`语法使用字符串的 **值** 来指定位置，这意味着程序可以动态地组建字符串的值。比如：
 
 ```js
 var wantA = true;
@@ -172,6 +210,8 @@ console.log( myObject[idx] ); // 2
 
 In objects, property names are **always** strings. If you use any other value besides a `string` (primitive) as the property, it will first be converted to a string. This even includes numbers, which are commonly used as array indexes, so be careful not to confuse the use of numbers between objects and arrays.
 
+在对象中，属性名 **总是** 字符串。如果你使用字符串以外的（基本）类型的值，它会首先被转换为字符串。这甚至包括在数组中常用于索引的数字，所以要小心不要将对象和数组使用的数字搞混了。
+
 ```js
 var myObject = { };
 
@@ -185,10 +225,15 @@ myObject["[object Object]"];	// "baz"
 ```
 
 ### Computed Property Names
+### 可计算属性名
 
 The `myObject[..]` property access syntax we just described is useful if you need to use a computed expression value *as* the key name, like `myObject[prefix + name]`. But that's not really helpful when declaring objects using the object-literal syntax.
 
+如果你需要将一个计算表达式 *作为* 一个键名称，那么我们刚刚描述的`myObject[..]`属性访问语法是十分有用的，比如`myObject[prefix + name]`。但是当使用字面对象语法声明对象时则没有什么帮助。
+
 ES6 adds *computed property names*, where you can specify an expression, surrounded by a `[ ]` pair, in the key-name position of an object-literal declaration:
+
+ES6加入了 *可计算属性名*，在一个字面对象声明的键名称位置，你可以指定一个表达式，用`[ ]`括起来：
 
 ```js
 var prefix = "foo";
@@ -204,6 +249,8 @@ myObject["foobaz"]; // world
 
 The most common usage of *computed property names* will probably be for ES6 `Symbol`s, which we will not be covering in detail in this book. In short, they're a new primitive data type which has an opaque unguessable value (technically a `string` value). You will be strongly discouraged from working with the *actual value* of a `Symbol` (which can theoretically be different between different JS engines), so the name of the `Symbol`, like `Symbol.Something` (just a made up name!), will be what you use:
 
+*可计算属性名* 的最常见用法，可能是用于ES6的`Symbol`，我们将不会在本书中涵盖关于它的细节。简短解说，它们是新的基本数据类型，拥有一个不透明不可知的值（技术上讲是一个`string`值）。你将会强烈地不被鼓励使用一个`Symbol`的 *实际值* （这个值理论上会因JS引擎的不同而不同），所以`Symbol`的名称，比如`Symbol.Something`（这是个瞎编的名称！），才是你会使用的：
+
 ```js
 var myObject = {
 	[Symbol.Something]: "hello world"
@@ -211,16 +258,27 @@ var myObject = {
 ```
 
 ### Property vs. Method
+### Property（属性） vs. Method（方法）
 
 Some developers like to make a distinction when talking about a property access on an object, if the value being accessed happens to be a function. Because it's tempting to think of the function as *belonging* to the object, and in other languages, functions which belong to objects (aka, "classes") are referred to as "methods", it's not uncommon to hear, "method access" as opposed to "property access".
 
+有些开发者喜欢在讨论对一个对象的属性访问时做一个区别，如果这个被访问的值恰好是一个函数的话。因为这诱使人们认为函数 *属于* 这个对象，而且在其他语言中，属于对象（也就是“类”）的函数被称作“方法”，所以相对于“属性访问”，我们常能听到“方法访问”。
+
 **The specification makes this same distinction**, interestingly.
+
+有趣的是，**语言规范也做出了同样的区别**。
 
 Technically, functions never "belong" to objects, so saying that a function that just happens to be accessed on an object reference is automatically a "method" seems a bit of a stretch of semantics.
 
+从技术上讲，函数绝不会“属于”对象，所以说一个对象的引用上刚好被访问的函数自动是一个“方法”，看起来有些像是语义的延伸。
+
 It *is* true that some functions have `this` references in them, and that *sometimes* these `this` references refer to the object reference at the call-site. But this usage really does not make that function any more a "method" than any other function, as `this` is dynamically bound at run-time, at the call-site, and thus its relationship to the object is indirect, at best.
 
+有些函数确实拥有`this`引用，而且 *有时* 这些`this`引用表示call-site的对象引用。但这个用法真的没有使这个函数比其他函数更像“方法”，因为`this`是在运行时动态绑定的，在call-site，这使得它与这个对象的关系至多是间接的。
+
 Every time you access a property on an object, that is a **property access**, regardless of the type of value you get back. If you *happen* to get a function from that property access, it's not magically a "method" at that point. There's nothing special (outside of possible implicit `this` binding as explained earlier) about a function that comes from a property access.
+
+每次你访问一个对象的属性都是一个 **属性访问**，无论你得到什么类型的值。如果你 *恰好* 从属性访问中得到一个函数，它也没有魔法般地在那时成为一个“方法”。一个从属性访问得来的函数没有任何特殊性（隐式`this`绑定之外的可能性在刚才已经解释过了）。
 
 For instance:
 
@@ -244,13 +302,23 @@ myObject.someFoo;	// function foo(){..}
 
 `someFoo` and `myObject.someFoo` are just two separate references to the same function, and neither implies anything about the function being special or "owned" by any other object. If `foo()` above was defined to have a `this` reference inside it, that `myObject.someFoo` *implicit binding* would be the **only** observable difference between the two references. Neither reference really makes sense to be called a "method".
 
+`someFoo`和`myObject.someFoo`只不过是同一个函数的两个分离的引用，它们中的任何一个都不意味着这个函数很特别或被其他对象所“拥有”。如果上面的`foo()`定义里面拥有一个`this`引用，那么`myObject.someFoo`的 *implicit binding* 将会是这个两个引用间 **唯一** 可以观察到的不同。它们中的任何一个都没有称为“方法”的道理。
+
 **Perhaps one could argue** that a function *becomes a method*, not at definition time, but during run-time just for that invocation, depending on how it's called at its call-site (with an object reference context or not -- see Chapter 2 for more details). Even this interpretation is a bit of a stretch.
+
+**也许有人会争辩**，函数 *变成了方法*，不是在定义期间，而是在调用的执行期间，根据它是如何在call-site被调用的。甚至这种解读也有些牵强。
 
 The safest conclusion is probably that "function" and "method" are interchangeable in JavaScript.
 
+可能最安全的结论是，在JavaScript中，“函数”和“方法”是可以互换使用的。
+
 **Note:** ES6 adds a `super` reference, which is typically going to be used with `class` (see Appendix A). The way `super` behaves (static binding rather than late binding as `this`) gives further weight to the idea that a function which is `super` bound somewhere is more a "method" than "function". But again, these are just subtle semantic (and mechanical) nuances.
 
+**注意：** ES6加入了`super`引用，它很典型地是和`class`（见附录A）一起使用的。`super`的行为方式，给了这种说法更多的权重——一个`super`绑定到某处的函数比起“函数”更像一个“方法”。但是再一次地，这仅仅是微妙的语义上的（和机制上的）细微区别。
+
 Even when you declare a function expression as part of the object-literal, that function doesn't magically *belong* more to the object -- still just multiple references to the same function object:
+
+就算你声明一个函数表达式作为字面对象的一部分，那个函数都不会魔法般地 *属于* 这个对象——仍然仅仅是同一个函数对象的多个引用罢了。
 
 ```js
 var myObject = {
@@ -267,6 +335,8 @@ myObject.foo;	// function foo(){..}
 ```
 
 **Note:** In Chapter 6, we will cover an ES6 short-hand for that `foo: function foo(){ .. }` declaration syntax in our object-literal.
+
+**注意：** 在第六张中，我们会为字面对象的`foo: function foo(){ .. }`声明语法介绍一种ES6的简化语法。
 
 ### Arrays
 
