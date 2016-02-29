@@ -336,11 +336,14 @@ myObject.foo;	// function foo(){..}
 
 **Note:** In Chapter 6, we will cover an ES6 short-hand for that `foo: function foo(){ .. }` declaration syntax in our object-literal.
 
-**注意：** 在第六张中，我们会为字面对象的`foo: function foo(){ .. }`声明语法介绍一种ES6的简化语法。
+**注意：** 在第六章中，我们会为字面对象的`foo: function foo(){ .. }`声明语法介绍一种ES6的简化语法。
 
 ### Arrays
+### 数组
 
 Arrays also use the `[ ]` access form, but as mentioned above, they have slightly more structured organization for how and where values are stored (though still no restriction on what *type* of values are stored). Arrays assume *numeric indexing*, which means that values are stored in locations, usually called *indices*, at non-negative integers, such as `0` and `42`.
+
+数组也使用`[ ]`访问形式，但正如上面提到的，在存储值的方式和位置上它们的组织更加结构化（虽然仍然在存储值的类型上没有限制）。数组采用 *数字索引*，这意味着值被存储的位置，通常称为“下标”，是一个非负整数，比如`0`和`42`。
 
 ```js
 var myArray = [ "foo", 42, "bar" ];
@@ -354,6 +357,8 @@ myArray[2];			// "bar"
 
 Arrays *are* objects, so even though each index is a positive integer, you can *also* add properties onto the array:
 
+数组是对象，所以即便每个索引都是正整数，你也可以在数组上添加属性：
+
 ```js
 var myArray = [ "foo", 42, "bar" ];
 
@@ -366,9 +371,15 @@ myArray.baz;	// "baz"
 
 Notice that adding named properties (regardless of `.` or `[ ]` operator syntax) does not change the reported `length` of the array.
 
+注意，添加命名属性（不论是使用`.`还是`[ ]`操作符语法）不会改变数组的`length`所报告的值。
+
 You *could* use an array as a plain key/value object, and never add any numeric indices, but this is a bad idea because arrays have behavior and optimizations specific to their intended use, and likewise with plain objects. Use objects to store key/value pairs, and arrays to store values at numeric indices.
 
+你可以把一个数组当做普通的键/值对象使用，并且从不添加任何数字下标，但这不是好主意，因为数组拥有对它本来的用途有特定的行为和优化，正如普通对象那样。使用对象来存储键/值对，而用数组在数字下标上存储值。
+
 **Be careful:** If you try to add a property to an array, but the property name *looks* like a number, it will end up instead as a numeric index (thus modifying the array contents):
+
+**小心：** 如果你试图在一个数组上添加属性，但是属性名 *看起来* 像一个数字，那么最终它会成为一个数字索引（也就是改变了数组的内容）：
 
 ```js
 var myArray = [ "foo", 42, "bar" ];
@@ -381,10 +392,14 @@ myArray[3];		// "baz"
 ```
 
 ### Duplicating Objects
+### 复制对象
 
 One of the most commonly requested features when developers newly take up the JavaScript language is how to duplicate an object. It would seem like there should just be a built-in `copy()` method, right? It turns out that it's a little more complicated than that, because it's not fully clear what, by default, should be the algorithm for the duplication.
 
+当开发者们初次拿起Javascript语言时，最常需求的特性就是如何复制一个对象。看起来应该有一个内建的`copy()`方法，对吧？但是事情实际上比这复杂一些，因为在默认情况下，复制的算法应当是什么，并不明确。
+
 For example, consider this object:
+比如，考虑这个对象：
 
 ```js
 function anotherFunction() { /*..*/ }
@@ -397,8 +412,8 @@ var anotherArray = [];
 
 var myObject = {
 	a: 2,
-	b: anotherObject,	// reference, not a copy!
-	c: anotherArray,	// another reference!
+	b: anotherObject,	// 引用，不是拷贝!
+	c: anotherArray,	// 又一个引用!
 	d: anotherFunction
 };
 
@@ -407,15 +422,27 @@ anotherArray.push( anotherObject, myObject );
 
 What exactly should be the representation of a *copy* of `myObject`?
 
+一个`myObject`的 *拷贝* 究竟应该什么样儿？
+
 Firstly, we should answer if it should be a *shallow* or *deep* copy? A *shallow copy* would end up with `a` on the new object as a copy of the value `2`, but `b`, `c`, and `d` properties as just references to the same places as the references in the original object. A *deep copy* would duplicate not only `myObject`, but `anotherObject` and `anotherArray`. But then we have issues that `anotherArray` has references to `anotherObject` and `myObject` in it, so *those* should also be duplicated rather than reference-preserved. Now we have an infinite circular duplication problem because of the circular reference.
+
+首先，我们应该回答它是一个 *shallow（浅）* 还是一个 *deep（深）* 拷贝？一个 *shallow copy（浅拷贝）* 会得到一个新对象，它的`a`是值`2`的拷贝，但`b`，`c`和`d`属性仅仅是引用，它们指向源对象中引用的相同位置。一个 *deep copy（深拷贝）* 将不仅复制`myObject`，还会复制`anotherObject`和`anotherArray`。但之后我们让`anotherArray`拥有`anotherObject`和`myObject`的引用，所以 *那些* 也应当被复制而不是仅保留引用。现在由于循环引用，我们得到了一个无限循环复制的问题。
 
 Should we detect a circular reference and just break the circular traversal (leaving the deep element not fully duplicated)? Should we error out completely? Something in between?
 
+我们应道检测循环引用并打破循环遍历吗（不管位于深处的，没有完全复制的元素）？我们应当报错退出吗？或者介于两者之间？
+
 Moreover, it's not really clear what "duplicating" a function would mean? There are some hacks like pulling out the `toString()` serialization of a function's source code (which varies across implementations and is not even reliable in all engines depending on the type of function being inspected).
+
+另外，“复制”一个函数意味着什么，也不是很清楚。有一些技巧，比如提取一个函数源代码的`toString()`序列化表达（这个源代码会因实现不同而不同，而且根据被考察的函数的类型，其结果甚至在所有引擎上都不可靠）。
 
 So how do we resolve all these tricky questions? Various JS frameworks have each picked their own interpretations and made their own decisions. But which of these (if any) should JS adopt as *the* standard? For a long time, there was no clear answer.
 
+那么我们如何解决所有这些刁钻的问题？不同的JS框架都各自挑选自己的解释并且做出自己的选择。但是哪一种（如果有的话）才是JS应当作为标准采用的呢？长久以来，没有明确答案。
+
 One subset solution is that objects which are JSON-safe (that is, can be serialized to a JSON string and then re-parsed to an object with the same structure and values) can easily be *duplicated* with:
+
+一个解决方案的子集是，一个JSON安全的对象（也就是，可以被序列化为一个JSON字符串，之后还可以被重新变换为拥有相同的结构和值的对象）可以简单地这样复制：
 
 ```js
 var newObj = JSON.parse( JSON.stringify( someObj ) );
@@ -423,7 +450,11 @@ var newObj = JSON.parse( JSON.stringify( someObj ) );
 
 Of course, that requires you to ensure your object is JSON safe. For some situations, that's trivial. For others, it's insufficient.
 
+当然，这要求你保证你的对象是JSON安全的。对于某些情况，这没什么大不了的。而对另一些情况，这还不够。
+
 At the same time, a shallow copy is fairly understandable and has far less issues, so ES6 has now defined `Object.assign(..)` for this task. `Object.assign(..)` takes a *target* object as its first parameter, and one or more *source* objects as its subsequent parameters. It iterates over all the *enumerable* (see below), *owned keys* (**immediately present**) on the *source* object(s) and copies them (via `=` assignment only) to *target*. It also, helpfully, returns *target*, as you can see below:
+
+同时，浅拷贝相当易懂，而且没有那么多问题，所以ES6为此任务已经定义了`Object.assign(..)`。`Object.assign(..)`接收 *目标* 对象作为第一个参数，然后是一个或多个 *源* 对象作为后续参数。它会在 *源* 对象上迭代所有的 *enumerable（可枚举）*，*owned keys*（**直接拥有的键**），并把它们拷贝到 *目标* 对象上（仅通过`=`赋值）。它也会为了方便，返回 *目标* 对象，正如下面你可以看到的：
 
 ```js
 var newObj = Object.assign( {}, myObject );
@@ -436,13 +467,22 @@ newObj.d === anotherFunction;	// true
 
 **Note:** In the next section, we describe "property descriptors" (property characteristics) and show the use of `Object.defineProperty(..)`. The duplication that occurs for `Object.assign(..)` however is purely `=` style assignment, so any special characteristics of a property (like `writable`) on a source object **are not preserved** on the target object.
 
+**注意：** 在下一部分中，我们将讨论“property descriptors（属性描述符）”并展示`Object.defineProperty(..)`的使用。然而在`Object.assign(..)`中发生的复制是单纯的`=`式赋值，所以任何在源对象属性的特殊性质（比如`writable`）在目标对象上 **都不会保留** 。
+
 ### Property Descriptors
+### Property Descriptors（属性描述符）
 
 Prior to ES5, the JavaScript language gave no direct way for your code to inspect or draw any distinction between the characteristics of properties, such as whether the property was read-only or not.
 
+在ES5之前，Javascript语言没有给出直接的方法，让你的代码可以考察或描述属性的性质间的区别，比如属性是否为只读。
+
 But as of ES5, all properties are described in terms of a **property descriptor**.
 
+在ES5中，所有的属性都用 **Property Descriptors（属性描述符）** 来描述。
+
 Consider this code:
+
+考虑这段代码：
 
 ```js
 var myObject = {
@@ -460,9 +500,14 @@ Object.getOwnPropertyDescriptor( myObject, "a" );
 
 As you can see, the property descriptor (called a "data descriptor" since it's only for holding a data value) for our normal object property `a` is much more than just its `value` of `2`. It includes 3 other characteristics: `writable`, `enumerable`, and `configurable`.
 
+正如你所见，我们普通的对象属性`a`,它的属性描述符（称为“数据描述符”，因为它仅持有一个数据值）的内容要比`value`为`2`多得多。它还包含另外3个性质：`writable`, `enumerable`, 和`configurable`.
+
 While we can see what the default values for the property descriptor characteristics are when we create a normal property, we can use `Object.defineProperty(..)` to add a new property, or modify an existing one (if it's `configurable`!), with the desired characteristics.
 
+当我们创建一个普通属性时，可以看到属性描述符的各种性质的默认值，我们可以用`Object.defineProperty(..)`来添加新属性，或使用期望的性质来修改既存的属性（如果它是`configurable`的！）。
+
 For example:
+举例来说：
 
 ```js
 var myObject = {};
@@ -479,11 +524,17 @@ myObject.a; // 2
 
 Using `defineProperty(..)`, we added the plain, normal `a` property to `myObject` in a manually explicit way. However, you generally wouldn't use this manual approach unless you wanted to modify one of the descriptor characteristics from its normal behavior.
 
+使用`defineProperty(..)`，我们手动明确地在`myObject`上添加了一个直白的，普通的`a`属性。然而，你通常不会使用这种手动方法，除非你想要把描述符的某个性质修改为不同的值。
+
 #### Writable
+#### Writable（可写性）
 
 The ability for you to change the value of a property is controlled by `writable`.
 
+`writable`控制着你改变属性值的能力。
+
 Consider:
+考虑：
 
 ```js
 var myObject = {};
@@ -502,6 +553,8 @@ myObject.a; // 2
 
 As you can see, our modification of the `value` silently failed. If we try in `strict mode`, we get an error:
 
+如你所见，我们对`value`的修改无声地失败了。如果我们在`strict mode`下进行尝试，会得到一个错误：
+
 ```js
 "use strict";
 
@@ -519,11 +572,18 @@ myObject.a = 3; // TypeError
 
 The `TypeError` tells us we cannot change a non-writable property.
 
+这个`TypeError`告诉我们，我们不能改变一个不可写属性。
+
 **Note:** We will discuss getters/setters shortly, but briefly, you can observe that `writable:false` means a value cannot be changed, which is somewhat equivalent to if you defined a no-op setter. Actually, your no-op setter would need to throw a `TypeError` when called, to be truly conformant to `writable:false`.
 
+**注意：** 我们一会儿就会讨论getters/setters，但是简单地说，你可以观察到`writable:false`意味着值不可改变，和你定义一个空的setter是有些等价的。实际上，你的空setter在被调用时需要扔出一个`TypeError`，来和`writable:false`保持一致。
+
 #### Configurable
+#### Configurable（可配置性）
 
 As long as a property is currently configurable, we can modify its descriptor definition, using the same `defineProperty(..)` utility.
+
+只要属性当前是可配置的，我们就可以使用同样的`defineProperty(..)`工具，修改它的描述符定义。
 
 ```js
 var myObject = {
@@ -554,9 +614,15 @@ Object.defineProperty( myObject, "a", {
 
 The final `defineProperty(..)` call results in a TypeError, regardless of `strict mode`, if you attempt to change the descriptor definition of a non-configurable property. Be careful: as you can see, changing `configurable` to `false` is a **one-way action, and cannot be undone!**
 
+最后的`defineProperty(..)`调用导致了一个TypeError，这与`strict mode`无关，如果你试图改变一个不可配置属性的描述符定义，就会发生TypeError。要小心：如你所看到的，将`configurable`设置为`false`是 **一个单向操作，而且不可撤销**。
+
 **Note:** There's a nuanced exception to be aware of: even if the property is already `configurable:false`, `writable` can always be changed from `true` to `false` without error, but not back to `true` if already `false`.
 
+**注意：** 这里有一个需要注意的微小例外：即便属性已经是`configurable:false`，`writable`总是可以没有错误地从`true`改变为`false`，但如果已经是`false`的话不能变回`true`。
+
 Another thing `configurable:false` prevents is the ability to use the `delete` operator to remove an existing property.
+
+`configurable:false`阻止的另外一个能力是使用`delete`操作符移除既存属性。
 
 ```js
 var myObject = {
@@ -581,23 +647,41 @@ myObject.a;				// 2
 
 As you can see, the last `delete` call failed (silently) because we made the `a` property non-configurable.
 
+如你所见，最后的`delete`调用失败了（无声地），因为我们将`a`属性设置成了不可配置。
+
 `delete` is only used to remove object properties (which can be removed) directly from the object in question. If an object property is the last remaining *reference* to some object/function, and you `delete` it, that removes the reference and now that unreferenced object/function can be garbage collected. But, it is **not** proper to think of `delete` as a tool to free up allocated memory as it does in other languages (like C/C++). `delete` is just an object property removal operation -- nothing more.
 
+`delete`仅用于直接从目标对象移除该对象的属性（可以被移除的属性）。如果一个对象的属性是某个其他对象/函数的最后一个既存引用，而你`delete`了它，那么这就移除了这个引用，于是现在那个没有被引用的对象/函数就可以被作为垃圾回收。但是，将`delete`当做一个像其他语言（如C/C++）中那样的释放内存工具是不合适的。`delete`仅仅是一个对象属性移除操作——没有更多别的含义。
+
 #### Enumerable
+#### Enumerable（可枚举性）
 
 The final descriptor characteristic we will mention here (there are two others, which we deal with shortly when we discuss getter/setters) is `enumerable`.
 
+我们将要在这里提到的最后一个描述符性质是`enumerable`（还有另外两个，我们将在一会儿讨论getter/setters时谈到）。
+
 The name probably makes it obvious, but this characteristic controls if a property will show up in certain object-property enumerations, such as the `for..in` loop. Set to `false` to keep it from showing up in such enumerations, even though it's still completely accessible. Set to `true` to keep it present.
+
+它的名称可能已经使它的功能很明显了，这个性质控制着一个属性是否能在特定的对象属性枚举操作中出现，比如`for..in`循环。设置为`false`将会阻止它出现在这样的枚举中，即使它依然完全是可以访问的。设置为`true`会使它出现。
 
 All normal user-defined properties are defaulted to `enumerable`, as this is most commonly what you want. But if you have a special property you want to hide from enumeration, set it to `enumerable:false`.
 
+所有普通的用户定义属性都默认是可`enumerable`的，正如你通常希望的那样。但如果你有一个特殊的属性，你想让它对枚举隐藏，就将它设置为`enumerable:false`。
+
 We'll demonstrate enumerability in much more detail shortly, so keep a mental bookmark on this topic.
 
+我们一会儿就更加详细地演示可枚举性，所以在大脑中给这个话题上打一个书签。
+
 ### Immutability
+### Immutability（不可变性）
 
 It is sometimes desired to make properties or objects that cannot be changed (either by accident or intentionally). ES5 adds support for handling that in a variety of different nuanced ways.
 
+有时我们希望将属性或对象（有意或无意地）设置为不可改变的。ES5用几种微妙不同的方式，加入了对此功能的支持。
+
 It's important to note that **all** of these approaches create shallow immutability. That is, they affect only the object and its direct property characteristics. If an object has a reference to another object (array, object, function, etc), the *contents* of that object are not affected, and remain mutable.
+
+一个重要的注意点是：**所有** 这些方法都创建的是浅不可变性。也就是，它们仅影响对象和它的直属属性的性质。如果对象拥有对其他对象（数组，对象，函数等）的引用，那个对象的 *内容* 不会受影响，任然保持可变。
 
 ```js
 myImmutableObject.foo; // [1,2,3]
@@ -607,11 +691,18 @@ myImmutableObject.foo; // [1,2,3,4]
 
 We assume in this snippet that `myImmutableObject` is already created and protected as immutable. But, to also protect the contents of `myImmutableObject.foo` (which is its own object -- array), you would also need to make `foo` immutable, using one or more of the following functionalities.
 
+在这段代码中，我们假想`myImmutableObject`已经被创建，而且被保护为不可变。但是，为了保护`myImmutableObject.foo`的内容（也是一个对象——数组），你将需要使用下面的一个或多个方法将`foo`设置为不可变。
+
 **Note:** It is not terribly common to create deeply entrenched immutable objects in JS programs. Special cases can certainly call for it, but as a general design pattern, if you find yourself wanting to *seal* or *freeze* all your objects, you may want to take a step back and reconsider your program design to be more robust to potential changes in objects' values.
 
+**注意：** 在JS程序中创建完全不可动摇的对象是不那么常见的。有些特殊情况当然需要，但作为一个普通的设计模式，如果你发现自己想要 *seal（封印）* 或 *freeze（冻结）* 你所有的对象，那么你可能想要退一步来重新考虑你的程序设计，让它对对象的值得潜在变化更加健壮。
+
 #### Object Constant
+#### Object Constant（对象常量）
 
 By combining `writable:false` and `configurable:false`, you can essentially create a *constant* (cannot be changed, redefined or deleted) as an object property, like:
+
+通过将`writable:false`与`configurable:false`组合，你可以实质上创建一个作为对象属性的 *常量*（不能被改变，重定义或删除），比如：
 
 ```js
 var myObject = {};
@@ -624,8 +715,11 @@ Object.defineProperty( myObject, "FAVORITE_NUMBER", {
 ```
 
 #### Prevent Extensions
+#### Prevent Extensions（防止扩展）
 
 If you want to prevent an object from having new properties added to it, but otherwise leave the rest of the object's properties alone, call `Object.preventExtensions(..)`:
+
+如果你想防止一个对象被添加新的属性，但相反想保留其他既存的对象属性，调用`Object.preventExtensions(..)`：
 
 ```js
 var myObject = {
@@ -640,20 +734,33 @@ myObject.b; // undefined
 
 In `non-strict mode`, the creation of `b` fails silently. In `strict mode`, it throws a `TypeError`.
 
+在`非-strict mode`模式下，`b`的创建会无声地失败。在`strict mode`下，它会抛出`TypeError`。
+
 #### Seal
+#### Seal（封印）
 
 `Object.seal(..)` creates a "sealed" object, which means it takes an existing object and essentially calls `Object.preventExtensions(..)` on it, but also marks all its existing properties as `configurable:false`.
 
+`Object.seal(..)`创建一个“封印”的对象，这只意味着它实质上在当前的对象上调用`Object.preventExtensions(..)`，同时也将它所有的既存属性标记为`configurable:false`。
+
 So, not only can you not add any more properties, but you also cannot reconfigure or delete any existing properties (though you *can* still modify their values).
 
+所以，你既不能添加更多的属性，也不能重新配置或删除寄存属性（虽然你依然 *可以* 修改它们的值）。
+
 #### Freeze
+#### Freeze（冻结）
 
 `Object.freeze(..)` creates a frozen object, which means it takes an existing object and essentially calls `Object.seal(..)` on it, but it also marks all "data accessor" properties as `writable:false`, so that their values cannot be changed.
 
+`Object.freeze(..)`创建一个冻结的对象，这只意味着它实质上在当前的对象上调用`Object.seal(..)`，同时也将它所有的“数据访问”属性设置为`writable:false`，所以他们的值不可改变。
+
 This approach is the highest level of immutability that you can attain for an object itself, as it prevents any changes to the object or to any of its direct properties (though, as mentioned above, the contents of any referenced other objects are unaffected).
+
+这种方法是你可以从对象自身获得的最高级别的不可变性，正如它阻止任何对对象或对象的直属属性的改变（虽然，如上面提到的，任何被引用的对象的内容不受影响）。
 
 You could "deep freeze" an object by calling `Object.freeze(..)` on the object, and then recursively iterating over all objects it references (which would have been unaffected thus far), and calling `Object.freeze(..)` on them as well. Be careful, though, as that could affect other (shared) objects you're not intending to affect.
 
+你可以“深度冻结”一个对象：在这个对象上调用`Object.freeze(..)`，然后递归地迭代所有它引用的对象（目前还没有受过影响的），然后在它们上也调用`Object.freeze(..)`。但是要小心，这可能会影响其他（共享的）你并不打算影响的对象。
 
 ### `[[Get]]`
 
