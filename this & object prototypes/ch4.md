@@ -1,61 +1,113 @@
-# You Don't Know JS: *this* & Object Prototypes
-# Chapter 4: Mixing (Up) "Class" Objects
+# 你不懂JS: *this* & Object Prototypes
+# 第四章: Mixing (Up) "Class" Objects
 
 Following our exploration of objects from the previous chapter, it's natural that we now turn our attention to "object oriented (OO) programming", with "classes". We'll first look at "class orientation" as a design pattern, before examining the mechanics of "classes": "instantiation", "inheritance" and "(relative) polymorphism".
 
+接着我们上一章对对象的探索，我们很自然的将注意力转移到“面向对象编程”，与“classes（类）”。我们先来看看“面向类”的设计模式，之后我们再考察“类”的机制：“instantiation（初始化）”, “inheritance（继承）”与“(relative) polymorphism（相对多态）”。
+
 We'll see that these concepts don't really map very naturally to the object mechanism in JS, and the lengths (mixins, etc.) many JavaScript developers go to overcome such challenges.
+
+我们将会看到，这些概念并不是非常自然地映射到JS的对象机制上，（TODO）
 
 **Note:** This chapter spends quite a bit of time (the first half!) on heavy "objected oriented programming" theory. We eventually relate these ideas to real concrete JavaScript code in the second half, when we talk about "Mixins". But there's a lot of concept and pseudo-code to wade through first, so don't get lost -- just stick with it!
 
+**注意：** 这一章花了相当一部分时间（前一半！）在着重解释“面向对象编程”理论上。在后半部分讨论“Mixins（混合）”时，我们最终会将这些内容与真实且实际的JavaScript代码联系起来。但是这里首先要蹚过许多概念和假想代码，所以可别迷路了——坚持下去！
+
 ## Class Theory
+## Class（类）理论
 
 "Class/Inheritance" describes a certain form of code organization and architecture -- a way of modeling real world problem domains in our software.
 
+“类/继承”描述了一种特定的代码组织和结构形式——一种在我们的软件中对真实世界的建模方法。
+
 OO or class oriented programming stresses that data intrinsically has associated behavior (of course, different depending on the type and nature of the data!) that operates on it, so proper design is to package up (aka, encapsulate) the data and the behavior together. This is sometimes called "data structures" in formal computer science.
+
+OO或者面向类的编程强调数据和操作它的行为有固有的联系（当然，依数据的类型和性质不同而不同！），所以合理的设计师将数据和行为打包在一起（也称为封装）。这有时在正式的计算机科学中称为“数据结构”。
 
 For example, a series of characters that represents a word or phrase is usually called a "string". The characters are the data. But you almost never just care about the data, you usually want to *do things* with the data, so the behaviors that can apply *to* that data (calculating its length, appending data, searching, etc.) are all designed as methods of a `String` class.
 
+比如，表示一个单词或短语的一系列字符通常称为“string（字符串）”。这些字符就是数据。但你几乎从来不关心数据，你总是相对数据 *做事情*， 所以可以 *向* 数据实施的行为（计算它的长度，在末尾添加数据，检索，等等）都被设计成为`String`类的方法。
+
 Any given string is just an instance of this class, which means that it's a neatly collected packaging of both the character data and the functionality we can perform on it.
+
+任何给定的字符串都是这个类的一个实例，这个类是一个整齐的集合包装：字符数据和我们可以对它进行的操作功能。
 
 Classes also imply a way of *classifying* a certain data structure. The way we do this is to think about any given structure as a specific variation of a more general base definition.
 
+类还隐含着对一个特定数据结构的一种 *分类* 方法。我们这么做的方法是，将一个给定的结构考虑为一个更加泛化的基础定义的具体种类。
+
 Let's explore this classification process by looking at a commonly cited example. A *car* can be described as a specific implementation of a more general "class" of thing, called a *vehicle*.
+
+让我们通过一个最常被引用的例子来探索这种分类处理。一辆 *车* 可以被描述为一“类”更泛化的东西——*载具*——的具体实现。
 
 We model this relationship in software with classes by defining a `Vehicle` class and a `Car` class.
 
+我们在软件中通过定义`Vehicle`类和`Car`类来模型化这种关系。
+
 The definition of `Vehicle` might include things like propulsion (engines, etc.), the ability to carry people, etc., which would all be the behaviors. What we define in `Vehicle` is all the stuff that is common to all (or most of) the different types of vehicles (the "planes, trains, and automobiles").
+
+`Vehicle`的定义可能会包含像动力（引擎等），载人能力等等，这些都是行为。我们在`Vehicle`中定义的东西，都是所有（或大多数）不同类型的载具（飞机，火车，机动车）都共同拥有的东西。
 
 It might not make sense in our software to re-define the basic essence of "ability to carry people" over and over again for each different type of vehicle. Instead, we define that capability once in `Vehicle`, and then when we define `Car`, we simply indicate that it "inherits" (or "extends") the base definition from `Vehicle`. The definition of `Car` is said to specialize the general `Vehicle` definition.
 
+在我们的软件中为每一种不同类型的载具一次又一次地重定义“载人能力”这个基本性质可能没有道理。取代这种做法的是，我们在`Vehicle`中把这个能力定义一次，之后当我们定义`Car`时，我们简单地指出它从基本的`Vehicle`定义中“继承”（或”“扩展”）。
+
 While `Vehicle` and `Car` collectively define the behavior by way of methods, the data in an instance would be things like the unique VIN of a specific car, etc.
+
+虽然`Vehicle`和`Car`用方法的形式集约地定义了行为，但一个实例中的数据就像一个唯一的车牌号一样属于一辆具体的车。
 
 **And thus, classes, inheritance, and instantiation emerge.**
 
+**这样，类，继承，和实例化就诞生了。**
+
 Another key concept with classes is "polymorphism", which describes the idea that a general behavior from a parent class can be overridden in a child class to give it more specifics. In fact, relative polymorphism lets us reference the base behavior from the overridden behavior.
+
+另一个关于累的关键概念是“polymorphism（多态）”，它描述这样的想法：一个来自于父类的泛化行为可以被子类覆盖，从而使它更加具体。实际上，相对多态让我们在覆盖行为中访问引用基础行为。
 
 Class theory strongly suggests that a parent class and a child class share the same method name for a certain behavior, so that the child overrides the parent (differentially). As we'll see later, doing so in your JavaScript code is opting into frustration and code brittleness.
 
+类理论强烈建议父类和子类对相同的行为共享同样的方法名，所以子类（差异化地）覆盖父类。我们即将看到，在你的JavaScript代码中这么做会导致种种困难和代码脆弱。
+
 ### "Class" Design Pattern
+### "Class（类）"设计模式
 
 You may never have thought about classes as a "design pattern", since it's most common to see discussion of popular "OO Design Patterns", like "Iterator", "Observer", "Factory", "Singleton", etc. As presented this way, it's almost an assumption that OO classes are the lower-level mechanics by which we implement all (higher level) design patterns, as if OO is a given foundation for *all* (proper) code.
 
+你可能从没把类当做一种“设计模式”考虑过，因为最常见的是关于流行的“面向对象设计模式”的讨论，比如“Iterator（迭代器）”，“Observer（观察者）”，“Factory（工厂）”，“Singleton（单例）”等等。当以这种方式表现时，几乎可以假定OO的类是我们实现所有（高级）设计模式的底层机制，好像对所有代码来说OO是一个给定的基础。（TODO）
+
 Depending on your level of formal education in programming, you may have heard of "procedural programming" as a way of describing code which only consists of procedures (aka, functions) calling other functions, without any higher abstractions. You may have been taught that classes were the *proper* way to transform procedural-style "spaghetti code" into well-formed, well-organized code.
+
+取决于你在编程方面接受过的正规教育的水平，你可能听说过“procedural programming（过程式编程）”：一种不用任何高级抽象，仅仅由过程（也就是函数）调用其他函数来构成的描述代码的方式。你可能被告知过，类是一个将过程式风格的“面条代码”转换为结构良好，组织良好代码的 *恰当* 的方法。
 
 Of course, if you have experience with "functional programming" (Monads, etc.), you know very well that classes are just one of several common design patterns. But for others, this may be the first time you've asked yourself if classes really are a fundamental foundation for code, or if they are an optional abstraction on top of code.
 
+当然，如果你有“functional programming（函数式编程）”的经验，你可能知道类只是几种常见设计模式中的一种。但是对于其他人来说，这可能是第一次你问自己，类是否真的是代码的根本基础，或者它们是在代码顶层上的选择性抽象。
+
 Some languages (like Java) don't give you the choice, so it's not very *optional* at all -- everything's a class. Other languages like C/C++ or PHP give you both procedural and class-oriented syntaxes, and it's left more to the developer's choice which style or mixture of styles is appropriate.
+
+有些语言（比如Java）不给你选择，所以这根本没有 *选择性*——一切都是类。其他语言如C/C++或PHP同时给你过程式和面向类的语法，在使用哪种风格合适或混合风格上，留给开发者更多选择。
 
 ### JavaScript "Classes"
 
 Where does JavaScript fall in this regard? JS has had *some* class-like syntactic elements (like `new` and `instanceof`) for quite awhile, and more recently in ES6, some additions, like the `class` keyword (see Appendix A).
 
+在这个问题上JavaScript属于哪一边？JS拥有 *一些* 像类的语法元素（比如`new`和`instanceof`）有一阵子了，而且在最近的ES6中，有一些追加的，比如`class`关键字（见附录A）。
+
 But does that mean JavaScript actually *has* classes? Plain and simple: **No.**
+
+但这意味着JavaScript实际上 *拥有* 类吗？直白且简单：**没有。**
 
 Since classes are a design pattern, you *can*, with quite a bit of effort (as we'll see throughout the rest of this chapter), implement approximations for much of classical class functionality. JS tries to satisfy the extremely pervasive *desire* to design with classes by providing seemingly class-like syntax.
 
+由于类是一种设计模式，你 *可以*，用相当的努力（我们将在本章剩下的部分看到），近似实现很多经典类的功能。JS在通过提供看起来像类的语法，来努力满足用类进行设计的极其广泛的渴望，
+
 While we may have a syntax that looks like classes, it's as if JavaScript mechanics are fighting against you using the *class design pattern*, because behind the curtain, the mechanisms that you build on are operating quite differently. Syntactic sugar and (extremely widely used) JS "Class" libraries go a long way toward hiding this reality from you, but sooner or later you will face the fact that the *classes* you have in other languages are not like the "classes" you're faking in JS.
 
+虽然我们好像有了看起来像类的语法，但是好像JavaScript机制在抵抗你使用 *类设计模式*，因为在底层，这些你正在上面工作的机制运行的十分不同。语法糖和（极其广泛被使用的）JS“Class”包废了很大力气来把这些真实情况对你隐藏起来，但你迟早会面对现实：你在其他语言中遇到的 *类* 和你在JS中模拟的“类”不同。
+
 What this boils down to is that classes are an optional pattern in software design, and you have the choice to use them in JavaScript or not. Since many developers have a strong affinity to class oriented software design, we'll spend the rest of this chapter exploring what it takes to maintain the illusion of classes with what JS provides, and the pain points we experience.
+
+这些归结为，类是软件设计中的一种可选模式，你可以选在在JavaScript中使用或不使用它。因为许多开发者都对面向类的软件设计情有独钟，我们将在本章剩下的部分中探索一下，为了使用JS提供的东西维护类的幻觉要付出什么代价，和我们经历的痛点。
 
 ## Class Mechanics
 
