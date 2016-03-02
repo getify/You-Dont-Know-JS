@@ -446,7 +446,7 @@ To polyfill `Number.isSafeInteger(..)` in pre-ES6 browsers:
 if (!Number.isSafeInteger) {
 	Number.isSafeInteger = function(num) {
 		return Number.isInteger( num ) &&
-			Math.abs( num ) <= Number.MAX_SAFE_INTEGER;
+			Math.abs( num ) < Math.pow(2, 53);
 	};
 }
 ```
