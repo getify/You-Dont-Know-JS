@@ -221,7 +221,11 @@ In JavaScript, classes can't (being that they don't exist!) describe what an obj
 
 There's a peculiar kind of behavior in JavaScript that has been shamelessly abused for years to *hack* something that *looks* like "classes". We'll examine this approach in detail.
 
+在JavaScript中有一种奇异的行为被无耻地滥用了与多年来 *骇* 成某些 *看起来* 像“类”的东西。我们来仔细看看这种方式。
+
 The peculiar "sort-of class" behavior hinges on a strange characteristic of functions: all functions by default get a public, non-enumerable (see Chapter 3) property on them called `prototype`, which points at an otherwise arbitrary object.
+
+“某种程度的类”这种奇特的行为取决于函数的一个奇怪的性质：所有的函数默认都会得到一个公有的，不可枚举的属性，称为`prototype`，它可以指向任意的对象。
 
 ```js
 function Foo() {
@@ -233,11 +237,19 @@ Foo.prototype; // { }
 
 This object is often called "Foo's prototype", because we access it via an unfortunately-named `Foo.prototype` property reference. However, that terminology is hopelessly destined to lead us into confusion, as we'll see shortly. Instead, I will call it "the object formerly known as Foo's prototype". Just kidding. How about: "object arbitrarily labeled 'Foo dot prototype'"?
 
+这个对象经常被称为“Foo的原型”，因为我们通过一个不幸地被命名为`Foo.prototype`的属性引用来访问它。然而，我们马上会看到，这个术语绝望地注定将我们引向困惑。为了取代它，我将它称为“以前被认为是Foo的原型的对象”。只是开个玩笑。“一个被随意标记为‘Foo点儿原型’的对象”，怎么样？
+
 Whatever we call it, what exactly is this object?
+
+不管我们怎么称呼它，这个对象到底是什么？
 
 The most direct way to explain it is that each object created from calling `new Foo()` (see Chapter 2) will end up (somewhat arbitrarily) `[[Prototype]]`-linked to this "Foo dot prototype" object.
 
+解释它的最直接的方法是，每个由调用`new Foo()`（见第二章）而创建的对象将最终（有些随意地）被`[[Prototype]]`链接入这个“Foo点儿原型”对象。
+
 Let's illustrate:
+
+让我们描绘一下：
 
 ```js
 function Foo() {
@@ -251,51 +263,94 @@ Object.getPrototypeOf( a ) === Foo.prototype; // true
 
 When `a` is created by calling `new Foo()`, one of the things (see Chapter 2 for all *four* steps) that happens is that `a` gets an internal `[[Prototype]]` link to the object that `Foo.prototype` is pointing at.
 
+当通过调用`new Foo()`创建`a`时，会发生的事情之一（见第二章了解所有 *四个* 步骤）是，`a`得到一个内部`[[Prototype]]`链接，此链接链到`Foo.prototype`所指向的对象。
+
 Stop for a moment and ponder the implications of that statement.
+
+停一会来思考一下这句话的含义。
 
 In class-oriented languages, multiple **copies** (aka, "instances") of a class can be made, like stamping something out from a mold. As we saw in Chapter 4, this happens because the process of instantiating (or inheriting from) a class means, "copy the behavior plan from that class into a physical object", and this is done again for each new instance.
 
+在面向类的语言中，可以制造一个类的多个 **拷贝**（即“实例”），就像从模具中冲压出某些东西一样。我们在第四章中看到，这是因为初始化（或者继承）类的处理意味着，“将行为计划从这个类拷贝到物理对象中”，对于每个新实例这都会发生。
+
 But in JavaScript, there are no such copy-actions performed. You don't create multiple instances of a class. You can create multiple objects that `[[Prototype]]` *link* to a common object. But by default, no copying occurs, and thus these objects don't end up totally separate and disconnected from each other, but rather, quite ***linked***.
+
+但是在JavaScript中，没有这样的拷贝动作发生。你不会创建类的多个实例。你可以创建多个对象`[[Prototype]]`连接至一个共通对象。但默认地，没有拷贝发生，如此这些对象彼此间最终不会完全分离和切断关系，而是相当地 ***链接在一起***。
 
 `new Foo()` results in a new object (we called it `a`), and **that** new object `a` is internally `[[Prototype]]` linked to the `Foo.prototype` object.
 
+`new Foo()`得到一个新对象（我们叫他`a`），这个新对象`a`内部地被`[[Prototype]]`链接至`Foo.prototype`对象。
+
 **We end up with two objects, linked to each other.** That's *it*. We didn't instantiate a class. We certainly didn't do any copying of behavior from a "class" into a concrete object. We just caused two objects to be linked to each other.
+
+**结果我们得到两个对象，彼此链接。** 如是而已。我们没有初始化一个对象。当然我们也没有做任何从一个“类”到一个实体对象拷贝。我们只是让两个对象互相链接在一起。
 
 In fact, the secret, which eludes most JS developers, is that the `new Foo()` function calling had really almost nothing *direct* to do with the process of creating the link. **It was sort of an accidental side-effect.** `new Foo()` is an indirect, round-about way to end up with what we want: **a new object linked to another object**.
 
+事实上，这个使大多数JS开发者无法理解的秘密，是因为`new Foo()`函数调用实际上几乎和建立链接的处理没有任何 *直接* 关系。**它是某种偶然的副作用。**`new Foo()`是一个间接的，迂回的方法来得到我们想要的：**一个被链接到另一个对象的对象。**
+
 Can we get what we want in a more *direct* way? **Yes!** The hero is `Object.create(..)`. But we'll get to that in a little bit.
+
+我们能用更直接的方法得到我们想要的吗？**可以！** 这位英雄就是`Object.create(..)`。我们过会儿就谈到它。
 
 #### What's in a name?
 
 In JavaScript, we don't make *copies* from one object ("class") to another ("instance"). We make *links* between objects. For the `[[Prototype]]` mechanism, visually, the arrows move from right to left, and from bottom to top.
 
+在JavaScript中，我们不从一个对象（“类”）向另一个对象（“实例”） *拷贝*。我们在对象之间制造 *链接*。对于`[[Prototype]]`机制，视觉上，箭头的移动方向是从右至左，由下至上。
+
 <img src="fig3.png">
 
 This mechanism is often called "prototypal inheritance" (we'll explore the code in detail shortly), which is commonly said to be the dynamic-language version of "classical inheritance". It's an attempt to piggy-back on the common understanding of what "inheritance" means in the class-oriented world, but *tweak* (**read: pave over**) the understood semantics, to fit dynamic scripting.
 
+这种机制常被称为“prototypal inheritance（原型继承）”（我们和快就用代码探索），它经常被说成是动态语言版的“类继承”。这种说法试图建立在“继承”在面向类世界中的含义的共识上。但是 *弄拧*（**意思是：铲平**） 了语义理解，来适应动态脚本。（TODO）
+
 The word "inheritance" has a very strong meaning (see Chapter 4), with plenty of mental precedent. Merely adding "prototypal" in front to distinguish the *actually nearly opposite* behavior in JavaScript has left in its wake nearly two decades of miry confusion.
+
+先入为主，“继承”这个词有很强烈的含义（见第四章）。仅仅在它前面加入“原型”来区别于JavaScript中 *实际上几乎相反* 的行为，是真相在泥泞般的困惑中沉睡了几乎二十年。（TODO）
 
 I like to say that sticking "prototypal" in front "inheritance" to drastically reverse its actual meaning is like holding an orange in one hand, an apple in the other, and insisting on calling the apple a "red orange". No matter what confusing label I put in front of it, that doesn't change the *fact* that one fruit is an apple and the other is an orange.
 
+我想说，将“原型”贴在“继承”之前很大程度上搞反了它的实际意义，就像一只手拿着一个桔子，另一手拿着一个苹果，而坚持说苹果是一个“红色的桔子”。无论我在它前面放什么糊涂的标签，那都不会改变一个水果是苹果而另一个是桔子的 *事实*。
+
 The better approach is to plainly call an apple an apple -- to use the most accurate and direct terminology. That makes it easier to understand both their similarities and their **many differences**, because we all have a simple, shared understanding of what "apple" means.
+
+更好的方法是直白地将苹果称为苹果——使用最准确的术语。这样能更容易地理解它们的相似之处和 **许多不同之处**，因为我们都对“苹果”的意义有一个简单的，共享的理解。
 
 Because of the confusion and conflation of terms, I believe the label "prototypal inheritance" itself (and trying to mis-apply all its associated class-orientation terminology, like "class", "constructor", "instance", "polymorphism", etc) has done **more harm than good** in explaining how JavaScript's mechanism *really* works.
 
+由于用语的模糊和歧义，我相信，对于解释JavaScript机制真正如何工作来说，“原型继承”这个标签（以及试图错误地应用所有面向类的术语，比如“类”，“构造器”，“实例”，“多态”等）本身带来的 **危害比好处多**。
+
 "Inheritance" implies a *copy* operation, and JavaScript doesn't copy object properties (natively, by default). Instead, JS creates a link between two objects, where one object can essentially *delegate* property/function access to another object. "Delegation" (see Chapter 6) is a much more accurate term for JavaScript's object-linking mechanism.
+
+“继承”意味着 *拷贝* 操作，而JavaScript不拷贝对象属性（原生上，默认地）。取而代之的是，JS在两个对象间建立链接，一个对象实质上可以将对属性/函数的访问 *委托* 到另一个对象上。对于描述JavaScript对象链接机制来说，“委托”是一个准确得多的术语。
 
 Another term which is sometimes thrown around in JavaScript is "differential inheritance". The idea here is that we describe an object's behavior in terms of what is *different* from a more general descriptor. For example, you explain that a car is a kind of vehicle, but one that has exactly 4 wheels, rather than re-describing all the specifics of what makes up a general vehicle (engine, etc).
 
+另一个有时被扔到扔到JavaScript周围的术语是“差分继承”。这里的想法是，我们可以用它与一个更泛化的对象的 *不同* 来描述一个对象的行为。比如，你要解释汽车是一种载具，与其重新描述组成一个一般载具的所有特点，不如只说它有4个轮子。
+
 If you try to think of any given object in JS as the sum total of all behavior that is *available* via delegation, and **in your mind you flatten** all that behavior into one tangible *thing*, then you can (sorta) see how "differential inheritance" might fit.
+
+如果你试着想象，在JS中任何给定的对象都是通过委托可用的所有行为的总和，而且 **在你思维中你扁平化** 所有的行为到一个有形的 *东西* 中，那么你就可以（八九不离十地）看到“差分继承”是如何适应的。
 
 But just like with "prototypal inheritance", "differential inheritance" pretends that your mental model is more important than what is physically happening in the language. It overlooks the fact that object `B` is not actually differentially constructed, but is instead built with specific characteristics defined, alongside "holes" where nothing is defined. It is in these "holes" (gaps in, or lack of, definition) that delegation *can* take over and, on the fly, "fill them in" with delegated behavior.
 
+但正如“原型继承”，“差分继承”假意使你的思维模型比在语言中物理发生的事情更重要。它忽视了这样一个事实：对象`B`实际上不是一个差异结构，而是由一些定义好的特定性质，与一些没有任何定义的“洞”组成的。正是通过这些“洞”，委托可以接管并且，动态地，用委托行为“填补”它们。
+
 The object is not, by native default, flattened into the single differential object, **through copying**, that the mental model of "differential inheritance" implies. As such, "differential inheritance" is just not as natural a fit for describing how JavaScript's `[[Prototype]]` mechanism actually works.
+
+对象不是像“差分继承”的思维模型所暗示的那样，原生默认地，**通过拷贝** 扁平化到一个单独的差异对象中。如此，对于描述JavaScript的`[[Prototype]]`机制如何工作来说，“差分继承”就不是自然合理。
 
 You *can choose* to prefer the "differential inheritance" terminology and mental model, as a matter of taste, but there's no denying the fact that it *only* fits the mental acrobatics in your mind, not the physical behavior in the engine.
 
+你 *可以选择* 偏向“差分继承”这个术语和思维模型，作为个人口味的问题，但是不能否认这个事实：它 *仅仅* 符合你思维中的精神杂耍（TODO），不是引擎的物理行为。
+
 ### "Constructors"
+### "Constructors"（构造器）
 
 Let's go back to some earlier code:
+
+让我们回到早先的代码：
 
 ```js
 function Foo() {
@@ -307,7 +362,11 @@ var a = new Foo();
 
 What exactly leads us to think `Foo` is a "class"?
 
+到底是什么导致我们认为`Foo`是一个“类”？
+
 For one, we see the use of the `new` keyword, just like class-oriented languages do when they construct class instances. For another, it appears that we are in fact executing a *constructor* method of a class, because `Foo()` is actually a method that gets called, just like how a real class's constructor gets called when you instantiate that class.
+
+其一，我们看到了`new`关键字的使用，就像面向类语言中人们构建类的对象那样。另外，它看起来我们事实上执行了一个类的 *构造器* 方法，因为`Foo()`实际上是个被调用的方法，就像当你初始化一个真实的类时，这个类的构造器被调用的那样。
 
 To further the confusion of "constructor" semantics, the arbitrarily labeled `Foo.prototype` object has another trick up its sleeve. Consider this code:
 
