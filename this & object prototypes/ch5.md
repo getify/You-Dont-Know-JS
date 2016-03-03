@@ -1,5 +1,5 @@
-# You Don't Know JS: *this* & Object Prototypes
-# Chapter 5: Prototypes
+# 你不懂JS: *this* & Object Prototypes
+# 第五章: Prototypes（原型）
 
 In Chapters 3 and 4, we mentioned the `[[Prototype]]` chain several times, but haven't said what exactly it is. We will now examine prototypes in detail.
 
