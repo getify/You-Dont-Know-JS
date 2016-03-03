@@ -648,7 +648,7 @@ You may still prefer the coercion, in which case using the global `isFinite(..)`
 
 ### Integer-Related Static Functions
 
-JavaScript number values are always floating point (IEE-754). So the notion of determining if a number is an "integer" is not about checking its type, because JS makes no such distinction.
+JavaScript number values are always floating point (IEEE-754). So the notion of determining if a number is an "integer" is not about checking its type, because JS makes no such distinction.
 
 Instead, you need to check if there's any non-zero decimal portion of the value. The easiest way to do that has commonly been:
 
