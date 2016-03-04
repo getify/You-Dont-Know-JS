@@ -370,6 +370,8 @@ For one, we see the use of the `new` keyword, just like class-oriented languages
 
 To further the confusion of "constructor" semantics, the arbitrarily labeled `Foo.prototype` object has another trick up its sleeve. Consider this code:
 
+为了使“构造器”的语义更使人糊涂，被随意贴上标签的`Foo.prototype`对象还有另外一招。考虑这段代码：
+
 ```js
 function Foo() {
 	// ...
@@ -383,17 +385,30 @@ a.constructor === Foo; // true
 
 The `Foo.prototype` object by default (at declaration time on line 1 of the snippet!) gets a public, non-enumerable (see Chapter 3) property called `.constructor`, and this property is a reference back to the function (`Foo` in this case) that the object is associated with. Moreover, we see that object `a` created by the "constructor" call `new Foo()` *seems* to also have a property on it called `.constructor` which similarly points to "the function which created it".
 
+`Foo.prototype`对象默认地（就在代码段中第一行的声明处！）得到一个公有的，称为`.constructor`的不可枚举（见第三章）属性，而且这个属性回头指向这个对象关联的函数（这里是`Foo`）。另外，我们看到被“构造器”调用`new Foo()`创建的对象`a` *看起来* 也拥有一个称为`.constructor`的属性，也相似地指向“创建它的函数”。
+
 **Note:** This is not actually true. `a` has no `.constructor` property on it, and though `a.constructor` does in fact resolve to the `Foo` function, "constructor" **does not actually mean** "was constructed by", as it appears. We'll explain this strangeness shortly.
+
+**注意：** 这实际上不是真的。`a`上没有`.constructro`属性，而`a.constructor`确实解析成了`Foo`函数，“constructor”并不像它看起来的那样实际意味着“被XX创建”。我们很快就会解释这个奇怪的地方。
 
 Oh, yeah, also... by convention in the JavaScript world, "class"es are named with a capital letter, so the fact that it's `Foo` instead of `foo` is a strong clue that we intend it to be a "class". That's totally obvious to you, right!?
 
+哦，是的，另外……根据JavaScript世界中的惯例，“类”都以大写字母开头的单词命名，所以使用`Foo`而不是`foo`强烈地意味着我们打算让它成为一个“类”。这对你来说太明显了，对吧！？
+
 **Note:** This convention is so strong that many JS linters actually *complain* if you call `new` on a method with a lowercase name, or if we don't call `new` on a function that happens to start with a capital letter. That sort of boggles the mind that we struggle so much to get (fake) "class-orientation" *right* in JavaScript that we create linter rules to ensure we use capital letters, even though the capital letter doesn't mean ** *anything* at all** to the JS engine.
 
+**注意：** 这个惯例是如此强大，以至于如果你在一个小写字母名称的方法上使用`new`调用，或并没有在一个大写字母开头的函数上使用`new`盗用，许多JS语法检查器将会报告错误。这是因为我们如此努力地想要在JavaScript中将（假的）“面向类” *搞对*，所以我们建立了这些语法规则来确保我们使用了大写字母，即便对JS引擎来讲，大写字母根本没有 *任何意义*。
+
 #### Constructor Or Call?
+#### 构造器还是调用？
 
 In the above snippet, it's tempting to think that `Foo` is a "constructor", because we call it with `new` and we observe that it "constructs" an object.
 
+上面的代码的段中，我们试图认为`Foo`是一个“构造器”，是因为我们用`new`调用它，而且我们观察到它“构建”了一个对象。
+
 In reality, `Foo` is no more a "constructor" than any other function in your program. Functions themselves are **not** constructors. However, when you put the `new` keyword in front of a normal function call, that makes that function call a "constructor call". In fact, `new` sort of hijacks any normal function and calls it in a fashion that constructs an object, **in addition to whatever else it was going to do**.
+
+在现实中，`Foo`不会比你的程序中的其他任何函数“更像构造器”。函数自身 **不是** 构造器。但是，当你在普通函数调用前面放一个`new`关键字时，这就将函数调用变成了“构造器调用”。事实上，`new`在某种意义上劫持了普通函数将它以另一种方式调用：构建一个对象，**外加它要做的其他任何事**。
 
 For example:
 
@@ -410,15 +425,25 @@ a; // {}
 
 `NothingSpecial` is just a plain old normal function, but when called with `new`, it *constructs* an object, almost as a side-effect, which we happen to assign to `a`. The **call** was a *constructor call*, but `NothingSpecial` is not, in and of itself, a *constructor*.
 
+`NothingSpecial`仅仅是一个普通的函数，但当用`new`调用时，几乎是一种副作用，它会 *构建* 一个对象，被我赋值到`a`。这个 **调用** 是一个 *构造器调用*，但是`NothingSpecial`本身并不是一个 *构造器*。
+
 In other words, in JavaScript, it's most appropriate to say that a "constructor" is **any function called with the `new` keyword** in front of it.
 
+换句话说，在JavaScript中，更合适的说法是，“构造器”是在它前面 **用`new`关键字调用的函数**。
+
 Functions aren't constructors, but function calls are "constructor calls" if and only if `new` is used.
+
+函数不是构造器，但是当且仅当`new`被使用时，函数调用是一个“构造器调用”。
 
 ### Mechanics
 
 Are *those* the only common triggers for ill-fated "class" discussions in JavaScript?
 
+仅仅是这些原因使得JavaScript中关于“类”的讨论变得命运多舛吗？
+
 **Not quite.** JS developers have strived to simulate as much as they can of class-orientation:
+
+**不全是。** JS开发者们努力地尽可能的模拟面向类：
 
 ```js
 function Foo(name) {
@@ -438,27 +463,48 @@ b.myName(); // "b"
 
 This snippet shows two additional "class-orientation" tricks in play:
 
+这段代码展示了另外两种“面向类”的花招：
+
 1. `this.name = name`: adds the `.name` property onto each object (`a` and `b`, respectively; see Chapter 2 about `this` binding), similar to how class instances encapsulate data values.
+1. `this.name = name`：在每个对象（分别在`a`和`b`上；参照第二章关于`this`绑定的内容）上添加了`.name`属性，和类的实例包装数据值很相似。
 
 2. `Foo.prototype.myName = ...`: perhaps the more interesting technique, this adds a property (function) to the `Foo.prototype` object. Now, `a.myName()` works, but perhaps surprisingly. How?
+2. `Foo.prototype.myName = ...`：这也许是更有趣的技术，它在`Foo.prototype`对象上添加了一个属性（函数）。现在，也许让人惊奇，`a.myName()`可以工作。但是是如何工作的？
 
 In the above snippet, it's strongly tempting to think that when `a` and `b` are created, the properties/functions on the `Foo.prototype` object are *copied* over to each of `a` and `b` objects. **However, that's not what happens.**
 
+在上面的代码段中，有很强的倾向认为当`a`和`b`被创建时，`Foo.prototype`上的属性/函数被 *拷贝* 到了`a`与`b`俩个对象上。**但是，这没有发生。**
+
 At the beginning of this chapter, we explained the `[[Prototype]]` link, and how it provides the fall-back look-up steps if a property reference isn't found directly on an object, as part of the default `[[Get]]` algorithm.
+
+在本章开头，我们解释了`[[Prototype]]`链，和它作为默认的`[[Get]]`算法的一部分,如何在不能直接在对象上找到属性引用时提供后备的查询步骤。
 
 So, by virtue of how they are created, `a` and `b` each end up with an internal `[[Prototype]]` linkage to `Foo.prototype`. When `myName` is not found on `a` or `b`, respectively, it's instead found (through delegation, see Chapter 6) on `Foo.prototype`.
 
+于是，得益于他们被创建的方式，`a`和`b`都最终拥有一个内部的`[[Prototype]]`链接链到`Foo.prototype`。当无法分别在`a`和`b`中找到`myName`时，就会在`Foo.prototype`上找到（通过委托，见第六章）。
+
 #### "Constructor" Redux
+#### 终极"构造器"
 
 Recall the discussion from earlier about the `.constructor` property, and how it *seems* like `a.constructor === Foo` being true means that `a` has an actual `.constructor` property on it, pointing at `Foo`? **Not correct.**
 
+回想我们刚才对`.constructor`属性的讨论，怎么看起来`a.constructor === Foo`为真意味着`a`上实际拥有一个`.constructor`属性，指向`Foo`？**不对。**
+
 This is just unfortunate confusion. In actuality, the `.constructor` reference is also *delegated* up to `Foo.prototype`, which **happens to**, by default, have a `.constructor` that points at `Foo`.
+
+这只是一种不行的混淆。实际上，`.constructor`引用也 *委托* 到了`Foo.prototype`，它 **恰好** 有一个指向`Foo`的默认属性。
 
 It *seems* awfully convenient that an object `a` "constructed by" `Foo` would have access to a `.constructor` property that points to `Foo`. But that's nothing more than a false sense of security. It's a happy accident, almost tangentially, that `a.constructor` *happens* to point at `Foo` via this default `[[Prototype]]` delegation. There's actually several ways that the ill-fated assumption of `.constructor` meaning "was constructed by" can come back to bite you.
 
+这 *看起来* 方便得可怕，一个被`Foo`构建的对象可以访问指向`Foo`的`.constructor`属性。但这只不过是安全性上的错觉。它是一个欢乐的巧合，（TODO），通过这个默认的`[[Prototype]]`委托`a.constructor` *恰好* 指向`Foo`。实际上`.construcor`意味着“被XX构建”这种注定失败的臆测会以几种方式来咬到你。
+
 For one, the `.constructor` property on `Foo.prototype` is only there by default on the object created when `Foo` the function is declared. If you create a new object, and replace a function's default `.prototype` object reference, the new object will not by default magically get a `.constructor` on it.
 
+第一，在`Foo.prototype`上的`.constructor`属性仅当`Foo`函数被声明时才出现在对象上。如果你创建一个新对象，并替换函数默认的`.prototype`对象引用，这个新对象上将不会魔法般地得到`.contructor`。
+
 Consider:
+
+考虑：
 
 ```js
 function Foo() { /* .. */ }
@@ -472,13 +518,23 @@ a1.constructor === Object; // true!
 
 `Object(..)` didn't "construct" `a1` did it? It sure seems like `Foo()` "constructed" it. Many developers think of `Foo()` as doing the construction, but where everything falls apart is when you think "constructor" means "was constructed by", because by that reasoning, `a1.constructor` should be `Foo`, but it isn't!
 
+`Object(..)`没有“构建”`a1`，是吧？看起来确实是`Foo()`“构建了”它。许多开发者认为`Foo()`在执行构建，但当你认为“构造器”意味着“被XX构建”时，一切就都崩塌了，因为如果那样的话，`a1.construcor`应当是`Foo`，但它不是！
+
 What's happening? `a1` has no `.constructor` property, so it delegates up the `[[Prototype]]` chain to `Foo.prototype`. But that object doesn't have a `.constructor` either (like the default `Foo.prototype` object would have had!), so it keeps delegating, this time up to `Object.prototype`, the top of the delegation chain. *That* object indeed has a `.constructor` on it, which points to the built-in `Object(..)` function.
+
+发生了什么？`a1`没有`.constructor`属性，所以它沿`[[Prototype]]`链向上委托到了`Foo.prototype`。但是这个对象也没有`.constructor`（默认的`Foo.prototype`对象就会有！），所以它继续委托，这次轮到了`Object.prototype`，委托链的最顶端。*那个* 对象上确实拥有`.constructor`，它指向内建的`Object(..)`函数。
 
 **Misconception, busted.**
 
+**误解，消除了。**
+
 Of course, you can add `.constructor` back to the `Foo.prototype` object, but this takes manual work, especially if you want to match native behavior and have it be non-enumerable (see Chapter 3).
 
+当然，你可以把`.constructor`加回到`Foo.prototype`对象上，但是做一些手动工作，特别是如果你想要它与原生的行为吻合，并不可枚举时（见第三章）。
+
 For example:
+
+举例来说：
 
 ```js
 function Foo() { /* .. */ }
@@ -498,29 +554,52 @@ Object.defineProperty( Foo.prototype, "constructor" , {
 
 That's a lot of manual work to fix `.constructor`. Moreover, all we're really doing is perpetuating the misconception that "constructor" means "was constructed by". That's an *expensive* illusion.
 
+要修复`.constructor`要花不少功夫。而且，我们做的一切是为了延续“构造器”意味着“被XX构建”的误解。这是一种昂贵的假象。
+
 The fact is, `.constructor` on an object arbitrarily points, by default, at a function who, reciprocally, has a reference back to the object -- a reference which it calls `.prototype`. The words "constructor" and "prototype" only have a loose default meaning that might or might not hold true later. The best thing to do is remind yourself, "constructor does not mean constructed by".
+
+事实上，一个对象上的`.construcor`默认地随意指向一个函数，而这个函数反过来拥有一个指向这个对象的引用——这个引用被称为`.prototype`。“构造器”和“原型”这两个词仅有松散的默认含义，可能是真的也可能不是真的。最佳方案是提醒你自己，“构造器不是意味着被XX构建”。
 
 `.constructor` is not a magic immutable property. It *is* non-enumerable (see snippet above), but its value is writable (can be changed), and moreover, you can add or overwrite (intentionally or accidentally) a property of the name `constructor` on any object in any `[[Prototype]]` chain, with any value you see fit.
 
+`.constructor`不是一个魔法般不可变的属性。它是不可枚举的（见上面的代码段），但是它的值是可写的（可以改变），而且，你可以在`[[Prototype]]`链上的任何对象上添加或覆盖（有意或无意地）名为`constructor`的属性，用你感觉合适的任何值。
+
 By virtue of how the `[[Get]]` algorithm traverses the `[[Prototype]]` chain, a `.constructor` property reference found anywhere may resolve quite differently than you'd expect.
+
+根据`[[Get]]`算法如何遍历`[[Prototype]]`链，在任何地方找到的一个`.constructor`属性引用解析的结果可能与你期望的十分不同。
 
 See how arbitrary its meaning actually is?
 
+看到它的实际意义有多随便了吗？
+
 The result? Some arbitrary object-property reference like `a1.constructor` cannot actually be *trusted* to be the assumed default function reference. Moreover, as we'll see shortly, just by simple omission, `a1.constructor` can even end up pointing somewhere quite surprising and insensible.
+
+结果？某些像`a1.constructor`这样随意的对象属性引用实际上不能被信任，认为它是默认的函数引用。还有，我们马上就会看到，通过一个简单的省略，`a1.constructor`可以最终指向某些令人惊讶，没道理的地方。
 
 `a1.constructor` is extremely unreliable, and an unsafe reference to rely upon in your code. **Generally, such references should be avoided where possible.**
 
+`a1.constructor`是极其不可靠的，在你的代码中不应依赖的不安全引用。**一般来说，这样的引用应当尽量避免。**
+
 ## "(Prototypal) Inheritance"
+## “（原型）继承”
 
 We've seen some approximations of "class" mechanics as typically hacked into JavaScript programs. But JavaScript "class"es would be rather hollow if we didn't have an approximation of "inheritance".
 
+我们已经看到了一些近似的“类”机制骇进JavaScript程序。但是如果我们没有一种近似的“继承”，JavaScript的“类”将会更空洞。
+
 Actually, we've already seen the mechanism which is commonly called "prototypal inheritance" at work when `a` was able to "inherit from" `Foo.prototype`, and thus get access to the `myName()` function. But we traditionally think of "inheritance" as being a relationship between two "classes", rather than between "class" and "instance".
+
+实际上，我们已经看到了一个常被称为“原型继承”的机制如何工作：`a`可以“继承自”`Foo.prototype`，并因此可以访问`myName()`函数。但是我们传统的想法认为“继承”是两个“类”间的关系，而非“类”与“实例”的关系。
 
 <img src="fig3.png">
 
 Recall this figure from earlier, which shows not only delegation from an object (aka, "instance") `a1` to object `Foo.prototype`, but from `Bar.prototype` to `Foo.prototype`, which somewhat resembles the concept of Parent-Child class inheritance. *Resembles*, except of course for the direction of the arrows, which show these are delegation links rather than copy operations.
 
+回想之前这幅图，它不仅展示了从对象（也就是“实例”）`a1`到对象`Foo.prototype`的委托，而且从`Bar.prototype`到`Foo.prototype`，这酷似类继承的亲自概念。*酷似*，除了方向，箭头表示的是委托链接，而不是拷贝操作。
+
 And, here's the typical "prototype style" code that creates such links:
+
+这里是一段典型的创建这样的链接的“原型风格”代码：
 
 ```js
 function Foo(name) {
@@ -536,13 +615,11 @@ function Bar(name,label) {
 	this.label = label;
 }
 
-// here, we make a new `Bar.prototype`
-// linked to `Foo.prototype`
+// 这里，我们创建一个新的`Bar.prototype`链接链到`Foo.prototype`
 Bar.prototype = Object.create( Foo.prototype );
 
-// Beware! Now `Bar.prototype.constructor` is gone,
-// and might need to be manually "fixed" if you're
-// in the habit of relying on such properties!
+// 注意！现在`Bar.prototype.constructor`不存在了，
+// 如果你有依赖这个属性的习惯的话，可以被手动“修复”。
 
 Bar.prototype.myLabel = function() {
 	return this.label;
@@ -556,13 +633,23 @@ a.myLabel(); // "obj a"
 
 **Note:** To understand why `this` points to `a` in the above code snippet, see Chapter 2.
 
+**注意：** 要想知道为什么上面代码中的`this`指向`a`，参见第二章。
+
 The important part is `Bar.prototype = Object.create( Foo.prototype )`. `Object.create(..)` *creates* a "new" object out of thin air, and links that new object's internal `[[Prototype]]` to the object you specify (`Foo.prototype` in this case).
+
+重要的部分是`Bar.prototype = Object.create( Foo.prototype )`。`Object.create(..)`凭空 *创建* 了一个“新”对象，并将这个新对象内部的`[[Prototype]]`链接到你指定的对象上（在这里是`Foo.prototype`）。
 
 In other words, that line says: "make a *new* 'Bar dot prototype' object that's linked to 'Foo dot prototype'."
 
+换句话说，这一行的意思是：“做一个 *新的* 链接到‘Foo点儿prototype’的‘Bar点儿prototype’对象”。
+
 When `function Bar() { .. }` is declared, `Bar`, like any other function, has a `.prototype` link to its default object. But *that* object is not linked to `Foo.prototype` like we want. So, we create a *new* object that *is* linked as we want, effectively throwing away the original incorrectly-linked object.
 
+当`function Bar() { .. }`被声明时，就像其他函数一样，拥有一个链到默认对象的`.prototype`链接。但是 *那个* 对象没有链到我们希望的`Foo.prototype`。所以，我们创建了一个 *新* 对象，链到我们希望的地方，并将原来的错误链接的对象扔掉。
+
 **Note:** A common mis-conception/confusion here is that either of the following approaches would *also* work, but they do not work as you'd expect:
+
+**注意：** 这里一个常见的误解/困惑是，下面两种方法 *也* 能工作，但是他们不会如你期望的那样工作：
 
 ```js
 // doesn't work like you want!
@@ -575,13 +662,23 @@ Bar.prototype = new Foo();
 
 `Bar.prototype = Foo.prototype` doesn't create a new object for `Bar.prototype` to be linked to. It just makes `Bar.prototype` be another reference to `Foo.prototype`, which effectively links `Bar` directly to **the same object as** `Foo` links to: `Foo.prototype`. This means when you start assigning, like `Bar.prototype.myLabel = ...`, you're modifying **not a separate object** but *the* shared `Foo.prototype` object itself, which would affect any objects linked to `Foo.prototype`. This is almost certainly not what you want. If it *is* what you want, then you likely don't need `Bar` at all, and should just use only `Foo` and make your code simpler.
 
+`Bar.prototype = Foo.prototype`不会创建新对象让`Bar.prototype`链接。它只是让`Bar.prototype`成为`Foo.prototype`的另一个引用，将`Bar`直接链到`Foo`链着的 **同一个对象**：`Foo.prototype`。这意味着当你开始赋值时，比如`Bar.prototype.myLabel = ...`，你修改的 **不是一个分离的对象** 而是那个被分享的`Foo.prototype`对象本身，它将影响到所有链接到`Foo.prototype`的对象。这几乎可以确定不是你想要的。如果这正是你想要的，那么你根本就不需要`Bar`，你应当仅使用`Foo`来使你的代码更简单。
+
 `Bar.prototype = new Foo()` **does in fact** create a new object which is duly linked to `Foo.prototype` as we'd want. But, it uses the `Foo(..)` "constructor call" to do it. If that function has any side-effects (such as logging, changing state, registering against other objects, **adding data properties to `this`**, etc.), those side-effects happen at the time of this linking (and likely against the wrong object!), rather than only when the eventual `Bar()` "descendents" are created, as would likely be expected.
+
+`Bar.prototype = new Foo()`**确实** 创建了一个新的对象，这个新对象也的确链接到了我们希望的`Foo.prototype`。但是，它是用`Foo(..)`“构造器调用”来这样做的。如果这个函数有任何副作用（比如logging，改变状态，注册其他对象，**向`this`添加数据属性**，等等），这些副作用就会在链接时发生（而且很可能是对错误的对象！），而不是像可能希望的那样，仅最终在`Bar()`的“后裔”被创建时发生。
 
 So, we're left with using `Object.create(..)` to make a new object that's properly linked, but without having the side-effects of calling `Foo(..)`. The slight downside is that we have to create a new object, throwing the old one away, instead of modifying the existing default object we're provided.
 
+于是，我们剩下的选择就是使用`Object.create(..)`来制造一个新对象，这个对象被正确地链接，而且没有调用`Foo(..)`时所产生的副作用。一个轻微的缺点是，我们不得不创建新对象，并把旧的扔掉，而不是修改提供给我们的默认既存对象。
+
 It would be *nice* if there was a standard and reliable way to modify the linkage of an existing object. Prior to ES6, there's a non-standard and not fully-cross-browser way, via the `.__proto__` property, which is settable. ES6 adds a `Object.setPrototypeOf(..)` helper utility, which does the trick in a standard and predictable way.
 
+如果有一种标准且可靠地方法来修改既存对象的链接就好了。ES6之前，有一个非标准的，而且不是完全跨浏览器的方法：通过可以设置的`.__proto__`属性。ES6中增加了`Object.setPrototypeOf(..)`辅助工具，它提供了标准且可预见的方法。
+
 Compare the pre-ES6 and ES6-standardized techniques for linking `Bar.prototype` to `Foo.prototype`, side-by-side:
+
+一对一地比较前ES6和ES6标准的技术如何处理将`Bar.prototype`链接至`Foo.prototype`：
 
 ```js
 // pre-ES6
@@ -595,11 +692,17 @@ Object.setPrototypeOf( Bar.prototype, Foo.prototype );
 
 Ignoring the slight performance disadvantage (throwing away an object that's later garbage collected) of the `Object.create(..)` approach, it's a little bit shorter and may be perhaps a little easier to read than the ES6+ approach. But it's probably a syntactic wash either way.
 
+如果忽略`Object.create(..)`方式在性能上的轻微劣势（扔掉一个对象，然后被回收），它相对短一些而且可能比ES6+的方式更易读。（TODO）。
+
 ### Inspecting "Class" Relationships
+### 考察“类”关系
 
 What if you have an object like `a` and want to find out what object (if any) it delegates to? Inspecting an instance (just an object in JS) for its inheritance ancestry (delegation linkage in JS) is often called *introspection* (or *reflection*) in traditional class-oriented environments.
 
+如果你有一个对象`a`并且希望找到它委托至哪个对象呢（如果有的话）？考察一个实例（一个JS对象）的继承血统（在JS中是委托链接），在传统的面向类环境中称为 *introspection（自省）*（或 *reflection（反射）*）。
+
 Consider:
+考虑：
 
 ```js
 function Foo() {
@@ -613,19 +716,31 @@ var a = new Foo();
 
 How do we then introspect `a` to find out its "ancestry" (delegation linkage)? The first approach embraces the "class" confusion:
 
+那么我们如何内省`a`来找到它的“祖先”（委托链）呢？一种方式是拥抱“类”的困惑：
+
 ```js
 a instanceof Foo; // true
 ```
 
 The `instanceof` operator takes a plain object as its left-hand operand and a **function** as its right-hand operand. The question `instanceof` answers is: **in the entire `[[Prototype]]` chain of `a`, does the object arbitrarily pointed to by `Foo.prototype` ever appear?**
 
+`instanceof`操作符的左边操作数接收一个普通对象，右边操作数接收一个 **函数**。`instanceof`回答的问题是：**在`a`的整个`[[Prototype]]`链中，有没有出现被`Foo.prototype`所指向的对象？**（TODO）
+
 Unfortunately, this means that you can only inquire about the "ancestry" of some object (`a`) if you have some **function** (`Foo`, with its attached `.prototype` reference) to test with. If you have two arbitrary objects, say `a` and `b`, and want to find out if *the objects* are related to each other through a `[[Prototype]]` chain, `instanceof` alone can't help.
+
+不幸的是，这意味着如果你拥有可以用于测试的 **函数**（`Foo`，和它带有的`.prototype`引用），你只能查询某些对象（`a`）的“祖先”。如果你有两个任意的对象，比如`a`和`b`，而且你想调查是否 *这些对象* 通过`[[Prototype]]`链相互关联，单靠`instanceof`帮不上什么忙。
 
 **Note:** If you use the built-in `.bind(..)` utility to make a hard-bound function (see Chapter 2), the function created will not have a `.prototype` property. Using `instanceof` with such a function transparently substitutes the `.prototype` of the *target function* that the hard-bound function was created from.
 
+**注意：** 如果你使用内建的`.bind(..)`工具来制造一个硬绑定的函数（见第二章），这个被创建的函数将不会拥有`.prototype`属性。将`instanceof`与这样的函数一起使用时，将会透明地替换为创建这个硬绑定函数的 *目标函数* 的`.prototype`。
+
 It's fairly uncommon to use hard-bound functions as "constructor calls", but if you do, it will behave as if the original *target function* was invoked instead, which means that using `instanceof` with a hard-bound function also behaves according to the original function.
 
+将硬绑定函数用于“构造器调用”十分不常见，但如果你这么做，它会表现得好像是 *目标函数* 被调用了，这意味着将`instanceof`与硬绑定函数一起使用也会参照原版函数。
+
 This snippet illustrates the ridiculousness of trying to reason about relationships between **two objects** using "class" semantics and `instanceof`:
+
+下面这段代码展示了试图通过“类”的语义和`instanceof`来推导 **两个对象** 间的关系是多么荒谬：
 
 ```js
 // helper utility to see if `o1` is
