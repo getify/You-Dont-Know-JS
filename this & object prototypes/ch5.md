@@ -759,7 +759,11 @@ isRelatedTo( b, a ); // true
 
 Inside `isRelatedTo(..)`, we borrow a throw-away function `F`, reassign its `.prototype` to arbitrarily point to some object `o2`, then ask if `o1` is an "instance of" `F`. Obviously `o1` isn't *actually* inherited or descended or even constructed from `F`, so it should be clear why this kind of exercise is silly and confusing. **The problem comes down to the awkwardness of class semantics forced upon JavaScript**, in this case as revealed by the indirect semantics of `instanceof`.
 
+在`isRelatedTo(..)`内部，我们借用一个一次性的函数`F`，重新对它的`.prototype`赋值，使他随意地指向某个对象`o2`，之后问是否`o1`是`F`的“一个实例”。很明显，`o1`实际上不是继承或遗传自`F`，甚至不是由`F`构建的，所以显而易见这种实践是愚蠢且让人迷惑的。**这个问题归根结底是将类的语义强加于JavaScript的尴尬**，在这个例子中是由`instanceof`的间接语义揭露的。
+
 The second, and much cleaner, approach to `[[Prototype]]` reflection is:
+
+第二种，也是更干净的`[[Prototype]]`反射方式：
 
 ```js
 Foo.prototype.isPrototypeOf( a ); // true
@@ -767,9 +771,15 @@ Foo.prototype.isPrototypeOf( a ); // true
 
 Notice that in this case, we don't really care about (or even *need*) `Foo`, we just need an **object** (in our case, arbitrarily labeled `Foo.prototype`) to test against another **object**. The question `isPrototypeOf(..)` answers is: **in the entire `[[Prototype]]` chain of `a`, does `Foo.prototype` ever appear?**
 
+注意在这种情况下，我们并不真正关心（甚至 *不需要*）`Foo`，我们仅需要一个 **对象**（在我们的例子中就是随意标志为`Foo.prototype`）来与另一个 **对象** 测试。`isPrototypeOf(..)`回答的问题是：**在`a`的整个`[[Prototype]]`链中，`Foo.prototype`出现过吗？**
+
 Same question, and exact same answer. But in this second approach, we don't actually need the indirection of referencing a **function** (`Foo`) whose `.prototype` property will automatically be consulted.
 
+同样的问题，和完全同样的答案。但是在第二种方式中，我们实际上不需要间接地引用一个`.prototype`属性将被自动查询的 **函数**（`Foo`）。
+
 We *just need* two **objects** to inspect a relationship between them. For example:
+
+我们 *只需要* 两个 **对象** 来考察它们之间的关系。比如：
 
 ```js
 // Simply: does `b` appear anywhere in
@@ -777,9 +787,13 @@ We *just need* two **objects** to inspect a relationship between them. For examp
 b.isPrototypeOf( c );
 ```
 
-Notice, this approach doesn't require a function ("class") at all. It just uses object references directly to `b` and `c`, and inquires about their relationship. In other words, our `isRelatedTo(..)` utility above is built-in to the language, and it's called `isPrototypeOf(..)`.
+Notice, this approach doesn't require a function ("class") at all. It just uses object references directly to `b` and `c`, and inquires about their relationship. In other words, our `isRelatedTo(..)` utility above is built-in to the language, and it's called `isPrototypeOf(..)`。.
+
+注意，这种方法根本不要求有一个函数（“类”）。它仅仅使用对象的直接引用`b`和`c`，来查询他们的关系。换句话说，我们上面的`isRelatedTo(..)`工具是内建在语言中的，它的名字叫`isPrototypeOf(..)`。
 
 We can also directly retrieve the `[[Prototype]]` of an object. As of ES5, the standard way to do this is:
+
+我们也可以直接取得一个对象的`[[Prototype]]`。在ES5中，这么做的标准方法是：
 
 ```js
 Object.getPrototypeOf( a );
@@ -787,11 +801,15 @@ Object.getPrototypeOf( a );
 
 And you'll notice that object reference is what we'd expect:
 
+而且你将注意到对象引用使我们期望的：
+
 ```js
 Object.getPrototypeOf( a ) === Foo.prototype; // true
 ```
 
 Most browsers (not all!) have also long supported a non-standard alternate way of accessing the internal `[[Prototype]]`:
+
+大多数浏览器（不是全部！）还一种长期支持的，非标准方法可以访问内部的`[[Prototype]]`：
 
 ```js
 a.__proto__ === Foo.prototype; // true
@@ -799,11 +817,19 @@ a.__proto__ === Foo.prototype; // true
 
 The strange `.__proto__` (not standardized until ES6!) property "magically" retrieves the internal `[[Prototype]]` of an object as a reference, which is quite helpful if you want to directly inspect (or even traverse: `.__proto__.__proto__...`) the chain.
 
+这个奇怪的`.__proto__`（直到ES6才标准化！）属性“魔法般地”取得一个对象的内部`[[Prototype]]`作为引用，如果你想要直接考察（设置遍历：`.__proto__.__proto__...`）`[[Prototype]]`链，这个引用十分有用。
+
 Just as we saw earlier with `.constructor`, `.__proto__` doesn't actually exist on the object you're inspecting (`a` in our running example). In fact, it exists (non-enumerable; see Chapter 2) on the built-in `Object.prototype`, along with the other common utilities (`.toString()`, `.isPrototypeOf(..)`, etc).
+
+和我们早先看到的`.constructor`一样，`.__proto__`实际上不存在于你考察的对象上（在我们的例子中是`a`）。事实上，它存在于（不可枚举地；见第二章）内建的`Object.prototype`上，和其他的共同工具在一起(`.toString()`, `.isPrototypeOf(..)`, 等等)。
 
 Moreover, `.__proto__` looks like a property, but it's actually more appropriate to think of it as a getter/setter (see Chapter 3).
 
+而且，`.__proto__`看起来想一个属性，但实际上将它看做是一个getter/setter（见第三章）更合适。
+
 Roughly, we could envision `.__proto__` implemented (see Chapter 3 for object property definitions) like this:
+
+大致地，我们可以这样描述`.__proto__`实现（见第三章，对象属性的定义）：
 
 ```js
 Object.defineProperty( Object.prototype, "__proto__", {
@@ -820,29 +846,51 @@ Object.defineProperty( Object.prototype, "__proto__", {
 
 So, when we access (retrieve the value of) `a.__proto__`, it's like calling `a.__proto__()` (calling the getter function). *That* function call has `a` as its `this` even though the getter function exists on the `Object.prototype` object (see Chapter 2 for `this` binding rules), so it's just like saying `Object.getPrototypeOf( a )`.
 
+所以，当我们访问`a.__proto__`（取得它的值）时，就好像调用`a.__proto__()`（调用getter函数）。这个函数调用将`a`用作它的`this`，虽然这个getter函数存在于`Object.prototype`上（参照第二章，`this`绑定规则），所以它相当于在说`Object.getPrototypeOf( a )`。
+
 `.__proto__` is also a settable property, just like using ES6's `Object.setPrototypeOf(..)` shown earlier. However, generally you **should not change the `[[Prototype]]` of an existing object**.
+
+`.__proto__`也是一个可设置的属性，就像早先展示过的ES6`Object.setPrototypeOf(..)`。然而，一般来说你 **不应该改变一个既存对象的`[[Prototype]]`**。
 
 There are some very complex, advanced techniques used deep in some frameworks that allow tricks like "subclassing" an `Array`, but this is commonly frowned on in general programming practice, as it usually leads to *much* harder to understand/maintain code.
 
+在某些允许对`Array`定义“子类”的框架中，深度地使用了一些非常复杂，高级的技术，但是在一般的编程实践中经常是让人皱眉头的，因为这通常导致非常难理解/维护的代码。
+
 **Note:** As of ES6, the `class` keyword will allow something that approximates "subclassing" of built-in's like `Array`. See Appendix A for discussion of the `class` syntax added in ES6.
+
+**注意：** 在ES6中，关键字`class`将允许某些近似方法，对像`Array`这样的内建类型“定义子类”。参见附录A中关于ES6中加入的`class`的讨论。
 
 The only other narrow exception (as mentioned earlier) would be setting the `[[Prototype]]` of a default function's `.prototype` object to reference some other object (besides `Object.prototype`). That would avoid replacing that default object entirely with a new linked object. Otherwise, **it's best to treat object `[[Prototype]]` linkage as a read-only characteristic** for ease of reading your code later.
 
+仅有一小部分例外（就像前面提到过的），会设置一个默认函数`.prototype`对象的`[[Prototype]]`，使它引用其他的对象（`Object.prototype`之外的对象）。那会避免将这个默认对象完全替换为一个新的链接对象。否则，为了在以后更容易地阅读你的代码 **最好将对象的`[[Prototype]]`链接作为只读性质对待**。
+
 **Note:** The JavaScript community unofficially coined a term for the double-underscore, specifically the leading one in properties like `__proto__`: "dunder". So, the "cool kids" in JavaScript would generally pronounce `__proto__` as "dunder proto".
 
+**注意：** 针对双下划线，特别是在像`__proto__`这样的属性中开头的部分，JavaScript社区非官方地创造了一个术语：“dunder”。所以，那些JavaScript的“酷小子”们通常将`__proto__`读作“dunder proto”。
+
 ## Object Links
+## 对象链接
 
 As we've now seen, the `[[Prototype]]` mechanism is an internal link that exists on one object which references some other object.
+正如我们看到的，`[[Prototype]]`机制是一个内部链接，它存在于一个对象上，这个对象引用一些其他的对象。
 
 This linkage is (primarily) exercised when a property/method reference is made against the first object, and no such property/method exists. In that case, the `[[Prototype]]` linkage tells the engine to look for the property/method on the linked-to object. In turn, if that object cannot fulfill the look-up, its `[[Prototype]]` is followed, and so on. This series of links between objects forms what is called the "prototype chain".
+
+这种链接（主要）在对第一个对象进行属性/方法引用，但这样的属性/方法不存在时实施。在这种情况下，`[[Prototype]]`链接告诉引擎在那个被链接的对象上查找这个属性/方法。接下来，如果这个对象不能满足查询，它的`[[Prototype]]`又会被查找，如此继续。这个在对象间的一系列链接构成了所谓的“原形链”。
 
 ### `Create()`ing Links
 
 We've thoroughly debunked why JavaScript's `[[Prototype]]` mechanism is **not** like *classes*, and we've seen how it instead creates **links** between proper objects.
 
+我们已经彻底揭露了为什么JavaScript的`[[Prototype]]`机制和 *类* **不** 一样，而且我们也看到了如何在正确的对象间创建 **链接**。
+
 What's the point of the `[[Prototype]]` mechanism? Why is it so common for JS developers to go to so much effort (emulating classes) in their code to wire up these linkages?
 
+`[[Prototype]]`机制的意义是什么？为什么JS开发者们费那么大力气（模拟类）在他们的代码中搞乱这些链接那么常见？
+
 Remember we said much earlier in this chapter that `Object.create(..)` would be a hero? Now, we're ready to see how.
+
+记得我们在本章很靠前的地方说过`Object.create(..)`是英雄吗？现在，我们准备好看看为什么了。
 
 ```js
 var foo = {
@@ -858,13 +906,21 @@ bar.something(); // Tell me something good...
 
 `Object.create(..)` creates a new object (`bar`) linked to the object we specified (`foo`), which gives us all the power (delegation) of the `[[Prototype]]` mechanism, but without any of the unnecessary complication of `new` functions acting as classes and constructor calls, confusing `.prototype` and `.constructor` references, or any of that extra stuff.
 
+`Object.create(..)`创建了一个链接到我们指定的对象（`foo`）上的新对象（`bar`），这给了我们`[[Prototype]]`机制的所有力量（委托），而且没有`new`函数作为类和构造器调用产生的任何没必要的复杂性，搞乱`.prototype`和`.constructor` 引用，或任何其他的多余的东西。
+
 **Note:** `Object.create(null)` creates an object that has an empty (aka, `null`) `[[Prototype]]` linkage, and thus the object can't delegate anywhere. Since such an object has no prototype chain, the `instanceof` operator (explained earlier) has nothing to check, so it will always return `false`. These special empty-`[[Prototype]]` objects are often called "dictionaries" as they are typically used purely for storing data in properties, mostly because they have no possible surprise effects from any delegated properties/functions on the `[[Prototype]]` chain, and are thus purely flat data storage.
 
+**注意：** `Object.create(null)`创建一个拥有空（也就是`null`）`[[Prototype]]`链接的对象，如此这个对象不能委托到任何地方。因为这样的对象没有原形链，`instancof`操作符（前面解释过）没有东西可检查，所以它总返回`false`。由于他们典型的用途是在属性中存储数据，这种特殊的空`[[Prototype]]`对象经常被称为“dictionaries（字典）”，这主要是因为它们没有可能受到在`[[Prototype]]`链上任何委托属性/函数的影响，所以它们是纯粹的扁平数据存储。
+
 We don't *need* classes to create meaningful relationships between two objects. The only thing we should **really care about** is objects linked together for delegation, and `Object.create(..)` gives us that linkage without all the class cruft.
+
+我们不 *需要* 类来在两个对象间创建有意义的关系。我们需要 **真正关心** 的唯一问题是对象为了委托而链接在一起，而`Object.create(..)`给我们这种链接并且没有一切关于类的烂设计。
 
 #### `Object.create()` Polyfilled
 
 `Object.create(..)` was added in ES5. You may need to support pre-ES5 environments (like older IE's), so let's take a look at a simple **partial** polyfill for `Object.create(..)` that gives us the capability that we need even in those older JS environments:
+
+`Object.create(..)`在ES5中被加入。你可能需要支持ES5之前的环境（比如老版本的IE），所以让我们来看一个`Object.create(..)`的简单 **部分** 填充工具，它甚至能在更老的JS环境中给我们所需的能力：
 
 ```js
 if (!Object.create) {
@@ -878,7 +934,11 @@ if (!Object.create) {
 
 This polyfill works by using a throw-away `F` function and overriding its `.prototype` property to point to the object we want to link to. Then we use `new F()` construction to make a new object that will be linked as we specified.
 
+这个填充工具通过一个一次性的`F`函数并覆盖它的`.prototype`属性来指向我们想连接到的对象。之后我们用`new F()`构造器调用来制造一个将会链到我们指定对象上的新对象。
+
 This usage of `Object.create(..)` is by far the most common usage, because it's the part that *can be* polyfilled. There's an additional set of functionality that the standard ES5 built-in `Object.create(..)` provides, which is **not polyfillable** for pre-ES5. As such, this capability is far-less commonly used. For completeness sake, let's look at that additional functionality:
+
+`Object.create(..)`的这种用法是目前最常见的用法，因为他的这一部分是 *可以* 填充的。ES5标准的内建`Object.create(..)`还提供了一个附加的功能，它是 **不能** 被ES5之前的版本填充的。如此，这个能力的使用远没有那么常见。为了完整性，让我么看看这个附加功能：
 
 ```js
 var anotherObject = {
@@ -911,9 +971,15 @@ myObject.c; // 4
 
 The second argument to `Object.create(..)` specifies property names to add to the newly created object, via declaring each new property's *property descriptor* (see Chapter 3). Because polyfilling property descriptors into pre-ES5 is not possible, this additional functionality on `Object.create(..)` also cannot be polyfilled.
 
+`Object.create(..)`的第二个参数指定了要添加在新对象上的属性名，通过声明每个新属性的 *属性描述符*（见第三章）。因为在ES5之前的环境中填充属性描述符是不可能的，所以`Object.create(..)`的这个附加功能无法填充。
+
 The vast majority of usage of `Object.create(..)` uses the polyfill-safe subset of functionality, so most developers are fine with using the **partial polyfill** in pre-ES5 environments.
 
+因为`Object.create(..)`的绝大多数用途都是使用填充安全的功能子集，所以大多数开发者在ES5之前的环境中使用这种 **部分填充** 也没有问题。
+
 Some developers take a much stricter view, which is that no function should be polyfilled unless it can be *fully* polyfilled. Since `Object.create(..)` is one of those partial-polyfill'able utilities, this narrower perspective says that if you need to use any of the functionality of `Object.create(..)` in a pre-ES5 environment, instead of polyfilling, you should use a custom utility, and stay away from using the name `Object.create` entirely. You could instead define your own utility, like:
+
+有些开发者采取严格得多的观点，也就是除非能够被 *完全* 填充，否则没有函数应该被填充。因为`Object.create(..)`可以部分填充的工具之一，这种较狭窄的观点会说，如果你需要在ES5之前的环境中使用`Object.create(..)`的任何功能，你应当使用自定义的工具，而不是填充，而且应当彻底远离使用`Object.create`这个名字。你可以定义自己的工具，比如：
 
 ```js
 function createAndLinkObject(o) {
@@ -932,6 +998,8 @@ myObject.a; // 2
 ```
 
 I do not share this strict opinion. I fully endorse the common partial-polyfill of `Object.create(..)` as shown above, and using it in your code even in pre-ES5. I'll leave it to you to make your own decision.
+
+我不会分享这种严格的观点。我完全拥护如上面展示的`Object.create(..)`的常见部分填充，甚至在ES5之前的环境下，在你的代码中使用它。我讲选择权留给你。
 
 ### Links As Fallbacks?
 
