@@ -1,9 +1,13 @@
-# You Don't Know JS: *this* & Object Prototypes
-# Chapter 6: Behavior Delegation
+# 你不懂JS: *this* & Object Prototypes
+# 第六章: 行为委托
 
 In Chapter 5, we addressed the `[[Prototype]]` mechanism  in detail, and *why* it's confusing and inappropriate (despite countless attempts for nearly two decades) to describe it as "class" or "inheritance". We trudged through not only the fairly verbose syntax (`.prototype` littering the code), but the various gotchas (like surprising `.constructor` resolution or ugly pseudo-polymorphic syntax). We explored variations of the "mixin" approach, which many people use to attempt to smooth over such rough areas.
 
+在第五章中，我们详细地讨论了`[[Prototype]]`机制，和 *为什么* 对于描述“类”或“继承”来说它是那么使人困惑和不合适。我们一路跋涉，不仅涉及了相当繁冗的语法（使代码凌乱的`.prototype`），还有各种陷阱（比如使人吃惊的`.constructor`解析和丑陋的假象多态语法）。我们探索了各种“mixin”方法，人们试图用它们来抹平这些粗糙的区域。
+
 It's a common reaction at this point to wonder why it has to be so complex to do something seemingly so simple. Now that we've pulled back the curtain and seen just how dirty it all gets, it's not a surprise that most JS developers never dive this deep, and instead relegate such mess to a "class" library to handle it for them.
+
+这时一个常见的反应是，想知道为什么这些看起来如此简单的事不得不如此复杂。现在我们已经拉开帷幕看到了它是多么麻烦，这并不奇怪：大多数JS开发者从不探究得这么深，而将这一团糟交给一个“类”包去帮他们处理。
 
 I hope by now you're not content to just gloss over and leave such details to a "black box" library. Let's now dig into how we *could and should be* thinking about the object `[[Prototype]]` mechanism in JS, in a **much simpler and more straightforward way** than the confusion of classes.
 
