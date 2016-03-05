@@ -1005,7 +1005,10 @@ I do not share this strict opinion. I fully endorse the common partial-polyfill 
 
 It may be tempting to think that these links between objects *primarily* provide a sort of fallback for "missing" properties or methods. While that may be an observed outcome, I don't think it represents the right way of thinking about `[[Prototype]]`.
 
+也许这么想很吸引人：这些对象间的链接 *主要* 是为了给“丢失”的属性和方法提供某种候补。虽然这是一个可观察到的结果，但是我不认为这是考虑`[[Prototype]]`的正确方法。
+
 Consider:
+考虑：
 
 ```js
 var anotherObject = {
@@ -1021,15 +1024,27 @@ myObject.cool(); // "cool!"
 
 That code will work by virtue of `[[Prototype]]`, but if you wrote it that way so that `anotherObject` was acting as a fallback **just in case** `myObject` couldn't handle some property/method that some developer may try to call, odds are that your software is going to be a bit more "magical" and harder to understand and maintain.
 
+得益于`[[Prototype]]`，这段代码可以工作，但如果你这样写是为了 **万一** `myObject`不能处理某些开发者可能会调用的属性/方法，而让`anotherObject`作为一个候补，你的软件大概会变得有点儿“魔法”并且更难于理解和维护。
+
 That's not to say there aren't cases where fallbacks are an appropriate design pattern, but it's not very common or idiomatic in JS, so if you find yourself doing so, you might want to take a step back and reconsider if that's really appropriate and sensible design.
+
+这不是说候补在任何情况下都不是一个合适的设计模式，但他不是一个在JS中很常见的用法，所以如果你发现自己在这么做，那么你可能想要退一步并重新考虑它是否真的是合适且合理的设计。
 
 **Note:** In ES6, an advanced functionality called `Proxy` is introduced which can provide something of a "method not found" type of behavior. `Proxy` is beyond the scope of this book, but will be covered in detail in a later book in the *"You Don't Know JS"* series.
 
+**注意：** 在ES6中，引入了一个称为`Proxy（代理）`的高级功能，它可以提供某种“方法未找到”类型的行为。`Proxy`超出了本书的范围，但会在以后的 *“你不懂JS”* 系列书目中详细讲解。
+
 **Don't miss an important but nuanced point here.**
+
+**这里不要错过一个重要的细节。**
 
 Designing software where you intend for a developer to, for instance, call `myObject.cool()` and have that work even though there is no `cool()` method on `myObject` introduces some "magic" into your API design that can be surprising for future developers who maintain your software.
 
+例如，你打算为一个开发者设计软件，如果调用`myObject.cool()`并且即使在`myObject`上没有`cool()`方法时也能工作，会在你的API设计上引入一些“魔法”，这可能会使未来维护你的软件的开发者很吃惊。
+
 You can however design your API with less "magic" to it, but still take advantage of the power of `[[Prototype]]` linkage.
+
+然而你可以在你的API设计上少用些“魔法”，而仍然利用`[[Prototype]]`链接的力量。
 
 ```js
 var anotherObject = {
@@ -1049,11 +1064,18 @@ myObject.doCool(); // "cool!"
 
 Here, we call `myObject.doCool()`, which is a method that *actually exists* on `myObject`, making our API design more explicit (less "magical"). *Internally*, our implementation follows the **delegation design pattern** (see Chapter 6), taking advantage of `[[Prototype]]` delegation to `anotherObject.cool()`.
 
+这里，我们调用`myObject.doCool()`，它是一个 *实际存在于* `myObject`上的方法，这使我们的API设计更清晰（没那么“魔法”）。*在它内部*，我们的实现依照 **委托设计模式**（见第六章），利用`[[Prototype]]`委托到`anotherObject.cool()`。
+
 In other words, delegation will tend to be less surprising/confusing if it's an internal implementation detail rather than plainly exposed in your API interface design. We will expound on **delegation** in great detail in the next chapter.
 
+换句话说，委托倾向于减少意外/困惑，如果它是一个内部实现细节，而非在你的API结构设计中简单地暴露出来。我们会在下一章中详细解释 **委托**。
+
 ## Review (TL;DR)
+## 复习 (TL;DR)
 
 When attempting a property access on an object that doesn't have that property, the object's internal `[[Prototype]]` linkage defines where the `[[Get]]` operation (see Chapter 3) should look next. This cascading linkage from object to object essentially defines a "prototype chain" (somewhat similar to a nested scope chain) of objects to traverse for property resolution.
+
+
 
 All normal objects have the built-in `Object.prototype` as the top of the prototype chain (like the global scope in scope look-up), where property resolution will stop if not found anywhere prior in the chain. `toString()`, `valueOf()`, and several other common utilities exist on this `Object.prototype` object, explaining how all objects in the language are able to access them.
 
