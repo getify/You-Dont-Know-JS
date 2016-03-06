@@ -11,33 +11,61 @@ It's a common reaction at this point to wonder why it has to be so complex to do
 
 I hope by now you're not content to just gloss over and leave such details to a "black box" library. Let's now dig into how we *could and should be* thinking about the object `[[Prototype]]` mechanism in JS, in a **much simpler and more straightforward way** than the confusion of classes.
 
+我希望到现在你不会甘心于敷衍了事并把这样的细节丢给一个“黑盒”库。现在我们来深入讲解我们 *如何与应当如何* 考虑JS中对象的`[[Prototype]]`机制，以一种比类造成的困惑简单 **得多而且更直接的方式**。
+
 As a brief review of our conclusions from Chapter 5, the `[[Prototype]]` mechanism is an internal link that exists on one object which references another object.
+
+简单地复习一下第五章的结论，`[[Prototype]]`机制是一种存在于一个对象上的内部链接，它指向一个其他对象。
 
 This linkage is exercised when a property/method reference is made against the first object, and no such property/method exists. In that case, the `[[Prototype]]` linkage tells the engine to look for the property/method on the linked-to object. In turn, if that object cannot fulfill the look-up, its `[[Prototype]]` is followed, and so on. This series of links between objects forms what is called the "prototype chain".
 
+当一个属性/方法引用在第一个对象上发生，而这样的属性/方法又不存在时，这个链接就会被使用。在这种情况下，`[[Prototype]]`链接告诉引擎去那个被链接的对象上寻找该属性/方法。接下来，如果那个对象也不能满足查询，就沿着它的`[[Prototype]]`查询，如此继续。这种对象间一系列的链条构成了所谓的“原形链”。
+
 In other words, the actual mechanism, the essence of what's important to the functionality we can leverage in JavaScript, is **all about objects being linked to other objects.**
+
+换句话说，对于我们能在JavaScript中利用的功能的实际机制来说，其重要的实质 **全部在于被连接到其他对象的对象。**
 
 That single observation is fundamental and critical to understanding the motivations and approaches for the rest of this chapter!
 
+这个观点是理解本章其余部分的动机和方法的重要基础。
+
 ## Towards Delegation-Oriented Design
+## 迈向面相委托的设计
 
 To properly focus our thoughts on how to use `[[Prototype]]` in the most straightforward way, we must recognize that it represents a fundamentally different design pattern from classes (see Chapter 4).
 
+为了将我们的思想恰当地集中在如何用最直截了当的方法使用`[[Prototype]]`，我们必须认识到它代表一种根本上与类不同的设计模式（见第四章）。
+
 **Note:** *Some* principles of class-oriented design are still very valid, so don't toss out everything you know (just most of it!). For example, *encapsulation* is quite powerful, and is compatible (though not as common) with delegation.
+
+**注意*** *某些* 面相类的设计依然是很有效的，所以不要扔掉你知道的每一件事（扔掉大多数就行了！）。比如，封装就是十分强大，而且与委托兼容的（虽然不那么常见）。
 
 We need to try to change our thinking from the class/inheritance design pattern to the behavior delegation design pattern. If you have done most or all of your programming in your education/career thinking in classes, this may be uncomfortable or feel unnatural. You may need to try this mental exercise quite a few times to get the hang of this very different way of thinking.
 
+我么需要试着将我们的思维从类/继承的设计模式转变为行为代理设计模式。如果你已经用在教育/工作生涯中思考类的方式做了大多数或所有的编程工作，这可能感觉不舒服或不自然。你可能需要尝试这种思维过程好几次，才能适应这种非常不同的思考方式。
+
 I'm going to walk you through some theoretical exercises first, then we'll look side-by-side at a more concrete example to give you practical context for your own code.
 
+我将首先带你进行一些理论练习，之后我们会一对一地看一些更实际的例子来为你自己的代码提供实践环境。
+
 ### Class Theory
+### 类理论
 
 Let's say we have several similar tasks ("XYZ", "ABC", etc) that we need to model in our software.
 
+比方说我们有几个相似的任务（“XYZ”，“ABC”，等）需要在我们的软件中建模。
+
 With classes, the way you design the scenario is: define a general parent (base) class like `Task`, defining shared behavior for all the "alike" tasks. Then, you define child classes `XYZ` and `ABC`, both of which inherit from `Task`, and each of which adds specialized behavior to handle their respective tasks.
+
+使用类，你设计这个场景的方式是：定义一个泛化的父类（基类）比如`Task`，为所有的“类似”任务定义共享的行为。然后，你定义子类`XYZ`和`ABC`，它们都继承自`Task`，每个都添加了特化的行为来处理各自的任务。
 
 **Importantly,** the class design pattern will encourage you that to get the most out of inheritance, you will want to employ method overriding (and polymorphism), where you override the definition of some general `Task` method in your `XYZ` task, perhaps even making use of `super` to call to the base version of that method while adding more behavior to it. **You'll likely find quite a few places** where you can "abstract" out general behavior to the parent class and specialize (override) it in your child classes.
 
+**重要的是，** 类设计模式将鼓励你发挥继承的最大功效，当你在`XYZ`任务中覆盖`Task`的某些泛化方法的定义时，你将会想利用方法覆盖（和多态），也许会利用`super`来调用这个方法泛化版本，为它添加更多的行为。**你很可能会找到几个可以“抽象”到父类中，或在子类中特化（覆盖）的地方**。
+
 Here's some loose pseudo-code for that scenario:
+
+这是一些关于这个场景的假象代码：
 
 ```js
 class Task {
@@ -63,15 +91,26 @@ class ABC inherits Task {
 
 Now, you can instantiate one or more **copies** of the `XYZ` child class, and use those instance(s) to perform task "XYZ". These instances have **copies both** of the general `Task` defined behavior as well as the specific `XYZ` defined behavior. Likewise, instances of the `ABC` class would have copies of the `Task` behavior and the specific `ABC` behavior. After construction, you will generally only interact with these instances (and not the classes), as the instances each have copies of all the behavior you need to do the intended task.
 
+现在，你可以初始化一个或多个`XYZ`子类的 **拷贝**，并且使用这些实例来执行“XYZ”任务。这些实例已经 **同时拷贝** 了泛化的`Tak`定义的行为和具体的`XYZ`定义的行为。类似地，`ABC`类的实例将拷贝`Task`的行为和具体的`ABC`的行为。在构建完成之后，你一般会仅与这些实例互动（而不是类），因为每个实例都拷贝了完成计划任务的所有行为。
+
 ### Delegation Theory
+### 委托理论
 
 But now let's try to think about the same problem domain, but using *behavior delegation* instead of *classes*.
 
+但是现在然我们试着用 *行为委托* 代替 *类* 来思考同样的问题。
+
 You will first define an **object** (not a class, nor a `function` as most JS'rs would lead you to believe) called `Task`, and it will have concrete behavior on it that includes utility methods that various tasks can use (read: *delegate to*!). Then, for each task ("XYZ", "ABC"), you define an **object** to hold that task-specific data/behavior. You **link** your task-specific object(s) to the `Task` utility object, allowing them to delegate to it when they need to.
+
+你讲首先定义一个称为`Task`的 **对象**（不是一个类，也不是一个大多数JS开发者想让你相信的`function`），而且它将拥有具体的行为，这些行为包含各种任务可以使用的（读作：*委托至*！）工具方法。然后，对于每个任务（“XYZ”，“ABC”），你定义一个 **对象** 来持有这个特定任务的数据/行为。你 **链接** 你的特定任务对象到`Task`工具对象，允许它们在必要的时候可以委托到它。
 
 Basically, you think about performing task "XYZ" as needing behaviors from two sibling/peer objects (`XYZ` and `Task`) to accomplish it. But rather than needing to compose them together, via class copies, we can keep them in their separate objects, and we can allow `XYZ` object to **delegate to** `Task` when needed.
 
+基本上，你认为执行任务“XYZ”就是从两个兄弟/对等的对象（`XYZ`和`Task`）中请求行为来完成它。与其通过类的拷贝将它们组合在一起，我们可以将他们保持在分离的对象中，而且可以在需要的情况下允许`XYZ`对象来 **委托到** `Task`。
+
 Here's some simple code to suggest how you accomplish that:
+
+这里是一些简单的代码，示意你如何实现它：
 
 ```js
 var Task = {
@@ -98,39 +137,68 @@ XYZ.outputTaskDetails = function() {
 
 In this code, `Task` and `XYZ` are not classes (or functions), they're **just objects**. `XYZ` is set up via `Object.create(..)` to `[[Prototype]]` delegate to the `Task` object (see Chapter 5).
 
+在这段代码中，`Task`和`XYZ`不是类（也不是函数），它们 **仅仅是对象**。`XYZ`通过`Object.create()`创建，来`[[Prototype]]`代理到`Task`对象（见第五章）。
+
 As compared to class-orientation (aka, OO -- object-oriented), I call this style of code **"OLOO"** (objects-linked-to-other-objects). All we *really* care about is that the `XYZ` object delegates to the `Task` object (as does the `ABC` object).
+
+作为面相类（也就是，OO——面相对象）的对比，我城这种风格的代码为 **“OLOO”**（objects-linked-to-other-objects（链接到其他对象的对象））。所有我们真正关心的是，对象`XYZ`委托到对象`Task`（对象`ABC`也一样）。
 
 In JavaScript, the `[[Prototype]]` mechanism links **objects** to other **objects**. There are no abstract mechanisms like "classes", no matter how much you try to convince yourself otherwise. It's like paddling a canoe upstream: you *can* do it, but you're *choosing* to go against the natural current, so it's obviously **going to be harder to get where you're going.**
 
+在JavaScript中，`[[Prototype]]`机制将 **对象** 链接到其他 **对象**。无论你多么想说服自己这不是真的，JavaScript没有像“类”那样的抽象机制。这就像逆水行舟：你 *可以* 做到，但你 *选择* 了逆流而上，所以很明显地，**你会更困难地达到目的地。**
+
 Some other differences to note with **OLOO style code**:
 
+**OLOO风格的代码** 中有一些需要注意的不同：
+
 1. Both `id` and `label` data members from the previous class example are data properties directly on `XYZ` (neither is on `Task`). In general, with `[[Prototype]]` delegation involved, **you want state to be on the delegators** (`XYZ`, `ABC`), not on the delegate (`Task`).
+1. 前一个类的例子中的`id`和`label`数据成员都是`XYZ`上的直接数据属性（它们都不在`Task`上）。一般来说，当`[[Prototype]]`委托引入时，**你想使状态保持在委托者上**（`XYZ`，`ABC`），不是在委托上（`Task`）。
 2. With the class design pattern, we intentionally named `outputTask` the same on both parent (`Task`) and child (`XYZ`), so that we could take advantage of overriding (polymorphism). In behavior delegation, we do the opposite: **we avoid if at all possible naming things the same** at different levels of the `[[Prototype]]` chain (called shadowing -- see Chapter 5), because having those name collisions creates awkward/brittle syntax to disambiguate references (see Chapter 4), and we want to avoid that if we can.
-
+2. 在类的设计模式中，我们故意在父类（`Task`）和子类（`XYZ`）上采用相同的命名`outputTask`，以至于我们可以利用覆盖（多态）。在委托的行为中，我们反其道而行之：**我们尽一切可能避免在`[[Prototype]]`链的不同层级上给出相同的命名**（称为“遮蔽”——见第五章），因为这些命名冲突会导致尴尬/脆弱的语法来消除引用的歧义（见第四章），而我们想避免它。
    This design pattern calls for less of general method names which are prone to overriding and instead more of descriptive method names, *specific* to the type of behavior each object is doing. **This can actually create easier to understand/maintain code**, because the names of methods (not only at definition location but strewn throughout other code) are more obvious (self documenting).
+	 这种设计模式不那么要求那些倾向于覆盖的泛化的方法名，而是要求针对于每个对象的行为类型给出更具描述性的方法名。**这实际上会产生更易于理解/维护的代码**，因为方法名（不仅在定义的位置，而是扩散到其他代码中）变得更加明白（代码即文档）。
 3. `this.setID(ID);` inside of a method on the `XYZ` object first looks on `XYZ` for `setID(..)`, but since it doesn't find a method of that name on `XYZ`, `[[Prototype]]` *delegation* means it can follow the link to `Task` to look for `setID(..)`, which it of course finds. Moreover, because of implicit call-site `this` binding rules (see Chapter 2), when `setID(..)` runs, even though the method was found on `Task`, the `this` binding for that function call is `XYZ` exactly as we'd expect and want. We see the same thing with `this.outputID()` later in the code listing.
-
+3. `this.setID(ID);`位于对象`XYZ`的一个方法内部，它首先在`XYZ`上查找`setID(..)`，但因为它不能在`XYZ`上找到叫这个名称的方法，`[[Prototype]]`委托意味着它可以沿着链接到`Task`来寻找`setID()`，这样当然就找到了。另外，因为隐式call-site`this`绑定规则（见第二章），当`setID()`运行时，即便方法是在`Task`上找到的，这个函数调用的`this`绑定依然是我么期望和想要的`XYZ`。我么在代码稍后的`this.outputID()`中也看到了同样的事情。
    In other words, the general utility methods that exist on `Task` are available to us while interacting with `XYZ`, because `XYZ` can delegate to `Task`.
+	 换句话说，我们可以使用存在于`Task`上的泛化工具与`XYZ`互动，因为`XYZ`可以委托至`Task`。
 
 **Behavior Delegation** means: let some object (`XYZ`) provide a delegation (to `Task`) for property or method references if not found on the object (`XYZ`).
 
+**行为委托** 意味着：如果某个对象（`XYZ`）的属性或方法没能在这个对象（`XYZ`）上找到时，让这个对象（`XYZ`）为属性或方法引用提供一个委托（`Task`）。
+
 This is an *extremely powerful* design pattern, very distinct from the idea of parent and child classes, inheritance, polymorphism, etc. Rather than organizing the objects in your mind vertically, with Parents flowing down to Children, think of objects side-by-side, as peers, with any direction of delegation links between the objects as necessary.
+
+这是一个极其强大的设计模式，与父类和子类，继承，多态等有很大的不同。与其在你的思维中纵向地，从上面父类到下面子类地组织对象，你应带并列地，对等地考虑对象，而且对象间拥有方向性的委托链接。
 
 **Note:** Delegation is more properly used as an internal implementation detail rather than exposed directly in the API interface design. In the above example, we don't necessarily *intend* with our API design for developers to call `XYZ.setID()` (though we can, of course!). We sorta *hide* the delegation as an internal detail of our API, where `XYZ.prepareTask(..)` delegates to `Task.setID(..)`. See the "Links As Fallbacks?" discussion in Chapter 5 for more detail.
 
+**注意：** 委托更适于作为内部实现的细节，而不是直接暴露在API接口的设计中。在上面的例子中，我们的API设计没必要有意地让开发者调用`XYZ.setID()`（当然我们可以！）。我们以某种隐藏的方式将委托作为我们API的内部细节，即`XYZ.prepareTask(..)`委托到`Task.setID(..)`。详细的内容，参照第五章的“链接还是候补？”中的讨论。
+
 #### Mutual Delegation (Disallowed)
+#### 相互委托（不被允许的）
 
 You cannot create a *cycle* where two or more objects are mutually delegated (bi-directionally) to each other. If you make `B` linked to `A`, and then try to link `A` to `B`, you will get an error.
 
-It's a shame (not terribly surprising, but mildly annoying) that this is disallowed. If you made a reference to a property/method which didn't exist in either place, you'd have an infinite recursion on the `[[Prototype]]` loop. But if all references were strictly present, then `B` could delegate to `A`, and vice versa, and it *could* work. This would mean you could use either object to delegate to the other, for various tasks. There are a few niche use-cases where this might be helpful.
+你不能在两个或多个对象间相互地委托（双向地）对方来创建一个 *循环* 。如果你使`b`链接到`A`，然后试着让`A`链接到`B`，你将得到一个错误。
+
+It's a shame (not terribly surprising, but shaosho annoying) that this is disallowed. If you made a reference to a property/method which didn't exist in either place, you'd have an infinite recursion on the `[[Prototype]]` loop. But if all references were strictly present, then `B` could delegate to `A`, and vice versa, and it *could* work. This would mean you could use either object to delegate to the other, for various tasks. There are a few niche use-cases where this might be helpful.
+
+这样的事情不被允许有些可惜（不是非常令人惊讶，但稍稍有些恼人）。如果你制造一个在任意一方都不存在的属性/方法引用，你就会在`[[Prototype]]`上得到一个无限递归的循环。但如果所有的引用都严格存在，那么`B`就可以委托至`A`，或相反，而且它可以工作。这意味着你可以为了多种任务用这两个对象互相委托至对方。有一些情况这可能会有用。
 
 But it's disallowed because engine implementors have observed that it's more performant to check for (and reject!) the infinite circular reference once at set-time rather than needing to have the performance hit of that guard check every time you look-up a property on an object.
 
+但它不被允许是因为引擎的实现者发现，在设置时检查（并拒绝！）无限循环引用一次，要比每次你在一个对象上查询属性时都做相同检查的性能要高。
+
 #### Debugged
+#### 调试
 
 We'll briefly cover a subtle detail that can be confusing to developers. In general, the JS specification does not control how browser developer tools should represent specific values/structures to a developer, so each browser/engine is free to interpret such things as they see fit. As such, browsers/tools *don't always agree*. Specifically, the behavior we will now examine is currently observed only in Chrome's Developer Tools.
 
+我们将简单地讨论一个可能困扰开发者的微妙的细节。一般来说，JS语言规范不会控制浏览器开发者工具如何向开发者表示指定的值/结构，所以每种浏览器/引擎都自由地按需要解释这个事情。因此，浏览器/工具 *不总是意见统一*。特别地，我们现在要考察的行为就是当前仅在Chrome的开发者工具中观察到的。
+
 Consider this traditional "class constructor" style JS code, as it would appear in the *console* of Chrome Developer Tools:
+
+考虑这段传统的“类构造器”风格的JS代码，正如它将在Chrome开发者工具 *控制台* 中的：
 
 ```js
 function Foo() {}
@@ -142,7 +210,11 @@ a1; // Foo {}
 
 Let's look at the last line of that snippet: the output of evaluating the `a1` expression, which prints `Foo {}`. If you try this same code in Firefox, you will likely see `Object {}`. Why the difference? What do these outputs mean?
 
+然我们看这个代码段的最后一行：对表达式`a1`进行求值的输出，打印`Foo {}`。如果你在FireFox中试用同样的代码，你很可能会看到`Object {}`。为什么会有不同？这些输出意味着什么？
+
 Chrome is essentially saying "{} is an empty object that was constructed by a function with name 'Foo'". Firefox is saying "{} is an empty object of general construction from Object". The subtle difference is that Chrome is actively tracking, as an *internal property*, the name of the actual function that did the construction, whereas other browsers don't track that additional information.
+
+
 
 It would be tempting to attempt to explain this with JavaScript mechanisms:
 
