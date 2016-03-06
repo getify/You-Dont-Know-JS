@@ -214,9 +214,11 @@ Let's look at the last line of that snippet: the output of evaluating the `a1` e
 
 Chrome is essentially saying "{} is an empty object that was constructed by a function with name 'Foo'". Firefox is saying "{} is an empty object of general construction from Object". The subtle difference is that Chrome is actively tracking, as an *internal property*, the name of the actual function that did the construction, whereas other browsers don't track that additional information.
 
-
+Chrome实质上在说“{}是一个由名为‘Foo’的函数创建的空对象”。Firefox在说“{}是一个由Object一般构建的空对象”.这种微妙的区别是因为Chrome在像一个 *内部属性* 一样，动态跟踪执行创建的实际方法的名称，而其他浏览器不会跟踪这样的附加信息。
 
 It would be tempting to attempt to explain this with JavaScript mechanisms:
+
+很容易试图用JavaScript机制来解释它：
 
 ```js
 function Foo() {}
@@ -229,7 +231,11 @@ a1.constructor.name; // "Foo"
 
 So, is that how Chrome is outputting "Foo", by simply examining the object's `.constructor.name`? Confusingly, the answer is both "yes" and "no".
 
+那么，Chrome就是通过简单地查看对象的`.Constructor.name`来输出“Foo”的？令人费解的是，答案既是“是”也是“不”。
+
 Consider this code:
+
+考虑下面的代码：
 
 ```js
 function Foo() {}
@@ -246,9 +252,15 @@ a1; // Foo {}
 
 Even though we change `a1.constructor.name` to legitimately be something else ("Gotcha"), Chrome's console still uses the "Foo" name.
 
+即便我们将`a1.constructor.name`合法地改变为其他的东西（“Gotcha”），Chrome控制台依旧使用名称“Foo”。
+
 So, it would appear the answer to previous question (does it use `.constructor.name`?) is **no**, it must track it somewhere else, internally.
 
+那么，说明前面问题（它使用`.constructor.name`吗？）的答案是 **不**，他一定在内部追踪其他的什么东西。
+
 But, Not so fast! Let's see how this kind of behavior works with OLOO-style code:
+
+但是，且慢！让我们看看这种行为如何与OLOO风格的代码一起工作：
 
 ```js
 var Foo = {};
@@ -267,17 +279,30 @@ a1; // Gotcha {}
 
 Ah-ha! **Gotcha!** Here, Chrome's console **did** find and use the `.constructor.name`. Actually, while writing this book, this exact behavior was identified as a bug in Chrome, and by the time you're reading this, it may have already been fixed. So you may instead have seen the corrected `a1; // Object {}`.
 
+啊哈！**Gotcha**，Chrome的控制台 **确实** 寻找并且使用了`.constructor.name`。实际上，就在写这本书的时候，正是这个行为被认定为Chrome的一个Bug，而且就在你读到这里的时候，它已经被修复了。所以你可能已经看到了被修改过的`a1; // Object{}`。
+
 Aside from that bug, the internal tracking (apparently only for debug output purposes) of the "constructor name" that Chrome does (shown in the earlier snippets) is an intentional Chrome-only extension of behavior beyond what the JS specification calls for.
+
+这个bug暂且不论，Chrome执行的（刚刚在代码段中展示的）“构造器名称”内部追踪（目前仅用于调试输出的目的），是一个仅Chrome内部存在的扩张行为，它已经超出了JS语言规范要求的范围。
 
 If you don't use a "constructor" to make your objects, as we've discouraged with OLOO-style code here in this chapter, then you'll get objects that Chrome does *not* track an internal "constructor name" for, and such objects will correctly only be outputted as "Object {}", meaning "object generated from Object() construction".
 
+如果你不使用“构造器”来制造你的对象，就像我们在本章OLOO风格代码中不鼓励的那样，那么你将会得到一个Chrome不会为其追踪内部“构造器名称”的对象，所以这样的对象将正确地仅仅被输出“Object {}”，意味着“从Object()构建生成的对象”。
+
 **Don't think** this represents a drawback of OLOO-style coding. When you code with OLOO and behavior delegation as your design pattern, *who* "constructed" (that is, *which function* was called with `new`?) some object is an irrelevant detail. Chrome's specific internal "constructor name" tracking is really only useful if you're fully embracing "class-style" coding, but is moot if you're instead embracing OLOO delegation.
 
+**不要认为** 这代表一个OLOO风格代码的缺点。当你用OLOO编码而且用行为代理作为你的设计模式时，*谁* “创建了”（也就是，*哪个函数* 被和`new`一起调用了？）一些对象是一个无关的细节。Chrome特殊的内部“构造器名称”追踪仅仅在你完全拥抱“类风格”编码时才有用，而在你拥抱OLOO委托时是没有意义的。
+
 ### Mental Models Compared
+### 思维模型比较
 
 Now that you can see a difference between "class" and "delegation" design patterns, at least theoretically, let's see the implications these design patterns have on the mental models we use to reason about our code.
 
+现在你可以看到“类”和“委托”设计模式的不同了，然我们看看这些设计模式在我们用来解释我们代码的思维模型上的含义。
+
 We'll examine some more theoretical ("Foo", "Bar") code, and compare both ways (OO vs. OLOO) of implementing the code. The first snippet uses the classical ("prototypal") OO style:
+
+我们将查看一些更加理论上的（“Foo”，“Bar”）代码，然后比较两种方法（OO vs. OLOO）的代码实现。第一段代码使用经典的（“原型的”）OO风格：
 
 ```js
 function Foo(who) {
@@ -305,7 +330,11 @@ b2.speak();
 
 Parent class `Foo`, inherited by child class `Bar`, which is then instantiated twice as `b1` and `b2`. What we have is `b1` delegating to `Bar.prototype` which delegates to `Foo.prototype`. This should look fairly familiar to you, at this point. Nothing too ground-breaking going on.
 
+父类`Foo`，被子类`Bar`继承，之后`Bar`被初始化两次：`b1`和`b2`。我们得到的是`be`委托至`Bar.prototype`，`Bar.prototype`委托至`Foo.prototype`。这对你来说应当看起来十分熟悉。没有太具开拓性的东西发生。
+
 Now, let's implement **the exact same functionality** using *OLOO* style code:
+
+现在，让我们使用 *OLOO* 风格的代码 **实现完全相同的功能**：
 
 ```js
 var Foo = {
@@ -334,47 +363,81 @@ b2.speak();
 
 We take exactly the same advantage of `[[Prototype]]` delegation from `b1` to `Bar` to `Foo` as we did in the previous snippet between `b1`, `Bar.prototype`, and `Foo.prototype`. **We still have the same 3 objects linked together**.
 
+我们利用了完全相同的从`Bar`到`Foo`的`[[Prototype]]`委托，正如我们在前一个代码段中`b1`，`Bar.prototype`，和`Foo.prototype`之间那样。**我们任然有3个对象链接在一起**。
+
 But, importantly, we've greatly simplified *all the other stuff* going on, because now we just set up **objects** linked to each other, without needing all the cruft and confusion of things that look (but don't behave!) like classes, with constructors and prototypes and `new` calls.
+
+但重要的是，我们极大地简化了发生的 *所有其他事项*，因为我们现在仅仅建立了相互链接的 **对象**，而不需要所有其他讨厌且困惑的看起来像类（但动起来不像）的东西，还有构造器，原型和`new`调用。
 
 Ask yourself: if I can get the same functionality with OLOO style code as I do with "class" style code, but OLOO is simpler and has less things to think about, **isn't OLOO better**?
 
+问你自己：如果我能用OLOO风格代码得到我用“类”风格代码得到的一样的东西，但OLOO更简单而且需要考虑的事情更少，**OLOO不是更好吗**？
+
 Let's examine the mental models involved between these two snippets.
 
+然我们查看这两个代码段间涉及的思维模型。
+
 First, the class-style code snippet implies this mental model of entities and their relationships:
+
+首先，类风给的代码段意味着这样的实体与它们的关系的思维模型：
 
 <img src="fig4.png">
 
 Actually, that's a little unfair/misleading, because it's showing a lot of extra detail that you don't *technically* need to know at all times (though you *do* need to understand it!). One take-away is that it's quite a complex series of relationships. But another take-away: if you spend the time to follow those relationship arrows around, **there's an amazing amount of internal consistency** in JS's mechanisms.
 
+实际上，这有点儿不公平/误导，因为它展示了许多额外的，你在技术上一直不需要知道（虽然你 *需要* 理解它）的细节。一个关键是，它是一系列十分复杂的关系。但另一个关键是：如果你花时间来沿着这些关系的箭头走，在JS的机制中 **有数量惊人的内部统一性**。
+
 For instance, the ability of a JS function to access `call(..)`, `apply(..)`, and `bind(..)` (see Chapter 2) is because functions themselves are objects, and function-objects also have a `[[Prototype]]` linkage, to the `Function.prototype` object, which defines those default methods that any function-object can delegate to. JS can do those things, *and you can too!*.
 
+例如，JS函数可以访问`call(..)`，`apply(..)`和`bind(..)`（见第二章）的能力是因为函数本身是对象，而函数对象也拥有一个`[[Prototype]]`链接，链到`Function.prototype`对象，它定义了那些任何函数对象都可以委托到的默认方法。JS可以做这些事情，*你也能！*
+
 OK, let's now look at a *slightly* simplified version of that diagram which is a little more "fair" for comparison -- it shows only the *relevant* entities and relationships.
+
+好了，现在让我们看一个这张图的 *稍稍* 简化的版本，用它来进行比较稍微“公平”一点——它仅展示了 *相关* 的实体与关系。
 
 <img src="fig5.png">
 
 Still pretty complex, eh? The dotted lines are depicting the implied relationships when you setup the "inheritance" between `Foo.prototype` and `Bar.prototype` and haven't yet *fixed* the **missing** `.constructor` property reference (see "Constructor Redux" in Chapter 5). Even with those dotted lines removed, the mental model is still an awful lot to juggle every time you work with object linkages.
 
+任然非常复杂，对吧？虚线描绘了当你在`Foo.prototype`和`Bar.prototype`间建立“继承”时的隐含关系，而且还没有 *修复* **丢失的** `.constructor`属性引用（见第五章“终极构造器”）。即便将虚线去掉，每次你与对象链接打交道时，这个思维模型依然要变很多可怕的戏法。
+
 Now, let's look at the mental model for OLOO-style code:
+
+现在，然我们看看OLOO风格代码的思维模型：
 
 <img src="fig6.png">
 
 As you can see comparing them, it's quite obvious that OLOO-style code has *vastly less stuff* to worry about, because OLOO-style code embraces the **fact** that the only thing we ever really cared about was the **objects linked to other objects**.
 
+正如你所比较它们得到的，十分明显，OLOO风格的代码 *需要关心的东西少太多了*，因为OLOO风格代码拥抱了 **事实**：我们唯一需要真正关心的事情是 **链接到其他对象的对象**。
+
 All the other "class" cruft was a confusing and complex way of getting the same end result. Remove that stuff, and things get much simpler (without losing any capability).
+
+所有其他“类”的烂设计用一种令人费解而且复杂的方式得到相同的结果。去掉那些东西，事情就变得简单得多（还不会失去任何功能）。
 
 ## Classes vs. Objects
 
 We've just seen various theoretical explorations and mental models of "classes" vs. "behavior delegation". But, let's now look at more concrete code scenarios to show how'd you actually use these ideas.
 
+我们已经看到了各种理论的探索和“类”与“行为委托”的思维模型的比较。但是，现在让我们来看看更具体的代码场景，来展示你如何在实际应用这些想法。
+
 We'll first examine a typical scenario in front-end web dev: creating UI widgets (buttons, drop-downs, etc).
+
+我们将首相考察一种在前端网页开发中的典型场景：建造UI部件（按钮，下拉列表等等）。
 
 ### Widget "Classes"
 
 Because you're probably still so used to the OO design pattern, you'll likely immediately think of this problem domain in terms of a parent class (perhaps called `Widget`) with all the common base widget behavior, and then child derived classes for specific widget types (like `Button`).
 
+应为你可能还是如此地习惯于OO设计模式，你很可能会立即这样考虑这个问题：一个父类（也许称为`Wedget`）拥有所有共通的基本部件行为，然后衍生的子类拥有具体的部件类型（比如`Button`）。
+
 **Note:** We're going to use jQuery here for DOM and CSS manipulation, only because it's a detail we don't really care about for the purposes of our current discussion. None of this code cares which JS framework (jQuery, Dojo, YUI, etc), if any, you might solve such mundane tasks with.
 
+**注意：** 为了DOM和CSS的操作，我们将在这里使用JQuery，这仅仅是因为对于我们现在的讨论，它不是一个我们真正关心的细节。这些代码中不关心你用哪个JS框架（JQuery，Dojo，YUI等等）来解决如此无趣的问题。
+
 Let's examine how we'd implement the "class" design in classic-style pure JS without any "class" helper library or syntax:
+
+让我们来看看，在没有任何“类”帮助库或语法的情况下，我们如何用经典风格的纯JS来实现“类”设计：
 
 ```js
 // Parent class
@@ -428,7 +491,11 @@ $( document ).ready( function(){
 
 OO design patterns tell us to declare a base `render(..)` in the parent class, then override it in our child class, but not to replace it per se, rather to augment the base functionality with button-specific behavior.
 
+OO设计模式告诉我们要在父类中声明一个基础`render(..)`，之后再我们的子类中覆盖它，但不是完全替代它，而是用按钮特定的行为增强这个基础功能。
+
 Notice the ugliness of *explicit pseudo-polymorphism* (see Chapter 4) with `Widget.call` and `Widget.prototype.render.call` references for faking "super" calls from the child "class" methods back up to the "parent" class base methods. Yuck.
+
+注意 *显示假想多态* 的丑陋，`Widget.call`和`Widget.prototype.render.call`引用是为了伪装从子“类”方法得到“父类”基础方法支持的“super”调用。呸。
 
 #### ES6 `class` sugar
 
