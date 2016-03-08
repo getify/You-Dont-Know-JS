@@ -1,40 +1,39 @@
-# You Don't Know JS: *this* & Object Prototypes
+# 你不懂JS: *this* & Object Prototypes
 
-## Table of Contents
+## 目录
 
-* Foreword
-* Preface
-* Chapter 1: `this` Or That?
+* 序
+* 前言
+* 第一章: `this` Or That?
 	* Why `this`?
 	* Confusions
 	* What's `this`?
-* Chapter 2: `this` All Makes Sense Now!
+* 第二章: `this`豁然开朗！
 	* Call-site
 	* Nothing But Rules
 	* Everything In Order
 	* Binding Exceptions
 	* Lexical `this`
-* Chapter 3: Objects
+* 第三章: 对象
 	* Syntax
 	* Type
 	* Contents
 	* Iteration
-* Chapter 4: Mixing (Up) "Class" Objects
+* 第四章: Mixing (Up) "Class" Objects
 	* Class Theory
 	* Class Mechanics
 	* Class Inheritance
 	* Mixins
-* Chapter 5: Prototypes
+* 第五章: 原型
 	* `[[Prototype]]`
 	* "Class"
 	* "(Prototypal) Inheritance"
 	* Object Links
-* Chapter 6: Behavior Delegation
+* 第六章: 行为委托
 	* Towards Delegation-Oriented Design
 	* Classes vs. Objects
 	* Simpler Design
 	* Nicer Syntax
 	* Introspection
-* Appendix A: ES6 `class`
-* Appendix B: Acknowledgments
-
+* 附录A: ES6 `class`
+* 附录B: 鸣谢
