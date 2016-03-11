@@ -291,7 +291,7 @@ a == b;		// false
 
 #### Inequality
 
-The `<`, `>`, `<=`, and `>=` operators are used for inequality, referred to in the specification as "relational comparison." Typically they will be used with ordinally comparable values like `number`s. It's easy to understand that `3 < 4`.
+The `<`, `>`, `<=`, and `>=` operators are used for inequality, referred to in the specification as "relational comparison." Typically they will be used with ordinally comparable values like `number` types. It's easy to understand that `3 < 4`.
 
 But JavaScript `string` values can also be compared for inequality, using typical alphabetic rules (`"bar" < "foo"`).
 
