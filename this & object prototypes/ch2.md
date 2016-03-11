@@ -685,9 +685,9 @@ bar( 3 ); // a:2, b:3
 
 ### 间接
 
-另外一个要注意的是，你可以（故意或非故意地！）创建对函数的“indirect reference（间接引用）”，在那样的情况下，当那个函数引用被调用时，*default binding* 规则也会适用。
+另外一个要注意的是，你可以（故意或非故意地！）创建对函数的“indirect reference（间接引用）”，在那样的情况下，当那个函数引用被调用时，*默认绑定* 规则也会适用。
 
-一个最常见的 *indirect reference* 产生方式是通过赋值：
+一个最常见的 *间接引用* 产生方式是通过赋值：
 
 ```js
 function foo() {
@@ -702,17 +702,17 @@ o.foo(); // 3
 (p.foo = o.foo)(); // 2
 ```
 
-赋值表达式`p.foo = o.foo`的 *结果值* 是一个刚好指向底层函数对象的引用。如此，起作用的call-site就是`foo()`，而非你期待的`p.foo()`或`o.foo()`。根据上面的结果，*default binding* 规则适用。
+赋值表达式`p.foo = o.foo`的 *结果值* 是一个刚好指向底层函数对象的引用。如此，起作用的call-site就是`foo()`，而非你期待的`p.foo()`或`o.foo()`。根据上面的结果，*默认绑定* 规则适用。
 
-提醒： 无论你如何得到适用 *default binding* 的函数调用，被调用函数的 **内容** 的`strict mode`状态——而非函数的call-site——决定了`this`引用的值：不是`global` object（在非`strict mode`下），就是`undefined`（在`strict mode`下）。
+提醒： 无论你如何得到适用 *默认绑定* 的函数调用，被调用函数的 **内容** 的`strict mode`状态——而非函数的call-site——决定了`this`引用的值：不是`global`对象（在非`strict mode`下），就是`undefined`（在`strict mode`下）。
 
 ### Softening Binding（软化绑定）
 
-我们之前看到 *hard binding* 是一种通过强制函数绑定到特定的`this`上，来防止函数调用在不经意间退回到 *default binding* 的策略（除非你用`new`去覆盖它！）。问题是，*hard-binding* 极大地降低了函数的灵活性，阻止我们手动使用 *implicit binding* 或后续的 *explicit binding* 尝试来覆盖`this`。
+我们之前看到 *硬绑定* 是一种通过强制函数绑定到特定的`this`上，来防止函数调用在不经意间退回到 *默认绑定* 的策略（除非你用`new`去覆盖它！）。问题是，*硬绑定* 极大地降低了函数的灵活性，阻止我们手动使用 *隐式绑定* 或后续的 *明确绑定* 尝试来覆盖`this`。
 
-如果有这样的办法就好了：为 *default binding* 提供不同的默认值（不是`global`或`undefined`），同时保持函数可以通过 *implicit binding* 或 *explicit binding* 技术来手动绑定`this`。
+如果有这样的办法就好了：为 *默认绑定* 提供不同的默认值（不是`global`或`undefined`），同时保持函数可以通过 *隐式绑定* 或 *明确绑定* 技术来手动绑定`this`。
 
-我们可以构建一个所谓的 *soft binding* 工具来模拟我们期望的行为。
+我们可以构建一个所谓的 *软绑定* 工具来模拟我们期望的行为。
 
 ```js
 if (!Function.prototype.softBind) {
@@ -736,7 +736,7 @@ if (!Function.prototype.softBind) {
 }
 ```
 
-这里提供的`softBind(..)`工具的工作方式和ES5内建的`bind(..)`工具很相似，除了我们的 *soft binding* 行为。他用一种逻辑将指定的函数包装起来，这个逻辑在函数调用时检查`this`，如果它是`global`或`undefined`，就使用预先指定的 *默认值* （`obj`），否则保持`this`不变。它也提供了可选的currying行为（见先前的`bind(..)`讨论）。
+这里提供的`softBind(..)`工具的工作方式和ES5内建的`bind(..)`工具很相似，除了我们的 *软绑定* 行为。他用一种逻辑将指定的函数包装起来，这个逻辑在函数调用时检查`this`，如果它是`global`或`undefined`，就使用预先指定的 *默认值* （`obj`），否则保持`this`不变。它也提供了可选的currying行为（见先前的`bind(..)`讨论）。
 
 我们来看看它的用法：
 
@@ -758,18 +758,18 @@ obj2.foo(); // name: obj2   <---- 看!!!
 
 fooOBJ.call( obj3 ); // name: obj3   <---- 看!
 
-setTimeout( obj2.foo, 10 ); // name: obj   <---- 退回到soft-binding
+setTimeout( obj2.foo, 10 ); // name: obj   <---- 退回到软绑定
 ```
 
-soft-bound版本的`foo()`函数可以如展示的那样被手动`this`绑定到`obj2`或`obj3`，如果 *default binding* 适用时会退到`obj`。
+软绑定版本的`foo()`函数可以如展示的那样被手动`this`绑定到`obj2`或`obj3`，如果 *默认绑定* 适用时会退到`obj`。
 
-## 词法 `this`
+## 词法`this`
 
 我们刚刚涵盖了一般函数遵守的4种规则。但是ES6引入了一种不适用于这些规则特殊的函数：arrow-function（箭头函数）。
 
-Arrow-function不是通过`function`声明的，而是通过所谓的“大箭头”操作符：`=>`。与使用4种标准的`this`规则不同的是，arrow-function从封闭（function或global）作用域采用`this`绑定。
+箭头函数不是通过`function`声明的，而是通过所谓的“大箭头”操作符：`=>`。与使用4种标准的`this`规则不同的是，箭头函数从封闭它的（function或global）作用域采用`this`绑定。
 
-我们来描绘一下arrow-function的词法作用域：
+我们来展示一下箭头函数的词法作用域：
 
 ```js
 function foo() {
@@ -792,7 +792,7 @@ var bar = foo.call( obj1 );
 bar.call( obj2 ); // 2, 不是3!
 ```
 
-在`foo()`中创建的arrow-function在词法上捕获`foo()`调用时的任何`this`。因为`foo()`被`this`绑定到`obj1`，`bar`（被返回的arrow-function的一个引用）也将会被`this`绑定到`obj1`。一个arrow-function的词法绑定是不能被覆盖的（就连`new`也不行！）。
+在`foo()`中创建的箭头函数在词法上捕获`foo()`调用时的`this`，不管它是什么。因为`foo()`被`this`绑定到`obj1`，`bar`（被返回的箭头函数的一个引用）也将会被`this`绑定到`obj1`。一个箭头函数的词法绑定是不能被覆盖的（就连`new`也不行！）。
 
 最常见的用法是用于回调，比如事件处理器或计时器：
 
@@ -811,7 +811,7 @@ var obj = {
 foo.call( obj ); // 2
 ```
 
-同时arrow-function提供了另外一种在函数上使用`bind(..)`的方式，来确保它的`this`，这看起来很吸引人，但重要的是要注意它们本质是用被广泛理解的词法作用域来禁止了传统的`this`机制。在ES6之前，我们为此已经有了相当常用的模式，这些模式几乎和ES6的arrow-function的精神没有区别：
+虽然箭头函数提供除了使用`bind(..)`外，另外一种在函数上来确保`this`的方式，这看起来很吸引人，但重要的是要注意它们本质是用被广泛理解的词法作用域来禁止了传统的`this`机制。在ES6之前，我们为此已经有了相当常用的模式，这些模式几乎和ES6的箭头函数的精神没有区别：
 
 ```js
 function foo() {
@@ -828,19 +828,19 @@ var obj = {
 foo.call( obj ); // 2
 ```
 
-虽然对不想用`bind(..)`的人来说`self = this`和arrow-function都是看起来不错的“解决方案”，但它们实质上逃避了`this`而非理解和拥抱它。
+虽然对不想用`bind(..)`的人来说`self = this`和箭头函数都是看起来不错的“解决方案”，但它们实质上逃避了`this`而非理解和接受它。
 
-如果你发现你在写`this`风格的代码，但是大多数或全部时候，你都用词法上的`self = this`或arrow-function“技巧”抵御`this`机制，那么也许你应该：
+如果你发现你在写`this`风格的代码，但是大多数或全部时候，你都用词法上的`self = this`或箭头函数“技巧”抵御`this`机制，那么也许你应该：
 
 1. 仅使用词法作用域并忘掉虚伪的`this`风格代码。
 
-2. 完全采用`this`风格机制，包括在必要的时候使用`bind(..)`，并尝试避开`self = this`和arrow-function的“词法this”技巧。
+2. 完全接受`this`风格机制，包括在必要的时候使用`bind(..)`，并尝试避开`self = this`和箭头函数的“词法this”技巧。
 
-一个程序可以有效地同时利用两种风格的代码（词法和`this`），但是在同一个函数内部，并确实为了同种类型的查找（TODO），混合这两种机制通常是自找很难维护的代码，而且可能是聪明过了头。
+一个程序可以有效地同时利用两种风格的代码（词法和`this`），但是在同一个函数内部，特别是对同种类型的查找，混合这两种机制通常是自找很难维护的代码，而且可能是聪明过了头。
 
 ## 复习 (TL;DR)
 
-为执行中的函数判定`this`绑定需要找到这个函数的直接调用点。查找到之后，4种规则将会以这个优先顺序施用于call-site：
+为执行中的函数判定`this`绑定需要找到这个函数的直接call-site。找到之后，4种规则将会以 *这个* 优先顺序施用于call-site：
 
 1. 被`new`调用？使用新构建的对象。
 
@@ -850,6 +850,6 @@ foo.call( obj ); // 2
 
 4. 默认：`strict mode`下是`undefined`，否则就是global object。
 
-小心偶热或不经意的调用 *default binding* 规则。如果你想“安全”地忽略`this`绑定，一个像`ø = Object.create(null)`这样的“DMZ”对象是一个很好的占位值，来保护`global`对象不受意外的副作用影响。
+小心偶热或不经意的 *默认绑定* 规则调用。如果你想“安全”地忽略`this`绑定，一个像`ø = Object.create(null)`这样的“DMZ”对象是一个很好的占位值，来保护`global`对象不受意外的副作用影响。
 
-取代这4种绑定规则的是，ES6的arrow-function使用词法作用域来决定`this`绑定，这意味着它们采用封闭他们的函数调用作为`this`绑定（无论它是什么）。它们实质上是ES6之前的`self = this`代码的语法替代品。
+与这4种绑定规则不同，ES6的箭头方法使用词法作用域来决定`this`绑定，这意味着它们采用封闭他们的函数调用作为`this`绑定（无论它是什么）。它们实质上是ES6之前的`self = this`代码的语法替代品。
