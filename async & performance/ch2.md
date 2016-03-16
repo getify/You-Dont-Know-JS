@@ -1,23 +1,39 @@
-# You Don't Know JS: Async & Performance
-# Chapter 2: Callbacks
+# 你不懂JS: 异步与性能
+# 第二章: 回调
 
 In Chapter 1, we explored the terminology and concepts around asynchronous programming in JavaScript. Our focus is on understanding the single-threaded (one-at-a-time) event loop queue that drives all "events" (async function invocations). We also explored various ways that concurrency patterns explain the relationships (if any!) between *simultaneously* running chains of events, or "processes" (tasks, function calls, etc.).
 
+在第一章中，我们探讨了JavaScript中关于异步编程的术语和概念。我们的焦点是理解驱动所有“事件”（异步函数调用）的单线程（一次一个）事件轮询队列。我们还探讨了各种解释 *同时* 运行的事件链，或“进程”（任务， 函数调用等）间的关系的并发模式。
+
 All our examples in Chapter 1 used the function as the individual, indivisible unit of operations, whereby inside the function, statements run in predictable order (above the compiler level!), but at the function-ordering level, events (aka async function invocations) can happen in a variety of orders.
+
+我们在第一章的所有例子中，将函数作为独立的，不可分割的操作单位使用，在这些函数内部语句按照可预知的顺序运行（在编译器等级之上！），但是在函数顺序等级上，事件（也就是异步函数调用）可以以各种顺序发生。
 
 In all these cases, the function is acting as a "callback," because it serves as the target for the event loop to "call back into" the program, whenever that item in the queue is processed.
 
+在所有这些情况中，函数都是一个“回调”。因为无论什么时候事件轮询队列中的事件被处理时，函数都作为事件轮询“调用并返回”程序的目标。
+
 As you no doubt have observed, callbacks are by far the most common way that asynchrony in JS programs is expressed and managed. Indeed, the callback is the most fundamental async pattern in the language.
+
+正如你观察到的，在JS程序中，回调是到目前为止最常见的表达和管理异步的方式。确实，在JavaScript语言中回调是最基础的异步模式。
 
 Countless JS programs, even very sophisticated and complex ones, have been written upon no other async foundation than the callback (with of course the concurrency interaction patterns we explored in Chapter 1). The callback function is the async work horse for JavaScript, and it does its job respectably.
 
+无数的JS程序，即便是最精巧最复杂的程序，都曾经除了回调外不依靠任何其他异步模式而编写（当然，和我们在第一章中探讨的并发互动模式一起）。回调函数是JavaScript的异步苦工，而且它工作得相当好。
+
 Except... callbacks are not without their shortcomings. Many developers are excited by the *promise* (pun intended!) of better async patterns. But it's impossible to effectively use any abstraction if you don't understand what it's abstracting, and why.
 
+除了……回调并不是没有缺点。许多开发者都对 *Promises* 提供的更好的异步模式感到兴奋不已。但是如果你不明白它在抽象什么，和为什么抽象，是不可能有效利用任何抽象机制的。
+
 In this chapter, we will explore a couple of those in depth, as motivation for why more sophisticated async patterns (explored in subsequent chapters of this book) are necessary and desired.
+
+在本章中，我们将深入探讨这些话题，来说明为什么更精巧的异步模式（在本书的后续章节中探讨）是必要和被期望的。
 
 ## Continuations
 
 Let's go back to the async callback example we started with in Chapter 1, but let me slightly modify it to illustrate a point:
+
+让我们回到在第一章中开始的异步回调的例子，但让我稍微修改它一下来画出重点：
 
 ```js
 // A
@@ -29,9 +45,15 @@ ajax( "..", function(..){
 
 `// A` and `// B` represent the first half of the program (aka the *now*), and `// C` marks the second half of the program (aka the *later*). The first half executes right away, and then there's a "pause" of indeterminate length. At some future moment, if the Ajax call completes, then the program will pick up where it left off, and *continue* with the second half.
 
+`// A`和`// B`代表程序的前半部分（也就是 *现在*），`// C`标识了程序的后半部分（也就是 *稍后*）。前半部分立即执行，然后会出现一个不知多久的“暂停”。在未来某个时刻，如果Ajax调用完成了，那么程序会回到它刚才离开的地方，并 *继续* 执行后半部分。
+
 In other words, the callback function wraps or encapsulates the *continuation* of the program.
 
+换句话说，回调函数包装或封装了程序的 *延续*。
+
 Let's make the code even simpler:
+
+让我们把代码弄得更简单一些：
 
 ```js
 // A
@@ -43,13 +65,23 @@ setTimeout( function(){
 
 Stop for a moment and ask yourself how you'd describe (to someone else less informed about how JS works) the way that program behaves. Go ahead, try it out loud. It's a good exercise that will help my next points make more sense.
 
+稍停片刻然后问你自己，你讲如何描述（给一个不那么懂JS工作方式的人）这个程序的行为。来吧，大声说出来。这个很好的练习将使我的下一个观点更有道理。
+
 Most readers just now probably thought or said something to the effect of: "Do A, then set up a timeout to wait 1,000 milliseconds, then once that fires, do C." How close was your rendition?
+
+现在大多数读者可能在想或说着这样的话：“做A，然后设置一个等待1000毫秒的定时器，一旦它触发，就做C”。与你的版本有多接近？
 
 You might have caught yourself and self-edited to: "Do A, setup the timeout for 1,000 milliseconds, then do B, then after the timeout fires, do C." That's more accurate than the first version. Can you spot the difference?
 
+你可能已经给了自己一个修正版：“做A，设置一个1000毫秒的定时器，然后做B，然后在超时事件触发后，做C”。这比第一个版本更准确。你能发现不同之处吗？
+
 Even though the second version is more accurate, both versions are deficient in explaining this code in a way that matches our brains to the code, and the code to the JS engine. The disconnect is both subtle and monumental, and is at the very heart of understanding the shortcomings of callbacks as async expression and management.
 
+虽然第二个版本更准确，但是对于以一种将我们的大脑匹配代码，代码匹配JS引擎的方式讲解这段代码来说，这两个版本都是不足的。这里的鸿沟既是微小的也是巨大的，而且是理解回调作为异步表达和管理的缺点的关键。
+
 As soon as we introduce a single continuation (or several dozen as many programs do!) in the form of a callback function, we have allowed a divergence to form between how our brains work and the way the code will operate. Any time these two diverge (and this is by far not the only place that happens, as I'm sure you know!), we run into the inevitable fact that our code becomes harder to understand, reason about, debug, and maintain.
+
+只要我们以回调函数的方式引入一个延续，我们就允许了一个分歧的形成：在我们的大脑如何工作和代码将运行的方式之间。当这两者背离时，我们的代码就不可避免地陷入这样的境地：更难理解，更难推理，更难调试，和更难维护。
 
 ## Sequential Brain
 
