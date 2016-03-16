@@ -87,41 +87,77 @@ As soon as we introduce a single continuation (or several dozen as many programs
 
 I'm pretty sure most of you readers have heard someone say (even made the claim yourself), "I'm a multitasker." The effects of trying to act as a multitasker range from humorous (e.g., the silly patting-head-rubbing-stomach kids' game) to mundane (chewing gum while walking) to downright dangerous (texting while driving).
 
+我相信大多数读者都曾经听某个人说过（甚至你自己就曾这么说），“我能一心多用”。试图表现得一心多用的效果包含幽默（孩子们的拍头揉肚子游戏），平常的行为（边走边嚼口香糖），和彻头彻尾的危险（开车时发短息）。
+
 But are we multitaskers? Can we really do two conscious, intentional actions at once and think/reason about both of them at exactly the same moment? Does our highest level of brain functionality have parallel multithreading going on?
+
+但我们是一心多用的人吗？我们真的能执行两个意识，有意地一起行动并在完全同一时刻思考/推理它们两个吗？我们最高级的大脑功能有并行的多线程发生吗？
 
 The answer may surprise you: **probably not.**
 
+答案可能令你吃惊：**可能没有。**
+
 That's just not really how our brains appear to be set up. We're much more single taskers than many of us (especially A-type personalities!) would like to admit. We can really only think about one thing at any given instant.
+
+我们的大脑其实就不是这样构成的。与我们中大多数人（特别是A型人格！）愿意承认的一心多用者相比，我们更像一个一心一用者。其实我们只能在任一给定的时刻考虑一件事情。
 
 I'm not talking about all our involuntary, subconscious, automatic brain functions, such as heart beating, breathing, and eyelid blinking. Those are all vital tasks to our sustained life, but we don't intentionally allocate any brain power to them. Thankfully, while we obsess about checking social network feeds for the 15th time in three minutes, our brain carries on in the background (threads!) with all those important tasks.
 
+我不是说我们所有的下意识，潜意识，大脑的自动功能，比如心跳，呼吸，和眨眼。那些都是我们延续生命的重要任务，我们不会有意识地给它们分配大脑的能量。谢天谢地，当我们在3分钟内第15次查看社交网络的新鲜事儿时，我们的大脑在后台（线程！）继续着这些重要任务。
+
 We're instead talking about whatever task is at the forefront of our minds at the moment. For me, it's writing the text in this book right now. Am I doing any other higher level brain function at exactly this same moment? Nope, not really. I get distracted quickly and easily -- a few dozen times in these last couple of paragraphs!
+
+相反我们讨论的是在某时刻我们的意识最前线的任务。对我来说，是现在正在写这本书。我还在这完全同一个时刻做其他高级的大脑活动吗？不，没有。我很快而且容易分心——在这最后的几段中有几十次了！
 
 When we *fake* multitasking, such as trying to type something at the same time we're talking to a friend or family member on the phone, what we're actually most likely doing is acting as fast context switchers. In other words, we switch back and forth between two or more tasks in rapid succession, *simultaneously* progressing on each task in tiny, fast little chunks. We do it so fast that to the outside world it appears as if we're doing these things *in parallel*.
 
+当我们 *模拟* 一心多用时，比如试着在打字的同时和朋友或家人通电话，实际上我们表现得更像一个快速环境切换器。换句话说，我们快速交替地在两个或更多任务间来回切换，在微小，快速的区块中 *同时* 处理每个任务。我们做的是如此之快，以至于从外界看开我们在 *平行地* 做这些事情。
+
 Does that sound suspiciously like async evented concurrency (like the sort that happens in JS) to you?! If not, go back and read Chapter 1 again!
+
+难道这听起来不像异步事件并发吗（就像JS中发生的那样）？！如果不，回去再读一遍第一章！
 
 In fact, one way of simplifying (i.e., abusing) the massively complex world of neurology into something I can remotely hope to discuss here is that our brains work kinda like the event loop queue.
 
+事实上，将庞大复杂的神经内科世界简化为我希望可以在这里讨论的东西的一个方法是，我们的大脑工作起来有点儿像事件轮询队列。
+
 If you think about every single letter (or word) I type as a single async event, in just this sentence alone there are several dozen opportunities for my brain to be interrupted by some other event, such as from my senses, or even just my random thoughts.
 
+如果你把我打得每一个字（或词）当做一个单独的异步事件，那么现在这一句话上就有十几处地方，可以让我的大脑被其他的事件打断，比如我的感觉，甚至只是我随机的想法。
+
 I don't get interrupted and pulled to another "process" at every opportunity that I could be (thankfully -- or this book would never be written!). But it happens often enough that I feel my own brain is nearly constantly switching to various different contexts (aka "processes"). And that's an awful lot like how the JS engine would probably feel.
+
+我不会在每个可能的地方被打断并被拉到其他的“处理”上去（谢天谢地——要不这本书永远也写不完了！）。但是它发生得也足够频繁，以至于我感到我的大脑几乎持续不断地切换到各种不同的环境（也就是“进程”）。而且这和JS引擎可能会感觉到的十分相像。
 
 ### Doing Versus Planning
 
 OK, so our brains can be thought of as operating in single-threaded event loop queue like ways, as can the JS engine. That sounds like a good match.
 
+好了，这么说来我们的大脑可以被认为运行在一个单线程事件轮询队列中，就像JS引擎那样。这听起来是个不错的匹配。
+
 But we need to be more nuanced than that in our analysis. There's a big, observable difference between how we plan various tasks, and how our brains actually operate those tasks.
+
+但是我们需要比我们刚才分析的更加细致入微。在我们如何计划各种任务，和我们的大脑实际如何运行这些任务之间，有一个巨大，明显的不同。
 
 Again, back to the writing of this text as my metaphor. My rough mental outline plan here is to keep writing and writing, going sequentially through a set of points I have ordered in my thoughts. I don't plan to have any interruptions or nonlinear activity in this writing. But yet, my brain is nevertheless switching around all the time.
 
+再一次，回到这篇文章的写作的比拟上来。我的粗略的心理轮廓计划是继续写啊写，顺序地经过一系列在我思想中定好的点。我没有在这次写作期间计划任何的打扰或非线性的活动。但无论如何，我的大脑依然一直不停地切换。
+
 Even though at an operational level our brains are async evented, we seem to plan out tasks in a sequential, synchronous way. "I need to go to the store, then buy some milk, then drop off my dry cleaning."
+
+即便在操作级别上我们的大脑是异步事件的，但我们还是用一种顺序的，同步的方式计划任务。“我得去商店，然后买些牛奶，然后去干洗店”。
 
 You'll notice that this higher level thinking (planning) doesn't seem very async evented in its formulation. In fact, it's kind of rare for us to deliberately think solely in terms of events. Instead, we plan things out carefully, sequentially (A then B then C), and we assume to an extent a sort of temporal blocking that forces B to wait on A, and C to wait on B.
 
-When a developer writes code, they are planning out a set of actions to occur. If they're any good at being a developer, they're **carefully planning** it out. "I need to set `z` to the value of `x`, and then `x` to the value of `y`," and so forth.
+你会注意到这种高级思维在它的规划上看起来不是那么异步事件。事实上，我们几乎很少会故意只用事件的形式思考。相反，我们小心，顺序地（A然后B然后C）计划，而且我们假设一个区间有某种临时的障碍物迫使B等待A，是C等待B。
+
+When a developer writes code, thqujianey are planning out a set of actions to occur. If they're any good at being a developer, they're **carefully planning** it out. "I need to set `z` to the value of `x`, and then `x` to the value of `y`," and so forth.
+
+当开发者编写代码时，他们规划一组将要发生的动作。如果他们是合格的开发者，他们会 **小心地规划**。比如“我需要将`z`的值设为`x`的值，然后将`x`的值设为`y`的值”。
 
 When we write out synchronous code, statement by statement, it works a lot like our errands to-do list:
+
+当我们编写同步代码时，一个语句一个语句，它工作起来就像我们的跑腿todo清单：
 
 ```js
 // swap `x` and `y` (via temp variable `z`)
