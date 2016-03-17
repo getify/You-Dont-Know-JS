@@ -1,37 +1,21 @@
 # 你不懂JS: 异步与性能
 # 第二章: 回调
 
-In Chapter 1, we explored the terminology and concepts around asynchronous programming in JavaScript. Our focus is on understanding the single-threaded (one-at-a-time) event loop queue that drives all "events" (async function invocations). We also explored various ways that concurrency patterns explain the relationships (if any!) between *simultaneously* running chains of events, or "processes" (tasks, function calls, etc.).
-
 在第一章中，我们探讨了JavaScript中关于异步编程的术语和概念。我们的焦点是理解驱动所有“事件”（异步函数调用）的单线程（一次一个）事件轮询队列。我们还探讨了各种解释 *同时* 运行的事件链，或“进程”（任务， 函数调用等）间的关系的并发模式。
-
-All our examples in Chapter 1 used the function as the individual, indivisible unit of operations, whereby inside the function, statements run in predictable order (above the compiler level!), but at the function-ordering level, events (aka async function invocations) can happen in a variety of orders.
 
 我们在第一章的所有例子中，将函数作为独立的，不可分割的操作单位使用，在这些函数内部语句按照可预知的顺序运行（在编译器等级之上！），但是在函数顺序等级上，事件（也就是异步函数调用）可以以各种顺序发生。
 
-In all these cases, the function is acting as a "callback," because it serves as the target for the event loop to "call back into" the program, whenever that item in the queue is processed.
-
 在所有这些情况中，函数都是一个“回调”。因为无论什么时候事件轮询队列中的事件被处理时，函数都作为事件轮询“调用并返回”程序的目标。
-
-As you no doubt have observed, callbacks are by far the most common way that asynchrony in JS programs is expressed and managed. Indeed, the callback is the most fundamental async pattern in the language.
 
 正如你观察到的，在JS程序中，回调是到目前为止最常见的表达和管理异步的方式。确实，在JavaScript语言中回调是最基础的异步模式。
 
-Countless JS programs, even very sophisticated and complex ones, have been written upon no other async foundation than the callback (with of course the concurrency interaction patterns we explored in Chapter 1). The callback function is the async work horse for JavaScript, and it does its job respectably.
-
 无数的JS程序，即便是最精巧最复杂的程序，都曾经除了回调外不依靠任何其他异步模式而编写（当然，和我们在第一章中探讨的并发互动模式一起）。回调函数是JavaScript的异步苦工，而且它工作得相当好。
 
-Except... callbacks are not without their shortcomings. Many developers are excited by the *promise* (pun intended!) of better async patterns. But it's impossible to effectively use any abstraction if you don't understand what it's abstracting, and why.
-
 除了……回调并不是没有缺点。许多开发者都对 *Promises* 提供的更好的异步模式感到兴奋不已。但是如果你不明白它在抽象什么，和为什么抽象，是不可能有效利用任何抽象机制的。
-
-In this chapter, we will explore a couple of those in depth, as motivation for why more sophisticated async patterns (explored in subsequent chapters of this book) are necessary and desired.
 
 在本章中，我们将深入探讨这些话题，来说明为什么更精巧的异步模式（在本书的后续章节中探讨）是必要和被期望的。
 
 ## Continuations
-
-Let's go back to the async callback example we started with in Chapter 1, but let me slightly modify it to illustrate a point:
 
 让我们回到在第一章中开始的异步回调的例子，但让我稍微修改它一下来画出重点：
 
@@ -43,15 +27,9 @@ ajax( "..", function(..){
 // B
 ```
 
-`// A` and `// B` represent the first half of the program (aka the *now*), and `// C` marks the second half of the program (aka the *later*). The first half executes right away, and then there's a "pause" of indeterminate length. At some future moment, if the Ajax call completes, then the program will pick up where it left off, and *continue* with the second half.
-
 `// A`和`// B`代表程序的前半部分（也就是 *现在*），`// C`标识了程序的后半部分（也就是 *稍后*）。前半部分立即执行，然后会出现一个不知多久的“暂停”。在未来某个时刻，如果Ajax调用完成了，那么程序会回到它刚才离开的地方，并 *继续* 执行后半部分。
 
-In other words, the callback function wraps or encapsulates the *continuation* of the program.
-
 换句话说，回调函数包装或封装了程序的 *延续*。
-
-Let's make the code even simpler:
 
 让我们把代码弄得更简单一些：
 
@@ -63,99 +41,53 @@ setTimeout( function(){
 // B
 ```
 
-Stop for a moment and ask yourself how you'd describe (to someone else less informed about how JS works) the way that program behaves. Go ahead, try it out loud. It's a good exercise that will help my next points make more sense.
-
 稍停片刻然后问你自己，你讲如何描述（给一个不那么懂JS工作方式的人）这个程序的行为。来吧，大声说出来。这个很好的练习将使我的下一个观点更有道理。
-
-Most readers just now probably thought or said something to the effect of: "Do A, then set up a timeout to wait 1,000 milliseconds, then once that fires, do C." How close was your rendition?
 
 现在大多数读者可能在想或说着这样的话：“做A，然后设置一个等待1000毫秒的定时器，一旦它触发，就做C”。与你的版本有多接近？
 
-You might have caught yourself and self-edited to: "Do A, setup the timeout for 1,000 milliseconds, then do B, then after the timeout fires, do C." That's more accurate than the first version. Can you spot the difference?
-
 你可能已经给了自己一个修正版：“做A，设置一个1000毫秒的定时器，然后做B，然后在超时事件触发后，做C”。这比第一个版本更准确。你能发现不同之处吗？
 
-Even though the second version is more accurate, both versions are deficient in explaining this code in a way that matches our brains to the code, and the code to the JS engine. The disconnect is both subtle and monumental, and is at the very heart of understanding the shortcomings of callbacks as async expression and management.
-
 虽然第二个版本更准确，但是对于以一种将我们的大脑匹配代码，代码匹配JS引擎的方式讲解这段代码来说，这两个版本都是不足的。这里的鸿沟既是微小的也是巨大的，而且是理解回调作为异步表达和管理的缺点的关键。
-
-As soon as we introduce a single continuation (or several dozen as many programs do!) in the form of a callback function, we have allowed a divergence to form between how our brains work and the way the code will operate. Any time these two diverge (and this is by far not the only place that happens, as I'm sure you know!), we run into the inevitable fact that our code becomes harder to understand, reason about, debug, and maintain.
 
 只要我们以回调函数的方式引入一个延续，我们就允许了一个分歧的形成：在我们的大脑如何工作和代码将运行的方式之间。当这两者背离时，我们的代码就不可避免地陷入这样的境地：更难理解，更难推理，更难调试，和更难维护。
 
 ## Sequential Brain
 
-I'm pretty sure most of you readers have heard someone say (even made the claim yourself), "I'm a multitasker." The effects of trying to act as a multitasker range from humorous (e.g., the silly patting-head-rubbing-stomach kids' game) to mundane (chewing gum while walking) to downright dangerous (texting while driving).
-
 我相信大多数读者都曾经听某个人说过（甚至你自己就曾这么说），“我能一心多用”。试图表现得一心多用的效果包含幽默（孩子们的拍头揉肚子游戏），平常的行为（边走边嚼口香糖），和彻头彻尾的危险（开车时发短息）。
-
-But are we multitaskers? Can we really do two conscious, intentional actions at once and think/reason about both of them at exactly the same moment? Does our highest level of brain functionality have parallel multithreading going on?
 
 但我们是一心多用的人吗？我们真的能执行两个意识，有意地一起行动并在完全同一时刻思考/推理它们两个吗？我们最高级的大脑功能有并行的多线程发生吗？
 
-The answer may surprise you: **probably not.**
-
 答案可能令你吃惊：**可能没有。**
-
-That's just not really how our brains appear to be set up. We're much more single taskers than many of us (especially A-type personalities!) would like to admit. We can really only think about one thing at any given instant.
 
 我们的大脑其实就不是这样构成的。与我们中大多数人（特别是A型人格！）愿意承认的一心多用者相比，我们更像一个一心一用者。其实我们只能在任一给定的时刻考虑一件事情。
 
-I'm not talking about all our involuntary, subconscious, automatic brain functions, such as heart beating, breathing, and eyelid blinking. Those are all vital tasks to our sustained life, but we don't intentionally allocate any brain power to them. Thankfully, while we obsess about checking social network feeds for the 15th time in three minutes, our brain carries on in the background (threads!) with all those important tasks.
-
 我不是说我们所有的下意识，潜意识，大脑的自动功能，比如心跳，呼吸，和眨眼。那些都是我们延续生命的重要任务，我们不会有意识地给它们分配大脑的能量。谢天谢地，当我们在3分钟内第15次查看社交网络的新鲜事儿时，我们的大脑在后台（线程！）继续着这些重要任务。
-
-We're instead talking about whatever task is at the forefront of our minds at the moment. For me, it's writing the text in this book right now. Am I doing any other higher level brain function at exactly this same moment? Nope, not really. I get distracted quickly and easily -- a few dozen times in these last couple of paragraphs!
 
 相反我们讨论的是在某时刻我们的意识最前线的任务。对我来说，是现在正在写这本书。我还在这完全同一个时刻做其他高级的大脑活动吗？不，没有。我很快而且容易分心——在这最后的几段中有几十次了！
 
-When we *fake* multitasking, such as trying to type something at the same time we're talking to a friend or family member on the phone, what we're actually most likely doing is acting as fast context switchers. In other words, we switch back and forth between two or more tasks in rapid succession, *simultaneously* progressing on each task in tiny, fast little chunks. We do it so fast that to the outside world it appears as if we're doing these things *in parallel*.
-
 当我们 *模拟* 一心多用时，比如试着在打字的同时和朋友或家人通电话，实际上我们表现得更像一个快速环境切换器。换句话说，我们快速交替地在两个或更多任务间来回切换，在微小，快速的区块中 *同时* 处理每个任务。我们做的是如此之快，以至于从外界看开我们在 *平行地* 做这些事情。
-
-Does that sound suspiciously like async evented concurrency (like the sort that happens in JS) to you?! If not, go back and read Chapter 1 again!
 
 难道这听起来不像异步事件并发吗（就像JS中发生的那样）？！如果不，回去再读一遍第一章！
 
-In fact, one way of simplifying (i.e., abusing) the massively complex world of neurology into something I can remotely hope to discuss here is that our brains work kinda like the event loop queue.
-
 事实上，将庞大复杂的神经内科世界简化为我希望可以在这里讨论的东西的一个方法是，我们的大脑工作起来有点儿像事件轮询队列。
 
-If you think about every single letter (or word) I type as a single async event, in just this sentence alone there are several dozen opportunities for my brain to be interrupted by some other event, such as from my senses, or even just my random thoughts.
-
 如果你把我打得每一个字（或词）当做一个单独的异步事件，那么现在这一句话上就有十几处地方，可以让我的大脑被其他的事件打断，比如我的感觉，甚至只是我随机的想法。
-
-I don't get interrupted and pulled to another "process" at every opportunity that I could be (thankfully -- or this book would never be written!). But it happens often enough that I feel my own brain is nearly constantly switching to various different contexts (aka "processes"). And that's an awful lot like how the JS engine would probably feel.
 
 我不会在每个可能的地方被打断并被拉到其他的“处理”上去（谢天谢地——要不这本书永远也写不完了！）。但是它发生得也足够频繁，以至于我感到我的大脑几乎持续不断地切换到各种不同的环境（也就是“进程”）。而且这和JS引擎可能会感觉到的十分相像。
 
 ### Doing Versus Planning
 
-OK, so our brains can be thought of as operating in single-threaded event loop queue like ways, as can the JS engine. That sounds like a good match.
-
 好了，这么说来我们的大脑可以被认为运行在一个单线程事件轮询队列中，就像JS引擎那样。这听起来是个不错的匹配。
-
-But we need to be more nuanced than that in our analysis. There's a big, observable difference between how we plan various tasks, and how our brains actually operate those tasks.
 
 但是我们需要比我们刚才分析的更加细致入微。在我们如何计划各种任务，和我们的大脑实际如何运行这些任务之间，有一个巨大，明显的不同。
 
-Again, back to the writing of this text as my metaphor. My rough mental outline plan here is to keep writing and writing, going sequentially through a set of points I have ordered in my thoughts. I don't plan to have any interruptions or nonlinear activity in this writing. But yet, my brain is nevertheless switching around all the time.
-
 再一次，回到这篇文章的写作的比拟上来。我的粗略的心理轮廓计划是继续写啊写，顺序地经过一系列在我思想中定好的点。我没有在这次写作期间计划任何的打扰或非线性的活动。但无论如何，我的大脑依然一直不停地切换。
-
-Even though at an operational level our brains are async evented, we seem to plan out tasks in a sequential, synchronous way. "I need to go to the store, then buy some milk, then drop off my dry cleaning."
 
 即便在操作级别上我们的大脑是异步事件的，但我们还是用一种顺序的，同步的方式计划任务。“我得去商店，然后买些牛奶，然后去干洗店”。
 
-You'll notice that this higher level thinking (planning) doesn't seem very async evented in its formulation. In fact, it's kind of rare for us to deliberately think solely in terms of events. Instead, we plan things out carefully, sequentially (A then B then C), and we assume to an extent a sort of temporal blocking that forces B to wait on A, and C to wait on B.
-
 你会注意到这种高级思维在它的规划上看起来不是那么异步事件。事实上，我们几乎很少会故意只用事件的形式思考。相反，我们小心，顺序地（A然后B然后C）计划，而且我们假设一个区间有某种临时的障碍物迫使B等待A，是C等待B。
 
-When a developer writes code, thqujianey are planning out a set of actions to occur. If they're any good at being a developer, they're **carefully planning** it out. "I need to set `z` to the value of `x`, and then `x` to the value of `y`," and so forth.
-
 当开发者编写代码时，他们规划一组将要发生的动作。如果他们是合格的开发者，他们会 **小心地规划**。比如“我需要将`z`的值设为`x`的值，然后将`x`的值设为`y`的值”。
-
-When we write out synchronous code, statement by statement, it works a lot like our errands to-do list:
 
 当我们编写同步代码时，一个语句一个语句，它工作起来就像我们的跑腿todo清单：
 
@@ -166,29 +98,29 @@ x = y;
 y = z;
 ```
 
-These three assignment statements are synchronous, so `x = y` waits for `z = x` to finish, and `y = z` in turn waits for `x = y` to finish. Another way of saying it is that these three statements are temporally bound to execute in a certain order, one right after the other. Thankfully, we don't need to be bothered with any async evented details here. If we did, the code gets a lot more complex, quickly!
+这三个赋值语句是同步的，所以`x=y`会等待`z=x`完成，而`y=z`会相应地等待`x=y`完成。另一种说法是这三个语句临时地按照特定的顺序绑在一起执行，一个接一个。幸好我们不必在这里关心任何异步事件的细节。如果我们关心，代码很快就会变得非常复杂！
 
-So if synchronous brain planning maps well to synchronous code statements, how well do our brains do at planning out asynchronous code?
+如果同步的大脑规划和同步的代码语句匹配的很好，那么我们的大脑能把异步代码规划得多好呢？
 
-It turns out that how we express asynchrony (with callbacks) in our code doesn't map very well at all to that synchronous brain planning behavior.
+事实证明，我们在代码中表达异步的方式（用回调）和我们同步的大脑规划行为根本匹配的不是很好。
 
-Can you actually imagine having a line of thinking that plans out your to-do errands like this?
+你能像这样实际想象一下规划你的跑腿todo清单的思维线索吗？
 
-> "I need to go to the store, but on the way I'm sure I'll get a phone call, so 'Hi, Mom', and while she starts talking, I'll be looking up the store address on GPS, but that'll take a second to load, so I'll turn down the radio so I can hear Mom better, then I'll realize I forgot to put on a jacket and it's cold outside, but no matter, keep driving and talking to Mom, and then the seatbelt ding reminds me to buckle up, so 'Yes, Mom, I am wearing my seatbelt, I always do!'. Ah, finally the GPS got the directions, now..."
+> “我得去趟商店，但是我确信在路上我会接到一个电话，于是‘嗨，妈妈’，然后她开始讲话，我会在GPS上搜索商店的位置，但那会花几分钟加载，所以我把收音机音量调小以便听到妈妈讲话，然后我发现我忘了穿夹克而且外面很冷，但没关系，继续开车并和妈妈说话，然后安全带警报提醒我要系好，于是‘是的，妈，我系着安全带呢，我总是系着安全带！’。啊，GPS终于得到方向了，现在……”
 
-As ridiculous as that sounds as a formulation for how we plan our day out and think about what to do and in what order, nonetheless it's exactly how our brains operate at a functional level. Remember, that's not multitasking, it's just fast context switching.
+虽然作为我们如何度过自己的一天，思考以什么顺序做什么事的规划听起来很荒唐，但这正是我们大脑在功能层面运行的方式。记住，这不是一心多用，而只是快速的环境切换。
 
-The reason it's difficult for us as developers to write async evented code, especially when all we have is the callback to do it, is that stream of consciousness thinking/planning is unnatural for most of us.
+我们这些开发则编写异步事件代码困难的原因，特别是当我们只有回调手段可用时，就是意识思考/规划的流动对我们大多数人是不自然的。
 
-We think in step-by-step terms, but the tools (callbacks) available to us in code are not expressed in a step-by-step fashion once we move from synchronous to asynchronous.
+我们用一步接一步的方式思考，但是一旦我们从同步走向异步，在代码中可以用的工具（回调）不是以一步接一步的方式表达的。
 
-And **that** is why it's so hard to accurately author and reason about async JS code with callbacks: because it's not how our brain planning works.
+而且这就是为什么正确编写和推理使用回调的异步JS代码是如此困难：因为它不是我们的大脑进行规划的工作方式。
 
-**Note:** The only thing worse than not knowing why some code breaks is not knowing why it worked in the first place! It's the classic "house of cards" mentality: "it works, but not sure why, so nobody touch it!" You may have heard, "Hell is other people" (Sartre), and the programmer meme twist, "Hell is other people's code." I believe truly: "Hell is not understanding my own code." And callbacks are one main culprit.
+**注意：** 唯一比不知道为什么代码不好用更糟糕的是，从一开始就不知道为什么代码好用！这是一种经典的“纸牌屋”心理：“它好用，但不知为什，所以大家都别碰！”你可能听说过，“他人即地狱”（萨特），而程序员们说，“他人的代码即地狱”。我相信：“不明白我自己的代码才是地狱。”而回调正式肇事者之一。
 
 ### Nested/Chained Callbacks
 
-Consider:
+考虑下面的代码：
 
 ```js
 listen( "click", function handler(evt){
@@ -205,17 +137,17 @@ listen( "click", function handler(evt){
 } );
 ```
 
-There's a good chance code like that is recognizable to you. We've got a chain of three functions nested together, each one representing a step in an asynchronous series (task, "process").
+你很可能一眼就能认出这样的代码。我们得到了三个嵌套在一起的函数链，每一个函数都代表异步序列（任务，“进程”）的一个步骤。
 
-This kind of code is often called "callback hell," and sometimes also referred to as the "pyramid of doom" (for its sideways-facing triangular shape due to the nested indentation).
+这样的代码常被称为“callback hell（回调地狱）”，有时也被称为“pyramid of doom（末日金字塔）”（由于嵌套的缩进它看起来像一个放倒的三角形）。
 
-But "callback hell" actually has almost nothing to do with the nesting/indentation. It's a far deeper problem than that. We'll see how and why as we continue through the rest of this chapter.
+但是“回调地狱”实际上与嵌套/缩进无关。它是一个深刻得多的问题。我们将继续在本章剩下的部分看到它为什么和如何成为一个问题。
 
-First, we're waiting for the "click" event, then we're waiting for the timer to fire, then we're waiting for the Ajax response to come back, at which point it might do it all again.
+首先，我们等待“click”事件，然后我们等待定时器触发，然后我们等待Ajax应答回来，就在这时它可能会将所有这些再做一遍。
 
-At first glance, this code may seem to map its asynchrony naturally to sequential brain planning.
+猛地一看，这段代码的异步性质可能看起来与顺序的大脑规划相匹配。
 
-First (*now*), we:
+首先（*现在*），我们：
 
 ```js
 listen( "..", function handler(..){
@@ -223,7 +155,7 @@ listen( "..", function handler(..){
 } );
 ```
 
-Then *later*, we:
+*稍后*，我们：
 
 ```js
 setTimeout( function request(..){
@@ -231,7 +163,7 @@ setTimeout( function request(..){
 }, 500) ;
 ```
 
-Then still *later*, we:
+再 *稍后*，我们：
 
 ```js
 ajax( "..", function response(..){
@@ -239,7 +171,7 @@ ajax( "..", function response(..){
 } );
 ```
 
-And finally (most *later*), we:
+最后（最 *稍后*），我们：
 
 ```js
 if ( .. ) {
@@ -248,11 +180,11 @@ if ( .. ) {
 else ..
 ```
 
-But there's several problems with reasoning about this code linearly in such a fashion.
+不过用这样的方式线性推导这段代码有几个问题。
 
-First, it's an accident of the example that our steps are on subsequent lines (1, 2, 3, and 4...). In real async JS programs, there's often a lot more noise cluttering things up, noise that we have to deftly maneuver past in our brains as we jump from one function to the next. Understanding the async flow in such callback-laden code is not impossible, but it's certainly not natural or easy, even with lots of practice.
+首先，这个例子中我们的步骤在一条顺序的线上（1，2，3，和4……）是一个巧合。在真实的异步JS程序中，经常会有很多噪音把事情搞乱，在我们从一个函数调到下一个函数时不得不在大脑中把这些噪音快速地演练一遍。理解这样满载回调的异步流程不是不可能，但绝不自然或容易，甚至需要很多练习。
 
-But also, there's something deeper wrong, which isn't evident just in that code example. Let me make up another scenario (pseudocode-ish) to illustrate it:
+而且，有些更深层的，仅在这段代码中不明显的东西搞错了。让我们建立另一个场景（假象代码）来展示它：
 
 ```js
 doA( function(){
@@ -268,7 +200,7 @@ doA( function(){
 doF();
 ```
 
-While the experienced among you will correctly identify the true order of operations here, I'm betting it is more than a little confusing at first glance, and takes some concerted mental cycles to arrive at. The operations will happen in this order:
+虽然根据经验你将正确地指出这些操作的真实顺序，但我打赌它第一眼看上去有些使人糊涂，而且需要一些协调的思维周期才能搞明白。这些操作将会以这种顺序发生：
 
 * `doA()`
 * `doF()`
@@ -277,9 +209,9 @@ While the experienced among you will correctly identify the true order of operat
 * `doE()`
 * `doD()`
 
-Did you get that right the very first time you glanced at the code?
+你是在第一次扫一眼这段代码就看明白的吗？
 
-OK, some of you are thinking I was unfair in my function naming, to intentionally lead you astray. I swear I was just naming in top-down appearance order. But let me try again:
+好吧，你们肯定有些人在想我在函数的命名上不公平，故意引导你误入歧途。我发誓我只是按照从上到下出现的顺序命名的。不过让我再试一次：
 
 ```js
 doA( function(){
@@ -295,17 +227,17 @@ doA( function(){
 doB();
 ```
 
-Now, I've named them alphabetically in order of actual execution. But I still bet, even with experience now in this scenario, tracing through the `A -> B -> C -> D -> E -> F` order doesn't come natural to many if any of you readers. Certainly your eyes do an awful lot of jumping up and down the code snippet, right?
+现在，我以他们实际执行的顺序用字母命名了。但我依然要打赌，即便是现在对这个场景有经验的情况下，大多数读者追踪`A -> B -> C -> D -> E -> F`的顺序并不是自然而然的。你的眼睛肯定在这段代码中上上下下跳了许多次，对吧？
 
-But even if that all comes natural to you, there's still one more hazard that could wreak havoc. Can you spot what it is?
+就算它对你来说都是自然的，这里依然还有一个可能肆虐的灾难。你能发现它是什么吗？
 
-What if `doA(..)` or `doD(..)` aren't actually async, the way we obviously assumed them to be? Uh oh, now the order is different. If they're both sync (and maybe only sometimes, depending on the conditions of the program at the time), the order is now `A -> C -> D -> F -> E -> B`.
+如果`doA(..)`或`doD(..)`实际上不是如我们明显地假设的那样，不是异步的呢？嗯，现在顺序不同了。如果它们都是同步的（也许仅仅有时是这样，根据当时程序所处的条件而定），现在的顺序是`A -> C -> D -> F -> E -> B`。
 
-That sound you just heard faintly in the background is the sighs of thousands of JS developers who just had a face-in-hands moment.
+你在背景中隐约听到的声音，正是成千上万双手掩面的JS开发者的叹息。
 
-Is nesting the problem? Is that what makes it so hard to trace the async flow? That's part of it, certainly.
+嵌套是问题吗？是它使追踪异步流程变得这么困难吗？当然，有一部分是。
 
-But let me rewrite the previous nested event/timeout/Ajax example without using nesting:
+但是然我不用嵌套重写一遍前面事件/超时/Ajax嵌套的例子：
 
 ```js
 listen( "click", handler );
@@ -328,31 +260,31 @@ function response(text){
 }
 ```
 
-This formulation of the code is not hardly as recognizable as having the nesting/indentation woes of its previous form, and yet it's every bit as susceptible to "callback hell." Why?
+这样的代码组织形式几乎看不出来有前一种形式的嵌套/缩进困境，但它的每一处依然容易受到“回调地狱”的影响。为什么呢？
 
-As we go to linearly (sequentially) reason about this code, we have to skip from one function, to the next, to the next, and bounce all around the code base to "see" the sequence flow. And remember, this is simplified code in sort of best-case fashion. We all know that real async JS program code bases are often fantastically more jumbled, which makes such reasoning orders of magnitude more difficult.
+当我们线性地（顺序地）推理这段代码，我们不得不从一个函数跳到下一个函数，再跳到下一个函数，并在代码中弹来弹去以“看到”顺序流。并且要记住，这个简化的代码风格是某种最佳情况。我们都知道真实的JS程序代码经常更加神奇地错综复杂，使这样量级的顺序推理更加困难。
 
-Another thing to notice: to get steps 2, 3, and 4 linked together so they happen in succession, the only affordance callbacks alone gives us is to hardcode step 2 into step 1, step 3 into step 2, step 4 into step 3, and so on. The hardcoding isn't necessarily a bad thing, if it really is a fixed condition that step 2 should always lead to step 3.
+另一件需要注意的事是：为了将第2，3，4步链接在一起使他们相继发生，回调独自给我们的启示是将第2步硬编码在第1步中，将第3步硬编码在第2步中，将第4步硬编码在第3步中，如此继续。硬编码不一定是一件坏事，如果第2步应当总是在第3步之前真的是一个固定条件。
 
-But the hardcoding definitely makes the code a bit more brittle, as it doesn't account for anything going wrong that might cause a deviation in the progression of steps. For example, if step 2 fails, step 3 never gets reached, nor does step 2 retry, or move to an alternate error handling flow, and so on.
+不过硬编码绝对会使代码变得更脆弱，因为它不考虑任何可能使在步骤前行的过程中出现偏差的异常情况。举个例子，如果第2步失败了，第3步永远不会到达，第2步也不会重试，或者移动到一个错误处理流程上，等等。
 
-All of these issues are things you *can* manually hardcode into each step, but that code is often very repetitive and not reusable in other steps or in other async flows in your program.
+所有这些问题你都 *可以* 手动硬编码在每一步中，但那样的代码总是重复的，而且不能再其他步骤或你程序的其他异步流程中复用。
 
-Even though our brains might plan out a series of tasks in a sequential type of way (this, then this, then this), the evented nature of our brain operation makes recovery/retry/forking of flow control almost effortless. If you're out running errands, and you realize you left a shopping list at home, it doesn't end the day because you didn't plan that ahead of time. Your brain routes around this hiccup easily: you go home, get the list, then head right back out to the store.
+即便我们的大脑可能以顺序的方式规划一系列任务，但我们大脑运行的事件性质，使恢复/重试/分流这样的流程控制几乎毫不费力。如果你出去购物，而且你发现你把购物单忘在家里了，这并不会因为你没有提前计划这种情况而结束这一天。你的大脑会很容易地绕过这个小问题：你回家，取购物单，然后回头去商店。
 
-But the brittle nature of manually hardcoded callbacks (even with hardcoded error handling) is often far less graceful. Once you end up specifying (aka pre-planning) all the various eventualities/paths, the code becomes so convoluted that it's hard to ever maintain or update it.
+但是手动硬编码的回调（甚至带有硬编码的错误处理的回调）的脆弱本性通常不那么优雅。一旦你最终指明了（也就是提前规划好了）所有各种可能性/路径，代码就会变得如此复杂以至于几乎不能维护或更行。
 
-**That** is what "callback hell" is all about! The nesting/indentation are basically a side show, a red herring.
+**这** 才是与“回调地狱”有关的！嵌套/缩进基本上一个余兴表演，转移注意力的东西。
 
-And as if all that's not enough, we haven't even touched what happens when two or more chains of these callback continuations are happening *simultaneously*, or when the third step branches out into "parallel" callbacks with gates or latches, or... OMG, my brain hurts, how about yours!?
+如果以上这些还不够，我们还没有触及两个或更多这些回调延续的链条 *同时* 发生会怎么样，或者当第三部分叉称为带有大门或门闩的“并行”回调，或者……我的天哪，我脑子疼，你呢？
 
-Are you catching the notion here that our sequential, blocking brain planning behaviors just don't map well onto callback-oriented async code? That's the first major deficiency to articulate about callbacks: they express asynchrony in code in ways our brains have to fight just to keep in sync with (pun intended!).
+你抓住这里的重点了吗？我们顺序的，阻塞的大脑规划行为和面向回调的异步代码不能很好地匹配。这就是需要清楚地阐明的关于回调的首要缺陷：它们在代码中表达异步的方式，是需要我们的大脑不得不斗争才能保持一致的。
 
 ## Trust Issues
 
-The mismatch between sequential brain planning and callback-driven async JS code is only part of the problem with callbacks. There's something much deeper to be concerned about.
+在顺序的大脑规划和JS代码中回调驱动的异步处理间的不匹配只是关于回调的问题的一部分。还有一些更深刻的问题值得担忧。
 
-Let's once again revisit the notion of a callback function as the continuation (aka the second half) of our program:
+让我们再一次重温这个概念——回调函数是我们程序的延续（也就是第二部分）：
 
 ```js
 // A
@@ -362,21 +294,21 @@ ajax( "..", function(..){
 // B
 ```
 
-`// A` and `// B` happen *now*, under the direct control of the main JS program. But `// C` gets deferred to happen *later*, and under the control of another party -- in this case, the `ajax(..)` function. In a basic sense, that sort of hand-off of control doesn't regularly cause lots of problems for programs.
+`// A`和`// B`*现在* 发生，在JS主程序的直接控制之下。但是`// C`被推迟到 *稍后* 再发生，并且在另一部分的控制之下——这里是`ajax(..)`函数。在基本的感觉上，这样的控制交接一般不会让程序产生很多问题。
 
-But don't be fooled by its infrequency that this control switch isn't a big deal. In fact, it's one of the worst (and yet most subtle) problems about callback-driven design. It revolves around the idea that sometimes `ajax(..)` (i.e., the "party" you hand your callback continuation to) is not a function that you wrote, or that you directly control. Many times it's a utility provided by some third party.
+但是不要被这种控制切换不是什么大事的罕见情况欺骗了。事实上，它是回调驱动的设计的最可怕的（也是最微妙的）问题。这个问题围绕着一个想法展开：有时`ajax(..)`不是你写的函数，或者不是你可以直接控制的函数。很多时候它是一个由第三方提供的工具。
 
-We call this "inversion of control," when you take part of your program and give over control of its execution to another third party. There's an unspoken "contract" that exists between your code and the third-party utility -- a set of things you expect to be maintained.
+当你把你程序的一部分拿出来并把它执行的控制权移交给另一个第三方时，我们称这种情况为“控制倒转”。在你的代码和第三方工具之间有一个没有明言的“契约”——一组你期望被维护的东西。
 
 ### Tale of Five Callbacks
 
-It might not be terribly obvious why this is such a big deal. Let me construct an exaggerated scenario to illustrate the hazards of trust at play.
+为什么这件事情很重要可能不是那么明显。让我们来构建一个夸张的场景来生动地描绘一下信任危机。
 
-Imagine you're a developer tasked with building out an ecommerce checkout system for a site that sells expensive TVs. You already have all the various pages of the checkout system built out just fine. On the last page, when the user clicks "confirm" to buy the TV, you need to call a third-party function (provided say by some analytics tracking company) so that the sale can be tracked.
+想象你是一个开发者，正在建造一个贩卖昂贵电视的网站的结算系统。你已经将结算系统的各种页面顺利地制造完成。在最后一个页面，当用户点解“确定”购买电视时，你需要调用一个第三方函数（假如由一个跟踪分析公司提供），以便使这笔交易能够被追踪。
 
-You notice that they've provided what looks like an async tracking utility, probably for the sake of performance best practices, which means you need to pass in a callback function. In this continuation that you pass in, you will have the final code that charges the customer's credit card and displays the thank you page.
+你注意到它们提供的是某种异步追踪工具，也许是为了最佳的性能，这意味着你需要传递一个回调函数。在你传入的这个程序的延续中，有你最后的代码——划客人的信用卡并显示一个感谢页面。
 
-This code might look like:
+这段代码可能看起来像这样：
 
 ```js
 analytics.trackPurchase( purchaseData, function(){
@@ -385,25 +317,25 @@ analytics.trackPurchase( purchaseData, function(){
 } );
 ```
 
-Easy enough, right? You write the code, test it, everything works, and you deploy to production. Everyone's happy!
+足够简单，对吧？你写好代码，测试它，一切正常，然后你把它部署到生产环境。大家都很开心！
 
-Six months go by and no issues. You've almost forgotten you even wrote that code. One morning, you're at a coffee shop before work, casually enjoying your latte, when you get a panicked call from your boss insisting you drop the coffee and rush into work right away.
+6个月过去了，没有任何问题。你几乎已经忘了你曾写过的代码。一天早上，工作之前你先在咖啡店坐坐，悠闲地享用着你的拿铁，直到你接到老板慌张的电话要求你立即扔掉咖啡并冲进办公室。
 
-When you arrive, you find out that a high-profile customer has had his credit card charged five times for the same TV, and he's understandably upset. Customer service has already issued an apology and processed a refund. But your boss demands to know how this could possibly have happened. "Don't we have tests for stuff like this!?"
+当你到达时，你发现一位高端客户为了买同一台电视信用卡被划了5次，而且可以理解，他不高兴。客服已经道了歉并开始办理退款。但你的老板要求知道这是怎么发生的。“我们没有测试过这样的情况吗！？”
 
-You don't even remember the code you wrote. But you dig back in and start trying to find out what could have gone awry.
+你甚至不记得你写过的代码了。但你还是往回挖掘试着找出是什么出错了。
 
-After digging through some logs, you come to the conclusion that the only explanation is that the analytics utility somehow, for some reason, called your callback five times instead of once. Nothing in their documentation mentions anything about this.
+在分析过一些日志之后，你得出的结论是，唯一的解释是分析工具不知怎么的，为了某些原因，将你的回调函数调用了5次而非一次。他们的文档中没有任何东西提到此事。
 
-Frustrated, you contact customer support, who of course is as astonished as you are. They agree to escalate it to their developers, and promise to get back to you. The next day, you receive a lengthy email explaining what they found, which you promptly forward to your boss.
+令人沮丧的，你联系了客户支持，当然他们和你一样惊讶。他们同意将此事向上提交至开发者，并许诺给你回复。第二天，你收到一封很长的邮件解释他们发现了什么，然后你讲它转发给了你的老板。
 
-Apparently, the developers at the analytics company had been working on some experimental code that, under certain conditions, would retry the provided callback once per second, for five seconds, before failing with a timeout. They had never intended to push that into production, but somehow they did, and they're totally embarrassed and apologetic. They go into plenty of detail about how they've identified the breakdown and what they'll do to ensure it never happens again. Yadda, yadda.
+看起来，分析公司的开发者曾经制作了一些实验性的代码，在一定条件下，将会每秒重试一次收到的回调，在超时之前共计5秒。他们从没想要把这部分推到生产环境，但不知怎地他们这样做了，而且他们感到十分难堪而且抱歉。然后是许多他们如何定位错误的细节，和他们将要如何做以保证此事不再发生。等等，等等。
 
-What's next?
+后来呢？
 
-You talk it over with your boss, but he's not feeling particularly comfortable with the state of things. He insists, and you reluctantly agree, that you can't trust *them* anymore (that's what bit you), and that you'll need to figure out how to protect the checkout code from such a vulnerability again.
+你找你的老板谈了此事，但是他对事情的状态不是感觉特别舒服。他坚持，而且你也勉强地同意，你不能再相信 *他们* 了（咬到你的东西），而你将需要指出如何保护放出的代码，使它们不再受这样的漏洞威胁。
 
-After some tinkering, you implement some simple ad hoc code like the following, which the team seems happy with:
+修修补补之后，你实现了一些如下的特殊逻辑代码，团队中的每个人看起来都挺喜欢：
 
 ```js
 var tracked = false;
@@ -417,32 +349,32 @@ analytics.trackPurchase( purchaseData, function(){
 } );
 ```
 
-**Note:** This should look familiar to you from Chapter 1, because we're essentially creating a latch to handle if there happen to be multiple concurrent invocations of our callback.
+**注意：** 对读过第一章的你来说这应当很熟悉，因为我们实质上创建了一个门闩来处理我们的回调被并发调用多次的情况。
 
-But then one of your QA engineers asks, "what happens if they never call the callback?" Oops. Neither of you had thought about that.
+但一个QA的工程师问，“如果他们没调你的回调怎么办？”，噢。谁也没想过。
 
-You begin to chase down the rabbit hole, and think of all the possible things that could go wrong with them calling your callback. Here's roughly the list you come up with of ways the analytics utility could misbehave:
+你开始追踪兔子洞，考虑在他们调用你的回调时所有出错的可能性。这里是你得到的分析工具可能不正常运行的方式的大致列表：
 
-* Call the callback too early (before it's been tracked)
-* Call the callback too late (or never)
-* Call the callback too few or too many times (like the problem you encountered!)
-* Fail to pass along any necessary environment/parameters to your callback
-* Swallow any errors/exceptions that may happen
+* 调用回调过早（在它开始追踪之前）
+* 调用回调过晚 (或不调)
+* 调用回调太少或太多次（就像你遇到的问题！）
+* 没能向你的回调传递必要的环境/参数
+* 吞掉了可能发生的错误/异常
 * ...
 
-That should feel like a troubling list, because it is. You're probably slowly starting to realize that you're going to have to invent an awful lot of ad hoc logic **in each and every single callback** that's passed to a utility you're not positive you can trust.
+这感觉像是一个麻烦清单，因为它就是。你可能慢慢开始理解，你将要不得不为 **每一个传递到你不能信任的工具中的回调** 都创造一大堆的特殊逻辑。
 
-Now you realize a bit more completely just how hellish "callback hell" is.
+现在更完整地理解了“回调地狱”有多地狱。
 
 ### Not Just Others' Code
 
-Some of you may be skeptical at this point whether this is as big a deal as I'm making it out to be. Perhaps you don't interact with truly third-party utilities much if at all. Perhaps you use versioned APIs or self-host such libraries, so that its behavior can't be changed out from underneath you.
+现在有些人可能会怀疑事情到底是不是如我所宣扬的这么大条。也许你根本就不和真正的第三方工具互动。也许你用的是进行了版本控制的API，或者自己保管的库，因此它的行为不会在你不知晓的情况下改变。
 
-So, contemplate this: can you even *really* trust utilities that you do theoretically control (in your own code base)?
+那么，思考这个问题：你能 *真正* 信任你理论上控制（在你的代码中）的工具吗？
 
-Think of it this way: most of us agree that at least to some extent we should build our own internal functions with some defensive checks on the input parameters, to reduce/prevent unexpected issues.
+这样考虑：我们大多数人都同意，至少在某个区间内我们应当带着一些防御性的输入参数检查制造我们自己的内部函数，来减少/防止以外的问题。
 
-Overly trusting of input:
+过于相信输入：
 ```js
 function addNumbers(x,y) {
 	// + is overloaded with coercion to also be
@@ -456,7 +388,7 @@ addNumbers( 21, 21 );	// 42
 addNumbers( 21, "21" );	// "2121"
 ```
 
-Defensive against untrusted input:
+防御不信任的输入：
 ```js
 function addNumbers(x,y) {
 	// ensure numerical input
@@ -472,7 +404,7 @@ addNumbers( 21, 21 );	// 42
 addNumbers( 21, "21" );	// Error: "Bad parameters"
 ```
 
-Or perhaps still safe but friendlier:
+或者也许依然安全但更友好：
 ```js
 function addNumbers(x,y) {
 	// ensure numerical input
@@ -487,23 +419,23 @@ addNumbers( 21, 21 );	// 42
 addNumbers( 21, "21" );	// 42
 ```
 
-However you go about it, these sorts of checks/normalizations are fairly common on function inputs, even with code we theoretically entirely trust. In a crude sort of way, it's like the programming equivalent of the geopolitical principle of "Trust But Verify."
+不管你怎么做，这类函数参数的检查/规范化是相当常见的，即便是我们理论上完全信任的代码。用一个粗俗的说法，编程好像是地缘政治学的“信任但验证”原则的等价物。
 
-So, doesn't it stand to reason that we should do the same thing about composition of async function callbacks, not just with truly external code but even with code we know is generally "under our own control"? **Of course we should.**
+那么，这不是要推论出我们应当对异步函数回调的编写做相同的事，而且不仅是针对真正的外部代码，甚至要对一般认为是“在我们控制之下”的代码？**我们当然应该**
 
-But callbacks don't really offer anything to assist us. We have to construct all that machinery ourselves, and it often ends up being a lot of boilerplate/overhead that we repeat for every single async callback.
+但是回调没有给我们提供任何协助。我们不得不自己构建所有的装置，而且这通常最终成为许多我们要在每个异步回调中重复的模板/负担。
 
-The most troublesome problem with callbacks is *inversion of control* leading to a complete breakdown along all those trust lines.
+有关于回调的最麻烦的问题就是 *控制反转* 导致所有这些信任完全崩溃。
 
-If you have code that uses callbacks, especially but not exclusively with third-party utilities, and you're not already applying some sort of mitigation logic for all these *inversion of control* trust issues, your code *has* bugs in it right now even though they may not have bitten you yet. Latent bugs are still bugs.
+如果你有代码用到回调，特别是但不特指第三方工具，而且你还没有为所有这些 *控制反转* 的信任问题实施某些缓和逻辑，那么你的代码现在就 *有* bug，虽然它们还没咬到你。将来的bug依然是bug。
 
-Hell indeed.
+确实是地狱。
 
 ## Trying to Save Callbacks
 
-There are several variations of callback design that have attempted to address some (not all!) of the trust issues we've just looked at. It's a valiant, but doomed, effort to save the callback pattern from imploding on itself.
+有几种回调的设计试图解决一些（不是全部！）我们刚才看到的信任问题。这是一种将回调模式从它自己的崩溃中拯救出来的勇敢，但注定失败的努力。
 
-For example, regarding more graceful error handling, some API designs provide for split callbacks (one for the success notification, one for the error notification):
+举个例子，为了更优雅地处理错误，有些API设计提供了分离的回调（一个用作成功的通知，一个用作错误的通知）：
 
 ```js
 function success(data) {
@@ -517,11 +449,11 @@ function failure(err) {
 ajax( "http://some.url.1", success, failure );
 ```
 
-In APIs of this design, often the `failure()` error handler is optional, and if not provided it will be assumed you want the errors swallowed. Ugh.
+在这种设计的API中，`failure()`错误处理器通常是可选的，而且如果不提供的话它会假定你想让错误被吞掉。呃。
 
-**Note:** This split-callback design is what the ES6 Promise API uses. We'll cover ES6 Promises in much more detail in the next chapter.
+**注意：** ES6的Promises的API使用的就是这种分离回调设计。我们将在下一章中详尽地讨论ES6的Promises。
 
-Another common callback pattern is called "error-first style" (sometimes called "Node style," as it's also the convention used across nearly all Node.js APIs), where the first argument of a single callback is reserved for an error object (if any). If success, this argument will be empty/falsy (and any subsequent arguments will be the success data), but if an error result is being signaled, the first argument is set/truthy (and usually nothing else is passed):
+另一种常见的回调设计模式称为“错误优先风格”（有时称为“Node风格”，因为它几乎在所有的Node.js的API中作为惯例使用），一个回调的第一个参数为一个错误对象保留（如果有的话）。如果成功，这个参数将会是空/falsy（而其他后续的参数将是成功的数据），但如果出现了错误的结果，这第一个参数就会被设置/truthy（而且通常没有其他东西会被传递了）：
 
 ```js
 function response(err,data) {
@@ -538,13 +470,13 @@ function response(err,data) {
 ajax( "http://some.url.1", response );
 ```
 
-In both of these cases, several things should be observed.
+这两种方法都有几件事情应当注意。
 
-First, it has not really resolved the majority of trust issues like it may appear. There's nothing about either callback that prevents or filters unwanted repeated invocations. Moreover, things are worse now, because you may get both success and error signals, or neither, and you still have to code around either of those conditions.
+首先，它们没有像看起来那样真正解决主要的信任问题。在这两个回调中没有关于防止或过滤意外的重复调用的东西。而且，事情现在更糟糕了，因为你可能同时得到成功和失败信号，或者都得不到，你仍然不得不围绕着这些条件写代码。
 
-Also, don't miss the fact that while it's a standard pattern you can employ, it's definitely more verbose and boilerplate-ish without much reuse, so you're going to get weary of typing all that out for every single callback in your application.
+还有，不要忘了这样的事实：虽然它们是你可以引用的标准模式，但它们绝对更加繁冗，而且是不能复用的模板代码，所以你将会对在你应用程序的每一个回调中打出它们感到厌倦。
 
-What about the trust issue of never being called? If this is a concern (and it probably should be!), you likely will need to set up a timeout that cancels the event. You could make a utility (proof-of-concept only shown) to help you with that:
+回调从不被调用的信任问题怎么解决？如果这要紧（而且它可能应当要紧！），你可能需要设置一个超时来取消事件。你可以制作一个工具来帮你：
 
 ```js
 function timeoutify(fn,delay) {
@@ -564,7 +496,7 @@ function timeoutify(fn,delay) {
 }
 ```
 
-Here's how you use it:
+这是你如何使用它：
 
 ```js
 // using "error-first style" callback design
@@ -580,13 +512,13 @@ function foo(err,data) {
 ajax( "http://some.url.1", timeoutify( foo, 500 ) );
 ```
 
-Another trust issue is being called "too early." In application-specific terms, this may actually involve being called before some critical task is complete. But more generally, the problem is evident in utilities that can either invoke the callback you provide *now* (synchronously), or *later* (asynchronously).
+另一个信任问题是被调用的“过早”。在应用程序规范上讲，这可能涉及在某些重要的任务完成之前被调用。但更一般地，在那些即可以 *现在*（同步地），也可以在 *稍后*（异步地）调用你提供的回调的工具中这个问题更明显。
 
-This nondeterminism around the sync-or-async behavior is almost always going to lead to very difficult to track down bugs. In some circles, the fictional insanity-inducing monster named Zalgo is used to describe the sync/async nightmares. "Don't release Zalgo!" is a common cry, and it leads to very sound advice: always invoke callbacks asynchronously, even if that's "right away" on the next turn of the event loop, so that all callbacks are predictably async.
+这种围绕着同步或异步行为的不确定性，几乎总是导致非常难追踪的Bug。在某些圈子中，一个名叫Zalgo的可以导致人精神错乱的虚构怪物被用来描述这种同步/异步的噩梦。经常能听到人们喊“不要释放Zalgo！”，而且它引出了一个非常响亮的建议：总是异步地调用回调，即便它是“立即”在事件轮询的下一个回合中，这样所有的回调都是可预见的异步。
 
-**Note:** For more information on Zalgo, see Oren Golan's "Don't Release Zalgo!" (https://github.com/oren/oren.github.io/blob/master/posts/zalgo.md) and Isaac Z. Schlueter's "Designing APIs for Asynchrony" (http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony).
+**注意：** 更多关于Zalgo的信息，参见Oren Golan的“Don't Release Zalgo!（不要释放Zalgo！）”(https://github.com/oren/oren.github.io/blob/master/posts/zalgo.md)和Isaac Z. Schlueter的“Designing APIs for Asynchrony（异步API设计）”(http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony)。
 
-Consider:
+考虑下面的代码：
 
 ```js
 function result(data) {
@@ -599,11 +531,11 @@ ajax( "..pre-cached-url..", result );
 a++;
 ```
 
-Will this code print `0` (sync callback invocation) or `1` (async callback invocation)? Depends... on the conditions.
+这段代码是打印`0`还是打印`1`？这……要看情况。
 
-You can see just how quickly the unpredictability of Zalgo can threaten any JS program. So the silly-sounding "never release Zalgo" is actually incredibly common and solid advice. Always be asyncing.
+你可以看到Zalgo的不可预见性能有多快地威胁你的JS程序。所以听起来傻傻的“绝不要释放Zalgo”实际上是一个不可思议地常见且实在的建议。总是保持异步。
 
-What if you don't know whether the API in question will always execute async? You could invent a utility like this `asyncify(..)` proof-of-concept:
+如果你不知道当前的API是否会总是异步地执行呢？你可以制造一个像`asyncify(..)`这样的工具：
 
 ```js
 function asyncify(fn) {
@@ -637,7 +569,7 @@ function asyncify(fn) {
 }
 ```
 
-You use `asyncify(..)` like this:
+你像这样使用`asyncify(..)`:
 
 ```js
 function result(data) {
@@ -650,26 +582,26 @@ ajax( "..pre-cached-url..", asyncify( result ) );
 a++;
 ```
 
-Whether the Ajax request is in the cache and resolves to try to call the callback right away, or must be fetched over the wire and thus complete later asynchronously, this code will always output `1` instead of `0` -- `result(..)` cannot help but be invoked asynchronously, which means the `a++` has a chance to run before `result(..)` does.
+不管Ajax请求是存在于缓存中而解析为回调的调用，还是它必须通过网线去取得数据而异步地稍后完成，这段代码总是输出`1`而不是`0`——`result(..)`总是被异步地调用，这意味着`a++`有机会再`result(..)`之前运行。
 
-Yay, another trust issued "solved"! But it's inefficient, and yet again more bloated boilerplate to weigh your project down.
+噢耶，又一个信任问题被“解决了”！但它很低效，而且又有更多臃肿的模板代码让你的项目变得沉重。
 
-That's just the story, over and over again, with callbacks. They can do pretty much anything you want, but you have to be willing to work hard to get it, and oftentimes this effort is much more than you can or should spend on such code reasoning.
+这只是关于回调一遍又一遍地发生的故事。它们几乎可以做任何你想做的事，但你不得不努力工作来达到目的，而且大多数时候这种努力比你应当在推理这样的代码上所付出的多得多。
 
-You might find yourself wishing for built-in APIs or other language mechanics to address these issues. Finally ES6 has arrived on the scene with some great answers, so keep reading!
+你可能发现自己希望有一些内建的API或语言机制来解决这些问题。终于ES6带着一个伟大的答案到来了，所以继续读下去！
 
-## Review
+## 复习
 
-Callbacks are the fundamental unit of asynchrony in JS. But they're not enough for the evolving landscape of async programming as JS matures.
+回调是JS中异步的基础单位。但是随着JS的成熟，它们对于异步编程的演化趋势来讲显得不够。
 
-First, our brains plan things out in sequential, blocking, single-threaded semantic ways, but callbacks express asynchronous flow in a rather nonlinear, nonsequential way, which makes reasoning properly about such code much harder. Bad to reason about code is bad code that leads to bad bugs.
+首先，我们的大脑用顺序的，阻塞的，单线程的语义方式规划事情，但是回调使用非线性，非顺序的方式表达异步流程，这使我们正确推理这样的代码变得非常困难。不好推理的代码是导致不好的Bug的不好的代码。
 
-We need a way to express asynchrony in a more synchronous, sequential, blocking manner, just like our brains do.
+我们需要一个种方法，以更同步化，顺序化，阻塞的方式来表达异步，正如我们的大脑那样。
 
-Second, and more importantly, callbacks suffer from *inversion of control* in that they implicitly give control over to another party (often a third-party utility not in your control!) to invoke the *continuation* of your program. This control transfer leads us to a troubling list of trust issues, such as whether the callback is called more times than we expect.
+第二，而且是更重要的，回调遭受着 *控制反转* 的蹂躏，它们隐含地将控制权交给第三方（通常第三方工具不受你控制！）来调用你程序的 *延续*。这种控制权的转移使我们得到一张信任问题的令人不安的列表，比如回调是否会比我们期望的调用更多次。
 
-Inventing ad hoc logic to solve these trust issues is possible, but it's more difficult than it should be, and it produces clunkier and harder to maintain code, as well as code that is likely insufficiently protected from these hazards until you get visibly bitten by the bugs.
+制造特殊的逻辑来解决这些信任问题是可能的，但是它比它应有的难度高多了，还会产生更笨重和更难维护的代码，而且在bug实际咬到你的时候代码会显得在这些危险上被保护的不够。
 
-We need a generalized solution to **all of the trust issues**, one that can be reused for as many callbacks as we create without all the extra boilerplate overhead.
+我们需要一个 **所有这些信任问题** 的一般化解决方案。一个可以被所有我们制造的回调复用，而且没有多余的模板代码负担的方案。
 
-We need something better than callbacks. They've served us well to this point, but the *future* of JavaScript demands more sophisticated and capable async patterns. The subsequent chapters in this book will dive into those emerging evolutions.
+我们需要比回调更好的东西。目前为止它们做的不错，但JavaScript的 *未来* 要求更精巧和强大的异步模式。本书的后续章节将会深入这些新兴的发展变化。
