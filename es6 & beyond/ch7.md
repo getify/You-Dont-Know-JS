@@ -552,9 +552,7 @@ var messages = [],
 			if (typeof val == "string") {
 				val = val.toLowerCase();
 				if (target.indexOf( val ) == -1) {
-					target.push(
-						val.toLowerCase()
-					);
+					target.push(val);
 				}
 			}
 			return true;
