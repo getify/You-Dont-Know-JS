@@ -323,7 +323,7 @@ foo( 1, 2, 3, 4, 5);			// [1,2,3,4,5]
 
 **Note:** The `...args` in the `foo(..)` function declaration is usually called "rest parameters," because you're collecting the rest of the parameters. I prefer "gather," because it's more descriptive of what it does rather than what it contains.
 
-The best part about this usage is that it provides a very solid alternative to using the long-since-deprecated `arguments` array -- actually, it's not really an array, but an array-like object. Because `args` (or whatever you call it -- a lot of people prefer `r` or `rest`) is a real array, we can get rid of lots of silly pre-ES6 tricks we jumped through to make `arguments` into something we can treat as an array.
+The best part about this usage is that it provides a very solid alternative to using the long-since-deprecated `arguments` object. Because `args` (or whatever you call it -- a lot of people prefer `r` or `rest`) is a real array, we can get rid of lots of silly pre-ES6 tricks we jumped through to make `arguments` into something we can treat as an array.
 
 Consider:
 
@@ -407,7 +407,7 @@ foo( undefined, 6 );	// 17
 
 Of course, that means that any value except `undefined` can be directly passed in. However, `undefined` will be assumed to signal, "I didn't pass this in." That works great unless you actually need to be able to pass `undefined` in.
 
-In that case, you could test to see if the argument is actually omitted, by it actually not being present in the `arguments` array, perhaps like this:
+In that case, you could test to see if the argument is actually omitted, by it actually not being present in the `arguments` object, perhaps like this:
 
 ```js
 function foo(x,y) {
@@ -1953,7 +1953,7 @@ controller.makeRequest(..);
 
 Although we invoke as `controller.makeRequest(..)`, the `this.helper` reference fails, because `this` here doesn't point to `controller` as it normally would. Where does it point? It lexically inherits `this` from the surrounding scope. In this previous snippet, that's the global scope, where `this` points to the global object. Ugh.
 
-In addition to lexical `this`, arrow functions also have lexical `arguments` -- they don't have their own `arguments` array but instead inherit from their parent -- as well as lexical `super` and `new.target` (see "Classes" in Chapter 3).
+In addition to lexical `this`, arrow functions also have lexical `arguments` -- they don't have their own `arguments` object but instead inherit from their parent -- as well as lexical `super` and `new.target` (see "Classes" in Chapter 3).
 
 So now we can conclude a more nuanced set of rules for when `=>` is appropriate and not:
 
