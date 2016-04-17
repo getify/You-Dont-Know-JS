@@ -377,10 +377,8 @@ analytics.trackPurchase( purchaseData, function(){
 过于相信输入：
 ```js
 function addNumbers(x,y) {
-	// + is overloaded with coercion to also be
-	// string concatenation, so this operation
-	// isn't strictly safe depending on what's
-	// passed in.
+	// + 操作符使用强制转换重载为字符串连接
+	// 所以根据传入参数的不同，这个操作不是严格的安全。
 	return x + y;
 }
 
@@ -391,12 +389,12 @@ addNumbers( 21, "21" );	// "2121"
 防御不信任的输入：
 ```js
 function addNumbers(x,y) {
-	// ensure numerical input
+	// 保证数字输入
 	if (typeof x != "number" || typeof y != "number") {
 		throw Error( "Bad parameters" );
 	}
 
-	// if we get here, + will safely do numeric addition
+	// 如果我们到达这里，+ 就可以安全地做数字加法
 	return x + y;
 }
 
@@ -407,11 +405,11 @@ addNumbers( 21, "21" );	// Error: "Bad parameters"
 或者也许依然安全但更友好：
 ```js
 function addNumbers(x,y) {
-	// ensure numerical input
+	// 保证数字输入
 	x = Number( x );
 	y = Number( y );
 
-	// + will safely do numeric addition
+	// + 将会安全地执行数字加法
 	return x + y;
 }
 
@@ -431,7 +429,7 @@ addNumbers( 21, "21" );	// 42
 
 确实是地狱。
 
-## Trying to Save Callbacks
+## 尝试拯救回调
 
 有几种回调的设计试图解决一些（不是全部！）我们刚才看到的信任问题。这是一种将回调模式从它自己的崩溃中拯救出来的勇敢，但注定失败的努力。
 
@@ -457,11 +455,11 @@ ajax( "http://some.url.1", success, failure );
 
 ```js
 function response(err,data) {
-	// error?
+	// 有错？
 	if (err) {
 		console.error( err );
 	}
-	// otherwise, assume success
+	// 否则，认为成功
 	else {
 		console.log( data );
 	}
@@ -487,7 +485,7 @@ function timeoutify(fn,delay) {
 	;
 
 	return function() {
-		// timeout hasn't happened yet?
+		// 超时还没有发生？
 		if (intv) {
 			clearTimeout( intv );
 			fn.apply( this, [ null ].concat( [].slice.call( arguments ) ) );
@@ -499,7 +497,7 @@ function timeoutify(fn,delay) {
 这是你如何使用它：
 
 ```js
-// using "error-first style" callback design
+// 使用“错误优先”风格的回调设计
 function foo(err,data) {
 	if (err) {
 		console.error( err );
@@ -531,7 +529,7 @@ ajax( "..pre-cached-url..", result );
 a++;
 ```
 
-这段代码是打印`0`还是打印`1`？这……要看情况。
+这段代码是打印`0`（同步回调调用）还是打印`1`（异步回调调用）？这……要看情况。
 
 你可以看到Zalgo的不可预见性能有多快地威胁你的JS程序。所以听起来傻傻的“绝不要释放Zalgo”实际上是一个不可思议地常见且实在的建议。总是保持异步。
 
@@ -549,20 +547,19 @@ function asyncify(fn) {
 	fn = null;
 
 	return function() {
-		// firing too quickly, before `intv` timer has fired to
-		// indicate async turn has passed?
+		// 触发太快，在`intv`计时器触发来
+		// 表示异步回合已经过去之前？
 		if (intv) {
 			fn = orig_fn.bind.apply(
 				orig_fn,
-				// add the wrapper's `this` to the `bind(..)`
-				// call parameters, as well as currying any
-				// passed in parameters
+				// 将包装函数的`this`加入`bind(..)`调用的
+				// 参数，同时currying其他所有的传入参数
 				[this].concat( [].slice.call( arguments ) )
 			);
 		}
-		// already async
+		// 已经是异步
 		else {
-			// invoke original function
+			// 调用原版的函数
 			orig_fn.apply( this, arguments );
 		}
 	};
@@ -582,7 +579,7 @@ ajax( "..pre-cached-url..", asyncify( result ) );
 a++;
 ```
 
-不管Ajax请求是存在于缓存中而解析为回调的调用，还是它必须通过网线去取得数据而异步地稍后完成，这段代码总是输出`1`而不是`0`——`result(..)`总是被异步地调用，这意味着`a++`有机会再`result(..)`之前运行。
+不管Ajax请求是存在于缓存中而解析为回调的调用，还是它必须通过网线去取得数据而异步地稍后完成，这段代码总是输出`1`而不是`0`——`result(..)`总是被异步地调用，这意味着`a++`有机会在`result(..)`之前运行。
 
 噢耶，又一个信任问题被“解决了”！但它很低效，而且又有更多臃肿的模板代码让你的项目变得沉重。
 
