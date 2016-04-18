@@ -1187,15 +1187,11 @@ p.then(
 
 ### Pit of Despair
 
-Jeff Atwood noted years ago: programming languages are often set up in such a way that by default, developers fall into the "pit of despair" (http://blog.codinghorror.com/falling-into-the-pit-of-success/) -- where accidents are punished -- and that you have to try harder to get it right. He implored us to instead create a "pit of success," where by default you fall into expected (successful) action, and thus would have to try hard to fail.
-
-几年前Jeff Atwood曾经写到：编程语言总是默认地以这样的方式建立，开发者们会掉入“绝望的深渊”（http://blog.codinghorror.com/falling-into-the-pit-of-success/）——在这里意外会被惩罚——而你不得不更努力地使它正确。他恳求我们相反地创建“成功的深渊”，就是你会默认地掉入期望的（成功的）行为，而如此你不得不更努力地去失败。
-
-Promise error handling is unquestionably "pit of despair" design. By default, it assumes that you want any error to be swallowed by the Promise state, and if you forget to observe that state, the error silently languishes/dies in obscurity -- usually despair.
+几年前Jeff Atwood曾经写到：编程语言总是默认地以这样的方式建立，开发者们会掉入“绝望的深渊”（http://blog.codinghorror.com/falling-into-the-pit-of-success/ ）——在这里意外会被惩罚——而你不得不更努力地使它正确。他恳求我们相反地创建“成功的深渊”，就是你会默认地掉入期望的（成功的）行为，而如此你不得不更努力地去失败。
 
 毫无疑问，Promise的错误处理是一种“绝望的深渊”的设计。默认情况下，它假定你想让所有的错误都被Promise的状态吞掉，而且如果你忘记监听这个状态，错误就会默默地凋零/死去——通常是绝望的。
 
-To avoid losing an error to the silence of a forgotten/discarded Promise, some developers have claimed that a "best practice" for Promise chains is to always end your chain with a final `catch(..)`, like:
+为了回避把一个被遗忘/抛弃的Promise的错误无声地丢失，一些开发者宣称Promise链的“最优方法”是总是将你的链条以`catch(..)`终结，就像这样：
 
 ```js
 var p = Promise.resolve( 42 );
@@ -1210,27 +1206,27 @@ p.then(
 .catch( handleErrors );
 ```
 
-Because we didn't pass a rejection handler to the `then(..)`, the default handler was substituted, which simply propagates the error to the next promise in the chain. As such, both errors that come into `p`, and errors that come *after* `p` in its resolution (like the `msg.toLowerCase()` one) will filter down to the final `handleErrors(..)`.
+因为我们没有给`then(..)`传递拒绝处理器，默认的处理器会顶替上来，它仅仅简单地将错误传播到链条的下一个promise中。如此，在`p`中发生的错误，与在`p`之后的解析中（比如`msg.toLowerCase()`）发生的错误都将会过滤到最后的`handleErrors(..)`中。
 
-Problem solved, right? Not so fast!
+问题解决了，对吧？没那么容易！
 
-What happens if `handleErrors(..)` itself also has an error in it? Who catches that? There's still yet another unattended promise: the one `catch(..)` returns, which we don't capture and don't register a rejection handler for.
+要是`handleErrors(..)`本身也有错误呢？谁来捕获它？这里还有一个没人注意的promise：`catch(..)`返回的promise，我们没有对它进行捕获，也没注册拒绝处理器。
 
-You can't just stick another `catch(..)` on the end of that chain, because it too could fail. The last step in any Promise chain, whatever it is, always has the possibility, even decreasingly so, of dangling with an uncaught error stuck inside an unobserved Promise.
+你不能仅仅将另一个`catch(..)`贴在链条末尾，因为它也可能失败。Promise链的最后一步，无论它是什么，总有可能，即便这种可能性逐渐减少，挂着一个困在未被监听的Promise中的，未被捕获的错误。
 
-Sound like an impossible conundrum yet?
+听起来像一个不可解的迷吧？
 
 ### Uncaught Handling
 
-It's not exactly an easy problem to solve completely. There are other ways to approach it which many would say are *better*.
+这不是一个很容易就能完全解决的问题。但是有些接近于解决的方法，或者说 *更好的方法*。
 
-Some Promise libraries have added methods for registering something like a "global unhandled rejection" handler, which would be called instead of a globally thrown error. But their solution for how to identify an error as "uncaught" is to have an arbitrary-length timer, say 3 seconds, running from time of rejection. If a Promise is rejected but no error handler is registered before the timer fires, then it's assumed that you won't ever be registering a handler, so it's "uncaught."
+一些Promise库有一些附加的方法，可以注册某些类似于“全局的未处理拒绝”的处理器，全局上不会抛出错误，而是调用它。但是他们识别一个错误是“未被捕获的错误”的方案是，使用一个任意长的计时器，比如说3秒，从拒绝的那一刻开始计时。如果一个Promise被拒绝但没有错误处理在计时器被触发前注册，那么它就假定你不会注册监听器了，所以它是“未被捕获的”。
 
-In practice, this has worked well for many libraries, as most usage patterns don't typically call for significant delay between Promise rejection and observation of that rejection. But this pattern is troublesome because 3 seconds is so arbitrary (even if empirical), and also because there are indeed some cases where you want a Promise to hold on to its rejectedness for some indefinite period of time, and you don't really want to have your "uncaught" handler called for all those false positives (not-yet-handled "uncaught errors").
+实践中，这个方法在许多库中工作的很好，因为大多数用法不会在Promise拒绝和监听这个拒绝之间有很明显的延迟。但是这个模式有点儿麻烦，因为3秒实在太随意了（即便它是实证过的），还因为确实有些情况你想让一个Promise在一段不确定的时间内持有它的拒绝状态，而且你不希望你的“未捕获错误”处理器因为这些具有正面含义的不成立（还没处理的“未捕获错误”）而被调用。
 
-Another more common suggestion is that Promises should have a `done(..)` added to them, which essentially marks the Promise chain as "done." `done(..)` doesn't create and return a Promise, so the callbacks passed to `done(..)` are obviously not wired up to report problems to a chained Promise that doesn't exist.
+另一种常见的建议是，Promise应当增加一个`done(..)`方法，它实质上标志着Promise链的“终结”。`done(..)`不会创建并返回一个Promise，所以传递给`done(..)`的回调很明显地不会链接上一个不存在的Promise链，并向它报告问题。
 
-So what happens instead? It's treated as you might usually expect in uncaught error conditions: any exception inside a `done(..)` rejection handler would be thrown as a global uncaught error (in the developer console, basically):
+那么接下来会发什么？正如你通常在未处理错误状态下希望的那样，在`done(..)`的拒绝处理器内部的任何异常都作为全局的未捕获错误抛出（基本上扔到开发者控制台）：
 
 ```js
 var p = Promise.resolve( 42 );
@@ -1248,28 +1244,28 @@ p.then(
 // be thrown globally here
 ```
 
-This might sound more attractive than the never-ending chain or the arbitrary timeouts. But the biggest problem is that it's not part of the ES6 standard, so no matter how good it sounds, at best it's a lot longer way off from being a reliable and ubiquitous solution.
+这听起来要比永不终结的链条或随意的超时要吸引人。但最大的问题是，它不是ES6标准，所以不管听起来多么好，它成为一个可靠而普遍的解决方案还有很长的距离。
 
-Are we just stuck, then? Not entirely.
+那我们就卡在这里了？不完全是。
 
-Browsers have a unique capability that our code does not have: they can track and know for sure when any object gets thrown away and garbage collected. So, browsers can track Promise objects, and whenever they get garbage collected, if they have a rejection in them, the browser knows for sure this was a legitimate "uncaught error," and can thus confidently know it should report it to the developer console.
+浏览器有一个我们的代码没有的能力：它们可以追踪并确定一个对象什么时候被废弃并可以作为垃圾回收。所以，浏览器可以追踪Promise对象，当它们被当做垃圾回收时，如果在它们内部存在一个拒绝状态，浏览器就可以确信这是一个合法的“未捕获错误”，它可以信心十足地知道应当在开发者控制台上报告这一情况。
 
-**Note:** At the time of this writing, both Chrome and Firefox have early attempts at that sort of "uncaught rejection" capability, though support is incomplete at best.
+**注意：** 在写作本书的时候，Chrome和Firefox都早已试图实现这种“未捕获拒绝”的能力，虽然至多支持的不完整。
 
-However, if a Promise doesn't get garbage collected -- it's exceedingly easy for that to accidentally happen through lots of different coding patterns -- the browser's garbage collection sniffing won't help you know and diagnose that you have a silently rejected Promise laying around.
+然而，如果一个Promise不被垃圾回收——通过许多不同的代码模式，这极其容易不经意地发生——浏览器的垃圾回收检测不会帮你知道或诊断你有一个拒绝的Promise安静的躺在附近。
 
-Is there any other alternative? Yes.
+还有其他选项吗？有。
 
 ### Pit of Success
 
-The following is just theoretical, how Promises *could* be someday changed to behave. I believe it would be far superior to what we currently have. And I think this change would be possible even post-ES6 because I don't think it would break web compatibility with ES6 Promises. Moreover, it can be polyfilled/prollyfilled in, if you're careful. Let's take a look:
+以下讲的仅仅是理论上，Promise *可能* 在某一天变成什么样的行为。我相信那会比我们现在拥有的优越许多。而且我想这种改变可能会发生在后ES6时代，因为我不认为它会破坏Web的兼容性。另外，如果你小心，它是可以被填补（polyfilled）/预填补（prollyfilled）的。让我们来看一下：
 
-* Promises could default to reporting (to the developer console) any rejection, on the next Job or event loop tick, if at that exact moment no error handler has been registered for the Promise.
-* For the cases where you want a rejected Promise to hold onto its rejected state for an indefinite amount of time before observing, you could call `defer()`, which suppresses automatic error reporting on that Promise.
+* Promise可以默认为是报告(向开发者控制台)一切拒绝的，就在下一个Job或事件轮询tick，如果就在这时Promise上没有注册任何错误处理器。
+* 如果你希望拒绝的Promise在被监听前，将其拒绝状态保持一段不确定的时间。你可以调用`defer()`，它会压制这个Promise自动报告错误。
 
-If a Promise is rejected, it defaults to noisily reporting that fact to the developer console (instead of defaulting to silence). You can opt out of that reporting either implicitly (by registering an error handler before rejection), or explicitly (with `defer()`). In either case, *you* control the false positives.
+如果一个Promise被拒绝，默认地它会吵吵闹闹地向开发者控制台报告这个情况（而不是默认不出声）。你既可以选择隐式地处理这个报告（通过在拒绝之前注册错误处理器），也可以选择明确地处理这个报告（使用`defer()`）。无论哪种情况，*你* 都控制着这种具有正面意义的不成立。
 
-Consider:
+考虑下面的代码：
 
 ```js
 var p = Promise.reject( "Oops" ).defer();
@@ -1287,37 +1283,37 @@ foo( 42 )
 ...
 ```
 
-When we create `p`, we know we're going to wait a while to use/observe its rejection, so we call `defer()` -- thus no global reporting. `defer()` simply returns the same promise, for chaining purposes.
+我们创建了`p`，我们知道我们会为了使用/监听它的拒绝而等待一会儿，所以我们调用`defer()`——如此就不会有全局的报告。`defer()`单纯地返回同一个promise，为了链接的目的。
 
-The promise returned from `foo(..)` gets an error handler attached *right away*, so it's implicitly opted out and no global reporting for it occurs either.
+从`foo(..)`返回的promise *当即* 就添附了一个错误处理器，所以这是一种隐式处理，而且不会有全局的关于错误的报告。
 
-But the promise returned from the `then(..)` call has no `defer()` or error handler attached, so if it rejects (from inside either resolution handler), then *it* will be reported to the developer console as an uncaught error.
+但是从`then(..)`调用返回的promise没有`defer()`或添附错误处理器，所以如果它被拒绝（从它内部的任意一个解析处理器中），那么它就会向开发者控制台报告一个未捕获错误。
 
-**This design is a pit of success.** By default, all errors are either handled or reported -- what almost all developers in almost all cases would expect. You either have to register a handler or you have to intentionally opt out, and indicate you intend to defer error handling until *later*; you're opting for the extra responsibility in just that specific case.
+**这种设计称为成功的深渊**。默认情况下，所有的错误不是被处理就是被报告——这几乎是所有开发者在几乎所有情况下所期望的。你要么不得不注册一个监听器，要么不得不有意什么都不做，并指示你要将错误处理推迟到 *稍后*；你仅为这种特定情况选择承担额外的责任。
 
-The only real danger in this approach is if you `defer()` a Promise but then fail to actually ever observe/handle its rejection.
+这种方式唯一真正的危险是，你`defer()`了一个Promise但是实际上没有监听/处理它的拒绝。
 
-But you had to intentionally call `defer()` to opt into that pit of despair -- the default was the pit of success -- so there's not much else we could do to save you from your own mistakes.
+但你不得不有意地调用`defer()`来选择进入绝望深渊——默认是成功深渊——所以对于从你自己的错误中拯救你这件事来说，我们能做的不多。
 
-I think there's still hope for Promise error handling (post-ES6). I hope the powers that be will rethink the situation and consider this alternative. In the meantime, you can implement this yourself (a challenging exercise for the reader!), or use a *smarter* Promise library that does so for you!
+我觉得对于Promise的错误处理还有希望（在后ES6时代）。我希望上层人物将会重新思考这种情况并考虑选用这种方式。同时，你可以自己实现这种方式（给读者们的挑战练习！），或使用一个 *聪明* 的Promise库来为你这么做。
 
-**Note:** This exact model for error handling/reporting is implemented in my *asynquence* Promise abstraction library, which will be discussed in Appendix A of this book.
+**注意：** 这种错误处理/报告的确切的模型已经在我的 *asynquence* Promise抽象库中实现，我们会在本书的附录A中讨论它。
 
 ## Promise Patterns
 
-We've already implicitly seen the sequence pattern with Promise chains (this-then-this-then-that flow control) but there are lots of variations on asynchronous patterns that we can build as abstractions on top of Promises. These patterns serve to simplify the expression of async flow control -- which helps make our code more reason-able and more maintainable -- even in the most complex parts of our programs.
+我们已经隐含地看到了使用Promise链的顺序模式（这个然后这个然后那个的流程控制），但是我们还可以在Promise的基础上抽象出许多其他种类的异步模式。这些模式用于简化异步流程控制的的表达——它可以使我们的代码更易于推理并且更易于维护——即便是我们程序中最复杂的部分。
 
-Two such patterns are codified directly into the native ES6 `Promise` implementation, so we get them for free, to use as building blocks for other patterns.
+有两个这样的模式被直接编码在ES6原生的`Promise`实现中，所以我们免费的得到了它们，来作为我们其他模式的构建块儿。
 
 ### Promise.all([ .. ])
 
-In an async sequence (Promise chain), only one async task is being coordinated at any given moment -- step 2 strictly follows step 1, and step 3 strictly follows step 2. But what about doing two or more steps concurrently (aka "in parallel")?
+在一个异步序列（Promise链）中，在任何给定的时刻都只有一个异步任务在被协调——第2步严格地接着第1步，而第3步严格地接着第2步。但要是并发（也叫“并行地”）地去做两个或以上的步骤呢？
 
-In classic programming terminology, a "gate" is a mechanism that waits on two or more parallel/concurrent tasks to complete before continuing. It doesn't matter what order they finish in, just that all of them have to complete for the gate to open and let the flow control through.
+用经典的编程术语，一个“门（gate）”是一种等待两个或更多并行/并发任务都执行完再继续的机制。它们完成的顺序无关紧要，只是它们不得不都完成才能让门打开，继而让流程控制通过。
 
-In the Promise API, we call this pattern `all([ .. ])`.
+在Promise API中，我们称这种模式为`all([ .. ])`。
 
-Say you wanted to make two Ajax requests at the same time, and wait for both to finish, regardless of their order, before making a third Ajax request. Consider:
+比方说你想同时发起两个Ajax请求，在发起第三个Ajax请求发起之前，等待它们都完成，而不管它们的顺序。考虑这段代码：
 
 ```js
 // `request(..)` is a Promise-aware Ajax utility,
@@ -1339,29 +1335,29 @@ Promise.all( [p1,p2] )
 } );
 ```
 
-`Promise.all([ .. ])` expects a single argument, an `array`, consisting generally of Promise instances. The promise returned from the `Promise.all([ .. ])` call will receive a fulfillment message (`msgs` in this snippet) that is an `array` of all the fulfillment messages from the passed in promises, in the same order as specified (regardless of fulfillment order).
+`Promise.all([ .. ])`期待一个单独的参数，一个`array`，一般由Promise的实例组成。从`Promise.all([ .. ])`返回的promise将会收到完成的消息（在这段代码中是`msgs`），它是一个由所有被传入的promise的完成消息按照被传入的顺序构成的`array`（与完成的顺序无关）。
 
-**Note:** Technically, the `array` of values passed into `Promise.all([ .. ])` can include Promises, thenables, or even immediate values. Each value in the list is essentially passed through `Promise.resolve(..)` to make sure it's a genuine Promise to be waited on, so an immediate value will just be normalized into a Promise for that value. If the `array` is empty, the main Promise is immediately fulfilled.
+**注意：** 技术上讲，被传入`Promise.all([ .. ])`的`array`的值可以包括Promise，thenable，甚至是立即值。这个列表中的每一个值都实质上通过`Promise.resolve(..)`来确保它是一个可以被等待的纯粹的Promise，所以一个立即值将被范化为这个值的一个Promise。如果这个`array`是空的，主Promise将会立即完成。
 
-The main promise returned from `Promise.all([ .. ])` will only be fulfilled if and when all its constituent promises are fulfilled. If any one of those promises instead is rejected, the main `Promise.all([ .. ])` promise is immediately rejected, discarding all results from any other promises.
+从`Promise.resolve(..)`返回的主Promise将会在所有组成它的promise完成之后才会被完成。如果其中任意一个promise被拒绝，`Promise.all([ .. ])`的主Promise将立即被拒绝，并放弃所有其他promise的结果。
 
-Remember to always attach a rejection/error handler to every promise, even and especially the one that comes back from `Promise.all([ .. ])`.
+要记得总是给每个promise添加拒绝/错误处理器，即使和特别是那个从`Promise.all([ .. ])`返回的promise。
 
 ### Promise.race([ .. ])
 
-While `Promise.all([ .. ])` coordinates multiple Promises concurrently and assumes all are needed for fulfillment, sometimes you only want to respond to the "first Promise to cross the finish line," letting the other Promises fall away.
+虽然`Promise.all([ .. ])`并发地协调多个Promise并假定它们都需要被完成，但是有时候你只想应答“冲过终点的第一个Promise”，而让其他的Promise被丢弃。
 
-This pattern is classically called a "latch," but in Promises it's called a "race."
+这种模式经典地被称为“闩”，但在Promise中它被称为一个“竞合（race）”。
 
-**Warning:** While the metaphor of "only the first across the finish line wins" fits the behavior well, unfortunately "race" is kind of a loaded term, because "race conditions" are generally taken as bugs in programs (see Chapter 1). Don't confuse `Promise.race([ .. ])` with "race condition."
+**警告：** 虽然“只有第一个冲过终点的算赢”是一个非常合适被比喻，但不幸的是“竞合（race）”是一个被占用的词，因为“竞合状态（race conditions）”通常被认为是程序中的Bug（见第一章）。不要把`Promise.race([ .. ])`与“竞合状态（race conditions）”搞混了。
 
-`Promise.race([ .. ])` also expects a single `array` argument, containing one or more Promises, thenables, or immediate values. It doesn't make much practical sense to have a race with immediate values, because the first one listed will obviously win -- like a foot race where one runner starts at the finish line!
+“竞合状态（race conditions）”也期待一个单独的`array`参数，含有一个或多个Promise，thenable，或立即值。与立即值进行竞合并没有多大实际意义，因为很明显列表中的第一个会胜出——就像赛跑时有一个选手在终点线上起跑！
 
-Similar to `Promise.all([ .. ])`, `Promise.race([ .. ])` will fulfill if and when any Promise resolution is a fulfillment, and it will reject if and when any Promise resolution is a rejection.
+和`Promise.all([ .. ])`相似，`Promise.race([ .. ])`将会在任意一个Promise解析为完成时完成，而且它会在任意一个Promise解析为拒绝时拒绝。
 
-**Warning:** A "race" requires at least one "runner," so if you pass an empty `array`, instead of immediately resolving, the main `race([..])` Promise will never resolve. This is a footgun! ES6 should have specified that it either fulfills, rejects, or just throws some sort of synchronous error. Unfortunately, because of precedence in Promise libraries predating ES6 `Promise`, they had to leave this gotcha in there, so be careful never to send in an empty `array`.
+**注意：** 一个“竞合（race）”需要至少一个“选手”，所以如果你传入一个空的`array`，`race([..])`的主Promise将不会立即解析，反而是永远不会被解析。这是砸自己的脚！ES6应当将它规范为要么完成，要么拒绝，或者要么抛出某种同步错误。不幸的是，因为在ES6的`Promise`之前的Promise库的优先权高，他们不得不把这个坑留在这儿，所以要小心绝不要传入一个空`array`。
 
-Let's revisit our previous concurrent Ajax example, but in the context of a race between `p1` and `p2`:
+让我们重温刚才的并发Ajax的例子，但是在`p1`和`p2`竞合的环境下：
 
 ```js
 // `request(..)` is a Promise-aware Ajax utility,
@@ -1382,11 +1378,11 @@ Promise.race( [p1,p2] )
 } );
 ```
 
-Because only one promise wins, the fulfillment value is a single message, not an `array` as it was for `Promise.all([ .. ])`.
+因为只有一个Promise会胜出，所以完成的值是一个单独的消息，而不是一个像`Promise.all([ .. ])`中那样的`array`。
 
 #### Timeout Race
 
-We saw this example earlier, illustrating how `Promise.race([ .. ])` can be used to express the "promise timeout" pattern:
+我们早先看过这个例子，描述`Promise.race([ .. ])`如何能够用于表达“promise超时”模式：
 
 ```js
 // `foo()` is a Promise-aware function
@@ -1411,17 +1407,17 @@ Promise.race( [
 );
 ```
 
-This timeout pattern works well in most cases. But there are some nuances to consider, and frankly they apply to both `Promise.race([ .. ])` and `Promise.all([ .. ])` equally.
+这种超时模式在绝大多数情况下工作的很好。但这里有一些微妙的细节要考虑，而且坦率的说它们对于`Promise.race([ .. ])`和`Promise.all([ .. ])`同样地适用。
 
 #### "Finally"
 
-The key question to ask is, "What happens to the promises that get discarded/ignored?" We're not asking that question from the performance perspective -- they would typically end up garbage collection eligible -- but from the behavioral perspective (side effects, etc.). Promises cannot be canceled -- and shouldn't be as that would destroy the external immutability trust discussed in the "Promise Uncancelable" section later in this chapter -- so they can only be silently ignored.
+要问的关键问题是，“那些被丢弃/忽略的promise发生了什么？”我们不是从性能的角度在问这个问题——它们通常会终结于合法的垃圾回收——而是从行为的角度（副作用等等）。Promise不能被取消——而且不应当被取消，因为那会摧毁本章稍后的“Promise不可取消”一节中要讨论的外部不可变性——所以它们只能被无声地忽略。
 
-But what if `foo()` in the previous example is reserving some sort of resource for usage, but the timeout fires first and causes that promise to be ignored? Is there anything in this pattern that proactively frees the reserved resource after the timeout, or otherwise cancels any side effects it may have had? What if all you wanted was to log the fact that `foo()` timed out?
+但如果前面例子中的`foo()`占用了某些资源，但超时首先触发而且导致这个promise被忽略了呢？这种模式中存在某种东西可以在超时后主动释放被占用的资源，或者取消任何它可能带来的副作用吗？要是你想做的全部只是记录下`foo()`超时的事实呢？
 
-Some developers have proposed that Promises need a `finally(..)` callback registration, which is always called when a Promise resolves, and allows you to specify any cleanup that may be necessary. This doesn't exist in the specification at the moment, but it may come in ES7+. We'll have to wait and see.
+一些开发者提议，Promise需要一个`finally(..)`回调注册机制，它总是在Promise解析时被调用，而且允许你制定任何可能的清理操作。在当前的语言规范中它还不存在，但它可能会在ES7+中加入。我们不得不边走边看了。
 
-It might look like:
+它看起来可能是这样：
 
 ```js
 var p = Promise.resolve( 42 );
@@ -1432,9 +1428,9 @@ p.then( something )
 .finally( cleanup );
 ```
 
-**Note:** In various Promise libraries, `finally(..)` still creates and returns a new Promise (to keep the chain going). If the `cleanup(..)` function were to return a Promise, it would be linked into the chain, which means you could still have the unhandled rejection issues we discussed earlier.
+**注意：** 在各种Promise库中，`finally(..)`依然会创建并返回一个新的Promise（为了使链条延续下去）。如果`cleanup(..)`函数返回一个Promise，它将会链入链条，这意味着你可能还有我们刚才讨论的未处理拒绝的问题。
 
-In the meantime, we could make a static helper utility that lets us observe (without interfering) the resolution of a Promise:
+同时，我们可以制造一个静态的帮助工具来让我们观察（但不干涉）Promise的解析：
 
 ```js
 // polyfill-safe guard check
@@ -1457,8 +1453,7 @@ if (!Promise.observe) {
 	};
 }
 ```
-
-Here's how we'd use it in the timeout example from before:
+这是我们在前面的超时例子中如何使用它：
 
 ```js
 Promise.race( [
@@ -1473,20 +1468,20 @@ Promise.race( [
 ] )
 ```
 
-This `Promise.observe(..)` helper is just an illustration of how you could observe the completions of Promises without interfering with them. Other Promise libraries have their own solutions. Regardless of how you do it, you'll likely have places where you want to make sure your Promises aren't *just* silently ignored by accident.
+这个`Promise.observe(..)`帮助工具只是描述你如何在不干扰Promise的情况下观测它的完成。其他的Promise库有他们自己的解决方案。不论你怎么做，你都将很可能有个地方想用来确认你的Promise没有意外地被无声地忽略掉。
 
 ### Variations on all([ .. ]) and race([ .. ])
 
-While native ES6 Promises come with built-in `Promise.all([ .. ])` and `Promise.race([ .. ])`, there are several other commonly used patterns with variations on those semantics:
+虽然原生的ES6Promise带有内建的`Promise.all([ .. ])`和`Promise.race([ .. ])`，这里还有几个其他常用的语义变种模式：
 
-* `none([ .. ])` is like `all([ .. ])`, but fulfillments and rejections are transposed. All Promises need to be rejected -- rejections become the fulfillment values and vice versa.
-* `any([ .. ])` is like `all([ .. ])`, but it ignores any rejections, so only one needs to fulfill instead of *all* of them.
-* `first([ .. ])` is a like a race with `any([ .. ])`, which is that it ignores any rejections and fulfills as soon as the first Promise fulfills.
-* `last([ .. ])` is like `first([ .. ])`, but only the latest fulfillment wins.
+* `none([ .. ])`很像`all([ .. ])`，但是完成和拒绝被转置了。所有的Promise都需要被拒绝——拒绝变成了完成值，反之亦然。
+* `any([ .. ])`很像`all([ .. ])`，但它忽略任何拒绝，所以只有一个需要完成而不是它们所有的。
+* `first([ .. ])`像是一个带有`any([ .. ])`的竞合，它忽略任何拒绝，而且一旦有一个Promise完成时，它就立即完成。
+* `last([ .. ])`很像`first([ .. ])`，但是只有最后一个完成胜出。
 
-Some Promise abstraction libraries provide these, but you could also define them yourself using the mechanics of Promises, `race([ .. ])` and `all([ .. ])`.
+某些Promise抽象工具库提供这些方法，但你也可以用Promise机制的`race([ .. ])`和`all([ .. ])`，自己定义他们。
 
-For example, here's how we could define `first([ .. ])`:
+比如，这是我们如何定义`first([..])`:
 
 ```js
 // polyfill-safe guard check
@@ -1506,15 +1501,15 @@ if (!Promise.first) {
 }
 ```
 
-**Note:** This implementation of `first(..)` does not reject if all its promises reject; it simply hangs, much like a `Promise.race([])` does. If desired, you could add additional logic to track each promise rejection and if all reject, call `reject()` on the main promise. We'll leave that as an exercise for the reader.
+**注意：** 这个`first(..)`的实现不会再它所有的promise都被拒绝时拒绝；它会简单地挂起，很像`Promise.race([])`。如果期望，你可以添加一些附加逻辑来追踪每个promise的拒绝，而且如果所有的都被拒绝，就在主promise上调用`reject()`。我们将此作为练习留给读者。
 
 ### Concurrent Iterations
 
-Sometimes you want to iterate over a list of Promises and perform some task against all of them, much like you can do with synchronous `array`s (e.g., `forEach(..)`, `map(..)`, `some(..)`, and `every(..)`). If the task to perform against each Promise is fundamentally synchronous, these work fine, just as we used `forEach(..)` in the previous snippet.
+有时候你想迭代一个Promise的列表，并对它们所有都实施一些任务，就像你可以对同步的`array`做的那样（比如，`forEach(..)`，`map(..)`，`some(..)`，和`every(..)`）。如果对每个Promise实施的操作根本上是同步的，它们工作的很好，正如我们在前面的代码段中用过的`forEach(..)`。
 
-But if the tasks are fundamentally asynchronous, or can/should otherwise be performed concurrently, you can use async versions of these utilities as provided by many libraries.
+但如果任务在根本上是异步的，或者可以/应当并发地实施，你可以使用许多库提供的异步版本的这些工具方法。
 
-For example, let's consider an asynchronous `map(..)` utility that takes an `array` of values (could be Promises or anything else), plus a function (task) to perform against each. `map(..)` itself returns a promise whose fulfillment value is an `array` that holds (in the same mapping order) the async fulfillment value from each task:
+比如，让我们考虑一个异步的`map(..)`工具，它接收一个`array`值（可以是Promise或任何东西），外加一个对数组中每一个值实施的函数（任务）。`map(..)`本身返回一个promise，它的完成值是一个持有每个任务的异步完成值的`array`（以与映射（mapping）相同的顺序）：
 
 ```js
 if (!Promise.map) {
@@ -1536,9 +1531,9 @@ if (!Promise.map) {
 }
 ```
 
-**Note:** In this implementation of `map(..)`, you can't signal async rejection, but if a synchronous exception/error occurs inside of the mapping callback (`cb(..)`), the main `Promise.map(..)` returned promise would reject.
+**注意：** 在这种`map(..)`的实现中，你无法表示异步拒绝，但如果一个在映射的回调内部发生一个同步的异常/错误，那么`Promise.map(..)`返回的主Promise就会拒绝。
 
-Let's illustrate using `map(..)` with a list of Promises (instead of simple values):
+让我们描绘一下对一组Promise（不是简单的值）使用`map(..)`：
 
 ```js
 var p1 = Promise.resolve( 21 );
@@ -1567,13 +1562,13 @@ Promise.map( [p1,p2,p3], function(pr,done){
 
 ## Promise API Recap
 
-Let's review the ES6 `Promise` API that we've already seen unfold in bits and pieces throughout this chapter.
+让我们复习一下我们已经在本章中零散地展开的ES6`Promise`API。
 
-**Note:** The following API is native only as of ES6, but there are specification-compliant polyfills (not just extended Promise libraries) which can define `Promise` and all its associated behavior so that you can use native Promises even in pre-ES6 browsers. One such polyfill is "Native Promise Only" (http://github.com/getify/native-promise-only), which I wrote!
+**注意：** 下面的API尽在ES6中是原生的，但也存在一些语言规范兼容的填补（不光是扩展Promise库），它们定义了`Promise`和与之相关的所有行为，所以即使是在前ES6时代的浏览器中你也以使用原生的Promise。这类填补的其中之一是“Native Promise Only”（http://github.com/getify/native-promise-only），我写的！
 
 ### new Promise(..) Constructor
 
-The *revealing constructor* `Promise(..)` must be used with `new`, and must be provided a function callback that is synchronously/immediately called. This function is passed two function callbacks that act as resolution capabilities for the promise. We commonly label these `resolve(..)` and `reject(..)`:
+*揭示构造器* `Promise(..)`必须与`new`一起使用，而且必须提供一个被同步/立即调用的回调函数。这个函数被传入两个回调函数，它们作为promise的解析能力。我们通常将它们标识为`resolve(..)`和`reject(..)`：
 
 ```js
 var p = new Promise( function(resolve,reject){
@@ -1582,13 +1577,13 @@ var p = new Promise( function(resolve,reject){
 } );
 ```
 
-`reject(..)` simply rejects the promise, but `resolve(..)` can either fulfill the promise or reject it, depending on what it's passed. If `resolve(..)` is passed an immediate, non-Promise, non-thenable value, then the promise is fulfilled with that value.
+`reject(..)`简单地拒绝promise，但是`resolve(..)`既可以完成promise，也可以拒绝promise，这要看它被传入什么值。如果`resolve(..)`被传入一个立即的，非Promise，非thenable的值，那么这个promise将用这个值完成。
 
-But if `resolve(..)` is passed a genuine Promise or thenable value, that value is unwrapped recursively, and whatever its final resolution/state is will be adopted by the promise.
+但如果`resolve(..)`被传入一个Promise或者thenable的值，那么这个值将被递归地展开，而且无论它最终解析结果/状态是什么，都将被promise采用。
 
 ### Promise.resolve(..) and Promise.reject(..)
 
-A shortcut for creating an already-rejected Promise is `Promise.reject(..)`, so these two promises are equivalent:
+一个用于创建已被拒绝的Promise的简便方法是`Promise.reject(..)`，所以这两个promise是等价的：
 
 ```js
 var p1 = new Promise( function(resolve,reject){
@@ -1598,7 +1593,7 @@ var p1 = new Promise( function(resolve,reject){
 var p2 = Promise.reject( "Oops" );
 ```
 
-`Promise.resolve(..)` is usually used to create an already-fulfilled Promise in a similar way to `Promise.reject(..)`. However, `Promise.resolve(..)` also unwraps thenable values (as discussed several times already). In that case, the Promise returned adopts the final resolution of the thenable you passed in, which could either be fulfillment or rejection:
+与`Promise.reject(..)`相似，`Promise.resolve(..)`通常用来创建一个已完成的Promise。然而，`Promise.resolve(..)`还会展开thenale值（就像我们已经几次讨论过的）。在这种情况下，返回的Promise将会采用你传入的thenable的解析，它既可能是完成，也可能是拒绝：
 
 ```js
 var fulfilledTh = {
@@ -1617,15 +1612,15 @@ var p2 = Promise.resolve( rejectedTh );
 // `p2` will be a rejected promise
 ```
 
-And remember, `Promise.resolve(..)` doesn't do anything if what you pass is already a genuine Promise; it just returns the value directly. So there's no overhead to calling `Promise.resolve(..)` on values that you don't know the nature of, if one happens to already be a genuine Promise.
+而且要记住，如果你传入一个纯粹的Promise，`Promise.resolve(..)`不会做任何事情；它仅仅会直接返回这个值。所以在你不知道其本性的值上调用`Promise.resolve(..)`不会有额外的开销，如果它偶然已经是一个纯粹的Promise。
 
 ### then(..) and catch(..)
 
-Each Promise instance (**not** the `Promise` API namespace) has `then(..)` and `catch(..)` methods, which allow registering of fulfillment and rejection handlers for the Promise. Once the Promise is resolved, one or the other of these handlers will be called, but not both, and it will always be called asynchronously (see "Jobs" in Chapter 1).
+每个Promise实例（**不是** `Promise` API 名称空间）都有`then(..)`和`catch(..)`方法，它们允许你为Promise注册成功或拒绝处理器。一旦Promise被解析，它们中的一个就会被调用，但不是都会被调用，而且它们总是会被异步地调用（参见第一章的“Jobs”）。
 
-`then(..)` takes one or two parameters, the first for the fulfillment callback, and the second for the rejection callback. If either is omitted or is otherwise passed as a non-function value, a default callback is substituted respectively. The default fulfillment callback simply passes the message along, while the default rejection callback simply rethrows (propagates) the error reason it receives.
+`then(..)`接收两个参数，第一个用于完成回调，第二个用户拒绝回调。如果它们其中之一被省略，或者被传入一个非函数的值，那么一个默认的回调就会分别顶替上来。默认的完成回调简单地将值向下传递，而默认的拒绝回调简单地重新抛出（传播）收到的拒绝理由。
 
-`catch(..)` takes only the rejection callback as a parameter, and automatically substitutes the default fulfillment callback, as just discussed. In other words, it's equivalent to `then(null,..)`:
+`catch(..)`仅仅接收一个拒绝回调作为参数，而且会自动的顶替一个默认的成功回调，就像我们讨论过的。换句话说，它等价于`then(null,..)`：
 
 ```js
 p.then( fulfilled );
@@ -1635,15 +1630,15 @@ p.then( fulfilled, rejected );
 p.catch( rejected ); // or `p.then( null, rejected )`
 ```
 
-`then(..)` and `catch(..)` also create and return a new promise, which can be used to express Promise chain flow control. If the fulfillment or rejection callbacks have an exception thrown, the returned promise is rejected. If either callback returns an immediate, non-Promise, non-thenable value, that value is set as the fulfillment for the returned promise. If the fulfillment handler specifically returns a promise or thenable value, that value is unwrapped and becomes the resolution of the returned promise.
+`then(..)`和`catch(..)`也会创建并返回一个新的promise，它可以用来表达Promise链式流程控制。如果完成或拒绝回调有异常被抛出，这个返回的promise就会被拒绝。如果这两个回调之一返回一个立即，非Promise，非thenable值，那么这个值就会作为被返回的promise的完成。如果完成处理器指定地返回一个promise或thenable值这个值就会被展开而且变成被返回的promise的解析。
 
 ### Promise.all([ .. ]) and Promise.race([ .. ])
 
-The static helpers `Promise.all([ .. ])` and `Promise.race([ .. ])` on the ES6 `Promise` API both create a Promise as their return value. The resolution of that promise is controlled entirely by the array of promises that you pass in.
+在ES6的`Promise`API的静态帮助方法`Promise.all([ .. ])`和`Promise.race([ .. ])`都创建一个Promise作为它们的返回值。这个promise的解析完全由你传入的promise数组控制。
 
-For `Promise.all([ .. ])`, all the promises you pass in must fulfill for the returned promise to fulfill. If any promise is rejected, the main returned promise is immediately rejected, too (discarding the results of any of the other promises). For fulfillment, you receive an `array` of all the passed in promises' fulfillment values. For rejection, you receive just the first promise rejection reason value. This pattern is classically called a "gate": all must arrive before the gate opens.
+对于`Promise.all([ .. ])`，为了被返回的promise完成，所有你传入的promise都必须完成。如果其中任意一个被拒绝，返回的主promise也会立即被拒绝（丢弃其他所有promise的结果）。至于完成状态，你会收到一个含有所有被传入的promise的完成值的`array`。至于拒绝状态，你仅会收到第一个promise拒绝的理由值。这种模式通常称为“门”：在门打开前所有人都必须到达。
 
-For `Promise.race([ .. ])`, only the first promise to resolve (fulfillment or rejection) "wins," and whatever that resolution is becomes the resolution of the returned promise. This pattern is classically called a "latch": first one to open the latch gets through. Consider:
+对于`Promise.race([ .. ])`，只有第一个解析（成功或拒绝）的promise会“胜出”，而且不论解析的结果是什么，都会成为被返回的promise的解析结果。这种模式通常成为“闩”：第一个打开门闩的人才能进来。考虑这段代码：
 
 ```js
 var p1 = Promise.resolve( 42 );
@@ -1666,23 +1661,31 @@ Promise.all( [p1,p2] )
 } );
 ```
 
-**Warning:** Be careful! If an empty `array` is passed to `Promise.all([ .. ])`, it will fulfill immediately, but `Promise.race([ .. ])` will hang forever and never resolve.
+**警告：** 要小心！如果一个空的`array`被传入`Promise.all([ .. ])`，它会立即完成，但`Promise.race([ .. ])`却会永远挂起，永远不会解析。
 
-The ES6 `Promise` API is pretty simple and straightforward. It's at least good enough to serve the most basic of async cases, and is a good place to start when rearranging your code from callback hell to something better.
+ES6的`Promise`API十分简单和直接。对服务于大多数基本的异步情况来说它足够好了，而且当你要把你的代码从回调地狱变为某些更好的东西时，它是一个开始的好地方。
 
-But there's a whole lot of async sophistication that apps often demand which Promises themselves will be limited in addressing. In the next section, we'll dive into those limitations as motivations for the benefit of Promise libraries.
+但是依然还有许多应用程序所要求的精巧的异步处理，由于Promise本身所受的限制而不能解决。在下一节中，我们将深入这些限制，作为Promise库的优点的动机。
 
 ## Promise Limitations
 
 Many of the details we'll discuss in this section have already been alluded to in this chapter, but we'll just make sure to review these limitations specifically.
 
+本节中我们将要讨论的许多细节已经在这一章中被提及了，但我们将明确地复习这些限制。
+
 ### Sequence Error Handling
 
 We covered Promise-flavored error handling in detail earlier in this chapter. The limitations of how Promises are designed -- how they chain, specifically -- creates a very easy pitfall where an error in a Promise chain can be silently ignored accidentally.
 
+我们在本章前面的部分详细涵盖了Promise风格的错误处理。Promise的设计方式——特别是他们如何链接——所产生的限制，创建了一个非常容易掉进去的陷阱，Promise链中的错误会被意外地无声地忽略掉。
+
 But there's something else to consider with Promise errors. Because a Promise chain is nothing more than its constituent Promises wired together, there's no entity to refer to the entire chain as a single *thing*, which means there's no external way to observe any errors that may occur.
 
+但关于Promise的错误还有一些其他事情要考虑。因为Promise链只不过是组成它的Promise连在一起，没有一个实体可以用来将整个链条表达为一个单独的 *东西*，这意味着没有外部的方法能够监听可能发生的任何错误。
+
 If you construct a Promise chain that has no error handling in it, any error anywhere in the chain will propagate indefinitely down the chain, until observed (by registering a rejection handler at some step). So, in that specific case, having a reference to the *last* promise in the chain is enough (`p` in the following snippet), because you can register a rejection handler there, and it will be notified of any propagated errors:
+
+如果你构建一个不包含错误处理器的Promise链，这个链条的任意位置发生的任何错误都将沿着链条向下无限传播，直到被监听为止（通过在某一步上注册拒绝处理器）。所以，在这种特定情况下，拥有链条的最后一个promise的引用就够了（下面代码段中的`p`），因为你可以在这里注册拒绝处理器，而且它会被所有传播的错误通知：
 
 ```js
 // `foo(..)`, `STEP2(..)` and `STEP3(..)` are
@@ -1695,7 +1698,11 @@ var p = foo( 42 )
 
 Although it may seem sneakily confusing, `p` here doesn't point to the first promise in the chain (the one from the `foo(42)` call), but instead from the last promise, the one that comes from the `then(STEP3)` call.
 
+虽然这看起来有点儿小困惑，但是这里的`p`没有指向链条中的第一个promise（`foo(42)`调用中来的那一个），而是指向了最后一个promise，来自于`then(STEP3)`调用的那一个。
+
 Also, no step in the promise chain is observably doing its own error handling. That means that you could then register a rejection error handler on `p`, and it would be notified if any errors occur anywhere in the chain:
+
+另外，这个promise链条上看不到一个步骤做了自己的错误处理。这意味着你可以在`p`上注册一个拒绝处理器，如果在链条的任意位置发生了错误，它就会被通知。
 
 ```
 p.catch( handleErrors );
@@ -1703,21 +1710,35 @@ p.catch( handleErrors );
 
 But if any step of the chain in fact does its own error handling (perhaps hidden/abstracted away from what you can see), your `handleErrors(..)` won't be notified. This may be what you want -- it was, after all, a "handled rejection" -- but it also may *not* be what you want. The complete lack of ability to be notified (of "already handled" rejection errors) is a limitation that restricts capabilities in some use cases.
 
+但如果这个链条中的某一步事实上做了自己的错误处理（也许是隐藏/抽象出去了，所以你看不到），那么你的`handleErrors(..)`就不会被通知。这可能是你想要的——它毕竟是一个“被处理过的拒绝”——但它也可能 *不* 是你想要的。完全缺乏被通知的能力（被“已处理过的”拒绝错误通知）是一个在某些用法中约束功能的一种限制。
+
 It's basically the same limitation that exists with a `try..catch` that can catch an exception and simply swallow it. So this isn't a limitation **unique to Promises**, but it *is* something we might wish to have a workaround for.
 
+它基本上和`try..catch`中存在的限制是相同的，它可以捕获一个异常并简单地吞掉。所以这不是一个 **Promise特有** 的限制，但它确实是一个我们希望绕过的限制。
+
 Unfortunately, many times there is no reference kept for the intermediate steps in a Promise-chain sequence, so without such references, you cannot attach error handlers to reliably observe the errors.
+
+不幸的是，许多时候Promise链序列的中间步骤不会被留下引用，所以没有这些引用，你就不能添加错误处理器来可靠地监听错误。
 
 ### Single Value
 
 Promises by definition only have a single fulfillment value or a single rejection reason. In simple examples, this isn't that big of a deal, but in more sophisticated scenarios, you may find this limiting.
 
+根据定义，Promise只能有一个单独的完成值或一个单独的拒绝理由。在简单的例子中，这没什么大不了的，但在更精巧的场景下，你可能发现这个限制。
+
 The typical advice is to construct a values wrapper (such as an `object` or `array`) to contain these multiple messages. This solution works, but it can be quite awkward and tedious to wrap and unwrap your messages with every single step of your Promise chain.
+
+典型的建议是构建一个包装值（比如`object`或`array`）来包含这些多个消息。这个方法好用，但是在你的Promise链的每一步上把消息包装再拆开显得十分尴尬和烦人。
 
 #### Splitting Values
 
 Sometimes you can take this as a signal that you could/should decompose the problem into two or more Promises.
 
+有时你可以将这种情况当做一个信号，表示你可以/应当将问题拆分为两个或更多的Promise。
+
 Imagine you have a utility `foo(..)` that produces two values (`x` and `y`) asynchronously:
+
+想象你有一个工具`foo(..)`，它异步地产生两个值（`x`和`y`）：
 
 ```js
 function getY(x) {
