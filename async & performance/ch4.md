@@ -1,22 +1,22 @@
-# You Don't Know JS: Async & Performance
-# Chapter 4: Generators
+# 你不懂JS: 异步与性能
+# 第四章: Generators
 
-In Chapter 2, we identified two key drawbacks to expressing async flow control with callbacks:
+在第二章中，我们定位了在使用回调表达异步流程控制时的两个关键缺陷：
 
-* Callback-based async doesn't fit how our brain plans out steps of a task.
-* Callbacks aren't trustable or composable because of *inversion of control*.
+* 基于回调的异步与我们的大脑规划任务的各个步骤的过程不相符。
+* 由于 *控制倒转* 回调是不可靠的，也是不可组合的。
 
-In Chapter 3, we detailed how Promises uninvert the *inversion of control* of callbacks, restoring trustability/composability.
+在第三章中，我们详细地讨论了Promise如何反转回调的 *控制倒转*，重建可靠性/可组合性。
 
-Now we turn our attention to expressing async flow control in a sequential, synchronous-looking fashion. The "magic" that makes it possible is ES6 **generators**.
+现在让我们把注意力集中到用一种顺序的，看起来同步的风格来表达异步流程控制。使这一切成为可能的“魔法”是ES6 **Generator**。
 
 ## Breaking Run-to-Completion
 
-In Chapter 1, we explained an expectation that JS developers almost universally rely on in their code: once a function starts executing, it runs until it completes, and no other code can interrupt and run in between.
+在第一章中，我们讲解了一个JS开发者们在他们的代码中几乎永恒依仗的一个期望：一旦函数开始执行，它将执行至完成，没有其他的代码可以在运行期间干扰它。
 
-As bizarre as it may seem, ES6 introduces a new type of function that does not behave with the run-to-completion behavior. This new type of function is called a "generator."
+这看起来可能很滑稽，ES6引入了一种新型的函数，它不按照“运行至完成”的行为进行动作。这种新型的函数称为“generator（生成器）”。
 
-To understand the implications, let's consider this example:
+为了理解它的含义，然我们看看这个例子：
 
 ```js
 var x = 1;
@@ -34,15 +34,15 @@ function bar() {
 foo();					// x: 3
 ```
 
-In this example, we know for sure that `bar()` runs in between `x++` and `console.log(x)`. But what if `bar()` wasn't there? Obviously the result would be `2` instead of `3`.
+在这个例子中，我们确信`bar()`会在`x++`和`console.log(x)`之间运行。但如果`bar()`不在这里嫩？很明显结果将是`2`而不是`3`。
 
-Now let's twist your brain. What if `bar()` wasn't present, but it could still somehow run between the `x++` and `console.log(x)` statements? How would that be possible?
+现在让我们来虐待你的大脑。要是`bar()`不存在，但以某种方式依然可以在`x++`和`console.log(x)`语句之间运行呢？这可能吗？
 
-In **preemptive** multithreaded languages, it would essentially be possible for `bar()` to "interrupt" and run at exactly the right moment between those two statements. But JS is not preemptive, nor is it (currently) multithreaded. And yet, a **cooperative** form of this "interruption" (concurrency) is possible, if `foo()` itself could somehow indicate a "pause" at that part in the code.
+在 **抢占式（preemptive）** 多线程语言中，`bar()`去“干扰”并正好在两个语句之间那一时刻运行，实质上时可能的。但JS不是抢占式的，也（还）不是多线程的。但是，如果`foo()`本身可以用某种办法在代码的这一部分指示一个“暂停”，那么这种“干扰”（并发）的 **协作** 形式就是可能的。
 
-**Note:** I use the word "cooperative" not only because of the connection to classical concurrency terminology (see Chapter 1), but because as you'll see in the next snippet, the ES6 syntax for indicating a pause point in code is `yield` -- suggesting a politely *cooperative* yielding of control.
+**注意：** 我使用“协作”这个词，不仅是因为它与经典的并发术语有关联（见第一章），也因为正如你将在下一个代码段中看到的，ES6在代码中指示暂停点的语法是`yield`——暗示一个让出控制权的潜在 *协作*。
 
-Here's the ES6 code to accomplish such cooperative concurrency:
+这就是实现这种协作并发的ES6代码：
 
 ```js
 var x = 1;
@@ -58,9 +58,9 @@ function bar() {
 }
 ```
 
-**Note:** You will likely see most other JS documentation/code that will format a generator declaration as `function* foo() { .. }` instead of as I've done here with `function *foo() { .. }` -- the only difference being the stylistic positioning of the `*`. The two forms are functionally/syntactically identical, as is a third `function*foo() { .. }` (no space) form. There are arguments for both styles, but I basically prefer `function *foo..` because it then matches when I reference a generator in writing with `*foo()`. If I said only `foo()`, you wouldn't know as clearly if I was talking about a generator or a regular function. It's purely a stylistic preference.
+**注意：** 已将很可能在大多数其他的JS文档/代码中看到，一个Generator的声明被格式化为`function* foo() { .. }`而不是我在这里使用的`function *foo() { .. }`——唯一的区别是`*`的位置风格。这两种形式在功能性/语法上是完全一样的，还有第三种`function*foo() { .. }`（没空格）形式。这两种风格存在争议，但我基本上偏好`function *foo..`，因为当我在写作中用`*foo()`引用一个generator时，这种形式可以匹配我写的东西。如果我只说`foo()`，你就不会清楚地知道我是在说一个generator还是一个一般的函数。这纯粹是一个风格偏好的问题。
 
-Now, how can we run the code in that previous snippet such that `bar()` executes at the point of the `yield` inside of `*foo()`?
+现在，我们该如何运行上面的代码，使`bar()`在`yield`那一点取代`*foo()`的执行？
 
 ```js
 // construct an iterator `it` to control the generator
@@ -74,23 +74,23 @@ x;						// 3
 it.next();				// x: 3
 ```
 
-OK, there's quite a bit of new and potentially confusing stuff in those two code snippets, so we've got plenty to wade through. But before we explain the different mechanics/syntax with ES6 generators, let's walk through the behavior flow:
+好了，这两段代码中有不少新的，可能使人困惑的东西，所以我们得跋涉好一段了。在我们用ES6的generator来讲解不同的机制/语法之前，让我们过一遍这个行为的流程：
 
-1. The `it = foo()` operation does *not* execute the `*foo()` generator yet, but it merely constructs an *iterator* that will control its execution. More on *iterators* in a bit.
-2. The first `it.next()` starts the `*foo()` generator, and runs the `x++` on the first line of `*foo()`.
-3. `*foo()` pauses at the `yield` statement, at which point that first `it.next()` call finishes. At the moment, `*foo()` is still running and active, but it's in a paused state.
-4. We inspect the value of `x`, and it's now `2`.
-5. We call `bar()`, which increments `x` again with `x++`.
-6. We inspect the value of `x` again, and it's now `3`.
-7. The final `it.next()` call resumes the `*foo()` generator from where it was paused, and runs the `console.log(..)` statement, which uses the current value of `x` of `3`.
+1. `it = foo()`操作 *不会* 执行`*foo()`generator，它只不过构建了一个用来控制它执行的 *迭代器（iterator）*。我们一会更多地讨论 *迭代器*。
+2. 第一个`it.next()`启动了`*foo()`发生器，并且运行`*foo()`第一行上的`x++`。
+3. `*foo()`在`yield`语句处暂停，就在这时第一个`it.next()`调用结束。在这个时刻，`*foo()`依然运行而且是活动的，但是处于暂停状态。
+4. 我们观察`x`的值，现在它是`2`.
+5. 我们调用`bar()`，它再一次用`x++`递增`x`。
+6. 我们再一次观察`x`的值，现在它是`3`。
+7. 最后的`it.next()`调用使`*foo()`发生器从它暂停的地方继续运行，而后运行使用`x`的当前值`3`的`console.log(..)`语句。
 
-Clearly, `*foo()` started, but did *not* run-to-completion -- it paused at the `yield`. We resumed `*foo()` later, and let it finish, but that wasn't even required.
+清楚的是，`*foo()`启动了，但 *没有* 运行至完成——它停在`yield`。我们稍后继续`*foo()`，让它完成，但这甚至不是必须的。
 
-So, a generator is a special kind of function that can start and stop one or more times, and doesn't necessarily ever have to finish. While it won't be terribly obvious yet why that's so powerful, as we go throughout the rest of this chapter, that will be one of the fundamental building blocks we use to construct generators-as-async-flow-control as a pattern for our code.
+所以，一个生成器是一种函数，它可以开始和停止一次或多次，而且没必要一定完成。虽然为什么它很强大看起来不那么明显，但正如我们将要在本章剩下的部分将要讲到的，它是我们用于在我们的代码中构建“生成器异步流程控制”模式的基础构建块儿之一。
 
 ### Input and Output
 
-A generator function is a special function with the new processing model we just alluded to. But it's still a function, which means it still has some basic tenets that haven't changed -- namely, that it still accepts arguments (aka "input"), and that it can still return a value (aka "output"):
+一个生成器函数是一种带有我们刚才提到的新型处理模型的函数。但它仍然是一个函数，这意味着依旧有一些不变的基本原则——即，它依然接收参数（也就是“输入”），而且它依然返回一个值（也就是“输出”）：
 
 ```js
 function *foo(x,y) {
@@ -104,21 +104,21 @@ var res = it.next();
 res.value;		// 42
 ```
 
-We pass in the arguments `6` and `7` to `*foo(..)` as the parameters `x` and `y`, respectively. And `*foo(..)` returns the value `42` back to the calling code.
+我们将`6`和`7`分别作为参数`x`和`y`传递给`*foo(..)`。而`*foo(..)`将值`42`返回给调用端代码。
 
-We now see a difference with how the generator is invoked compared to a normal function. `foo(6,7)` obviously looks familiar. But subtly, the `*foo(..)` generator hasn't actually run yet as it would have with a function.
+现在我们可以看到发生器的调用和一般函数的调用的一个不同之处了。`foo(6,7)`显然看起来很熟悉。但微妙的是，`*foo(..)`发生器不会像一个函数那样实际运行起来。
 
-Instead, we're just creating an *iterator* object, which we assign to the variable `it`, to control the `*foo(..)` generator. Then we call `it.next()`, which instructs the `*foo(..)` generator to advance from its current location, stopping either at the next `yield` or end of the generator.
+相反，我们只是创建了 *迭代器* 对象，将它赋值给变量`it`，来控制`*foo(..)`生成器。当我们调用`it.next()`时，它命令`*foo(..)`生成器从现在的位置向前推进，直到下一个`yield`或者生成器的最后。
 
-The result of that `next(..)` call is an object with a `value` property on it holding whatever value (if anything) was returned from `*foo(..)`. In other words, `yield` caused a value to be sent out from the generator during the middle of its execution, kind of like an intermediate `return`.
+`next(..)`调用的结果是一个带有`value`属性的对象，它持有从`*foo(..)`返回的任何值（如果有的话）。换句话说，`yield`导致在生成器运行期间，一个值被从中发送出来，有点儿像一个中间的`return`。
 
-Again, it won't be obvious yet why we need this whole indirect *iterator* object to control the generator. We'll get there, I *promise*.
+再一次，为什么我们需要这个完全间接的 *迭代器* 对象来控制生成器还不清楚。我们回头会讨论它的，我保证。
 
 #### Iteration Messaging
 
-In addition to generators accepting arguments and having return values, there's even more powerful and compelling input/output messaging capability built into them, via `yield` and `next(..)`.
+生成器除了接收参数和有返回值，它还内建有更强大，更吸引人的输入/输出消息能力，通过使用`yield`和`next(..)`。
 
-Consider:
+考虑下面的代码：
 
 ```js
 function *foo(x) {
@@ -136,38 +136,38 @@ var res = it.next( 7 );
 res.value;		// 42
 ```
 
-First, we pass in `6` as the parameter `x`. Then we call `it.next()`, and it starts up `*foo(..)`.
+首先，我们将`6`作为参数`x`传入。之后我们调用`it.next()`，它启动了`*foo(..)`.
 
-Inside `*foo(..)`, the `var y = x ..` statement starts to be processed, but then it runs across a `yield` expression. At that point, it pauses `*foo(..)` (in the middle of the assignment statement!), and essentially requests the calling code to provide a result value for the `yield` expression. Next, we call `it.next( 7 )`, which is passing the `7` value back in to *be* that result of the paused `yield` expression.
+在`*foo(..)`内部，`var y = x ..`语句开始被处理，但它运行到了一个`yield`表达式。就在这时，它暂停了`*foo(..)`（就在赋值语句的中间！），而且请求调用端代码为`yield`表达式提供一个结果值。接下来，我们调用`it.next(7)`，它将`7`这个值传回去作为暂停的`yield`表达式的结果。
 
-So, at this point, the assignment statement is essentially `var y = 6 * 7`. Now, `return y` returns that `42` value back as the result of the `it.next( 7 )` call.
+所以，在这个时候，赋值语句实质上是`var y = 6 * 7`。现在，`return y`将值`42`作为结果返回给`it.next( 7 )`调用。
 
-Notice something very important but also easily confusing, even to seasoned JS developers: depending on your perspective, there's a mismatch between the `yield` and the `next(..)` call. In general, you're going to have one more `next(..)` call than you have `yield` statements -- the preceding snippet has one `yield` and two `next(..)` calls.
+注意一个非常重要，而且即便是对于老练的JS开发者也非常容易犯糊涂的事情：根据你的角度，在`yield`和`next(..)`调用之间存在着错位。一般来说，你所拥有的`next(..)`调用的数量，会比你所拥有的`yield`语句的数量多一个——前面的代码段中有一个`yield`和两个`next(..)`调用。
 
-Why the mismatch?
+为什么会有这样的错位？
 
-Because the first `next(..)` always starts a generator, and runs to the first `yield`. But it's the second `next(..)` call that fulfills the first paused `yield` expression, and the third `next(..)` would fulfill the second `yield`, and so on.
+因为第一个`next(..)`总是启动一个生成器，然后运行至第一个`yield`。但是第二个`next(..)`调用满足了第一个暂停的`yield`表达式，而第三个`next(..)`将满足第二个`yield`，如此反复。
 
 ##### Tale of Two Questions
 
-Actually, which code you're thinking about primarily will affect whether there's a perceived mismatch or not.
+实际上，你主要考虑的是哪部分代码会影响你是否感知到错位。
 
-Consider only the generator code:
+仅考虑生成器代码：
 
 ```js
 var y = x * (yield);
 return y;
 ```
 
-This **first** `yield` is basically *asking a question*: "What value should I insert here?"
+这 **第一个** `yield`基本上是在 *问一个问题*：“我应该在这里插入什么值？”
 
-Who's going to answer that question? Well, the **first** `next()` has already run to get the generator up to this point, so obviously *it* can't answer the question. So, the **second** `next(..)` call must answer the question *posed* by the **first** `yield`.
+谁来回答这个问题？好吧，**第一个** `next()`在这个时候已经为了启动生成器而运行过了，所以很明显 *它* 不能回答这个问题。所以，**第二个** `next(..)`调用必须回答由 **第一个** `yield`提出的问题。
 
-See the mismatch -- second-to-first?
+看到错位了吧——第二个对第一个？
 
-But let's flip our perspective. Let's look at it not from the generator's point of view, but from the iterator's point of view.
+但是让我们反转一下我们的角度。让我们不从生成器的角度看问题，而从迭代器的角度看。
 
-To properly illustrate this perspective, we also need to explain that messages can go in both directions -- `yield ..` as an expression can send out messages in response to `next(..)` calls, and `next(..)` can send values to a paused `yield` expression. Consider this slightly adjusted code:
+为了恰当地描述这种角度，我们还需要解析一下，消息可以双向发送——`yield ..`作为表达式可以发送消息来应答`next(..)`调用，而`next(..)`可以发送值给暂停的`yield`表达式。考虑一下这段稍稍调整过的代码：
 
 ```js
 function *foo(x) {
@@ -184,9 +184,9 @@ res = it.next( 7 );		// pass `7` to waiting `yield`
 res.value;				// 42
 ```
 
-`yield ..` and `next(..)` pair together as a two-way message passing system **during the execution of the generator**.
+`yield ..`和`next(..)`一起成对地 **在生成器运行期间** 构成了一个双向消息传递系统。
 
-So, looking only at the *iterator* code:
+那么，如果只看 *迭代器* 代码：
 
 ```js
 var res = it.next();	// first `next()`, don't pass anything
@@ -196,27 +196,27 @@ res = it.next( 7 );		// pass `7` to waiting `yield`
 res.value;				// 42
 ```
 
-**Note:** We don't pass a value to the first `next()` call, and that's on purpose. Only a paused `yield` could accept such a value passed by a `next(..)`, and at the beginning of the generator when we call the first `next()`, there **is no paused `yield`** to accept such a value. The specification and all compliant browsers just silently **discard** anything passed to the first `next()`. It's still a bad idea to pass a value, as you're just creating silently "failing" code that's confusing. So, always start a generator with an argument-free `next()`.
+**注意：** 我们没有传递任何值给第一个`next()`调用，而且是故意的。只有一个暂停的`yield`才能接收这样一个被`next(..)`传递的值，但是当我们调用第一个`next()`时，在生成器的最开始并 **没有任何暂停的`yield`** 可以接收这样的值。语言规范和所有兼容的浏览器只会无声地 **丢弃** 任何传入第一个`next()`的东西。传递这样的值是一个坏主意，因为你仅仅创建了一些令人困惑的无声“失败”的代码。所以，记得总是用一个无参数的`next()`来启动生成器。
 
-The first `next()` call (with nothing passed to it) is basically *asking a question*: "What *next* value does the `*foo(..)` generator have to give me?" And who answers this question? The first `yield "hello"` expression.
+第一个`next()`调用（没有任何参数的）基本上是在 *问一个问题*：“`*foo(..)`生成器将要给我的 *下一个* 值是什么？”，谁来回答这个问题？第一个`yield`表达式。
 
-See? No mismatch there.
+看到了？这里没有错位。
 
-Depending on *who* you think about asking the question, there is either a mismatch between the `yield` and `next(..)` calls, or not.
+根据你认为是 *谁* 在问问题，在`yield`和`next(..)`之间的错位既存在又不存在。
 
-But wait! There's still an extra `next()` compared to the number of `yield` statements. So, that final `it.next(7)` call is again asking the question about what *next* value the generator will produce. But there's no more `yield` statements left to answer, is there? So who answers?
+但等一下！跟`yield`语句的数量比起来，还有一个额外的`next()`。那么，这个最后的`it.next(7)`调用又一次在询问生成器 *下一个* 产生的值是什么。但是没有`yield`语句剩下可以回答了，不是吗？那么谁回答？
 
-The `return` statement answers the question!
+`return`语句回答这个问题！
 
-And if there **is no `return`** in your generator -- `return` is certainly not any more required in generators than in regular functions -- there's always an assumed/implicit `return;` (aka `return undefined;`), which serves the purpose of default answering the question *posed* by the final `it.next(7)` call.
+而且如果在你的生成器中 **没有`return`**——比起一般的函数，生成器中的`return`当然不再是必须的——总会有一个假定/隐式的`return;`（也就是`return undefined;`），它默认的目的就是回答由最后的`it.next(7)`调用 *提出* 的问题。
 
-These questions and answers -- the two-way message passing with `yield` and `next(..)` -- are quite powerful, but it's not obvious at all how these mechanisms are connected to async flow control. We're getting there!
+这些问题与回答——用`yield`和`next(..)`进行双向消息传递——十分强大，但还是看不出来这些机制与异步流程控制有什么联系。我们正在接近！
 
 ### Multiple Iterators
 
-It may appear from the syntactic usage that when you use an *iterator* to control a generator, you're controlling the declared generator function itself. But there's a subtlety that's easy to miss: each time you construct an *iterator*, you are implicitly constructing an instance of the generator which that *iterator* will control.
+从语法使用上来看，当你用一个 *迭代器* 来控制生成器时，你正在控制声明的生成器函数本身。但这里有一个容易忽视的微妙问题：每当你构建一个 *迭代器*，你都隐含地构建了一个将由这个 *迭代器* 控制的生成器的实例。
 
-You can have multiple instances of the same generator running at the same time, and they can even interact:
+你可以有同一个生成器的多个实例同时运行，它们甚至可以互动：
 
 ```js
 function *foo() {
@@ -243,21 +243,21 @@ it2.next( val1 / 4 );					// y:10
 										// 200 10 3
 ```
 
-**Warning:** The most common usage of multiple instances of the same generator running concurrently is not such interactions, but when the generator is producing its own values without input, perhaps from some independently connected resource. We'll talk more about value production in the next section.
+**警告：** 同一个生成器的多个并发运行实例的最常见的用法，不是这样的互动，而是生成器在没有输入的情况下，从一些连接着的独立资源中产生它自己的值。我们将在下一节中更多地讨论产生值。
 
-Let's briefly walk through the processing:
+让我们简单地走一遍这个处理过程：
 
-1. Both instances of `*foo()` are started at the same time, and both `next()` calls reveal a `value` of `2` from the `yield 2` statements, respectively.
-2. `val2 * 10` is `2 * 10`, which is sent into the first generator instance `it1`, so that `x` gets value `20`. `z` is incremented from `1` to `2`, and then `20 * 2` is `yield`ed out, setting `val1` to `40`.
-3. `val1 * 5` is `40 * 5`, which is sent into the second generator instance `it2`, so that `x` gets value `200`. `z` is incremented again, from `2` to `3`, and then `200 * 3` is `yield`ed out, setting `val2` to `600`.
-4. `val2 / 2` is `600 / 2`, which is sent into the first generator instance `it1`, so that `y` gets value `300`, then printing out `20 300 3` for its `x y z` values, respectively.
-5. `val1 / 4` is `40 / 4`, which is sent into the second generator instance `it2`, so that `y` gets value `10`, then printing out `200 10 3` for its `x y z` values, respectively.
+1. 两个`*foo()`在同时启动，而且两个`next()`都分别从`yield 2`语句中得到了`2`的`value`。
+2. `val2 * 10`就是`2 * 10`，它被发送到第一个生成器实例`it1`，所以`x`得到值`20`。`z`将`1`递增至`2`，然后`20 * 2`被`yield`出来，将`val1`设置为`40`。
+3. `val1 * 5`就是`40 * 5`，它被发送到第二个生成器实例`it2`中，所以`x`得到值`200`。`z`又一次递增，从`2`到`3`，然后`200 * 3`被`yield`出来，将`val2`设置为`600`。
+4. `val2 / 2`就是`600 / 2`，它被发送到第一个生成器实例`it1`，所以`y`得到值`300`，然后分别为它的`x y z`值打印出`20 300 3`。
+5. `val1 / 4`就是`40 / 4`，它被发送到第一个生成器实例`it2`，所以`y`得到值`10`，然后分别为它的`x y z`值打印出`200 10 3`。
 
-That's a "fun" example to run through in your mind. Did you keep it straight?
+这是在你脑海中跑过的一个“有趣”的例子。你还能保持清醒？
 
 #### Interleaving
 
-Recall this scenario from the "Run-to-completion" section of Chapter 1:
+回想第一章中“运行至完成”一节的这个场景：
 
 ```js
 var a = 1;
@@ -276,9 +276,9 @@ function bar() {
 }
 ```
 
-With normal JS functions, of course either `foo()` can run completely first, or `bar()` can run completely first, but `foo()` cannot interleave its individual statements with `bar()`. So, there are only two possible outcomes to the preceding program.
+使用普通的JS函数，当然要么是`foo()`可以首先运行完成，要么是`bar()`可以首先运行至完成，但是`foo()`不可能与`bar()`穿插它的独立语句。所以，前面这段代码只有两个可能的输出。
 
-However, with generators, clearly interleaving (even in the middle of statements!) is possible:
+然而，使用生成器，明确地穿插（甚至是在语句中间！）是可能的：
 
 ```js
 var a = 1;
@@ -299,9 +299,9 @@ function *bar() {
 }
 ```
 
-Depending on what respective order the *iterators* controlling `*foo()` and `*bar()` are called, the preceding program could produce several different results. In other words, we can actually illustrate (in a sort of fake-ish way) the theoretical "threaded race conditions" circumstances discussed in Chapter 1, by interleaving the two generator interations over the same shared variables.
+根据 *迭代器* 控制`*foo()`与`*bar()`以什么样的相对顺序被调用，前面这段代码可以产生几种不同的结果。换句话说，通过两个生成器在同一个共享的变量上穿插，我们实际上可以描绘（以一种模拟的方式）在第一章中讨论的，理论上的“线程的竞合状态”环境。
 
-First, let's make a helper called `step(..)` that controls an *iterator*:
+首先，让我们制造一个称为`step(..)`的帮助函数，让它控制 *迭代器*：
 
 ```js
 function step(gen) {
@@ -316,9 +316,9 @@ function step(gen) {
 }
 ```
 
-`step(..)` initializes a generator to create its `it` *iterator*, then returns a function which, when called, advances the *iterator* by one step. Additionally, the previously `yield`ed out value is sent right back in at the *next* step. So, `yield 8` will just become `8` and `yield b` will just be `b` (whatever it was at the time of `yield`).
+`step(..)`初始化一个生成器来创建它的`it` *迭代器*，然后它返回一个函数，每次这个函数被调用时，都将 *迭代器* 向前推一步。另外，前一个被`yield`出来的值将被直接发给下一步。所以，`yield 8`将变成`8`而`yield b`将成为`b`（不管它在`yield`时是什么值）。
 
-Now, just for fun, let's experiment to see the effects of interleaving these different chunks of `*foo()` and `*bar()`. We'll start with the boring base case, making sure `*foo()` totally finishes before `*bar()` (just like we did in Chapter 1):
+现在，为了好玩儿，让我们做一些实验，来看看将这些`*foo()`与`*bar()`的不同块儿穿插时的效果。我们从一个无聊的基本情况开始，保证`*foo()`在`*bar()`之前全部完成（就像我们在第一章中做的那样）：
 
 ```js
 // make sure to reset `a` and `b`
@@ -342,7 +342,7 @@ s2();
 console.log( a, b );	// 11 22
 ```
 
-The end result is `11` and `22`, just as it was in the Chapter 1 version. Now let's mix up the interleaving ordering and see how it changes the final values of `a` and `b`:
+最终结果是`11`和`22`，就像第一章的版本那样。现在让我们把顺序混合穿插，来看看它如何改变`a`与`b`的值。
 
 ```js
 // make sure to reset `a` and `b`
@@ -363,27 +363,33 @@ s1();		// a = b + 3;
 s2();		// b = a * 2;
 ```
 
-Before I tell you the results, can you figure out what `a` and `b` are after the preceding program? No cheating!
+在我告诉你结果之前，你能指出在前面的程序运行之后`a`和`b`的值是什么吗？不要作弊！
 
 ```js
 console.log( a, b );	// 12 18
 ```
 
-**Note:** As an exercise for the reader, try to see how many other combinations of results you can get back rearranging the order of the `s1()` and `s2()` calls. Don't forget you'll always need three `s1()` calls and four `s2()` calls. Recall the discussion earlier about matching `next()` with `yield` for the reasons why.
+**注意：** 作为留给读者的练习，试试通过重新安排`s1()`和`s2()`调用的顺序，看看你能得到多少种结果组合。别忘了你总是需要三个`s1()`调用和四个`s2()`调用。至于为什么，回想早先关于使用`yield`匹配`next()`的讨论。
 
-You almost certainly won't want to intentionally create *this* level of interleaving confusion, as it creates incredibly difficult to understand code. But the exercise is interesting and instructive to understand more about how multiple generators can run concurrently in the same shared scope, because there will be places where this capability is quite useful.
+当然，你几乎不会想有意制造 *这种* 水平的，令人糊涂的穿插，因为他创建了非常难理解的代码。但是练习很有趣，而且对于理解多个生成器如何并发地运行在相同的共享作用域来说很有教育意义，因为会有一些地方这种能力十分有用。
 
-We'll discuss generator concurrency in more detail at the end of this chapter.
+我们会在本章末尾更详细地讨论生成器并发。
 
 ## Generator'ing Values
 
 In the previous section, we mentioned an interesting use for generators, as a way to produce values. This is **not** the main focus in this chapter, but we'd be remiss if we didn't cover the basics, especially because this use case is essentially the origin of the name: generators.
 
+在前一节中，我们提到了一个生成器的有趣用法，作为一种生产值的方式。这 **不是** 我们本章主要关注的，但如果我们不在这里讲一下基本我们会想念它的，特别是因为这种用法实质上是它的名称的由来：生成器。
+
 We're going to take a slight diversion into the topic of *iterators* for a bit, but we'll circle back to how they relate to generators and using a generator to *generate* values.
+
+我们将要稍稍深入一下 *迭代器* 的话题，但我们会绕回到它们如何与生成器关联，并使用生成器来 *生成* 值。
 
 ### Producers and Iterators
 
 Imagine you're producing a series of values where each value has a definable relationship to the previous value. To do this, you're going to need a stateful producer that remembers the last value it gave out.
+
+
 
 You can implement something like that straightforwardly using a function closure (see the *Scope & Closures* title of this series):
 
