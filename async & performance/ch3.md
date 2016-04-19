@@ -1710,11 +1710,7 @@ p.catch( handleErrors );
 
 #### Splitting Values
 
-Sometimes you can take this as a signal that you could/should decompose the problem into two or more Promises.
-
 有时你可以将这种情况当做一个信号，表示你可以/应当将问题拆分为两个或更多的Promise。
-
-Imagine you have a utility `foo(..)` that produces two values (`x` and `y`) asynchronously:
 
 想象你有一个工具`foo(..)`，它异步地产生两个值（`x`和`y`）：
 
@@ -1746,8 +1742,6 @@ foo( 10, 20 )
 } );
 ```
 
-First, let's rearrange what `foo(..)` returns so that we don't have to wrap `x` and `y` into a single `array` value to transport through one Promise. Instead, we can wrap each value into its own promise:
-
 首先，让我们重新安排一下`foo(..)`返回的东西，以便于我们不必再将`x`和`y`包装进一个单独的`array`值中来传送给一个Promise。相反，我们将每一个值包装进它自己的promise：
 
 ```js
@@ -1772,17 +1766,11 @@ Promise.all(
 } );
 ```
 
-Is an `array` of promises really better than an `array` of values passed through a single promise? Syntactically, it's not much of an improvement.
-
 一个promise的`array`真的要比传递给一个单独的Promise的值的`array`要好吗？语法上，它没有太多改进。
-
-But this approach more closely embraces the Promise design theory. It's now easier in the future to refactor to split the calculation of `x` and `y` into separate functions. It's cleaner and more flexible to let the calling code decide how to orchestrate the two promises -- using `Promise.all([ .. ])` here, but certainly not the only option -- rather than to abstract such details away inside of `foo(..)`.
 
 但是这种方式更加接近于Promise的设计原理。现在它更易于在未来将`x`与`y`的计算分开，重构进两个分离的函数中。它更清晰，也允许调用端代码更灵活地安排这两个promise——这里使用了`Promise.all([ .. ])`，但当然不是唯一的选择——而不是将这样的细节在`foo(..)`内部进行抽象。
 
 #### Unwrap/Spread Arguments
-
-The `var x = ..` and `var y = ..` assignments are still awkward overhead. We can employ some functional trickery (hat tip to Reginald Braithwaite, @raganwald on Twitter) in a helper utility:
 
 `var x = ..`和`var y = ..`的赋值依然是一个尴尬的负担。我们可以在一个帮助工具中利用一些函数式技巧（向Reginald Braithwaite致敬，在推特上的 @raganwald ）：
 
@@ -1801,8 +1789,6 @@ Promise.all(
 )
 ```
 
-That's a bit nicer! Of course, you could inline the functional magic to avoid the extra helper:
-
 看起来好些了！当然，你可以内联这个函数式魔法来避免额外的帮助函数：
 
 ```js
@@ -1817,8 +1803,6 @@ Promise.all(
 ) );
 ```
 
-These tricks may be neat, but ES6 has an even better answer for us: destructuring. The array destructuring assignment form looks like this:
-
 这个技巧可能很整洁，但是ES6给了我们一个更好的答案：解构（destructuring）。数组的解构赋值形式看起来像这样：
 
 ```js
@@ -1832,8 +1816,6 @@ Promise.all(
 } );
 ```
 
-But best of all, ES6 offers the array parameter destructuring form:
-
 最棒的是，ES6提供了数组参数解构形式：
 
 ```js
@@ -1845,29 +1827,17 @@ Promise.all(
 } );
 ```
 
-We've now embraced the one-value-per-Promise mantra, but kept our supporting boilerplate to a minimum!
-
 我们现在已经接受了“每个Promise一个值”的准则，继续让我们把模板代码最小化！
-
-**Note:** For more information on ES6 destructuring forms, see the *ES6 & Beyond* title of this series.
 
 **注意：** 更多关于ES6解构形式的信息，参阅本系列的 *ES6与未来*。
 
 ### Single Resolution
 
-One of the most intrinsic behaviors of Promises is that a Promise can only be resolved once (fulfillment or rejection). For many async use cases, you're only retrieving a value once, so this works fine.
-
 Promise的一个最固有的行为之一就是，一个Promise只能被解析一次（成功或拒绝）。对于多数异步用例来说，你仅仅取用这个值一次，所以这工作的很好。
-
-But there's also a lot of async cases that fit into a different model -- one that's more akin to events and/or streams of data. It's not clear on the surface how well Promises can fit into such use cases, if at all. Without a significant abstraction on top of Promises, they will completely fall short for handling multiple value resolution.
 
 但也有许多异步情况适用于一个不同的模型——更类似于事件和/或数据流。表面上看不清Promise能对这种用例适应的多好，如果能的话。没有基于Promise的重要抽象过程，它们将完全缺乏对多个值解析的处理。（TODO）
 
-Imagine a scenario where you might want to fire off a sequence of async steps in response to a stimulus (like an event) that can in fact happen multiple times, like a button click.
-
 想象这样一个场景，你可能想要为响应一个刺激（比如事件）触发一系列异步处理步骤，而这实际上将会发生多次，比如按钮点击。
-
-This probably won't work the way you want:
 
 这可能不会像你想的那样工作：
 
@@ -1888,11 +1858,7 @@ p.then( function(evt){
 } );
 ```
 
-The behavior here only works if your application calls for the button to be clicked just once. If the button is clicked a second time, the `p` promise has already been resolved, so the second `resolve(..)` call would be ignored.
-
 这里的行为仅能在你的应用程序只让按钮被点击一次的情况下工作。如果按钮被点击第二次，promise`p`已经被解析了，所以第二个`resolve(..)`将被忽略。
-
-Instead, you'd probably need to invert the paradigm, creating a whole new Promise chain for each event firing:
 
 相反的，你可能需要将模式反过来，在每次事件触发时创建一个全新的Promise链：
 
@@ -1907,33 +1873,19 @@ click( "#mybtn", function(evt){
 } );
 ```
 
-This approach will *work* in that a whole new Promise sequence will be fired off for each `"click"` event on the button.
-
 这种方式会 *好用*，为每个按钮上的`"click"`事件发起一个全新的Promise序列。
 
-But beyond just the ugliness of having to define the entire Promise chain inside the event handler, this design in some respects violates the idea of separation of concerns/capabilities (SoC). You might very well want to define your event handler in a different place in your code from where you define the *response* to the event (the Promise chain). That's pretty awkward to do in this pattern, without helper mechanisms.
-
 但是除了在事件处理器内部定义一整套Promise链看起来很丑以外，这样的设计在某种意义上违背了关注/能力分离原则（SoC）。你可能非常想在一个你的代码不同的地方定义事件处理器：你定义对事件的 *响应*（Promise链）的地方。如果没有帮助机制，在这种模式下这么做很尴尬。
-
-**Note:** Another way of articulating this limitation is that it'd be nice if we could construct some sort of "observable" that we can subscribe a Promise chain to. There are libraries that have created these abstractions (such as RxJS -- http://rxjs.codeplex.com/), but the abstractions can seem so heavy that you can't even see the nature of Promises anymore. Such heavy abstraction brings important questions to mind such as whether (sans Promises) these mechanisms are as *trustable* as Promises themselves have been designed to be. We'll revisit the "Observable" pattern in Appendix B.
 
 **注意：** 这种限制的另一种表述方法是，如果我们能够构建某种能在它上面进行Promise链监听的“可监听对象（observable）”就好了。有一些库已经建立这些抽象（比如RxJS——http://rxjs.codeplex.com/），但是这种抽象看起来是如此的重，以至于你甚至再也看不到Promise的性质。这样的重抽象带来一个重要的问题：这些机制是否像Promise本身被设计的一样 *可靠*。我们将会在附录B中重新讨论“观察者（Observable）”模式。
 
 ### Inertia
 
-One concrete barrier to starting to use Promises in your own code is all the code that currently exists which is not already Promise-aware. If you have lots of callback-based code, it's far easier to just keep coding in that same style.
-
 对于在你的代码中使用Promise而言一个实在的壁垒是，现存的所有代码都没有Promise的意识。如果你有许多基于回调的代码，让代码保持相同的风格容易多了。
-
-"A code base in motion (with callbacks) will remain in motion (with callbacks) unless acted upon by a smart, Promises-aware developer."
 
 “一段基于动作（用回调）的代码将仍然基于动作（用回调），除非一个更聪明，具有Promise意识的开发者对它采取行动。”
 
-Promises offer a different paradigm, and as such, the approach to the code can be anywhere from just a little different to, in some cases, radically different. You have to be intentional about it, because Promises will not just naturally shake out from the same ol' ways of doing code that have served you well thus far.
-
 Promise提供了一种不同的模式规范，如此，代码的表达方式可能会变得有一点儿不同，某些情况下，则根不同。你不得不有意这么做，因为Promise不仅只是把那些为你服务至今的老式编码方法自然地抖落掉。
-
-Consider a callback-based scenario like the following:
 
 考虑一个像这样的基于回调的场景：
 
@@ -1955,15 +1907,9 @@ foo( 11, 31, function(err,text) {
 } );
 ```
 
-Is it immediately obvious what the first steps are to convert this callback-based code to Promise-aware code? Depends on your experience. The more practice you have with it, the more natural it will feel. But certainly, Promises don't just advertise on the label exactly how to do it -- there's no one-size-fits-all answer -- so the responsibility is up to you.
-
 将这个基于会掉的代码转换为Promise意识的代码的第一步该怎么做，是立即明确的吗？这要看你的经验。你练习的越多，它就感觉越自然。但当然，Promise没有明确告知到底怎么做——没有一个放之四海而皆准的答案——所以这要靠你的责任心。
 
-As we've covered before, we definitely need an Ajax utility that is Promise-aware instead of callback-based, which we could call `request(..)`. You can make your own, as we have already. But the overhead of having to manually define Promise-aware wrappers for every callback-based utility makes it less likely you'll choose to refactor to Promise-aware coding at all.
-
 就像我们以前讲过的，我们绝对需要一种具备Promise意识的Ajax工具来取代基于回调的工具，我们可以称它为`request(..)`。你可以制造自己的，正如我们已经做过的。但是不得不为每个基于回调的工具手动定义Promise相关的包装器的负担，使得你根本就不太可能选择将代码重构为Promise相关的。
-
-Promises offer no direct answer to that limitation. Most Promise libraries do offer a helper, however. But even without a library, imagine a helper like this:
 
 Promise没有为这种限制提供直接的答案。但是大多数Promise库确实提供了帮助函数。想象一个这样的帮助函数：
 
@@ -1992,11 +1938,7 @@ if (!Promise.wrap) {
 }
 ```
 
-OK, that's more than just a tiny trivial utility. However, although it may look a bit intimidating, it's not as bad as you'd think. It takes a function that expects an error-first style callback as its last parameter, and returns a new one that automatically creates a Promise to return, and substitutes the callback for you, wired up to the Promise fulfillment/rejection.
-
 好吧，这可不是一个微不足道的工具。然而，虽然他可能看起来有点儿令人生畏，但也没有你想的那么糟。它接收一个函数，这个函数期望一个错误优先风格的回调作为第一个参数，然后返回一个可以自动创建Promise并返回的新函数，然后为你替换掉回调，与Promise的完成/拒绝连接在一起。
-
-Rather than waste too much time talking about *how* this `Promise.wrap(..)` helper works, let's just look at how we use it:
 
 与其浪费太多时间谈论这个`Promise.wrap(..)`帮助函数 *如何* 工作，还不如让我们来看看如何使用它：
 
@@ -2008,31 +1950,17 @@ request( "http://some.url.1/" )
 ..
 ```
 
-Wow, that was pretty easy!
-
 哇哦，真简单！
-
-`Promise.wrap(..)` does **not** produce a Promise. It produces a function that will produce Promises. In a sense, a Promise-producing function could be seen as a "Promise factory." I propose "promisory" as the name for such a thing ("Promise" + "factory").
 
 `Promise.wrap(..)` **不会** 生产Promise。它生产一个将会生产Promise的函数。某种意义上，一个Promise生产函数可以被看做一个“Promise工厂”。我提议将这样的东西命名为“promisory”（"Promise" + "factory"）。
 
-The act of wrapping a callback-expecting function to be a Promise-aware function is sometimes referred to as "lifting" or "promisifying". But there doesn't seem to be a standard term for what to call the resultant function other than a "lifted function", so I like "promisory" better as I think it's more descriptive.
-
 这种将期望回调的函数包装为一个Promise相关的函数的行为，有时被称为“提升”或“promise化”。但是除了“提升过的函数”以外，看起来没有一个标准的名词来称呼这个结果函数，所以我更喜欢“Promise化”，因为我认为他更具描述性。
-
-**Note:** Promisory isn't a made-up term. It's a real word, and its definition means to contain or convey a promise. That's exactly what these functions are doing, so it turns out to be a pretty perfect terminology match!
 
 **注意：** Promisory不是一个瞎编的词。它是一个真实存在的词汇，而且它的定义是含有或载有一个promise。这正是这些函数所做的，所以这显然是一个完美的术语匹配！
 
-So, `Promise.wrap(ajax)` produces an `ajax(..)` promisory we call `request(..)`, and that promisory produces Promises for Ajax responses.
-
 那么，`Promise.wrap(ajax)`生产了一个我们称为`request(..)`的`ajax(..)`promisory，而这个promisory为Ajax应答生产Promise。
 
-If all functions were already promisories, we wouldn't need to make them ourselves, so the extra step is a tad bit of a shame. But at least the wrapping pattern is (usually) repeatable so we can put it into a `Promise.wrap(..)` helper as shown to aid our promise coding.
-
 如果所有的函数已经都是promisory，我们就不需要自己制造它们，所以额外的步骤就有点儿多余。但是至少包装模式是（通常都是）可重复的，所以我们可以把它放进`Promise.wrap(..)`帮助函数中来支援我们的promise编码。
-
-So back to our earlier example, we need a promisory for both `ajax(..)` and `foo(..)`:
 
 那么回到刚才的例子，我们需要为`ajax(..)`和`foo(..)`都做一个promisory。
 
@@ -2072,8 +2000,6 @@ betterFoo( 11, 31 )
 );
 ```
 
-Of course, while we're refactoring `foo(..)` to use our new `request(..)` promisory, we could just make `foo(..)` a promisory itself, instead of remaining callback-based and needing to make and use the subsequent `betterFoo(..)` promisory. This decision just depends on whether `foo(..)` needs to stay callback-based compatible with other parts of the code base or not.
-
 当然，虽然我们将`foo(..)`重构为使用我们的新`request(..)`promisory，我们可以将`foo(..)`本身制成promisory，而不是保留基于会掉的实现并需要制造和使用后续的`betterFoo(..)`promisory。这个决定只是要看`foo(..)`是否需要保持基于回调的形式以便于代码的其他部分兼容。
 
 Consider:
@@ -2094,21 +2020,13 @@ foo( 11, 31 )
 ..
 ```
 
-While ES6 Promises don't natively ship with helpers for such promisory wrapping, most libraries provide them, or you can make your own. Either way, this particular limitation of Promises is addressable without too much pain (certainly compared to the pain of callback hell!).
-
 虽然ES6的Promise没有为这样的promisory包装提供原生的帮助函数，但是大多数库提供它们，或者你可以制造自己的。不管哪种方法，这种Promise特定的限制是可以不费太多劲儿就可以解决的（当然是和回调地狱的痛苦相比！）。
 
 ### Promise Uncancelable
 
-Once you create a Promise and register a fulfillment and/or rejection handler for it, there's nothing external you can do to stop that progression if something else happens to make that task moot.
-
 一旦你创建了一个Promise并给它注册了一个完成和/或拒绝处理器，就没有什么你可以从外部做的事情能停止这个进程，即使是某些其他的事情使这个任务变得毫无意义。
 
-**Note:** Many Promise abstraction libraries provide facilities to cancel Promises, but this is a terrible idea! Many developers wish Promises had natively been designed with external cancelation capability, but the problem is that it would let one consumer/observer of a Promise affect some other consumer's ability to observe that same Promise. This violates the future-value's trustability (external immutability), but morever is the embodiment of the "action at a distance" anti-pattern (http://en.wikipedia.org/wiki/Action_at_a_distance_%28computer_programming%29). Regardless of how useful it seems, it will actually lead you straight back into the same nightmares as callbacks.
-
-**注意：** 许多Promise抽象库都提供取消Promise的设备，但这是一个非常坏的主意！许多开发者都希望Promise被原生地设计为具有外部取消能力，但问题是这将允许Promise的一个消费者/监听器影响某些其他消费者监听同一个Promise的能力。这违反了未来值得可靠性原则（外部不可变），另外就是嵌入了“远距离行为（action at a distance）”的反模式（http://en.wikipedia.org/wiki/Action_at_a_distance_%28computer_programming%29）。不管它看起来多么有用，它实际上会直接将你引回与回调地狱相同的噩梦。
-
-Consider our Promise timeout scenario from earlier:
+**注意：** 许多Promise抽象库都提供取消Promise的功能，但这是一个非常坏的主意！许多开发者都希望Promise被原生地设计为具有外部取消能力，但问题是这将允许Promise的一个消费者/监听器影响某些其他消费者监听同一个Promise的能力。这违反了未来值得可靠性原则（外部不可变），另外就是嵌入了“远距离行为（action at a distance）”的反模式（http://en.wikipedia.org/wiki/Action_at_a_distance_%28computer_programming%29）。不管它看起来多么有用，它实际上会直接将你引回与回调地狱相同的噩梦。
 
 考虑我们早先的Promise超时场景：
 
@@ -2129,11 +2047,7 @@ p.then( function(){
 } );
 ```
 
-The "timeout" was external to the promise `p`, so `p` itself keeps going, which we probably don't want.
-
 “超时”对于promise`p`来说是外部的，所以`p`本身继续运行，这可能不是我们想要的。
-
-One option is to invasively define your resolution callbacks:
 
 一个选项是侵入性地定义你的解析回调：
 
@@ -2162,72 +2076,50 @@ p.then( function(){
 } );
 ```
 
-This is ugly. It works, but it's far from ideal. Generally, you should try to avoid such scenarios.
-
 这很丑。这可以工作，但是远不理想。一般来说，你应当避免这样的场景。
-
-But if you can't, the ugliness of this solution should be a clue that *cancelation* is a functionality that belongs at a higher level of abstraction on top of Promises. I'd recommend you look to Promise abstraction libraries for assistance rather than hacking it yourself.
 
 但是如果你不能，这种解决方案的丑陋应当是一个线索，说明 *取消* 是一种属于在Promise之上的更高层抽象的功能。我推荐你找一个Promise抽象库来辅助你，而不是自己骇它。
 
-**Note:** My *asynquence* Promise abstraction library provides just such an abstraction and an `abort()` capability for the sequence, all of which will be discussed in Appendix A.
-
 **注意：** 我的 *asynquence* Promise抽象库提供了这样的抽象，还为序列提供了一个`abort()`能力，这一切将在附录A中讨论。
-
-A single Promise is not really a flow-control mechanism (at least not in a very meaningful sense), which is exactly what *cancelation* refers to; that's why Promise cancelation would feel awkward.
 
 一个单独的Promise不是真正的流程控制机制（至少没有实际意义），而流程控制机制正是 *取消* 要表达的；这就是为什么Promise取消显得尴尬。
 
-By contrast, a chain of Promises taken collectively together -- what I like to call a "sequence" -- *is* a flow control expression, and thus it's appropriate for cancelation to be defined at that level of abstraction.
-
 相比之下，一个链条的Promise集合在一起——我称之为“序列”—— *是* 一个流程控制的表达，如此在这一层面的抽象上它就适于定义取消。
-
-No individual Promise should be cancelable, but it's sensible for a *sequence* to be cancelable, because you don't pass around a sequence as a single immutable value like you do with a Promise.
 
 没有一个单独的Promise应该是可以取消的，但是一个 *序列* 可以取消是有道理的，因为你不会将一个序列作为一个不可变值传来传去，就像Promise那样。
 
 ### Promise Performance
 
-This particular limitation is both simple and complex.
-
 这种限制既简单又复杂。
-
-Comparing how many pieces are moving with a basic callback-based async task chain versus a Promise chain, it's clear Promises have a fair bit more going on, which means they are naturally at least a tiny bit slower. Think back to just the simple list of trust guarantees that Promises offer, as compared to the ad hoc solution code you'd have to layer on top of callbacks to achieve the same protections.
 
 比较一下在基于回调的异步任务链和Promise链上有多少东西在动，很明显Promise有更多的事情发生，这意味着它们自然地会更慢一点点。回想一下Promise提供的保证信任的简单列表，将它和你为了达到相同保护效果而在回调上面添加的特殊代码比较一下。
 
-More work to do, more guards to protect, means that Promises *are* slower as compared to naked, untrustable callbacks. That much is obvious, and probably simple to wrap your brain around.
-
 更多工作要做，更多的安全要保护，意味着Promise与赤裸的，不可靠的回调相比 *确实* 更慢。这些都很明显，可能很容易萦绕在你脑海中。
 
-But how much slower? Well... that's actually proving to be an incredibly difficult question to answer absolutely, across the board.
-
-但是慢多少？好吧……这实际上是一个难到不可思议而不能绝对，全面地回答的问题。
-
-Frankly, it's kind of an apples-to-oranges comparison, so it's probably the wrong question to ask. You should actually compare whether an ad-hoc callback system with all the same protections manually layered in is faster than a Promise implementation.
+但是慢多少？好吧……这实际上是一个难到不可思议的问题，无法绝对，全面地回答。
 
 坦白地说，这是一个比较苹果和橘子的问题，所以可能是问错了。你实际上应当比较的是，带有所有手动保护层的经过特殊处理的回调系统，是否比一个Promise实现要快。
 
-If Promises have a legitimate performance limitation, it's more that they don't really offer a line-item choice as to which trustability protections you want/need or not -- you get them all, always.
+如果说Promise有一种合理的性能限制，那就是它并不将可靠性保护的选项罗列出来让你选择——你总是一下得到全部。
 
-Nevertheless, if we grant that a Promise is generally a *little bit slower* than its non-Promise, non-trustable callback equivalent -- assuming there are places where you feel you can justify the lack of trustability -- does that mean that Promises should be avoided across the board, as if your entire application is driven by nothing but must-be-utterly-the-fastest code possible?
+如果我们承认Promise一般来说要比它的非Promise，不可靠的回调等价物 *慢一点儿*——假定在有些地方你觉得你可以自己调整可靠性的缺失——难道这意味着Promise应当被全面地避免，就好像你的整个应用程序仅仅由一些可能的“必须绝对最快”的代码驱动着？
 
-Sanity check: if your code is legitimately like that, **is JavaScript even the right language for such tasks?** JavaScript can be optimized to run applications very performantly (see Chapter 5 and Chapter 6). But is obsessing over tiny performance tradeoffs with Promises, in light of all the benefits they offer, *really* appropriate?
+神志清醒测试：如果你的代码有那么合理，那么 **对于这样的任务，JavaScript是正确的选择吗？** 为了运行应用程序JavaScript可以被优化得十分高效（参见第五章和第六章）。但是在Promise提供的所有好处的光辉之下，过于沉迷它微小的性能权衡，*真的* 合适吗？
 
-Another subtle issue is that Promises make *everything* async, which means that some immediately (synchronously) complete steps still defer advancement of the next step to a Job (see Chapter 1). That means that it's possible that a sequence of Promise tasks could complete ever-so-slightly slower than the same sequence wired up with callbacks.
+另一个微妙的问题是Promise使 *所有事情* 都成为异步的，这意味着有些应当立即完成的（同步的）步骤也要推迟到下一个Job步骤中（参见第一章）。也就是说一个Promise任务序列要比使用回调连接的相同序列要完成的稍微慢一些是可能的。
 
-Of course, the question here is this: are these potential slips in tiny fractions of performance *worth* all the other articulated benefits of Promises we've laid out across this chapter?
+当然，这里的问题是：这些关于性能的微小零头的潜在疏忽，和我们在本章通篇阐述的Promise带来的益处相比，*还值得考虑吗？*
 
-My take is that in virtually all cases where you might think Promise performance is slow enough to be concerned, it's actually an anti-pattern to optimize away the benefits of Promise trustability and composability by avoiding them altogether.
+我的观点是，在几乎所有你可能认为Promise的性能慢到了需要被考虑的情况下，完全回避Promise并将它的可靠性和组合性优化掉，实际上一种反模式。
 
-Instead, you should default to using them across the code base, and then profile and analyze your application's hot (critical) paths. Are Promises *really* a bottleneck, or are they just a theoretical slowdown? Only *then*, armed with actual valid benchmarks (see Chapter 6) is it responsible and prudent to factor out the Promises in just those identified critical areas.
+相反地，你应当默认地在代码中广泛使用它们，然后再记录并分析你的应用程序的热（临界）点。Promise *真的* 是瓶颈？还是它们只是理论上慢了下来？只有在那 *之后*，拿着实际合法的观测数据，再将Promise从这些临界区域中重构移除才称得上是合理与谨慎。
 
-Promises are a little slower, but in exchange you're getting a lot of trustability, non-Zalgo predictability, and composability built in. Maybe the limitation is not actually their performance, but your lack of perception of their benefits?
+Promise是有一点儿慢，但作为交换你得到了很多内建的可靠性，无Zalgo的可预测性，与组合性。也许真正的限制不是它们的性能，而是你对它们的益处缺乏认识？
 
 ## Review
 
-Promises are awesome. Use them. They solve the *inversion of control* issues that plague us with callbacks-only code.
+Promise很牛。用它们。它们解决了肆虐在回调代码中的 *控制倒转* 问题。
 
-They don't get rid of callbacks, they just redirect the orchestration of those callbacks to a trustable intermediary mechanism that sits between us and another utility.
+它们没有摆脱回调，而是重新定向了这些回调的组织安排方式，是它成为一种坐落于我们和其他工具之间的可靠的中间机制。
 
-Promise chains also begin to address (though certainly not perfectly) a better way of expressing async flow in sequential fashion, which helps our brains plan and maintain async JS code better. We'll see an even better solution to *that* problem in the next chapter!
+Promise链还开始以顺序的风格定义了一种更好的（当然，还不完美）表达异步流程的方式，它帮我们的大脑更好的规划和维护异步JS代码。我们会在下一章中看到一个更好的解决 *那个* 问题的方法！
