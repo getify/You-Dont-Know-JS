@@ -389,9 +389,11 @@ We're going to take a slight diversion into the topic of *iterators* for a bit, 
 
 Imagine you're producing a series of values where each value has a definable relationship to the previous value. To do this, you're going to need a stateful producer that remembers the last value it gave out.
 
-
+想象你正在生产一系列的值，它们中的每一个都与前一个值有可定义的关系。为此，你将需要一个有状态的生产器来记住上一个给出的值。
 
 You can implement something like that straightforwardly using a function closure (see the *Scope & Closures* title of this series):
+
+你可以用函数闭包来直接地实现这样的东西：
 
 ```js
 var gimmeSomething = (function(){
@@ -417,11 +419,19 @@ gimmeSomething();		// 105
 
 **Note:** The `nextVal` computation logic here could have been simplified, but conceptually, we don't want to calculate the *next value* (aka `nextVal`) until the *next* `gimmeSomething()` call happens, because in general that could be a resource-leaky design for producers of more persistent or resource-limited values than simple `number`s.
 
+**注意：** 这里`nextVal`的计算逻辑已经被简化了，但从概念上讲，直到 *下一次* `gimmeSomething()`调用发生之前，我们不想计算 *下一个值*（也就是`nextVal`），因为一般对于持久性更强的，或者比简单的`number`更有限的资源的产生器来说，那可能是一种资源泄漏的设计。
+
 Generating an arbitrary number series isn't a terribly realistic example. But what if you were generating records from a data source? You could imagine much the same code.
+
+生成随意的数字序列不是是一个很真实的例子。但是如果你从一个数据源中生成记录呢？你可以想象很多相同的代码。
 
 In fact, this task is a very common design pattern, usually solved by iterators. An *iterator* is a well-defined interface for stepping through a series of values from a producer. The JS interface for iterators, as it is in most languages, is to call `next()` each time you want the next value from the producer.
 
+事实上，这种任务是一种非常常见的设计模式，通常用迭代器解决。一个 *迭代器* 是一个明确定义的接口，用来逐个通过一系列从产生器得到的值。迭代器的JS接口，和大多数语言一样，是在你每次想从产生器中得到下一个值时调用`next()`。
+
 We could implement the standard *iterator* interface for our number series producer:
+
+我们可以为我们的数字序列产生器实现标准的 *迭代器*；
 
 ```js
 var something = (function(){
@@ -453,9 +463,15 @@ something.next().value;		// 105
 
 **Note:** We'll explain why we need the `[Symbol.iterator]: ..` part of this code snippet in the "Iterables" section. Syntactically though, two ES6 features are at play. First, the `[ .. ]` syntax is called a *computed property name* (see the *this & Object Prototypes* title of this series). It's a way in an object literal definition to specify an expression and use the result of that expression as the name for the property. Next, `Symbol.iterator` is one of ES6's predefined special `Symbol` values (see the *ES6 & Beyond* title of this book series).
 
+**注意：** 我们将在“Iterables”一节中讲解为什么我们在这个代码段中需要`[Symbol.iterator]: ..`这一部分。在语法上讲，两个ES6特性在发挥作用。首先，`[ .. ]`语法称为一个 *计算属性名*。它是一种字面对象定义方法，用来指定一个表达式并用用这个表达式的结果作为属性名。另一个，`Symbol.iterator`是ES6预定的特殊`Symbol`值。
+
 The `next()` call returns an object with two properties: `done` is a `boolean` value signaling the *iterator's* complete status; `value` holds the iteration value.
 
+`next()`调用返回一个对象，它带有两个属性：`done`是一个`boolean`值表示 *迭代器* 的完成状态；`value`持有迭代的值。
+
 ES6 also adds the `for..of` loop, which means that a standard *iterator* can automatically be consumed with native loop syntax:
+
+ES6还增加了`for..of`循环，它意味着一个标准的 *迭代器* 可以使用原声的循环语法来自动地被消费：
 
 ```js
 for (var v of something) {
@@ -471,9 +487,15 @@ for (var v of something) {
 
 **Note:** Because our `something` *iterator* always returns `done:false`, this `for..of` loop would run forever, which is why we put the `break` conditional in. It's totally OK for iterators to be never-ending, but there are also cases where the *iterator* will run over a finite set of values and eventually return a `done:true`.
 
+**注意：** 因为我们的`something`迭代器总是返回`done:false`，这个`for..of`循环将会永远运行，这就是为什么我们条件性地放进一个`break`。对于迭代器来说永不终结是完全没问题的，但是也有一些情况 *迭代器* 将运行在有限的值得集合上，而最终返回`done:true`。
+
 The `for..of` loop automatically calls `next()` for each iteration -- it doesn't pass any values in to the `next()` -- and it will automatically terminate on receiving a `done:true`. It's quite handy for looping over a set of data.
 
+`for..of`循环为每一次迭代自动调用`next()`——他不会给`next()`传入任何值——而且他将会在收到一个`done:true`时自动终结。这对于在一个集合的数据中进行循环十分方便。
+
 Of course, you could manually loop over iterators, calling `next()` and checking for the `done:true` condition to know when to stop:
+
+当然，你可以手动循环一个迭代器，调用`next()`并检查`done:true`条件来知道什么时候停止：
 
 ```js
 for (
@@ -492,7 +514,11 @@ for (
 
 **Note:** This manual `for` approach is certainly uglier than the ES6 `for..of` loop syntax, but its advantage is that it affords you the opportunity to pass in values to the `next(..)` calls if necessary.
 
+**注意：** 这种手动的`for`方式当然要比ES6的`for..of`循环语法丑陋，但它的好处是它提供给你一个机会，在有必要时传值给`next(..)`调用。
+
 In addition to making your own *iterators*, many built-in data structures in JS (as of ES6), like `array`s, also have default *iterators*:
+
+除了制造你自己的 *迭代器* 之外，许多JS中（就ES6来说）内建的数据结构，比如`array`，也有默认的 *迭代器*：
 
 ```js
 var a = [1,3,5,7,9];
@@ -505,7 +531,11 @@ for (var v of a) {
 
 The `for..of` loop asks `a` for its *iterator*, and automatically uses it to iterate over `a`'s values.
 
+`for..of`循环向`a`要来它的迭代器，并自动使用它迭代`a`的值。
+
 **Note:** It may seem a strange omission by ES6, but regular `object`s intentionally do not come with a default *iterator* the way `array`s do. The reasons go deeper than we will cover here. If all you want is to iterate over the properties of an object (with no particular guarantee of ordering), `Object.keys(..)` returns an `array`, which can then be used like `for (var k of Object.keys(obj)) { ..`. Such a `for..of` loop over an object's keys would be similar to a `for..in` loop, except that `Object.keys(..)` does not include properties from the `[[Prototype]]` chain while `for..in` does (see the *this & Object Prototypes* title of this series).
+
+**注意：** 看起来像是一个ES6的奇怪省略，但是普通的`object`有意地不带有`array`那样的默认 *迭代器*。原因比我们要在这里讲的深刻得多。如果你想要的只是迭代一个对象的属性（不特别保证顺序），`Object.keys(..)`返回一个`array`，它可以像`for (var k of Object.keys(obj)) { ..`这样使用。这样的`for..of`
 
 ### Iterables
 
