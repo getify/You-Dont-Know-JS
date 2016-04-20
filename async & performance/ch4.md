@@ -927,11 +927,11 @@ p.then(
 
 ### Promise-Aware Generator Runner
 
-The more you start to explore this path, the more you realize, "wow, it'd be great if there was just some utility to do it for me." And you're absolutely correct. This is such an important pattern, and you don't want to get it wrong (or exhaust yourself repeating it over and over), so your best bet is to use a utility that is specifically designed to *run* Promise-`yield`ing generators in the manner we've illustrated.
+你在这条路上探索得越远，你就越能理解，“哇，要是有一些工具能帮我做这些就好了。”而且你绝对是对的。这是一种如此重要的模式，而且你不想把它弄错（或者因为一遍又一遍地重复它而把自己累死），所以你最好的选择是把赌注压在一个工具上，而你以我们将要描述的方式使用这种特定设计的工具来 *运行* `yield`Promise的生成器。
 
-Several Promise abstraction libraries provide just such a utility, including my *asynquence* library and its `runner(..)`, which will be discussed in Appendix A of this book.
+有几种Promise抽象库提供了这样的工具，包括我的 *asynquence* 库和它的`runner(..)`，我们将在本书的在附录A中讨论它。
 
-But for the sake of learning and illustration, let's just define our own standalone utility that we'll call `run(..)`:
+但看在学习和讲解的份儿上，让我们定义我们自己的称为`run(..)`的独立工具：
 
 ```js
 // thanks to Benjamin Gruenbaum (@benjamingr on GitHub) for
@@ -979,9 +979,9 @@ function run(gen) {
 }
 ```
 
-As you can see, it's a quite a bit more complex than you'd probably want to author yourself, and you especially wouldn't want to repeat this code for each generator you use. So, a utility/library helper is definitely the way to go. Nevertheless, I encourage you to spend a few minutes studying that code listing to get a better sense of how to manage the generator+Promise negotiation.
+如你所见，它可能比你想要自己制造的复杂得多，特别是你将不会想我每个你使用的生成器重复这段代码。所以，一个帮助工具/库绝对是可行的。虽然，我鼓励你花几分钟时间研究一下这点代码，以便对如何管理生成器+Promise交涉得到更好的感觉。
 
-How would you use `run(..)` with `*main()` in our *running* Ajax example?
+你如何在我们的 *运行* Ajax例子中将`run(..)`和`*main()`一起使用呢？
 
 ```js
 function *main() {
@@ -991,15 +991,15 @@ function *main() {
 run( main );
 ```
 
-That's it! The way we wired `run(..)`, it will automatically advance the generator you pass to it, asynchronously until completion.
+就是这样！按照我们连接`run(..)`的方式，它将自动地，异步地推进你传入的生成器，直到完成。
 
-**Note:** The `run(..)` we defined returns a promise which is wired to resolve once the generator is complete, or receive an uncaught exception if the generator doesn't handle it. We don't show that capability here, but we'll come back to it later in the chapter.
+**注意：** 我们定义的`run(..)`返回一个promise，它被连接成一旦生成器完成就立即解析，或者收到一个未捕获的异常，如果生成器没有处理它。我们没有在这里展示这种能力，但我们会在本章稍后回到这个话题。
 
 #### ES7: `async` and `await`?
 
-The preceding pattern -- generators yielding Promises that then control the generator's *iterator* to advance it to completion -- is such a powerful and useful approach, it would be nicer if we could do it without the clutter of the library utility helper (aka `run(..)`).
+前面的模式——生成器让出一个Promise，然后这个Promise控制生成器的 *迭代器* 向前推进至它完成——是一个如此强大和有用的方法，如果我们能不通过乱七八糟的帮助工具库（也就是`run(..)`）来使用它就更好了。
 
-There's probably good news on that front. At the time of this writing, there's early but strong support for a proposal for more syntactic addition in this realm for the post-ES6, ES7-ish timeframe. Obviously, it's too early to guarantee the details, but there's a pretty decent chance it will shake out similar to the following:
+在这方面可能有一些好消息。在写作这本书的时候，后ES6，ES7化的时间表上已经出现了草案，对这个问题提供附加语法的早期但强大的支持。显然，现在还太早而不能保证细节，但是有相当大的机会它将蜕变为类似于下面的东西：
 
 ```js
 function foo(x,y) {
@@ -1021,25 +1021,25 @@ async function main() {
 main();
 ```
 
-As you can see, there's no `run(..)` call (meaning no need for a library utility!) to invoke and drive `main()` -- it's just called as a normal function. Also, `main()` isn't declared as a generator function anymore; it's a new kind of function: `async function`. And finally, instead of `yield`ing a Promise, we `await` for it to resolve.
+如你所见，这里没有`run(..)`调用（意味着不需要工具库！）来驱动和调用`main()`——它仅仅像一个普通方法那样被调用。另外，`main()`不再作为一个生成器函数声明；它是一种新型的函数：`async function`。而最后，与`yield`一个Promise相反，我们`await`它解析。
 
-The `async function` automatically knows what to do if you `await` a Promise -- it will pause the function (just like with generators) until the Promise resolves. We didn't illustrate it in this snippet, but calling an async function like `main()` automatically returns a promise that's resolved whenever the function finishes completely.
+如果你`await`一个Promise，`async function`会自动地知道做什么——它会暂停这个函数（就像使用生成器那样）直到Promise解析。我们没有在这个代码段中展示，但是调用一个像`main()`这样的异步函数将自动地返回一个promise，它会在函数完全完成时被解析。
 
-**Tip:** The `async` / `await` syntax should look very familiar to readers with  experience in C#, because it's basically identical.
+**提示：** `async` / `await`的语法应该对拥有C#经验的读者看起来非常熟悉，因为它们基本上是一样的。
 
-The proposal essentially codifies support for the pattern we've already derived, into a syntactic mechanism: combining Promises with sync-looking flow control code. That's the best of both worlds combined, to effectively address practically all of the major concerns we outlined with callbacks.
+这个草案实质上是为我们已经衍生出的模式进行代码化的支持，成为一种语法机制：用看似同步的流程控制代码组合Promise。将两个世界的最好部分组合，来有效解决我们用回调遇到的几乎所有主要问题。
 
-The mere fact that such a ES7-ish proposal already exists and has early support and enthusiasm is a major vote of confidence in the future importance of this async pattern.
+这样的ES7化草案已经存在，并且有了早期的支持和热忱的拥护。这一事实为这种异步模式在未来的重要性上信心满满地投了有力的一票。
 
 ### Promise Concurrency in Generators
 
-So far, all we've demonstrated is a single-step async flow with Promises+generators. But real-world code will often have many async steps.
+至此，所有我们展示过的是一种使用Promise+生成器的单步异步流程。但是现实世界的代码将总是有许多异步步骤。
 
-If you're not careful, the sync-looking style of generators may lull you into complacency with how you structure your async concurrency, leading to suboptimal performance patterns. So we want to spend a little time exploring the options.
+如果你不小心，生成器看似同步的风格也许会蒙蔽你，使你在如何构造你的异步并发上感到自满，导致性能次优的模式。那么我们想花一点时间来探索一下其他选项。
 
-Imagine a scenario where you need to fetch data from two different sources, then combine those responses to make a third request, and finally print out the last response. We explored a similar scenario with Promises in Chapter 3, but let's reconsider it in the context of generators.
+想象一个场景，你需要从两个不同的数据源取得数据，然后将这些应答组合来发起第三个请求，最后答应出最终的应答。我们在第三章中用Promise探索过类似的场景，但这次让我们在生成器的场景下考虑它。
 
-Your first instinct might be something like:
+你的第一直觉可能是像这样的东西：
 
 ```js
 function *foo() {
@@ -1057,15 +1057,15 @@ function *foo() {
 run( foo );
 ```
 
-This code will work, but in the specifics of our scenario, it's not optimal. Can you spot why?
+这段代码可以工作，但在我们特定的这个场景中，它不是最优的。你能发现为什么吗？
 
-Because the `r1` and `r2` requests can -- and for performance reasons, *should* -- run concurrently, but in this code they will run sequentially; the `"http://some.url.2"` URL isn't Ajax fetched until after the `"http://some.url.1"` request is finished. These two requests are independent, so the better performance approach would likely be to have them run at the same time.
+因为`r1`和`r2`请求可以——而且为了性能的原因，*应该*——并发运行，但在这段代码中它们将顺序地运行；直到`"http://some.url.1"`请求完成之前，`"http://some.url.2"`URL不会被Ajax取得。这两个请求是独立的，所以性能更好的方式可能是让它们同时运行。
 
-But how exactly would you do that with a generator and `yield`? We know that `yield` is only a single pause point in the code, so you can't really do two pauses at the same time.
+但是使用生成器和`yield`，到底应该怎么做？
 
-The most natural and effective answer is to base the async flow on Promises, specifically on their capability to manage state in a time-independent fashion (see "Future Value" in Chapter 3).
-
-The simplest approach:
+最自然和有效的答案是基于Promise的异步流程，特别是因为它们的时间无关的状态管理能力。
+、、、
+最简单的方式：
 
 ```js
 function *foo() {
@@ -1088,13 +1088,13 @@ function *foo() {
 run( foo );
 ```
 
-Why is this different from the previous snippet? Look at where the `yield` is and is not. `p1` and `p2` are promises for Ajax requests made concurrently (aka "in parallel"). It doesn't matter which one finishes first, because promises will hold onto their resolved state for as long as necessary.
+为什么这与前一个代码段不同？看看`yield`在哪里和不在哪里。`p1`和`p2`是并发地（也就是“并行”）发起的Ajax请求promise。它们哪一个先完成都不要紧，因为promise会一直保持它们的解析状态。
 
-Then we use two subsequent `yield` statements to wait for and retrieve the resolutions from the promises (into `r1` and `r2`, respectively). If `p1` resolves first, the `yield p1` resumes first then waits on the `yield p2` to resume. If `p2` resolves first, it will just patiently hold onto that resolution value until asked, but the `yield p1` will hold on first, until `p1` resolves.
+然后我们使用两个`yield`语句等待并从promise中取得解析值（分别取到`r1`和`r2`中）。如果`p1`首先解析，`yield p1`会首先继续执行然后等待`yield p2`继续执行。如果`p2`首先解析，它将会耐心地保持解析值知道被请求，但是`yield p1`将会首先停住，直到`p1`解析。
 
-Either way, both `p1` and `p2` will run concurrently, and both have to finish, in either order, before the `r3 = yield request..` Ajax request will be made.
+不管是哪一种情况，`p1`和`p2`都将并发地运行，并且在`r3 = yield request..`Ajax请求发起之前，都必须完成，无论以哪种顺序。
 
-If that flow control processing model sounds familiar, it's basically the same as what we identified in Chapter 3 as the "gate" pattern, enabled by the `Promise.all([ .. ])` utility. So, we could also express the flow control like this:
+如果这种流程控制处理模型听起来很熟悉，那是因为它基本上和我们在第三章中介绍的，因`Promise.all([ .. ])`工具成为可能的“门”模式是相同的。所以，我们也可以像这样表达这种流程控制：
 
 ```js
 function *foo() {
@@ -1119,9 +1119,9 @@ function *foo() {
 run( foo );
 ```
 
-**Note:** As we discussed in Chapter 3, we can even use ES6 destructuring assignment to simplify the `var r1 = .. var r2 = ..` assignments, with `var [r1,r2] = results`.
+**注意：** 就像我们在第三章中讨论的，我们甚至可以用ES6解构赋值来把`var r1 = .. var r2 = ..`赋值简化为`var [r1,r2] = results`。
 
-In other words, all of the concurrency capabilities of Promises are available to us in the generator+Promise approach. So in any place where you need more than sequential this-then-that async flow control steps, Promises are likely your best bet.
+换句话说，在生成器+Promise的方式中，Promise所有的并发能力都是可用的。所以在任何地方，如果你需要比“这个然后那个”要复杂的顺序异步流程步骤时，Promise都可能是最佳选择。
 
 #### Promises, Hidden
 
