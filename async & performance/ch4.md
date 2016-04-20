@@ -377,21 +377,13 @@ console.log( a, b );	// 12 18
 
 ## Generator'ing Values
 
-In the previous section, we mentioned an interesting use for generators, as a way to produce values. This is **not** the main focus in this chapter, but we'd be remiss if we didn't cover the basics, especially because this use case is essentially the origin of the name: generators.
-
 在前一节中，我们提到了一个生成器的有趣用法，作为一种生产值的方式。这 **不是** 我们本章主要关注的，但如果我们不在这里讲一下基本我们会想念它的，特别是因为这种用法实质上是它的名称的由来：生成器。
-
-We're going to take a slight diversion into the topic of *iterators* for a bit, but we'll circle back to how they relate to generators and using a generator to *generate* values.
 
 我们将要稍稍深入一下 *迭代器* 的话题，但我们会绕回到它们如何与生成器关联，并使用生成器来 *生成* 值。
 
 ### Producers and Iterators
 
-Imagine you're producing a series of values where each value has a definable relationship to the previous value. To do this, you're going to need a stateful producer that remembers the last value it gave out.
-
 想象你正在生产一系列的值，它们中的每一个都与前一个值有可定义的关系。为此，你将需要一个有状态的生产器来记住上一个给出的值。
-
-You can implement something like that straightforwardly using a function closure (see the *Scope & Closures* title of this series):
 
 你可以用函数闭包来直接地实现这样的东西：
 
@@ -417,19 +409,11 @@ gimmeSomething();		// 33
 gimmeSomething();		// 105
 ```
 
-**Note:** The `nextVal` computation logic here could have been simplified, but conceptually, we don't want to calculate the *next value* (aka `nextVal`) until the *next* `gimmeSomething()` call happens, because in general that could be a resource-leaky design for producers of more persistent or resource-limited values than simple `number`s.
-
 **注意：** 这里`nextVal`的计算逻辑已经被简化了，但从概念上讲，直到 *下一次* `gimmeSomething()`调用发生之前，我们不想计算 *下一个值*（也就是`nextVal`），因为一般对于持久性更强的，或者比简单的`number`更有限的资源的产生器来说，那可能是一种资源泄漏的设计。
-
-Generating an arbitrary number series isn't a terribly realistic example. But what if you were generating records from a data source? You could imagine much the same code.
 
 生成随意的数字序列不是是一个很真实的例子。但是如果你从一个数据源中生成记录呢？你可以想象很多相同的代码。
 
-In fact, this task is a very common design pattern, usually solved by iterators. An *iterator* is a well-defined interface for stepping through a series of values from a producer. The JS interface for iterators, as it is in most languages, is to call `next()` each time you want the next value from the producer.
-
 事实上，这种任务是一种非常常见的设计模式，通常用迭代器解决。一个 *迭代器* 是一个明确定义的接口，用来逐个通过一系列从产生器得到的值。迭代器的JS接口，和大多数语言一样，是在你每次想从产生器中得到下一个值时调用`next()`。
-
-We could implement the standard *iterator* interface for our number series producer:
 
 我们可以为我们的数字序列产生器实现标准的 *迭代器*；
 
@@ -461,15 +445,9 @@ something.next().value;		// 33
 something.next().value;		// 105
 ```
 
-**Note:** We'll explain why we need the `[Symbol.iterator]: ..` part of this code snippet in the "Iterables" section. Syntactically though, two ES6 features are at play. First, the `[ .. ]` syntax is called a *computed property name* (see the *this & Object Prototypes* title of this series). It's a way in an object literal definition to specify an expression and use the result of that expression as the name for the property. Next, `Symbol.iterator` is one of ES6's predefined special `Symbol` values (see the *ES6 & Beyond* title of this book series).
-
 **注意：** 我们将在“Iterables”一节中讲解为什么我们在这个代码段中需要`[Symbol.iterator]: ..`这一部分。在语法上讲，两个ES6特性在发挥作用。首先，`[ .. ]`语法称为一个 *计算属性名*。它是一种字面对象定义方法，用来指定一个表达式并用用这个表达式的结果作为属性名。另一个，`Symbol.iterator`是ES6预定的特殊`Symbol`值。
 
-The `next()` call returns an object with two properties: `done` is a `boolean` value signaling the *iterator's* complete status; `value` holds the iteration value.
-
 `next()`调用返回一个对象，它带有两个属性：`done`是一个`boolean`值表示 *迭代器* 的完成状态；`value`持有迭代的值。
-
-ES6 also adds the `for..of` loop, which means that a standard *iterator* can automatically be consumed with native loop syntax:
 
 ES6还增加了`for..of`循环，它意味着一个标准的 *迭代器* 可以使用原声的循环语法来自动地被消费：
 
@@ -485,15 +463,9 @@ for (var v of something) {
 // 1 9 33 105 321 969
 ```
 
-**Note:** Because our `something` *iterator* always returns `done:false`, this `for..of` loop would run forever, which is why we put the `break` conditional in. It's totally OK for iterators to be never-ending, but there are also cases where the *iterator* will run over a finite set of values and eventually return a `done:true`.
-
 **注意：** 因为我们的`something`迭代器总是返回`done:false`，这个`for..of`循环将会永远运行，这就是为什么我们条件性地放进一个`break`。对于迭代器来说永不终结是完全没问题的，但是也有一些情况 *迭代器* 将运行在有限的值得集合上，而最终返回`done:true`。
 
-The `for..of` loop automatically calls `next()` for each iteration -- it doesn't pass any values in to the `next()` -- and it will automatically terminate on receiving a `done:true`. It's quite handy for looping over a set of data.
-
 `for..of`循环为每一次迭代自动调用`next()`——他不会给`next()`传入任何值——而且他将会在收到一个`done:true`时自动终结。这对于在一个集合的数据中进行循环十分方便。
-
-Of course, you could manually loop over iterators, calling `next()` and checking for the `done:true` condition to know when to stop:
 
 当然，你可以手动循环一个迭代器，调用`next()`并检查`done:true`条件来知道什么时候停止：
 
@@ -512,11 +484,7 @@ for (
 // 1 9 33 105 321 969
 ```
 
-**Note:** This manual `for` approach is certainly uglier than the ES6 `for..of` loop syntax, but its advantage is that it affords you the opportunity to pass in values to the `next(..)` calls if necessary.
-
 **注意：** 这种手动的`for`方式当然要比ES6的`for..of`循环语法丑陋，但它的好处是它提供给你一个机会，在有必要时传值给`next(..)`调用。
-
-In addition to making your own *iterators*, many built-in data structures in JS (as of ES6), like `array`s, also have default *iterators*:
 
 除了制造你自己的 *迭代器* 之外，许多JS中（就ES6来说）内建的数据结构，比如`array`，也有默认的 *迭代器*：
 
@@ -529,21 +497,17 @@ for (var v of a) {
 // 1 3 5 7 9
 ```
 
-The `for..of` loop asks `a` for its *iterator*, and automatically uses it to iterate over `a`'s values.
-
 `for..of`循环向`a`要来它的迭代器，并自动使用它迭代`a`的值。
 
-**Note:** It may seem a strange omission by ES6, but regular `object`s intentionally do not come with a default *iterator* the way `array`s do. The reasons go deeper than we will cover here. If all you want is to iterate over the properties of an object (with no particular guarantee of ordering), `Object.keys(..)` returns an `array`, which can then be used like `for (var k of Object.keys(obj)) { ..`. Such a `for..of` loop over an object's keys would be similar to a `for..in` loop, except that `Object.keys(..)` does not include properties from the `[[Prototype]]` chain while `for..in` does (see the *this & Object Prototypes* title of this series).
-
-**注意：** 看起来像是一个ES6的奇怪省略，但是普通的`object`有意地不带有`array`那样的默认 *迭代器*。原因比我们要在这里讲的深刻得多。如果你想要的只是迭代一个对象的属性（不特别保证顺序），`Object.keys(..)`返回一个`array`，它可以像`for (var k of Object.keys(obj)) { ..`这样使用。这样的`for..of`
+**注意：** 看起来像是一个ES6的奇怪省略，普通的`object`有意地不带有`array`那样的默认 *迭代器*。原因比我们要在这里讲的深刻得多。如果你想要的只是迭代一个对象的属性（不特别保证顺序），`Object.keys(..)`返回一个`array`，它可以像`for (var k of Object.keys(obj)) { ..`这样使用。像这样用`for..of`循环一个对象上的键，与用`for..in`循环内很相似，除了在`for..in`中会包含`[[Prototype]]`链的属性，而`Object.keys(..)`不会。
 
 ### Iterables
 
-The `something` object in our running example is called an *iterator*, as it has the `next()` method on its interface. But a closely related term is *iterable*, which is an `object` that **contains** an *iterator* that can iterate over its values.
+在我们运行的例子中的`something`对象被称为一个 *迭代器*，因为它的接口中有`next()`方法。但一个更确切的术语是 *iterable*，它指 **包含有** 一个可以迭代它所有值的迭代器的对象。
 
-As of ES6, the way to retrieve an *iterator* from an *iterable* is that the *iterable* must have a function on it, with the name being the special ES6 symbol value `Symbol.iterator`. When this function is called, it returns an *iterator*. Though not required, generally each call should return a fresh new *iterator*.
+在ES6中从一个 *iterable* 中取得一个 *迭代器* 的方法是，*iterable* 上必须有一个函数，它的名称是特殊的ES6符号值`Symbol.iterator`。当这个函数被调用是，它就会返回一个 *迭代器*。虽然不是必须的，一般上每次调用应当返回一个全新的 *迭代器*。
 
-`a` in the previous snippet is an *iterable*. The `for..of` loop automatically calls its `Symbol.iterator` function to construct an *iterator*. But we could of course call the function manually, and use the *iterator* it returns:
+前一个代码段的`a`就是一个 *iterable*。`for..of`循环自动地调用它的`Symbol.iterator`函数来构建一个 *迭代器*。我们当然可以手动地调用这个函数，然后使用它返回的 *iterator*：
 
 ```js
 var a = [1,3,5,7,9];
@@ -556,13 +520,13 @@ it.next().value;	// 5
 ..
 ```
 
-In the previous code listing that defined `something`, you may have noticed this line:
+在前面定义`something`的代码段中，你可能已经注意到了这一行：
 
 ```js
 [Symbol.iterator]: function(){ return this; }
 ```
 
-That little bit of confusing code is making the `something` value -- the interface of the `something` *iterator* -- also an *iterable*; it's now both an *iterable* and an *iterator*. Then, we pass `something` to the `for..of` loop:
+这段有点让人困惑的代码制造了`something`值——`something`*迭代器* 的接口——也是一个 *iterable*；现在它既是一个 *iterable* 也是一个 *迭代器*。然后，我们把`something`传递给`for..of`循环：
 
 ```js
 for (var v of something) {
@@ -570,13 +534,13 @@ for (var v of something) {
 }
 ```
 
-The `for..of` loop expects `something` to be an *iterable*, so it looks for and calls its `Symbol.iterator` function. We defined that function to simply `return this`, so it just gives itself back, and the `for..of` loop is none the wiser.
+`for..of`循环期待`something`是一个 *iterable*，所以它会寻找并调用它的`Symbol.iterator`函数。我们将这个函数定义为简单地`return this`，所以它将自己给出，而`for..of`不会知道这些。
 
 ### Generator Iterator
 
-Let's turn our attention back to generators, in the context of *iterators*. A generator can be treated as a producer of values that we extract one at a time through an *iterator* interface's `next()` calls.
+带着 *迭代器* 的背景知识，让我们把注意力移回生成器。一个生成器可以被看做一个值的生产器，我们通过一个 *迭代器* 接口的`next()`调用每次从中抽取一个值。
 
-So, a generator itself is not technically an *iterable*, though it's very similar -- when you execute the generator, you get an *iterator* back:
+所以，一个生成器本身在技术上讲并不是一个 *iterable*，虽然很相似——当你执行生成器时，你就得到一个 *迭代器*：
 
 ```js
 function *foo(){ .. }
@@ -584,7 +548,7 @@ function *foo(){ .. }
 var it = foo();
 ```
 
-We can implement the `something` infinite number series producer from earlier with a generator, like this:
+我们可以用生成器实现早前的`something`无限数字序列产生器，就像这样：
 
 ```js
 function *something() {
@@ -603,13 +567,13 @@ function *something() {
 }
 ```
 
-**Note:** A `while..true` loop would normally be a very bad thing to include in a real JS program, at least if it doesn't have a `break` or `return` in it, as it would likely run forever, synchronously, and block/lock-up the browser UI. However, in a generator, such a loop is generally totally OK if it has a `yield` in it, as the generator will pause at each iteration, `yield`ing back to the main program and/or to the event loop queue. To put it glibly, "generators put the `while..true` back in JS programming!"
+**注意：** 在一个真实的JS程序中含有一个`while..true`循环通常是一件非常不好的事情，至少如果它没有一个`break`或`return`语句，那么它就很可能永远运行，同步地，阻塞/锁定浏览器UI。然而，在生成器中，如果这样的循环含有一个`yield`，那它就是完全没问题的，因为生成器将在每次迭代后暂停，`yield`回主程序和/或事件轮询队列。说的明白点儿，“生成器把`while..true`带回到JS编程中了！”
 
-That's a fair bit cleaner and simpler, right? Because the generator pauses at each `yield`, the state (scope) of the function `*something()` is kept around, meaning there's no need for the closure boilerplate to preserve variable state across calls.
+这变得相当干净和简单点儿了，对吧？因为生成器会暂停在每个`yield`，`*something()`函数的状态（作用域）被保持着，这意味着没有必要用闭包的模板代码来跨调用保留变量的状态了。
 
-Not only is it simpler code -- we don't have to make our own *iterator* interface -- it actually is more reason-able code, because it more clearly expresses the intent. For example, the `while..true` loop tells us the generator is intended to run forever -- to keep *generating* values as long as we keep asking for them.
+不仅是更简单的代码——我们不必自己制造 *迭代器* 借口了——它实际上是更合理的代码，因为它更清晰地表达了意图。比如，`while..true`循环告诉我们这个生成器将要永远运行——只要我们一直向它请求，它就一直 *产生* 值。
 
-And now we can use our shiny new `*something()` generator with a `for..of` loop, and you'll see it works basically identically:
+现在我们可以在`for..of`循环中使用新得发亮的`*something()`生成器了，而且你会看到它工作起来基本一模一样：
 
 ```js
 for (var v of something()) {
@@ -623,24 +587,24 @@ for (var v of something()) {
 // 1 9 33 105 321 969
 ```
 
-But don't skip over `for (var v of something()) ..`! We didn't just reference `something` as a value like in earlier examples, but instead called the `*something()` generator to get its *iterator* for the `for..of` loop to use.
+不要跳过`for (var v of something()) ..`！我们不仅仅像之前的例子那样讲`something`作为一个值引用了，而是调用`*something()`生成器来得到它的 *迭代器*，并交给`for..of`使用。
 
-If you're paying close attention, two questions may arise from this interaction between the generator and the loop:
+如果你仔细观察，在这个生成器和循环的互动中，你可能会有两个疑问：
 
-* Why couldn't we say `for (var v of something) ..`? Because `something` here is a generator, which is not an *iterable*. We have to call `something()` to construct a producer for the `for..of` loop to iterate over.
-* The `something()` call produces an *iterator*, but the `for..of` loop wants an *iterable*, right? Yep. The generator's *iterator* also has a `Symbol.iterator` function on it, which basically does a `return this`, just like the `something` *iterable* we defined earlier. In other words, a generator's *iterator* is also an *iterable*!
+* 为什么我们不能说`for (var v of something) ..`？因为这个`something`是一个生成器，而不是一个 *iterable*。我们不得不调用`something()`来构建一个产生器给`for..of`，以便它可以迭代。
+* `something()`调用创建一个 *迭代器*，但是`for..of`想要一个 *iterable*，对吧？对，生成器的 *迭代器* 上也有一个`Symbol.iterator`函数，这个函数基本上就是`return this`，就像我们刚才定义的`something`*iterable*。换句话说生成器的 *迭代器* 也是一个 *iterable*！
 
 #### Stopping the Generator
 
-In the previous example, it would appear the *iterator* instance for the `*something()` generator was basically left in a suspended state forever after the `break` in the loop was called.
+在前一个例子中，看起来在循环的`break`别调用后，`*something()`生成器的 *迭代器* 实例基本上被留在了一个永远挂起的状态。
 
-But there's a hidden behavior that takes care of that for you. "Abnormal completion" (i.e., "early termination") of the `for..of` loop -- generally caused by a `break`, `return`, or an uncaught exception -- sends a signal to the generator's *iterator* for it to terminate.
+但是这里有一个隐藏的行为为你处理这件事。`for..of`循环的“异常完成”（“提前终结”等等）——一般是由`break`，`return`，或未捕捉的异常导致的——会向生成器的 *迭代器* 发送一个信号，以使它终结。
 
-**Note:** Technically, the `for..of` loop also sends this signal to the *iterator* at the normal completion of the loop. For a generator, that's essentially a moot operation, as the generator's *iterator* had to complete first so the `for..of` loop completed. However, custom *iterators* might desire to receive this additional signal from `for..of` loop consumers.
+**注意：** 技术上讲，`for..of`循环也会在循环正常完成时向 *迭代器* 发送这个信号。对于生成器来说，这实质上是一个无实际意义的操作，因为生成器的 *迭代器* 要首先完成，`for..of`循环才能完成。然而，自定义的 *迭代器* 可能会希望从`for..of`循环的消费者那里得到另外的信号。
 
-While a `for..of` loop will automatically send this signal, you may wish to send the signal manually to an *iterator*; you do this by calling `return(..)`.
+虽然一个`for..of`循环将会自动发送这种信号，你可能会希望手动发送信号给一个 *迭代器*；你可以通过调用`return(..)`来这么做。
 
-If you specify a `try..finally` clause inside the generator, it will always be run even when the generator is externally completed. This is useful if you need to clean up resources (database connections, etc.):
+如果你在生成器内部指定一个`try..finally`从句，它将总是被执行，即便是生成器从外部被完成。这在你需要进行资源清理时很有用（数据库连接等）：
 
 ```js
 function *something() {
@@ -665,7 +629,7 @@ function *something() {
 }
 ```
 
-The earlier example with `break` in the `for..of` loop will trigger the `finally` clause. But you could instead manually terminate the generator's *iterator* instance from the outside with `return(..)`:
+前面那个在`for..of`中带有`break`的例子将会触发`finally`子句。但是你可以用`return(..)`从外部来手动终结生成器的 *迭代器* 实例。
 
 ```js
 var it = something();
@@ -686,17 +650,17 @@ for (var v of it) {
 // Hello World
 ```
 
-When we call `it.return(..)`, it immediately terminates the generator, which of course runs the `finally` clause. Also, it sets the returned `value` to whatever you passed in to `return(..)`, which is how `"Hello World"` comes right back out. We also don't need to include a `break` now because the generator's *iterator* is set to `done:true`, so the `for..of` loop will terminate on its next iteration.
+当我们调用`it.return(..)`时，它会立即终结生成器，而生成器就会运行`finally`从句。而且，它会将返回的`value`设置为你传入`return(..)`的任何东西，这就是`Hellow World`如何立即回来的。我们现在也不必再包含一个`break`，因为生成器的 *迭代器* 会被设置为`done:true`，所以`for..of`循环会在下一次迭代时终结。
 
-Generators owe their namesake mostly to this *consuming produced values* use. But again, that's just one of the uses for generators, and frankly not even the main one we're concerned with in the context of this book.
+生成器的命名大部分来自于这种 *消费生产的值* 的用法。但要重申的是，这只是生成器的用法之一，而且坦白的说，在这本书的背景下这甚至不是我们主要关注的。
 
-But now that we more fully understand some of the mechanics of how they work, we can *next* turn our attention to how generators apply to async concurrency.
+但是现在我们更加全面地了解它们的机制是如何工作，我们接下来可以将注意力转向生成器如何实施于异步并发。
 
 ## Iterating Generators Asynchronously
 
-What do generators have to do with async coding patterns, fixing problems with callbacks, and the like? Let's get to answering that important question.
+生成器要怎样处理异步编码模式，解决回调和类似的问题？让我们开始回答这个重要的问题。
 
-We should revisit one of our scenarios from Chapter 3. Let's recall the callback approach:
+我们应当重温一下第三章的一个场景。回想一下这个回调方式：
 
 ```js
 function foo(x,y,cb) {
@@ -716,7 +680,7 @@ foo( 11, 31, function(err,text) {
 } );
 ```
 
-If we wanted to express this same task flow control with a generator, we could do:
+如果我们想用生成器表示相同的任务流控制，我们可以：
 
 ```js
 function foo(x,y) {
@@ -751,55 +715,55 @@ var it = main();
 it.next();
 ```
 
-At first glance, this snippet is longer, and perhaps a little more complex looking, than the callback snippet before it. But don't let that impression get you off track. The generator snippet is actually **much** better! But there's a lot going on for us to explain.
+一眼看上去，这个代码段要比以前的回调代码更长，而且也许看起来更复杂。但不要让这种印象使你失望。生成器的代码段实际上要好 **太多** 了！但是这里有很多我们需要讲解的。
 
-First, let's look at this part of the code, which is the most important:
+首先，让我们看看代码的这一部分，也是最重要的部分：
 
 ```js
 var text = yield foo( 11, 31 );
 console.log( text );
 ```
 
-Think about how that code works for a moment. We're calling a normal function `foo(..)` and we're apparently able to get back the `text` from the Ajax call, even though it's asynchronous.
+花一点时间考虑一下这段代码如何工作。我们调用了一个普通的函数`foo(..)`，而且我们显然可以从Ajax调用那里得到`text`，即便它是异步的。
 
-How is that possible? If you recall the beginning of Chapter 1, we had almost identical code:
+这怎么可能？如果你回忆一下第一章的最开始，我们有一个几乎完全一样的代码：
 
 ```js
 var data = ajax( "..url 1.." );
 console.log( data );
 ```
 
-And that code didn't work! Can you spot the difference? It's the `yield` used in a generator.
+但是这段代码不好用！你能发现不同吗？它就是在生成器中使用的`yield`。
 
-That's the magic! That's what allows us to have what appears to be blocking, synchronous code, but it doesn't actually block the whole program; it only pauses/blocks the code in the generator itself.
+这是魔法！是它允许我们拥有一个看起来是阻塞的，同步的，但实际上不会阻塞整个程序的代码；它仅仅暂停/阻塞在生成器本身的代码。
 
-In `yield foo(11,31)`, first the `foo(11,31)` call is made, which returns nothing (aka `undefined`), so we're making a call to request data, but we're actually then doing `yield undefined`. That's OK, because the code is not currently relying on a `yield`ed value to do anything interesting. We'll revisit this point later in the chapter.
+在`yield foo(11,31)`中，首先`foo(11,31)`调用被发起，它什么也不返回（也就是`undefined`），所以我们发起了数据请求，然后我们实际上做的是`yield undefined`。这没问题，因为这段代码现在没有依赖`yield`的值来做任何有趣的事。我们在本章稍后再重新讨论这个问题。
 
-We're not using `yield` in a message passing sense here, only in a flow control sense to pause/block. Actually, it will have message passing, but only in one direction, after the generator is resumed.
+在这里，我们没有将`yield`作为消息传递的工具，只是作为进行暂停/阻塞的流程控制的工具。实际上，它会传递消息，但是只是单向的，在生成器被继续运行之后。
 
-So, the generator pauses at the `yield`, essentially asking the question, "what value should I return to assign to the variable `text`?" Who's going to answer that question?
+那么，生成器暂停在了`yield`，它实质上再问一个问题，“我该将什么值返回并赋给变量`text`？”谁来回答这个问题？
 
-Look at `foo(..)`. If the Ajax request is successful, we call:
+看一下`foo(..)`。如果Ajax请求成功，我们调用：
 
 ```js
 it.next( data );
 ```
 
-That's resuming the generator with the response data, which means that our paused `yield` expression receives that value directly, and then as it restarts the generator code, that value gets assigned to the local variable `text`.
+这将使生成器使用应答数据继续运行，这意味着我们暂停的`yield`表达式直接受到这个值，然后因为他重新开始以运行生成器代码，所以这个值被赋给本地变量`text`。
 
-Pretty cool, huh?
+很酷吧？
 
-Take a step back and consider the implications. We have totally synchronous-looking code inside the generator (other than the `yield` keyword itself), but hidden behind the scenes, inside of `foo(..)`, the operations can complete asynchronously.
+推一步考虑一下这个实现。我们在生成器内部的代码看起来完全是同步的（除了`yield`关键字本身），但隐藏在幕后的是，在`foo(..)`内部，操作可以完全是异步的。
 
-**That's huge!** That's a nearly perfect solution to our previously stated problem with callbacks not being able to express asynchrony in a sequential, synchronous fashion that our brains can relate to.
+**这很伟大！** 这几乎完美地解决了我们前面遇到的问题：回调不能像我们的大脑可以关联的那样，以一种顺序，同步的风格表达异步处理。
 
-In essence, we are abstracting the asynchrony away as an implementation detail, so that we can reason synchronously/sequentially about our flow control: "Make an Ajax request, and when it finishes print out the response." And of course, we just expressed two steps in the flow control, but this same capability extends without bounds, to let us express however many steps we need to.
+实质上，我们将异步处理作为实现细节抽象出去，以至于我们可以同步地/顺序地推理我们的流程控制：“发起Ajax请求，然后在它完成之后打印应答。” 当然，我们仅仅在这个流程控制中表达了两个步骤，但同样的能力可以无边界地延伸，让我们需要表达多少步骤，就表达多少。
 
-**Tip:** This is such an important realization, just go back and read the last three paragraphs again to let it sink in!
+**提示：** 这是一个如此重要的认识，为了充分理解，现在回过头去再把最后三段读一遍！
 
 ### Synchronous Error Handling
 
-But the preceding generator code has even more goodness to *yield* to us. Let's turn our attention to the `try..catch` inside the generator:
+但是前面的生成器代码会 *让* 出更多的好处给我们。让我么把注意力移到生成器内部的`try..catch`上：
 
 ```js
 try {
@@ -811,9 +775,9 @@ catch (err) {
 }
 ```
 
-How does this work? The `foo(..)` call is asynchronously completing, and doesn't `try..catch` fail to catch asynchronous errors, as we looked at in Chapter 3?
+这怎么工作？`foo(..)`调用是异步完成的，`try..catch`不是无法捕捉异步错误吗？就像我们在第三章中看到的？
 
-We already saw how the `yield` lets the assignment statement pause to wait for `foo(..)` to finish, so that the completed response can be assigned to `text`. The awesome part is that this `yield` pausing *also* allows the generator to `catch` an error. We throw that error into the generator with this part of the earlier code listing:
+我们已经看到了`yield`如何让赋值语句暂停，来等待`foo(..)`去完成，以至于完成的响应可以被赋予`text`。牛X的是，`yield`暂停 *还* 允许生成器`catch`一个错误。我们在前面的例子，我们用这一部分代码将这个错误抛出到生成器中：
 
 ```js
 if (err) {
@@ -822,9 +786,9 @@ if (err) {
 }
 ```
 
-The `yield`-pause nature of generators means that not only do we get synchronous-looking `return` values from async function calls, but we can also synchronously `catch` errors from those async function calls!
+生成器的`yield`暂停特性不仅意味着我们可以从异步的函数调用那里得到看起来同步的`return`值，还意味着我们可以同步地捕获这些异步函数调用的错误！
 
-So we've seen we can throw errors *into* a generator, but what about throwing errors *out of* a generator? Exactly as you'd expect:
+那么我们看到了，我们可以将错误 *抛入* 生成器，但是将错误 *抛出* 一个生成器呢？和你期望的一样：
 
 ```js
 function *main() {
@@ -845,9 +809,9 @@ catch (err) {
 }
 ```
 
-Of course, we could have manually thrown an error with `throw ..` instead of causing an exception.
+当然，我们本可以用`throw ..`手动地抛出一个错误，而不是制造一个异常。
 
-We can even `catch` the same error that we `throw(..)` into the generator, essentially giving the generator a chance to handle it but if it doesn't, the *iterator* code must handle it:
+我们甚至可以`catch`我们`throw(..)`进生成器的同一个错误，实质上给了生成器一个机会来处理它，但如果生成器没处理，那么 *迭代器* 代码必须处理它：
 
 ```js
 function *main() {
@@ -871,17 +835,17 @@ catch (err) {
 }
 ```
 
-Synchronous-looking error handling (via `try..catch`) with async code is a huge win for readability and reason-ability.
+使用异步代码的，看似同步的错误处理（通过`try..catch`）在可读性和可推理性上大获全胜。
 
 ## Generators + Promises
 
-In our previous discussion, we showed how generators can be iterated asynchronously, which is a huge step forward in sequential reason-ability over the spaghetti mess of callbacks. But we lost something very important: the trustability and composability of Promises (see Chapter 3)!
+在我们前面的讨论中，我们展示了生成器如何可以异步地迭代，这是一个用顺序的可推理性来取代混乱如面条的回调的一个巨大进步。但我们丢掉了两个非常重要的东西：Promise的可靠性和可组合性（见第三章）！
 
-Don't worry -- we can get that back. The best of all worlds in ES6 is to combine generators (synchronous-looking async code) with Promises (trustable and composable).
+别担心——我们会把它们拿回来。在ES6的世界中最棒的就是将生成器（看似同步的异步代码）与Promise（可靠性和可组合性）组合起来。
 
-But how?
+但怎么做？
 
-Recall from Chapter 3 the Promise-based approach to our running Ajax example:
+回想一下第三章中我们运行Ajax的例子中，基于Promise的方式：
 
 ```js
 function foo(x,y) {
@@ -901,17 +865,17 @@ foo( 11, 31 )
 );
 ```
 
-In our earlier generator code for the running Ajax example, `foo(..)` returned nothing (`undefined`), and our *iterator* control code didn't care about that `yield`ed value.
+在我们早先的运行Ajax的例子的生成器代码中，`foo(..)`什么也不返回（`undefined`），而且我们的 *迭代器* 控制代码也不关心`yield`的值。
 
-But here the Promise-aware `foo(..)` returns a promise after making the Ajax call. That suggests that we could construct a promise with `foo(..)` and then `yield` it from the generator, and then the *iterator* control code would receive that promise.
+但这里的Promise相关的`foo(..)`在发起Ajax调用后返回一个promise。这暗示着我们可以用`foo(..)`构建一个promise，然后从生成器中`yield`出来，而后 *迭代器* 控制代码将可以收到这个promise。
 
-But what should the *iterator* do with the promise?
+那么 *迭代器* 应当对promise做什么？
 
-It should listen for the promise to resolve (fulfillment or rejection), and then either resume the generator with the fulfillment message or throw an error into the generator with the rejection reason.
+它应当监听promise的解析（完成或拒绝），然后要么使用完成消息继续运行生成器，要么使用拒绝理由向生成器抛出错误。
 
-Let me repeat that, because it's so important. The natural way to get the most out of Promises and generators is **to `yield` a Promise**, and wire that Promise to control the generator's *iterator*.
+让我重复一遍，因为它如此重要。发挥Promise和生成器的最大功效的自然方法是 **`yield`一个Promise**，并将这个Promise连接到生成器的 *迭代器* 的控制端。
 
-Let's give it a try! First, we'll put the Promise-aware `foo(..)` together with the generator `*main()`:
+让我们试一下！首先，我们将Promise相关的`foo(..)`与生成器`*main()`放在一起：
 
 ```js
 function foo(x,y) {
@@ -931,9 +895,9 @@ function *main() {
 }
 ```
 
-The most powerful revelation in this refactor is that the code inside `*main()` **did not have to change at all!** Inside the generator, whatever values are `yield`ed out is just an opaque implementation detail, so we're not even aware it's happening, nor do we need to worry about it.
+在这个重构中最强大的启示是，`*main()`内部的代码 **更本就没变！** 在生成器内部，无论什么样的值被`yield`出去都是一个不可见的实现细节，所以我们甚至不会察觉它发生了，也不用担心它。
 
-But how are we going to run `*main()` now? We still have some of the implementation plumbing work to do, to receive and wire up the `yield`ed promise so that it resumes the generator upon resolution. We'll start by trying that manually:
+那么我们现在如何运行`*main()`？我们任然还有一些实现的管道工作要做，接受并连接`yield`的promise，使它能够根据解析来继续运行生成器。我们从手动这么做开始：
 
 ```js
 var it = main();
@@ -951,15 +915,15 @@ p.then(
 );
 ```
 
-Actually, that wasn't so painful at all, was it?
+其实，根本不费事，对吧？
 
-This snippet should look very similar to what we did earlier with the manually wired generator controlled by the error-first callback. Instead of an `if (err) { it.throw..`, the promise already splits fulfillment (success) and rejection (failure) for us, but otherwise the *iterator* control is identical.
+这段代码应当看起来与我们早前做的很相似：手动地连接被错误优先的回调控制的生成器。与`if (err) { it.throw..`相反，promise已经为我们分割为完成（成功）与拒绝（失败），否则 *迭代器* 控制是完全相同的。
 
-Now, we've glossed over some important details.
+现在，我们已接掩盖了一些重要的细节。
 
-Most importantly, we took advantage of the fact that we knew that `*main()` only had one Promise-aware step in it. What if we wanted to be able to Promise-drive a generator no matter how many steps it has? We certainly don't want to manually write out the Promise chain differently for each generator! What would be much nicer is if there was a way to repeat (aka "loop" over) the iteration control, and each time a Promise comes out, wait on its resolution before continuing.
+最重要的是，我们利用了这样一个事实：我们知道`*main()`里面只有一个Promise相关的步骤。如果我们想要能用Promise驱动一个生成器而不管它有多少步骤呢？我们当然不想为每一个生成器手动连接一个不同的Promise链！要是有这样一种方法该多好：可以重复（也就是“循环”）迭代的控制，而且每次一有Promise出来，就在继续之前等待它的解析。
 
-Also, what if the generator throws out an error (intentionally or accidentally) during the `it.next(..)` call? Should we quit, or should we `catch` it and send it right back in? Similarly, what if we `it.throw(..)` a Promise rejection into the generator, but it's not handled, and comes right back out?
+另外，如果生成器在`it.next()`期间抛出一个错误怎么办？我们是该退出，还是应该`catch`它并把它送回去？相似地，要是我们`it.throw(..)`一个Promise拒绝给生成器，但是没有被处理，又直接回来了呢？
 
 ### Promise-Aware Generator Runner
 
