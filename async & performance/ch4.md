@@ -1125,9 +1125,9 @@ run( foo );
 
 #### Promises, Hidden
 
-As a word of stylistic caution, be careful about how much Promise logic you include **inside your generators**. The whole point of using generators for asynchrony in the way we've described is to create simple, sequential, sync-looking code, and to hide as much of the details of asynchrony away from that code as possible.
+作为代码风格的警告要说一句，要小心你在 **你的生成器内部** 包含了多少Promise逻辑。以我们描述过的方式在异步性上使用生成器的全部意义，是要创建简单，顺序，看似同步的代码，并尽可能多地将异步性细节隐藏在这些代码之外。
 
-For example, this might be a cleaner approach:
+比如，这可能是一种更干净的方式：
 
 ```js
 // note: normal function, not generator
@@ -1160,11 +1160,11 @@ function *foo() {
 run( foo );
 ```
 
-Inside `*foo()`, it's cleaner and clearer that all we're doing is just asking `bar(..)` to get us some `results`, and we'll `yield`-wait on that to happen. We don't have to care that under the covers a `Promise.all([ .. ])` Promise composition will be used to make that happen.
+在`*foo()`内部，它更干净更清晰地表达了我们要做的事情：我们要求`bar(..)`给我们一些`results`，而我们将`yield`等待它的发生。我们不必关心在底层一个`Promise.all([ .. ])`的Promise组合将被用来完成任务。
 
-**We treat asynchrony, and indeed Promises, as an implementation detail.**
+**我们将异步性，特别是Promise，作为一种实现细节。**
 
-Hiding your Promise logic inside a function that you merely call from your generator is especially useful if you're going to do a sophisticated series flow-control. For example:
+如果你要做一种精巧的序列流控制，那么将你的Promise逻辑隐藏在一个仅仅从你的生成器中调用的函数里特别有用。举个例子：
 
 ```js
 function bar() {
@@ -1177,17 +1177,17 @@ function bar() {
 }
 ```
 
-That kind of logic is sometimes required, and if you dump it directly inside your generator(s), you've defeated most of the reason why you would want to use generators in the first place. We *should* intentionally abstract such details away from our generator code so that they don't clutter up the higher level task expression.
+有时候这种逻辑是必须的，而如果你直接把它扔在你的生成器内部，你就违背了大多数你使用生成器的初衷。我们 *应当* 有意地将这样的细节从生成器代码中抽象出去，以使它们不会搞乱更高层的任务表达。
 
-Beyond creating code that is both functional and performant, you should also strive to make code that is as reason-able and maintainable as possible.
+在创建功能强与性能好的代码之上，你还应当努力使代码尽可能地容易推理和维护。
 
-**Note:** Abstraction is not *always* a healthy thing for programming -- many times it can increase complexity in exchange for terseness. But in this case, I believe it's much healthier for your generator+Promise async code than the alternatives. As with all such advice, though, pay attention to your specific situations and make proper decisions for you and your team.
+**注意：** 对于编程来说，抽象不总是一种健康的东西——许多时候它可能在得到简洁的同时增加复杂性。但是在这种情况下，我相信你的生成器+Promise异步代码要比其他的选择健康得多。虽然有所有这些建议，你仍然要注意你的特殊情况，并为你和你的团队做出合适的决策。
 
 ## Generator Delegation
 
-In the previous section, we showed calling regular functions from inside a generator, and how that remains a useful technique for abstracting away implementation details (like async Promise flow). But the main drawback of using a normal function for this task is that it has to behave by the normal function rules, which means it cannot pause itself with `yield` like a generator can.
+在上一节中，我们展示了从生成器内部调用普通函数，和它如何作为一种有用的技术来将实现细节（比如异步Promise流程）抽象出去。但是为这种任务使用普通函数的缺陷是，它必须按照普通函数的规则行动，也就是说它不能像生成器那样用`yield`来暂停自己。
 
-It may then occur to you that you might try to call one generator from another generator, using our `run(..)` helper, such as:
+在你身上可能发生这样的事情：你可能会试着使用我们的`run(..)`帮助函数，从一个生成器中调用另个一生成器。比如：
 
 ```js
 function *foo() {
@@ -1209,9 +1209,9 @@ function *bar() {
 run( bar );
 ```
 
-We run `*foo()` inside of `*bar()` by using our `run(..)` utility again. We take advantage here of the fact that the `run(..)` we defined earlier returns a promise which is resolved when its generator is run to completion (or errors out), so if we `yield` out to a `run(..)` instance the promise from another `run(..)` call, it automatically pauses `*bar()` until `*foo()` finishes.
+通过再一次使用我们的`run(..)`工具，我们在`*bar()`内部运行`*foo()`。我们利用了这样一个事实：我们早先定义的`run(..)`返回一个promise，这个promise在生成器运行至完成是才解析（或发生错误），所以如果我们从一个`run(..)`调用中`yield`出一个promise给另一个`run(..)`，它就会自动暂停`*bar()`知道`*foo()`完成。
 
-But there's an even better way to integrate calling `*foo()` into `*bar()`, and it's called `yield`-delegation. The special syntax for `yield`-delegation is: `yield * __` (notice the extra `*`). Before we see it work in our previous example, let's look at a simpler scenario:
+但这里有一个更好的办法将`*foo()`调用整合进`*bar()`，它称为`yield`委托。`yield`委托的特殊语法是：`yield * __`（注意额外的`*`）。让它在我们前面的例子中工作之前，让我们看一个更简单的场景：
 
 ```js
 function *foo() {
@@ -1239,17 +1239,17 @@ it.next().value;	// `*foo()` finished
 					// 5
 ```
 
-**Note:** Similar to a note earlier in the chapter where I explained why I prefer `function *foo() ..` instead of `function* foo() ..`, I also prefer -- differing from most other documentation on the topic -- to say `yield *foo()` instead of `yield* foo()`. The placement of the `*` is purely stylistic and up to your best judgment. But I find the consistency of styling attractive.
+**注意：** 在本章早前的一个注意点中，我解释了为什么我偏好`function *foo() ..`而不是`function* foo() ..`，相似地，我也偏好——与关于这个话题的其他大多数文档不同——说`yield *foo()`而不是`yield* foo()`。`*`的摆放是纯粹的风格问题，而且要看你的最佳判断。但我发现保持统一风格很吸引人。
 
-How does the `yield *foo()` delegation work?
+`yield *foo()`委托是如何工作的？
 
-First, calling `foo()` creates an *iterator* exactly as we've already seen. Then, `yield *` delegates/transfers the *iterator* instance control (of the present `*bar()` generator) over to this other `*foo()` *iterator*.
+首先，正如我们看到过的那样，调用`foo()`创建了一个 *迭代器*。然后，`yield *`将 *迭代器* 的控制（当前`*bar()`生成器的）委托/传递给这另一个`*foo()`*迭代器*。
 
-So, the first two `it.next()` calls are controlling `*bar()`, but when we make the third `it.next()` call, now `*foo()` starts up, and now we're controlling `*foo()` instead of `*bar()`. That's why it's called delegation -- `*bar()` delegated its iteration control to `*foo()`.
+那么，前两个`it.next()`调用控制着`*bar()`，但当我们发起第三个`it.next()`调用时，`*foo()`就启动了，而且这时我们控制的是`*foo()`而非`*bar()`。这就是为什么它称为委托——`*bar()`将它的迭代控制委托给`*foo()`。
 
-As soon as the `it` *iterator* control exhausts the entire `*foo()` *iterator*, it automatically returns to controlling `*bar()`.
+只要`it`*迭代器* 的控制耗尽了整个`*foo()`*迭代器*，它就会自动地将控制返回到`*bar()`。
 
-So now back to the previous example with the three sequential Ajax requests:
+那么现在回到前面的三个顺序Ajax请求的例子：
 
 ```js
 function *foo() {
@@ -1271,23 +1271,23 @@ function *bar() {
 run( bar );
 ```
 
-The only difference between this snippet and the version used earlier is the use of `yield *foo()` instead of the previous `yield run(foo)`.
+这个代码段和前面使用的版本的唯一区别是，使用了`yield *foo()`而不是前面的`yield run(foo)`。
 
-**Note:** `yield *` yields iteration control, not generator control; when you invoke the `*foo()` generator, you're now `yield`-delegating to its *iterator*. But you can actually `yield`-delegate to any *iterable*; `yield *[1,2,3]` would consume the default *iterator* for the `[1,2,3]` array value.
+**注意：** `yield *`让出了迭代控制，不是生成器控制；当你调用`*foo()`生成器时，你就`yield`委托给它的 *迭代器*。但你实际上可以`yield`委托给任何 *迭代器*；`yield *[1,2,3]`将会消费默认的`[1,2,3]`数组值 *迭代器*。
 
 ### Why Delegation?
 
-The purpose of `yield`-delegation is mostly code organization, and in that way is symmetrical with normal function calling.
+`yield`委托的目的很大程度上是为了代码组织，并且是以一种与普通函数调用对称的方式。
 
-Imagine two modules that respectively provide methods `foo()` and `bar()`, where `bar()` calls `foo()`. The reason the two are separate is generally because the proper organization of code for the program calls for them to be in separate functions. For example, there may be cases where `foo()` is called standalone, and other places where `bar()` calls `foo()`.
+想象两个分别提供了`foo()`和`bar()`方法的模块，其中`bar()`调用`foo()`。它们俩分开的原因一般是由于为了程序将它们作为分离的程序来调用而进行的恰当组织。例如，可能会有一些情况`foo()`需要被独立调用，而其他地方`bar()`来调用`foo()`。
 
-For all these exact same reasons, keeping generators separate aids in program readability, maintenance, and debuggability. In that respect, `yield *` is a syntactic shortcut for manually iterating over the steps of `*foo()` while inside of `*bar()`.
+由于这些完全相同的原因，将生成器分开可以增强程序的可读性，可维护性，与可调试性。从这个角度讲，`yield *`是一种快捷的语法，用来在`*bar()`内部手动地迭代`*foo()`的步骤。
 
-Such manual approach would be especially complex if the steps in `*foo()` were asynchronous, which is why you'd probably need to use that `run(..)` utility to do it. And as we've shown, `yield *foo()` eliminates the need for a sub-instance of the `run(..)` utility (like `run(foo)`).
+如果`*foo()`中的步骤是异步的，这样的手动方式可能会特别复杂，这就是为什么你可能会需要那个`run(..)`工具来做它。正如我们已经展示的，`yield *foo()`消灭了使用`run(..)`工具的子实例（比如`run(foo)`）的需要。
 
 ### Delegating Messages
 
-You may wonder how this `yield`-delegation works not just with *iterator* control but with the two-way message passing. Carefully follow the flow of messages in and out, through the `yield`-delegation:
+你可能想知道，这种`yield`委托在除了与 *迭代器* 控制一起工作以外，是如何与双向消息传递一起工作的。仔细查看下面这些通过`yield`委托进进出出的消息流：
 
 ```js
 function *foo() {
@@ -1332,16 +1332,16 @@ console.log( "outside:", it.next( 4 ).value );
 // outside: F
 ```
 
-Pay particular attention to the processing steps after the `it.next(3)` call:
+特别注意一下`it.next(3)`调用之后的处理步骤：
 
-1. The `3` value is passed (through the `yield`-delegation in `*bar()`) into the waiting `yield "C"` expression inside of `*foo()`.
-2. `*foo()` then calls `return "D"`, but this value doesn't get returned all the way back to the outside `it.next(3)` call.
-3. Instead, the `"D"` value is sent as the result of the waiting `yield *foo()` expression inside of `*bar()` -- this `yield`-delegation expression has essentially been paused while all of `*foo()` was exhausted. So `"D"` ends up inside of `*bar()` for it to print out.
-4. `yield "E"` is called inside of `*bar()`, and the `"E"` value is yielded to the outside as the result of the `it.next(3)` call.
+1. 值`3`被传入（通过`*bar`里的`yield`委托）在`*foo()`内部等待中的`yield "C"`表达式。
+2. 然后`*foo()`调用`return "D"`，但是这个值不会一路返回到外面的`it.next(3)`调用。
+3. 相反地，值`"D"`作为结果被发送到在`*bar()`内部等待中的`yield *foo()`表示式——这个`yield`委托表达式实质上在`*foo()`被耗尽之前一直被暂停着。所以`"D"`被送到`*bar()`内部来让它打印。
+4. `yield "E"`在`*bar()`内部被调用，而且值`"E"`被让出到外部作为`it.next(3)`调用的结果。
 
-From the perspective of the external *iterator* (`it`), it doesn't appear any differently between controlling the initial generator or a delegated one.
+从外部 *迭代器*（`it`）的角度来看，在初始的生成器和被委托的生成器之间的控制没有任何区别。
 
-In fact, `yield`-delegation doesn't even have to be directed to another generator; it can just be directed to a non-generator, general *iterable*. For example:
+事实上，`yield`委托甚至不必指向另一个生成器；它可以进被指向一个为生成器的，一般的 *iterable*。比如：
 
 ```js
 function *bar() {
@@ -1379,13 +1379,13 @@ console.log( "outside:", it.next( 5 ).value );
 // outside: F
 ```
 
-Notice the differences in where the messages were received/reported between this example and the one previous.
+注意这个例子与前一个之间，被接收/报告的消息的不同之处。
 
-Most strikingly, the default `array` *iterator* doesn't care about any messages sent in via `next(..)` calls, so the values `2`, `3`, and `4` are essentially ignored. Also, because that *iterator* has no explicit `return` value (unlike the previously used `*foo()`), the `yield *` expression gets an `undefined` when it finishes.
+最惊人的是，默认的`array`*迭代器* 不关心任何通过`next(..)`调用被发送的消息，所以值`2`，`3`，与`4`实质上被忽略了。另外，因为这个 *迭代器* 没有明确的`return`值（不想前面使用的`*foo()`），所以`yield *`表达式在它完成时得到一个`undefined`。
 
 #### Exceptions Delegated, Too!
 
-In the same way that `yield`-delegation transparently passes messages through in both directions, errors/exceptions also pass in both directions:
+与`yield`委托在两个方向上透明地传递消息的方式相同，错误/异常也在双向传递：
 
 ```js
 function *foo() {
@@ -1448,15 +1448,15 @@ catch (err) {
 // error caught outside: F
 ```
 
-Some things to note from this snippet:
+在这段代码中有一些事情要注意：
 
-1. When we call `it.throw(2)`, it sends the error message `2` into `*bar()`, which delegates that to `*foo()`, which then `catch`es it and handles it gracefully. Then, the `yield "C"` sends `"C"` back out as the return `value` from the `it.throw(2)` call.
-2. The `"D"` value that's next `throw`n from inside `*foo()` propagates out to `*bar()`, which `catch`es it and handles it gracefully. Then the `yield "E"` sends `"E"` back out as the return `value` from the `it.next(3)` call.
-3. Next, the exception `throw`n from `*baz()` isn't caught in `*bar()` -- though we did `catch` it outside -- so both `*baz()` and `*bar()` are set to a completed state. After this snippet, you would not be able to get the `"G"` value out with any subsequent `next(..)` call(s) -- they will just return `undefined` for `value`.
+1. 但我们调用`it.throw(2)`时，它发送一个错误消息`2`到`*bar()`，而`*bar()`将它委托至`*foo()`，然后`*foo()`来`catch`它并瓶颈地处理。之后，`yield "C"`把`"C"`作为返回的`value`发送回`it.throw(2)`调用。
+2. 接下来值`"D"`被从`*foo()`内部`throw`出来并传播到`*bar()`，`*bar()`会`catch`它并平静地处理。然后`yield "E"`把`"E"`作为返回的`value`发送回`it.next(3)`调用。
+3. 接下来，一个异常从`*baz()`中`throw`出来，而没有被`*bar()`捕获——我们没在外面`catch`它——所以`*baz()`和`*bar()`都被设置为完成状态。这段代码结束后，即便有后续的`next(..)`调用，你也不会得到值`"G"`——它们的`value`将返回`undefined`。
 
 ### Delegating Asynchrony
 
-Let's finally get back to our earlier `yield`-delegation example with the multiple sequential Ajax requests:
+最后让我们回到早先的多个顺序Ajax请求的例子，使用`yield`委托：
 
 ```js
 function *foo() {
@@ -1477,15 +1477,15 @@ function *bar() {
 run( bar );
 ```
 
-Instead of calling `yield run(foo)` inside of `*bar()`, we just call `yield *foo()`.
+在`*bar()`内部，与调用`yield run(foo)`不同的是，我们调用`yield *foo()`。
 
-In the previous version of this example, the Promise mechanism (controlled by `run(..)`) was used to transport the value from `return r3` in `*foo()` to the local variable `r3` inside `*bar()`. Now, that value is just returned back directly via the `yield *` mechanics.
+在前一个版本的这个例子中，Promise机制被用于将值从`*foo()`中的`return r3`传送到`*bar()`内部的本地变量`r3`。现在，这个值通过`yield *`机制直接返回。
 
-Otherwise, the behavior is pretty much identical.
+除此以外，它们的行为是一样的。
 
 ### Delegating "Recursion"
 
-Of course, `yield`-delegation can keep following as many delegation steps as you wire up. You could even use `yield`-delegation for async-capable generator "recursion" -- a generator `yield`-delegating to itself:
+当然，`yield`委托可以一直持续委托下去，你想连接多少步骤就连接多少。你甚至可以在具有异步能力的生成器上“递归”使用`yield`委托——一个`yield`委托至自己的生成器：
 
 ```js
 function *foo(val) {
@@ -1505,23 +1505,23 @@ function *bar() {
 run( bar );
 ```
 
-**Note:** Our `run(..)` utility could have been called with `run( foo, 3 )`, because it supports additional parameters being passed along to the initialization of the generator. However, we used a parameter-free `*bar()` here to highlight the flexibility of `yield *`.
+**注意：** 我们的`run(..)`工具本可以用`run( foo, 3 )`来调用，因为它支持用额外传递的参数来进行生成器的初始化。然而，为了在这里展示`yield *`的灵活性，我们使用了无参数的`*bar()`。
 
-What processing steps follow from that code? Hang on, this is going to be quite intricate to describe in detail:
+这段代码之后的处理步骤是什么？坚持住，它的细节要描述起来可是十分错综复杂：
 
-1. `run(bar)` starts up the `*bar()` generator.
-2. `foo(3)` creates an *iterator* for `*foo(..)` and passes `3` as its `val` parameter.
-3. Because `3 > 1`, `foo(2)` creates another *iterator* and passes in `2` as its `val` parameter.
-4. Because `2 > 1`, `foo(1)` creates yet another *iterator* and passes in `1` as its `val` parameter.
-5. `1 > 1` is `false`, so we next call `request(..)` with the `1` value, and get a promise back for that first Ajax call.
-6. That promise is `yield`ed out, which comes back to the `*foo(2)` generator instance.
-7. The `yield *` passes that promise back out to the `*foo(3)` generator instance. Another `yield *` passes the promise out to the `*bar()` generator instance. And yet again another `yield *` passes the promise out to the `run(..)` utility, which will wait on that promise (for the first Ajax request) to proceed.
-8. When the promise resolves, its fulfillment message is sent to resume `*bar()`, which passes through the `yield *` into the `*foo(3)` instance, which then passes through the `yield *` to the `*foo(2)` generator instance, which then passes through the `yield *` to the normal `yield` that's waiting in the `*foo(3)` generator instance.
-9. That first call's Ajax response is now immediately `return`ed from the `*foo(3)` generator instance, which sends that value back as the result of the `yield *` expression in the `*foo(2)` instance, and assigned to its local `val` variable.
-10. Inside `*foo(2)`, a second Ajax request is made with `request(..)`, whose promise is `yield`ed back to the `*foo(1)` instance, and then `yield *` propagates all the way out to `run(..)` (step 7 again). When the promise resolves, the second Ajax response propagates all the way back into the `*foo(2)` generator instance, and is assigned to its local `val` variable.
-11. Finally, the third Ajax request is made with `request(..)`, its promise goes out to `run(..)`, and then its resolution value comes all the way back, which is then `return`ed so that it comes back to the waiting `yield *` expression in `*bar()`.
+1. `run(bar)`启动了`*bar()`生成器。
+2. `foo(3)`为`*foo(..)`创建了 *迭代器* 并传递`3`作为它的`val`参数。
+3. 因为`3 > 1`，`foo(2)`创建了另一个 *迭代器* 并传递`2`作为它的`val`参数。
+4. 因为`2 > 1`，`foo(1)`又创建了另一个 *迭代器* 并传递`1`作为它的`val`参数。
+5. `1 > 1`是`false`，所以我们接下来用值`1`调用`request(..)`，并得到一个代表第一个Ajax调用的promise。
+6. 这个promise被`yield`出来，回到`*foo(2)`生成器实例。
+7. `yield *`将这个promise传出并回到`*foo(3)`生成器实例。另一个`yield *`把这个promise传出到`*bar()`生成器实例。而又有另一个`yield *`把这个promise传出到`run(..)`工具，而它将会等待这个promise（第一个Ajax请求）再处理。
+8. 当这个promise解析时，它的完成消息会被发送以继续`*bar()`，`*bar()`通过`yield *`把消息传递进`*foo(3)`实例，`*foo(3)`实例通过`yield *`把消息传递进`*foo(2)`生成器实例，`*foo(2)`实例通过`yield *`把消息传给那个在`*foo(3)`生成器实例中等待的一般的`yield`。
+9. 这第一个Ajax调用的应答现在立即从`*foo(3)`生成器实例中被`return`，作为`*foo(2)`实例中`yield *`表达式的结果发送回来，并赋值给本地`val`变量。
+10. `*foo(2)`内部，第二个Ajax请求用`request(..)`发起，它的promise被`yield`回到`*foo(1)`实例，然后一路`yield *`传播到`run(..)`（回到第7步）。当promise解析时，第二个Ajax应答一路传播回到`*foo(2)`生成器实例，并赋值到他本地的`val`变量。
+11. 最终，第三个Ajax请求用`request(..)`发起，它的promise走出到`run(..)`，然后它的解析值一路返回，最后被`return`到在`*bar()`中等待的`yield *`表达式。
 
-Phew! A lot of crazy mental juggling, huh? You might want to read through that a few more times, and then go grab a snack to clear your head!
+天！许多疯狂的头脑杂技，对吧？你可能想要把它通读几遍，然后抓点儿零食放松一下大脑！
 
 ## Generator Concurrency
 
