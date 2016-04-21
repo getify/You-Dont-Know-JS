@@ -1525,11 +1525,11 @@ run( bar );
 
 ## Generator Concurrency
 
-As we discussed in both Chapter 1 and earlier in this chapter, two simultaneously running "processes" can cooperatively interleave their operations, and many times this can *yield* (pun intended) very powerful asynchrony expressions.
+正如我们在第一章和本章早先讨论过的，另个同时运行的“进程”可以协作地穿插它们的操作，而且许多时候这可以产生非常强大的异步表达式。
 
-Frankly, our earlier examples of concurrency interleaving of multiple generators showed how to make it really confusing. But we hinted that there's places where this capability is quite useful.
+坦白地说，我们前面关于多个生成器并发穿插的例子，展示了这真的容易让人糊涂。但我们也受到了启发，有些地方这种能力十分有用。
 
-Recall a scenario we looked at in Chapter 1, where two different simultaneous Ajax response handlers needed to coordinate with each other to make sure that the data communication was not a race condition. We slotted the responses into the `res` array like this:
+回想我们在第一章中看过的场景，两个不同但同时的Ajax应答处理需要互相协调，来确保数据通信不是竟合状态。我们这样把应答分别放在`res`数组的不同位置中：
 
 ```js
 function response(data) {
@@ -1542,7 +1542,7 @@ function response(data) {
 }
 ```
 
-But how can we use multiple generators concurrently for this scenario?
+但是我们如何在这种场景下使用多生成器呢？
 
 ```js
 // `request(..)` is a Promise-aware Ajax utility
@@ -1556,11 +1556,11 @@ function *reqData(url) {
 }
 ```
 
-**Note:** We're going to use two instances of the `*reqData(..)` generator here, but there's no difference to running a single instance of two different generators; both approaches are reasoned about identically. We'll see two different generators coordinating in just a bit.
+**注意：** 我们将在这里使用两个`*reqData(..)`生成器的实例，但是这和分别使用两个不同生成器的一个实例没有区别；这两种方式在道理上完全一样的。我们过一会儿就会看到两个生成器的协调操作。
 
-Instead of having to manually sort out `res[0]` and `res[1]` assignments, we'll use coordinated ordering so that `res.push(..)` properly slots the values in the expected and predictable order. The expressed logic thus should feel a bit cleaner.
+与不得不手动将`res[0]`和`res[1]`赋值手动排序不同，我们将使用协调过得顺序，让`res.push(..)`恰当地将值放在预期的位置，以可预见的顺序。如此被表达的逻辑应当感觉更干净。
 
-But how will we actually orchestrate this interaction? First, let's just do it manually, with Promises:
+但是我们将如何实际安排这种互动呢？首先，让我们手动实现它：
 
 ```js
 var it1 = reqData( "http://some.url.1" );
@@ -1579,9 +1579,9 @@ p1
 } );
 ```
 
-`*reqData(..)`'s two instances are both started to make their Ajax requests, then paused with `yield`. Then we choose to resume the first instance when `p1` resolves, and then `p2`'s resolution will restart the second instance. In this way, we use Promise orchestration to ensure that `res[0]` will have the first response and `res[1]` will have the second response.
+`*reqData(..)`的两个实例都开始发起它们的Ajax请求，然后用`yield`暂停。之后我们再`p1`解析式继续运行第一个实例，而后来的`p2`的解析将会重启第二个实例。以这种方式，我们使用Promise的安排来确保`res[0]`将持有第一个应答，而`res[1]`持有第二个应答。
 
-But frankly, this is awfully manual, and it doesn't really let the generators orchestrate themselves, which is where the true power can lie. Let's try it a different way:
+但坦白地说，这是可怕的手动，而且它没有真正让生成器组织它们自己，而那才是真正的力量。让我们用不同的方法试一下：
 
 ```js
 // `request(..)` is a Promise-aware Ajax utility
@@ -1618,11 +1618,11 @@ Promise.all( [p1,p2] )
 } );
 ```
 
-OK, this is a bit better (though still manual!), because now the two instances of `*reqData(..)` run truly concurrently, and (at least for the first part) independently.
+好的，这看起来好些了（虽然仍然是手动），因为现在两个`*reqData(..)`的实例真正地并发运行了，而且（至少是在第一部分）是独立的。
 
-In the previous snippet, the second instance was not given its data until after the first instance was totally finished. But here, both instances receive their data as soon as their respective responses come back, and then each instance does another `yield` for control transfer purposes. We then choose what order to resume them in the `Promise.all([ .. ])` handler.
+在前一个代码段中，第二个实例在第一个实例完全完成之前没有给出它的数据。但是这里，只要它们的应答一返回这两个实例就立即分别收到他们的数据，然后每个实例调用另一个`yield`来传送控制。最后我们在`Promise.all([ .. ])`的处理器中选择用什么样的顺序继续它们。
 
-What may not be as obvious is that this approach hints at an easier form for a reusable utility, because of the symmetry. We can do even better. Let's imagine using a utility called `runAll(..)`:
+可能不太明显的是，这种方式因其对称性启发了一种可复用工具的简单形式。让我们想象使用一个称为`runAll(..)`的工具：
 
 ```js
 // `request(..)` is a Promise-aware Ajax utility
@@ -1649,20 +1649,20 @@ runAll(
 );
 ```
 
-**Note:** We're not including a code listing for `runAll(..)` as it is not only long enough to bog down the text, but is an extension of the logic we've already implemented in `run(..)` earlier. So, as a good supplementary exercise for the reader, try your hand at evolving the code from `run(..)` to work like the imagined `runAll(..)`. Also, my *asynquence* library provides a previously mentioned `runner(..)` utility with this kind of capability already built in, and will be discussed in Appendix A of this book.
+**注意：** 我们没有包含`runAll(..)`的实现代码，不仅因为它长得无法行文，也因为它是一个我们已经在先前de `run(..)`中实现的逻辑的扩展。所以，作为留给读者的一个很好的补充性练习，请你自己动手改进`run(..)`的代码，来使它像想象中的`runAll(..)`那样工作。另外，我的 *asynquence* 库提供了一个前面提到过的`runner(..)`工具，它内建了这种能力，我们将在本书的附录A中讨论它。
 
-Here's how the processing inside `runAll(..)` would operate:
+这是`runAll(..)`内部的处理将如何操作：
 
-1. The first generator gets a promise for the first Ajax response from `"http://some.url.1"`, then `yield`s control back to the `runAll(..)` utility.
-2. The second generator runs and does the same for `"http://some.url.2"`, `yield`ing control back to the `runAll(..)` utility.
-3. The first generator resumes, and then `yield`s out its promise `p1`. The `runAll(..)` utility does the same in this case as our previous `run(..)`, in that it waits on that promise to resolve, then resumes the same generator (no control transfer!). When `p1` resolves, `runAll(..)` resumes the first generator again with that resolution value, and then `res[0]` is given its value. When the first generator then finishes, that's an implicit transfer of control.
-4. The second generator resumes, `yield`s out its promise `p2`, and waits for it to resolve. Once it does, `runAll(..)` resumes the second generator with that value, and `res[1]` is set.
+1. 第一个生成器得到一个代表从`"http://some.url.1"`来的Ajax应答，然后将控制`yield`回到`runAll(..)`工具。
+2. 第二个生成器运行，并对`"http://some.url.2"`做相同的事，将控制`yield`回到`runAll(..)`工具。
+3. 第一个生成器继续，然后`yield`出他的promise`p1`。在这种情况下`runAll(..)`工具和我们前面的`run(..)`做同样的事，它等待promise解析，然后继续这同一个生成器（没有控制传递！）。当`p1`解析时，`runAll(..)`使用解析值再一次继续第一个生成器，而后`res[0]`得到它的值。在第一个生成器完成之后，有一个隐式的控制传递。
+4. 第二个生成器继续，`yield`出它的promise`p2`，并等待它的解析。一旦`p2`解析，`runAll(..)`使用这个解析值继续第二个生成器，于是`res[1]`被设置。
 
-In this running example, we use an outer variable called `res` to store the results of the two different Ajax responses -- that's our concurrency coordination making that possible.
+在这个例子中，我们使用了一个称为`res`的外部变量来保存两个不同的Ajax应答的结果——这是我们的并发协调。
 
-But it might be quite helpful to further extend `runAll(..)` to provide an inner variable space for the multiple generator instances to *share*, such as an empty object we'll call `data` below. Also, it could take non-Promise values that are `yield`ed and hand them off to the next generator.
+但是这样做可能十分有帮助：进一步扩展`runAll(..)`使它为多个生成器实例提供 *分享的* 内部的变量作用域，比如一个我们将在下面称为`data`的空对象。另外，它可以接收被`yield`的非Promise值，并把它们交给下一个生成器。
 
-Consider:
+考虑这段代码：
 
 ```js
 // `request(..)` is a Promise-aware Ajax utility
@@ -1695,9 +1695,9 @@ runAll(
 );
 ```
 
-In this formulation, the two generators are not just coordinating control transfer, but actually communicating with each other, both through `data.res` and the `yield`ed messages that trade `url1` and `url2` values. That's incredibly powerful!
+在这个公式中，两个生成器不仅协调控制传递，实际上还互相通信：通过`data.res`，和交换`url1`与`url2`的值的`yield`消息。这强大到不可思议！
 
-Such realization also serves as a conceptual base for a more sophisticated asynchrony technique called CSP (Communicating Sequential Processes), which we will cover in Appendix B of this book.
+这样的认识也是一种更为精巧的称为CSP的异步技术的概念基础，我们将在本书的附录B中讨论它。
 
 ## Thunks
 
