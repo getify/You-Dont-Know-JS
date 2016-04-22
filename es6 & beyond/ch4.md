@@ -1,7 +1,10 @@
 # You Don't Know JS: ES6 & Beyond
+# 你不知道的JS：ES6和ES6之外
 # Chapter 4: Async Flow Control
+# 第四章：异步流程控制
 
 It's no secret if you've written any significant amount of JavaScript that asynchronous programming is a required skill. The primary mechanism for managing asynchrony has been the function callback.
+这已经不是什么秘密，如果你编写过任何大量的JavaScript代码,异步编程是一个必需的技能。管理异步的主要机制是回调函数。
 
 However, ES6 adds a new feature that helps address significant shortcomings in the callbacks-only approach to async: *Promises*. In addition, we can revisit generators (from the previous chapter) and see a pattern for combining the two that's a major step forward in async flow control programming in JavaScript.
 
