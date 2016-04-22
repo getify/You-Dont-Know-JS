@@ -1701,15 +1701,15 @@ runAll(
 
 ## Thunks
 
-So far, we've made the assumption that `yield`ing a Promise from a generator -- and having that Promise resume the generator via a helper utility like `run(..)` -- was the best possible way to manage asynchrony with generators. To be clear, it is.
+至此，我们都假定从一个生成器`yield`一个Promise——让这个Promise使用像`run(..)`这样的帮助工具来推进生成器——是管理使用生成器的异步处理的最佳方法。明白地说，它是的。
 
-But we skipped over another pattern that has some mildly widespread adoption, so in the interest of completeness we'll take a brief look at it.
+但是我们跳过了一个被轻微广泛使用的模式，为了完整性我们将简单地看一看它。
 
-In general computer science, there's an old pre-JS concept called a "thunk." Without getting bogged down in the historical nature, a narrow expression of a thunk in JS is a function that -- without any parameters -- is wired to call another function.
+在一般的计算机科学中，有一种老旧的前JS时代的概念，称为“thunk”。我们不在这里赘述它的历史，一个狭隘的表达是，thunk是一个JS函数——没有任何参数——它连接并调用另一个函数。
 
-In other words, you wrap a function definition around function call -- with any parameters it needs -- to *defer* the execution of that call, and that wrapping function is a thunk. When you later execute the thunk, you end up calling the original function.
+换句话讲，你用一个函数定义包装函数调用——带着它需要的所有参数——来 *推迟* 这个调用的执行，而这个包装用的函数就是thunk。当你稍后执行thunk时，你最终会调用那个原始的函数。
 
-For example:
+举个例子：
 
 ```js
 function foo(x,y) {
@@ -1725,9 +1725,9 @@ function fooThunk() {
 console.log( fooThunk() );	// 7
 ```
 
-So, a synchronous thunk is pretty straightforward. But what about an async thunk? We can essentially extend the narrow thunk definition to include it receiving a callback.
+所以，一个同步的thunk是十分直白的。但是一个异步的thunk呢？我们实质上可以扩展这个狭隘的thunk定义，让它接收一个回调。
 
-Consider:
+考虑这段代码：
 
 ```js
 function foo(x,y,cb) {
@@ -1747,11 +1747,11 @@ fooThunk( function(sum){
 } );
 ```
 
-As you can see, `fooThunk(..)` only expects a `cb(..)` parameter, as it already has values `3` and `4` (for `x` and `y`, respectively) pre-specified and ready to pass to `foo(..)`. A thunk is just waiting around patiently for the last piece it needs to do its job: the callback.
+如你所见，`fooThunk(..)`仅需要一个`cb(..)`参数，因为它已经预先制定了值`3`和`4`（分别为`x`和`y`）并准备传递给`foo(..)`。一个thunk只是在外面耐心地等待着它开始工作所需的最后一部分信息：回调。
 
-You don't want to make thunks manually, though. So, let's invent a utility that does this wrapping for us.
+但是你不会想要手动制造thunk。那么，让我们发明一个工具来为我们进行这种包装。
 
-Consider:
+考虑这段代码：
 
 ```js
 function thunkify(fn) {
@@ -1771,15 +1771,15 @@ fooThunk( function(sum) {
 } );
 ```
 
-**Tip:** Here we assume that the original (`foo(..)`) function signature expects its callback in the last position, with any other parameters coming before it. This is a pretty ubiquitous "standard" for async JS function standards. You might call it "callback-last style." If for some reason you had a need to handle "callback-first style" signatures, you would just make a utility that used `args.unshift(..)` instead of `args.push(..)`.
+**提示：** 这里我们假定原始的（`foo(..)`）函数签名希望它的回调的位置在最后，而其它的参数在这之前。这是一个异步JS函数的相当普遍的“标准”。你可以称它为“回调后置风格”。如果因为某些原因你需要处理“回调优先风格”的签名，你只需要制造一个使用`args.unshift(..)`而非`args.push(..)`的工具。
 
-The preceding formulation of `thunkify(..)` takes both the `foo(..)` function reference, and any parameters it needs, and returns back the thunk itself (`fooThunk(..)`). However, that's not the typical approach you'll find to thunks in JS.
+前面的`thunkify(..)`公式接收`foo(..)`函数的引用，和任何它所需的参数，并返回thunk本身（`fooThunk(..)`）。然而，这并不是你将在JS中发现的thunk的典型表达方式。
 
-Instead of `thunkify(..)` making the thunk itself, typically -- if not perplexingly -- the `thunkify(..)` utility would produce a function that produces thunks.
+与`thunkify(..)`制造thunk本身相反，典型的——可能有点儿让人困惑的——`thunkify(..)`工具将产生一个制造thunk的函数。
 
-Uhhhh... yeah.
+额...是的。
 
-Consider:
+考虑这段代码：
 
 ```js
 function thunkify(fn) {
@@ -1793,7 +1793,7 @@ function thunkify(fn) {
 }
 ```
 
-The main difference here is the extra `return function() { .. }` layer. Here's how its usage differs:
+这里主要的不同之处是有一个额外的`return function() { .. }`。这是它在用法上的不同：
 
 ```js
 var whatIsThis = thunkify( foo );
@@ -1807,9 +1807,9 @@ fooThunk( function(sum) {
 } );
 ```
 
-Obviously, the big question this snippet implies is what is `whatIsThis` properly called? It's not the thunk, it's the thing that will produce thunks from `foo(..)` calls. It's kind of like a "factory" for "thunks." There doesn't seem to be any kind of standard agreement for naming such a thing.
+明显地，这段代码隐含的最大的问题是，被调用的`whatIsThis`是什么？它不是thunk，它是一个从`foo(..)`调用生产thunk的东西。它是一种“thunk”的“工厂”。而且看起来没有任何标准的意见来命名这种东西。
 
-So, my proposal is "thunkory" ("thunk" + "factory").  So, `thunkify(..)` produces a thunkory, and a thunkory produces thunks. That reasoning is symmetric to my proposal for "promisory" in Chapter 3:
+所以，我的提案是“thunkory”（"thunk" + "factory"）。于是，`thunkify(..)`制造了一个thunkory，而一个thunkory制造thunks。这个道理与第三章中我的“promisory”提案是对称的：
 
 ```js
 var fooThunkory = thunkify( foo );
@@ -1828,11 +1828,11 @@ fooThunk2( function(sum) {
 } );
 ```
 
-**Note:** The running `foo(..)` example expects a style of callback that's not "error-first style." Of course, "error-first style" is much more common. If `foo(..)` had some sort of legitimate error-producing expectation, we could change it to expect and use an error-first callback. None of the subsequent `thunkify(..)` machinery cares what style of callback is assumed. The only difference in usage would be `fooThunk1(function(err,sum){..`.
+**注意：** 这个例子中的`foo(..)`期望的回调不是“错误优先风格”。当然，“错误优先风格”更常见。如果`foo(..)`有某种合理的错误发生机制，我们可以改变而使他期望并使用一个错误优先的回调。没有后续的`thunkify(..)`关心回调被预想成什么样。用法的唯一区别是`fooThunk1(function(err,sum){..`。
 
-Exposing the thunkory method -- instead of how the earlier `thunkify(..)` hides this intermediary step -- may seem like unnecessary complication. But in general, it's quite useful to make thunkories at the beginning of your program to wrap existing API methods, and then be able to pass around and call those thunkories when you need thunks. The two distinct steps preserve a cleaner separation of capability.
+暴露出thunkory方法——而不是像早先的`thunkify(..)`那样将中间步骤隐藏起来——可能看起来像是没必要的混乱。但是一般来讲，在你的程序一开始就制造一些thunkory来包装既存API的方法是十分有用的，然后你就可以在你需要thunk的时候传递并调用这些thunkory。这两个区别开的步骤保证了功能上更干净的分离。
 
-To illustrate:
+来描述一下的话：
 
 ```js
 // cleaner:
@@ -1846,19 +1846,19 @@ var fooThunk1 = thunkify( foo, 3, 4 );
 var fooThunk2 = thunkify( foo, 5, 6 );
 ```
 
-Regardless of whether you like to deal with the thunkories explicitly or not, the usage of thunks `fooThunk1(..)` and `fooThunk2(..)` remains the same.
+不管你是否愿意明确处理thunkory，thunk（`fooThunk1(..)`和`fooThunk2(..)`）的用法还是一样的。
 
 ### s/promise/thunk/
 
-So what's all this thunk stuff have to do with generators?
+那么所有这些thunk的东西与生成器有什么关系？
 
-Comparing thunks to promises generally: they're not directly interchangable as they're not equivalent in behavior. Promises are vastly more capable and trustable than bare thunks.
+一般性地比较一下thunk和promise：它们是不能直接互换的，因为它们在行为上不是等价的。比起单纯的thunk，Promise可用性更广泛，而且更可靠。
 
-But in another sense, they both can be seen as a request for a value, which may be async in its answering.
+但从另一种意义上讲，它们都可以被看作是对一个值的请求，这个请求可能被异步地应答。
 
-Recall from Chapter 3 we defined a utility for promisifying a function, which we called `Promise.wrap(..)` -- we could have called it `promisify(..)`, too! This Promise-wrapping utility doesn't produce Promises; it produces promisories that in turn produce Promises. This is completely symmetric to the thunkories and thunks presently being discussed.
+回忆第三章，我们定义了一个工具来promise化一个函数，我们称之为`Promise.wrap(..)`——我们本来也可以叫它`promisify(..)`的！这个Promise化包装工具不会生产Promise；它生产那些继而生产Promise的promisories。这和我们当前讨论的thunkory和thunk是完全对称的。
 
-To illustrate the symmetry, let's first alter the running `foo(..)` example from earlier to assume an "error-first style" callback:
+为了描绘这种对称性，让我们首先将`foo(..)`的例子改为假定一个“错误优先风格”回调的形式：
 
 ```js
 function foo(x,y,cb) {
@@ -1869,7 +1869,7 @@ function foo(x,y,cb) {
 }
 ```
 
-Now, we'll compare using `thunkify(..)` and `promisify(..)` (aka `Promise.wrap(..)` from Chapter 3):
+现在，我们将比较`thunkify(..)`和`promisify(..)`（也就是第三章的`Promise.wrap(..)`）：
 
 ```js
 // symmetrical: constructing the question asker
@@ -1902,11 +1902,11 @@ fooPromise
 );
 ```
 
-Both the thunkory and the promisory are essentially asking a question (for a value), and respectively the thunk `fooThunk` and promise `fooPromise` represent the future answers to that question. Presented in that light, the symmetry is clear.
+thunkory和promisory实质上都是在问一个问题（为一个值），thunk的`fooThunk`和promise的`fooPromise`分别代表这个问题的未来的答案。放在这样的阳光下，对称性就清楚了。
 
-With that perspective in mind, we can see that generators which `yield` Promises for asynchrony could instead `yield` thunks for asynchrony. All we'd need is a smarter `run(..)` utility (like from before) that can not only look for and wire up to a `yield`ed Promise but also to provide a callback to a `yield`ed thunk.
+带着这个角度的想法，我们可以看到为了异步而`yield`Promise的生成器，也可以为异步而`yield`thunk。我们需要的只是一个更聪明的`run(..)`工具（就像以前一样），他不仅可以寻找并连接一个被`yield`的Promise，而且可以给一个被`yield`的thunk提供回调。
 
-Consider:
+考虑这段代码：
 
 ```js
 function *foo() {
@@ -1917,9 +1917,9 @@ function *foo() {
 run( foo );
 ```
 
-In this example, `request(..)` could either be a promisory that returns a promise, or a thunkory that returns a thunk. From the perspective of what's going on inside the generator code logic, we don't care about that implementation detail, which is quite powerful!
+在这个例子中，`request(..)`既可以是一个返回一个promise的promisory，也可以是一个返回一个thunk的thunkory。从生成器的内部代码逻辑的角度看，我们不关心这个实现细节，这就它强大的地方！
 
-So, `request(..)` could be either:
+所以，`request(..)`可以使以下任何一种形式：
 
 ```js
 // promisory `request(..)` (see Chapter 3)
@@ -1931,7 +1931,7 @@ var request = Promise.wrap( ajax );
 var request = thunkify( ajax );
 ```
 
-Finally, as a thunk-aware patch to our earlier `run(..)` utility, we would need logic like this:
+最后，作为一个让我们早先的`run(..)`工具支持thunk的补丁，我们可能会需要这样的逻辑：
 
 ```js
 // ..
@@ -1960,29 +1960,29 @@ else if (typeof next.value == "function") {
 }
 ```
 
-Now, our generators can either call promisories to `yield` Promises, or call thunkories to `yield` thunks, and in either case, `run(..)` would handle that value and use it to wait for the completion to resume the generator.
+现在，我们生成器既可以调用promisory来`yield`Promise，也可以调用thunkory来`yield`thunk，而不论那种情况，`run(..)`都将处理这个值并等待它的完成，以继续生成器。
 
-Symmetry wise, these two approaches look identical. However, we should point out that's true only from the perspective of Promises or thunks representing the future value continuation of a generator.
+在对称性上，这两个方式是看起来相同的。然而，我们应当指出这仅仅从Promise或thunk表示延续生成器的未来值的角度讲是成立的。
 
-From the larger perspective, thunks do not in and of themselves have hardly any of the trustability or composability guarantees that Promises are designed with. Using a thunk as a stand-in for a Promise in this particular generator asynchrony pattern is workable but should be seen as less than ideal when compared to all the benefits that Promises offer (see Chapter 3).
+从更大的角度讲，与Promise被设计成的那样不同，thunk没有提供，它们本身也几乎没有任何可靠性和可组合性的保证。在这种特定的生成器异步模式下使用一个thunk作为Promise的替代品是可以工作的，但与Promise提供的所有好处相比，这应当被看做是一种次理想的方法。
 
-If you have the option, prefer `yield pr` rather than `yield th`. But there's nothing wrong with having a `run(..)` utility which can handle both value types.
+如果你有选择，那就偏向`yield pr`而非`yield th`。但是使`run(..)`工具可以处理两种类型的值本身没有什么问题。
 
-**Note:** The `runner(..)` utility in my *asynquence* library, which will be discussed in Appendix A, handles `yield`s of Promises, thunks and *asynquence* sequences.
+**注意：** 在我的 *asynquence* 库中的`runner(..)`工具，可以处理`yield`的Promise，thunk和 *asynquence* 序列。
 
 ## Pre-ES6 Generators
 
-You're hopefully convinced now that generators are a very important addition to the async programming toolbox. But it's a new syntax in ES6, which means you can't just polyfill generators like you can Promises (which are just a new API). So what can we do to bring generators to our browser JS if we don't have the luxury of ignoring pre-ES6 browsers?
+我希望你已经被说服了，生成器是一个对异步编程工具箱的非常重要的增益。但它是ES6中的新语法，这意味着你不能像填补Promise（它只是新的API）那样填补生成器。那么如果我们不能奢望忽略前ES6时代的浏览器，我们该如何将生成器带到浏览器中呢？
 
-For all new syntax extensions in ES6, there are tools -- the most common term for them is transpilers, for trans-compilers -- which can take your ES6 syntax and transform it into equivalent (but obviously uglier!) pre-ES6 code. So, generators can be transpiled into code that will have the same behavior but work in ES5 and below.
+对所有ES6中的新语法的扩展，有一些工具——称呼他们最常见的名词是转译器（transpilers），也就是转换编译器（trans-compilers）——它们会拿起你的ES6语法，并转换为前ES6时代的等价代码（但是明显地变难看了！）。所以，生成器可以被转译为具有相同行为但可以在ES5或以下版本进行工作的代码。
 
-But how? The "magic" of `yield` doesn't obviously sound like code that's easy to transpile. We actually hinted at a solution in our earlier discussion of closure-based *iterators*.
+但是怎么做？`yield`的“魔法”听起来不像是那么容易转译的。在我们早先的基于闭包的 *迭代器* 例子中，实际上提示了一种解决方法。
 
 ### Manual Transformation
 
-Before we discuss the transpilers, let's derive how manual transpilation would work in the case of generators. This isn't just an academic exercise, because doing so will actually help further reinforce how they work.
+在我们讨论转译器之前，让我们延伸一下，在生成器的情况下手动转译如何工作。这不仅是一个学院派的练习，因为这样做实际上可以帮助我们进一步理解它们如何工作。
 
-Consider:
+考虑这段代码：
 
 ```js
 // `request(..)` is a Promise-aware Ajax utility
@@ -2002,7 +2002,7 @@ function *foo(url) {
 var it = foo( "http://some.url.1" );
 ```
 
-The first thing to observe is that we'll still need a normal `foo()` function that can be called, and it will still need to return an *iterator*. So, let's sketch out the non-generator transformation:
+第一个要注意的事情是，我们仍然需要一个可以被调用的普通的`foo()`函数，而且它仍然需要返回一个 *迭代器*。那么让我们来画出非生成器的变形：
 
 ```js
 function foo(url) {
@@ -2023,7 +2023,7 @@ function foo(url) {
 var it = foo( "http://some.url.1" );
 ```
 
-The next thing to observe is that a generator does its "magic" by suspending its scope/state, but we can emulate that with function closure (see the *Scope & Closures* title of this series). To understand how to write such code, we'll first annotate different parts of our generator with state values:
+下一个需要注意的是，生成器通过挂起它的作用域/状态来施展它的“魔法”，但我们可以用函数闭包来模拟。为了理解如何写出这样的代码，我们将先用状态值注释生成器不同的部分：
 
 ```js
 // `request(..)` is a Promise-aware Ajax utility
@@ -2047,11 +2047,11 @@ function *foo(url) {
 }
 ```
 
-**Note:** For more accurate illustration, we split up the `val = yield request..` statement into two parts, using the temporary `TMP1` variable. `request(..)` happens in state `*1*`, and the assignment of its completion value to `val` happens in state `*2*`. We'll get rid of that intermediate `TMP1` when we convert the code to its non-generator equivalent.
+**注意：** 为了更准去地讲解，我们使用`TMP1`变量将`val = yield request..`语句分割为两部分。`request(..)`发生在状态`*1*`，而将完成值赋给`val`发生在状态`*2*`。在我们将代码转换为非生成器的等价物后，我们就可以摆脱中间的`TMP1`。
 
-In other words, `*1*` is the beginning state, `*2*` is the state if the `request(..)` succeeds, and `*3*` is the state if the `request(..)` fails. You can probably imagine how any extra `yield` steps would just be encoded as extra states.
+换句话所，`*1*`是初始状态，`*2*`是`request(..)`成功的状态，`*3*`是`request(..)`失败的状态。你可能会想象额外的`yield`步骤将如何编码为额外的状态。
 
-Back to our transpiled generator, let's define a variable `state` in the closure we can use to keep track of the state:
+回到我们的转译的生成器，让我们在这个闭包中定义一个变量`state`，用它来追踪状态：
 
 ```js
 function foo(url) {
@@ -2062,7 +2062,7 @@ function foo(url) {
 }
 ```
 
-Now, let's define an inner function called `process(..)` inside the closure which handles each state, using a `switch` statement:
+现在，让我们在闭包内部定义一个称为`process(..)`的内部函数，它用`switch`语句来处理各种状态。
 
 ```js
 // `request(..)` is a Promise-aware Ajax utility
@@ -2094,13 +2094,13 @@ function foo(url) {
 }
 ```
 
-Each state in our generator is represented by its own `case` in the `switch` statement. `process(..)` will be called each time we need to process a new state. We'll come back to how that works in just a moment.
+在我们的生成器中每种状态都在`switch`语句中有它自己的`case`。每当我们需要处理一个新状态时，`process(..)`就会被调用。我们一会就回来讨论它如何工作。
 
-For any generator-wide variable declarations (`val`), we move those to a `var` declaration outside of `process(..)` so they can survive multiple calls to `process(..)`. But the "block scoped" `err` variable is only needed for the `*3*` state, so we leave it in place.
+对任何生成器范围的变量声明（`val`），我们将它们移动到`process(..)`外面的`var`生命中，这样它们就可以在`process(..)`的多次调用中存活下来。但是“块儿作用域”的`err`变量仅在`*3*`状态下需要，所以我们将它留在原处。
 
-In state `*1*`, instead of `yield request(..)`, we did `return request(..)`. In terminal state `*2*`, there was no explicit `return`, so we just do a `return;` which is the same as `return undefined`. In terminal state `*3*`, there was a `return false`, so we preserve that.
+在状态`*1*`，与`yield request(..)`相反，我们`return request(..)`。在终结状态`*2*`，没有明确的`return`，所以我们仅仅`return;`也就是`return undefined`。在终结状态`*3*`，有一个`return false`，我们保留它。
 
-Now we need to define the code in the *iterator* functions so they call `process(..)` appropriately:
+现在我们需要定义 *迭代器* 函数的代码，以便人们恰当地调用`process(..)`：
 
 ```js
 function foo(url) {
@@ -2173,25 +2173,25 @@ function foo(url) {
 }
 ```
 
-How does this code work?
+这段代码如何工作？
 
-1. The first call to the *iterator*'s `next()` call would move the generator from the uninitialized state to state `1`, and then call `process()` to handle that state. The return value from `request(..)`, which is the promise for the Ajax response, is returned back as the `value` property from the `next()` call.
-2. If the Ajax request succeeds, the second call to `next(..)` should send in the Ajax response value, which moves our state to `2`. `process(..)` is again called (this time with the passed in Ajax response value), and the `value` property returned from `next(..)` will be `undefined`.
-3. However, if the Ajax request fails, `throw(..)` should be called with the error, which would move the state from `1` to `3` (instead of `2`). Again `process(..)` is called, this time with the error value. That `case` returns `false`, which is set as the `value` property returned from the `throw(..)` call.
+1. 第一个对 *迭代器* 的`next()`调用将把生成器从未初始化的状态移动到状态`1`，然后调用`process()`来处理这个状态。`request(..)`的返回值是一个代表Ajax应答的promise，它作为`value`属性从`next()`调用被返回。
+2. 如果Ajax请求成功，第二个`next(..)`调用应当送进Ajax的应答值，它将我们的状态移动到`2`。`process(..)`再次被调用（这次它被传入Ajax应答的值），而从`next(..)`返回的`value`属性将是`undefined`。
+3. 然而，如果Ajax请求失败，应当用错误调用`throw(..)`，它将状态从`1`移动到`3`（而不是`2`）。`process(..)`再一次被调用，这词被传入了错误的值。这个`case`返回`false`，所以`false`作为`throw(..)`调用返回的`value`属性。
 
-From the outside -- that is, interacting only with the *iterator* -- this `foo(..)` normal function works pretty much the same as the `*foo(..)` generator would have worked. So we've effectively "transpiled" our ES6 generator to pre-ES6 compatibility!
+从外面看——也就是仅仅与 *迭代器* 互动——这个普通的`foo(..)`函数与`*foo(..)`生成器的工作方式是一样的。所以我们有效地将ES6生成器“转译”为前ES6可兼容的！
 
-We could then manually instantiate our generator and control its iterator -- calling `var it = foo("..")` and `it.next(..)` and such -- or better, we could pass it to our previously defined `run(..)` utility as `run(foo,"..")`.
+然后我么就可以手动初始化我们的生成器并控制它的迭代器——调用`var it = foo("..")`和`it.next(..)`等等——或更好地，我们可以将它传递给我们先前定义的`run(..)`工具，比如`run(foo,"..")`。
 
 ### Automatic Transpilation
 
-The preceding exercise of manually deriving a transformation of our ES6 generator to pre-ES6 equivalent teaches us how generators work conceptually. But that transformation was really intricate and very non-portable to other generators in our code. It would be quite impractical to do this work by hand, and would completely obviate all the benefit of generators.
+前面的练习——手动编写从ES6生成器到前ES6的等价物的变形过程——教会了我们生成器在概念上是如何工作的。但是这种变形真的是错综复杂，而且完全不能移植到我们代码中的其他生成器上。手动做这些工作是不切实际的，而且将会把生成器的好处完全消除掉。
 
-But luckily, several tools already exist that can automatically convert ES6 generators to things like what we derived in the previous section. Not only do they do the heavy lifting work for us, but they also handle several complications that we glossed over.
+但走运的是，已经存在几种工具可以自动地将ES6生成器转换为我们在前一节延伸出的东西。它们不仅帮我们做力气活儿，还可以处理几种我们敷衍而过的情况。
 
-One such tool is regenerator (https://facebook.github.io/regenerator/), from the smart folks at Facebook.
+一个这样的工具是regenerator（https://facebook.github.io/regenerator/），由Facebook的聪明伙计们开发的。
 
-If we use regenerator to transpile our previous generator, here's the code produced (at the time of this writing):
+如果我们用regenerator来转译我们前面的生成器，这就是产生的代码（在编写本文时）：
 
 ```js
 // `request(..)` is a Promise-aware Ajax utility
@@ -2224,24 +2224,24 @@ var foo = regeneratorRuntime.mark(function foo(url) {
 });
 ```
 
-There's some obvious similarities here to our manual derivation, such as the `switch` / `case` statements, and we even see `val` pulled out of the closure just as we did.
+这和我们的手动推导有明显的相似性，比如`switch`/`case`语句，而且我们甚至可以到，正如我们做的那样`val`被拉到了闭包外面。
 
-Of course, one trade-off is that regenerator's transpilation requires a helper library `regeneratorRuntime` that holds all the reusable logic for managing a general generator / *iterator*. A lot of that boilerplate looks different than our version, but even then, the concepts can be seen, like with `context$1$0.next = 4` keeping track of the next state for the generator.
+当然，一个代价是这个生成器的转译需要一个帮助工具库`regeneratorRuntime`，它持有全部管理一个普通生成器/*迭代器* 所需的可复用逻辑。它的许多模板代码看起来和我们的版本不同，但即便如此，概念还是可以看到的，比如使用`context$1$0.next = 4`追踪生成器的下一个状态。
 
-The main takeaway is that generators are not restricted to only being useful in ES6+ environments. Once you understand the concepts, you can employ them throughout your code, and use tools to transform the code to be compatible with older environments.
+主要的结论是，生成器不仅限于ES6+的环境中才有用。一旦你理解了它的概念，你可以在你的全部代码中利用他们，并使用工具将代码变形为旧环境兼容的。
 
-This is more work than just using a `Promise` API polyfill for pre-ES6 Promises, but the effort is totally worth it, because generators are so much better at expressing async flow control in a reason-able, sensible, synchronous-looking, sequential fashion.
+这比使用`Promise`API的填补来实现前ES6的Promise要做更多的工作，但是努力完全是值得的，因为对于以一种可推理的，合理的，看似同步的顺序风格来表达异步流程控制来说，生成器实在是好太多了。
 
-Once you get hooked on generators, you'll never want to go back to the hell of async spaghetti callbacks!
+一旦你适应了生成器，你将永远不会回到面条般的回调地狱了！
 
 ## Review
 
-Generators are a new ES6 function type that does not run-to-completion like normal functions. Instead, the generator can be paused in mid-completion (entirely preserving its state), and it can later be resumed from where it left off.
+生成器是一种ES6的新函数类型，它不像普通函数那样运行至完成。相反，生成器可以暂停在一种中间完成状态（完整地保留它的状态），而且它可以从暂停的地方重新开始。
 
-This pause/resume interchange is cooperative rather than preemptive, which means that the generator has the sole capability to pause itself, using the `yield` keyword, and yet the *iterator* that controls the generator has the sole capability (via `next(..)`) to resume the generator.
+这种暂停/继续的互换是一种协作而非抢占，这意味着生成器拥有的唯一能力是暂停它自己，使用`yield`关键字，而且控制这个生成器的 *迭代器* 拥有的唯一能力是继续这个生成器（通过`next(..)`）。
 
-The `yield` / `next(..)` duality is not just a control mechanism, it's actually a two-way message passing mechanism. A `yield ..` expression essentially pauses waiting for a value, and the next `next(..)` call passes a value (or implicit `undefined`) back to that paused `yield` expression.
+`yield`/`next(..)`的对偶不仅是一种控制机制，它实际上是一种双向消息传递机制。一个`yield ..`表达式实质上为了等待一个值而暂停，而下一个`next(..)`调用将把值（或隐含的`undefined`）传递回这个暂停的`yield`表达式。
 
-The key benefit of generators related to async flow control is that the code inside a generator expresses a sequence of steps for the task in a naturally sync/sequential fashion. The trick is that we essentially hide potential asynchrony behind the `yield` keyword -- moving the asynchrony to the code where the generator's *iterator* is controlled.
+与异步流程控制关联的生成器的主要好处是，在一个生成器内部的代码以一种自然的同步/顺序风格表达一个任务的各个步骤的序列。这其中的技巧是我们实质上将潜在的异步处理隐藏在`yield`关键字的后面——将异步处理移动到控制生成器的 *迭代器* 代码中。
 
-In other words, generators preserve a sequential, synchronous, blocking code pattern for async code, which lets our brains reason about the code much more naturally, addressing one of the two key drawbacks of callback-based async.
+换句话说，生成器为异步代码保留了顺序的，同步的，阻塞的代码模式，这允许我们的大脑更自然地推理代码，解决了基于回调的异步产生的两个关键问题中的一个。
