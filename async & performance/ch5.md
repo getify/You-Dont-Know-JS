@@ -1,55 +1,55 @@
-# You Don't Know JS: Async & Performance
-# Chapter 5: Program Performance
+# 你不懂JS: 异步与性能
+# 第五章: 程序性能
 
-This book so far has been all about how to leverage asynchrony patterns more effectively. But we haven't directly addressed why asynchrony really matters to JS. The most obvious explicit reason is **performance**.
+这本书至此一直是关于如何更有效地利用异步模式。但是我们还没有直接解释为什么异步对于JS如此重要。最明显明确的理由就是 **性能**。
 
-For example, if you have two Ajax requests to make, and they're independent, but you need to wait on them both to finish before doing the next task, you have two options for modeling that interaction: serial and concurrent.
+举个例子，如果你要发起两个Ajax请求，而且他们是独立的，但你在进行下一个任务之前需要等到他们全部完成，你就有两种选择来对这种互动建模：顺序和并发。
 
-You could make the first request and wait to start the second request until the first finishes. Or, as we've seen both with promises and generators, you could make both requests "in parallel," and express the "gate" to wait on both of them before moving on.
+你可以发起第一个请求并等到它完成再发起第二个请求。或者，就像我们在promise和generator中看到的那样，你可以“并列地”发起两个请求，并在继续下一步之前让一个“门”等待它们全部完成。
 
-Clearly, the latter is usually going to be more performant than the former. And better performance generally leads to better user experience.
+显然，后者要比前者性能更好。更好的性能一般都会带来更好的用户体验。
 
-It's even possible that asynchrony (interleaved concurrency) can improve just the perception of performance, even if the overall program still takes the same amount of time to complete. User perception of performance is every bit -- if not more! -- as important as actual measurable performance.
+异步（并发穿插）甚至可能仅仅增强高性能的印象，就算整个程序依然要用相同的时间才成完成。用户对性能的印象就是一切——如果没有别的的话！——和实际可测量的性能一样重要。
 
-We want to now move beyond localized asynchrony patterns to talk about some bigger picture performance details at the program level.
+现在，我们想超越局部的异步模式，转而在程序级别的水平上讨论一些宏观的性能细节。
 
-**Note:** You may be wondering about micro-performance issues like if `a++` or `++a` is faster. We'll look at those sorts of performance details in the next chapter on "Benchmarking & Tuning."
+**注意：** 你肯能会想知道关于微性能问题比如`a++`与`++a`哪个更快。我们会在下一章“基准分析与调优”中讨论这类性能细节。
 
 ## Web Workers
 
-If you have processing-intensive tasks but you don't want them to run on the main thread (which may slow down the browser/UI), you might have wished that JavaScript could operate in a multithreaded manner.
+如果你有一些计算敏感的任务，但你不想让它们在主线程上运行（那样会使浏览器/UI变慢），你可能会希望JavaScript可以以多线程的方式操作。
 
-In Chapter 1, we talked in detail about how JavaScript is single threaded. And that's still true. But a single thread isn't the only way to organize the execution of your program.
+在第一章中，我们详细地谈到了关于JavaScript如何是单线程的。那仍然是成立的。但是单线程不是组织你程序运行的唯一方法。
 
-Imagine splitting your program into two pieces, and running one of those pieces on the main UI thread, and running the other piece on an entirely separate thread.
+想象将你的程序分割成两块儿，在UI主线程上运行其中的一块儿，而在一个完全分离的线程上运行另一块儿。
 
-What kinds of concerns would such an architecture bring up?
+这样的结构会引发什么我们需要关心的问题？
 
-For one, you'd want to know if running on a separate thread meant that it ran in parallel (on systems with multiple CPUs/cores) such that a long-running process on that second thread would **not** block the main program thread. Otherwise, "virtual threading" wouldn't be of much benefit over what we already have in JS with async concurrency.
+其一，你会想知道运行在一个分离的线程上是否意味着它在并行运行（在多CPU/内核的系统上），而在第二个线程上长时间运行的处理将 **不会** 阻塞主程序线程。否则，“虚拟线程”所带来的好处，不会比我们已经在异步并发的JS中得到的更多。
 
-And you'd want to know if these two pieces of the program have access to the same shared scope/resources. If they do, then you have all the questions that multithreaded languages (Java, C++, etc.) deal with, such as needing cooperative or preemptive locking (mutexes, etc.). That's a lot of extra work, and shouldn't be undertaken lightly.
+而且你会想知道这两块儿程序是否访问共享的作用域/资源。如果是，那么你就要对付多线程语言（Java，C++等等）的所有问题，比如协作式或抢占式锁定（mutexes等）。这是很多额外的工作，而且不应当轻易着手。
 
-Alternatively, you'd want to know how these two pieces could "communicate" if they couldn't share scope/resources.
+换一个角度，如果这两块儿程序不能共享作用域/资源，你会想知道它们将如何“通信”。
 
-All these are great questions to consider as we explore a feature added to the web platform circa HTML5 called "Web Workers." This is a feature of the browser (aka host environment) and actually has almost nothing to do with the JS language itself. That is, JavaScript does not *currently* have any features that support threaded execution.
+随着我们探索一个在近HTML5时代被加入web平台，称为“Web Worker”的特性，这些都是我们要考虑的大问题。这是一个浏览器（也就是宿主环境）特性，而且几乎和JS语言本身没有任何关系。也就是，JavaScript并没有任何平行的特性来支持线程运行。
 
-But an environment like your browser can easily provide multiple instances of the JavaScript engine, each on its own thread, and let you run a different program in each thread. Each of those separate threaded pieces of your program is called a "(Web) Worker." This type of parallelism is called "task parallelism," as the emphasis is on splitting up chunks of your program to run in parallel.
+但是一个像你的浏览器那样的环境可以很容易地提供多个JavaScript引擎实例，每个都在自己的线程上，并允许你在每个线程上运行不同的程序。你的程序中分离的线程块儿中的每一个都成为一个“（Web）Worker”。这种并行机制称为“任务并行机制”，它强调将你的程序分割成块儿来并行运行。
 
-From your main JS program (or another Worker), you instantiate a Worker like so:
+在你的主JS程序（或另一个Worker）中，你可以这样初始化一个Worker：
 
 ```js
 var w1 = new Worker( "http://some.url.1/mycoolworker.js" );
 ```
 
-The URL should point to the location of a JS file (not an HTML page!) which is intended to be loaded into a Worker. The browser will then spin up a separate thread and let that file run as an independent program in that thread.
+这个URL应当指向JS文件的位置（不是一个HTML网页！），它将会被加载到一个Worker。然后浏览器会启动一个分离的线程，然这个文件在这个线程上作为独立的程序运行。
 
-**Note:** The kind of Worker created with such a URL is called a "Dedicated Worker." But instead of providing a URL to an external file, you can also create an "Inline Worker" by providing a Blob URL (another HTML5 feature); essentially it's an inline file stored in a single (binary) value. However, Blobs are beyond the scope of what we'll discuss here.
+**注意：** 这种用这样的URL创建的Worker称为“专用（Dedicated）Wroker”。但与提供一个外部文件的URL相反，你也可以通过提供一个Blob URL（另一个HTML5特性）来创建一个“内联（Inline）Worker”；它实质上是一个存储在一个单一（二进制）值中的内联文件。但是，Blob超出了我们要在这里讨论的范围。
 
-Workers do not share any scope or resources with each other or the main program -- that would bring all the nightmares of threaded programming to the forefront -- but instead have a basic event messaging mechanism connecting them.
+Worker不会相互，或者与主程序共享任何作用域或资源——那会将所有的多线程编程噩梦带到前沿——取而代之的是连接它们的基本事件消息机制。
 
-The `w1` Worker object is an event listener and trigger, which lets you subscribe to events sent by the Worker as well as send events to the Worker.
+`w1`Worker对象是一个事件监听器和触发器，它允许你监听Worker发出的事件也允许向Worker发送事件。
 
-Here's how to listen for events (actually, the fixed `"message"` event):
+这是如何监听事件（实际上，是固定的`"message"`事件）：
 
 ```js
 w1.addEventListener( "message", function(evt){
@@ -57,13 +57,13 @@ w1.addEventListener( "message", function(evt){
 } );
 ```
 
-And you can send the `"message"` event to the Worker:
+而且你可以发送`"message"`事件给Worker：
 
 ```js
 w1.postMessage( "something cool to say" );
 ```
 
-Inside the Worker, the messaging is totally symmetrical:
+在Worker内部，消息是完全对称的：
 
 ```js
 // "mycoolworker.js"
@@ -75,55 +75,55 @@ addEventListener( "message", function(evt){
 postMessage( "a really cool reply" );
 ```
 
-Notice that a dedicated Worker is in a one-to-one relationship with the program that created it. That is, the `"message"` event doesn't need any disambiguation here, because we're sure that it could only have come from this one-to-one relationship -- either it came from the Worker or the main page.
+要注意的是，一个专用Worker与它创建的程序是一对一的关系。也就是，`"message"`事件不需要消除任何歧义，因为我们可以确定他来自于这种一对一关系——不是从Wroker来的，就是从主页面来的。
 
-Usually the main page application creates the Workers, but a Worker can instantiate its own child Worker(s) -- known as subworkers -- as necessary. Sometimes this is useful to delegate such details to a sort of "master" Worker that spawns other Workers to process parts of a task. Unfortunately, at the time of this writing, Chrome still does not support subworkers, while Firefox does.
+通常主页面的程序会创建Worker，但是一个Worker可以根据需要初始化它自己的子Worker——称为subworker。有时将这样的细节委托给一种可以生成其他Worker来处理任务的一部分的“主”Worker十分有用。不幸的是，在本书写作的时候，Chrome还没有支持subworker，然而Firefox支持。
 
-To kill a Worker immediately from the program that created it, call `terminate()` on the Worker object (like `w1` in the previous snippets). Abruptly terminating a Worker thread does not give it any chance to finish up its work or clean up any resources. It's akin to you closing a browser tab to kill a page.
+要从创建一个Worker的程序中立即杀死它，在Worker对象（就像前一个代码段中的`w1`）上调用`terminate()`。突然终结一个Worker线程不会给它任何机会结束它的工作，或清理任何资源。这和你关闭浏览器的标签页来杀死一个页面相似。
 
-If you have two or more pages (or multiple tabs with the same page!) in the browser that try to create a Worker from the same file URL, those will actually end up as completely separate Workers. Shortly, we'll discuss a way to "share" a Worker.
+如果你在浏览器中有两个或多个页面（或者同一个页面有多个标签页！），它们试着从同一个文件URL中创建Worker，实际上最终结果是完全分离的Worker。待一会儿我们就会讨论“共享”Worker的方法。
 
-**Note:** It may seem like a malicious or ignorant JS program could easily perform a denial-of-service attack on a system by spawning hundreds of Workers, seemingly each with their own thread. While it's true that it's somewhat of a guarantee that a Worker will end up on a separate thread, this guarantee is not unlimited. The system is free to decide how many actual threads/CPUs/cores it really wants to create. There's no way to predict or guarantee how many you'll have access to, though many people assume it's at least as many as the number of CPUs/cores available. I think the safest assumption is that there's at least one other thread besides the main UI thread, but that's about it.
+**注意：** 看起来一个恶意的或者是无知的JS程序可以很容易地通过在系统上生成数百个Worker来发起拒绝服务攻击（Dos攻击），看起来每个都在自己的线程上。虽然一个Worker将会在一个分离的线程上终结是有某种保证的，但这种保证不是无限的。系统可以自由决定有多少实际的线程/CPU/内核要去创建。没有办法预测或保证你能访问多少，虽然很多人假定它至少和可用的CPU/内核数一样多。我认为最安全的臆测是，除了主UI线程外至少有一个线程，仅此而已。
 
 ### Worker Environment
 
-Inside the Worker, you do not have access to any of the main program's resources. That means you cannot access any of its global variables, nor can you access the page's DOM or other resources. Remember: it's a totally separate thread.
+在Worker内部，你不能访问主程序的任何资源。这意味着你不能访问它的任何全局变量，你也不能访问页面的DOM或其他资源。记住：它是一个完全分离的线程。
 
-You can, however, perform network operations (Ajax, WebSockets) and set timers. Also, the Worker has access to its own copy of several important global variables/features, including `navigator`, `location`, `JSON`, and `applicationCache`.
+然而，你可以实施网络操作（Ajax，WebSocket）和设置定时器。另外，Worker可以访问它自己的几个重要全局变量/特性的拷贝，包括`navigator`，`location`，`JSON`，和`applicationCache`。
 
-You can also load extra JS scripts into your Worker, using `importScripts(..)`:
+你也可以加载额外的JS脚本到你的Worker中，使用`importScripts(..)`：
 
 ```js
 // inside the Worker
 importScripts( "foo.js", "bar.js" );
 ```
 
-These scripts are loaded synchronously, which means the `importScripts(..)` call will block the rest of the Worker's execution until the file(s) are finished loading and executing.
+这些脚本会被同步地加载，这意味着在文件完成加载和运行之前，`importScripts(..)`调用会阻塞Worker其他的执行。
 
-**Note:** There have also been some discussions about exposing the `<canvas>` API to Workers, which combined with having canvases be Transferables (see the "Data Transfer" section), would allow Workers to perform more sophisticated off-thread graphics processing, which can be useful for high-performance gaming (WebGL) and other similar applications. Although this doesn't exist yet in any browsers, it's likely to happen in the near future.
+**注意：** 还有一些关于暴露`<canvas>`API给Worker的讨论，包含着使canvas成为Transferable（见“数据传送”一节），这将允许Worker来实施一些精细的脱线程绘图处理，在高性能的游戏（WebGL）和其他类似应用中可能很有用。虽然这在任何浏览器中都还不存在，但是很有可能在近未来发生。
 
-What are some common uses for Web Workers?
+Web Worker的常见用法是什么？
 
-* Processing intensive math calculations
-* Sorting large data sets
-* Data operations (compression, audio analysis, image pixel manipulations, etc.)
-* High-traffic network communications
+* 处理敏感的数学计算
+* 大数据集合的排序
+* 数据操作（压缩，音频分析，图像像素操作等等）
+* 高流量网络通信
 
 ### Data Transfer
 
-You may notice a common characteristic of most of those uses, which is that they require a large amount of information to be transferred across the barrier between threads using the event mechanism, perhaps in both directions.
+你可能注意到了这些用法中的大多数的一个共同性质，就是它们要求使用事件机制穿越线程间的壁垒来传递大量的信息，也许是双向的。
 
-In the early days of Workers, serializing all data to a string value was the only option. In addition to the speed penalty of the two-way serializations, the other major negative was that the data was being copied, which meant a doubling of memory usage (and the subsequent churn of garbage collection).
+在Worker的早期，将所有数据序列化为字符串是唯一的选择。除了在两个方向上进行序列化时速度上受到的惩罚，另外一个主要缺点是，数据是被拷贝的，这意味着内存用量的翻倍（以及在后续垃圾回收上的流失）。
 
-Thankfully, we now have a few better options.
+谢天谢地，现在我们有了几个更好的选择。
 
-If you pass an object, a so-called "Structured Cloning Algorithm" (https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/The_structured_clone_algorithm) is used to copy/duplicate the object on the other side. This algorithm is fairly sophisticated and can even handle duplicating objects with circular references. The to-string/from-string performance penalty is not paid, but we still have duplication of memory using this approach. There is support for this in IE10 and above, as well as all the other major browsers.
+如果你传递一个对象，在另一端一个所谓的“结构化克隆算法（Structured Cloning Algorithm）”（https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/The_structured_clone_algorithm）会用于拷贝/复制这个对象。这个算法相当精巧，甚至可以处理循环引用的对象复制。to-string/from-string的性能低下没有了，但用这种方式我们依然面对这内存用量的翻倍。IE10以上版本，和其他主流浏览器都对此有支持。
 
-An even better option, especially for larger data sets, is "Transferable Objects" (http://updates.html5rocks.com/2011/12/Transferable-Objects-Lightning-Fast). What happens is that the object's "ownership" is transferred, but the data itself is not moved. Once you transfer away an object to a Worker, it's empty or inaccessible in the originating location -- that eliminates the hazards of threaded programming over a shared scope. Of course, transfer of ownership can go in both directions.
+一个更好的选择，特别是对大的数据集合而言，是“Transferable对象”（http://updates.html5rocks.com/2011/12/Transferable-Objects-Lightning-Fast）。它发生的是对象的“所有权”被传送了，而对象本身没动。一旦你传送一个对象给Worker，它在原来的位置就空了出来或者不可访问——这消除了共享作用域的多线程编程中的灾难。当然，所有权的传送可以双向进行。
 
-There really isn't much you need to do to opt into a Transferable Object; any data structure that implements the Transferable interface (https://developer.mozilla.org/en-US/docs/Web/API/Transferable) will automatically be transferred this way (support Firefox & Chrome).
+选择使用Transferable对象不需要你做太多；任何实现了Transferable接口（https://developer.mozilla.org/en-US/docs/Web/API/Transferable）的数据结构都将自动地以这种方式传递（Firefox和Chrome支持此特性）。
 
-For example, typed arrays like `Uint8Array` (see the *ES6 & Beyond* title of this series) are "Transferables." This is how you'd send a Transferable Object using `postMessage(..)`:
+举个例子，有类型的数组如`Uint8Array`（见本系列的 *ES6与未来*）是一个“Transferables”。这是你如何用`postMessage(..)`来传送一个Transferable对象：
 
 ```js
 // `foo` is a `Uint8Array` for instance
@@ -131,23 +131,23 @@ For example, typed arrays like `Uint8Array` (see the *ES6 & Beyond* title of thi
 postMessage( foo.buffer, [ foo.buffer ] );
 ```
 
-The first parameter is the raw buffer and the second parameter is a list of what to transfer.
+第一个参数是未经加工的缓冲，而第二个参数是要传送的内容的列表。
 
-Browsers that don't support Transferable Objects simply degrade to structured cloning, which means performance reduction rather than outright feature breakage.
+不支持Transferable对象的浏览器简单地降级到结构化克隆，这意味着性能上的降低，而不是彻底的特性断裂。
 
 ### Shared Workers
 
-If your site or app allows for loading multiple tabs of the same page (a common feature), you may very well want to reduce the resource usage of their system by preventing duplicate dedicated Workers; the most common limited resource in this respect is a socket network connection, as browsers limit the number of simultaneous connections to a single host. Of course, limiting multiple connections from a client also eases your server resource requirements.
+如果你的网站或应用允许同一个网页加载多个标签页（一个很常见的特性），你也许非常想通过防止复制专用Worker来降低系统资源的使用量；这方面最常见的资源限制是网络套接字链接，因为浏览器限制同时连接到一个服务器的连接数量。当然，限制从客户端来的链接数也缓和了你的服务器资源需求。
 
-In this case, creating a single centralized Worker that all the page instances of your site or app can *share* is quite useful.
+在这种情况下，创建一个单独的中心化Worker，让你的网站或应用的所有网页实例可以 *共享* 它是十分有用的。
 
-That's called a `SharedWorker`, which you create like so (support for this is limited to Firefox and Chrome):
+这称为`SharedWorker`，你肯这样创建它（仅有Firefox与Chrome支持此特性）：
 
 ```js
 var w1 = new SharedWorker( "http://some.url.1/mycoolworker.js" );
 ```
 
-Because a shared Worker can be connected to or from more than one program instance or page on your site, the Worker needs a way to know which program a message comes from. This unique identification is called a "port" -- think network socket ports. So the calling program must use the `port` object of the Worker for communication:
+因为一个共享Worker可以被连接到，或者从多于一个你网站上的程序实例或网页连接，Worker需要一个方法来知道消息来自哪个程序。这种唯一的标识称为“端口（port）”——想想网络套接字端口。所以调用端程序必须使用Worker的`port`对象来通信：
 
 ```js
 w1.port.addEventListener( "message", handleMessages );
@@ -157,13 +157,13 @@ w1.port.addEventListener( "message", handleMessages );
 w1.port.postMessage( "something cool" );
 ```
 
-Also, the port connection must be initialized, as:
+另外，端口连接必须被初始化，就像：
 
 ```js
 w1.port.start();
 ```
 
-Inside the shared Worker, an extra event must be handled: `"connect"`. This event provides the port `object` for that particular connection. The most convenient way to keep multiple connections separate is to use closure (see *Scope & Closures* title of this series) over the `port`, as shown next, with the event listening and transmitting for that connection defined inside the handler for the `"connect"` event:
+在共享Worker内部，一个额外的事件必须被处理：`"connect"`。这个事件为这个特定的连接提供了端口`object`。保持多个分离的连接最简单的方法是在`port`上使用闭包，就像下面展示的那样，同时在`"connect"`事件的处理器内部定义这个连接的事件监听与传送：
 
 ```js
 // inside the shared Worker
@@ -184,35 +184,35 @@ addEventListener( "connect", function(evt){
 } );
 ```
 
-Other than that difference, shared and dedicated Workers have the same capabilities and semantics.
+除了这点不同，共享与专用Worker的功能和语义是一样的。
 
-**Note:** Shared Workers survive the termination of a port connection if other port connections are still alive, whereas dedicated Workers are terminated whenever the connection to their initiating program is terminated.
+**注意：** 如果在一个端口的连接终结时还有其他端口的连接存活着的话，共享Worker也会存活下来，而专用Worker会在与初始化它的程序间接终结时终结。
 
 ### Polyfilling Web Workers
 
-Web Workers are very attractive performance-wise for running JS programs in parallel. However, you may be in a position where your code needs to run in older browsers that lack support. Because Workers are an API and not a syntax, they can be polyfilled, to an extent.
+Web Worker对于并行运行JS程序在性能考量上十分吸引人。然而，你的代码可能运行在对此缺乏支持的老版本浏览器上。因为Worker是一个API而不是语法，它们可以被填补，在某种程度上。
 
-If a browser doesn't support Workers, there's simply no way to fake multithreading from the performance perspective. Iframes are commonly thought of to provide a parallel environment, but in all modern browsers they actually run on the same thread as the main page, so they're not sufficient for faking parallelism.
+如果浏览器不支持Worker，那就没有办法从性能的角度来模拟多线程。Iframe通常被认为可以提供并行环境，但在所有的现代浏览器中它们实际上和主页运行在同一个线程上，所以用它们来模拟并行机制是不够的。
 
-As we detailed in Chapter 1, JS's asynchronicity (not parallelism) comes from the event loop queue, so you can force faked Workers to be asynchronous using timers (`setTimeout(..)`, etc.). Then you just need to provide a polyfill for the Worker API. There are some listed here (https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills#web-workers), but frankly none of them look great.
+正如我们在第一章中详细讨论的，JS的异步能力（不是并行机制）来自于事件轮询队列，所以你可以用计时器（`setTimeout(..)`等等）来强制模拟的Worker是异步的。然后你只需要提供Worker API的填补就行了。这里有一份列表（https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills#web-workers），但坦白地说它们看起来都不怎么样。
 
-I've written a sketch of a polyfill for `Worker` here (https://gist.github.com/getify/1b26accb1a09aa53ad25). It's basic, but it should get the job done for simple `Worker` support, given that the two-way messaging works correctly as well as `"onerror"` handling. You could probably also extend it with more features, such as `terminate()` or faked Shared Workers, as you see fit.
+我在这里（https://gist.github.com/getify/1b26accb1a09aa53ad25）写了一个填补`Worker`的轮廓。它很基本，但应该满足了简单的`Worker`支持，它的双向信息传递可以争取工作，还有`"onerror"`处理。你可能会扩展它来支持更多特性，比如`terminate()`或模拟共享Worker，只要你觉得合适。
 
-**Note:** You can't fake synchronous blocking, so this polyfill just disallows use of `importScripts(..)`. Another option might have been to parse and transform the Worker's code (once Ajax loaded) to handle rewriting to some asynchronous form of an `importScripts(..)` polyfill, perhaps with a promise-aware interface.
+**注意：** 你不能模拟同步阻塞，所以这个填补不允许使用`importScripts(..)`。另一个选择可能是转换并传递Worker的代码（一旦Ajax加载后），来重写一个`importScripts(..)`填补的一些异步形式，也许使用一个promise相关的接口。
 
 ## SIMD
 
-Single instruction, multiple data (SIMD) is a form of "data parallelism," as contrasted to "task parallelism" with Web Workers, because the emphasis is not really on program logic chunks being parallelized, but rather multiple bits of data being processed in parallel.
+一个指令，多个数据（SIMD）是一种形式的“数据并行机制”，与Web Worker的“任务并行机制”相对照，因为他强调的不是程序逻辑的块儿被并行化，而是多个字节的数据被并行地处理。
 
-With SIMD, threads don't provide the parallelism. Instead, modern CPUs provide SIMD capability with "vectors" of numbers -- think: type specialized arrays -- as well as instructions that can operate in parallel across all the numbers; these are low-level operations leveraging instruction-level parallelism.
+使用SIMD，线程不提供并行机制。相反，现代CPU用数字的“向量”提供SIMD能力——想想：指定类型的数组——还有可以在所有这些数字上并行操作的指令；这些是利用底层操作的指令级别的并行机制。
 
-The effort to expose SIMD capability to JavaScript is primarily spearheaded by Intel (https://01.org/node/1495), namely by Mohammad Haghighat (at the time of this writing), in cooperation with Firefox and Chrome teams. SIMD is on an early standards track with a good chance of making it into a future revision of JavaScript, likely in the ES7 timeframe.
+使SIMD能力包含在JavaScript中的努力主要是由Intel带头的（https://01.org/node/1495），名义上是Mohammad Haghighat（在本书写作的时候），与Firefox和Chrome团队合作。SIMD处于早期标准化阶段，而且很有可能被加入未来版本的JavaScript中，很可能在ES7的时间框架内。
 
-SIMD JavaScript proposes to expose short vector types and APIs to JS code, which on those SIMD-enabled systems would map the operations directly through to the CPU equivalents, with fallback to non-parallelized operation "shims" on non-SIMD systems.
+SIMD JavaScript提议向JS代码暴露短向量类型与API，它们在SIMD可用的系统中将操作直接映射为CPU的等价物，同时在非SIMD系统中退回到非并行化操作的“shim”。
 
-The performance benefits for data-intensive applications (signal analysis, matrix operations on graphics, etc.) with such parallel math processing are quite obvious!
+对于数据敏感的应用程序（信号分析，对图形的矩阵操作等等）来说，这种并行数学处理在性能上的优势是十分明显的！
 
-Early proposal forms of the SIMD API at the time of this writing look like this:
+在本书写作时，SIMD API的早期提案形式看起来像这样：
 
 ```js
 var v1 = SIMD.float32x4( 3.14159, 21.0, 32.3, 55.55 );
@@ -225,11 +225,11 @@ SIMD.float32x4.mul( v1, v2 );	// [ 6.597339, 67.2, 138.89, 299.97 ]
 SIMD.int32x4.add( v3, v4 );		// [ 20, 121, 1031, 10041 ]
 ```
 
-Shown here are two different vector data types, 32-bit floating-point numbers and 32-bit integer numbers. You can see that these vectors are sized exactly to four 32-bit elements, as this matches the SIMD vector sizes (128-bit) available in most modern CPUs. It's also possible we may see an `x8` (or larger!) version of these APIs in the future.
+这里展示了两种不同的向量数据类型，32位浮点数和32位整数。你可以看到这些向量正好被设置为4个32位元素，这与大多数CPU中可用的SIMD向量的大小（128位）相匹配。在未来我们看到一个`x8`（或更大！）版本的这些API也是可能的。
 
-Besides `mul()` and `add()`, many other operations are likely to be included, such as `sub()`, `div()`, `abs()`, `neg()`, `sqrt()`, `reciprocal()`, `reciprocalSqrt()` (arithmetic), `shuffle()` (rearrange vector elements), `and()`, `or()`, `xor()`, `not()` (logical), `equal()`, `greaterThan()`, `lessThan()` (comparison), `shiftLeft()`, `shiftRightLogical()`, `shiftRightArithmetic()` (shifts), `fromFloat32x4()`, and `fromInt32x4()` (conversions).
+除了`mul()`和`add()`，许多其他操作也很可能被加入，比如`sub()`，`div()`，`abs()`，`neg()`，`sqrt()`，`reciprocal()`，`reciprocalSqrt()` （算数运算），`shuffle()`（重拍向量元素），`and()`，`or()`，`xor()`，`not()`（逻辑运算），`equal()`，`greaterThan()`，`lessThan()` （比较运算），`shiftLeft()`，`shiftRightLogical()`，`shiftRightArithmetic()`（轮换），`fromFloat32x4()`，和`fromInt32x4()`（变换）。
 
-**Note:** There's an official "prollyfill" (hopeful, expectant, future-leaning polyfill) for the SIMD functionality available (https://github.com/johnmccutchan/ecmascript_simd), which illustrates a lot more of the planned SIMD capability than we've illustrated in this section.
+**注意：** 这里有一个SIMD功能的官方“填补”（很有希望，预期的，着眼未来的填补）（https://github.com/johnmccutchan/ecmascript_simd），它描述了许多比我们在这一节中没有讲到的许多计划中的SIMD功能。
 
 ## asm.js
 
