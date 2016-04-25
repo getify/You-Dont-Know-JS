@@ -233,23 +233,23 @@ SIMD.int32x4.add( v3, v4 );		// [ 20, 121, 1031, 10041 ]
 
 ## asm.js
 
-"asm.js" (http://asmjs.org/) is a label for a highly optimizable subset of the JavaScript language. By carefully avoiding certain mechanisms and patterns that are *hard* to optimize (garbage collection, coercion, etc.), asm.js-styled code can be recognized by the JS engine and given special attention with aggressive low-level optimizations.
+“asm.js”（http://asmjs.org/）是可以被高度优化的JavaScript语言子集的标志。通过小心地回避那些特定的很难优化的（垃圾回收，强制转换，等等）机制和模式，asm.js风格的代码可以被JS引擎识别，而且用主动地底层优化进行特殊的处理。
 
-Distinct from other program performance mechanisms discussed in this chapter, asm.js isn't necessarily something that needs to be adopted into the JS language specification. There *is* an asm.js specification (http://asmjs.org/spec/latest/), but it's mostly for tracking an agreed upon set of candidate inferences for optimization rather than a set of requirements of JS engines.
+与本章中讨论的其他性能优化机制相区别的是，asm.js没必须要是必须被JS语言规范采用的东西。确实有一个asm.js规范（http://asmjs.org/spec/latest/），但它主要是追踪一组关于优化的候选推论，而不是JS引擎的需求。
 
-There's not currently any new syntax being proposed. Instead, asm.js suggests ways to recognize existing standard JS syntax that conforms to the rules of asm.js and let engines implement their own optimizations accordingly.
+目前还没有新的语法被提案。取而代之的是，ams.js建议了一些方法，用来识别那些符合ams.js规则的既存标准JS语法，并且让引擎相应地实现它们自己的优化功能。
 
-There's been some disagreement between browser vendors over exactly how asm.js should be activated in a program. Early versions of the asm.js experiment required a `"use asm";` pragma (similar to strict mode's `"use strict";`) to help clue the JS engine to be looking for asm.js optimization opportunities and hints. Others have asserted that asm.js should just be a set of heuristics that engines automatically recognize without the author having to do anything extra, meaning that existing programs could theoretically benefit from asm.js-style optimizations without doing anything special.
+关于ams.js应当如何在程序中活动，在浏览器生产商之间存在一些争议。早期版本的asm.js实验着要求一个`"use asm";`编译附注（与strict模式的`"use strict";`类似）来帮助JS引擎来寻找asm.js优化的机会和提示。另一些人则断言asm.js应当只是一组启发式算法，让引擎自动地识别而不用作者做任何额外的事情，这意味着理论上既存的程序可以在不用做任何特殊的事情的情况下从asm.js优化中获益。
 
 ### How to Optimize with asm.js
 
-The first thing to understand about asm.js optimizations is around types and coercion (see the *Types & Grammar* title of this series). If the JS engine has to track multiple different types of values in a variable through various operations, so that it can handle coercions between types as necessary, that's a lot of extra work that keeps the program optimization suboptimal.
+关于asm.js需要理解的第一件事情是类型和强制转换。如果JS引擎不得不在变量的操作期间一直追踪一个变量内的值的类型，以便于在必要时它可以处理强制转换，那么就会有许多额外的工作使程序处于次优化状态。
 
-**Note:** We're going to use asm.js-style code here for illustration purposes, but be aware that it's not commonly expected that you'll author such code by hand. asm.js is more intended to a compilation target from other tools, such as Emscripten (https://github.com/kripken/emscripten/wiki). It's of course possible to write your own asm.js code, but that's usually a bad idea because the code is very low level and managing it can be very time consuming and error prone. Nevertheless, there may be cases where you'd want to hand tweak your code for asm.js optimization purposes.
+**注意：** 为了说明的目的，我们将在这里使用ams.js风格的代码，但要意识到的是你会手写这些代码的情况不是很常见。asm.js的本意更多的是作为其他工具的编译目标，比如Emscripten（https://github.com/kripken/emscripten/wiki）。当然你写自己的asm.js代码也是可能的，但是这通常不是一个好注意，因为那样的代码非常底层，而这意味着它会非常耗时而且易错。尽管如此，也会有情况使你想要为了ams.js优化的目的手动调整代码。
 
-There are some "tricks" you can use to hint to an asm.js-aware JS engine what the intended type is for variables/operations, so that it can skip these coercion tracking steps.
+这里有一些“技巧”，你可以使用它们来提示支持asm.js的JS引擎变量/操作预期的类型是什么，以便于它可以跳过那些强制转换追踪的步骤。
 
-For example:
+举个例子：
 
 ```js
 var a = 42;
@@ -259,7 +259,7 @@ var a = 42;
 var b = a;
 ```
 
-In that program, the `b = a` assignment leaves the door open for type divergence in variables. However, it could instead be written as:
+在这个程序中，赋值`b = a`在变量中留下了类型分歧的问题。然而，它可以写成这样：
 
 ```js
 var a = 42;
@@ -269,37 +269,37 @@ var a = 42;
 var b = a | 0;
 ```
 
-Here, we've used the `|` ("binary OR") with value `0`, which has no effect on the value other than to make sure it's a 32-bit integer. That code run in a normal JS engine works just fine, but when run in an asm.js-aware JS engine it *can* signal that `b` should always be treated as a 32-bit integer, so the coercion tracking can be skipped.
+这里，我们与值`0`一起使用了`|`（“二进制或”），虽然它的值没有影响，但它确保是一个32位整数。这段代码在普通的JS引擎中可以工作，但是当它运行在支持asm.js的JS引擎上时，它 *可以* 表示`b`应当总是被作为32位整数来对待，所以强制转换追踪可以被跳过。
 
-Similarly, the addition operation between two variables can be restricted to a more performant integer addition (instead of floating point):
+类似地，两个变量之间的加法操作可以被限定为性能更好的整数加法（而不是浮点数）：
 
 ```js
 (a + b) | 0
 ```
 
-Again, the asm.js-aware JS engine can see that hint and infer that the `+` operation should be 32-bit integer addition because the end result of the whole expression would automatically be 32-bit integer conformed anyway.
+再一次，支持asm.js的JS引擎可以看到这个提示，并推断`+`操作应当是一个32位整数加法，因为不论怎样整个表达式的最终结构都将自动是32位整数。
 
 ### asm.js Modules
 
-One of the biggest detractors to performance in JS is around memory allocation, garbage collection, and scope access. asm.js suggests one of the ways around these issues is to declare a more formalized asm.js "module" -- do not confuse these with ES6 modules; see the *ES6 & Beyond* title of this series.
+在JS中最托性能后腿的东西之一是关于内存分怕，垃圾回收，与作用域访问。asm.js对于这些问题建一个的一个方法是，声明一个更加正式的asm.js“模块”——不要和ES6模块搞混；参见本系列的 *ES6与未来*。
 
-For an asm.js module, you need to explicitly pass in a tightly conformed namespace -- this is referred to in the spec as `stdlib`, as it should represent standard libraries needed -- to import necessary symbols, rather than just using globals via lexical scope. In the base case, the `window` object is an acceptable `stdlib` object for asm.js module purposes, but you could and perhaps should construct an even more restricted one.
+对于一个asm.js模块，你需要明确传入一个严格遵循的名称空间——在规范中以`stdlib`引用，好像他应当代表需要的标准库——来引入需要的符号，而不是通过词法作用域来使用全局对象。在最基本的情况下，`window`对象就是一个可接受的用于asm.js模块的`stdlib`对象，但是你可能应该构建一个更加被严格限制的对象。
 
-You also must declare a "heap" -- which is just a fancy term for a reserved spot in memory where variables can already be used without asking for more memory or releasing previously used memory -- and pass that in, so that the asm.js module won't need to do anything that would cause memory churn; it can just use the pre-reserved space.
+你还必须定义一个“堆（heap）”——这只是一个别致的词汇，它表示在内存中被保留的位置，变量不必要求内存分配或释放已使用内存就可以使用——并将它传入，这样asm.js模块就不必做任何导致内存流失的的事情；它可以使用提前保留的空间。
 
-A "heap" is likely a typed `ArrayBuffer`, such as:
+一个“堆”就像一个有类型的`ArrayBuffer`，比如：
 
 ```js
 var heap = new ArrayBuffer( 0x10000 );	// 64k heap
 ```
 
-Using that pre-reserved 64k of binary space, an asm.js module can store and retrieve values in that buffer without any memory allocation or garbage collection penalties. For example, the `heap` buffer could be used inside the module to back an array of 64-bit float values like this:
+使用这个提前保留的64k的二进制空间，一个asm.js模块可以在这个缓冲区中存储或读取值，而不受任何内存分配与垃圾回收的性能损耗。比如，`heap`缓冲区可以在模块内部用于备份一个64位浮点数值的数组，像这样：
 
 ```js
 var arr = new Float64Array( heap );
 ```
 
-OK, so let's make a quick, silly example of an asm.js-styled module to illustrate how these pieces fit together. We'll define a `foo(..)` that takes a start (`x`) and end (`y`) integer for a range, and calculates all the inner adjacent multiplications of the values in the range, and then finally averages those values together:
+好了，让我制作一个asm.js风格模块的快速，愚蠢的例子来描述这些东西是如何联系在一起的。我们将定义一个`foo(..)`，它为一个范围接收一个开始位置（`x`）和一个终止位置（`y`），并且计算这个范围内所有相邻的数字的积，然后最终计算这些值的平均值：
 
 ```js
 function fooASM(stdlib,foreign,heap) {
@@ -347,22 +347,22 @@ var foo = fooASM( window, null, heap ).foo;
 foo( 10, 20 );		// 233
 ```
 
-**Note:** This asm.js example is hand authored for illustration purposes, so it doesn't represent the same code that would be produced from a compilation tool targeting asm.js. But it does show the typical nature of asm.js code, especially the type hinting and use of the `heap` buffer for temporary variable storage.
+**注意：** 这个asm.js例子是为了演示的目的手动编写的，所以它与那些支持asm.js的编译工具生产的代码的表现不同。但是它展示了asm.js代码的典型性质，特别是类型提示与为了临时变量存储而使用`heap`缓冲。
 
-The first call to `fooASM(..)` is what sets up our asm.js module with its `heap` allocation. The result is a `foo(..)` function we can call as many times as necessary. Those `foo(..)` calls should be specially optimized by an asm.js-aware JS engine. Importantly, the preceding code is completely standard JS and would run just fine (without special optimization) in a non-asm.js engine.
+第一个`fooASM(..)`调用用它的`heap`分配区建立了我们的asm.js模块。结果是一个我们可以调用任意多次的`foo(..)`函数。这些调用应当会被支持asm.js的JS引擎特别优化。重要的是，前面的代码完全是标准JS，而且会在非asm.js引擎中工作的很好（但没有特别优化）。
 
-Obviously, the nature of restrictions that make asm.js code so optimizable reduces the possible uses for such code significantly. asm.js won't necessarily be a general optimization set for any given JS program. Instead, it's intended to provide an optimized way of handling specialized tasks such as intensive math operations (e.g., those used in graphics processing for games).
+很明显，使asm.js代码可优化的各种限制降低了广泛使用这种代码的可能性。asm.js没有必要为任意给出的JS程序成为一个一般化的优化集合。相反，它的本意是提供一种处理特定任务——如密集数学操作（那些用于游戏中图形处理的）——的优化方法。
 
 ## Review
 
-The first four chapters of this book are based on the premise that async coding patterns give you the ability to write more performant code, which is generally a very important improvement. But async behavior only gets you so far, because it's still fundamentally bound to a single event loop thread.
+本书的前四章基于这样的前提：异步编码模式给了你编写更高效代码的能力，这通常是一个非常重要的改进。但是异步行为也就能帮你这么多，因为它在基础上仍然使用一个单独的事件轮询线程。
 
-So in this chapter we've covered several program-level mechanisms for improving performance even further.
+所以在这一章我们涵盖了几种程序级别的机制来进一步提升性能。
 
-Web Workers let you run a JS file (aka program) in a separate thread using async events to message between the threads. They're wonderful for offloading long-running or resource-intensive tasks to a different thread, leaving the main UI thread more responsive.
+Web Worker让你在一个分离的线程上运行一个JS文件（也就是程序），使用异步事件在线程之间传递消息。对于将长时间运行或资源密集型任务卸载到一个不同线程，让主UI线程保持相应来说，它们非常棒。
 
-SIMD proposes to map CPU-level parallel math operations to JavaScript APIs for high-performance data-parallel operations, like number processing on large data sets.
+SIMD提议将CPU级别的并行数学操作映射到JavaScript API上来提供高性能数据并行操作，比如在大数据集合上进行数字处理。
 
-Finally, asm.js describes a small subset of JavaScript that avoids the hard-to-optimize parts of JS (like garbage collection and coercion) and lets the JS engine recognize and run such code through aggressive optimizations. asm.js could be hand authored, but that's extremely tedious and error prone, akin to hand authoring assembly language (hence the name). Instead, the main intent is that asm.js would be a good target for cross-compilation from other highly optimized program languages -- for example, Emscripten (https://github.com/kripken/emscripten/wiki) transpiling C/C++ to JavaScript.
+最后，asm.js描述了一个JavaScript的小的子集，它回避了JS中不易优化的部分（比如垃圾回收与强制转换）并让JS引擎通过主动优化识别并运行这样的代码。asm.js可以手动编写，但是极其麻烦且易错，就像手动编写汇编语言。相反，asm.js的主要意图是作为一个从其他高度优化的程序语言交叉编译来的目标——例如，Emscripten（https://github.com/kripken/emscripten/wiki）可以将C/C++转译为JavaScript。
 
-While not covered explicitly in this chapter, there are even more radical ideas under very early discussion for JavaScript, including approximations of direct threaded functionality (not just hidden behind data structure APIs). Whether that happens explicitly, or we just see more parallelism creep into JS behind the scenes, the future of more optimized program-level performance in JS looks really *promising*.
+虽然在本章没有明确地提及，在很早以前的有关JavaScript的讨论中存在着更激进的想法，包括近似地直接多线程功能（不仅仅是隐藏在数据结构API后面）。这是否会明确地发生，还是我们将看到更多并行机制偷偷潜入JS，在JS中发生更多程序级别优化的未来是可以确定的。
