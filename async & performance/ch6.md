@@ -1,11 +1,17 @@
-# You Don't Know JS: Async & Performance
-# Chapter 6: Benchmarking & Tuning
+# 你不懂JS: 异步与性能
+# 第六章: 基准分析与调优
 
 As the first four chapters of this book were all about performance as a coding pattern (asynchrony and concurrency), and Chapter 5 was about performance at the macro program architecture level, this chapter goes after the topic of performance at the micro level, focusing on single expressions/statements.
 
+本书的前四章都是关于代码模式（异步与同步）的性能，而第五章是关于宏观程序结构层面的性能，本章从微观层面继续性能的话题，关注的焦点在一个表达式/语句上。
+
 One of the most common areas of curiosity -- indeed, some developers can get quite obsessed about it -- is in analyzing and testing various options for how to write a line or chunk of code, and which one is faster.
 
+好奇心的一个最常见的领域——确实，一些开发者十分痴迷于此——是分析和测试关于如何写一行或一块儿代码的各种选项，看哪一个更快。
+
 We're going to look at some of these issues, but it's important to understand from the outset that this chapter is **not** about feeding the obsession of micro-performance tuning, like whether some given JS engine can run `++a` faster than `a++`. The more important goal of this chapter is to figure out what kinds of JS performance matter and which ones don't, *and how to tell the difference*.
+
+我们将会看到这些问题中的一些，但重要的是要理解从最开始这一章就 **不是** 为了满足对微性能调优的痴迷，比如某种给定的JS引擎运行`++a`要比运行`a++`快。这一章更重要的目标是，搞清楚哪种JS性能要紧而哪种不要紧，*和如何指出这种不同*。
 
 But even before we get there, we need to explore how to most accurately and reliably test JS performance, because there's tons of misconceptions and myths that have flooded our collective cult knowledge base. We've got to sift through all that junk to find some clarity.
 
