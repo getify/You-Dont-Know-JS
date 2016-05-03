@@ -1,23 +1,17 @@
 # 你不懂JS: 异步与性能
 # 第六章: 基准分析与调优
 
-As the first four chapters of this book were all about performance as a coding pattern (asynchrony and concurrency), and Chapter 5 was about performance at the macro program architecture level, this chapter goes after the topic of performance at the micro level, focusing on single expressions/statements.
-
 本书的前四章都是关于代码模式（异步与同步）的性能，而第五章是关于宏观程序结构层面的性能，本章从微观层面继续性能的话题，关注的焦点在一个表达式/语句上。
-
-One of the most common areas of curiosity -- indeed, some developers can get quite obsessed about it -- is in analyzing and testing various options for how to write a line or chunk of code, and which one is faster.
 
 好奇心的一个最常见的领域——确实，一些开发者十分痴迷于此——是分析和测试关于如何写一行或一块儿代码的各种选项，看哪一个更快。
 
-We're going to look at some of these issues, but it's important to understand from the outset that this chapter is **not** about feeding the obsession of micro-performance tuning, like whether some given JS engine can run `++a` faster than `a++`. The more important goal of this chapter is to figure out what kinds of JS performance matter and which ones don't, *and how to tell the difference*.
-
 我们将会看到这些问题中的一些，但重要的是要理解从最开始这一章就 **不是** 为了满足对微性能调优的痴迷，比如某种给定的JS引擎运行`++a`要比运行`a++`快。这一章更重要的目标是，搞清楚哪种JS性能要紧而哪种不要紧，*和如何指出这种不同*。
 
-But even before we get there, we need to explore how to most accurately and reliably test JS performance, because there's tons of misconceptions and myths that have flooded our collective cult knowledge base. We've got to sift through all that junk to find some clarity.
+但在我们达到目的之前，我们需要探索一下如何最准确和最可靠地测试JS性能，因为有太多的误解和谜题充斥着我们集体主义崇拜的知识库。我们需要将这些垃圾筛选出来以便找到清晰的答案。
 
 ## Benchmarking
 
-OK, time to start dispelling some misconceptions. I'd wager the vast majority of JS developers, if asked to benchmark the speed (execution time) of a certain operation, would initially go about it something like this:
+好了，是时候开始消除一些误解了。我敢打赌，最广大的JS开发者们，如果被问到如何测量一个特定操作的速度（执行时间），将会一头扎进这样的东西：
 
 ```js
 var start = (new Date()).getTime();	// or `Date.now()`
@@ -29,47 +23,47 @@ var end = (new Date()).getTime();
 console.log( "Duration:", (end - start) );
 ```
 
-Raise your hand if that's roughly what came to your mind. Yep, I thought so. There's a lot wrong with this approach, but don't feel bad; **we've all been there.**
+如果这大致就是你想到的，请举手。是的，我就知道。这个方式有许多错误，但是别难过；**我们都这么干过。**
 
-What did that measurement tell you, exactly? Understanding what it does and doesn't say about the execution time of the operation in question is key to learning how to appropriately benchmark performance in JavaScript.
+这种测量到底告诉了你什么？对于当前的操作的执行时间来说，理解它告诉了你什么和没告诉你什么是学习如何正确测量JavaScript的性能的关键。
 
-If the duration reported is `0`, you may be tempted to believe that it took less than a millisecond. But that's not very accurate. Some platforms don't have single millisecond precision, but instead only update the timer in larger increments. For example, older versions of windows (and thus IE) had only 15ms precision, which means the operation has to take at least that long for anything other than `0` to be reported!
+如果持续的时间报告为`0`，你也许会试图认为它花的时间少于1毫秒。但是这不是那么准确。一些平台不能精确到毫秒，反而是在更大的时间单位上更新计时器。举个例子，老版本的windows（IE也是如此）只有15毫秒的精确度，这意味着要得到与`0`不同的报告，操作就必须至少要花这么长时间！
 
-Moreover, whatever duration is reported, the only thing you really know is that the operation took approximately that long on that exact single run. You have near-zero confidence that it will always run at that speed. You have no idea if the engine or system had some sort of interference at that exact moment, and that at other times the operation could run faster.
+另外，不管被报告的持续时间是多少，你唯一真实知道的是，操作在当前这一次运行中大概花了这么长时间。你几乎没有信心说它将总是以这个速度运行。你不知道引擎或系统是否在就在那个确切的时刻进行了干扰，而在其他的时候这个操作可能会运行的快一些。
 
-What if the duration reported is `4`? Are you more sure it took about four milliseconds? Nope. It might have taken less time, and there may have been some other delay in getting either `start` or `end` timestamps.
+要是持续的时间报告为`4`呢？你确信它花了大概4毫秒？不，它可能没花那么长时间，而且在取得`start`或`end`时间戳时会有一些其他的延迟。
 
-More troublingly, you also don't know that the circumstances of this operation test aren't overly optimistic. It's possible that the JS engine figured out a way to optimize your isolated test case, but in a more real program such optimization would be diluted or impossible, such that the operation would run slower than your test.
+更麻烦的是，你也不知道这个操作测试所在的环境是不是过于优化了。这样的情况是有可能的：JS引擎找到了一个办法来优化你的测试用例，但是在更真实的程序中这样的优化将会被稀释或者根本不可能，如此这个操作将会比你测试时运行的慢。
 
-So... what do we know? Unfortunately, with those realizations stated, **we know very little.** Something of such low confidence isn't even remotely good enough to build your determinations on. Your "benchmark" is basically useless. And worse, it's dangerous in that it implies false confidence, not just to you but also to others who don't think critically about the conditions that led to those results.
+那么...我们知道什么？不幸的是，在这些现实情况下，**我们几乎什么都不知道。** 可信度如此低的东西甚至不够你建立自己的判断。你的“基准分析”基本没用。更糟的是，它隐含的这种不成立的可信度很危险，不仅是对你，而且对其他人也一样：认为导致这些结果的条件不重要。
 
 ### Repetition
 
-"OK," you now say, "Just put a loop around it so the whole test takes longer." If you repeat an operation 100 times, and that whole loop reportedly takes a total of 137ms, then you can just divide by 100 and get an average duration of 1.37ms for each operation, right?
+“好的，”你说，“在它周围放一个循环，让整个测试需要的时间长一些。”如果你重复一个操作100次，而整个循环在报告上说总共花了137ms，那么你可以除以100并得到每次操作平均持续时间1.37ms，对吧？
 
-Well, not exactly.
+其实，不确切。
 
-A straight mathematical average by itself is definitely not sufficient for making judgments about performance which you plan to extrapolate to the breadth of your entire application. With a hundred iterations, even a couple of outliers (high or low) can skew the average, and then when you apply that conclusion repeatedly, you even further inflate the skew beyond credulity.
+对于你打算在你的整个应用程序范围内推广的操作的性能，仅靠一个直白的数据上的平均做出判断绝对是不够的。在一百次迭代中，即使是几个极端值（或高或低）就可以歪曲平均值，而后当你反复实施这个结论时，你就更进一步扩大了这种歪曲。
 
-Instead of just running for a fixed number of iterations, you can instead choose to run the loop of tests until a certain amount of time has passed. That might be more reliable, but how do you decide how long to run? You might guess that it should be some multiple of how long your operation should take to run once. Wrong.
+与仅仅运行固定次数的迭代不同，你可以选择将测试的循环运行一个特定长的时间。那可能更可靠，但是你如何决定运行多长时间？你可能会猜它应该是你的操作运行一次所需时间的倍数。错。
 
-Actually, the length of time to repeat across should be based on the accuracy of the timer you're using, specifically to minimize the chances of inaccuracy. The less precise your timer, the longer you need to run to make sure you've minimized the error percentage. A 15ms timer is pretty bad for accurate benchmarking; to minimize its uncertainty (aka "error rate") to less than 1%, you need to run your each cycle of test iterations for 750ms. A 1ms timer only needs a cycle to run for 50ms to get the same confidence.
+实际上，循环持续的时间应当基于你使用的计时器的精度，具体地将不精确地可能性最小化。你的计时器精度越低，你就需要运行更长时间来确保你将错误的概率最小化了。一个15ms的计时器对于精确的基准分析来说太差劲儿了；为了把它的不确定性（也就是“错误率”）最小化到低于1%，你需要将测试的迭代循环运行750ms。一个1ms的计时器只需要一个循环运行50ms就可以得到相同的可信度。
 
-But then, that's just a single sample. To be sure you're factoring out the skew, you'll want lots of samples to average across. You'll also want to understand something about just how slow the worst sample is, how fast the best sample is, how far apart those best and worse cases were, and so on. You'll want to know not just a number that tells you how fast something ran, but also to have some quantifiable measure of how trustable that number is.
+但，这只是一个样本。为了确信你排除了歪曲结果的因素，你将会想要许多样本来求平均值。你还会想要明白最擦的样本有多慢，最佳的样本有多快，最差与最佳的情况相差多少等等。你想知道的不仅是一个数字告诉你某个东西跑的多块，而且还需要一个关于这个数字有多可信的量化表达。
 
-Also, you probably want to combine these different techniques (as well as others), so that you get the best balance of all the possible approaches.
+另外，你可能想要组合这些不同的技术（还有其他的），以便于你可以在所有这些可能的方式中找到最佳的平衡。
 
-That's all bare minimum just to get started. If you've been approaching performance benchmarking with anything less serious than what I just glossed over, well... "you don't know: proper benchmarking."
+这一切只不过是开始所需的最低限度的认识。如果你曾经使用比我刚才几句话带过的东西更不严谨的方式进行基准分析，那么...“你不懂：正确的基准分析”。
 
 ### Benchmark.js
 
-Any relevant and reliable benchmark should be based on statistically sound practices. I am not going to write a chapter on statistics here, so I'll hand wave around some terms: standard deviation, variance, margin of error. If you don't know what those terms really mean -- I took a stats class back in college and I'm still a little fuzzy on them -- you are not actually qualified to write your own benchmarking logic.
+任何有用而且可靠的基准分析应当基于统计学上的实践。我不是要在这里写一章统计学，所以我会带过一些名词：标准差，方差，误差边际。如果你不知道这些名词意味着什么——我在大学上过统计学课程，而我依然对他们有点儿晕——那么实际上你没有资格去写你自己的基准分析逻辑。
 
-Luckily, smart folks like John-David Dalton and Mathias Bynens do understand these concepts, and wrote a statistically sound benchmarking tool called Benchmark.js (http://benchmarkjs.com/). So I can end the suspense by simply saying: "just use that tool."
+幸运的是，一些像John-David Dalton和Mathias Bynens这样的聪明家伙明白这些概念，并且写了一个统计学上的基准分析工具，称为Benchmark.js（http://benchmarkjs.com/）。所以我可以简单地说：“用这个工具就行了。”来终结这个悬念。
 
-I won't repeat their whole documentation for how Benchmark.js works; they have fantastic API Docs (http://benchmarkjs.com/docs) you should read. Also there are some great (http://calendar.perfplanet.com/2010/bulletproof-javascript-benchmarks/) writeups (http://monsur.hossa.in/2012/12/11/benchmarkjs.html) on more of the details and methodology.
+我不会重复他们的整个文档来讲解Benchmark.js如何工作；他们有很棒的API文档（http://benchmarkjs.com/docs）你可以阅读。另外这里还有一些了不起的文章（http://calendar.perfplanet.com/2010/bulletproof-javascript-benchmarks/）（http://monsur.hossa.in/2012/12/11/benchmarkjs.html）讲解细节与方法学。
 
-But just for quick illustration purposes, here's how you could use Benchmark.js to run a quick performance test:
+但是为了快速演示一下，这是你如何用Benchmark.js来运行一个快速的性能测试：
 
 ```js
 function foo() {
@@ -90,68 +84,68 @@ bench.stats.variance;		// variance across samples
 // ..
 ```
 
-There's *lots* more to learn about using Benchmark.js besides this glance I'm including here. But the point is that it's handling all of the complexities of setting up a fair, reliable, and valid performance benchmark for a given piece of JavaScript code. If you're going to try to test and benchmark your code, this library is the first place you should turn.
+比起我在这里的窥豹一斑，关于使用Benchmark.js还有 *许多* 需要学习的东西。不过重点是，为了给一段给定的JavaScript代码建立一个公平，可靠，并且合法的性能基准分析，Benchmark.js包揽了所有的复杂性。如果你想要试着对你的代码进行测试和基准分析，这个库应当是你第一个想到的地方。
 
-We're showing here the usage to test a single operation like X, but it's fairly common that you want to compare X to Y. This is easy to do by simply setting up two different tests in a "Suite" (a Benchmark.js organizational feature). Then, you run them head-to-head, and compare the statistics to conclude whether X or Y was faster.
+我们在这里展示的是测试一个单独操作X的用法，但是相当常见的情况是你想要用X和Y进行比较。这可以通过简单地在一个“Suite”（一个Benchmark.js的组织特性）中建立两个测试来很容易做到。然后，你对照地运行它们，然后比较统计结果来对为什么X或Y更快做出论断。
 
-Benchmark.js can of course be used to test JavaScript in a browser (see the "jsPerf.com" section later in this chapter), but it can also run in non-browser environments (Node.js, etc.).
+Benchmark.js理所当然地可以被用于在浏览器中测试JavaScript（参见本章稍后的“jsPerf.com”一节），但它也可以运行在非浏览器环境中（Node.js等等）。
 
-One largely untapped potential use-case for Benchmark.js is to use it in your Dev or QA environments to run automated performance regression tests against critical path parts of your application's JavaScript. Similar to how you might run unit test suites before deployment, you can also compare the performance against previous benchmarks to monitor if you are improving or degrading application performance.
+一个很大程度上没有触及的Benchmark.js的潜在用例是，在你的Dev或QA环境中针对你的应用程序的JavaScript的关键路径运行自动化的性能回归测试。与在部署之前你可能运行单元测试的方式相似，你也可以将性能与前一次基准分析进行比较，来观测你是否改进或恶化了应用程序性能。
 
 #### Setup/Teardown
 
-In the previous code snippet, we glossed over the "extra options" `{ .. }` object. But there are two options we should discuss: `setup` and `teardown`.
+在前一个代码段中，我们略过了“额外选项（extra options）”`{ .. }`对象。但是这里有两个我们应当讨论的选项`setup`和`teardown`。
 
-These two options let you define functions to be called before and after your test case runs.
+这两个选项让你定义在你的测试用例开始运行前和运行后被调用的函数。
 
-It's incredibly important to understand that your `setup` and `teardown` code **does not run for each test iteration**. The best way to think about it is that there's an outer loop (repeating cycles), and an inner loop (repeating test iterations). `setup` and `teardown` are run at the beginning and end of each *outer* loop (aka cycle) iteration, but not inside the inner loop.
+一个需要理解的极其重要的事情是，你的`setup`和`teardown`代码 **不会为每一次测试迭代而运行**。考虑它的最佳方式是，存在一个外部循环（重复的轮回），和一个内部循环（重复的测试迭代）。`setup`和`teardown`会在每个 *外部* 循环（也就是轮回）迭代的开始和末尾运行，但不是在内部循环。
 
-Why does this matter? Let's imagine you have a test case that looks like this:
+为什么这很重要？让我们想象你有一个看起来像这样的测试用例：
 
 ```js
 a = a + "w";
 b = a.charAt( 1 );
 ```
 
-Then, you set up your test `setup` as follows:
+然后，你这样建立你的测试`setup`：
 
 ```js
 var a = "x";
 ```
 
-Your temptation is probably to believe that `a` is starting out as `"x"` for each test iteration.
+你的意图可能是相信对每一次测试迭代`a`都以值`"x"`开始。
 
-But it's not! It's starting `a` at `"x"` for each test cycle, and then your repeated `+ "w"` concatenations will be making a larger and larger `a` value, even though you're only ever accessing the character `"w"` at the `1` position.
+但它不是！它使`a`在每一次测试轮回中以`"x"`开始，而后你的反复的`+ "w"`连接将使`a`的值越来越大，即便你永远唯一访问的是位于位置`1`的字符`"w"`。
 
-Where this most commonly bites you is when you make side effect changes to something like the DOM, like appending a child element. You may think your parent element is set as empty each time, but it's actually getting lots of elements added, and that can significantly sway the results of your tests.
+当你想利用副作用来改变某些东西比如DOM，向它追加一个子元素时，这种意外经常会咬到你。你可能认为的父元素每次都被设置为空，但他实际上被追加了许多元素，而这可能会显著地扭曲你的测试结果。
 
 ## Context Is King
 
-Don't forget to check the context of a particular performance benchmark, especially a comparison between X and Y tasks. Just because your test reveals that X is faster than Y doesn't mean that the conclusion "X is faster than Y" is actually relevant.
+不要忘了检查一个指定的性能基准分析的上下文环境，特别是在X与Y之间进行比较时。仅仅因为你的测试揭示了X比Y速度快，并不意味着“X比Y快”这个结论是实际上有意义的。
 
-For example, let's say a performance test reveals that X runs 10,000,000 operations per second, and Y runs at 8,000,000 operations per second. You could claim that Y is 20% slower than X, and you'd be mathematically correct, but your assertion doesn't hold as much water as you'd think.
+举个例子，让我们假定一个性能测试揭示出X每秒可以运行1千万次操作，而Y每秒运行8百万次。你可以声称Y比X慢20%，而且在数学上你是对的，但是你的断言并不向像你认为的那么有用。
 
-Let's think about the results more critically: 10,000,000 operations per second is 10,000 operations per millisecond, and 10 operations per microsecond. In other words, a single operation takes 0.1 microseconds, or 100 nanoseconds. It's hard to fathom just how small 100ns is, but for comparison, it's often cited that the human eye isn't generally capable of distinguishing anything less than 100ms, which is one million times slower than the 100ns speed of the X operation.
+让我们更加苛刻地考虑这个测试结果：每秒1千万次操作就是每毫秒1万次操作，就是每微秒10次操作。换句话说，一次操作要花0.1毫秒，或者100纳秒。很难体会100纳秒到底有多小，但是作为比较，通常认为人类的眼睛一般不能分辨小于100毫秒的变化，而这要比X操作的100纳秒的速度慢100万倍。
 
-Even recent scientific studies showing that maybe the brain can process as quick as 13ms (about 8x faster than previously asserted) would mean that X is still running 125,000 times faster than the human brain can perceive a distinct thing happening. **X is going really, really fast.**
+即便最近的科学研究显示，大脑可能的最快处理速度是13毫秒（比先前的论断快大约8倍），这意味着X的运行速度依然要比人类大脑可以感知事情的发生要快12万5千倍。**X运行的非常，非常快。**
 
-But more importantly, let's talk about the difference between X and Y, the 2,000,000 operations per second difference. If X takes 100ns, and Y takes 80ns, the difference is 20ns, which in the best case is still one 650-thousandth of the interval the human brain can perceive.
+但更重要的是，让我们来谈谈X与Y之间的不同，每秒2百万次的差。如果X花100纳秒，而Y花80纳秒，差就是20纳秒，也就是人类大脑可以感知的间隔的65万分之一。
 
-What's my point? **None of this performance difference matters, at all!**
+我要说什么？**这种性能上的差别根本就一点儿都不重要！**
 
-But wait, what if this operation is going to happen a whole bunch of times in a row? Then the difference could add up, right?
+但是等一下，如果这种操作将要一个接一个地发生许多次呢？那么差异就会累加起来，对吧？
 
-OK, so what we're asking then is, how likely is it that operation X is going to be run over and over again, one right after the other, and that this has to happen 650,000 times just to get a sliver of a hope the human brain could perceive it. More likely, it'd have to happen 5,000,000 to 10,000,000 times together in a tight loop to even approach relevance.
+好的，那么我们就要问，操作X有多大可能性将要一次又一次，一个接一个地运行，而且为了人类大脑能够感知的一线希望而不得不发生65万次。更有可能的是，它不得不在一个紧凑的循环中发生5百万到1千万次。（TODO）
 
-While the computer scientist in you might protest that this is possible, the louder voice of realism in you should sanity check just how likely or unlikely that really is. Even if it is relevant in rare occasions, it's irrelevant in most situations.
+虽然你们之中的计算机科学家会反对说这是可能的，但是你们之中的现实主义者们应当对这究竟有多大可能或不可能进行合理性检查。即使在极其稀少的偶然中这有实际意义，但是在绝大多数情况下它没有。
 
-The vast majority of your benchmark results on tiny operations -- like the `++x` vs `x++` myth -- **are just totally bogus** for supporting the conclusion that X should be favored over Y on a performance basis.
+你们大量的针对微小操作的基准分析结果——比如`++x`对`x++`的神话——**完全是伪命题**，只不过是用来支持在性能的基准上X应当取代Y的结论。
 
 ### Engine Optimizations
 
-You simply cannot reliably extrapolate that if X was 10 microseconds faster than Y in your isolated test, that means X is always faster than Y and should always be used. That's not how performance works. It's vastly more complicated.
+你根本无法可靠地这样推断：如果在你的独立测试中X要比Y快10微秒，这意味着X总是比Y快所以应当总是被使用。这不是性能的工作方式。它要复杂太多了。
 
-For example, let's imagine (purely hypothetical) that you test some microperformance behavior such as comparing:
+举个例子，让我们想象（纯粹地假想）你在测试某些行为的微观性能，比如比较：
 
 ```js
 var twelve = "12";
@@ -166,27 +160,43 @@ var Y1 = Number( twelve );
 var Y2 = Number( foo );
 ```
 
-If you understand what `parseInt(..)` does compared to `Number(..)`, you might intuit that `parseInt(..)` potentially has "more work" to do, especially in the `foo` case. Or you might intuit that they should have the same amount of work to do in the `foo` case, as both should be able to stop at the first character `"f"`.
+如果你理解与`Number(..)`比起来`parseInt(..)`做了什么，你可能会在直觉上认为`parseInt(..)`潜在地有“更多工作”要做，特别是在`foo`的测试用例下。或者你可能在直觉上认为在`foo`的测试用例下它们应当有同样多的工作要做，因为它们俩应当能够在第一个字符`"f"`处停下。
 
-Which intuition is correct? I honestly don't know. But I'll make the case it doesn't matter what your intuition is. What might the results be when you test it? Again, I'm making up a pure hypothetical here, I haven't actually tried, nor do I care.
+哪一种直觉正确？老实说我不知道。但是我会制造一个与你的直觉无关的测试用例。当你测试它的时候结果会是什么？再一次，我在这里制造了一个纯粹的假想，我们没实际上尝试过，我也不关心。
 
-Let's pretend the test comes back that `X` and `Y` are statistically identical. Have you then confirmed your intuition about the `"f"` character thing? Nope.
+让我们假装`X`与`Y`的测试结果在统计上是相同的。那么你关于`"f"`字符上发生的事情的直觉得到确认了吗？没有。
 
 It's possible in our hypothetical that the engine might recognize that the variables `twelve` and `foo` are only being used in one place in each test, and so it might decide to inline those values. Then it may realize that `Number( "12" )` can just be replaced by `12`. And maybe it comes to the same conclusion with `parseInt(..)`, or maybe not.
 
+在我们的假想中可能发生这样的事情：引擎可能会识别出变量`twelve`和`foo`在每个测试中仅被使用了一次，因此它可能会决定要内联这些值。然后它可能发现`Number("12")`可以替换为`12`。而且也许会得到与`parseInt(..)`相同的结论，也许不会。
+
 Or an engine's dead-code removal heuristic could kick in, and it could realize that variables `X` and `Y` aren't being used, so declaring them is irrelevant, so it doesn't end up doing anything at all in either test.
+
+或者一个引擎的死代码移除启发式算法会搅和进来，而且它发现变量`X`和`Y`都没有被使用，所以声明它们是没有意义的，所以最终在任一个测试中都不做任何事情。
 
 And all that's just made with the mindset of assumptions about a single test run. Modern engines are fantastically more complicated than what we're intuiting here. They do all sorts of tricks, like tracing and tracking how a piece of code behaves over a short period of time, or with a particularly constrained set of inputs.
 
+而且所有这些都只是关于一个单独测试运行的假设心态而言的。比我们在这里用直觉想象的，现代的引擎更加难以置信地复杂。它们会使用所有的招数，比如追踪并记录一段代码在一段很短的时间内的行为，或者使用一组特别限定的输入。
+
 What if the engine optimizes a certain way because of the fixed input, but in your real program you give more varied input and the optimization decisions shake out differently (or not at all!)? Or what if the engine kicks in optimizations because it sees the code being run tens of thousands of times by the benchmarking utility, but in your real program it will only run a hundred times in near proximity, and under those conditions the engine determines the optimizations are not worth it?
+
+如果引擎由于固定的输入而用特定的方法进行了优化，但是在你的真实的程序中你给出了更多种类的输入，以至于优化机制决定使用不同的方式呢（或者根本不优化！）？或者如果因为引擎看到代码被基准分析工具运行了成千上万次而进行了优化，但在你的真实程序中它将仅会运行大约100次，而在这些条件下引擎认定优化不值得呢？
 
 And all those optimizations we just hypothesized about might happen in our constrained test but maybe the engine wouldn't do them in a more complex program (for various reasons). Or it could be reversed -- the engine might not optimize such trivial code but may be more inclined to optimize it more aggressively when the system is already more taxed by a more sophisticated program.
 
+所有这些我们刚刚假想的优化措施可能会发生在我们的被限定的测试中，但在更复杂的程序中引擎可能不会那么做（由于种种原因）。或者正相反——引擎可能不会优化这样不起眼的代码，但是可能会更倾向于在系统已经被一个更精巧的程序消耗后更加积极地优化。
+
 The point I'm trying to make is that you really don't know for sure exactly what's going on under the covers. All the guesses and hypothesis you can muster don't amount to hardly anything concrete for really making such decisions.
+
+我想要说的是，你不能确切地知道这背后究竟发生了什么。你能搜罗的所有猜测和假想几乎不会聚集成任何坚实的依据。（TODO）
 
 Does that mean you can't really do any useful testing? **Definitely not!**
 
+难道这意味着你不能真正地做有用的测试了吗？**绝对不是！**
+
 What this boils down to is that testing *not real* code gives you *not real* results. In so much as is possible and practical, you should test actual real, non-trivial snippets of your code, and under as best of real conditions as you can actually hope to. Only then will the results you get have a chance to approximate reality.
+
+这可以归结为测试 *不真实* 的代码会给你 *不真实* 的结果。在如此多的可能性和实践中，你应当测试真实的，
 
 Microbenchmarks like `++x` vs `x++` are so incredibly likely to be bogus, we might as well just flatly assume them as such.
 
