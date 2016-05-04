@@ -365,9 +365,9 @@ JS编译器能够决定干脆完全移除`foo`变量，并 *内联* 它的值是
 
 **注意：** 当然，编译器可能也会对这里的`baz`变量进行相似的分析和重写。
 
-When you begin to think about your JS code as being a hint or suggestion to the engine of what to do, rather than a literal requirement, you realize that a lot of the obsession over discrete syntactic minutia is most likely unfounded.
+但你开始将你的JS代码作为一种告诉引擎去做什么的提示或建议来考虑，而不是一种字面上的需求，你就会理解许多对零碎的语法细节的痴迷几乎是毫无根据的。
 
-Another example:
+另一个例子：
 
 ```js
 function factorial(n) {
@@ -378,11 +378,11 @@ function factorial(n) {
 factorial( 5 );		// 120
 ```
 
-Ah, the good ol' fashioned "factorial" algorithm! You might assume that the JS engine will run that code mostly as is. And to be honest, it might -- I'm not really sure.
+啊，一个老式的“阶乘”算法！你可能会认为JS引擎将会原封不动地运行这段代码。老实说，它可能会——我不是很确定。
 
-But as an anecdote, the same code expressed in C and compiled with advanced optimizations would result in the compiler realizing that the call `factorial(5)` can just be replaced with the constant value `120`, eliminating the function and call entirely!
+但作为一段轶事，用C语言表达的同样的代码并使用高级的优化处理进行编译时，将会导致编译器认为`factorial(5)`调用可以被替换为常数值`120`，完全消除这个函数以及调用！
 
-Moreover, some engines have a practice called "unrolling recursion," where it can realize that the recursion you've expressed can actually be done "easier" (i.e., more optimally) with a loop. It's possible the preceding code could be *rewritten* by a JS engine to run as:
+另外，一些引擎有一种称为“递归展开（unrolling recursion）”的行为，它会意识到你表达的递归实际上可以用循环“更容易”（也就是更优化地）地完成。前面的代码可能会被JS引擎 *重写* 为：
 
 ```js
 function factorial(n) {
@@ -398,11 +398,11 @@ function factorial(n) {
 factorial( 5 );		// 120
 ```
 
-Now, let's imagine that in the earlier snippet you had been worried about whether `n * factorial(n-1)` or `n *= factorial(--n)` runs faster. Maybe you even did a performance benchmark to try to figure out which was better. But you miss the fact that in the bigger context, the engine may not run either line of code because it may unroll the recursion!
+现在，让我们想象在前一个片段中你曾经担心`n * factorial(n-1)`或`n *= factorial(--n)`哪一个运行的更快。也许你甚至做了性能基准分析来试着找出哪个更好。但是你忽略了一个事实，就是在更大的上下文环境中，引擎也许不会运行任何一行代码，因为它可能展开了递归！
 
-Speaking of `--`, `--n` versus `n--` is often cited as one of those places where you can optimize by choosing the `--n` version, because theoretically it requires less effort down at the assembly level of processing.
+说到`--`，`--n`与`n--`的对比经常在你可以通过选择`--n`的版本进行优化的地方被引用，因为理论上在汇编语言层面的处理上，它要做的努力少一些。
 
-That sort of obsession is basically nonsense in modern JavaScript. That's the kind of thing you should be letting the engine take care of. You should write the code that makes the most sense. Compare these three `for` loops:
+在现代的JavaScript中这种痴迷基本上是没道理的。这种事情你应当留给引擎来处理。你应该编写最合理的代码。比较这三个`for`循环：
 
 ```js
 // Option 1
@@ -421,11 +421,11 @@ for (var i=-1; ++i<10; ) {
 }
 ```
 
-Even if you have some theory where the second or third option is more performant than the first option by a tiny bit, which is dubious at best, the third loop is more confusing because you have to start with `-1` for `i` to account for the fact that `++i` pre-increment is used. And the difference between the first and second options is really quite irrelevant.
+就算你有一些理论支持第二或第三种选择要比第一种的性能好那么一点点，充其量只能算是可疑，第三个循环更加使人困惑，因为为了使提前递增的`++i`被使用，你不得不让`i`从`-1`开始来计算。而第一个与第二个选择之间的区别实际上无关紧要。
 
-It's entirely possible that a JS engine may see a place where `i++` is used and realize that it can safely replace it with the `++i` equivalent, which means your time spent deciding which one to pick was completely wasted and the outcome moot.
+这样的事情是完全有可能的：JS引擎也许看到一个`i++`被使用的地方，并意识到它可以安全地替换为等价的`++i`，这意味着你决定挑选它们中的哪一个所花的时间完全被浪费了，而且这么做的产出毫无意义。
 
-Here's another common example of silly microperformance obsession:
+这是另外一个常见的愚蠢的痴迷于微观性能的例子：
 
 ```js
 var x = [ .. ];
@@ -441,46 +441,78 @@ for (var i=0, len = x.length; i < len; i++) {
 }
 ```
 
-The theory here goes that you should cache the length of the `x` array in the variable `len`, because ostensibly it doesn't change, to avoid paying the price of `x.length` being consulted for each iteration of the loop.
+这里的理论是，你应当在变量`len`中缓存数组`x`的长度，因为从表面上看它不会改变，来避免在循环的每一次迭代中都查询`x.length`所花的开销。
 
-If you run performance benchmarks around `x.length` usage compared to caching it in a `len` variable, you'll find that while the theory sounds nice, in practice any measured differences are statistically completely irrelevant.
+如果你围绕`x.length`的用法进行性能基准分析，与将它缓存在变量`len`中的用法进行比较，你会发现虽然理论听起来不错，但是在实践中任何测量出的差异都是在统计学上完全没有意义的。
 
-In fact, in some engines like v8, it can be shown (http://mrale.ph/blog/2014/12/24/array-length-caching.html) that you could make things slightly worse by pre-caching the length instead of letting the engine figure it out for you. Don't try to outsmart your JavaScript engine, you'll probably lose when it comes to performance optimizations.
+事实上，在像v8这样的引擎中，可以看到通过提前缓存长度而不是让引擎帮你处理它会使事情稍稍恶化。不要尝试在聪明上战胜你的JavaScript引擎，当它来到性能优化的地方时你可能会输给它。
 
 ### Not All Engines Are Alike
 
 The different JS engines in various browsers can all be "spec compliant" while having radically different ways of handling code. The JS specification doesn't require anything performance related -- well, except ES6's "Tail Call Optimization" covered later in this chapter.
 
+在各种浏览器中的不同JS引擎可以称为“兼容规范的”，虽然各自有根本不同的方式处理代码。JS语言规范不要求与性能相关的任何事情——除了将在本章稍后将要讲解的ES6“尾部调用优化（Tail Call Optimization）”。
+
 The engines are free to decide that one operation will receive its attention to optimize, perhaps trading off for lesser performance on another operation. It can be very tenuous to find an approach for an operation that always runs faster in all browsers.
+
+引擎可以自由决定哪一个操作将会受到它的关注而被优化，也许代价是在另一种操作上的性能降低一些。要为一种操作找到一种在所有的浏览器中总是运行的更快的方式是非常脆弱的。
 
 There's a movement among some in the JS dev community, especially those who work with Node.js, to analyze the specific internal implementation details of the v8 JavaScript engine and make decisions about writing JS code that is tailored to take best advantage of how v8 works. You can actually achieve a surprisingly high degree of performance optimization with such endeavors, so the payoff for the effort can be quite high.
 
+在JS开发者社区的一些人发起了一项运动，特别是那些使用Node.js工作的人，去分析v8 JavaScript引擎的具体内部实现细节，并决定如何编写定制的JS代码来最大限度的利用v8的工作方式。通过这样的努力你实际上可以在性能优化上达到惊人的高度，所以这种努力的收益可能十分高。
+
 Some commonly cited examples (https://github.com/petkaantonov/bluebird/wiki/Optimization-killers) for v8:
 
+一些针对v8的经常被引用的例子是：
+
 * Don't pass the `arguments` variable from one function to any other function, as such "leakage" slows down the function implementation.
+* 不要将`arguments`变量从一个函数传递到任何其他函数中，因为这样的“泄露”放慢了函数实现。
 * Isolate a `try..catch` in its own function. Browsers struggle with optimizing any function with a `try..catch` in it, so moving that construct to its own function means you contain the de-optimization harm while letting the surrounding code be optimizable.
+* 将一个`try..catch`隔离到它自己的函数中。浏览器在优化任何含有`try..catch`的函数时都会苦苦挣扎，所以将这样的结构移动到它自己的函数中意味着你持有不可优化的危害的同时，让其周围的代码是可以优化的。
 
 But rather than focus on those tips specifically, let's sanity check the v8-only optimization approach in a general sense.
 
+但与其聚焦在这些具体的窍门上，不如让我们在一般意义上对v8专用的优化方式进行一下合理性检查。
+
 Are you genuinely writing code that only needs to run in one JS engine? Even if your code is entirely intended for Node.js *right now*, is the assumption that v8 will *always* be the used JS engine reliable? Is it possible that someday a few years from now, there's another server-side JS platform besides Node.js that you choose to run your code on? What if what you optimized for before is now a much slower way of doing that operation on the new engine?
+
+你真的在编写仅仅需要在一种JS引擎上运行的代码吗？即便你的代码 *当前* 是完全为了Node.js，那么v8将 *总是* 被使用的JS引擎的假设可靠吗？从现在开始的几年以后的某一天，你有没有可能会选择除了Node.js之外的另一种服务器端JS平台来运行你的程序？如果你以前所做的优化现在在新的引擎上成为了执行这种操作的很慢的方式怎么办？
 
 Or what if your code always stays running on v8 from here on out, but v8 decides at some point to change the way some set of operations works such that what used to be fast is now slow, and vice versa?
 
+或者如果你的代码总是在v8上运行，但是v8在某个时点决定改变一组操作的工作方式，是的曾经快的现在变慢了，曾经慢的变快了呢？
+
 These scenarios aren't just theoretical, either. It used to be that it was faster to put multiple string values into an array and then call `join("")` on the array to concatenate the values than to just use `+` concatenation directly with the values. The historical reason for this is nuanced, but it has to do with internal implementation details about how string values were stored and managed in memory.
+
+这些场景也都不只是理论上的。曾经，将多个字符串值放在一个数组中然后在这个数组上调用`join("")`来连接这些值，要比仅适用`+`直接连接这些值要快。这件事的历史原因很微妙，但它与字符串值如何被存储和在内存中管理的内部实现细节有关。
 
 As a result, "best practice" advice at the time disseminated across the industry suggesting developers always use the array `join(..)` approach. And many followed.
 
+结果，当时在业界广泛传播的“最佳实践”建议开发者们总是使用数组`join(..)`的方式。而且有许多人遵循了。
+
 Except, somewhere along the way, the JS engines changed approaches for internally managing strings, and specifically put in optimizations for `+` concatenation. They didn't slow down `join(..)` per se, but they put more effort into helping `+` usage, as it was still quite a bit more widespread.
+
+某一天，JS引擎改变了内部管理字符串的方式，而且特别在`+`连接上做了优化。他们并没有放慢`join(..)`，但是他们在帮助`+`用法上做了更多的努力，因为它依然十分普遍。
 
 **Note:** The practice of standardizing or optimizing some particular approach based mostly on its existing widespread usage is often called (metaphorically) "paving the cowpath."
 
+**注意：** 对于一些特定的方式，很大程度上基于它的现存广泛使用而进行标准化和优化的业务，经常称为“”
+
 Once that new approach to handling strings and concatenation took hold, unfortunately all the code out in the wild that was using array `join(..)` to concatenate strings was then sub-optimal.
+
+一旦处理字符串和连接的新方式定型，所有在世界上运行的，使用数组`join(..)`来连接字符串的代码都不幸地变成了次优的方式。
 
 Another example: at one time, the Opera browser differed from other browsers in how it handled the boxing/unboxing of primitive wrapper objects (see the *Types & Grammar* title of this book series). As such, their advice to developers was to use a `String` object instead of the primitive `string` value if properties like `length` or methods like `charAt(..)` needed to be accessed. This advice may have been correct for Opera at the time, but it was literally completely opposite for other major contemporary browsers, as they had optimizations specifically for the `string` primitives and not their object wrapper counterparts.
 
+另一个例子：曾经，Opera浏览器在如何处理主要包装对象的封箱/开箱上与其他浏览器不同。因此，他们给开发者的建议是如果一个原生`string`值的属性（如`length`）或方法（如`charAt(..)`）需要被访问，就使用一个`String`对象取代它。这个建议也许对那时的Opera是正确的，但是对于同时代的其他浏览器来说简直就是完全相反的，因为它们都对原生`string`进行了专门的优化，而不是对它们的包装对象。
+
 I think these various gotchas are at least possible, if not likely, for code even today. So I'm very cautious about making wide ranging performance optimizations in my JS code based purely on engine implementation details, **especially if those details are only true of a single engine**.
 
+我认为即使是对今天的代码，这种种陷阱即便可能性不高，至少是可能的。所以对于在我的JS代码中单纯地根据引擎的实现细节来进行大范围的优化这件事来说我会非常小心，**特别是如果这些细节仅对一种引擎成立时。**
+
 The reverse is also something to be wary of: you shouldn't necessarily change a piece of code to work around one engine's difficulty with running a piece of code in an acceptably performant way.
+
+
 
 Historically, IE has been the brunt of many such frustrations, given that there have been plenty of scenarios in older IE versions where it struggled with some performance aspect that other major browsers of the time seemed not to have much trouble with. The string concatenation discussion we just had was actually a real concern back in the IE6 and IE7 days, where it was possible to get better performance out of `join(..)` than `+`.
 
