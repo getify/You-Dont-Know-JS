@@ -166,63 +166,47 @@ var Y2 = Number( foo );
 
 让我们假装`X`与`Y`的测试结果在统计上是相同的。那么你关于`"f"`字符上发生的事情的直觉得到确认了吗？没有。
 
-It's possible in our hypothetical that the engine might recognize that the variables `twelve` and `foo` are only being used in one place in each test, and so it might decide to inline those values. Then it may realize that `Number( "12" )` can just be replaced by `12`. And maybe it comes to the same conclusion with `parseInt(..)`, or maybe not.
-
 在我们的假想中可能发生这样的事情：引擎可能会识别出变量`twelve`和`foo`在每个测试中仅被使用了一次，因此它可能会决定要内联这些值。然后它可能发现`Number("12")`可以替换为`12`。而且也许会得到与`parseInt(..)`相同的结论，也许不会。
-
-Or an engine's dead-code removal heuristic could kick in, and it could realize that variables `X` and `Y` aren't being used, so declaring them is irrelevant, so it doesn't end up doing anything at all in either test.
 
 或者一个引擎的死代码移除启发式算法会搅和进来，而且它发现变量`X`和`Y`都没有被使用，所以声明它们是没有意义的，所以最终在任一个测试中都不做任何事情。
 
-And all that's just made with the mindset of assumptions about a single test run. Modern engines are fantastically more complicated than what we're intuiting here. They do all sorts of tricks, like tracing and tracking how a piece of code behaves over a short period of time, or with a particularly constrained set of inputs.
-
 而且所有这些都只是关于一个单独测试运行的假设心态而言的。比我们在这里用直觉想象的，现代的引擎更加难以置信地复杂。它们会使用所有的招数，比如追踪并记录一段代码在一段很短的时间内的行为，或者使用一组特别限定的输入。
-
-What if the engine optimizes a certain way because of the fixed input, but in your real program you give more varied input and the optimization decisions shake out differently (or not at all!)? Or what if the engine kicks in optimizations because it sees the code being run tens of thousands of times by the benchmarking utility, but in your real program it will only run a hundred times in near proximity, and under those conditions the engine determines the optimizations are not worth it?
 
 如果引擎由于固定的输入而用特定的方法进行了优化，但是在你的真实的程序中你给出了更多种类的输入，以至于优化机制决定使用不同的方式呢（或者根本不优化！）？或者如果因为引擎看到代码被基准分析工具运行了成千上万次而进行了优化，但在你的真实程序中它将仅会运行大约100次，而在这些条件下引擎认定优化不值得呢？
 
-And all those optimizations we just hypothesized about might happen in our constrained test but maybe the engine wouldn't do them in a more complex program (for various reasons). Or it could be reversed -- the engine might not optimize such trivial code but may be more inclined to optimize it more aggressively when the system is already more taxed by a more sophisticated program.
-
 所有这些我们刚刚假想的优化措施可能会发生在我们的被限定的测试中，但在更复杂的程序中引擎可能不会那么做（由于种种原因）。或者正相反——引擎可能不会优化这样不起眼的代码，但是可能会更倾向于在系统已经被一个更精巧的程序消耗后更加积极地优化。
-
-The point I'm trying to make is that you really don't know for sure exactly what's going on under the covers. All the guesses and hypothesis you can muster don't amount to hardly anything concrete for really making such decisions.
 
 我想要说的是，你不能确切地知道这背后究竟发生了什么。你能搜罗的所有猜测和假想几乎不会聚集成任何坚实的依据。（TODO）
 
-Does that mean you can't really do any useful testing? **Definitely not!**
-
 难道这意味着你不能真正地做有用的测试了吗？**绝对不是！**
 
-What this boils down to is that testing *not real* code gives you *not real* results. In so much as is possible and practical, you should test actual real, non-trivial snippets of your code, and under as best of real conditions as you can actually hope to. Only then will the results you get have a chance to approximate reality.
+这可以归结为测试 *不真实* 的代码会给你 *不真实* 的结果。在尽可能的情况下，你应当测试真实的，有意义的代码段，并且在最接近你实际能够期望的真实条件下进行。只有这样你得到的结果才有机会模拟现实。
 
-这可以归结为测试 *不真实* 的代码会给你 *不真实* 的结果。在如此多的可能性和实践中，你应当测试真实的，
-
-Microbenchmarks like `++x` vs `x++` are so incredibly likely to be bogus, we might as well just flatly assume them as such.
+像`++x`和`x++`这样的微观基准分析简直和伪命题一模一样，我们也许应该直接认为它就是。
 
 ## jsPerf.com
 
-While Benchmark.js is useful for testing the performance of your code in whatever JS environment you're running, it cannot be stressed enough that you need to compile test results from lots of different environments (desktop browsers, mobile devices, etc.) if you want to have any hope of reliable test conclusions.
+虽然Bechmark.js对于在你使用的任何JS环境中测试代码性能很有用，但是如果你需要从许多不同的环境（桌面浏览器，移动设备等）汇总测试结果并期望得到可靠的测试结论，它就显得比较紧张。
 
-For example, Chrome on a high-end desktop machine is not likely to perform anywhere near the same as Chrome mobile on a smartphone. And a smartphone with a full battery charge is not likely to perform anywhere near the same as a smartphone with 2% battery life left, when the device is starting to power down the radio and processor.
+举例来说，Chrome在高端的桌面电脑上与Chrome移动版在智能手机上的表现就大相径庭。而一个充满电的智能手机与一个只剩2%电量，设备开始降低无线电和处理器的能源供应的智能手机的表现也完全不同。
 
-If you want to make assertions like "X is faster than Y" in any reasonable sense across more than just a single environment, you're going to need to actually test as many of those real world environments as possible. Just because Chrome executes some X operation faster than Y doesn't mean that all browsers do. And of course you also probably will want to cross-reference the results of multiple browser test runs with the demographics of your users.
+如果在横跨多于一种环境的情况下，你想在任何合理的意义上宣称“X比Y快”，那么你就需要实际测试尽可能多的真实世界的环境。只因为Chrome执行某种X操作比Y快并不意味着所有的浏览器都是这样。而且你还可能想要交叉参照基于你的用户的人口统计的多种浏览器测试运行的结果。
 
-There's an awesome website for this purpose called jsPerf (http://jsperf.com). It uses the Benchmark.js library we talked about earlier to run statistically accurate and reliable tests, and makes the test on an openly available URL that you can pass around to others.
+有一个为此目的而生的牛X网站，称为jsPerf（http://jsperf.com）。它使用我们前面提到的Benchmark.js库来运行统计上正确且可靠的测试，并且可以让测试运行在一个你可交给其他人的公开URL上。
 
-Each time a test is run, the results are collected and persisted with the test, and the cumulative test results are graphed on the page for anyone to see.
+每当一个测试运行后，其结果都被收集并与这个测试一起保存，同时累积的测试结果将在网页上被绘制成图供所有人阅览。
 
-When creating a test on the site, you start out with two test cases to fill in, but you can add as many as you need. You also have the ability to set up `setup` code that is run at the beginning of each test cycle and `teardown` code run at the end of each cycle.
+当在这个网站上创建测试时，你一开始有两个测试用例可以填写，但你可以根据需要添加任意多个。你还可以建立在每次测试轮回开始时运行的`setup`代码，和在每次测试轮回结束前运行的`teardown`代码。
 
-**Note:** A trick for doing just one test case (if you're benchmarking a single approach instead of a head-to-head) is to fill in the second test input boxes with placeholder text on first creation, then edit the test and leave the second test blank, which will delete it. You can always add more test cases later.
+**注意：** 一个只做一个测试用例（如果你只对一个方案进行基准分析而不是相互对照）的技巧是，在第一次创建时使用输入框的占位提示文本填写第二个测试输入框，之后编辑这个测试并将第二个测试留为空白，这样它就会被删除。你可以稍后添加更多测试用例。
 
-You can define the initial page setup (importing libraries, defining utility helper functions, declaring variables, etc.). There are also options for defining setup and teardown behavior if needed -- consult the "Setup/Teardown" section in the Benchmark.js discussion earlier.
+你可以顶一个页面的初始配置。如有需要这里也有选项可以定义setup和teardow行为——参照前面关于Benchmark.js的讨论中的“Setup/Teardown”一节。
 
 ### Sanity Check
 
-jsPerf is a fantastic resource, but there's an awful lot of tests published that when you analyze them are quite flawed or bogus, for any of a variety of reasons as outlined so far in this chapter.
+jsPerf是一个奇妙的资源，但它上面有许多公开的糟糕测试，当你分析它们时会发现，由于在本章目前为止罗列的各种原因，它们有很大的漏洞或者是伪命题。
 
-Consider:
+考虑：
 
 ```js
 // Case 1
@@ -246,17 +230,18 @@ for (var i=0; i<10; i++) {
 
 Some observations to ponder about this test scenario:
 
-* It's extremely common for devs to put their own loops into test cases, and they forget that Benchmark.js already does all the repetition you need. There's a really strong chance that the `for` loops in these cases are totally unnecessary noise.
-* The declaring and initializing of `x` is included in each test case, possibly unnecessarily. Recall from earlier that if `x = []` were in the `setup` code, it wouldn't actually be run before each test iteration, but instead once at the beginning of each cycle. That means `x` would continue growing quite large, not just the size `10` implied by the `for` loops.
+关于这个测试场景有一些现象值得我们深思：
 
-   So is the intent to make sure the tests are constrained only to how the JS engine behaves with very small arrays (size `10`)? That *could* be the intent, but if it is, you have to consider if that's not focusing far too much on nuanced internal implementation details.
+* 开发者们在测试用例中加入自己的循环极其常见，而他们忘记了Benchmark.js已经做了你所需要的所有反复。这些测试用例中的`for`循环有很大的可能完全是不必要的噪音。
+* 在每一个测试用例中都包含了`x`的声明与初始化，似乎是不必要的。回想早前如果`x = []`存在于`setup`代码中，它实际上不会在每一次测试迭代前执行，而是在每一个轮回的开始执行一次。这意味这`x`将会持续地增长到非常大，而不仅是`for`循环中暗示的大小`10`。
 
-   On the other hand, does the intent of the test embrace the context that the arrays will actually be growing quite large? Is the JS engines' behavior with larger arrays relevant and accurate when compared with the intended real world usage?
+	 那么这是有意确保测试仅被限制在很小的数组上（大小为`10`）来观察JS引擎如何动作？这 *可能* 是有意的，但如果是，你就不得不考虑它是否过于关注内微妙的部实现细节了。
 
-* Is the intent to find out how much `x.length` or `x.push(..)` add to the performance of the operation to append to the `x` array? OK, that might be a valid thing to test. But then again, `push(..)` is a function call, so of course it's going to be slower than `[..]` access. Arguably, cases 1 and 2 are fairer than case 3.
+   另一方面，这个测试的意图包含数组实际上会增长到非常大的情况吗？JS引擎对大数组的行为与真实世界中预期的用法相比有意义且正确吗？
 
+* 它的意图是要找出`x.length`或`x.push(..)`在数组`x`的追加操作上拖慢了多少性能吗？好吧，这可能是一个合法的测试。但再一次，`push(..)`是一个函数调用，所以它理所当然地要比`[..]`访问慢。可以说，用例1与用例2比用例3更合理。
 
-Here's another example that illustrates a common apples-to-oranges flaw:
+这里有另一个展示苹果比橘子漏洞的例子：
 
 ```js
 // Case 1
@@ -272,13 +257,13 @@ x.sort( function mySort(a,b){
 } );
 ```
 
-Here, the obvious intent is to find out how much slower the custom `mySort(..)` comparator is than the built-in default comparator. But by specifying the function `mySort(..)` as inline function expression, you've created an unfair/bogus test. Here, the second case is not only testing a custom user JS function, **but it's also testing creating a new function expression for each iteration.**
+这里，明显的意图是要找出自定义的`mySort(..)`比较器比内建的默认比较器慢多少。但是通过将函数`mySort(..)`作为内联的函数表达式生命，你就创建了一个不合理的/伪命题的测试。这里，第二个测试用例不仅测试用户自定义的JS函数，**而且它还测试为每一个迭代创建一个新的函数表达式。**
 
-Would it surprise you to find out that if you run a similar test but update it to isolate only for creating an inline function expression versus using a pre-declared function, the inline function expression creation can be from 2% to 20% slower!?
+不知这会不会吓到你，如果你运行一个相似的测试，但是将它更改为比较内联函数表达式与预先声明的函数，内联函数表达式的创建可能要慢2%到20%。
 
-Unless your intent with this test *is* to consider the inline function expression creation "cost," a better/fairer test would put `mySort(..)`'s declaration in the page setup -- don't put it in the test `setup` as that's unnecessary redeclaration for each cycle -- and simply reference it by name in the test case: `x.sort(mySort)`.
+除非你的测试的意图 *就是* 要考虑内联函数表达式创建的“成本”，一个更好/更合理的测试是将`mySort(..)`的声明放在页面的setup中——不要放在测试的`setup`中，因为这会为每次轮回进行不必要的重复声明——然后简单地在测试用例中通过名称引用它：`x.sort(mySort)`。
 
-Building on the previous example, another pitfall is in opaquely avoiding or adding "extra work" to one test case that creates an apples-to-oranges scenario:
+基于前一个例子，另一种造成苹果比橘子场景的陷阱是，不透明地对一个测试用例回避或添加“额外的工作”：
 
 ```js
 // Case 1
@@ -292,13 +277,13 @@ x.sort( function mySort(a,b){
 } );
 ```
 
-Setting aside the previously mentioned inline function expression pitfall, the second case's `mySort(..)` works in this case because you have provided it numbers, but would have of course failed with strings. The first case doesn't throw an error, but it actually behaves differently and has a different outcome! It should be obvious, but: **a different outcome between two test cases almost certainly invalidates the entire test!**
+将先前提到的内联函数表达式陷阱放在一边不谈，第二个用例的`mySort(..)`可以在这里工作是因为你给它提供了一组数字，而在字符串的情况下肯定会失败。第一个用例不会扔出错误，但是它的实际行为将会不同而且会有不同的结果！这应当很明显，但是：**两个测试用例之间结果的不同，几乎可以否定了整个测试的合法性！**
 
-But beyond the different outcomes, in this case, the built in `sort(..)`'s comparator is actually doing "extra work" that `mySort()` does not, in that the built-in one coerces the compared values to strings and does lexicographic comparison. The first snippet results in `[-14, 0, 0, 12, 18, 2.9, 3]` while the second snippet results (likely more accurately based on intent) in `[-14, 0, 0, 2.9, 3, 12, 18]`.
+但是除了结果的不同，在这个用例中，内建的`sort(..)`比较器实际上要比`mySort()`做了更多“额外的工作”，内建的比较器将被比较的值转换为字符串，然后进行字典顺序的比较。这样第一个代码段的结果为`[-14, 0, 0, 12, 18, 2.9, 3]`而第二段代码的结果为`[-14, 0, 0, 2.9, 3, 12, 18]`（就测试的意图来讲可能更准确）。
 
-So that test is unfair because it's not actually doing the same task between the cases. Any results you get are bogus.
+所以这个测试是不合理的，因为它的两个测试用例实际上没有做相同的任务。你得到的任何结果都将是伪命题。
 
-These same pitfalls can even be much more subtle:
+这些同样的陷阱可以微妙的多：
 
 ```js
 // Case 1
@@ -310,9 +295,9 @@ var x;
 var y = x ? 1 : 2;
 ```
 
-Here, the intent might be to test the performance impact of the coercion to a Boolean that the `? :` operator will do if the `x` expression is not already a Boolean (see the *Types & Grammar* title of this book series). So, you're apparently OK with the fact that there is extra work to do the coercion in the second case.
+这里的意图可能是要测试如果`x`表达式不是Boolean的情况下，`? :`操作符将要进行的Boolean转换对性能的影响。那么，根据在第二个用例中将会有额外的工作进行转换的事实，你看起来没问题。
 
-The subtle problem? You're setting `x`'s value in the first case and not setting it in the other, so you're actually doing work in the first case that you're not doing in the second. To eliminate any potential (albeit minor) skew, try:
+微妙的问题呢？你在第一个测试用例中设定了`x`的值，而没在另一个中设置，那么你实际上在第一个用例中做了在第二个用例中没做的工作。为了消灭任何潜在的扭曲（尽管很微小），可以这样：
 
 ```js
 // Case 1
@@ -324,29 +309,29 @@ var x = undefined;
 var y = x ? 1 : 2;
 ```
 
-Now there's an assignment in both cases, so the thing you want to test -- the coercion of `x` or not -- has likely been more accurately isolated and tested.
+现在两个用例都有一个赋值了，这样你想要测试的东西——`x`的转换或者不转换——会更加正确的被隔离并测试。
 
 ## Writing Good Tests
 
-Let me see if I can articulate the bigger point I'm trying to make here.
+让我看看我能否清晰地表达我想在这里申明的更大的要点。
 
-Good test authoring requires careful analytical thinking about what differences exist between two test cases and whether the differences between them are *intentional* or *unintentional*.
+好的测试作者需要细心地分析性地思考两个测试用例之间存在什么样的差别，和它们之间的差别是否是 *有意的* 或 *无意的*。
 
-Intentional differences are of course normal and OK, but it's too easy to create unintentional differences that skew your results. You have to be really, really careful to avoid that skew. Moreover, you may intend a difference but it may not be obvious to other readers of your test what your intent was, so they may doubt (or trust!) your test incorrectly. How do you fix that?
+有意的差别当然是正常的，但是产生歪曲结果的无意的差异实在太容易了。你不得不非常非常小心地回避这种歪曲。另外，你可能预期一个差异，但是你的意图是什么对于你的测试的其他读者来讲不那么明显，所以他们可能会错误地怀疑（或者相信！）你的测试。你如何搞定这个呢？
 
-**Write better, clearer tests.** But also, take the time to document (using the jsPerf.com "Description" field and/or code comments) exactly what the intent of your test is, even to the nuanced detail. Call out the intentional differences, which will help others and your future self to better identify unintentional differences that could be skewing the test results.
+**编写更好，更清晰的测试。** 另外，花些时间用文档确切地记录下你的测试意图是什么，即使是微小的细节。明确地表示有意的差别，这将帮助其他人和未来的你自己更好地定位那些可能歪曲测试结果的无意的差别。
 
-Isolate things which aren't relevant to your test by pre-declaring them in the page or test setup settings so they're outside the timed parts of the test.
+将与你的测试无关的东西隔离开来，通过在页面或测试的setup设置中预先声明它们使它们位于测试计时部分的外部。
 
-Instead of trying to narrow in on a tiny snippet of your real code and benchmarking just that piece out of context, tests and benchmarks are better when they include a larger (while still relevant) context. Those tests also tend to run slower, which means any differences you spot are more relevant in context.
+与将你的真实代码限制在很小的一块，并脱离上下文环境来进行基准分析相比，测试与基准分析在它们包含更大的上下文环境（但仍然有意义）时表现更好。这些测试将会趋向于运行得更慢，这意味着你发现的任何差别都在上下文环境中更有意义。
 
 ## Microperformance
 
-OK, until now we've been dancing around various microperformance issues and generally looking disfavorably upon obsessing about them. I want to take just a moment to address them directly.
+好了，直至现在我们一直围绕着微观性能的问题跳舞，并且一般上不赞成痴迷于它们。我想花一点儿时间直接解决它们。
 
-The first thing you need to get more comfortable with when thinking about performance benchmarking your code is that the code you write is not always the code the engine actually runs. We briefly looked at that topic back in Chapter 1 when we discussed statement reordering by the compiler, but here we're going to suggest the compiler can sometimes decide to run different code than you wrote, not just in different orders but different in substance.
+当你考虑对你的代码进行性能基准分析时，第一件需要习惯的事情就是你写的代码不总是引擎实际运行的代码。我们在第一章中讨论编译器的语句重排时简单地看过这个话题，但是这里我们将要建议编译器能有时决定运行与你编写的不同的代码，不仅是不同的顺序而是不同的替代品。
 
-Let's consider this piece of code:
+让我们考虑这段代码：
 
 ```js
 var foo = 41;
@@ -361,11 +346,11 @@ var foo = 41;
 })();
 ```
 
-You may think about the `foo` reference in the innermost function as needing to do a three-level scope lookup. We covered in the *Scope & Closures* title of this book series how lexical scope works, and the fact that the compiler generally caches such lookups so that referencing `foo` from different scopes doesn't really practically "cost" anything extra.
+你也许会认为在最里面的函数的`foo`引用需要做一个三层作用域查询。我们在这个系列丛书的 *作用域与闭包* 一卷中涵盖了词法作用域如何工作，而事实上编译器通常缓存这样的查询，以至于从不同的作用域引用`foo`不会实质上“花费”任何额外的东西。
 
-But there's something deeper to consider. What if the compiler realizes that `foo` isn't referenced anywhere else but that one location, and it further notices that the value never is anything except the `41` as shown?
+但是这里有些更深刻的东西需要思考。如果编译器认识到`foo`除了这一个位置外没有被任何其他地方引用，进而注意到它的值除了这里的`41`外没有任何变化会怎么样呢？
 
-Isn't it quite possible and acceptable that the JS compiler could decide to just remove the `foo` variable entirely, and *inline* the value, such as this:
+JS编译器能够决定干脆完全移除`foo`变量，并 *内联* 它的值是可能和可接受的，比如这样：
 
 ```js
 (function(){
@@ -378,7 +363,7 @@ Isn't it quite possible and acceptable that the JS compiler could decide to just
 })();
 ```
 
-**Note:** Of course, the compiler could probably also do a similar analysis and rewrite with the `baz` variable here, too.
+**注意：** 当然，编译器可能也会对这里的`baz`变量进行相似的分析和重写。
 
 When you begin to think about your JS code as being a hint or suggestion to the engine of what to do, rather than a literal requirement, you realize that a lot of the obsession over discrete syntactic minutia is most likely unfounded.
 
