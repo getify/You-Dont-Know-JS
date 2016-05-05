@@ -449,104 +449,72 @@ for (var i=0, len = x.length; i < len; i++) {
 
 ### Not All Engines Are Alike
 
-The different JS engines in various browsers can all be "spec compliant" while having radically different ways of handling code. The JS specification doesn't require anything performance related -- well, except ES6's "Tail Call Optimization" covered later in this chapter.
-
 在各种浏览器中的不同JS引擎可以称为“兼容规范的”，虽然各自有根本不同的方式处理代码。JS语言规范不要求与性能相关的任何事情——除了将在本章稍后将要讲解的ES6“尾部调用优化（Tail Call Optimization）”。
-
-The engines are free to decide that one operation will receive its attention to optimize, perhaps trading off for lesser performance on another operation. It can be very tenuous to find an approach for an operation that always runs faster in all browsers.
 
 引擎可以自由决定哪一个操作将会受到它的关注而被优化，也许代价是在另一种操作上的性能降低一些。要为一种操作找到一种在所有的浏览器中总是运行的更快的方式是非常脆弱的。
 
-There's a movement among some in the JS dev community, especially those who work with Node.js, to analyze the specific internal implementation details of the v8 JavaScript engine and make decisions about writing JS code that is tailored to take best advantage of how v8 works. You can actually achieve a surprisingly high degree of performance optimization with such endeavors, so the payoff for the effort can be quite high.
-
 在JS开发者社区的一些人发起了一项运动，特别是那些使用Node.js工作的人，去分析v8 JavaScript引擎的具体内部实现细节，并决定如何编写定制的JS代码来最大限度的利用v8的工作方式。通过这样的努力你实际上可以在性能优化上达到惊人的高度，所以这种努力的收益可能十分高。
-
-Some commonly cited examples (https://github.com/petkaantonov/bluebird/wiki/Optimization-killers) for v8:
 
 一些针对v8的经常被引用的例子是：
 
-* Don't pass the `arguments` variable from one function to any other function, as such "leakage" slows down the function implementation.
 * 不要将`arguments`变量从一个函数传递到任何其他函数中，因为这样的“泄露”放慢了函数实现。
-* Isolate a `try..catch` in its own function. Browsers struggle with optimizing any function with a `try..catch` in it, so moving that construct to its own function means you contain the de-optimization harm while letting the surrounding code be optimizable.
 * 将一个`try..catch`隔离到它自己的函数中。浏览器在优化任何含有`try..catch`的函数时都会苦苦挣扎，所以将这样的结构移动到它自己的函数中意味着你持有不可优化的危害的同时，让其周围的代码是可以优化的。
-
-But rather than focus on those tips specifically, let's sanity check the v8-only optimization approach in a general sense.
 
 但与其聚焦在这些具体的窍门上，不如让我们在一般意义上对v8专用的优化方式进行一下合理性检查。
 
-Are you genuinely writing code that only needs to run in one JS engine? Even if your code is entirely intended for Node.js *right now*, is the assumption that v8 will *always* be the used JS engine reliable? Is it possible that someday a few years from now, there's another server-side JS platform besides Node.js that you choose to run your code on? What if what you optimized for before is now a much slower way of doing that operation on the new engine?
-
 你真的在编写仅仅需要在一种JS引擎上运行的代码吗？即便你的代码 *当前* 是完全为了Node.js，那么v8将 *总是* 被使用的JS引擎的假设可靠吗？从现在开始的几年以后的某一天，你有没有可能会选择除了Node.js之外的另一种服务器端JS平台来运行你的程序？如果你以前所做的优化现在在新的引擎上成为了执行这种操作的很慢的方式怎么办？
-
-Or what if your code always stays running on v8 from here on out, but v8 decides at some point to change the way some set of operations works such that what used to be fast is now slow, and vice versa?
 
 或者如果你的代码总是在v8上运行，但是v8在某个时点决定改变一组操作的工作方式，是的曾经快的现在变慢了，曾经慢的变快了呢？
 
-These scenarios aren't just theoretical, either. It used to be that it was faster to put multiple string values into an array and then call `join("")` on the array to concatenate the values than to just use `+` concatenation directly with the values. The historical reason for this is nuanced, but it has to do with internal implementation details about how string values were stored and managed in memory.
-
 这些场景也都不只是理论上的。曾经，将多个字符串值放在一个数组中然后在这个数组上调用`join("")`来连接这些值，要比仅适用`+`直接连接这些值要快。这件事的历史原因很微妙，但它与字符串值如何被存储和在内存中管理的内部实现细节有关。
-
-As a result, "best practice" advice at the time disseminated across the industry suggesting developers always use the array `join(..)` approach. And many followed.
 
 结果，当时在业界广泛传播的“最佳实践”建议开发者们总是使用数组`join(..)`的方式。而且有许多人遵循了。
 
-Except, somewhere along the way, the JS engines changed approaches for internally managing strings, and specifically put in optimizations for `+` concatenation. They didn't slow down `join(..)` per se, but they put more effort into helping `+` usage, as it was still quite a bit more widespread.
-
 某一天，JS引擎改变了内部管理字符串的方式，而且特别在`+`连接上做了优化。他们并没有放慢`join(..)`，但是他们在帮助`+`用法上做了更多的努力，因为它依然十分普遍。
-
-**Note:** The practice of standardizing or optimizing some particular approach based mostly on its existing widespread usage is often called (metaphorically) "paving the cowpath."
 
 **注意：** 对于一些特定的方式，很大程度上基于它的现存广泛使用而进行标准化和优化的业务，经常称为“”
 
-Once that new approach to handling strings and concatenation took hold, unfortunately all the code out in the wild that was using array `join(..)` to concatenate strings was then sub-optimal.
-
 一旦处理字符串和连接的新方式定型，所有在世界上运行的，使用数组`join(..)`来连接字符串的代码都不幸地变成了次优的方式。
-
-Another example: at one time, the Opera browser differed from other browsers in how it handled the boxing/unboxing of primitive wrapper objects (see the *Types & Grammar* title of this book series). As such, their advice to developers was to use a `String` object instead of the primitive `string` value if properties like `length` or methods like `charAt(..)` needed to be accessed. This advice may have been correct for Opera at the time, but it was literally completely opposite for other major contemporary browsers, as they had optimizations specifically for the `string` primitives and not their object wrapper counterparts.
 
 另一个例子：曾经，Opera浏览器在如何处理主要包装对象的封箱/开箱上与其他浏览器不同。因此，他们给开发者的建议是如果一个原生`string`值的属性（如`length`）或方法（如`charAt(..)`）需要被访问，就使用一个`String`对象取代它。这个建议也许对那时的Opera是正确的，但是对于同时代的其他浏览器来说简直就是完全相反的，因为它们都对原生`string`进行了专门的优化，而不是对它们的包装对象。
 
-I think these various gotchas are at least possible, if not likely, for code even today. So I'm very cautious about making wide ranging performance optimizations in my JS code based purely on engine implementation details, **especially if those details are only true of a single engine**.
+我认为即使是对今天的代码，这种种陷阱即便可能性不高，至少也是可能的。所以对于在我的JS代码中单纯地根据引擎的实现细节来进行大范围的优化这件事来说我会非常小心，**特别是如果这些细节仅对一种引擎成立时。**
 
-我认为即使是对今天的代码，这种种陷阱即便可能性不高，至少是可能的。所以对于在我的JS代码中单纯地根据引擎的实现细节来进行大范围的优化这件事来说我会非常小心，**特别是如果这些细节仅对一种引擎成立时。**
+反过来也有一些事情需要警惕：你不应当为了绕过某一种引擎难于处理的地方而改变一块代码。
 
-The reverse is also something to be wary of: you shouldn't necessarily change a piece of code to work around one engine's difficulty with running a piece of code in an acceptably performant way.
+历史上，IE是导致许多这种挫折的领头羊，在老版本的IE中曾经有许多场景，在当时的其他主流浏览器中看起来没有太多麻烦的性能方面苦苦挣扎。我们刚刚讨论的字符串连接在IE6和IE7的年代就是一个真实的问题，那时候使用`join(..)`可能要比使用`+`能得到更好的性能。
 
+不过为了一种浏览器的性能问题而使用一种很有可能在其他所有浏览器上是次优的编码方式，很难说是正当的。即便这种浏览器占有了你的网站用户的很大市场份额，编写恰当的代码并仰仗浏览器最终在更好的优化机制上更新自己可能更实际。
 
+“没什么是比暂时的黑科技更永恒的。”你现在为了绕过一些性能的Bug而编写的代码可能要比这个Bug在浏览器中存在的时间长的多。
 
-Historically, IE has been the brunt of many such frustrations, given that there have been plenty of scenarios in older IE versions where it struggled with some performance aspect that other major browsers of the time seemed not to have much trouble with. The string concatenation discussion we just had was actually a real concern back in the IE6 and IE7 days, where it was possible to get better performance out of `join(..)` than `+`.
+在那个浏览器每五年才更新一次的年代，很难这么说。但是如今，所有的浏览器都在快速地更新，而且它们都在竞争而使得web优化特性变得越来越好。
 
-But it's troublesome to suggest that just one browser's trouble with performance is justification for using a code approach that quite possibly could be sub-optimal in all other browsers. Even if the browser in question has a large market share for your site's audience, it may be more practical to write the proper code and rely on the browser to update itself with better optimizations eventually.
+如果你碰到了一个浏览器确实有其他浏览器没有的性能瑕疵，那么就确保用你一切可用的手段来报告它。绝大多数浏览器都有为此而公开的Bug追迹系统。
 
-"There is nothing more permanent than a temporary hack." Chances are, the code you write now to work around some performance bug will probably outlive the performance bug in the browser itself.
-
-In the days when a browser only updated once every five years, that was a tougher call to make. But as it stands now, browsers across the board are updating at a much more rapid interval (though obviously the mobile world still lags), and they're all competing to optimize web features better and better.
-
-If you run across a case where a browser *does* have a performance wart that others don't suffer from, make sure to report it to them through whatever means you have available. Most browsers have open public bug trackers suitable for this purpose.
-
-**Tip:** I'd only suggest working around a performance issue in a browser if it was a really drastic show-stopper, not just an annoyance or frustration. And I'd be very careful to check that the performance hack didn't have noticeable negative side effects in another browser.
+**提示：** 我只建议如果一个在某种浏览器中的性能问题真的是极端搅局的问题，而不是仅仅是人厌烦或沮丧时才绕过它。而且我会非常小心地检查这种性能黑科技有没有在其他浏览器中产生负面影响。
 
 ### Big Picture
 
-Instead of worrying about all these microperformance nuances, we should instead be looking at big-picture types of optimizations.
+与担心所有这些微观性能的细节相反，我们应但关注全局类型的优化。
 
-How do you know what's big picture or not? You have to first understand if your code is running on a critical path or not. If it's not on the critical path, chances are your optimizations are not worth much.
+你怎么知道什么东西是不是全局？你首先必须理解你的代码是否运行在关键路径上。如果它没在关键路径上，你的优化可能就没有太大价值。
 
-Ever heard the admonition, "that's premature optimization!"? It comes from a famous quote from Donald Knuth: "premature optimization is the root of all evil.". Many developers cite this quote to suggest that most optimizations are "premature" and are thus a waste of effort. The truth is, as usual, more nuanced.
+“这是过早的优化！”你听过这种训诫吗？它源自Donald Knuth的一段著名的话：“过早的优化是万恶之源。”。许多开发者都引用这段话来说明大多数优化都是“过早”的而且是一种精力的浪费。事实是，像往常一样，更加微妙。
 
-Here is Knuth's quote, in context:
+这是Knuth在语境中的原话：
 
-> Programmers waste enormous amounts of time thinking about, or worrying about, the speed of **noncritical** parts of their programs, and these attempts at efficiency actually have a strong negative impact when debugging and maintenance are considered. We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil. Yet we should not pass up our opportunities in that **critical** 3%. [emphasis added]
+> 程序员们浪费了大量的时间考虑，或者担心，他们的程序中的 **不关键** 部分的速度，而在考虑调试和维护时这些在效率上的企图实际上有很强大的负面影响。我们应当忘记微小的效率，可以说在大概97%的情况下：过早的优化是万恶之源。然而我们不应该忽略那 **关键的** 3%中的机会。[强调]
 
 (http://web.archive.org/web/20130731202547/http://pplab.snu.ac.kr/courses/adv_pl05/papers/p261-knuth.pdf, Computing Surveys, Vol 6, No 4, December 1974)
 
-I believe it's a fair paraphrasing to say that Knuth *meant*: "non-critical path optimization is the root of all evil." So the key is to figure out if your code is on the critical path -- you should optimize it! -- or not.
+我相信这样转述Knuth的 *意思* 是合理的：“非关键路径的优化是万恶之源。”所以问题的关键是弄清楚你的代码是否在关键路径上——你因该优化它——或者不。
 
-I'd even go so far as to say this: no amount of time spent optimizing critical paths is wasted, no matter how little is saved; but no amount of optimization on noncritical paths is justified, no matter how much is saved.
+我甚至可以激进地这么说：没有花在优化关键路径上的时间是浪费的，不管它节省的效果多么微小。没有花在优化非关键路径上的时间是合理的，不管它节省的效果多么大。
 
-If your code is on the critical path, such as a "hot" piece of code that's going to be run over and over again, or in UX critical places where users will notice, like an animation loop or CSS style updates, then you should spare no effort in trying to employ relevant, measurably significant optimizations.
+如果你的代码在关键路径上，比如将要一次又一次被运行的“热”代码块儿，或者在用户将要注意到的UX关键位置，比如循环动画或者CSS样式更新，那么你应当不遗余力地进行有意义的，可测量的重大优化。
 
-For example, consider a critical path animation loop that needs to coerce a string value to a number. There are of course multiple ways to do that (see the *Types & Grammar* title of this book series), but which one if any is the fastest?
+举个例子，考虑一个动画循环的关键路径，它需要将一个字符串值转换为一个数字。这当然有多种方法做到，但是哪一个是最快的呢？
 
 ```js
 var x = "42";	// need number `42`
@@ -567,25 +535,25 @@ var y = +x / 2;
 var y = (x | 0) / 2;
 ```
 
-**Note:** I will leave it as an exercise to the reader to set up a test if you're interested in examining the minute differences in performance among these options.
+**注意：** 我将这个问题留作给读者们的练习，如果你对这些选择之间性能上的微小区别感兴趣的话可以建立一个测试。
 
-When considering these different options, as they say, "One of these things is not like the others." `parseInt(..)` does the job, but it also does a lot more -- it parses the string rather than just coercing. You can probably guess, correctly, that `parseInt(..)` is a slower option, and you should probably avoid it.
+当你考虑这些不同的选择时，就像人们说的，“有一个和其他的不一样。”`parseInt(..)`可以工作，但它做的事情多的多——它会解析字符串而不是转换它。你可能会正确地猜想`parseInt(..)`是一个更慢的选择，而你可能应当避免使用它。
 
-Of course, if `x` can ever be a value that **needs parsing**, such as `"42px"` (like from a CSS style lookup), then `parseInt(..)` really is the only suitable option!
+当然，如果`x`可能是一个 **需要被解析** 的值，比如`"42px"`（比如CSS样式查询），那么`parseInt(..)`确实是唯一合适的选择！
 
-`Number(..)` is also a function call. From a behavioral perspective, it's identical to the `+` unary operator option, but it may in fact be a little slower, requiring more machinery to execute the function. Of course, it's also possible that the JS engine recognizes this behavioral symmetry and just handles the inlining of `Number(..)`'s behavior (aka `+x`) for you!
+`Number(..)`也是一个函数调用。从行为的角度讲，它与`+`二元操作符是相同的，但它事实上可能慢一点儿，需要更多的机器运转来执行这个函数。当然，JS引擎也可能识别出了这种行为上的对称性，而仅仅为你处理`Number(..)`行为的内联形式（也就是`+x`）！
 
-But remember, obsessing about `+x` versus `x | 0` is in most cases likely a waste of effort. This is a microperformance issue, and one that you shouldn't let dictate/degrade the readability of your program.
+但是要记住，痴迷于`+x`和`x | 0`的比较在大多数情况下都是浪费精力。这是一个微观性能问题，而且你不应该让它使你的程序的可读性降低。
 
-While performance is very important in critical paths of your program, it's not the only factor. Among several options that are roughly similar in performance, readability should be another important concern.
+虽然你的程序的关键路径性能非常重要，但它不是唯一的因素。在几种性能上大体相似的选择中，可读性应当是另一个重要的考量。
 
 ## Tail Call Optimization (TCO)
 
-As we briefly mentioned earlier, ES6 includes a specific requirement that ventures into the world of performance. It's related to a specific form of optimization that can occur with function calls: *tail call optimization*.
+正如我们早前简单提到的，ES6包含了一个冒险进入性能世界的具体需求。它是关于在函数调用时可能会发生的一种具体的优化形式：*尾部调用优化（TCO）*。
 
-Briefly, a "tail call" is a function call that appears at the "tail" of another function, such that after the call finishes, there's nothing left to do (except perhaps return its result value).
+简单地说，一个“尾部调用”是一个出现在另一个函数“尾部”的函数调用，于是在这个调用完成后，就没有其他的事情要做了（除了也许要返回结果值）。
 
-For example, here's a non-recursive setup with tail calls:
+例如，这是一个带有尾部调用的非递归形式：
 
 ```js
 function foo(x) {
@@ -603,17 +571,17 @@ function baz() {
 baz();						// 42
 ```
 
-`foo(y+1)` is a tail call in `bar(..)` because after `foo(..)` finishes, `bar(..)` is also finished except in this case returning the result of the `foo(..)` call. However, `bar(40)` is *not* a tail call because after it completes, its result value must be added to `1` before `baz()` can return it.
+`foo(y+1)`是一个在`bar(..)`中的尾部调用，因为在`foo(..)`完成之后，`bar(..)`也即而完成除了在这里需要返回`foo(..)`调用的结果。然而，`bar(40)` *不是* 一个尾部调用，因为在它完成后，在`baz()`能返回它的结果前，这个结果必须被加1。
 
-Without getting into too much nitty-gritty detail, calling a new function requires an extra amount of reserved memory to manage the call stack, called a "stack frame." So the preceding snippet would generally require a stack frame for each of `baz()`, `bar(..)`, and `foo(..)` all at the same time.
+不过于深入本质细节，简单地说调用一个新函数需要保留额外的内存来管理调用栈，它称为一个“栈帧（stack frame）”。所以前面的代码段通常需要同时为`baz()`，`bar(..)`，和`foo(..)`都准备一个栈帧。
 
-However, if a TCO-capable engine can realize that the `foo(y+1)` call is in *tail position* meaning `bar(..)` is basically complete, then when calling `foo(..)`, it doesn't need to create a new stack frame, but can instead reuse the existing stack frame from `bar(..)`. That's not only faster, but it also uses less memory.
+然而，如果一个支持TCO的引擎可以认识到`foo(y+1)`调用位于 *尾部位置* 意味着`bar(..)`基本上完成了，那么当调用`foo(..)`时，它就并没有必要创建一个新的栈帧，而是可以重复利用既存的`bar(..)`的栈帧。这不仅更快，而且也更节省内存。
 
-That sort of optimization isn't a big deal in a simple snippet, but it becomes a *much bigger deal* when dealing with recursion, especially if the recursion could have resulted in hundreds or thousands of stack frames. With TCO the engine can perform all those calls with a single stack frame!
+在一个简单的代码段中，这种优化机制没什么大不了的，但是当对付递归，特别是当递归会造成成百上千的栈帧时，它就变成了 *相当有用的技术*。引擎可以使用TCO在一个栈帧内完成所有调用！
 
-Recursion is a hairy topic in JS because without TCO, engines have had to implement arbitrary (and different!) limits to how deep they will let the recursion stack get before they stop it, to prevent running out of memory. With TCO, recursive functions with *tail position* calls can essentially run unbounded, because there's never any extra usage of memory!
+在JS中递归是一个令人不安的话题，因为没有TCO，引擎就不得不实现一个随意的（而且各不相同的）限制，规定它们允许递归栈能有多深，来防止内存耗尽。使用TCO，带有 *尾部位置* 调用的递归函数实质上可以没有边界地运行，因为从没有额外的内存使用！
 
-Consider that recursive `factorial(..)` from before, but rewritten to make it TCO friendly:
+考虑前面的递归`factorial(..)`，但是将它重写以使它对TCO友好：
 
 ```js
 function factorial(n) {
@@ -629,24 +597,24 @@ function factorial(n) {
 factorial( 5 );		// 120
 ```
 
-This version of `factorial(..)` is still recursive, but it's also optimizable with TCO, because both inner `fact(..)` calls are in *tail position*.
+这个版本的`factorial(..)`仍然是递归的，而且它还是可以进行TCO优化的，因为两个内部的`fact(..)`调用都在 *尾部位置*。
 
-**Note:** It's important to note that TCO only applies if there's actually a tail call. If you write recursive functions without tail calls, the performance will still fall back to normal stack frame allocation, and the engines' limits on such recursive call stacks will still apply. Many recursive functions can be rewritten as we just showed with `factorial(..)`, but it takes careful attention to detail.
+**注意：** 一个需要注意的重点是，TCO尽在尾部调用实际存在时才会实施。如果你没用尾部调用编写递归函数，性能机制将仍然退回到普通的栈帧分配，而且引擎对于这样的递归的调用栈限制依然有效。许多递归函数可以像我们刚刚展示的`factorial(..)`那样重写，但是要小心处理细节。
 
-One reason that ES6 requires engines to implement TCO rather than leaving it up to their discretion is because the *lack of TCO* actually tends to reduce the chances that certain algorithms will be implemented in JS using recursion, for fear of the call stack limits.
+ES6要求各个引擎实现TCO而不是留给它们自行考虑的原因之一是，*缺少TCO* 实际上趋向于减少特定的算法在JS中使用递归实现的机会，因为对调用栈限制的恐惧。
 
-If the lack of TCO in the engine would just gracefully degrade to slower performance in all cases, it wouldn't probably have been something that ES6 needed to *require*. But because the lack of TCO can actually make certain programs impractical, it's more an important feature of the language than just a hidden implementation detail.
+如果无论什么情况下引擎缺少TCO只是安静地退化到性能差一些的方式上，那么它可能不会是ES6需要 *要求* 的东西。但是因为缺乏TCO可能会实际上使特定的程序不现实，所以与其说它只是一种隐藏的实现细节，不如说它是一个重要的语言特性更合适。
 
-ES6 guarantees that from now on, JS developers will be able to rely on this optimization across all ES6+ compliant browsers. That's a win for JS performance!
+ES6保证，从现在开始，JS开发者们能够在所有兼容ES6+的浏览器上信赖这种优化机制。这是JS性能的一个胜利！
 
 ## Review
 
-Effectively benchmarking performance of a piece of code, especially to compare it to another option for that same code to see which approach is faster, requires careful attention to detail.
+有效地对一段代码进行性能基准分析，特别是将它与同样代码的另一种写法相比较来看哪一种方式更快，需要小心地关注细节。
 
-Rather than rolling your own statistically valid benchmarking logic, just use the Benchmark.js library, which does that for you. But be careful about how you author tests, because it's far too easy to construct a test that seems valid but that's actually flawed -- even tiny differences can skew the results to be completely unreliable.
+与其运行你自己的统计学上合法的基准分析逻辑，不如使用Benchmark.js库，它会为你搞定。但要小心你如何编写测试，因为太容易构建一个看起来合法但实际上有漏洞的测试了——即使是一个微小的区别也会使结果歪曲到完全不可靠。
 
-It's important to get as many test results from as many different environments as possible to eliminate hardware/device bias. jsPerf.com is a fantastic website for crowdsourcing performance benchmark test runs.
+尽可能多地从不同的环境中得到尽可能多的测试结果来消灭硬件/设备偏差很重要。jsPerf.com是一个用于大众外包性能基准分析测试的神奇网站。
 
-Many common performance tests unfortunately obsess about irrelevant microperformance details like `x++` versus `++x`. Writing good tests means understanding how to focus on big picture concerns, like optimizing on the critical path, and avoiding falling into traps like different JS engines' implementation details.
+许多常见的性能测试不幸地痴迷于无关紧要的微观性能细节，比如比较`x++`和`++x`。编写好的测试意味着理解如何聚焦大局上关注的问题，比如在关键路径上优化，和避免落入不同JS引擎的实现细节的陷阱。
 
-Tail call optimization (TCO) is a required optimization as of ES6 that will make some recursive patterns practical in JS where they would have been impossible otherwise. TCO allows a function call in the *tail position* of another function to execute without needing any extra resources, which means the engine no longer needs to place arbitrary restrictions on call stack depth for recursive algorithms.
+尾部调用优化（TCO）是一个ES6要求的优化机制，它会使一些以前在JS中不可能的递归模式变得可能。TCO允许一个位于另一个函数的 *尾部位置* 的函数调用不需要额外的资源就可以执行，这意味着引擎不再需要对递归算法的调用栈深度设置一个随意的限制了。
