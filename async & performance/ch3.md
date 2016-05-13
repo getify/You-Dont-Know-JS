@@ -452,7 +452,7 @@ Promises by definition cannot be susceptible to this concern, because even an im
 
 That is, when you call `then(..)` on a Promise, even if that Promise was already resolved, the callback you provide to `then(..)` will **always** be called asynchronously (for more on this, refer back to "Jobs" in Chapter 1).
 
-No more need to insert your own `setTimeout(..,0)` hacks. Promises prevent Zalgo automatically.
+No more need to insert your own `setTimeout(.., 0)` hacks. Promises prevent Zalgo automatically.
 
 ### Calling Too Late
 
