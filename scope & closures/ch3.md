@@ -91,7 +91,7 @@ function doSomething(a) {
 
 	b = a + doSomethingElse( a * 2 );
 
-	console.log( (b * 3) );
+	console.log( b * 3 );
 }
 
 doSomething( 2 ); // 15
