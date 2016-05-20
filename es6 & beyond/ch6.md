@@ -767,7 +767,7 @@ However, ES6 defines a string prototype method `repeat(..)` to accomplish the ta
 
 ### String Inspection Functions
 
-In addition to `String#indexOf(..)` and `String#lastIndexOf(..)` from prior to ES6, three new methods for searching/inspection have been added: `startsWith(..)`, `endsWidth(..)`, and `includes(..)`.
+In addition to `String#indexOf(..)` and `String#lastIndexOf(..)` from prior to ES6, three new methods for searching/inspection have been added: `startsWith(..)`, `endsWith(..)`, and `includes(..)`.
 
 ```js
 var palindrome = "step on no pets";
