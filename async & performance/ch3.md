@@ -1422,7 +1422,7 @@ p.then( something )
 同时，我们可以制造一个静态的帮助工具来让我们观察（但不干涉）Promise的解析：
 
 ```js
-// 安全填补的检查
+// 填补的安全检查
 if (!Promise.observe) {
 	Promise.observe = function(pr,cb) {
 		// 从侧面观察`pr`的解析
@@ -1460,10 +1460,10 @@ Promise.race( [
 
 ### Variations on all([ .. ]) and race([ .. ])
 
-虽然原生的ES6Promise带有内建的`Promise.all([ .. ])`和`Promise.race([ .. ])`，这里还有几个其他常用的语义变种模式：
+原生的ES6Promise带有内建的`Promise.all([ .. ])`和`Promise.race([ .. ])`，这里还有几个关于这些语义的其他常用的变种模式：
 
 * `none([ .. ])`很像`all([ .. ])`，但是完成和拒绝被转置了。所有的Promise都需要被拒绝——拒绝变成了完成值，反之亦然。
-* `any([ .. ])`很像`all([ .. ])`，但它忽略任何拒绝，所以只有一个需要完成而不是它们所有的。
+* `any([ .. ])`很像`all([ .. ])`，但它忽略任何拒绝，所以只有一个需要完成即可，而不是它们所有的。
 * `first([ .. ])`像是一个带有`any([ .. ])`的竞合，它忽略任何拒绝，而且一旦有一个Promise完成时，它就立即完成。
 * `last([ .. ])`很像`first([ .. ])`，但是只有最后一个完成胜出。
 
@@ -1472,16 +1472,15 @@ Promise.race( [
 比如，这是我们如何定义`first([..])`:
 
 ```js
-// polyfill-safe guard check
+// 填补的安全检查
 if (!Promise.first) {
 	Promise.first = function(prs) {
 		return new Promise( function(resolve,reject){
-			// loop through all promises
+			// 迭代所有的promise
 			prs.forEach( function(pr){
-				// normalize the value
+				// 泛化它的值
 				Promise.resolve( pr )
-				// whichever one fulfills first wins, and
-				// gets to resolve the main promise
+				// 无论哪一个首先成功完成，都由它来解析主promise
 				.then( resolve );
 			} );
 		} );
@@ -1489,9 +1488,9 @@ if (!Promise.first) {
 }
 ```
 
-**注意：** 这个`first(..)`的实现不会再它所有的promise都被拒绝时拒绝；它会简单地挂起，很像`Promise.race([])`。如果期望，你可以添加一些附加逻辑来追踪每个promise的拒绝，而且如果所有的都被拒绝，就在主promise上调用`reject()`。我们将此作为练习留给读者。
+**注意：** 这个`first(..)`的实现不会在它所有的promise都被拒绝时拒绝；它会简单地挂起，很像`Promise.race([])`。如果需要，你可以添加一些附加逻辑来追踪每个promise的拒绝，而且如果所有的都被拒绝，就在主promise上调用`reject()`。我们将此作为练习留给读者。
 
-### Concurrent Iterations
+### 并发迭代
 
 有时候你想迭代一个Promise的列表，并对它们所有都实施一些任务，就像你可以对同步的`array`做的那样（比如，`forEach(..)`，`map(..)`，`some(..)`，和`every(..)`）。如果对每个Promise实施的操作根本上是同步的，它们工作的很好，正如我们在前面的代码段中用过的`forEach(..)`。
 
@@ -1502,14 +1501,13 @@ if (!Promise.first) {
 ```js
 if (!Promise.map) {
 	Promise.map = function(vals,cb) {
-		// new promise that waits for all mapped promises
+		// 一个等待所有被映射的promise的新promise
 		return Promise.all(
-			// note: regular array `map(..)`, turns
-			// the array of values into an array of
-			// promises
+			// 注意：普通的数组`map(..)`，
+			// 将值的数组变为promise的数组
 			vals.map( function(val){
-				// replace `val` with a new promise that
-				// resolves after `val` is async mapped
+				// 将`val`替换为一个在`val`
+				// 异步映射完成后才解析的新promise
 				return new Promise( function(resolve){
 					cb( val, resolve );
 				} );
@@ -1528,18 +1526,17 @@ var p1 = Promise.resolve( 21 );
 var p2 = Promise.resolve( 42 );
 var p3 = Promise.reject( "Oops" );
 
-// double values in list even if they're in
-// Promises
+// 将列表中的值翻倍，即便它们在Promise中
 Promise.map( [p1,p2,p3], function(pr,done){
-	// make sure the item itself is a Promise
+	// 确保列表中每一个值都是Promise
 	Promise.resolve( pr )
 	.then(
-		// extract value as `v`
+		// 将值作为`v`抽取出来
 		function(v){
-			// map fulfillment `v` to new value
+			// 将完成的`v`映射到新的值
 			done( v * 2 );
 		},
-		// or, map to promise rejection message
+		// 或者，映射到promise的拒绝消息上
 		done
 	);
 } )
@@ -1548,20 +1545,20 @@ Promise.map( [p1,p2,p3], function(pr,done){
 } );
 ```
 
-## Promise API Recap
+## Promise API概览
 
 让我们复习一下我们已经在本章中零散地展开的ES6`Promise`API。
 
 **注意：** 下面的API尽在ES6中是原生的，但也存在一些语言规范兼容的填补（不光是扩展Promise库），它们定义了`Promise`和与之相关的所有行为，所以即使是在前ES6时代的浏览器中你也以使用原生的Promise。这类填补的其中之一是“Native Promise Only”（http://github.com/getify/native-promise-only），我写的！
 
-### new Promise(..) Constructor
+### new Promise(..)构造器
 
-*揭示构造器* `Promise(..)`必须与`new`一起使用，而且必须提供一个被同步/立即调用的回调函数。这个函数被传入两个回调函数，它们作为promise的解析能力。我们通常将它们标识为`resolve(..)`和`reject(..)`：
+*揭示构造器（revealing constructor）* `Promise(..)`必须与`new`一起使用，而且必须提供一个被同步/立即调用的回调函数。这个函数被传入两个回调函数，它们作为promise的解析能力。我们通常将它们标识为`resolve(..)`和`reject(..)`：
 
 ```js
 var p = new Promise( function(resolve,reject){
-	// `resolve(..)` to resolve/fulfill the promise
-	// `reject(..)` to reject the promise
+	// `resolve(..)`给解析/完成的promise
+	// `reject(..)`给拒绝的promise
 } );
 ```
 
@@ -1569,7 +1566,7 @@ var p = new Promise( function(resolve,reject){
 
 但如果`resolve(..)`被传入一个Promise或者thenable的值，那么这个值将被递归地展开，而且无论它最终解析结果/状态是什么，都将被promise采用。
 
-### Promise.resolve(..) and Promise.reject(..)
+### Promise.resolve(..) 和 Promise.reject(..)
 
 一个用于创建已被拒绝的Promise的简便方法是`Promise.reject(..)`，所以这两个promise是等价的：
 
@@ -1596,13 +1593,13 @@ var rejectedTh = {
 var p1 = Promise.resolve( fulfilledTh );
 var p2 = Promise.resolve( rejectedTh );
 
-// `p1` will be a fulfilled promise
-// `p2` will be a rejected promise
+// `p1`将是一个完成的promise
+// `p2`将是一个拒绝的promise
 ```
 
 而且要记住，如果你传入一个纯粹的Promise，`Promise.resolve(..)`不会做任何事情；它仅仅会直接返回这个值。所以在你不知道其本性的值上调用`Promise.resolve(..)`不会有额外的开销，如果它偶然已经是一个纯粹的Promise。
 
-### then(..) and catch(..)
+### then(..) 和 catch(..)
 
 每个Promise实例（**不是** `Promise` API 名称空间）都有`then(..)`和`catch(..)`方法，它们允许你为Promise注册成功或拒绝处理器。一旦Promise被解析，它们中的一个就会被调用，但不是都会被调用，而且它们总是会被异步地调用（参见第一章的“Jobs”）。
 
@@ -1615,12 +1612,12 @@ p.then( fulfilled );
 
 p.then( fulfilled, rejected );
 
-p.catch( rejected ); // or `p.then( null, rejected )`
+p.catch( rejected ); // 或者`p.then( null, rejected )`
 ```
 
 `then(..)`和`catch(..)`也会创建并返回一个新的promise，它可以用来表达Promise链式流程控制。如果完成或拒绝回调有异常被抛出，这个返回的promise就会被拒绝。如果这两个回调之一返回一个立即，非Promise，非thenable值，那么这个值就会作为被返回的promise的完成。如果完成处理器指定地返回一个promise或thenable值这个值就会被展开而且变成被返回的promise的解析。
 
-### Promise.all([ .. ]) and Promise.race([ .. ])
+### Promise.all([ .. ]) 和 Promise.race([ .. ])
 
 在ES6的`Promise`API的静态帮助方法`Promise.all([ .. ])`和`Promise.race([ .. ])`都创建一个Promise作为它们的返回值。这个promise的解析完全由你传入的promise数组控制。
 
@@ -1653,30 +1650,30 @@ Promise.all( [p1,p2] )
 
 ES6的`Promise`API十分简单和直接。对服务于大多数基本的异步情况来说它足够好了，而且当你要把你的代码从回调地狱变为某些更好的东西时，它是一个开始的好地方。
 
-但是依然还有许多应用程序所要求的精巧的异步处理，由于Promise本身所受的限制而不能解决。在下一节中，我们将深入这些限制，作为Promise库的优点的动机。
+但是依然还有许多应用程序所要求的精巧的异步处理，由于Promise本身所受的限制而不能解决。在下一节中，我们将深入这些限制，来看看Promise库的优点。
 
-## Promise Limitations
+## Promise限制
 
 本节中我们将要讨论的许多细节已经在这一章中被提及了，但我们将明确地复习这些限制。
 
-### Sequence Error Handling
+### 顺序的错误处理
 
-我们在本章前面的部分详细涵盖了Promise风格的错误处理。Promise的设计方式——特别是他们如何链接——所产生的限制，创建了一个非常容易掉进去的陷阱，Promise链中的错误会被意外地无声地忽略掉。
+我们在本章前面的部分详细讲解了Promise风格的错误处理。Promise的设计方式——特别是他们如何链接——所产生的限制，创建了一个非常容易掉进去的陷阱，Promise链中的错误会被意外地无声地忽略掉。
 
 但关于Promise的错误还有一些其他事情要考虑。因为Promise链只不过是组成它的Promise连在一起，没有一个实体可以用来将整个链条表达为一个单独的 *东西*，这意味着没有外部的方法能够监听可能发生的任何错误。
 
 如果你构建一个不包含错误处理器的Promise链，这个链条的任意位置发生的任何错误都将沿着链条向下无限传播，直到被监听为止（通过在某一步上注册拒绝处理器）。所以，在这种特定情况下，拥有链条的最后一个promise的引用就够了（下面代码段中的`p`），因为你可以在这里注册拒绝处理器，而且它会被所有传播的错误通知：
 
 ```js
-// `foo(..)`, `STEP2(..)` and `STEP3(..)` are
-// all promise-aware utilities
+// `foo(..)`, `STEP2(..)` 和 `STEP3(..)`
+// 都是promise兼容的工具
 
 var p = foo( 42 )
 .then( STEP2 )
 .then( STEP3 );
 ```
 
-虽然这看起来有点儿小困惑，但是这里的`p`没有指向链条中的第一个promise（`foo(42)`调用中来的那一个），而是指向了最后一个promise，来自于`then(STEP3)`调用的那一个。
+虽然这看起来有点儿小糊涂，但是这里的`p`没有指向链条中的第一个promise（`foo(42)`调用中来的那一个），而是指向了最后一个promise，来自于`then(STEP3)`调用的那一个。
 
 另外，这个promise链条上看不到一个步骤做了自己的错误处理。这意味着你可以在`p`上注册一个拒绝处理器，如果在链条的任意位置发生了错误，它就会被通知。
 
@@ -1686,17 +1683,17 @@ p.catch( handleErrors );
 
 但如果这个链条中的某一步事实上做了自己的错误处理（也许是隐藏/抽象出去了，所以你看不到），那么你的`handleErrors(..)`就不会被通知。这可能是你想要的——它毕竟是一个“被处理过的拒绝”——但它也可能 *不* 是你想要的。完全缺乏被通知的能力（被“已处理过的”拒绝错误通知）是一个在某些用法中约束功能的一种限制。
 
-它基本上和`try..catch`中存在的限制是相同的，它可以捕获一个异常并简单地吞掉。所以这不是一个 **Promise特有** 的限制，但它确实是一个我们希望绕过的限制。
+它基本上和`try..catch`中存在的限制是相同的，它可以捕获一个异常并简单地吞掉。所以这不是一个 **Promise特有** 的问题，但它确实是一个我们希望绕过的限制。
 
 不幸的是，许多时候Promise链序列的中间步骤不会被留下引用，所以没有这些引用，你就不能添加错误处理器来可靠地监听错误。
 
-### Single Value
+### 单独的值
 
 根据定义，Promise只能有一个单独的完成值或一个单独的拒绝理由。在简单的例子中，这没什么大不了的，但在更精巧的场景下，你可能发现这个限制。
 
 典型的建议是构建一个包装值（比如`object`或`array`）来包含这些多个消息。这个方法好用，但是在你的Promise链的每一步上把消息包装再拆开显得十分尴尬和烦人。
 
-#### Splitting Values
+#### 分割值
 
 有时你可以将这种情况当做一个信号，表示你可以/应当将问题拆分为两个或更多的Promise。
 
@@ -1716,7 +1713,7 @@ function foo(bar,baz) {
 
 	return getY( x )
 	.then( function(y){
-		// wrap both values into container
+		// 将两个值包装近一个容器
 		return [x,y];
 	} );
 }
@@ -1736,7 +1733,7 @@ foo( 10, 20 )
 function foo(bar,baz) {
 	var x = bar * baz;
 
-	// return both promises
+	// 将两个promise返回
 	return [
 		Promise.resolve( x ),
 		getY( x )
@@ -1756,11 +1753,11 @@ Promise.all(
 
 一个promise的`array`真的要比传递给一个单独的Promise的值的`array`要好吗？语法上，它没有太多改进。
 
-但是这种方式更加接近于Promise的设计原理。现在它更易于在未来将`x`与`y`的计算分开，重构进两个分离的函数中。它更清晰，也允许调用端代码更灵活地安排这两个promise——这里使用了`Promise.all([ .. ])`，但当然不是唯一的选择——而不是将这样的细节在`foo(..)`内部进行抽象。
+但是这种方式更加接近于Promise的设计原理。现在它更易于在未来将`x`与`y`的计算分开，重构进两个分离的函数中。它更清晰，也允许调用端代码更灵活地安排这两个promise——这里使用了`Promise.all([ .. ])`，但它当然不是唯一的选择——而不是将这样的细节在`foo(..)`内部进行抽象。
 
-#### Unwrap/Spread Arguments
+#### 展开/散开参数
 
-`var x = ..`和`var y = ..`的赋值依然是一个尴尬的负担。我们可以在一个帮助工具中利用一些函数式技巧（向Reginald Braithwaite致敬，在推特上的 @raganwald ）：
+`var x = ..`和`var y = ..`的赋值依然是一个尴尬的负担。我们可以在一个帮助工具中利用一些函数式技巧（向Reginald Braithwaite致敬，在推特上 @raganwald ）：
 
 ```js
 function spread(fn) {
@@ -1819,19 +1816,19 @@ Promise.all(
 
 **注意：** 更多关于ES6解构形式的信息，参阅本系列的 *ES6与未来*。
 
-### Single Resolution
+### 单次解析
 
 Promise的一个最固有的行为之一就是，一个Promise只能被解析一次（成功或拒绝）。对于多数异步用例来说，你仅仅取用这个值一次，所以这工作的很好。
 
-但也有许多异步情况适用于一个不同的模型——更类似于事件和/或数据流。表面上看不清Promise能对这种用例适应的多好，如果能的话。没有基于Promise的重要抽象过程，它们将完全缺乏对多个值解析的处理。（TODO）
+但也有许多异步情况适用于一个不同的模型——更类似于事件和/或数据流。表面上看不清Promise能对这种用例适应的多好，如果能的话。没有基于Promise的重大抽象过程，它们完全缺乏对多个值解析的处理。
 
 想象这样一个场景，你可能想要为响应一个刺激（比如事件）触发一系列异步处理步骤，而这实际上将会发生多次，比如按钮点击。
 
 这可能不会像你想的那样工作：
 
 ```js
-// `click(..)` binds the `"click"` event to a DOM element
-// `request(..)` is the previously defined Promise-aware Ajax
+// `click(..)` 绑定了一个DOM元素的 `"click"` 事件
+// `request(..)` 是先前定义的支持Promise的Ajax
 
 var p = new Promise( function(resolve,reject){
 	click( "#mybtn", resolve );
@@ -1867,9 +1864,9 @@ click( "#mybtn", function(evt){
 
 **注意：** 这种限制的另一种表述方法是，如果我们能够构建某种能在它上面进行Promise链监听的“可监听对象（observable）”就好了。有一些库已经建立这些抽象（比如RxJS——http://rxjs.codeplex.com/），但是这种抽象看起来是如此的重，以至于你甚至再也看不到Promise的性质。这样的重抽象带来一个重要的问题：这些机制是否像Promise本身被设计的一样 *可靠*。我们将会在附录B中重新讨论“观察者（Observable）”模式。
 
-### Inertia
+### 惰性
 
-对于在你的代码中使用Promise而言一个实在的壁垒是，现存的所有代码都没有Promise的意识。如果你有许多基于回调的代码，让代码保持相同的风格容易多了。
+对于在你的代码中使用Promise而言一个实在的壁垒是，现存的所有代码都没有支持Promise。如果你有许多基于回调的代码，让代码保持相同的风格容易多了。
 
 “一段基于动作（用回调）的代码将仍然基于动作（用回调），除非一个更聪明，具有Promise意识的开发者对它采取行动。”
 
@@ -1895,14 +1892,14 @@ foo( 11, 31, function(err,text) {
 } );
 ```
 
-将这个基于会掉的代码转换为Promise意识的代码的第一步该怎么做，是立即明确的吗？这要看你的经验。你练习的越多，它就感觉越自然。但当然，Promise没有明确告知到底怎么做——没有一个放之四海而皆准的答案——所以这要靠你的责任心。
+将这个基于回调的代码转换为支持Promise的代码的第一步该怎么做，是立即明确的吗？这要看你的经验。你练习的越多，它就感觉越自然。但当然，Promise没有明确告知到底怎么做——没有一个放之四海而皆准的答案——所以这要靠你的责任心。
 
-就像我们以前讲过的，我们绝对需要一种具备Promise意识的Ajax工具来取代基于回调的工具，我们可以称它为`request(..)`。你可以制造自己的，正如我们已经做过的。但是不得不为每个基于回调的工具手动定义Promise相关的包装器的负担，使得你根本就不太可能选择将代码重构为Promise相关的。
+就像我们以前讲过的，我们绝对需要一种支持Promise的Ajax工具来取代基于回调的工具，我们可以称它为`request(..)`。你可以制造自己的，正如我们已经做过的。但是不得不为每个基于回调的工具手动定义Promise相关的包装器的负担，使得你根本就不太可能选择将代码重构为Promise相关的。
 
 Promise没有为这种限制提供直接的答案。但是大多数Promise库确实提供了帮助函数。想象一个这样的帮助函数：
 
 ```js
-// polyfill-safe guard check
+// 填补的安全检查
 if (!Promise.wrap) {
 	Promise.wrap = function(fn) {
 		return function() {
@@ -1942,9 +1939,9 @@ request( "http://some.url.1/" )
 
 `Promise.wrap(..)` **不会** 生产Promise。它生产一个将会生产Promise的函数。某种意义上，一个Promise生产函数可以被看做一个“Promise工厂”。我提议将这样的东西命名为“promisory”（"Promise" + "factory"）。
 
-这种将期望回调的函数包装为一个Promise相关的函数的行为，有时被称为“提升”或“promise化”。但是除了“提升过的函数”以外，看起来没有一个标准的名词来称呼这个结果函数，所以我更喜欢“Promise化”，因为我认为他更具描述性。
+这种将期望回调的函数包装为一个Promise相关的函数的行为，有时被称为“提升（lifting）”或“promise化（promisifying）”。但是除了“提升过的函数”以外，看起来没有一个标准的名词来称呼这个结果函数，所以我更喜欢“promisory”，因为我认为他更具描述性。
 
-**注意：** Promisory不是一个瞎编的词。它是一个真实存在的词汇，而且它的定义是含有或载有一个promise。这正是这些函数所做的，所以这显然是一个完美的术语匹配！
+**注意：** Promisory不是一个瞎编的词。它是一个真实存在的词汇，而且它的定义是含有或载有一个promise。这正是这些函数所做的，所以这个术语匹配得简直完美！
 
 那么，`Promise.wrap(ajax)`生产了一个我们称为`request(..)`的`ajax(..)`promisory，而这个promisory为Ajax应答生产Promise。
 
@@ -1953,13 +1950,12 @@ request( "http://some.url.1/" )
 那么回到刚才的例子，我们需要为`ajax(..)`和`foo(..)`都做一个promisory。
 
 ```js
-// make a promisory for `ajax(..)`
+// 为`ajax(..)`制造一个promisory
 var request = Promise.wrap( ajax );
 
-// refactor `foo(..)`, but keep it externally
-// callback-based for compatibility with other
-// parts of the code for now -- only use
-// `request(..)`'s promise internally.
+// 重构`foo(..)`，但是为了代码其他部分
+// 的兼容性暂且保持它对外是基于回调的
+// ——仅在内部使用`request(..)`'的promise
 function foo(x,y,cb) {
 	request(
 		"http://some.url.1/?x=" + x + "&y=" + y
@@ -1972,11 +1968,10 @@ function foo(x,y,cb) {
 	);
 }
 
-// now, for this code's purposes, make a
-// promisory for `foo(..)`
+// 现在，为了这段代码本来的目的，为`foo(..)`制造一个promisory
 var betterFoo = Promise.wrap( foo );
 
-// and use the promisory
+// 并使用这个promisory
 betterFoo( 11, 31 )
 .then(
 	function fulfilled(text){
@@ -1990,13 +1985,11 @@ betterFoo( 11, 31 )
 
 当然，虽然我们将`foo(..)`重构为使用我们的新`request(..)`promisory，我们可以将`foo(..)`本身制成promisory，而不是保留基于会掉的实现并需要制造和使用后续的`betterFoo(..)`promisory。这个决定只是要看`foo(..)`是否需要保持基于回调的形式以便于代码的其他部分兼容。
 
-Consider:
-
 考虑这段代码：
 
 ```js
-// `foo(..)` is now also a promisory because it
-// delegates to the `request(..)` promisory
+// 现在，`foo(..)`也是一个promisory
+// 因为它委托到`request(..)` promisory
 function foo(x,y) {
 	return request(
 		"http://some.url.1/?x=" + x + "&y=" + y
@@ -2010,7 +2003,7 @@ foo( 11, 31 )
 
 虽然ES6的Promise没有为这样的promisory包装提供原生的帮助函数，但是大多数库提供它们，或者你可以制造自己的。不管哪种方法，这种Promise特定的限制是可以不费太多劲儿就可以解决的（当然是和回调地狱的痛苦相比！）。
 
-### Promise Uncancelable
+### Promise不可撤销
 
 一旦你创建了一个Promise并给它注册了一个完成和/或拒绝处理器，就没有什么你可以从外部做的事情能停止这个进程，即使是某些其他的事情使这个任务变得毫无意义。
 
@@ -2031,7 +2024,7 @@ Promise.race( [
 );
 
 p.then( function(){
-	// still happens even in the timeout case :(
+	// 即使是在超时的情况下也会发生 :(
 } );
 ```
 
@@ -2066,23 +2059,23 @@ p.then( function(){
 
 这很丑。这可以工作，但是远不理想。一般来说，你应当避免这样的场景。
 
-但是如果你不能，这种解决方案的丑陋应当是一个线索，说明 *取消* 是一种属于在Promise之上的更高层抽象的功能。我推荐你找一个Promise抽象库来辅助你，而不是自己骇它。
+但是如果你不能，这种解决方案的丑陋应当是一个线索，说明 *取消* 是一种属于在Promise之上的更高层抽象的功能。我推荐你找一个Promise抽象库来辅助你，而不是自己使用黑科技。
 
 **注意：** 我的 *asynquence* Promise抽象库提供了这样的抽象，还为序列提供了一个`abort()`能力，这一切将在附录A中讨论。
 
-一个单独的Promise不是真正的流程控制机制（至少没有实际意义），而流程控制机制正是 *取消* 要表达的；这就是为什么Promise取消显得尴尬。
+一个单独的Promise不是真正的流程控制机制（至少没有多大实际意义），而流程控制机制正是 *取消* 要表达的；这就是为什么Promise取消显得尴尬。
 
 相比之下，一个链条的Promise集合在一起——我称之为“序列”—— *是* 一个流程控制的表达，如此在这一层面的抽象上它就适于定义取消。
 
 没有一个单独的Promise应该是可以取消的，但是一个 *序列* 可以取消是有道理的，因为你不会将一个序列作为一个不可变值传来传去，就像Promise那样。
 
-### Promise Performance
+### Promise性能
 
 这种限制既简单又复杂。
 
-比较一下在基于回调的异步任务链和Promise链上有多少东西在动，很明显Promise有更多的事情发生，这意味着它们自然地会更慢一点点。回想一下Promise提供的保证信任的简单列表，将它和你为了达到相同保护效果而在回调上面添加的特殊代码比较一下。
+比较一下在基于回调的异步任务链和Promise链上有多少东西在动，很明显Promise有多得多的事情发生，这意味着它们自然地会更慢一点点。回想一下Promise提供的保证信任的简单列表，将它和你为了达到相同保护效果而在回调上面添加的特殊代码比较一下。
 
-更多工作要做，更多的安全要保护，意味着Promise与赤裸的，不可靠的回调相比 *确实* 更慢。这些都很明显，可能很容易萦绕在你脑海中。
+更多工作要做，更多的安全要保护，意味着Promise与赤裸裸的，不可靠的回调相比 *确实* 更慢。这些都很明显，可能很容易萦绕在你脑海中。
 
 但是慢多少？好吧……这实际上是一个难到不可思议的问题，无法绝对，全面地回答。
 
@@ -2092,7 +2085,7 @@ p.then( function(){
 
 如果我们承认Promise一般来说要比它的非Promise，不可靠的回调等价物 *慢一点儿*——假定在有些地方你觉得你可以自己调整可靠性的缺失——难道这意味着Promise应当被全面地避免，就好像你的整个应用程序仅仅由一些可能的“必须绝对最快”的代码驱动着？
 
-神志清醒测试：如果你的代码有那么合理，那么 **对于这样的任务，JavaScript是正确的选择吗？** 为了运行应用程序JavaScript可以被优化得十分高效（参见第五章和第六章）。但是在Promise提供的所有好处的光辉之下，过于沉迷它微小的性能权衡，*真的* 合适吗？
+合理性检查：如果你的代码有那么合理，那么 **对于这样的任务，JavaScript是正确的选择吗？** 为了运行应用程序JavaScript可以被优化得十分高效（参见第五章和第六章）。但是在Promise提供的所有好处的光辉之下，过于沉迷它微小的性能权衡，*真的* 合适吗？
 
 另一个微妙的问题是Promise使 *所有事情* 都成为异步的，这意味着有些应当立即完成的（同步的）步骤也要推迟到下一个Job步骤中（参见第一章）。也就是说一个Promise任务序列要比使用回调连接的相同序列要完成的稍微慢一些是可能的。
 
@@ -2100,14 +2093,14 @@ p.then( function(){
 
 我的观点是，在几乎所有你可能认为Promise的性能慢到了需要被考虑的情况下，完全回避Promise并将它的可靠性和组合性优化掉，实际上一种反模式。
 
-相反地，你应当默认地在代码中广泛使用它们，然后再记录并分析你的应用程序的热（临界）点。Promise *真的* 是瓶颈？还是它们只是理论上慢了下来？只有在那 *之后*，拿着实际合法的观测数据，再将Promise从这些临界区域中重构移除才称得上是合理与谨慎。
+相反地，你应当默认地在代码中广泛使用它们，然后再记录并分析你的应用程序的热（关键）路径。Promise *真的* 是瓶颈？还是它们只是理论上慢了下来？只有在那 *之后*，拿着实际合法的基准分析观测数据（参见第六章），再将Promise从这些关键区域中重构移除才称得上是合理与谨慎。
 
 Promise是有一点儿慢，但作为交换你得到了很多内建的可靠性，无Zalgo的可预测性，与组合性。也许真正的限制不是它们的性能，而是你对它们的益处缺乏认识？
 
-## Review
+## 复习
 
 Promise很牛。用它们。它们解决了肆虐在回调代码中的 *控制倒转* 问题。
 
 它们没有摆脱回调，而是重新定向了这些回调的组织安排方式，是它成为一种坐落于我们和其他工具之间的可靠的中间机制。
 
-Promise链还开始以顺序的风格定义了一种更好的（当然，还不完美）表达异步流程的方式，它帮我们的大脑更好的规划和维护异步JS代码。我们会在下一章中看到一个更好的解决 *那个* 问题的方法！
+Promise链还开始以顺序的风格定义了一种更好的（当然，还不完美）表达异步流程的方式，它帮我们的大脑更好的规划和维护异步JS代码。我们会在下一章中看到一个更好的解决 *这个* 问题的方法！
