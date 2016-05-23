@@ -2,7 +2,7 @@
 
 * [Introduction](README.md)
 * [Tập 1: Up & Going](up & going/README.md)
-   * Mục lục
+   * [Mục lục](/up & going/toc.md)
    * [Lời tựa](up & going/foreword.md)
    * Mở đầu
    * Chương 1: Giới thiệu về Lập trình
