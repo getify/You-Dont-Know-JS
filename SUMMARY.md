@@ -2,7 +2,7 @@
 
 * [Introduction](README.md)
 * [Tập 1: Up & Going](up & going/README.md)
-   * Lời tựa
+   * [Lời tựa](/up & going/foreword.md)
    * Mở đầu
    * Chương 1: Giới thiệu về Lập trình
    * Chương 2: Giới thiệu JavaScript
