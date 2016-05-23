@@ -2,6 +2,8 @@
 
 Đây là sê-ri 6 cuốn sách giúp bạn đào sâu vào các chức năng core của JavaScript (như là closures, prototype, async, ES6,...). Phiên bản tiếng Việt được dịch lại từ [bản gốc của @getify](https://github.com/getify/You-Dont-Know-JS)
 
+:warning: **Mình sẽ không dịch bất kì thuật ngữ nào ra tiếng Việt, nên nếu cảm thấy khó hiểu, các bạn có thể tự tra cứu, nhưng mình không khuyến khích việc này.**
+
 <a href="http://shop.oreilly.com/product/0636920039303.do"><img src="up %26 going/cover.jpg" width="75"></a>&nbsp;
 <a href="http://shop.oreilly.com/product/0636920026327.do"><img src="scope %26 closures/cover.jpg" width="75"></a>&nbsp;
 <a href="http://shop.oreilly.com/product/0636920033738.do"><img src="this %26 object prototypes/cover.jpg" width="75"></a>&nbsp;
