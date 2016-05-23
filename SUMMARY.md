@@ -2,9 +2,9 @@
 
 * [Introduction](README.md)
 * [Tập 1: Up & Going](up & going/README.md)
-   * [Mục lục](/up & going/toc.md)
+   * [Mục lục](up & going/toc.md)
    * [Lời tựa](up & going/foreword.md)
-   * Mở đầu
+   * [Mở đầu](preface.md)
    * Chương 1: Giới thiệu về Lập trình
    * Chương 2: Giới thiệu JavaScript
    * Chương 3: Giới thiệu bộ sách YDKJS
