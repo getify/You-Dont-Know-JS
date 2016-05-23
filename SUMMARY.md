@@ -5,8 +5,8 @@
    * [Mục lục](up & going/toc.md)
    * [Lời tựa](up & going/foreword.md)
    * [Mở đầu](preface.md)
-   * [Chương 1: Giới thiệu về Lập trình](/up & going/ch1.md)
-   * Chương 2: Giới thiệu JavaScript
+   * [Chương 1: Giới thiệu về Lập trình](up & going/ch1.md)
+   * [Chương 2: Giới thiệu JavaScript](/up & going/ch2.md)
    * Chương 3: Giới thiệu bộ sách YDKJS
    * Phụ lục A: Thank You's!
 * [Tập 2: Scope & Closures](scope & closures/README.md)
