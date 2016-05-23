@@ -5,4 +5,4 @@
 * [Tập 3: this & Object Prototypes](/this & object prototypes/README.md)
 * [Tập 4: Types & Grammar](/types & grammar/README.md)
 * [Tập 5: Async & Performance](/async & performance/README.md)
-* [Tập 6: ES6 & Beyond](/es6 & beyond)
+* [Tập 6: ES6 & Beyond](/es6 & beyond/README.md)
