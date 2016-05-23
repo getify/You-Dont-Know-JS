@@ -1,10 +1,10 @@
-# You Don't Know JS: Up & Going
+# You Don't Know JS - Tập 1: Up & Going
 
-## Table of Contents
+## Mục lục
 
-* Foreword
-* Preface
-* Chapter 1: Into Programming
+* Lời tựa
+* Mở đầu
+* Chương 1: Giới thiệu về Lập trình
 	* Code
 	* Try It Yourself
 	* Operators
@@ -16,7 +16,7 @@
 	* Loops
 	* Functions
 	* Practice
-* Chapter 2: Into JavaScript
+* Chương 2: Giới thiệu JavaScript
 	* Values & Types
 	* Variables
 	* Conditionals
@@ -26,10 +26,10 @@
 	* Prototypes
 	* Old & New
 	* Non-JavaScript
-* Chapter 3: Into YDKJS
+* Chương 3: Giới thiệu YDKJS
 	* Scope & Closures
 	* this & Object Prototypes
 	* Types & Grammar
 	* Async & Performance
 	* ES6 & Beyond
-* Appendix A: Acknowledgments
+* Phụ lục A: Acknowledgments
