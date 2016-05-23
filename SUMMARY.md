@@ -3,6 +3,7 @@
 * [Introduction](README.md)
 * [Tập 1: Up & Going](up & going/README.md)
    * Lời tựa
+   * Mở đầu
 * [Tập 2: Scope & Closures](scope & closures/README.md)
 * [Tập 3: this & Object Prototypes](this & object prototypes/README.md)
 * [Tập 4: Types & Grammar](types & grammar/README.md)
