@@ -2,7 +2,7 @@
 
 Đây là sê-ri 6 cuốn sách giúp bạn đào sâu vào các chức năng core của JavaScript (như là closures, prototype, async, ES6,...). Phiên bản tiếng Việt được dịch lại từ [bản gốc của @getify](https://github.com/getify/You-Dont-Know-JS)
 
-:warning: **Mình sẽ không dịch bất kì thuật ngữ nào ra tiếng Việt, nên nếu cảm thấy khó hiểu, các bạn có thể tự tra cứu, nhưng mình không khuyến khích việc này.**
+**Bọn mình sẽ không dịch bất kì thuật ngữ nào ra tiếng Việt, nên nếu cảm thấy khó hiểu, các bạn có thể tự tra cứu, nhưng mình không khuyến khích việc này.**
 
 <a href="http://shop.oreilly.com/product/0636920039303.do"><img src="up %26 going/cover.jpg" width="75"></a>&nbsp;
 <a href="http://shop.oreilly.com/product/0636920026327.do"><img src="scope %26 closures/cover.jpg" width="75"></a>&nbsp;
@@ -10,8 +10,6 @@
 <a href="http://shop.oreilly.com/product/0636920033745.do"><img src="types %26 grammar/cover.jpg" width="75"></a>&nbsp;
 <a href="http://shop.oreilly.com/product/0636920033752.do"><img src="async %26 performance/cover.jpg" width="75"></a>&nbsp;
 <a href="http://shop.oreilly.com/product/0636920033769.do"><img src="es6 %26 beyond/cover.jpg" width="75"></a>
-
-Nếu bạn có nhã ý muốn tham gia dịch, có thể gửi mail cho mình tại địa chỉ [huytd189@gmail.com](huytd189@gmail.com)
 
 ## Phiên bản sách online
 
@@ -26,7 +24,7 @@ Nếu bạn có nhã ý muốn tham gia dịch, có thể gửi mail cho mình t
 
 Các tập sách được phát hành online tại đây là bản draft, miễn phí, của phiên bản sách giấy, đã được tác giả biên tập lại và phát hành bởi nhà phát hành O'Reilly.
 
-Nếu đọc và cảm thấy bộ sách này hữu ích, các bạn nên tìm mua bản sách gốc để ủng hộ tác giả. Nếu ở Việt Nam không có điều kiện để mua sách từ O'Reilly, mình có thể giúp, các bạn cứ email cho mình.
+Nếu đọc và cảm thấy bộ sách này hữu ích, các bạn nên tìm mua bản sách gốc để ủng hộ tác giả. Nếu ở Việt Nam không có điều kiện để mua sách từ O'Reilly, nhóm mình có thể giúp, các bạn cứ email cho nhóm.
 
 Tác giả (@getify) còn để lại một link để nếu bạn nào có nhã ý ủng hộ tài chính cho anh ấy, thì có thể đóng góp tại đây [patreon](https://www.patreon.com/getify).
 
