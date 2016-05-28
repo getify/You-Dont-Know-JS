@@ -1,6 +1,6 @@
-# Summary
+# Sơ lược
 
-* [Introduction](README.md)
+* [Giới thiệu](README.md)
 * [Tập 1: Up & Going](up & going/README.md)
    * [Mục lục](up & going/toc.md)
    * [Lời tựa](up & going/foreword.md)
