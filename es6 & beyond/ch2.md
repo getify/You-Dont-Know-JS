@@ -1135,17 +1135,17 @@ So let's examine if ES6 object destructuring with defaults can help at all:
 ```js
 config.options = config.options || {};
 config.log = config.log || {};
-{
+({
 	options: {
-		remove: config.options.remove = default.options.remove,
-		enable: config.options.enable = default.options.enable,
-		instance: config.options.instance = default.options.instance
+		remove: config.options.remove = defaults.options.remove,
+		enable: config.options.enable = defaults.options.enable,
+		instance: config.options.instance = defaults.options.instance
 	} = {},
 	log: {
-		warn: config.log.warn = default.log.warn,
-		error: config.log.error = default.log.error
+		warn: config.log.warn = defaults.log.warn,
+		error: config.log.error = defaults.log.error
 	} = {}
-} = config;
+} = config);
 ```
 
 Not as nice as the false promise of `Object.assign(..)` (being that it's shallow only), but it's better than the manual approach by a fair bit, I think. It is still unfortunately verbose and repetitive, though.

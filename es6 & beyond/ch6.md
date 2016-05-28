@@ -368,7 +368,7 @@ points.findIndex( function matcher(point) {
 
 Don't use `findIndex(..) != -1` (the way it's always been done with `indexOf(..)`) to get a boolean from the search, because `some(..)` already yields the `true`/`false` you want. And don't do `a[ a.findIndex(..) ]` to get the matched value, because that's what `find(..)` accomplishes. And finally, use `indexOf(..)` if you need the index of a strict match, or `findIndex(..)` if you need the index of a more customized match.
 
-**Note:** As with other array methods that take callbacks, `find(..)` takes an optional second argument that if set will specify the `this` binding for the callback passed as the first argument. Otherwise, `this` will be `undefined`.
+**Note:** As with other array methods that take callbacks, `findIndex(..)` takes an optional second argument that if set will specify the `this` binding for the callback passed as the first argument. Otherwise, `this` will be `undefined`.
 
 ### `entries()`, `values()`, `keys()` Prototype Methods
 
@@ -648,7 +648,7 @@ You may still prefer the coercion, in which case using the global `isFinite(..)`
 
 ### Integer-Related Static Functions
 
-JavaScript number valuess are always floating point (IEE-754). So the notion of determining if a number is an "integer" is not about checking its type, because JS makes no such distinction.
+JavaScript number values are always floating point (IEEE-754). So the notion of determining if a number is an "integer" is not about checking its type, because JS makes no such distinction.
 
 Instead, you need to check if there's any non-zero decimal portion of the value. The easiest way to do that has commonly been:
 
