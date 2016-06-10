@@ -632,7 +632,7 @@ for (var v of bar()) {
 	console.log( v );
 }
 // 1 2 3
-// x: { value: 4, done: true }
+// x: 4
 ```
 
 While the `1`, `2`, and `3` values are `yield`ed out of `*foo()` and then out of `*bar()`, the `4` value returned from `*foo()` is the completion value of the `yield *foo()` expression, which then gets assigned to `x`.
