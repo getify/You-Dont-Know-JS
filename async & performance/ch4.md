@@ -933,38 +933,32 @@ p.then(
 但看在学习和讲解的份儿上，让我们定义我们自己的名为`run(..)`的独立工具：
 
 ```js
-// thanks to Benjamin Gruenbaum (@benjamingr on GitHub) for
-// big improvements here!
+// 感谢Benjamin Gruenbaum (@benjamingr在GitHub)在此做出的巨大改进！
 function run(gen) {
 	var args = [].slice.call( arguments, 1), it;
 
-	// initialize the generator in the current context
+	// 在当前的上下文环境中初始化generator
 	it = gen.apply( this, args );
 
-	// return a promise for the generator completing
+	// 为generator的完成返回一个promise
 	return Promise.resolve()
 		.then( function handleNext(value){
-			// run to the next yielded value
+			// 运行至下一个让出的值
 			var next = it.next( value );
 
 			return (function handleResult(next){
-				// generator has completed running?
+				// generator已经完成运行了？
 				if (next.done) {
 					return next.value;
 				}
-				// otherwise keep going
+				// 否则继续执行
 				else {
 					return Promise.resolve( next.value )
 						.then(
-							// resume the async loop on
-							// success, sending the resolved
-							// value back into the generator
+							// 在成功的情况下继续异步循环，将解析的值送回generator
 							handleNext,
 
-							// if `value` is a rejected
-							// promise, propagate error back
-							// into the generator for its own
-							// error handling
+							// 如果`value`是一个拒绝的promise，就将错误传播回generator自己的错误处理g
 							function handleErr(err) {
 								return Promise.resolve(
 									it.throw( err )
@@ -978,9 +972,9 @@ function run(gen) {
 }
 ```
 
-如你所见，它可能比你想要自己制造的复杂得多，特别是你将不会想我每个你使用的生成器重复这段代码。所以，一个帮助工具/库绝对是可行的。虽然，我鼓励你花几分钟时间研究一下这点代码，以便对如何管理生成器+Promise交涉得到更好的感觉。
+如你所见，它可能比你想要自己编写的东西复杂得多，特别是你将不会想为每个你使用的generator重复这段代码。所以，一个帮助工具/库绝对是可行的。虽然，我鼓励你花几分钟时间研究一下这点代码，以便对如何管理generator+Promise交涉得到更好的感觉。
 
-你如何在我们的 *运行* Ajax例子中将`run(..)`和`*main()`一起使用呢？
+你如何在我们 *正在讨论* 的Ajax例子中将`run(..)`和`*main()`一起使用呢？
 
 ```js
 function *main() {
@@ -990,15 +984,15 @@ function *main() {
 run( main );
 ```
 
-就是这样！按照我们连接`run(..)`的方式，它将自动地，异步地推进你传入的生成器，直到完成。
+就是这样！按照我们连接`run(..)`的方式，它将自动地，异步地推进你传入的generator，直到完成。
 
-**注意：** 我们定义的`run(..)`返回一个promise，它被连接成一旦生成器完成就立即解析，或者收到一个未捕获的异常，如果生成器没有处理它。我们没有在这里展示这种能力，但我们会在本章稍后回到这个话题。
+**注意：** 我们定义的`run(..)`返回一个promise，它被连接成一旦generator完成就立即解析，或者收到一个未捕获的异常，而generator没有处理它。我们没有在这里展示这种能力，但我们会在本章稍后回到这个话题。
 
-#### ES7: `async` and `await`?
+#### ES7: `async` 和 `await`？
 
-前面的模式——生成器让出一个Promise，然后这个Promise控制生成器的 *迭代器* 向前推进至它完成——是一个如此强大和有用的方法，如果我们能不通过乱七八糟的帮助工具库（也就是`run(..)`）来使用它就更好了。
+前面的模式——generator让出一个Promise，然后这个Promise控制生成器的 *迭代器* 向前推进至它完成——是一个如此强大和有用的方法，如果我们能不通过乱七八糟的帮助工具库（也就是`run(..)`）来使用它就更好了。
 
-在这方面可能有一些好消息。在写作这本书的时候，后ES6，ES7化的时间表上已经出现了草案，对这个问题提供附加语法的早期但强大的支持。显然，现在还太早而不能保证细节，但是有相当大的机会它将蜕变为类似于下面的东西：
+在这方面可能有一些好消息。在写作这本书的时候，后ES6，ES7化的时间表上已经出现了草案，对这个问题提供早期但强大的附加语法支持。显然，现在还太早而不能保证其细节，但是有相当大的可能性它将蜕变为类似于下面的东西：
 
 ```js
 function foo(x,y) {
@@ -1020,23 +1014,23 @@ async function main() {
 main();
 ```
 
-如你所见，这里没有`run(..)`调用（意味着不需要工具库！）来驱动和调用`main()`——它仅仅像一个普通方法那样被调用。另外，`main()`不再作为一个生成器函数声明；它是一种新型的函数：`async function`。而最后，与`yield`一个Promise相反，我们`await`它解析。
+如你所见，这里没有`run(..)`调用（意味着不需要工具库！）来驱动和调用`main()`——它仅仅像一个普通函数那样被调用。另外，`main()`不再作为一个生成器函数声明；它是一种新型的函数：`async function`。而最后，与`yield`一个Promise相反，我们`await`它解析。
 
 如果你`await`一个Promise，`async function`会自动地知道做什么——它会暂停这个函数（就像使用生成器那样）直到Promise解析。我们没有在这个代码段中展示，但是调用一个像`main()`这样的异步函数将自动地返回一个promise，它会在函数完全完成时被解析。
 
 **提示：** `async` / `await`的语法应该对拥有C#经验的读者看起来非常熟悉，因为它们基本上是一样的。
 
-这个草案实质上是为我们已经衍生出的模式进行代码化的支持，成为一种语法机制：用看似同步的流程控制代码组合Promise。将两个世界的最好部分组合，来有效解决我们用回调遇到的几乎所有主要问题。
+这个草案实质上是为我们已经衍生出的模式进行代码化的支持，成为一种语法机制：用看似同步的流程控制代码与Promise组合。将两个世界的最好部分组合，来有效解决我们用回调遇到的几乎所有主要问题。
 
 这样的ES7化草案已经存在，并且有了早期的支持和热忱的拥护。这一事实为这种异步模式在未来的重要性上信心满满地投了有力的一票。
 
-### Promise Concurrency in Generators
+### Generator中的Promise并发
 
-至此，所有我们展示过的是一种使用Promise+生成器的单步异步流程。但是现实世界的代码将总是有许多异步步骤。
+至此，所有我们展示过的是一种使用Promise+generator的单步异步流程。但是现实世界的代码将总是有许多异步步骤。
 
-如果你不小心，生成器看似同步的风格也许会蒙蔽你，使你在如何构造你的异步并发上感到自满，导致性能次优的模式。那么我们想花一点时间来探索一下其他选项。
+如果你不小心，generator看似同步的风格也许会蒙蔽你，使你在如何构造你的异步并发上感到自满，导致性能次优的模式。那么我们想花一点时间来探索一下其他选项。
 
-想象一个场景，你需要从两个不同的数据源取得数据，然后将这些应答组合来发起第三个请求，最后答应出最终的应答。我们在第三章中用Promise探索过类似的场景，但这次让我们在生成器的场景下考虑它。
+想象一个场景，你需要从两个不同的数据源取得数据，然后将这些应答组合来发起第三个请求，最后打印出最终的应答。我们在第三章中用Promise探索过类似的场景，但这次让我们在generator的环境下考虑它。
 
 你的第一直觉可能是像这样的东西：
 
@@ -1052,7 +1046,7 @@ function *foo() {
 	console.log( r3 );
 }
 
-// use previously defined `run(..)` utility
+// 使用刚才定义的`run(..)`工具
 run( foo );
 ```
 
@@ -1060,19 +1054,19 @@ run( foo );
 
 因为`r1`和`r2`请求可以——而且为了性能的原因，*应该*——并发运行，但在这段代码中它们将顺序地运行；直到`"http://some.url.1"`请求完成之前，`"http://some.url.2"`URL不会被Ajax取得。这两个请求是独立的，所以性能更好的方式可能是让它们同时运行。
 
-但是使用生成器和`yield`，到底应该怎么做？
+但是使用generator和`yield`，到底应该怎么做？我们知道`yield`在代码中只是一个单独的暂停点，所以你根本不能再同一时刻做两次暂停。
 
-最自然和有效的答案是基于Promise的异步流程，特别是因为它们的时间无关的状态管理能力。
-、、、
+最自然和有效的答案是基于Promise的异步流程，特别是因为它们的时间无关的状态管理能力（参见第三章的“未来的值”）。
+
 最简单的方式：
 
 ```js
 function *foo() {
-	// make both requests "in parallel"
+	// 使两个请求“并行”
 	var p1 = request( "http://some.url.1" );
 	var p2 = request( "http://some.url.2" );
 
-	// wait until both promises resolve
+	// 等待两个promise都被解析
 	var r1 = yield p1;
 	var r2 = yield p2;
 
@@ -1083,13 +1077,13 @@ function *foo() {
 	console.log( r3 );
 }
 
-// use previously defined `run(..)` utility
+// 使用刚才定义的`run(..)`工具
 run( foo );
 ```
 
 为什么这与前一个代码段不同？看看`yield`在哪里和不在哪里。`p1`和`p2`是并发地（也就是“并行”）发起的Ajax请求promise。它们哪一个先完成都不要紧，因为promise会一直保持它们的解析状态。
 
-然后我们使用两个`yield`语句等待并从promise中取得解析值（分别取到`r1`和`r2`中）。如果`p1`首先解析，`yield p1`会首先继续执行然后等待`yield p2`继续执行。如果`p2`首先解析，它将会耐心地保持解析值知道被请求，但是`yield p1`将会首先停住，直到`p1`解析。
+然后我们使用两个连续的`yield`语句等待并从promise中取得解析值（分别取到`r1`和`r2`中）。如果`p1`首先解析，`yield p1`会首先继续执行然后等待`yield p2`继续执行。如果`p2`首先解析，它将会耐心地保持解析值知道被请求，但是`yield p1`将会首先停住，直到`p1`解析。
 
 不管是哪一种情况，`p1`和`p2`都将并发地运行，并且在`r3 = yield request..`Ajax请求发起之前，都必须完成，无论以哪种顺序。
 
@@ -1097,8 +1091,7 @@ run( foo );
 
 ```js
 function *foo() {
-	// make both requests "in parallel," and
-	// wait until both promises resolve
+	// 使两个请求“并行”并等待两个promise都被解析
 	var results = yield Promise.all( [
 		request( "http://some.url.1" ),
 		request( "http://some.url.2" )
@@ -1114,22 +1107,22 @@ function *foo() {
 	console.log( r3 );
 }
 
-// use previously defined `run(..)` utility
+// 使用前面定义的`run(..)`工具
 run( foo );
 ```
 
-**注意：** 就像我们在第三章中讨论的，我们甚至可以用ES6解构赋值来把`var r1 = .. var r2 = ..`赋值简化为`var [r1,r2] = results`。
+**注意：** 就像我们在第三章中讨论的，我们甚至可以用ES6解构赋值来把`var r1 = .. var r2 = ..`赋值简写为`var [r1,r2] = results`。
 
-换句话说，在生成器+Promise的方式中，Promise所有的并发能力都是可用的。所以在任何地方，如果你需要比“这个然后那个”要复杂的顺序异步流程步骤时，Promise都可能是最佳选择。
+换句话说，在generator+Promise的方式中，Promise所有的并发能力都是可用的。所以在任何地方，如果你需要比“这个然后那个”要复杂的顺序异步流程步骤时，Promise都可能是最佳选择。
 
-#### Promises, Hidden
+#### Promises，隐藏起来
 
-作为代码风格的警告要说一句，要小心你在 **你的生成器内部** 包含了多少Promise逻辑。以我们描述过的方式在异步性上使用生成器的全部意义，是要创建简单，顺序，看似同步的代码，并尽可能多地将异步性细节隐藏在这些代码之外。
+作为代码风格的警告要说一句，要小心你在 **你的generator内部** 包含了多少Promise逻辑。以我们描述过的方式在异步性上使用generator的全部意义，是要创建简单，顺序，看似同步的代码，并尽可能多地将异步性细节隐藏在这些代码之外。
 
 比如，这可能是一种更干净的方式：
 
 ```js
-// note: normal function, not generator
+// 注意：这是一个普通函数，不是generator
 function bar(url1,url2) {
 	return Promise.all( [
 		request( url1 ),
@@ -1138,8 +1131,7 @@ function bar(url1,url2) {
 }
 
 function *foo() {
-	// hide the Promise-based concurrency details
-	// inside `bar(..)`
+	// 将基于Promise的并发细节隐藏在`bar(..)`内部
 	var results = yield bar(
 		"http://some.url.1",
 		"http://some.url.2"
@@ -1155,11 +1147,11 @@ function *foo() {
 	console.log( r3 );
 }
 
-// use previously defined `run(..)` utility
+// 使用刚才定义的`run(..)`工具
 run( foo );
 ```
 
-在`*foo()`内部，它更干净更清晰地表达了我们要做的事情：我们要求`bar(..)`给我们一些`results`，而我们将`yield`等待它的发生。我们不必关心在底层一个`Promise.all([ .. ])`的Promise组合将被用来完成任务。
+在`*foo()`内部，它更干净更清晰地表达了我们要做的事情：我们要求`bar(..)`给我们一些`results`，而我们将用`yield`等待它的发生。我们不必关心在底层一个`Promise.all([ .. ])`的Promise组合将被用来完成任务。
 
 **我们将异步性，特别是Promise，作为一种实现细节。**
 
@@ -1176,17 +1168,17 @@ function bar() {
 }
 ```
 
-有时候这种逻辑是必须的，而如果你直接把它扔在你的生成器内部，你就违背了大多数你使用生成器的初衷。我们 *应当* 有意地将这样的细节从生成器代码中抽象出去，以使它们不会搞乱更高层的任务表达。
+有时候这种逻辑是必须的，而如果你直接把它扔在你的generator内部，你就违背了大多数你使用generator的初衷。我们 *应当* 有意地将这样的细节从generator代码中抽象出去，以使它们不会搞乱更高层的任务表达。
 
 在创建功能强与性能好的代码之上，你还应当努力使代码尽可能地容易推理和维护。
 
-**注意：** 对于编程来说，抽象不总是一种健康的东西——许多时候它可能在得到简洁的同时增加复杂性。但是在这种情况下，我相信你的生成器+Promise异步代码要比其他的选择健康得多。虽然有所有这些建议，你仍然要注意你的特殊情况，并为你和你的团队做出合适的决策。
+**注意：** 对于编程来说，抽象不总是一种健康的东西——许多时候它可能在得到简洁的同时增加复杂性。但是在这种情况下，我相信你的generator+Promise异步代码要比其他的选择健康得多。虽然有所有这些建议，你仍然要注意你的特殊情况，并为你和你的团队做出合适的决策。
 
-## Generator Delegation
+## Generator 委托
 
-在上一节中，我们展示了从生成器内部调用普通函数，和它如何作为一种有用的技术来将实现细节（比如异步Promise流程）抽象出去。但是为这种任务使用普通函数的缺陷是，它必须按照普通函数的规则行动，也就是说它不能像生成器那样用`yield`来暂停自己。
+在上一节中，我们展示了从generator内部调用普通函数，和它如何作为一种有用的技术来将实现细节（比如异步Promise流程）抽象出去。但是为这样的任务使用普通函数的缺陷是，它必须按照普通函数的规则行动，也就是说它不能像generator那样用`yield`来暂停自己。
 
-在你身上可能发生这样的事情：你可能会试着使用我们的`run(..)`帮助函数，从一个生成器中调用另个一生成器。比如：
+在你身上可能发生这样的事情：你可能会试着使用我们的`run(..)`帮助函数，从一个generator中调用另个一generator。比如：
 
 ```js
 function *foo() {
@@ -1199,7 +1191,7 @@ function *foo() {
 function *bar() {
 	var r1 = yield request( "http://some.url.1" );
 
-	// "delegating" to `*foo()` via `run(..)`
+	// 通过`run(..)`“委托”到`*foo()`
 	var r3 = yield run( foo );
 
 	console.log( r3 );
@@ -1208,7 +1200,7 @@ function *bar() {
 run( bar );
 ```
 
-通过再一次使用我们的`run(..)`工具，我们在`*bar()`内部运行`*foo()`。我们利用了这样一个事实：我们早先定义的`run(..)`返回一个promise，这个promise在生成器运行至完成是才解析（或发生错误），所以如果我们从一个`run(..)`调用中`yield`出一个promise给另一个`run(..)`，它就会自动暂停`*bar()`知道`*foo()`完成。
+通过再一次使用我们的`run(..)`工具，我们在`*bar()`内部运行`*foo()`。我们利用了这样一个事实：我们早先定义的`run(..)`返回一个promise，这个promise在generator运行至完成时才解析（或发生错误），所以如果我们从一个`run(..)`调用中`yield`出一个promise给另一个`run(..)`，它就会自动暂停`*bar()`直到`*foo()`完成。
 
 但这里有一个更好的办法将`*foo()`调用整合进`*bar()`，它称为`yield`委托。`yield`委托的特殊语法是：`yield * __`（注意额外的`*`）。让它在我们前面的例子中工作之前，让我们看一个更简单的场景：
 
@@ -1242,7 +1234,7 @@ it.next().value;	// `*foo()` finished
 
 `yield *foo()`委托是如何工作的？
 
-首先，正如我们看到过的那样，调用`foo()`创建了一个 *迭代器*。然后，`yield *`将 *迭代器* 的控制（当前`*bar()`生成器的）委托/传递给这另一个`*foo()`*迭代器*。
+首先，正如我们看到过的那样，调用`foo()`创建了一个 *迭代器*。然后，`yield *`将（当前`*bar()`generator的） *迭代器* 的控制委托/传递给这另一个`*foo()`*迭代器*。
 
 那么，前两个`it.next()`调用控制着`*bar()`，但当我们发起第三个`it.next()`调用时，`*foo()`就启动了，而且这时我们控制的是`*foo()`而非`*bar()`。这就是为什么它称为委托——`*bar()`将它的迭代控制委托给`*foo()`。
 
@@ -1261,7 +1253,7 @@ function *foo() {
 function *bar() {
 	var r1 = yield request( "http://some.url.1" );
 
-	// "delegating" to `*foo()` via `yield*`
+	// 通过`run(..)`“委托”到`*foo()`
 	var r3 = yield *foo();
 
 	console.log( r3 );
@@ -1272,19 +1264,19 @@ run( bar );
 
 这个代码段和前面使用的版本的唯一区别是，使用了`yield *foo()`而不是前面的`yield run(foo)`。
 
-**注意：** `yield *`让出了迭代控制，不是生成器控制；当你调用`*foo()`生成器时，你就`yield`委托给它的 *迭代器*。但你实际上可以`yield`委托给任何 *迭代器*；`yield *[1,2,3]`将会消费默认的`[1,2,3]`数组值 *迭代器*。
+**注意：** `yield *`让出了迭代控制，不是generator控制；当你调用`*foo()`生成器时，你就`yield`委托给它的 *迭代器*。但你实际上可以`yield`委托给任何 *迭代器*；`yield *[1,2,3]`将会消费默认的`[1,2,3]`数组值 *迭代器*。
 
-### Why Delegation?
+### 为什么委托？
 
-`yield`委托的目的很大程度上是为了代码组织，并且是以一种与普通函数调用对称的方式。
+`yield`委托的目的很大程度上是为了代码组织，而且这种方式是与普通函数调用对称的。
 
 想象两个分别提供了`foo()`和`bar()`方法的模块，其中`bar()`调用`foo()`。它们俩分开的原因一般是由于为了程序将它们作为分离的程序来调用而进行的恰当组织。例如，可能会有一些情况`foo()`需要被独立调用，而其他地方`bar()`来调用`foo()`。
 
-由于这些完全相同的原因，将生成器分开可以增强程序的可读性，可维护性，与可调试性。从这个角度讲，`yield *`是一种快捷的语法，用来在`*bar()`内部手动地迭代`*foo()`的步骤。
+由于这些完全相同的原因，将generator分开可以增强程序的可读性，可维护性，与可调试性。从这个角度讲，`yield *`是一种快捷的语法，用来在`*bar()`内部手动地迭代`*foo()`的步骤。
 
 如果`*foo()`中的步骤是异步的，这样的手动方式可能会特别复杂，这就是为什么你可能会需要那个`run(..)`工具来做它。正如我们已经展示的，`yield *foo()`消灭了使用`run(..)`工具的子实例（比如`run(foo)`）的需要。
 
-### Delegating Messages
+### 委托消息
 
 你可能想知道，这种`yield`委托在除了与 *迭代器* 控制一起工作以外，是如何与双向消息传递一起工作的。仔细查看下面这些通过`yield`委托进进出出的消息流：
 
@@ -1300,7 +1292,7 @@ function *foo() {
 function *bar() {
 	console.log( "inside `*bar()`:", yield "A" );
 
-	// `yield`-delegation!
+	// `yield`-委托！
 	console.log( "inside `*bar()`:", yield *foo() );
 
 	console.log( "inside `*bar()`:", yield "E" );
