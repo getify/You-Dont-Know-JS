@@ -140,7 +140,11 @@ var arr = Array.from( arguments );
 
 It's a very common belief that `string`s are essentially just `array`s of characters. While the implementation under the covers may or may not use `array`s, it's important to realize that JavaScript `string`s are really not the same as `array`s of characters. The similarity is mostly just skin-deep.
 
+一个很常见的想法是，`string`实质上只是字符的`array`。虽然内部的实现可能是也可能不是`array`，但重要的是要理解JavaScript的`string`与字符的`array`确实不一样。它们的相似性几乎只是表面上的。
+
 For example, let's consider these two values:
+
+举个例子，让我们考虑这两个值：
 
 ```js
 var a = "foo";
@@ -148,6 +152,8 @@ var b = ["f","o","o"];
 ```
 
 Strings do have a shallow resemblance to `array`s -- `array`-likes, as above -- for instance, both of them having a `length` property, an `indexOf(..)` method (`array` version only as of ES5), and a `concat(..)` method:
+
+String确实与`array`有很肤浅的相似性 -- 也就是刚才讨论的，类`array` -- 举例来说，它们都有`length`属性，一个`indexOf(..)`方法（在ES5中仅有`array`版本），和一个`concat(..)`方法：
 
 ```js
 a.length;							// 3
@@ -168,6 +174,8 @@ b;									// ["f","o","o"]
 
 So, they're both basically just "arrays of characters", right? **Not exactly**:
 
+那么，它们基本上都仅仅是“字符的数组”，对吧？ **不确切**：
+
 ```js
 a[1] = "O";
 b[1] = "O";
@@ -178,7 +186,11 @@ b; // ["f","O","o"]
 
 JavaScript `string`s are immutable, while `array`s are quite mutable. Moreover, the `a[1]` character position access form was not always widely valid JavaScript. Older versions of IE did not allow that syntax (but now they do). Instead, the *correct* approach has been `a.charAt(1)`.
 
+JavaScript的`string`是不可变的，而`array`是极其可变的。另外，在JavaScript中用位置访问字符的`a[1]`形式不总是广发合法的。老版本的IE就不允许这种语法（但是它们现在允许了）。相反，*正确的* 方式是`a.charAt(1)`.
+
 A further consequence of immutable `string`s is that none of the `string` methods that alter its contents can modify in-place, but rather must create and return new `string`s. By contrast, many of the methods that change `array` contents actually *do* modify in-place.
+
+`string`不可变性的进一步的后果是，`string`上没有一个方法是可以原地修改它的内容的，而是创建并返回一个新的`string`。与之相对的是，许多改变`array`内容的方法实际上 *是* 原地修改的。
 
 ```js
 c = a.toUpperCase();
@@ -191,6 +203,8 @@ b;			// ["f","O","o","!"]
 ```
 
 Also, many of the `array` methods that could be helpful when dealing with `string`s are not actually available for them, but we can "borrow" non-mutation `array` methods against our `string`:
+
+另外，许多`array`方法在处理`string`时非常有用，虽然这些方法不属于`string`，但我们可以对我们的`string`“借用”非变化的`array`方法：
 
 ```js
 a.join;			// undefined
@@ -207,6 +221,8 @@ d;				// "F.O.O."
 
 Let's take another example: reversing a `string` (incidentally, a common JavaScript interview trivia question!). `array`s have a `reverse()` in-place mutator method, but `string`s do not:
 
+让我们来看另一个例子：翻转一个`string`（顺带一提，这是一个JavaScript面试中常见的细小问题！）。`array`拥有一个原地的`reverse()`修改器方法，但是`string`没有：
+
 ```js
 a.reverse;		// undefined
 
@@ -216,21 +232,25 @@ b;				// ["!","o","O","f"]
 
 Unfortunately, this "borrowing" doesn't work with `array` mutators, because `string`s are immutable and thus can't be modified in place:
 
+不幸的是，这种“借用”对`array`修改器不起作用，因为`string`是不可变的，因此它不能被原地修改：
+
 ```js
 Array.prototype.reverse.call( a );
-// still returns a String object wrapper (see Chapter 3)
-// for "foo" :(
+// 仍然返回一个“foo”的String对象包装器（见第三章） :(
 ```
 
 Another workaround (aka hack) is to convert the `string` into an `array`, perform the desired operation, then convert it back to a `string`.
 
+另一种迂回的做法（也就是黑科技）是，将`string`转换为一个`array`，实施我们想做的操作，然后将它转回`string`。
+
 ```js
 var c = a
-	// split `a` into an array of characters
+	// 将`a`切分成一个字符的数组
 	.split( "" )
-	// reverse the array of characters
+	// 翻转字符的数组
 	.reverse()
 	// join the array of characters back to a string
+	// 将字符的数组连接回一个字符串
 	.join( "" );
 
 c; // "oof"
@@ -238,23 +258,39 @@ c; // "oof"
 
 If that feels ugly, it is. Nevertheless, *it works* for simple `string`s, so if you need something quick-n-dirty, often such an approach gets the job done.
 
+如果你觉得这很难看，没错。不管怎样，对于简单的`string`它 *好用*，所以如果你需要某些快速但是“脏”的东西，像这样的方式经常能满足你。
+
 **Warning:** Be careful! This approach **doesn't work** for `string`s with complex (unicode) characters in them (astral symbols, multibyte characters, etc.). You need more sophisticated library utilities that are unicode-aware for such operations to be handled accurately. Consult Mathias Bynens' work on the subject: *Esrever* (https://github.com/mathiasbynens/esrever).
 
+**警告：** 小心！这种方法对含有复杂（unicode）字符（星号，多字节字符等）的`string` **不好用**。你需要支持unicode的更精巧的工具库来准确地处理这种操作。在这个问题上可以咨询Mathias Bynens的作品：*Esrever*（https://github.com/mathiasbynens/esrever）。
+
 The other way to look at this is: if you are more commonly doing tasks on your "strings" that treat them as basically *arrays of characters*, perhaps it's better to just actually store them as `array`s rather than as `string`s. You'll probably save yourself a lot of hassle of converting from `string` to `array` each time. You can always call `join("")` on the `array` *of characters* whenever you actually need the `string` representation.
+
+另外一种考虑这个问题的方式是：如果你更经常地将你的“string”基本上作为 *字符的数组* 来执行一些任务的话，也许就将它们作为`array`而不是作为`string`存储更好。你可能会因此省去很多每次都将`string`装换为`array`的麻烦。无论何时你确实需要`string`的表现形式时，你总是可以调用 *字符的* `array`的`join("")`方法。
 
 ## Numbers
 
 JavaScript has just one numeric type: `number`. This type includes both "integer" values and fractional decimal numbers. I say "integer" in quotes because it's long been a criticism of JS that there are not true integers, as there are in other languages. That may change at some point in the future, but for now, we just have `number`s for everything.
 
+JavaScript只用一种数字类型：`number`。这种类型包含“整数”值和小数值。我说“整数”时加了引号，因为JS的一个长久以来为人诟病的原因是，和其他语言不同，JS没有真正的整数。这可能在未来某个时候会改变，但是目前，我们只有`number`可用。
+
 So, in JS, an "integer" is just a value that has no fractional decimal value. That is, `42.0` is as much an "integer" as `42`.
+
+所以，在JS中，一个“整数”只是一个没有小数部分的小数值。也就是说，`42.0`和`42`一样是“整数”。
 
 Like most modern languages, including practically all scripting languages, the implementation of JavaScript's `number`s is based on the "IEEE 754" standard, often called "floating-point." JavaScript specifically uses the "double precision" format (aka "64-bit binary") of the standard.
 
+像大多数现代计算机语言一样，包括几乎所有的脚本语言，JavaScript的`number`的实现基于“IEEE 754”标准，通常被称为“浮点”。JavaScript明确地使用了这个标准的“双精度”（也就是“64未二进制”）格式。
+
 There are many great write-ups on the Web about the nitty-gritty details of how binary floating-point numbers are stored in memory, and the implications of those choices. Because understanding bit patterns in memory is not strictly necessary to understand how to correctly use `number`s in JS, we'll leave it as an exercise for the interested reader if you'd like to dig further into IEEE 754 details.
+
+在网络上有许多了不起的文章介绍了二进制浮点数如何在内存中存储的技术细节，以及这些选择的意义。因为对于理解如何在JS中正确使用`number`来说，理解内存中的位模式不是必须的，所以我们将这个话题作为练习留给那些想要进一步挖掘IEEE 754的细节的读者。
 
 ### Numeric Syntax
 
 Number literals are expressed in JavaScript generally as base-10 decimal literals. For example:
+
+在JavaScript中字面数字一般用字面上的10进制小数表达：
 
 ```js
 var a = 42;
@@ -263,12 +299,16 @@ var b = 42.3;
 
 The leading portion of a decimal value, if `0`, is optional:
 
+小数的整数部分，如果是`0`，是可选的：
+
 ```js
 var a = 0.42;
 var b = .42;
 ```
 
 Similarly, the trailing portion (the fractional) of a decimal value after the `.`, if `0`, is optional:
+
+相似地，一个小数在`.`之后的小数部分，如果是`0`，是可选的：
 
 ```js
 var a = 42.0;
@@ -277,7 +317,11 @@ var b = 42.;
 
 **Warning:** `42.` is pretty uncommon, and probably not a great idea if you're trying to avoid confusion when other people read your code. But it is, nevertheless, valid.
 
+**警告：** `42.`是极不常见的，如果你正在努力避免别人阅读你的代码时感到困惑，它可能不是一个好主意。但不管怎样，它是合法的。
+
 By default, most `number`s will be outputted as base-10 decimals, with trailing fractional `0`s removed. So:
+
+默认情况下，大多数`number`将会以10进制小数的形式输出，并去掉末尾小数部分的`0`。所以：
 
 ```js
 var a = 42.300;
@@ -288,6 +332,8 @@ b; // 42
 ```
 
 Very large or very small `number`s will by default be outputted in exponent form, the same as the output of the `toExponential()` method, like:
+
+非常大或非常小的`number`将默认以指数形式输出，与`toExponential()`方法的输出一样，比如：
 
 ```js
 var a = 5E10;
@@ -303,6 +349,8 @@ c;					// 2e-11
 
 Because `number` values can be boxed with the `Number` object wrapper (see Chapter 3), `number` values can access methods that are built into the `Number.prototype` (see Chapter 3). For example, the `toFixed(..)` method allows you to specify how many fractional decimal places you'd like the value to be represented with:
 
+因为`number`值可以用`Number`对象包装器封装（见第三章），`number`值可以访问内建在`Number.prototype`上的方法（见第三章）。举个例子，`toFixed(..)`方法允许你指定一个值在表现时，带有多少位小数：
+
 ```js
 var a = 42.59;
 
@@ -315,7 +363,11 @@ a.toFixed( 4 ); // "42.5900"
 
 Notice that the output is actually a `string` representation of the `number`, and that the value is `0`-padded on the right-hand side if you ask for more decimals than the value holds.
 
+要注意的是，它的输出实际上是一个`number`的`string`表现形式，而且如果你指定的位数多于值持有的小数位数时，会在右侧补`0`。
+
 `toPrecision(..)` is similar, but specifies how many *significant digits* should be used to represent the value:
+
+`toPrecision(..)`很相似，但它指定的是有多少 *有效数字* 用来表现这个值：
 
 ```js
 var a = 42.59;
@@ -330,11 +382,13 @@ a.toPrecision( 6 ); // "42.5900"
 
 You don't have to use a variable with the value in it to access these methods; you can access these methods directly on `number` literals. But you have to be careful with the `.` operator. Since `.` is a valid numeric character, it will first be interpreted as part of the `number` literal, if possible, instead of being interpreted as a property accessor.
 
+你不必非得使用持有这个值的变量来访问这些方法；你可以直接在`number`的字面上访问这些方法。但你不得不小心`.`操作符。因为`.`是一个合法数字字符，如果可能的话，它会首先被翻译为`number`字面的一部分，而不是被翻译为属性访问操作符。
+
 ```js
-// invalid syntax:
+// 不合法的语法：
 42.toFixed( 3 );	// SyntaxError
 
-// these are all valid:
+// 这些都是合法的：
 (42).toFixed( 3 );	// "42.000"
 0.42.toFixed( 3 );	// "0.420"
 42..toFixed( 3 );	// "42.000"
@@ -342,7 +396,11 @@ You don't have to use a variable with the value in it to access these methods; y
 
 `42.toFixed(3)` is invalid syntax, because the `.` is swallowed up as part of the `42.` literal (which is valid -- see above!), and so then there's no `.` property operator present to make the `.toFixed` access.
 
+`42.toFixed(3)`是不合法的语法，因为`.`作为`42.`字面（这是合法的 -- 参见上面的讨论！）的一部分被吞掉了，因此没有`.`属性操作符来表示`.toFixed`访问。
+
 `42..toFixed(3)` works because the first `.` is part of the `number` and the second `.` is the property operator. But it probably looks strange, and indeed it's very rare to see something like that in actual JavaScript code. In fact, it's pretty uncommon to access methods directly on any of the primitive values. Uncommon doesn't mean *bad* or *wrong*.
+
+
 
 **Note:** There are libraries that extend the built-in `Number.prototype` (see Chapter 3) to provide extra operations on/with `number`s, and so in those cases, it's perfectly valid to use something like `10..makeItRain()` to set off a 10-second money raining animation, or something else silly like that.
 
