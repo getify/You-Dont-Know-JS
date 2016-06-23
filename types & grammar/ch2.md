@@ -1,13 +1,19 @@
-# You Don't Know JS: Types & Grammar
-# Chapter 2: Values
+# 你不懂JS：类型与文法
+# 第二章：值
 
 `array`s, `string`s, and `number`s are the most basic building-blocks of any program, but JavaScript has some unique characteristics with these types that may either delight or confound you.
 
+`array`，`string`，和`number`是任何程序的最基础构建块儿，但是JavaScript在这些类型上有一些要么使你惊喜要么使你惊讶的独特性质。
+
 Let's look at several of the built-in value types in JS, and explore how we can more fully understand and correctly leverage their behaviors.
+
+让我们来看几种JS内建的值类型，并探讨一下我们如何才能更加全面地理解并正确地利用它们的行为。
 
 ## Arrays
 
 As compared to other type-enforced languages, JavaScript `array`s are just containers for any type of value, from `string` to `number` to `object` to even another `array` (which is how you get multidimensional `array`s).
+
+和强制类型的语言相比，JavaScript的`array`只是值的容器，而这些值可以是任何类型：`string`或者`number`或者`object`，甚至是另一个`array`（这也是你得到多维数组的方法）。
 
 ```js
 var a = [ 1, "2", [3] ];
@@ -18,6 +24,8 @@ a[2][0] === 3;	// true
 ```
 
 You don't need to presize your `array`s (see "Arrays" in Chapter 3), you can just declare them and add values as you see fit:
+
+你不需要预先指定`array`的大小，你可以仅仅声明它们并加入你觉得合适的值：
 
 ```js
 var a = [ ];
@@ -33,7 +41,11 @@ a.length;	// 3
 
 **Warning:** Using `delete` on an `array` value will remove that slot from the `array`, but even if you remove the final element, it does **not** update the `length` property, so be careful! We'll cover the `delete` operator itself in more detail in Chapter 5.
 
+**警告：** 在一个`array`值上使用`delete`将会从这个`array`上移除一个值槽，但就算你移除了最后一个元素，它也 **不会** 更新`length`属性，所以多加小心！我们会在第五章讨论`delete`操作符的更多细节。
+
 Be careful about creating "sparse" `array`s (leaving or creating empty/missing slots):
+
+关于创建“稀散”的`array`（留下或创建空的/丢失的值槽）需要小心：
 
 ```js
 var a = [ ];
@@ -49,7 +61,11 @@ a.length;	// 3
 
 While that works, it can lead to some confusing behavior with the "empty slots" you leave in between. While the slot appears to have the `undefined` value in it, it will not behave the same as if the slot is explicitly set (`a[1] = undefined`). See "Arrays" in Chapter 3 for more information.
 
+虽然这可以工作，但它可能会在你留下的“空值槽”上导致一些令人困惑的行为。虽然这样的值槽看起来拥有`undefined`值，但是它不会像被明确设置（`a[1] = undefined`）的值槽那样动作。更多细节可以参见第三章的“Array”。
+
 `array`s are numerically indexed (as you'd expect), but the tricky thing is that they also are objects that can have `string` keys/properties added to them (but which don't count toward the `length` of the `array`):
+
+`array`是被数字索引的（正如你期望的那样），但微妙的是它们也是对象，可以在它们上面添加`string`键/属性（但是这些属性不会计算在`array`的`length`中）：
 
 ```js
 var a = [ ];
@@ -64,6 +80,8 @@ a.foobar;		// 2
 
 However, a gotcha to be aware of is that if a `string` value intended as a key can be coerced to a standard base-10 `number`, then it is assumed that you wanted to use it as a `number` index rather than as a `string` key!
 
+然而，一个需要小心的坑是，如果一个可以被强制转换为10进制`number`的`string`值被用作键的话，它会认为你想使用`number`索引而不是一个`string`键！
+
 ```js
 var a = [ ];
 
@@ -74,13 +92,21 @@ a.length; // 14
 
 Generally, it's not a great idea to add `string` keys/properties to `array`s. Use `object`s for holding values in keys/properties, and save `array`s for strictly numerically indexed values.
 
+一般来说，向`array`添加`string`键/属性不是一个好主意。最好使用`object`来持有键/属性形式的值，而将`array`专用于严格地数字索引的值。
+
 ### Array-Likes
 
 There will be occasions where you need to convert an `array`-like value (a numerically indexed collection of values) into a true `array`, usually so you can call array utilities (like `indexOf(..)`, `concat(..)`, `forEach(..)`, etc.) against the collection of values.
 
+偶尔你需要将一个类`array`值（一个数字索引的值的集合）转换为一个真正的`array`，通常你可以对这些值的集合调用数组的工具函数（比如`indexOf(..)`，`concat(..)`，`forEach(..)`等等）。
+
 For example, various DOM query operations return lists of DOM elements that are not true `array`s but are `array`-like enough for our conversion purposes. Another common example is when functions expose the `arguments` (`array`-like) object (as of ES6, deprecated) to access the arguments as a list.
 
+举个例子，各种DOM查询操作会返回一个DOM元素的列表，对于我们转换的目的来说，这些列表不是真正的`array`但是也足够类似`array`。另一个常见的例子是，函数将`arugumens`对象（类`array`，但是在ES6中被废弃了）作为列表来访问它的参数。
+
 One very common way to make such a conversion is to borrow the `slice(..)` utility against the value:
+
+一个进行这种转换的很常见的方法是对这个值借用`slice(..)`工具：
 
 ```js
 function foo() {
@@ -94,7 +120,11 @@ foo( "bar", "baz" ); // ["bar","baz","bam"]
 
 If `slice()` is called without any other parameters, as it effectively is in the above snippet, the default values for its parameters have the effect of duplicating the `array` (or, in this case, `array`-like).
 
+如果`slice()`没有用其他额外的参数调用，实际上就像上面的代码段那样，它的参数的默认值会使它复制这个`array`（或者，像这里的情况，一个类`array`）。
+
 As of ES6, there's also a built-in utility called `Array.from(..)` that can do the same task:
+
+在ES6中，还有一种称为`Array.from(..)`的内建工具可以执行相同的任务：
 
 ```js
 ...
@@ -103,6 +133,8 @@ var arr = Array.from( arguments );
 ```
 
 **Note:** `Array.from(..)` has several powerful capabilities, and will be covered in detail in the *ES6 & Beyond* title of this series.
+
+**注意：** `Array.from(..)`拥有几种其他强大的能力，我们将在本系列的 *ES6与未来* 中涵盖它的细节。
 
 ## Strings
 
