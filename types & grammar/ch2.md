@@ -400,11 +400,15 @@ You don't have to use a variable with the value in it to access these methods; y
 
 `42..toFixed(3)` works because the first `.` is part of the `number` and the second `.` is the property operator. But it probably looks strange, and indeed it's very rare to see something like that in actual JavaScript code. In fact, it's pretty uncommon to access methods directly on any of the primitive values. Uncommon doesn't mean *bad* or *wrong*.
 
-
+`42..toFixed(3)`可以工作，因为第一个`.`是`number`的一部分，而第二个`.`是属性操作符。但它可能看起来很古怪，而且确实在实际的JavaScript代码中很少会看到这样的东西。实际上，在任何基本类型上直接访问方法是十分不常见的。但是不常见不意味着 *坏* 或者 *错*。
 
 **Note:** There are libraries that extend the built-in `Number.prototype` (see Chapter 3) to provide extra operations on/with `number`s, and so in those cases, it's perfectly valid to use something like `10..makeItRain()` to set off a 10-second money raining animation, or something else silly like that.
 
+**注意：** 有一些库扩展了内建的`Number.prototype`（见第三章），使用`number`或在`number`上提供了额外的操作，所以在这些情况下，像使用`10..makeItRain()`来设定一个10秒钟的下钱雨的动画，或者其他诸如此类的傻事是完全合法的。
+
 This is also technically valid (notice the space):
+
+在技术上讲，这也是合法的（注意那个空格）：
 
 ```js
 42 .toFixed(3); // "42.000"
@@ -412,7 +416,11 @@ This is also technically valid (notice the space):
 
 However, with the `number` literal specifically, **this is particularly confusing coding style** and will serve no other purpose but to confuse other developers (and your future self). Avoid it.
 
+但是，尤其是对`number`字面量来说，**这是特别使人糊涂的代码风格**，而且除了使其他开发者（和未来的你）糊涂意外，没有任何用处。避免它。
+
 `number`s can also be specified in exponent form, which is common when representing larger `number`s, such as:
+
+`number`还可以使用科学计数法的形式指定，这在表示很大的`number`时很常见，比如：
 
 ```js
 var onethousand = 1E3;						// means 1 * 10^3
@@ -421,32 +429,45 @@ var onemilliononehundredthousand = 1.1E6;	// means 1.1 * 10^6
 
 `number` literals can also be expressed in other bases, like binary, octal, and hexadecimal.
 
+`number`字面量还可以使用其他进制表达，比如二进制，八进制，和十六进制。
+
 These formats work in current versions of JavaScript:
 
-```js
-0xf3; // hexadecimal for: 243
-0Xf3; // ditto
+这些格式是可以在当前版本的JavaScript中使用的：
 
-0363; // octal for: 243
+```js
+0xf3; // 十六进制的: 243
+0Xf3; // 同上
+
+0363; // 八进制的: 243
 ```
 
 **Note:** Starting with ES6 + `strict` mode, the `0363` form of octal literals is no longer allowed (see below for the new form). The `0363` form is still allowed in non-`strict` mode, but you should stop using it anyway, to be future-friendly (and because you should be using `strict` mode by now!).
 
+**注意：** 从ES6 + `strict`模式开始，不在允许`0363`这样的的八进制形式（新的形式参见后面的讨论）。`0363`在非`strict`模式下依然是允许的，但是无论如何你应当停止使用它，来拥抱未来（而且因为你现在应当在使用`strict`模式了！）。
+
 As of ES6, the following new forms are also valid:
 
-```js
-0o363;		// octal for: 243
-0O363;		// ditto
+至于ES6，下面的新形式也是合法的：
 
-0b11110011;	// binary for: 243
-0B11110011; // ditto
+```js
+0o363;		// 八进制的: 243
+0O363;		// 同上
+
+0b11110011;	// 二进制的: 243
+0B11110011; // 同上
 ```
 
 Please do your fellow developers a favor: never use the `0O363` form. `0` next to capital `O` is just asking for confusion. Always use the lowercase predicates `0x`, `0b`, and `0o`.
 
+情为你的开发者同胞们做件好事：绝不要使用`0O363`形式。把`0`放在大写的`O`旁边就是在制造困惑。保持使用小写的谓词`0x`，`0b`，和`0o`。
+
 ### Small Decimal Values
+### 小数值
 
 The most (in)famous side effect of using binary floating-point numbers (which, remember, is true of **all** languages that use IEEE 754 -- not *just* JavaScript as many assume/pretend) is:
+
+使用二进制浮点数的最出名（臭名昭著）的副作用是（记住，这是对 **所有** 使用IEEE 754的语言都成立的——不是许多人认为/假装 *仅* 在JavaScript中存在的问题）：
 
 ```js
 0.1 + 0.2 === 0.3; // false
@@ -454,13 +475,23 @@ The most (in)famous side effect of using binary floating-point numbers (which, r
 
 Mathematically, we know that statement should be `true`. Why is it `false`?
 
+从数学的意义上，我们知道这个语句应当为`true`。为什么它是`false`？
+
 Simply put, the representations for `0.1` and `0.2` in binary floating-point are not exact, so when they are added, the result is not exactly `0.3`. It's **really** close: `0.30000000000000004`, but if your comparison fails, "close" is irrelevant.
+
+简单地说，`0.1`和`0.2`的二进制表示形式是不精确的，所以它们相加时，结果不是精确地`0.3`。而是 **非常** 接近的值：`0.30000000000000004`，但是如果你的比较失败了，“接近”是无关紧要的。
 
 **Note:** Should JavaScript switch to a different `number` implementation that has exact representations for all values? Some think so. There have been many alternatives presented over the years. None of them have been accepted yet, and perhaps never will. As easy as it may seem to just wave a hand and say, "fix that bug already!", it's not nearly that easy. If it were, it most definitely would have been changed a long time ago.
 
+**注意：** JavaScript应当切换到可以精确表达所有值的一个不同的`number`实现吗？有些人认为应该。多年以来有许多选项出现过。但是没有一个被采纳，而且也许永远也不会。它看起来就像挥挥手然后说“已经改好那个bug了!”那么简单，但根本不是那么回事儿。如果真有这么简单，它绝对就在很久以前被改掉了。
+
 Now, the question is, if some `number`s can't be *trusted* to be exact, does that mean we can't use `number`s at all? **Of course not.**
 
+现在的问题是，如果一些`number`不能被 *信任* 为精确的，这不是意味着我们根本不能使用`number`吗？ **当然不是。**
+
 There are some applications where you need to be more careful, especially when dealing with fractional decimal values. There are also plenty of (maybe most?) applications that only deal with whole numbers ("integers"), and moreover, only deal with numbers in the millions or trillions at maximum. These applications have been, and always will be, **perfectly safe** to use numeric operations in JS.
+
+
 
 What if we *did* need to compare two `number`s, like `0.1 + 0.2` to `0.3`, knowing that the simple equality test fails?
 
