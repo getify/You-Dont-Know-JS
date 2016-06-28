@@ -1577,32 +1577,32 @@ In essence, the mutual imports, along with the static verification that's done t
 Now let's try using the two modules together. First, we'll try `foo(..)`:
 
 ```js
-import foo from "foo";
+import foo from "A";
 foo( 25 );				// 11
 ```
 
 Or we can try `bar(..)`:
 
 ```js
-import bar from "bar";
+import bar from "B";
 bar( 25 );				// 11.5
 ```
 
 By the time either the `foo(25)` or `bar(25)` calls are executed, all the analysis/compilation of all modules has completed. That means `foo(..)` internally knows directly about `bar(..)` and `bar(..)` internally knows directly about `foo(..)`.
 
-If all we need is to interact with `foo(..)`, then we only need to import the `"foo"` module. Likewise with `bar(..)` and the `"bar"` module.
+If all we need is to interact with `foo(..)`, then we only need to import the `"A"` module. Likewise with `bar(..)` and the `"B"` module.
 
 Of course, we *can* import and use both of them if we want to:
 
 ```js
-import foo from "foo";
-import bar from "bar";
+import foo from "A";
+import bar from "B";
 
 foo( 25 );				// 11
 bar( 25 );				// 11.5
 ```
 
-The static loading semantics of the `import` statement mean that a `"foo"` and `"bar"` that mutually depend on each other via `import` will ensure that both are loaded, parsed, and compiled before either of them runs. So their circular dependency is statically resolved and this works as you'd expect.
+The static loading semantics of the `import` statement mean that `"A"` and `"B"` modules that mutually depend on each other via `import` will ensure that both are loaded, parsed, and compiled before either of them runs. So their circular dependency is statically resolved and this works as you'd expect.
 
 ### Module Loading
 
