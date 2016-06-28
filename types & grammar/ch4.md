@@ -1002,7 +1002,7 @@ Generally, this sort of gotcha won't bite you unless you're really trying to cre
 
 What about the other direction? How can we *implicitly coerce* from `string` to `number`?
 
-```
+```js
 var a = "3.14";
 var b = a - 0;
 
