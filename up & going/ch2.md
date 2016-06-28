@@ -11,6 +11,19 @@ Your journey to deeply learn JavaScript starts here.
 
 **Note:** As I said in Chapter 1, you should definitely try all this code yourself as you read and work through this chapter. Be aware that some of the code here assumes capabilities introduced in the newest version of JavaScript at the time of this writing (commonly referred to as "ES6" for the 6th edition of ECMAScript -- the official name of the JS specification). If you happen to be using an older, pre-ES6 browser, the code may not work. A recent update of a modern browser (like Chrome, Firefox, or IE) should be used.
 
+### Table of contents
+
+* [Values & Types](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20%26%20going/ch2.md#values--types)
+* [Variables](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20%26%20going/ch2.md#variables)
+* [Conditionals](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20%26%20going/ch2.md#conditionals)
+* [Strict Mode](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20%26%20going/ch2.md#strict-mode)
+* [Functions As Values](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20%26%20going/ch2.md#functions-as-values)
+* [`this` Keyword](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20%26%20going/ch2.md#this-identifier)
+* [Prototypes](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20%26%20going/ch2.md#prototypes)
+* [Old & New](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20%26%20going/ch2.md#old--new)
+* [Non-JavaScript](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20%26%20going/ch2.md#non-javascript)
+
+
 ## Values & Types
 
 As we asserted in Chapter 1, JavaScript has typed values, not typed variables. The following built-in types are available:
