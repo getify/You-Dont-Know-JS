@@ -450,63 +450,37 @@ if (!Number.isSafeInteger) {
 	};
 }
 ```
-
-### 32-bit (Signed) Integers
 ### 32位（有符号）整数
-
-While integers can range up to roughly 9 quadrillion safely (53 bits), there are some numeric operations (like the bitwise operators) that are only defined for 32-bit `number`s, so the "safe range" for `number`s used in that way must be much smaller.
 
 虽然整数可以安全地最大达到约9万亿，但有一些数字操作（比如位操作符）是仅仅为32位`number`定义的，所以对于那样使用的`number`来说，“安全范围”必须要小得多。
 
-The range then is `Math.pow(-2,31)` (`-2147483648`, about -2.1 billion) up to `Math.pow(2,31)-1` (`2147483647`, about +2.1 billion).
-
 这个范围是从`Math.pow(-2,31)`（`-2147483648`，大约-2.1亿）到`Math.pow(2,31)-1`（`2147483647`，大约+2.1亿）。
-
-To force a `number` value in `a` to a 32-bit signed integer value, use `a | 0`. This works because the `|` bitwise operator only works for 32-bit integer values (meaning it can only pay attention to 32 bits and any other bits will be lost). Then, "or'ing" with zero is essentially a no-op bitwise speaking.
 
 要强制`a`中的`number`值是32位有符号整数，使用`a | 0`。这可以工作是因为`|`位操作符仅仅对32位值起作用（意味着它可以只关注32位，而其他的位将被丢掉）。而且，和0进行“或”的位操作实质上是什么也不做。
 
-**Note:** Certain special values (which we will cover in the next section) such as `NaN` and `Infinity` are not "32-bit safe," in that those values when passed to a bitwise operator will pass through the abstract operation `ToInt32` (see Chapter 4) and become simply the `+0` value for the purpose of that bitwise operation.
-
 **注意：** 特定的特殊值（我们将在下一节讨论），比如`NaN`和`Infinity`不是“32位安全”的，当这些值被传入位操作符时将会通过一个抽象操作`ToInt32`（见第四章）并为了位操作而简单地变成`+0`值。
 
-## Special Values
 ## 特殊值
-
-There are several special values spread across the various types that the *alert* JS developer needs to be aware of, and use properly.
 
 在各种类型中散布着一些特殊值，需要 *警惕* 的JS开发者小心，并正确使用。
 
 ### The Non-value Values
 
-For the `undefined` type, there is one and only one value: `undefined`. For the `null` type, there is one and only one value: `null`. So for both of them, the label is both its type and its value.
-
 对于`undefined`类型来说，有且仅有一个值：`undefined`。对于`null`类型来说，有且仅有一个值：`null`。所以对它们而言，这些文字既是它们的类型也是它们的值。
-
-Both `undefined` and `null` are often taken to be interchangeable as either "empty" values or "non" values. Other developers prefer to distinguish between them with nuance. For example:
 
 `undefined`和`null`作为“空”值或者“没有”值，经常被认为是可以互换的。另一些开发者偏好于使用微妙的区别将它们区分开。举例来讲：
 
-* `null` is an empty value
 * `null`是一个空值
-* `undefined` is a missing value
 * `undefined`是一个丢失的值
 
-Or:
 或者：
 
-* `undefined` hasn't had a value yet
 * `undefined`还没有值
-* `null` had a value and doesn't anymore
 * `null`曾经有过值但现在没有
-
-Regardless of how you choose to "define" and use these two values, `null` is a special keyword, not an identifier, and thus you cannot treat it as a variable to assign to (why would you!?). However, `undefined` *is* (unfortunately) an identifier. Uh oh.
 
 不管你选择如何“定义”和使用这两个值，`null`是一个特殊的关键字，不是一个标识符，因此你不能将它作为一个变量对待来给它赋值（为什么你要给它赋值呢？！）。然而，`undefined`（不幸地）是一个标识符。噢。
 
 ### Undefined
-
-In non-`strict` mode, it's actually possible (though incredibly ill-advised!) to assign a value to the globally provided `undefined` identifier:
 
 在非`strict`模式下，给在全局上提供的`undefined`标识符赋一个值实际上是可能的（虽然这是一个非常不好的做法！）：
 
@@ -527,8 +501,6 @@ function foo() {
 foo();
 ```
 
-In both non-`strict` mode and `strict` mode, however, you can create a local variable of the name `undefined`. But again, this is a terrible idea!
-
 但是，在非`strict`模式和`strict`模式下，你可以创建一个名叫`undefined`局部变量。但这又是一个很差劲儿的主意！
 
 ```js
@@ -541,17 +513,11 @@ function foo() {
 foo();
 ```
 
-**Friends don't let friends override `undefined`.** Ever.
-
 **朋友永远不让朋友覆盖`undefined`。**
 
 #### `void` Operator
 
-While `undefined` is a built-in identifier that holds (unless modified -- see above!) the built-in `undefined` value, another way to get this value is the `void` operator.
-
 虽然`undefined`是一个持有内建的`undefined`值的内建标识符（除非被修改——见上面的讨论！），另一个得到这个值的方法是`void`操作符。
-
-The expression `void ___` "voids" out any value, so that the result of the expression is always the `undefined` value. It doesn't modify the existing value; it just ensures that no value comes back from the operator expression.
 
 表达式`void __`会“躲开”任何值，所以这个表达式的结果总是`undefined`值。它不会修改任何已经存在的值；只是确保不会有值从操作符表达式中回来。
 
@@ -561,15 +527,9 @@ var a = 42;
 console.log( void a, a ); // undefined 42
 ```
 
-By convention (mostly from C-language programming), to represent the `undefined` value stand-alone by using `void`, you'd use `void 0` (though clearly even `void true` or any other `void` expression does the same thing). There's no practical difference between `void 0`, `void 1`, and `undefined`.
-
 从惯例上讲（大约是从C语言编程中发展而来），通过使用`void`来独立表现`undefined`值，你可以使用`void 0`（虽然，很明显，`void true`或者任何其他的`void`表达式都做同样的事情）。在`void 0`，`void 1`和`undefined`之间没有实际上的区别。
 
-But the `void` operator can be useful in a few other circumstances, if you need to ensure that an expression has no result value (even if it has side effects).
-
 但是在几种其他的环境下`void`操作符可以十分有用：如果你需要确保一个表达式没有结果值（即便它有副作用）。
-
-For example:
 
 举个例子：
 
@@ -593,11 +553,7 @@ if (doSomething()) {
 }
 ```
 
-Here, the `setTimeout(..)` function returns a numeric value (the unique identifier of the timer interval, if you wanted to cancel it), but we want to `void` that out so that the return value of our function doesn't give a false-positive with the `if` statement.
-
 这里，`setTimeout(..)`函数返回一个数字值（时间间隔的唯一标识符，用于取消它自己），但是我们想`void`它，这样我们函数的返回值不会在`if`语句上给出一个错误的成立。
-
-Many devs prefer to just do these actions separately, which works the same but doesn't use the `void` operator:
 
 许多开发者宁愿将这些动作分开，这样的效用相同但不使用`void`操作符：
 
@@ -608,8 +564,6 @@ if (!APP.ready) {
 	return;
 }
 ```
-
-In general, if there's ever a place where a value exists (from some expression) and you'd find it useful for the value to be `undefined` instead, use the `void` operator. That probably won't be terribly common in your programs, but in the rare cases you do need it, it can be quite helpful.
 
 一般来说，如果有那么一个地方，有一个值存在而你发现这个值如果是`undefined`才有用，就使用`void`操作符。这可能在你的程序中不是非常常见，但如果在一些稀有的情况下你需要它，它就十分有用。
 
