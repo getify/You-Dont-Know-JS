@@ -13,6 +13,19 @@ Once you feel comfortable with general programming basics, Chapter 2 will help g
 
 If you're already fairly comfortable with JavaScript, first check out Chapter 3 as a brief glimpse of what to expect from *YDKJS*, then jump right in!
 
+* Chapter 1: Into Programming
+	* [Code](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20&%20going/ch1.md#code)
+	* [Try It Yourself](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20&%20going/ch1.md#try-it-yourself)
+	* [Operators](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20&%20going/ch1.md#operators)
+	* [Values & Types](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20&%20going/ch1.md#values--types)
+	* [Code Comments](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20&%20going/ch1.md#code-comments)
+	* [Variables](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20&%20going/ch1.md#variables)
+	* [Blocks](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20&%20going/ch1.md#blocks)
+	* [Conditionals](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20&%20going/ch1.md#conditionals)
+	* [Loops](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20&%20going/ch1.md#loops)
+	* [Functions](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20&%20going/ch1.md#functions)
+	* [Practice](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20&%20going/ch1.md#practice)
+
 ## Code
 
 Let's start from the beginning.
