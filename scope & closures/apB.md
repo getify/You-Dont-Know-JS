@@ -120,4 +120,4 @@ The question really becomes: do you want block-scoping, or not. If you do, these
 
 [^note-traceur]: [Google Traceur](http://traceur-compiler.googlecode.com/git/demo/repl.html)
 
-[^note-let_er]: [let-er](https://github.com/getify/let-er)
+[^note-let_er]\: [let-er](https://github.com/getify/let-er)

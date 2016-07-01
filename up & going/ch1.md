@@ -692,7 +692,7 @@ outer();
 
 Lexical scope rules say that code in one scope can access variables of either that scope or any scope outside of it.
 
-So, code inside the `inner()` function has access to both variables `a` and `b`, but code only in `outer()` has access only to `a` -- it cannot access `b` because that variable is only inside `inner()`.
+So, code inside the `inner()` function has access to both variables `a` and `b`, but code in `outer()` has access only to `a` -- it cannot access `b` because that variable is only inside `inner()`.
 
 Recall this code snippet from earlier:
 

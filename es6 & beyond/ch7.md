@@ -552,9 +552,7 @@ var messages = [],
 			if (typeof val == "string") {
 				val = val.toLowerCase();
 				if (target.indexOf( val ) == -1) {
-					target.push(
-						val.toLowerCase()
-					);
+					target.push(val);
 				}
 			}
 			return true;
@@ -932,7 +930,7 @@ Object.keys( p );
 
 Boiling this all down: as of ES6, `Reflect.ownKeys(..)`, `Object.getOwnPropertyNames(..)`, and `Object.getOwnPropertySymbols(..)` all have predictable and reliable ordering guaranteed by the specification. So it's safe to build code that relies on this ordering.
 
-`Reflect.enumerate(..)`, `Object.keys(..)`, and `for..in` (as well as `JSON.stringification(..)` by extension) continue to share an observable ordering with each other, as they always have. But that ordering will not necessarily be the same as that of `Reflect.ownKeys(..)`. Care should still be taken in relying on their implementation-dependent ordering.
+`Reflect.enumerate(..)`, `Object.keys(..)`, and `for..in` (as well as `JSON.stringify(..)` by extension) continue to share an observable ordering with each other, as they always have. But that ordering will not necessarily be the same as that of `Reflect.ownKeys(..)`. Care should still be taken in relying on their implementation-dependent ordering.
 
 ## Feature Testing
 

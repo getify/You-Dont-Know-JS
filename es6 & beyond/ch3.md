@@ -632,7 +632,7 @@ for (var v of bar()) {
 	console.log( v );
 }
 // 1 2 3
-// x: { value: 4, done: true }
+// x: 4
 ```
 
 While the `1`, `2`, and `3` values are `yield`ed out of `*foo()` and then out of `*bar()`, the `4` value returned from `*foo()` is the completion value of the `yield *foo()` expression, which then gets assigned to `x`.
@@ -1171,7 +1171,7 @@ As you can see, ES6 modules will serve the overall use case of organizing code w
 
 There's a similar, but not fully compatible, module syntax called CommonJS, which is familiar to those in the Node.js ecosystem.
 
-For lack of a more tactful way to say this, in the long run, ES6 modules essentially are bound to supercede all previous formats and standards for modules, even CommonJS, as they are built on syntactic support in the language. This will, in time, inevitably win out as the superior approach, if for no other reason than ubiquity.
+For lack of a more tactful way to say this, in the long run, ES6 modules essentially are bound to supersede all previous formats and standards for modules, even CommonJS, as they are built on syntactic support in the language. This will, in time, inevitably win out as the superior approach, if for no other reason than ubiquity.
 
 We face a fairly long road to get to that point, though. There are literally hundreds of thousands of CommonJS style modules in the server-side JavaScript world, and 10 times that many modules of varying format standards (UMD, AMD, ad hoc) in the browser world. It will take many years for the transitions to make any significant progress.
 
