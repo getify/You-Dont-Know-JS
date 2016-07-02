@@ -308,3 +308,5 @@ var c = foo( 2 );
 
 
 [^note-strictmode]: MDN: [Strict Mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode)
+
+[Chapter 2: Lexical Scope] (https://github.com/getify/You-Dont-Know-JS/blob/master/scope%20&%20closures/ch2.md)
