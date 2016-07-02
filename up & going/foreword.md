@@ -19,4 +19,4 @@ Jenn Lukas<br>
 [jennlukas.com](http://jennlukas.com/), [@jennlukas](https://twitter.com/jennlukas)<br>
 Front-end consultant
 
-[Preface} (https://github.com/getify/You-Dont-Know-JS/blob/master/preface.md)
+[Preface] (https://github.com/getify/You-Dont-Know-JS/blob/master/preface.md)
