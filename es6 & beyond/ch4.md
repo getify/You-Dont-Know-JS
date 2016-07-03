@@ -379,3 +379,5 @@ Thankfully, ES6 adds Promises to address one of the major shortcomings of callba
 But it's the combination of Promises with generators that fully realizes the benefits of rearranging our async flow control code to de-emphasize and abstract away that ugly callback soup (aka "hell").
 
 Right now, we can manage these interactions with the aide of various async libraries' runners, but JavaScript is eventually going to support this interaction pattern with dedicated syntax alone!
+
+[Chapter 5: Collections] (https://github.com/getify/You-Dont-Know-JS/blob/master/es6%20%26%20beyond/ch5.md)
