@@ -750,3 +750,5 @@ While these JavaScript mechanisms can seem to resemble "class instantiation" and
 For a variety of reasons, not the least of which is terminology precedent, "inheritance" (and "prototypal inheritance") and all the other OO terms just do not make sense when considering how JavaScript *actually* works (not just applied to our forced mental models).
 
 Instead, "delegation" is a more appropriate term, because these relationships are not *copies* but delegation **links**.
+
+[Chapter 6: Behavior Delegation] (https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch6.md)
