@@ -797,3 +797,5 @@ ES6 adds many extra API helpers on the various built-in native objects:
 * `String` adds static functions like `String.fromCodePoint(..)` and `String.raw(..)`, as well as prototype functions like `repeat(..)` and `includes(..)`.
 
 Most of these additions can be polyfilled (see ES6 Shim), and were inspired by utilities in common JS libraries/frameworks.
+
+[Chapter 7: Meta Programming] (https://github.com/getify/You-Dont-Know-JS/blob/master/es6%20%26%20beyond/ch7.md)
