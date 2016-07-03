@@ -20,4 +20,4 @@ I would say that the vast majority of web developers probably have never built a
 Nick Berardi<br>
 [nickberardi.com](http://nickberardi.com), [@nberardi](http://twitter.com/nberardi)
 
-[Preface] (https://github.com/getify/You-Dont-Know-JS/blob/master/preface.md)
+[Chapter 1: this Or That?] (https://github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch1.md)

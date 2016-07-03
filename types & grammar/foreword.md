@@ -18,3 +18,5 @@ Enjoy Types and Grammar and don't let it get too far away from your desk!
 David Walsh<br>
 [http://davidwalsh.name](http://davidwalsh.name), [@davidwalshblog](http://twitter.com/davidwalshblog)<br>
 Senior Web Developer, Mozilla
+
+[Chapter 1: Types] (https://github.com/getify/You-Dont-Know-JS/blob/master/types%20%26%20grammar/ch1.md)
