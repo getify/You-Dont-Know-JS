@@ -1282,3 +1282,5 @@ From function name inferences for anonymous functions to meta properties that gi
 Feature testing, even for subtle semantic behaviors like Tail Call Optimization, shifts the meta programming focus from your program to the JS engine capabilities itself. By knowing more about what the environment can do, your programs can adjust themselves to the best fit as they run.
 
 Should you meta program? My advice is: first focus on learning how the core mechanics of the language really work. But once you fully know what JS itself can do, it's time to start leveraging these powerful meta programming capabilities to push the language further!
+
+[Chapter 8: Beyond ES6] (https://github.com/getify/You-Dont-Know-JS/blob/master/es6%20%26%20beyond/ch8.md)
