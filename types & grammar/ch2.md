@@ -983,3 +983,5 @@ The `null` type has just one value: `null`, and likewise the `undefined` type ha
 `number`s include several special values, like `NaN` (supposedly "Not a Number", but really more appropriately "invalid number"); `+Infinity` and `-Infinity`; and `-0`.
 
 Simple scalar primitives (`string`s, `number`s, etc.) are assigned/passed by value-copy, but compound values (`object`s, etc.) are assigned/passed by reference-copy. References are not like references/pointers in other languages -- they're never pointed at other variables/references, only at the underlying values.
+
+[Chapter 3: Natives] (https://github.com/getify/You-Dont-Know-JS/blob/master/types%20&%20grammar/ch3.md)
