@@ -437,3 +437,5 @@ But JS is not done with ES6! Not even close. There's already quite a few feature
 `async function`s are powerful syntactic sugar on top of the generators + promises pattern (see Chapter 4). `Object.observe(..)` adds direct native support for observing object change events, which is critical for implementing data binding. The `**` exponentiation operator, `...` for object properties, and `Array#includes(..)` are all simple but helpful improvements to existing mechanisms. Finally, SIMD ushers in a new era in the evolution of high performance JS.
 
 Cliché as it sounds, the future of JS is really bright! The challenge of this series, and indeed of this book, is incumbent on every reader now. What are you waiting for? It's time to get learning and exploring!
+
+[Appendix A: Acknowledgments] (https://github.com/getify/You-Dont-Know-JS/blob/master/es6%20%26%20beyond/apA.md)
