@@ -617,3 +617,7 @@ It's important to get as many test results from as many different environments a
 Many common performance tests unfortunately obsess about irrelevant microperformance details like `x++` versus `++x`. Writing good tests means understanding how to focus on big picture concerns, like optimizing on the critical path, and avoiding falling into traps like different JS engines' implementation details.
 
 Tail call optimization (TCO) is a required optimization as of ES6 that will make some recursive patterns practical in JS where they would have been impossible otherwise. TCO allows a function call in the *tail position* of another function to execute without needing any extra resources, which means the engine no longer needs to place arbitrary restrictions on call stack depth for recursive algorithms.
+
+[Appendix A: asynquence Library] (https://github.com/getify/You-Dont-Know-JS/blob/master/async%20%26%20performance/apA.md)
+[Appendix B: Advanced Async Patterns] (https://github.com/getify/You-Dont-Know-JS/blob/master/async%20%26%20performance/apB.md)
+[Appendix C: Acknowledgments] (https://github.com/getify/You-Dont-Know-JS/blob/master/async%20%26%20performance/apC.md)
