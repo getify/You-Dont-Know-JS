@@ -363,17 +363,17 @@ Error对象实例一般拥有至少一个`message`属性，有时还有其他属
 
 ### `Symbol(..)`
 
-New as of ES6, an additional primitive value type has been added, called "Symbol". Symbols are special "unique" (not strictly guaranteed!) values that can be used as properties on objects with little fear of any collision. They're primarily designed for special built-in behaviors of ES6 constructs, but you can also define your own symbols.
+在ES6中，新增了一个基本值类型，称为“Symbol（标志）”。Symbol是一种特殊的“独一无二”（不是严格保证的!）的值，可以作为对象上的属性使用而几乎不必担心任何冲突。它们主要是为特殊的ES6结构的内建行为设计的，但你也可以定义你自己的symbol。
 
-Symbols can be used as property names, but you cannot see or access the actual value of a symbol from your program, nor from the developer console. If you evaluate a symbol in the developer console, what's shown looks like `Symbol(Symbol.create)`, for example.
+Symbol可以用做属性名，但是你不能从你的程序中看到或访问一个symbol的实际值，从开发者控制台也不行。例如，如果你在开发者控制台中对一个Symbol求值，将会显示`Symbol(Symbol.create)`之类的东西。
 
-There are several predefined symbols in ES6, accessed as static properties of the `Symbol` function object, like `Symbol.create`, `Symbol.iterator`, etc. To use them, do something like:
+在ES6中有几种预定义的Symbol，做为`Symbol`函数对象的静态属性访问，比如`Symbol.create`，`Symbol.iterator`等等。要使用它们，可以这样做：
 
 ```js
 obj[Symbol.iterator] = function(){ /*..*/ };
 ```
 
-To define your own custom symbols, use the `Symbol(..)` native. The `Symbol(..)` native "constructor" is unique in that you're not allowed to use `new` with it, as doing so will throw an error.
+要定义你自己的Symbol，使用`Symbol(..)`原生类型。`Symbol(..)`原生类型“构造器”很独特，因为它不允许你将`new`与它一起使用，这么做会抛出一个错误。
 
 ```js
 var mysym = Symbol( "my own symbol" );
@@ -388,29 +388,29 @@ Object.getOwnPropertySymbols( a );
 // [ Symbol(my own symbol) ]
 ```
 
-While symbols are not actually private (`Object.getOwnPropertySymbols(..)` reflects on the object and reveals the symbols quite publicly), using them for private or special properties is likely their primary use-case. For most developers, they may take the place of property names with `_` underscore prefixes, which are almost always by convention signals to say, "hey, this is a private/special/internal property, so leave it alone!"
+虽然Symbol实际上不是私有的（在对象上使用`Object.getOwnPropertySymbols(..)`反射，揭示了Symbol其实是相当公开的），但是它们的主要用途是表达私有这个词，或者类似的特殊属性。对于大多数开发者，他们也许会在属性名上加入`_`下划线前缀，这在经常在惯例上表示：“这是一个私有的/特殊的/内部的属性，别碰！”
 
-**Note:** `Symbol`s are *not* `object`s, they are simple scalar primitives.
+**注意：** `Symbol` *不是* `object`，它们是简单的基本标量。
 
-### Native Prototypes
+### 原生属性
 
-Each of the built-in native constructors has its own `.prototype` object -- `Array.prototype`, `String.prototype`, etc.
+每一个内建的原生构造器都拥有它自己的`.prototype`对象——`Array.prototype`，`String.prototype`等等。
 
-These objects contain behavior unique to their particular object subtype.
+对于它们特定的对象子类型，这些对象含有独特的行为。
 
-For example, all string objects, and by extension (via boxing) `string` primitives, have access to default behavior as methods defined on the `String.prototype` object.
+例如，所有的字符串对象，和`string`基本值的扩展（通过封箱），都可以访问在`String.prototype`对象上做为方法定义的默认行为。
 
-**Note:** By documentation convention, `String.prototype.XYZ` is shortened to `String#XYZ`, and likewise for all the other `.prototype`s.
+**注意：** 做为文档惯例，`String.prototype.XYZ`会被缩写为`String#XYZ`，对于其它所有`.prototype`的属性都是如此。
 
-* `String#indexOf(..)`: find the position in the string of another substring
-* `String#charAt(..)`: access the character at a position in the string
-* `String#substr(..)`, `String#substring(..)`, and `String#slice(..)`: extract a portion of the string as a new string
-* `String#toUpperCase()` and `String#toLowerCase()`: create a new string that's converted to either uppercase or lowercase
-* `String#trim()`: create a new string that's stripped of any trailing or leading whitespace
+* `String#indexOf(..)`：在一个字符串中找出一个子串的位置
+* `String#charAt(..)`：在一个字符串中访问某个位置的字符
+* `String#substr(..)`，`String#substring(..)`，和`String#slice(..)`：将字符串的一部分抽取为一个新字符串
+* `String#toUpperCase()`和`String#toLowerCase()`：创建一个转换为大写或小写的新字符串
+* `String#trim()`：创建一个截去开头或结尾空格的新字符串。
 
-None of the methods modify the string *in place*. Modifications (like case conversion or trimming) create a new value from the existing value.
+这些方法中没有一个是在 *原地* 修改字符串的。修改（比如大小写变换或去空格）会根据当前的值来创建一个新的值。
 
-By virtue of prototype delegation (see the *this & Object Prototypes* title in this series), any string value can access these methods:
+有赖于原型委托（见本系列的 *this与对象原型*），任何字符串值都可以访问这些方法：
 
 ```js
 var a = " abc ";
@@ -420,9 +420,9 @@ a.toUpperCase(); // " ABC "
 a.trim(); // "abc"
 ```
 
-The other constructor prototypes contain behaviors appropriate to their types, such as `Number#toFixed(..)` (stringifying a number with a fixed number of decimal digits) and `Array#concat(..)` (merging arrays). All functions have access to `apply(..)`, `call(..)`, and `bind(..)` because `Function.prototype` defines them.
+其他构造器的原型包含适用于它们类型的行为，比如`Number#toFixed(..)`（将一个数字转换为一个固定小数位的字符串）和`Array#concat(..)`（混合数组）。所有这些函数都可以访问`apply(..)`，`call(..)`，和`bind(..)`，因为`Function.prototype`定义了它们。
 
-But, some of the native prototypes aren't *just* plain objects:
+但是，一些原生类型的原型不 *仅仅* 是单纯的对象：
 
 ```js
 typeof Function.prototype;			// "function"
@@ -432,7 +432,7 @@ RegExp.prototype.toString();		// "/(?:)/" -- empty regex
 "abc".match( RegExp.prototype );	// [""]
 ```
 
-A particularly bad idea, you can even modify these native prototypes (not just adding properties as you're probably familiar with):
+一个特别差劲儿的主意是，你甚至可以修改这些原生类型的原型（不仅仅是像你可能熟悉的添加属性）：
 
 ```js
 Array.isArray( Array.prototype );	// true
@@ -444,13 +444,13 @@ Array.prototype;					// [1,2,3]
 Array.prototype.length = 0;
 ```
 
-As you can see, `Function.prototype` is a function, `RegExp.prototype` is a regular expression, and `Array.prototype` is an array. Interesting and cool, huh?
+如你所见，`Function.prototype`是一个函数，`RegExp.prototype`是一个正则表达式，而`Array.prototype`是一个数组。有趣吧？酷吧？
 
 #### Prototypes As Defaults
 
-`Function.prototype` being an empty function, `RegExp.prototype` being an "empty" (e.g., non-matching) regex, and `Array.prototype` being an empty array, make them all nice "default" values to assign to variables if those variables wouldn't already have had a value of the proper type.
+`Function.prototype`是一个空函数，`RegExp.prototype`是一个“空”正则表达式（也就是不匹配任何东西），而`Array.prototype`是一个空数组，这使它们成了可以赋值给变量的，很好的“默认”值——如果这些类型的变量还没有值。
 
-For example:
+例如：
 
 ```js
 function isThisCool(vals,fn,rx) {
@@ -472,16 +472,16 @@ isThisCool(
 );					// false
 ```
 
-**Note:** As of ES6, we don't need to use the `vals = vals || ..` default value syntax trick (see Chapter 4) anymore, because default values can be set for parameters via native syntax in the function declaration (see Chapter 5).
+**注意：** 在ES6中，我们不再需要使用`vals = vals || ..`这样的默认值语法技巧了（见第四章），因为在函数声明中可以通过原生语法为参数设定默认值（见第五章）。
 
-One minor side-benefit of this approach is that the `.prototype`s are already created and built-in, thus created *only once*. By contrast, using `[]`, `function(){}`, and `/(?:)/` values themselves for those defaults would (likely, depending on engine implementations) be recreating those values (and probably garbage-collecting them later) for *each call* of `isThisCool(..)`. That could be memory/CPU wasteful.
+这个方式的一个微小的副作用是，`.prototype`已经被创建了，而且是内建的，因此它仅被创建 *一次*。相比之下，使用`[]`，`function(){}`，和`/(?:)/`这些值本身作为默认值，将会（很可能，要看引擎如何实现）在每次调用`isThisCool(..)`时重新创建这些值（而且稍可能要回收它们）。这可能会消耗内存/CPU。
 
-Also, be very careful not to use `Array.prototype` as a default value **that will subsequently be modified**. In this example, `vals` is used read-only, but if you were to instead make in-place changes to `vals`, you would actually be modifying `Array.prototype` itself, which would lead to the gotchas mentioned earlier!
+另外，要非常小心不要使用 **后续要被修改的** `Array.prototype`做为默认值。在这个例子中，`vals`是只读的，但如果你要在原地对`vals`进行修改，那你实际上修改的是`Array.prototype`本身，这将把你引到刚才提到的坑里！
 
-**Note:** While we're pointing out these native prototypes and some usefulness, be cautious of relying on them and even more wary of modifying them in anyway. See Appendix A "Native Prototypes" for more discussion.
+**注意：** 虽然我们指出了这些原生类型的原型和一些用处，但是依赖它们的时候要小心，更要小心以任何形式修改它们。更多的讨论见附录A“原生原型”。
 
-## Review
+## 复习
 
-JavaScript provides object wrappers around primitive values, known as natives (`String`, `Number`, `Boolean`, etc). These object wrappers give the values access to behaviors appropriate for each object subtype (`String#trim()` and `Array#concat(..)`).
+JavaScript为基本类型提供了对象包装器，被称为原生类型。这些对象包装器使这些值可以访问每种对象子类型的恰当行为。
 
-If you have a simple scalar primitive value like `"abc"` and you access its `length` property or some `String.prototype` method, JS automatically "boxes" the value (wraps it in its respective object wrapper) so that the property/method accesses can be fulfilled.
+如果你有一个像`"abc"`这样的简答基本类型标量，而且你想要访问它的`length`属性或某些`String.prototype`方法，JS会自动地“封箱”这个值，以满足这样的属性/方法访问。
