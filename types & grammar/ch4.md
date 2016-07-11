@@ -3,25 +3,45 @@
 
 Now that we much more fully understand JavaScript's types and values, we turn our attention to a very controversial topic: coercion.
 
+现在我们更全面地了解了JavaScript的类型和值，我们将注意力转向一个极具争议的话题：强制转换。
+
 As we mentioned in Chapter 1, the debates over whether coercion is a useful feature or a flaw in the design of the language (or somewhere in between!) have raged since day one. If you've read other popular books on JS, you know that the overwhelmingly prevalent *message* out there is that coercion is magical, evil, confusing, and just downright a bad idea.
+
+正如我们在第一章中提到的，关于强制转换到底是一个有用的特性，还是一个语言设计上的缺陷（或位于两者之间！），早就开始就争论不休了。如果你读过关于JS的其他书籍，你就会知道世面上那种淹没一切的 *声音*：强制转换是魔法，是邪恶的，令人困惑的，或者就是彻头彻尾的坏主意。
 
 In the same overall spirit of this book series, rather than running away from coercion because everyone else does, or because you get bitten by some quirk, I think you should run toward that which you don't understand and seek to *get it* more fully.
 
+本着这个系列丛书的总体精神，而不是因为大家都这样做，或是你曾经被一些怪东西咬到就逃避强制转换，我认为你应当直面你不理解的东西并设法更全面地 *搞懂它*。
+
 Our goal is to fully explore the pros and cons (yes, there *are* pros!) of coercion, so that you can make an informed decision on its appropriateness in your program.
+
+我们的目标是全面地探索强制转换的优点和缺点（是的，它们 *有* 优点！），这样你就能在程序中对它是否合适做出明智的决定。
 
 ## Converting Values
 
 Converting a value from one type to another is often called "type casting," when done explicitly, and "coercion" when done implicitly (forced by the rules of how a value is used).
 
+将一个值从一个类型明确地转换到另一个类型通常称为“类型转换（type casting）”，当这个操作隐含地完成时称为“强制转换（coercion）”（根据一个值如何被使用的规则来强制它变换类型）。
+
 **Note:** It may not be obvious, but JavaScript coercions always result in one of the scalar primitive (see Chapter 2) values, like `string`, `number`, or `boolean`. There is no coercion that results in a complex value like `object` or `function`. Chapter 3 covers "boxing," which wraps scalar primitive values in their `object` counterparts, but this is not really coercion in an accurate sense.
+
+**注意：** 这可能不明显，但是JavaScript强制转换总是得到基本标量值的一种，比如`string`，`number`，或`boolean`。没有强制转换可以得到像`object`和`function`这样的复杂值。第三章讲解了“封箱”，它将一个基本类型标量值包装在它们相应的`object`中，但在准确的意义上这不是真正的强制转换。
 
 Another way these terms are often distinguished is as follows: "type casting" (or "type conversion") occur in statically typed languages at compile time, while "type coercion" is a runtime conversion for dynamically typed languages.
 
+另一种区别这些词语的常见方法是：“类型转换（type casting/conversion）”发生在静态类型语言的编译时，而“类型强制转换（type coercion）”是动态类型语言的运行时转换。
+
 However, in JavaScript, most people refer to all these types of conversions as *coercion*, so the way I prefer to distinguish is to say "implicit coercion" vs. "explicit coercion."
+
+然而，在JavaScript中，大多数人将所有这些类型的转换都称为 *强制转换（coercion）*，所以我偏好的区别方式是使用“隐含强制转换（implicit coercion）”与“明确强制转换（explicit coercion）”。
 
 The difference should be obvious: "explicit coercion" is when it is obvious from looking at the code that a type conversion is intentionally occurring, whereas "implicit coercion" is when the type conversion will occur as a less obvious side effect of some other intentional operation.
 
+其中的区别应当是很明显的：在观察代码时如果一个类型转换明显是有意为之的，那么它就是“显式强制转换”，而如果这个类型转换是做为其他操作的，不那么明显的副作用发生的，那么它就是“隐式强制转换”。
+
 For example, consider these two approaches to coercion:
+
+例如，考虑这两种强制转换的方式：
 
 ```js
 var a = 42;
@@ -33,29 +53,51 @@ var c = String( a );	// explicit coercion
 
 For `b`, the coercion that occurs happens implicitly, because the `+` operator combined with one of the operands being a `string` value (`""`) will insist on the operation being a `string` concatenation (adding two strings together), which *as a (hidden) side effect* will force the `42` value in `a` to be coerced to its `string` equivalent: `"42"`.
 
+对于`b`来说，强制转换是隐含地发生的，因为`+`操作符组合的操作数之一是一个`string`值（`""`），这将使这个操作成为一个`string`连接，而`string`连接的一个（隐藏的）副作用将`a`中的值`42`强制转换为它的`string`等价物：`"42"`。
+
 By contrast, the `String(..)` function makes it pretty obvious that it's explicitly taking the value in `a` and coercing it to a `string` representation.
+
+相比之下，`String(..)`函数使一切相当明显，它明确地取得`a`中的值，并把它强制转换为一个`string`表现。
 
 Both approaches accomplish the same effect: `"42"` comes from `42`. But it's the *how* that is at the heart of the heated debates over JavaScript coercion.
 
+两种方式都能达到相同的效果：从`42`变成`"42"`。但它们 *如何* 达到这种效果，才是关于JavaScript强制转换的热烈争论的核心。
+
 **Note:** Technically, there's some nuanced behavioral difference here beyond the stylistic difference. We cover that in more detail later in the chapter, in the "Implicitly: Strings <--> Numbers" section.
+
+**注意：** 技术上讲，这里有一些在语法形式区别之上的，行为上的微妙区别。我们将在本章稍后，“隐式：Strings <--> Numbers”一节中仔细讲解。
 
 The terms "explicit" and "implicit," or "obvious" and "hidden side effect," are *relative*.
 
+“明确地”，“隐含地”，或“明显地”和“隐藏的副作用”这些名词，是 *相对的*。
+
 If you know exactly what `a + ""` is doing and you're intentionally doing that to coerce to a `string`, you might feel the operation is sufficiently "explicit." Conversely, if you've never seen the `String(..)` function used for `string` coercion, its behavior might seem hidden enough as to feel "implicit" to you.
+
+如果你确切地知道`a + ""`是在做什么，并且你有意地这么做来强制转换一个`string`，你可能感觉这个操作已经足够“明确了”。相反，如果你从没见过`String(..)`函数被用于`string`强制转换，那么对你来说它的行为可能看起来太过隐蔽而让你感到“隐含”。
 
 But we're having this discussion of "explicit" vs. "implicit" based on the likely opinions of an *average, reasonably informed, but not expert or JS specification devotee* developer. To whatever extent you do or do not find yourself fitting neatly in that bucket, you will need to adjust your perspective on our observations here accordingly.
 
+但我们是基于一个 *大众的，充分了解，但不是专家或JS规范爱好者的* 开发者的看法来讨论“明确”与“隐含”的。无论你的程度如何，或是没有在这个范畴内准确地找到自己，你都需要根据我们在这里的观察方式，相应地调整你的角度。
+
 Just remember: it's often rare that we write our code and are the only ones who ever read it. Even if you're an expert on all the ins and outs of JS, consider how a less experienced teammate of yours will feel when they read your code. Will it be "explicit" or "implicit" to them in the same way it is for you?
+
+记住：我们自己写代码而也只有我们自己会读它，通常是很少见的。即便你是一个精通JS里里外外的专家，也要考虑一个经验没那么丰富的队友在读你的代码时感受如何。对于他们和对于你来说，“明确”或“隐含”的意义相同吗？
 
 ## Abstract Value Operations
 
 Before we can explore *explicit* vs *implicit* coercion, we need to learn the basic rules that govern how values *become* either a `string`, `number`, or `boolean`. The ES5 spec in section 9 defines several "abstract operations" (fancy spec-speak for "internal-only operation") with the rules of value conversion. We will specifically pay attention to: `ToString`, `ToNumber`, and `ToBoolean`, and to a lesser extent, `ToPrimitive`.
 
+在我们可以探究“明确”与“隐含”强制转换之前，我们需要学习一些基本规则，是它们控制着值如何 *变成* 一个`string`，`number`，或`boolean`的。ES5语言规范的第9部分用值的变形规则定义了几种“抽象操作”（“仅供内部使用的操作”的高大上说法）。我们将特别关注于：`ToString`，`ToNumber`，和`ToBoolean`，并稍稍关注一下`ToPrimitive`。
+
 ### `ToString`
 
 When any non-`string` value is coerced to a `string` representation, the conversion is handled by the `ToString` abstract operation in section 9.8 of the specification.
 
+当任何一个非`string`值被强制转换为一个`string`表现形式时，这个转换的过程是由语言规范的9.8部分的`ToString`抽象操作处理的。
+
 Built-in primitive values have natural stringification: `null` becomes `"null"`, `undefined` becomes `"undefined"` and `true` becomes `"true"`. `number`s are generally expressed in the natural way you'd expect, but as we discussed in Chapter 2, very small or very large `numbers` are represented in exponent form:
+
+内建的基本类型值拥有自然的字符串化形式：`null`变为`"null"`，`undefined`变为`"undefined"`，`true`变为`"true"`。`number`一般会以你期望的自然方式表达，但正如我们在第二章中讨论的，非常小或非常大的`number`将会以指数形式表达：
 
 ```js
 // multiplying `1.07` by `1000`, seven times over
@@ -67,11 +109,19 @@ a.toString(); // "1.07e21"
 
 For regular objects, unless you specify your own, the default `toString()` (located in `Object.prototype.toString()`) will return the *internal `[[Class]]`* (see Chapter 3), like for instance `"[object Object]"`.
 
+对于普通的对象，除非你指定你自己的，默认的`toString()`（可以在`Object.prototype.toString()`找到）将返回 *internal `[[Class]]`*（见第三章），例如`"[object Object]"`。
+
 But as shown earlier, if an object has its own `toString()` method on it, and you use that object in a `string`-like way, its `toString()` will automatically be called, and the `string` result of that call will be used instead.
+
+但正如早先所展示的，如果一个对象上拥有它自己的`toString()`方法，而你又以一种类似`string`的方式使用这个对象，它的`toString()`将会被自动调用，而且这个调用的`string`结果将被使用。
 
 **Note:** The way an object is coerced to a `string` technically goes through the `ToPrimitive` abstract operation (ES5 spec, section 9.1), but those nuanced details are covered in more detail in the `ToNumber` section later in this chapter, so we will skip over them here.
 
+**注意：** 技术上讲，一个对象被强制转换为一个`string`的方法要通过`ToPrimitive`抽象操作（ES5语言规范，9.1部分），但是那其中的微妙细节将会在本章稍后的`ToNumber`中讲解，所以我们在这里先跳过它。
+
 Arrays have an overridden default `toString()` that stringifies as the (string) concatenation of all its values (each stringified themselves), with `","` in between each value:
+
+数组拥有一个覆盖版本的默认`toString()`，将数组字符串化为它所有的值（每个都字符串化）的（字符串）连接，并用`","`分割每个值。
 
 ```js
 var a = [1,2,3];
@@ -81,13 +131,21 @@ a.toString(); // "1,2,3"
 
 Again, `toString()` can either be called explicitly, or it will automatically be called if a non-`string` is used in a `string` context.
 
+重申一次，`toString()`可以明确地被调用，也可以通过在一个`string`上下文环境中使用一个非`string`来自动地被调用。
+
 #### JSON Stringification
 
 Another task that seems awfully related to `ToString` is when you use the `JSON.stringify(..)` utility to serialize a value to a JSON-compatible `string` value.
 
+另一种看起来与`ToString`密切相关的操作是，使用`JSON.stringify(..)`工具将一个值序列化为一个JSON兼容的`string`值。
+
 It's important to note that this stringification is not exactly the same thing as coercion. But since it's related to the `ToString` rules above, we'll take a slight diversion to cover JSON stringification behaviors here.
 
+很重要并需要注意的是，这种字符串化与强制转换并不完全是同一种东西。但是因为它与上面讲的`ToString`规则有关联，我们将在这里稍微深入地讲解一下JSON字符串化行为。
+
 For most simple values, JSON stringification behaves basically the same as `toString()` conversions, except that the serialization result is *always a `string`*:
+
+对于最简单的值，JSON字符串化行为基本上和`toString()`转换是相同的，除了序列化的结果 *总是一个`string`*：
 
 ```js
 JSON.stringify( 42 );	// "42"
@@ -98,11 +156,19 @@ JSON.stringify( true );	// "true"
 
 Any *JSON-safe* value can be stringified by `JSON.stringify(..)`. But what is *JSON-safe*? Any value that can be represented validly in a JSON representation.
 
+任何 *JSON安全* 的值都可以被`JSON.stringify(..)`字符串化。但是什么是 *JSON安全的*？任何可以用JSON表现形式合法表达的值。
+
 It may be easier to consider values that are **not** JSON-safe. Some examples: `undefined`s, `function`s, (ES6+) `symbol`s, and `object`s with circular references (where property references in an object structure create a never-ending cycle through each other). These are all illegal values for a standard JSON structure, mostly because they aren't portable to other languages that consume JSON values.
+
+考虑JSON不安全的值可能更容易一些。一些例子是：`undefined`，`function`，（ES6+）`symbol`，带有循环引用的`object`（一个对象结构中的属性引用之间造成了一个永不终结的循环）。对于标准的JSON结构来说这些都是非法的值，主要是因为他们不能移植到消费JSON值的其他语言中。
 
 The `JSON.stringify(..)` utility will automatically omit `undefined`, `function`, and `symbol` values when it comes across them. If such a value is found in an `array`, that value is replaced by `null` (so that the array position information isn't altered). If found as a property of an `object`, that property will simply be excluded.
 
+`JSON.stringify(..)`工具在遇到`undefined`，`function`，和`symbol`时将会自动地忽略它们。如果在一个`array`中遇到这样的值，它会被替换为`null`（这样数组的位置信息就不会改变）。如果在一个`object`的属性中遇到这样的值，这个属性会被简单地剔除掉。
+
 Consider:
+
+考虑：
 
 ```js
 JSON.stringify( undefined );					// undefined
@@ -114,11 +180,19 @@ JSON.stringify( { a:2, b:function(){} } );		// "{"a":2}"
 
 But if you try to `JSON.stringify(..)` an `object` with circular reference(s) in it, an error will be thrown.
 
+但入过你试着`JSON.stringify(..)`一个带有循环引用的`object`，就会抛出一个错误。
+
 JSON stringification has the special behavior that if an `object` value has a `toJSON()` method defined, this method will be called first to get a value to use for serialization.
+
+JSON字符串化有一个特殊行为，如果一个`object`值定义了一个`toJSON()`方法，这个方法将会被首先调用，以取得序列化的值。
 
 If you intend to JSON stringify an object that may contain illegal JSON value(s), or if you just have values in the `object` that aren't appropriate for the serialization, you should define a `toJSON()` method for it that returns a *JSON-safe* version of the `object`.
 
+如果你打算JSON字符串化一个可能含有非法JSON值的对象，或者如果这个对象中正好有不适于序列化的值，那么你就应当为它定义一个`toJSON()`方法，返回这个`object`的一个 *JSON安全* 版本。
+
 For example:
+
+例如：
 
 ```js
 var o = { };
@@ -146,9 +220,15 @@ JSON.stringify( a ); // "{"b":42}"
 
 It's a very common misconception that `toJSON()` should return a JSON stringification representation. That's probably incorrect, unless you're wanting to actually stringify the `string` itself (usually not!). `toJSON()` should return the actual regular value (of whatever type) that's appropriate, and `JSON.stringify(..)` itself will handle the stringification.
 
+一个很常见的误解是，`toJSON()`应当返回一个JSON字符串化的表现形式。这可能是不正确的，除非你事实上想要字符串化`string`本身（通常不会！）。`toJSON()`应当返回合适的实际普通值（无论什么类型），而`JSON.stringify(..)`自己会处理字符串化。
+
 In other words, `toJSON()` should be interpreted as "to a JSON-safe value suitable for stringification," not "to a JSON string" as many developers mistakenly assume.
 
+换句话说，`toJSON()`应当被翻译为：“变为一个适用于字符串化的JSON安全的值”，不是像许多开发者错误假设的那样，“变为一个JSON字符串”。
+
 Consider:
+
+考虑：
 
 ```js
 var a = {
@@ -177,6 +257,8 @@ JSON.stringify( b ); // ""[2,3]""
 ```
 
 In the second call, we stringified the returned `string` rather than the `array` itself, which was probably not what we wanted to do.
+
+在第二个调用中，我们
 
 While we're talking about `JSON.stringify(..)`, let's discuss some lesser-known functionalities that can still be very useful.
 
@@ -630,7 +712,7 @@ if (!~a.indexOf( "ol" )) {	// true
 }
 ```
 
-`~` takes the return value of `indexOf(..)` and transforms it: for the "failure" `-1` we get the falsy `0`, and every other value is truthy.
+`~ ` takes the return value of `indexOf(..)` and transforms it: for the "failure" `-1` we get the falsy `0`, and every other value is truthy.
 
 **Note:** The `-(x+1)` pseudo-algorithm for `~` would imply that `~-1` is `-0`, but actually it produces `0` because the underlying operation is actually bitwise, not mathematic.
 
