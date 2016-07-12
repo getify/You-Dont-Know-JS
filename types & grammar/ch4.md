@@ -258,15 +258,23 @@ JSON.stringify( b ); // ""[2,3]""
 
 In the second call, we stringified the returned `string` rather than the `array` itself, which was probably not what we wanted to do.
 
-在第二个调用中，我们
+在第二个调用中，我们字符串化了返回的`string`而不是`array`本身，这可能不是我们想要的。
 
 While we're talking about `JSON.stringify(..)`, let's discuss some lesser-known functionalities that can still be very useful.
 
+既然我们说到了`JSON.stringify(..)`，那么就让我们来讨论一些不那么广为人知，但是仍然很有用的功能吧。
+
 An optional second argument can be passed to `JSON.stringify(..)` that is called *replacer*. This argument can either be an `array` or a `function`. It's used to customize the recursive serialization of an `object` by providing a filtering mechanism for which properties should and should not be included, in a similar way to how `toJSON()` can prepare a value for serialization.
+
+`JSON.stringify(..)`的第二个参数是可选的，它成为 *替换器（replacer）*。这个参数既可以是一个`array`也可以是一个`function`。与`toJSON()`为序列化准备一个值的方式类似，它提供一种过滤机制，指出一个`object`的哪一个属性应该或不应该被包含在序列化形式中，来自定义这个`object`的递归序列化行为。
 
 If *replacer* is an `array`, it should be an `array` of `string`s, each of which will specify a property name that is allowed to be included in the serialization of the `object`. If a property exists that isn't in this list, it will be skipped.
 
+如果 *替换器* 是一个`array`，那么它应当是一个`string`的`array`，它的每一个元素指定了允许被包含在这个`object`的序列化形式中的属性名称。如果存在一个不在这个列表中的属性，那么它就会被跳过。
+
 If *replacer* is a `function`, it will be called once for the `object` itself, and then once for each property in the `object`, and each time is passed two arguments, *key* and *value*. To skip a *key* in the serialization, return `undefined`. Otherwise, return the *value* provided.
+
+如果 *替换器* 是一个`function`，那么它会为`object`本身而被调用一次，并且为这个`object`中的每个属性都被调用一次，而且每次都被传入两个参数，*key* 和 *value*。要在序列化中跳过一个 *key*，可以返回`undefined`。否则，就返回被提供的 *value*。
 
 ```js
 var a = {
@@ -285,7 +293,11 @@ JSON.stringify( a, function(k,v){
 
 **Note:** In the `function` *replacer* case, the key argument `k` is `undefined` for the first call (where the `a` object itself is being passed in). The `if` statement **filters out** the property named `"c"`. Stringification is recursive, so the `[1,2,3]` array has each of its values (`1`, `2`, and `3`) passed as `v` to *replacer*, with indexes (`0`, `1`, and `2`) as `k`.
 
+**注意：** 在`function`*替换器* 的情况下，第一次调用时key参数`k`是`undefined`（而对象`a`本身会被传入）。`if`语句会 **过滤掉** 名称为`c`的属性。字符串化是递归的，所以数组`[1,2,3]`会将它的每一个值（`1`，`2`，和`3`）都作为`v`传递给 *替换器*，并将索引值（`0`，`1`，和`2`）作为`k`。
+
 A third optional argument can also be passed to `JSON.stringify(..)`, called *space*, which is used as indentation for prettier human-friendly output. *space* can be a positive integer to indicate how many space characters should be used at each indentation level. Or, *space* can be a `string`, in which case up to the first ten characters of its value will be used for each indentation level.
+
+`JSON.stringify(..)`还可以接收第三个可选参数，称为 *填充符（space）*，在对人类友好的输出中它被用做缩进。*填充符* 可以是一个正整数，用来指示每一级缩进中应当使用多少个空格字符。或者，*填充符* 可以是一个`string`，这时每一级缩进将会使用它的前十个字符。
 
 ```js
 var a = {
@@ -319,30 +331,54 @@ JSON.stringify( a, null, "-----" );
 
 Remember, `JSON.stringify(..)` is not directly a form of coercion. We covered it here, however, for two reasons that relate its behavior to `ToString` coercion:
 
+记住，`JSON.stringify(..)`并不直接是一种强制转换的形式。但是，我们在这里讨论它，是由于两个与`ToString`强制转换有关联的行为：
+
 1. `string`, `number`, `boolean`, and `null` values all stringify for JSON basically the same as how they coerce to `string` values via the rules of the `ToString` abstract operation.
+1. `string`，`number`，`boolean`，和`null`值在JSON字符串化时，与它们通过`ToString`抽象操作的规则强制转换为`string`值的方式基本上是相同的。
 2. If you pass an `object` value to `JSON.stringify(..)`, and that `object` has a `toJSON()` method on it, `toJSON()` is automatically called to (sort of) "coerce" the value to be *JSON-safe* before stringification.
+2. 如果传递一个`object`值给`JSON.stringify(..)`，而这个`object`上拥有一个`toJSON()`方法，那么在字符串化之前，`toJSON()`就会被自动调用来将这个值（某种意义上）“强制转换”为 *JSON安全* 的。
 
 ### `ToNumber`
 
 If any non-`number` value is used in a way that requires it to be a `number`, such as a mathematical operation, the ES5 spec defines the `ToNumber` abstract operation in section 9.3.
 
+如果任何非`number`值，以一种要求它是`number`的方式被使用，比如数学操作，ES5语言规范在9.3部分定义了`ToNumber`抽象操作。
+
 For example, `true` becomes `1` and `false` becomes `0`. `undefined` becomes `NaN`, but (curiously) `null` becomes `0`.
+
+例如，`true`变为`1`而`false`变为`0`。`undefined`变为`NaN`，而（奇怪的是）`null`变为`0`。
 
 `ToNumber` for a `string` value essentially works for the most part like the rules/syntax for numeric literals (see Chapter 3). If it fails, the result is `NaN` (instead of a syntax error as with `number` literals). One example difference is that `0`-prefixed octal numbers are not handled as octals (just as normal base-10 decimals) in this operation, though such octals are valid as `number` literals (see Chapter 2).
 
+对于一个`string`值来说，`ToNumber`工作起来很大程度上与数字字面量的规则/语法很相似（见第三章）。如果它失败了，结果将是`NaN`（而非`number`字面量中会出现的语法错误）。一个不同的例子是，在这个操作中`0`前缀的八进制数不会被作为八进制数来处理（而仅作为普通的十进制小数），虽然这样的八进制数作为`number`字面量是合法的。
+
 **Note:** The differences between `number` literal grammar and `ToNumber` on a `string` value are subtle and highly nuanced, and thus will not be covered further here. Consult section 9.3.1 of the ES5 spec for more information.
+
+**注意：** `number`字面量文法与用于`string`值的`ToNumber`间的区别极其微妙，在这里就不进一步讲解了。更多的信息可以参考ES语言规范的9.3.1部分。
 
 Objects (and arrays) will first be converted to their primitive value equivalent, and the resulting value (if a primitive but not already a `number`) is coerced to a `number` according to the `ToNumber` rules just mentioned.
 
+对象（以及数组）将会首先被转换为它们的基本类型值的等价物，而后这个结果值（如果它还不是一个`number`基本类型）会根据刚才提到的`ToNumber`规则被强制转换为一个`number`。
+
 To convert to this primitive value equivalent, the `ToPrimitive` abstract operation (ES5 spec, section 9.1) will consult the value (using the internal `DefaultValue` operation -- ES5 spec, section 8.12.8) in question to see if it has a `valueOf()` method. If `valueOf()` is available and it returns a primitive value, *that* value is used for the coercion. If not, but `toString()` is available, it will provide the value for the coercion.
+
+为了转换为基本类型值的等价物，`ToPrimitive`抽象操作（ES5语言规范，9.1部分）将会查询这个值（使用内部的`DefaultValue`操作 —— ES5语言规范，8.12.8不分），看它有没有`valueOf()`方法。如果`valueOf()`可用并且它返回一个基本类型值，那么这个值就将用于强制转换。如果不是这样，但`toString()`可用，那么就由它来提供用于强制转换的值。
 
 If neither operation can provide a primitive value, a `TypeError` is thrown.
 
+如果这两种操作都没提供一个基本类型值，就会抛出一个`TypeError`。
+
 As of ES5, you can create such a noncoercible object -- one without `valueOf()` and `toString()` -- if it has a `null` value for its `[[Prototype]]`, typically created with `Object.create(null)`. See the *this & Object Prototypes* title of this series for more information on `[[Prototype]]`s.
+
+在ES5中，你可以创建这样一个不可强制转换的对象 —— 没有`valueOf()`和`toString()` —— 如果他的`[[Prototype]]`的值为`null`，这通常是通过`Object.create(null)`来创建的。关于`[[Prototype]]`的详细信息参见本系列的 *this与对象原型*。
 
 **Note:** We cover how to coerce to `number`s later in this chapter in detail, but for this next code snippet, just assume the `Number(..)` function does so.
 
+**注意：** 我们会在本章稍后讲解如何强制转换至`number`，但对于下面的代码段，想象`Number(..)`函数就是那样做的。
+
 Consider:
+
+考虑：
 
 ```js
 var a = {
@@ -374,22 +410,38 @@ Number( [ "abc" ] );	// NaN
 
 Next, let's have a little chat about how `boolean`s behave in JS. There's **lots of confusion and misconception** floating out there around this topic, so pay close attention!
 
+下面，让我们聊一聊在JS中`boolean`如何动作。世面上关于这个话题有 **许多的困惑和误解**，所以集中注意力！
+
 First and foremost, JS has actual keywords `true` and `false`, and they behave exactly as you'd expect of `boolean` values. It's a common misconception that the values `1` and `0` are identical to `true`/`false`. While that may be true in other languages, in JS the `number`s are `number`s and the `boolean`s are `boolean`s. You can coerce `1` to `true` (and vice versa) or `0` to `false` (and vice versa). But they're not the same.
+
+首先而且最重要的是，JS实际上拥有`true`和`false`关键字，而且它们的行为正如你所期望的`boolean`值一样。一个常见的误解是，值`1`和`0`与`true`/`false`是相同的。虽然这可能在其他语言中是成立的，但在JS中`number`就是`number`，而`boolean`就是`boolean`。你可以将`1`强制转换为`true`（或反之），或将`0`强制转换为`false`（或反之）。但它们不是相同的。
 
 #### Falsy Values
 
 But that's not the end of the story. We need to discuss how values other than the two `boolean`s behave whenever you coerce *to* their `boolean` equivalent.
 
+但这还不是故事的结尾。我们需要讨论一下，除了这两个`boolean`值以外，当你把其他值强制转换为它们的`boolean`等价物时如何动作。
+
 All of JavaScript's values can be divided into two categories:
 
+所有的JavaScript值都可以被划分进两个类别：
+
 1. values that will become `false` if coerced to `boolean`
+1. 如果被强制转换为`boolean`，将成为`false`的值
 2. everything else (which will obviously become `true`)
+2. 其它的一切值（很明显将变为`true`）
 
 I'm not just being facetious. The JS spec defines a specific, narrow list of values that will coerce to `false` when coerced to a `boolean` value.
 
+我不是在出洋相。JS语言规范定义了一个规范，给那些在强制转换为`boolean`值时将会变为`false`的值划定了一个小范围的列表。
+
 How do we know what the list of values is? In the ES5 spec, section 9.2 defines a `ToBoolean` abstract operation, which says exactly what happens for all the possible values when you try to coerce them "to boolean."
 
+我们如何才能知道这个列表中的值是什么？在ES5语言规范中，9.2部分定义了一个`ToBoolean`抽象操作，它讲述了对所有可能的值而言，当你试着强制转换它们为boolean时究竟会发生什么。
+
 From that table, we get the following as the so-called "falsy" values list:
+
+从那个表格中，我们得到了下面所谓的“falsy”值列表：
 
 * `undefined`
 * `null`
@@ -399,19 +451,33 @@ From that table, we get the following as the so-called "falsy" values list:
 
 That's it. If a value is on that list, it's a "falsy" value, and it will coerce to `false` if you force a `boolean` coercion on it.
 
+就是这些。如果一个值在这个列表中，它就是一个“falsy”值，而且当你在它上面进行`boolean`强制转换时它会转换为`false`。
+
 By logical conclusion, if a value is *not* on that list, it must be on *another list*, which we call the "truthy" values list. But JS doesn't really define a "truthy" list per se. It gives some examples, such as saying explicitly that all objects are truthy, but mostly the spec just implies: **anything not explicitly on the falsy list is therefore truthy.**
+
+根据逻辑上的结论，如果一个值不在这个列表中，那么它一定在另一个列表中，也就是我们称为“truthy”值的列表。但是JS没有真正定义一个“truthy”列表。它给出了一些例子，比如它说所有的对象都是truthy，但是语言规范大致上暗示着：**任何没有明确地存在于falsy列表中的东西，都是truthy**。
 
 #### Falsy Objects
 
 Wait a minute, that section title even sounds contradictory. I literally *just said* the spec calls all objects truthy, right? There should be no such thing as a "falsy object."
 
+等一下，这一节的标题听起来简直是矛盾的。我刚刚才说过语言规范将所有对象称为truthy，对吧？应该没有“falsy对象”这样的东西。
+
 What could that possibly even mean?
+
+这会是什么意思呢？
 
 You might be tempted to think it means an object wrapper (see Chapter 3) around a falsy value (such as `""`, `0` or `false`). But don't fall into that *trap*.
 
+它可能诱使你认为它意味着一个包装了falsy值（比如`""`，`0`或`false`）的对象包装器（见第三章）。但别掉到这个陷阱中。
+
 **Note:** That's a subtle specification joke some of you may get.
 
+
+
 Consider:
+
+考虑下面的代码：
 
 ```js
 var a = new Boolean( false );
@@ -421,6 +487,8 @@ var c = new String( "" );
 
 We know all three values here are objects (see Chapter 3) wrapped around obviously falsy values. But do these objects behave as `true` or as `false`? That's easy to answer:
 
+我们知道这三个值都是包装了明显是falsy值的对象。但这些对象是作为`true`还是作为`false`动作呢？这很容易回答：
+
 ```js
 var d = Boolean( a && b && c );
 
@@ -429,43 +497,81 @@ d; // true
 
 So, all three behave as `true`, as that's the only way `d` could end up as `true`.
 
+所以，三个都作为`true`动作，这是唯一能使`d`得到`true`的方法。
+
 **Tip:** Notice the `Boolean( .. )` wrapped around the `a && b && c` expression -- you might wonder why that's there. We'll come back to that later in this chapter, so make a mental note of it. For a sneak-peek (trivia-wise), try for yourself what `d` will be if you just do `d = a && b && c` without the `Boolean( .. )` call!
+
+**提示：** 注意包在`a && b && c`表达式外面的`Boolean( .. )` —— 你可能想知道为什么它在这儿。我们会在本章稍后回到这个话题，所以先做个心理准备。为了先睹为快，你可以自己试试如果没有`Boolean( .. )`调用而只有`d = a && b && c`时`d`是什么。
 
 So, if "falsy objects" are **not just objects wrapped around falsy values**, what the heck are they?
 
+那么，如果“falsy对象” **不是包装着falsy值的对象**，它们是什么鬼东西？
+
 The tricky part is that they can show up in your JS program, but they're not actually part of JavaScript itself.
+
+刁钻的地方在于，它们可以出现在你的JS程序中，但它们实际上不是JavaScript本身的一部分。
 
 **What!?**
 
+**什么！？**
+
 There are certain cases where browsers have created their own sort of *exotic* values behavior, namely this idea of "falsy objects," on top of regular JS semantics.
+
+有些特定的情况，在普通的JS语义之上，浏览器已经创建了它们自己的某种 *外来* 值的行为，也就是这种“falsy对象”的想法。
 
 A "falsy object" is a value that looks and acts like a normal object (properties, etc.), but when you coerce it to a `boolean`, it coerces to a `false` value.
 
+一个“falsy对象”看起来和动起来都像一个普通对象（属性，等等）的值，但是当你强制转换它为一个`boolean`时，它会变为一个`false`值。
+
 **Why!?**
+
+**为什么！？**
 
 The most well-known case is `document.all`: an array-like (object) provided to your JS program *by the DOM* (not the JS engine itself), which exposes elements in your page to your JS program. It *used* to behave like a normal object--it would act truthy. But not anymore.
 
+最著名的例子是`document.all`：一个 *由DOM*（不是JS引擎本身） 给你的JS程序提供的类数组（对象），它向你的JS程序暴露你页面上的元素。它 *曾经* 像一个普通对象那样动作 —— 是一个truthy。但不再是了。
+
 `document.all` itself was never really "standard" and has long since been deprecated/abandoned.
+
+`document.all`本身从来就不是“标准的”，而且从很早以前就被废弃/抛弃了。
 
 "Can't they just remove it, then?" Sorry, nice try. Wish they could. But there's far too many legacy JS code bases out there that rely on using it.
 
+“那他们就不能删掉它吗？” 对不起，想得不错。但愿它们能。但是世面上有太多的遗产JS代码库依赖于它。
+
 So, why make it act falsy? Because coercions of `document.all` to `boolean` (like in `if` statements) were almost always used as a means of detecting old, nonstandard IE.
+
+那么，为什么使它像falsy一样动作？因为从`document.all`到`boolean`的强制转换（比如在`if`语句中）几乎总是用来检测老的，非标准的IE。
 
 IE has long since come up to standards compliance, and in many cases is pushing the web forward as much or more than any other browser. But all that old `if (document.all) { /* it's IE */ }` code is still out there, and much of it is probably never going away. All this legacy code is still assuming it's running in decade-old IE, which just leads to bad browsing experience for IE users.
 
+IE从很早以前就开始顺应规范了，而且在许多情况下它在推动web向前发展的作用和其他浏览器一样多，甚至更多。但是所有那些老旧的`if (document.all) { /* it's IE */ }`代码依然留在世面上，而且大多数可能永远都不会消失。所有这些遗产代码依然假设它们运行在那些给IE用户带来差劲儿的浏览体验的，几十年前的老IE上，
+
 So, we can't remove `document.all` completely, but IE doesn't want `if (document.all) { .. }` code to work anymore, so that users in modern IE get new, standards-compliant code logic.
 
-"What should we do?" **"I've got it! Let's bastardize the JS type system and pretend that `document.all` is falsy!"
+所以，我们不能完全移除`document.all`，但是IE不再想让`if (document.all) { .. }`代码继续工作了，这样现代IE的用户就能得到新的，符合标准的代码逻辑。
+
+"What should we do?" "I've got it! Let's bastardize the JS type system and pretend that `document.all` is falsy!"
+
+“我们应当怎么做？” “我知道了！让我们黑进JS的类型系统并假装`document.all`是falsy！”
 
 Ugh. That sucks. It's a crazy gotcha that most JS developers don't understand. But the alternative (doing nothing about the above no-win problems) sucks *just a little bit more*.
 
+呃。这很烂。这是一个大多数JS开发者们都不理解的疯狂的坑。但是其它的替代方案（对上面两败俱伤的问题什么都不做）还要烂得 *多那么一点点*。
+
 So... that's what we've got: crazy, nonstandard "falsy objects" added to JavaScript by the browsers. Yay!
+
+所以……这就是我们得到的：由浏览器给JavaScript添加的疯狂，非标准的“falsy对象”。耶！
 
 #### Truthy Values
 
 Back to the truthy list. What exactly are the truthy values? Remember: **a value is truthy if it's not on the falsy list.**
 
+回到truthy列表。到底什么是truthy值？记住：**如果一个值不在falsy列表中，它就是truthy**。
+
 Consider:
+
+考虑下面代码：
 
 ```js
 var a = "false";
@@ -479,9 +585,15 @@ d;
 
 What value do you expect `d` to have here? It's gotta be either `true` or `false`.
 
+你期望这里的`d`是什么值？它要么是`true`要么是`false`。
+
 It's `true`. Why? Because despite the contents of those `string` values looking like falsy values, the `string` values themselves are all truthy, because `""` is the only `string` value on the falsy list.
 
+它是`true`。为什么？因为尽管这些`string`值的内容看起来是falsy值，但是`string`值本身都是truthy，而这是因为在falsy列表中`""`是唯一的`string`值。
+
 What about these?
+
+那么这些呢？
 
 ```js
 var a = [];				// empty array -- truthy or falsy?
@@ -495,25 +607,43 @@ d;
 
 Yep, you guessed it, `d` is still `true` here. Why? Same reason as before. Despite what it may seem like, `[]`, `{}`, and `function(){}` are *not* on the falsy list, and thus are truthy values.
 
+是的，你猜到了，这里的`d`依然是`true`。为什么？和前面的原因一样。尽管它们看起来像，但是`[]`，`{}`，和`function(){}` *不在* falsy列表中，因此它们是truthy值。
+
 In other words, the truthy list is infinitely long. It's impossible to make such a list. You can only make a finite falsy list and consult *it*.
+
+换句话说，truthy列表是无限长的。不可能制成一个这样的列表。你只能制造一个falsy列表并查询它。
 
 Take five minutes, write the falsy list on a post-it note for your computer monitor, or memorize it if you prefer. Either way, you'll easily be able to construct a virtual truthy list whenever you need it by simply asking if it's on the falsy list or not.
 
+花五分钟，把falsy列表写在便利贴上，然后粘在你的电脑显示器上，或者如果你愿意就记住它。不管哪种方法，你都可以在自己需要的时候通过简单地查询一个值是否在falsy列表中，来构建一个虚拟的truthy列表。
+
 The importance of truthy and falsy is in understanding how a value will behave if you coerce it (either explicitly or implicitly) to a `boolean` value. Now that you have those two lists in mind, we can dive into coercion examples themselves.
+
+truthy和falsy的重要性在于，理解如果一个值在被强制转换为`boolean`值的话，它将如何动作。现在你的大脑中有了这两个列表，我们可以深入强制转换的例子本身了。
 
 ## Explicit Coercion
 
 *Explicit* coercion refers to type conversions that are obvious and explicit. There's a wide range of type conversion usage that clearly falls under the *explicit* coercion category for most developers.
 
+*明确的* 强制转换指的是明显且明确的类型转换。对于大多数开发者来说，有很多类型转换的用法可以清楚地归类于这种 *明确的* 强制转换。
+
 The goal here is to identify patterns in our code where we can make it clear and obvious that we're converting a value from one type to another, so as to not leave potholes for future developers to trip into. The more explicit we are, the more likely someone later will be able to read our code and understand without undue effort what our intent was.
 
+我们在这里的目标是，在我们的代码中指明一些模式，在这些模式中我们可以清楚明白地将一个值从一种类型转换至另一种类型，以确保不给未来将读到这段代码的开发者留下任何坑。我们越明确，后来的人就越容易读懂我们的代码，也不必费太多的力气去理解我们的意图。
+
 It would be hard to find any salient disagreements with *explicit* coercion, as it most closely aligns with how the commonly accepted practice of type conversion works in statically typed languages. As such, we'll take for granted (for now) that *explicit* coercion can be agreed upon to not be evil or controversial. We'll revisit this later, though.
+
+关于 *明确的* 强制转换可能很难找到什么主要的不同意见，因为它与被广泛接受的静态类型语言中的类型转换的工作方式非常接近。因此，我们理所当然地认为（暂且） *明确的* 强制转换可以被认同为不是邪恶的，或没有争议的。虽然我们稍后会回到这个话题。
 
 ### Explicitly: Strings <--> Numbers
 
 We'll start with the simplest and perhaps most common coercion operation: coercing values between `string` and `number` representation.
 
+我们将从最简单，也许是最常见强制转换操作开始：将值在`string`和`number`表现形式之间进行强制转换。
+
 To coerce between `string`s and `number`s, we use the built-in `String(..)` and `Number(..)` functions (which we referred to as "native constructors" in Chapter 3), but **very importantly**, we do not use the `new` keyword in front of them. As such, we're not creating object wrappers.
+
+为了在`string`和`number`之间进行强制转换，我们使用内建的`String(..)`和`Number(..)`函数（我们在第三章中所指的“原生构造器”），但 **非常重要的是**，我们能不在它们前面使用`new`关键字。这样，我们就不是在创建对象包装器。
 
 Instead, we're actually *explicitly coercing* between the two types:
 
