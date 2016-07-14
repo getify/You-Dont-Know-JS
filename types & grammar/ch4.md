@@ -1031,7 +1031,11 @@ a - b; // 2
 
 I think a case where *implicit* coercion can really shine is in simplifying certain types of complicated `boolean` logic into simple numeric addition. Of course, this is not a general-purpose technique, but a specific solution for specific cases.
 
+我认为 *隐含* 强制转换可以真正闪光的一个情况是，将特定类型的负载`boolean`逻辑简化为简单的数字加法。当然，这不是一个通用的技术，而是一个特定情况的特定解决方法。
+
 Consider:
+
+考虑：
 
 ```js
 function onlyOne(a,b,c) {
@@ -1050,9 +1054,15 @@ onlyOne( a, b, a );	// false
 
 This `onlyOne(..)` utility should only return `true` if exactly one of the arguments is `true` / truthy. It's using *implicit* coercion on the truthy checks and *explicit* coercion on the others, including the final return value.
 
+这个`onlyOne(..)`工具应当仅在正好有一个参数是`true`/truthy时返回`true`。它在truthy的检查上使用 *隐含的* 强制转换，而在其他的地方使用 *明确的* 强制转换，包括最后的返回值。
+
 But what if we needed that utility to be able to handle four, five, or twenty flags in the same way? It's pretty difficult to imagine implementing code that would handle all those permutations of comparisons.
 
+但如果我们需要这个工具能够以相同的方式处理四个，五个，或者二十个标志值呢？很难想象处理所有那些比较的排列组合的实现代码。
+
 But here's where coercing the `boolean` values to `number`s (`0` or `1`, obviously) can greatly help:
+
+但这里是`boolean`值到`number`（很明显，`0`或`1`）的强制转换可以提供巨大帮助的地方：
 
 ```js
 function onlyOne() {
@@ -1079,9 +1089,15 @@ onlyOne( b, a, b, b, b, a );	// false
 
 **Note:** Of course, instead of the `for` loop in `onlyOne(..)`, you could more tersely use the ES5 `reduce(..)` utility, but I didn't want to obscure the concepts.
 
+**注意：** 当让，除了在`onlyOne(..)`中的`for`循环，你可以更简洁地使用ES5的`reduce(..)`工具，但我不想因此而模糊概念。
+
 What we're doing here is relying on the `1` for `true`/truthy coercions, and numerically adding them all up. `sum += arguments[i]` uses *implicit* coercion to make that happen. If one and only one value in the `arguments` list is `true`, then the numeric sum will be `1`, otherwise the sum will not be `1` and thus the desired condition is not met.
 
+我们在这里做的事情有赖于`true`/truthy的强制转换结果为`1`，并将它们作为数字加起来。`sum += arguments[i]`通过 *隐含的* 强制转换使这发生。如果在`arguments`列表中有且仅有一个值为`true`，那么这个数字的和将是`1`，否则和就不是`1`而不能使期望的条件成立。
+
 We could of course do this with *explicit* coercion instead:
+
+我们当然本可以使用 *明确的* 强制转换：
 
 ```js
 function onlyOne() {
@@ -1095,21 +1111,37 @@ function onlyOne() {
 
 We first use `!!arguments[i]` to force the coercion of the value to `true` or `false`. That's so you could pass non-`boolean` values in, like `onlyOne( "42", 0 )`, and it would still work as expected (otherwise you'd end up with `string` concatenation and the logic would be incorrect).
 
+我们首先使用`!!arguments[i]`来将这个值强制转换为`true`或`false`。这样你就可以传入非`boolean`值了，而且它依然可以如意料的那样工作（要不然，你将会得到`string`连接，而且逻辑也不正确）。
+
 Once we're sure it's a `boolean`, we do another *explicit* coercion with `Number(..)` to make sure the value is `0` or `1`.
+
+一旦我们确认它是一个`boolean`，我们就使用`Number(..)`进行另一个 *明确的* 强制转换来确保值是`0`或`1`。
 
 Is the *explicit* coercion form of this utility "better"? It does avoid the `NaN` trap as explained in the code comments. But, ultimately, it depends on your needs. I personally think the former version, relying on *implicit* coercion is more elegant (if you won't be passing `undefined` or `NaN`), and the *explicit* version is needlessly more verbose.
 
+这个工具的 *明确* 强制转换形式“更好”吗？它确实像代码注释中解释的那样避开了`NaN`的陷阱。但是，这最终要看你的需要。我个人认为前一个版本，依赖于 *隐含的* 强制转换更优雅（如果你不传入`undefined`或`NaN`），而 *明确的* 版本是一种不必要的繁冗。
+
 But as with almost everything we're discussing here, it's a judgment call.
 
+但与我们在这里讨论的几乎所有东西一样，这是一个主观判断。
+
 **Note:** Regardless of *implicit* or *explicit* approaches, you could easily make `onlyTwo(..)` or `onlyFive(..)` variations by simply changing the final comparison from `1`, to `2` or `5`, respectively. That's drastically easier than adding a bunch of `&&` and `||` expressions. So, generally, coercion is very helpful in this case.
+
+**注意：** 不管是 *隐含的* 还是 *明确的* 方式，你可以通过将最后的比较从`1`改为`2`或`5`，来分别很容易地制造`onlyTwo(..)`或`onlyFive(..)`。这要比添加一大堆`&&`和`||`表达式要简单太多了。所以，一般来说，在这种情况下强制转换非常有用。
 
 ### Implicitly: * --> Boolean
 
 Now, let's turn our attention to *implicit* coercion to `boolean` values, as it's by far the most common and also by far the most potentially troublesome.
 
+现在，让我们将注意力转向目标为`boolean`值的 *隐含* 强制转换上，这是目前最常见，并且还是目前潜在的最麻烦的一种。
+
 Remember, *implicit* coercion is what kicks in when you use a value in such a way that it forces the value to be converted. For numeric and `string` operations, it's fairly easy to see how the coercions can occur.
 
+记住，*隐含的* 强制转换是当你以强制一个值被转换的方式使用这个值时才启动的。对于数字和`string`操作，很容易就能看出这种强制转换是如何发生的。
+
 But, what sort of expression operations require/force (*implicitly*) a `boolean` coercion?
+
+但是，哪个种类的表达式操作要求/强制一个（*隐含的*）`boolean`转换呢？
 
 1. The test expression in an `if (..)` statement.
 2. The test expression (second clause) in a `for ( .. ; .. ; .. )` header.
