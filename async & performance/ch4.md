@@ -1168,12 +1168,12 @@ Hiding your Promise logic inside a function that you merely call from your gener
 
 ```js
 function bar() {
-	Promise.all( [
-		baz( .. )
-		.then( .. ),
-		Promise.race( [ .. ] )
-	] )
-	.then( .. )
+	return	Promise.all( [
+		  baz( .. )
+		  .then( .. ),
+		  Promise.race( [ .. ] )
+		] )
+		.then( .. )
 }
 ```
 
