@@ -1144,14 +1144,23 @@ But, what sort of expression operations require/force (*implicitly*) a `boolean`
 但是，哪个种类的表达式操作要求/强制一个（*隐含的*）`boolean`转换呢？
 
 1. The test expression in an `if (..)` statement.
+1. 在一个`if (..)`语句中的测试表达式。
 2. The test expression (second clause) in a `for ( .. ; .. ; .. )` header.
+2. 在一个`for ( .. ; .. ; .. )`头部的测试表达式（第二个子句）。
 3. The test expression in `while (..)` and `do..while(..)` loops.
+3. 在`while (..)`和`do..while(..)`循环中的测试表达式。
 4. The test expression (first clause) in `? :` ternary expressions.
+4. 在`? :`三元表达式中的测试表达式（第一个子句）。
 5. The left-hand operand (which serves as a test expression -- see below!) to the `||` ("logical or") and `&&` ("logical and") operators.
+5. `||`（“逻辑或”）和`&&`（“逻辑与”）操作符左手边的操作数（它用做测试表达式——见下面的讨论！）。
 
 Any value used in these contexts that is not already a `boolean` will be *implicitly* coerced to a `boolean` using the rules of the `ToBoolean` abstract operation covered earlier in this chapter.
 
+在这些上下文环境中使用的，任何还不是`boolean`的值，将通过本章早先讲解的`ToBoolean`抽象操作的规则，被 *隐含地* 强制转换为一个`boolean`
+
 Let's look at some examples:
+
+我们来看一些例子：
 
 ```js
 var a = 42;
@@ -1177,23 +1186,41 @@ if ((a && d) || c) {
 
 In all these contexts, the non-`boolean` values are *implicitly coerced* to their `boolean` equivalents to make the test decisions.
 
+在所有这些上下文环境中，非`boolean`值被 *隐含地强制转换* 为它们的`boolean`等价物，来决定测试的结果。
+
 ### Operators `||` and `&&`
 
 It's quite likely that you have seen the `||` ("logical or") and `&&` ("logical and") operators in most or all other languages you've used. So it'd be natural to assume that they work basically the same in JavaScript as in other similar languages.
 
+很可能你已经在你用过的大多数或所有其他语言中见到过`||`（“逻辑或”）和`&&`（“逻辑与”）操作符了。所以假设他们在JavaScript中的工作方式和其他类似的语言基本上相同是很自然的。
+
 There's some very little known, but very important, nuance here.
+
+这里有一个少为人知的，但很重要的，微妙细节。
 
 In fact, I would argue these operators shouldn't even be called "logical ___ operators", as that name is incomplete in describing what they do. If I were to give them a more accurate (if more clumsy) name, I'd call them "selector operators," or more completely, "operand selector operators."
 
+其实，我会争辩这些操作符甚至不应当被称为“逻辑__操作符”，因为这样的名称没有完整地描述它们在做什么。如果让我给它们一个更准确的（更蹩脚的）名称，我会叫它们“选择器操作符”或更完整的，“操作数选择器操作符”。
+
 Why? Because they don't actually result in a *logic* value (aka `boolean`) in JavaScript, as they do in some other languages.
+
+为什么？因为在JavaScript中它们实际上不会得出一个 *逻辑* 值（也就是`boolean`），这与它们在其他的语言中的表现不同。
 
 So what *do* they result in? They result in the value of one (and only one) of their two operands. In other words, **they select one of the two operand's values**.
 
+那么它们到底得出什么？他们得出两个操作数中的一个（而且仅有一个）。换句话说，**它们在两个操作数的值中选择一个**。
+
 Quoting the ES5 spec from section 11.11:
+
+引用ES5语言规范的11.11部分：
 
 > The value produced by a && or || operator is not necessarily of type Boolean. The value produced will always be the value of one of the two operand expressions.
 
+> 一个&&或||操作符产生的值不见得是Boolean类型。这个产生的值将总是两个操作数表达式其中之一的值。
+
 Let's illustrate:
+
+让我们展示一下：
 
 ```js
 var a = 42;
@@ -1209,17 +1236,31 @@ c && b;		// null
 
 **Wait, what!?** Think about that. In languages like C and PHP, those expressions result in `true` or `false`, but in JS (and Python and Ruby, for that matter!), the result comes from the values themselves.
 
+**等一下，什么！？** 想一想。在像C和PHP这样的语言中，这些表达式结果为`true`或`false`，而在JS中（就此而言还有Python和Ruby！），结果来自于值本身。
+
 Both `||` and `&&` operators perform a `boolean` test on the **first operand** (`a` or `c`). If the operand is not already `boolean` (as it's not, here), a normal `ToBoolean` coercion occurs, so that the test can be performed.
+
+`||`和`&&`操作符都在 **第一个操作数**（`a`或`c`） 上进行`boolean`测试。如果这个操作数还不是`boolean`（就像在这里一样），就会发生一次正常的`ToBoolean`强制转换，这样测试就可以进行了。
 
 For the `||` operator, if the test is `true`, the `||` expression results in the value of the *first operand* (`a` or `c`). If the test is `false`, the `||` expression results in the value of the *second operand* (`b`).
 
+对于`||`操作符，如果测试结果为`true`，`||`表达式就将 *第一个操作数* 的值（`a`或`c`）作为结果。如果测试结果为`false`，`||`表达式就将 *第二个操作数* 的值（`b`）作为结果。
+
 Inversely, for the `&&` operator, if the test is `true`, the `&&` expression results in the value of the *second operand* (`b`). If the test is `false`, the `&&` expression results in the value of the *first operand* (`a` or `c`).
+
+相反地，对于`&&`操作符，如果测试结果为`true`，`&&`表达式将 *第二个操作数* 的值（`b`）作为结果。如果测试结果为`false`，那么`&&`表达式就将 *第一个操作数* 的值（`a`或`c`）作为结果。
 
 The result of a `||` or `&&` expression is always the underlying value of one of the operands, **not** the (possibly coerced) result of the test. In `c && b`, `c` is `null`, and thus falsy. But the `&&` expression itself results in `null` (the value in `c`), not in the coerced `false` used in the test.
 
+`||`或`&&`表达式的结果总是两个操作数之一的底层值，**不是**（可能是被强制转换来的）测试的结果。在`c && b`中，`c`是`null`，因此是falsy。但是`&&`表达式本身的结果为`null`（`c`中的值），不是用于测试的强制转换来的`false`。
+
 Do you see how these operators act as "operand selectors", now?
 
+现在你明白这些操作符如何像“操作数选择器”一样工作了吗？
+
 Another way of thinking about these operators:
+
+另一种考虑这些操作数的方式是：
 
 ```js
 a || b;
@@ -1232,6 +1273,8 @@ a ? b : a;
 ```
 
 **Note:** I call `a || b` "roughly equivalent" to `a ? a : b` because the outcome is identical, but there's a nuanced difference. In `a ? a : b`, if `a` was a more complex expression (like for instance one that might have side effects like calling a `function`, etc.), then the `a` expression would possibly be evaluated twice (if the first evaluation was truthy). By contrast, for `a || b`, the `a` expression is evaluated only once, and that value is used both for the coercive test as well as the result value (if appropriate). The same nuance applies to the `a && b` and `a ? b : a` expressions.
+
+**注意：** 我说`a || b`“大体上等价”于`a ? a : b`，是因为虽然结果相同，但是这里有一个微妙的不同。在`a ? a : b`中，如果`a`是一个更复杂的表达式（例如像调用`function`那样可能带有副作用），那么这个表达式`a`将有可能被求值两次（如果第一次求值的结果为truthy）。相比之下，对于`a || b`，表达式`a`仅被求值一次，而且这个值将被同时用于强制转换测试和结果值（如果适合的话）。同样的区别也适用于`a && b`和`a ? b : a`表达式。
 
 An extremely common and helpful usage of this behavior, which there's a good chance you may have used before and not fully understood, is:
 
