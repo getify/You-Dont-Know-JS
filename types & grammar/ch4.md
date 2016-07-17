@@ -1029,11 +1029,7 @@ a - b; // 2
 
 ### Implicitly: Booleans --> Numbers
 
-I think a case where *implicit* coercion can really shine is in simplifying certain types of complicated `boolean` logic into simple numeric addition. Of course, this is not a general-purpose technique, but a specific solution for specific cases.
-
 我认为 *隐含* 强制转换可以真正闪光的一个情况是，将特定类型的负载`boolean`逻辑简化为简单的数字加法。当然，这不是一个通用的技术，而是一个特定情况的特定解决方法。
-
-Consider:
 
 考虑：
 
@@ -1052,15 +1048,9 @@ onlyOne( b, a, b );	// true
 onlyOne( a, b, a );	// false
 ```
 
-This `onlyOne(..)` utility should only return `true` if exactly one of the arguments is `true` / truthy. It's using *implicit* coercion on the truthy checks and *explicit* coercion on the others, including the final return value.
-
 这个`onlyOne(..)`工具应当仅在正好有一个参数是`true`/truthy时返回`true`。它在truthy的检查上使用 *隐含的* 强制转换，而在其他的地方使用 *明确的* 强制转换，包括最后的返回值。
 
-But what if we needed that utility to be able to handle four, five, or twenty flags in the same way? It's pretty difficult to imagine implementing code that would handle all those permutations of comparisons.
-
 但如果我们需要这个工具能够以相同的方式处理四个，五个，或者二十个标志值呢？很难想象处理所有那些比较的排列组合的实现代码。
-
-But here's where coercing the `boolean` values to `number`s (`0` or `1`, obviously) can greatly help:
 
 但这里是`boolean`值到`number`（很明显，`0`或`1`）的强制转换可以提供巨大帮助的地方：
 
@@ -1087,15 +1077,9 @@ onlyOne( b, b );				// false
 onlyOne( b, a, b, b, b, a );	// false
 ```
 
-**Note:** Of course, instead of the `for` loop in `onlyOne(..)`, you could more tersely use the ES5 `reduce(..)` utility, but I didn't want to obscure the concepts.
-
 **注意：** 当让，除了在`onlyOne(..)`中的`for`循环，你可以更简洁地使用ES5的`reduce(..)`工具，但我不想因此而模糊概念。
 
-What we're doing here is relying on the `1` for `true`/truthy coercions, and numerically adding them all up. `sum += arguments[i]` uses *implicit* coercion to make that happen. If one and only one value in the `arguments` list is `true`, then the numeric sum will be `1`, otherwise the sum will not be `1` and thus the desired condition is not met.
-
 我们在这里做的事情有赖于`true`/truthy的强制转换结果为`1`，并将它们作为数字加起来。`sum += arguments[i]`通过 *隐含的* 强制转换使这发生。如果在`arguments`列表中有且仅有一个值为`true`，那么这个数字的和将是`1`，否则和就不是`1`而不能使期望的条件成立。
-
-We could of course do this with *explicit* coercion instead:
 
 我们当然本可以使用 *明确的* 强制转换：
 
@@ -1109,56 +1093,31 @@ function onlyOne() {
 }
 ```
 
-We first use `!!arguments[i]` to force the coercion of the value to `true` or `false`. That's so you could pass non-`boolean` values in, like `onlyOne( "42", 0 )`, and it would still work as expected (otherwise you'd end up with `string` concatenation and the logic would be incorrect).
-
 我们首先使用`!!arguments[i]`来将这个值强制转换为`true`或`false`。这样你就可以传入非`boolean`值了，而且它依然可以如意料的那样工作（要不然，你将会得到`string`连接，而且逻辑也不正确）。
-
-Once we're sure it's a `boolean`, we do another *explicit* coercion with `Number(..)` to make sure the value is `0` or `1`.
 
 一旦我们确认它是一个`boolean`，我们就使用`Number(..)`进行另一个 *明确的* 强制转换来确保值是`0`或`1`。
 
-Is the *explicit* coercion form of this utility "better"? It does avoid the `NaN` trap as explained in the code comments. But, ultimately, it depends on your needs. I personally think the former version, relying on *implicit* coercion is more elegant (if you won't be passing `undefined` or `NaN`), and the *explicit* version is needlessly more verbose.
-
 这个工具的 *明确* 强制转换形式“更好”吗？它确实像代码注释中解释的那样避开了`NaN`的陷阱。但是，这最终要看你的需要。我个人认为前一个版本，依赖于 *隐含的* 强制转换更优雅（如果你不传入`undefined`或`NaN`），而 *明确的* 版本是一种不必要的繁冗。
 
-But as with almost everything we're discussing here, it's a judgment call.
-
 但与我们在这里讨论的几乎所有东西一样，这是一个主观判断。
-
-**Note:** Regardless of *implicit* or *explicit* approaches, you could easily make `onlyTwo(..)` or `onlyFive(..)` variations by simply changing the final comparison from `1`, to `2` or `5`, respectively. That's drastically easier than adding a bunch of `&&` and `||` expressions. So, generally, coercion is very helpful in this case.
 
 **注意：** 不管是 *隐含的* 还是 *明确的* 方式，你可以通过将最后的比较从`1`改为`2`或`5`，来分别很容易地制造`onlyTwo(..)`或`onlyFive(..)`。这要比添加一大堆`&&`和`||`表达式要简单太多了。所以，一般来说，在这种情况下强制转换非常有用。
 
 ### Implicitly: * --> Boolean
 
-Now, let's turn our attention to *implicit* coercion to `boolean` values, as it's by far the most common and also by far the most potentially troublesome.
-
 现在，让我们将注意力转向目标为`boolean`值的 *隐含* 强制转换上，这是目前最常见，并且还是目前潜在的最麻烦的一种。
-
-Remember, *implicit* coercion is what kicks in when you use a value in such a way that it forces the value to be converted. For numeric and `string` operations, it's fairly easy to see how the coercions can occur.
 
 记住，*隐含的* 强制转换是当你以强制一个值被转换的方式使用这个值时才启动的。对于数字和`string`操作，很容易就能看出这种强制转换是如何发生的。
 
-But, what sort of expression operations require/force (*implicitly*) a `boolean` coercion?
-
 但是，哪个种类的表达式操作要求/强制一个（*隐含的*）`boolean`转换呢？
 
-1. The test expression in an `if (..)` statement.
 1. 在一个`if (..)`语句中的测试表达式。
-2. The test expression (second clause) in a `for ( .. ; .. ; .. )` header.
 2. 在一个`for ( .. ; .. ; .. )`头部的测试表达式（第二个子句）。
-3. The test expression in `while (..)` and `do..while(..)` loops.
 3. 在`while (..)`和`do..while(..)`循环中的测试表达式。
-4. The test expression (first clause) in `? :` ternary expressions.
 4. 在`? :`三元表达式中的测试表达式（第一个子句）。
-5. The left-hand operand (which serves as a test expression -- see below!) to the `||` ("logical or") and `&&` ("logical and") operators.
 5. `||`（“逻辑或”）和`&&`（“逻辑与”）操作符左手边的操作数（它用做测试表达式——见下面的讨论！）。
 
-Any value used in these contexts that is not already a `boolean` will be *implicitly* coerced to a `boolean` using the rules of the `ToBoolean` abstract operation covered earlier in this chapter.
-
 在这些上下文环境中使用的，任何还不是`boolean`的值，将通过本章早先讲解的`ToBoolean`抽象操作的规则，被 *隐含地* 强制转换为一个`boolean`
-
-Let's look at some examples:
 
 我们来看一些例子：
 
@@ -1184,41 +1143,23 @@ if ((a && d) || c) {
 }
 ```
 
-In all these contexts, the non-`boolean` values are *implicitly coerced* to their `boolean` equivalents to make the test decisions.
-
 在所有这些上下文环境中，非`boolean`值被 *隐含地强制转换* 为它们的`boolean`等价物，来决定测试的结果。
 
 ### Operators `||` and `&&`
 
-It's quite likely that you have seen the `||` ("logical or") and `&&` ("logical and") operators in most or all other languages you've used. So it'd be natural to assume that they work basically the same in JavaScript as in other similar languages.
-
 很可能你已经在你用过的大多数或所有其他语言中见到过`||`（“逻辑或”）和`&&`（“逻辑与”）操作符了。所以假设他们在JavaScript中的工作方式和其他类似的语言基本上相同是很自然的。
-
-There's some very little known, but very important, nuance here.
 
 这里有一个少为人知的，但很重要的，微妙细节。
 
-In fact, I would argue these operators shouldn't even be called "logical ___ operators", as that name is incomplete in describing what they do. If I were to give them a more accurate (if more clumsy) name, I'd call them "selector operators," or more completely, "operand selector operators."
-
 其实，我会争辩这些操作符甚至不应当被称为“逻辑__操作符”，因为这样的名称没有完整地描述它们在做什么。如果让我给它们一个更准确的（更蹩脚的）名称，我会叫它们“选择器操作符”或更完整的，“操作数选择器操作符”。
-
-Why? Because they don't actually result in a *logic* value (aka `boolean`) in JavaScript, as they do in some other languages.
 
 为什么？因为在JavaScript中它们实际上不会得出一个 *逻辑* 值（也就是`boolean`），这与它们在其他的语言中的表现不同。
 
-So what *do* they result in? They result in the value of one (and only one) of their two operands. In other words, **they select one of the two operand's values**.
-
 那么它们到底得出什么？他们得出两个操作数中的一个（而且仅有一个）。换句话说，**它们在两个操作数的值中选择一个**。
-
-Quoting the ES5 spec from section 11.11:
 
 引用ES5语言规范的11.11部分：
 
-> The value produced by a && or || operator is not necessarily of type Boolean. The value produced will always be the value of one of the two operand expressions.
-
 > 一个&&或||操作符产生的值不见得是Boolean类型。这个产生的值将总是两个操作数表达式其中之一的值。
-
-Let's illustrate:
 
 让我们展示一下：
 
@@ -1234,31 +1175,17 @@ c || b;		// "abc"
 c && b;		// null
 ```
 
-**Wait, what!?** Think about that. In languages like C and PHP, those expressions result in `true` or `false`, but in JS (and Python and Ruby, for that matter!), the result comes from the values themselves.
-
 **等一下，什么！？** 想一想。在像C和PHP这样的语言中，这些表达式结果为`true`或`false`，而在JS中（就此而言还有Python和Ruby！），结果来自于值本身。
-
-Both `||` and `&&` operators perform a `boolean` test on the **first operand** (`a` or `c`). If the operand is not already `boolean` (as it's not, here), a normal `ToBoolean` coercion occurs, so that the test can be performed.
 
 `||`和`&&`操作符都在 **第一个操作数**（`a`或`c`） 上进行`boolean`测试。如果这个操作数还不是`boolean`（就像在这里一样），就会发生一次正常的`ToBoolean`强制转换，这样测试就可以进行了。
 
-For the `||` operator, if the test is `true`, the `||` expression results in the value of the *first operand* (`a` or `c`). If the test is `false`, the `||` expression results in the value of the *second operand* (`b`).
-
 对于`||`操作符，如果测试结果为`true`，`||`表达式就将 *第一个操作数* 的值（`a`或`c`）作为结果。如果测试结果为`false`，`||`表达式就将 *第二个操作数* 的值（`b`）作为结果。
-
-Inversely, for the `&&` operator, if the test is `true`, the `&&` expression results in the value of the *second operand* (`b`). If the test is `false`, the `&&` expression results in the value of the *first operand* (`a` or `c`).
 
 相反地，对于`&&`操作符，如果测试结果为`true`，`&&`表达式将 *第二个操作数* 的值（`b`）作为结果。如果测试结果为`false`，那么`&&`表达式就将 *第一个操作数* 的值（`a`或`c`）作为结果。
 
-The result of a `||` or `&&` expression is always the underlying value of one of the operands, **not** the (possibly coerced) result of the test. In `c && b`, `c` is `null`, and thus falsy. But the `&&` expression itself results in `null` (the value in `c`), not in the coerced `false` used in the test.
-
 `||`或`&&`表达式的结果总是两个操作数之一的底层值，**不是**（可能是被强制转换来的）测试的结果。在`c && b`中，`c`是`null`，因此是falsy。但是`&&`表达式本身的结果为`null`（`c`中的值），不是用于测试的强制转换来的`false`。
 
-Do you see how these operators act as "operand selectors", now?
-
 现在你明白这些操作符如何像“操作数选择器”一样工作了吗？
-
-Another way of thinking about these operators:
 
 另一种考虑这些操作数的方式是：
 
@@ -1272,11 +1199,9 @@ a && b;
 a ? b : a;
 ```
 
-**Note:** I call `a || b` "roughly equivalent" to `a ? a : b` because the outcome is identical, but there's a nuanced difference. In `a ? a : b`, if `a` was a more complex expression (like for instance one that might have side effects like calling a `function`, etc.), then the `a` expression would possibly be evaluated twice (if the first evaluation was truthy). By contrast, for `a || b`, the `a` expression is evaluated only once, and that value is used both for the coercive test as well as the result value (if appropriate). The same nuance applies to the `a && b` and `a ? b : a` expressions.
-
 **注意：** 我说`a || b`“大体上等价”于`a ? a : b`，是因为虽然结果相同，但是这里有一个微妙的不同。在`a ? a : b`中，如果`a`是一个更复杂的表达式（例如像调用`function`那样可能带有副作用），那么这个表达式`a`将有可能被求值两次（如果第一次求值的结果为truthy）。相比之下，对于`a || b`，表达式`a`仅被求值一次，而且这个值将被同时用于强制转换测试和结果值（如果适合的话）。同样的区别也适用于`a && b`和`a ? b : a`表达式。
 
-An extremely common and helpful usage of this behavior, which there's a good chance you may have used before and not fully understood, is:
+很有可能你在没有完全理解之前你就已经使用了这个行为的一个极其常见，而且很有帮助的用法：
 
 ```js
 function foo(a,b) {
@@ -1290,23 +1215,23 @@ foo();					// "hello world"
 foo( "yeah", "yeah!" );	// "yeah yeah!"
 ```
 
-The `a = a || "hello"` idiom (sometimes said to be JavaScript's version of the C# "null coalescing operator") acts to test `a` and if it has no value (or only an undesired falsy value), provides a backup default value (`"hello"`).
+这种`a = a || "hello"`惯用法（有时被说成C#“null合并操作符”的JavaScript版本）对`a`进行测试，如果它没有值（或仅仅是一个不期望的falsy值），就提供一个后备的默认值（`"hello"`）。
 
-**Be careful**, though!
+但是 **要小心！**
 
 ```js
 foo( "That's it!", "" ); // "That's it! world" <-- Oops!
 ```
 
-See the problem? `""` as the second argument is a falsy value (see `ToBoolean` earlier in this chapter), so the `b = b || "world"` test fails, and the `"world"` default value is substituted, even though the intent probably was to have the explicitly passed `""` be the value assigned to `b`.
+看到问题了吗？作为第二个参数的`""`是一个falsy值（参见本章早先的`ToBoolean`），所以`b = b || "world"`测试失败，而默认值`"world"`被替换上来，即便本来的意图可能是想让明确传入的`""`作为赋给`b`的值。
 
-This `||` idiom is extremely common, and quite helpful, but you have to use it only in cases where *all falsy values* should be skipped. Otherwise, you'll need to be more explicit in your test, and probably use a `? :` ternary instead.
+这种`||`惯用法极其常见，而且十分有用，但是你不得不只在 *所有的falsy值* 应当被跳过时使用它。不然，你就需要在你的测试中更加具体，而且可能应该使用一个`? :`三元操作符。
 
-This *default value assignment* idiom is so common (and useful!) that even those who publicly and vehemently decry JavaScript coercion often use it in their own code!
+这种默认值赋值惯用法是如此常见（和有用！），以至于那些公开激烈诽谤JavaScript强制转换的人都经常在它们的代码中使用！
 
-What about `&&`?
+那么`&&`呢？
 
-There's another idiom that is quite a bit less commonly authored manually, but which is used by JS minifiers frequently. The `&&` operator "selects" the second operand if and only if the first operand tests as truthy, and this usage is sometimes called the "guard operator" (also see "Short Circuited" in Chapter 5) -- the first expression test "guards" the second expression:
+有另一种在手动编写中不那么常见，而在JS压缩器中频繁使用的惯用法。`&&`操作符会“选择”第二个操作数，当且仅当第一个操作数测试为truthy，这种用法有时被称为“守护操作符”（参见第五章的“短接”） —— 第一个表达式的测试“守护”着第二个表达式：
 
 ```js
 function foo() {
@@ -1318,19 +1243,19 @@ var a = 42;
 a && foo(); // 42
 ```
 
-`foo()` gets called only because `a` tests as truthy. If that test failed, this `a && foo()` expression statement would just silently stop -- this is known as "short circuiting" -- and never call `foo()`.
+`foo()`仅在`a`测试为truthy时会被调用。如果这个测试失败，这个`a && foo()`表达式语句将会无声地停止 —— 这被称为“短接” —— 而且永远不会调用`foo()`。
 
-Again, it's not nearly as common for people to author such things. Usually, they'd do `if (a) { foo(); }` instead. But JS minifiers choose `a && foo()` because it's much shorter. So, now, if you ever have to decipher such code, you'll know what it's doing and why.
+重申一次，几乎很少有人手动编写这样的东西。通常，他们会写`if (a) { foo(); }`。但是JS压缩器选择`a && foo()`是因为它短的多。所以，现在，如果你不得不解读这样的代码，你就知道它是在做什么以及为什么了。
 
-OK, so `||` and `&&` have some neat tricks up their sleeve, as long as you're willing to allow the *implicit* coercion into the mix.
+好了，那么`||`和`&&`在它们的功能上有些不错的技巧，只要你乐意让 *隐含的* 强制转换掺和进来。
 
-**Note:** Both the `a = b || "something"` and `a && b()` idioms rely on short circuiting behavior, which we cover in more detail in Chapter 5.
+**注意：** `a = b || "something"`和`a && b()`两种惯用法都依赖于短接行为，我们将在第五章中讲述它的细节。
 
-The fact that these operators don't actually result in `true` and `false` is possibly messing with your head a little bit by now. You're probably wondering how all your `if` statements and `for` loops have been working, if they've included compound logical expressions like `a && (b || c)`.
+现在，这些操作符实际上不会得出`true`和`false`的事实可能使你的头脑有点儿混乱。你可能想知道，如果你的`if`语句和`for`循环包含`a && (b || c)`这样的复合的逻辑表达式，它们到底都是怎么工作的。
 
-Don't worry! The sky is not falling. Your code is (probably) just fine. It's just that you probably never realized before that there was an *implicit* coercion to `boolean` going on **after** the compound expression was evaluated.
+别担心！天没塌下来。你的代码（可能）没有问题。你只是可能从来没有理解在这个符合表达式被求值 **之后**，有一个向`boolean` *隐含的* 强制转换发生了。
 
-Consider:
+考虑这段代码：
 
 ```js
 var a = 42;
@@ -1342,11 +1267,11 @@ if (a && (b || c)) {
 }
 ```
 
-This code still works the way you always thought it did, except for one subtle extra detail. The `a && (b || c)` expression *actually* results in `"foo"`, not `true`. So, the `if` statement *then* forces the `"foo"` value to coerce to a `boolean`, which of course will be `true`.
+这段代码将会像你总是认为的那样工作，除了一个额外的微妙细节。`a && (b || c)`的结果 *实际上* 是`"foo"`，不是`true`。所以，这之后`if`语句强制值`"foo"`转换为一个`boolean`，这理所当然地将是`true`。
 
-See? No reason to panic. Your code is probably still safe. But now you know more about how it does what it does.
+看到了？没有理由惊慌。你的代码可能依然是安全的。但是现在关于它在做什么和如何做，你知道了更多。
 
-And now you also realize that such code is using *implicit* coercion. If you're in the "avoid (implicit) coercion camp" still, you're going to need to go back and make all of those tests *explicit*:
+而且现在你理解了这样的代码使用 *隐含的* 强制转换。如果你依然属于“避开（隐含）强制转换阵营”，那么你就需要退回去并使所有这些测试 *明确*：
 
 ```js
 if (!!a && (!!b || !!c)) {
@@ -1354,15 +1279,21 @@ if (!!a && (!!b || !!c)) {
 }
 ```
 
-Good luck with that! ... Sorry, just teasing.
+祝你好运！...对不起，只是逗个乐儿。
 
 ### Symbol Coercion
 
 Up to this point, there's been almost no observable outcome difference between *explicit* and *implicit* coercion -- only the readability of code has been at stake.
 
+在此为止，在 *明确的* 和 *隐含的* 强制转换之间几乎没有可以观察到的结果上的不同 —— 只有代码的可读性至关重要。
+
 But ES6 Symbols introduce a gotcha into the coercion system that we need to discuss briefly. For reasons that go well beyond the scope of what we'll discuss in this book, *explicit* coercion of a `symbol` to a `string` is allowed, but *implicit* coercion of the same is disallowed and throws an error.
 
+但是ES6的Symbol在强制转换系统中引入了一个我们需要简单讨论的坑。由于一个明显超出了我们将在本书中讨论的范围的原因，从一个`symbol`到一个`string`的 *明确* 强制转换是允许的，但是相同的 *隐含* 强制转换时不被允许的，而且会抛出一个错误。
+
 Consider:
+
+考虑如下代码：
 
 ```js
 var s1 = Symbol( "cool" );
@@ -1374,41 +1305,73 @@ s2 + "";						// TypeError
 
 `symbol` values cannot coerce to `number` at all (throws an error either way), but strangely they can both *explicitly* and *implicitly* coerce to `boolean` (always `true`).
 
+`symbol`值根本不能强制转换为`number`（不论哪种方式都抛出错误），但奇怪的是它们既可以 *明确地* 也可以 *隐含地* 强制转换为`boolean`（总是`true`）。
+
 Consistency is always easier to learn, and exceptions are never fun to deal with, but we just need to be careful around the new ES6 `symbol` values and how we coerce them.
 
+一致性总是容易学习的，而对付例外从来就不有趣，但是我们只需要在ES6`symbol`值和我们如何强制转换它们的问题上多加小心。
+
 The good news: it's probably going to be exceedingly rare for you to need to coerce a `symbol` value. The way they're typically used (see Chapter 3) will probably not call for coercion on a normal basis.
+
+好消息：你需要强制转换一个`symbol`值的情况可能极其少见。它们典型的被使用的方式可能不会用到强制转换。
 
 ## Loose Equals vs. Strict Equals
 
 Loose equals is the `==` operator, and strict equals is the `===` operator. Both operators are used for comparing two values for "equality," but the "loose" vs. "strict" indicates a **very important** difference in behavior between the two, specifically in how they decide "equality."
 
+宽松等价是`==`操作符，而严格等价是`===`操作符。两个操作符都被用于比较两个值的“等价性”，但是“宽松”和“严格”暗示着它们行为之间的一个 **非常重要** 的不同，特别是在它们如何决定“等价性”上。
+
 A very common misconception about these two operators is: "`==` checks values for equality and `===` checks both values and types for equality." While that sounds nice and reasonable, it's inaccurate. Countless well-respected JavaScript books and blogs have said exactly that, but unfortunately they're all *wrong*.
 
+关于这两个操作符的一个非常常见的误解是：“`==`检查值得等价性，而`===`检查值和类型的等价性。”虽然这听起来很好很合理，但是这不准确。无数知名的JavaScript书籍和文章都是这么说的，但不幸的是它们都 *错了*。
+
 The correct description is: "`==` allows coercion in the equality comparison and `===` disallows coercion."
+
+正确的描述是：“`==`允许在等价性比较中进行强制转换，而`===`不允许强制转换”。
 
 ### Equality Performance
 
 Stop and think about the difference between the first (inaccurate) explanation and this second (accurate) one.
 
+停下来思考一下第一种（不正确的）解释和这第二种（正确的）解释的不同。
+
 In the first explanation, it seems obvious that `===` is *doing more work* than `==`, because it has to *also* check the type. In the second explanation, `==` is the one *doing more work* because it has to follow through the steps of coercion if the types are different.
+
+在第一种解释中，看起来`===`明显的要比`==`*做更多工作*，因为它还必须检查类型。在第二种解释中，`==`是要 *做更多工作* 的，因为它不得不在类型不同时走过强制转换的步骤。
 
 Don't fall into the trap, as many have, of thinking this has anything to do with performance, though, as if `==` is going to be slower than `===` in any relevant way. While it's measurable that coercion does take *a little bit* of processing time, it's mere microseconds (yes, that's millionths of a second!).
 
+不要像许多人那样落入陷阱中，认为这会与性能有任何关系，虽然在这个问题上`==`好像要比`===`慢一些。强制转换确实要花费一点点处理时间，但也仅仅是几微秒（是的，1微秒就是一秒的百万分之一！）。
+
 If you're comparing two values of the same types, `==` and `===` use the identical algorithm, and so other than minor differences in engine implementation, they should do the same work.
+
+如果你比较同类型的两个值，`==`和`==`使用的是相同的算法，所以处理的在引擎的实现上会有一些微笑的区别，它们做的应当是相同的工作。
 
 If you're comparing two values of different types, the performance isn't the important factor. What you should be asking yourself is: when comparing these two values, do I want coercion or not?
 
+如果你比较两个不同类型的值，性能也不是重要因素。你应当问自己的是：当比较这两个值时，我想要进行强制转换吗？
+
 If you want coercion, use `==` loose equality, but if you don't want coercion, use `===` strict equality.
 
+如果你想要进行强制转换，使用`==`宽松等价，但如果你不想进行强制转换，就使用`===`严格等价。
+
 **Note:** The implication here then is that both `==` and `===` check the types of their operands. The difference is in how they respond if the types don't match.
+
+**注意：** 这里暗示`==`和`===`都会检查它们的操作数的类型。不同之处在于它们在类型不同时如何反应。
 
 ### Abstract Equality
 
 The `==` operator's behavior is defined as "The Abstract Equality Comparison Algorithm" in section 11.9.3 of the ES5 spec. What's listed there is a comprehensive but simple algorithm that explicitly states every possible combination of types, and how the coercions (if necessary) should happen for each combination.
 
+在ES5语言规范的11.9.3部分中，`==`操作符的行为被定义为“抽象等价性比较算法”。那里列出了一个详尽但简单的算法，它明确地指出了类型的每一种可能的组合，与对于每一种组合强制转化应当如何发生（如果有必要的话）。
+
 **Warning:** When (*implicit*) coercion is maligned as being too complicated and too flawed to be a *useful good part*, it is these rules of "abstract equality" that are being condemned. Generally, they are said to be too complex and too unintuitive for developers to practically learn and use, and that they are prone more to causing bugs in JS programs than to enabling greater code readability. I believe this is a flawed premise -- that you readers are competent developers who write (and read and understand!) algorithms (aka code) all day long. So, what follows is a plain exposition of the "abstract equality" in simple terms. But I implore you to also read the ES5 spec section 11.9.3. I think you'll be surprised at just how reasonable it is.
 
+**警告：** 当（*隐含的*）强制转换被中伤为太过复杂和缺陷过多而不能成为 *有用的，好的部分* 时，遭到谴责的正是这些“抽象等价”规则。一般上，它们被认为对于开发者来说过于复杂和不直观而不能实际学习和应用，而且在JS程序中，和改善代码的可读性比起来，它倾向于导致更多的bug。我相信这是一种有缺陷的预断 —— 读者都是整天都在写（而且读，理解）算法（也就是代码）的能干的开发者。所以，接下来的是用简单的词语来直白地解读“抽象等价性”。但我恳请你也去读一下ES5规范的11.9.3部分。我想你将会对它是多么合理而感到震惊。
+
 Basically, the first clause (11.9.3.1) says, if the two values being compared are of the same type, they are simply and naturally compared via Identity as you'd expect. For example, `42` is only equal to `42`, and `"abc"` is only equal to `"abc"`.
+
+基本上，它的第一句话是在说，如果两个被比较的值是同一类型，
 
 Some minor exceptions to normal expectation to be aware of:
 
