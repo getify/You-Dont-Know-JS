@@ -1345,7 +1345,7 @@ Don't fall into the trap, as many have, of thinking this has anything to do with
 
 If you're comparing two values of the same types, `==` and `===` use the identical algorithm, and so other than minor differences in engine implementation, they should do the same work.
 
-如果你比较同类型的两个值，`==`和`==`使用的是相同的算法，所以处理的在引擎的实现上会有一些微笑的区别，它们做的应当是相同的工作。
+如果你比较同类型的两个值，`==`和`==`使用的是相同的算法，所以处理的在引擎的实现上会有一些微小的区别，它们做的应当是相同的工作。
 
 If you're comparing two values of different types, the performance isn't the important factor. What you should be asking yourself is: when comparing these two values, do I want coercion or not?
 
@@ -1371,24 +1371,38 @@ The `==` operator's behavior is defined as "The Abstract Equality Comparison Alg
 
 Basically, the first clause (11.9.3.1) says, if the two values being compared are of the same type, they are simply and naturally compared via Identity as you'd expect. For example, `42` is only equal to `42`, and `"abc"` is only equal to `"abc"`.
 
-基本上，它的第一句话是在说，如果两个被比较的值是同一类型，
+基本上，它的第一个条款（11.9.3.1）是在说，如果两个被比较的值是同一类型，它们就像你期望的那样通过相同性简单自然地比较。比如，`42`只和`42`相等，而`"abc"`只和`"abc"`相等。
 
 Some minor exceptions to normal expectation to be aware of:
 
+在一般期望的结果中，有一些例外需要小心：
+
 * `NaN` is never equal to itself (see Chapter 2)
+* `NaN`永远不等于它自己（见第二章）
 * `+0` and `-0` are equal to each other (see Chapter 2)
+* `+0`和`-0`是相等的（见第二章）
 
 The final provision in clause 11.9.3.1 is for `==` loose equality comparison with `object`s (including `function`s and `array`s). Two such values are only *equal* if they are both references to *the exact same value*. No coercion occurs here.
 
+条款11.9.3.1的最后一个规定是关于`object`（包括`function`和`array`）的`==`宽松相等性比较。这样的值仅在它们引用 *完全相同* 的值时 *相等*。这里没有强制转换发生。
+
 **Note:** The `===` strict equality comparison is defined identically to 11.9.3.1, including the provision about two `object` values. It's a very little known fact that **`==` and `===` behave identically** in the case where two `object`s are being compared!
+
+**注意：** `===`严格等价比较与11.9.3.1的定义一模一样，包括关于两个`object`的值的规定。很少有人知道，在两个`object`被比较的情况下，**`==`和`===`的行为相同**！
 
 The rest of the algorithm in 11.9.3 specifies that if you use `==` loose equality to compare two values of different types, one or both of the values will need to be *implicitly* coerced. This coercion happens so that both values eventually end up as the same type, which can then directly be compared for equality using simple value Identity.
 
+11.9.3算法中的剩余部分指出，如果你使用`==`款所等价来比较两个不同类型的值，它们两者或其中之一将需要被 *隐含地* 强制转换。由于这个强制转换，两个值最终归于同一类型，可以使用简单的值的等价性来直接比较它们的等价性。
+
 **Note:** The `!=` loose not-equality operation is defined exactly as you'd expect, in that it's literally the `==` operation comparison performed in its entirety, then the negation of the result. The same goes for the `!==` strict not-equality operation.
+
+**注意：** `!=`宽松不等价操作是如你预料的那样定义的，它差不多就是`==`比较操作完整实施，之后对结果取反。这对于`!==`严格不等价操作也是一样的。
 
 #### Comparing: `string`s to `number`s
 
 To illustrate `==` coercion, let's first build off the `string` and `number` examples earlier in this chapter:
+
+为了展示`==`强制转换，首先让我们建立本章中早先的`string`和`number`的例子：
 
 ```js
 var a = 42;
@@ -1400,20 +1414,36 @@ a == b;		// true
 
 As we'd expect, `a === b` fails, because no coercion is allowed, and indeed the `42` and `"42"` values are different.
 
+我们所预料的，`a === b`失败了，因为不允许强制转换，而且值`42`和`"42"`确实是不同的。
+
 However, the second comparison `a == b` uses loose equality, which means that if the types happen to be different, the comparison algorithm will perform *implicit* coercion on one or both values.
+
+然而，第二个比较`a == b`使用了宽松等价，这意味着如果类型偶然不同，这个比较算法将会对两个或其中一个值实施 *隐含的* 强制转换。
 
 But exactly what kind of coercion happens here? Does the `a` value of `42` become a `string`, or does the `b` value of `"42"` become a `number`?
 
+那么这里发生的究竟是那种强制转换呢？是`a`的值变成了一个`string`，还是`b`的值`"42"`变成了一个`number`。
+
 In the ES5 spec, clauses 11.9.3.4-5 say:
 
+在ES5语言规范中，条款11.9.3.4-5说：
+
 > 4. If Type(x) is Number and Type(y) is String,
+> 4. 如果Type(x)是Number而Type(y)是String,
 >    return the result of the comparison x == ToNumber(y).
+>    返回比较x == ToNumber(y)的结果。
 > 5. If Type(x) is String and Type(y) is Number,
+> 5. 如果Type(x)是String而Type(y)是Number,
 >    return the result of the comparison ToNumber(x) == y.
+>    返回比较ToNumber(x) == y的结果。
 
 **Warning:** The spec uses `Number` and `String` as the formal names for the types, while this book prefers `number` and `string` for the primitive types. Do not let the capitalization of `Number` in the spec confuse you for the `Number()` native function. For our purposes, the capitalization of the type name is irrelevant -- they have basically the same meaning.
 
+**警告：** 语言规范中使用`Number`和`String`作为类型的正式名称，虽然这本书中偏好使用`number`和`string`指代基本类型。别让语言规范中首字母大写的`Number`与`Number()`原生函数把你给搞糊涂了。对于我们的目的来说，类型名称的首字母大写是无关紧要的 —— 它们基本上是同一个意思。
+
 Clearly, the spec says the `"42"` value is coerced to a `number` for the comparison. The *how* of that coercion has already been covered earlier, specifically with the `ToNumber` abstract operation. In this case, it's quite obvious then that the resulting two `42` values are equal.
+
+显然，语言规范说为了比较，将值`"42"`强制转换为一个`number`。这个强制转换如何进行已经在前面将结过了，明确地说就是通过`ToNumber`抽象操作。在这种情况下十分明显，两个值`42`是相等的。
 
 #### Comparing: anything to `boolean`
 
