@@ -1283,15 +1283,9 @@ if (!!a && (!!b || !!c)) {
 
 ### Symbol Coercion
 
-Up to this point, there's been almost no observable outcome difference between *explicit* and *implicit* coercion -- only the readability of code has been at stake.
-
 在此为止，在 *明确的* 和 *隐含的* 强制转换之间几乎没有可以观察到的结果上的不同 —— 只有代码的可读性至关重要。
 
-But ES6 Symbols introduce a gotcha into the coercion system that we need to discuss briefly. For reasons that go well beyond the scope of what we'll discuss in this book, *explicit* coercion of a `symbol` to a `string` is allowed, but *implicit* coercion of the same is disallowed and throws an error.
-
 但是ES6的Symbol在强制转换系统中引入了一个我们需要简单讨论的坑。由于一个明显超出了我们将在本书中讨论的范围的原因，从一个`symbol`到一个`string`的 *明确* 强制转换是允许的，但是相同的 *隐含* 强制转换时不被允许的，而且会抛出一个错误。
-
-Consider:
 
 考虑如下代码：
 
@@ -1303,104 +1297,58 @@ var s2 = Symbol( "not cool" );
 s2 + "";						// TypeError
 ```
 
-`symbol` values cannot coerce to `number` at all (throws an error either way), but strangely they can both *explicitly* and *implicitly* coerce to `boolean` (always `true`).
-
 `symbol`值根本不能强制转换为`number`（不论哪种方式都抛出错误），但奇怪的是它们既可以 *明确地* 也可以 *隐含地* 强制转换为`boolean`（总是`true`）。
 
-Consistency is always easier to learn, and exceptions are never fun to deal with, but we just need to be careful around the new ES6 `symbol` values and how we coerce them.
-
 一致性总是容易学习的，而对付例外从来就不有趣，但是我们只需要在ES6`symbol`值和我们如何强制转换它们的问题上多加小心。
-
-The good news: it's probably going to be exceedingly rare for you to need to coerce a `symbol` value. The way they're typically used (see Chapter 3) will probably not call for coercion on a normal basis.
 
 好消息：你需要强制转换一个`symbol`值的情况可能极其少见。它们典型的被使用的方式可能不会用到强制转换。
 
 ## Loose Equals vs. Strict Equals
 
-Loose equals is the `==` operator, and strict equals is the `===` operator. Both operators are used for comparing two values for "equality," but the "loose" vs. "strict" indicates a **very important** difference in behavior between the two, specifically in how they decide "equality."
-
 宽松等价是`==`操作符，而严格等价是`===`操作符。两个操作符都被用于比较两个值的“等价性”，但是“宽松”和“严格”暗示着它们行为之间的一个 **非常重要** 的不同，特别是在它们如何决定“等价性”上。
 
-A very common misconception about these two operators is: "`==` checks values for equality and `===` checks both values and types for equality." While that sounds nice and reasonable, it's inaccurate. Countless well-respected JavaScript books and blogs have said exactly that, but unfortunately they're all *wrong*.
-
 关于这两个操作符的一个非常常见的误解是：“`==`检查值得等价性，而`===`检查值和类型的等价性。”虽然这听起来很好很合理，但是这不准确。无数知名的JavaScript书籍和文章都是这么说的，但不幸的是它们都 *错了*。
-
-The correct description is: "`==` allows coercion in the equality comparison and `===` disallows coercion."
 
 正确的描述是：“`==`允许在等价性比较中进行强制转换，而`===`不允许强制转换”。
 
 ### Equality Performance
 
-Stop and think about the difference between the first (inaccurate) explanation and this second (accurate) one.
-
 停下来思考一下第一种（不正确的）解释和这第二种（正确的）解释的不同。
-
-In the first explanation, it seems obvious that `===` is *doing more work* than `==`, because it has to *also* check the type. In the second explanation, `==` is the one *doing more work* because it has to follow through the steps of coercion if the types are different.
 
 在第一种解释中，看起来`===`明显的要比`==`*做更多工作*，因为它还必须检查类型。在第二种解释中，`==`是要 *做更多工作* 的，因为它不得不在类型不同时走过强制转换的步骤。
 
-Don't fall into the trap, as many have, of thinking this has anything to do with performance, though, as if `==` is going to be slower than `===` in any relevant way. While it's measurable that coercion does take *a little bit* of processing time, it's mere microseconds (yes, that's millionths of a second!).
-
 不要像许多人那样落入陷阱中，认为这会与性能有任何关系，虽然在这个问题上`==`好像要比`===`慢一些。强制转换确实要花费一点点处理时间，但也仅仅是几微秒（是的，1微秒就是一秒的百万分之一！）。
-
-If you're comparing two values of the same types, `==` and `===` use the identical algorithm, and so other than minor differences in engine implementation, they should do the same work.
 
 如果你比较同类型的两个值，`==`和`==`使用的是相同的算法，所以处理的在引擎的实现上会有一些微小的区别，它们做的应当是相同的工作。
 
-If you're comparing two values of different types, the performance isn't the important factor. What you should be asking yourself is: when comparing these two values, do I want coercion or not?
-
 如果你比较两个不同类型的值，性能也不是重要因素。你应当问自己的是：当比较这两个值时，我想要进行强制转换吗？
 
-If you want coercion, use `==` loose equality, but if you don't want coercion, use `===` strict equality.
-
 如果你想要进行强制转换，使用`==`宽松等价，但如果你不想进行强制转换，就使用`===`严格等价。
-
-**Note:** The implication here then is that both `==` and `===` check the types of their operands. The difference is in how they respond if the types don't match.
 
 **注意：** 这里暗示`==`和`===`都会检查它们的操作数的类型。不同之处在于它们在类型不同时如何反应。
 
 ### Abstract Equality
 
-The `==` operator's behavior is defined as "The Abstract Equality Comparison Algorithm" in section 11.9.3 of the ES5 spec. What's listed there is a comprehensive but simple algorithm that explicitly states every possible combination of types, and how the coercions (if necessary) should happen for each combination.
-
 在ES5语言规范的11.9.3部分中，`==`操作符的行为被定义为“抽象等价性比较算法”。那里列出了一个详尽但简单的算法，它明确地指出了类型的每一种可能的组合，与对于每一种组合强制转化应当如何发生（如果有必要的话）。
-
-**Warning:** When (*implicit*) coercion is maligned as being too complicated and too flawed to be a *useful good part*, it is these rules of "abstract equality" that are being condemned. Generally, they are said to be too complex and too unintuitive for developers to practically learn and use, and that they are prone more to causing bugs in JS programs than to enabling greater code readability. I believe this is a flawed premise -- that you readers are competent developers who write (and read and understand!) algorithms (aka code) all day long. So, what follows is a plain exposition of the "abstract equality" in simple terms. But I implore you to also read the ES5 spec section 11.9.3. I think you'll be surprised at just how reasonable it is.
 
 **警告：** 当（*隐含的*）强制转换被中伤为太过复杂和缺陷过多而不能成为 *有用的，好的部分* 时，遭到谴责的正是这些“抽象等价”规则。一般上，它们被认为对于开发者来说过于复杂和不直观而不能实际学习和应用，而且在JS程序中，和改善代码的可读性比起来，它倾向于导致更多的bug。我相信这是一种有缺陷的预断 —— 读者都是整天都在写（而且读，理解）算法（也就是代码）的能干的开发者。所以，接下来的是用简单的词语来直白地解读“抽象等价性”。但我恳请你也去读一下ES5规范的11.9.3部分。我想你将会对它是多么合理而感到震惊。
 
-Basically, the first clause (11.9.3.1) says, if the two values being compared are of the same type, they are simply and naturally compared via Identity as you'd expect. For example, `42` is only equal to `42`, and `"abc"` is only equal to `"abc"`.
-
 基本上，它的第一个条款（11.9.3.1）是在说，如果两个被比较的值是同一类型，它们就像你期望的那样通过相同性简单自然地比较。比如，`42`只和`42`相等，而`"abc"`只和`"abc"`相等。
-
-Some minor exceptions to normal expectation to be aware of:
 
 在一般期望的结果中，有一些例外需要小心：
 
-* `NaN` is never equal to itself (see Chapter 2)
 * `NaN`永远不等于它自己（见第二章）
-* `+0` and `-0` are equal to each other (see Chapter 2)
 * `+0`和`-0`是相等的（见第二章）
-
-The final provision in clause 11.9.3.1 is for `==` loose equality comparison with `object`s (including `function`s and `array`s). Two such values are only *equal* if they are both references to *the exact same value*. No coercion occurs here.
 
 条款11.9.3.1的最后一个规定是关于`object`（包括`function`和`array`）的`==`宽松相等性比较。这样的值仅在它们引用 *完全相同* 的值时 *相等*。这里没有强制转换发生。
 
-**Note:** The `===` strict equality comparison is defined identically to 11.9.3.1, including the provision about two `object` values. It's a very little known fact that **`==` and `===` behave identically** in the case where two `object`s are being compared!
-
 **注意：** `===`严格等价比较与11.9.3.1的定义一模一样，包括关于两个`object`的值的规定。很少有人知道，在两个`object`被比较的情况下，**`==`和`===`的行为相同**！
 
-The rest of the algorithm in 11.9.3 specifies that if you use `==` loose equality to compare two values of different types, one or both of the values will need to be *implicitly* coerced. This coercion happens so that both values eventually end up as the same type, which can then directly be compared for equality using simple value Identity.
-
 11.9.3算法中的剩余部分指出，如果你使用`==`款所等价来比较两个不同类型的值，它们两者或其中之一将需要被 *隐含地* 强制转换。由于这个强制转换，两个值最终归于同一类型，可以使用简单的值的等价性来直接比较它们的等价性。
-
-**Note:** The `!=` loose not-equality operation is defined exactly as you'd expect, in that it's literally the `==` operation comparison performed in its entirety, then the negation of the result. The same goes for the `!==` strict not-equality operation.
 
 **注意：** `!=`宽松不等价操作是如你预料的那样定义的，它差不多就是`==`比较操作完整实施，之后对结果取反。这对于`!==`严格不等价操作也是一样的。
 
 #### Comparing: `string`s to `number`s
-
-To illustrate `==` coercion, let's first build off the `string` and `number` examples earlier in this chapter:
 
 为了展示`==`强制转换，首先让我们建立本章中早先的`string`和`number`的例子：
 
@@ -1412,44 +1360,28 @@ a === b;	// false
 a == b;		// true
 ```
 
-As we'd expect, `a === b` fails, because no coercion is allowed, and indeed the `42` and `"42"` values are different.
-
 我们所预料的，`a === b`失败了，因为不允许强制转换，而且值`42`和`"42"`确实是不同的。
-
-However, the second comparison `a == b` uses loose equality, which means that if the types happen to be different, the comparison algorithm will perform *implicit* coercion on one or both values.
 
 然而，第二个比较`a == b`使用了宽松等价，这意味着如果类型偶然不同，这个比较算法将会对两个或其中一个值实施 *隐含的* 强制转换。
 
-But exactly what kind of coercion happens here? Does the `a` value of `42` become a `string`, or does the `b` value of `"42"` become a `number`?
-
 那么这里发生的究竟是那种强制转换呢？是`a`的值变成了一个`string`，还是`b`的值`"42"`变成了一个`number`。
-
-In the ES5 spec, clauses 11.9.3.4-5 say:
 
 在ES5语言规范中，条款11.9.3.4-5说：
 
-> 4. If Type(x) is Number and Type(y) is String,
 > 4. 如果Type(x)是Number而Type(y)是String,
->    return the result of the comparison x == ToNumber(y).
 >    返回比较x == ToNumber(y)的结果。
-> 5. If Type(x) is String and Type(y) is Number,
 > 5. 如果Type(x)是String而Type(y)是Number,
->    return the result of the comparison ToNumber(x) == y.
 >    返回比较ToNumber(x) == y的结果。
 
-**Warning:** The spec uses `Number` and `String` as the formal names for the types, while this book prefers `number` and `string` for the primitive types. Do not let the capitalization of `Number` in the spec confuse you for the `Number()` native function. For our purposes, the capitalization of the type name is irrelevant -- they have basically the same meaning.
-
 **警告：** 语言规范中使用`Number`和`String`作为类型的正式名称，虽然这本书中偏好使用`number`和`string`指代基本类型。别让语言规范中首字母大写的`Number`与`Number()`原生函数把你给搞糊涂了。对于我们的目的来说，类型名称的首字母大写是无关紧要的 —— 它们基本上是同一个意思。
-
-Clearly, the spec says the `"42"` value is coerced to a `number` for the comparison. The *how* of that coercion has already been covered earlier, specifically with the `ToNumber` abstract operation. In this case, it's quite obvious then that the resulting two `42` values are equal.
 
 显然，语言规范说为了比较，将值`"42"`强制转换为一个`number`。这个强制转换如何进行已经在前面将结过了，明确地说就是通过`ToNumber`抽象操作。在这种情况下十分明显，两个值`42`是相等的。
 
 #### Comparing: anything to `boolean`
 
-One of the biggest gotchas with the *implicit* coercion of `==` loose equality pops up when you try to compare a value directly to `true` or `false`.
+当你试着将一个值直接与`true`或`false`相比较时，你会遇到`==`宽松等价的 *隐含* 强制转换中最大的一个坑。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a = "42";
@@ -1458,18 +1390,18 @@ var b = true;
 a == b;	// false
 ```
 
-Wait, what happened here!? We know that `"42"` is a truthy value (see earlier in this chapter). So, how come it's not `==` loose equal to `true`?
+等一下，这里发生了什么！？我们知道`"42"`是一个truthy值（见本章早先的部分）。那么他和`true`怎么不是`==`宽松等价的？
 
-The reason is both simple and deceptively tricky. It's so easy to misunderstand, many JS developers never pay close enough attention to fully grasp it.
+其中的原因既简单又刁钻得使人迷惑。它是如此的容易让人误解，以至于许多JS开发者从来不会花费足够多的精力来完全掌握它。
 
-Let's again quote the spec, clauses 11.9.3.6-7:
+让我们再次引用语言规范，条款11.9.3.6-7
 
-> 6. If Type(x) is Boolean,
->    return the result of the comparison ToNumber(x) == y.
-> 7. If Type(y) is Boolean,
->    return the result of the comparison x == ToNumber(y).
+> 6. 如果Type(x)是Boolean，
+>    返回比较 ToNumber(x) == y 的结果。
+> 7. 如果Type(y)是Boolean，
+>    返回比较 x == ToNumber(y) 的结果。
 
-Let's break that down. First:
+我们来把它分解。首先：
 
 ```js
 var x = true;
@@ -1478,9 +1410,9 @@ var y = "42";
 x == y; // false
 ```
 
-The `Type(x)` is indeed `Boolean`, so it performs `ToNumber(x)`, which coerces `true` to `1`. Now, `1 == "42"` is evaluated. The types are still different, so (essentially recursively) we reconsult the algorithm, which just as above will coerce `"42"` to `42`, and `1 == 42` is clearly `false`.
+`Type(x)`确实是`Boolean`，所以它会实施`ToNumber(x)`，将`true`强制转换为`1`。现在，`1 == "42"`会被求值。这里面的类型依然不同，所以（实质上是递归地）我们再次向早先讲解过的算法求解，它将`"42"`强制转换为`42`，而`1 == 42`明显是`false`。
 
-Reverse it, and we still get the same outcome:
+反过来，我们任然得到相同的结果：
 
 ```js
 var x = "42";
@@ -1489,23 +1421,23 @@ var y = false;
 x == y; // false
 ```
 
-The `Type(y)` is `Boolean` this time, so `ToNumber(y)` yields `0`. `"42" == 0` recursively becomes `42 == 0`, which is of course `false`.
+这次`Type(y)`是`Boolean`，所以`ToNumber(y)`给出`0`。`"42" == 0`递归地变为`42 == 0`，这当然是`false`。
 
-In other words, **the value `"42"` is neither `== true` nor `== false`.** At first, that statement might seem crazy. How can a value be neither truthy nor falsy?
+换句话说，**值`"42"`既不`== true`也不`== false`**。猛地一看，这看起来像句疯话。一个值怎么可能既不是truthy也不是falsy呢？
 
-But that's the problem! You're asking the wrong question, entirely. It's not your fault, really. Your brain is tricking you.
+但这就是问题所在！你在问一个完全错误的问题。但这确实不是你的错，你的大脑在耍你。
 
-`"42"` is indeed truthy, but `"42" == true` **is not performing a boolean test/coercion** at all, no matter what your brain says. `"42"` *is not* being coerced to a `boolean` (`true`), but instead `true` is being coerced to a `1`, and then `"42"` is being coerced to `42`.
+`"42"`的确是truthy，但是`"42" == true`根本就 **不是在进行一个boolean测试/强制转换**，不管你的大脑怎么说，`"42"` *没有* 被强制转换为一个`boolean`（`true`），而是`true`被强制转换为一个`1`，而后`"42"`被强制转换为`42`。
 
-Whether we like it or not, `ToBoolean` is not even involved here, so the truthiness or falsiness of `"42"` is irrelevant to the `==` operation!
+不管我们喜不喜欢，`ToBoolean`甚至都没参与到这里，所以`"42"`的真假是与`==`操作无关的！
 
-What *is* relevant is to understand how the `==` comparison algorithm behaves with all the different type combinations. As it regards a `boolean` value on either side of the `==`, a `boolean` always coerces to a `number` *first*.
+而有关的是要理解`==`比较算法对所有不同类型组合如何动作。当`==`的任意一边是一个`boolean`值时，`boolean`总是首先被强制转换为一个`number`。
 
-If that seems strange to you, you're not alone. I personally would recommend to never, ever, under any circumstances, use `== true` or `== false`. Ever.
+如果这对你来讲很奇怪，那么你不是一个人。我个人建议永远，永远，不要在任何情况下，使用`== true`或`== false`。永远。
 
-But remember, I'm only talking about `==` here. `=== true` and `=== false` wouldn't allow the coercion, so they're safe from this hidden `ToNumber` coercion.
+但时要记住，我在此说的仅与`==`有关。`=== true`和`=== false`不允许强制转换，所以它们没有`ToNumber`强制转换，因而是安全的。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a = "42";
@@ -1536,18 +1468,18 @@ if (Boolean( a )) {
 }
 ```
 
-If you avoid ever using `== true` or `== false` (aka loose equality with `boolean`s) in your code, you'll never have to worry about this truthiness/falsiness mental gotcha.
+如果你在你的代码中一直避免使用`== true`或`== false`（也就是与`boolean`的宽松等价），你将永远不必担心这种真/假的思维陷阱。
 
 #### Comparing: `null`s to `undefined`s
 
-Another example of *implicit* coercion can be seen with `==` loose equality between `null` and `undefined` values. Yet again quoting the ES5 spec, clauses 11.9.3.2-3:
+另一个 *隐含* 强制转换的例子可以在`null`和`undefined`值之间的`==`宽松等价中看到。又再一次引述ES5语言规范，条款11.9.3.2-3：
 
-> 2. If x is null and y is undefined, return true.
-> 3. If x is undefined and y is null, return true.
+> 2. 如果x是null而y是undefined，返回true。
+> 3. 如果x是undefined而y是null，返回true。
 
-`null` and `undefined`, when compared with `==` loose equality, equate to (aka coerce to) each other (as well as themselves, obviously), and no other values in the entire language.
+当使用`==`宽松等价比较`null`和`undefined`，它们是互相等价（也就是互相强制转换）的，而且在整个语言中不会等价于其他值了。
 
-What this means is that `null` and `undefined` can be treated as indistinguishable for comparison purposes, if you use the `==` loose equality operator to allow their mutual *implicit* coercion.
+这意味着`null`和`undefined`对于比较的目的来说，如果你使用`==`宽松等价操作符来允许它们互相 *隐含地* 强制转换的话，它们可以被认为是不可区分的。
 
 ```js
 var a = null;
@@ -1565,9 +1497,9 @@ a == 0;		// false
 b == 0;		// false
 ```
 
-The coercion between `null` and `undefined` is safe and predictable, and no other values can give false positives in such a check. I recommend using this coercion to allow `null` and `undefined` to be indistinguishable and thus treated as the same value.
+`null`和`undefined`之间的强制转换时安全且可预见的，而且在这样的检查中没有其他的值会给出不成立的真值。我推荐使用这种强制转换来允许`null`和`undefined`是不可区分的，如此将它们作为相同的值对待。
 
-For example:
+比如：
 
 ```js
 var a = doSomething();
@@ -1577,9 +1509,9 @@ if (a == null) {
 }
 ```
 
-The `a == null` check will pass only if `doSomething()` returns either `null` or `undefined`, and will fail with any other value, even other falsy values like `0`, `false`, and `""`.
+`a == null`检查仅在`doSomething()`返回`null`或者`undefined`时才会通过，而在任何其他值的情况下将会失败，即便是`0`，`false`，和`""`这样的falsy值。
 
-The *explicit* form of the check, which disallows any such coercion, is (I think) unnecessarily much uglier (and perhaps a tiny bit less performant!):
+这个检查的 *明确* 形式 —— 不允许任何强制转换 —— （我认为）没有必要地难看太多了（而且性能可能有点儿不好！）：
 
 ```js
 var a = doSomething();
@@ -1589,20 +1521,20 @@ if (a === undefined || a === null) {
 }
 ```
 
-In my opinion, the form `a == null` is yet another example where *implicit* coercion improves code readability, but does so in a reliably safe way.
+在我看来，`a == null`的形式是以另一个 *隐含* 强制转换增进了代码可读性的例子，而且是以一种可靠安全的方式。
 
 #### Comparing: `object`s to non-`object`s
 
-If an `object`/`function`/`array` is compared to a simple scalar primitive (`string`, `number`, or `boolean`), the ES5 spec says in clauses 11.9.3.8-9:
+如果一个`object`/`function`/`array`被与一个简单基本标量进行比较，ES5语言规范在条款11.9.3.8-9中这样说道：
 
-> 8. If Type(x) is either String or Number and Type(y) is Object,
->    return the result of the comparison x == ToPrimitive(y).
-> 9. If Type(x) is Object and Type(y) is either String or Number,
->    return the result of the comparison ToPrimitive(x) == y.
+> 8. 如果Type(x)是一个String或者Number而Type(y)是一个Object，
+>    返回比较 x == ToPrimitive(y) 的结果。
+> 9. 如果Type(x)是一个Object而Type(y)是String或者Number，
+>    返回比较 ToPrimitive(x) == y 的结果。
 
-**Note:** You may notice that these clauses only mention `String` and `Number`, but not `Boolean`. That's because, as quoted earlier, clauses 11.9.3.6-7 take care of coercing any `Boolean` operand presented to a `Number` first.
+**注意：** 你可能注意到了，这些条款仅提到了`String`和`Number`，而没有`Boolean`。这是因为，正如我们早先引述的，条款11.9.3.6-7首先将任何出现的`Boolean`操作数强制转换为一个`Number`。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a = 42;
@@ -1613,9 +1545,15 @@ a == b;	// true
 
 The `[ 42 ]` value has its `ToPrimitive` abstract operation called (see the "Abstract Value Operations" section earlier), which results in the `"42"` value. From there, it's just `42 == "42"`, which as we've already covered becomes `42 == 42`, so `a` and `b` are found to be coercively equal.
 
+值`[ 42 ]`的`ToPrimitive`抽象操作被调用，结果为值`"42"`。这里它就变为`42 == "42"`，我们已经讲解过这将变为`42 == 42`，所以`a`和`b`被认为是强制转换地等价。
+
 **Tip:** All the quirks of the `ToPrimitive` abstract operation that we discussed earlier in this chapter (`toString()`, `valueOf()`) apply here as you'd expect. This can be quite useful if you have a complex data structure that you want to define a custom `valueOf()` method on, to provide a simple value for equality comparison purposes.
 
+**提示：** 我们在本章早先讨论过的`ToPrimitive`抽象操作的所以奇怪之处（`toString()`，`valueOf()`），都在这里如你期望的那样适用。如果你有一个复杂的数据结构，而且你想在它上面定义一个`valueOf()`方法来为等价比较提供一个简答值的话，这将十分有用。
+
 In Chapter 3, we covered "unboxing," where an `object` wrapper around a primitive value (like from `new String("abc")`, for instance) is unwrapped, and the underlying primitive value (`"abc"`) is returned. This behavior is related to the `ToPrimitive` coercion in the `==` algorithm:
+
+在第三章中，我们讲解了“拆箱”，就是一个基本类型值的`object`包装器（例如`new String("abc")`这样的形式）被展开，其底层的基本类型值（`"abc"`）被返回。这种行为与`==`算法中的`ToPrimitive`强制转换有关：
 
 ```js
 var a = "abc";
@@ -1627,7 +1565,11 @@ a == b;					// true
 
 `a == b` is `true` because `b` is coerced (aka "unboxed," unwrapped) via `ToPrimitive` to its underlying `"abc"` simple scalar primitive value, which is the same as the value in `a`.
 
+`a == b`为`true`是因为`b`通过`ToPrimitive`强制转换为它的底层简单基本标量值`"abc"`，它与`a`中的值是相同的。
+
 There are some values where this is not the case, though, because of other overriding rules in the `==` algorithm. Consider:
+
+然而由于`==`算法中的其他覆盖规则，有些值是例外。考虑如下代码：
 
 ```js
 var a = null;
@@ -1645,13 +1587,21 @@ e == f;					// false
 
 The `null` and `undefined` values cannot be boxed -- they have no object wrapper equivalent -- so `Object(null)` is just like `Object()` in that both just produce a normal object.
 
+值`null`和`undefined`不能被装箱 —— 它们没有等价的对象包装器 —— 所以`Object(null)`就像`Object()`一样，它们都仅仅产生一个普通对象。
+
 `NaN` can be boxed to its `Number` object wrapper equivalent, but when `==` causes an unboxing, the `NaN == NaN` comparison fails because `NaN` is never equal to itself (see Chapter 2).
+
+`NaN`可以被封箱到它等价的`Number`对象包装器中，当`==`导致拆箱时，比较`NaN == NaN`会失败，因为`NaN`永远不会它自己相等（见第二章）。
 
 ### Edge Cases
 
 Now that we've thoroughly examined how the *implicit* coercion of `==` loose equality works (in both sensible and surprising ways), let's try to call out the worst, craziest corner cases so we can see what we need to avoid to not get bitten with coercion bugs.
 
+现在我们已经彻底检视了`==`宽松等价的 *隐含* 强制转换是如何工作的，让我们召唤角落中最差劲儿的，最疯狂的情况，这样我们就能看到我们需要避免什么来防止被强制转换的bug咬到。
+
 First, let's examine how modifying the built-in native prototypes can produce crazy results:
+
+首先，让我们检视修改内建的原生prototype是如何产生疯狂的结果的：
 
 #### A Number By Any Other Value Would...
 
@@ -1665,7 +1615,11 @@ new Number( 2 ) == 3;	// true
 
 **Warning:** `2 == 3` would not have fallen into this trap, because neither `2` nor `3` would have invoked the built-in `Number.prototype.valueOf()` method because both are already primitive `number` values and can be compared directly. However, `new Number(2)` must go through the `ToPrimitive` coercion, and thus invoke `valueOf()`.
 
+**警告：** `2 == 3`不会调到这个陷阱中，这是由于`2`和`3`都不会调用内建的`Number.prototype.valueOf()`方法，因为它们已经是基本`number`值，可以直接比较。然而，`new Number(2)`必须通过`ToPrimitive`强制转换，因此调用`valueOf()`。
+
 Evil, huh? Of course it is. No one should ever do such a thing. The fact that you *can* do this is sometimes used as a criticism of coercion and `==`. But that's misdirected frustration. JavaScript is not *bad* because you can do such things, a developer is *bad* **if they do such things**. Don't fall into the "my programming language should protect me from myself" fallacy.
+
+邪恶吧？当然。任何人都不应当做这样的事情。你 *可以* 这么做，这个事实有时被当成批评强制转换和`==`的根据。但这是一个被误导的沮丧。
 
 Next, let's consider another tricky example, which takes the evil from the previous example to another level:
 
