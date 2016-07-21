@@ -1820,15 +1820,15 @@ Source: https://github.com/dorey/JavaScript-Equality-Table
 
 ## Abstract Relational Comparison
 
-While this part of *implicit* coercion often gets a lot less attention, it's important nonetheless to think about what happens with `a < b` comparisons (similar to how we just examined `a == b` in depth).
+虽然这部分的 *隐含* 强制转换经常不为人所注意，但无论如何考虑比较`a < b`是发生了什么是很重要的（和我们如何深入检视`a == b`类似）。
 
-The "Abstract Relational Comparison" algorithm in ES5 section 11.8.5 essentially divides itself into two parts: what to do if the comparison involves both `string` values (second half), or anything else (first half).
+在ES5语言规范的11.8.5部分的“抽象关系型比较”算法，实质上把自己分成了两个部分：如果比较涉及两个`string`值要做什么（后半部分），和除此之外的其他值要做什么（前半部分）。
 
-**Note:** The algorithm is only defined for `a < b`. So, `a > b` is handled as `b < a`.
+**注意：** 这个算法仅仅定义了`a < b`。所以，`a > b`作为`b < a`处理。
 
-The algorithm first calls `ToPrimitive` coercion on both values, and if the return result of either call is not a `string`, then both values are coerced to `number` values using the `ToNumber` operation rules, and compared numerically.
+这个算法首先在两个值上调用`ToPrimitive`强制转换，如果两个调用的返回值之一不是`string`，那么就使用`ToNumber`操作规则将这两个值强制转换为`number`值，并进行数字的比较。
 
-For example:
+举例来说：
 
 ```js
 var a = [ 42 ];
@@ -1838,9 +1838,9 @@ a < b;	// true
 b < a;	// false
 ```
 
-**Note:** Similar caveats for `-0` and `NaN` apply here as they did in the `==` algorithm discussed earlier.
+**注意：** 早先讨论的关于`-0`和`NaN`在`==`算法中的类似注意事项也适用于这里。
 
-However, if both values are `string`s for the `<` comparison, simple lexicographic (natural alphabetic) comparison on the characters is performed:
+然而，如果`<`比较的两个值都是`string`的话，就会在字符上进行简单的字典顺序（自然的字母顺序）比较：
 
 ```js
 var a = [ "42" ];
@@ -1849,9 +1849,9 @@ var b = [ "043" ];
 a < b;	// false
 ```
 
-`a` and `b` are *not* coerced to `number`s, because both of them end up as `string`s after the `ToPrimitive` coercion on the two `array`s. So, `"42"` is compared character by character to `"043"`, starting with the first characters `"4"` and `"0"`, respectively. Since `"0"` is lexicographically *less than* than `"4"`, the comparison returns `false`.
+`a`和`b`不会被强制转换为`number`，因为它们会在两个`array`的`ToPrimitive`强制转换后成为`string`。所以，`"42"`将会与`"043"`一个字符一个字符地进行比较，从第一个字符开始，分别是`"4"`和`"0"`。因为`"0"`在字典顺序上 *小于* `"4"`，所以这个比较返回`false`。
 
-The exact same behavior and reasoning goes for:
+完全相同的行为和推理也适用于：
 
 ```js
 var a = [ 4, 2 ];
@@ -1860,9 +1860,9 @@ var b = [ 0, 4, 3 ];
 a < b;	// false
 ```
 
-Here, `a` becomes `"4,2"` and `b` becomes `"0,4,3"`, and those lexicographically compare identically to the previous snippet.
+这里，`a`变成了`"4,2"`而`b`变成了`"0,4,3"`，那些字典顺序比较和前一个代码段一模一样。
 
-What about:
+那么这个怎么样：
 
 ```js
 var a = { b: 42 };
@@ -1871,9 +1871,9 @@ var b = { b: 43 };
 a < b;	// ??
 ```
 
-`a < b` is also `false`, because `a` becomes `[object Object]` and `b` becomes `[object Object]`, and so clearly `a` is not lexicographically less than `b`.
+`a < b`也是`false`，因为`a`变成了`[object Object]`而`b`变成了`[object Object]`，所以明显地`a`在字典顺序上不小于`b`。
 
-But strangely:
+但奇怪的是：
 
 ```js
 var a = { b: 42 };
@@ -1887,17 +1887,17 @@ a <= b;	// true
 a >= b;	// true
 ```
 
-Why is `a == b` not `true`? They're the same `string` value (`"[object Object]"`), so it seems they should be equal, right? Nope. Recall the previous discussion about how `==` works with `object` references.
+为什么`a == b`不是`true`？它们是相同的`string`值（`"[object Object]"`），所以看起来它们应当相等，对吧？不。回忆一下前面关于`==`如何与`object`引用进行工作的讨论。
 
-But then how are `a <= b` and `a >= b` resulting in `true`, if `a < b` **and** `a == b` **and** `a > b` are all `false`?
+那么为什么`a <= b`和`a >= b`的结果为`true`，如果`a < b`**和**`a == b`**和**`a > b`都是`false`？
 
-Because the spec says for `a <= b`, it will actually evaluate `b < a` first, and then negate that result. Since `b < a` is *also* `false`, the result of `a <= b` is `true`.
+因为语言规范说，对于`a <= b`，它实际上首先对`b < a`求值，然后反转那个结果。因为`b < a`*也是*`false`，所以`a <= b`的结果为`true`。
 
-That's probably awfully contrary to how you might have explained what `<=` does up to now, which would likely have been the literal: "less than *or* equal to." JS more accurately considers `<=` as "not greater than" (`!(a > b)`, which JS treats as `!(b < a)`). Moreover, `a >= b` is explained by first considering it as `b <= a`, and then applying the same reasoning.
+到目前为止你解释`<=`在做什么的方式可能是：“小于 *或* 等于”。而这可能完全相反，JS更准确地将`<=`考虑为“不大于”（`!(a > b)`，JS将它作为`(!b < a)`）。另外，`a >= b`被解释为它首先被考虑为`b <= a`，然后实施相同的推理。
 
-Unfortunately, there is no "strict relational comparison" as there is for equality. In other words, there's no way to prevent *implicit* coercion from occurring with relational comparisons like `a < b`, other than to ensure that `a` and `b` are of the same type explicitly before making the comparison.
+不幸的是，没有像等价那样的“严格的关系型比较”。换句话说，没有办法防止`a < b`这样的关系型比较发生 *隐含的* 强制转换，除非在进行比较之前就明确地确保`a`和`b`是同种类型。
 
-Use the same reasoning from our earlier `==` vs. `===` sanity check discussion. If coercion is helpful and reasonably safe, like in a `42 < "43"` comparison, **use it**. On the other hand, if you need to be safe about a relational comparison, *explicitly coerce* the values first, before using `<` (or its counterparts).
+使用与我们早先`==`与`===`合理性检查的讨论相同的推理方法。如果强制转换有帮助并且合理的安全，比如比较`42 < "43"`，**就是用它**。另一方面，如果你需要在关系型比较上获得安全性，那么在使用`<`（或`>`）之前，就首先 *明确地强制转换* 这些值。
 
 ```js
 var a = [ 42 ];
@@ -1909,12 +1909,12 @@ Number( a ) < Number( b );	// true -- number comparison!
 
 ## Review
 
-In this chapter, we turned our attention to how JavaScript type conversions happen, called **coercion**, which can be characterized as either *explicit* or *implicit*.
+在这一章中，我们将注意力转向了JavaScript类型转换如何发生，也叫 **强制转换**，按性质来说它要么是 *明确的* 要么是 *隐含的*。
 
-Coercion gets a bad rap, but it's actually quite useful in many cases. An important task for the responsible JS developer is to take the time to learn all the ins and outs of coercion to decide which parts will help improve their code, and which parts they really should avoid.
+强制转换的名声很坏，但它实际上在许多情况下很有帮助。对于负责任的JS开发者来说，一个重要的任务就是花时间去学习强制转换的里里外外，来决定那一部分将帮助他们改进代码，那一部分他们真的应该回避。
 
-*Explicit* coercion is code which is obvious that the intent is to convert a value from one type to another. The benefit is improvement in readability and maintainability of code by reducing confusion.
+*明确的* 强制转换时这样一种代码，它很明显地有意将一个值从一种类型转换到另一种类型。它的益处是通过减少困惑来增强了代码的可读性和可维护性。
 
-*Implicit* coercion is coercion that is "hidden" as a side-effect of some other operation, where it's not as obvious that the type conversion will occur. While it may seem that *implicit* coercion is the opposite of *explicit* and is thus bad (and indeed, many think so!), actually *implicit* coercion is also about improving the readability of code.
+*隐含的* 强制转换是作为一些其他操作的“隐藏的”副作用而存在的，将要发生的类型转换并不明显。虽然看起来 *隐含的* 强制转换是 *明确的* 反面，而且因此是不好的（确实，很多人这么认为！），但是实际上 *隐含的* 强制转换也是为了增强代码的可读性。
 
-Especially for *implicit*, coercion must be used responsibly and consciously. Know why you're writing the code you're writing, and how it works. Strive to write code that others will easily be able to learn from and understand as well.
+特别是对于 *隐含的*，强制转换必须被负责地，有意识地使用。懂得为什么你在写你正在写的代码，和它是如何工作的。同时也要努力编写其他人容易学习和理解的代码。
