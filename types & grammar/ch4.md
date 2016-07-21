@@ -1543,15 +1543,9 @@ var b = [ 42 ];
 a == b;	// true
 ```
 
-The `[ 42 ]` value has its `ToPrimitive` abstract operation called (see the "Abstract Value Operations" section earlier), which results in the `"42"` value. From there, it's just `42 == "42"`, which as we've already covered becomes `42 == 42`, so `a` and `b` are found to be coercively equal.
-
 值`[ 42 ]`的`ToPrimitive`抽象操作被调用，结果为值`"42"`。这里它就变为`42 == "42"`，我们已经讲解过这将变为`42 == 42`，所以`a`和`b`被认为是强制转换地等价。
 
-**Tip:** All the quirks of the `ToPrimitive` abstract operation that we discussed earlier in this chapter (`toString()`, `valueOf()`) apply here as you'd expect. This can be quite useful if you have a complex data structure that you want to define a custom `valueOf()` method on, to provide a simple value for equality comparison purposes.
-
 **提示：** 我们在本章早先讨论过的`ToPrimitive`抽象操作的所以奇怪之处（`toString()`，`valueOf()`），都在这里如你期望的那样适用。如果你有一个复杂的数据结构，而且你想在它上面定义一个`valueOf()`方法来为等价比较提供一个简答值的话，这将十分有用。
-
-In Chapter 3, we covered "unboxing," where an `object` wrapper around a primitive value (like from `new String("abc")`, for instance) is unwrapped, and the underlying primitive value (`"abc"`) is returned. This behavior is related to the `ToPrimitive` coercion in the `==` algorithm:
 
 在第三章中，我们讲解了“拆箱”，就是一个基本类型值的`object`包装器（例如`new String("abc")`这样的形式）被展开，其底层的基本类型值（`"abc"`）被返回。这种行为与`==`算法中的`ToPrimitive`强制转换有关：
 
@@ -1563,11 +1557,7 @@ a === b;				// false
 a == b;					// true
 ```
 
-`a == b` is `true` because `b` is coerced (aka "unboxed," unwrapped) via `ToPrimitive` to its underlying `"abc"` simple scalar primitive value, which is the same as the value in `a`.
-
 `a == b`为`true`是因为`b`通过`ToPrimitive`强制转换为它的底层简单基本标量值`"abc"`，它与`a`中的值是相同的。
-
-There are some values where this is not the case, though, because of other overriding rules in the `==` algorithm. Consider:
 
 然而由于`==`算法中的其他覆盖规则，有些值是例外。考虑如下代码：
 
@@ -1585,21 +1575,13 @@ var f = Object( e );	// same as `new Number( e )`
 e == f;					// false
 ```
 
-The `null` and `undefined` values cannot be boxed -- they have no object wrapper equivalent -- so `Object(null)` is just like `Object()` in that both just produce a normal object.
-
 值`null`和`undefined`不能被装箱 —— 它们没有等价的对象包装器 —— 所以`Object(null)`就像`Object()`一样，它们都仅仅产生一个普通对象。
-
-`NaN` can be boxed to its `Number` object wrapper equivalent, but when `==` causes an unboxing, the `NaN == NaN` comparison fails because `NaN` is never equal to itself (see Chapter 2).
 
 `NaN`可以被封箱到它等价的`Number`对象包装器中，当`==`导致拆箱时，比较`NaN == NaN`会失败，因为`NaN`永远不会它自己相等（见第二章）。
 
 ### Edge Cases
 
-Now that we've thoroughly examined how the *implicit* coercion of `==` loose equality works (in both sensible and surprising ways), let's try to call out the worst, craziest corner cases so we can see what we need to avoid to not get bitten with coercion bugs.
-
 现在我们已经彻底检视了`==`宽松等价的 *隐含* 强制转换是如何工作的，让我们召唤角落中最差劲儿的，最疯狂的情况，这样我们就能看到我们需要避免什么来防止被强制转换的bug咬到。
-
-First, let's examine how modifying the built-in native prototypes can produce crazy results:
 
 首先，让我们检视修改内建的原生prototype是如何产生疯狂的结果的：
 
@@ -1613,15 +1595,11 @@ Number.prototype.valueOf = function() {
 new Number( 2 ) == 3;	// true
 ```
 
-**Warning:** `2 == 3` would not have fallen into this trap, because neither `2` nor `3` would have invoked the built-in `Number.prototype.valueOf()` method because both are already primitive `number` values and can be compared directly. However, `new Number(2)` must go through the `ToPrimitive` coercion, and thus invoke `valueOf()`.
-
 **警告：** `2 == 3`不会调到这个陷阱中，这是由于`2`和`3`都不会调用内建的`Number.prototype.valueOf()`方法，因为它们已经是基本`number`值，可以直接比较。然而，`new Number(2)`必须通过`ToPrimitive`强制转换，因此调用`valueOf()`。
 
-Evil, huh? Of course it is. No one should ever do such a thing. The fact that you *can* do this is sometimes used as a criticism of coercion and `==`. But that's misdirected frustration. JavaScript is not *bad* because you can do such things, a developer is *bad* **if they do such things**. Don't fall into the "my programming language should protect me from myself" fallacy.
+邪恶吧？当然。任何人都不应当做这样的事情。你 *可以* 这么做，这个事实有时被当成批评强制转换和`==`的根据。但这种沮丧是被误导的。JavaScript不会因为你能做这样的事情而 *不好*，是 **做这样的事的开发者** *不好*。不要陷入“我的编程语言应当保护我不受我自己伤害”的谬论。
 
-邪恶吧？当然。任何人都不应当做这样的事情。你 *可以* 这么做，这个事实有时被当成批评强制转换和`==`的根据。但这是一个被误导的沮丧。
-
-Next, let's consider another tricky example, which takes the evil from the previous example to another level:
+接下来，让我们考虑另一个刁钻的例子，它将前一个例子的邪恶带到另一个水平：
 
 ```js
 if (a == 2 && a == 3) {
@@ -1629,9 +1607,9 @@ if (a == 2 && a == 3) {
 }
 ```
 
-You might think this would be impossible, because `a` could never be equal to both `2` and `3` *at the same time*. But "at the same time" is inaccurate, since the first expression `a == 2` happens strictly *before* `a == 3`.
+你可能认为这是不可能的，因为`a`绝不会 *同时* 等于`2`和`3`。但是“同时”是不准确的，因为第一个表达式`a == 2`严格地发生在`a == 3` *之前*。
 
-So, what if we make `a.valueOf()` have side effects each time it's called, such that the first time it returns `2` and the second time it's called it returns `3`? Pretty easy:
+那么，要是我们让`a.valueOf()`在每次被调用时拥有一种副作用，使它第一次被调用时返回`2`而第二次被调用时返回`3`呢？很简单：
 
 ```js
 var i = 2;
@@ -1647,13 +1625,13 @@ if (a == 2 && a == 3) {
 }
 ```
 
-Again, these are evil tricks. Don't do them. But also don't use them as complaints against coercion. Potential abuses of a mechanism are not sufficient evidence to condemn the mechanism. Just avoid these crazy tricks, and stick only with valid and proper usage of coercion.
+重申一次，这些都是邪恶的技巧。不要这么做。也不要用它们来抱怨强制转换。潜在地滥用一种机制并不是谴责这种机制的充分证据。避开这些疯狂的技巧，并坚持强制转换的合法与合理的用法就好了。
 
 #### False-y Comparisons
 
-The most common complaint against *implicit* coercion in `==` comparisons comes from how falsy values behave surprisingly when compared to each other.
+关于`==`比较中 *隐含* 强制转换的最常见的抱怨，来自于falsy值互相比较时它们如何的令人吃惊地动作。
 
-To illustrate, let's look at a list of the corner-cases around falsy value comparisons, to see which ones are reasonable and which are troublesome:
+为了展示，让我们看一个关于falsy值比较的极端例子的列表，来瞧瞧哪一个是合理的，哪一个是麻烦的：
 
 ```js
 "0" == null;			// false
@@ -1685,60 +1663,60 @@ false == {};			// false
 0 == {};				// false
 ```
 
-In this list of 24 comparisons, 17 of them are quite reasonable and predictable. For example, we know that `""` and `NaN` are not at all equatable values, and indeed they don't coerce to be loose equals, whereas `"0"` and `0` are reasonably equatable and *do* coerce as loose equals.
+在这24个比较的类表中，17个是十分合理和可预见的。比如，我们知道`""`和`"NaN"`是根本不可能相等的值，并且它们确实不会强制转换以成为宽松等价的，而`"0"`和`0`是合理等价的，而且确实强制转换为宽松等价。
 
-However, seven of the comparisons are marked with "UH OH!" because as false positives, they are much more likely gotchas that could trip you up. `""` and `0` are definitely distinctly different values, and it's rare you'd want to treat them as equatable, so their mutual coercion is troublesome. Note that there aren't any false negatives here.
+然而，这些比较中的7个被标上了“UN OH!”。作为误判的成立，它们更像是会将你陷进去的坑。`""`和`0`绝对是有区别的不同的值，而且你很少会将他们作为等价的，所以它们的互相强制转换是一种麻烦。注意这里没有任何误判不成立。
 
 #### The Crazy Ones
 
-We don't have to stop there, though. We can keep looking for even more troublesome coercions:
+但是我们不必停留在此。我们可以继续寻找更能引起麻烦的强制转换：
 
 ```js
 [] == ![];		// true
 ```
 
-Oooo, that seems at a higher level of crazy, right!? Your brain may likely trick you that you're comparing a truthy to a falsy value, so the `true` result is surprising, as we *know* a value can never be truthy and falsy at the same time!
+噢，这看起来像是更高层次的疯狂，对吧！？你的大脑可能会欺骗你说，你在将一个truthy和falsy值比较，所以结果`true`是令人吃惊的，因为我们知道一个值不可能同时为truthy和falsy！
 
-But that's not what's actually happening. Let's break it down. What do we know about the `!` unary operator? It explicitly coerces to a `boolean` using the `ToBoolean` rules (and it also flips the parity). So before `[] == ![]` is even processed, it's actually already translated to `[] == false`. We already saw that form in our above list (`false == []`), so its surprise result is *not new* to us.
+但这不是实际发生的事情。让我们把它分解一下。我们了解`!`一元操作符吧？它明确地使用`ToBoolean`规则将操作数强制转换为一个`boolean`（而且它还会翻转真假性）。所以在`[] == ![]`执行之前，它实际上已经被翻译为了`[] == false`。我们已将在上面的列表中见过了这种形式（`false == []`），所以它的令人吃惊的结果对我们来说并不 *新鲜*。
 
-How about other corner cases?
+其它的极端情况呢？
 
 ```js
 2 == [2];		// true
 "" == [null];	// true
 ```
 
-As we said earlier in our `ToNumber` discussion, the right-hand side `[2]` and `[null]` values will go through a `ToPrimitive` coercion so they can be more readily compared to the simple primitives (`2` and `""`, respectively) on the left-hand side. Since the `valueOf()` for `array` values just returns the `array` itself, coercion falls to stringifying the `array`.
+在我们关于`ToNumber`的讨论中我们说过，右手边的`[2]`和`[null]`值将会通过一个`ToPrimitive`强制转换，以使我们可以方便地与左手边的简单基本类型值进行比较。因为`array`值的`valueOf()`只是返回`array`本身，强制转换会退到`array`的字符串化上。
 
-`[2]` will become `"2"`, which then is `ToNumber` coerced to `2` for the right-hand side value in the first comparison. `[null]` just straight becomes `""`.
+对于第一个比较的右手边的值来说，`[2]`将变为`"2"`，然后它会`ToNumber`强制转换为`2`。`[null]`就直接变成`""`。
 
-So, `2 == 2` and `"" == ""` are completely understandable.
+那么，`2 == 2`和`"" == ""`是完全可以理解的。
 
-If your instinct is to still dislike these results, your frustration is not actually with coercion like you probably think it is. It's actually a complaint against the default `array` values' `ToPrimitive` behavior of coercing to a `string` value. More likely, you'd just wish that `[2].toString()` didn't return `"2"`, or that `[null].toString()` didn't return `""`.
+如果你的直觉依然不喜欢这个结果，那么你的沮丧实际上与你可能认为的强制转换无关。这其实是在抱怨`array`值在强制转换为`string`值时的默认`ToPrimitive`行为。很可能，你只是希望`[2].toString()`不返回`"2"`，或者`[null].toString()`不返回`""`。
 
-But what exactly *should* these `string` coercions result in? I can't really think of any other appropriate `string` coercion of `[2]` than `"2"`, except perhaps `"[2]"` -- but that could be very strange in other contexts!
+但是这些`string`强制转换到底 *应该* 得出什么结果？对于`[2]`的`string`强制转换，除了`"2"`我确实想不出来其他合适的结果，也许是`"[2]"` —— 但这可能会在其他的上下文中很奇怪！
 
-You could rightly make the case that since `String(null)` becomes `"null"`, then `String([null])` should also become `"null"`. That's a reasonable assertion. So, that's the real culprit.
+你可以正确地制造另一个例子：因为`String(null)`变成了`"null"`，那么`String([null])`也应当变成`"null"`。这是个合理的断言。所以，它才是真正的犯人。
 
-*Implicit* coercion itself isn't the evil here. Even an *explicit* coercion of `[null]` to a `string` results in `""`. What's at odds is whether it's sensible at all for `array` values to stringify to the equivalent of their contents, and exactly how that happens. So, direct your frustration at the rules for `String( [..] )`, because that's where the craziness stems from. Perhaps there should be no stringification coercion of `array`s at all? But that would have lots of other downsides in other parts of the language.
+*隐含* 强制转换在这里并不邪恶。即使一个从`[null]`到`string`结果为`""`的 *明确* 强制转换也不。真正奇怪的是，`array`值字符串化为它们内容的等价物是否有道理，和它是如何发生的。所以，应当将你沮丧的原因指向`String( [..] )`的规则，因为这里才是疯狂起源的地方。也许根本就不应该有`array`的字符串化强制转换？但这会在语言的其他部分造成许多的缺点。
 
-Another famously cited gotcha:
+另一个常被引用的著名的坑是：
 
 ```js
 0 == "\n";		// true
 ```
 
-As we discussed earlier with empty `""`, `"\n"` (or `" "` or any other whitespace combination) is coerced via `ToNumber`, and the result is `0`. What other `number` value would you expect whitespace to coerce to? Does it bother you that *explicit* `Number(" ")` yields `0`?
+正如我们早先讨论的空`""`，`"\n"`（或`" "`，或其他任何空格的组合）是通过`ToNumber`强制转换的，而且结果为`0`。你还希望空格被转换为其他的什么`number`值呢？*明确的* `Number()`给出`0`会困扰你吗？
 
-Really the only other reasonable `number` value that empty strings or whitespace strings could coerce to is the `NaN`. But would that *really* be better? The comparison `" " == NaN` would of course fail, but it's unclear that we'd have really *fixed* any of the underlying concerns.
+空字符串和空格字符串可以转换为的，另一个真正唯一合理的`number`值是`NaN`。但这 *真的* 会更好吗？`" " == NaN`的比较当然会失败，但是不清楚我们是否真的 *修正* 了任何底层的问题。
 
-The chances that a real-world JS program fails because `0 == "\n"` are awfully rare, and such corner cases are easy to avoid.
+真实世界中的JS程序由于`0 == "\n"`而失败的几率非常之低，而且这样的极端用例很容比避免。
 
-Type conversions **always** have corner cases, in any language -- nothing specific to coercion. The issues here are about second-guessing a certain set of corner cases (and perhaps rightly so!?), but that's not a salient argument against the overall coercion mechanism.
+在任何语言中，类型转换 **总是** 有极端用例 —— 强制转换也不例外。这里讨论的是特定的一组极端用例的马后炮，但不是针对强制转换整体而言的争论。
 
-Bottom line: almost any crazy coercion between *normal values* that you're likely to run into (aside from intentionally tricky `valueOf()` or `toString()` hacks as earlier) will boil down to the short seven-item list of gotcha coercions we've identified above.
+底线：你可能遇到的几乎所有 *普通值* 间的疯狂强制转换（除了像早先那样有意而为的`valueOf()`或`toString()`黑科技），都能归结为我们在上面指出的7中情况的短列表。
 
-To contrast against these 24 likely suspects for coercion gotchas, consider another list like this:
+对比这24个疑似强制转换的坑，考虑另一个像这样的列表：
 
 ```js
 42 == "43";							// false
@@ -1749,21 +1727,21 @@ To contrast against these 24 likely suspects for coercion gotchas, consider anot
 "foo" == [ "foo" ];					// true
 ```
 
-In these nonfalsy, noncorner cases (and there are literally an infinite number of comparisons we could put on this list), the coercion results are totally safe, reasonable, and explainable.
+在这些非falsy，非极端的用例中（而且我们简直可以向这个列表中添加无限多个比较），强制转换完全是安全，合理，和可解释的。
 
 #### Sanity Check
 
-OK, we've definitely found some crazy stuff when we've looked deeply into *implicit* coercion. No wonder that most developers claim coercion is evil and should be avoided, right!?
+好的，当我们深入观察 *隐含的* 强制转换时，我确实找到了一些疯狂的东西。难怪大多数开发者声称强制转换是邪恶而且应该避开的，对吧？
 
-But let's take a step back and do a sanity check.
+但是让我们退一步并反省一下。
 
-By way of magnitude comparison, we have *a list* of seven troublesome gotcha coercions, but we have *another list* of (at least 17, but actually infinite) coercions that are totally sane and explainable.
+通过大量比较，我们得到了一张7个麻烦的，坑人的强制转换的列表，但我们还得到了另一张（至少17个，但实际上有无限多个）完全正常和可以解释的强制转换的列表。
 
-If you're looking for a textbook example of "throwing the baby out with the bathwater," this is it: discarding the entirety of coercion (the infinitely large list of safe and useful behaviors) because of a list of literally just seven gotchas.
+如果你在讯在本“把孩子和洗澡水一起泼出去”的教科书，这就是了：由于一个仅有7个坑的列表，而抛弃整个强制转换（安全且有效的行为的无限大列表）。
 
-The more prudent reaction would be to ask, "how can I use the countless *good parts* of coercion, but avoid the few *bad parts*?"
+一个更谨慎的反应是问，“我如何使用强制转换的 *好的部分*，而避开这几个 *坏的部分* 呢？”
 
-Let's look again at the *bad* list:
+然我们再看一次这个 *坏* 列表：
 
 ```js
 "0" == false;			// true -- UH OH!
@@ -1775,9 +1753,9 @@ false == [];			// true -- UH OH!
 0 == [];				// true -- UH OH!
 ```
 
-Four of the seven items on this list involve `== false` comparison, which we said earlier you should **always, always** avoid. That's a pretty easy rule to remember.
+这个列表中7个项目的4个与`== false`比较有关，我们早先说过你应当 **总是，总是** 避免的。
 
-Now the list is down to three.
+现在这个列表缩小到了3个项目。
 
 ```js
 "" == 0;				// true -- UH OH!
@@ -1785,9 +1763,9 @@ Now the list is down to three.
 0 == [];				// true -- UH OH!
 ```
 
-Are these reasonable coercions you'd do in a normal JavaScript program? Under what conditions would they really happen?
+这些是你在一般的JavaScript程序中使用的合理的强制转换吗？在什么条件下它们会发生？
 
-I don't think it's terribly likely that you'd literally use `== []` in a `boolean` test in your program, at least not if you know what you're doing. You'd probably instead be doing `== ""` or `== 0`, like:
+我不认为你在程序里有很大的可能要在一个`boolean`测试中使用`== []`，至少在你知道自己在做什么的情况下。你可能会使用`== ""`或`== 0`，比如：
 
 ```js
 function doSomething(a) {
@@ -1797,7 +1775,7 @@ function doSomething(a) {
 }
 ```
 
-You'd have an oops if you accidentally called `doSomething(0)` or `doSomething([])`. Another scenario:
+如果你偶然调用了`doSomething(0)`或`doSomething([])`，你就会吓一跳。另一个例子：
 
 ```js
 function doSomething(a,b) {
@@ -1807,34 +1785,34 @@ function doSomething(a,b) {
 }
 ```
 
-Again, this could break if you did something like `doSomething("",0)` or `doSomething([],"")`.
+再一次，如果你调用`doSomething("",0)`或`doSomething([],"")`时，它们会失败。
 
-So, while the situations *can* exist where these coercions will bite you, and you'll want to be careful around them, they're probably not super common on the whole of your code base.
+所以，虽然这些强制转换会咬到你的情况 *可能* 存在，而且你会小心地处理它们，但是它们可能不会在你的代码库中超级常见。
 
 #### Safely Using Implicit Coercion
 
-The most important advice I can give you: examine your program and reason about what values can show up on either side of an `==` comparison. To effectively avoid issues with such comparisons, here's some heuristic rules to follow:
+我能给你的最重要的建议是：检查你的程序，并推理什么样的值会出现在`==`比较两边。为了避免这样的比较中的问题，这里有一些可以遵循的启发性规则：
 
-1. If either side of the comparison can have `true` or `false` values, don't ever, EVER use `==`.
-2. If either side of the comparison can have `[]`, `""`, or `0` values, seriously consider not using `==`.
+1. 如果比较的任意一边可能出现`true`或者`false`值，那么就永远，永远不要使用`==`。
+2. 如果比较的任意一边可能出现`[]`，`""`，或`0`这些值，那么严肃地考虑不使用`==`。
 
-In these scenarios, it's almost certainly better to use `===` instead of `==`, to avoid unwanted coercion. Follow those two simple rules and pretty much all the coercion gotchas that could reasonably hurt you will effectively be avoided.
+在这些场景中，为了避免不希望的强制转换，几乎可以确定使用`===`要比使用`==`好。遵循这两个简单的规则，可以有效地避免几乎所有可能会伤害你的强制转换的坑。
 
-**Being more explicit/verbose in these cases will save you from a lot of headaches.**
+**在这些情况下，使用更加明确/繁冗的方式会减少很多使你头疼的东西。**
 
-The question of `==` vs. `===` is really appropriately framed as: should you allow coercion for a comparison or not?
+`==`与`===`的问题其实可以更加恰当地表述为：你应当在比较中允许强制转换吗？
 
-There's lots of cases where such coercion can be helpful, allowing you to more tersely express some comparison logic (like with `null` and `undefined`, for example).
+在许多情况下这样的强制转换会很有用，允许你更简练地表述一些比较逻辑（例如，`null`和`undefined`）。
 
-In the overall scheme of things, there's relatively few cases where *implicit* coercion is truly dangerous. But in those places, for safety sake, definitely use `===`.
+对于整体来说，相对有几个 *隐含* 强制转换会真的很危险的情况。但是在这些地方，为了安全起见，绝对要使用`===`。
 
-**Tip:** Another place where coercion is guaranteed *not* to bite you is with the `typeof` operator. `typeof` is always going to return you one of seven strings (see Chapter 1), and none of them are the empty `""` string. As such, there's no case where checking the type of some value is going to run afoul of *implicit* coercion. `typeof x == "function"` is 100% as safe and reliable as `typeof x === "function"`. Literally, the spec says the algorithm will be identical in this situation. So, don't just blindly use `===` everywhere simply because that's what your code tools tell you to do, or (worst of all) because you've been told in some book to **not think about it**. You own the quality of your code.
+**提示：** 另一个强制转换保证 *不会* 咬到你的地方是`typeof`操作符。`typeof`总是将返回给你7中字符串之一（见第一章），它们中没有一个是空`""`字符串。这样，检查某个值的类型时不会有任何情况与 *隐含* 强制转换相冲突。`typeof x == "function"`就像`typeof x === "function"`一样安全可靠。从字面意义上将，语言规范说这种情况下它们的算法是相同的。所以，不要只是因为你的代码工具告诉你这么做，或者（最差劲儿的）在某本书中有人告诉你 **不要考虑它**，而盲目地到处使用`===`。你掌管着你的代码的质量。
 
-Is *implicit* coercion evil and dangerous? In a few cases, yes, but overwhelmingly, no.
+*隐含* 强制转换是邪恶和危险的吗？在几个情况下，是的，但总体说来，不是。
 
-Be a responsible and mature developer. Learn how to use the power of coercion (both *explicit* and *implicit*) effectively and safely. And teach those around you to do the same.
+做一个负责任和成熟的开发者。学习如何有效并安全地使用强制转换（*明确的* 和 *隐含的* 两者）的力量。并教你周围的人也这么做。
 
-Here's a handy table made by Alex Dorey (@dorey on GitHub) to visualize a variety of comparisons:
+这里是由Alex Dorey (@dorey on GitHub)制作的一个方便的表格，将各种比较进行了可视化：
 
 <img src="fig1.png" width="600">
 
