@@ -1,33 +1,19 @@
 # You Don't Know JS: Types & Grammar
 # Chapter 5: Grammar
 
-The last major topic we want to tackle is how JavaScript's language syntax works (aka its grammar). You may think you know how to write JS, but there's an awful lot of nuance to various parts of the language grammar that lead to confusion and misconception, so we want to dive into those parts and clear some things up.
-
 我们想要解决的最后一个主要话题是JavaScript的语法如何工作（也称为它的文法）。你可能认为你懂得如何编写JS，但是语言文法的各个部分中有太多微妙的地方导致了困惑和误解，所以我们想要深入这些部分并搞清楚一些事情。
-
-**Note:** The term "grammar" may be a little less familiar to readers than the term "syntax." In many ways, they are similar terms, describing the *rules* for how the language works. There are nuanced differences, but they mostly don't matter for our discussion here. The grammar for JavaScript is a structured way to describe how the syntax (operators, keywords, etc.) fits together into well-formed, valid programs. In other words, discussing syntax without grammar would leave out a lot of the important details. So our focus here in this chapter is most accurately described as *grammar*, even though the raw syntax of the language is what developers directly interact with.
 
 **注意：** 对于读者们来说，“文法（grammar）”一词不像“语法（syntax）”一词那么为人熟知。在许多意义上，它们是相似的词，描述语言如何工作的 *规则*。它们有一些微妙的不同，但是这对于我们在这里的讨论无关紧要。JavaScript的文法是一种结构化的方式，来描述语法（操作符，关键字，等等）如何组合在一起形成结构良好，合法的程序。换句话说，抛开文法来讨论语法将会忽略许多重要的细节。所以我们在本章中注目的内容的最准确的描述是 *文法*，尽管语言中的纯语法才是开发者们直接交互的。
 
 ## Statements & Expressions
 
-It's fairly common for developers to assume that the term "statement" and "expression" are roughly equivalent. But here we need to distinguish between the two, because there are some very important differences in our JS programs.
-
 一个很常见的现象是，开发者们假定“语句（statement）”和“表达式（expression）”是大致等价的。但是这里我们需要区分它们俩，因为在我们的JS程序中有一些非常重要的区别。
-
-To draw the distinction, let's borrow from terminology you may be more familiar with: the English language.
 
 为了描述这种区别，让我们借用一下你可能更熟悉的术语：英语。
 
-A "sentence" is one complete formation of words that expresses a thought. It's comprised of one or more "phrases," each of which can be connected with punctuation marks or conjunction words ("and," "or," etc). A phrase can itself be made up of smaller phrases. Some phrases are incomplete and don't accomplish much by themselves, while other phrases can stand on their own. These rules are collectively called the *grammar* of the English language.
-
 一个“句子（sentence）”是一个表达想法的词汇的完整构造。它由一个或多个“短语（phrase）”组成，它们每一个都可以用标点符号或连词（“和”，“或”等等）连接。一个短语本身可以由更小的短语组成。一些短语是不完整的，而且本身没有太多含义，而另一些短语可以自成一句。这些规则总体地称为英语的 *文法*。
 
-And so it goes with JavaScript grammar. Statements are sentences, expressions are phrases, and operators are conjunctions/punctuation.
-
 JavaScript文法也类似。语句就是句子，表达式就是短语，而操作符就是连词/标点。
-
-Every expression in JS can be evaluated down to a single, specific value result. For example:
 
 JS中的每一个表达式都可以被求值而成为一个单独的，具体的结果值。举例来说：
 
@@ -37,37 +23,35 @@ var b = a;
 b;
 ```
 
-In this snippet, `3 * 6` is an expression (evaluates to the value `18`). But `a` on the second line is also an expression, as is `b` on the third line. The `a` and `b` expressions both evaluate to the values stored in those variables at that moment, which also happens to be `18`.
+在这个代码段中，`3 * 6`是一个表达式（求值得值`18`）。而第二行的`a`也是一个表达式，第三行的`b`也一样。对表达式`a`和`b`求值都会得到在那一时刻存储在这些变量中的值，也就偶然是`18`。
 
+另外，这三行的每一行都是一个包含表达式的语句。`var a = 3 * 6`和`var b = a`称为“声明语句（declaration statments）”因为它们每一个都声明了一个变量（并选择性地给它赋值）。赋值`a = 3 * 6`和`b = a`（除去`var`）被称为赋值表达式（assignment expressions）。
 
-
-Moreover, each of the three lines is a statement containing expressions. `var a = 3 * 6` and `var b = a` are called "declaration statements" because they each declare a variable (and optionally assign a value to it). The `a = 3 * 6` and `b = a` assignments (minus the `var`s) are called assignment expressions.
-
-The third line contains just the expression `b`, but it's also a statement all by itself (though not a terribly interesting one!). This is generally referred to as an "expression statement."
+第三行仅仅含有一个表达式`b`，但是它本身也是一个表达式。这一般称为一个“表达式语句（expression statement）”。
 
 ### Statement Completion Values
 
-It's a fairly little known fact that statements all have completion values (even if that value is just `undefined`).
+一个鲜为人知的事实是，所有语句都有完成值（即使这个值只是`undefined`）。
 
-How would you even go about seeing the completion value of a statement?
+你要如何做才能看到一个语句的完成值呢？
 
-The most obvious answer is to type the statement into your browser's developer console, because when you execute it, the console by default reports the completion value of the most recent statement it executed.
+最明显的答案是把语句敲进你的浏览器开发者控制台，因为当你运行它时，默认地控制台会报告最近一次执行的语句的完成值。
 
-Let's consider `var b = a`. What's the completion value of that statement?
+让我们考虑一下`var b = a`。这个语句的完成值是什么？
 
-The `b = a` assignment expression results in the value that was assigned (`18` above), but the `var` statement itself results in `undefined`. Why? Because `var` statements are defined that way in the spec. If you put `var a = 42;` into your console, you'll see `undefined` reported back instead of `42`.
+`b = a`赋值表达式给出的结果是被赋予的值（上面的`18`），但是`var`语句本身给出的结果是`undefined`。为什么？因为在语言规范中`var`语句就是这么定义的。入股你在你的控制台中敲入`var a = 42`，你会看到`undefined`被报告而不是`42`。
 
-**Note:** Technically, it's a little more complex than that. In the ES5 spec, section 12.2 "Variable Statement," the `VariableDeclaration` algorithm actually *does* return a value (a `string` containing the name of the variable declared -- weird, huh!?), but that value is basically swallowed up (except for use by the `for..in` loop) by the `VariableStatement` algorithm, which forces an empty (aka `undefined`) completion value.
+**注意：** 技术上讲，要比这复杂一些。在ES5语言规范，12.2部分的“变量语句”中，`VariableDeclaration`算法实际上返回了一个值（一个包含被声明变量的名称的`string` —— 诡异吧！？），但是这个值基本上被`VariableStatement`算法吞掉了（除了在`for..in`循环中使用），而这强制产生一个空的（也就是`undefined`）完成值。
 
-In fact, if you've done much code experimenting in your console (or in a JavaScript environment REPL -- read/evaluate/print/loop tool), you've probably seen `undefined` reported after many different statements, and perhaps never realized why or what that was. Put simply, the console is just reporting the statement's completion value.
+事实上，如果你曾在你的控制台上（或者一个JavaScript环境REPL —— read/evaluate/print/loop工具）做过很多的代码实验的话，你可能看到过许多不同的语句都报告`undefined`，而且你也许从来没理解它是什么和为什么。简单地说，控制台仅仅报告语句的完成值。
 
-But what the console prints out for the completion value isn't something we can use inside our program. So how can we capture the completion value?
+但是控制台打印出的完成值并不是我们可以在程序中使用的东西。那么我们该如何捕获完成值呢？
 
-That's a much more complicated task. Before we explain *how*, let's explore *why* would you want to do that?
+这是个更加复杂的任务。在我们解释 *如何* 之前，让我们先探索一下 *为什么* 你想这样做。
 
-We need to consider other types of statement completion values. For example, any regular `{ .. }` block has a completion value of the completion value of its last contained statement/expression.
+我们需要考虑其他类新的语句的完成值。例如，任何普通的`{ .. }`块儿都有一个完成值，即它所包含的最后一个语句/表达式的完成值。
 
-Consider:
+考虑如下代码：
 
 ```js
 var b;
@@ -77,13 +61,13 @@ if (true) {
 }
 ```
 
-If you typed that into your console/REPL, you'd probably see `42` reported, since `42` is the completion value of the `if` block, which took on the completion value of its last assignment expression statement `b = 4 + 38`.
+如果你将这段代码敲入你的控制台/REPL，你可能会看到它报告`42`，因为`42`是`if`块儿的完成值，它取自`if`的最后一个复制表达式语句`b = 4 + 38`。
 
-In other words, the completion value of a block is like an *implicit return* of the last statement value in the block.
+换句话说，一个块儿的完成值就像 *隐含地返回* 块儿中最后一个语句的值。
 
-**Note:** This is conceptually familiar in languages like CoffeeScript, which have implicit `return` values from `function`s that are the same as the last statement value in the function.
+**注意：** 这在概念上与CoffeeScript这样的语言很类似，它们隐含地从`function`中`return`值，这些值与函数中最后一个语句的值是相同的。
 
-But there's an obvious problem. This kind of code doesn't work:
+但这里有一个明显的问题。这样的代码是不工作的：
 
 ```js
 var a, b;
@@ -93,13 +77,13 @@ a = if (true) {
 };
 ```
 
-We can't capture the completion value of a statement and assign it into another variable in any easy syntactic/grammatical way (at least not yet!).
+我们不能以任何简单的语法/文法来捕获一个语句的完成值并将它赋值给另一个变量（至少是还不能！）。
 
-So, what can we do?
+那么，我们能做什么？
 
-**Warning**: For demo purposes only -- don't actually do the following in your real code!
+**警告：** 仅用于演示的目的 —— 不要实际地在你的真实代码中做如下内容！
 
-We could use the much maligned `eval(..)` (sometimes pronounced "evil") function to capture this completion value.
+我们可以使用臭名昭著的`eval(..)`（有时读成“evil”）函数来捕获这个完成值。
 
 ```js
 var a, b;
@@ -109,9 +93,9 @@ a = eval( "if (true) { b = 4 + 38; }" );
 a;	// 42
 ```
 
-Yeeeaaahhhh. That's terribly ugly. But it works! And it illustrates the point that statement completion values are a real thing that can be captured not just in our console but in our programs.
+啊呀呀。这太难看了。但是这好用！而且它展示了语句的完成值是一个真实的东西，不仅仅是在控制台中，还可以在我们的程序中被捕获。
 
-There's a proposal for ES7 called "do expression." Here's how it might work:
+有一个称为“do表达式”的ES7提案。这是它可能工作的方式：
 
 ```js
 var a, b;
@@ -125,26 +109,26 @@ a = do {
 a;	// 42
 ```
 
-The `do { .. }` expression executes a block (with one or many statements in it), and the final statement completion value inside the block becomes the completion value *of* the `do` expression, which can then be assigned to `a` as shown.
+`do { .. }`表达式执行一个块儿（其中有一个或多个语句），这个块儿中的最后一个语句的完成值将成为`do`表达式的完成值，它可以像展示的那样被赋值给`a`。
 
-The general idea is to be able to treat statements as expressions -- they can show up inside other statements -- without needing to wrap them in an inline function expression and perform an explicit `return ..`.
+这里的大意是能够将语句作为表达式对待 —— 他们可以出现在其他语句内部 —— 而不必将它们包装在一个内联的函数表达式中，并实施一个明确的`return ..`。
 
-For now, statement completion values are not much more than trivia. But they're probably going to take on more significance as JS evolves, and hopefully `do { .. }` expressions will reduce the temptation to use stuff like `eval(..)`.
+到目前为止，语句的完成值不过是一些琐碎的事情。不顾随着JS的进化它们的重要性可能会进一步提高，而且很有希望的是`do { .. }`表达式将会降低使用`eval(..)`这样的东西的冲动。
 
-**Warning:** Repeating my earlier admonition: avoid `eval(..)`. Seriously. See the *Scope & Closures* title of this series for more explanation.
+**警告：** 重复我刚才的训诫：避开`eval(..)`。真的。更多解释参见本系列的 *作用域与闭包* 一书。
 
 ### Expression Side Effects
 
-Most expressions don't have side effects. For example:
+大多数表达式没有副作用。例如：
 
 ```js
 var a = 2;
 var b = a + 3;
 ```
 
-The expression `a + 3` did not *itself* have a side effect, like for instance changing `a`. It had a result, which is `5`, and that result was assigned to `b` in the statement `b = a + 3`.
+表达式`a + 3`本身并没有副作用，例如改变`a`。它有一个结果，就是`5`，而且这个结果在语句`b = a + 3`中被赋值给`b`。
 
-The most common example of an expression with (possible) side effects is a function call expression:
+一个最常见的（可能）带有副作用的表达式的例子是函数调用表达式：
 
 ```js
 function foo() {
@@ -155,14 +139,14 @@ var a = 1;
 foo();		// result: `undefined`, side effect: changed `a`
 ```
 
-There are other side-effecting expressions, though. For example:
+还有其他的副作用表达式。例如：
 
 ```js
 var a = 42;
 var b = a++;
 ```
 
-The expression `a++` has two separate behaviors. *First*, it returns the current value of `a`, which is `42` (which then gets assigned to `b`). But *next*, it changes the value of `a` itself, incrementing it by one.
+表达式`a++`有两个分离的行为。*首先*，它返回`a`的当前值，也就是`42`（然后它被赋值给`b`）。但 *接下来*，它改变`a`本身的值，将它增加1。
 
 ```js
 var a = 42;
@@ -172,9 +156,9 @@ a;	// 43
 b;	// 42
 ```
 
-Many developers would mistakenly believe that `b` has value `43` just like `a` does. But the confusion comes from not fully considering the *when* of the side effects of the `++` operator.
+许多开发者错误的认为`b`和`a`一样拥有值`43`。这种困惑源自没有完全考虑`++`操作符的副作用在 *什么时候* 发生。
 
-The `++` increment operator and the `--` decrement operator are both unary operators (see Chapter 4), which can be used in either a postfix ("after") position or prefix ("before") position.
+`++`递增操作符和`--`递减操作符都是一元操作符（见第四章），它们既可以用于后缀（“后面”）位置也可用于前缀（“前面”）位置。
 
 ```js
 var a = 42;
@@ -186,11 +170,11 @@ a;		// 43
 a;		// 44
 ```
 
-When `++` is used in the prefix position as `++a`, its side effect (incrementing `a`) happens *before* the value is returned from the expression, rather than *after* as with `a++`.
+当`++`像`++a`这样用于前缀位置时，它的副作用（递增`a`）发生在值从表达式中返回 *之前*，而不是`a++`那样发生在 *之后*。
 
-**Note:** Would you think `++a++` was legal syntax? If you try it, you'll get a `ReferenceError` error, but why? Because side-effecting operators **require a variable reference** to target their side effects to. For `++a++`, the `a++` part is evaluated first (because of operator precedence -- see below), which gives back the value of `a` _before_ the increment. But then it tries to evaluate `++42`, which (if you try it) gives the same `ReferenceError` error, since `++` can't have a side effect directly on a value like `42`.
+**注意：** 你认为`++a++`是一个合法的语法吗？如果你试一下，你将会得到一个`ReferenceError`错误，但为什么？因为有副作用的操作符 **要求一个变量引用** 来作为他们副作用的目标。对于`++a++`来说，`a++`这部分会首先被求值（因为操作符优先级 —— 参见下面的讨论），它会给出`a`在递增 _之前_ 的值。担然后它试着对`++42`求值，这将（如果你试一下）会给出相同的`ReferenceError`错误，因为`++`不能直接在`42`这样的值上施加副作用。
 
-It is sometimes mistakenly thought that you can encapsulate the *after* side effect of `a++` by wrapping it in a `( )` pair, like:
+有时它会被错误地认为，你可以通过将`a++`包近一个`( )`中来封装它的 *后* 副作用，比如：
 
 ```js
 var a = 42;
@@ -200,9 +184,9 @@ a;	// 43
 b;	// 42
 ```
 
-Unfortunately, `( )` itself doesn't define a new wrapped expression that would be evaluated *after* the *after side effect* of the `a++` expression, as we might have hoped. In fact, even if it did, `a++` returns `42` first, and unless you have another expression that reevaluates `a` after the side effect of `++`, you're not going to get `43` from that expression, so `b` will not be assigned `43`.
+不幸的是，`( )`本身不会像我们希望的那样，定义一个新的被包装的表达式，而它会在`a++`表达式的 *后副作用* 之 *后* 求值。事实上，就算它能，`a++`也会首先返回`42`，而且除非你有另一个表达式在`++`的副作用之后对`a`在次求值，你也不会从这个表达式中得到`43`，于是`b`不会被赋值为`43`。
 
-There's an option, though: the `,` statement-series comma operator. This operator allows you to string together multiple standalone expression statements into a single statement:
+虽然，有另一种选择：`,`语句序列逗号操作符。这个操作符允许你将多个独立的表达式语句连成一个单独的语句：
 
 ```js
 var a = 42, b;
@@ -212,11 +196,11 @@ a;	// 43
 b;	// 43
 ```
 
-**Note:** The `( .. )` around `a++, a` is required here. The reason is operator precedence, which we'll cover later in this chapter.
+**注意：** `a++, a`周围的`( .. )`是必需的。其原因的操作符优先级，我们将在本章后面讨论。
 
-The expression `a++, a` means that the second `a` statement expression gets evaluated *after* the *after side effects* of the first `a++` statement expression, which means it returns the `43` value for assignment to `b`.
+表达式`a++, a`意味着第二个`a`语句表达式会在第一个`a++`语句表达式的 *后副作用* 之 *后* 进行求值，这表明它为`b`的赋值返回`43`。
 
-Another example of a side-effecting operator is `delete`. As we showed in Chapter 2, `delete` is used to remove a property from an `object` or a slot from an `array`. But it's usually just called as a standalone statement:
+另一个副作用操作符的例子是`delete`。正如我们在第二章中展示的，`delete`用于从一个`object`或一个`array`值槽中移除一个属性。但它经常作为一个独立语句被调用：
 
 ```js
 var obj = {
@@ -228,13 +212,13 @@ delete obj.a;	// true
 obj.a;			// undefined
 ```
 
-The result value of the `delete` operator is `true` if the requested operation is valid/allowable, or `false` otherwise. But the side effect of the operator is that it removes the property (or array slot).
+如果被请求的操作是合法/可允许的，`delete`操作符的结果值为`true`，否则结果为`false`。但是这个操作符的副作用是它移除了属性（或数组值槽）。
 
-**Note:** What do we mean by valid/allowable? Nonexistent properties, or properties that exist and are configurable (see Chapter 3 of the *this & Object Prototypes* title of this series) will return `true` from the `delete` operator. Otherwise, the result will be `false` or an error.
+**注意：** 我们说合法/可允许是什么意思？不存在的属性，或存在但不可配置的属性（见本系列 *this与对象原型* 的第三章）将会从`delete`操作符中返回`true`。否则，其结果将是`false`或者一个错误。
 
-One last example of a side-effecting operator, which may at once be both obvious and nonobvious, is the `=` assignment operator.
+副作用操作符的最后一个例子，可能既是明显的也是不明显的，是`=`赋值操作符。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a;
@@ -243,11 +227,11 @@ a = 42;		// 42
 a;			// 42
 ```
 
-It may not seem like `=` in `a = 42` is a side-effecting operator for the expression. But if we examine the result value of the `a = 42` statement, it's the value that was just assigned (`42`), so the assignment of that same value into `a` is essentially a side effect.
+对于这个表达式来说，`a = 42`中的`=`看起来似乎不是一个副作用操作符。但如果我们检视语句`a = 42`的结果值，会发现它就是刚刚被赋予的值（`42`），所以向`a`赋予的相同的值实质上是一中副作用。
 
-**Tip:** The same reasoning about side effects goes for the compound-assignment operators like `+=`, `-=`, etc. For example, `a = b += 2` is processed first as `b += 2` (which is `b = b + 2`), and the result of *that* `=` assignment is then assigned to `a`.
+**提示：** 相同的原因也适用于`+=`，`-=`这样的复合赋值操作符的副作用。例如，`a = b += 2`被处理为首先进行`b += 2`（也就是`b = b + 2`），然后这个赋值的结果被赋予`a`。
 
-This behavior that an assignment expression (or statement) results in the assigned value is primarily useful for chained assignments, such as:
+这种赋值表达式（语句）得出被赋予的值的行为，主要在链式赋值上十分有用，就像这样：
 
 ```js
 var a, b, c;
@@ -255,11 +239,11 @@ var a, b, c;
 a = b = c = 42;
 ```
 
-Here, `c = 42` is evaluated to `42` (with the side effect of assigning `42` to `c`), then `b = 42` is evaluated to `42` (with the side effect of assigning `42` to `b`), and finally `a = 42` is evaluated (with the side effect of assigning `42` to `a`).
+这里，`c = 42`被求值得出`42`（带有将`42`赋值给`c`的副作用），然后`b = 42`被求值得出`42`（带有将`42`赋值给`b`的副作用），而最后`a = 42`被求值（带有将`42`赋值给`a`的副作用）。
 
-**Warning:** A common mistake developers make with chained assignments is like `var a = b = 42`. While this looks like the same thing, it's not. If that statement were to happen without there also being a separate `var b` (somewhere in the scope) to formally declare `b`, then `var a = b = 42` would not declare `b` directly. Depending on `strict` mode, that would either throw an error or create an accidental global (see the *Scope & Closures* title of this series).
+**警告：** 一个开发者们常犯的错误是将链式赋值写成`var a = b = 42`这样。虽然这看起来是相同的东西，但它不是。如果这个语句发生在没有另外分离的`var b`（在作用域的某处）来正式声明它的情况下，那么`var a = b = 42`将不会直接声明`b`。依`strict`模式的状态，它要么抛出一个错误，要么无意中创建一个全局变量（参见本系列的 *作用域与闭包*）。
 
-Another scenario to consider:
+另一个要考虑的场景是：
 
 ```js
 function vowels(str) {
@@ -278,7 +262,7 @@ function vowels(str) {
 vowels( "Hello World" ); // ["e","o","o"]
 ```
 
-This works, and many developers prefer such. But using an idiom where we take advantage of the assignment side effect, we can simplify by combining the two `if` statements into one:
+这可以工作，而且许多开发者喜欢这么做。但是使用一个我们可以利用赋值副作用的惯用法，可以通过将两个`if`语句组合为一个来进行简化：
 
 ```js
 function vowels(str) {
@@ -293,23 +277,31 @@ function vowels(str) {
 vowels( "Hello World" ); // ["e","o","o"]
 ```
 
-**Note:** The `( .. )` around `matches = str.match..` is required. The reason is operator precedence, which we'll cover in the "Operator Precedence" section later in this chapter.
+**注意：** `matches = str.match..`周围的`( .. )`是必需的。其原因是操作符优先级，我们将在本章稍后的“操作符优先级”一节中讨论。
 
-I prefer this shorter style, as I think it makes it clearer that the two conditionals are in fact related rather than separate. But as with most stylistic choices in JS, it's purely opinion which one is *better*.
+我偏好这种短一些的风格，因为我认为他明白地表示了两个条件其实是有关联，而非分离的。但是与大多数JS中的风格选择一样，哪一种 *更好* 纯粹是个人意见。
 
 ### Contextual Rules
 
 There are quite a few places in the JavaScript grammar rules where the same syntax means different things depending on where/how it's used. This kind of thing can, in isolation, cause quite a bit of confusion.
 
+在JavaScript文法规则中有好几个地方，同样的语法根据它们被使用的地方/方式不同意味着不同的东西。这样的东西可能，孤立的看，导致相当多的困惑。
+
 We won't exhaustively list all such cases here, but just call out a few of the common ones.
+
+我们不会在这里详尽地罗列所有这些情况，而只是指出常见的几个。
 
 #### `{ .. }` Curly Braces
 
 There's two main places (and more coming as JS evolves!) that a pair of `{ .. }` curly braces will show up in your code. Let's take a look at each of them.
 
+在你的代码中一对`{ .. }`大括号将主要出现在两种地方（随着JS的进化会有更多！）。让我们来看看它们每一种。
+
 ##### Object Literals
 
 First, as an `object` literal:
+
+首先，作为一个`object`字面量：
 
 ```js
 // assume there's a `bar()` function defined
@@ -321,11 +313,17 @@ var a = {
 
 How do we know this is an `object` literal? Because the `{ .. }` pair is a value that's getting assigned to `a`.
 
+我们怎么知道这是一个`object`字面量？因为`{ .. }`是一个被赋予给`a`的值。
+
 **Note:** The `a` reference is called an "l-value" (aka left-hand value) since it's the target of an assignment. The `{ .. }` pair is an "r-value" (aka right-hand value) since it's used *just* as a value (in this case as the source of an assignment).
+
+**注意：** `a`这个引用被称为一个“l-值”（也称为左手边的值）因为它是赋值的目标。`{ .. }`是一个“r-值”（也称为右手边的值）因为它仅被作为一个值使用（在这里作为赋值的源）。
 
 ##### Labels
 
 What happens if we remove the `var a =` part of the above snippet?
+
+如果我们移除上面代码的`var a =`部分会发生什么？
 
 ```js
 // assume there's a `bar()` function defined
