@@ -283,23 +283,15 @@ vowels( "Hello World" ); // ["e","o","o"]
 
 ### Contextual Rules
 
-There are quite a few places in the JavaScript grammar rules where the same syntax means different things depending on where/how it's used. This kind of thing can, in isolation, cause quite a bit of confusion.
-
 在JavaScript文法规则中有好几个地方，同样的语法根据它们被使用的地方/方式不同意味着不同的东西。这样的东西可能，孤立的看，导致相当多的困惑。
-
-We won't exhaustively list all such cases here, but just call out a few of the common ones.
 
 我们不会在这里详尽地罗列所有这些情况，而只是指出常见的几个。
 
 #### `{ .. }` Curly Braces
 
-There's two main places (and more coming as JS evolves!) that a pair of `{ .. }` curly braces will show up in your code. Let's take a look at each of them.
-
 在你的代码中一对`{ .. }`大括号将主要出现在两种地方（随着JS的进化会有更多！）。让我们来看看它们每一种。
 
 ##### Object Literals
-
-First, as an `object` literal:
 
 首先，作为一个`object`字面量：
 
@@ -311,17 +303,11 @@ var a = {
 };
 ```
 
-How do we know this is an `object` literal? Because the `{ .. }` pair is a value that's getting assigned to `a`.
-
 我们怎么知道这是一个`object`字面量？因为`{ .. }`是一个被赋予给`a`的值。
-
-**Note:** The `a` reference is called an "l-value" (aka left-hand value) since it's the target of an assignment. The `{ .. }` pair is an "r-value" (aka right-hand value) since it's used *just* as a value (in this case as the source of an assignment).
 
 **注意：** `a`这个引用被称为一个“l-值”（也称为左手边的值）因为它是赋值的目标。`{ .. }`是一个“r-值”（也称为右手边的值）因为它仅被作为一个值使用（在这里作为赋值的源）。
 
 ##### Labels
-
-What happens if we remove the `var a =` part of the above snippet?
 
 如果我们移除上面代码的`var a =`部分会发生什么？
 
@@ -333,19 +319,19 @@ What happens if we remove the `var a =` part of the above snippet?
 }
 ```
 
-A lot of developers assume that the `{ .. }` pair is just a standalone `object` literal that doesn't get assigned anywhere. But it's actually entirely different.
+许多开发者臆测`{ .. }`只是一个独立的没有被赋值给任何地方的`object`字面量。但事实上完全不同。
 
-Here, `{ .. }` is just a regular code block. It's not very idiomatic in JavaScript (much more so in other languages!) to have a standalone `{ .. }` block like that, but it's perfectly valid JS grammar. It can be especially helpful when combined with `let` block-scoping declarations (see the *Scope & Closures* title in this series).
+这里，`{ .. }`只是一个普通的代码块儿。在JavaScript中拥有一个这样的独立`{ .. }`块儿并不是一个很惯用的形式（在其他语言中要常见得多！），但它是完美合法的JS文法。当与`let`块儿作用域声明组合使用时非常有用（见本系列的 *作用域与闭包*）。
 
-The `{ .. }` code block here is functionally pretty much identical to the code block being attached to some statement, like a `for`/`while` loop, `if` conditional, etc.
+这里的`{ .. }`代码块儿在功能上差不多与附着在一些语句后面的代码块儿是相同的，比如`for`/`while`循环，`if`条件，等等。
 
-But if it's a normal block of code, what's that bizarre looking `foo: bar()` syntax, and how is that legal?
+但如果它是一个一般代码块儿，那么那个看起来异乎寻常的`foo: bar()`语法是什么？它怎么会是合法的呢？
 
-It's because of a little known (and, frankly, discouraged) feature in JavaScript called "labeled statements." `foo` is a label for the statement `bar()` (which has omitted its trailing `;` -- see "Automatic Semicolons" later in this chapter). But what's the point of a labeled statement?
+这是因为一个鲜为人知的（而且，坦白地说，不鼓励使用的）称为“标签语句”的JavaScript特性。`foo`是语句`bar()`（这个语句省略了末尾的`;`—— 见本章稍后的“自动分号”）的标签。但一个打了标签的语句有何意义？
 
-If JavaScript had a `goto` statement, you'd theoretically be able to say `goto foo` and have execution jump to that location in code. `goto`s are usually considered terrible coding idioms as they make code much harder to understand (aka "spaghetti code"), so it's a *very good thing* that JavaScript doesn't have a general `goto`.
+如果JavaScript有一个`goto`语句，那么在理论上你就可以说`goto foo`并使程序的执行跳转到代码中的那个位置。`goto`通常被认为是一种糟糕的编码惯用形式，因为它们使代码更难于理解（也称为“面条代码”），所以JavaScript没有一般的`goto`语句是一件 *非常好的事情*。
 
-However, JS *does* support a limited, special form of `goto`: labeled jumps. Both the `continue` and `break` statements can optionally accept a specified label, in which case the program flow "jumps" kind of like a `goto`. Consider:
+然而，JS的确支持一种有限的，特殊形式的`goto`：标签跳转。`continue`和`break`语句都可以选择性地接受一个指定的标签，在这种情况下程序流会有些像`goto`一样“跳转”。考虑一下代码：
 
 ```js
 // `foo` labeled-loop
@@ -374,11 +360,11 @@ foo: for (var i=0; i<4; i++) {
 // 3 2
 ```
 
-**Note:** `continue foo` does not mean "go to the 'foo' labeled position to continue", but rather, "continue the loop that is labeled 'foo' with its next iteration." So, it's not *really* an arbitrary `goto`.
+**注意：** `continue foo`不意味着“走到标记为‘foo’的位置并继续”，而是，“继续标记为‘foo’的循环，并进行下一次迭代”。所以，它不是一个 *真正的* 随意的`goto`。
 
-As you can see, we skipped over the odd-multiple `3 1` iteration, but the labeled-loop jump also skipped iterations `1 1` and `2 2`.
+如你所见，我们跳过了多个奇数的`3 1`迭代，而且被打了标签的循环跳转还跳过了`1 1`和`2 2`的迭代。
 
-Perhaps a slightly more useful form of the labeled jump is with `break __` from inside an inner loop where you want to break out of the outer loop. Without a labeled `break`, this same logic could sometimes be rather awkward to write:
+也许标签跳转的一个稍稍更有用的形式是，使用`break __`从一个内部循环里面跳出外部循环。没有带标签的`break`，同样的逻辑有时写起来非常尴尬：
 
 ```js
 // `foo` labeled-loop
@@ -403,11 +389,11 @@ foo: for (var i=0; i<4; i++) {
 // stopping! 1 3
 ```
 
-**Note:** `break foo` does not mean "go to the 'foo' labeled position to continue," but rather, "break out of the loop/block that is labeled 'foo' and continue *after* it." Not exactly a `goto` in the traditional sense, huh?
+**注意：** `break foo`不意味着“走到‘foo’标记的位置并继续”，而是，“跳出标记为‘foo’的循环/代码块儿，并继续它 *后面* 的部分”。不是一个传统意义上的`goto`，对吧？
 
-The nonlabeled `break` alternative to the above would probably need to involve one or more functions, shared scope variable access, etc. It would quite likely be more confusing than labeled `break`, so here using a labeled `break` is perhaps the better option.
+对于上面的问题，使用不带标签的`break`将可能会牵连一个或多个函数，共享作用域中变量的访问，等等。它很可能要比带标签的`break`更令人糊涂，所以在这里使用带标签的`break`也许是更好的选择。
 
-A label can apply to a non-loop block, but only `break` can reference such a non-loop label. You can do a labeled `break ___` out of any labeled block, but you cannot `continue ___` a non-loop label, nor can you do a non-labeled `break` out of a block.
+一个标签也可以用于一个非循环的块儿，但只有`break`可以引用这样的非循环标签。你可以使用带标签的`break ___`跳出任何被标记的块儿，但你不能`continue ___`一个非循环标签，也不能用一个不带标签的`break`跳出一个块儿。
 
 ```js
 function foo() {
@@ -425,36 +411,36 @@ foo();
 // World
 ```
 
-Labeled loops/blocks are extremely uncommon, and often frowned upon. It's best to avoid them if possible; for example using function calls instead of the loop jumps. But there are perhaps some limited cases where they might be useful. If you're going to use a labeled jump, make sure to document what you're doing with plenty of comments!
+带标签的循环/块儿极不常见，而且经常使人皱眉头。最好尽可能地避开它们；比如使用函数调用取代循环跳转。但是也许在一些有限的情况下它们会有用。如果你打算使用标签跳转，那么就确保使用大量注释在文档中记下你在做什么！
 
-It's a very common belief that JSON is a proper subset of JS, so a string of JSON (like `{"a":42}` -- notice the quotes around the property name as JSON requires!) is thought to be a valid JavaScript program. **Not true!** Try putting `{"a":42}` into your JS console, and you'll get an error.
+一个很常见的想法是，JSON是一个JS的恰当子集，所以一个JSON字符串（比如`{"a":42}` —— 注意属性名周围的引号是JSON必需的！）被认为是一个合法的JavaScript程序。**不是这样的！** 如果你试着把`{"a":42}`敲进你的JS控制台，你会得到一个错误。
 
-That's because statement labels cannot have quotes around them, so `"a"` is not a valid label, and thus `:` can't come right after it.
+这是因为语句标签周围不能有引号，所以`"a"`不是一个合法的标签，因此`:`不能出现在它后面。
 
-So, JSON is truly a subset of JS syntax, but JSON is not valid JS grammar by itself.
+所以，JSON确实是JS语法的子集，但是JSON本身不是合法的JS文法。
 
-One extremely common misconception along these lines is that if you were to load a JS file into a `<script src=..>` tag that only has JSON content in it (like from an API call), the data would be read as valid JavaScript but just be inaccessible to the program. JSON-P (the practice of wrapping the JSON data in a function call, like `foo({"a":42})`) is usually said to solve this inaccessibility by sending the value to one of your program's functions.
+按照这个路线产生的一个极其常见的误解是，如果你将一个JS文件加载进一个`<script src=..>`标签，而它里面仅含有JSON内容的话（就像从API调用中得到那样），这些数据将作为合法的JavaScript被读取，但只是不能从程序中访问。JSON-P（将JSON数据包进一个函数调用的做法，比如`foo({"a":42})`）经常被说成是解决了这种不可访问性，通过向你程序中的一个函数发送这些值。
 
-**Not true!** The totally valid JSON value `{"a":42}` by itself would actually throw a JS error because it'd be interpreted as a statement block with an invalid label. But `foo({"a":42})` is valid JS because in it, `{"a":42}` is an `object` literal value being passed to `foo(..)`. So, properly said, **JSON-P makes JSON into valid JS grammar!**
+**不是这样的！** 实际上完全合法的JSON值`{"a":42}`本身将会抛出一个JS错误，因为它被翻译为一个带有非法标签的语句块儿。但是`foo({"a":42})`是一个合法的JS，因为在它里面，`{"a":42}`是一个被传入`foo(..)`的`object`字面量值。所以，更合适的说法是，**JSON-P使JSON成为合法的JS文法！**
 
 ##### Blocks
 
-Another commonly cited JS gotcha (related to coercion -- see Chapter 4) is:
+另一个常为人所诟病的JS坑（与强制转换有关 —— 见第四章）是：
 
 ```js
 [] + {}; // "[object Object]"
 {} + []; // 0
 ```
 
-This seems to imply the `+` operator gives different results depending on whether the first operand is the `[]` or the `{}`. But that actually has nothing to do with it!
+这看起来暗示着`+`操作符会根据第一个操作数是`[]`还是`{}`而给出不同的结果。但实际上这与它一点儿关系都没有！
 
-On the first line, `{}` appears in the `+` operator's expression, and is therefore interpreted as an actual value (an empty `object`). Chapter 4 explained that `[]` is coerced to `""` and thus `{}` is coerced to a `string` value as well: `"[object Object]"`.
+在第一行中，`{}`出现在`+`操作符的表达式中，因此被翻译为一个实际的值（一个空`object`）。第四章解释过，`[]`被强制转换为`""`因此`{}`也会被强制转换为一个`string`：`"[object Object]"`。
 
-But on the second line, `{}` is interpreted as a standalone `{}` empty block (which does nothing). Blocks don't need semicolons to terminate them, so the lack of one here isn't a problem. Finally, `+ []` is an expression that *explicitly coerces* (see Chapter 4) the `[]` to a `number`, which is the `0` value.
+但在第二行中，`{}`被翻译为一个独立的`{}`空代码块儿（它什么也不做）。块儿不需要分号来终结它们，所以这里缺少分号不是一个问题。最终，`+ []`是一个将`[]`*明确强制转换* 为`number`的表达式，而它的值是`0`。
 
 ##### Object Destructuring
 
-Starting with ES6, another place that you'll see `{ .. }` pairs showing up is with "destructuring assignments" (see the *ES6 & Beyond* title of this series for more info), specifically `object` destructuring. Consider:
+从ES6开始，你将看到`{ .. }`出现的另一个地方是“解构赋值”（更多信息参见本系列的 *ES6与未来*），确切地说是`object`解构。考虑下面的代码：
 
 ```js
 function getData() {
@@ -470,7 +456,7 @@ var { a, b } = getData();
 console.log( a, b ); // 42 "foo"
 ```
 
-As you can probably tell, `var { a , b } = ..` is a form of ES6 destructuring assignment, which is roughly equivalent to:
+正如你可能看出来的，`var { a , b } = ..`是ES6解构赋值的一种形式，它大体等价于：
 
 ```js
 var res = getData();
@@ -478,9 +464,9 @@ var a = res.a;
 var b = res.b;
 ```
 
-**Note:** `{ a, b }` is actually ES6 destructuring shorthand for `{ a: a, b: b }`, so either will work, but it's expected that the shorter `{ a, b }` will be become the preferred form.
+**注意：** `{ a, b }` 实际上是`{ a: a, b: b }`的ES6解构缩写，两者都能工作，但是人们期望短一些的`{ a, b }`能成为首先的形式。
 
-Object destructuring with a `{ .. }` pair can also be used for named function arguments, which is sugar for this same sort of implicit object property assignment:
+使用一个`{ .. }`进行对象解构也可用于被命名的函数参数，这时它是同种类的隐含对象属性赋值的语法糖：
 
 ```js
 function foo({ a, b, c }) {
@@ -496,11 +482,11 @@ foo( {
 } );	// 42 "foo" [1, 2, 3]
 ```
 
-So, the context we use `{ .. }` pairs in entirely determines what they mean, which illustrates the difference between syntax and grammar. It's very important to understand these nuances to avoid unexpected interpretations by the JS engine.
+所以，我们使用`{ .. }`的上下文环境整体上决定了它们的含义，这展示了语法和文法之间的区别。理解这些微妙之处以回避JS引擎进行意外的翻译是很重要的。
 
 #### `else if` And Optional Blocks
 
-It's a common misconception that JavaScript has an `else if` clause, because you can do:
+一个常见的误解是JavaScript拥有一个`else if`子句，因为你可以这么做：
 
 ```js
 if (a) {
@@ -514,19 +500,19 @@ else {
 }
 ```
 
-But there's a hidden characteristic of the JS grammar here: there is no `else if`. But `if` and `else` statements are allowed to omit the `{ }` around their attached block if they only contain a single statement. You've seen this many times before, undoubtedly:
+但是这里有一个JS文法隐藏的性质：它没有`else if`。但是如果附着在`if`和`else`语句后面的代码块儿仅包含一个语句时，`if`和`else`语句允许省略这些代码块儿周围的`{ }`。毫无疑问，你以前已经见过这种现象很多次了：
 
 ```js
 if (a) doSomething( a );
 ```
 
-Many JS style guides will insist that you always use `{ }` around a single statement block, like:
+许多JS编码风格指引坚持认为，你应当总是在一个单独的语句块儿周围使用`{ }`，就像：
 
 ```js
 if (a) { doSomething( a ); }
 ```
 
-However, the exact same grammar rule applies to the `else` clause, so the `else if` form you've likely always coded is *actually* parsed as:
+然而，完全相同的文法规则也适用于`else`子句，所以你经常编写的`else if`形式 *实际上* 被解析为：
 
 ```js
 if (a) {
@@ -542,13 +528,13 @@ else {
 }
 ```
 
-The `if (b) { .. } else { .. }` is a single statement that follows the `else`, so you can either put the surrounding `{ }` in or not. In other words, when you use `else if`, you're technically breaking that common style guide rule and just defining your `else` with a single `if` statement.
+`if (b) { .. } else { .. }`是一个紧随着`else`的单独的语句，所以你在它周围放不放一个`{ }`都可以。换句话说，当你使用`else if`的时候，从技术上讲你就打破了那个常见的编码风格指引，而且只是用一个单独的`if`语句定义了你的`else`。
 
-Of course, the `else if` idiom is extremely common and results in one less level of indentation, so it's attractive. Whichever way you do it, just call out explicitly in your own style guide/rules and don't assume things like `else if` are direct grammar rules.
+当然，`else if`惯用法极其常见，而且减少了一级缩进，所以它很吸引人。无论你用哪种方式，就在你自己的编码风格指导/规则中明确地指出它，并且不要臆测`else if`是直接的文法规则。
 
 ## Operator Precedence
 
-As we covered in Chapter 4, JavaScript's version of `&&` and `||` are interesting in that they select and return one of their operands, rather than just resulting in `true` or `false`. That's easy to reason about if there are only two operands and one operator.
+就像我们在第四章中讲解的，JavaScript版本的`&&`和`||`很有趣，因为它们选择并返回它们的操作数之一，而不是仅仅得出`true`或`false`的结果。如果只有两个操作数和一个操作符，这很容易推理。
 
 ```js
 var a = 42;
@@ -558,7 +544,7 @@ a && b;	// "foo"
 a || b;	// 42
 ```
 
-But what about when there's two operators involved, and three operands?
+但是如果牵扯到两个操作符，和三个操作数呢？
 
 ```js
 var a = 42;
@@ -569,13 +555,13 @@ a && b || c; // ???
 a || b && c; // ???
 ```
 
-To understand what those expressions result in, we're going to need to understand what rules govern how the operators are processed when there's more than one present in an expression.
+要明白这些表达式产生什么结果，我们就需要理解当在一个表达式中有多于一个操作符时，什么样的规则统治着操作符被处理的方式。
 
-These rules are called "operator precedence."
+这些规则称为“操作符优先级”。
 
-I bet most readers feel they have a decent grasp on operator precedence. But as with everything else we've covered in this book series, we're going to poke and prod at that understanding to see just how solid it really is, and hopefully learn a few new things along the way.
+我打赌大多数读者都觉得自己已经很好地理解了操作符优先级。但是和我们在本系列丛书中讲解的其他一切东西一样，我们将拨弄这种理解来看看它到底有多扎实，并希望能在这个过程中学到一些新东西。
 
-Recall the example from above:
+回想上面的例子：
 
 ```js
 var a = 42, b;
@@ -585,7 +571,7 @@ a;	// 43
 b;	// 43
 ```
 
-But what would happen if we remove the `( )`?
+要是我们移除了`( )`会怎样？
 
 ```js
 var a = 42, b;
@@ -595,13 +581,13 @@ a;	// 43
 b;	// 42
 ```
 
-Wait! Why did that change the value assigned to `b`?
+等一下！为什么这改变了赋给`b`的值？
 
-Because the `,` operator has a lower precedence than the `=` operator. So, `b = a++, a` is interpreted as `(b = a++), a`. Because (as we explained earlier) `a++` has *after side effects*, the assigned value to `b` is the value `42` before the `++` changes `a`.
+因为`,`操作符要比`=`操作符的优先级低。所以，`b = a++, a`被翻译为`(b = a++), a`。因为（如我们前面讲解的）`a++`拥有 *后副作用*，赋值给`b`的值就是在`++`改变`a`之前的值`42`。
 
-This is just a simple matter of needing to understand operator precedence. If you're going to use `,` as a statement-series operator, it's important to know that it actually has the lowest precedence. Every other operator will more tightly bind than `,` will.
+这只是为了理解操作符优先级所需的一个简单事实。如果你将要把`,`作为一个语句序列操作符使用，那么知道它实际上拥有最低的优先级是很重要的。任何其他的操作符都将要比`,`结合得更紧密。
 
-Now, recall this example from above:
+现在，回想上面的这个例子：
 
 ```js
 if (str && (matches = str.match( /[aeiou]/g ))) {
@@ -609,11 +595,11 @@ if (str && (matches = str.match( /[aeiou]/g ))) {
 }
 ```
 
-We said the `( )` around the assignment is required, but why? Because `&&` has higher precedence than `=`, so without the `( )` to force the binding, the expression would instead be treated as `(str && matches) = str.match..`. But this would be an error, because the result of `(str && matches)` isn't going to be a variable, but instead a value (in this case `undefined`), and so it can't be the left-hand side of an `=` assignment!
+我们说过赋值语句周围的`( )`是必须的，但为什么？因为`&&`拥有的优先级比`=`更高，所以如果没有`( )`来强制结合，这个表达式将被作为`(str && matches) = str.match..`对待。但是这将是个错误，因为`(str && matches)`的结果将不是一个变量（在这里是`undefined`），而是一个值，因此它不能成为`=`赋值的左边！
 
-OK, so you probably think you've got this operator precedence thing down.
+好了，那么你可能认为你已经搞定操作符优先级了。
 
-Let's move on to a more complex example (which we'll carry throughout the next several sections of this chapter) to *really* test your understanding:
+让我们移动到更复杂的例子（在本章下面几节中我们将一直使用这个例子），来真正测试一下你的理解：
 
 ```js
 var a = 42;
@@ -625,29 +611,29 @@ var d = a && b || c ? c || b ? a : c && b : a;
 d;		// ??
 ```
 
-OK, evil, I admit it. No one would write a string of expressions like that, right? *Probably* not, but we're going to use it to examine various issues around chaining multiple operators together, which *is* a very common task.
+好的，邪恶，我承认。没有人会写这样的表达式串，对吧？*也许* 不会，但是我们将使用它来检视将多个操作符链接在一起时的各种问题，而链接多个操作符是一个非常常见的任务。
 
-The result above is `42`. But that's not nearly as interesting as how we can figure out that answer without just plugging it into a JS program to let JavaScript sort it out.
+上面的结果是`42`。但是这根本没意思，除非我们自己能搞清楚这个答案，而不是将它插进JS程序来让JavaScript搞定它。
 
-Let's dig in.
+让我们深入挖掘。
 
-The first question -- it may not have even occurred to you to ask -- is, does the first part (`a && b || c`) behave like `(a && b) || c` or like `a && (b || c)`? Do you know for certain? Can you even convince yourself they are actually different?
+第一个问题 —— 你可能还从来没问过 —— 是，第一个部分（`a && b || c`）是像`(a && b) || c`那样动作，还是像`a && (b || c)`那样动作？你能确定吗？你能说服你自己它们实际上是不同的吗？
 
 ```js
 (false && true) || true;	// true
 false && (true || true);	// false
 ```
 
-So, there's proof they're different. But still, how does `false && true || true` behave? The answer:
+所以，这就是它们不同的证据。但是`false && true || true`到底是如何动作的？答案是：
 
 ```js
 false && true || true;		// true
 (false && true) || true;	// true
 ```
 
-So we have our answer. The `&&` operator is evaluated first and the `||` operator is evaluated second.
+那么我们有了答案。`&&`操作符首先被求值，而`||`操作符第二被求值。
 
-But is that just because of left-to-right processing? Let's reverse the order of operators:
+但这不是因为从左到右的处理顺序吗？让我们把操作符的顺序倒过来：
 
 ```js
 true || false && false;		// true
@@ -656,25 +642,33 @@ true || false && false;		// true
 true || (false && false);	// true -- winner, winner!
 ```
 
-Now we've proved that `&&` is evaluated first and then `||`, and in this case that was actually counter to generally expected left-to-right processing.
+现在我们证明了`&&`首先被求值，然后才是`||`，而且在这个例子中的顺序实际上是与一般希望的从左到右的顺序相反的。
 
-So what caused the behavior? **Operator precedence**.
+那么什么导致了这种行为？**操作符优先级。**
 
-Every language defines its own operator precedence list. It's dismaying, though, just how uncommon it is that JS developers have read JS's list.
+每种语言都定义了自己的操作符优先级列表。虽然令人焦虑，但是JS开发者读过JS的列表是不常见的。
 
-If you knew it well, the above examples wouldn't have tripped you up in the slightest, because you'd already know that `&&` is more precedent than `||`. But I bet a fair amount of readers had to think about it a little bit.
+如果你熟知它，上面的例子一点儿都不会绊到你，因为你已经知道了`&&`要比`||`优先级高。但是我打赌有相当一部分读者不得不将它考虑一会。
 
-**Note:** Unfortunately, the JS spec doesn't really have its operator precedence list in a convenient, single location. You have to parse through and understand all the grammar rules. So we'll try to lay out the more common and useful bits here in a more convenient format. For a complete list of operator precedence, see "Operator Precedence" on the MDN site (* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence).
+**注意：** 不幸的是，JS语言规范没有将它的操作符优先级罗列在一个方便，单独的位置。你不得不通读并理解所有的文法规则。所以我们将试着以一种更方便的格式排列出更常见和更有用的部分。要得到完整的操作符优先级列表，参见MDN网站的“操作符优先级”(* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence)。
 
 ### Short Circuited
 
 In Chapter 4, we mentioned in a side note the "short circuiting" nature of operators like `&&` and `||`. Let's revisit that in more detail now.
 
+在第四章中，我们在一个边注中提到了`&&`个`||`这样的操作符的“短接”性质。让我们更详细地重温它们。
+
 For both `&&` and `||` operators, the right-hand operand will **not be evaluated** if the left-hand operand is sufficient to determine the outcome of the operation. Hence, the name "short circuited" (in that if possible, it will take an early shortcut out).
+
+对于`&&`和`||`两个操作符来说，如果左手边的操作数足够确定操作的结果，那么右手边的操作数将 **不会被求值**。故而，有了“短接”（如果可能，它就会取捷径退出）这个名字。
 
 For example, with `a && b`, `b` is not evaluated if `a` is falsy, because the result of the `&&` operand is already certain, so there's no point in bothering to check `b`. Likewise, with `a || b`, if `a` is truthy, the result of the operand is already certain, so there's no reason to check `b`.
 
+例如，说`a && b`，如果`a`是falsy`b`就不会被求值，因为`&&`操作数的结果已经确定了，所以再去麻烦地检查`b`是没有意义的。同样的，说`a || b`，如果`a`是truthy，那么操作的结果就已经确定了，所以没有理由再去检查`b`。
+
 This short circuiting can be very helpful and is commonly used:
+
+这种短接非常有帮助，而且经常被使用：
 
 ```js
 function doSomething(opts) {
@@ -686,7 +680,11 @@ function doSomething(opts) {
 
 The `opts` part of the `opts && opts.cool` test acts as sort of a guard, because if `opts` is unset (or is not an `object`), the expression `opts.cool` would throw an error. The `opts` test failing plus the short circuiting means that `opts.cool` won't even be evaluated, thus no error!
 
+`opts && opts.cool`测试的`opts`部分就像某种保护，因为如果`opts`没有被赋值（或不是一个`object`），那么表达式`opts.cool`就将抛出一个错误。`opts`测试失败加上短接意味着`opts.cool`根本不会被求值，因此没有错误！
+
 Similarly, you can use `||` short circuiting:
+
+相似地，你可以用`||`短接：
 
 ```js
 function doSomething(opts) {
@@ -698,9 +696,13 @@ function doSomething(opts) {
 
 Here, we're checking for `opts.cache` first, and if it's present, we don't call the `primeCache()` function, thus avoiding potentially unnecessary work.
 
+这里，我们首先检查`opts.cache`，如果它存在，我们就不会调用`primeCache()`函数，如此避免了潜在的不必要的工作。
+
 ### Tighter Binding
 
 But let's turn our attention back to that earlier complex statement example with all the chained operators, specifically the `? :` ternary operator parts. Does the `? :` operator have more or less precedence than the `&&` and `||` operators?
+
+让我们把注意力转回前面全是链接的操作符的复杂语句的例子，特别是`? :`三元操作符的部分。`? :`操作对的优先级与`&&`和`||`操作符比起来是高还是低？
 
 ```js
 a && b || c ? c || b ? a : c && b : a
@@ -720,19 +722,33 @@ or this?
 
 The answer is the second one. But why?
 
+答案是第二个。但为什么？
+
 Because `&&` is more precedent than `||`, and `||` is more precedent than `? :`.
 
+因为`&&`优先级比`||`高，而`||`优先级比`? :`高。
+
 So, the expression `(a && b || c)` is evaluated *first* before the `? :` it participates in. Another way this is commonly explained is that `&&` and `||` "bind more tightly" than `? :`. If the reverse was true, then `c ? c...` would bind more tightly, and it would behave (as the first choice) like `a && b || (c ? c..)`.
+
+所以，表达式`(a && b || c)`在`? :`参与之前被 *首先* 求值。另一种常见的解释方式是，`&&`和`||`要被`? :`“结合的更紧密”。如果倒过来成立的话，那么`c ? c..`将结合的更紧密，那么它就会如`a && b || (c ? c..)`那样动作（就像第一种选择）。
 
 ### Associativity
 
 So, the `&&` and `||` operators bind first, then the `? :` operator. But what about multiple operators of the same precedence? Do they always process left-to-right or right-to-left?
 
+所以，`&&`和`||`操作符首先集合，然后是`? :`操作符。但是多个同等优先级的操作符呢？它们总是从左到右或是从右到左地处理吗？
+
 In general, operators are either left-associative or right-associative, referring to whether **grouping happens from the left or from the right**.
+
+一般来说，操作符不是左结合的就是右结合的，这要看 **分组是从左边发生还是从右边发生。**
 
 It's important to note that associativity is *not* the same thing as left-to-right or right-to-left processing.
 
+很重要而需要注意的是，结合性与从左到右或从右到左的处理 *不是* 同一个东西。
+
 But why does it matter whether processing is left-to-right or right-to-left? Because expressions can have side effects, like for instance with function calls:
+
+但为什么处理是从左到右或从右到左那么重要？因为表达式可以有副作用，例如函数调用：
 
 ```js
 var a = foo() && bar();
@@ -740,11 +756,19 @@ var a = foo() && bar();
 
 Here, `foo()` is evaluated first, and then possibly `bar()` depending on the result of the `foo()` expression. That definitely could result in different program behavior than if `bar()` was called before `foo()`.
 
+这里，`foo()`首先被求值，然后根据表达式`foo()`的结果，`bar()`可能会求值。如果`bar()`在`foo()`之前被调用绝对会得出不同的程序行为。
+
 But this behavior is *just* left-to-right processing (the default behavior in JavaScript!) -- it has nothing to do with the associativity of `&&`. In that example, since there's only one `&&` and thus no relevant grouping here, associativity doesn't even come into play.
+
+但是这个行为就是从左到右的处理（JavaScript中的默认行为！）—— 它与`&&`的结合性无关。在这个例子中，因为这里只有一个`&&`因此没有相关的分组，所以根本谈不上结合性。
 
 But with an expression like `a && b && c`, grouping *will* happen implicitly, meaning that either `a && b` or `b && c` will be evaluated first.
 
+但是像`a && b && c`这样的表达式，分组将会隐含地发生，意味着不是`a && b`就是`b && c`会先被求值。
+
 Technically, `a && b && c` will be handled as `(a && b) && c`, because `&&` is left-associative (so is `||`, by the way). However, the right-associative alternative `a && (b && c)` behaves observably the same way. For the same values, the same expressions are evaluated in the same order.
+
+技术上讲，`a && b && c`将会作为`(a && b) && c`处理，因为`&&`是左结合的（顺带一提，`||`也是）。然而，
 
 **Note:** If hypothetically `&&` was right-associative, it would be processed the same as if you manually used `( )` to create grouping like `a && (b && c)`. But that still **doesn't mean** that `c` would be processed before `b`. Right-associativity does **not** mean right-to-left evaluation, it means right-to-left **grouping**. Either way, regardless of the grouping/associativity, the strict ordering of evaluation will be `a`, then `b`, then `c` (aka left-to-right).
 
