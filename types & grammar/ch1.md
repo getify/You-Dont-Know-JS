@@ -17,7 +17,7 @@
 
 这绝不是一个完美的定义。但是对于这里的讨论足够好了。而且它与JS描述它的方式并不矛盾。
 
-# A Type By Any Other Name...
+# 无论类型被称为什么，它很重要
 
 抛开在定义上的学院派的分歧，为什么JavaScript有或者没有 *类型* 那么重要？
 
@@ -78,7 +78,7 @@ var a = null;
 (!a && typeof a === "object"); // true
 ```
 
-`null`是唯一一个“falsy”（也交类false；见第四章），但是在`typeof`检查中返回`"object"`的基本类型。
+`null`是唯一一个“falsy”（也叫类false；见第四章），但是在`typeof`检查中返回`"object"`的基本类型。
 
 那么`typeof`可以返回的第7种字符串值是什么？
 
