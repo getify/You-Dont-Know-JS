@@ -133,23 +133,14 @@ foo( 2 );
 
 你可能错过了这个代码段隐含的`a = 2`。它发生在当值`2`作为参数传递给`foo(..)`函数时，这时值`2` **被赋值** 给参数`a`。为了（隐含地）给参数`a`赋值，进行了一个LHS查询。
 
-There's also an RHS reference for the value of `a`, and that resulting value is passed to `console.log(..)`. `console.log(..)` needs a reference to execute. It's an RHS look-up for the `console` object, then a property-resolution occurs to see if it has a method called `log`.
-
 这里还有一个`a`的值的RHS引用，它的结果值被传入`console.log(..)`。`console.log(..)`需要一个引用来执行。它为`console`对象进行一个RHS查询，然后发生一个属性解析来看它是否有一个称为`log`的方法。
-
-Finally, we can conceptualize that there's an LHS/RHS exchange of passing the value `2` (by way of variable `a`'s RHS look-up) into `log(..)`. Inside of the native implementation of `log(..)`, we can assume it has parameters, the first of which (perhaps called `arg1`) has an LHS reference look-up, before assigning `2` to it.
 
 最后，我们可以将这一过程概念化为，在将值`2`（通过变量`a`的RHS查询得到的）传入`log(..)`时发生了一次LHS/RHS的交换。在`log(..)`的原生实现内部，我们可以假定它拥有参数，其中的第一个（也许被称为`arg1`）在`2`被赋值给它之前，进行了一次LHS引用查询。
 
-**Note:** You might be tempted to conceptualize the function declaration `function foo(a) {...` as a normal variable declaration and assignment, such as `var foo` and `foo = function(a){...`. In so doing, it would be tempting to think of this function declaration as involving an LHS look-up.
-
 **注意：** 你可能会试图将函数声明`function foo(a) {...`概念化为一个普通的变量声明和赋值，比如`var foo`和`foo = function(a){...`。这样做会诱使你认为函数声明涉及了一次LHS查询。
-
-However, the subtle but important difference is that *Compiler* handles both the declaration and the value definition during code-generation, such that when *Engine* is executing code, there's no processing necessary to "assign" a function value to `foo`. Thus, it's not really appropriate to think of a function declaration as an LHS look-up assignment in the way we're discussing them here.
 
 然而，一个微妙但重要的不同是，*编译器* 处理声明和代码生成期间的值的定义，如此当 *引擎* 执行代码时，没有必要将一个函数值“赋予”`foo`。因此，认为函数声明是一个我们在这里讨论的LSH查询赋值是不太合适的。
 
-### Engine/Scope Conversation
 ### 引擎/作用域对话
 
 ```js
@@ -160,51 +151,35 @@ function foo(a) {
 foo( 2 );
 ```
 
-Let's imagine the above exchange (which processes this code snippet) as a conversation. The conversation would go a little something like this:
-
 让我们将上面的（处理这个代码段的）交互想象为一场对话。这场对话将会有点儿像这样进行：
 
-> ***Engine***: Hey *Scope*, I have an RHS reference for `foo`. Ever heard of it?
 > ***引擎***：嘿 *作用域*，我有一个`foo`的RHS引用。听说过它吗？
 
-> ***Scope***: Why yes, I have. *Compiler* declared it just a second ago. He's a function. Here you go.
 > ***作用域***；啊，是的，听说过。*编译器* 刚在一秒钟之前声明了它。它是一个函数。给你。
 
-> ***Engine***: Great, thanks! OK, I'm executing `foo`.
 > ***引擎***：太棒了，谢谢！好的，我要执行`foo`了。
 
-> ***Engine***: Hey, *Scope*, I've got an LHS reference for `a`, ever heard of it?
 > ***引擎***：嘿，*作用域*，我得到了一个`a`的LHS引用，听说过它吗？
 
-> ***Scope***: Why yes, I have. *Compiler* declared it as a formal parameter to `foo` just recently. Here you go.
 > ***作用域***：啊，是的，听说过。*编译器* 刚才将它声明为`foo`的一个正式参数了。给你。
 
-> ***Engine***: Helpful as always, *Scope*. Thanks again. Now, time to assign `2` to `a`.
 > ***引擎***：一如既往的给力，*作用域*。再次感谢你。现在，该把`2`赋值给`a`了。
 
-> ***Engine***: Hey, *Scope*, sorry to bother you again. I need an RHS look-up for `console`. Ever heard of it?
 > ***引擎***：嘿，*作用域*，很抱歉又一次打扰你。我需要RHS查询`console`。听说过它吗？
 
-> ***Scope***: No problem, *Engine*, this is what I do all day. Yes, I've got `console`. He's built-in. Here ya go.
 > ***作用域***：没问题，*引擎*，这是我一天到晚的工作。是的，我得到`console`了。它是一个内建对象。给你。
 
-> ***Engine***: Perfect. Looking up `log(..)`. OK, great, it's a function.
 > ***引擎***：完美。查找`log(..)`。好的，很好，它是一个函数。
 
-> ***Engine***: Yo, *Scope*. Can you help me out with an RHS reference to `a`. I think I remember it, but just want to double-check.
 > ***引擎***：嘿，*作用域*。你能帮我查一下`a`的RHS引用吗？我想记得它，但只是想再次确认一下。
 
-> ***Scope***: You're right, *Engine*. Same guy, hasn't changed. Here ya go.
 > ***作用域***：你是对的，*引擎*。同一个家伙，没变。给你。
 
-> ***Engine***: Cool. Passing the value of `a`, which is `2`, into `log(..)`.
 > ***引擎***：酷。传递`a`的值，也就是`2`，给`log(..)`。
 
 > ...
 
 ### 小测验
-
-Check your understanding so far. Make sure to play the part of *Engine* and have a "conversation" with the *Scope*:
 
 检查你目前为止的理解。确保你扮演 *引擎*，并与 *作用域* “对话”：
 
@@ -217,23 +192,19 @@ function foo(a) {
 var c = foo( 2 );
 ```
 
-1. Identify all the LHS look-ups (there are 3!).
+1. 找到所有的LHS查询（有3处！）。
 
-2. Identify all the RHS look-ups (there are 4!).
-
-**Note:** See the chapter review for the quiz answers!
+2. 找到所有的RHS查询（有4处！）。
 
 **注意：** 小测验答案参见本章的复习部分！
 
-## Nested Scope
-
 ## 嵌套作用域
 
-We said that *Scope* is a set of rules for looking up variables by their identifier name. There's usually more than one *Scope* to consider, however.
+我们说过 *作用域* 是通过标识符名称查询变量的一组规则。但是，通常会有多于一个的 *作用域* 需要考虑。
 
-Just as a block or function is nested inside another block or function, scopes are nested inside other scopes. So, if a variable cannot be found in the immediate scope, *Engine* consults the next outer containing scope, continuing until found or until the outermost (aka, global) scope has been reached.
+就像一个代码块儿或函数被嵌套在另一个代码块儿或函数中一样，作用域被嵌套在其他的作用域中。所以，如果在直接作用域中找不到一个变量的话，*引擎* 就会咨询下一个外层作用域，如此继续直到找到这个变量或者到达最外层作用域（也就是全局作用域）。
 
-Consider:
+考虑这段代码：
 
 ```js
 function foo(a) {
@@ -245,37 +216,37 @@ var b = 2;
 foo( 2 ); // 4
 ```
 
-The RHS reference for `b` cannot be resolved inside the function `foo`, but it can be resolved in the *Scope* surrounding it (in this case, the global).
+`b`的RHS引用不能在函数`foo`的内部被解析，但是可以在包围着它的 *作用域*（这个例子中是全局作用域）中解析。
 
-So, revisiting the conversations between *Engine* and *Scope*, we'd overhear:
+所以，重返 *引擎* 和 *作用域* 的对话，我们会听到：
 
-> ***Engine***: "Hey, *Scope* of `foo`, ever heard of `b`? Got an RHS reference for it."
+> ***引擎***：“嘿，`foo`的 *作用域*，听说过`b`吗？我得到一个它的RHS引用。”
 
-> ***Scope***: "Nope, never heard of it. Go fish."
+> ***作用域****：“没有，从没听说过。问问别人吧。”
 
-> ***Engine***: "Hey, *Scope* outside of `foo`, oh you're the global *Scope*, ok cool. Ever heard of `b`? Got an RHS reference for it."
+> ***引擎***：“嘿，`foo`外面的 *作用域*，哦，你是全局 *作用域*，好吧，酷。听说过`b`吗？我得到一个它的RHS引用。”
 
-> ***Scope***: "Yep, sure have. Here ya go."
+> ***作用域***：“是的，当然有。给你。”
 
-The simple rules for traversing nested *Scope*: *Engine* starts at the currently executing *Scope*, looks for the variable there, then if not found, keeps going up one level, and so on. If the outermost global scope is reached, the search stops, whether it finds the variable or not.
+遍历嵌套 *作用域* 的简单规则：*引擎* 从当前执行的 *作用域* 开始，在那里查找变量，如果没有找到，就在上一级继续查找，如此类推。如果到了最外层的全局作用域，那么查找就会停止，无论它是否找到了变量。
 
-### Building on Metaphors
+### 建筑的隐喻
 
-To visualize the process of nested *Scope* resolution, I want you to think of this tall building.
+为了将嵌套 *作用域* 解析的过程可视化，我想让你考虑一下这个高层建筑。
 
 <img src="fig1.png" width="250">
 
-The building represents our program's nested *Scope* rule set. The first floor of the building represents your currently executing *Scope*, wherever you are. The top level of the building is the global *Scope*.
+这个建筑物表示我们程序的嵌套 *作用域* 规则集合。无论你在哪里，建筑的第一层表示你当前执行的 *作用域*。建筑的顶层表示全局 *作用域*。
 
-You resolve LHS and RHS references by looking on your current floor, and if you don't find it, taking the elevator to the next floor, looking there, then the next, and so on. Once you get to the top floor (the global *Scope*), you either find what you're looking for, or you don't. But you have to stop regardless.
+你通过在你当前的楼层中查找来解析LHS和RHS引用，如果你没有找到它，就做电梯到上一层楼，在那里寻找，然后再上一层，如此类推。一旦你到了顶层（全局 *作用域*）。你要么找到了你想要的东西，要么没有。但是不管怎样你都不得不停止了。
 
-## Errors
+## 错误
 
-Why does it matter whether we call it LHS or RHS?
+为什么我们称之为LHS或者RHS那么重要？
 
-Because these two types of look-ups behave differently in the circumstance where the variable has not yet been declared (is not found in any consulted *Scope*).
+因为在变量还没有被声明（在所有被咨询的 *作用域* 中都没找到）的情况下，这两种类型的查询的行为不同。
 
-Consider:
+考虑如下代码：
 
 ```js
 function foo(a) {
@@ -286,37 +257,37 @@ function foo(a) {
 foo( 2 );
 ```
 
-When the RHS look-up occurs for `b` the first time, it will not be found. This is said to be an "undeclared" variable, because it is not found in the scope.
+当`b`的RHS查询第一次发生时，它是找不到的。它被说成是一个“未声明”的变量，因为它在作用域中找不到。
 
-If an RHS look-up fails to ever find a variable, anywhere in the nested *Scope*s, this results in a `ReferenceError` being thrown by the *Engine*. It's important to note that the error is of the type `ReferenceError`.
+如果RHS查询在嵌套的 *作用域* 的任何地方都找不到一个值时，这会导致 *引擎* 抛出一个`ReferenceError`。必须要注意的是这个错误的类型是`ReferenceError`。
 
-By contrast, if the *Engine* is performing an LHS look-up and arrives at the top floor (global *Scope*) without finding it, and if the program is not running in "Strict Mode" [^note-strictmode], then the global *Scope* will create a new variable of that name **in the global scope**, and hand it back to *Engine*.
+相比之下，如果 *引擎* 在进行一个LHS查询并到达了顶层（全局 *作用域*）都没有找到它，而且如果程序没有运行在“Strict模式”[^note-strictmode]下，那么这个全局 *作用域* 将会在 **全局作用域中** 创建一个同名的新变量，并把它交给*引擎*。
 
-*"No, there wasn't one before, but I was helpful and created one for you."*
+*“不，之前没有这样的东西，但是我可以帮忙给你创建一个。”*
 
-"Strict Mode" [^note-strictmode], which was added in ES5, has a number of different behaviors from normal/relaxed/lazy mode. One such behavior is that it disallows the automatic/implicit global variable creation. In that case, there would be no global *Scope*'d variable to hand back from an LHS look-up, and *Engine* would throw a `ReferenceError` similarly to the RHS case.
+在ES5中被加入的“Strict模式”[^note-strictmode]，有许多与一般/宽松/懒惰模式不同的行为。其中之一就是不允许自动/隐含的全局变量创建。在这种情况下，将不会有全局 *作用域* 的变量交回给LHS查询，并且类似于RHS的情况, *引擎* 将抛出一个`ReferenceError`。
 
-Now, if a variable is found for an RHS look-up, but you try to do something with its value that is impossible, such as trying to execute-as-function a non-function value, or reference a property on a `null` or `undefined` value, then *Engine* throws a different kind of error, called a `TypeError`.
+现在，如果一个RHS查询的变脸被找到了，但是你试着去做一些这个值不可能做到的事，比如将一个非函数的值作为函数运行，或者引用`null`或者`undefined`值得属性，那么 *引擎* 就会抛出一个不同种类的错误，称为`TypeError`。
 
-`ReferenceError` is *Scope* resolution-failure related, whereas `TypeError` implies that *Scope* resolution was successful, but that there was an illegal/impossible action attempted against the result.
+`ReferenceError`是关于 *作用域* 解析失败的，而`TypeError`暗示着 *作用域* 解析成功了，但是试图对这个结果进行一个非法/不可能的动作。
 
-## Review (TL;DR)
+## 复习
 
-Scope is the set of rules that determines where and how a variable (identifier) can be looked-up. This look-up may be for the purposes of assigning to the variable, which is an LHS (left-hand-side) reference, or it may be for the purposes of retrieving its value, which is an RHS (right-hand-side) reference.
+作用域是一组规则，它决定了在哪里和如何查找一个变量（标识符）。这种查询也许是为了向这个变量赋值，这时变量是一个LHS（左手边）引用，或者是为取得它的值，这时变量是一个RHS（右手边）引用。
 
-LHS references result from assignment operations. *Scope*-related assignments can occur either with the `=` operator or by passing arguments to (assign to) function parameters.
+LHS引用得自复制操作。*作用域* 相关的赋值可以通过`=`操作符发生，也可以通过向函数参数传递（赋予）数据发生。
 
-The JavaScript *Engine* first compiles code before it executes, and in so doing, it splits up statements like `var a = 2;` into two separate steps:
+JavaScript *引擎* 在执行代码之前首先会编译它，这样做，它将`var a = 2;`这样的语句分割为两个分离的步骤：
 
-1. First, `var a` to declare it in that *Scope*. This is performed at the beginning, before code execution.
+1. 首先，`var a`在当前 *作用域* 中声明。这在最开始，代码执行之前实施。
 
-2. Later, `a = 2` to look up the variable (LHS reference) and assign to it if found.
+2. 稍后，`a = 2`查找这个变量（LHS引用），并且如果找到就向它赋值。
 
-Both LHS and RHS reference look-ups start at the currently executing *Scope*, and if need be (that is, they don't find what they're looking for there), they work their way up the nested *Scope*, one scope (floor) at a time, looking for the identifier, until they get to the global (top floor) and stop, and either find it, or don't.
+LHS和RHS引用查询都从当前执行中的 *作用域* 开始，如果有需要（也就是，它们在这里没能找到它们要找的东西），它们会在嵌套的 *作用域* 中一路向上，一次一个作用域（层）地查找这个标识符，直到它们到达全局作用域（顶层）并停止，既可能找到也可能没找到。
 
-Unfulfilled RHS references result in `ReferenceError`s being thrown. Unfulfilled LHS references result in an automatic, implicitly-created global of that name (if not in "Strict Mode" [^note-strictmode]), or a `ReferenceError` (if in "Strict Mode" [^note-strictmode]).
+未满足的RHS引用会导致`ReferenceError`被抛出。未满足的LHS引用会导致一个自动的，隐含地创建的同名全局变量（如果不是“Strict模式”[^note-strictmode]），或者一个`ReferenceError`（如果是“Strict模式”[^note-strictmode]）。
 
-### Quiz Answers
+### 小测验答案
 
 ```js
 function foo(a) {
@@ -327,13 +298,12 @@ function foo(a) {
 var c = foo( 2 );
 ```
 
-1. Identify all the LHS look-ups (there are 3!).
+1. 找出所有的LHS查询（有3处！）。
 
-	**`c = ..`, `a = 2` (implicit param assignment) and `b = ..`**
+	**`c = ..`, `a = 2`（隐含的参数赋值）和`b = ..`**
 
-2. Identify all the RHS look-ups (there are 4!).
+2. 找出所有的RHS查询（有4处！）。
 
-    **`foo(2..`, `= a;`, `a + ..` and `.. + b`**
-
+    **`foo(2..`, `= a;`, `a + ..`和`.. + b`**
 
 [^note-strictmode]: MDN: [Strict Mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode)
