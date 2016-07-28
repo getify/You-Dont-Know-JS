@@ -31,7 +31,7 @@ console.log( s.toString() ); // "Hello World!"
 ```js
 var a = new String( "abc" );
 
-typeof a; // "object" ... not "String"
+typeof a; // "object" ... 不是 "String"
 
 a instanceof String; // true
 
