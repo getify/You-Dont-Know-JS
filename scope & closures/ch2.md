@@ -1,23 +1,23 @@
 # You Don't Know JS: Scope & Closures
 # Chapter 2: Lexical Scope
 
-In Chapter 1, we defined "scope" as the set of rules that govern how the *Engine* can look up a variable by its identifier name and find it, either in the current *Scope*, or in any of the *Nested Scopes* it's contained within.
+在第一章中，我们将“作用域”定义为一组规则，它主宰着 *引擎* 如何通过标识符名称在当前的 *作用域*，或者在包含它的任意 *嵌套作用域* 中来查询一个变量，
 
-There are two predominant models for how scope works. The first of these is by far the most common, used by the vast majority of programming languages. It's called **Lexical Scope**, and we will examine it in-depth. The other model, which is still used by some languages (such as Bash scripting, some modes in Perl, etc.) is called **Dynamic Scope**.
+作用域的工作方式有两种占统治地位的模型。其中的第一种是最最常见，在绝大多数的编程语言中被使用的。它称为 **词法作用域**，我们将深入检视它。另一种仍然被一些语言（比如Bash脚本，Perl中的一些模式，等等）使用的模型，称为 **动态作用域**。
 
-Dynamic Scope is covered in Appendix A. I mention it here only to provide a contrast with Lexical Scope, which is the scope model that JavaScript employs.
+动态作用域在附录A中讲解。我在这里提到它仅仅是为词法作用域提供一个对比，而词法作用域是JavaScript采用的作用域模型。
 
 ## Lex-time
 
-As we discussed in Chapter 1, the first traditional phase of a standard language compiler is called lexing (aka, tokenizing). If you recall, the lexing process examines a string of source code characters and assigns semantic meaning to the tokens as a result of some stateful parsing.
+正如我们在第一章中讨论的，标准语言编译器的第一个传统步骤称为词法分析（也就是分词）。如果你回忆一下，词法分析处理是检查一串源代码字符，并给token赋予语法含义作为某种有状态解析的输出。
 
-It is this concept which provides the foundation to understand what lexical scope is and where the name comes from.
+正是这个概念给理解词法作用域是什么和这个名词源于何处提供了基础。
 
-To define it somewhat circularly, lexical scope is scope that is defined at lexing time. In other words, lexical scope is based on where variables and blocks of scope are authored, by you, at write time, and thus is (mostly) set in stone by the time the lexer processes your code.
+要定义它有点儿兜圈子，词法作用域是在词法分析时被定义的作用域。换句话说，词法作用域是基于，你，在写程序时，变量和作用域的块儿在何处被编写决定的，因此在词法分析器处理你的代码时（基本上）是固定不变的。
 
-**Note:** We will see in a little bit there are some ways to cheat lexical scope, thereby modifying it after the lexer has passed by, but these are frowned upon. It is considered best practice to treat lexical scope as, in fact, lexical-only, and thus entirely author-time in nature.
+**注意：** 我们将会稍稍看到有一些方法可以骗过词法作用域，从而在词法分析器处理过后改变它，但是这些方法都是使人皱眉头的。事实上，将词法作用域看作是仅仅依靠词法的，因此在本质上完全是编写时决定的，才被认为是最佳实践。
 
-Let's consider this block of code:
+让我们考虑这段代码：
 
 ```js
 function foo(a) {
@@ -34,61 +34,61 @@ function foo(a) {
 foo( 2 ); // 2 4 12
 ```
 
-There are three nested scopes inherent in this code example. It may be helpful to think about these scopes as bubbles inside of each other.
+在这个代码实例中有三个固有的嵌套作用域。将这些作用域考虑为套在一起的气泡可能有助于思考。
 
 <img src="fig2.png" width="500">
 
-**Bubble 1** encompasses the global scope, and has just one identifier in it: `foo`.
+**气泡1** 围绕着全局作用域，它里面只有一个标识符：`foo`。
 
-**Bubble 2** encompasses the scope of `foo`, which includes the three identifiers: `a`, `bar` and `b`.
+**气泡2** 围绕着作用域`foo`，它含有三个标识符：`a`，`bar`和`b`。
 
-**Bubble 3** encompasses the scope of `bar`, and it includes just one identifier: `c`.
+**气泡3** 围绕着作用域`bar`，它里面只包含一个标识符：`c`。
 
-Scope bubbles are defined by where the blocks of scope are written, which one is nested inside the other, etc. In the next chapter, we'll discuss different units of scope, but for now, let's just assume that each function creates a new bubble of scope.
+作用域气泡是根据作用域的块儿被写在何处定义的，一个嵌套在另一个内部，等等。在下一章中，我们将讨论作用域的不同单位，但是就现在来说，让我们认为每一个函数创建了一个新的作用域气泡。
 
-The bubble for `bar` is entirely contained within the bubble for `foo`, because (and only because) that's where we chose to define the function `bar`.
+`bar`的气泡完全被包含在`foo`的气泡中，因为（而且只因为）这就是我们选择定义函数`bar`的位置。
 
-Notice that these nested bubbles are strictly nested. We're not talking about Venn diagrams where the bubbles can cross boundaries. In other words, no bubble for some function can simultaneously exist (partially) inside two other outer scope bubbles, just as no function can partially be inside each of two parent functions.
+注意这些嵌套的气泡是严格嵌套的。我们没有讨论气泡可以跨越边界的维恩图（Venn diagrams）。换句话说，没有那个函数的气泡可以同时（部分地）存在于另外两个外部的作用域气泡中，就像没有函数可以部分地存在于它的两个父函数中一样。
 
 ### Look-ups
 
-The structure and relative placement of these scope bubbles fully explains to the *Engine* all the places it needs to look to find an identifier.
+这些作用域气泡的结构和相对位置完全解释了 *引擎* 在查找一个标识符时，它需要查看的所有地方。
 
-In the above code snippet, the *Engine* executes the `console.log(..)` statement and goes looking for the three referenced variables `a`, `b`, and `c`. It first starts with the innermost scope bubble, the scope of the `bar(..)` function. It won't find `a` there, so it goes up one level, out to the next nearest scope bubble, the scope of `foo(..)`. It finds `a` there, and so it uses that `a`. Same thing for `b`. But `c`, it does find inside of `bar(..)`.
+在上面的代码段中，*引擎* 执行语句`console.log(..)`并开始查找三个被引用的变量`a`，`b`和`c`。它首先从最内部的作用域气泡开始，也就是`bar(..)`函数的作用域。在这里它找不到`a`，所以它向上走一层，到外面下一个最近的作用域气泡，`foo(..)`的作用域。它在这里找到了`a`，于是它就使用这个`a`。同样的事情也发生在`b`上。但是对于`c`，它在`bar(..)`内部就找到了。
 
-Had there been a `c` both inside of `bar(..)` and inside of `foo(..)`, the `console.log(..)` statement would have found and used the one in `bar(..)`, never getting to the one in `foo(..)`.
+如果在`bar(..)`内部和`foo(..)`内部都有一个`c`，那么`console.log(..)`语句将会找到并使用`bar(..)`中的那一个，绝不会到达`foo(..)`中的那一个。
 
-**Scope look-up stops once it finds the first match**. The same identifier name can be specified at multiple layers of nested scope, which is called "shadowing" (the inner identifier "shadows" the outer identifier). Regardless of shadowing, scope look-up always starts at the innermost scope being executed at the time, and works its way outward/upward until the first match, and stops.
+**一旦找到第一个匹配，作用域查询就停止了**。相同的标识符名称可以在嵌套作用域的多个层中被指定，这称为“遮蔽（shadowing）”（内部的标识符“遮蔽”了外部的标识符）。无论如何遮蔽，作用域查询总是从当前被执行的最内侧的作用域开始，向外/向上不断查找，直到第一个匹配才停止。
 
-**Note:** Global variables are also automatically properties of the global object (`window` in browsers, etc.), so it *is* possible to reference a global variable not directly by its lexical name, but instead indirectly as a property reference of the global object.
+**注意：** 全局变量也自动地是全局对象（在浏览器中是`window`，等等）的属性，所以不直接通过全局变量的词法名称，而通过将它作为全局对象的一个属性引用来间接地引用，是可能的。
 
 ```js
 window.a
 ```
 
-This technique gives access to a global variable which would otherwise be inaccessible due to it being shadowed. However, non-global shadowed variables cannot be accessed.
+这种技术给出了访问全局变量的方法，没有它全局变量将因为被遮蔽而不可访问。然而，被遮蔽的非全局变量是无法访问的。
 
-No matter *where* a function is invoked from, or even *how* it is invoked, its lexical scope is **only** defined by where the function was declared.
+不管函数是从 *哪里* 被调用的，也不论它是 *如何* 被调用的，它的词法作用域是由这个函数被声明的位置 **唯一** 定义的。
 
-The lexical scope look-up process *only* applies to first-class identifiers, such as the `a`, `b`, and `c`. If you had a reference to `foo.bar.baz` in a piece of code, the lexical scope look-up would apply to finding the `foo` identifier, but once it locates that variable, object property-access rules take over to resolve the `bar` and `baz` properties, respectively.
+词法作用域查询 *仅仅* 在处理头等标识符时实施，比如`a`，`b`，和`c`。如果你在一段代码中拥有一个`foo.bar.baz`的引用，词法作用域查询将在查找`foo`标识符时实施，但一旦定位这个变量，对象属性访问规则将会分别接管`bar`和`baz`属性的解析。
 
 ## Cheating Lexical
 
-If lexical scope is defined only by where a function is declared, which is entirely an author-time decision, how could there possibly be a way to "modify" (aka, cheat) lexical scope at run-time?
+如果词法作用域仅仅是由函数被声明的位置定义的，而且这个位置完全是一个编写时的决定，那么怎么可能有办法在运行时“修改”（也就是，欺骗）词法作用域呢？
 
-JavaScript has two such mechanisms. Both of them are equally frowned-upon in the wider community as bad practices to use in your code. But the typical arguments against them are often missing the most important point: **cheating lexical scope leads to poorer performance.**
+JavaScript有两种这样的机制。在广大的社区中它们都等同地被认为是让人皱眉头的，在你代码中使用它们是一种差劲儿的做法。但是关于它们的具有代表性的争论经常错过了最重要的一点：**欺骗词法作用域会导致更低下的性能。**
 
-Before I explain the performance issue, though, let's look at how these two mechanisms work.
+在我讲解性能的问题以前，先让我们看看这两种机制是如何工作的。
 
 ### `eval`
 
-The `eval(..)` function in JavaScript takes a string as an argument, and treats the contents of the string as if it had actually been authored code at that point in the program. In other words, you can programmatically generate code inside of your authored code, and run the generated code as if it had been there at author time.
+JavaScript中的`eval(..)`函数接收一个字符串作为参数值，并将这个字符串的内容看作是好像它已经被实际编写在程序的那个位置上。换句话说，你可以用编程的方式在你编写好的代码内部生成代码，而且你可以运行这个生成的代码，就好像它在编写时已就已经在那里了一样。
 
-Evaluating `eval(..)` (pun intended) in that light, it should be clear how `eval(..)` allows you to modify the lexical scope environment by cheating and pretending that author-time (aka, lexical) code was there all along.
+如果以这种观点来评价`eval(..)`，那么`eval(..)`是如何允许你修改词法作用域环境应当是很清楚的：欺骗并假装这个编写时（也就是，词法）代码一直就在那里。
 
-On subsequent lines of code after an `eval(..)` has executed, the *Engine* will not "know" or "care" that the previous code in question was dynamically interpreted and thus modified the lexical scope environment. The *Engine* will simply perform its lexical scope look-ups as it always does.
+在`eval(..)`被执行的后续代码行中，*引擎* 将不会“知道”或“关心”前面的代码是被动态翻译的，而且因此修改了词法作用域环境。*引擎* 将会像它一直做的那样，简单地进行词法作用域查询。
 
-Consider the following code:
+考虑如下代码：
 
 ```js
 function foo(str, a) {
@@ -101,15 +101,15 @@ var b = 2;
 foo( "var b = 3;", 1 ); // 1, 3
 ```
 
-The string `"var b = 3;"` is treated, at the point of the `eval(..)` call, as code that was there all along. Because that code happens to declare a new variable `b`, it modifies the existing lexical scope of `foo(..)`. In fact, as mentioned above, this code actually creates variable `b` inside of `foo(..)` that shadows the `b` that was declared in the outer (global) scope.
+在`eval(..)`调用的位置上，字符串`"var b = 3"`被看作是一直就存在在那里的代码。因为这个代码恰巧声明了一个新的变量`b`，它就修改了现存的`foo(..)`的词法作用域。事实上，就像上面提到的那样，这个代码实际上在`foo(..)`内部创建了变量`b`，它遮蔽了声明在外部（全局）作用域中的`b`。
 
-When the `console.log(..)` call occurs, it finds both `a` and `b` in the scope of `foo(..)`, and never finds the outer `b`. Thus, we print out "1, 3" instead of "1, 2" as would have normally been the case.
+当`console.log(..)`调用发生时，它会在`foo(..)`的作用域中找到`a`和`b`，而且绝不会找到外部的`b`。这样，我们就打印出"1, 3"而不是一般情况下的"1, 2"。
 
-**Note:** In this example, for simplicity's sake, the string of "code" we pass in was a fixed literal. But it could easily have been programmatically created by adding characters together based on your program's logic. `eval(..)` is usually used to execute dynamically created code, as dynamically evaluating essentially static code from a string literal would provide no real benefit to just authoring the code directly.
+**注意：** 在这个例子中，为了简单起见，我们传入的“代码”字符串是固定的文字。但是它可以通过根据你的程序逻辑将字符拼接在一起，很容易地以编程方式创建。`eval(..)`通常被用于执行动态创建的代码，因为动态地对一段实质上源自字符串字面值的静态代码进行求值，并不会比直接编写这样的代码带来真正的好处。
 
-By default, if a string of code that `eval(..)` executes contains one or more declarations (either variables or functions), this action modifies the existing lexical scope in which the `eval(..)` resides. Technically, `eval(..)` can be invoked "indirectly", through various tricks (beyond our discussion here), which causes it to instead execute in the context of the global scope, thus modifying it. But in either case, `eval(..)` can at runtime modify an author-time lexical scope.
+默认情况下，如果`eval(..)`执行的代码字符串包含一个或多个声明（变量或函数）的话，这个动作就会修改这个`eval(..)`所在的词法作用域。技术上讲，`eval(..)`可以通过种种技巧（超出了我们这里的讨论范围）被“间接”调用，而使它在全局作用域的上下文中执行，如此修改全局作用域。但不论那种情况，`eval(..)`都可以在运行时修改一个编写时的词法作用域。
 
-**Note:** `eval(..)` when used in a strict-mode program operates in its own lexical scope, which means declarations made inside of the `eval()` do not actually modify the enclosing scope.
+**注意：** 当`eval(..)`被用于一个操作它自己的词法作用域的strict模式程序时，在`eval(..)`内部做出的声明不会实际上修改包围它的作用域。
 
 ```js
 function foo(str) {
@@ -121,19 +121,19 @@ function foo(str) {
 foo( "var a = 2" );
 ```
 
-There are other facilities in JavaScript which amount to a very similar effect to `eval(..)`. `setTimeout(..)` and `setInterval(..)` *can* take a string for their respective first argument, the contents of which are `eval`uated as the code of a dynamically-generated function. This is old, legacy behavior and long-since deprecated. Don't do it!
+在JavaScript中还有其他的工具拥有与`eval(..)`非常类似的效果。`setTimeout(..)`和`setInterval(..)`*可以* 为它们各自的第一个参数值接收一个字符串，其内容将会被`eval`为一个动态生成的函数的代码。这种老旧的，遗产行为早就被废弃了。别这么做！
 
-The `new Function(..)` function constructor similarly takes a string of code in its **last** argument to turn into a dynamically-generated function (the first argument(s), if any, are the named parameters for the new function). This function-constructor syntax is slightly safer than `eval(..)`, but it should still be avoided in your code.
+`new Function(..)`函数构造器类似地为它的 **最后** 一个参数值接收一个代码字符串，来把它转换为一个动态生成的函数（前面的参数值，如果有的话，将作为新函数的命名参数）。这总函数构造器语法要比`eval(..)`稍稍安全一些，但在你的代码中它仍然应当被避免。
 
-The use-cases for dynamically generating code inside your program are incredibly rare, as the performance degradations are almost never worth the capability.
+在你的代码中动态生成代码的用例少的不可思议，因为在性能上的倒退使得这种能力几乎总是得不偿失。
 
 ### `with`
 
-The other frowned-upon (and now deprecated!) feature in JavaScript which cheats lexical scope is the `with` keyword. There are multiple valid ways that `with` can be explained, but I will choose here to explain it from the perspective of how it interacts with and affects lexical scope.
+JavaScript的另一个使人皱眉头（而且现在被废弃了！），而且可以欺骗词法作用域的特性是`with`关键字。有许多种合法的方式可以讲解`with`，但是我在此选择从它如何与词法作用域互动并影响词法作用域的角度来讲解它。
 
-`with` is typically explained as a short-hand for making multiple property references against an object *without* repeating the object reference itself each time.
+讲解`with`的典型方式是作为一种缩写，来引用一个对象的多个属性，而 *不必* 每次都重复对象引用本身。
 
-For example:
+例如：
 
 ```js
 var obj = {
@@ -155,7 +155,7 @@ with (obj) {
 }
 ```
 
-However, there's much more going on here than just a convenient short-hand for object property access. Consider:
+然而，这里发生的事情要比只是一个对象属性访问的便捷缩写要多得多。考虑如下代码：
 
 ```js
 function foo(obj) {
@@ -180,44 +180,44 @@ console.log( o2.a ); // undefined
 console.log( a ); // 2 -- Oops, leaked global!
 ```
 
-In this code example, two objects `o1` and `o2` are created. One has an `a` property, and the other does not. The `foo(..)` function takes an object reference `obj` as an argument, and calls `with (obj) { .. }` on the reference. Inside the `with` block, we make what appears to be a normal lexical reference to a variable `a`, an LHS reference in fact (see Chapter 1), to assign to it the value of `2`.
+在这个代码示例中，创建了两个对象`o1`和`o2`。一个有用`a`属性，而另一个没有。`foo(..)`函数接收一个对象引用`obj`作为参数值，并在这个引用上调用`with (obj) {..}`。在`with`块儿内部，我们制造了一个变量`a`的看似是普通词法引用的东西，实际上是一个LHS引用（见第一章），并将值`2`赋予它。
 
-When we pass in `o1`, the `a = 2` assignment finds the property `o1.a` and assigns it the value `2`, as reflected in the subsequent `console.log(o1.a)` statement. However, when we pass in `o2`, since it does not have an `a` property, no such property is created, and `o2.a` remains `undefined`.
+当我们传入`o1`时，赋值`a = 2`找到属性`o1.a`并赋予它值`2`，正如在后续的`console.log(o1.a)`语句反应的那样。然而，当我们传入`o2`，因为它没有`a`属性，没有这样的属性被创建，所以`o2.a`还是`undefined`。
 
-But then we note a peculiar side-effect, the fact that a global variable `a` was created by the `a = 2` assignment. How can this be?
+但是之后我们注意到一个特别的副作用，赋值`a = 2`创建了一个全局变量`a`。这怎么可能？
 
-The `with` statement takes an object, one which has zero or more properties, and **treats that object as if *it* is a wholly separate lexical scope**, and thus the object's properties are treated as lexically defined identifiers in that "scope".
+`with`语句接收一个对象，这个对象有0个或多个属性，并 **将这个对象视为好像它是一个完全隔离的词法作用域**，因此这个对象的属性被视为在这个“作用域”中词法定义的标识符。
 
-**Note:** Even though a `with` block treats an object like a lexical scope, a normal `var` declaration inside that `with` block will not be scoped to that `with` block, but instead the containing function scope.
+**注意：** 尽管一个`with`块儿将一个对象视为一个词法作用域，但是在`with`块儿内部的一个普通`var`声明将不会归于这个`with`块儿的作用域，而是归于包含它的函数作用域。
 
-While the `eval(..)` function can modify existing lexical scope if it takes a string of code with one or more declarations in it, the `with` statement actually creates a **whole new lexical scope** out of thin air, from the object you pass to it.
+如果`eval(..)`函数接收一个含有一个或多个声明的代码字符串，它就会修改现存的词法作用域，而`with`语句实际上是从你传递给它的对象中凭空制造了一个 **全新的词法作用域**。
 
-Understood in this way, the "scope" declared by the `with` statement when we passed in `o1` was `o1`, and that "scope" had an "identifier" in it which corresponds to the `o1.a` property. But when we used `o2` as the "scope", it had no such `a` "identifier" in it, and so the normal rules of LHS identifier look-up (see Chapter 1) occurred.
+以这种方式理解的话，当我们传入`o1`时`with`语句声明的“作用域”就是`o1`，而且这个“作用域”拥有一个对应于`o1.a`属性的“标识符”。但当我们使用`o2`作为“作用域”时，它里面没有这样的`a`“标识符”，于是LHS标识符查询（见第一章）的普通规则发生了。
 
-Neither the "scope" of `o2`, nor the scope of `foo(..)`, nor the global scope even, has an `a` identifier to be found, so when `a = 2` is executed, it results in the automatic-global being created (since we're in non-strict mode).
+“作用域”`o2`中没有，`foo(..)`的作用域中也没有，甚至连全局作作用域中都没有找到标识符`a`，所以当`a = 2`被执行时，其结果就是自动全局变量被创建（因为我们没有在strict模式下）。
 
-It is a strange sort of mind-bending thought to see `with` turning, at runtime, an object and its properties into a "scope" *with* "identifiers". But that is the clearest explanation I can give for the results we see.
+`with`在运行时将一个对象和它的属性转换为一个带有“标识符”的“作用域”，这个奇怪想法有些烧脑。但是对于我们看到的结果来说，这是我们给出的最清晰的解释。
 
-**Note:** In addition to being a bad idea to use, both `eval(..)` and `with` are affected (restricted) by Strict Mode. `with` is outright disallowed, whereas various forms of indirect or unsafe `eval(..)` are disallowed while retaining the core functionality.
+**注意：** 除了使用它们是个坏主意意外，`eval(..)`和`with`都受Strict模式的影响。`with`干脆就不允许使用，而虽然`eval(..)`还保有其核心功能，但各种间接形式的或不安全的`eval(..)`是不允许的。
 
 ### Performance
 
-Both `eval(..)` and `with` cheat the otherwise author-time defined lexical scope by modifying or creating new lexical scope at runtime.
+通过在运行时修改，或创建新的词法作用域，`eval(..)`和`with`都可以欺骗编写时定义的词法作用域。
 
-So, what's the big deal, you ask? If they offer more sophisticated functionality and coding flexibility, aren't these *good* features? **No.**
+你可能会问，那又有什么大不了的？如果它们提供了更精巧的功能和编码灵活性，那它们不是 *好的* 特性吗？**不。**
 
-The JavaScript *Engine* has a number of performance optimizations that it performs during the compilation phase. Some of these boil down to being able to essentially statically analyze the code as it lexes, and pre-determine where all the variable and function declarations are, so that it takes less effort to resolve identifiers during execution.
+JavaScript *引擎* 在编译阶段期行许多性能优化工作。其中的一些优化原理都归结为实质上在进行词法分析时可以静态地分析代码，并提前决定所有的变量和函数声明都在什么位置，这样在执行期间就可以少花些力气来解析标识符。
 
-But if the *Engine* finds an `eval(..)` or `with` in the code, it essentially has to *assume* that all its awareness of identifier location may be invalid, because it cannot know at lexing time exactly what code you may pass to `eval(..)` to modify the lexical scope, or the contents of the object you may pass to `with` to create a new lexical scope to be consulted.
+但如果 *引擎* 在代码中找到一个`eval(..)`或`with`，它实质上就不得不 *假定* 自己知道的所有的标识符的位置可能是不合法的，因为他不可能在词法分析时就知道你将会向`eval(..)`传递什么样的代码来修改词法作用域，或者你可能会向`with`传递的对象有什么样的内容来创建一个新的将被查询的词法作用域。
 
-In other words, in the pessimistic sense, most of those optimizations it *would* make are pointless if `eval(..)` or `with` are present, so it simply doesn't perform the optimizations *at all*.
+换句话说，悲观地看，如果`eval(..)`或`with`出现，那么它 *将* 做的几乎所有的优化都会变得没有意义，所以它就会简单地根本不做任何优化。
 
-Your code will almost certainly tend to run slower simply by the fact that you include an `eval(..)` or `with` anywhere in the code. No matter how smart the *Engine* may be about trying to limit the side-effects of these pessimistic assumptions, **there's no getting around the fact that without the optimizations, code runs slower.**
+你的代码几乎肯定会趋于运行的更慢，只因为你在代码的任何地方引入了一个了`eval(..)`或`with`。无论 *引擎* 将在努力限制这些悲观臆测的副作用上表现得多么聪明，**都没有任何办法可以绕过这个事实：没有优化，代码就运行的更慢。**
 
 ## Review (TL;DR)
 
-Lexical scope means that scope is defined by author-time decisions of where functions are declared. The lexing phase of compilation is essentially able to know where and how all identifiers are declared, and thus predict how they will be looked-up during execution.
+词法作用域意味着作用域是由编写时函数被声明的位置的决策定义的。编译器的词法分析阶段实质上可以知道所有的标识符是在哪里和如何声明的，并如此在执行期间预测它们将如何被查询。
 
-Two mechanisms in JavaScript can "cheat" lexical scope: `eval(..)` and `with`. The former can modify existing lexical scope (at runtime) by evaluating a string of "code" which has one or more declarations in it. The latter essentially creates a whole new lexical scope (again, at runtime) by treating an object reference *as* a "scope" and that object's properties as scoped identifiers.
+在JavaScript中有两种机制可以“欺骗”词法作用域：`eval(..)`和`with`。前者可以通过对一个拥有一个或多个声明的“代码”字符串进行求值，来（在运行时）修改现存的词法作用域。后者实质上是通过将一个对象引用看作一个“作用域”，并将这个对象的属性看作作用域中的标识符，（同样，也是在运行时）创建一个全新的词法作用域。
 
-The downside to these mechanisms is that it defeats the *Engine*'s ability to perform compile-time optimizations regarding scope look-up, because the *Engine* has to assume pessimistically that such optimizations will be invalid. Code *will* run slower as a result of using either feature. **Don't use them.**
+这些机制的缺点是，它压制了 *引擎* 在作用域查询上进行编译期优化的能力，因为 *引擎* 不得不悲观地假定这样的优化是不合法的。这两种特性的结果就是代码 *将* 会运行的更慢。**不要使用它们。**
