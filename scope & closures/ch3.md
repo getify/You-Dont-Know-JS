@@ -1,25 +1,15 @@
 # You Don't Know JS: Scope & Closures
 # Chapter 3: Function vs. Block Scope
 
-As we explored in Chapter 2, scope consists of a series of "bubbles" that each act as a container or bucket, in which identifiers (variables, functions) are declared. These bubbles nest neatly inside each other, and this nesting is defined at author-time.
-
 正如我们在第二章中探索的，作用域由一系列“气泡”组成，这些“气泡”的每一个就像一个容器或篮子，标识符（变量，函数）就在它里面被声明。这些气泡整齐地互相嵌套在一起，而且这种嵌套是在编写时定义的。
-
-But what exactly makes a new bubble? Is it only the function? Can other structures in JavaScript create bubbles of scope?
 
 但是到底是什么才能制造一个新气泡？只能是函数吗？JavaScript中的其他结构可以创建作用域的气泡吗？
 
 ## Scope From Functions
 
-The most common answer to those questions is that JavaScript has function-based scope. That is, each function you declare creates a bubble for itself, but no other structures create their own scope bubbles. As we'll see in just a little bit, this is not quite true.
-
 对这些问题滴最常见的回答是，JavaScript拥有基于函数的作用域。也就是，你声明的每一个函数都为自己创建了一个气泡，而且没有其他的结构可以创建它们自己的作用域气泡。但是就像我们一会儿就会看到的，这不完全正确。
 
-But first, let's explore function scope and its implications.
-
 但首先，让我们探索一下函数作用域和它的含义。
-
-Consider this code:
 
 考虑这段代码：
 
@@ -39,15 +29,9 @@ function foo(a) {
 }
 ```
 
-In this snippet, the scope bubble for `foo(..)` includes identifiers `a`, `b`, `c` and `bar`. **It doesn't matter** *where* in the scope a declaration appears, the variable or function belongs to the containing scope bubble, regardless. We'll explore how exactly *that* works in the next chapter.
-
 在这个代码段中，`foo(..)`的作用域气泡包含标识符`a`，`b`，`c`和`bar`。一个声明出现在作用域 *何处* 是 **无关紧要的**，不管怎样，变量和函数属于包含它们的作用域气泡。在下一章中我们将会探索这到底是如何工作的。
 
-`bar(..)` has its own scope bubble. So does the global scope, which has just one identifier attached to it: `foo`.
-
 `bar(..)`拥有它自己的作用域气泡。全局作用域也一样，它仅含有一个标识符：`foo`。
-
-Because `a`, `b`, `c`, and `bar` all belong to the scope bubble of `foo(..)`, they are not accessible outside of `foo(..)`. That is, the following code would all result in `ReferenceError` errors, as the identifiers are not available to the global scope:
 
 因为`a`，`b`，`c`，和`bar`都属于`foo(..)`的作用域气泡，所以它们在`foo(..)`外部是不可访问的。也就是，接下来的代码都会得到`ReferenceError`错误，因为这些标识符在全局作用域中都不可用：
 
@@ -57,39 +41,25 @@ bar(); // fails
 console.log( a, b, c ); // all 3 fail
 ```
 
-However, all these identifiers (`a`, `b`, `c`, `foo`, and `bar`) are accessible *inside* of `foo(..)`, and indeed also available inside of `bar(..)` (assuming there are no shadow identifier declarations inside `bar(..)`).
-
 然而，所有这些标识符（`a`，`b`，`c`，和`bar`）在`foo(..)`*内部* 都是可以访问的，而且在`bar(..)`内部实际上也都是可用的（假定在`bar(..)`内部没有遮蔽标识符的声明）。
 
-Function scope encourages the idea that all variables belong to the function, and can be used and reused throughout the entirety of the function (and indeed, accessible even to nested scopes). This design approach can be quite useful, and certainly can make full use of the "dynamic" nature of JavaScript variables to take on values of different types as needed.
-
 函数作用域支持着这样的想法：所有变量都属于函数，而且贯穿整个函数始终都可以使用和重用（而且甚至可以在嵌套的作用域中访问）。这种设计方式可以十分有用，而且肯定可以完全利用JavaScript的“动态”性质 —— 变量可以根据需要接受不同种类型的值。
-
-On the other hand, if you don't take careful precautions, variables existing across the entirety of a scope can lead to some unexpected pitfalls.
 
 另一方面，如果你不小心提防，跨越整个作用域存在的变量可能会导致一些以外的陷阱。
 
 ## Hiding In Plain Scope
 
-The traditional way of thinking about functions is that you declare a function, and then add code inside it. But the inverse thinking is equally powerful and useful: take any arbitrary section of code you've written, and wrap a function declaration around it, which in effect "hides" the code.
-
 考虑一个函数的传统方式是，你声明一个函数，并在它内部添加代码。但是相反的想法也同样强大和有用：拿你所编写的代码的任意一部分，在它周围包装一个函数声明，这实质上“隐藏”了这段代码。
-
-The practical result is to create a scope bubble around the code in question, which means that any declarations (variable or function) in that code will now be tied to the scope of the new wrapping function, rather than the previously enclosing scope. In other words, you can "hide" variables and functions by enclosing them in the scope of a function.
 
 其实际结果是在这段代码周围创建了一个作用域气泡，这意味着现在在这段代码中的任何声明都将绑在这个新的包装函数的作用域上，而不是前一个包含它们的作用域。换句话说，你可以通过将变量和函数围在一个函数的作用域中来“隐藏”它们。
 
-Why would "hiding" variables and functions be a useful technique?
-
 为什么“隐藏”变量和函数是一种有用的技术？
 
-There's a variety of reasons motivating this scope-based hiding. They tend to arise from the software design principle "Principle of Least Privilege" [^note-leastprivilege], also sometimes called "Least Authority" or "Least Exposure". This principle states that in the design of software, such as the API for a module/object, you should expose only what is minimally necessary, and "hide" everything else.
+有各种原因驱使着这种基于作用域的隐藏。它们主要是由一种称为“最低权限原则”的软件设计原则引起的[^note-leastprivilege]，有时也被称为“最低授权”或“最少曝光”。这个原则规定，在软件设计中，比如一个模块/对象的API，你应当只暴露所需要的最低限度的东西，而“隐藏”其他的一切。
 
-有各种原因驱使着这种基于作用域的隐藏。它们主要是由一种称为“最低权限原则”的软件设计原则引起的，有时也被称为“最低授权”或“最少曝光”。这个原则规定，在软件设计中，比如一个模块/对象的API，你应当只暴露所需要的最低限度的东西，而“隐藏”其他的一切。
+这个原则可以扩展到用哪个作用域来包含变量和函数的选择。如果所有的变量和函数在全局作用域中，它们将理所当然地对任何嵌套的作用域是可访问的。但这回违背“最少...”原则，因为你（很可能）暴露了许多你本应当保持为私有的变量和函数，而这些代码的恰当用法是不鼓励访问这些变量/函数的。
 
-This principle extends to the choice of which scope to contain variables and functions. If all variables and functions were in the global scope, they would of course be accessible to any nested scope. But this would violate the "Least..." principle in that you are (likely) exposing many variables or functions which you should otherwise keep private, as proper use of the code would discourage access to those variables/functions.
-
-For example:
+例如：
 
 ```js
 function doSomething(a) {
@@ -107,9 +77,9 @@ var b;
 doSomething( 2 ); // 15
 ```
 
-In this snippet, the `b` variable and the `doSomethingElse(..)` function are likely "private" details of how `doSomething(..)` does its job. Giving the enclosing scope "access" to `b` and `doSomethingElse(..)` is not only unnecessary but also possibly "dangerous", in that they may be used in unexpected ways, intentionally or not, and this may violate pre-condition assumptions of `doSomething(..)`.
+在这个代码段中，变量`b`和函数`doSomethingElse(..)`很可能是`doSomething(..)`如何工作的“私有”细节。允许外围的作用域“访问”`b`和`doSomethingElse(..)`不仅没必要而且可能是“危险的”，因为它们可能会以种种意外的方式，有意或无意地被使用，而这也许违背了`doSomething(..)`假设的前提条件。
 
-A more "proper" design would hide these private details inside the scope of `doSomething(..)`, such as:
+一个更“恰当”的设计是讲这些私有细节隐藏在`doSomething(..)`的作用域内部，比如：
 
 ```js
 function doSomething(a) {
@@ -127,13 +97,13 @@ function doSomething(a) {
 doSomething( 2 ); // 15
 ```
 
-Now, `b` and `doSomethingElse(..)` are not accessible to any outside influence, instead controlled only by `doSomething(..)`. The functionality and end-result has not been affected, but the design keeps private details private, which is usually considered better software.
+现在，`b`和`doSomethingElse(..)`对任何外界影响都是不可访问的，而是仅仅由`doSomething(..)`控制。它的功能和最终结果不受影响，但是这种设计将私有细节保持为私有的，这通常被认为是好的软件。
 
 ### Collision Avoidance
 
-Another benefit of "hiding" variables and functions inside a scope is to avoid unintended collision between two different identifiers with the same name but different intended usages. Collision results often in unexpected overwriting of values.
+将变量和函数“隐藏”在一个作用域内部的另一个好处是，避免两个同名但用处不同的标识符之间发生无意的冲突。冲突经常导致值被意外地覆盖。
 
-For example:
+例如：
 
 ```js
 function foo() {
@@ -150,17 +120,17 @@ function foo() {
 foo();
 ```
 
-The `i = 3` assignment inside of `bar(..)` overwrites, unexpectedly, the `i` that was declared in `foo(..)` at the for-loop. In this case, it will result in an infinite loop, because `i` is set to a fixed value of `3` and that will forever remain `< 10`.
+`bar(..)`内部的赋值`i = 3`意外地覆盖了在`foo(..)`的for循环中声明的`i`。在这个例子中，将导致一个无线循环，因为`i`被设定为固定的值`3`，而这将永远`< 10`。
 
-The assignment inside `bar(..)` needs to declare a local variable to use, regardless of what identifier name is chosen. `var i = 3;` would fix the problem (and would create the previously mentioned "shadowed variable" declaration for `i`). An *additional*, not alternate, option is to pick another identifier name entirely, such as `var j = 3;`. But your software design may naturally call for the same identifier name, so utilizing scope to "hide" your inner declaration is your best/only option in that case.
+`bar(..)`内部的赋值需要声明一个本地变量来使用，不论选用什么样的标识符名称。`var i = 3;`将修复这个问题（并将为`i`创建一个前面提到的“遮蔽变量”声明）。一个 *另外的*，不是代替的，选择是完全选择另外一个标识符名称，比如`var j = 3;`。但是你的软件设计也许会自然而然地使用相同的标识符名称，所以在这种情况下利用作用域来“隐藏”你的内部声明是你最好/唯一的选择。
 
 #### Global "Namespaces"
 
-A particularly strong example of (likely) variable collision occurs in the global scope. Multiple libraries loaded into your program can quite easily collide with each other if they don't properly hide their internal/private functions and variables.
+变量冲突（可能）发生的一个特别强有力的例子是在全局作用域中。多个库被加载到你的程序中时可以十分容易地互相从图，如果它们没有适当地隐藏它们的内部/私有函数和变量。
 
-Such libraries typically will create a single variable declaration, often an object, with a sufficiently unique name, in the global scope. This object is then used as a "namespace" for that library, where all specific exposures of functionality are made as properties off that object (namespace), rather than as top-level lexically scoped identifiers themselves.
+这样的库通常会在全局作用域中使用一个足够独特的名称来创建一个单独的变量声明，它经常是一个对象。然后这个对象被用作这个库的一个“名称空间”，所有要明确暴露出来的功能都被作为属性挂在这个对象（名称空间）上，而不是将它们自身作为顶层词法作用域的标识符。
 
-For example:
+例如：
 
 ```js
 var MyReallyCoolLibrary = {
@@ -176,17 +146,17 @@ var MyReallyCoolLibrary = {
 
 #### Module Management
 
-Another option for collision avoidance is the more modern "module" approach, using any of various dependency managers. Using these tools, no libraries ever add any identifiers to the global scope, but are instead required to have their identifier(s) be explicitly imported into another specific scope through usage of the dependency manager's various mechanisms.
+另一种回避冲突的选择是更加现代的“模块”方式，它使用任意一种依赖管理器。使用这些工具，没有库可以向全局作用域添加任何标识符，取而代之的是使用依赖管理器的各种机制，要求库的标识符被明确地导入到另一个指定的作用域中。
 
-It should be observed that these tools do not possess "magic" functionality that is exempt from lexical scoping rules. They simply use the rules of scoping as explained here to enforce that no identifiers are injected into any shared scope, and are instead kept in private, non-collision-susceptible scopes, which prevents any accidental scope collisions.
+应该可以看到，这些工具并不拥有可以豁免于词法作用域规则的“魔法”功能。它们简单地使用这里讲解的作用域规则，来强制标识符不会被注入任何共享的作用域，而是保持在私有的，不易冲突的作用域中，这防止了任何以外的作用域冲突。
 
-As such, you can code defensively and achieve the same results as the dependency managers do without actually needing to use them, if you so choose. See the Chapter 5 for more information about the module pattern.
+因此，如果你选择这样做的话，你可以防御性地编码，并在实际上不使用依赖管理器的情况下，取得与使用它们相同的结果。关于模块模式的更多信息参见第五章。
 
 ## Functions As Scopes
 
-We've seen that we can take any snippet of code and wrap a function around it, and that effectively "hides" any enclosed variable or function declarations from the outside scope inside that function's inner scope.
+我们已经看到，我们可以拿来一段代码并在它周围包装一个函数，而这实质上对外部作用域“隐藏”了这个函数内部作用域包含的任何变量或函数声明。
 
-For example:
+例如：
 
 ```js
 var a = 2;
@@ -202,11 +172,11 @@ foo(); // <-- and this
 console.log( a ); // 2
 ```
 
-While this technique "works", it is not necessarily very ideal. There are a few problems it introduces. The first is that we have to declare a named-function `foo()`, which means that the identifier name `foo` itself "pollutes" the enclosing scope (global, in this case). We also have to explicitly call the function by name (`foo()`) so that the wrapped code actually executes.
+虽然这种技术“好用”，但它不一定非常理想。它引入了几个问题。首先是我们不得不声明一个命名函数`foo()`，这意味着这个标识符名称`foo`本身就“污染”了外围作用域（在这个例子中是全局）。我们要不得不通过名称（`foo()`）明确地调用这个函数来使被包装的代码真正运行。
 
-It would be more ideal if the function didn't need a name (or, rather, the name didn't pollute the enclosing scope), and if the function could automatically be executed.
+如果这个函数不需要名称（或者，这个名称不污染外围作用域），而且如果这个函数能自动地被执行就更理想了。
 
-Fortunately, JavaScript offers a solution to both problems.
+幸运的是，JavaScript给这两个问题提供了一个解决方法。
 
 ```js
 var a = 2;
@@ -221,21 +191,21 @@ var a = 2;
 console.log( a ); // 2
 ```
 
-Let's break down what's happening here.
+让我们分解一下这里发生了什么。
 
-First, notice that the wrapping function statement starts with `(function...` as opposed to just `function...`. While this may seem like a minor detail, it's actually a major change. Instead of treating the function as a standard declaration, the function is treated as a function-expression.
+首先，注意与仅仅是`function...`相对，这个包装函数语句以`(function...)`开头。虽然这看起来像是一个微小的细节，但实际上这是重大改变。与将这个函数视为一个标准的声明不同的是，这个函数被视为一个函数表达式。
 
-**Note:** The easiest way to distinguish declaration vs. expression is the position of the word "function" in the statement (not just a line, but a distinct statement). If "function" is the very first thing in the statement, then it's a function declaration. Otherwise, it's a function expression.
+**注意：** 区分声明与表达式的最简单的方法是，这个语句中（不仅仅是一行，而是一个独立的语句）“function”一词的位置。如果“function”是这个语句中的第一个东西，那么它就是一个函数声明。否则，它就是一个函数表达式。
 
-The key difference we can observe here between a function declaration and a function expression relates to where its name is bound as an identifier.
+这里我们可以观察到一个函数声明和一个函数表达式之间的关键不同是，它的名称作为一个标识符被绑定在何处。
 
-Compare the previous two snippets. In the first snippet, the name `foo` is bound in the enclosing scope, and we call it directly with `foo()`. In the second snippet, the name `foo` is not bound in the enclosing scope, but instead is bound only inside of its own function.
+比较这前两个代码段。在第一个代码段中，名称`foo`被绑定在外围作用域中，我们用`foo()`直接调用它。在第二个代码段中，名称`foo`没有被绑定在外围作用域中，而是被绑定在它自己的函数内部。
 
-In other words, `(function foo(){ .. })` as an expression means the identifier `foo` is found *only* in the scope where the `..` indicates, not in the outer scope. Hiding the name `foo` inside itself means it does not pollute the enclosing scope unnecessarily.
+换句话说，`(function foo(){ .. })`作为一个表达式意味着标识符`foo`仅能在`..`代表的作用域中被找到，而不是在外部作用域中。将名称`foo`隐藏在它自己内部意味着它不会多余地污染外围作用域。
 
 ### Anonymous vs. Named
 
-You are probably most familiar with function expressions as callback parameters, such as:
+你可能对函数表达式作为回调参数再熟悉不过了，比如：
 
 ```js
 setTimeout( function(){
@@ -243,17 +213,17 @@ setTimeout( function(){
 }, 1000 );
 ```
 
-This is called an "anonymous function expression", because `function()...` has no name identifier on it. Function expressions can be anonymous, but function declarations cannot omit the name -- that would be illegal JS grammar.
+这称为一个“匿名函数表达式”，因为`function()...`上没有名称标识符。函数表达式可以是匿名的，但是函数声明不能省略名称 —— 那将是不合法的JS程序。
 
-Anonymous function expressions are quick and easy to type, and many libraries and tools tend to encourage this idiomatic style of code. However, they have several draw-backs to consider:
+匿名函数表达式可以快速和很容易地键入，而且许多库和工具往往鼓励使用这种代码惯用风格。然而，它们有几个缺点需要考虑：
 
-1. Anonymous functions have no useful name to display in stack traces, which can make debugging more difficult.
+1. 在站轨迹上匿名函数没有有用的名称可以表示，这使得调试更加困难。
 
-2. Without a name, if the function needs to refer to itself, for recursion, etc., the **deprecated** `arguments.callee` reference is unfortunately required. Another example of needing to self-reference is when an event handler function wants to unbind itself after it fires.
+2. 没有名称的情况下，如果这个函数需要为了递归等目的引用它自己，那么就需要很不幸地使用 **被废弃的** `arguments.callee`引用。另一个需要自引用的例子是，当一个事件处理器函数在被触发后想要把自己解除绑定。
 
-3. Anonymous functions omit a name that is often helpful in providing more readable/understandable code. A descriptive name helps self-document the code in question.
+3. 匿名函数省略的名称经常对提供更易读/易懂的代码很有帮助。一个描述性的名称可以帮助代码自解释。
 
-**Inline function expressions** are powerful and useful -- the question of anonymous vs. named doesn't detract from that. Providing a name for your function expression quite effectively addresses all these draw-backs, but has no tangible downsides. The best practice is to always name your function expressions:
+**内联函数表达式** 很强大且很有用 —— 匿名和命名的问题并不会贬损这一点。给你的函数表达式提供一个名称就可以十分有效地解决这些缺陷，而且没有实际的坏处。最佳的方法是总是命名你的函数表达式：
 
 ```js
 setTimeout( function timeoutHandler(){ // <-- Look, I have a name!
@@ -276,11 +246,11 @@ var a = 2;
 console.log( a ); // 2
 ```
 
-Now that we have a function as an expression by virtue of wrapping it in a `( )` pair, we can execute that function by adding another `()` on the end, like `(function foo(){ .. })()`. The first enclosing `( )` pair makes the function an expression, and the second `()` executes the function.
+得益于包装在一个`()`中，我们有了一个作为表达式的函数，我们可以通过在末尾加入另一个`()`来执行这个函数，就像`(function foo(){ .. })()`。第一个外围的`()`使这个函数变成表达式，而第二个`()`执行这个函数。
 
-This pattern is so common, a few years ago the community agreed on a term for it: **IIFE**, which stands for **I**mmediately **I**nvoked **F**unction **E**xpression.
+这个模式是如此常见，以至于几年前开发者社区同意给它一个术语：**IIFE**，它表示“立即被调用的函数表达式”（**I**mmediately **I**nvoked **F**unction **E** xpression）。
 
-Of course, IIFE's don't need names, necessarily -- the most common form of IIFE is to use an anonymous function expression. While certainly less common, naming an IIFE has all the aforementioned benefits over anonymous function expressions, so it's a good practice to adopt.
+当然，IIFE不一定需要一个名称 —— IIFE的最常见形式是使用一个匿名函数表达式。虽然少见一些，与匿名函数表达式相比，命名的IIFE拥有前述所有的好处，所以它是一个可以采用的好方式。
 
 ```js
 var a = 2;
@@ -295,13 +265,13 @@ var a = 2;
 console.log( a ); // 2
 ```
 
-There's a slight variation on the traditional IIFE form, which some prefer: `(function(){ .. }())`. Look closely to see the difference. In the first form, the function expression is wrapped in `( )`, and then the invoking `()` pair is on the outside right after it. In the second form, the invoking `()` pair is moved to the inside of the outer `( )` wrapping pair.
+传统的IIFE有一种稍稍变化的形式，一些人偏好：`(function(){ .. }())`。仔细观察不同之处。在第一种形式中，函数表达式被包在`( )`中，然后用于调用的`()`出现在它的外侧。在第二种形式中，用于调用的`()`被移动到用于包装的`( )`内侧。
 
-These two forms are identical in functionality. **It's purely a stylistic choice which you prefer.**
+这两种形式在功能上完全相同。**这纯粹是一个你偏好的风格的选择。**
 
-Another variation on IIFE's which is quite common is to use the fact that they are, in fact, just function calls, and pass in argument(s).
+IIFE的另一种十分常见的变化是，利用它们实际上只是函数调用的事实，来传入参数值。
 
-For instance:
+例如：
 
 ```js
 var a = 2;
@@ -317,9 +287,9 @@ var a = 2;
 console.log( a ); // 2
 ```
 
-We pass in the `window` object reference, but we name the parameter `global`, so that we have a clear stylistic delineation for global vs. non-global references. Of course, you can pass in anything from an enclosing scope you want, and you can name the parameter(s) anything that suits you. This is mostly just stylistic choice.
+我们传入`window`对象引用，但是我们将参数命名为`global`，这样我们对于全局和非全局引用就有了一个清晰的文体上的划分。当然，你可以从外围作用域传入任何你想要的东西，而且你可以将参数命名为任何适合你的名称。这几乎仅仅是文体上的选择。
 
-Another application of this pattern addresses the (minor niche) concern that the default `undefined` identifier might have its value incorrectly overwritten, causing unexpected results. By naming a parameter `undefined`, but not passing any value for that argument, we can guarantee that the `undefined` identifier is in fact the undefined value in a block of code:
+这种模式的另一种应用解决了一个小问题：默认的`undefined`标识符的值也许会被不正确地覆盖掉，而导致意外的结果。通过将参数命名为`undefined`，同时不为它传递任何参数值，我们就可以保证在一个代码块中`undefined`标识符确实是是一个未定义的值。
 
 ```js
 undefined = true; // setting a land-mine for other code! avoid!
@@ -334,7 +304,7 @@ undefined = true; // setting a land-mine for other code! avoid!
 })();
 ```
 
-Still another variation of the IIFE inverts the order of things, where the function to execute is given second, *after* the invocation and parameters to pass to it. This pattern is used in the UMD (Universal Module Definition) project. Some people find it a little cleaner to understand, though it is slightly more verbose.
+IIFE还有另一种变化将事情的顺序倒了过来，要被执行的函数在调用和传递给它的参数 *之后* 给出。这种模式被用于UMD（Universal Module Definition —— 统一模块定义）项目。一些人发现它更干净和移动一些，虽然有点儿繁冗。
 
 ```js
 var a = 2;
@@ -350,15 +320,15 @@ var a = 2;
 });
 ```
 
-The `def` function expression is defined in the second-half of the snippet, and then passed as a parameter (also called `def`) to the `IIFE` function defined in the first half of the snippet. Finally, the parameter `def` (the function) is invoked, passing `window` in as the `global` parameter.
+`def`函数表达式带这个代码段的后半部分被定义，然后作为一个参数（也叫`def`）被传递给在代码段前半部分定义的`IIFE`函数。最后，参数`def`（函数）被调用，并将`window`作为`global`参数传入。
 
 ## Blocks As Scopes
 
-While functions are the most common unit of scope, and certainly the most wide-spread of the design approaches in the majority of JS in circulation, other units of scope are possible, and the usage of these other scope units can lead to even better, cleaner to maintain code.
+虽然函数是最常见的作用域单位，而且当然也是在世面上流通的绝大多数JS中最为广泛传播的设计方式，但是其他的作用域单位也是可能的，而且使用这些作用域单位可以导致更好，对于维护来说更干净的代码。
 
-Many languages other than JavaScript support Block Scope, and so developers from those languages are accustomed to the mindset, whereas those who've primarily only worked in JavaScript may find the concept slightly foreign.
+JavaScript之外的许多其他语言都支持块儿作用域，所以有这些语言背景的开发者习惯于这种思维模式，然而那些主要在JavaScript中工作的开发者可能会发现这个概念有些许陌生。
 
-But even if you've never written a single line of code in block-scoped fashion, you are still probably familiar with this extremely common idiom in JavaScript:
+但即使你从没用块儿作用域的方式写过一行代码，你可能依然对JavaScript中这种极其常见的惯用法很熟悉：
 
 ```js
 for (var i=0; i<10; i++) {
@@ -366,9 +336,9 @@ for (var i=0; i<10; i++) {
 }
 ```
 
-We declare the variable `i` directly inside the for-loop head, most likely because our *intent* is to use `i` only within the context of that for-loop, and essentially ignore the fact that the variable actually scopes itself to the enclosing scope (function or global).
+我们在for循环头的内部直接声明了变量`i`，因为我们意图很可能是仅在这个for循环内部的上下文环境中使用`i`，而实质上忽略了这个变量实际上将自己划入了外围作用域中（函数或全局）的事实。
 
-That's what block-scoping is all about. Declaring variables as close as possible, as local as possible, to where they will be used. Another example:
+这就是有关块儿作用域的一切。尽可能封闭地，尽可能局部地，在变量将被使用的位置声明它。另一个例子是：
 
 ```js
 var foo = true;
@@ -380,11 +350,11 @@ if (foo) {
 }
 ```
 
-We are using a `bar` variable only in the context of the if-statement, so it makes a kind of sense that we would declare it inside the if-block. However, where we declare variables is not relevant when using `var`, because they will always belong to the enclosing scope. This snippet is essentially "fake" block-scoping, for stylistic reasons, and relying on self-enforcement not to accidentally use `bar` in another place in that scope.
+我们仅在if语句的上下文环境中使用变量`bar`，所以我们将它声明在if块儿的内部是有些道理的。然而，当使用`var`时，我们在何处声明变量是无关紧要的，因为它们将总是属于外围作用域。这个代码段实质上为了代码风格的原因“假冒”了块儿作用域，并依赖于不要在这个作用域的其他地方意外地使用`bar`的自我约束。
 
-Block scope is a tool to extend the earlier "Principle of Least ~~Privilege~~ Exposure" [^note-leastprivilege] from hiding information in functions to hiding information in blocks of our code.
+从将信息隐藏在函数中到将信息隐藏在我们代码的块儿中，块儿作用域是一种扩展了早先的“最低 ~~权限~~ 暴露原则”[^note-leastprivilege]的工具。
 
-Consider the for-loop example again:
+再次考虑这个for循环的例子：
 
 ```js
 for (var i=0; i<10; i++) {
@@ -392,23 +362,23 @@ for (var i=0; i<10; i++) {
 }
 ```
 
-Why pollute the entire scope of a function with the `i` variable that is only going to be (or only *should be*, at least) used for the for-loop?
+为什么要用将仅会（或者至少是，仅 *应当*）在这个for循环中使用的变量`i`去污染一个函数的整个作用域呢？
 
-But more importantly, developers may prefer to *check* themselves against accidentally (re)using variables outside of their intended purpose, such as being issued an error about an unknown variable if you try to use it in the wrong place. Block-scoping (if it were possible) for the `i` variable would make `i` available only for the for-loop, causing an error if `i` is accessed elsewhere in the function. This helps ensure variables are not re-used in confusing or hard-to-maintain ways.
+但更重要的是，开发者们也许偏好于 *检查* 他们自己来防止在变量预期的目的之外意外地（重）使用它们，例如如果你试着在错误的地方使用变量会导致一个未知变量的错误。对于变量`i`的块儿作用域（如果它是可能的话）将使`i`仅在for循环内部可用，使得如果在函数的其他地方访问`i`将导致一个错误。这有助于保证变量不会被糊涂地重用或者难于维护。
 
-But, the sad reality is that, on the surface, JavaScript has no facility for block scope.
+但是，悲惨的现实是，表面上看来，JavaScript没有块儿作用域的能力。
 
-That is, until you dig a little further.
+更确切地说，直到你再深入一些才有。
 
 ### `with`
 
-We learned about `with` in Chapter 2. While it is a frowned upon construct, it *is* an example of (a form of) block scope, in that the scope that is created from the object only exists for the lifetime of that `with` statement, and not in the enclosing scope.
+我们在第二章中学习了`with`。虽然它是一个使人皱眉头的结构，但它确实是一个（一种形式的）块儿作用域的例子，它从对象中创建的作用域仅存在于这个`with`语句的生命周期中，而不再外围作用域中。
 
 ### `try/catch`
 
-It's a *very* little known fact that JavaScript in ES3 specified the variable declaration in the `catch` clause of a `try/catch` to be block-scoped to the `catch` block.
+一个鲜为人知的是事实，JavaScript在ES3中明确指出在`try/catch`的`catch`子句中声明的变量，是属于`catch`块儿的块儿作用域的。
 
-For instance:
+例如：
 
 ```js
 try {
@@ -421,21 +391,27 @@ catch (err) {
 console.log( err ); // ReferenceError: `err` not found
 ```
 
-As you can see, `err` exists only in the `catch` clause, and throws an error when you try to reference it elsewhere.
+如你所见，`err`仅存在于`catch`子句中，并且在你试着从其他地方引用他时抛出一个错误。
 
-**Note:** While this behavior has been specified and true of practically all standard JS environments (except perhaps old IE), many linters seem to still complain if you have two or more `catch` clauses in the same scope which each declare their error variable with the same identifier name. This is not actually a re-definition, since the variables are safely block-scoped, but the linters still seem to, annoyingly, complain about this fact.
+**注意：** 虽然这种行为已经被明确规定，而且对于几乎所有的标准JS环境（也许除了老IE）来说都是成立的，但是如果你在同一个作用域中有两个或多个`catch`子句，而它们又各自用相同的标识符名称声明了它们的错误变量时，许多linter依然会报警。实际上这不是重定义，因为这些变量都安全第位于块儿作用域中，但是linter看起来依然，恼人地，抱怨这个事实。
 
-To avoid these unnecessary warnings, some devs will name their `catch` variables `err1`, `err2`, etc. Other devs will simply turn off the linting check for duplicate variable names.
+为了避免这些不必要的警告，一些开发者将他们的`catch`变量命名为`err1`，`err2`，等等。另一些开发者干脆关闭linter对重复变量名的检查。
 
-The block-scoping nature of `catch` may seem like a useless academic fact, but see Appendix B for more information on just how useful it might be.
+`catch`的块儿作用域性质看起来像是一个没用的，只有学院派意义的事实，但是参看附录B来了解更多它如何有用的信息。
 
 ### `let`
 
 Thus far, we've seen that JavaScript only has some strange niche behaviors which expose block scope functionality. If that were all we had, and *it was* for many, many years, then block scoping would not be terribly useful to the JavaScript developer.
 
+至此，我们看到JavaScript仅仅有一些奇怪的小众行为暴露了块儿作用域功能。如果这就是我们拥有的一切，而且许多许多年以来这确实就是我们拥有的一切，那么块作用域对JavaScript开发者来说就不是非常有用。
+
 Fortunately, ES6 changes that, and introduces a new keyword `let` which sits alongside `var` as another way to declare variables.
 
+幸运的是，ES6改变了这种状态，并引入了一个新的关键字`let`，作为另一种声明变量的方式伴随着`var`。
+
 The `let` keyword attaches the variable declaration to the scope of whatever block (commonly a `{ .. }` pair) it's contained in. In other words, `let` implicitly hijacks any block's scope for its variable declaration.
+
+`let`关键字将变量声明附着在它所在的任何块儿（通常是一个`{ .. }`）的作用域中。换句话说，`let`为它的变量声明隐含地劫持了任意块儿的作用域。
 
 ```js
 var foo = true;
@@ -451,7 +427,11 @@ console.log( bar ); // ReferenceError
 
 Using `let` to attach a variable to an existing block is somewhat implicit. It can confuse if you're not paying close attention to which blocks have variables scoped to them, and are in the habit of moving blocks around, wrapping them in other blocks, etc., as you develop and evolve code.
 
+使用`let`将一个变量附着在一个现存的块儿上有些隐晦。它可能会使人困惑 —— 在你开发和设计代码时，如果你不仔细注意哪些块儿的作用域包含了变量，并且习惯于将块儿四处移动，将它们包进其他的块儿中，等等。
+
 Creating explicit blocks for block-scoping can address some of these concerns, making it more obvious where variables are attached and not. Usually, explicit code is preferable over implicit or subtle code. This explicit block-scoping style is easy to achieve, and fits more naturally with how block-scoping works in other languages:
+
+为块儿作用域创建明确的块儿可以解决这些问题中的一些，使变量附着在何处更加明显。通常来说，明确的代码要比隐晦或微妙的代码好。这种明确的块儿作用域风格很容易达成，而且它与块儿作用域在其他语言中的工作方式匹配得更自然：
 
 ```js
 var foo = true;
@@ -469,11 +449,19 @@ console.log( bar ); // ReferenceError
 
 We can create an arbitrary block for `let` to bind to by simply including a `{ .. }` pair anywhere a statement is valid grammar. In this case, we've made an explicit block *inside* the if-statement, which may be easier as a whole block to move around later in refactoring, without affecting the position and semantics of the enclosing if-statement.
 
+我们可以通过在一个语句是合法文法的任何地方，简单地引入一个`{ .. }`来为`let`创建一个任意的可以绑定的块儿。在这个例子中，我们在if语句内部制造了一个明确的块儿，在以后的重构中将整个块儿四处移动可能会更容易，而且不会影响外围的if语句的位置和语义。
+
 **Note:** For another way to express explicit block scopes, see Appendix B.
+
+**注意：** 另一个明确表达块儿作用域的方法，参见附录B。
 
 In Chapter 4, we will address hoisting, which talks about declarations being taken as existing for the entire scope in which they occur.
 
+在第四章中，我们将讲解提升（hoisting），它讲述关于声明在它们所出现的整个作用域中都被认为是存在的。
+
 However, declarations made with `let` will *not* hoist to the entire scope of the block they appear in. Such declarations will not observably "exist" in the block until the declaration statement.
+
+然而，使用`let`做出的声明将不会提升它们所出现的至整个块儿的作用域中。如此，直到声明语句为止，声明将不会明显地 *存在* 于块儿中。
 
 ```js
 {
