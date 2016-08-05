@@ -1,51 +1,33 @@
 # You Don't Know JS: Scope & Closures
 # Chapter 5: Scope Closure
 
-We arrive at this point with hopefully a very healthy, solid understanding of how scope works.
-
 希望我们是带着对作用域的工作方式的健全，牢固的理解来到这里的。
 
-We turn our attention to an incredibly important, but persistently elusive, *almost mythological*, part of the language: **closure**. If you have followed our discussion of lexical scope thus far, the payoff is that closure is going to be, largely, anti-climatic, almost self-obvious. *There's a man behind the wizard's curtain, and we're about to see him*. No, his name is not Crockford!
-
 我们将我们的注意力转向这个语言中一个重要到不可思议，但是一直难以捉摸的，*几乎是神话班的* 部分：**闭包**。如果你至此一直跟随着我们关于词法作用域的讨论，那么你的报偿就是闭包将在很大程度上是自然而然的，几乎是显而易见的。*有一个人坐在魔法师的幕后，现在我们即将见到他*。不，他的名字不是Crockford！
-
-If however you have nagging questions about lexical scope, now would be a good time to go back and review Chapter 2 before proceeding.
 
 如果你还对词法作用域有令人不安的问题，现在就是在继续之前回过头去再复习一下第二章的好时机。
 
 ## Enlightenment
 
-For those who are somewhat experienced in JavaScript, but have perhaps never fully grasped the concept of closures, *understanding closure* can seem like a special nirvana that one must strive and sacrifice to attain.
-
 对于那些对JavaScript有些经验，但是也许从没全面掌握闭包概念的人来说，*理解闭包* 看起来就像是必须努力并作出牺牲才能到达的涅槃状态。
-
-I recall years back when I had a firm grasp on JavaScript, but had no idea what closure was. The hint that there was *this other side* to the language, one which promised even more capability than I already possessed, teased and taunted me. I remember reading through the source code of early frameworks trying to understand how it actually worked. I remember the first time something of the "module pattern" began to emerge in my mind. I remember the *a-ha!* moments quite vividly.
 
 回想几年前我对JavaScript有了牢固的掌握，但是不知道闭包是什么。它暗示着这种语言有着另外的一面，它许诺了甚至比我已经拥有的还多的力量，它取笑并嘲弄我。我记得我通读早期框架的源代码试图搞懂它到底是如何工作的。我记得第一次“模块模式”的某些东西融入我的大脑。我记得那依然栩栩如生的 *啊哈！* 的一刻。
 
-What I didn't know back then, what took me years to understand, and what I hope to impart to you presently, is this secret: **closure is all around you in JavaScript, you just have to recognize and embrace it.** Closures are not a special opt-in tool that you must learn new syntax and patterns for. No, closures are not even a weapon that you must learn to wield and master as Luke trained in The Force.
-
 那时我不明白的东西，那个花了我好几年时间才搞懂的东西，那个我即将传授给你的东西，是这个秘密：**在JavaScript中闭包无所不在，你只是不得不认出它并接纳它**。闭包不是你必须学习新的语法和模式才能使用的特殊的可选的工具。不，闭包甚至不是你必须像卢克在原力中受训那样，一定要学会使用并掌握的武器。
 
-Closures happen as a result of writing code that relies on lexical scope. They just happen. You do not even really have to intentionally create closures to take advantage of them. Closures are created and used for you all over your code. What you are *missing* is the proper mental context to recognize, embrace, and leverage closures for your own will.
-
 闭包是依赖于词法作用域编写代码而发生的结果。它们就这么发生了。你甚至不需要有意地创建闭包来利用它们。闭包在你的代码中一直在被创建和使用。你 *缺少* 的是恰当的思维环境，来识别，接纳，并以自己的意志利用闭包。
-
-The enlightenment moment should be: **oh, closures are already occurring all over my code, I can finally *see* them now.** Understanding closures is like when Neo sees the Matrix for the first time.
 
 启蒙的时刻应该是：**哦，闭包已经在我的代码中到处发生了，现在我终于 *看到* 它们了**。理解闭包就像是尼欧第一次见到母体。
 
 ## Nitty Gritty
 
-OK, enough hyperbole and shameless movie references.
-
 好了，夸张和对电影的无耻引用够多了。
 
-Here's a down-n-dirty definition of what you need to know to understand and recognize closures:
+为了理解和识别闭包，这里有一个你需要知道的简单粗暴的定义：
 
-> Closure is when a function is able to remember and access its lexical scope even when that function is executing outside its lexical scope.
+> 闭包就是函数能够记住并访问它的词法作用域，即使当这个函数在它的词法作用域之外执行时。
 
-Let's jump into some code to illustrate that definition.
+让我们跳进代码来说明这个定义：
 
 ```js
 function foo() {
@@ -61,17 +43,17 @@ function foo() {
 foo();
 ```
 
-This code should look familiar from our discussions of Nested Scope. Function `bar()` has *access* to the variable `a` in the outer enclosing scope because of lexical scope look-up rules (in this case, it's an RHS reference look-up).
+根据我们对嵌套作用域的讨论，这段代码应当看起来很熟悉。由于词法作用域查询规则（在这个例子中，是一个RHS引用查询），函数`bar()`可以 *访问* 外围作用域的变量`a`。
 
-Is this "closure"?
+这是“闭包”吗？
 
-Well, technically... *perhaps*. But by our what-you-need-to-know definition above... *not exactly*. I think the most accurate way to explain `bar()` referencing `a` is via lexical scope look-up rules, and those rules are *only* (an important!) **part** of what closure is.
+好吧，技术上……*也许是*。但是根据我们上面的“你需要知道”的定义……*不确切*。我认为解释`bar()`引用`a`的最准确的方式是根据词法作用域查询规则，但是那些规则 *仅仅* 是闭包的（一个很重要的！）**一部分**。
 
-From a purely academic perspective, what is said of the above snippet is that the function `bar()` has a *closure* over the scope of `foo()` (and indeed, even over the rest of the scopes it has access to, such as the global scope in our case). Put slightly differently, it's said that `bar()` closes over the scope of `foo()`. Why? Because `bar()` appears nested inside of `foo()`. Plain and simple.
+从纯粹的学院派角度讲，上面的代码段被认为是函数`bar()`在函数`foo()`的作用域上有一个 *闭包*（而且实际上，它甚至对其他的作用域也可以访问，比如这个例子中的全局作用域）。换一种略有不同的说法是，`bar()`闭住了`foo()`的作用域。为什么？因为`bar()`嵌套地出现在`foo()`内部。简单直白。
 
-But, closure defined in this way is not directly *observable*, nor do we see closure *exercised* in that snippet. We clearly see lexical scope, but closure remains sort of a mysterious shifting shadow behind the code.
+但是，这样一来闭包的定义就是不能直接 *观察到* 的了，我们也不能看到闭包在这个代码段中 *被行使*。我们清楚地看到词法作用域，但是闭包仍然像代码后面谜一般的模糊阴影。
 
-Let us then consider code which brings closure into full light:
+让我们考虑这段将闭包完全照亮的代码：
 
 ```js
 function foo() {
@@ -89,25 +71,25 @@ var baz = foo();
 baz(); // 2 -- Whoa, closure was just observed, man.
 ```
 
-The function `bar()` has lexical scope access to the inner scope of `foo()`. But then, we take `bar()`, the function itself, and pass it *as* a value. In this case, we `return` the function object itself that `bar` references.
+函数`bar()`对于`foo()`内的作用域拥有词法作用域访问权。但是之后，我们拿起`bar()`，这个函数本身，将它像 *值* 一样传递。在这个例子中，我们`return``bar`引用的函数对象本身。
 
-After we execute `foo()`, we assign the value it returned (our inner `bar()` function) to a variable called `baz`, and then we actually invoke `baz()`, which of course is invoking our inner function `bar()`, just by a different identifier reference.
+在执行`foo()`之后，我们将它返回的值（我们里面的`bar()`函数）赋予一个称为`baz`的变量，然后我们实际地调用`baz()`，这将理所当然地调用我们内部的函数`bar()`，只不过是通过一个不同的标识符引用。
 
-`bar()` is executed, for sure. But in this case, it's executed *outside* of its declared lexical scope.
+`bar()`被执行了，必然的。但是在这个例子中，它是在它被声明的词法作用域 *外部* 被执行的。
 
-After `foo()` executed, normally we would expect that the entirety of the inner scope of `foo()` would go away, because we know that the *Engine* employs a *Garbage Collector* that comes along and frees up memory once it's no longer in use. Since it would appear that the contents of `foo()` are no longer in use, it would seem natural that they should be considered *gone*.
+`foo()`被执行之后，一般说来我们会期望`foo()`的整个内部作用域都将消失，因为我们知道 *引擎* 启用了 *垃圾回收器* 在内存不再被使用时来回收它们。因为很显然`foo()`的内容不再被使用了，所以看起来它们很自然地应该被认为是 *消失了*。
 
-But the "magic" of closures does not let this happen. That inner scope is in fact *still* "in use", and thus does not go away. Who's using it? **The function `bar()` itself**.
+但是闭包的“魔法”不会让这发生。内部的作用域实际上 *依然* “在使用”，因此将不会消失。谁在使用它？**函数`bar()`本身。**
 
-By virtue of where it was declared, `bar()` has a lexical scope closure over that inner scope of `foo()`, which keeps that scope alive for `bar()` to reference at any later time.
+有赖于它被声明的位置，`bar()`拥有一个词法作用域闭包覆盖着`foo()`的内部作用域，闭包为了能使`bar()`在以后任意的时刻可以引用这个作用域而保持它的存在。
 
-**`bar()` still has a reference to that scope, and that reference is called closure.**
+**`bar()`依然拥有对那个作用域的引用，而这个引用称为闭包。**
 
-So, a few microseconds later, when the variable `baz` is invoked (invoking the inner function we initially labeled `bar`), it duly has *access* to author-time lexical scope, so it can access the variable `a` just as we'd expect.
+所以，在几微秒之后，当变量`baz`被调用时（调用我们最开始标记为`bar`的内部函数），它理所应当地对编写时的词法作用域拥有 *访问* 权，所以它可以如我们所愿地访问变量`a`。
 
-The function is being invoked well outside of its author-time lexical scope. **Closure** lets the function continue to access the lexical scope it was defined in at author-time.
+这个函数在它被编写时的词法作用域之外被调用。**闭包** 使这个函数可以继续访问它在编写时被定义的词法作用域。
 
-Of course, any of the various ways that functions can be *passed around* as values, and indeed invoked in other locations, are all examples of observing/exercising closure.
+当然，任何函数可以被作为值传递，而且实际上在其他位置被调用的各种方式，都是观察/行使闭包的例子。
 
 ```js
 function foo() {
@@ -125,9 +107,9 @@ function bar(fn) {
 }
 ```
 
-We pass the inner function `baz` over to `bar`, and call that inner function (labeled `fn` now), and when we do, its closure over the inner scope of `foo()` is observed, by accessing `a`.
+我们将内部函数`baz`传递给`bar`，并调用这个内部函数（现在被标记为`fn`），当我们这么做时，它覆盖在`foo()`内部作用域的闭包就可以通过`a`的访问观察到。
 
-These passings-around of functions can be indirect, too.
+这样的函数传递也可以是间接的。
 
 ```js
 var fn;
@@ -151,11 +133,11 @@ foo();
 bar(); // 2
 ```
 
-Whatever facility we use to *transport* an inner function outside of its lexical scope, it will maintain a scope reference to where it was originally declared, and wherever we execute it, that closure will be exercised.
+无论我们使用什么方法将内部函数 *传送* 到它的词法作用域之外，它都将维护一个指向它最开始被声明时的作用域的引用，而且无论我们什么时候执行它，这个闭包就会被行使。
 
 ## Now I Can See
 
-The previous code snippets are somewhat academic and artificially constructed to illustrate *using closure*. But I promised you something more than just a cool new toy. I promised that closure was something all around you in your existing code. Let us now *see* that truth.
+前面的代码段有些学术化，而且是人工构建来说明 *闭包的使用* 的。但我保证过给你的东西不止是一个新的酷玩具。我保证过闭包是在你的现存代码中无处不在的东西。现在让我们 *看看* 真相。
 
 ```js
 function wait(message) {
@@ -169,15 +151,15 @@ function wait(message) {
 wait( "Hello, closure!" );
 ```
 
-We take an inner function (named `timer`) and pass it to `setTimeout(..)`. But `timer` has a scope closure over the scope of `wait(..)`, indeed keeping and using a reference to the variable `message`.
+我们拿来一个内部函数（名为`timer`）将它传递给`setTimeout(..)`。但是`timer`拥有覆盖`wait(..)`的作用域的闭包，实际上保持并使用着对变量`message`的引用。
 
-A thousand milliseconds after we have executed `wait(..)`, and its inner scope should otherwise be long gone, that inner function `timer` still has closure over that scope.
+在我们执行`wait(..)`一千毫秒之后，要不是内部函数`timer`依然拥有覆盖着`wait()`内部作用域的闭包，它早就会消失了。
 
-Deep down in the guts of the *Engine*, the built-in utility `setTimeout(..)` has reference to some parameter, probably called `fn` or `func` or something like that. *Engine* goes to invoke that function, which is invoking our inner `timer` function, and the lexical scope reference is still intact.
+在 *引擎* 的内脏深处，内建的工具`setTimeout(..)`拥有一些参数的引用，可能称为`fn`或者`func`或者其他诸如此类的东西。*引擎* 去调用这个函数，它调用我们的内部`timer`函数，而词法作用域依然完好无损。
 
-**Closure.**
+**闭包。**
 
-Or, if you're of the jQuery persuasion (or any JS framework, for that matter):
+或者，如果你信仰jQuery（或者就此而言，其他的任何JS框架）：
 
 ```js
 function setupBot(name,selector) {
@@ -190,11 +172,11 @@ setupBot( "Closure Bot 1", "#bot_1" );
 setupBot( "Closure Bot 2", "#bot_2" );
 ```
 
-I am not sure what kind of code you write, but I regularly write code which is responsible for controlling an entire global drone army of closure bots, so this is totally realistic!
+我不确定你写的是什么代码，但我通常写一些代码来负责控制全球的闭包无人机军团，所以这完全是真实的！
 
-(Some) joking aside, essentially *whenever* and *wherever* you treat functions (which access their own respective lexical scopes) as first-class values and pass them around, you are likely to see those functions exercising closure. Be that timers, event handlers, Ajax requests, cross-window messaging, web workers, or any of the other asynchronous (or synchronous!) tasks, when you pass in a *callback function*, get ready to sling some closure around!
+把玩笑放在一边，实质上 *无论何时何地* 只要你将函数作为头等的值看待并将它们传来传去的话，你就可能看到这些函数行使闭包。计时器，事件处理器，Ajax请求，跨窗口消息，web worker，或者任何其他的异步（或同步！）任务，当你传入一个 *回调函数*，你就在它周围悬挂了一些闭包！
 
-**Note:** Chapter 3 introduced the IIFE pattern. While it is often said that IIFE (alone) is an example of observed closure, I would somewhat disagree, by our definition above.
+**注意：** 第三章介绍了IIFE模式。虽然人们常说IIFE（独自）是一个可以观察到闭包的例子，但是根据我们上面的定义，我有些不同意。
 
 ```js
 var a = 2;
@@ -204,21 +186,23 @@ var a = 2;
 })();
 ```
 
-This code "works", but it's not strictly an observation of closure. Why? Because the function (which we named "IIFE" here) is not executed outside its lexical scope. It's still invoked right there in the same scope as it was declared (the enclosing/global scope that also holds `a`). `a` is found via normal lexical scope look-up, not really via closure.
+这段代码“好用”，但严格来说它不是在观察闭包。为什么？因为这个函数（就是我们这里命名为“IIFE”的那个）没有在它的词法作用域之外执行。它仍然在它被声明的相同作用域中（那个同时持有`a`的外围/全局作用域）被调用。`a`是通过普通的词法作用域查询找到的，不是真正的闭包。
 
-While closure might technically be happening at declaration time, it is *not* strictly observable, and so, as they say, *it's a tree falling in the forest with no one around to hear it.*
+虽说技术上闭包可能发生在声明时，但它 *不是* 严格地可以观察到的，因此，就像人们说的，*它是一颗在森林中倒掉，但没人听到的树*。
 
-Though an IIFE is not *itself* an example of closure, it absolutely creates scope, and it's one of the most common tools we use to create scope which can be closed over. So IIFEs are indeed heavily related to closure, even if not exercising closure themselves.
+虽然IIFE *本身* 不是一个闭包的例子，但是它绝对创建了作用域，而且它是我们用来创建可以被覆盖的闭包的最常见的工具之一。所以IIFE确实与闭包有强烈的关联，即便它们本身不形式闭包。
 
-Put this book down right now, dear reader. I have a task for you. Go open up some of your recent JavaScript code. Look for your functions-as-values and identify where you are already using closure and maybe didn't even know it before.
+亲爱的读者，现在把这本书放下。我有一个任务给你。去打开一些你最近的JavaScript代码。寻找那些被你作为值的函数，并识别你已经在那里使用了闭包，而你以前甚至可能不知道它。
 
-I'll wait.
+我会等你。
 
-Now... you see!
+现在……你看到了！
 
 ## Loops + Closure
 
 The most common canonical example used to illustrate closure involves the humble for-loop.
+
+用来展示闭包最常见最权威的例子是谦卑的for循环。
 
 ```js
 for (var i=1; i<=5; i++) {
@@ -230,27 +214,51 @@ for (var i=1; i<=5; i++) {
 
 **Note:** Linters often complain when you put functions inside of loops, because the mistakes of not understanding closure are **so common among developers**. We explain how to do so properly here, leveraging the full power of closure. But that subtlety is often lost on linters and they will complain regardless, assuming you don't *actually* know what you're doing.
 
+**注意：** 当你将函数放在循环内部时Linter经常会抱怨，因为不理解闭包的错误 **在开发者中太常见了**。我们在这里讲解如何正确地利用闭包的全部力量。但是Linter通常不具有这样的微妙之处，所以它们不管怎样都将抱怨，认为你 *实际上* 不知道你在做什么。
+
 The spirit of this code snippet is that we would normally *expect* for the behavior to be that the numbers "1", "2", .. "5" would be printed out, one at a time, one per second, respectively.
+
+这段代码的精神是，我们一般将期待它的行为是分别打印数字“1”，“2”，……“5”，一次一个，一秒一个。
 
 In fact, if you run this code, you get "6" printed out 5 times, at the one-second intervals.
 
+实际上，如果你运行这段代码，你会得到“6”被打印5次，在一秒的间隔内。
+
 **Huh?**
+
+**啊？**
 
 Firstly, let's explain where `6` comes from. The terminating condition of the loop is when `i` is *not* `<=5`. The first time that's the case is when `i` is 6. So, the output is reflecting the final value of the `i` after the loop terminates.
 
+首先，让我们解释一下“6”是从哪儿来的。循环的终结条件是`i` *不* `<=5`。以一次满足这个条件时`i`是6。所以，输出的结果反映的是`i`在循环终结后的最终值。
+
 This actually seems obvious on second glance. The timeout function callbacks are all running well after the completion of the loop. In fact, as timers go, even if it was `setTimeout(.., 0)` on each iteration, all those function callbacks would still run strictly after the completion of the loop, and thus print `6` each time.
+
+如果多看两眼的话这其实很明显。超时的回调函数都将在循环的完成之后立即运行。实际上，就计时器而言，即便在每次迭代中它是`setTimeout(.., 0)`，所有这些回调函数也都仍然是严格地在循环之后运行的，因此每次都打印`6`。
 
 But there's a deeper question at play here. What's *missing* from our code to actually have it behave as we semantically have implied?
 
+但是这里有个更深刻的问题。要是想让它实际上如我们语言上暗示的那样动作，我们的代码缺少了什么？
+
 What's missing is that we are trying to *imply* that each iteration of the loop "captures" its own copy of `i`, at the time of the iteration. But, the way scope works, all 5 of those functions, though they are defined separately in each loop iteration, all **are closed over the same shared global scope**, which has, in fact, only one `i` in it.
+
+缺少的东西是，我们试图 *暗示* 在迭代期间，循环的每次迭代都“捕捉”一份对`i`的拷贝。但是，虽然所有这5个函数在每个循环迭代中分离地定义，由于作用域的工作方式，它们 **都覆盖在同一个共享的全局作用域上**，而它事实上只有一个`i`。
 
 Put that way, *of course* all functions share a reference to the same `i`. Something about the loop structure tends to confuse us into thinking there's something else more sophisticated at work. There is not. There's no difference than if each of the 5 timeout callbacks were just declared one right after the other, with no loop at all.
 
+这么说来，所有函数共享一个指向相同的`i`的引用是理所当然的。循环结构的某些东西往往迷惑我们，使我们认为这里有其他更精巧的东西在工作。但是这里没有。这与根本没有循环，5个超时回调仅仅一个接一个地被声明没有区别。
+
 OK, so, back to our burning question. What's missing? We need more ~~cowbell~~ closured scope. Specifically, we need a new closured scope for each iteration of the loop.
+
+好了，那么，回到我们火烧眉毛的问题。缺少了什么？我们需要更多 ~~铃声~~ 被闭包的作用域。明确地说，我们需要为循环的每次迭代都准备一个新的被闭包的作用域。
 
 We learned in Chapter 3 that the IIFE creates scope by declaring a function and immediately executing it.
 
+我们在第三章中学到，IIFE通过声明并立即执行一个函数来创建作用域。
+
 Let's try:
+
+让我们试试：
 
 ```js
 for (var i=1; i<=5; i++) {
@@ -264,7 +272,11 @@ for (var i=1; i<=5; i++) {
 
 Does that work? Try it. Again, I'll wait.
 
+这好用吗？试试。我还会等你。
+
 I'll end the suspense for you. **Nope.** But why? We now obviously have more lexical scope. Each timeout function callback is indeed closing over its own per-iteration scope created respectively by each IIFE.
+
+我来为你终结悬念。**不好用。** 但是为什么？很明显我们现在有了更多的词法作用域。每个超时回调函数确实覆盖在
 
 It's not enough to have a scope to close over **if that scope is empty**. Look closely. Our IIFE is just an empty do-nothing scope. It needs *something* in it to be useful to us.
 

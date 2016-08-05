@@ -1220,7 +1220,7 @@ function foo() {
 		return 42;
 	}
 	finally {
-		// no `return ..` here, so no override
+		// 这里没有 `return ..`，所以返回值不会被覆盖
 	}
 }
 
@@ -1229,7 +1229,7 @@ function bar() {
 		return 42;
 	}
 	finally {
-		// override previous `return 42`
+		// 覆盖前面的 `return 42`
 		return;
 	}
 }
@@ -1239,7 +1239,7 @@ function baz() {
 		return 42;
 	}
 	finally {
-		// override previous `return 42`
+		// 覆盖前面的 `return 42`
 		return "Hello";
 	}
 }
