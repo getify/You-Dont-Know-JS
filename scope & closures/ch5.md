@@ -200,8 +200,6 @@ var a = 2;
 
 ## Loops + Closure
 
-The most common canonical example used to illustrate closure involves the humble for-loop.
-
 用来展示闭包最常见最权威的例子是谦卑的for循环。
 
 ```js
@@ -212,51 +210,27 @@ for (var i=1; i<=5; i++) {
 }
 ```
 
-**Note:** Linters often complain when you put functions inside of loops, because the mistakes of not understanding closure are **so common among developers**. We explain how to do so properly here, leveraging the full power of closure. But that subtlety is often lost on linters and they will complain regardless, assuming you don't *actually* know what you're doing.
-
 **注意：** 当你将函数放在循环内部时Linter经常会抱怨，因为不理解闭包的错误 **在开发者中太常见了**。我们在这里讲解如何正确地利用闭包的全部力量。但是Linter通常不具有这样的微妙之处，所以它们不管怎样都将抱怨，认为你 *实际上* 不知道你在做什么。
-
-The spirit of this code snippet is that we would normally *expect* for the behavior to be that the numbers "1", "2", .. "5" would be printed out, one at a time, one per second, respectively.
 
 这段代码的精神是，我们一般将期待它的行为是分别打印数字“1”，“2”，……“5”，一次一个，一秒一个。
 
-In fact, if you run this code, you get "6" printed out 5 times, at the one-second intervals.
-
 实际上，如果你运行这段代码，你会得到“6”被打印5次，在一秒的间隔内。
-
-**Huh?**
 
 **啊？**
 
-Firstly, let's explain where `6` comes from. The terminating condition of the loop is when `i` is *not* `<=5`. The first time that's the case is when `i` is 6. So, the output is reflecting the final value of the `i` after the loop terminates.
-
 首先，让我们解释一下“6”是从哪儿来的。循环的终结条件是`i` *不* `<=5`。以一次满足这个条件时`i`是6。所以，输出的结果反映的是`i`在循环终结后的最终值。
-
-This actually seems obvious on second glance. The timeout function callbacks are all running well after the completion of the loop. In fact, as timers go, even if it was `setTimeout(.., 0)` on each iteration, all those function callbacks would still run strictly after the completion of the loop, and thus print `6` each time.
 
 如果多看两眼的话这其实很明显。超时的回调函数都将在循环的完成之后立即运行。实际上，就计时器而言，即便在每次迭代中它是`setTimeout(.., 0)`，所有这些回调函数也都仍然是严格地在循环之后运行的，因此每次都打印`6`。
 
-But there's a deeper question at play here. What's *missing* from our code to actually have it behave as we semantically have implied?
-
 但是这里有个更深刻的问题。要是想让它实际上如我们语言上暗示的那样动作，我们的代码缺少了什么？
-
-What's missing is that we are trying to *imply* that each iteration of the loop "captures" its own copy of `i`, at the time of the iteration. But, the way scope works, all 5 of those functions, though they are defined separately in each loop iteration, all **are closed over the same shared global scope**, which has, in fact, only one `i` in it.
 
 缺少的东西是，我们试图 *暗示* 在迭代期间，循环的每次迭代都“捕捉”一份对`i`的拷贝。但是，虽然所有这5个函数在每个循环迭代中分离地定义，由于作用域的工作方式，它们 **都覆盖在同一个共享的全局作用域上**，而它事实上只有一个`i`。
 
-Put that way, *of course* all functions share a reference to the same `i`. Something about the loop structure tends to confuse us into thinking there's something else more sophisticated at work. There is not. There's no difference than if each of the 5 timeout callbacks were just declared one right after the other, with no loop at all.
-
 这么说来，所有函数共享一个指向相同的`i`的引用是理所当然的。循环结构的某些东西往往迷惑我们，使我们认为这里有其他更精巧的东西在工作。但是这里没有。这与根本没有循环，5个超时回调仅仅一个接一个地被声明没有区别。
-
-OK, so, back to our burning question. What's missing? We need more ~~cowbell~~ closured scope. Specifically, we need a new closured scope for each iteration of the loop.
 
 好了，那么，回到我们火烧眉毛的问题。缺少了什么？我们需要更多 ~~铃声~~ 被闭包的作用域。明确地说，我们需要为循环的每次迭代都准备一个新的被闭包的作用域。
 
-We learned in Chapter 3 that the IIFE creates scope by declaring a function and immediately executing it.
-
 我们在第三章中学到，IIFE通过声明并立即执行一个函数来创建作用域。
-
-Let's try:
 
 让我们试试：
 
@@ -270,17 +244,13 @@ for (var i=1; i<=5; i++) {
 }
 ```
 
-Does that work? Try it. Again, I'll wait.
-
 这好用吗？试试。我还会等你。
 
-I'll end the suspense for you. **Nope.** But why? We now obviously have more lexical scope. Each timeout function callback is indeed closing over its own per-iteration scope created respectively by each IIFE.
+我来为你终结悬念。**不好用。** 但是为什么？很明显我们现在有了更多的词法作用域。每个超时回调函数确实闭包在每次迭代时分别被每个IIFE创建的作用域中。
 
-我来为你终结悬念。**不好用。** 但是为什么？很明显我们现在有了更多的词法作用域。每个超时回调函数确实覆盖在
+拥有一个被闭包的空的作用域是不够的。仔细观察。我们的IIFE只是一个空的什么也不做的作用域。它内部需要 *一些东西* 才能变得对我们有用。
 
-It's not enough to have a scope to close over **if that scope is empty**. Look closely. Our IIFE is just an empty do-nothing scope. It needs *something* in it to be useful to us.
-
-It needs its own variable, with a copy of the `i` value at each iteration.
+它需要它自己的变量，在每次迭代时持有值`i`的一个拷贝。
 
 ```js
 for (var i=1; i<=5; i++) {
@@ -293,9 +263,9 @@ for (var i=1; i<=5; i++) {
 }
 ```
 
-**Eureka! It works!**
+**万岁！它好用了！**
 
-A slight variation some prefer is:
+有些人偏好一种稍稍变形的形式：
 
 ```js
 for (var i=1; i<=5; i++) {
@@ -307,17 +277,17 @@ for (var i=1; i<=5; i++) {
 }
 ```
 
-Of course, since these IIFEs are just functions, we can pass in `i`, and we can call it `j` if we prefer, or we can even call it `i` again. Either way, the code works now.
+当让，因为这些IIFE只是函数，我们可以传入`i`，如果我们乐意的话可以称它为为`j`，或者我们甚至可以再次称它为`i`。不管哪种方式，这段代码都能工作。
 
-The use of an IIFE inside each iteration created a new scope for each iteration, which gave our timeout function callbacks the opportunity to close over a new scope for each iteration, one which had a variable with the right per-iteration value in it for us to access.
+在每次迭代内部使用的IIFE为每次迭代创建了新的作用域，这给了我们的超时回调函数一个机会在每次迭代时闭包一个新的作用域，这些作用域中的每一个都拥有一个持有正确的迭代值的变量给我们访问。
 
-Problem solved!
+问题解决了！
 
 ### Block Scoping Revisited
 
-Look carefully at our analysis of the previous solution. We used an IIFE to create new scope per-iteration. In other words, we actually *needed* a per-iteration **block scope**. Chapter 3 showed us the `let` declaration, which hijacks a block and declares a variable right there in the block.
+仔细观察我们前一个解决方案的分析。我们使用了一个IIFE来在每一次迭代中创建新的作用域。换句话说，我们实际上每次迭代都 *需要* 一个 **块儿作用域**。我们在第三章展示了`let`声明，它劫持一个块儿并且就在这个块儿中声明一个变量。
 
-**It essentially turns a block into a scope that we can close over.** So, the following awesome code "just works":
+**这实质上将块儿变成了一个我们可以闭包的作用域**。所以接下来的牛逼代码“就是好用”：
 
 ```js
 for (var i=1; i<=5; i++) {
@@ -328,7 +298,7 @@ for (var i=1; i<=5; i++) {
 }
 ```
 
-*But, that's not all!* (in my best Bob Barker voice). There's a special behavior defined for `let` declarations used in the head of a for-loop. This behavior says that the variable will be declared not just once for the loop, **but each iteration**. And, it will, helpfully, be initialized at each subsequent iteration with the value from the end of the previous iteration.
+*但是，这还不是全部！*（用我最棒的Bob Barker嗓音）在用于for循环头部的`let`声明被定义了一种特殊行为。这种行为说，这个变量将不是只为循环声明一次，**而是为每次迭代声明一次**。并且，它将在每次后续的迭代中被上一次迭代末尾的值初始化。
 
 ```js
 for (let i=1; i<=5; i++) {
@@ -338,11 +308,11 @@ for (let i=1; i<=5; i++) {
 }
 ```
 
-How cool is that? Block scoping and closure working hand-in-hand, solving all the world's problems. I don't know about you, but that makes me a happy JavaScripter.
+这有多酷？块儿作用域和闭包携手工作，解决世界上所有的问题。我不知道你怎么样，但这使我成了一个快乐的JavaScript开发者。
 
 ## Modules
 
-There are other code patterns which leverage the power of closure but which do not on the surface appear to be about callbacks. Let's examine the most powerful of them: *the module*.
+还有其他的代码模式利用了闭包的力量，但是它们都不像回调那样浮于表面。让我们来检视它们中最强大的一种：*模块*。
 
 ```js
 function foo() {
@@ -359,9 +329,9 @@ function foo() {
 }
 ```
 
-As this code stands right now, there's no observable closure going on. We simply have some private data variables `something` and `another`, and a couple of inner functions `doSomething()` and `doAnother()`, which both have lexical scope (and thus closure!) over the inner scope of `foo()`.
+就现在这段代码来说，没有发生明显的闭包。我们只是拥有一些私有数据变量`something`和`another`，和几个内部函数`doSomething()`和`doAnother()`，它们都拥有覆盖在`foo()`内部作用域上的词法作用域（因此是闭包！）。
 
-But now consider:
+但是现在考虑这段代码：
 
 ```js
 function CoolModule() {
@@ -388,29 +358,29 @@ foo.doSomething(); // cool
 foo.doAnother(); // 1 ! 2 ! 3
 ```
 
-This is the pattern in JavaScript we call *module*. The most common way of implementing the module pattern is often called "Revealing Module", and it's the variation we present here.
+在JavaScript中我们称这种模式为 *模块*。实现模块模式的最常见方法经常被称为“揭示模块”，它是我们在这里展示的方式的变种。
 
-Let's examine some things about this code.
+让我们检视关于这段代码的一些事情。
 
-Firstly, `CoolModule()` is just a function, but it *has to be invoked* for there to be a module instance created. Without the execution of the outer function, the creation of the inner scope and the closures would not occur.
+首先，`CoolModule()`只是一个函数，但它 *必须被调用* 才能成为一个被创建的模块实例。没有外部函数的执行，内部作用域的创建和闭包都不会发生。
 
-Secondly, the `CoolModule()` function returns an object, denoted by the object-literal syntax `{ key: value, ... }`. The object we return has references on it to our inner functions, but *not* to our inner data variables. We keep those hidden and private. It's appropriate to think of this object return value as essentially a **public API for our module**.
+第二，`CoolModule()`函数返回一个对象，通过对象字面量语法`{ key: value, ... }`标记。这个我们返回的对象拥有指向我们内部函数的引用，但是 *没有* 指向我们内部数据变量的引用。我们可以将它们保持为隐藏和私有的。可以很恰当地认为这个返回值对象实质上是一个 **我们模块的公有API**。
 
-This object return value is ultimately assigned to the outer variable `foo`, and then we can access those property methods on the API, like `foo.doSomething()`.
+这个返回值对象最终被赋值给外部变量`foo`，然后我们可以在这个API上访问那些属性，就像`foo.doSomething()`。
 
-**Note:** It is not required that we return an actual object (literal) from our module. We could just return back an inner function directly. jQuery is actually a good example of this. The `jQuery` and `$` identifiers are the public API for the jQuery "module", but they are, themselves, just a function (which can itself have properties, since all functions are objects).
+**注意：** 从我们的模块中返回一个实际的对象（字面量）不是必须的。我们可以仅仅直接返回一个内部函数。jQuery就是一个很好地例子。`jQuery`和`$`标识符是jQuery“模块”的公有API，但是它们本身只是一个函数（这个函数本身可以有属性，因为所有的函数都是对象）。
 
-The `doSomething()` and `doAnother()` functions have closure over the inner scope of the module "instance" (arrived at by actually invoking `CoolModule()`). When we transport those functions outside of the lexical scope, by way of property references on the object we return, we have now set up a condition by which closure can be observed and exercised.
+`doSomething()`和`doAnother()`函数拥有模块“实例”内部作用域的闭包（通过实际调用`CoolModule()`得到的）。当我们通过返回值对象的属性引用，将这些函数传送到词法作用域外部时，我们就建立好了可以观察和行使闭包的条件。
 
-To state it more simply, there are two "requirements" for the module pattern to be exercised:
+更简单地说，行使模块模式有两个“必要条件”：
 
-1. There must be an outer enclosing function, and it must be invoked at least once (each time creates a new module instance).
+1. 必须有一个外部的外围函数，而且它必须至少被调用一次（每次创建一个新的模块实例）。
 
-2. The enclosing function must return back at least one inner function, so that this inner function has closure over the private scope, and can access and/or modify that private state.
+2. 外围的函数必须至少返回一个内部函数，这样这个内部函数才拥有私有作用域的闭包，并且可以访问和/或修改这个私有状态。
 
-An object with a function property on it alone is not *really* a module. An object which is returned from a function invocation which only has data properties on it and no closured functions is not *really* a module, in the observable sense.
+一个仅带有一个函数属性的对象不是 *真正* 的模块。一个从函数调用中返回的对象，仅带有数据属性而没有闭包的函数，也不是 *真正* 的模块，从可观察的角度来说。
 
-The code snippet above shows a standalone module creator called `CoolModule()` which can be invoked any number of times, each time creating a new module instance. A slight variation on this pattern is when you only care to have one instance, a "singleton" of sorts:
+上面的代码段展示了一个称为`CoolModule()`独立的模块创建器，它可以被调用任意多次，每次创建一个新的模块实例。这种模式的一个稍稍的变化是当你只想要一个实例的时候，某种“单例”：
 
 ```js
 var foo = (function CoolModule() {
@@ -435,9 +405,9 @@ foo.doSomething(); // cool
 foo.doAnother(); // 1 ! 2 ! 3
 ```
 
-Here, we turned our module function into an IIFE (see Chapter 3), and we *immediately* invoked it and assigned its return value directly to our single module instance identifier `foo`.
+这里，我们将模块放进一个IIFE（见第三章）中，而且我们 *立即* 调用它，并把它的返回值直接赋值给我们单独的模块实例标识符`foo`。
 
-Modules are just functions, so they can receive parameters:
+模块只是函数，所以它们可以接收参数：
 
 ```js
 function CoolModule(id) {
@@ -457,7 +427,7 @@ foo1.identify(); // "foo 1"
 foo2.identify(); // "foo 2"
 ```
 
-Another slight but powerful variation on the module pattern is to name the object you are returning as your public API:
+另一种在模块模式上微小但是强大的变化是，为你作为公有API返回的对象命名：
 
 ```js
 var foo = (function CoolModule(id) {
@@ -487,11 +457,11 @@ foo.change();
 foo.identify(); // FOO MODULE
 ```
 
-By retaining an inner reference to the public API object inside your module instance, you can modify that module instance **from the inside**, including adding and removing methods, properties, *and* changing their values.
+通过在模块实例内部持有一个指向公有API对象的内部引用，你可以 **从内部** 修改这个模块，包括添加和删除方法，属性，*和* 改变它们的值。
 
 ### Modern Modules
 
-Various module dependency loaders/managers essentially wrap up this pattern of module definition into a friendly API. Rather than examine any one particular library, let me present a *very simple* proof of concept **for illustration purposes (only)**:
+各种模块依赖加载器/消息机制实质上都是讲这种模块定义包装进一个友好的API。与其检视任意一个特定的库，不如让我 **（仅）为了说明的目的** 展示一个 *非常简单* 的概念证明：
 
 ```js
 var MyModules = (function Manager() {
@@ -515,9 +485,9 @@ var MyModules = (function Manager() {
 })();
 ```
 
-The key part of this code is `modules[name] = impl.apply(impl, deps)`. This is invoking the definition wrapper function for a module (passing in any dependencies), and storing the return value, the module's API, into an internal list of modules tracked by name.
+这段代码的关键部分是`modules[name] = impl.apply(impl, deps)`。这为一个模块调用了它的定义的包装函数（传入所有依赖），并将返回值，也就是模块的API，存储到一个用名称追踪的内部模块列表中。
 
-And here's how I might use it to define some modules:
+这里是我可能如何使用它来定义一个模块：
 
 ```js
 MyModules.define( "bar", [], function(){
@@ -552,23 +522,23 @@ console.log(
 foo.awesome(); // LET ME INTRODUCE: HIPPO
 ```
 
-Both the "foo" and "bar" modules are defined with a function that returns a public API. "foo" even receives the instance of "bar" as a dependency parameter, and can use it accordingly.
+模块“foo”和“bar”都使用一个返回公有API的函数来定义。“foo”甚至接收一个“bar”的实例作为依赖参数，并且可以因此使用它。
 
-Spend some time examining these code snippets to fully understand the power of closures put to use for our own good purposes. The key take-away is that there's not really any particular "magic" to module managers. They fulfill both characteristics of the module pattern I listed above: invoking a function definition wrapper, and keeping its return value as the API for that module.
+花些时间检视这些代码段，来完全理解将闭包的力量付诸实践给我们带来的好处。关键之处在于，对于模块管理器来说真的没有什么特殊的“魔法”。它们只是满足了我在上面列出的模块模式的两个性质：调用一个函数定义包装器，并将它的返回值作为这个模块的API保存下来。
 
-In other words, modules are just modules, even if you put a friendly wrapper tool on top of them.
+换句话说，模块就是模块，即便你在它们上面放了一个友好的包装工具。
 
 ### Future Modules
 
-ES6 adds first-class syntax support for the concept of modules. When loaded via the module system, ES6 treats a file as a separate module. Each module can both import other modules or specific API members, as well export their own public API members.
+ES6为模块的概念增加了头等的语法支持。当通过模块系统加载时，ES6将一个文件视为一个独立的模块。每个模块可以导入其他的模块或者特定的API成员，也可以导出它们自己的公有API成员。
 
-**Note:** Function-based modules aren't a statically recognized pattern (something the compiler knows about), so their API semantics aren't considered until run-time. That is, you can actually modify a module's API during the run-time (see earlier `publicAPI` discussion).
+**注意：** 基于函数的模块不是一个可以被静态识别的模式（编译器可以知道的东西），所以它们的API语义直到运行时才会被考虑。也就是，你实际上可以在运行时期间修改模块的API（参见早先`publicAPI`的讨论）。
 
-By contrast, ES6 Module APIs are static (the APIs don't change at run-time). Since the compiler knows *that*, it can (and does!) check during (file loading and) compilation that a reference to a member of an imported module's API *actually exists*. If the API reference doesn't exist, the compiler throws an "early" error at compile-time, rather than waiting for traditional dynamic run-time resolution (and errors, if any).
+相比之下，ES6模块API是静态的（这些API不会在运行时改变）。因为编译器知道它，它可以（也确实在作！）在（文件加载和）编译期间检查一个指向被导入模块的成员的引用是否 *实际存在*。如果API引用不存在，编译器就会在编译时抛出一个“早期”错误，而不是等待传统的动态运行时解决方案（和错误，如果有的话）。
 
-ES6 modules **do not** have an "inline" format, they must be defined in separate files (one per module). The browsers/engines have a default "module loader" (which is overridable, but that's well-beyond our discussion here) which synchronously loads a module file when it's imported.
+ES6模块 **没有** “内联”格式，它们必须被定义在一个分离的文件中（每个模块一个）。浏览器/引擎拥有一个默认的“模块加载器”（它是可以被覆盖的，但是这超出我们在此讨论的范围），它在模块被导入时同步地加载模块文件。
 
-Consider:
+考虑这段代码：
 
 **bar.js**
 ```js
@@ -607,20 +577,20 @@ console.log(
 foo.awesome(); // LET ME INTRODUCE: HIPPO
 ```
 
-**Note:** Separate files **"foo.js"** and **"bar.js"** would need to be created, with the contents as shown in the first two snippets, respectively. Then, your program would load/import those modules to use them, as shown in the third snippet.
+**注意：** 需要使用前两个代码片段中的内容分别创建分离的文件 **“foo.js”** 和 **“bar.js”**。然后， 你的程序将加载/导入这些模块来使用它们，就像第三个片段那样。
 
-`import` imports one or more members from a module's API into the current scope, each to a bound variable (`hello` in our case). `module` imports an entire module API to a bound variable (`foo`, `bar` in our case). `export` exports an identifier (variable, function) to the public API for the current module. These operators can be used as many times in a module's definition as is necessary.
+`import`在当前的作用域中导入一个模块的API的一个或多个成员，每个都绑定到一个变量（这个例子中是`hello`）。`module`将整个模块的API导入到一个被绑定的变量（这个例子中是`foo`，`bar`）。`export`为当前模块的公有API导出一个标识符（变量，函数）。在一个模块的定义中，这些操作根据需要使用任意多次。
 
-The contents inside the *module file* are treated as if enclosed in a scope closure, just like with the function-closure modules seen earlier.
+在 *模块文件* 内部的内容被视为像是包围在一个作用域闭包中，就像早先看到的使用函数闭包的模块那样。
 
 ## Review (TL;DR)
 
-Closure seems to the un-enlightened like a mystical world set apart inside of JavaScript which only the few bravest souls can reach. But it's actually just a standard and almost obvious fact of how we write code in a lexically scoped environment, where functions are values and can be passed around at will.
+闭包就像在JavaScript内部被隔离开的魔法世界，看起来少为人知，只有很少一些最勇敢的灵魂才能到达。但是它实际上只是一个标准的，而且几乎明显的事实 —— 我们如何在函数即是值，而且可以被随意传递的词法作用域环境中编写代码，
 
-**Closure is when a function can remember and access its lexical scope even when it's invoked outside its lexical scope.**
+**闭包就是当一个函数即使是在它的词法作用域之外被调用时，也可以记住并访问它的词法作用域。**
 
-Closures can trip us up, for instance with loops, if we're not careful to recognize them and how they work. But they are also an immensely powerful tool, enabling patterns like *modules* in their various forms.
+如果我们不能小心地识别它们和它们的工作方式，闭包可能会绊住我们，例如在循环中。但它们也是一种极其强大的工具，以各种形式开启了像 *模块* 这样的模式。
 
-Modules require two key characteristics: 1) an outer wrapping function being invoked, to create the enclosing scope 2) the return value of the wrapping function must include reference to at least one inner function that then has closure over the private inner scope of the wrapper.
+模块要求两个关键性质：1）一个被调用的外部包装函数，来创建外围作用域。2）这个包装函数的返回值必须包含至少一个内部函数的引用，这个函数才拥有包装函数内部作用域的闭包。
 
-Now we can see closures all around our existing code, and we have the ability to recognize and leverage them to our own benefit!
+现在我们看到了闭包在我们的代码中无处不在，而且我们有能力识别它们，并为我们自己的利益利用它们！

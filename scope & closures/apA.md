@@ -1,13 +1,13 @@
 # You Don't Know JS: Scope & Closures
 # Appendix A: Dynamic Scope
 
-In Chapter 2, we talked about "Dynamic Scope" as a contrast to the "Lexical Scope" model, which is how scope works in JavaScript (and in fact, most other languages).
+在第二章中，作为与JavaScript中（事实上，其他大多数语言也是）作用域的工作方式模型 —— “词法作用域”的对比，我们谈到了“动态作用域”。
 
-We will briefly examine dynamic scope, to hammer home the contrast. But, more importantly, dynamic scope actually is a near cousin to another mechanism (`this`) in JavaScript, which we covered in the "*this & Object Prototypes*" title of this book series.
+我们将简单地检视动态作用域，来彻底说明这种比较。但更重要的是，对于JavaScript中的另一种机制（`this`）来说动态作用域实际上是它的一个近亲表兄，我们将在本系列的“*this与对象原型*”中详细讲解这种机制。
 
-As we saw in Chapter 2, lexical scope is the set of rules about how the *Engine* can look-up a variable and where it will find it. The key characteristic of lexical scope is that it is defined at author-time, when the code is written (assuming you don't cheat with `eval()` or `with`).
+正如我们在第二章中看到的，词法作用域是一组关于 *引擎* 如何查询变量和它在何处能够找到变量的规则。词法作用域的关键性质是，他是在代码编写时被定义的（假定你不使用`eval()`或`with`作弊的话）。
 
-Dynamic scope seems to imply, and for good reason, that there's a model whereby scope can be determined dynamically at runtime, rather than statically at author-time. That is in fact the case. Let's illustrate via code:
+动态作用域看起来在暗示，有充分的理由，存在这样一种模型，它的作用域是在运行时被确定的，而不是在编写时静态地确定的。让我们通过代码来说明这样的实际情况：
 
 ```js
 function foo() {
@@ -24,11 +24,11 @@ var a = 2;
 bar();
 ```
 
-Lexical scope holds that the RHS reference to `a` in `foo()` will be resolved to the global variable `a`, which will result in value `2` being output.
+在`foo()`的词法作用域中指向`a`的RHS引用将被解析为全局变量`a`，它将导致输出结果为值`2`。
 
-Dynamic scope, by contrast, doesn't concern itself with how and where functions and scopes are declared, but rather **where they are called from**. In other words, the scope chain is based on the call-stack, not the nesting of scopes in code.
+相比之下，动态作用域本身不关心函数和作用域是在哪里和如何被声明的，而是关心 **它们是从何处被调用的**。换句话说，它的作用域链条是基于调用栈的，而不是代码中作用域的嵌套。
 
-So, if JavaScript had dynamic scope, when `foo()` is executed, **theoretically** the code below would instead result in `3` as the output.
+所以，如果JavaScript拥有动态作用域，当`foo()`被执行时，**理论上** 下面的代码将得出`3`作为输出结果。
 
 ```js
 function foo() {
@@ -45,14 +45,14 @@ var a = 2;
 bar();
 ```
 
-How can this be? Because when `foo()` cannot resolve the variable reference for `a`, instead of stepping up the nested (lexical) scope chain, it walks up the call-stack, to find where `foo()` was *called from*. Since `foo()` was called from `bar()`, it checks the variables in scope for `bar()`, and finds an `a` there with value `3`.
+这怎么可能？因为当`foo()`不能为`a`解析出一个变量引用时，它不会沿着嵌套的（词法）作用域链向上走一层，而是沿着调用栈向上走，以找到`foo()`是 *从何处* 被调用的。因为`foo()`是从`bar()`中被调用的，它就会在`bar()`的作用域中检查变量，兵器在这里找到持有值`3`的`a`。
 
-Strange? You're probably thinking so, at the moment.
+奇怪吗？此时此刻你可能会这样认为。
 
-But that's just because you've probably only ever worked on (or at least deeply considered) code which is lexically scoped. So dynamic scoping seems foreign. If you had only ever written code in a dynamically scoped language, it would seem natural, and lexical scope would be the odd-ball.
+但这可能只是因为你仅在拥有词法作用域的代码中工作过。所以动态作用域看起来陌生。如果你仅使用动态作用域的语言编写过代码，它看起来就是很自然的，而词法作用域将是个怪东西。
 
-To be clear, JavaScript **does not, in fact, have dynamic scope**. It has lexical scope. Plain and simple. But the `this` mechanism is kind of like dynamic scope.
+要清楚，JavaScript **实际上没有动态作用域**。它拥有词法作用域。简单明了。但是`this`机制有些像动态作用域。
 
-The key contrast: **lexical scope is write-time, whereas dynamic scope (and `this`!) are runtime**. Lexical scope cares *where a function was declared*, but dynamic scope cares where a function was *called from*.
+关键的差异：**词法作用域是编写时的，而动态作用域（和`this`）是运行时的**。词法作用域关心的是 *函数在何处被声明*，但是动态作用域关心的是函数 *从何处* 被调用。
 
-Finally: `this` cares *how a function was called*, which shows how closely related the `this` mechanism is to the idea of dynamic scoping. To dig more into `this`, read the title "*this & Object Prototypes*".
+最后：`this`关心的是 *函数是如何被调用的*，这揭示了`this`机制与动态作用域的想法有多么紧密的关联。要了解更多关于`this`的细节，请阅读 “*this与对象原型*”。
