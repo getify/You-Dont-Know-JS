@@ -1,9 +1,9 @@
 # You Don't Know JS: Scope & Closures
 # Appendix C: Lexical-this
 
-Though this title does not address the `this` mechanism in any detail, there's one ES6 topic which relates `this` to lexical scope in an important way, which we will quickly examine.
+这本书通篇没有讲解`this`机制的任何细节，有一个ES6的话题以一种重要的方式将`this`与词法作用域联系了起来，我们将快速检视它一下。
 
-ES6 adds a special syntactic form of function declaration called the "arrow function". It looks like this:
+ES6为函数声明增加了一种特殊的语法形式，称为“箭头函数”。它看起来像这样：
 
 ```js
 var foo = a => {
@@ -13,11 +13,11 @@ var foo = a => {
 foo( 2 ); // 2
 ```
 
-The so-called "fat arrow" is often mentioned as a short-hand for the *tediously verbose* (sarcasm) `function` keyword.
+这个所谓的“大箭头”经常被称为是 *乏味烦冗的*（讽刺）`function`关键字的缩写。
 
-But there's something much more important going on with arrow-functions that has nothing to do with saving keystrokes in your declaration.
+但是在箭头函数上发生的一些事情要重要得多，而且这与在你的声明中少敲几下键盘无关。
 
-Briefly, this code suffers a problem:
+简单地说，这段代码有一个问题：
 
 ```js
 
@@ -35,9 +35,9 @@ obj.cool(); // awesome
 setTimeout( obj.cool, 100 ); // not awesome
 ```
 
-The problem is the loss of `this` binding on the `cool()` function. There are various ways to address that problem, but one often-repeated solution is `var self = this;`.
+这个问题就是在`cool()`函数上丢失了`this`绑定。有各种方法可以解决这个问题，但一个经常重复的解决方案是`var self = this;`。
 
-That might look like:
+它可能看起来像：
 
 ```js
 var obj = {
@@ -57,11 +57,11 @@ var obj = {
 obj.cool(); // awesome?
 ```
 
-Without getting too much into the weeds here, the `var self = this` "solution" just dispenses with the whole problem of understanding and properly using `this` binding, and instead falls back to something we're perhaps more comfortable with: lexical scope. `self` becomes just an identifier that can be resolved via lexical scope and closure, and cares not what happened to the `this` binding along the way.
+用不过于深入细节的方式讲，`var self = this`的“解决方案”免除了理解和正确使用`this`绑定的整个问题，而是退回到我们也许感到更舒服的东西上面：词法作用域。`self`变成了一个可以通过词法作用域和闭包解析的标识符，而且一直不关心`this`绑定发生了什么。
 
-People don't like writing verbose stuff, especially when they do it over and over again. So, a motivation of ES6 is to help alleviate these scenarios, and indeed, *fix* common idiom problems, such as this one.
+人们不喜欢写繁冗的东西，特别是当他们一次又一次重复它的时候。于是，ES6的一个动机是帮助缓和这些场景，将常见的惯用法问题 *确定* 下来，就像这一个。
 
-The ES6 solution, the arrow-function, introduces a behavior called "lexical this".
+ES6的解决方案，箭头函数，引入了一种称为“词法this”的行为。
 
 ```js
 var obj = {
@@ -79,17 +79,17 @@ var obj = {
 obj.cool(); // awesome?
 ```
 
-The short explanation is that arrow-functions do not behave at all like normal functions when it comes to their `this` binding. They discard all the normal rules for `this` binding, and instead take on the `this` value of their immediate lexical enclosing scope, whatever it is.
+简单的解释是，当箭头函数遇到它们的`this`绑定时，它们的行为与一般的函数根本不同。它们摒弃了`this`绑定的所有一般规则，而是将它们的立即外围词法作用域作为`this`的值，无论它是什么。
 
-So, in that snippet, the arrow-function doesn't get its `this` unbound in some unpredictable way, it just "inherits" the `this` binding of the `cool()` function (which is correct if we invoke it as shown!).
+于是，在这个代码段中，箭头函数不会以不可预知的方式丢掉`this`绑定，它只是“继承”`cool()`函数的`this`绑定。
 
-While this makes for shorter code, my perspective is that arrow-functions are really just codifying into the language syntax a common *mistake* of developers, which is to confuse and conflate "this binding" rules with "lexical scope" rules.
+虽然这使代码更短，但在我看来，箭头函数只不过是将一个开发者们常犯的错误固化成了语言的语法，这混淆了“this绑定”规则与“词法作用域”规则。
 
-Put another way: why go to the trouble and verbosity of using the `this` style coding paradigm, only to cut it off at the knees by mixing it with lexical references. It seems natural to embrace one approach or the other for any given piece of code, and not mix them in the same piece of code.
+换一种说法：为什么要使用`this`风格的编码形式来招惹麻烦和繁冗？只要通过将它与词法作用域混合把它剔除掉就好。对于给定的一段代码只采纳一种方式或另一种看起来才是自然的，而不是在同一段代码中将它们混在一起。
 
-**Note:** one other detraction from arrow-functions is that they are anonymous, not named. See Chapter 3 for the reasons why anonymous functions are less desirable than named functions.
+**注意：** 源自箭头函数的另一个非议是，它们是匿名的，不是命名的。参见第三章来了解为什么匿名函数不如命名函数理想的原因。
 
-A more appropriate approach, in my perspective, to this "problem", is to use and embrace the `this` mechanism correctly.
+在我看来，这个“问题”的更恰当的解决方式是，正确地使用并接受`this`机制。
 
 ```js
 var obj = {
@@ -107,8 +107,8 @@ var obj = {
 obj.cool(); // more awesome
 ```
 
-Whether you prefer the new lexical-this behavior of arrow-functions, or you prefer the tried-and-true `bind()`, it's important to note that arrow-functions are **not** just about less typing of "function".
+不管你是偏好箭头函数的新的词法this行为，还是偏好经得起考验的`bind()`，重要的是要注意箭头函数 **不** 仅仅是关于可以少打一些“function”。
 
-They have an *intentional behavioral difference* that we should learn and understand, and if we so choose, leverage.
+它们拥有一种我们应当学习并理解的，*有意的行为上的不同*，而且如果我们这样选择，就可以利用它们。
 
-Now that we fully understand lexical scoping (and closure!), understanding lexical-this should be a breeze!
+现在我们完全理解了词法作用域（和闭包！），理解词法this应该是小菜一碟！
