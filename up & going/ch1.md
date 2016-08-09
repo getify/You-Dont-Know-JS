@@ -3,27 +3,47 @@
 
 Welcome to the *You Don't Know JS* (*YDKJS*) series.
 
+欢迎来到 *你不懂JS*（*YDKJS*） 系列。
+
 *Up & Going* is an introduction to several basic concepts of programming -- of course we lean toward JavaScript (often abbreviated JS) specifically -- and how to approach and understand the rest of the titles in this series. Especially if you're just getting into programming and/or JavaScript, this book will briefly explore what you need to get *up and going*.
+
+*入门与进阶* 是一个对几种编程基本概念的介绍 —— 当然我们是特别倾向于JavaScript（经常略称为JS）的 —— 以及如何走近与理解本系列的其他书目。特别是如果你刚刚接触编程和/或JavaScript，这本书将简要地探索你需要什么来 *入门与进阶*。
 
 This book starts off explaining the basic principles of programming at a very high level. It's mostly intended if you are starting *YDKJS* with little to no prior programming experience, and are looking to these books to help get you started along a path to understanding programming through the lens of JavaScript.
 
+这本书从很高的角度来解释编程的基本原则开始。它基本上假定你是在没有或很少的编程经验的情况下开始阅读 *YDKJS*，而且期待这些书可以透过JavaScript的镜头帮助你开启一条理解编程的道路。
+
 Chapter 1 should be approached as a quick overview of the things you'll want to learn more about and practice to get *into programming*. There are also many other fantastic programming introduction resources that can help you dig into these topics further, and I encourage you to learn from them in addition to this chapter.
+
+第一章应当作为一个快速的概览来阅读，它讲述为了 *开始编程* 你将想要多加学习和实践的东西。有许多其他精彩的编程介绍资源可以帮你在这个话题上走得更远，而且我鼓励你学习它们来作为这一章的补充。
 
 Once you feel comfortable with general programming basics, Chapter 2 will help guide you to a familiarity with JavaScript's flavor of programming. Chapter 2 introduces what JavaScript is about, but again, it's not a comprehensive guide -- that's what the rest of the *YDKJS* books are for!
 
+一旦你对一般的编程基础感到适应了，第二章将指引你熟悉JavaScript风格的编程。第二章介绍了JavaScript是什么，但是同样的，它不是一个全面的指引 —— 那是其他 *YDKJS* 书目的任务！
+
 If you're already fairly comfortable with JavaScript, first check out Chapter 3 as a brief glimpse of what to expect from *YDKJS*, then jump right in!
+
+如果你已经相当熟悉JavaScript，首先看一下第三章作为 *YDKJS* 内容的简要一瞥，然后立即投入其中！
 
 ## Code
 
 Let's start from the beginning.
 
+让我们从头开始。
+
 A program, often referred to as *source code* or just *code*, is a set of special instructions to tell the computer what tasks to perform. Usually code is saved in a text file, although with JavaScript you can also type code directly into a developer console in a browser, which we'll cover shortly.
 
+一个程序，经常被称为 *源代码* 或者只是 *代码*，是一组告诉计算机要执行什么任务的特殊的指令。代码通常保存在文本文件中，虽然你也可以使用JavaScript在一个浏览器的开发者控制台中直接敲入代码，我们一会儿就会讲解。
+
 The rules for valid format and combinations of instructions is called a *computer language*, sometimes referred to as its *syntax*, much the same as English tells you how to spell words and how to create valid sentences using words and punctuation.
+
+合法的格式与指令的组合规则被称为一种 *计算机语言*，有时被称作它的 *语法*，这和英语教你如何拼写单词和如何使用单词与标点创建合法的句子差不多是相同的。
 
 ### Statements
 
 In a computer language, a group of words, numbers, and operators that performs a specific task is a *statement*. In JavaScript, a statement might look as follows:
+
+在一种计算机语言中，一组单词，数字，和执行一种具体任务的操作符构成了一个 *语句*。在JavaScript中，一个语句可能看起来像下面这样：
 
 ```js
 a = b * 2;
@@ -31,21 +51,37 @@ a = b * 2;
 
 The characters `a` and `b` are called *variables* (see "Variables"), which are like simple boxes you can store any of your stuff in. In programs, variables hold values (like the number `42`) to be used by the program. Think of them as symbolic placeholders for the values themselves.
 
+字符`a`和`b`被称为 *变量*（参见“变量”），它们就像简单和盒子，你可以把任何东西存储在其中。在程序中，变量持有将被程序使用的值（比如数字`42`）。可以认为它们就是值本身的标志占位符。
+
 By contrast, the `2` is just a value itself, called a *literal value*, because it stands alone without being stored in a variable.
+
+相比之下，`2`本身只是一个值，称为一个 *字面值*，因为它没有被存入一个变量，是独立的。
 
 The `=` and `*` characters are *operators* (see "Operators") -- they perform actions with the values and variables such as assignment and mathematic multiplication.
 
+字符`=`和`*`是 *操作符*（见“操作符”） —— 它们使用值和变量实施动作，比如赋值和数学乘法。
+
 Most statements in JavaScript conclude with a semicolon (`;`) at the end.
+
+在JavaScript中大多数语句都以末尾的分号（`;`）结束。
 
 The statement `a = b * 2;` tells the computer, roughly, to get the current value stored in the variable `b`, multiply that value by `2`, then store the result back into another variable we call `a`.
 
+语句`a = b * 2;`告诉计算机，大致上，去取得当前存储在变量`b`中的值，将这个值乘以`2`，然后将结果存回到另一个变量`a`里面。
+
 Programs are just collections of many such statements, which together describe all the steps that it takes to perform your program's purpose.
+
+程序只是许多这样的语句的集合，它们一起描述了为执行你的程序的意图所要采取的所有步骤。
 
 ### Expressions
 
 Statements are made up of one or more *expressions*. An expression is any reference to a variable or value, or a set of variable(s) and value(s) combined with operators.
 
+语句是由一个或多个 *表达式* 组成的。一个表达式是指向一个变量或值，或者一组用操作符组合的变量和值的任意引用。
+
 For example:
+
+例如：
 
 ```js
 a = b * 2;
@@ -53,12 +89,20 @@ a = b * 2;
 
 This statement has four expressions in it:
 
+这个语句中有四个表达式：
+
 * `2` is a *literal value expression*
+* `2`是一个 *字面量表达式*
 * `b` is a *variable expression*, which means to retrieve its current value
+* `b`是一个 *变量表达式*，它意味着取出它的当前值
 * `b * 2` is an *arithmetic expression*, which means to do the multiplication
+* `b * 2`是一个 *算数表达式*，它意味着执行乘法
 * `a = b * 2` is an *assignment expression*, which means to assign the result of the `b * 2` expression to the variable `a` (more on assignments later)
+* `a = b * 2`是一个 *赋值表达式*，它意味着将表达式`b * 2`的结果赋值给变量`a`（稍后有更多关于赋值的内容）
 
 A general expression that stands alone is also called an *expression statement*, such as the following:
+
+一个独立的普通表达式也被称为一个 *表达式语句*，比如下面的：
 
 ```js
 b * 2;
@@ -66,7 +110,11 @@ b * 2;
 
 This flavor of expression statement is not very common or useful, as generally it wouldn't have any effect on the running of the program -- it would retrieve the value of `b` and multiply it by `2`, but then wouldn't do anything with that result.
 
+这种风格的表达式语句不是很常见和有用，因为一般来说它不会对程序的运行有任何影响 —— 它将取得`b`的值并乘以`2`，但是之后不会对结果做任何事情。
+
 A more common expression statement is a *call expression* statement (see "Functions"), as the entire statement is the function call expression itself:
+
+一种更常见的表达式是 *调用表达式* 语句（见“函数”），因为整个语句本身是一个函数调用表达式：
 
 ```js
 alert( a );
@@ -76,15 +124,27 @@ alert( a );
 
 How do those collections of programming statements tell the computer what to do? The program needs to be *executed*, also referred to as *running the program*.
 
+这些程序语句的集合如何告诉计算机要做什么？这个程序需要被 *执行*，也称为 *运行这个程序*。
+
 Statements like `a = b * 2` are helpful for developers when reading and writing, but are not actually in a form the computer can directly understand. So a special utility on the computer (either an *interpreter* or a *compiler*) is used to translate the code you write into commands a computer can understand.
+
+在开发者们阅读与编写时，像`a = b * 2`这样的语句很有帮助，但是它实际上不是计算机可以直接理解的形式。所以一个计算机上的特殊工具（不是一个 *解释器* 就是一个 *编译器*）被用于将你编写的代码翻译为计算机可以理解的命令。
 
 For some computer languages, this translation of commands is typically done from top to bottom, line by line, every time the program is run, which is usually called *interpreting* the code.
 
+对于某些计算机语言，这种命令的翻译经常是在每次程序运行时从上向下，一行接一行完成的，这通常成为代码的 *解释*。
+
 For other languages, the translation is done ahead of time, called *compiling* the code, so when the program *runs* later, what's running is actually the already compiled computer instructions ready to go.
+
+对于另一些语言，这种翻译是提前完成的，成为代码的 *编译*，所以当程序稍后 *运行* 时，实际上运行的东西已经是编译好，随时可以运行的计算机指令了。
 
 It's typically asserted that JavaScript is *interpreted*, because your JavaScript source code is processed each time it's run. But that's not entirely accurate. The JavaScript engine actually *compiles* the program on the fly and then immediately runs the compiled code.
 
+JavaScript通常被断言为 *解释型* 的，因为你的JavaScript源代码在它每次运行时都被处理。但这不是完全准确的。JavaScript引擎实际上在即时地 *编译* 程序然后立即运行编译好的代码。
+
 **Note:** For more information on JavaScript compiling, see the first two chapters of the *Scope & Closures* title of this series.
+
+**注意：** 更多关于JavaScript编译的信息，参见本系列的 *作用域与闭包* 的前两章。
 
 ## Try It Yourself
 
