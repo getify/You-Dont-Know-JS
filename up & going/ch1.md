@@ -1,47 +1,27 @@
 # You Don't Know JS: Up & Going
 # Chapter 1: Into Programming
 
-Welcome to the *You Don't Know JS* (*YDKJS*) series.
-
-欢迎来到 *你不懂JS*（*YDKJS*） 系列。
-
-*Up & Going* is an introduction to several basic concepts of programming -- of course we lean toward JavaScript (often abbreviated JS) specifically -- and how to approach and understand the rest of the titles in this series. Especially if you're just getting into programming and/or JavaScript, this book will briefly explore what you need to get *up and going*.
+欢迎来到 *你不懂JS*（*YDKJS*）系列。
 
 *入门与进阶* 是一个对几种编程基本概念的介绍 —— 当然我们是特别倾向于JavaScript（经常略称为JS）的 —— 以及如何走近与理解本系列的其他书目。特别是如果你刚刚接触编程和/或JavaScript，这本书将简要地探索你需要什么来 *入门与进阶*。
 
-This book starts off explaining the basic principles of programming at a very high level. It's mostly intended if you are starting *YDKJS* with little to no prior programming experience, and are looking to these books to help get you started along a path to understanding programming through the lens of JavaScript.
-
 这本书从很高的角度来解释编程的基本原则开始。它基本上假定你是在没有或很少的编程经验的情况下开始阅读 *YDKJS*，而且期待这些书可以透过JavaScript的镜头帮助你开启一条理解编程的道路。
-
-Chapter 1 should be approached as a quick overview of the things you'll want to learn more about and practice to get *into programming*. There are also many other fantastic programming introduction resources that can help you dig into these topics further, and I encourage you to learn from them in addition to this chapter.
 
 第一章应当作为一个快速的概览来阅读，它讲述为了 *开始编程* 你将想要多加学习和实践的东西。有许多其他精彩的编程介绍资源可以帮你在这个话题上走得更远，而且我鼓励你学习它们来作为这一章的补充。
 
-Once you feel comfortable with general programming basics, Chapter 2 will help guide you to a familiarity with JavaScript's flavor of programming. Chapter 2 introduces what JavaScript is about, but again, it's not a comprehensive guide -- that's what the rest of the *YDKJS* books are for!
-
 一旦你对一般的编程基础感到适应了，第二章将指引你熟悉JavaScript风格的编程。第二章介绍了JavaScript是什么，但是同样的，它不是一个全面的指引 —— 那是其他 *YDKJS* 书目的任务！
-
-If you're already fairly comfortable with JavaScript, first check out Chapter 3 as a brief glimpse of what to expect from *YDKJS*, then jump right in!
 
 如果你已经相当熟悉JavaScript，首先看一下第三章作为 *YDKJS* 内容的简要一瞥，然后立即投入其中！
 
 ## Code
 
-Let's start from the beginning.
-
 让我们从头开始。
 
-A program, often referred to as *source code* or just *code*, is a set of special instructions to tell the computer what tasks to perform. Usually code is saved in a text file, although with JavaScript you can also type code directly into a developer console in a browser, which we'll cover shortly.
-
 一个程序，经常被称为 *源代码* 或者只是 *代码*，是一组告诉计算机要执行什么任务的特殊的指令。代码通常保存在文本文件中，虽然你也可以使用JavaScript在一个浏览器的开发者控制台中直接敲入代码，我们一会儿就会讲解。
-
-The rules for valid format and combinations of instructions is called a *computer language*, sometimes referred to as its *syntax*, much the same as English tells you how to spell words and how to create valid sentences using words and punctuation.
 
 合法的格式与指令的组合规则被称为一种 *计算机语言*，有时被称作它的 *语法*，这和英语教你如何拼写单词和如何使用单词与标点创建合法的句子差不多是相同的。
 
 ### Statements
-
-In a computer language, a group of words, numbers, and operators that performs a specific task is a *statement*. In JavaScript, a statement might look as follows:
 
 在一种计算机语言中，一组单词，数字，和执行一种具体任务的操作符构成了一个 *语句*。在JavaScript中，一个语句可能看起来像下面这样：
 
@@ -49,37 +29,21 @@ In a computer language, a group of words, numbers, and operators that performs a
 a = b * 2;
 ```
 
-The characters `a` and `b` are called *variables* (see "Variables"), which are like simple boxes you can store any of your stuff in. In programs, variables hold values (like the number `42`) to be used by the program. Think of them as symbolic placeholders for the values themselves.
-
 字符`a`和`b`被称为 *变量*（参见“变量”），它们就像简单和盒子，你可以把任何东西存储在其中。在程序中，变量持有将被程序使用的值（比如数字`42`）。可以认为它们就是值本身的标志占位符。
-
-By contrast, the `2` is just a value itself, called a *literal value*, because it stands alone without being stored in a variable.
 
 相比之下，`2`本身只是一个值，称为一个 *字面值*，因为它没有被存入一个变量，是独立的。
 
-The `=` and `*` characters are *operators* (see "Operators") -- they perform actions with the values and variables such as assignment and mathematic multiplication.
-
 字符`=`和`*`是 *操作符*（见“操作符”） —— 它们使用值和变量实施动作，比如赋值和数学乘法。
-
-Most statements in JavaScript conclude with a semicolon (`;`) at the end.
 
 在JavaScript中大多数语句都以末尾的分号（`;`）结束。
 
-The statement `a = b * 2;` tells the computer, roughly, to get the current value stored in the variable `b`, multiply that value by `2`, then store the result back into another variable we call `a`.
-
 语句`a = b * 2;`告诉计算机，大致上，去取得当前存储在变量`b`中的值，将这个值乘以`2`，然后将结果存回到另一个变量`a`里面。
-
-Programs are just collections of many such statements, which together describe all the steps that it takes to perform your program's purpose.
 
 程序只是许多这样的语句的集合，它们一起描述了为执行你的程序的意图所要采取的所有步骤。
 
 ### Expressions
 
-Statements are made up of one or more *expressions*. An expression is any reference to a variable or value, or a set of variable(s) and value(s) combined with operators.
-
 语句是由一个或多个 *表达式* 组成的。一个表达式是指向一个变量或值，或者一组用操作符组合的变量和值的任意引用。
-
-For example:
 
 例如：
 
@@ -87,20 +51,11 @@ For example:
 a = b * 2;
 ```
 
-This statement has four expressions in it:
-
 这个语句中有四个表达式：
-
-* `2` is a *literal value expression*
 * `2`是一个 *字面量表达式*
-* `b` is a *variable expression*, which means to retrieve its current value
 * `b`是一个 *变量表达式*，它意味着取出它的当前值
-* `b * 2` is an *arithmetic expression*, which means to do the multiplication
 * `b * 2`是一个 *算数表达式*，它意味着执行乘法
-* `a = b * 2` is an *assignment expression*, which means to assign the result of the `b * 2` expression to the variable `a` (more on assignments later)
 * `a = b * 2`是一个 *赋值表达式*，它意味着将表达式`b * 2`的结果赋值给变量`a`（稍后有更多关于赋值的内容）
-
-A general expression that stands alone is also called an *expression statement*, such as the following:
 
 一个独立的普通表达式也被称为一个 *表达式语句*，比如下面的：
 
@@ -108,11 +63,7 @@ A general expression that stands alone is also called an *expression statement*,
 b * 2;
 ```
 
-This flavor of expression statement is not very common or useful, as generally it wouldn't have any effect on the running of the program -- it would retrieve the value of `b` and multiply it by `2`, but then wouldn't do anything with that result.
-
 这种风格的表达式语句不是很常见和有用，因为一般来说它不会对程序的运行有任何影响 —— 它将取得`b`的值并乘以`2`，但是之后不会对结果做任何事情。
-
-A more common expression statement is a *call expression* statement (see "Functions"), as the entire statement is the function call expression itself:
 
 一种更常见的表达式是 *调用表达式* 语句（见“函数”），因为整个语句本身是一个函数调用表达式：
 
@@ -122,41 +73,29 @@ alert( a );
 
 ### Executing a Program
 
-How do those collections of programming statements tell the computer what to do? The program needs to be *executed*, also referred to as *running the program*.
-
 这些程序语句的集合如何告诉计算机要做什么？这个程序需要被 *执行*，也称为 *运行这个程序*。
-
-Statements like `a = b * 2` are helpful for developers when reading and writing, but are not actually in a form the computer can directly understand. So a special utility on the computer (either an *interpreter* or a *compiler*) is used to translate the code you write into commands a computer can understand.
 
 在开发者们阅读与编写时，像`a = b * 2`这样的语句很有帮助，但是它实际上不是计算机可以直接理解的形式。所以一个计算机上的特殊工具（不是一个 *解释器* 就是一个 *编译器*）被用于将你编写的代码翻译为计算机可以理解的命令。
 
-For some computer languages, this translation of commands is typically done from top to bottom, line by line, every time the program is run, which is usually called *interpreting* the code.
-
 对于某些计算机语言，这种命令的翻译经常是在每次程序运行时从上向下，一行接一行完成的，这通常成为代码的 *解释*。
-
-For other languages, the translation is done ahead of time, called *compiling* the code, so when the program *runs* later, what's running is actually the already compiled computer instructions ready to go.
 
 对于另一些语言，这种翻译是提前完成的，成为代码的 *编译*，所以当程序稍后 *运行* 时，实际上运行的东西已经是编译好，随时可以运行的计算机指令了。
 
-It's typically asserted that JavaScript is *interpreted*, because your JavaScript source code is processed each time it's run. But that's not entirely accurate. The JavaScript engine actually *compiles* the program on the fly and then immediately runs the compiled code.
-
 JavaScript通常被断言为 *解释型* 的，因为你的JavaScript源代码在它每次运行时都被处理。但这不是完全准确的。JavaScript引擎实际上在即时地 *编译* 程序然后立即运行编译好的代码。
-
-**Note:** For more information on JavaScript compiling, see the first two chapters of the *Scope & Closures* title of this series.
 
 **注意：** 更多关于JavaScript编译的信息，参见本系列的 *作用域与闭包* 的前两章。
 
 ## Try It Yourself
 
-This chapter is going to introduce each programming concept with simple snippets of code, all written in JavaScript (obviously!).
+这一章将用简单的代码段来介绍每一个编程概念，它们都是用JavaScript写的（显而易见！）。
 
-It cannot be emphasized enough: while you go through this chapter -- and you may need to spend the time to go over it several times -- you should practice each of these concepts by typing the code yourself. The easiest way to do that is to open up the developer tools console in your nearest browser (Firefox, Chrome, IE, etc.).
+有一件事情怎么强调都不过分：在你通读本章时 —— 而且你可能需要花时间读好几遍 —— 你应当通过自己编写代码来实践这些概念中的每一个。最简单的方法就是打开你手边的浏览器（Firefox，Chrome，IE，等等）的开发者工具控制台。
 
-**Tip:** Typically, you can launch the developer console with a keyboard shortcut or from a menu item. For more detailed information about launching and using the console in your favorite browser, see "Mastering The Developer Tools Console" (http://blog.teamtreehouse.com/mastering-developer-tools-console). To type multiple lines into the console at once, use `<shift> + <enter>` to move to the next new line. Once you hit `<enter>` by itself, the console will run everything you've just typed.
+**提示：** 一般来说，你可以使用快捷键或者菜单选项来启动开发者控制台。更多关于启动和使用你最喜欢的浏览器的控制台的细节，参见“精通开发者工具控制台”(http://blog.teamtreehouse.com/mastering-developer-tools-console)。要在控制台中一次键入多行，可以使用`<shift> + <enter>`来移动到下一行。一旦你敲击`<enter>`，控制台将运行任何你刚刚键入的东西。
 
-Let's get familiar with the process of running code in the console. First, I suggest opening up an empty tab in your browser. I prefer to do this by typing `about:blank` into the address bar. Then, make sure your developer console is open, as we just mentioned.
+让我们熟悉一下在控制台中运行代码的过程。首先，我建议你在浏览器中打开一个新的标签页。我偏好在地址栏中键入`about:blank`来这么做。然后，确认你的开发者控制台是打开的，就像我们刚刚提到的那样。
 
-Now, type this code and see how it runs:
+现在，键入如下代码看看它是怎么运行的：
 
 ```js
 a = 21;
@@ -166,39 +105,39 @@ b = a * 2;
 console.log( b );
 ```
 
-Typing the preceding code into the console in Chrome should produce something like the following:
+在Chrome的控制台中键入前面的代码应该会产生如下的东西：
 
 <img src="fig1.png" width="500">
 
-Go on, try it. The best way to learn programming is to start coding!
+继续，试试吧。学习编程的最佳方式就是开始编码！
 
 ### Output
 
-In the previous code snippet, we used `console.log(..)`. Briefly, let's look at what that line of code is all about.
+在前一个代码段中，我们使用了`console.log(..)`。让我们简单地看看这一行代码在做什么。
 
-You may have guessed, but that's exactly how we print text (aka *output* to the user) in the developer console. There are two characteristics of that statement that we should explain.
+你也许已经猜到了，它正是我们如何在开发者控制台中打印文本（也就是向用户 *输出*）的方法。这个语句有两个性质，我们应当解释一下。
 
-First, the `log( b )` part is referred to as a function call (see "Functions"). What's happening is we're handing the `b` variable to that function, which asks it to take the value of `b` and print it to the console.
+首先，`log( b )`部分被称为一个函数调用（见“函数”）。这里发生的事情是，我们将变量`b`交给这个函数，它向变量`b`要来它的值，并在控制台中打印。
 
-Second, the `console.` part is an object reference where the `log(..)` function is located. We cover objects and their properties in more detail in Chapter 2.
+第二，`console.`部分是一个对象引用，这个对象就是找到`log(..)`函数的地方。我们会在第二章中详细讲解对象和它们的属性。
 
-Another way of creating output that you can see is to run an `alert(..)` statement. For example:
+另一种创建你可以看到的输出的方式是`alert(..)`语句。例如：
 
 ```js
 alert( b );
 ```
 
-If you run that, you'll notice that instead of printing the output to the console, it shows a popup "OK" box with the contents of the `b` variable. However, using `console.log(..)` is generally going to make learning about coding and running your programs in the console easier than using `alert(..)`, because you can output many values at once without interrupting the browser interface.
+如果你运行它，你会注意到它不会打印输出到控制台，而是显示一个内容为变量`b`的“OK”弹出框。但是，一般来说与使用`alert(..)`相比，使用`console.log(..)`会使学习编码和在控制台运行你的程序更简单一些，因为你可以一次输出许多值，而不必干扰浏览器的界面。
 
-For this book, we'll use `console.log(..)` for output.
+在这本书中，我们将使用`console.log(..)`来输出。
 
 ### Input
 
-While we're discussing output, you may also wonder about *input* (i.e., receiving information from the user).
+虽然我们在讨论输出，你也许还想知道 *输入*（例如，从用户那里获得信息）。
 
-The most common way that happens is for the HTML page to show form elements (like text boxes) to a user that they can type into, and then using JS to read those values into your program's variables.
+对于HTML网页来说，输入发生的最常见的方式是向用户显示一个他们可以键入的form元素，然后使用JS将这些值读入你程序的变量中。
 
-But there's an easier way to get input for simple learning and demonstration purposes such as what you'll be doing throughout this book. Use the `prompt(..)` function:
+但是为了单纯的学习和展示的目的 —— 比如你将在这本书中通篇要做的 —— 有一个获取输入的更简单的方法。使用`prompt(..)`函数：
 
 ```js
 age = prompt( "Please tell me your age:" );
@@ -206,40 +145,40 @@ age = prompt( "Please tell me your age:" );
 console.log( age );
 ```
 
-As you may have guessed, the message you pass to `prompt(..)` -- in this case, `"Please tell me your age:"` -- is printed into the popup.
+正如你可能已经猜到的，你传递给`prompt(..)`的消息 —— 在这个例子中，`"Please tell me your age:"` —— 被打印在弹出框中。
 
-This should look similar to the following:
+它应当和下面的东西很相似：
 
 <img src="fig2.png" width="500">
 
-Once you submit the input text by clicking "OK," you'll observe that the value you typed is stored in the `age` variable, which we then *output* with `console.log(..)`:
+一旦你点击“OK”提交输入的文本，你将会看到你输入的值被存储在变量`age`中，然后我们使用`console.log(..)`把它 *输出*：
 
 <img src="fig3.png" width="500">
 
-To keep things simple while we're learning basic programming concepts, the examples in this book will not require input. But now that you've seen how to use `prompt(..)`, if you want to challenge yourself you can try to use input in your explorations of the examples.
+为了让我们在学习基本编程概念时使事情保持简单，本书中的例子不要求输入。但是现在你已经看到了如何使用`prompt(..)`，如果你想挑战一下自己，你可以试着在探索这些例子时使用输入。
 
 ## Operators
 
-Operators are how we perform actions on variables and values. We've already seen two JavaScript operators, the `=` and the `*`.
+操作符是我们如何在变量和值上实施操作的方式。我们已经见到了两种JavaScript操作符，`=`和`*`。
 
-The `*` operator performs mathematic multiplication. Simple enough, right?
+`*`操作符实施数学乘法。够简单的，对吧？
 
-The `=` equals operator is used for *assignment* -- we first calculate the value on the *right-hand side* (source value) of the `=` and then put it into the variable that we specify on the *left-hand side* (target variable).
+`=`操作符用于 *赋值* —— 我们首先计算`=` *右手边* 的值（源值）然后将它放进我们在 *左手边* 指定的变量中（目标变量）。
 
-**Warning:** This may seem like a strange reverse order to specify assignment. Instead of `a = 42`, some might prefer to flip the order so the source value is on the left and the target variable is on the right, like `42 -> a` (this is not valid JavaScript!). Unfortunately, the `a = 42` ordered form, and similar variations, is quite prevalent in modern programming languages. If it feels unnatural, just spend some time rehearsing that ordering in your mind to get accustomed to it.
+**警告：** 对于指定赋值，这看起来像是一种奇怪的倒置。与`a = 42`不同，一些人喜欢把顺序反转过来，于是源值在左而目标变量在右，就像`42 -> a`（这不是合法的JavaScript！）。不幸的是，`a = 42`顺序的形式，和与其相似的变种，在现代编程语言中是十分流行的。如果它让你觉得不自然，那么就花些时间在脑中演练这个顺序并习惯它。
 
-Consider:
+考虑如下代码：
 
 ```js
 a = 2;
 b = a + 1;
 ```
 
-Here, we assign the `2` value to the `a` variable. Then, we get the value of the `a` variable (still `2`), add `1` to it resulting in the value `3`, then store that value in the `b` variable.
+这里，我们将值`2`赋值给变量`a`。然后，我们取得变量`a`的值（还是`2`），把它加`1`得到值`3`，然后将这个值存储到变量`b`中。
 
-While not technically an operator, you'll need the keyword `var` in every program, as it's the primary way you *declare* (aka *create*) *var*iables (see "Variables").
+虽然在技术上说`var`不是一个操作符，但是你将在每一个程序中都需要这个关键字，因为它是你 *声明*（也就是 *创建*）变量（见“变量”）的主要方式。
 
-You should always declare the variable by name before you use it. But you only need to declare a variable once for each *scope* (see "Scope"); it can be used as many times after that as needed. For example:
+你应当总是在使用变量前用名称声明它。但是对于每个 *作用域*（见“作用域”）你只需要声明变量一次；它可以根据需要使用任意多次。例如：
 
 ```js
 var a = 20;
@@ -252,44 +191,80 @@ console.log( a );	// 42
 
 Here are some of the most common operators in JavaScript:
 
+这里是一些在JavaScript中最常见的操作符：
+
 * Assignment: `=` as in `a = 2`.
+* 赋值：比如`a = 2`中的`=`。
 * Math: `+` (addition), `-` (subtraction), `*` (multiplication), and `/` (division), as in `a * 3`.
+* 数学：`+`（加法），`-`（减法），`*`（乘法），和`/`（除法），比如`a * 3`。
 * Compound Assignment: `+=`, `-=`, `*=`, and `/=` are compound operators that combine a math operation with assignment, as in `a += 2` (same as `a = a + 2`).
+* 复合赋值：`+=`，`-=`，`*=`，和`/=`都是复合操作符，它们组合了数学操作和赋值，比如`a += 2`（与`a = a + 2`相同）。
 * Increment/Decrement: `++` (increment), `--` (decrement), as in `a++` (similar to `a = a + 1`).
+* 递增/递减：`++`（递增），`--`（递减），比如`a++`（和`a = a + 1`很相似）。
 * Object Property Access: `.` as in `console.log()`.
+* 对象属性访问：比如`console.log()`的`.`。
 
    Objects are values that hold other values at specific named locations called properties. `obj.a` means an object value called `obj` with a property of the name `a`. Properties can alternatively be accessed as `obj["a"]`. See Chapter 2.
+
+   对象是一种值，它可以在被称为属性的，被具体命名的位置上持有其他的值。`obj.a`意味着一堆称为`obj`的对象值有一个名为`a`的属性。属性可以用`obj["a"]`这种替代的方式访问。参见第二章。
+
 * Equality: `==` (loose-equals), `===` (strict-equals), `!=` (loose not-equals), `!==` (strict not-equals), as in `a == b`.
+* 等价性：`==`（宽松等价），`===`（严格等价），`!=`（宽松不等价），`!==`（严格不等价），比如`a == b`。
 
    See "Values & Types" and Chapter 2.
+   参见“值与类型”和第二章。
 * Comparison: `<` (less than), `>` (greater than), `<=` (less than or loose-equals), `>=` (greater than or loose-equals), as in `a <= b`.
+* 比较：`<`（小于），`>`（大于），`<=`（小于或宽松等价），`>=`（大于或宽松等价），比如`a <= b`。
 
    See "Values & Types" and Chapter 2.
+   参见“值与类型”和第二章。
 * Logical: `&&` (and), `||` (or), as in `a || b` that selects either `a` *or* `b`.
+* 逻辑：`&&`（与），`||`（或），比如`a || b`它选择`a`*或*`b`中的一个。
 
    These operators are used to express compound conditionals (see "Conditionals"), like if either `a` *or* `b` is true.
 
+   这些操作符用于表达复合的条件（见“条件”），比如如果`a`*或者*`b`成立。
+
 **Note:** For much more detail, and coverage of operators not mentioned here, see the Mozilla Developer Network (MDN)'s "Expressions and Operators" (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators).
+
+**注意：** 更多细节，以及在此没有提到的其他操作符，可以参见Mozilla开发者网络（MDN）的“表达式与操作符”(https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators)。
 
 ## Values & Types
 
 If you ask an employee at a phone store how much a certain phone costs, and they say "ninety-nine, ninety-nine" (i.e., $99.99), they're giving you an actual numeric dollar figure that represents what you'll need to pay (plus taxes) to buy it. If you want to buy two of those phones, you can easily do the mental math to double that value to get $199.98 for your base cost.
 
+如果你问一个手机店的店员一种特定手机的价格，而他们说“九十九块九毛九”（即，$99.99），他们给了你一个实际的美元数字来表示你需要花多少钱才能买到它。如果你想两部这种手机，你可以很容易地心算这个值的两倍来得到你需要花费的$199.98。
+
 If that same employee picks up another similar phone but says it's "free" (perhaps with air quotes), they're not giving you a number, but instead another kind of representation of your expected cost ($0.00) -- the word "free."
+
+如果同一个店员拿起另一部相似的手机说它是“免费的”（也许在用手比划引号），那么他们就不是在给你一个数字，而是你的花费（$0.00）的另一种表达形式 —— “免费”这个词。
 
 When you later ask if the phone includes a charger, that answer could only have been either "yes" or "no."
 
+当你稍后问到这个手机是否带充电器时，回答可能仅仅是“是”或者“不”。
+
 In very similar ways, when you express values in a program, you choose different representations for those values based on what you plan to do with them.
+
+以同样的方式，当你在程序中表达一个值时，你根据你打算对这些值做什么来选择不同的表达形式。
 
 These different representations for values are called *types* in programming terminology. JavaScript has built-in types for each of these so called *primitive* values:
 
+在编程术语中值的这些不同的表达形式称为 *类型*。JavaScript中对这些所谓的 *基本类型* 值都有内建的类型：
+
 * When you need to do math, you want a `number`.
+* 但你需要做数学计算时，你需要一个`number`。
 * When you need to print a value on the screen, you need a `string` (one or more characters, words, sentences).
+* 当你需要在屏幕上打印一个值时，你需要一个`string`（一个或多个字符，单词，句子）。
 * When you need to make a decision in your program, you need a `boolean` (`true` or `false`).
+* 当你需要在你的程序中做决定时，你需要一个`boolean`（`true`或`false`）。
 
 Values that are included directly in the source code are called *literals*. `string` literals are surrounded by double quotes `"..."` or single quotes (`'...'`) -- the only difference is stylistic preference. `number` and `boolean` literals are just presented as is (i.e., `42`, `true`, etc.).
 
+在源代码中直接包含的值称为 *字面量*。`string`字面量被双引号`"..."`或单引号（`'...'`）包围 —— 唯一的区别是风格上的偏好。`number`和`boolean`字面量用它们本身来表示（即，`42`，`true`，等等）。
+
 Consider:
+
+考虑如下代码：
 
 ```js
 "I am a string";
@@ -302,6 +277,8 @@ false;
 ```
 
 Beyond `string`/`number`/`boolean` value types, it's common for programming languages to provide *arrays*, *objects*, *functions*, and more. We'll cover much more about values and types throughout this chapter and the next.
+
+在`string`/`number`/`boolean`值的类型以外，编程语言通常会提供 *数组*，*对象*，*函数* 等更多的类型。我们会在本章和下一章中讲解更多关于值和类型的事情。
 
 ### Converting Between Types
 
