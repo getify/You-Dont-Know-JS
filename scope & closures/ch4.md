@@ -197,7 +197,7 @@ While this all may sound like nothing more than interesting academic trivia, it 
 Function declarations that appear inside of normal blocks typically hoist to the enclosing scope, rather than being conditional as this code implies:
 
 ```js
-foo(); // "b"
+foo(); // Uncaught TypeError: foo is not a function(...)
 
 var a = true;
 if (a) {
