@@ -338,17 +338,27 @@ console.log( a );	// 42
 
 Most useful programs need to track a value as it changes over the course of the program, undergoing different operations as called for by your program's intended tasks.
 
-
+大多数有用的程序都需要追踪值的变化，在程序运行，底层不同的操作由于你的程序所意图的任务被调用的整个过程中。
 
 The easiest way to go about that in your program is to assign a value to a symbolic container, called a *variable* -- so called because the value in this container can *vary* over time as needed.
 
+要这样做的最简单的方法是将一个值赋予一个符号容器，称为一个 *变量* —— 因为在这个容器中的值可以根据需要不时 *变化* 而得名。
+
 In some programming languages, you declare a variable (container) to hold a specific type of value, such as `number` or `string`. *Static typing*, otherwise known as *type enforcement*, is typically cited as a benefit for program correctness by preventing unintended value conversions.
+
+在某些编程语言中，你可以声明一个变量（容器）来持有特定类型的值，比如`number`或`string`。因为防止了意外的类型转换，*静态类型*，也被称为 *类型强制*，通常被认为是对程序正确性有好处的。
 
 Other languages emphasize types for values instead of variables. *Weak typing*, otherwise known as *dynamic typing*, allows a variable to hold any type of value at any time. It's typically cited as a benefit for program flexibility by allowing a single variable to represent a value no matter what type form that value may take at any given moment in the program's logic flow.
 
+另一些语言在值上强调类型而非在变量上。*弱类型*，也被称为 *动态类型*，允许变量在任意时刻持有任意类型的值。因为它允许一个变量在程序逻辑流程中代表一个值，而不论这个值在任意给定的时刻是什么类型，所以它被认为是对程序灵活性有好处的。
+
 JavaScript uses the latter approach, *dynamic typing*, meaning variables can hold values of any *type* without any *type* enforcement.
 
+JavaScript使用的是后者，*动态类型*，这意味着变量可以持有任意 *类型* 的值而没有任何 *类型* 强制约束。
+
 As mentioned earlier, we declare a variable using the `var` statement -- notice there's no other *type* information in the declaration. Consider this simple program:
+
+正如我们刚才提到的，我们使用`var`语句来声明一个变量 —— 注意在这种声明中没有其他的 *类型* 信息。考虑这段简单的代码：
 
 ```js
 var amount = 99.99;
@@ -366,9 +376,15 @@ console.log( amount );		// "$199.98"
 
 The `amount` variable starts out holding the number `99.99`, and then holds the `number` result of `amount * 2`, which is `199.98`.
 
+变量`amount`开始时持有数字`99.99`，然后持有`amount * 2`的`number`结果，也就是`199.98`。
+
 The first `console.log(..)` command has to *implicitly* coerce that `number` value to a `string` to print it out.
 
+第一个`console.log(..)`命令不得不 *隐含地* 将这个`number`值强制转换为一个`string`才能够打印出来。
+
 Then the statement `amount = "$" + String(amount)` *explicitly* coerces the `199.98` value to a `string` and adds a `"$"` character to the beginning. At this point, `amount` now holds the `string` value `"$199.98"`, so the second `console.log(..)` statement doesn't need to do any coercion to print it out.
+
+然后语句`amount = "$" + String(amount)` *明确地* 将值`199.98`强制转换为一个`string`并且在开头加入一个`"$"`字符。这时，`amount`现在就持有这个`string`值`$199.98`，所以第二个`console.log(..)`语句无需强制转换就可以把它打印出来。
 
 JavaScript developers will note the flexibility of using the `amount` variable for each of the `99.99`, `199.98`, and the `"$199.98"` values. Static-typing enthusiasts would prefer a separate variable like `amountStr` to hold the final `"$199.98"` representation of the value, because it's a different type.
 
