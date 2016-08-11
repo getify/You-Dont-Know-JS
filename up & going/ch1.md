@@ -189,80 +189,44 @@ a = a * 2;
 console.log( a );	// 42
 ```
 
-Here are some of the most common operators in JavaScript:
-
 这里是一些在JavaScript中最常见的操作符：
 
-* Assignment: `=` as in `a = 2`.
 * 赋值：比如`a = 2`中的`=`。
-* Math: `+` (addition), `-` (subtraction), `*` (multiplication), and `/` (division), as in `a * 3`.
 * 数学：`+`（加法），`-`（减法），`*`（乘法），和`/`（除法），比如`a * 3`。
-* Compound Assignment: `+=`, `-=`, `*=`, and `/=` are compound operators that combine a math operation with assignment, as in `a += 2` (same as `a = a + 2`).
 * 复合赋值：`+=`，`-=`，`*=`，和`/=`都是复合操作符，它们组合了数学操作和赋值，比如`a += 2`（与`a = a + 2`相同）。
-* Increment/Decrement: `++` (increment), `--` (decrement), as in `a++` (similar to `a = a + 1`).
 * 递增/递减：`++`（递增），`--`（递减），比如`a++`（和`a = a + 1`很相似）。
-* Object Property Access: `.` as in `console.log()`.
 * 对象属性访问：比如`console.log()`的`.`。
 
-   Objects are values that hold other values at specific named locations called properties. `obj.a` means an object value called `obj` with a property of the name `a`. Properties can alternatively be accessed as `obj["a"]`. See Chapter 2.
-
    对象是一种值，它可以在被称为属性的，被具体命名的位置上持有其他的值。`obj.a`意味着一堆称为`obj`的对象值有一个名为`a`的属性。属性可以用`obj["a"]`这种替代的方式访问。参见第二章。
-
-* Equality: `==` (loose-equals), `===` (strict-equals), `!=` (loose not-equals), `!==` (strict not-equals), as in `a == b`.
 * 等价性：`==`（宽松等价），`===`（严格等价），`!=`（宽松不等价），`!==`（严格不等价），比如`a == b`。
 
-   See "Values & Types" and Chapter 2.
    参见“值与类型”和第二章。
-* Comparison: `<` (less than), `>` (greater than), `<=` (less than or loose-equals), `>=` (greater than or loose-equals), as in `a <= b`.
 * 比较：`<`（小于），`>`（大于），`<=`（小于或宽松等价），`>=`（大于或宽松等价），比如`a <= b`。
 
-   See "Values & Types" and Chapter 2.
    参见“值与类型”和第二章。
-* Logical: `&&` (and), `||` (or), as in `a || b` that selects either `a` *or* `b`.
 * 逻辑：`&&`（与），`||`（或），比如`a || b`它选择`a`*或*`b`中的一个。
 
-   These operators are used to express compound conditionals (see "Conditionals"), like if either `a` *or* `b` is true.
-
    这些操作符用于表达复合的条件（见“条件”），比如如果`a`*或者*`b`成立。
-
-**Note:** For much more detail, and coverage of operators not mentioned here, see the Mozilla Developer Network (MDN)'s "Expressions and Operators" (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators).
 
 **注意：** 更多细节，以及在此没有提到的其他操作符，可以参见Mozilla开发者网络（MDN）的“表达式与操作符”(https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators)。
 
 ## Values & Types
 
-If you ask an employee at a phone store how much a certain phone costs, and they say "ninety-nine, ninety-nine" (i.e., $99.99), they're giving you an actual numeric dollar figure that represents what you'll need to pay (plus taxes) to buy it. If you want to buy two of those phones, you can easily do the mental math to double that value to get $199.98 for your base cost.
-
 如果你问一个手机店的店员一种特定手机的价格，而他们说“九十九块九毛九”（即，$99.99），他们给了你一个实际的美元数字来表示你需要花多少钱才能买到它。如果你想两部这种手机，你可以很容易地心算这个值的两倍来得到你需要花费的$199.98。
-
-If that same employee picks up another similar phone but says it's "free" (perhaps with air quotes), they're not giving you a number, but instead another kind of representation of your expected cost ($0.00) -- the word "free."
 
 如果同一个店员拿起另一部相似的手机说它是“免费的”（也许在用手比划引号），那么他们就不是在给你一个数字，而是你的花费（$0.00）的另一种表达形式 —— “免费”这个词。
 
-When you later ask if the phone includes a charger, that answer could only have been either "yes" or "no."
-
 当你稍后问到这个手机是否带充电器时，回答可能仅仅是“是”或者“不”。
-
-In very similar ways, when you express values in a program, you choose different representations for those values based on what you plan to do with them.
 
 以同样的方式，当你在程序中表达一个值时，你根据你打算对这些值做什么来选择不同的表达形式。
 
-These different representations for values are called *types* in programming terminology. JavaScript has built-in types for each of these so called *primitive* values:
-
 在编程术语中值的这些不同的表达形式称为 *类型*。JavaScript中对这些所谓的 *基本类型* 值都有内建的类型：
 
-* When you need to do math, you want a `number`.
 * 但你需要做数学计算时，你需要一个`number`。
-* When you need to print a value on the screen, you need a `string` (one or more characters, words, sentences).
 * 当你需要在屏幕上打印一个值时，你需要一个`string`（一个或多个字符，单词，句子）。
-* When you need to make a decision in your program, you need a `boolean` (`true` or `false`).
 * 当你需要在你的程序中做决定时，你需要一个`boolean`（`true`或`false`）。
 
-Values that are included directly in the source code are called *literals*. `string` literals are surrounded by double quotes `"..."` or single quotes (`'...'`) -- the only difference is stylistic preference. `number` and `boolean` literals are just presented as is (i.e., `42`, `true`, etc.).
-
 在源代码中直接包含的值称为 *字面量*。`string`字面量被双引号`"..."`或单引号（`'...'`）包围 —— 唯一的区别是风格上的偏好。`number`和`boolean`字面量用它们本身来表示（即，`42`，`true`，等等）。
-
-Consider:
 
 考虑如下代码：
 
@@ -276,15 +240,13 @@ true;
 false;
 ```
 
-Beyond `string`/`number`/`boolean` value types, it's common for programming languages to provide *arrays*, *objects*, *functions*, and more. We'll cover much more about values and types throughout this chapter and the next.
-
 在`string`/`number`/`boolean`值的类型以外，编程语言通常会提供 *数组*，*对象*，*函数* 等更多的类型。我们会在本章和下一章中讲解更多关于值和类型的事情。
 
 ### Converting Between Types
 
-If you have a `number` but need to print it on the screen, you need to convert the value to a `string`, and in JavaScript this conversion is called "coercion." Similarly, if someone enters a series of numeric characters into a form on an ecommerce page, that's a `string`, but if you need to then use that value to do math operations, you need to *coerce* it to a `number`.
+如果你有一个`number`但需要将它打印在屏幕上，那么你就需要将这个值转换为一个`string`，在JavaScript中这种转换称为“强制转换”。类似地，如果某些人在一个电商网页的form中输入一系列数字，那么它是一个`string`，但是如果你需要使用这个值去做数学运算，那么你就需要将它 *强制转换* 为一个`number`。
 
-JavaScript provides several different facilities for forcibly coercing between *types*. For example:
+为了在 *类型* 之间强制转换，JavaScript提供了几种不同的工具。例如：
 
 ```js
 var a = "42";
@@ -294,43 +256,43 @@ console.log( a );	// "42"
 console.log( b );	// 42
 ```
 
-Using `Number(..)` (a built-in function) as shown is an *explicit* coercion from any other type to the `number` type. That should be pretty straightforward.
+使用上面展示的`Number(..)`（一个内建函数）是一种从任意其他类型到`number`类型的 *明确的* 强制转换。这应当是相当直白的。
 
-But a controversial topic is what happens when you try to compare two values that are not already of the same type, which would require *implicit* coercion.
+但是一个具有争议的话题是，当你试着比较两个还不是相同类型的值时发生的事情，它需要 *隐含的* 强制转换。
 
-When comparing the string `"99.99"` to the number `99.99`, most people would agree they are equivalent. But they're not exactly the same, are they? It's the same value in two different representations, two different *types*. You could say they're "loosely equal," couldn't you?
+当比较字符串`"99.99"`和数字`99.99`时，大多数人同意它们是等价的。但是他们不完全相同，不是吗？它们是相同的值的两种不同表现形式，两个不同的 *类型*。你可以说它们是“宽松地等价”的，不是吗？
 
-To help you out in these common situations, JavaScript will sometimes kick in and *implicitly* coerce values to the matching types.
+为了在这些常见情况下帮助你，JavaScript有时会启动 *隐含的* 强制转换来把值转换为匹配的类型。
 
-So if you use the `==` loose equals operator to make the comparison `"99.99" == 99.99`, JavaScript will convert the left-hand side `"99.99"` to its `number` equivalent `99.99`. The comparison then becomes `99.99 == 99.99`, which is of course `true`.
+所以如果你使用`==`宽松等价操作符来进行`"99.99" == 99.99`比较，JavaScript会将左手边的`"99.99"`转换为它的`number`等价物`99.99`。所以比较就变成了`99.99 == 99.99`，这当然是成立的。
 
-While designed to help you, implicit coercion can create confusion if you haven't taken the time to learn the rules that govern its behavior. Most JS developers never have, so the common feeling is that implicit coercion is confusing and harms programs with unexpected bugs, and should thus be avoided. It's even sometimes called a flaw in the design of the language.
+虽然隐含强制转换被设计为要帮助你，但是它也可能把你搞糊涂，如果你没有花时间去学习控制它行为的规则。大多数开发者从没有这么做，所以常见的感觉是隐含的强制转换是令人困惑的，并且会产生意外的bug危害程序，因此应当避免使用。有时它甚至被称为这种语言中的设计缺陷。
 
-However, implicit coercion is a mechanism that *can be learned*, and moreover *should be learned* by anyone wishing to take JavaScript programming seriously. Not only is it not confusing once you learn the rules, it can actually make your programs better! The effort is well worth it.
+然而，隐含强制转换是一种 *可以被学习* 的机制，而且是一种 *应当* 被所有想要严肃对待JavaScript编程的人学习的机制。一旦你学习了这些规则，它不仅是消除了困惑，而且它实际上是你的程序变得更好！这种努力是值得的。
 
-**Note:** For more information on coercion, see Chapter 2 of this title and Chapter 4 of the *Types & Grammar* title of this series.
+**注意：** 关于强制转换的更多信息，参见本书第二章和本系列 *类型与文法* 的第四章。
 
 ## Code Comments
 
-The phone store employee might jot down some notes on the features of a newly released phone or on the new plans her company offers. These notes are only for the employee -- they're not for customers to read. Nevertheless, these notes help the employee do her job better by documenting the hows and whys of what she should tell customers.
+手机店店员可能会写下一些笔记，记下新出的手机的特性或者他们公司推出的新套餐。这些笔记仅仅是为店员使用的 —— 他们不是给顾客读的。不管怎样，通过记录下为什么和如何告诉顾客他应当说的东西，这些笔记帮助店员更好的工作。
 
-One of the most important lessons you can learn about writing code is that it's not just for the computer. Code is every bit as much, if not more, for the developer as it is for the compiler.
+关于编写代码你要学的最重要的一课之一，就是它不仅仅是写给计算机的。代码的每一个字节都和写给编译器一样，也是写给开发者的。
 
-Your computer only cares about machine code, a series of binary 0s and 1s, that comes from *compilation*. There's a nearly infinite number of programs you could write that yield the same series of 0s and 1s. The choices you make about how to write your program matter -- not only to you, but to your other team members and even to your future self.
+你的计算机只关心机器码，一系列源自 *编译* 的0和1。你几乎可以写出无限多种可以产生相同0和1序列的代码。所以你对如何编写程序作出的决定很重要 —— 不仅是对你，也对你的团队中的其他成员，甚至是你未来的自己。
 
-You should strive not just to write programs that work correctly, but programs that make sense when examined. You can go a long way in that effort by choosing good names for your variables (see "Variables") and functions (see "Functions").
+你不仅应当努力去编写可以正确工作的程序，而且应当努力编写检视起来有道理的程序。你可以通过给变量（见“变量”）和函数（见“函数”）起一个好名字在这条路上走很远。
 
-But another important part is code comments. These are bits of text in your program that are inserted purely to explain things to a human. The interpreter/compiler will always ignore these comments.
+但另外一个重要的部分是代码注释。它们纯粹是为了向人类解释一些事情而在你的程序中插入的一点儿文本。解释器/编译器将总是忽略这些注释。
 
-There are lots of opinions on what makes well-commented code; we can't really define absolute universal rules. But some observations and guidelines are quite useful:
+关于什么是良好注释的代码有许多意见；我们不能真正地定义绝对统一的规则。但是一些意见和指导是十分有用的：
 
-* Code without comments is suboptimal.
-* Too many comments (one per line, for example) is probably a sign of poorly written code.
-* Comments should explain *why*, not *what*. They can optionally explain *how* if that's particularly confusing.
+* 没有注释的代码是次优的。
+* 过多的注释（比如，每行都有注释）可能是代码编写的很烂的标志。
+* 注释应当解释 *为什么*，而不是 *是什么*。它们可以选择性地解释 *如何做*，如果代码特别令人困惑的话。
 
-In JavaScript, there are two types of comments possible: a single-line comment and a multiline comment.
+在JavaScript中，有两种可能的注释类型：单行注释和多行注释
 
-Consider:
+考虑如下代码：
 
 ```js
 // This is a single-line comment
@@ -341,17 +303,17 @@ Consider:
                       */
 ```
 
-The `//` single-line comment is appropriate if you're going to put a comment right above a single statement, or even at the end of a line. Everything on the line after the `//` is treated as the comment (and thus ignored by the compiler), all the way to the end of the line. There's no restriction to what can appear inside a single-line comment.
+如果你想在一个语句的正上方，或者甚至是在行的末尾加一个注释，`//`单行注释是很合适的。这一行上`//`之后的所有东西都将被视为注释（因此被编译器忽略），一直到行的末尾。在单行注释内部可以出现的内容没有限制。
 
-Consider:
+考虑：
 
 ```js
 var a = 42;		// 42 is the meaning of life
 ```
 
-The `/* .. */` multiline comment is appropriate if you have several lines worth of explanation to make in your comment.
+如果你想在注释中用好几行来解释一些事情，`/* .. */`多行注释就很合适。
 
-Here's a common usage of multiline comments:
+这是多行注释的一个常见用法：
 
 ```js
 /* The following value is used because
@@ -360,7 +322,7 @@ Here's a common usage of multiline comments:
 var a = 42;
 ```
 
-It can also appear anywhere on a line, even in the middle of a line, because the `*/` ends it. For example:
+它还可以出现在一行中的任意位置，甚至是一行的中间，因为`*/`终结了它。例如：
 
 ```js
 var a = /* arbitrary value */ 42;
@@ -368,13 +330,15 @@ var a = /* arbitrary value */ 42;
 console.log( a );	// 42
 ```
 
-The only thing that cannot appear inside a multiline comment is a `*/`, because that would be interpreted to end the comment.
+在多行注释中唯一不能出现的就是`*/`，因为这将干扰注释的结尾。
 
-You will definitely want to begin your learning of programming by starting off with the habit of commenting code. Throughout the rest of this chapter, you'll see I use comments to explain things, so do the same in your own practice. Trust me, everyone who reads your code will thank you!
+你将绝对希望通过养成注释代码的习惯来开始学习编程。在本书剩余的部分中，你将看到我使用注释来解释事情，请也在你自己的实践中这么做。相信我，所有阅读你的代码的人都会感谢你！
 
 ## Variables
 
 Most useful programs need to track a value as it changes over the course of the program, undergoing different operations as called for by your program's intended tasks.
+
+
 
 The easiest way to go about that in your program is to assign a value to a symbolic container, called a *variable* -- so called because the value in this container can *vary* over time as needed.
 

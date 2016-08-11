@@ -1,5 +1,5 @@
-# You Don't Know JS: Scope & Closures
-# Appendix C: Lexical-this
+# 你不懂JS：作用域与闭包
+# 附录C：词法this
 
 这本书通篇没有讲解`this`机制的任何细节，有一个ES6的话题以一种重要的方式将`this`与词法作用域联系了起来，我们将快速检视它一下。
 
@@ -35,7 +35,7 @@ obj.cool(); // awesome
 setTimeout( obj.cool, 100 ); // not awesome
 ```
 
-这个问题就是在`cool()`函数上丢失了`this`绑定。有各种方法可以解决这个问题，但一个经常重复的解决方案是`var self = this;`。
+这个问题就是在`cool()`函数上丢失了`this`绑定。有各种方法可以解决这个问题，但一个经常被重复的解决方案是`var self = this;`。
 
 它可能看起来像：
 
@@ -59,7 +59,7 @@ obj.cool(); // awesome?
 
 用不过于深入细节的方式讲，`var self = this`的“解决方案”免除了理解和正确使用`this`绑定的整个问题，而是退回到我们也许感到更舒服的东西上面：词法作用域。`self`变成了一个可以通过词法作用域和闭包解析的标识符，而且一直不关心`this`绑定发生了什么。
 
-人们不喜欢写繁冗的东西，特别是当他们一次又一次重复它的时候。于是，ES6的一个动机是帮助缓和这些场景，将常见的惯用法问题 *确定* 下来，就像这一个。
+人们不喜欢写繁冗的东西，特别是当他们一次又一次重复它的时候。于是，ES6的一个动机是帮助缓和这些场景，将常见的惯用法问题 *固定* 下来，就像这一个。
 
 ES6的解决方案，箭头函数，引入了一种称为“词法this”的行为。
 
@@ -68,7 +68,7 @@ var obj = {
 	count: 0,
 	cool: function coolFn() {
 		if (this.count < 1) {
-			setTimeout( () => { // arrow-function ftw?
+			setTimeout( () => { // 箭头函数能好用？
 				this.count++;
 				console.log( "awesome?" );
 			}, 100 );
@@ -97,9 +97,9 @@ var obj = {
 	cool: function coolFn() {
 		if (this.count < 1) {
 			setTimeout( function timer(){
-				this.count++; // `this` is safe because of `bind(..)`
+				this.count++; // `this` 因为 `bind(..)` 所以安全
 				console.log( "more awesome" );
-			}.bind( this ), 100 ); // look, `bind()`!
+			}.bind( this ), 100 ); // 看，`bind()`!
 		}
 	}
 };
