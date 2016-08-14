@@ -642,11 +642,11 @@ console.log( amount.toFixed( 2 ) );		// "107.99"
 
 ### Scope
 
-If you ask the phone store employee for a phone model that her store doesn't carry, she will not be able to sell you the phone you want. She only has access to the phones in her store's inventory. You'll have to try another store to see if you can find the phone you're looking for.
+如果你向手机店的店员询问一款她们店里没有的手机，那么她就不能卖给你你想要的。她只能访问她们店里库房里的手机。你不得不到另外一家店里去看看能不能找到你想要的手机。
 
-Programming has a term for this concept: *scope* (technically called *lexical scope*). In JavaScript, each function gets its own scope. Scope is basically a collection of variables as well as the rules for how those variables are accessed by name. Only code inside that function can access that function's *scoped* variables.
+编程对这种概念有一个术语：*作用域*（技术上讲称为 *词法作用域*）。在JavaScript中，每个函数都有自己的作用域。作用域基本上就是变量的集合，也是如何使用名称访问这些变量的规则。只有在这个函数内部的代码才能访问这个函数 *作用域内* 的变量。
 
-A variable name has to be unique within the same scope -- there can't be two different `a` variables sitting right next to each other. But the same variable name `a` could appear in different scopes.
+在同一个作用域内变量名必须是唯一的 —— 不能有两个不同的变量`a`并排出现。但是相同的变量名`a`可以出现在不同的作用域中。
 
 ```js
 function one() {
@@ -665,9 +665,9 @@ one();		// 1
 two();		// 2
 ```
 
-Also, a scope can be nested inside another scope, just like if a clown at a birthday party blows up one balloon inside another balloon. If one scope is nested inside another, code inside the innermost scope can access variables from either scope.
+另外，一个作用域可以嵌套在另一个作用域中，就像生日Party上的小丑在一个气球的里面吹另一个气球。如果一个作用域嵌套在另一个中，那么在内部作用域中的代码就可以访问这两个作用域中的变量。
 
-Consider:
+考虑如下代码：
 
 ```js
 function outer() {
@@ -689,11 +689,11 @@ function outer() {
 outer();
 ```
 
-Lexical scope rules say that code in one scope can access variables of either that scope or any scope outside of it.
+词法作用域规则说，在一个作用域中的代码既可以访问这个作用域中的变量，又可以访问任何在它外面的作用域的变量。
 
-So, code inside the `inner()` function has access to both variables `a` and `b`, but code only in `outer()` has access only to `a` -- it cannot access `b` because that variable is only inside `inner()`.
+所以，在函数`inner()`内部的代码可以同时访问变量`a`和`b`，但是仅在`outer()`中的代码只能访问`a` —— 它不能访问`b`因为这个变量仅存在于`inner()`内部。
 
-Recall this code snippet from earlier:
+回忆一下先前的这个代码段：
 
 ```js
 const TAX_RATE = 0.08;
@@ -707,28 +707,27 @@ function calculateFinalPurchaseAmount(amt) {
 }
 ```
 
-The `TAX_RATE` constant (variable) is accessible from inside the `calculateFinalPurchaseAmount(..)` function, even though we didn't pass it in, because of lexical scope.
+因为词法作用域，常数`TAX_RATE`（变量）可以从`calculateFinalPurchaseAmount(..)`函数中访问，即便它没有被传入这个函数。
 
-**Note:** For more information about lexical scope, see the first three chapters of the *Scope & Closures* title of this series.
+**注意：** 关于词法作用域的更多信息，参见本系列的 *作用域与闭包* 的前三章。
 
 ## Practice
 
-There is absolutely no substitute for practice in learning programming. No amount of articulate writing on my part is alone going to make you a programmer.
+在编程的学习中绝对没有什么可以替代练习。我写的再好也不可能使你成为一个程序员。
 
-With that in mind, let's try practicing some of the concepts we learned here in this chapter. I'll give the "requirements," and you try it first. Then consult the code listing below to see how I approached it.
+带着这样的意识，让我们试着练习一下我们在本章学到的一些概念。我将给出“需求”，而你首先试着实现它。然后参考下面的代码清单来看看我是怎么处理它的。
+* 写一个程序来计算你购买手机的总价。你将不停地购买手机直到你的银行账户上的钱都用光（提示：循环！）。你还将为每个手机购买配件，只要你的话费低于你心理预算。
+* 在你计算完购买总价之后，加入税费，然后用合适的格式打印出计算好的购买总价。
+* 最后，将总价与你银行账户上的余额作比较，来看看那你是否买的起。
+* 你应当为“税率”，“手机价格”，“配件价格”和“花费预算”设置一些常数，也为你的“银行账户余额”设置一个变量。
+* 你应当为税费的计算和价格的格式化 —— 使用一个“$”并四舍五入到小数点后两位 —— 定义函数。
+* **加分挑战：** 试着在这个程序中利用输入，也许是使用在前面的“输入”中讲过的`prompt(..)`。比如，你可能会提示用户输入它们的银行账户余额。发挥创造力好好玩儿吧！
 
-* Write a program to calculate the total price of your phone purchase. You will keep purchasing phones (hint: loop!) until you run out of money in your bank account. You'll also buy accessories for each phone as long as your purchase amount is below your mental spending threshold.
-* After you've calculated your purchase amount, add in the tax, then print out the calculated purchase amount, properly formatted.
-* Finally, check the amount against your bank account balance to see if you can afford it or not.
-* You should set up some constants for the "tax rate," "phone price," "accessory price," and "spending threshold," as well as a variable for your "bank account balance.""
-* You should define functions for calculating the tax and for formatting the price with a "$" and rounding to two decimal places.
-* **Bonus Challenge:** Try to incorporate input into this program, perhaps with the `prompt(..)` covered in "Input" earlier. You may prompt the user for their bank account balance, for example. Have fun and be creative!
+好的，去吧。试试看。在你自己实践过之前不要偷看我的代码清单！
 
-OK, go ahead. Try it. Don't peek at my code listing until you've given it a shot yourself!
+**注意：** 因为这是一本JavaScript书，很明显我将使用JavaScript解决这个联系。但是目前你可使用其他的语言，如果你感觉更适应的话。
 
-**Note:** Because this is a JavaScript book, I'm obviously going to solve the practice exercise in JavaScript. But you can do it in another language for now if you feel more comfortable.
-
-Here's my JavaScript solution for this exercise:
+对于这个练习，这是我的JavaScript解决方案：
 
 ```js
 const SPENDING_THRESHOLD = 200;
@@ -775,27 +774,27 @@ if (amount > bank_balance) {
 // You can't afford this purchase. :(
 ```
 
-**Note:** The simplest way to run this JavaScript program is to type it into the developer console of your nearest browser.
+**注意：** 运行这个JavaScript程序的最简单的方法是将它键入到你手边的浏览器的开发者控制台中。
 
-How did you do? It wouldn't hurt to try it again now that you've seen my code. And play around with changing some of the constants to see how the program runs with different values.
+你做的怎么样？再看了我的代码之后，现在再试一次也没什么不好。而且你可以改变某些常数来看看使用不同的值时这个程序运行的如何。
 
 ## Review
 
-Learning programming doesn't have to be a complex and overwhelming process. There are just a few basic concepts you need to wrap your head around.
+学习编程不一定是个复杂而且巨大的过程。你只需要在脑中装进几个基本的概念。
 
-These act like building blocks. To build a tall tower, you start first by putting block on top of block on top of block. The same goes with programming. Here are some of the essential programming building blocks:
+它们就像构建块儿。要建一座高塔，你就要从堆砌构建块儿开始。编程也一样。这里是一些编程中必不可少的构建块儿：
 
-* You need *operators* to perform actions on values.
-* You need values and *types* to perform different kinds of actions like math on `number`s or output with `string`s.
-* You need *variables* to store data (aka *state*) during your program's execution.
-* You need *conditionals* like `if` statements to make decisions.
-* You need *loops* to repeat tasks until a condition stops being true.
-* You need *functions* to organize your code into logical and reusable chunks.
+* 你需要 *操作符* 来在值上实施动作。
+* 你需要值和 *类型* 来试试不同种类的动作，比如在`number`上做数学，或者使用`string`输出。
+* 你需要 *变量* 在你程序执行的过程中存储数据（也就是 *状态*）。
+* 你需要 *条件*，比如`if`语句来做决定。
+* 你需要 *循环* 来重复任务，直到一个条件不再成立。
+* 你需要 *函数* 来将你的代码组织为有逻辑的和可复用的块儿。
 
-Code comments are one effective way to write more readable code, which makes your program easier to understand, maintain, and fix later if there are problems.
+代码注释是一种编写更好可读性代码的有效方法，它使你的代码更易理解，维护，而且如果稍后出现问题的话更易修改。
 
-Finally, don't neglect the power of practice. The best way to learn how to write code is to write code.
+最后，不要忽视练习的力量。学习写代码的最好方法就是写代码。
 
-I'm excited you're well on your way to learning how to code, now! Keep it up. Don't forget to check out other beginner programming resources (books, blogs, online training, etc.). This chapter and this book are a great start, but they're just a brief introduction.
+现在，我很高兴看到你在学习编码的道路上走得很好！保持下去。不要忘了看看其他编程初学者的资源（书，博客，在线教学，等等）。这一章和这本书是一个很好的开始，但它们只是一个简要的介绍。
 
-The next chapter will review many of the concepts from this chapter, but from a more JavaScript-specific perspective, which will highlight most of the major topics that are addressed in deeper detail throughout the rest of the series.
+下一章将会复习许多本章中的概念，但是是从更加专门于JavaScript的视角，这将突出将在本系列的剩余部分将要深度剖析的大多数主要话题。
