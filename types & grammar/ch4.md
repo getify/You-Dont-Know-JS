@@ -1138,7 +1138,7 @@ c = d ? a : b;
 c;								// "abc"
 
 if ((a && d) || c) {
-	console.log( "yep" );		// yep
+	console.log( "nope, not going to run as undefined is falsy." );
 }
 ```
 
