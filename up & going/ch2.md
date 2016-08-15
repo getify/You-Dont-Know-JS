@@ -686,15 +686,11 @@ x;	// 42
 
 ### Closure
 
-*Closure* is one of the most important, and often least understood, concepts in JavaScript. I won't cover it in deep detail here, and instead refer you to the *Scope & Closures* title of this series. But I want to say a few things about it so you understand the general concept. It will be one of the most important techniques in your JS skillset.
-
 *闭包* 是JavaScript中最重要，而又经常最少为人知的概念之一。我不会在这里涵盖更深的细节，你可以参照本系列的 *作用域与闭包*。但我想说几件关于它的事情，以便你了解它的一般概念。它将是你的JS技术结构中最重要的技术之一。
 
-You can think of closure as a way to "remember" and continue to access a function's scope (its variables) even once the function has finished running.
+你可以认为闭包是这样一种方法：即使函数已经完成了运行，它依然可以“记住”并持续访问函数的作用域。
 
-
-
-Consider:
+考虑如下代码：
 
 ```js
 function makeAdder(x) {
@@ -710,7 +706,7 @@ function makeAdder(x) {
 }
 ```
 
-The reference to the inner `add(..)` function that gets returned with each call to the outer `makeAdder(..)` is able to remember whatever `x` value was passed in to `makeAdder(..)`. Now, let's use `makeAdder(..)`:
+每次调用外部的`makeAdder(..)`所返回的对内部`add(..)`函数的引用可以记住被传入`makeAdder(..)`的`x`值。现在，让我们使用`makeAdder(..)`：
 
 ```js
 // `plusOne` gets a reference to the inner `add(..)`
@@ -729,22 +725,22 @@ plusOne( 41 );		// 42 <-- 1 + 41
 plusTen( 13 );		// 23 <-- 10 + 13
 ```
 
-More on how this code works:
+这段代码的工作方式是：
 
-1. When we call `makeAdder(1)`, we get back a reference to its inner `add(..)` that remembers `x` as `1`. We call this function reference `plusOne(..)`.
-2. When we call `makeAdder(10)`, we get back another reference to its inner `add(..)` that remembers `x` as `10`. We call this function reference `plusTen(..)`.
-3. When we call `plusOne(3)`, it adds `3` (its inner `y`) to the `1` (remembered by `x`), and we get `4` as the result.
-4. When we call `plusTen(13)`, it adds `13` (its inner `y`) to the `10` (remembered by `x`), and we get `23` as the result.
+1. 当我们调用`makeAdder(1)`时，我们得到一个指向它内部的`add(..)`的引用，它记住了`x`是`1`。我们称这个函数引用为`plusOne(..)`。
+2. 当我们调用`makeAdder(10)`时，我们得到了另一个指向它内部的`add(..)`引用，它记住了`x`是`10`。我们称这个函数引用为`plusTen(..)`。
+3. 当我们调用`plusOne(3)`时，它在`3`（它内部的`y`）上加`1`（被`x`记住的），于是我们得到结果`4`。
+4. 当我们调用`plusTen(13)`时，它在`13`（它内部的`y`）上加`10`（被`x`记住的），于是我们得到结果`23`。
 
-Don't worry if this seems strange and confusing at first -- it can be! It'll take lots of practice to understand it fully.
+如果这看起里很奇怪和令人困惑，不要担心 —— 它确实是的！要完全理解它需要很多的练习。
 
-But trust me, once you do, it's one of the most powerful and useful techniques in all of programming. It's definitely worth the effort to let your brain simmer on closures for a bit. In the next section, we'll get a little more practice with closure.
+但是相信我，一旦你理解了它，它就是编程中最强大最有用的技术之一。让你的大脑在闭包中煎熬一会是绝对值得的。在下一节中，我们将进一步实践闭包。
 
 #### Modules
 
-The most common usage of closure in JavaScript is the module pattern. Modules let you define private implementation details (variables, functions) that are hidden from the outside world, as well as a public API that *is* accessible from the outside.
+在JavaScript中闭包最常见的用法就是模块模式。模块让你定义对外面世界不可见的私有实现细节（变量，函数），和对外面可访问的公有API。
 
-Consider:
+考虑如下代码：
 
 ```js
 function User(){
@@ -770,35 +766,45 @@ var fred = User();
 fred.login( "fred", "12Battery34!" );
 ```
 
-The `User()` function serves as an outer scope that holds the variables `username` and `password`, as well as the inner `doLogin()` function; these are all private inner details of this `User` module that cannot be accessed from the outside world.
+函数`User()`作为一个外部作用域持有变量`username`和`password`，以及内部`doLogin()`函数；它们都是`User`模块内部的私有细节，是不能从外部世界访问的。
 
-**Warning:** We are not calling `new User()` here, on purpose, despite the fact that probably seems more common to most readers. `User()` is just a function, not a class to be instantiated, so it's just called normally. Using `new` would be inappropriate and actually waste resources.
+**警告：** 我们在这里没有调用`new User()`，这是有意为之的，虽然对大多数读者来说那可能更常见。`User()`只是一个函数，不是一个要被初始化的对象，所以它只是被一般地调用了。使用`new`将是不合适的，而且实际上会浪费资源。
 
-Executing `User()` creates an *instance* of the `User` module -- a whole new scope is created, and thus a whole new copy of each of these inner variables/functions. We assign this instance to `fred`. If we run `User()` again, we'd get a new instance entirely separate from `fred`.
+执行`User()`创建了`User`模块的一个 *实例* —— 一个全新的作用域会被创建，而每个内部变量/函数的一个全新的拷贝也因此而被创建。我们将这个实例赋值给`fred`。如果我们再次运行`User()`，我们将会得到一个与`fred`完全分离的新的实例。
 
-The inner `doLogin()` function has a closure over `username` and `password`, meaning it will retain its access to them even after the `User()` function finishes running.
+内部的`doLogin()`函数在`username`和`password`上拥有闭包，这意味着即便`User()`函数已经完成了运行，它依然持有对它们的访问权。
 
-`publicAPI` is an object with one property/method on it, `login`, which is a reference to the inner `doLogin()` function. When we return `publicAPI` from `User()`, it becomes the instance we call `fred`.
+`publicAPI`是一个带有一个属性/方法的对象，`login`，它是一个指向内部`doLogin()`函数的引用。当我们从`User()`中返回`publicAPI`时，它就变成了我们称为`fred`的实例。
 
-At this point, the outer `User()` function has finished executing. Normally, you'd think the inner variables like `username` and `password` have gone away. But here they have not, because there's a closure in the `login()` function keeping them alive.
+在这个时候，外部的`User()`函数已经完成了执行。一般说来，你会认为像`username`和`password`这样的内部变量将会消失。但是在这里它们不会，因为在`login()`函数里有一个闭包使它们继续存活。
 
-That's why we can call `fred.login(..)` -- the same as calling the inner `doLogin(..)` -- and it can still access `username` and `password` inner variables.
+这就是为什么我们可以调用`fred.login(..)` —— 和调用内部的`doLogin(..)`一样 —— 而且它依然可以访问内部变量`username`和`password`。
 
-There's a good chance that with just this brief glimpse at closure and the module pattern, some of it is still a bit confusing. That's OK! It takes some work to wrap your brain around it.
+这样对闭包和模块模式的简单一瞥，你很有可能还是有点儿糊涂。没关系！要把它装进你的大脑确实需要花些功夫。
 
-From here, go read the *Scope & Closures* title of this series for a much more in-depth exploration.
+以此为起点，关于更多深入细节的探索可以去读本系列的 *作用域与闭包*。
 
 ## `this` Identifier
 
 Another very commonly misunderstood concept in JavaScript is the `this` identifier. Again, there's a couple of chapters on it in the *this & Object Prototypes* title of this series, so here we'll just briefly introduce the concept.
 
+在JavaScript中另一个经常被误解的概念是`this`标识符。同样，在本系列的 *this与对象原型* 中有好几章关于它的内容，所以在这里我们只简要的介绍一下概念。
+
 While it may often seem that `this` is related to "object-oriented patterns," in JS `this` is a different mechanism.
+
+虽然`this`可能经常看起来是与“面向对象模式”有关的，但在JS中`this`是一个不同的概念。
 
 If a function has a `this` reference inside it, that `this` reference usually points to an `object`. But which `object` it points to depends on how the function was called.
 
+如果一个函数在它内部拥有一个`this`引用，那么这个`this`引用通常指向一个`object`。但是指向哪一个`object`要看这个函数是如何被调用的。
+
 It's important to realize that `this` *does not* refer to the function itself, as is the most common misconception.
 
+重要的是要理解`this` *不是* 指函数本身，这是最常见的误解。
+
 Here's a quick illustration:
+
+这是一个快速的说明：
 
 ```js
 function foo() {
@@ -826,24 +832,42 @@ new foo();			// undefined
 
 There are four rules for how `this` gets set, and they're shown in those last four lines of that snippet.
 
+关于`this`如何被设置有四个规则，它们被展示在这个代码段的最后四行中：
+
 1. `foo()` ends up setting `this` to the global object in non-strict mode -- in strict mode, `this` would be `undefined` and you'd get an error in accessing the `bar` property -- so `"global"` is the value found for `this.bar`.
+1. `foo()`最终在非strict模式中将`this`设置为全局对象 —— 在strict模式中，`this`将会是`undefined`而且你会在访问`bar`属性时得到一个错误 —— 所以`this.bar`的值是`global`。
 2. `obj1.foo()` sets `this` to the `obj1` object.
+2. `obj1.foo()`将`this`设置为对象`obj1`。
 3. `foo.call(obj2)` sets `this` to the `obj2` object.
+3. `foo.call(obj2)`将`this`设置为对象`obj2`。
 4. `new foo()` sets `this` to a brand new empty object.
+4. `new foo()`将`this`设置为一个新的空对象。
 
 Bottom line: to understand what `this` points to, you have to examine how the function in question was called. It will be one of those four ways just shown, and that will then answer what `this` is.
 
+底线：要搞清楚`this`指向什么，你必须检视当前的函数是如何被调用的。它将是我们刚刚看到的四种中的一种，而这将会回答`this`是什么。
+
 **Note:** For more information about `this`, see Chapters 1 and 2 of the *this & Object Prototypes* title of this series.
+
+**注意：** 关于`this`的更多信息，参见本系列的 *this与对象原型* 的第一和第二章。
 
 ## Prototypes
 
 The prototype mechanism in JavaScript is quite complicated. We will only glance at it here. You will want to spend plenty of time reviewing Chapters 4-6 of the *this & Object Prototypes* title of this series for all the details.
 
+JavaScript中的原型机制十分复杂。我们在这里近仅仅扫它一眼。要了解关于它的所有细节，你需要花相当的时间来学习本系列的 *this与对象原型* 的第四到六章。
+
 When you reference a property on an object, if that property doesn't exist, JavaScript will automatically use that object's internal prototype reference to find another object to look for the property on. You could think of this almost as a fallback if the property is missing.
+
+当你引用一个对象上的属性时，如果这个属性不存在，JavaScript将会自动地使用这个对象的内部原型引用来寻找另外一个对象，在它上面查询你想要的属性。你可以认为它几乎是在属性缺失时的备用对象。
 
 The internal prototype reference linkage from one object to its fallback happens at the time the object is created. The simplest way to illustrate it is with a built-in utility called `Object.create(..)`.
 
+从一个对象到它备用对象的内部原型引用链接发生在这个对象被创建的时候。说明它的最简单的方法是使用称为`Object.create(..)`的内建工具。
+
 Consider:
+
+考虑如下代码：
 
 ```js
 var foo = {
@@ -861,13 +885,21 @@ bar.a;		// 42 <-- delegated to `foo`
 
 It may help to visualize the `foo` and `bar` objects and their relationship:
 
+将对象`foo`和`bar`以及它们的关系可视化也许会有所帮助：
+
 <img src="fig6.png">
 
 The `a` property doesn't actually exist on the `bar` object, but because `bar` is prototype-linked to `foo`, JavaScript automatically falls back to looking for `a` on the `foo` object, where it's found.
 
+属性`a`实际上不存在于对象`bar`上，但是因为`bar`被原型链接到`foo`，JavaScript自动地退到对象`foo`上去寻找`a`，而且在这里找到了它。
+
 This linkage may seem like a strange feature of the language. The most common way this feature is used -- and I would argue, abused -- is to try to emulate/fake a "class" mechanism with "inheritance."
 
+这种链接看起来是语言的一种奇怪的特性。这种特性最常被使用的方式 —— 我会争辩说这是一种滥用 —— 是用来模拟/模仿“类”机制的“继承”。
+
 But a more natural way of applying prototypes is a pattern called "behavior delegation," where you intentionally design your linked objects to be able to *delegate* from one to the other for parts of the needed behavior.
+
+使用原型的更自然的方式是一种称为“行为委托”的模式，在这种模式中你有意地将你的被链接的对象设计为可以进行
 
 **Note:** For more information about prototypes and behavior delegation, see Chapters 4-6 of the *this & Object Prototypes* title of this series.
 
