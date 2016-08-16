@@ -440,7 +440,7 @@ Let's start by reviewing the trust issues with callbacks-only coding. When you p
 * Call the callback too late (or never)
 * Call the callback too few or too many times
 * Fail to pass along any necessary environment/parameters
-* swallow any errors/exceptions that may happen
+* Swallow any errors/exceptions that may happen
 
 The characteristics of Promises are intentionally designed to provide useful, repeatable answers to all these concerns.
 
