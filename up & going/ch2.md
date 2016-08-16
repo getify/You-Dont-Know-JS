@@ -954,11 +954,7 @@ function foo() {
 
 ## Non-JavaScript
 
-So far, the only things we've covered are in the JS language itself. The reality is that most JS is written to run in and interact with environments like browsers. A good chunk of the stuff that you write in your code is, strictly speaking, not directly controlled by JavaScript. That probably sounds a little strange.
-
 至此，我们讨论过的所有东西都限于JS语言本身。现实是大多数JS程序都是在浏览器这样的环境中运行并与之互动的。你在你的代码中编写的很大一部分东西，严格地说，不是直接由JavaScript控制的。这听起来可能有点奇怪。
-
-The most common non-JavaScript JavaScript you'll encounter is the DOM API. For example:
 
 你将会遇到的最常见的非JavaScript程序是DOM API。例如：
 
@@ -966,26 +962,22 @@ The most common non-JavaScript JavaScript you'll encounter is the DOM API. For e
 var el = document.getElementById( "foo" );
 ```
 
-The `document` variable exists as a global variable when your code is running in a browser. It's not provided by the JS engine, nor is it particularly controlled by the JavaScript specification. It takes the form of something that looks an awful lot like a normal JS `object`, but it's not really exactly that. It's a special `object,` often called a "host object."
-
 当你的代码运行在一个浏览器中时，变量`document`作为一个全局变量存在。它不是由JS引擎提供的，也不为JavaScript语言规范所控制。它采取了某种与普通JS`object`极其相似的形式，但它不是真正的`object`。它是一种特殊的`object`，经常被称为“宿主对象”。
 
-Moreover, the `getElementById(..)` method on `document` looks like a normal JS function, but it's just a thinly exposed interface to a built-in method provided by the DOM from your browser. In some (newer-generation) browsers, this layer may also be in JS, but traditionally the DOM and its behavior is implemented in something more like C/C++.
+另外，`document`上的`getElementById(..)`方法看起来像一个普通的JS函数，但它只是一个微微暴露出来的接口，指向由浏览器DOM提供的内建方法。在一些（新一代的）浏览器中，这一层可能也是由JS实现的，但是传统的DOM和它的行为是由像C/C++这样的语言实现的。
 
-另外，`document`上的`getElementById(..)`方法看起来像一个普通的JS函数，但它只是一个由浏览器DOM提供的内建方法的
+另一个例子是输入/输出（I/O）。
 
-Another example is with input/output (I/O).
+大家最喜爱的`alert(..)`在用户的浏览器窗口中弹出一个消息框。`alert(..)`是由浏览器提供给你的JS程序的，而不是JS引擎本身。你进行的调用将消息发送给浏览器内部，它来处理消息框的绘制与显示。
 
-Everyone's favorite `alert(..)` pops up a message box in the user's browser window. `alert(..)` is provided to your JS program by the browser, not by the JS engine itself. The call you make sends the message to the browser internals and it handles drawing and displaying the message box.
+`console.log()`也一样；你的浏览器提供这样的机制并将它们挂在开发者工具中。
 
-The same goes with `console.log(..)`; your browser provides such mechanisms and hooks them up to the developer tools.
-
-This book, and this whole series, focuses on JavaScript the language. That's why you don't see any substantial coverage of these non-JavaScript JavaScript mechanisms. Nevertheless, you need to be aware of them, as they'll be in every JS program you write!
+这本书，和整个这个系列，聚焦于JavaScript这种语言。这就是为什么你看不到任何涵盖这些非JavaScript机制的重要内容。不管怎样，你需要小心它们，因为它们将在你写的每一个JS程序中存在！
 
 ## Review
 
-The first step to learning JavaScript's flavor of programming is to get a basic understanding of its core mechanisms like values, types, function closures, `this`, and prototypes.
+学习JavaScript风格编程的第一步是对它的核心机制有一个基本的了解，比如值，类型，函数闭包，`this`，和原型。
 
-Of course, each of these topics deserves much greater coverage than you've seen here, but that's why they have chapters and books dedicated to them throughout the rest of this series. After you feel pretty comfortable with the concepts and code samples in this chapter, the rest of the series awaits you to really dig in and get to know the language deeply.
+当然，这些话题中的每一个都会衍生出比你在这里见到的多得多的内容，这也是为什么它们在这个系列剩下的部分中拥有自己的章节和书目。在你对本章中的概念和代码示例感到相当适应之后，这个系列的其他部分正等着你真正地深入挖掘和了解这门语言。
 
-The final chapter of this book will briefly summarize each of the other titles in the series and the other concepts they cover besides what we've already explored.
+这本书的最后一章将会对这个系列的每一卷的内容，以及它们所涵盖的我们在这里还没有探索过的概念，进行简单地总结。
