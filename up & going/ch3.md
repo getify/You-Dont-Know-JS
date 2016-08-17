@@ -47,76 +47,58 @@ JS引擎在你的代码执行的前一刻（有时是在执行期间！）编译
 
 但是强制转换真的如此令人困惑，如此的坏，如此的不可信，以至于只要你使用它，你的代码从一开始就灭亡了吗？
 
-I say no. After having built up an understanding of how types and values really work in Chapters 1-3, Chapter 4 takes on this debate and fully explains how coercion works, in all its nooks and crevices. We see just what parts of coercion really are surprising and what parts actually make complete sense if given the time to learn.
-
 我说不。在第一到三章中建立了对类型和值真正的工作方式的理解后，第四章参与了这个辩论，并从强制转换的角落和缝隙全面地讲解它的工作方式。我们将看到强制转换的哪一部分真的令人惊讶，而且如果花时间去学习，哪一部分实际上完全是合理的。
 
-But I'm not merely suggesting that coercion is sensible and learnable, I'm asserting that coercion is an incredibly useful and totally underestimated tool that *you should be using in your code.* I'm saying that coercion, when used properly, not only works, but makes your code better. All the naysayers and doubters will surely scoff at such a position, but I believe it's one of the main keys to upping your JS game.
-
 但我不仅仅要说强制转换是合理的和可以学习的，我断言强制转换是一种 *你应当在代码中使用的* 极其有用而且完全被低估的工具。我要说在合理使用的情况下，强制转换不仅好用，而且会使你的代码更好。所有唱反调的和怀疑的人当然会嘲笑这样的立场，但我相信它是让你玩儿好JS游戏的主要按键之一。
-
-Do you want to just keep following what the crowd says, or are you willing to set all the assumptions aside and look at coercion with a fresh perspective? The *Types & Grammar* title of this series will coerce your thinking.
 
 你是想继续人云亦云，还是想将所有的臆测放在一边，用一个全新的视角观察强制转换？这个系列的 *类型与文法* 将会强制转换你的想法。
 
 ## Async & Performance
 
-The first three titles of this series focus on the core mechanics of the language, but the fourth title branches out slightly to cover patterns on top of the language mechanics for managing asynchronous programming. Asynchrony is not only critical to the performance of our applications, it's increasingly becoming *the* critical factor in writability and maintainability.
-
 这个系列的前三本书聚焦于这门语言的核心技术，但是第四本书稍稍开出一个分支来探讨在这门语言技术之上的管理异步编程的模式。异步不仅对于性能和我们的应用程序很关键，而且它日渐成为可写性和可维护性的关键因素。
-
-The book starts first by clearing up a lot of terminology and concept confusion around things like "async," "parallel," and "concurrent," and explains in depth how such things do and do not apply to JS.
 
 这本书从搞清楚许多令人困惑的术语和概念开始，比如“异步”，“并行”和“并发”。而且深入讲解了这些东西如何适用和不适用于JS。
 
-Then we move into examining callbacks as the primary method of enabling asynchrony. But it's here that we quickly see that the callback alone is hopelessly insufficient for the modern demands of asynchronous programming. We identify two major deficiencies of callbacks-only coding: *Inversion of Control* (IoC) trust loss and lack of linear reason-ability.
-
 然后我们继续检视作为开启异步的主要方法：回调。但我们很快就会看到，对于现代异步编程的需求来说，单靠回调自身是远远不够的。我们将找出仅使用回调编码的两种主要的不足之处：*控制反转*（IoC）信任丢失和缺乏线性的可推理性。
-
-To address these two major deficiencies, ES6 introduces two new mechanisms (and indeed, patterns): promises and generators.
 
 为了解决这两种主要的不足，ES6引入了两种新的机制（实际上也是模式）：promise 和 generator。
 
-Promises are a time-independent wrapper around a "future value," which lets you reason about and compose them regardless of if the value is ready or not yet. Moreover, they effectively solve the IoC trust issues by routing callbacks through a trustable and composable promise mechanism.
-
 Prmise是一个“未来值”的一种与时间无关的包装，它让你推理并组合这些未来值而不必关心它们是否已经准备好。另外，它们通过将回调沿着一个可信赖和可组装的promise机制传递，有效地解决了IoC信任问题。
 
-Generators introduce a new mode of execution for JS functions, whereby the generator can be paused at `yield` points and be resumed asynchronously later. The pause-and-resume capability enables synchronous, sequential looking code in the generator to be processed asynchronously behind the scenes. By doing so, we address the non-linear, non-local-jump confusions of callbacks and thereby make our asynchronous code sync-looking so as to be more reason-able.
+Generator给JS函数引入了一种新的执行模式，generator可以在`yield`点被暂停而稍后异步地被继续。这种“暂停-继续”的能力让generator在幕后异步地被处理，使看起来同步，顺序执行的代码称为可能。如此，我们就解决了回调的非线性，非本地跳转的困惑，并因此使我们的异步代码看起来是更容易推理的同步代码。
 
-Generator给JS函数引入了一种新的执行模式，generator可以在`yield`点被暂停而稍后异步地被继续。这种“暂停-继续”的能力使看起来同步，顺序执行的代码称为可能。
+但是，是promise与generator的组合给了我们JavaScript中最有效的异步代码模式。事实上，在即将到来的ES7与之后的版本中，大多数精巧的异步性肯定会建立在这个基础之上。为了认真地在一个异步的世界中高效地编程，你将需要对promise与generator的组合十分适应。
 
-But it's the combination of promises and generators that "yields" our most effective asynchronous coding pattern to date in JavaScript. In fact, much of the future sophistication of asynchrony coming in ES7 and later will certainly be built on this foundation. To be serious about programming effectively in an async world, you're going to need to get really comfortable with combining promises and generators.
+如果promise和generator是关于表达一些模式，这些模式让你的程序更加并发地运行，而因此在更短的时间内完成更多的处理，那么JS在性能优化上就拥有许多其他的方面值得探索。
 
-If promises and generators are about expressing patterns that let our programs run more concurrently and thus get more processing accomplished in a shorter period, JS has many other facets of performance optimization worth exploring.
+第五章钻研的话题是使用Web Worker的程序并行性和使用SIMD的数据并行性，以及像ASM.js这样的底层优化技术。第六章从正确的基准分析技术的角度来观察性能优化，包括什么样的性能值得关心而什么应当忽略。
 
-Chapter 5 delves into topics like program parallelism with Web Workers and data parallelism with SIMD, as well as low-level optimization techniques like ASM.js. Chapter 6 takes a look at performance optimization from the perspective of proper benchmarking techniques, including what kinds of performance to worry about and what to ignore.
+高效地编写JavaScript意味着编写的代码可以突破这种限制壁垒：在范围广泛的浏览器和其他环境中动态运行。这需要我们进行读多复杂的详细计划与努力，才能使一个程序从“可以工作”到“工作得很好”。
 
-Writing JavaScript effectively means writing code that can break the constraint barriers of being run dynamically in a wide range of browsers and other environments. It requires a lot of intricate and detailed planning and effort on our parts to take a program from "it works" to "it works well."
-
-The *Async & Performance* title is designed to give you all the tools and skills you need to write reasonable and performant JavaScript code.
+给你编写合理且高效的JavaScript代码所需的全部工具与技能，*异步与性能* 就是为此而设计的。
 
 ## ES6 & Beyond
 
-No matter how much you feel you've mastered JavaScript to this point, the truth is that JavaScript is never going to stop evolving, and moreover, the rate of evolution is increasing rapidly. This fact is almost a metaphor for the spirit of this series, to embrace that we'll never fully *know* every part of JS, because as soon as you master it all, there's going to be new stuff coming down the line that you'll need to learn.
+至此，无论你感觉自己已经将JavaScript掌握的多么好，现实是JavaScript从来没有停止过进化，此外，进化的频率正在飞快地增长。这个事实几乎就是本系列精神的比喻，拥抱我们永远不会完全 *懂得* 的JS的所有部分，因为只要你掌握了它的全部，就会有你需要学习的新的东西到来。
 
-This title is dedicated to both the short- and mid-term visions of where the language is headed, not just the *known* stuff like ES6 but the *likely* stuff beyond.
+这本书专注于这门语言在中短期的发展前景，不仅是像ES6这样 *已知的* 东西，还包括在未来 *可能的* 东西。
 
-While all the titles of this series embrace the state of JavaScript at the time of this writing, which is mid-way through ES6 adoption, the primary focus in the series has been more on ES5. Now, we want to turn our attention to ES6, ES7, and ...
+虽然这个系列的所有书目采纳的是在编写它们时JavaScript的状态，也就是ES6正在被接纳的半途中，但是这个系列更主要地集中与ES5。现在我们想要将注意力转移到ES6，ES7，和……
 
-Since ES6 is nearly complete at the time of this writing, *ES6 & Beyond* starts by dividing up the concrete stuff from the ES6 landscape into several key categories, including new syntax, new data structures (collections), and new processing capabilities and APIs. We cover each of these new ES6 features, in varying levels of detail, including reviewing details that are touched on in other books of this series.
+因为在编写本书时ES6已经近于完成，*ES6与未来* 首先将ES6中确定的东西分割为几个关键的范畴，包括新的语法，新的数据结构（集合），和新的处理能力以及API。我们将在各种细节的层面讲解这些新的ES6特性中的每一个，包括复习我们在本系列的其他书目中遇到过的细节。
 
-Some exciting ES6 things to look forward to reading about: destructuring, default parameter values, symbols, concise methods, computed properties, arrow functions, block scoping, promises, generators, iterators, modules, proxies, weakmaps, and much, much more! Phew, ES6 packs quite a punch!
+这是一些值得一读的激动人心的ES6特性：解构，参数默认值，symbol，简洁方法，计算属性，箭头函数，块儿作用域，promise，generator，iterator，模块，代理，weakmap，以及很多，很多别的东西！呼，ES6真是不容小觑！
 
-The first part of the book is a roadmap for all the stuff you need to learn to get ready for the new and improved JavaScript you'll be writing and exploring over the next couple of years.
+这本书的第一部分是一张路线图，为了对你将要在以后几年中编写和探索的新改进的JavaScript做好准备，它指明了你需要学习的所有东西。
 
-The latter part of the book turns attention to briefly glance at things that we can likely expect to see in the near future of JavaScript. The most important realization here is that post-ES6, JS is likely going to evolve feature by feature rather than version by version, which means we can expect to see these near-future things coming much sooner than you might imagine.
+这本书稍后的部分将注意力转向简要地介绍一些我们将在近未来可能看到的JavaScript的新东西。在这里最重要的是，要理解在后ES6时代，JS很可能将会一个特性一个特性地进化，而不是一个版本一个版本地进化，这意味着我们将在比你想象的早得多的时候，看到这些近未来的到来。
 
-The future for JavaScript is bright. Isn't it time we start learning it!?
+JavaScript的未来是光明的。这不正是我们开始学习它好时机吗！？
 
 ## Review
 
-The *YDKJS* series is dedicated to the proposition that all JS developers can and should learn all of the parts of this great language. No person's opinion, no framework's assumptions, and no project's deadline should be the excuse for why you never learn and deeply understand JavaScript.
+*YDKJS* 系列投身于这样的命题：所有的JS开发者都可以，也应该学习这门伟大语言的每一部分。没有任何个人意见，没有任何框架的设想，没有任何项目的期限可以作为你从没有学习和深入理解JavaScript的借口。
 
-We take each important area of focus in the language and dedicate a short but very dense book to fully explore all the parts of it that you perhaps thought you knew but probably didn't fully.
+我们聚焦这门语言中的每一个重要领域，为之专著一本很短但是内容非常稠密的书，来全面地探索它的 —— 你也许认为自己知道但可能并不全面 —— 所有部分。
 
-"You Don't Know JS" isn't a criticism or an insult. It's a realization that all of us, myself included, must come to terms with. Learning JavaScript isn't an end goal but a process. We don't know JavaScript, yet. But we will!
+“你不懂JS”不是一种批评或羞辱。它是我们所有人，包括我自己，都必须正视的一种现实。学习JavaScript不是一个最终目标，而是一个过程。我们还不懂JavaScript。但是我们会的！
