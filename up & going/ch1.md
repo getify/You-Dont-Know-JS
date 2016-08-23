@@ -499,7 +499,7 @@ JavaScript定义了一组特定的被认为是“falsy”的值，因为在强�
 
 ## 循环
 
-在繁忙的时候，有一张需要和手机店店员谈话的顾客的排队单。虽然排队单上还有许多人，但是她只需要持续服务下一位顾客就好了。
+在繁忙的时候，有一张排队单，上面记载着需要和手机店店员谈话的顾客。虽然排队单上还有许多人，但是她只需要持续服务下一位顾客就好了。
 
 重复一组动作直到特定的条件失败 —— 换句话说，仅在条件成立时重复 —— 就是程序循环的工作；循环可以有不同的形式，但是它们都符合这种基本行为。
 
@@ -511,17 +511,17 @@ JavaScript定义了一组特定的被认为是“falsy”的值，因为在强�
 while (numOfCustomers > 0) {
 	console.log( "How may I help you?" );
 
-	// help the customer...
+	// 服务顾客……
 
 	numOfCustomers = numOfCustomers - 1;
 }
 
-// versus:
+// 与
 
 do {
 	console.log( "How may I help you?" );
 
-	// help the customer...
+	// 服务顾客……
 
 	numOfCustomers = numOfCustomers - 1;
 } while (numOfCustomers > 0);
@@ -544,9 +544,9 @@ do {
 ```js
 var i = 0;
 
-// a `while..true` loop would run forever, right?
+// 一个 `while..true` 循环将会永远运行，对吧？
 while (true) {
-	// stop the loop?
+	// 停止循环？
 	if ((i <= 9) === false) {
 		break;
 	}
@@ -568,13 +568,13 @@ for (var i = 0; i <= 9; i = i + 1) {
 // 0 1 2 3 4 5 6 7 8 9
 ```
 
-如你所见，对于这两种循环形式来说，前10次迭代（`i`的值从`0`到`9`）条件`i <= 9`都是`true`，而且一旦`i`值为`10`就变为`false`。
+如你所见，对于这两种循环形式来说，前10次迭代（`i`的值从`0`到`9`）的条件`i <= 9`都是`true`，而且一旦`i`值为`10`就变为`false`。
 
 `for`循环有三个子句：初始化子句（`var i=0`），条件测试子句（`i <= 9`），和更新子句（`i = i + 1`）。所以如果你想要使用循环迭代来计数，`for`是一个更紧凑而且更易理解和编写的形式。
 
-还有一些意在迭代特定的值的特殊循环形式，比如迭代一个对象的属性（见第二章），它隐含的测试条件是所有的属性是否都被处理了。无论循环是何种形式，“循环直到条件失败”的概念是它们共有的。
+还有一些意在迭代特定的值的特殊循环形式，比如迭代一个对象的属性（见第二章），它隐含的测试条件是所有的属性是否都被处理过了。无论循环是何种形式，“循环直到条件失败”的概念是它们共有的。
 
-## Functions
+## 函数
 
 手机店的店员可能不会拿着一个计算器到处走，用它来搞清税费和最终的购物款。这是一个她需要定义一次然后一遍又一遍地重用的任务。很有可能的是，公司有一个带有内建这些“功能”的收银机（电脑，平板电脑，等等）。
 
@@ -625,10 +625,10 @@ console.log( amount );			// "$99.99"
 const TAX_RATE = 0.08;
 
 function calculateFinalPurchaseAmount(amt) {
-	// calculate the new amount with the tax
+	// 计算带有税费的新费用
 	amt = amt + (amt * TAX_RATE);
 
-	// return the new amount
+	// 返回新费用
 	return amt;
 }
 
@@ -639,11 +639,11 @@ amount = calculateFinalPurchaseAmount( amount );
 console.log( amount.toFixed( 2 ) );		// "107.99"
 ```
 
-虽然`calculateFinalPurchaseAmount(..)`只被调用了一次，将它的行为组织进一个分离的带名称的函数让使用它逻辑的代码（`amount = calculateFinal...`语句）更干净。如果函数中拥有更多的语句，这种好处将会更加明显。
+虽然`calculateFinalPurchaseAmount(..)`只被调用了一次，但是将它的行为组织进一个分离的带名称的函数，让使用它逻辑的代码（`amount = calculateFinal...`语句）更干净。如果函数中拥有更多的语句，这种好处将会更加明显。
 
-### Scope
+### 作用域
 
-如果你向手机店的店员询问一款她们店里没有的手机，那么她就不能卖给你你想要的。她只能访问她们店里库房里的手机。你不得不到另外一家店里去看看能不能找到你想要的手机。
+如果你向手机店的店员询问一款她们店里没有的手机，那么她就不能卖给你你想要的。她只能访问她们店库房里的手机。你不得不到另外一家店里去看看能不能找到你想要的手机。
 
 编程对这种概念有一个术语：*作用域*（技术上讲称为 *词法作用域*）。在JavaScript中，每个函数都有自己的作用域。作用域基本上就是变量的集合，也是如何使用名称访问这些变量的规则。只有在这个函数内部的代码才能访问这个函数 *作用域内* 的变量。
 
@@ -651,13 +651,13 @@ console.log( amount.toFixed( 2 ) );		// "107.99"
 
 ```js
 function one() {
-	// this `a` only belongs to the `one()` function
+	// 这个 `a` 仅属于函数 `one()`
 	var a = 1;
 	console.log( a );
 }
 
 function two() {
-	// this `a` only belongs to the `two()` function
+	// 这个 `a` 仅属于函数 `two()`
 	var a = 2;
 	console.log( a );
 }
@@ -666,7 +666,7 @@ one();		// 1
 two();		// 2
 ```
 
-另外，一个作用域可以嵌套在另一个作用域中，就像生日Party上的小丑在一个气球的里面吹另一个气球。如果一个作用域嵌套在另一个中，那么在内部作用域中的代码就可以访问这两个作用域中的变量。
+另外，一个作用域可以嵌套在另一个作用域中，就像生日Party上的小丑在一个气球的里面吹另一个气球一样。如果一个作用域嵌套在另一个中，那么在内部作用域中的代码就可以访问这两个作用域中的变量。
 
 考虑如下代码：
 
@@ -677,13 +677,13 @@ function outer() {
 	function inner() {
 		var b = 2;
 
-		// we can access both `a` and `b` here
+		// 我们可以在这里同时访问 `a` 和 `b`
 		console.log( a + b );	// 3
 	}
 
 	inner();
 
-	// we can only access `a` here
+	// 我们在这里只能访问 `a`
 	console.log( a );			// 1
 }
 
@@ -700,10 +700,10 @@ outer();
 const TAX_RATE = 0.08;
 
 function calculateFinalPurchaseAmount(amt) {
-	// calculate the new amount with the tax
+	// 计算带有税费的新费用
 	amt = amt + (amt * TAX_RATE);
 
-	// return the new amount
+	// 返回新费用
 	return amt;
 }
 ```
@@ -712,12 +712,12 @@ function calculateFinalPurchaseAmount(amt) {
 
 **注意：** 关于词法作用域的更多信息，参见本系列的 *作用域与闭包* 的前三章。
 
-## Practice
+## 练习
 
 在编程的学习中绝对没有什么可以替代练习。我写的再好也不可能使你成为一个程序员。
 
 带着这样的意识，让我们试着练习一下我们在本章学到的一些概念。我将给出“需求”，而你首先试着实现它。然后参考下面的代码清单来看看我是怎么处理它的。
-* 写一个程序来计算你购买手机的总价。你将不停地购买手机直到你的银行账户上的钱都用光（提示：循环！）。你还将为每个手机购买配件，只要你的话费低于你心理预算。
+* 写一个程序来计算你购买手机的总价。你将不停地购买手机直到你的银行账户上的钱都用光（提示：循环！）。你还将为每个手机购买配件，只要你的花费低于你心理预算。
 * 在你计算完购买总价之后，加入税费，然后用合适的格式打印出计算好的购买总价。
 * 最后，将总价与你银行账户上的余额作比较，来看看那你是否买的起。
 * 你应当为“税率”，“手机价格”，“配件价格”和“花费预算”设置一些常数，也为你的“银行账户余额”设置一个变量。
@@ -747,18 +747,18 @@ function formatAmount(amount) {
 	return "$" + amount.toFixed( 2 );
 }
 
-// keep buying phones while you still have money
+// 只要你还有钱就不停地买手机
 while (amount < bank_balance) {
-	// buy a new phone!
+	// 买个新手机
 	amount = amount + PHONE_PRICE;
 
-	// can we afford the accessory?
+	// 还买得起配件吗？
 	if (amount < SPENDING_THRESHOLD) {
 		amount = amount + ACCESSORY_PRICE;
 	}
 }
 
-// don't forget to pay the government, too
+// 也别忘了给政府交钱
 amount = amount + calculateTax( amount );
 
 console.log(
@@ -766,20 +766,20 @@ console.log(
 );
 // Your purchase: $334.76
 
-// can you actually afford this purchase?
+// 你买的起吗？
 if (amount > bank_balance) {
 	console.log(
 		"You can't afford this purchase. :("
 	);
 }
-// You can't afford this purchase. :(
+// 你买不起 :(
 ```
 
 **注意：** 运行这个JavaScript程序的最简单的方法是将它键入到你手边的浏览器的开发者控制台中。
 
-你做的怎么样？再看了我的代码之后，现在再试一次也没什么不好。而且你可以改变某些常数来看看使用不同的值时这个程序运行的如何。
+你做的怎么样？看了我的代码之后，现在再试一次也没什么不好。而且你可以改变某些常数来看看使用不同的值时这个程序运行的如何。
 
-## Review
+## 复习
 
 学习编程不一定是个复杂而且巨大的过程。你只需要在脑中装进几个基本的概念。
 

@@ -1,5 +1,5 @@
-# You Don't Know JS: Up & Going
-# Chapter 2: Into JavaScript
+# 你不懂JS：入门与进阶
+# 第二章：进入JavaScript
 
 在前一章中，我介绍了编程的基本构建块儿，比如变量，循环，条件，和函数。当然，所有被展示的代码都是JavaScript。但是在这一章中，我们想要特别集中于那些为了作为一个JS开发者入门和进阶，你需要知道的关于JavaScript的事情。
 
