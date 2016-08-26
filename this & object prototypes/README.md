@@ -1,4 +1,4 @@
-# 你不懂JS: *this* & Object Prototypes
+# 你不懂JS: *this* 与对象原型
 
 <img src="cover.jpg" width="300">
 
@@ -19,4 +19,4 @@
 * [第五章: Prototypes（原型）](ch5.md)
 * [第六章: Behavior Delegation（行为委托）](ch6.md)
 * [附录A: ES6 *class*](apA.md)
-* [附录B: 感谢](apB.md)
+* [附录B: 鸣谢](apB.md)
