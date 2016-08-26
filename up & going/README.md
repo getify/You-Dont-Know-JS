@@ -1,18 +1,18 @@
-# You Don't Know JS: Up & Going
+# 你不懂JS：入门与进阶
 
 <img src="cover.jpg" width="300">
 
 -----
 
-**[Purchase digital/print copy from O'Reilly](http://shop.oreilly.com/product/0636920039303.do)**
+**[从O'Reilly购买数字/印刷版](http://shop.oreilly.com/product/0636920039303.do)**
 
 -----
 
-[Table of Contents](toc.md)
+[目录](toc.md)
 
-* [Foreword](foreword.md) (by [Jenn Lukas](http://jennlukas.com))
-* [Preface](../preface.md)
-* [Chapter 1: Into Programming](ch1.md)
-* [Chapter 2: Into JavaScript](ch2.md)
-* [Chapter 3: Into YDKJS](ch3.md)
-* [Appendix A: Thank You's!](apA.md)
+* [序](foreword.md) (by [Jenn Lukas](http://jennlukas.com))
+* [前言](../preface.md)
+* [第一章：进入编程](ch1.md)
+* [第二章：进入JavaScript](ch2.md)
+* [第三章：进入YDKJS](ch3.md)
+* [附录A：鸣谢](apA.md)
