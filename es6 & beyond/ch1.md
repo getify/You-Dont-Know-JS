@@ -1,53 +1,53 @@
-# You Don't Know JS: ES6 & Beyond
-# Chapter 1: ES? Now & Future
+# 你不懂JS：ES6与未来
+# 第一章：ES？现在与未来
 
-Before you dive into this book, you should have a solid working proficiency over JavaScript up to the most recent standard (at the time of this writing), which is commonly called *ES5* (technically ES 5.1). Here, we plan to talk squarely about the upcoming *ES6*, as well as cast our vision beyond to understand how JS will evolve moving forward.
+在你一头扎进这本书之前，你应当可以熟练地使用（在本书写作时）最近版本的JavaScript，也就是通常所说的 *ES5*（技术上讲是ES 5.1）。这里，我们打算好好谈谈即将到来的 *ES6*，同时放眼未来去看看JS将会如何继续进化。
 
-If you are still looking for confidence with JavaScript, I highly recommend you read the other titles in this series first:
+如果你仍然在JavaScript上寻找信心，我强烈推荐你首先读一读本系列的其他书目：
 
-* *Up & Going*: Are you new to programming and JS? This is the roadmap you need to consult as you start your learning journey.
-* *Scope & Closures*: Did you know that JS lexical scope is based on compiler (not interpreter!) semantics? Can you explain how closures are a direct result of lexical scope and functions as values?
-* *this & Object Prototypes*: Can you recite the four simple rules for how `this` is bound? Have you been muddling through fake "classes" in JS instead of adopting the simpler "behavior delegation" design pattern? Ever heard of *objects linked to other objects* (OLOO)?
-* *Types & Grammar*: Do you know the built-in types in JS, and more importantly, do you know how to properly and safely use coercion between types? How comfortable are you with the nuances of JS grammar/syntax?
-* *Async & Performance*: Are you still using callbacks to manage your asynchrony? Can you explain what a promise is and why/how it solves "callback hell"? Do you know how to use generators to improve the legibility of async code? What exactly constitutes mature optimization of JS programs and individual operations?
+* *入门与进阶*：你是编程和JS的新手吗？这就是你在开启学习的旅程前需要查看的路线图。
+* *作用域与闭包*：你知道JS的词法作用域是基于编译器（不是解释器！）语义的吗？你能解释闭包是如何成为词法作用域和函数作为值的直接结果的吗？
+* *this与对象原型*：你能复述`this`绑定的四个简单规则吗？你有没有曾经在JS中对付着去山寨“类”，而不是采取更简单的“行为委托”设计模式？你听说过 *链接到其他对象的对象* （OOLO）吗？
+* *类型与文法*：你知道JS中的内建类型吗？更重要的是，你知道如何在类型之间正确且安全地使用强制转换吗？你对JS文法/语法的微妙之处感到有多习惯？
+* *异步与性能*：你还在使用回调管理你的异步处理吗？你能解释promise是为什么/如何解决了“回调地狱”的吗？你知道如何使用generator来改进异步代码的易读性吗？到底是什么构成了JS程序和独立操作的成熟的优化？
 
-If you've already read all those titles and you feel pretty comfortable with the topics they cover, it's time we dive into the evolution of JS to explore all the changes coming not only soon but farther over the horizon.
+如果你已经读过了这些书目而且对它们涵盖的内容感到十分轻松，那么现在就是我们深入JS的进化过程来探索所有即将到来的以及未来会发生的改变。
 
-Unlike ES5, ES6 is not just a modest set of new APIs added to the language. It incorporates a whole slew of new syntactic forms, some of which may take quite a bit of getting used to. There's also a variety of new organization forms and new API helpers for various data types.
+与ES5不同，ES6不仅仅是向语言添加的一组不算太多的新API。它包含大量的新的语法形式，其中的一些你可能会花上相当一段时间才能适应。还有几种新的组织形式和为各种数据类型添加的新API。
 
-ES6 is a radical jump forward for the language. Even if you think you know JS in ES5, ES6 is full of new stuff you *don't know yet*, so get ready! This book explores all the major themes of ES6 that you need to get up to speed on, and even gives you a glimpse of future features coming down the track that you should be aware of.
+对这门语言来说ES6十分激进。就算你认为你懂得ES5的JS，ES6也满是 *你还不懂的* 新东西，所以组做好准备！这本书探索所有你需要迅速掌握的ES6主要主题，并且窥见一下那些你应当注意的正在步入正轨的未来特性。
 
-**Warning:** All code in this book assumes an ES6+ environment. At the time of this writing, ES6 support varies quite a bit in browsers and JS environments (like Node.js), so your mileage may vary.
+**警告：** 真本书中的所有代码都假定运行在ES6+的环境中。在写作本书时，浏览器和JS环境（比如Node.js）对ES6的支持相当不同，所以你的里程可能将会不同。
 
 ## Versioning
 
-The JavaScript standard is referred to officially as "ECMAScript" (abbreviated "ES"), and up until just recently has been versioned entirely by ordinal number (i.e., "5" for "5th edition").
+JavaScript标准在官方上被称为“ECMAScript”（缩写为“ES”），而且直到最近才刚刚完全采用顺序数字来标记版本（例如，“5”代表“第五版”）。
 
-The earliest versions, ES1 and ES2, were not widely known or implemented. ES3 was the first widespread baseline for JavaScript, and constitutes the JavaScript standard for browsers like IE6-8 and older Android 2.x mobile browsers. For political reasons beyond what we'll cover here, the ill-fated ES4 never came about.
+最早的版本，ES1和ES2，并不广为人知也没有大范围地被实现。ES3是JavaScript第一次广泛传播的基准线，并且构成了像IE6-8和更早的Android 2.x移动浏览器的JavaScript标准。由于一些超出我们讨论范围的政治原因，命运多舛的ES4从未问世。
 
-In 2009, ES5 was officially finalized (later ES5.1 in 2011), and settled as the widespread standard for JS for the modern revolution and explosion of browsers, such as Firefox, Chrome, Opera, Safari, and many others.
+在2009年，ES5正式定稿（在2011年出现了ES5.1），并作为现代革新和浏览器的爆发性增长（比如Firefox，Chrome，Opera，Safari，和其他许多）中广泛传播的JS标准稳定下来。
 
-Leading up to the expected *next* version of JS (slipped from 2013 to 2014 and then 2015), the obvious and common label in discourse has been ES6.
+通往下一个预期的版本的JS，在讨论中显然经常被称为ES6。
 
-However, late into the ES6 specification timeline, suggestions have surfaced that versioning may in the future switch to a year-based schema, such as ES2016 (aka ES7) to refer to whatever version of the specification is finalized before the end of 2016. Some disagree, but ES6 will likely maintain its dominant mindshare over the late-change substitute ES2015. However, ES2016 may in fact signal the new year-based schema.
+然而，在ES6规范的晚些时候，有建议提及未来的版本号也许会切换到编年制，比如用ES2016（也叫ES7）来指代在2016年末之前被定稿的任何版本。有些人对此持否定意见，但是相对于后来的ES2015来说，ES6将很可能继续维持它占统治地位的影响力。可是，ES2016事实上可能标志了新的编年制。
 
-It has also been observed that the pace of JS evolution is much faster even than single-year versioning. As soon as an idea begins to progress through standards discussions, browsers start prototyping the feature, and early adopters start experimenting with the code.
+还可以看到，JS进化的频度即使与一年一度的定版相比都要快得多。只要一个想法开始标准化讨论的进程，浏览器就开始为这种特性建造原型，而且早期的采用者就开始在代码中进行实验。
 
-Usually well before there's an official stamp of approval, a feature is de facto standardized by virtue of this early engine/tooling prototyping. So it's also valid to consider the future of JS versioning to be per-feature rather than per-arbitrary-collection-of-major-features (as it is now) or even per-year (as it may become).
+通常在一个特性被盖上官方承认的印章以前，由于这些早期的引擎/工具的原型它实际上已经被标准化了。所以也可以认为未来的JS版本将是一个特性一个特性的更新，而非一组主要特性的随意集合的更新（就像现在），也不是一年一年的更新（就像可能将变成的那样）。
 
-The takeaway is that the version labels stop being as important, and JavaScript starts to be seen more as an evergreen, living standard. The best way to cope with this is to stop thinking about your code base as being "ES6-based," for instance, and instead consider it feature by feature for support.
+简而言之，版本号不再那么重要了，JavaScript开始变得更像一个常青的，活的标准。应对它的最佳方法是，举例来说，不再将你的代码库认为是“基于ES6”的，而是考虑它支持的一个个特性。
 
 ## Transpiling
 
-Made even worse by the rapid evolution of features, a problem arises for JS developers who at once may both strongly desire to use new features while at the same time being slapped with the reality that their sites/apps may need to support older browsers without such support.
+由于特性的快速进化，给开发者们造成了一个糟糕的问题，他们强烈地渴望立即使用新特性，而同时被被现实打脸 —— 他们的网站/app需要支持那些不支持这些特性的老版本浏览器。
 
-The way ES5 appears to have played out in the broader industry, the typical mindset was that code bases waited to adopt ES5 until most if not all pre-ES5 environments had fallen out of their support spectrum. As a result, many are just recently (at the time of this writing) starting to adopt things like `strict` mode, which landed in ES5 over five years ago.
+在整个行业中ES5的方式似乎已经无力回天了，它典型的思维模式是，代码库等待几乎所有的前ES5环境从它们的支持谱系中除名之后才开始采用ES5。结果呢，许多人最近（在本书写作时）才开始采用`strict`模式这样的东西，而它在五年前就在ES5中定稿了。
 
-It's widely considered to be a harmful approach for the future of the JS ecosystem to wait around and trail the specification by so many years. All those responsible for evolving the language desire for developers to begin basing their code on the new features and patterns as soon as they stabilize in specification form and browsers have a chance to implement them.
+对于JS生态系统的未来来说，等待和落后与语言规范那么多年被广泛地认为是一种有害的方式。
 
-So how do we resolve this seeming contradiction? The answer is tooling, specifically a technique called *transpiling* (transformation + compiling). Roughly, the idea is to use a special tool to transform your ES6 code into equivalent (or close!) matches that work in ES5 environments.
+那么我们如何解决这个看起来似乎矛盾的问题？答案是工具，特别是一种称为 *转译* 的技术（转换+编译）。大致上，它的想法是使用一种特殊的工具将你的ES6代码转换为可以在ES5环境中工作的等价物（或近似物！）。
 
-For example, consider shorthand property definitions (see "Object Literal Extensions" in Chapter 2). Here's the ES6 form:
+例如，考虑属性定义缩写（见第二章的“对象字面扩展”）。这是ES6的形式：
 
 ```js
 var foo = [1,2,3];
@@ -59,7 +59,7 @@ var obj = {
 obj.foo;	// [1,2,3]
 ```
 
-But (roughly) here's how that transpiles:
+这（大致）是它如何被转译：
 
 ```js
 var foo = [1,2,3];
@@ -71,15 +71,15 @@ var obj = {
 obj.foo;	// [1,2,3]
 ```
 
-This is a minor but pleasant transformation that lets us shorten the `foo: foo` in an object literal declaration to just `foo`, if the names are the same.
+这是一个微小但令人高兴的转换，它让我们在一个对象字面声明中将一个`foo: foo`缩写为`foo`，如果名称相同的话。
 
-Transpilers perform these transformations for you, usually in a build workflow step similar to how you perform linting, minification, and other similar operations.
+转译其为你实施这些变形，通常和你进行linting，压缩，和其他类似操作的构建工作流步骤中。
 
 ### Shims/Polyfills
 
-Not all new ES6 features need a transpiler. Polyfills (aka shims) are a pattern for defining equivalent behavior from a newer environment into an older environment, when possible. Syntax cannot be polyfilled, but APIs often can be.
+不是所有的ES6新特性都需要转译器。填补（也叫shims）是一种模式，在可能的情况下，它为一个新环境的行为定义一个可以在旧环境中运行的等价性为。语法是不能填补的，但是API经常是可以的。
 
-For example, `Object.is(..)` is a new utility for checking strict equality of two values but without the nuanced exceptions that `===` has for `NaN` and `-0` values. The polyfill for `Object.is(..)` is pretty easy:
+例如，`Object.is(..)`是一个用来检查两个值严格等价性的新工具，它不带有`===`对于`NaN`和`-0`值的那种微妙的例外。`Object.is(..)`的填补相当简单：
 
 ```js
 if (!Object.is) {
@@ -98,22 +98,22 @@ if (!Object.is) {
 }
 ```
 
-**Tip:** Pay attention to the outer `if` statement guard wrapped around the polyfill. This is an important detail, which means the snippet only defines its fallback behavior for older environments where the API in question isn't already defined; it would be very rare that you'd want to overwrite an existing API.
+**提示**：注意外部的`if`语句守护性地包围着填补的内容。这是一个重要的细节，它意味着这个代码段仅仅是为这个API还未定义的老环境而定义的后备行为；你想要覆盖既存的API是非常少见的。
 
-There's a great collection of ES6 shims called "ES6 Shim" (https://github.com/paulmillr/es6-shim/) that you should definitely adopt as a standard part of any new JS project!
+有一个被称为“ES6 Shim”（https://github.com/paulmillr/es6-shim/）的了不起的ES6 shim集合，你绝对应该将它采纳为任何新JS项目的标准组成部分。
 
-It is assumed that JS will continue to evolve constantly, with browsers rolling out support for features continually rather than in large chunks. So the best strategy for keeping updated as it evolves is to just introduce polyfill shims into your code base, and a transpiler step into your build workflow, right now and get used to that new reality.
+看起来JS将会继续一往无前的进化下去，同时浏览器也会持续地小步迭代以支持新特性，而不是大块大块地更新。所以跟上时代的最佳策略就是在你的代码库中引入shim填补，并在你的构建流程中引入一个转译器，现在就开始习惯新的事实。
 
-If you decide to keep the status quo and just wait around for all browsers without a feature supported to go away before you start using the feature, you're always going to be way behind. You'll sadly be missing out on all the innovations designed to make writing JavaScript more effective, efficient, and robust.
+如果你决定维持现状，等待不支持新特性的所有浏览器都消失才开始使用新特性，那么你将总是落后于时代。你将悲伤地错过所有新发明的设计 —— 它们使编写JavaScript更有效，更高效，而且更健壮。
 
 ## Review
 
-ES6 (some may try to call it ES2015) is just landing as of the time of this writing, and it has lots of new stuff you need to learn!
+ES6（有些人可能会称它为ES2015）在本书写作时刚刚定稿，它包含许多你需要学习的新东西！
 
-But it's even more important to shift your mindset to align with the new way that JavaScript is going to evolve. It's not just waiting around for years for some official document to get a vote of approval, as many have done in the past.
+但更重要的是，它将你的思维模式与JavaScript新的进化方式相接轨。不是仅仅为了等待某些官方文档投票通过而耗上许多年，就像以前许多人做的那样。
 
-Now, JavaScript features land in browsers as they become ready, and it's up to you whether you'll get on the train early or whether you'll be playing costly catch-up games years from now.
+现在，JavaScript特性一准备好就会在浏览器中实现，由你来决定是否现在就搭上早班车，还是去玩儿代价不菲的追车游戏。
 
-Whatever labels that future JavaScript adopts, it's going to move a lot quicker than it ever has before. Transpilers and shims/polyfills are important tools to keep you on the forefront of where the language is headed.
+不管未来的JavaScript采用什么样的标签，它都将会以比以前快得多的速度前进。为了使你位于在这门语言前进方向上的最前列，转译和shim/填补是不可或缺的工具。
 
-If there's any narrative important to understand about the new reality for JavaScript, it's that all JS developers are strongly implored to move from the trailing edge of the curve to the leading edge. And learning ES6 is where that all starts!
+如果说对于JavaScript的新现实有什么重要的事实需要理解，那就是所有的JS开发者都被强烈地恳求从落后的一端移动到领先的一段。而学些ES6就是这一切的开端！

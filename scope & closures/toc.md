@@ -1,33 +1,33 @@
-# You Don't Know JS: Scope & Closures
+# 你不懂JS：作用域与闭包
 
-## Table of Contents
+## 目录
 
-* Foreword
-* Preface
-* Chapter 1: What is Scope?
-	* Compiler Theory
-	* Understanding Scope
-	* Nested Scope
-	* Errors
-* Chapter 2: Lexical Scope
-	* Lex-time
-	* Cheating Lexical
-* Chapter 3: Function vs. Block Scope
-	* Scope From Functions
-	* Hiding In Plain Scope
-	* Functions As Scopes
-	* Blocks As Scopes
-* Chapter 4: Hoisting
-	* Chicken Or The Egg?
-	* The Compiler Strikes Again
-	* Functions First
-* Chapter 5: Scope Closures
-	* Enlightenment
-	* Nitty Gritty
-	* Now I Can See
-	* Loops + Closure
-	* Modules
-* Appendix A: Dynamic Scope
-* Appendix B: Polyfilling Block Scope
-* Appendix C: Lexical-this
-* Appendix D: Acknowledgments
+* 序
+* 前言
+* 第一章：什么是作用域？
+	* 编译器理论
+	* 理解作用域
+	* 嵌套的作用域
+	* 错误
+* 第二章：词法作用域
+	* 词法分析时
+	* 欺骗词法作用域
+* 第三章：函数与块儿作用域
+	* 函数中的作用域
+	* 隐藏于普通作用域
+	* 函数作为作用域
+	* 块儿作为作用域
+* 第四章：提升
+	* 先有鸡还是先有蛋？
+	* 编译器再次袭来
+	* 函数优先
+* 第五章：作用域闭包
+	* 启示
+	* 事实真相
+	* 现在我能看到了
+	* 循环 + 闭包
+	* 模块
+* 附录A：动态作用域
+* 附录B：填补块儿作用域
+* 附录C：词法this
+* 附录D：鸣谢
