@@ -579,7 +579,7 @@ function foo(p1,p2) {
 	this.val = p1 + p2;
 }
 
-// 在这里使用`null`是因为在这种场景下我们不关心`this`的hard-binding
+// 在这里使用`null`是因为在这种场景下我们不关心`this`的硬绑定
 // 而且反正它将会被`new`调用覆盖掉！
 var bar = foo.bind( null, "p1" );
 
