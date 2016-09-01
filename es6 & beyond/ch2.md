@@ -139,11 +139,9 @@ if (a > 1) {
 
 #### `let` + `for`
 
-The only exception I'd make to the preference for the *explicit* form of `let` declaration blocking is a `let` that appears in the header of a `for` loop. The reason may seem nuanced, but I believe it to be one of the more important ES6 features.
+我偏好 *明确* 形式的`let`声明块儿，但对此的唯一例外是出现在`for`循环头部的`let`。这里的原因看起来很微妙，但我相信它是更重要的ES6特性中的一个。
 
-我对于偏好 *明确* 形式的`let`声明的唯一例外是，
-
-Consider:
+考虑如下代码：
 
 ```js
 var funcs = [];
@@ -157,11 +155,11 @@ for (let i = 0; i < 5; i++) {
 funcs[3]();		// 3
 ```
 
-The `let i` in the `for` header declares an `i` not just for the `for` loop itself, but it redeclares a new `i` for each iteration of the loop. That means that closures created inside the loop iteration close over those per-iteration variables the way you'd expect.
+在`for`头部中的`let i`不仅是为`for`循环本身声明了一个`i`，而且它为循环的每一次迭代都声明了一个新的`i`。这意味着在循环迭代内部创建的闭包都分别闭合着那些在每次迭代中创建的变量，正如你期望的那样。
 
-If you tried that same snippet but with `var i` in the `for` loop header, you'd get `5` instead of `3`, because there'd only be one `i` in the outer scope that was closed over, instead of a new `i` for each iteration's function to close over.
+如果你尝试在这段相同代码的`for`循环头部使用`var i`，那么你会得到`5`而不是`3`，因为在被闭合的外部作用域中只有一个`i`，而不是为每次迭代的函数都有一个`i`被闭合。
 
-You could also have accomplished the same thing slightly more verbosely:
+你也可以稍稍繁冗地实现相同的东西：
 
 ```js
 var funcs = [];
@@ -176,15 +174,15 @@ for (var i = 0; i < 5; i++) {
 funcs[3]();		// 3
 ```
 
-Here, we forcibly create a new `j` for each iteration, and then the closure works the same way. I prefer the former approach; that extra special capability is why I endorse the `for (let .. ) ..` form. It could be argued it's somewhat more *implicit*, but it's *explicit* enough, and useful enough, for my tastes.
+在这里，我们强制地为每次迭代都创建一个新的`j`，然后闭包以相同的方式工作。我喜欢前一种形式；那种额外的特殊能力正是我支持`for(let .. ) ..`形式的原因。可能有人会争论说它有点儿 *隐晦*，但是对我的口味来说，它足够 *明确* 了，也足够有用。
 
-`let` also works the same way with `for..in` and `for..of` loops (see "`for..of` Loops").
+`let`在`for..in`和`for..of`（参见“`for..of`循环”）循环中也以形同的方式工作。
 
 ### `const` Declarations
 
-There's one other form of block-scoped declaration to consider: the `const`, which creates *constants*.
+还有另一种需要考虑的块儿作用域声明：`const`，它创建 *常量*。
 
-What exactly is a constant? It's a variable that's read-only after its initial value is set. Consider:
+到底什么是一个常量？它是一个在初始值被设定后就成为只读的变量。考虑如下代码：
 
 ```js
 {
@@ -195,9 +193,9 @@ What exactly is a constant? It's a variable that's read-only after its initial v
 }
 ```
 
-You are not allowed to change the value the variable holds once it's been set, at declaration time. A `const` declaration must have an explicit initialization. If you wanted a *constant* with the `undefined` value, you'd have to declare `const a = undefined` to get it.
+变量持有的值一旦在声明时被设定就不允许改变了。一个`const`声明必须拥有一个明确的初始化。如果想要一个持有`undefined`值的 *常量*，你必须声明`const a = undefined`来得到它。
 
-Constants are not a restriction on the value itself, but on the variable's assignment of that value. In other words, the value is not frozen or immutable because of `const`, just the assignment of it. If the value is complex, such as an object or array, the contents of the value can still be modified:
+常量不是一个作用于值本身的制约，而是作用变量对这个值的赋值。换句话说，值不会因为`const`而冻结或不可变，只是它的赋值被冻结了。如果这个值是一个复杂值，比如对象或数组，那么这个值的内容仍然是可以被修改的：
 
 ```js
 {
@@ -209,31 +207,29 @@ Constants are not a restriction on the value itself, but on the variable's assig
 }
 ```
 
-The `a` variable doesn't actually hold a constant array; rather, it holds a constant reference to the array. The array itself is freely mutable.
+变量`a`实际上没有持有一个恒定的数组；而是持有一个指向数组的恒定的引用。数组本身可以自由变化。
 
-**Warning:** Assigning an object or array as a constant means that value will not be able to be garbage collected until that constant's lexical scope goes away, as the reference to the value can never be unset. That may be desirable, but be careful if it's not your intent!
+**警告：** 将一个对象或数组作为常量赋值意味着这个值在常量的词法作用域消失以前是不能够被垃圾回收的，因为指向这个值的引用是永远不能解除的。这可能是你期望的，但如果不是你就要小心！
 
-Essentially, `const` declarations enforce what we've stylistically signaled with our code for years, where we declared a variable name of all uppercase letters and assigned it some literal value that we took care never to change. There's no enforcement on a `var` assignment, but there is now with a `const` assignment, which can help you catch unintended changes.
+实质上，`const`声明强制实行了我们许多年来在代码中用文体来表明的东西：我们声明一个名称全由大写字母组成的变量并赋予它某些字面值，我们小心照看它们以使它们永不改变。`var`赋值没有强制性，但是现在`const`赋值上有了，它可以帮你发现不经意的改变。
 
-`const` *can* be used with variable declarations of `for`, `for..in`, and `for..of` loops (see "`for..of` Loops"). However, an error will be thrown if there's any attempt to reassign, such as the typical `i++` clause of a `for` loop.
+`const`*可以* 被用于`for`，`for..in`，和`for..of`循环（参见“`for..of`循环”）的变量声明。然而，如果有任何重新赋值的企图，一个错误就会被抛出，例如在`for`循环中常见的`i++`子句。
 
 #### `const` Or Not
 
-There's some rumored assumptions that a `const` could be more optimizable by the JS engine in certain scenarios than a `let` or `var` would be. Theoretically, the engine more easily knows the variable's value/type will never change, so it can eliminate some possible tracking.
+有些流传的猜测认为在特定的场景下，与`let`或`var`相比一个`const`可能会被JS引擎进行更多的优化。理论上，引擎可以更容易地知道变量的值/类型将永远不会改变，所以它可以免除一些可能的追踪工作。
 
-Whether `const` really helps here or this is just our own fantasies and intuitions, the much more important decision to make is if you intend constant behavior or not. Remember: one of the most important roles for source code is to communicate clearly, not only to you, but your future self and other code collaborators, what your intent is.
+无论`const`在这方面是否真的有帮助，还是这仅仅是我们的幻想和直觉，你要做的更重要的决定是你是否打算使用常量的行为。记住：源代码扮演的一个最重要的角色是为了明确地交流你的意图是什么，不仅是与你自己，而且还是与未来的你和其他代码的协作者。
 
-Some developers prefer to start out every variable declaration as a `const` and then relax a declaration back to a `let` if it becomes necessary for its value to change in the code. This is an interesting perspective, but it's not clear that it genuinely improves the readability or reason-ability of code.
+一些开发者喜欢在一开始将每个变量都声明为一个`const`然后当它的值在代码中有必要发生变化的时候将声明放松至一个`let`。这是一个有趣的角度，但是不清楚这是否真正能偶改善代码的可读性或可推理性。
 
-It's not really a *protection*, as many believe, because any later developer who wants to change a value of a `const` can just blindly change `const` to `let` on the declaration. At best, it protects accidental change. But again, other than our intuitions and sensibilities, there doesn't appear to be objective and clear measure of what constitutes "accidents" or prevention thereof. Similar mindsets exist around type enforcement.
+就像许多人认为的那样，它不是一种真正的 *保护*，因为任何后来的想要改变一个`const`值的开发者都可以盲目地将声明从`const`改为`let`。它至多是防止意外的改变。但是同样地，除了我们的直觉和感觉以外，似乎没有客观和明确的标准可以衡量什么构成了“意外”或预防措施。这与类型强制上的思维模式类似。
 
-My advice: to avoid potentially confusing code, only use `const` for variables that you're intentionally and obviously signaling will not change. In other words, don't *rely on* `const` for code behavior, but instead use it as a tool for signaling intent, when intent can be signaled clearly.
+我的建议：为了避免潜在的令人糊涂的代码，仅将`const`用于那些你有意地并且明显标识为不会改变的变量。换言之，不要为了代码行为而 *依靠* `const`，而是在意图可以被清楚地表明是，将它作为一个表明意图的工具。
 
 ### Block-scoped Functions
 
-Starting with ES6, function declarations that occur inside of blocks are now specified to be scoped to that block. Prior to ES6, the specification did not call for this, but many implementations did it anyway. So now the specification meets reality.
-
-Consider:
+从ES6开始，发生在块儿内部的函数声明现在被明确规定属于那个块儿的作用域。在ES6之前，语言规范没有要求这一点，但是许多实现不管怎样都是这么做的。所以现在语言规范和现实吻合了。
 
 ```js
 {
@@ -247,9 +243,9 @@ Consider:
 foo();						// ReferenceError
 ```
 
-The `foo()` function is declared inside the `{ .. }` block, and as of ES6 is block-scoped there. So it's not available outside that block. But also note that it is "hoisted" within the block, as opposed to `let` declarations, which suffer the TDZ error trap mentioned earlier.
+函数`foo()`在`{ .. }`块儿内部被声明的，由于ES6的原因它是属于那里的块儿作用域的。所以在那个块儿的外部是不可用的。但是还要注意它在块儿里面被提升了，这与早先提到的遭受TDZ错误陷阱的`let`声明是相反的。
 
-Block-scoping of function declarations could be a problem if you've ever written code like this before, and relied on the old legacy non-block-scoped behavior:
+如果你以前曾经写过这样的代码，并依赖于老旧的非块儿作用域行为的话，那么函数声明的块儿作用域可能是一个问题：
 
 ```js
 if (something) {
@@ -266,9 +262,9 @@ else {
 foo();		// ??
 ```
 
-In pre-ES6 environments, `foo()` would print `"2"` regardless of the value of `something`, because both function declarations were hoisted out of the blocks, and the second one always wins.
+在前ES6环境下，无论`something`的值是什么`foo()`都将会打印`"2"`，因为两个函数声明被提升到了块儿的顶端，而且总是第二个有效。
 
-In ES6, that last line throws a `ReferenceError`.
+在ES6中，最后一行将抛出一个`ReferenceError`。
 
 ## Spread/Rest
 
