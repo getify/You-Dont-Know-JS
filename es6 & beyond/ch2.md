@@ -270,6 +270,8 @@ foo();		// ??
 
 ES6 introduces a new `...` operator that's typically referred to as the *spread* or *rest* operator, depending on where/how it's used. Let's take a look:
 
+ES6引入了一个新的`...`操作符，根据你在何处以及如何使用它，它一般被称作 *扩散（spread）* 或 *剩余（rest）* 操作符。让我们看一看：
+
 ```js
 function foo(x,y,z) {
 	console.log( x, y, z );
@@ -280,7 +282,11 @@ foo( ...[1,2,3] );				// 1 2 3
 
 When `...` is used in front of an array (actually, any *iterable*, which we cover in Chapter 3), it acts to "spread" it out into its individual values.
 
+当`...`在一个数组（实际上，是我们将在第三章中讲解的任何的 *可迭代* 对象）前面被使用时，它就将数组“扩散”为它的个别的值。
+
 You'll typically see that usage as is shown in that previous snippet, when spreading out an array as a set of arguments to a function call. In this usage, `...` acts to give us a simpler syntactic replacement for the `apply(..)` method, which we would typically have used pre-ES6 as:
+
+通常你将会在前面所展示的那样的代码段中看到这种用法，也就是将一个数组扩散为函数调用的一组参数。
 
 ```js
 foo.apply( null, [1,2,3] );		// 1 2 3
