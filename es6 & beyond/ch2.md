@@ -268,8 +268,6 @@ foo();		// ??
 
 ## Spread/Rest
 
-ES6 introduces a new `...` operator that's typically referred to as the *spread* or *rest* operator, depending on where/how it's used. Let's take a look:
-
 ES6引入了一个新的`...`操作符，根据你在何处以及如何使用它，它一般被称作 *扩散（spread）* 或 *剩余（rest）* 操作符。让我们看一看：
 
 ```js
@@ -280,11 +278,7 @@ function foo(x,y,z) {
 foo( ...[1,2,3] );				// 1 2 3
 ```
 
-When `...` is used in front of an array (actually, any *iterable*, which we cover in Chapter 3), it acts to "spread" it out into its individual values.
-
 当`...`在一个数组（实际上，是我们将在第三章中讲解的任何的 *可迭代* 对象）前面被使用时，它就将数组“扩散”为它的个别的值。
-
-You'll typically see that usage as is shown in that previous snippet, when spreading out an array as a set of arguments to a function call. In this usage, `...` acts to give us a simpler syntactic replacement for the `apply(..)` method, which we would typically have used pre-ES6 as:
 
 通常你将会在前面所展示的那样的代码段中看到这种用法，也就是将一个数组扩散为函数调用的一组参数。
 
@@ -292,7 +286,7 @@ You'll typically see that usage as is shown in that previous snippet, when sprea
 foo.apply( null, [1,2,3] );		// 1 2 3
 ```
 
-But `...` can be used to spread out/expand a value in other contexts as well, such as inside another array declaration:
+但`...`也可以在其他上下文环境中被用于扩散/展开一个值，比如在另一个数组声明内部：
 
 ```js
 var a = [2,3,4];
@@ -301,9 +295,9 @@ var b = [ 1, ...a, 5 ];
 console.log( b );					// [1,2,3,4,5]
 ```
 
-In this usage, `...` is basically replacing `concat(..)`, as it behaves like `[1].concat( a, [5] )` here.
+在这种用法中，`...`取代了`concat(..)`，它在这里的行为就像`[1].concat( a, [5] )`。
 
-The other common usage of `...` can be seen as essentially the opposite; instead of spreading a value out, the `...` *gathers* a set of values together into an array. Consider:
+另一种`...`的用法常见于一种实质上相反的操作；与将值散开不同，`...`将一组值 *收集* 到一个数组中。
 
 ```js
 function foo(x, y, ...z) {
@@ -313,9 +307,9 @@ function foo(x, y, ...z) {
 foo( 1, 2, 3, 4, 5 );			// 1 2 [3,4,5]
 ```
 
-The `...z` in this snippet is essentially saying: "gather the *rest* of the arguments (if any) into an array called `z`." Because `x` was assigned `1`, and `y` was assigned `2`, the rest of the arguments `3`, `4`, and `5` were gathered into `z`.
+这个代码段中的`...z`实质上是在说：“将 *剩余的* 参数值（如果有的话）收集到一个称为`z`的数组中。” 因为`x`被赋值为`1`，而`y`被赋值为`2`，所以剩余的参数值`3`，`4`，和`5`被收集进了`z`。
 
-Of course, if you don't have any named parameters, the `...` gathers all arguments:
+当然，如果你没有任何命名参数，`...`会收集所有的参数值：
 
 ```js
 function foo(...args) {
@@ -325,11 +319,11 @@ function foo(...args) {
 foo( 1, 2, 3, 4, 5);			// [1,2,3,4,5]
 ```
 
-**Note:** The `...args` in the `foo(..)` function declaration is usually called "rest parameters," because you're collecting the rest of the parameters. I prefer "gather," because it's more descriptive of what it does rather than what it contains.
+**注意：** 在`foo(..)`函数声明中的`...args`经常因为你向其中收集参数的剩余部分而被称为“剩余参数”。我喜欢使用“收集”这个词，因为它描述了它做什么而不是它包含什么。
 
-The best part about this usage is that it provides a very solid alternative to using the long-since-deprecated `arguments` array -- actually, it's not really an array, but an array-like object. Because `args` (or whatever you call it -- a lot of people prefer `r` or `rest`) is a real array, we can get rid of lots of silly pre-ES6 tricks we jumped through to make `arguments` into something we can treat as an array.
+这种用法最棒的地方是，它为被废弃了很久的`arguments`数组 —— 实际上它不是一个真正的数组，而是一个类数组对象 —— 提供了一种非常稳固的替代方案。因为`args`（无论你叫它什么 —— 许多人喜欢叫它`r`或者`rest`）是一个真正的数组，我们可以摆脱许多愚蠢的前ES6技巧，我们曾经通过这些技巧尽全力去使`arguments`变成我们可以视之为数组的东西。
 
-Consider:
+考虑如下代码：
 
 ```js
 // doing things the new ES6 way
@@ -365,13 +359,13 @@ function bar() {
 bar( 0, 1, 2, 3 );					// 2 4
 ```
 
-The `...args` in the `foo(..)` function declaration gathers arguments, and the `...args` in the `console.log(..)` call spreads them out. That's a good illustration of the symmetric but opposite uses of the `...` operator.
+在函数`foo(..)`声明中的`...args`收集参数值，而在`console.log(..)`调用中的`...args`将它们扩散开。这个例子很好地展示了`...`操作符平行但相反的用途。
 
-Besides the `...` usage in a function declaration, there's another case where `...` is used for gathering values, and we'll look at it in the "Too Many, Too Few, Just Enough" section later in this chapter.
+除了在函数声明中`...`的用法以外，还有另一种`...`被用于收集值的情况，我们将在本章稍后的“太多，太少，正合适”一节中检视它。
 
 ## Default Parameter Values
 
-Perhaps one of the most common idioms in JavaScript relates to setting a default value for a function parameter. The way we've done this for years should look quite familiar:
+也许在JavaScript中最常见的惯用法之一就是为函数参数设置默认值。我们多年来一直使用的方法应当看起来很熟悉：
 
 ```js
 function foo(x,y) {
@@ -387,15 +381,15 @@ foo( 5 );			// 36
 foo( null, 6 );		// 17
 ```
 
-Of course, if you've used this pattern before, you know that it's both helpful and a little bit dangerous, if for example you need to be able to pass in what would otherwise be considered a falsy value for one of the parameters. Consider:
+当然，如果你曾经用过这种模式，你就会知道它既有用又有点儿危险，例如如果你需要能够为其中一个参数传入一个可能被认为是falsy的值。考虑下面的代码：
 
 ```js
 foo( 0, 42 );		// 53 <-- Oops, not 42
 ```
 
-Why? Because the `0` is falsy, and so the `x || 11` results in `11`, not the directly passed in `0`.
+为什么？因为`0`是falsy，因此`x || 11`的结果为`11`，而不是直接被传入的`0`。
 
-To fix this gotcha, some people will instead write the check more verbosely like this:
+为了填这个坑，一些人会像这样更加啰嗦地编写检查：
 
 ```js
 function foo(x,y) {
@@ -409,9 +403,9 @@ foo( 0, 42 );			// 42
 foo( undefined, 6 );	// 17
 ```
 
-Of course, that means that any value except `undefined` can be directly passed in. However, `undefined` will be assumed to signal, "I didn't pass this in." That works great unless you actually need to be able to pass `undefined` in.
+当然，这意味着除了`undefined`以外的任何值都可以直接传入。然而，`undefined`将被假定是这样一种信号，“我没有传入这个值。” 除非你实际需要能够传入`undefined`，它就工作的很好。
 
-In that case, you could test to see if the argument is actually omitted, by it actually not being present in the `arguments` array, perhaps like this:
+在那样的情况下，你可以通过测试参数值是否没有出现在`arguments`数组中，来看它是否实际上被省略了，也许是像这样：
 
 ```js
 function foo(x,y) {
@@ -425,17 +419,17 @@ foo( 5 );				// 36
 foo( 5, undefined );	// NaN
 ```
 
-But how would you omit the first `x` argument without the ability to pass in any kind of value (not even `undefined`) that signals "I'm omitting this argument"?
+但是在没有能力传入意味着“我省略了这个参数值”的任何种类的值的情况下，你如何才能省略第一个参数值`x`呢？
 
-`foo(,5)` is tempting, but it's invalid syntax. `foo.apply(null,[,5])` seems like it should do the trick, but `apply(..)`'s quirks here mean that the arguments are treated as `[undefined,5]`, which of course doesn't omit.
+`foo(,5)`很诱人，但它不是合法的语法。`foo.apply(null,[,5])`看起来应该可以实现这个技巧，但是`apply(..)`的奇怪之处意味着这组参数值将被视为`[undefined,5]`，显然它没有被省略。
 
-If you investigate further, you'll find you can only omit arguments on the end (i.e., righthand side) by simply passing fewer arguments than "expected," but you cannot omit arguments in the middle or at the beginning of the arguments list. It's just not possible.
+如果你深入调查下去，你将发现你只能通过简单地传入比“期望的”参数值个数少的参数值来省略末尾的参数值，但是你不能省略在参数值列表中间或者开头的参数值。这就是不可能的。
 
-There's a principle applied to JavaScript's design here that is important to remember: `undefined` means *missing*. That is, there's no difference between `undefined` and *missing*, at least as far as function arguments go.
+这里有一个施用于JavaScript设计的重要原则需要被记住：`undefined`意味着 *丢失*。也就是，在`undefined`和 *丢失* 之间没有区别，至少是就函数参数值而言。
 
-**Note:** There are, confusingly, other places in JS where this particular design principle doesn't apply, such as for arrays with empty slots. See the *Types & Grammar* title of this series for more information.
+**注意：** 容易令人糊涂的是，JS中有其他的地方不适用这种特殊的设计原则，比如带有空值槽的数组。更多信息参见本系列的 *类型与文法*。
 
-With all this in mind, we can now examine a nice helpful syntax added as of ES6 to streamline the assignment of default values to missing arguments:
+带着所有这些意识，现在我们可以检视在ES6中新增的一种有用的好语法，来简化对丢失的参数值进行默认值的赋值。
 
 ```js
 function foo(x = 11, y = 31) {
@@ -454,15 +448,15 @@ foo( undefined, 6 );	// 17 <-- `undefined` is missing
 foo( null, 6 );			// 6  <-- null coerces to `0`
 ```
 
-Notice the results and how they imply both subtle differences and similarities to the earlier approaches.
+注意这些结果，和它们如何暗示了与前面的方式的微妙区别和相似之处。
 
-`x = 11` in a function declaration is more like `x !== undefined ? x : 11` than the much more common idiom `x || 11`, so you'll need to be careful in converting your pre-ES6 code to this ES6 default parameter value syntax.
+与常见得多的`x || 11`惯用法相比，在一个函数声明中的`x = 11`更像`x !== undefined ? x : 11`，所以在将你的前ES6代码转换为这种ES6默认参数值语法时要多加小心。
 
-**Note:** A rest/gather parameter (see "Spread/Rest") cannot have a default value. So, while `function foo(...vals=[1,2,3]) {` might seem an intriguing capability, it's not valid syntax. You'll need to continue to apply that sort of logic manually if necessary.
+**注意：** 一个剩余/收集参数（参见“扩散/剩余”）不能拥有默认值。所以，虽然`function foo(...vals=[1,2,3]) {`看起来是一种迷人的能力，但它不是合法的语法。有必要的话你需要继续手动实施那种逻辑。
 
 ### Default Value Expressions
 
-Function default values can be more than just simple values like `31`; they can be any valid expression, even a function call:
+函数默认值可以比像`31`这样的简单值复杂得多；它们可以是任何合法的表达式，甚至是函数调用：
 
 ```js
 function bar(val) {
@@ -483,11 +477,11 @@ y = 6;
 foo( undefined, 10 );				// 9 10
 ```
 
-As you can see, the default value expressions are lazily evaluated, meaning they're only run if and when they're needed -- that is, when a parameter's argument is omitted or is `undefined`.
+如你所见，默认值表达式是被懒惰地求值的，这意味着他们仅在被需要时运行 —— 也就是，当一个参数的参数值被省略或者为`undefined`。
 
-It's a subtle detail, but the formal parameters in a function declaration are in their own scope (think of it as a scope bubble wrapped around just the `( .. )` of the function declaration), not in the function body's scope. That means a reference to an identifier in a default value expression first matches the formal parameters' scope before looking to an outer scope. See the *Scope & Closures* title of this series for more information.
+这是一个微妙的细节，但是在一个函数声明中的正式参数是在它们自己的作用域中的（将它想象为一个仅仅围绕在函数声明的`(..)`外面的一个作用域气泡），不是在函数体的作用域中。这意味着在一个默认值表达式中的标识符引用会在首先在正式参数的作用域中查找标识符，然后再查找一个外部作用域。更多信息参见本系列的 *作用域与闭包*。
 
-Consider:
+考虑如下代码：
 
 ```js
 var w = 1, z = 2;
@@ -499,13 +493,13 @@ function foo( x = w + 1, y = x + 1, z = z + 1 ) {
 foo();					// ReferenceError
 ```
 
-The `w` in the `w + 1` default value expression looks for `w` in the formal parameters' scope, but does not find it, so the outer scope's `w` is used. Next, The `x` in the `x + 1` default value expression finds `x` in the formal parameters' scope, and luckily `x` has already been initialized, so the assignment to `y` works fine.
+在默认值表达式`w + 1`中的`w`在正式参数作用域中查找`w`，但没有找到，所以外部作用域的`w`被使用了。接下来，在默认值表达式`x + 1`中的`x`在正式参数的作用域中找到了`x`，而且走运的是`x`已经被初始化了，所以对`y`的赋值工作的很好。
 
-However, the `z` in `z + 1` finds `z` as a not-yet-initialized-at-that-moment parameter variable, so it never tries to find the `z` from the outer scope.
+然而，`z + 1`中的`z`找到了一个在那个时刻还没有被初始化的参数变量`z`，所以它绝不会试着在外部作用域中寻找`z`。
 
-As we mentioned in the "`let` Declarations" section earlier in this chapter, ES6 has a TDZ, which prevents a variable from being accessed in its uninitialized state. As such, the `z + 1` default value expression throws a TDZ `ReferenceError` error.
+正如我们在本章早先的“`let`声明”一节中提到过的那样，ES6拥有一个TDZ，它会防止一个变量在它还没有被初始化的状态下被访问。因此，`z + 1`默认值表达式抛出一个TDZ`ReferenceError`错误。
 
-Though it's not necessarily a good idea for code clarity, a default value expression can even be an inline function expression call -- commonly referred to as an immediately invoked function expression (IIFE):
+虽然对于代码的清晰度来说不见得是一个好主意，一个默认值表达式甚至可以是一个内联的函数表达式调用 —— 通常被称为一个立即被调用的函数表达式（IIFE）：
 
 ```js
 function foo( x =
@@ -517,11 +511,11 @@ function foo( x =
 foo();			// 42
 ```
 
-There will very rarely be any cases where an IIFE (or any other executed inline function expression) will be appropriate for default value expressions. If you find yourself tempted to do this, take a step back and reevaluate!
+一个IIFE（或者任何其他被执行的内联函数表达式）作为默认值表示来说很合适是非常少见的。如果你发现自己试图这么做，那么就退一步再考虑一下！
 
-**Warning:** If the IIFE had tried to access the `x` identifier and had not declared its own `x`, this would also have been a TDZ error, just as discussed before.
+**警告：** 如果一个IIFE试图访问标识符`x`，而且还没有声明自己的`x`，那么这也将是一个TDZ错误，就像我们刚才讨论的一样。
 
-The default value expression in the previous snippet is an IIFE in that in the sense that it's a function that's executed right inline, via `(31)`. If we had left that part off, the default value assigned to `x` would have just been a function reference itself, perhaps like a default callback. There will probably be cases where that pattern will be quite useful, such as:
+前一个代码段的默认值表达式是一个IIFE，这是因为它是通过`(31)`在内联时立即被执行。如果我们去掉这一部分，赋予`x`的默认值将会仅仅是一个函数的引用，也许像一个默认的回调。可能有一些情况这种模式将十分有用，比如：
 
 ```js
 function ajax(url, cb = function(){}) {
@@ -531,13 +525,15 @@ function ajax(url, cb = function(){}) {
 ajax( "http://some.url.1" );
 ```
 
-In this case, we essentially want to default `cb` to be a no-op empty function call if not otherwise specified. The function expression is just a function reference, not a function call itself (no invoking `()` on the end of it), which accomplishes that goal.
+这种情况下，我们实质上想在没有其他值被指定时，让默认的`cb`是一个没有操作的空函数。这个函数表达式只是一个函数引用，不是一个调用它自己（在它末尾没有调用的`()`）以达成自己目的的函数。
 
-Since the early days of JS, there's been a little-known but useful quirk available to us: `Function.prototype` is itself an empty no-op function. So, the declaration could have been `cb = Function.prototype` and saved the inline function expression creation.
+从JS的早些年开始，就有一个少为人知但是十分有用的奇怪之处可供我们使用：`Function.prototype`本身就是一个没有操作的空函数。这样，这个声明可以是`cb = Function.prototype`而省去内联函数表达式的创建。
 
 ## Destructuring
 
 ES6 introduces a new syntactic feature called *destructuring*, which may be a little less confusing if you instead think of it as *structured assignment*. To understand this meaning, consider:
+
+ES6引入了一个称为 *解构* 的新语法特性，如果你将它考虑为 *结构化赋值* 那么它令人困惑的程度可能会小一些。为了理解它的含义，考虑如下代码：
 
 ```js
 function foo() {
@@ -552,7 +548,11 @@ console.log( a, b, c );				// 1 2 3
 
 As you can see, we created a manual assignment of the values in the array that `foo()` returns to individual variables `a`, `b`, and `c`, and to do so we (unfortunately) needed the `tmp` variable.
 
+如你所见，我们创建了一个手动赋值：从`foo()`返回的数组中的值到个别的变量`a`，`b`，和`c`，而且这么做我们就（不幸地）需要`tmp`变量。
+
 Similarly, we can do the following with objects:
+
+相似地，我们也可以用对象这么做：
 
 ```js
 function bar() {
@@ -571,7 +571,11 @@ console.log( x, y, z );				// 4 5 6
 
 The `tmp.x` property value is assigned to the `x` variable, and likewise for `tmp.y` to `y` and `tmp.z` to `z`.
 
+属性值`tmp.x`被赋值给变量`x`，`tmp.y`到`y`和`tmp.z`到`z`也一样。
+
 Manually assigning indexed values from an array or properties from an object can be thought of as *structured assignment*. ES6 adds a dedicated syntax for *destructuring*, specifically *array destructuring* and *object destructuring*. This syntax eliminates the need for the `tmp` variable in the previous snippets, making them much cleaner. Consider:
+
+从一个数组中索引的值，或从一个对象的属性中手动赋值可以被认为是 *结构化赋值*。ES6为 *解构* 增加了一种专门的语法，明确地称为 *数组解构* 和 *对象结构*。这种语法消灭了前一个代码段中对变量`tmp`的需要，使它们更加干净。考虑如下代码：
 
 ```js
 var [ a, b, c ] = foo();
@@ -583,13 +587,21 @@ console.log( x, y, z );				// 4 5 6
 
 You're likely more accustomed to seeing syntax like `[a,b,c]` on the righthand side of an `=` assignment, as the value being assigned.
 
+你很可能更加习惯于看到像`[a,b,c]`这样的东西出现在一个`=`赋值的右手边的语法，即作为被赋予的值。
+
 Destructuring symmetrically flips that pattern, so that `[a,b,c]` on the lefthand side of the `=` assignment is treated as a kind of "pattern" for decomposing the righthand side array value into separate variable assignments.
 
+解构对称地翻转了这个模式，所以在`=`赋值左手边的`[a,b,c]`被看作是为了将右手边的数组拆解为分离的变量赋值的某种“模式”。
+
 Similarly, `{ x: x, y: y, z: z }` specifies a "pattern" to decompose the object value from `bar()` into separate variable assignments.
+
+相似地，`{ x: x, y: y, z: z }`指明了一种“模式”把来自于`bar()`的对象拆解为分离的变量赋值。
 
 ### Object Property Assignment Pattern
 
 Let's dig into that `{ x: x, .. }` syntax from the previous snippet. If the property name being matched is the same as the variable you want to declare, you can actually shorten the syntax:
+
+让我们深入前一个代码段中的`{ x: x, .. }`语法。如果属性名与你想要声明的变量名一致，你实际上可以缩写这个语法：
 
 ```js
 var { x, y, z } = bar();
@@ -599,9 +611,15 @@ console.log( x, y, z );				// 4 5 6
 
 Pretty cool, right?
 
+很酷，对吧？
+
 But is `{ x, .. }` leaving off the `x: ` part or leaving off the `: x` part? We're actually leaving off the `x: ` part when we use the shorter syntax. That may not seem like an important detail, but you'll understand its importance in just a moment.
 
+但`{ x, .. }`是省略了`x: `部分还是省略了` : x`部分？当我们使用这种缩写语法时，我们实际上省略了`x: `部分。这看起来可能不是一个重要的细节，但是一会儿你就会了解它的重要性。
+
 If you can write the shorter form, why would you ever write out the longer form? Because that longer form actually allows you to assign a property to a different variable name, which can sometimes be quite useful:
+
+如果你能写缩写形式，那为什么你还要写出更长的形式呢？因为更长的形式事实上允许你将一个属性赋值给一个不同的变量名称，这有时很有用：
 
 ```js
 var { x: bam, y: baz, z: bap } = bar();
@@ -611,6 +629,8 @@ console.log( x, y, z );				// ReferenceError
 ```
 
 There's a subtle but super-important quirk to understand about this variation of the object destructuring form. To illustrate why it can be a gotcha you need to be careful of, let's consider the "pattern" of how normal object literals are specified:
+
+关于这种对象结构形式有一个微妙但超级重要的怪异之处需要理解。为了展示为什么它可能是一个你需要注意的坑，让我们考虑一下普通对象字面量的“模式”是如何被指定的：
 
 ```js
 var X = 10, Y = 20;
@@ -622,7 +642,11 @@ console.log( o.a, o.b );			// 10 20
 
 In `{ a: X, b: Y }`, we know that `a` is the object property, and `X` is the source value that gets assigned to it. In other words, the syntactic pattern is `target: source`, or more obviously, `property-alias: value`. We intuitively understand this because it's the same as `=` assignment, where the pattern is `target = source`.
 
+在`{ a: X, b: Y }`中，我们知道`a`是对象属性，而`X`是被赋值给它的源值。换句话说，它的语义模式是`目标: 源`，或者更明显地，`属性别名: 值`。我们能直观地明白这一点，因为它和`=`赋值是一样的，而它的模式就是`目标 = 源`。
+
 However, when you use object destructuring assignment -- that is, putting the `{ .. }` object literal-looking syntax on the lefthand side of the `=` operator -- you invert that `target: source` pattern.
+
+
 
 Recall:
 
