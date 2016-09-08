@@ -531,8 +531,6 @@ ajax( "http://some.url.1" );
 
 ## Destructuring
 
-ES6 introduces a new syntactic feature called *destructuring*, which may be a little less confusing if you instead think of it as *structured assignment*. To understand this meaning, consider:
-
 ES6引入了一个称为 *解构* 的新语法特性，如果你将它考虑为 *结构化赋值* 那么它令人困惑的程度可能会小一些。为了理解它的含义，考虑如下代码：
 
 ```js
@@ -546,11 +544,7 @@ var tmp = foo(),
 console.log( a, b, c );				// 1 2 3
 ```
 
-As you can see, we created a manual assignment of the values in the array that `foo()` returns to individual variables `a`, `b`, and `c`, and to do so we (unfortunately) needed the `tmp` variable.
-
 如你所见，我们创建了一个手动赋值：从`foo()`返回的数组中的值到个别的变量`a`，`b`，和`c`，而且这么做我们就（不幸地）需要`tmp`变量。
-
-Similarly, we can do the following with objects:
 
 相似地，我们也可以用对象这么做：
 
@@ -569,11 +563,7 @@ var tmp = bar(),
 console.log( x, y, z );				// 4 5 6
 ```
 
-The `tmp.x` property value is assigned to the `x` variable, and likewise for `tmp.y` to `y` and `tmp.z` to `z`.
-
 属性值`tmp.x`被赋值给变量`x`，`tmp.y`到`y`和`tmp.z`到`z`也一样。
-
-Manually assigning indexed values from an array or properties from an object can be thought of as *structured assignment*. ES6 adds a dedicated syntax for *destructuring*, specifically *array destructuring* and *object destructuring*. This syntax eliminates the need for the `tmp` variable in the previous snippets, making them much cleaner. Consider:
 
 从一个数组中索引的值，或从一个对象的属性中手动赋值可以被认为是 *结构化赋值*。ES6为 *解构* 增加了一种专门的语法，明确地称为 *数组解构* 和 *对象结构*。这种语法消灭了前一个代码段中对变量`tmp`的需要，使它们更加干净。考虑如下代码：
 
@@ -585,21 +575,13 @@ console.log( a, b, c );				// 1 2 3
 console.log( x, y, z );				// 4 5 6
 ```
 
-You're likely more accustomed to seeing syntax like `[a,b,c]` on the righthand side of an `=` assignment, as the value being assigned.
-
 你很可能更加习惯于看到像`[a,b,c]`这样的东西出现在一个`=`赋值的右手边的语法，即作为被赋予的值。
 
-Destructuring symmetrically flips that pattern, so that `[a,b,c]` on the lefthand side of the `=` assignment is treated as a kind of "pattern" for decomposing the righthand side array value into separate variable assignments.
-
 解构对称地翻转了这个模式，所以在`=`赋值左手边的`[a,b,c]`被看作是为了将右手边的数组拆解为分离的变量赋值的某种“模式”。
-
-Similarly, `{ x: x, y: y, z: z }` specifies a "pattern" to decompose the object value from `bar()` into separate variable assignments.
 
 相似地，`{ x: x, y: y, z: z }`指明了一种“模式”把来自于`bar()`的对象拆解为分离的变量赋值。
 
 ### Object Property Assignment Pattern
-
-Let's dig into that `{ x: x, .. }` syntax from the previous snippet. If the property name being matched is the same as the variable you want to declare, you can actually shorten the syntax:
 
 让我们深入前一个代码段中的`{ x: x, .. }`语法。如果属性名与你想要声明的变量名一致，你实际上可以缩写这个语法：
 
@@ -609,15 +591,9 @@ var { x, y, z } = bar();
 console.log( x, y, z );				// 4 5 6
 ```
 
-Pretty cool, right?
-
 很酷，对吧？
 
-But is `{ x, .. }` leaving off the `x: ` part or leaving off the `: x` part? We're actually leaving off the `x: ` part when we use the shorter syntax. That may not seem like an important detail, but you'll understand its importance in just a moment.
-
 但`{ x, .. }`是省略了`x: `部分还是省略了` : x`部分？当我们使用这种缩写语法时，我们实际上省略了`x: `部分。这看起来可能不是一个重要的细节，但是一会儿你就会了解它的重要性。
-
-If you can write the shorter form, why would you ever write out the longer form? Because that longer form actually allows you to assign a property to a different variable name, which can sometimes be quite useful:
 
 如果你能写缩写形式，那为什么你还要写出更长的形式呢？因为更长的形式事实上允许你将一个属性赋值给一个不同的变量名称，这有时很有用：
 
@@ -627,8 +603,6 @@ var { x: bam, y: baz, z: bap } = bar();
 console.log( bam, baz, bap );		// 4 5 6
 console.log( x, y, z );				// ReferenceError
 ```
-
-There's a subtle but super-important quirk to understand about this variation of the object destructuring form. To illustrate why it can be a gotcha you need to be careful of, let's consider the "pattern" of how normal object literals are specified:
 
 关于这种对象结构形式有一个微妙但超级重要的怪异之处需要理解。为了展示为什么它可能是一个你需要注意的坑，让我们考虑一下普通对象字面量的“模式”是如何被指定的：
 
@@ -640,23 +614,19 @@ var o = { a: X, b: Y };
 console.log( o.a, o.b );			// 10 20
 ```
 
-In `{ a: X, b: Y }`, we know that `a` is the object property, and `X` is the source value that gets assigned to it. In other words, the syntactic pattern is `target: source`, or more obviously, `property-alias: value`. We intuitively understand this because it's the same as `=` assignment, where the pattern is `target = source`.
-
 在`{ a: X, b: Y }`中，我们知道`a`是对象属性，而`X`是被赋值给它的源值。换句话说，它的语义模式是`目标: 源`，或者更明显地，`属性别名: 值`。我们能直观地明白这一点，因为它和`=`赋值是一样的，而它的模式就是`目标 = 源`。
 
-However, when you use object destructuring assignment -- that is, putting the `{ .. }` object literal-looking syntax on the lefthand side of the `=` operator -- you invert that `target: source` pattern.
+然而，当你使用对象解构赋值时 —— 也就是，将看起来像是对象字面量的`{ .. }`语法放在`=`操作符的左手边 —— 你反转了这个`目标: 源`的模式。
 
-
-
-Recall:
+回想一下：
 
 ```js
 var { x: bam, y: baz, z: bap } = bar();
 ```
 
-The syntactic pattern here is `source: target` (or `value: variable-alias`). `x: bam` means the `x` property is the source value and `bam` is the target variable to assign to. In other words, object literals are `target <-- source`, and object destructuring assignments are `source --> target`. See how that's flipped?
+这里面对称的模式是`源: 目标`（或者`值: 属性别名`）。`x: bam`意味着属性`x`是源值而`ban`是被赋值的目标变量。换句话说，对象字面量是`target <-- source`，而对象解构赋值是`source --> target`。看到它是如何反转的了吗？
 
-There's another way to think about this syntax though, which may help ease the confusion. Consider:
+有另外一种考虑这种语法的方式，它可能有助于缓和这种困惑。考虑如下代码：
 
 ```js
 var aa = 10, bb = 20;
@@ -667,19 +637,19 @@ var     { x: AA, y: BB } = o;
 console.log( AA, BB );				// 10 20
 ```
 
-In the `{ x: aa, y: bb }` line, the `x` and `y` represent the object properties. In the `{ x: AA, y: BB }` line, the `x` and the `y` *also* represent the object properties.
+在`{ x: aa, y: bb }`这一行中，`x`和`y`代表对象属性。在`{ x: AA, y: BB }`这一行，`x`和`y` *也* 代表对象属性。
 
-Recall how earlier I asserted that `{ x, .. }` was leaving off the `x: ` part? In those two lines, if you erase the `x: ` and `y: ` parts in that snippet, you're left only with `aa, bb` and `AA, BB`, which in effect -- only conceptually, not actually -- are assignments from `aa` to `AA` and from `bb` to `BB`.
+还记得刚才我是如何断言`{ x, .. }`省去了`x: `部分的吗？在这两行中，如果你在代码段中擦掉`x: `和`y: `部分，仅留下`aa, bb`和`AA, BB`，它的效果 —— 从概念上讲，实际上不是 —— 将是从`aa`赋值到`AA`和从`bb`赋值到`BB`。
 
-So, that symmetry may help to explain why the syntactic pattern was intentionally flipped for this ES6 feature.
+所以，这种平行性也许有助于解释为什么对于这种ES6特性，语法模式被故意地反转了。
 
-**Note:** I would have preferred the syntax to be `{ AA: x , BB: y }` for the destructuring assignment, as that would have preserved consistency of the more familiar `target: source` pattern for both usages. Alas, I'm having to train my brain for the inversion, as some readers may also have to do.
+*注意：* 对于解构赋值来说我更喜欢它的语法是`{ AA: x , BB: y }`，因为那样的话可以在两种用法中一致地我们更熟悉的`target: source`模式。唉，我已经被迫训练自己的大脑去习惯这种反转了，就像一些读者也不得不去做的那样。
 
 ### Not Just Declarations
 
-So far, we've used destructuring assignment with `var` declarations (of course, they could also use `let` and `const`), but destructuring is a general assignment operation, not just a declaration.
+至此，我们一直将解构赋值与`var`声明（当然，它们也可以使用`let`和`const`）一起使用，但是解构是一种一般意义上的赋值操作，不仅是一种声明。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a, b, c, x, y, z;
@@ -691,11 +661,11 @@ console.log( a, b, c );				// 1 2 3
 console.log( x, y, z );				// 4 5 6
 ```
 
-The variables can already be declared, and then the destructuring only does assignments, exactly as we've already seen.
+变量可以是已经被定义好的，然后解构仅仅负责赋值，正如我们已经看到的那样。
 
-**Note:** For the object destructuring form specifically, when leaving off a `var`/`let`/`const` declarator, we had to surround the whole assignment expression in `( )`, because otherwise the `{ .. }` on the lefthand side as the first element in the statement is taken to be a block statement instead of an object.
+**注意：** 特别对于对象解构形式来说，当我们省略了`var`/`let`/`const`声明符时，就必须将整个赋值表达式包含在`()`中，因为如果不这样做的话左手边作为语句第一个元素的`{ .. }`将被视为一个语句块儿而不是一个对象。
 
-In fact, the assignment expressions (`a`, `y`, etc.) don't actually need to be just variable identifiers. Anything that's a valid assignment expression is allowed. For example:
+事实上，变量表达式（`a`，`y`，等等）不必是一个变量标识符。任何合法的赋值表达式都是允许的。例如：
 
 ```js
 var o = {};
@@ -707,7 +677,7 @@ console.log( o.a, o.b, o.c );		// 1 2 3
 console.log( o.x, o.y, o.z );		// 4 5 6
 ```
 
-You can even use computed property expressions in the destructuring. Consider:
+你甚至可以在解构中使用可计算属性名。考虑如下代码：
 
 ```js
 var which = "x",
@@ -718,9 +688,9 @@ var which = "x",
 console.log( o.x );					// 4
 ```
 
-The `[which]:` part is the computed property, which results in `x` -- the property to destructure from the object in question as the source of the assignment. The `o[which]` part is just a normal object key reference, which equates to `o.x` as the target of the assignment.
+`[which]:`的部分是可计算属性名，它的结果是`x` —— 将从当前的对象中拆解出来作为赋值的源头的属性。`o[which]`的部分只是一个普通的对象键引用，作为赋值的目标来说它与`o.x`是等价的。
 
-You can use the general assignments to create object mappings/transformations, such as:
+你可以使用普通的赋值来创建对象映射/变形，例如：
 
 ```js
 var o1 = { a: 1, b: 2, c: 3 },
@@ -731,7 +701,7 @@ var o1 = { a: 1, b: 2, c: 3 },
 console.log( o2.x, o2.y, o2.z );	// 1 2 3
 ```
 
-Or you can map an object to an array, such as:
+或者你可以将对象映射进一个数组，例如：
 
 ```js
 var o1 = { a: 1, b: 2, c: 3 },
@@ -742,7 +712,7 @@ var o1 = { a: 1, b: 2, c: 3 },
 console.log( a2 );					// [1,2,3]
 ```
 
-Or the other way around:
+或者用另一种方式：
 
 ```js
 var a1 = [ 1, 2, 3 ],
@@ -753,7 +723,7 @@ var a1 = [ 1, 2, 3 ],
 console.log( o2.a, o2.b, o2.c );	// 1 2 3
 ```
 
-Or you could reorder one array to another:
+或者你可以将一个数组重排到另一个数组中：
 
 ```js
 var a1 = [ 1, 2, 3 ],
@@ -764,7 +734,7 @@ var a1 = [ 1, 2, 3 ],
 console.log( a2 );					// [2,3,1]
 ```
 
-You can even solve the traditional "swap two variables" task without a temporary variable:
+你甚至可以不使用临时变量来解决传统的“交换两个变量”的问题：
 
 ```js
 var x = 10, y = 20;
@@ -774,11 +744,11 @@ var x = 10, y = 20;
 console.log( x, y );				// 20 10
 ```
 
-**Warning:** Be careful: you shouldn't mix in declaration with assignment unless you want all of the assignment expressions *also* to be treated as declarations. Otherwise, you'll get syntax errors. That's why in the earlier example I had to do `var a2 = []` separately from the `[ a2[0], .. ] = ..` destructuring assignment. It wouldn't make any sense to try `var [ a2[0], .. ] = ..`, because `a2[0]` isn't a valid declaration identifier; it also obviously couldn't implicitly create a `var a2 = []` declaration to use.
+**警告：** 小心：你不应该将声明和赋值混在一起，除非你想要所有的赋值表达式 *也* 被视为声明。否则，你会得到一个语法错误。这就是为什么在刚才的例子中我必须将`var a2 = []`与`[ a2[0], .. ] = ..`解构赋值分开做。尝试`var [ a2[0], .. ] = ..`没有任何意义，因为`a2[0]`不是一个合法的声明标识符；很显然它也不能隐含地创建一个`var a2 = []`声明来使用。
 
 ### Repeated Assignments
 
-The object destructuring form allows a source property (holding any value type) to be listed multiple times. For example:
+对象解构形式允许源属性（持有任意值的类型）被罗列多次。例如：
 
 ```js
 var { a: X, a: Y } = { a: 1 };
@@ -787,7 +757,7 @@ X;	// 1
 Y;	// 1
 ```
 
-That also means you can both destructure a sub-object/array property and also capture the sub-object/array's value itself. Consider:
+这意味着你既可以解构一个子对象/数组属性，也可以捕获这个子对象/数组的值本身。考虑如下代码：
 
 ```js
 var { a: { x: X, x: Y }, a } = { a: { x: 1 } };
@@ -806,7 +776,7 @@ Y;	// [10,2]
 Z;	// 1
 ```
 
-A word of caution about destructuring: it may be tempting to list destructuring assignments all on a single line as has been done thus far in our discussion. However, it's a much better idea to spread destructuring assignment patterns over multiple lines, using proper indentation -- much like you would in JSON or with an object literal value -- for readability sake.
+关于解构有一句话要提醒：像我们到目前为止的讨论中做的那样，将所有的解构赋值都罗列在单独一行中的方式可能很诱人。然而，一个好得多的主意是使用恰当的缩进将解构赋值的模式分散在多行中 —— 和你在JSON或对象字面量中做的事非常相似 —— 为了可读性。
 
 ```js
 // harder to read:
@@ -822,11 +792,11 @@ var {
 } = obj;
 ```
 
-Remember: **the purpose of destructuring is not just less typing, but more declarative readability.**
+记住：**解构的目的不仅是为了少打些字，更多是为了陈述的可读性**
 
 #### Destructuring Assignment Expressions
 
-The assignment expression with object or array destructuring has as its completion value the full righthand object/array value. Consider:
+带有对象或数组解构的赋值表达式的完成值是右手边完整的对象/数组值。考虑如下代码：
 
 ```js
 var o = { a:1, b:2, c:3 },
@@ -838,7 +808,7 @@ console.log( a, b, c );			// 1 2 3
 p === o;						// true
 ```
 
-In the previous snippet, `p` was assigned the `o` object reference, not one of the `a`, `b`, or `c` values. The same is true of array destructuring:
+在前面的代码段中，`p`被赋值为对象`o`的引用，而不是`a`，`b`，或`c`的值。数组解构也是一样：
 
 ```js
 var o = [1,2,3],
@@ -850,7 +820,7 @@ console.log( a, b, c );			// 1 2 3
 p === o;						// true
 ```
 
-By carrying the object/array value through as the completion, you can chain destructuring assignment expressions together:
+通过将这个对象/数组作为完成值传递下去，你可将解构赋值表达式链接在一起：
 
 ```js
 var o = { a:1, b:2, c:3 },
@@ -866,7 +836,7 @@ console.log( x, y, z );			// 4 5 4
 
 ### Too Many, Too Few, Just Enough
 
-With both array destructuring assignment and object destructuring assignment, you do not have to assign all the values that are present. For example:
+对于数组解构赋值和对象解构赋值两者来说，你不必分配所有出现的值。例如：
 
 ```js
 var [,b] = foo();
@@ -875,9 +845,9 @@ var { x, z } = bar();
 console.log( b, x, z );				// 2 4 6
 ```
 
-The `1` and `3` values that came back from `foo()` are discarded, as is the `5` value from `bar()`.
+从`foo()`返回的值`1`和`3`被丢弃了，从`bar()`返回的值`5`也是。
 
-Similarly, if you try to assign more values than are present in the value you're destructuring/decomposing, you get graceful fallback to `undefined`, as you'd expect:
+相似地，如果你试着分配比你正在解构/拆解的值要多的值时，它们会如你所想的那样退回到`undefined`：
 
 ```js
 var [,,c,d] = foo();
@@ -887,11 +857,11 @@ console.log( c, z );				// 3 6
 console.log( d, w );				// undefined undefined
 ```
 
-This behavior follows symmetrically from the earlier stated "`undefined` is missing" principle.
+这种行为平行地遵循早先提到的“`undefined`意味着丢失”原则。
 
-We examined the `...` operator earlier in this chapter, and saw that it can sometimes be used to spread an array value out into its separate values, and sometimes it can be used to do the opposite: to gather a set of values together into an array.
+我们在本章早先检视了`...`操作符，并看到了它有时可以用于将一个数组值扩散为它的分离值，而有时它可以被用于相反的操作：将一组值收集进一个数组。
 
-In addition to the gather/rest usage in function declarations, `...` can perform the same behavior in destructuring assignments. To illustrate, let's recall a snippet from earlier in this chapter:
+除了在函数声明中的收集/剩余用法以外，`...`可以在解构赋值中实施相同的行为。为了展示这一点，让我们回想一下本章早先的一个代码段：
 
 ```js
 var a = [2,3,4];
@@ -900,7 +870,7 @@ var b = [ 1, ...a, 5 ];
 console.log( b );					// [1,2,3,4,5]
 ```
 
-Here we see that `...a` is spreading `a` out, because it appears in the array `[ .. ]` value position. If `...a` appears in an array destructuring position, it performs the gather behavior:
+我们在这里看到因为`...a`出现在数组`[ .. ]`中值的位置，所以它将`a`扩散开。如果`...a`出现一个数组解构的位置，它会实施收集行为：
 
 ```js
 var a = [2,3,4];
@@ -909,15 +879,15 @@ var [ b, ...c ] = a;
 console.log( b, c );				// 2 [3,4]
 ```
 
-The `var [ .. ] = a` destructuring assignment spreads `a` out to be assigned to the pattern described inside the `[ .. ]`. The first part names `b` for the first value in `a` (`2`). But then `...c` gathers the rest of the values (`3` and `4`) into an array and calls it `c`.
+解构赋值`var [ .. ] = a`为了将`a`赋值给在`[ .. ]`中描述的模式而将它扩散开。第一部分的名称`b`对应`a`中的第一个值(`2`)。然后`...c`将剩余的值（`3`和`4`）收集到一个称为`c`的数组中。
 
-**Note:** We've seen how `...` works with arrays, but what about with objects? It's not an ES6 feature, but see Chapter 8 for discussion of a possible "beyond ES6" feature where `...` works with spreading or gathering objects.
+**注意：** 我们已经看到`...`是如何与数组一起工作的，但是对象呢？那不是一个ES6特性，但是参看第八章中关于一种可能的“ES6之后”的特性的讨论，它可以让`...`扩散或者收集对象。
 
 ### Default Value Assignment
 
-Both forms of destructuring can offer a default value option for an assignment, using the `=` syntax similar to the default function argument values discussed earlier.
+两种形式的解构都可以为赋值提供默认值选项，它使用和早先讨论过的默认函数参数值相似的`=`语法。
 
-Consider:
+考虑如下代码：
 
 ```js
 var [ a = 3, b = 6, c = 9, d = 12 ] = foo();
@@ -927,7 +897,7 @@ console.log( a, b, c, d );			// 1 2 3 12
 console.log( x, y, z, w );			// 4 5 6 20
 ```
 
-You can combine the default value assignment with the alternative assignment expression syntax covered earlier. For example:
+你可以将默认值赋值与前面讲过的赋值表达式语法组合在一起。例如：
 
 ```js
 var { x, y, z, w: WW = 20 } = bar();
@@ -935,7 +905,7 @@ var { x, y, z, w: WW = 20 } = bar();
 console.log( x, y, z, WW );			// 4 5 6 20
 ```
 
-Be careful about confusing yourself (or other developers who read your code) if you use an object or array as the default value in a destructuring. You can create some really hard to understand code:
+如果你在一个解构中使用一个对象或者数组作为默认值，那么要小心不要把自己（或者读你的代码的其他开发者）搞糊涂了。你可能会创建一些非常难理解的代码：
 
 ```js
 var x = 200, y = 300, z = 100;
@@ -946,17 +916,17 @@ var o1 = { x: { y: 42 }, z: { y: z } };
 ( { x: z = { y: x } } = o1 );
 ```
 
-Can you tell from that snippet what values `x`, `y`, and `z` have at the end? Takes a moment of pondering, I would imagine. I'll end the suspense:
+你能从这个代码段中看出`x`，`y`和`z`最终是什么值吗？花点儿时间深思熟虑一下，我能想象你的样子。我会终结这个悬念：
 
 ```js
 console.log( x.y, y.y, z.y );		// 300 100 42
 ```
 
-The takeaway here: destructuring is great and can be very useful, but it's also a sharp sword that can cause injury (to someone's brain) if used unwisely.
+这里的要点是：解构很棒也可以很有用，但是如果使用的不明智，它也是一把可以伤人（某人的大脑）的利剑。
 
 ### Nested Destructuring
 
-If the values you're destructuring have nested objects or arrays, you can destructure those nested values as well:
+如果你正在解构的值拥有嵌套的对象或数组，你也可以结构这些嵌套的值：
 
 ```js
 var a1 = [ 1, [2, 3, 4], 5 ];
@@ -969,7 +939,7 @@ console.log( a, b, c, d, e );		// 1 2 3 4 5
 console.log( w );					// 6
 ```
 
-Nested destructuring can be a simple way to flatten out object namespaces. For example:
+嵌套的结构可以是一种将对象名称空间扁平哈的简单方法。例如：
 
 ```js
 var App = {
@@ -986,7 +956,7 @@ var { model: { User } } = App;
 
 ### Destructuring Parameters
 
-In the following snippet, can you spot the assignment?
+你能在下面的代码段中发现赋值吗？
 
 ```js
 function foo(x) {
@@ -996,9 +966,9 @@ function foo(x) {
 foo( 42 );
 ```
 
-The assignment is kinda hidden: `42` (the argument) is assigned to `x` (the parameter) when `foo(42)` is executed. If parameter/argument pairing is an assignment, then it stands to reason that it's an assignment that could be destructured, right? Of course!
+其中的赋值有点儿被隐藏的感觉：当`foo(42)`被执行时`42`（参数值）被赋值给`x`（参数）。如果参数/参数值对是一种赋值，那么按常理说它是一个可以被解构的赋值，对吧？当然！
 
-Consider array destructuring for parameters:
+考虑参数的数组解构：
 
 ```js
 function foo( [ x, y ] ) {
@@ -1010,7 +980,7 @@ foo( [ 1 ] );						// 1 undefined
 foo( [] );							// undefined undefined
 ```
 
-Object destructuring for parameters works, too:
+参数也可以进行对象解构：
 
 ```js
 function foo( { x, y } ) {
@@ -1022,11 +992,11 @@ foo( { y: 42 } );					// undefined 42
 foo( {} );							// undefined undefined
 ```
 
-This technique is an approximation of named arguments (a long requested feature for JS!), in that the properties on the object map to the destructured parameters of the same names. That also means that we get optional parameters (in any position) for free, as you can see leaving off the `x` "parameter" worked as we'd expect.
+这种技术是命名参数值（一个长期以来被要求的JS特性！）的一种近似解法：对象上的属性映射到被解构的同名参数上。这也意味着我们免费地（在任何位置）得到了可选参数，如你所见，省去“参数”`x`可以如我们期望的那样工作。
 
-Of course, all the previously discussed variations of destructuring are available to us with parameter destructuring, including nested destructuring, default values, and more. Destructuring also mixes fine with other ES6 function parameter capabilities, like default parameter values and rest/gather parameters.
+当然，先前讨论过的所有解构的种类对于参数解构来说都是可用的，包括嵌套解构，默认值，和其他。解构也可以和其他ES6函数参数功能很好地混合在一起，比如默认参数值和剩余/收集参数。
 
-Consider these quick illustrations (certainly not exhaustive of the possible variations):
+考虑这些快速的示例（当然这没有穷尽所有可能的种类）：
 
 ```js
 function f1([ x=2, y=3, z ]) { .. }
@@ -1038,7 +1008,7 @@ function f5({ x: X = 10, y = 20 }) { .. }
 function f6({ x = 10 } = {}, { y } = { y: 10 }) { .. }
 ```
 
-Let's take one example from this snippet and examine it, for illustration purposes:
+为了展示的目的，让我们从这个代码段中取一个例子来检视：
 
 ```js
 function f3([ x, y, ...z], ...w) {
@@ -1049,11 +1019,11 @@ f3( [] );							// undefined undefined [] []
 f3( [1,2,3,4], 5, 6 );				// 1 2 [3,4] [5,6]
 ```
 
-There are two `...` operators in use here, and they're both gathering values in arrays (`z` and `w`), though `...z` gathers from the rest of the values left over in the first array argument, while `...w` gathers from the rest of the main arguments left over after the first.
+这里使用了两个`...`操作符，他们都是将值收集到数组中（`z`和`w`），虽然`...z`是从第一个数组参数值的剩余值中收集，而`...w`是从第一个之后的剩余主参数值中收集的。
 
 #### Destructuring Defaults + Parameter Defaults
 
-There's one subtle point you should be particularly careful to notice -- the difference in behavior between a destructuring default value and a function parameter default value. For example:
+有一个微妙的地方你应当注意要特别小心 —— 解构默认值与函数参数默认值的行为之间的不同。例如：
 
 ```js
 function f6({ x = 10 } = {}, { y } = { y: 10 }) {
@@ -1063,25 +1033,25 @@ function f6({ x = 10 } = {}, { y } = { y: 10 }) {
 f6();								// 10 10
 ```
 
-At first, it would seem that we've declared a default value of `10` for both the `x` and `y` parameters, but in two different ways. However, these two different approaches will behave differently in certain cases, and the difference is awfully subtle.
+首先，看起来我们用两种不同的方法为参数`x`和`y`都声明了默认值`10`。然而，这两种不同的方式会在特定的情况下表现出不同的行为，而且这种区别极其微妙。
 
-Consider:
+考虑如下代码：
 
 ```js
 f6( {}, {} );						// 10 undefined
 ```
 
-Wait, why did that happen? It's pretty clear that named parameter `x` is defaulting to `10` if not passed as a property of that same name in the first argument's object.
+等等，为什么会这样？十分清楚，如果在第一个参数值的对象中没有一个同名属性被传递，那么命名参数`x`将默认为`10`。
 
-But what about `y` being `undefined`? The `{ y: 10 }` value is an object as a function parameter default value, not a destructuring default value. As such, it only applies if the second argument is not passed at all, or is passed as `undefined`.
+但`y`是`undefined`是怎么回事儿？值`{ y: 10 }`是一个作为函数参数默认值的对象，不是结构默认值。因此，它仅在第二个参数根本没有被传递，或者`undefined`被传递时生效，
 
-In the previous snippet, we *are* passing a second argument (`{}`), so the default `{ y: 10 }` value is not used, and the `{ y }` destructuring occurs against the passed in `{}` empty object value.
+在前面的代码段中，我们传递了第二个参数（`{}`），所以默认值`{ y: 10 }`不被使用，而解构`{ y }`会针对被传入的空对象值`{}`发生。
 
-Now, compare `{ y } = { y: 10 }` to `{ x = 10 } = {}`.
+现在，将`{ y } = { y: 10 }`与`{ x = 10 } = {}`比较一下。
 
-For the `x`'s form usage, if the first function argument is omitted or `undefined`, the `{}` empty object default applies. Then, whatever value is in the first argument position -- either the default `{}` or whatever you passed in -- is destructured with the `{ x = 10 }`, which checks to see if an `x` property is found, and if not found (or `undefined`), the `10` default value is applied to the `x` named parameter.
+对于`x`的使用形式来说，如果第一个函数参数值被省略或者是`undefined`，会默认地使用空对象`{}`。然后，不管在第一个参数值的位置上是什么值 —— 要么是默认的`{}`，要么是你传入的 —— 都会被`{ x = 10 }`解构，它会检查属性`x`是否被找到，如果没有找到（或者是`undefined`），默认值`10`会被设置到命名参数`x`上。
 
-Deep breath. Read back over those last few paragraphs a couple of times. Let's review via code:
+深呼吸。回过头去把最后几段多读几遍。让我们用代码复习一下：
 
 ```js
 function f6({ x = 10 } = {}, { y } = { y: 10 }) {
@@ -1098,15 +1068,19 @@ f6( undefined, {} );				// 10 undefined
 f6( { x: 2 }, { y: 3 } );			// 2 3
 ```
 
-It would generally seem that the defaulting behavior of the `x` parameter is probably the more desirable and sensible case compared to that of `y`. As such, it's important to understand why and how `{ x = 10 } = {}` form is different from `{ y } = { y: 10 }` form.
+一般来说，与参数`y`的默认行为比起来，参数`x`的默认行为可能看起来更可取也更合理。因此，理解`{ x = 10 } = {}`形式与`{ y } = { y: 10 }`形式为何与如何不同是很重要的。
 
-If that's still a bit fuzzy, go back and read it again, and play with this yourself. Your future self will thank you for taking the time to get this very subtle gotcha nuance detail straight.
+如果这仍然有点儿模糊，回头再把它读一遍，并亲自把它玩弄一番。未来的你将会感谢你花了时间把这种非常微妙的晦涩的细节的坑搞明白。
 
 #### Nested Defaults: Destructured and Restructured
 
 Although it may at first be difficult to grasp, an interesting idiom emerges for setting defaults for a nested object's properties: using object destructuring along with what I'd call *restructuring*.
 
+虽然一开始可能很难掌握，但是为一个嵌套的对象的属性设置默认值产生了一种有趣的惯用法：将对象解构与一种我成为 *重构* 的东西一起使用。
+
 Consider a set of defaults in a nested object structure, like the following:
+
+考虑在一个嵌套的对象解构中的一组默认值，就像下面这样：
 
 ```js
 // taken from: http://es-discourse.com/t/partial-default-arguments/120/7
@@ -1126,6 +1100,8 @@ var defaults = {
 
 Now, let's say that you have an object called `config`, which has some of these applied, but perhaps not all, and you'd like to set all the defaults into this object in the missing spots, but not override specific settings already present:
 
+现在，我们假定你有一个称为`config`的对象，它有一些这其中的值，但也许不全有，而且你想要将所有的默认值设置到这个对象的缺失点上，但不覆盖已经存在的特定设置：
+
 ```js
 var config = {
 	options: {
@@ -1137,6 +1113,8 @@ var config = {
 
 You can of course do so manually, as you might have done in the past:
 
+你当然可以手动这样做，就像你可能曾经做过的那样：
+
 ```js
 config.options = config.options || {};
 config.options.remove = (config.options.remove !== undefined) ?
@@ -1147,8 +1125,11 @@ config.options.enable = (config.options.enable !== undefined) ?
 ```
 
 Yuck.
+讨厌。
 
 Others may prefer the assign-overwrite approach to this task. You might be tempted by the ES6 `Object.assign(..)` utility (see Chapter 6) to clone the properties first from `defaults` and then overwritten with the cloned properties from `config`, as so:
+
+另一些人可能喜欢用覆盖赋值的方式来完成这个任务。你可能会被ES6的`Object.assign(..)`工具（见第六章）所吸引，来首先克隆`defaults`中的属性然后使用从`config`中克隆的属性覆盖它，像这样：
 
 ```js
 config = Object.assign( {}, defaults, config );
@@ -1156,9 +1137,15 @@ config = Object.assign( {}, defaults, config );
 
 That looks way nicer, huh? But there's a major problem! `Object.assign(..)` is shallow, which means when it copies `defaults.options`, it just copies that object reference, not deep cloning that object's properties to a `config.options` object. `Object.assign(..)` would need to be applied (sort of "recursively") at all levels of your object's tree to get the deep cloning you're expecting.
 
+这看起来好多了，是吧？但是这里有一个重大问题！`Object.assign(..)`是浅拷贝，这意味着当它拷贝`defaults.options`时，它仅仅拷贝这个对象的引用，而不是深度克隆这个对象的属性到一个`config.options`对象。`Object.assign(..)`需要在你的对象树的每一层中实施才能得到你期望的深度克隆。
+
 **Note:** Many JS utility libraries/frameworks provide their own option for deep cloning of an object, but those approaches and their gotchas are beyond our scope to discuss here.
 
+**注意：** 许多JS工具库/框架都为对象的深度克隆提供它们自己的选项，但是那些方式和它们的坑超出了我们在这里的讨论范围。
+
 So let's examine if ES6 object destructuring with defaults can help at all:
+
+那么让我们检视一下ES6的带有默认值的对象解构能否帮到我们：
 
 ```js
 config.options = config.options || {};
@@ -1178,15 +1165,27 @@ config.log = config.log || {};
 
 Not as nice as the false promise of `Object.assign(..)` (being that it's shallow only), but it's better than the manual approach by a fair bit, I think. It is still unfortunately verbose and repetitive, though.
 
+不像`Object.assign(..)`的虚假诺言（因为它只是浅拷贝）那么好，但是我想它要比手动的方式强多了。虽然它仍然很不幸地带有冗余和重复。
+
 The previous snippet's approach works because I'm hacking the destructuring and defaults mechanism to do the property `=== undefined` checks and assignment decisions for me. It's a trick in that I'm destructuring `config` (see the `= config` at the end of the snippet), but I'm reassigning all the destructured values right back into `config`, with the `config.options.enable` assignment references.
+
+前面的代码段的方式可以工作，因为我黑进了结构和默认机制来为我做属性的`=== undefined`检查和赋值的决定。这里的技巧是，我解构了`config`（看看在代码段末尾的`= config`），但是我将所有解构出来的值又立即赋值回`config`，带着`config.options.enable`赋值引用。
 
 Still too much, though. Let's see if we can make anything better.
 
+但还是太多了。让我们看看能否做得更好。
+
 The following trick works best if you know that all the various properties you're destructuring are uniquely named. You can still do it even if that's not the case, but it's not as nice -- you'll have to do the destructuring in stages, or create unique local variables as temporary aliases.
+
+下面的技巧在你知道你正在解构的所有属性的名称都是唯一的情况下工作得最好。但即使不是这样的情况你也仍然可以使用它，只是没有那么好 —— 你将不得不分阶段解构，或者创建独一无二的本地变量作为临时别名。
 
 If we fully destructure all the properties into top-level variables, we can then immediately restructure to reconstitute the original nested object structure.
 
+如果我们将所有的属性完全解构为顶层变量，那么我们就可以立即重构来重组原本的嵌套对象解构。
+
 But all those temporary variables hanging around would pollute scope. So, let's use block scoping (see "Block-Scoped Declarations" earlier in this chapter) with a general `{ }` enclosing block:
+
+
 
 ```js
 // merge `defaults` into `config`
