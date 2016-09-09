@@ -1074,11 +1074,7 @@ f6( { x: 2 }, { y: 3 } );			// 2 3
 
 #### Nested Defaults: Destructured and Restructured
 
-Although it may at first be difficult to grasp, an interesting idiom emerges for setting defaults for a nested object's properties: using object destructuring along with what I'd call *restructuring*.
-
 虽然一开始可能很难掌握，但是为一个嵌套的对象的属性设置默认值产生了一种有趣的惯用法：将对象解构与一种我成为 *重构* 的东西一起使用。
-
-Consider a set of defaults in a nested object structure, like the following:
 
 考虑在一个嵌套的对象解构中的一组默认值，就像下面这样：
 
@@ -1098,8 +1094,6 @@ var defaults = {
 };
 ```
 
-Now, let's say that you have an object called `config`, which has some of these applied, but perhaps not all, and you'd like to set all the defaults into this object in the missing spots, but not override specific settings already present:
-
 现在，我们假定你有一个称为`config`的对象，它有一些这其中的值，但也许不全有，而且你想要将所有的默认值设置到这个对象的缺失点上，但不覆盖已经存在的特定设置：
 
 ```js
@@ -1110,8 +1104,6 @@ var config = {
 	}
 };
 ```
-
-You can of course do so manually, as you might have done in the past:
 
 你当然可以手动这样做，就像你可能曾经做过的那样：
 
@@ -1124,10 +1116,7 @@ config.options.enable = (config.options.enable !== undefined) ?
 ...
 ```
 
-Yuck.
 讨厌。
-
-Others may prefer the assign-overwrite approach to this task. You might be tempted by the ES6 `Object.assign(..)` utility (see Chapter 6) to clone the properties first from `defaults` and then overwritten with the cloned properties from `config`, as so:
 
 另一些人可能喜欢用覆盖赋值的方式来完成这个任务。你可能会被ES6的`Object.assign(..)`工具（见第六章）所吸引，来首先克隆`defaults`中的属性然后使用从`config`中克隆的属性覆盖它，像这样：
 
@@ -1135,15 +1124,9 @@ Others may prefer the assign-overwrite approach to this task. You might be tempt
 config = Object.assign( {}, defaults, config );
 ```
 
-That looks way nicer, huh? But there's a major problem! `Object.assign(..)` is shallow, which means when it copies `defaults.options`, it just copies that object reference, not deep cloning that object's properties to a `config.options` object. `Object.assign(..)` would need to be applied (sort of "recursively") at all levels of your object's tree to get the deep cloning you're expecting.
-
 这看起来好多了，是吧？但是这里有一个重大问题！`Object.assign(..)`是浅拷贝，这意味着当它拷贝`defaults.options`时，它仅仅拷贝这个对象的引用，而不是深度克隆这个对象的属性到一个`config.options`对象。`Object.assign(..)`需要在你的对象树的每一层中实施才能得到你期望的深度克隆。
 
-**Note:** Many JS utility libraries/frameworks provide their own option for deep cloning of an object, but those approaches and their gotchas are beyond our scope to discuss here.
-
 **注意：** 许多JS工具库/框架都为对象的深度克隆提供它们自己的选项，但是那些方式和它们的坑超出了我们在这里的讨论范围。
-
-So let's examine if ES6 object destructuring with defaults can help at all:
 
 那么让我们检视一下ES6的带有默认值的对象解构能否帮到我们：
 
@@ -1163,29 +1146,17 @@ config.log = config.log || {};
 } = config);
 ```
 
-Not as nice as the false promise of `Object.assign(..)` (being that it's shallow only), but it's better than the manual approach by a fair bit, I think. It is still unfortunately verbose and repetitive, though.
-
 不像`Object.assign(..)`的虚假诺言（因为它只是浅拷贝）那么好，但是我想它要比手动的方式强多了。虽然它仍然很不幸地带有冗余和重复。
-
-The previous snippet's approach works because I'm hacking the destructuring and defaults mechanism to do the property `=== undefined` checks and assignment decisions for me. It's a trick in that I'm destructuring `config` (see the `= config` at the end of the snippet), but I'm reassigning all the destructured values right back into `config`, with the `config.options.enable` assignment references.
 
 前面的代码段的方式可以工作，因为我黑进了结构和默认机制来为我做属性的`=== undefined`检查和赋值的决定。这里的技巧是，我解构了`config`（看看在代码段末尾的`= config`），但是我将所有解构出来的值又立即赋值回`config`，带着`config.options.enable`赋值引用。
 
-Still too much, though. Let's see if we can make anything better.
-
 但还是太多了。让我们看看能否做得更好。
-
-The following trick works best if you know that all the various properties you're destructuring are uniquely named. You can still do it even if that's not the case, but it's not as nice -- you'll have to do the destructuring in stages, or create unique local variables as temporary aliases.
 
 下面的技巧在你知道你正在解构的所有属性的名称都是唯一的情况下工作得最好。但即使不是这样的情况你也仍然可以使用它，只是没有那么好 —— 你将不得不分阶段解构，或者创建独一无二的本地变量作为临时别名。
 
-If we fully destructure all the properties into top-level variables, we can then immediately restructure to reconstitute the original nested object structure.
-
 如果我们将所有的属性完全解构为顶层变量，那么我们就可以立即重构来重组原本的嵌套对象解构。
 
-But all those temporary variables hanging around would pollute scope. So, let's use block scoping (see "Block-Scoped Declarations" earlier in this chapter) with a general `{ }` enclosing block:
-
-
+但是所有那些游荡在外的临时变量将会污染作用域。所以，让我们通过一个普通的`{ }`包围块儿来使用块儿作用域（参见本章早先的“块儿作用域声明”）。
 
 ```js
 // merge `defaults` into `config`
@@ -1211,19 +1182,19 @@ But all those temporary variables hanging around would pollute scope. So, let's 
 }
 ```
 
-That seems a fair bit nicer, huh?
+这看起来好多了，是吧？
 
-**Note:** You could also accomplish the scope enclosure with an arrow IIFE instead of the general `{ }` block and `let` declarations. Your destructuring assignments/defaults would be in the parameter list and your restructuring would be the `return` statement in the function body.
+**注意：** 你也可以使用箭头IIFE来代替一般的`{ }`块儿和`let`声明来达到圈占作用域的目的。你的解构赋值/默认值将位于参数列表中，而你的重构将位于函数体的`return`语句中。
 
-The `{ warn, error }` syntax in the restructuring part may look new to you; that's called "concise properties" and we cover it in the next section!
+在重构部分的`{ warn, error }`语法可能是你初次见到；它称为“简约属性”，我们将在下一节讲解它！
 
 ## Object Literal Extensions
 
-ES6 adds a number of important convenience extensions to the humble `{ .. }` object literal.
+ES6给不起眼儿的`{ .. }`对象字面量增加了几个重要的便利扩展。
 
 ### Concise Properties
 
-You're certainly familiar with declaring object literals in this form:
+你一定很熟悉用这种形式声明对象字面量：
 
 ```js
 var x = 2, y = 3,
@@ -1233,7 +1204,7 @@ var x = 2, y = 3,
 	};
 ```
 
-If it's always felt redundant to say `x: x` all over, there's good news. If you need to define a property that is the same name as a lexical identifier, you can shorten it from `x: x` to `x`. Consider:
+如果到处说`x: x`总是让你感到繁冗，那么有个好消息。如果你需要定义一个名称和词法标识符一致的属性，你可以将它从`x: x`缩写为`x`。考虑如下代码：
 
 ```js
 var x = 2, y = 3,
@@ -1245,9 +1216,9 @@ var x = 2, y = 3,
 
 ### Concise Methods
 
-In a similar spirit to concise properties we just examined, functions attached to properties in object literals also have a concise form, for convenience.
+本着与我们刚刚检视的简约属性相同的精神，添附在对象字面量属性上的函数也有一种便利简约形式。
 
-The old way:
+以前的方式：
 
 ```js
 var o = {
@@ -1260,7 +1231,7 @@ var o = {
 }
 ```
 
-And as of ES6:
+而在ES6中：
 
 ```js
 var o = {
@@ -1273,9 +1244,9 @@ var o = {
 }
 ```
 
-**Warning:** While `x() { .. }` seems to just be shorthand for `x: function(){ .. }`, concise methods have special behaviors that their older counterparts don't; specifically, the allowance for `super` (see "Object `super`" later in this chapter).
+**警告：** 虽然`x() { .. }`看起来只是`x: function(){ .. }`的缩写，但是简约方法有一种特殊行为，是它们对应的老方式所不具有的；确切地说，是允许`super`（参见本章稍后的“对象`super`”）的使用。
 
-Generators (see Chapter 4) also have a concise method form:
+Generator（见第四章）也有一种简约方法形式：
 
 ```js
 var o = {
@@ -1285,7 +1256,7 @@ var o = {
 
 #### Concisely Unnamed
 
-While that convenience shorthand is quite attractive, there's a subtle gotcha to be aware of. To illustrate, let's examine pre-ES6 code like the following, which you might try to refactor to use concise methods:
+虽然这种便利缩写十分诱人，但是这其中有一个微妙的坑要小心。为了展示这一点，让我们检视一下如下的前ES6代码，你可能会试着使用简约方法来重构它：
 
 ```js
 function runSomething(o) {
@@ -1308,7 +1279,7 @@ runSomething( {
 } );
 ```
 
-This obviously silly code just generates two random numbers and subtracts the smaller from the bigger. But what's important here isn't what it does, but rather how it's defined. Let's focus on the object literal and function definition, as we see here:
+这段蠢代码只是生成两个随机数，然后用大的减去小的。但这里重要的不是它做的是什么，而是它是如何被定义的。让我把焦点放在对象字面量和函数定义上，就像我们在这里看到的：
 
 ```js
 runSomething( {
@@ -1318,11 +1289,11 @@ runSomething( {
 } );
 ```
 
-Why do we say both `something:` and `function something`? Isn't that redundant? Actually, no, both are needed for different purposes. The property `something` is how we can call `o.something(..)`, sort of like its public name. But the second `something` is a lexical name to refer to the function from inside itself, for recursion purposes.
+为什么我们同时说`something:`和`function something`？这不是冗余吗？实际上，不是，它们俩被用于不同的目的。属性`something`让我们能够调用`o.something(..)`，有点儿像它的公有名称。但是第二个`something`是一个词法名称，使这个函数可以为了递归而从内部引用它自己。
 
-Can you see why the line `return something(y,x)` needs the name `something` to refer to the function? There's no lexical name for the object, such that it could have said `return o.something(y,x)` or something of that sort.
+你能看出来为什么`return something(y,x)`这一行需要名称`something`来引用这个函数吗？因为这里没有对象的词法名称，要是有的话我们就可以说`return o.something(y,x)`或者其他类似的东西。
 
-That's actually a pretty common practice when the object literal does have an identifying name, such as:
+当一个对象字面量的确拥有一个标识符名称时，这其实是一个很常见的做法，比如：
 
 ```js
 var controller = {
@@ -1333,9 +1304,9 @@ var controller = {
 };
 ```
 
-Is this a good idea? Perhaps, perhaps not. You're assuming that the name `controller` will always point to the object in question. But it very well may not -- the `makeRequest(..)` function doesn't control the outer code and so can't force that to be the case. This could come back to bite you.
+这是个好主意吗？也许是，也许不是。你在假设名称`controller`将总是指向目标对象。但它也很可能不是 —— 函数`makeRequest(..)`不能控制外部的代码，因此不能强制你的假设一定成立。这可能会回过头来咬到你。
 
-Others prefer to use `this` to define such things:
+另一些人喜欢使用`this`定义这样的东西：
 
 ```js
 var controller = {
@@ -1346,15 +1317,15 @@ var controller = {
 };
 ```
 
-That looks fine, and should work if you always invoke the method as `controller.makeRequest(..)`. But you now have a `this` binding gotcha if you do something like:
+这看起来不错，而且如果你总是用`controller.makeRequest(..)`来调用方法的话它就应该能工作。但现在你有一个`this`绑定的坑，如果你做这样的事情的话：
 
 ```js
 btn.addEventListener( "click", controller.makeRequest, false );
 ```
 
-Of course, you can solve that by passing `controller.makeRequest.bind(controller)` as the handler reference to bind the event to. But yuck -- it isn't very appealing.
+当然，你可以通过传递`controller.makeRequest.bind(controller)`作为绑定到事件上的处理器引用来解决这个问题。但是这很讨厌——它不是很吸引人。
 
-Or what if your inner `this.makeRequest(..)` call needs to be made from a nested function? You'll have another `this` binding hazard, which people will often solve with the hacky `var self = this`, such as:
+或者要是你的内部`this.makeRequest(..)`调用需要从一个嵌套的函数内发起呢？你会有另一个`this`绑定灾难，人们经常使用`var self = this`这种用黑科技解决，就像：
 
 ```js
 var controller = {
@@ -1369,11 +1340,11 @@ var controller = {
 };
 ```
 
-More yuck.
+更讨厌。
 
-**Note:** For more information on `this` binding rules and gotchas, see Chapters 1-2 of the *this & Object Prototypes* title of this series.
+**注意：** 更多关于`this`绑定规则和陷阱的信息，刹那间本系列的 *this与对象原型* 的第一到二章。
 
-OK, what does all this have to do with concise methods? Recall our `something(..)` method definition:
+好了，这些与简约方法有什么关系？回想一下我们的`something(..)`方法定义：
 
 ```js
 runSomething( {
@@ -1383,11 +1354,11 @@ runSomething( {
 } );
 ```
 
-The second `something` here provides a super convenient lexical identifier that will always point to the function itself, giving us the perfect reference for recursion, event binding/unbinding, and so on -- no messing around with `this` or trying to use an untrustable object reference.
+在这里的第二个`something`提供了一个超级便利的词法标识符，它总是指向函数自己，给了我们一个可用于递归，事件绑定/解除等等的完美引用 —— 不用乱搞`this`或者使用不可靠的对象引用。
 
-Great!
+太好了!
 
-So, now we try to refactor that function reference to this ES6 concise method form:
+那么，现在我们试着将函数引用重构为这种ES6解约方法的形式：
 
 ```js
 runSomething( {
@@ -1401,9 +1372,9 @@ runSomething( {
 } );
 ```
 
-Seems fine at first glance, except this code will break. The `return something(..)` call will not find a `something` identifier, so you'll get a `ReferenceError`. Oops. But why?
+第一案看上去不错，除了这个代码将会坏掉。`return something(..)`调用经不会找到`something`标识符，所以你会得到一个`ReferenceError`。噢，但为什么？
 
-The above ES6 snippet is interpreted as meaning:
+上面的ES6代码段将会被翻译为：
 
 ```js
 runSomething( {
@@ -1417,23 +1388,23 @@ runSomething( {
 } );
 ```
 
-Look closely. Do you see the problem? The concise method definition implies `something: function(x,y)`. See how the second `something` we were relying on has been omitted? In other words, concise methods imply anonymous function expressions.
+仔细看。你看出问题了吗？简约方法定义暗指`something: function(x,y)`。看到我们依靠的第二个`something`是如何被省略的了吗？换句话说，简约方法暗指匿名函数表达式。
 
-Yeah, yuck.
+对，讨厌。
 
-**Note:** You may be tempted to think that `=>` arrow functions are a good solution here, but they're equally insufficient, as they're also anonymous function expressions. We'll cover them in "Arrow Functions" later in this chapter.
+**注意：** 你可能认为在这里`=>`箭头函数是一个好的解决方案。但是它们也同样不够，因为它们也是匿名函数表达式。我们将在本章稍后的“箭头函数”中讲解它们。
 
-The partially redeeming news is that our `something(x,y)` concise method won't be totally anonymous. See "Function Names" in Chapter 7 for information about ES6 function name inference rules. That won't help us for our recursion, but it helps with debugging at least.
+一个部分地补偿了这一点的消息是，我们的简约函数`something(x,y)`将不会是完全匿名的。参见第七章的“函数名”来了解ES6函数名称的推测规则。这不会在递归中帮到我们，但是它至少在调试时有用处。
 
-So what are we left to conclude about concise methods? They're short and sweet, and a nice convenience. But you should only use them if you're never going to need them to do recursion or event binding/unbinding. Otherwise, stick to your old-school `something: function something(..)` method definitions.
+那么我们怎样总结简约方法？它们简短又甜蜜，而且很方便。但是你应当仅在你永远不需要将它们用于递归或事件绑定/解除时使用它们。否则，就坚持使用你的老式`something: function something(..)`方法定义。
 
-A lot of your methods are probably going to benefit from concise method definitions, so that's great news! Just be careful of the few where there's an un-naming hazard.
+你的很多方法都将可能从简约方法定义中受益，这是个非常好的消息！只要小心几处未命名的灾难就好。
 
 #### ES5 Getter/Setter
 
-Technically, ES5 defined getter/setter literals forms, but they didn't seem to get used much, mostly due to the lack of transpilers to handle that new syntax (the only major new syntax added in ES5, really). So while it's not a new ES6 feature, we'll briefly refresh on that form, as it's probably going to be much more useful with ES6 going forward.
+技术上讲，ES5定义了getter/setter字面形式，但是看起来它们没有被太多使用，这主要是由于缺乏转译器来处理这种新的语法（其实，它是ES5中加入的唯一的主要新语法）。所以虽然它不是一个ES6的新特性，我们也将简单地复习一下这种形式，因为它可能会随着ES6的向前发展而变得有用得多。
 
-Consider:
+考虑如下代码：
 
 ```js
 var o = {
@@ -1452,13 +1423,13 @@ o.__id;			// 21
 o.__id;			// 21 -- still!
 ```
 
-These getter and setter literal forms are also present in classes; see Chapter 3.
+这些getter和setter字面形式也可以出现在类中；参见第三章。
 
-**Warning:** It may not be obvious, but the setter literal must have exactly one declared parameter; omitting it or listing others is illegal syntax. The single required parameter *can* use destructuring and defaults (e.g., `set id({ id: v = 0 }) { .. }`), but the gather/rest `...` is not allowed (`set id(...v) { .. }`).
+**警告：** 可能不太明显，但是setter字面量必须恰好有一个被声明的参数；省略它或罗列其他的参数都是不合法的语法。这个单独的必须参数 *可以* 使用解构和默认值（例如，`set id({ id: v = 0 }) { .. }`），但是收集/剩余`...`是不允许的（`set id(...v) { .. }`）。
 
 ### Computed Property Names
 
-You've probably been in a situation like the following snippet, where you have one or more property names that come from some sort of expression and thus can't be put into the object literal:
+你可能曾经遇到过像下面的代码段那样的情况，你的一个或多个属性名来自于某种表达式，因此你不能将它们放在对象字面量中：
 
 ```js
 var prefix = "user_";
@@ -1472,7 +1443,7 @@ o[ prefix + "bar" ] = function(..){ .. };
 ..
 ```
 
-ES6 adds a syntax to the object literal definition which allows you to specify an expression that should be computed, whose result is the property name assigned. Consider:
+ES6为对象字面定义增加了一种语法，它允许你指定一个应当被计算的表达式，其结果就是被赋值属性名。考虑如下代码：
 
 ```js
 var prefix = "user_";
@@ -1485,9 +1456,9 @@ var o = {
 };
 ```
 
-Any valid expression can appear inside the `[ .. ]` that sits in the property name position of the object literal definition.
+任何合法的表达式都可以出现在位于对象字面定义的属性名位置的`[ .. ]`内部。
 
-Probably the most common use of computed property names will be with `Symbol`s (which we cover in "Symbols" later in this chapter), such as:
+很有可能，可计算属性名最经常与`Symbol`（我们将在本章稍后的“Symbol”中讲解）一起使用，比如：
 
 ```js
 var o = {
@@ -1496,9 +1467,9 @@ var o = {
 };
 ```
 
-`Symbol.toStringTag` is a special built-in value, which we evaluate with the `[ .. ]` syntax, so we can assign the `"really cool thing"` value to the special property name.
+`Symbol.toStringTag`是一个特殊的内建值，我们使用`[ .. ]`语法求值得到，所以我们可以将值`"really cool thing"`赋值给这个特殊的属性名。
 
-Computed property names can also appear as the name of a concise method or a concise generator:
+可计算属性名还可以作为简约方法或简约generator的名称出现：
 
 ```js
 var o = {
@@ -1509,9 +1480,9 @@ var o = {
 
 ### Setting `[[Prototype]]`
 
-We won't cover prototypes in detail here, so for more information, see the *this & Object Prototypes* title of this series.
+我们不会在这里讲解原型的细节，所以关于它的更多信息，参见本系列的 *this与对象原型*。
 
-Sometimes it will be helpful to assign the `[[Prototype]]` of an object at the same time you're declaring its object literal. The following has been a nonstandard extension in many JS engines for a while, but is standardized as of ES6:
+有时候在你声明对象字面量的同时给它的`[[Prototype]]`赋值很有用。下面的代码在一段时期内曾经是许多JS引擎的一种非标准扩展，但是在ES6中得到了标准化：
 
 ```js
 var o1 = {
@@ -1524,13 +1495,13 @@ var o2 = {
 };
 ```
 
-`o2` is declared with a normal object literal, but it's also `[[Prototype]]`-linked to `o1`. The `__proto__` property name here can also be a string `"__proto__"`, but note that it *cannot* be the result of a computed property name (see the previous section).
+`o2`是用一个对象字面量声明的，但它也被`[[Prototype]]`链接到了`o1`。这里的`__proto__`属性名还可以是一个字符串`"__proto__"`，但是要注意它 *不能* 是一个可计算属性名的结果（参见前一节）。
 
-`__proto__` is controversial, to say the least. It's a decades-old proprietary extension to JS that is finally standardized, somewhat begrudgingly it seems, in ES6. Many developers feel it shouldn't ever be used. In fact, it's in "Annex B" of ES6, which is the section that lists things JS feels it has to standardize for compatibility reasons only.
+客气点儿说，`__proto__`是有争议的。在ES6中，它看起来是一个最终被很勉强地标准化了的，几十年前的自主扩展功能。实际上，它属于ES6的“Annex B”，这一部分罗列了JS感觉它仅仅为了兼容性的原因，而不得不标准化的东西。
 
-**Warning:** Though I'm narrowly endorsing `__proto__` as a key in an object literal definition, I definitely do not endorse using it in its object property form, like `o.__proto__`. That form is both a getter and setter (again for compatibility reasons), but there are definitely better options. See the *this & Object Prototypes* title of this series for more information.
+**警告：** 虽然我勉强赞同在一个对象字面定义中将`__proto__`作为一个键，但我绝对不赞同在对象属性形式中使用它，就像`o.__proto__`。这种形式既是一个getter也是一个setter（也是为了兼容性的原因），但绝对存在更好的选择。更多信息参见 *this与对象原型*。
 
-For setting the `[[Prototype]]` of an existing object, you can use the ES6 utility `Object.setPrototypeOf(..)`. Consider:
+对于给一个既存的对象设置`[[Prototype]]`，你可以使用ES6的工具`Object.setPrototypeOf(..)`。考虑如下代码：
 
 ```js
 var o1 = {
@@ -1544,13 +1515,13 @@ var o2 = {
 Object.setPrototypeOf( o2, o1 );
 ```
 
-**Note:** We'll discuss `Object` again in Chapter 6. "`Object.setPrototypeOf(..)` Static Function" provides additional details on `Object.setPrototypeOf(..)`. Also see "`Object.assign(..)` Static Function" for another form that relates `o2` prototypically to `o1`.
+**注意：** 我们将在第六章中再次讨论`Object`。“`Object.setPrototypeOf(..)`静态函数”提供了关于`Object.setPrototypeOf(..)`的额外细节。另外参见“`Object.assign(..)`静态函数”来了解另一种将`o2`原型关联到`o1`的形式。
 
 ### Object `super`
 
-`super` is typically thought of as being only related to classes. However, due to JS's classless-objects-with-prototypes nature, `super` is equally effective, and nearly the same in behavior, with plain objects' concise methods.
+`super`通常被认为是仅与类有关。然而，由于JS对象仅有原型而没有类的性质，`super`是同样有效的，而且在普通对象的简约方法中行为几乎一样。
 
-Consider:
+考虑如下代码：
 
 ```js
 var o1 = {
@@ -1572,11 +1543,11 @@ o2.foo();		// o1:foo
 				// o2:foo
 ```
 
-**Warning:** `super` is only allowed in concise methods, not regular function expression properties. It also is only allowed in `super.XXX` form (for property/method access), not in `super()` form.
+**警告：** `super`仅在简约方法中允许使用，而不允许在普通的函数表达式属性中。而且它还仅允许使用`super.XXX`形式（属性/方法访问），而不是`super()`形式。
 
-The `super` reference in the `o2.foo()` method is locked statically to `o2`, and specifically to the `[[Prototype]]` of `o2`. `super` here would basically be `Object.getPrototypeOf(o2)` -- resolves to `o1` of course -- which is how it finds and calls `o1.foo()`.
+在方法`o2.foo()`中的`super`引用被静态地锁定在了`o2`，而且明确地说是`o2`的`[[Prototype]]`。这里的`super`基本上是`Object.getPrototypeOf(o2)` —— 显然被解析为`o1` —— 这就是他如何找到并调用`o1.foo()`的。
 
-For complete details on `super`, see "Classes" in Chapter 3.
+关于`super`的完整细节，参见第三章的“类”。
 
 ## Template Literals
 
