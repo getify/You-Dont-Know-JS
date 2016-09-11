@@ -551,7 +551,7 @@ myObject.b; // undefined
 
 `Object.seal(..)`创建一个“封印”的对象，这意味着它实质上在当前的对象上调用`Object.preventExtensions(..)`，同时也将它所有的既存属性标记为`configurable:false`。
 
-所以，你既不能添加更多的属性，也不能重新配置或删除寄存属性（虽然你依然 *可以* 修改它们的值）。
+所以，你既不能添加更多的属性，也不能重新配置或删除既存属性（虽然你依然 *可以* 修改它们的值）。
 
 #### 冻结（Freeze）
 
@@ -631,7 +631,7 @@ myObject.b; // undefined
 
 ES5引入了一个方法来覆盖这些默认操作的一部分，但不是在对象级别而是针对每个属性，就是通过getters和setters。Getter是实际上调用一个隐藏函数来取得值的属性。Setter是实际上调用一个隐藏函数来设置值的属性。
 
-当你将一个属性定义为拥有getter或setter或两者兼备，那么它的定义就成为了“访问器描述符”（与“数据描述符”相对）。对于访问器描述符，它`value`和`writable`性质没有意义而被忽略，取而代之的是JS将会考虑属性的`set`和`get`性质（还有`configurable`和`enumerable`）。
+当你将一个属性定义为拥有getter或setter或两者兼备，那么它的定义就成为了“访问器描述符”（与“数据描述符”相对）。对于访问器描述符，它的`value`和`writable`性质没有意义而被忽略，取而代之的是JS将会考虑属性的`set`和`get`性质（还有`configurable`和`enumerable`）。
 
 考虑下面的代码：
 
