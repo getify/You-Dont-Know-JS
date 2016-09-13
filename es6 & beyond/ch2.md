@@ -677,7 +677,7 @@ console.log( o.a, o.b, o.c );		// 1 2 3
 console.log( o.x, o.y, o.z );		// 4 5 6
 ```
 
-你甚至可以在解构中使用可计算属性名。考虑如下代码：
+你甚至可以在解构中使用计算型属性名。考虑如下代码：
 
 ```js
 var which = "x",
@@ -688,7 +688,7 @@ var which = "x",
 console.log( o.x );					// 4
 ```
 
-`[which]:`的部分是可计算属性名，它的结果是`x` —— 将从当前的对象中拆解出来作为赋值的源头的属性。`o[which]`的部分只是一个普通的对象键引用，作为赋值的目标来说它与`o.x`是等价的。
+`[which]:`的部分是计算型属性名，它的结果是`x` —— 将从当前的对象中拆解出来作为赋值的源头的属性。`o[which]`的部分只是一个普通的对象键引用，作为赋值的目标来说它与`o.x`是等价的。
 
 你可以使用普通的赋值来创建对象映射/变形，例如：
 
@@ -1458,7 +1458,7 @@ var o = {
 
 任何合法的表达式都可以出现在位于对象字面定义的属性名位置的`[ .. ]`内部。
 
-很有可能，可计算属性名最经常与`Symbol`（我们将在本章稍后的“Symbol”中讲解）一起使用，比如：
+很有可能，计算型属性名最经常与`Symbol`（我们将在本章稍后的“Symbol”中讲解）一起使用，比如：
 
 ```js
 var o = {
@@ -1469,7 +1469,7 @@ var o = {
 
 `Symbol.toStringTag`是一个特殊的内建值，我们使用`[ .. ]`语法求值得到，所以我们可以将值`"really cool thing"`赋值给这个特殊的属性名。
 
-可计算属性名还可以作为简约方法或简约generator的名称出现：
+计算型属性名还可以作为简约方法或简约generator的名称出现：
 
 ```js
 var o = {
@@ -1495,7 +1495,7 @@ var o2 = {
 };
 ```
 
-`o2`是用一个对象字面量声明的，但它也被`[[Prototype]]`链接到了`o1`。这里的`__proto__`属性名还可以是一个字符串`"__proto__"`，但是要注意它 *不能* 是一个可计算属性名的结果（参见前一节）。
+`o2`是用一个对象字面量声明的，但它也被`[[Prototype]]`链接到了`o1`。这里的`__proto__`属性名还可以是一个字符串`"__proto__"`，但是要注意它 *不能* 是一个计算型属性名的结果（参见前一节）。
 
 客气点儿说，`__proto__`是有争议的。在ES6中，它看起来是一个最终被很勉强地标准化了的，几十年前的自主扩展功能。实际上，它属于ES6的“Annex B”，这一部分罗列了JS感觉它仅仅为了兼容性的原因，而不得不标准化的东西。
 
@@ -1551,17 +1551,17 @@ o2.foo();		// o1:foo
 
 ## Template Literals
 
-At the very outset of this section, I'm going to have to call out the name of this ES6 feature as being awfully... misleading, depending on your experiences with what the word *template* means.
+在这一节的最开始，我将不得不呼唤这个ES6特性的极其……误导人的名称，这要看在你的经验中 *模板（template）* 一词的含义是什么。
 
-Many developers think of templates as being reusable renderable pieces of text, such as the capability provided by most template engines (Mustache, Handlebars, etc.). ES6's use of the word *template* would imply something similar, like a way to declare inline template literals that can be re-rendered. However, that's not at all the right way to think about this feature.
+许多开发者认为模板是一段可重用的，可重绘的文本，就像大多数模板引擎（Mustache，Handlebars，等等）提供的能力那样。ES6中使用的 *模板* 一词暗示着相似的东西，就像一种声明可以被重绘的内联模板字面量的方法。然而，这根本不是考虑这个特性的正确方式。
 
-So, before we go on, I'm renaming to what it should have been called: *interpolated string literals* (or *interpoliterals* for short).
+所以，在我们继续之前，我把它重命名为它本应被称呼的名字：*查补型字符串字面量*（或者略称为 *查补型字面量*）。
 
-You're already well aware of declaring string literals with `"` or `'` delimiters, and you also know that these are not *smart strings* (as some languages have), where the contents would be parsed for interpolation expressions.
+你已经十分清楚地知道了如何使用`"`或`'`分隔符来声明字符串字面量，而且你还知道它们不是（像有些语言中拥有的）内容将被解析为查补表达式的 *智能字符串*。
 
-However, ES6 introduces a new type of string literal, using the `` ` `` backtick as the delimiter. These string literals allow basic string interpolation expressions to be embedded, which are then automatically parsed and evaluated.
+但是，ES6引入了一种新型的字符串字面量，使用反引号`` ` ``作为分隔符。这些字符串字面量允许嵌入基本的字符串查补表达式，之后这些表达式自动地被解析和求值。
 
-Here's the old pre-ES6 way:
+这是老式的前ES6方式：
 
 ```js
 var name = "Kyle";
@@ -1572,7 +1572,7 @@ console.log( greeting );			// "Hello Kyle!"
 console.log( typeof greeting );		// "string"
 ```
 
-Now, consider the new ES6 way:
+现在，考虑这种新的ES6方式：
 
 ```js
 var name = "Kyle";
@@ -1583,13 +1583,13 @@ console.log( greeting );			// "Hello Kyle!"
 console.log( typeof greeting );		// "string"
 ```
 
-As you can see, we used the `` `..` `` around a series of characters, which are interpreted as a string literal, but any expressions of the form `${..}` are parsed and evaluated inline immediately. The fancy term for such parsing and evaluating is *interpolation* (much more accurate than templating).
+如你所见，我们在一系列被翻译为字符串字面量的字符周围使用了`` `..` ``，但是`${..}`形式中的任何表达式都将立即内联地被解析和求值。称呼这样的解析和求值的高大上名词就是 *插补（interpolation）*（比模板要准确多了）。
 
-The result of the interpolated string literal expression is just a plain old normal string, assigned to the `greeting` variable.
+被查补的字符串字面量表达式的结果只是一个老式的普通字符串，赋值给变量`greeting`。
 
-**Warning:** `typeof greeting == "string"` illustrates why it's important not to think of these entities as special template values, as you cannot assign the unevaluated form of the literal to something and reuse it. The `` `..` `` string literal is more like an IIFE in the sense that it's automatically evaluated inline. The result of a `` `..` `` string literal is, simply, just a string.
+**警告：** `typeof greeting == "string"`展示了为什么不将这些实体考虑为特殊的模板值很重要，因为你不能将这种字面量的未求值形式赋值给某些东西并重用它。`` `..` ``字符串字面量在某种意义上更像是IIFE，因为它自动内联地被求值。`` `..` ``字符串字面量的结果只不过是一个简单的字符串。
 
-One really nice benefit of interpolated string literals is they are allowed to split across multiple lines:
+查补型字符串字面量的一个真正的好处是他们允许被分割为多行：
 
 ```js
 var text =
@@ -1603,15 +1603,15 @@ console.log( text );
 // country!
 ```
 
-The line breaks (newlines) in the interpolated string literal were preserved in the string value.
+在查补型字符串字面量中的换行将会被保留在字符串值中。
 
-Unless appearing as explicit escape sequences in the literal value, the value of the `\r` carriage return character (code point `U+000D`) or the value of the `\r\n` carriage return + line feed sequence (code points `U+000D` and `U+000A`) are both normalized to a `\n` line feed character (code point `U+000A`). Don't worry though; this normalization is rare and would likely only happen if copy-pasting text into your JS file.
+除非在字面量值中作为明确的转义序列出现，回车字符`\r`（编码点`U+000D`）的值或者回车+换行序列`\r\n`（编码点`U+000D`和`U+000A`）的值都会被泛化为一个换行字符`\n`（编码点`U+000A`）。但不要担心；这种泛化很少见而且很可能仅会在你将文本拷贝粘贴到JS文件中时才会发生。
 
 ### Interpolated Expressions
 
-Any valid expression is allowed to appear inside `${..}` in an interpolated string literal, including function calls, inline function expression calls, and even other interpolated string literals!
+在一个查补型字符串字面量中任何合法的表达式都被允许出现在`${..}`内部，包括函数调用，内联函数表达式调用，甚至是另一个查补型字符串字面量！
 
-Consider:
+考虑如下代码：
 
 ```js
 function upper(s) {
@@ -1629,17 +1629,17 @@ console.log( text );
 // to all of you READERS!
 ```
 
-Here, the inner `` `${who}s` `` interpolated string literal was a little bit nicer convenience for us when combining the `who` variable with the `"s"` string, as opposed to `who + "s"`. There will be cases that nesting interpolated string literals is helpful, but be wary if you find yourself doing that kind of thing often, or if you find yourself nesting several levels deep.
+当我们组合变量`who`与字符串`s`时， 相对于`who + "s"`，这里的内部查补型字符串字面量`` `${who}s` ``更方便一些。有些情况下嵌套的查补型字符串字面量是有用的，但是如果你发现自己做这样的事情太频繁，或者发现你自己嵌套了好几层时，你就要小心一些。
 
-If that's the case, the odds are good that your string value production could benefit from some abstractions.
+如果确实有这样情况，你的字符串你值生产过程很可能可以从某些抽象中获益。
 
-**Warning:** As a word of caution, be very careful about the readability of your code with such new found power. Just like with default value expressions and destructuring assignment expressions, just because you *can* do something doesn't mean you *should* do it. Never go so overboard with new ES6 tricks that your code becomes more clever than you or your other team members.
+**警告：** 作为一个忠告，使用这样的新发现的力量时要非常小心你代码的可读性。就像默认值表达式和结构赋值表达式一样，仅仅因为你 *能* 做某些事情，并不意味着你 *应该* 做这些事情。在使用新的ES6技巧时千万不要做过了头，使你的代码比你或者你的其他队友聪明。
 
 #### Expression Scope
 
-One quick note about the scope that is used to resolve variables in expressions. I mentioned earlier that an interpolated string literal is kind of like an IIFE, and it turns out thinking about it like that explains the scoping behavior as well.
+关于作用域的一个快速提醒是它用于解析表达式中的变量。我早先提到过一个查补型字符串字面量与IIFE有些相像，事实上这也可以考虑为作用域行为的一种解释。
 
-Consider:
+考虑如下代码：
 
 ```js
 function foo(str) {
@@ -1657,15 +1657,15 @@ var name = "global";
 bar();					// "Hello from bar!"
 ```
 
-At the moment the `` `..` `` string literal is expressed, inside the `bar()` function, the scope available to it finds `bar()`'s `name` variable with value `"bar"`. Neither the global `name` nor `foo(..)`'s `name` matter. In other words, an interpolated string literal is just lexically scoped where it appears, not dynamically scoped in any way.
+在函数`bar()`内部，字符串字面量`` `..` ``被表达的那一刻，可供它查找的作用域发现变量的`name`的值为`"bar"`。既不是全局的`name`也不是`foo(..)`的`name`。换句话说，一个查补型字符串字面量在它出现的地方是词法作用域的，而不是任何方式的动态作用域。
 
 ### Tagged Template Literals
 
-Again, renaming the feature for sanity sake: *tagged string literals*.
+再次为了合理性而重命名这个特性：*标签型字符串字面量*。
 
-To be honest, this is one of the cooler tricks that ES6 offers. It may seem a little strange, and perhaps not all that generally practical at first. But once you've spent some time with it, tagged string literals may just surprise you in their usefulness.
+老实说，这是一个ES6提供的更酷的特性。它可能看起来有点儿奇怪，而且也许一开始看起来一般不那么实用。但一旦你花些时间在它上面，标签型字符串字面量的用处可能会令你惊讶。
 
-For example:
+例如：
 
 ```js
 function foo(strings, ...values) {
@@ -1680,9 +1680,9 @@ foo`Everything is ${desc}!`;
 // [ "awesome" ]
 ```
 
-Let's take a moment to consider what's happening in the previous snippet. First, the most jarring thing that jumps out is ``foo`Everything...`;``. That doesn't look like anything we've seen before. What is it?
+让我们花点儿时间考虑一下前面的代码段中发生了什么。首先，跳出来的最刺眼的东西就是``foo`Everything...`;``。它看起来不像是任何我们曾经见过的东西。不是吗？
 
-It's essentially a special kind of function call that doesn't need the `( .. )`. The *tag* -- the `foo` part before the `` `..` `` string literal -- is a function value that should be called. Actually, it can be any expression that results in a function, even a function call that returns another function, like:
+它实质上是一种不需要`( .. )`的特殊函数调用。*标签*—— 在字符串字面量`` `..` ``之前的`foo`部分 —— 是一个应当被调用的函数的值。实际上，它可以是返回函数的任何表达式，甚至是一个返回另一个函数的函数调用，就像：
 
 ```js
 function bar() {
@@ -1699,19 +1699,19 @@ bar()`Everything is ${desc}!`;
 // [ "awesome" ]
 ```
 
-But what gets passed to the `foo(..)` function when invoked as a tag for a string literal?
+但是当作为一个字符串字面量的标签时，函数`foo(..)`被传入了什么？
 
-The first argument -- we called it `strings` -- is an array of all the plain strings (the stuff between any interpolated expressions). We get two values in the `strings` array: `"Everything is "` and `"!"`.
+第一个参数值 —— 我们称它为`strings` —— 是一个所有普通字符串的数组（任何被查补的表达式之间的东西）。我们在`strings`数组中得到两个值：`"Everything is "`和`"!"`。
 
-For convenience sake in our example, we then gather up all subsequent arguments into an array called `values` using the `...` gather/rest operator (see the "Spread/Rest" section earlier in this chapter), though you could of course have left them as individual named parameters following the `strings` parameter.
+之后为了我们示例的方便，我们使用`...`收集/剩余操作符（见本章早先的“扩散/剩余”部分）将所有后续的参数值收集到一个称为`values`的数组中，虽说你本来当然可以把它们留作参数`strings`后面单独的命名参数。
 
-The argument(s) gathered into our `values` array are the results of the already-evaluated interpolation expressions found in the string literal. So obviously the only element in `values` in our example is `"awesome"`.
+被收集进我们的`values`数组中的参数值，就是在字符串字面量中发现的，已经被求过值的查补表达式的结果。所以显然在我们的例子中`values`里唯一的元素就是`awesome`。
 
-You can think of these two arrays as: the values in `values` are the separators if you were to splice them in between the values in `strings`, and then if you joined everything together, you'd get the complete interpolated string value.
+你可以将这两个数组考虑为：在`values`中的值原本是你拼接在`stings`的值之间的分隔符，而且如果你将所有的东西连接在一起，你就会得到完整的查补字符串值。
 
-A tagged string literal is like a processing step after the interpolation expressions are evaluated but before the final string value is compiled, allowing you more control over generating the string from the literal.
+一个标签型字符串字面量像是一个在查补表达式被评价之后，但是在最终的字符串被编译之前的处理步骤，允许你在从字面量中产生字符串的过程中进行更多的控制。
 
-Typically, the string literal tag function (`foo(..)` in the previous snippets) should compute an appropriate string value and return it, so that you can use the tagged string literal as a value just like untagged string literals:
+一般来说，一个字符串字面连标签函数（在前面的代码段中是`foo(..)`）应当计算一个恰当的字符串值并返回它，所以你可以使用标签型字符串字面量作为一个未打标签的字符串字面量来使用：
 
 ```js
 function tag(strings, ...values) {
@@ -1727,9 +1727,9 @@ var text = tag`Everything is ${desc}!`;
 console.log( text );			// Everything is awesome!
 ```
 
-In this snippet, `tag(..)` is a pass-through operation, in that it doesn't perform any special modifications, but just uses `reduce(..)` to loop over and splice/interleave `strings` and `values` together the same way an untagged string literal would have done.
+在这个代码段中，`tag(..)`是一个直通操作，因为它不实施任何特殊的修改，而只是使用`reduce(..)`来循环遍历，并像一个未打标签的字符串字面量一样，将`strings`和`values`拼接/穿插在一起。
 
-So what are some practical uses? There are many advanced ones that are beyond our scope to discuss here. But here's a simple idea that formats numbers as U.S. dollars (sort of like basic localization):
+那么实际的用法是什么？有许多高级的用法超出了我们要在这里讨论的范围。但这里有一个格式化美元数字的简单想法（有些像基本的本地化）：
 
 ```js
 function dollabillsyall(strings, ...values) {
@@ -1764,11 +1764,11 @@ console.log( text );
 // comes out to $12.95.
 ```
 
-If a `number` value is encountered in the `values` array, we put `"$"` in front of it and format it to two decimal places with `toFixed(2)`. Otherwise, we let the value pass-through untouched.
+如果在`values`数组中遇到一个`number`值，我们就在它前面放一个`"$"`并用`toFixed(2)`将它格式化为小数点后两位有效。否则，我们就不碰这个值而让它直通过去。
 
 #### Raw Strings
 
-In the previous snippets, our tag functions receive the first argument we called `strings`, which is an array. But there's an additional bit of data included: the raw unprocessed versions of all the strings. You can access those raw string values using the `.raw` property, like this:
+在前一个代码段中，我们的标签函数接受的第一个参数值称为`strings`，是一个数组。但是有一点儿额外的数据被包含了进来：所有字符串的原始未处理版本。你可以使用`.raw`属性访问这些原始字符串值，就像这样：
 
 ```js
 function showraw(strings, ...values) {
@@ -1782,9 +1782,9 @@ showraw`Hello\nWorld`;
 // [ "Hello\nWorld" ]
 ```
 
-The raw version of the value preserves the raw escaped `\n` sequence (the `\` and the `n` are separate characters), while the processed version considers it a single newline character. However, the earlier mentioned line-ending normalization is applied to both values.
+原始版本的值保留了原始的转义序列`\n`（`\`和`n`是两个分离的字符），虽然处理过的版本认为它是一个单独的换行符。但是，早先提到的行终结符泛化操作，是对两个值都实施的。
 
-ES6 comes with a built-in function that can be used as a string literal tag: `String.raw(..)`. It simply passes through the raw versions of the `strings` values:
+ES6带来了一个内建函数，它可以用做字符串字面量的标签：`String.raw(..)`。它简单地直通`strings`值的原始版本：
 
 ```js
 console.log( `Hello\nWorld` );
@@ -1798,13 +1798,17 @@ String.raw`Hello\nWorld`.length;
 // 12
 ```
 
-Other uses for string literal tags included special processing for internationalization, localization, and more!
+字符串字面量标签的其他用法包括国际化，本地化，和许多其他的特殊处理，
 
 ## Arrow Functions
 
 We've touched on `this` binding complications with functions earlier in this chapter, and they're covered at length in the *this & Object Prototypes* title of this series. It's important to understand the frustrations that `this`-based programming with normal functions brings, because that is the primary motivation for the new ES6 `=>` arrow function feature.
 
+我们在本章早先接触了函数中`this`绑定的复杂性，而且在本系列的 *this与对象原型* 中也以相当的篇幅讲解过。理解普通函数中基于`this`的编程带来的挫折是很重要的，因为这是ES6的新`=>`箭头函数的主要动机。
+
 Let's first illustrate what an arrow function looks like, as compared to normal functions:
+
+作为与普通函数的比较，我们首先来展示一下箭头函数看起来什么样：
 
 ```js
 function foo(x,y) {
@@ -1818,11 +1822,19 @@ var foo = (x,y) => x + y;
 
 The arrow function definition consists of a parameter list (of zero or more parameters, and surrounding `( .. )` if there's not exactly one parameter), followed by the `=>` marker, followed by a function body.
 
+箭头函数的定义由一个参数列表（零个或多个参数，如果参数不是只有一个，需要有一个`( .. )`包围这些参数）组成，紧跟着是一个`=>`符号，然后是一个函数体。
+
 So, in the previous snippet, the arrow function is just the `(x,y) => x + y` part, and that function reference happens to be assigned to the variable `foo`.
+
+所以，在前面的代码段中，箭头函数只是`(x,y) => x + y`这一部分，而这个函数的引用刚好被赋值给了变量`foo`。
 
 The body only needs to be enclosed by `{ .. }` if there's more than one expression, or if the body consists of a non-expression statement. If there's only one expression, and you omit the surrounding `{ .. }`, there's an implied `return` in front of the expression, as illustrated in the previous snippet.
 
+函数体仅在含有多于一个表达式，或者由一个非表达式语句组成时才需要用`{ .. }`括起来。如果仅含有一个表达式，而且你省略了外围的`{ .. }`，那么在这个表达式前面就会有一个隐含的`return`，就像前面的代码段中展示的那样。
+
 Here's some other arrow function variations to consider:
+
+这里是一些其他种类的箭头函数：
 
 ```js
 var f1 = () => 12;
@@ -1837,11 +1849,19 @@ var f3 = (x,y) => {
 
 Arrow functions are *always* function expressions; there is no arrow function declaration. It also should be clear that they are anonymous function expressions -- they have no named reference for the purposes of recursion or event binding/unbinding -- though "Function Names" in Chapter 7 will describe ES6's function name inference rules for debugging purposes.
 
+箭头函数 *总是* 函数表达式；不存在箭头函数声明。而且很明显它们都是匿名函数表达式 —— 它们没有可以用于递归或者事件绑定/解除的命名引用 —— 虽然在第七章的“函数名”中将会讲解为了调试的目的而存在的ES6函数名接口规则。
+
 **Note:** All the capabilities of normal function parameters are available to arrow functions, including default values, destructuring, rest parameters, and so on.
+
+**注意：** 普通函数参数的所有功能对于箭头函数都是可用的，包括默认值，解构，剩余参数，等等。
 
 Arrow functions have a nice, shorter syntax, which makes them on the surface very attractive for writing terser code. Indeed, nearly all literature on ES6 (other than the titles in this series) seems to immediately and exclusively adopt the arrow function as "the new function."
 
+箭头函数拥有漂亮，简短的语法，这使得它们在表面上看起来对于编写简洁代码很有吸引力。确实，几乎所有关于ES6的文献（除了这个系列中的书目）看起来都立即将箭头函数仅仅认作“新函数”。
+
 It is telling that nearly all examples in discussion of arrow functions are short single statement utilities, such as those passed as callbacks to various utilities. For example:
+
+这说明在关于箭头函数的讨论中，几乎所有的例子都是简短的单语句工具，比如那些作为回调传递给各种工具的箭头函数。例如：
 
 ```js
 var a = [1,2,3,4,5];
@@ -1853,11 +1873,19 @@ console.log( a );				// [2,4,6,8,10]
 
 In those cases, where you have such inline function expressions, and they fit the pattern of computing a quick calculation in a single statement and returning that result, arrow functions indeed look to be an attractive and lightweight alternative to the more verbose `function` keyword and syntax.
 
+在这些情况下，你的内联函数表达式很适合这种在一个单独语句中快速计算并返回结果的模式，对于更繁冗的`function`关键字和语法来说箭头函数确实看起来是一个很吸人，而且轻量的替代品。
+
 Most people tend to *ooh and aah* at nice terse examples like that, as I imagine you just did!
+
+大多数人看着这样简洁的例子都倾向于发出“哦……！啊……！”的感叹，就像我想象中你刚刚做的那样！
 
 However, I would caution you that it would seem to me somewhat a misapplication of this feature to use arrow function syntax with otherwise normal, multistatement functions, especially those that would otherwise be naturally expressed as function declarations.
 
+然而我要警示你的是，在我看来，使用箭头函数的语法代替普通的，多语句函数，特别是那些可以被自然地表达为函数声明的函数，是某种误用。
+
 Recall the `dollabillsyall(..)` string literal tag function from earlier in this chapter -- let's change it to use `=>` syntax:
+
+会议本章早前的字符串字面量标签函数`dollabillsyall(..)` —— 让我们将它改为使用`=>`语法：
 
 ```js
 var dollabillsyall = (strings, ...values) =>
@@ -1879,21 +1907,37 @@ var dollabillsyall = (strings, ...values) =>
 
 In this example,  the only modifications I made were the removal of `function`, `return`, and some `{ .. }`, and then the insertion of `=>` and a `var`. Is this a significant improvement in the readability of the code? Meh.
 
+在这个例子中，我做的唯一修改是删除了`function`，`return`，和一些`{ .. }`，然后插入了`=>`和一个`var`。这是对代码可读性的重大改进吗？哼。
+
 I'd actually argue that the lack of `return` and outer `{ .. }` partially obscures the fact that the `reduce(..)` call is the only statement in the `dollabillsyall(..)` function and that its result is the intended result of the call. Also, the trained eye that is so used to hunting for the word `function` in code to find scope boundaries now needs to look for the `=>` marker, which can definitely be harder to find in the thick of the code.
+
+实际上我会争论，缺少`return`和外部的`{ .. }`在某种程度上模糊了这样的事实：`reduce(..)`调用是函数`dollabillsyall(..)`中唯一的语句，而且它的结果是这个调用的预期结果。另外，那些受过训练而习惯于在代码中搜索`function`关键字来寻找作用域边界的眼睛，现在需要搜索`=>`标志，在密集的代码中这绝对会更加困难。
 
 While not a hard-and-fast rule, I'd say that the readability gains from `=>` arrow function conversion are inversely proportional to the length of the function being converted. The longer the function, the less `=>` helps; the shorter the function, the more `=>` can shine.
 
+虽然不是一个硬性规则，但是我要说从`=>`箭头函数转换得来的可读性，与被转换的函数长度成反比。函数越长，`=>`能帮的忙越少；函数越短，`=>`的闪光之处就越多。
+
 I think it's probably more sensible and reasonable to adopt `=>` for the places in code where you do need short inline function expressions, but leave your normal-length main functions as is.
+
+我觉得这样做更明智也更合理：在你需要短的内联函数表达式的地方采用`=>`，但保持你的一般长度的主函数原封不动。
 
 ### Not Just Shorter Syntax, But `this`
 
 Most of the popular attention toward `=>` has been on saving those precious keystrokes by dropping `function`, `return`, and `{ .. }` from your code.
 
+曾经集中在`=>`上的大多数注意力都是它通过在你的代码中除去`function`，`return`，和`{ .. }`来节省那些宝贵的击键。
+
 But there's a big detail we've skipped over so far. I said at the beginning of the section that `=>` functions are closely related to `this` binding behavior. In fact, `=>` arrow functions are *primarily designed* to alter `this` behavior in a specific way, solving a particular and common pain point with `this`-aware coding.
+
+但是至此我们一直忽略了一个重要的细节。我在这一节最开始的时候说过`=>`函数与`this`绑定行为密切相关。事实上，`=>`箭头函数 *主要的设计目的* 就是以一种特定的方式改变`this`的行为，解决在`this`敏感的编码中的一个痛点。
 
 The saving of keystrokes is a red herring, a misleading sideshow at best.
 
+节省击键是掩人耳目的东西，至多是一个误导人的配角。
+
 Let's revisit another example from earlier in this chapter:
+
+让我们重温本章早前的另一个例子：
 
 ```js
 var controller = {
@@ -1910,9 +1954,15 @@ var controller = {
 
 We used the `var self = this` hack, and then referenced `self.makeRequest(..)`, because inside the callback function we're passing to `addEventListener(..)`, the `this` binding will not be the same as it is in `makeRequest(..)` itself. In other words, because `this` bindings are dynamic, we fall back to the predictability of lexical scope via the `self` variable.
 
+我们使用了黑科技`var self = this`，然后引用了`self.makeRequest(..)`，因为在我们传递给`addEventListener(..)`的回调函数内部，`this`绑定将于`makeRequest(..)`本身中的`this`绑定不同。换句话说，因为`this`绑定是动态的，我们通过`self`变量退回到了可预测的词法作用域。
+
 Herein we finally can see the primary design characteristic of `=>` arrow functions. Inside arrow functions, the `this` binding is not dynamic, but is instead lexical. In the previous snippet, if we used an arrow function for the callback, `this` will be predictably what we wanted it to be.
 
+在这其中我们终于可以看到`=>`箭头函数主要的设计特性了。在箭头函数内部，`this`绑定不是动态的，而是词法的。在前一个代码段中，如果我们在回调里使用一个箭头函数，`this`将会不出所料地成为我们希望它成为的东西。
+
 Consider:
+
+考虑如下代码：
 
 ```js
 var controller = {
@@ -1926,6 +1976,8 @@ var controller = {
 ```
 
 Lexical `this` in the arrow function callback in the previous snippet now points to the same value as in the enclosing `makeRequest(..)` function. In other words, `=>` is a syntactic stand-in for `var self = this`.
+
+前面代码段的箭头函数中的词法`this`现在与
 
 In cases where `var self = this` (or, alternatively, a function `.bind(this)` call) would normally be helpful, `=>` arrow functions are a nicer alternative operating on the same prinicple. Sounds great, right?
 
