@@ -1802,11 +1802,7 @@ String.raw`Hello\nWorld`.length;
 
 ## Arrow Functions
 
-We've touched on `this` binding complications with functions earlier in this chapter, and they're covered at length in the *this & Object Prototypes* title of this series. It's important to understand the frustrations that `this`-based programming with normal functions brings, because that is the primary motivation for the new ES6 `=>` arrow function feature.
-
 我们在本章早先接触了函数中`this`绑定的复杂性，而且在本系列的 *this与对象原型* 中也以相当的篇幅讲解过。理解普通函数中基于`this`的编程带来的挫折是很重要的，因为这是ES6的新`=>`箭头函数的主要动机。
-
-Let's first illustrate what an arrow function looks like, as compared to normal functions:
 
 作为与普通函数的比较，我们首先来展示一下箭头函数看起来什么样：
 
@@ -1820,19 +1816,11 @@ function foo(x,y) {
 var foo = (x,y) => x + y;
 ```
 
-The arrow function definition consists of a parameter list (of zero or more parameters, and surrounding `( .. )` if there's not exactly one parameter), followed by the `=>` marker, followed by a function body.
-
 箭头函数的定义由一个参数列表（零个或多个参数，如果参数不是只有一个，需要有一个`( .. )`包围这些参数）组成，紧跟着是一个`=>`符号，然后是一个函数体。
-
-So, in the previous snippet, the arrow function is just the `(x,y) => x + y` part, and that function reference happens to be assigned to the variable `foo`.
 
 所以，在前面的代码段中，箭头函数只是`(x,y) => x + y`这一部分，而这个函数的引用刚好被赋值给了变量`foo`。
 
-The body only needs to be enclosed by `{ .. }` if there's more than one expression, or if the body consists of a non-expression statement. If there's only one expression, and you omit the surrounding `{ .. }`, there's an implied `return` in front of the expression, as illustrated in the previous snippet.
-
 函数体仅在含有多于一个表达式，或者由一个非表达式语句组成时才需要用`{ .. }`括起来。如果仅含有一个表达式，而且你省略了外围的`{ .. }`，那么在这个表达式前面就会有一个隐含的`return`，就像前面的代码段中展示的那样。
-
-Here's some other arrow function variations to consider:
 
 这里是一些其他种类的箭头函数：
 
@@ -1847,19 +1835,11 @@ var f3 = (x,y) => {
 };
 ```
 
-Arrow functions are *always* function expressions; there is no arrow function declaration. It also should be clear that they are anonymous function expressions -- they have no named reference for the purposes of recursion or event binding/unbinding -- though "Function Names" in Chapter 7 will describe ES6's function name inference rules for debugging purposes.
-
 箭头函数 *总是* 函数表达式；不存在箭头函数声明。而且很明显它们都是匿名函数表达式 —— 它们没有可以用于递归或者事件绑定/解除的命名引用 —— 虽然在第七章的“函数名”中将会讲解为了调试的目的而存在的ES6函数名接口规则。
-
-**Note:** All the capabilities of normal function parameters are available to arrow functions, including default values, destructuring, rest parameters, and so on.
 
 **注意：** 普通函数参数的所有功能对于箭头函数都是可用的，包括默认值，解构，剩余参数，等等。
 
-Arrow functions have a nice, shorter syntax, which makes them on the surface very attractive for writing terser code. Indeed, nearly all literature on ES6 (other than the titles in this series) seems to immediately and exclusively adopt the arrow function as "the new function."
-
 箭头函数拥有漂亮，简短的语法，这使得它们在表面上看起来对于编写简洁代码很有吸引力。确实，几乎所有关于ES6的文献（除了这个系列中的书目）看起来都立即将箭头函数仅仅认作“新函数”。
-
-It is telling that nearly all examples in discussion of arrow functions are short single statement utilities, such as those passed as callbacks to various utilities. For example:
 
 这说明在关于箭头函数的讨论中，几乎所有的例子都是简短的单语句工具，比如那些作为回调传递给各种工具的箭头函数。例如：
 
@@ -1871,19 +1851,11 @@ a = a.map( v => v * 2 );
 console.log( a );				// [2,4,6,8,10]
 ```
 
-In those cases, where you have such inline function expressions, and they fit the pattern of computing a quick calculation in a single statement and returning that result, arrow functions indeed look to be an attractive and lightweight alternative to the more verbose `function` keyword and syntax.
-
 在这些情况下，你的内联函数表达式很适合这种在一个单独语句中快速计算并返回结果的模式，对于更繁冗的`function`关键字和语法来说箭头函数确实看起来是一个很吸人，而且轻量的替代品。
-
-Most people tend to *ooh and aah* at nice terse examples like that, as I imagine you just did!
 
 大多数人看着这样简洁的例子都倾向于发出“哦……！啊……！”的感叹，就像我想象中你刚刚做的那样！
 
-However, I would caution you that it would seem to me somewhat a misapplication of this feature to use arrow function syntax with otherwise normal, multistatement functions, especially those that would otherwise be naturally expressed as function declarations.
-
 然而我要警示你的是，在我看来，使用箭头函数的语法代替普通的，多语句函数，特别是那些可以被自然地表达为函数声明的函数，是某种误用。
-
-Recall the `dollabillsyall(..)` string literal tag function from earlier in this chapter -- let's change it to use `=>` syntax:
 
 会议本章早前的字符串字面量标签函数`dollabillsyall(..)` —— 让我们将它改为使用`=>`语法：
 
@@ -1905,37 +1877,21 @@ var dollabillsyall = (strings, ...values) =>
 	}, "" );
 ```
 
-In this example,  the only modifications I made were the removal of `function`, `return`, and some `{ .. }`, and then the insertion of `=>` and a `var`. Is this a significant improvement in the readability of the code? Meh.
-
 在这个例子中，我做的唯一修改是删除了`function`，`return`，和一些`{ .. }`，然后插入了`=>`和一个`var`。这是对代码可读性的重大改进吗？哼。
-
-I'd actually argue that the lack of `return` and outer `{ .. }` partially obscures the fact that the `reduce(..)` call is the only statement in the `dollabillsyall(..)` function and that its result is the intended result of the call. Also, the trained eye that is so used to hunting for the word `function` in code to find scope boundaries now needs to look for the `=>` marker, which can definitely be harder to find in the thick of the code.
 
 实际上我会争论，缺少`return`和外部的`{ .. }`在某种程度上模糊了这样的事实：`reduce(..)`调用是函数`dollabillsyall(..)`中唯一的语句，而且它的结果是这个调用的预期结果。另外，那些受过训练而习惯于在代码中搜索`function`关键字来寻找作用域边界的眼睛，现在需要搜索`=>`标志，在密集的代码中这绝对会更加困难。
 
-While not a hard-and-fast rule, I'd say that the readability gains from `=>` arrow function conversion are inversely proportional to the length of the function being converted. The longer the function, the less `=>` helps; the shorter the function, the more `=>` can shine.
-
 虽然不是一个硬性规则，但是我要说从`=>`箭头函数转换得来的可读性，与被转换的函数长度成反比。函数越长，`=>`能帮的忙越少；函数越短，`=>`的闪光之处就越多。
-
-I think it's probably more sensible and reasonable to adopt `=>` for the places in code where you do need short inline function expressions, but leave your normal-length main functions as is.
 
 我觉得这样做更明智也更合理：在你需要短的内联函数表达式的地方采用`=>`，但保持你的一般长度的主函数原封不动。
 
 ### Not Just Shorter Syntax, But `this`
 
-Most of the popular attention toward `=>` has been on saving those precious keystrokes by dropping `function`, `return`, and `{ .. }` from your code.
-
 曾经集中在`=>`上的大多数注意力都是它通过在你的代码中除去`function`，`return`，和`{ .. }`来节省那些宝贵的击键。
-
-But there's a big detail we've skipped over so far. I said at the beginning of the section that `=>` functions are closely related to `this` binding behavior. In fact, `=>` arrow functions are *primarily designed* to alter `this` behavior in a specific way, solving a particular and common pain point with `this`-aware coding.
 
 但是至此我们一直忽略了一个重要的细节。我在这一节最开始的时候说过`=>`函数与`this`绑定行为密切相关。事实上，`=>`箭头函数 *主要的设计目的* 就是以一种特定的方式改变`this`的行为，解决在`this`敏感的编码中的一个痛点。
 
-The saving of keystrokes is a red herring, a misleading sideshow at best.
-
 节省击键是掩人耳目的东西，至多是一个误导人的配角。
-
-Let's revisit another example from earlier in this chapter:
 
 让我们重温本章早前的另一个例子：
 
@@ -1952,15 +1908,9 @@ var controller = {
 };
 ```
 
-We used the `var self = this` hack, and then referenced `self.makeRequest(..)`, because inside the callback function we're passing to `addEventListener(..)`, the `this` binding will not be the same as it is in `makeRequest(..)` itself. In other words, because `this` bindings are dynamic, we fall back to the predictability of lexical scope via the `self` variable.
-
 我们使用了黑科技`var self = this`，然后引用了`self.makeRequest(..)`，因为在我们传递给`addEventListener(..)`的回调函数内部，`this`绑定将于`makeRequest(..)`本身中的`this`绑定不同。换句话说，因为`this`绑定是动态的，我们通过`self`变量退回到了可预测的词法作用域。
 
-Herein we finally can see the primary design characteristic of `=>` arrow functions. Inside arrow functions, the `this` binding is not dynamic, but is instead lexical. In the previous snippet, if we used an arrow function for the callback, `this` will be predictably what we wanted it to be.
-
 在这其中我们终于可以看到`=>`箭头函数主要的设计特性了。在箭头函数内部，`this`绑定不是动态的，而是词法的。在前一个代码段中，如果我们在回调里使用一个箭头函数，`this`将会不出所料地成为我们希望它成为的东西。
-
-Consider:
 
 考虑如下代码：
 
@@ -1975,17 +1925,15 @@ var controller = {
 };
 ```
 
-Lexical `this` in the arrow function callback in the previous snippet now points to the same value as in the enclosing `makeRequest(..)` function. In other words, `=>` is a syntactic stand-in for `var self = this`.
+前面代码段的箭头函数中的词法`this`现在指向的值与外围的`makeRequest(..)`函数相同。换句话说，`=>`是`var self = this`的语法上的替代品。
 
-前面代码段的箭头函数中的词法`this`现在与
+在`var self = this`（或者，另一种选择是，`.bind(this)`调用）通常可以帮忙的情况下，`=>`箭头函数是一个基于相同原则的很好的替代操作。听起来很棒，是吧？
 
-In cases where `var self = this` (or, alternatively, a function `.bind(this)` call) would normally be helpful, `=>` arrow functions are a nicer alternative operating on the same prinicple. Sounds great, right?
+没那么简单。
 
-Not quite so simple.
+如果`=>`取代`var self = this`或`.bind(this)`可以工作，那么猜猜`=>`用于一个 *不需要* `var self = this`就能工作的`this`敏感的函数会发生么？你可能会猜到它将会把事情搞砸。没错。
 
-If `=>` replaces `var self = this` or `.bind(this)` and it helps, guess what happens if you use `=>` with a `this`-aware function that *doesn't* need `var self = this` to work? You might be able to guess that it's going to mess things up. Yeah.
-
-Consider:
+考虑如下代码：
 
 ```js
 var controller = {
@@ -2001,24 +1949,24 @@ var controller = {
 controller.makeRequest(..);
 ```
 
-Although we invoke as `controller.makeRequest(..)`, the `this.helper` reference fails, because `this` here doesn't point to `controller` as it normally would. Where does it point? It lexically inherits `this` from the surrounding scope. In this previous snippet, that's the global scope, where `this` points to the global object. Ugh.
+虽然我们以`controller.makeRequest(..)`的方式进行了调用，但是`this.helper`引用失败了，因为这里的`this`没有像平常那样指向`controller`。那么它指向哪里？它通过词法继承了外围的作用域中的`this`。在前面的代码段中，它是全局作用域，`this`指向了全局作用域。呃。
 
-In addition to lexical `this`, arrow functions also have lexical `arguments` -- they don't have their own `arguments` array but instead inherit from their parent -- as well as lexical `super` and `new.target` (see "Classes" in Chapter 3).
+除了词法的`this`以外，箭头函数还拥有词法的`arguments` —— 它们没有自己的`arguments`数组，而是从它们的上层继承下来 —— 同样还有词法的`super`和`new.target`（参见第三章的“类”）。
 
-So now we can conclude a more nuanced set of rules for when `=>` is appropriate and not:
+所以，关于`=>`在什么情况下合适或不合适，我们现在可以推论出一组更加微妙的规则：
 
-* If you have a short, single-statement inline function expression, where the only statement is a `return` of some computed value, *and* that function doesn't already make a `this` reference inside it, *and* there's no self-reference (recursion, event binding/unbinding), *and* you don't reasonably expect the function to ever be that way, you can probably safely refactor it to be an `=>` arrow function.
-* If you have an inner function expression that's relying on a `var self = this` hack or a `.bind(this)` call on it in the enclosing function to ensure proper `this` binding, that inner function expression can probably safely become an `=>` arrow function.
-* If you have an inner function expression that's relying on something like `var args = Array.prototype.slice.call(arguments)` in the enclosing function to make a lexical copy of `arguments`, that inner function expression can probably safely become an `=>` arrow function.
-* For everything else -- normal function declarations, longer multistatement function expressions, functions that need a lexical name identifier self-reference (recursion, etc.), and any other function that doesn't fit the previous characteristics -- you should probably avoid `=>` function syntax.
+* 如果你有一个简短的，单语句内联函数表达式，它唯一的语句是某个计算后的值的`return`语句，*并且* 这个函数没有在它内部制造一个`this`引用，*并且* 没有自引用（递归，事件绑定/解除），*并且* 你合理地预期这个函数绝不会变得需要`this`引用或自引用，那么你就可能安全地将它重构为一个`=>`箭头函数。
+* 如果你有一个内部函数表达式，它依赖于外围函数的`var self = this`黑科技或者`.bind(this)`调用来确保正确的`this`绑定，那么这个内部函数表达式就可能安全地变为一个`=>`箭头函数。
+* 如果你有一个内部函数表达式，它依赖于外围函数的类似于`var args = Array.prototype.slice.call(arguments)`这样的东西来制造一个`arguments`的词法拷贝，那么这个内部函数就可能安全地变为一个`=>`箭头函数。
+* 对于其他的所有东西 —— 普通函数声明，较长的多语句函数表达式，需要词法名称标识符进行自引用（递归等）的函数，和任何其他不符合前述性质的函数 —— 你就可能应当避免`=>`函数语法。
 
-Bottom line: `=>` is about lexical binding of `this`, `arguments`, and `super`. These are intentional features designed to fix some common problems, not bugs, quirks, or mistakes in ES6.
+底线：`=>`与`this`，`arguments`，和`super`的词法绑定有关。它们是ES6为了修正一些常见的问题而被有意设计的特性，而不是为了修正bug，怪异的代码，或者错误。
 
-Don't believe any hype that `=>` is primarily, or even mostly, about fewer keystrokes. Whether you save keystrokes or waste them, you should know exactly what you are intentionally doing with every character typed.
+不要相信任何说`=>`主要是，或者几乎是，为了减少几下击键的炒作。无论你是省下还是浪费了这几下击键，你都应当确切地知道你打入的每个字母是为了做什么。
 
-**Tip:** If you have a function that for any of these articulated reasons is not a good match for an `=>` arrow function, but it's being declared as part of an object literal, recall from "Concise Methods" earlier in this chapter that there's another option for shorter function syntax.
+**提示：** 如果你有一个函数，由于上述各种清楚的原因而不适合成为一个`=>`箭头函数，但同时它又被声明为一个对象字面量的一部分，那么回想一下本章早先的“简约方法”，它有简短函数语法的另一种选择。
 
-If you prefer a visual decision chart for how/why to pick an arrow function:
+对于如何/为何选用一个箭头函数，如果你喜欢一个可视化的决策图：
 
 <img src="fig1.png">
 
@@ -2026,9 +1974,15 @@ If you prefer a visual decision chart for how/why to pick an arrow function:
 
 Joining the `for` and `for..in` loops from the JavaScript we're all familiar with, ES6 adds a `for..of` loop, which loops over the set of values produced by an *iterator*.
 
+伴随着我们熟知的JavaScript`for`和`for..in`循环，ES6增加了一个`for..of`循环，它循环遍历一组由一个 *迭代器* 产生的值。
+
 The value you loop over with `for..of` must be an *iterable*, or it must be a value which can be coerced/boxed to an object (see the *Types & Grammar* title of this series) that is an iterable. An iterable is simply an object that is able to produce an iterator, which the loop then uses.
 
+你使用`for..of`循环遍历的值必须是一个 *iterable（可迭代对象）*，或者它必须是一个可以被强制转换/封箱（参见本系列的 *类型与文法*）为一个iterable对象的值。一个iterable是一个可以生成iterator（迭代器）的简单对象，然后由循环使用这个iterator。
+
 Let's compare `for..of` to `for..in` to illustrate the difference:
+
+让我们比较`for..of`与`for..in`来展示它们的区别：
 
 ```js
 var a = ["a","b","c","d","e"];
@@ -2046,7 +2000,11 @@ for (var val of a) {
 
 As you can see, `for..in` loops over the keys/indexes in the `a` array, while `for..of` loops over the values in `a`.
 
+如你所见，`for..in`循环遍历数组`a`中的键/索引，而`for.of`循环遍历`a`中的值。
+
 Here's the pre-ES6 version of the `for..of` from that previous snippet:
+
+这是前面代码段中`for..of`的前ES6版本：
 
 ```js
 var a = ["a","b","c","d","e"],
@@ -2060,6 +2018,8 @@ for (var val, i = 0; i < k.length; i++) {
 ```
 
 And here's the ES6 but non-`for..of` equivalent, which also gives a glimpse at manually iterating an iterator (see "Iterators" in Chapter 3):
+
+而这是一个ES6版本的非`for..of`等价物，它同时展示了手动迭代一个iterator（见第三章的“迭代器”）：
 
 ```js
 var a = ["a","b","c","d","e"];
