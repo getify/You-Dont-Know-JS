@@ -1,29 +1,29 @@
-# 你不懂JS: *this* & Object Prototypes
+# 你不懂JS: *this* 与对象原型
 
 ## 目录
 
 * 序
 * 前言
-* 第一章: `this` Or That?
-	* Why `this`?
-	* Confusions
-	* What's `this`?
+* 第一章: `this`是什么？
+	* 为什么要用 `this`？
+	* 困惑
+	* 什么是`this`？
 * 第二章: `this`豁然开朗！
-	* Call-site
-	* Nothing But Rules
-	* Everything In Order
-	* Binding Exceptions
-	* Lexical `this`
+	* 调用点（Call-site）
+	* 仅仅是规则
+	* 一切皆有顺序
+	* 绑定的特例
+	* 词法`this`
 * 第三章: 对象
-	* Syntax
-	* Type
-	* Contents
-	* Iteration
-* 第四章: Mixing (Up) "Class" Objects
-	* Class Theory
-	* Class Mechanics
-	* Class Inheritance
-	* Mixins
+	* 语法
+	* 类型
+	* 内容
+	* 迭代
+* 第四章: 混合（淆）“类”的对象
+	* 类理论
+	* 类机制
+	* 类继承
+	* 混合（Mixin）
 * 第五章: 原型
 	* `[[Prototype]]`
 	* "Class"
