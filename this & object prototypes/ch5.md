@@ -66,7 +66,7 @@ for (var k in myObject) {
 ("a" in myObject); // true
 ```
 
-所以，当你以各种方式进行属性查询时，`[[Prototype]]`就会被查询，每次一个链接。一旦找到属性或者链条终结，查询会才会停止。
+所以，当你以各种方式进行属性查询时，`[[Prototype]]`链就会一个链接一个链接地被查询。一旦找到属性或者链条终结，这种查询会就会停止。
 
 ### `Object.prototype`
 
@@ -315,7 +315,7 @@ b.myName(); // "b"
 
 于是，得益于他们被创建的方式，`a`和`b`都最终拥有一个内部的`[[Prototype]]`链接链到`Foo.prototype`。当无法分别在`a`和`b`中找到`myName`时，就会在`Foo.prototype`上找到（通过委托，见第六章）。
 
-#### 终极"构造器"
+#### 复活"构造器"
 
 回想我们刚才对`.constructor`属性的讨论，怎么看起来`a.constructor === Foo`为true意味着`a`上实际拥有一个`.constructor`属性，指向`Foo`？**不对。**
 
@@ -323,7 +323,7 @@ b.myName(); // "b"
 
 这 *看起来* 方便得可怕，一个被`Foo`构建的对象可以访问指向`Foo`的`.constructor`属性。但这只不过是安全感上的错觉。它是一个欢乐的巧合，几乎是误打误撞，通过默认的`[[Prototype]]`委托`a.constructor` *恰好* 指向`Foo`。实际上`.construcor`意味着“被XX构建”这种注定失败的臆测会以几种方式来咬到你。
 
-第一，在`Foo.prototype`上的`.constructor`属性仅当`Foo`函数被声明时才出现在对象上。如果你创建一个新对象，并替换函数默认的`.prototype`对象引用，这个新对象上将不会魔法般地得到`.contructor`。
+第一，在`Foo.prototype`上的`.constructor`属性仅当`Foo`函数被声明时才出现在对象上。如果你创建一个新对象，并用它替换函数默认的`.prototype`对象引用，这个新对象上将不会魔法般地得到`.contructor`。
 
 考虑这段代码：
 
