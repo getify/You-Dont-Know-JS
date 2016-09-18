@@ -1972,15 +1972,9 @@ controller.makeRequest(..);
 
 ## `for..of` Loops
 
-Joining the `for` and `for..in` loops from the JavaScript we're all familiar with, ES6 adds a `for..of` loop, which loops over the set of values produced by an *iterator*.
-
 伴随着我们熟知的JavaScript`for`和`for..in`循环，ES6增加了一个`for..of`循环，它循环遍历一组由一个 *迭代器* 产生的值。
 
-The value you loop over with `for..of` must be an *iterable*, or it must be a value which can be coerced/boxed to an object (see the *Types & Grammar* title of this series) that is an iterable. An iterable is simply an object that is able to produce an iterator, which the loop then uses.
-
 你使用`for..of`循环遍历的值必须是一个 *iterable（可迭代对象）*，或者它必须是一个可以被强制转换/封箱（参见本系列的 *类型与文法*）为一个iterable对象的值。一个iterable是一个可以生成iterator（迭代器）的简单对象，然后由循环使用这个iterator。
-
-Let's compare `for..of` to `for..in` to illustrate the difference:
 
 让我们比较`for..of`与`for..in`来展示它们的区别：
 
@@ -1998,11 +1992,7 @@ for (var val of a) {
 // "a" "b" "c" "d" "e"
 ```
 
-As you can see, `for..in` loops over the keys/indexes in the `a` array, while `for..of` loops over the values in `a`.
-
 如你所见，`for..in`循环遍历数组`a`中的键/索引，而`for.of`循环遍历`a`中的值。
-
-Here's the pre-ES6 version of the `for..of` from that previous snippet:
 
 这是前面代码段中`for..of`的前ES6版本：
 
@@ -2016,8 +2006,6 @@ for (var val, i = 0; i < k.length; i++) {
 }
 // "a" "b" "c" "d" "e"
 ```
-
-And here's the ES6 but non-`for..of` equivalent, which also gives a glimpse at manually iterating an iterator (see "Iterators" in Chapter 3):
 
 而这是一个ES6版本的非`for..of`等价物，它同时展示了手动迭代一个iterator（见第三章的“迭代器”）：
 
@@ -2033,18 +2021,18 @@ for (var val, ret, it = a[Symbol.iterator]();
 // "a" "b" "c" "d" "e"
 ```
 
-Under the covers, the `for..of` loop asks the iterable for an iterator (using the built-in `Symbol.iterator`; see "Well-Known Symbols" in Chapter 7), then it repeatedly calls the iterator and assigns its produced value to the loop iteration variable.
+在幕后，`for..of`循环向可迭代对象要来一个迭代器（使用内建的`Symbol.iterator`；参见第七章的“Well-Known Symbols”），然后反复调用这个迭代器并将它产生的值赋值给循环迭代的变量。
 
-Standard built-in values in JavaScript that are by default iterables (or provide them) include:
+在JavaScript标准的内建值中，默认为可迭代对象的（或提供它们可迭代能力的）有：
 
 * Arrays
 * Strings
 * Generators (see Chapter 3)
 * Collections / TypedArrays (see Chapter 5)
 
-**Warning:** Plain objects are not by default suitable for `for..of` looping. That's because they don't have a default iterator, which is intentional, not a mistake. However, we won't go any further into those nuanced reasonings here. In "Iterators" in Chapter 3, we'll see how to define iterators for our own objects, which lets `for..of` loop over any object to get a set of values we define.
+**警告：** 普通对象默认是不是用于`for..of`循环的。因为他们没有默认的迭代器，这是有意为之的，不是一个错误。但是，我们不会进一步探究这其中微妙的原因。在第三章的“迭代器”中，我们将看到如何为我们自己的对象定义迭代器，这允许`for..of`遍历任何对象来得到我们定义的一组值。
 
-Here's how to loop over the characters in a primitive string:
+这是如何遍历一个基本类型字符串的字符：
 
 ```js
 for (var c of "hello") {
@@ -2053,9 +2041,9 @@ for (var c of "hello") {
 // "h" "e" "l" "l" "o"
 ```
 
-The `"hello"` primitive string value is coerced/boxed to the `String` object wrapper equivalent, which is an iterable by default.
+基本类型字符串`"hello"`被强制转换/封箱为等价的`String`对象包装器，它是默认就是一个可迭代对象。
 
-In `for (XYZ of ABC)..`, the `XYZ` clause can either be an assignment expression or a declaration, identical to that same clause in `for` and `for..in` loops. So you can do stuff like this:
+在`for (XYZ of ABC)..`中，`XYZ`子句既可以是一个赋值表达式也可以是一个声明，这与`for`和`for..in`中相同的子句一模一样。所以你可以做这样的事情：
 
 ```js
 var o = {};
@@ -2071,54 +2059,54 @@ for ({x: o.a} of [ {x: 1}, {x: 2}, {x: 3} ]) {
 // 1 2 3
 ```
 
-`for..of` loops can be prematurely stopped, just like other loops, with `break`, `continue`, `return` (if in a function), and thrown exceptions. In any of these cases, the iterator's `return(..)` function is automatically called (if one exists) to let the iterator perform cleanup tasks, if necessary.
+与其他的循环一样，使用`break`，`continue`，`return`（如果是在一个函数中），以及抛出异常，`for..of`循环可以被提前终止。在任何这些情况下，迭代器的`return(..)`函数都会被自动调用（如果存在一个这样的函数的话），以便让迭代器进行必要的清理工作。
 
-**Note:** See "Iterators" in Chapter 3 for more complete coverage on iterables and iterators.
+**注意：** 可迭代对象与迭代器的完整内容参见第三章的“迭代器”。
 
 ## Regular Expressions
 
-Let's face it: regular expressions haven't changed much in JS in a long time. So it's a great thing that they've finally learned a couple of new tricks in ES6. We'll briefly cover the additions here, but the overall topic of regular expressions is so dense that you'll need to turn to chapters/books dedicated to it (of which there are many!) if you need a refresher.
+让我们承认：长久以来在JS中正则表达式都没怎么改变过。所以在ES6中它们终于学会了一些新技巧是一件很棒的事情。我们将在这里简要地讲解一下新增的功能，但是正则表达式整体的话题是如此厚重，以至于如果你需要复习一下的话你需要找一些关于它的专门章节/书籍（有许多！）。
 
 ### Unicode Flag
 
-We'll cover the topic of Unicode in more detail in "Unicode" later in this chapter. Here, we'll just look briefly at the new `u` flag for ES6+ regular expressions, which turns on Unicode matching for that expression.
+我们将在本章稍后的“Unicode”一节中讲解关于Unicode的更多细节。在此，我们将仅仅简要地看一下ES6+正则表达式的新`u`标志位，它使这个正则表达式的Unicode匹配成为可能。
 
-JavaScript strings are typically interpreted as sequences of 16-bit characters, which correspond to the characters in the *Basic Multilingual Plane (BMP)* (http://en.wikipedia.org/wiki/Plane_%28Unicode%29). But there are many UTF-16 characters that fall outside this range, and so strings may have these multibyte characters in them.
+JavaScript字符串通常被解释为16位字符的序列，它们对应于 *基本多文种平面（Basic Multilingual Plane (BMP)）* (http://en.wikipedia.org/wiki/Plane_%28Unicode%29)中的字符。但是有许多UTF-16字符在这个范围以外，而且字符串可能含有这些多字节字符。
 
-Prior to ES6, regular expressions could only match based on BMP characters, which means that those extended characters were treated as two separate characters for matching purposes. This is often not ideal.
+在ES6之前，正则表达式只能基于BMP字符进行匹配，这意味着在匹配时那些扩展字符被看作是两个分离的字符。这通常不理想。
 
-So, as of ES6, the `u` flag tells a regular expression to process a string with the interpretation of Unicode (UTF-16) characters, such that such an extended character will be matched as a single entity.
+所以，在ES6中，`u`标志位告诉正则表达式使用Unicode（UTF-16）字符的解释方式来处理字符串，这样一来一个扩展的字符将作为一个单独的实体被匹配。
 
-**Warning:** Despite the name implication, "UTF-16" doesn't strictly mean 16 bits. Modern Unicode uses 21 bits, and standards like UTF-8 and UTF-16 refer roughly to how many bits are used in the representation of a character.
+**警告：** 尽管名字的暗示是这样，但是“UTF-16”并不严格地意味着16位。现代的Unicode使用21位，而且像UTF-8和UTF-16这样的标准大体上是指有多少位用于表示一个字符。
 
-An example (straight from the ES6 specification): 𝄞 (the musical symbol G-clef) is Unicode point U+1D11E (0x1D11E).
+一个例子（直接从ES6语言规范中拿来的）： 𝄞 （G大调音乐符号）是Unicode代码点U+1D11E（0x1D11E）。
 
-If this character appears in a regular expression pattern (like `/𝄞/`), the standard BMP interpretation would be that it's two separate characters (0xD834 and 0xDD1E) to match with. But the new ES6 Unicode-aware mode means that `/𝄞/u` (or the escaped Unicode form `/\u{1D11E}/u`) will match `"𝄞"` in a string as a single matched character.
+如果这个字符出现在一个正则表达式模式中（比如`/𝄞/`），标准的BMP解释方式将认为它是需要被匹配的两个字符（0xD834和0xDD1E）。但是ES6新的Unicode敏感模式意味着`/𝄞/u`（或者Unicode的转义形式`/\u{1D11E}/u`）将会把`"𝄞"`作为一个单独的字符在一个字符串中进行匹配。
 
-You might be wondering why this matters? In non-Unicode BMP mode, the pattern is treated as two separate characters, but would still find the match in a string with the `"𝄞"` character in it, as you can see if you try:
+你可能想知道为什么这很重要。在非Unicode的BMP模式下，这个正则表达式模式被看作两个分离的字符，但它仍然可以在一个含有`"𝄞"`字符的字符串中找到匹配，如果你试一下就会看到：
 
 ```js
 /𝄞/.test( "𝄞-clef" );			// true
 ```
 
-The length of the match is what matters. For example:
+重要的是匹配的长度。例如：
 
 ```js
 /^.-clef/ .test( "𝄞-clef" );		// false
 /^.-clef/u.test( "𝄞-clef" );		// true
 ```
 
-The `^.-clef` in the pattern says to match only a single character at the beginning before the normal `"-clef"` text. In standard BMP mode, the match fails (two characters), but with `u` Unicode mode flagged on, the match succeeds (one character).
+这个模式中的`^.-clef`说要在普通的`"-clef"`文本前面只匹配一个单独的字符。在标准的BMP模式下，这个匹配会失败（因为是两个字符），但是在Unicode模式标志位`u`打开的情况下，这个匹配会成功（一个字符）。
 
-It's also important to note that `u` makes quantifiers like `+` and `*` apply to the entire Unicode code point as a single character, not just the *lower surrogate* (aka rightmost half of the symbol) of the character. The same goes for Unicode characters appearing in character classes, like `/[💩-💫]/u`.
+另外一个重要的注意点是，`u`使像`+`和`*`这样的量词实施于作为一个单独字符的整个Unicode代码点，而不仅仅是字符的 *低端替代符*（也就是符号最右边的一半）。对于出现在字符类中的Unicode字符也是一样，比如`/[💩-💫]/u`。
 
-**Note:** There's plenty more nitty-gritty details about `u` behavior in regular expressions, which Mathias Bynens (https://twitter.com/mathias) has written extensively about (https://mathiasbynens.be/notes/es6-unicode-regex).
+**注意：** 还有许多关于`u`在正则表达式中行为的细节，对此Mathias Bynens(https://twitter.com/mathias)撰写了大量的作品(https://mathiasbynens.be/notes/es6-unicode-regex)。
 
 ### Sticky Flag
 
-Another flag mode added to ES6 regular expressions is `y`, which is often called "sticky mode." *Sticky* essentially means the regular expression has a virtual anchor at its beginning that keeps it rooted to matching at only the position indicated by the regular expression's `lastIndex` property.
+另一个加入ES6正则表达式的模式标志位是`y`，它经常被称为“粘性模式（sticky mode）”。*粘性* 实质上意味着正则表达式在它开始时有一个虚拟的锚点，这个锚点使正则表达式以自己的`lastIndex`属性所指示的位置为起点进行匹配。
 
-To illustrate, let's consider two regular expressions, the first without sticky mode and the second with:
+为了展示一下，让我们考虑两个正则表达式，第一个没有使用粘性模式而第二个有：
 
 ```js
 var re1 = /foo/,
@@ -2133,13 +2121,13 @@ re1.test( str );		// true -- ignored `lastIndex`
 re1.lastIndex;			// 4 -- not updated
 ```
 
-Three things to observe about this snippet:
+关于这个代码段可以观察到三件事：
 
-* `test(..)` doesn't pay any attention to `lastIndex`'s value, and always just performs its match from the beginning of the input string.
-* Because our pattern does not have a `^` start-of-input anchor, the search for `"foo"` is free to move ahead through the whole string looking for a match.
-* `lastIndex` is not updated by `test(..)`.
+* `test(..)`根本不在意`lastIndex`的值，而总是从输入字符串的开始实施它的匹配。
+* 因为我们的模式没有输入的起始锚点`^`，所以对`"foo"`的搜索可以在整个字符串上自由向前移动。
+* `lastIndex`没有被`test(..)`更新。
 
-Now, let's try a sticky mode regular expression:
+现在，让我们试一下粘性模式的正则表达式：
 
 ```js
 var re2 = /foo/y,		// <-- notice the `y` sticky flag
@@ -2157,24 +2145,24 @@ re2.test( str );		// false
 re2.lastIndex;			// 0 -- reset after previous match failure
 ```
 
-And so our new observations about sticky mode:
+于是关于粘性模式我们可以观察到一些新的事实：
 
-* `test(..)` uses `lastIndex` as the exact and only position in `str` to look to make a match. There is no moving ahead to look for the match -- it's either there at the `lastIndex` position or not.
-* If a match is made, `test(..)` updates `lastIndex` to point to the character immediately following the match. If a match fails, `test(..)` resets `lastIndex` back to `0`.
+* `test(..)`在`str`中使用`lastIndex`作为唯一精确的位置来进行匹配。在寻找匹配时不会发生向前的移动 —— 匹配要么出现在`lastIndex`的位置，要么就不存在。
+* 如果发生了一个匹配，`test(..)`就更新`lastIndex`使它指向紧随匹配之后的那个字符。如果匹配失败，`test(..)`就将`lastIndex`重置为`0`。
 
-Normal non-sticky patterns that aren't otherwise `^`-rooted to the start-of-input are free to move ahead in the input string looking for a match. But sticky mode restricts the pattern to matching just at the position of `lastIndex`.
+没有使用`^`固定在输入起点的普通非粘性模式可以自由地在字符串中向前移动来搜索匹配。但是粘性模式制约这个范例仅在`lastIndex`的位置进行匹配。
 
-As I suggested at the beginning of this section, another way of looking at this is that `y` implies a virtual anchor at the beginning of the pattern that is relative (aka constrains the start of the match) to exactly the `lastIndex` position.
+正如我在这一节开始时提到过的，另一种考虑的方式是，`y`暗示着一个虚拟的锚点，它在正好相对于`lastIndex`位置的范例的开头。
 
-**Warning:** In previous literature on the topic, it has alternatively been asserted that this behavior is like `y` implying a `^` (start-of-input) anchor in the pattern. This is inaccurate. We'll explain in further detail in "Anchored Sticky" later.
+**警告：** 在关于这个话题的以前的文献中，这种行为曾经被声称为`y`像是在范例中暗示着一个`^`（输入的起始）锚点。这是不准确的。我们将在稍后的“锚定粘性”中讲解更多细节。
 
 #### Sticky Positioning
 
-It may seem strangely limiting that to use `y` for repeated matches, you have to manually ensure `lastIndex` is in the exact right position, as it has no move-ahead capability for matching.
+对反复匹配使用`y`可能看起来是一种奇怪的限制，因为匹配没有向前移动的能力，你不得不手动保证`lastIndex`恰好位于正确的位置上。
 
-Here's one possible scenario: if you know that the match you care about is always going to be at a position that's a multiple of a number (e.g., `0`, `10`, `20`, etc.), you can just construct a limited pattern matching what you care about, but then manually set `lastIndex` each time before match to those fixed positions.
+这是一种可能的场景：如果你知道你关心的匹配总是会出现在一个数字（例如，`0`，`10`，`20`，等等）倍数的位置。那么你就可以只构建一个受限的范例来匹配你关心的东西，然后在每次匹配那些固定位置之前手动设置`lastIndex`。
 
-Consider:
+考虑如下代码：
 
 ```js
 var re = /f../y,
@@ -2189,17 +2177,17 @@ re.lastIndex = 20;
 str.match( re );		// ["fad"]
 ```
 
-However, if you're parsing a string that isn't formatted in fixed positions like that, figuring out what to set `lastIndex` to before each match is likely going to be untenable.
+然而，如果你正在解析一个没有像这样被格式化为固定位置的字符串，在每次匹配之前搞清楚向`lastIndex`设置什么东西可能会难以维系。
 
-There's a saving nuance to consider here. `y` requires that `lastIndex` be in the exact position for a match to occur. But it doesn't strictly require that *you* manually set `lastIndex`.
+这里有一个微妙之处要考虑。`y`要求`lastIndex`位于发生匹配的准确位置。但它不严格要求 *你* 来手动设置`lastIndex`。
 
-Instead, you can construct your expressions in such a way that they capture in each main match everything before and after the thing you care about, up to right before the next thing you'll care to match.
+取而代之的是，你可以用这样的方式构建你的正则表达式：它们在每次主匹配中都捕获你所关心的东西的前后所有内容，直到你想要进行下一次匹配的东西为止。
 
-Because `lastIndex` will set to the next character beyond the end of a match, if you've matched everything up to that point, `lastIndex` will always be in the correct position for the `y` pattern to start from the next time.
+因为`lastIndex`将被设置为一个匹配末尾之后的下一个字符，所以如果你已经匹配了到那个位置的所有东西，`lastIndex`将总是位于下次`y`范例开始的正确位置。
 
-**Warning:** If you can't predict the structure of the input string in a sufficiently patterned way like that, this technique may not be suitable and you may not be able to use `y`.
+**警告：** 如果你不能像这样足够范例化地预知输入字符串的结构，这种技术可能不合适，而且你可能不能使用`y`。
 
-Having structured string input is likely the most practical scenario where `y` will be capable of performing repeated matching throughout a string. Consider:
+拥有结构化的字符串输入，可能是`y`能够在一个字符串上由始至终地进行反复匹配的最实际场景。考虑如下代码：
 
 ```js
 var re = /\d+\.\s(.*?)(?:\s|$)/y
@@ -2214,15 +2202,15 @@ re.lastIndex;			// 14 -- correct position!
 str.match( re );		// ["3. baz", "baz"]
 ```
 
-This works because I knew something ahead of time about the structure of the input string: there is always a numeral prefix like `"1. "` before the desired match (`"foo"`, etc.), and either a space after it, or the end of the string (`$` anchor). So the regular expression I constructed captures all of that in each main match, and then I use a matching group `( )` so that the stuff I really care about is separated out for convenience.
+这能够工作是因为我事先知道输入字符串的结构：总是有一个像`"1. "`这样的数字的前缀出现在期望的匹配（`"foo"`，等等）之前，而且它后面要么是一个空格，要么就是字符串的末尾（`$`锚点）。所以我构建的正则表达式在每次主匹配中捕获了所有这一切，然后我使用一个匹配分组`( )`使我真正关心的东西方便地分离出来。
 
-After the first match (`"1. foo "`), the `lastIndex` is `7`, which is already the position needed to start the next match, for `"2. bar "`, and so on.
+在第一次匹配（`"1. foo "`）之后，`lastIndex`是`7`，它已经是开始下一次匹配`"2. bar "`所需的位置了，如此类推。
 
-If you're going to use `y` sticky mode for repeated matches, you'll probably want to look for opportunities to have `lastIndex` automatically positioned as we've just demonstrated.
+如果你要使用粘性模式`y`进行反复匹配，那么你就可能想要像我们刚刚展示的那样寻找一个机会自动地定位`lastIndex`。
 
 #### Sticky Versus Global
 
-Some readers may be aware that you can emulate something like this `lastIndex`-relative matching with the `g` global match flag and the `exec(..)` method, as so:
+一些读者可能意识到，你可以使用全局匹配标志位`g`和`exec(..)`方法来模拟某些像`lastIndex`相对匹配的东西，就像这样：
 
 ```js
 var re = /o+./g,		// <-- look, `g`!
@@ -2241,13 +2229,13 @@ re.exec( str );			// null -- no more matches!
 re.lastIndex;			// 0 -- starts over now!
 ```
 
-While it's true that `g` pattern matches with `exec(..)` start their matching from `lastIndex`'s current value, and also update `lastIndex` after each match (or failure), this is not the same thing as `y`'s behavior.
+虽然使用`exec(..)`的`g`范例确实从`lastIndex`的当前值开始它们的匹配，而且也在每次匹配（或失败）之后更新`lastIndex`，但这与`y`的行为不是相同的东西。
 
-Notice in the previous snippet that `"ook"`, located at position `6`, was matched and found by the second `exec(..)` call, even though at the time, `lastIndex` was `4` (from the end of the previous match). Why? Because as we said earlier, non-sticky matches are free to move ahead in their matching. A sticky mode expression would have failed here, because it would not be allowed to move ahead.
+注意前面代码段中被第二个`exec(..)`调用匹配并找到的`"ook"`，被定位在位置`6`，即便在这个时候`lastIndex`是`4`（前一次匹配的末尾）。为什么？因为正如我们前面讲过的，非粘性匹配可以在它们的匹配过程中自由地向前移动。一个粘性模式表达式在这里将会失败，因为它不允许向前移动。
 
-In addition to perhaps undesired move-ahead matching behavior, another downside to just using `g` instead of `y` is that `g` changes the behavior of some matching methods, like `str.match(re)`.
+除了也许不被期望的向前移动的匹配行为以外，使用`g`代替`y`的另一个缺点是，`g`改变了一些匹配方法的行为，比如`str.match(re)`。
 
-Consider:
+考虑如下代码：
 
 ```js
 var re = /o+./g,		// <-- look, `g`!
@@ -2256,19 +2244,19 @@ var re = /o+./g,		// <-- look, `g`!
 str.match( re );		// ["oot","ook","or"]
 ```
 
-See how all the matches were returned at once? Sometimes that's OK, but sometimes that's not what you want.
+看到所有的匹配是如何一次性地被返回的吗？有时这没问题，但有时这不是你想要的。
 
-The `y` sticky flag will give you one-at-a-time progressive matching with utilities like `test(..)` and `match(..)`. Just make sure the `lastIndex` is always in the right position for each match!
+与`test(..)`和`match(..)`这样的工具一起使用，粘性标志位`y`将给你一次一个的推进式的匹配。只要保证每次匹配时`lastIndex`总是在正确的位置上就行！
 
 #### Anchored Sticky
 
-As we warned earlier, it's inaccurate to think of sticky mode as implying a pattern starts with `^`. The `^` anchor has a distinct meaning in regular expressions, which is *not altered* by sticky mode. `^` is an anchor that *always* refers to the beginning of the input, and *is not* in any way relative to `lastIndex`.
+正如我们早先被警告过的，将粘性模式认为是暗示着一个以`^`开头的范例是不准确的。在正则表达式中锚点`^`拥有独特的含义，它 *没有* 被粘性模式改变。`^`*总是* 一个指向输入起点的锚点，而且 *不* 以任何方式相对于`lastIndex`。
 
-Besides poor/inaccurate documentation on this topic, the confusion is unfortunately strengthened further because an older pre-ES6 experiment with sticky mode in Firefox *did* make `^` relative to `lastIndex`, so that behavior has been around for years.
+在这个问题上，除了糟糕/不准确的文档，一个在Firefox中进行的老旧的前ES6粘性模式实验不幸地加深了这种困惑，它确实 *曾经* 使`^`相对于`lastIndex`，所以这种行为曾经存在了许多年。
 
-ES6 elected not to do it that way. `^` in a pattern means start-of-input absolutely and only.
+ES6选择不这么做。`^`在一个范例中绝对且唯一地意味着输入的起点。
 
-As a consequence, a pattern like `/^foo/y` will always and only find a `"foo"` match at the beginning of a string, *if it's allowed to match there*. If `lastIndex` is not `0`, the match will fail. Consider:
+这样的后果是，一个像`/^foo/y`这样的范例将总是仅在一个字符串的开头找到`"foo"`匹配，*如果它被允许在那里匹配的话*。如果`lastIndex`不是`0`，匹配就会失败。考虑如下代码：
 
 ```js
 var re = /^foo/y,
@@ -2283,13 +2271,13 @@ re.test( str );			// false -- failed for positioning
 re.lastIndex;			// 0 -- reset after failure
 ```
 
-Bottom line: `y` plus `^` plus `lastIndex > 0` is an incompatible combination that will always cause a failed match.
+底线：`y`加`^`加`lastIndex > 0`是一种不兼容的组合，它将总是导致失败的匹配。
 
-**Note:** While `y` does not alter the meaning of `^` in any way, the `m` multiline mode *does*, such that `^` means start-of-input *or* start of text after a newline. So, if you combine `y` and `m` flags together for a pattern, you can find multiple `^`-rooted matches in a string. But remember: because it's `y` sticky, you'll have to make sure `lastIndex` is pointing at the correct new line position (likely by matching to the end of the line) each subsequent time, or no subsequent matches will be made.
+**注意：** 虽然`y`不会以任何方式改变`^`的含义，但是多行模式`m`*会*，这样`^`就意味着输入的起点 *或者* 一个换行之后的文本的起点。所以，如果你在一个范例中组合使用`y`和`m`，你会在一个字符串中发现多个开始于`^`的匹配。但是要记住：因为它的粘性`y`，将不得不在后续的每次匹配时确保`lastIndex`被置于正确的换行的位置（可能是通过匹配到行的末尾），否者后续的匹配将不会执行。
 
 ### Regular Expression `flags`
 
-Prior to ES6, if you wanted to examine a regular expression object to see what flags it had applied, you needed to parse them out -- ironically, probably with another regular expression -- from the content of the `source` property, such as:
+在ES6之前，如果你想要检查一个正则表达式来看看它被施用了什么标志位，你需要将它们 —— 讽刺的是，可能是使用另一个正则表达式 —— 从`source`属性的内容中解析出来，就像这样：
 
 ```js
 var re = /foo/ig;
@@ -2301,7 +2289,7 @@ var flags = re.toString().match( /\/([gim]*)$/ )[1];
 flags;					// "ig"
 ```
 
-As of ES6, you can now get these values directly, with the new `flags` property:
+在ES6中，你现在可以直接得到这些值，使用新的`flags`属性：
 
 ```js
 var re = /foo/ig;
@@ -2309,11 +2297,11 @@ var re = /foo/ig;
 re.flags;				// "gi"
 ```
 
-It's a small nuance, but the ES6 specification calls for the expression's flags to be listed in this order: `"gimuy"`, regardless of what order the original pattern was specified with. That's the reason for the difference between `/ig` and `"gi"`.
+虽然是个细小的地方，但是ES6规范要求表达式的标志位以`"gimuy"`的顺序罗列，无论原本的范例中是以什么顺序指定的。这就是出现`/ig`和`"gi"`的区别的原因。
 
-No, the order of flags specified or listed doesn't matter.
+是的，标志位被指定和罗列的顺序无所谓。
 
-Another tweak from ES6 is that the `RegExp(..)` constructor is now `flags`-aware if you pass it an existing regular expression:
+ES6的另一个调整是，如果你向构造器`RegExp(..)`传递一个既存的正则表达式，它现在是`flags`敏感的：
 
 ```js
 var re1 = /foo*/y;
@@ -2329,11 +2317,11 @@ re3.source;							// "foo*"
 re3.flags;							// "gi"
 ```
 
-Prior to ES6, the `re3` construction would throw an error, but as of ES6 you can override the flags when duplicating.
+在ES6之前，构造`re3`将抛出一个错误，但是在ES6中你可以在复制时覆盖标志位。
 
 ## Number Literal Extensions
 
-Prior to ES5, number literals looked like the following -- the octal form was not officially specified, only allowed as an extension that browsers had come to de facto agreement on:
+在ES5之前，数字字面量看起来就像下面的东西 —— 八进制形式没有被官方指定，唯一被允许的是各种浏览器已经实质上达成一致的一种扩展：
 
 ```js
 var dec = 42,
@@ -2341,9 +2329,9 @@ var dec = 42,
 	hex = 0x2a;
 ```
 
-**Note:** Though you are specifying a number in different bases, the number's mathematic value is what is stored, and the default output interpretation is always base-10. The three variables in the previous snippet all have the `42` value stored in them.
+**注意：** 虽然你用不同的进制来指定一个数字，但是数字的数学值才是被存储的东西，而且默认的输出解释方式总是10进制的。前面代码段中的三个变量都在它们当中存储了值`42`。
 
-To further illustrate that `052` was a nonstandard form extension, consider:
+为了进一步说明`052`是一种非标准形式扩展，考虑如下代码：
 
 ```js
 Number( "42" );				// 42
@@ -2351,11 +2339,11 @@ Number( "052" );			// 52
 Number( "0x2a" );			// 42
 ```
 
-ES5 continued to permit the browser-extended octal form (including such inconsistencies), except that in strict mode, the octal literal (`052`) form is disallowed. This restriction was done mainly because many developers had the habit (from other languages) of seemingly innocuously prefixing otherwise base-10 numbers with `0`'s for code alignment purposes, and then running into the accidental fact that they'd changed the number value entirely!
+ES5继续允许这种浏览器扩展的八进制形式（包括这样的不一致性），除了在strict模式下，八进制字面量（`052`）是不允许的。做出这种限制的主要原因是，许多开发者习惯于看似下意识地为了将代码对其而在是十进制的数组前面前缀`0`，然后遭遇他们完全改变了数字的值的意外！
 
-ES6 continues the legacy of changes/variations to how number literals outside base-10 numbers can be represented. There's now an official octal form, an amended hexadecimal form, and a brand-new binary form. For web compatibility reasons, the old octal `052` form will continue to be legal (though unspecified) in non-strict mode, but should really never be used anymore.
+ES6延续了十进制数字之外的数字字面量可以被表示的遗留的改变/种类。现在有了一种官方的八进制形式，一种改进了的十六进制形式，和一种全新的二进制形式。由于Web兼容性的原因，在非strict模式下老式的八进制形式`052`将继续是合法的，但其实应当永远不再被使用了。
 
-Here are the new ES6 number literal forms:
+这些是新的ES6数字字面形式：
 
 ```js
 var dec = 42,
@@ -2364,9 +2352,9 @@ var dec = 42,
 	bin = 0b101010;		// or `0B101010` :/
 ```
 
-The only decimal form allowed is base-10. Octal, hexadecimal, and binary are all integer forms.
+唯一允许的小数形式是十进制的。八进制，十六进制，和二进制都是整数形式。
 
-And the string representations of these forms are all able to be coerced/converted to their number equivalent:
+而且所有这些形式的字符串表达形式都是可以被强制转换/变换为它们的数字等价物的：
 
 ```js
 Number( "42" );			// 42
@@ -2375,7 +2363,7 @@ Number( "0x2a" );		// 42
 Number( "0b101010" );	// 42
 ```
 
-Though not strictly new to ES6, it's a little-known fact that you can actually go the opposite direction of conversion (well, sort of):
+虽然严格来说不是ES6新增的，但一个少为人知的事实是你其实可以做方向的转换（好吧，某种意义上的）：
 
 ```js
 var a = 42;
@@ -2386,17 +2374,25 @@ a.toString( 16 );		// "2a"
 a.toString( 2 );		// "101010"
 ```
 
-In fact, you can represent a number this way in any base from `2` to `36`, though it'd be rare that you'd go outside the standard bases: 2, 8, 10, and 16.
+事实上，以这种方你可以用从`2`到`36`的任何进制表达一个数字，虽然你会使用标准进制 —— 2，8，10，和16 ——之外的情况非常少见。
 
 ## Unicode
 
 Let me just say that this section is not an exhaustive everything-you-ever-wanted-to-know-about-Unicode resource. I want to cover what you need to know that's *changing* for Unicode in ES6, but we won't go much deeper than that. Mathias Bynens (http://twitter.com/mathias) has written/spoken extensively and brilliantly about JS and Unicode (see https://mathiasbynens.be/notes/javascript-unicode and http://fluentconf.com/javascript-html-2015/public/content/2015/02/18-javascript-loves-unicode).
 
+我只能说这一节不是一个穷尽了“关于Unicode你想知道的一切”的资料。我想讲解的是，你需要知道在ES6中对Unicode改变了什么，但是我们不会比这深入太多。Mathias Bynens (http://twitter.com/mathias) 大量且出色地撰写/讲解了关于JS和Unicode (参见 https://mathiasbynens.be/notes/javascript-unicode 和 http://fluentconf.com/javascript-html-2015/public/content/2015/02/18-javascript-loves-unicode)。
+
 The Unicode characters that range from `0x0000` to `0xFFFF` contain all the standard printed characters (in various languages) that you're likely to have seen or interacted with. This group of characters is called the *Basic Multilingual Plane (BMP)*. The BMP even contains fun symbols like this cool snowman: ☃ (U+2603).
+
+从`0x0000`到`0xFFFF`范围内的Unicode字符包含了所有的标准印刷字符（以各种语言），它们都是你可能看到过和互动过的。这组字符被称为 *基本多文种平面（Basic Multilingual Plane (BMP)）*。BMP甚至包含像这个酷雪人一样的有趣字符: ☃ (U+2603)。
 
 There are lots of other extended Unicode characters beyond this BMP set, which range up to `0x10FFFF`. These symbols are often referred to as *astral* symbols, as that's the name given to the set of 16 *planes* (e.g., layers/groupings) of characters beyond the BMP. Examples of astral symbols include 𝄞 (U+1D11E) and 💩 (U+1F4A9).
 
+在这个BMP集合之外还有许多扩展的Unicode字符，它们的范围一直到`0x10FFFF`。这些符号经常被称为 *星形（astral）* 符号，这正是BMP之外的字符的16组 *平面* （例如，分层/分组）的名称。
+
 Prior to ES6, JavaScript strings could specify Unicode characters using Unicode escaping, such as:
+
+在ES6之前，JavaScript字符串可以使用Unicode转义来制定Unicode字符，例如：
 
 ```js
 var snowman = "\u2603";
