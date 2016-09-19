@@ -2378,46 +2378,38 @@ a.toString( 2 );		// "101010"
 
 ## Unicode
 
-Let me just say that this section is not an exhaustive everything-you-ever-wanted-to-know-about-Unicode resource. I want to cover what you need to know that's *changing* for Unicode in ES6, but we won't go much deeper than that. Mathias Bynens (http://twitter.com/mathias) has written/spoken extensively and brilliantly about JS and Unicode (see https://mathiasbynens.be/notes/javascript-unicode and http://fluentconf.com/javascript-html-2015/public/content/2015/02/18-javascript-loves-unicode).
-
 我只能说这一节不是一个穷尽了“关于Unicode你想知道的一切”的资料。我想讲解的是，你需要知道在ES6中对Unicode改变了什么，但是我们不会比这深入太多。Mathias Bynens (http://twitter.com/mathias) 大量且出色地撰写/讲解了关于JS和Unicode (参见 https://mathiasbynens.be/notes/javascript-unicode 和 http://fluentconf.com/javascript-html-2015/public/content/2015/02/18-javascript-loves-unicode)。
-
-The Unicode characters that range from `0x0000` to `0xFFFF` contain all the standard printed characters (in various languages) that you're likely to have seen or interacted with. This group of characters is called the *Basic Multilingual Plane (BMP)*. The BMP even contains fun symbols like this cool snowman: ☃ (U+2603).
 
 从`0x0000`到`0xFFFF`范围内的Unicode字符包含了所有的标准印刷字符（以各种语言），它们都是你可能看到过和互动过的。这组字符被称为 *基本多文种平面（Basic Multilingual Plane (BMP)）*。BMP甚至包含像这个酷雪人一样的有趣字符: ☃ (U+2603)。
 
-There are lots of other extended Unicode characters beyond this BMP set, which range up to `0x10FFFF`. These symbols are often referred to as *astral* symbols, as that's the name given to the set of 16 *planes* (e.g., layers/groupings) of characters beyond the BMP. Examples of astral symbols include 𝄞 (U+1D11E) and 💩 (U+1F4A9).
+在这个BMP集合之外还有许多扩展的Unicode字符，它们的范围一直到`0x10FFFF`。这些符号经常被称为 *星形（astral）* 符号，这正是BMP之外的字符的16组 *平面* （例如，分层/分组）的名称。星形符号的例子包括𝄞 （U+1D11E）和💩 （U+1F4A9）。
 
-在这个BMP集合之外还有许多扩展的Unicode字符，它们的范围一直到`0x10FFFF`。这些符号经常被称为 *星形（astral）* 符号，这正是BMP之外的字符的16组 *平面* （例如，分层/分组）的名称。
-
-Prior to ES6, JavaScript strings could specify Unicode characters using Unicode escaping, such as:
-
-在ES6之前，JavaScript字符串可以使用Unicode转义来制定Unicode字符，例如：
+在ES6之前，JavaScript字符串可以使用Unicode转义来指定Unicode字符，例如：
 
 ```js
 var snowman = "\u2603";
 console.log( snowman );			// "☃"
 ```
 
-However, the `\uXXXX` Unicode escaping only supports four hexadecimal characters, so you can only represent the BMP set of characters in this way. To represent an astral character using Unicode escaping prior to ES6, you need to use a *surrogate pair* -- basically two specially calculated Unicode-escaped characters side by side, which JS interprets together as a single astral character:
+然而，`\uXXXX`Unicode转义仅支持四个十六进制字符，所以用这种方式表示你只能表示BMP集合中的字符。要在ES6以前使用Unicode转义表示一个星形字符，你需要使用一个 *代理对（surrogate pair）* —— 基本上是两个经特殊计算的Unicode转义字符放在一起，被JS解释为一个单独星形字符：
 
 ```js
 var gclef = "\uD834\uDD1E";
 console.log( gclef );			// "𝄞"
 ```
 
-As of ES6, we now have a new form for Unicode escaping (in strings and regular expressions), called Unicode *code point escaping*:
+在ES6中，我们现在有了一种Unicode转义的新形式（在字符串和正则表达式中），称为Unicode *代码点转义*：
 
 ```js
 var gclef = "\u{1D11E}";
 console.log( gclef );			// "𝄞"
 ```
 
-As you can see, the difference is the presence of the `{ }` in the escape sequence, which allows it to contain any number of hexadecimal characters. Because you only need six to represent the highest possible code point value in Unicode (i.e., 0x10FFFF), this is sufficient.
+如你所见，它的区别是出现在转义序列中的`{ }`，它允许转义序列中包含任意数量的十六进制字符。因为你只需要六个就可以表示在Unicode中可能的最高代码点（也就是，0x10FFFF），所以这是足够的。
 
 ### Unicode-Aware String Operations
 
-By default, JavaScript string operations and methods are not sensitive to astral symbols in string values. So, they treat each BMP character individually, even the two surrogate halves that make up an otherwise single astral character. Consider:
+在默认情况下，JavaScript字符串操作和方法对字符串值中的星形符号是不敏感的。所以，它们独立地处理每个BMP字符，即便是可以组成一个单独字符的代理的每一半。考虑如下代码：
 
 ```js
 var snowman = "☃";
@@ -2427,7 +2419,7 @@ var gclef = "𝄞";
 gclef.length;					// 2
 ```
 
-So, how do we accurately calculate the length of such a string? In this scenario, the following trick will work:
+那么，我们如何才能正确地计算这样的字符串的长度呢？在这种场景下，下面的技巧可以工作：
 
 ```js
 var gclef = "𝄞";
@@ -2436,34 +2428,34 @@ var gclef = "𝄞";
 Array.from( gclef ).length;		// 1
 ```
 
-Recall from the "`for..of` Loops" section earlier in this chapter that ES6 strings have built-in iterators. This iterator happens to be Unicode-aware, meaning it will automatically output an astral symbol as a single value. We take advantage of that using the `...` spread operator in an array literal, which creates an array of the string's symbols. Then we just inspect the length of that resultant array. ES6's `Array.from(..)` does basically the same thing as `[...XYZ]`, but we'll cover that utility in detail in Chapter 6.
+回想一下本章早先的“`for..of`循环”一节，ES6字符串拥有内建的迭代器。这个迭代器恰好是Unicode敏感的，这意味着它将自动地把一个星形符号作为一个单独的值输出。我们在一个数组字面量上使用扩散操作符`...`，利用它创建了一个字符串符号的数组。然后我们只需检查这个结果数组的长度。ES6的`Array.from(..)`基本上与`[...XYZ]`做的事情相同，不过我们将在第六章中讲解这个工具的细节。
 
-**Warning:** It should be noted that constructing and exhausting an iterator just to get the length of a string is quite expensive on performance, relatively speaking, compared to what a theoretically optimized native utility/property would do.
+**警告：** 应当注意的是，相对地讲，与理论上经过优化的原生工具/属性将做的事情比起来，仅仅为了得到一个字符串的长度就构建并耗尽一个迭代器在性能上的代价是高昂的。
 
-Unfortunately, the full answer is not as simple or straightforward. In addition to the surrogate pairs (which the string iterator takes care of), there are special Unicode code points that behave in other special ways, which is much harder to account for. For example, there's a set of code points that modify the previous adjacent character, known as *Combining Diacritical Marks*.
+不幸的是，完整的答案并不简单或直接。除了代理对（字符串迭代器可以搞定的），一些特殊的Unicode代码点有其他特殊的行为，解释起来非常困难。例如，有一组代码点可以修改前一个相邻的字符，称为 *组合变音符号（Combining Diacritical Marks）*
 
-Consider these two string outputs:
+考虑这两个数组的输出：
 
 ```js
 console.log( s1 );				// "é"
 console.log( s2 );				// "é"
 ```
 
-They look the same, but they're not! Here's how we created `s1` and `s2`:
+它们看起来一样，但它们不是！这是我们如何创建`s1`和`s2`的：
 
 ```js
 var s1 = "\xE9",
 	s2 = "e\u0301";
 ```
 
-As you can probably guess, our previous `length` trick doesn't work with `s2`:
+你可能猜到了，我们前面的`length`技巧对`s2`不管用：
 
 ```js
 [...s1].length;					// 1
 [...s2].length;					// 2
 ```
 
-So what can we do? In this case, we can perform a *Unicode normalization* on the value before inquiring about its length, using the ES6 `String#normalize(..)` utility (which we'll cover more in Chapter 6):
+那么我们能做什么？在这种情况下，我们可以使用ES6的`String#normalize(..)`工具，在查询这个值的长度前对它实施一个 *Unicode正规化操作*：
 
 ```js
 var s1 = "\xE9",
@@ -2476,7 +2468,7 @@ s1 === s2;						// false
 s1 === s2.normalize();			// true
 ```
 
-Essentially, `normalize(..)` takes a sequence like `"e\u0301"` and normalizes it to `"\xE9"`. Normalization can even combine multiple adjacent combining marks if there's a suitable Unicode character they combine to:
+实质上，`normalize(..)`接受一个`"e\u0301"`这样的序列，并把它正规化为`\xE9`。正规化甚至可以组合多个相邻的组合符号，如果存在适合他们组合的Unicode字符的话：
 
 ```js
 var s1 = "o\u0302\u0300",
@@ -2490,7 +2482,7 @@ s3.length;						// 1
 s2 === s3;						// true
 ```
 
-Unfortunately, normalization isn't fully perfect here, either. If you have multiple combining marks modifying a single character, you may not get the length count you'd expect, because there may not be a single defined normalized character that represents the combination of all the marks. For example:
+不幸的是，这里的正规化也不完美。如果你有多个组合符号在修改一个字符，你可能不会得到你所期望的长度计数，因为一个被独立定义的，可以表示所有这些符号组合的正规化字符可能不存在。例如：
 
 ```js
 var s1 = "e\u0301\u0330";
@@ -2500,15 +2492,15 @@ console.log( s1 );				// "ḛ́"
 s1.normalize().length;			// 2
 ```
 
-The further you go down this rabbit hole, the more you realize that it's difficult to get one precise definition for "length." What we see visually rendered as a single character -- more precisely called a *grapheme* -- doesn't always strictly relate to a single "character" in the program processing sense.
+你越深入这个兔子洞，你就越能理解要得到一个“长度”的精确定义是很困难的。我们在视觉上看到的作为一个单独字符绘制的东西 —— 更精确地说，它称为一个 *字形* —— 在程序处理的意义上不总是严格地关联到一个单独的“字符”上。
 
-**Tip:** If you want to see just how deep this rabbit hole goes, check out the "Grapheme Cluster Boundaries" algorithm (http://www.Unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries).
+**提示：** 如果你就是想看看这个兔子洞有多深，看看“字形群集边界（Grapheme Cluster Boundaries）”算法(http://www.Unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries)。
 
 ### Character Positioning
 
-Similar to length complications, what does it actually mean to ask, "what is the character at position 2?" The naive pre-ES6 answer comes from `charAt(..)`, which will not respect the atomicity of an astral character, nor will it take into account combining marks.
+与长度的复杂性相似，“在位置2上的字符是什么？”，这么问的意思究竟是什么？前ES6的原生答案来自`charAt(..)`，它不会遵守一个星形字符的原子性，也不会考虑组合符号。
 
-Consider:
+考虑如下代码：
 
 ```js
 var s1 = "abc\u0301d",
@@ -2525,9 +2517,9 @@ s3.charAt( 2 );					// "" <-- unprintable surrogate
 s3.charAt( 3 );					// "" <-- unprintable surrogate
 ```
 
-So, is ES6 giving us a Unicode-aware version of `charAt(..)`? Unfortunately, no. At the time of this writing, there's a proposal for such a utility that's under consideration for post-ES6.
+那么，ES6会给我们Unicode敏感版本的`charAt(..)`吗？不幸的是，不。在本书写作时，在后ES6的考虑之中有一个这样的工具的提议。
 
-But with what we explored in the previous section (and of course with the limitations noted thereof!), we can hack an ES6 answer:
+但是使用我们在前一节探索的东西（当然也带着它的限制），我们可以黑一个ES6的答案：
 
 ```js
 var s1 = "abc\u0301d",
@@ -2539,9 +2531,9 @@ var s1 = "abc\u0301d",
 [...s3.normalize()][2];			// "𝒞"
 ```
 
-**Warning:** Reminder of an earlier warning: constructing and exhausting an iterator each time you want to get at a single character is... very not ideal, performance wise. Let's hope we get a built-in and optimized utility for this soon, post-ES6.
+**警告：** 提醒一个早先的警告：在每次你想得到一个单独的字符时构建并耗尽一个迭代器……在性能上不是很理想。对此，希望我们很快能在后ES6时代得到一个内建的，优化过的工具。
 
-What about a Unicode-aware version of the `charCodeAt(..)` utility? ES6 gives us `codePointAt(..)`:
+那么`charCodeAt(..)`工具的Unicode敏感版本呢？ES6给了我们`codePointAt(..)`：
 
 ```js
 var s1 = "abc\u0301d",
@@ -2558,7 +2550,7 @@ s3.normalize().codePointAt( 2 ).toString( 16 );
 // "1d49e"
 ```
 
-What about the other direction? A Unicode-aware version of `String.fromCharCode(..)` is ES6's `String.fromCodePoint(..)`:
+那么从另一个方向呢？`String.fromCharCode(..)`的Unicode敏感版本是ES6的`String.fromCodePoint(..)`：
 
 ```js
 String.fromCodePoint( 0x107 );		// "ć"
@@ -2566,7 +2558,7 @@ String.fromCodePoint( 0x107 );		// "ć"
 String.fromCodePoint( 0x1d49e );	// "𝒞"
 ```
 
-So wait, can we just combine `String.fromCodePoint(..)` and `codePointAt(..)` to get a better version of a Unicode-aware `charAt(..)` from earlier? Yep!
+那么等一下，我们能组合`String.fromCodePoint(..)`与`codePointAt(..)`来得到一个刚才的Unicode敏感`charAt(..)`的更好版本吗？是的！
 
 ```js
 var s1 = "abc\u0301d",
@@ -2583,15 +2575,15 @@ String.fromCodePoint( s3.normalize().codePointAt( 2 ) );
 // "𝒞"
 ```
 
-There's quite a few other string methods we haven't addressed here, including `toUpperCase()`, `toLowerCase()`, `substring(..)`, `indexOf(..)`, `slice(..)`, and a dozen others. None of these have been changed or augmented for full Unicode awareness, so you should be very careful -- probably just avoid them! -- when working with strings containing astral symbols.
+还有好几个字符串方法我们没有在这里讲解，包括`toUpperCase()`，`toLowerCase()`，`substring(..)`，`indexOf(..)`，`slice(..)`，以及其他十几个。它们中没有任何一个为了完全支持Unicode而被改变或增强过，所以在处理含有星形符号的字符串是，你应当非常小心 —— 可能干脆回避它们！
 
-There are also several string methods that use regular expressions for their behavior, like `replace(..)` and `match(..)`. Thankfully, ES6 brings Unicode awareness to regular expressions, as we covered in "Unicode Flag" earlier in this chapter.
+还有几个字符串方法为了它们的行为而使用正则表达式，比如`replace(..)`和`match(..)`。值得庆幸的是，ES6为正则表达式带来了Unicode支持，正如我们在本章早前的“Unicode标志位”中讲解过的那样。
 
-OK, there we have it! JavaScript's Unicode string support is significantly better over pre-ES6 (though still not perfect) with the various additions we've just covered.
+好了，就是这些！有了我们刚刚讲过的各种附加功能，JavaScript的Unicode字符串支持要比前ES6时代好太多了（虽然还不完美）。
 
 ### Unicode Identifier Names
 
-Unicode can also be used in identifier names (variables, properties, etc.). Prior to ES6, you could do this with Unicode-escapes, like:
+Unicode还可以被用于标识符名称（变量，属性，等等）。在ES6之前，你可以通过Unicode转义这么做，比如：
 
 ```js
 var \u03A9 = 42;
@@ -2599,7 +2591,7 @@ var \u03A9 = 42;
 // same as: var Ω = 42;
 ```
 
-As of ES6, you can also use the earlier explained code point escape syntax:
+在ES6中，你还可以使用前面讲过的代码点转义语法：
 
 ```js
 var \u{2B400} = 42;
@@ -2607,17 +2599,17 @@ var \u{2B400} = 42;
 // same as: var 𫐀 = 42;
 ```
 
-There's a complex set of rules around exactly which Unicode characters are allowed. Furthermore, some are allowed only if they're not the first character of the identifier name.
+关于究竟哪些Unicode字符被允许使用，有一组复杂的规则。另外，有些字符只要不是标识符名称的第一个字符就允许使用。
 
-**Note:** Mathias Bynens has a great post (https://mathiasbynens.be/notes/javascript-identifiers-es6) on all the nitty-gritty details.
+**注意：** 关于所有这些细节，Mathias Bynens写了一篇了不起的文章 (https://mathiasbynens.be/notes/javascript-identifiers-es6)。
 
-The reasons for using such unusual characters in identifier names are rather rare and academic. You typically won't be best served by writing code that relies on these esoteric capabilities.
+很少有理由，或者是为了学术上的目的，才会在标识符名称中使用这样不寻常的字符。你通常不会因为依靠这些深奥的功能编写代码而感到舒服。
 
 ## Symbols
 
-With ES6, for the first time in quite a while, a new primitive type has been added to JavaScript: the `symbol`. Unlike the other primitive types, however, symbols don't have a literal form.
+在ES6中，长久以来首次，有一个新的基本类型被加入到了JavaScript：`symbol`。但是，与其他的基本类型不同，symbol没有字面形式。
 
-Here's how you create a symbol:
+这是你如何创建一个symbol：
 
 ```js
 var sym = Symbol( "some optional description" );
@@ -2625,19 +2617,19 @@ var sym = Symbol( "some optional description" );
 typeof sym;		// "symbol"
 ```
 
-Some things to note:
+一些要注意的事情是：
 
-* You cannot and should not use `new` with `Symbol(..)`. It's not a constructor, nor are you producing an object.
-* The parameter passed to `Symbol(..)` is optional. If passed, it should be a string that gives a friendly description for the symbol's purpose.
-* The `typeof` output is a new value (`"symbol"`) that is the primary way to identify a symbol.
+* 你不能也不应该将`new`与`Symbol(..)`一起使用。它不是一个构造器，你也不是在产生一个对象。
+* 被传入`Symbol(..)`的参数是可选的。如果传入的话，它应当是一个字符串，为symbol的目的给出一个友好的描述。
+* `typeof`的输出是一个新的值（`"symbol"`），这是识别一个symbol的主要方法。
 
-The description, if provided, is solely used for the stringification representation of the symbol:
+如果描述被提供的话，它仅仅用于symbol的字符串化表示：
 
 ```js
 sym.toString();		// "Symbol(some optional description)"
 ```
 
-Similar to how primitive string values are not instances of `String`, symbols are also not instances of `Symbol`. If, for some reason, you want to construct a boxed wrapper object form of a symbol value, you can do the following:
+与基本字符串值如何不是`String`的实例的原理很相似，symbol也不是`Symbol`的实例。如果，由于某些原因，你想要为一个symbol值构建一个封箱的包装器对像，你可以做如下的事情：
 
 ```js
 sym instanceof Symbol;		// false
@@ -2648,19 +2640,19 @@ symObj instanceof Symbol;	// true
 symObj.valueOf() === sym;	// true
 ```
 
-**Note:** `symObj` in this snippet is interchangeable with `sym`; either form can be used in all places symbols are utilized. There's not much reason to use the boxed wrapper object form (`symObj`) instead of the primitive form (`sym`). Keeping with similar advice for other primitives, it's probably best to prefer `sym` over `symObj`.
+**注意：** 在这个代码段中的`symObj`和`sym`是可以互换使用的；两种形式可以在symbol被用到的地方使用。没有太多的理由要使用封箱的包装对象形式（`symObj`），而不用基本类型形式（`sym`）。和其他基本类型的建议相似，使用`sym`而非`symObj`可能是最好的。
 
-The internal value of a symbol itself -- referred to as its `name` -- is hidden from the code and cannot be obtained. You can think of this symbol value as an automatically generated, unique (within your application) string value.
+一个symbol本身的内部值 —— 称为它的`name` —— 被隐藏在代码之外而不能取得。你可以认为这个symbol的值是一个自动生成的，（在你的应用程序中）独一无二的字符串值。
 
-But if the value is hidden and unobtainable, what's the point of having a symbol at all?
+但如果这个值是隐藏且不可取得的，那么拥有一个symbol还有什么意义？
 
-The main point of a symbol is to create a string-like value that can't collide with any other value. So, for example, consider using a symbol as a constant representing an event name:
+一个symbol的主要意义是创建一个不会和其他任何值冲突的类字符串值。所以，举例来说，可以考虑将一个symbol用做表示一个事件的名称的值：
 
 ```js
 const EVT_LOGIN = Symbol( "event.login" );
 ```
 
-You'd then use `EVT_LOGIN` in place of a generic string literal like `"event.login"`:
+然后你可以在一个使用像`"event.login"`这样的一般字符串字面量的地方使用`EVT_LOGIN`：
 
 ```js
 evthub.listen( EVT_LOGIN, function(data){
@@ -2668,13 +2660,13 @@ evthub.listen( EVT_LOGIN, function(data){
 } );
 ```
 
-The benefit here is that `EVT_LOGIN` holds a value that cannot be duplicated (accidentally or otherwise) by any other value, so it is impossible for there to be any confusion of which event is being dispatched or handled.
+其中的好处是，`EVT_LOGIN`持有一个不能被其他任何值所（有意或无意地）重复的值，所以在哪个事件被分发或处理的问题上不可能存在任何含糊。
 
-**Note:** Under the covers, the `evthub` utility assumed in the previous snippet would almost certainly be using the symbol value from the `EVT_LOGIN` argument directly as the property/key in some internal object (hash) that tracks event handlers. If `evthub` instead needed to use the symbol value as a real string, it would need to explicitly coerce with `String(..)` or `toString()`, as implicit string coercion of symbols is not allowed.
+**注意：** 在前面的代码段的幕后，几乎可以肯定地认为`evthub`工具使用了`EVT_LOGIN`参数值的symbol值作为某个跟踪事件处理器的内部对象的属性/键。如果`evthub`需要将symbol值作为一个真实的字符串使用，那么它将需要使用`String(..)`或者`toString(..)`进行明确强制转换，因为symbol的隐含字符串强制转换是不允许的。
 
-You may use a symbol directly as a property name/key in an object, such as a special property that you want to treat as hidden or meta in usage. It's important to know that although you intend to treat it as such, it is not *actually* a hidden or untouchable property.
+你可能会将一个symbol直接用做一个对象中的属性名/键，如此作为一个你想将之用于隐藏或元属性的特殊属性。重要的是，要知道虽然你试图这样对待它，但是它 *实际上* 并不是隐藏或不可接触的属性。
 
-Consider this module that implements the *singleton* pattern behavior -- that is, it only allows itself to be created once:
+考虑这个实现了 *单例* 模式行为的模块 —— 也就是，它仅允许自己被创建一次：
 
 ```js
 const INSTANCE = Symbol( "instance" );
@@ -2695,15 +2687,15 @@ var me = HappyFace(),
 me === you;			// true
 ```
 
-The `INSTANCE` symbol value here is a special, almost hidden, meta-like property stored statically on the `HappyFace()` function object.
+这里的symbol值`INSTANCE`是一个被静态地存储在`HappyFace()`函数对象上的特殊的，几乎是隐藏的，类元属性。
 
-It could alternatively have been a plain old property like `__instance`, and the behavior would have been identical. The usage of a symbol simply improves the metaprogramming style, keeping this `INSTANCE` property set apart from any other normal properties.
+替代性地，它本可以是一个像`__instance`这样的普通属性，而且其行为将会是一模一样的。symbol的使用仅仅增强了程序元编程的风格，将这个`INSTANCE`属性与其他普通的属性间保持隔离。
 
 ### Symbol Registry
 
-One mild downside to using symbols as in the last few examples is that the `EVT_LOGIN` and `INSTANCE` variables had to be stored in an outer scope (perhaps even the global scope), or otherwise somehow stored in a publicly available location, so that all parts of the code that need to use the symbols can access them.
+在前面几个例子中使用symbol的一个微小的缺点是，变量`EVT_LOGIN`和`INSTANCE`不得不存储在外部作用域中（甚至也许是全局作用域），或者用某种方法存储在一个可用的公共位置，这样代码所有需要使用这些symbol的部分都可以访问它们。
 
-To aid in organizing code with access to these symbols, you can create symbol values with the *global symbol registry*. For example:
+为了辅助组织访问这些symbol的代码，你可以使用 *全局symbol注册表* 来创建symbol。例如：
 
 ```js
 const EVT_LOGIN = Symbol.for( "event.login" );
@@ -2711,7 +2703,7 @@ const EVT_LOGIN = Symbol.for( "event.login" );
 console.log( EVT_LOGIN );		// Symbol(event.login)
 ```
 
-And:
+和：
 
 ```js
 function HappyFace() {
@@ -2725,15 +2717,15 @@ function HappyFace() {
 }
 ```
 
-`Symbol.for(..)` looks in the global symbol registry to see if a symbol is already stored with the provided description text, and returns it if so. If not, it creates one to return. In other words, the global symbol registry treats symbol values, by description text, as singletons themselves.
+`Symbol.for(..)`查询全局symbol注册表来查看一个symbol是否已经使用被提供的说明文本存储过了，如果有就返回它。如果没有，就创建一个并返回。换句话说，全局symbol注册表通过描述文本将symbol值看作它们本身的单例。
 
-But that also means that any part of your application can retrieve the symbol from the registry using `Symbol.for(..)`, as long as the matching description name is used.
+但这也意味着只要使用匹配的描述名，你的应用程序的任何部分都可以使用`Symbol.for(..)`从注册表中取得symbol。
 
-Ironically, symbols are basically intended to replace the use of *magic strings* (arbitrary string values given special meaning) in your application. But you precisely use *magic* description string values to uniquely identify/locate them in the global symbol registry!
+讽刺的是，基本上symbol的本意是在你的应用程序中取代 *魔法字符串* 的使用（被赋予了特殊意义的随意的字符串值）。但是你正是在全局symbol注册表中使用 *魔法* 描述字符串值来唯一识别/定位它们的！
 
-To avoid accidental collisions, you'll probably want to make your symbol descriptions quite unique. One easy way of doing that is to include prefix/context/namespacing information in them.
+为了避免意外的冲突，你可能想使你的symbol描述十分独特。这么做的一个简单的方法是在它们之中包含前缀/环境/名称空间的信息。
 
-For example, consider a utility such as the following:
+例如，考虑一个像下面这样的工具：
 
 ```js
 function extractValues(str) {
@@ -2750,9 +2742,9 @@ function extractValues(str) {
 }
 ```
 
-We use the magic string value `"extractValues.parse"` because it's quite unlikely that any other symbol in the registry would ever collide with that description.
+我们使用魔法字符串值`"extractValues.parse"`，因为在注册表中的其他任何symbol都不太可能与这个描述相冲突。
 
-If a user of this utility wants to override the parsing regular expression, they can also use the symbol registry:
+如果这个工具的一个用户想要覆盖这个解析用的正则表达式，他们也可以使用symbol注册表：
 
 ```js
 extractValues[Symbol.for( "extractValues.parse" )] =
@@ -2761,11 +2753,11 @@ extractValues[Symbol.for( "extractValues.parse" )] =
 extractValues( "..some string.." );
 ```
 
-Aside from the assistance the symbol registry provides in globally storing these values, everything we're seeing here could have been done by just actually using the magic string `"extractValues.parse"` as the key, rather than the symbol. The improvements exist at the metaprogramming level more than the functional level.
+除了symbol注册表在全局地存储这些值上提供的协助以外，我们在这里看到的一切其实都可以通过将魔法字符串`"extractValues.parse"`作为一个键，而不是一个symbol，来做到。这其中在元编程的层次上的改进要多于在函数层次上的改进。
 
-You may have occasion to use a symbol value that has been stored in the registry to look up what description text (key) it's stored under. For example, you may need to signal to another part of your application how to locate a symbol in the registry because you cannot pass the symbol value itself.
+你可能偶然会使用一个已经被存储在注册表中的symbol值来查询它底层存储了什么描述文本（键）。例如，因为你无法传递symbol值本身，你可能需要通知你的应用程序的另一个部分如何在注册表中定位一个symbol。
 
-You can retrieve a registered symbol's description text (key) using `Symbol.keyFor(..)`:
+你可以使用`Symbol.keyFor(..)`取得一个被注册的symbol描述文本（键）：
 
 ```js
 var s = Symbol.for( "something cool" );
@@ -2781,7 +2773,7 @@ s2 === s;						// true
 
 ### Symbols as Object Properties
 
-If a symbol is used as a property/key of an object, it's stored in a special way so that the property will not show up in a normal enumeration of the object's properties:
+如果一个symbol被用作一个对象的属性/键，它会被以一种特殊的方式存储，以至这个属性不会出现在这个对象属性的普通枚举中：
 
 ```js
 var o = {
@@ -2793,19 +2785,19 @@ var o = {
 Object.getOwnPropertyNames( o );	// [ "foo","baz" ]
 ```
 
-To retrieve an object's symbol properties:
+要取得对象的symbol属性：
 
 ```js
 Object.getOwnPropertySymbols( o );	// [ Symbol(bar) ]
 ```
 
-This makes it clear that a property symbol is not actually hidden or inaccessible, as you can always see it in the `Object.getOwnPropertySymbols(..)` list.
+这表明一个属性symbol实际上不是隐藏的或不可访问的，因为你总是可以在`Object.getOwnPropertySymbols(..)`中看到它。
 
 #### Built-In Symbols
 
-ES6 comes with a number of predefined built-in symbols that expose various meta behaviors on JavaScript object values. However, these symbols are *not* registered in the global symbol registry, as one might expect.
+ES6带来了好几种预定义的内建symbol，它们暴露了在JavaScript对象值上的各种元行为。然而，正如人们所预料的那样，这些symbol *没有* 没被注册到全局symbol注册表中。
 
-Instead, they're stored as properties on the `Symbol` function object. For example, in the "`for..of`" section earlier in this chapter, we introduced the `Symbol.iterator` value:
+相反，它们作为属性被存储到了`Symbol`函数对象中。例如，在本章早先的“`for..of`”一节中，我们介绍了值`Symbol.iterator`：
 
 ```js
 var a = [1,2,3];
@@ -2813,16 +2805,16 @@ var a = [1,2,3];
 a[Symbol.iterator];			// native function
 ```
 
-The specification uses the `@@` prefix notation to refer to the built-in symbols, the most common ones being: `@@iterator`, `@@toStringTag`, `@@toPrimitive`. Several others are defined as well, though they probably won't be used as often.
+语言规范使用`@@`前缀注释指代内建的symbol，最常见的几个是：`@@iterator`，`@@toStringTag`，`@@toPrimitive`。有几个其他的也被定义了，虽然他们可能不那么频繁地被使用。
 
-**Note:** See "Well Known Symbols" in Chapter 7 for detailed information about how these built-in symbols are used for meta programming purposes.
+**注意：** 关于这些内建symbol如何被用于元编程的详细信息，参见第七章的“常见的Symbol”。
 
 ## Review
 
-ES6 adds a heap of new syntax forms to JavaScript, so there's plenty to learn!
+ES6给JavaScript增加了一堆新的语法形式，有好多东西要学！
 
-Most of these are designed to ease the pain points of common programming idioms, such as setting default values to function parameters and gathering the "rest" of the parameters into an array. Destructuring is a powerful tool for more concisely expressing assignments of values from arrays and nested objects.
+这些东西中的大多数都是为了缓解常见编程惯用法中的痛点而设计的，比如为函数参数设置默认值和将“剩余”的参数收集到一个数组中。解构是一个强大的工具，用来更简约地表达从数字或嵌套对象的赋值。
 
-While features like `=>` arrow functions appear to also be all about shorter and nicer-looking syntax, they actually have very specific behaviors that you should intentionally use only in appropriate situations.
+虽然像箭头函数`=>`这样的特性看起来也都是关于更简短更好看的语法，但是它们实际上拥有非常特定的行为，你应当在恰当的情况下有意地使用它们。
 
-Expanded Unicode support, new tricks for regular expressions, and even a new primitive `symbol` type round out the syntactic evolution of ES6.
+扩展的Unicode支持，新的正则表达式技巧，和新的`symbol`基本类型充实了ES6语法的发展演变。

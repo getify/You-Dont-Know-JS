@@ -1,9 +1,13 @@
-# You Don't Know JS: ES6 & Beyond
-# Chapter 3: Organization
+# 你不懂JS：ES6与未来
+# 第三章：组织
 
 It's one thing to write JS code, but it's another to properly organize it. Utilizing common patterns for organization and reuse goes a long way to improving the readability and understandability of your code. Remember: code is at least as much about communicating to other developers as it is about feeding the computer instructions.
 
+编写JS代码是一回事儿，而合理地组织它是另一回事儿。使用常见的组织和重用模式在很大程度上改善了你代码的可读性和可理解性。记住：代码在与其他开发者交流上起的作用，与在给计算机喂指令上起的作用同样重要。
+
 ES6 has several important features that help significantly improve these patterns, including: iterators, generators, modules, and classes.
+
+ES6拥有几种重要的特性可以显著改善这些模式，包括：iterator，generator，模块，和类。
 
 ## Iterators
 
