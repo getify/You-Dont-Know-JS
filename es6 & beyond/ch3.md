@@ -13,17 +13,29 @@ ES6拥有几种重要的特性可以显著改善这些模式，包括：iterator
 
 An *iterator* is a structured pattern for pulling information from a source in one-at-a-time fashion. This pattern has been around programming for a long time. And to be sure, JS developers have been ad hoc designing and implementing iterators in JS programs since before anyone can remember, so it's not at all a new topic.
 
+*迭代器（iterator）* 是一种结构化的模式，用于从一个信息源中以一次一个的方式抽取信息。这种模式在程序设计中存在很久了。而且不可否认的是，不知从什么时候起JS开发者们就已经特别地设计并实现了迭代器，所以它根本不是什么新的话题。
+
 What ES6 has done is introduce an implicit standardized interface for iterators. Many of the built-in data structures in JavaScript will now expose an iterator implementing this standard. And you can also construct your own iterators adhering to the same standard, for maximal interoperability.
+
+ES6所做的是，为迭代器引入了一个隐含的标准化接口。许多在JavaScript中内建的数据结构现在都会暴露一个实现了这个标准的迭代器。而且为了最大化互用性，你也可以构建自己的遵循同样标准的迭代器。
 
 Iterators are a way of organizing ordered, sequential, pull-based consumption of data.
 
+迭代器是一种组织有顺序的，相继的，基于抽取消费的数据的方法。
+
 For example, you may implement a utility that produces a new unique identifier each time it's requested. Or you may produce an infinite series of values that rotate through a fixed list, in round-robin fashion. Or you could attach an iterator to a database query result to pull out new rows one at a time.
 
+举个例子，你可能实现一个工具，它在每次被请求时产生一个新的唯一的标识符。或者你可能循环一个固定的列表以轮流的方式产生一系列无限的值。或者你可以在一个数据库查询的结果上添加一个迭代器来一次抽取一行结果。
+
 Although they have not commonly been used in JS in such a manner, iterators can also be thought of as controlling behavior one step at a time. This can be illustrated quite clearly when considering generators (see "Generators" later in this chapter), though you can certainly do the same without generators.
+
+虽然在JS中它们不经常以这样的方式被使用，但是迭代器还可以认为是每次控制行为中的一个步骤。这会在考虑generator时得到相当清楚的展示（参见本章稍后的“Generator”），虽然你当然可以不使用generator而做同样的事。
 
 ### Interfaces
 
 At the time of this writing, ES6 section 25.1.1.2 (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-iterator-interface) details the `Iterator` interface as having the following requirement:
+
+在本书写作的时候，ES6的25.1.1.2部分 (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-iterator-interface) 详述了`Iterator`接口，它有如下的要求：
 
 ```
 Iterator [required]
@@ -32,6 +44,8 @@ Iterator [required]
 
 There are two optional members that some iterators are extended with:
 
+有两个可选成员，有些迭代器用它们进行了扩展：
+
 ```
 Iterator [optional]
 	return() {method}: stops iterator and returns IteratorResult
@@ -39,6 +53,8 @@ Iterator [optional]
 ```
 
 The `IteratorResult` interface is specified as:
+
+接口`IteratorResult`被规定为：
 
 ```
 IteratorResult
@@ -49,7 +65,11 @@ IteratorResult
 
 **Note:** I call these interfaces implicit not because they're not explicitly called out in the specification -- they are! -- but because they're not exposed as direct objects accessible to code. JavaScript does not, in ES6, support any notion of "interfaces," so adherence for your own code is purely conventional. However, wherever JS expects an iterator -- a `for..of` loop, for instance -- what you provide must adhere to these interfaces or the code will fail.
 
+**注意：** 我称这些接口是隐含的，不是因为它们没有在语言规范中被明确地被说出来 —— 它们被说出来了！—— 而是因为它们没有作为可以直接访问的对象暴露给代码。在ES6中，JavaScript不支持任何“接口”的概念，所以在你自己的代码中遵循它们纯粹是惯例上的。但是，不论JS在何处需要一个迭代器 —— 例如在一个`for..of`循环中 —— 你提供的东西必须遵循这些接口，否则代码就会失败。
+
 There's also an `Iterable` interface, which describes objects that must be able to produce iterators:
+
+还有一个`Iterable`接口，它描述了一定能够产生迭代器的对象：
 
 ```
 Iterable
@@ -58,9 +78,13 @@ Iterable
 
 If you recall from "Built-In Symbols" in Chapter 2, `@@iterator` is the special built-in symbol representing the method that can produce iterator(s) for the object.
 
+如果你回忆一下第二章的“内建Symbol”，`@@iterator`是一种特殊的内建symbol，表示可以为对象产生迭代器的方法。
+
 #### IteratorResult
 
 The `IteratorResult` interface specifies that the return value from any iterator operation will be an object of the form:
+
+`IteratorResult`接口规定从任何迭代器操作的返回值都是这样形式的对象：
 
 ```js
 { value: .. , done: true / false }
@@ -68,9 +92,15 @@ The `IteratorResult` interface specifies that the return value from any iterator
 
 Built-in iterators will always return values of this form, but more properties are, of course, allowed to be present on the return value, as necessary.
 
+内建迭代器将总是返回这种形式的值，当然，更多的属性也允许出现在这个返回值中，如果有必要的话。
+
 For example, a custom iterator may add additional metadata to the result object (e.g., where the data came from, how long it took to retrieve, cache expiration length, frequency for the appropriate next request, etc.).
 
+例如，一个自定义的迭代器可能会在结果对象中加入额外的元数据（比如，数据是从哪里来的，取得它花了多久，缓存过期的时间长度，下次请求的恰当频率，等等）。
+
 **Note:** Technically, `value` is optional if it would otherwise be considered absent or unset, such as in the case of the value `undefined`. Because accessing `res.value` will produce `undefined` whether it's present with that value or absent entirely, the presence/absence of the property is more an implementation detail or an optimization (or both), rather than a functional issue.
+
+**注意：** 从技术上讲，`value`是可选的，
 
 ### `next()` Iteration
 
