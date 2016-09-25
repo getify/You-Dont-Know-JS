@@ -1,22 +1,22 @@
-# You Don't Know JS: Async & Performance
-# Foreword
+# 你不懂JS: 异步与性能
+# 序
 
-Over the years, my employer has trusted me enough to conduct interviews. If we're looking for someone with skills in JavaScript, my first line of questioning… actually that's not true, I first check if the candidate needs the bathroom and/or a drink, because comfort is important, but once I'm past the bit about the candidate's fluid in/out-take, I set about determining if the candidate knows JavaScript, or just jQuery.
+多年以前，我的雇主十分信任我来让我进行面试。如果我们要找某些拥有JavaScript技能的人，我的问卷的第一行是...实际上这不是真的，我首先会问问应聘者是否需要上个卫生间或者喝些饮料，因为平静是很重要的，但是一旦我确信可以和应聘者进行流畅的交流，我就要开始考察这位应聘者是否懂得JavaScript，还是只懂得jQuery。
 
-Not that there's anything wrong with jQuery. It lets you do a lot without really knowing JavaScript, and that's a feature not a bug. But if the job calls for advanced skills in JavaScript performance and maintainability, you need someone who knows how libraries such as jQuery are put together. You need to be able to harness the core of JavaScript the same way they do.
+并不是jQuery有什么错。它使你不必真的懂得JavaScript就可以做很多事，这是一个特性而不是一个bug。但是如果这份工作需要关于JavaScript性能和可维护性上的高级技能，你就需要一些懂得jQuery这样的库是如何组装在一起的人。你需要能够像他们一样操控JavaScript的核心。
 
-If I want to get a picture of someone's core JavaScript skill, I'm most interested in what they make of closures (you've read that book of this series already, right?) and how to get the most out of asynchronicity, which brings us to this book.
+如果我想对某人的核心JavaScript技能取得一些了解，我最感兴趣就是他们如何使用闭包（你已经读过这个系列的那本书了，对吧？），以及如何最大限度地利用异步性，而这就是这本书带给我们的。
 
-For starters, you'll be taken through callbacks, the bread and butter of asynchronous programming. Of course, bread and butter does not make for a particularly satisfying meal, but the next course is full of tasty tasty promises!
+对于初学者，你将被带领着学习回调，它是异步编程的面包和黄油。当然，面包和黄油并不能做一顿特别令人满意的午餐，但是下一课满是非常美味的promise！
 
-If you don't know promises, now is the time to learn. Promises are now the official way to provide async return values in both JavaScript and the DOM. All future async DOM APIs will use them, many already do, so be prepared! At the time of writing, Promises have shipped in most major browsers, with IE shipping soon. Once you've finished that, I hope you left room for the next course, Generators.
+如果你不懂得promise，现在是学习的时候了。现在在JavaScript和DOM中，Promise是提供一部返回值的官方方法。所有未来的异步DOM API都将使用它们，而且有许多已经这样做了，所以做好准备！在本次写作时，Promise已经在大多数主流浏览器中获得了支持，IE也很快会支持。一旦你完成了这一课，我希望你离开教室去学习下一刻，Generator。
 
-Generators snuck their way into stable versions of Chrome and Firefox without too much pomp and ceremony, because, frankly, they're more complicated than they are interesting. Or, that's what I thought until I saw them combined with promises. There, they become an important tool in readability and maintenance.
+Generator不声不响地溜进了Chrome和Firefox的稳定版本，因为，老实说，它们的复杂程度要比有趣程度大多了。或者说，直到我看到它们与promise组合起来之前我都是这么认为的。在此，它们成为了增强可读性和可维护性的重要工具。
 
-For dessert, well, I won't spoil the surprise, but prepare to gaze into the future of JavaScript! Features that give you more and more control over concurrency and asynchronicity.
+至于甜点，好吧，我不会把惊喜放坏了，准备好凝视JavaScript的未来吧！许多特性在并发性和异步性上给了你越来越多的控制权。
 
-Well, I won't block your enjoyment of the book any longer, on with the show! If you've already read part of the book before reading this Foreword, give yourself 10 asynchronous points! You deserve them!
+好吧，我不会继续挡着你享受这本书了，让好戏开始吧！如果你已经在读这篇序之前度过了这本书的一些部分，给你10点异步加分！你值得拥有！
 
 Jake Archibald<br>
 [jakearchibald.com](http://jakearchibald.com), [@jaffathecake](http://twitter.com/jaffathecake)<br>
-Developer Advocate at Google Chrome
+Google Chrome 技术推广部

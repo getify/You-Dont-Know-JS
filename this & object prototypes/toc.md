@@ -26,14 +26,14 @@
 	* 混合（Mixin）
 * 第五章: 原型
 	* `[[Prototype]]`
-	* "Class"
-	* "(Prototypal) Inheritance"
-	* Object Links
+	* “类”
+	* “（原型）继承”
+	* 对象链接
 * 第六章: 行为委托
-	* Towards Delegation-Oriented Design
+	* 迈向面相委托的设计
 	* Classes vs. Objects
-	* Simpler Design
-	* Nicer Syntax
-	* Introspection
+	* 更简单的设计
+	* 更好的语法
+	* 自省
 * 附录A: ES6 `class`
 * 附录B: 鸣谢

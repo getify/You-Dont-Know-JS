@@ -1,39 +1,23 @@
 # 你不懂JS：ES6与未来
 # 第三章：组织
 
-It's one thing to write JS code, but it's another to properly organize it. Utilizing common patterns for organization and reuse goes a long way to improving the readability and understandability of your code. Remember: code is at least as much about communicating to other developers as it is about feeding the computer instructions.
-
 编写JS代码是一回事儿，而合理地组织它是另一回事儿。使用常见的组织和重用模式在很大程度上改善了你代码的可读性和可理解性。记住：代码在与其他开发者交流上起的作用，与在给计算机喂指令上起的作用同样重要。
-
-ES6 has several important features that help significantly improve these patterns, including: iterators, generators, modules, and classes.
 
 ES6拥有几种重要的特性可以显著改善这些模式，包括：iterator，generator，模块，和类。
 
 ## Iterators
 
-An *iterator* is a structured pattern for pulling information from a source in one-at-a-time fashion. This pattern has been around programming for a long time. And to be sure, JS developers have been ad hoc designing and implementing iterators in JS programs since before anyone can remember, so it's not at all a new topic.
-
 *迭代器（iterator）* 是一种结构化的模式，用于从一个信息源中以一次一个的方式抽取信息。这种模式在程序设计中存在很久了。而且不可否认的是，不知从什么时候起JS开发者们就已经特别地设计并实现了迭代器，所以它根本不是什么新的话题。
-
-What ES6 has done is introduce an implicit standardized interface for iterators. Many of the built-in data structures in JavaScript will now expose an iterator implementing this standard. And you can also construct your own iterators adhering to the same standard, for maximal interoperability.
 
 ES6所做的是，为迭代器引入了一个隐含的标准化接口。许多在JavaScript中内建的数据结构现在都会暴露一个实现了这个标准的迭代器。而且为了最大化互用性，你也可以构建自己的遵循同样标准的迭代器。
 
-Iterators are a way of organizing ordered, sequential, pull-based consumption of data.
-
 迭代器是一种组织有顺序的，相继的，基于抽取消费的数据的方法。
 
-For example, you may implement a utility that produces a new unique identifier each time it's requested. Or you may produce an infinite series of values that rotate through a fixed list, in round-robin fashion. Or you could attach an iterator to a database query result to pull out new rows one at a time.
-
 举个例子，你可能实现一个工具，它在每次被请求时产生一个新的唯一的标识符。或者你可能循环一个固定的列表以轮流的方式产生一系列无限的值。或者你可以在一个数据库查询的结果上添加一个迭代器来一次抽取一行结果。
-
-Although they have not commonly been used in JS in such a manner, iterators can also be thought of as controlling behavior one step at a time. This can be illustrated quite clearly when considering generators (see "Generators" later in this chapter), though you can certainly do the same without generators.
 
 虽然在JS中它们不经常以这样的方式被使用，但是迭代器还可以认为是每次控制行为中的一个步骤。这会在考虑generator时得到相当清楚的展示（参见本章稍后的“Generator”），虽然你当然可以不使用generator而做同样的事。
 
 ### Interfaces
-
-At the time of this writing, ES6 section 25.1.1.2 (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-iterator-interface) details the `Iterator` interface as having the following requirement:
 
 在本书写作的时候，ES6的25.1.1.2部分 (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-iterator-interface) 详述了`Iterator`接口，它有如下的要求：
 
@@ -42,8 +26,6 @@ Iterator [required]
 	next() {method}: retrieves next IteratorResult
 ```
 
-There are two optional members that some iterators are extended with:
-
 有两个可选成员，有些迭代器用它们进行了扩展：
 
 ```
@@ -51,8 +33,6 @@ Iterator [optional]
 	return() {method}: stops iterator and returns IteratorResult
 	throw() {method}: signals error and returns IteratorResult
 ```
-
-The `IteratorResult` interface is specified as:
 
 接口`IteratorResult`被规定为：
 
@@ -63,11 +43,7 @@ IteratorResult
 	done {property}: boolean, indicates completion status
 ```
 
-**Note:** I call these interfaces implicit not because they're not explicitly called out in the specification -- they are! -- but because they're not exposed as direct objects accessible to code. JavaScript does not, in ES6, support any notion of "interfaces," so adherence for your own code is purely conventional. However, wherever JS expects an iterator -- a `for..of` loop, for instance -- what you provide must adhere to these interfaces or the code will fail.
-
 **注意：** 我称这些接口是隐含的，不是因为它们没有在语言规范中被明确地被说出来 —— 它们被说出来了！—— 而是因为它们没有作为可以直接访问的对象暴露给代码。在ES6中，JavaScript不支持任何“接口”的概念，所以在你自己的代码中遵循它们纯粹是惯例上的。但是，不论JS在何处需要一个迭代器 —— 例如在一个`for..of`循环中 —— 你提供的东西必须遵循这些接口，否则代码就会失败。
-
-There's also an `Iterable` interface, which describes objects that must be able to produce iterators:
 
 还有一个`Iterable`接口，它描述了一定能够产生迭代器的对象：
 
@@ -76,13 +52,9 @@ Iterable
 	@@iterator() {method}: produces an Iterator
 ```
 
-If you recall from "Built-In Symbols" in Chapter 2, `@@iterator` is the special built-in symbol representing the method that can produce iterator(s) for the object.
-
 如果你回忆一下第二章的“内建Symbol”，`@@iterator`是一种特殊的内建symbol，表示可以为对象产生迭代器的方法。
 
 #### IteratorResult
-
-The `IteratorResult` interface specifies that the return value from any iterator operation will be an object of the form:
 
 `IteratorResult`接口规定从任何迭代器操作的返回值都是这样形式的对象：
 
@@ -90,21 +62,13 @@ The `IteratorResult` interface specifies that the return value from any iterator
 { value: .. , done: true / false }
 ```
 
-Built-in iterators will always return values of this form, but more properties are, of course, allowed to be present on the return value, as necessary.
-
 内建迭代器将总是返回这种形式的值，当然，更多的属性也允许出现在这个返回值中，如果有必要的话。
 
-For example, a custom iterator may add additional metadata to the result object (e.g., where the data came from, how long it took to retrieve, cache expiration length, frequency for the appropriate next request, etc.).
-
 例如，一个自定义的迭代器可能会在结果对象中加入额外的元数据（比如，数据是从哪里来的，取得它花了多久，缓存过期的时间长度，下次请求的恰当频率，等等）。
-
-**Note:** Technically, `value` is optional if it would otherwise be considered absent or unset, such as in the case of the value `undefined`. Because accessing `res.value` will produce `undefined` whether it's present with that value or absent entirely, the presence/absence of the property is more an implementation detail or an optimization (or both), rather than a functional issue.
 
 **注意：** 从技术上讲，`value`是可选的，在值为`undefined`的情况下，它将会被认为是不存在或者是没有被设置。因为不管它是表示的就是这个值还是完全不存在，访问`res.value`都将会产生`undefined`，所以这个属性的存在/不存在更大程度上是一个实现或者优化（或两者）的细节，而非一个功能上的问题。
 
 ### `next()` Iteration
-
-Let's look at an array, which is an iterable, and the iterator it can produce to consume its values:
 
 让我们来看一个数组，它是一个可迭代对象，它可以生成一个迭代器来消费它的值：
 
@@ -120,19 +84,11 @@ it.next();		// { value: 3, done: false }
 it.next();		// { value: undefined, done: true }
 ```
 
-Each time the method located at `Symbol.iterator` (see Chapters 2 and 7) is invoked on this `arr` value, it will produce a new fresh iterator. Most structures will do the same, including all the built-in data structures in JS.
-
 每一次定位在`Symbol.iterator`上的方法在值`arr`上被调用时，它都将生成一个全新的迭代器。大多数的数据结构都会这么做，包括所有内建在JS中的数据结构。
-
-However, a structure like an event queue consumer might only ever produce a single iterator (singleton pattern). Or a structure might only allow one unique iterator at a time, requiring the current one to be completed before a new one can be created.
 
 然而，像事件队列这样的结构也许只能生成一个单独的迭代器（单例模式）。或者某种结构可能在同一时间内只允许一个唯一的迭代器，要求当前的迭代器必须完成，才能创建一个新的迭代器。
 
-The `it` iterator in the previous snippet doesn't report `done: true` when you receive the `3` value. You have to call `next()` again, in essence going beyond the end of the array's values, to get the complete signal `done: true`. It may not be clear why until later in this section, but that design decision will typically be considered a best practice.
-
 前一个代码段中的`it`迭代器不会再你得到值`3`时报告`done: true`。你必须再次调用`next()`，实质上越过数组末尾的值，才能得到完成信号`done: true`。在这一节稍后会清楚地讲解这种设计方式的原因，但是它通常被认为是一种最佳实践。
-
-Primitive string values are also iterables by default:
 
 基本字符串值也默认地是可迭代对象：
 
@@ -146,11 +102,7 @@ it.next();		// { value: "e", done: false }
 ..
 ```
 
-**Note:** Technically, the primitive value itself isn't iterable, but thanks to "boxing", `"hello world"` is coerced/converted to its `String` object wrapper form, which *is* an iterable. See the *Types & Grammar* title of this series for more information.
-
 **注意：** 从技术上讲，这个基本类型值本身不是可迭代对象，但多亏了“封箱”，`"hello world"`被强制转换为它的`String`对象包装形式，*它* 才是一个可迭代对象。更多信息参见本系列的 *类型与文法*。
-
-ES6 also includes several new data structures, called collections (see Chapter 5). These collections are not only iterables themselves, but they also provide API method(s) to generate an iterator, such as:
 
 ES6还包括几种新的数据结构，称为集合（参见第五章）。这些集合不仅本身就是可迭代对象，而且它们还提供API方法来生成一个迭代器，例如：
 
@@ -167,51 +119,29 @@ it2.next();		// { value: [ "foo", 42 ], done: false }
 ..
 ```
 
-The `next(..)` method of an iterator can optionally take one or more arguments. The built-in iterators mostly do not exercise this capability, though a generator's iterator definitely does (see "Generators" later in this chapter).
-
 一个迭代器的`next(..)`方法能够可选地接受一个或多个参数。大多数内建的迭代器不会实施这种能力，虽然一个generator的迭代器绝对会这么做（参见本章稍后的“Generator”）。
-
-By general convention, including all the built-in iterators, calling `next(..)` on an iterator that's already been exhausted is not an error, but will simply continue to return the result `{ value: undefined, done: true }`.
 
 根据一般的惯例，包括所有的内建迭代器，在一个已经被耗尽的迭代器上调用`next(..)`不是一个错误，而是简单地持续返回结果`{ value: undefined, done: true }`。
 
 ### Optional: `return(..)` and `throw(..)`
 
-The optional methods on the iterator interface -- `return(..)` and `throw(..)` -- are not implemented on most of the built-in iterators. However, they definitely do mean something in the context of generators, so see "Generators" for more specific information.
-
 在迭代器接口上的可选方法 —— `return(..)`和`throw(..)` —— 在大多数内建的迭代器上都没有被实现。但是，它们在generator的上下文环境中绝对有某些含义，所以更具体的信息可以参看“Generator”。
-
-`return(..)` is defined as sending a signal to an iterator that the consuming code is complete and will not be pulling any more values from it. This signal can be used to notify the producer (the iterator responding to `next(..)` calls) to perform any cleanup it may need to do, such as releasing/closing network, database, or file handle resources.
 
 `return(..)`被定义为向一个迭代器发送一个信号，告知它消费者代码已经完成而且不会再从它那里抽取更多的值。这个信号可以用于通知生产者（应答`next(..)`调用的迭代器）去实施一些可能的清理作业，比如释放/关闭网络，数据库，或者文件引用资源。
 
-If an iterator has a `return(..)` present and any condition occurs that can automatically be interpreted as abnormal or early termination of consuming the iterator, `return(..)` will automatically be called. You can call `return(..)` manually as well.
-
 如果一个迭代器拥有`return(..)`，而且发生了可以自动被解释为非正常或者提前终止消费迭代器的任何条件，`return(..)`就将会被自动调用。你也可以手动调用`return(..)`。
-
-`return(..)` will return an `IteratorResult` object just like `next(..)` does. In general, the optional value you send to `return(..)` would be sent back as `value` in this `IteratorResult`, though there are nuanced cases where that might not be true.
 
 `return(..)`将会像`next(..)`一样返回一个`IteratorResult`对象。一般来说，你向`return(..)`发送的可选值将会在这个`IteratorResult`中作为`value`发送回来，虽然在一些微妙的情况下这可能不成立。
 
-`throw(..)` is used to signal an exception/error to an iterator, which possibly may be used differently by the iterator than the completion signal implied by `return(..)`. It does not necessarily imply a complete stop of the iterator as `return(..)` generally does.
-
 `throw(..)`被用于向一个迭代器发送一个异常/错误信号，与`return(..)`隐含的完成信号相比，它可能会被迭代器用于不同的目的。它不一定像`return(..)`一样暗示着迭代器的一个完成停止。
 
-For example, with generator iterators, `throw(..)` actually injects a thrown exception into the generator's paused execution context, which can be caught with a `try..catch`. An uncaught `throw(..)` exception would end up abnormally aborting the generator's iterator.
-
 例如，在generator迭代器中，`throw(..)`实际上会将一个被抛出的异常注射到generator暂停的执行环境中，这个异常可以用`try..catch`捕获。一个未捕获的`throw(..)`异常将会导致generator的迭代器异常中止。
-
-**Note:** By general convention, an iterator should not produce any more results after having called `return(..)` or `throw(..)`.
 
 **注意：** 根据一般的惯例，在`return(..)`或`throw(..)`被调用之后，一个迭代器就不应该在产生任何结果了。
 
 ### Iterator Loop
 
-As we covered in the "`for..of`" section in Chapter 2, the ES6 `for..of` loop directly consumes a conforming iterable.
-
 正如我们在第二章的“`for..of`”一节中讲解的，ES6的`for..of`循环可以直接消费一个规范的可迭代对象。
-
-If an iterator is also an iterable, it can be used directly with the `for..of` loop. You make an iterator an iterable by giving it a `Symbol.iterator` method that simply returns the iterator itself:
 
 如果一个迭代器也是一个可迭代对象，那么它就可以直接与`for..of`循环一起使用。通过给予迭代器一个简单地返回它自身的`Symbol.iterator`方法，你就可以是它成为一个可迭代对象：
 
@@ -227,8 +157,6 @@ var it = {
 it[Symbol.iterator]() === it;		// true
 ```
 
-Now we can consume the `it` iterator with a `for..of` loop:
-
 现在我们就可以用一个`for..of`循环来消费迭代器`it`了：
 
 ```js
@@ -236,8 +164,6 @@ for (var v of it) {
 	console.log( v );
 }
 ```
-
-To fully understand how such a loop works, recall the `for` equivalent of a `for..of` loop from Chapter 2:
 
 为了完全理解这样的循环如何工作，回忆下第二章中的`for..of`循环的`for`等价物：
 
@@ -248,29 +174,17 @@ for (var v, res; (res = it.next()) && !res.done; ) {
 }
 ```
 
-If you look closely, you'll see that `it.next()` is called before each iteration, and then `res.done` is consulted. If `res.done` is `true`, the expression evaluates to `false` and the iteration doesn't occur.
-
 如果你仔细观察，你会发现`it.next()`是在每次迭代之前被调用的，然后`res.done`才被查询。如果`res.done`是`true`，那么这个表达式将会求值为`false`于是这次迭代不会发生。
-
-Recall earlier that we suggested iterators should in general not return `done: true` along with the final intended value from the iterator. Now you can see why.
 
 回忆一下之前我们建议说，迭代器一般不应与最终预期的值一起返回`done: true`。现在你知道为什么了。
 
-If an iterator returned `{ done: true, value: 42 }`, the `for..of` loop would completely discard the `42` value and it'd be lost. For this reason, assuming that your iterator may be consumed by patterns like the `for..of` loop or its manual `for` equivalent, you should probably wait to return `done: true` for signaling completion until after you've already returned all relevant iteration values.
-
 如果一个迭代器返回了`{ done: true, value: 42 }`，`for..of`循环将完全扔掉值`42`。因此，假定你的迭代器可能会被`for..of`循环或它的`for`等价物这样的模式消费的话，你可能应当等到你已经返回了所有相关的迭代值之后才返回`done: true`来表示完成。
-
-**Warning:** You can, of course, intentionally design your iterator to return some relevant `value` at the same time as returning `done: true`. But don't do this unless you've documented that as the case, and thus implicitly forced consumers of your iterator to use a different pattern for iteration than is implied by `for..of` or its manual equivalent we depicted.
 
 **警告：** 当然，你可以有意地将你的迭代器设计为将某些相关的`value`与`done: true`同时返回。但除非你将此情况在文档中记录下来，否则不要这么做，因为这样会隐含地强制你的迭代器消费者使用一种，与我们刚才描述的`for..of`或它的手动等价物不同的模式来进行迭代。
 
 ### Custom Iterators
 
-In addition to the standard built-in iterators, you can make your own! All it takes to make them interoperate with ES6's consumption facilities (e.g., the `for..of` loop and the `...` operator) is to adhere to the proper interface(s).
-
 除了标准的内建迭代器，你还可以制造你自己的迭代器！所有使它们可以与ES6消费设施（例如，`for..of`循环和`...`操作符）进行互动的代价就是遵循恰当的接口。
-
-Let's try constructing an iterator that produces the infinite series of numbers in the Fibonacci sequence:
 
 让我们试着构建一个迭代器，它能够以斐波那契（Fibonacci）数列的形式产生无限多的数字序列：
 
@@ -309,15 +223,9 @@ for (var v of Fib) {
 // Fibonacci sequence abandoned.
 ```
 
-**Warning:** If we hadn't inserted the `break` condition, this `for..of` loop would have run forever, which is probably not the desired result in terms of breaking your program!
-
 **警告：** 如果我们没有插入`break`条件，这个`for..of`循环将会永远运行下去，就破坏你的程序来讲这可能不是我们想要的！
 
-The `Fib[Symbol.iterator]()` method when called returns the iterator object with `next()` and `return(..)` methods on it. State is maintained via `n1` and `n2` variables, which are kept by the closure.
-
 方法`Fib[Symbol.iterator]()`在被调用时返回带有`next()`和`return(..)`方法的迭代器对象。它的状态通过变量`n1`和`n2`维护在闭包中。
-
-Let's *next* consider an iterator that is designed to run through a series (aka a queue) of actions, one item at a time:
 
 接下来让我们考虑一个迭代器，它被设计为执行一系列（也叫队列）动作，一次一个：
 
@@ -350,11 +258,7 @@ var tasks = {
 };
 ```
 
-The iterator on `tasks` steps through functions found in the `actions` array property, if any, and executes them one at a time, passing in whatever arguments you pass to `next(..)`, and returning any return value to you in the standard `IteratorResult` object.
-
 在`tasks`上的迭代器步过在数组属性`actions`中找到的函数，并每次执行它们中的一个，并传入你传递给`next(..)`的任何参数值，并在标准的`IteratorResult`对象中向你返回任何它返回的东西。
-
-Here's how we could use this `tasks` queue:
 
 这是我们如何使用这个`tasks`队列：
 

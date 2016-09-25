@@ -1,20 +1,20 @@
-# You Don't Know JS: Types & Grammar
-# Foreword
+# 你不懂JS：类型与文法
+# 序
 
-It was once said, "JavaScript is the only language developers don't learn to use before using it."
+人们曾说，“JavaScript是唯一一种开发者在学会之前就使用的语言。”
 
-I laugh each time I hear that quote because it was true for me and I suspect it was for many other developers. JavaScript, and maybe even CSS and HTML, were not a core computer science language taught at college in the Internet's early days, so personal development was very much based on the budding developer's search and "view source" abilities to piece together these basic web languages.
+我每次听到这句话都会笑出来，因为对我来说这是真的，而且我怀疑对于许多其他开发者也是。JavaScript，甚至可能还有CSS和HTML，在因特网出现的早期都不是大学中教授的核心计算机语言，所以个人开发很大程度上都是基于开发者的搜索和“看源代码”的能力来将这些基本的web语言拼凑在一起。
 
-I still remember my first high school website project. The task was to create any type of web store, and me being a James Bond fan, I decided to create a Goldeneye store. It had everything: the Goldeneye midi theme song playing in the background, a JavaScript-powered crosshairs following the mouse around the screen, and a gunshot sound that played upon every click. Q would have been proud of this masterpiece of a website.
+我还记得我的第一个高中网站项目。它的任务是创建任意类型的网上商店，而我作为一个James Bond的粉丝，决定创建一个黄金眼商店。它有一切东西：黄金眼的迷笛主题音乐在背景中播放，一个用JavaScript制作的瞄准十字在屏幕上跟踪着鼠标，还有在每次点击时播放一次枪响的音效。Q本应该会为这个网站中的杰作感到骄傲的。
 
-I tell that story because I did back then what many developers are doing today: I copied and pasted chunks of JavaScript code into my project without having a clue what's actually happening. The widespread use of JavaScript toolkits like jQuery have, in their own small way, perpetuated this pattern of nonlearning of core JavaScript.
+我说这个故事是因为在那时我确实做了许多开发者今天在做的事情：我在我的项目中拷贝粘贴了大块儿的JavaScript代码，而根本不知道究竟发生了什么。像jQuery那样的工具包的广泛使用，以它们微不足道的方式，延续了这种不学习核心JavaScript的模式。
 
-I'm not disparaging JavaScript toolkit use; after all, I'm a member of the MooTools JavaScript team! But the reason JavaScript toolkits are as powerful as they are is because their developers know the fundamentals, and their "gotchas," and apply them magnificently. As useful as these toolkits are, it's still incredibly important to know the basics of the language, and with books like Kyle Simpson's *You Don't Know JS* series, there's no excuse not to learn them.
+我不是在贬低JavaScript工具包的使用；毕竟，我还是MooToo，ls JavaScript团队的一员！但是JavaScript工具包如此强大的原因是因为它们的开发者了解基础，和它们的“坑”，并出色地施用了它们。和这些工具包的有用之处一样，了解这门语言的基础依然是极其重要的，而且有了Kyle Simpson的 *你不懂JS* 系列这样的书，没有借口不学习它们。
 
-*Types and Grammar*, the third installment of the series, is an excellent look at the core JavaScript fundamentals that copy and paste and JavaScript toolkits don't and could never teach you. Coercion and its pitfalls, natives as constructors, and the whole gamut of JavaScript basics are thoroughly explained with focused code examples. Like the other books in this series, Kyle cuts straight to the point: no fluff and word-smithing -- exactly the type of tech book I love.
+*类型与文法*，这个系列的第三部，是学习核心JavaScript基础的杰出教材，这些基础是拷贝粘贴和JavaScript工具包没有和绝不会教你的。强制转换和它的陷阱，原生类型与构造器，和JavaScript基本的全部方面都使用专门的代码示例进行了彻底地讲解。和这个系列的其他书籍一样，Kyle总是一针见血：没有作秀和文字游戏 —— 这正是我喜爱类型的技术书籍。
 
-Enjoy Types and Grammar and don't let it get too far away from your desk!
+享受类型与文法而且不要让它离你的桌子太远！
 
 David Walsh<br>
 [http://davidwalsh.name](http://davidwalsh.name), [@davidwalshblog](http://twitter.com/davidwalshblog)<br>
-Senior Web Developer, Mozilla
+高级Web开发者，Mozilla
