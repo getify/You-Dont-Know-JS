@@ -292,11 +292,11 @@ it.next( 20, 50, 120 );	// step 3: 20 50 120
 it.next();				// { done: true }
 ```
 
-This particular usage reinforces that iterators can be a pattern for organizing functionality, not just data. It's also reminiscent of what we'll see with generators in the next section.
+这种特别的用法证实了迭代器可以是一种组织功能的模式，不仅仅是数据。这也联系着我们在下一节关于generator将要看到的东西。
 
-You could even get creative and define an iterator that represents meta operations on a single piece of data. For example, we could define an iterator for numbers that by default ranges from `0` up to (or down to, for negative numbers) the number in question.
+你甚至可以更有创意一些，在一块数据上定义一个表示元操作的迭代器。例如，我们可以为默认从0开始递增至（或递减至，对于负数来说）指定数字的一组数字定义一个迭代器。
 
-Consider:
+考虑如下代码：
 
 ```js
 if (!Number.prototype[Symbol.iterator]) {
@@ -348,7 +348,7 @@ if (!Number.prototype[Symbol.iterator]) {
 }
 ```
 
-Now, what tricks does this creativity afford us?
+现在，这种创意给了我们什么技巧？
 
 ```js
 for (var i of 3) {
@@ -359,25 +359,25 @@ for (var i of 3) {
 [...-3];				// [0,-1,-2,-3]
 ```
 
-Those are some fun tricks, though the practical utility is somewhat debatable. But then again, one might wonder why ES6 didn't just ship with such a minor but delightful feature easter egg!?
+这是一些有趣的技巧，虽然其实际用途有些值得商榷。但是再一次，有人可能想知道为什么ES6没有提供如此微小但讨喜的特性呢？
 
-I'd be remiss if I didn't at least remind you that extending native prototypes as I'm doing in the previous snippet is something you should only do with caution and awareness of potential hazards.
+如果我连这样的提醒都没给过你，那就是我的疏忽：像我在前面的代码段中做的那样扩展原生原型，是一件你需要小心并了解潜在的危害后才应该做的事情。
 
-In this case, the chances that you'll have a collision with other code or even a future JS feature is probably exceedingly low. But just beware of the slight possibility. And document what you're doing verbosely for posterity's sake.
+在这样的情况下，你于其他代码或者未来的JS特性发生冲突的可能性非常低。但是要小心微小的可能性。并在文档中为后人详细记录下你在做什么。
 
-**Note:** I've expounded on this particular technique in this blog post (http://blog.getify.com/iterating-es6-numbers/) if you want more details. And this comment (http://blog.getify.com/iterating-es6-numbers/comment-page-1/#comment-535294) even suggests a similar trick but for making string character ranges.
+**注意：** 如果你想知道更多细节，我在这篇文章(http://blog.getify.com/iterating-es6-numbers/) 中详细论述了这种特别的技术。而且这段评论(http://blog.getify.com/iterating-es6-numbers/comment-page-1/#comment-535294)甚至为制造一个字符串字符范围提出了一个相似的技巧。
 
 ### Iterator Consumption
 
-We've already shown consuming an iterator item by item with the `for..of` loop. But there are other ES6 structures that can consume iterators.
+我们已经看到了使用`for..of`循环来一个元素一个元素地消费一个迭代器。但是还一些其他的ES6解构可以消费迭代器。
 
-Let's consider the iterator attached to this array (though any iterator we choose would have the following behaviors):
+让我们考虑一下附着这个数组上的迭代器（虽然任何我们选择的迭代器都将拥有如下的行为）：
 
 ```js
 var a = [1,2,3,4,5];
 ```
 
-The `...` spread operator fully exhausts an iterator. Consider:
+扩散操作符`...`将完全耗尽一个迭代器。考虑如下代码：
 
 ```js
 function foo(x,y,z,w,p) {
@@ -387,14 +387,14 @@ function foo(x,y,z,w,p) {
 foo( ...a );			// 15
 ```
 
-`...` can also spread an iterator inside an array:
+`...`还可以在一个数组内部扩散一个迭代器：
 
 ```js
 var b = [ 0, ...a, 6 ];
 b;						// [0,1,2,3,4,5,6]
 ```
 
-Array destructuring (see "Destructuring" in Chapter 2) can partially or completely (if paired with a `...` rest/gather operator) consume an iterator:
+数组解构（参见第二章的“解构”）可以部分地或者完全地（如果与一个`...`剩余/收集操作符一起使用）消费一个迭代器：
 
 ```js
 var it = a[Symbol.iterator]();
@@ -413,19 +413,19 @@ w;						// [4,5]
 
 ## Generators
 
-All functions run to completion, right? In other words, once a function starts running, it finishes before anything else can interrupt.
+所有的函数都会运行至完成，对吧？换句话说，一旦一个函数开始运行，在它完成之前没有任何东西能够打断它。
 
-At least that's how it's been for the whole history of JavaScript up to this point. As of ES6, a new somewhat exotic form of function is being introduced, called a generator. A generator can pause itself in mid-execution, and can be resumed either right away or at a later time. So it clearly does not hold the run-to-completion guarantee that normal functions do.
+至少对与到现在为止的JavaScript的整个历史来说是这样的。在ES6中，引入了一个有些异乎寻常的新形式的函数，称为generator。一个generator可以在运行期间暂停它自己，还可以立即或者稍后继续运行。所以显然它没有普通函数那样的运行至完成的保证。
 
-Moreover, each pause/resume cycle in mid-execution is an opportunity for two-way message passing, where the generator can return a value, and the controlling code that resumes it can send a value back in.
+另外，在运行期间的每次暂停/继续轮回都是一个双向消息传递的好机会，generator可以在这里返回一个值，而使它继续的控制端代码可以发回一个值。
 
-As with iterators in the previous section, there are multiple ways to think about what a generator is, or rather what it's most useful for. There's no one right answer, but we'll try to consider several angles.
+就像前一节中的迭代器一样，有种方式可以考虑generator是什么，或者说它对什么最有用。对此没有一个正确的答案，但我们将试着从几个角度考虑。
 
-**Note:** See the *Async & Performance* title of this series for more information about generators, and also see Chapter 4 of this current title.
+**注意：** 关于generator的更多信息参见本系列的 *异步与性能*，还可以参见本书的第四章。
 
 ### Syntax
 
-The generator function is declared with this new syntax:
+generator函数使用这种新语法声明：
 
 ```js
 function *foo() {
@@ -433,7 +433,7 @@ function *foo() {
 }
 ```
 
-The position of the `*` is not functionally relevant. The same declaration could be written as any of the following:
+`*`的位置在功能上无关紧要。同样的声明还可以写做以下的任意一种：
 
 ```js
 function *foo()  { .. }
@@ -443,11 +443,11 @@ function*foo()   { .. }
 ..
 ```
 
-The *only* difference here is stylistic preference. Most other literature seems to prefer `function* foo(..) { .. }`. I prefer `function *foo(..) { .. }`, so that's how I'll present them for the rest of this title.
+这里 *唯一* 的区别就是风格的偏好。大多数其他的文献似乎喜欢`function* foo(..) { .. }`。我喜欢`function *foo(..) { .. }`，所以这就是我将在本书剩余部分中表示它们的方法。
 
-My reason is purely didactic in nature. In this text, when referring to a generator function, I will use `*foo(..)`, as opposed to `foo(..)` for a normal function. I observe that `*foo(..)` more closely matches the `*` positioning of `function *foo(..) { .. }`.
+我这样做的理由实质上纯粹是为了教学。在这本书中，当我引用一个generator函数时，我将使用`*foo(..)`，与普通函数的`foo(..)`相对。我发现`*foo(..)`与`function *foo(..) { .. }`中`*`的位置更加吻合。
 
-Moreover, as we saw in Chapter 2 with concise methods, there's a concise generator form in object literals:
+另外，就像我们在第二章的简约方法中看到的，在对象字面量中有一种简约generator形式：
 
 ```js
 var a = {
@@ -455,19 +455,19 @@ var a = {
 };
 ```
 
-I would say that with concise generators, `*foo() { .. }` is rather more natural than `* foo() { .. }`. So that further argues for matching the consistency with `*foo()`.
+我要说在简约generator中，`*foo() { .. }`要比`* foo() { .. }`更自然。这进一步表明了为何使用`*foo()`匹配一致性。
 
-Consistency eases understanding and learning.
+一致性使理解与学习更轻松。
 
 #### Executing a Generator
 
-Though a generator is declared with `*`, you still execute it like a normal function:
+虽然一个generator使用`*`进行声明，但是你依然可以像一个普通函数那样执行它：
 
 ```js
 foo();
 ```
 
-You can still pass it arguments, as in:
+你依然可以传给它参数值，就像：
 
 ```js
 function *foo(x,y) {
@@ -477,9 +477,9 @@ function *foo(x,y) {
 foo( 5, 10 );
 ```
 
-The major difference is that executing a generator, like `foo(5,10)` doesn't actually run the code in the generator. Instead, it produces an iterator that will control the generator to execute its code.
+主要区别在于，执行一个generator，比如`foo(5,10)`，并不实际运行generator中的代码。取而代之的是，它生成一个迭代器来控制generator执行它的代码。
 
-We'll come back to this later in "Iterator Control," but briefly:
+我们将在稍后的“迭代器控制”中回到这个话题，但是简要地说：
 
 ```js
 function *foo() {
@@ -494,7 +494,7 @@ var it = foo();
 
 #### `yield`
 
-Generators also have a new keyword you can use inside them, to signal the pause point: `yield`. Consider:
+Generator还有一个你可以在它们内部使用的新关键字，用来表示暂停点：`yield`。考虑如下代码：
 
 ```js
 function *foo() {
@@ -507,11 +507,11 @@ function *foo() {
 }
 ```
 
-In this `*foo()` generator, the operations on the first two lines would run at the beginning, then `yield` would pause the generator. If and when resumed, the last line of `*foo()` would run. `yield` can appear any number of times (or not at all, technically!) in a generator.
+在这个`*foo()`generator中，前两行的操作将会在开始时运行，然后`yield`将会暂停这个generator。如果这个generator被继续，`*foo()`的最后一行将运行。在一个generator中`yield`可以出现任意多次（或者，在技术上讲，根本不出现！）。
 
-You can even put `yield` inside a loop, and it can represent a repeated pause point. In fact, a loop that never completes just means a generator that never completes, which is completely valid, and sometimes entirely what you need.
+你甚至可以在一个循环内部放置`yield`，它可以表示一个重复的暂停点。事实上，一个永不完成的循环就意味着一个永不完成的generator，这是完全合法的，而且有时候完全是你需要的。
 
-`yield` is not just a pause point. It's an expression that sends out a value when pausing the generator. Here's a `while..true` loop in a generator that for each iteration `yield`s a new random number:
+`yield`不只是一个暂停点。它是在暂停generator时发送出一个值的表达式。这里是一个位于generator中的`while..true`循环，它每次迭代时`yield`出一个新的随机数：
 
 ```js
 function *foo() {
@@ -521,7 +521,7 @@ function *foo() {
 }
 ```
 
-The `yield ..` expression not only sends a value -- `yield` without a value is the same as `yield undefined` -- but also receives (e.g., is replaced by) the eventual resumption value. Consider:
+`yield ..`表达式不仅发送一个值 —— 不带值的`yield`与`yield undefined`相同 —— 它还接收（例如，被替换为）最终的继续值。考虑如下代码：
 
 ```js
 function *foo() {
@@ -530,9 +530,9 @@ function *foo() {
 }
 ```
 
-This generator will first `yield` out the value `10` when pausing itself. When you resume the generator -- using the `it.next(..)` we referred to earlier -- whatever value (if any) you resume with will replace/complete the whole `yield 10` expression, meaning that value will be assigned to the `x` variable.
+这个generator在暂停它自己时将首先`yield`出值`10`。当你继续这个generator时 —— 使用我们先前提到的`it.next(..)` —— 无论你使用什么值继续它，这个值都将替换/完成整个表达式`yield 10`，这意味着这个值将被赋值给变量`x`
 
-A `yield ..` expression can appear anywhere a normal expression can. For example:
+一个`yield..`表达式可以出现在任意普通表达式可能出现的地方。例如：
 
 ```js
 function *foo() {
@@ -541,13 +541,13 @@ function *foo() {
 }
 ```
 
-`*foo()` here has four `yield ..` expressions. Each `yield` results in the generator pausing to wait for a resumption value that's then used in the various expression contexts.
+这里的`*foo()`有四个`yield ..`表达式。其中每个`yield`都会导致generator暂停以等待一个继续值，这个继续值稍后被用于各个表达式环境中。
 
-`yield` is not technically an operator, though when used like `yield 1` it sure looks like it. Because `yield` can be used all by itself as in `var x = yield;`, thinking of it as an operator can sometimes be confusing.
+`yield`在技术上讲不是一个操作符，虽然像`yield 1`这样使用时看起来确实很像。因为`yield`可以像`var x = yield`这样完全通过自己被使用，所以将它认为是一个操作符有时令人困惑。
 
-Technically, `yield ..` is of the same "expression precedence" -- similar conceptually to operator precedence -- as an assignment expression like `a = 3`. That means `yield ..` can basically appear anywhere `a = 3` can validly appear.
+从技术上讲，`yield ..`与`a = 3`这样的赋值表达式拥有相同的“表达式优先级” —— 概念上和操作符优先级很相似。这意味着`yield ..`基本上可以出现在任何`a = 3`可以合法出现的地方。
 
-Let's illustrate the symmetry:
+让我们展示一下这种对称性：
 
 ```js
 var a, b;
@@ -561,13 +561,13 @@ a = 2 + yield 3;		// invalid
 a = 2 + (yield 3);		// valid
 ```
 
-**Note:** If you think about it, it makes a sort of conceptual sense that a `yield ..` expression would behave similar to an assignment expression. When a paused `yield` expression is resumed, it's completed/replaced by the resumption value in a way that's not terribly dissimilar from being "assigned" that value.
+**注意：** 如果你好好考虑一下，认为一个`yield ..`表达式与一个赋值表达式的行为相似在概念上有些道理。当一个被暂停的generator被继续时，它就以一种与被这个继续值“赋值”区别不大的方式，被这个值完成/替换。
 
-The takeaway: if you need `yield ..` to appear in a position where an assignment like `a = 3` would not itself be allowed, it needs to be wrapped in a `( )`.
+要点：如果你需要`yield ..`出现在`a = 3`这样的赋值本书不被允许出现的位置，那么它就需要被包在一个`( )`中。
 
-Because of the low precedence of the `yield` keyword, almost any expression after a `yield ..` will be computed first before being sent with `yield`. Only the `...` spread operator and the `,` comma operator have lower precedence, meaning they'd bind after the `yield` has been evaluated.
+因为`yield`关键字的优先级很低，几乎任何出现在`yield ..`之后的表达式都会在被`yield`发送之前首先被计算。只有扩散操作符`...`和逗号操作符`,`拥有更低的优先级，这意味着他们会在`yield`已经被求值之后才会被处理。
 
-So just like with multiple operators in normal statements, another case where `( )` might be needed is to override (elevate) the low precedence of `yield`, such as the difference between these expressions:
+所以正如带有多个操作符的普通语句一样，存在另一个可能需要`( )`来覆盖（提升）`yield`的低优先级的情况，就像这些表达式之间的区别：
 
 ```js
 yield 2 + 3;			// same as `yield (2 + 3)`
@@ -575,17 +575,17 @@ yield 2 + 3;			// same as `yield (2 + 3)`
 (yield 2) + 3;			// `yield 2` first, then `+ 3`
 ```
 
-Just like `=` assignment, `yield` is also "right-associative," which means that multiple `yield` expressions in succession are treated as having been `( .. )` grouped from right to left. So, `yield yield yield 3` is treated as `yield (yield (yield 3))`. A "left-associative" interpretation like `((yield) yield) yield 3` would make no sense.
+和`=`赋值一样，`yield`也是“右结合性”的，这意味着多个接连出现的`yield`表达式被视为从右到左被`( .. )`分组。所以，`yield yield yield 3`将被视为`yield (yield (yield 3))`。像`((yield) yield) yield 3`这样的“左结合性”解释没有意义。
 
-Just like with operators, it's a good idea to use `( .. )` grouping, even if not strictly required, to disambiguate your intent if `yield` is combined with other operators or `yield`s.
+和其他操作符一样，`yield`与其他操作符或`yield`组合时为了使你的意图没有歧义，使用`( .. )`分组是一个好主意，即使这不是严格要求的。
 
-**Note:** See the *Types & Grammar* title of this series for more information about operator precedence and associativity.
+**注意：** 更多关于操作符优先级和结合性的信息，参见本系列的 *类型与文法*。
 
 #### `yield *`
 
-In the same way that the `*` makes a `function` declaration into `function *` generator declaration, a `*` makes `yield` into `yield *`, which is a very different mechanism, called *yield delegation*. Grammatically, `yield *..` will behave the same as a `yield ..`, as discussed in the previous section.
+与`*`使一个`function`声明成为一个`function *`generator声明的方式一样，一个`*`使`yield`成为一个机制非常不同的`yield *`，称为 *yield委托*。从文法上讲，`yield *..`的行为与`yield ..`相同，就像在前一节讨论过的那样。
 
-`yield * ..` requires an iterable; it then invokes that iterable's iterator, and delegates its own host generator's control to that iterator until it's exhausted. Consider:
+`yield * ..`需要一个可迭代对象；然后它调用这个可迭代对象的迭代器，并将它自己的宿主generator的控制权委托给那个迭代器，直到它被耗尽。考虑如下代码：
 
 ```js
 function *foo() {
@@ -593,9 +593,9 @@ function *foo() {
 }
 ```
 
-**Note:** As with the `*` position in a generator's declaration (discussed earlier), the `*` positioning in `yield *` expressions is stylistically up to you. Most other literature prefers `yield* ..`, but I prefer `yield *..`, for very symmetrical reasons as already discussed.
+**注意：** 与generator声明中`*`的位置（早先讨论过）一样，在`yield *`表达式中的`*`的位置在风格上由你来决定。大多数其他文献偏好`yield* ..`，但是我喜欢`yield *..`，理由和我们已经讨论过的相同。
 
-The `[1,2,3]` value produces an iterator that will step through its values, so the `*foo()` generator will yield those values out as it's consumed. Another way to illustrate the behavior is in yield delegating to another generator:
+值`[1,2,3]`产生一个将会步过它的值的迭代器，所以generator`*foo()`将会在被消费时产生这些值。另一种说明这种行为的方式是，yield委托到了另一个generator：
 
 ```js
 function *foo() {
@@ -609,11 +609,11 @@ function *bar() {
 }
 ```
 
-The iterator produced when `*bar()` calls `*foo()` is delegated to via `yield *`, meaning whatever value(s) `*foo()` produces will be produced by `*bar()`.
+当`*bar()`调用`*foo()`产生的迭代器通过`yield *`受到委托，意味着无论`*foo()`产生什么值都会被`*bar()`产生。
 
-Whereas with `yield ..` the completion value of the expression comes from resuming the generator with `it.next(..)`, the completion value of the `yield *..` expression comes from the return value (if any) from the delegated-to iterator.
+在`yield ..`中表达式的完成值来自于使用`it.next(..)`继续generator，而`yield *..`表达式的完成值来自于受到委托的迭代器的返回值（如果有的话）。
 
-Built-in iterators generally don't have return values, as we covered at the end of the "Iterator Loop" section earlier in this chapter. But if you define your own custom iterator (or generator), you can design it to `return` a value, which `yield *..` would capture:
+内建的迭代器一般没有返回值，正如我们在本站早先的“迭代器循环”一节的末尾讲过的。但是如果你定义你自己的迭代器（或者generator），你就可以将它设计为`return`一个值，`yield *..`将会捕获它：
 
 ```js
 function *foo() {
@@ -635,9 +635,9 @@ for (var v of bar()) {
 // x: { value: 4, done: true }
 ```
 
-While the `1`, `2`, and `3` values are `yield`ed out of `*foo()` and then out of `*bar()`, the `4` value returned from `*foo()` is the completion value of the `yield *foo()` expression, which then gets assigned to `x`.
+虽然值`1`，`2`，和`3`从`*foo()`中被`yield`出来，然后从`*bar()`中被`yield`出来，但是从`*foo()`中返回的值`4`是表达式`yield *foo()`的完成值，然后它被赋值给`x`。
 
-Because `yield *` can call another generator (by way of delegating to its iterator), it can also perform a sort of generator recursion by calling itself:
+因为`yield *`可以调用另一个generator（通过委托到它的迭代器的方式），它还可以通过调用自己来实施某种generator递归：
 
 ```js
 function *foo(x) {
@@ -650,15 +650,19 @@ function *foo(x) {
 foo( 1 );
 ```
 
-The result from `foo(1)` and then calling the iterator's `next()` to run it through its recursive steps will be `24`. The first `*foo(..)` run has `x` at value `1`, which is `x < 3`. `x + 1` is passed recursively to `*foo(..)`, so `x` is then `2`. One more recursive call results in `x` of `3`.
+`foo(1)`并调用迭代器的`next()`来使它运行它的递归步骤，结果将是`24`。第一次`*foo()`运行时`x`拥有值`1`，它是`x < 3`。`x + 1`被递归地传递到`*foo(..)`，所以之后的`x`是`2`。再一次递归调用导致`x`为`3`。
 
-Now, because `x < 3` fails, the recursion stops, and `return 3 * 2` gives `6` back to the previous call's `yield *..` expression, which is then assigned to `x`. Another `return 6 * 2` returns `12` back to the previous call's `x`. Finally `12 * 2`, or `24`, is returned from the completed run of the `*foo(..)` generator.
+现在，因为`x < 3`失败了，递归停止，而且`return 3 * 2`将`6`给回前一个调用的`yeild *..`表达式，它被赋值给`x`。另一个`return 6 * 2`返回`12`给前一个调用的`x`。最终`12 * 2`，即`24`，从generator`*foo(..)`的运行完成中被返回。
 
 ### Iterator Control
 
 Earlier, we briefly introduced the concept that generators are controlled by iterators. Let's fully dig into that now.
 
+早先，我们简要地介绍了generator是由迭代器控制的概念。现在让我们完整地深入这个话题。
+
 Recall the recursive `*foo(..)` from the previous section. Here's how we'd run it:
+
+回忆一下前一节的递归`*for(..)`。这是我们如何运行它：
 
 ```js
 function *foo(x) {
@@ -674,7 +678,11 @@ it.next();				// { value: 24, done: true }
 
 In this case, the generator doesn't really ever pause, as there's no `yield ..` expression. Instead, `yield *` just keeps the current iteration step going via the recursive call. So, just one call to the iterator's `next()` function fully runs the generator.
 
+在这种情况下，generator并没有真正暂停过，因为这里没有`yield ..`表达式。`yield *`只是通过递归调用保持当前的迭代步骤继续运行下去。所以，仅仅对迭代器的`next()`函数进行一次调用就完全地运行了generator。
+
 Now let's consider a generator that will have multiple steps and thus multiple produced values:
+
+现在让我们考虑一个有多个步骤并且因此有多个产生值的generator：
 
 ```js
 function *foo() {
@@ -686,6 +694,8 @@ function *foo() {
 
 We already know we can consume an iterator, even one attached to a generator like `*foo()`, with a `for..of` loop:
 
+我们已经知道我们可以是使用一个`for..of`循环来消费一个迭代器，即便它是一个附着在`*foo()`这样的generator上：
+
 ```js
 for (var v of foo()) {
 	console.log( v );
@@ -695,7 +705,11 @@ for (var v of foo()) {
 
 **Note:** The `for..of` loop requires an iterable. A generator function reference (like `foo`) by itself is not an iterable; you must execute it with `foo()` to get the iterator (which is also an iterable, as we explained earlier in this chapter). You could theoretically extend the `GeneratorPrototype` (the prototype of all generator functions) with a `Symbol.iterator` function that essentially just does `return this()`. That would make the `foo` reference itself an iterable, which means `for (var v of foo) { .. }` (notice no `()` on `foo`) will work.
 
+**注意：** `for..of`循环需要一个可迭代对象。一个generator函数引用（比如`foo`）本身不是一个可迭代对象；你必须使用`foo()`来执行它以得到迭代器（它还是一个可迭代对象，正如我们在本章早先讲解过的）。理论上你可以使用一个实质上仅仅执行`return this()`的`Symbol.iterator`函数来扩展`GeneratorPrototype`（所有generator函数的原型）。这将使`foo`引用本身成为一个可迭代对象，也就意味着`for (var v of foo) { .. }`（注意在`foo`上没有`()`）将可以工作。
+
 Let's instead iterate the generator manually:
+
+让我们手动迭代这个generator：
 
 ```js
 function *foo() {
@@ -714,6 +728,8 @@ it.next();				// { value: undefined, done: true }
 ```
 
 If you look closely, there are three `yield` statements and four `next()` calls. That may seem like a strange mismatch. In fact, there will always be one more `next()` call than `yield` expression, assuming all are evaluated and the generator is fully run to completion.
+
+如果你仔细观察，这里有三个`yield`语句和四个`next()`调用。这可能看起来像是一个奇怪的不匹配。事实上，假定所有的东西都被求值并且generator完全运行至完成的话，`next()`调用将总是比`yield`表达式多一个。
 
 But if you look at it from the opposite perspective (inside-out instead of outside-in), the matching between `yield` and `next()` makes more sense.
 
