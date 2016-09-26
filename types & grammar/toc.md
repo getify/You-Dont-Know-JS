@@ -1,9 +1,9 @@
-# You Don't Know JS: Types & Grammar
+# 你不懂JS：类型与文法
 
-## Table of Contents
+## 目录
 
-* Foreword
-* Preface
+* 序
+* 前言
 * Chapter 1: Types
 	* A Type By Any Other Name...
 	* Built-in Types
@@ -36,4 +36,3 @@
 	* `switch`
 * Appendix A: Mixed Environment JavaScript
 * Appendix B: Acknowledgments
-
