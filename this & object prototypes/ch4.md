@@ -476,3 +476,6 @@ The mixin pattern (both explicit and implicit) is often used to *sort of* emulat
 Explicit mixins are also not exactly the same as class *copy*, since objects (and functions!) only have shared references duplicated, not the objects/functions duplicated themselves. Not paying attention to such nuance is the source of a variety of gotchas.
 
 In general, faking classes in JS often sets more landmines for future coding than solving present *real* problems.
+
+
+[Next Chapter](./ch5.md)
