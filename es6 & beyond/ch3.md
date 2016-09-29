@@ -1103,7 +1103,7 @@ I don't think it's an exaggeration to suggest that the single most important cod
 
 The traditional module pattern is based on an outer function with inner variables and functions, and a returned "public API" with methods that have closure over the inner data and capabilities. It's often expressed like this:
 
-传统的模块模式
+传统的模块模式基于一个外部函数，它带有内部变量和函数，以及一个被返回的“公有API”。这个“公有API”带有对内部变量和功能拥有闭包的方法。它经常这样表达：
 
 ```js
 function Hello(name) {
@@ -1123,6 +1123,8 @@ me.greeting();			// Hello Kyle!
 
 This `Hello(..)` module can produce multiple instances by being called subsequent times. Sometimes, a module is only called for as a singleton (i.e., it just needs one instance), in which case a slight variation on the previous snippet, using an IIFE, is common:
 
+这个`Hello(..)`模块通过被后续调用可以产生多个实例。有时，一个模块为了作为一个单例（也就是，只需要一个实例）而只被调用一次，这样的情况下常见的是一种前面代码段的变种，使用IIFE：
+
 ```js
 var me = (function Hello(name){
 	function greeting() {
@@ -1140,24 +1142,49 @@ me.greeting();			// Hello Kyle!
 
 This pattern is tried and tested. It's also flexible enough to have a wide assortment of variations for a number of different scenarios.
 
+这种模式是经受过检验的。它也足够灵活，以至于在许多不同的场景下可以有大量的各种变化。
+
 One of the most common is the Asynchronous Module Definition (AMD), and another is the Universal Module Definition (UMD). We won't cover the particulars of these patterns and techniques here, but they're explained extensively in many places online.
+
+其中一种最常见的是异步模块定义（AMD），另一种是统一模块定义（UMD）。我们不会在这里涵盖这些特定的模式和技术，但是它们在网上的许多地方有大量的讲解。
 
 ### Moving Forward
 
 As of ES6, we no longer need to rely on the enclosing function and closure to provide us with module support. ES6 modules have first class syntactic and functional support.
 
+在ES6中，我们不再需要依赖外围函数和闭包来为我们提供模块支持了。ES6模块拥有头等语法上和功能上的支持。
+
 Before we get into the specific syntax, it's important to understand some fairly significant conceptual differences with ES6 modules compared to how you may have dealt with modules in the past:
+
+在我们接触这些具体语法之前，重要的是要理解ES6模块与你以前曾经用过的模块比较起来，在概念上的一些相当显著的不同之处：
 
 * ES6 uses file-based modules, meaning one module per file. At this time, there is no standardized way of combining multiple modules into a single file.
 
+* ES6使用基于文件的模块，这意味着一个模块一个文件。同时，没有标准的方法将多个模块组合到一个文件中。
+
    That means that if you are going to load ES6 modules directly into a browser web application, you will be loading them individually, not as a large bundle in a single file as has been common in performance optimization efforts.
 
+	 这意味着如果你要直接把ES6模块加载到一个浏览器web应用中的话，你将个别地加载它们，不是像常见的那样为了性能优化而作为一个单独文件中的一个巨大的包加载。
+
    It's expected that the contemporaneous advent of HTTP/2 will significantly mitigate any such performance concerns, as it operates on a persistent socket connection and thus can very efficiently load many smaller files in parallel and interleaved with one another.
+
+	 人们预期同时期到来的HTTP/2将会大幅缓和这种性能上的顾虑，因为它工作在一个持续的套接字连接上，因而可以用并行的，互相交错的方式非常高效地加载许多小文件。
+
 * The API of an ES6 module is static. That is, you define statically what all the top-level exports are on your module's public API, and those cannot be amended later.
 
+* 一个ES6模块的API是静态的。这就是说，你在模块的公有API上静态地定义所有被导出的顶层内容，而这些内容之后不能被修改。
+
    Some uses are accustomed to being able to provide dynamic API definitions, where methods can be added/removed/replaced in response to runtime conditions. Either these uses will have to change to fit with ES6 static APIs, or they will have to restrain the dynamic changes to properties/methods of a second-level object.
+
+	 有些用法习惯于能够提供动态API定义，它的方法可以根据运行时的条件被增加/删除/替换。这些用法要么必须改变以适应ES6静态API，要么它们就不得不将属性/方法的动态修改限制在一个内层对象中。
+
 * ES6 modules are singletons. That is, there's only one instance of the module, which maintains its state. Every time you import that module into another module, you get a reference to the one centralized instance. If you want to be able to produce multiple module instances, your module will need to provide some sort of factory to do it.
+
+* ES6模块都是单例。也就是，模块只有一个维持它状态的实例。每次你将这个模块导入到另一个模块时，你得到的都是一个指向中央实例的引用。如果你想要能够产生多个模块实例，你的模块将需要提供某种工厂来这么做。
+
 * The properties and methods you expose on a module's public API are not just normal assignments of values or references. They are actual bindings (almost like pointers) to the identifiers in your inner module definition.
+
+* 你在模块的公有API上暴露的属性和方法
 
    In pre-ES6 modules, if you put a property on your public API that holds a primitive value like a number or string, that property assignment was by value-copy, and any internal update of a corresponding variable would be separate and not affect the public copy on the API object.
 
