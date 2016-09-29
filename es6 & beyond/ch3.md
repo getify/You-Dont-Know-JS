@@ -656,11 +656,7 @@ foo( 1 );
 
 ### Iterator Control
 
-Earlier, we briefly introduced the concept that generators are controlled by iterators. Let's fully dig into that now.
-
 早先，我们简要地介绍了generator是由迭代器控制的概念。现在让我们完整地深入这个话题。
-
-Recall the recursive `*foo(..)` from the previous section. Here's how we'd run it:
 
 回忆一下前一节的递归`*for(..)`。这是我们如何运行它：
 
@@ -676,11 +672,7 @@ var it = foo( 1 );
 it.next();				// { value: 24, done: true }
 ```
 
-In this case, the generator doesn't really ever pause, as there's no `yield ..` expression. Instead, `yield *` just keeps the current iteration step going via the recursive call. So, just one call to the iterator's `next()` function fully runs the generator.
-
 在这种情况下，generator并没有真正暂停过，因为这里没有`yield ..`表达式。`yield *`只是通过递归调用保持当前的迭代步骤继续运行下去。所以，仅仅对迭代器的`next()`函数进行一次调用就完全地运行了generator。
-
-Now let's consider a generator that will have multiple steps and thus multiple produced values:
 
 现在让我们考虑一个有多个步骤并且因此有多个产生值的generator：
 
@@ -692,8 +684,6 @@ function *foo() {
 }
 ```
 
-We already know we can consume an iterator, even one attached to a generator like `*foo()`, with a `for..of` loop:
-
 我们已经知道我们可以是使用一个`for..of`循环来消费一个迭代器，即便它是一个附着在`*foo()`这样的generator上：
 
 ```js
@@ -703,11 +693,7 @@ for (var v of foo()) {
 // 1 2 3
 ```
 
-**Note:** The `for..of` loop requires an iterable. A generator function reference (like `foo`) by itself is not an iterable; you must execute it with `foo()` to get the iterator (which is also an iterable, as we explained earlier in this chapter). You could theoretically extend the `GeneratorPrototype` (the prototype of all generator functions) with a `Symbol.iterator` function that essentially just does `return this()`. That would make the `foo` reference itself an iterable, which means `for (var v of foo) { .. }` (notice no `()` on `foo`) will work.
-
 **注意：** `for..of`循环需要一个可迭代对象。一个generator函数引用（比如`foo`）本身不是一个可迭代对象；你必须使用`foo()`来执行它以得到迭代器（它还是一个可迭代对象，正如我们在本章早先讲解过的）。理论上你可以使用一个实质上仅仅执行`return this()`的`Symbol.iterator`函数来扩展`GeneratorPrototype`（所有generator函数的原型）。这将使`foo`引用本身成为一个可迭代对象，也就意味着`for (var v of foo) { .. }`（注意在`foo`上没有`()`）将可以工作。
-
-Let's instead iterate the generator manually:
 
 让我们手动迭代这个generator：
 
@@ -727,15 +713,13 @@ it.next();				// { value: 3, done: false }
 it.next();				// { value: undefined, done: true }
 ```
 
-If you look closely, there are three `yield` statements and four `next()` calls. That may seem like a strange mismatch. In fact, there will always be one more `next()` call than `yield` expression, assuming all are evaluated and the generator is fully run to completion.
-
 如果你仔细观察，这里有三个`yield`语句和四个`next()`调用。这可能看起来像是一个奇怪的不匹配。事实上，假定所有的东西都被求值并且generator完全运行至完成的话，`next()`调用将总是比`yield`表达式多一个。
 
-But if you look at it from the opposite perspective (inside-out instead of outside-in), the matching between `yield` and `next()` makes more sense.
+但是如果你相反的角度观察（从里向外而不是从外向里），`yield`和`next()`之间的匹配就显得更有道理。
 
-Recall that the `yield ..` expression will be completed by the value you resume the generator with. That means the argument you pass to `next(..)` completes whatever `yield ..` expression is currently paused waiting for a completion.
+回忆一下，`yield ..`表达式将被你用于继续generator的值完成。这意味着你传递给`next(..)`的参数值将完成任何当前暂停中等待完成的`yield ..`表达式。
 
-Let's illustrate this perspective this way:
+让我们这样展示一下这种视角：
 
 ```js
 function *foo() {
@@ -746,9 +730,9 @@ function *foo() {
 }
 ```
 
-In this snippet, each `yield ..` is sending a value out (`1`, `2`, `3`), but more directly, it's pausing the generator to wait for a value. In other words, it's almost like asking the question, "What value should I use here? I'll wait to hear back."
+在这个代码段中，每个`yield ..`都送出一个值（`1`，`2`，`3`），但更直接的是，它暂停了generator来等待一个值。换句话说，它就像在问这样一个问题，“我应当在这里用什么值？我会在这里等你告诉我。”
 
-Now, here's how we control `*foo()` to start it up:
+现在，这是我们如何控制`*foo()`来启动它：
 
 ```js
 var it = foo();
@@ -756,32 +740,32 @@ var it = foo();
 it.next();				// { value: 1, done: false }
 ```
 
-That first `next()` call is starting up the generator from its initial paused state, and running it to the first `yield`. At the moment you call that first `next()`, there's no `yield ..` expression waiting for a completion. If you passed a value to that first `next()` call, it would currently just be thrown away, because no `yield` is waiting to receive such a value.
+这第一个`next()`调用从generator初始的暂停状态启动了它，并运行至第一个`yield`。在你调用第一个`next()`的那一刻，并没有`yield ..`表达式等待完成。如果你给第一个`next()`调用传递一个值，目前它会被扔掉，因为没有`yield`等着接受这样的一个值。
 
-**Note:** An early proposal for the "beyond ES6" timeframe *would* let you access a value passed to an initial `next(..)` call via a separate meta property (see Chapter 7) inside the generator.
+**注意：** 一个“ES6之后”时间表中的早期提案 *将* 允许你在generator内部通过一个分离的元属性（见第七章）来访问一个被传入初始`next(..)`调用的值。
 
-Now, let's answer the currently pending question, "What value should I assign to `x`?" We'll answer it by sending a value to the *next* `next(..)` call:
+现在，让我们回答那个未解的问题，“我应当给`x`赋什么值？” 我们将通过给 *下一个* `next(..)`调用发送一个值来回答：
 
 ```js
 it.next( "foo" );		// { value: 2, done: false }
 ```
 
-Now, the `x` will have the value `"foo"`, but we've also asked a new question, "What value should I assign to `y`?" And we answer:
+现在，`x`将拥有值`"foo"`，但我们也问了一个新的问题，“我应当给`y`赋什么值？”
 
 ```js
 it.next( "bar" );		// { value: 3, done: false }
 ```
 
-Answer given, another question asked. Final answer:
+答案给出了，另一个问题被提出了。最终答案：
 
 ```js
 it.next( "baz" );		// "foo" "bar" "baz"
 						// { value: undefined, done: true }
 ```
 
-Now it should be clearer how each `yield ..` "question" is answered by the *next* `next(..)` call, and so the "extra" `next()` call we observed is always just the initial one that starts everything going.
+现在，每一个`yield ..`的“问题”是如何被 *下一个* `next(..)`调用回答的，所以我们观察到的那个“额外的”`next()`调用总是使一切开始的那一个。
 
-Let's put all those steps together:
+让我们把这些步骤放在一起：
 
 ```js
 var it = foo();
@@ -800,17 +784,17 @@ it.next( "baz" );		// "foo" "bar" "baz"
 						// { value: undefined, done: true }
 ```
 
-You can think of a generator as a producer of values, in which case each iteration is simply producing a value to be consumed.
+在生成器的每次迭代都简单地为消费者生成一个值的情况下，你可认为一个generator是一个值的生成器。
 
-But in a more general sense, perhaps it's appropriate to think of generators as controlled, progressive code execution, much like the `tasks` queue example from the earlier "Custom Iterators" section.
+但是在更一般的意义上，也许将generator认为是一个受控制的，累进的代码执行过程更恰当，与早先“自定义迭代器”一节中的`tasks`队列的例子非常相像。
 
-**Note:** That perspective is exactly the motivation for how we'll revisit generators in Chapter 4. Specifically, there's no reason that `next(..)` has to be called right away after the previous `next(..)` finishes. While the generator's inner execution context is paused, the rest of the program continues unblocked, including the ability for asynchronous actions to control when the generator is resumed.
+**注意：** 这种视角正是我们将如何在第四章中重温generator的动力。特别是，`next(..)`没有理由一定要在前一个`next(..)`完成之后立即被调用。虽然generator的内部执行环境被暂停了，程序的其他部分仍然没有被阻塞，这包括控制generator什么时候被继续的异步动作能力。
 
 ### Early Completion
 
-As we covered earlier in this chapter, the iterator attached to a generator supports the optional `return(..)` and `throw(..)` methods. Both of them have the effect of aborting a paused generator immediately.
+正如我们在本章早先讲过的，连接到一个generator的迭代器支持可选的`return(..)`和`throw(..)`方法。它们俩都有立即中止一个暂停的的generator的效果。
 
-Consider:
+考虑如下代码：
 
 ```js
 function *foo() {
@@ -828,11 +812,11 @@ it.return( 42 );		// { value: 42, done: true }
 it.next();				// { value: undefined, done: true }
 ```
 
-`return(x)` is kind of like forcing a `return x` to be processed at exactly that moment, such that you get the specified value right back. Once a generator is completed, either normally or early as shown, it no longer processes any code or returns any values.
+`return(x)`有点像强制一个`return x`就在那个时刻被处理，这样你就立即得到这个指定的值。一旦一个generator完成，无论是正常地还是像展示的那样提前地，它就不再处理任何代码或返回任何值了。
 
-In addition to `return(..)` being callable manually, it's also called automatically at the end of iteration by any of the ES6 constructs that consume iterators, such as the `for..of` loop and the `...` spread operator.
+`return(..)`除了可以手动调用，它还在迭代的最后被任何ES6中消费迭代器的结构自动调用，比如`for..of`循环和`...`扩散操作符。
 
-The purpose for this capability is so the generator can be notified if the controlling code is no longer going to iterate over it anymore, so that it can perhaps do any cleanup tasks (freeing up resources, resetting status, etc.). Identical to a normal function cleanup pattern, the main way to accomplish this is to use a `finally` clause:
+这种能力的目的是，在控制端的代码不再继续迭代generator时它可以收到通知，这样它就可能做一些清理工作（释放资源，复位状态，等等）。与普通函数的清理模式完全相同，达成这个目的的主要方法是使用一个`finally`子句：
 
 ```js
 function *foo() {
@@ -859,9 +843,9 @@ it.return( 42 );		// cleanup!
 						// { value: 42, done: true }
 ```
 
-**Warning:** Do not put a `yield` statement inside the `finally` clause! It's valid and legal, but it's a really terrible idea. It acts in a sense as deferring the completion of the `return(..)` call you made, as any `yield ..` expressions in the `finally` clause are respected to pause and send messages; you don't immediately get a completed generator as expected. There's basically no good reason to opt in to that crazy *bad part*, so avoid doing so!
+**警告：** 不要把`yield`语句放在`finally`子句内部！它是有效和合法的，但这确实是一个可怕的主意。它在某种意义上推迟了`return(..)`调用的完成，因为在`finally`子句中的任何`yield ..`表达式都被遵循来暂停和发送消息；你不会像期望的那样立即得到一个完成的generator。基本上没有任何好的理由去选择这种疯狂的 *坏的部分*，所以避免这么做！
 
-In addition to the previous snippet showing how `return(..)` aborts the generator while still triggering the `finally` clause, it also demonstrates that a generator produces a whole new iterator each time it's called. In fact, you can use multiple iterators attached to the same generator concurrently:
+前一个代码段除了展示`return(..)`如何在中止generator的同时触发`finally`子句，它还展示了一个generator在每次被调用时都产生一个全新的迭代器。事实上，你可以并发地使用连接到相同generator的多个迭代器：
 
 ```js
 function *foo() {
@@ -888,9 +872,9 @@ it1.next();				// { value: undefined, done: true }
 
 #### Early Abort
 
-Instead of calling `return(..)`, you can call `throw(..)`. Just like `return(x)` is essentially injecting a `return x` into the generator at its current pause point, calling `throw(x)` is essentially like injecting a `throw x` at the pause point.
+你可以调用`throw(..)`来代替`return(..)`调用。就像`return(x)`实质上在generator当前的暂停点上注入了一个`return x`一样，调用`throw(x)`实质上就像在暂停点上注入了一个`throw x`。
 
-Other than the exception behavior (we cover what that means to `try` clauses in the next section), `throw(..)` produces the same sort of early completion that aborts the generator's run at its current pause point. For example:
+除了处理异常的行为（我们在下一节讲解这对`try`子句意味着什么），`throw(..)`产生相同的提前完成 —— 在generator当前的暂停点中止它的运行。例如：
 
 ```js
 function *foo() {
@@ -913,15 +897,15 @@ catch (err) {
 it.next();				// { value: undefined, done: true }
 ```
 
-Because `throw(..)` basically injects a `throw ..` in replacement of the `yield 1` line of the generator, and nothing handles this exception, it immediately propagates back out to the calling code, which handles it with a `try..catch`.
+因为`throw(..)`基本上注入了一个`throw ..`来替换generator的`yield 1`这一行，而且没有东西处理这个异常，它立即传播回外面的调用端代码，调用端代码使用了一个`try..catch`来处理了它。
 
-Unlike `return(..)`, the iterator's `throw(..)` method is never called automatically.
+与`return(..)`不同的是，迭代器的`throw(..)`方法绝不会被自动调用。
 
-Of course, though not shown in the previous snippet, if a `try..finally` clause was waiting inside the generator when you call `throw(..)`, the `finally` clause would be given a chance to complete before the exception is propagated back to the calling code.
+当然，虽然没有在前面的代码段中展示，但如果当你调用`throw(..)`时有一个`try..finally`子句等在generator内部的话，这个`finally`子句将会在异常被传播回调用端代码之前有机会运行。
 
 ### Error Handling
 
-As we've already hinted, error handling with generators can be expressed with `try..catch`, which works in both inbound and outbound directions:
+正如我们已经得到的提示，generator中的错误处理可以使用`try..catch`表达，它在上行和下行两个方向都可以工作。
 
 ```js
 function *foo() {
@@ -953,7 +937,7 @@ catch (err) {
 }
 ```
 
-Errors can also propagate in both directions through `yield *` delegation:
+错误也可以通过`yield *`委托在两个方向上传播：
 
 ```js
 function *foo() {
@@ -998,21 +982,21 @@ catch (err) {
 it.next();				// { value: undefined, done: true }
 ```
 
-When `*foo()` calls `yield 1`, the `1` value passes through `*bar()` untouched, as we've already seen.
+当`*foo()`调用`yield 1`时，值`1`原封不动地穿过了`*bar()`，就像我们已经看到过的那样。
 
-But what's most interesting about this snippet is that when `*foo()` calls `throw "foo: e2"`, this error propagates to `*bar()` and is immediately caught by `*bar()`'s `try..catch` block. The error doesn't pass through `*bar()` like the `1` value did.
+但这个代码段最有趣的部分是，当`*foo()`调用`throw "foo: e2"`时，这个错误传播到了`*bar()`并立即被`*bar()`的`try..catch`块儿捕获。错误没有像值`1`那样穿过`*bar()`。
 
-`*bar()`'s `catch` then does a normal output of `err` (`"foo: e2"`) and then `*bar()` finishes normally, which is why the `{ value: undefined, done: true }` iterator result comes back from `it.next()`.
+然后`*bar()`的`catch`将`err`普通地输出（`"foo: e2"`）之后`*bar()`就正常结束了，这就是为什么迭代器结果`{ value: undefined, done: true }`从`it.next()`中返回。
 
-If `*bar()` didn't have a `try..catch` around the `yield *..` expression, the error would of course propagate all the way out, and on the way through it still would complete (abort) `*bar()`.
+如果`*bar()`没有用`try..catch`环绕着`yield *..`表达式，那么错误将理所当然地一直传播出来，而且在它传播的路径上依然会完成（中止）`*bar()`。
 
 ### Transpiling a Generator
 
-Is it possible to represent a generator's capabilities prior to ES6? It turns out it is, and there are several great tools that do so, including most notably Facebook's Regenerator tool (https://facebook.github.io/regenerator/).
+有可能在ES6之前的环境中表达generator的能力吗？事实上是可以的，而且有好几种了不起的工具在这么做，包括最著名的Facebook的Regenerator工具 (https://facebook.github.io/regenerator/)。
 
-But just to better understand generators, let's try our hand at manually converting. Basically, we're going to create a simple closure-based state machine.
+但为了更好地理解generator，让我们试着手动转换一下。基本上讲，我们将制造一个简单的基于闭包的状态机。
 
-We'll keep our source generator really simple:
+我们将使原本的generator非常简单：
 
 ```js
 function *foo() {
@@ -1021,7 +1005,7 @@ function *foo() {
 }
 ```
 
-To start, we'll need a function called `foo()` that we can execute, which needs to return an iterator:
+开始之前，我们将需要一个我们能够执行的称为`foo()`的函数，它需要返回一个迭代器：
 
 ```js
 function foo() {
@@ -1037,11 +1021,11 @@ function foo() {
 }
 ```
 
-Now, we need some inner variable to keep track of where we are in the steps of our "generator"'s logic. We'll call it `state`. There will be three states: `0` initially, `1` while waiting to fulfill the `yield` expression, and `2` once the generator is complete.
+现在，我们需要一些内部变量来持续跟踪我们的“generator”的逻辑走到了哪一个步骤。我们称它为`state`。我们将有三种状态：起始状态的`0`，等待完成`yield`表达式的`1`，和generator完成的`2`。
 
-Each time `next(..)` is called, we need to process the next step, and then increment `state`. For convenience, we'll put each step into a `case` clause of a `switch` statement, and we'll hold that in an inner function called `nextState(..)` that `next(..)` can call. Also, because `x` is a variable across the overall scope of the "generator," it needs to live outside the `nextState(..)` function.
+每次`next(..)`被调用时，我们需要处理下一个步骤，然后递增`state`。为了方便，我们将每个步骤放在一个`switch`语句的`case`子句中，并且我们将它放在一个`next(..)`可以调用的称为`nextState(..)`的内部函数中。另外，因为`x`是一个横跨整个“generator”作用域的变量，所以它需要存活在`nextState(..)`函数的外部。
 
-Here it is all together (obviously somewhat simplified, to keep the conceptual illustration clearer):
+这是将它们放在一起（很明显，为了使概念的展示更清晰，它经过了某些简化）：
 
 ```js
 function foo() {
@@ -1080,7 +1064,7 @@ function foo() {
 }
 ```
 
-And finally, let's test our pre-ES6 "generator":
+最后，让我们测试一下我们的前ES6“generator”：
 
 ```js
 var it = foo();
@@ -1091,30 +1075,35 @@ it.next( 10 );			// 10
 						// { value: undefined, done: true }
 ```
 
-Not bad, huh? Hopefully this exercise solidifies in your mind that generators are actually just simple syntax for state machine logic. That makes them widely applicable.
+不赖吧？希望这个练习能在你的脑中巩固这个概念：generator实际上只是状态机逻辑的简单语法。这使它们可以广泛地应用。
 
 ### Generator Uses
 
-So, now that we much more deeply understand how generators work, what are they useful for?
+我们现在非常深入地理解了generator如何工作，那么，它们在什么地方有用？
 
-We've seen two major patterns:
+我们已经看过了两种主要模式：
 
-* *Producing a series of values:* This usage can be simple (e.g., random strings or incremented numbers), or it can represent more structured data access (e.g., iterating over rows returned from a database query).
+* *生产一系列值：* 这种用法可以很简单（例如，随机字符串或者递增的数字），或者它也可以表达更加结构化的数据访问（例如，迭代一个数据库查询结果的所有行）。
 
-   Either way, we use the iterator to control a generator so that some logic can be invoked for each call to `next(..)`. Normal iterators on data structures merely pull values without any controlling logic.
-* *Queue of tasks to perform serially:* This usage often represents flow control for the steps in an algorithm, where each step requires retrieval of data from some external source. The fulfillment of each piece of data may be immediate, or may be asynchronously delayed.
+	 这两种方式中，我们使用迭代器来控制generator，这样就可以为每次`next(..)`调用执行一些逻辑。在数据解构上的普通迭代器只不过生成值而没有任何控制逻辑。
 
-   From the perspective of the code inside the generator, the details of sync or async at a `yield` point are entirely opaque. Moreover, these details are intentionally abstracted away, such as not to obscure the natural sequential expression of steps with such implementation complications. Abstraction also means the implementations can be swapped/refactored often without touching the code in the generator at all.
+* *串行执行的任务队列：* 这种用法经常用来表达一个算法中步骤的流程控制，其中每一步都要求从某些外部数据源取得数据。对每块儿数据的请求可能会立即满足，或者可能会异步延迟地满足。
 
-When generators are viewed in light of these uses, they become a lot more than just a different or nicer syntax for a manual state machine. They are a powerful abstraction tool for organizing and controlling orderly production and consumption of data.
+	 从generator内部代码的角度来看，在`yield`的地方，同步或异步的细节是完全不透明的。另外，这些细节被有意地抽象出去，这样就不会让这样的实现细节把各个步骤间自然的，顺序的表达搞得模糊不清。抽象还意味着实现可以被替换/重构，而根本不用碰generator中的代码。
+
+当根据这些用法观察generator时，它们的含义要比仅仅是手动状态机的一种不同或更好的语法多多了。它们是一种用于组织和控制有序地生产与消费数据的强大工具。
 
 ## Modules
 
 I don't think it's an exaggeration to suggest that the single most important code organization pattern in all of JavaScript is, and always has been, the module. For myself, and I think for a large cross-section of the community, the module pattern drives the vast majority of code.
 
+我觉得这样说并不夸张：在所有的JavaScript代码组织模式中最重要的就是，而且一直是，模块。对于我自己来说，而且我认为对广大典型的技术社区来说，模块模式驱动着绝大多数代码。
+
 ### The Old Way
 
 The traditional module pattern is based on an outer function with inner variables and functions, and a returned "public API" with methods that have closure over the inner data and capabilities. It's often expressed like this:
+
+传统的模块模式
 
 ```js
 function Hello(name) {
