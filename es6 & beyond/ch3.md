@@ -1095,13 +1095,9 @@ it.next( 10 );			// 10
 
 ## Modules
 
-I don't think it's an exaggeration to suggest that the single most important code organization pattern in all of JavaScript is, and always has been, the module. For myself, and I think for a large cross-section of the community, the module pattern drives the vast majority of code.
-
 我觉得这样说并不夸张：在所有的JavaScript代码组织模式中最重要的就是，而且一直是，模块。对于我自己来说，而且我认为对广大典型的技术社区来说，模块模式驱动着绝大多数代码。
 
 ### The Old Way
-
-The traditional module pattern is based on an outer function with inner variables and functions, and a returned "public API" with methods that have closure over the inner data and capabilities. It's often expressed like this:
 
 传统的模块模式基于一个外部函数，它带有内部变量和函数，以及一个被返回的“公有API”。这个“公有API”带有对内部变量和功能拥有闭包的方法。它经常这样表达：
 
@@ -1121,8 +1117,6 @@ var me = Hello( "Kyle" );
 me.greeting();			// Hello Kyle!
 ```
 
-This `Hello(..)` module can produce multiple instances by being called subsequent times. Sometimes, a module is only called for as a singleton (i.e., it just needs one instance), in which case a slight variation on the previous snippet, using an IIFE, is common:
-
 这个`Hello(..)`模块通过被后续调用可以产生多个实例。有时，一个模块为了作为一个单例（也就是，只需要一个实例）而只被调用一次，这样的情况下常见的是一种前面代码段的变种，使用IIFE：
 
 ```js
@@ -1140,88 +1134,73 @@ var me = (function Hello(name){
 me.greeting();			// Hello Kyle!
 ```
 
-This pattern is tried and tested. It's also flexible enough to have a wide assortment of variations for a number of different scenarios.
-
 这种模式是经受过检验的。它也足够灵活，以至于在许多不同的场景下可以有大量的各种变化。
-
-One of the most common is the Asynchronous Module Definition (AMD), and another is the Universal Module Definition (UMD). We won't cover the particulars of these patterns and techniques here, but they're explained extensively in many places online.
 
 其中一种最常见的是异步模块定义（AMD），另一种是统一模块定义（UMD）。我们不会在这里涵盖这些特定的模式和技术，但是它们在网上的许多地方有大量的讲解。
 
 ### Moving Forward
 
-As of ES6, we no longer need to rely on the enclosing function and closure to provide us with module support. ES6 modules have first class syntactic and functional support.
-
 在ES6中，我们不再需要依赖外围函数和闭包来为我们提供模块支持了。ES6模块拥有头等语法上和功能上的支持。
-
-Before we get into the specific syntax, it's important to understand some fairly significant conceptual differences with ES6 modules compared to how you may have dealt with modules in the past:
 
 在我们接触这些具体语法之前，重要的是要理解ES6模块与你以前曾经用过的模块比较起来，在概念上的一些相当显著的不同之处：
 
-* ES6 uses file-based modules, meaning one module per file. At this time, there is no standardized way of combining multiple modules into a single file.
-
 * ES6使用基于文件的模块，这意味着一个模块一个文件。同时，没有标准的方法将多个模块组合到一个文件中。
-
-   That means that if you are going to load ES6 modules directly into a browser web application, you will be loading them individually, not as a large bundle in a single file as has been common in performance optimization efforts.
 
 	 这意味着如果你要直接把ES6模块加载到一个浏览器web应用中的话，你将个别地加载它们，不是像常见的那样为了性能优化而作为一个单独文件中的一个巨大的包加载。
 
-   It's expected that the contemporaneous advent of HTTP/2 will significantly mitigate any such performance concerns, as it operates on a persistent socket connection and thus can very efficiently load many smaller files in parallel and interleaved with one another.
-
 	 人们预期同时期到来的HTTP/2将会大幅缓和这种性能上的顾虑，因为它工作在一个持续的套接字连接上，因而可以用并行的，互相交错的方式非常高效地加载许多小文件。
-
-* The API of an ES6 module is static. That is, you define statically what all the top-level exports are on your module's public API, and those cannot be amended later.
 
 * 一个ES6模块的API是静态的。这就是说，你在模块的公有API上静态地定义所有被导出的顶层内容，而这些内容之后不能被修改。
 
-   Some uses are accustomed to being able to provide dynamic API definitions, where methods can be added/removed/replaced in response to runtime conditions. Either these uses will have to change to fit with ES6 static APIs, or they will have to restrain the dynamic changes to properties/methods of a second-level object.
-
 	 有些用法习惯于能够提供动态API定义，它的方法可以根据运行时的条件被增加/删除/替换。这些用法要么必须改变以适应ES6静态API，要么它们就不得不将属性/方法的动态修改限制在一个内层对象中。
-
-* ES6 modules are singletons. That is, there's only one instance of the module, which maintains its state. Every time you import that module into another module, you get a reference to the one centralized instance. If you want to be able to produce multiple module instances, your module will need to provide some sort of factory to do it.
 
 * ES6模块都是单例。也就是，模块只有一个维持它状态的实例。每次你将这个模块导入到另一个模块时，你得到的都是一个指向中央实例的引用。如果你想要能够产生多个模块实例，你的模块将需要提供某种工厂来这么做。
 
-* The properties and methods you expose on a module's public API are not just normal assignments of values or references. They are actual bindings (almost like pointers) to the identifiers in your inner module definition.
+* 你在模块的公有API上暴露的属性和方法不是值和引用的普通赋值。它们是在你内部模块定义中的标识符的实际绑定（几乎就是指针）。
 
-* 你在模块的公有API上暴露的属性和方法
+	 在前ES6的模块中，如果你将一个持有像数字或者字符串这样基本类型的属性放在你的共有API中，那么这个属性是通过值拷贝赋值的，任何对相应内部变量的更新都将是分离的，不会影响在API对象上的共有拷贝。
 
-   In pre-ES6 modules, if you put a property on your public API that holds a primitive value like a number or string, that property assignment was by value-copy, and any internal update of a corresponding variable would be separate and not affect the public copy on the API object.
+	 在ES6中，导出一个本地私有变量，即便它当前持有一个基本类型的字符串/数字/等等，导出的都是这个变量的一个绑定。如果这个模块改变了这个变量的值，外部导入的绑定就会解析为那个新的值。
 
-   With ES6, exporting a local private variable, even if it currently holds a primitive string/number/etc, exports a binding to the variable. If the module changes the  variable's value, the external import binding now resolves to that new value.
-* Importing a module is the same thing as statically requesting it to load (if it hasn't already). If you're in a browser, that implies a blocking load over the network. If you're on a server (i.e., Node.js), it's a blocking load from the filesystem.
+* 导入一个模块和静态地请求它被加载是同一件事情（如果以前它不是的话）。如果你在浏览器中，这意味着通过网络的阻塞加载。如果你在服务器中，它是一个通过文件系统的阻塞加载。
 
-   However, don't panic about the performance implications. Because ES6 modules have static definitions, the import requirements can be statically scanned, and loads will happen preemptively, even before you've used the module.
+	 但是，不要对它在性能的影响上惊慌。因为ES6模块是静态定义的，导入的请求可以被静态地扫描，并提前加载，甚至是在你使用这个模块之前。
 
-   ES6 doesn't actually specify or handle the mechanics of how these load requests work. There's a separate notion of a Module Loader, where each hosting environment (browser, Node.js, etc.) provides a default Loader appropriate to the environment. The importing of a module uses a string value to represent where to get the module (URL, file path, etc.), but this value is opaque in your program and only meaningful to the Loader itself.
+	 ES6并没有实际规定或操纵这些加载请求如何工作的机制。有一个模块加载器的分离概念，它让每一个宿主环境（浏览器，Node.js，等等）为该环境提供合适的默认加载器。一个模块的导入使用一个字符串值来表示从哪里去取得模块（URL，文件路径，等等），但是这个值在你的程序中是不透明的，它仅对加载器自身有意义。
 
-   You can define your own custom Loader if you want more fine-grained control than the default Loader affords -- which is basically none, as it's totally hidden from your program's code.
+	 如果你想要比默认加载器提供的更细致的控制能力，你可以定义你自己的加载器 —— 默认加载器基本上不提供任何控制，它对于你的程序代码是完全隐藏的。
 
-As you can see, ES6 modules will serve the overall use case of organizing code with encapsulation, controlling public APIs, and referencing dependency imports. But they have a very particular way of doing so, and that may or may not fit very closely with how you've already been doing modules for years.
+如你所见，ES6模块将通过封装，控制共有API，以及应用依赖导入来服务于所有的代码组织需求。但是它们用一种非常特别的方式来这样做，而这可能与你已经使用多年的模块方式十分接近，也肯能差得很远。
 
 #### CommonJS
 
-There's a similar, but not fully compatible, module syntax called CommonJS, which is familiar to those in the Node.js ecosystem.
+有一种相似，但不是完全兼容的模块语法，称为CommonJS，那些使用Node.js生态系统的人很熟悉它。
 
-For lack of a more tactful way to say this, in the long run, ES6 modules essentially are bound to supercede all previous formats and standards for modules, even CommonJS, as they are built on syntactic support in the language. This will, in time, inevitably win out as the superior approach, if for no other reason than ubiquity.
+不太委婉地说，从长久看来，ES6模块实质上将要取代所有先前的模块格式与标准，即便是CommonJS，因为它们是建立在语言的语法支持上的。如果出了普遍性以外没有其他原因，迟早ES6将必可避免地作为更好的方式胜出。
 
-We face a fairly long road to get to that point, though. There are literally hundreds of thousands of CommonJS style modules in the server-side JavaScript world, and 10 times that many modules of varying format standards (UMD, AMD, ad hoc) in the browser world. It will take many years for the transitions to make any significant progress.
+但是，要达到那一天我们还有相当长的路要走。在服务器端的JavaScript世界中差不多有成百上千的CommonJS风格模块，而在浏览器的世界里各种格式标准的模块（UMD，AMD，临时性的模块方案）数量还要多十倍。这要花许多年过渡才能取得任何显著的进展。
 
-In the interim, module transpilers/converters will be an absolute necessity. You might as well just get used to that new reality. Whether you author in regular modules, AMD, UMD, CommonJS, or ES6, these tools will have to parse and convert to a format that is suitable for whatever environment your code will run in.
+在这个过渡期间，模块转译器/转换器将是绝对必要的。你可能刚刚适应了这种新的现实。不论你是使用正规的模块，AMD，UMD，CommonJS，或者ES6，这些工具都不得不解析并转换为适合你代码运行环境的格式。
 
-For Node.js, that probably means (for now) that the target is CommonJS. For the browser, it's probably UMD or AMD. Expect lots of flux on this over the next few years as these tools mature and best practices emerge.
+对于Node.js，这可能意味着（目前）转换的目标是CommonJS。对于浏览器来说，可能是UMD或者AMD。除了在接下来的几年中随着这些工具的成熟和最佳实践的出现而发生的许多变化。
 
-From here on out, my best advice on modules is this: whatever format you've been religiously attached to with strong affinity, also develop an appreciation for and understanding of ES6 modules, such as they are, and let your other module tendencies fade. They *are* the future of modules in JS, even if that reality is a bit of a ways off.
+从现在起，我能对模块的提出的最佳建议是：不管你曾经由于强烈的爱好而虔诚地追随哪一种格式，都要培养对理解ES6模块的欣赏，虽然价值平平，并让你对其他模块模式的倾向性渐渐消失掉。它们就是JS中模块的未来，即便现实有些偏差。
 
 ### The New Way
 
 The two main new keywords that enable ES6 modules are `import` and `export`. There's lots of nuance to the syntax, so let's take a deeper look.
 
+使用ES6模块的两个主要的心关键字是`import`和`export`。在语法上有许多微妙的地方，那么让我们深入地看看。
+
 **Warning:** An important detail that's easy to overlook: both `import` and `export` must always appear in the top-level scope of their respective usage. For example, you cannot put either an `import` or `export` inside an `if` conditional; they must appear outside of all blocks and functions.
+
+**警告：** 一个容易忽视的重要细节：`import`和`export`都必须总是出现在它们分别被使用之处的顶层作用域。例如，你不能把`import`或`export`放在一个`if`条件内部；它们必须出现在所有块儿和函数的外部。
 
 #### `export`ing API Members
 
 The `export` keyword is either put in front of a declaration, or used as an operator (of sorts) with a special list of bindings to export. Consider:
+
+`export`关键字要么放在一个声明的前面，要么就与一组特殊的要被导出的绑定一起，用作一个操作符。考虑如下代码：
 
 ```js
 export function foo() {
@@ -1236,6 +1215,8 @@ export { bar };
 
 Another way of expressing the same exports:
 
+表达相同导出的另一种方法：
+
 ```js
 function foo() {
 	// ..
@@ -1249,11 +1230,19 @@ export { foo, awesome, bar };
 
 These are all called *named exports*, as you are in effect exporting the name bindings of the variables/functions/etc.
 
+这些都称为 *命名导出*，因为你实际上导出的是变量/函数/等的名称绑定。
+
 Anything you don't *label* with `export` stays private inside the scope of the module. That is, although something like `var bar = ..` looks like it's declaring at the top-level global scope, the top-level scope is actually the module itself; there is no global scope in modules.
+
+任何你没有使用`export`*标记* 的东西将在模块作用域的内部保持私有。也就是说，虽然有些像`var bar = ..`的东西看起来像是在顶层全局作用域中声明的，但是这个顶层作用域实际上是模块本身；在模块中没有全局作用域。
 
 **Note:** Modules *do* still have access to `window` and all the "globals" that hang off it, just not as lexical top-level scope. However, you really should stay away from the globals in your modules if at all possible.
 
+**注意：** 模块确实依然可以访问挂在它外面的`window`和所有的“全局”，只是不作为顶层此法作用域而已。但是，你真的应该在你的模块中尽可能地远离全局。
+
 You can also "rename" (aka alias) a module member during named export:
+
+你还可以在命名导出期间“重命名”（也叫别名）一个模块成员：
 
 ```js
 function foo() { .. }
@@ -1263,11 +1252,19 @@ export { foo as bar };
 
 When this module is imported, only the `bar` member name is available to import; `foo` stays hidden inside the module.
 
+当这个模块被导入时，只有成员名称`bar`可以用于导入；`foo`在模块内部保持隐藏。
+
 Module exports are not just normal assignments of values or references, as you're accustomed to with the `=` assignment operator. Actually, when you export something, you're exporting a binding (kinda like a pointer) to that thing (variable, etc.).
+
+模块导出不像你习以为常的`=`赋值操作符那样，仅仅是值或引用的普通赋值。实际上，当你导出某些东西时，你导出了一个对那个东西（变量等）的一个绑定（有些像指针）。
 
 Within your module, if you change the value of a variable you already exported a binding to, even if it's already been imported (see the next section), the imported binding will resolve to the current (updated) value.
 
+在你的模块内部，如果你改变一个你已经被导出绑定的变量的值，即使它已经被导入了（见下一节），这个被导入的绑定也将解析为当前的（更新后的）值。
+
 Consider:
+
+考虑如下代码：
 
 ```js
 var awesome = 42;
@@ -1279,15 +1276,27 @@ awesome = 100;
 
 When this module is imported, regardless of whether that's before or after the `awesome = 100` setting, once that assignment has happened, the imported binding resolves to the `100` value, not `42`.
 
+当这个模块被导入时，无论它是在`awesome = 100`设定的之前还是之后，一旦这个赋值发生，被导入的绑定都将被解析为值`100`，不是`42`。
+
 That's because the binding is, in essence, a reference to, or a pointer to, the `awesome` variable itself, rather than a copy of its value. This is a mostly unprecedented concept for JS introduced with ES6 module bindings.
+
+这是因为，这个绑定实质上是一个指向变量`awesome`本身的一个引用，或指针，而不是它的值的一个拷贝。ES6模块绑定引入了一个对于JS来说几乎是史无前例的概念。
 
 Though you can clearly use `export` multiple times inside a module's definition, ES6 definitely prefers the approach that a module has a single export, which is known as a *default export*. In the words of some members of the TC39 committee, you're "rewarded with simpler `import` syntax" if you follow that pattern, and conversely "penalized" with more verbose syntax if you don't.
 
+虽然你显然可以在一个模块定义的内部多次使用`export`，但是ES6绝对偏向于一个模块只有一个单独导出的方式，这称为 *默认导出*。用TC39协会的一些成员的话说，如果你遵循这个模式你就可以“获得更简单的`import`语法作为奖励”，如果你不遵循你就会反过来得到更繁冗的语法作为“惩罚”。
+
 A default export sets a particular exported binding to be the default when importing the module. The name of the binding is literally `default`. As you'll see later, when importing module bindings you can also rename them, as you commonly will with a default export.
+
+一个默认导出将一个特定的导出绑定设置为在这个模块被导入时的默认绑定。这个绑定的名称是字面上的`default`。正如你即将看到的，在导入模块绑定时你还可以重命名它们，你经常会对默认导出这么做。
 
 There can only be one `default` per module definition. We'll cover `import` in the next section, and you'll see how the `import` syntax is more concise if the module has a default export.
 
+每个模块定义只能有一个`default`。我们将在下一节中讲解`import`，你将看到如果模块拥有默认导入时`import`语法如何变得更简洁。
+
 There's a subtle nuance to default export syntax that you should pay close attention to. Compare these two snippets:
+
+默认导出语法有一个微妙的细节你应当多加注意。比较这两个代码段：
 
 ```js
 function foo(..) {
@@ -1299,6 +1308,8 @@ export default foo;
 
 And this one:
 
+和这一个：
+
 ```js
 function foo(..) {
 	// ..
@@ -1309,7 +1320,11 @@ export { foo as default };
 
 In the first snippet, you are exporting a binding to the function expression value at that moment, *not* to the identifier `foo`. In other words, `export default ..` takes an expression. If you later assign `foo` to a different value inside your module, the module import still reveals the function originally exported, not the new value.
 
+在第一个代码段中，你导出的是那一个函数表达式在那一刻的值的绑定，*不是* 标识符`foo`的绑定。换句话说，`export default ..`接收一个表达式。如果你稍后在你的模块内部赋给`foo`一个不同的值，这个模块导入将依然表示原本被导出的函数，而不是那个新的值。
+
 By the way, the first snippet could also have been written as:
+
+顺带一提，第一个代码段还可以写做：
 
 ```js
 export default function foo(..) {
@@ -1318,6 +1333,8 @@ export default function foo(..) {
 ```
 
 **Warning:** Although the `function foo..` part here is technically a function expression, for the purposes of the internal scope of the module, it's treated like a function declaration, in that the `foo` name is bound in the module's top-level scope (often called "hoisting"). The same is true for `export default class Foo..`. However, while you *can* do `export var foo = ..`, you currently cannot do `export default var foo = ..` (or `let` or `const`), in a frustrating case of inconsistency. At the time of this writing, there's already discussion of adding that capability in soon, post-ES6, for consistency sake.
+
+**警告：** 虽然技术上讲这里的`function foo..`部分是一个函数表达式，但是对于模块内部作用域来说，它被视为一个函数声明，
 
 Recall the second snippet again:
 
