@@ -2457,7 +2457,7 @@ As you can probably guess, our previous `length` trick doesn't work with `s2`:
 [...s2].length;					// 2
 ```
 
-So what can we do? In this case, we can perform a *Unicode normalization* on the value before inquiring about its length, using the ES6 `String#normalize(..)` utility (which we'll cover more in Chapter 6):
+So what can we do? In this case, we can perform a *Unicode normalization* on the value before inquiring about its length, using the ES6 `String.normalize(..)` utility (which we'll cover more in Chapter 6):
 
 ```js
 var s1 = "\xE9",
