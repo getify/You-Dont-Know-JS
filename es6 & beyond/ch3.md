@@ -1188,17 +1188,11 @@ me.greeting();			// Hello Kyle!
 
 ### The New Way
 
-The two main new keywords that enable ES6 modules are `import` and `export`. There's lots of nuance to the syntax, so let's take a deeper look.
-
-使用ES6模块的两个主要的心关键字是`import`和`export`。在语法上有许多微妙的地方，那么让我们深入地看看。
-
-**Warning:** An important detail that's easy to overlook: both `import` and `export` must always appear in the top-level scope of their respective usage. For example, you cannot put either an `import` or `export` inside an `if` conditional; they must appear outside of all blocks and functions.
+使用ES6模块的两个主要的新关键字是`import`和`export`。在语法上有许多微妙的地方，那么让我们深入地看看。
 
 **警告：** 一个容易忽视的重要细节：`import`和`export`都必须总是出现在它们分别被使用之处的顶层作用域。例如，你不能把`import`或`export`放在一个`if`条件内部；它们必须出现在所有块儿和函数的外部。
 
 #### `export`ing API Members
-
-The `export` keyword is either put in front of a declaration, or used as an operator (of sorts) with a special list of bindings to export. Consider:
 
 `export`关键字要么放在一个声明的前面，要么就与一组特殊的要被导出的绑定一起，用作一个操作符。考虑如下代码：
 
@@ -1213,8 +1207,6 @@ var bar = [1,2,3];
 export { bar };
 ```
 
-Another way of expressing the same exports:
-
 表达相同导出的另一种方法：
 
 ```js
@@ -1228,19 +1220,11 @@ var bar = [1,2,3];
 export { foo, awesome, bar };
 ```
 
-These are all called *named exports*, as you are in effect exporting the name bindings of the variables/functions/etc.
-
 这些都称为 *命名导出*，因为你实际上导出的是变量/函数/等的名称绑定。
-
-Anything you don't *label* with `export` stays private inside the scope of the module. That is, although something like `var bar = ..` looks like it's declaring at the top-level global scope, the top-level scope is actually the module itself; there is no global scope in modules.
 
 任何你没有使用`export`*标记* 的东西将在模块作用域的内部保持私有。也就是说，虽然有些像`var bar = ..`的东西看起来像是在顶层全局作用域中声明的，但是这个顶层作用域实际上是模块本身；在模块中没有全局作用域。
 
-**Note:** Modules *do* still have access to `window` and all the "globals" that hang off it, just not as lexical top-level scope. However, you really should stay away from the globals in your modules if at all possible.
-
 **注意：** 模块确实依然可以访问挂在它外面的`window`和所有的“全局”，只是不作为顶层此法作用域而已。但是，你真的应该在你的模块中尽可能地远离全局。
-
-You can also "rename" (aka alias) a module member during named export:
 
 你还可以在命名导出期间“重命名”（也叫别名）一个模块成员：
 
@@ -1250,19 +1234,11 @@ function foo() { .. }
 export { foo as bar };
 ```
 
-When this module is imported, only the `bar` member name is available to import; `foo` stays hidden inside the module.
-
 当这个模块被导入时，只有成员名称`bar`可以用于导入；`foo`在模块内部保持隐藏。
-
-Module exports are not just normal assignments of values or references, as you're accustomed to with the `=` assignment operator. Actually, when you export something, you're exporting a binding (kinda like a pointer) to that thing (variable, etc.).
 
 模块导出不像你习以为常的`=`赋值操作符那样，仅仅是值或引用的普通赋值。实际上，当你导出某些东西时，你导出了一个对那个东西（变量等）的一个绑定（有些像指针）。
 
-Within your module, if you change the value of a variable you already exported a binding to, even if it's already been imported (see the next section), the imported binding will resolve to the current (updated) value.
-
 在你的模块内部，如果你改变一个你已经被导出绑定的变量的值，即使它已经被导入了（见下一节），这个被导入的绑定也将解析为当前的（更新后的）值。
-
-Consider:
 
 考虑如下代码：
 
@@ -1274,27 +1250,15 @@ export { awesome };
 awesome = 100;
 ```
 
-When this module is imported, regardless of whether that's before or after the `awesome = 100` setting, once that assignment has happened, the imported binding resolves to the `100` value, not `42`.
-
 当这个模块被导入时，无论它是在`awesome = 100`设定的之前还是之后，一旦这个赋值发生，被导入的绑定都将被解析为值`100`，不是`42`。
-
-That's because the binding is, in essence, a reference to, or a pointer to, the `awesome` variable itself, rather than a copy of its value. This is a mostly unprecedented concept for JS introduced with ES6 module bindings.
 
 这是因为，这个绑定实质上是一个指向变量`awesome`本身的一个引用，或指针，而不是它的值的一个拷贝。ES6模块绑定引入了一个对于JS来说几乎是史无前例的概念。
 
-Though you can clearly use `export` multiple times inside a module's definition, ES6 definitely prefers the approach that a module has a single export, which is known as a *default export*. In the words of some members of the TC39 committee, you're "rewarded with simpler `import` syntax" if you follow that pattern, and conversely "penalized" with more verbose syntax if you don't.
-
 虽然你显然可以在一个模块定义的内部多次使用`export`，但是ES6绝对偏向于一个模块只有一个单独导出的方式，这称为 *默认导出*。用TC39协会的一些成员的话说，如果你遵循这个模式你就可以“获得更简单的`import`语法作为奖励”，如果你不遵循你就会反过来得到更繁冗的语法作为“惩罚”。
-
-A default export sets a particular exported binding to be the default when importing the module. The name of the binding is literally `default`. As you'll see later, when importing module bindings you can also rename them, as you commonly will with a default export.
 
 一个默认导出将一个特定的导出绑定设置为在这个模块被导入时的默认绑定。这个绑定的名称是字面上的`default`。正如你即将看到的，在导入模块绑定时你还可以重命名它们，你经常会对默认导出这么做。
 
-There can only be one `default` per module definition. We'll cover `import` in the next section, and you'll see how the `import` syntax is more concise if the module has a default export.
-
 每个模块定义只能有一个`default`。我们将在下一节中讲解`import`，你将看到如果模块拥有默认导入时`import`语法如何变得更简洁。
-
-There's a subtle nuance to default export syntax that you should pay close attention to. Compare these two snippets:
 
 默认导出语法有一个微妙的细节你应当多加注意。比较这两个代码段：
 
@@ -1306,8 +1270,6 @@ function foo(..) {
 export default foo;
 ```
 
-And this one:
-
 和这一个：
 
 ```js
@@ -1318,11 +1280,7 @@ function foo(..) {
 export { foo as default };
 ```
 
-In the first snippet, you are exporting a binding to the function expression value at that moment, *not* to the identifier `foo`. In other words, `export default ..` takes an expression. If you later assign `foo` to a different value inside your module, the module import still reveals the function originally exported, not the new value.
-
 在第一个代码段中，你导出的是那一个函数表达式在那一刻的值的绑定，*不是* 标识符`foo`的绑定。换句话说，`export default ..`接收一个表达式。如果你稍后在你的模块内部赋给`foo`一个不同的值，这个模块导入将依然表示原本被导出的函数，而不是那个新的值。
-
-By the way, the first snippet could also have been written as:
 
 顺带一提，第一个代码段还可以写做：
 
@@ -1332,11 +1290,9 @@ export default function foo(..) {
 }
 ```
 
-**Warning:** Although the `function foo..` part here is technically a function expression, for the purposes of the internal scope of the module, it's treated like a function declaration, in that the `foo` name is bound in the module's top-level scope (often called "hoisting"). The same is true for `export default class Foo..`. However, while you *can* do `export var foo = ..`, you currently cannot do `export default var foo = ..` (or `let` or `const`), in a frustrating case of inconsistency. At the time of this writing, there's already discussion of adding that capability in soon, post-ES6, for consistency sake.
+**警告：** 虽然技术上讲这里的`function foo..`部分是一个函数表达式，但是对于模块内部作用域来说，它被视为一个函数声明，因为名称`foo`被绑定在模块的顶层作用域（经常称为“提升”）。对`export default var foo = ..`也是如此。然而，虽然你 *可以* `export var foo = ..`，但是一个令人沮丧的不一致是，你目前还不能`export default bar foo = ..`（或者`let`和`const`）。在写作本书时，为了保持一致性，已经开始了在后ES6不久的时期增加这种能力的讨论。
 
-**警告：** 虽然技术上讲这里的`function foo..`部分是一个函数表达式，但是对于模块内部作用域来说，它被视为一个函数声明，
-
-Recall the second snippet again:
+再次回想一下第二个代码段：
 
 ```js
 function foo(..) {
@@ -1346,11 +1302,11 @@ function foo(..) {
 export { foo as default };
 ```
 
-In this version of the module export, the default export binding is actually to the `foo` identifier rather than its value, so you get the previously described binding behavior (i.e., if you later change `foo`'s value, the value seen on the import side will also be updated).
+这种版本的模块导出中，默认导出的绑定实际上是标识符`foo`而不是它的值，所以你会得到先前描述过的绑定行为（也就是，如果你稍后改变`foo`的值，在导入一端看到的值也会被更新）。
 
-Be very careful of this subtle gotcha in default export syntax, especially if your logic calls for export values to be updated. If you never plan to update a default export's value, `export default ..` is fine. If you do plan to update the value, you must use `export { .. as default }`. Either way, make sure to comment your code to explain your intent!
+要非常小心这种默认导出语法的微妙区别，特别是在你的逻辑需要导出的值要被更新时。如果你永远不打算更新一个默认导出的值，`export default ..`就没问题。如果你确实打算更新这个值，你必须使用`export { .. as default }`。无论哪种情况，都要确保注释你的代码以解释你的意图！
 
-Because there can only be one `default` per module, you may be tempted to design your module with one default export of an object with all your API methods on it, such as:
+因为一个模块只能有一个`default`，这可能会诱使你将你的模块设计为默认导出一个带有你所有API方法的对象，就像这样：
 
 ```js
 export default {
@@ -1360,13 +1316,13 @@ export default {
 };
 ```
 
-That pattern seems to map closely to how a lot of developers have already structured their pre-ES6 modules, so it seems like a natural approach. Unfortunately, it has some downsides and is officially discouraged.
+这种模式看起来十分接近于许多开发者构建它们的前ES6模块时曾经用过的模式，所以它看起来像是一种十分自然的方式。不幸的是，它有一些缺陷并且不为官方所鼓励使用。
 
-In particular, the JS engine cannot statically analyze the contents of a plain object, which means it cannot do some optimizations for static `import` performance. The advantage of having each member individually and explicitly exported is that the engine *can* do the static analysis and optimization.
+特别是，JS引擎不能静态地分析一个普通对象的内容，这意味着它不能为静态`import`性能进行一些优化。使每个成员独立地并明确地导出的好处是，引擎 *可以* 进行静态分析和性能优化。
 
-If your API has more than one member already, it seems like these principles -- one default export per module, and all API members as named exports -- are in conflict, doesn't it? But you *can* have a single default export as well as other named exports; they are not mutually exclusive.
+如果你的API已经有多于一个的成员，这些原则 —— 一个模块一个默认导出，和所有API成员作为被命名的导出 —— 看起来是冲突的，不是吗？但是你 *可以* 有一个单独的默认导出并且有其他的被命名导出；它们不是互相排斥的。
 
-So, instead of this (discouraged) pattern:
+所以，取代这种（不被鼓励使用的）模式：
 
 ```js
 export default function foo() { .. }
@@ -1375,7 +1331,7 @@ foo.bar = function() { .. };
 foo.baz = function() { .. };
 ```
 
-You can do:
+你可以这样做*
 
 ```js
 export default function foo() { .. }
@@ -1384,9 +1340,9 @@ export function bar() { .. }
 export function baz() { .. }
 ```
 
-**Note:** In this previous snippet, I used the name `foo` for the function that `default` labels. That `foo` name, however, is ignored for the purposes of export -- `default` is actually the exported name. When you import this default binding, you can give it whatever name you want, as you'll see in the next section.
+**注意：** 在前面这个代码段中，我为标记为`default`的函数使用了名称`foo`。但是，这个名称`foo`为了导出的目的而被忽略掉了 —— `default`才是实际上被导出的名称。当你导入这个默认绑定时，你可以叫它任何你想用的名字，就像你将在下一节中看到的。
 
-Alternatively, some will prefer:
+或者，一些人喜欢：
 
 ```js
 function foo() { .. }
@@ -1396,15 +1352,15 @@ function baz() { .. }
 export { foo as default, bar, baz, .. };
 ```
 
-The effects of mixing default and named exports will be more clear when we cover `import` shortly. But essentially it means that the most concise default import form would only retrieve the `foo()` function. The user could additionally manually list `bar` and `baz` as named imports, if they want them.
+混合默认和被命名导出的效果将在稍后我们讲解`import`时更加清晰。但它实质上意味着最简洁的默认导入形式将仅仅取回`foo()`函数。用户可以额外地手动罗列`bar`和`baz`作为命名导入，如果他们想用它们的话。
 
-You can probably imagine how tedious that's going to be for consumers of your module if you have lots of named export bindings. There is a wildcard import form where you import all of a module's exports within a single namespace object, but there's no way to wildcard import to top-level bindings.
+你可能能够想象，如果你的模块有许多命名导出绑定，那么对于模块的消费者来说将有多么乏味。有一个通配符导入形式，你可以在一个名称空间对象中导入一个模块的所有导出，但是没有办法用通配符导入到顶层绑定。
 
-Again, the ES6 module mechanism is intentionally designed to discourage modules with lots of exports; relatively speaking, it's desired that such approaches be a little more difficult, as a sort of social engineering to encourage simple module design in favor of large/complex module design.
+要重审的是，ES6模块机制被有意设计为不鼓励带有许多导出的模块；相对而言，它被期望成为一种更困难一些的，作为某种社会工程的方式，以鼓励对大型/复杂模块设计有利的简单模块设计。
 
-I would probably recommend you not mix default export with named exports, especially if you have a large API and refactoring to separate modules isn't practical or desired. In that case, just use all named exports, and document that consumers of your module should probably use the `import * as ..` (namespace import, discussed in the next section) approach to bring the whole API in at once on a single namespace.
+我将可能推荐你不要将默认导出与命名导出混在一起，特别是当你有一个大型API，并且将它重构为分离的模块是不现实或不希望的时候。在这种情况下，就都使用命名导出，并在文档中记录你的模块的消费者可能应当使用`import * as ..`（名称空间导入，在下一节中讨论）方式来将整个API一次性地带到一个单独的名称空间中。
 
-We mentioned this earlier, but let's come back to it in more detail. Other than the `export default ...` form that exports an expression value binding, all other export forms are exporting bindings to local identifiers. For those bindings, if you change the value of a variable inside a module after exporting, the external imported binding will access the updated value:
+我们早先提到过这一点，但让我们回过头来更详细地讨论一下。除了导出一个表达式的值的绑定的`export default ...`形式，所有其他的导出形式都导出本地标识符的绑定。对于这些绑定，如果你在导出之后改变一个模块内部变量的值，外部被导入的绑定将可以访问这个被更新的值：
 
 ```js
 var foo = 42;
@@ -1416,11 +1372,11 @@ foo = 10;
 bar = "cool";
 ```
 
-When you import this module, the `default` and `bar` exports will be bound to the local variables `foo` and `bar`, meaning they will reveal the updated `10` and `"cool"` values. The values at time of export are irrelevant. The values at time of import are irrelevant. The bindings are live links, so all that matters is what the current value is when you access the binding.
+当你导出这个模块时，`default`和`bar`导出将会绑定到本地变量`foo`和`bar`，这意味着它们将反映被更新的值`10`和`"cool"`。在被导出时的值是无关紧要的。在被导入时的值是无关紧要的。这些绑定是实时的链接，所以唯一重要的是当你访问这个绑定时它当前的值是什么。
 
-**Warning:** Two-way bindings are not allowed. If you import a `foo` from a module, and try to change the value of your imported `foo` variable, an error will be thrown! We'll revisit that in the next section.
+**警告：** 双向绑定是不允许的。如果你从一个模块中导入一个`foo`，并试图改变你导入的变量`foo`的值，一个错误就会被抛出！我们将在下一节重新回到这个问题。
 
-You can also re-export another module's exports, such as:
+你还可以重新导出另一个模块的导出，比如：
 
 ```js
 export { foo, bar } from "baz";
@@ -1428,13 +1384,17 @@ export { foo as FOO, bar as BAR } from "baz";
 export * from "baz";
 ```
 
-Those forms are similar to just first importing from the `"baz"` module then listing its members explicitly for export from your module. However, in these forms, the members of the `"baz"` module are never imported to your module's local scope; they sort of pass through untouched.
+这些形式都与首先从`"baz"`模块导入然后为了从你的模块中到处而明确地罗列它的成员相似。然而，在这些形式中，模块`"baz"`的成员从没有被导入到你的模块的本地作用域；它们有些原封不动地穿了过去。
 
 #### `import`ing API Members
 
 To import a module, unsurprisingly you use the `import` statement. Just as `export` has several nuanced variations, so does `import`, so spend plenty of time considering the following issues and experimenting with your options.
 
+要导入一个模块，你将不出意料地使用`import`语句。就像`export`有几种微妙的变化一样，`import`也有，所以你要花相当多的时间来考虑下面的问题，并试验你的选择。
+
 If you want to import certain specific named members of a module's API into your top-level scope, you use this syntax:
+
+如果你想要导入一个模块的API中的特定命名成员到你的顶层作用域，使用这种语法：
 
 ```js
 import { foo, bar, baz } from "foo";
@@ -1442,11 +1402,19 @@ import { foo, bar, baz } from "foo";
 
 **Warning:** The `{ .. }` syntax here may look like an object literal, or even an object destructuring syntax. However, its form is special just for modules, so be careful not to confuse it with other `{ .. }` patterns elsewhere.
 
+**警告：** 这里的`{ .. }`语法可能看起来像一个对象字面量，甚至是像一个对象解构语法。但是，它的形式仅对模块而言是特殊的，所以不要讲它与其他地方的`{ .. }`模式搞混了。
+
 The `"foo"` string is called a *module specifier*. Because the whole goal is statically analyzable syntax, the module specifier must be a string literal; it cannot be a variable holding the string value.
+
+字符串`"foo"`称为一个 *模块指示符*。因为它的全部目的在于可以静态分析的语法，所以模块指示符必须是一个字符串字面量；它不能是一个持有字符串值的变量。
 
 From the perspective of your ES6 code and the JS engine itself, the contents of this string literal are completely opaque and meaningless. The module loader will interpret this string as an instruction of where to find the desired module, either as a URL path or a local filesystem path.
 
+从你的ES6代码和JS引擎本身的角度来看，这个字符串字面量的内容是完全不透明和没有意义的。模块加载器将会把这个字符串翻译为一个在何处寻找被期望的模块的指令，不是作为一个URL路径就是一个本地文件系统路径。
+
 The `foo`, `bar`, and `baz` identifiers listed must match named exports on the module's API (static analysis and error assertion apply). They are bound as top-level identifiers in your current scope:
+
+被罗列的标识符`foo`，`bar`和`baz`必须匹配在模块的API上的命名导出（这里将会发生静态分析和错误断言）。它们在你当前的作用域中被绑定为顶层标识符。
 
 ```js
 import { foo } from "foo";
@@ -1456,6 +1424,8 @@ foo();
 
 You can rename the bound identifiers imported, as:
 
+你可以重命名被导入的绑定标识符，就像：
+
 ```js
 import { foo as theFooFunc } from "foo";
 
@@ -1463,6 +1433,8 @@ theFooFunc();
 ```
 
 If the module has just a default export that you want to import and bind to an identifier, you can opt to skip the `{ .. }` surrounding syntax for that binding. The `import` in this preferred case gets the nicest and most concise of the `import` syntax forms:
+
+如果这个模块仅有一个你想要导入并绑定到一个标识符的默认导出，你可以为这个绑定选择性地跳过外围的`{ .. }`语法。在这种首选情况下`import`会得到最好的最简洁的`import`语法形式：
 
 ```js
 import foo from "foo";
@@ -1473,7 +1445,11 @@ import { default as foo } from "foo";
 
 **Note:** As explained in the previous section, the `default` keyword in a module's `export` specifies a named export where the name is actually `default`, as is illustrated by the second more verbose syntax option. The renaming from `default` to, in this case, `foo`, is explicit in the latter syntax and is identical yet implicit in the former syntax.
 
+**注意：** 正如我们在前一节中讲解过的，一个模块的`export`中的`default`关键字指定了一个名称实际上为`default`的命名导出，正如在第二个更加繁冗的语法中展示的那样。在这个例子中，从`default`到`foo`的重命名在后者的语法中是明确的，并且与前者隐含地重命名是完全相同的。
+
 You can also import a default export along with other named exports, if the module has such a definition. Recall this module definition from earlier:
+
+如果模块有这样的定义，你还可以与其他的命名导出一起导入一个默认导出。回忆一下先前的这个模块定义：
 
 ```js
 export default function foo() { .. }
@@ -1484,6 +1460,8 @@ export function baz() { .. }
 
 To import that module's default export and its two named exports:
 
+要引入这个模块的默认导出和它的两个命名导出：
+
 ```js
 import FOOFN, { bar, baz as BAZ } from "foo";
 
@@ -1493,6 +1471,8 @@ BAZ();
 ```
 
 The strongly suggested approach from ES6's module philosophy is that you only import the specific bindings from a module that you need. If a module provides 10 API methods, but you only need two of them, some believe it wasteful to bring in the entire set of API bindings.
+
+
 
 One benefit, besides code being more explicit, is that narrow imports make static analysis and error detection (accidentally using the wrong binding name, for instance) more robust.
 
