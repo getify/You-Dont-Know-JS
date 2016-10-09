@@ -3,17 +3,29 @@
 
 Structured collection and access to data is a critical component of just about any JS program. From the beginning of the language up to this point, the array and the object have been our primary mechanism for creating data structures. Of course, many higher-level data structures have been built on top of these, as user-land libraries.
 
+结构化的集合与访问数据对于任何JS程序来说都是一个关键组成部分。从这门语言的最开始到现在，书组和对象一直都是我们创建数据结构的主要机制。当然，许多更高级的数据结构都曾建立在这些之上，作为用户方的库。
+
 As of ES6, some of the most useful (and performance-optimizing!) data structure abstractions have been added as native components of the language.
+
+到了ES6，最有用（而且最能优化性能）的数据结构抽象中的一些已经作为这门语言的原生组件被加入了进来。
 
 We'll start this chapter first by looking at *TypedArrays*, technically contemporary to ES5 efforts several years ago, but only standardized as companions to WebGL and not JavaScript itself. As of ES6, these have been adopted directly by the language specification, which gives them first-class status.
 
+我们将通过检视 *TypedArrays* 来开始这一章，技术上讲它与几年前ES5的努力是同一时期的产物，但是仅仅作为WebGL的同伴被标准化了，而不是作为JavaScript自身的一部分。到了ES6，这些东西已经被语言规范直接采纳了，这给予了它们头等的地位。
+
 Maps are like objects (key/value pairs), but instead of just a string for the key, you can use any value -- even another object or map! Sets are similar to arrays (lists of values), but the values are unique; if you add a duplicate, it's ignored. There are also weak (in relation to memory/garbage collection) counterparts: WeakMap and WeakSet.
+
+Map就像对象（键/值对），但是与仅能使用一个字符串作为键不同的是，你可以使用任何值 —— 即使是另一个对象或map！Set与数组很相似（值的列表），但是这些值都是唯一的；如果你添加一个重复的值，它会被忽略。还有与之相对应的weak结构：WeakMap和WeakSet。
 
 ## TypedArrays
 
 As we cover in the *Types & Grammar* title of this series, JS does have a set of built-in types, like `number` and `string`. It'd be tempting to look at a feature named "typed array" and assume it means an array of a specific type of values, like an array of only strings.
 
+正如我们在本系列的 *类型与文法* 中讲到过的，JS确实拥有一组内建类型，比如`number`和`string`。看到一个称为“类型化的数组”的特性，可能会诱使你推测它意味着一个特定类型的值的数组，比如一个仅含字符串的数组。
+
 However, typed arrays are really more about providing structured access to binary data using array-like semantics (indexed access, etc.). The "type" in the name refers to a "view" layered on type of the bucket of bits, which is essentially a mapping of whether the bits should be viewed as an array of 8-bit signed integers, 16-bit signed integers, and so on.
+
+然而，类型化数组其实更多的是关于使用类数组的语义（索引访问，等等）提供对二进制数据的结构化访问。名称中的“类型”指的是在大量位的类型之上覆盖的“视图”，
 
 How do you construct such a bit-bucket? It's called a "buffer," and you construct it most directly with the `ArrayBuffer(..)` constructor:
 
