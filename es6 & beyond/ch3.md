@@ -1388,11 +1388,7 @@ export * from "baz";
 
 #### `import`ing API Members
 
-To import a module, unsurprisingly you use the `import` statement. Just as `export` has several nuanced variations, so does `import`, so spend plenty of time considering the following issues and experimenting with your options.
-
 要导入一个模块，你将不出意料地使用`import`语句。就像`export`有几种微妙的变化一样，`import`也有，所以你要花相当多的时间来考虑下面的问题，并试验你的选择。
-
-If you want to import certain specific named members of a module's API into your top-level scope, you use this syntax:
 
 如果你想要导入一个模块的API中的特定命名成员到你的顶层作用域，使用这种语法：
 
@@ -1400,19 +1396,11 @@ If you want to import certain specific named members of a module's API into your
 import { foo, bar, baz } from "foo";
 ```
 
-**Warning:** The `{ .. }` syntax here may look like an object literal, or even an object destructuring syntax. However, its form is special just for modules, so be careful not to confuse it with other `{ .. }` patterns elsewhere.
-
 **警告：** 这里的`{ .. }`语法可能看起来像一个对象字面量，甚至是像一个对象解构语法。但是，它的形式仅对模块而言是特殊的，所以不要讲它与其他地方的`{ .. }`模式搞混了。
-
-The `"foo"` string is called a *module specifier*. Because the whole goal is statically analyzable syntax, the module specifier must be a string literal; it cannot be a variable holding the string value.
 
 字符串`"foo"`称为一个 *模块指示符*。因为它的全部目的在于可以静态分析的语法，所以模块指示符必须是一个字符串字面量；它不能是一个持有字符串值的变量。
 
-From the perspective of your ES6 code and the JS engine itself, the contents of this string literal are completely opaque and meaningless. The module loader will interpret this string as an instruction of where to find the desired module, either as a URL path or a local filesystem path.
-
 从你的ES6代码和JS引擎本身的角度来看，这个字符串字面量的内容是完全不透明和没有意义的。模块加载器将会把这个字符串翻译为一个在何处寻找被期望的模块的指令，不是作为一个URL路径就是一个本地文件系统路径。
-
-The `foo`, `bar`, and `baz` identifiers listed must match named exports on the module's API (static analysis and error assertion apply). They are bound as top-level identifiers in your current scope:
 
 被罗列的标识符`foo`，`bar`和`baz`必须匹配在模块的API上的命名导出（这里将会发生静态分析和错误断言）。它们在你当前的作用域中被绑定为顶层标识符。
 
@@ -1422,8 +1410,6 @@ import { foo } from "foo";
 foo();
 ```
 
-You can rename the bound identifiers imported, as:
-
 你可以重命名被导入的绑定标识符，就像：
 
 ```js
@@ -1431,8 +1417,6 @@ import { foo as theFooFunc } from "foo";
 
 theFooFunc();
 ```
-
-If the module has just a default export that you want to import and bind to an identifier, you can opt to skip the `{ .. }` surrounding syntax for that binding. The `import` in this preferred case gets the nicest and most concise of the `import` syntax forms:
 
 如果这个模块仅有一个你想要导入并绑定到一个标识符的默认导出，你可以为这个绑定选择性地跳过外围的`{ .. }`语法。在这种首选情况下`import`会得到最好的最简洁的`import`语法形式：
 
@@ -1443,11 +1427,7 @@ import foo from "foo";
 import { default as foo } from "foo";
 ```
 
-**Note:** As explained in the previous section, the `default` keyword in a module's `export` specifies a named export where the name is actually `default`, as is illustrated by the second more verbose syntax option. The renaming from `default` to, in this case, `foo`, is explicit in the latter syntax and is identical yet implicit in the former syntax.
-
 **注意：** 正如我们在前一节中讲解过的，一个模块的`export`中的`default`关键字指定了一个名称实际上为`default`的命名导出，正如在第二个更加繁冗的语法中展示的那样。在这个例子中，从`default`到`foo`的重命名在后者的语法中是明确的，并且与前者隐含地重命名是完全相同的。
-
-You can also import a default export along with other named exports, if the module has such a definition. Recall this module definition from earlier:
 
 如果模块有这样的定义，你还可以与其他的命名导出一起导入一个默认导出。回忆一下先前的这个模块定义：
 
@@ -1457,8 +1437,6 @@ export default function foo() { .. }
 export function bar() { .. }
 export function baz() { .. }
 ```
-
-To import that module's default export and its two named exports:
 
 要引入这个模块的默认导出和它的两个命名导出：
 
@@ -1470,19 +1448,17 @@ bar();
 BAZ();
 ```
 
-The strongly suggested approach from ES6's module philosophy is that you only import the specific bindings from a module that you need. If a module provides 10 API methods, but you only need two of them, some believe it wasteful to bring in the entire set of API bindings.
+ES6的模块哲学强烈推荐的方式是，你只从一个模块中导入你需要的特定的绑定。如果一个模块提供10个API方法，但是你只需它们中的两个，有些人认为带入整套API绑定是一种浪费。
 
+一个好处是，除了代码变得更加明确，收窄导入使得静态分析和错误检测（例如，不小心使用了错误的绑定名称）变得更加健壮。
 
+当然，这只是受ES6设计哲学影响的标准观点；没有什么东西要求我们坚持这种方式。
 
-One benefit, besides code being more explicit, is that narrow imports make static analysis and error detection (accidentally using the wrong binding name, for instance) more robust.
+许多开发者可能很快指出这样的方式更令人厌烦，每次你发现自己需要一个模块中的其他某些东西时，它要求你经常地重新找到并更新你的`import`语句。它的代价是牺牲便利性。
 
-Of course, that's just the standard position influenced by ES6 design philosophy; there's nothing that requires adherence to that approach.
+以这种观点看，首选方式可能是将模块中的所有东西都导入到一个单独的名称空间中，而不是将每个个别的成员直接导入到作用域中。幸运的是，`import`语句拥有一个变种语法可以支持这种风格的模块使用，它被称为 *名称空间导入*。
 
-Many developers would be quick to point out that such approaches can be more tedious, requiring you to regularly revisit and update your `import` statement(s) each time you realize you need something else from a module. The trade-off is in exchange for convenience.
-
-In that light, the preference might be to import everything from the module into a single namespace, rather than importing individual members, each directly into the scope. Fortunately, the `import` statement has a syntax variation that can support this style of module consumption, called *namespace import*.
-
-Consider a `"foo"` module exported as:
+考虑一个被这样导出的`"foo"`模块：
 
 ```js
 export function bar() { .. }
@@ -1490,7 +1466,7 @@ export var x = 42;
 export function baz() { .. }
 ```
 
-You can import that entire API to a single module namespace binding:
+你可以将整个API导入到一个单独的模块名称空间绑定中：
 
 ```js
 import * as foo from "foo";
@@ -1500,9 +1476,9 @@ foo.x;			// 42
 foo.baz();
 ```
 
-**Note:** The `* as ..` clause requires the `*` wildcard. In other words, you cannot do something like `import { bar, x } as foo from "foo"` to bring in only part of the API but still bind to the `foo` namespace. I would have liked something like that, but for ES6 it's all or nothing with the namespace import.
+**注意：** `* as ..`子句要求使用`*`通配符。换句话说，你不能做像`import { bar, x } as foo from "foo"`这样的事情来将API的一部分绑定到`foo`名称空间。我会很喜欢这样的东西，但是对ES6的名称空间导入来说，要么全有要么全无。
 
-If the module you're importing with `* as ..` has a default export, it is named `default` in the namespace specified. You can additionally name the default import outside of the namespace binding, as a top-level identifier. Consider a `"world"` module exported as:
+如果你正在使用`* as ..`导入的模块拥有一个默认导出，它会在指定的名称空间中被命名为`default`。你可以在这个名称空间绑定的外面，作为一个顶层标识符额外地命名这个默认导出。考虑一个被这样导出的`"world"`模块：
 
 ```js
 export default function foo() { .. }
@@ -1510,7 +1486,7 @@ export function bar() { .. }
 export function baz() { .. }
 ```
 
-And this `import`:
+和这个`import`：
 
 ```js
 import foofn, * as hello from "world";
@@ -1521,11 +1497,11 @@ hello.bar();
 hello.baz();
 ```
 
-While this syntax is valid, it can be rather confusing that one method of the module (the default export) is bound at the top-level of your scope, whereas the rest of the named exports (and one called `default`) are bound as properties on a differently named (`hello`) identifier namespace.
+虽然这个语法是合法的，但是它可能令人困惑：这个模块的一个方法（那个默认导出）被绑定到你作用域的顶层，然而其他的命名导出（而且之中之一称为`default`）作为一个不同名称（`hello`）的标识符名称空间的属性被绑定。
 
-As I mentioned earlier, my suggestion would be to avoid designing your module exports in this way, to reduce the chances that your module's users will suffer these strange quirks.
+正如我早先提到的，我的建议是避免这样设计你的模块导出，以降低你模块的用户遭受这些奇异之处的可能性。
 
-All imported bindings are immutable and/or read-only. Consider the previous import; all of these subsequent assignment attempts will throw `TypeError`s:
+所有被导入的绑定都是不可变和/或只读的。考虑前面的导入；所有这些后续的赋值尝试都将抛出`TypeError`:
 
 ```js
 import foofn, * as hello from "world";
@@ -1536,15 +1512,15 @@ hello.bar = 42;		// (runtime) TypeError!
 hello.baz = 42;		// (runtime) TypeError!
 ```
 
-Recall earlier in the "`export`ing API Members" section that we talked about how the `bar` and `baz` bindings are bound to the actual identifiers inside the `"world"` module. That means if the module changes those values, `hello.bar` and `hello.baz` now reference the updated values.
+回忆早先在“`export` API成员”一节中，我们谈到`bar`和`baz`绑定是如何被绑定到`"world"`模块内部的实际标识符上的。它意味着如果模块改变那些值，`hello.bar`和`hello.baz`将引用更新后的值。
 
-But the immutable/read-only nature of your local imported bindings enforces that you cannot change them from the imported bindings, hence the `TypeError`s. That's pretty important, because without those protections, your changes would end up affecting all other consumers of the module (remember: singleton), which could create some very surprising side effects!
+但是你的本地导入绑定的不可变/只读的性质强制你不能从被导入的绑定一方改变他们，不然就会发生`TypeError`。这很重要，因为如果没有这种保护，你的修改将会最终影响所有其他该模块的消费者（记住：单例），这可能会产生一些非常令人吃惊的副作用！
 
-Moreover, though a module *can* change its API members from the inside, you should be very cautious of intentionally designing your modules in that fashion. ES6 modules are *intended* to be static, so deviations from that principle should be rare and should be carefully and verbosely documented.
+另外，虽然一个模块 *可以* 从内部改变它的API成员，但你应当对有意地以这种风格设计你的模块非常谨慎。ES6模块 *被预计* 是静态的，所以背离这个原则应当是不常见的，而且应当在文档中被非常小心和详细地记录下来。
 
-**Warning:** There are module design philosophies where you actually intend to let a consumer change the value of a property on your API, or module APIs are designed to be "extended" by having other "plug-ins" add to the API namespace. As we just asserted, ES6 module APIs should be thought of and designed as static and unchangeable, which strongly restricts and discourages these alternative module design patterns. You can get around these limitations by exporting a plain object, which of course can then be changed at will. But be careful and think twice before going down that road.
+**警告：** 存在一些这样的模块设计思想，你实际上打算允许一个消费者改变你的API上的一个属性的值，或者模块的API被设计为可以通过向API的名称空间中添加“插件”来“扩展”。但正如我们刚刚断言的，ES6模块API应当被认为并设计为静态的和不可变的，这强烈地约束和不鼓励那些其他的模块设计模式。你可以通过导出一个普通对象 —— 它理所当然是可以随意改变的 —— 来绕过这些限制。但是在选择这条路之前要三思而后行。
 
-Declarations that occur as a result of an `import` are "hoisted" (see the *Scope & Closures* title of this series). Consider:
+作为一个`import`的结果发生的声明将被“提升”（参见本系列的 *作用域与闭包*）。考虑如下代码：
 
 ```js
 foo();
@@ -1552,25 +1528,25 @@ foo();
 import { foo } from "foo";
 ```
 
-`foo()` can run because not only did the static resolution of the `import ..` statement figure out what `foo` is during compilation, but it also "hoisted" the declaration to the top of the module's scope, thus making it available throughout the module.
+`foo()`可以运行是因为`import ..`语句的静态解析不仅在编译时搞清了`foo`是什么，它还将这个声明“提升”到模块作用域的顶部，如此使它在模块中通篇都是可用的。
 
-Finally, the most basic form of the `import` looks like this:
+最后，最基本的`import`形式看起来像这样：
 
 ```js
 import "foo";
 ```
 
-This form does not actually import any of the module's bindings into your scope. It loads (if not already loaded), compiles (if not already compiled), and evaluates (if not already run) the `"foo"` module.
+这种形式实际上不会将模块的任何绑定导入到你的作用域中。它加载（如果还没被加载过），编译（如果还没被编译过），并对`"foo"`模块求值（如果还没被运行过）。
 
-In general, that sort of import is probably not going to be terribly useful. There may be niche cases where a module's definition has side effects (such as assigning things to the `window`/global object). You could also envision using `import "foo"` as a sort of preload for a module that may be needed later.
+一般来说，这种导入可能不会特别有用。可能会有一些模块的定义拥有副作用（比如向`window`/全局对象赋值）的特殊情况。你还可以将`import "foo"`用作稍后可能需要的模块的预加载。
 
 ### Circular Module Dependency
 
-A imports B. B imports A. How does this actually work?
+A导入B。B导入A。这将如何工作？
 
-I'll state off the bat that designing systems with intentional circular dependency is generally something I try to avoid. That having been said, I recognize there are reasons people do this and it can solve some sticky design situations.
+我要立即声明，一般来说我会避免使用刻意的循环依赖来设计系统。话虽如此，我也认识到人们这么做是有原因的，而且它可以解决一些艰难的设计问题。
 
-Let's consider how ES6 handles this. First, module `"A"`:
+让我们考虑一下ES6如何处理这种情况。首先，模块`"A"`：
 
 ```js
 import bar from "B";
@@ -1581,7 +1557,7 @@ export default function foo(x) {
 }
 ```
 
-Now, module `"B"`:
+现在，是模块`"B"`：
 
 ```js
 import foo from "A";
@@ -1592,36 +1568,37 @@ export default function bar(y) {
 }
 ```
 
-These two functions, `foo(..)` and `bar(..)`, would work as standard function declarations if they were in the same scope, because the declarations are "hoisted" to the whole scope and thus available to each other regardless of authoring order.
+这两个函数，`foo(..)`和`bar(..)`，如果它们在相同的作用域中就会像标准的函数声明那样工作，因为声明被“提升”至整个作用域，而因此与它们的编写顺序无关，它们互相是可用的。
 
-With modules, you have declarations in entirely different scopes, so ES6 has to do extra work to help make these circular references work.
+在模块中，你的声明在完全不同的作用域中，所以ES6必须做一些额外的工作以使这些循环引用工作起来。
 
-In a rough conceptual sense, this is how circular `import` dependencies are validated and resolved:
+在大致的概念上，这就是循环的`import`依赖如何被验证和解析的：
 
-* If the `"A"` module is loaded first, the first step is to scan the file and analyze all the exports, so it can register all those bindings available for import. Then it processes the `import .. from "B"`, which signals that it needs to go fetch `"B"`.
-* Once the engine loads `"B"`, it does the same analysis of its export bindings. When it sees the `import .. from "A"`, it knows the API of `"A"` already, so it can verify the `import` is valid. Now that it knows the `"B"` API, it can also validate the `import .. from "B"` in the waiting `"A"` module.
+* 如果模块`"A"`被首先加载，第一步将是扫描文件并分析所有的导出，这样就可以为导入注册所有可用的绑定。然后它处理`import .. from "B"`，这指示它需要去取得`"B"`。
 
-In essence, the mutual imports, along with the static verification that's done to validate both `import` statements, virtually composes the two separate module scopes (via the bindings), such that `foo(..)` can call `bar(..)` and vice versa. This is symmetric to if they had originally been declared in the same scope.
+* 一旦引擎加载了`"B"`，它会做同样的导出绑定分析。当它看到`import .. from "A"`时，它知道`"A"`的API已经准备好了，所以它可以验证这个`import`为合法的。现在它知道了`"B"`的API，它也可以验证在模块`"A"`中等待的`import .. from "B"`了。
 
-Now let's try using the two modules together. First, we'll try `foo(..)`:
+实质上，这种相互导入，连同对两个`import`语句合法性的静态验证，虚拟地组合了两个分离的模块作用域（通过绑定），因此`foo(..)`可以调用`bar(..)`或相反。这与我们在相同的作用域中声明是对称的。
+
+现在然我们试着一起使用这两个模块。首先，我们将试用`foo(..)`：
 
 ```js
 import foo from "foo";
 foo( 25 );				// 11
 ```
 
-Or we can try `bar(..)`:
+或者我们可以试用`bar(..)`：
 
 ```js
 import bar from "bar";
 bar( 25 );				// 11.5
 ```
 
-By the time either the `foo(25)` or `bar(25)` calls are executed, all the analysis/compilation of all modules has completed. That means `foo(..)` internally knows directly about `bar(..)` and `bar(..)` internally knows directly about `foo(..)`.
+在`foo(25)`调用`bar(25)`被执行的时刻，所有模块的所有分析/编译都已经完成了。这意味着`foo(..)`内部地直接知道`bar(..)`，而且`bar(..)`内部地直接知道`foo(..)`。
 
-If all we need is to interact with `foo(..)`, then we only need to import the `"foo"` module. Likewise with `bar(..)` and the `"bar"` module.
+如果所有我们需要的仅是与`foo(..)`互动，那么我们只需要导入`"foo"`模块。`bar(..)`和`"bar"`模块也同理。
 
-Of course, we *can* import and use both of them if we want to:
+当然，如果我们想，我们 *可以* 导入并使用它们两个：
 
 ```js
 import foo from "foo";
@@ -1631,25 +1608,25 @@ foo( 25 );				// 11
 bar( 25 );				// 11.5
 ```
 
-The static loading semantics of the `import` statement mean that a `"foo"` and `"bar"` that mutually depend on each other via `import` will ensure that both are loaded, parsed, and compiled before either of them runs. So their circular dependency is statically resolved and this works as you'd expect.
+`import`语句的静态加载语义意味着通过`import`互相依赖对方的`"foo"`和`"bar"`将确保在它们运行前被加载，解析，和编译。所以它们的循环依赖是被静态地解析的，而且将会如你所愿地工作。
 
 ### Module Loading
 
-We asserted at the beginning of this "Modules" section that the `import` statement uses a separate mechanism, provided by the hosting environment (browser, Node.js, etc.), to actually resolve the module specifier string into some useful instruction for finding and loading the desired module. That mechanism is the system *Module Loader*.
+我们在“模块”这一节的最开始声称，`import`语句使用了一个由宿主环境（浏览器，Node.js，等等）提供的分离的机制，来实际地价将模块指示符字符串解析为一些对寻找和加载所期望模块的有用的指令。这种机制就是系统 *模块加载器*。
 
-The default module loader provided by the environment will interpret a module specifier as a URL if in the browser, and (generally) as a local filesystem path if on a server such as Node.js. The default behavior is to assume the loaded file is authored in the ES6 standard module format.
+由环境提供的默认模块加载器，如果是在浏览器中将会把模块指示符解释为一个URL，如果是在服务器端（一般地）将会解释为一个本地文件系统路径，比如Node.js。它的默认行为是假定被加载的文件是以ES6标准的模块格式编写的。
 
-Moreover, you will be able to load a module into the browser via an HTML tag, similar to how current script programs are loaded. At the time of this writing, it's not fully clear if this tag will be `<script type="module">` or `<module>`. ES6 doesn't control that decision, but discussions in the appropriate standards bodies are already well along in parallel of ES6.
+另外，与当下脚本程序被加载的方式相似，你将可以通过一个HTML标签将一个模块加载到浏览器中。在本书写作时，这个标签将会是`<script type="module">`还是`<module>`还不完全清楚。ES6没有控制这个决定，但是在恰当的标准化机构中的讨论早已随着ES6开始了。
 
-Whatever the tag looks like, you can be sure that under the covers it will use the default loader (or a customized one you've pre-specified, as we'll discuss in the next section).
+无论这个标签看起来什么样，你可以确信它的内部将会使用默认加载器（或者一个你预先指定好的加载器，就像我们将在下一节中讨论的）。
 
-Just like the tag you'll use in markup, the module loader itself is not specified by ES6. It is a separate, parallel standard (http://whatwg.github.io/loader/) controlled currently by the WHATWG browser standards group.
+就像你将在标记中使用的标签一样，ES6没有规定模块加载器本身。它是一个分离的，目前由WHATWG浏览器标准化小组控制的平行的标准。(http://whatwg.github.io/loader/)
 
-At the time of this writing, the following discussions reflect an early pass at the API design, and things are likely to change.
+在本书写作时，接下来的讨论反映了它的API设计的一个早期版本，和一些可能将要改变的东西。
 
 #### Loading Modules Outside of Modules
 
-One use for interacting directly with the module loader is if a non-module needs to load a module. Consider:
+一个与模块加载器直接交互的用法，是当一个非模块需要加载一个模块时。考虑如下代码：
 
 ```js
 // normal script loaded in browser via `<script>`,
@@ -1661,21 +1638,21 @@ Reflect.Loader.import( "foo" ) // returns a promise for `"foo"`
 } );
 ```
 
-The `Reflect.Loader.import(..)` utility imports the entire module onto the named parameter (as a namespace), just like the `import * as foo ..` namespace import we discussed earlier.
+工具`Reflect.Loader.import(..)`将整个模块导入到命名参数中（作为一个名称空间），就像我们早先讨论过的`import * as foo ..`名称空间导入。
 
-**Note:** The `Reflect.Loader.import(..)` utility returns a promise that is fulfilled once the module is ready. To import multiple modules, you can compose promises from multiple `Reflect.Loader.import(..)` calls using `Promise.all([ .. ])`. For more information about Promises, see "Promises" in Chapter 4.
+**注意：** `Reflect.Loader.import(..)`返回一个promise，它在模块准备好时被完成。要导入多个模块的话，你可以使用`Promise.all([ .. ])`将多个`Reflect.Loader.import(..)`的promise组合起来。有关Promise的更多信息，参见第四章的“Promise”。
 
-You can also use `Reflect.Loader.import(..)` in a real module to dynamically/conditionally load a module, where `import` itself would not work. You might, for instance, choose to load a module containing a polyfill for some ES7+ feature if a feature test reveals it's not defined by the current engine.
+你还可以在一个真正的模块中使用`Reflect.Loader.import(..)`来动态地/条件性地加载一个模块，这是`import`自身无法做到的。例如，你可能在一个特性测试表明某个ES7+特性没有被当前的引擎所定义的情况下，选择性地加载一个含有此特性的填补的模块。
 
-For performance reasons, you'll want to avoid dynamic loading whenever possible, as it hampers the ability of the JS engine to fire off early fetches from its static analysis.
+由于性能的原因，你将想要尽量避免动态加载，因为它阻碍了JS引擎从它的静态分析中提前获取的能力。
 
 #### Customized Loading
 
-Another use for directly interacting with the module loader is if you want to customize its behavior through configuration or even redefinition.
+直接与模块加载器交互的另外一种用法是，你想要通过配置或者甚至是重定义来定制它的行为。
 
-At the time of this writing, there's a polyfill for the module loader API being developed (https://github.com/ModuleLoader/es6-module-loader). While details are scarce and highly subject to change, we can explore what possibilities may eventually land.
+在本书写作时，有一个被开发好的模块加载器API的填补(https://github.com/ModuleLoader/es6-module-loader)。虽然关于它的细节非常匮乏，而且很可能改变，但是我们可以通过它探索最终可能固定下来的东西是什么。
 
-The `Reflect.Loader.import(..)` call may support a second argument for specifying various options to customize the import/load task. For example:
+`Reflect.Loader.import(..)`调用可能会支持第二个参数，它指定各种选项来定制导入/加载任务。例如：
 
 ```js
 Reflect.Loader.import( "foo", { address: "/path/to/foo.js" } )
@@ -1684,25 +1661,25 @@ Reflect.Loader.import( "foo", { address: "/path/to/foo.js" } )
 } )
 ```
 
-It's also expected that a customization will be provided (through some means) for hooking into the process of loading a module, where a translation/transpilation could occur after load but before the engine compiles the module.
+还有一种预期是，会为一个自定义内容提供某种机制来将之挂钩到模块加载的处理过程中，就在翻译/转译可能发生的加载之后，但是在引擎编译这个模块之前。
 
-For example, you could load something that's not already an ES6-compliant module format (e.g., CoffeeScript, TypeScript, CommonJS, AMD). Your translation step could then convert it to an ES6-compliant module for the engine to then process.
+例如，你可能会加载某些还不是ES6兼容的模块格式的东西（例如，CoffeeScript，TypeScript，CommonJS，AMD）。你的翻译步骤可能会为了后面的引擎处理而将它转换为ES6兼容的模块。
 
 ## Classes
 
-From nearly the beginning of JavaScript, syntax and development patterns have all strived (read: struggled) to put on a facade of supporting class-oriented development. With things like `new` and `instanceof` and a `.constructor` property, who couldn't help but be teased that JS had classes hidden somewhere inside its prototype system?
+几乎从JavaScript的最开始的那时候起，语法和开发模式都曾努力（读作：挣扎地）地戴上一个支持面向类的开发的假面具。伴随着`new`和`instanceof`和一个`.constructor`属性，谁能不认为JS在它的原型系统的某个地方藏着类机制呢？
 
-Of course, JS "classes" aren't nearly the same as classical classes. The differences are well documented, so I won't belabor that point any further here.
+当然，JS的“类”与经典的类完全不同。其区别有很好的文档记录，所以在此我不会在这一点上花更多力气。
 
-**Note:** To learn more about the patterns used in JS to fake "classes," and an alternative view of prototypes called "delegation," see the second half of the *this & Object Prototypes* title of this series.
+**注意：** 要学习更多关于在JS中假冒“类”的模式，以及另一种称为“委托”的原型的视角，参见本系列的 *this与对象原型* 的后半部分。
 
 ### `class`
 
-Although JS's prototype mechanism doesn't work like traditional classes, that doesn't stop the strong tide of demand on the language to extend the syntactic sugar so that expressing "classes" looks more like real classes. Enter the ES6 `class` keyword and its associated mechanism.
+虽然JS的原型机制与传统的类的工作方式不同，但是这并不能阻挡一种强烈的潮流 —— 要求这门语言扩展它的语法糖以便将“类”表达得更像真正的类。让我们进入ES6`class`关键字和它相关的机制。
 
-This feature is the result of a highly contentious and drawn-out debate, and represents a smaller subset compromise from several strongly opposed views on how to approach JS classes. Most developers who want full classes in JS will find parts of the new syntax quite inviting, but will find important bits still missing. Don't worry, though. TC39 is already working on additional features to augment classes in the post-ES6 timeframe.
+这个特性是一个具有高度争议性和旷日持久的争论的结果，而且代表了几种对关于如何处理JS类的强烈反对意见的妥协的一小部分。大多数希望JS拥有完整的类机制的开发者将会发现新语法的一些部分十分吸引人，但是也会发现一些重要的部分仍然缺失了。但不要担心，TC39已经致力于另外的特性，以求在后ES6时代中增强类机制。
 
-At the heart of the new ES6 class mechanism is the `class` keyword, which identifies a *block* where the contents define the members of a function's prototype. Consider:
+新的ES6类机制的核心是`class`关键字，它标识了一个 *块*，其内容定义了一个函数的原型的成员。考虑如下代码：
 
 ```js
 class Foo {
@@ -1717,14 +1694,14 @@ class Foo {
 }
 ```
 
-Some things to note:
+一些要注意的事情：
 
-* `class Foo` implies creating a (special) function of the name `Foo`, much like you did pre-ES6.
-* `constructor(..)` identifies the signature of that `Foo(..)` function, as well as its body contents.
-* Class methods use the same "concise method" syntax available to object literals, as discussed in Chapter 2. This also includes the concise generator form as discussed earlier in this chapter, as well as the ES5 getter/setter syntax. However, class methods are non-enumerable whereas object methods are by default enumerable.
-* Unlike object literals, there are no commas separating members in a `class` body! In fact, they're not even allowed.
+* `class Foo` 暗示着创建一个（特殊的）名为`Foo`的函数，与你在前ES6中所做的非常相似。
+* `constructor(..)`表示了这个`Foo(..)`函数的签名，和它的函数体内容。
+* 类方法同样使用对象字面量中可以使用的“简约方法”语法，正如在第二章中讨论过的。这也包括在本章早先讨论过的简约generator，以及ES5的getter/setter语法。但是，类方法是不可枚举的而对象方法默认是可枚举的。
+* 与对象字面量不同的是，在一个`class`内容的部分没有逗号分隔各个成员！事实上，这甚至是不允许的。
 
-The `class` syntax definition in the previous snippet can be roughly thought of as this pre-ES6 equivalent, which probably will look fairly familiar to those who've done prototype-style coding before:
+前一个代码段的`class`语法定义可以大致认为和这个前ES6等价物相同，对于那些以前做过原型风格代码的人来说可能十分熟悉它：
 
 ```js
 function Foo(a,b) {
@@ -1737,7 +1714,7 @@ Foo.prototype.gimmeXY = function() {
 }
 ```
 
-In either the pre-ES6 form or the new ES6 `class` form, this "class" can now be instantiated and used just as you'd expect:
+不管是前ES6形式还是新的ES6`class`形式，这个“类”现在可以被实例化并如你所想地使用了：
 
 ```js
 var f = new Foo( 5, 15 );
@@ -1747,23 +1724,23 @@ f.y;						// 15
 f.gimmeXY();				// 75
 ```
 
-Caution! Though `class Foo` seems much like `function Foo()`, there are important differences:
+注意！虽然`class Foo`看起来很像`function Foo()`，但是有一些重要的区别：
 
-* A `Foo(..)` call of `class Foo` *must* be made with `new`, as the pre-ES6 option of `Foo.call( obj )` will *not* work.
-* While `function Foo` is "hoisted" (see the *Scope & Closures* title of this series), `class Foo` is not; the `extends ..` clause specifies an expression that cannot be "hoisted." So, you must declare a `class` before you can instantiate it.
-* `class Foo` in the top global scope creates a lexical `Foo` identifier in that scope, but unlike `function Foo` does not create a global object property of that name.
+* `class Foo`的一个`Foo(..)`调用 *必须* 与`new`一起使用，因为前ES6的`Foo.call( obj )`方式 *不能* 工作。
+* 虽然`function Foo`会被“提升”（参见本系列的 *作用域与闭包*），但是`class Foo`不会；`extends ..`指定的表达式不能被“提升”。所以，在你能够实例化一个`class`之前必须先声明它。
+* 在顶层全局作用域中的`class Foo`在这个作用域中创建了一个词法标识符`Foo`，但与此不同的是`function Foo`不会创建一个同名的全局对象属性。
 
-The established `instanceof` operator still works with ES6 classes, because `class` just creates a constructor function of the same name. However, ES6 introduces a way to customize how `instanceof` works, using `Symbol.hasInstance` (see "Well-Known Symbols" in Chapter 7).
+已经建立的`instanceof`操作仍然可以与ES6的类一起工作，因为`class`只是创建了一个同名的构造器函数。然而，ES6引入了一个定制`instanceof`如何工作的方法，使用`Symbol.hasInstance`（参见第七章的“周知Symbol”）。
 
-Another way of thinking about `class`, which I find more convenient, is as a *macro* that is used to automatically populate a `prototype` object. Optionally, it also wires up the `[[Prototype]]` relationship if using `extends` (see the next section).
+我发现另一种更方便地考虑`class`的方法是，将它作为一个用来自动填充`proptotype`对象的 *宏*。可选的是，如果使用`extends`（参见下一节）的话它还能连接`[[Prototype]]`关系。
 
-An ES6 `class` isn't really an entity itself, but a meta concept that wraps around other concrete entities, such as functions and properties, and ties them together.
+其实一个ES6`class`本身不是一个实体，而是一个元概念，它包裹在其他具体实体上，例如函数和属性，并将它们绑在一起。
 
-**Tip:** In addition to the declaration form, a `class` can also be an expression, as in: `var x = class Y { .. }`. This is primarily useful for passing a class definition (technically, the constructor itself) as a function argument or assigning it to an object property.
+**提示：** 除了这种声明的形式，一个`class`还可以是一个表达式，就像：`var x = class Y { .. }`。这主要用于将类的定义（技术上说，是构造器本身）作为函数参数值传递，或者将它赋值给一个对象属性。
 
 ### `extends` and `super`
 
-ES6 classes also have syntactic sugar for establishing the `[[Prototype]]` delegation link between two function prototypes -- commonly mislabeled "inheritance" or confusingly labeled "prototype inheritance" -- using the class-oriented familiar terminology `extends`:
+ES6的类还有一种语法糖，用于在两个函数原型之间建立`[[Prototype]]`委托链 —— 通常被错误地标记为“继承”或者令人困惑地标记为“原型继承” —— 使用我们熟悉的面向类的术语`extends`：
 
 ```js
 class Bar extends Foo {
@@ -1785,23 +1762,23 @@ b.z;						// 25
 b.gimmeXYZ();				// 1875
 ```
 
-A significant new addition is `super`, which is actually something not directly possible pre-ES6 (without some unfortunate hack trade-offs). In the constructor, `super` automatically refers to the "parent constructor," which in the previous example is `Foo(..)`. In a method, it refers to the "parent object," such that you can then make a property/method access off it, such as `super.gimmeXY()`.
+一个有重要意义的新增物是`super`，它实际上在前ES6中不是直接可能的东西（不付出一些不幸的黑科技的代价的话）。在构造器中，`super`自动指向“父构造器”，这在前一个例子中是`Foo(..)`。在方法中，它指向“父对象”，如此你就可以访问它上面的属性/方法，比如`super.gimmeXY()`。
 
-`Bar extends Foo` of course means to link the `[[Prototype]]` of `Bar.prototype` to `Foo.prototype`. So, `super` in a method like `gimmeXYZ()` specifically means `Foo.prototype`, whereas `super` means `Foo` when used in the `Bar` constructor.
+`Bar extends Foo`理所当然地意味着将`Bar.prototype`的`[[Prototype]]`链接到`Foo.prototype`。所以，在`gimmeXYZ()`这样的方法中的`super`特被地意味着`Foo.prototype`，而当`super`用在`Bar`构造器中时意味着`Foo`。
 
-**Note:** `super` is not limited to `class` declarations. It also works in object literals, in much the same way we're discussing here. See "Object `super`" in Chapter 2 for more information.
+**注意：** `super`不仅限于`class`声明。它也可以在对象字面量中工作，其方式在很大程度上与我们再此讨论的相同。更多信息参见第二章中的“对象`super`”。
 
 #### There Be `super` Dragons
 
-It is not insignificant to note that `super` behaves differently depending on where it appears. In fairness, most of the time, that won't be a problem. But surprises await if you deviate from a narrow norm.
+注意到`super`的行为根据它出现的位置不同而不同是很重要的。公平地说，大多数时候这不是一个问题。但是如果你背离一个狭窄的规范，令人诧异的事情就会等着你。
 
-There may be cases where in the constructor you would want to reference the `Foo.prototype`, such as to directly access one of its properties/methods. However, `super` in the constructor cannot be used in that way; `super.prototype` will not work. `super(..)` means roughly to call `new Foo(..)`, but isn't actually a usable reference to `Foo` itself.
+可能会有这样的情况，你想在构造器中引用`Foo.prototype`，比如直接访问它的属性/方法之一。然而，在构造器中的`super`不能这样被使用；`super.prototype`将不会工作。`super(..)`大致上意味着调用`new Foo(..)`，但它实际上不是一个可用的对`Foo`本身的引用。
 
-Symmetrically, you may want to reference the `Foo(..)` function from inside a non-constructor method. `super.constructor` will point at `Foo(..)` the function, but beware that this function can *only* be invoked with `new`. `new super.constructor(..)` would be valid, but it wouldn't be terribly useful in most cases, because you can't make that call use or reference the current `this` object context, which is likely what you'd want.
+与此对称的是，你可能想要在一个非构造器方法中引用`Foo(..1)`函数。`super.constructor`将会指向`Foo(..)`函数，但是要小心这个函数 *只能* 与`new`一起被调用。`new super.constructor(..)`将是合法的，但是在大多数情况下它都不是很有用， 因为你不能使这个调用使用或引用当前的`this`对象环境，而这很可能是你想要的。
 
-Also, `super` looks like it might be driven by a function's context just like `this` -- that is, that they'd both be dynamically bound. However, `super` is not dynamic like `this` is. When a constructor or method makes a `super` reference inside it at declaration time (in the `class` body), that `super` is statically bound to that specific class hierarchy, and cannot be overridden (at least in ES6).
+另外，`super`看起来可能就像`this`一样是被函数的环境所驱动的 —— 也就是说，它们都是被动态绑定的。但是，`super`像`this`那样是动态的。当声明时一个构造器或者方法在它内部使用一个`super`引用时（在`class`的内容部分），这个`super`是被静态地绑定到这个指定的类阶层中的，而且不能被覆盖（至少是在ES6中）。
 
-What does that mean? It means that if you're in the habit of taking a method from one "class" and "borrowing" it for another class by overriding its `this`, say with `call(..)` or `apply(..)`, that may very well create surprises if the method you're borrowing has a `super` in it. Consider this class hierarchy:
+这意味着什么？这意味着如果你习惯于从一个“类”中拿来一个方法并通过覆盖它的`this`，比如使用`call(..)`或者`apply(..)`，来为另一个类而“借用”它的话，那么当你借用的方法中有一个`super`时，将很有可能发生令你诧异的事情。考虑这个类阶层：
 
 ```js
 class ParentA {
@@ -1835,7 +1812,7 @@ var b = new ChildB();		// ParentB: b
 b.foo();					// ChildB: b
 ```
 
-All seems fairly natural and expected in this previous snippet. However, if you try to borrow `b.foo()` and use it in the context of `a` -- by virtue of dynamic `this` binding, such borrowing is quite common and used in many different ways, including mixins most notably -- you may find this result an ugly surprise:
+在前面这个代码段中一切看起来都相当自然和意料之中。但是，如果你试着借来`b.foo()`并在`a`的上下文中使用它的话 —— 通过动态`this`绑定的力量，这样的借用十分常见而且以许多不同的方式被使用，包括最明显的mixin —— 你可能会发现这个结果出奇地难看：
 
 ```js
 // borrow `b.foo()` to use in `a` context
@@ -1843,19 +1820,19 @@ b.foo.call( a );			// ParentB: a
 							// ChildB: a
 ```
 
-As you can see, the `this.id` reference was dynamically rebound so that `: a` is reported in both cases instead of `: b`. But `b.foo()`'s `super.foo()` reference wasn't dynamically rebound, so it still reported `ParentB` instead of the expected `ParentA`.
+如你所见，引用`this.id`被动态地重绑定所以在两种情况下都报告`: a`而不是`: b`。但是`b.foo()`的`super.foo()`引用没有被动态重绑定，所以它依然报告`ParentB`而不是期望的`ParentA`。
 
-Because `b.foo()` references `super`, it is statically bound to the `ChildB`/`ParentB` hierarchy and cannot be used against the `ChildA`/`ParentA` hierarchy. There is no ES6 solution to this limitation.
+因为`b.foo()`引用`super`，所以它被静态地绑定到了`ChildB`/`ParentB`阶层而不能被用于`ChildA`/`ParentA`阶层。在ES6中没有办法解决这个限制。
 
-`super` seems to work intuitively if you have a static class hierarchy with no cross-pollination. But in all fairness, one of the main benefits of doing `this`-aware coding is exactly that sort of flexibility. Simply, `class` + `super` requires you to avoid such techniques.
+如果你有一个不带移花接木的静态类阶层，那么`super`的工作方式看起来很直观。但公平地说，实施带有`this`的编码的一个主要好处正是这种灵活性。简单地说，`class` + `super`要求你避免使用这样的技术。
 
-The choice boils down to narrowing your object design to these static hierarchies -- `class`, `extends`, and `super` will be quite nice -- or dropping all attempts to "fake" classes and instead embrace dynamic and flexible, classless objects and `[[Prototype]]` delegation (see the *this & Object Prototypes* title of this series).
+你能在对象设计上作出的选择归结为两个：使用这些静态的阶层 —— `class`，`extends`，和`super`将十分不错 —— 要么放弃所有“山寨”类的企图，而接受动态且灵活的，没有类的对象和`[[Prototype]]`委托（参见本系列的 *this与对象原型*）。
 
 #### Subclass Constructor
 
-Constructors are not required for classes or subclasses; a default constructor is substituted in both cases if omitted. However, the default substituted constructor is different for a direct class versus an extended class.
+对类或子类来说构造器不是必需的；如果构造器被省略，这两种情况下都会有一个默认构造器顶替上来。但是，对于一个直接的类和一个被扩展的类来说，顶替上来的默认构造器是不同的。
 
-Specifically, the default subclass constructor automatically calls the parent constructor, and passes along any arguments. In other words, you could think of the default subclass constructor sort of like this:
+特别地，默认的子类构造器自动地调用父构造器，并且传递所有参数值。换句话说，你可以认为默认的子类构造器有些像这样：
 
 ```js
 constructor(...args) {
@@ -1863,11 +1840,11 @@ constructor(...args) {
 }
 ```
 
-This is an important detail to note. Not all class languages have the subclass constructor automatically call the parent constructor. C++ does, but Java does not. But more importantly, in pre-ES6 classes, such automatic "parent constructor" calling does not happen. Be careful when converting to ES6 `class` if you've been relying on such calls *not* happening.
+这是一个需要注意的重要细节。不是所有支持类的语言的子类构造器都会自动地调用父构造器。C++会，但Java不会。更重要的是，在前ES6的类中，这样的自动“父构造器”调用不会发生。如果你曾经依赖于这样的调用 *不会* 发生，按么当你将代码转换为ES6`class`时就要小心。
 
-Another perhaps surprising deviation/limitation of ES6 subclass constructors: in a constructor of a subclass, you cannot access `this` until `super(..)` has been called. The reason is nuanced and complicated, but it boils down to the fact that the parent constructor is actually the one creating/initializing your instance's `this`. Pre-ES6, it works oppositely; the `this` object is created by the "subclass constructor," and then you  call a "parent constructor" with the context of the "subclass" `this`.
+ES6子类构造器的另一个也许令人吃惊的偏差/限制是：在一个子类的构造器中，在`super(..)`被调用之前你不能访问`this`。其中的原因十分微妙和复杂，但是可以归结为是父构造器在实际上创建/初始化你的实例的`this`。前ES6中，它相反地工作；`this`对象被“子类构造器”创建，然后你使用这个“子类”的`this`上下文环境调用“父构造器”。
 
-Let's illustrate. This works pre-ES6:
+让我们展示一下。这是前ES6版本：
 
 ```js
 function Foo() {
@@ -1883,7 +1860,7 @@ function Bar() {
 Bar.prototype = Object.create( Foo.prototype );
 ```
 
-But this ES6 equivalent is not allowed:
+但是这个ES6等价物不允许：
 
 ```js
 class Foo {
@@ -1898,11 +1875,11 @@ class Bar extends Foo {
 }
 ```
 
-In this case, the fix is simple. Just swap the two statements in the subclass `Bar` constructor. However, if you've been relying pre-ES6 on being able to skip calling the "parent constructor," beware because that won't be allowed anymore.
+在这种情况下，修改很简单。只要在子类`Bar`的构造器中调换两个语句的位置就行了。但是，如果你曾经依赖于前ES6可以跳过“父构造器”调用的话，就要小心这不再被允许了。
 
 #### `extend`ing Natives
 
-One of the most heralded benefits to the new `class` and `extend` design is the ability to (finally!) subclass the built-in natives, like `Array`. Consider:
+新的`class`和`extend`设计中最值得被欢呼的好处之一，就是（终于！）能够为内建原生类型，比如`Array`，创建子类。考虑如下代码：
 
 ```js
 class MyCoolArray extends Array {
@@ -1919,11 +1896,11 @@ a.first();					// 1
 a.last();					// 3
 ```
 
-Prior to ES6, a fake "subclass" of `Array` using manual object creation and linking to `Array.prototype` only partially worked. It missed out on the special behaviors of a real array, such as the automatically updating `length` property. ES6 subclasses should fully work with "inherited" and augmented behaviors as expected!
+在ES6之前，可以使用手动的对象创建并将它链接到`Array.prototype`来制造一个`Array`的“子类”的山寨版，但它仅能部分地工作。它缺失了一个真正数组的特殊行为，比如自动地更新`length`属性。ES6子类应该可以如我们盼望的那样使用“继承”与增强的行为来完整地工作！
 
-Another common pre-ES6 "subclass" limitation is with the `Error` object, in creating custom error "subclasses." When genuine `Error` objects are created, they automatically capture special `stack` information, including the line number and file where the error is created. Pre-ES6 custom error "subclasses" have no such special behavior, which severely limits their usefulness.
+另一个常见的前ES6“子类”的限制与`Error`对象有关，在创建自定义的错误“子类”时。当纯粹的`Error`被创建时，它们自动地捕获特殊的`stack`信息，包括错误被创建的行号和文件。前ES6的自定义错误“子类”没有这样的特殊行为，这严重地限制了它们的用处。
 
-ES6 to the rescue:
+ES6前来拯救：
 
 ```js
 class Oops extends Error {
@@ -1938,15 +1915,15 @@ var ouch = new Oops( "I messed up!" );
 throw ouch;
 ```
 
-The `ouch` custom error object in this previous snippet will behave like any other genuine error object, including capturing `stack`. That's a big improvement!
+前面代码段的`ouch`自定义错误对象将会向任何其他的纯粹错误对象那样动作，包括捕获`stack`。这是一个巨大的改进！
 
 ### `new.target`
 
-ES6 introduces a new concept called a *meta property* (see Chapter 7), in the form of `new.target`.
+ES6引入了一个称为 *元属性* 的新概念（见第七章），用`new.target`的形式表示。
 
-If that looks strange, it is; pairing a keyword with a `.` and a property name is definitely an out-of-the-ordinary pattern for JS.
+如果这看起来很奇怪，是的；将一个带有`.`的关键字与一个属性名配成一对，对JS来说绝对是不同寻常的模式。
 
-`new.target` is a new "magical" value available in all functions, though in normal functions it will always be `undefined`. In any constructor, `new.target` always points at the constructor that `new` actually directly invoked, even if the constructor is in a parent class and was delegated to by a `super(..)` call from a child constructor. Consider:
+`new.target`是一个在所有函数中可用的“魔法”值，虽然在普通的函数中它总是`undefined`。在任意的构造器中，`new.target`总是指向`new`实际直接调用的构造器，即便这个构造器是在一个父类中，而且是通过一个在子构造器中的`super(..)`调用被委托的。
 
 ```js
 class Foo {
@@ -1976,15 +1953,15 @@ b.baz();
 // baz: undefined
 ```
 
-The `new.target` meta property doesn't have much purpose in class constructors, except accessing a static property/method (see the next section).
+`new.target`元属性在类构造器中没有太多作用，除了访问一个静态属性/方法（见下一节）。
 
-If `new.target` is `undefined`, you know the function was not called with `new`. You can then force a `new` invocation if that's necessary.
+如果`new.target`是`undefined`，那么你就知道这个函数不是用`new`调用的。然后你就可以强制一个`new`调用，如果有必要的话。
 
 ### `static`
 
-When a subclass `Bar` extends a parent class `Foo`, we already observed that `Bar.prototype` is `[[Prototype]]`-linked to `Foo.prototype`. But additionally, `Bar()` is `[[Prototype]]`-linked to `Foo()`. That part may not have such an obvious reasoning.
+当一个子类`Bar`扩展一个父类`Foo`时，我们已经观察到`Bar.prototype`被`[[Prototype]]`链接到`Foo.prototype`。但是额外地，`Bar()`被`[[Prototype]]`链接到`Foo()`。这部分可能就没有那么明显了。
 
-However, it's quite useful in the case where you declare `static` methods (not just properties) for a class, as these are added directly to that class's function object, not to the function object's `prototype` object. Consider:
+但是，在你为一个类声明`static`方法（不只是属性）时它就十分有用，因为这些静态方法被直接添加到这个类的函数对象上，不是函数对象的`prototype`对象上。考虑如下代码：
 
 ```js
 class Foo {
@@ -2016,13 +1993,17 @@ b.awesome;					// undefined
 b.cool;						// undefined
 ```
 
-Be careful not to get confused that `static` members are on the class's prototype chain. They're actually on the dual/parallel chain between the function constructors.
+小心不要被搞糊涂，认为`static`成员是在类的原型链上的。它们实际上存在与函数构造器中间的一个双重/平行链条上。
 
 #### `Symbol.species` Constructor Getter
 
 One place where `static` can be useful is in setting the `Symbol.species` getter (known internally in the specification as `@@species`) for a derived (child) class. This capability allows a child class to signal to a parent class what constructor should be used -- when not intending the child class's constructor itself -- if any parent class method needs to vend a new instance.
 
+一个`static`可以十分有用的地方是为一个衍生（子）类设置`Symbol.species`getter（在语言规范内部称为`@@species`）。这种能力允许一个子类通知一个父类应当使用什么样的构造器 —— 当不打算使用子类的构造器本身时 —— 如果有任何父类方法需要产生新的实例的话。
+
 For example, many methods on `Array` create and return a new `Array` instance. If you define a derived class from `Array`, but you want those methods to continue to vend actual `Array` instances instead of from your derived class, this works:
+
+举个例子，在`Array`上的许多方法都创建并返回一个新的`Array`实例。如果你从`Array`定义一个衍生的类，但你想让这些方法实际上继续产生`Array`实例，而非从你的衍生类中产生实例，那么这就可以工作：
 
 ```js
 class MyCoolArray extends Array {
@@ -2038,6 +2019,8 @@ b instanceof Array;			// true
 ```
 
 To illustrate how a parent class method can use a child's species declaration somewhat like `Array#map(..)` is doing, consider:
+
+为了展示一个父类方法如何可以有些像`Array#map(..)`所做的那样，使用一个子类型声明，考虑如下代码：
 
 ```js
 class Foo {
@@ -2064,6 +2047,8 @@ y instanceof Foo;					// true
 ```
 
 The parent class `Symbol.species` does `return this` to defer to any derived class, as you'd normally expect. `Bar` then overrides to manually declare `Foo` to be used for such instance creation. Of course, a derived class can still vend instances of itself using `new this.constructor(..)`.
+
+父类的`Symbol.species`使用`return this`来推迟到任意的衍生类，就像你通常期望的那样。然后`Bar`手动地声明`Foo`被用于这样的实例创建。当然，一个衍生的类依然可以使用`new this.constructor(..)`生成它本身的实例。
 
 ## Review
 
