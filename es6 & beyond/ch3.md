@@ -1997,11 +1997,7 @@ b.cool;						// undefined
 
 #### `Symbol.species` Constructor Getter
 
-One place where `static` can be useful is in setting the `Symbol.species` getter (known internally in the specification as `@@species`) for a derived (child) class. This capability allows a child class to signal to a parent class what constructor should be used -- when not intending the child class's constructor itself -- if any parent class method needs to vend a new instance.
-
 一个`static`可以十分有用的地方是为一个衍生（子）类设置`Symbol.species`getter（在语言规范内部称为`@@species`）。这种能力允许一个子类通知一个父类应当使用什么样的构造器 —— 当不打算使用子类的构造器本身时 —— 如果有任何父类方法需要产生新的实例的话。
-
-For example, many methods on `Array` create and return a new `Array` instance. If you define a derived class from `Array`, but you want those methods to continue to vend actual `Array` instances instead of from your derived class, this works:
 
 举个例子，在`Array`上的许多方法都创建并返回一个新的`Array`实例。如果你从`Array`定义一个衍生的类，但你想让这些方法实际上继续产生`Array`实例，而非从你的衍生类中产生实例，那么这就可以工作：
 
@@ -2017,8 +2013,6 @@ var a = new MyCoolArray( 1, 2, 3 ),
 b instanceof MyCoolArray;	// false
 b instanceof Array;			// true
 ```
-
-To illustrate how a parent class method can use a child's species declaration somewhat like `Array#map(..)` is doing, consider:
 
 为了展示一个父类方法如何可以有些像`Array#map(..)`所做的那样，使用一个子类型声明，考虑如下代码：
 
@@ -2046,17 +2040,15 @@ y instanceof Bar;					// false
 y instanceof Foo;					// true
 ```
 
-The parent class `Symbol.species` does `return this` to defer to any derived class, as you'd normally expect. `Bar` then overrides to manually declare `Foo` to be used for such instance creation. Of course, a derived class can still vend instances of itself using `new this.constructor(..)`.
-
 父类的`Symbol.species`使用`return this`来推迟到任意的衍生类，就像你通常期望的那样。然后`Bar`手动地声明`Foo`被用于这样的实例创建。当然，一个衍生的类依然可以使用`new this.constructor(..)`生成它本身的实例。
 
 ## Review
 
-ES6 introduces several new features that aid in code organization:
+ES6引入了几个在代码组织上提供帮助的新特性：
 
-* Iterators provide sequential access to data or operations. They can be consumed by new language features like `for..of` and `...`.
-* Generators are locally pause/resume capable functions controlled by an iterator. They can be used to programmatically (and interactively, through `yield`/`next(..)` message passing) *generate* values to be consumed via iteration.
-* Modules allow private encapsulation of implementation details with a publicly exported API. Module definitions are file-based, singleton instances, and statically resolved at compile time.
-* Classes provide cleaner syntax around prototype-based coding. The addition of `super` also solves tricky issues with relative references in the `[[Prototype]]` chain.
+* 迭代器提供了对数据和操作的序列化访问。它们可以被`for..of`和`...`这样的新语言特性消费。
+* Generator是由一个迭代器控制的能够在本地暂停/继续的函数。它们可以被用于程序化地（并且是互动地，通过`yield`/`next(..)`消息传递） *生成* 通过迭代器被消费的值。
+* 模块允许实现的细节的私有封装带有一个公开导出的API。模块定义是基于文件的，单例的实例，并且在编译时静态地解析。
+* 类为基于原型的编码提供了更干净的语法。`super`的到来也解决了在`[[Prototype]]`链中进行相对引用的刁钻问题。
 
-These new tools should be your first stop when trying to improve the architecture of your JS projects by embracing ES6.
+在你试着通过采纳ES6来改进你的JS项目体系结构时，这些新工具应当是你的第一站。
