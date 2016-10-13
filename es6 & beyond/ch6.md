@@ -3,6 +3,8 @@
 
 From conversions of values to mathematic calculations, ES6 adds many static properties and methods to various built-in natives and objects to help with common tasks. In addition, instances of some of the natives have new capabilities via various new prototype methods.
 
+从值的转换到数学计算，ES6给各种内建原生类型和对象增加了许多静态属性和方法来辅助这些常见任务。
+
 **Note:** Most of these features can be faithfully polyfilled. We will not dive into such details here, but check out "ES6 Shim" (https://github.com/paulmillr/es6-shim/) for standards-compliant shims/polyfills.
 
 ## `Array`
