@@ -1,21 +1,19 @@
 # You Don't Know JS: ES6 & Beyond
 # Chapter 6: API Additions
 
-From conversions of values to mathematic calculations, ES6 adds many static properties and methods to various built-in natives and objects to help with common tasks. In addition, instances of some of the natives have new capabilities via various new prototype methods.
+从值的转换到数学计算，ES6给各种内建原生类型和对象增加了许多静态属性和方法来辅助这些常见任务。另外，一些原生类型的实例通过各种新的原型方法获得了新的能力。
 
-从值的转换到数学计算，ES6给各种内建原生类型和对象增加了许多静态属性和方法来辅助这些常见任务。
-
-**Note:** Most of these features can be faithfully polyfilled. We will not dive into such details here, but check out "ES6 Shim" (https://github.com/paulmillr/es6-shim/) for standards-compliant shims/polyfills.
+**注意：** 大多数这些特性都可以被忠实地填补。我们不会在这里深入这样的细节，但是关于兼容标准的shim/填补，你可以看一下“ES6 Shim”(https://github.com/paulmillr/es6-shim/)。
 
 ## `Array`
 
-One of the most commonly extended features in JS by various user libraries is the Array type. It should be no surprise that ES6 adds a number of helpers to Array, both static and prototype (instance).
+在JS中被各种用户库扩展得最多的特性之一就是数组类型。ES6在数组上增加许多静态的和原型（实例）的帮助功能并不令人惊讶。
 
 ### `Array.of(..)` Static Function
 
-There's a well known gotcha with the `Array(..)` constructor, which is that if there's only one argument passed, and that argument is a number, instead of making an array of one element with that number value in it, it constructs an empty array with a `length` property equal to the number. This action produces the unfortunate and quirky "empty slots" behavior that's reviled about JS arrays.
+`Array(..)`的构造器有一个尽人皆知的坑：如果仅有一个参数值被传递，而且这个参数值是一个数字的话，它并不会制造一个含有一个带有该数值元素的数组，而是构建一个长度等于这个数字的空数组。这种操作造成了不幸的和怪异的“空值槽”行为，而这正是JS数组为人诟病的地方。
 
-`Array.of(..)` replaces `Array(..)` as the preferred function-form constructor for arrays, because `Array.of(..)` does not have that special single-number-argument case. Consider:
+`Array.of(..)`作为数组首选的函数型构造器取代了`Array(..)`，因为`Array.of(..)`没有那种单数字参数值的情况。考虑如下代码：
 
 ```js
 var a = Array( 3 );
@@ -31,11 +29,11 @@ c.length;						// 3
 c;								// [1,2,3]
 ```
 
-Under what circumstances would you want to use `Array.of(..)` instead of just creating an array with literal syntax, like `c = [1,2,3]`? There's two possible cases.
+在什么样的环境下，你才会想要是使用`Array.of(..)`来创建一个数组，而不是使用像`c = [1,2,3]`这样的字面语法呢？有两种可能的情况。
 
-If you have a callback that's supposed to wrap argument(s) passed to it in an array, `Array.of(..)` fits the bill perfectly. That's probably not terribly common, but it may scratch an itch for you.
+如果你有一个回调，传递给它的参数值本应当被包装在一个数组中时，`Array.of(..)`就完美地符合条件。这可能不是那么常见，但是它可以为你的痒处挠上一把。
 
-The other scenario is if you subclass `Array` (see "Classes" in Chapter 3) and want to be able to create and initialize elements in an instance of your subclass, such as:
+另一种场景是如果你扩展`Array`构成它的子类，而且希望能够在一个你的子类的实例中创建和初始化元素，比如：
 
 ```js
 class MyCoolArray extends Array {
@@ -59,13 +57,13 @@ z.length;						// 1
 z.sum();						// 3
 ```
 
-You can't just (easily) create a constructor for `MyCoolArray` that overrides the behavior of the `Array` parent constructor, because that constructor is necessary to actually create a well-behaving array value (initializing the `this`). The "inherited" static `of(..)` method on the `MyCoolArray` subclass provides a nice solution.
+你不能（简单地）只创建一个`MyCoolArray`的构造器，让它覆盖`Array`父构造器的行为，因为这个父构造器对于实际创建一个规范的数组值（初始化`this`）是必要的。在`MyCoolArray`子类上“被继承”的静态`of(..)`方法提供了一个不错的解决方案。
 
 ### `Array.from(..)` Static Function
 
-An "array-like object" in JavaScript is an object that has a `length` property on it, specifically with an integer value of zero or higher.
+在JavaScript中一个“类数组对象”是一个拥有`length`属性的对象，这个属性明确地带有0或跟高的整数值。
 
-These values have been notoriously frustrating to work with in JS; it's been quite common to need to transform them into an actual array, so that the various `Array.prototype` methods (`map(..)`, `indexOf(..)` etc.) are available to use with it. That process usually looks like:
+在JS中处理这些值出了名地让人沮丧；将它们变形为真正的数组曾经是十分常见的做法，有各种`Array.property`方法（`map(..)`，`indexOf(..)`等等）可以用于这个目的。这种处理通常看起来像：
 
 ```js
 // array-like object
@@ -78,13 +76,13 @@ var arrLike = {
 var arr = Array.prototype.slice.call( arrLike );
 ```
 
-Another common task where `slice(..)` is often used is in duplicating a real array:
+另一种`slice(..)`经常被使用的常见任务是，复制一个真正的数组：
 
 ```js
 var arr2 = arr.slice();
 ```
 
-In both cases, the new ES6 `Array.from(..)` method can be a more understandable and graceful -- if also less verbose -- approach:
+在这两种情况下，新的ES6`Array.from(..)`方法是一种更易懂而且更优雅的方式 —— 也不那么冗长：
 
 ```js
 var arr = Array.from( arrLike );
@@ -92,11 +90,11 @@ var arr = Array.from( arrLike );
 var arrCopy = Array.from( arr );
 ```
 
-`Array.from(..)` looks to see if the first argument is an iterable (see "Iterators" in Chapter 3), and if so, it uses the iterator to produce values to "copy" into the returned array. Because real arrays have an iterator for those values, that iterator is automatically used.
+`Array.from(..)`会查看第一个参数值是否是一个可迭代对象（参见第三章的“迭代器”），如果是，它就使用迭代器来产生值，并将这些值“拷贝”到将要被返回的数组中。因为真正的数组拥有一个可以产生这些值的迭代器，所以这个迭代器会被自动地使用。
 
-But if you pass an array-like object as the first argument to `Array.from(..)`, it behaves basically the same as `slice()` (no arguments!) or `apply(..)` does, which is that it simply loops over the value, accessing numerically named properties from `0` up to whatever the value of `length` is.
+但是如果你传递一个类数组对象作为`Array.from(..)`的第一个参数值，它的行为基本上是和`slice()`（不带参数值的！）或`apply()`相同的，它简单地循环所有的值，访问从`0`开始到`length`值的由数字命名的属性。
 
-Consider:
+考虑如下代码：
 
 ```js
 var arrLike = {
@@ -108,9 +106,9 @@ Array.from( arrLike );
 // [ undefined, undefined, "foo", undefined ]
 ```
 
-Because positions `0`, `1`, and `3` didn't exist on `arrLike`, the result was the `undefined` value for each of those slots.
+因为在`arrLike`上不存在位置`0`，`1`，和`3`，所以对这些值槽中的每一个，结果都是`undefined`值。
 
-You could produce a similar outcome like this:
+你也可以这样产生类似的结果：
 
 ```js
 var emptySlotsArr = [];
@@ -123,9 +121,9 @@ Array.from( emptySlotsArr );
 
 #### Avoiding Empty Slots
 
-There's a subtle but important difference in the previous snippet between the `emptySlotsArr` and the result of the `Array.from(..)` call. `Array.from(..)` never produces empty slots.
+前面的代码段中，在`emptySlotsArr`和`Array.from(..)`调用的结果有一个微妙但重要的不同。`Array.from(..)`从不产生空值槽。
 
-Prior to ES6, if you wanted to produce an array initialized to a certain length with actual `undefined` values in each slot (no empty slots!), you had to do extra work:
+在ES6之前，如果你想要制造一个被初始化为在每个值槽中使用实际`undefined`值（不是空值槽！）的特定长数组，你不得不做一些额外的工作：
 
 ```js
 var a = Array( 4 );								// four empty slots!
@@ -133,17 +131,17 @@ var a = Array( 4 );								// four empty slots!
 var b = Array.apply( null, { length: 4 } );		// four `undefined` values
 ```
 
-But `Array.from(..)` now makes this easier:
+但现在`Array.from(..)`是这件事简单了些：
 
 ```js
 var c = Array.from( { length: 4 } );			// four `undefined` values
 ```
 
-**Warning:** Using an empty slot array like `a` in the previous snippets would work with some array functions, but others ignore empty slots (like `map(..)`, etc.). You should never intentionally work with empty slots, as it will almost certainly lead to strange/unpredictable behavior in your programs.
+**警告：** 使用一个像前面代码段中的`a`那样的空值槽数组可以与一些数组函数工作，但是其他的函数会忽略空值槽（比如`map(..)`等）。你永远不应该刻意地使用空值槽，因为它几乎可能会在你的程序中导致奇怪/不可预料的行为。
 
 #### Mapping
 
-The `Array.from(..)` utility has another helpful trick up its sleeve. The second argument, if provided, is a mapping callback (almost the same as the regular `Array#map(..)` expects) which is called to map/transform each value from the source to the returned target. Consider:
+`Array.from(..)`工具还有另外一个绝技。第二个参数值，如果被提供的话，是一个映射函数（和普通的`Array#map(..)`几乎相同），它在将每个源值映射/变形为返回的目标值时调用。考虑如下代码：
 
 ```js
 var arrLike = {
@@ -162,13 +160,13 @@ Array.from( arrLike, function mapper(val,idx){
 // [ 0, 1, "FOO", 3 ]
 ```
 
-**Note:** As with other array methods that take callbacks, `Array.from(..)` takes an optional third argument that if set will specify the `this` binding for the callback passed as the second argument. Otherwise, `this` will be `undefined`.
+**注意：** 就像其他接收回调的数组方法一样，`Array.from(..)`接收可选的第三个参数值，它将被指定为作为第二个参数传递的回调的`this`绑定。否则，`this`将是`undefined`。
 
-See "TypedArrays" in Chapter 5 for an example of using `Array.from(..)` in translating values from an array of 8-bit values to an array of 16-bit values.
+一个使用`Array.from(..)`将一个8位值数组翻译为16位值数组的例子，参见第五章的“类型化数组”。
 
 ### Creating Arrays and Subtypes
 
-In the last couple of sections, we've discussed `Array.of(..)` and `Array.from(..)`, both of which create a new array in a similar way to a constructor. But what do they do in subclasses? Do they create instances of the base `Array` or the derived subclass?
+在前面几节中，我们讨论了`Array.of(..)`和`Array.from(..)`，它们都用与构造器相似的方法创建一个新数组。但是在子类中它们会怎么做？它们是创建基本`Array`的实例，还是创建衍生的子类的实例？
 
 ```js
 class MyCoolArray extends Array {
@@ -182,9 +180,9 @@ Array.from(
 ) instanceof MyCoolArray;							// false
 ```
 
-Both `of(..)` and `from(..)` use the constructor that they're accessed from to construct the array. So if you use the base `Array.of(..)` you'll get an `Array` instance, but if you use `MyCoolArray.of(..)`, you'll get a `MyCoolArray` instance.
+`of(..)`和`from(..)`都使用它们被访问时的构造器来构建数组。所以如果你使用基本的`Array.of(..)`你将得到`Array`实例，但如果你使用`MyCoolArray.of(..)`，你将得到一个`MyCoolArray`实例。
 
-In "Classes" in Chapter 3, we covered the `@@species` setting which all the built-in classes (like `Array`) have defined, which is used by any prototype methods if they create a new instance. `slice(..)` is a great example:
+在第三章的“类”中，我们讲解了在所有内建类（比如`Array`）中定义好的`@@species`设定，它被用于任何创建新实例的原型方法。`slice(..)`是一个很棒的例子：
 
 ```js
 var x = new MyCoolArray( 1, 2, 3 );
@@ -192,7 +190,7 @@ var x = new MyCoolArray( 1, 2, 3 );
 x.slice( 1 ) instanceof MyCoolArray;				// true
 ```
 
-Generally, that default behavior will probably be desired, but as we discussed in Chapter 3, you *can* override if you want:
+一般来说，这种默认行为将可能是你想要的，但是正如我们在第三站中讨论过的，如果你想的话你 *可以* 覆盖它：
 
 ```js
 class MyCoolArray extends Array {
@@ -206,7 +204,7 @@ x.slice( 1 ) instanceof MyCoolArray;				// false
 x.slice( 1 ) instanceof Array;						// true
 ```
 
-It's important to note that the `@@species` setting is only used for the prototype methods, like `slice(..)`. It's not used by `of(..)` and `from(..)`; they both just use the `this` binding (whatever constructor is used to make the reference). Consider:
+要注意的是，`@@species`设定仅用于原型方法，比如`slice(..)`。`of(..)`和`from(..)`不使用它；它们俩都只使用`this`绑定（哪个构造器被用于发起引用）。考虑如下代码：
 
 ```js
 class MyCoolArray extends Array {
@@ -222,11 +220,11 @@ MyCoolArray.of( [2, 3] ) instanceof MyCoolArray;	// true
 
 ### `copyWithin(..)` Prototype Method
 
-`Array#copyWithin(..)` is a new mutator method available to all arrays (including Typed Arrays; see Chapter 5). `copyWithin(..)` copies a portion of an array to another location in the same array, overwriting whatever was there before.
+`Array#copyWithin(..)`是一个对所有数组可用的新修改器方法（包括类型化数组；参加第五章）。`copyWithin(..)`将数组的一部分拷贝到同一个数组的其他位置，覆盖之前存在在哪里的任何东西。
 
-The arguments are *target* (the index to copy to), *start* (the inclusive index to start the copying from), and optionally *end* (the exclusive index to stop copying). If any of the arguments are negative, they're taken to be relative from the end of the array.
+它的参数值是 *目标*（要被拷贝到的索引位置），*开始*（拷贝开始的索引位置（含）），和可选的*结束*（拷贝结束的索引位置（不含））。如果这些参数值中存在任何负数，那么它们就被认为是相对于数组的末尾。
 
-Consider:
+考虑如下代码：
 
 ```js
 [1,2,3,4,5].copyWithin( 3, 0 );			// [1,2,3,1,2]
@@ -238,23 +236,23 @@ Consider:
 [1,2,3,4,5].copyWithin( 0, -2, -1 );	// [4,2,3,4,5]
 ```
 
-The `copyWithin(..)` method does not extend the array's length, as the first example in the previous snippet shows. Copying simply stops when the end of the array is reached.
+`copyWithin(..)`方法不会扩张数组的长度，就像前面代码段中的第一个例子展示的。当到达数组的末尾时拷贝就会停止。
 
-Contrary to what you might think, the copying doesn't always go in left-to-right (ascending index) order. It's possible this would result in repeatedly copying an already copied value if the from and target ranges overlap, which is presumably not desired behavior.
+与你可能想象的不同，拷贝的顺序并不总是从左到右的。如果起始位置与目标为重叠的话，它有可能造成已经被拷贝过的值被重复拷贝，这大概不是你期望的行为。
 
-So internally, the algorithm avoids this case by copying in reverse order to avoid that gotcha. Consider:
+所以在这种情况下，算法内部通过相反的拷贝顺序来避免这个坑。考虑如下代码：
 
 ```js
 [1,2,3,4,5].copyWithin( 2, 1 );		// ???
 ```
 
-If the algorithm was strictly moving left to right, then the `2` should be copied to overwrite the `3`, then *that* copied `2` should be copied to overwrite `4`, then *that* copied `2` should be copied to overwrite `5`, and you'd end up with `[1,2,2,2,2]`.
+如果算法是严格的从左到右，那么`2`应当被拷贝来覆盖`3`，然后这个被拷贝的`2`应当被拷贝来覆盖`4`，然后这个被拷贝的`2`应当被拷贝来覆盖`5`，而你最终会得到`[1,2,2,2,2]`。
 
-Instead, the copying algorithm reverses direction and copies `4` to overwrite `5`, then copies `3` to overwrite `4`, then copies `2` to overwrite `3`, and the final result is `[1,2,2,3,4]`. That's probably more "correct" in terms of expectation, but it can be confusing if you're only thinking about the copying algorithm in a naive left-to-right fashion.
+于此不同的是，拷贝算法把方向反转过来，拷贝`4`来覆盖`5`，然后拷贝`3`来覆盖`4`，然后拷贝`2`来覆盖`3`，而最后的记过是`[1,2,2,3,4]`。就期待的结果而言这可能更“正确”，但是如果你仅以单纯的从左到右的方式考虑拷贝算法的话，它就可能让人糊涂。
 
 ### `fill(..)` Prototype Method
 
-Filling an existing array entirely (or partially) with a specified value is natively supported as of ES6 with the `Array#fill(..)` method:
+ES6中的`Array#fill(..)`方法原生地支持使用一个指定的值来完全地（或部分地）填充一个既存的数组：
 
 ```js
 var a = Array( 4 ).fill( undefined );
@@ -262,7 +260,7 @@ a;
 // [undefined,undefined,undefined,undefined]
 ```
 
-`fill(..)` optionally takes *start* and *end* parameters, which indicate a subset portion of the array to fill, such as:
+`fill(..)`可选地接收 *开始* 与 *结束* 参数，它们指示要被填充的数组的一部分，比如：
 
 ```js
 var a = [ null, null, null, null ].fill( 42, 1, 3 );
@@ -272,7 +270,7 @@ a;									// [null,42,42,null]
 
 ### `find(..)` Prototype Method
 
-The most common way to search for a value in an array has generally been the `indexOf(..)` method, which returns the index the value is found at or `-1` if not found:
+一般来说，在一个数组中搜索一个值的最常见方法曾经是`indexOf(..)`方法，如果值被找到的话它返回值的位置索引，没有找到的话返回`-1`：
 
 ```js
 var a = [1,2,3,4,5];
@@ -285,9 +283,15 @@ var a = [1,2,3,4,5];
 
 The `indexOf(..)` comparison requires a strict `===` match, so a search for `"2"` fails to find a value of `2`, and vice versa. There's no way to override the matching algorithm for `indexOf(..)`. It's also unfortunate/ungraceful to have to make the manual comparison to the `-1` value.
 
+`indexOf(..)`比较要求一个严格`===`匹配，所以搜索`"2"`找不到值`2`，反之亦然。没有办法覆盖`indexOf(..)`的匹配算法。不得不手动与值`-1`进行比较也很不幸/不优雅。
+
 **Tip:** See the *Types & Grammar* title of this series for an interesting (and controversially confusing) technique to work around the `-1` ugliness with the `~` operator.
 
+**提示：** 一个使用`~`操作符来绕过难看的`-1`的有趣（而且争议性地令人糊涂）技术，参见本系列的 *类型与文法*。
+
 Since ES5, the most common workaround to have control over the matching logic has been the `some(..)` method. It works by calling a function callback for each element, until one of those calls returns a `true`/truthy value, and then it stops. Because you get to define the callback function, you have full control over how a match is made:
+
+从ES5开始，一个可以
 
 ```js
 var a = [1,2,3,4,5];
