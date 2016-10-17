@@ -910,7 +910,7 @@ Wouldn't you generally agree that we simplified the type conversion here to redu
 
 Some would argue, at least in some circumstances, yes. But I think an equal argument can be made of many other circumstances that here, the simplification **actually aids in the readability of the code** by abstracting or hiding away such details, either in the language itself or in our own abstractions.
 
-Undoubtedly, behind the scenes, somewhere, the intermediate conversion step is still happening. But if that detail is hidden from view here, we can just reason about getting `y` to type `SomeType` as an generic operation and hide the messy details.
+Undoubtedly, behind the scenes, somewhere, the intermediate conversion step is still happening. But if that detail is hidden from view here, we can just reason about getting `y` to type `SomeType` as a generic operation and hide the messy details.
 
 While not a perfect analogy, what I'm going to argue throughout the rest of this chapter is that JS *implicit* coercion can be thought of as providing a similar aid to your code.
 
@@ -1002,7 +1002,7 @@ Generally, this sort of gotcha won't bite you unless you're really trying to cre
 
 What about the other direction? How can we *implicitly coerce* from `string` to `number`?
 
-```
+```js
 var a = "3.14";
 var b = a - 0;
 
