@@ -281,17 +281,11 @@ var a = [1,2,3,4,5];
 (a.indexOf( "2" ) != -1);			// false
 ```
 
-The `indexOf(..)` comparison requires a strict `===` match, so a search for `"2"` fails to find a value of `2`, and vice versa. There's no way to override the matching algorithm for `indexOf(..)`. It's also unfortunate/ungraceful to have to make the manual comparison to the `-1` value.
-
 `indexOf(..)`比较要求一个严格`===`匹配，所以搜索`"2"`找不到值`2`，反之亦然。没有办法覆盖`indexOf(..)`的匹配算法。不得不手动与值`-1`进行比较也很不幸/不优雅。
-
-**Tip:** See the *Types & Grammar* title of this series for an interesting (and controversially confusing) technique to work around the `-1` ugliness with the `~` operator.
 
 **提示：** 一个使用`~`操作符来绕过难看的`-1`的有趣（而且争议性地令人糊涂）技术，参见本系列的 *类型与文法*。
 
-Since ES5, the most common workaround to have control over the matching logic has been the `some(..)` method. It works by calling a function callback for each element, until one of those calls returns a `true`/truthy value, and then it stops. Because you get to define the callback function, you have full control over how a match is made:
-
-从ES5开始，一个可以
+从ES5开始，控制匹配逻辑的最常见的迂回方法是`some(..)`。它的工作方式是为每一个元素调用一个回调函数，直到这些调用中的一个返回`true`/truthy值，然后它就会停止。因为是由你来定义这个回调函数，所以你就拥有了如何做出匹配的完全控制权：
 
 ```js
 var a = [1,2,3,4,5];
@@ -305,9 +299,9 @@ a.some( function matcher(v){
 } );								// false
 ```
 
-But the downside to this approach is that you only get the `true`/`false` indicating if a suitably matched value was found, but not what the actual matched value was.
+但这种方式的缺陷是你只能使用`true`/`false`来指示是否找到了合适的匹配值，而不是实际被匹配的值。
 
-ES6's `find(..)` addresses this. It works basically the same as `some(..)`, except that once the callback returns a `true`/truthy value, the actual array value is returned:
+ES6的`find(..)`解决了这个问题。它的工作方式基本上与`some(..)`相同，除了一旦回调返回一个`true`/truthy值，实际的数组值就会被返回：
 
 ```js
 var a = [1,2,3,4,5];
@@ -321,7 +315,7 @@ a.find( function matcher(v){
 });
 ```
 
-Using a custom `matcher(..)` function also lets you match against complex values like objects:
+使用一个自定义的`matcher(..)`函数还允许你与对象这样的复杂值进行匹配：
 
 ```js
 var points = [
@@ -340,13 +334,13 @@ points.find( function matcher(point) {
 } );								// { x: 30, y: 40 }
 ```
 
-**Note:** As with other array methods that take callbacks, `find(..)` takes an optional second argument that if set will specify the `this` binding for the callback passed as the first argument. Otherwise, `this` will be `undefined`.
+**注意：** 和其他接收回调的数组方法一样，`find(..)`接收一个可选的第二参数。如果它被设置了的话，就将被指定为作为第一个参数传递的回调的`this`绑定。否则，`this`将是`undefined`。
 
 ### `findIndex(..)` Prototype Method
 
-While the previous section illustrates how `some(..)` yields a boolean result for a search of an array, and `find(..)` yields the matched value itself from the array search, there's also a need for finding the positional index of the matched value.
+虽然前一节展示了`some(..)`如何在一个数组检索给出一个Boolean结果，和`find(..)`如何从数组检索中给出匹配的值，但是还有一种需求是寻找匹配的值的位置索引。
 
-`indexOf(..)` does that, but there's no control over its matching logic; it always uses `===` strict equality. So ES6's `findIndex(..)` is the answer:
+`indexOf(..)`可以完成这个任务，但是没有办法控制它的匹配逻辑；它总是使用`===`严格等价。所以ES6的`findIndex(..)`才是答案：
 
 ```js
 var points = [
@@ -372,15 +366,15 @@ points.findIndex( function matcher(point) {
 } );								// -1
 ```
 
-Don't use `findIndex(..) != -1` (the way it's always been done with `indexOf(..)`) to get a boolean from the search, because `some(..)` already yields the `true`/`false` you want. And don't do `a[ a.findIndex(..) ]` to get the matched value, because that's what `find(..)` accomplishes. And finally, use `indexOf(..)` if you need the index of a strict match, or `findIndex(..)` if you need the index of a more customized match.
+不要使用`findIndex(..) != -1`（在`indexOf(..)`中经常这么干）来从检索中取得一个boolean，因为`some(..)`已经给出了你想要的`true`/`false`了。而且也不要用`a[ a.findIndex(..) ]`来取得一个匹配的值，因为这是`find(..)`完成的任务。最后，如果你需要严格匹配的索引，就使用`indexOf(..)`，如果你需要一个更加定制化的匹配，就使用`findIndex(..)`。
 
-**Note:** As with other array methods that take callbacks, `find(..)` takes an optional second argument that if set will specify the `this` binding for the callback passed as the first argument. Otherwise, `this` will be `undefined`.
+**注意：** 和其他接收回调的数组方法一样，`find(..)`接收一个可选的第二参数。如果它被设置了的话，就将被指定为作为第一个参数传递的回调的`this`绑定。否则，`this`将是`undefined`。
 
 ### `entries()`, `values()`, `keys()` Prototype Methods
 
-In Chapter 3, we illustrated how data structures can provide a patterned item-by-item enumeration of their values, via an iterator. We then expounded on this approach in Chapter 5, as we explored how the new ES6 collections (Map, Set, etc.) provide several methods for producing different kinds of iterations.
+在第三章中，我们展示了数据结构如何通过一个迭代器来提供一种模拟逐个值的迭代。然后我们在第五章探索新的ES6集合（Map，Set，等）如何为了产生不同种类的迭代器而提供几种方法时阐述了这种方式。
 
-Because it's not new to ES6, `Array` might not be thought of traditionally as a "collection," but it is one in the sense that it provides these same iterator methods: `entries()`, `values()`, and `keys()`. Consider:
+因为`Array`并不是ES6的新东西，所以它可能不被认为是一个传统意义上的“集合”，但是在它提供了相同的迭代器方法：`entries()`，`values()`，和`keys()`的意义上它是的。考虑如下代码：
 
 ```js
 var a = [1,2,3];
@@ -392,9 +386,9 @@ var a = [1,2,3];
 [...a[Symbol.iterator]()];			// [1,2,3]
 ```
 
-Just like with `Set`, the default `Array` iterator is the same as what `values()` returns.
+就像`Set`一样，默认的`Array`迭代器与`values()`放回的东西相同。
 
-In "Avoiding Empty Slots" earlier in this chapter, we illustrated how `Array.from(..)` treats empty slots in an array as just being present slots with `undefined` in them. That's actually because under the covers, the array iterators behave that way:
+在本章早先的“避免空值槽”一节中，我们展示了`Array.from(..)`如何将一个数组中的空值槽看作带有`undefined`的存在值槽。其实际的原因是，在底层数组迭代器就是以这种方式动作的：
 
 ```js
 var a = [];
@@ -408,17 +402,17 @@ a[1] = 2;
 
 ## `Object`
 
-A few additional static helpers have been added to `Object`. Traditionally, functions of this sort have been seen as focused on the behaviors/capabilities of object values.
+几个额外的静态帮助方法已经被加入`Object`。从传统意义上讲，这种种类的函数是关注于对象值的行为/能力的。
 
-However, starting with ES6, `Object` static functions will also be for general-purpose global APIs of any sort that don't already belong more naturally in some other location (i.e., `Array.from(..)`).
+但是，从ES6开始，`Object`静态函数还用于任意种类的通用全局API —— 那些还没有更自然地存在于其他的某些位置的API（例如，`Array.from(..)`）。
 
 ### `Object.is(..)` Static Function
 
-The `Object.is(..)` static function makes value comparisons in an even more strict fashion than the `===` comparison.
+`Object.is(..)`静态函数进行值的比较，它的风格甚至要比`===`比较还要严格。
 
-`Object.is(..)` invokes the underlying `SameValue` algorithm (ES6 spec, section 7.2.9). The `SameValue` algorithm is basically the same as the `===` Strict Equality Comparison Algorithm (ES6 spec, section 7.2.13), with two important exceptions.
+`Object(..)`调用底层的`SameValue`算法（ES6语言规范，第7.2.9节）。`SameValue`算法基本上与`===`严格等价比较算法相同（ES6语言规范，第7.2.13节），但是带有两个重要的例外。
 
-Consider:
+考虑如下代码：
 
 ```js
 var x = NaN, y = 0, z = -0;
@@ -430,15 +424,19 @@ Object.is( x, x );					// true
 Object.is( y, z );					// false
 ```
 
-You should continue to use `===` for strict equality comparisons; `Object.is(..)` shouldn't be thought of as a replacement for the operator. However, in cases where you're trying to strictly identify a `NaN` or `-0` value, `Object.is(..)` is now the preferred option.
+你应当为严格等价性比较继续使用`===`；`Object.is(..)`不应当被认为是这个操作符的替代品。但是，在你想要严格地识别`NaN`或`-0`值的情况下，`Object.is(..)`是现在的首选方式。
 
-**Note:** ES6 also adds a `Number.isNaN(..)` utility (discussed later in this chapter) which may be a slightly more convenient test; you may prefer `Number.isNaN(x)` over `Object.is(x,NaN)`. You *can* accurately test for `-0` with a clumsy `x == 0 && 1 / x === -Infinity`, but in this case `Object.is(x,-0)` is much better.
+**注意：** ES6还增加了一个`Number.isNaN(..)`工具（在本章稍后讨论），它可能是一个稍稍方便一些的测试；比起`Object.is(x, NaN)`你可能更偏好`Number.isNaN(x)`。你 *可以* 使用笨拙的`x == 0 && 1 / x === -Infinity`来准确地测试`-0`，但在这种情况下`Object.is(x,-0)`要好得多。
 
 ### `Object.getOwnPropertySymbols(..)` Static Function
 
 The "Symbols" section in Chapter 2 discusses the new Symbol primitive value type in ES6.
 
+第二章中的“Symbol”一节讨论了ES6中的新Symbol基本值类型。
+
 Symbols are likely going to be mostly used as special (meta) properties on objects. So the `Object.getOwnPropertySymbols(..)` utility was introduced, which retrieves only the symbol properties directly on an object:
+
+Symbol可能将是在对象上最经常被使用的特殊（元）属性。所以引入了`Object.getOwnPropertySymbols(..)`，它仅取回直接存在于对象上的symbol属性：
 
 ```js
 var o = {
@@ -453,6 +451,8 @@ Object.getOwnPropertySymbols( o );	// [ Symbol(bar) ]
 ### `Object.setPrototypeOf(..)` Static Function
 
 Also in Chapter 2, we mentioned the `Object.setPrototypeOf(..)` utility, which (unsurprisingly) sets the `[[Prototype]]` of an object for the purposes of *behavior delegation* (see the *this & Object Prototypes* title of this series). Consider:
+
+还是在第二章中，我们提到了`Object.setPrototypeOf(..)`工具，它为了 *行为委托* 的目的（意料之中地）设置一个对象的`[[Prototype]]`（参见本系列的 *this与对象原型*）。考虑如下代码：
 
 ```js
 var o1 = {
@@ -470,6 +470,8 @@ o2.foo();							// foo
 
 Alternatively:
 
+另一中方式：
+
 ```js
 var o1 = {
 	foo() { console.log( "foo" ); }
@@ -485,7 +487,11 @@ o2.foo();							// foo
 
 In both previous snippets, the relationship between `o2` and `o1` appears at the end of the `o2` definition. More commonly, the relationship between an `o2` and `o1` is specified at the top of the `o2` definition, as it is with classes, and also with `__proto__` in object literals (see "Setting `[[Prototype]]`" in Chapter 2).
 
+在前面两个代码段中，`o2`和`o1`之间的关系都出现在`o2`定义的末尾。更常见的是，`o2`和`o1`之间的关系在`o2`定义的上面被指定，就像在类中，而且在对象字面量的`__proto__`中也是这样（参见第二章的“设置`[[Prototype]]`”）。
+
 **Warning:** Setting a `[[Prototype]]` right after object creation is reasonable, as shown. But changing it much later is generally not a good idea and will usually lead to more confusion than clarity.
+
+**警告：** 正如展示的那样，在对象创建之后立即设置`[[Prototype]]`是合理的。但是在很久之后才改变它一般不是一个好主意，而且经常会导致困惑而非清晰。
 
 ### `Object.assign(..)` Static Function
 
