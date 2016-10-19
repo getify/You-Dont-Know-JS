@@ -430,11 +430,7 @@ Object.is( y, z );					// false
 
 ### `Object.getOwnPropertySymbols(..)` Static Function
 
-The "Symbols" section in Chapter 2 discusses the new Symbol primitive value type in ES6.
-
 第二章中的“Symbol”一节讨论了ES6中的新Symbol基本值类型。
-
-Symbols are likely going to be mostly used as special (meta) properties on objects. So the `Object.getOwnPropertySymbols(..)` utility was introduced, which retrieves only the symbol properties directly on an object:
 
 Symbol可能将是在对象上最经常被使用的特殊（元）属性。所以引入了`Object.getOwnPropertySymbols(..)`，它仅取回直接存在于对象上的symbol属性：
 
@@ -449,8 +445,6 @@ Object.getOwnPropertySymbols( o );	// [ Symbol(bar) ]
 ```
 
 ### `Object.setPrototypeOf(..)` Static Function
-
-Also in Chapter 2, we mentioned the `Object.setPrototypeOf(..)` utility, which (unsurprisingly) sets the `[[Prototype]]` of an object for the purposes of *behavior delegation* (see the *this & Object Prototypes* title of this series). Consider:
 
 还是在第二章中，我们提到了`Object.setPrototypeOf(..)`工具，它为了 *行为委托* 的目的（意料之中地）设置一个对象的`[[Prototype]]`（参见本系列的 *this与对象原型*）。考虑如下代码：
 
@@ -485,21 +479,17 @@ var o2 = Object.setPrototypeOf( {
 o2.foo();							// foo
 ```
 
-In both previous snippets, the relationship between `o2` and `o1` appears at the end of the `o2` definition. More commonly, the relationship between an `o2` and `o1` is specified at the top of the `o2` definition, as it is with classes, and also with `__proto__` in object literals (see "Setting `[[Prototype]]`" in Chapter 2).
-
 在前面两个代码段中，`o2`和`o1`之间的关系都出现在`o2`定义的末尾。更常见的是，`o2`和`o1`之间的关系在`o2`定义的上面被指定，就像在类中，而且在对象字面量的`__proto__`中也是这样（参见第二章的“设置`[[Prototype]]`”）。
-
-**Warning:** Setting a `[[Prototype]]` right after object creation is reasonable, as shown. But changing it much later is generally not a good idea and will usually lead to more confusion than clarity.
 
 **警告：** 正如展示的那样，在对象创建之后立即设置`[[Prototype]]`是合理的。但是在很久之后才改变它一般不是一个好主意，而且经常会导致困惑而非清晰。
 
 ### `Object.assign(..)` Static Function
 
-Many JavaScript libraries/frameworks provide utilities for copying/mixing one object's properties into another (e.g., jQuery's `extend(..)`). There are various nuanced differences between these different utilities, such as whether a property with value `undefined` is ignored or not.
+许多JavaScript库/框架都提供将一个对象的属性拷贝/混合到另一个对象中的工具（例如，jQuery的`extend(..)`）。在这些不同的工具中存在着各种微妙的区别，比如一个拥有`undefined`值的属性是否被忽略。
 
-ES6 adds `Object.assign(..)`, which is a simplified version of these algorithms. The first argument is the *target*, and any other arguments passed are the *sources*, which will be processed in listed order. For each source, its enumerable and own (e.g., not "inherited") keys, including symbols, are copied as if by plain `=` assignment. `Object.assign(..)` returns the target object.
+ES6增加了`Object.assign(..)`，它是这些算法的一个简化版本。第一个参数是 *目标对象* 而所有其他的参数是 *源对象*，它们会按照罗列的顺序被处理。对每一个源对象，它自己的（也就是，不是“继承的”）可枚举键，包括symbol，将会好像通过普通`=`赋值那样拷贝。`Object.assign(..)`返回目标对象。
 
-Consider this object setup:
+考虑这种对象构成：
 
 ```js
 var target = {},
@@ -531,7 +521,7 @@ Object.defineProperty( o3, Symbol( "h" ), {
 Object.setPrototypeOf( o3, o4 );
 ```
 
-Only the properties `a`, `b`, `c`, `e`, and `Symbol("g")` will be copied to `target`:
+仅有属性`a`，`b`，`c`，`e`，和`Symbol("g")`将被拷贝到`target`：
 
 ```js
 Object.assign( target, o1, o2, o3 );
@@ -548,9 +538,9 @@ Object.getOwnPropertySymbols( target );
 // [Symbol("g")]
 ```
 
-The `d`, `f`, and `Symbol("h")` properties are omitted from copying; non-enumerable properties and non-owned properties are all excluded from the assignment. Also, `e` is copied as a normal property assignment, not duplicated as a read-only property.
+属性`d`，`f`，和`Symbol("h")`在拷贝中被忽略了；非枚举属性和非自身属性将会被排除在赋值之外。另外，`e`作为一个普通属性赋值被拷贝，而不是作为一个只读属性被复制。
 
-In an earlier section, we showed using `setPrototypeOf(..)` to set up a `[[Prototype]]` relationship between an `o2` and `o1` object. There's another form that leverages `Object.assign(..)`:
+在早先一节中，我们展示了使用`setPrototypeOf(..)`来在对象`o2`和`o1`之间建立一个`[[Prototype]]`关系。这是利用`Object.assign(..)`的另外一种形式：
 
 ```js
 var o1 = {
@@ -568,45 +558,49 @@ var o2 = Object.assign(
 o2.foo();							// foo
 ```
 
-**Note:** `Object.create(..)` is the ES5 standard utility that creates an empty object that is `[[Prototype]]`-linked. See the *this & Object Prototypes* title of this series for more information.
+**注意：** `Object.create(..)`是一个ES5标准工具，它创建一个`[[Prototype]]`链接好的空对象。更多信息参见本系列的 *this与对象原型*。
 
 ## `Math`
 
-ES6 adds several new mathematic utilities that fill in holes or aid with common operations. All of these can be manually calculated, but most of them are now defined natively so that in some cases the JS engine can either more optimally perform the calculations, or perform them with better decimal precision than their manual counterparts.
+ES6增加了几种新的数学工具，它们协助或填补了常见操作的空白。所有这些操作都可以被手动计算，但是它们中的大多数现在都被原生地定义，这样JS引擎就可以优化计算的性能，或者进行与手动计算比起来小数精度更高的计算。
 
-It's likely that asm.js/transpiled JS code (see the *Async & Performance* title of this series) is the more likely consumer of many of these utilities rather than direct developers.
+与直接的开发者相比，asm.js/转译的JS代码（参见本系列的 *异步与性能*）更可能是这些工具的使用者。
 
-Trigonometry:
+三角函数：
 
-* `cosh(..)` - Hyperbolic cosine
-* `acosh(..)` - Hyperbolic arccosine
-* `sinh(..)` - Hyperbolic sine
-* `asinh(..)` - Hyperbolic arcsine
-* `tanh(..)` - Hyperbolic tangent
-* `atanh(..)` - Hyperbolic arctangent
-* `hypot(..)` - The squareroot of the sum of the squares (i.e., the generalized Pythagorean theorem)
+* `cosh(..)` - 双曲余弦
+* `acosh(..)` - 双曲反余弦
+* `sinh(..)` - 双曲正弦
+* `asinh(..)` - 双曲反正弦
+* `tanh(..)` - 双曲正切
+* `atanh(..)` - 双曲反正切
+* `hypot(..)` - 平方和的平方根（也就是，广义勾股定理）
 
-Arithmetic:
+算数函数：
 
-* `cbrt(..)` - Cube root
-* `clz32(..)` - Count leading zeros in 32-bit binary representation
-* `expm1(..)` - The same as `exp(x) - 1`
-* `log2(..)` - Binary logarithm (log base 2)
-* `log10(..)` - Log base 10
-* `log1p(..)` - The same as `log(x + 1)`
-* `imul(..)` - 32-bit integer multiplication of two numbers
+* `cbrt(..)` - 立方根
+* `clz32(..)` - 计数32位二进制表达中前缀的零
+* `expm1(..)` - 与`exp(x) - 1`相同
+* `log2(..)` - 二进制对数（以2为底的对数）
+* `log10(..)` - 以10为底的对数
+* `log1p(..)` - 与`log(x + 1)`相同
+* `imul(..)` - 两个数字的32为整数乘法
 
-Meta:
+元函数：
 
-* `sign(..)` - Returns the sign of the number
-* `trunc(..)` - Returns only the integer part of a number
-* `fround(..)` - Rounds to nearest 32-bit (single precision) floating-point value
+* `sign(..)` - 返回数字的符号
+* `trunc(..)` - 仅返回一个数字的整数部分
+* `fround(..)` - 舍入到最接近的32位（单精度）浮点数值
 
 ## `Number`
 
 Importantly, for your program to properly work, it must accurately handle numbers. ES6 adds some additional properties and functions to assist with common numeric operations.
 
+重要的是，为了你的程序能够正常工作，它必须准确地处理数字。ES6增加了一些额外的属性和函数来辅助常见的数字操作：
+
 Two additions to `Number` are just references to the preexisting globals: `Number.parseInt(..)` and `Number.parseFloat(..)`.
+
+
 
 ### Static Properties
 
