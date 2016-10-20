@@ -20,6 +20,7 @@ As we asserted in Chapter 1, JavaScript has typed values, not typed variables. T
 * `boolean`
 * `null` and `undefined`
 * `object`
+* `function`
 * `symbol` (new to ES6)
 
 JavaScript provides a `typeof` operator that can examine a value and tell you what type it is:
@@ -45,6 +46,11 @@ typeof a;				// "undefined"
 
 a = { b: "c" };
 typeof a;				// "object"
+
+a = function () {
+    console.log("hello world");
+};
+typeof a;				// "function"
 ```
 
 The return value from the `typeof` operator is always one of six (seven as of ES6! - the "symbol" type) string values. That is, `typeof "abc"` returns `"string"`, not `string`.
