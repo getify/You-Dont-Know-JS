@@ -594,27 +594,23 @@ ES6增加了几种新的数学工具，它们协助或填补了常见操作的�
 
 ## `Number`
 
-Importantly, for your program to properly work, it must accurately handle numbers. ES6 adds some additional properties and functions to assist with common numeric operations.
+重要的是，为了你的程序能够正常工作，它必须准确地处理数字。ES6增加了一些额外的属性和函数来辅助常见的数字操作。
 
-重要的是，为了你的程序能够正常工作，它必须准确地处理数字。ES6增加了一些额外的属性和函数来辅助常见的数字操作：
-
-Two additions to `Number` are just references to the preexisting globals: `Number.parseInt(..)` and `Number.parseFloat(..)`.
-
-
+两个在`Number`上新增的功能只是既存全局函数的引用：`Number.parseInt(..)`和`Number.parseFloat(..)`。
 
 ### Static Properties
 
-ES6 adds some helpful numeric constants as static properties:
+ES6以静态属性的形式增加了一些有用的数字常数：
 
-* `Number.EPSILON` - The minimum value between any two numbers: `2^-52` (see Chapter 2 of the *Types & Grammar* title of this series regarding using this value as a tolerance for imprecision in floating-point arithmetic)
-* `Number.MAX_SAFE_INTEGER` - The highest integer that can "safely" be represented unambiguously in a JS number value: `2^53 - 1`
-* `Number.MIN_SAFE_INTEGER` - The lowest integer that can "safely" be represented unambiguously in a JS number value: `-(2^53 - 1)` or `(-2)^53 + 1`.
+* `Number.EPSILON` - 在任意两个数字之间的最小值：`2^-52`（关于为了应对浮点算数运算不精确的问题而将这个值用做容差的讲解，参见本系列的 *类型与文法* 的第二章）
+* `Number.MAX_SAFE_INTEGER` - 可以用一个JS数字值明确且“安全地”表示的最大整数：`2^53 - 1`
+* `Number.MIN_SAFE_INTEGER` - 可以用一个JS数字值明确且“安全地”表示的最小整数：`-(2^53 - 1)`或`(-2)^53 + 1`.
 
-**Note:** See Chapter 2 of the *Types & Grammar* title of this series for more information about "safe" integers.
+**注意：** 关于“安全”整数的更多信息，参见本系列的 *类型与文法* 的第二章。
 
 ### `Number.isNaN(..)` Static Function
 
-The standard global `isNaN(..)` utility has been broken since its inception, in that it returns `true` for things that are not numbers, not just for the actual `NaN` value, because it coerces the argument to a number type (which can falsely result in a NaN). ES6 adds a fixed utility `Number.isNaN(..)` that works as it should:
+标准的全局`isNaN(..)`工具从一开始就坏掉了，因为不仅对实际的`NaN`值返回`true`，而且对不是数字的东西也返回`true`。其原因是它会将参数值强制转换为数字类型（这可能失败而导致一个NaN）。ES6增加了一个修复过的工具`Number.isNaN(..)`，它可以正确工作：
 
 ```js
 var a = NaN, b = "NaN", c = 42;
@@ -630,7 +626,7 @@ Number.isNaN( c );					// false
 
 ### `Number.isFinite(..)` Static Function
 
-There's a temptation to look at a function name like `isFinite(..)` and assume it's simply "not infinite". That's not quite correct, though. There's more nuance to this new ES6 utility. Consider:
+看到像`isFinite(..)`这样的函数名会诱使人们认为它单纯地意味着“不是无限”。但这不十分正确。这个新的ES6工具有更多的微妙之处。考虑如下代码：
 
 ```js
 var a = NaN, b = Infinity, c = 42;
@@ -641,7 +637,7 @@ Number.isFinite( b );				// false
 Number.isFinite( c );				// true
 ```
 
-The standard global `isFinite(..)` coerces its argument, but `Number.isFinite(..)` omits the coercive behavior:
+标准的全局`isFinite(..)`会强制转换它收到的参数值，但是`Number.isFinite(..)`会省略强制转换的行为：
 
 ```js
 var a = "42";
@@ -650,37 +646,37 @@ isFinite( a );						// true
 Number.isFinite( a );				// false
 ```
 
-You may still prefer the coercion, in which case using the global `isFinite(..)` is a valid choice. Alternatively, and perhaps more sensibly, you can use `Number.isFinite(+x)`, which explicitly coerces `x` to a number before passing it in (see Chapter 4 of the *Types & Grammar* title of this series).
+你可能依然偏好强制转换，这时使用全局`isFinite(..)`是一个合法的选择。或者，并且可能是更明智的选择，你可以使用`Number.isFinite(+x)`，它在将`x`传递前明确地将它强制转换为数字（参见本系列的 *类型与文法* 的第四章）。
 
 ### Integer-Related Static Functions
 
-JavaScript number values are always floating point (IEEE-754). So the notion of determining if a number is an "integer" is not about checking its type, because JS makes no such distinction.
+JavaScript数组值总是浮点数（IEEE-754）。所以判定一个数字是否是“整数”的概念与检查它的类型无关，因为JS没有这样的区分。
 
-Instead, you need to check if there's any non-zero decimal portion of the value. The easiest way to do that has commonly been:
+取而代之的是，你需要检查这个值是否拥有非零的小数部分。这样做的最简单的方法通常是：
 
 ```js
 x === Math.floor( x );
 ```
 
-ES6 adds a `Number.isInteger(..)` helper utility that potentially can determine this quality slightly more efficiently:
+ES6增加了一个`Number.isInteger(..)`帮助工具，它可以潜在地判定这种性质，而且效率稍微高一些：
 
 ```js
 Number.isInteger( 4 );				// true
 Number.isInteger( 4.2 );			// false
 ```
 
-**Note:** In JavaScript, there's no difference between `4`, `4.`, `4.0`, or `4.0000`. All of these would be considered an "integer", and would thus yield `true` from `Number.isInteger(..)`.
+**注意：** 在JavaScript中，`4`，`4.`，`4.0`，或`4.0000`之间没有区别。它们都将被认为是一个“整数”，因此都会从`Number.isInteger(..)`中给出`true`。
 
-In addition, `Number.isInteger(..)` filters out some clearly not-integer values that `x === Math.floor(x)` could potentially mix up:
+另外，`Number.isInteger(..)`过滤了一些明显的非整数值，它们在`x === Math.floor(x)`中可能会被混淆：
 
 ```js
 Number.isInteger( NaN );			// false
 Number.isInteger( Infinity );		// false
 ```
 
-Working with "integers" is sometimes an important bit of information, as it can simplify certain kinds of algorithms. JS code by itself will not run faster just from filtering for only integers, but there are optimization techniques the engine can take (e.g., asm.js) when only integers are being used.
+有时候处理“整数”是信息的重点，它可以简化特定的算法。由于为了仅留下整数而进行过滤，JS代码本身不会运行得更快，但是当仅有整数被使用时引擎可以采取几种优化技术（例如，asm.js）。
 
-Because of `Number.isInteger(..)`'s handling of `NaN` and `Infinity` values, defining a `isFloat(..)` utility would not be just as simple as `!Number.isInteger(..)`. You'd need to do something like:
+因为`Number.isInteger(..)`对`Nan`和`Infinity`值的处理，定义一个`isFloat(..)`工具并不像`!Number.isInteger(..)`一样简单。你需要这么做：
 
 ```js
 function isFloat(x) {
@@ -694,9 +690,9 @@ isFloat( NaN );						// false
 isFloat( Infinity );				// false
 ```
 
-**Note:** It may seem strange, but Infinity should neither be considered an integer nor a float.
+**注意：** 这看起来可能很奇怪，但是无穷即不应当被认为是整数也不应当被认为是浮点数。
 
-ES6 also defines a `Number.isSafeInteger(..)` utility, which checks to make sure the value is both an integer and within the range of `Number.MIN_SAFE_INTEGER`-`Number.MAX_SAFE_INTEGER` (inclusive).
+ES6还定义了一个`Number.isSafeInteger(..)`工具，它检查一个值以确保它是一个整数并且在`Number.MIN_SAFE_INTEGER`-`Number.MAX_SAFE_INTEGER`的范围内（包含两端）。
 
 ```js
 var x = Math.pow( 2, 53 ),
@@ -711,11 +707,11 @@ Number.isSafeInteger( y );			// false
 
 ## `String`
 
-Strings already have quite a few helpers prior to ES6, but even more have been added to the mix.
+在ES6之前字符串就已经拥有好几种帮助函数了，但是有更多的内容被加入了进来。
 
 ### Unicode Functions
 
-"Unicode-Aware String Operations" in Chapter 2 discusses `String.fromCodePoint(..)`, `String#codePointAt(..)`, and `String#normalize(..)` in detail. They have been added to improve Unicode support in JS string values.
+在第二章的“Unicode敏感的字符串操作”中详细讨论了`String.fromCodePoint(..)`，`String#codePointAt(..)`，`String#normalize(..)`。它们被用来改进JS字符串值对Unicode的支持。
 
 ```js
 String.fromCodePoint( 0x1d49e );			// "𝒞"
@@ -723,9 +719,9 @@ String.fromCodePoint( 0x1d49e );			// "𝒞"
 "ab𝒞d".codePointAt( 2 ).toString( 16 );		// "1d49e"
 ```
 
-The `normalize(..)` string prototype method is used to perform Unicode normalizations that either combine characters with adjacent "combining marks" or decompose combined characters.
+`normalize(..)`字符串原型方法用来进行Unicode规范化，它将字符与相邻的“组合标志”进行组合，或者将组合好的字符拆开。
 
-Generally, the normalization won't create a visible effect on the contents of the string, but will change the contents of the string, which can affect how things like the `length` property are reported, as well as how character access by position behave:
+一般来说，规范化不会对字符串的内容产生视觉上的影响，但是会改变字符串的内容，这可能会影响`like`属性报告的结果，以及用位置访问字符的行为，等诸如此类东西：
 
 ```js
 var s1 = "e\u0301";
@@ -736,15 +732,15 @@ s2.length;							// 1
 s2 === "\xE9";						// true
 ```
 
-`normalize(..)` takes an optional argument that specifies the normalization form to use. This argument must be one of the following four values: `"NFC"` (default), `"NFD"`, `"NFKC"`, or `"NFKD"`.
+`normalize(..)`接受一个可选参数值，它用于指定使用的规范化形式。这个参数值必须是下面四个值中的一个：`"NFC"`（默认），`"NFD"`，`"NFKC"`，或者`"NFKD"`。
 
-**Note:** Normalization forms and their effects on strings is well beyond the scope of what we'll discuss here. See "Unicode Normalization Forms" (http://www.unicode.org/reports/tr15/) for more information.
+**注意：** 规范化形式和它们在字符串上的效果超出了我们要在这里讨论的范围。更多细节参见“Unicode规范化形式”(http://www.unicode.org/reports/tr15/)。
 
 ### `String.raw(..)` Static Function
 
-The `String.raw(..)` utility is provided as a built-in tag function to use with template string literals (see Chapter 2) for obtaining the raw string value without any processing of escape sequences.
+`String.raw(..)`工具被作为一个内建的标签函数来与字符串字面模板（参见第二章）一起使用，取得不带有任何转译序列处理的未加工的字符串值。
 
-This function will almost never be called manually, but will be used with tagged template literals:
+这个函数几乎永远不会被手动调用，但是将与被标记的模板字面量一起使用：
 
 ```js
 var str = "bc";
@@ -753,19 +749,19 @@ String.raw`\ta${str}d\xE9`;
 // "\tabcd\xE9", not "	abcdé"
 ```
 
-In the resultant string, `\` and `t` are separate raw characters, not the one escape sequence character `\t`. The same is true with the Unicode escape sequence.
+在结果字符串中，`\`和`t`是分离的未被加工过的字符，而不是一个转译字符序列`\t`。这对Unicode转译序列也是一样。
 
 ### `repeat(..)` Prototype Function
 
-In languages like Python and Ruby, you can repeat a string as:
+在Python和Ruby那样的语言中，你可以这样重复一个字符串：
 
 ```js
 "foo" * 3;							// "foofoofoo"
 ```
 
-That doesn't work in JS, because `*` multiplication is only defined for numbers, and thus `"foo"` coerces to the `NaN` number.
+在JS中这不能工作，因为`*`乘法是仅对数字定义的，因此`"foo"`会被强制转换为`NaN`数字。
 
-However, ES6 defines a string prototype method `repeat(..)` to accomplish the task:
+但是，ES6定义了一个字符串原型方法`repeat(..)`来完成这个任务：
 
 ```js
 "foo".repeat( 3 );					// "foofoofoo"
@@ -773,7 +769,7 @@ However, ES6 defines a string prototype method `repeat(..)` to accomplish the ta
 
 ### String Inspection Functions
 
-In addition to `String#indexOf(..)` and `String#lastIndexOf(..)` from prior to ES6, three new methods for searching/inspection have been added: `startsWith(..)`, `endsWidth(..)`, and `includes(..)`.
+作为对ES6以前的`String#indexOf(..)`和`String#lastIndexOf(..)`的补充，增加了三个新的搜索/检验函数：`startsWith(..)`，`endsWidth(..)`，和`includes(..)`。
 
 ```js
 var palindrome = "step on no pets";
@@ -788,18 +784,18 @@ palindrome.includes( "on" );		// true
 palindrome.includes( "on", 6 );		// false
 ```
 
-For all the string search/inspection methods, if you look for an empty string `""`, it will either be found at the beginning or the end of the string.
+对于所有这些字符串搜索/检验方法，如果你查询一个空字符串`""`，那么它将要么在字符串的开头被找到，要么就在字符串的末尾被找到。
 
-**Warning:** These methods will not by default accept a regular expression for the search string. See "Regular Expression Symbols" in Chapter 7 for information about disabling the `isRegExp` check that is performed on this first argument.
+**警告：** 这些方法默认不接受正则表达式作为检索字符串。关于关闭实施在第一个参数值上的`isRegExp`检查的信息，参见第七章的“正则表达式Symbol”。
 
 ## Review
 
-ES6 adds many extra API helpers on the various built-in native objects:
+ES6在各种内建原生对象上增加了许多额外的API帮助函数：
 
-* `Array` adds `of(..)` and `from(..)` static functions, as well as prototype functions like `copyWithin(..)` and `fill(..)`.
-* `Object` adds static functions like `is(..)` and `assign(..)`.
-* `Math` adds static functions like `acosh(..)` and `clz32(..)`.
-* `Number` adds static properties like `Number.EPSILON`, as well as static functions like `Number.isFinite(..)`.
-* `String` adds static functions like `String.fromCodePoint(..)` and `String.raw(..)`, as well as prototype functions like `repeat(..)` and `includes(..)`.
+* `Array`增加了`of(..)`和`from(..)`之类的静态函数，以及`copyWithin(..)`和`fill(..)`之类的原型函数。
+* `Object`增加了`is(..)`和`assign(..)`之类的静态函数。
+* `Math`增加了`acosh(..)`和`clz32(..)`之类的静态函数。
+* `Number`增加了`Number.EPSILON`之类的静态属性，以及`Number.isFinite(..)`之类的静态函数。
+* `String`增加了`String.fromCodePoint(..)`和`String.raw(..)`之类的静态函数，以及`repeat(..)`和`includes(..)`之类的原型函数。
 
-Most of these additions can be polyfilled (see ES6 Shim), and were inspired by utilities in common JS libraries/frameworks.
+这些新增函数中的绝大多数都可以被填补（参见ES6 Shim），它们都是受常见的JS库/框架中的工具启发的。
