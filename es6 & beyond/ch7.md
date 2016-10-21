@@ -1,19 +1,19 @@
 # You Don't Know JS: ES6 & Beyond
 # Chapter 7: Meta Programming
 
-Meta programming is programming where the operation targets the behavior of the program itself. In other words, it's programming the programming of your program. Yeah, a mouthful, huh?
+元编程是针对程序本身的行为进行操作的编程。换句话说，它是为你程序的编程而进行的编程。是的，很拗口，对吧？
 
-For example, if you probe the relationship between one object `a` and another `b` -- are they `[[Prototype]]` linked? -- using `a.isPrototype(b)`, this is commonly referred to as introspection, a form of meta programming. Macros (which don't exist in JS, yet) --  where the code modifies itself at compile time -- are another obvious example of meta programming. Enumerating the keys of an object with a `for..in` loop, or checking if an object is an *instance of* a "class constructor", are other common meta programming tasks.
+例如，如果你为了调查对象`a`和另一个对象`b`之间的关系 —— 它们是被`[[Prototype]]`链接的吗？ —— 而使用`a.isPrototypeOf(b)`，这通常称为自省，一种形式的元编程。宏（JS中还没有） —— 代码在编译时修改自己 —— 是元编程的另一个明显的例子。使用`for..in`循环枚举一个对象的键，或者检查一个对象是否是一个“类构造器”的 *实例*，是另一些常见的元编程任务。
 
-Meta programming focuses on one or more of the following: code inspecting itself, code modifying itself, or code modifying default language behavior so other code is affected.
+元编程关注一下的一点或几点：代码检视自己，代码修改自己，或者代码修改默认的语言行为而使其他代码受影响。
 
-The goal of meta programming is to leverage the language's own intrinsic capabilities to make the rest of your code more descriptive, expressive, and/or flexible. Because of the *meta* nature of meta programming, it's somewhat difficult to put a more precise definition on it than that. The best way to understand meta programming is to see it through examples.
+元编程的目标是利用语言自身的内在能力使你其他部分的代码更具描述性，表现力，和/或灵活性。由于元编程的 *元* 的性质，要给它一个更精确的定义有些困难。理解元编程的最佳方法是通过代码来观察它。
 
-ES6 adds several new forms/features for meta programming on top of what JS already had.
+ES6在JS已经拥有的东西上，增加了几种新的元编程形式/特性。
 
 ## Function Names
 
-There are cases where your code may want to introspect on itself and ask what the name of some function is. If you ask what a function's name is, the answer is surprisingly somewhat ambiguous. Consider:
+有一些情况，你的代码想要检视自己并询问某个函数的名称是什么。如果你询问一个函数的名称，答案会有些令人诧异地模糊。考虑如下代码：
 
 ```js
 function daz() {
@@ -34,9 +34,9 @@ var obj = {
 };
 ```
 
-In this previous snippet, "what is the name of `obj.foo()`" is slightly nuanced. Is it `"foo"`, `""`, or `undefined`? And what about `obj.bar()` -- is it named `"bar"` or `"baz"`? Is `obj.bam()` named `"bam"` or `"daz"`? What about `obj.zim()`?
+在这前一个代码段中，“`obj.foo()`的名字是什么？”有些微妙。是`"foo"`，`""`，还是`undefined`？那么`obj.bar()`呢 —— 是`"bar"`还是`"baz"`？`obj.bam()`称为`"bam"`还是`"daz"`？`obj.zim()`呢？
 
-Moreover, what about functions which are passed as callbacks, like:
+另外，作为回调被传递的函数呢？就像：
 
 ```js
 function foo(cb) {
@@ -48,11 +48,11 @@ foo( function(){
 } );
 ```
 
-There are quite a few ways that functions can be expressed in programs, and it's not always clear and unambiguous what the "name" of that function should be.
+在程序中函数可以被好几种方法所表达，而函数的“名字”应当是什么并不总是那么清晰和明确。
 
-More importantly, we need to distinguish whether the "name" of a function refers to its `name` property -- yes, functions have a property called `name` -- or whether it refers to the lexical binding name, such as `bar` in `function bar() { .. }`.
+更重要的是，我们需要区别函数的“名字”是指它的`name`属性 —— 是的，函数有一个叫做`name`的属性 —— 还是指它词法绑定的名称，比如在`function bar() { .. }`中的`bar`。
 
-The lexical binding name is what you use for things like recursion:
+词法绑定名称是你将在递归之类的东西中所使用的：
 
 ```js
 function foo(i) {
@@ -61,19 +61,19 @@ function foo(i) {
 }
 ```
 
-The `name` property is what you'd use for meta programming purposes, so that's what we'll focus on in this discussion.
+`name`属性是你为了元编程而使用的，所以它才是我们在这里的讨论中所关注的。
 
-The confusion comes because by default, the lexical name a function has (if any) is also set as its `name` property. Actually there was no official requirement for that behavior by the ES5 (and prior) specifications. The setting of the `name` property was nonstandard but still fairly reliable. As of ES6, it has been standardized.
+产生这种用困惑是因为，在默认情况下一个函数的词法名称（如果有的话）也会被设置为它的`name`属性。实际上，ES5（和以前的）语言规范中并没有官方要求这种行为。`name`属性的设置是一种非标准，但依然相当可靠的行为。在ES6中，它已经被标准化。
 
-**Tip:** If a function has a `name` value assigned, that's typically the name used in stack traces in developer tools.
+**提示：** 如果一个函数的`name`被赋值，它通常是在开发者工具的栈轨迹中使用的名称。
 
 ### Inferences
 
-But what happens to the `name` property if a function has no lexical name?
+但如果函数没有词法名称，`name`属性会怎么样呢？
 
-As of ES6, there are now inference rules which can determine a sensible `name` property value to assign a function even if that function doesn't have a lexical name to use.
+现在在ES6中，有一个推断规则可以判定一个合理的`name`属性值来赋予一个函数，即使它没有词法名称可用。
 
-Consider:
+考虑如下代码：
 
 ```js
 var abc = function() {
@@ -83,9 +83,9 @@ var abc = function() {
 abc.name;				// "abc"
 ```
 
-Had we given the function a lexical name like `abc = function def() { .. }`, the `name` property would of course be `"def"`. But in the absence of the lexical name, intuitively the `"abc"` name seems appropriate.
+如果我们给了这个函数一个词法名称，比如`abc = function def() { .. }`，那么`name`属性将理所当然地是`"def"`。但是由于缺少词法名称，直观上名称`"abc"`看起来很合适。
 
-Here are other forms that will infer a name (or not) in ES6:
+这里是在ES6中将会（或不会）进行名称推断的其他形式：
 
 ```js
 (function(){ .. });					// name:
@@ -123,17 +123,17 @@ var GeneratorFunction =
 var z = new GeneratorFunction();	// name: anonymous
 ```
 
-The `name` property is not writable by default, but it is configurable, meaning you can use `Object.defineProperty(..)` to manually change it if so desired.
+`name`属性默认是不可写的，但它是可配置的，这意味着如果有需要，你可以使用`Object.defineProperty(..)`来手动改变它。
 
 ## Meta Properties
 
-In the "`new.target`" section of Chapter 3, we introduced a concept new to JS in ES6: the meta property. As the name suggests, meta properties are intended to provide special meta information in the form of a property access that would otherwise not have been possible.
+在第三章的“`new.target`”一节中，我们引入了一个ES6的新概念：元属性。正如这个名称所暗示的，元属性意在以一种属性访问的形式提供特殊的元信息，而这在以前是不可能的。
 
-In the case of `new.target`, the keyword `new` serves as the context for a property access. Clearly `new` is itself not an object, which makes this capability special. However, when `new.target` is used inside a constructor call (a function/method invoked with `new`), `new` becomes a virtual context, so that `new.target` can refer to the target constructor that `new` invoked.
+在`new.target`的情况下，关键字`new`作为一个属性访问的上下文环境。显然`new`本身不是一个对象，这使得这种能力很特殊。然而，当`new.target`被用于一个构造器调用（一个使用`new`调用的函数/方法）内部时，`new`变成了一个虚拟上下文环境，如此`new.target`就可以指代这个`new`调用的目标构造器。
 
-This is a clear example of a meta programming operation, as the intent is to determine from inside a constructor call what the original `new` target was, generally for the purposes of introspection (examining typing/structure) or static property access.
+这是一个元编程操作的典型例子，因为它的意图是从一个构造器调用内部判定原来的`new`的目标是什么，这一般是为了自省（检查类型/解构）或者静态属性访问。
 
-For example, you may want to have different behavior in a constructor depending on if it's directly invoked or invoked via a child class:
+举例来说，你可能想根据一个构造器是被直接调用，还是通过一个子类进行调用，来使它有不同的行为：
 
 ```js
 class Parent {
@@ -156,27 +156,27 @@ var b = new Child();
 // A child instantiated
 ```
 
-There's a slight nuance here, which is that the `constructor()` inside the `Parent` class definition is actually given the lexical name of the class (`Parent`), even though the syntax implies that the class is a separate entity from the constructor.
+这里有一个微妙的地方，在`Parent`类定义内部的`constructor()`实际上被给予了这个类的词法名称（`Parent`），即便语法暗示着这个类是一个与构造器分离的不同实体。
 
-**Warning:** As with all meta programming techniques, be careful of creating code that's too clever for your future self or others maintaining your code to understand. Use these tricks with caution.
+**警告：** 与所有的元编程技术一样，要小心不要创建太过聪明的代码，而使未来的你或其他维护你代码的人很难理解。小心使用这些技巧。
 
 ## Well Known Symbols
 
-In the "Symbols" section of Chapter 2, we covered the new ES6 primitive type `symbol`. In addition to symbols you can define in your own program, JS predefines a number of built-in symbols, referred to as *Well Known Symbols* (WKS).
+在第二章中的“Symbol”一节中，我们讲解了新的ES6基本类型`symbol`。除了你可以在你自己的程序中定义的symbol以外，JS预定义了几种内建symbol，被称为 *Well Known Symbols*。
 
-These symbol values are defined primarily to expose special meta properties that are being exposed to your JS programs to give you more control over JS's behavior.
+定义这些symbol值主要是为了向你的JS程序暴露特殊的元属性来给你更多JS行为的控制权。
 
-We'll briefly introduce each and discuss their purpose.
+我们将简要介绍每一个symbol并讨论它们的目的。
 
 ### `Symbol.iterator`
 
-In Chapters 2 and 3, we introduced and used the `@@iterator` symbol, automatically used by `...` spreads and `for..of` loops. We also saw `@@iterator` as defined on the new ES6 collections as defined in Chapter 5.
+在第二和第三章中，我们介绍并使用了`@@iterator`symbol，它被自动地用于`...`扩散和`for..of`循环。我们还在第五章中看到了在新的ES6集合中定义的`@@iterator`。
 
-`Symbol.iterator` represents the special location (property) on any object where the language mechanisms automatically look to find a method that will construct an iterator instance for consuming that object's values. Many objects come with a default one defined.
+`Symbol.iterator`表示在任意一个对象上的特殊位置（属性），语言机制自动地在这里寻找一个方法，这个方法将构建一个用于消费对象值的迭代器对象。许多对象都带有一个默认的`Symbol.iterator`。
 
-However, we can define our own iterator logic for any object value by setting the `Symbol.iterator` property, even if that's overriding the default iterator. The meta programming aspect is that we are defining behavior which other parts of JS (namely, operators and looping constructs) use when processing an object value we define.
+然而，我们可以通过设置`Symbol.iterator`属性来为任意对象定义我们自己的迭代器逻辑，即便它是覆盖默认迭代器的。这里的元编程观点是，我们在定义JS的其他部分在处理对象值时所使用的行为。
 
-Consider:
+考虑如下代码：
 
 ```js
 var arr = [4,5,6,7,8,9];
@@ -203,9 +203,9 @@ for (var v of arr) {
 
 ### `Symbol.toStringTag` and `Symbol.hasInstance`
 
-One of the most common meta programming tasks is to introspect on a value to find out what *kind* it is, usually to decide what operations are appropriate to perform on it. With objects, the two most common inspection techniques are `toString()` and `instanceof`.
+最常见的元编程任务之一，就是在一个值上进行自省来找出它是什么 *种类* 的，者经常用来决定它们上面适于实施什么操作。对于对象，最常见的两个自省技术是`toString()`和`instanceof`。
 
-Consider:
+考虑如下代码：
 
 ```js
 function Foo() {}
@@ -216,7 +216,7 @@ a.toString();				// [object Object]
 a instanceof Foo;			// true
 ```
 
-As of ES6, you can control the behavior of these operations:
+在ES6中，你可以控制这些操作的行为：
 
 ```js
 function Foo(greeting) {
@@ -243,19 +243,19 @@ a instanceof Foo;			// true
 b instanceof Foo;			// false
 ```
 
-The `@@toStringTag` symbol on the prototype (or instance itself) specifies a string value to use in the `[object ___]` stringification.
+在原型（或实例本身）上的`@@toStringTag`symbol指定一个用于`[object ___]`字符串化的字符串值。
 
-The `@@hasInstance` symbol is a method on the constructor function which receives the instance object value and lets you decide by returning `true` or `false` if the value should be considered an instance or not.
+`@@hasInstance`symbol是一个在构造器函数上的方法，它接收一个实例对象值并让你通过放回`true`或`false`来决定这个值是否应当被认为是一个实例。
 
-**Note:** To set `@@hasInstance` on a function, you must use `Object.defineProperty(..)`, as the default one on `Function.prototype` is `writable: false`. See the *this & Object Prototypes* title of this series for more information.
+**注意：** 要在一个函数上设置`@@hasInstance`，你必须使用`Object.defineProperty(..)`，因为在`Function.prototype`上默认的那一个是`writable: false`。更多信息参见本系列的 *this与对象原型*。
 
 ### `Symbol.species`
 
-In "Classes" in Chapter 3, we introduced the `@@species` symbol, which controls which constructor is used by built-in methods of a class that needs to spawn new instances.
+在第三章的“类”中，我们介绍了`@@species`symbol，它控制一个类内建的生成新实例的方法使用哪一个构造器。
 
-The most common example is when subclassing `Array` and wanting to define which constructor (`Array(..)` or your subclass) inherited methods like `slice(..)` should use. By default, `slice(..)` called on an instance of a subclass of `Array` would produce a new instance of that subclass, which is frankly what you'll likely often want.
+最常见的例子是，在子类化`Array`并且想要定义`slice(..)`之类被继承的方法应当使用哪一个构造器时。默认地，在一个`Array`的子类实例上调用的`slice(..)`将产生这个子类的实例，坦白地说这正是你经常希望的。
 
-However, you can meta program by overriding a class's default `@@species` definition:
+但是，你可以通过覆盖一个类的默认`@@species`定义来进行元编程：
 
 ```js
 class Cool {
@@ -284,17 +284,17 @@ d instanceof Awesome;		// false
 d instanceof Cool;			// true
 ```
 
-The `Symbol.species` setting defaults on the built-in native constructors to the `return this` behavior as illustrated in the previous snippet in the `Cool` definition. It has no default on user classes, but as shown that behavior is easy to emulate.
+就像在前面的代码段中的`Cool`的定义展示的那样，在内建的原生构造器上的`Symbol.species`设定默认为`return this`。它在用户自己的类上没有默认值，但也像展示的那样，这种行为很容易模拟。
 
-If you need to define methods that generate new instances, use the meta programming of the `new this.constructor[Symbol.species](..)` pattern instead of the hard-wiring of `new this.constructor(..)` or `new XYZ(..)`. Derived classes will then be able to customize `Symbol.species` to control which constructor vends those instances.
+如果你需要定义生成新实例的方法，使用`new this.constructor[Symbol.species](..)`的元编程模式，而不要用手写的`new this.constructor(..)`或者`new XYZ(..)`。如此衍生的类就能够自定义`Symbol.species`来控制哪一个构造器来制造这些实例。
 
 ### `Symbol.toPrimitive`
 
-In the *Types & Grammar* title of this series, we discussed the `ToPrimitive` abstract coercion operation, which is used when an object must be coerced to a primitive value for some operation (such as `==` comparison or `+` addition). Prior to ES6, there was no way to control this behavior.
+在本系列的 *类型与文法* 一书中，我们讨论了`ToPrimitive`抽象强制转换操作，它在对象为了某些操作（例如`==`比较或者`+`加法）而必须被强制转换为一个基本类型值时被使用。在ES6以前，没有办法控制这个行为。
 
-As of ES6, the `@@toPrimitive` symbol as a property on any object value can customize that `ToPrimitive` coercion by specifying a method.
+在ES6中，在任意对象值上作为属性的`@@toPrimitive`symbol都可以通过指定一个方法来自定义这个`ToPrimitive`强制转换。
 
-Consider:
+考虑如下代码：
 
 ```js
 var arr = [1,2,3,4,5];
@@ -313,38 +313,41 @@ arr[Symbol.toPrimitive] = function(hint) {
 arr + 10;				// 25
 ```
 
-The `Symbol.toPrimitive` method will be provided with a *hint* of `"string"`, `"number"`, or `"default"` (which should be interpreted as `"number"`), depending on what type the operation invoking `ToPrimitive` is expecting. In the previous snippet, the additive `+` operation has no hint (`"default"` is passed). A multiplicative `*` operation would hint `"number"` and a `String(arr)` would hint `"string"`.
+`Symbol.toPrimitive`方法将根据调用`ToPrimitive`的操作期望何种类型，而被提供一个值为`"string"`，`"number"`，或`"default"`（这应当被解释为`"number"`）的 *提示（hint）*。在前一个代码段中，`+`加法操作没有提示（`"default"`将被传递）。一个`*`乘法操作将提示`"number"`，而一个`String(arr)`将提示`"string"`。
 
-**Warning:** The `==` operator will invoke the `ToPrimitive` operation with no hint -- the `@@toPrimitive` method, if any is called with hint `"default"` -- on an object if the other value being compared is not an object. However, if both comparison values are objects, the behavior of `==` is identical to `===`, which is that the references themselves are directly compared. In this case, `@@toPrimitive` is not invoked at all. See the *Types & Grammar* title of this series for more information about coercion and the abstract operations.
+**警告：** `==`操作符将在一个对象上不使用任何提来示调用`ToPrimitive`操作 —— 如果存在`@@toPrimitive`方法的话，将使用`"default"`被调用 —— 如果另一个被比较的值不是一个对象。但是，如果两个被比较的值都是对象，`==`的行为与`===`是完全相同的，也就是引用本身将被直接比较。这种情况下，`@@toPrimitive`根本不会被调用。关于强制转换和抽象操作的更多信息，参见本系列的 *类型与文法*。
 
 ### Regular Expression Symbols
 
-There are four well known symbols that can be overridden for regular expression objects, which control how those regular expressions are used by the four corresponding `String.prototype` functions of the same name:
+对于正则表达式对象，有四种well known symbols 可以被覆盖，它们控制着这些正则表达式在四个相应的同名`String.prototype`函数中如何被使用：
 
-* `@@match`: The `Symbol.match` value of a regular expression is the method used to match all or part of a string value with the given regular expression. It's used by `String.prototype.match(..)` if you pass it a regular expression for the pattern matching.
+* `@@match`：一个正则表达式的`Symbol.match`值是使用被给定的正则表达式来匹配一个字符串值的全部或部分的方法。如果你为`String.prototype.match(..)`传递一个正则表达式做范例匹配，它就会被使用。
 
-   The default algorithm for matching is laid out in section 21.2.5.6 of the ES6 specification (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@match). You could override this default algorithm and provide extra regex features, such as look-behind assertions.
+	 匹配的默认算法写在ES6语言规范的第21.2.5.6部分(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@match)。你可以覆盖这个默认算法并提供额外的正则表达式特性，比如后顾断言。
 
-   `Symbol.match` is also used by the `isRegExp` abstract operation (see the note in "String Inspection Functions" in Chapter 6) to determine if an object is intended to be used as a regular expression. To force this check to fail for an object so it's not treated as a regular expression, set the `Symbol.match` value to `false` (or something falsy).
-* `@@replace`: The `Symbol.replace` value of a regular expression is the method used by `String.prototype.replace(..)` to replace within a string one or all occurrences of character sequences that match the given regular expression pattern.
+	 `Symbol.match`还被用于`isRegExp`抽象操作（参见第六章的“字符串检测函数”中的注意部分）来判定一个对象是否意在被用作正则表达式。为了是一个要被用作正则表达式的对象不被看作是正则表达式，可以将`Symbol.match`的值设置为`false`（或falsy的东西）强制这个检查失败。
 
-   The default algorithm for replacing is laid out in section 21.2.5.8 of the ES6 specification (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@replace).
+* `@@replace`：一个正则表达式的`Symbol.replace`值是被`String.prototype.replace(..)`使用的方法，来替换一个字符串里面出现的一个或所有字符序列，这些字符序列匹配给出的正则表达式范例。
 
-   One cool use for overriding the default algorithm is to provide additional `replacer` argument options, such as supporting `"abaca".replace(/a/g,[1,2,3])` producing `"1b2c3"` by consuming the iterable for successive replacement values.
-* `@@search`: The `Symbol.search` value of a regular expression is the method used by `String.prototype.search(..)` to search for a sub-string within another string as matched by the given regular expression.
+	 替换的默认算法写在ES6语言规范的第21.2.5.8部分(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@replace)。
 
-   The default algorithm for searching is laid out in section 21.2.5.9 of the ES6 specification (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@search).
-* `@@split`: The `Symbol.split` value of a regular expression is the method used by `String.prototype.split(..)` to split a string into sub-strings at the location(s) of the delimiter as matched by the given regular expression.
+	 一个覆盖默认算法的很酷的用法是提供额外的`replacer`可选参数子，比如通过用连续的替换值消费可迭代对象来支持`"abaca".replace(/a/g,[1,2,3])`产生`"1b2c3"`。
 
-   The default algorithm for splitting is laid out in section 21.2.5.11 of the ES6 specification (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@split).
+* `@@search`：一个正则表达式的`Symbol.search`值是被`String.prototype.search(..)`使用的方法，来在一个字符串中检索一个匹配给定正则表达式的子字符串。
 
-Overriding the built-in regular expression algorithms is not for the faint of heart! JS ships with a highly optimized regular expression engine, so your own user code will likely be a lot slower. This kind of meta programming is neat and powerful, but it should only be used in cases where it's really necessary or beneficial.
+	 检索的默认算法写在ES6语言规范的第21.2.5.9部分(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@search)。
+
+* `@@split`：一个正则表达式的`Symbol.split`值是被`String.prototype.split(..)`使用的方法，来将一个字符串在分隔符匹配给定正则表达式的位置分割为子字符串。
+
+	 分割的默认算法写在ES6语言规范的第21.2.5.11部分(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@split)。
+
+覆盖内建的正则表达式算法不是为心脏脆弱的人准备的！JS带有高度优化的正则表达式引擎，所以你自己的用户代码将很可能慢得多。这各种类的元编程很精巧和强大，但是应当仅用于确实必要或有好处的情况下。
 
 ### `Symbol.isConcatSpreadable`
 
-The `@@isConcatSpreadable` symbol can be defined as a boolean property (`Symbol.isConcatSpreadable`) on any object (like an array or other iterable) to indicate if it should be *spread out* if passed to an array `concat(..)`.
+`@@isConcatSpreadable`symbol可以作为一个布尔属性（`Symbol.isConcatSpreadable`）在任意对象上（比如一个数组或其他的可迭代对象）定义，来指示当它被传递给一个数组`concat(..)`时是否应当被 *扩散*。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a = [1,2,3],
@@ -357,9 +360,9 @@ b[Symbol.isConcatSpreadable] = false;
 
 ### `Symbol.unscopables`
 
-The `@@unscopables` symbol can be defined as an object property (`Symbol.unscopables`) on any object to indicate which properties can and cannot be exposed as lexical variables in a `with` statement.
+`@@unscopables`symbol可以作为一个对象属性（`Symbol.unscopables`）在任意对象上定义，来指示在一个`with`语句中哪一个属性可以和不可以作为此法变量被暴露。
 
-Consider:
+考虑如下代码：
 
 ```js
 var o = { a:1, b:2, c:3 },
@@ -376,9 +379,9 @@ with (o) {
 }
 ```
 
-A `true` in the `@@unscopables` object indicates the property should be *unscopable*, and thus filtered out from the lexical scope variables. `false` means it's OK to be included in the lexical scope variables.
+一个在`@@unscopables`对象中的`true`指示这个属性应当是 *非作用域（unscopable）* 的，因此会从此法作用域变量中被过滤掉。`false`意味着它可以被包含在此法作用域变量中。
 
-**Warning:** The `with` statement is disallowed entirely in `strict` mode, and as such should be considered deprecated from the language. Don't use it. See the *Scope & Closures* title of this series for more information. Because `with` should be avoided, the `@@unscopables` symbol is also moot.
+**警告：** `with`语句在`strict`模式下是完全禁用的，而且因此应当被认为是在语言中被废弃的。不要使用它。更多信息参见本系列的 *作用域与闭包*。因为应当避免`with`，所以这个`@@unscopables`symbol也是无意义的。
 
 ## Proxies
 
