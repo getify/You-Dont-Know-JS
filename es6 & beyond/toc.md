@@ -2,12 +2,12 @@
 
 ## Table of Contents
 
-* Foreword
-* Preface
-* Chapter 1: ES? Now & Future
+* [Foreword](foreword.md)
+* [Preface](../preface.md)
+* [Chapter 1: ES? Now & Future](ch1.md)
 	* Versioning
 	* Transpiling
-* Chapter 2: Syntax
+* [Chapter 2: Syntax](ch2.md)
 	* Block-Scoped Declarations
 	* Spread / Rest
 	* Default Parameter Values
@@ -20,27 +20,27 @@
 	* Number Literal Extensions
 	* Unicode
 	* Symbols
-* Chapter 3: Organization
+* [Chapter 3: Organization](ch3.md)
 	* Iterators
 	* Generators
 	* Modules
 	* Classes
-* Chapter 4: Async Flow Control
+* [Chapter 4: Async Flow Control](ch4.md)
 	* Promises
 	* Generators + Promises
-* Chapter 5: Collections
+* [Chapter 5: Collections](ch5.md)
 	* TypedArrays
 	* Maps
 	* WeakMaps
 	* Sets
 	* WeakSets
-* Chapter 6: API Additions
+* [Chapter 6: API Additions](ch6.md)
 	* `Array`
 	* `Object`
 	* `Math`
 	* `Number`
 	* `String`
-* Chapter 7: Meta Programming
+* [Chapter 7: Meta Programming](ch7.md)
 	* Function Names
 	* Meta Properties
 	* Well Known Symbols
@@ -48,7 +48,7 @@
 	* `Reflect` API
 	* Feature Testing
 	* Tail Call Optimization (TCO)
-* Chapter 8: Beyond ES6
+* [Chapter 8: Beyond ES6](ch8.md)
 	* `async function`s
 	* `Object.observe(..)`
 	* Exponentiation Operator
