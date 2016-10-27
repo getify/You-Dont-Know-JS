@@ -385,11 +385,11 @@ with (o) {
 
 ## Proxies
 
-One of the most obviously meta programming features added to ES6 is the `Proxy` feature.
+在ES6中被加入的最明显的元编程特性之一就是`proxy`特性。
 
-A proxy is a special kind of object you create that "wraps" -- or sits in front of -- another normal object. You can register special handlers (aka *traps*) on the proxy object which are called when various operations are performed against the proxy. These handlers have the opportunity to perform extra logic in addition to *forwarding* the operations on to the original target/wrapped object.
+一个代理是一种由你创建的特殊的对象，它“包”着另一个普通的对象 —— 或者说挡在这个普通对象的前面。你可以在代理对象上注册特殊的处理器（也叫 *机关（traps）*），当对这个代理实施各种操作时被调用。这些处理器除了将操作 *传送* 到原本的目标/被包装的对象上之外，还有机会运行额外的逻辑。
 
-One example of the kind of *trap* handler you can define on a proxy is `get` that intercepts the `[[Get]]` operation -- performed when you try to access a property on an object. Consider:
+一个这样的 *机关* 处理器的例子是，你可以在一个代理上定义一个拦截`[[Get]]`操作的`get` —— 它在当你试图访问一个对象上的属性时运行。考虑如下代码：
 
 ```js
 var obj = { a: 1 },
@@ -413,32 +413,46 @@ pobj.a;
 // 1
 ```
 
-We declare a `get(..)` handler as a named method on the *handler* object (second argument to `Proxy(..)`), which receives a reference to the *target* object (`obj`), the *key* property name (`"a"`), and the `self`/receiver/proxy (`pobj`).
+我们将一个`get(..)`处理器作为 *处理器* 对象的命名方法声明（`Proxy(..)`的第二个参数值），它接收一个指向 *目标* 对象的引用（`obj`），属性的 *键* 名称（`"a"`），和`self`/接受者/代理本身（`pobj`）。
 
-After the `console.log(..)` tracing statement, we "forward" the operation onto `obj` via `Reflect.get(..)`. We will cover the `Reflect` API in the next section, but note that each available proxy trap has a corresponding `Reflect` function of the same name.
+在追踪语句`console.log(..)`之后，我们通过`Reflect.get(..)`将操作“转送”到`obj`。我们将在下一节详细讲解`Reflect`API，但要注意的是每个可用的代理机关都有一个相应的同名`Reflect`函数。
 
-These mappings are symmetric on purpose. The proxy handlers each intercept when a respective meta programming task is performed, and the `Reflect` utilities each perform the respective meta programming task on an object. Each proxy handler has a default definition that automatically calls the corresponding `Reflect` utility. You will almost certainly use both `Proxy` and `Reflect` in tandem.
+这些映射是故意对称的。每个代理处理器在各自的元编程任务实施时进行拦截，而每个`Reflect`工具将各自的元编程任务在一个对象上实施。每个代理处理器都有一个自动调用相应`Reflect`工具的默认定义。几乎可以肯定你将总是一前一后地使用`Proxy`和`Reflect`。
 
-Here's a list of handlers you can define on a proxy for a *target* object/function, and how/when they are triggered:
+这里的列表是你可以在一个代理上为一个 *目标* 对象/函数定义的处理器，以及它们如何/何时被触发：
 
-* `get(..)`: via `[[Get]]`, a property is accessed on the proxy (`Reflect.get(..)`, `.` property operator, or `[ .. ]` property operator)
-* `set(..)`: via `[[Set]]`, a property value is set on the proxy (`Reflect.set(..)`, the `=` assignment operator, or destructuring assignment if it targets an object property)
-* `deleteProperty(..)`: via `[[Delete]]`, a property is deleted from the proxy (`Reflect.deleteProperty(..)` or `delete`)
-* `apply(..)` (if *target* is a function): via `[[Call]]`, the proxy is invoked as a normal function/method (`Reflect.apply(..)`, `call(..)`, `apply(..)`, or the `(..)` call operator)
-* `construct(..)` (if *target* is a constructor function): via `[[Construct]]`, the proxy is invoked as a constructor function (`Reflect.construct(..)` or `new`)
-* `getOwnPropertyDescriptor(..)`: via `[[GetOwnProperty]]`, a property descriptor is retrieved from the proxy (`Object.getOwnPropertyDescriptor(..)` or `Reflect.getOwnPropertyDescriptor(..)`)
-* `defineProperty(..)`: via `[[DefineOwnProperty]]`, a property descriptor is set on the proxy (`Object.defineProperty(..)` or `Reflect.defineProperty(..)`)
-* `getPrototypeOf(..)`: via `[[GetPrototypeOf]]`, the `[[Prototype]]` of the proxy is retrieved (`Object.getPrototypeOf(..)`, `Reflect.getPrototypeOf(..)`, `__proto__`, `Object#isPrototypeOf(..)`, or `instanceof`)
-* `setPrototypeOf(..)`: via `[[SetPrototypeOf]]`, the `[[Prototype]]` of the proxy is set (`Object.setPrototypeOf(..)`, `Reflect.setPrototypeOf(..)`, or `__proto__`)
-* `preventExtensions(..)`: via `[[PreventExtensions]]`, the proxy is made non-extensible (`Object.preventExtensions(..)` or `Reflect.preventExtensions(..)`)
-* `isExtensible(..)`: via `[[IsExtensible]]`, the extensibility of the proxy is probed (`Object.isExtensible(..)` or `Reflect.isExtensible(..)`)
-* `ownKeys(..)`: via `[[OwnPropertyKeys]]`, the set of owned properties and/or owned symbol properties of the proxy is retrieved (`Object.keys(..)`, `Object.getOwnPropertyNames(..)`, `Object.getOwnSymbolProperties(..)`, `Reflect.ownKeys(..)`, or `JSON.stringify(..)`)
-* `enumerate(..)`: via `[[Enumerate]]`, an iterator is requested for the proxy's enumerable owned and "inherited" properties (`Reflect.enumerate(..)` or `for..in`)
-* `has(..)`: via `[[HasProperty]]`, the proxy is probed to see if it has an owned or "inherited" property (`Reflect.has(..)`, `Object#hasOwnProperty(..)`, or `"prop" in obj`)
+* `get(..)`：通过`[[Get]]`，在代理上访问一个属性（`Reflect.get(..)`，`.`属性操作符或`[ .. ]`属性操作符）
 
-**Tip:** For more information about each of these meta programming tasks, see the "`Reflect` API" section later in this chapter.
+* `set(..)`：通过`[[Set]]`，在代理对象上设置一个属性（`Reflect.set(..)`，`=`赋值操作符，或者解构赋值 —— 如果目标是一个对象属性的话)
 
-In addition to the notations in the preceding list about actions that will trigger the various traps, some traps are triggered indirectly by the default actions of another trap. For example:
+* `deleteProperty(..)`：通过`[[Delete]]`，在代理对象上删除一个属性 (`Reflect.deleteProperty(..)`或`delete`)
+
+* `apply(..)`（如果 *目标* 是一个函数）：通过`[[Call]]`，代理作为一个普通函数/方法被调用（`Reflect.apply(..)`，`call(..)`，`apply(..)`，或者`(..)`调用操作符）
+
+
+* `construct(..)`（如果 *目标* 是一个构造函数）：通过`[[Construct]]`代理作为一个构造器函数被调用（`Reflect.construct(..)`或`new`）
+
+* `getOwnPropertyDescriptor(..)`：通过`[[GetOwnProperty]]`，从代理取得一个属性的描述符（`Object.getOwnPropertyDescriptor(..)`或`Reflect.getOwnPropertyDescriptor(..)`）
+
+* `defineProperty(..)`：通过`[[DefineOwnProperty]]`，在代理上设置一个属性描述符（`Object.defineProperty(..)`或`Reflect.defineProperty(..)`）
+
+* `getPrototypeOf(..)`：通过`[[GetPrototypeOf]]`，取得代理的`[[Prototype]]`（`Object.getPrototypeOf(..)`，`Reflect.getPrototypeOf(..)`，`__proto__`, `Object#isPrototypeOf(..)`，或`instanceof`）
+
+* `setPrototypeOf(..)`：通过`[[SetPrototypeOf]]`，设置代理的`[[Prototype]]`（`Object.setPrototypeOf(..)`，`Reflect.setPrototypeOf(..)`，或`__proto__`）
+
+* `preventExtensions(..)`：通过`[[PreventExtensions]]`使代理称为不可扩展的（`Object.preventExtensions(..)`或`Reflect.preventExtensions(..)`）
+
+* `isExtensible(..)`：通过`[[IsExtensible]]`，检测代理的可扩展性（`Object.isExtensible(..)`或`Reflect.isExtensible(..)`）
+
+* `ownKeys(..)`：通过`[[OwnPropertyKeys]]`，取得一组代理的直属属性和/或直属symbol属性（`Object.keys(..)`，`Object.getOwnPropertyNames(..)`，`Object.getOwnSymbolProperties(..)`，`Reflect.ownKeys(..)`，或`JSON.stringify(..)`）
+
+* `enumerate(..)`：通过`[[Enumerate]]`，为代理的可枚举直属属性及“继承”属性请求一个迭代器（`Reflect.enumerate(..)`或`for..in`）
+
+* `has(..)`：通过`[[HasProperty]]`，检测代理是否拥有一个直属属性或“继承”属性（`Reflect.has(..)`，`Object#hasOwnProperty(..)`，或`"prop" in obj`）
+
+**提示：** 关于每个这些元编程任务的更多信息，参见本章稍后的“`Reflect` API”一节。
+
+关于将会触发各种机关的动作，除了在前面列表中记载的以外，一些机关还会由另一个机关的默认动作间接地触发。举例来说：
 
 ```js
 var handlers = {
@@ -464,13 +478,17 @@ proxy.a = 2;
 // defineProperty
 ```
 
-The `getOwnPropertyDescriptor(..)` and `defineProperty(..)` handlers are triggered by the default `set(..)` handler's steps when setting a property value (whether newly adding or updating). If you also define your own `set(..)` handler, you may or may not make the corresponding calls against `context` (not `target`!) which would trigger these proxy traps.
+在设置一个属性值时（不管是新添加还是更新），`getOwnPropertyDescriptor(..)`和`defineProperty(..)`处理器被默认的`set(..)`处理器触发。如果你还定义了你自己的`set(..)`处理器，你或许对`context`（不是`target`！）进行了将会触发这些代理机关的相应调用。
 
 ### Proxy Limitations
 
 These meta programming handlers trap a wide array of fundamental operations you can perform against an object. However, there are some operations which are not (yet, at least) available to intercept.
 
+这些元编程处理器拦截了你可以对一个对象进行的很广泛的一组基础操作。但是，有一些操作不能（至少是还不能）被用于拦截。
+
 For example, none of these operations are trapped and forwarded from `pobj` proxy to `obj` target:
+
+例如，从`pobj`代理到`obj`目标，这些操作全都没有被拦截和转送：
 
 ```js
 var obj = { a:1, b:2 },
@@ -485,6 +503,8 @@ obj === pobj
 ```
 
 Perhaps in the future, more of these underlying fundamental operations in the language will be interceptable, giving us even more power to extend JavaScript from within itself.
+
+也许在未来，更多这些语言中的底层基础操作都将是可拦截的，以给我们更多力量来从JavaScript自身扩展它。
 
 **Warning:** There are certain *invariants* -- behaviors which cannot be overridden -- that apply to the use of proxy handlers. For example, the result from the `isExtensible(..)` handler is always coerced to a `boolean`. These invariants restrict some of your ability to customize behaviors with proxies, but they do so only to prevent you from creating strange and unusual (or inconsistent) behavior. The conditions for these invariants are complicated so we won't fully go into them here, but this post (http://www.2ality.com/2014/12/es6-proxies.html#invariants) does a great job of covering them.
 
