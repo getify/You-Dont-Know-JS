@@ -508,9 +508,13 @@ Perhaps in the future, more of these underlying fundamental operations in the la
 
 **Warning:** There are certain *invariants* -- behaviors which cannot be overridden -- that apply to the use of proxy handlers. For example, the result from the `isExtensible(..)` handler is always coerced to a `boolean`. These invariants restrict some of your ability to customize behaviors with proxies, but they do so only to prevent you from creating strange and unusual (or inconsistent) behavior. The conditions for these invariants are complicated so we won't fully go into them here, but this post (http://www.2ality.com/2014/12/es6-proxies.html#invariants) does a great job of covering them.
 
+**警告：** 对于代理处理器的使用来说存在某些 *不变量* —— 它们的行为不能被覆盖。例如，`isExtensible(..)`处理器的结果总是被强制转换为一个`boolean`。这些不变量限制了一些你可以使用代理来自定义行为的能力，但是它们这样做只是为了防止你创建奇怪和不寻常（或不合逻辑）的行为。这些不变量的条件十分复杂，所以我们就不再这里全面阐述了，但是这篇博文(http://www.2ality.com/2014/12/es6-proxies.html#invariants)很好地讲解了它们。
+
 ### Revocable Proxies
 
 A regular proxy always traps for the target object, and cannot be modified after creation -- as long as a reference is kept to the proxy, proxying remains possible. However, there may be cases where you want to create a proxy that can be disabled when you want to stop allowing it to proxy. The solution is to create a *revocable proxy*:
+
+一个一般的代理总是包装着目标对象，而且在创建之后就不能修改了 —— 只要保持着一个指向这个代理的引用，代理的机制就将维持下去。但是，可能会有一些情况你想要创建一个这样的代理：在你想要停止它作为代理时可以被停用。解决方案就是创建一个 *可撤销代理*：
 
 ```js
 var obj = { a: 1 },
