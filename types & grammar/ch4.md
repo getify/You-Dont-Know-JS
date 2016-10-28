@@ -1137,7 +1137,7 @@ while (c) {
 c = d ? a : b;
 c;								// "abc"
 
-if ((a && d) || c) {
+if (!(a && d) || c) {
 	console.log( "yep" );		// yep
 }
 ```
