@@ -1112,11 +1112,11 @@ TCO意味着调用栈可以有多深实际上是没有限度的。这种技巧�
 
 ### Tail Call Rewrite
 
-The hitch, however, is that only PTC can be optimized; non-PTC will still work of course, but will cause stack frame allocation as they always did. You'll have to be careful about structuring your functions with PTC if you expect the optimizations to kick in.
+然而，障碍是只有PTC是可以被优化的；非PTC理所当然地依然可以工作，但是将造成往常那样的栈帧分配。如果你希望优化机制启动，就必须小心地使用PTC构造你的函数。
 
-If you have a function that's not written with PTC, you may find the need to manually rearrange your code to be eligible for TCO.
+如果你有一个没有用PTC编写的函数，你可能会发现你需要手动地重新安排你的代码，使它成为合法的TCO。
 
-Consider:
+考虑如下代码：
 
 ```js
 "use strict";
@@ -1129,9 +1129,9 @@ function foo(x) {
 foo( 123456 );			// RangeError
 ```
 
-The call to `foo(x-1)` isn't a PTC because its result has to be added to `(x / 2)` before `return`ing.
+对`foo(x-1)`的调用不是一个PTC，因为在`return`之前它的结果必须被加上`(x / 2)`。
 
-However, to make this code eligible for TCO in an ES6 engine, we can rewrite it as follows:
+但是，要使这段代码在一个ES6引擎中是合法的TCO，我们可以像下面这样重写它：
 
 ```js
 "use strict";
@@ -1150,11 +1150,13 @@ var foo = (function(){
 foo( 123456 );			// 3810376848.5
 ```
 
-If you run the previous snippet in an ES6 engine that implements TCO, you'll get the `3810376848.5` answer as shown. However, it'll still fail with a `RangeError` in non-TCO engines.
+如果你在一个实现了TCO的ES6引擎中运行前面这个代码段，你将会如展示的那样得到答案`3810376848.5`。然而，它仍然会在非TCO引擎中因为`RangeError`而失败。
 
 ### Non-TCO Optimizations
 
 There are other techniques to rewrite the code so that the call stack isn't growing with each call.
+
+有另一中技术可以重写代码，让调用栈不随每次调用增长。
 
 One such technique is called *trampolining*, which amounts to having each partial result represented as a function that either returns another partial result function or the final result. Then you can simply loop until you stop getting a function, and you'll have the result. Consider:
 
