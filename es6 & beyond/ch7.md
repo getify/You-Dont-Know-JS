@@ -1154,11 +1154,9 @@ foo( 123456 );			// 3810376848.5
 
 ### Non-TCO Optimizations
 
-There are other techniques to rewrite the code so that the call stack isn't growing with each call.
+有另一种技术可以重写代码，让调用栈不随每次调用增长。
 
-有另一中技术可以重写代码，让调用栈不随每次调用增长。
-
-One such technique is called *trampolining*, which amounts to having each partial result represented as a function that either returns another partial result function or the final result. Then you can simply loop until you stop getting a function, and you'll have the result. Consider:
+一个这样的技术称为 *蹦床*，它相当于让每一部分结果表示为一个函数，这个函数要么返回另一个部分结果函数，要么返回最终结果。然后你就可以简单地循环直到你不再收到一个函数，这时你就得到了结果。考虑如下代码：
 
 ```js
 "use strict";
@@ -1186,16 +1184,16 @@ var foo = (function(){
 foo( 123456 );			// 3810376848.5
 ```
 
-This reworking required minimal changes to factor out the recursion into the loop in `trampoline(..)`:
+这种返工需要一些最低限度的改变来将递归抽出到`trampoline(..)`中的循环中：
 
-1. First, we wrapped the `return _foo ..` line in the `return partial() { ..` function expression.
-2. Then we wrapped the `_foo(1,x)` call in the `trampoline(..)` call.
+1. 首先，我们将`return _foo ..`这一行包装进函数表达式`return partial() {..`。
+2. 然后我们将`_foo(1,x)`包装进`trampoline(..)`调用。
 
-The reason this technique doesn't suffer the call stack limitation is that each of those inner `partial(..)` functions is just returned back to the `while` loop in `trampoline(..)`, which runs it and then loop iterates again. In other words, `partial(..)` doesn't recursively call itself, it just returns another function. The stack depth remains constant, so it can run as long as it needs to.
+这种技术之所以不受调用栈限制的影响，是因为每个内部的`partial(..)`函数都只是返回到`trampoline(..)`的`while`循环中，这个循环运行它然后再一次循环迭代。换言之，`partial(..)`并不递归地调用它自己，它只是返回另一个函数。栈的深度维持不变，所以它需要运行多久就可以运行多久。
 
-Trampolining expressed in this way uses the closure that the inner `partial()` function has over the `x` and `acc` variables to keep the state from iteration to iteration. The advantage is that the looping logic is pulled out into a reusable `trampoline(..)` utility function, which many libraries provide versions of. You can reuse `trampoline(..)` multiple times in your program with different trampolined algorithms.
+蹦床表达的是，内部的`partial()`函数使用在变量`x`和`acc`上的闭包来保持迭代与迭代之间的状态。它的优势是循环的逻辑可以被抽出到一个可重用的`trampoline(..)`工具函数中，许多库都提供这个工具的各种版本。你可以使用不同的蹦床算法在你的程序中重用`trampoline(..)`多次。
 
-Of course, if you really wanted to deeply optimize (and the reusability wasn't a concern), you could discard the closure state and inline the state tracking of `acc` into just one function's scope along with a loop. This technique is generally called *recursion unrolling*:
+当然，如果你真的想要深度优化（于是可复用性不予考虑），你可以摒弃闭包状态，并将对`acc`的状态追踪，与一个循环一起内联到一个函数的作用域内。这种结束通常称为 *递归展开*：
 
 ```js
 "use strict";
@@ -1212,22 +1210,22 @@ function foo(x) {
 foo( 123456 );			// 3810376848.5
 ```
 
-This expression of the algorithm is simpler to read, and will likely perform the best (strictly speaking) of the various forms we've explored. That may seem like a clear winner, and you may wonder why you would ever try the other approaches.
+算法的这种表达形式很容易阅读，而且很可能是在我们探索过得各种形式中性能最好的（严格地说）一个。很明显它看起来是一个胜利者，而且你可能会想知道为什么你曾尝试其他的方式。
 
-There are some reasons why you might not want to always manually unroll your recursions:
+这些是为什么你可能不想总是手动地展开递归的原因：
 
-* Instead of factoring out the trampolining (loop) logic for reusability, we've inlined it. This works great when there's only one example to consider, but as soon as you have a half dozen or more of these in your program, there's a good chance you'll want some reusability to keep things shorter and more manageable.
-* The example here is deliberately simple enough to illustrate the different forms. In practice, there are many more complications in recursion algorithms, such as mutual recursion (more than just one function calling itself).
+* 与为了复用而将弹簧（循环）逻辑抽出去相比，我们内联了它。这在仅有一个这样的例子需要考虑时工作的很好，但只要你在程序中有五六个或更多这样的东西时，你将很可能想要一些可复用性来将让事情更简短、更易管理一些。
+* 这里的例子为了展示不同的形式而被故意地搞得很简单。在现实中，递归算法有着更多的复杂性，比如相互递归（有多于一个的函数调用它自己）。
 
-   The farther you go down this rabbit hole, the more manual and intricate the *unrolling* optimizations are. You'll quickly lose all the perceived value of readability. The primary advantage of recursion, even in the PTC form, is that it preserves the algorithm readability, and offloads the performance optimization to the engine.
+	 你在这条路上走得越远，*展开* 优化就变得越复杂和越依靠手动。你很快就会失去所有可读性的认知价值。递归，甚至是PTC形式的递归的主要优点是，它保留了算法的可读性，并将性能优化的任务交给引擎。
 
-If you write your algorithms with PTC, the ES6 engine will apply TCO to let your code run in constant stack depth (by reusing stack frames). You get the readability of recursion with most of the performance benefits and no limitations of run length.
+如果你使用PTC编写你的算法，ES6引擎将会实施TCO来使你的代码运行在一个定长深度的栈中（通过重用栈帧）。你将在得到递归的可读性的同时，也得到性能上的大部分好处与无限的运行长度。
 
 ### Meta?
 
-What does TCO have to do with meta programming?
+TCO与元编程有什么关系？
 
-As we covered in the "Feature Testing" section earlier, you can determine at runtime what features an engine supports. This includes TCO, though determining it is quite brute force. Consider:
+正如我们在早先的“特性测试”一节中讲过的，你可以在运行时判定一个引擎支持什么特性。这也包括TCO，虽然判定的过程相当粗暴。考虑如下代码：
 
 ```js
 "use strict";
@@ -1244,15 +1242,15 @@ catch (err) {
 }
 ```
 
-In a non-TCO engine, the recursive loop will fail out eventually, throwing an exception caught by the `try..catch`. Otherwise, the loop completes easily thanks to TCO.
+在一个非TCO引擎中，递归循环最终将会失败，抛出一个被`try..catch`捕获的异常。否则循环将由于TCO轻易地完成。
 
-Yuck, right?
+讨厌，对吧？
 
-But how could meta programming around the TCO feature (or rather, the lack thereof) benefit our code? The simple answer is that you could use such a feature test to decide to load a version of your application's code that uses recursion, or an alternative one that's been converted/transpiled to not need recursion.
+但是围绕着TCO特性进行的元编程（或者，没有它）如何给我们的代码带来好处？简单的答案是你可以使用这样的特性测试来决定加载一个你的应用程序的使用递归的版本，还是一个被转换/转译为不需要递归的版本。
 
 #### Self-Adjusting Code
 
-But here's another way of looking at the problem:
+但这里有另外一种看待这个问题的方式：
 
 ```js
 "use strict";
@@ -1281,30 +1279,30 @@ function foo(x) {
 foo( 123456 );			// 3810376848.5
 ```
 
-This algorithm works by attempting to do as much of the work with recursion as possible, but keeping track of the progress via scoped variables `x` and `acc`. If the entire problem can be solved with recursion without an error, great. If the engine kills the recursion at some point, we simply catch that with the `try..catch` and then try again, picking up where we left off.
+这个算法试图尽可能多地使用递归来工作，但是通过作用域中的变量`x`和`acc`来跟踪这个进程。如果整个问题可以通过递归没有错误地解决，很好。如果引擎在某一点终止了递归，我们简单地使用`try..catch`捕捉它，然后从我们离开的地方再试一次。
 
-I consider this a form of meta programming in that you are probing during runtime the ability of the engine to fully (recursively) finish the task, and working around any (non-TCO) engine limitations that may restrict you.
+我认为这是一种形式的元编程，因为你在运行时期间探测着引擎是否能（递归地）完成任务的能力，并绕过了任何可能制约你的（非TCO得）引擎的限制。
 
-At first (or even second!) glance, my bet is this code seems much uglier to you compared to some of the earlier versions. It also runs a fair bit slower (on larger runs in a non-TCO environment).
+一眼（或者是两眼！）看上去，我打赌这段代码要比以前的版本难看许多。它运行起来还相当地慢一些（在一个非TCO环境中长时间运行的情况下）。
 
-The primary advantage, other than it being able to complete any size task even in non-TCO engines, is that this "solution" to the recursion stack limitation is much more flexible than the trampolining or manual unrolling techniques shown previously.
+它主要的优势是，除了在非TCO引擎中也能完成任意栈大小的任务外，这种对递归栈限制的“解法”要比前面展示的蹦床和手动展开技术灵活得多。
 
-Essentially, `_foo()` in this case is a sort of stand-in for practically any recursive task, even mutual recursion. The rest is the boilerplate that should work for just about any algorithm.
+实质上，这种情况下的`_foo()`实际上是任意递归任务，甚至是相互递归的某种替身。剩下的内容是应当对任何算法都可以工作的模板代码。
 
-The only "catch" is that to be able to resume in the event of a recursion limit being hit, the state of the recursion must be in scoped variables that exist outside the recursive function(s). We did that by leaving `x` and `acc` outside of the `_foo()` function, instead of passing them as arguments to `_foo()` as earlier.
+唯一的“技巧”是为了能够在达到递归限制的事件发生时继续运行，递归的状态必须保存在递归函数外部的作用域变量中。我们是通过将`x`和`acc`留在`_foo()`函数外面这样做的，而不是像早先那样将它们作为参数值传递给`_foo()`。
 
-Almost any recursive algorithm can be adapted to work this way. That means it's the most widely applicable way of leveraging TCO with recursion in your programs, with minimal rewriting.
+几乎所有的递归算法都可以采用这种方法工作。这意味着它是在你的程序中，进行最小的重写就能利用TCO递归的最广泛的可行方法。
 
-This approach still uses a PTC, meaning that this code will *progressively enhance* from running using the loop many times (recursion batches) in an older browser to fully leveraging TCO'd recursion in an ES6+ environment. I think that's pretty cool!
+这种方式仍然使用一个PTC，意味着这段代码将会 *渐进增强*：从在一个老版浏览器中使用许多次循环（递归批处理）来运行，到在一个ES6+环境中完全利用TCO递归。我觉得这相当酷！
 
 ## Review
 
-Meta programming is when you turn the logic of your program to focus on itself (or its runtime environment), either to inspect its own structure or to modify it. The primary value of meta programming is to extend the normal mechanisms of the language to provide additional capabilities.
+元编程是当你将程序的逻辑转向关注它自身（或者它的运行时环境）时进行的编程，要么为了调查它自己的结构，要么为了修改它。元编程的主要价值是扩展语言的普通机制来提供额外的能力。
 
-Prior to ES6, JavaScript already had quite a bit of meta programming capability, but ES6 significantly ramps that up with several new features.
+在ES6以前，JavaScript已经有了相当的元编程能力，但是ES6使用了几个新特性及大地提高了它的地位。
 
-From function name inferences for anonymous functions to meta properties that give you information about things like how a constructor was invoked, you can inspect the program structure while it runs more than ever before. Well Known Symbols let you override intrinsic behaviors, such as coercion of an object to a primitive value. Proxies can intercept and customize various low-level operations on objects, and `Reflect` provides utilities to emulate them.
+从为匿名函数的函数名推断，到告诉你一个构造器是如何被调用的元属性，你可以前所未有地在程序运行期间来调查它的结构。Well Known Symbols允许你覆盖固有的行为，比如将一个对象转换为一个基本类型值的强制转换。代理可以拦截并自定义各种在对象上的底层操作，而且`Reflect`提供了模拟它们的工具。
 
-Feature testing, even for subtle semantic behaviors like Tail Call Optimization, shifts the meta programming focus from your program to the JS engine capabilities itself. By knowing more about what the environment can do, your programs can adjust themselves to the best fit as they run.
+特性测试，即便是对尾部调用优化这样微妙的语法行为，将元编程的焦点从你的程序提升到JS引擎的能力本身。通过更多地了解环境可以做什么，你的程序可以在运行时将它们自己调整到最佳状态。
 
-Should you meta program? My advice is: first focus on learning how the core mechanics of the language really work. But once you fully know what JS itself can do, it's time to start leveraging these powerful meta programming capabilities to push the language further!
+你应该进行元编程吗？我的建议是：先集中学习这门语言的核心机制是如何工作的。一旦你完全懂得了JS本身可以做什么，就是开始利用这些强大的元编程能力将这门语言向前推进的时候了！
