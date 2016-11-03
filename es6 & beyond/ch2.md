@@ -323,38 +323,36 @@ foo( 1, 2, 3, 4, 5);			// [1,2,3,4,5]
 
 **注意：** 在`foo(..)`函数声明中的`...args`经常因为你向其中收集参数的剩余部分而被称为“剩余参数”。我喜欢使用“收集”这个词，因为它描述了它做什么而不是它包含什么。
 
-这种用法最棒的地方是，它为被废弃了很久的`arguments`数组 —— 实际上它不是一个真正的数组，而是一个类数组对象 —— 提供了一种非常稳固的替代方案。因为`args`（无论你叫它什么 —— 许多人喜欢叫它`r`或者`rest`）是一个真正的数组，我们可以摆脱许多愚蠢的前ES6技巧，我们曾经通过这些技巧尽全力去使`arguments`变成我们可以视之为数组的东西。
+这种用法最棒的地方是，它为被废弃了很久的`arguments`数组 —— 实际上它不是一个真正的数组，而是一个类数组对象 —— 提供了一种非常稳健的替代方案。因为`args`（无论你叫它什么 —— 许多人喜欢叫它`r`或者`rest`）是一个真正的数组，我们可以摆脱许多愚蠢的前ES6技巧，我们曾经通过这些技巧尽全力去使`arguments`变成我们可以视之为数组的东西。
 
 考虑如下代码：
 
 ```js
-// doing things the new ES6 way
+// 使用新的ES6方式
 function foo(...args) {
-	// `args` is already a real array
+	// `args`已经是一个真正的数组了
 
-	// discard first element in `args`
+	// 丢弃`args`中的第一个元素
 	args.shift();
 
-	// pass along all of `args` as arguments
-	// to `console.log(..)`
+	// 将`args`的所有内容作为参数值传给`console.log(..)`
 	console.log( ...args );
 }
 
-// doing things the old-school pre-ES6 way
+// 使用老旧的前ES6方式
 function bar() {
-	// turn `arguments` into a real array
+	// 将`arguments`转换为一个真正的数组
 	var args = Array.prototype.slice.call( arguments );
 
-	// add some elements on the end
+	// 在末尾添加一些元素
 	args.push( 4, 5 );
 
-	// filter out odd numbers
+	// 过滤掉所有奇数
 	args = args.filter( function(v){
 		return v % 2 == 0;
 	} );
 
-	// pass along all of `args` as arguments
-	// to `foo(..)`
+	// 将`args`的所有内容作为参数值传给`foo(..)`
 	foo.apply( null, args );
 }
 
@@ -365,7 +363,7 @@ bar( 0, 1, 2, 3 );					// 2 4
 
 除了在函数声明中`...`的用法以外，还有另一种`...`被用于收集值的情况，我们将在本章稍后的“太多，太少，正合适”一节中检视它。
 
-## Default Parameter Values
+## 默认参数值
 
 也许在JavaScript中最常见的惯用法之一就是为函数参数设置默认值。我们多年来一直使用的方法应当看起来很熟悉：
 
@@ -386,7 +384,7 @@ foo( null, 6 );		// 17
 当然，如果你曾经用过这种模式，你就会知道它既有用又有点儿危险，例如如果你需要能够为其中一个参数传入一个可能被认为是falsy的值。考虑下面的代码：
 
 ```js
-foo( 0, 42 );		// 53 <-- Oops, not 42
+foo( 0, 42 );		// 53 <-- 噢，不是42
 ```
 
 为什么？因为`0`是falsy，因此`x || 11`的结果为`11`，而不是直接被传入的`0`。
@@ -421,17 +419,17 @@ foo( 5 );				// 36
 foo( 5, undefined );	// NaN
 ```
 
-但是在没有能力传入意味着“我省略了这个参数值”的任何种类的值的情况下，你如何才能省略第一个参数值`x`呢？
+但是在没有能力传入意味着“我省略了这个参数值”的任何种类的值（连`undefined`也不行）的情况下，你如何才能省略第一个参数值`x`呢？
 
 `foo(,5)`很诱人，但它不是合法的语法。`foo.apply(null,[,5])`看起来应该可以实现这个技巧，但是`apply(..)`的奇怪之处意味着这组参数值将被视为`[undefined,5]`，显然它没有被省略。
 
-如果你深入调查下去，你将发现你只能通过简单地传入比“期望的”参数值个数少的参数值来省略末尾的参数值，但是你不能省略在参数值列表中间或者开头的参数值。这就是不可能的。
+如果你深入调查下去，你将发现你只能通过简单地传入比“期望的”参数值个数少的参数值来省略末尾的参数值，但是你不能省略在参数值列表中间或者开头的参数值。这就是不可能。
 
-这里有一个施用于JavaScript设计的重要原则需要被记住：`undefined`意味着 *丢失*。也就是，在`undefined`和 *丢失* 之间没有区别，至少是就函数参数值而言。
+这里有一个施用于JavaScript设计的重要原则需要记住：`undefined`意味着 *缺失*。也就是，在`undefined`和 *缺失* 之间没有区别，至少是就函数参数值而言。
 
 **注意：** 容易令人糊涂的是，JS中有其他的地方不适用这种特殊的设计原则，比如带有空值槽的数组。更多信息参见本系列的 *类型与文法*。
 
-带着所有这些意识，现在我们可以检视在ES6中新增的一种有用的好语法，来简化对丢失的参数值进行默认值的赋值。
+带着所有这些认识，现在我们可以检视在ES6中新增的一种有用的好语法，来简化对丢失的参数值进行默认值的赋值。
 
 ```js
 function foo(x = 11, y = 31) {
@@ -443,11 +441,11 @@ foo( 5, 6 );			// 11
 foo( 0, 42 );			// 42
 
 foo( 5 );				// 36
-foo( 5, undefined );	// 36 <-- `undefined` is missing
-foo( 5, null );			// 5  <-- null coerces to `0`
+foo( 5, undefined );	// 36 <-- `undefined`是缺失
+foo( 5, null );			// 5  <-- null强制转换为`0`
 
-foo( undefined, 6 );	// 17 <-- `undefined` is missing
-foo( null, 6 );			// 6  <-- null coerces to `0`
+foo( undefined, 6 );	// 17 <-- `undefined`是缺失
+foo( null, 6 );			// 6  <-- null强制转换为`0`
 ```
 
 注意这些结果，和它们如何暗示了与前面的方式的微妙区别和相似之处。
@@ -456,7 +454,7 @@ foo( null, 6 );			// 6  <-- null coerces to `0`
 
 **注意：** 一个剩余/收集参数（参见“扩散/剩余”）不能拥有默认值。所以，虽然`function foo(...vals=[1,2,3]) {`看起来是一种迷人的能力，但它不是合法的语法。有必要的话你需要继续手动实施那种逻辑。
 
-### Default Value Expressions
+### 默认值表达式
 
 函数默认值可以比像`31`这样的简单值复杂得多；它们可以是任何合法的表达式，甚至是函数调用：
 
@@ -531,7 +529,7 @@ ajax( "http://some.url.1" );
 
 从JS的早些年开始，就有一个少为人知但是十分有用的奇怪之处可供我们使用：`Function.prototype`本身就是一个没有操作的空函数。这样，这个声明可以是`cb = Function.prototype`而省去内联函数表达式的创建。
 
-## Destructuring
+## 解构
 
 ES6引入了一个称为 *解构* 的新语法特性，如果你将它考虑为 *结构化赋值* 那么它令人困惑的程度可能会小一些。为了理解它的含义，考虑如下代码：
 
