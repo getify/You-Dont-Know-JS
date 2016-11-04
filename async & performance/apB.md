@@ -34,10 +34,10 @@ steps
 .then( function STEP1(x){
 	return x * 2;
 } )
-.steps( function STEP2(x){
+.then( function STEP2(x){
 	return x + 3;
 } )
-.steps( function STEP3(x){
+.then( function STEP3(x){
 	return x * 4;
 } );
 
