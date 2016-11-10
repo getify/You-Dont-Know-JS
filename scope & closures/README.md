@@ -10,7 +10,7 @@
 
 [目录](toc.md)
 
-* [序](https://shanehudson.net/2014/06/03/foreword-dont-know-js/) (by [Shane Hudson](https://github.com/shanehudson))
+* [序](https://shanehudson.net/2014/06/03/foreword-dont-know-js/)（[Shane Hudson](https://github.com/shanehudson)）
 * [前言](../preface.md)
 * [第一章：什么是作用域？](ch1.md)
 * [第二章：词法作用域](ch2.md)

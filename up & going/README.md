@@ -10,7 +10,7 @@
 
 [目录](toc.md)
 
-* [序](foreword.md) (by [Jenn Lukas](http://jennlukas.com))
+* [序](foreword.md)（[Jenn Lukas](http://jennlukas.com)）
 * [前言](../preface.md)
 * [第一章：进入编程](ch1.md)
 * [第二章：进入JavaScript](ch2.md)

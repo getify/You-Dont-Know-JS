@@ -1,21 +1,21 @@
-# You Don't Know JS: Types & Grammar
+# 你不懂JS：类型与文法
 
 <img src="cover.jpg" width="300">
 
 -----
 
-**[Purchase digital/print copy from O'Reilly](http://shop.oreilly.com/product/0636920033745.do)**
+**[从O'Reilly购买数字/印刷版](http://shop.oreilly.com/product/0636920033745.do)**
 
 -----
 
-[Table of Contents](toc.md)
+[目录](toc.md)
 
-* [Foreword](foreword.md) (by [David Walsh](http://davidwalsh.name))
-* [Preface](../preface.md)
-* [Chapter 1: Types](ch1.md)
-* [Chapter 2: Values](ch2.md)
-* [Chapter 3: Natives](ch3.md)
-* [Chapter 4: Coercion](ch4.md)
-* [Chapter 5: Grammar](ch5.md)
-* [Appendix A: Mixed Environment JavaScript](apA.md)
-* [Appendix B: Thank You's!](apB.md)
+* [序](foreword.md)（[David Walsh](http://davidwalsh.name)）
+* [前言](../preface.md)
+* [第一章：类型](ch1.md)
+* [第二章：值](ch2.md)
+* [第三章：原生类型](ch3.md)
+* [第四章：强制转换](ch4.md)
+* [第五章：文法](ch5.md)
+* [附录A：混合环境下的JavaScript](apA.md)
+* [附录B: 鸣谢](apB.md)
