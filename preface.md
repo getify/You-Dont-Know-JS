@@ -17,7 +17,7 @@
 
 这就是JavaScript的矛盾之处，这门语言的致命弱点，我们当下面临的挑战。因为JavaScript *可以* 不搞懂就使用，所以这门语言经常是从没被搞懂过。
 
-## Mission
+## 使命
 
 如果每次你在JavaScript中遭遇惊诧和挫折时，你的反应都是像某些人习惯的那样将它加入黑名单，那么你很快就会将JavaScript的丰富内涵掏成一个空壳。
 
@@ -29,14 +29,12 @@
 
 我不满足于，你也不应当满足于，一看到某些东西 *好用* 就停下来，而不真正知道 *为什么*。我礼貌地挑战你沿着这条颠簸的“少有人走的路”走下去，并拥抱JavaScript和它能做的一起。有了这些知识，没有什么技术，框架，本周最流行的词儿，是你理解不了的。
 
-These books each take on specific core parts of the language which are most commonly misunderstood or under-understood, and dive very deep and exhaustively into them. You should come away from reading with a firm confidence in your understanding, not just of the theoretical, but the practical "what you need to know" bits.
+这些书的每一本都承担这门语言的一个具体的核心部分 —— 这些内容都是最常被误解或不被了解的，并且非常深入、穷尽地探究它们。你应当在读过之后对你的理解有坚定的信心，不仅仅是理论上的，而且是对实际的“你需要懂得的”部分。
 
-这些书的每一本都承担这门语言的一个具体的核心部分 —— 这些内容都是最常被误解或不被了解的，并且非常深入、穷尽地探究它们。
+你 *目前* 知道的JavaScript可能是被那些没有完全懂得它的人传授下来的 *部分*。*那些* JavaScript只是真正的这门语言的影子。你 *还* 不 *真正* 懂得JavaScript，但如果你深入这个系列，你会的。读下去，我的朋友。JavaScript在等着你。
 
-The JavaScript you know *right now* is probably *parts* handed down to you by others who've been burned by incomplete understanding. *That* JavaScript is but a shadow of the true language. You don't *really* know JavaScript, *yet*, but if you dig into this series, you *will*. Read on, my friends. JavaScript awaits you.
+## 总结
 
-## Summary
+JavaScript很了不起。很容易学习它的一部分，但是完整地（甚至是 *充分地*）学习它可就难太多了。当开发者们遭遇困惑时，他们经常责备这门语言而不是自己对它理解的匮乏。这些书的目的就是要修正这些情况，极大地巩固这门语言中你现在可以，而且 *应当*，深刻 *懂得* 的东西。
 
-JavaScript is awesome. It's easy to learn partially, and much harder to learn completely (or even *sufficiently*). When developers encounter confusion, they usually blame the language instead of their lack of understanding. These books aim to fix that, inspiring a strong appreciation for the language you can now, and *should*, deeply *know*.
-
-Note: Many of the examples in this book assume modern (and future-reaching) JavaScript engine environments, such as ES6. Some code may not work as described if run in older (pre-ES6) engines.
+注意：这本书中的许多例子都假定运行在现代化的（以及与未来接轨的）JavaScript引擎环境中，比如ES6。一些代码可能会在老版本的（前ES6）引擎中不能如描述的那样工作。
