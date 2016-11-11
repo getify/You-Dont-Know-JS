@@ -118,6 +118,6 @@ Secondly, IIFE is not a fair apples-to-apples comparison with `try/catch`, becau
 
 The question really becomes: do you want block-scoping, or not. If you do, these tools provide you that option. If not, keep using `var` and go on about your coding!
 
-[^note-traceur]: [Google Traceur](http://traceur-compiler.googlecode.com/git/demo/repl.html)
+[^note-traceur]: [Google Traceur](http://google.github.io/traceur-compiler/demo/repl.html)
 
 [^note-let_er]\: [let-er](https://github.com/getify/let-er)
