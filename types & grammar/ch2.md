@@ -32,6 +32,9 @@ a.length;	// 3
 ```
 
 **Warning:** Using `delete` on an `array` value will remove that slot from the `array`, but even if you remove the final element, it does **not** update the `length` property, so be careful! We'll cover the `delete` operator itself in more detail in Chapter 5.
+Actually `delete` operator in js just removes a particular property from its object-memory. So any deleted property is no longer
+accessable from that object. And as we know that any index of any array are just property like any other object's property.
+So `delete` operator behaves exactly same for Array.
 
 Be careful about creating "sparse" `array`s (leaving or creating empty/missing slots):
 
