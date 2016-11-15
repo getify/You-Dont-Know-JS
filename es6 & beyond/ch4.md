@@ -1,5 +1,5 @@
-# You Don't Know JS: ES6 & Beyond
-# Chapter 4: Async Flow Control
+# 你不懂JS：ES6与未来
+# 第四章：异步流程控制
 
 如果你写过任何数量相当的JavaScript，这就不是什么秘密：异步编程是一种必须的技能。管理异步的主要机制曾经是函数回调。
 
@@ -19,7 +19,7 @@ Promise可以被链接在一起，它们可以是一系列顺序的、异步完�
 
 显然，有几种不同的方式可以来考虑一个Promise是什么。没有一个角度就它自身来说是完全充分的，但是每一个角度都提供了整体的一个方面。这其中的要点是，它们为仅使用回调的异步提供了一个重大的改进，也就是说它们提供了顺序、可预测性、以及可靠性。
 
-### Making and Using Promises
+### 创建与使用 Promises
 
 要构建一个promise实例，可以使用`Promise(..)`构造器：
 
@@ -260,8 +260,6 @@ Promise.race( [p2,p4] )
 
 ## Generators + Promises
 
-It *is* possible to express a series of promises in a chain to represent the async flow control of your program. Consider:
-
 将一系列promise在一个链条中表达来代表你程序的异步流程控制是 *可能* 的。考虑如如下代码：
 
 ```js
@@ -282,15 +280,9 @@ step1()
 .then(step4);
 ```
 
-However, there's a much better option for expressing async flow control, and it will probably be much more preferable in terms of coding style than long promise chains. We can use what we learned in Chapter 3 about generators to express our async flow control.
-
 但是，对于表达异步流程控制来说有更好的选项，而且在代码风格上可能比长长的promise链更理想。我们可以使用在第三章中学到的generator来表达我们的异步流程控制。
 
-The important pattern to recognize: a generator can yield a promise, and that promise can then be wired to resume the generator with its fulfillment value.
-
 要识别一个重要的模式：一个generator可以yield出一个promise，然后这个promise可以使用它的完成值来推进generator。
-
-Consider the previous snippet's async flow control expressed with a generator:
 
 考虑前一个代码段，使用generator来表达：
 
@@ -317,25 +309,15 @@ function *main() {
 }
 ```
 
-On the surface, this snippet may seem more verbose than the promise chain equivalent in the earlier snippet. However, it offers a much more attractive -- and more importantly, a more understandable and reason-able -- synchronous-looking coding style (with `=` assignment of "return" values, etc.) That's especially true in that `try..catch` error handling can be used across those hidden async boundaries.
-
 从表面上看，这个代码段要比前一个promise链等价物要更繁冗。但是它提供了更加吸引人的 —— 而且重要的是，更加容易理解和阅读 —— 看起来同步的代码风格（“return”值的`=`赋值操作，等等），对于`try..catch`错误处理可以跨越那些隐藏的异步边界使用来说就更是这样。
-
-Why are we using Promises with the generator? It's certainly possible to do async generator coding without Promises.
 
 为什么我们要与generator一起使用Promise？不用Promise进行异步generator编码当然是可能的。
 
-Promises are a trustable system that uninverts the inversion of control of normal callbacks or thunks (see the *Async & Performance* title of this series). So, combining the trustability of Promises and the synchronicity of code in generators effectively addresses all the major deficiencies of callbacks. Also, utilities like `Promise.all([ .. ])` are a nice, clean way to express concurrency at a generator's single `yield` step.
-
 Promise是一个可信的系统，它将普通的回调和thunk中发生的控制倒转（参见本系列的 *异步与性能*）反转回来。所以组合Promise的可信性与generator中代码的同步性有效地解决了回调的主要缺陷。另外，像`Promise.all([ .. ])`这样的工具是一个非常美好、干净的方式 —— 在一个generator的一个`yield`步骤中表达并发。
-
-So how does this magic work? We're going to need a *runner* that can run our generator, receive a `yield`ed promise, and wire it up to resume the generator with either the fulfillment success value, or throw an error into the generator with the rejection reason.
 
 那么这种魔法是如何工作的？我们需要一个可以运行我们generator的 *运行器（runner）*，接收一个被`yield`出来的promise并连接它，让它要么使用成功的完成推进generator，要么使用拒绝的理由向generator抛出异常。
 
-Many async-capable utilities/libraries have such a "runner"; for example, `Q.spawn(..)` and my asynquence's `runner(..)` plug-in. But here's a stand-alone runner to illustrate how the process works:
-
-许多具备异步能力的工具/库都有这样的“运行器”；例如，`Q.spawn(..)`和我的asynquence中的`runner(..)`插件。这里有一个独立的运行期来展示这种处理如何工作：
+许多具备异步能力的工具/库都有这样的“运行器”；例如，`Q.spawn(..)`和我的asynquence中的`runner(..)`插件。这里有一个独立的运行器来展示这种处理如何工作：
 
 ```js
 function run(gen) {
@@ -368,9 +350,9 @@ function run(gen) {
 }
 ```
 
-**Note:** For a more prolifically commented version of this utility, see the *Async & Performance* title of this series. Also, the run utilities provided with various async libraries are often more powerful/capable than what we've shown here. For example, asynquence's `runner(..)` can handle `yield`ed promises, sequences, thunks, and immediate (non-promise) values, giving you ultimate flexibility.
+**注意：** 这个工具的更丰富注释的版本，参见本系列的 *异步与性能*。另外，由各种异步库提供的这种运行工具通常要比我们在这里展示的东西更强大。例如，asynquence的`runner(..)`可以处理被`yield`的promise、序列、thunk、以及（非promise的）间接值，给你终极的灵活性。
 
-So now running `*main()` as listed in the earlier snippet is as easy as:
+于是现在运行早先代码段中的`*main()`就像这样容易：
 
 ```js
 run( main )
@@ -384,16 +366,16 @@ run( main )
 );
 ```
 
-Essentially, anywhere that you have more than two asynchronous steps of flow control logic in your program, you can *and should* use a promise-yielding generator driven by a run utility to express the flow control in a synchronous fashion. This will make for much easier to understand and maintain code.
+实质上，在你程序中的任何拥有多于两个异步步骤的流程控制逻辑的地方，你就可以 *而且应当* 使用一个由运行工具驱动的让出promise的generator来以一种同步的风格表达流程控制。这样做将产生更易于理解和维护的代码。
 
-This yield-a-promise-resume-the-generator pattern is going to be so common and so powerful, the next version of JavaScript after ES6 is almost certainly going to introduce a new function type that will do it automatically without needing the run utility. We'll cover `async function`s (as they're expected to be called) in Chapter 8.
+这种“让出一个promise推进generator”的模式将会如此常见和如此强大，以至于ES6之后的下一个版本的JavaScript几乎可以确定将会引入一中新的函数类型，它无需运行工具就可以自动地执行。我们将在第八章中讲解`async function`（正如它们期望被称呼的那样）。
 
-## Review
+## 复习
 
-As JavaScript continues to mature and grow in its widespread adoption, asynchronous programming is more and more of a central concern. Callbacks are not fully sufficient for these tasks, and totally fall down the more sophisticated the need.
+随着JavaScript在它被广泛采用过程中的日益成熟与成长，异步编程越发地成为关注的中心。对于这些异步任务来说回调不完全够用，而且在更精巧的需求面前全面地崩塌。
 
-Thankfully, ES6 adds Promises to address one of the major shortcomings of callbacks: lack of trust in predictable behavior. Promises represent the future completion value from a potentially async task, normalizing behavior across sync and async boundaries.
+可喜的是，ES6增加了Promise来回调的主要缺陷之一：在可预测的行为上缺乏可信性。Promise代表一个潜在异步任务的未来完成值，跨越同步和异步的边界将行为进行了规范化。
 
-But it's the combination of Promises with generators that fully realizes the benefits of rearranging our async flow control code to de-emphasize and abstract away that ugly callback soup (aka "hell").
+但是，Promise与generator的组合才完全揭示了这样做的好处：将我们的异步流程控制代码重新安排，将难看的回调浆糊（也叫“低于”）弱化并抽象出去。
 
-Right now, we can manage these interactions with the aide of various async libraries' runners, but JavaScript is eventually going to support this interaction pattern with dedicated syntax alone!
+目前，我们可以在各种异步库的运行器的帮助下管理这些交互，但是JavaScript最终将会使用一种专门的独立语法来支持这种交互模式！
