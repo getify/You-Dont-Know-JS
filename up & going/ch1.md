@@ -333,7 +333,7 @@ console.log( a );	// 42
 
 The only thing that cannot appear inside a multiline comment is a `*/`, because that would be interpreted to end the comment.
 
-You will definitely want to begin your learning of programming by starting off with the habit of commenting code. Throughout the rest of this chapter, you'll see I use comments to explain things, so do the same in your own practice. Trust me, everyone who reads your code will thank you!
+You will definitely want to begin your learning of programming by starting off with the habit of commenting code. Throughout the rest of this chapter, you'll see I use comments to explain things, so do the same in your own practice. Trust me, everyone who reads your code (including yourself) will thank you!
 
 ## Variables
 
