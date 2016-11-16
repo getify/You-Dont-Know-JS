@@ -3,11 +3,11 @@
 
 如果你写过任何数量相当的JavaScript，这就不是什么秘密：异步编程是一种必须的技能。管理异步的主要机制曾经是函数回调。
 
-然而，ES6增加了一种新特性来帮助你解决仅使用回调来管理异步的重大缺陷：*Promise*。另外，我们可以重温generator（前一章中提到的）来看看一种将两者组合的模式，它是JavaScript中异步流程控制编程向前迈出的重要一步。
+然而，ES6增加了一种新特性：*Promise*，来帮助你解决仅使用回调来管理异步的重大缺陷。另外，我们可以重温generator（前一章中提到的）来看看一种将两者组合的模式，它是JavaScript中异步流程控制编程向前迈出的重要一步。
 
 ## Promises
 
-让我们辨明一些误解：Promise不是回调的替代品。Promise提供了一种可靠的中介机制 —— 也就是，在你的调用代码和将要执行任务的异步代码之间 —— 来管理回调。
+让我们辨明一些误解：Promise不是回调的替代品。Promise提供了一种可信的中介机制 —— 也就是，在你的调用代码和将要执行任务的异步代码之间 —— 来管理回调。
 
 另一种考虑Promise的方式是作为一种事件监听器，你可以在它上面注册监听一个通知你任务何时完成的事件。它是一个仅被触发一次的时间，但不管怎样可以被看作是一个事件。
 
@@ -15,9 +15,9 @@ Promise可以被链接在一起，它们可以是一系列顺序的、异步完�
 
 还有另外一种概念化Promise的方式是，将它看作一个 *未来值*，一个与时间无关的值的容器。无论底层的值是否是最终值，这种容器都可以被同样地推理。观测一个Promise的解析会在这个值准备好的时候将它抽取出来。换言之，一个Promise被认为是一个同步函数返回值的异步版本。
 
-一个Promise只可能拥有两种解析结果：完成或拒绝，并带有一个可选的信号值。如果一个Promise被完成，这个最终值成为一个完成值。如果它被拒绝，这个最终值称为理由（也就是“拒绝的理由”）。Promise只可能被解析（完成或拒绝）一次。任何其他的完成或拒绝的尝试都会被简单地忽略，一点一个Promise被解析，它就成为一个不可被改变的值（immutable）。
+一个Promise只可能拥有两种解析结果：完成或拒绝，并带有一个可选的信号值。如果一个Promise被完成，这个最终值称为一个完成值。如果它被拒绝，这个最终值称为理由（也就是“拒绝的理由”）。Promise只可能被解析（完成或拒绝）一次。任何其他的完成或拒绝的尝试都会被简单地忽略，一旦一个Promise被解析，它就成为一个不可被改变的值（immutable）。
 
-显然，有几种不同的方式可以来考虑一个Promise是什么。没有一个角度就它自身来说是完全充分的，但是每一个角度都提供了整体的一个方面。这其中的要点是，它们为仅使用回调的异步提供了一个重大的改进，也就是说它们提供了顺序、可预测性、以及可靠性。
+显然，有几种不同的方式可以来考虑一个Promise是什么。没有一个角度就它自身来说是完全充分的，但是每一个角度都提供了整体的一个方面。这其中的要点是，它们为仅使用回调的异步提供了一个重大的改进，也就是它们提供了顺序、可预测性、以及可信性。
 
 ### 创建与使用 Promises
 
@@ -35,21 +35,21 @@ var p = new Promise( function pr(resolve,reject){
 * 如果你不使用参数值，或任何非promise值调用`resolve(..)`，promise就会被完成。
 * 如果你调用`resolve(..)`并传入另一个promise，这个promise就会简单地采用 —— 要么立即要么最终地 —— 这个被传入的promise的状态（不是完成就是拒绝）。
 
-这里是你通常如何使用一个promise来重构一个依赖于回调的函数调用。如果你始于使用一个`ajax(..)`工具，它期预期要调用一个错误优先风格的回调：
+这里是你通常如何使用一个promise来重构一个依赖于回调的函数调用。假定你始于使用一个`ajax(..)`工具，它期预期要调用一个错误优先风格的回调：
 
 ```js
 function ajax(url,cb) {
-	// make request, eventually call `cb(..)`
+	// 发起请求，最终调用 `cb(..)`
 }
 
 // ..
 
 ajax( "http://some.url.1", function handler(err,contents){
 	if (err) {
-		// handle ajax error
+		// 处理ajax错误
 	}
 	else {
-		// handle `contents` success
+		// 处理成功的`contents`
 	}
 } );
 ```
@@ -59,8 +59,7 @@ ajax( "http://some.url.1", function handler(err,contents){
 ```js
 function ajax(url) {
 	return new Promise( function pr(resolve,reject){
-		// make request, eventually call
-		// either `resolve(..)` or `reject(..)`
+		// 发起请求，最终不是调用 `resolve(..)` 就是调用 `reject(..)`
 	} );
 }
 
@@ -69,15 +68,15 @@ function ajax(url) {
 ajax( "http://some.url.1" )
 .then(
 	function fulfilled(contents){
-		// handle `contents` success
+		// 处理成功的 `contents`
 	},
 	function rejected(reason){
-		// handle ajax error reason
+		// 处理ajax的错误reason
 	}
 );
 ```
 
-Promise拥有一个接收一个或两个回调函数的方法`then(..)`。第一个函数（如果存在的话）被看作是promise被成功地完成时要调用的处理器。第二个函数（如果存在的话）被看作是promise被明确拒绝时，或者任何错误/异常在解析的过程中被捕捉到时要调用的处理器。
+Promise拥有一个方法`then(..)`，它接收一个或两个回调函数。第一个函数（如果存在的话）被看作是promise被成功地完成时要调用的处理器。第二个函数（如果存在的话）被看作是promise被明确拒绝时，或者任何错误/异常在解析的过程中被捕捉到时要调用的处理器。
 
 如果这两个参数值之一被省略或者不是一个合法的函数 —— 通常你会用`null`来代替 —— 那么一个占位用的默认等价物就会被使用。默认的成功回调将传递它的完成值，而默认的错误回调将传播它的拒绝理由。
 
@@ -96,8 +95,7 @@ ajax( "http://some.url.1" )
 	}
 )
 .then( function fulfilled(data){
-	// handle data from original promise's
-	// handlers
+	// 处理来自于原本的promise的处理器中的数据
 } );
 ```
 
@@ -118,16 +116,15 @@ ajax( "http://some.url.1" )
 	}
 )
 .then( function fulfilled(contents){
-	// `contents` comes from the subsequent
-	// `ajax(..)` call, whichever it was
+	// `contents` 来自于任意一个后续的 `ajax(..)` 调用
 } );
 ```
 
-要注意的是，在第一个`fulfilled(..)`中的一个exception将 *不会* 导致第一个`rejected(..)`被调用，因为这个处理仅会应答第一个原始的promise的解析。取代它的是，第二个`then(..)`调用所针对的第二个promise，将会收到这个拒绝。
+要注意的是，在第一个`fulfilled(..)`中的一个异常（或者promise拒绝）将 *不会* 导致第一个`rejected(..)`被调用，因为这个处理仅会应答第一个原始的promise的解析。取代它的是，第二个`then(..)`调用所针对的第二个promise，将会收到这个拒绝。
 
-在上面的代码段中，我们没有监听这个拒绝，这意味着它会为了未来的观察而被静静地保持下来。如果你永远不通过调用`then(..)`或`catch(..)`来观察它，那么它将会称为未处理的。有些浏览器的开发者控制台可能会探测到这些未处理的拒绝并报告它们，但是这不是有可靠保证的；你应当总是观察promise拒绝。
+在上面的代码段中，我们没有监听这个拒绝，这意味着它会为了未来的观察而被静静地保持下来。如果你永远不通过调用`then(..)`或`catch(..)`来观察它，那么它将会成为未处理的。有些浏览器的开发者控制台可能会探测到这些未处理的拒绝并报告它们，但是这不是有可靠保证的；你应当总是观察promise拒绝。
 
-**注意：** 这只是Promise理论和行为的简要概览。要进行深入得多的探索，参见本系列的 *异步与性能* 的第三章。
+**注意：** 这只是Promise理论和行为的简要概览。要进行更加深入的探索，参见本系列的 *异步与性能* 的第三章。
 
 ### Thenables
 
@@ -140,7 +137,7 @@ Thenable基本上是一个一般化的标签，标识着任何由除了`Promise(
 ```js
 var th = {
 	then: function thener( fulfilled ) {
-		// call `fulfilled(..)` once every 100ms forever
+		// 永远会每100ms调用一次`fulfilled(..)`
 		setInterval( fulfilled, 100 );
 	}
 };
@@ -182,7 +179,7 @@ var p2 = new Promise( function pr(resolve){
 } );
 ```
 
-**提示：** `Promise.resolve(..)`就是前一节提出的thenable信任问题的解决方案。任何你还不确定是一个可信的promise的值 —— 它甚至可能是一个立即值 —— 都可以通过传入`Promise.resolve(..)`来进行规范化。如果这个值已经是一个可识别的promise或thenable，它的状态/解析结果将简单地被采用，将错误行为与你隔绝开。如果相反它是一个立即值，那么它将会被“包装”进一个纯粹的promise，以此将它的行为规范化为异步的。
+**提示：** `Promise.resolve(..)`就是前一节提出的thenable信任问题的解决方案。任何你还不确定是一个可信promise的值 —— 它甚至可能是一个立即值 —— 都可以通过传入`Promise.resolve(..)`来进行规范化。如果这个值已经是一个可识别的promise或thenable，它的状态/解析结果将简单地被采用，将错误行为与你隔绝开。如果相反它是一个立即值，那么它将会被“包装”进一个纯粹的promise，以此将它的行为规范化为异步的。
 
 `Promise.reject(..)`创建一个立即被拒绝的promise，与它的`Promise(..)`构造器对等品一样：
 
@@ -226,7 +223,7 @@ Promise.all( [p1,p2,v3] )
 Promise.all( [p1,p2,v3,p4] )
 .then(
 	function fulfilled(vals){
-		// never gets here
+		// 永远不会跑到这里
 	},
 	function rejected(reason){
 		console.log( reason );		// Oops
@@ -237,8 +234,8 @@ Promise.all( [p1,p2,v3,p4] )
 `Promise.all([ .. ])`等待所有的值完成（或第一个拒绝），而`Promise.race([ .. ])`仅会等待第一个完成或拒绝。考虑如下代码：
 
 ```js
-// NOTE: re-setup all test values to
-// avoid timing issues misleading you!
+// 注意：为了避免时间的问题误导你，
+// 重建所有的测试值！
 
 Promise.race( [p2,p1,v3] )
 .then( function fulfilled(val){
@@ -248,7 +245,7 @@ Promise.race( [p2,p1,v3] )
 Promise.race( [p2,p4] )
 .then(
 	function fulfilled(val){
-		// never gets here
+		// 永远不会跑到这里
 	},
 	function rejected(reason){
 		console.log( reason );		// Oops
@@ -280,7 +277,7 @@ step1()
 .then(step4);
 ```
 
-但是，对于表达异步流程控制来说有更好的选项，而且在代码风格上可能比长长的promise链更理想。我们可以使用在第三章中学到的generator来表达我们的异步流程控制。
+但是对于表达异步流程控制来说有更好的选项，而且在代码风格上可能比长长的promise链更理想。我们可以使用在第三章中学到的generator来表达我们的异步流程控制。
 
 要识别一个重要的模式：一个generator可以yield出一个promise，然后这个promise可以使用它的完成值来推进generator。
 
@@ -309,7 +306,7 @@ function *main() {
 }
 ```
 
-从表面上看，这个代码段要比前一个promise链等价物要更繁冗。但是它提供了更加吸引人的 —— 而且重要的是，更加容易理解和阅读 —— 看起来同步的代码风格（“return”值的`=`赋值操作，等等），对于`try..catch`错误处理可以跨越那些隐藏的异步边界使用来说就更是这样。
+从表面上看，这个代码段要比前一个promise链等价物要更繁冗。但是它提供了更加吸引人的 —— 而且重要的是，更加容易理解和阅读的 —— 看起来同步的代码风格（“return”值的`=`赋值操作，等等），对于`try..catch`错误处理可以跨越那些隐藏的异步边界使用来说就更是这样。
 
 为什么我们要与generator一起使用Promise？不用Promise进行异步generator编码当然是可能的。
 
@@ -358,24 +355,24 @@ function run(gen) {
 run( main )
 .then(
 	function fulfilled(){
-		// `*main()` completed successfully
+		// `*main()` 成功地完成了
 	},
 	function rejected(reason){
-		// Oops, something went wrong
+		// 噢，什么东西搞错了
 	}
 );
 ```
 
-实质上，在你程序中的任何拥有多于两个异步步骤的流程控制逻辑的地方，你就可以 *而且应当* 使用一个由运行工具驱动的让出promise的generator来以一种同步的风格表达流程控制。这样做将产生更易于理解和维护的代码。
+实质上，在你程序中的任何拥有多于两个异步步骤的流程控制逻辑的地方，你就可以 *而且应当* 使用一个由运行工具驱动的promise-yielding generator来以一种同步的风格表达流程控制。这样做将产生更易于理解和维护的代码。
 
 这种“让出一个promise推进generator”的模式将会如此常见和如此强大，以至于ES6之后的下一个版本的JavaScript几乎可以确定将会引入一中新的函数类型，它无需运行工具就可以自动地执行。我们将在第八章中讲解`async function`（正如它们期望被称呼的那样）。
 
 ## 复习
 
-随着JavaScript在它被广泛采用过程中的日益成熟与成长，异步编程越发地成为关注的中心。对于这些异步任务来说回调不完全够用，而且在更精巧的需求面前全面地崩塌。
+随着JavaScript在它被广泛采用过程中的日益成熟与成长，异步编程越发地成为关注的中心。对于这些异步任务来说回调并不完全够用，而且在更精巧的需求面前全面崩塌了。
 
-可喜的是，ES6增加了Promise来回调的主要缺陷之一：在可预测的行为上缺乏可信性。Promise代表一个潜在异步任务的未来完成值，跨越同步和异步的边界将行为进行了规范化。
+可喜的是，ES6增加了Promise来解决回调的主要缺陷之一：在可预测的行为上缺乏可信性。Promise代表一个潜在异步任务的未来完成值，跨越同步和异步的边界将行为进行了规范化。
 
-但是，Promise与generator的组合才完全揭示了这样做的好处：将我们的异步流程控制代码重新安排，将难看的回调浆糊（也叫“低于”）弱化并抽象出去。
+但是，Promise与generator的组合才完全揭示了这样做的好处：将我们的异步流程控制代码重新安排，将难看的回调浆糊（也叫“地狱”）弱化并抽象出去。
 
 目前，我们可以在各种异步库的运行器的帮助下管理这些交互，但是JavaScript最终将会使用一种专门的独立语法来支持这种交互模式！
