@@ -1,5 +1,5 @@
-# You Don't Know JS: ES6 & Beyond
-# Chapter 6: API Additions
+# 你不懂JS：ES6与未来
+# 第六章：新增API
 
 从值的转换到数学计算，ES6给各种内建原生类型和对象增加了许多静态属性和方法来辅助这些常见任务。另外，一些原生类型的实例通过各种新的原型方法获得了新的能力。
 
@@ -7,9 +7,9 @@
 
 ## `Array`
 
-在JS中被各种用户库扩展得最多的特性之一就是数组类型。ES6在数组上增加许多静态的和原型（实例）的帮助功能并不令人惊讶。
+在JS中被各种用户库扩展得最多的特性之一就是数组类型。ES6在数组上增加许多静态的和原型（实例）的帮助功能应当并不令人惊讶。
 
-### `Array.of(..)` Static Function
+### `Array.of(..)` 静态函数
 
 `Array(..)`的构造器有一个尽人皆知的坑：如果仅有一个参数值被传递，而且这个参数值是一个数字的话，它并不会制造一个含有一个带有该数值元素的数组，而是构建一个长度等于这个数字的空数组。这种操作造成了不幸的和怪异的“空值槽”行为，而这正是JS数组为人诟病的地方。
 
@@ -45,10 +45,10 @@ class MyCoolArray extends Array {
 }
 
 var x = new MyCoolArray( 3 );
-x.length;						// 3 -- oops!
-x.sum();						// 0 -- oops!
+x.length;						// 3 -- 噢！
+x.sum();						// 0 -- 噢！
 
-var y = [3];					// Array, not MyCoolArray
+var y = [3];					// Array，不是 MyCoolArray
 y.length;						// 1
 y.sum();						// `sum` is not a function
 
@@ -59,14 +59,14 @@ z.sum();						// 3
 
 你不能（简单地）只创建一个`MyCoolArray`的构造器，让它覆盖`Array`父构造器的行为，因为这个父构造器对于实际创建一个规范的数组值（初始化`this`）是必要的。在`MyCoolArray`子类上“被继承”的静态`of(..)`方法提供了一个不错的解决方案。
 
-### `Array.from(..)` Static Function
+### `Array.from(..)` 静态函数
 
-在JavaScript中一个“类数组对象”是一个拥有`length`属性的对象，这个属性明确地带有0或跟高的整数值。
+在JavaScript中一个“类数组对象”是一个拥有`length`属性的对象，这个属性明确地带有0或更高的整数值。
 
-在JS中处理这些值出了名地让人沮丧；将它们变形为真正的数组曾经是十分常见的做法，有各种`Array.property`方法（`map(..)`，`indexOf(..)`等等）可以用于这个目的。这种处理通常看起来像：
+在JS中处理这些值出了名地让人沮丧；将它们变形为真正的数组曾经是十分常见的做法，这样各种`Array.property`方法（`map(..)`，`indexOf(..)`等等）才能与它一起使用。这种处理通常看起来像：
 
 ```js
-// array-like object
+// 类数组对象
 var arrLike = {
 	length: 3,
 	0: "foo",
@@ -119,27 +119,27 @@ Array.from( emptySlotsArr );
 // [ undefined, undefined, "foo", undefined ]
 ```
 
-#### Avoiding Empty Slots
+#### 避免空值槽
 
 前面的代码段中，在`emptySlotsArr`和`Array.from(..)`调用的结果有一个微妙但重要的不同。`Array.from(..)`从不产生空值槽。
 
 在ES6之前，如果你想要制造一个被初始化为在每个值槽中使用实际`undefined`值（不是空值槽！）的特定长数组，你不得不做一些额外的工作：
 
 ```js
-var a = Array( 4 );								// four empty slots!
+var a = Array( 4 );								// 四个空值槽！
 
-var b = Array.apply( null, { length: 4 } );		// four `undefined` values
+var b = Array.apply( null, { length: 4 } );		// 四个 `undefined` 值
 ```
 
-但现在`Array.from(..)`是这件事简单了些：
+但现在`Array.from(..)`使这件事简单了些：
 
 ```js
-var c = Array.from( { length: 4 } );			// four `undefined` values
+var c = Array.from( { length: 4 } );			// 四个 `undefined` 值
 ```
 
-**警告：** 使用一个像前面代码段中的`a`那样的空值槽数组可以与一些数组函数工作，但是其他的函数会忽略空值槽（比如`map(..)`等）。你永远不应该刻意地使用空值槽，因为它几乎可能会在你的程序中导致奇怪/不可预料的行为。
+**警告：** 使用一个像前面代码段中的`a`那样的空值槽数组可以与一些数组函数工作，但是另一些函数会忽略空值槽（比如`map(..)`等）。你永远不应该刻意地使用空值槽，因为它几乎肯定会在你的程序中导致奇怪/不可预料的行为。
 
-#### Mapping
+#### 映射
 
 `Array.from(..)`工具还有另外一个绝技。第二个参数值，如果被提供的话，是一个映射函数（和普通的`Array#map(..)`几乎相同），它在将每个源值映射/变形为返回的目标值时调用。考虑如下代码：
 
@@ -164,7 +164,7 @@ Array.from( arrLike, function mapper(val,idx){
 
 一个使用`Array.from(..)`将一个8位值数组翻译为16位值数组的例子，参见第五章的“类型化数组”。
 
-### Creating Arrays and Subtypes
+### 创建 Arrays 和子类型
 
 在前面几节中，我们讨论了`Array.of(..)`和`Array.from(..)`，它们都用与构造器相似的方法创建一个新数组。但是在子类中它们会怎么做？它们是创建基本`Array`的实例，还是创建衍生的子类的实例？
 
@@ -190,11 +190,11 @@ var x = new MyCoolArray( 1, 2, 3 );
 x.slice( 1 ) instanceof MyCoolArray;				// true
 ```
 
-一般来说，这种默认行为将可能是你想要的，但是正如我们在第三站中讨论过的，如果你想的话你 *可以* 覆盖它：
+一般来说，这种默认行为将可能是你想要的，但是正如我们在第三章中讨论过的，如果你想的话你 *可以* 覆盖它：
 
 ```js
 class MyCoolArray extends Array {
-	// force `species` to be parent constructor
+	// 强制 `species` 为父类构造器
 	static get [Symbol.species]() { return Array; }
 }
 
@@ -204,11 +204,11 @@ x.slice( 1 ) instanceof MyCoolArray;				// false
 x.slice( 1 ) instanceof Array;						// true
 ```
 
-要注意的是，`@@species`设定仅用于原型方法，比如`slice(..)`。`of(..)`和`from(..)`不使用它；它们俩都只使用`this`绑定（哪个构造器被用于发起引用）。考虑如下代码：
+要注意的是，`@@species`设定仅适用于原型方法，比如`slice(..)`。`of(..)`和`from(..)`不使用它；它们俩都只使用`this`绑定（哪个构造器被用于发起引用）。考虑如下代码：
 
 ```js
 class MyCoolArray extends Array {
-	// force `species` to be parent constructor
+	// 强制 `species` 为父类构造器
 	static get [Symbol.species]() { return Array; }
 }
 
@@ -218,11 +218,11 @@ MyCoolArray.from( x ) instanceof MyCoolArray;		// true
 MyCoolArray.of( [2, 3] ) instanceof MyCoolArray;	// true
 ```
 
-### `copyWithin(..)` Prototype Method
+### `copyWithin(..)` 原型方法
 
-`Array#copyWithin(..)`是一个对所有数组可用的新修改器方法（包括类型化数组；参加第五章）。`copyWithin(..)`将数组的一部分拷贝到同一个数组的其他位置，覆盖之前存在在哪里的任何东西。
+`Array#copyWithin(..)`是一个对所有数组可用的新修改器方法（包括类型化数组；参加第五章）。`copyWithin(..)`将数组的一部分拷贝到同一个数组的其他位置，覆盖之前存在在那里的任何东西。
 
-它的参数值是 *目标*（要被拷贝到的索引位置），*开始*（拷贝开始的索引位置（含）），和可选的*结束*（拷贝结束的索引位置（不含））。如果这些参数值中存在任何负数，那么它们就被认为是相对于数组的末尾。
+它的参数值是 *目标*（要被拷贝到的索引位置），*开始*（拷贝开始的索引位置（含）），和可选的 *结束*（拷贝结束的索引位置（不含））。如果这些参数值中存在任何负数，那么它们就被认为是相对于数组的末尾。
 
 考虑如下代码：
 
@@ -248,9 +248,9 @@ MyCoolArray.of( [2, 3] ) instanceof MyCoolArray;	// true
 
 如果算法是严格的从左到右，那么`2`应当被拷贝来覆盖`3`，然后这个被拷贝的`2`应当被拷贝来覆盖`4`，然后这个被拷贝的`2`应当被拷贝来覆盖`5`，而你最终会得到`[1,2,2,2,2]`。
 
-于此不同的是，拷贝算法把方向反转过来，拷贝`4`来覆盖`5`，然后拷贝`3`来覆盖`4`，然后拷贝`2`来覆盖`3`，而最后的记过是`[1,2,2,3,4]`。就期待的结果而言这可能更“正确”，但是如果你仅以单纯的从左到右的方式考虑拷贝算法的话，它就可能让人糊涂。
+与此不同的是，拷贝算法把方向反转过来，拷贝`4`来覆盖`5`，然后拷贝`3`来覆盖`4`，然后拷贝`2`来覆盖`3`，而最后的结果是`[1,2,2,3,4]`。就期待的结果而言这可能更“正确”，但是如果你仅以单纯的从左到右的方式考虑拷贝算法的话，它就可能让人糊涂。
 
-### `fill(..)` Prototype Method
+### `fill(..)` 原型方法
 
 ES6中的`Array#fill(..)`方法原生地支持使用一个指定的值来完全地（或部分地）填充一个既存的数组：
 
@@ -268,7 +268,7 @@ var a = [ null, null, null, null ].fill( 42, 1, 3 );
 a;									// [null,42,42,null]
 ```
 
-### `find(..)` Prototype Method
+### `find(..)` 原型方法
 
 一般来说，在一个数组中搜索一个值的最常见方法曾经是`indexOf(..)`方法，如果值被找到的话它返回值的位置索引，没有找到的话返回`-1`：
 
@@ -336,7 +336,7 @@ points.find( function matcher(point) {
 
 **注意：** 和其他接收回调的数组方法一样，`find(..)`接收一个可选的第二参数。如果它被设置了的话，就将被指定为作为第一个参数传递的回调的`this`绑定。否则，`this`将是`undefined`。
 
-### `findIndex(..)` Prototype Method
+### `findIndex(..)` 原型方法
 
 虽然前一节展示了`some(..)`如何在一个数组检索给出一个Boolean结果，和`find(..)`如何从数组检索中给出匹配的值，但是还有一种需求是寻找匹配的值的位置索引。
 
@@ -370,11 +370,11 @@ points.findIndex( function matcher(point) {
 
 **注意：** 和其他接收回调的数组方法一样，`find(..)`接收一个可选的第二参数。如果它被设置了的话，就将被指定为作为第一个参数传递的回调的`this`绑定。否则，`this`将是`undefined`。
 
-### `entries()`, `values()`, `keys()` Prototype Methods
+### `entries()`, `values()`, `keys()` 原型方法
 
 在第三章中，我们展示了数据结构如何通过一个迭代器来提供一种模拟逐个值的迭代。然后我们在第五章探索新的ES6集合（Map，Set，等）如何为了产生不同种类的迭代器而提供几种方法时阐述了这种方式。
 
-因为`Array`并不是ES6的新东西，所以它可能不被认为是一个传统意义上的“集合”，但是在它提供了相同的迭代器方法：`entries()`，`values()`，和`keys()`的意义上它是的。考虑如下代码：
+因为`Array`并不是ES6的新东西，所以它可能不被认为是一个传统意义上的“集合”，但是在它提供了相同的迭代器方法：`entries()`，`values()`，和`keys()`的意义上，它是的。考虑如下代码：
 
 ```js
 var a = [1,2,3];
@@ -406,7 +406,7 @@ a[1] = 2;
 
 但是，从ES6开始，`Object`静态函数还用于任意种类的通用全局API —— 那些还没有更自然地存在于其他的某些位置的API（例如，`Array.from(..)`）。
 
-### `Object.is(..)` Static Function
+### `Object.is(..)` 静态函数
 
 `Object.is(..)`静态函数进行值的比较，它的风格甚至要比`===`比较还要严格。
 
@@ -428,7 +428,7 @@ Object.is( y, z );					// false
 
 **注意：** ES6还增加了一个`Number.isNaN(..)`工具（在本章稍后讨论），它可能是一个稍稍方便一些的测试；比起`Object.is(x, NaN)`你可能更偏好`Number.isNaN(x)`。你 *可以* 使用笨拙的`x == 0 && 1 / x === -Infinity`来准确地测试`-0`，但在这种情况下`Object.is(x,-0)`要好得多。
 
-### `Object.getOwnPropertySymbols(..)` Static Function
+### `Object.getOwnPropertySymbols(..)` 静态函数
 
 第二章中的“Symbol”一节讨论了ES6中的新Symbol基本值类型。
 
@@ -444,7 +444,7 @@ var o = {
 Object.getOwnPropertySymbols( o );	// [ Symbol(bar) ]
 ```
 
-### `Object.setPrototypeOf(..)` Static Function
+### `Object.setPrototypeOf(..)` 静态函数
 
 还是在第二章中，我们提到了`Object.setPrototypeOf(..)`工具，它为了 *行为委托* 的目的（意料之中地）设置一个对象的`[[Prototype]]`（参见本系列的 *this与对象原型*）。考虑如下代码：
 
@@ -453,18 +453,16 @@ var o1 = {
 	foo() { console.log( "foo" ); }
 };
 var o2 = {
-	// .. o2's definition ..
+	// .. o2 的定义 ..
 };
 
 Object.setPrototypeOf( o2, o1 );
 
-// delegates to `o1.foo()`
+// 委托至 `o1.foo()`
 o2.foo();							// foo
 ```
 
-Alternatively:
-
-另一中方式：
+另一种方式：
 
 ```js
 var o1 = {
@@ -472,10 +470,10 @@ var o1 = {
 };
 
 var o2 = Object.setPrototypeOf( {
-	// .. o2's definition ..
+	// .. o2 的定义 ..
 }, o1 );
 
-// delegates to `o1.foo()`
+// 委托至 `o1.foo()`
 o2.foo();							// foo
 ```
 
@@ -483,7 +481,7 @@ o2.foo();							// foo
 
 **警告：** 正如展示的那样，在对象创建之后立即设置`[[Prototype]]`是合理的。但是在很久之后才改变它一般不是一个好主意，而且经常会导致困惑而非清晰。
 
-### `Object.assign(..)` Static Function
+### `Object.assign(..)` 静态函数
 
 许多JavaScript库/框架都提供将一个对象的属性拷贝/混合到另一个对象中的工具（例如，jQuery的`extend(..)`）。在这些不同的工具中存在着各种微妙的区别，比如一个拥有`undefined`值的属性是否被忽略。
 
@@ -496,7 +494,7 @@ var target = {},
 	o1 = { a: 1 }, o2 = { b: 2 },
 	o3 = { c: 3 }, o4 = { d: 4 };
 
-// setup read-only property
+// 设置只读属性
 Object.defineProperty( o3, "e", {
 	value: 5,
 	enumerable: true,
@@ -504,7 +502,7 @@ Object.defineProperty( o3, "e", {
 	configurable: false
 } );
 
-// setup non-enumerable property
+// 设置不可枚举属性
 Object.defineProperty( o3, "f", {
 	value: 6,
 	enumerable: false
@@ -512,7 +510,7 @@ Object.defineProperty( o3, "f", {
 
 o3[ Symbol( "g" ) ] = 7;
 
-// setup non-enumerable symbol
+// 设置不可枚举 symbol
 Object.defineProperty( o3, Symbol( "h" ), {
 	value: 8,
 	enumerable: false
@@ -550,11 +548,11 @@ var o1 = {
 var o2 = Object.assign(
 	Object.create( o1 ),
 	{
-		// .. o2's definition ..
+		// .. o2 的定义 ..
 	}
 );
 
-// delegates to `o1.foo()`
+// 委托至 `o1.foo()`
 o2.foo();							// foo
 ```
 
@@ -598,7 +596,7 @@ ES6增加了几种新的数学工具，它们协助或填补了常见操作的�
 
 两个在`Number`上新增的功能只是既存全局函数的引用：`Number.parseInt(..)`和`Number.parseFloat(..)`。
 
-### Static Properties
+### 静态属性
 
 ES6以静态属性的形式增加了一些有用的数字常数：
 
@@ -608,7 +606,7 @@ ES6以静态属性的形式增加了一些有用的数字常数：
 
 **注意：** 关于“安全”整数的更多信息，参见本系列的 *类型与文法* 的第二章。
 
-### `Number.isNaN(..)` Static Function
+### `Number.isNaN(..)` 静态函数
 
 标准的全局`isNaN(..)`工具从一开始就坏掉了，因为不仅对实际的`NaN`值返回`true`，而且对不是数字的东西也返回`true`。其原因是它会将参数值强制转换为数字类型（这可能失败而导致一个NaN）。ES6增加了一个修复过的工具`Number.isNaN(..)`，它可以正确工作：
 
@@ -616,15 +614,15 @@ ES6以静态属性的形式增加了一些有用的数字常数：
 var a = NaN, b = "NaN", c = 42;
 
 isNaN( a );							// true
-isNaN( b );							// true -- oops!
+isNaN( b );							// true —— 噢！
 isNaN( c );							// false
 
 Number.isNaN( a );					// true
-Number.isNaN( b );					// false -- fixed!
+Number.isNaN( b );					// false —— 修好了！
 Number.isNaN( c );					// false
 ```
 
-### `Number.isFinite(..)` Static Function
+### `Number.isFinite(..)` 静态函数
 
 看到像`isFinite(..)`这样的函数名会诱使人们认为它单纯地意味着“不是无限”。但这不十分正确。这个新的ES6工具有更多的微妙之处。考虑如下代码：
 
@@ -648,9 +646,9 @@ Number.isFinite( a );				// false
 
 你可能依然偏好强制转换，这时使用全局`isFinite(..)`是一个合法的选择。或者，并且可能是更明智的选择，你可以使用`Number.isFinite(+x)`，它在将`x`传递前明确地将它强制转换为数字（参见本系列的 *类型与文法* 的第四章）。
 
-### Integer-Related Static Functions
+### 整数相关的静态函数
 
-JavaScript数组值总是浮点数（IEEE-754）。所以判定一个数字是否是“整数”的概念与检查它的类型无关，因为JS没有这样的区分。
+JavaScript数字值总是浮点数（IEEE-754）。所以判定一个数字是否是“整数”的概念与检查它的类型无关，因为JS没有这样的区分。
 
 取而代之的是，你需要检查这个值是否拥有非零的小数部分。这样做的最简单的方法通常是：
 
@@ -709,7 +707,7 @@ Number.isSafeInteger( y );			// false
 
 在ES6之前字符串就已经拥有好几种帮助函数了，但是有更多的内容被加入了进来。
 
-### Unicode Functions
+### Unicode 函数
 
 在第二章的“Unicode敏感的字符串操作”中详细讨论了`String.fromCodePoint(..)`，`String#codePointAt(..)`，`String#normalize(..)`。它们被用来改进JS字符串值对Unicode的支持。
 
@@ -721,7 +719,7 @@ String.fromCodePoint( 0x1d49e );			// "𝒞"
 
 `normalize(..)`字符串原型方法用来进行Unicode规范化，它将字符与相邻的“组合标志”进行组合，或者将组合好的字符拆开。
 
-一般来说，规范化不会对字符串的内容产生视觉上的影响，但是会改变字符串的内容，这可能会影响`like`属性报告的结果，以及用位置访问字符的行为，等诸如此类东西：
+一般来说，规范化不会对字符串的内容产生视觉上的影响，但是会改变字符串的内容，这可能会影响`length`属性报告的结果，以及用位置访问字符的行为：
 
 ```js
 var s1 = "e\u0301";
@@ -736,7 +734,7 @@ s2 === "\xE9";						// true
 
 **注意：** 规范化形式和它们在字符串上的效果超出了我们要在这里讨论的范围。更多细节参见“Unicode规范化形式”(http://www.unicode.org/reports/tr15/)。
 
-### `String.raw(..)` Static Function
+### `String.raw(..)` 静态函数
 
 `String.raw(..)`工具被作为一个内建的标签函数来与字符串字面模板（参见第二章）一起使用，取得不带有任何转译序列处理的未加工的字符串值。
 
@@ -751,7 +749,7 @@ String.raw`\ta${str}d\xE9`;
 
 在结果字符串中，`\`和`t`是分离的未被加工过的字符，而不是一个转译字符序列`\t`。这对Unicode转译序列也是一样。
 
-### `repeat(..)` Prototype Function
+### `repeat(..)` 原型函数
 
 在Python和Ruby那样的语言中，你可以这样重复一个字符串：
 
@@ -767,7 +765,7 @@ String.raw`\ta${str}d\xE9`;
 "foo".repeat( 3 );					// "foofoofoo"
 ```
 
-### String Inspection Functions
+### 字符串检验函数
 
 作为对ES6以前的`String#indexOf(..)`和`String#lastIndexOf(..)`的补充，增加了三个新的搜索/检验函数：`startsWith(..)`，`endsWidth(..)`，和`includes(..)`。
 
@@ -788,7 +786,7 @@ palindrome.includes( "on", 6 );		// false
 
 **警告：** 这些方法默认不接受正则表达式作为检索字符串。关于关闭实施在第一个参数值上的`isRegExp`检查的信息，参见第七章的“正则表达式Symbol”。
 
-## Review
+## 复习
 
 ES6在各种内建原生对象上增加了许多额外的API帮助函数：
 
