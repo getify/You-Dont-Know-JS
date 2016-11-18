@@ -40,11 +40,11 @@ var obj = {
 
 ```js
 function foo(cb) {
-	// what is the name of `cb()` here?
+	// 这里的 `cb()` 的名字是什么？
 }
 
 foo( function(){
-	// I'm anonymous!
+	// 我是匿名的！
 } );
 ```
 
@@ -67,7 +67,7 @@ function foo(i) {
 
 **提示：** 如果一个函数的`name`被赋值，它通常是在开发者工具的栈轨迹中使用的名称。
 
-### Inferences
+### 推断
 
 但如果函数没有词法名称，`name`属性会怎么样呢？
 
@@ -125,13 +125,13 @@ var z = new GeneratorFunction();	// name: anonymous
 
 `name`属性默认是不可写的，但它是可配置的，这意味着如果有需要，你可以使用`Object.defineProperty(..)`来手动改变它。
 
-## Meta Properties
+## 元属性
 
 在第三章的“`new.target`”一节中，我们引入了一个ES6的新概念：元属性。正如这个名称所暗示的，元属性意在以一种属性访问的形式提供特殊的元信息，而这在以前是不可能的。
 
 在`new.target`的情况下，关键字`new`作为一个属性访问的上下文环境。显然`new`本身不是一个对象，这使得这种能力很特殊。然而，当`new.target`被用于一个构造器调用（一个使用`new`调用的函数/方法）内部时，`new`变成了一个虚拟上下文环境，如此`new.target`就可以指代这个`new`调用的目标构造器。
 
-这是一个元编程操作的典型例子，因为它的意图是从一个构造器调用内部判定原来的`new`的目标是什么，这一般是为了自省（检查类型/解构）或者静态属性访问。
+这是一个元编程操作的典型例子，因为它的意图是从一个构造器调用内部判定原来的`new`的目标是什么，这一般是为了自省（检查类型/结构）或者静态属性访问。
 
 举例来说，你可能想根据一个构造器是被直接调用，还是通过一个子类进行调用，来使它有不同的行为：
 
@@ -160,9 +160,9 @@ var b = new Child();
 
 **警告：** 与所有的元编程技术一样，要小心不要创建太过聪明的代码，而使未来的你或其他维护你代码的人很难理解。小心使用这些技巧。
 
-## Well Known Symbols
+## 通用 Symbols
 
-在第二章中的“Symbol”一节中，我们讲解了新的ES6基本类型`symbol`。除了你可以在你自己的程序中定义的symbol以外，JS预定义了几种内建symbol，被称为 *Well Known Symbols*。
+在第二章中的“Symbol”一节中，我们讲解了新的ES6基本类型`symbol`。除了你可以在你自己的程序中定义的symbol以外，JS预定义了几种内建symbol，被称为 *通用（Well Known） Symbols*（WKS）。
 
 定义这些symbol值主要是为了向你的JS程序暴露特殊的元属性来给你更多JS行为的控制权。
 
@@ -174,7 +174,7 @@ var b = new Child();
 
 `Symbol.iterator`表示在任意一个对象上的特殊位置（属性），语言机制自动地在这里寻找一个方法，这个方法将构建一个用于消费对象值的迭代器对象。许多对象都带有一个默认的`Symbol.iterator`。
 
-然而，我们可以通过设置`Symbol.iterator`属性来为任意对象定义我们自己的迭代器逻辑，即便它是覆盖默认迭代器的。这里的元编程观点是，我们在定义JS的其他部分在处理对象值时所使用的行为。
+然而，我们可以通过设置`Symbol.iterator`属性来为任意对象定义我们自己的迭代器逻辑，即便它是覆盖默认迭代器的。这里的元编程观点是，我们在定义JS的其他部分（明确地说，是操作符和循环结构）在处理我们所定义的对象值时所使用的行为。
 
 考虑如下代码：
 
@@ -186,8 +186,7 @@ for (var v of arr) {
 }
 // 4 5 6 7 8 9
 
-// define iterator that only produces values
-// from odd indexes
+// 定义一个仅在奇数索引处产生值的迭代器
 arr[Symbol.iterator] = function*() {
 	var idx = 1;
 	do {
@@ -201,7 +200,7 @@ for (var v of arr) {
 // 5 7 9
 ```
 
-### `Symbol.toStringTag` and `Symbol.hasInstance`
+### `Symbol.toStringTag` 和 `Symbol.hasInstance`
 
 最常见的元编程任务之一，就是在一个值上进行自省来找出它是什么 *种类* 的，者经常用来决定它们上面适于实施什么操作。对于对象，最常见的两个自省技术是`toString()`和`instanceof`。
 
@@ -259,7 +258,7 @@ b instanceof Foo;			// false
 
 ```js
 class Cool {
-	// defer `@@species` to derived constructor
+	// 将 `@@species` 倒推至被衍生的构造器
 	static get [Symbol.species]() { return this; }
 
 	again() {
@@ -270,7 +269,7 @@ class Cool {
 class Fun extends Cool {}
 
 class Awesome extends Cool {
-	// force `@@species` to be parent constructor
+	// 将 `@@species` 强制为父类构造器
 	static get [Symbol.species]() { return Cool; }
 }
 
@@ -303,7 +302,7 @@ arr + 10;				// 1,2,3,4,510
 
 arr[Symbol.toPrimitive] = function(hint) {
 	if (hint == "default" || hint == "number") {
-		// sum all numbers
+		// 所有数字的和
 		return this.reduce( function(acc,curr){
 			return acc + curr;
 		}, 0 );
@@ -317,21 +316,21 @@ arr + 10;				// 25
 
 **警告：** `==`操作符将在一个对象上不使用任何提来示调用`ToPrimitive`操作 —— 如果存在`@@toPrimitive`方法的话，将使用`"default"`被调用 —— 如果另一个被比较的值不是一个对象。但是，如果两个被比较的值都是对象，`==`的行为与`===`是完全相同的，也就是引用本身将被直接比较。这种情况下，`@@toPrimitive`根本不会被调用。关于强制转换和抽象操作的更多信息，参见本系列的 *类型与文法*。
 
-### Regular Expression Symbols
+### 正则表达式 Symbols
 
-对于正则表达式对象，有四种well known symbols 可以被覆盖，它们控制着这些正则表达式在四个相应的同名`String.prototype`函数中如何被使用：
+对于正则表达式对象，有四种通用 symbols 可以被覆盖，它们控制着这些正则表达式在四个相应的同名`String.prototype`函数中如何被使用：
 
 * `@@match`：一个正则表达式的`Symbol.match`值是使用被给定的正则表达式来匹配一个字符串值的全部或部分的方法。如果你为`String.prototype.match(..)`传递一个正则表达式做范例匹配，它就会被使用。
 
 	 匹配的默认算法写在ES6语言规范的第21.2.5.6部分(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@match)。你可以覆盖这个默认算法并提供额外的正则表达式特性，比如后顾断言。
 
-	 `Symbol.match`还被用于`isRegExp`抽象操作（参见第六章的“字符串检测函数”中的注意部分）来判定一个对象是否意在被用作正则表达式。为了是一个要被用作正则表达式的对象不被看作是正则表达式，可以将`Symbol.match`的值设置为`false`（或falsy的东西）强制这个检查失败。
+	 `Symbol.match`还被用于`isRegExp`抽象操作（参见第六章的“字符串检测函数”中的注意部分）来判定一个对象是否意在被用作正则表达式。为了使一个这样的对象不被看作是正则表达式，可以将`Symbol.match`的值设置为`false`（或falsy的东西）强制这个检查失败。
 
 * `@@replace`：一个正则表达式的`Symbol.replace`值是被`String.prototype.replace(..)`使用的方法，来替换一个字符串里面出现的一个或所有字符序列，这些字符序列匹配给出的正则表达式范例。
 
 	 替换的默认算法写在ES6语言规范的第21.2.5.8部分(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@replace)。
 
-	 一个覆盖默认算法的很酷的用法是提供额外的`replacer`可选参数子，比如通过用连续的替换值消费可迭代对象来支持`"abaca".replace(/a/g,[1,2,3])`产生`"1b2c3"`。
+	 一个覆盖默认算法的很酷的用法是提供额外的`replacer`可选参数值，比如通过用连续的替换值消费可迭代对象来支持`"abaca".replace(/a/g,[1,2,3])`产生`"1b2c3"`。
 
 * `@@search`：一个正则表达式的`Symbol.search`值是被`String.prototype.search(..)`使用的方法，来在一个字符串中检索一个匹配给定正则表达式的子字符串。
 
@@ -341,7 +340,7 @@ arr + 10;				// 25
 
 	 分割的默认算法写在ES6语言规范的第21.2.5.11部分(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@split)。
 
-覆盖内建的正则表达式算法不是为心脏脆弱的人准备的！JS带有高度优化的正则表达式引擎，所以你自己的用户代码将很可能慢得多。这各种类的元编程很精巧和强大，但是应当仅用于确实必要或有好处的情况下。
+覆盖内建的正则表达式算法不是为心脏脆弱的人准备的！JS带有高度优化的正则表达式引擎，所以你自己的用户代码将很可能慢得多。这种类型的元编程很精巧和强大，但是应当仅用于确实必要或有好处的情况下。
 
 ### `Symbol.isConcatSpreadable`
 
@@ -383,7 +382,7 @@ with (o) {
 
 **警告：** `with`语句在`strict`模式下是完全禁用的，而且因此应当被认为是在语言中被废弃的。不要使用它。更多信息参见本系列的 *作用域与闭包*。因为应当避免`with`，所以这个`@@unscopables`symbol也是无意义的。
 
-## Proxies
+## 代理
 
 在ES6中被加入的最明显的元编程特性之一就是`proxy`特性。
 
@@ -395,7 +394,7 @@ with (o) {
 var obj = { a: 1 },
 	handlers = {
 		get(target,key,context) {
-			// note: target === obj,
+			// 注意：target === obj,
 			// context === pobj
 			console.log( "accessing: ", key );
 			return Reflect.get(
@@ -422,32 +421,18 @@ pobj.a;
 这里的列表是你可以在一个代理上为一个 *目标* 对象/函数定义的处理器，以及它们如何/何时被触发：
 
 * `get(..)`：通过`[[Get]]`，在代理上访问一个属性（`Reflect.get(..)`，`.`属性操作符或`[ .. ]`属性操作符）
-
 * `set(..)`：通过`[[Set]]`，在代理对象上设置一个属性（`Reflect.set(..)`，`=`赋值操作符，或者解构赋值 —— 如果目标是一个对象属性的话)
-
 * `deleteProperty(..)`：通过`[[Delete]]`，在代理对象上删除一个属性 (`Reflect.deleteProperty(..)`或`delete`)
-
 * `apply(..)`（如果 *目标* 是一个函数）：通过`[[Call]]`，代理作为一个普通函数/方法被调用（`Reflect.apply(..)`，`call(..)`，`apply(..)`，或者`(..)`调用操作符）
-
-
 * `construct(..)`（如果 *目标* 是一个构造函数）：通过`[[Construct]]`代理作为一个构造器函数被调用（`Reflect.construct(..)`或`new`）
-
 * `getOwnPropertyDescriptor(..)`：通过`[[GetOwnProperty]]`，从代理取得一个属性的描述符（`Object.getOwnPropertyDescriptor(..)`或`Reflect.getOwnPropertyDescriptor(..)`）
-
 * `defineProperty(..)`：通过`[[DefineOwnProperty]]`，在代理上设置一个属性描述符（`Object.defineProperty(..)`或`Reflect.defineProperty(..)`）
-
 * `getPrototypeOf(..)`：通过`[[GetPrototypeOf]]`，取得代理的`[[Prototype]]`（`Object.getPrototypeOf(..)`，`Reflect.getPrototypeOf(..)`，`__proto__`, `Object#isPrototypeOf(..)`，或`instanceof`）
-
 * `setPrototypeOf(..)`：通过`[[SetPrototypeOf]]`，设置代理的`[[Prototype]]`（`Object.setPrototypeOf(..)`，`Reflect.setPrototypeOf(..)`，或`__proto__`）
-
-* `preventExtensions(..)`：通过`[[PreventExtensions]]`使代理称为不可扩展的（`Object.preventExtensions(..)`或`Reflect.preventExtensions(..)`）
-
+* `preventExtensions(..)`：通过`[[PreventExtensions]]`使代理成为不可扩展的（`Object.preventExtensions(..)`或`Reflect.preventExtensions(..)`）
 * `isExtensible(..)`：通过`[[IsExtensible]]`，检测代理的可扩展性（`Object.isExtensible(..)`或`Reflect.isExtensible(..)`）
-
 * `ownKeys(..)`：通过`[[OwnPropertyKeys]]`，取得一组代理的直属属性和/或直属symbol属性（`Object.keys(..)`，`Object.getOwnPropertyNames(..)`，`Object.getOwnSymbolProperties(..)`，`Reflect.ownKeys(..)`，或`JSON.stringify(..)`）
-
 * `enumerate(..)`：通过`[[Enumerate]]`，为代理的可枚举直属属性及“继承”属性请求一个迭代器（`Reflect.enumerate(..)`或`for..in`）
-
 * `has(..)`：通过`[[HasProperty]]`，检测代理是否拥有一个直属属性或“继承”属性（`Reflect.has(..)`，`Object#hasOwnProperty(..)`，或`"prop" in obj`）
 
 **提示：** 关于每个这些元编程任务的更多信息，参见本章稍后的“`Reflect` API”一节。
@@ -480,7 +465,7 @@ proxy.a = 2;
 
 在设置一个属性值时（不管是新添加还是更新），`getOwnPropertyDescriptor(..)`和`defineProperty(..)`处理器被默认的`set(..)`处理器触发。如果你还定义了你自己的`set(..)`处理器，你或许对`context`（不是`target`！）进行了将会触发这些代理机关的相应调用。
 
-### Proxy Limitations
+### 代理的限制
 
 这些元编程处理器拦截了你可以对一个对象进行的很广泛的一组基础操作。但是，有一些操作不能（至少是还不能）被用于拦截。
 
