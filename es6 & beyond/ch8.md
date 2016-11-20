@@ -1,39 +1,25 @@
 # You Don't Know JS: ES6 & Beyond
 # Chapter 8: Beyond ES6
 
-At the time of this writing, the final draft of ES6 (*ECMAScript 2015*) is shortly headed toward its final official vote of approval by ECMA. But even as ES6 is being finalized, the TC39 committee is already hard at work at on features for ES7/2016 and beyond.
-
 在本书写作的时候，ES6（*ECMAScript 2015*）的最终草案即将为了ECMA的批准而进行最终的官方投票。但即便是在ES6已经被最终定稿的时候，TC39协会已经在为了ES7/2016和将来的特性进行努力的工作。
-
-As we discussed in Chapter 1, it's expected that the cadence of progress for JS is going to accelerate from updating once every several years to having an official version update once per year (hence the year-based naming). That alone is going to radically change how JS developers learn about and keep up with the language.
 
 正如我们在第一章中讨论过的，预计JS进步的节奏将会从好几年升级一次加速到每年进行一次官方的版本升级（因此采用编年命名法）。这将会彻底改变JS开发者如何学习与跟上这门语言的脚步。
 
-But even more importantly, the committee is actually going to work feature by feature. As soon as a feature is spec-complete and has its kinks worked out through implementation experiments in a few browsers, that feature will be considered stable enough to start using. We're all strongly encouraged to adopt features once they're ready instead of waiting for some official standards vote. If you haven't already learned ES6, the time is *past due* to get on board!
-
 但更重要的是，这个协会实际上将会一个特性一个特性地进行工作。只要一种特性的规范被定义完成，而且通过在几种浏览器中的实验性实现打通了关节，那么这种特性就会被认为足够稳定并可以开始使用了。我们都被强烈鼓励一旦特性准备好就立即采用它，而不是等待什么官方标准投票。如果你还没学过ES6，现在上船的日子已经过了！
-
-As the time of this writing, a list of future proposals and their status can be seen here (https://github.com/tc39/ecma262#current-proposals).
 
 在本书写作时，一个未来特性提案的列表和它们的状态可以在这里看到(https://github.com/tc39/ecma262#current-proposals)。
 
-Transpilers and polyfills are how we'll bridge to these new features even before all browsers we support have implemented them. Babel, Traceur, and several other major transpilers already have support for some of the post-ES6 features that are most likely to stabilize.
-
 在所有我们支持的浏览器实现这些新特性之前，转译器和填补是我们如何桥接它们的方法。Babel，Traceur，和其他几种主流转译器已经支持了一些最可能稳定下来的ES6之后的特性。
-
-With that in mind, it's already time for us to look at some of them. Let's jump in!
 
 认识到这一点，是时候看一看它们中的一些了。让我们开始吧！
 
-**Warning:** These features are all in various stages of development. While they're likely to land, and probably will look similar, take the contents of this chapter with more than a few grains of salt. This chapter will evolve in future editions of this title as these (and other!) features finalize.
-
-**警告：** 这些特性都处于开发的各种阶段。虽然它们很可能确定下来，而且将与本章的内容看起来相似，但还是将本章的内容看作是。
+**警告：** 这些特性都处于开发的各种阶段。虽然它们很可能确定下来，而且将与本章的内容看起来相似，但还是要抱着更多质疑的态度看待本章的内容。这一章将会在本书未来的版本中随着这些（和其他的！）特性的确定而演化。
 
 ## `async function`s
 
-In "Generators + Promises" in Chapter 4, we mentioned that there's a proposal for direct syntactic support for the pattern of generators `yield`ing promises to a runner-like utility that will resume it on promise completion. Let's take a brief look at that proposed feature, called `async function`.
+我们在第四章的“Generators + Promises”中提到过，generator`yield`一个promise给一个类似运行器的工具，它会在promise完成时推进generator —— 有一个提案是要为这种模式提供直接的语法支持。让我们简要看一下这个被提出的特性，它称为`async function`。
 
-Recall this generator example from Chapter 4:
+回想一下第四章中的这个generator的例子：
 
 ```js
 run( function *main() {
@@ -64,7 +50,7 @@ run( function *main() {
 );
 ```
 
-The proposed `async function` syntax can express this same flow control logic without needing the `run(..)` utility, because JS will automatically know how to look for promises to wait and resume. Consider:
+被提案的`async function`语法可以无需`run(..)`工具就表达相同的流程控制逻辑，因为JS将会自动地知道如何寻找promise来等待和推进。考虑如下代码：
 
 ```js
 async function main() {
@@ -97,21 +83,21 @@ main()
 );
 ```
 
-Instead of the `function *main() { ..` declaration, we declare with the `async function main() { ..` form. And instead of `yield`ing a promise, we `await` the promise. The call to run the function `main()` actually returns a promise that we can directly observe. That's the equivalent to the promise that we get back from a `run(main)` call.
+取代`function *main() { ..`声明的，是我们使用`async function main() { ..`形式声明。而取代`yield`一个promise的，是我们`await`promise。运行`main()`函数的调用实际上返回一个我们可以直接监听的promise。这与我们从一个`run(main)`调用中拿回一个promise是等价的。
 
-Do you see the symmetry? `async function` is essentially syntactic sugar for the generators + promises + `run(..)` pattern; under the covers, it operates the same!
+你看到对称性了吗？`async function`实质上是 generators + promises + `run(..)`模式的语法糖；它在底层的操作是相同的！
 
-If you're a C# developer and this `async`/`await` looks familiar, it's because this feature is directly inspired by C#'s feature. It's nice to see language precedence informing convergence!
+如果你是一个C#开发者而且这种`async`/`await`看起来很熟悉，那是因为这种特性就是由C#的特性直接启发的。很高兴看到语言
 
-Babel, Traceur and other transpilers already have early support for the current status of `async function`s, so you can start using them already. However, in the next section "Caveats", we'll see why you perhaps shouldn't jump on that ship quite yet.
+Babel、Traceur 以及其他转译器已经对当前的`async function`状态有了早期支持，所以你已经可以使用它们了。但是，在下一节的“警告”中，我们将看到为什么你也学还不应该上这艘船。
 
-**Note:** There's also a proposal for `async function*`, which would be called an "async generator." You can both `yield` and `await` in the same code, and even combine those operations in the same statement: `x = await yield y`. The "async generator" proposal seems to be more in flux -- namely, its return value is not fully worked out yet. Some feel it should be an *observable*, which is kind of like the combination of an iterator and a promise. For now, we won't go further into that topic, but stay tuned as it evolves.
+**注意：** 还有一个`async function*`的提案，它应当被称为“异步generator”。你可以在同一段代码中使用`yield`和`await`两者，甚至是在同一个语句中组合这两个操作：`x = await yield y`。“异步generator”提案看起来更具变化 —— 也就是说，它返回一个没有还没有完全被计算好的值。一些人觉得它应当是一个 *可监听对象（observable）*，有些像是一个迭代器和promise的组合。就目前来说，我们不会进一步探讨这个话题，但是会继续关注它的演变。
 
 ### Caveats
 
-One unresolved point of contention with `async function` is that because it only returns a promise, there's no way from the outside to *cancel* an `async function` instance that's currently running. This can be a problem if the async operation is resource intensive, and you want to free up the resources as soon as you're sure the result won't be needed.
+关于`async function`的一个未解的争论点是，因为它仅返回一个promise，所以没有办法从外部 *撤销* 一个当前正在运行的`async function`实例。如果这个异步操作是资源密集型的，而且你想在自己能确定不需要它的结果时立即释放资源，这可能是一个问题。
 
-For example:
+举例来说：
 
 ```js
 async function request(url) {
@@ -148,26 +134,26 @@ pr.then(
 );
 ```
 
-This `request(..)` that I've conceived is somewhat like the `fetch(..)` utility that's recently been proposed for inclusion into the web platform. So the concern is, what happens if you want to use the `pr` value to somehow indicate that you want to cancel a long-running Ajax request, for example?
+我构想的`request(..)`有点儿像最近被提案要包含进web平台的`fetch(..)`工具。我们关心的是，例如，如果你想要用`pr`值以某种方法指示撤销一个长时间运行的Ajax请求会怎么样？
 
-Promises are not cancelable (at the time of writing, anyway). In my opinion, as well as many others, they never should be (see the *Async & Performance* title of this series). And even if a promise did have a `cancel()` method on it, does that necessarily mean that calling `pr.cancel()` should actually propagate a cancelation signal all the way back up the promise chain to the `async function`?
+Promise是不可撤销的（在本书写作时）。在我和其他许多人看来，它们就不应该是可以被撤销的（参见本系列的 *异步与性能*）。而且即使一个proimse确实拥有一个`cancel()`方法，那么一定意味着调用`pr.cancel()`应当真的沿着promise链一路传播一个撤销信号到`async function`吗？
 
-Several possible resolutions to this debate have surfaced:
+对于这个争论的几种可能的解决方案已经浮出水面：
 
-* `async function`s won't be cancelable at all (status quo)
-* A "cancel token" can be passed to an async function at call time
-* Return value changes to a cancelable-promise type that's added
-* Return value changes to something else non-promise (e.g., observable, or control token with promise and cancel capabilities)
+* `async function`将根本不能被撤销（现状）
+* 一个“撤销存根”可以在调用时传递给一个异步函数
+* 返回值改变为一个新增的可撤销promsie类型
+* 返回值改变为非promise的其他东西（比如，可监听对象，或带有promise和撤销能力的控制存根）
 
-At the time of this writing, `async function`s return regular promises, so it's less likely that the return value will entirely change. But it's too early to tell where things will land. Keep an eye on this discussion.
+在本书写作时，`async function`返回普通的promise，所以改变整个返回值不太可能。但是现在下定论还是为时过早了。让我们持续关注这个讨论吧。
 
 ## `Object.observe(..)`
 
-One of the holy grails of front-end web development is data binding -- listening for updates to a data object and syncing the DOM representation of that data. Most JS frameworks provide some mechanism for these sorts of operations.
+前端web开发的圣杯之一就是数据绑定 —— 监听一个数据对象的更新并同步这个数据的DOM表现形式。大多数JS框架都为这些类型的操作提供某种机制。
 
-It appears likely that post ES6, we'll see support added directly to the language, via a utility called `Object.observe(..)`. Essentially, the idea is that you can set up a listener to observe an object's changes, and have a callback called any time a change occurs. You can then update the DOM accordingly, for instance.
+在ES6后期，我们似乎很有可能看到这门语言通过一个称为`Object.observe(..)`的工具，对此提供直接的支持。实质上，它的思想是你可以建立监听器来监听一个对象的变化，并在一个变化发生的任何时候调用一个回调。例如，你可相应地更新DOM。
 
-There are six types of changes that you can observe:
+你可以监听六中类型的变化：
 
 * add
 * update
@@ -176,9 +162,9 @@ There are six types of changes that you can observe:
 * setPrototype
 * preventExtensions
 
-By default, you'll be notified of all these change types, but you can filter down to only the ones you care about.
+默认情况下，你将会受到所有这些类型的变化的通知，但是你可以将它们过滤为你关心的那一些。
 
-Consider:
+考虑如下代码：
 
 ```js
 var obj = { a: 1, b: 2 };
@@ -203,21 +189,22 @@ delete obj.b;
 // { name: "b", object: obj, type: "delete", oldValue: 2 }
 ```
 
-In addition to the main `"add"`, `"update"`, and `"delete"` change types:
+除了主要的`"add"`、`"update"`、和`"delete"`变化类型：
 
-* The `"reconfigure"` change event is fired if one of the object's properties is reconfigured with `Object.defineProperty(..)`, such as changing its `writable` attribute. See the *this & Object Prototypes* title of this series for more information.
-* The `"preventExtensions"` change event is fired if the object is made non-extensible via `Object.preventExtensions(..)`.
+* `"reconfigure"`变化事件在对象的一个属性通过`Object.defineProperty(..)`而重新配置时触发，比如改变它的`writable`属性。更多信息参见本系列的 *this与对象原型*。
+* `"preventExtensions"`变化事件在对象通过`Object.preventExtensions(..)`被设置为不可扩展时触发。
 
-   Because both `Object.seal(..)` and `Object.freeze(..)` also imply `Object.preventExtensions(..)`, they'll also fire its corresponding change event. In addition, `"reconfigure"` change events will also be fired for each property on the object.
-* The `"setPrototype"` change event is fired if the `[[Prototype]]` of an object is changed, either by setting it with the `__proto__` setter, or using `Object.setPrototypeOf(..)`.
+	 因为`Object.seal(..)`和`Object.freeze(..)`两者都暗示着`Object.preventExtensions(..)`，所以它们也将触发相应的变化事件。另外，`"reconfigure"`变化事件也会为对象上的每个属性被触发。
+* `"setPrototype"`变化事件在一个对象的`[[Prototype]]`被改变是触发，不论是使用`__proto__`setter，还是使用`Object.setPrototypeOf(..)`设置它。
 
-Notice that these change events are notified immediately after said change. Don't confuse this with proxies (see Chapter 7) where you can intercept the actions before they occur. Object observation lets you respond after a change (or set of changes) occurs.
+
+注意，这些变化事件在会在改变发生后立即触发。不要将它们与代理（见第七章）搞混，代理是可以在动作发生之前拦截它们的。对象监听让你在变化（或一组变化）发生之后进行应答。
 
 ### Custom Change Events
 
-In addition to the six built-in change event types, you can also listen for and fire custom change events.
+除了六中内建的变化事件类型，你还可以监听并触发自定义变化事件。
 
-Consider:
+考虑如下代码：
 
 ```js
 function observer(changes){
