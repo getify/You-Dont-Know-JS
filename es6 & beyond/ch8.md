@@ -397,44 +397,44 @@ SIMD将会引入`mul(..)`（乘法）之外的几种其他操作，比如`sub()`
 
 ## WebAssembly (WASM)
 
-Brendan Eich made a late breaking announcement near the completion of the first edition of this title that has the potential to significantly impact the future path of JavaScript: WebAssembly (WASM). We will not be able to cover WASM in detail here, as it's extremely early at the time of this writing. But this title would be incomplete without at least a brief mention of it.
+在本书的第一版将近完成的时候，Brendan Eich 突然宣布了一个有可能对JavaScript未来的道路产生重大冲击的公告：WebAssembly（WASM）。我们不能在这里详细地探讨WASM，因为在本书写作时这个话题为时过早了。但如果不简要地提上一句，这本书就不够完整。
 
-One of the strongest pressures on the recent (and near future) design changes of the JS language has been the desire that it become a more suitable target for transpilation/cross-compilation from other languages (like C/C++, ClojureScript, etc.). Obviously, performance of code running as JavaScript has been a primary concern.
+JS语言在近期（和近未来的）设计的改变上所承受的最大压力之一，就是渴望它能够成为从其他语言（比如 C/C++，ClojureScript，等等）转译/交叉编译来的、合适的目标语言。显然，作为JavaScript运行的代码性能是一个主要问题。
 
-As discussed in the *Async & Performance* title of this series, a few years ago a group of developers at Mozilla introduced an idea to JavaScript called ASM.js. ASM.js is a subset of valid JS that most significantly restricts certain actions that make code hard for the JS engine to optimize. The result is that ASM.js compatible code running in an ASM-aware engine can run remarkably faster, nearly on par with native optimized C equivalents. Many viewed ASM.js as the most likely backbone on which performance-hungry applications would ride in JavaScript.
+正如在本系列的 *异步与性能* 中讨论过的，几年前一组在Mozilla的开发者给JavaScript引入了一个称为ASM.js的想法。AMS.js是一个合法JS的子集，它大幅地制约了使代码难于被JS引擎优化的特定行为。其结果就是兼容AMS.js的代码在一个支持ASM的引擎上可以显著地快速运行，几乎可以与优化过的原生C语言的等价物相媲美。许多观点认为，对于那些将要由JavaScript编写的渴求性能的应用程序来说，ASM.js很可能将是它们的基干。
 
-In other words, all roads to running code in the browser *lead through JavaScript*.
+换言之，在浏览器中条条大路通过JavaScript通向运行的代码。
 
-That is, until the WASM announcement. WASM provides an alternate path for other languages to target the browser's runtime environment without having to first pass through JavaScript. Essentially, if WASM takes off, JS engines will grow an extra capability to execute a binary format of code that can be seen as somewhat similar to a bytecode (like that which runs on the JVM).
+直到WASM公告之前，是这样的。WASM提供了另一条路线，让其他语言不必非得首先通过JavaScript就能将浏览器的运行时环境作为运行的目标。实质上，如果WASM启用，JS引擎将会生长出额外的能力 —— 执行可以被视为有些与字节码相似的二进制代码（就像在JVM上运行的那些东西）。
 
-WASM proposes a format for a binary representation of a highly compressed AST (syntax tree) of code, which can then give instructions directly to the JS engine and its underpinnings, without having to be parsed by JS, or even behave by the rules of JS. Languages like C or C++ can be compiled directly to the WASM format instead of ASM.js, and gain an extra speed advantage by skipping the JS parsing.
+WASM提出了一种高度压缩的代码AST（语法树）的二进制表示格式，它可以继而像JS引擎以及它的基础结构直接发出指令，无需被JS解析，甚至无需按照JS的规则动作。像C或C++这样的语言可以直接被编译为WASM格式而非ASM.js，并且由于跳过JS解析而得到额外的速度优势。
 
-The near term for WASM is to have parity with ASM.js and indeed JS. But eventually, it's expected that WASM would grow new capabilities that surpass anything JS could do. For example, the pressure for JS to evolve radical features like threads -- a change that would certainly send major shockwaves through the JS ecosystem -- has a more hopeful future as a future WASM extension, relieving the pressure to change JS.
+短期内，WASM与AMS.js、JS不相上下。但是最终，人们预期WASM将会生长出新的能力，那将超过JS能做的任何事情。例如，让JS演化出像线程这样的根本特性 —— 一个肯定会对JS生态系统造成重大冲击的改变 —— 作为一个WASM未来的扩展更有希望，也会缓解改变JS的压力。
 
-In fact, this new roadmap opens up many new roads for many languages to target the web runtime. That's an exciting new future path for the web platform!
+事实上，这张新的路线图为许多语言服务于web运行时开启了新的道路。对于web平台来说，这真是一个激动人心的新路线！
 
-What does it mean for JS? Will JS become irrelevant or "die"? Absolutely not. ASM.js will likely not see much of a future beyond the next couple of years, but the majority of JS is quite safely anchored in the web platform story.
+它对JS意味着什么？JS将会变得无关紧要或者“死去”吗？绝对不是。ASM.js在接下来的几年中很可能看不到太多未来，但JS在数量上的绝对优势将它安全地锚定在web平台中。
 
-Proponents of WASM suggest its success will mean that the design of JS will be protected from pressures that would have eventually stretched it beyond assumed breaking points of reasonability. It is projected that WASM will become the preferred target for high-performance parts of applications, as authored in any of a myriad of different languages.
+WASM的拥护者们说，它的成功意味着JS的设计将会被保护起来，远离那些最终会迫使它超过自己合理性的临界点的压力。人们估计WASM将会成为应用程序中高性能部分的首选目标语言，这些部分曾用各种各样不同的语言编写过。
 
-Interestingly, JavaScript is one of the lesser likely languages to target WASM in the future. There may be future changes that carve out subsets of JS that might be tenable for such targeting, but that path doesn't seem high on the priority list.
+有趣的是，JavaScript是未来不太可能以WASM为目标的语言之一。可能有一些未来的改变会切出JS的一部分，而使这一部分更适于以WASM作为目标，但是这件事情看起来优先级不高。
 
-While JS likely won't be much of a WASM funnel, JS code and WASM code will be able to interoperate in the most significant ways, just as naturally as current module interactions. You can imagine calling a JS function like `foo()` and having that actually invoke a WASM function of that name with the power to run well outside the constraints of the rest of your JS.
+虽然JS很可能与WASM没什么关联，JS代码和WASM代码将能够以最重要的方式进行交互，就像当下的模块互动一样自然。你可以想象，调用一个`foo()`之类的JS函数而使它实际上调用一个同名WASM函数，它具备远离你其余JS的制约而运行的能力。
 
-Things which are currently written in JS will probably continue to always be written in JS, at least for the foreseeable future. Things which are transpiled to JS will probably eventually at least consider targeting WASM instead. For things which need the utmost in performance with minimal tolerance for layers of abstraction, the likely choice will be to find a suitable non-JS language to author in, then targeting WASM.
+至少是在可预见的未来，当下以JS编写的东西可能将继续总是由JS编写。转译为JS的东西将可能最终至少考虑以WASM为目标。对于那些需极致性能，而且在抽象的层面上没有余地的东西，最有可能的选择是找一种合适的非JS语言编写，然后以WASM为目标语言。
 
-There's a good chance this shift will be slow, and will be years in the making. WASM landing in all the major browser platforms is probably a few years out at best. In the meantime, the WASM project (https://github.com/WebAssembly) has an early polyfill to demonstrate proof-of-concept for its basic tenets.
+这个转变很有可能将会很慢，将会花上许多年成形。WASM在所有的主流浏览器上固定下来可能最快也要花几年。同时，WASM项目(https://github.com/WebAssembly)有一个早期填补，来为它的基本原则展示概念证明。
 
-But as time goes on, and as WASM learns new non-JS tricks, it's not too much a stretch of imagination to see some currently-JS things being refactored to a WASM-targetable language. For example, the performance sensitive parts of frameworks, game engines, and other heavily used tools might very well benefit from such a shift. Developers using these tools in their web applications likely won't notice much difference in usage or integration, but will just automatically take advantage of the performance and capabilities.
+但随着时间的推移，也随着WASM学到新的非JS技巧，不难想象一些当前是JS的东西被重构为以WASM作为目标的语言。例如，框架中性能敏感的部分，游戏引擎，和其他被深度使用的工具都很可能从这样的转变中收益。在web应用程序中使用这些工具的开发者们并不会在使用或整合上注意到太多不同，但确实会自动地利用这些性能和能力。
 
-What's certain is that the more real WASM becomes over time, the more it means to the trajectory and design of JavaScript. It's perhaps one of the most important "beyond ES6" topics developers should keep an eye on.
+可以确定的是，随着WASM变得越来越真实，它对JavaScript设计路线影响得越来越多。这可能是开发者们应当关注的最重要的“ES6以后”的话题。
 
 ## Review
 
-If all the other books in this series essentially propose this challenge, "you (may) not know JS (as much as you thought)," this book has instead suggested, "you don't know JS anymore." The book has covered a ton of new stuff added to the language in ES6. It's an exciting collection of new language features and paradigms that will forever improve our JS programs.
+如果这个系列的其他书目实质上提出了这个挑战，“你（可能）不懂JS（不想自己想象的那么懂）”，那么这本书就是在说，“你不再懂JS了”。这本书讲解了在ES6中加入到语言里的一大堆新东西。它是一个新语言特性的精彩集合，也是将永远改进我们JS程序的范例。
 
-But JS is not done with ES6! Not even close. There's already quite a few features in various stages of development for the "beyond ES6" timeframe. In this chapter, we briefly looked at some of the most likely candidates to land in JS very soon.
+但JS不是到ES6就完了！还早得很呢。已经有好几个“ES6之后”的特性处于开发的各个阶段。在这一章中，我们简要地看了一些最有可能很快会被固定在JS中的候选特性。
 
-`async function`s are powerful syntactic sugar on top of the generators + promises pattern (see Chapter 4). `Object.observe(..)` adds direct native support for observing object change events, which is critical for implementing data binding. The `**` exponentiation operator, `...` for object properties, and `Array#includes(..)` are all simple but helpful improvements to existing mechanisms. Finally, SIMD ushers in a new era in the evolution of high performance JS.
+`async function`是建立在 generators + promises 模式（见第四章）上的强大语法糖。`Object.observe(..)`为监听对象变化事件增加了直接原生的支持，它对实现数据绑定至关重要。`**`指数作符，针对对象属性的`...`，以及`Array#includes(..)`都是对现存机制的简单而有用的改进。最后，SIMD将高性能JS的演化带入一个新纪元。
 
-Cliché as it sounds, the future of JS is really bright! The challenge of this series, and indeed of this book, is incumbent on every reader now. What are you waiting for? It's time to get learning and exploring!
+听起来很俗套，但JS的未来是非常光明的！这个系列，以及这本书的挑战，现在是各位读者的职责了。你还在等什么？是时候开始学习和探索了！
