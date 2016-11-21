@@ -202,7 +202,7 @@ delete obj.b;
 
 ### Custom Change Events
 
-除了六中内建的变化事件类型，你还可以监听并触发自定义变化事件。
+除了六种内建的变化事件类型，你还可以监听并触发自定义变化事件。
 
 考虑如下代码：
 
@@ -247,15 +247,15 @@ obj.b;			// 30
 obj.c;			// 3
 ```
 
-The change set (`"recalc"` custom event) has been queued for delivery to the observer, but not delivered yet, which is why `obj.c` is still `3`.
+变化的集合（`"recalc"`自定义事件）为了投递给监听器而被排队，但还没被投递，这就是为什么`obj.c`依然是`3`。
 
-The changes are by default delivered at the end of the current event loop (see the *Async & Performance* title of this series). If you want to deliver them immediately, use `Object.deliverChangeRecords(observer)`. Once the change events are delivered, you can observe `obj.c` updated as expected:
+默认情况下，这些变化将在当前事件轮询（参见本系列的 *异步与性能*）的末尾被投递。如果你想要立即投递它们，使用`Object.deliverChangeRecords(observer)`。一旦这些变化投递完成，你就可以观察到`obj.c`如预期地更新为：
 
 ```js
 obj.c;			// 42
 ```
 
-In the previous example, we called `notifier.notify(..)` with the complete change event record. An alternative form for queuing change records is to use `performChange(..)`, which separates specifying the type of the event from the rest of event record's properties (via a function callback). Consider:
+在前面的例子中，我们使用变化完成事件的记录调用了`notifier.notify(..)`。将变化事件的记录进行排队的一种替代形式是使用`performChange(..)`，它把事件的类型与事件记录的属性（通过一个函数回调）分割开来。考虑如下代码：
 
 ```js
 notifier.performChange( "recalc", function(){
@@ -267,13 +267,13 @@ notifier.performChange( "recalc", function(){
 } );
 ```
 
-In certain circumstances, this separation of concerns may map more cleanly to your usage pattern.
+在特定的环境下，这种关注点分离可能与你的使用模式匹配的更干净。
 
 ### Ending Observation
 
-Just like with normal event listeners, you may wish to stop observing an object's change events. For that, you use `Object.unobserve(..)`.
+正如普通的事件监听器一样，你可能希望停止监听一个对象的变化事件。为此，你可以使用`Object.unobserve(..)`。
 
-For example:
+举例来说：
 
 ```js
 var obj = { a: 1, b: 2 };
@@ -290,11 +290,11 @@ Object.observe( obj, function observer(changes) {
 } );
 ```
 
-In this trivial example, we listen for change events until we see the `"setPrototype"` event come through, at which time we stop observing any more change events.
+在这个小例子中，我们监听变化事件直到我们看到`"setPrototype"`事件到来，那时我们就不再监听任何变化事件了。
 
 ## Exponentiation Operator
 
-An operator has been proposed for JavaScript to perform exponentiation in the same way that `Math.pow(..)` does. Consider:
+为了使JavaScript以与`Math.pow(..)`相同的方式进行指数运算，提案了一个操作符。考虑如下代码：
 
 ```js
 var a = 2;
@@ -305,13 +305,13 @@ a **= 3;		// a = Math.pow( a, 3 )
 a;				// 8
 ```
 
-**Note:** `**` is essentially the same as it appears in Python, Ruby, Perl, and others.
+**注意：** `**`实质上在Python、Ruby、Perl、和其他语言中都与此相同。
 
 ## Objects Properties and `...`
 
-As we saw in the "Too Many, Too Few, Just Enough" section of Chapter 2, the `...` operator is pretty obvious in how it relates to spreading or gathering arrays. But what about objects?
+正如我们在第二章的“太多，太少，正合适”一节中看到的，`...`操作符在扩散或收集一个数组上的工作方式是显而易见的。但对象会怎么样？
 
-Such a feature was considered for ES6, but was deferred to be considered after ES6 (aka "ES7" or "ES2016" or ...). Here's how it might work in that "beyond ES6" timeframe:
+这样的特性在ES6中被考虑过，但是被推迟到ES6之后（也就是“ES7”或者“ES2016”或者……）才会被考虑。这是它在“ES6以后”的时代中可能的工作方式：
 
 ```js
 var o1 = { a: 1, b: 2 },
@@ -322,7 +322,7 @@ console.log( o3.a, o3.b, o3.c, o3.d );
 // 1 2 3 4
 ```
 
-The `...` operator might also be used to gather an object's destructured properties back into an object:
+`...`操作符也可能被用于将一个对象的被解构属性收集到另一个对象：
 
 ```js
 var o1 = { b: 2, c: 3, d: 4 };
@@ -331,13 +331,13 @@ var { b, ...o2 } = o1;
 console.log( b, o2.c, o2.d );		// 2 3 4
 ```
 
-Here, the `...o2` re-gathers the destructured `c` and `d` properties back into an `o2` object (`o2` does not have a `b` property like `o1` does).
+这里，`...o2`将被解构的`c`和`d`属性重新收集到一个`o2`对象中（与`o1`不同，`o2`没有`b`属性）。
 
-Again, these are just proposals under consideration beyond ES6. But it'll be cool if they do land.
+重申一下，这些只是正在考虑之中的ES6之后的提案。但是如果它们能被确定下来就太酷了。
 
 ## `Array#includes(..)`
 
-One extremely common task JS developers need to perform is searching for a value inside an array of values. The way this has always been done is:
+JS开发者需要执行的极其常见的一个任务就是在一个值的数组中搜索一个值。完成这项任务的方式曾经总是：
 
 ```js
 var vals = [ "foo", "bar", 42, "baz" ];
@@ -347,9 +347,9 @@ if (vals.indexOf( 42 ) >= 0) {
 }
 ```
 
-The reason for the `>= 0` check is because `indexOf(..)` returns a numeric value of `0` or greater if found, or `-1` if not found. In other words, we're using an index-returning function in a boolean context. But because `-1` is truthy instead of falsy, we have to be more manual with our checks.
+进行`>= 0`检查是因为`indexOf(..)`在找到结果时返回一个`0`或更大的数字值，或者在没找到结果时返回`-1`。换句话说，我们在一个布尔值的上下文环境中使用了一个返回索引的函数。而由于`-1`是truthy而非falsy，所以我们不得不手动进行检查。
 
-In the *Types & Grammar* title of this series, I explored another pattern that I slightly prefer:
+在本系列的 *类型与文法* 中，我探索了另一种我稍稍偏好的模式：
 
 ```js
 var vals = [ "foo", "bar", 42, "baz" ];
@@ -359,11 +359,11 @@ if (~vals.indexOf( 42 )) {
 }
 ```
 
-The `~` operator here conforms the return value of `indexOf(..)` to a value range that is suitably boolean coercible. That is, `-1` produces `0` (falsy), and anything else produces a non-zero (truthy) value, which is what we for deciding if we found the value or not.
+这里的`~`操作符使`indexOf(..)`的返回值与一个值的范围相一致，这个范围可以恰当地强制转换为布尔型。也就是，`-1`产生`0`（falsy），而其余的东西产生非零值（truthy），而这正是我们判定是否找到值的依据。
 
-While I think that's an improvement, others strongly disagree. However, no one can argue that `indexOf(..)`'s searching logic is perfect. It fails to find `NaN` values in the array, for example.
+虽然我觉得这是一种改进，但有另一些人强烈反对。然而，没有人会质疑`indexOf(..)`的检索逻辑是完美的。例如，在数组中查找`NaN`值会失败。
 
-So a proposal has surfaced and gained a lot of support for adding a real boolean-returning array search method, called `includes(..)`:
+于是一个提案浮出了水面并得到了大量的支持 —— 增加一个真正的返回布尔值的数组检索方法，称为`includes(..)`：
 
 ```js
 var vals = [ "foo", "bar", 42, "baz" ];
@@ -373,15 +373,15 @@ if (vals.includes( 42 )) {
 }
 ```
 
-**Note:** `Array#includes(..)` uses matching logic that will find `NaN` values, but will not distinguish between `-0` and `0` (see the *Types & Grammar* title of this series). If you don't care about `-0` values in your programs, this will likely be exactly what you're hoping for. If you *do* care about `-0`, you'll need to do your own searching logic, likely using the `Object.is(..)` utility (see Chapter 6).
+**注意：** `Array#includes(..)`使用了将会找到`NaN`值的匹配逻辑，但将不会区分`-0`与`0`（参加本系列的 *类型与文法*）。如果你在自己的程序中不关心`-0`值，那么它很可能正是你希望的。如果你 *确实* 关心`-0`，那么你就需要实现你自己的检索逻辑，很可能是使用`Object.is(..)`工具（见六章）。
 
 ## SIMD
 
-We cover Single Instruction, Multiple Data (SIMD) in more detail in the *Async & Performance* title of this series, but it bears a brief mention here, as it's one of the next likely features to land in a future JS.
+我们在本系列的 *异步与性能* 中详细讲解了一个指令，多个数据（SIMD），但因为它是未来JS中下一个很可能被确定下来的特性，所以这里简要地提一下。
 
-The SIMD API exposes various low-level (CPU) instructions that can operate on more than a single number value at a time. For example, you'll be able to specify two *vectors* of 4 or 8 numbers each, and multiply the respective elements all at once (data parallelism!).
+SIMD API 暴露了各种底层（CPU）指令，它们可以同时操作一个以上的数字值。例如，你可以指定两个拥有4个或8个数字的 *向量*，然后一次性分别相乘所有元素（数据并行机制！）。
 
-Consider:
+考虑如下代码：
 
 ```js
 var v1 = SIMD.float32x4( 3.14159, 21.0, 32.3, 55.55 );
@@ -391,9 +391,9 @@ SIMD.float32x4.mul( v1, v2 );
 // [ 6.597339, 67.2, 138.89, 299.97 ]
 ```
 
-SIMD will include several other operations besides `mul(..)` (multiplication), such as `sub()`, `div()`, `abs()`, `neg()`, `sqrt()`, and many more.
+SIMD将会引入`mul(..)`（乘法）之外的几种其他操作，比如`sub()`、`div()`、`abs()`、`neg()`、`sqrt()`、以及其他许多。
 
-Parallel math operations are critical for the next generations of high performance JS applications.
+并行数学操作对下一代的高性能JS应用程序至关重要。
 
 ## WebAssembly (WASM)
 
