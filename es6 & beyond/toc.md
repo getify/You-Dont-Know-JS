@@ -1,58 +1,58 @@
-# You Don't Know JS: ES6 & Beyond
+# 你不懂JS：ES6与未来
 
-## Table of Contents
+## 目录
 
-* Foreword
-* Preface
-* Chapter 1: ES? Now & Future
-	* Versioning
-	* Transpiling
-* Chapter 2: Syntax
-	* Block-Scoped Declarations
-	* Spread / Rest
-	* Default Parameter Values
-	* Destructuring
-	* Object Literal Extensions
-	* Template Literals
-	* Arrow Functions
-	* `for..of` Loops
-	* Regular Expression Extensions
-	* Number Literal Extensions
+* 序
+* 前言
+* 第一章：ES？现在与未来
+	* 版本
+	* 转译
+* 第二章：语法
+	* 块儿作用域声明
+	* 扩散/剩余
+	* 默认参数值
+	* 解构
+	* 对象字面量扩展
+	* 模板字面量
+	* 箭头函数
+	* `for..of`循环
+	* 正则表达式扩展
+	* 数字字面量扩展
 	* Unicode
-	* Symbols
-* Chapter 3: Organization
-	* Iterators
+	* Symbol
+* 第三章：组织
+	* 迭代器
 	* Generators
-	* Modules
-	* Classes
-* Chapter 4: Async Flow Control
+	* 模块
+	* 类
+* 第四章：异步流程控制
 	* Promises
 	* Generators + Promises
-* Chapter 5: Collections
-	* TypedArrays
+* 第五章：集合
+	* 类型化数组（TypedArrays）
 	* Maps
 	* WeakMaps
 	* Sets
 	* WeakSets
-* Chapter 6: API Additions
+* 第六章：新增API
 	* `Array`
 	* `Object`
 	* `Math`
 	* `Number`
 	* `String`
-* Chapter 7: Meta Programming
-	* Function Names
-	* Meta Properties
-	* Well Known Symbols
-	* Proxies
+* 第七章：元编程
+	* 函数名
+	* 元属性
+	* 通用Symbol
+	* 代理
 	* `Reflect` API
-	* Feature Testing
-	* Tail Call Optimization (TCO)
-* Chapter 8: Beyond ES6
-	* `async function`s
+	* 特性测试
+	* 尾部调用优化（TCO）
+* 第八章：ES6以后
+	* `async function`
 	* `Object.observe(..)`
-	* Exponentiation Operator
-	* Object Properties and `...`
+	* 指数操作符
+	* 对象属性与`...`
 	* `Array#includes(..)`
 	* SIMD
-* Appendix A: Acknowledgments
+* 附录A：鸣谢

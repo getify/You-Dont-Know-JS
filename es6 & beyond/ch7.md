@@ -160,7 +160,7 @@ var b = new Child();
 
 **警告：** 与所有的元编程技术一样，要小心不要创建太过聪明的代码，而使未来的你或其他维护你代码的人很难理解。小心使用这些技巧。
 
-## 通用 Symbols
+## 通用 Symbol
 
 在第二章中的“Symbol”一节中，我们讲解了新的ES6基本类型`symbol`。除了你可以在你自己的程序中定义的symbol以外，JS预定义了几种内建symbol，被称为 *通用（Well Known） Symbols*（WKS）。
 
