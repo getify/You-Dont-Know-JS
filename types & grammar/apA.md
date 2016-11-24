@@ -1,46 +1,46 @@
 # You Don't Know JS: Types & Grammar
 # Appendix A: Mixed Environment JavaScript
 
-Beyond the core language mechanics we've fully explored in this book, there are several ways that your JS code can behave differently when it runs in the real world. If JS was executing purely inside an engine, it'd be entirely predictable based on nothing but the black-and-white of the spec. But JS pretty much always runs in the context of a hosting environment, which exposes your code to some degree of unpredictability.
+当你的JS代码在真实世界中运行时，除了我们在本书中完整探索过的核心语言机制以外，还有好几种不同的行为方式。如果JS纯粹地运行在一个引擎中，那么它就会按照语言规范非黑即白地动作，是完全可以预测的。但是JS很可能总是运行在一个宿主环境的上下文中，这将会给你的代码带来某种程度的不可预测性。
 
-For example, when your code runs alongside code from other sources, or when your code runs in different types of JS engines (not just browsers), there are some things that may behave differently.
+例如，当你的代码与源自于其他地方的代码并肩运行时，或者当你的代码在不同种类的JS引擎（不只是浏览器）中运行时，有些事情的行为就可能不同。
 
-We'll briefly explore some of these concerns.
+我们将简要地探索这些问题中的一些。
 
 ## Annex B (ECMAScript)
 
-It's a little known fact that the official name of the language is ECMAScript (referring to the ECMA standards body that manages it). What then is "JavaScript"? JavaScript is the common tradename of the language, of course, but more appropriately, JavaScript is basically the browser implementation of the spec.
+一个鲜为人知的事实是，这门语言的官方名称是ECMAScript（意指管理它的ECMA标准本体）。那么“JavaScript”是什么？JavaScript是这门语言常见的商业名称，当然，更恰当地说，JavaScript基本上是语言规范的浏览器实现。
 
-The official ECMAScript specification includes "Annex B," which discusses specific deviations from the official spec for the purposes of JS compatibility in browsers.
+官方的ECMAScript语言规范包含“Annex B”，它是为了浏览器中JS兼容性的目的，讨论那些与官方语言规范有偏差的特别部分。
 
-The proper way to consider these deviations is that they are only reliably present/valid if your code is running in a browser. If your code always runs in browsers, you won't see any observable difference. If not (like if it can run in node.js, Rhino, etc.), or you're not sure, tread carefully.
+考虑这些偏差部分的恰当方法是，它们仅在你的代码运行在浏览器中时才是确实会出现/合法的。如果你的代码总是运行在浏览器中，那你就不会看到明显的不同。如果不是（比如它可以运行在node.js、Rhino中，等等），或者你不确定，那么就要小心对待。
 
-The main compatibility differences:
+兼容性上的主要不同是：
 
-* Octal number literals are allowed, such as `0123` (decimal `83`) in non-`strict mode`.
-* `window.escape(..)` and `window.unescape(..)` allow you to escape or unescape strings with `%`-delimited hexadecimal escape sequences. For example: `window.escape( "?foo=97%&bar=3%" )` produces `"%3Ffoo%3D97%25%26bar%3D3%25"`.
-* `String.prototype.substr` is quite similar to `String.prototype.substring`, except that instead of the second parameter being the ending index (noninclusive), the second parameter is the `length` (number of characters to include).
+* 八进制数字字面量是允许的，比如在非`strict mode`下的`123`（小数`83`）。
+* `window.escape(..)`和`window.unescape(..)`允许你使用`%`分割的十六进制转义序列来转义或非转义字符串。
+* `String.prototype.substr`与`String.prototype.substring`十分相似，除了第二个参数是`length`（包含的字符数），而非结束（不含）的索引。
 
 ### Web ECMAScript
 
-The Web ECMAScript specification (http://javascript.spec.whatwg.org/) covers the differences between the official ECMAScript specification and the current JavaScript implementations in browsers.
+Web ECMAScript语言规范涵盖了官方ECMAScript语言规范与当前浏览器中JavaScript实现之间的不同。
 
-In other words, these items are "required" of browsers (to be compatible with each other) but are not (as of the time of writing) listed in the "Annex B" section of the official spec:
+换言之，这些项目是浏览器的“必须品”（为了相互兼容），但是（在本书编写时）没有列在官方语言规范的“Annex B”部分：
 
-* `<!--` and `-->` are valid single-line comment delimiters.
-* `String.prototype` additions for returning HTML-formatted strings: `anchor(..)`, `big(..)`, `blink(..)`, `bold(..)`, `fixed(..)`, `fontcolor(..)`, `fontsize(..)`, `italics(..)`, `link(..)`, `small(..)`, `strike(..)`, and `sub(..)`. **Note:** These are very rarely used in practice, and are generally discouraged in favor of other built-in DOM APIs or user-defined utilities.
-* `RegExp` extensions: `RegExp.$1` .. `RegExp.$9` (match-groups) and `RegExp.lastMatch`/`RegExp["$&"]` (most recent match).
-* `Function.prototype` additions: `Function.prototype.arguments` (aliases internal `arguments` object) and `Function.caller` (aliases internal `arguments.caller`). **Note:** `arguments` and thus `arguments.caller` are deprecated, so you should avoid using them if possible. That goes doubly so for these aliases -- don't use them!
+* `<!--`和`-->`是合法的单行注释分割符。
+* `String.prototype` 返回HTML格式化字符串的附加方法：`anchor(..)`, `big(..)`, `blink(..)`, `bold(..)`, `fixed(..)`, `fontcolor(..)`, `fontsize(..)`, `italics(..)`, `link(..)`, `small(..)`, `strike(..)`, 和`sub(..)`。**注意：** 它们在实际应用中非常罕见，而且一般来说不鼓励使用，而是用其他内建DOM API或用户定义的工具取代。
+* `RegExp`扩展：`RegExp.$1` .. `RegExp.$9`（匹配组）和`RegExp.lastMatch`/`RegExp["$&"]`（最近的匹配）。
+* `Function.prototype`附加功能：`Function.prototype.arguments`（内部`arguments`对象的别名）和`Function.caller`（内部`arguments.caller`的别名）。**注意：** `arguments`和 `arguments.caller`都被废弃了，所以你应当尽可能避免使用它们。这些别名更是这样 —— 不要使用它们！
 
-**Note:** Some other minor and rarely used deviations are not included in our list here. See the external "Annex B" and "Web ECMAScript" documents for more detailed information as needed.
+**注意：** 其他的一些微小和罕见的偏差点没有包含在我们这里的列表中。有必要的话，更多详细信息参见外部的“Annex B”和“Web ECMAScript”文档。
 
-Generally speaking, all these differences are rarely used, so the deviations from the specification are not significant concerns. **Just be careful** if you rely on any of them.
+一般来说，所有这些不同点都很少被使用，所以这些与语言规范有出入的地方不是什么重大问题。只是如果你依赖于其中任何一个的话，**要小心**。
 
 ## Host Objects
 
-The well-covered rules for how variables behave in JS have exceptions to them when it comes to variables that are auto-defined, or otherwise created and provided to JS by the environment that hosts your code (browser, etc.) -- so called, "host objects" (which include both built-in `object`s and `function`s).
+JS中变量的行为有一些例外 —— 当它们是被自动定义，或由持有你代码的环境（浏览器等）创建并提供给JS时 —— 也就是所谓的“宿主对象”（包括`object`和`function`两者）。
 
-For example:
+例如：
 
 ```js
 var a = document.createElement( "div" );
@@ -51,35 +51,35 @@ Object.prototype.toString.call( a );	// "[object HTMLDivElement]"
 a.tagName;								// "DIV"
 ```
 
-`a` is not just an `object`, but a special host object because it's a DOM element. It has a different internal `[[Class]]` value (`"HTMLDivElement"`) and comes with predefined (and often unchangeable) properties.
+`a`不仅是一个`object`，而且是一个特殊的宿主对象，因为它是一个DOM元素。它拥有一个不同的内部`[[Class]]`值（`"HTMLDivElement"`），而且带有预定义的（而且通常是不可更改的）属性。
 
-Another such quirk has already been covered, in the "Falsy Objects" section in Chapter 4: some objects can exist but when coerced to `boolean` they (confoundingly) will coerce to `false` instead of the expected `true`.
+另一个已经在第四章的“Falsy对象”一节中探讨过的同样的怪异之处是：存在这样一些对象，当被强制转换为`boolean`时，它们将（令人糊涂地）被转换为`false`而不是预期的`true`。
 
-Other behavior variations with host objects to be aware of can include:
+另一些需要小心的宿主对象行为包括：
 
-* not having access to normal `object` built-ins like `toString()`
-* not being overwritable
-* having certain predefined read-only properties
-* having methods that cannot be `this`-overriden to other objects
-* and more...
+* 不能访问像`toString()`这样的`object`内建方法
+* 不可覆盖
+* 拥有特定的预定义只读属性
+* 拥有一些`this`不可被重载为其他对象的方法
+* 和其他...
 
-Host objects are critical to making our JS code work with its surrounding environment. But it's important to note when you're interacting with a host object and be careful assuming its behaviors, as they will quite often not conform to regular JS `object`s.
+为了使我们的JS代码与它外围的环境一起工作，宿主对象至关重要。但在你与宿主对象交互时是要特别注意，并且小心地推测它的行为，因为它们经常与普通的JS`object`不符。
 
-One notable example of a host object that you probably interact with regularly is the `console` object and its various functions (`log(..)`, `error(..)`, etc.). The `console` object is provided by the *hosting environment* specifically so your code can interact with it for various development-related output tasks.
+一个你可能经常与之交互的宿主对象的尽人皆知的例子，就是`console`对象和他的各种函数（`log(..)`、`error(..)`等等）。`console`对象是由 *宿主环境* 特别提供的，所以你的代码可以与之互动来进行各种开发相关的输出任务。
 
-In browsers, `console` hooks up to the developer tools' console display, whereas in node.js and other server-side JS environments, `console` is generally connected to the standard-output (`stdout`) and standard-error (`stderr`) streams of the JavaScript environment system process.
+在浏览器中，`console`与开发者工具控制台的显示相勾连，因此在node.js和其他服务器端JS环境中，`console`一般连接着JavaScript环境系统进程的标准输出流（`stdout`）和标准错误流（`stderr`）。
 
 ## Global DOM Variables
 
-You're probably aware that declaring a variable in the global scope (with or without `var`) creates not only a global variable, but also its mirror: a property of the same name on the `global` object (`window` in the browser).
+你可能知道，在全局作用域中声明变量（用或者不用`var`）不仅会创建一个全局变量，还会创建它的镜像：在`global`对象（浏览器中的`window`）上的同名属性。
 
-But what may be less common knowledge is that (because of legacy browser behavior) creating DOM elements with `id` attributes creates global variables of those same names. For example:
+但少为人知的是，（由于浏览器的遗留行为）使用`id`属性创建DOM元素会创建同名的全局变量。例如：
 
 ```html
 <div id="foo"></div>
 ```
 
-And:
+和：
 
 ```js
 if (typeof foo == "undefined") {
