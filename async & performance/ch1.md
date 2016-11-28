@@ -622,14 +622,14 @@ So, we can coordinate the interaction with a simple latch, to let only the first
 var a;
 
 function foo(x) {
-	if (a == undefined) {
+	if (a === undefined) {
 		a = x * 2;
 		baz();
 	}
 }
 
 function bar(x) {
-	if (a == undefined) {
+	if (a === undefined) {
 		a = x / 2;
 		baz();
 	}
