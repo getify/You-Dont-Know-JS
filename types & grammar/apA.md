@@ -89,21 +89,21 @@ if (typeof foo == "undefined") {
 console.log( foo );	// HTML element
 ```
 
-You're perhaps used to managing global variable tests (using `typeof` or `.. in window` checks) under the assumption that only JS code creates such variables, but as you can see, the contents of your hosting HTML page can also create them, which can easily throw off your existence check logic if you're not careful.
+你可能臆测只有JS代码会创建这样的变量，并习惯于在这样假定的前提下进行全局变量检测（使用`typeof`或者`.. in window`检查），但是如你所见，你的宿主HTML页面的内容也会创建它们，如果你不小心它们就可以轻而易举地摆脱你的存在性检查。
 
-This is yet one more reason why you should, if at all possible, avoid using global variables, and if you have to, use variables with unique names that won't likely collide. But you also need to make sure not to collide with the HTML content as well as any other code.
+这就是另一个你为什么应该尽全力避免使用全局变量的原因，如果你不得不这样做，那就使用不太可能冲突的变量名。但是你还是需要确认它不会与HTML的内容以及其他的代码相冲突。
 
 ## Native Prototypes
 
-One of the most widely known and classic pieces of JavaScript *best practice* wisdom is: **never extend native prototypes**.
+最广为人知的，经典的JavaScript *最佳实践* 智慧之一是：**永远不要扩展原生原型**。
 
-Whatever method or property name you come up with to add to `Array.prototype` that doesn't (yet) exist, if it's a useful addition and well-designed, and properly named, there's a strong chance it *could* eventually end up being added to the spec -- in which case your extension is now in conflict.
+当你将方法或属性添加到`Array.prototype`时，无论你想出什么样的（还）不存在于`Array.prototype`上名称，如果它是有用的、设计良好的、并且被恰当命名的新增功能，那么它就有很大的可能性被最终加入语言规范 —— 这种情况下你的扩展就处于冲突之中。
 
-Here's a real example that actually happened to me that illustrates this point well.
+这里有一个真实地发生在我身上的例子，很好地展示了这一点。
 
-I was building an embeddable widget for other websites, and my widget relied on jQuery (though pretty much any framework would have suffered this gotcha). It worked on almost every site, but we ran across one where it was totally broken.
+那是我正在为其他网站建造一个可嵌入的控件，而且我的控件依赖于JQuery（虽然任何框架都很可能遭受这样的坑）。它几乎可以在每一个网站上工作，但是我们碰到了一个它会完全崩溃的网站。
 
-After almost a week of analysis/debugging, I found that the site in question had, buried deep in one of its legacy files, code that looked like this:
+经过差不多一周的分析/调试之后，我发现这个出问题的网站有这样一段代码，埋藏在它的一个遗留文件的深处：
 
 ```js
 // Netscape 4 doesn't have Array.push
@@ -112,19 +112,19 @@ Array.prototype.push = function(item) {
 };
 ```
 
-Aside from the crazy comment (who cares about Netscape 4 anymore!?), this looks reasonable, right?
+除了那疯狂的注释（谁还会关心Netscape 4！？），它看起来很合理，对吧？
 
-The problem is, `Array.prototype.push` was added to the spec sometime subsequent to this Netscape 4 era coding, but what was added is not compatible with this code. The standard `push(..)` allows multiple items to be pushed at once. This hacked one ignores the subsequent items.
+问题是，在这段 Netscape 4 时代的代码被编写之后的某个时点，`Array.prototype.push`被加入了语言规范，但是被加入的东西与这段代码是不兼容的。标准的`push(..)`允许一次加入多个项目，而这个黑进来的东西会忽略后续项目。
 
-Basically all JS frameworks have code that relies on `push(..)` with multiple elements. In my case, it was code around the CSS selector engine that was completely busted. But there could conceivably be dozens of other places susceptible.
+基本上所有的JS框架都有这样的代码 —— 依赖于带有多个元素的`push(..)`。在我的例子中，我在围绕着一个完全被毁坏的CSS选择器引擎进行编码。但是可以料想到还有其他十几处可疑的地方。
 
-The developer who originally wrote that `push(..)` hack had the right instinct to call it `push`, but didn't foresee pushing multiple elements. They were certainly acting in good faith, but they created a landmine that didn't go off until almost 10 years later when I unwittingly came along.
+一开始编写这个`push(..)`黑科技的开发者称它为`push`，这种直觉很正确，但是没有预见到添加多个元素。当然他们的初衷是好的，但是也埋下了一个地雷，当我差不多在10年之后路过时才不知不觉地踩上。
 
-There's multiple lessons to take away on all sides.
+这里要吸取几个教训。
 
-First, don't extend the natives unless you're absolutely sure your code is the only code that will ever run in that environment. If you can't say that 100%, then extending the natives is dangerous. You must weigh the risks.
+第一，不要扩展原生类型，除非你绝对确信你的代码将是运行在那个环境那个中的唯一代码。如果你不能100%确信，那么扩展原生类型就是危险的。你必须掂量掂量风险。
 
-Next, don't unconditionally define extensions (because you can overwrite natives accidentally). In this particular example, had the code said this:
+其次，不要无条件地定义扩展（因为你可能意外地覆盖原生类型）。就这个特定的例子，用代码说话：
 
 ```js
 if (!Array.prototype.push) {
@@ -135,16 +135,16 @@ if (!Array.prototype.push) {
 }
 ```
 
-The `if` statement guard would have only defined this hacked `push()` for JS environments where it didn't exist. In my case, that probably would have been OK. But even this approach is not without risk:
+`if`守护语句将会仅在JS环境中不存在`push()`时才定义那个`push()`黑科技。在我的情况中，这可能就够了。但即便是这种方式也不是没有风险：
 
-1. If the site's code (for some crazy reason!) was relying on a `push(..)` that ignored multiple items, that code would have been broken years ago when the standard `push(..)` was rolled out.
-2. If any other library had come in and hacked in a `push(..)` ahead of this `if` guard, and it did so in an incompatible way, that would have broken the site at that time.
+1. 如果网站的代码（为了某些疯狂的理由！）有赖于忽略多个项目的`push(..)`，那么几年以后当标准的`push(..)`推出时，那些代码将会坏掉。
+2. 如果有其他库被引入，并在这个`if`守护之前就黑进了`push(..)`，而且还是以一种不兼容的方式，那么它就在那一刻毁坏了这个网站。
 
-What that highlights is an interesting question that, frankly, doesn't get enough attention from JS developers: **Should you EVER rely on native built-in behavior** if your code is running in any environment where it's not the only code present?
+这里的重点是一个，坦白地讲，没有得到JS开发者们足够重视的有趣问题：如果在你代码运行的环境中，你的代码不是唯一的存在，那么 **你应该依赖于任何原生的内建行为吗?**
 
-The strict answer is **no**, but that's awfully impractical. Your code usually can't redefine its own private untouchable versions of all built-in behavior relied on. Even if you *could*, that's pretty wasteful.
+严格的答案是 **不**，但这非常不切实际。你的代码通常不会为所有它依赖的内建行为重新定义它自己的、不可接触的私有版本。即便你 *能*，那也是相当的浪费。
 
-So, should you feature-test for the built-in behavior as well as compliance-testing that it does what you expect? And what if that test fails -- should your code just refuse to run?
+那么，你应当为内建行为进行特性测试，以及为了验证它能如你预期的那样工作而进行兼容性测试吗？但如果测试失败了 —— 你的代码应当拒绝运行吗？
 
 ```js
 // don't trust Array.prototype.push
@@ -164,21 +164,21 @@ So, should you feature-test for the built-in behavior as well as compliance-test
 })();
 ```
 
-In theory, that sounds plausible, but it's also pretty impractical to design tests for every single built-in method.
+理论上，这貌似有些道理，但是为每一个内建方法设计测试还是非常不切实际。
 
-So, what should we do? Should we *trust but verify* (feature- and compliance-test) **everything**? Should we just assume existence is compliance and let breakage (caused by others) bubble up as it will?
+那么，我们应当怎么做？我们应当 *信赖但验证*（特性和兼容性测试）**每一件事吗**？我们应当假设既存的东西是符合规范的并让（由他人）造成的破坏任意传播吗？
 
-There's no great answer. The only fact that can be observed is that extending native prototypes is the only way these things bite you.
+没有太好的答案。可以观察到的唯一事实是，扩展原生原型是这些东西咬到你的唯一方法。
 
-If you don't do it, and no one else does in the code in your application, you're safe. Otherwise, you should build in at least a little bit of skepticism, pessimism, and expectation of possible breakage.
+如果你不这么做，而且在你的应用程序中也没有其他人这么做，那么你就是安全的。否则，你就应当多多少少建立一些怀疑的、悲观的机制、并对可能的破坏做好准备。
 
-Having a full set of unit/regression tests of your code that runs in all known environments is one way to surface some of these issues earlier, but it doesn't do anything to actually protect you from these conflicts.
+在所有已知环境中，为你的代码准备一整套单元/回归测试是发现一些前述问题的方法，但是它不会对这些冲突为你做出任何实际的保护。
 
 ### Shims/Polyfills
 
-It's usually said that the only safe place to extend a native is in an older (non-spec-compliant) environment, since that's unlikely to ever change -- new browsers with new spec features replace older browsers rather than amending them.
+人们常说，扩展一个原生类型唯一安全的地方是在一个（不兼容语言规范的）老版本环境中，因为它不太可能在改变了 —— 带有新语言规范特性的新浏览器会取代老版本浏览器，而非改良它们。
 
-If you could see into the future, and know for sure what a future standard was going to be, like for `Array.prototype.foobar`, it'd be totally safe to make your own compatible version of it to use now, right?
+如果你能预见未来，而且确信未来的标准将是怎样，比如`Array.prototype.foobar`，那么现在就制造你自己的兼容版本来使用就是完全安全的，对吧？
 
 ```js
 if (!Array.prototype.foobar) {
@@ -189,33 +189,39 @@ if (!Array.prototype.foobar) {
 }
 ```
 
-If there's already a spec for `Array.prototype.foobar`, and the specified behavior is equal to this logic, you're pretty safe in defining such a snippet, and in that case it's generally called a "polyfill" (or "shim").
+如果已经有了`Array.prototype.foobar`的规范，而且规定的行为与这个逻辑等价，那么你定义这样的代码段就十分安全，在这种情况下它通常称为一个“填补（polyfill）”（或者“垫片（shim）”）。
 
-Such code is **very** useful to include in your code base to "patch" older browser environments that aren't updated to the newest specs. Using polyfills is a great way to create predictable code across all your supported environments.
+在你的代码库中引入这样的代码，对给那些没有更新到最新规范的老版本浏览器环境打“补丁”**非常** 有用。为所有你支持的环境创建可预见的代码，使用填补是非常好的方法。
 
-**Tip:** ES5-Shim (https://github.com/es-shims/es5-shim) is a comprehensive collection of shims/polyfills for bringing a project up to ES5 baseline, and similarly, ES6-Shim (https://github.com/es-shims/es6-shim) provides shims for new APIs added as of ES6. While APIs can be shimmed/polyfilled, new syntax generally cannot. To bridge the syntactic divide, you'll want to also use an ES6-to-ES5 transpiler like Traceur (https://github.com/google/traceur-compiler/wiki/GettingStarted).
+**提示：** ES5-Shim (https://github.com/es-shims/es5-shim) 是一个将项目代码桥接至ES5基准线的完整的shims/polyfills集合，相似地，ES6-Shim (https://github.com/es-shims/es6-shim) 提供了ES6新增的新API的shim。虽然API可以被填补，新的语法通常是不能的。要桥接语法的部分，你将还需要使用一个ES6到ES5的转译器，比如Traceur (https://github.com/google/traceur-compiler/wiki/GettingStarted)。
 
-If there's likely a coming standard, and most discussions agree what it's going to be called and how it will operate, creating the ahead-of-time polyfill for future-facing standards compliance is called "prollyfill" (probably-fill).
+如果有一个即将到来的标准，而且关于它叫什么名字和它将如何工作的讨论达成了一致，那么为了兼容面向未来的标准提前创建填补，被称为“预填补（prollyfill —— probably-fill）”。
 
-The real catch is if some new standard behavior can't be (fully) polyfilled/prollyfilled.
+真正的坑是某些标准行为不能被（完全）填补/预填补。
 
-There's debate in the community if a partial-polyfill for the common cases is acceptable (documenting the parts that cannot be polyfilled), or if a polyfill should be avoided if it purely can't be 100% compliant to the spec.
+在开发者社区中有这样一种争论：对于常见的情况一个部分地填补是否是可接受的，或者如果一个填补不能100%地与语言规范兼容是否应当避免它。
 
-Many developers at least accept some common partial polyfills (like for instance `Object.create(..)`), because the parts that aren't covered are not parts they intend to use anyway.
+许多开发者至少会接受一些常见的部分填补（例如`Object.create(..)`），因为没有被填补的部分是他们不管怎样都不会用到的。
 
-Some developers believe that the `if` guard around a polyfill/shim should include some form of conformance test, replacing the existing method either if it's absent or fails the tests. This extra layer of compliance testing is sometimes used to distinguish "shim" (compliance tested) from "polyfill" (existence checked).
+一些开发者相信，包围着 polyfill/shim 的`if`守护语句应当引入某种形式的一致性测试，在既存的方法缺失或者测试失败时取代它。这额外的一层兼容性测试有时被用于将“shim”（兼容性测试）与“polyfill”（存在性测试）区别开。
 
-The only absolute take-away is that there is no absolute *right* answer here. Extending natives, even when done "safely" in older environments, is not 100% safe. The same goes for relying upon (possibly extended) natives in the presence of others' code.
+这里的要点是，没有绝对 *正确* 的答案。即使是在老版本环境中“安全地”扩展原生类型，也不是100%安全的。在其他人代码存在的情况下依赖于（可能被扩展过的）原生类型也是一样。
 
-Either should always be done with caution, defensive code, and lots of obvious documentation about the risks.
+在这两种情况下都应当小心地使用防御性的代码，并在文档中大量记录它的风险。
 
 ## `<script>`s
 
 Most browser-viewed websites/applications have more than one file that contains their code, and it's common to have a few or several `<script src=..></script>` elements in the page that load these files separately, and even a few inline-code `<script> .. </script>` elements as well.
 
+大多数通过浏览器使用的网站/应用程序都将它们的代码包含在一个以上的文件中，在一个页面中含有几个或好几个分别加载这些文件`<script src=..></script>`元素，甚至几个内联的`<script> .. </script>`元素也很常见。
+
 But do these separate files/code snippets constitute separate programs or are they collectively one JS program?
 
+但这些分离的文件/代码段是组成分离的程序，还是综合为一个JS程序？
+
 The (perhaps surprising) reality is they act more like independent JS programs in most, but not all, respects.
+
+（也许令人吃惊）
 
 The one thing they *share* is the single `global` object (`window` in the browser), which means multiple files can append their code to that shared namespace and they can all interact.
 
