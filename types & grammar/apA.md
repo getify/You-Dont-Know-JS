@@ -211,23 +211,17 @@ if (!Array.prototype.foobar) {
 
 ## `<script>`s
 
-Most browser-viewed websites/applications have more than one file that contains their code, and it's common to have a few or several `<script src=..></script>` elements in the page that load these files separately, and even a few inline-code `<script> .. </script>` elements as well.
-
 大多数通过浏览器使用的网站/应用程序都将它们的代码包含在一个以上的文件中，在一个页面中含有几个或好几个分别加载这些文件`<script src=..></script>`元素，甚至几个内联的`<script> .. </script>`元素也很常见。
-
-But do these separate files/code snippets constitute separate programs or are they collectively one JS program?
 
 但这些分离的文件/代码段是组成分离的程序，还是综合为一个JS程序？
 
-The (perhaps surprising) reality is they act more like independent JS programs in most, but not all, respects.
+（也许令人吃惊）现实是它们在极大程度上，但不是全部，像独立的JS程序那样动作。
 
-（也许令人吃惊）
+它们所 *共享* 的一个东西是一个单独的`global`对象（在浏览器中是`window`），这意味着多个文件可以将它们的代码追加到这个共享的名称空间中，而且它们都是可以交互的。
 
-The one thing they *share* is the single `global` object (`window` in the browser), which means multiple files can append their code to that shared namespace and they can all interact.
+所以，如果一个`script`元素定义了一个全局函数`foo()`，当第二个`script`运行时，它就可以访问并调用`foo()`，就好像它自己已经定义过了这个函数一样。
 
-So, if one `script` element defines a global function `foo()`, when a second `script` later runs, it can access and call `foo()` just as if it had defined the function itself.
-
-But global variable scope *hoisting* (see the *Scope & Closures* title of this series) does not occur across these boundaries, so the following code would not work (because `foo()`'s declaration isn't yet declared), regardless of if they are (as shown) inline `<script> .. </script>` elements or externally loaded `<script src=..></script>` files:
+但是全局变量作用域 *提升*（参见本系列的 *作用域与闭包*）不会跨越这些界限发生，所以下面的代码将不能工作（因为`foo()`的声明还没有被声明过），无论它们是否是内联的`<script> .. </script>`元素还是外部加载的`<script src=..></script>`文件：
 
 ```html
 <script>foo();</script>
@@ -237,7 +231,7 @@ But global variable scope *hoisting* (see the *Scope & Closures* title of this s
 </script>
 ```
 
-But either of these *would* work instead:
+但是这两个都将 *可以* 工作：
 
 ```html
 <script>
@@ -246,7 +240,7 @@ But either of these *would* work instead:
 </script>
 ```
 
-Or:
+或者：
 
 ```html
 <script>
@@ -256,9 +250,9 @@ Or:
 <script>foo();</script>
 ```
 
-Also, if an error occurs in a `script` element (inline or external), as a separate standalone JS program it will fail and stop, but any subsequent `script`s will run (still with the shared `global`) unimpeded.
+另外，如果在一个`script`元素（内联或者外部的）中发生了一个错误，一个分离的独立的JS程序将会失败并停止，但是任何后续的`script`都将会（依然在共享的`global`中）畅通无阻地运行。
 
-You can create `script` elements dynamically from your code, and inject them into the DOM of the page, and the code in them will behave basically as if loaded normally in a separate file:
+你可以从你的代码中动态地创建`script`元素，并将它们插入到页面的DOM中，它们之中的代码基本上将会像从一个分离的文件中普通地加载那样运行：
 
 ```js
 var greeting = "Hello World";
@@ -271,9 +265,9 @@ el.text = "function foo(){ alert( greeting );\
 document.body.appendChild( el );
 ```
 
-**Note:** Of course, if you tried the above snippet but set `el.src` to some file URL instead of setting `el.text` to the code contents, you'd be dynamically creating an externally loaded `<script src=..></script>` element.
+**注意：** 当然，如果你试一下上面的代码段并将`el.src`设置为某些文件的URL，而非将`el.text`设置为代码内容，你就会动态地创建一个外部加载的`<script src=..></script>`元素。
 
-One difference between code in an inline code block and that same code in an external file is that in the inline code block, the sequence of characters `</script>` cannot appear together, as (regardless of where it appears) it would be interpreted as the end of the code block. So, beware of code like:
+一个内联代码块中的代码，与在一个外部文件中的相同的代码之间的一个不同之处是，在内联的代码块中，字符`</script>`的序列不能一起出现，因为（无论它在哪里出现）它将会被翻译为代码快的末尾。所以，小心这样的代码：
 
 ```html
 <script>
@@ -281,17 +275,17 @@ One difference between code in an inline code block and that same code in an ext
 </script>
 ```
 
-It looks harmless, but the `</script>` appearing inside the `string` literal will terminate the script block abnormally, causing an error. The most common workaround is:
+它看起来无害，但是在`string`字面量中出现的`</script>`将会不正常地终结script块，造成一个错误。绕过它最常见的一个方法是：
 
 ```js
 "</sc" + "ript>";
 ```
 
-Also, beware that code inside an external file will be interpreted in the character set (UTF-8, ISO-8859-8, etc.) the file is served with (or the default), but that same code in an inline `script` element in your HTML page will be interpreted by the character set of the page (or its default).
+另外要小心的是，一个外部文件中的代码将会根据和文件一起被提供（或默认的）的字符集编码（UTF-8、ISO-8859-8等等）来翻译，但在内联在你HTML页面中的一个`script`元素中的相同代码将会根据这个页面的（或它默认的）字符集编码来翻译。
 
-**Warning:** The `charset` attribute will not work on inline script elements.
+**警告：** `charset`属性在内联script元素中不能工作。
 
-Another deprecated practice with inline `script` elements is including HTML-style or X(HT)ML-style comments around inline code, like:
+关于内联`script`元素，另一个被废弃的做法是在内联代码的周围引入HTML风格或X(HT)ML风格的注释，就像：
 
 ```html
 <script>
@@ -307,17 +301,17 @@ alert( "World" );
 </script>
 ```
 
-Both of these are totally unnecessary now, so if you're still doing that, stop it!
+这两种东西现在完全是不必要的了，所以如果你还在这么做，停下！
 
-**Note:** Both `<!--` and `-->` (HTML-style comments) are actually specified as valid single-line comment delimiters (`var x = 2; <!-- valid comment` and `--> another valid line comment`) in JavaScript (see the "Web ECMAScript" section earlier), purely because of this old technique. But never use them.
+**注意：** 实际上纯粹是因为这种老技术，JavaScript才把`<!--`和`-->`（HTML风格的注释）两者都被规定为合法的单行注释分隔符（`var x = 2; <!-- valid comment`和`--> another valid line comment`）。永远不要使用它们。
 
 ## Reserved Words
 
-The ES5 spec defines a set of "reserved words" in Section 7.6.1 that cannot be used as standalone variable names. Technically, there are four categories: "keywords", "future reserved words", the `null` literal, and the `true` / `false` boolean literals.
+ES5语言规范在第7.6.1部分中定义了一套“保留字”，它们不能被用作独立的变量名。技术上讲，有四个类别：“关键字”，“未来保留字”，`null`字面量，以及`true`/`false`布尔字面量。
 
-Keywords are the obvious ones like `function` and `switch`. Future reserved words include things like `enum`, though many of the rest of them (`class`, `extends`, etc.) are all now actually used by ES6; there are other strict-mode only reserved words like `interface`.
+像`function`和`switch`这样的关键字是显而易见的。像`enum`之类的未来保留字，虽然它们中的许多（`class`、`extends`等等）现在都已经实际被ES6使用了；但还有另外一些像`interface`之类的仅在strict模式下的关键字。
 
-StackOverflow user "art4theSould" creatively worked all these reserved words into a fun little poem (http://stackoverflow.com/questions/26255/reserved-keywords-in-javascript/12114140#12114140):
+StackOverflow用户“art4theSould”创造性地将这些保留字编成了一首有趣的小诗(http://stackoverflow.com/questions/26255/reserved-keywords-in-javascript/12114140#12114140)：
 
 > Let this long package float,
 > Goto private class if short.
@@ -335,30 +329,30 @@ StackOverflow user "art4theSould" creatively worked all these reserved words int
 > In return for const, true, char
 > …Finally catch byte.
 
-**Note:** This poem includes words that were reserved in ES3 (`byte`, `long`, etc.) that are no longer reserved as of ES5.
+**注意：** 这首诗包含ES3中的保留字（`byte`、`long`等等），它们在ES5中不再被保留了。
 
-Prior to ES5, the reserved words also could not be property names or keys in object literals, but that restriction no longer exists.
+在ES5以前，这些保留字也不能被用于对象字面量中的属性名或键，但这种限制已经不复存在了。
 
-So, this is not allowed:
+所以，这是不允许的：
 
 ```js
 var import = "42";
 ```
 
-But this is allowed:
+但这是允许的：
 
 ```js
 var obj = { import: "42" };
 console.log( obj.import );
 ```
 
-You should be aware though that some older browser versions (mainly older IE) weren't completely consistent on applying these rules, so there are places where using reserved words in object property name locations can still cause issues. Carefully test all supported browser environments.
+你应当小心，有些老版本的浏览器（主要是老IE）没有完全地遵循这些规则，所以有些将保留字用作对象属性名的地方任然会造成问题。小心地测试所有你支持的浏览器环境。
 
 ## Implementation Limits
 
-The JavaScript spec does not place arbitrary limits on things such as the number of arguments to a function or the length of a string literal, but these limits exist nonetheless, because of implementation details in different engines.
+JavaScript语言规范没有在诸如函数参数值的个数，或者字符串字面量的长度上做出随意的限制，但是无论如何这些限制是存在的，由于不同引擎的实现细节。
 
-For example:
+例如：
 
 ```js
 function addAll() {
@@ -378,24 +372,24 @@ addAll( 2, 4, 6 );				// 12
 addAll.apply( null, nums );		// should be: 499950000
 ```
 
-In some JS engines, you'll get the correct `499950000` answer, but in others (like Safari 6.x), you'll get the error: "RangeError: Maximum call stack size exceeded."
+在某些JS引擎中，你将会得到正确答案`499950000`，但在另一些引擎中（比如Safari 6.x），你会得到一个错误：“RangeError: Maximum call stack size exceeded.”
 
-Examples of other limits known to exist:
+已知存在的其他限制的例子：
 
-* maximum number of characters allowed in a string literal (not just a string value)
-* size (bytes) of data that can be sent in arguments to a function call (aka stack size)
-* number of parameters in a function declaration
-* maximum depth of non-optimized call stack (i.e., with recursion): how long a chain of function calls from one to the other can be
-* number of seconds a JS program can run continuously blocking the browser
-* maximum length allowed for a variable name
+* 在字符串字面量（不是一个字符串变量）中允许出现的最大字符个数
+* 在一个函数调用的参数值中可以发送的数据的大小（字节数，也称为栈的大小）
+* 在一个函数声明中的参数数量
+* 没有经过优化的调用栈最大深度（比如，使用递归时）：从一个函数到另一个函数的调用链能有多长
+* JS程序可以持续运行并阻塞浏览器的秒数
+* 变量名的最大长度
 * ...
 
-It's not very common at all to run into these limits, but you should be aware that limits can and do exist, and importantly that they vary between engines.
+遭遇这些限制不是非常常见，但你应当知道这些限制存在并确实会发生，而且重要的是它们以引擎不同而不同。
 
 ## Review
 
-We know and can rely upon the fact that the JS language itself has one standard and is predictably implemented by all the modern browsers/engines. This is a very good thing!
+我们知道并且可以依赖于这样的事实：JS语言本身拥有一个标准，而且这个标准可预见地被所有现代浏览器/引擎实现了。这是非常好的一件事！
 
-But JavaScript rarely runs in isolation. It runs in an environment mixed in with code from third-party libraries, and sometimes it even runs in engines/environments that differ from those found in browsers.
+但是JavaScript几乎不会与世隔绝地运行。它会运行在混合了第三方库的环境中运行，而且有时甚至会在不同浏览器中不同的引擎/环境中运行。
 
-Paying close attention to these issues improves the reliability and robustness of your code.
+对这些问题多加注意，改进你代码的可靠性和健壮性。

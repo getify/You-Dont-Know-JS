@@ -65,7 +65,7 @@ var a = 1.07 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000;
 a.toString(); // "1.07e21"
 ```
 
-对于普通的对象，除非你指定你自己的，默认的`toString()`（可以在`Object.prototype.toString()`找到）将返回 *internal `[[Class]]`*（见第三章），例如`"[object Object]"`。
+对于普通的对象，除非你指定你自己的，默认的`toString()`（可以在`Object.prototype.toString()`找到）将返回 *内部`[[Class]]`*（见第三章），例如`"[object Object]"`。
 
 但正如早先所展示的，如果一个对象上拥有它自己的`toString()`方法，而你又以一种类似`string`的方式使用这个对象，那么它的`toString()`将会被自动调用，而且这个调用的`string`结果将被使用。
 
