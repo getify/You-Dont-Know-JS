@@ -12,9 +12,9 @@
 
 * [序](foreword.md)（[Jake Archibald](http://jakearchibald.com)）
 * [前言](../preface.md)
-* [第一章: 异步: 现在与稍后](ch1.md)
+* [第一章: 异步:现在与稍后](ch1.md)
 * [第二章: 回调](ch2.md)
-* [第三章: Promises](ch3.md)
+* [第三章: Promise](ch3.md)
 * [第四章: Generator](ch4.md)
 * [第五章: 程序性能](ch5.md)
 * [第六章: 基准分析与调优](ch6.md)

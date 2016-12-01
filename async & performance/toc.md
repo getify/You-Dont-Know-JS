@@ -1,22 +1,22 @@
-# You Don't Know JS: Async & Performance
+# 你不懂JS: 异步与性能
 
-## Table of Contents
+## 目录
 
-* Foreword
-* Preface
-* Chapter 1: Asynchrony: Now & Later
+* 序
+* 前言
+* 第一章: 异步:现在与稍后
 	* A Program In Chunks
 	* Event Loop
 	* Parallel Threading
 	* Concurrency
 	* Jobs
 	* Statement Ordering
-* Chapter 2: Callbacks
+* 第二章: 回调
 	* Continuations
 	* Sequential Brain
 	* Trust Issues
 	* Trying To Save Callbacks
-* Chapter 3: Promises
+* 第三章: Promise
 	* What is a Promise?
 	* Thenable Duck-Typing
 	* Promise Trust
@@ -25,7 +25,7 @@
 	* Promise Patterns
 	* Promise API Recap
 	* Promise Limitations
-* Chapter 4: Generators
+* 第四章: Generator
 	* Breaking Run-to-completion
 	* Generator'ing Values
 	* Iterating Generators Asynchronously
@@ -34,18 +34,17 @@
 	* Generator Concurrency
 	* Thunks
 	* Pre-ES6 Generators
-* Chapter 5: Program Performance
+* 第五章: 程序性能
 	* Web Workers
 	* SIMD
 	* asm.js
-* Chapter 6: Benchmarking & Tuning
+* 第六章: 基准分析与调优
 	* Benchmarking
 	* Context Is King
 	* jsPerf.com
 	* Writing Good Tests
 	* Microperformance
 	* Tail Call Optimization (TCO)
-* Appendix A: *asynquence* Library
-* Appendix B: Advanced Async Patterns
-* Appendix C: Acknowledgments
-
+* 附录A：库：asynquence
+* 附录B：高级异步模式
+* 附录C：鸣谢
