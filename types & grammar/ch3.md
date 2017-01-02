@@ -285,6 +285,8 @@ In other words, it ends up calling `Array(..)` basically like this: `Array(undef
 
 While `Array.apply( null, { length: 3 } )` is a strange and verbose way to create an array filled with `undefined` values, it's **vastly** better and more reliable than what you get with the footgun'ish `Array(3)` empty slots.
 
+**Note:** An alternative way to create an array filled with `undefined` values is to use ES6's `Array.from` static function: `Array.from({length:3})`. See the "`Array.from(..)` Static Function" section in Chapter 6 for more details
+
 Bottom line: **never ever, under any circumstances**, should you intentionally create and use these exotic empty-slot arrays. Just don't do it. They're nuts.
 
 ### `Object(..)`, `Function(..)`, and `RegExp(..)`
