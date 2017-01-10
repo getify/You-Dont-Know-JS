@@ -95,7 +95,7 @@ a;	// 42
 
 Yeeeaaahhhh. That's terribly ugly. But it works! And it illustrates the point that statement completion values are a real thing that can be captured not just in our console but in our programs.
 
-There's a proposal for ES7 called "do expression." Here's how it might work:
+There's a proposal for EcmaScript called "do expression." Here's how it might work:
 
 ```js
 var a, b;
