@@ -68,7 +68,7 @@ function foo() {
 
 var baz = foo();
 
-baz(); // 2 -- Whoa, closure was just observed, man.
+bar(); // 2 -- Whoa, closure was just observed, man.
 ```
 
 The function `bar()` has lexical scope access to the inner scope of `foo()`. But then, we take `bar()`, the function itself, and pass it *as* a value. In this case, we `return` the function object itself that `bar` references.
