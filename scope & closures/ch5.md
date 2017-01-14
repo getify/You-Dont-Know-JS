@@ -105,6 +105,8 @@ function foo() {
 function bar(fn) {
 	fn(); // look ma, I saw closure!
 }
+
+foo();
 ```
 
 We pass the inner function `baz` over to `bar`, and call that inner function (labeled `fn` now), and when we do, its closure over the inner scope of `foo()` is observed, by accessing `a`.
