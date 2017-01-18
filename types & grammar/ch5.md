@@ -1157,7 +1157,7 @@ console.log( foo() );
 
 `return 42`立即运行，它设置好`foo()`调用的完成值。这个动作完成了`try`子句而`finally`子句接下来立即运行。只有这之后`foo()`函数才算完成，所以被返回的完成值交给`console.log(..)`语句使用。
 
-对于`try`内部的`throw`说，行为是完全相同的：
+对于`try`内部的`throw`来说，行为是完全相同的：
 
 ```js
  function foo() {

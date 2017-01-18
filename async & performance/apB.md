@@ -1,15 +1,15 @@
 # You Don't Know JS: Async & Performance
 # Appendix B: Advanced Async Patterns
 
-Appendix A introduced the *asynquence* library for sequence-oriented async flow control, primarily based on Promises and generators.
+为了面向了的异步流程控制，附录A介绍了 *asynquence* 库，它主要基于 Promise 与 Generator。
 
-Now we'll explore other advanced asynchronous patterns built on top of that existing understanding and functionality, and see how *asynquence* makes those sophisticated async techniques easy to mix and match in our programs without needing lots of separate libraries.
+现在我们将要探索其他建立在既存理解与功能之上的高级异步模式，并看看 *asynquence* 是如何在不需要许多分离的库的情况下，使得这些精巧的异步技术与我们的程序进行混合与匹配的。
 
 ## Iterable Sequences
 
-We introduced *asynquence*'s iterable sequences in the previous appendix, but we want to revisit them in more detail.
+我们在前一篇附录中介绍过 *asynquence* 的可迭代序列，但我们要更加详细地重温它们。
 
-To refresh, recall:
+为了复习，回忆一下：
 
 ```js
 var domready = ASQ.iterable();
@@ -25,7 +25,7 @@ domready.val( function(){
 document.addEventListener( "DOMContentLoaded", domready.next );
 ```
 
-Now, let's define a sequence of multiple steps as an iterable sequence:
+现在，让我们定义将一个多步骤序列定义为一个可迭代序列：
 
 ```js
 var steps = ASQ.iterable();
@@ -47,7 +47,7 @@ steps.next( 19 ).value;	// 76
 steps.next().done;		// true
 ```
 
-As you can see, an iterable sequence is a standard-compliant *iterator* (see Chapter 4). So, it can be iterated with an ES6 `for..of` loop, just like a generator (or any other *iterable*) can:
+如你所见，一个可迭代序列是一个标准兼容的 *iterator*（见第四章）。所以，就像一个 generator（或其他任何 *可迭代对象*）那样，它是可以使用ES6`for..of`循环进行迭代的，
 
 ```js
 var steps = ASQ.iterable();
@@ -65,9 +65,9 @@ for (var v of steps) {
 // 2 4 6 8 10
 ```
 
-Beyond the event triggering example shown in the previous appendix, iterable sequences are interesting because in essence they can be seen as a stand-in for generators or Promise chains, but with even more flexibility.
+除了在前一篇附录中展示的事件触发的例子之外，可迭代序列很有趣还因为他们实质上可以被视为 generator 和 Promise 链的替代品，但具备更多灵活性。
 
-Consider a multiple Ajax request example -- we've seen the same scenario in Chapters 3 and 4, both as a Promise chain and as a generator, respectively -- expressed as an iterable sequence:
+考虑一个多Ajax请求的例子 —— 我们已经在第三章和第四章中看到过同样的场景，分别使用一个 Promise 链和一个 generator —— 表达为一个可迭代序列：
 
 ```js
 // sequence-aware ajax
@@ -96,15 +96,15 @@ ASQ( "http://some.url.1" )
 } );
 ```
 
-The iterable sequence expresses a sequential series of (sync or async) steps that looks awfully similar to a Promise chain -- in other words, it's much cleaner looking than just plain nested callbacks, but not quite as nice as the `yield`-based sequential syntax of generators.
+可迭代类型表达了一系列顺序的（同步的或异步的）步骤，它看起来与一个 Promise 链极其相似 —— 换言之，它要比单纯嵌套的回调看起来干净的多，但没有 generator 的基于`yield`的顺序化语法那么好。
 
-But we pass the iterable sequence into `ASQ#runner(..)`, which runs it to completion the same as if it was a generator. The fact that an iterable sequence behaves essentially the same as a generator is notable for a couple of reasons.
+但我们将可迭代序列传入`ASQ#runner(..)`，它将可迭代序列像一个 generator 那样运行至完成。由于几个原因，一个可迭代序列的行为实质上与一个 generator 相同的事实是值得注意的：
 
-First, iterable sequences are kind of a pre-ES6 equivalent to a certain subset of ES6 generators, which means you can either author them directly (to run anywhere), or you can author ES6 generators and transpile/convert them to iterable sequences (or Promise chains for that matter!).
+首先，对于ES6 generator 的特定子集来说，可迭代对象是它的一种前ES6等价物，这意味着你既可以直接编写它们（为了在任何地方都能运行），也可以编写ES6 generator 并将它们转译/转换成可迭代序列（或者 Promise 链！）。
 
-Thinking of an async-run-to-completion generator as just syntactic sugar for a Promise chain is an important recognition of their isomorphic relationship.
+将一个异步运行至完成的 generator 考虑为一个 Promise 链的语法糖，是对它们之间的同构关系的一种重要认识。
 
-Before we move on, we should note that the previous snippet could have been expressed in *asynquence* as:
+在我们继续之前，我们应当注意到，前一个代码段本可以用 *asynquence* 表达为：
 
 ```js
 ASQ( "http://some.url.1" )
@@ -121,7 +121,7 @@ ASQ( "http://some.url.1" )
 } );
 ```
 
-Moreover, step 2 could have even been expressed as:
+进一步，步骤2本可以被表达为：
 
 ```js
 .gate(
@@ -136,9 +136,9 @@ Moreover, step 2 could have even been expressed as:
 )
 ```
 
-So, why would we go to the trouble of expressing our flow control as an iterable sequence in a `ASQ#runner(..)` step, when it seems like a simpler/flatter *asyquence* chain does the job well?
+那么，为什么我们要在一个简单/扁平的 *asyquence* 链看起来可以很好地工作的情况下，很麻烦地将自己的控制流在一个`ASQ#runner(..)`步骤中表达为一个可迭代序列呢？
 
-Because the iterable sequence form has an important trick up its sleeve that gives us more capability. Read on.
+因为可迭代序列的形式有一种重要的技巧可以给我们更多的力量。继续读。
 
 ### Extending Iterable Sequences
 
