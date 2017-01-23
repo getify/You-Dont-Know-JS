@@ -1,11 +1,11 @@
-# You Don't Know JS: Async & Performance
-# Appendix A: *asynquence* Library
+# 你不懂JS: 异步与性能
+# 附录A: *asynquence* 库
 
-第一章和第二章中相当详细地探讨了常见的异步编程模式，以及如何通过回调解决它们。但我们也看到了为什么回调在处理能力上有着致命的缺陷，这将我们带到了第三章和第四章，Promise 与 Generator 为你的异步流程构建提供了一个更加坚实，可信，以及可推理的基础。
+第一章和第二章相当详细地探讨了常见的异步编程模式，以及如何通过回调解决它们。但我们也看到了为什么回调在处理能力上有着致命的缺陷，这将我们带到了第三章和第四章，Promise 与 Generator 为你的异步流程构建提供了一个更加坚实，可信，以及可推理的基础。
 
-我在这本书中好几次提到我自己的异步库 *asynquence* (http://github.com/getify/asynquence) —— "async" + "sequence" = "asynquence"，现在我想简要讲解一下它的工作原理，以及它的独特设计为什么很重要和很有用。
+我在这本书中好几次提到我自己的异步库 *asynquence* (http://github.com/getify/asynquence) —— “async” + “sequence” = “asynquence”，现在我想简要讲解一下它的工作原理，以及它的独特设计为什么很重要和很有用。
 
-在下一篇附录中，我们将要一些高级的异步模式，但为了它们的可用性能够使人接受你可能需要一个库。我们将使用 *asynquence* 来表达这些模式，所以你会想首先在这里花一点时间来了解这个库。
+在下一篇附录中，我们将要探索一些高级的异步模式，但为了它们的可用性能够使人接受你可能需要一个库。我们将使用 *asynquence* 来表达这些模式，所以你会想首先在这里花一点时间来了解这个库。
 
 *asynquence* 绝对不是优秀异步编码的唯一选择；在这方面当然有许多了不起的库。但是 *asynquence* 提供了一种独特的视角 —— 通过将这些模式中最好的部分组合进一个单独的库，另外它基于一个基本的抽象：（异步）序列。
 
@@ -15,7 +15,7 @@
 
 开始之前，我将讲解 *asynquence* 背后的设计原则，然后我们将使用代码示例来展示它的API如何工作。
 
-## Sequences, Abstraction Design
+## 序列，抽象设计
 
 对 *asynquence* 的理解开始于对一个基础抽象的理解：对于一个任务的任何一系列步骤来说，无论它们是同步的还是异步的，都可以被综合地考虑为一个“序列（sequence）”。换句话说，一个序列是一个容器，它代表一个任务，并由一个个完成这个任务的独立的（可能是异步的）步骤组成。
 
@@ -31,13 +31,13 @@
 
 但是序列没有这样的不可变性设计原则，这主要是由于序列不会作为需要不可变语义的未来值的容器被传递。所以序列是一个处理退出/取消行为的恰当的抽象层面。*asynquence* 序列可以在任何时候`abort()`，而且这个序列将会停止在那一点而不会因为任何原因继续下去。
 
-为了流程控制的目的，还有许多理由首选序列的抽象而非 Promise 链。
+为了流程控制，还有许多理由首选序列的抽象而非 Promise 链。
 
-首先，Promise 链是一个更加手动的处理 —— 一旦你开始在你的程序中大面积地创建和链接 Promise ，这种处理可能会变得相当烦冗 —— 在那些使用 Promise 相当恰当的地方，这种烦冗会降低效率而使得开发者不使用Promise。
+首先，Promise 链是一个更加手动的处理 —— 一旦你开始在你的程序中大面积地创建和链接 Promise ，这种处理可能会变得相当烦冗 —— 在那些使用 Promise 相当恰当的地方，这种烦冗会降低效率而使得开发者不愿使用Promise。
 
-抽象意味着减少模板代码和烦冗，所以序列抽象是这个问题的一个好的解决方案。使用 Promise，你关注的是个别的步骤，而且不太会假定你将延续这个链条。而序列采用相反的方式，它假定序列将会无息地持续添加更多步骤。
+抽象意味着减少模板代码和烦冗，所以序列抽象是这个问题的一个好的解决方案。使用 Promise，你关注的是个别的步骤，而且不太会假定你将延续这个链条。而序列采用相反的方式，它假定序列将会无限地持续添加更多步骤。
 
-当你开始考虑更高阶的 Promise 模式时（`race([..])`和`all([..])`之上），这种抽象复杂性的降低特别强大。
+当你开始考虑更高阶的 Promise 模式时（除了`race([..])`和`all([..])`以外），这种抽象复杂性的降低特别强大。
 
 例如，在一个序列的中间，你可能想表达一个在概念上类似于`try..catch`的步骤，它的结果将总是成功，不管是意料之中的主线上的成功解析，还是为被捕获的错误提供一个正面的非错误信号。或者，你可能想表达一个类似于 retry/until 循环的步骤，它不停地尝试相同的步骤直到成功为止。
 
@@ -61,7 +61,7 @@
 
 许多在这里讨论的API方法都内建于 *asynquence* 的核心部分，而其他的API是通过引入可选的“contrib”插件包提供的。要知道一个方法是内建的还是通过插件定义的，可以参见 *asynquence* 的文档：http://github.com/getify/asynquence
 
-### Steps
+### 步骤
 
 如果一个函数代表序列中的一个普通步骤，那么这个函数会被这样调用：第一个参数是延续回调，而任何后续参数都是从前一个步骤中传递下来的消息。在延续回调被调用之前，这个步骤将不会完成。一旦延续回调被调用，你传递给它的任何参数值都会作为序列下一个步骤中的消息被发送。
 
@@ -69,63 +69,63 @@
 
 ```js
 ASQ(
-	// step 1
+	// 步骤 1
 	function(done){
 		setTimeout( function(){
 			done( "Hello" );
 		}, 100 );
 	},
-	// step 2
+	// 步骤 2
 	function(done,greeting) {
 		setTimeout( function(){
 			done( greeting + " World" );
 		}, 100 );
 	}
 )
-// step 3
+// 步骤 3
 .then( function(done,msg){
 	setTimeout( function(){
 		done( msg.toUpperCase() );
 	}, 100 );
 } )
-// step 4
+// 步骤 4
 .then( function(done,msg){
 	console.log( msg );			// HELLO WORLD
 } );
 ```
 
-**注意：** 虽然`then(..)`这个名称与原生的 Promise API 完全一样，但是这个`then(..)`是不同的。你可以传递任意多或者任意少的函数或值给`then(..)`，而它们中的每一个都被看作是一个分离的步骤。这里与完成/拒绝语义的双回调毫不相干。
+**注意：** 虽然`then(..)`这个名称与原生的 Promise API 完全一样，但是这个`then(..)`的含义是不同的。你可以传递任意多或者任意少的函数或值给`then(..)`，而它们中的每一个都被看作是一个分离的步骤。这里与完成/拒绝语义的双回调毫不相干。
 
 在 Promise 中，可以把一个 Promise 与下一个你在`then(..)`的完成处理器中创建并`return`的 Promise 链接。与此不同的是，在 *asynquence* 中，你所需要做的一切就是调用延续回调 —— 我总是称之为`done()`，但你可以起任何适合你的名字 —— 并将完成的消息作为参数值选择性地传递给它。
 
 通过`then(..)`定义的每一个步骤都被认为是异步的。如果你有一个同步的步骤，你可以立即调用`done(..)`，或者使用更简单的`val(..)`步骤帮助函数：
 
 ```js
-// step 1 (sync)
+// 步骤 1（同步）
 ASQ( function(done){
-	done( "Hello" );	// manually synchronous
+	done( "Hello" );	// 手动同步
 } )
-// step 2 (sync)
+// 步骤 2（同步）
 .val( function(greeting){
 	return greeting + " World";
 } )
-// step 3 (async)
+// 步骤 3（异步）
 .then( function(done,msg){
 	setTimeout( function(){
 		done( msg.toUpperCase() );
 	}, 100 );
 } )
-// step 4 (sync)
+// 步骤 4（同步）
 .val( function(msg){
 	console.log( msg );
 } );
 ```
 
-如你所见，`val(..)`调用的步骤不会收到一个延续毁掉，因为这部分已经为你做好了 —— 而且参数列表作为一个结果显得不那么凌乱了！要向下一个步骤发送消息，你简单地使用`return`。
+如你所见，`val(..)`调用的步骤不会收到一个延续回调，因为这部分已经为你做好了 —— 而且参数列表作为一个结果显得不那么凌乱了！要向下一个步骤发送消息，你简单地使用`return`。
 
 将`val(..)`考虑为表示一个同步的“仅含有值”的步骤，它对同步的值操作，比如 logging 之类，非常有用。
 
-### Errors
+### 错误
 
 与 Promise 相比 *asynquence* 的一个重要的不同之处是错误处理。
 
@@ -144,21 +144,21 @@ ASQ( function(done){
 ```js
 var sq = ASQ( function(done){
 	setTimeout( function(){
-		// signal an error for the sequence
+		// 为序列发出一个错误
 		done.fail( "Oops" );
 	}, 100 );
 } )
 .then( function(done){
-	// will never get here
+	// 永远不会到达这里
 } )
 .or( function(err){
 	console.log( err );			// Oops
 } )
 .then( function(done){
-	// won't get here either
+	// 也不会到达这里
 } );
 
-// later
+// 稍后
 
 sq.or( function(err){
 	console.log( err );			// Oops
@@ -167,7 +167,7 @@ sq.or( function(err){
 
 *asynquence* 与原生的 Promise 相比，在错误处理上另一个重要的不同就是“未处理异常”的默认行为。正如我们在第三章中以相当的篇幅讨论过的，一个没有被注册拒绝处理器的 Promise 如果被拒绝的话，将会无声地保持（也就是吞掉）那个错误；你不得不总是想着要用一个最后的`catch(..)`来终结一个链条。
 
-在 *asynquence* 中，这种假设被保留了。
+在 *asynquence* 中，这种假设被颠倒过来了。
 
 如果一个错误在序列上发生，而且 **在那个时刻** 它没有被注册错误处理器，那么这个错误会被报告至`console`。换言之，未处理的的拒绝将总是默认地被报告，因此不会被吞掉或丢掉。
 
@@ -175,17 +175,17 @@ sq.or( function(err){
 
 事实上有许多情况你想要创建这样一个序列，它可能会在你有机会注册处理器之前就进入错误状态。这不常见，但可能时不时地发生。
 
-在这样的情况下，你也可以通过在序列上调用`defer()`来使一个序列实例从错误报告中退出。你应当仅在自己确信不会最终处理这样的错误时，才决定从报告中退出：
+在这样的情况下，你也可以通过在序列上调用`defer()`来使一个序列实例 **从错误报告中退出**。你应当仅在自己确信不会最终处理这样的错误时，才决定从报告中退出：
 
 ```js
 var sq1 = ASQ( function(done){
-	doesnt.Exist();			// will throw exception to console
+	doesnt.Exist();			// 将会向控制台抛出异常
 } );
 
 var sq2 = ASQ( function(done){
-	doesnt.Exist();			// will throw only a sequence error
+	doesnt.Exist();			// 仅仅会抛出一个序列错误
 } )
-// opt-out of error reporting
+// 错误报告中的退出
 .defer();
 
 setTimeout( function(){
@@ -198,14 +198,14 @@ setTimeout( function(){
 	} );
 }, 100 );
 
-// ReferenceError (from sq1)
+// ReferenceError （来自sq1）
 ```
 
 这是一种比 Promise 本身拥有的更好的错误处理行为，因为它是一个成功的深渊，而不是一个失败的深渊（参见第三章）。
 
-**注意：** 如果一个序列被导入（也就是被纳入）另一个序列 —— 完整的描述参见“组合序列” —— 之后源序列从错误报告中退出，那么就必须考虑目标序列是否进行错误报告。
+**注意：** 如果一个序列被导入（也就是被汇合入）另一个序列 —— 完整的描述参见“组合序列” —— 之后源序列从错误报告中退出，那么就必须考虑目标序列是否进行错误报告。
 
-### Parallel Steps
+### 并行步骤
 
 在你的序列中不是所有的步骤都将只拥有一个（异步）任务去执行；有些将会需要“并行”（并发地）执行多个步骤。在一个序列中，一个并发地处理多个子步骤的步骤称为一个`gate(..)` —— 如果你喜欢的话它还有一个别名`all(..)` —— 而且它与原生的`Promise.all([..])`是对称的。
 
@@ -250,7 +250,7 @@ new Promise( function(resolve,reject){
 		} ),
 		new Promise( function(resolve,reject){
 			setTimeout( function(){
-				// note: we need a [ ] array here
+				// 注意：这里我们需要一个 [ ]
 				resolve( [ "World", "!" ] );
 			}, 100 );
 		} )
@@ -264,14 +264,14 @@ new Promise( function(resolve,reject){
 
 讨厌。Promise 需要多得多的模板代码来表达相同的异步流程控制。这个例子很好地说明了为什么 *asynquence* API 和抽象使得对付 Promise 步骤容易多了。你的异步流程越复杂，它的改进程度就越高。
 
-#### Step Variations
+#### 各种步骤
 
 关于 *asynquence* 的`gate(..)`步骤类型，有好几种不同的 contrib 插件可能十分有用：
 
 * `any(..)`很像`gate(..)`，除了为了继续主序列，只需要有一个环节最终必须成功。
 * `first(..)`很像`any(..)`，除了只要有任何一个环节成功，主序列就会继续（忽略任何其余环节产生的后续结果）。
 * `race(..)`（与`Promise.race([..])`对称）很像`first(..)`，除了主序列会在任何环节完成时（不管成功还是失败）立即继续。
-* `last(..)`很像`any(..)`，除了只有最后一个关节成功完成时才会把它的消息发送给主序列。
+* `last(..)`很像`any(..)`，除了只有最后一个环节成功完成时才会把它的消息发送给主序列。
 * `none(..)`是`gate(..)`的反义：主序列仅在所有环节失败时才会继续（将所有环节的错误消息作为成功消息传送，或者反之）。
 
 让我们首先定义一些帮助函数来使示例清晰一些：
@@ -362,7 +362,7 @@ ASQ().map( [1,2,3], double )
 .val( output );					// [2,4,6]
 ```
 
-另外，`map(..)`既可以从前一步骤传递来的消息中收到它的两个参数（数组或者回调）：
+另外，`map(..)`可以从前一步骤传递来的消息中收到它的两个参数（数组或者回调）：
 
 ```js
 function plusOne(x,done) {
@@ -372,14 +372,14 @@ function plusOne(x,done) {
 }
 
 ASQ( [1,2,3] )
-.map( double )			// message `[1,2,3]` comes in
-.map( plusOne )			// message `[2,4,6]` comes in
+.map( double )			// 收到消息`[1,2,3]`
+.map( plusOne )			// 收到消息`[2,4,6]`
 .val( output );			// [3,5,7]
 ```
 
 另一个种类是`waterfall(..)`，它有些像混合了`gate(..)`的消息收集行为与`then(..)`的序列化处理。
 
-步骤1首先被执行，然后来自步骤1的成功消息被传递给步骤2，然后两个成功消息走到步骤3，然后所有三个成功消息走到步骤4，如此继续，这样消息被某种程度上手机并从“瀑布”上倾斜而下。
+步骤1首先被执行，然后来自步骤1的成功消息被传递给步骤2，然后两个成功消息走到步骤3，然后所有三个成功消息走到步骤4，如此继续，这样消息被某种程度上收集并从“瀑布”上倾泻而下。
 
 考虑如下代码：
 
@@ -408,9 +408,9 @@ ASQ( 3 )
 
 如果在“瀑布”的任何一点发生错误，那么整个序列就会立即进入错误状态。
 
-#### Error Tolerance
+#### 容错
 
-有时你想在步骤一级管理错误，而不一定让它们使整个序列称为错误状态。*asynquence* 为此提供了两种步骤类型。
+有时你想在步骤一级管理错误，而不一定让它们使整个序列成为错误状态。*asynquence* 为此提供了两种步骤类型。
 
 `try(..)`尝试一个步骤，如果它成功，序列就会正常继续，但如果这个步骤失败了，失败的状态会转换成格式为`{ catch: .. }`的成功消息，它的值由错误消息填充：
 
@@ -421,11 +421,11 @@ ASQ()
 .try( failure3 )
 .val( output )			// { catch: 3 }
 .or( function(err){
-	// never gets here
+	// 永远不会到达这里
 } );
 ```
 
-你可以使用`until(..)`构建一个重试循环，它尝试一个步骤，如果失败，就会在下一个事件轮询的 tick 时重试这个步骤，如此继续。
+你还可以使用`until(..)`构建一个重试循环，它尝试一个步骤，如果失败，就会在下一个事件轮询的 tick 中重试这个步骤，如此继续。
 
 这种重试循环可以无限延续下去，但如果你想要从循环中跳出来，你可以在完成触发器上调用`break()`标志方法，它将主序列置为错误状态：
 
@@ -443,7 +443,7 @@ ASQ( 3 )
 			done.fail();
 		}
 		else {
-			// break out of the `until(..)` retry loop
+			// 跳出 `until(..)` 重试循环
 			done.break( "Oops" );
 		}
 	}, 100 );
@@ -451,7 +451,7 @@ ASQ( 3 )
 .or( output );					// Oops
 ```
 
-#### Promise-Style Steps
+#### Promise 式的步骤
 
 如果你喜欢在你的序列中内联 Promise 风格的语义，比如 Promise 的`then(..)`和`catch(..)`（见第三章），你可以使用`pThen`和`pCatch`插件：
 
@@ -462,31 +462,30 @@ ASQ( 21 )
 } )
 .pThen( output )				// 42
 .pThen( function(){
-	// throw an exception
+	// 抛出一个异常
 	doesnt.Exist();
 } )
 .pCatch( function(err){
-	// caught the exception (rejection)
+	// 捕获这个异常（拒绝）
 	console.log( err );			// ReferenceError
 } )
 .val( function(){
-	// main sequence is back in a
-	// success state because previous
-	// exception was caught by
-	// `pCatch(..)`
+	// 主旋律回归到正常状态，
+	// 因为前一个异常已经被
+	// `pCatch(..)`捕获了
 } );
 ```
 
 `pThen(..)`和`pCatch(..)`被设计为运行在序列中，但好像在普通的 Promise 链中动作。这样，你就可以在传递给`pThen(..)`的“完成”处理器中解析纯粹的 Promise 或者 *asynquence* 序列。
 
-### Forking Sequences
+### 序列分支
 
-一个有关 Promise 的可能十分有用的特性是，你可以在同一个 Promise 上添附多个`then(..)`处理器，事实上在这个 Promise 的流程上创建“分支”：
+一个有关 Promise 的可能十分有用的特性是，你可以在同一个 Promise 上添附多个`then(..)`处理器，这实质上在这个 Promise 的流程上创建了“分支”：
 
 ```js
 var p = Promise.resolve( 21 );
 
-// fork 1 (from `p`)
+// （从`p`开始的）分支 1
 p.then( function(msg){
 	return msg * 2;
 } )
@@ -494,7 +493,7 @@ p.then( function(msg){
 	console.log( msg );		// 42
 } )
 
-// fork 2 (from `p`)
+// （从`p`开始的）分支 2
 p.then( function(msg){
 	console.log( msg );		// 21
 } );
@@ -507,16 +506,16 @@ var sq = ASQ(..).then(..).then(..);
 
 var sq2 = sq.fork();
 
-// fork 1
+// 分支 1
 sq.then(..)..;
 
-// fork 2
+// 分支 2
 sq2.then(..)..;
 ```
 
-### Combining Sequences
+### 组合序列
 
-与`fork()`相反，你可以通过将一个序列汇合进另一个来组合两个序列，使用`seq(..)`实例方法：
+与`fork()`相反的是，你可以通过将一个序列汇合进另一个来组合两个序列，使用`seq(..)`实例方法：
 
 ```js
 var sq = ASQ( function(done){
@@ -528,7 +527,7 @@ var sq = ASQ( function(done){
 ASQ( function(done){
 	setTimeout( done, 100 );
 } )
-// subsume `sq` sequence into this sequence
+// 将序列 `sq` 汇合进这个系列
 .seq( sq )
 .val( function(msg){
 	console.log( msg );		// Hello World
@@ -550,7 +549,7 @@ ASQ( function(done){
 ```js
 // ..
 .then( function(done){
-	// pipe `sq` into the `done` continuation callback
+	// 将 `sq` 导入延续回调 `done`
 	sq.pipe( done );
 } )
 // ..
@@ -560,7 +559,7 @@ ASQ( function(done){
 
 **注意：** 正如早先的注意事项中提到过的，导入会使源序列从错误报告中退出，但不会影响目标序列的错误报告状态。
 
-## Value and Error Sequences
+## 值与错误序列
 
 如果一个序列的任意一个步骤只是一个普通值，那么这个值就会被映射到这个步骤的完成消息中：
 
@@ -572,7 +571,7 @@ sq.val( function(msg){
 } );
 ```
 
-如果你想使一个序列自动出错：
+如果你想制造一个自动出错的序列：
 
 ```js
 var sq = ASQ.failed( "Oops" );
@@ -580,7 +579,7 @@ var sq = ASQ.failed( "Oops" );
 ASQ()
 .seq( sq )
 .val( function(msg){
-	// won't get here
+	// 不会到达这里
 } )
 .or( function(err){
 	console.log( err );		// Oops
@@ -606,24 +605,24 @@ sq2.or( function(err){
 
 ```js
 ASQ( 42 )
-// insert a delay into the sequence
+// 在这个序列中插入一个延迟
 .after( 100 )
 .val( function(msg){
 	console.log( msg );		// 42
 } );
 ```
 
-## Promises and Callbacks
+## Promises 与回调
 
-我认为 *asynquence* 序列在原生的 Promise 之上提供了许多价值，而且你会发现在很大程度上它在抽象层面上使用更舒适和更强大。然而，将 *asynquence* 与其他非 *asynquence* 代码进行整合将是现实。
+我认为 *asynquence* 序列在原生的 Promise 之上提供了许多价值，而且你会发现在很大程度上它在抽象层面上使用起来更舒适更强大。然而，将 *asynquence* 与其他非 *asynquence* 代码进行整合将是不可避免的现实。
 
-使用`promise(..)`实例方法，你可以很容易地将一个 Promise（也就是 thenable —— 见第三章）纳入一个序列：
+使用`promise(..)`实例方法，你可以很容易地将一个 Promise（也就是 thenable —— 见第三章）汇合进一个序列：
 
 ```js
 var p = Promise.resolve( 42 );
 
 ASQ()
-.promise( p )			// could also: `function(){ return p; }`
+.promise( p )			// 本可以写做：`function(){ return p; }`
 .val( function(msg){
 	console.log( msg );	// 42
 } );
@@ -635,7 +634,7 @@ ASQ()
 var sq = ASQ.after( 100, "Hello World" );
 
 sq.toPromise()
-// this is a standard promise chain now
+// 现在这是一个标准的 promise 链了
 .then( function(msg){
 	return msg.toUpperCase();
 } )
@@ -644,11 +643,11 @@ sq.toPromise()
 } );
 ```
 
-有好几种设施可以在使用回调的系统中适配 *asynquence*。要从你的序列中自动地生成一个“错误优先风格”回调，来接入一个面向回调的工具，使用`errfcb`：
+有好几种帮助设施可以在使用回调的系统中适配 *asynquence*。要从你的序列中自动地生成一个“错误优先风格”回调，来接入一个面向回调的工具，使用`errfcb`：
 
 ```js
 var sq = ASQ( function(done){
-	// note: expecting "error-first style" callback
+	// 注意：这里期待“错误优先风格”的回调
 	someAsyncFuncWithCB( 1, 2, done.errfcb )
 } )
 .val( function(msg){
@@ -658,7 +657,7 @@ var sq = ASQ( function(done){
 	// ..
 } );
 
-// note: expecting "error-first style" callback
+// 注意：这里期待“错误优先风格”的回调
 anotherAsyncFuncWithCB( 1, 2, sq.errfcb() );
 ```
 
@@ -678,9 +677,9 @@ coolUtility( 1, 2 )
 
 **注意：** 为了清晰（和有趣！），让我们为来自`ASQ.wrap(..)`的产生序列的函数杜撰另一个名词，就像这里的`coolUtility`。我提议“sequory”（“sequence” + “factory”）。
 
-## Iterable Sequences
+## 可迭代序列
 
-一个序列普通的范例是，每一个步骤都负责完成它自己，这进而推进这个序列。Promise 就是这样工作的。
+一个序列普通的范例是，每一个步骤都负责完成它自己，进而推进这个序列。Promise 就是这样工作的。
 
 不幸的是，有时你需要从外部控制一个 Promise/步骤，而这会导致尴尬的“能力抽取”。
 
@@ -688,16 +687,15 @@ coolUtility( 1, 2 )
 
 ```js
 var domready = new Promise( function(resolve,reject){
-	// don't want to put this here, because
-	// it belongs logically in another part
-	// of the code
+	// 不想把这个放在这里，因为在逻辑上
+	// 它属于代码的另一部分
 	document.addEventListener( "DOMContentLoaded", resolve );
 } );
 
 // ..
 
 domready.then( function(){
-	// DOM is ready!
+	// DOM 准备好了！
 } );
 ```
 
@@ -707,14 +705,14 @@ domready.then( function(){
 var ready;
 
 var domready = new Promise( function(resolve,reject){
-	// extract the `resolve()` capability
+	// 抽取 `resolve()` 能力
 	ready = resolve;
 } );
 
 // ..
 
 domready.then( function(){
-	// DOM is ready!
+	// DOM 准备好了！
 } );
 
 // ..
@@ -727,14 +725,13 @@ document.addEventListener( "DOMContentLoaded", ready );
 *asynquence* 提供一种我称为“可迭代序列”的反转序列类型，它将控制能力外部化（它在`domready`这样的情况下十分有用）：
 
 ```js
-// note: `domready` here is an *iterator* that
-// controls the sequence
+// 注意：这里`domready`是一个控制序列的 *迭代器*
 var domready = ASQ.iterable();
 
 // ..
 
 domready.val( function(){
-	// DOM is ready
+	// DOM 准备好了！
 } );
 
 // ..
@@ -744,7 +741,7 @@ document.addEventListener( "DOMContentLoaded", domready.next );
 
 与我们在这个场景中看到的东西比起来，可迭代序列还有很多内容。我们将在附录B中回过头来讨论它们。
 
-## Running Generators
+## 运行 Generator
 
 在第四章中，我们衍生了一种称为`run(..)`的工具，它可以将 generator 运行至完成，监听被`yield`的 Promise 并使用它们来异步推进 generator。*asynquence* 正好有一个这样的内建工具，称为`runner(..)`。
 
@@ -775,10 +772,10 @@ ASQ( 10, 11 )
 .runner( function*(token){
 	var x = token.messages[0] + token.messages[1];
 
-	// yield a real promise
+	// yield 一个真正的 promise
 	x = yield doublePr( x );
 
-	// yield a sequence
+	// yield 一个序列
 	x = yield doubleSeq( x );
 
 	return x;
@@ -788,7 +785,7 @@ ASQ( 10, 11 )
 } );
 ```
 
-### Wrapped Generators
+### 包装过的 Generator
 
 你还可以创建自包装的 generator —— 也就是一个普通函数，运行你指定的 generator 并为它的完成返回一个序列 —— 通过`ASQ.wrap(..)`包装它：
 
@@ -796,10 +793,10 @@ ASQ( 10, 11 )
 var foo = ASQ.wrap( function*(token){
 	var x = token.messages[0] + token.messages[1];
 
-	// yield a real promise
+	// yield 一个真正的 promise
 	x = yield doublePr( x );
 
-	// yield a sequence
+	// yield 一个序列
 	x = yield doubleSeq( x );
 
 	return x;
@@ -815,11 +812,11 @@ foo( 8, 9 )
 
 `runner(..)`还能做很多很牛的事情，我们会在附录B中回过头来讨论它。
 
-## Review
+## 复习
 
 *asynquence* 是一个在 Promise 之上的简单抽象 —— 一个序列是一系列（异步）步骤，它的目标是使各种异步模式更加容易使用，而在功能上没有任何妥协。
 
-在 *asynquence* 的核心API与它的 contrib 插件中，除了我们在这片附录中看到的内容以外还有其他的好东西，我们把对这些剩余功能的探索作为练习留给读者。
+在 *asynquence* 的核心API与它的 contrib 插件中，除了我们在这篇附录中看到的内容以外还有其他的好东西，我们把对这些剩余功能的探索作为练习留给读者。
 
 现在你看到了 *asynquence* 的实质与精神。关键点是，一个序列由许多步骤组成，而这些步骤可以使许多不同种类的 Promise，或者它们可以是一个 generator 运行器，或者... 选择由你来决定，你有完全的自由为你的任务采用恰当的任何异步流程控制逻辑。
 
