@@ -1159,12 +1159,12 @@ run( foo );
 
 ```js
 function bar() {
-	Promise.all( [
-		baz( .. )
-		.then( .. ),
-		Promise.race( [ .. ] )
-	] )
-	.then( .. )
+	return Promise.all( [
+				baz( .. )
+				.then( .. ),
+				Promise.race( [ .. ] )
+			] )
+			.then( .. )
 }
 ```
 

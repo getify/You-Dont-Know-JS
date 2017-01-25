@@ -47,7 +47,7 @@ a = { b: "c" };
 typeof a;				// "object"
 ```
 
-来自`typeof`的返回值总是六个（ES6中是七个！）字符串值之一。也就是，`typeof "abc"`返回`"string"`，不是`string`。
+来自`typeof`的返回值总是六个（ES6中是七个！ —— “symbol”类型）字符串值之一。也就是，`typeof "abc"`返回`"string"`，不是`string`。
 
 注意在这个代码段中变量`a`是如何持有每种不同类型的值的，而且尽管表面上看起来很像，但是`typeof a`并不是在询问“`a`的类型”，而是“当前`a`中的值的类型”。在JavaScript中只有值拥有类型；变量只是这些值的简单容器。
 

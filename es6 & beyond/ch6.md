@@ -368,7 +368,7 @@ points.findIndex( function matcher(point) {
 
 不要使用`findIndex(..) != -1`（在`indexOf(..)`中经常这么干）来从检索中取得一个boolean，因为`some(..)`已经给出了你想要的`true`/`false`了。而且也不要用`a[ a.findIndex(..) ]`来取得一个匹配的值，因为这是`find(..)`完成的任务。最后，如果你需要严格匹配的索引，就使用`indexOf(..)`，如果你需要一个更加定制化的匹配，就使用`findIndex(..)`。
 
-**注意：** 和其他接收回调的数组方法一样，`find(..)`接收一个可选的第二参数。如果它被设置了的话，就将被指定为作为第一个参数传递的回调的`this`绑定。否则，`this`将是`undefined`。
+**注意：** 和其他接收回调的数组方法一样，`findIndex(..)`接收一个可选的第二参数。如果它被设置了的话，就将被指定为作为第一个参数传递的回调的`this`绑定。否则，`this`将是`undefined`。
 
 ### `entries()`, `values()`, `keys()` 原型方法
 
@@ -767,7 +767,7 @@ String.raw`\ta${str}d\xE9`;
 
 ### 字符串检验函数
 
-作为对ES6以前的`String#indexOf(..)`和`String#lastIndexOf(..)`的补充，增加了三个新的搜索/检验函数：`startsWith(..)`，`endsWidth(..)`，和`includes(..)`。
+作为对ES6以前的`String#indexOf(..)`和`String#lastIndexOf(..)`的补充，增加了三个新的搜索/检验函数：`startsWith(..)`，`endsWith(..)`，和`includes(..)`。
 
 ```js
 var palindrome = "step on no pets";

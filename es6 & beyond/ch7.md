@@ -554,9 +554,7 @@ var messages = [],
 			if (typeof val == "string") {
 				val = val.toLowerCase();
 				if (target.indexOf( val ) == -1) {
-					target.push(
-						val.toLowerCase()
-					);
+					target.push(val);
 				}
 			}
 			return true;
@@ -934,7 +932,7 @@ Object.keys( p );
 
 这一切可以归纳为：在ES6中，根据语言规范`Reflect.ownKeys(..)`，`Object.getOwnPropertyNames(..)`，和`Object.getOwnPropertySymbols(..)`保证都有可预见和可靠的顺序。所以依赖于这种顺序来建造代码是安全的。
 
-`Reflect.enumerate(..)`，`Object.keys(..)`，和`for..in` （扩展一下的话还有`JSON.stringification(..)`）继续互相共享一个可观察的顺序，就像它们往常一样。但这个顺序不一定与`Reflect.ownKeys(..)`的相同。在使用它们依赖于具体实现的顺序时依然应当小心。
+`Reflect.enumerate(..)`，`Object.keys(..)`，和`for..in` （扩展一下的话还有`JSON.stringify(..)`）继续互相共享一个可观察的顺序，就像它们往常一样。但这个顺序不一定与`Reflect.ownKeys(..)`的相同。在使用它们依赖于具体实现的顺序时依然应当小心。
 
 ## 特性测试
 

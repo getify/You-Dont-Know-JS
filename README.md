@@ -48,14 +48,12 @@
 
 ## 内容贡献
 
-**非常地感谢** 你向本作品做出的任何贡献。
+**非常感谢** 你向本作品做出的任何贡献。
 
-但是，如果你选择向这个代码库贡献内容（不只是修改拼写错误），你就相当于同意给予我一个非独家许可，以我（和O'Reilly）认为恰当的方式在这个系列丛书中使用那些内容。你可能已经猜到了，但我们不得不把话说明白来使律师们高兴一些。
-
-所以：哇啦，哇啦，哇啦…… :)
+但是在提交 PR 以前 *请* 仔细阅读[内容贡献指引](CONTRIBUTING.md)。
 
 ## 许可 & 版权
 
-The materials herein are all (c) 2013-2015 Kyle Simpson.
+The materials herein are all (c) 2013-2016 Kyle Simpson.
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/3.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/3.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/3.0/">Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License</a>.
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License</a>.

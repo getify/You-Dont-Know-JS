@@ -34,10 +34,10 @@ steps
 .then( function STEP1(x){
 	return x * 2;
 } )
-.steps( function STEP2(x){
+.then( function STEP2(x){
 	return x + 3;
 } )
-.steps( function STEP3(x){
+.then( function STEP3(x){
 	return x * 4;
 } );
 
@@ -744,7 +744,7 @@ run( bar );
 
 **注意：** 预先奉告：这种模式非常强大，但要习惯它有些烧脑。你可能会需要实践它一下，来习惯这种协调并发性的新的思考方式。
 
-有好几个了不起的库已经用 JavaScript 实现了这种风格的CSP，最引人注目的是“js-csp”(https://github.com/ubolonton/js-csp)，由 James Long (http://twitter.com/jlongster)开出的分支(https://github.com/jlongster/js-csp)，以及他特意撰写的作品(http://jlongster.com/Taming-the-Asynchronous-Beast-with-CSP-in-JavaScript)。另外，关于将 ClojureScript 中 go 风格的 core.async CSP 适配到 JS generator 的话题，无论怎么夸赞 David Nolen 的许多作品很精彩都不为过。
+有好几个了不起的库已经用 JavaScript 实现了这种风格的CSP，最引人注目的是“js-csp”(https://github.com/ubolonton/js-csp)，由 James Long (http://twitter.com/jlongster)开出的分支(https://github.com/jlongster/js-csp)，以及他特意撰写的作品(http://jlongster.com/Taming-the-Asynchronous-Beast-with-CSP-in-JavaScript)。另外，关于将 ClojureScript 中 go 风格的 core.async CSP 适配到 JS generator 的话题，无论怎么夸赞 David Nolen (http://twitter.com/swannodette) 的许多作品很精彩都不为过 (http://swannodette.github.io/2013/08/24/es6-generators-and-csp)。
 
 ### asynquence 的 CSP 模拟
 

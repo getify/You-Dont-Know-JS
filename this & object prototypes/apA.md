@@ -133,7 +133,7 @@ class C {
 		this.id = id;
 	}
 	id() {
-		console.log( "Id: " + id );
+		console.log( "Id: " + this.id );
 	}
 }
 
