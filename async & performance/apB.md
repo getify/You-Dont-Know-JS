@@ -1,13 +1,13 @@
-# You Don't Know JS: Async & Performance
-# Appendix B: Advanced Async Patterns
+# 你不懂JS: 异步与性能
+# 附录B: 高级异步模式
 
-为了面向了的异步流程控制，附录A介绍了 *asynquence* 库，它主要基于 Promise 与 Generator。
+为了了解主要基于 Promise 与 Generator 的面向序列异步流程控制，附录A介绍了 *asynquence* 库。
 
 现在我们将要探索其他建立在既存理解与功能之上的高级异步模式，并看看 *asynquence* 是如何在不需要许多分离的库的情况下，使得这些精巧的异步技术与我们的程序进行混合与匹配的。
 
-## Iterable Sequences
+## 可迭代序列
 
-我们在前一篇附录中介绍过 *asynquence* 的可迭代序列，但我们要更加详细地重温它们。
+我们在前一篇附录中介绍过 *asynquence* 的可迭代序列，我们将更加详细地重温它们。
 
 为了复习，回忆一下：
 
@@ -17,7 +17,7 @@ var domready = ASQ.iterable();
 // ..
 
 domready.val( function(){
-	// DOM is ready
+	// DOM 准备好了
 } );
 
 // ..
@@ -65,12 +65,12 @@ for (var v of steps) {
 // 2 4 6 8 10
 ```
 
-除了在前一篇附录中展示的事件触发的例子之外，可迭代序列很有趣还因为他们实质上可以被视为 generator 和 Promise 链的替代品，但具备更多灵活性。
+除了在前一篇附录中展示的事件触发的例子之外，可迭代序列的有趣之处还因为它们实质上可以被视为 generator 和 Promise 链的替代品，但具备更多灵活性。
 
 考虑一个多Ajax请求的例子 —— 我们已经在第三章和第四章中看到过同样的场景，分别使用一个 Promise 链和一个 generator —— 表达为一个可迭代序列：
 
 ```js
-// sequence-aware ajax
+// 兼容序列的 ajax
 var request = ASQ.wrap( ajax );
 
 ASQ( "http://some.url.1" )
@@ -96,7 +96,7 @@ ASQ( "http://some.url.1" )
 } );
 ```
 
-可迭代类型表达了一系列顺序的（同步的或异步的）步骤，它看起来与一个 Promise 链极其相似 —— 换言之，它要比单纯嵌套的回调看起来干净的多，但没有 generator 的基于`yield`的顺序化语法那么好。
+可迭代序列表达了一系列顺序的（同步的或异步的）步骤，它看起来与一个 Promise 链极其相似 —— 换言之，它要比单纯嵌套的回调看起来干净的多，但没有 generator 的基于`yield`的顺序化语法那么好。
 
 但我们将可迭代序列传入`ASQ#runner(..)`，它将可迭代序列像一个 generator 那样运行至完成。由于几个原因，一个可迭代序列的行为实质上与一个 generator 相同的事实是值得注意的：
 
@@ -140,7 +140,7 @@ ASQ( "http://some.url.1" )
 
 因为可迭代序列的形式有一种重要的技巧可以给我们更多的力量。继续读。
 
-### Extending Iterable Sequences
+### 扩展可迭代序列
 
 Generator，普通的 *asynquence* 序列，和 Promise 链，都是被 **急切求值** 的 —— 控制流程最初要表达的的内容 *就是* 紧跟在后面的固定流程。
 
@@ -154,7 +154,7 @@ Generator，普通的 *asynquence* 序列，和 Promise 链，都是被 **急切
 function double(x) {
 	x *= 2;
 
-	// should we keep extending?
+	// 我们应当继续扩展吗？
 	if (x < 500) {
 		isq.then( double );
 	}
@@ -162,7 +162,7 @@ function double(x) {
 	return x;
 }
 
-// setup single-step iterable sequence
+// 建立单步可迭代序列
 var isq = ASQ.iterable().then( double );
 
 for (var v = 10, ret;
@@ -187,7 +187,7 @@ var steps = ASQ.iterable()
 .then( function STEP1(token){
 	var url = token.messages[0].url;
 
-	// was an additional formatting step provided?
+	// 有额外的格式化步骤被提供吗？
 	if (token.messages[0].format) {
 		steps.then( token.messages[0].format );
 	}
@@ -196,7 +196,7 @@ var steps = ASQ.iterable()
 } )
 
 .then( function STEP2(resp){
-	// add another Ajax request to the sequence?
+	// 要为序列增加另一个Ajax请求吗？
 	if (/x1/.test( resp )) {
 		steps.then( function STEP5(text){
 			return request(
@@ -233,26 +233,26 @@ var main = ASQ( {
 
 ```js
 function *steps(token) {
-	// **STEP 1**
+	// **步骤 1**
 	var resp = yield request( token.messages[0].url );
 
-	// **STEP 2**
+	// **步骤 2**
 	var rvals = yield ASQ().gate(
 		request( "http://some.url.2/?v=" + resp ),
 		request( "http://some.url.3/?v=" + resp )
 	);
 
-	// **STEP 3**
+	// **步骤 3**
 	var text = rvals[0] + rvals[1];
 
-	// **STEP 4**
-	// was an additional formatting step provided?
+	// **步骤 4**
+	// 有额外的格式化步骤被提供吗？
 	if (token.messages[0].format) {
 		text = yield token.messages[0].format( text );
 	}
 
-	// **STEP 5**
-	// need another Ajax request added to the sequence?
+	// **步骤 5**
+	// 要为序列增加另一个Ajax请求吗？
 	if (/foobar/.test( resp )) {
 		text = yield request(
 			"http://some.url.4/?v=" + text
@@ -262,8 +262,7 @@ function *steps(token) {
 	return text;
 }
 
-// note: `*steps()` can be run by the same `ASQ` sequence
-// as `steps` was previously
+// 注意：`*steps()`可以向先前的`step`一样被相同的`ASQ`序列运行
 ```
 
 先把我们已经知道的序列的好处，以及看起来同步的 generator 语法（见第四章）放在一边，`steps`逻辑不得不在`*steps()` generator 形式中重排，来假冒可扩展的可迭代序列`steps`的动态机制。
@@ -276,7 +275,7 @@ var steps = something( .. )
 .then( function(..){
 	// ..
 
-	// extending the chain, right?
+	// 扩展这个链条，对吧？
 	steps = steps.then( .. );
 
 	// ..
@@ -294,7 +293,7 @@ var main = Promise.resolve( {
 	}
 } )
 .then( function(..){
-	return steps;			// hint!
+	return steps;			// 提示！
 } )
 .val( function(msg){
 	console.log( msg );
@@ -307,16 +306,16 @@ var main = Promise.resolve( {
 
 这里有两种可能的结果：
 
-* 如果`steps`仍然是原来的 Promise 链，一旦它稍后通过`steps = steps.then(..)`“扩展”，这个位于链条末尾的扩展过的 promise 是 **不会** 被`main`流程考虑的，因为它已经通过这个`steps`链了。这就是 **急切求值** 的不幸限制。
+* 如果`steps`仍然是原来的 Promise 链，一旦它稍后通过`steps = steps.then(..)`“扩展”，这个位于链条末尾的扩展过的 promise 是 **不会** 被`main`流程考虑的，因为它已经通过这个`steps`链了。这就是不幸的 **急切求值** 限制。
 * 如果`steps`已经是扩展过的 promise 链了，那么由于这个扩展过的 promise 正是`main`要通过的东西，所以它会如我们期望的那样工作。
 
 第一种情况除了展示竞合状态不可容忍的明显事实，它还展示了 promise 链的 **急切求值**。相比之下，我们可以很容易地扩展可迭代序列而没有这样的问题，因为可迭代序列是 **懒惰求值** 的。
 
 你越需要自己的流程控制动态，可迭代序列就越显得强大。
 
-**提示：** 在 *asynquence* 网站(https://github.com/getify/asynquence/blob/master/README.md#iterable-sequences)上可以看到更多关于可迭代序列的信息与示例。
+**提示：** 在 *asynquence* 的网站(https://github.com/getify/asynquence/blob/master/README.md#iterable-sequences)上可以看到更多关于可迭代序列的信息与示例。
 
-## Event Reactive
+## 事件响应式
 
 （至少！）从第三章看来这应当很明显：Promise 是你异步工具箱中的一种非常强大的工具。但它们明显缺乏处理事件流的能力，因为一个 Promise 只能被解析一次。而且坦白地讲，对于 *asynquence* 序列来说这也正是它的一个弱点。
 
@@ -325,7 +324,7 @@ var main = Promise.resolve( {
 ```js
 listener.on( "foobar", function(data){
 
-	// create a new event handling promise chain
+	// 创建一个新的事件处理 Promise 链
 	new Promise( function(resolve,reject){
 		// ..
 	} )
@@ -337,19 +336,19 @@ listener.on( "foobar", function(data){
 
 在这种方式拥有我们需要的基本功能，但是对于表达我们意图中的逻辑来说远不能使人满意。两种分离的能力混杂在这个范例中：事件监听，与事件应答；而关注点分离原则恳求我们将这些能力分开。
 
-细心地读者会发现，这个问题与我们在第二章中详细讲解过的问题是有些对称的；它是一种控制反转问题。
+细心的读者会发现，这个问题与我们在第二章中详细讲解过的问题是有些对称的；它是一种控制反转问题。
 
 想象一下非反转这个范例，就像这样：
 
 ```js
 var observable = listener.on( "foobar" );
 
-// later
+// 稍后
 observable
 .then( .. )
 .then( .. );
 
-// elsewhere
+// 在其他的地方
 observable
 .then( .. )
 .then( .. );
@@ -357,19 +356,18 @@ observable
 
 值`observable`不是一个真正的 Promise，但你可以像监听一个 Promise 那样 *监听* 它，所以它们是有密切关联的。事实上，它可以被监听很多次，而且它会在每次事件（`"foobar"`）发生时都发送通知。
 
-**提示：** 我刚刚展示过的这个模式，是响应式编程（reactive programming，也称为 RP）背后的概念和动机的 **大幅度简化**，响应式编程已经由好几种了不起的项目和语言实现/详细论述过了。RP 的一个变种是函数响应式编程（functional reactive programming，FRP），它指的是在数据流之上实施函数式编程技术（不可变性，参照完整性，等等）。“响应式”指的是随着事件的推移散布这种功能，以对事件进行应答。对此感兴趣的读者应当考虑学习“响应式可见听对象”，在由微软开发的神奇的“响应式扩展”库(对于 JavaScript 来说是 “RxJS”，http://rxjs.codeplex.com/)；它可要比我刚刚展示过的东西精巧和强大太多了。另外，Andre Staltz 洗过一篇出色的文章(https://gist.github.com/staltz/868e7e9bc2a7b8c1f754)，用具体的例子高效地讲解了 RP。
+**提示：** 我刚刚展示过的这个模式，是响应式编程（reactive programming，也称为 RP）背后的概念和动机的 **大幅度简化**，响应式编程已经由好几种了不起的项目和语言实现/详细论述过了。RP 的一个变种是函数响应式编程（functional reactive programming，FRP），它指的是在数据流之上实施函数式编程技术（不可变性，参照完整性，等等）。“响应式”指的是随着事件的推移散布这种功能，以对事件进行应答。对此感兴趣的读者应当考虑学习“响应式可监听对象”，它源于由微软开发的神奇的“响应式扩展”库(对于 JavaScript 来说是 “RxJS”，http://rxjs.codeplex.com/)；它可要比我刚刚展示过的东西精巧和强大太多了。另外，Andre Staltz 写过一篇出色的文章(https://gist.github.com/staltz/868e7e9bc2a7b8c1f754)，用具体的例子高效地讲解了 RP。
 
-### ES7 Observables
+### ES7 可监听对象
 
 在本书写作时，有一个早期ES7提案，一种称为“Observable（可监听对象）”的新数据类型(https://github.com/jhusain/asyncgenerator#introducing-observable)，它在精神上与我们在这里讲解过的相似，但是绝对更精巧。
 
-这种可监听对象的概念是，你在一个流上“监听”事件的方法是传入一个generator —— 其实 *迭代器* 才是有趣的部分 —— 它的`next(..)`方法会为每一个事件而调用。
+这种可监听对象的概念是，你在一个流上“监听”事件的方法是传入一个 generator —— 其实 *迭代器* 才是有趣的部分 —— 它的`next(..)`方法会为每一个事件而调用。
 
 你可以想象它是这样一种东西：
 
 ```js
-// `someEventStream` is a stream of events, like from
-// mouse clicks, and the like.
+// `someEventStream` 是一个事件流，来自于鼠标点击之类
 
 var observer = new Observer( someEventStream, function*(){
 	while (var evt = yield) {
@@ -386,7 +384,7 @@ var observer = new Observer( someEventStream, function*(){
 
 当然，这些都是早期提案，所以最终脱颖而出的东西可能会在外观/行为上与这里展示的有很大的不同。但是看到在不同的库与语言提案在概念上的早期统一还是很激动人心的！
 
-### Reactive Sequences
+### 响应式序列
 
 将这种可监听对象（和F/RP）的超级简要的概览作为我们的启发与动机，我们现在将展示一种“响应式可监听对象”的很小的子集的适配方案，我称之为“响应式序列”。
 
@@ -441,7 +439,7 @@ var sq = ASQ.react( function setup(next,registerTeardown){
 
 	btn.addEventListener( "click", next, false );
 
-	// will be called once `sq.stop()` is called
+	// 只要`sq.stop()`被调用，它就会被调用
 	registerTeardown( function(){
 		btn.removeEventListener( "click", next, false );
 	} );
@@ -450,7 +448,7 @@ var sq = ASQ.react( function setup(next,registerTeardown){
 .then( .. )
 .val( .. );
 
-// later
+// 稍后
 sq.stop();
 ```
 
@@ -462,7 +460,7 @@ sq.stop();
 var server = http.createServer();
 server.listen(8000);
 
-// reactive observer
+// 响应式监听
 var request = ASQ.react( function setup(next,registerTeardown){
 	server.addListener( "request", next );
 	server.addListener( "close", this.stop );
@@ -473,14 +471,14 @@ var request = ASQ.react( function setup(next,registerTeardown){
 	} );
 });
 
-// respond to requests
+// 应答请求
 request
 .seq( pullFromDatabase )
 .val( function(data,res){
 	res.end( data );
 } );
 
-// node teardown
+// 关闭 node
 process.on( "SIGINT", request.stop );
 ```
 
@@ -490,10 +488,10 @@ process.on( "SIGINT", request.stop );
 ASQ.react( function setup(next){
 	var fstream = fs.createReadStream( "/some/file" );
 
-	// pipe the stream's "data" event to `next(..)`
+	// 将流的 "data" 事件导向 `next(..)`
 	next.onStream( fstream );
 
-	// listen for the end of the stream
+	// 监听流的结束
 	fstream.on( "end", function(){
 		next.unStream( fstream );
 	} );
@@ -521,7 +519,7 @@ var sq3 = ASQ.react(..)
 
 **注意：** 这里有一个使用`ASQ.react(..)`来管理UI状态的例子(http://jsbin.com/rozipaki/6/edit?js,output)，和另一个使用`ASQ.react(..)`来处理HTTP请求/应答流的例子(https://gist.github.com/getify/bba5ec0de9d6047b720e)。
 
-## Generator Coroutine
+## Generator 协程
 
 希望第四章帮助你很好地熟悉了ES6 generator。特别地，我们将重温并更加深入“Generator 并发性”的讨论。
 
@@ -529,7 +527,7 @@ var sq3 = ASQ.react(..)
 
 除了能够将一个 generator 运行至完成之外，我们在附录A中谈论过的`AQS#runner(..)`是一个`runAll(..)`概念的近似实现，它可以将多个 generator 并发地运行至完成。
 
-那么让我们看看实现第四章的并发Ajax场景：
+那么让我们看看如何实现第四章的并发Ajax场景：
 
 ```js
 ASQ(
@@ -537,17 +535,17 @@ ASQ(
 )
 .runner(
 	function*(token){
-		// transfer control
+		// 转移控制权
 		yield token;
 
 		var url1 = token.messages[0]; // "http://some.url.1"
 
-		// clear out messages to start fresh
+		// 清空消息重新开始
 		token.messages = [];
 
 		var p1 = request( url1 );
 
-		// transfer control
+		// 转移控制权
 		yield token;
 
 		token.messages.push( yield p1 );
@@ -555,18 +553,18 @@ ASQ(
 	function*(token){
 		var url2 = token.messages[0]; // "http://some.url.2"
 
-		// message pass and transfer control
+		// 传递消息并转移控制权
 		token.messages[0] = "http://some.url.1";
 		yield token;
 
 		var p2 = request( url2 );
 
-		// transfer control
+		// 移控制权
 		yield token;
 
 		token.messages.push( yield p2 );
 
-		// pass along results to next sequence step
+		// 讲结果传递给下一个序列步骤
 		return token.messages;
 	}
 )
@@ -578,16 +576,16 @@ ASQ(
 
 以下是`ASQ#runner(..)`和`runAll(..)`之间的主要不同：
 
-* 每个 generator（携程）都被提供了一个称为`token`的参数值，它是一个当你想要明确地将控制权传递给下一个携程时`yield`用的特殊值。
-* `token.messages`是一个数组，持有从前一个序列步骤中传入的任何消息。它也是一种数据结构，你可以用来在携程之间分享消息。
-* `yield`一个 Promise（或序列）值不会传递控制权，但会暂停这个携程处理直到这个值准备好。
-* 这个携程处理运行到最后`return`或`yield`的值将会传递给序列中的下一个步骤。
+* 每个 generator（协程）都被提供了一个称为`token`的参数值，它是一个当你想要明确地将控制权传递给下一个协程时`yield`用的特殊值。
+* `token.messages`是一个数组，持有从前一个序列步骤中传入的任何消息。它也是一种数据结构，你可以用来在协程之间分享消息。
+* `yield`一个 Promise（或序列）值不会传递控制权，但会暂停这个协程处理直到这个值准备好。
+* 这个协程处理运行到最后`return`或`yield`的值将会传递给序列中的下一个步骤。
 
 为了适应不同的用法，在`ASQ#runner(..)`功能的基础上包装一层帮助函数也很容易。
 
-### State Machines
+### 状态机
 
-一个许多程序员可能很熟悉的例子是状态机。在一个简单包装工具的帮助下，你可以创一个易于表达的状态机处理器。
+许多程序员可能很熟悉的一个例子是状态机。在一个简单包装工具的帮助下，你可以创一个易于表达的状态机处理器。
 
 让我们想象一个这样的工具。我们称之为`state(..)`，我们将传递给它两个参数值：一个状态值和一个处理这个状态的 generator。`state(..)`将担负起创建并返回一个适配器 generator 的脏活，并把它传递给`ASQ#runner(..)`。
 
@@ -595,27 +593,27 @@ ASQ(
 
 ```js
 function state(val,handler) {
-	// make a coroutine handler for this state
+	// 为这个状态制造一个协程处理器
 	return function*(token) {
-		// state transition handler
+		// 状态转换处理器
 		function transition(to) {
 			token.messages[0] = to;
 		}
 
-		// set initial state (if none set yet)
+		// 设置初始状态（如果还没有设置的话）
 		if (token.messages.length < 1) {
 			token.messages[0] = val;
 		}
 
-		// keep going until final state (false) is reached
+		// 持续运行直到最终状态（false）
 		while (token.messages[0] !== false) {
-			// current state matches this handler?
+			// 当前的状态匹配这个处理器吗？
 			if (token.messages[0] === val) {
-				// delegate to state handler
+				// 委托到状态处理器
 				yield *handler( transition );
 			}
 
-			// transfer control to another state handler?
+			// 要把控制权转移给另一个状态处理器吗？
 			if (token.messages[0] !== false) {
 				yield token;
 			}
@@ -624,7 +622,7 @@ function state(val,handler) {
 }
 ```
 
-如果你仔细观察，你会发现`state(..)`返回了一个接收`token`的 generator，然后它建立一个`while`循环，这个循环会运行到状态机到达它的最终状态（我们随意地将它选定为`false`值）为止；这正是我们想要传递给`ASQ#runner(..)`的那种 generator！
+如果你仔细观察，你会发现`state(..)`返回了一个接收`token`的 generator，然后它建立一个`while`循环，这个循环会运行到状态机直到到达它的最终状态（我们随意地将它选定为`false`值）为止；这正是我们想要传递给`ASQ#runner(..)`的那种 generator！
 
 我们还随意地保留了`token.messages[0]`值槽，放置我们的状态机将要追踪的当前状态，这意味着我们甚至可以指定初始状态，作为序列中前一个步骤传递来的值。
 
@@ -634,46 +632,46 @@ function state(val,handler) {
 var prevState;
 
 ASQ(
-	/* optional: initial state value */
+	/* 可选的：初始状态值 */
 	2
 )
-// run our state machine
-// transitions: 2 -> 3 -> 1 -> 3 -> false
+// 运行我们的状态机
+// 转换是：2 -> 3 -> 1 -> 3 -> false
 .runner(
-	// state `1` handler
+	// 状态 `1` 处理器
 	state( 1, function *stateOne(transition){
 		console.log( "in state 1" );
 
 		prevState = 1;
-		yield transition( 3 );	// goto state `3`
+		yield transition( 3 );	// 前往状态 `3`
 	} ),
 
-	// state `2` handler
+	// 状态 `2` 处理器
 	state( 2, function *stateTwo(transition){
 		console.log( "in state 2" );
 
 		prevState = 2;
-		yield transition( 3 );	// goto state `3`
+		yield transition( 3 );	// 前往状态 `3`
 	} ),
 
-	// state `3` handler
+	// 状态 `3` 处理器
 	state( 3, function *stateThree(transition){
 		console.log( "in state 3" );
 
 		if (prevState === 2) {
 			prevState = 3;
-			yield transition( 1 ); // goto state `1`
+			yield transition( 1 ); // 前往状态 `1`
 		}
-		// all done!
+		// 完成了！
 		else {
 			yield "That's all folks!";
 
 			prevState = 3;
-			yield transition( false ); // terminal state
+			yield transition( false ); // 终止状态
 		}
 	} )
 )
-// state machine complete, so move on
+// 状态机运行完成，所以继续
 .val( function(msg){
 	console.log( msg );	// That's all folks!
 } );
@@ -685,59 +683,37 @@ ASQ(
 
 **注意：** 看看这个“乒乓”的例子(http://jsbin.com/qutabu/1/edit?js,output)，它展示了由`ASQ#runner(..)`驱动的 generator 的协作并发的用法。
 
-## Communicating Sequential Processes (CSP)
+## 通信序列化处理（CSP）
 
 “通信序列化处理（Communicating Sequential Processes —— CSP）”是由 C. A. R. Hoare 在1978年的一篇学术论文(http://dl.acm.org/citation.cfm?doid=359576.359585)中首先被提出的，后来在1985年的一本同名书籍中被描述过。CSP描述了一种并发“进程”在处理期间进行互动（也就是“通信”）的形式方法。
 
 你可能会回忆起我们在第一章检视过的并发“进程”，所以我们对CSP的探索将会建立在那种理解之上。
 
-就像大多数计算机科学中的伟大概念一样，CSP深深地沉浸在学术形式中，被表达为一种代数处理。然而，我怀疑满是符号的代数定理不会给读者带来太多实际意义，所以我们将找其他的方法将CSP带进我们的大脑。
+就像大多数计算机科学中的伟大概念一样，CSP深深地沉浸在学术形式主意中，被表达为一种代数处理。然而，我怀疑满是符号的代数定理不会给读者带来太多实际意义，所以我们将找其他的方法将CSP带进我们的大脑。
 
-我会将很多CSP的形式描述和证明留给 Hoare 的文章，与其他许多美妙的相关作品。取而代之的是，我们将尽可能以一种非学院派的、但愿是可以直挂地理解的方法，来试着简要地讲解CSP的思想。
+我会将很多CSP的形式描述和证明留给 Hoare 的文章，与其他许多美妙的相关作品。取而代之的是，我们将尽可能以一种非学院派的、但愿是可以直接理解的方法，来试着简要地讲解CSP的思想。
 
-### Message Passing
-
-The core principle in CSP is that all communication/interaction between otherwise independent processes must be through formal message passing. Perhaps counter to your expectations, CSP message passing is described as a synchronous action, where the sender process and the receiver process have to mutually be ready for the message to be passed.
+### 消息传递
 
 CSP的核心原则是，在独立进程之间的通信/互动都必须通过正式的消息传递。也许与你的期望背道而驰，CSP的消息传递是作为同步行为进行描述的，发送进程与接收进程都不得不为消息的传递做好准备。
 
-How could such synchronous messaging possibly be related to asynchronous programming in JavaScript?
-
 这样的同步消息怎么会与 JavaScript 中的异步编程有联系？
 
-The concreteness of relationship comes from the nature of how ES6 generators are used to produce synchronous-looking actions that under the covers can indeed either be synchronous or (more likely) asynchronous.
-
-这种联系具体来自于 ES6 generator 的性质 —— generator 如何被用于生产看似同步的行为，而这些行为的内部既可以是同步的也可以（更可能）是异步的。
-
-In other words, two or more concurrently running generators can appear to synchronously message each other while preserving the fundamental asynchrony of the system because each generator's code is paused (aka "blocked") waiting on resumption of an asynchronous action.
+这种联系具体来自于 ES6 generator 的性质 —— generator 被用于生产看似同步的行为，而这些行为的内部既可以是同步的也可以（更可能）是异步的。
 
 换言之，两个或更多并发运行的 generator 可能看起来像是在互相同步地传递消息，而同时保留了系统的异步性基础，因为每个 generator 的代码都会被暂停（也就是“阻塞”）来等待一个异步动作的运行。
 
-How does this work?
-
 这是如何工作的？
-
-Imagine a generator (aka "process") called "A" that wants to send a message to generator "B." First, "A" `yield`s the message (thus pausing "A") to be sent to "B." When "B" is ready and takes the message, "A" is then resumed (unblocked).
 
 想象一个称为“A”的 generator，它想要给 generator “B” 发送一个消息。首先，“A” `yield`出要发送给“B”的消息（因此暂停了“A”）。当“B”准备好并拿走这个消息时，“A”才会继续（解除阻塞）。
 
-Symmetrically, imagine a generator "A" that wants a message **from** "B." "A" `yield`s its request (thus pausing "A") for the message from "B," and once "B" sends a message, "A" takes the message and is resumed.
-
 与此对称的，想象一个 generator “A”想要 **从** “B”接收一个消息。“A” `yield`出一个从“B”取得消息的请求（因此暂停了“A”），一旦“B”发送了一个消息，“A”就拿来这个消息并继续。
-
-One of the more popular expressions of this CSP message passing theory comes from ClojureScript's core.async library, and also from the *go* language. These takes on CSP embody the described communication semantics in a conduit that is opened between processes called a "channel."
 
 对于这种CSP消息传递理论来说，一个更广为人知的表达形式是 ClojureScript 的 core.async 库，以及 *go* 语言。它们将CSP中描述的通信语义实现为一种在进程之间打开的管道，称为“频道（channel）”。
 
-**Note:** The term *channel* is used in part because there are modes in which more than one value can be sent at once into the "buffer" of the channel; this is similar to what you may think of as a stream. We won't go into depth about it here, but it can be a very powerful technique for managing streams of data.
-
 **注意：** *频道* 这个术语描述了问题的一部分，因为存在一种模式，会有多于一个的值被一次性发送到这个频道的“缓冲”中；这与你对流的认识相似。我们不会在这里深入这个问题，但是对于数据流的管理来说它可能是一个非常强大的技术。
 
-In the simplest notion of CSP, a channel that we create between "A" and "B" would have a method called `take(..)` for blocking to receive a value, and a method called `put(..)` for blocking to send a value.
-
 在CSP最简单的概念中，一个我们在“A”和“B”之间建立的频道会有一个称为`take(..)`的阻塞方法来接收一个值，以及一个称为`put(..)`的阻塞方法来发送一个值。
-
-This might look like:
 
 它看起来可能像这样：
 
@@ -762,57 +738,48 @@ run( bar );
 // "message sent"
 ```
 
-Compare this structured, synchronous(-looking) message passing interaction to the informal and unstructured message sharing that `ASQ#runner(..)` provides through the `token.messages` array and cooperative `yield`ing. In essence, `yield put(..)` is a single operation that both sends the value and pauses execution to transfer control, whereas in earlier examples we did those as separate steps.
+将这种结构化的、（看似）同步的消息传递互动，与`ASQ#runner(..)`通过`token.messages`数组与协作的`yield`提供的、非形式化与非结构化的消息共享相比较。实质上，`yield put(..)`是一种可以同时发送值并为了传递控制权而暂停执行的单一操作，而前一个例子中我们将这两个步骤分开实施。
 
-将这种结构化的，（看似）同步的消息传递互动，与`ASQ#runner(..)`通过`token.messages`数组与协作的`yield`提供的，非形式化与非结构化的消息共享相比较。实质上，`yield put(..)`是一种可以同时发送值并为了传递控制权而暂停执行的单一操作，而前一个例子中我们将这两个步骤分开实施。
-
-Moreover, CSP stresses that you don't really explicitly "transfer control," but rather you design your concurrent routines to block expecting either a value received from the channel, or to block expecting to try to send a message on the channel. The blocking around receiving or sending messages is how you coordinate sequencing of behavior between the coroutines.
-
-另外CSP强调，你不会真正明确地“传递控制权”，而是这样设计你的并发过程：要么为了从频道中接收值而阻塞，要么为了试着向这个频道中发送值而阻塞。这种围绕着消息的发送或接收的阻塞，就是你如何在携程之间协调行为序列的方法。
-
-**Note:** Fair warning: this pattern is very powerful but it's also a little mind twisting to get used to at first. You will want to practice this a bit to get used to this new way of thinking about coordinating your concurrency.
+另外CSP强调，你不会真正明确地“传递控制权”，而是这样设计你的并发过程：要么为了从频道中接收值而阻塞，要么为了试着向这个频道中发送值而阻塞。这种围绕着消息的发送或接收的阻塞，就是你如何在协程之间协调行为序列的方法。
 
 **注意：** 预先奉告：这种模式非常强大，但要习惯它有些烧脑。你可能会需要实践它一下，来习惯这种协调并发性的新的思考方式。
 
-There are several great libraries that have implemented this flavor of CSP in JavaScript, most notably "js-csp" (https://github.com/ubolonton/js-csp), which James Long (http://twitter.com/jlongster) forked (https://github.com/jlongster/js-csp) and has written extensively about (http://jlongster.com/Taming-the-Asynchronous-Beast-with-CSP-in-JavaScript). Also, it cannot be stressed enough how amazing the many writings of David Nolen (http://twitter.com/swannodette) are on the topic of adapting ClojureScript's go-style core.async CSP into JS generators (http://swannodette.github.io/2013/08/24/es6-generators-and-csp/).
+有好几个了不起的库已经用 JavaScript 实现了这种风格的CSP，最引人注目的是“js-csp”(https://github.com/ubolonton/js-csp)，由 James Long (http://twitter.com/jlongster)开出的分支(https://github.com/jlongster/js-csp)，以及他特意撰写的作品(http://jlongster.com/Taming-the-Asynchronous-Beast-with-CSP-in-JavaScript)。另外，关于将 ClojureScript 中 go 风格的 core.async CSP 适配到 JS generator 的话题，无论怎么夸赞 David Nolen 的许多作品很精彩都不为过。
 
-有好几个了不起的库已经用 JavaScript 实现了这种风格的CSP，最引人注目的是“js-csp”(https://github.com/ubolonton/js-csp)，由 James Long (http://twitter.com/jlongster)开出的分支(https://github.com/jlongster/js-csp)，以及他特意撰写的作品(http://jlongster.com/Taming-the-Asynchronous-Beast-with-CSP-in-JavaScript)。另外，关于将 ClojureScript 中 go 风格的 core.async CSP 适配到 JS generator 的话题，David Nolen 的许多作品
+### asynquence 的 CSP 模拟
 
-### asynquence CSP emulation
+因为我们是在我的 *asynquence* 库的上下文环境中讨论异步模式的，你可能会对这个话题很感兴趣：我们可以很容易地在`ASQ#runner(..)` generator 处理上增加一个模拟层，来近乎完美地移植CSP的API和行为。这个模拟层放在与 *asynquence* 一起发放的 “asynquence-contrib”包的可选部分。
 
-Because we've been discussing async patterns here in the context of my *asynquence* library, you might be interested to see that we can fairly easily add an emulation layer on top of `ASQ#runner(..)` generator handling as a nearly perfect porting of the CSP API and behavior. This emulation layer ships as an optional part of the "asynquence-contrib" package alongside *asynquence*.
+与早先的`state(..)`帮助函数非常类似，`ASQ.csp.go(..)`接收一个 generator —— 用 go/core.async 的术语来讲，它称为一个 goroutine —— 并将它适配为一个可以与`ASQ#runner(..)`一起使用的新 generator。
 
-Very similar to the `state(..)` helper from earlier, `ASQ.csp.go(..)` takes a generator -- in go/core.async terms, it's known as a goroutine -- and adapts it to use with `ASQ#runner(..)` by returning a new generator.
+与被传入一个`token`不同，你的 goroutine 接收一个创建好的频道（下面的`ch`），这个频道会被本次运行的所有 goroutine 共享。你可以使用`ASQ.csp.chan(..)`创建更多频道（这通常十分有用）。
 
-Instead of being passed a `token`, your goroutine receives an initially created channel (`ch` below) that all goroutines in this run will share. You can create more channels (which is often quite helpful!) with `ASQ.csp.chan(..)`.
+在CSP中，我们使用频道消息传递上的阻塞作为所有异步性的模型，而不是为了等待 Promise/序列/thunk 的完成而发生的阻塞。
 
-In CSP, we model all asynchrony in terms of blocking on channel messages, rather than blocking waiting for a Promise/sequence/thunk to complete.
+所以，与`yield`从`request(..)`中返回的 Promise 不同的是，`request(..)`应当返回一个频道，你从它那里`take(..)`一个值。换句话说，一个单值频道在这种上下文环境/用法上大致上与一个 Promise/序列是等价的。
 
-So, instead of `yield`ing the Promise returned from `request(..)`, `request(..)` should return a channel that you `take(..)` a value from. In other words, a single-value channel is roughly equivalent in this context/usage to a Promise/sequence.
-
-Let's first make a channel-aware version of `request(..)`:
+让我们先制造一个兼容频道版本的`request(..)`：
 
 ```js
 function request(url) {
 	var ch = ASQ.csp.channel();
 	ajax( url ).then( function(content){
-		// `putAsync(..)` is a version of `put(..)` that
-		// can be used outside of a generator. It returns
-		// a promise for the operation's completion. We
-		// don't use that promise here, but we could if
-		// we needed to be notified when the value had
-		// been `take(..)`n.
+		// `putAsync(..)` 是 `put(..)` 的另一个版本，
+		// 它可以在一个 generator 的外部使用。它为操作
+		// 的完成返回一个 promise。我们不在这里使用这个
+		// promise，但如果有需要的话我们可以在值被
+		// `taken(..)` 之后收到通知。
 		ASQ.csp.putAsync( ch, content );
 	} );
 	return ch;
 }
 ```
 
-From Chapter 3, "promisory" is a Promise-producing utility, "thunkory" from Chapter 4 is a thunk-producing utility, and finally, in Appendix A we invented "sequory" for a sequence-producing utility.
+在第三章中，“promisory”是一个生产 Promise 的工具，第四章中“thunkory”是一个生产thunk的工具，最后，在附录A中我们发明了“sequory”表示一个生产序列的工具。
 
-Naturally, we need to coin a symmetric term here for a channel-producing utility. So let's unsurprisingly call it a "chanory" ("channel" + "factory"). As an exercise for the reader, try your hand at defining a `channelify(..)` utility similar to `Promise.wrap(..)`/`promisify(..)` (Chapter 3), `thunkify(..)` (Chapter 4), and `ASQ.wrap(..)` (Appendix A).
+很自然地，我们需要为一个生产频道的工具杜撰一个对称的术语。所以就让我们不出意料地称它为“chanory”（“channel” + “factory”）吧。作为一个留给读者的练习，请试着亲手定义一个`channelify(..)`的工具，就像 `Promise.wrap(..)`/`promisify(..)`（第三章），`thunkify(..)`（第四章），和`ASQ.wrap(..)`（附录A）一样。
 
-Now consider the concurrent Ajax example using *asyquence*-flavored CSP:
+先考虑这个使用 *asyquence* 风格CSP的并发Ajax的例子：
 
 ```js
 ASQ()
@@ -836,7 +803,7 @@ ASQ()
 		var res2 = yield ASQ.csp.take( request( url2 ) );
 		var res1 = yield ASQ.csp.take( ch );
 
-		// pass along results to next sequence step
+		// 讲结果传递给序列的下一个步骤
 		ch.buffer_size = 2;
 		ASQ.csp.put( ch, res1 );
 		ASQ.csp.put( ch, res2 );
@@ -848,16 +815,16 @@ ASQ()
 } );
 ```
 
-The message passing that trades the URL strings between the two goroutines is pretty straightforward. The first goroutine makes an Ajax request to the first URL, and that response is put onto the `ch` channel. The second goroutine makes an Ajax request to the second URL, then gets the first response `res1` off the `ch` channel. At that point, both responses `res1` and `res2` are completed and ready.
+消息传递在两个 goroutines 之间进行的 URL 字符串交换是非常直接的。第一个 goroutine 向第一个URL发起一个Ajax请求，它的应答被放进`ch`频道。第二个 goroutine 想第二个URL发起一个Ajax请求，然后从`ch`频道取下第一个应答`res1`。在这个时刻，应答`res1`和`res2`都被完成且准备好了。
 
-If there are any remaining values in the `ch` channel at the end of the goroutine run, they will be passed along to the next step in the sequence. So, to pass out message(s) from the final goroutine, `put(..)` them into `ch`. As shown, to avoid the blocking of those final `put(..)`s, we switch `ch` into buffering mode by setting its `buffer_size` to `2` (default: `0`).
+如果在 goroutine 运行的末尾`ch`频道还有什么剩余价值的话，它们将被传递进序列的下一个步骤中。所以，为了从最后的 goroutine 中传出消息，把它们`put(..)`进`ch`。就像展示的那样，为了避免最后的那些`put(..)`阻塞，我们通过把`ch`的`buffer_size`设置为`2`（默认是`0`）来将它切换到缓冲模式。
 
-**Note:** See many more examples of using *asynquence*-flavored CSP here (https://gist.github.com/getify/e0d04f1f5aa24b1947ae).
+**注意：** 更多使用 *asynquence* 风格CSP的例子可以参见这里(https://gist.github.com/getify/e0d04f1f5aa24b1947ae)。
 
-## Review
+## 复习
 
-Promises and generators provide the foundational building blocks upon which we can build much more sophisticated and capable asynchrony.
+Promise 和 generator 为我们能够创建更加精巧和强大的异步性提供了基础构建块。
 
-*asynquence* has utilities for implementing *iterable sequences*, *reactive sequences* (aka "Observables"), *concurrent coroutines*, and even *CSP goroutines*.
+*asynquence* 拥有许多工具，用于实现 *的迭代序列*，*响应式序列*（也就是“可监听对象”），*并发协程*，甚至 *CSP goroutines*。
 
-Those patterns, combined with the continuation-callback and Promise capabilities, gives *asynquence* a powerful mix of different asynchronous functionalities, all integrated in one clean async flow control abstraction: the sequence.
+将这些模式，与延续回调和 Promise 能力相组合，使得 *asynquence* 拥有了混合不同异步处理的强大功能，一切都整合进一个干净的异步流程控制抽象：序列。
