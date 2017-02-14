@@ -632,7 +632,7 @@ for (var v of bar()) {
 	console.log( v );
 }
 // 1 2 3
-// x: { value: 4, done: true }
+// x: 4
 ```
 
 虽然值`1`，`2`，和`3`从`*foo()`中被`yield`出来，然后从`*bar()`中被`yield`出来，但是从`*foo()`中返回的值`4`是表达式`yield *foo()`的完成值，然后它被赋值给`x`。
