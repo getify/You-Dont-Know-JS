@@ -192,7 +192,7 @@ An array that has no explicit values in its slots, but has a `length` property t
 
 **Note:** An array with at least one "empty slot" in it is often called a "sparse array."
 
-It doesn't help matters that this is yet another example where browser developer consoles vary on how they represent such an object, which breeds more confusion.
+It doesn't help that this is yet another example where browser developer consoles vary on how they represent such an object, which breeds more confusion.
 
 For example:
 
