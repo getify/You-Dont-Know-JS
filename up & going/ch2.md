@@ -504,6 +504,7 @@ var b = (a > 41) ? "hello" : "world";
 
 // similar to:
 
+// var b;
 // if (a > 41) {
 //    b = "hello";
 // }
