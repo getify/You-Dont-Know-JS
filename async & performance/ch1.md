@@ -415,7 +415,7 @@ response 6
 response 7
 ```
 
-It's quite possible that an `onscroll` event and an Ajax response event could be ready to be processed at exactly the same *moment*. For example let's visualize these events in a timeline:
+It's quite possible that an `onscroll` event and an Ajax response event could be ready to be processed at exactly the same *moment*. For example, let's visualize these events in a timeline:
 
 ```
 onscroll, request 1
