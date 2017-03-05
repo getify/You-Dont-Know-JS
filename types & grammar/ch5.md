@@ -47,7 +47,7 @@ In fact, if you've done much code experimenting in your console (or in a JavaScr
 
 But what the console prints out for the completion value isn't something we can use inside our program. So how can we capture the completion value?
 
-That's a much more complicated task. Before we explain *how*, let's explore *why* would you want to do that?
+That's a much more complicated task. Before we explain *how*, let's explore *why* you would want to do that.
 
 We need to consider other types of statement completion values. For example, any regular `{ .. }` block has a completion value of the completion value of its last contained statement/expression.
 

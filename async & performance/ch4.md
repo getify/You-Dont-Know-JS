@@ -34,7 +34,7 @@ function bar() {
 foo();					// x: 3
 ```
 
-In this example, we know for sure that `bar()` runs in between `x++` and `console.log(x)`. But what if `bar()` wasn't there? Obviously the result would be `2` instead of `3`.
+In this example, we know for sure that `bar()` runs in between `x++` and `console.log(x)`. But what if `bar()` wasn't there? Obviously, the result would be `2` instead of `3`.
 
 Now let's twist your brain. What if `bar()` wasn't present, but it could still somehow run between the `x++` and `console.log(x)` statements? How would that be possible?
 
@@ -1168,12 +1168,12 @@ Hiding your Promise logic inside a function that you merely call from your gener
 
 ```js
 function bar() {
-	Promise.all( [
-		baz( .. )
-		.then( .. ),
-		Promise.race( [ .. ] )
-	] )
-	.then( .. )
+	return	Promise.all( [
+		  baz( .. )
+		  .then( .. ),
+		  Promise.race( [ .. ] )
+		] )
+		.then( .. )
 }
 ```
 
