@@ -1,28 +1,28 @@
-# You Don't Know JS: Up & Going
-# Chapter 2: Into JavaScript
+# 你不懂JS：入门与进阶
+# 第二章：进入JavaScript
 
-In the previous chapter, I introduced the basic building blocks of programming, such as variables, loops, conditionals, and functions. Of course, all the code shown has been in JavaScript. But in this chapter, we want to focus specifically on things you need to know about JavaScript to get up and going as a JS developer.
+在前一章中，我介绍了编程的基本构建块儿，比如变量，循环，条件，和函数。当然，所有被展示的代码都是JavaScript。但是在这一章中，为了作为一个JS开发者入门和进阶，我们想要特别集中于那些你需要知道的关于JavaScript的事情。
 
-We will introduce quite a few concepts in this chapter that will not be fully explored until subsequent *YDKJS* books. You can think of this chapter as an overview of the topics covered in detail throughout the rest of this series.
+我们将在本章中介绍好几个概念，它们将会在后续的 *YDKJS* 丛书中全面地探索。你可以将这一章看作是这个系列的其他书目中将要详细讲解的话题的一个概览。
 
-Especially if you're new to JavaScript, you should expect to spend quite a bit of time reviewing the concepts and code examples here multiple times. Any good foundation is laid brick by brick, so don't expect that you'll immediately understand it all the first pass through.
+特别是如果你刚刚接触JavaScript，那么你应当希望花相当一段时间来多次复习这里的概念和代码示例。任何好的基础都是一砖一瓦积累起来的，所以不要指望你会在第一遍通读后就立即理解了全部内容。
 
-Your journey to deeply learn JavaScript starts here.
+你深入学习JavaScript的旅途从这里开始。
 
-**Note:** As I said in Chapter 1, you should definitely try all this code yourself as you read and work through this chapter. Be aware that some of the code here assumes capabilities introduced in the newest version of JavaScript at the time of this writing (commonly referred to as "ES6" for the 6th edition of ECMAScript -- the official name of the JS specification). If you happen to be using an older, pre-ES6 browser, the code may not work. A recent update of a modern browser (like Chrome, Firefox, or IE) should be used.
+**注意：** 正如我在第一章中说过的，在你通读这一章的同时，你绝对应该亲自尝试这里所有的代码。要注意的是，这里的有些代码假定最新版本的JavaScript（通常称为“ES6”，ECMAScript的第六个版本 —— ECMAScript是JS语言规范的官方名称）中引入的功能是存在的。如果你碰巧在使用一个老版本的，前ES6时代的浏览器，这些代码可能不好用。应当使用一个更新版本的现代浏览器（比如Chrome，Firefox，或者IE）。
 
-## Values & Types
+## 值与类型
 
-As we asserted in Chapter 1, JavaScript has typed values, not typed variables. The following built-in types are available:
+正如我们在第一章中宣称的，JavaScript拥有带类型的值，没有带类型的变量。下面是可用的内建类型：
 
 * `string`
 * `number`
 * `boolean`
-* `null` and `undefined`
+* `null` 和 `undefined`
 * `object`
-* `symbol` (new to ES6)
+* `symbol` （ES6新增类型）
 
-JavaScript provides a `typeof` operator that can examine a value and tell you what type it is:
+JavaScript提供了一个`typeof`操作符，它可以检查一个值并告诉你它的类型是什么：
 
 ```js
 var a;
@@ -38,7 +38,7 @@ a = true;
 typeof a;				// "boolean"
 
 a = null;
-typeof a;				// "object" -- weird, bug
+typeof a;				// "object" -- 奇怪的bug
 
 a = undefined;
 typeof a;				// "undefined"
@@ -47,19 +47,19 @@ a = { b: "c" };
 typeof a;				// "object"
 ```
 
-The return value from the `typeof` operator is always one of six (seven as of ES6! - the "symbol" type) string values. That is, `typeof "abc"` returns `"string"`, not `string`.
+来自`typeof`的返回值总是六个（ES6中是七个！ —— “symbol”类型）字符串值之一。也就是，`typeof "abc"`返回`"string"`，不是`string`。
 
-Notice how in this snippet the `a` variable holds every different type of value, and that despite appearances, `typeof a` is not asking for the "type of `a`", but rather for the "type of the value currently in `a`." Only values have types in JavaScript; variables are just simple containers for those values.
+注意在这个代码段中变量`a`是如何持有每种不同类型的值的，而且尽管表面上看起来很像，但是`typeof a`并不是在询问“`a`的类型”，而是“当前`a`中的值的类型”。在JavaScript中只有值拥有类型；变量只是这些值的简单容器。
 
-`typeof null` is an interesting case, because it errantly returns `"object"`, when you'd expect it to return `"null"`.
+`typeof null`是一个有趣的例子，因为当你期望它返回`"null"`时，它错误地返回了`"object"`。
 
-**Warning:** This is a long-standing bug in JS, but one that is likely never going to be fixed. Too much code on the Web relies on the bug and thus fixing it would cause a lot more bugs!
+**警告：** 这是JS中一直存在的一个bug，但是看起来它永远都不会被修复了。在网络上有太多的代码依存于这个bug，因此修复它将会导致更多的bug！
 
-Also, note `a = undefined`. We're explicitly setting `a` to the `undefined` value, but that is behaviorally no different from a variable that has no value set yet, like with the `var a;` line at the top of the snippet. A variable can get to this "undefined" value state in several different ways, including functions that return no values and usage of the `void` operator.
+另外，注意`a = undefined`。我们明确地将`a`设置为值`undefined`，但是在行为上这与一个还没有被设定值的变量没有区别，比如在这个代码段顶部的`var a;`。一个变量可以用好几种不同的方式得到这样的“undefined”值状态，包括没有返回值的函数和使用`void`操作符。
 
-### Objects
+### 对象
 
-The `object` type refers to a compound value where you can set properties (named locations) that each hold their own values of any type. This is perhaps one of the most useful value types in all of JavaScript.
+`object`类型指的是一种复合值，你可以在它上面设定属性（带名称的位置），每个属性持有各自的任意类型的值。它也许是JavaScript中最有用的类型之一。
 
 ```js
 var obj = {
@@ -77,15 +77,15 @@ obj["b"];	// 42
 obj["c"];	// true
 ```
 
-It may be helpful to think of this `obj` value visually:
+可视化地考虑这个`obj`值可能会有所帮助：
 
 <img src="fig4.png">
 
-Properties can either be accessed with *dot notation* (i.e., `obj.a`) or *bracket notation* (i.e., `obj["a"]`). Dot notation is shorter and generally easier to read, and is thus preferred when possible.
+属性既可以使用 *点号标记法*（例如，`obj.a`） 访问，也可以使用 *方括号标记法*（例如，`obj["a"]`） 访问。点号标记法更短而且一般来说更易于阅读，因此在可能的情况下它都是首选。
 
-Bracket notation is useful if you have a property name that has special characters in it, like `obj["hello world!"]` -- such properties are often referred to as *keys* when accessed via bracket notation. The `[ ]` notation requires either a variable (explained next) or a `string` *literal* (which needs to be wrapped in `" .. "` or `' .. '`).
+如果你有一个名称中含有特殊字符的属性名称，方括号标记法就很有用，比如`obj["hello world!"]` —— 当通过方括号标记法访问时，这样的属性经常被称为 *键*。`[ ]`标记法要求一个变量（下一节讲解）或者一个`string` *字面量*（它需要包装进`" .. "`或`' .. '`）。
 
-Of course, bracket notation is also useful if you want to access a property/key but the name is stored in another variable, such as:
+当然，如果你想访问一个属性/键，但是它的名称被存储在另一个变量中时，方括号标记法也很有用。例如：
 
 ```js
 var obj = {
@@ -99,13 +99,13 @@ obj[b];			// "hello world"
 obj["b"];		// 42
 ```
 
-**Note:** For more information on JavaScript `object`s, see the *this & Object Prototypes* title of this series, specifically Chapter 3.
+**注意：** 更多关于JavaScript的`object`的信息，请参见本系列的 *this与对象原型*，特别是第三章。
 
-There are a couple of other value types that you will commonly interact with in JavaScript programs: *array* and *function*. But rather than being proper built-in types, these should be thought of more like subtypes -- specialized versions of the `object` type.
+在JavaScript程序中有另外两种你将会经常打交道的值类型：*数组* 和 *函数*。但与其说它们是内建类型，这些类型应当被认为更像是子类型 —— `object`类型的特化版本。
 
-#### Arrays
+#### 数组
 
-An array is an `object` that holds values (of any type) not particularly in named properties/keys, but rather in numerically indexed positions. For example:
+一个数组是一个`object`，它不使用特殊的带名称的属性/键持有（任意类型的）值，而是使用数字索引的位置。例如：
 
 ```js
 var arr = [
@@ -122,21 +122,21 @@ arr.length;		// 3
 typeof arr;		// "object"
 ```
 
-**Note:** Languages that start counting at zero, like JS does, use `0` as the index of the first element in the array.
+**注意：** 从零开始计数的语言，比如JS，在数组中使用`0`作为第一个元素的索引。
 
-It may be helpful to think of `arr` visually:
+可视化地考虑`arr`很能会有所帮助：
 
 <img src="fig5.png">
 
-Because arrays are special objects (as `typeof` implies), they can also have properties, including the automatically updated `length` property.
+因为数组是一种特殊的对象（正如`typeof`所暗示的），所以它们可以拥有属性，包括一个可以自动被更新的`length`属性。
 
-You theoretically could use an array as a normal object with your own named properties, or you could use an `object` but only give it numeric properties (`0`, `1`, etc.) similar to an array. However, this would generally be considered improper usage of the respective types.
+理论上你可以使用你自己的命名属性将一个数组用作一个普通对象，或者你可以使用一个`object`但是给它类似于数组的数字属性（`0`，`1`，等等）。然而，这么做一般被认为是分别误用了这两种类型。
 
-The best and most natural approach is to use arrays for numerically positioned values and use `object`s for named properties.
+最好且最自然的方法是为数字定位的值使用数组，而为命名属性使用`object`。
 
-#### Functions
+#### 函数
 
-The other `object` subtype you'll use all over your JS programs is a function:
+另一个你将在JS程序中到处使用的`object`子类型是函数：
 
 ```js
 function foo() {
@@ -150,15 +150,15 @@ typeof foo();		// "number"
 typeof foo.bar;		// "string"
 ```
 
-Again, functions are a subtype of `objects` -- `typeof` returns `"function"`, which implies that a `function` is a main type -- and can thus have properties, but you typically will only use function object properties (like `foo.bar`) in limited cases.
+同样地，函数也是`object`的子类型 —— `typeof`返回`"function"`，这暗示着`"function"`是一种主要类型 —— 因此也可以拥有属性，但是你一般仅会在有限情况下才使用函数对象属性（比如`foo.bar`）。
 
-**Note:** For more information on JS values and their types, see the first two chapters of the *Types & Grammar* title of this series.
+**注意：** 更多关于JS的值和它们的类型的信息，参见本系列的 *类型与文法* 的前两章。
 
-### Built-In Type Methods
+### 内建类型的方法
 
-The built-in types and subtypes we've just discussed have behaviors exposed as properties and methods that are quite powerful and useful.
+我们刚刚讨论的内建类型和子类型拥有十分强大和有用的行为，它们作为属性和方法暴露出来。
 
-For example:
+例如：
 
 ```js
 var a = "hello world";
@@ -169,31 +169,31 @@ a.toUpperCase();		// "HELLO WORLD"
 b.toFixed(4);			// "3.1416"
 ```
 
-The "how" behind being able to call `a.toUpperCase()` is more complicated than just that method existing on the value.
+使调用`a.toUpperCase()`成为可能的原因，要比这个值上存在这个方法的说法复杂一些。
 
-Briefly, there is a `String` (capital `S`) object wrapper form, typically called a "native," that pairs with the primitive `string` type; it's this object wrapper that defines the `toUpperCase()` method on its prototype.
+简而言之，有一个`String`（`S`大写）对象包装器形式，通常被称为“原生类型”，与`string`基本类型配成一对儿；正是这个对象包装器的原型上定义了`toUpperCase()`方法。
 
-When you use a primitive value like `"hello world"` as an `object` by referencing a property or method (e.g., `a.toUpperCase()` in the previous snippet), JS automatically "boxes" the value to its object wrapper counterpart (hidden under the covers).
+当你通过引用一个属性或方法（例如，前一个代码段中的`a.toUpperCase()`）将一个像`"hello world"`这样的基本类型值当做一个`object`来使用时，JS自动地将这个值“封箱”为它对应的对象包装器（这个操作是隐藏在幕后的）。
 
-A `string` value can be wrapped by a `String` object, a `number` can be wrapped by a `Number` object, and a `boolean` can be wrapped by a `Boolean` object. For the most part, you don't need to worry about or directly use these object wrapper forms of the values -- prefer the primitive value forms in practically all cases and JavaScript will take care of the rest for you.
+一个`string`值可以被包装为一个`String`对象，一个`number`可以被包装为一个`Number`对象，而一个`boolean`可以被包装为一个`Boolean`对象。在大多数情况下，你不担心或者直接使用这些值的对象包装器形式 —— 在所有实际情况中首选基本类型值形式，而JavaScript会帮你搞定剩下的一切。
 
-**Note:** For more information on JS natives and "boxing," see Chapter 3 of the *Types & Grammar* title of this series. To better understand the prototype of an object, see Chapter 5 of the *this & Object Prototypes* title of this series.
+**注意：** 关于JS原生类型和“封箱”的更多信息，参见本系列的 *类型与文法* 的第三章。要更好地理解对象原型，参见本系列的 *this与对象原型* 的第五章。
 
-### Comparing Values
+### 值的比较
 
-There are two main types of value comparison that you will need to make in your JS programs: *equality* and *inequality*. The result of any comparison is a strictly `boolean` value (`true` or `false`), regardless of what value types are compared.
+在你的JS程序中你将需要进行两种主要的值的比较：*等价* 和 *不等价*。任何比较的结果都是严格的`boolean`值（`true`或`false`），无论被比较的值的类型是什么。
 
-#### Coercion
+#### 强制转换
 
-We talked briefly about coercion in Chapter 1, but let's revisit it here.
+在第一章中我们简单地谈了一下强制转换，我们在此回顾它。
 
-Coercion comes in two forms in JavaScript: *explicit* and *implicit*. Explicit coercion is simply that you can see obviously from the code that a conversion from one type to another will occur, whereas implicit coercion is when the type conversion can happen as more of a non-obvious side effect of some other operation.
+在JavaScript中强制转换有两种形式：*明确的* 和 *隐含的*。明确的强制转换比较简单，因为你可以在代码中明显地看到一个类型转换到另一个类型将会发生，而隐含的强制转换更像是另外一些操作的不明显的副作用引发的类型转换。
 
-You've probably heard sentiments like "coercion is evil" drawn from the fact that there are clearly places where coercion can produce some surprising results. Perhaps nothing evokes frustration from developers more than when the language surprises them.
+你可能听到过像“强制转换是邪恶的”这样情绪化的观点，这是因为一个清楚的事实 —— 强制转换在某些地方会产生一些令人吃惊的结果。也许没有什么能比当一个语言吓到开发者时更能唤起他们的沮丧心情了。
 
-Coercion is not evil, nor does it have to be surprising. In fact, the majority of cases you can construct with type coercion are quite sensible and understandable, and can even be used to *improve* the readability of your code. But we won't go much further into that debate -- Chapter 4 of the *Types & Grammar* title of this series covers all sides.
+强制转换并不邪恶，它也不一定是令人吃惊的。事实上，你使用类型强制转换构建的绝大部分情况是十分合理和可理解的，而且它甚至可以用来 *增强* 你代码的可读性。但我们不会在这个话题上过度深入 —— 本系列的 *类型与文法* 的第四章将会进行全面讲解。
 
-Here's an example of *explicit* coercion:
+这是一个 *明确* 强制转换的例子：
 
 ```js
 var a = "42";
@@ -201,49 +201,49 @@ var a = "42";
 var b = Number( a );
 
 a;				// "42"
-b;				// 42 -- the number!
+b;				// 42 -- 数字！
 ```
 
-And here's an example of *implicit* coercion:
+而这是一个 *隐含* 强制转换的例子：
 
 ```js
 var a = "42";
 
-var b = a * 1;	// "42" implicitly coerced to 42 here
+var b = a * 1;	// 这里 "42" 被隐含地强制转换为 42
 
 a;				// "42"
-b;				// 42 -- the number!
+b;				// 42 -- 数字！
 ```
 
-#### Truthy & Falsy
+#### Truthy 与 Falsy
 
-In Chapter 1, we briefly mentioned the "truthy" and "falsy" nature of values: when a non-`boolean` value is coerced to a `boolean`, does it become `true` or `false`, respectively?
+在第一章中，我们简要地提到了值的“truthy”和“falsy”性质：当一个非`boolean`值被强制转换为一个`boolean`时，它是变成`true`还是`false`。
 
-The specific list of "falsy" values in JavaScript is as follows:
+在JavaScript中“falsy”的明确列表如下：
 
-* `""` (empty string)
-* `0`, `-0`, `NaN` (invalid `number`)
+* `""` （空字符串）
+* `0`, `-0`, `NaN` （非法的`number`）
 * `null`, `undefined`
 * `false`
 
-Any value that's not on this "falsy" list is "truthy." Here are some examples of those:
+任何不在这个“falsy”列表中的值都是“truthy”。这是其中的一些例子：
 
 * `"hello"`
 * `42`
 * `true`
-* `[ ]`, `[ 1, "2", 3 ]` (arrays)
-* `{ }`, `{ a: 42 }` (objects)
-* `function foo() { .. }` (functions)
+* `[ ]`, `[ 1, "2", 3 ]` （数组）
+* `{ }`, `{ a: 42 }` （对象）
+* `function foo() { .. }` （函数）
 
-It's important to remember that a non-`boolean` value only follows this "truthy"/"falsy" coercion if it's actually coerced to a `boolean`. It's not all that difficult to confuse yourself with a situation that seems like it's coercing a value to a `boolean` when it's not.
+重要的是要记住，一个非`boolean`值仅在实际上被强制转换为一个`boolean`时才遵循这个“truthy”/“falsy”强制转换。把你搞糊涂并不困难 —— 当一个场景看起来像是将一个值强制转换为`boolean`，可其实它不是。
 
-#### Equality
+#### 等价性
 
-There are four equality operators: `==`, `===`, `!=`, and `!==`. The `!` forms are of course the symmetric "not equal" versions of their counterparts; *non-equality* should not be confused with *inequality*.
+有四种等价性操作符：`==`，`===`，`!=`，和`!==`。`!`形式当然是与它们相对应操作符平行的“不等”版本；*不等（non-equality）* 不应当与 *不等价性（inequality）* 相混淆。
 
-The difference between `==` and `===` is usually characterized that `==` checks for value equality and `===` checks for both value and type equality. However, this is inaccurate. The proper way to characterize them is that `==` checks for value equality with coercion allowed, and `===` checks for value equality without allowing coercion; `===` is often called "strict equality" for this reason.
+`==`和`===`之间的不同通常被描述为，`==`检查值的等价性而`===`检查值和类型两者的等价性。然而，这是不准确的。描述它们的合理方式是，`==`在允许强制转换的条件下检查值的等价性，而`===`是在不允许强制转换的条件下检查值的等价性；因此`===`常被称为“严格等价”。
 
-Consider the implicit coercion that's allowed by the `==` loose-equality comparison and not allowed with the `===` strict-equality:
+考虑这个隐含强制转换，它在`==`宽松等价性比较中允许，而`===`严格等价性比较中不允许：
 
 ```js
 var a = "42";
@@ -253,29 +253,30 @@ a == b;			// true
 a === b;		// false
 ```
 
-In the `a == b` comparison, JS notices that the types do not match, so it goes through an ordered series of steps to coerce one or both values to a different type until the types match, where then a simple value equality can be checked.
+在`a == b`的比较中，JS注意到类型不匹配，于是它经过一系列有顺序的步骤将一个值或者它们两者强制转换为一个不同的类型，直到类型匹配为止，然后就可以检查一个简单的值等价性。
 
-If you think about it, there's two possible ways `a == b` could give `true` via coercion. Either the comparison could end up as `42 == 42` or it could be `"42" == "42"`. So which is it?
+如果你仔细想一想，通过强制转换`a == b`可以有两种方式给出`true`。这个比较要么最终成为`42 == 42`，要么成为`"42" == "42"`。那么是哪一种呢？
 
-The answer: `"42"` becomes `42`, to make the comparison `42 == 42`. In such a simple example, it doesn't really seem to matter which way that process goes, as the end result is the same. There are more complex cases where it matters not just what the end result of the comparison is, but *how* you get there.
+答案：`"42"`变成`42`，于是比较成为`42 == 42`。在一个这样简单的例子中，只要最终结果是一样的，处理的过程走哪一条路看起来并不重要。但在一些更复杂的情况下，这不仅对比较的最终结果很重要，而且对你 *如何* 得到这个结果也很重要。
 
-The `a === b` produces `false`, because the coercion is not allowed, so the simple value comparison obviously fails. Many developers feel that `===` is more predictable, so they advocate always using that form and staying away from `==`. I think this view is very shortsighted. I believe `==` is a powerful tool that helps your program, *if you take the time to learn how it works.*
+`a === b`产生`false`，因为强制转换是不允许的，所以简单值的比较很明显将会失败。许多开发者感觉`===`更可靠，所以他们提倡一直使用这种形式而远离`==`。我认为这种观点是非常短视的。我相信`==`是一种可以改进程序的强大工具，*如果你花时间去学习它的工作方式*。
 
-We're not going to cover all the nitty-gritty details of how the coercion in `==` comparisons works here. Much of it is pretty sensible, but there are some important corner cases to be careful of. You can read section 11.9.3 of the ES5 specification (http://www.ecma-international.org/ecma-262/5.1/) to see the exact rules, and you'll be surprised at just how straightforward this mechanism is, compared to all the negative hype surrounding it.
+我们不会详细地讲解强制转换在`==`比较中是如何工作的。它的大部分都是相当合理的，但是有一些重要的极端用例要小心。你可以阅读ES5语言规范的11.9.3部分（http://www.ecma-international.org/ecma-262/5.1/）来了解确切的规则，而且与围绕这种机制的所有负面炒作比起来，你会对这它是多么的直白而感到吃惊。
 
-To boil down a whole lot of details to a few simple takeaways, and help you know whether to use `==` or `===` in various situations, here are my simple rules:
+为了将这许多细节归纳为一个简单的包装，并帮助你在各种情况下判断是否使用`==`或`===`，这是我的简单规则：
 
-* If either value (aka side) in a comparison could be the `true` or `false` value, avoid `==` and use `===`.
-* If either value in a comparison could be of these specific values (`0`, `""`, or `[]` -- empty array), avoid `==` and use `===`.
-* In *all* other cases, you're safe to use `==`. Not only is it safe, but in many cases it simplifies your code in a way that improves readability.
+* 如果一个比较的两个值之一可能是`true`或`false`值，避免`==`而使用`===`。
+* 如果一个比较的两个值之一可能是这些具体的值（`0`，`""`，或`[]` —— 空数组），避免`==`而使用`===`。
+* 在 *所有* 其他情况下，你使用`==`是安全的。它不仅安全，而且在许多情况下它可以简化你的代码并改善可读性。
 
-What these rules boil down to is requiring you to think critically about your code and about what kinds of values can come through variables that get compared for equality. If you can be certain about the values, and `==` is safe, use it! If you can't be certain about the values, use `===`. It's that simple.
+这些规则归纳出来的东西要求你严谨地考虑你的代码：什么样的值可能通过这个被比较等价性的变量。如果你可以确定这些值，那么`==`就是安全的，使用它！如果你不能确定这些值，就使用`===`。就这么简单。
 
-The `!=` non-equality form pairs with `==`, and the `!==` form pairs with `===`. All the rules and observations we just discussed hold symmetrically for these non-equality comparisons.
+`!=`不等价形式对应于`==`，而`!==`形式对应于`===`。我们刚刚讨论的所有规则和注意点对这些非等价比较都是平行适用的。
 
-You should take special note of the `==` and `===` comparison rules if you're comparing two non-primitive values, like `object`s (including `function` and `array`). Because those values are actually held by reference, both `==` and `===` comparisons will simply check whether the references match, not anything about the underlying values.
+如果你在比较两个非基本类型值，比如`object`（包括`function`和`array`），那么你应当特别小心`==`和`===`的比较规则。因为这些值实际上是通过引用持有的，`==`和`===`比较都将简单地检查这个引用是否相同，而不是它们底层的值。
 
-For example, `array`s are by default coerced to `string`s by simply joining all the values with commas (`,`) in between. You might think that two `array`s with the same contents would be `==` equal, but they're not:
+例如，`array`默认情况下会通过使用逗号（`,`）连接所有值来被强制转换为`string`。你可能认为两个内容相同的`array`将是`==`相等的，但它们不是：
+
 
 ```js
 var a = [1,2,3];
@@ -287,17 +288,17 @@ b == c;		// true
 a == b;		// false
 ```
 
-**Note:** For more information about the `==` equality comparison rules, see the ES5 specification (section 11.9.3) and also consult Chapter 4 of the *Types & Grammar* title of this series; see Chapter 2 for more information about values versus references.
+**注意：** 更多关于`==`等价性比较规则的信息，参见ES5语言规范（11.9.3部分），和本系列的 *类型与文法* 的第四章；更多关于值和引用的信息，参见它的第二章。
 
-#### Inequality
+#### 不等价性
 
-The `<`, `>`, `<=`, and `>=` operators are used for inequality, referred to in the specification as "relational comparison." Typically they will be used with ordinally comparable values like `number`s. It's easy to understand that `3 < 4`.
+`<`，`>`，`<=`，和`>=`操作符用于不等价性比较，在语言规范中被称为“关系比较”。一般来说它们将与`number`这样的可比较有序值一起使用。`3 < 4`是很容易理解的。
 
-But JavaScript `string` values can also be compared for inequality, using typical alphabetic rules (`"bar" < "foo"`).
+但是JavaScript`string`值也可进行不等价性比较，它使用典型的字母顺序规则（`"bar" < "foo"`）。
 
-What about coercion? Similar rules as `==` comparison (though not exactly identical!) apply to the inequality operators. Notably, there are no "strict inequality" operators that would disallow coercion the same way `===` "strict equality" does.
+那么强制转换呢？与`==`比较相似的规则（虽然不是完全相同！）也适用于不等价操作符。要注意的是，没有像`===`严格等价操作符那样不允许强制转换的“严格不等价”操作符。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a = 41;
@@ -308,9 +309,9 @@ a < b;		// true
 b < c;		// true
 ```
 
-What happens here? In section 11.8.5 of the ES5 specification, it says that if both values in the `<` comparison are `string`s, as it is with `b < c`, the comparison is made lexicographically (aka alphabetically like a dictionary). But if one or both is not a `string`, as it is with `a < b`, then both values are coerced to be `number`s, and a typical numeric comparison occurs.
+这里发生了什么？在ES5语言规范的11.8.5部分中，它说如果`<`比较的两个值都是`string`，就像`b < c`，那么这个比较将会以字典顺序（也就是像字典中字母的排列顺序）进行。但如果两个值之一不是`string`，就像`a < b`，那么两个值就将被强制转换成`number`，并进行一般的数字比较。
 
-The biggest gotcha you may run into here with comparisons between potentially different value types -- remember, there are no "strict inequality" forms to use -- is when one of the values cannot be made into a valid number, such as:
+在可能不同类型的值之间进行比较时，你可能遇到的最大的坑 —— 记住，没有“严格不等价”可用 —— 是其中一个值不能转换为合法的数字，例如：
 
 ```js
 var a = 42;
@@ -321,57 +322,55 @@ a > b;		// false
 a == b;		// false
 ```
 
-Wait, how can all three of those comparisons be `false`? Because the `b` value is being coerced to the "invalid number value" `NaN` in the `<` and `>` comparisons, and the specification says that `NaN` is neither greater-than nor less-than any other value.
+等一下，这三个比较怎么可能都是`false`？因为在`<`和`>`的比较中，值`b`被强制转换为了“非法的数字值”，而且语言规范说`NaN`既不大于其他值，也不小于其他值。
 
-The `==` comparison fails for a different reason. `a == b` could fail if it's interpreted either as `42 == NaN` or `"42" == "foo"` -- as we explained earlier, the former is the case.
+`==`比较失败于不同的原因。如果`a == b`被解释为`42 == NaN`或者`"42" == "foo"`都会失败 —— 正如我们前面讲过的，这里是前一种情况。
 
-**Note:** For more information about the inequality comparison rules, see section 11.8.5 of the ES5 specification and also consult Chapter 4 of the *Types & Grammar* title of this series.
+**注意：** 关于不等价比较规则的更多信息，参见ES5语言规范的11.8.5部分，和本系列的 *类型与文法* 第四章。
 
-## Variables
+## 变量
 
-In JavaScript, variable names (including function names) must be valid *identifiers*. The strict and complete rules for valid characters in identifiers are a little complex when you consider nontraditional characters such as Unicode. If you only consider typical ASCII alphanumeric characters, though, the rules are simple.
+在JavaScript中，变量名（包括函数名）必须是合法的 *标识符（identifiers）*。当你考虑非传统意义上的字符时，比如Unicode，标识符中合法字符的严格和完整的规则就有点儿复杂。如果你仅考虑典型的ASCII字母数字的字符，那么这个规则还是很简单的。
 
-An identifier must start with `a`-`z`, `A`-`Z`, `$`, or `_`. It can then contain any of those characters plus the numerals `0`-`9`.
+一个标识符必须以`a`-`z`，`A`-`Z`，`$`，或`_`开头。它可以包含任意这些字符外加数字`0`-`9`。
 
-Generally, the same rules apply to a property name as to a variable identifier. However, certain words cannot be used as variables, but are OK as property names. These words are called "reserved words," and include the JS keywords (`for`, `in`, `if`, etc.) as well as `null`, `true`, and `false`.
+一般来说，变量标识符的规则也通用适用于属性名称。然而，有一些不能用作变量名，但是可以用作属性名的单词。这些单词被称为“保留字（reserved words）”，包括JS关键字（`for`，`in`，`if`，等等）和`null`，`true`和`false`。
 
-**Note:** For more information about reserved words, see Appendix A of the *Types & Grammar* title of this series.
+**注意：** 更多关于保留字的信息，参见本系列的 *类型与文法* 的附录A。
 
-### Function Scopes
+### 函数作用域
 
-You use the `var` keyword to declare a variable that will belong to the current function scope, or the global scope if at the top level outside of any function.
+你使用`var`关键字声明的变量将属于当前的函数作用域，如果声明位于任何函数外部的顶层，它就属于全局作用域。
 
-#### Hoisting
+#### 提升
 
-Wherever a `var` appears inside a scope, that declaration is taken to belong to the entire scope and accessible everywhere throughout.
+无论`var`出现在一个作用域内部的何处，这个声明都被认为是属于整个作用域，而且在作用域的所有位置都是可以访问的。
 
-Metaphorically, this behavior is called *hoisting*, when a `var` declaration is conceptually "moved" to the top of its enclosing scope. Technically, this process is more accurately explained by how code is compiled, but we can skip over those details for now.
+这种行为称为 *提升*，比喻一个`var`声明在概念上 *被移动* 到了包含它的作用域的顶端。技术上讲，这个过程通过代码的编译方式进行解释更准确，但是我们先暂且跳过那些细节。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a = 2;
 
-foo();					// works because `foo()`
-						// declaration is "hoisted"
+foo();					// 可以工作， 因为 `foo()` 声明被“提升”了
 
 function foo() {
 	a = 3;
 
 	console.log( a );	// 3
 
-	var a;				// declaration is "hoisted"
-						// to the top of `foo()`
+	var a;				// 声明被“提升”到了 `foo()` 的顶端
 }
 
 console.log( a );	// 2
 ```
 
-**Warning:** It's not common or a good idea to rely on variable *hoisting* to use a variable earlier in its scope than its `var` declaration appears; it can be quite confusing. It's much more common and accepted to use *hoisted* function declarations, as we do with the `foo()` call appearing before its formal declaration.
+**警告：** 在一个作用域中依靠变量提升来在`var`声明出现之前使用一个变量是不常见的，也不是个好主意；它可能相当使人困惑。而使用被提升的函数声明要常见得多，也更为人所接受，就像我们在`foo()`正式声明之前就调用它一样。
 
-#### Nested Scopes
+#### 嵌套的作用域
 
-When you declare a variable, it is available anywhere in that scope, as well as any lower/inner scopes. For example:
+当你声明了一个变量时，它就在这个作用域内的任何地方都是可用的，包括任何下层/内部作用域。例如：
 
 ```js
 function foo() {
@@ -397,22 +396,22 @@ function foo() {
 foo();
 ```
 
-Notice that `c` is not available inside of `bar()`, because it's declared only inside the inner `baz()` scope, and that `b` is not available to `foo()` for the same reason.
+注意`c`在`bar()`的内部是不可用的，因为它是仅在内部的`baz()`作用域中被声明的，并且`b`因为同样的原因在`foo()`内是不可用的。
 
-If you try to access a variable's value in a scope where it's not available, you'll get a `ReferenceError` thrown. If you try to set a variable that hasn't been declared, you'll either end up creating a variable in the top-level global scope (bad!) or getting an error, depending on "strict mode" (see "Strict Mode"). Let's take a look:
+如果你试着在一个作用域内访问一个不可用的变量的值，你就会得到一个被抛出的`ReferenceError`。如果你试着为一个还没有被声明的变量赋值，那么根据“strict模式”的状态，你会要么得到一个在顶层全局作用域中创建的变量（不好！），要么得到一个错误。让我们看一下：
 
 ```js
 function foo() {
-	a = 1;	// `a` not formally declared
+	a = 1;	// `a` 没有被正式声明
 }
 
 foo();
-a;			// 1 -- oops, auto global variable :(
+a;			// 1 -- 噢，自动全局变量 :(
 ```
 
-This is a very bad practice. Don't do it! Always formally declare your variables.
+这是一种非常差劲儿的做法。别这么干！总是给你的变量进行正式声明。
 
-In addition to creating declarations for variables at the function level, ES6 *lets* you declare variables to belong to individual blocks (pairs of `{ .. }`), using the `let` keyword. Besides some nuanced details, the scoping rules will behave roughly the same as we just saw with functions:
+除了在函数级别为变量创建声明，ES6允许你使用`let`关键字声明属于个别块儿（一个`{ .. }`）的变量。除了一些微妙的细节，作用域规则将大致上与我们刚刚看到的函数相同：
 
 ```js
 function foo() {
@@ -434,75 +433,75 @@ foo();
 // 5 7 9
 ```
 
-Because of using `let` instead of `var`, `b` will belong only to the `if` statement and thus not to the whole `foo()` function's scope. Similarly, `c` belongs only to the `while` loop. Block scoping is very useful for managing your variable scopes in a more fine-grained fashion, which can make your code much easier to maintain over time.
+因为使用了`let`而非`var`，`b`将仅属于`if`语句而不是整个`foo()`函数的作用域。相似地，`c`仅属于`while`循环。对于以更加细粒度的方式管理你的变量作用域来说，块儿作用域是非常有用的，它将使你的代码随着时间的推移更加易于维护。
 
-**Note:** For more information about scope, see the *Scope & Closures* title of this series. See the *ES6 & Beyond* title of this series for more information about `let` block scoping.
+**注意：** 关于作用域的更多信息，参见本系列的 *作用域与闭包*。更多关于`let`块儿作用域的信息，参见本系列的 *ES6与未来*。
 
-## Conditionals
+## 条件
 
-In addition to the `if` statement we introduced briefly in Chapter 1, JavaScript provides a few other conditionals mechanisms that we should take a look at.
+除了我们在第一章中简要介绍过的`if`语句，JavaScript还提供了几种其他值得我们一看的条件机制。
 
-Sometimes you may find yourself writing a series of `if..else..if` statements like this:
+有时你可能发现自己在像这样写一系列的`if..else..if`语句：
 
 ```js
 if (a == 2) {
-	// do something
+	// 做一些事情
 }
 else if (a == 10) {
-	// do another thing
+	// 做另一些事请
 }
 else if (a == 42) {
-	// do yet another thing
+	// 又是另外一些事情
 }
 else {
-	// fallback to here
+	// 这里是备用方案
 }
 ```
 
-This structure works, but it's a little verbose because you need to specify the `a` test for each case. Here's another option, the `switch` statement:
+这种结构好用，但有一点儿繁冗，因为你需要为每一种情况都指明`a`的测试。这里有另一种选项，`switch`语句：
 
 ```js
 switch (a) {
 	case 2:
-		// do something
+		// 做一些事情
 		break;
 	case 10:
-		// do another thing
+		// 做另一些事请
 		break;
 	case 42:
-		// do yet another thing
+		// 又是另外一些事情
 		break;
 	default:
-		// fallback to here
+		// 这里是备用方案
 }
 ```
 
-The `break` is important if you want only the statement(s) in one `case` to run. If you omit `break` from a `case`, and that `case` matches or runs, execution will continue with the next `case`'s statements regardless of that `case` matching. This so called "fall through" is sometimes useful/desired:
+如果你想仅让一个`case`中的语句运行，`break`是很重要的。如果你在一个`case`中省略了`break`，并且这个`case`成立或运行，那么程序的执行将会不管下一个`case`语句是否成立而继续执行它。这种所谓的“掉落”有时是有用/期望的：
 
 ```js
 switch (a) {
 	case 2:
 	case 10:
-		// some cool stuff
+		// 一些很酷的事情
 		break;
 	case 42:
-		// other stuff
+		// 另一些事情
 		break;
 	default:
-		// fallback
+		// 备用方案
 }
 ```
 
-Here, if `a` is either `2` or `10`, it will execute the "some cool stuff" code statements.
+这里，如果`a`是`2`或`10`，它就会执行“一些很酷的事情”的代码语句。
 
-Another form of conditional in JavaScript is the "conditional operator," often called the "ternary operator." It's like a more concise form of a single `if..else` statement, such as:
+在JavaScript中的另一种条件形式是“条件操作符”，经常被称为“三元操作符”。它像是一个单独的`if..else`语句的更简洁的形式，比如：
 
 ```js
 var a = 42;
 
 var b = (a > 41) ? "hello" : "world";
 
-// similar to:
+// 与此相似：
 
 // if (a > 41) {
 //    b = "hello";
@@ -512,68 +511,68 @@ var b = (a > 41) ? "hello" : "world";
 // }
 ```
 
-If the test expression (`a > 41` here) evaluates as `true`, the first clause (`"hello"`) results, otherwise the second clause (`"world"`) results, and whatever the result is then gets assigned to `b`.
+如果测试表达式（这里是`a > 41`）求值为`true`，那么就会得到第一个子句（`"hello"`），否则得到第二个子句（`"world"`），而且无论结果为何都会被赋值给`b`。
 
-The conditional operator doesn't have to be used in an assignment, but that's definitely the most common usage.
+条件操作符不一定非要用于赋值，但是这绝对是最常见的用法。
 
-**Note:** For more information about testing conditions and other patterns for `switch` and `? :`, see the *Types & Grammar* title of this series.
+**注意：** 关于测试条件和`switch`与`? :`的其他模式的更多信息，参见本系列的 *类型与文法*。
 
-## Strict Mode
+## Strict模式
 
-ES5 added a "strict mode" to the language, which tightens the rules for certain behaviors. Generally, these restrictions are seen as keeping the code to a safer and more appropriate set of guidelines. Also, adhering to strict mode makes your code generally more optimizable by the engine. Strict mode is a big win for code, and you should use it for all your programs.
+ES5在语言中加入了一个“strict模式”，它收紧了一些特定行为的规则。一般来说，这些限制被视为使代码符合一组更安全和更合理的指导方针。另外，坚持strict模式一般会使你的代码对引擎有更强的可优化性。strict模式对代码有很大的好处，你应当在你所有的程序中使用它。
 
-You can opt in to strict mode for an individual function, or an entire file, depending on where you put the strict mode pragma:
+根据你摆放strict模式注解的位置，你可以为一个单独的函数，或者是整个一个文件切换到strict模式：
 
 ```js
 function foo() {
 	"use strict";
 
-	// this code is strict mode
+	// 这部分代码是strict模式的
 
 	function bar() {
-		// this code is strict mode
+		// 这部分代码是strict模式的
 	}
 }
 
-// this code is not strict mode
+// 这部分代码不是strict模式的
 ```
 
-Compare that to:
+将它与这个相比：
 
 ```js
 "use strict";
 
 function foo() {
-	// this code is strict mode
+	// 这部分代码是strict模式的
 
 	function bar() {
-		// this code is strict mode
+		// 这部分代码是strict模式的
 	}
 }
 
-// this code is strict mode
+// 这部分代码是strict模式的
 ```
 
-One key difference (improvement!) with strict mode is disallowing the implicit auto-global variable declaration from omitting the `var`:
+使用strict模式的一个关键不同（改善！）是，它不允许因为省略了`var`而进行隐含的自动全局变量声明：
 
 ```js
 function foo() {
-	"use strict";	// turn on strict mode
-	a = 1;			// `var` missing, ReferenceError
+	"use strict";	// 打开strict模式
+	a = 1;			// 缺少`var`，ReferenceError
 }
 
 foo();
 ```
 
-If you turn on strict mode in your code, and you get errors, or code starts behaving buggy, your temptation might be to avoid strict mode. But that instinct would be a bad idea to indulge. If strict mode causes issues in your program, almost certainly it's a sign that you have things in your program you should fix.
+如果你在代码中打开strict模式，并且得到错误，或者代码开始变得有bug，这可能会诱使你避免使用strict模式。但是纵容这种直觉不是一个好主意。如果strict模式在你的程序中导致了问题，那么这标志着在你的代码中几乎可以肯定有应该修改的东西。
 
-Not only will strict mode keep your code to a safer path, and not only will it make your code more optimizable, but it also represents the future direction of the language. It'd be easier on you to get used to strict mode now than to keep putting it off -- it'll only get harder to convert later!
+strict模式不仅将你的代码保持在更安全的道路上，也不仅将使你的代码可优化性更强，它还代表着这种语言未来的方向。对于你来说，现在就开始习惯于strict模式要比一直回避它容易得多 —— 以后再进行这种转变只会更难！
 
-**Note:** For more information about strict mode, see the Chapter 5 of the *Types & Grammar* title of this series.
+**注意：** 关于strict模式的更多信息，参见本系列的 *类型与文法* 的第五章。
 
-## Functions As Values
+## 函数作为值
 
-So far, we've discussed functions as the primary mechanism of *scope* in JavaScript. You recall typical `function` declaration syntax as follows:
+至此，我们已经将函数作为JavaScript中主要的 *作用域* 机制讨论过了。你可以回想一下典型的`function`声明语法是这样的：
 
 ```js
 function foo() {
@@ -581,13 +580,13 @@ function foo() {
 }
 ```
 
-Though it may not seem obvious from that syntax, `foo` is basically just a variable in the outer enclosing scope that's given a reference to the `function` being declared. That is, the `function` itself is a value, just like `42` or `[1,2,3]` would be.
+虽然从这种语法中看起来不明显，`foo`基本上是一个位于外围作用域的变量，它给了被声明的`function`一个引用。也就是说，`function`本身是一个值，就像`42`或`[1,2,3]`一样。
 
-This may sound like a strange concept at first, so take a moment to ponder it. Not only can you pass a value (argument) *to* a function, but *a function itself can be a value* that's assigned to variables, or passed to or returned from other functions.
+这可能听起来像是一个奇怪的概念，所以花点儿时间仔细考虑一下。你不仅可以向一个`function`传递一个值（参数值），而且 *一个函数本身可以是一个值*，它能够赋值给变量，传递给其他函数，或者从其它函数中返回。
 
-As such, a function value should be thought of as an expression, much like any other value or expression.
+因此，一个函数值应当被认为是一个表达式，与任何其他的值或表达式很相似。
 
-Consider:
+考虑如下代码：
 
 ```js
 var foo = function() {
@@ -599,17 +598,17 @@ var x = function bar(){
 };
 ```
 
-The first function expression assigned to the `foo` variable is called *anonymous* because it has no `name`.
+第一个被赋值给变量`foo`的函数表达式称为 *匿名* 函数表达式，因为它没有“名称”。
 
-The second function expression is *named* (`bar`), even as a reference to it is also assigned to the `x` variable. *Named function expressions* are generally more preferable, though *anonymous function expressions* are still extremely common.
+第二个函数表达式是 *命名的*（`bar`），它还被赋值给变量`x`作为它的引用。*命名函数表达式* 一般来说更理想，虽然 *匿名函数表达式* 仍然极其常见。
 
-For more information, see the *Scope & Closures* title of this series.
+更多信息参见本系列的 *作用域与闭包*。
 
-### Immediately Invoked Function Expressions (IIFEs)
+### 立即被调用的函数表达式（IIFE）
 
-In the previous snippet, neither of the function expressions are executed -- we could if we had included `foo()` or `x()`, for instance.
+在前一个代码段中，哪一个函数表达式都没有被执行 —— 除非我们使用了`foo()`或`x()`。
 
-There's another way to execute a function expression, which is typically referred to as an *immediately invoked function expression* (IIFE):
+有另一种执行函数表达式的方法，它通常被称为一个 *立即被调用的函数表达式* （IIFE）：
 
 ```js
 (function IIFE(){
@@ -618,27 +617,25 @@ There's another way to execute a function expression, which is typically referre
 // "Hello!"
 ```
 
-The outer `( .. )` that surrounds the `(function IIFE(){ .. })` function expression is just a nuance of JS grammar needed to prevent it from being treated as a normal function declaration.
+围绕在函数表达式`(function IIFE(){ .. })`外部的`( .. )`只是一个微妙的JS文法，我们需要它来防止函数表达式被看作一个普通的函数声明。
 
-The final `()` on the end of the expression -- the `})();` line -- is what actually executes the function expression referenced immediately before it.
+在表达式末尾的最后的`()` —— `})();`这一行 —— 才是实际立即执行它前面的函数表达式的东西。
 
-That may seem strange, but it's not as foreign as first glance. Consider the similarities between `foo` and `IIFE` here:
+这看起来可能很奇怪，但它不像第一眼看上去那么陌生。考虑这里的`foo`和`IIFE`之间的相似性：
 
 ```js
 function foo() { .. }
 
-// `foo` function reference expression,
-// then `()` executes it
+// `foo` 是函数引用表达式，然后用`()`执行它
 foo();
 
-// `IIFE` function expression,
-// then `()` executes it
+// `IIFE` 是函数表达式，然后用`()`执行它
 (function IIFE(){ .. })();
 ```
 
-As you can see, listing the `(function IIFE(){ .. })` before its executing `()` is essentially the same as including `foo` before its executing `()`; in both cases, the function reference is executed with `()` immediately after it.
+如你所见，在执行它的`()`之前列出`(function IIFE(){ .. })`，与在执行它的`()`之前定义`foo`实质上是相同的；在这两种情况下，函数引用都使用立即在它后面的`()`执行。
 
-Because an IIFE is just a function, and functions create variable *scope*, using an IIFE in this fashion is often used to declare variables that won't affect the surrounding code outside the IIFE:
+因为IIFE只是一个函数，而函数可以创建变量 *作用域*，以这样的风格使用一个IIFE经常被用于定义变量，而这些变量将不会影响围绕在IIFE外面的代码：
 
 ```js
 var a = 42;
@@ -651,7 +648,7 @@ var a = 42;
 console.log( a );		// 42
 ```
 
-IIFEs can also have return values:
+IIFE还可以有返回值：
 
 ```js
 var x = (function IIFE(){
@@ -661,22 +658,21 @@ var x = (function IIFE(){
 x;	// 42
 ```
 
-The `42` value gets `return`ed from the `IIFE`-named function being executed, and is then assigned to `x`.
+值`42`从被执行的命名为`IIFE`的函数中`return`，然后被赋值给`x`。
 
-### Closure
+### 闭包
 
-*Closure* is one of the most important, and often least understood, concepts in JavaScript. I won't cover it in deep detail here, and instead refer you to the *Scope & Closures* title of this series. But I want to say a few things about it so you understand the general concept. It will be one of the most important techniques in your JS skillset.
+*闭包* 是JavaScript中最重要，却又经常最少为人知的概念之一。我不会在这里涵盖更深的细节，你可以参照本系列的 *作用域与闭包*。但我想说几件关于它的事情，以便你了解它的一般概念。它将是你的JS技术结构中最重要的技术之一。
 
-You can think of closure as a way to "remember" and continue to access a function's scope (its variables) even once the function has finished running.
+你可以认为闭包是这样一种方法：即使函数已经完成了运行，它依然可以“记住”并持续访问函数的作用域。
 
-Consider:
+考虑如下代码：
 
 ```js
 function makeAdder(x) {
-	// parameter `x` is an inner variable
+	// 参数 `x` 是一个内部变量
 
-	// inner function `add()` uses `x`, so
-	// it has a "closure" over it
+	// 内部函数 `add()` 使用 `x`，所以它对 `x` 拥有一个“闭包”
 	function add(y) {
 		return y + x;
 	};
@@ -685,17 +681,17 @@ function makeAdder(x) {
 }
 ```
 
-The reference to the inner `add(..)` function that gets returned with each call to the outer `makeAdder(..)` is able to remember whatever `x` value was passed in to `makeAdder(..)`. Now, let's use `makeAdder(..)`:
+每次调用外部的`makeAdder(..)`所返回的对内部`add(..)`函数的引用可以记住被传入`makeAdder(..)`的`x`值。现在，让我们使用`makeAdder(..)`：
 
 ```js
-// `plusOne` gets a reference to the inner `add(..)`
-// function with closure over the `x` parameter of
-// the outer `makeAdder(..)`
+// `plusOne` 得到一个指向内部函数 `add(..)` 的引用，
+// `add()` 函数拥有对外部 `makeAdder(..)` 的参数 `x`
+// 的闭包
 var plusOne = makeAdder( 1 );
 
-// `plusTen` gets a reference to the inner `add(..)`
-// function with closure over the `x` parameter of
-// the outer `makeAdder(..)`
+// `plusTen` 得到一个指向内部函数 `add(..)` 的引用，
+// `add()` 函数拥有对外部 `makeAdder(..)` 的参数 `x`
+// 的闭包
 var plusTen = makeAdder( 10 );
 
 plusOne( 3 );		// 4  <-- 1 + 3
@@ -704,22 +700,22 @@ plusOne( 41 );		// 42 <-- 1 + 41
 plusTen( 13 );		// 23 <-- 10 + 13
 ```
 
-More on how this code works:
+这段代码的工作方式是：
 
-1. When we call `makeAdder(1)`, we get back a reference to its inner `add(..)` that remembers `x` as `1`. We call this function reference `plusOne(..)`.
-2. When we call `makeAdder(10)`, we get back another reference to its inner `add(..)` that remembers `x` as `10`. We call this function reference `plusTen(..)`.
-3. When we call `plusOne(3)`, it adds `3` (its inner `y`) to the `1` (remembered by `x`), and we get `4` as the result.
-4. When we call `plusTen(13)`, it adds `13` (its inner `y`) to the `10` (remembered by `x`), and we get `23` as the result.
+1. 当我们调用`makeAdder(1)`时，我们得到一个指向它内部的`add(..)`的引用，它记住了`x`是`1`。我们称这个函数引用为`plusOne(..)`。
+2. 当我们调用`makeAdder(10)`时，我们得到了另一个指向它内部的`add(..)`引用，它记住了`x`是`10`。我们称这个函数引用为`plusTen(..)`。
+3. 当我们调用`plusOne(3)`时，它在`3`（它内部的`y`）上加`1`（被`x`记住的），于是我们得到结果`4`。
+4. 当我们调用`plusTen(13)`时，它在`13`（它内部的`y`）上加`10`（被`x`记住的），于是我们得到结果`23`。
 
-Don't worry if this seems strange and confusing at first -- it can be! It'll take lots of practice to understand it fully.
+如果这看起里很奇怪和令人困惑，不要担心 —— 它确实是的！要完全理解它需要很多的练习。
 
-But trust me, once you do, it's one of the most powerful and useful techniques in all of programming. It's definitely worth the effort to let your brain simmer on closures for a bit. In the next section, we'll get a little more practice with closure.
+但是相信我，一旦你理解了它，它就是编程中最强大最有用的技术之一。让你的大脑在闭包中煎熬一会是绝对值得的。在下一节中，我们将进一步实践闭包。
 
-#### Modules
+#### 模块
 
-The most common usage of closure in JavaScript is the module pattern. Modules let you define private implementation details (variables, functions) that are hidden from the outside world, as well as a public API that *is* accessible from the outside.
+在JavaScript中闭包最常见的用法就是模块模式。模块让你定义对外面世界不可见的私有实现细节（变量，函数），和对外面可访问的公有API。
 
-Consider:
+考虑如下代码：
 
 ```js
 function User(){
@@ -729,7 +725,7 @@ function User(){
 		username = user;
 		password = pw;
 
-		// do the rest of the login work
+		// 做登录的工作
 	}
 
 	var publicAPI = {
@@ -739,41 +735,41 @@ function User(){
 	return publicAPI;
 }
 
-// create a `User` module instance
+// 创建一个 `User` 模块的实例
 var fred = User();
 
 fred.login( "fred", "12Battery34!" );
 ```
 
-The `User()` function serves as an outer scope that holds the variables `username` and `password`, as well as the inner `doLogin()` function; these are all private inner details of this `User` module that cannot be accessed from the outside world.
+函数`User()`作为一个外部作用域持有变量`username`和`password`，以及内部`doLogin()`函数；它们都是`User`模块内部的私有细节，是不能从外部世界访问的。
 
-**Warning:** We are not calling `new User()` here, on purpose, despite the fact that probably seems more common to most readers. `User()` is just a function, not a class to be instantiated, so it's just called normally. Using `new` would be inappropriate and actually waste resources.
+**警告：** 我们在这里没有调用`new User()`，这是有意为之的，虽然对大多数读者来说那可能更常见。`User()`只是一个函数，不是一个要被初始化的对象，所以它只是被一般地调用了。使用`new`将是不合适的，而且实际上会浪费资源。
 
-Executing `User()` creates an *instance* of the `User` module -- a whole new scope is created, and thus a whole new copy of each of these inner variables/functions. We assign this instance to `fred`. If we run `User()` again, we'd get a new instance entirely separate from `fred`.
+执行`User()`创建了`User`模块的一个 *实例* —— 一个全新的作用域会被创建，而每个内部变量/函数的一个全新的拷贝也因此而被创建。我们将这个实例赋值给`fred`。如果我们再次运行`User()`，我们将会得到一个与`fred`完全分离的新的实例。
 
-The inner `doLogin()` function has a closure over `username` and `password`, meaning it will retain its access to them even after the `User()` function finishes running.
+内部的`doLogin()`函数在`username`和`password`上拥有闭包，这意味着即便`User()`函数已经完成了运行，它依然持有对它们的访问权。
 
-`publicAPI` is an object with one property/method on it, `login`, which is a reference to the inner `doLogin()` function. When we return `publicAPI` from `User()`, it becomes the instance we call `fred`.
+`publicAPI`是一个带有一个属性/方法的对象，`login`是一个指向内部`doLogin()`函数的引用。当我们从`User()`中返回`publicAPI`时，它就变成了我们称为`fred`的实例。
 
-At this point, the outer `User()` function has finished executing. Normally, you'd think the inner variables like `username` and `password` have gone away. But here they have not, because there's a closure in the `login()` function keeping them alive.
+在这个时候，外部的`User()`函数已经完成了执行。一般说来，你会认为像`username`和`password`这样的内部变量将会消失。但是在这里它们不会，因为在`login()`函数里有一个闭包使它们继续存活。
 
-That's why we can call `fred.login(..)` -- the same as calling the inner `doLogin(..)` -- and it can still access `username` and `password` inner variables.
+这就是为什么我们可以调用`fred.login(..)` —— 和调用内部的`doLogin(..)`一样 —— 而且它依然可以访问内部变量`username`和`password`。
 
-There's a good chance that with just this brief glimpse at closure and the module pattern, some of it is still a bit confusing. That's OK! It takes some work to wrap your brain around it.
+这样对闭包和模块模式的简单一瞥，你很有可能还是有点儿糊涂。没关系！要把它装进你的大脑确实需要花些功夫。
 
-From here, go read the *Scope & Closures* title of this series for a much more in-depth exploration.
+以此为起点，关于更多深入细节的探索可以去读本系列的 *作用域与闭包*。
 
-## `this` Identifier
+## `this` 标识符
 
-Another very commonly misunderstood concept in JavaScript is the `this` identifier. Again, there's a couple of chapters on it in the *this & Object Prototypes* title of this series, so here we'll just briefly introduce the concept.
+在JavaScript中另一个经常被误解的概念是`this`标识符。同样，在本系列的 *this与对象原型* 中有好几章关于它的内容，所以在这里我们只简要的介绍一下概念。
 
-While it may often seem that `this` is related to "object-oriented patterns," in JS `this` is a different mechanism.
+虽然`this`可能经常看起来是与“面向对象模式”有关的，但在JS中`this`是一个不同的概念。
 
-If a function has a `this` reference inside it, that `this` reference usually points to an `object`. But which `object` it points to depends on how the function was called.
+如果一个函数在它内部拥有一个`this`引用，那么这个`this`引用通常指向一个`object`。但是指向哪一个`object`要看这个函数是如何被调用的。
 
-It's important to realize that `this` *does not* refer to the function itself, as is the most common misconception.
+重要的是要理解`this` *不是* 指函数本身，这是最常见的误解。
 
-Here's a quick illustration:
+这是一个快速的说明：
 
 ```js
 function foo() {
@@ -799,70 +795,70 @@ foo.call( obj2 );	// "obj2"
 new foo();			// undefined
 ```
 
-There are four rules for how `this` gets set, and they're shown in those last four lines of that snippet.
+关于`this`如何被设置有四个规则，它们被展示在这个代码段的最后四行中：
 
-1. `foo()` ends up setting `this` to the global object in non-strict mode -- in strict mode, `this` would be `undefined` and you'd get an error in accessing the `bar` property -- so `"global"` is the value found for `this.bar`.
-2. `obj1.foo()` sets `this` to the `obj1` object.
-3. `foo.call(obj2)` sets `this` to the `obj2` object.
-4. `new foo()` sets `this` to a brand new empty object.
+1. `foo()`最终在非strict模式中将`this`设置为全局对象 —— 在strict模式中，`this`将会是`undefined`而且你会在访问`bar`属性时得到一个错误 —— 所以`this.bar`的值是`global`。
+2. `obj1.foo()`将`this`设置为对象`obj1`。
+3. `foo.call(obj2)`将`this`设置为对象`obj2`。
+4. `new foo()`将`this`设置为一个新的空对象。
 
-Bottom line: to understand what `this` points to, you have to examine how the function in question was called. It will be one of those four ways just shown, and that will then answer what `this` is.
+底线：要搞清楚`this`指向什么，你必须检视当前的函数是如何被调用的。它将是我们刚刚看到的四种中的一种，而这将会回答`this`是什么。
 
-**Note:** For more information about `this`, see Chapters 1 and 2 of the *this & Object Prototypes* title of this series.
+**注意：** 关于`this`的更多信息，参见本系列的 *this与对象原型* 的第一和第二章。
 
-## Prototypes
+## 原型
 
-The prototype mechanism in JavaScript is quite complicated. We will only glance at it here. You will want to spend plenty of time reviewing Chapters 4-6 of the *this & Object Prototypes* title of this series for all the details.
+JavaScript中的原型机制十分复杂。我们在这里近仅仅扫它一眼。要了解关于它的所有细节，你需要花相当的时间来学习本系列的 *this与对象原型* 的第四到六章。
 
-When you reference a property on an object, if that property doesn't exist, JavaScript will automatically use that object's internal prototype reference to find another object to look for the property on. You could think of this almost as a fallback if the property is missing.
+当你引用一个对象上的属性时，如果这个属性不存在，JavaScript将会自动地使用这个对象的内部原型引用来寻找另外一个对象，在它上面查询你想要的属性。你可以认为它几乎是在属性缺失时的备用对象。
 
-The internal prototype reference linkage from one object to its fallback happens at the time the object is created. The simplest way to illustrate it is with a built-in utility called `Object.create(..)`.
+从一个对象到它备用对象的内部原型引用链接发生在这个对象被创建的时候。说明它的最简单的方法是使用称为`Object.create(..)`的内建工具。
 
-Consider:
+考虑如下代码：
 
 ```js
 var foo = {
 	a: 42
 };
 
-// create `bar` and link it to `foo`
+// 创建 `bar` 并将它链接到 `foo`
 var bar = Object.create( foo );
 
 bar.b = "hello world";
 
 bar.b;		// "hello world"
-bar.a;		// 42 <-- delegated to `foo`
+bar.a;		// 42 <-- 委托到 `foo`
 ```
 
-It may help to visualize the `foo` and `bar` objects and their relationship:
+将对象`foo`和`bar`以及它们的关系可视化也许会有所帮助：
 
 <img src="fig6.png">
 
-The `a` property doesn't actually exist on the `bar` object, but because `bar` is prototype-linked to `foo`, JavaScript automatically falls back to looking for `a` on the `foo` object, where it's found.
+属性`a`实际上不存在于对象`bar`上，但是因为`bar`被原型链接到`foo`，JavaScript自动地退到对象`foo`上去寻找`a`，而且在这里找到了它。
 
-This linkage may seem like a strange feature of the language. The most common way this feature is used -- and I would argue, abused -- is to try to emulate/fake a "class" mechanism with "inheritance."
+这种链接看起来是语言的一种奇怪的特性。这种特性最常被使用的方式 —— 我会争辩说这是一种滥用 —— 是用来模拟/模仿“类”机制的“继承”。
 
-But a more natural way of applying prototypes is a pattern called "behavior delegation," where you intentionally design your linked objects to be able to *delegate* from one to the other for parts of the needed behavior.
+使用原型的更自然的方式是一种称为“行为委托”的模式，在这种模式中你有意地将你的被链接的对象设计为可以从一个委托到另一个的部分所需的行为中。
 
-**Note:** For more information about prototypes and behavior delegation, see Chapters 4-6 of the *this & Object Prototypes* title of this series.
+**注意：** 更多关于原型和行为委托的信息，参见本系列的 *this与对象原型* 的第四到六章。
 
-## Old & New
+## 旧的与新的
 
-Some of the JS features we've already covered, and certainly many of the features covered in the rest of this series, are newer additions and will not necessarily be available in older browsers. In fact, some of the newest features in the specification aren't even implemented in any stable browsers yet.
+以我们已经介绍过的JS特性，和将在这个系列的其他部分中讲解的相当一部分特性都是新近增加的，不一定在老版本的浏览器中可用。事实上，语言规范中的一些最新特性甚至在任何稳定的浏览中都没有被实现。
 
-So, what do you do with the new stuff? Do you just have to wait around for years or decades for all the old browsers to fade into obscurity?
+那么，你拿这些新东西怎么办？你只能等上几年或者十几年直到老版本浏览器归于尘土？
 
-That's how many people think about the situation, but it's really not a healthy approach to JS.
+这确实是许多人认为的情况，但是它不是JS健康的进步方式。
 
-There are two main techniques you can use to "bring" the newer JavaScript stuff to the older browsers: polyfilling and transpiling.
+有两种主要的技术可以将新的JavaScript特性“带到”老版本的浏览器中：填补和转译。
 
-### Polyfilling
+### 填补
 
-The word "polyfill" is an invented term (by Remy Sharp) (https://remysharp.com/2010/10/08/what-is-a-polyfill) used to refer to taking the definition of a newer feature and producing a piece of code that's equivalent to the behavior, but is able to run in older JS environments.
+“填补（Polyfilling）”是一个认为发明的词（由Remy Sharp创造）（https://remysharp.com/2010/10/08/what-is-a-polyfill）。它是指拿来一个新特性的定义并制造一段行为等价的代码，但是这段代码可以运行在老版本的JS环境中。
 
-For example, ES6 defines a utility called `Number.isNaN(..)` to provide an accurate non-buggy check for `NaN` values, deprecating the original `isNaN(..)` utility. But it's easy to polyfill that utility so that you can start using it in your code regardless of whether the end user is in an ES6 browser or not.
+例如，ES6定义了一个称为`Number.isNaN(..)`的工具，来为检查`NaN`值提供一种准确无误的方法，同时废弃原来的`isNaN(..)`工具。这个工具可以很容易填补，因此你可开始在你的代码中使用它，而不管最终用户是否在一个ES6浏览器中。
 
-Consider:
+考虑如下代码：
 
 ```js
 if (!Number.isNaN) {
@@ -872,31 +868,31 @@ if (!Number.isNaN) {
 }
 ```
 
-The `if` statement guards against applying the polyfill definition in ES6 browsers where it will already exist. If it's not already present, we define `Number.isNaN(..)`.
+`if`语句决定着在这个工具已经存在的ES6环境中不再进行填补。如果它还不存在，我们就定义`Number.isNaN(..)`。
 
-**Note:** The check we do here takes advantage of a quirk with `NaN` values, which is that they're the only value in the whole language that is not equal to itself. So the `NaN` value is the only one that would make `x !== x` be `true`.
+**注意：** 我们在这里做的检查利用了`NaN`值的怪异之处，即它们是整个语言中唯一与自己不相等的值。所以`NaN`是唯一可能使`x !== x`为`true`的值。
 
-Not all new features are fully polyfillable. Sometimes most of the behavior can be polyfilled, but there are still small deviations. You should be really, really careful in implementing a polyfill yourself, to make sure you are adhering to the specification as strictly as possible.
+ 并不是所有的新特性都可以完全填补。有时一种特性的大部分行为可以被填补，但是仍然存在一些小的偏差。在实现你自己的添补时你应当非常非常小心，来确保你尽可能严格地遵循语言规范。
 
-Or better yet, use an already vetted set of polyfills that you can trust, such as those provided by ES5-Shim (https://github.com/es-shims/es5-shim) and ES6-Shim (https://github.com/es-shims/es6-shim).
+或者更好地，使用一组你信任的，经受过检验的添补，比如那些由ES5-Shim（https://github.com/es-shims/es5-shim）和ES6-Shim（https://github.com/es-shims/es6-shim）提供的。
 
-### Transpiling
+### 转译
 
-There's no way to polyfill new syntax that has been added to the language. The new syntax would throw an error in the old JS engine as unrecognized/invalid.
+没有任何办法可以添补语言中新增加的语法。在老版本的JS引擎中新的语法将因为不可识别/不合法而抛出一个错误。
 
-So the better option is to use a tool that converts your newer code into older code equivalents. This process is commonly called "transpiling," a term for transforming + compiling.
+所以更好的选择是使用一个工具将你的新版本代码转换为等价的老版本代码。这个处理通常被称为“转译（transpiling）”，表示转换 + 编译。
 
-Essentially, your source code is authored in the new syntax form, but what you deploy to the browser is the transpiled code in old syntax form. You typically insert the transpiler into your build process, similar to your code linter or your minifier.
+实质上，你的源代码是使用新的语法形式编写的，但是你向浏览器部署的是转译过的旧语法形式。你一般会将转译器插入到你的构建过程中，与你的代码linter和代码压缩器类似。
 
-You might wonder why you'd go to the trouble to write new syntax only to have it transpiled away to older code -- why not just write the older code directly?
+你可能想知道为什么要麻烦地使用新语法编写程序又将它转译为老版本代码 —— 为什么不直接编写老版本代码呢？
 
-There are several important reasons you should care about transpiling:
+关于转译你应当注意几个重要的原因：
 
-* The new syntax added to the language is designed to make your code more readable and maintainable. The older equivalents are often much more convoluted. You should prefer writing newer and cleaner syntax, not only for yourself but for all other members of the development team.
-* If you transpile only for older browsers, but serve the new syntax to the newest browsers, you get to take advantage of browser performance optimizations with the new syntax. This also lets browser makers have more real-world code to test their implementations and optimizations on.
-* Using the new syntax earlier allows it to be tested more robustly in the real world, which provides earlier feedback to the JavaScript committee (TC39). If issues are found early enough, they can be changed/fixed before those language design mistakes become permanent.
+* 在语言中新加入的语法是为了使你的代码更具可读性和维护性而设计的。老版本的等价物经常会绕多得多的圈子。你应当首选编写新的和干净的语法，不仅为你自己，也为了开发团队的其他的成员。
+* 如果你仅为老版本浏览器转译，而给最新的浏览器提供新语法，那么你就可以利用浏览器对新语法进行的性能优化。这也让浏览器制造商有更多真实世界的代码来测试它们的实现和优化方法。
+* 提早使用新语法可以允许它在真实世界中被测试得更加健壮，这给JavaScript协会（TC39）提供了更早的反馈。如果问题被发现的足够早，他们就可以在那些语言设计错误变得无法挽回之前改变/修改它。
 
-Here's a quick example of transpiling. ES6 adds a feature called "default parameter values." It looks like this:
+这是一个转译的简单例子。ES6增加了一个称为“默认参数值”的新特性。它看起来像是这样：
 
 ```js
 function foo(a = 2) {
@@ -907,7 +903,7 @@ foo();		// 2
 foo( 42 );	// 42
 ```
 
-Simple, right? Helpful, too! But it's new syntax that's invalid in pre-ES6 engines. So what will a transpiler do with that code to make it run in older environments?
+简单，对吧？也很有用！但是这种新语法在前ES6引擎中是不合法的。那么转译器将会对这段代码做什么才能使它在老版本环境中运行呢？
 
 ```js
 function foo() {
@@ -916,47 +912,47 @@ function foo() {
 }
 ```
 
-As you can see, it checks to see if the `arguments[0]` value is `void 0` (aka `undefined`), and if so provides the `2` default value; otherwise, it assigns whatever was passed.
+如你所见，它检查`arguments[0]`值是否是`void 0`（也就是`undefined`），而且如果是，就提供默认值`2`；否则，它就赋值被传递的任何东西。
 
-In addition to being able to now use the nicer syntax even in older browsers, looking at the transpiled code actually explains the intended behavior more clearly.
+除了可以现在就在老版本浏览器中使用更好的语法以外，观察转译后的代码实际上更清晰地解释了意图中的行为。
 
-You may not have realized just from looking at the ES6 version that `undefined` is the only value that can't get explicitly passed in for a default-value parameter, but the transpiled code makes that much more clear.
+仅从ES6版本的代码看来，你可能还不理解`undefined`是唯一不能作为参数默认值的明确传递的值，但是转译后的代码使这一点清楚的多。
 
-The last important detail to emphasize about transpilers is that they should now be thought of as a standard part of the JS development ecosystem and process. JS is going to continue to evolve, much more quickly than before, so every few months new syntax and new features will be added.
+关于转译要强调的最后一个细节是，现在它们应当被认为是JS开发的生态系统和过程中的标准部分。JS将继续以比以前快得多的速度进化，所以每几个月就会有新语法和新特性被加入进来。
 
-If you use a transpiler by default, you'll always be able to make that switch to newer syntax whenever you find it useful, rather than always waiting for years for today's browsers to phase out.
+如果你默认地使用一个转译器，那么你将总是可以在你发现新语法有用时，立即开始使用它，而不必为了让今天的浏览器被淘汰而等上好几年。
 
-There are quite a few great transpilers for you to choose from. Here are some good options at the time of this writing:
+有好几个了不起的转译器供你选择。这是一些在本书写作时存在的好选择：
 
-* Babel (https://babeljs.io) (formerly 6to5): Transpiles ES6+ into ES5
-* Traceur (https://github.com/google/traceur-compiler): Transpiles ES6, ES7, and beyond into ES5
+* Babel (https://babeljs.io) (formerly 6to5): 将 ES6+ 转译为 ES5
+* Traceur (https://github.com/google/traceur-compiler): 将 ES6，ES7，和以后特性转译为 ES5
 
-## Non-JavaScript
+## 非JavaScript
 
-So far, the only things we've covered are in the JS language itself. The reality is that most JS is written to run in and interact with environments like browsers. A good chunk of the stuff that you write in your code is, strictly speaking, not directly controlled by JavaScript. That probably sounds a little strange.
+至此，我们讨论过的所有东西都限于JS语言本身。现实是大多数JS程序都是在浏览器这样的环境中运行并与之互动的。你在你的代码中编写的很大一部分东西，严格地说，不是直接由JavaScript控制的。这听起来可能有点奇怪。
 
-The most common non-JavaScript JavaScript you'll encounter is the DOM API. For example:
+你将会遇到的最常见的非JavaScript程序是DOM API。例如：
 
 ```js
 var el = document.getElementById( "foo" );
 ```
 
-The `document` variable exists as a global variable when your code is running in a browser. It's not provided by the JS engine, nor is it particularly controlled by the JavaScript specification. It takes the form of something that looks an awful lot like a normal JS `object`, but it's not really exactly that. It's a special `object,` often called a "host object."
+当你的代码运行在一个浏览器中时，变量`document`作为一个全局变量存在。它不是由JS引擎提供的，也不为JavaScript语言规范所控制。它采取了某种与普通JS`object`极其相似的形式，但它不是真正的`object`。它是一种特殊的`object`，经常被称为“宿主对象”。
 
-Moreover, the `getElementById(..)` method on `document` looks like a normal JS function, but it's just a thinly exposed interface to a built-in method provided by the DOM from your browser. In some (newer-generation) browsers, this layer may also be in JS, but traditionally the DOM and its behavior is implemented in something more like C/C++.
+另外，`document`上的`getElementById(..)`方法看起来像一个普通的JS函数，但它只是一个微微暴露出来的接口，指向由浏览器DOM提供的内建方法。在一些（新一代的）浏览器中，这一层可能也是由JS实现的，但是传统的DOM和它的行为是由像C/C++这样的语言实现的。
 
-Another example is with input/output (I/O).
+另一个例子是输入/输出（I/O）。
 
-Everyone's favorite `alert(..)` pops up a message box in the user's browser window. `alert(..)` is provided to your JS program by the browser, not by the JS engine itself. The call you make sends the message to the browser internals and it handles drawing and displaying the message box.
+大家最喜爱的`alert(..)`在用户的浏览器窗口中弹出一个消息框。`alert(..)`是由浏览器提供给你的JS程序的，而不是JS引擎本身。你进行的调用将消息发送给浏览器内部，它来处理消息框的绘制与显示。
 
-The same goes with `console.log(..)`; your browser provides such mechanisms and hooks them up to the developer tools.
+`console.log()`也一样；你的浏览器提供这样的机制并将它们挂在开发者工具中。
 
-This book, and this whole series, focuses on JavaScript the language. That's why you don't see any substantial coverage of these non-JavaScript JavaScript mechanisms. Nevertheless, you need to be aware of them, as they'll be in every JS program you write!
+这本书，和整个这个系列，聚焦于JavaScript这种语言。这就是为什么你看不到任何涵盖这些非JavaScript机制的重要内容。不管怎样，你需要小心它们，因为它们将在你写的每一个JS程序中存在！
 
-## Review
+## 复习
 
-The first step to learning JavaScript's flavor of programming is to get a basic understanding of its core mechanisms like values, types, function closures, `this`, and prototypes.
+学习JavaScript风格编程的第一步是对它的核心机制有一个基本的了解，比如值，类型，函数闭包，`this`，和原型。
 
-Of course, each of these topics deserves much greater coverage than you've seen here, but that's why they have chapters and books dedicated to them throughout the rest of this series. After you feel pretty comfortable with the concepts and code samples in this chapter, the rest of the series awaits you to really dig in and get to know the language deeply.
+当然，这些话题中的每一个都会衍生出比你在这里见到的多得多的内容，这也是为什么它们在这个系列剩下的部分中拥有自己的章节和书目。在你对本章中的概念和代码示例感到相当适应之后，这个系列的其他部分正等着你真正地深入挖掘和了解这门语言。
 
-The final chapter of this book will briefly summarize each of the other titles in the series and the other concepts they cover besides what we've already explored.
+这本书的最后一章将会对这个系列的每一卷的内容，以及它们所涵盖的我们在这里还没有探索过的概念，进行简单地总结。

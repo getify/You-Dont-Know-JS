@@ -1,20 +1,20 @@
-# You Don't Know JS: Up & Going
-# Foreword
+# 你不懂JS：入门与进阶
+# 序
 
-What was the last new thing you learned?
+你学的最后一个新东西是什么？
 
-Perhaps it was a foreign language, like Italian or German. Or maybe it was a graphics editor, like Photoshop. Or a cooking technique or woodworking or an exercise routine. I want you to remember that feeling when you finally got it: the lightbulb moment. When things went from blurry to crystal clear, as you mastered the table saw or understood the difference between masculine and feminine nouns in French. How did it feel? Pretty amazing, right?
+也许是一门外语，比如意大利语或德语。或者可能是一种图像编辑器，比如 Photoshop。或者是一种烹饪技术，木工活，日常锻炼。我想让你回忆一下你最终学会它时的感觉：醍醐灌顶的时刻。当事情从模糊不清变得豁然开朗，正如你掌握了如何使用台锯，或者理解了法语中雄性名词和雌性名词的区别。那种感觉怎么样？非常美妙，对吧？
 
-Now I want you to travel back a little bit further in your memory to right before you learned your new skill. How did *that* feel? Probably slightly intimidating and maybe a little bit frustrating, right? At one point, we all did not know the things that we know now and that’s totally OK; we all start somewhere. Learning new material is an exciting adventure, especially if you are looking to learn the subject efficiently.
+现在我想让你再多向前回忆一些，找到你学会新技能之前的那一刻。*它* 感觉如何？可能有点儿吓人，也可能有点儿沮丧，是吧？在某一个时刻，我们都还不知道我们现在知道的事情，而这完全没问题；我们是从某处开始的。学习新的东西是一次激动人心的冒险，特被是当你想高效地学习它时。
 
-I teach a lot of beginner coding classes. The students who take my classes have often tried teaching themselves subjects like HTML or JavaScript by reading blog posts or copying and pasting code, but they haven’t been able to truly master the material that will allow them to code their desired outcome. And because they don’t truly grasp the ins and outs of certain coding topics, they can’t write powerful code or debug their own work, as they don’t really understand what is happening.
+我教授过许多面向初学者的编程课程。上我课的学生们经常试着通过阅读博客或者拷贝粘贴代码来自学HTML或JavaScript这样的东西，但是他们都没能真正掌握能够使他们编写出自己渴望的结果的技能。而且，因为他们没有真正把握关于编程的特定问题的内在和外在，他们不能编写强大的代码或调试自己的程序，因为他们没有真正地理解发生的事情。
 
-I always believe in teaching my classes the proper way, meaning I teach web standards, semantic markup, well-commented code, and other best practices. I cover the subject in a thorough manner to explain the hows and whys, without just tossing out code to copy and paste. When you strive to comprehend your code, you create better work and become better at what you do. The code isn’t just your *job* anymore, it’s your *craft*. This is why I love *Up & Going*. Kyle takes us on a deep dive through syntax and terminology to give a great introduction to JavaScript without cutting corners. This book doesn’t skim over the surface, but really allows us to genuinely understand the concepts we will be writing.
+我总是相信教授我的课程的正确方法，意味着我教授Web标准，语义标记，良好注释的代码，和其他的最佳实践。我使用一种彻底的方式讲解问题来阐明如何做与为何做，而非通过复制粘贴来倒腾代码。当你努力理解你的代码时，你就在创造更好的成果，并在编程上变得更加纯熟。代码不再仅仅是你的 *工作*，而是你的 *作品*。这就是为什么我喜爱 *入门与进阶*。Kyle通过深入讲解语法和术语给我们带来了一个对JavaScript的全面介绍。这本书不是浅尝辄止，而是让我们真正地理解我们将要编写的东西。
 
-Because it’s not enough to be able to duplicate jQuery snippets into your website, the same way it’s not enough to learn how to open, close, and save a document in Photoshop. Sure, once I learn a few basics about the program I could create and share a design I made. But without legitimately knowing the tools and what is behind them, how can I define a grid, or craft a legible type system, or optimize graphics for web use. The same goes for JavaScript. Without knowing how loops work, or how to define variables, or what scope is, we won’t be writing the best code we can. We don’t want to settle for anything less -- this is, after all, our craft.
+能够在你的网站中复制JQuery代码段是不够的，就像在Photoshop中仅仅学习如何打开，关闭和保存一个文档是不够的一样。确实，只要我学会了一些关于编程的基本我就可以制造并分享一些我的设计。但是没有合理地了解这些工具和它们背后的机制，我又如何定义一个网格，或者建造一个合理的类型系统，或者为Web优化图像呢？JavaScript也一样。不知道循环如何工作，或者如何定义变量，或者作用域是什么，我们将不能写出最好的代码。我们不想安于这种次优的状态 —— 这毕竟是我们的作品。
 
-The more you are exposed to JavaScript, the clearer it becomes. Words like closures, objects, and methods might seem out of reach to you now, but this book will help those terms come into clarity. I want you to keep those two feelings of before and after you learn something in mind as you begin this book. It might seem daunting, but you’ve picked up this book because you are starting an awesome journey to hone your knowledge. *Up & Going* is the start of our path to understanding programming. Enjoy the lightbulb moments!
+你对JavaScript探索得越多，它就变得越清晰。闭包，对象，和方法这样的词现在可能看起来与你还有些距离，但是这本书将会帮你搞清楚这些术语。我希望你在开始阅读这本书时保持学会东西之前与之后的那两种感觉。它看起来可能有些令人望而却步，但是你已经拿起了这本书，你开启了一个了不起的旅程来磨练自己的知识。*入门与进阶* 是我们理解编程之路的开端。享受醍醐灌顶的时刻吧！
 
 Jenn Lukas<br>
 [jennlukas.com](http://jennlukas.com/), [@jennlukas](https://twitter.com/jennlukas)<br>
-Front-end consultant
+前端顾问

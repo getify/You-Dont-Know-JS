@@ -1,19 +1,19 @@
-# You Don't Know JS: ES6 & Beyond
-# Chapter 7: Meta Programming
+# 你不懂JS：ES6与未来
+# 第七章：元编程
 
-Meta programming is programming where the operation targets the behavior of the program itself. In other words, it's programming the programming of your program. Yeah, a mouthful, huh?
+元编程是针对程序本身的行为进行操作的编程。换句话说，它是为你程序的编程而进行的编程。是的，很拗口，对吧？
 
-For example, if you probe the relationship between one object `a` and another `b` -- are they `[[Prototype]]` linked? -- using `a.isPrototypeOf(b)`, this is commonly referred to as introspection, a form of meta programming. Macros (which don't exist in JS, yet) --  where the code modifies itself at compile time -- are another obvious example of meta programming. Enumerating the keys of an object with a `for..in` loop, or checking if an object is an *instance of* a "class constructor", are other common meta programming tasks.
+例如，如果你为了调查对象`a`和另一个对象`b`之间的关系 —— 它们是被`[[Prototype]]`链接的吗？ —— 而使用`a.isPrototypeOf(b)`，这通常称为自省，就是一种形式的元编程。宏（JS中还没有） —— 代码在编译时修改自己 —— 是元编程的另一个明显的例子。使用`for..in`循环枚举一个对象的键，或者检查一个对象是否是一个“类构造器”的 *实例*，是另一些常见的元编程任务。
 
-Meta programming focuses on one or more of the following: code inspecting itself, code modifying itself, or code modifying default language behavior so other code is affected.
+元编程关注以下的一点或几点：代码检视自己，代码修改自己，或者代码修改默认的语言行为而使其他代码受影响。
 
-The goal of meta programming is to leverage the language's own intrinsic capabilities to make the rest of your code more descriptive, expressive, and/or flexible. Because of the *meta* nature of meta programming, it's somewhat difficult to put a more precise definition on it than that. The best way to understand meta programming is to see it through examples.
+元编程的目标是利用语言自身的内在能力使你其他部分的代码更具描述性，表现力，和/或灵活性。由于元编程的 *元* 的性质，要给它一个更精确的定义有些困难。理解元编程的最佳方法是通过代码来观察它。
 
-ES6 adds several new forms/features for meta programming on top of what JS already had.
+ES6在JS已经拥有的东西上，增加了几种新的元编程形式/特性。
 
-## Function Names
+## 函数名
 
-There are cases where your code may want to introspect on itself and ask what the name of some function is. If you ask what a function's name is, the answer is surprisingly somewhat ambiguous. Consider:
+有一些情况，你的代码想要检视自己并询问某个函数的名称是什么。如果你询问一个函数的名称，答案会有些令人诧异地模糊。考虑如下代码：
 
 ```js
 function daz() {
@@ -34,25 +34,25 @@ var obj = {
 };
 ```
 
-In this previous snippet, "what is the name of `obj.foo()`" is slightly nuanced. Is it `"foo"`, `""`, or `undefined`? And what about `obj.bar()` -- is it named `"bar"` or `"baz"`? Is `obj.bam()` named `"bam"` or `"daz"`? What about `obj.zim()`?
+在这前一个代码段中，“`obj.foo()`的名字是什么？”有些微妙。是`"foo"`，`""`，还是`undefined`？那么`obj.bar()`呢 —— 是`"bar"`还是`"baz"`？`obj.bam()`称为`"bam"`还是`"daz"`？`obj.zim()`呢？
 
-Moreover, what about functions which are passed as callbacks, like:
+另外，作为回调被传递的函数呢？就像：
 
 ```js
 function foo(cb) {
-	// what is the name of `cb()` here?
+	// 这里的 `cb()` 的名字是什么？
 }
 
 foo( function(){
-	// I'm anonymous!
+	// 我是匿名的！
 } );
 ```
 
-There are quite a few ways that functions can be expressed in programs, and it's not always clear and unambiguous what the "name" of that function should be.
+在程序中函数可以被好几种方法所表达，而函数的“名字”应当是什么并不总是那么清晰和明确。
 
-More importantly, we need to distinguish whether the "name" of a function refers to its `name` property -- yes, functions have a property called `name` -- or whether it refers to the lexical binding name, such as `bar` in `function bar() { .. }`.
+更重要的是，我们需要区别函数的“名字”是指它的`name`属性 —— 是的，函数有一个叫做`name`的属性 —— 还是指它词法绑定的名称，比如在`function bar() { .. }`中的`bar`。
 
-The lexical binding name is what you use for things like recursion:
+词法绑定名称是你将在递归之类的东西中所使用的：
 
 ```js
 function foo(i) {
@@ -61,19 +61,19 @@ function foo(i) {
 }
 ```
 
-The `name` property is what you'd use for meta programming purposes, so that's what we'll focus on in this discussion.
+`name`属性是你为了元编程而使用的，所以它才是我们在这里的讨论中所关注的。
 
-The confusion comes because by default, the lexical name a function has (if any) is also set as its `name` property. Actually there was no official requirement for that behavior by the ES5 (and prior) specifications. The setting of the `name` property was nonstandard but still fairly reliable. As of ES6, it has been standardized.
+产生这种用困惑是因为，在默认情况下一个函数的词法名称（如果有的话）也会被设置为它的`name`属性。实际上，ES5（和以前的）语言规范中并没有官方要求这种行为。`name`属性的设置是一种非标准，但依然相当可靠的行为。在ES6中，它已经被标准化。
 
-**Tip:** If a function has a `name` value assigned, that's typically the name used in stack traces in developer tools.
+**提示：** 如果一个函数的`name`被赋值，它通常是在开发者工具的栈轨迹中使用的名称。
 
-### Inferences
+### 推断
 
-But what happens to the `name` property if a function has no lexical name?
+但如果函数没有词法名称，`name`属性会怎么样呢？
 
-As of ES6, there are now inference rules which can determine a sensible `name` property value to assign a function even if that function doesn't have a lexical name to use.
+现在在ES6中，有一个推断规则可以判定一个合理的`name`属性值来赋予一个函数，即使它没有词法名称可用。
 
-Consider:
+考虑如下代码：
 
 ```js
 var abc = function() {
@@ -83,9 +83,9 @@ var abc = function() {
 abc.name;				// "abc"
 ```
 
-Had we given the function a lexical name like `abc = function def() { .. }`, the `name` property would of course be `"def"`. But in the absence of the lexical name, intuitively the `"abc"` name seems appropriate.
+如果我们给了这个函数一个词法名称，比如`abc = function def() { .. }`，那么`name`属性将理所当然地是`"def"`。但是由于缺少词法名称，直观上名称`"abc"`看起来很合适。
 
-Here are other forms that will infer a name (or not) in ES6:
+这里是在ES6中将会（或不会）进行名称推断的其他形式：
 
 ```js
 (function(){ .. });					// name:
@@ -123,17 +123,17 @@ var GeneratorFunction =
 var z = new GeneratorFunction();	// name: anonymous
 ```
 
-The `name` property is not writable by default, but it is configurable, meaning you can use `Object.defineProperty(..)` to manually change it if so desired.
+`name`属性默认是不可写的，但它是可配置的，这意味着如果有需要，你可以使用`Object.defineProperty(..)`来手动改变它。
 
-## Meta Properties
+## 元属性
 
-In the "`new.target`" section of Chapter 3, we introduced a concept new to JS in ES6: the meta property. As the name suggests, meta properties are intended to provide special meta information in the form of a property access that would otherwise not have been possible.
+在第三章的“`new.target`”一节中，我们引入了一个ES6的新概念：元属性。正如这个名称所暗示的，元属性意在以一种属性访问的形式提供特殊的元信息，而这在以前是不可能的。
 
-In the case of `new.target`, the keyword `new` serves as the context for a property access. Clearly `new` is itself not an object, which makes this capability special. However, when `new.target` is used inside a constructor call (a function/method invoked with `new`), `new` becomes a virtual context, so that `new.target` can refer to the target constructor that `new` invoked.
+在`new.target`的情况下，关键字`new`作为一个属性访问的上下文环境。显然`new`本身不是一个对象，这使得这种能力很特殊。然而，当`new.target`被用于一个构造器调用（一个使用`new`调用的函数/方法）内部时，`new`变成了一个虚拟上下文环境，如此`new.target`就可以指代这个`new`调用的目标构造器。
 
-This is a clear example of a meta programming operation, as the intent is to determine from inside a constructor call what the original `new` target was, generally for the purposes of introspection (examining typing/structure) or static property access.
+这是一个元编程操作的典型例子，因为它的意图是从一个构造器调用内部判定原来的`new`的目标是什么，这一般是为了自省（检查类型/结构）或者静态属性访问。
 
-For example, you may want to have different behavior in a constructor depending on if it's directly invoked or invoked via a child class:
+举例来说，你可能想根据一个构造器是被直接调用，还是通过一个子类进行调用，来使它有不同的行为：
 
 ```js
 class Parent {
@@ -156,27 +156,27 @@ var b = new Child();
 // A child instantiated
 ```
 
-There's a slight nuance here, which is that the `constructor()` inside the `Parent` class definition is actually given the lexical name of the class (`Parent`), even though the syntax implies that the class is a separate entity from the constructor.
+这里有一个微妙的地方，在`Parent`类定义内部的`constructor()`实际上被给予了这个类的词法名称（`Parent`），即便语法暗示着这个类是一个与构造器分离的不同实体。
 
-**Warning:** As with all meta programming techniques, be careful of creating code that's too clever for your future self or others maintaining your code to understand. Use these tricks with caution.
+**警告：** 与所有的元编程技术一样，要小心不要创建太过聪明的代码，而使未来的你或其他维护你代码的人很难理解。小心使用这些技巧。
 
-## Well Known Symbols
+## 通用 Symbol
 
-In the "Symbols" section of Chapter 2, we covered the new ES6 primitive type `symbol`. In addition to symbols you can define in your own program, JS predefines a number of built-in symbols, referred to as *Well Known Symbols* (WKS).
+在第二章中的“Symbol”一节中，我们讲解了新的ES6基本类型`symbol`。除了你可以在你自己的程序中定义的symbol以外，JS预定义了几种内建symbol，被称为 *通用（Well Known） Symbols*（WKS）。
 
-These symbol values are defined primarily to expose special meta properties that are being exposed to your JS programs to give you more control over JS's behavior.
+定义这些symbol值主要是为了向你的JS程序暴露特殊的元属性来给你更多JS行为的控制权。
 
-We'll briefly introduce each and discuss their purpose.
+我们将简要介绍每一个symbol并讨论它们的目的。
 
 ### `Symbol.iterator`
 
-In Chapters 2 and 3, we introduced and used the `@@iterator` symbol, automatically used by `...` spreads and `for..of` loops. We also saw `@@iterator` as defined on the new ES6 collections as defined in Chapter 5.
+在第二和第三章中，我们介绍并使用了`@@iterator`symbol，它被自动地用于`...`扩散和`for..of`循环。我们还在第五章中看到了在新的ES6集合中定义的`@@iterator`。
 
-`Symbol.iterator` represents the special location (property) on any object where the language mechanisms automatically look to find a method that will construct an iterator instance for consuming that object's values. Many objects come with a default one defined.
+`Symbol.iterator`表示在任意一个对象上的特殊位置（属性），语言机制自动地在这里寻找一个方法，这个方法将构建一个用于消费对象值的迭代器对象。许多对象都带有一个默认的`Symbol.iterator`。
 
-However, we can define our own iterator logic for any object value by setting the `Symbol.iterator` property, even if that's overriding the default iterator. The meta programming aspect is that we are defining behavior which other parts of JS (namely, operators and looping constructs) use when processing an object value we define.
+然而，我们可以通过设置`Symbol.iterator`属性来为任意对象定义我们自己的迭代器逻辑，即便它是覆盖默认迭代器的。这里的元编程观点是，我们在定义JS的其他部分（明确地说，是操作符和循环结构）在处理我们所定义的对象值时所使用的行为。
 
-Consider:
+考虑如下代码：
 
 ```js
 var arr = [4,5,6,7,8,9];
@@ -186,8 +186,7 @@ for (var v of arr) {
 }
 // 4 5 6 7 8 9
 
-// define iterator that only produces values
-// from odd indexes
+// 定义一个仅在奇数索引处产生值的迭代器
 arr[Symbol.iterator] = function*() {
 	var idx = 1;
 	do {
@@ -201,11 +200,11 @@ for (var v of arr) {
 // 5 7 9
 ```
 
-### `Symbol.toStringTag` and `Symbol.hasInstance`
+### `Symbol.toStringTag` 和 `Symbol.hasInstance`
 
-One of the most common meta programming tasks is to introspect on a value to find out what *kind* it is, usually to decide what operations are appropriate to perform on it. With objects, the two most common inspection techniques are `toString()` and `instanceof`.
+最常见的元编程任务之一，就是在一个值上进行自省来找出它是什么 *种类* 的，者经常用来决定它们上面适于实施什么操作。对于对象，最常见的两个自省技术是`toString()`和`instanceof`。
 
-Consider:
+考虑如下代码：
 
 ```js
 function Foo() {}
@@ -216,7 +215,7 @@ a.toString();				// [object Object]
 a instanceof Foo;			// true
 ```
 
-As of ES6, you can control the behavior of these operations:
+在ES6中，你可以控制这些操作的行为：
 
 ```js
 function Foo(greeting) {
@@ -243,23 +242,23 @@ a instanceof Foo;			// true
 b instanceof Foo;			// false
 ```
 
-The `@@toStringTag` symbol on the prototype (or instance itself) specifies a string value to use in the `[object ___]` stringification.
+在原型（或实例本身）上的`@@toStringTag`symbol指定一个用于`[object ___]`字符串化的字符串值。
 
-The `@@hasInstance` symbol is a method on the constructor function which receives the instance object value and lets you decide by returning `true` or `false` if the value should be considered an instance or not.
+`@@hasInstance`symbol是一个在构造器函数上的方法，它接收一个实例对象值并让你通过放回`true`或`false`来决定这个值是否应当被认为是一个实例。
 
-**Note:** To set `@@hasInstance` on a function, you must use `Object.defineProperty(..)`, as the default one on `Function.prototype` is `writable: false`. See the *this & Object Prototypes* title of this series for more information.
+**注意：** 要在一个函数上设置`@@hasInstance`，你必须使用`Object.defineProperty(..)`，因为在`Function.prototype`上默认的那一个是`writable: false`。更多信息参见本系列的 *this与对象原型*。
 
 ### `Symbol.species`
 
-In "Classes" in Chapter 3, we introduced the `@@species` symbol, which controls which constructor is used by built-in methods of a class that needs to spawn new instances.
+在第三章的“类”中，我们介绍了`@@species`symbol，它控制一个类内建的生成新实例的方法使用哪一个构造器。
 
-The most common example is when subclassing `Array` and wanting to define which constructor (`Array(..)` or your subclass) inherited methods like `slice(..)` should use. By default, `slice(..)` called on an instance of a subclass of `Array` would produce a new instance of that subclass, which is frankly what you'll likely often want.
+最常见的例子是，在子类化`Array`并且想要定义`slice(..)`之类被继承的方法应当使用哪一个构造器时。默认地，在一个`Array`的子类实例上调用的`slice(..)`将产生这个子类的实例，坦白地说这正是你经常希望的。
 
-However, you can meta program by overriding a class's default `@@species` definition:
+但是，你可以通过覆盖一个类的默认`@@species`定义来进行元编程：
 
 ```js
 class Cool {
-	// defer `@@species` to derived constructor
+	// 将 `@@species` 倒推至被衍生的构造器
 	static get [Symbol.species]() { return this; }
 
 	again() {
@@ -270,7 +269,7 @@ class Cool {
 class Fun extends Cool {}
 
 class Awesome extends Cool {
-	// force `@@species` to be parent constructor
+	// 将 `@@species` 强制为父类构造器
 	static get [Symbol.species]() { return Cool; }
 }
 
@@ -284,17 +283,17 @@ d instanceof Awesome;		// false
 d instanceof Cool;			// true
 ```
 
-The `Symbol.species` setting defaults on the built-in native constructors to the `return this` behavior as illustrated in the previous snippet in the `Cool` definition. It has no default on user classes, but as shown that behavior is easy to emulate.
+就像在前面的代码段中的`Cool`的定义展示的那样，在内建的原生构造器上的`Symbol.species`设定默认为`return this`。它在用户自己的类上没有默认值，但也像展示的那样，这种行为很容易模拟。
 
-If you need to define methods that generate new instances, use the meta programming of the `new this.constructor[Symbol.species](..)` pattern instead of the hard-wiring of `new this.constructor(..)` or `new XYZ(..)`. Derived classes will then be able to customize `Symbol.species` to control which constructor vends those instances.
+如果你需要定义生成新实例的方法，使用`new this.constructor[Symbol.species](..)`的元编程模式，而不要用手写的`new this.constructor(..)`或者`new XYZ(..)`。如此衍生的类就能够自定义`Symbol.species`来控制哪一个构造器来制造这些实例。
 
 ### `Symbol.toPrimitive`
 
-In the *Types & Grammar* title of this series, we discussed the `ToPrimitive` abstract coercion operation, which is used when an object must be coerced to a primitive value for some operation (such as `==` comparison or `+` addition). Prior to ES6, there was no way to control this behavior.
+在本系列的 *类型与文法* 一书中，我们讨论了`ToPrimitive`抽象强制转换操作，它在对象为了某些操作（例如`==`比较或者`+`加法）而必须被强制转换为一个基本类型值时被使用。在ES6以前，没有办法控制这个行为。
 
-As of ES6, the `@@toPrimitive` symbol as a property on any object value can customize that `ToPrimitive` coercion by specifying a method.
+在ES6中，在任意对象值上作为属性的`@@toPrimitive`symbol都可以通过指定一个方法来自定义这个`ToPrimitive`强制转换。
 
-Consider:
+考虑如下代码：
 
 ```js
 var arr = [1,2,3,4,5];
@@ -303,7 +302,7 @@ arr + 10;				// 1,2,3,4,510
 
 arr[Symbol.toPrimitive] = function(hint) {
 	if (hint == "default" || hint == "number") {
-		// sum all numbers
+		// 所有数字的和
 		return this.reduce( function(acc,curr){
 			return acc + curr;
 		}, 0 );
@@ -313,38 +312,41 @@ arr[Symbol.toPrimitive] = function(hint) {
 arr + 10;				// 25
 ```
 
-The `Symbol.toPrimitive` method will be provided with a *hint* of `"string"`, `"number"`, or `"default"` (which should be interpreted as `"number"`), depending on what type the operation invoking `ToPrimitive` is expecting. In the previous snippet, the additive `+` operation has no hint (`"default"` is passed). A multiplicative `*` operation would hint `"number"` and a `String(arr)` would hint `"string"`.
+`Symbol.toPrimitive`方法将根据调用`ToPrimitive`的操作期望何种类型，而被提供一个值为`"string"`，`"number"`，或`"default"`（这应当被解释为`"number"`）的 *提示（hint）*。在前一个代码段中，`+`加法操作没有提示（`"default"`将被传递）。一个`*`乘法操作将提示`"number"`，而一个`String(arr)`将提示`"string"`。
 
-**Warning:** The `==` operator will invoke the `ToPrimitive` operation with no hint -- the `@@toPrimitive` method, if any is called with hint `"default"` -- on an object if the other value being compared is not an object. However, if both comparison values are objects, the behavior of `==` is identical to `===`, which is that the references themselves are directly compared. In this case, `@@toPrimitive` is not invoked at all. See the *Types & Grammar* title of this series for more information about coercion and the abstract operations.
+**警告：** `==`操作符将在一个对象上不使用任何提来示调用`ToPrimitive`操作 —— 如果存在`@@toPrimitive`方法的话，将使用`"default"`被调用 —— 如果另一个被比较的值不是一个对象。但是，如果两个被比较的值都是对象，`==`的行为与`===`是完全相同的，也就是引用本身将被直接比较。这种情况下，`@@toPrimitive`根本不会被调用。关于强制转换和抽象操作的更多信息，参见本系列的 *类型与文法*。
 
-### Regular Expression Symbols
+### 正则表达式 Symbols
 
-There are four well known symbols that can be overridden for regular expression objects, which control how those regular expressions are used by the four corresponding `String.prototype` functions of the same name:
+对于正则表达式对象，有四种通用 symbols 可以被覆盖，它们控制着这些正则表达式在四个相应的同名`String.prototype`函数中如何被使用：
 
-* `@@match`: The `Symbol.match` value of a regular expression is the method used to match all or part of a string value with the given regular expression. It's used by `String.prototype.match(..)` if you pass it a regular expression for the pattern matching.
+* `@@match`：一个正则表达式的`Symbol.match`值是使用被给定的正则表达式来匹配一个字符串值的全部或部分的方法。如果你为`String.prototype.match(..)`传递一个正则表达式做范例匹配，它就会被使用。
 
-   The default algorithm for matching is laid out in section 21.2.5.6 of the ES6 specification (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@match). You could override this default algorithm and provide extra regex features, such as look-behind assertions.
+	 匹配的默认算法写在ES6语言规范的第21.2.5.6部分(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@match)。你可以覆盖这个默认算法并提供额外的正则表达式特性，比如后顾断言。
 
-   `Symbol.match` is also used by the `isRegExp` abstract operation (see the note in "String Inspection Functions" in Chapter 6) to determine if an object is intended to be used as a regular expression. To force this check to fail for an object so it's not treated as a regular expression, set the `Symbol.match` value to `false` (or something falsy).
-* `@@replace`: The `Symbol.replace` value of a regular expression is the method used by `String.prototype.replace(..)` to replace within a string one or all occurrences of character sequences that match the given regular expression pattern.
+	 `Symbol.match`还被用于`isRegExp`抽象操作（参见第六章的“字符串检测函数”中的注意部分）来判定一个对象是否意在被用作正则表达式。为了使一个这样的对象不被看作是正则表达式，可以将`Symbol.match`的值设置为`false`（或falsy的东西）强制这个检查失败。
 
-   The default algorithm for replacing is laid out in section 21.2.5.8 of the ES6 specification (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@replace).
+* `@@replace`：一个正则表达式的`Symbol.replace`值是被`String.prototype.replace(..)`使用的方法，来替换一个字符串里面出现的一个或所有字符序列，这些字符序列匹配给出的正则表达式范例。
 
-   One cool use for overriding the default algorithm is to provide additional `replacer` argument options, such as supporting `"abaca".replace(/a/g,[1,2,3])` producing `"1b2c3"` by consuming the iterable for successive replacement values.
-* `@@search`: The `Symbol.search` value of a regular expression is the method used by `String.prototype.search(..)` to search for a sub-string within another string as matched by the given regular expression.
+	 替换的默认算法写在ES6语言规范的第21.2.5.8部分(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@replace)。
 
-   The default algorithm for searching is laid out in section 21.2.5.9 of the ES6 specification (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@search).
-* `@@split`: The `Symbol.split` value of a regular expression is the method used by `String.prototype.split(..)` to split a string into sub-strings at the location(s) of the delimiter as matched by the given regular expression.
+	 一个覆盖默认算法的很酷的用法是提供额外的`replacer`可选参数值，比如通过用连续的替换值消费可迭代对象来支持`"abaca".replace(/a/g,[1,2,3])`产生`"1b2c3"`。
 
-   The default algorithm for splitting is laid out in section 21.2.5.11 of the ES6 specification (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@split).
+* `@@search`：一个正则表达式的`Symbol.search`值是被`String.prototype.search(..)`使用的方法，来在一个字符串中检索一个匹配给定正则表达式的子字符串。
 
-Overriding the built-in regular expression algorithms is not for the faint of heart! JS ships with a highly optimized regular expression engine, so your own user code will likely be a lot slower. This kind of meta programming is neat and powerful, but it should only be used in cases where it's really necessary or beneficial.
+	 检索的默认算法写在ES6语言规范的第21.2.5.9部分(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@search)。
+
+* `@@split`：一个正则表达式的`Symbol.split`值是被`String.prototype.split(..)`使用的方法，来将一个字符串在分隔符匹配给定正则表达式的位置分割为子字符串。
+
+	 分割的默认算法写在ES6语言规范的第21.2.5.11部分(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@split)。
+
+覆盖内建的正则表达式算法不是为心脏脆弱的人准备的！JS带有高度优化的正则表达式引擎，所以你自己的用户代码将很可能慢得多。这种类型的元编程很精巧和强大，但是应当仅用于确实必要或有好处的情况下。
 
 ### `Symbol.isConcatSpreadable`
 
-The `@@isConcatSpreadable` symbol can be defined as a boolean property (`Symbol.isConcatSpreadable`) on any object (like an array or other iterable) to indicate if it should be *spread out* if passed to an array `concat(..)`.
+`@@isConcatSpreadable`symbol可以作为一个布尔属性（`Symbol.isConcatSpreadable`）在任意对象上（比如一个数组或其他的可迭代对象）定义，来指示当它被传递给一个数组`concat(..)`时是否应当被 *扩散*。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a = [1,2,3],
@@ -357,9 +359,9 @@ b[Symbol.isConcatSpreadable] = false;
 
 ### `Symbol.unscopables`
 
-The `@@unscopables` symbol can be defined as an object property (`Symbol.unscopables`) on any object to indicate which properties can and cannot be exposed as lexical variables in a `with` statement.
+`@@unscopables`symbol可以作为一个对象属性（`Symbol.unscopables`）在任意对象上定义，来指示在一个`with`语句中哪一个属性可以和不可以作为此法变量被暴露。
 
-Consider:
+考虑如下代码：
 
 ```js
 var o = { a:1, b:2, c:3 },
@@ -376,23 +378,23 @@ with (o) {
 }
 ```
 
-A `true` in the `@@unscopables` object indicates the property should be *unscopable*, and thus filtered out from the lexical scope variables. `false` means it's OK to be included in the lexical scope variables.
+一个在`@@unscopables`对象中的`true`指示这个属性应当是 *非作用域（unscopable）* 的，因此会从此法作用域变量中被过滤掉。`false`意味着它可以被包含在此法作用域变量中。
 
-**Warning:** The `with` statement is disallowed entirely in `strict` mode, and as such should be considered deprecated from the language. Don't use it. See the *Scope & Closures* title of this series for more information. Because `with` should be avoided, the `@@unscopables` symbol is also moot.
+**警告：** `with`语句在`strict`模式下是完全禁用的，而且因此应当被认为是在语言中被废弃的。不要使用它。更多信息参见本系列的 *作用域与闭包*。因为应当避免`with`，所以这个`@@unscopables`symbol也是无意义的。
 
-## Proxies
+## 代理
 
-One of the most obviously meta programming features added to ES6 is the `Proxy` feature.
+在ES6中被加入的最明显的元编程特性之一就是`proxy`特性。
 
-A proxy is a special kind of object you create that "wraps" -- or sits in front of -- another normal object. You can register special handlers (aka *traps*) on the proxy object which are called when various operations are performed against the proxy. These handlers have the opportunity to perform extra logic in addition to *forwarding* the operations on to the original target/wrapped object.
+一个代理是一种由你创建的特殊的对象，它“包”着另一个普通的对象 —— 或者说挡在这个普通对象的前面。你可以在代理对象上注册特殊的处理器（也叫 *机关（traps）*），当对这个代理实施各种操作时被调用。这些处理器除了将操作 *传送* 到原本的目标/被包装的对象上之外，还有机会运行额外的逻辑。
 
-One example of the kind of *trap* handler you can define on a proxy is `get` that intercepts the `[[Get]]` operation -- performed when you try to access a property on an object. Consider:
+一个这样的 *机关* 处理器的例子是，你可以在一个代理上定义一个拦截`[[Get]]`操作的`get` —— 它在当你试图访问一个对象上的属性时运行。考虑如下代码：
 
 ```js
 var obj = { a: 1 },
 	handlers = {
 		get(target,key,context) {
-			// note: target === obj,
+			// 注意：target === obj,
 			// context === pobj
 			console.log( "accessing: ", key );
 			return Reflect.get(
@@ -410,32 +412,32 @@ pobj.a;
 // 1
 ```
 
-We declare a `get(..)` handler as a named method on the *handler* object (second argument to `Proxy(..)`), which receives a reference to the *target* object (`obj`), the *key* property name (`"a"`), and the `self`/receiver/proxy (`pobj`).
+我们将一个`get(..)`处理器作为 *处理器* 对象的命名方法声明（`Proxy(..)`的第二个参数值），它接收一个指向 *目标* 对象的引用（`obj`），属性的 *键* 名称（`"a"`），和`self`/接受者/代理本身（`pobj`）。
 
-After the `console.log(..)` tracing statement, we "forward" the operation onto `obj` via `Reflect.get(..)`. We will cover the `Reflect` API in the next section, but note that each available proxy trap has a corresponding `Reflect` function of the same name.
+在追踪语句`console.log(..)`之后，我们通过`Reflect.get(..)`将操作“转送”到`obj`。我们将在下一节详细讲解`Reflect`API，但要注意的是每个可用的代理机关都有一个相应的同名`Reflect`函数。
 
-These mappings are symmetric on purpose. The proxy handlers each intercept when a respective meta programming task is performed, and the `Reflect` utilities each perform the respective meta programming task on an object. Each proxy handler has a default definition that automatically calls the corresponding `Reflect` utility. You will almost certainly use both `Proxy` and `Reflect` in tandem.
+这些映射是故意对称的。每个代理处理器在各自的元编程任务实施时进行拦截，而每个`Reflect`工具将各自的元编程任务在一个对象上实施。每个代理处理器都有一个自动调用相应`Reflect`工具的默认定义。几乎可以肯定你将总是一前一后地使用`Proxy`和`Reflect`。
 
-Here's a list of handlers you can define on a proxy for a *target* object/function, and how/when they are triggered:
+这里的列表是你可以在一个代理上为一个 *目标* 对象/函数定义的处理器，以及它们如何/何时被触发：
 
-* `get(..)`: via `[[Get]]`, a property is accessed on the proxy (`Reflect.get(..)`, `.` property operator, or `[ .. ]` property operator)
-* `set(..)`: via `[[Set]]`, a property value is set on the proxy (`Reflect.set(..)`, the `=` assignment operator, or destructuring assignment if it targets an object property)
-* `deleteProperty(..)`: via `[[Delete]]`, a property is deleted from the proxy (`Reflect.deleteProperty(..)` or `delete`)
-* `apply(..)` (if *target* is a function): via `[[Call]]`, the proxy is invoked as a normal function/method (`Reflect.apply(..)`, `call(..)`, `apply(..)`, or the `(..)` call operator)
-* `construct(..)` (if *target* is a constructor function): via `[[Construct]]`, the proxy is invoked as a constructor function (`Reflect.construct(..)` or `new`)
-* `getOwnPropertyDescriptor(..)`: via `[[GetOwnProperty]]`, a property descriptor is retrieved from the proxy (`Object.getOwnPropertyDescriptor(..)` or `Reflect.getOwnPropertyDescriptor(..)`)
-* `defineProperty(..)`: via `[[DefineOwnProperty]]`, a property descriptor is set on the proxy (`Object.defineProperty(..)` or `Reflect.defineProperty(..)`)
-* `getPrototypeOf(..)`: via `[[GetPrototypeOf]]`, the `[[Prototype]]` of the proxy is retrieved (`Object.getPrototypeOf(..)`, `Reflect.getPrototypeOf(..)`, `__proto__`, `Object#isPrototypeOf(..)`, or `instanceof`)
-* `setPrototypeOf(..)`: via `[[SetPrototypeOf]]`, the `[[Prototype]]` of the proxy is set (`Object.setPrototypeOf(..)`, `Reflect.setPrototypeOf(..)`, or `__proto__`)
-* `preventExtensions(..)`: via `[[PreventExtensions]]`, the proxy is made non-extensible (`Object.preventExtensions(..)` or `Reflect.preventExtensions(..)`)
-* `isExtensible(..)`: via `[[IsExtensible]]`, the extensibility of the proxy is probed (`Object.isExtensible(..)` or `Reflect.isExtensible(..)`)
-* `ownKeys(..)`: via `[[OwnPropertyKeys]]`, the set of owned properties and/or owned symbol properties of the proxy is retrieved (`Object.keys(..)`, `Object.getOwnPropertyNames(..)`, `Object.getOwnSymbolProperties(..)`, `Reflect.ownKeys(..)`, or `JSON.stringify(..)`)
-* `enumerate(..)`: via `[[Enumerate]]`, an iterator is requested for the proxy's enumerable owned and "inherited" properties (`Reflect.enumerate(..)` or `for..in`)
-* `has(..)`: via `[[HasProperty]]`, the proxy is probed to see if it has an owned or "inherited" property (`Reflect.has(..)`, `Object#hasOwnProperty(..)`, or `"prop" in obj`)
+* `get(..)`：通过`[[Get]]`，在代理上访问一个属性（`Reflect.get(..)`，`.`属性操作符或`[ .. ]`属性操作符）
+* `set(..)`：通过`[[Set]]`，在代理对象上设置一个属性（`Reflect.set(..)`，`=`赋值操作符，或者解构赋值 —— 如果目标是一个对象属性的话)
+* `deleteProperty(..)`：通过`[[Delete]]`，在代理对象上删除一个属性 (`Reflect.deleteProperty(..)`或`delete`)
+* `apply(..)`（如果 *目标* 是一个函数）：通过`[[Call]]`，代理作为一个普通函数/方法被调用（`Reflect.apply(..)`，`call(..)`，`apply(..)`，或者`(..)`调用操作符）
+* `construct(..)`（如果 *目标* 是一个构造函数）：通过`[[Construct]]`代理作为一个构造器函数被调用（`Reflect.construct(..)`或`new`）
+* `getOwnPropertyDescriptor(..)`：通过`[[GetOwnProperty]]`，从代理取得一个属性的描述符（`Object.getOwnPropertyDescriptor(..)`或`Reflect.getOwnPropertyDescriptor(..)`）
+* `defineProperty(..)`：通过`[[DefineOwnProperty]]`，在代理上设置一个属性描述符（`Object.defineProperty(..)`或`Reflect.defineProperty(..)`）
+* `getPrototypeOf(..)`：通过`[[GetPrototypeOf]]`，取得代理的`[[Prototype]]`（`Object.getPrototypeOf(..)`，`Reflect.getPrototypeOf(..)`，`__proto__`, `Object#isPrototypeOf(..)`，或`instanceof`）
+* `setPrototypeOf(..)`：通过`[[SetPrototypeOf]]`，设置代理的`[[Prototype]]`（`Object.setPrototypeOf(..)`，`Reflect.setPrototypeOf(..)`，或`__proto__`）
+* `preventExtensions(..)`：通过`[[PreventExtensions]]`使代理成为不可扩展的（`Object.preventExtensions(..)`或`Reflect.preventExtensions(..)`）
+* `isExtensible(..)`：通过`[[IsExtensible]]`，检测代理的可扩展性（`Object.isExtensible(..)`或`Reflect.isExtensible(..)`）
+* `ownKeys(..)`：通过`[[OwnPropertyKeys]]`，取得一组代理的直属属性和/或直属symbol属性（`Object.keys(..)`，`Object.getOwnPropertyNames(..)`，`Object.getOwnSymbolProperties(..)`，`Reflect.ownKeys(..)`，或`JSON.stringify(..)`）
+* `enumerate(..)`：通过`[[Enumerate]]`，为代理的可枚举直属属性及“继承”属性请求一个迭代器（`Reflect.enumerate(..)`或`for..in`）
+* `has(..)`：通过`[[HasProperty]]`，检测代理是否拥有一个直属属性或“继承”属性（`Reflect.has(..)`，`Object#hasOwnProperty(..)`，或`"prop" in obj`）
 
-**Tip:** For more information about each of these meta programming tasks, see the "`Reflect` API" section later in this chapter.
+**提示：** 关于每个这些元编程任务的更多信息，参见本章稍后的“`Reflect` API”一节。
 
-In addition to the notations in the preceding list about actions that will trigger the various traps, some traps are triggered indirectly by the default actions of another trap. For example:
+关于将会触发各种机关的动作，除了在前面列表中记载的以外，一些机关还会由另一个机关的默认动作间接地触发。举例来说：
 
 ```js
 var handlers = {
@@ -461,13 +463,13 @@ proxy.a = 2;
 // defineProperty
 ```
 
-The `getOwnPropertyDescriptor(..)` and `defineProperty(..)` handlers are triggered by the default `set(..)` handler's steps when setting a property value (whether newly adding or updating). If you also define your own `set(..)` handler, you may or may not make the corresponding calls against `context` (not `target`!) which would trigger these proxy traps.
+在设置一个属性值时（不管是新添加还是更新），`getOwnPropertyDescriptor(..)`和`defineProperty(..)`处理器被默认的`set(..)`处理器触发。如果你还定义了你自己的`set(..)`处理器，你或许对`context`（不是`target`！）进行了将会触发这些代理机关的相应调用。
 
-### Proxy Limitations
+### 代理的限制
 
-These meta programming handlers trap a wide array of fundamental operations you can perform against an object. However, there are some operations which are not (yet, at least) available to intercept.
+这些元编程处理器拦截了你可以对一个对象进行的范围很广泛的一组基础操作。但是，有一些操作不能（至少是还不能）被用于拦截。
 
-For example, none of these operations are trapped and forwarded from `pobj` proxy to `obj` target:
+例如，从`pobj`代理到`obj`目标，这些操作全都没有被拦截和转送：
 
 ```js
 var obj = { a:1, b:2 },
@@ -481,19 +483,19 @@ obj == pobj;
 obj === pobj
 ```
 
-Perhaps in the future, more of these underlying fundamental operations in the language will be interceptable, giving us even more power to extend JavaScript from within itself.
+也许在未来，更多这些语言中的底层基础操作都将是可拦截的，那将给我们更多力量来从JavaScript自身扩展它。
 
-**Warning:** There are certain *invariants* -- behaviors which cannot be overridden -- that apply to the use of proxy handlers. For example, the result from the `isExtensible(..)` handler is always coerced to a `boolean`. These invariants restrict some of your ability to customize behaviors with proxies, but they do so only to prevent you from creating strange and unusual (or inconsistent) behavior. The conditions for these invariants are complicated so we won't fully go into them here, but this post (http://www.2ality.com/2014/12/es6-proxies.html#invariants) does a great job of covering them.
+**警告：** 对于代理处理器的使用来说存在某些 *不变量* —— 它们的行为不能被覆盖。例如，`isExtensible(..)`处理器的结果总是被强制转换为一个`boolean`。这些不变量限制了一些你可以使用代理来自定义行为的能力，但是它们这样做只是为了防止你创建奇怪和不寻常（或不合逻辑）的行为。这些不变量的条件十分复杂，所以我们就不再这里全面阐述了，但是这篇博文(http://www.2ality.com/2014/12/es6-proxies.html#invariants)很好地讲解了它们。
 
-### Revocable Proxies
+### 可撤销的代理
 
-A regular proxy always traps for the target object, and cannot be modified after creation -- as long as a reference is kept to the proxy, proxying remains possible. However, there may be cases where you want to create a proxy that can be disabled when you want to stop allowing it to proxy. The solution is to create a *revocable proxy*:
+一个一般的代理总是包装着目标对象，而且在创建之后就不能修改了 —— 只要保持着一个指向这个代理的引用，代理的机制就将维持下去。但是，可能会有一些情况你想要创建一个这样的代理：在你想要停止它作为代理时可以被停用。解决方案就是创建一个 *可撤销代理*：
 
 ```js
 var obj = { a: 1 },
 	handlers = {
 		get(target,key,context) {
-			// note: target === obj,
+			// 注意：target === obj,
 			// context === pobj
 			console.log( "accessing: ", key );
 			return target[key];
@@ -506,49 +508,49 @@ pobj.a;
 // accessing: a
 // 1
 
-// later:
+// 稍后：
 prevoke();
 
 pobj.a;
 // TypeError
 ```
 
-A revocable proxy is created with `Proxy.revocable(..)`, which is a regular function, not a constructor like `Proxy(..)`. Otherwise, it takes the same two arguments: *target* and *handlers*.
+一个可撤销代理是由`Proxy.revocable(..)`创建的，它是一个普通的函数，不是一个像`Proxy(..)`那样的构造器。此外，它接收同样的两个参数值：*目标* 和 *处理器*。
 
-The return value of `Proxy.revocable(..)` is not the proxy itself as with `new Proxy(..)`. Instead, it's an object with two properties: *proxy* and *revoke* -- we used object destructuring (see "Destructuring" in Chapter 2) to assign these properties to `pobj` and `prevoke()` variables, respectively.
+与`new Proxy(..)`不同的是，`Proxy.revocable(..)`的返回值不是代理本身。取而代之的是，它返回一个带有 *proxy* 和 *revoke* 两个属性的对象 —— 我们使用了对象解构（参见第二章的“解构”）来将这些属性分别赋值给变量`pobj`和`prevoke`。
 
-Once a revocable proxy is revoked, any attempts to access it (trigger any of its traps) will throw a `TypeError`.
+一旦可撤销代理被撤销，任何访问它的企图（触发它的任何机关）都将抛出`TypeError`。
 
-An example of using a revocable proxy might be handing out a proxy to another party in your application that manages data in your model, instead of giving them a reference to the real model object itself. If your model object changes or is replaced, you want to invalidate the proxy you handed out so the other party knows (via the errors!) to request an updated reference to the model.
+一个使用可撤销代理的例子可能是，将一个代理交给另一个存在于你应用中、并管理你模型中的数据的团体，而不是给它们一个指向正式模型对象本身的引用。如果你的模型对象改变了或者被替换掉了，你希望废除这个你交出去的代理，以便于其他的团体能够（通过错误！）知道要请求一个更新过的模型引用。
 
-### Using Proxies
+### 使用代理
 
-The meta programming benefits of these Proxy handlers should be obvious. We can almost fully intercept (and thus override) the behavior of objects, meaning we can extend object behavior beyond core JS in some very powerful ways. We'll look at a few example patterns to explore the possibilities.
+这些代理处理器带来的元编程的好处应当是显而易见的。我们可以全面地拦截（而因此覆盖）对象的行为，这意味着我们可以用一些非常强大的方式将对象行为扩展至JS核心之外。我们将看几个模式的例子来探索这些可能性。
 
-#### Proxy First, Proxy Last
+#### 代理前置，代理后置
 
-As we mentioned earlier, you typically think of a proxy as "wrapping" the target object. In that sense, the proxy becomes the primary object that the code interfaces with, and the actual target object remains hidden/protected.
+正如我们早先提到过的，你通常将一个代理考虑为一个目标对象的“包装”。在这种意义上，代理就变成了代码接口所针对的主要对象，而实际的目标对象则保持被隐藏/被保护的状态。
 
-You might do this because you want to pass the object somewhere that can't be fully "trusted," and so you need to enforce special rules around its access rather than passing the object itself.
+你可能这么做是因为你希望将对象传递到某个你不能完全“信任”的地方去，如此你需要在它的访问权上强制实施一些特殊的规则，而不是传递这个对象本身。
 
-Consider:
+考虑如下代码：
 
 ```js
 var messages = [],
 	handlers = {
 		get(target,key) {
-			// string value?
+			// 是字符串值吗？
 			if (typeof target[key] == "string") {
-				// filter out punctuation
+				// 过滤掉标点符号
 				return target[key]
 					.replace( /[^\w]/g, "" );
 			}
 
-			// pass everything else through
+			// 让其余的东西通过
 			return target[key];
 		},
 		set(target,key,val) {
-			// only set unique strings, lowercased
+			// 仅设置唯一的小写字符串
 			if (typeof val == "string") {
 				val = val.toLowerCase();
 				if (target.indexOf( val ) == -1) {
@@ -561,7 +563,7 @@ var messages = [],
 	messages_proxy =
 		new Proxy( messages, handlers );
 
-// elsewhere:
+// 在别处：
 messages_proxy.push(
 	"heLLo...", 42, "wOrlD!!", "WoRld!!"
 );
@@ -577,13 +579,13 @@ messages.forEach( function(val){
 // hello... world!!
 ```
 
-I call this *proxy first* design, as we interact first (primarily, entirely) with the proxy.
+我称此为 *代理前置* 设计，因为我们首先（主要、完全地）与代理进行互动。
 
-We enforce some special rules on interacting with `messages_proxy` that aren't enforced for `messages` itself. We only add elements if the value is a string and is also unique; we also lowercase the value. When retrieving values from `messages_proxy`, we filter out any punctuation in the strings.
+我们在与`messages_proxy`的互动上强制实施了一些特殊规则，这些规则不会强制实施在`messages`本身上。我们仅在值是一个不重复的字符串时才将它添加为元素；我们还将这个值变为小写。当从`messages_proxy`取得值时，我们过滤掉字符串中所有的标点符号。
 
-Alternatively, we can completely invert this pattern, where the target interacts with the proxy instead of the proxy interacting with the target. Thus, code really only interacts with the main object. The easiest way to accomplish this fallback is to have the proxy object in the `[[Prototype]]` chain of the main object.
+另一种方式是，我们可以完全反转这个模式，让目标与代理交互而不是让代理与目标交互。这样，代码其实只与主对象交互。达成这种后备方案的最简单的方法是，让代理对象存在于主对象的`[[Prototype]]`链中。
 
-Consider:
+考虑如下代码：
 
 ```js
 var handlers = {
@@ -600,7 +602,7 @@ var handlers = {
 		}
 	};
 
-// setup `greeter` to fall back to `catchall`
+// 让 `catchall` 成为 `greeter` 的后备方法
 Object.setPrototypeOf( greeter, catchall );
 
 greeter.speak();				// hello someone
@@ -609,17 +611,17 @@ greeter.speak( "world" );		// hello world
 greeter.everyone();				// hello everyone!
 ```
 
-We interact directly with `greeter` instead of `catchall`. When we call `speak(..)`, it's found on `greeter` and used directly. But when we try to access a method like `everyone()`, that function doesn't exist on `greeter`.
+我们直接与`greeter`而非`catchall`进行交互。当我们调用`speak(..)`时，它在`greeter`上被找到并直接使用。但当我们试图访问`everyone()`这样的方法时，这个函数并不存在于`greeter`。
 
-The default object property behavior is to check up the `[[Prototype]]` chain (see the *this & Object Prototypes* title of this series), so `catchall` is consulted for an `everyone` property. The proxy `get()` handler then kicks in and returns a function that calls `speak(..)` with the name of the property being accessed (`"everyone"`).
+默认的对象属性行为是向上检查`[[Prototype]]`链（参见本系列的 *this与对象原型*），所以`catchall`被询问有没有一个`everyone`属性。然后代理的`get()`处理器被调用并返回一个函数，这个函数使用被访问的属性名（`"everyone"`）调用`speak(..)`。
 
-I call this pattern *proxy last*, as the proxy is used only as a last resort.
+我称这种模式为 *代理后置*，因为代理仅被用作最后一道防线。
 
 #### "No Such Property/Method"
 
-A common complaint about JS is that objects aren't by default very defensive in the situation where you try to access or set a property that doesn't already exist. You may wish to predefine all the properties/methods for an object, and have an error thrown if a nonexistent property name is subsequently used.
+一个关于JS的常见的抱怨是，在你试着访问或设置一个对象上还不存在的属性时，默认情况下对象不是非常具有防御性。你可能希望为一个对象预定义所有这些属性/方法，而且在后续使用不存在的属性名时抛出一个错误。
 
-We can accomplish this with a proxy, either in *proxy first* or *proxy last* design. Let's consider both.
+我们可以使用一个代理来达成这种想法，既可以使用 *代理前置* 也可以 *代理后置* 设计。我们将两者都考虑一下。
 
 ```js
 var obj = {
@@ -659,9 +661,9 @@ pobj.b = 4;			// Error: No such property/method!
 pobj.bar();			// Error: No such property/method!
 ```
 
-For both `get(..)` and `set(..)`, we only forward the operation if the target object's property already exists; error thrown otherwise. The proxy object (`pobj`) is the main object code should interact with, as it intercepts these actions to provide the protections.
+对于`get(..)`和`set(..)`两者，我们仅在目标对象的属性已经存在时才转送操作；否则抛出错误。代理对象应当是进行交互的主对象，因为它拦截这些操作来提供保护。
 
-Now, let's consider inverting with *proxy last* design:
+现在，让我们考虑一下反过来的 *代理后置* 设计：
 
 ```js
 var handlers = {
@@ -680,7 +682,7 @@ var handlers = {
 		}
 	};
 
-// setup `obj` to fall back to `pobj`
+// 让 `pobj` 称为 `obj` 的后备
 Object.setPrototypeOf( obj, pobj );
 
 obj.a = 3;
@@ -690,17 +692,17 @@ obj.b = 4;			// Error: No such property/method!
 obj.bar();			// Error: No such property/method!
 ```
 
-The *proxy last* design here is a fair bit simpler with respect to how the handlers are defined. Instead of needing to intercept the `[[Get]]` and `[[Set]]` operations and only forward them if the target property exists, we instead rely on the fact that if either `[[Get]]` or `[[Set]]` get to our `pobj` fallback, the action has already traversed the whole `[[Prototype]]` chain and not found a matching property. We are free at that point to unconditionally throw the error. Cool, huh?
+在处理器如何定义的角度上，这里的 *代理后置* 设计相当简单。与拦截`[[Get]]`和`[[Set]]`操作并仅在目标属性存在时转送它们不同，我们依赖于这样一个事实：不管`[[Get]]`还是`[[Set]]`到达了我们的`pobj`后备对象，这个动作已经遍历了整个`[[Prototype]]`链并且没有找到匹配的属性。在这时我们可以自由地、无条件地抛出错误。很酷，对吧？
 
-#### Proxy Hacking the `[[Prototype]]` Chain
+#### 代理黑入 `[[Prototype]]` 链
 
-The `[[Get]]` operation is the primary channel by which the `[[Prototype]]` mechanism is invoked. When a property is not found on the immediate object, `[[Get]]` automatically hands off the operation to the `[[Prototype]]` object.
+`[[Get]]`操作是`[[Prototype]]`机制被调用的主要渠道。当一个属性不能在直接对象上找到时，`[[Get]]`会自动将操作交给`[[Prototype]]`对象。
 
-That means you can use the `get(..)` trap of a proxy to emulate or extend the notion of this `[[Prototype]]` mechanism.
+这意味着你可以使用一个代理的`get(..)`机关来模拟或扩展这个`[[Prototype]]`机制的概念。
 
-The first hack we'll consider is creating two objects which are circularly linked via `[[Prototype]]` (or, at least it appears that way!). You cannot actually create a real circular `[[Prototype]]` chain, as the engine will throw an error. But a proxy can fake it!
+我们将考虑的第一种黑科技是创建两个通过`[[Prototype]]`循环链接的对象（或者说，至少看起来是这样！）。你不能实际创建一个真正循环的`[[Prototype]]`链，因为引擎将会抛出一个错误。但是代理可以假冒它！
 
-Consider:
+考虑如下代码：
 
 ```js
 var handlers = {
@@ -710,7 +712,7 @@ var handlers = {
 					target, key, context
 				);
 			}
-			// fake circular `[[Prototype]]`
+			// 假冒循环的 `[[Prototype]]`
 			else {
 				return Reflect.get(
 					target[
@@ -742,26 +744,26 @@ var handlers = {
 		}
 	);
 
-// fake circular `[[Prototype]]` link
+// 假冒循环的 `[[Prototype]]` 链
 obj1[ Symbol.for( "[[Prototype]]" ) ] = obj2;
 
 obj1.bar();
-// bar: obj-1 <-- through proxy faking [[Prototype]]
-// foo: obj-1 <-- `this` context still preserved
+// bar: obj-1 <-- 通过代理假冒 [[Prototype]]
+// foo: obj-1 <-- `this` 上下文环境依然被保留
 
 obj2.foo();
-// foo: obj-2 <-- through [[Prototype]]
+// foo: obj-2 <-- 通过 [[Prototype]]
 ```
 
-**Note:** We didn't need to proxy/forward `[[Set]]` in this example, so we kept things simpler. To be fully `[[Prototype]]` emulation compliant, you'd want to implement a `set(..)` handler that searches the `[[Prototype]]` chain for a matching property and respects its descriptor behavior (e.g., set, writable). See the *this & Object Prototypes* title of this series.
+**注意：** 为了让事情简单一些，在这个例子中我们没有代理/转送`[[Set]]`。要完整地模拟`[[Prototype]]`兼容，你会想要实现一个`set(..)`处理器，它在`[[Prototype]]`链上检索一个匹配得属性并遵循它的描述符的行为（例如，set，可写性）。参见本系列的 *this与对象原型*。
 
-In the previous snippet, `obj2` is `[[Prototype]]` linked to `obj1` by virtue of the `Object.create(..)` statement. But to create the reverse (circular) linkage, we create property on `obj1` at the symbol location `Symbol.for("[[Prototype]]")` (see "Symbols" in Chapter 2). This symbol may look sort of special/magical, but it isn't. It just allows me a conveniently named hook that semantically appears related to the task I'm performing.
+在前面的代码段中，`obj2`凭借`Object.create(..)`语句`[[Prototype]]`链接到`obj1`。但是要创建反向（循环）的链接，我们在`obj1`的symbol位置`Symbol.for("[[Prototype]]")`（参见第二章的“Symbol”）上创建了一个属性。这个symbol可能看起来有些特别/魔幻，但它不是的。它只是允许我使用一个被方便地命名的属性，这个属性在语义上看来是与我进行的任务有关联的。
 
-Then, the proxy's `get(..)` handler looks first to see if a requested `key` is on the proxy. If not, the operation is manually handed off to the object reference stored in the `Symbol.for("[[Prototype]]")` location of `target`.
+然后，代理的`get(..)`处理器首先检查一个被请求的`key`是否存在于代理上。如果每个有，操作就被手动地交给存储在`target`的`Symbol.for("[[Prototype]]")`位置中的对象引用。
 
-One important advantage of this pattern is that the definitions of `obj1` and `obj2` are mostly not intruded by the setting up of this circular relationship between them. Although the previous snippet has all the steps intertwined for brevity's sake, if you look closely, the proxy handler logic is entirely generic (doesn't know about `obj1` or `obj2` specifically). So, that logic could be pulled out into a simple helper that wires them up, like a `setCircularPrototypeOf(..)` for example. We'll leave that as an exercise for the reader.
+这种模式的一个重要优点是，在`obj1`和`obj2`之间建立循环关系几乎没有入侵它们的定义。虽然前面的代码段为了简短而将所有的步骤交织在一起，但是如果你仔细观察，代理处理器的逻辑完全是范用的（不具体地知道`obj1`或`obj2`）。所以，这段逻辑可以抽出到一个简单的将它们连在一起的帮助函数中，例如`setCircularPrototypeOf(..)`。我们将此作为一个练习留给读者。
 
-Now that we've seen how we can use `get(..)` to emulate a `[[Prototype]]` link, let's push the hackery a bit further. Instead of a circular `[[Prototype]]`, what about multiple `[[Prototype]]` linkages (aka "multiple inheritance")? This turns out to be fairly straightforward:
+现在我们看到了如何使用`get(..)`来模拟一个`[[Prototype]]`链接，但让我们将这种黑科技推动的远一些。与其制造一个循环`[[Prototype]]`，搞一个多重`[[Prototype]]`链接（也就是“多重继承”）怎么样？这看起来相当直白：
 
 ```js
 var obj1 = {
@@ -786,7 +788,7 @@ var obj1 = {
 					target, key, context
 				);
 			}
-			// fake multiple `[[Prototype]]`
+			// 假冒多重 `[[Prototype]]`
 			else {
 				for (var P of target[
 					Symbol.for( "[[Prototype]]" )
@@ -811,7 +813,7 @@ var obj1 = {
 		handlers
 	);
 
-// fake multiple `[[Prototype]]` links
+// 假冒多重 `[[Prototype]]` 链接
 obj3[ Symbol.for( "[[Prototype]]" ) ] = [
 	obj1, obj2
 ];
@@ -821,25 +823,25 @@ obj3.baz();
 // obj2.bar: obj-3
 ```
 
-**Note:** As mentioned in the note after the earlier circular `[[Prototype]]` example, we didn't implement the `set(..)` handler, but it would be necessary for a complete solution that emulates `[[Set]]` actions as normal `[[Prototype]]`s behave.
+**注意：** 正如在前面的循环`[[Prototype]]`例子后的注意中提到的，我们没有实现`set(..)`处理器，但对于一个将`[[Set]]`模拟为普通`[[Prototype]]`行为的解决方案来说，它将是必要的。
 
-`obj3` is set up to multiple-delegate to both `obj1` and `obj2`. In `obj3.baz()`, the `this.foo()` call ends up pulling `foo()` from `obj1` (first-come, first-served, even though there's also a `foo()` on `obj2`). If we reordered the linkage as `obj2, obj1`, the `obj2.foo()` would have been found and used.
+`obj3`被设置为多重委托到`obj1`和`obj2`。在`obj2.baz()`中，`this.foo()`调用最终成为从`obj1`中抽出`foo()`（先到先得，虽然还有一个在`obj2`上的`foo()`）。如果我们将连接重新排列为`obj2, obj1`，那么`obj2.foo()`将被找到并使用。
 
-But as is, the `this.bar()` call doesn't find a `bar()` on `obj1`, so it falls over to check `obj2`, where it finds a match.
+同理，`this.bar()`调用没有在`obj1`上找到`bar()`，所以它退而检查`obj2`，这里找到了一个匹配。
 
-`obj1` and `obj2` represent two parallel `[[Prototype]]` chains of `obj3`. `obj1` and/or `obj2` could themselves have normal `[[Prototype]]` delegation to other objects, or either could themself be a proxy (like `obj3` is) that can multiple-delegate.
+`obj1`和`obj2`代表`obj3`的两个平行的`[[Prototype]]`链。`obj1`和/或`obj2`自身可以拥有委托至其他对象的普通`[[Prototype]]`，或者自身也可以是多重委托的代理（就像`obj3`一样）。
 
-Just as with the circular `[[Prototype]]` example earlier, the definitions of `obj1`, `obj2`, and `obj3` are almost entirely separate from the generic proxy logic that handles the multiple-delegation. It would be trivial to define a utility like `setPrototypesOf(..)` (notice the "s"!) that takes a main object and a list of objects to fake the multiple `[[Prototype]]` linkage to. Again, we'll leave that as an exercise for the reader.
+正如先前的循环`[[Prototype]]`的例子一样，`obj1`，`obj2`和`obj3`的定义几乎完全与处理多重委托的范用代理逻辑相分离。定义一个`setPrototypesOf(..)`（注意那个“s”！）这样的工具将是小菜一碟，它接收一个主对象和一组模拟多重`[[Prototype]]`链接用的对象。同样，我们将此作为练习留给读者。
 
-Hopefully the power of proxies is now becoming clearer after these various examples. There are many other powerful meta programming tasks that proxies enable.
+希望在这种种例子之后代理的力量现在变得明朗了。代理使得许多强大的元编程任务成为可能。
 
 ## `Reflect` API
 
-The `Reflect` object is a plain object (like `Math`), not a function/constructor like the other built-in natives.
+`Reflect`对象是一个普通对象（就像`Math`），不是其他内建原生类型那样的函数/构造器。
 
-It holds static functions which correspond to various meta programming tasks that you can control. These functions correspond one-to-one with the handler methods (*traps*) that Proxies can define.
+它持有对应于你可以控制的各种元编程任务的静态函数。这些函数与代理可以定义的处理器方法（*机关*）一一对应。
 
-Some of the functions will look familiar as functions of the same names on `Object`:
+这些函数中的一些看起来与在`Object`上的同名函数很相似：
 
 * `Reflect.getOwnPropertyDescriptor(..)`
 * `Reflect.defineProperty(..)`
@@ -848,40 +850,40 @@ Some of the functions will look familiar as functions of the same names on `Obje
 * `Reflect.preventExtensions(..)`
 * `Reflect.isExtensible(..)`
 
-These utilities in general behave the same as their `Object.*` counterparts. However, one difference is that the `Object.*` counterparts attempt to coerce their first argument (the target object) to an object if it's not already one. The `Reflect.*` methods simply throw an error in that case.
+这些工具一般与它们的`Object.*`对等物的行为相同。但一个区别是，`Object.*`对等物在它们的第一个参数值（目标对象）还不是对象的情况下，试图将它强制转换为一个对象。`Reflect.*`方法在同样的情况下仅简单地抛出一个错误。
 
-An object's keys can be accessed/inspected using these utilities:
+一个对象的键可以使用这些工具访问/检测：
 
-* `Reflect.ownKeys(..)`: Returns the list of all owned keys (not "inherited"), as returned by both `Object.getOwnPropertyNames(..)` and `Object.getOwnPropertySymbols(..)`. See the "Property Enumeration Order" section for information about the order of keys.
-* `Reflect.enumerate(..)`: Returns an iterator that produces the set of all non-symbol keys (owned and "inherited") that are *enumerable* (see the *this & Object Prototypes* title of this series). Essentially, this set of keys is the same as those processed by a `for..in` loop. See the "Property Enumeration Order" section for information about the order of keys.
-* `Reflect.has(..)`: Essentially the same as the `in` operator for checking if a property is on an object or its `[[Prototype]]` chain. For example, `Reflect.has(o,"foo")` essentially performs `"foo" in o`.
+* `Reflect.ownKeys(..)`：返回一个所有直属（不是“继承的”）键的列表，正如被 `Object.getOwnPropertyNames(..)`和`Object.getOwnPropertySymbols(..)`返回的那样。关于键的顺序问题，参见“属性枚举顺序”一节。
+* `Reflect.enumerate(..)`：返回一个产生所有（直属和“继承的”）非symbol、可枚举的键的迭代器（参见本系列的 *this与对象原型*）。 实质上，这组键与在`for..in`循环中被处理的那一组键是相同的。关于键的顺序问题，参见“属性枚举顺序”一节。
+* `Reflect.has(..)`：实质上与用于检查一个属性是否存在于一个对象或它的`[[Prototype]]`链上的`in`操作符相同。例如，`Reflect.has(o,"foo")`实质上实施`"foo" in o`。
 
-Function calls and constructor invocations can be performed manually, separate of the normal syntax (e.g., `(..)` and `new`) using these utilities:
+函数调用和构造器调用可以使用这些工具手动地实施，与普通的语法（例如，`(..)`和`new`）分开：
 
-* `Reflect.apply(..)`: For example, `Reflect.apply(foo,thisObj,[42,"bar"])` calls the `foo(..)` function with `thisObj` as its `this`, and passes in the `42` and `"bar"` arguments.
-* `Reflect.construct(..)`: For example, `Reflect.construct(foo,[42,"bar"])` essentially calls `new foo(42,"bar")`.
+* `Reflect.apply(..)`：例如，`Reflect.apply(foo,thisObj,[42,"bar"])`使用`thisObj`作为`foo(..)`函数的`this`来调用它，并传入参数值`42`和`"bar"`。
+* `Reflect.construct(..)`：例如，`Reflect.construct(foo,[42,"bar"])`实质上调用`new foo(42,"bar")`。
 
-Object property access, setting, and deletion can be performed manually using these utilities:
+对象属性访问，设置，和删除可以使用这些工具手动实施：
 
-* `Reflect.get(..)`: For example, `Reflect.get(o,"foo")` retrieves `o.foo`.
-* `Reflect.set(..)`: For example, `Reflect.set(o,"foo",42)` essentially performs `o.foo = 42`.
-* `Reflect.deleteProperty(..)`: For example, `Reflect.deleteProperty(o,"foo")` essentially performs `delete o.foo`.
+* `Reflect.get(..)`：例如，`Reflect.get(o,"foo")`会取得`o.foo`。
+* `Reflect.set(..)`：例如，`Reflect.set(o,"foo",42)`实质上实施`o.foo = 42`。
+* `Reflect.deleteProperty(..)`：例如，`Reflect.deleteProperty(o,"foo")`实质上实施`delete o.foo`。
 
-The meta programming capabilities of `Reflect` give you programmatic equivalents to emulate various syntactic features, exposing previously hidden-only abstract operations. For example, you can use these capabilities to extend features and APIs for *domain specific languages* (DSLs).
+`Reflect`的元编程能力给了你可以模拟各种语法特性的程序化等价物，暴露以前隐藏着的抽象操作。例如，你可以使用这些能力来扩展 *领域特定语言*（DSL）的特性和API。
 
-### Property Ordering
+### 属性顺序
 
-Prior to ES6, the order used to list an object's keys/properties was implementation dependent and undefined by the specification. Generally, most engines have enumerated them in creation order, though developers have been strongly encouraged not to ever rely on this ordering.
+在ES6之前，罗列一个对象的键/属性的顺序没有在语言规范中定义，而是依赖于具体实现的。一般来说，大多数引擎会以创建的顺序来罗列它们，虽然开发者们已经被强烈建议永远不要依仗这种顺序。
 
-As of ES6, the order for listing owned properties is now defined (ES6 specification, section 9.1.12) by the `[[OwnPropertyKeys]]` algorithm, which produces all owned properties (strings or symbols), regardless of enumerability. This ordering is only guaranteed for `Reflect.ownKeys(..)` (and by extension, `Object.getOwnPropertyNames(..)` and `Object.getOwnPropertySymbols(..)`).
+在ES6中，罗列直属属性的属性是由`[[OwnPropertyKeys]]`算法定义的（ES6语言规范，9.1.12部分），它产生所有直属属性（字符串或symbol），不论其可枚举性。这种顺序仅对`Reflect.ownKeys(..)`有保证（）。
 
-The ordering is:
+这个顺序是：
 
-1. First, enumerate any owned properties that are integer indexes, in ascending numeric order.
-2. Next, enumerate the rest of the owned string property names in creation order.
-3. Finally, enumerate owned symbol properties in creation order.
+1. 首先，以数字上升的顺序，枚举所有数字索引的直属属性。
+2. 然后，以创建顺序枚举剩下的直属字符串属性名。
+3. 最后，以创建顺序枚举直属symbol属性。
 
-Consider:
+考虑如下代码：
 
 ```js
 var o = {};
@@ -897,13 +899,13 @@ Object.getOwnPropertyNames( o );	// [1,2,"b","a"]
 Object.getOwnPropertySymbols( o );	// [Symbol(c)]
 ```
 
-On the other hand, the `[[Enumerate]]` algorithm (ES6 specification, section 9.1.11) produces only enumerable properties, from the target object as well as its `[[Prototype]]` chain. It is used by both `Reflect.enumerate(..)` and `for..in`. The observable ordering is implementation dependent and not controlled by the specification.
+另一方面，`[[Enumeration]]`算法（ES6语言规范，9.1.11部分）从目标对象和它的`[[Prototype]]`链中仅产生可枚举属性。它被用于`Reflect.enumerate(..)`和`for..in`。可观察到的顺序是依赖于具体实现的，语言规范没有控制它。
 
-By contrast, `Object.keys(..)` invokes the `[[OwnPropertyKeys]]` algorithm to get a list of all owned keys. However, it filters out non-enumerable properties and then reorders the list to match legacy implementation-dependent behavior, specifically with `JSON.stringify(..)` and `for..in`. So, by extension the ordering *also* matches that of `Reflect.enumerate(..)`.
+相比之下，`Object.keys(..)`调用`[[OwnPropertyKeys]]`算法来得到一个所有直属属性的列表。但是，它过滤掉了不可枚举属性，然后特别为了`JSON.stringify(..)`和`for..in`而将这个列表重排，以匹配遗留的、依赖于具体实现的行为。所以通过扩展，这个顺序 *也* 与`Reflect.enumerate(..)`的顺序像吻合。
 
-In other words, all four mechanisms (`Reflect.enumerate(..)`, `Object.keys(..)`, `for..in`, and `JSON.stringify(..)`) will  match with the same implementation-dependent ordering, though they technically get there in different ways.
+换言之，所有四种机制（`Reflect.enumerate(..)`，`Object.keys(..)`，`for..in`，和`JSON.stringify(..)`）都同样将与依赖于具体实现的顺序像吻合，虽然技术上它们是以不同的方式达到的同样的效果。
 
-Implementations are allowed to match these four to the ordering of `[[OwnPropertyKeys]]`, but are not required to. Nevertheless, you will likely observe the following ordering behavior from them:
+具体实现可以将这四种机制与`[[OwnPropertyKeys]]`的顺序相吻合，但不是必须的。无论如何，你将很可能从它们的行为中观察到以下的排序：
 
 ```js
 var o = { a: 1, b: 2 };
@@ -928,17 +930,17 @@ Object.keys( p );
 // ["c","d"]
 ```
 
-Boiling this all down: as of ES6, `Reflect.ownKeys(..)`, `Object.getOwnPropertyNames(..)`, and `Object.getOwnPropertySymbols(..)` all have predictable and reliable ordering guaranteed by the specification. So it's safe to build code that relies on this ordering.
+这一切可以归纳为：在ES6中，根据语言规范`Reflect.ownKeys(..)`，`Object.getOwnPropertyNames(..)`，和`Object.getOwnPropertySymbols(..)`保证都有可预见和可靠的顺序。所以依赖于这种顺序来建造代码是安全的。
 
-`Reflect.enumerate(..)`, `Object.keys(..)`, and `for..in` (as well as `JSON.stringify(..)` by extension) continue to share an observable ordering with each other, as they always have. But that ordering will not necessarily be the same as that of `Reflect.ownKeys(..)`. Care should still be taken in relying on their implementation-dependent ordering.
+`Reflect.enumerate(..)`，`Object.keys(..)`，和`for..in` （扩展一下的话还有`JSON.stringify(..)`）继续互相共享一个可观察的顺序，就像它们往常一样。但这个顺序不一定与`Reflect.ownKeys(..)`的相同。在使用它们依赖于具体实现的顺序时依然应当小心。
 
-## Feature Testing
+## 特性测试
 
-What is a feature test? It's a test that you run to determine if a feature is available or not. Sometimes, the test is not just for existence, but for conformance to specified behavior -- features can exist but be buggy.
+什么是特性测试？它是一种由你运行来判定一个特性是否可用的测试。有些时候，这种测试不仅是为了判定存在性，还是为判定对特定行为的适应性 —— 特性可能存在但有bug。
 
-This is a meta programming technique, to test the environment your program runs in to then determine how your program should behave.
+这是一种元编程技术 —— 测试你程序将要运行的环境然后判定你的程序应当如何动作。
 
-The most common use of feature tests in JS is checking for the existence of an API and if it's not present, defining a polyfill (see Chapter 1). For example:
+在JS中特性测试最常见的用法是检测一个API的存在性，而且如果它不存在，就定义一个填补（见第一章）。例如：
 
 ```js
 if (!Number.isNaN) {
@@ -948,11 +950,11 @@ if (!Number.isNaN) {
 }
 ```
 
-The `if` statement in this snippet is meta programming: we're probing our program and its runtime environment to determine if and how we should proceed.
+在这个代码段中的`if`语句就是一个元编程：我们探测我们的程序和它的运行时环境，来判定我们是否和如何进行后续处理。
 
-But what about testing for features that involve new syntax?
+但是如何测试一个涉及新语法的特性呢？
 
-You might try something like:
+你可能会尝试这样的东西：
 
 ```js
 try {
@@ -964,15 +966,15 @@ catch (err) {
 }
 ```
 
-Unfortunately, this doesn't work, because our JS programs are compiled. Thus, the engine will choke on the `() => {}` syntax if it is not already supporting ES6 arrow functions. Having a syntax error in your program prevents it from running, which prevents your program from subsequently responding differently if the feature is supported or not.
+不幸的是，这不能工作，因为我们的JS程序是要被编译的。因此，如果引擎还没有支持ES6箭头函数的话，它就会在`() => {}`语法的地方熄火。你程序中的语法错误会阻止它的运行，进而阻止你程序根据特性是否被支持而进行后续的不同相应。
 
-To meta program with feature tests around syntax-related features, we need a way to insulate the test from the initial compile step our program runs through. For instance, if we could store the code for the test in a string, then the JS engine wouldn't by default try to compile the contents of that string, until we asked it to.
+为了围绕语法相关的特性进行特性测试的元编程，我们需要一个方法将测试与我们程序将要通过的初始编译步骤隔离开。举例来说，如果我们能够将进行测试的代码存储在一个字符串中，之后JS引擎默认地将不会尝试编译这个字符串中的内容，直到我们要求它这么做。
 
-Did your mind just jump to using `eval(..)`?
+你的思路是不是跳到了使用`eval(..)`？
 
-Not so fast. See the *Scope & Closures* title of this series for why `eval(..)` is a bad idea. But there's another option with less downsides: the `Function(..)` constructor.
+别这么着急。看看本系列的 *作用域与闭包* 来了解一下为什么`eval(..)`是一个坏主意。但是有另外一个缺陷较少的选项：`Function(..)`构造器。
 
-Consider:
+考虑如下代码：
 
 ```js
 try {
@@ -984,57 +986,57 @@ catch (err) {
 }
 ```
 
-OK, so now we're meta programming by determining if a feature like arrow functions *can* compile in the current engine or not. You might then wonder, what would we do with this information?
+好了，现在我们判定一个像箭头函数这样的特性是否 *能* 被当前的引擎所编译来进行元编程。你可能会想知道，我们要用这种信息做什么？
 
-With existence checks for APIs, and defining fallback API polyfills, there's a clear path for what to do with either test success or failure. But what can we do with the information that we get from `ARROW_FUNCS_ENABLED` being `true` or `false`?
+检查API的存在性，并定义后备的API填补，对于特性检测成功或失败来说都是一条明确的道路。但是对于从`ARROW_FUNCS_ENABLED`是`true`还是`false`中得到的信息来说，我们能对它做什么呢？
 
-Because the syntax can't appear in a file if the engine doesn't support that feature, you can't just have different functions defined in the file with and without the syntax in question.
+因为如果引擎不支持一种特性，它的语法就不能出现在一个文件中，所以你不能在这个文件中定义使用这种语法的函数。
 
-What you can do is use the test to determine which of a set of JS files you should load. For example, if you had a set of these feature tests in a bootstrapper for your JS application, it could then test the environment to determine if your ES6 code can be loaded and run directly, or if you need to load a transpiled version of your code (see Chapter 1).
+你所能做的是，使用测试来判定你应当加载哪一组JS文件。例如，如果在你的JS应用程序中的启动装置中有一组这样的特性测试，那么它就可以测试环境来判定你的ES6代码是否可以直接加载运行，或者你是否需要加载一个代码的转译版本（参见第一章）。
 
-This technique is called *split delivery*.
+这种技术称为 *分割投递*。
 
-It recognizes the reality that your ES6 authored JS programs will sometimes be able to entirely run "natively" in ES6+ browsers, but other times need transpilation to run in pre-ES6 browsers. If you always load and use the transpiled code, even in the new ES6-compliant environments, you're running suboptimal code at least some of the time. This is not ideal.
+事实表明，你使用ES6编写的JS程序有时可以在ES6+浏览器中完全“原生地”运行，但是另一些时候需要在前ES6浏览器中运行转译版本。如果你总是加载并使用转译代码，即便是在新的ES6兼容环境中，至少是有些情况下你运行的也是次优的代码。这并不理想。
 
-Split delivery is more complicated and sophisticated, but it represents a more mature and robust approach to bridging the gap between the code you write and the feature support in browsers your programs must run in.
+分割投递更加复杂和精巧，但对于你编写的代码和你的程序所必须在其中运行的浏览器支持的特性之间，它代表一种更加成熟和健壮的桥接方式。
 
 ### FeatureTests.io
 
-Defining feature tests for all of the ES6+ syntax, as well as the semantic behaviors, is a daunting task you probably don't want to tackle yourself. Because these tests require dynamic compilation (`new Function(..)`), there's some unfortunate performance cost.
+为所有的ES6+语法以及语义行为定义特性测试，是一项你可能不想自己解决的艰巨任务。因为这些测试要求动态编译（`new Function(..)`），这会产生不幸的性能损耗。
 
-Moreover, running these tests every single time your app runs is probably wasteful, as on average a user's browser only updates once in a several week period at most, and even then, new features aren't necessarily showing up with every update.
+另外，在每次你的应用运行时都执行这些测试可能是一种浪费，因为平均来说一个用户的浏览器在几周之内至多只会更新一次，而即使是这样，新特性也不一定会在每次更新中都出现。
 
-Finally, managing the list of feature tests that apply to your specific code base -- rarely will your programs use the entirety of ES6 -- is unruly and error-prone.
+最终，管理一个对你特定代码库进行的特性测试列表 —— 你的程序将很少用到ES6的全部 —— 是很容易失控而且易错的。
 
-The "https://featuretests.io" feature-tests-as-a-service offers solutions to these frustrations.
+“https://featuretests.io”的“特性测试服务”为这种挫折提供了解决方案。
 
-You can load the service's library into your page, and it loads the latest test definitions and runs all the feature tests. It does so using background processing with Web Workers, if possible, to reduce the performance overhead. It also uses LocalStorage persistence to cache the results in a way that can be shared across all sites you visit which use the service, which drastically reduces how often the tests need to run on each browser instance.
+你可以将这个服务的库加载到你的页面中，而它会加载最新的测试定义并运行所有的特性测试。在可能的情况下，它将使用Web Worker的后台处理中这样做，以降低性能上的开销。它还会使用LocalStorage持久化来缓存测试的结果 —— 以一种可以被所有你访问的使用这个服务的站点所共享的方式，这将及大地降低测试需要在每个浏览器实例上运行的频度。
 
-You get runtime feature tests in each of your users' browsers, and you can use those tests results dynamically to serve users the most appropriate code (no more, no less) for their environments.
+你可以在每一个用户的浏览器上进行运行时特性测试，而且你可以使用这些测试结果动态地向用户传递最适合他们环境的代码（不多也不少）。
 
-Moreover, the service provides tools and APIs to scan your files to determine what features you need, so you can fully automate your split delivery build processes.
+另外，这个服务还提供工具和API来扫描你的文件以判定你需要什么特性，这样你就能够完全自动化你的分割投递构建过程。
 
-FeatureTests.io makes it practical to use feature tests for all parts of ES6 and beyond to make sure that only the best code is ever loaded and run for any given environment.
+对ES6的所有以及未来的部分进行特性测试，以确保对于任何给定的环境都只有最佳的代码会被加载和运行 —— FeatureTests.io使这成为可能。
 
-## Tail Call Optimization (TCO)
+## 尾部调用优化（TCO）
 
-Normally, when a function call is made from inside another function, a second *stack frame* is allocated to separately manage the variables/state of that other function invocation. Not only does this allocation cost some processing time, but it also takes up some extra memory.
+通常来说，当从一个函数内部发起对另一个函数的调用时，就会分配一个 *栈帧* 来分离地管理这另一个函数调用的变量/状态。这种分配不仅花费一些处理时间，还会消耗一些额外的内存。
 
-A call stack chain typically has at most 10-15 jumps from one function to another and another. In those scenarios, the memory usage is not likely any kind of practical problem.
+一个调用栈链从一个函数到另一个再到另一个，通常至多拥有10-15跳。在这些场景下，内存使用不太可能是某种实际问题。
 
-However, when you consider recursive programming (a function calling itself repeatedly) -- or mutual recursion with two or more functions calling each other -- the call stack could easily be hundreds, thousands, or more levels deep. You can probably see the problems that could cause, if memory usage grows unbounded.
+然而，当你考虑递归编程（一个函数频繁地调用自己） —— 或者使用两个或更多的函数相互调用而构成相互递归 —— 调用栈就可能轻易地到达上百，上千，或更多层的深度。如果内存的使用无限制地增长下去，你可能看到了它将导致的问题。
 
-JavaScript engines have to set an arbitrary limit to prevent such programming techniques from crashing by running the browser and device out of memory. That's why we get the frustrating "RangeError: Maximum call stack size exceeded" thrown if the limit is hit.
+JavaScript引擎不得不设置一个随意的限度来防止这样的编程技术耗尽浏览器或设备的内存。这就是为什么我们会在到达这个限度时得到令人沮丧的“RangeError: Maximum call stack size exceeded”。
 
-**Warning:** The limit of call stack depth is not controlled by the specification. It's implementation dependent, and will vary between browsers and devices. You should never code with strong assumptions of exact observable limits, as they may very well change from release to release.
+**警告：** 调用栈深度的限制是不由语言规范控制的。它是依赖于具体实现的，而且将会根据浏览器和设备不同而不同。你绝不应该带着可精确观察到的限度的强烈臆想进行编码，因为它们还很可能在每个版本中变化。
 
-Certain patterns of function calls, called *tail calls*, can be optimized in a way to avoid the extra allocation of stack frames. If the extra allocation can be avoided, there's no reason to arbitrarily limit the call stack depth, so the engines can let them run unbounded.
+一种称为 *尾部调用* 的特定函数调用模式，可以以一种避免额外的栈帧分配的方法进行优化。如果额外的分配可以被避免，那么就没有理由随意地限制调用栈的深度，这样引擎就可以让它们没有边界地运行下去。
 
-A tail call is a `return` statement with a function call, where nothing has to happen after the call except returning its value.
+一个尾部调用是一个带有函数调用的`return`语句，除了返回它的值，函数调用之后没有任何事情需要发生。
 
-This optimization can only be applied in `strict` mode. Yet another reason to always be writing all your code as `strict`!
+这种优化只能在`strict`模式下进行。又一个你总是应该用`strict`编写所有代码的理由！
 
-Here's a function call that is *not* in tail position:
+这个函数调用 *不是* 在尾部：
 
 ```js
 "use strict";
@@ -1044,16 +1046,16 @@ function foo(x) {
 }
 
 function bar(x) {
-	// not a tail call
+	// 不是一个尾部调用
 	return 1 + foo( x );
 }
 
 bar( 10 );				// 21
 ```
 
-`1 + ..` has to be performed after the `foo(x)` call completes, so the state of that `bar(..)` invocation needs to be preserved.
+在`foo(x)`调用完成后必须进行`1 + ..`，所以那个`bar(..)`调用的状态需要被保留。
 
-But the following snippet demonstrates calls to `foo(..)` and `bar(..)` where both *are* in tail position, as they're the last thing to happen in their code path (other than the `return`):
+但是下面的代码段中展示的`foo(..)`和`bar(..)`都是位于尾部，因为它们都是在自身代码路径上（除了`return`以外）发生的最后一件事：
 
 ```js
 "use strict";
@@ -1076,23 +1078,23 @@ bar( 5 );				// 24
 bar( 15 );				// 32
 ```
 
-In this program, `bar(..)` is clearly recursive, but `foo(..)` is just a regular function call. In both cases, the function calls are in *proper tail position*. The `x + 1` is evaluated before the `bar(..)` call, and whenever that call finishes, all that happens is the `return`.
+在这个程序中，`bar(..)`明显是递归，但`foo(..)`只是一个普通的函数调用。这两个函数调用都位于 *恰当的尾部位置*。`x + 1`在`bar(..)`调用之前被求值，而且不论这个调用何时完成，所有将要放生的只有`return`。
 
-Proper Tail Calls (PTC) of these forms can be optimized -- called tail call optimization (TCO) -- so that the extra stack frame allocation is unnecessary. Instead of creating a new stack frame for the next function call, the engine just reuses the existing stack frame. That works because a function doesn't need to preserve any of the current state, as nothing happens with that state after the PTC.
+这些形式的恰当尾部调用（Proper Tail Calls —— PTC）是可以被优化的 —— 称为尾部调用优化（TCO）—— 于是额外的栈帧分配是不必要的。与为下一个函数调用创建新的栈帧不同，引擎会重用既存的栈帧。这能够工作是因为一个函数不需要保留任何当前状态 —— 在PTC之后的状态下不会发生任何事情。
 
-TCO means there's practically no limit to how deep the call stack can be. That trick slightly improves regular function calls in normal programs, but more importantly opens the door to using recursion for program expression even if the call stack could be tens of thousands of calls deep.
+TCO意味着调用栈可以有多深实际上是没有限度的。这种技巧稍稍改进了一般程序中的普通函数调用，但更重要的是它打开了一扇大门：可以使用递归表达程序，即使它的调用栈深度有成千上万层。
 
-We're no longer relegated to simply theorizing about recursion for problem solving, but can actually use it in real JavaScript programs!
+我们不再局限于单纯地在理论上考虑用递归解决问题了，而是可以在真实的JavaScript程序中使用它！
 
-As of ES6, all PTC should be optimizable in this way, recursion or not.
+作为ES6，所有的PTC都应该是可以以这种方式优化的，不论递归与否。
 
-### Tail Call Rewrite
+### 重写尾部调用
 
-The hitch, however, is that only PTC can be optimized; non-PTC will still work of course, but will cause stack frame allocation as they always did. You'll have to be careful about structuring your functions with PTC if you expect the optimizations to kick in.
+然而，障碍是只有PTC是可以被优化的；非PTC理所当然地依然可以工作，但是将造成往常那样的栈帧分配。如果你希望优化机制启动，就必须小心地使用PTC构造你的函数。
 
-If you have a function that's not written with PTC, you may find the need to manually rearrange your code to be eligible for TCO.
+如果你有一个没有用PTC编写的函数，你可能会发现你需要手动地重新安排你的代码，使它成为合法的TCO。
 
-Consider:
+考虑如下代码：
 
 ```js
 "use strict";
@@ -1105,9 +1107,9 @@ function foo(x) {
 foo( 123456 );			// RangeError
 ```
 
-The call to `foo(x-1)` isn't a PTC because its result has to be added to `(x / 2)` before `return`ing.
+对`foo(x-1)`的调用不是一个PTC，因为在`return`之前它的结果必须被加上`(x / 2)`。
 
-However, to make this code eligible for TCO in an ES6 engine, we can rewrite it as follows:
+但是，要使这段代码在一个ES6引擎中是合法的TCO，我们可以像下面这样重写它：
 
 ```js
 "use strict";
@@ -1126,13 +1128,13 @@ var foo = (function(){
 foo( 123456 );			// 3810376848.5
 ```
 
-If you run the previous snippet in an ES6 engine that implements TCO, you'll get the `3810376848.5` answer as shown. However, it'll still fail with a `RangeError` in non-TCO engines.
+如果你在一个实现了TCO的ES6引擎中运行前面这个代码段，你将会如展示的那样得到答案`3810376848.5`。然而，它仍然会在非TCO引擎中因为`RangeError`而失败。
 
-### Non-TCO Optimizations
+### 非TCO优化
 
-There are other techniques to rewrite the code so that the call stack isn't growing with each call.
+有另一种技术可以重写代码，让调用栈不随每次调用增长。
 
-One such technique is called *trampolining*, which amounts to having each partial result represented as a function that either returns another partial result function or the final result. Then you can simply loop until you stop getting a function, and you'll have the result. Consider:
+一个这样的技术称为 *蹦床*，它相当于让每一部分结果表示为一个函数，这个函数要么返回另一个部分结果函数，要么返回最终结果。然后你就可以简单地循环直到你不再收到一个函数，这时你就得到了结果。考虑如下代码：
 
 ```js
 "use strict";
@@ -1160,16 +1162,16 @@ var foo = (function(){
 foo( 123456 );			// 3810376848.5
 ```
 
-This reworking required minimal changes to factor out the recursion into the loop in `trampoline(..)`:
+这种返工需要一些最低限度的改变来将递归抽出到`trampoline(..)`中的循环中：
 
-1. First, we wrapped the `return _foo ..` line in the `return partial() { ..` function expression.
-2. Then we wrapped the `_foo(1,x)` call in the `trampoline(..)` call.
+1. 首先，我们将`return _foo ..`这一行包装进函数表达式`return partial() {..`。
+2. 然后我们将`_foo(1,x)`包装进`trampoline(..)`调用。
 
-The reason this technique doesn't suffer the call stack limitation is that each of those inner `partial(..)` functions is just returned back to the `while` loop in `trampoline(..)`, which runs it and then loop iterates again. In other words, `partial(..)` doesn't recursively call itself, it just returns another function. The stack depth remains constant, so it can run as long as it needs to.
+这种技术之所以不受调用栈限制的影响，是因为每个内部的`partial(..)`函数都只是返回到`trampoline(..)`的`while`循环中，这个循环运行它然后再一次循环迭代。换言之，`partial(..)`并不递归地调用它自己，它只是返回另一个函数。栈的深度维持不变，所以它需要运行多久就可以运行多久。
 
-Trampolining expressed in this way uses the closure that the inner `partial()` function has over the `x` and `acc` variables to keep the state from iteration to iteration. The advantage is that the looping logic is pulled out into a reusable `trampoline(..)` utility function, which many libraries provide versions of. You can reuse `trampoline(..)` multiple times in your program with different trampolined algorithms.
+蹦床表达的是，内部的`partial()`函数使用在变量`x`和`acc`上的闭包来保持迭代与迭代之间的状态。它的优势是循环的逻辑可以被抽出到一个可重用的`trampoline(..)`工具函数中，许多库都提供这个工具的各种版本。你可以使用不同的蹦床算法在你的程序中重用`trampoline(..)`多次。
 
-Of course, if you really wanted to deeply optimize (and the reusability wasn't a concern), you could discard the closure state and inline the state tracking of `acc` into just one function's scope along with a loop. This technique is generally called *recursion unrolling*:
+当然，如果你真的想要深度优化（于是可复用性不予考虑），你可以摒弃闭包状态，并将对`acc`的状态追踪，与一个循环一起内联到一个函数的作用域内。这种技术通常称为 *递归展开*：
 
 ```js
 "use strict";
@@ -1186,22 +1188,22 @@ function foo(x) {
 foo( 123456 );			// 3810376848.5
 ```
 
-This expression of the algorithm is simpler to read, and will likely perform the best (strictly speaking) of the various forms we've explored. That may seem like a clear winner, and you may wonder why you would ever try the other approaches.
+算法的这种表达形式很容易阅读，而且很可能是在我们探索过的各种形式中性能最好的（严格地说）一个。很明显它看起来是一个胜利者，而且你可能会想知道为什么你曾尝试其他的方式。
 
-There are some reasons why you might not want to always manually unroll your recursions:
+这些是为什么你可能不想总是手动地展开递归的原因：
 
-* Instead of factoring out the trampolining (loop) logic for reusability, we've inlined it. This works great when there's only one example to consider, but as soon as you have a half dozen or more of these in your program, there's a good chance you'll want some reusability to keep things shorter and more manageable.
-* The example here is deliberately simple enough to illustrate the different forms. In practice, there are many more complications in recursion algorithms, such as mutual recursion (more than just one function calling itself).
+* 与为了复用而将弹簧（循环）逻辑抽出去相比，我们内联了它。这在仅有一个这样的例子需要考虑时工作的很好，但只要你在程序中有五六个或更多这样的东西时，你将很可能想要一些可复用性来将让事情更简短、更易管理一些。
+* 这里的例子为了展示不同的形式而被故意地搞得很简单。在现实中，递归算法有着更多的复杂性，比如相互递归（有多于一个的函数调用它自己）。
 
-   The farther you go down this rabbit hole, the more manual and intricate the *unrolling* optimizations are. You'll quickly lose all the perceived value of readability. The primary advantage of recursion, even in the PTC form, is that it preserves the algorithm readability, and offloads the performance optimization to the engine.
+	 你在这条路上走得越远，*展开* 优化就变得越复杂和越依靠手动。你很快就会失去所有可读性的认知价值。递归，甚至是PTC形式的递归的主要优点是，它保留了算法的可读性，并将性能优化的任务交给引擎。
 
-If you write your algorithms with PTC, the ES6 engine will apply TCO to let your code run in constant stack depth (by reusing stack frames). You get the readability of recursion with most of the performance benefits and no limitations of run length.
+如果你使用PTC编写你的算法，ES6引擎将会实施TCO来使你的代码运行在一个定长深度的栈中（通过重用栈帧）。你将在得到递归的可读性的同时，也得到性能上的大部分好处与无限的运行长度。
 
-### Meta?
+### 元？
 
-What does TCO have to do with meta programming?
+TCO与元编程有什么关系？
 
-As we covered in the "Feature Testing" section earlier, you can determine at runtime what features an engine supports. This includes TCO, though determining it is quite brute force. Consider:
+正如我们在早先的“特性测试”一节中讲过的，你可以在运行时判定一个引擎支持什么特性。这也包括TCO，虽然判定的过程相当粗暴。考虑如下代码：
 
 ```js
 "use strict";
@@ -1218,15 +1220,15 @@ catch (err) {
 }
 ```
 
-In a non-TCO engine, the recursive loop will fail out eventually, throwing an exception caught by the `try..catch`. Otherwise, the loop completes easily thanks to TCO.
+在一个非TCO引擎中，递归循环最终将会失败，抛出一个被`try..catch`捕获的异常。否则循环将由TCO轻易地完成。
 
-Yuck, right?
+讨厌，对吧？
 
-But how could meta programming around the TCO feature (or rather, the lack thereof) benefit our code? The simple answer is that you could use such a feature test to decide to load a version of your application's code that uses recursion, or an alternative one that's been converted/transpiled to not need recursion.
+但是围绕着TCO特性进行的元编程（或者，没有它）如何给我们的代码带来好处？简单的答案是你可以使用这样的特性测试来决定加载一个你的应用程序的使用递归的版本，还是一个被转换/转译为不需要递归的版本。
 
-#### Self-Adjusting Code
+#### 自我调整的代码
 
-But here's another way of looking at the problem:
+但这里有另外一种看待这个问题的方式：
 
 ```js
 "use strict";
@@ -1255,30 +1257,30 @@ function foo(x) {
 foo( 123456 );			// 3810376848.5
 ```
 
-This algorithm works by attempting to do as much of the work with recursion as possible, but keeping track of the progress via scoped variables `x` and `acc`. If the entire problem can be solved with recursion without an error, great. If the engine kills the recursion at some point, we simply catch that with the `try..catch` and then try again, picking up where we left off.
+这个算法试图尽可能多地使用递归来工作，但是通过作用域中的变量`x`和`acc`来跟踪这个进程。如果整个问题可以通过递归没有错误地解决，很好。如果引擎在某一点终止了递归，我们简单地使用`try..catch`捕捉它，然后从我们离开的地方再试一次。
 
-I consider this a form of meta programming in that you are probing during runtime the ability of the engine to fully (recursively) finish the task, and working around any (non-TCO) engine limitations that may restrict you.
+我认为这是一种形式的元编程，因为你在运行时期间探测着引擎是否能（递归地）完成任务的能力，并绕过了任何可能制约你的（非TCO的）引擎的限制。
 
-At first (or even second!) glance, my bet is this code seems much uglier to you compared to some of the earlier versions. It also runs a fair bit slower (on larger runs in a non-TCO environment).
+一眼（或者是两眼！）看上去，我打赌这段代码要比以前的版本难看许多。它运行起来还相当地慢一些（在一个非TCO环境中长时间运行的情况下）。
 
-The primary advantage, other than it being able to complete any size task even in non-TCO engines, is that this "solution" to the recursion stack limitation is much more flexible than the trampolining or manual unrolling techniques shown previously.
+它主要的优势是，除了在非TCO引擎中也能完成任意栈大小的任务外，这种对递归栈限制的“解法”要比前面展示的蹦床和手动展开技术灵活得多。
 
-Essentially, `_foo()` in this case is a sort of stand-in for practically any recursive task, even mutual recursion. The rest is the boilerplate that should work for just about any algorithm.
+实质上，这种情况下的`_foo()`实际上是任意递归任务，甚至是相互递归的某种替身。剩下的内容是应当对任何算法都可以工作的模板代码。
 
-The only "catch" is that to be able to resume in the event of a recursion limit being hit, the state of the recursion must be in scoped variables that exist outside the recursive function(s). We did that by leaving `x` and `acc` outside of the `_foo()` function, instead of passing them as arguments to `_foo()` as earlier.
+唯一的“技巧”是为了能够在达到递归限制的事件发生时继续运行，递归的状态必须保存在递归函数外部的作用域变量中。我们是通过将`x`和`acc`留在`_foo()`函数外面这样做的，而不是像早先那样将它们作为参数值传递给`_foo()`。
 
-Almost any recursive algorithm can be adapted to work this way. That means it's the most widely applicable way of leveraging TCO with recursion in your programs, with minimal rewriting.
+几乎所有的递归算法都可以采用这种方法工作。这意味着它是在你的程序中，进行最小的重写就能利用TCO递归的最广泛的可行方法。
 
-This approach still uses a PTC, meaning that this code will *progressively enhance* from running using the loop many times (recursion batches) in an older browser to fully leveraging TCO'd recursion in an ES6+ environment. I think that's pretty cool!
+这种方式仍然使用一个PTC，意味着这段代码将会 *渐进增强*：从在一个老版浏览器中使用许多次循环（递归批处理）来运行，到在一个ES6+环境中完全利用TCO递归。我觉得这相当酷！
 
-## Review
+## 复习
 
-Meta programming is when you turn the logic of your program to focus on itself (or its runtime environment), either to inspect its own structure or to modify it. The primary value of meta programming is to extend the normal mechanisms of the language to provide additional capabilities.
+元编程是当你将程序的逻辑转向关注它自身（或者它的运行时环境）时进行的编程，要么为了调查它自己的结构，要么为了修改它。元编程的主要价值是扩展语言的普通机制来提供额外的能力。
 
-Prior to ES6, JavaScript already had quite a bit of meta programming capability, but ES6 significantly ramps that up with several new features.
+在ES6以前，JavaScript已经有了相当的元编程能力，但是ES6使用了几个新特性及大地提高了它的地位。
 
-From function name inferences for anonymous functions to meta properties that give you information about things like how a constructor was invoked, you can inspect the program structure while it runs more than ever before. Well Known Symbols let you override intrinsic behaviors, such as coercion of an object to a primitive value. Proxies can intercept and customize various low-level operations on objects, and `Reflect` provides utilities to emulate them.
+从对匿名函数的函数名推断，到告诉你一个构造器是如何被调用的元属性，你可以前所未有地在程序运行期间来调查它的结构。通用Symbols允许你覆盖固有的行为，比如将一个对象转换为一个基本类型值的强制转换。代理可以拦截并自定义各种在对象上的底层操作，而且`Reflect`提供了模拟它们的工具。
 
-Feature testing, even for subtle semantic behaviors like Tail Call Optimization, shifts the meta programming focus from your program to the JS engine capabilities itself. By knowing more about what the environment can do, your programs can adjust themselves to the best fit as they run.
+特性测试，即便是对尾部调用优化这样微妙的语法行为，将元编程的焦点从你的程序提升到JS引擎的能力本身。通过更多地了解环境可以做什么，你的程序可以在运行时将它们自己调整到最佳状态。
 
-Should you meta program? My advice is: first focus on learning how the core mechanics of the language really work. But once you fully know what JS itself can do, it's time to start leveraging these powerful meta programming capabilities to push the language further!
+你应该进行元编程吗？我的建议是：先集中学习这门语言的核心机制是如何工作的。一旦你完全懂得了JS本身可以做什么，就是开始利用这些强大的元编程能力将这门语言向前推进的时候了！

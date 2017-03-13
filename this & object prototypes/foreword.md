@@ -1,21 +1,21 @@
-# You Don't Know JS: *this* & Object Prototypes
-# Foreword
+# 你不懂JS: *this* 与对象原型
+# 序
 
-While reading this book in preparation for writing this foreword, I was forced to reflect on how I learned JavaScript and how much it has changed over the last 15 years that I have been programming and developing with it.
+在我读这本书为写这篇序言做准备时，我被迫反思我是如何学习JavaScript，和在我用它进行编程和开发的最近15年它改变了多少。
 
-When I started using JavaScript 15 years ago, the practice of using non-HTML technologies such as CSS and JS in your web pages was called DHTML or Dynamic HTML. Back then, the usefulness of JavaScript varied greatly and seemed to be tilted toward adding animated snowflakes to your web pages or dynamic clocks that told the time in the status bar. Suffice it to say, I didn’t really pay much attention to JavaScript in the early part of my career because of the novelty of the implementations that I often found on the Internet.
+当我15年前开始使用JavaScript时，在你的网页上使用CSS和JS这样的非HTML技术的实践称为DHTML或动态HTML。回到那时，JavaScript的用途有很大的不同，并且倾向于在你的网页上加入动画雪花，或者在状态栏上显示告知时间的动态时钟。可以说，在我的职业生涯早期，因为这些我经常能在因特网上找到的新奇小玩意儿，我真的没有太注意JavaScript。
 
-It wasn’t until 2005 that I first rediscovered JavaScript as a real programming language that I needed to pay closer attention to. After digging into the first beta release of Google Maps, I was hooked on the potential it had. At the time, Google Maps was a first-of-its-kind application -- it allowed you to move a map around with your mouse, zoom in and out, and make server requests without reloading the page -- all with JavaScript. It seemed like magic!
+直到2005年我第一次重新认识到JavaScript是一个我需要更加重视的真正的编程语言。在挖掘研究了Google Maps的第一个beta版后，我被它的潜力吸引住了。那时，Google Maps是第一个同种类的应用——它允许你用鼠标移动地图，放缩，请求服务器而不必刷新页面——都是通过JavaScript。它看起来就像魔法！
 
-When anything seems like magic, it is usually a good indication you are at the dawn of a new way of doing things. And boy, was I not wrong -- fast-forwarding to today, I would say that JavaScript is one of the primary languages I use for both client- and server-side programming, and I wouldn’t have it any other way.
+当什么东西看起来像魔法时，这通常都一个好的信号：你正处在用新方法做事的黎明。噢，我没有错 —— 快进到今天，我敢说JavaScript是同时用于客户端和服务器端编程的主要语言之一，而且我不会用其他方式这么说。
 
-One of my regrets as I look over the past 15 years is that I didn’t give JavaScript more of a chance before 2005, or more accurately, that I lacked the foresight to see JavaScript as a true programming language that is just as useful as C++, C#, Java, and many others.
+在我回顾过去的15年时，我的一个遗憾是在2005年以前我没有给JavaScript更多机会，或者更确切地说，我缺乏远见来看到JavaScript是一个真正的编程语言，就像C++，C#，Java和许多其他语言一样有用。
 
-If I had this *You Don’t Know JS* series of books at the start of my career, my career history would look much different than it does today. And that is one of the things I love about this series: it explains JS at a level that builds your understanding as you go through the series, but in a fun and informative way.
+如果我在自己的职业生涯一开始就拥有这套 *你不懂JS* 系列丛书，我们的职业经历将和今天有很大的不同。我喜欢这个系列的一个地方是：当你通读这个系列时，它在建立你的理解的水平上讲解JS，而且用一种有趣且信息丰富的方式。
 
-*this & Object Prototypes* is a wonderful continuation to the series. It does a great and natural job of building on the prior book, Scope & Closures, and extending that knowledge to a very important part of the JS language, the `this` keyword and prototypes. These two simple things are pivotal for what you will learn in the future books, because they are foundational to doing real programming with JavaScript. The concept of how to create objects, relate them, and extend them to represent things in your application is necessary to create large and complex applications in JavaScript. And without them, creating complex applications (such as Google Maps) wouldn’t be possible in JavaScript.
+*this与对象原型* 是这个系列的一个绝妙的续作。它漂亮且自然地建立于前一本书之上，作用于与闭包，将知识扩展至JS语言中十分重要的部分，`this`关键字和原型。这两个简单的东西是你将在未来的书中学到的东西的枢纽，因为他们是用JavaScript进行真正的编程的基础。如何创建对象，关联它们，和扩展它们来表达你的应用中的东西，是用JavaScript建立大型和复杂应用程序所必要的。没有它们，用JavaScript制造复杂应用程序（比如Google Maps）将是不可能的。
 
-I would say that the vast majority of web developers probably have never built a JavaScript object and just treat the language as event-binding glue between buttons and AJAX requests. I was in that camp at a point in my career, but after I learned how to master prototypes and create objects in JavaScript, a world of possibilities opened up for me. If you fall into the category of just creating event-binding glue code, this book is a must-read; if you just need a refresher, this book will be a go-to resource for you. Either way, you will not be disappointed. Trust me!
+我敢说绝大多数web开发者可能从没建立过JavaScript对象，而只是将这个语言当做按钮和AJAX请求的事件绑定胶水。我曾经在我职业生涯的某一点上属于这个群体，但是当我学习了如何掌握原型和在JavaScript中创建对象后，一个充满可能性的世界向我打开了大门。如果你属于仅仅会写事件绑定胶水代码的那一类，这本书是必读的；如果你只是需要进修，这本书是你一定会用到的资源。不管怎样，你不会失望的。相信我！
 
 Nick Berardi<br>
 [nickberardi.com](http://nickberardi.com), [@nberardi](http://twitter.com/nberardi)

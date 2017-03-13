@@ -1,37 +1,37 @@
-# Contributing
+# 贡献
 
-Please feel free to contribute to the quality of this content by submitting PR's for improvements to code snippets, explanations, etc. If there's any doubt or if you think that a word/phrase is used confusingly, **before submitting a PR, open an issue to ask about it.**
+欢迎通过提交PR改进代码段，讲解等，来为此内容的质量做出贡献。如果有任何疑问，或者你认为一个词/句的用法令人糊涂，**那么在提交 PR 之前，先开一个 issue 来询问此事。**
 
-However, if you choose to contribute content (not just typo corrections) to this repo, you agree that you're giving me a non-exclusive license to use that content for the book, as I (and my publisher) deem appropriate. You probably guessed that already, but I just have to make sure the lawyers are happy by explicitly stating it.
+但是，如果你选择向这个代码库贡献内容（不只是修改拼写错误），你就相当于同意给予我一个非独家许可，以我（和O'Reilly）认为恰当的方式在这个系列丛书中使用那些内容。你可能已经猜到了，但我们不得不把话说明白来使律师们高兴一些。
 
-## Reading Experience (Chapter/Section links, etc)
+## 阅读体验（章节链接，等等）
 
-I understand that reading one long .md file, with no relative cross links to other sections/etc, is not the preferred reading experience for most of you. As such, it's totally reasonable to want to file an issue/PR to add those kinds of features.
+我明白，在没有交叉连接其他章节的的情况下，阅读一个很长的 .md 文件不是大多数人喜欢的阅读体验。因此，想要为添加这种特性而创建一个 issue/PR 的想法是完全合理的。
 
-This topic has been brought up many times, and I've considered it. For now, I **do not** accept these kinds of changes into the repo.
+这个话题已经被提起许多次了，而且我考虑过它。目前，我 **不** 在这个代码库中接受这种改变。
 
-The main purpose of my book repos is to track and manage the content for the purposes of publication (paid-for ebooks and print books). I do this in the open because I also care about providing free and early access to the content, to make sure there is no paywall barrier to learning.
+我的书的代码库的主要目的是为了出版（付费的电子书与印刷版书籍）来追踪与管理内容。我公开这样做是因为我对提供免费和内容的早期访问同样关心，以确保对于学习来说不存在付费的壁垒。
 
-As such, this repo **is not optimized for your reading experience.**
+因此，这个代码库 **没有为你的阅读体验而优化**。
 
-The primary reading experience, likely the most pleasant one for many of you, is the ebooks or print books, which [are available for sale](http://ssearch.oreilly.com/?q=%22you+don%27t+know+js%22&x=0&y=0). The balance I'm striking here is releasing the content for free, but selling the reading experience. Other authors make different decisions on that balance, but that's what I've come to for now.
+大多数人喜欢的阅读体验，是电子书与印刷版书籍，它们[已经上市](http://ssearch.oreilly.com/?q=%22you+don%27t+know+js%22&x=0&y=0)。我在这里调整的平衡，是免费发布内容，贩卖阅读体验。其他的作者会在这种平衡中做出不同的决定，但这是我目前的想法。
 
-I hope you continue to enjoy and benefit from the content, and I also hope you value it enough to [purchase the best reading experience](http://ssearch.oreilly.com/?q=%22you+don%27t+know+js%22&x=0&y=0) in the ebook/print form.
+我希望你能继续享受这里的内容并从中获益，也希望你通过[购买电子书与印刷版中的最佳阅读体验](http://ssearch.oreilly.com/?q=%22you+don%27t+know+js%22&x=0&y=0)来给予它足够的肯定。
 
-## Editions
+## 版本
 
-The current state of this repo is the 1st Edition of the published form of these books. That means that you should have almost exactly the same content here as in the ebooks or printed books, with only minor variances in typos, formatting, etc.
+这个代码库当前的状态是这些书籍出版的第一个版本。这就是说你拥有的应当是与电子书或印刷版书籍中几乎完全相同的内容，只在拼写，格式等问题上有所不同。
 
-I generally am not accepting any changes to the current repo, as I do not want this content to diverge from what's in the published books. There are over a hundred filed issues/PRs for changes that are being collected for the 2nd Edition, but work has not yet begun on that.
+一般我不会接受任何对当前代码库的改变，因为我不想让这里的内容与出版过的书籍有出入。对于本书的第二版已经有超过一百个 issue/PR 被提出了，但是关于它们的工作还没有展开。
 
-So, if you find something that should be fixed, just know that it will likely sit for awhile in that batch until it's time to make the 2nd Edition updates. At that time, my plan is to make separate branches to track the editions.
+所以，如果你发现有些东西应当被修改，那么要知道它很可能会在一批修改中等待一段时间，直到第二版更新的时机来临。到那时，我的计划是开出其他分支来追踪各个版本。
 
-## Typos?
+## 拼写错误？
 
-These books go through official editing with the publisher, and typos are likely all caught at that stage. As such, **typos are not a big concern for this repo**.
+这些书已经经过出版商的官方编辑，拼写错误很可能在那一阶段都被找出来了。因此，**这个代码库不很关心拼写错误**。
 
-If you're going to submit a PR for typo fixes, please be measured in doing so by collecting several small changes into a single PR (in separate commits). Or, **just don't even worry about them for now,** because we'll get to them later. I promise.
+如果你要为拼写错误的修改提交 PR，请将几个小的修改综合在一个单独的 PR 中（分为几个 commit）。或者，**就目前来说根本不必关心它们**，因为我们会稍后处理它们的。我保证。
 
-## Search First!
+## 先搜索一下！
 
-Also, if you have any questions or concerns, please make sure to search the issues (both open and closed!) first, to keep the churn of issues to a minimum. I want to keep my focus on writing these books as much as possible.
+另外，如果你有任何问题或疑问，请首先搜索 issue（打开的与关闭的两者！），以使 issue 数量维持在最小。我想让自己竟可能地将注意力集中在写书上。

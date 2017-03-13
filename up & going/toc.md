@@ -1,35 +1,35 @@
-# You Don't Know JS: Up & Going
+# 你不懂JS：入门与进阶
 
-## Table of Contents
+## 目录
 
-* Foreword
-* Preface
-* Chapter 1: Into Programming
-	* Code
-	* Try It Yourself
-	* Operators
-	* Values & Types
-	* Code Comments
-	* Variables
-	* Blocks
-	* Conditionals
-	* Loops
-	* Functions
-	* Practice
-* Chapter 2: Into JavaScript
-	* Values & Types
-	* Variables
-	* Conditionals
-	* Strict Mode
-	* Functions As Values
-	* `this` Keyword
-	* Prototypes
-	* Old & New
-	* Non-JavaScript
-* Chapter 3: Into YDKJS
-	* Scope & Closures
-	* this & Object Prototypes
-	* Types & Grammar
-	* Async & Performance
-	* ES6 & Beyond
-* Appendix A: Acknowledgments
+* 序
+* 前言
+* 第一章：进入编程
+	* 代码
+	* 亲自尝试
+	* 操作符
+	* 值与类型
+	* 代码注释
+	* 变量
+	* 块儿
+	* 条件
+	* 循环
+	* 函数
+	* 练习
+* 第二章：进入JavaScript
+	* 值与类型
+	* 变量
+	* 条件
+	* Strict模式
+	* 函数作为值
+	* `this` 标识符
+	* 原型
+	* 旧的与新的
+	* 非JavaScript
+* 第三章：进入YDKJS
+	* 作用域与闭包
+	* this与对象原型
+	* 类型与文法
+	* 异步与性能
+	* ES6与未来
+* 附录A：鸣谢

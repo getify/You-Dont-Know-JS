@@ -1,15 +1,15 @@
-# You Don't Know JS: ES6 & Beyond
-# Chapter 2: Syntax
+# 你不懂JS：ES6与未来
+# 第二章：语法
 
-If you've been writing JS for any length of time, odds are the syntax is pretty familiar to you. There are certainly many quirks, but overall it's a fairly reasonable and straightforward syntax that draws many similarities from other languages.
+如果你曾经或多或少地写过JS，那么你很可能对它的语法感到十分熟悉。当然有一些奇怪之处，但是总体来讲这是一种与其他语言有很多相似之处的，相当合理而且直接的语法。
 
-However, ES6 adds quite a few new syntactic forms that take some getting used to. In this chapter, we'll tour through them to find out what's in store.
+然而，ES6增加了好几种需要费些功夫才能习惯的新语法形式。在这一章中，我们将遍历它们来看看葫芦里到底卖的什么药。
 
-**Tip:** At the time of this writing, some of the features discussed in this book have been implemented in various browsers (Firefox, Chrome, etc.), but some have only been partially implemented and many others have not been implemented at all. Your experience may be mixed trying these examples directly. If so, try them out with transpilers, as most of these features are covered by those tools. ES6Fiddle (http://www.es6fiddle.net/) is a great, easy-to-use playground for trying out ES6, as is the online REPL for the Babel transpiler (http://babeljs.io/repl/).
+**提示：** 在写作本书时，这本书中所讨论的特性中的一些已经被各种浏览器（Firefox，Chrome，等等）实现了，但是有一些仅仅被实现了一部分，而另一些根本就没实现。如果直接尝试这些例子，你的体验可能会夹杂着三种情况。如果是这样，就使用转译器尝试吧，这些特性中的大多数都被那些工具涵盖了。ES6Fiddle（http://www.es6fiddle.net/）是一个了不起的尝试ES6的游乐场，简单易用，它是一个Babel转译器的在线REPL（http://babeljs.io/repl/）。
 
-## Block-Scoped Declarations
+## 块儿作用域声明
 
-You're probably aware that the fundamental unit of variable scoping in JavaScript has always been the `function`. If you needed to create a block of scope, the most prevalent way to do so other than a regular function declaration was the immediately invoked function expression (IIFE). For example:
+你可能知道在JavaScript中变量作用域的基本单位总是`function`。如果你需要创建一个作用域的块儿，除了普通的函数声明以外最流行的方法就是使用立即被调用的函数表达式（IIFE）。例如：
 
 ```js
 var a = 2;
@@ -22,9 +22,9 @@ var a = 2;
 console.log( a );		// 2
 ```
 
-### `let` Declarations
+### `let`声明
 
-However, we can now create declarations that are bound to any block, called (unsurprisingly) *block scoping*. This means all we need is a pair of `{ .. }` to create a scope. Instead of using `var`, which always declares variables attached to the enclosing function (or global, if top level) scope, use `let`:
+但是，现在我们可以创建绑定到任意的块儿上的声明了，它（勿庸置疑地）称为 *块儿作用域*。这意味着一对`{ .. }`就是我们用来创建一个作用域所需要的全部。`var`总是声明附着在外围函数（或者全局，如果在顶层的话）上的变量，取而代之的是，使用`let`：
 
 ```js
 var a = 2;
@@ -37,11 +37,11 @@ var a = 2;
 console.log( a );		// 2
 ```
 
-It's not very common or idiomatic thus far in JS to use a standalone `{ .. }` block, but it's always been valid. And developers from other languages that have *block scoping* will readily recognize that pattern.
+迄今为止，在JS中使用独立的`{ .. }`块儿不是很常见，也不是惯用模式，但它总是合法的。而且那些来自拥有 *块儿作用域* 的语言的开发者将很容易认出这种模式。
 
-I believe this is the best way to create block-scoped variables, with a dedicated `{ .. }` block. Moreover, you should always put the `let` declaration(s) at the very top of that block. If you have more than one to declare, I'd recommend using just one `let`.
+我相信使用一个专门的`{ .. }`块儿是创建块儿作用域变量的最佳方法。但是，你应该总是将`let`声明放在块儿的最顶端。如果你有多于一个的声明，我推荐只使用一个`let`。
 
-Stylistically, I even prefer to put the `let` on the same line as the opening `{`, to make it clearer that this block is only for the purpose of declaring the scope for those variables.
+从文体上说，我甚至喜欢将`let`放在与开放的`{`的同一行中，以便更清楚地表示这个块儿的目的仅仅是为了这些变量声明作用域。
 
 ```js
 {	let a = 2, b, c;
@@ -49,9 +49,9 @@ Stylistically, I even prefer to put the `let` on the same line as the opening `{
 }
 ```
 
-Now, that's going to look strange and it's not likely going to match the recommendations given in most other ES6 literature. But I have reasons for my madness.
+它现在看起来很奇怪，而且不大可能与其他大多数ES6文献中推荐的文法吻合。但我的疯狂是有原因的。
 
-There's another experimental (not standardized) form of the `let` declaration called the `let`-block, which looks like:
+这是另一种实验性的（不是标准化的）`let`声明形式，称为`let`块儿，看起来就像这样：
 
 ```js
 let (a = 2, b, c) {
@@ -59,11 +59,11 @@ let (a = 2, b, c) {
 }
 ```
 
-That form is what I call *explicit* block scoping, whereas the `let ..` declaration form that mirrors `var` is more *implicit*, as it kind of hijacks whatever `{ .. }` pair it's found in. Generally developers find *explicit* mechanisms a bit more preferable than *implicit* mechanisms, and I claim this is one of those cases.
+我称这种形式为 *明确的* 块儿作用域，而与`var`相似的`let`声明形式更像是 *隐含的*，因为它在某种意义上劫持了它所处的`{ .. }`。一般来说开发者们认为 *明确的* 机制要比 *隐含的* 机制更好一些，我主张这种情况就是这样的情况之一。
 
-If you compare the previous two snippet forms, they're very similar, and in my opinion both qualify stylistically as *explicit* block scoping. Unfortunately, the `let (..) { .. }` form, the most *explicit* of the options, was not adopted in ES6. That may be revisited post-ES6, but for now the former option is our best bet, I think.
+如果你比较前面两个形式的代码段，它们非常相似，而且我个人认为两种形式都有资格在文体上称为 *明确的* 块儿作用域。不幸的是，两者中最 *明确的* `let (..) { .. }`形式没有被ES6所采用。它可能会在后ES6时代被重新提起，但我想目前为止前者是我们的最佳选择。
 
-To reinforce the *implicit* nature of `let ..` declarations, consider these usages:
+为了增强对`let ..`声明的 *隐含* 性质的理解，考虑一下这些用法：
 
 ```js
 let a = 2;
@@ -83,17 +83,17 @@ if (a > 1) {
 }
 ```
 
-Quick quiz without looking back at that snippet: which variable(s) exist only inside the `if` statement, and which variable(s) exist only inside the `for` loop?
+不要回头去看这个代码段，小测验：哪些变量仅存在于`if`语句内部？哪些变量仅存在于`for`循环内部？
 
-The answers: the `if` statement contains `b` and `c` block-scoped variables, and the `for` loop contains `i` and `j` block-scoped variables.
+答案：`if`语句包含块儿作用域变量`b`和`c`，而`for`循环包含块儿作用域变量`i`和`j`。
 
-Did you have to think about it for a moment? Does it surprise you that `i` isn't added to the enclosing `if` statement scope? That mental pause and questioning -- I call it a "mental tax" -- comes from the fact that this `let` mechanism is not only new to us, but it's also *implicit*.
+你有任何迟疑吗？`i`没有被加入外围的`if`语句的作用域让你惊讶吗？思维上的停顿和疑问 —— 我称之为“思维税” —— 不仅源自于`let`机制对我们来说是新东西，还因为它是 *隐含的*。
 
-There's also hazard in the `let c = ..` declaration appearing so far down in the scope. Unlike traditional `var`-declared variables, which are attached to the entire enclosing function scope regardless of where they appear, `let` declarations attach to the block scope but are not initialized until they appear in the block.
+还有一个灾难是`let c = ..`声明出现在作用域中太过靠下的地方。传统的被`var`声明的变量，无论它们出现在何处，都会被附着在整个外围的函数作用域中；与此不同的是，`let`声明附着在块儿作用域，而且在它们出现在块儿中之前是不会被初始化的。
 
-Accessing a `let`-declared variable earlier than its `let ..` declaration/initialization causes an error, whereas with `var` declarations the ordering doesn't matter (except stylistically).
+在一个`let ..`声明/初始化之前访问一个用`let`声明的变量会导致一个错误，而对于`var`声明来说这个顺序无关紧要（除了文体上的区别）。
 
-Consider:
+考虑如下代码：
 
 ```js
 {
@@ -105,18 +105,18 @@ Consider:
 }
 ```
 
-**Warning:** This `ReferenceError` from accessing too-early `let`-declared references is technically called a *Temporal Dead Zone (TDZ)* error -- you're accessing a variable that's been declared but not yet initialized. This will not be the only time we see TDZ errors -- they crop up in several places in ES6. Also, note that "initialized" doesn't require explicitly assigning a value in your code, as `let b;` is totally valid. A variable that's not given an assignment at declaration time is assumed to have been assigned the `undefined` value, so `let b;` is the same as `let b = undefined;`. Explicit assignment or not, you cannot access `b` until the `let b` statement is run.
+**警告：** 这个由于过早访问被`let`声明的引用而引起的`ReferenceError`在技术上称为一个 *临时死区（Temporal Dead Zone —— TDZ）* 错误 —— 你在访问一个已经被声明但还没被初始化的变量。这将不是我们唯一能够见到TDZ错误的地方 —— 在ES6中它们会在几种地方意外地发生。另外，注意“初始化”并不要求在你的代码中明确地赋一个值，比如`let b;`是完全合法的。一个在声明时没有被赋值的变量被认为已经被赋予了`undefined`值，所以`let b;`和`let b = undefined;`是一样的。无论是否明确赋值，在`let b`语句运行之前你都不能访问`b`。
 
-One last gotcha: `typeof` behaves differently with TDZ variables than it does with undeclared (or declared!) variables. For example:
+最后一个坑：对于TDZ变量和未声明的（或声明的！）变量，`typeof`的行为是不同的。例如：
 
 ```js
 {
-	// `a` is not declared
+	// `a` 没有被声明
 	if (typeof a === "undefined") {
 		console.log( "cool" );
 	}
 
-	// `b` is declared, but in its TDZ
+	// `b` 被声明了，但位于它的TDZ中
 	if (typeof b === "undefined") {		// ReferenceError!
 		// ..
 	}
@@ -127,21 +127,21 @@ One last gotcha: `typeof` behaves differently with TDZ variables than it does wi
 }
 ```
 
-The `a` is not declared, so `typeof` is the only safe way to check for its existence or not. But `typeof b` throws the TDZ error because farther down in the code there happens to be a `let b` declaration. Oops.
+`a`没有被声明，所以`typeof`是检查它是否存在的唯一安全的方法。但是`typeof b`抛出了TDZ错误，因为在代码下面很远的地方偶然出现了一个`let b`声明。噢。
 
-Now it should be clearer why I insist that `let` declarations should all be at the top of their scope. That totally avoids the accidental errors of accessing too early. It also makes it more *explicit* when you look at the start of a block, any block, what variables it contains.
+现在你应当清楚为什么我坚持认为所有的`let`声明都应该位于它们作用域的顶部了。这完全避免了偶然过早访问的错误。当你观察一个块儿，或任何块儿的开始部分时，它还更 *明确* 地指出这个块儿中含有什么变量。
 
-Your blocks (`if` statements, `while` loops, etc.) don't have to share their original behavior with scoping behavior.
+你的块儿（`if`语句，`while`循环，等等）不一定要与作用域行为共享它们原有的行为。
 
-This explicitness on your part, which is up to you to maintain with discipline, will save you lots of refactor headaches and footguns down the line.
+这种明确性要由你负责，由你用毅力来维护，它将为你省去许多重构时的头疼和后续的麻烦。
 
-**Note:** For more information on `let` and block scoping, see Chapter 3 of the *Scope & Closures* title of this series.
+**注意：** 更多关于`let`和块儿作用域的信息，参见本系列的 *作用域与闭包* 的第三章。
 
 #### `let` + `for`
 
-The only exception I'd make to the preference for the *explicit* form of `let` declaration blocking is a `let` that appears in the header of a `for` loop. The reason may seem nuanced, but I believe it to be one of the more important ES6 features.
+我偏好 *明确* 形式的`let`声明块儿，但对此的唯一例外是出现在`for`循环头部的`let`。这里的原因看起来很微妙，但我相信它是更重要的ES6特性中的一个。
 
-Consider:
+考虑如下代码：
 
 ```js
 var funcs = [];
@@ -155,11 +155,11 @@ for (let i = 0; i < 5; i++) {
 funcs[3]();		// 3
 ```
 
-The `let i` in the `for` header declares an `i` not just for the `for` loop itself, but it redeclares a new `i` for each iteration of the loop. That means that closures created inside the loop iteration close over those per-iteration variables the way you'd expect.
+在`for`头部中的`let i`不仅是为`for`循环本身声明了一个`i`，而且它为循环的每一次迭代都重新声明了一个新的`i`。这意味着在循环迭代内部创建的闭包都分别引用着那些在每次迭代中创建的变量，正如你期望的那样。
 
-If you tried that same snippet but with `var i` in the `for` loop header, you'd get `5` instead of `3`, because there'd only be one `i` in the outer scope that was closed over, instead of a new `i` for each iteration's function to close over.
+如果你尝试在这段相同代码的`for`循环头部使用`var i`，那么你会得到`5`而不是`3`，因为在被引用的外部作用域中只有一个`i`，而不是为每次迭代的函数都有一个`i`被引用。
 
-You could also have accomplished the same thing slightly more verbosely:
+你也可以稍稍繁冗地实现相同的东西：
 
 ```js
 var funcs = [];
@@ -174,15 +174,15 @@ for (var i = 0; i < 5; i++) {
 funcs[3]();		// 3
 ```
 
-Here, we forcibly create a new `j` for each iteration, and then the closure works the same way. I prefer the former approach; that extra special capability is why I endorse the `for (let .. ) ..` form. It could be argued it's somewhat more *implicit*, but it's *explicit* enough, and useful enough, for my tastes.
+在这里，我们强制地为每次迭代都创建一个新的`j`，然后闭包以相同的方式工作。我喜欢前一种形式；那种额外的特殊能力正是我支持`for(let .. ) ..`形式的原因。可能有人会争论说它有点儿 *隐晦*，但是对我的口味来说，它足够 *明确* 了，也足够有用。
 
-`let` also works the same way with `for..in` and `for..of` loops (see "`for..of` Loops").
+`let`在`for..in`和`for..of`（参见“`for..of`循环”）循环中也以形同的方式工作。
 
-### `const` Declarations
+### `const`声明
 
-There's one other form of block-scoped declaration to consider: the `const`, which creates *constants*.
+还有另一种需要考虑的块儿作用域声明：`const`，它创建 *常量*。
 
-What exactly is a constant? It's a variable that's read-only after its initial value is set. Consider:
+到底什么是一个常量？它是一个在初始值被设定后就成为只读的变量。考虑如下代码：
 
 ```js
 {
@@ -193,9 +193,9 @@ What exactly is a constant? It's a variable that's read-only after its initial v
 }
 ```
 
-You are not allowed to change the value the variable holds once it's been set, at declaration time. A `const` declaration must have an explicit initialization. If you wanted a *constant* with the `undefined` value, you'd have to declare `const a = undefined` to get it.
+变量持有的值一旦在声明时被设定就不允许你改变了。一个`const`声明必须拥有一个明确的初始化。如果想要一个持有`undefined`值的 *常量*，你必须声明`const a = undefined`来得到它。
 
-Constants are not a restriction on the value itself, but on the variable's assignment of that value. In other words, the value is not frozen or immutable because of `const`, just the assignment of it. If the value is complex, such as an object or array, the contents of the value can still be modified:
+常量不是一个作用于值本身的制约，而是作用于变量对这个值的赋值。换句话说，值不会因为`const`而冻结或不可变，只是它的赋值被冻结了。如果这个值是一个复杂值，比如对象或数组，那么这个值的内容仍然是可以被修改的：
 
 ```js
 {
@@ -207,35 +207,35 @@ Constants are not a restriction on the value itself, but on the variable's assig
 }
 ```
 
-The `a` variable doesn't actually hold a constant array; rather, it holds a constant reference to the array. The array itself is freely mutable.
+变量`a`实际上没有持有一个恒定的数组；而是持有一个指向数组的恒定的引用。数组本身可以自由变化。
 
-**Warning:** Assigning an object or array as a constant means that value will not be able to be garbage collected until that constant's lexical scope goes away, as the reference to the value can never be unset. That may be desirable, but be careful if it's not your intent!
+**警告：** 将一个对象或数组作为常量赋值意味着这个值在常量的词法作用域消失以前是不能够被垃圾回收的，因为指向这个值的引用是永远不能解除的。这可能是你期望的，但如果不是你就要小心！
 
-Essentially, `const` declarations enforce what we've stylistically signaled with our code for years, where we declared a variable name of all uppercase letters and assigned it some literal value that we took care never to change. There's no enforcement on a `var` assignment, but there is now with a `const` assignment, which can help you catch unintended changes.
+实质上，`const`声明强制实行了我们许多年来在代码中用文体来表明的东西：我们声明一个名称全由大写字母组成的变量并赋予它某些字面值，我们小心照看它以使它永不改变。`var`赋值没有强制性，但是现在`const`赋值上有了，它可以帮你发现不经意的改变。
 
-`const` *can* be used with variable declarations of `for`, `for..in`, and `for..of` loops (see "`for..of` Loops"). However, an error will be thrown if there's any attempt to reassign, such as the typical `i++` clause of a `for` loop.
+`const`*可以* 被用于`for`，`for..in`，和`for..of`循环（参见“`for..of`循环”）的变量声明。然而，如果有任何重新赋值的企图，一个错误就会被抛出，例如在`for`循环中常见的`i++`子句。
 
-#### `const` Or Not
+#### `const`用还是不用
 
-There's some rumored assumptions that a `const` could be more optimizable by the JS engine in certain scenarios than a `let` or `var` would be. Theoretically, the engine more easily knows the variable's value/type will never change, so it can eliminate some possible tracking.
+有些流传的猜测认为在特定的场景下，与`let`或`var`相比一个`const`可能会被JS引擎进行更多的优化。理论上，引擎可以更容易地知道变量的值/类型将永远不会改变，所以它可以免除一些可能的追踪工作。
 
-Whether `const` really helps here or this is just our own fantasies and intuitions, the much more important decision to make is if you intend constant behavior or not. Remember: one of the most important roles for source code is to communicate clearly, not only to you, but your future self and other code collaborators, what your intent is.
+无论`const`在这方面是否真的有帮助，还是这仅仅是我们的幻想和直觉，你要做的更重要的决定是你是否打算使用常量的行为。记住：源代码扮演的一个最重要的角色是为了明确地交流你的意图是什么，不仅是与你自己，而且还是与未来的你和其他的代码协作者。
 
-Some developers prefer to start out every variable declaration as a `const` and then relax a declaration back to a `let` if it becomes necessary for its value to change in the code. This is an interesting perspective, but it's not clear that it genuinely improves the readability or reason-ability of code.
+一些开发者喜欢在一开始将每个变量都声明为一个`const`，然后当它的值在代码中有必要发生变化的时候将声明放松至一个`let`。这是一个有趣的角度，但是不清楚这是否真正能够改善代码的可读性或可推理性。
 
-It's not really a *protection*, as many believe, because any later developer who wants to change a value of a `const` can just blindly change `const` to `let` on the declaration. At best, it protects accidental change. But again, other than our intuitions and sensibilities, there doesn't appear to be objective and clear measure of what constitutes "accidents" or prevention thereof. Similar mindsets exist around type enforcement.
+就像许多人认为的那样，它不是一种真正的 *保护*，因为任何后来的想要改变一个`const`值的开发者都可以盲目地将声明从`const`改为`let`。它至多是防止意外的改变。但是同样地，除了我们的直觉和感觉以外，似乎没有客观和明确的标准可以衡量什么构成了“意外”或预防措施。这与类型强制上的思维模式类似。
 
-My advice: to avoid potentially confusing code, only use `const` for variables that you're intentionally and obviously signaling will not change. In other words, don't *rely on* `const` for code behavior, but instead use it as a tool for signaling intent, when intent can be signaled clearly.
+我的建议：为了避免潜在的令人糊涂的代码，仅将`const`用于那些你有意地并且明显地标识为不会改变的变量。换言之，不要为了代码行为而 *依靠* `const`，而是在为了意图可以被清楚地表明时，将它作为一个表明意图的工具。
 
-### Block-scoped Functions
+### 块儿作用域的函数
 
-Starting with ES6, function declarations that occur inside of blocks are now specified to be scoped to that block. Prior to ES6, the specification did not call for this, but many implementations did it anyway. So now the specification meets reality.
+从ES6开始，发生在块儿内部的函数声明现在被明确规定属于那个块儿的作用域。在ES6之前，语言规范没有要求这一点，但是许多实现不管怎样都是这么做的。所以现在语言规范和现实吻合了。
 
-Consider:
+考虑如下代码：
 
 ```js
 {
-	foo();					// works!
+	foo();					// 好用！
 
 	function foo() {
 		// ..
@@ -245,9 +245,9 @@ Consider:
 foo();						// ReferenceError
 ```
 
-The `foo()` function is declared inside the `{ .. }` block, and as of ES6 is block-scoped there. So it's not available outside that block. But also note that it is "hoisted" within the block, as opposed to `let` declarations, which suffer the TDZ error trap mentioned earlier.
+函数`foo()`是在`{ .. }`块儿内部被声明的，由于ES6的原因它是属于那里的块儿作用域的。所以在那个块儿的外部是不可用的。但是还要注意它在块儿里面被“提升”了，这与早先提到的遭受TDZ错误陷阱的`let`声明是相反的。
 
-Block-scoping of function declarations could be a problem if you've ever written code like this before, and relied on the old legacy non-block-scoped behavior:
+如果你以前曾经写过这样的代码，并依赖于老旧的非块儿作用域行为的话，那么函数声明的块儿作用域可能是一个问题：
 
 ```js
 if (something) {
@@ -264,13 +264,13 @@ else {
 foo();		// ??
 ```
 
-In pre-ES6 environments, `foo()` would print `"2"` regardless of the value of `something`, because both function declarations were hoisted out of the blocks, and the second one always wins.
+在前ES6环境下，无论`something`的值是什么`foo()`都将会打印`"2"`，因为两个函数声明被提升到了块儿的顶端，而且总是第二个有效。
 
-In ES6, that last line throws a `ReferenceError`.
+在ES6中，最后一行将抛出一个`ReferenceError`。
 
-## Spread/Rest
+## 扩散/剩余
 
-ES6 introduces a new `...` operator that's typically referred to as the *spread* or *rest* operator, depending on where/how it's used. Let's take a look:
+ES6引入了一个新的`...`操作符，根据你在何处以及如何使用它，它一般被称作 *扩散（spread）* 或 *剩余（rest）* 操作符。让我们看一看：
 
 ```js
 function foo(x,y,z) {
@@ -280,15 +280,15 @@ function foo(x,y,z) {
 foo( ...[1,2,3] );				// 1 2 3
 ```
 
-When `...` is used in front of an array (actually, any *iterable*, which we cover in Chapter 3), it acts to "spread" it out into its individual values.
+当`...`在一个数组（实际上，是我们将在第三章中讲解的任何的 *可迭代* 对象）前面被使用时，它就将数组“扩散”为它的个别的值。
 
-You'll typically see that usage as is shown in that previous snippet, when spreading out an array as a set of arguments to a function call. In this usage, `...` acts to give us a simpler syntactic replacement for the `apply(..)` method, which we would typically have used pre-ES6 as:
+通常你将会在前面所展示的那样的代码段中看到这种用法，它将一个数组扩散为函数调用的一组参数。在这种用法中，`...`扮演了`apply(..)`方法的简约语法替代品，在前ES6中我们经常这样使用`apply(..)`：
 
 ```js
 foo.apply( null, [1,2,3] );		// 1 2 3
 ```
 
-But `...` can be used to spread out/expand a value in other contexts as well, such as inside another array declaration:
+但`...`也可以在其他上下文环境中被用于扩散/展开一个值，比如在另一个数组声明内部：
 
 ```js
 var a = [2,3,4];
@@ -297,9 +297,9 @@ var b = [ 1, ...a, 5 ];
 console.log( b );					// [1,2,3,4,5]
 ```
 
-In this usage, `...` is basically replacing `concat(..)`, as it behaves like `[1].concat( a, [5] )` here.
+在这种用法中，`...`取代了`concat(..)`，它在这里的行为就像`[1].concat( a, [5] )`。
 
-The other common usage of `...` can be seen as essentially the opposite; instead of spreading a value out, the `...` *gathers* a set of values together into an array. Consider:
+另一种`...`的用法常见于一种实质上相反的操作；与将值散开不同，`...`将一组值 *收集* 到一个数组中。
 
 ```js
 function foo(x, y, ...z) {
@@ -309,9 +309,9 @@ function foo(x, y, ...z) {
 foo( 1, 2, 3, 4, 5 );			// 1 2 [3,4,5]
 ```
 
-The `...z` in this snippet is essentially saying: "gather the *rest* of the arguments (if any) into an array called `z`." Because `x` was assigned `1`, and `y` was assigned `2`, the rest of the arguments `3`, `4`, and `5` were gathered into `z`.
+这个代码段中的`...z`实质上是在说：“将 *剩余的* 参数值（如果有的话）收集到一个称为`z`的数组中。” 因为`x`被赋值为`1`，而`y`被赋值为`2`，所以剩余的参数值`3`，`4`，和`5`被收集进了`z`。
 
-Of course, if you don't have any named parameters, the `...` gathers all arguments:
+当然，如果你没有任何命名参数，`...`会收集所有的参数值：
 
 ```js
 function foo(...args) {
@@ -321,53 +321,51 @@ function foo(...args) {
 foo( 1, 2, 3, 4, 5);			// [1,2,3,4,5]
 ```
 
-**Note:** The `...args` in the `foo(..)` function declaration is usually called "rest parameters," because you're collecting the rest of the parameters. I prefer "gather," because it's more descriptive of what it does rather than what it contains.
+**注意：** 在`foo(..)`函数声明中的`...args`经常因为你向其中收集参数的剩余部分而被称为“剩余参数”。我喜欢使用“收集”这个词，因为它描述了它做什么而不是它包含什么。
 
-The best part about this usage is that it provides a very solid alternative to using the long-since-deprecated `arguments` array -- actually, it's not really an array, but an array-like object. Because `args` (or whatever you call it -- a lot of people prefer `r` or `rest`) is a real array, we can get rid of lots of silly pre-ES6 tricks we jumped through to make `arguments` into something we can treat as an array.
+这种用法最棒的地方是，它为被废弃了很久的`arguments`数组 —— 实际上它不是一个真正的数组，而是一个类数组对象 —— 提供了一种非常稳健的替代方案。因为`args`（无论你叫它什么 —— 许多人喜欢叫它`r`或者`rest`）是一个真正的数组，我们可以摆脱许多愚蠢的前ES6技巧，我们曾经通过这些技巧尽全力去使`arguments`变成我们可以视之为数组的东西。
 
-Consider:
+考虑如下代码：
 
 ```js
-// doing things the new ES6 way
+// 使用新的ES6方式
 function foo(...args) {
-	// `args` is already a real array
+	// `args`已经是一个真正的数组了
 
-	// discard first element in `args`
+	// 丢弃`args`中的第一个元素
 	args.shift();
 
-	// pass along all of `args` as arguments
-	// to `console.log(..)`
+	// 将`args`的所有内容作为参数值传给`console.log(..)`
 	console.log( ...args );
 }
 
-// doing things the old-school pre-ES6 way
+// 使用老旧的前ES6方式
 function bar() {
-	// turn `arguments` into a real array
+	// 将`arguments`转换为一个真正的数组
 	var args = Array.prototype.slice.call( arguments );
 
-	// add some elements on the end
+	// 在末尾添加一些元素
 	args.push( 4, 5 );
 
-	// filter out odd numbers
+	// 过滤掉所有奇数
 	args = args.filter( function(v){
 		return v % 2 == 0;
 	} );
 
-	// pass along all of `args` as arguments
-	// to `foo(..)`
+	// 将`args`的所有内容作为参数值传给`foo(..)`
 	foo.apply( null, args );
 }
 
 bar( 0, 1, 2, 3 );					// 2 4
 ```
 
-The `...args` in the `foo(..)` function declaration gathers arguments, and the `...args` in the `console.log(..)` call spreads them out. That's a good illustration of the symmetric but opposite uses of the `...` operator.
+在函数`foo(..)`声明中的`...args`收集参数值，而在`console.log(..)`调用中的`...args`将它们扩散开。这个例子很好地展示了`...`操作符平行但相反的用途。
 
-Besides the `...` usage in a function declaration, there's another case where `...` is used for gathering values, and we'll look at it in the "Too Many, Too Few, Just Enough" section later in this chapter.
+除了在函数声明中`...`的用法以外，还有另一种`...`被用于收集值的情况，我们将在本章稍后的“太多，太少，正合适”一节中检视它。
 
-## Default Parameter Values
+## 默认参数值
 
-Perhaps one of the most common idioms in JavaScript relates to setting a default value for a function parameter. The way we've done this for years should look quite familiar:
+也许在JavaScript中最常见的惯用法之一就是为函数参数设置默认值。我们多年来一直使用的方法应当看起来很熟悉：
 
 ```js
 function foo(x,y) {
@@ -383,15 +381,15 @@ foo( 5 );			// 36
 foo( null, 6 );		// 17
 ```
 
-Of course, if you've used this pattern before, you know that it's both helpful and a little bit dangerous, if for example you need to be able to pass in what would otherwise be considered a falsy value for one of the parameters. Consider:
+当然，如果你曾经用过这种模式，你就会知道它既有用又有点儿危险，例如如果你需要能够为其中一个参数传入一个可能被认为是falsy的值。考虑下面的代码：
 
 ```js
-foo( 0, 42 );		// 53 <-- Oops, not 42
+foo( 0, 42 );		// 53 <-- 噢，不是42
 ```
 
-Why? Because the `0` is falsy, and so the `x || 11` results in `11`, not the directly passed in `0`.
+为什么？因为`0`是falsy，因此`x || 11`的结果为`11`，而不是直接被传入的`0`。
 
-To fix this gotcha, some people will instead write the check more verbosely like this:
+为了填这个坑，一些人会像这样更加啰嗦地编写检查：
 
 ```js
 function foo(x,y) {
@@ -405,9 +403,9 @@ foo( 0, 42 );			// 42
 foo( undefined, 6 );	// 17
 ```
 
-Of course, that means that any value except `undefined` can be directly passed in. However, `undefined` will be assumed to signal, "I didn't pass this in." That works great unless you actually need to be able to pass `undefined` in.
+当然，这意味着除了`undefined`以外的任何值都可以直接传入。然而，`undefined`将被假定是这样一种信号，“我没有传入这个值。” 除非你实际需要能够传入`undefined`，它就工作的很好。
 
-In that case, you could test to see if the argument is actually omitted, by it actually not being present in the `arguments` array, perhaps like this:
+在那样的情况下，你可以通过测试参数值是否没有出现在`arguments`数组中，来看它是否实际上被省略了，也许是像这样：
 
 ```js
 function foo(x,y) {
@@ -421,17 +419,17 @@ foo( 5 );				// 36
 foo( 5, undefined );	// NaN
 ```
 
-But how would you omit the first `x` argument without the ability to pass in any kind of value (not even `undefined`) that signals "I'm omitting this argument"?
+但是在没有能力传入意味着“我省略了这个参数值”的任何种类的值（连`undefined`也不行）的情况下，你如何才能省略第一个参数值`x`呢？
 
-`foo(,5)` is tempting, but it's invalid syntax. `foo.apply(null,[,5])` seems like it should do the trick, but `apply(..)`'s quirks here mean that the arguments are treated as `[undefined,5]`, which of course doesn't omit.
+`foo(,5)`很诱人，但它不是合法的语法。`foo.apply(null,[,5])`看起来应该可以实现这个技巧，但是`apply(..)`的奇怪之处意味着这组参数值将被视为`[undefined,5]`，显然它没有被省略。
 
-If you investigate further, you'll find you can only omit arguments on the end (i.e., righthand side) by simply passing fewer arguments than "expected," but you cannot omit arguments in the middle or at the beginning of the arguments list. It's just not possible.
+如果你深入调查下去，你将发现你只能通过简单地传入比“期望的”参数值个数少的参数值来省略末尾的参数值，但是你不能省略在参数值列表中间或者开头的参数值。这就是不可能。
 
-There's a principle applied to JavaScript's design here that is important to remember: `undefined` means *missing*. That is, there's no difference between `undefined` and *missing*, at least as far as function arguments go.
+这里有一个施用于JavaScript设计的重要原则需要记住：`undefined`意味着 *缺失*。也就是，在`undefined`和 *缺失* 之间没有区别，至少是就函数参数值而言。
 
-**Note:** There are, confusingly, other places in JS where this particular design principle doesn't apply, such as for arrays with empty slots. See the *Types & Grammar* title of this series for more information.
+**注意：** 容易令人糊涂的是，JS中有其他的地方不适用这种特殊的设计原则，比如带有空值槽的数组。更多信息参见本系列的 *类型与文法*。
 
-With all this in mind, we can now examine a nice helpful syntax added as of ES6 to streamline the assignment of default values to missing arguments:
+带着所有这些认识，现在我们可以检视在ES6中新增的一种有用的好语法，来简化对丢失的参数值进行默认值的赋值。
 
 ```js
 function foo(x = 11, y = 31) {
@@ -443,22 +441,22 @@ foo( 5, 6 );			// 11
 foo( 0, 42 );			// 42
 
 foo( 5 );				// 36
-foo( 5, undefined );	// 36 <-- `undefined` is missing
-foo( 5, null );			// 5  <-- null coerces to `0`
+foo( 5, undefined );	// 36 <-- `undefined`是缺失
+foo( 5, null );			// 5  <-- null强制转换为`0`
 
-foo( undefined, 6 );	// 17 <-- `undefined` is missing
-foo( null, 6 );			// 6  <-- null coerces to `0`
+foo( undefined, 6 );	// 17 <-- `undefined`是缺失
+foo( null, 6 );			// 6  <-- null强制转换为`0`
 ```
 
-Notice the results and how they imply both subtle differences and similarities to the earlier approaches.
+注意这些结果，和它们如何暗示了与前面的方式的微妙区别和相似之处。
 
-`x = 11` in a function declaration is more like `x !== undefined ? x : 11` than the much more common idiom `x || 11`, so you'll need to be careful in converting your pre-ES6 code to this ES6 default parameter value syntax.
+与常见得多的`x || 11`惯用法相比，在一个函数声明中的`x = 11`更像`x !== undefined ? x : 11`，所以在将你的前ES6代码转换为这种ES6默认参数值语法时要多加小心。
 
-**Note:** A rest/gather parameter (see "Spread/Rest") cannot have a default value. So, while `function foo(...vals=[1,2,3]) {` might seem an intriguing capability, it's not valid syntax. You'll need to continue to apply that sort of logic manually if necessary.
+**注意：** 一个剩余/收集参数（参见“扩散/剩余”）不能拥有默认值。所以，虽然`function foo(...vals=[1,2,3]) {`看起来是一种迷人的能力，但它不是合法的语法。有必要的话你需要继续手动实施那种逻辑。
 
-### Default Value Expressions
+### 默认值表达式
 
-Function default values can be more than just simple values like `31`; they can be any valid expression, even a function call:
+函数默认值可以比像`31`这样的简单值复杂得多；它们可以是任何合法的表达式，甚至是函数调用：
 
 ```js
 function bar(val) {
@@ -479,11 +477,11 @@ y = 6;
 foo( undefined, 10 );				// 9 10
 ```
 
-As you can see, the default value expressions are lazily evaluated, meaning they're only run if and when they're needed -- that is, when a parameter's argument is omitted or is `undefined`.
+如你所见，默认值表达式是被懒惰地求值的，这意味着他们仅在被需要时运行 —— 也就是，当一个参数的参数值被省略或者为`undefined`。
 
-It's a subtle detail, but the formal parameters in a function declaration are in their own scope (think of it as a scope bubble wrapped around just the `( .. )` of the function declaration), not in the function body's scope. That means a reference to an identifier in a default value expression first matches the formal parameters' scope before looking to an outer scope. See the *Scope & Closures* title of this series for more information.
+这是一个微妙的细节，但是在一个函数声明中的正式参数是在它们自己的作用域中的（将它想象为一个仅仅围绕在函数声明的`(..)`外面的一个作用域气泡），不是在函数体的作用域中。这意味着在一个默认值表达式中的标识符引用会在首先在正式参数的作用域中查找标识符，然后再查找一个外部作用域。更多信息参见本系列的 *作用域与闭包*。
 
-Consider:
+考虑如下代码：
 
 ```js
 var w = 1, z = 2;
@@ -495,13 +493,13 @@ function foo( x = w + 1, y = x + 1, z = z + 1 ) {
 foo();					// ReferenceError
 ```
 
-The `w` in the `w + 1` default value expression looks for `w` in the formal parameters' scope, but does not find it, so the outer scope's `w` is used. Next, The `x` in the `x + 1` default value expression finds `x` in the formal parameters' scope, and luckily `x` has already been initialized, so the assignment to `y` works fine.
+在默认值表达式`w + 1`中的`w`在正式参数作用域中查找`w`，但没有找到，所以外部作用域的`w`被使用了。接下来，在默认值表达式`x + 1`中的`x`在正式参数的作用域中找到了`x`，而且走运的是`x`已经被初始化了，所以对`y`的赋值工作的很好。
 
-However, the `z` in `z + 1` finds `z` as a not-yet-initialized-at-that-moment parameter variable, so it never tries to find the `z` from the outer scope.
+然而，`z + 1`中的`z`找到了一个在那个时刻还没有被初始化的参数变量`z`，所以它绝不会试着在外部作用域中寻找`z`。
 
-As we mentioned in the "`let` Declarations" section earlier in this chapter, ES6 has a TDZ, which prevents a variable from being accessed in its uninitialized state. As such, the `z + 1` default value expression throws a TDZ `ReferenceError` error.
+正如我们在本章早先的“`let`声明”一节中提到过的那样，ES6拥有一个TDZ，它会防止一个变量在它还没有被初始化的状态下被访问。因此，`z + 1`默认值表达式抛出一个TDZ`ReferenceError`错误。
 
-Though it's not necessarily a good idea for code clarity, a default value expression can even be an inline function expression call -- commonly referred to as an immediately invoked function expression (IIFE):
+虽然对于代码的清晰度来说不见得是一个好主意，一个默认值表达式甚至可以是一个内联的函数表达式调用 —— 通常被称为一个立即被调用的函数表达式（IIFE）：
 
 ```js
 function foo( x =
@@ -513,11 +511,11 @@ function foo( x =
 foo();			// 42
 ```
 
-There will very rarely be any cases where an IIFE (or any other executed inline function expression) will be appropriate for default value expressions. If you find yourself tempted to do this, take a step back and reevaluate!
+一个IIFE（或者任何其他被执行的内联函数表达式）作为默认值表示来说很合适是非常少见的。如果你发现自己试图这么做，那么就退一步再考虑一下！
 
-**Warning:** If the IIFE had tried to access the `x` identifier and had not declared its own `x`, this would also have been a TDZ error, just as discussed before.
+**警告：** 如果一个IIFE试图访问标识符`x`，而且还没有声明自己的`x`，那么这也将是一个TDZ错误，就像我们刚才讨论的一样。
 
-The default value expression in the previous snippet is an IIFE in that in the sense that it's a function that's executed right inline, via `(31)`. If we had left that part off, the default value assigned to `x` would have just been a function reference itself, perhaps like a default callback. There will probably be cases where that pattern will be quite useful, such as:
+前一个代码段的默认值表达式是一个IIFE，这是因为它是通过`(31)`在内联时立即被执行。如果我们去掉这一部分，赋予`x`的默认值将会仅仅是一个函数的引用，也许像一个默认的回调。可能有一些情况这种模式将十分有用，比如：
 
 ```js
 function ajax(url, cb = function(){}) {
@@ -527,13 +525,13 @@ function ajax(url, cb = function(){}) {
 ajax( "http://some.url.1" );
 ```
 
-In this case, we essentially want to default `cb` to be a no-op empty function call if not otherwise specified. The function expression is just a function reference, not a function call itself (no invoking `()` on the end of it), which accomplishes that goal.
+这种情况下，我们实质上想在没有其他值被指定时，让默认的`cb`是一个没有操作的空函数。这个函数表达式只是一个函数引用，不是一个调用它自己（在它末尾没有调用的`()`）以达成自己目的的函数。
 
-Since the early days of JS, there's been a little-known but useful quirk available to us: `Function.prototype` is itself an empty no-op function. So, the declaration could have been `cb = Function.prototype` and saved the inline function expression creation.
+从JS的早些年开始，就有一个少为人知但是十分有用的奇怪之处可供我们使用：`Function.prototype`本身就是一个没有操作的空函数。这样，这个声明可以是`cb = Function.prototype`而省去内联函数表达式的创建。
 
-## Destructuring
+## 解构
 
-ES6 introduces a new syntactic feature called *destructuring*, which may be a little less confusing if you instead think of it as *structured assignment*. To understand this meaning, consider:
+ES6引入了一个称为 *解构* 的新语法特性，如果你将它考虑为 *结构化赋值* 那么它令人困惑的程度可能会小一些。为了理解它的含义，考虑如下代码：
 
 ```js
 function foo() {
@@ -546,9 +544,9 @@ var tmp = foo(),
 console.log( a, b, c );				// 1 2 3
 ```
 
-As you can see, we created a manual assignment of the values in the array that `foo()` returns to individual variables `a`, `b`, and `c`, and to do so we (unfortunately) needed the `tmp` variable.
+如你所见，我们创建了一个手动赋值：从`foo()`返回的数组中的值到个别的变量`a`，`b`，和`c`，而且这么做我们就（不幸地）需要`tmp`变量。
 
-Similarly, we can do the following with objects:
+相似地，我们也可以用对象这么做：
 
 ```js
 function bar() {
@@ -565,9 +563,9 @@ var tmp = bar(),
 console.log( x, y, z );				// 4 5 6
 ```
 
-The `tmp.x` property value is assigned to the `x` variable, and likewise for `tmp.y` to `y` and `tmp.z` to `z`.
+属性值`tmp.x`被赋值给变量`x`，`tmp.y`到`y`和`tmp.z`到`z`也一样。
 
-Manually assigning indexed values from an array or properties from an object can be thought of as *structured assignment*. ES6 adds a dedicated syntax for *destructuring*, specifically *array destructuring* and *object destructuring*. This syntax eliminates the need for the `tmp` variable in the previous snippets, making them much cleaner. Consider:
+从一个数组中取得索引的值，或从一个对象中取得属性并手动赋值可以被认为是 *结构化赋值*。ES6为 *解构* 增加了一种专门的语法，具体地称为 *数组解构* 和 *对象结构*。这种语法消灭了前一个代码段中对变量`tmp`的需要，使它们更加干净。考虑如下代码：
 
 ```js
 var [ a, b, c ] = foo();
@@ -577,15 +575,15 @@ console.log( a, b, c );				// 1 2 3
 console.log( x, y, z );				// 4 5 6
 ```
 
-You're likely more accustomed to seeing syntax like `[a,b,c]` on the righthand side of an `=` assignment, as the value being assigned.
+你很可能更加习惯于看到像`[a,b,c]`这样的东西出现在一个`=`赋值的右手边的语法，即作为要被赋予的值。
 
-Destructuring symmetrically flips that pattern, so that `[a,b,c]` on the lefthand side of the `=` assignment is treated as a kind of "pattern" for decomposing the righthand side array value into separate variable assignments.
+解构对称地翻转了这个模式，所以在`=`赋值左手边的`[a,b,c]`被看作是为了将右手边的数组拆解为分离的变量赋值的某种“模式”。
 
-Similarly, `{ x: x, y: y, z: z }` specifies a "pattern" to decompose the object value from `bar()` into separate variable assignments.
+类似地，`{ x: x, y: y, z: z }`指明了一种“模式”把来自于`bar()`的对象拆解为分离的变量赋值。
 
-### Object Property Assignment Pattern
+### 对象属性赋值模式
 
-Let's dig into that `{ x: x, .. }` syntax from the previous snippet. If the property name being matched is the same as the variable you want to declare, you can actually shorten the syntax:
+让我们深入前一个代码段中的`{ x: x, .. }`语法。如果属性名与你想要声明的变量名一致，你实际上可以缩写这个语法：
 
 ```js
 var { x, y, z } = bar();
@@ -593,11 +591,11 @@ var { x, y, z } = bar();
 console.log( x, y, z );				// 4 5 6
 ```
 
-Pretty cool, right?
+很酷，对吧？
 
-But is `{ x, .. }` leaving off the `x: ` part or leaving off the `: x` part? We're actually leaving off the `x: ` part when we use the shorter syntax. That may not seem like an important detail, but you'll understand its importance in just a moment.
+但`{ x, .. }`是省略了`x: `部分还是省略了` : x`部分？当我们使用这种缩写语法时，我们实际上省略了`x: `部分。这看起来可能不是一个重要的细节，但是一会儿你就会了解它的重要性。
 
-If you can write the shorter form, why would you ever write out the longer form? Because that longer form actually allows you to assign a property to a different variable name, which can sometimes be quite useful:
+如果你能写缩写形式，那为什么你还要写出更长的形式呢？因为更长的形式事实上允许你将一个属性赋值给一个不同的变量名称，这有时很有用：
 
 ```js
 var { x: bam, y: baz, z: bap } = bar();
@@ -606,7 +604,7 @@ console.log( bam, baz, bap );		// 4 5 6
 console.log( x, y, z );				// ReferenceError
 ```
 
-There's a subtle but super-important quirk to understand about this variation of the object destructuring form. To illustrate why it can be a gotcha you need to be careful of, let's consider the "pattern" of how normal object literals are specified:
+关于这种对象结构形式有一个微妙但超级重要的怪异之处需要理解。为了展示为什么它可能是一个你需要注意的坑，让我们考虑一下普通对象字面量的“模式”是如何被指定的：
 
 ```js
 var X = 10, Y = 20;
@@ -616,19 +614,19 @@ var o = { a: X, b: Y };
 console.log( o.a, o.b );			// 10 20
 ```
 
-In `{ a: X, b: Y }`, we know that `a` is the object property, and `X` is the source value that gets assigned to it. In other words, the syntactic pattern is `target: source`, or more obviously, `property-alias: value`. We intuitively understand this because it's the same as `=` assignment, where the pattern is `target = source`.
+在`{ a: X, b: Y }`中，我们知道`a`是对象属性，而`X`是被赋值给它的源值。换句话说，它的语义模式是`目标: 源`，或者更明显地，`属性别名: 值`。我们能直观地明白这一点，因为它和`=`赋值是一样的，而它的模式就是`目标 = 源`。
 
-However, when you use object destructuring assignment -- that is, putting the `{ .. }` object literal-looking syntax on the lefthand side of the `=` operator -- you invert that `target: source` pattern.
+然而，当你使用对象解构赋值时 —— 也就是，将看起来像是对象字面量的`{ .. }`语法放在`=`操作符的左手边 —— 你反转了这个`目标: 源`的模式。
 
-Recall:
+回想一下：
 
 ```js
 var { x: bam, y: baz, z: bap } = bar();
 ```
 
-The syntactic pattern here is `source: target` (or `value: variable-alias`). `x: bam` means the `x` property is the source value and `bam` is the target variable to assign to. In other words, object literals are `target <-- source`, and object destructuring assignments are `source --> target`. See how that's flipped?
+这里面对称的模式是`源: 目标`（或者`值: 属性别名`）。`x: bam`意味着属性`x`是源值而`ban`是被赋值的目标变量。换句话说，对象字面量是`target <-- source`，而对象解构赋值是`source --> target`。看到它是如何反转的了吗？
 
-There's another way to think about this syntax though, which may help ease the confusion. Consider:
+有另外一种考虑这种语法的方式，可能有助于缓和这种困惑。考虑如下代码：
 
 ```js
 var aa = 10, bb = 20;
@@ -639,19 +637,19 @@ var     { x: AA, y: BB } = o;
 console.log( AA, BB );				// 10 20
 ```
 
-In the `{ x: aa, y: bb }` line, the `x` and `y` represent the object properties. In the `{ x: AA, y: BB }` line, the `x` and the `y` *also* represent the object properties.
+在`{ x: aa, y: bb }`这一行中，`x`和`y`代表对象属性。在`{ x: AA, y: BB }`这一行，`x`和`y` *也* 代表对象属性。
 
-Recall how earlier I asserted that `{ x, .. }` was leaving off the `x: ` part? In those two lines, if you erase the `x: ` and `y: ` parts in that snippet, you're left only with `aa, bb` and `AA, BB`, which in effect -- only conceptually, not actually -- are assignments from `aa` to `AA` and from `bb` to `BB`.
+还记得刚才我是如何断言`{ x, .. }`省去了`x: `部分的吗？在这两行中，如果你在代码段中擦掉`x: `和`y: `部分，仅留下`aa, bb`和`AA, BB`，它的效果 —— 从概念上讲，实际上不能 —— 将是从`aa`赋值到`AA`和从`bb`赋值到`BB`。
 
-So, that symmetry may help to explain why the syntactic pattern was intentionally flipped for this ES6 feature.
+所以，这种平行性也许有助于解释为什么对于这种ES6特性，语法模式被故意地反转了。
 
-**Note:** I would have preferred the syntax to be `{ AA: x , BB: y }` for the destructuring assignment, as that would have preserved consistency of the more familiar `target: source` pattern for both usages. Alas, I'm having to train my brain for the inversion, as some readers may also have to do.
+*注意：* 对于解构赋值来说我更喜欢它的语法是`{ AA: x , BB: y }`，因为那样的话可以在两种用法中一致地使用我们更熟悉的`target: source`模式。唉，我已经被迫训练自己的大脑去习惯这种反转了，就像一些读者也不得不去做的那样。
 
-### Not Just Declarations
+### 不仅是声明
 
-So far, we've used destructuring assignment with `var` declarations (of course, they could also use `let` and `const`), but destructuring is a general assignment operation, not just a declaration.
+至此，我们一直将解构赋值与`var`声明（当然，它们也可以使用`let`和`const`）一起使用，但是解构是一种一般意义上的赋值操作，不仅是一种声明。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a, b, c, x, y, z;
@@ -663,11 +661,11 @@ console.log( a, b, c );				// 1 2 3
 console.log( x, y, z );				// 4 5 6
 ```
 
-The variables can already be declared, and then the destructuring only does assignments, exactly as we've already seen.
+变量可以是已经被定义好的，然后解构仅仅负责赋值，正如我们已经看到的那样。
 
-**Note:** For the object destructuring form specifically, when leaving off a `var`/`let`/`const` declarator, we had to surround the whole assignment expression in `( )`, because otherwise the `{ .. }` on the lefthand side as the first element in the statement is taken to be a block statement instead of an object.
+**注意：** 特别对于对象解构形式来说，当我们省略了`var`/`let`/`const`声明符时，就必须将整个赋值表达式包含在`()`中，因为如果不这样做的话左手边作为语句第一个元素的`{ .. }`将被视为一个语句块儿而不是一个对象。
 
-In fact, the assignment expressions (`a`, `y`, etc.) don't actually need to be just variable identifiers. Anything that's a valid assignment expression is allowed. For example:
+事实上，变量表达式（`a`，`y`，等等）不必是一个变量标识符。任何合法的赋值表达式都是允许的。例如：
 
 ```js
 var o = {};
@@ -679,7 +677,7 @@ console.log( o.a, o.b, o.c );		// 1 2 3
 console.log( o.x, o.y, o.z );		// 4 5 6
 ```
 
-You can even use computed property expressions in the destructuring. Consider:
+你甚至可以在解构中使用计算型属性名。考虑如下代码：
 
 ```js
 var which = "x",
@@ -690,9 +688,9 @@ var which = "x",
 console.log( o.x );					// 4
 ```
 
-The `[which]:` part is the computed property, which results in `x` -- the property to destructure from the object in question as the source of the assignment. The `o[which]` part is just a normal object key reference, which equates to `o.x` as the target of the assignment.
+`[which]:`的部分是计算型属性名，它的结果是`x` —— 将从当前的对象中拆解出来作为赋值的源头的属性。`o[which]`的部分只是一个普通的对象键引用，作为赋值的目标来说它与`o.x`是等价的。
 
-You can use the general assignments to create object mappings/transformations, such as:
+你可以使用普通的赋值来创建对象映射/变形，例如：
 
 ```js
 var o1 = { a: 1, b: 2, c: 3 },
@@ -703,7 +701,7 @@ var o1 = { a: 1, b: 2, c: 3 },
 console.log( o2.x, o2.y, o2.z );	// 1 2 3
 ```
 
-Or you can map an object to an array, such as:
+或者你可以将对象映射进一个数组，例如：
 
 ```js
 var o1 = { a: 1, b: 2, c: 3 },
@@ -714,7 +712,7 @@ var o1 = { a: 1, b: 2, c: 3 },
 console.log( a2 );					// [1,2,3]
 ```
 
-Or the other way around:
+或者从另一个方向：
 
 ```js
 var a1 = [ 1, 2, 3 ],
@@ -725,7 +723,7 @@ var a1 = [ 1, 2, 3 ],
 console.log( o2.a, o2.b, o2.c );	// 1 2 3
 ```
 
-Or you could reorder one array to another:
+或者你可以将一个数组重排到另一个数组中：
 
 ```js
 var a1 = [ 1, 2, 3 ],
@@ -736,7 +734,7 @@ var a1 = [ 1, 2, 3 ],
 console.log( a2 );					// [2,3,1]
 ```
 
-You can even solve the traditional "swap two variables" task without a temporary variable:
+你甚至可以不使用临时变量来解决传统的“交换两个变量”的问题：
 
 ```js
 var x = 10, y = 20;
@@ -746,11 +744,11 @@ var x = 10, y = 20;
 console.log( x, y );				// 20 10
 ```
 
-**Warning:** Be careful: you shouldn't mix in declaration with assignment unless you want all of the assignment expressions *also* to be treated as declarations. Otherwise, you'll get syntax errors. That's why in the earlier example I had to do `var a2 = []` separately from the `[ a2[0], .. ] = ..` destructuring assignment. It wouldn't make any sense to try `var [ a2[0], .. ] = ..`, because `a2[0]` isn't a valid declaration identifier; it also obviously couldn't implicitly create a `var a2 = []` declaration to use.
+**警告：** 小心：你不应该将声明和赋值混在一起，除非你想要所有的赋值表达式 *也* 被视为声明。否则，你会得到一个语法错误。这就是为什么在刚才的例子中我必须将`var a2 = []`与`[ a2[0], .. ] = ..`解构赋值分开做。尝试`var [ a2[0], .. ] = ..`没有任何意义，因为`a2[0]`不是一个合法的声明标识符；很显然它也不能隐含地创建一个`var a2 = []`声明来使用。
 
-### Repeated Assignments
+### 重复赋值
 
-The object destructuring form allows a source property (holding any value type) to be listed multiple times. For example:
+对象解构形式允许源属性（持有任意值的类型）被罗列多次。例如：
 
 ```js
 var { a: X, a: Y } = { a: 1 };
@@ -759,7 +757,7 @@ X;	// 1
 Y;	// 1
 ```
 
-That also means you can both destructure a sub-object/array property and also capture the sub-object/array's value itself. Consider:
+这意味着你既可以解构一个子对象/数组属性，也可以捕获这个子对象/数组的值本身。考虑如下代码：
 
 ```js
 var { a: { x: X, x: Y }, a } = { a: { x: 1 } };
@@ -778,13 +776,13 @@ Y;	// [10,2]
 Z;	// 1
 ```
 
-A word of caution about destructuring: it may be tempting to list destructuring assignments all on a single line as has been done thus far in our discussion. However, it's a much better idea to spread destructuring assignment patterns over multiple lines, using proper indentation -- much like you would in JSON or with an object literal value -- for readability sake.
+关于解构有一句话要提醒：像我们到目前为止的讨论中做的那样，将所有的解构赋值都罗列在单独一行中的方式可能很诱人。然而，一个好得多的主意是使用恰当的缩进将解构赋值的模式分散在多行中 —— 和你在JSON或对象字面量中做的事非常相似 —— 为了可读性。
 
 ```js
-// harder to read:
+// 很难读懂：
 var { a: { b: [ c, d ], e: { f } }, g } = obj;
 
-// better:
+// 好一些：
 var {
 	a: {
 		b: [ c, d ],
@@ -794,11 +792,11 @@ var {
 } = obj;
 ```
 
-Remember: **the purpose of destructuring is not just less typing, but more declarative readability.**
+记住：**解构的目的不仅是为了少打些字，更多是为了声明可读性**
 
-#### Destructuring Assignment Expressions
+#### 解构赋值表达式
 
-The assignment expression with object or array destructuring has as its completion value the full righthand object/array value. Consider:
+带有对象或数组解构的赋值表达式的完成值是右手边完整的对象/数组值。考虑如下代码：
 
 ```js
 var o = { a:1, b:2, c:3 },
@@ -810,7 +808,7 @@ console.log( a, b, c );			// 1 2 3
 p === o;						// true
 ```
 
-In the previous snippet, `p` was assigned the `o` object reference, not one of the `a`, `b`, or `c` values. The same is true of array destructuring:
+在前面的代码段中，`p`被赋值为对象`o`的引用，而不是`a`，`b`，或`c`的值。数组解构也是一样：
 
 ```js
 var o = [1,2,3],
@@ -822,7 +820,7 @@ console.log( a, b, c );			// 1 2 3
 p === o;						// true
 ```
 
-By carrying the object/array value through as the completion, you can chain destructuring assignment expressions together:
+通过将这个对象/数组作为完成值传递下去，你可将解构赋值表达式链接在一起：
 
 ```js
 var o = { a:1, b:2, c:3 },
@@ -836,9 +834,9 @@ console.log( a, b, c );			// 1 2 3
 console.log( x, y, z );			// 4 5 4
 ```
 
-### Too Many, Too Few, Just Enough
+### 太多，太少，正合适
 
-With both array destructuring assignment and object destructuring assignment, you do not have to assign all the values that are present. For example:
+对于数组解构赋值和对象解构赋值两者来说，你不必分配所有出现的值。例如：
 
 ```js
 var [,b] = foo();
@@ -847,9 +845,9 @@ var { x, z } = bar();
 console.log( b, x, z );				// 2 4 6
 ```
 
-The `1` and `3` values that came back from `foo()` are discarded, as is the `5` value from `bar()`.
+从`foo()`返回的值`1`和`3`被丢弃了，从`bar()`返回的值`5`也是。
 
-Similarly, if you try to assign more values than are present in the value you're destructuring/decomposing, you get graceful fallback to `undefined`, as you'd expect:
+相似地，如果你试着分配比你正在解构/拆解的值要多的值时，它们会如你所想的那样安静地退回到`undefined`：
 
 ```js
 var [,,c,d] = foo();
@@ -859,11 +857,11 @@ console.log( c, z );				// 3 6
 console.log( d, w );				// undefined undefined
 ```
 
-This behavior follows symmetrically from the earlier stated "`undefined` is missing" principle.
+这种行为平行地遵循早先提到的“`undefined`意味着缺失”原则。
 
-We examined the `...` operator earlier in this chapter, and saw that it can sometimes be used to spread an array value out into its separate values, and sometimes it can be used to do the opposite: to gather a set of values together into an array.
+我们在本章早先检视了`...`操作符，并看到了它有时可以用于将一个数组值扩散为它的分离值，而有时它可以被用于相反的操作：将一组值收集进一个数组。
 
-In addition to the gather/rest usage in function declarations, `...` can perform the same behavior in destructuring assignments. To illustrate, let's recall a snippet from earlier in this chapter:
+除了在函数声明中的收集/剩余用法以外，`...`可以在解构赋值中实施相同的行为。为了展示这一点，让我们回想一下本章早先的一个代码段：
 
 ```js
 var a = [2,3,4];
@@ -872,7 +870,7 @@ var b = [ 1, ...a, 5 ];
 console.log( b );					// [1,2,3,4,5]
 ```
 
-Here we see that `...a` is spreading `a` out, because it appears in the array `[ .. ]` value position. If `...a` appears in an array destructuring position, it performs the gather behavior:
+我们在这里看到因为`...a`出现在数组`[ .. ]`中值的位置，所以它将`a`扩散开。如果`...a`出现一个数组解构的位置，它会实施收集行为：
 
 ```js
 var a = [2,3,4];
@@ -881,15 +879,15 @@ var [ b, ...c ] = a;
 console.log( b, c );				// 2 [3,4]
 ```
 
-The `var [ .. ] = a` destructuring assignment spreads `a` out to be assigned to the pattern described inside the `[ .. ]`. The first part names `b` for the first value in `a` (`2`). But then `...c` gathers the rest of the values (`3` and `4`) into an array and calls it `c`.
+解构赋值`var [ .. ] = a`为了将`a`赋值给在`[ .. ]`中描述的模式而将它扩散开。第一部分的名称`b`对应`a`中的第一个值(`2`)。然后`...c`将剩余的值（`3`和`4`）收集到一个称为`c`的数组中。
 
-**Note:** We've seen how `...` works with arrays, but what about with objects? It's not an ES6 feature, but see Chapter 8 for discussion of a possible "beyond ES6" feature where `...` works with spreading or gathering objects.
+**注意：** 我们已经看到`...`是如何与数组一起工作的，但是对象呢？那不是一个ES6特性，但是参看第八章中关于一种可能的“ES6之后”的特性的讨论，它可以让`...`扩散或者收集对象。
 
-### Default Value Assignment
+### 默认值赋值
 
-Both forms of destructuring can offer a default value option for an assignment, using the `=` syntax similar to the default function argument values discussed earlier.
+两种形式的解构都可以为赋值提供默认值选项，它使用和早先讨论过的默认函数参数值相似的`=`语法。
 
-Consider:
+考虑如下代码：
 
 ```js
 var [ a = 3, b = 6, c = 9, d = 12 ] = foo();
@@ -899,7 +897,7 @@ console.log( a, b, c, d );			// 1 2 3 12
 console.log( x, y, z, w );			// 4 5 6 20
 ```
 
-You can combine the default value assignment with the alternative assignment expression syntax covered earlier. For example:
+你可以将默认值赋值与前面讲过的赋值表达式语法组合在一起。例如：
 
 ```js
 var { x, y, z, w: WW = 20 } = bar();
@@ -907,7 +905,7 @@ var { x, y, z, w: WW = 20 } = bar();
 console.log( x, y, z, WW );			// 4 5 6 20
 ```
 
-Be careful about confusing yourself (or other developers who read your code) if you use an object or array as the default value in a destructuring. You can create some really hard to understand code:
+如果你在一个解构中使用一个对象或者数组作为默认值，那么要小心不要把自己（或者读你的代码的其他开发者）搞糊涂了。你可能会创建一些非常难理解的代码：
 
 ```js
 var x = 200, y = 300, z = 100;
@@ -918,17 +916,17 @@ var o1 = { x: { y: 42 }, z: { y: z } };
 ( { x: z = { y: x } } = o1 );
 ```
 
-Can you tell from that snippet what values `x`, `y`, and `z` have at the end? Takes a moment of pondering, I would imagine. I'll end the suspense:
+你能从这个代码段中看出`x`，`y`和`z`最终是什么值吗？花点儿时间好好考虑一下，我能想象你的样子。我会终结这个悬念：
 
 ```js
 console.log( x.y, y.y, z.y );		// 300 100 42
 ```
 
-The takeaway here: destructuring is great and can be very useful, but it's also a sharp sword that can cause injury (to someone's brain) if used unwisely.
+这里的要点是：解构很棒也可以很有用，但是如果使用得不明智，它也是一把可以伤人（某人的大脑）的利剑。
 
-### Nested Destructuring
+### 嵌套解构
 
-If the values you're destructuring have nested objects or arrays, you can destructure those nested values as well:
+如果你正在解构的值拥有嵌套的对象或数组，你也可以解构这些嵌套的值：
 
 ```js
 var a1 = [ 1, [2, 3, 4], 5 ];
@@ -941,7 +939,7 @@ console.log( a, b, c, d, e );		// 1 2 3 4 5
 console.log( w );					// 6
 ```
 
-Nested destructuring can be a simple way to flatten out object namespaces. For example:
+嵌套的解构可以是一种将对象名称空间扁平化的简单方法。例如：
 
 ```js
 var App = {
@@ -950,15 +948,15 @@ var App = {
 	}
 };
 
-// instead of:
+// 取代：
 // var User = App.model.User;
 
 var { model: { User } } = App;
 ```
 
-### Destructuring Parameters
+### 参数解构
 
-In the following snippet, can you spot the assignment?
+你能在下面的代码段中发现赋值吗？
 
 ```js
 function foo(x) {
@@ -968,9 +966,9 @@ function foo(x) {
 foo( 42 );
 ```
 
-The assignment is kinda hidden: `42` (the argument) is assigned to `x` (the parameter) when `foo(42)` is executed. If parameter/argument pairing is an assignment, then it stands to reason that it's an assignment that could be destructured, right? Of course!
+其中的赋值有点儿被隐藏的感觉：当`foo(42)`被执行时`42`（参数值）被赋值给`x`（参数）。如果参数/参数值对是一种赋值，那么按常理说它是一个可以被解构的赋值，对吧？当然！
 
-Consider array destructuring for parameters:
+考虑参数的数组解构：
 
 ```js
 function foo( [ x, y ] ) {
@@ -982,7 +980,7 @@ foo( [ 1 ] );						// 1 undefined
 foo( [] );							// undefined undefined
 ```
 
-Object destructuring for parameters works, too:
+参数也可以进行对象解构：
 
 ```js
 function foo( { x, y } ) {
@@ -994,11 +992,11 @@ foo( { y: 42 } );					// undefined 42
 foo( {} );							// undefined undefined
 ```
 
-This technique is an approximation of named arguments (a long requested feature for JS!), in that the properties on the object map to the destructured parameters of the same names. That also means that we get optional parameters (in any position) for free, as you can see leaving off the `x` "parameter" worked as we'd expect.
+这种技术是命名参数值（一个长期以来被渴求的JS特性！）的一种近似解法：对象上的属性映射到被解构的同名参数上。这也意味着我们免费地（在任何位置）得到了可选参数，如你所见，省去“参数”`x`可以如我们期望的那样工作。
 
-Of course, all the previously discussed variations of destructuring are available to us with parameter destructuring, including nested destructuring, default values, and more. Destructuring also mixes fine with other ES6 function parameter capabilities, like default parameter values and rest/gather parameters.
+当然，先前讨论过的所有解构的种类对于参数解构来说都是可用的，包括嵌套解构，默认值，和其他。解构也可以和其他ES6函数参数功能很好地混合在一起，比如默认参数值和剩余/收集参数。
 
-Consider these quick illustrations (certainly not exhaustive of the possible variations):
+考虑这些快速的示例（当然这没有穷尽所有可能的种类）：
 
 ```js
 function f1([ x=2, y=3, z ]) { .. }
@@ -1010,7 +1008,7 @@ function f5({ x: X = 10, y = 20 }) { .. }
 function f6({ x = 10 } = {}, { y } = { y: 10 }) { .. }
 ```
 
-Let's take one example from this snippet and examine it, for illustration purposes:
+为了展示一下，让我们从这个代码段中取一个例子来检视：
 
 ```js
 function f3([ x, y, ...z], ...w) {
@@ -1021,11 +1019,11 @@ f3( [] );							// undefined undefined [] []
 f3( [1,2,3,4], 5, 6 );				// 1 2 [3,4] [5,6]
 ```
 
-There are two `...` operators in use here, and they're both gathering values in arrays (`z` and `w`), though `...z` gathers from the rest of the values left over in the first array argument, while `...w` gathers from the rest of the main arguments left over after the first.
+这里使用了两个`...`操作符，他们都是将值收集到数组中（`z`和`w`），虽然`...z`是从第一个数组参数值的剩余值中收集，而`...w`是从第一个之后的剩余主参数值中收集的。
 
-#### Destructuring Defaults + Parameter Defaults
+#### 解构默认值 + 参数默认值
 
-There's one subtle point you should be particularly careful to notice -- the difference in behavior between a destructuring default value and a function parameter default value. For example:
+有一个微妙的地方你应当注意要特别小心 —— 解构默认值与函数参数默认值的行为之间的不同。例如：
 
 ```js
 function f6({ x = 10 } = {}, { y } = { y: 10 }) {
@@ -1035,25 +1033,25 @@ function f6({ x = 10 } = {}, { y } = { y: 10 }) {
 f6();								// 10 10
 ```
 
-At first, it would seem that we've declared a default value of `10` for both the `x` and `y` parameters, but in two different ways. However, these two different approaches will behave differently in certain cases, and the difference is awfully subtle.
+首先，看起来我们用两种不同的方法为参数`x`和`y`都声明了默认值`10`。然而，这两种不同的方式会在特定的情况下表现出不同的行为，而且这种区别极其微妙。
 
-Consider:
+考虑如下代码：
 
 ```js
 f6( {}, {} );						// 10 undefined
 ```
 
-Wait, why did that happen? It's pretty clear that named parameter `x` is defaulting to `10` if not passed as a property of that same name in the first argument's object.
+等等，为什么会这样？十分清楚，如果在第一个参数值的对象中没有一个同名属性被传递，那么命名参数`x`将默认为`10`。
 
-But what about `y` being `undefined`? The `{ y: 10 }` value is an object as a function parameter default value, not a destructuring default value. As such, it only applies if the second argument is not passed at all, or is passed as `undefined`.
+但`y`是`undefined`是怎么回事儿？值`{ y: 10 }`是一个作为函数参数默认值的对象，不是结构默认值。因此，它仅在第二个参数根本没有被传递，或者`undefined`被传递时生效，
 
-In the previous snippet, we *are* passing a second argument (`{}`), so the default `{ y: 10 }` value is not used, and the `{ y }` destructuring occurs against the passed in `{}` empty object value.
+在前面的代码段中，我们传递了第二个参数（`{}`），所以默认值`{ y: 10 }`不被使用，而解构`{ y }`会针对被传入的空对象值`{}`发生。
 
-Now, compare `{ y } = { y: 10 }` to `{ x = 10 } = {}`.
+现在，将`{ y } = { y: 10 }`与`{ x = 10 } = {}`比较一下。
 
-For the `x`'s form usage, if the first function argument is omitted or `undefined`, the `{}` empty object default applies. Then, whatever value is in the first argument position -- either the default `{}` or whatever you passed in -- is destructured with the `{ x = 10 }`, which checks to see if an `x` property is found, and if not found (or `undefined`), the `10` default value is applied to the `x` named parameter.
+对于`x`的使用形式来说，如果第一个函数参数值被省略或者是`undefined`，会默认地使用空对象`{}`。然后，不管在第一个参数值的位置上是什么值 —— 要么是默认的`{}`，要么是你传入的 —— 都会被`{ x = 10 }`解构，它会检查属性`x`是否被找到，如果没有找到（或者是`undefined`），默认值`10`会被设置到命名参数`x`上。
 
-Deep breath. Read back over those last few paragraphs a couple of times. Let's review via code:
+深呼吸。回过头去把最后几段多读几遍。让我们用代码复习一下：
 
 ```js
 function f6({ x = 10 } = {}, { y } = { y: 10 }) {
@@ -1070,18 +1068,18 @@ f6( undefined, {} );				// 10 undefined
 f6( { x: 2 }, { y: 3 } );			// 2 3
 ```
 
-It would generally seem that the defaulting behavior of the `x` parameter is probably the more desirable and sensible case compared to that of `y`. As such, it's important to understand why and how `{ x = 10 } = {}` form is different from `{ y } = { y: 10 }` form.
+一般来说，与参数`y`的默认行为比起来，参数`x`的默认行为可能看起来更可取也更合理。因此，理解`{ x = 10 } = {}`形式与`{ y } = { y: 10 }`形式为何与如何不同是很重要的。
 
-If that's still a bit fuzzy, go back and read it again, and play with this yourself. Your future self will thank you for taking the time to get this very subtle gotcha nuance detail straight.
+如果这仍然有点儿模糊，回头再把它读一遍，并亲自把它玩弄一番。未来的你将会感谢你花了时间把这种非常微妙的，晦涩的细节的坑搞明白。
 
-#### Nested Defaults: Destructured and Restructured
+#### 嵌套默认值：解构与重构
 
-Although it may at first be difficult to grasp, an interesting idiom emerges for setting defaults for a nested object's properties: using object destructuring along with what I'd call *restructuring*.
+虽然一开始可能很难掌握，但是为一个嵌套的对象的属性设置默认值产生了一种有趣的惯用法：将对象解构与一种我成为 *重构* 的东西一起使用。
 
-Consider a set of defaults in a nested object structure, like the following:
+考虑在一个嵌套的对象结构中的一组默认值，就像下面这样：
 
 ```js
-// taken from: http://es-discourse.com/t/partial-default-arguments/120/7
+// 摘自：http://es-discourse.com/t/partial-default-arguments/120/7
 
 var defaults = {
 	options: {
@@ -1096,7 +1094,7 @@ var defaults = {
 };
 ```
 
-Now, let's say that you have an object called `config`, which has some of these applied, but perhaps not all, and you'd like to set all the defaults into this object in the missing spots, but not override specific settings already present:
+现在，我们假定你有一个称为`config`的对象，它有一些这其中的值，但也许不全有，而且你想要将所有的默认值设置到这个对象的缺失点上，但不覆盖已经存在的特定设置：
 
 ```js
 var config = {
@@ -1107,7 +1105,7 @@ var config = {
 };
 ```
 
-You can of course do so manually, as you might have done in the past:
+你当然可以手动这样做，就像你可能曾经做过的那样：
 
 ```js
 config.options = config.options || {};
@@ -1118,19 +1116,19 @@ config.options.enable = (config.options.enable !== undefined) ?
 ...
 ```
 
-Yuck.
+讨厌。
 
-Others may prefer the assign-overwrite approach to this task. You might be tempted by the ES6 `Object.assign(..)` utility (see Chapter 6) to clone the properties first from `defaults` and then overwritten with the cloned properties from `config`, as so:
+另一些人可能喜欢用覆盖赋值的方式来完成这个任务。你可能会被ES6的`Object.assign(..)`工具（见第六章）所吸引，来首先克隆`defaults`中的属性然后使用从`config`中克隆的属性覆盖它，像这样：
 
 ```js
 config = Object.assign( {}, defaults, config );
 ```
 
-That looks way nicer, huh? But there's a major problem! `Object.assign(..)` is shallow, which means when it copies `defaults.options`, it just copies that object reference, not deep cloning that object's properties to a `config.options` object. `Object.assign(..)` would need to be applied (sort of "recursively") at all levels of your object's tree to get the deep cloning you're expecting.
+这看起来好多了，是吧？但是这里有一个重大问题！`Object.assign(..)`是浅拷贝，这意味着当它拷贝`defaults.options`时，它仅仅拷贝这个对象的引用，而不是深度克隆这个对象的属性到一个`config.options`对象。`Object.assign(..)`需要在你的对象树的每一层中实施才能得到你期望的深度克隆。
 
-**Note:** Many JS utility libraries/frameworks provide their own option for deep cloning of an object, but those approaches and their gotchas are beyond our scope to discuss here.
+**注意：** 许多JS工具库/框架都为对象的深度克隆提供它们自己的选项，但是那些方式和它们的坑超出了我们在这里的讨论范围。
 
-So let's examine if ES6 object destructuring with defaults can help at all:
+那么让我们检视一下ES6的带有默认值的对象解构能否帮到我们：
 
 ```js
 config.options = config.options || {};
@@ -1148,22 +1146,22 @@ config.log = config.log || {};
 } = config);
 ```
 
-Not as nice as the false promise of `Object.assign(..)` (being that it's shallow only), but it's better than the manual approach by a fair bit, I think. It is still unfortunately verbose and repetitive, though.
+不像`Object.assign(..)`的虚假诺言（因为它只是浅拷贝）那么好，但是我想它要比手动的方式强多了。虽然它仍然很不幸地带有冗余和重复。
 
-The previous snippet's approach works because I'm hacking the destructuring and defaults mechanism to do the property `=== undefined` checks and assignment decisions for me. It's a trick in that I'm destructuring `config` (see the `= config` at the end of the snippet), but I'm reassigning all the destructured values right back into `config`, with the `config.options.enable` assignment references.
+前面的代码段的方式可以工作，因为我黑进了结构和默认机制来为我做属性的`=== undefined`检查和赋值的决定。这里的技巧是，我解构了`config`（看看在代码段末尾的`= config`），但是我将所有解构出来的值又立即赋值回`config`，带着`config.options.enable`赋值引用。
 
-Still too much, though. Let's see if we can make anything better.
+但还是太多了。让我们看看能否做得更好。
 
-The following trick works best if you know that all the various properties you're destructuring are uniquely named. You can still do it even if that's not the case, but it's not as nice -- you'll have to do the destructuring in stages, or create unique local variables as temporary aliases.
+下面的技巧在你知道你正在解构的所有属性的名称都是唯一的情况下工作得最好。但即使不是这样的情况你也仍然可以使用它，只是没有那么好 —— 你将不得不分阶段解构，或者创建独一无二的本地变量作为临时的别名。
 
-If we fully destructure all the properties into top-level variables, we can then immediately restructure to reconstitute the original nested object structure.
+如果我们将所有的属性完全解构为顶层变量，那么我们就可以立即重构来重组原本的嵌套对象解构。
 
-But all those temporary variables hanging around would pollute scope. So, let's use block scoping (see "Block-Scoped Declarations" earlier in this chapter) with a general `{ }` enclosing block:
+但是所有那些游荡在外的临时变量将会污染作用域。所以，让我们通过一个普通的`{ }`包围块儿来使用块儿作用域（参见本章早先的“块儿作用域声明”）。
 
 ```js
-// merge `defaults` into `config`
+// 将`defaults`混入`config`
 {
-	// destructure (with default value assignments)
+	// 解构（使用默认值赋值）
 	let {
 		options: {
 			remove = defaults.options.remove,
@@ -1176,7 +1174,7 @@ But all those temporary variables hanging around would pollute scope. So, let's 
 		} = {}
 	} = config;
 
-	// restructure
+	// 重构
 	config = {
 		options: { remove, enable, instance },
 		log: { warn, error }
@@ -1184,19 +1182,19 @@ But all those temporary variables hanging around would pollute scope. So, let's 
 }
 ```
 
-That seems a fair bit nicer, huh?
+这看起来好多了，是吧？
 
-**Note:** You could also accomplish the scope enclosure with an arrow IIFE instead of the general `{ }` block and `let` declarations. Your destructuring assignments/defaults would be in the parameter list and your restructuring would be the `return` statement in the function body.
+**注意：** 你也可以使用箭头IIFE来代替一般的`{ }`块儿和`let`声明来达到圈占作用域的目的。你的解构赋值/默认值将位于参数列表中，而你的重构将位于函数体的`return`语句中。
 
-The `{ warn, error }` syntax in the restructuring part may look new to you; that's called "concise properties" and we cover it in the next section!
+在重构部分的`{ warn, error }`语法可能是你初次见到；它称为“简约属性”，我们将在下一节讲解它！
 
-## Object Literal Extensions
+## 对象字面量扩展
 
-ES6 adds a number of important convenience extensions to the humble `{ .. }` object literal.
+ES6给不起眼儿的`{ .. }`对象字面量增加了几个重要的便利扩展。
 
-### Concise Properties
+### 简约属性
 
-You're certainly familiar with declaring object literals in this form:
+你一定很熟悉用这种形式的对象字面量声明：
 
 ```js
 var x = 2, y = 3,
@@ -1206,7 +1204,7 @@ var x = 2, y = 3,
 	};
 ```
 
-If it's always felt redundant to say `x: x` all over, there's good news. If you need to define a property that is the same name as a lexical identifier, you can shorten it from `x: x` to `x`. Consider:
+如果到处说`x: x`总是让你感到繁冗，那么有个好消息。如果你需要定义一个名称和词法标识符一致的属性，你可以将它从`x: x`缩写为`x`。考虑如下代码：
 
 ```js
 var x = 2, y = 3,
@@ -1216,11 +1214,11 @@ var x = 2, y = 3,
 	};
 ```
 
-### Concise Methods
+### 简约方法
 
-In a similar spirit to concise properties we just examined, functions attached to properties in object literals also have a concise form, for convenience.
+本着与我们刚刚检视的简约属性相同的精神，添附在对象字面量属性上的函数也有一种便利简约形式。
 
-The old way:
+以前的方式：
 
 ```js
 var o = {
@@ -1233,7 +1231,7 @@ var o = {
 }
 ```
 
-And as of ES6:
+而在ES6中：
 
 ```js
 var o = {
@@ -1246,9 +1244,9 @@ var o = {
 }
 ```
 
-**Warning:** While `x() { .. }` seems to just be shorthand for `x: function(){ .. }`, concise methods have special behaviors that their older counterparts don't; specifically, the allowance for `super` (see "Object `super`" later in this chapter).
+**警告：** 虽然`x() { .. }`看起来只是`x: function(){ .. }`的缩写，但是简约方法有一种特殊行为，是它们对应的老方式所不具有的；确切地说，是允许`super`（参见本章稍后的“对象`super`”）的使用。
 
-Generators (see Chapter 4) also have a concise method form:
+Generator（见第四章）也有一种简约方法形式：
 
 ```js
 var o = {
@@ -1256,9 +1254,9 @@ var o = {
 };
 ```
 
-#### Concisely Unnamed
+#### 简约匿名
 
-While that convenience shorthand is quite attractive, there's a subtle gotcha to be aware of. To illustrate, let's examine pre-ES6 code like the following, which you might try to refactor to use concise methods:
+虽然这种便利缩写十分诱人，但是这其中有一个微妙的坑要小心。为了展示这一点，让我们检视一下如下的前ES6代码，你可能会试着使用简约方法来重构它：
 
 ```js
 function runSomething(o) {
@@ -1271,8 +1269,7 @@ function runSomething(o) {
 runSomething( {
 	something: function something(x,y) {
 		if (x > y) {
-			// recursively call with `x`
-			// and `y` swapped
+			// 使用相互对调的`x`和`y`来递归地调用
 			return something( y, x );
 		}
 
@@ -1281,7 +1278,7 @@ runSomething( {
 } );
 ```
 
-This obviously silly code just generates two random numbers and subtracts the smaller from the bigger. But what's important here isn't what it does, but rather how it's defined. Let's focus on the object literal and function definition, as we see here:
+这段蠢代码只是生成两个随机数，然后用大的减去小的。但这里重要的不是它做的是什么，而是它是如何被定义的。让我把焦点放在对象字面量和函数定义上，就像我们在这里看到的：
 
 ```js
 runSomething( {
@@ -1291,11 +1288,11 @@ runSomething( {
 } );
 ```
 
-Why do we say both `something:` and `function something`? Isn't that redundant? Actually, no, both are needed for different purposes. The property `something` is how we can call `o.something(..)`, sort of like its public name. But the second `something` is a lexical name to refer to the function from inside itself, for recursion purposes.
+为什么我们同时说`something:`和`function something`？这不是冗余吗？实际上，不是，它们俩被用于不同的目的。属性`something`让我们能够调用`o.something(..)`，有点儿像它的公有名称。但是第二个`something`是一个词法名称，使这个函数可以为了递归而从内部引用它自己。
 
-Can you see why the line `return something(y,x)` needs the name `something` to refer to the function? There's no lexical name for the object, such that it could have said `return o.something(y,x)` or something of that sort.
+你能看出来为什么`return something(y,x)`这一行需要名称`something`来引用这个函数吗？因为这里没有对象的词法名称，要是有的话我们就可以说`return o.something(y,x)`或者其他类似的东西。
 
-That's actually a pretty common practice when the object literal does have an identifying name, such as:
+当一个对象字面量的确拥有一个标识符名称时，这其实是一个很常见的做法，比如：
 
 ```js
 var controller = {
@@ -1306,9 +1303,9 @@ var controller = {
 };
 ```
 
-Is this a good idea? Perhaps, perhaps not. You're assuming that the name `controller` will always point to the object in question. But it very well may not -- the `makeRequest(..)` function doesn't control the outer code and so can't force that to be the case. This could come back to bite you.
+这是个好主意吗？也许是，也许不是。你在假设名称`controller`将总是指向目标对象。但它也很可能不是 —— 函数`makeRequest(..)`不能控制外部的代码，因此不能强制你的假设一定成立。这可能会回过头来咬到你。
 
-Others prefer to use `this` to define such things:
+另一些人喜欢使用`this`定义这样的东西：
 
 ```js
 var controller = {
@@ -1319,15 +1316,15 @@ var controller = {
 };
 ```
 
-That looks fine, and should work if you always invoke the method as `controller.makeRequest(..)`. But you now have a `this` binding gotcha if you do something like:
+这看起来不错，而且如果你总是用`controller.makeRequest(..)`来调用方法的话它就应该能工作。但现在你有一个`this`绑定的坑，如果你做这样的事情的话：
 
 ```js
 btn.addEventListener( "click", controller.makeRequest, false );
 ```
 
-Of course, you can solve that by passing `controller.makeRequest.bind(controller)` as the handler reference to bind the event to. But yuck -- it isn't very appealing.
+当然，你可以通过传递`controller.makeRequest.bind(controller)`作为绑定到事件上的处理器引用来解决这个问题。但是这很讨厌 —— 它不是很吸引人。
 
-Or what if your inner `this.makeRequest(..)` call needs to be made from a nested function? You'll have another `this` binding hazard, which people will often solve with the hacky `var self = this`, such as:
+或者要是你的内部`this.makeRequest(..)`调用需要从一个嵌套的函数内发起呢？你会有另一个`this`绑定灾难，人们经常使用`var self = this`这种用黑科技解决，就像：
 
 ```js
 var controller = {
@@ -1342,11 +1339,11 @@ var controller = {
 };
 ```
 
-More yuck.
+更讨厌。
 
-**Note:** For more information on `this` binding rules and gotchas, see Chapters 1-2 of the *this & Object Prototypes* title of this series.
+**注意：** 更多关于`this`绑定规则和陷阱的信息，参见本系列的 *this与对象原型* 的第一到二章。
 
-OK, what does all this have to do with concise methods? Recall our `something(..)` method definition:
+好了，这些与简约方法有什么关系？回想一下我们的`something(..)`方法定义：
 
 ```js
 runSomething( {
@@ -1356,11 +1353,11 @@ runSomething( {
 } );
 ```
 
-The second `something` here provides a super convenient lexical identifier that will always point to the function itself, giving us the perfect reference for recursion, event binding/unbinding, and so on -- no messing around with `this` or trying to use an untrustable object reference.
+在这里的第二个`something`提供了一个超级便利的词法标识符，它总是指向函数自己，给了我们一个可用于递归，事件绑定/解除等等的完美引用 —— 不用乱搞`this`或者使用不可靠的对象引用。
 
-Great!
+太好了!
 
-So, now we try to refactor that function reference to this ES6 concise method form:
+那么，现在我们试着将函数引用重构为这种ES6解约方法的形式：
 
 ```js
 runSomething( {
@@ -1374,9 +1371,9 @@ runSomething( {
 } );
 ```
 
-Seems fine at first glance, except this code will break. The `return something(..)` call will not find a `something` identifier, so you'll get a `ReferenceError`. Oops. But why?
+第一眼看上去不错，除了这个代码将会坏掉。`return something(..)`调用经不会找到`something`标识符，所以你会得到一个`ReferenceError`。噢，但为什么？
 
-The above ES6 snippet is interpreted as meaning:
+上面的ES6代码段将会被翻译为：
 
 ```js
 runSomething( {
@@ -1390,23 +1387,23 @@ runSomething( {
 } );
 ```
 
-Look closely. Do you see the problem? The concise method definition implies `something: function(x,y)`. See how the second `something` we were relying on has been omitted? In other words, concise methods imply anonymous function expressions.
+仔细看。你看出问题了吗？简约方法定义暗指`something: function(x,y)`。看到我们依靠的第二个`something`是如何被省略的了吗？换句话说，简约方法暗指匿名函数表达式。
 
-Yeah, yuck.
+对，讨厌。
 
-**Note:** You may be tempted to think that `=>` arrow functions are a good solution here, but they're equally insufficient, as they're also anonymous function expressions. We'll cover them in "Arrow Functions" later in this chapter.
+**注意：** 你可能认为在这里`=>`箭头函数是一个好的解决方案。但是它们也同样不够，因为它们也是匿名函数表达式。我们将在本章稍后的“箭头函数”中讲解它们。
 
-The partially redeeming news is that our `something(x,y)` concise method won't be totally anonymous. See "Function Names" in Chapter 7 for information about ES6 function name inference rules. That won't help us for our recursion, but it helps with debugging at least.
+一个部分地补偿了这一点的消息是，我们的简约函数`something(x,y)`将不会是完全匿名的。参见第七章的“函数名”来了解ES6函数名称的推断规则。这不会在递归中帮到我们，但是它至少在调试时有用处。
 
-So what are we left to conclude about concise methods? They're short and sweet, and a nice convenience. But you should only use them if you're never going to need them to do recursion or event binding/unbinding. Otherwise, stick to your old-school `something: function something(..)` method definitions.
+那么我们怎样总结简约方法？它们简短又甜蜜，而且很方便。但是你应当仅在你永远不需要将它们用于递归或事件绑定/解除时使用它们。否则，就坚持使用你的老式`something: function something(..)`方法定义。
 
-A lot of your methods are probably going to benefit from concise method definitions, so that's great news! Just be careful of the few where there's an un-naming hazard.
+你的很多方法都将可能从简约方法定义中受益，这是个非常好的消息！只要小心几处未命名的灾难就好。
 
 #### ES5 Getter/Setter
 
-Technically, ES5 defined getter/setter literals forms, but they didn't seem to get used much, mostly due to the lack of transpilers to handle that new syntax (the only major new syntax added in ES5, really). So while it's not a new ES6 feature, we'll briefly refresh on that form, as it's probably going to be much more useful with ES6 going forward.
+技术上讲，ES5定义了getter/setter字面形式，但是看起来它们没有被太多地使用，这主要是由于缺乏转译器来处理这种新的语法（其实，它是ES5中加入的唯一的主要新语法）。所以虽然它不是一个ES6的新特性，我们也将简单地复习一下这种形式，因为它可能会随着ES6的向前发展而变得有用得多。
 
-Consider:
+考虑如下代码：
 
 ```js
 var o = {
@@ -1420,18 +1417,18 @@ o.id;			// 11
 o.id = 20;
 o.id;			// 20
 
-// and:
+// 而：
 o.__id;			// 21
-o.__id;			// 21 -- still!
+o.__id;			// 还是 —— 21！
 ```
 
-These getter and setter literal forms are also present in classes; see Chapter 3.
+这些getter和setter字面形式也可以出现在类中；参见第三章。
 
-**Warning:** It may not be obvious, but the setter literal must have exactly one declared parameter; omitting it or listing others is illegal syntax. The single required parameter *can* use destructuring and defaults (e.g., `set id({ id: v = 0 }) { .. }`), but the gather/rest `...` is not allowed (`set id(...v) { .. }`).
+**警告：** 可能不太明显，但是setter字面量必须恰好有一个被声明的参数；省略它或罗列其他的参数都是不合法的语法。这个单独的必须参数 *可以* 使用解构和默认值（例如，`set id({ id: v = 0 }) { .. }`），但是收集/剩余`...`是不允许的（`set id(...v) { .. }`）。
 
-### Computed Property Names
+### 计算型属性名
 
-You've probably been in a situation like the following snippet, where you have one or more property names that come from some sort of expression and thus can't be put into the object literal:
+你可能曾经遇到过像下面的代码段那样的情况，你的一个或多个属性名来自于某种表达式，因此你不能将它们放在对象字面量中：
 
 ```js
 var prefix = "user_";
@@ -1445,7 +1442,7 @@ o[ prefix + "bar" ] = function(..){ .. };
 ..
 ```
 
-ES6 adds a syntax to the object literal definition which allows you to specify an expression that should be computed, whose result is the property name assigned. Consider:
+ES6为对象字面定义增加了一种语法，它允许你指定一个应当被计算的表达式，其结果就是被赋值属性名。考虑如下代码：
 
 ```js
 var prefix = "user_";
@@ -1458,9 +1455,9 @@ var o = {
 };
 ```
 
-Any valid expression can appear inside the `[ .. ]` that sits in the property name position of the object literal definition.
+任何合法的表达式都可以出现在位于对象字面定义的属性名位置的`[ .. ]`内部。
 
-Probably the most common use of computed property names will be with `Symbol`s (which we cover in "Symbols" later in this chapter), such as:
+很有可能，计算型属性名最经常与`Symbol`（我们将在本章稍后的“Symbol”中讲解）一起使用，比如：
 
 ```js
 var o = {
@@ -1469,22 +1466,22 @@ var o = {
 };
 ```
 
-`Symbol.toStringTag` is a special built-in value, which we evaluate with the `[ .. ]` syntax, so we can assign the `"really cool thing"` value to the special property name.
+`Symbol.toStringTag`是一个特殊的内建值，我们使用`[ .. ]`语法求值得到，所以我们可以将值`"really cool thing"`赋值给这个特殊的属性名。
 
-Computed property names can also appear as the name of a concise method or a concise generator:
+计算型属性名还可以作为简约方法或简约generator的名称出现：
 
 ```js
 var o = {
-	["f" + "oo"]() { .. }	// computed concise method
-	*["b" + "ar"]() { .. }	// computed concise generator
+	["f" + "oo"]() { .. }	// 计算型简约方法
+	*["b" + "ar"]() { .. }	// 计算型简约generator
 };
 ```
 
-### Setting `[[Prototype]]`
+### 设置`[[Prototype]]`
 
-We won't cover prototypes in detail here, so for more information, see the *this & Object Prototypes* title of this series.
+我们不会在这里讲解原型的细节，所以关于它的更多信息，参见本系列的 *this与对象原型*。
 
-Sometimes it will be helpful to assign the `[[Prototype]]` of an object at the same time you're declaring its object literal. The following has been a nonstandard extension in many JS engines for a while, but is standardized as of ES6:
+有时候在你声明对象字面量的同时给它的`[[Prototype]]`赋值很有用。下面的代码在一段时期内曾经是许多JS引擎的一种非标准扩展，但是在ES6中得到了标准化：
 
 ```js
 var o1 = {
@@ -1497,13 +1494,13 @@ var o2 = {
 };
 ```
 
-`o2` is declared with a normal object literal, but it's also `[[Prototype]]`-linked to `o1`. The `__proto__` property name here can also be a string `"__proto__"`, but note that it *cannot* be the result of a computed property name (see the previous section).
+`o2`是用一个对象字面量声明的，但它也被`[[Prototype]]`链接到了`o1`。这里的`__proto__`属性名还可以是一个字符串`"__proto__"`，但是要注意它 *不能* 是一个计算型属性名的结果（参见前一节）。
 
-`__proto__` is controversial, to say the least. It's a decades-old proprietary extension to JS that is finally standardized, somewhat begrudgingly it seems, in ES6. Many developers feel it shouldn't ever be used. In fact, it's in "Annex B" of ES6, which is the section that lists things JS feels it has to standardize for compatibility reasons only.
+客气点儿说，`__proto__`是有争议的。在ES6中，它看起来是一个最终被很勉强地标准化了的，几十年前的自主扩展功能。实际上，它属于ES6的“Annex B”，这一部分罗列了JS感觉它仅仅为了兼容性的原因，而不得不标准化的东西。
 
-**Warning:** Though I'm narrowly endorsing `__proto__` as a key in an object literal definition, I definitely do not endorse using it in its object property form, like `o.__proto__`. That form is both a getter and setter (again for compatibility reasons), but there are definitely better options. See the *this & Object Prototypes* title of this series for more information.
+**警告：** 虽然我勉强赞同在一个对象字面定义中将`__proto__`作为一个键，但我绝对不赞同在对象属性形式中使用它，就像`o.__proto__`。这种形式既是一个getter也是一个setter（同样也是为了兼容性的原因），但绝对存在更好的选择。更多信息参见本系列的 *this与对象原型*。
 
-For setting the `[[Prototype]]` of an existing object, you can use the ES6 utility `Object.setPrototypeOf(..)`. Consider:
+对于给一个既存的对象设置`[[Prototype]]`，你可以使用ES6的工具`Object.setPrototypeOf(..)`。考虑如下代码：
 
 ```js
 var o1 = {
@@ -1517,13 +1514,13 @@ var o2 = {
 Object.setPrototypeOf( o2, o1 );
 ```
 
-**Note:** We'll discuss `Object` again in Chapter 6. "`Object.setPrototypeOf(..)` Static Function" provides additional details on `Object.setPrototypeOf(..)`. Also see "`Object.assign(..)` Static Function" for another form that relates `o2` prototypically to `o1`.
+**注意：** 我们将在第六章中再次讨论`Object`。“`Object.setPrototypeOf(..)`静态函数”提供了关于`Object.setPrototypeOf(..)`的额外细节。另外参见“`Object.assign(..)`静态函数”来了解另一种将`o2`原型关联到`o1`的形式。
 
-### Object `super`
+### 对象`super`
 
-`super` is typically thought of as being only related to classes. However, due to JS's classless-objects-with-prototypes nature, `super` is equally effective, and nearly the same in behavior, with plain objects' concise methods.
+`super`通常被认为是仅与类有关。然而，由于JS对象仅有原型而没有类的性质，`super`是同样有效的，而且在普通对象的简约方法中行为几乎一样。
 
-Consider:
+考虑如下代码：
 
 ```js
 var o1 = {
@@ -1545,25 +1542,25 @@ o2.foo();		// o1:foo
 				// o2:foo
 ```
 
-**Warning:** `super` is only allowed in concise methods, not regular function expression properties. It also is only allowed in `super.XXX` form (for property/method access), not in `super()` form.
+**警告：** `super`仅在简约方法中允许使用，而不允许在普通的函数表达式属性中。而且它还仅允许使用`super.XXX`形式（属性/方法访问），而不是`super()`形式。
 
-The `super` reference in the `o2.foo()` method is locked statically to `o2`, and specifically to the `[[Prototype]]` of `o2`. `super` here would basically be `Object.getPrototypeOf(o2)` -- resolves to `o1` of course -- which is how it finds and calls `o1.foo()`.
+在方法`o2.foo()`中的`super`引用被静态地锁定在了`o2`，而且明确地说是`o2`的`[[Prototype]]`。这里的`super`基本上是`Object.getPrototypeOf(o2)` —— 显然被解析为`o1` —— 这就是他如何找到并调用`o1.foo()`的。
 
-For complete details on `super`, see "Classes" in Chapter 3.
+关于`super`的完整细节，参见第三章的“类”。
 
-## Template Literals
+## 模板字面量
 
-At the very outset of this section, I'm going to have to call out the name of this ES6 feature as being awfully... misleading, depending on your experiences with what the word *template* means.
+在这一节的最开始，我将不得不呼唤这个ES6特性的极其……误导人的名称，这要看在你的经验中 *模板（template）* 一词的含义是什么。
 
-Many developers think of templates as being reusable renderable pieces of text, such as the capability provided by most template engines (Mustache, Handlebars, etc.). ES6's use of the word *template* would imply something similar, like a way to declare inline template literals that can be re-rendered. However, that's not at all the right way to think about this feature.
+许多开发者认为模板是一段可复用的，可重绘的文本，就像大多数模板引擎（Mustache，Handlebars，等等）提供的能力那样。ES6中使用的 *模板* 一词暗示着相似的东西，就像一种声明可以被重绘的内联模板字面量的方法。然而，这根本不是考虑这个特性的正确方式。
 
-So, before we go on, I'm renaming to what it should have been called: *interpolated string literals* (or *interpoliterals* for short).
+所以，在我们继续之前，我把它重命名为它本应被称呼的名字：*插值型字符串字面量*（或者略称为 *插值型字面量*）。
 
-You're already well aware of declaring string literals with `"` or `'` delimiters, and you also know that these are not *smart strings* (as some languages have), where the contents would be parsed for interpolation expressions.
+你已经十分清楚地知道了如何使用`"`或`'`分隔符来声明字符串字面量，而且你还知道它们不是（像有些语言中拥有的）内容将被解析为插值表达式的 *智能字符串*。
 
-However, ES6 introduces a new type of string literal, using the `` ` `` backtick as the delimiter. These string literals allow basic string interpolation expressions to be embedded, which are then automatically parsed and evaluated.
+但是，ES6引入了一种新型的字符串字面量，使用反引号`` ` ``作为分隔符。这些字符串字面量允许嵌入基本的字符串插值表达式，之后这些表达式自动地被解析和求值。
 
-Here's the old pre-ES6 way:
+这是老式的前ES6方式：
 
 ```js
 var name = "Kyle";
@@ -1574,7 +1571,7 @@ console.log( greeting );			// "Hello Kyle!"
 console.log( typeof greeting );		// "string"
 ```
 
-Now, consider the new ES6 way:
+现在，考虑这种新的ES6方式：
 
 ```js
 var name = "Kyle";
@@ -1585,13 +1582,13 @@ console.log( greeting );			// "Hello Kyle!"
 console.log( typeof greeting );		// "string"
 ```
 
-As you can see, we used the `` `..` `` around a series of characters, which are interpreted as a string literal, but any expressions of the form `${..}` are parsed and evaluated inline immediately. The fancy term for such parsing and evaluating is *interpolation* (much more accurate than templating).
+如你所见，我们在一系列被翻译为字符串字面量的字符周围使用了`` `..` ``，但是`${..}`形式中的任何表达式都将立即内联地被解析和求值。称呼这样的解析和求值的高大上名词就是 *插值（interpolation）*（比模板要准确多了）。
 
-The result of the interpolated string literal expression is just a plain old normal string, assigned to the `greeting` variable.
+被插值的字符串字面量表达式的结果只是一个老式的普通字符串，赋值给变量`greeting`。
 
-**Warning:** `typeof greeting == "string"` illustrates why it's important not to think of these entities as special template values, as you cannot assign the unevaluated form of the literal to something and reuse it. The `` `..` `` string literal is more like an IIFE in the sense that it's automatically evaluated inline. The result of a `` `..` `` string literal is, simply, just a string.
+**警告：** `typeof greeting == "string"`展示了为什么不将这些实体考虑为特殊的模板值很重要，因为你不能将这种字面量的未求值形式赋值给某些东西并复用它。`` `..` ``字符串字面量在某种意义上更像是IIFE，因为它自动内联地被求值。`` `..` ``字符串字面量的结果只不过是一个简单的字符串。
 
-One really nice benefit of interpolated string literals is they are allowed to split across multiple lines:
+插值型字符串字面量的一个真正的好处是他们允许被分割为多行：
 
 ```js
 var text =
@@ -1605,15 +1602,15 @@ console.log( text );
 // country!
 ```
 
-The line breaks (newlines) in the interpolated string literal were preserved in the string value.
+在插值型字符串字面量中的换行将会被保留在字符串值中。
 
-Unless appearing as explicit escape sequences in the literal value, the value of the `\r` carriage return character (code point `U+000D`) or the value of the `\r\n` carriage return + line feed sequence (code points `U+000D` and `U+000A`) are both normalized to a `\n` line feed character (code point `U+000A`). Don't worry though; this normalization is rare and would likely only happen if copy-pasting text into your JS file.
+除非在字面量值中作为明确的转义序列出现，回车字符`\r`（编码点`U+000D`）的值或者回车+换行序列`\r\n`（编码点`U+000D`和`U+000A`）的值都会被泛化为一个换行字符`\n`（编码点`U+000A`）。但不要担心；这种泛化很少见而且很可能仅会在你将文本拷贝粘贴到JS文件中时才会发生。
 
-### Interpolated Expressions
+### 插值表达式
 
-Any valid expression is allowed to appear inside `${..}` in an interpolated string literal, including function calls, inline function expression calls, and even other interpolated string literals!
+在一个插值型字符串字面量中，任何合法的表达式都被允许出现在`${..}`内部，包括函数调用，内联函数表达式调用，甚至是另一个插值型字符串字面量！
 
-Consider:
+考虑如下代码：
 
 ```js
 function upper(s) {
@@ -1631,17 +1628,17 @@ console.log( text );
 // to all of you READERS!
 ```
 
-Here, the inner `` `${who}s` `` interpolated string literal was a little bit nicer convenience for us when combining the `who` variable with the `"s"` string, as opposed to `who + "s"`. There will be cases that nesting interpolated string literals is helpful, but be wary if you find yourself doing that kind of thing often, or if you find yourself nesting several levels deep.
+当我们组合变量`who`与字符串`s`时， 相对于`who + "s"`，这里的内部插值型字符串字面量`` `${who}s` ``更方便一些。有些情况下嵌套的插值型字符串字面量是有用的，但是如果你发现自己做这样的事情太频繁，或者发现你自己嵌套了好几层时，你就要小心一些。
 
-If that's the case, the odds are good that your string value production could benefit from some abstractions.
+如果确实有这样情况，你的字符串你值生产过程很可能可以从某些抽象中获益。
 
-**Warning:** As a word of caution, be very careful about the readability of your code with such new found power. Just like with default value expressions and destructuring assignment expressions, just because you *can* do something doesn't mean you *should* do it. Never go so overboard with new ES6 tricks that your code becomes more clever than you or your other team members.
+**警告：** 作为一个忠告，使用这样的新发现的力量时要非常小心你代码的可读性。就像默认值表达式和解构赋值表达式一样，仅仅因为你 *能* 做某些事情，并不意味着你 *应该* 做这些事情。在使用新的ES6技巧时千万不要做过了头，使你的代码比你或者你的其他队友聪明。
 
-#### Expression Scope
+#### 表达式作用域
 
-One quick note about the scope that is used to resolve variables in expressions. I mentioned earlier that an interpolated string literal is kind of like an IIFE, and it turns out thinking about it like that explains the scoping behavior as well.
+关于作用域的一个快速提醒是它用于解析表达式中的变量时。我早先提到过一个插值型字符串字面量与IIFE有些相像，事实上这也可以考虑为作用域行为的一种解释。
 
-Consider:
+考虑如下代码：
 
 ```js
 function foo(str) {
@@ -1659,15 +1656,15 @@ var name = "global";
 bar();					// "Hello from bar!"
 ```
 
-At the moment the `` `..` `` string literal is expressed, inside the `bar()` function, the scope available to it finds `bar()`'s `name` variable with value `"bar"`. Neither the global `name` nor `foo(..)`'s `name` matter. In other words, an interpolated string literal is just lexically scoped where it appears, not dynamically scoped in any way.
+在函数`bar()`内部，字符串字面量`` `..` ``被表达的那一刻，可供它查找的作用域发现变量的`name`的值为`"bar"`。既不是全局的`name`也不是`foo(..)`的`name`。换句话说，一个插值型字符串字面量在它出现的地方是词法作用域的，而不是任何方式的动态作用域。
 
-### Tagged Template Literals
+### 标签型模板字面量
 
-Again, renaming the feature for sanity sake: *tagged string literals*.
+再次为了合理性而重命名这个特性：*标签型字符串字面量*。
 
-To be honest, this is one of the cooler tricks that ES6 offers. It may seem a little strange, and perhaps not all that generally practical at first. But once you've spent some time with it, tagged string literals may just surprise you in their usefulness.
+老实说，这是一个ES6提供的更酷的特性。它可能看起来有点儿奇怪，而且也许一开始看起来一般不那么实用。但一旦你花些时间在它上面，标签型字符串字面量的用处可能会令你惊讶。
 
-For example:
+例如：
 
 ```js
 function foo(strings, ...values) {
@@ -1682,9 +1679,9 @@ foo`Everything is ${desc}!`;
 // [ "awesome" ]
 ```
 
-Let's take a moment to consider what's happening in the previous snippet. First, the most jarring thing that jumps out is ``foo`Everything...`;``. That doesn't look like anything we've seen before. What is it?
+让我们花点儿时间考虑一下前面的代码段中发生了什么。首先，跳出来的最刺眼的东西就是``foo`Everything...`;``。它看起来不像是任何我们曾经见过的东西。不是吗？
 
-It's essentially a special kind of function call that doesn't need the `( .. )`. The *tag* -- the `foo` part before the `` `..` `` string literal -- is a function value that should be called. Actually, it can be any expression that results in a function, even a function call that returns another function, like:
+它实质上是一种不需要`( .. )`的特殊函数调用。*标签* —— 在字符串字面量`` `..` ``之前的`foo`部分 —— 是一个应当被调用的函数的值。实际上，它可以是返回函数的任何表达式，甚至是一个返回另一个函数的函数调用，就像：
 
 ```js
 function bar() {
@@ -1701,19 +1698,19 @@ bar()`Everything is ${desc}!`;
 // [ "awesome" ]
 ```
 
-But what gets passed to the `foo(..)` function when invoked as a tag for a string literal?
+但是当作为一个字符串字面量的标签时，函数`foo(..)`被传入了什么？
 
-The first argument -- we called it `strings` -- is an array of all the plain strings (the stuff between any interpolated expressions). We get two values in the `strings` array: `"Everything is "` and `"!"`.
+第一个参数值 —— 我们称它为`strings` —— 是一个所有普通字符串的数组（所有被插值的表达式之间的东西）。我们在`strings`数组中得到两个值：`"Everything is "`和`"!"`。
 
-For convenience sake in our example, we then gather up all subsequent arguments into an array called `values` using the `...` gather/rest operator (see the "Spread/Rest" section earlier in this chapter), though you could of course have left them as individual named parameters following the `strings` parameter.
+之后为了我们示例的方便，我们使用`...`收集/剩余操作符（见本章早先的“扩散/剩余”部分）将所有后续的参数值收集到一个称为`values`的数组中，虽说你本来当然可以把它们留作参数`strings`后面单独的命名参数。
 
-The argument(s) gathered into our `values` array are the results of the already-evaluated interpolation expressions found in the string literal. So obviously the only element in `values` in our example is `"awesome"`.
+被收集进我们的`values`数组中的参数值，就是在字符串字面量中发现的，已经被求过值的插值表达式的结果。所以在我们的例子中`values`里唯一的元素显然就是`awesome`。
 
-You can think of these two arrays as: the values in `values` are the separators if you were to splice them in between the values in `strings`, and then if you joined everything together, you'd get the complete interpolated string value.
+你可以将这两个数组考虑为：在`values`中的值原本是你拼接在`stings`的值之间的分隔符，而且如果你将所有的东西连接在一起，你就会得到完整的插值字符串值。
 
-A tagged string literal is like a processing step after the interpolation expressions are evaluated but before the final string value is compiled, allowing you more control over generating the string from the literal.
+一个标签型字符串字面量像是一个在插值表达式被求值之后，但是在最终的字符串被编译之前的处理步骤，允许你在从字面量中产生字符串的过程中进行更多的控制。
 
-Typically, the string literal tag function (`foo(..)` in the previous snippets) should compute an appropriate string value and return it, so that you can use the tagged string literal as a value just like untagged string literals:
+一般来说，一个字符串字面连标签函数（在前面的代码段中是`foo(..)`）应当计算一个恰当的字符串值并返回它，所以你可以使用标签型字符串字面量作为一个未打标签的字符串字面量来使用：
 
 ```js
 function tag(strings, ...values) {
@@ -1729,17 +1726,16 @@ var text = tag`Everything is ${desc}!`;
 console.log( text );			// Everything is awesome!
 ```
 
-In this snippet, `tag(..)` is a pass-through operation, in that it doesn't perform any special modifications, but just uses `reduce(..)` to loop over and splice/interleave `strings` and `values` together the same way an untagged string literal would have done.
+在这个代码段中，`tag(..)`是一个直通操作，因为它不实施任何特殊的修改，而只是使用`reduce(..)`来循环遍历，并像一个未打标签的字符串字面量一样，将`strings`和`values`拼接/穿插在一起。
 
-So what are some practical uses? There are many advanced ones that are beyond our scope to discuss here. But here's a simple idea that formats numbers as U.S. dollars (sort of like basic localization):
+那么实际的用法是什么？有许多高级的用法超出了我们要在这里讨论的范围。但这里有一个格式化美元数字的简单想法（有些像基本的本地化）：
 
 ```js
 function dollabillsyall(strings, ...values) {
 	return strings.reduce( function(s,v,idx){
 		if (idx > 0) {
 			if (typeof values[idx-1] == "number") {
-				// look, also using interpolated
-				// string literals!
+				// 看，也使用插值性字符串字面量！
 				s += `$${values[idx-1].toFixed( 2 )}`;
 			}
 			else {
@@ -1766,11 +1762,11 @@ console.log( text );
 // comes out to $12.95.
 ```
 
-If a `number` value is encountered in the `values` array, we put `"$"` in front of it and format it to two decimal places with `toFixed(2)`. Otherwise, we let the value pass-through untouched.
+如果在`values`数组中遇到一个`number`值，我们就在它前面放一个`"$"`并用`toFixed(2)`将它格式化为小数点后两位有效。否则，我们就不碰这个值而让它直通过去。
 
-#### Raw Strings
+#### 原始字符串
 
-In the previous snippets, our tag functions receive the first argument we called `strings`, which is an array. But there's an additional bit of data included: the raw unprocessed versions of all the strings. You can access those raw string values using the `.raw` property, like this:
+在前一个代码段中，我们的标签函数接受的第一个参数值称为`strings`，是一个数组。但是有一点儿额外的数据被包含了进来：所有字符串的原始未处理版本。你可以使用`.raw`属性访问这些原始字符串值，就像这样：
 
 ```js
 function showraw(strings, ...values) {
@@ -1784,9 +1780,9 @@ showraw`Hello\nWorld`;
 // [ "Hello\nWorld" ]
 ```
 
-The raw version of the value preserves the raw escaped `\n` sequence (the `\` and the `n` are separate characters), while the processed version considers it a single newline character. However, the earlier mentioned line-ending normalization is applied to both values.
+原始版本的值保留了原始的转义序列`\n`（`\`和`n`是两个分离的字符），但处理过的版本认为它是一个单独的换行符。但是，早先提到的行终结符泛化操作，是对两个值都实施的。
 
-ES6 comes with a built-in function that can be used as a string literal tag: `String.raw(..)`. It simply passes through the raw versions of the `strings` values:
+ES6带来了一个内建函数，它可以用做字符串字面量的标签：`String.raw(..)`。它简单地直通`strings`值的原始版本：
 
 ```js
 console.log( `Hello\nWorld` );
@@ -1800,31 +1796,31 @@ String.raw`Hello\nWorld`.length;
 // 12
 ```
 
-Other uses for string literal tags included special processing for internationalization, localization, and more!
+字符串字面量标签的其他用法包括国际化，本地化，和许多其他的特殊处理。
 
-## Arrow Functions
+## 箭头函数
 
-We've touched on `this` binding complications with functions earlier in this chapter, and they're covered at length in the *this & Object Prototypes* title of this series. It's important to understand the frustrations that `this`-based programming with normal functions brings, because that is the primary motivation for the new ES6 `=>` arrow function feature.
+我们在本章早先接触了函数中`this`绑定的复杂性，而且在本系列的 *this与对象原型* 中也以相当的篇幅讲解过。理解普通函数中基于`this`的编程带来的挫折是很重要的，因为这是ES6的新`=>`箭头函数的主要动机。
 
-Let's first illustrate what an arrow function looks like, as compared to normal functions:
+作为与普通函数的比较，我们首先来展示一下箭头函数看起来什么样：
 
 ```js
 function foo(x,y) {
 	return x + y;
 }
 
-// versus
+// 对比
 
 var foo = (x,y) => x + y;
 ```
 
-The arrow function definition consists of a parameter list (of zero or more parameters, and surrounding `( .. )` if there's not exactly one parameter), followed by the `=>` marker, followed by a function body.
+箭头函数的定义由一个参数列表（零个或多个参数，如果参数不是只有一个，需要有一个`( .. )`包围这些参数）组成，紧跟着是一个`=>`符号，然后是一个函数体。
 
-So, in the previous snippet, the arrow function is just the `(x,y) => x + y` part, and that function reference happens to be assigned to the variable `foo`.
+所以，在前面的代码段中，箭头函数只是`(x,y) => x + y`这一部分，而这个函数的引用刚好被赋值给了变量`foo`。
 
-The body only needs to be enclosed by `{ .. }` if there's more than one expression, or if the body consists of a non-expression statement. If there's only one expression, and you omit the surrounding `{ .. }`, there's an implied `return` in front of the expression, as illustrated in the previous snippet.
+函数体仅在含有多于一个表达式，或者由一个非表达式语句组成时才需要用`{ .. }`括起来。如果仅含有一个表达式，而且你省略了外围的`{ .. }`，那么在这个表达式前面就会有一个隐含的`return`，就像前面的代码段中展示的那样。
 
-Here's some other arrow function variations to consider:
+这里是一些其他种类的箭头函数：
 
 ```js
 var f1 = () => 12;
@@ -1837,13 +1833,13 @@ var f3 = (x,y) => {
 };
 ```
 
-Arrow functions are *always* function expressions; there is no arrow function declaration. It also should be clear that they are anonymous function expressions -- they have no named reference for the purposes of recursion or event binding/unbinding -- though "Function Names" in Chapter 7 will describe ES6's function name inference rules for debugging purposes.
+箭头函数 *总是* 函数表达式；不存在箭头函数声明。而且很明显它们都是匿名函数表达式 —— 它们没有可以用于递归或者事件绑定/解除的命名引用 —— 但在第七章的“函数名”中将会讲解为了调试的目的而存在的ES6函数名接口规则。
 
-**Note:** All the capabilities of normal function parameters are available to arrow functions, including default values, destructuring, rest parameters, and so on.
+**注意：** 普通函数参数的所有功能对于箭头函数都是可用的，包括默认值，解构，剩余参数，等等。
 
-Arrow functions have a nice, shorter syntax, which makes them on the surface very attractive for writing terser code. Indeed, nearly all literature on ES6 (other than the titles in this series) seems to immediately and exclusively adopt the arrow function as "the new function."
+箭头函数拥有漂亮，简短的语法，这使得它们在表面上看起来对于编写简洁代码很有吸引力。确实，几乎所有关于ES6的文献（除了这个系列中的书目）看起来都立即将箭头函数仅仅认作“新函数”。
 
-It is telling that nearly all examples in discussion of arrow functions are short single statement utilities, such as those passed as callbacks to various utilities. For example:
+这说明在关于箭头函数的讨论中，几乎所有的例子都是简短的单语句工具，比如那些作为回调传递给各种工具的箭头函数。例如：
 
 ```js
 var a = [1,2,3,4,5];
@@ -1853,13 +1849,13 @@ a = a.map( v => v * 2 );
 console.log( a );				// [2,4,6,8,10]
 ```
 
-In those cases, where you have such inline function expressions, and they fit the pattern of computing a quick calculation in a single statement and returning that result, arrow functions indeed look to be an attractive and lightweight alternative to the more verbose `function` keyword and syntax.
+在这些情况下，你的内联函数表达式很适合这种在一个单独语句中快速计算并返回结果的模式，对于更繁冗的`function`关键字和语法来说箭头函数确实看起来是一个很吸人，而且轻量的替代品。
 
-Most people tend to *ooh and aah* at nice terse examples like that, as I imagine you just did!
+大多数人看着这样简洁的例子都倾向于发出“哦……！啊……！”的感叹，就像我想象中你刚刚做的那样！
 
-However, I would caution you that it would seem to me somewhat a misapplication of this feature to use arrow function syntax with otherwise normal, multistatement functions, especially those that would otherwise be naturally expressed as function declarations.
+然而我要警示你的是，在我看来，使用箭头函数的语法代替普通的，多语句函数，特别是那些可以被自然地表达为函数声明的函数，是某种误用。
 
-Recall the `dollabillsyall(..)` string literal tag function from earlier in this chapter -- let's change it to use `=>` syntax:
+回忆本章早前的字符串字面量标签函数`dollabillsyall(..)` —— 让我们将它改为使用`=>`语法：
 
 ```js
 var dollabillsyall = (strings, ...values) =>
@@ -1879,23 +1875,23 @@ var dollabillsyall = (strings, ...values) =>
 	}, "" );
 ```
 
-In this example,  the only modifications I made were the removal of `function`, `return`, and some `{ .. }`, and then the insertion of `=>` and a `var`. Is this a significant improvement in the readability of the code? Meh.
+在这个例子中，我做的唯一修改是删除了`function`，`return`，和一些`{ .. }`，然后插入了`=>`和一个`var`。这是对代码可读性的重大改进吗？呵呵。
 
-I'd actually argue that the lack of `return` and outer `{ .. }` partially obscures the fact that the `reduce(..)` call is the only statement in the `dollabillsyall(..)` function and that its result is the intended result of the call. Also, the trained eye that is so used to hunting for the word `function` in code to find scope boundaries now needs to look for the `=>` marker, which can definitely be harder to find in the thick of the code.
+实际上我会争论，缺少`return`和外部的`{ .. }`在某种程度上模糊了这样的事实：`reduce(..)`调用是函数`dollabillsyall(..)`中唯一的语句，而且它的结果是这个调用的预期结果。另外，那些受过训练而习惯于在代码中搜索`function`关键字来寻找作用域边界的眼睛，现在需要搜索`=>`标志，在密集的代码中这绝对会更加困难。
 
-While not a hard-and-fast rule, I'd say that the readability gains from `=>` arrow function conversion are inversely proportional to the length of the function being converted. The longer the function, the less `=>` helps; the shorter the function, the more `=>` can shine.
+虽然不是一个硬性规则，但是我要说从`=>`箭头函数转换得来的可读性，与被转换的函数长度成反比。函数越长，`=>`能帮的忙越少；函数越短，`=>`的闪光之处就越多。
 
-I think it's probably more sensible and reasonable to adopt `=>` for the places in code where you do need short inline function expressions, but leave your normal-length main functions as is.
+我觉得这样做更明智也更合理：在你需要短的内联函数表达式的地方采用`=>`，但保持你的一般长度的主函数原封不动。
 
-### Not Just Shorter Syntax, But `this`
+### 不只是简短的语法，而是`this`
 
-Most of the popular attention toward `=>` has been on saving those precious keystrokes by dropping `function`, `return`, and `{ .. }` from your code.
+曾经集中在`=>`上的大多数注意力都是它通过在你的代码中除去`function`，`return`，和`{ .. }`来节省那些宝贵的击键。
 
-But there's a big detail we've skipped over so far. I said at the beginning of the section that `=>` functions are closely related to `this` binding behavior. In fact, `=>` arrow functions are *primarily designed* to alter `this` behavior in a specific way, solving a particular and common pain point with `this`-aware coding.
+但是至此我们一直忽略了一个重要的细节。我在这一节最开始的时候说过，`=>`函数与`this`绑定行为密切相关。事实上，`=>`箭头函数 *主要的设计目的* 就是以一种特定的方式改变`this`的行为，解决在`this`敏感的编码中的一个痛点。
 
-The saving of keystrokes is a red herring, a misleading sideshow at best.
+节省击键是掩人耳目的东西，至多是一个误导人的配角。
 
-Let's revisit another example from earlier in this chapter:
+让我们重温本章早前的另一个例子：
 
 ```js
 var controller = {
@@ -1910,11 +1906,11 @@ var controller = {
 };
 ```
 
-We used the `var self = this` hack, and then referenced `self.makeRequest(..)`, because inside the callback function we're passing to `addEventListener(..)`, the `this` binding will not be the same as it is in `makeRequest(..)` itself. In other words, because `this` bindings are dynamic, we fall back to the predictability of lexical scope via the `self` variable.
+我们使用了黑科技`var self = this`，然后引用了`self.makeRequest(..)`，因为在我们传递给`addEventListener(..)`的回调函数内部，`this`绑定将与`makeRequest(..)`本身中的`this`绑定不同。换句话说，因为`this`绑定是动态的，我们通过`self`变量退回到了可预测的词法作用域。
 
-Herein we finally can see the primary design characteristic of `=>` arrow functions. Inside arrow functions, the `this` binding is not dynamic, but is instead lexical. In the previous snippet, if we used an arrow function for the callback, `this` will be predictably what we wanted it to be.
+在这其中我们终于可以看到`=>`箭头函数主要的设计特性了。在箭头函数内部，`this`绑定不是动态的，而是词法的。在前一个代码段中，如果我们在回调里使用一个箭头函数，`this`将会不出所料地成为我们希望它成为的东西。
 
-Consider:
+考虑如下代码：
 
 ```js
 var controller = {
@@ -1927,15 +1923,15 @@ var controller = {
 };
 ```
 
-Lexical `this` in the arrow function callback in the previous snippet now points to the same value as in the enclosing `makeRequest(..)` function. In other words, `=>` is a syntactic stand-in for `var self = this`.
+前面代码段的箭头函数中的词法`this`现在指向的值与外围的`makeRequest(..)`函数相同。换句话说，`=>`是`var self = this`的语法上的替代品。
 
-In cases where `var self = this` (or, alternatively, a function `.bind(this)` call) would normally be helpful, `=>` arrow functions are a nicer alternative operating on the same prinicple. Sounds great, right?
+在`var self = this`（或者，另一种选择是，`.bind(this)`调用）通常可以帮忙的情况下，`=>`箭头函数是一个基于相同原则的很好的替代操作。听起来很棒，是吧？
 
-Not quite so simple.
+没那么简单。
 
-If `=>` replaces `var self = this` or `.bind(this)` and it helps, guess what happens if you use `=>` with a `this`-aware function that *doesn't* need `var self = this` to work? You might be able to guess that it's going to mess things up. Yeah.
+如果`=>`取代`var self = this`或`.bind(this)`可以工作，那么猜猜`=>`用于一个 *不需要* `var self = this`就能工作的`this`敏感的函数会发生么？你可能会猜到它将会把事情搞砸。没错。
 
-Consider:
+考虑如下代码：
 
 ```js
 var controller = {
@@ -1951,34 +1947,34 @@ var controller = {
 controller.makeRequest(..);
 ```
 
-Although we invoke as `controller.makeRequest(..)`, the `this.helper` reference fails, because `this` here doesn't point to `controller` as it normally would. Where does it point? It lexically inherits `this` from the surrounding scope. In this previous snippet, that's the global scope, where `this` points to the global object. Ugh.
+虽然我们以`controller.makeRequest(..)`的方式进行了调用，但是`this.helper`引用失败了，因为这里的`this`没有像平常那样指向`controller`。那么它指向哪里？它通过词法继承了外围的作用域中的`this`。在前面的代码段中，它是全局作用域，`this`指向了全局作用域。呃。
 
-In addition to lexical `this`, arrow functions also have lexical `arguments` -- they don't have their own `arguments` array but instead inherit from their parent -- as well as lexical `super` and `new.target` (see "Classes" in Chapter 3).
+除了词法的`this`以外，箭头函数还拥有词法的`arguments` —— 它们没有自己的`arguments`数组，而是从它们的上层继承下来 —— 同样还有词法的`super`和`new.target`（参见第三章的“类”）。
 
-So now we can conclude a more nuanced set of rules for when `=>` is appropriate and not:
+所以，关于`=>`在什么情况下合适或不合适，我们现在可以推论出一组更加微妙的规则：
 
-* If you have a short, single-statement inline function expression, where the only statement is a `return` of some computed value, *and* that function doesn't already make a `this` reference inside it, *and* there's no self-reference (recursion, event binding/unbinding), *and* you don't reasonably expect the function to ever be that way, you can probably safely refactor it to be an `=>` arrow function.
-* If you have an inner function expression that's relying on a `var self = this` hack or a `.bind(this)` call on it in the enclosing function to ensure proper `this` binding, that inner function expression can probably safely become an `=>` arrow function.
-* If you have an inner function expression that's relying on something like `var args = Array.prototype.slice.call(arguments)` in the enclosing function to make a lexical copy of `arguments`, that inner function expression can probably safely become an `=>` arrow function.
-* For everything else -- normal function declarations, longer multistatement function expressions, functions that need a lexical name identifier self-reference (recursion, etc.), and any other function that doesn't fit the previous characteristics -- you should probably avoid `=>` function syntax.
+* 如果你有一个简短的，单语句内联函数表达式，它唯一的语句是某个计算后的值的`return`语句，*并且* 这个函数没有在它内部制造一个`this`引用，*并且* 没有自引用（递归，事件绑定/解除），*并且* 你合理地预期这个函数绝不会变得需要`this`引用或自引用，那么你就可能安全地将它重构为一个`=>`箭头函数。
+* 如果你有一个内部函数表达式，它依赖于外围函数的`var self = this`黑科技或者`.bind(this)`调用来确保正确的`this`绑定，那么这个内部函数表达式就可能安全地变为一个`=>`箭头函数。
+* 如果你有一个内部函数表达式，它依赖于外围函数的类似于`var args = Array.prototype.slice.call(arguments)`这样的东西来制造一个`arguments`的词法拷贝，那么这个内部函数就可能安全地变为一个`=>`箭头函数。
+* 对于其他的所有东西 —— 普通函数声明，较长的多语句函数表达式，需要词法名称标识符进行自引用（递归等）的函数，和任何其他不符合前述性质的函数 —— 你就可能应当避免`=>`函数语法。
 
-Bottom line: `=>` is about lexical binding of `this`, `arguments`, and `super`. These are intentional features designed to fix some common problems, not bugs, quirks, or mistakes in ES6.
+底线：`=>`与`this`，`arguments`，和`super`的词法绑定有关。它们是ES6为了修正一些常见的问题而被有意设计的特性，而不是为了修正bug，怪异的代码，或者错误。
 
-Don't believe any hype that `=>` is primarily, or even mostly, about fewer keystrokes. Whether you save keystrokes or waste them, you should know exactly what you are intentionally doing with every character typed.
+不要相信任何说`=>`主要是，或者几乎是，为了减少几下击键的炒作。无论你是省下还是浪费了这几下击键，你都应当确切地知道你打入的每个字母是为了做什么。
 
-**Tip:** If you have a function that for any of these articulated reasons is not a good match for an `=>` arrow function, but it's being declared as part of an object literal, recall from "Concise Methods" earlier in this chapter that there's another option for shorter function syntax.
+**提示：** 如果你有一个函数，由于上述各种清楚的原因而不适合成为一个`=>`箭头函数，但同时它又被声明为一个对象字面量的一部分，那么回想一下本章早先的“简约方法”，它有简短函数语法的另一种选择。
 
-If you prefer a visual decision chart for how/why to pick an arrow function:
+对于如何/为何选用一个箭头函数，如果你喜欢一个可视化的决策图的话：
 
 <img src="fig1.png">
 
-## `for..of` Loops
+## `for..of`循环
 
-Joining the `for` and `for..in` loops from the JavaScript we're all familiar with, ES6 adds a `for..of` loop, which loops over the set of values produced by an *iterator*.
+伴随着我们熟知的JavaScript`for`和`for..in`循环，ES6增加了一个`for..of`循环，它循环遍历一组由一个 *迭代器（iterator）* 产生的值。
 
-The value you loop over with `for..of` must be an *iterable*, or it must be a value which can be coerced/boxed to an object (see the *Types & Grammar* title of this series) that is an iterable. An iterable is simply an object that is able to produce an iterator, which the loop then uses.
+你使用`for..of`循环遍历的值必须是一个 *可迭代对象（iterable）*，或者它必须是一个可以被强制转换/封箱（参见本系列的 *类型与文法*）为一个可迭代对象的值。一个可迭代对象只不过是一个可以生成迭代器的对象，然后由循环使用这个迭代器。
 
-Let's compare `for..of` to `for..in` to illustrate the difference:
+让我们比较`for..of`与`for..in`来展示它们的区别：
 
 ```js
 var a = ["a","b","c","d","e"];
@@ -1994,9 +1990,9 @@ for (var val of a) {
 // "a" "b" "c" "d" "e"
 ```
 
-As you can see, `for..in` loops over the keys/indexes in the `a` array, while `for..of` loops over the values in `a`.
+如你所见，`for..in`循环遍历数组`a`中的键/索引，而`for.of`循环遍历`a`中的值。
 
-Here's the pre-ES6 version of the `for..of` from that previous snippet:
+这是前面代码段中`for..of`的前ES6版本：
 
 ```js
 var a = ["a","b","c","d","e"],
@@ -2009,7 +2005,7 @@ for (var val, i = 0; i < k.length; i++) {
 // "a" "b" "c" "d" "e"
 ```
 
-And here's the ES6 but non-`for..of` equivalent, which also gives a glimpse at manually iterating an iterator (see "Iterators" in Chapter 3):
+而这是一个ES6版本的非`for..of`等价物，它同时展示了手动迭代一个迭代器（见第三章的“迭代器”）：
 
 ```js
 var a = ["a","b","c","d","e"];
@@ -2023,18 +2019,18 @@ for (var val, ret, it = a[Symbol.iterator]();
 // "a" "b" "c" "d" "e"
 ```
 
-Under the covers, the `for..of` loop asks the iterable for an iterator (using the built-in `Symbol.iterator`; see "Well-Known Symbols" in Chapter 7), then it repeatedly calls the iterator and assigns its produced value to the loop iteration variable.
+在幕后，`for..of`循环向可迭代对象要来一个迭代器（使用内建的`Symbol.iterator`；参见第七章的“通用Symbols”），然后反复调用这个迭代器并将它产生的值赋值给循环迭代的变量。
 
-Standard built-in values in JavaScript that are by default iterables (or provide them) include:
+在JavaScript标准的内建值中，默认为可迭代对象的（或提供可迭代能力的）有：
 
-* Arrays
-* Strings
-* Generators (see Chapter 3)
-* Collections / TypedArrays (see Chapter 5)
+* 数组
+* 字符串
+* Generators（见第三章）
+* 集合/类型化数组（见第五章）
 
-**Warning:** Plain objects are not by default suitable for `for..of` looping. That's because they don't have a default iterator, which is intentional, not a mistake. However, we won't go any further into those nuanced reasonings here. In "Iterators" in Chapter 3, we'll see how to define iterators for our own objects, which lets `for..of` loop over any object to get a set of values we define.
+**警告：** 普通对象默认是不适用于`for..of`循环的。因为他们没有默认的迭代器，这是有意为之的，不是一个错误。但是，我们不会进一步探究这其中微妙的原因。在第三章的“迭代器”中，我们将看到如何为我们自己的对象定义迭代器，这允许`for..of`遍历任何对象来得到我们定义的一组值。
 
-Here's how to loop over the characters in a primitive string:
+这是如何遍历一个基本类型的字符串中的字符：
 
 ```js
 for (var c of "hello") {
@@ -2043,9 +2039,9 @@ for (var c of "hello") {
 // "h" "e" "l" "l" "o"
 ```
 
-The `"hello"` primitive string value is coerced/boxed to the `String` object wrapper equivalent, which is an iterable by default.
+基本类型字符串`"hello"`被强制转换/封箱为等价的`String`对象包装器，它是默认就是一个可迭代对象。
 
-In `for (XYZ of ABC)..`, the `XYZ` clause can either be an assignment expression or a declaration, identical to that same clause in `for` and `for..in` loops. So you can do stuff like this:
+在`for (XYZ of ABC)..`中，`XYZ`子句既可以是一个赋值表达式也可以是一个声明，这与`for`和`for..in`中相同的子句一模一样。所以你可以做这样的事情：
 
 ```js
 var o = {};
@@ -2061,54 +2057,54 @@ for ({x: o.a} of [ {x: 1}, {x: 2}, {x: 3} ]) {
 // 1 2 3
 ```
 
-`for..of` loops can be prematurely stopped, just like other loops, with `break`, `continue`, `return` (if in a function), and thrown exceptions. In any of these cases, the iterator's `return(..)` function is automatically called (if one exists) to let the iterator perform cleanup tasks, if necessary.
+与其他的循环一样，使用`break`，`continue`，`return`（如果是在一个函数中），以及抛出异常，`for..of`循环可以被提前终止。在任何这些情况下，迭代器的`return(..)`函数（如果存在的话）都会被自动调用，以便让迭代器进行必要的清理工作。
 
-**Note:** See "Iterators" in Chapter 3 for more complete coverage on iterables and iterators.
+**注意：** 可迭代对象与迭代器的完整内容参见第三章的“迭代器”。
 
-## Regular Expressions
+## 正则表达式扩展
 
-Let's face it: regular expressions haven't changed much in JS in a long time. So it's a great thing that they've finally learned a couple of new tricks in ES6. We'll briefly cover the additions here, but the overall topic of regular expressions is so dense that you'll need to turn to chapters/books dedicated to it (of which there are many!) if you need a refresher.
+让我们承认吧：长久以来在JS中正则表达式都没怎么改变过。所以一件很棒的事情是，在ES6中它们终于学会了一些新招数。我们将在这里简要地讲解一下新增的功能，但是正则表达式整体的话题是如此厚重，以至于如果你需要复习一下的话你需要找一些关于它的专门章节/书籍（有许多！）。
 
-### Unicode Flag
+### Unicode标志
 
-We'll cover the topic of Unicode in more detail in "Unicode" later in this chapter. Here, we'll just look briefly at the new `u` flag for ES6+ regular expressions, which turns on Unicode matching for that expression.
+我们将在本章稍后的“Unicode”一节中讲解关于Unicode的更多细节。在此，我们将仅仅简要地看一下ES6+正则表达式的新`u`标志，它使这个正则表达式的Unicode匹配成为可能。
 
-JavaScript strings are typically interpreted as sequences of 16-bit characters, which correspond to the characters in the *Basic Multilingual Plane (BMP)* (http://en.wikipedia.org/wiki/Plane_%28Unicode%29). But there are many UTF-16 characters that fall outside this range, and so strings may have these multibyte characters in them.
+JavaScript字符串通常被解释为16位字符的序列，它们对应于 *基本多文种平面（Basic Multilingual Plane (BMP)）* (http://en.wikipedia.org/wiki/Plane_%28Unicode%29)中的字符。但是有许多UTF-16字符在这个范围以外，而且字符串可能含有这些多字节字符。
 
-Prior to ES6, regular expressions could only match based on BMP characters, which means that those extended characters were treated as two separate characters for matching purposes. This is often not ideal.
+在ES6之前，正则表达式只能基于BMP字符进行匹配，这意味着在匹配时那些扩展字符被看作是两个分离的字符。这通常不理想。
 
-So, as of ES6, the `u` flag tells a regular expression to process a string with the interpretation of Unicode (UTF-16) characters, such that such an extended character will be matched as a single entity.
+所以，在ES6中，`u`标志告诉正则表达式使用Unicode（UTF-16）字符的解释方式来处理字符串，这样一来一个扩展的字符将作为一个单独的实体被匹配。
 
-**Warning:** Despite the name implication, "UTF-16" doesn't strictly mean 16 bits. Modern Unicode uses 21 bits, and standards like UTF-8 and UTF-16 refer roughly to how many bits are used in the representation of a character.
+**警告：** 尽管名字的暗示是这样，但是“UTF-16”并不严格地意味着16位。现代的Unicode使用21位，而且像UTF-8和UTF-16这样的标准大体上是指有多少位用于表示一个字符。
 
-An example (straight from the ES6 specification): 𝄞 (the musical symbol G-clef) is Unicode point U+1D11E (0x1D11E).
+一个例子（直接从ES6语言规范中拿来的）： 𝄞 （G大调音乐符号）是Unicode代码点U+1D11E（0x1D11E）。
 
-If this character appears in a regular expression pattern (like `/𝄞/`), the standard BMP interpretation would be that it's two separate characters (0xD834 and 0xDD1E) to match with. But the new ES6 Unicode-aware mode means that `/𝄞/u` (or the escaped Unicode form `/\u{1D11E}/u`) will match `"𝄞"` in a string as a single matched character.
+如果这个字符出现在一个正则表达式范例中（比如`/𝄞/`），标准的BMP解释方式将认为它是需要被匹配的两个字符（0xD834和0xDD1E）。但是ES6新的Unicode敏感模式意味着`/𝄞/u`（或者Unicode的转义形式`/\u{1D11E}/u`）将会把`"𝄞"`作为一个单独的字符在一个字符串中进行匹配。
 
-You might be wondering why this matters? In non-Unicode BMP mode, the pattern is treated as two separate characters, but would still find the match in a string with the `"𝄞"` character in it, as you can see if you try:
+你可能想知道为什么这很重要。在非Unicode的BMP模式下，这个正则表达式范例被看作两个分离的字符，但它仍然可以在一个含有`"𝄞"`字符的字符串中找到匹配，如果你试一下就会看到：
 
 ```js
 /𝄞/.test( "𝄞-clef" );			// true
 ```
 
-The length of the match is what matters. For example:
+重要的是匹配的长度。例如：
 
 ```js
 /^.-clef/ .test( "𝄞-clef" );		// false
 /^.-clef/u.test( "𝄞-clef" );		// true
 ```
 
-The `^.-clef` in the pattern says to match only a single character at the beginning before the normal `"-clef"` text. In standard BMP mode, the match fails (two characters), but with `u` Unicode mode flagged on, the match succeeds (one character).
+这个范例中的`^.-clef`说要在普通的`"-clef"`文本前面只匹配一个单独的字符。在标准的BMP模式下，这个匹配会失败（因为是两个字符），但是在Unicode模式标志位`u`打开的情况下，这个匹配会成功（一个字符）。
 
-It's also important to note that `u` makes quantifiers like `+` and `*` apply to the entire Unicode code point as a single character, not just the *lower surrogate* (aka rightmost half of the symbol) of the character. The same goes for Unicode characters appearing in character classes, like `/[💩-💫]/u`.
+另外一个重要的注意点是，`u`使像`+`和`*`这样的量词实施于作为一个单独字符的整个Unicode代码点，而不仅仅是字符的 *低端替代符*（也就是符号最右边的一半）。对于出现在字符类中的Unicode字符也是一样，比如`/[💩-💫]/u`。
 
-**Note:** There's plenty more nitty-gritty details about `u` behavior in regular expressions, which Mathias Bynens (https://twitter.com/mathias) has written extensively about (https://mathiasbynens.be/notes/es6-unicode-regex).
+**注意：** 还有许多关于`u`在正则表达式中行为的细节，对此Mathias Bynens(https://twitter.com/mathias)撰写了大量的作品(https://mathiasbynens.be/notes/es6-unicode-regex)。
 
-### Sticky Flag
+### 粘性标志
 
-Another flag mode added to ES6 regular expressions is `y`, which is often called "sticky mode." *Sticky* essentially means the regular expression has a virtual anchor at its beginning that keeps it rooted to matching at only the position indicated by the regular expression's `lastIndex` property.
+另一个加入ES6正则表达式的模式标志是`y`，它经常被称为“粘性模式（sticky mode）”。*粘性* 实质上意味着正则表达式在它开始时有一个虚拟的锚点，这个锚点使正则表达式仅以自己的`lastIndex`属性所指示的位置为起点进行匹配。
 
-To illustrate, let's consider two regular expressions, the first without sticky mode and the second with:
+为了展示一下，让我们考虑两个正则表达式，第一个没有使用粘性模式而第二个有：
 
 ```js
 var re1 = /foo/,
@@ -2116,55 +2112,55 @@ var re1 = /foo/,
 
 re1.lastIndex;			// 0
 re1.test( str );		// true
-re1.lastIndex;			// 0 -- not updated
+re1.lastIndex;			// 0 —— 没有更新
 
 re1.lastIndex = 4;
-re1.test( str );		// true -- ignored `lastIndex`
-re1.lastIndex;			// 4 -- not updated
+re1.test( str );		// true —— `lastIndex`被忽略了
+re1.lastIndex;			// 4 —— 没有更新
 ```
 
-Three things to observe about this snippet:
+关于这个代码段可以观察到三件事：
 
-* `test(..)` doesn't pay any attention to `lastIndex`'s value, and always just performs its match from the beginning of the input string.
-* Because our pattern does not have a `^` start-of-input anchor, the search for `"foo"` is free to move ahead through the whole string looking for a match.
-* `lastIndex` is not updated by `test(..)`.
+* `test(..)`根本不在意`lastIndex`的值，而总是从输入字符串的开始实施它的匹配。
+* 因为我们的模式没有输入的起始锚点`^`，所以对`"foo"`的搜索可以在整个字符串上自由向前移动。
+* `lastIndex`没有被`test(..)`更新。
 
-Now, let's try a sticky mode regular expression:
+现在，让我们试一下粘性模式的正则表达式：
 
 ```js
-var re2 = /foo/y,		// <-- notice the `y` sticky flag
+var re2 = /foo/y,		// <-- 注意粘性标志`y`
 	str = "++foo++";
 
 re2.lastIndex;			// 0
-re2.test( str );		// false -- "foo" not found at `0`
+re2.test( str );		// false —— 在`0`没有找到“foo”
 re2.lastIndex;			// 0
 
 re2.lastIndex = 2;
 re2.test( str );		// true
-re2.lastIndex;			// 5 -- updated to after previous match
+re2.lastIndex;			// 5 —— 在前一次匹配后更新了
 
 re2.test( str );		// false
-re2.lastIndex;			// 0 -- reset after previous match failure
+re2.lastIndex;			// 0 —— 在前一次匹配失败后重置
 ```
 
-And so our new observations about sticky mode:
+于是关于粘性模式我们可以观察到一些新的事实：
 
-* `test(..)` uses `lastIndex` as the exact and only position in `str` to look to make a match. There is no moving ahead to look for the match -- it's either there at the `lastIndex` position or not.
-* If a match is made, `test(..)` updates `lastIndex` to point to the character immediately following the match. If a match fails, `test(..)` resets `lastIndex` back to `0`.
+* `test(..)`在`str`中使用`lastIndex`作为唯一精确的位置来进行匹配。在寻找匹配时不会发生向前的移动 —— 匹配要么出现在`lastIndex`的位置，要么就不存在。
+* 如果发生了一个匹配，`test(..)`就更新`lastIndex`使它指向紧随匹配之后的那个字符。如果匹配失败，`test(..)`就将`lastIndex`重置为`0`。
 
-Normal non-sticky patterns that aren't otherwise `^`-rooted to the start-of-input are free to move ahead in the input string looking for a match. But sticky mode restricts the pattern to matching just at the position of `lastIndex`.
+没有使用`^`固定在输入起点的普通非粘性范例可以自由地在字符串中向前移动来搜索匹配。但是粘性模式制约这个范例仅在`lastIndex`的位置进行匹配。
 
-As I suggested at the beginning of this section, another way of looking at this is that `y` implies a virtual anchor at the beginning of the pattern that is relative (aka constrains the start of the match) to exactly the `lastIndex` position.
+正如我在这一节开始时提到过的，另一种考虑的方式是，`y`暗示着一个虚拟的锚点，它位于正好相对于（也就是制约着匹配的起始位置）`lastIndex`位置的范例的开头。
 
-**Warning:** In previous literature on the topic, it has alternatively been asserted that this behavior is like `y` implying a `^` (start-of-input) anchor in the pattern. This is inaccurate. We'll explain in further detail in "Anchored Sticky" later.
+**警告：** 在关于这个话题的以前的文献中，这种行为曾经被声称为`y`像是在范例中暗示着一个`^`（输入的起始）锚点。这是不准确的。我们将在稍后的“锚定粘性”中讲解更多细节。
 
-#### Sticky Positioning
+#### 粘性定位
 
-It may seem strangely limiting that to use `y` for repeated matches, you have to manually ensure `lastIndex` is in the exact right position, as it has no move-ahead capability for matching.
+对反复匹配使用`y`可能看起来是一种奇怪的限制，因为匹配没有向前移动的能力，你不得不手动保证`lastIndex`恰好位于正确的位置上。
 
-Here's one possible scenario: if you know that the match you care about is always going to be at a position that's a multiple of a number (e.g., `0`, `10`, `20`, etc.), you can just construct a limited pattern matching what you care about, but then manually set `lastIndex` each time before match to those fixed positions.
+这是一种可能的场景：如果你知道你关心的匹配总是会出现在一个数字（例如，`0`，`10`，`20`，等等）倍数的位置。那么你就可以只构建一个受限的范例来匹配你关心的东西，然后在每次匹配那些固定位置之前手动设置`lastIndex`。
 
-Consider:
+考虑如下代码：
 
 ```js
 var re = /f../y,
@@ -2179,17 +2175,17 @@ re.lastIndex = 20;
 str.match( re );		// ["fad"]
 ```
 
-However, if you're parsing a string that isn't formatted in fixed positions like that, figuring out what to set `lastIndex` to before each match is likely going to be untenable.
+然而，如果你正在解析一个没有像这样被格式化为固定位置的字符串，在每次匹配之前搞清楚为`lastIndex`设置什么东西的做法可能会难以维系。
 
-There's a saving nuance to consider here. `y` requires that `lastIndex` be in the exact position for a match to occur. But it doesn't strictly require that *you* manually set `lastIndex`.
+这里有一个微妙之处要考虑。`y`要求`lastIndex`位于发生匹配的准确位置。但它不严格要求 *你* 来手动设置`lastIndex`。
 
-Instead, you can construct your expressions in such a way that they capture in each main match everything before and after the thing you care about, up to right before the next thing you'll care to match.
+取而代之的是，你可以用这样的方式构建你的正则表达式：它们在每次主匹配中都捕获你所关心的东西的前后所有内容，直到你想要进行下一次匹配的东西为止。
 
-Because `lastIndex` will set to the next character beyond the end of a match, if you've matched everything up to that point, `lastIndex` will always be in the correct position for the `y` pattern to start from the next time.
+因为`lastIndex`将被设置为一个匹配末尾之后的下一个字符，所以如果你已经匹配了到那个位置的所有东西，`lastIndex`将总是位于下次`y`范例开始的正确位置。
 
-**Warning:** If you can't predict the structure of the input string in a sufficiently patterned way like that, this technique may not be suitable and you may not be able to use `y`.
+**警告：** 如果你不能像这样足够范例化地预知输入字符串的结构，这种技术可能不合适，而且你可能不应使用`y`。
 
-Having structured string input is likely the most practical scenario where `y` will be capable of performing repeated matching throughout a string. Consider:
+拥有结构化的字符串输入，可能是`y`能够在一个字符串上由始至终地进行反复匹配的最实际场景。考虑如下代码：
 
 ```js
 var re = /\d+\.\s(.*?)(?:\s|$)/y
@@ -2197,25 +2193,25 @@ var re = /\d+\.\s(.*?)(?:\s|$)/y
 
 str.match( re );		// [ "1. foo ", "foo" ]
 
-re.lastIndex;			// 7 -- correct position!
+re.lastIndex;			// 7 —— 正确位置！
 str.match( re );		// [ "2. bar ", "bar" ]
 
-re.lastIndex;			// 14 -- correct position!
+re.lastIndex;			// 14 —— 正确位置！
 str.match( re );		// ["3. baz", "baz"]
 ```
 
-This works because I knew something ahead of time about the structure of the input string: there is always a numeral prefix like `"1. "` before the desired match (`"foo"`, etc.), and either a space after it, or the end of the string (`$` anchor). So the regular expression I constructed captures all of that in each main match, and then I use a matching group `( )` so that the stuff I really care about is separated out for convenience.
+这能够工作是因为我事先知道输入字符串的结构：总是有一个像`"1. "`这样的数字的前缀出现在期望的匹配（`"foo"`，等等）之前，而且它后面要么是一个空格，要么就是字符串的末尾（`$`锚点）。所以我构建的正则表达式在每次主匹配中捕获了所有这一切，然后我使用一个匹配分组`( )`使我真正关心的东西被方便地分离出来。
 
-After the first match (`"1. foo "`), the `lastIndex` is `7`, which is already the position needed to start the next match, for `"2. bar "`, and so on.
+在第一次匹配（`"1. foo "`）之后，`lastIndex`是`7`，它已经是开始下一次匹配`"2. bar "`所需的位置了，如此类推。
 
-If you're going to use `y` sticky mode for repeated matches, you'll probably want to look for opportunities to have `lastIndex` automatically positioned as we've just demonstrated.
+如果你要使用粘性模式`y`进行反复匹配，那么你就可能想要像我们刚刚展示的那样寻找一个机会自动地定位`lastIndex`。
 
-#### Sticky Versus Global
+#### 粘性对比全局
 
-Some readers may be aware that you can emulate something like this `lastIndex`-relative matching with the `g` global match flag and the `exec(..)` method, as so:
+一些读者可能意识到，你可以使用全局匹配标志位`g`和`exec(..)`方法来模拟某些像`lastIndex`相对匹配的东西，就像这样：
 
 ```js
-var re = /o+./g,		// <-- look, `g`!
+var re = /o+./g,		// <-- 看，`g`！
 	str = "foot book more";
 
 re.exec( str );			// ["oot"]
@@ -2227,38 +2223,38 @@ re.lastIndex;			// 9
 re.exec( str );			// ["or"]
 re.lastIndex;			// 13
 
-re.exec( str );			// null -- no more matches!
-re.lastIndex;			// 0 -- starts over now!
+re.exec( str );			// null —— 没有更多的匹配了！
+re.lastIndex;			// 0 —— 现在重新开始！
 ```
 
-While it's true that `g` pattern matches with `exec(..)` start their matching from `lastIndex`'s current value, and also update `lastIndex` after each match (or failure), this is not the same thing as `y`'s behavior.
+虽然使用`exec(..)`的`g`范例确实从`lastIndex`的当前值开始它们的匹配，而且也在每次匹配（或失败）之后更新`lastIndex`，但这与`y`的行为不是相同的东西。
 
-Notice in the previous snippet that `"ook"`, located at position `6`, was matched and found by the second `exec(..)` call, even though at the time, `lastIndex` was `4` (from the end of the previous match). Why? Because as we said earlier, non-sticky matches are free to move ahead in their matching. A sticky mode expression would have failed here, because it would not be allowed to move ahead.
+注意前面代码段中被第二个`exec(..)`调用匹配并找到的`"ook"`，被定位在位置`6`，即便在这个时候`lastIndex`是`4`（前一次匹配的末尾）。为什么？因为正如我们前面讲过的，非粘性匹配可以在它们的匹配过程中自由地向前移动。一个粘性模式表达式在这里将会失败，因为它不允许向前移动。
 
-In addition to perhaps undesired move-ahead matching behavior, another downside to just using `g` instead of `y` is that `g` changes the behavior of some matching methods, like `str.match(re)`.
+除了也许不被期望的向前移动的匹配行为以外，使用`g`代替`y`的另一个缺点是，`g`改变了一些匹配方法的行为，比如`str.match(re)`。
 
-Consider:
+考虑如下代码：
 
 ```js
-var re = /o+./g,		// <-- look, `g`!
+var re = /o+./g,		// <-- 看，`g`！
 	str = "foot book more";
 
 str.match( re );		// ["oot","ook","or"]
 ```
 
-See how all the matches were returned at once? Sometimes that's OK, but sometimes that's not what you want.
+看到所有的匹配是如何一次性地被返回的吗？有时这没问题，但有时这不是你想要的。
 
-The `y` sticky flag will give you one-at-a-time progressive matching with utilities like `test(..)` and `match(..)`. Just make sure the `lastIndex` is always in the right position for each match!
+与`test(..)`和`match(..)`这样的工具一起使用，粘性标志位`y`将给你一次一个的推进式的匹配。只要保证每次匹配时`lastIndex`总是在正确的位置上就行！
 
-#### Anchored Sticky
+#### 锚定粘性
 
-As we warned earlier, it's inaccurate to think of sticky mode as implying a pattern starts with `^`. The `^` anchor has a distinct meaning in regular expressions, which is *not altered* by sticky mode. `^` is an anchor that *always* refers to the beginning of the input, and *is not* in any way relative to `lastIndex`.
+正如我们早先被警告过的，将粘性模式认为是暗含着一个以`^`开头的范例是不准确的。在正则表达式中锚点`^`拥有独特的含义，它 *没有* 被粘性模式改变。`^`*总是* 一个指向输入起点的锚点，而且 *不* 以任何方式相对于`lastIndex`。
 
-Besides poor/inaccurate documentation on this topic, the confusion is unfortunately strengthened further because an older pre-ES6 experiment with sticky mode in Firefox *did* make `^` relative to `lastIndex`, so that behavior has been around for years.
+在这个问题上，除了糟糕/不准确的文档，一个在Firefox中进行的老旧的前ES6粘性模式实验不幸地加深了这种困惑，它确实 *曾经* 使`^`相对于`lastIndex`，所以这种行为曾经存在了许多年。
 
-ES6 elected not to do it that way. `^` in a pattern means start-of-input absolutely and only.
+ES6选择不这么做。`^`在一个范例中绝对且唯一地意味着输入的起点。
 
-As a consequence, a pattern like `/^foo/y` will always and only find a `"foo"` match at the beginning of a string, *if it's allowed to match there*. If `lastIndex` is not `0`, the match will fail. Consider:
+这样的后果是，一个像`/^foo/y`这样的范例将总是仅在一个字符串的开头找到`"foo"`匹配，*如果它被允许在那里匹配的话*。如果`lastIndex`不是`0`，匹配就会失败。考虑如下代码：
 
 ```js
 var re = /^foo/y,
@@ -2266,20 +2262,20 @@ var re = /^foo/y,
 
 re.test( str );			// true
 re.test( str );			// false
-re.lastIndex;			// 0 -- reset after failure
+re.lastIndex;			// 0 —— 失败之后被重置
 
 re.lastIndex = 1;
-re.test( str );			// false -- failed for positioning
-re.lastIndex;			// 0 -- reset after failure
+re.test( str );			// false —— 由于定位而失败
+re.lastIndex;			// 0 —— 失败之后被重置
 ```
 
-Bottom line: `y` plus `^` plus `lastIndex > 0` is an incompatible combination that will always cause a failed match.
+底线：`y`加`^`加`lastIndex > 0`是一种不兼容的组合，它将总是导致失败的匹配。
 
-**Note:** While `y` does not alter the meaning of `^` in any way, the `m` multiline mode *does*, such that `^` means start-of-input *or* start of text after a newline. So, if you combine `y` and `m` flags together for a pattern, you can find multiple `^`-rooted matches in a string. But remember: because it's `y` sticky, you'll have to make sure `lastIndex` is pointing at the correct new line position (likely by matching to the end of the line) each subsequent time, or no subsequent matches will be made.
+**注意：** 虽然`y`不会以任何方式改变`^`的含义，但是多行模式`m`*会*，这样`^`就意味着输入的起点 *或者* 一个换行之后的文本的起点。所以，如果你在一个范例中组合使用`y`和`m`，你会在一个字符串中发现多个开始于`^`的匹配。但是要记住：因为它的粘性`y`，将不得不在后续的每次匹配时确保`lastIndex`被置于正确的换行的位置（可能是通过匹配到行的末尾），否者后续的匹配将不会执行。
 
-### Regular Expression `flags`
+### 正则表达式`flags`
 
-Prior to ES6, if you wanted to examine a regular expression object to see what flags it had applied, you needed to parse them out -- ironically, probably with another regular expression -- from the content of the `source` property, such as:
+在ES6之前，如果你想要检查一个正则表达式来看看它被施用了什么标志位，你需要将它们 —— 讽刺的是，可能是使用另一个正则表达式 —— 从`source`属性的内容中解析出来，就像这样：
 
 ```js
 var re = /foo/ig;
@@ -2291,7 +2287,7 @@ var flags = re.toString().match( /\/([gim]*)$/ )[1];
 flags;					// "ig"
 ```
 
-As of ES6, you can now get these values directly, with the new `flags` property:
+在ES6中，你现在可以直接得到这些值，使用新的`flags`属性：
 
 ```js
 var re = /foo/ig;
@@ -2299,11 +2295,11 @@ var re = /foo/ig;
 re.flags;				// "gi"
 ```
 
-It's a small nuance, but the ES6 specification calls for the expression's flags to be listed in this order: `"gimuy"`, regardless of what order the original pattern was specified with. That's the reason for the difference between `/ig` and `"gi"`.
+虽然是个细小的地方，但是ES6规范要求表达式的标志位以`"gimuy"`的顺序罗列，无论原本的范例中是以什么顺序指定的。这就是出现`/ig`和`"gi"`的区别的原因。
 
-No, the order of flags specified or listed doesn't matter.
+是的，标志位被指定和罗列的顺序无所谓。
 
-Another tweak from ES6 is that the `RegExp(..)` constructor is now `flags`-aware if you pass it an existing regular expression:
+ES6的另一个调整是，如果你向构造器`RegExp(..)`传递一个既存的正则表达式，它现在是`flags`敏感的：
 
 ```js
 var re1 = /foo*/y;
@@ -2319,11 +2315,11 @@ re3.source;							// "foo*"
 re3.flags;							// "gi"
 ```
 
-Prior to ES6, the `re3` construction would throw an error, but as of ES6 you can override the flags when duplicating.
+在ES6之前，构造`re3`将抛出一个错误，但是在ES6中你可以在复制时覆盖标志位。
 
-## Number Literal Extensions
+## 数字字面量扩展
 
-Prior to ES5, number literals looked like the following -- the octal form was not officially specified, only allowed as an extension that browsers had come to de facto agreement on:
+在ES5之前，数字字面量看起来就像下面的东西 —— 八进制形式没有被官方指定，唯一被允许的是各种浏览器已经实质上达成一致的一种扩展：
 
 ```js
 var dec = 42,
@@ -2331,9 +2327,9 @@ var dec = 42,
 	hex = 0x2a;
 ```
 
-**Note:** Though you are specifying a number in different bases, the number's mathematic value is what is stored, and the default output interpretation is always base-10. The three variables in the previous snippet all have the `42` value stored in them.
+**注意：** 虽然你用不同的进制来指定一个数字，但是数字的数学值才是被存储的东西，而且默认的输出解释方式总是10进制的。前面代码段中的三个变量都在它们当中存储了值`42`。
 
-To further illustrate that `052` was a nonstandard form extension, consider:
+为了进一步说明`052`是一种非标准形式扩展，考虑如下代码：
 
 ```js
 Number( "42" );				// 42
@@ -2341,11 +2337,11 @@ Number( "052" );			// 52
 Number( "0x2a" );			// 42
 ```
 
-ES5 continued to permit the browser-extended octal form (including such inconsistencies), except that in strict mode, the octal literal (`052`) form is disallowed. This restriction was done mainly because many developers had the habit (from other languages) of seemingly innocuously prefixing otherwise base-10 numbers with `0`'s for code alignment purposes, and then running into the accidental fact that they'd changed the number value entirely!
+ES5继续允许这种浏览器扩展的八进制形式（包括这样的不一致性），除了在strict模式下，八进制字面量（`052`）是不允许的。做出这种限制的主要原因是，许多开发者似乎习惯于下意识地为了将代码对齐而在十进制的数字前面前缀`0`，然后遭遇他们完全改变了数字的值的意外！
 
-ES6 continues the legacy of changes/variations to how number literals outside base-10 numbers can be represented. There's now an official octal form, an amended hexadecimal form, and a brand-new binary form. For web compatibility reasons, the old octal `052` form will continue to be legal (though unspecified) in non-strict mode, but should really never be used anymore.
+ES6延续了除十进制数字之外的数字字面量可以被表示的遗留的改变/种类。现在有了一种官方的八进制形式，一种改进了的十六进制形式，和一种全新的二进制形式。由于Web兼容性的原因，在非strict模式下老式的八进制形式`052`将继续是合法的，但其实应当永远不再被使用了。
 
-Here are the new ES6 number literal forms:
+这些是新的ES6数字字面形式：
 
 ```js
 var dec = 42,
@@ -2354,9 +2350,9 @@ var dec = 42,
 	bin = 0b101010;		// or `0B101010` :/
 ```
 
-The only decimal form allowed is base-10. Octal, hexadecimal, and binary are all integer forms.
+唯一允许的小数形式是十进制的。八进制，十六进制，和二进制都是整数形式。
 
-And the string representations of these forms are all able to be coerced/converted to their number equivalent:
+而且所有这些形式的字符串表达形式都是可以被强制转换/变换为它们的数字等价物的：
 
 ```js
 Number( "42" );			// 42
@@ -2365,53 +2361,53 @@ Number( "0x2a" );		// 42
 Number( "0b101010" );	// 42
 ```
 
-Though not strictly new to ES6, it's a little-known fact that you can actually go the opposite direction of conversion (well, sort of):
+虽然严格来说不是ES6新增的，但一个鲜为人知的事实是你其实可以做反方向的转换（好吧，某种意义上的）：
 
 ```js
 var a = 42;
 
-a.toString();			// "42" -- also `a.toString( 10 )`
+a.toString();			// "42" —— 也可使用`a.toString( 10 )`
 a.toString( 8 );		// "52"
 a.toString( 16 );		// "2a"
 a.toString( 2 );		// "101010"
 ```
 
-In fact, you can represent a number this way in any base from `2` to `36`, though it'd be rare that you'd go outside the standard bases: 2, 8, 10, and 16.
+事实上，以这种方你可以用从`2`到`36`的任何进制表达一个数字，虽然你会使用标准进制 —— 2，8，10，和16 ——之外的情况非常少见。
 
 ## Unicode
 
-Let me just say that this section is not an exhaustive everything-you-ever-wanted-to-know-about-Unicode resource. I want to cover what you need to know that's *changing* for Unicode in ES6, but we won't go much deeper than that. Mathias Bynens (http://twitter.com/mathias) has written/spoken extensively and brilliantly about JS and Unicode (see https://mathiasbynens.be/notes/javascript-unicode and http://fluentconf.com/javascript-html-2015/public/content/2015/02/18-javascript-loves-unicode).
+我只能说这一节不是一个穷尽了“关于Unicode你想知道的一切”的资料。我想讲解的是，你需要知道在ES6中对Unicode改变了什么，但是我们不会比这深入太多。Mathias Bynens (http://twitter.com/mathias) 大量且出色地撰写/讲解了关于JS和Unicode (参见 https://mathiasbynens.be/notes/javascript-unicode 和 http://fluentconf.com/javascript-html-2015/public/content/2015/02/18-javascript-loves-unicode)。
 
-The Unicode characters that range from `0x0000` to `0xFFFF` contain all the standard printed characters (in various languages) that you're likely to have seen or interacted with. This group of characters is called the *Basic Multilingual Plane (BMP)*. The BMP even contains fun symbols like this cool snowman: ☃ (U+2603).
+从`0x0000`到`0xFFFF`范围内的Unicode字符包含了所有的标准印刷字符（以各种语言），它们都是你可能看到过和互动过的。这组字符被称为 *基本多文种平面（Basic Multilingual Plane (BMP)）*。BMP甚至包含像这个酷雪人一样的有趣字符: ☃ (U+2603)。
 
-There are lots of other extended Unicode characters beyond this BMP set, which range up to `0x10FFFF`. These symbols are often referred to as *astral* symbols, as that's the name given to the set of 16 *planes* (e.g., layers/groupings) of characters beyond the BMP. Examples of astral symbols include 𝄞 (U+1D11E) and 💩 (U+1F4A9).
+在这个BMP集合之外还有许多扩展的Unicode字符，它们的范围一直到`0x10FFFF`。这些符号经常被称为 *星形（astral）* 符号，这正是BMP之外的字符的16组 *平面* （也就是，分层/分组）的名称。星形符号的例子包括𝄞 （U+1D11E）和💩 （U+1F4A9）。
 
-Prior to ES6, JavaScript strings could specify Unicode characters using Unicode escaping, such as:
+在ES6之前，JavaScript字符串可以使用Unicode转义来指定Unicode字符，例如：
 
 ```js
 var snowman = "\u2603";
 console.log( snowman );			// "☃"
 ```
 
-However, the `\uXXXX` Unicode escaping only supports four hexadecimal characters, so you can only represent the BMP set of characters in this way. To represent an astral character using Unicode escaping prior to ES6, you need to use a *surrogate pair* -- basically two specially calculated Unicode-escaped characters side by side, which JS interprets together as a single astral character:
+然而，`\uXXXX`Unicode转义仅支持四个十六进制字符，所以用这种方式表示你只能表示BMP集合中的字符。要在ES6以前使用Unicode转义表示一个星形字符，你需要使用一个 *代理对（surrogate pair）* —— 基本上是两个经特殊计算的Unicode转义字符放在一起，被JS解释为一个单独星形字符：
 
 ```js
 var gclef = "\uD834\uDD1E";
 console.log( gclef );			// "𝄞"
 ```
 
-As of ES6, we now have a new form for Unicode escaping (in strings and regular expressions), called Unicode *code point escaping*:
+在ES6中，我们现在有了一种Unicode转义的新形式（在字符串和正则表达式中），称为Unicode *代码点转义*：
 
 ```js
 var gclef = "\u{1D11E}";
 console.log( gclef );			// "𝄞"
 ```
 
-As you can see, the difference is the presence of the `{ }` in the escape sequence, which allows it to contain any number of hexadecimal characters. Because you only need six to represent the highest possible code point value in Unicode (i.e., 0x10FFFF), this is sufficient.
+如你所见，它的区别是出现在转义序列中的`{ }`，它允许转义序列中包含任意数量的十六进制字符。因为你只需要六个就可以表示在Unicode中可能的最高代码点（也就是，0x10FFFF），所以这是足够的。
 
-### Unicode-Aware String Operations
+### Unicode敏感的字符串操作
 
-By default, JavaScript string operations and methods are not sensitive to astral symbols in string values. So, they treat each BMP character individually, even the two surrogate halves that make up an otherwise single astral character. Consider:
+在默认情况下，JavaScript字符串操作和方法对字符串值中的星形符号是不敏感的。所以，它们独立地处理每个BMP字符，即便是可以组成一个单独字符的两半代理。考虑如下代码：
 
 ```js
 var snowman = "☃";
@@ -2421,7 +2417,7 @@ var gclef = "𝄞";
 gclef.length;					// 2
 ```
 
-So, how do we accurately calculate the length of such a string? In this scenario, the following trick will work:
+那么，我们如何才能正确地计算这样的字符串的长度呢？在这种场景下，下面的技巧可以工作：
 
 ```js
 var gclef = "𝄞";
@@ -2430,34 +2426,34 @@ var gclef = "𝄞";
 Array.from( gclef ).length;		// 1
 ```
 
-Recall from the "`for..of` Loops" section earlier in this chapter that ES6 strings have built-in iterators. This iterator happens to be Unicode-aware, meaning it will automatically output an astral symbol as a single value. We take advantage of that using the `...` spread operator in an array literal, which creates an array of the string's symbols. Then we just inspect the length of that resultant array. ES6's `Array.from(..)` does basically the same thing as `[...XYZ]`, but we'll cover that utility in detail in Chapter 6.
+回想一下本章早先的“`for..of`循环”一节，ES6字符串拥有内建的迭代器。这个迭代器恰好是Unicode敏感的，这意味着它将自动地把一个星形符号作为一个单独的值输出。我们在一个数组字面量上使用扩散操作符`...`，利用它创建了一个字符串符号的数组。然后我们只需检查这个结果数组的长度。ES6的`Array.from(..)`基本上与`[...XYZ]`做的事情相同，不过我们将在第六章中讲解这个工具的细节。
 
-**Warning:** It should be noted that constructing and exhausting an iterator just to get the length of a string is quite expensive on performance, relatively speaking, compared to what a theoretically optimized native utility/property would do.
+**警告：** 应当注意的是，相对地讲，与理论上经过优化的原生工具/属性将做的事情比起来，仅仅为了得到一个字符串的长度就构建并耗尽一个迭代器在性能上的代价是高昂的。
 
-Unfortunately, the full answer is not as simple or straightforward. In addition to the surrogate pairs (which the string iterator takes care of), there are special Unicode code points that behave in other special ways, which is much harder to account for. For example, there's a set of code points that modify the previous adjacent character, known as *Combining Diacritical Marks*.
+不幸的是，完整的答案并不简单或直接。除了代理对（字符串迭代器可以搞定的），一些特殊的Unicode代码点有其他特殊的行为，解释起来非常困难。例如，有一组代码点可以修改前一个相邻的字符，称为 *组合变音符号（Combining Diacritical Marks）*
 
-Consider these two string outputs:
+考虑这两个数组的输出：
 
 ```js
 console.log( s1 );				// "é"
 console.log( s2 );				// "é"
 ```
 
-They look the same, but they're not! Here's how we created `s1` and `s2`:
+它们看起来一样，但它们不是！这是我们如何创建`s1`和`s2`的：
 
 ```js
 var s1 = "\xE9",
 	s2 = "e\u0301";
 ```
 
-As you can probably guess, our previous `length` trick doesn't work with `s2`:
+你可能猜到了，我们前面的`length`技巧对`s2`不管用：
 
 ```js
 [...s1].length;					// 1
 [...s2].length;					// 2
 ```
 
-So what can we do? In this case, we can perform a *Unicode normalization* on the value before inquiring about its length, using the ES6 `String#normalize(..)` utility (which we'll cover more in Chapter 6):
+那么我们能做什么？在这种情况下，我们可以使用ES6的`String#normalize(..)`工具，在查询这个值的长度前对它实施一个 *Unicode正规化操作*：
 
 ```js
 var s1 = "\xE9",
@@ -2470,7 +2466,7 @@ s1 === s2;						// false
 s1 === s2.normalize();			// true
 ```
 
-Essentially, `normalize(..)` takes a sequence like `"e\u0301"` and normalizes it to `"\xE9"`. Normalization can even combine multiple adjacent combining marks if there's a suitable Unicode character they combine to:
+实质上，`normalize(..)`接受一个`"e\u0301"`这样的序列，并把它正规化为`\xE9`。正规化甚至可以组合多个相邻的组合符号，如果存在适合他们组合的Unicode字符的话：
 
 ```js
 var s1 = "o\u0302\u0300",
@@ -2484,7 +2480,7 @@ s3.length;						// 1
 s2 === s3;						// true
 ```
 
-Unfortunately, normalization isn't fully perfect here, either. If you have multiple combining marks modifying a single character, you may not get the length count you'd expect, because there may not be a single defined normalized character that represents the combination of all the marks. For example:
+不幸的是，这里的正规化也不完美。如果你有多个组合符号在修改一个字符，你可能不会得到你所期望的长度计数，因为一个被独立定义的，可以表示所有这些符号组合的正规化字符可能不存在。例如：
 
 ```js
 var s1 = "e\u0301\u0330";
@@ -2494,15 +2490,15 @@ console.log( s1 );				// "ḛ́"
 s1.normalize().length;			// 2
 ```
 
-The further you go down this rabbit hole, the more you realize that it's difficult to get one precise definition for "length." What we see visually rendered as a single character -- more precisely called a *grapheme* -- doesn't always strictly relate to a single "character" in the program processing sense.
+你越深入这个兔子洞，你就越能理解要得到一个“长度”的精确定义是很困难的。我们在视觉上看到的作为一个单独字符绘制的东西 —— 更精确地说，它称为一个 *字形* —— 在程序处理的意义上不总是严格地关联到一个单独的“字符”上。
 
-**Tip:** If you want to see just how deep this rabbit hole goes, check out the "Grapheme Cluster Boundaries" algorithm (http://www.Unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries).
+**提示：** 如果你就是想看看这个兔子洞有多深，看看“字形群集边界（Grapheme Cluster Boundaries）”算法(http://www.Unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries)。
 
-### Character Positioning
+### 字符定位
 
-Similar to length complications, what does it actually mean to ask, "what is the character at position 2?" The naive pre-ES6 answer comes from `charAt(..)`, which will not respect the atomicity of an astral character, nor will it take into account combining marks.
+与长度的复杂性相似，“在位置2上的字符是什么？”，这么问的意思究竟是什么？前ES6的原生答案来自`charAt(..)`，它不会遵守一个星形字符的原子性，也不会考虑组合符号。
 
-Consider:
+考虑如下代码：
 
 ```js
 var s1 = "abc\u0301d",
@@ -2515,13 +2511,13 @@ console.log( s3 );				// "ab𝒞d"
 
 s1.charAt( 2 );					// "c"
 s2.charAt( 2 );					// "ć"
-s3.charAt( 2 );					// "" <-- unprintable surrogate
-s3.charAt( 3 );					// "" <-- unprintable surrogate
+s3.charAt( 2 );					// "" <-- 不可打印的代理字符
+s3.charAt( 3 );					// "" <-- 不可打印的代理字符
 ```
 
-So, is ES6 giving us a Unicode-aware version of `charAt(..)`? Unfortunately, no. At the time of this writing, there's a proposal for such a utility that's under consideration for post-ES6.
+那么，ES6会给我们Unicode敏感版本的`charAt(..)`吗？不幸的是，不。在本书写作时，在后ES6的考虑之中有一个这样的工具的提案。
 
-But with what we explored in the previous section (and of course with the limitations noted thereof!), we can hack an ES6 answer:
+但是使用我们在前一节探索的东西（当然也带着它的限制！），我们可以黑一个ES6的答案：
 
 ```js
 var s1 = "abc\u0301d",
@@ -2533,9 +2529,9 @@ var s1 = "abc\u0301d",
 [...s3.normalize()][2];			// "𝒞"
 ```
 
-**Warning:** Reminder of an earlier warning: constructing and exhausting an iterator each time you want to get at a single character is... not very ideal, performance wise. Let's hope we get a built-in and optimized utility for this soon, post-ES6.
+**警告：** 提醒一个早先的警告：在每次你想得到一个单独的字符时构建并耗尽一个迭代器……在性能上不是很理想。对此，希望我们很快能在后ES6时代得到一个内建的，优化过的工具。
 
-What about a Unicode-aware version of the `charCodeAt(..)` utility? ES6 gives us `codePointAt(..)`:
+那么`charCodeAt(..)`工具的Unicode敏感版本呢？ES6给了我们`codePointAt(..)`：
 
 ```js
 var s1 = "abc\u0301d",
@@ -2552,7 +2548,7 @@ s3.normalize().codePointAt( 2 ).toString( 16 );
 // "1d49e"
 ```
 
-What about the other direction? A Unicode-aware version of `String.fromCharCode(..)` is ES6's `String.fromCodePoint(..)`:
+那么从另一个方向呢？`String.fromCharCode(..)`的Unicode敏感版本是ES6的`String.fromCodePoint(..)`：
 
 ```js
 String.fromCodePoint( 0x107 );		// "ć"
@@ -2560,7 +2556,7 @@ String.fromCodePoint( 0x107 );		// "ć"
 String.fromCodePoint( 0x1d49e );	// "𝒞"
 ```
 
-So wait, can we just combine `String.fromCodePoint(..)` and `codePointAt(..)` to get a better version of a Unicode-aware `charAt(..)` from earlier? Yep!
+那么等一下，我们能组合`String.fromCodePoint(..)`与`codePointAt(..)`来得到一个刚才的Unicode敏感`charAt(..)`的更好版本吗？是的！
 
 ```js
 var s1 = "abc\u0301d",
@@ -2577,41 +2573,41 @@ String.fromCodePoint( s3.normalize().codePointAt( 2 ) );
 // "𝒞"
 ```
 
-There's quite a few other string methods we haven't addressed here, including `toUpperCase()`, `toLowerCase()`, `substring(..)`, `indexOf(..)`, `slice(..)`, and a dozen others. None of these have been changed or augmented for full Unicode awareness, so you should be very careful -- probably just avoid them! -- when working with strings containing astral symbols.
+还有好几个字符串方法我们没有在这里讲解，包括`toUpperCase()`，`toLowerCase()`，`substring(..)`，`indexOf(..)`，`slice(..)`，以及其他十几个。它们中没有任何一个为了完全支持Unicode而被改变或增强过，所以在处理含有星形符号的字符串是，你应当非常小心 —— 可能干脆回避它们！
 
-There are also several string methods that use regular expressions for their behavior, like `replace(..)` and `match(..)`. Thankfully, ES6 brings Unicode awareness to regular expressions, as we covered in "Unicode Flag" earlier in this chapter.
+还有几个字符串方法为了它们的行为而使用正则表达式，比如`replace(..)`和`match(..)`。值得庆幸的是，ES6为正则表达式带来了Unicode支持，正如我们在本章早前的“Unicode标志”中讲解过的那样。
 
-OK, there we have it! JavaScript's Unicode string support is significantly better over pre-ES6 (though still not perfect) with the various additions we've just covered.
+好了，就是这些！有了我们刚刚讲过的各种附加功能，JavaScript的Unicode字符串支持要比前ES6时代好太多了（虽然还不完美）。
 
-### Unicode Identifier Names
+### Unicode标识符名称
 
-Unicode can also be used in identifier names (variables, properties, etc.). Prior to ES6, you could do this with Unicode-escapes, like:
+Unicode还可以被用于标识符名称（变量，属性，等等）。在ES6之前，你可以通过Unicode转义这么做，比如：
 
 ```js
 var \u03A9 = 42;
 
-// same as: var Ω = 42;
+// 等同于：var Ω = 42;
 ```
 
-As of ES6, you can also use the earlier explained code point escape syntax:
+在ES6中，你还可以使用前面讲过的代码点转义语法：
 
 ```js
 var \u{2B400} = 42;
 
-// same as: var 𫐀 = 42;
+// 等同于：var 𫐀 = 42;
 ```
 
-There's a complex set of rules around exactly which Unicode characters are allowed. Furthermore, some are allowed only if they're not the first character of the identifier name.
+关于究竟哪些Unicode字符被允许使用，有一组复杂的规则。另外，有些字符只要不是标识符名称的第一个字符就允许使用。
 
-**Note:** Mathias Bynens has a great post (https://mathiasbynens.be/notes/javascript-identifiers-es6) on all the nitty-gritty details.
+**注意：** 关于所有这些细节，Mathias Bynens写了一篇了不起的文章 (https://mathiasbynens.be/notes/javascript-identifiers-es6)。
 
-The reasons for using such unusual characters in identifier names are rather rare and academic. You typically won't be best served by writing code that relies on these esoteric capabilities.
+很少有理由，或者是为了学术上的目的，才会在标识符名称中使用这样不寻常的字符。你通常不会因为依靠这些深奥的功能编写代码而感到舒服。
 
-## Symbols
+## Symbol
 
-With ES6, for the first time in quite a while, a new primitive type has been added to JavaScript: the `symbol`. Unlike the other primitive types, however, symbols don't have a literal form.
+在ES6中，长久以来首次，有一个新的基本类型被加入到了JavaScript：`symbol`。但是，与其他的基本类型不同，symbol没有字面形式。
 
-Here's how you create a symbol:
+这是你如何创建一个symbol：
 
 ```js
 var sym = Symbol( "some optional description" );
@@ -2619,19 +2615,19 @@ var sym = Symbol( "some optional description" );
 typeof sym;		// "symbol"
 ```
 
-Some things to note:
+一些要注意的事情是：
 
-* You cannot and should not use `new` with `Symbol(..)`. It's not a constructor, nor are you producing an object.
-* The parameter passed to `Symbol(..)` is optional. If passed, it should be a string that gives a friendly description for the symbol's purpose.
-* The `typeof` output is a new value (`"symbol"`) that is the primary way to identify a symbol.
+* 你不能也不应该将`new`与`Symbol(..)`一起使用。它不是一个构造器，你也不是在产生一个对象。
+* 被传入`Symbol(..)`的参数是可选的。如果传入的话，它应当是一个字符串，为symbol的目的给出一个友好的描述。
+* `typeof`的输出是一个新的值（`"symbol"`），这是识别一个symbol的主要方法。
 
-The description, if provided, is solely used for the stringification representation of the symbol:
+如果描述被提供的话，它仅仅用于symbol的字符串化表示：
 
 ```js
 sym.toString();		// "Symbol(some optional description)"
 ```
 
-Similar to how primitive string values are not instances of `String`, symbols are also not instances of `Symbol`. If, for some reason, you want to construct a boxed wrapper object form of a symbol value, you can do the following:
+与基本字符串值如何不是`String`的实例的原理很相似，symbol也不是`Symbol`的实例。如果，由于某些原因，你想要为一个symbol值构建一个封箱的包装器对像，你可以做如下的事情：
 
 ```js
 sym instanceof Symbol;		// false
@@ -2642,19 +2638,19 @@ symObj instanceof Symbol;	// true
 symObj.valueOf() === sym;	// true
 ```
 
-**Note:** `symObj` in this snippet is interchangeable with `sym`; either form can be used in all places symbols are utilized. There's not much reason to use the boxed wrapper object form (`symObj`) instead of the primitive form (`sym`). Keeping with similar advice for other primitives, it's probably best to prefer `sym` over `symObj`.
+**注意：** 在这个代码段中的`symObj`和`sym`是可以互换使用的；两种形式可以在symbol被用到的地方使用。没有太多的理由要使用封箱的包装对象形式（`symObj`），而不用基本类型形式（`sym`）。和其他基本类型的建议相似，使用`sym`而非`symObj`可能是最好的。
 
-The internal value of a symbol itself -- referred to as its `name` -- is hidden from the code and cannot be obtained. You can think of this symbol value as an automatically generated, unique (within your application) string value.
+一个symbol本身的内部值 —— 称为它的`name` —— 被隐藏在代码之外而不能取得。你可以认为这个symbol的值是一个自动生成的，（在你的应用程序中）独一无二的字符串值。
 
-But if the value is hidden and unobtainable, what's the point of having a symbol at all?
+但如果这个值是隐藏且不可取得的，那么拥有一个symbol还有什么意义？
 
-The main point of a symbol is to create a string-like value that can't collide with any other value. So, for example, consider using a symbol as a constant representing an event name:
+一个symbol的主要意义是创建一个不会和其他任何值冲突的类字符串值。所以，举例来说，可以考虑将一个symbol用做表示一个事件的名称的值：
 
 ```js
 const EVT_LOGIN = Symbol( "event.login" );
 ```
 
-You'd then use `EVT_LOGIN` in place of a generic string literal like `"event.login"`:
+然后你可以在一个使用像`"event.login"`这样的一般字符串字面量的地方使用`EVT_LOGIN`：
 
 ```js
 evthub.listen( EVT_LOGIN, function(data){
@@ -2662,13 +2658,13 @@ evthub.listen( EVT_LOGIN, function(data){
 } );
 ```
 
-The benefit here is that `EVT_LOGIN` holds a value that cannot be duplicated (accidentally or otherwise) by any other value, so it is impossible for there to be any confusion of which event is being dispatched or handled.
+其中的好处是，`EVT_LOGIN`持有一个不能被其他任何值所（有意或无意地）重复的值，所以在哪个事件被分发或处理的问题上不可能存在任何含糊。
 
-**Note:** Under the covers, the `evthub` utility assumed in the previous snippet would almost certainly be using the symbol value from the `EVT_LOGIN` argument directly as the property/key in some internal object (hash) that tracks event handlers. If `evthub` instead needed to use the symbol value as a real string, it would need to explicitly coerce with `String(..)` or `toString()`, as implicit string coercion of symbols is not allowed.
+**注意：** 在前面的代码段的幕后，几乎可以肯定地认为`evthub`工具使用了`EVT_LOGIN`参数值的symbol值作为某个跟踪事件处理器的内部对象的属性/键。如果`evthub`需要将symbol值作为一个真实的字符串使用，那么它将需要使用`String(..)`或者`toString(..)`进行明确强制转换，因为symbol的隐含字符串强制转换是不允许的。
 
-You may use a symbol directly as a property name/key in an object, such as a special property that you want to treat as hidden or meta in usage. It's important to know that although you intend to treat it as such, it is not *actually* a hidden or untouchable property.
+你可能会将一个symbol直接用做一个对象中的属性名/键，如此作为一个你想将之用于隐藏或元属性的特殊属性。重要的是，要知道虽然你试图这样对待它，但是它 *实际上* 并不是隐藏或不可接触的属性。
 
-Consider this module that implements the *singleton* pattern behavior -- that is, it only allows itself to be created once:
+考虑这个实现了 *单例* 模式行为的模块 —— 也就是，它仅允许自己被创建一次：
 
 ```js
 const INSTANCE = Symbol( "instance" );
@@ -2689,15 +2685,15 @@ var me = HappyFace(),
 me === you;			// true
 ```
 
-The `INSTANCE` symbol value here is a special, almost hidden, meta-like property stored statically on the `HappyFace()` function object.
+这里的symbol值`INSTANCE`是一个被静态地存储在`HappyFace()`函数对象上的特殊的，几乎是隐藏的，类元属性。
 
-It could alternatively have been a plain old property like `__instance`, and the behavior would have been identical. The usage of a symbol simply improves the metaprogramming style, keeping this `INSTANCE` property set apart from any other normal properties.
+替代性地，它本可以是一个像`__instance`这样的普通属性，而且其行为将会是一模一样的。symbol的使用仅仅增强了程序元编程的风格，将这个`INSTANCE`属性与其他普通的属性间保持隔离。
 
-### Symbol Registry
+### Symbol注册表
 
-One mild downside to using symbols as in the last few examples is that the `EVT_LOGIN` and `INSTANCE` variables had to be stored in an outer scope (perhaps even the global scope), or otherwise somehow stored in a publicly available location, so that all parts of the code that need to use the symbols can access them.
+在前面几个例子中使用symbol的一个微小的缺点是，变量`EVT_LOGIN`和`INSTANCE`不得不存储在外部作用域中（甚至也许是全局作用域），或者用某种方法存储在一个可用的公共位置，这样代码所有需要使用这些symbol的部分都可以访问它们。
 
-To aid in organizing code with access to these symbols, you can create symbol values with the *global symbol registry*. For example:
+为了辅助组织访问这些symbol的代码，你可以使用 *全局symbol注册表* 来创建symbol。例如：
 
 ```js
 const EVT_LOGIN = Symbol.for( "event.login" );
@@ -2705,7 +2701,7 @@ const EVT_LOGIN = Symbol.for( "event.login" );
 console.log( EVT_LOGIN );		// Symbol(event.login)
 ```
 
-And:
+和：
 
 ```js
 function HappyFace() {
@@ -2719,15 +2715,15 @@ function HappyFace() {
 }
 ```
 
-`Symbol.for(..)` looks in the global symbol registry to see if a symbol is already stored with the provided description text, and returns it if so. If not, it creates one to return. In other words, the global symbol registry treats symbol values, by description text, as singletons themselves.
+`Symbol.for(..)`查询全局symbol注册表来查看一个symbol是否已经使用被提供的说明文本存储过了，如果有就返回它。如果没有，就创建一个并返回。换句话说，全局symbol注册表通过描述文本将symbol值看作它们本身的单例。
 
-But that also means that any part of your application can retrieve the symbol from the registry using `Symbol.for(..)`, as long as the matching description name is used.
+但这也意味着只要使用匹配的描述名，你的应用程序的任何部分都可以使用`Symbol.for(..)`从注册表中取得symbol。
 
-Ironically, symbols are basically intended to replace the use of *magic strings* (arbitrary string values given special meaning) in your application. But you precisely use *magic* description string values to uniquely identify/locate them in the global symbol registry!
+讽刺的是，基本上symbol的本意是在你的应用程序中取代 *魔法字符串* 的使用（被赋予了特殊意义的随意的字符串值）。但是你正是在全局symbol注册表中使用 *魔法* 描述字符串值来唯一识别/定位它们的！
 
-To avoid accidental collisions, you'll probably want to make your symbol descriptions quite unique. One easy way of doing that is to include prefix/context/namespacing information in them.
+为了避免意外的冲突，你可能想使你的symbol描述十分独特。这么做的一个简单的方法是在它们之中包含前缀/环境/名称空间的信息。
 
-For example, consider a utility such as the following:
+例如，考虑一个像下面这样的工具：
 
 ```js
 function extractValues(str) {
@@ -2744,9 +2740,9 @@ function extractValues(str) {
 }
 ```
 
-We use the magic string value `"extractValues.parse"` because it's quite unlikely that any other symbol in the registry would ever collide with that description.
+我们使用魔法字符串值`"extractValues.parse"`，因为在注册表中的其他任何symbol都不太可能与这个描述相冲突。
 
-If a user of this utility wants to override the parsing regular expression, they can also use the symbol registry:
+如果这个工具的一个用户想要覆盖这个解析用的正则表达式，他们也可以使用symbol注册表：
 
 ```js
 extractValues[Symbol.for( "extractValues.parse" )] =
@@ -2755,11 +2751,11 @@ extractValues[Symbol.for( "extractValues.parse" )] =
 extractValues( "..some string.." );
 ```
 
-Aside from the assistance the symbol registry provides in globally storing these values, everything we're seeing here could have been done by just actually using the magic string `"extractValues.parse"` as the key, rather than the symbol. The improvements exist at the metaprogramming level more than the functional level.
+除了symbol注册表在全局地存储这些值上提供的协助以外，我们在这里看到的一切其实都可以通过将魔法字符串`"extractValues.parse"`作为一个键，而不是一个symbol，来做到。这其中在元编程的层次上的改进要多于在函数层次上的改进。
 
-You may have occasion to use a symbol value that has been stored in the registry to look up what description text (key) it's stored under. For example, you may need to signal to another part of your application how to locate a symbol in the registry because you cannot pass the symbol value itself.
+你可能偶然会使用一个已经被存储在注册表中的symbol值来查询它底层存储了什么描述文本（键）。例如，因为你无法传递symbol值本身，你可能需要通知你的应用程序的另一个部分如何在注册表中定位一个symbol。
 
-You can retrieve a registered symbol's description text (key) using `Symbol.keyFor(..)`:
+你可以使用`Symbol.keyFor(..)`取得一个被注册的symbol描述文本（键）：
 
 ```js
 var s = Symbol.for( "something cool" );
@@ -2767,15 +2763,15 @@ var s = Symbol.for( "something cool" );
 var desc = Symbol.keyFor( s );
 console.log( desc );			// "something cool"
 
-// get the symbol from the registry again
+// 再次从注册表取得symbol
 var s2 = Symbol.for( desc );
 
 s2 === s;						// true
 ```
 
-### Symbols as Object Properties
+### Symbols作为对象属性
 
-If a symbol is used as a property/key of an object, it's stored in a special way so that the property will not show up in a normal enumeration of the object's properties:
+如果一个symbol被用作一个对象的属性/键，它会被以一种特殊的方式存储，以至这个属性不会出现在这个对象属性的普通枚举中：
 
 ```js
 var o = {
@@ -2787,19 +2783,19 @@ var o = {
 Object.getOwnPropertyNames( o );	// [ "foo","baz" ]
 ```
 
-To retrieve an object's symbol properties:
+要取得对象的symbol属性：
 
 ```js
 Object.getOwnPropertySymbols( o );	// [ Symbol(bar) ]
 ```
 
-This makes it clear that a property symbol is not actually hidden or inaccessible, as you can always see it in the `Object.getOwnPropertySymbols(..)` list.
+这表明一个属性symbol实际上不是隐藏的或不可访问的，因为你总是可以在`Object.getOwnPropertySymbols(..)`的列表中看到它。
 
-#### Built-In Symbols
+#### 内建Symbols
 
-ES6 comes with a number of predefined built-in symbols that expose various meta behaviors on JavaScript object values. However, these symbols are *not* registered in the global symbol registry, as one might expect.
+ES6带来了好几种预定义的内建symbol，它们暴露了在JavaScript对象值上的各种元行为。然而，正如人们所预料的那样，这些symbol *没有* 没被注册到全局symbol注册表中。
 
-Instead, they're stored as properties on the `Symbol` function object. For example, in the "`for..of`" section earlier in this chapter, we introduced the `Symbol.iterator` value:
+取而代之的是，它们作为属性被存储到了`Symbol`函数对象中。例如，在本章早先的“`for..of`”一节中，我们介绍了值`Symbol.iterator`：
 
 ```js
 var a = [1,2,3];
@@ -2807,16 +2803,16 @@ var a = [1,2,3];
 a[Symbol.iterator];			// native function
 ```
 
-The specification uses the `@@` prefix notation to refer to the built-in symbols, the most common ones being: `@@iterator`, `@@toStringTag`, `@@toPrimitive`. Several others are defined as well, though they probably won't be used as often.
+语言规范使用`@@`前缀注释指代内建的symbol，最常见的几个是：`@@iterator`，`@@toStringTag`，`@@toPrimitive`。还定义了几个其他的symbol，虽然他们可能不那么频繁地被使用。
 
-**Note:** See "Well Known Symbols" in Chapter 7 for detailed information about how these built-in symbols are used for meta programming purposes.
+**注意：** 关于这些内建symbol如何被用于元编程的详细信息，参见第七章的“通用Symbol”。
 
-## Review
+## 复习
 
-ES6 adds a heap of new syntax forms to JavaScript, so there's plenty to learn!
+ES6给JavaScript增加了一堆新的语法形式，有好多东西要学！
 
-Most of these are designed to ease the pain points of common programming idioms, such as setting default values to function parameters and gathering the "rest" of the parameters into an array. Destructuring is a powerful tool for more concisely expressing assignments of values from arrays and nested objects.
+这些东西中的大多数都是为了缓解常见编程惯用法中的痛点而设计的，比如为函数参数设置默认值和将“剩余”的参数收集到一个数组中。解构是一个强大的工具，用来更简约地表达从数组或嵌套对象的赋值。
 
-While features like `=>` arrow functions appear to also be all about shorter and nicer-looking syntax, they actually have very specific behaviors that you should intentionally use only in appropriate situations.
+虽然像箭头函数`=>`这样的特性看起来也都是关于更简短更好看的语法，但是它们实际上拥有非常特殊的行为，你应当在恰当的情况下有意地使用它们。
 
-Expanded Unicode support, new tricks for regular expressions, and even a new primitive `symbol` type round out the syntactic evolution of ES6.
+扩展的Unicode支持，新的正则表达式技巧，和新的`symbol`基本类型充实了ES6语法的发展演变。

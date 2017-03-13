@@ -1,159 +1,159 @@
-# You Don't Know JS: Types & Grammar
-# Appendix A: Mixed Environment JavaScript
+# 你不懂JS：类型与文法
+# 附录A：与环境混合的JavaScript
 
-Beyond the core language mechanics we've fully explored in this book, there are several ways that your JS code can behave differently when it runs in the real world. If JS was executing purely inside an engine, it'd be entirely predictable based on nothing but the black-and-white of the spec. But JS pretty much always runs in the context of a hosting environment, which exposes your code to some degree of unpredictability.
+当你的JS代码在真实世界中运行时，除了我们在本书中完整探索过的核心语言机制以外，它还有好几种不同的行为方式。如果JS纯粹地运行在一个引擎中，那么它就会按照语言规范非黑即白地动作，是完全可以预测的。但是JS很可能总是运行在一个宿主环境的上下文中，这将会给你的代码带来某种程度的不可预测性。
 
-For example, when your code runs alongside code from other sources, or when your code runs in different types of JS engines (not just browsers), there are some things that may behave differently.
+例如，当你的代码与源自于其他地方的代码并肩运行时，或者当你的代码在不同种类的JS引擎（不只是浏览器）中运行时，有些事情的行为就可能不同。
 
-We'll briefly explore some of these concerns.
+我们将简要地探索这些问题中的一些。
 
-## Annex B (ECMAScript)
+## Annex B （ECMAScript）
 
-It's a little known fact that the official name of the language is ECMAScript (referring to the ECMA standards body that manages it). What then is "JavaScript"? JavaScript is the common tradename of the language, of course, but more appropriately, JavaScript is basically the browser implementation of the spec.
+一个鲜为人知的事实是，这门语言的官方名称是ECMAScript（意指管理它的ECMA标准本体）。那么“JavaScript”是什么？JavaScript是这门语言常见的商业名称，当然，更恰当地说，JavaScript基本上是语言规范的浏览器实现。
 
-The official ECMAScript specification includes "Annex B," which discusses specific deviations from the official spec for the purposes of JS compatibility in browsers.
+官方的ECMAScript语言规范包含“Annex B”，它是为了浏览器中JS的兼容性，讨论那些与官方语言规范有偏差的特别部分。
 
-The proper way to consider these deviations is that they are only reliably present/valid if your code is running in a browser. If your code always runs in browsers, you won't see any observable difference. If not (like if it can run in node.js, Rhino, etc.), or you're not sure, tread carefully.
+考虑这些偏差部分的恰当方法是，它们仅在你的代码运行在浏览器中时才是确实会出现/合法的。如果你的代码总是运行在浏览器中，那你就不会看到明显的不同。如果不是（比如它可以运行在node.js、Rhino中，等等），或者你不确定，那么就要小心对待。
 
-The main compatibility differences:
+兼容性上的主要不同是：
 
-* Octal number literals are allowed, such as `0123` (decimal `83`) in non-`strict mode`.
-* `window.escape(..)` and `window.unescape(..)` allow you to escape or unescape strings with `%`-delimited hexadecimal escape sequences. For example: `window.escape( "?foo=97%&bar=3%" )` produces `"%3Ffoo%3D97%25%26bar%3D3%25"`.
-* `String.prototype.substr` is quite similar to `String.prototype.substring`, except that instead of the second parameter being the ending index (noninclusive), the second parameter is the `length` (number of characters to include).
+* 八进制数字字面量是允许的，比如在非`strict mode`下的`0123`（小数`83`）。
+* `window.escape(..)`和`window.unescape(..)`允许你使用`%`分割的十六进制转义序列来转义或非转义字符串。例如：`window.escape( "?foo=97%&bar=3%" )`产生`"%3Ffoo%3D97%25%26bar%3D3%25"`
+* `String.prototype.substr`与`String.prototype.substring`十分相似，除了第二个参数是`length`（要包含的字符数），而非结束（不含）的索引。
 
 ### Web ECMAScript
 
-The Web ECMAScript specification (http://javascript.spec.whatwg.org/) covers the differences between the official ECMAScript specification and the current JavaScript implementations in browsers.
+Web ECMAScript语言规范(http://javascript.spec.whatwg.org/)涵盖了官方ECMAScript语言规范与当前浏览器中JavaScript实现之间的不同。
 
-In other words, these items are "required" of browsers (to be compatible with each other) but are not (as of the time of writing) listed in the "Annex B" section of the official spec:
+换言之，这些项目是浏览器的“必须品”（为了相互兼容），但是（在本书编写时）没有列在官方语言规范的“Annex B”部分是：
 
-* `<!--` and `-->` are valid single-line comment delimiters.
-* `String.prototype` additions for returning HTML-formatted strings: `anchor(..)`, `big(..)`, `blink(..)`, `bold(..)`, `fixed(..)`, `fontcolor(..)`, `fontsize(..)`, `italics(..)`, `link(..)`, `small(..)`, `strike(..)`, and `sub(..)`. **Note:** These are very rarely used in practice, and are generally discouraged in favor of other built-in DOM APIs or user-defined utilities.
-* `RegExp` extensions: `RegExp.$1` .. `RegExp.$9` (match-groups) and `RegExp.lastMatch`/`RegExp["$&"]` (most recent match).
-* `Function.prototype` additions: `Function.prototype.arguments` (aliases internal `arguments` object) and `Function.caller` (aliases internal `arguments.caller`). **Note:** `arguments` and thus `arguments.caller` are deprecated, so you should avoid using them if possible. That goes doubly so for these aliases -- don't use them!
+* `<!--`和`-->`是合法的单行注释分割符。
+* `String.prototype` 拥有返回HTML格式化字符串的附加方法：`anchor(..)`、`big(..)`、`blink(..)`、`bold(..)`、`fixed(..)`、`fontcolor(..)`、`fontsize(..)`、`italics(..)`、`link(..)`、`small(..)`、`strike(..)`、和`sub(..)`。**注意：** 它们在实际应用中非常罕见，而且一般来说不鼓励使用，而是用其他内建DOM API或用户定义的工具取代。
+* `RegExp`扩展：`RegExp.$1` .. `RegExp.$9`（匹配组）和`RegExp.lastMatch`/`RegExp["$&"]`（最近的匹配）。
+* `Function.prototype`附加功能：`Function.prototype.arguments`（内部`arguments`对象的别名）和`Function.caller`（内部`arguments.caller`的别名）。**注意：** `arguments`和 `arguments.caller`都被废弃了，所以你应当尽可能避免使用它们。这些别名更是这样 —— 不要使用它们！
 
-**Note:** Some other minor and rarely used deviations are not included in our list here. See the external "Annex B" and "Web ECMAScript" documents for more detailed information as needed.
+**注意：** 其他的一些微小和罕见的偏差点没有包含在我们这里的列表中。有必要的话，更多详细信息可以参见外部的“Annex B”和“Web ECMAScript”文档。
 
-Generally speaking, all these differences are rarely used, so the deviations from the specification are not significant concerns. **Just be careful** if you rely on any of them.
+一般来说，所有这些不同点都很少被使用，所以这些与语言规范有出入的地方不是什么重大问题。只是如果你依赖于其中任何一个的话，**要小心**。
 
-## Host Objects
+## 宿主对象
 
-The well-covered rules for how variables behave in JS have exceptions to them when it comes to variables that are auto-defined, or otherwise created and provided to JS by the environment that hosts your code (browser, etc.) -- so called, "host objects" (which include both built-in `object`s and `function`s).
+JS中变量的行为有一些广为人知的例外 —— 当它们是被自动定义，或由持有你代码的环境（浏览器等）创建并提供给JS时 —— 也就是所谓的“宿主对象”（包括`object`和`function`两者）。
 
-For example:
+例如：
 
 ```js
 var a = document.createElement( "div" );
 
-typeof a;								// "object" -- as expected
+typeof a;								// "object" -- 意料之中的
 Object.prototype.toString.call( a );	// "[object HTMLDivElement]"
 
 a.tagName;								// "DIV"
 ```
 
-`a` is not just an `object`, but a special host object because it's a DOM element. It has a different internal `[[Class]]` value (`"HTMLDivElement"`) and comes with predefined (and often unchangeable) properties.
+`a`不仅是一个`object`，而且是一个特殊的宿主对象，因为它是一个DOM元素。它拥有一个不同的内部`[[Class]]`值（`"HTMLDivElement"`），而且带有预定义的（而且通常是不可更改的）属性。
 
-Another such quirk has already been covered, in the "Falsy Objects" section in Chapter 4: some objects can exist but when coerced to `boolean` they (confoundingly) will coerce to `false` instead of the expected `true`.
+另一个已经在第四章的“Falsy对象”一节中探讨过的同样的怪异之处是：存在这样一些对象，当被强制转换为`boolean`时，它们将（令人糊涂地）被转换为`false`而不是预期的`true`。
 
-Other behavior variations with host objects to be aware of can include:
+另一些需要小心的宿主对象行为包括：
 
-* not having access to normal `object` built-ins like `toString()`
-* not being overwritable
-* having certain predefined read-only properties
-* having methods that cannot be `this`-overriden to other objects
-* and more...
+* 不能访问像`toString()`这样的`object`内建方法
+* 不可覆盖
+* 拥有特定的预定义只读属性
+* 拥有一些`this`不可被重载为其他对象的方法
+* 其他……
 
-Host objects are critical to making our JS code work with its surrounding environment. But it's important to note when you're interacting with a host object and be careful assuming its behaviors, as they will quite often not conform to regular JS `object`s.
+为了使我们的JS代码与它外围的环境一起工作，宿主对象至关重要。但在你与宿主对象交互时是要特别注意，并且在推测它的行为时要小心，因为它们经常与普通的JS`object`不符。
 
-One notable example of a host object that you probably interact with regularly is the `console` object and its various functions (`log(..)`, `error(..)`, etc.). The `console` object is provided by the *hosting environment* specifically so your code can interact with it for various development-related output tasks.
+一个尽人皆知的你可能经常与之交互的宿主对象的例子，就是`console`对象和他的各种函数（`log(..)`、`error(..)`等等）。`console`对象是由 *宿主环境* 特别提供的，所以你的代码可以与之互动来进行各种开发相关的输出任务。
 
-In browsers, `console` hooks up to the developer tools' console display, whereas in node.js and other server-side JS environments, `console` is generally connected to the standard-output (`stdout`) and standard-error (`stderr`) streams of the JavaScript environment system process.
+在浏览器中，`console`与开发者工具控制台的显示相勾连，因此在node.js和其他服务器端JS环境中，`console`一般连接着JavaScript环境系统进程的标准输出流（`stdout`）和标准错误流（`stderr`）。
 
-## Global DOM Variables
+## 全局DOM变量
 
-You're probably aware that declaring a variable in the global scope (with or without `var`) creates not only a global variable, but also its mirror: a property of the same name on the `global` object (`window` in the browser).
+你可能知道，在全局作用域中声明变量（用或者不用`var`）不仅会创建一个全局变量，还会创建它的镜像：在`global`对象（浏览器中的`window`）上的同名属性。
 
-But what may be less common knowledge is that (because of legacy browser behavior) creating DOM elements with `id` attributes creates global variables of those same names. For example:
+但少为人知的是，（由于浏览器的遗留行为）使用`id`属性创建DOM元素会创建同名的全局变量。例如：
 
 ```html
 <div id="foo"></div>
 ```
 
-And:
+和：
 
 ```js
 if (typeof foo == "undefined") {
-	foo = 42;		// will never run
+	foo = 42;		// 永远不会运行
 }
 
-console.log( foo );	// HTML element
+console.log( foo );	// HTML元素
 ```
 
-You're perhaps used to managing global variable tests (using `typeof` or `.. in window` checks) under the assumption that only JS code creates such variables, but as you can see, the contents of your hosting HTML page can also create them, which can easily throw off your existence check logic if you're not careful.
+你可能臆测只有JS代码会创建这样的变量，并习惯于在这样假定的前提下进行全局变量检测（使用`typeof`或者`.. in window`检查），但是如你所见，你的宿主HTML页面的内容也会创建它们，如果你不小心它们就可以轻而易举地摆脱你的存在性检查。
 
-This is yet one more reason why you should, if at all possible, avoid using global variables, and if you have to, use variables with unique names that won't likely collide. But you also need to make sure not to collide with the HTML content as well as any other code.
+这就是另一个你为什么应该尽全力避免使用全局变量的原因，如果你不得不这样做，那就使用不太可能冲突的变量名。但是你还是需要确认它不会与HTML的内容以及其他的代码相冲突。
 
-## Native Prototypes
+## 原生原型
 
-One of the most widely known and classic pieces of JavaScript *best practice* wisdom is: **never extend native prototypes**.
+最广为人知的，经典的JavaScript *最佳实践* 智慧之一是：**永远不要扩展原生原型**。
 
-Whatever method or property name you come up with to add to `Array.prototype` that doesn't (yet) exist, if it's a useful addition and well-designed, and properly named, there's a strong chance it *could* eventually end up being added to the spec -- in which case your extension is now in conflict.
+当你将方法或属性添加到`Array.prototype`时，无论你想出什么样的（还）不存在于`Array.prototype`上名称，如果它是有用的、设计良好的、并且被恰当命名的新增功能，那么它就有很大的可能性被最终加入语言规范 —— 这种情况下你的扩展就处于冲突之中。
 
-Here's a real example that actually happened to me that illustrates this point well.
+这里有一个真实地发生在我身上的例子，很好地展示了这一点。
 
-I was building an embeddable widget for other websites, and my widget relied on jQuery (though pretty much any framework would have suffered this gotcha). It worked on almost every site, but we ran across one where it was totally broken.
+那时我正在为其他网站建造一个可嵌入的控件，而且我的控件依赖于JQuery（虽然任何框架都很可能遭受这样的坑）。它几乎可以在每一个网站上工作，但是我们碰到了一个它会完全崩溃的网站。
 
-After almost a week of analysis/debugging, I found that the site in question had, buried deep in one of its legacy files, code that looked like this:
+经过差不多一周的分析/调试之后，我发现这个出问题的网站有这样一段代码，埋藏在它的一个遗留文件的深处：
 
 ```js
-// Netscape 4 doesn't have Array.push
+// Netscape 4 没有 Array.push
 Array.prototype.push = function(item) {
 	this[this.length] = item;
 };
 ```
 
-Aside from the crazy comment (who cares about Netscape 4 anymore!?), this looks reasonable, right?
+除了那疯狂的注释（谁还会关心Netscape 4！？），它看起来很合理，对吧？
 
-The problem is, `Array.prototype.push` was added to the spec sometime subsequent to this Netscape 4 era coding, but what was added is not compatible with this code. The standard `push(..)` allows multiple items to be pushed at once. This hacked one ignores the subsequent items.
+问题是，在这段 Netscape 4 时代的代码被编写之后的某个时点，`Array.prototype.push`被加入了语言规范，但是被加入的东西与这段代码是不兼容的。标准的`push(..)`允许一次加入多个项目，而这个黑进来的东西会忽略后续项目。
 
-Basically all JS frameworks have code that relies on `push(..)` with multiple elements. In my case, it was code around the CSS selector engine that was completely busted. But there could conceivably be dozens of other places susceptible.
+基本上所有的JS框架都有这样的代码 —— 依赖于带有多个元素的`push(..)`。在我的例子中，我在围绕着一个完全被毁坏的CSS选择器引擎进行编码。但是可以料想到还有其他十几处可疑的地方。
 
-The developer who originally wrote that `push(..)` hack had the right instinct to call it `push`, but didn't foresee pushing multiple elements. They were certainly acting in good faith, but they created a landmine that didn't go off until almost 10 years later when I unwittingly came along.
+一开始编写这个`push(..)`黑科技的开发者称它为`push`，这种直觉很正确，但是没有预见到添加多个元素。当然他们的初衷是好的，但是也埋下了一个地雷，当我差不多在10年之后路过时才不知不觉地踩上。
 
-There's multiple lessons to take away on all sides.
+这里要吸取几个教训。
 
-First, don't extend the natives unless you're absolutely sure your code is the only code that will ever run in that environment. If you can't say that 100%, then extending the natives is dangerous. You must weigh the risks.
+第一，不要扩展原生类型，除非你绝对确信你的代码将是运行在那个环境中的唯一代码。如果你不能100%确信，那么扩展原生类型就是危险的。你必须掂量掂量风险。
 
-Next, don't unconditionally define extensions (because you can overwrite natives accidentally). In this particular example, had the code said this:
+其次，不要无条件地定义扩展（因为你可能意外地覆盖原生类型）。就这个特定的例子，用代码说话就是：
 
 ```js
 if (!Array.prototype.push) {
-	// Netscape 4 doesn't have Array.push
+	// Netscape 4 没有 Array.push
 	Array.prototype.push = function(item) {
 		this[this.length] = item;
 	};
 }
 ```
 
-The `if` statement guard would have only defined this hacked `push()` for JS environments where it didn't exist. In my case, that probably would have been OK. But even this approach is not without risk:
+`if`守护语句将会仅在JS环境中不存在`push()`时才定义那个`push()`黑科技。在我的情况中，这可能就够了。但即便是这种方式也不是没有风险：
 
-1. If the site's code (for some crazy reason!) was relying on a `push(..)` that ignored multiple items, that code would have been broken years ago when the standard `push(..)` was rolled out.
-2. If any other library had come in and hacked in a `push(..)` ahead of this `if` guard, and it did so in an incompatible way, that would have broken the site at that time.
+1. 如果网站的代码（为了某些疯狂的理由！）有赖于忽略多个项目的`push(..)`，那么几年以后当标准的`push(..)`推出时，那些代码将会坏掉。
+2. 如果有其他库被引入，并在这个`if`守护之前就黑进了`push(..)`，而且还是以一种不兼容的方式，那么它就在那一刻毁坏了这个网站。
 
-What that highlights is an interesting question that, frankly, doesn't get enough attention from JS developers: **Should you EVER rely on native built-in behavior** if your code is running in any environment where it's not the only code present?
+这里的重点，坦白地讲，是一个没有得到JS开发者们足够重视的有趣问题：如果在你代码运行的环境中，你的代码不是唯一的存在，那么 **你应该依赖于任何原生的内建行为吗?**
 
-The strict answer is **no**, but that's awfully impractical. Your code usually can't redefine its own private untouchable versions of all built-in behavior relied on. Even if you *could*, that's pretty wasteful.
+严格的答案是 **不**，但这非常不切实际。你的代码通常不会为所有它依赖的内建行为重新定义它自己的、不可接触的私有版本。即便你 *能*，那也是相当的浪费。
 
-So, should you feature-test for the built-in behavior as well as compliance-testing that it does what you expect? And what if that test fails -- should your code just refuse to run?
+那么，你应当为内建行为进行特性测试，以及为了验证它能如你预期的那样工作而进行兼容性测试吗？但如果测试失败了 —— 你的代码应当拒绝运行吗？
 
 ```js
-// don't trust Array.prototype.push
+// 不信任 Array.prototype.push
 (function(){
 	if (Array.prototype.push) {
 		var a = [];
 		a.push(1,2);
 		if (a[0] === 1 && a[1] === 2) {
-			// tests passed, safe to use!
+			// 测试通过，可以安全使用！
 			return;
 		}
 	}
@@ -164,64 +164,64 @@ So, should you feature-test for the built-in behavior as well as compliance-test
 })();
 ```
 
-In theory, that sounds plausible, but it's also pretty impractical to design tests for every single built-in method.
+理论上，这貌似有些道理，但是为每一个内建方法设计测试还是非常不切实际。
 
-So, what should we do? Should we *trust but verify* (feature- and compliance-test) **everything**? Should we just assume existence is compliance and let breakage (caused by others) bubble up as it will?
+那么，我们应当怎么做？我们应当 *信赖但验证*（特性测试和兼容性测试）**每一件事吗**？我们应当假设既存的东西是符合规范的并让（由他人）造成的破坏任意传播吗？
 
-There's no great answer. The only fact that can be observed is that extending native prototypes is the only way these things bite you.
+没有太好的答案。可以观察到的唯一事实是，扩展原生原型是这些东西咬到你的唯一方式。
 
-If you don't do it, and no one else does in the code in your application, you're safe. Otherwise, you should build in at least a little bit of skepticism, pessimism, and expectation of possible breakage.
+如果你不这么做，而且在你的应用程序中也没有其他人这么做，那么你就是安全的。否则，你就应当多多少少建立一些怀疑的、悲观的机制、并对可能的破坏做好准备。
 
-Having a full set of unit/regression tests of your code that runs in all known environments is one way to surface some of these issues earlier, but it doesn't do anything to actually protect you from these conflicts.
+在所有已知环境中，为你的代码准备一整套单元/回归测试是发现一些前述问题的方法，但是它不会对这些冲突为你做出任何实际的保护。
 
 ### Shims/Polyfills
 
-It's usually said that the only safe place to extend a native is in an older (non-spec-compliant) environment, since that's unlikely to ever change -- new browsers with new spec features replace older browsers rather than amending them.
+人们常说，扩展一个原生类型唯一安全的地方是在一个（不兼容语言规范的）老版本环境中，因为它不太可能再改变了 —— 带有新语言规范特性的新浏览器会取代老版本浏览器，而非改良它们。
 
-If you could see into the future, and know for sure what a future standard was going to be, like for `Array.prototype.foobar`, it'd be totally safe to make your own compatible version of it to use now, right?
+如果你能预见未来，而且确信未来的标准将是怎样，比如`Array.prototype.foobar`，那么现在就制造你自己的兼容版本来使用就是完全安全的，对吧？
 
 ```js
 if (!Array.prototype.foobar) {
-	// silly, silly
+	// 愚蠢，愚蠢
 	Array.prototype.foobar = function() {
 		this.push( "foo", "bar" );
 	};
 }
 ```
 
-If there's already a spec for `Array.prototype.foobar`, and the specified behavior is equal to this logic, you're pretty safe in defining such a snippet, and in that case it's generally called a "polyfill" (or "shim").
+如果已经有了`Array.prototype.foobar`的规范，而且规定的行为与这个逻辑等价，那么你定义这样的代码段就十分安全，在这种情况下它通常称为一个“polyfill（填补）”（或者“shim（垫片）”）。
 
-Such code is **very** useful to include in your code base to "patch" older browser environments that aren't updated to the newest specs. Using polyfills is a great way to create predictable code across all your supported environments.
+在你的代码库中引入这样的代码，对给那些没有更新到最新规范的老版本浏览器环境打“补丁”**非常** 有用。为所有你支持的环境创建可预见的代码，使用填补是非常好的方法。
 
-**Tip:** ES5-Shim (https://github.com/es-shims/es5-shim) is a comprehensive collection of shims/polyfills for bringing a project up to ES5 baseline, and similarly, ES6-Shim (https://github.com/es-shims/es6-shim) provides shims for new APIs added as of ES6. While APIs can be shimmed/polyfilled, new syntax generally cannot. To bridge the syntactic divide, you'll want to also use an ES6-to-ES5 transpiler like Traceur (https://github.com/google/traceur-compiler/wiki/GettingStarted).
+**提示：** ES5-Shim (https://github.com/es-shims/es5-shim) 是一个将项目代码桥接至ES5基准线的完整的shims/polyfills集合，相似地，ES6-Shim (https://github.com/es-shims/es6-shim) 提供了ES6新增的新API的shim。虽然API可以被填补，但新的语法通常是不能的。要桥接语法的部分，你将还需要使用一个ES6到ES5的转译器，比如Traceur (https://github.com/google/traceur-compiler/wiki/GettingStarted)。
 
-If there's likely a coming standard, and most discussions agree what it's going to be called and how it will operate, creating the ahead-of-time polyfill for future-facing standards compliance is called "prollyfill" (probably-fill).
+如果有一个即将到来的标准，而且关于它叫什么名字和它将如何工作的讨论达成了一致，那么为了兼容面向未来的标准提前创建填补，被称为“prollyfill（probably-fill —— 预填补）”。
 
-The real catch is if some new standard behavior can't be (fully) polyfilled/prollyfilled.
+真正的坑是某些标准行为不能被（完全）填补/预填补。
 
-There's debate in the community if a partial-polyfill for the common cases is acceptable (documenting the parts that cannot be polyfilled), or if a polyfill should be avoided if it purely can't be 100% compliant to the spec.
+在开发者社区中有这样一种争论：对于常见的情况一个部分地填补是否是可接受的，或者如果一个填补不能100%地与语言规范兼容是否应当避免它。
 
-Many developers at least accept some common partial polyfills (like for instance `Object.create(..)`), because the parts that aren't covered are not parts they intend to use anyway.
+许多开发者至少会接受一些常见的部分填补（例如`Object.create(..)`），因为没有被填补的部分是他们不管怎样都不会用到的。
 
-Some developers believe that the `if` guard around a polyfill/shim should include some form of conformance test, replacing the existing method either if it's absent or fails the tests. This extra layer of compliance testing is sometimes used to distinguish "shim" (compliance tested) from "polyfill" (existence checked).
+一些开发者相信，包围着 polyfill/shim 的`if`守护语句应当引入某种形式的一致性测试，在既存的方法缺失或者测试失败时取代它。这额外的一层兼容性测试有时被用于将“shim”（兼容性测试）与“polyfill”（存在性测试）区别开。
 
-The only absolute take-away is that there is no absolute *right* answer here. Extending natives, even when done "safely" in older environments, is not 100% safe. The same goes for relying upon (possibly extended) natives in the presence of others' code.
+这里的要点是，没有绝对 *正确* 的答案。即使是在老版本环境中“安全地”扩展原生类型，也不是100%安全的。在其他人代码存在的情况下依赖于（可能被扩展过的）原生类型也是一样。
 
-Either should always be done with caution, defensive code, and lots of obvious documentation about the risks.
+在这两种情况下都应当小心地使用防御性的代码，并在文档中大量记录它的风险。
 
-## `<script>`s
+## `<script>`
 
-Most browser-viewed websites/applications have more than one file that contains their code, and it's common to have a few or several `<script src=..></script>` elements in the page that load these files separately, and even a few inline-code `<script> .. </script>` elements as well.
+大多数通过浏览器使用的网站/应用程序都将它们的代码包含在一个以上的文件中，在一个页面中含有几个或好几个分别加载这些文件的`<script src=..></script>`元素，甚至几个内联的`<script> .. </script>`元素也很常见。
 
-But do these separate files/code snippets constitute separate programs or are they collectively one JS program?
+但这些分离的文件/代码段是组成分离的程序，还是综合为一个JS程序？
 
-The (perhaps surprising) reality is they act more like independent JS programs in most, but not all, respects.
+（也许令人吃惊）现实是它们在极大程度上，但不是全部，像独立的JS程序那样动作。
 
-The one thing they *share* is the single `global` object (`window` in the browser), which means multiple files can append their code to that shared namespace and they can all interact.
+它们所 *共享* 的一个东西是一个单独的`global`对象（在浏览器中是`window`），这意味着多个文件可以将它们的代码追加到这个共享的名称空间中，而且它们都是可以交互的。
 
-So, if one `script` element defines a global function `foo()`, when a second `script` later runs, it can access and call `foo()` just as if it had defined the function itself.
+所以，如果一个`script`元素定义了一个全局函数`foo()`，当第二个`script`运行时，它就可以访问并调用`foo()`，就好像它自己已经定义过了这个函数一样。
 
-But global variable scope *hoisting* (see the *Scope & Closures* title of this series) does not occur across these boundaries, so the following code would not work (because `foo()`'s declaration isn't yet declared), regardless of if they are (as shown) inline `<script> .. </script>` elements or externally loaded `<script src=..></script>` files:
+但是全局变量作用域 *提升*（参见本系列的 *作用域与闭包*）不会跨越这些界线发生，所以下面的代码将不能工作（因为`foo()`的声明还没有被声明过），无论它们是否是内联的`<script> .. </script>`元素还是外部加载的`<script src=..></script>`文件：
 
 ```html
 <script>foo();</script>
@@ -231,7 +231,7 @@ But global variable scope *hoisting* (see the *Scope & Closures* title of this s
 </script>
 ```
 
-But either of these *would* work instead:
+但是这两个都将 *可以* 工作：
 
 ```html
 <script>
@@ -240,7 +240,7 @@ But either of these *would* work instead:
 </script>
 ```
 
-Or:
+或者：
 
 ```html
 <script>
@@ -250,9 +250,9 @@ Or:
 <script>foo();</script>
 ```
 
-Also, if an error occurs in a `script` element (inline or external), as a separate standalone JS program it will fail and stop, but any subsequent `script`s will run (still with the shared `global`) unimpeded.
+另外，如果在一个`script`元素（内联或者外部的）中发生了一个错误，一个分离的独立的JS程序将会失败并停止，但是任何后续的`script`都将会（依然在共享的`global`中）畅通无阻地运行。
 
-You can create `script` elements dynamically from your code, and inject them into the DOM of the page, and the code in them will behave basically as if loaded normally in a separate file:
+你可以在你的代码中动态地创建`script`元素，并将它们插入到页面的DOM中，它们之中的代码基本上将会像从一个分离的文件中普通地加载那样运行：
 
 ```js
 var greeting = "Hello World";
@@ -265,9 +265,9 @@ el.text = "function foo(){ alert( greeting );\
 document.body.appendChild( el );
 ```
 
-**Note:** Of course, if you tried the above snippet but set `el.src` to some file URL instead of setting `el.text` to the code contents, you'd be dynamically creating an externally loaded `<script src=..></script>` element.
+**注意：** 当然，如果你试一下上面的代码段并将`el.src`设置为某些文件的URL，而非将`el.text`设置为代码内容，你就会动态地创建一个外部加载的`<script src=..></script>`元素。
 
-One difference between code in an inline code block and that same code in an external file is that in the inline code block, the sequence of characters `</script>` cannot appear together, as (regardless of where it appears) it would be interpreted as the end of the code block. So, beware of code like:
+内联代码块中的代码，与在外部文件中的相同的代码之间的一个不同之处是，在内联的代码块中，字符`</script>`的序列不能一起出现，因为（无论它在哪里出现）它将会被翻译为代码块的末尾。所以，小心这样的代码：
 
 ```html
 <script>
@@ -275,17 +275,17 @@ One difference between code in an inline code block and that same code in an ext
 </script>
 ```
 
-It looks harmless, but the `</script>` appearing inside the `string` literal will terminate the script block abnormally, causing an error. The most common workaround is:
+它看起来无害，但是在`string`字面量中出现的`</script>`将会不正常地终结script块，造成一个错误。绕过它最常见的一个方法是：
 
 ```js
 "</sc" + "ript>";
 ```
 
-Also, beware that code inside an external file will be interpreted in the character set (UTF-8, ISO-8859-8, etc.) the file is served with (or the default), but that same code in an inline `script` element in your HTML page will be interpreted by the character set of the page (or its default).
+另外要小心的是，一个外部文件中的代码将会根据和文件一起被提供（或默认的）的字符集编码（UTF-8、ISO-8859-8等等）来翻译，但在内联在你HTML页面中的一个`script`元素中的相同代码将会根据这个页面的（或它默认的）字符集编码来翻译。
 
-**Warning:** The `charset` attribute will not work on inline script elements.
+**警告：** `charset`属性在内联script元素中不能工作。
 
-Another deprecated practice with inline `script` elements is including HTML-style or X(HT)ML-style comments around inline code, like:
+关于内联`script`元素，另一个被废弃的做法是在内联代码的周围引入HTML风格或X(HT)ML风格的注释，就像：
 
 ```html
 <script>
@@ -301,17 +301,17 @@ alert( "World" );
 </script>
 ```
 
-Both of these are totally unnecessary now, so if you're still doing that, stop it!
+这两种东西现在完全是不必要的了，所以如果你还在这么做，停下！
 
-**Note:** Both `<!--` and `-->` (HTML-style comments) are actually specified as valid single-line comment delimiters (`var x = 2; <!-- valid comment` and `--> another valid line comment`) in JavaScript (see the "Web ECMAScript" section earlier), purely because of this old technique. But never use them.
+**注意：** 实际上纯粹是因为这种老技术，JavaScript才把`<!--`和`-->`（HTML风格的注释）两者都被规定为合法的单行注释分隔符（`var x = 2; <!-- valid comment`和`--> another valid line comment`）。永远不要使用它们。
 
-## Reserved Words
+## 保留字
 
-The ES5 spec defines a set of "reserved words" in Section 7.6.1 that cannot be used as standalone variable names. Technically, there are four categories: "keywords", "future reserved words", the `null` literal, and the `true` / `false` boolean literals.
+ES5语言规范在第7.6.1部分中定义了一套“保留字”，它们不能被用作独立的变量名。技术上讲，有四个类别：“关键字”，“未来保留字”，`null`字面量，以及`true`/`false`布尔字面量。
 
-Keywords are the obvious ones like `function` and `switch`. Future reserved words include things like `enum`, though many of the rest of them (`class`, `extends`, etc.) are all now actually used by ES6; there are other strict-mode only reserved words like `interface`.
+像`function`和`switch`这样的关键字是显而易见的。像`enum`之类的未来保留字，虽然它们中的许多（`class`、`extends`等等）现在都已经实际被ES6使用了；但还有另外一些像`interface`之类的仅在strict模式下的保留字。
 
-StackOverflow user "art4theSould" creatively worked all these reserved words into a fun little poem (http://stackoverflow.com/questions/26255/reserved-keywords-in-javascript/12114140#12114140):
+StackOverflow用户“art4theSould”创造性地将这些保留字编成了一首有趣的小诗(http://stackoverflow.com/questions/26255/reserved-keywords-in-javascript/12114140#12114140)：
 
 > Let this long package float,
 > Goto private class if short.
@@ -329,30 +329,30 @@ StackOverflow user "art4theSould" creatively worked all these reserved words int
 > In return for const, true, char
 > …Finally catch byte.
 
-**Note:** This poem includes words that were reserved in ES3 (`byte`, `long`, etc.) that are no longer reserved as of ES5.
+**注意：** 这首诗包含ES3中的保留字（`byte`、`long`等等），它们在ES5中不再被保留了。
 
-Prior to ES5, the reserved words also could not be property names or keys in object literals, but that restriction no longer exists.
+在ES5以前，这些保留字也不能被用于对象字面量中的属性名或键，但这种限制已经不复存在了。
 
-So, this is not allowed:
+所以，这是不允许的：
 
 ```js
 var import = "42";
 ```
 
-But this is allowed:
+但这是允许的：
 
 ```js
 var obj = { import: "42" };
 console.log( obj.import );
 ```
 
-You should be aware though that some older browser versions (mainly older IE) weren't completely consistent on applying these rules, so there are places where using reserved words in object property name locations can still cause issues. Carefully test all supported browser environments.
+你应当小心，有些老版本的浏览器（主要是老IE）没有完全地遵循这些规则，所以有些将保留字用作对象属性名的地方任然会造成问题。小心地测试所有你支持的浏览器环境。
 
-## Implementation Limits
+## 实现的限制
 
-The JavaScript spec does not place arbitrary limits on things such as the number of arguments to a function or the length of a string literal, but these limits exist nonetheless, because of implementation details in different engines.
+JavaScript语言规范没有在诸如函数参数值的个数，或者字符串字面量的长度上做出随意的限制，但是由于不同引擎的实现细节，无论如何这些限制是存在的。
 
-For example:
+例如：
 
 ```js
 function addAll() {
@@ -369,27 +369,27 @@ for (var i=1; i < 100000; i++) {
 }
 
 addAll( 2, 4, 6 );				// 12
-addAll.apply( null, nums );		// should be: 499950000
+addAll.apply( null, nums );		// 应该是：499950000
 ```
 
-In some JS engines, you'll get the correct `499950000` answer, but in others (like Safari 6.x), you'll get the error: "RangeError: Maximum call stack size exceeded."
+在某些JS引擎中，你将会得到正确答案`499950000`，但在另一些引擎中（比如Safari 6.x），你会得到一个错误：“RangeError: Maximum call stack size exceeded.”
 
-Examples of other limits known to exist:
+已知存在的其他限制的例子：
 
-* maximum number of characters allowed in a string literal (not just a string value)
-* size (bytes) of data that can be sent in arguments to a function call (aka stack size)
-* number of parameters in a function declaration
-* maximum depth of non-optimized call stack (i.e., with recursion): how long a chain of function calls from one to the other can be
-* number of seconds a JS program can run continuously blocking the browser
-* maximum length allowed for a variable name
+* 在字符串字面量（不是一个字符串变量）中允许出现的最大字符个数
+* 在一个函数调用的参数值中可以发送的数据的大小（字节数，也称为栈的大小）
+* 在一个函数声明中的参数数量
+* 没有经过优化的调用栈最大深度（比如，使用递归时）：从一个函数到另一个函数的调用链能有多长
+* JS程序可以持续运行并阻塞浏览器的秒数
+* 变量名的最大长度
 * ...
 
-It's not very common at all to run into these limits, but you should be aware that limits can and do exist, and importantly that they vary between engines.
+遭遇这些限制不是非常常见，但你应当知道这些限制存在并确实会发生，而且重要的是它们因引擎不同而不同。
 
-## Review
+## 复习
 
-We know and can rely upon the fact that the JS language itself has one standard and is predictably implemented by all the modern browsers/engines. This is a very good thing!
+我们知道并且可以依赖于这样的事实：JS语言本身拥有一个标准，而且这个标准可预见地被所有现代浏览器/引擎实现了。这是非常好的一件事！
 
-But JavaScript rarely runs in isolation. It runs in an environment mixed in with code from third-party libraries, and sometimes it even runs in engines/environments that differ from those found in browsers.
+但是JavaScript几乎不会与世隔绝地运行。它会运行在混合了第三方库的环境中运行，而且有时甚至会在不同浏览器中不同的引擎/环境中运行。
 
-Paying close attention to these issues improves the reliability and robustness of your code.
+对这些问题多加注意，会改进你代码的可靠性和健壮性。

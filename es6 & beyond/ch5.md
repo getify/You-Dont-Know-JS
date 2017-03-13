@@ -1,58 +1,58 @@
-# You Don't Know JS: ES6 & Beyond
-# Chapter 5: Collections
+# 你不懂JS：ES6与未来
+# 第五章：集合
 
-Structured collection and access to data is a critical component of just about any JS program. From the beginning of the language up to this point, the array and the object have been our primary mechanism for creating data structures. Of course, many higher-level data structures have been built on top of these, as user-land libraries.
+结构化的集合与数据访问对于任何JS程序来说都是一个关键组成部分。从这门语言的最开始到现在，数组和对象一直都是我们创建数据结构的主要机制。当然，许多更高级的数据结构作为用户方的库都曾建立在这些之上。
 
-As of ES6, some of the most useful (and performance-optimizing!) data structure abstractions have been added as native components of the language.
+到了ES6，最有用（而且优化性能的！）的数据结构抽象中的一些已经作为这门语言的原生组件被加入了进来。
 
-We'll start this chapter first by looking at *TypedArrays*, technically contemporary to ES5 efforts several years ago, but only standardized as companions to WebGL and not JavaScript itself. As of ES6, these have been adopted directly by the language specification, which gives them first-class status.
+我们将通过检视 *类型化数组（TypedArrays）* 来开始这一章，技术上讲它与几年前的ES5是同一时期的产物，但是仅仅作为WebGL的同伴被标准化了，而不是作为JavaScript自身的一部分。到了ES6，这些东西已经被语言规范直接采纳了，这给予了它们头等的地位。
 
-Maps are like objects (key/value pairs), but instead of just a string for the key, you can use any value -- even another object or map! Sets are similar to arrays (lists of values), but the values are unique; if you add a duplicate, it's ignored. There are also weak (in relation to memory/garbage collection) counterparts: WeakMap and WeakSet.
+Map就像对象（键/值对），但是与仅能使用一个字符串作为键不同的是，你可以使用任何值 —— 即使是另一个对象或map！Set与数组很相似（值的列表），但是这些值都是唯一的；如果你添加一个重复的值，它会被忽略。还有与之相对应的weak结构（与内存/垃圾回收有关联）：WeakMap和WeakSet。
 
-## TypedArrays
+## 类型化数组（TypedArrays）
 
-As we cover in the *Types & Grammar* title of this series, JS does have a set of built-in types, like `number` and `string`. It'd be tempting to look at a feature named "typed array" and assume it means an array of a specific type of values, like an array of only strings.
+正如我们在本系列的 *类型与文法* 中讲到过的，JS确实拥有一组内建类型，比如`number`和`string`。看到一个称为“类型化的数组”的特性，可能会诱使你推测它意味着一个特定类型的值的数组，比如一个仅含字符串的数组。
 
-However, typed arrays are really more about providing structured access to binary data using array-like semantics (indexed access, etc.). The "type" in the name refers to a "view" layered on type of the bucket of bits, which is essentially a mapping of whether the bits should be viewed as an array of 8-bit signed integers, 16-bit signed integers, and so on.
+然而，类型化数组其实更多的是关于使用类似数组的语义（索引访问，等等）提供对二进制数据的结构化访问。名称中的“类型”指的是在大量二进制位（比特桶）的类型之上覆盖的“视图”，它实质上是一个映射，控制着这些二进制位是否应当被看作8位有符号整数的数组，还是被看作16位有符号整数的数组，等等。
 
-How do you construct such a bit-bucket? It's called a "buffer," and you construct it most directly with the `ArrayBuffer(..)` constructor:
+你怎样才能构建这样的比特桶呢？它被称为一个“缓冲（buffer）”，而你可以用`ArrayBuffer(..)`构造器直接地构建它：
 
 ```js
 var buf = new ArrayBuffer( 32 );
 buf.byteLength;							// 32
 ```
 
-`buf` is now a binary buffer that is 32-bytes long (256-bits), that's pre-initialized to all `0`s. A buffer by itself doesn't really allow you any interaction except for checking its `byteLength` property.
+现在`buf`是一个长度为32字节（256比特）的二进制缓冲，它被预初始化为全`0`。除了检查它的`byteLength`属性，一个缓冲本身不会允许你进行任何操作。
 
-**Tip:** Several web platform features use or return array buffers, such as `FileReader#readAsArrayBuffer(..)`, `XMLHttpRequest#send(..)`, and `ImageData` (canvas data).
+**提示：** 有几种web平台特性都使用或返回缓冲，比如`FileReader#readAsArrayBuffer(..)`，`XMLHttpRequest#send(..)`，和`ImageData`（canvas数据）。
 
-But on top of this array buffer, you can then layer a "view," which comes in the form of a typed array. Consider:
+但是在这个数组缓冲的上面，你可以平铺一层“视图”，它就是用类型化数组的形式表现的。考虑如下代码：
 
 ```js
 var arr = new Uint16Array( buf );
 arr.length;							// 16
 ```
 
-`arr` is a typed array of 16-bit unsigned integers mapped over the 256-bit `buf` buffer, meaning you get 16 elements.
+`arr`是一个256位的`buf`缓冲在16位无符号整数的类型化数组的映射，意味着你得到16个元素。
 
-### Endianness
+### 字节顺序
 
-It's very important to understand that the `arr` is mapped using the endian-setting (big-endian or little-endian) of the platform the JS is running on. This can be an issue if the binary data is created with one endianness but interpreted on a platform with the opposite endianness.
+明白一个事实非常重要：`arr`是使用JS所运行的平台的字节顺序设定（大端法或小端法）被映射的。如果二进制数据是由一种字节顺序创建，但是在一个拥有相反字节数序的平台被解释时，这就可能是个问题。
 
-Endian means if the low-order byte (collection of 8-bits) of a multi-byte number -- such as the 16-bit unsigned ints we created in the earlier snippet -- is on the right or the left of the number's bytes.
+字节顺序指的是一个多字节数字的低位字节（8个比特位的集合） —— 比如我们在早先的代码段中创建的16位无符号整数 —— 是在这个数字的字节序列的左边还是右边。
 
-For example, let's imagine the base-10 number `3085`, which takes 16-bits to represent. If you have just one 16-bit number container, it'd be represented in binary as `0000110000001101` (hexadecimal `0c0d`) regardless of endianness.
+举个例子，让我们想象一下用16位来表示的10进制的数字`3085`。如果你只有一个16位数字的容器，无论字节顺序怎样它都将以二进制表示为`0000110000001101`（十六进制的`0c0d`）。
 
-But if `3085` was represented with two 8-bit numbers, the endianness would significantly affect its storage in memory:
+但是如果`3085`使用两个8位数字来表示的话，字节顺序就像会极大地影响它在内存中的存储：
 
-* `0000110000001101` / `0c0d` (big endian)
-* `0000110100001100` / `0d0c` (little endian)
+* `0000110000001101` / `0c0d` （大端法）
+* `0000110100001100` / `0d0c` （小端法）
 
-If you received the bits of `3085` as `0000110100001100` from a little-endian system, but you layered a view on top of it in a big-endian system, you'd instead see value `3340` (base-10) and `0d0c` (base-16).
+如果你从一个小端法系统中收到表示为`0000110100001100`的`3085`，但是在一个大端法系统中为它上面铺一层视图，那么你将会看到值`3340`（10进制）和`0d0c`（16进制）。
 
-Little endian is the most common representation on the web these days, but there are definitely browsers where that's not true. It's important that you understand the endianness of both the producer and consumer of a chunk of binary data.
+如今在web上最常见的表现形式是小端法，但是绝对存在一些与此不同的浏览器。你明白一块二进制数据的生产者和消费者的字节顺序是十分重要的。
 
-From MDN, here's a quick way to test the endianness of your JavaScript:
+在MDN上有一种快速的方法测试你的JavaScript的字节顺序：
 
 ```js
 var littleEndian = (function() {
@@ -62,13 +62,13 @@ var littleEndian = (function() {
 })();
 ```
 
-`littleEndian` will be `true` or `false`; for most browsers, it should return `true`. This test uses `DataView(..)`, which allows more low-level, fine-grained control over accessing (setting/getting) the bits from the view you layer over the buffer. The third parameter of the `setInt16(..)` method in the previous snippet is for telling the `DataView` what endianness you're wanting it to use for that operation.
+`littleEndian`将是`true`或`false`；对大多数浏览器来说，它应当返回`true`。这个测试使用`DataView(..)`，它允许更底层，更精细地控制如何从你平铺在缓冲上的视图中访问二进制位。前面代码段中的`setInt16(..)`方法的第三个参数告诉`DataView`，对于这个操作你想使用什么字节顺序。
 
-**Warning:** Do not confuse endianness of underlying binary storage in array buffers with how a given number is represented when exposed in a JS program. For example, `(3085).toString(2)` returns `"110000001101"`, which with an assumed leading four `"0"`s appears to be the big-endian representation. In fact, this representation is based on a single 16-bit view, not a view of two 8-bit bytes. The `DataView` test above is the best way to determine endianness for your JS environment.
+**警告：** 不要将一个数组缓冲中底层的二进制存储的字节顺序与一个数字在JS程序中被暴露时如何被表示搞混。举例来说，`(3085).toString(2)`返回`"110000001101"`，它被假定前面有四个`"0"`因而是大端法表现形式。事实上，这个表现形式是基于一个单独的16位视图的，而不是两个8位字节的视图。上面的`DataView`测试是确定你的JS环境的字节顺序的最佳方法。
 
-### Multiple Views
+### 多视图
 
-A single buffer can have multiple views attached to it, such as:
+一个单独的缓冲可以连接多个视图，例如：
 
 ```js
 var buf = new ArrayBuffer( 2 );
@@ -83,7 +83,7 @@ view8[1];						// 12
 view8[0].toString( 16 );		// "d"
 view8[1].toString( 16 );		// "c"
 
-// swap (as if endian!)
+// 调换（好像字节顺序一样！）
 var tmp = view8[0];
 view8[0] = view8[1];
 view8[1] = tmp;
@@ -91,11 +91,11 @@ view8[1] = tmp;
 view16[0];						// 3340
 ```
 
-The typed array constructors have multiple signature variations. We've shown so far only passing them an existing buffer. However, that form also takes two extra parameters: `byteOffset` and `length`. In other words, you can start the typed array view at a location other than `0` and you can make it span less than the full length of the buffer.
+类型化数组的构造器拥有多种签名。目前我们展示过的只是向它们传递一个既存的缓冲。然而，这种形式还接受两个额外的参数：`byteOffset`和`length`。换句话讲，你可以从`0`以外的位置开始类型化数组视图，也可以使它的长度小于整个缓冲的长度。
 
-If the buffer of binary data includes data in non-uniform size/location, this technique can be quite useful.
+如果二进制数据的缓冲包含规格不一的大小/位置，这种技术可能十分有用。
 
-For example, consider a binary buffer that has a 2-byte number (aka "word") at the beginning, followed by two 1-byte numbers, followed by a 32-bit floating point number. Here's how you can access that data with multiple views on the same buffer, offsets, and lengths:
+例如，考虑一个这样的二进制缓冲：在开头拥有一个2字节数字（也叫做“字”），紧跟着两个1字节数字，然后跟着一个32位浮点数。这是你如何在同一个缓冲，偏移量，和长度上使用多视图来访问数据：
 
 ```js
 var first = new Uint16Array( buf, 0, 2 )[0],
@@ -104,28 +104,28 @@ var first = new Uint16Array( buf, 0, 2 )[0],
 	fourth = new Float32Array( buf, 4, 4 )[0];
 ```
 
-### TypedArray Constructors
+### 类型化数组构造器
 
-In addition to the `(buffer,[offset, [length]])` form examined in the previous section, typed array constructors also support these forms:
+除了前一节我们检视的`(buffer,[offset, [length]])`形式之外，类型化数组的构造器还支持这些形式：
 
-* [constructor]`(length)`: Creates a new view over a new buffer of `length` bytes
-* [constructor]`(typedArr)`: Creates a new view and buffer, and copies the contents from the `typedArr` view
-* [constructor]`(obj)`: Creates a new view and buffer, and iterates over the array-like or object `obj` to copy its contents
+* [constructor]`(length)`：在一个长度为`length`字节的缓冲上创建一个新视图
+* [constructor]`(typedArr)`：创建一个新视图和缓冲，并拷贝`typedArr`视图中的内容
+* [constructor]`(obj)`：创建一个新视图和缓冲，并迭代类数组或对象`obj`来拷贝它的内容
 
-The following typed array constructors are available as of ES6:
+在ES6中可以使用下面的类型化数组构造器：
 
-* `Int8Array` (8-bit signed integers), `Uint8Array` (8-bit unsigned integers)
-	- `Uint8ClampedArray` (8-bit unsigned integers, each value clamped on setting to the `0`-`255` range)
-* `Int16Array` (16-bit signed integers), `Uint16Array` (16-bit unsigned integers)
-* `Int32Array` (32-bit signed integers), `Uint32Array` (32-bit unsigned integers)
-* `Float32Array` (32-bit floating point, IEEE-754)
-* `Float64Array` (64-bit floating point, IEEE-754)
+* `Int8Array`（8位有符号整数），`Uint8Array`（8位无符号整数）
+	- `Uint8ClampedArray`（8位无符号整数，每个值都被卡在`0 - 255`范围内）
+* `Int16Array`（16位有符号整数），`Uint16Array`（16位无符号整数）
+* `Int32Array`（32位有符号整数），`Uint32Array`（32位无符号整数）
+* `Float32Array`（32位浮点数，IEEE-754）
+* `Float64Array`（64位浮点数，IEEE-754）
 
-Instances of typed array constructors are almost the same as regular native arrays. Some differences include having a fixed length and the values all being of the same "type."
+类型化数组构造器的实例基本上和原生的普通数组是一样的。一些区别包括它有一个固定的长度并且值都是同种“类型”。
 
-However, they share most of the same `prototype` methods. As such, you likely will be able to use them as regular arrays without needing to convert.
+但是，它们共享绝大多数相同的`prototype`方法。这样一来，你很可能将会像普通数组那样使用它们而不必进行转换。
 
-For example:
+例如：
 
 ```js
 var a = new Int32Array( 3 );
@@ -142,11 +142,11 @@ a.join( "-" );
 // "10-20-30"
 ```
 
-**Warning:** You can't use certain `Array.prototype` methods with TypedArrays that don't make sense, such as the mutators (`splice(..)`, `push(..)`, etc.) and `concat(..)`.
+**警告：** 你不能对类型化数组使用没有意义的特定`Array.prototype`方法，比如修改器（`splice(..)`，`push(..)`，等等）和`concat(..)`。
 
-Be aware that the elements in TypedArrays really are constrained to the declared bit sizes. If you have a `Uint8Array` and try to assign something larger than an 8-bit value into one of its elements, the value wraps around so as to stay within the bit length.
+要小心，在类型化数组中的元素被限制在它被声明的位长度中。如果你有一个`Uint8Array`并试着向它的一个元素赋予某些大于8为的值，那么这个值将被截断以保持在相应的位长度中。
 
-This could cause problems if you were trying to, for instance, square all the values in a TypedArray. Consider:
+这可能造成一些问题，例如，如果你试着对一个类型化数组中的所有值求平方。考虑如下代码：
 
 ```js
 var a = new Uint8Array( 3 );
@@ -161,7 +161,7 @@ var b = a.map( function(v){
 b;				// [100, 144, 132]
 ```
 
-The `20` and `30` values, when squared, resulted in bit overflow. To get around such a limitation, you can use the `TypedArray#from(..)` function:
+在被平方后，值`20`和`30`的结果会位溢出。要绕过这样的限制，你可以使用`TypedArray#from(..)`函数：
 
 ```js
 var a = new Uint8Array( 3 );
@@ -176,9 +176,9 @@ var b = Uint16Array.from( a, function(v){
 b;				// [100, 400, 900]
 ```
 
-See the "`Array.from(..)` Static Function" section in Chapter 6 for more information about the `Array.from(..)` that is shared with TypedArrays. Specifically, the "Mapping" section explains the mapping function accepted as its second argument.
+关于被类型化数组所共享的`Array.from(..)`函数的更多信息，参见第六章的“`Array.from(..)`静态方法”一节。特别地，“映射”一节讲解了作为第二个参数值被接受的映射函数。
 
-One interesting behavior to consider is that TypedArrays have a `sort(..)` method much like regular arrays, but this one defaults to numeric sort comparisons instead of coercing values to strings for lexicographic comparison. For example:
+一个值得考虑的有趣行为是，类型化数组像普通数组一样有一个`sort(..)`方法，但是这个方法默认是数字排序比较而不是将值强制转换为字符串进行字典顺序比较。例如：
 
 ```js
 var a = [ 10, 1, 2, ];
@@ -188,13 +188,13 @@ var b = new Uint8Array( [ 10, 1, 2 ] );
 b.sort();								// [1,2,10]
 ```
 
-The `TypedArray#sort(..)` takes an optional compare function argument just like `Array#sort(..)`, which works in exactly the same way.
+就像`Array#sort(..)`一样，`TypedArray#sort(..)`接收一个可选的比较函数作为参数值，它们的工作方式完全一样。
 
 ## Maps
 
-If you have a lot of JS experience, you know that objects are the primary mechanism for creating unordered key/value-pair data structures, otherwise known as maps. However, the major drawback with objects-as-maps is the inability to use a non-string value as the key.
+如果你对JS经验丰富，那么你一定知道对象是创建无序键/值对数据结构的主要机制，这也被称为map。然而，将对象作为map的主要缺陷是不能使用一个非字符串值作为键。
 
-For example, consider:
+例如，考虑如下代码：
 
 ```js
 var m = {};
@@ -209,9 +209,9 @@ m[x];							// "bar"
 m[y];							// "bar"
 ```
 
-What's going on here? The two objects `x` and `y` both stringify to `"[object Object]"`, so only that one key is being set in `m`.
+这里发生了什么？`x`和`y`这两个对象都被字符串化为`"[object Object]"`，所以只有这一个键被设置为`m`。
 
-Some have implemented fake maps by maintaining a parallel array of non-string keys alongside an array of the values, such as:
+一些人通过在一个值的数组旁边同时维护一个平行的非字符串键的数组实现了山寨的map，比如：
 
 ```js
 var keys = [], vals = [];
@@ -232,9 +232,9 @@ keys[1] === y;					// true
 vals[1];						// "bar"
 ```
 
-Of course, you wouldn't want to manage those parallel arrays yourself, so you could define a data structure with methods that automatically do the management under the covers. Besides having to do that work yourself, the main drawback is that access is no longer O(1) time-complexity, but instead is O(n).
+当然，你不会想亲自管理这些平行数组，所以你可能会定义一个数据解构，使它内部带有自动管理的方法。除了你不得不自己做这些工作，主要的缺陷是访问的时间复杂度不再是O(1)，而是O(n)。
 
-But as of ES6, there's no longer any need to do this! Just use `Map(..)`:
+但在ES6中，不再需要这么做了！使用`Map(..)`就好：
 
 ```js
 var m = new Map();
@@ -249,9 +249,9 @@ m.get( x );						// "foo"
 m.get( y );						// "bar"
 ```
 
-The only drawback is that you can't use the `[ ]` bracket access syntax for setting and retrieving values. But `get(..)` and `set(..)` work perfectly suitably instead.
+唯一的缺点是你不能使用`[]`方括号访问语法来设置或取得值。但是`get(..)`和`set(..)`可以完美地取代这种语法。
 
-To delete an element from a map, don't use the `delete` operator, but instead use the `delete(..)` method:
+要从一个map中删除一个元素，不要使用`delete`操作符，而是使用`delete(..)`方法：
 
 ```js
 m.set( x, "foo" );
@@ -260,7 +260,7 @@ m.set( y, "bar" );
 m.delete( y );
 ```
 
-You can clear the entire map's contents with `clear()`. To get the length of a map (i.e., the number of keys), use the `size` property (not `length`):
+使用`clear()`你可清空整个map的内容。要得到map的长度（也就是，键的数量），使用`size`属性（不是`length`）。
 
 ```js
 m.set( x, "foo" );
@@ -271,18 +271,18 @@ m.clear();
 m.size;							// 0
 ```
 
-The `Map(..)` constructor can also receive an iterable (see "Iterators" in Chapter 3), which must produce a list of arrays, where the first item in each array is the key and the second item is the value. This format for iteration is identical to that produced by the `entries()` method, explained in the next section. That makes it easy to make a copy of a map:
+`Map(..)`的构造器还可以接受一个可迭代对象（参见第三章的“迭代器”），它必须产生一个数组的列表，每个数组的第一个元素是键，第二元素是值。这种用于迭代的格式与`entries()`方法产生的格式是一样的，`entries()`方法将在下一节中讲解。这使得制造一个map的拷贝十分简单：
 
 ```js
 var m2 = new Map( m.entries() );
 
-// same as:
+// 等同于：
 var m2 = new Map( m );
 ```
 
-Because a map instance is an iterable, and its default iterator is the same as `entries()`, the second shorter form is more preferable.
+因为一个map实例是一个可迭代对象，而且它的默认迭代器与`entries()`相同，第二种稍短的形式更理想。
 
-Of course, you can just manually specify an *entries* list (array of key/value arrays) in the `Map(..)` constructor form:
+当然，你可以在`Map(..)`构造器形式中手动指定一个 *entries* 列表：
 
 ```js
 var x = { id: 1 },
@@ -297,9 +297,9 @@ m.get( x );						// "foo"
 m.get( y );						// "bar"
 ```
 
-### Map Values
+### Map 值
 
-To get the list of values from a map, use `values(..)`, which returns an iterator. In Chapters 2 and 3, we covered various ways to process an iterator sequentially (like an array), such as the `...` spread operator and the `for..of` loop. Also, "Arrays" in Chapter 6 covers the `Array.from(..)` method in detail. Consider:
+要从一个map得到值的列表，使用`values(..)`，它返回一个迭代器。在第二和第三章，我们讲解了几种序列化（像一个数组那样）处理一个迭代器的方法，比如`...`扩散操作符和`for..of`循环。另外，第六章的“Arrays”将会详细讲解`Array.from(..)`方法。考虑如下代码：
 
 ```js
 var m = new Map();
@@ -316,7 +316,7 @@ vals;							// ["foo","bar"]
 Array.from( m.values() );		// ["foo","bar"]
 ```
 
-As discussed in the previous section, you can iterate over a map's entries using `entries()` (or the default map iterator). Consider:
+就像在前一节中讨论过的，你可以使用`entries()`（或者默认的map迭代器）迭代一个map的记录。考虑如下代码：
 
 ```js
 var m = new Map();
@@ -336,9 +336,9 @@ vals[1][0] === y;				// true
 vals[1][1];						// "bar"
 ```
 
-### Map Keys
+### Map 键
 
-To get the list of keys, use `keys()`, which returns an iterator over the keys in the map:
+要得到键的列表，使用`keys()`，它返回一个map中键的迭代器：
 
 ```js
 var m = new Map();
@@ -355,7 +355,7 @@ keys[0] === x;					// true
 keys[1] === y;					// true
 ```
 
-To determine if a map has a given key, use `has(..)`:
+要判定一个map中是否拥有一个给定的键，使用`has(..)`：
 
 ```js
 var m = new Map();
@@ -369,19 +369,19 @@ m.has( x );						// true
 m.has( y );						// false
 ```
 
-Maps essentially let you associate some extra piece of information (the value) with an object (the key) without actually putting that information on the object itself.
+实质上map让你将一些额外的信息（值）与一个对象（键）相关联，而不用实际上将这些信息放在对象本身中。
 
-While you can use any kind of value as a key for a map, you typically will use objects, as strings and other primitives are already eligible as keys of normal objects. In other words, you'll probably want to continue to use normal objects for maps unless some or all of the keys need to be objects, in which case map is more appropriate.
+虽然在一个map中你可以使用任意种类的值作为键，但是你经常使用的将是对象，就像字符串和其他在普通对象中可以合法地作为键的基本类型。换句话说，你可能将想要继续使用普通对象，除非一些或全部的键需要是对象，在那种情况下map更合适。
 
-**Warning:** If you use an object as a map key and that object is later discarded (all references unset) in attempt to have garbage collection (GC) reclaim its memory, the map itself will still retain its entry. You will need to remove the entry from the map for it to be GC-eligible. In the next section, we'll see WeakMaps as a better option for object keys and GC.
+**警告：** 如果你使用一个对象作为一个map键，而且这个对象稍后为了能够被垃圾回收器（GC）回收它占用的内存而被丢弃（解除所有的引用），那么map本身将依然持有它的记录。你需要从map中移除这个记录来使它能够被垃圾回收。在下一节中，我们将看到对于作为对象键和GC来说更好的选择 —— WeakMaps。
 
 ## WeakMaps
 
-WeakMaps are a variation on maps, which has most of the same external behavior but differs underneath in how the memory allocation (specifically its GC) works.
+WeakMap是map的一个变种，它们的大多数外部行为是相同的，而在底层内存分配（明确地说是它的GC）如何工作上有区别。
 
-WeakMaps take (only) objects as keys. Those objects are held *weakly*, which means if the object itself is GC'd, the entry in the WeakMap is also removed. This isn't observable behavior, though, as the only way an object can be GC'd is if there's no more references to it -- once there are no more references to it, you have no object reference to check if it exists in the WeakMap.
+WeakMap（仅）接收对象作为键。这些对象被 *弱* 持有，这意味着如果对象本身被垃圾回收掉了，那么在WeakMap中的记录也会被移除。这是观察不到的，因为一个对象可以被垃圾回收的唯一方法是不再有指向它的引用 —— 一旦不再有指向它的引用，你就没有对象引用可以用来检查它是否存在于这个WeakMap中。
 
-Otherwise, the API for WeakMap is similar, though more limited:
+除此以外，WeakMap的API是相似的，虽然限制更多：
 
 ```js
 var m = new WeakMap();
@@ -395,11 +395,11 @@ m.has( x );						// true
 m.has( y );						// false
 ```
 
-WeakMaps do not have a `size` property or `clear()` method, nor do they expose any iterators over their keys, values, or entries. So even if you unset the `x` reference, which will remove its entry from `m` upon GC, there is no way to tell. You'll just have to take JavaScript's word for it!
+WeakMap没有`size`属性和`clear()`方法，它们也不对它们的键，值和记录暴露任何迭代器。所以即便你解除了`x`引用，它将会因GC从`m`中移除它的记录，也没有办法确定这一事实。你只能相信JavaScript会这么做！
 
-Just like Maps, WeakMaps let you soft-associate information with an object. But they are particularly useful if the object is not one you completely control, such as a DOM element. If the object you're using as a map key can be deleted and should be GC-eligible when it is, then a WeakMap is a more appropriate option.
+就像map一样，WeakMap让你将信息与一个对象软关联。如果你不能完全控制这个对象，比如DOM元素，它们就特别有用。如果你用做map键的对象可以被删除并且应当在被删除时成为GC的回收对象，那么一个WeakMap就是更合适的选项。
 
-It's important to note that a WeakMap only holds its *keys* weakly, not its values. Consider:
+要注意的是WeakMap只弱持有它的 *键*，而不是它的值。考虑如下代码：
 
 ```js
 var m = new WeakMap();
@@ -411,24 +411,23 @@ var x = { id: 1 },
 
 m.set( x, y );
 
-x = null;						// { id: 1 } is GC-eligible
-y = null;						// { id: 2 } is GC-eligible
-								// only because { id: 1 } is
+x = null;						// { id: 1 } 是可以GC的
+y = null;						// 由于 { id: 1 } 是可以GC的，因此 { id: 2 } 也可以
 
 m.set( z, w );
 
-w = null;						// { id: 4 } is not GC-eligible
+w = null;						// { id: 4 } 不可以GC
 ```
 
-For this reason, WeakMaps are in my opinion better named "WeakKeyMaps."
+因此，我认为WeakMap被命名为“WeakKeyMap”更好。
 
 ## Sets
 
-A set is a collection of unique values (duplicates are ignored).
+一个set是一个集合，其中的值都是唯一的（重复的会被忽略）。
 
-The API for a set is similar to map. The `add(..)` method takes the place of the `set(..)` method (somewhat ironically), and there is no `get(..)` method.
+set的API与map很相似。`add(..)`方法（有点讽刺地）取代了`set(..)`，而且没有`get(..)`方法。
 
-Consider:
+考虑如下代码：
 
 ```js
 var s = new Set();
@@ -449,7 +448,7 @@ s.clear();
 s.size;							// 0
 ```
 
-The `Set(..)` constructor form is similar to `Map(..)`, in that it can receive an iterable, like another set or simply an array of values. However, unlike how `Map(..)` expects *entries* list (array of key/value arrays), `Set(..)` expects a *values* list (array of values):
+`Set(..)`构造器形式与`Map(..)`相似，它可以接收一个可迭代对象，比如另一个set或者一个值的数组。但是，与`Map(..)`期待一个 *记录* 的列表（键/值数组的数组）不同的是，`Set(..)`期待一个 *值* 的列表（值的数组）：
 
 ```js
 var x = { id: 1 },
@@ -458,7 +457,7 @@ var x = { id: 1 },
 var s = new Set( [x,y] );
 ```
 
-A set doesn't need a `get(..)` because you don't retrieve a value from a set, but rather test if it is present or not, using `has(..)`:
+一个set不需要`get(..)`，因为你不会从一个set中取得值，而是使用`has(..)`测试一个值是否存在：
 
 ```js
 var s = new Set();
@@ -472,11 +471,11 @@ s.has( x );						// true
 s.has( y );						// false
 ```
 
-**Note:** The comparison algorithm in `has(..)` is almost identical to `Object.is(..)` (see Chapter 6), except that `-0` and `0` are treated as the same rather than distinct.
+**注意：** `has(..)`中的比较算法与`Object.is(..)`（见第六章）几乎完全相同，除了`-0`和`0`被视为相同而非不同。
 
-### Set Iterators
+### Set 迭代器
 
-Sets have the same iterator methods as maps. Their behavior is different for sets, but symmetric with the behavior of map iterators. Consider:
+set和map一样拥有相同的迭代器方法。set的行为有所不同，但是与map的迭代器的行为是对称的。考虑如下代码：
 
 ```js
 var s = new Set();
@@ -502,9 +501,9 @@ entries[1][0] === y;
 entries[1][1] === y;
 ```
 
-The `keys()` and `values()` iterators both yield a list of the unique values in the set. The `entries()` iterator yields a list of entry arrays, where both items of the array are the unique set value. The default iterator for a set is its `values()` iterator.
+`keys()`和`values()`迭代器都会给出set中唯一值的列表。`entries()`迭代器给出记录数组的列表，记录数组中的两个元素都是唯一的set值。一个set的默认迭代器是它的`values()`迭代器。
 
-The inherent uniqueness of a set is its most useful trait. For example:
+一个set天生的唯一性是它最有用的性质。例如：
 
 ```js
 var s = new Set( [1,2,3,4,"1",2,4,"5"] ),
@@ -513,11 +512,11 @@ var s = new Set( [1,2,3,4,"1",2,4,"5"] ),
 uniques;						// [1,2,3,4,"1","5"]
 ```
 
-Set uniqueness does not allow coercion, so `1` and `"1"` are considered distinct values.
+set的唯一性不允许强制转换，所以`1`和`"1"`被认为是不同的值。
 
 ## WeakSets
 
-Whereas a WeakMap holds its keys weakly (but its values strongly), a WeakSet holds its values weakly (there aren't really keys).
+一个WeakMap弱持有它的键（但强持有它的值），而一个WeakSet弱持有它的值（不存在真正的键）。
 
 ```js
 var s = new WeakSet();
@@ -528,18 +527,18 @@ var x = { id: 1 },
 s.add( x );
 s.add( y );
 
-x = null;						// `x` is GC-eligible
-y = null;						// `y` is GC-eligible
+x = null;						// `x` 可以GC
+y = null;						// `y` 可以GC
 ```
 
-**Warning:** WeakSet values must be objects, not primitive values as is allowed with sets.
+**警告：** WeakSet的值必须是对象，在set中被允许的基本类型值是不行的。
 
-## Review
+## 复习
 
-ES6 defines a number of useful collections that make working with data in structured ways more efficient and effective.
+ES6定义了几种有用的集合，它们使得处理解构化的数据更加高效和有效。
 
-TypedArrays provide "view"s of binary data buffers that align with various integer types, like 8-bit unsigned integers and 32-bit floats. The array access to binary data makes operations much easier to express and maintain, which enables you to more easily work with complex data like video, audio, canvas data, and so on.
+类型化数组提供了二进制数据缓冲的“视图”，它使用各种整数类型对齐，比如8位无符号整数和32位浮点数。二进制数据的数组访问使得操作更加容易表达和维护，它可以让你更简单地处理如视频，音频，canvas数据等复杂的数组。
 
-Maps are key-value pairs where the key can be an object instead of just a string/primitive. Sets are unique lists of values (of any type).
+Map是键-值对集合，它的键可以是对象而非只可以是字符串/基本类型。Set是（任何类型的）唯一值的列表。
 
-WeakMaps are maps where the key (object) is weakly held, so that GC is free to collect the entry if it's the last reference to an object. WeakSets are sets where the value is weakly held, again so that GC can remove the entry if it's the last reference to that object.
+WeakMap是键（对象）被弱持有的map，所以如果它是最后一个指向这个对象的引用，GC就可以自由地回收这个记录。WeakSet是值被弱持有的set，所以同样地，如果它是最后一个指向这个对象的引用，GC就可以移除这个记录。

@@ -1,253 +1,252 @@
-# You Don't Know JS: Async & Performance
-# Chapter 6: Benchmarking & Tuning
+# 你不懂JS: 异步与性能
+# 第六章: 基准分析与调优
 
-As the first four chapters of this book were all about performance as a coding pattern (asynchrony and concurrency), and Chapter 5 was about performance at the macro program architecture level, this chapter goes after the topic of performance at the micro level, focusing on single expressions/statements.
+本书的前四章都是关于代码模式（异步与同步）的性能，而第五章是关于宏观的程序结构层面的性能，本章从微观层面继续性能的话题，关注的焦点在一个表达式/语句上。
 
-One of the most common areas of curiosity -- indeed, some developers can get quite obsessed about it -- is in analyzing and testing various options for how to write a line or chunk of code, and which one is faster.
+好奇心的一个最常见的领域——确实，一些开发者十分痴迷于此——是分析和测试如何写一行或一块儿代码的各种选项，看哪一个更快。
 
-We're going to look at some of these issues, but it's important to understand from the outset that this chapter is **not** about feeding the obsession of micro-performance tuning, like whether some given JS engine can run `++a` faster than `a++`. The more important goal of this chapter is to figure out what kinds of JS performance matter and which ones don't, *and how to tell the difference*.
+我们将会看到这些问题中的一些，但重要的是要理解从最开始这一章就 **不是** 为了满足对微性能调优的痴迷，比如某种给定的JS引擎运行`++a`是否要比运行`a++`快。这一章更重要的目标是，搞清楚哪种JS性能要紧而哪种不要紧，*和如何指出这种不同*。
 
-But even before we get there, we need to explore how to most accurately and reliably test JS performance, because there's tons of misconceptions and myths that have flooded our collective cult knowledge base. We've got to sift through all that junk to find some clarity.
+但在我们达到目的之前，我们需要探索一下如何最准确和最可靠地测试JS性能，因为有太多的误解和谜题充斥着我们集体主义崇拜的知识库。我们需要将这些垃圾筛出去以便找到清晰的答案。
 
-## Benchmarking
+## 基准分析（Benchmarking）
 
-OK, time to start dispelling some misconceptions. I'd wager the vast majority of JS developers, if asked to benchmark the speed (execution time) of a certain operation, would initially go about it something like this:
+好了，是时候开始消除一些误解了。我敢打赌，最广大的JS开发者们，如果被问到如何测量一个特定操作的速度（执行时间），将会一头扎进这样的东西：
 
 ```js
-var start = (new Date()).getTime();	// or `Date.now()`
+var start = (new Date()).getTime();	// 或者`Date.now()`
 
-// do some operation
+// 做一些操作
 
 var end = (new Date()).getTime();
 
 console.log( "Duration:", (end - start) );
 ```
 
-Raise your hand if that's roughly what came to your mind. Yep, I thought so. There's a lot wrong with this approach, but don't feel bad; **we've all been there.**
+如果这大致就是你想到的，请举手。是的，我就知道你会这么想。这个方式有许多错误，但是别难过；**我们都这么干过。**
 
-What did that measurement tell you, exactly? Understanding what it does and doesn't say about the execution time of the operation in question is key to learning how to appropriately benchmark performance in JavaScript.
+这种测量到底告诉了你什么？对于当前的操作的执行时间来说，理解它告诉了你什么和没告诉你什么是学习如何正确测量JavaScript的性能的关键。
 
-If the duration reported is `0`, you may be tempted to believe that it took less than a millisecond. But that's not very accurate. Some platforms don't have single millisecond precision, but instead only update the timer in larger increments. For example, older versions of windows (and thus IE) had only 15ms precision, which means the operation has to take at least that long for anything other than `0` to be reported!
+如果持续的时间报告为`0`，你也许会试图认为它花的时间少于1毫秒。但是这不是非常准确。一些平台不能精确到毫秒，反而是在更大的时间单位上更新计时器。举个例子，老版本的windows（IE也是如此）只有15毫秒的精确度，这意味着要得到与`0`不同的报告，操作就必须至少要花这么长时间！
 
-Moreover, whatever duration is reported, the only thing you really know is that the operation took approximately that long on that exact single run. You have near-zero confidence that it will always run at that speed. You have no idea if the engine or system had some sort of interference at that exact moment, and that at other times the operation could run faster.
+另外，不管被报告的持续时间是多少，你唯一真实知道的是，操作在当前这一次运行中大概花了这么长时间。你几乎没有信心说它将总是以这个速度运行。你不知道引擎或系统是否在就在那个确切的时刻进行了干扰，而在其他的时候这个操作可能会运行的快一些。
 
-What if the duration reported is `4`? Are you more sure it took about four milliseconds? Nope. It might have taken less time, and there may have been some other delay in getting either `start` or `end` timestamps.
+要是持续的时间报告为`4`呢？你确信它花了大概4毫秒？不，它可能没花那么长时间，而且在取得`start`或`end`时间戳时会有一些其他的延迟。
 
-More troublingly, you also don't know that the circumstances of this operation test aren't overly optimistic. It's possible that the JS engine figured out a way to optimize your isolated test case, but in a more real program such optimization would be diluted or impossible, such that the operation would run slower than your test.
+更麻烦的是，你也不知道这个操作测试所在的环境是不是过于优化了。这样的情况是有可能的：JS引擎找到了一个办法来优化你的测试用例，但是在更真实的程序中这样的优化将会被稀释或者根本不可能，如此这个操作将会比你测试时运行的慢。
 
-So... what do we know? Unfortunately, with those realizations stated, **we know very little.** Something of such low confidence isn't even remotely good enough to build your determinations on. Your "benchmark" is basically useless. And worse, it's dangerous in that it implies false confidence, not just to you but also to others who don't think critically about the conditions that led to those results.
+那么...我们知道什么？不幸的是，在这种状态下，**我们几乎什么都不知道。** 可信度如此低的东西甚至不够你建立自己的判断。你的“基准分析”基本没用。更糟的是，它隐含的这种不成立的可信度很危险，不仅是对你，而且对其他人也一样：认为导致这些结果的条件不重要。
 
-### Repetition
+### 重复
 
-"OK," you now say, "Just put a loop around it so the whole test takes longer." If you repeat an operation 100 times, and that whole loop reportedly takes a total of 137ms, then you can just divide by 100 and get an average duration of 1.37ms for each operation, right?
+“好的，”你说，“在它周围放一个循环，让整个测试需要的时间长一些。”如果你重复一个操作100次，而整个循环在报告上说总共花了137ms，那么你可以除以100并得到每次操作平均持续时间1.37ms，对吧？
 
-Well, not exactly.
+其实，不确切。
 
-A straight mathematical average by itself is definitely not sufficient for making judgments about performance which you plan to extrapolate to the breadth of your entire application. With a hundred iterations, even a couple of outliers (high or low) can skew the average, and then when you apply that conclusion repeatedly, you even further inflate the skew beyond credulity.
+对于你打算在你的整个应用程序范围内推广的操作的性能，仅靠一个直白的数据上的平均做出判断绝对是不够的。在一百次迭代中，即使是几个极端值（或高或低）就可以歪曲平均值，而后当你反复实施这个结论时，你就更进一步扩大了这种歪曲。
 
-Instead of just running for a fixed number of iterations, you can instead choose to run the loop of tests until a certain amount of time has passed. That might be more reliable, but how do you decide how long to run? You might guess that it should be some multiple of how long your operation should take to run once. Wrong.
+与仅仅运行固定次数的迭代不同，你可以选择将测试的循环运行一个特定长的时间。那可能更可靠，但是你如何决定运行多长时间？你可能会猜它应该是你的操作运行一次所需时间的倍数。错。
 
-Actually, the length of time to repeat across should be based on the accuracy of the timer you're using, specifically to minimize the chances of inaccuracy. The less precise your timer, the longer you need to run to make sure you've minimized the error percentage. A 15ms timer is pretty bad for accurate benchmarking; to minimize its uncertainty (aka "error rate") to less than 1%, you need to run your each cycle of test iterations for 750ms. A 1ms timer only needs a cycle to run for 50ms to get the same confidence.
+实际上，循环持续的时间应当基于你使用的计时器的精度，具体地将不精确的         ·可能性最小化。你的计时器精度越低，你就需要运行更长时间来确保你将错误的概率最小化了。一个15ms的计时器对于精确的基准分析来说太差劲儿了；为了把它的不确定性（也就是“错误率”）最小化到低于1%，你需要将测试的迭代循环运行750ms。一个1ms的计时器只需要一个循环运行50ms就可以得到相同的可信度。
 
-But then, that's just a single sample. To be sure you're factoring out the skew, you'll want lots of samples to average across. You'll also want to understand something about just how slow the worst sample is, how fast the best sample is, how far apart those best and worse cases were, and so on. You'll want to know not just a number that tells you how fast something ran, but also to have some quantifiable measure of how trustable that number is.
+但，这只是一个样本。为了确信你排除了歪曲结果的因素，你将会想要许多样本来求平均值。你还会想要明白最差的样本有多慢，最佳的样本有多快，最差与最佳的情况相差多少等等。你想知道的不仅是一个数字告诉你某个东西跑的多块，而且还需要一个关于这个数字有多可信的量化表达。
 
-Also, you probably want to combine these different techniques (as well as others), so that you get the best balance of all the possible approaches.
+另外，你可能想要组合这些不同的技术（还有其他的），以便于你可以在所有这些可能的方式中找到最佳的平衡。
 
-That's all bare minimum just to get started. If you've been approaching performance benchmarking with anything less serious than what I just glossed over, well... "you don't know: proper benchmarking."
+这一切只不过是开始所需的最低限度的认识。如果你曾经使用比我刚才几句话带过的东西更不严谨的方式进行基准分析，那么...“你不懂：正确的基准分析”。
 
 ### Benchmark.js
 
-Any relevant and reliable benchmark should be based on statistically sound practices. I am not going to write a chapter on statistics here, so I'll hand wave around some terms: standard deviation, variance, margin of error. If you don't know what those terms really mean -- I took a stats class back in college and I'm still a little fuzzy on them -- you are not actually qualified to write your own benchmarking logic.
+任何有用而且可靠的基准分析应当基于统计学上的实践。我不是要在这里写一章统计学，所以我会带过一些名词：标准差，方差，误差边际。如果你不知道这些名词意味着什么——我在大学上过统计学课程，而我依然对他们有点儿晕——那么实际上你没有资格去写你自己的基准分析逻辑。
 
-Luckily, smart folks like John-David Dalton and Mathias Bynens do understand these concepts, and wrote a statistically sound benchmarking tool called Benchmark.js (http://benchmarkjs.com/). So I can end the suspense by simply saying: "just use that tool."
+幸运的是，一些像John-David Dalton和Mathias Bynens这样的聪明家伙明白这些概念，并且写了一个统计学上的基准分析工具，称为Benchmark.js（http://benchmarkjs.com/）。所以我可以简单地说：“用这个工具就行了。”来终结这个悬念。
 
-I won't repeat their whole documentation for how Benchmark.js works; they have fantastic API Docs (http://benchmarkjs.com/docs) you should read. Also there are some great (http://calendar.perfplanet.com/2010/bulletproof-javascript-benchmarks/) writeups (http://monsur.hossa.in/2012/12/11/benchmarkjs.html) on more of the details and methodology.
+我不会重复他们的整个文档来讲解Benchmark.js如何工作；他们有很棒的API文档（http://benchmarkjs.com/docs）你可以阅读。另外这里还有一些了不起的文章（http://calendar.perfplanet.com/2010/bulletproof-javascript-benchmarks/）（http://monsur.hossa.in/2012/12/11/benchmarkjs.html）讲解细节与方法学。
 
-But just for quick illustration purposes, here's how you could use Benchmark.js to run a quick performance test:
+但是为了快速演示一下，这是你如何用Benchmark.js来运行一个快速的性能测试：
 
 ```js
 function foo() {
-	// operation(s) to test
+	// 需要测试的操作
 }
 
 var bench = new Benchmark(
-	"foo test",				// test name
-	foo,					// function to test (just contents)
+	"foo test",				// 测试的名称
+	foo,					// 要测试的函数（仅仅是内容）
 	{
-		// ..				// optional extra options (see docs)
+		// ..				// 额外的选项（参见文档）
 	}
 );
 
-bench.hz;					// number of operations per second
-bench.stats.moe;			// margin of error
-bench.stats.variance;		// variance across samples
+bench.hz;					// 每秒钟执行的操作数
+bench.stats.moe;			// 误差边际
+bench.stats.variance;		// 所有样本上的方差
 // ..
 ```
 
-There's *lots* more to learn about using Benchmark.js besides this glance I'm including here. But the point is that it's handling all of the complexities of setting up a fair, reliable, and valid performance benchmark for a given piece of JavaScript code. If you're going to try to test and benchmark your code, this library is the first place you should turn.
+比起我在这里的窥豹一斑，关于使用Benchmark.js还有 *许多* 需要学习的东西。不过重点是，为了给一段给定的JavaScript代码建立一个公平，可靠，并且合法的性能基准分析，Benchmark.js包揽了所有的复杂性。如果你想要试着对你的代码进行测试和基准分析，这个库应当是你第一个想到的地方。
 
-We're showing here the usage to test a single operation like X, but it's fairly common that you want to compare X to Y. This is easy to do by simply setting up two different tests in a "Suite" (a Benchmark.js organizational feature). Then, you run them head-to-head, and compare the statistics to conclude whether X or Y was faster.
+我们在这里展示的是测试一个单独操作X的用法，但是相当常见的情况是你想要用X和Y进行比较。这可以通过简单地在一个“Suite”（一个Benchmark.js的组织特性）中建立两个测试来很容易做到。然后，你对照地运行它们，然后比较统计结果来对为什么X或Y更快做出论断。
 
-Benchmark.js can of course be used to test JavaScript in a browser (see the "jsPerf.com" section later in this chapter), but it can also run in non-browser environments (Node.js, etc.).
+Benchmark.js理所当然地可以被用于在浏览器中测试JavaScript（参见本章稍后的“jsPerf.com”一节），但它也可以运行在非浏览器环境中（Node.js等等）。
 
-One largely untapped potential use-case for Benchmark.js is to use it in your Dev or QA environments to run automated performance regression tests against critical path parts of your application's JavaScript. Similar to how you might run unit test suites before deployment, you can also compare the performance against previous benchmarks to monitor if you are improving or degrading application performance.
+一个很大程度上没有触及的Benchmark.js的潜在用例是，在你的Dev或QA环境中针对你的应用程序的JavaScript的关键路径运行自动化的性能回归测试。与在部署之前你可能运行单元测试的方式相似，你也可以将性能与前一次基准分析进行比较，来观测你是否改进或恶化了应用程序性能。
 
 #### Setup/Teardown
 
-In the previous code snippet, we glossed over the "extra options" `{ .. }` object. But there are two options we should discuss: `setup` and `teardown`.
+在前一个代码段中，我们略过了“额外选项（extra options）”`{ .. }`对象。但是这里有两个我们应当讨论的选项`setup`和`teardown`。
 
-These two options let you define functions to be called before and after your test case runs.
+这两个选项让你定义在你的测试用例开始运行前和运行后被调用的函数。
 
-It's incredibly important to understand that your `setup` and `teardown` code **does not run for each test iteration**. The best way to think about it is that there's an outer loop (repeating cycles), and an inner loop (repeating test iterations). `setup` and `teardown` are run at the beginning and end of each *outer* loop (aka cycle) iteration, but not inside the inner loop.
+一个需要理解的极其重要的事情是，你的`setup`和`teardown`代码 **不会为每一次测试迭代而运行**。考虑它的最佳方式是，存在一个外部循环（重复的轮回），和一个内部循环（重复的测试迭代）。`setup`和`teardown`会在每个 *外部* 循环（也就是轮回）迭代的开始和末尾运行，但不是在内部循环。
 
-Why does this matter? Let's imagine you have a test case that looks like this:
+为什么这很重要？让我们想象你有一个看起来像这样的测试用例：
 
 ```js
 a = a + "w";
 b = a.charAt( 1 );
 ```
 
-Then, you set up your test `setup` as follows:
+然后，你这样建立你的测试`setup`：
 
 ```js
 var a = "x";
 ```
 
-Your temptation is probably to believe that `a` is starting out as `"x"` for each test iteration.
+你的意图可能是相信对每一次测试迭代`a`都以值`"x"`开始。
 
-But it's not! It's starting `a` at `"x"` for each test cycle, and then your repeated `+ "w"` concatenations will be making a larger and larger `a` value, even though you're only ever accessing the character `"w"` at the `1` position.
+但它不是！它使`a`在每一次测试轮回中以`"x"`开始，而后你的反复的`+ "w"`连接将使`a`的值越来越大，即便你永远唯一访问的是位于位置`1`的字符`"w"`。
 
-Where this most commonly bites you is when you make side effect changes to something like the DOM, like appending a child element. You may think your parent element is set as empty each time, but it's actually getting lots of elements added, and that can significantly sway the results of your tests.
+当你想利用副作用来改变某些东西比如DOM，向它追加一个子元素时，这种意外经常会咬到你。你可能认为的父元素每次都被设置为空，但他实际上被追加了许多元素，而这可能会显著地歪曲你的测试结果。
 
-## Context Is King
+## 上下文为王
 
-Don't forget to check the context of a particular performance benchmark, especially a comparison between X and Y tasks. Just because your test reveals that X is faster than Y doesn't mean that the conclusion "X is faster than Y" is actually relevant.
+不要忘了检查一个指定的性能基准分析的上下文环境，特别是在X与Y之间进行比较时。仅仅因为你的测试显示X比Y速度快，并不意味着“X比Y快”这个结论是实际上有意义的。
 
-For example, let's say a performance test reveals that X runs 10,000,000 operations per second, and Y runs at 8,000,000 operations per second. You could claim that Y is 20% slower than X, and you'd be mathematically correct, but your assertion doesn't hold as much water as you'd think.
+举个例子，让我们假定一个性能测试显示出X每秒可以运行1千万次操作，而Y每秒运行8百万次。你可以声称Y比X慢20%，而且在数学上你是对的，但是你的断言并不向像你认为的那么有用。
 
-Let's think about the results more critically: 10,000,000 operations per second is 10,000 operations per millisecond, and 10 operations per microsecond. In other words, a single operation takes 0.1 microseconds, or 100 nanoseconds. It's hard to fathom just how small 100ns is, but for comparison, it's often cited that the human eye isn't generally capable of distinguishing anything less than 100ms, which is one million times slower than the 100ns speed of the X operation.
+让我们更加苛刻地考虑这个测试结果：每秒1千万次操作就是每毫秒1万次操作，就是每微秒10次操作。换句话说，一次操作要花0.1毫秒，或者100纳秒。很难体会100纳秒到底有多小，可以这样比较一下，通常认为人类的眼睛一般不能分辨小于100毫秒的变化，而这要比X操作的100纳秒的速度慢100万倍。
 
-Even recent scientific studies showing that maybe the brain can process as quick as 13ms (about 8x faster than previously asserted) would mean that X is still running 125,000 times faster than the human brain can perceive a distinct thing happening. **X is going really, really fast.**
+即便最近的科学研究显示，大脑可能的最快处理速度是13毫秒（比先前的论断快大约8倍），这意味着X的运行速度依然要比人类大脑可以感知事情的发生要快12万5千倍。**X运行的非常，非常快。**
 
-But more importantly, let's talk about the difference between X and Y, the 2,000,000 operations per second difference. If X takes 100ns, and Y takes 80ns, the difference is 20ns, which in the best case is still one 650-thousandth of the interval the human brain can perceive.
+但更重要的是，让我们来谈谈X与Y之间的不同，每秒2百万次的差。如果X花100纳秒，而Y花80纳秒，差就是20纳秒，也就是人类大脑可以感知的间隔的65万分之一。
 
-What's my point? **None of this performance difference matters, at all!**
+我要说什么？**这种性能上的差别根本就一点儿都不重要！**
 
-But wait, what if this operation is going to happen a whole bunch of times in a row? Then the difference could add up, right?
+但是等一下，如果这种操作将要一个接一个地发生许多次呢？那么差异就会累加起来，对吧？
 
-OK, so what we're asking then is, how likely is it that operation X is going to be run over and over again, one right after the other, and that this has to happen 650,000 times just to get a sliver of a hope the human brain could perceive it. More likely, it'd have to happen 5,000,000 to 10,000,000 times together in a tight loop to even approach relevance.
+好的，那么我们就要问，操作X有多大可能性将要一次又一次，一个接一个地运行，而且为了人类大脑能够感知的一线希望而不得不发生65万次。而且，它不得不在一个紧凑的循环中发生5百万到1千万次，才能接近于有意义。
 
-While the computer scientist in you might protest that this is possible, the louder voice of realism in you should sanity check just how likely or unlikely that really is. Even if it is relevant in rare occasions, it's irrelevant in most situations.
+虽然你们之中的计算机科学家会反对说这是可能的，但是你们之中的现实主义者们应当对这究竟有多大可能性进行可行性检查。即使在极其稀少的偶然中这有实际意义，但是在绝大多数情况下它没有。
 
-The vast majority of your benchmark results on tiny operations -- like the `++x` vs `x++` myth -- **are just totally bogus** for supporting the conclusion that X should be favored over Y on a performance basis.
+你们大量的针对微小操作的基准分析结果——比如`++x`对`x++`的神话——**完全是伪命题**，只不过是用来支持在性能的基准上X应当取代Y的结论。
 
-### Engine Optimizations
+### 引擎优化
 
-You simply cannot reliably extrapolate that if X was 10 microseconds faster than Y in your isolated test, that means X is always faster than Y and should always be used. That's not how performance works. It's vastly more complicated.
+你根本无法可靠地这样推断：如果在你的独立测试中X要比Y快10微秒，这意味着X总是比Y快所以应当总是被使用。这不是性能的工作方式。它要复杂太多了。
 
-For example, let's imagine (purely hypothetical) that you test some microperformance behavior such as comparing:
+举个例子，让我们想象（纯粹地假想）你在测试某些行为的微观性能，比如比较：
 
 ```js
 var twelve = "12";
 var foo = "foo";
 
-// test 1
+// 测试 1
 var X1 = parseInt( twelve );
 var X2 = parseInt( foo );
 
-// test 2
+// 测试 2
 var Y1 = Number( twelve );
 var Y2 = Number( foo );
 ```
 
-If you understand what `parseInt(..)` does compared to `Number(..)`, you might intuit that `parseInt(..)` potentially has "more work" to do, especially in the `foo` case. Or you might intuit that they should have the same amount of work to do in the `foo` case, as both should be able to stop at the first character `"f"`.
+如果你明白与`Number(..)`比起来`parseInt(..)`做了什么，你可能会在直觉上认为`parseInt(..)`潜在地有“更多工作”要做，特别是在`foo`的测试用例下。或者你可能在直觉上认为在`foo`的测试用例下它们应当有同样多的工作要做，因为它们俩应当能够在第一个字符`"f"`处停下。
 
-Which intuition is correct? I honestly don't know. But I'll make the case it doesn't matter what your intuition is. What might the results be when you test it? Again, I'm making up a pure hypothetical here, I haven't actually tried, nor do I care.
+哪一种直觉正确？老实说我不知道。但是我会制造一个与你的直觉无关的测试用例。当你测试它的时候结果会是什么？我又一次在这里制造一个纯粹的假想，我们没实际上尝试过，我也不关心。
 
-Let's pretend the test comes back that `X` and `Y` are statistically identical. Have you then confirmed your intuition about the `"f"` character thing? Nope.
+让我们假装`X`与`Y`的测试结果在统计上是相同的。那么你关于`"f"`字符上发生的事情的直觉得到确认了吗？没有。
 
-It's possible in our hypothetical that the engine might recognize that the variables `twelve` and `foo` are only being used in one place in each test, and so it might decide to inline those values. Then it may realize that `Number( "12" )` can just be replaced by `12`. And maybe it comes to the same conclusion with `parseInt(..)`, or maybe not.
+在我们的假想中可能发生这样的事情：引擎可能会识别出变量`twelve`和`foo`在每个测试中仅被使用了一次，因此它可能会决定要内联这些值。然后它可能发现`Number("12")`可以替换为`12`。而且也许在`parseInt(..)`上得到相同的结论，也许不会。
 
-Or an engine's dead-code removal heuristic could kick in, and it could realize that variables `X` and `Y` aren't being used, so declaring them is irrelevant, so it doesn't end up doing anything at all in either test.
+或者一个引擎的死代码移除启发式算法会搅和进来，而且它发现变量`X`和`Y`都没有被使用，所以声明它们是没有意义的，所以最终在任一个测试中都不做任何事情。
 
-And all that's just made with the mindset of assumptions about a single test run. Modern engines are fantastically more complicated than what we're intuiting here. They do all sorts of tricks, like tracing and tracking how a piece of code behaves over a short period of time, or with a particularly constrained set of inputs.
+而且所有这些都只是关于一个单独测试运行的假设而言的。比我们在这里用直觉想象的，现代的引擎复杂得更加难以置信。它们会使用所有的招数，比如追踪并记录一段代码在一段很短的时间内的行为，或者使用一组特别限定的输入。
 
-What if the engine optimizes a certain way because of the fixed input, but in your real program you give more varied input and the optimization decisions shake out differently (or not at all!)? Or what if the engine kicks in optimizations because it sees the code being run tens of thousands of times by the benchmarking utility, but in your real program it will only run a hundred times in near proximity, and under those conditions the engine determines the optimizations are not worth it?
+如果引擎由于固定的输入而用特定的方法进行了优化，但是在你的真实的程序中你给出了更多种类的输入，以至于优化机制决定使用不同的方式呢（或者根本不优化！）？或者如果因为引擎看到代码被基准分析工具运行了成千上万次而进行了优化，但在你的真实程序中它将仅会运行大约100次，而在这些条件下引擎认定优化不值得呢？
 
-And all those optimizations we just hypothesized about might happen in our constrained test but maybe the engine wouldn't do them in a more complex program (for various reasons). Or it could be reversed -- the engine might not optimize such trivial code but may be more inclined to optimize it more aggressively when the system is already more taxed by a more sophisticated program.
+所有这些我们刚刚假想的优化措施可能会发生在我们的被限定的测试中，但在更复杂的程序中引擎可能不会那么做（由于种种原因）。或者正相反——引擎可能不会优化这样不起眼的代码，但是可能会更倾向于在系统已经被一个更精巧的程序消耗后更加积极地优化。
 
-The point I'm trying to make is that you really don't know for sure exactly what's going on under the covers. All the guesses and hypothesis you can muster don't amount to hardly anything concrete for really making such decisions.
+我想要说的是，你不能确切地知道这背后究竟发生了什么。你能搜罗的所有猜测和假想几乎不会提炼成任何坚实的依据。
 
-Does that mean you can't really do any useful testing? **Definitely not!**
+难道这意味着你不能真正地做有用的测试了吗？**绝对不是！**
 
-What this boils down to is that testing *not real* code gives you *not real* results. In so much as is possible and practical, you should test actual real, non-trivial snippets of your code, and under as best of real conditions as you can actually hope to. Only then will the results you get have a chance to approximate reality.
+这可以归结为测试 *不真实* 的代码会给你 *不真实* 的结果。在尽可能的情况下，你应当测试真实的，有意义的代码段，并且在最接近你实际能够期望的真实条件下进行。只有这样你得到的结果才有机会模拟现实。
 
-Microbenchmarks like `++x` vs `x++` are so incredibly likely to be bogus, we might as well just flatly assume them as such.
+像`++x`和`x++`这样的微观基准分析简直和伪命题一模一样，我们也许应该直接认为它就是。
 
 ## jsPerf.com
 
-While Benchmark.js is useful for testing the performance of your code in whatever JS environment you're running, it cannot be stressed enough that you need to compile test results from lots of different environments (desktop browsers, mobile devices, etc.) if you want to have any hope of reliable test conclusions.
+虽然Bechmark.js对于在你使用的任何JS环境中测试代码性能很有用，但是如果你需要从许多不同的环境（桌面浏览器，移动设备等）汇总测试结果并期望得到可靠的测试结论，它就显得能力不足。
 
-For example, Chrome on a high-end desktop machine is not likely to perform anywhere near the same as Chrome mobile on a smartphone. And a smartphone with a full battery charge is not likely to perform anywhere near the same as a smartphone with 2% battery life left, when the device is starting to power down the radio and processor.
+举例来说，Chrome在高端的桌面电脑上与Chrome移动版在智能手机上的表现就大相径庭。而一个充满电的智能手机与一个只剩2%电量，设备开始降低无线电和处理器的能源供应的智能手机的表现也完全不同。
 
-If you want to make assertions like "X is faster than Y" in any reasonable sense across more than just a single environment, you're going to need to actually test as many of those real world environments as possible. Just because Chrome executes some X operation faster than Y doesn't mean that all browsers do. And of course you also probably will want to cross-reference the results of multiple browser test runs with the demographics of your users.
+如果在横跨多于一种环境的情况下，你想在任何合理的意义上宣称“X比Y快”，那么你就需要实际测试尽可能多的真实世界的环境。只因为Chrome执行某种X操作比Y快并不意味着所有的浏览器都是这样。而且你还可能想要根据你的用户的人口统计交叉参照多种浏览器测试运行的结果。
 
-There's an awesome website for this purpose called jsPerf (http://jsperf.com). It uses the Benchmark.js library we talked about earlier to run statistically accurate and reliable tests, and makes the test on an openly available URL that you can pass around to others.
+有一个为此目的而生的牛X网站，称为jsPerf（http://jsperf.com）。它使用我们前面提到的Benchmark.js库来运行统计上正确且可靠的测试，并且可以让测试运行在一个你可交给其他人的公开URL上。
 
-Each time a test is run, the results are collected and persisted with the test, and the cumulative test results are graphed on the page for anyone to see.
+每当一个测试运行后，其结果都被收集并与这个测试一起保存，同时累积的测试结果将在网页上被绘制成图供所有人阅览。
 
-When creating a test on the site, you start out with two test cases to fill in, but you can add as many as you need. You also have the ability to set up `setup` code that is run at the beginning of each test cycle and `teardown` code run at the end of each cycle.
+当在这个网站上创建测试时，你一开始有两个测试用例可以填写，但你可以根据需要添加任意多个。你还可以建立在每次测试轮回开始时运行的`setup`代码，和在每次测试轮回结束前运行的`teardown`代码。
 
-**Note:** A trick for doing just one test case (if you're benchmarking a single approach instead of a head-to-head) is to fill in the second test input boxes with placeholder text on first creation, then edit the test and leave the second test blank, which will delete it. You can always add more test cases later.
+**注意：** 一个只做一个测试用例（如果你只对一个方案进行基准分析而不是相互对照）的技巧是，在第一次创建时使用输入框的占位提示文本填写第二个测试输入框，之后编辑这个测试并将第二个测试留为空白，这样它就会被删除。你可以稍后添加更多测试用例。
 
-You can define the initial page setup (importing libraries, defining utility helper functions, declaring variables, etc.). There are also options for defining setup and teardown behavior if needed -- consult the "Setup/Teardown" section in the Benchmark.js discussion earlier.
+你可以顶一个页面的初始配置（引入库文件，定义工具函数，声明变量，等等）。如有需要这里也有选项可以定义setup和teardow行为——参照前面关于Benchmark.js的讨论中的“Setup/Teardown”一节。
 
-### Sanity Check
+### 可行性检查
 
-jsPerf is a fantastic resource, but there's an awful lot of tests published that when you analyze them are quite flawed or bogus, for any of a variety of reasons as outlined so far in this chapter.
+jsPerf是一个奇妙的资源，但它上面有许多公开的糟糕测试，当你分析它们时会发现，由于在本章目前为止罗列的各种原因，它们有很大的漏洞或者是伪命题。
 
-Consider:
+考虑：
 
 ```js
-// Case 1
+// 用例 1
 var x = [];
 for (var i=0; i<10; i++) {
 	x[i] = "x";
 }
 
-// Case 2
+// 用例 2
 var x = [];
 for (var i=0; i<10; i++) {
 	x[x.length] = "x";
 }
 
-// Case 3
+// 用例 3
 var x = [];
 for (var i=0; i<10; i++) {
 	x.push( "x" );
 }
 ```
 
-Some observations to ponder about this test scenario:
+关于这个测试场景有一些现象值得我们深思：
 
-* It's extremely common for devs to put their own loops into test cases, and they forget that Benchmark.js already does all the repetition you need. There's a really strong chance that the `for` loops in these cases are totally unnecessary noise.
-* The declaring and initializing of `x` is included in each test case, possibly unnecessarily. Recall from earlier that if `x = []` were in the `setup` code, it wouldn't actually be run before each test iteration, but instead once at the beginning of each cycle. That means `x` would continue growing quite large, not just the size `10` implied by the `for` loops.
+* 开发者们在测试用例中加入自己的循环极其常见，而他们忘记了Benchmark.js已经做了你所需要的所有反复。这些测试用例中的`for`循环有很大的可能是完全不必要的噪音。
+* 在每一个测试用例中都包含了`x`的声明与初始化，似乎是不必要的。回想早前如果`x = []`存在于`setup`代码中，它实际上不会在每一次测试迭代前执行，而是在每一个轮回的开始执行一次。这意味这`x`将会持续地增长到非常大，而不仅是`for`循环中暗示的大小`10`。
 
-   So is the intent to make sure the tests are constrained only to how the JS engine behaves with very small arrays (size `10`)? That *could* be the intent, but if it is, you have to consider if that's not focusing far too much on nuanced internal implementation details.
+	 那么这是有意确保测试仅被限制在很小的数组上（大小为`10`）来观察JS引擎如何动作？这 *可能* 是有意的，但如果是，你就不得不考虑它是否过于关注内微妙的部实现细节了。
 
-   On the other hand, does the intent of the test embrace the context that the arrays will actually be growing quite large? Is the JS engines' behavior with larger arrays relevant and accurate when compared with the intended real world usage?
+   另一方面，这个测试的意图包含数组实际上会增长到非常大的情况吗？JS引擎对大数组的行为与真实世界中预期的用法相比有意义且正确吗？
 
-* Is the intent to find out how much `x.length` or `x.push(..)` add to the performance of the operation to append to the `x` array? OK, that might be a valid thing to test. But then again, `push(..)` is a function call, so of course it's going to be slower than `[..]` access. Arguably, cases 1 and 2 are fairer than case 3.
+* 它的意图是要找出`x.length`或`x.push(..)`在数组`x`的追加操作上拖慢了多少性能吗？好吧，这可能是一个合法的测试。但再一次，`push(..)`是一个函数调用，所以它理所当然地要比`[..]`访问慢。可以说，用例1与用例2比用例3更合理。
 
-
-Here's another example that illustrates a common apples-to-oranges flaw:
+这里有另一个展示苹果比橘子的常见漏洞的例子：
 
 ```js
-// Case 1
+// 用例 1
 var x = ["John","Albert","Sue","Frank","Bob"];
 x.sort();
 
-// Case 2
+// 用例 2
 var x = ["John","Albert","Sue","Frank","Bob"];
 x.sort( function mySort(a,b){
 	if (a < b) return -1;
@@ -256,81 +255,81 @@ x.sort( function mySort(a,b){
 } );
 ```
 
-Here, the obvious intent is to find out how much slower the custom `mySort(..)` comparator is than the built-in default comparator. But by specifying the function `mySort(..)` as inline function expression, you've created an unfair/bogus test. Here, the second case is not only testing a custom user JS function, **but it's also testing creating a new function expression for each iteration.**
+这里，明显的意图是要找出自定义的`mySort(..)`比较器比内建的默认比较器慢多少。但是通过将函数`mySort(..)`作为内联的函数表达式生命，你就创建了一个不合理的/伪命题的测试。这里，第二个测试用例不仅测试用户自定义的JS函数，**而且它还测试为每一个迭代创建一个新的函数表达式。**
 
-Would it surprise you to find out that if you run a similar test but update it to isolate only for creating an inline function expression versus using a pre-declared function, the inline function expression creation can be from 2% to 20% slower!?
+不知这会不会吓到你，如果你运行一个相似的测试，但是将它更改为比较内联函数表达式与预先声明的函数，内联函数表达式的创建可能要慢2%到20%！
 
-Unless your intent with this test *is* to consider the inline function expression creation "cost," a better/fairer test would put `mySort(..)`'s declaration in the page setup -- don't put it in the test `setup` as that's unnecessary redeclaration for each cycle -- and simply reference it by name in the test case: `x.sort(mySort)`.
+除非你的测试的意图 *就是* 要考虑内联函数表达式创建的“成本”，一个更好/更合理的测试是将`mySort(..)`的声明放在页面的setup中——不要放在测试的`setup`中，因为这会为每次轮回进行不必要的重复声明——然后简单地在测试用例中通过名称引用它：`x.sort(mySort)`。
 
-Building on the previous example, another pitfall is in opaquely avoiding or adding "extra work" to one test case that creates an apples-to-oranges scenario:
+基于前一个例子，另一种造成苹果比橘子场景的陷阱是，不透明地对一个测试用例回避或添加“额外的工作”：
 
 ```js
-// Case 1
+// 用例 1
 var x = [12,-14,0,3,18,0,2.9];
 x.sort();
 
-// Case 2
+// 用例 2
 var x = [12,-14,0,3,18,0,2.9];
 x.sort( function mySort(a,b){
 	return a - b;
 } );
 ```
 
-Setting aside the previously mentioned inline function expression pitfall, the second case's `mySort(..)` works in this case because you have provided it numbers, but would have of course failed with strings. The first case doesn't throw an error, but it actually behaves differently and has a different outcome! It should be obvious, but: **a different outcome between two test cases almost certainly invalidates the entire test!**
+将先前提到的内联函数表达式陷阱放在一边不谈，第二个用例的`mySort(..)`可以在这里工作是因为你给它提供了一组数字，而在字符串的情况下肯定会失败。第一个用例不会扔出错误，但是它的实际行为将会不同而且会有不同的结果！这应当很明显，但是：**两个测试用例之间结果的不同，几乎可以否定了整个测试的合法性！**
 
-But beyond the different outcomes, in this case, the built in `sort(..)`'s comparator is actually doing "extra work" that `mySort()` does not, in that the built-in one coerces the compared values to strings and does lexicographic comparison. The first snippet results in `[-14, 0, 0, 12, 18, 2.9, 3]` while the second snippet results (likely more accurately based on intent) in `[-14, 0, 0, 2.9, 3, 12, 18]`.
+但是除了结果的不同，在这个用例中，内建的`sort(..)`比较器实际上要比`mySort()`做了更多“额外的工作”，内建的比较器将被比较的值转换为字符串，然后进行字典顺序的比较。这样第一个代码段的结果为`[-14, 0, 0, 12, 18, 2.9, 3]`而第二段代码的结果为`[-14, 0, 0, 2.9, 3, 12, 18]`（就测试的意图来讲可能更准确）。
 
-So that test is unfair because it's not actually doing the same task between the cases. Any results you get are bogus.
+所以这个测试是不合理的，因为它的两个测试用例实际上没有做相同的任务。你得到的任何结果都将是伪命题。
 
-These same pitfalls can even be much more subtle:
+这些同样的陷阱可以微妙的多：
 
 ```js
-// Case 1
+// 用例 1
 var x = false;
 var y = x ? 1 : 2;
 
-// Case 2
+// 用例 2
 var x;
 var y = x ? 1 : 2;
 ```
 
-Here, the intent might be to test the performance impact of the coercion to a Boolean that the `? :` operator will do if the `x` expression is not already a Boolean (see the *Types & Grammar* title of this book series). So, you're apparently OK with the fact that there is extra work to do the coercion in the second case.
+这里的意图可能是要测试如果`x`表达式不是Boolean的情况下，`? :`操作符将要进行的Boolean转换对性能的影响（参见本系列的 *类型与文法*）。那么，根据在第二个用例中将会有额外的工作进行转换的事实，你看起来没问题。
 
-The subtle problem? You're setting `x`'s value in the first case and not setting it in the other, so you're actually doing work in the first case that you're not doing in the second. To eliminate any potential (albeit minor) skew, try:
+微妙的问题呢？你在第一个测试用例中设定了`x`的值，而没在另一个中设置，那么你实际上在第一个用例中做了在第二个用例中没做的工作。为了消灭任何潜在的扭曲（尽管很微小），可以这样：
 
 ```js
-// Case 1
+// 用例 1
 var x = false;
 var y = x ? 1 : 2;
 
-// Case 2
+// 用例 2
 var x = undefined;
 var y = x ? 1 : 2;
 ```
 
-Now there's an assignment in both cases, so the thing you want to test -- the coercion of `x` or not -- has likely been more accurately isolated and tested.
+现在两个用例都有一个赋值了，这样你想要测试的东西——`x`的转换或者不转换——会更加正确的被隔离并测试。
 
-## Writing Good Tests
+## 编写好的测试
 
-Let me see if I can articulate the bigger point I'm trying to make here.
+来看看我能否清晰地表达我想在这里申明的更重要的事情。
 
-Good test authoring requires careful analytical thinking about what differences exist between two test cases and whether the differences between them are *intentional* or *unintentional*.
+好的测试作者需要细心地分析性地思考两个测试用例之间存在什么样的差别，和它们之间的差别是否是 *有意的* 或 *无意的*。
 
-Intentional differences are of course normal and OK, but it's too easy to create unintentional differences that skew your results. You have to be really, really careful to avoid that skew. Moreover, you may intend a difference but it may not be obvious to other readers of your test what your intent was, so they may doubt (or trust!) your test incorrectly. How do you fix that?
+有意的差别当然是正常的，但是产生歪曲结果的无意的差异实在太容易了。你不得不非常非常小心地回避这种歪曲。另外，你可能预期一个差异，但是你的意图是什么对于你的测试的其他读者来讲不那么明显，所以他们可能会错误地怀疑（或者相信！）你的测试。你如何搞定这个呢？
 
-**Write better, clearer tests.** But also, take the time to document (using the jsPerf.com "Description" field and/or code comments) exactly what the intent of your test is, even to the nuanced detail. Call out the intentional differences, which will help others and your future self to better identify unintentional differences that could be skewing the test results.
+**编写更好，更清晰的测试。** 另外，花些时间用文档确切地记录下你的测试意图是什么（使用jsPerf.com的“Description”字段，或/和代码注释），即使是微小的细节。明确地表示有意的差别，这将帮助其他人和未来的你自己更好地找出那些可能歪曲测试结果的无意的差别。
 
-Isolate things which aren't relevant to your test by pre-declaring them in the page or test setup settings so they're outside the timed parts of the test.
+将与你的测试无关的东西隔离开来，通过在页面或测试的setup设置中预先声明它们，使它们位于测试计时部分的外面。
 
-Instead of trying to narrow in on a tiny snippet of your real code and benchmarking just that piece out of context, tests and benchmarks are better when they include a larger (while still relevant) context. Those tests also tend to run slower, which means any differences you spot are more relevant in context.
+与将你的真实代码限制在很小的一块，并脱离上下文环境来进行基准分析相比，测试与基准分析在它们包含更大的上下文环境（但仍然有意义）时表现更好。这些测试将会趋向于运行得更慢，这意味着你发现的任何差别都在上下文环境中更有意义。
 
-## Microperformance
+## 微观性能
 
-OK, until now we've been dancing around various microperformance issues and generally looking disfavorably upon obsessing about them. I want to take just a moment to address them directly.
+好了，直至现在我们一直围绕着微观性能的问题跳舞，并且一般上不赞成痴迷于它们。我想花一点儿时间直接解决它们。
 
-The first thing you need to get more comfortable with when thinking about performance benchmarking your code is that the code you write is not always the code the engine actually runs. We briefly looked at that topic back in Chapter 1 when we discussed statement reordering by the compiler, but here we're going to suggest the compiler can sometimes decide to run different code than you wrote, not just in different orders but different in substance.
+当你考虑对你的代码进行性能基准分析时，第一件需要习惯的事情就是你写的代码不总是引擎实际运行的代码。我们在第一章中讨论编译器的语句重排时简单地看过这个话题，但是这里我们将要说明编译器能有时决定运行与你编写的不同的代码，不仅是不同的顺序，而是不同的替代品。
 
-Let's consider this piece of code:
+让我们考虑这段代码：
 
 ```js
 var foo = 41;
@@ -345,11 +344,11 @@ var foo = 41;
 })();
 ```
 
-You may think about the `foo` reference in the innermost function as needing to do a three-level scope lookup. We covered in the *Scope & Closures* title of this book series how lexical scope works, and the fact that the compiler generally caches such lookups so that referencing `foo` from different scopes doesn't really practically "cost" anything extra.
+你也许会认为在最里面的函数的`foo`引用需要做一个三层作用域查询。我们在这个系列丛书的 *作用域与闭包* 一卷中涵盖了词法作用域如何工作，而事实上编译器通常缓存这样的查询，以至于从不同的作用域引用`foo`不会实质上“花费”任何额外的东西。
 
-But there's something deeper to consider. What if the compiler realizes that `foo` isn't referenced anywhere else but that one location, and it further notices that the value never is anything except the `41` as shown?
+但是这里有些更深刻的东西需要思考。如果编译器认识到`foo`除了这一个位置外没有被任何其他地方引用，进而注意到它的值除了这里的`41`外没有任何变化会怎么样呢？
 
-Isn't it quite possible and acceptable that the JS compiler could decide to just remove the `foo` variable entirely, and *inline* the value, such as this:
+JS编译器能够决定干脆完全移除`foo`变量，并 *内联* 它的值是可能和可接受的，比如这样：
 
 ```js
 (function(){
@@ -362,11 +361,11 @@ Isn't it quite possible and acceptable that the JS compiler could decide to just
 })();
 ```
 
-**Note:** Of course, the compiler could probably also do a similar analysis and rewrite with the `baz` variable here, too.
+**注意：** 当然，编译器可能也会对这里的`baz`变量进行相似的分析和重写。
 
-When you begin to think about your JS code as being a hint or suggestion to the engine of what to do, rather than a literal requirement, you realize that a lot of the obsession over discrete syntactic minutia is most likely unfounded.
+但你开始将你的JS代码作为一种告诉引擎去做什么的提示或建议来考虑，而不是一种字面上的需求，你就会理解许多对零碎的语法细节的痴迷几乎是毫无根据的。
 
-Another example:
+另一个例子：
 
 ```js
 function factorial(n) {
@@ -377,11 +376,11 @@ function factorial(n) {
 factorial( 5 );		// 120
 ```
 
-Ah, the good ol' fashioned "factorial" algorithm! You might assume that the JS engine will run that code mostly as is. And to be honest, it might -- I'm not really sure.
+啊，一个老式的“阶乘”算法！你可能会认为JS引擎将会原封不动地运行这段代码。老实说，它可能会——但我不是很确定。
 
-But as an anecdote, the same code expressed in C and compiled with advanced optimizations would result in the compiler realizing that the call `factorial(5)` can just be replaced with the constant value `120`, eliminating the function and call entirely!
+但作为一段轶事，用C语言表达的同样的代码并使用先进的优化处理进行编译时，将会导致编译器认为`factorial(5)`调用可以被替换为常数值`120`，完全消除这个函数以及调用！
 
-Moreover, some engines have a practice called "unrolling recursion," where it can realize that the recursion you've expressed can actually be done "easier" (i.e., more optimally) with a loop. It's possible the preceding code could be *rewritten* by a JS engine to run as:
+另外，一些引擎有一种称为“递归展开（unrolling recursion）”的行为，它会意识到你表达的递归实际上可以用循环“更容易”（也就是更优化地）地完成。前面的代码可能会被JS引擎 *重写* 为：
 
 ```js
 function factorial(n) {
@@ -397,162 +396,162 @@ function factorial(n) {
 factorial( 5 );		// 120
 ```
 
-Now, let's imagine that in the earlier snippet you had been worried about whether `n * factorial(n-1)` or `n *= factorial(--n)` runs faster. Maybe you even did a performance benchmark to try to figure out which was better. But you miss the fact that in the bigger context, the engine may not run either line of code because it may unroll the recursion!
+现在，让我们想象在前一个片段中你曾经担心`n * factorial(n-1)`或`n *= factorial(--n)`哪一个运行的更快。也许你甚至做了性能基准分析来试着找出哪个更好。但是你忽略了一个事实，就是在更大的上下文环境中，引擎也许不会运行任何一行代码，因为它可能展开了递归！
 
-Speaking of `--`, `--n` versus `n--` is often cited as one of those places where you can optimize by choosing the `--n` version, because theoretically it requires less effort down at the assembly level of processing.
+说到`--`，`--n`与`n--`的对比，经常被认为可以通过选择`--n`的版本进行优化，因为理论上在汇编语言层面的处理上，它要做的努力少一些。
 
-That sort of obsession is basically nonsense in modern JavaScript. That's the kind of thing you should be letting the engine take care of. You should write the code that makes the most sense. Compare these three `for` loops:
+在现代的JavaScript中这种痴迷基本上是没道理的。这种事情应当留给引擎来处理。你应该编写最合理的代码。比较这三个`for`循环：
 
 ```js
-// Option 1
+// 方式 1
 for (var i=0; i<10; i++) {
 	console.log( i );
 }
 
-// Option 2
+// 方式 2
 for (var i=0; i<10; ++i) {
 	console.log( i );
 }
 
-// Option 3
+// 方式 3
 for (var i=-1; ++i<10; ) {
 	console.log( i );
 }
 ```
 
-Even if you have some theory where the second or third option is more performant than the first option by a tiny bit, which is dubious at best, the third loop is more confusing because you have to start with `-1` for `i` to account for the fact that `++i` pre-increment is used. And the difference between the first and second options is really quite irrelevant.
+就算你有一些理论支持第二或第三种选择要比第一种的性能好那么一点点，充其量只能算是可疑，第三个循环更加使人困惑，因为为了使提前递增的`++i`被使用，你不得不让`i`从`-1`开始来计算。而第一个与第二个选择之间的区别实际上无关紧要。
 
-It's entirely possible that a JS engine may see a place where `i++` is used and realize that it can safely replace it with the `++i` equivalent, which means your time spent deciding which one to pick was completely wasted and the outcome moot.
+这样的事情是完全有可能的：JS引擎也许看到一个`i++`被使用的地方，并意识到它可以安全地替换为等价的`++i`，这意味着你决定挑选它们中的哪一个所花的时间完全被浪费了，而且这么做的产出毫无意义。
 
-Here's another common example of silly microperformance obsession:
+这是另外一个常见的愚蠢的痴迷于微观性能的例子：
 
 ```js
 var x = [ .. ];
 
-// Option 1
+// 方式 1
 for (var i=0; i < x.length; i++) {
 	// ..
 }
 
-// Option 2
+// 方式 2
 for (var i=0, len = x.length; i < len; i++) {
 	// ..
 }
 ```
 
-The theory here goes that you should cache the length of the `x` array in the variable `len`, because ostensibly it doesn't change, to avoid paying the price of `x.length` being consulted for each iteration of the loop.
+这里的理论是，你应当在变量`len`中缓存数组`x`的长度，因为从表面上看它不会改变，来避免在循环的每一次迭代中都查询`x.length`所花的开销。
 
-If you run performance benchmarks around `x.length` usage compared to caching it in a `len` variable, you'll find that while the theory sounds nice, in practice any measured differences are statistically completely irrelevant.
+如果你围绕`x.length`的用法进行性能基准分析，与将它缓存在变量`len`中的用法进行比较，你会发现虽然理论听起来不错，但是在实践中任何测量出的差异都是在统计学上完全没有意义的。
 
-In fact, in some engines like v8, it can be shown (http://mrale.ph/blog/2014/12/24/array-length-caching.html) that you could make things slightly worse by pre-caching the length instead of letting the engine figure it out for you. Don't try to outsmart your JavaScript engine, you'll probably lose when it comes to performance optimizations.
+事实上，在像v8这样的引擎中，可以看到(http://mrale.ph/blog/2014/12/24/array-length-caching.html)通过提前缓存长度而不是让引擎帮你处理它会使事情稍稍恶化。不要尝试在聪明上战胜你的JavaScript引擎，当它来到性能优化的地方时你可能会输给它。
 
-### Not All Engines Are Alike
+### 不是所有的引擎都一样
 
-The different JS engines in various browsers can all be "spec compliant" while having radically different ways of handling code. The JS specification doesn't require anything performance related -- well, except ES6's "Tail Call Optimization" covered later in this chapter.
+在各种浏览器中的不同JS引擎可以称为“规范兼容的”，虽然各自有完全不同的方式处理代码。JS语言规范不要求与性能相关的任何事情——除了将在本章稍后将要讲解的ES6“尾部调用优化（Tail Call Optimization）”。
 
-The engines are free to decide that one operation will receive its attention to optimize, perhaps trading off for lesser performance on another operation. It can be very tenuous to find an approach for an operation that always runs faster in all browsers.
+引擎可以自由决定哪一个操作将会受到它的关注而被优化，也许代价是在另一种操作上的性能降低一些。要为一种操作找到一种在所有的浏览器中总是运行的更快的方式是非常不现实的。
 
-There's a movement among some in the JS dev community, especially those who work with Node.js, to analyze the specific internal implementation details of the v8 JavaScript engine and make decisions about writing JS code that is tailored to take best advantage of how v8 works. You can actually achieve a surprisingly high degree of performance optimization with such endeavors, so the payoff for the effort can be quite high.
+在JS开发者社区的一些人发起了一项运动，特别是那些使用Node.js工作的人，去分析v8 JavaScript引擎的具体内部实现细节，并决定如何编写定制的JS代码来最大限度的利用v8的工作方式。通过这样的努力你实际上可以在性能优化上达到惊人的高度，所以这种努力的收益可能十分高。
 
-Some commonly cited examples (https://github.com/petkaantonov/bluebird/wiki/Optimization-killers) for v8:
+一些针对v8的经常被引用的例子是(https://github.com/petkaantonov/bluebird/wiki/Optimization-killers) ：
 
-* Don't pass the `arguments` variable from one function to any other function, as such "leakage" slows down the function implementation.
-* Isolate a `try..catch` in its own function. Browsers struggle with optimizing any function with a `try..catch` in it, so moving that construct to its own function means you contain the de-optimization harm while letting the surrounding code be optimizable.
+* 不要将`arguments`变量从一个函数传递到任何其他函数中，因为这样的“泄露”放慢了函数实现。
+* 将一个`try..catch`隔离到它自己的函数中。浏览器在优化任何含有`try..catch`的函数时都会苦苦挣扎，所以将这样的结构移动到它自己的函数中意味着你持有不可优化的危害的同时，让其周围的代码是可以优化的。
 
-But rather than focus on those tips specifically, let's sanity check the v8-only optimization approach in a general sense.
+但与其聚焦在这些具体的窍门上，不如让我们在一般意义上对v8专用的优化方式进行一下合理性检验。
 
-Are you genuinely writing code that only needs to run in one JS engine? Even if your code is entirely intended for Node.js *right now*, is the assumption that v8 will *always* be the used JS engine reliable? Is it possible that someday a few years from now, there's another server-side JS platform besides Node.js that you choose to run your code on? What if what you optimized for before is now a much slower way of doing that operation on the new engine?
+你真的在编写仅仅需要在一种JS引擎上运行的代码吗？即便你的代码 *当前* 是完全为了Node.js，那么假设v8将 *总是* 被使用的JS引擎可靠吗？从现在开始的几年以后的某一天，你有没有可能会选择除了Node.js之外的另一种服务器端JS平台来运行你的程序？如果你以前所做的优化现在在新的引擎上成为了执行这种操作的很慢的方式怎么办？
 
-Or what if your code always stays running on v8 from here on out, but v8 decides at some point to change the way some set of operations works such that what used to be fast is now slow, and vice versa?
+或者如果你的代码总是在v8上运行，但是v8在某个时点决定改变一组操作的工作方式，是的曾经快的现在变慢了，曾经慢的变快了呢？
 
-These scenarios aren't just theoretical, either. It used to be that it was faster to put multiple string values into an array and then call `join("")` on the array to concatenate the values than to just use `+` concatenation directly with the values. The historical reason for this is nuanced, but it has to do with internal implementation details about how string values were stored and managed in memory.
+这些场景也都不只是理论上的。曾经，将多个字符串值放在一个数组中然后在这个数组上调用`join("")`来连接这些值，要比仅使用`+`直接连接这些值要快。这件事的历史原因很微妙，但它与字符串值如何被存储和在内存中如何管理的内部实现细节有关。
 
-As a result, "best practice" advice at the time disseminated across the industry suggesting developers always use the array `join(..)` approach. And many followed.
+结果，当时在业界广泛传播的“最佳实践”建议开发者们总是使用数组`join(..)`的方式。而且有许多人遵循了。
 
-Except, somewhere along the way, the JS engines changed approaches for internally managing strings, and specifically put in optimizations for `+` concatenation. They didn't slow down `join(..)` per se, but they put more effort into helping `+` usage, as it was still quite a bit more widespread.
+但是，某一天，JS引擎改变了内部管理字符串的方式，而且特别在`+`连接上做了优化。他们并没有放慢`join(..)`，但是他们在帮助`+`用法上做了更多的努力，因为它依然十分普遍。
 
-**Note:** The practice of standardizing or optimizing some particular approach based mostly on its existing widespread usage is often called (metaphorically) "paving the cowpath."
+**注意：** 某些特定方法的标准化和优化的实施，很大程度上决定于它被使用的广泛程度。这经常（隐喻地）称为“paving the cowpath”（不提前做好方案，而是等到事情发生了再去应对）。
 
-Once that new approach to handling strings and concatenation took hold, unfortunately all the code out in the wild that was using array `join(..)` to concatenate strings was then sub-optimal.
+一旦处理字符串和连接的新方式定型，所有在世界上运行的，使用数组`join(..)`来连接字符串的代码都不幸地变成了次优的方式。
 
-Another example: at one time, the Opera browser differed from other browsers in how it handled the boxing/unboxing of primitive wrapper objects (see the *Types & Grammar* title of this book series). As such, their advice to developers was to use a `String` object instead of the primitive `string` value if properties like `length` or methods like `charAt(..)` needed to be accessed. This advice may have been correct for Opera at the time, but it was literally completely opposite for other major contemporary browsers, as they had optimizations specifically for the `string` primitives and not their object wrapper counterparts.
+另一个例子：曾经，Opera浏览器在如何处理基本包装对象的封箱/拆箱（参见本系列的 *类型与文法*）上与其他浏览器不同。因此他们给开发者的建议是，如果一个原生`string`值的属性（如`length`）或方法（如`charAt(..)`）需要被访问，就使用一个`String`对象取代它。这个建议也许对那时的Opera是正确的，但是对于同时代的其他浏览器来说简直就是完全相反的，因为它们都对原生`string`进行了专门的优化，而不是对它们的包装对象。
 
-I think these various gotchas are at least possible, if not likely, for code even today. So I'm very cautious about making wide ranging performance optimizations in my JS code based purely on engine implementation details, **especially if those details are only true of a single engine**.
+我认为即使是对今天的代码，这种种陷阱即便可能性不高，至少也是可能的。所以对于在我的JS代码中单纯地根据引擎的实现细节来进行大范围的优化这件事来说我会非常小心，**特别是如果这些细节仅对一种引擎成立时。**
 
-The reverse is also something to be wary of: you shouldn't necessarily change a piece of code to work around one engine's difficulty with running a piece of code in an acceptably performant way.
+反过来也有一些事情需要警惕：你不应当为了绕过某一种引擎难于处理的地方而改变一块代码。
 
-Historically, IE has been the brunt of many such frustrations, given that there have been plenty of scenarios in older IE versions where it struggled with some performance aspect that other major browsers of the time seemed not to have much trouble with. The string concatenation discussion we just had was actually a real concern back in the IE6 and IE7 days, where it was possible to get better performance out of `join(..)` than `+`.
+历史上，IE是导致许多这种挫折的领头羊，在老版本的IE中曾经有许多场景，在当时的其他主流浏览器中看起来没有太多麻烦的性能方面苦苦挣扎。我们刚刚讨论的字符串连接在IE6和IE7的年代就是一个真实的问题，那时候使用`join(..)`就可能要比使用`+`能得到更好的性能。
 
-But it's troublesome to suggest that just one browser's trouble with performance is justification for using a code approach that quite possibly could be sub-optimal in all other browsers. Even if the browser in question has a large market share for your site's audience, it may be more practical to write the proper code and rely on the browser to update itself with better optimizations eventually.
+不过为了一种浏览器的性能问题而使用一种很有可能在其他所有浏览器上是次优的编码方式，很难说是正当的。即便这种浏览器占有了你的网站用户的很大市场份额，编写恰当的代码并仰仗浏览器最终在更好的优化机制上更新自己可能更实际。
 
-"There is nothing more permanent than a temporary hack." Chances are, the code you write now to work around some performance bug will probably outlive the performance bug in the browser itself.
+“没什么是比暂时的黑科技更永恒的。”你现在为了绕过一些性能的Bug而编写的代码可能要比这个Bug在浏览器中存在的时间长的多。
 
-In the days when a browser only updated once every five years, that was a tougher call to make. But as it stands now, browsers across the board are updating at a much more rapid interval (though obviously the mobile world still lags), and they're all competing to optimize web features better and better.
+在那个浏览器每五年才更新一次的年代，这是个很难做的决定。但是如今，所有的浏览器都在快速地更新（虽然移动端的世界还有些滞后），而且它们都在竞争而使得web优化特性变得越来越好。
 
-If you run across a case where a browser *does* have a performance wart that others don't suffer from, make sure to report it to them through whatever means you have available. Most browsers have open public bug trackers suitable for this purpose.
+如果你真的碰到了一个浏览器有其他浏览器没有的性能瑕疵，那么就确保用你一切可用的手段来报告它。绝大多数浏览器都有为此而公开的Bug追迹系统。
 
-**Tip:** I'd only suggest working around a performance issue in a browser if it was a really drastic show-stopper, not just an annoyance or frustration. And I'd be very careful to check that the performance hack didn't have noticeable negative side effects in another browser.
+**提示：** 我只建议，如果一个在某种浏览器中的性能问题真的是极端搅局的问题时才绕过它，而不是仅仅因为它使人厌烦或沮丧。而且我会非常小心地检查这种性能黑科技有没有在其他浏览器中产生负面影响。
 
-### Big Picture
+### 大局
 
-Instead of worrying about all these microperformance nuances, we should instead be looking at big-picture types of optimizations.
+与担心所有这些微观性能的细节相反，我们应但关注大局类型的优化。
 
-How do you know what's big picture or not? You have to first understand if your code is running on a critical path or not. If it's not on the critical path, chances are your optimizations are not worth much.
+你怎么知道什么东西是不是大局的？你首先必须理解你的代码是否运行在关键路径上。如果它没在关键路径上，你的优化可能就没有太大价值。
 
-Ever heard the admonition, "that's premature optimization!"? It comes from a famous quote from Donald Knuth: "premature optimization is the root of all evil.". Many developers cite this quote to suggest that most optimizations are "premature" and are thus a waste of effort. The truth is, as usual, more nuanced.
+“这是过早的优化！”你听过这种训诫吗？它源自Donald Knuth的一段著名的话：“过早的优化是万恶之源。”。许多开发者都引用这段话来说明大多数优化都是“过早”的而且是一种精力的浪费。事实是，像往常一样，更加微妙。
 
-Here is Knuth's quote, in context:
+这是Knuth在语境中的原话：
 
-> Programmers waste enormous amounts of time thinking about, or worrying about, the speed of **noncritical** parts of their programs, and these attempts at efficiency actually have a strong negative impact when debugging and maintenance are considered. We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil. Yet we should not pass up our opportunities in that **critical** 3%. [emphasis added]
+> 程序员们浪费了大量的时间考虑，或者担心，他们的程序中的 **不关键** 部分的速度，而在考虑调试和维护时这些在效率上的企图实际上有很强大的负面影响。我们应当忘记微小的效率，可以说在大概97%的情况下：过早的优化是万恶之源。然而我们不应该忽略那 **关键的** 3%中的机会。[强调]
 
 (http://web.archive.org/web/20130731202547/http://pplab.snu.ac.kr/courses/adv_pl05/papers/p261-knuth.pdf, Computing Surveys, Vol 6, No 4, December 1974)
 
-I believe it's a fair paraphrasing to say that Knuth *meant*: "non-critical path optimization is the root of all evil." So the key is to figure out if your code is on the critical path -- you should optimize it! -- or not.
+我相信这样转述Knuth的 *意思* 是合理的：“非关键路径的优化是万恶之源。”所以问题的关键是弄清楚你的代码是否在关键路径上——你因该优化它！——或者不。
 
-I'd even go so far as to say this: no amount of time spent optimizing critical paths is wasted, no matter how little is saved; but no amount of optimization on noncritical paths is justified, no matter how much is saved.
+我甚至可以激进地这么说：没有花在优化关键路径上的时间是浪费的，不管它的效果多么微小。没有花在优化非关键路径上的时间是合理的，不管它的效果多么大。
 
-If your code is on the critical path, such as a "hot" piece of code that's going to be run over and over again, or in UX critical places where users will notice, like an animation loop or CSS style updates, then you should spare no effort in trying to employ relevant, measurably significant optimizations.
+如果你的代码在关键路径上，比如将要一次又一次被运行的“热”代码块儿，或者在用户将要注意到的UX关键位置，比如循环动画或者CSS样式更新，那么你应当不遗余力地进行有意义的，可测量的重大优化。
 
-For example, consider a critical path animation loop that needs to coerce a string value to a number. There are of course multiple ways to do that (see the *Types & Grammar* title of this book series), but which one if any is the fastest?
+举个例子，考虑一个动画循环的关键路径，它需要将一个字符串值转换为一个数字。这当然有多种方法做到，但是哪一个是最快的呢？
 
 ```js
-var x = "42";	// need number `42`
+var x = "42";	// 需要数字 `42`
 
-// Option 1: let implicit coercion automatically happen
+// 选择1：让隐式强制转换自动完成工作
 var y = x / 2;
 
-// Option 2: use `parseInt(..)`
+// 选择2：使用`parseInt(..)`
 var y = parseInt( x, 0 ) / 2;
 
-// Option 3: use `Number(..)`
+// 选择3：使用`Number(..)`
 var y = Number( x ) / 2;
 
-// Option 4: use `+` unary operator
+// 选择4：使用`+`二元操作符
 var y = +x / 2;
 
-// Option 5: use `|` unary operator
+// 选择5：使用`|`二元操作符
 var y = (x | 0) / 2;
 ```
 
-**Note:** I will leave it as an exercise to the reader to set up a test if you're interested in examining the minute differences in performance among these options.
+**注意：** 我将这个问题留作给读者们的练习，如果你对这些选择之间性能上的微小区别感兴趣的话，可以做一个测试。
 
-When considering these different options, as they say, "One of these things is not like the others." `parseInt(..)` does the job, but it also does a lot more -- it parses the string rather than just coercing. You can probably guess, correctly, that `parseInt(..)` is a slower option, and you should probably avoid it.
+当你考虑这些不同的选择时，就像人们说的，“有一个和其他的不一样。”`parseInt(..)`可以工作，但它做的事情多的多——它会解析字符串而不是转换它。你可能会正确地猜想`parseInt(..)`是一个更慢的选择，而你可能应当避免使用它。
 
-Of course, if `x` can ever be a value that **needs parsing**, such as `"42px"` (like from a CSS style lookup), then `parseInt(..)` really is the only suitable option!
+当然，如果`x`可能是一个 **需要被解析** 的值，比如`"42px"`（比如CSS样式查询），那么`parseInt(..)`确实是唯一合适的选择！
 
-`Number(..)` is also a function call. From a behavioral perspective, it's identical to the `+` unary operator option, but it may in fact be a little slower, requiring more machinery to execute the function. Of course, it's also possible that the JS engine recognizes this behavioral symmetry and just handles the inlining of `Number(..)`'s behavior (aka `+x`) for you!
+`Number(..)`也是一个函数调用。从行为的角度讲，它与`+`二元操作符是相同的，但它事实上可能慢一点儿，需要更多的机器指令运转来执行这个函数。当然，JS引擎也可能识别出了这种行为上的对称性，而仅仅为你处理`Number(..)`行为的内联形式（也就是`+x`）！
 
-But remember, obsessing about `+x` versus `x | 0` is in most cases likely a waste of effort. This is a microperformance issue, and one that you shouldn't let dictate/degrade the readability of your program.
+但是要记住，痴迷于`+x`和`x | 0`的比较在大多数情况下都是浪费精力。这是一个微观性能问题，而且你不应该让它使你的程序的可读性降低。
 
-While performance is very important in critical paths of your program, it's not the only factor. Among several options that are roughly similar in performance, readability should be another important concern.
+虽然你的程序的关键路径性能非常重要，但它不是唯一的因素。在几种性能上大体相似的选择中，可读性应当是另一个重要的考量。
 
-## Tail Call Optimization (TCO)
+## 尾部调用优化 (TCO)
 
-As we briefly mentioned earlier, ES6 includes a specific requirement that ventures into the world of performance. It's related to a specific form of optimization that can occur with function calls: *tail call optimization*.
+正如我们早前简单提到的，ES6包含了一个冒险进入性能世界的具体需求。它是关于在函数调用时可能会发生的一种具体的优化形式：*尾部调用优化（TCO）*。
 
-Briefly, a "tail call" is a function call that appears at the "tail" of another function, such that after the call finishes, there's nothing left to do (except perhaps return its result value).
+简单地说，一个“尾部调用”是一个出现在另一个函数“尾部”的函数调用，于是在这个调用完成后，就没有其他的事情要做了（除了也许要返回结果值）。
 
-For example, here's a non-recursive setup with tail calls:
+例如，这是一个带有尾部调用的非递归形式：
 
 ```js
 function foo(x) {
@@ -560,27 +559,27 @@ function foo(x) {
 }
 
 function bar(y) {
-	return foo( y + 1 );	// tail call
+	return foo( y + 1 );	// 尾部调用
 }
 
 function baz() {
-	return 1 + bar( 40 );	// not tail call
+	return 1 + bar( 40 );	// 不是尾部调用
 }
 
 baz();						// 42
 ```
 
-`foo(y+1)` is a tail call in `bar(..)` because after `foo(..)` finishes, `bar(..)` is also finished except in this case returning the result of the `foo(..)` call. However, `bar(40)` is *not* a tail call because after it completes, its result value must be added to `1` before `baz()` can return it.
+`foo(y+1)`是一个在`bar(..)`中的尾部调用，因为在`foo(..)`完成之后，`bar(..)`也即而完成，除了在这里需要返回`foo(..)`调用的结果。然而，`bar(40)` *不是* 一个尾部调用，因为在它完成后，在`baz()`能返回它的结果前，这个结果必须被加1。
 
-Without getting into too much nitty-gritty detail, calling a new function requires an extra amount of reserved memory to manage the call stack, called a "stack frame." So the preceding snippet would generally require a stack frame for each of `baz()`, `bar(..)`, and `foo(..)` all at the same time.
+不过于深入本质细节而简单地说，调用一个新函数需要保留额外的内存来管理调用栈，它称为一个“栈帧（stack frame）”。所以前面的代码段通常需要同时为`baz()`，`bar(..)`，和`foo(..)`都准备一个栈帧。
 
-However, if a TCO-capable engine can realize that the `foo(y+1)` call is in *tail position* meaning `bar(..)` is basically complete, then when calling `foo(..)`, it doesn't need to create a new stack frame, but can instead reuse the existing stack frame from `bar(..)`. That's not only faster, but it also uses less memory.
+然而，如果一个支持TCO的引擎可以认识到`foo(y+1)`调用位于 *尾部位置* 意味着`bar(..)`基本上完成了，那么当调用`foo(..)`时，它就并没有必要创建一个新的栈帧，而是可以重复利用既存的`bar(..)`的栈帧。这不仅更快，而且也更节省内存。
 
-That sort of optimization isn't a big deal in a simple snippet, but it becomes a *much bigger deal* when dealing with recursion, especially if the recursion could have resulted in hundreds or thousands of stack frames. With TCO the engine can perform all those calls with a single stack frame!
+在一个简单的代码段中，这种优化机制没什么大不了的，但是当对付递归，特别是当递归会造成成百上千的栈帧时，它就变成了 *相当有用的技术*。引擎可以使用TCO在一个栈帧内完成所有调用！
 
-Recursion is a hairy topic in JS because without TCO, engines have had to implement arbitrary (and different!) limits to how deep they will let the recursion stack get before they stop it, to prevent running out of memory. With TCO, recursive functions with *tail position* calls can essentially run unbounded, because there's never any extra usage of memory!
+在JS中递归是一个令人不安的话题，因为没有TCO，引擎就不得不实现一个随意的（而且各不相同的）限制，规定它们允许递归栈能有多深，来防止内存耗尽。使用TCO，带有 *尾部位置* 调用的递归函数实质上可以没有边界地运行，因为从没有额外的内存使用！
 
-Consider that recursive `factorial(..)` from before, but rewritten to make it TCO friendly:
+考虑前面的递归`factorial(..)`，但是将它重写为对TCO友好的：
 
 ```js
 function factorial(n) {
@@ -596,24 +595,24 @@ function factorial(n) {
 factorial( 5 );		// 120
 ```
 
-This version of `factorial(..)` is still recursive, but it's also optimizable with TCO, because both inner `fact(..)` calls are in *tail position*.
+这个版本的`factorial(..)`仍然是递归的，而且它还是可以进行TCO优化的，因为两个内部的`fact(..)`调用都在 *尾部位置*。
 
-**Note:** It's important to note that TCO only applies if there's actually a tail call. If you write recursive functions without tail calls, the performance will still fall back to normal stack frame allocation, and the engines' limits on such recursive call stacks will still apply. Many recursive functions can be rewritten as we just showed with `factorial(..)`, but it takes careful attention to detail.
+**注意：** 一个需要注意的重点是，TCO尽在尾部调用实际存在时才会实施。如果你没用尾部调用编写递归函数，性能机制将仍然退回到普通的栈帧分配，而且引擎对于这样的递归的调用栈限制依然有效。许多递归函数可以像我们刚刚展示的`factorial(..)`那样重写，但是要小心处理细节。
 
-One reason that ES6 requires engines to implement TCO rather than leaving it up to their discretion is because the *lack of TCO* actually tends to reduce the chances that certain algorithms will be implemented in JS using recursion, for fear of the call stack limits.
+ES6要求各个引擎实现TCO而不是留给它们自行考虑的原因之一是，由于对调用栈限制的恐惧，*缺少TCO* 实际上趋向于减少特定的算法在JS中使用递归实现的机会。
 
-If the lack of TCO in the engine would just gracefully degrade to slower performance in all cases, it wouldn't probably have been something that ES6 needed to *require*. But because the lack of TCO can actually make certain programs impractical, it's more an important feature of the language than just a hidden implementation detail.
+如果无论什么情况下引擎缺少TCO只是安静地退化到性能差一些的方式上，那么它可能不会是ES6需要 *要求* 的东西。但是因为缺乏TCO可能会实际上使特定的程序不现实，所以与其说它只是一种隐藏的实现细节，不如说它是一个重要的语言特性更合适。
 
-ES6 guarantees that from now on, JS developers will be able to rely on this optimization across all ES6+ compliant browsers. That's a win for JS performance!
+ES6保证，从现在开始，JS开发者们能够在所有兼容ES6+的浏览器上信赖这种优化机制。这是JS性能的一个胜利！
 
-## Review
+## 复习
 
-Effectively benchmarking performance of a piece of code, especially to compare it to another option for that same code to see which approach is faster, requires careful attention to detail.
+有效地对一段代码进行性能基准分析，特别是将它与同样代码的另一种写法相比较来看哪一种方式更快，需要小心地关注细节。
 
-Rather than rolling your own statistically valid benchmarking logic, just use the Benchmark.js library, which does that for you. But be careful about how you author tests, because it's far too easy to construct a test that seems valid but that's actually flawed -- even tiny differences can skew the results to be completely unreliable.
+与其运行你自己的统计学上合法的基准分析逻辑，不如使用Benchmark.js库，它会为你搞定。但要小心你如何编写测试，因为太容易构建一个看起来合法但实际上有漏洞的测试了——即使是一个微小的区别也会使结果歪曲到完全不可靠。
 
-It's important to get as many test results from as many different environments as possible to eliminate hardware/device bias. jsPerf.com is a fantastic website for crowdsourcing performance benchmark test runs.
+尽可能多地从不同的环境中得到尽可能多的测试结果来消除硬件/设备偏差很重要。jsPerf.com是一个用于大众外包性能基准分析测试的神奇网站。
 
-Many common performance tests unfortunately obsess about irrelevant microperformance details like `x++` versus `++x`. Writing good tests means understanding how to focus on big picture concerns, like optimizing on the critical path, and avoiding falling into traps like different JS engines' implementation details.
+许多常见的性能测试不幸地痴迷于无关紧要的微观性能细节，比如比较`x++`和`++x`。编写好的测试意味着理解如何聚焦大局上关注的问题，比如在关键路径上优化，和避免落入不同JS引擎的实现细节的陷阱。
 
-Tail call optimization (TCO) is a required optimization as of ES6 that will make some recursive patterns practical in JS where they would have been impossible otherwise. TCO allows a function call in the *tail position* of another function to execute without needing any extra resources, which means the engine no longer needs to place arbitrary restrictions on call stack depth for recursive algorithms.
+尾部调用优化（TCO）是一个ES6要求的优化机制，它会使一些以前在JS中不可能的递归模式变得可能。TCO允许一个位于另一个函数的 *尾部位置* 的函数调用不需要额外的资源就可以执行，这意味着引擎不再需要对递归算法的调用栈深度设置一个随意的限制了。

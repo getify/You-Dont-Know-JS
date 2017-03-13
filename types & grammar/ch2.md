@@ -1,13 +1,13 @@
-# You Don't Know JS: Types & Grammar
-# Chapter 2: Values
+# 你不懂JS：类型与文法
+# 第二章：值
 
-`array`s, `string`s, and `number`s are the most basic building-blocks of any program, but JavaScript has some unique characteristics with these types that may either delight or confound you.
+`array`，`string`，和`number`是任何程序的最基础构建块，但是JavaScript在这些类型上有一些要么使你惊喜要么使你惊讶的独特性质。
 
-Let's look at several of the built-in value types in JS, and explore how we can more fully understand and correctly leverage their behaviors.
+让我们来看几种JS内建的值类型，并探讨一下我们如何才能更加全面地理解并正确地利用它们的行为。
 
-## Arrays
+## Array
 
-As compared to other type-enforced languages, JavaScript `array`s are just containers for any type of value, from `string` to `number` to `object` to even another `array` (which is how you get multidimensional `array`s).
+和其他强制类型的语言相比，JavaScript的`array`只是值的容器，而这些值可以是任何类型：`string`或者`number`或者`object`，甚至是另一个`array`（这也是你得到多维数组的方法）。
 
 ```js
 var a = [ 1, "2", [3] ];
@@ -17,7 +17,7 @@ a[0] === 1;		// true
 a[2][0] === 3;	// true
 ```
 
-You don't need to presize your `array`s (see "Arrays" in Chapter 3), you can just declare them and add values as you see fit:
+你不需要预先指定`array`的大小，你可以仅声明它们并加入你觉得合适的值：
 
 ```js
 var a = [ ];
@@ -31,15 +31,15 @@ a[2] = [ 3 ];
 a.length;	// 3
 ```
 
-**Warning:** Using `delete` on an `array` value will remove that slot from the `array`, but even if you remove the final element, it does **not** update the `length` property, so be careful! We'll cover the `delete` operator itself in more detail in Chapter 5.
+**警告：** 在一个`array`值上使用`delete`将会从这个`array`上移除一个值槽，但就算你移除了最后一个元素，它也 **不会** 更新`length`属性，所以多加小心！我们会在第五章讨论`delete`操作符的更多细节。
 
-Be careful about creating "sparse" `array`s (leaving or creating empty/missing slots):
+要小心创建“稀散”的`array`（留下或创建空的/丢失的值槽）：
 
 ```js
 var a = [ ];
 
 a[0] = 1;
-// no `a[1]` slot set here
+// 这里没有设置值槽`a[1]`
 a[2] = [ 3 ];
 
 a[1];		// undefined
@@ -47,9 +47,9 @@ a[1];		// undefined
 a.length;	// 3
 ```
 
-While that works, it can lead to some confusing behavior with the "empty slots" you leave in between. While the slot appears to have the `undefined` value in it, it will not behave the same as if the slot is explicitly set (`a[1] = undefined`). See "Arrays" in Chapter 3 for more information.
+虽然这可以工作，但你留下的“空值槽”可能会导致一些令人困惑的行为。虽然这样的值槽看起来拥有`undefined`值，但是它不会像被明确设置（`a[1] = undefined`）的值槽那样动作。更多信息可以参见第三章的“Array”。
 
-`array`s are numerically indexed (as you'd expect), but the tricky thing is that they also are objects that can have `string` keys/properties added to them (but which don't count toward the `length` of the `array`):
+`array`是被数字索引的（正如你认为的那样），但微妙的是它们也是对象，可以在它们上面添加`string`键/属性（但是这些属性不会计算在`array`的`length`中）：
 
 ```js
 var a = [ ];
@@ -62,7 +62,7 @@ a["foobar"];	// 2
 a.foobar;		// 2
 ```
 
-However, a gotcha to be aware of is that if a `string` value intended as a key can be coerced to a standard base-10 `number`, then it is assumed that you wanted to use it as a `number` index rather than as a `string` key!
+然而，一个需要小心的坑是，如果一个可以被强制转换为10进制`number`的`string`值被用作键的话，它会认为你想使用`number`索引而不是一个`string`键！
 
 ```js
 var a = [ ];
@@ -72,15 +72,15 @@ a["13"] = 42;
 a.length; // 14
 ```
 
-Generally, it's not a great idea to add `string` keys/properties to `array`s. Use `object`s for holding values in keys/properties, and save `array`s for strictly numerically indexed values.
+一般来说，向`array`添加`string`键/属性不是一个好主意。最好使用`object`来持有键/属性形式的值，而将`array`专用于严格地数字索引的值。
 
-### Array-Likes
+### 类Array
 
-There will be occasions where you need to convert an `array`-like value (a numerically indexed collection of values) into a true `array`, usually so you can call array utilities (like `indexOf(..)`, `concat(..)`, `forEach(..)`, etc.) against the collection of values.
+偶尔你需要将一个类`array`值（一个数字索引的值的集合）转换为一个真正的`array`，通常你可以对这些值的集合调用数组的工具函数（比如`indexOf(..)`，`concat(..)`，`forEach(..)`等等）。
 
-For example, various DOM query operations return lists of DOM elements that are not true `array`s but are `array`-like enough for our conversion purposes. Another common example is when functions expose the `arguments` (`array`-like) object (as of ES6, deprecated) to access the arguments as a list.
+举个例子，各种DOM查询操作会返回一个DOM元素的列表，对于我们转换的目的来说，这些列表不是真正的`array`但是也足够类似`array`。另一个常见的例子是，函数为了像列表一样访问它的参数值，而暴露了`arugumens`对象（类`array`，在ES6中被废弃了）。
 
-One very common way to make such a conversion is to borrow the `slice(..)` utility against the value:
+一个进行这种转换的很常见的方法是对这个值借用`slice(..)`工具：
 
 ```js
 function foo() {
@@ -92,9 +92,9 @@ function foo() {
 foo( "bar", "baz" ); // ["bar","baz","bam"]
 ```
 
-If `slice()` is called without any other parameters, as it effectively is in the above snippet, the default values for its parameters have the effect of duplicating the `array` (or, in this case, `array`-like).
+如果`slice()`没有用其他额外的参数调用，就像上面的代码段那样，它的参数的默认值会使它具有复制这个`array`（或者，在这个例子中，是一个类`array`）的效果。
 
-As of ES6, there's also a built-in utility called `Array.from(..)` that can do the same task:
+在ES6中，还有一种称为`Array.from(..)`的内建工具可以执行相同的任务：
 
 ```js
 ...
@@ -102,20 +102,20 @@ var arr = Array.from( arguments );
 ...
 ```
 
-**Note:** `Array.from(..)` has several powerful capabilities, and will be covered in detail in the *ES6 & Beyond* title of this series.
+**注意：** `Array.from(..)`拥有几种其他强大的能力，我们将在本系列的 *ES6与未来* 中涵盖它的细节。
 
-## Strings
+## String
 
-It's a very common belief that `string`s are essentially just `array`s of characters. While the implementation under the covers may or may not use `array`s, it's important to realize that JavaScript `string`s are really not the same as `array`s of characters. The similarity is mostly just skin-deep.
+一个很常见的想法是，`string`实质上只是字符的`array`。虽然内部的实现可能是也可能不是`array`，但重要的是要理解JavaScript的`string`与字符的`array`确实不一样。它们的相似性几乎只是表面上的。
 
-For example, let's consider these two values:
+举个例子，让我们考虑这两个值：
 
 ```js
 var a = "foo";
 var b = ["f","o","o"];
 ```
 
-Strings do have a shallow resemblance to `array`s -- `array`-likes, as above -- for instance, both of them having a `length` property, an `indexOf(..)` method (`array` version only as of ES5), and a `concat(..)` method:
+String确实与`array`有很肤浅的相似性 -- 也就是上面说的，类`array` -- 举例来说，它们都有一个`length`属性，一个`indexOf(..)`方法（在ES5中仅有`array`版本），和一个`concat(..)`方法：
 
 ```js
 a.length;							// 3
@@ -134,7 +134,7 @@ a;									// "foo"
 b;									// ["f","o","o"]
 ```
 
-So, they're both basically just "arrays of characters", right? **Not exactly**:
+那么，它们基本上都仅仅是“字符的数组”，对吧？ **不确切**：
 
 ```js
 a[1] = "O";
@@ -144,9 +144,9 @@ a; // "foo"
 b; // ["f","O","o"]
 ```
 
-JavaScript `string`s are immutable, while `array`s are quite mutable. Moreover, the `a[1]` character position access form was not always widely valid JavaScript. Older versions of IE did not allow that syntax (but now they do). Instead, the *correct* approach has been `a.charAt(1)`.
+JavaScript的`string`是不可变的，而`array`是相当可变的。另外，在JavaScript中用位置访问字符的`a[1]`形式不总是广泛合法的。老版本的IE就不允许这种语法（但是它们现在允许了）。相反，*正确的* 方式是`a.charAt(1)`。
 
-A further consequence of immutable `string`s is that none of the `string` methods that alter its contents can modify in-place, but rather must create and return new `string`s. By contrast, many of the methods that change `array` contents actually *do* modify in-place.
+`string`不可变性的进一步的后果是，`string`上没有一个方法是可以原地修改它的内容的，而是创建并返回一个新的`string`。与之相对的是，许多改变`array`内容的方法实际上 *是* 原地修改的。
 
 ```js
 c = a.toUpperCase();
@@ -158,7 +158,7 @@ b.push( "!" );
 b;			// ["f","O","o","!"]
 ```
 
-Also, many of the `array` methods that could be helpful when dealing with `string`s are not actually available for them, but we can "borrow" non-mutation `array` methods against our `string`:
+另外，许多`array`方法在处理`string`时非常有用，虽然这些方法不属于`string`，但我们可以对我们的`string`“借用”非变化的`array`方法：
 
 ```js
 a.join;			// undefined
@@ -173,7 +173,7 @@ c;				// "f-o-o"
 d;				// "F.O.O."
 ```
 
-Let's take another example: reversing a `string` (incidentally, a common JavaScript interview trivia question!). `array`s have a `reverse()` in-place mutator method, but `string`s do not:
+让我们来看另一个例子：翻转一个`string`（顺带一提，这是一个JavaScript面试中常见的细小问题！）。`array`拥有一个原地的`reverse()`修改器方法，但是`string`没有：
 
 ```js
 a.reverse;		// undefined
@@ -182,70 +182,69 @@ b.reverse();	// ["!","o","O","f"]
 b;				// ["!","o","O","f"]
 ```
 
-Unfortunately, this "borrowing" doesn't work with `array` mutators, because `string`s are immutable and thus can't be modified in place:
+不幸的是，这种“借用”`array`修改器不起作用，因为`string`是不可变的，因此它不能被原地修改：
 
 ```js
 Array.prototype.reverse.call( a );
-// still returns a String object wrapper (see Chapter 3)
-// for "foo" :(
+// 仍然返回一个“foo”的String对象包装器（见第三章） :(
 ```
 
-Another workaround (aka hack) is to convert the `string` into an `array`, perform the desired operation, then convert it back to a `string`.
+另一种迂回的做法（也是黑科技）是，将`string`转换为一个`array`，实施我们想做的操作，然后将它转回`string`。
 
 ```js
 var c = a
-	// split `a` into an array of characters
+	// 将`a`切分成一个字符的数组
 	.split( "" )
-	// reverse the array of characters
+	// 翻转字符的数组
 	.reverse()
-	// join the array of characters back to a string
+	// 将字符的数组连接回一个字符串
 	.join( "" );
 
 c; // "oof"
 ```
 
-If that feels ugly, it is. Nevertheless, *it works* for simple `string`s, so if you need something quick-n-dirty, often such an approach gets the job done.
+如果你觉得这很难看，没错。不管怎样，对于简单的`string`它 *好用*，所以如果你需要某些快速但是“脏”的东西，像这样的方式经常能满足你。
 
-**Warning:** Be careful! This approach **doesn't work** for `string`s with complex (unicode) characters in them (astral symbols, multibyte characters, etc.). You need more sophisticated library utilities that are unicode-aware for such operations to be handled accurately. Consult Mathias Bynens' work on the subject: *Esrever* (https://github.com/mathiasbynens/esrever).
+**警告：** 小心！这种方法对含有复杂（unicode）字符（星号，多字节字符等）的`string` **不起作用**。你需要支持unicode的更精巧的工具库来准确地处理这种操作。在这个问题上可以咨询Mathias Bynens的作品：*Esrever*（https://github.com/mathiasbynens/esrever）。
 
-The other way to look at this is: if you are more commonly doing tasks on your "strings" that treat them as basically *arrays of characters*, perhaps it's better to just actually store them as `array`s rather than as `string`s. You'll probably save yourself a lot of hassle of converting from `string` to `array` each time. You can always call `join("")` on the `array` *of characters* whenever you actually need the `string` representation.
+另外一种考虑这个问题的方式是：如果你更经常地将你的“string”基本上作为 *字符的数组* 来执行一些任务的话，也许就将它们作为`array`而不是作为`string`存储更好。你可能会因此省去很多每次都将`string`转换为`array`的麻烦。无论何时你确实需要`string`的表现形式的话，你总是可以调用 *字符的* `array`的`join("")`方法。
 
-## Numbers
+## Number
 
-JavaScript has just one numeric type: `number`. This type includes both "integer" values and fractional decimal numbers. I say "integer" in quotes because it's long been a criticism of JS that there are not true integers, as there are in other languages. That may change at some point in the future, but for now, we just have `number`s for everything.
+JavaScript只有一种数字类型：`number`。这种类型包含“整数”值和小数值。我说“整数”时加了引号，因为JS的一个长久以来为人诟病的原因是，和其他语言不同，JS没有真正的整数。这可能在未来某个时候会改变，但是目前，我们只有`number`可用。
 
-So, in JS, an "integer" is just a value that has no fractional decimal value. That is, `42.0` is as much an "integer" as `42`.
+所以，在JS中，一个“整数”只是一个没有小数部分的小数值。也就是说，`42.0`和`42`一样是“整数”。
 
-Like most modern languages, including practically all scripting languages, the implementation of JavaScript's `number`s is based on the "IEEE 754" standard, often called "floating-point." JavaScript specifically uses the "double precision" format (aka "64-bit binary") of the standard.
+像大多数现代计算机语言，以及几乎所有的脚本语言一样，JavaScript的`number`的实现基于“IEEE 754”标准，通常被称为“浮点”。JavaScript明确地使用了这个标准的“双精度”（也就是“64位二进制”）格式。
 
-There are many great write-ups on the Web about the nitty-gritty details of how binary floating-point numbers are stored in memory, and the implications of those choices. Because understanding bit patterns in memory is not strictly necessary to understand how to correctly use `number`s in JS, we'll leave it as an exercise for the interested reader if you'd like to dig further into IEEE 754 details.
+在网络上有许多了不起的文章都在介绍二进制浮点数如何在内存中存储的细节，以及选择这些做法的意义。因为对于理解如何在JS中正确使用`number`来说，理解内存中的位模式不是必须的，所以我们将这个话题作为练习留给那些想要进一步挖掘IEEE 754的细节的读者。
 
-### Numeric Syntax
+### 数字的语法
 
-Number literals are expressed in JavaScript generally as base-10 decimal literals. For example:
+在JavaScript中字面数字一般用10进制小数表达。例如：
 
 ```js
 var a = 42;
 var b = 42.3;
 ```
 
-The leading portion of a decimal value, if `0`, is optional:
+小数的整数部分如果是`0`，是可选的：
 
 ```js
 var a = 0.42;
 var b = .42;
 ```
 
-Similarly, the trailing portion (the fractional) of a decimal value after the `.`, if `0`, is optional:
+相似地，一个小数在`.`之后的小数部分如果是`0`，是可选的：
 
 ```js
 var a = 42.0;
 var b = 42.;
 ```
 
-**Warning:** `42.` is pretty uncommon, and probably not a great idea if you're trying to avoid confusion when other people read your code. But it is, nevertheless, valid.
+**警告：** `42.`是极不常见的，如果你正在努力避免别人阅读你的代码时感到困惑，它可能不是一个好主意。但不管怎样，它是合法的。
 
-By default, most `number`s will be outputted as base-10 decimals, with trailing fractional `0`s removed. So:
+默认情况下，大多数`number`将会以10进制小数的形式输出，并去掉末尾小数部分的`0`。所以：
 
 ```js
 var a = 42.300;
@@ -255,7 +254,7 @@ a; // 42.3
 b; // 42
 ```
 
-Very large or very small `number`s will by default be outputted in exponent form, the same as the output of the `toExponential()` method, like:
+非常大或非常小的`number`将默认以指数形式输出，与`toExponential()`方法的输出一样，比如：
 
 ```js
 var a = 5E10;
@@ -269,7 +268,7 @@ var c = 1 / a;
 c;					// 2e-11
 ```
 
-Because `number` values can be boxed with the `Number` object wrapper (see Chapter 3), `number` values can access methods that are built into the `Number.prototype` (see Chapter 3). For example, the `toFixed(..)` method allows you to specify how many fractional decimal places you'd like the value to be represented with:
+因为`number`值可以用`Number`对象包装器封装（见第三章），`number`值可以访问内建在`Number.prototype`上的方法（见第三章）。举个例子，`toFixed(..)`方法允许你指定一个值在被表示时，带有多少位小数：
 
 ```js
 var a = 42.59;
@@ -281,9 +280,9 @@ a.toFixed( 3 ); // "42.590"
 a.toFixed( 4 ); // "42.5900"
 ```
 
-Notice that the output is actually a `string` representation of the `number`, and that the value is `0`-padded on the right-hand side if you ask for more decimals than the value holds.
+要注意的是，它的输出实际上是一个`number`的`string`表现形式，而且如果你指定的位数多于值持有的小数位数时，会在右侧补`0`。
 
-`toPrecision(..)` is similar, but specifies how many *significant digits* should be used to represent the value:
+`toPrecision(..)`很相似，但它指定的是有多少 *有效数字* 用来表示这个值：
 
 ```js
 var a = 42.59;
@@ -296,87 +295,87 @@ a.toPrecision( 5 ); // "42.590"
 a.toPrecision( 6 ); // "42.5900"
 ```
 
-You don't have to use a variable with the value in it to access these methods; you can access these methods directly on `number` literals. But you have to be careful with the `.` operator. Since `.` is a valid numeric character, it will first be interpreted as part of the `number` literal, if possible, instead of being interpreted as a property accessor.
+你不必非得使用持有这个值的变量来访问这些方法；你可以直接在`number`的字面上访问这些方法。但你不得不小心`.`操作符。因为`.`是一个合法数字字符，如果可能的话，它会首先被翻译为`number`字面的一部分，而不是被翻译为属性访问操作符。
 
 ```js
-// invalid syntax:
+// 不合法的语法：
 42.toFixed( 3 );	// SyntaxError
 
-// these are all valid:
+// 这些都是合法的：
 (42).toFixed( 3 );	// "42.000"
 0.42.toFixed( 3 );	// "0.420"
 42..toFixed( 3 );	// "42.000"
 ```
 
-`42.toFixed(3)` is invalid syntax, because the `.` is swallowed up as part of the `42.` literal (which is valid -- see above!), and so then there's no `.` property operator present to make the `.toFixed` access.
+`42.toFixed(3)`是不合法的语法，因为`.`作为`42.`字面（这是合法的 -- 参见上面的讨论！）的一部分被吞掉了，因此没有`.`属性操作符来表示`.toFixed`访问。
 
-`42..toFixed(3)` works because the first `.` is part of the `number` and the second `.` is the property operator. But it probably looks strange, and indeed it's very rare to see something like that in actual JavaScript code. In fact, it's pretty uncommon to access methods directly on any of the primitive values. Uncommon doesn't mean *bad* or *wrong*.
+`42..toFixed(3)`可以工作，因为第一个`.`是`number`的一部分，而第二个`.`是属性操作符。但它可能看起来很古怪，而且确实在实际的JavaScript代码中很少会看到这样的东西。实际上，在任何基本类型上直接访问方法是十分不常见的。但是不常见并不意味着 *坏* 或者 *错*。
 
-**Note:** There are libraries that extend the built-in `Number.prototype` (see Chapter 3) to provide extra operations on/with `number`s, and so in those cases, it's perfectly valid to use something like `10..makeItRain()` to set off a 10-second money raining animation, or something else silly like that.
+**注意：** 有一些库扩展了内建的`Number.prototype`（见第三章），使用`number`或在`number`上提供了额外的操作，所以在这些情况下，像使用`10..makeItRain()`来设定一个10秒钟的下钱雨的动画，或者其他诸如此类的傻事是完全合法的。
 
-This is also technically valid (notice the space):
+在技术上讲，这也是合法的（注意那个空格）：
 
 ```js
 42 .toFixed(3); // "42.000"
 ```
 
-However, with the `number` literal specifically, **this is particularly confusing coding style** and will serve no other purpose but to confuse other developers (and your future self). Avoid it.
+但是，尤其是对`number`字面量来说，**这是特别使人糊涂的代码风格**，而且除了使其他开发者（和未来的你）糊涂以外没有任何用处。避免它。
 
-`number`s can also be specified in exponent form, which is common when representing larger `number`s, such as:
-
-```js
-var onethousand = 1E3;						// means 1 * 10^3
-var onemilliononehundredthousand = 1.1E6;	// means 1.1 * 10^6
-```
-
-`number` literals can also be expressed in other bases, like binary, octal, and hexadecimal.
-
-These formats work in current versions of JavaScript:
+`number`还可以使用科学计数法的形式指定，这在表示很大的`number`时很常见，比如：
 
 ```js
-0xf3; // hexadecimal for: 243
-0Xf3; // ditto
-
-0363; // octal for: 243
+var onethousand = 1E3;						// 代表 1 * 10^3
+var onemilliononehundredthousand = 1.1E6;	// 代表 1.1 * 10^6
 ```
 
-**Note:** Starting with ES6 + `strict` mode, the `0363` form of octal literals is no longer allowed (see below for the new form). The `0363` form is still allowed in non-`strict` mode, but you should stop using it anyway, to be future-friendly (and because you should be using `strict` mode by now!).
+`number`字面量还可以使用其他进制表达，比如二进制，八进制，和十六进制。
 
-As of ES6, the following new forms are also valid:
+这些格式是可以在当前版本的JavaScript中使用的：
 
 ```js
-0o363;		// octal for: 243
-0O363;		// ditto
+0xf3; // 十六进制的: 243
+0Xf3; // 同上
 
-0b11110011;	// binary for: 243
-0B11110011; // ditto
+0363; // 八进制的: 243
 ```
 
-Please do your fellow developers a favor: never use the `0O363` form. `0` next to capital `O` is just asking for confusion. Always use the lowercase predicates `0x`, `0b`, and `0o`.
+**注意：** 从ES6 + `strict`模式开始，不再允许`0363`这样的的八进制形式（新的形式参见后面的讨论）。`0363`在非`strict`模式下依然是允许的，但是不管怎样你应当停止使用它，来拥抱未来（而且因为你现在应当在使用`strict`模式了！）。
 
-### Small Decimal Values
+至于ES6，下面的新形式也是合法的：
 
-The most (in)famous side effect of using binary floating-point numbers (which, remember, is true of **all** languages that use IEEE 754 -- not *just* JavaScript as many assume/pretend) is:
+```js
+0o363;		// 八进制的: 243
+0O363;		// 同上
+
+0b11110011;	// 二进制的: 243
+0B11110011; // 同上
+```
+
+请为你的开发者同胞们做件好事：绝不要使用`0O363`形式。把`0`放在大写的`O`旁边就是在制造困惑。保持使用小写的谓词`0x`，`0b`，和`0o`。
+
+### 小数值
+
+使用二进制浮点数的最出名（臭名昭著）的副作用是（记住，这是对 **所有** 使用IEEE 754的语言都成立的——不是许多人认为/假装 *仅* 在JavaScript中存在的问题）：
 
 ```js
 0.1 + 0.2 === 0.3; // false
 ```
 
-Mathematically, we know that statement should be `true`. Why is it `false`?
+从数学的意义上，我们知道这个语句应当为`true`。为什么它是`false`？
 
-Simply put, the representations for `0.1` and `0.2` in binary floating-point are not exact, so when they are added, the result is not exactly `0.3`. It's **really** close: `0.30000000000000004`, but if your comparison fails, "close" is irrelevant.
+简单地说，`0.1`和`0.2`的二进制表示形式是不精确的，所以它们相加时，结果不是精确地`0.3`。而是 **非常** 接近的值：`0.30000000000000004`，但是如果你的比较失败了，“接近”是无关紧要的。
 
-**Note:** Should JavaScript switch to a different `number` implementation that has exact representations for all values? Some think so. There have been many alternatives presented over the years. None of them have been accepted yet, and perhaps never will. As easy as it may seem to just wave a hand and say, "fix that bug already!", it's not nearly that easy. If it were, it most definitely would have been changed a long time ago.
+**注意：** JavaScript应当切换到可以精确表达所有值的一个不同的`number`实现吗？有些人认为应该。多年以来有许多选项出现过。但是没有一个被采纳，而且也许永远也不会。它看起来就像挥挥手然后说“已经改好那个bug了!”那么简单，但根本不是那么回事儿。如果真有这么简单，它绝对就在很久以前被改掉了。
 
-Now, the question is, if some `number`s can't be *trusted* to be exact, does that mean we can't use `number`s at all? **Of course not.**
+现在的问题是，如果一些`number`不能被 *信任* 为精确的，这不是意味着我们根本不能使用`number`吗？ **当然不是。**
 
-There are some applications where you need to be more careful, especially when dealing with fractional decimal values. There are also plenty of (maybe most?) applications that only deal with whole numbers ("integers"), and moreover, only deal with numbers in the millions or trillions at maximum. These applications have been, and always will be, **perfectly safe** to use numeric operations in JS.
+在一些应用程序中你需要多加小心，特别是在对付小数的时候。还有许多（也许是大多数？）应用程序只处理整数，而且，最大只处理到几百万到几万亿。这些应用程序使用JS中的数字操作是，而且将总是，**非常安全** 的。
 
-What if we *did* need to compare two `number`s, like `0.1 + 0.2` to `0.3`, knowing that the simple equality test fails?
+要是我们 *确实* 需要比较两个`number`，就像`0.1 + 0.2`与`0.3`，而且知道这个简单的相等测试将会失败呢？
 
-The most commonly accepted practice is to use a tiny "rounding error" value as the *tolerance* for comparison. This tiny value is often called "machine epsilon," which is commonly `2^-52` (`2.220446049250313e-16`) for the kind of `number`s in JavaScript.
+可以接受的最常见的做法是使用一个很小的“错误舍入”值作为比较的 *容差*。这个很小的值经常被称为“机械极小值（machine epsilon）”，对于JavaScript来说这种`number`通常为`2^-52`（`2.220446049250313e-16`）。
 
-As of ES6, `Number.EPSILON` is predefined with this tolerance value, so you'd want to use it, but you can safely polyfill the definition for pre-ES6:
+在ES6中，使用这个容差值预定义了`Number.EPSILON`，所以你将会想要使用它，你也可以在前ES6中安全地填补这个定义：
 
 ```js
 if (!Number.EPSILON) {
@@ -384,7 +383,7 @@ if (!Number.EPSILON) {
 }
 ```
 
-We can use this `Number.EPSILON` to compare two `number`s for "equality" (within the rounding error tolerance):
+我们可以使用这个`Number.EPSILON`来比较两个`number`的“等价性”（带有错误舍入的容差）：
 
 ```js
 function numbersCloseEnoughToEqual(n1,n2) {
@@ -398,23 +397,23 @@ numbersCloseEnoughToEqual( a, b );					// true
 numbersCloseEnoughToEqual( 0.0000001, 0.0000002 );	// false
 ```
 
-The maximum floating-point value that can be represented is roughly `1.798e+308` (which is really, really, really huge!), predefined for you as `Number.MAX_VALUE`. On the small end, `Number.MIN_VALUE` is roughly `5e-324`, which isn't negative but is really close to zero!
+可以被表示的最大的浮点值大概是`1.798e+308`（它真的非常，非常，非常大！），它为你预定义为`Number.MAX_VALUE`。在极小的一端，`Number.MIN_VALUE`大概是`5e-324`，它不是负数但是非常接近于0！
 
-### Safe Integer Ranges
+### 安全整数范围
 
-Because of how `number`s are represented, there is a range of "safe" values for the whole `number` "integers", and it's significantly less than `Number.MAX_VALUE`.
+由于`number`的表示方式，对完全是`number`的“整数”而言有一个“安全”的值的范围，而且它要比`Number.MAX_VALUE`小得多。
 
-The maximum integer that can "safely" be represented (that is, there's a guarantee that the requested value is actually representable unambiguously) is `2^53 - 1`, which is `9007199254740991`. If you insert your commas, you'll see that this is just over 9 quadrillion. So that's pretty darn big for `number`s to range up to.
+可以“安全地”被表示的最大整数（也就是说，可以保证被表示的值是实际可以无误地表示的）是`2^53 - 1`，也就是`9007199254740991`，如果你插入一些数字分隔符，可以看到它刚好超过9万亿。所以对于`number`能表示的上限来说它确实是够TM大的。
 
-This value is actually automatically predefined in ES6, as `Number.MAX_SAFE_INTEGER`. Unsurprisingly, there's a minimum value, `-9007199254740991`, and it's defined in ES6 as `Number.MIN_SAFE_INTEGER`.
+在ES6中这个值实际上是自动预定义的，它是`Number.MAX_SAFE_INTEGER`。意料之中的是，还有一个最小值，`-9007199254740991`，它在ES6中定义为`Number.MIN_SAFE_INTEGER`。
 
-The main way that JS programs are confronted with dealing with such large numbers is when dealing with 64-bit IDs from databases, etc. 64-bit numbers cannot be represented accurately with the `number` type, so must be stored in (and transmitted to/from) JavaScript using `string` representation.
+JS程序面临处理这样大的数字的主要情况是，处理数据库中的64位ID等等。64位数字不能使用`number`类型准确表达，所以在JavaScript中必须使用`string`表现形式存储（和传递）。
 
-Numeric operations on such large ID `number` values (besides comparison, which will be fine with `string`s) aren't all that common, thankfully. But if you *do* need to perform math on these very large values, for now you'll need to use a *big number* utility. Big numbers may get official support in a future version of JavaScript.
+谢天谢地，在这样的大ID`number`值上的数字操作（除了比较，它使用`string`也没问题）并不很常见。但是如果你 *确实* 需要在这些非常大的值上实施数学操作，目前来讲你需要使用一个 *大数字* 工具。在未来版本的JavaScript中，大数字也许会得到官方支持。
 
-### Testing for Integers
+### 测试整数
 
-To test if a value is an integer, you can use the ES6-specified `Number.isInteger(..)`:
+测试一个值是否是整数，你可以使用ES6定义的`Number.isInteger(..)`：
 
 ```js
 Number.isInteger( 42 );		// true
@@ -422,7 +421,7 @@ Number.isInteger( 42.000 );	// true
 Number.isInteger( 42.3 );	// false
 ```
 
-To polyfill `Number.isInteger(..)` for pre-ES6:
+可以为前ES6填补`Number.isInteger(..)`：
 
 ```js
 if (!Number.isInteger) {
@@ -432,7 +431,7 @@ if (!Number.isInteger) {
 }
 ```
 
-To test if a value is a *safe integer*, use the ES6-specified `Number.isSafeInteger(..)`:
+要测试一个值是否是 *安全整数*，使用ES6定义的`Number.isSafeInteger(..)`：
 
 ```js
 Number.isSafeInteger( Number.MAX_SAFE_INTEGER );	// true
@@ -440,7 +439,7 @@ Number.isSafeInteger( Math.pow( 2, 53 ) );			// false
 Number.isSafeInteger( Math.pow( 2, 53 ) - 1 );		// true
 ```
 
-To polyfill `Number.isSafeInteger(..)` in pre-ES6 browsers:
+可以为前ES6浏览器填补`Number.isSafeInteger(..)`：
 
 ```js
 if (!Number.isSafeInteger) {
@@ -450,44 +449,43 @@ if (!Number.isSafeInteger) {
 	};
 }
 ```
+### 32位（有符号）整数
 
-### 32-bit (Signed) Integers
+虽然整数可以安全地最大达到约9万亿（53比特），但有一些数字操作（比如位操作符）是仅仅为32位`number`定义的，所以对于被这样使用的`number`来说，“安全范围”一定会小得多。
 
-While integers can range up to roughly 9 quadrillion safely (53 bits), there are some numeric operations (like the bitwise operators) that are only defined for 32-bit `number`s, so the "safe range" for `number`s used in that way must be much smaller.
+这个范围是从`Math.pow(-2,31)`（`-2147483648`，大约-21亿）到`Math.pow(2,31)-1`（`2147483647`，大约+21亿）。
 
-The range then is `Math.pow(-2,31)` (`-2147483648`, about -2.1 billion) up to `Math.pow(2,31)-1` (`2147483647`, about +2.1 billion).
+要强制`a`中的`number`值是32位有符号整数，使用`a | 0`。这可以工作是因为`|`位操作符仅仅对32位值起作用（意味着它可以只关注32位，而其他的位将被丢掉）。而且，和0进行“或”的位操作实质上是什么也不做。
 
-To force a `number` value in `a` to a 32-bit signed integer value, use `a | 0`. This works because the `|` bitwise operator only works for 32-bit integer values (meaning it can only pay attention to 32 bits and any other bits will be lost). Then, "or'ing" with zero is essentially a no-op bitwise speaking.
+**注意：** 特定的特殊值（我们将在下一节讨论），比如`NaN`和`Infinity`不是“32位安全”的，当这些值被传入位操作符时将会通过一个抽象操作`ToInt32`（见第四章）并为了位操作而简单地变成`+0`值。
 
-**Note:** Certain special values (which we will cover in the next section) such as `NaN` and `Infinity` are not "32-bit safe," in that those values when passed to a bitwise operator will pass through the abstract operation `ToInt32` (see Chapter 4) and become simply the `+0` value for the purpose of that bitwise operation.
+## 特殊值
 
-## Special Values
+在各种类型中散布着一些特殊值，需要 *警惕* 的JS开发者小心，并正确使用。
 
-There are several special values spread across the various types that the *alert* JS developer needs to be aware of, and use properly.
+### 不是值的值
 
-### The Non-value Values
+对于`undefined`类型来说，有且仅有一个值：`undefined`。对于`null`类型来说，有且仅有一个值：`null`。所以对它们而言，这些文字既是它们的类型也是它们的值。
 
-For the `undefined` type, there is one and only one value: `undefined`. For the `null` type, there is one and only one value: `null`. So for both of them, the label is both its type and its value.
+`undefined`和`null`作为“空”值或者“没有”值，经常被认为是可以互换的。另一些开发者偏好于使用微妙的区别将它们区分开。举例来讲：
 
-Both `undefined` and `null` are often taken to be interchangeable as either "empty" values or "non" values. Other developers prefer to distinguish between them with nuance. For example:
+* `null`是一个空值
+* `undefined`是一个丢失的值
 
-* `null` is an empty value
-* `undefined` is a missing value
+或者：
 
-Or:
+* `undefined`还没有值
+* `null`曾经有过值但现在没有
 
-* `undefined` hasn't had a value yet
-* `null` had a value and doesn't anymore
-
-Regardless of how you choose to "define" and use these two values, `null` is a special keyword, not an identifier, and thus you cannot treat it as a variable to assign to (why would you!?). However, `undefined` *is* (unfortunately) an identifier. Uh oh.
+不管你选择如何“定义”和使用这两个值，`null`是一个特殊的关键字，不是一个标识符，因此你不能将它作为一个变量对待来给它赋值（为什么你要给它赋值呢？！）。然而，`undefined`（不幸地）*是* 一个标识符。噢。
 
 ### Undefined
 
-In non-`strict` mode, it's actually possible (though incredibly ill-advised!) to assign a value to the globally provided `undefined` identifier:
+在非`strict`模式下，给在全局上提供的`undefined`标识符赋一个值实际上是可能的（虽然这是一个非常不好的做法！）：
 
 ```js
 function foo() {
-	undefined = 2; // really bad idea!
+	undefined = 2; // 非常差劲儿的主意！
 }
 
 foo();
@@ -502,7 +500,7 @@ function foo() {
 foo();
 ```
 
-In both non-`strict` mode and `strict` mode, however, you can create a local variable of the name `undefined`. But again, this is a terrible idea!
+但是，在非`strict`模式和`strict`模式下，你可以创建一个名叫`undefined`局部变量。但这又是一个很差劲儿的主意！
 
 ```js
 function foo() {
@@ -514,13 +512,13 @@ function foo() {
 foo();
 ```
 
-**Friends don't let friends override `undefined`.** Ever.
+**朋友永远不让朋友覆盖`undefined`。**
 
-#### `void` Operator
+#### `void`操作符
 
-While `undefined` is a built-in identifier that holds (unless modified -- see above!) the built-in `undefined` value, another way to get this value is the `void` operator.
+虽然`undefined`是一个持有内建的值`undefined`的内建标识符（除非被修改——见上面的讨论！），另一个得到这个值的方法是`void`操作符。
 
-The expression `void ___` "voids" out any value, so that the result of the expression is always the `undefined` value. It doesn't modify the existing value; it just ensures that no value comes back from the operator expression.
+表达式`void __`会“躲开”任何值，所以这个表达式的结果总是值`undefined`。它不会修改任何已经存在的值；只是确保不会有值从操作符表达式中返回来。
 
 ```js
 var a = 42;
@@ -528,57 +526,57 @@ var a = 42;
 console.log( void a, a ); // undefined 42
 ```
 
-By convention (mostly from C-language programming), to represent the `undefined` value stand-alone by using `void`, you'd use `void 0` (though clearly even `void true` or any other `void` expression does the same thing). There's no practical difference between `void 0`, `void 1`, and `undefined`.
+从惯例上讲（大约是从C语言编程中发展而来），要通过使用`void`来独立表现值`undefined`，你可以使用`void 0`（虽然，很明显，`void true`或者任何其他的`void`表达式都做同样的事情）。在`void 0`，`void 1`和`undefined`之间没有实际上的区别。
 
-But the `void` operator can be useful in a few other circumstances, if you need to ensure that an expression has no result value (even if it has side effects).
+但是在几种其他的环境下`void`操作符可以十分有用：如果你需要确保一个表达式没有结果值（即便它有副作用）。
 
-For example:
+举个例子：
 
 ```js
 function doSomething() {
-	// note: `APP.ready` is provided by our application
+	// 注意：`APP.ready`是由我们的应用程序提供的
 	if (!APP.ready) {
-		// try again later
+		// 稍后再试一次
 		return void setTimeout( doSomething, 100 );
 	}
 
 	var result;
 
-	// do some other stuff
+	// 做其他一些事情
 	return result;
 }
 
-// were we able to do it right away?
+// 我们能立即执行吗？
 if (doSomething()) {
-	// handle next tasks right away
+	// 马上处理其他任务
 }
 ```
 
-Here, the `setTimeout(..)` function returns a numeric value (the unique identifier of the timer interval, if you wanted to cancel it), but we want to `void` that out so that the return value of our function doesn't give a false-positive with the `if` statement.
+这里，`setTimeout(..)`函数返回一个数字值（时间间隔定时器的唯一标识符，用于取消它自己），但是我们想`void`它，这样我们函数的返回值不会在`if`语句上给出一个成立的误报。
 
-Many devs prefer to just do these actions separately, which works the same but doesn't use the `void` operator:
+许多开发者宁愿将这些动作分开，这样的效用相同但不使用`void`操作符：
 
 ```js
 if (!APP.ready) {
-	// try again later
+	// 稍后再试一次
 	setTimeout( doSomething, 100 );
 	return;
 }
 ```
 
-In general, if there's ever a place where a value exists (from some expression) and you'd find it useful for the value to be `undefined` instead, use the `void` operator. That probably won't be terribly common in your programs, but in the rare cases you do need it, it can be quite helpful.
+一般来说，如果有那么一个地方，有一个值存在（来自某个表达式）而你发现这个值如果是`undefined`才有用，就使用`void`操作符。这可能在你的程序中不是非常常见，但如果在一些稀有的情况下你需要它，它就十分有用。
 
-### Special Numbers
+### 特殊的数字
 
-The `number` type includes several special values. We'll take a look at each in detail.
+`number`类型包含几种特殊值。我们将会仔细考察每一种。
 
-#### The Not Number, Number
+#### 不是数字的数字
 
-Any mathematic operation you perform without both operands being `number`s (or values that can be interpreted as regular `number`s in base 10 or base 16) will result in the operation failing to produce a valid `number`, in which case you will get the `NaN` value.
+如果你不使用同为`number`（或者可以被翻译为10进制或16进制的普通`number`的值）的两个操作数进行任何算数操作，那么操作的结果将失败而产生一个不合法的`number`，在这种情况下你将得到`NaN`值。
 
-`NaN` literally stands for "not a `number`", though this label/description is very poor and misleading, as we'll see shortly. It would be much more accurate to think of `NaN` as being "invalid number," "failed number," or even "bad number," than to think of it as "not a number."
+`NaN`在字面上代表“不是一个`number`(Not a Number)”，但是正如我们即将看到的，这种文字描述十分失败而且容易误导人。将`NaN`考虑为“不合法数字”，“失败的数字”，甚至是“坏掉的数字”都要比“不是一个数字”准确得多。
 
-For example:
+举例来说：
 
 ```js
 var a = 2 / "foo";		// NaN
@@ -586,11 +584,11 @@ var a = 2 / "foo";		// NaN
 typeof a === "number";	// true
 ```
 
-In other words: "the type of not-a-number is 'number'!" Hooray for confusing names and semantics.
+换句话说：“‘不是一个数字’的类型是‘数字’”！为这使人糊涂的名字和语义欢呼吧。
 
-`NaN` is a kind of "sentinel value" (an otherwise normal value that's assigned a special meaning) that represents a special kind of error condition within the `number` set. The error condition is, in essence: "I tried to perform a mathematic operation but failed, so here's the failed `number` result instead."
+`NaN`是一种“哨兵值”（一个被赋予了特殊意义的普通的值），它代表`number`集合内的一种特殊的错误情况。这种错误情况实质上是：“我试着进行数学操作但是失败了，而这就是失败的`number`结果。”
 
-So, if you have a value in some variable and want to test to see if it's this special failed-number `NaN`, you might think you could directly compare to `NaN` itself, as you can with any other value, like `null` or `undefined`. Nope.
+那么，如果你有一个值存在某个变量中，而且你想要测试它是否是这个特殊的失败数字`NaN`，你也许认为你可以直接将它与`NaN`本身比较，就像你能对其它的值做的那样，比如`null`和`undefined`。不是这样。
 
 ```js
 var a = 2 / "foo";
@@ -599,9 +597,9 @@ a == NaN;	// false
 a === NaN;	// false
 ```
 
-`NaN` is a very special value in that it's never equal to another `NaN` value (i.e., it's never equal to itself). It's the only value, in fact, that is not reflexive (without the Identity characteristic `x === x`). So, `NaN !== NaN`. A bit strange, huh?
+`NaN`是一个非常特殊的值，它从来不会等于另一个`NaN`值（也就是，它从来不等于它自己）。实际上，它是唯一一个不具有反射性的值（没有恒等性`x === x`）。所以，`NaN !== NaN`。有点奇怪，对吧？
 
-So how *do* we test for it, if we can't compare to `NaN` (since that comparison would always fail)?
+那么，如果不能与`NaN`进行比较（因为这种比较将总是失败），我们该如何测试它呢？
 
 ```js
 var a = 2 / "foo";
@@ -609,11 +607,11 @@ var a = 2 / "foo";
 isNaN( a ); // true
 ```
 
-Easy enough, right? We use the built-in global utility called `isNaN(..)` and it tells us if the value is `NaN` or not. Problem solved!
+够简单的吧？我们使用称为`isNaN(..)`的内建全局工具，它告诉我们这个值是否是`NaN`。问题解决了！
 
-Not so fast.
+别高兴得太早。
 
-The `isNaN(..)` utility has a fatal flaw. It appears it tried to take the meaning of `NaN` ("Not a Number") too literally -- that its job is basically: "test if the thing passed in is either not a `number` or is a `number`." But that's not quite accurate.
+`isNaN(..)`工具有一个重大缺陷。它似乎过于按照字面的意思（“不是一个数字”）去理解`NaN`的含义了——它的工作基本上是：“测试这个传进来的东西是否不是一个`number`或者是一个`number`”。但这不是十分准确。
 
 ```js
 var a = 2 / "foo";
@@ -623,12 +621,12 @@ a; // NaN
 b; // "foo"
 
 window.isNaN( a ); // true
-window.isNaN( b ); // true -- ouch!
+window.isNaN( b ); // true -- 噢!
 ```
 
-Clearly, `"foo"` is literally *not a `number`*, but it's definitely not the `NaN` value either! This bug has been in JS since the very beginning (over 19 years of *ouch*).
+很明显，`"foo"`根本 *不是一个`number`*，但它也绝不是一个`NaN`值！这个bug从最开始的时候就存在于JS中了（存在超过19年的坑）。
 
-As of ES6, finally a replacement utility has been provided: `Number.isNaN(..)`. A simple polyfill for it so that you can safely check `NaN` values *now* even in pre-ES6 browsers is:
+在ES6中，终于提供了一个替代它的工具：`Number.isNaN(..)`。有一个简单的填补，可以让你即使是在前ES6的浏览器中安全地检查`NaN`值：
 
 ```js
 if (!Number.isNaN) {
@@ -644,12 +642,12 @@ var a = 2 / "foo";
 var b = "foo";
 
 Number.isNaN( a ); // true
-Number.isNaN( b ); // false -- phew!
+Number.isNaN( b ); // false -- 咻!
 ```
 
-Actually, we can implement a `Number.isNaN(..)` polyfill even easier, by taking advantage of that peculiar fact that `NaN` isn't equal to itself. `NaN` is the *only* value in the whole language where that's true; every other value is always **equal to itself**.
+实际上，通过利用`NaN`与它自己不相等这个特殊的事实，我们可以更简单地实现`Number.isNaN(..)`的填补。在整个语言中`NaN`是唯一一个这样的值；其他的值都总是 **等于它自己**。
 
-So:
+所以：
 
 ```js
 if (!Number.isNaN) {
@@ -659,32 +657,32 @@ if (!Number.isNaN) {
 }
 ```
 
-Weird, huh? But it works!
+怪吧？但是好用！
 
-`NaN`s are probably a reality in a lot of real-world JS programs, either on purpose or by accident. It's a really good idea to use a reliable test, like `Number.isNaN(..)` as provided (or polyfilled), to recognize them properly.
+不管有意还是无意，在许多真实世界的JS程序中`NaN`可能是一个现实的问题。使用`Number.isNaN(..)`（或者它的填补）这样的可靠测试来正确地识别它们是一个非常好的主意。
 
-If you're currently using just `isNaN(..)` in a program, the sad reality is your program *has a bug*, even if you haven't been bitten by it yet!
+如果你正在程序中仅使用`isNaN(..)`，悲惨的现实是你的程序 *有bug*，即便是你还没有被它咬到！
 
-#### Infinities
+#### 无穷
 
-Developers from traditional compiled languages like C are probably used to seeing either a compiler error or runtime exception, like "Divide by zero," for an operation like:
+来自于像C这样的传统编译型语言的开发者，可能习惯于看到编译器错误或者是运行时异常，比如对这样一个操作给出的“除数为0”：
 
 ```js
 var a = 1 / 0;
 ```
 
-However, in JS, this operation is well-defined and results in the value `Infinity` (aka `Number.POSITIVE_INFINITY`). Unsurprisingly:
+然而在JS中，这个操作是明确定义的，而且它的结果是值`Infinity`（也就是`Number.POSITIVE_INFINITY`）。意料之中的是：
 
 ```js
 var a = 1 / 0;	// Infinity
 var b = -1 / 0;	// -Infinity
 ```
 
-As you can see, `-Infinity` (aka `Number.NEGATIVE_INFINITY`) results from a divide-by-zero where either (but not both!) of the divide operands is negative.
+如你所见，`-Infinity`（也就是`Number.NEGATIVE_INFINITY`）是从任一个被除数为负（不是两个都是负数！）的除0操作得来的。
 
-JS uses finite numeric representations (IEEE 754 floating-point, which we covered earlier), so contrary to pure mathematics, it seems it *is* possible to overflow even with an operation like addition or subtraction, in which case you'd get `Infinity` or `-Infinity`.
+JS使用有限的数字表现形式（IEEE 754 浮点，我们早先讨论过），所以和单纯的数学相比，它看起来甚至在做加法和减法这样的操作时都有可能溢出，这样的情况下你将会得到`Infinity`或`-Infinity`。
 
-For example:
+例如：
 
 ```js
 var a = Number.MAX_VALUE;	// 1.7976931348623157e+308
@@ -693,49 +691,49 @@ a + Math.pow( 2, 970 );		// Infinity
 a + Math.pow( 2, 969 );		// 1.7976931348623157e+308
 ```
 
-According to the specification, if an operation like addition results in a value that's too big to represent, the IEEE 754 "round-to-nearest" mode specifies what the result should be. So, in a crude sense, `Number.MAX_VALUE + Math.pow( 2, 969 )` is closer to `Number.MAX_VALUE` than to `Infinity`, so it "rounds down," whereas `Number.MAX_VALUE + Math.pow( 2, 970 )` is closer to `Infinity` so it "rounds up".
+根据语言规范，如果一个像加法这样的操作得到一个太大而不能表示的值，IEEE 754“就近舍入”模式将会指明结果应该是什么。所以粗略的意义上，`Number.MAX_VALUE + Math.pow( 2, 969 )`比起`Infinity`更接近于`Number.MAX_VALUE`，所以它“向下舍入”，而`Number.MAX_VALUE + Math.pow( 2, 970 )`距离`Infinity`更近，所以它“向上舍入”。
 
-If you think too much about that, it's going to make your head hurt. So don't. Seriously, stop!
+如果你对此考虑的太多，它会使你头疼的。所以别想了。我是认真的，停！
 
-Once you overflow to either one of the *infinities*, however, there's no going back. In other words, in an almost poetic sense, you can go from finite to infinite but not from infinite back to finite.
+一旦你溢出了任意一个 *无限值*，那么，就没有回头路了。换句最有诗意的话说，你可以从有限迈向无限，但不能从无限回归有限。
 
-It's almost philosophical to ask: "What is infinity divided by infinity". Our naive brains would likely say "1" or maybe "infinity." Turns out neither is true. Both mathematically and in JavaScript, `Infinity / Infinity` is not a defined operation. In JS, this results in `NaN`.
+“无限除以无限等于什么”，这简直是一个哲学问题。我们幼稚的大脑可能会说“1”或“无限”。事实表明它们都不对。在数学上和在JavaScript中，`Infinity / Infinity`不是一个有定义的操作。在JS中，它的结果为`NaN`。
 
-But what about any positive finite `number` divided by `Infinity`? That's easy! `0`. And what about a negative finite `number` divided by `Infinity`? Keep reading!
+一个有限的正`number`除以`Infinity`呢？简单！`0`。那一个有限的负`number`处理`Infinity`呢？接着往下读！
 
-#### Zeros
+#### 零
 
-While it may confuse the mathematics-minded reader, JavaScript has both a normal zero `0` (otherwise known as a positive zero `+0`) *and* a negative zero `-0`. Before we explain why the `-0` exists, we should examine how JS handles it, because it can be quite confusing.
+虽然这可能使有数学头脑的读者困惑，JavaScript拥有普通的零`0`（也称为正零`+0`） *和* 一个负零`-0`。在我们讲解为什么`-0`存在之前，我们应该考察JS如何处理它，因为它可能十分令人困惑。
 
-Besides being specified literally as `-0`, negative zero also results from certain mathematic operations. For example:
+除了使用字面量`-0`指定，负的零还可以从特定的数学操作中得出。比如：
 
 ```js
 var a = 0 / -3; // -0
 var b = 0 * -3; // -0
 ```
 
-Addition and subtraction cannot result in a negative zero.
+加法和减法无法得出负零。
 
-A negative zero when examined in the developer console will usually reveal `-0`, though that was not the common case until fairly recently, so some older browsers you encounter may still report it as `0`.
+在开发者控制台中考察一个负的零，经常显示为`-0`，然而直到最近这才是一个常见情况，所以一些你可能遇到的老版本浏览器也许依然将它报告为`0`。
 
-However, if you try to stringify a negative zero value, it will always be reported as `"0"`, according to the spec.
+但是根据语言规范，如果你试着将一个负零转换为字符串，它将总会被报告为`"0"`。
 
 ```js
 var a = 0 / -3;
 
-// (some browser) consoles at least get it right
+// 至少（有些浏览器）控制台是对的
 a;							// -0
 
-// but the spec insists on lying to you!
+// 但是语言规范坚持要向你撒谎！
 a.toString();				// "0"
 a + "";						// "0"
 String( a );				// "0"
 
-// strangely, even JSON gets in on the deception
+// 奇怪的是，就连JSON也加入了骗局之中
 JSON.stringify( a );		// "0"
 ```
 
-Interestingly, the reverse operations (going from `string` to `number`) don't lie:
+有趣的是，反向操作（从`string`到`number`）不会撒谎：
 
 ```js
 +"-0";				// -0
@@ -743,9 +741,9 @@ Number( "-0" );		// -0
 JSON.parse( "-0" );	// -0
 ```
 
-**Warning:** The `JSON.stringify( -0 )` behavior of `"0"` is particularly strange when you observe that it's inconsistent with the reverse: `JSON.parse( "-0" )` reports `-0` as you'd correctly expect.
+**警告：** 当你观察的时候，`JSON.stringify( -0 )`产生`"0"`显得特别奇怪，因为它与反向操作不符：`JSON.parse( "-0" )`将像你期望地那样报告`-0`。
 
-In addition to stringification of negative zero being deceptive to hide its true value, the comparison operators are also (intentionally) configured to *lie*.
+除了一个负零的字符串化会欺骗性地隐藏它实际的值外，比较操作符也被设定为（有意地） *要说谎*。
 
 ```js
 var a = 0;
@@ -761,7 +759,7 @@ a === b;	// true
 a > b;		// false
 ```
 
-Clearly, if you want to distinguish a `-0` from a `0` in your code, you can't just rely on what the developer console outputs, so you're going to have to be a bit more clever:
+很明显，如果你想在你的代码中区分`-0`和`0`，你就不能仅依靠开发者控制台的输出，你必须更聪明一些：
 
 ```js
 function isNegZero(n) {
@@ -774,17 +772,17 @@ isNegZero( 0 / -3 );	// true
 isNegZero( 0 );			// false
 ```
 
-Now, why do we need a negative zero, besides academic trivia?
+那么，除了学院派的细节以外，我们为什么需要一个负零呢？
 
-There are certain applications where developers use the magnitude of a value to represent one piece of information (like speed of movement per animation frame) and the sign of that `number` to represent another piece of information (like the direction of that movement).
+在一些应用程序中，开发者使用值的大小来表示一部分信息（比如动画中每一帧的速度），而这个`number`的符号来表示另一部分信息（比如移动的方向）。
 
-In those applications, as one example, if a variable arrives at zero and it loses its sign, then you would lose the information of what direction it was moving in before it arrived at zero. Preserving the sign of the zero prevents potentially unwanted information loss.
+在这些应用程序中，举例来说，如果一个变量的值变成了0，而它丢失了符号，那么你就丢失了它是从哪个方向移动到0的信息。保留零的符号避免了潜在的意外信息丢失。
 
-### Special Equality
+### 特殊等价
 
-As we saw above, the `NaN` value and the `-0` value have special behavior when it comes to equality comparison. `NaN` is never equal to itself, so you have to use ES6's `Number.isNaN(..)` (or a polyfill). Simlarly, `-0` lies and pretends that it's equal (even `===` strict equal -- see Chapter 4) to regular positive `0`, so you have to use the somewhat hackish `isNegZero(..)` utility we suggested above.
+正如我们上面看到的，当使用等价性比较时，值`NaN`和值`-0`拥有特殊的行为。`NaN`永远不会和自己相等，所以你不得不使用ES6的`Number.isNaN(..)`（或者它的填补）。相似地，`-0`撒谎并假装它和普通的正零相等（即使使用`===`严格等价——见第四章），所以你不得不使用我们上面建议的某些`isNegZero(..)`黑科技工具。
 
-As of ES6, there's a new utility that can be used to test two values for absolute equality, without any of these exceptions. It's called `Object.is(..)`:
+在ES6中，有一个新工具可以用于测试两个值的绝对等价性，而没有任何这些例外。它称为`Object.is(..)`:
 
 ```js
 var a = 2 / "foo";
@@ -796,64 +794,64 @@ Object.is( b, -0 );		// true
 Object.is( b, 0 );		// false
 ```
 
-There's a pretty simple polyfill for `Object.is(..)` for pre-ES6 environments:
+对于前ES6环境，这是一个相当简单的`Object.is(..)`填补：
 
 ```js
 if (!Object.is) {
 	Object.is = function(v1, v2) {
-		// test for `-0`
+		// 测试 `-0`
 		if (v1 === 0 && v2 === 0) {
 			return 1 / v1 === 1 / v2;
 		}
-		// test for `NaN`
+		// 测试 `NaN`
 		if (v1 !== v1) {
 			return v2 !== v2;
 		}
-		// everything else
+		// 其他情况
 		return v1 === v2;
 	};
 }
 ```
 
-`Object.is(..)` probably shouldn't be used in cases where `==` or `===` are known to be *safe* (see Chapter 4 "Coercion"), as the operators are likely much more efficient and certainly are more idiomatic/common. `Object.is(..)` is mostly for these special cases of equality.
+`Object.is(..)`可能不应当用于那些`==`或`===`已知 *安全* 的情况（见第四章“强制转换”），因为这些操作符可能高效得多，并且更惯用/常见。`Object.is(..)`很大程度上是为这些特殊的等价情况准备的。
 
-## Value vs. Reference
+## 值与引用
 
-In many other languages, values can either be assigned/passed by value-copy or by reference-copy depending on the syntax you use.
+在其他许多语言中，根据你使用的语法，值可以通过值拷贝，也可以通过引用拷贝来赋予/传递。
 
-For example, in C++ if you want to pass a `number` variable into a function and have that variable's value updated, you can declare the function parameter like `int& myNum`, and when you pass in a variable like `x`, `myNum` will be a **reference to `x`**; references are like a special form of pointers, where you obtain a pointer to another variable (like an *alias*). If you don't declare a reference parameter, the value passed in will *always* be copied, even if it's a complex object.
+比如，在C++中如果你想要把一个`number`变量传递进一个函数，并使这个变量的值被更新，你可以用`int& myNum`这样的东西来声明函数参数，当你传入一个变量`x`时，`myNum`将是一个 **指向`x`的引用**；引用就像一个特殊形式的指针，你得到的是一个指向另一个变量的指针（像一个 *别名（alias）*） 。如果你没有声明一个引用参数，被传入的值将 *总是* 被拷贝的，就算它是一个复杂的对象。
 
-In JavaScript, there are no pointers, and references work a bit differently. You cannot have a reference from one JS variable to another variable. That's just not possible.
+在JavaScript中，没有指针，并且引用的工作方式有一点儿不同。你不能拥有一个从一个JS变量到另一个JS变量的引用。这是完全不可能的。
 
-A reference in JS points at a (shared) **value**, so if you have 10 different references, they are all always distinct references to a single shared value; **none of them are references/pointers to each other.**
+JS中的引用指向一个（共享的） **值**，所以如果你有10个不同的引用，它们都总是同一个共享值的不同引用；**它们没有一个是另一个的引用/指针。**
 
-Moreover, in JavaScript, there are no syntactic hints that control value vs. reference assignment/passing. Instead, the *type* of the value *solely* controls whether that value will be assigned by value-copy or by reference-copy.
+另外，在JavaScript中，没有语法上的提示可以控制值和引用的赋值/传递。取而代之的是，值的 *类型* 用来 *唯一* 控制值是通过值拷贝，还是引用拷贝来赋予。
 
-Let's illustrate:
+让我们来展示一下：
 
 ```js
 var a = 2;
-var b = a; // `b` is always a copy of the value in `a`
+var b = a; // `b`总是`a`中的值的拷贝
 b++;
 a; // 2
 b; // 3
 
 var c = [1,2,3];
-var d = c; // `d` is a reference to the shared `[1,2,3]` value
+var d = c; // `d`是共享值`[1,2,3]`的引用
 d.push( 4 );
 c; // [1,2,3,4]
 d; // [1,2,3,4]
 ```
 
-Simple values (aka scalar primitives) are *always* assigned/passed by value-copy: `null`, `undefined`, `string`, `number`, `boolean`, and ES6's `symbol`.
+简单值（也叫基本标量） *总是* 通过值拷贝来赋予/传递：`null`，`undefined`，`string`，`number`， `boolean`，以及ES6的`symbol`。
 
-Compound values -- `object`s (including `array`s, and all boxed object wrappers -- see Chapter 3) and `function`s -- *always* create a copy of the reference on assignment or passing.
+复合值——`object`（包括`array`，和所有的对象包装器——见第三章）和`function`——*总是* 在赋值或传递时创建一个引用的拷贝。
 
-In the above snippet, because `2` is a scalar primitive, `a` holds one initial copy of that value, and `b` is assigned another *copy* of the value. When changing `b`, you are in no way changing the value in `a`.
+在上面的代码段中，因为`2`是一个基本标量，`a`持有一个这个值的初始拷贝，而`b`被赋予了这个值的另一个拷贝。当改变`b`时，你根本没有在改变`a`中的值。
 
-But **both `c` and `d`** are separate references to the same shared value `[1,2,3]`, which is a compound value. It's important to note that neither `c` nor `d` more "owns" the `[1,2,3]` value -- both are just equal peer references to the value. So, when using either reference to modify (`.push(4)`) the actual shared `array` value itself, it's affecting just the one shared value, and both references will reference the newly modified value `[1,2,3,4]`.
+但 **`c`和`d`两个都** 是同一个共享的值`[1,2,3]`的分离的引用。重要的是，`c`和`d`对值`[1,2,3]`的“拥有”程度上是一样的——它们只是同一个值的对等引用。所以，不管使用哪一个引用去修改（`.push(4)`）实际上共享的`array`值本身，影响的仅仅是这一个共享值，而且这两个引用将会指向新修改的值`[1,2,3,4]`。
 
-Since references point to the values themselves and not to the variables, you cannot use one reference to change where another reference is pointed:
+因为引用指向的是值本身而不是变量，你不能使用一个引用来改变另一个引用所指向的值：
 
 ```js
 var a = [1,2,3];
@@ -861,22 +859,22 @@ var b = a;
 a; // [1,2,3]
 b; // [1,2,3]
 
-// later
+// 稍后
 b = [4,5,6];
 a; // [1,2,3]
 b; // [4,5,6]
 ```
 
-When we make the assignment `b = [4,5,6]`, we are doing absolutely nothing to affect *where* `a` is still referencing (`[1,2,3]`). To do that, `b` would have to be a pointer to `a` rather than a reference to the `array` -- but no such capability exists in JS!
+当我们做赋值操作`b = [4,5,6]`时，我们做的事情绝对不会对`a`所指向的 *位置*（`[1,2,3]`）造成任何影响。如果那可能的话，`b`就会是`a`的指针而不是这个`array`的引用 —— 但是这样的能力在JS中是不存在的！
 
-The most common way such confusion happens is with function parameters:
+这样的困惑最常见于函数参数：
 
 ```js
 function foo(x) {
 	x.push( 4 );
 	x; // [1,2,3,4]
 
-	// later
+	// 稍后
 	x = [4,5,6];
 	x.push( 7 );
 	x; // [4,5,6,7]
@@ -886,22 +884,22 @@ var a = [1,2,3];
 
 foo( a );
 
-a; // [1,2,3,4]  not  [4,5,6,7]
+a; // [1,2,3,4]  不是  [4,5,6,7]
 ```
 
-When we pass in the argument `a`, it assigns a copy of the `a` reference to `x`. `x` and `a` are separate references pointing at the same `[1,2,3]` value. Now, inside the function, we can use that reference to mutate the value itself (`push(4)`). But when we make the assignment `x = [4,5,6]`, this is in no way affecting where the initial reference `a` is pointing -- still points at the (now modified) `[1,2,3,4]` value.
+当我们传入参数`a`时，它将一份`a`引用的拷贝赋值给`x`。`x`和`a`是指向相同的`[1,2,3]`的不同引用。现在，在函数内部，我们可以使用这个引用来改变值本身（`push(4)`）。但是当我们进行赋值操作`x = [4,5,6]`时，不可能影响原来的引用`a`所指向的东西——它仍然指向（已经被修改了的）值`[1,2,3,4]`。
 
-There is no way to use the `x` reference to change where `a` is pointing. We could only modify the contents of the shared value that both `a` and `x` are pointing to.
+没有办法可以使用`x`引用来改变`a`指向哪里。我们只能修改`a`和`x`共通指向的那个共享值的内容。
 
-To accomplish changing `a` to have the `[4,5,6,7]` value contents, you can't create a new `array` and assign -- you must modify the existing `array` value:
+要想改变`a`来使它拥有内容为`[4,5,6,7]`的值，你不能创建一个新的`array`并赋值——你必须修改现存的`array`值：
 
 ```js
 function foo(x) {
 	x.push( 4 );
 	x; // [1,2,3,4]
 
-	// later
-	x.length = 0; // empty existing array in-place
+	// 稍后
+	x.length = 0; // 原地清空既存的数组
 	x.push( 4, 5, 6, 7 );
 	x; // [4,5,6,7]
 }
@@ -910,22 +908,22 @@ var a = [1,2,3];
 
 foo( a );
 
-a; // [4,5,6,7]  not  [1,2,3,4]
+a; // [4,5,6,7]  不是  [1,2,3,4]
 ```
 
-As you can see, `x.length = 0` and `x.push(4,5,6,7)` were not creating a new `array`, but modifying the existing shared `array`. So of course, `a` references the new `[4,5,6,7]` contents.
+正如你看到的，`x.length = 0`和`x.push(4,5,6,7)`没有创建一个新的`array`，但是修改了现存的共享`array`。所以理所当然地，`a`引用了新的内容`[4,5,6,7]`。
 
-Remember: you cannot directly control/override value-copy vs. reference -- those semantics are controlled entirely by the type of the underlying value.
+记住：你不能直接控制/覆盖值拷贝和引用拷贝的行为 —— 这些语义是完全由当前值的类型来控制的。
 
-To effectively pass a compound value (like an `array`) by value-copy, you need to manually make a copy of it, so that the reference passed doesn't still point to the original. For example:
+为了实质上地通过值拷贝传递一个复合值（比如一个`array`），你需要手动制造一个它的拷贝，使被传递的引用不指向原来的值。比如：
 
 ```js
 foo( a.slice() );
 ```
 
-`slice(..)` with no parameters by default makes an entirely new (shallow) copy of the `array`. So, we pass in a reference only to the copied `array`, and thus `foo(..)` cannot affect the contents of `a`.
+不带参数的`slice(..)`方法默认地为这个`array`制造一个全新的（浅）拷贝。所以，我们传入的引用仅指向拷贝的`array`，这样`foo(..)`不会影响`a`的内容。
 
-To do the reverse -- pass a scalar primitive value in a way where its value updates can be seen, kinda like a reference -- you have to wrap the value in another compound value (`object`, `array`, etc) that *can* be passed by reference-copy:
+反之 —— 传递一个基本标量值，使它的值的变化可见，就像引用那样 —— 你不得不将这个值包装在另一个可以通过引用拷贝来传递的复合值中（`object`，`array`，等等）：
 
 ```js
 function foo(wrapper) {
@@ -941,11 +939,11 @@ foo( obj );
 obj.a; // 42
 ```
 
-Here, `obj` acts as a wrapper for the scalar primitive property `a`. When passed to `foo(..)`, a copy of the `obj` reference is passed in and set to the `wrapper` parameter. We now can use the `wrapper` reference to access the shared object, and update its property. After the function finishes, `obj.a` will see the updated value `42`.
+这里，`obj`作为基本标量属性`a`的包装。当传递给`foo(..)`时，一个`obj`引用的拷贝被传入并设置给`wrapper`参数。我们现在可以使用`wrapper`引用来访问这个共享的对象，并更新它的值。在函数完成时，`obj.a`将被更新为值`42`。
 
-It may occur to you that if you wanted to pass in a reference to a scalar primitive value like `2`, you could just box the value in its `Number` object wrapper (see Chapter 3).
+你可能会遇到这样的情况，如果你想要传入一个像`2`这样的基本标量值的引用，你可以将这个值包装在它的`Number`对象包装器中（见第三章）。
 
-It *is* true a copy of the reference to this `Number` object *will* be passed to the function, but unfortunately, having a reference to the shared object is not going to give you the ability to modify the shared primitive value, like you may expect:
+这个`Number`对象的引用的拷贝 *将* 会被传递给函数是事实，但不幸的是，和你可能期望的不同，拥有一个共享独享的引用不会给你修改这个共享的基本值的能力：
 
 ```js
 function foo(x) {
@@ -954,32 +952,32 @@ function foo(x) {
 }
 
 var a = 2;
-var b = new Number( a ); // or equivalently `Object(a)`
+var b = new Number( a ); // 或等价的 `Object(a)`
 
 foo( b );
-console.log( b ); // 2, not 3
+console.log( b ); // 2, 不是 3
 ```
 
-The problem is that the underlying scalar primitive value is *not mutable* (same goes for `String` and `Boolean`). If a `Number` object holds the scalar primitive value `2`, that exact `Number` object can never be changed to hold another value; you can only create a whole new `Number` object with a different value.
+这里的问题是，底层的基本标量值是 *不可变的*（`String`和`Boolean`也一样）。如果一个`Number`对象持有一个基本标量值`2`，那么这个`Number`对象就永远不能再持有另一个值；你只能用一个不同的值创建一个全新的`Number`对象。
 
-When `x` is used in the expression `x + 1`, the underlying scalar primitive value `2` is unboxed (extracted) from the `Number` object automatically, so the line `x = x + 1` very subtly changes `x` from being a shared reference to the `Number` object, to just holding the scalar primitive value `3` as a result of the addition operation `2 + 1`. Therefore, `b` on the outside still references the original unmodified/immutable `Number` object holding the value `2`.
+当`x`用于表达式`x + 1`时，底层的基本标量值`2`被自动地从`Number`对象中开箱（抽出），所以`x = x + 1`这一行很微秒地将`x`从一个共享的`Number`对象的引用，改变为仅持有加法操作`2 + 1`的结果`3`的基本标量值。因此，外面的`b`仍然引用原来的未被改变/不可变的，持有`2`的`Number`对象。
 
-You *can* add properties on top of the `Number` object (just not change its inner primitive value), so you could exchange information indirectly via those additional properties.
+你 *可以* 在`Number`对象上添加属性（只是不要改变它内部的基本值），所以你可间接地通过这些额外的属性交换信息。
 
-This is not all that common, however; it probably would not be considered a good practice by most developers.
+不过，这可不太常见；对大多数开发者来说这可能不是一个好的做法。
 
-Instead of using the wrapper object `Number` in this way, it's probably much better to use the manual object wrapper (`obj`) approach in the earlier snippet. That's not to say that there's no clever uses for the boxed object wrappers like `Number` -- just that you should probably prefer the scalar primitive value form in most cases.
+与其这样使用`Number`包装器对象，使用早先的代码段中那样的手动对象包装器（`obj`）要好得多。这不是说像`Number`这样包装好的对象包装器没有用处——而是说在大多数情况下，你可能应该优先使用基本标量值的形式。
 
-References are quite powerful, but sometimes they get in your way, and sometimes you need them where they don't exist. The only control you have over reference vs. value-copy behavior is the type of the value itself, so you must indirectly influence the assignment/passing behavior by which value types you choose to use.
+引用十分强大，但是有时候它们碍你的事儿，而有时你会在它们不存在时需要它们。你唯一可以用来控制引用与值拷贝的东西是值本身的类型，所以你必须通过你选用的值的类型来间接地影响赋值/传递行为。
 
-## Review
+## 复习
 
-In JavaScript, `array`s are simply numerically indexed collections of any value-type. `string`s are somewhat "`array`-like", but they have distinct behaviors and care must be taken if you want to treat them as `array`s. Numbers in JavaScript include both "integers" and floating-point values.
+在JavaScript中，`array`仅仅是数字索引的集合，可以容纳任何类型的值。`string`是某种“类`array`”，但它们有着不同的行为，如果你想要将它们作为`array`对待的话，必须要小心。JavaScript中的数字既包括“整数”也包括浮点数。
 
-Several special values are defined within the primitive types.
+几种特殊值被定义在基本类型内部。
 
-The `null` type has just one value: `null`, and likewise the `undefined` type has just the `undefined` value. `undefined` is basically the default value in any variable or property if no other value is present. The `void` operator lets you create the `undefined` value from any other value.
+`null`类型只有一个值`null`，`undefined`类型同样地只有`undefined`值。对于任何没有值存在的变量或属性，`undefined`基本上是默认值。`void`操作符允许你从任意另一个值中创建`undefined`值。
 
-`number`s include several special values, like `NaN` (supposedly "Not a Number", but really more appropriately "invalid number"); `+Infinity` and `-Infinity`; and `-0`.
+`number`包含几种特殊值，比如`NaN`（意为“不是一个数字”，但称为“非法数字”更合适）；`+Infinity`和`-Infinity`； 还有`-0`。
 
-Simple scalar primitives (`string`s, `number`s, etc.) are assigned/passed by value-copy, but compound values (`object`s, etc.) are assigned/passed by reference-copy. References are not like references/pointers in other languages -- they're never pointed at other variables/references, only at the underlying values.
+简单基本标量（`string`，`number`等）通过值拷贝进行赋值/传递，而复合值（`object`等）通过引用拷贝进行赋值/传递。引用与其他语言中的引用/指针不同 —— 它们从不指向其他的变量/引用，而仅指向底层的值。

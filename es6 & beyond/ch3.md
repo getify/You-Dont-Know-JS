@@ -1,76 +1,76 @@
-# You Don't Know JS: ES6 & Beyond
-# Chapter 3: Organization
+# 你不懂JS：ES6与未来
+# 第三章：组织
 
-It's one thing to write JS code, but it's another to properly organize it. Utilizing common patterns for organization and reuse goes a long way to improving the readability and understandability of your code. Remember: code is at least as much about communicating to other developers as it is about feeding the computer instructions.
+编写JS代码是一回事儿，而合理地组织它是另一回事儿。利用常见的组织和重用模式在很大程度上改善了你代码的可读性和可理解性。记住：代码在与其他开发者交流上起的作用，与在给计算机喂指令上起的作用同样重要。
 
-ES6 has several important features that help significantly improve these patterns, including: iterators, generators, modules, and classes.
+ES6拥有几种重要的特性可以显著改善这些模式，包括：迭代器，generator，模块，和类。
 
-## Iterators
+## 迭代器
 
-An *iterator* is a structured pattern for pulling information from a source in one-at-a-time fashion. This pattern has been around programming for a long time. And to be sure, JS developers have been ad hoc designing and implementing iterators in JS programs since before anyone can remember, so it's not at all a new topic.
+*迭代器（iterator）* 是一种结构化的模式，用于从一个信息源中以一次一个的方式抽取信息。这种模式在程序设计中存在很久了。而且不可否认的是，不知从什么时候起JS开发者们就已经特别地设计并实现了迭代器，所以它根本不是什么新的话题。
 
-What ES6 has done is introduce an implicit standardized interface for iterators. Many of the built-in data structures in JavaScript will now expose an iterator implementing this standard. And you can also construct your own iterators adhering to the same standard, for maximal interoperability.
+ES6所做的是，为迭代器引入了一个隐含的标准化接口。许多在JavaScript中内建的数据结构现在都会暴露一个实现了这个标准的迭代器。而且你也可以构建自己的遵循同样标准的迭代器，来使互用性最大化。
 
-Iterators are a way of organizing ordered, sequential, pull-based consumption of data.
+迭代器是一种消费数据的方法，它是组织有顺序的，相继的，基于抽取的。
 
-For example, you may implement a utility that produces a new unique identifier each time it's requested. Or you may produce an infinite series of values that rotate through a fixed list, in round-robin fashion. Or you could attach an iterator to a database query result to pull out new rows one at a time.
+举个例子，你可能实现一个工具，它在每次被请求时产生一个新的唯一的标识符。或者你可能循环一个固定的列表以轮流的方式产生一系列无限多的值。或者你可以在一个数据库查询的结果上添加一个迭代器来一次抽取一行结果。
 
-Although they have not commonly been used in JS in such a manner, iterators can also be thought of as controlling behavior one step at a time. This can be illustrated quite clearly when considering generators (see "Generators" later in this chapter), though you can certainly do the same without generators.
+虽然在JS中它们不经常以这样的方式被使用，但是迭代器还可以认为是每次控制行为中的一个步骤。这会在考虑generator时得到相当清楚的展示（参见本章稍后的“Generator”），虽然你当然可以不使用generator而做同样的事。
 
-### Interfaces
+### 接口
 
-At the time of this writing, ES6 section 25.1.1.2 (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-iterator-interface) details the `Iterator` interface as having the following requirement:
-
-```
-Iterator [required]
-	next() {method}: retrieves next IteratorResult
-```
-
-There are two optional members that some iterators are extended with:
+在本书写作的时候，ES6的25.1.1.2部分 (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-iterator-interface) 详述了`Iterator`接口，它有如下的要求：
 
 ```
-Iterator [optional]
-	return() {method}: stops iterator and returns IteratorResult
-	throw() {method}: signals error and returns IteratorResult
+Iterator [必须]
+	next() {method}: 取得下一个IteratorResult
 ```
 
-The `IteratorResult` interface is specified as:
+有两个可选成员，有些迭代器用它们进行了扩展：
+
+```
+Iterator [可选]
+	return() {method}: 停止迭代并返回IteratorResult
+	throw() {method}: 通知错误并返回IteratorResult
+```
+
+接口`IteratorResult`被规定为：
 
 ```
 IteratorResult
-	value {property}: current iteration value or final return value
-		(optional if `undefined`)
-	done {property}: boolean, indicates completion status
+	value {property}: 当前的迭代值或最终的返回值
+		（如果它的值为`undefined`，是可选的）
+	done {property}: 布尔值，指示完成的状态
 ```
 
-**Note:** I call these interfaces implicit not because they're not explicitly called out in the specification -- they are! -- but because they're not exposed as direct objects accessible to code. JavaScript does not, in ES6, support any notion of "interfaces," so adherence for your own code is purely conventional. However, wherever JS expects an iterator -- a `for..of` loop, for instance -- what you provide must adhere to these interfaces or the code will fail.
+**注意：** 我称这些接口是隐含的，不是因为它们没有在语言规范中被明确地被说出来 —— 它们被说出来了！—— 而是因为它们没有作为可以直接访问的对象暴露给代码。在ES6中，JavaScript不支持任何“接口”的概念，所以在你自己的代码中遵循它们纯粹是惯例上的。但是，不论JS在何处需要一个迭代器 —— 例如在一个`for..of`循环中 —— 你提供的东西必须遵循这些接口，否则代码就会失败。
 
-There's also an `Iterable` interface, which describes objects that must be able to produce iterators:
+还有一个`Iterable`接口，它描述了一定能够产生迭代器的对象：
 
 ```
 Iterable
-	@@iterator() {method}: produces an Iterator
+	@@iterator() {method}: 产生一个迭代器
 ```
 
-If you recall from "Built-In Symbols" in Chapter 2, `@@iterator` is the special built-in symbol representing the method that can produce iterator(s) for the object.
+如果你回忆一下第二章的“内建Symbol”，`@@iterator`是一种特殊的内建symbol，表示可以为对象产生迭代器的方法。
 
 #### IteratorResult
 
-The `IteratorResult` interface specifies that the return value from any iterator operation will be an object of the form:
+`IteratorResult`接口规定从任何迭代器操作的返回值都是这样形式的对象：
 
 ```js
 { value: .. , done: true / false }
 ```
 
-Built-in iterators will always return values of this form, but more properties are, of course, allowed to be present on the return value, as necessary.
+内建迭代器将总是返回这种形式的值，当然，更多的属性也允许出现在这个返回值中，如果有必要的话。
 
-For example, a custom iterator may add additional metadata to the result object (e.g., where the data came from, how long it took to retrieve, cache expiration length, frequency for the appropriate next request, etc.).
+例如，一个自定义的迭代器可能会在结果对象中加入额外的元数据（比如，数据是从哪里来的，取得它花了多久，缓存过期的时间长度，下次请求的恰当频率，等等）。
 
-**Note:** Technically, `value` is optional if it would otherwise be considered absent or unset, such as in the case of the value `undefined`. Because accessing `res.value` will produce `undefined` whether it's present with that value or absent entirely, the presence/absence of the property is more an implementation detail or an optimization (or both), rather than a functional issue.
+**注意：** 从技术上讲，在值为`undefined`的情况下，`value`是可选的，它将会被认为是不存在或者是没有被设置。因为不管它是表示的就是这个值还是完全不存在，访问`res.value`都将会产生`undefined`，所以这个属性的存在/不存在更大程度上是一个实现或者优化（或两者）的细节，而非一个功能上的问题。
 
-### `next()` Iteration
+### `next()`迭代
 
-Let's look at an array, which is an iterable, and the iterator it can produce to consume its values:
+让我们来看一个数组，它是一个可迭代对象，可以生成一个迭代器来消费它的值：
 
 ```js
 var arr = [1,2,3];
@@ -84,13 +84,13 @@ it.next();		// { value: 3, done: false }
 it.next();		// { value: undefined, done: true }
 ```
 
-Each time the method located at `Symbol.iterator` (see Chapters 2 and 7) is invoked on this `arr` value, it will produce a new fresh iterator. Most structures will do the same, including all the built-in data structures in JS.
+每一次定位在`Symbol.iterator`上的方法在值`arr`上被调用时，它都将生成一个全新的迭代器。大多数的数据结构都会这么做，包括所有内建在JS中的数据结构。
 
-However, a structure like an event queue consumer might only ever produce a single iterator (singleton pattern). Or a structure might only allow one unique iterator at a time, requiring the current one to be completed before a new one can be created.
+然而，像事件队列这样的结构也许只能生成一个单独的迭代器（单例模式）。或者某种结构可能在同一时间内只允许存在一个唯一的迭代器，要求当前的迭代器必须完成，才能创建一个新的。
 
-The `it` iterator in the previous snippet doesn't report `done: true` when you receive the `3` value. You have to call `next()` again, in essence going beyond the end of the array's values, to get the complete signal `done: true`. It may not be clear why until later in this section, but that design decision will typically be considered a best practice.
+前一个代码段中的`it`迭代器不会再你得到值`3`时报告`done: true`。你必须再次调用`next()`，实质上越过数组末尾的值，才能得到完成信号`done: true`。在这一节稍后会清楚地讲解这种设计方式的原因，但是它通常被认为是一种最佳实践。
 
-Primitive string values are also iterables by default:
+基本类型的字符串值也默认地是可迭代对象：
 
 ```js
 var greeting = "hello world";
@@ -102,9 +102,9 @@ it.next();		// { value: "e", done: false }
 ..
 ```
 
-**Note:** Technically, the primitive value itself isn't iterable, but thanks to "boxing", `"hello world"` is coerced/converted to its `String` object wrapper form, which *is* an iterable. See the *Types & Grammar* title of this series for more information.
+**注意：** 从技术上讲，这个基本类型值本身不是可迭代对象，但多亏了“封箱”，`"hello world"`被强制转换为它的`String`对象包装形式，*它* 才是一个可迭代对象。更多信息参见本系列的 *类型与文法*。
 
-ES6 also includes several new data structures, called collections (see Chapter 5). These collections are not only iterables themselves, but they also provide API method(s) to generate an iterator, such as:
+ES6还包括几种新的数据结构，称为集合（参见第五章）。这些集合不仅本身就是可迭代对象，而且它们还提供API方法来生成一个迭代器，例如：
 
 ```js
 var m = new Map();
@@ -119,35 +119,35 @@ it2.next();		// { value: [ "foo", 42 ], done: false }
 ..
 ```
 
-The `next(..)` method of an iterator can optionally take one or more arguments. The built-in iterators mostly do not exercise this capability, though a generator's iterator definitely does (see "Generators" later in this chapter).
+一个迭代器的`next(..)`方法能够可选地接受一个或多个参数。大多数内建的迭代器不会实施这种能力，虽然一个generator的迭代器绝对会这么做（参见本章稍后的“Generator”）。
 
-By general convention, including all the built-in iterators, calling `next(..)` on an iterator that's already been exhausted is not an error, but will simply continue to return the result `{ value: undefined, done: true }`.
+根据一般的惯例，包括所有的内建迭代器，在一个已经被耗尽的迭代器上调用`next(..)`不是一个错误，而是简单地持续返回结果`{ value: undefined, done: true }`。
 
-### Optional: `return(..)` and `throw(..)`
+### 可选的`return(..)`和`throw(..)`
 
-The optional methods on the iterator interface -- `return(..)` and `throw(..)` -- are not implemented on most of the built-in iterators. However, they definitely do mean something in the context of generators, so see "Generators" for more specific information.
+在迭代器接口上的可选方法 —— `return(..)`和`throw(..)` —— 在大多数内建的迭代器上都没有被实现。但是，它们在generator的上下文环境中绝对有某些含义，所以更具体的信息可以参看“Generator”。
 
-`return(..)` is defined as sending a signal to an iterator that the consuming code is complete and will not be pulling any more values from it. This signal can be used to notify the producer (the iterator responding to `next(..)` calls) to perform any cleanup it may need to do, such as releasing/closing network, database, or file handle resources.
+`return(..)`被定义为向一个迭代器发送一个信号，告知它消费者代码已经完成而且不会再从它那里抽取更多的值。这个信号可以用于通知生产者（应答`next(..)`调用的迭代器）去实施一些可能的清理作业，比如释放/关闭网络，数据库，或者文件引用资源。
 
-If an iterator has a `return(..)` present and any condition occurs that can automatically be interpreted as abnormal or early termination of consuming the iterator, `return(..)` will automatically be called. You can call `return(..)` manually as well.
+如果一个迭代器拥有`return(..)`，而且发生了可以自动被解释为非正常或者提前终止消费迭代器的任何情况，`return(..)`就将会被自动调用。你也可以手动调用`return(..)`。
 
-`return(..)` will return an `IteratorResult` object just like `next(..)` does. In general, the optional value you send to `return(..)` would be sent back as `value` in this `IteratorResult`, though there are nuanced cases where that might not be true.
+`return(..)`将会像`next(..)`一样返回一个`IteratorResult`对象。一般来说，你向`return(..)`发送的可选值将会在这个`IteratorResult`中作为`value`发送回来，虽然在一些微妙的情况下这可能不成立。
 
-`throw(..)` is used to signal an exception/error to an iterator, which possibly may be used differently by the iterator than the completion signal implied by `return(..)`. It does not necessarily imply a complete stop of the iterator as `return(..)` generally does.
+`throw(..)`被用于向一个迭代器发送一个异常/错误信号，与`return(..)`隐含的完成信号相比，它可能会被迭代器用于不同的目的。它不一定像`return(..)`一样暗示着迭代器的完全停止。
 
-For example, with generator iterators, `throw(..)` actually injects a thrown exception into the generator's paused execution context, which can be caught with a `try..catch`. An uncaught `throw(..)` exception would end up abnormally aborting the generator's iterator.
+例如，在generator迭代器中，`throw(..)`实际上会将一个被抛出的异常注射到generator暂停的执行环境中，这个异常可以用`try..catch`捕获。一个未捕获的`throw(..)`异常将会导致generator的迭代器异常中止。
 
-**Note:** By general convention, an iterator should not produce any more results after having called `return(..)` or `throw(..)`.
+**注意：** 根据一般的惯例，在`return(..)`或`throw(..)`被调用之后，一个迭代器就不应该在产生任何结果了。
 
-### Iterator Loop
+### 迭代器循环
 
-As we covered in the "`for..of`" section in Chapter 2, the ES6 `for..of` loop directly consumes a conforming iterable.
+正如我们在第二章的“`for..of`”一节中讲解的，ES6的`for..of`循环可以直接消费一个规范的可迭代对象。
 
-If an iterator is also an iterable, it can be used directly with the `for..of` loop. You make an iterator an iterable by giving it a `Symbol.iterator` method that simply returns the iterator itself:
+如果一个迭代器也是一个可迭代对象，那么它就可以直接与`for..of`循环一起使用。通过给予迭代器一个简单地返回它自身的`Symbol.iterator`方法，你就可以使它成为一个可迭代对象：
 
 ```js
 var it = {
-	// make the `it` iterator an iterable
+	// 使迭代器`it`成为一个可迭代对象
 	[Symbol.iterator]() { return this; },
 
 	next() { .. },
@@ -157,7 +157,7 @@ var it = {
 it[Symbol.iterator]() === it;		// true
 ```
 
-Now we can consume the `it` iterator with a `for..of` loop:
+现在我们就可以用一个`for..of`循环来消费迭代器`it`了：
 
 ```js
 for (var v of it) {
@@ -165,7 +165,7 @@ for (var v of it) {
 }
 ```
 
-To fully understand how such a loop works, recall the `for` equivalent of a `for..of` loop from Chapter 2:
+为了完全理解这样的循环如何工作，回忆下第二章中的`for..of`循环的`for`等价物：
 
 ```js
 for (var v, res; (res = it.next()) && !res.done; ) {
@@ -174,19 +174,19 @@ for (var v, res; (res = it.next()) && !res.done; ) {
 }
 ```
 
-If you look closely, you'll see that `it.next()` is called before each iteration, and then `res.done` is consulted. If `res.done` is `true`, the expression evaluates to `false` and the iteration doesn't occur.
+如果你仔细观察，你会发现`it.next()`是在每次迭代之前被调用的，然后`res.done`才被查询。如果`res.done`是`true`，那么这个表达式将会求值为`false`于是这次迭代不会发生。
 
-Recall earlier that we suggested iterators should in general not return `done: true` along with the final intended value from the iterator. Now you can see why.
+回忆一下之前我们建议说，迭代器一般不应与最终预期的值一起返回`done: true`。现在你知道为什么了。
 
-If an iterator returned `{ done: true, value: 42 }`, the `for..of` loop would completely discard the `42` value and it'd be lost. For this reason, assuming that your iterator may be consumed by patterns like the `for..of` loop or its manual `for` equivalent, you should probably wait to return `done: true` for signaling completion until after you've already returned all relevant iteration values.
+如果一个迭代器返回了`{ done: true, value: 42 }`，`for..of`循环将完全扔掉值`42`。因此，假定你的迭代器可能会被`for..of`循环或它的`for`等价物这样的模式消费的话，你可能应当等到你已经返回了所有相关的迭代值之后才返回`done: true`来表示完成。
 
-**Warning:** You can, of course, intentionally design your iterator to return some relevant `value` at the same time as returning `done: true`. But don't do this unless you've documented that as the case, and thus implicitly forced consumers of your iterator to use a different pattern for iteration than is implied by `for..of` or its manual equivalent we depicted.
+**警告：** 当然，你可以有意地将你的迭代器设计为将某些相关的`value`与`done: true`同时返回。但除非你将此情况在文档中记录下来，否则不要这么做，因为这样会隐含地强制你的迭代器消费者使用一种，与我们刚才描述的`for..of`或它的手动等价物不同的模式来进行迭代。
 
-### Custom Iterators
+### 自定义迭代器
 
-In addition to the standard built-in iterators, you can make your own! All it takes to make them interoperate with ES6's consumption facilities (e.g., the `for..of` loop and the `...` operator) is to adhere to the proper interface(s).
+除了标准的内建迭代器，你还可以制造你自己的迭代器！所有使它们可以与ES6消费设施（例如，`for..of`循环和`...`操作符）进行互动的代价就是遵循恰当的接口。
 
-Let's try constructing an iterator that produces the infinite series of numbers in the Fibonacci sequence:
+让我们试着构建一个迭代器，它能够以斐波那契（Fibonacci）数列的形式产生无限多的数字序列：
 
 ```js
 var Fib = {
@@ -194,7 +194,7 @@ var Fib = {
 		var n1 = 1, n2 = 1;
 
 		return {
-			// make the iterator an iterable
+			// 使迭代器成为一个可迭代对象
 			[Symbol.iterator]() { return this; },
 
 			next() {
@@ -223,11 +223,11 @@ for (var v of Fib) {
 // Fibonacci sequence abandoned.
 ```
 
-**Warning:** If we hadn't inserted the `break` condition, this `for..of` loop would have run forever, which is probably not the desired result in terms of breaking your program!
+**警告：** 如果我们没有插入`break`条件，这个`for..of`循环将会永远运行下去，这回破坏你的程序，因此可能不是我们想要的！
 
-The `Fib[Symbol.iterator]()` method when called returns the iterator object with `next()` and `return(..)` methods on it. State is maintained via `n1` and `n2` variables, which are kept by the closure.
+方法`Fib[Symbol.iterator]()`在被调用时返回带有`next()`和`return(..)`方法的迭代器对象。它的状态通过变量`n1`和`n2`维护在闭包中。
 
-Let's *next* consider an iterator that is designed to run through a series (aka a queue) of actions, one item at a time:
+接下来让我们考虑一个迭代器，它被设计为执行一系列（也叫队列）动作，一次一个：
 
 ```js
 var tasks = {
@@ -235,7 +235,7 @@ var tasks = {
 		var steps = this.actions.slice();
 
 		return {
-			// make the iterator an iterable
+			// 使迭代器成为一个可迭代对象
 			[Symbol.iterator]() { return this; },
 
 			next(...args) {
@@ -258,9 +258,9 @@ var tasks = {
 };
 ```
 
-The iterator on `tasks` steps through functions found in the `actions` array property, if any, and executes them one at a time, passing in whatever arguments you pass to `next(..)`, and returning any return value to you in the standard `IteratorResult` object.
+在`tasks`上的迭代器步过在数组属性`actions`中找到的函数，并每次执行它们中的一个，并传入你传递给`next(..)`的任何参数值，并在标准的`IteratorResult`对象中向你返回任何它返回的东西。
 
-Here's how we could use this `tasks` queue:
+这是我们如何使用这个`tasks`队列：
 
 ```js
 tasks.actions.push(
@@ -292,11 +292,11 @@ it.next( 20, 50, 120 );	// step 3: 20 50 120
 it.next();				// { done: true }
 ```
 
-This particular usage reinforces that iterators can be a pattern for organizing functionality, not just data. It's also reminiscent of what we'll see with generators in the next section.
+这种特别的用法证实了迭代器可以是一种具有组织功能的模式，不仅仅是数据。这也联系着我们在下一节关于generator将要看到的东西。
 
-You could even get creative and define an iterator that represents meta operations on a single piece of data. For example, we could define an iterator for numbers that by default ranges from `0` up to (or down to, for negative numbers) the number in question.
+你甚至可以更有创意一些，在一块数据上定义一个表示元操作的迭代器。例如，我们可以为默认从0开始递增至（或递减至，对于负数来说）指定数字的一组数字定义一个迭代器。
 
-Consider:
+考虑如下代码：
 
 ```js
 if (!Number.prototype[Symbol.iterator]) {
@@ -310,29 +310,29 @@ if (!Number.prototype[Symbol.iterator]) {
 			value: function iterator(){
 				var i, inc, done = false, top = +this;
 
-				// iterate positively or negatively?
+				// 正向迭代还是负向迭代？
 				inc = 1 * (top < 0 ? -1 : 1);
 
 				return {
-					// make the iterator itself an iterable!
+					// 使迭代器本身成为一个可迭代对象！
 					[Symbol.iterator](){ return this; },
 
 					next() {
 						if (!done) {
-							// initial iteration always 0
+							// 最初的迭代总是0
 							if (i == null) {
 								i = 0;
 							}
-							// iterating positively
+							// 正向迭代
 							else if (top >= 0) {
 								i = Math.min(top,i + inc);
 							}
-							// iterating negatively
+							// 负向迭代
 							else {
 								i = Math.max(top,i + inc);
 							}
 
-							// done after this iteration?
+							// 这次迭代之后就完了？
 							if (i == top) done = true;
 
 							return { value: i, done: false };
@@ -348,7 +348,7 @@ if (!Number.prototype[Symbol.iterator]) {
 }
 ```
 
-Now, what tricks does this creativity afford us?
+现在，这种创意给了我们什么技巧？
 
 ```js
 for (var i of 3) {
@@ -359,25 +359,25 @@ for (var i of 3) {
 [...-3];				// [0,-1,-2,-3]
 ```
 
-Those are some fun tricks, though the practical utility is somewhat debatable. But then again, one might wonder why ES6 didn't just ship with such a minor but delightful feature easter egg!?
+这是一些有趣的技巧，虽然其实际用途有些值得商榷。但是再一次，有人可能想知道为什么ES6没有提供如此微小但讨喜的特性呢？
 
-I'd be remiss if I didn't at least remind you that extending native prototypes as I'm doing in the previous snippet is something you should only do with caution and awareness of potential hazards.
+如果我连这样的提醒都没给过你，那就是我的疏忽：像我在前面的代码段中做的那样扩展原生原型，是一件你需要小心并了解潜在的危害后才应该做的事情。
 
-In this case, the chances that you'll have a collision with other code or even a future JS feature is probably exceedingly low. But just beware of the slight possibility. And document what you're doing verbosely for posterity's sake.
+在这样的情况下，你与其他代码或者未来的JS特性发生冲突的可能性非常低。但是要小心微小的可能性。并在文档中为后人详细记录下你在做什么。
 
-**Note:** I've expounded on this particular technique in this blog post (http://blog.getify.com/iterating-es6-numbers/) if you want more details. And this comment (http://blog.getify.com/iterating-es6-numbers/comment-page-1/#comment-535294) even suggests a similar trick but for making string character ranges.
+**注意：** 如果你想知道更多细节，我在这篇文章(http://blog.getify.com/iterating-es6-numbers/) 中详细论述了这种特别的技术。而且这段评论(http://blog.getify.com/iterating-es6-numbers/comment-page-1/#comment-535294)甚至为制造一个字符串字符范围提出了一个相似的技巧。
 
-### Iterator Consumption
+### 消费迭代器
 
-We've already shown consuming an iterator item by item with the `for..of` loop. But there are other ES6 structures that can consume iterators.
+我们已经看到了使用`for..of`循环来一个元素一个元素地消费一个迭代器。但是还有一些其他的ES6结构可以消费迭代器。
 
-Let's consider the iterator attached to this array (though any iterator we choose would have the following behaviors):
+让我们考虑一下附着这个数组上的迭代器（虽然任何我们选择的迭代器都将拥有如下的行为）：
 
 ```js
 var a = [1,2,3,4,5];
 ```
 
-The `...` spread operator fully exhausts an iterator. Consider:
+扩散操作符`...`将完全耗尽一个迭代器。考虑如下代码：
 
 ```js
 function foo(x,y,z,w,p) {
@@ -387,22 +387,22 @@ function foo(x,y,z,w,p) {
 foo( ...a );			// 15
 ```
 
-`...` can also spread an iterator inside an array:
+`...`还可以在一个数组内部扩散一个迭代器：
 
 ```js
 var b = [ 0, ...a, 6 ];
 b;						// [0,1,2,3,4,5,6]
 ```
 
-Array destructuring (see "Destructuring" in Chapter 2) can partially or completely (if paired with a `...` rest/gather operator) consume an iterator:
+数组解构（参见第二章的“解构”）可以部分地或者完全地（如果与一个`...`剩余/收集操作符一起使用）消费一个迭代器：
 
 ```js
 var it = a[Symbol.iterator]();
 
-var [x,y] = it;			// take just the first two elements from `it`
-var [z, ...w] = it;		// take the third, then the rest all at once
+var [x,y] = it;			// 仅从`it`中取前两个元素
+var [z, ...w] = it;		// 取第三个，然后一次取得剩下所有的
 
-// is `it` fully exhausted? Yep.
+// `it`被完全耗尽了吗？是的
 it.next();				// { value: undefined, done: true }
 
 x;						// 1
@@ -411,21 +411,21 @@ z;						// 3
 w;						// [4,5]
 ```
 
-## Generators
+## Generator
 
-All functions run to completion, right? In other words, once a function starts running, it finishes before anything else can interrupt.
+所有的函数都会运行至完成，对吧？换句话说，一旦一个函数开始运行，在它完成之前没有任何东西能够打断它。
 
-At least that's how it's been for the whole history of JavaScript up to this point. As of ES6, a new somewhat exotic form of function is being introduced, called a generator. A generator can pause itself in mid-execution, and can be resumed either right away or at a later time. So it clearly does not hold the run-to-completion guarantee that normal functions do.
+至少对于到目前为止的JavaScript的整个历史来说是这样的。在ES6中，引入了一个有些异乎寻常的新形式的函数，称为generator。一个generator可以在运行期间暂停它自己，还可以立即或者稍后继续运行。所以显然它没有普通函数那样的运行至完成的保证。
 
-Moreover, each pause/resume cycle in mid-execution is an opportunity for two-way message passing, where the generator can return a value, and the controlling code that resumes it can send a value back in.
+另外，在运行期间的每次暂停/继续轮回都是一个双向消息传递的好机会，generator可以在这里返回一个值，而使它继续的控制端代码可以发回一个值。
 
-As with iterators in the previous section, there are multiple ways to think about what a generator is, or rather what it's most useful for. There's no one right answer, but we'll try to consider several angles.
+就像前一节中的迭代器一样，有种方式可以考虑generator是什么，或者说它对什么最有用。对此没有一个正确的答案，但我们将试着从几个角度考虑。
 
-**Note:** See the *Async & Performance* title of this series for more information about generators, and also see Chapter 4 of this current title.
+**注意：** 关于generator的更多信息参见本系列的 *异步与性能*，还可以参见本书的第四章。
 
-### Syntax
+### 语法
 
-The generator function is declared with this new syntax:
+generator函数使用这种新语法声明：
 
 ```js
 function *foo() {
@@ -433,7 +433,7 @@ function *foo() {
 }
 ```
 
-The position of the `*` is not functionally relevant. The same declaration could be written as any of the following:
+`*`的位置在功能上无关紧要。同样的声明还可以写做以下的任意一种：
 
 ```js
 function *foo()  { .. }
@@ -443,11 +443,11 @@ function*foo()   { .. }
 ..
 ```
 
-The *only* difference here is stylistic preference. Most other literature seems to prefer `function* foo(..) { .. }`. I prefer `function *foo(..) { .. }`, so that's how I'll present them for the rest of this title.
+这里 *唯一* 的区别就是风格的偏好。大多数其他的文献似乎喜欢`function* foo(..) { .. }`。我喜欢`function *foo(..) { .. }`，所以这就是我将在本书剩余部分中表示它们的方法。
 
-My reason is purely didactic in nature. In this text, when referring to a generator function, I will use `*foo(..)`, as opposed to `foo(..)` for a normal function. I observe that `*foo(..)` more closely matches the `*` positioning of `function *foo(..) { .. }`.
+我这样做的理由实质上纯粹是为了教学。在这本书中，当我引用一个generator函数时，我将使用`*foo(..)`，与普通函数的`foo(..)`相对。我发现`*foo(..)`与`function *foo(..) { .. }`中`*`的位置更加吻合。
 
-Moreover, as we saw in Chapter 2 with concise methods, there's a concise generator form in object literals:
+另外，就像我们在第二章的简约方法中看到的，在对象字面量中有一种简约generator形式：
 
 ```js
 var a = {
@@ -455,19 +455,19 @@ var a = {
 };
 ```
 
-I would say that with concise generators, `*foo() { .. }` is rather more natural than `* foo() { .. }`. So that further argues for matching the consistency with `*foo()`.
+我要说在简约generator中，`*foo() { .. }`要比`* foo() { .. }`更自然。这进一步表明了为何使用`*foo()`匹配一致性。
 
-Consistency eases understanding and learning.
+一致性使理解与学习更轻松。
 
-#### Executing a Generator
+#### 执行一个Generator
 
-Though a generator is declared with `*`, you still execute it like a normal function:
+虽然一个generator使用`*`进行声明，但是你依然可以像一个普通函数那样执行它：
 
 ```js
 foo();
 ```
 
-You can still pass it arguments, as in:
+你依然可以传给它参数值，就像：
 
 ```js
 function *foo(x,y) {
@@ -477,9 +477,9 @@ function *foo(x,y) {
 foo( 5, 10 );
 ```
 
-The major difference is that executing a generator, like `foo(5,10)` doesn't actually run the code in the generator. Instead, it produces an iterator that will control the generator to execute its code.
+主要区别在于，执行一个generator，比如`foo(5,10)`，并不实际运行generator中的代码。取而代之的是，它生成一个迭代器来控制generator执行它的代码。
 
-We'll come back to this later in "Iterator Control," but briefly:
+我们将在稍后的“迭代器控制”中回到这个话题，但是简要地说：
 
 ```js
 function *foo() {
@@ -488,13 +488,13 @@ function *foo() {
 
 var it = foo();
 
-// to start/advanced `*foo()`, call
+// 要开始/推进`*foo()`，调用
 // `it.next(..)`
 ```
 
 #### `yield`
 
-Generators also have a new keyword you can use inside them, to signal the pause point: `yield`. Consider:
+Generator还有一个你可以在它们内部使用的新关键字，用来表示暂停点：`yield`。考虑如下代码：
 
 ```js
 function *foo() {
@@ -507,11 +507,11 @@ function *foo() {
 }
 ```
 
-In this `*foo()` generator, the operations on the first two lines would run at the beginning, then `yield` would pause the generator. If and when resumed, the last line of `*foo()` would run. `yield` can appear any number of times (or not at all, technically!) in a generator.
+在这个`*foo()`generator中，前两行的操作将会在开始时运行，然后`yield`将会暂停这个generator。如果这个generator被继续，`*foo()`的最后一行将运行。在一个generator中`yield`可以出现任意多次（或者，在技术上讲，根本不出现！）。
 
-You can even put `yield` inside a loop, and it can represent a repeated pause point. In fact, a loop that never completes just means a generator that never completes, which is completely valid, and sometimes entirely what you need.
+你甚至可以在一个循环内部放置`yield`，它可以表示一个重复的暂停点。事实上，一个永不完成的循环就意味着一个永不完成的generator，这是完全合法的，而且有时候完全是你需要的。
 
-`yield` is not just a pause point. It's an expression that sends out a value when pausing the generator. Here's a `while..true` loop in a generator that for each iteration `yield`s a new random number:
+`yield`不只是一个暂停点。它是在暂停generator时发送出一个值的表达式。这里是一个位于generator中的`while..true`循环，它每次迭代时`yield`出一个新的随机数：
 
 ```js
 function *foo() {
@@ -521,7 +521,7 @@ function *foo() {
 }
 ```
 
-The `yield ..` expression not only sends a value -- `yield` without a value is the same as `yield undefined` -- but also receives (e.g., is replaced by) the eventual resumption value. Consider:
+`yield ..`表达式不仅发送一个值 —— 不带值的`yield`与`yield undefined`相同 —— 它还接收（也就是，被替换为）最终的继续值。考虑如下代码：
 
 ```js
 function *foo() {
@@ -530,9 +530,9 @@ function *foo() {
 }
 ```
 
-This generator will first `yield` out the value `10` when pausing itself. When you resume the generator -- using the `it.next(..)` we referred to earlier -- whatever value (if any) you resume with will replace/complete the whole `yield 10` expression, meaning that value will be assigned to the `x` variable.
+这个generator在暂停它自己时将首先`yield`出值`10`。当你继续这个generator时 —— 使用我们先前提到的`it.next(..)` —— 无论你使用什么值继续它，这个值都将替换/完成整个表达式`yield 10`，这意味着这个值将被赋值给变量`x`
 
-A `yield ..` expression can appear anywhere a normal expression can. For example:
+一个`yield..`表达式可以出现在任意普通表达式可能出现的地方。例如：
 
 ```js
 function *foo() {
@@ -541,51 +541,51 @@ function *foo() {
 }
 ```
 
-`*foo()` here has four `yield ..` expressions. Each `yield` results in the generator pausing to wait for a resumption value that's then used in the various expression contexts.
+这里的`*foo()`有四个`yield ..`表达式。其中每个`yield`都会导致generator暂停以等待一个继续值，这个继续值稍后被用于各个表达式环境中。
 
-`yield` is not technically an operator, though when used like `yield 1` it sure looks like it. Because `yield` can be used all by itself as in `var x = yield;`, thinking of it as an operator can sometimes be confusing.
+`yield`在技术上讲不是一个操作符，虽然像`yield 1`这样使用时看起来确实很像。因为`yield`可以像`var x = yield`这样完全通过自己被使用，所以将它认为是一个操作符有时令人困惑。
 
-Technically, `yield ..` is of the same "expression precedence" -- similar conceptually to operator precedence -- as an assignment expression like `a = 3`. That means `yield ..` can basically appear anywhere `a = 3` can validly appear.
+从技术上讲，`yield ..`与`a = 3`这样的赋值表达式拥有相同的“表达式优先级” —— 概念上和操作符优先级很相似。这意味着`yield ..`基本上可以出现在任何`a = 3`可以合法出现的地方。
 
-Let's illustrate the symmetry:
+让我们展示一下这种对称性：
 
 ```js
 var a, b;
 
-a = 3;					// valid
-b = 2 + a = 3;			// invalid
-b = 2 + (a = 3);		// valid
+a = 3;					// 合法
+b = 2 + a = 3;			// 不合法
+b = 2 + (a = 3);		// 合法
 
-yield 3;				// valid
-a = 2 + yield 3;		// invalid
-a = 2 + (yield 3);		// valid
+yield 3;				// 合法
+a = 2 + yield 3;		// 不合法
+a = 2 + (yield 3);		// 合法
 ```
 
-**Note:** If you think about it, it makes a sort of conceptual sense that a `yield ..` expression would behave similar to an assignment expression. When a paused `yield` expression is resumed, it's completed/replaced by the resumption value in a way that's not terribly dissimilar from being "assigned" that value.
+**注意：** 如果你好好考虑一下，认为一个`yield ..`表达式与一个赋值表达式的行为相似在概念上有些道理。当一个被暂停的generator被继续时，它就以一种与被这个继续值“赋值”区别不大的方式，被这个值完成/替换。
 
-The takeaway: if you need `yield ..` to appear in a position where an assignment like `a = 3` would not itself be allowed, it needs to be wrapped in a `( )`.
+要点：如果你需要`yield ..`出现在`a = 3`这样的赋值本不被允许出现的位置，那么它就需要被包在一个`( )`中。
 
-Because of the low precedence of the `yield` keyword, almost any expression after a `yield ..` will be computed first before being sent with `yield`. Only the `...` spread operator and the `,` comma operator have lower precedence, meaning they'd bind after the `yield` has been evaluated.
+因为`yield`关键字的优先级很低，几乎任何出现在`yield ..`之后的表达式都会在被`yield`发送之前首先被计算。只有扩散操作符`...`和逗号操作符`,`拥有更低的优先级，这意味着他们会在`yield`已经被求值之后才会被处理。
 
-So just like with multiple operators in normal statements, another case where `( )` might be needed is to override (elevate) the low precedence of `yield`, such as the difference between these expressions:
+所以正如带有多个操作符的普通语句一样，存在另一个可能需要`( )`来覆盖（提升）`yield`的低优先级的情况，就像这些表达式之间的区别：
 
 ```js
-yield 2 + 3;			// same as `yield (2 + 3)`
+yield 2 + 3;			// 与`yield (2 + 3)`相同
 
-(yield 2) + 3;			// `yield 2` first, then `+ 3`
+(yield 2) + 3;			// 首先`yield 2`，然后`+ 3`
 ```
 
-Just like `=` assignment, `yield` is also "right-associative," which means that multiple `yield` expressions in succession are treated as having been `( .. )` grouped from right to left. So, `yield yield yield 3` is treated as `yield (yield (yield 3))`. A "left-associative" interpretation like `((yield) yield) yield 3` would make no sense.
+和`=`赋值一样，`yield`也是“右结合性”的，这意味着多个接连出现的`yield`表达式被视为从右到左被`( .. )`分组。所以，`yield yield yield 3`将被视为`yield (yield (yield 3))`。像`((yield) yield) yield 3`这样的“左结合性”解释没有意义。
 
-Just like with operators, it's a good idea to use `( .. )` grouping, even if not strictly required, to disambiguate your intent if `yield` is combined with other operators or `yield`s.
+和其他操作符一样，`yield`与其他操作符或`yield`组合时为了使你的意图没有歧义，使用`( .. )`分组是一个好主意，即使这不是严格要求的。
 
-**Note:** See the *Types & Grammar* title of this series for more information about operator precedence and associativity.
+**注意：** 更多关于操作符优先级和结合性的信息，参见本系列的 *类型与文法*。
 
 #### `yield *`
 
-In the same way that the `*` makes a `function` declaration into `function *` generator declaration, a `*` makes `yield` into `yield *`, which is a very different mechanism, called *yield delegation*. Grammatically, `yield *..` will behave the same as a `yield ..`, as discussed in the previous section.
+与`*`使一个`function`声明成为一个`function *`generator声明的方式一样，一个`*`使`yield`成为一个机制非常不同的`yield *`，称为 *yield委托*。从文法上讲，`yield *..`的行为与`yield ..`相同，就像在前一节讨论过的那样。
 
-`yield * ..` requires an iterable; it then invokes that iterable's iterator, and delegates its own host generator's control to that iterator until it's exhausted. Consider:
+`yield * ..`需要一个可迭代对象；然后它调用这个可迭代对象的迭代器，并将它自己的宿主generator的控制权委托给那个迭代器，直到它被耗尽。考虑如下代码：
 
 ```js
 function *foo() {
@@ -593,9 +593,9 @@ function *foo() {
 }
 ```
 
-**Note:** As with the `*` position in a generator's declaration (discussed earlier), the `*` positioning in `yield *` expressions is stylistically up to you. Most other literature prefers `yield* ..`, but I prefer `yield *..`, for very symmetrical reasons as already discussed.
+**注意：** 与generator声明中`*`的位置（早先讨论过）一样，在`yield *`表达式中的`*`的位置在风格上由你来决定。大多数其他文献偏好`yield* ..`，但是我喜欢`yield *..`，理由和我们已经讨论过的相同。
 
-The `[1,2,3]` value produces an iterator that will step through its values, so the `*foo()` generator will yield those values out as it's consumed. Another way to illustrate the behavior is in yield delegating to another generator:
+值`[1,2,3]`产生一个将会步过它的值的迭代器，所以generator`*foo()`将会在被消费时产生这些值。另一种说明这种行为的方式是，yield委托到了另一个generator：
 
 ```js
 function *foo() {
@@ -609,11 +609,11 @@ function *bar() {
 }
 ```
 
-The iterator produced when `*bar()` calls `*foo()` is delegated to via `yield *`, meaning whatever value(s) `*foo()` produces will be produced by `*bar()`.
+当`*bar()`调用`*foo()`产生的迭代器通过`yield *`受到委托，意味着无论`*foo()`产生什么值都会被`*bar()`产生。
 
-Whereas with `yield ..` the completion value of the expression comes from resuming the generator with `it.next(..)`, the completion value of the `yield *..` expression comes from the return value (if any) from the delegated-to iterator.
+在`yield ..`中表达式的完成值来自于使用`it.next(..)`继续generator，而`yield *..`表达式的完成值来自于受到委托的迭代器的返回值（如果有的话）。
 
-Built-in iterators generally don't have return values, as we covered at the end of the "Iterator Loop" section earlier in this chapter. But if you define your own custom iterator (or generator), you can design it to `return` a value, which `yield *..` would capture:
+内建的迭代器一般没有返回值，正如我们在本章早先的“迭代器循环”一节的末尾讲过的。但是如果你定义你自己的迭代器（或者generator），你就可以将它设计为`return`一个值，`yield *..`将会捕获它：
 
 ```js
 function *foo() {
@@ -635,9 +635,9 @@ for (var v of bar()) {
 // x: 4
 ```
 
-While the `1`, `2`, and `3` values are `yield`ed out of `*foo()` and then out of `*bar()`, the `4` value returned from `*foo()` is the completion value of the `yield *foo()` expression, which then gets assigned to `x`.
+虽然值`1`，`2`，和`3`从`*foo()`中被`yield`出来，然后从`*bar()`中被`yield`出来，但是从`*foo()`中返回的值`4`是表达式`yield *foo()`的完成值，然后它被赋值给`x`。
 
-Because `yield *` can call another generator (by way of delegating to its iterator), it can also perform a sort of generator recursion by calling itself:
+因为`yield *`可以调用另一个generator（通过委托到它的迭代器的方式），它还可以通过调用自己来实施某种generator递归：
 
 ```js
 function *foo(x) {
@@ -650,15 +650,15 @@ function *foo(x) {
 foo( 1 );
 ```
 
-The result from `foo(1)` and then calling the iterator's `next()` to run it through its recursive steps will be `24`. The first `*foo(..)` run has `x` at value `1`, which is `x < 3`. `x + 1` is passed recursively to `*foo(..)`, so `x` is then `2`. One more recursive call results in `x` of `3`.
+取得`foo(1)`的结果并调用迭代器的`next()`来使它运行它的递归步骤，结果将是`24`。第一次`*foo()`运行时`x`拥有值`1`，它是`x < 3`。`x + 1`被递归地传递到`*foo(..)`，所以之后的`x`是`2`。再一次递归调用导致`x`为`3`。
 
-Now, because `x < 3` fails, the recursion stops, and `return 3 * 2` gives `6` back to the previous call's `yield *..` expression, which is then assigned to `x`. Another `return 6 * 2` returns `12` back to the previous call's `x`. Finally `12 * 2`, or `24`, is returned from the completed run of the `*foo(..)` generator.
+现在，因为`x < 3`失败了，递归停止，而且`return 3 * 2`将`6`给回前一个调用的`yeild *..`表达式，它被赋值给`x`。另一个`return 6 * 2`返回`12`给前一个调用的`x`。最终`12 * 2`，即`24`，从generator`*foo(..)`运行的完成中被返回。
 
-### Iterator Control
+### 迭代器控制
 
-Earlier, we briefly introduced the concept that generators are controlled by iterators. Let's fully dig into that now.
+早先，我们简要地介绍了generator是由迭代器控制的概念。现在让我们完整地深入这个话题。
 
-Recall the recursive `*foo(..)` from the previous section. Here's how we'd run it:
+回忆一下前一节的递归`*for(..)`。这是我们如何运行它：
 
 ```js
 function *foo(x) {
@@ -672,9 +672,9 @@ var it = foo( 1 );
 it.next();				// { value: 24, done: true }
 ```
 
-In this case, the generator doesn't really ever pause, as there's no `yield ..` expression. Instead, `yield *` just keeps the current iteration step going via the recursive call. So, just one call to the iterator's `next()` function fully runs the generator.
+在这种情况下，generator并没有真正暂停过，因为这里没有`yield ..`表达式。而`yield *`只是通过递归调用保持当前的迭代步骤继续运行下去。所以，仅仅对迭代器的`next()`函数进行一次调用就完全地运行了generator。
 
-Now let's consider a generator that will have multiple steps and thus multiple produced values:
+现在让我们考虑一个有多个步骤并且因此有多个产生值的generator：
 
 ```js
 function *foo() {
@@ -684,7 +684,7 @@ function *foo() {
 }
 ```
 
-We already know we can consume an iterator, even one attached to a generator like `*foo()`, with a `for..of` loop:
+我们已经知道我们可以是使用一个`for..of`循环来消费一个迭代器，即便它是一个附着在`*foo()`这样的generator上：
 
 ```js
 for (var v of foo()) {
@@ -693,9 +693,9 @@ for (var v of foo()) {
 // 1 2 3
 ```
 
-**Note:** The `for..of` loop requires an iterable. A generator function reference (like `foo`) by itself is not an iterable; you must execute it with `foo()` to get the iterator (which is also an iterable, as we explained earlier in this chapter). You could theoretically extend the `GeneratorPrototype` (the prototype of all generator functions) with a `Symbol.iterator` function that essentially just does `return this()`. That would make the `foo` reference itself an iterable, which means `for (var v of foo) { .. }` (notice no `()` on `foo`) will work.
+**注意：** `for..of`循环需要一个可迭代对象。一个generator函数引用（比如`foo`）本身不是一个可迭代对象；你必须使用`foo()`来执行它以得到迭代器（它也是一个可迭代对象，正如我们在本章早先讲解过的）。理论上你可以使用一个实质上仅仅执行`return this()`的`Symbol.iterator`函数来扩展`GeneratorPrototype`（所有generator函数的原型）。这将使`foo`引用本身成为一个可迭代对象，也就意味着`for (var v of foo) { .. }`（注意在`foo`上没有`()`）将可以工作。
 
-Let's instead iterate the generator manually:
+让我们手动迭代这个generator：
 
 ```js
 function *foo() {
@@ -713,13 +713,13 @@ it.next();				// { value: 3, done: false }
 it.next();				// { value: undefined, done: true }
 ```
 
-If you look closely, there are three `yield` statements and four `next()` calls. That may seem like a strange mismatch. In fact, there will always be one more `next()` call than `yield` expression, assuming all are evaluated and the generator is fully run to completion.
+如果你仔细观察，这里有三个`yield`语句和四个`next()`调用。这可能看起来像是一个奇怪的不匹配。事实上，假定所有的东西都被求值并且generator完全运行至完成的话，`next()`调用将总是比`yield`表达式多一个。
 
-But if you look at it from the opposite perspective (inside-out instead of outside-in), the matching between `yield` and `next()` makes more sense.
+但是如果你相反的角度观察（从里向外而不是从外向里），`yield`和`next()`之间的匹配就显得更有道理。
 
-Recall that the `yield ..` expression will be completed by the value you resume the generator with. That means the argument you pass to `next(..)` completes whatever `yield ..` expression is currently paused waiting for a completion.
+回忆一下，`yield ..`表达式将被你用于继续generator的值完成。这意味着你传递给`next(..)`的参数值将完成任何当前暂停中等待完成的`yield ..`表达式。
 
-Let's illustrate this perspective this way:
+让我们这样展示一下这种视角：
 
 ```js
 function *foo() {
@@ -730,9 +730,9 @@ function *foo() {
 }
 ```
 
-In this snippet, each `yield ..` is sending a value out (`1`, `2`, `3`), but more directly, it's pausing the generator to wait for a value. In other words, it's almost like asking the question, "What value should I use here? I'll wait to hear back."
+在这个代码段中，每个`yield ..`都送出一个值（`1`，`2`，`3`），但更直接的是，它暂停了generator来等待一个值。换句话说，它就像在问这样一个问题，“我应当在这里用什么值？我会在这里等你告诉我。”
 
-Now, here's how we control `*foo()` to start it up:
+现在，这是我们如何控制`*foo()`来启动它：
 
 ```js
 var it = foo();
@@ -740,61 +740,61 @@ var it = foo();
 it.next();				// { value: 1, done: false }
 ```
 
-That first `next()` call is starting up the generator from its initial paused state, and running it to the first `yield`. At the moment you call that first `next()`, there's no `yield ..` expression waiting for a completion. If you passed a value to that first `next()` call, it would currently just be thrown away, because no `yield` is waiting to receive such a value.
+这第一个`next()`调用从generator初始的暂停状态启动了它，并运行至第一个`yield`。在你调用第一个`next()`的那一刻，并没有`yield ..`表达式等待完成。如果你给第一个`next()`调用传递一个值，目前它会被扔掉，因为没有`yield`等着接受这样的一个值。
 
-**Note:** An early proposal for the "beyond ES6" timeframe *would* let you access a value passed to an initial `next(..)` call via a separate meta property (see Chapter 7) inside the generator.
+**注意：** 一个“ES6之后”时间表中的早期提案 *将* 允许你在generator内部通过一个分离的元属性（见第七章）来访问一个被传入初始`next(..)`调用的值。
 
-Now, let's answer the currently pending question, "What value should I assign to `x`?" We'll answer it by sending a value to the *next* `next(..)` call:
+现在，让我们回答那个未解的问题，“我应当给`x`赋什么值？” 我们将通过给 *下一个* `next(..)`调用发送一个值来回答：
 
 ```js
 it.next( "foo" );		// { value: 2, done: false }
 ```
 
-Now, the `x` will have the value `"foo"`, but we've also asked a new question, "What value should I assign to `y`?" And we answer:
+现在，`x`将拥有值`"foo"`，但我们也问了一个新的问题，“我应当给`y`赋什么值？”
 
 ```js
 it.next( "bar" );		// { value: 3, done: false }
 ```
 
-Answer given, another question asked. Final answer:
+答案给出了，另一个问题被提出了。最终答案：
 
 ```js
 it.next( "baz" );		// "foo" "bar" "baz"
 						// { value: undefined, done: true }
 ```
 
-Now it should be clearer how each `yield ..` "question" is answered by the *next* `next(..)` call, and so the "extra" `next()` call we observed is always just the initial one that starts everything going.
+现在，每一个`yield ..`的“问题”是如何被 *下一个* `next(..)`调用回答的，所以我们观察到的那个“额外的”`next()`调用总是使一切开始的那一个。
 
-Let's put all those steps together:
+让我们把这些步骤放在一起：
 
 ```js
 var it = foo();
 
-// start up the generator
+// 启动generator
 it.next();				// { value: 1, done: false }
 
-// answer first question
+// 回答第一个问题
 it.next( "foo" );		// { value: 2, done: false }
 
-// answer second question
+// 回答第二个问题
 it.next( "bar" );		// { value: 3, done: false }
 
-// answer third question
+// 回答第三个问题
 it.next( "baz" );		// "foo" "bar" "baz"
 						// { value: undefined, done: true }
 ```
 
-You can think of a generator as a producer of values, in which case each iteration is simply producing a value to be consumed.
+在生成器的每次迭代都简单地为消费者生成一个值的情况下，你可认为一个generator是一个值的生成器。
 
-But in a more general sense, perhaps it's appropriate to think of generators as controlled, progressive code execution, much like the `tasks` queue example from the earlier "Custom Iterators" section.
+但是在更一般的意义上，也许将generator认为是一个受控制的，累进的代码执行过程更恰当，与早先“自定义迭代器”一节中的`tasks`队列的例子非常相像。
 
-**Note:** That perspective is exactly the motivation for how we'll revisit generators in Chapter 4. Specifically, there's no reason that `next(..)` has to be called right away after the previous `next(..)` finishes. While the generator's inner execution context is paused, the rest of the program continues unblocked, including the ability for asynchronous actions to control when the generator is resumed.
+**注意：** 这种视角正是我们将如何在第四章中重温generator的动力。特别是，`next(..)`没有理由一定要在前一个`next(..)`完成之后立即被调用。虽然generator的内部执行环境被暂停了，程序的其他部分仍然没有被阻塞，这包括控制generator什么时候被继续的异步动作能力。
 
-### Early Completion
+### 提前完成
 
-As we covered earlier in this chapter, the iterator attached to a generator supports the optional `return(..)` and `throw(..)` methods. Both of them have the effect of aborting a paused generator immediately.
+正如我们在本章早先讲过的，连接到一个generator的迭代器支持可选的`return(..)`和`throw(..)`方法。它们俩都有立即中止一个暂停的的generator的效果。
 
-Consider:
+考虑如下代码：
 
 ```js
 function *foo() {
@@ -812,11 +812,11 @@ it.return( 42 );		// { value: 42, done: true }
 it.next();				// { value: undefined, done: true }
 ```
 
-`return(x)` is kind of like forcing a `return x` to be processed at exactly that moment, such that you get the specified value right back. Once a generator is completed, either normally or early as shown, it no longer processes any code or returns any values.
+`return(x)`有点像强制一个`return x`就在那个时刻被处理，这样你就立即得到这个指定的值。一旦一个generator完成，无论是正常地还是像展示的那样提前地，它就不再处理任何代码或返回任何值了。
 
-In addition to `return(..)` being callable manually, it's also called automatically at the end of iteration by any of the ES6 constructs that consume iterators, such as the `for..of` loop and the `...` spread operator.
+`return(..)`除了可以手动调用，它还在迭代的最后被任何ES6中消费迭代器的结构自动调用，比如`for..of`循环和`...`扩散操作符。
 
-The purpose for this capability is so the generator can be notified if the controlling code is no longer going to iterate over it anymore, so that it can perhaps do any cleanup tasks (freeing up resources, resetting status, etc.). Identical to a normal function cleanup pattern, the main way to accomplish this is to use a `finally` clause:
+这种能力的目的是，在控制端的代码不再继续迭代generator时它可以收到通知，这样它就可能做一些清理工作（释放资源，复位状态，等等）。与普通函数的清理模式完全相同，达成这个目的的主要方法是使用一个`finally`子句：
 
 ```js
 function *foo() {
@@ -843,9 +843,9 @@ it.return( 42 );		// cleanup!
 						// { value: 42, done: true }
 ```
 
-**Warning:** Do not put a `yield` statement inside the `finally` clause! It's valid and legal, but it's a really terrible idea. It acts in a sense as deferring the completion of the `return(..)` call you made, as any `yield ..` expressions in the `finally` clause are respected to pause and send messages; you don't immediately get a completed generator as expected. There's basically no good reason to opt in to that crazy *bad part*, so avoid doing so!
+**警告：** 不要把`yield`语句放在`finally`子句内部！它是有效和合法的，但这确实是一个可怕的主意。它在某种意义上推迟了`return(..)`调用的完成，因为在`finally`子句中的任何`yield ..`表达式都被遵循来暂停和发送消息；你不会像期望的那样立即得到一个完成的generator。基本上没有任何好的理由去选择这种疯狂的 *坏的部分*，所以避免这么做！
 
-In addition to the previous snippet showing how `return(..)` aborts the generator while still triggering the `finally` clause, it also demonstrates that a generator produces a whole new iterator each time it's called. In fact, you can use multiple iterators attached to the same generator concurrently:
+前一个代码段除了展示`return(..)`如何在中止generator的同时触发`finally`子句，它还展示了一个generator在每次被调用时都产生一个全新的迭代器。事实上，你可以并发地使用连接到相同generator的多个迭代器：
 
 ```js
 function *foo() {
@@ -870,11 +870,11 @@ it2.next();				// { value: undefined, done: true }
 it1.next();				// { value: undefined, done: true }
 ```
 
-#### Early Abort
+#### 提前中止
 
-Instead of calling `return(..)`, you can call `throw(..)`. Just like `return(x)` is essentially injecting a `return x` into the generator at its current pause point, calling `throw(x)` is essentially like injecting a `throw x` at the pause point.
+你可以调用`throw(..)`来代替`return(..)`调用。就像`return(x)`实质上在generator当前的暂停点上注入了一个`return x`一样，调用`throw(x)`实质上就像在暂停点上注入了一个`throw x`。
 
-Other than the exception behavior (we cover what that means to `try` clauses in the next section), `throw(..)` produces the same sort of early completion that aborts the generator's run at its current pause point. For example:
+除了处理异常的行为（我们在下一节讲解这对`try`子句意味着什么），`throw(..)`产生相同的提前完成 —— 在generator当前的暂停点中止它的运行。例如：
 
 ```js
 function *foo() {
@@ -897,15 +897,15 @@ catch (err) {
 it.next();				// { value: undefined, done: true }
 ```
 
-Because `throw(..)` basically injects a `throw ..` in replacement of the `yield 1` line of the generator, and nothing handles this exception, it immediately propagates back out to the calling code, which handles it with a `try..catch`.
+因为`throw(..)`基本上注入了一个`throw ..`来替换generator的`yield 1`这一行，而且没有东西处理这个异常，它立即传播回外面的调用端代码，调用端代码使用了一个`try..catch`来处理了它。
 
-Unlike `return(..)`, the iterator's `throw(..)` method is never called automatically.
+与`return(..)`不同的是，迭代器的`throw(..)`方法绝不会被自动调用。
 
-Of course, though not shown in the previous snippet, if a `try..finally` clause was waiting inside the generator when you call `throw(..)`, the `finally` clause would be given a chance to complete before the exception is propagated back to the calling code.
+当然，虽然没有在前面的代码段中展示，但如果当你调用`throw(..)`时有一个`try..finally`子句等在generator内部的话，这个`finally`子句将会在异常被传播回调用端代码之前有机会运行。
 
-### Error Handling
+### 错误处理
 
-As we've already hinted, error handling with generators can be expressed with `try..catch`, which works in both inbound and outbound directions:
+正如我们已经得到的提示，generator中的错误处理可以使用`try..catch`表达，它在上行和下行两个方向都可以工作。
 
 ```js
 function *foo() {
@@ -937,7 +937,7 @@ catch (err) {
 }
 ```
 
-Errors can also propagate in both directions through `yield *` delegation:
+错误也可以通过`yield *`委托在两个方向上传播：
 
 ```js
 function *foo() {
@@ -982,21 +982,21 @@ catch (err) {
 it.next();				// { value: undefined, done: true }
 ```
 
-When `*foo()` calls `yield 1`, the `1` value passes through `*bar()` untouched, as we've already seen.
+当`*foo()`调用`yield 1`时，值`1`原封不动地穿过了`*bar()`，就像我们已经看到过的那样。
 
-But what's most interesting about this snippet is that when `*foo()` calls `throw "foo: e2"`, this error propagates to `*bar()` and is immediately caught by `*bar()`'s `try..catch` block. The error doesn't pass through `*bar()` like the `1` value did.
+但这个代码段最有趣的部分是，当`*foo()`调用`throw "foo: e2"`时，这个错误传播到了`*bar()`并立即被`*bar()`的`try..catch`块儿捕获。错误没有像值`1`那样穿过`*bar()`。
 
-`*bar()`'s `catch` then does a normal output of `err` (`"foo: e2"`) and then `*bar()` finishes normally, which is why the `{ value: undefined, done: true }` iterator result comes back from `it.next()`.
+然后`*bar()`的`catch`将`err`普通地输出（`"foo: e2"`）之后`*bar()`就正常结束了，这就是为什么迭代器结果`{ value: undefined, done: true }`从`it.next()`中返回。
 
-If `*bar()` didn't have a `try..catch` around the `yield *..` expression, the error would of course propagate all the way out, and on the way through it still would complete (abort) `*bar()`.
+如果`*bar()`没有用`try..catch`环绕着`yield *..`表达式，那么错误将理所当然地一直传播出来，而且在它传播的路径上依然会完成（中止）`*bar()`。
 
-### Transpiling a Generator
+### 转译一个Generator
 
-Is it possible to represent a generator's capabilities prior to ES6? It turns out it is, and there are several great tools that do so, including most notably Facebook's Regenerator tool (https://facebook.github.io/regenerator/).
+有可能在ES6之前的环境中表达generator的能力吗？事实上是可以的，而且有好几种了不起的工具在这么做，包括最著名的Facebook的Regenerator工具 (https://facebook.github.io/regenerator/)。
 
-But just to better understand generators, let's try our hand at manually converting. Basically, we're going to create a simple closure-based state machine.
+但为了更好地理解generator，让我们试着手动转换一下。基本上讲，我们将制造一个简单的基于闭包的状态机。
 
-We'll keep our source generator really simple:
+我们将使原本的generator非常简单：
 
 ```js
 function *foo() {
@@ -1005,7 +1005,7 @@ function *foo() {
 }
 ```
 
-To start, we'll need a function called `foo()` that we can execute, which needs to return an iterator:
+开始之前，我们将需要一个我们能够执行的称为`foo()`的函数，它需要返回一个迭代器：
 
 ```js
 function foo() {
@@ -1016,16 +1016,16 @@ function foo() {
 			// ..
 		}
 
-		// we'll skip `return(..)` and `throw(..)`
+		// 我们将省略`return(..)`和`throw(..)`
 	};
 }
 ```
 
-Now, we need some inner variable to keep track of where we are in the steps of our "generator"'s logic. We'll call it `state`. There will be three states: `0` initially, `1` while waiting to fulfill the `yield` expression, and `2` once the generator is complete.
+现在，我们需要一些内部变量来持续跟踪我们的“generator”的逻辑走到了哪一个步骤。我们称它为`state`。我们将有三种状态：起始状态的`0`，等待完成`yield`表达式的`1`，和generator完成的`2`。
 
-Each time `next(..)` is called, we need to process the next step, and then increment `state`. For convenience, we'll put each step into a `case` clause of a `switch` statement, and we'll hold that in an inner function called `nextState(..)` that `next(..)` can call. Also, because `x` is a variable across the overall scope of the "generator," it needs to live outside the `nextState(..)` function.
+每次`next(..)`被调用时，我们需要处理下一个步骤，然后递增`state`。为了方便，我们将每个步骤放在一个`switch`语句的`case`子句中，并且我们将它放在一个`next(..)`可以调用的称为`nextState(..)`的内部函数中。另外，因为`x`是一个横跨整个“generator”作用域的变量，所以它需要存活在`nextState(..)`函数的外部。
 
-Here it is all together (obviously somewhat simplified, to keep the conceptual illustration clearer):
+这是将它们放在一起（很明显，为了使概念的展示更清晰，它经过了某些简化）：
 
 ```js
 function foo() {
@@ -1034,19 +1034,19 @@ function foo() {
 			case 0:
 				state++;
 
-				// the `yield` expression
+				// `yield`表达式
 				return 42;
 			case 1:
 				state++;
 
-				// `yield` expression fulfilled
+				// `yield`表达式完成了
 				x = v;
 				console.log( x );
 
-				// the implicit `return`
+				// 隐含的`return`
 				return undefined;
 
-			// no need to handle state `2`
+			// 无需处理状态`2`
 		}
 	}
 
@@ -1059,12 +1059,12 @@ function foo() {
 			return { value: ret, done: (state == 2) };
 		}
 
-		// we'll skip `return(..)` and `throw(..)`
+		// 我们将省略`return(..)`和`throw(..)`
 	};
 }
 ```
 
-And finally, let's test our pre-ES6 "generator":
+最后，让我们测试一下我们的前ES6“generator”：
 
 ```js
 var it = foo();
@@ -1075,30 +1075,31 @@ it.next( 10 );			// 10
 						// { value: undefined, done: true }
 ```
 
-Not bad, huh? Hopefully this exercise solidifies in your mind that generators are actually just simple syntax for state machine logic. That makes them widely applicable.
+不赖吧？希望这个练习能在你的脑中巩固这个概念：generator实际上只是状态机逻辑的简单语法。这使它们可以广泛地应用。
 
-### Generator Uses
+### Generator的使用
 
-So, now that we much more deeply understand how generators work, what are they useful for?
+我们现在非常深入地理解了generator如何工作，那么，它们在什么地方有用？
 
-We've seen two major patterns:
+我们已经看过了两种主要模式：
 
-* *Producing a series of values:* This usage can be simple (e.g., random strings or incremented numbers), or it can represent more structured data access (e.g., iterating over rows returned from a database query).
+* *生产一系列值：* 这种用法可以很简单（例如，随机字符串或者递增的数字），或者它也可以表达更加结构化的数据访问（例如，迭代一个数据库查询结果的所有行）。
 
-   Either way, we use the iterator to control a generator so that some logic can be invoked for each call to `next(..)`. Normal iterators on data structures merely pull values without any controlling logic.
-* *Queue of tasks to perform serially:* This usage often represents flow control for the steps in an algorithm, where each step requires retrieval of data from some external source. The fulfillment of each piece of data may be immediate, or may be asynchronously delayed.
+	 这两种方式中，我们使用迭代器来控制generator，这样就可以为每次`next(..)`调用执行一些逻辑。在数据解构上的普通迭代器只不过生成值而没有任何控制逻辑。
 
-   From the perspective of the code inside the generator, the details of sync or async at a `yield` point are entirely opaque. Moreover, these details are intentionally abstracted away, such as not to obscure the natural sequential expression of steps with such implementation complications. Abstraction also means the implementations can be swapped/refactored often without touching the code in the generator at all.
+* *串行执行的任务队列：* 这种用法经常用来表达一个算法中步骤的流程控制，其中每一步都要求从某些外部数据源取得数据。对每块儿数据的请求可能会立即满足，或者可能会异步延迟地满足。
 
-When generators are viewed in light of these uses, they become a lot more than just a different or nicer syntax for a manual state machine. They are a powerful abstraction tool for organizing and controlling orderly production and consumption of data.
+	 从generator内部代码的角度来看，在`yield`的地方，同步或异步的细节是完全不透明的。另外，这些细节被有意地抽象出去，如此就不会让这样的实现细节把各个步骤间自然的，顺序的表达搞得模糊不清。抽象还意味着实现可以被替换/重构，而根本不用碰generator中的代码。
 
-## Modules
+当根据这些用法观察generator时，它们的含义要比仅仅是手动状态机的一种不同或更好的语法多多了。它们是一种用于组织和控制有序地生产与消费数据的强大工具。
 
-I don't think it's an exaggeration to suggest that the single most important code organization pattern in all of JavaScript is, and always has been, the module. For myself, and I think for a large cross-section of the community, the module pattern drives the vast majority of code.
+## 模块
 
-### The Old Way
+我觉得这样说并不夸张：在所有的JavaScript代码组织模式中最重要的就是，而且一直是，模块。对于我自己来说，而且我认为对广大典型的技术社区来说，模块模式驱动着绝大多数代码。
 
-The traditional module pattern is based on an outer function with inner variables and functions, and a returned "public API" with methods that have closure over the inner data and capabilities. It's often expressed like this:
+### 过去的方式
+
+传统的模块模式基于一个外部函数，它带有内部变量和函数，以及一个被返回的“公有API”。这个“公有API”带有对内部变量和功能拥有闭包的方法。它经常这样表达：
 
 ```js
 function Hello(name) {
@@ -1106,7 +1107,7 @@ function Hello(name) {
 		console.log( "Hello " + name + "!" );
 	}
 
-	// public API
+	// 公有API
 	return {
 		greeting: greeting
 	};
@@ -1116,7 +1117,7 @@ var me = Hello( "Kyle" );
 me.greeting();			// Hello Kyle!
 ```
 
-This `Hello(..)` module can produce multiple instances by being called subsequent times. Sometimes, a module is only called for as a singleton (i.e., it just needs one instance), in which case a slight variation on the previous snippet, using an IIFE, is common:
+这个`Hello(..)`模块通过被后续调用可以产生多个实例。有时，一个模块为了作为一个单例（也就是，只需要一个实例）而只被调用一次，这样的情况下常见的是一种前面代码段的变种，使用IIFE：
 
 ```js
 var me = (function Hello(name){
@@ -1124,7 +1125,7 @@ var me = (function Hello(name){
 		console.log( "Hello " + name + "!" );
 	}
 
-	// public API
+	// 公有API
 	return {
 		greeting: greeting
 	};
@@ -1133,63 +1134,67 @@ var me = (function Hello(name){
 me.greeting();			// Hello Kyle!
 ```
 
-This pattern is tried and tested. It's also flexible enough to have a wide assortment of variations for a number of different scenarios.
+这种模式是经受过检验的。它也足够灵活，以至于在许多不同的场景下可以有大量的各种变化。
 
-One of the most common is the Asynchronous Module Definition (AMD), and another is the Universal Module Definition (UMD). We won't cover the particulars of these patterns and techniques here, but they're explained extensively in many places online.
+其中一种最常见的是异步模块定义（AMD），另一种是统一模块定义（UMD）。我们不会在这里涵盖这些特定的模式和技术，但是它们在网上的许多地方有大量的讲解。
 
-### Moving Forward
+### 向前迈进
 
-As of ES6, we no longer need to rely on the enclosing function and closure to provide us with module support. ES6 modules have first class syntactic and functional support.
+在ES6中，我们不再需要依赖外围函数和闭包来为我们提供模块支持了。ES6模块拥有头等语法上和功能上的支持。
 
-Before we get into the specific syntax, it's important to understand some fairly significant conceptual differences with ES6 modules compared to how you may have dealt with modules in the past:
+在我们接触这些具体语法之前，重要的是要理解ES6模块与你以前曾经用过的模块比较起来，在概念上的一些相当显著的不同之处：
 
-* ES6 uses file-based modules, meaning one module per file. At this time, there is no standardized way of combining multiple modules into a single file.
+* ES6使用基于文件的模块，这意味着一个模块一个文件。目前，没有标准的方法将多个模块组合到一个文件中。
 
-   That means that if you are going to load ES6 modules directly into a browser web application, you will be loading them individually, not as a large bundle in a single file as has been common in performance optimization efforts.
+	 这意味着如果你要直接把ES6模块加载到一个浏览器web应用中的话，你将个别地加载它们，不是像常见的那样为了性能优化而作为一个单独文件中的一个巨大的包加载。
 
-   It's expected that the contemporaneous advent of HTTP/2 will significantly mitigate any such performance concerns, as it operates on a persistent socket connection and thus can very efficiently load many smaller files in parallel and interleaved with one another.
-* The API of an ES6 module is static. That is, you define statically what all the top-level exports are on your module's public API, and those cannot be amended later.
+	 预计同时期到来的HTTP/2将会大幅缓和这种性能上的顾虑，因为它工作在一个持续的套接字连接上，因而可以用并行的，互相交错的方式非常高效地加载许多小文件。
 
-   Some uses are accustomed to being able to provide dynamic API definitions, where methods can be added/removed/replaced in response to runtime conditions. Either these uses will have to change to fit with ES6 static APIs, or they will have to restrain the dynamic changes to properties/methods of a second-level object.
-* ES6 modules are singletons. That is, there's only one instance of the module, which maintains its state. Every time you import that module into another module, you get a reference to the one centralized instance. If you want to be able to produce multiple module instances, your module will need to provide some sort of factory to do it.
-* The properties and methods you expose on a module's public API are not just normal assignments of values or references. They are actual bindings (almost like pointers) to the identifiers in your inner module definition.
+* 一个ES6模块的API是静态的。这就是说，你在模块的公有API上静态地定义所有被导出的顶层内容，而这些内容导出之后不能被修改。
 
-   In pre-ES6 modules, if you put a property on your public API that holds a primitive value like a number or string, that property assignment was by value-copy, and any internal update of a corresponding variable would be separate and not affect the public copy on the API object.
+	 有些用法习惯于能够提供动态API定义，它的方法可以根据运行时的条件被增加/删除/替换。这些用法要么必须改变以适应ES6静态API，要么它们就不得不将属性/方法的动态修改限制在一个内层对象中。
 
-   With ES6, exporting a local private variable, even if it currently holds a primitive string/number/etc, exports a binding to the variable. If the module changes the  variable's value, the external import binding now resolves to that new value.
-* Importing a module is the same thing as statically requesting it to load (if it hasn't already). If you're in a browser, that implies a blocking load over the network. If you're on a server (i.e., Node.js), it's a blocking load from the filesystem.
+* ES6模块都是单例。也就是，模块只有一个维持它状态的实例。每次你将这个模块导入到另一个模块时，你得到的都是一个指向中央实例的引用。如果你想要能够产生多个模块实例，你的模块将需要提供某种工厂来这么做。
 
-   However, don't panic about the performance implications. Because ES6 modules have static definitions, the import requirements can be statically scanned, and loads will happen preemptively, even before you've used the module.
+* 你在模块的公有API上暴露的属性和方法不是值和引用的普通赋值。它们是在你内部模块定义中的标识符的实际绑定（几乎就是指针）。
 
-   ES6 doesn't actually specify or handle the mechanics of how these load requests work. There's a separate notion of a Module Loader, where each hosting environment (browser, Node.js, etc.) provides a default Loader appropriate to the environment. The importing of a module uses a string value to represent where to get the module (URL, file path, etc.), but this value is opaque in your program and only meaningful to the Loader itself.
+	 在前ES6的模块中，如果你将一个持有像数字或者字符串这样基本类型的属性放在你的共有API中，那么这个属性是通过值拷贝赋值的，任何对相应内部变量的更新都将是分离的，不会影响在API对象上的共有拷贝。
 
-   You can define your own custom Loader if you want more fine-grained control than the default Loader affords -- which is basically none, as it's totally hidden from your program's code.
+	 在ES6中，导出一个本地私有变量，即便它当前持有一个基本类型的字符串/数字/等等，导出的都是这个变量的一个绑定。如果这个模块改变了这个变量的值，外部导入的绑定就会解析为那个新的值。
 
-As you can see, ES6 modules will serve the overall use case of organizing code with encapsulation, controlling public APIs, and referencing dependency imports. But they have a very particular way of doing so, and that may or may not fit very closely with how you've already been doing modules for years.
+* 导入一个模块和静态地请求它被加载是同一件事情（如果它还没被加载的话）。如果你在浏览器中，这意味着通过网络的阻塞加载。如果你在服务器中，它是一个通过文件系统的阻塞加载。
+
+	 但是，不要对它在性能的影响上惊慌。因为ES6模块是静态定义的，导入的请求可以被静态地扫描，并提前加载，甚至是在你使用这个模块之前。
+
+	 ES6并没有实际规定或操纵这些加载请求如何工作的机制。有一个模块加载器的分离概念，它让每一个宿主环境（浏览器，Node.js，等等）为该环境提供合适的默认加载器。一个模块的导入使用一个字符串值来表示从哪里去取得模块（URL，文件路径，等等），但是这个值在你的程序中是不透明的，它仅对加载器自身有意义。
+
+	 如果你想要比默认加载器提供的更细致的控制能力，你可以定义你自己的加载器 —— 默认加载器基本上不提供任何控制，它对于你的程序代码是完全隐藏的。
+
+如你所见，ES6模块将通过封装，控制共有API，以及应用依赖导入来服务于所有的代码组织需求。但是它们用一种非常特别的方式来这样做，这可能与你已经使用多年的模块方式十分接近，也肯能差得很远。
 
 #### CommonJS
 
-There's a similar, but not fully compatible, module syntax called CommonJS, which is familiar to those in the Node.js ecosystem.
+有一种相似，但不是完全兼容的模块语法，称为CommonJS，那些使用Node.js生态系统的人很熟悉它。
 
-For lack of a more tactful way to say this, in the long run, ES6 modules essentially are bound to supersede all previous formats and standards for modules, even CommonJS, as they are built on syntactic support in the language. This will, in time, inevitably win out as the superior approach, if for no other reason than ubiquity.
+不太委婉地说，从长久看来，ES6模块实质上将要取代所有先前的模块格式与标准，即便是CommonJS，因为它们是建立在语言的语法支持上的。如果除了普遍性以外没有其他原因，迟早ES6将不可避免地作为更好的方式胜出。
 
-We face a fairly long road to get to that point, though. There are literally hundreds of thousands of CommonJS style modules in the server-side JavaScript world, and 10 times that many modules of varying format standards (UMD, AMD, ad hoc) in the browser world. It will take many years for the transitions to make any significant progress.
+但是，要达到那一天我们还有相当长的路要走。在服务器端的JavaScript世界中差不多有成百上千的CommonJS风格模块，而在浏览器的世界里各种格式标准的模块（UMD，AMD，临时性的模块方案）数量还要多十倍。这要花许多年过渡才能取得任何显著的进展。
 
-In the interim, module transpilers/converters will be an absolute necessity. You might as well just get used to that new reality. Whether you author in regular modules, AMD, UMD, CommonJS, or ES6, these tools will have to parse and convert to a format that is suitable for whatever environment your code will run in.
+在这个过渡期间，模块转译器/转换器将是绝对必要的。你可能刚刚适应了这种新的现实。不论你是使用正规的模块，AMD，UMD，CommonJS，或者ES6，这些工具都不得不解析并转换为适合你代码运行环境的格式。
 
-For Node.js, that probably means (for now) that the target is CommonJS. For the browser, it's probably UMD or AMD. Expect lots of flux on this over the next few years as these tools mature and best practices emerge.
+对于Node.js，这可能意味着（目前）转换的目标是CommonJS。对于浏览器来说，可能是UMD或者AMD。除了在接下来的几年中随着这些工具的成熟和最佳实践的出现而发生的许多变化。
 
-From here on out, my best advice on modules is this: whatever format you've been religiously attached to with strong affinity, also develop an appreciation for and understanding of ES6 modules, such as they are, and let your other module tendencies fade. They *are* the future of modules in JS, even if that reality is a bit of a ways off.
+从现在起，我能对模块的提出的最佳建议是：不管你曾经由于强烈的爱好而虔诚地追随哪一种格式，都要培养对理解ES6模块的欣赏能力，并让你对其他模块模式的倾向性渐渐消失掉。它们就是JS中模块的未来，即便现实有些偏差。
 
-### The New Way
+### 新的方式
 
-The two main new keywords that enable ES6 modules are `import` and `export`. There's lots of nuance to the syntax, so let's take a deeper look.
+使用ES6模块的两个主要的新关键字是`import`和`export`。在语法上有许多微妙的地方，那么让我们深入地看看。
 
-**Warning:** An important detail that's easy to overlook: both `import` and `export` must always appear in the top-level scope of their respective usage. For example, you cannot put either an `import` or `export` inside an `if` conditional; they must appear outside of all blocks and functions.
+**警告：** 一个容易忽视的重要细节：`import`和`export`都必须总是出现在它们分别被使用之处的顶层作用域。例如，你不能把`import`或`export`放在一个`if`条件内部；它们必须出现在所有块儿和函数的外部。
 
-#### `export`ing API Members
+#### `export`API成员
 
-The `export` keyword is either put in front of a declaration, or used as an operator (of sorts) with a special list of bindings to export. Consider:
+`export`关键字要么放在一个声明的前面，要么就与一组特殊的要被导出的绑定一起用作一个操作符。考虑如下代码：
 
 ```js
 export function foo() {
@@ -1202,7 +1207,7 @@ var bar = [1,2,3];
 export { bar };
 ```
 
-Another way of expressing the same exports:
+表达相同导出的另一种方法：
 
 ```js
 function foo() {
@@ -1215,13 +1220,13 @@ var bar = [1,2,3];
 export { foo, awesome, bar };
 ```
 
-These are all called *named exports*, as you are in effect exporting the name bindings of the variables/functions/etc.
+这些都称为 *命名导出*，因为你实际上导出的是变量/函数/等等其他的名称绑定。
 
-Anything you don't *label* with `export` stays private inside the scope of the module. That is, although something like `var bar = ..` looks like it's declaring at the top-level global scope, the top-level scope is actually the module itself; there is no global scope in modules.
+任何你没有使用`export`*标记* 的东西将在模块作用域的内部保持私有。也就是说，虽然有些像`var bar = ..`的东西看起来像是在顶层全局作用域中声明的，但是这个顶层作用域实际上是模块本身；在模块中没有全局作用域。
 
-**Note:** Modules *do* still have access to `window` and all the "globals" that hang off it, just not as lexical top-level scope. However, you really should stay away from the globals in your modules if at all possible.
+**注意：** 模块确实依然可以访问挂在它外面的`window`和所有的“全局”，只是不作为顶层词法作用域而已。但是，你真的应该在你的模块中尽可能地远离全局。
 
-You can also "rename" (aka alias) a module member during named export:
+你还可以在命名导出期间“重命名”（也叫别名）一个模块成员：
 
 ```js
 function foo() { .. }
@@ -1229,33 +1234,33 @@ function foo() { .. }
 export { foo as bar };
 ```
 
-When this module is imported, only the `bar` member name is available to import; `foo` stays hidden inside the module.
+当这个模块被导入时，只有成员名称`bar`可以用于导入；`foo`在模块内部保持隐藏。
 
-Module exports are not just normal assignments of values or references, as you're accustomed to with the `=` assignment operator. Actually, when you export something, you're exporting a binding (kinda like a pointer) to that thing (variable, etc.).
+模块导出不像你习以为常的`=`赋值操作符那样，仅仅是值或引用的普通赋值。实际上，当你导出某些东西时，你导出了一个对那个东西（变量等）的一个绑定（有些像指针）。
 
-Within your module, if you change the value of a variable you already exported a binding to, even if it's already been imported (see the next section), the imported binding will resolve to the current (updated) value.
+在你的模块内部，如果你改变一个你已经被导出绑定的变量的值，即使它已经被导入了（见下一节），这个被导入的绑定也将解析为当前的（更新后的）值。
 
-Consider:
+考虑如下代码：
 
 ```js
 var awesome = 42;
 export { awesome };
 
-// later
+// 稍后
 awesome = 100;
 ```
 
-When this module is imported, regardless of whether that's before or after the `awesome = 100` setting, once that assignment has happened, the imported binding resolves to the `100` value, not `42`.
+当这个模块被导入时，无论它是在`awesome = 100`设定的之前还是之后，一旦这个赋值发生，被导入的绑定都将被解析为值`100`，不是`42`。
 
-That's because the binding is, in essence, a reference to, or a pointer to, the `awesome` variable itself, rather than a copy of its value. This is a mostly unprecedented concept for JS introduced with ES6 module bindings.
+这是因为，这个绑定实质上是一个指向变量`awesome`本身的一个引用，或指针，而不是它的值的一个拷贝。ES6模块绑定引入了一个对于JS来说几乎是史无前例的概念。
 
-Though you can clearly use `export` multiple times inside a module's definition, ES6 definitely prefers the approach that a module has a single export, which is known as a *default export*. In the words of some members of the TC39 committee, you're "rewarded with simpler `import` syntax" if you follow that pattern, and conversely "penalized" with more verbose syntax if you don't.
+虽然你显然可以在一个模块定义的内部多次使用`export`，但是ES6绝对偏向于一个模块只有一个单独导出的方式，这称为 *默认导出*。用TC39协会的一些成员的话说，如果你遵循这个模式你就可以“获得更简单的`import`语法作为奖励”，如果你不遵循你就会反过来得到更繁冗的语法作为“惩罚”。
 
-A default export sets a particular exported binding to be the default when importing the module. The name of the binding is literally `default`. As you'll see later, when importing module bindings you can also rename them, as you commonly will with a default export.
+一个默认导出将一个特定的导出绑定设置为在这个模块被导入时的默认绑定。这个绑定的名称是字面上的`default`。正如你即将看到的，在导入模块绑定时你还可以重命名它们，你经常会对默认导出这么做。
 
-There can only be one `default` per module definition. We'll cover `import` in the next section, and you'll see how the `import` syntax is more concise if the module has a default export.
+每个模块定义只能有一个`default`。我们将在下一节中讲解`import`，你将看到如果模块拥有默认导入时`import`语法如何变得更简洁。
 
-There's a subtle nuance to default export syntax that you should pay close attention to. Compare these two snippets:
+默认导出语法有一个微妙的细节你应当多加注意。比较这两个代码段：
 
 ```js
 function foo(..) {
@@ -1265,7 +1270,7 @@ function foo(..) {
 export default foo;
 ```
 
-And this one:
+和这一个：
 
 ```js
 function foo(..) {
@@ -1275,9 +1280,9 @@ function foo(..) {
 export { foo as default };
 ```
 
-In the first snippet, you are exporting a binding to the function expression value at that moment, *not* to the identifier `foo`. In other words, `export default ..` takes an expression. If you later assign `foo` to a different value inside your module, the module import still reveals the function originally exported, not the new value.
+在第一个代码段中，你导出的是那一个函数表达式在那一刻的值的绑定，*不是* 标识符`foo`的绑定。换句话说，`export default ..`接收一个表达式。如果你稍后在你的模块内部赋给`foo`一个不同的值，这个模块导入将依然表示原本被导出的函数，而不是那个新的值。
 
-By the way, the first snippet could also have been written as:
+顺带一提，第一个代码段还可以写做：
 
 ```js
 export default function foo(..) {
@@ -1285,9 +1290,9 @@ export default function foo(..) {
 }
 ```
 
-**Warning:** Although the `function foo..` part here is technically a function expression, for the purposes of the internal scope of the module, it's treated like a function declaration, in that the `foo` name is bound in the module's top-level scope (often called "hoisting"). The same is true for `export default class Foo..`. However, while you *can* do `export var foo = ..`, you currently cannot do `export default var foo = ..` (or `let` or `const`), in a frustrating case of inconsistency. At the time of this writing, there's already discussion of adding that capability in soon, post-ES6, for consistency sake.
+**警告：** 虽然技术上讲这里的`function foo..`部分是一个函数表达式，但是对于模块内部作用域来说，它被视为一个函数声明，因为名称`foo`被绑定在模块的顶层作用域（经常称为“提升”）。对`export default var foo = ..`也是如此。然而，虽然你 *可以* `export var foo = ..`，但是一个令人沮丧的不一致是，你目前还不能`export default bar foo = ..`（或者`let`和`const`）。在写作本书时，为了保持一致性，已经开始了在后ES6不久的时期增加这种能力的讨论。
 
-Recall the second snippet again:
+再次回想一下第二个代码段：
 
 ```js
 function foo(..) {
@@ -1297,11 +1302,11 @@ function foo(..) {
 export { foo as default };
 ```
 
-In this version of the module export, the default export binding is actually to the `foo` identifier rather than its value, so you get the previously described binding behavior (i.e., if you later change `foo`'s value, the value seen on the import side will also be updated).
+这种版本的模块导出中，默认导出的绑定实际上是标识符`foo`而不是它的值，所以你会得到先前描述过的绑定行为（也就是，如果你稍后改变`foo`的值，在导入一端看到的值也会被更新）。
 
-Be very careful of this subtle gotcha in default export syntax, especially if your logic calls for export values to be updated. If you never plan to update a default export's value, `export default ..` is fine. If you do plan to update the value, you must use `export { .. as default }`. Either way, make sure to comment your code to explain your intent!
+要非常小心这种默认导出语法的微妙区别，特别是在你的逻辑需要导出的值要被更新时。如果你永远不打算更新一个默认导出的值，`export default ..`就没问题。如果你确实打算更新这个值，你必须使用`export { .. as default }`。无论哪种情况，都要确保注释你的代码以解释你的意图！
 
-Because there can only be one `default` per module, you may be tempted to design your module with one default export of an object with all your API methods on it, such as:
+因为一个模块只能有一个`default`，这可能会诱使你将你的模块设计为默认导出一个带有你所有API方法的对象，就像这样：
 
 ```js
 export default {
@@ -1311,13 +1316,13 @@ export default {
 };
 ```
 
-That pattern seems to map closely to how a lot of developers have already structured their pre-ES6 modules, so it seems like a natural approach. Unfortunately, it has some downsides and is officially discouraged.
+这种模式看起来十分接近于许多开发者构建它们的前ES6模块时曾经用过的模式，所以它看起来像是一种十分自然的方式。不幸的是，它有一些缺陷并且不为官方所鼓励使用。
 
-In particular, the JS engine cannot statically analyze the contents of a plain object, which means it cannot do some optimizations for static `import` performance. The advantage of having each member individually and explicitly exported is that the engine *can* do the static analysis and optimization.
+特别是，JS引擎不能静态地分析一个普通对象的内容，这意味着它不能为静态`import`性能进行一些优化。使每个成员独立地并明确地导出的好处是，引擎 *可以* 进行静态分析和性能优化。
 
-If your API has more than one member already, it seems like these principles -- one default export per module, and all API members as named exports -- are in conflict, doesn't it? But you *can* have a single default export as well as other named exports; they are not mutually exclusive.
+如果你的API已经有多于一个的成员，这些原则 —— 一个模块一个默认导出，和所有API成员作为被命名的导出 —— 看起来是冲突的，不是吗？但是你 *可以* 有一个单独的默认导出并且有其他的被命名导出；它们不是互相排斥的。
 
-So, instead of this (discouraged) pattern:
+所以，取代这种（不被鼓励使用的）模式：
 
 ```js
 export default function foo() { .. }
@@ -1326,7 +1331,7 @@ foo.bar = function() { .. };
 foo.baz = function() { .. };
 ```
 
-You can do:
+你可以这样做：
 
 ```js
 export default function foo() { .. }
@@ -1335,9 +1340,9 @@ export function bar() { .. }
 export function baz() { .. }
 ```
 
-**Note:** In this previous snippet, I used the name `foo` for the function that `default` labels. That `foo` name, however, is ignored for the purposes of export -- `default` is actually the exported name. When you import this default binding, you can give it whatever name you want, as you'll see in the next section.
+**注意：** 在前面这个代码段中，我为标记为`default`的函数使用了名称`foo`。但是，这个名称`foo`为了导出的目的而被忽略掉了 —— `default`才是实际上被导出的名称。当你导入这个默认绑定时，你可以叫它任何你想用的名字，就像你将在下一节中看到的。
 
-Alternatively, some will prefer:
+或者，一些人喜欢：
 
 ```js
 function foo() { .. }
@@ -1347,15 +1352,15 @@ function baz() { .. }
 export { foo as default, bar, baz, .. };
 ```
 
-The effects of mixing default and named exports will be more clear when we cover `import` shortly. But essentially it means that the most concise default import form would only retrieve the `foo()` function. The user could additionally manually list `bar` and `baz` as named imports, if they want them.
+混合默认和被命名导出的效果将在稍后我们讲解`import`时更加清晰。但它实质上意味着最简洁的默认导入形式将仅仅取回`foo()`函数。用户可以额外地手动罗列`bar`和`baz`作为命名导入，如果他们想用它们的话。
 
-You can probably imagine how tedious that's going to be for consumers of your module if you have lots of named export bindings. There is a wildcard import form where you import all of a module's exports within a single namespace object, but there's no way to wildcard import to top-level bindings.
+你可能能够想象，如果你的模块有许多命名导出绑定，那么对于模块的消费者来说将有多么乏味。有一个通配符导入形式，你可以在一个名称空间对象中导入一个模块的所有导出，但是没有办法用通配符导入到顶层绑定。
 
-Again, the ES6 module mechanism is intentionally designed to discourage modules with lots of exports; relatively speaking, it's desired that such approaches be a little more difficult, as a sort of social engineering to encourage simple module design in favor of large/complex module design.
+要重申的是，ES6模块机制被有意设计为不鼓励带有许多导出的模块；相对而言，它被期望成为一种更困难一些的，作为某种社会工程的方式，以鼓励对大型/复杂模块设计有利的简单模块设计。
 
-I would probably recommend you not mix default export with named exports, especially if you have a large API and refactoring to separate modules isn't practical or desired. In that case, just use all named exports, and document that consumers of your module should probably use the `import * as ..` (namespace import, discussed in the next section) approach to bring the whole API in at once on a single namespace.
+我将可能推荐你不要将默认导出与命名导出混在一起，特别是当你有一个大型API，并且将它重构为分离的模块是不现实或不希望的时候。在这种情况下，就都使用命名导出，并在文档中记录你的模块的消费者可能应当使用`import * as ..`（名称空间导入，在下一节中讨论）方式来将整个API一次性地带到一个单独的名称空间中。
 
-We mentioned this earlier, but let's come back to it in more detail. Other than the `export default ...` form that exports an expression value binding, all other export forms are exporting bindings to local identifiers. For those bindings, if you change the value of a variable inside a module after exporting, the external imported binding will access the updated value:
+我们早先提到过这一点，但让我们回过头来更详细地讨论一下。除了导出一个表达式的值的绑定的`export default ...`形式，所有其他的导出形式都导出本地标识符的绑定。对于这些绑定，如果你在导出之后改变一个模块内部变量的值，外部被导入的绑定将可以访问这个被更新的值：
 
 ```js
 var foo = 42;
@@ -1367,11 +1372,11 @@ foo = 10;
 bar = "cool";
 ```
 
-When you import this module, the `default` and `bar` exports will be bound to the local variables `foo` and `bar`, meaning they will reveal the updated `10` and `"cool"` values. The values at time of export are irrelevant. The values at time of import are irrelevant. The bindings are live links, so all that matters is what the current value is when you access the binding.
+当你导出这个模块时，`default`和`bar`导出将会绑定到本地变量`foo`和`bar`，这意味着它们将反映被更新的值`10`和`"cool"`。在被导出时的值是无关紧要的。在被导入时的值是无关紧要的。这些绑定是实时的链接，所以唯一重要的是当你访问这个绑定时它当前的值是什么。
 
-**Warning:** Two-way bindings are not allowed. If you import a `foo` from a module, and try to change the value of your imported `foo` variable, an error will be thrown! We'll revisit that in the next section.
+**警告：** 双向绑定是不允许的。如果你从一个模块中导入一个`foo`，并试图改变你导入的变量`foo`的值，一个错误就会被抛出！我们将在下一节重新回到这个问题。
 
-You can also re-export another module's exports, such as:
+你还可以重新导出另一个模块的导出，比如：
 
 ```js
 export { foo, bar } from "baz";
@@ -1379,25 +1384,25 @@ export { foo as FOO, bar as BAR } from "baz";
 export * from "baz";
 ```
 
-Those forms are similar to just first importing from the `"baz"` module then listing its members explicitly for export from your module. However, in these forms, the members of the `"baz"` module are never imported to your module's local scope; they sort of pass through untouched.
+这些形式都与首先从`"baz"`模块导入然后为了从你的模块中到处而明确地罗列它的成员相似。然而，在这些形式中，模块`"baz"`的成员从没有被导入到你的模块的本地作用域；某种程度上，它们原封不动地穿了过去。
 
-#### `import`ing API Members
+#### `import`API成员
 
-To import a module, unsurprisingly you use the `import` statement. Just as `export` has several nuanced variations, so does `import`, so spend plenty of time considering the following issues and experimenting with your options.
+要导入一个模块，你将不出意料地使用`import`语句。就像`export`有几种微妙的变化一样，`import`也有，所以你要花相当多的时间来考虑下面的问题，并试验你的选择。
 
-If you want to import certain specific named members of a module's API into your top-level scope, you use this syntax:
+如果你想要导入一个模块的API中的特定命名成员到你的顶层作用域，使用这种语法：
 
 ```js
 import { foo, bar, baz } from "foo";
 ```
 
-**Warning:** The `{ .. }` syntax here may look like an object literal, or even an object destructuring syntax. However, its form is special just for modules, so be careful not to confuse it with other `{ .. }` patterns elsewhere.
+**警告：** 这里的`{ .. }`语法可能看起来像一个对象字面量，甚至是像一个对象解构语法。但是，它的形式仅对模块而言是特殊的，所以不要将它与其他地方的`{ .. }`模式搞混了。
 
-The `"foo"` string is called a *module specifier*. Because the whole goal is statically analyzable syntax, the module specifier must be a string literal; it cannot be a variable holding the string value.
+字符串`"foo"`称为一个 *模块指示符*。因为它的全部目的在于可以静态分析的语法，所以模块指示符必须是一个字符串字面量；它不能是一个持有字符串值的变量。
 
-From the perspective of your ES6 code and the JS engine itself, the contents of this string literal are completely opaque and meaningless. The module loader will interpret this string as an instruction of where to find the desired module, either as a URL path or a local filesystem path.
+从你的ES6代码和JS引擎本身的角度来看，这个字符串字面量的内容是完全不透明和没有意义的。模块加载器将会把这个字符串翻译为一个在何处寻找被期望的模块的指令，不是作为一个URL路径就是一个本地文件系统路径。
 
-The `foo`, `bar`, and `baz` identifiers listed must match named exports on the module's API (static analysis and error assertion apply). They are bound as top-level identifiers in your current scope:
+被罗列的标识符`foo`，`bar`和`baz`必须匹配在模块的API上的命名导出（这里将会发生静态分析和错误断言）。它们在你当前的作用域中被绑定为顶层标识符。
 
 ```js
 import { foo } from "foo";
@@ -1405,7 +1410,7 @@ import { foo } from "foo";
 foo();
 ```
 
-You can rename the bound identifiers imported, as:
+你可以重命名被导入的绑定标识符，就像：
 
 ```js
 import { foo as theFooFunc } from "foo";
@@ -1413,18 +1418,18 @@ import { foo as theFooFunc } from "foo";
 theFooFunc();
 ```
 
-If the module has just a default export that you want to import and bind to an identifier, you can opt to skip the `{ .. }` surrounding syntax for that binding. The `import` in this preferred case gets the nicest and most concise of the `import` syntax forms:
+如果这个模块仅有一个你想要导入并绑定到一个标识符的默认导出，你可以为这个绑定选择性地跳过外围的`{ .. }`语法。在这种首选情况下`import`会得到最好的最简洁的`import`语法形式：
 
 ```js
 import foo from "foo";
 
-// or:
+// 或者：
 import { default as foo } from "foo";
 ```
 
-**Note:** As explained in the previous section, the `default` keyword in a module's `export` specifies a named export where the name is actually `default`, as is illustrated by the second more verbose syntax option. The renaming from `default` to, in this case, `foo`, is explicit in the latter syntax and is identical yet implicit in the former syntax.
+**注意：** 正如我们在前一节中讲解过的，一个模块的`export`中的`default`关键字指定了一个名称实际上为`default`的命名导出，正如在第二个更加繁冗的语法中展示的那样。在这个例子中，从`default`到`foo`的重命名在后者的语法中是明确的，并且与前者隐含地重命名是完全相同的。
 
-You can also import a default export along with other named exports, if the module has such a definition. Recall this module definition from earlier:
+如果模块有这样的定义，你还可以与其他的命名导出一起导入一个默认导出。回忆一下先前的这个模块定义：
 
 ```js
 export default function foo() { .. }
@@ -1433,7 +1438,7 @@ export function bar() { .. }
 export function baz() { .. }
 ```
 
-To import that module's default export and its two named exports:
+要引入这个模块的默认导出和它的两个命名导出：
 
 ```js
 import FOOFN, { bar, baz as BAZ } from "foo";
@@ -1443,17 +1448,17 @@ bar();
 BAZ();
 ```
 
-The strongly suggested approach from ES6's module philosophy is that you only import the specific bindings from a module that you need. If a module provides 10 API methods, but you only need two of them, some believe it wasteful to bring in the entire set of API bindings.
+ES6的模块哲学强烈推荐的方式是，你只从一个模块中导入你需要的特定的绑定。如果一个模块提供10个API方法，但是你只需它们中的两个，有些人认为带入整套API绑定是一种浪费。
 
-One benefit, besides code being more explicit, is that narrow imports make static analysis and error detection (accidentally using the wrong binding name, for instance) more robust.
+一个好处是，除了代码变得更加明确，收窄导入使得静态分析和错误检测（例如，不小心使用了错误的绑定名称）变得更加健壮。
 
-Of course, that's just the standard position influenced by ES6 design philosophy; there's nothing that requires adherence to that approach.
+当然，这只是受ES6设计哲学影响的标准观点；没有什么东西要求我们坚持这种方式。
 
-Many developers would be quick to point out that such approaches can be more tedious, requiring you to regularly revisit and update your `import` statement(s) each time you realize you need something else from a module. The trade-off is in exchange for convenience.
+许多开发者可能很快指出这样的方式更令人厌烦，每次你发现自己需要一个模块中的其他某些东西时，它要求你经常地重新找到并更新你的`import`语句。它的代价是牺牲便利性。
 
-In that light, the preference might be to import everything from the module into a single namespace, rather than importing individual members, each directly into the scope. Fortunately, the `import` statement has a syntax variation that can support this style of module consumption, called *namespace import*.
+以这种观点看，首选方式可能是将模块中的所有东西都导入到一个单独的名称空间中，而不是将每个个别的成员直接导入到作用域中。幸运的是，`import`语句拥有一个变种语法可以支持这种风格的模块使用，它被称为 *名称空间导入*。
 
-Consider a `"foo"` module exported as:
+考虑一个被这样导出的`"foo"`模块：
 
 ```js
 export function bar() { .. }
@@ -1461,7 +1466,7 @@ export var x = 42;
 export function baz() { .. }
 ```
 
-You can import that entire API to a single module namespace binding:
+你可以将整个API导入到一个单独的模块名称空间绑定中：
 
 ```js
 import * as foo from "foo";
@@ -1471,9 +1476,9 @@ foo.x;			// 42
 foo.baz();
 ```
 
-**Note:** The `* as ..` clause requires the `*` wildcard. In other words, you cannot do something like `import { bar, x } as foo from "foo"` to bring in only part of the API but still bind to the `foo` namespace. I would have liked something like that, but for ES6 it's all or nothing with the namespace import.
+**注意：** `* as ..`子句要求使用`*`通配符。换句话说，你不能做像`import { bar, x } as foo from "foo"`这样的事情来将API的一部分绑定到`foo`名称空间。我会很喜欢这样的东西，但是对ES6的名称空间导入来说，要么全有要么全无。
 
-If the module you're importing with `* as ..` has a default export, it is named `default` in the namespace specified. You can additionally name the default import outside of the namespace binding, as a top-level identifier. Consider a `"world"` module exported as:
+如果你正在使用`* as ..`导入的模块拥有一个默认导出，它会在指定的名称空间中被命名为`default`。你可以在这个名称空间绑定的外面，作为一个顶层标识符额外地命名这个默认导出。考虑一个被这样导出的`"world"`模块：
 
 ```js
 export default function foo() { .. }
@@ -1481,7 +1486,7 @@ export function bar() { .. }
 export function baz() { .. }
 ```
 
-And this `import`:
+和这个`import`：
 
 ```js
 import foofn, * as hello from "world";
@@ -1492,30 +1497,30 @@ hello.bar();
 hello.baz();
 ```
 
-While this syntax is valid, it can be rather confusing that one method of the module (the default export) is bound at the top-level of your scope, whereas the rest of the named exports (and one called `default`) are bound as properties on a differently named (`hello`) identifier namespace.
+虽然这个语法是合法的，但是它可能令人困惑：这个模块的一个方法（那个默认导出）被绑定到你作用域的顶层，然而其他的命名导出（而且之中之一称为`default`）作为一个不同名称（`hello`）的标识符名称空间的属性被绑定。
 
-As I mentioned earlier, my suggestion would be to avoid designing your module exports in this way, to reduce the chances that your module's users will suffer these strange quirks.
+正如我早先提到的，我的建议是避免这样设计你的模块导出，以降低你模块的用户受困于这些奇异之处的可能性。
 
-All imported bindings are immutable and/or read-only. Consider the previous import; all of these subsequent assignment attempts will throw `TypeError`s:
+所有被导入的绑定都是不可变和/或只读的。考虑前面的导入；所有这些后续的赋值尝试都将抛出`TypeError`:
 
 ```js
 import foofn, * as hello from "world";
 
-foofn = 42;			// (runtime) TypeError!
-hello.default = 42;	// (runtime) TypeError!
-hello.bar = 42;		// (runtime) TypeError!
-hello.baz = 42;		// (runtime) TypeError!
+foofn = 42;			// （运行时）TypeError!
+hello.default = 42;	// （运行时）TypeError!
+hello.bar = 42;		// （运行时）TypeError!
+hello.baz = 42;		// （运行时）TypeError!
 ```
 
-Recall earlier in the "`export`ing API Members" section that we talked about how the `bar` and `baz` bindings are bound to the actual identifiers inside the `"world"` module. That means if the module changes those values, `hello.bar` and `hello.baz` now reference the updated values.
+回忆早先在“`export` API成员”一节中，我们谈到`bar`和`baz`绑定是如何被绑定到`"world"`模块内部的实际标识符上的。它意味着如果模块改变那些值，`hello.bar`和`hello.baz`将引用更新后的值。
 
-But the immutable/read-only nature of your local imported bindings enforces that you cannot change them from the imported bindings, hence the `TypeError`s. That's pretty important, because without those protections, your changes would end up affecting all other consumers of the module (remember: singleton), which could create some very surprising side effects!
+但是你的本地导入绑定的不可变/只读的性质强制你不能从被导入的绑定一方改变他们，不然就会发生`TypeError`。这很重要，因为如果没有这种保护，你的修改将会最终影响所有其他该模块的消费者（记住：单例），这可能会产生一些非常令人吃惊的副作用！
 
-Moreover, though a module *can* change its API members from the inside, you should be very cautious of intentionally designing your modules in that fashion. ES6 modules are *intended* to be static, so deviations from that principle should be rare and should be carefully and verbosely documented.
+另外，虽然一个模块 *可以* 从内部改变它的API成员，但你应当对有意地以这种风格设计你的模块非常谨慎。ES6模块 *被预计* 是静态的，所以背离这个原则应当是不常见的，而且应当在文档中被非常小心和详细地记录下来。
 
-**Warning:** There are module design philosophies where you actually intend to let a consumer change the value of a property on your API, or module APIs are designed to be "extended" by having other "plug-ins" add to the API namespace. As we just asserted, ES6 module APIs should be thought of and designed as static and unchangeable, which strongly restricts and discourages these alternative module design patterns. You can get around these limitations by exporting a plain object, which of course can then be changed at will. But be careful and think twice before going down that road.
+**警告：** 存在一些这样的模块设计思想，你实际上打算允许一个消费者改变你的API上的一个属性的值，或者模块的API被设计为可以通过向API的名称空间中添加“插件”来“扩展”。但正如我们刚刚断言的，ES6模块API应当被认为并设计为静态的和不可变的，这强烈地约束和不鼓励那些其他的模块设计模式。你可以通过导出一个普通对象 —— 它理所当然是可以随意改变的 —— 来绕过这些限制。但是在选择这条路之前要三思而后行。
 
-Declarations that occur as a result of an `import` are "hoisted" (see the *Scope & Closures* title of this series). Consider:
+作为一个`import`的结果发生的声明将被“提升”（参见本系列的 *作用域与闭包*）。考虑如下代码：
 
 ```js
 foo();
@@ -1523,25 +1528,25 @@ foo();
 import { foo } from "foo";
 ```
 
-`foo()` can run because not only did the static resolution of the `import ..` statement figure out what `foo` is during compilation, but it also "hoisted" the declaration to the top of the module's scope, thus making it available throughout the module.
+`foo()`可以运行是因为`import ..`语句的静态解析不仅在编译时搞清了`foo`是什么，它还将这个声明“提升”到模块作用域的顶部，如此使它在模块中通篇都是可用的。
 
-Finally, the most basic form of the `import` looks like this:
+最后，最基本的`import`形式看起来像这样：
 
 ```js
 import "foo";
 ```
 
-This form does not actually import any of the module's bindings into your scope. It loads (if not already loaded), compiles (if not already compiled), and evaluates (if not already run) the `"foo"` module.
+这种形式实际上不会将模块的任何绑定导入到你的作用域中。它加载（如果还没被加载过），编译（如果还没被编译过），并对`"foo"`模块求值（如果还没被运行过）。
 
-In general, that sort of import is probably not going to be terribly useful. There may be niche cases where a module's definition has side effects (such as assigning things to the `window`/global object). You could also envision using `import "foo"` as a sort of preload for a module that may be needed later.
+一般来说，这种导入可能不会特别有用。可能会有一些模块的定义拥有副作用（比如向`window`/全局对象赋值）的特殊情况。你还可以将`import "foo"`用作稍后可能需要的模块的预加载。
 
-### Circular Module Dependency
+### 模块循环依赖
 
-A imports B. B imports A. How does this actually work?
+A导入B。B导入A。这将如何工作？
 
-I'll state off the bat that designing systems with intentional circular dependency is generally something I try to avoid. That having been said, I recognize there are reasons people do this and it can solve some sticky design situations.
+我要立即声明，一般来说我会避免使用刻意的循环依赖来设计系统。话虽如此，我也认识到人们这么做是有原因的，而且它可以解决一些艰难的设计问题。
 
-Let's consider how ES6 handles this. First, module `"A"`:
+让我们考虑一下ES6如何处理这种情况。首先，模块`"A"`：
 
 ```js
 import bar from "B";
@@ -1552,7 +1557,7 @@ export default function foo(x) {
 }
 ```
 
-Now, module `"B"`:
+现在，是模块`"B"`：
 
 ```js
 import foo from "A";
@@ -1563,36 +1568,37 @@ export default function bar(y) {
 }
 ```
 
-These two functions, `foo(..)` and `bar(..)`, would work as standard function declarations if they were in the same scope, because the declarations are "hoisted" to the whole scope and thus available to each other regardless of authoring order.
+这两个函数，`foo(..)`和`bar(..)`，如果它们在相同的作用域中就会像标准的函数声明那样工作，因为声明被“提升”至整个作用域，而因此与它们的编写顺序无关，它们互相是可用的。
 
-With modules, you have declarations in entirely different scopes, so ES6 has to do extra work to help make these circular references work.
+在模块中，你的声明在完全不同的作用域中，所以ES6必须做一些额外的工作以使这些循环引用工作起来。
 
-In a rough conceptual sense, this is how circular `import` dependencies are validated and resolved:
+在大致的概念上，这就是循环的`import`依赖如何被验证和解析的：
 
-* If the `"A"` module is loaded first, the first step is to scan the file and analyze all the exports, so it can register all those bindings available for import. Then it processes the `import .. from "B"`, which signals that it needs to go fetch `"B"`.
-* Once the engine loads `"B"`, it does the same analysis of its export bindings. When it sees the `import .. from "A"`, it knows the API of `"A"` already, so it can verify the `import` is valid. Now that it knows the `"B"` API, it can also validate the `import .. from "B"` in the waiting `"A"` module.
+* 如果模块`"A"`被首先加载，第一步将是扫描文件并分析所有的导出，这样就可以为导入注册所有可用的绑定。然后它处理`import .. from "B"`，这指示它需要去取得`"B"`。
 
-In essence, the mutual imports, along with the static verification that's done to validate both `import` statements, virtually composes the two separate module scopes (via the bindings), such that `foo(..)` can call `bar(..)` and vice versa. This is symmetric to if they had originally been declared in the same scope.
+* 一旦引擎加载了`"B"`，它会做同样的导出绑定分析。当它看到`import .. from "A"`时，它知道`"A"`的API已经准备好了，所以它可以验证这个`import`为合法的。现在它知道了`"B"`的API，它也可以验证在模块`"A"`中等待的`import .. from "B"`了。
 
-Now let's try using the two modules together. First, we'll try `foo(..)`:
+实质上，这种相互导入，连同对两个`import`语句合法性的静态验证，虚拟地组合了两个分离的模块作用域（通过绑定），因此`foo(..)`可以调用`bar(..)`或相反。这与我们在相同的作用域中声明是对称的。
+
+现在然我们试着一起使用这两个模块。首先，我们将试用`foo(..)`：
 
 ```js
 import foo from "foo";
 foo( 25 );				// 11
 ```
 
-Or we can try `bar(..)`:
+或者我们可以试用`bar(..)`：
 
 ```js
 import bar from "bar";
 bar( 25 );				// 11.5
 ```
 
-By the time either the `foo(25)` or `bar(25)` calls are executed, all the analysis/compilation of all modules has completed. That means `foo(..)` internally knows directly about `bar(..)` and `bar(..)` internally knows directly about `foo(..)`.
+在`foo(25)`调用`bar(25)`被执行的时刻，所有模块的所有分析/编译都已经完成了。这意味着`foo(..)`内部地直接知道`bar(..)`，而且`bar(..)`内部地直接知道`foo(..)`。
 
-If all we need is to interact with `foo(..)`, then we only need to import the `"foo"` module. Likewise with `bar(..)` and the `"bar"` module.
+如果所有我们需要的仅是与`foo(..)`互动，那么我们只需要导入`"foo"`模块。`bar(..)`和`"bar"`模块也同理。
 
-Of course, we *can* import and use both of them if we want to:
+当然，如果我们想，我们 *可以* 导入并使用它们两个：
 
 ```js
 import foo from "foo";
@@ -1602,51 +1608,51 @@ foo( 25 );				// 11
 bar( 25 );				// 11.5
 ```
 
-The static loading semantics of the `import` statement mean that a `"foo"` and `"bar"` that mutually depend on each other via `import` will ensure that both are loaded, parsed, and compiled before either of them runs. So their circular dependency is statically resolved and this works as you'd expect.
+`import`语句的静态加载语义意味着通过`import`互相依赖对方的`"foo"`和`"bar"`将确保在它们运行前被加载，解析，和编译。所以它们的循环依赖是被静态地解析的，而且将会如你所愿地工作。
 
-### Module Loading
+### 模块加载
 
-We asserted at the beginning of this "Modules" section that the `import` statement uses a separate mechanism, provided by the hosting environment (browser, Node.js, etc.), to actually resolve the module specifier string into some useful instruction for finding and loading the desired module. That mechanism is the system *Module Loader*.
+我们在“模块”这一节的最开始声称，`import`语句使用了一个由宿主环境（浏览器，Node.js，等等）提供的分离的机制，来实际地将模块指示符字符串解析为一些对寻找和加载所期望模块的有用的指令。这种机制就是系统 *模块加载器*。
 
-The default module loader provided by the environment will interpret a module specifier as a URL if in the browser, and (generally) as a local filesystem path if on a server such as Node.js. The default behavior is to assume the loaded file is authored in the ES6 standard module format.
+由环境提供的默认模块加载器，如果是在浏览器中将会把模块指示符解释为一个URL，如果是在服务器端（一般地）将会解释为一个本地文件系统路径，比如Node.js。它的默认行为是假定被加载的文件是以ES6标准的模块格式编写的。
 
-Moreover, you will be able to load a module into the browser via an HTML tag, similar to how current script programs are loaded. At the time of this writing, it's not fully clear if this tag will be `<script type="module">` or `<module>`. ES6 doesn't control that decision, but discussions in the appropriate standards bodies are already well along in parallel of ES6.
+另外，与当下脚本程序被加载的方式相似，你将可以通过一个HTML标签将一个模块加载到浏览器中。在本书写作时，这个标签将会是`<script type="module">`还是`<module>`还不完全清楚。ES6没有控制这个决定，但是在相应的标准化机构中的讨论早已随着ES6开始了。
 
-Whatever the tag looks like, you can be sure that under the covers it will use the default loader (or a customized one you've pre-specified, as we'll discuss in the next section).
+无论这个标签看起来什么样，你可以确信它的内部将会使用默认加载器（或者一个你预先指定好的加载器，就像我们将在下一节中讨论的）。
 
-Just like the tag you'll use in markup, the module loader itself is not specified by ES6. It is a separate, parallel standard (http://whatwg.github.io/loader/) controlled currently by the WHATWG browser standards group.
+就像你将在标记中使用的标签一样，ES6没有规定模块加载器本身。它是一个分离的，目前由WHATWG浏览器标准化小组控制的平行的标准。(http://whatwg.github.io/loader/)
 
-At the time of this writing, the following discussions reflect an early pass at the API design, and things are likely to change.
+在本书写作时，接下来的讨论反映了它的API设计的一个早期版本，和一些可能将要改变的东西。
 
-#### Loading Modules Outside of Modules
+#### 加载模块之外的模块
 
-One use for interacting directly with the module loader is if a non-module needs to load a module. Consider:
+一个与模块加载器直接交互的用法，是当一个非模块需要加载一个模块时。考虑如下代码：
 
 ```js
-// normal script loaded in browser via `<script>`,
-// `import` is illegal here
+// 在浏览器中通过`<script>`加载的普通script，
+// `import`在这里是不合法的
 
-Reflect.Loader.import( "foo" ) // returns a promise for `"foo"`
+Reflect.Loader.import( "foo" ) // 返回一个`"foo"`的promise
 .then( function(foo){
 	foo.bar();
 } );
 ```
 
-The `Reflect.Loader.import(..)` utility imports the entire module onto the named parameter (as a namespace), just like the `import * as foo ..` namespace import we discussed earlier.
+工具`Reflect.Loader.import(..)`将整个模块导入到命名参数中（作为一个名称空间），就像我们早先讨论过的`import * as foo ..`名称空间导入。
 
-**Note:** The `Reflect.Loader.import(..)` utility returns a promise that is fulfilled once the module is ready. To import multiple modules, you can compose promises from multiple `Reflect.Loader.import(..)` calls using `Promise.all([ .. ])`. For more information about Promises, see "Promises" in Chapter 4.
+**注意：** `Reflect.Loader.import(..)`返回一个promise，它在模块准备好时被完成。要导入多个模块的话，你可以使用`Promise.all([ .. ])`将多个`Reflect.Loader.import(..)`的promise组合起来。有关Promise的更多信息，参见第四章的“Promise”。
 
-You can also use `Reflect.Loader.import(..)` in a real module to dynamically/conditionally load a module, where `import` itself would not work. You might, for instance, choose to load a module containing a polyfill for some ES7+ feature if a feature test reveals it's not defined by the current engine.
+你还可以在一个真正的模块中使用`Reflect.Loader.import(..)`来动态地/条件性地加载一个模块，这是`import`自身无法做到的。例如，你可能在一个特性测试表明某个ES7+特性没有被当前的引擎所定义的情况下，选择性地加载一个含有此特性的填补的模块。
 
-For performance reasons, you'll want to avoid dynamic loading whenever possible, as it hampers the ability of the JS engine to fire off early fetches from its static analysis.
+由于性能的原因，你将想要尽量避免动态加载，因为它阻碍了JS引擎从它的静态分析中提前获取的能力。
 
-#### Customized Loading
+#### 自定义加载
 
-Another use for directly interacting with the module loader is if you want to customize its behavior through configuration or even redefinition.
+直接与模块加载器交互的另外一种用法是，你想要通过配置或者甚至是重定义来定制它的行为。
 
-At the time of this writing, there's a polyfill for the module loader API being developed (https://github.com/ModuleLoader/es6-module-loader). While details are scarce and highly subject to change, we can explore what possibilities may eventually land.
+在本书写作时，有一个被开发好的模块加载器API的填补(https://github.com/ModuleLoader/es6-module-loader)。虽然关于它的细节非常匮乏，而且很可能改变，但是我们可以通过它来探索最终可能固定下来的东西是什么。
 
-The `Reflect.Loader.import(..)` call may support a second argument for specifying various options to customize the import/load task. For example:
+`Reflect.Loader.import(..)`调用可能会支持第二个参数，它指定各种选项来定制导入/加载任务。例如：
 
 ```js
 Reflect.Loader.import( "foo", { address: "/path/to/foo.js" } )
@@ -1655,25 +1661,25 @@ Reflect.Loader.import( "foo", { address: "/path/to/foo.js" } )
 } )
 ```
 
-It's also expected that a customization will be provided (through some means) for hooking into the process of loading a module, where a translation/transpilation could occur after load but before the engine compiles the module.
+还有一种预期是，会为一个自定义内容提供某种机制来将之挂钩到模块加载的处理过程中，就在翻译/转译可能发生的加载之后，但是在引擎编译这个模块之前。
 
-For example, you could load something that's not already an ES6-compliant module format (e.g., CoffeeScript, TypeScript, CommonJS, AMD). Your translation step could then convert it to an ES6-compliant module for the engine to then process.
+例如，你可能会加载某些还不是ES6兼容的模块格式的东西（例如，CoffeeScript，TypeScript，CommonJS，AMD）。你的翻译步骤可能会为了后面的引擎处理而将它转换为ES6兼容的模块。
 
-## Classes
+## 类
 
-From nearly the beginning of JavaScript, syntax and development patterns have all strived (read: struggled) to put on a facade of supporting class-oriented development. With things like `new` and `instanceof` and a `.constructor` property, who couldn't help but be teased that JS had classes hidden somewhere inside its prototype system?
+几乎从JavaScript的最开始的那时候起，语法和开发模式都曾努力（读作：挣扎地）地戴上一个支持面向类的开发的假面具。伴随着`new`和`instanceof`和一个`.constructor`属性，谁能不认为JS在它的原型系统的某个地方藏着类机制呢？
 
-Of course, JS "classes" aren't nearly the same as classical classes. The differences are well documented, so I won't belabor that point any further here.
+当然，JS的“类”与经典的类完全不同。其区别有很好的文档记录，所以在此我不会在这一点上花更多力气。
 
-**Note:** To learn more about the patterns used in JS to fake "classes," and an alternative view of prototypes called "delegation," see the second half of the *this & Object Prototypes* title of this series.
+**注意：** 要学习更多关于在JS中假冒“类”的模式，以及另一种称为“委托”的原型的视角，参见本系列的 *this与对象原型* 的后半部分。
 
 ### `class`
 
-Although JS's prototype mechanism doesn't work like traditional classes, that doesn't stop the strong tide of demand on the language to extend the syntactic sugar so that expressing "classes" looks more like real classes. Enter the ES6 `class` keyword and its associated mechanism.
+虽然JS的原型机制与传统的类的工作方式不同，但是这并不能阻挡一种强烈的潮流 —— 要求这门语言扩展它的语法糖以便将“类”表达得更像真正的类。让我们进入ES6`class`关键字和它相关的机制。
 
-This feature is the result of a highly contentious and drawn-out debate, and represents a smaller subset compromise from several strongly opposed views on how to approach JS classes. Most developers who want full classes in JS will find parts of the new syntax quite inviting, but will find important bits still missing. Don't worry, though. TC39 is already working on additional features to augment classes in the post-ES6 timeframe.
+这个特性是一个具有高度争议、旷日持久的争论的结果，而且代表了几种对关于如何处理JS类的强烈反对意见的妥协的一小部分。大多数希望JS拥有完整的类机制的开发者将会发现新语法的一些部分十分吸引人，但是也会发现一些重要的部分仍然缺失了。但不要担心，TC39已经致力于另外的特性，以求在后ES6时代中增强类机制。
 
-At the heart of the new ES6 class mechanism is the `class` keyword, which identifies a *block* where the contents define the members of a function's prototype. Consider:
+新的ES6类机制的核心是`class`关键字，它标识了一个 *块*，其内容定义了一个函数的原型的成员。考虑如下代码：
 
 ```js
 class Foo {
@@ -1688,14 +1694,14 @@ class Foo {
 }
 ```
 
-Some things to note:
+一些要注意的事情：
 
-* `class Foo` implies creating a (special) function of the name `Foo`, much like you did pre-ES6.
-* `constructor(..)` identifies the signature of that `Foo(..)` function, as well as its body contents.
-* Class methods use the same "concise method" syntax available to object literals, as discussed in Chapter 2. This also includes the concise generator form as discussed earlier in this chapter, as well as the ES5 getter/setter syntax. However, class methods are non-enumerable whereas object methods are by default enumerable.
-* Unlike object literals, there are no commas separating members in a `class` body! In fact, they're not even allowed.
+* `class Foo` 暗示着创建一个（特殊的）名为`Foo`的函数，与你在前ES6中所做的非常相似。
+* `constructor(..)`表示了这个`Foo(..)`函数的签名，和它的函数体内容。
+* 类方法同样使用对象字面量中可以使用的“简约方法”语法，正如在第二章中讨论过的。这也包括在本章早先讨论过的简约generator，以及ES5的getter/setter语法。但是，类方法是不可枚举的而对象方法默认是可枚举的。
+* 与对象字面量不同的是，在一个`class`内容的部分没有逗号分隔各个成员！事实上，这甚至是不允许的。
 
-The `class` syntax definition in the previous snippet can be roughly thought of as this pre-ES6 equivalent, which probably will look fairly familiar to those who've done prototype-style coding before:
+前一个代码段的`class`语法定义可以大致认为和这个前ES6等价物相同，对于那些以前做过原型风格代码的人来说可能十分熟悉它：
 
 ```js
 function Foo(a,b) {
@@ -1708,7 +1714,7 @@ Foo.prototype.gimmeXY = function() {
 }
 ```
 
-In either the pre-ES6 form or the new ES6 `class` form, this "class" can now be instantiated and used just as you'd expect:
+不管是前ES6形式还是新的ES6`class`形式，这个“类”现在可以被实例化并如你所想地使用了：
 
 ```js
 var f = new Foo( 5, 15 );
@@ -1718,23 +1724,23 @@ f.y;						// 15
 f.gimmeXY();				// 75
 ```
 
-Caution! Though `class Foo` seems much like `function Foo()`, there are important differences:
+注意！虽然`class Foo`看起来很像`function Foo()`，但是有一些重要的区别：
 
-* A `Foo(..)` call of `class Foo` *must* be made with `new`, as the pre-ES6 option of `Foo.call( obj )` will *not* work.
-* While `function Foo` is "hoisted" (see the *Scope & Closures* title of this series), `class Foo` is not; the `extends ..` clause specifies an expression that cannot be "hoisted." So, you must declare a `class` before you can instantiate it.
-* `class Foo` in the top global scope creates a lexical `Foo` identifier in that scope, but unlike `function Foo` does not create a global object property of that name.
+* `class Foo`的一个`Foo(..)`调用 *必须* 与`new`一起使用，因为前ES6的`Foo.call( obj )`方式 *不能* 工作。
+* 虽然`function Foo`会被“提升”（参见本系列的 *作用域与闭包*），但是`class Foo`不会；`extends ..`指定的表达式不能被“提升”。所以，在你能够实例化一个`class`之前必须先声明它。
+* 在顶层全局作用域中的`class Foo`在这个作用域中创建了一个词法标识符`Foo`，但与此不同的是`function Foo`不会创建一个同名的全局对象属性。
 
-The established `instanceof` operator still works with ES6 classes, because `class` just creates a constructor function of the same name. However, ES6 introduces a way to customize how `instanceof` works, using `Symbol.hasInstance` (see "Well-Known Symbols" in Chapter 7).
+已经建立的`instanceof`操作仍然可以与ES6的类一起工作，因为`class`只是创建了一个同名的构造器函数。然而，ES6引入了一个定制`instanceof`如何工作的方法，使用`Symbol.hasInstance`（参见第七章的“通用Symbol”）。
 
-Another way of thinking about `class`, which I find more convenient, is as a *macro* that is used to automatically populate a `prototype` object. Optionally, it also wires up the `[[Prototype]]` relationship if using `extends` (see the next section).
+我发现另一种更方便地考虑`class`的方法是，将它作为一个用来自动填充`proptotype`对象的 *宏*。可选的是，如果使用`extends`（参见下一节）的话它还能连接`[[Prototype]]`关系。
 
-An ES6 `class` isn't really an entity itself, but a meta concept that wraps around other concrete entities, such as functions and properties, and ties them together.
+其实一个ES6`class`本身不是一个实体，而是一个元概念，它包裹在其他具体实体上，例如函数和属性，并将它们绑在一起。
 
-**Tip:** In addition to the declaration form, a `class` can also be an expression, as in: `var x = class Y { .. }`. This is primarily useful for passing a class definition (technically, the constructor itself) as a function argument or assigning it to an object property.
+**提示：** 除了这种声明的形式，一个`class`还可以是一个表达式，就像：`var x = class Y { .. }`。这主要用于将类的定义（技术上说，是构造器本身）作为函数参数值传递，或者将它赋值给一个对象属性。
 
-### `extends` and `super`
+### `extends` 和 `super`
 
-ES6 classes also have syntactic sugar for establishing the `[[Prototype]]` delegation link between two function prototypes -- commonly mislabeled "inheritance" or confusingly labeled "prototype inheritance" -- using the class-oriented familiar terminology `extends`:
+ES6的类还有一种语法糖，用于在两个函数原型之间建立`[[Prototype]]`委托链 —— 通常被错误地标记为“继承”或者令人困惑地标记为“原型继承” —— 使用我们熟悉的面向类的术语`extends`：
 
 ```js
 class Bar extends Foo {
@@ -1756,23 +1762,23 @@ b.z;						// 25
 b.gimmeXYZ();				// 1875
 ```
 
-A significant new addition is `super`, which is actually something not directly possible pre-ES6 (without some unfortunate hack trade-offs). In the constructor, `super` automatically refers to the "parent constructor," which in the previous example is `Foo(..)`. In a method, it refers to the "parent object," such that you can then make a property/method access off it, such as `super.gimmeXY()`.
+一个有重要意义的新增物是`super`，它实际上在前ES6中不是直接可能的东西（不付出一些不幸的黑科技的代价的话）。在构造器中，`super`自动指向“父构造器”，这在前一个例子中是`Foo(..)`。在方法中，它指向“父对象”，如此你就可以访问它上面的属性/方法，比如`super.gimmeXY()`。
 
-`Bar extends Foo` of course means to link the `[[Prototype]]` of `Bar.prototype` to `Foo.prototype`. So, `super` in a method like `gimmeXYZ()` specifically means `Foo.prototype`, whereas `super` means `Foo` when used in the `Bar` constructor.
+`Bar extends Foo`理所当然地意味着将`Bar.prototype`的`[[Prototype]]`链接到`Foo.prototype`。所以，在`gimmeXYZ()`这样的方法中的`super`特被地意味着`Foo.prototype`，而当`super`用在`Bar`构造器中时意味着`Foo`。
 
-**Note:** `super` is not limited to `class` declarations. It also works in object literals, in much the same way we're discussing here. See "Object `super`" in Chapter 2 for more information.
+**注意：** `super`不仅限于`class`声明。它也可以在对象字面量中工作，其方式在很大程度上与我们在此讨论的相同。更多信息参见第二章中的“对象`super`”。
 
-#### There Be `super` Dragons
+#### `super`的坑
 
-It is not insignificant to note that `super` behaves differently depending on where it appears. In fairness, most of the time, that won't be a problem. But surprises await if you deviate from a narrow norm.
+注意到`super`的行为根据它出现的位置不同而不同是很重要的。公平地说，大多数时候这不是一个问题。但是如果你背离一个狭窄的规范，令人诧异的事情就会等着你。
 
-There may be cases where in the constructor you would want to reference the `Foo.prototype`, such as to directly access one of its properties/methods. However, `super` in the constructor cannot be used in that way; `super.prototype` will not work. `super(..)` means roughly to call `new Foo(..)`, but isn't actually a usable reference to `Foo` itself.
+可能会有这样的情况，你想在构造器中引用`Foo.prototype`，比如直接访问它的属性/方法之一。然而，在构造器中的`super`不能这样被使用；`super.prototype`将不会工作。`super(..)`大致上意味着调用`new Foo(..)`，但它实际上不是一个可用的对`Foo`本身的引用。
 
-Symmetrically, you may want to reference the `Foo(..)` function from inside a non-constructor method. `super.constructor` will point at `Foo(..)` the function, but beware that this function can *only* be invoked with `new`. `new super.constructor(..)` would be valid, but it wouldn't be terribly useful in most cases, because you can't make that call use or reference the current `this` object context, which is likely what you'd want.
+与此对称的是，你可能想要在一个非构造器方法中引用`Foo(..)`函数。`super.constructor`将会指向`Foo(..)`函数，但是要小心这个函数 *只能* 与`new`一起被调用。`new super.constructor(..)`将是合法的，但是在大多数情况下它都不是很有用， 因为你不能使这个调用使用或引用当前的`this`对象环境，而这很可能是你想要的。
 
-Also, `super` looks like it might be driven by a function's context just like `this` -- that is, that they'd both be dynamically bound. However, `super` is not dynamic like `this` is. When a constructor or method makes a `super` reference inside it at declaration time (in the `class` body), that `super` is statically bound to that specific class hierarchy, and cannot be overridden (at least in ES6).
+另外，`super`看起来可能就像`this`一样是被函数的环境所驱动的 —— 也就是说，它们都是被动态绑定的。但是，`super`不像`this`那样是动态的。当声明时一个构造器或者方法在它内部使用一个`super`引用时（在`class`的内容部分），这个`super`是被静态地绑定到这个指定的类阶层中的，而且不能被覆盖（至少是在ES6中）。
 
-What does that mean? It means that if you're in the habit of taking a method from one "class" and "borrowing" it for another class by overriding its `this`, say with `call(..)` or `apply(..)`, that may very well create surprises if the method you're borrowing has a `super` in it. Consider this class hierarchy:
+这意味着什么？这意味着如果你习惯于从一个“类”中拿来一个方法并通过覆盖它的`this`，比如使用`call(..)`或者`apply(..)`，来为另一个类而“借用”它的话，那么当你借用的方法中有一个`super`时，将很有可能发生令你诧异的事情。考虑这个类阶层：
 
 ```js
 class ParentA {
@@ -1806,27 +1812,27 @@ var b = new ChildB();		// ParentB: b
 b.foo();					// ChildB: b
 ```
 
-All seems fairly natural and expected in this previous snippet. However, if you try to borrow `b.foo()` and use it in the context of `a` -- by virtue of dynamic `this` binding, such borrowing is quite common and used in many different ways, including mixins most notably -- you may find this result an ugly surprise:
+在前面这个代码段中一切看起来都相当自然和在意料之中。但是，如果你试着借来`b.foo()`并在`a`的上下文中使用它的话 —— 通过动态`this`绑定的力量，这样的借用十分常见而且以许多不同的方式被使用，包括最明显的mixin —— 你可能会发现这个结果出奇地难看：
 
 ```js
-// borrow `b.foo()` to use in `a` context
+// 在`a`的上下文环境中借用`b.foo()`
 b.foo.call( a );			// ParentB: a
 							// ChildB: a
 ```
 
-As you can see, the `this.id` reference was dynamically rebound so that `: a` is reported in both cases instead of `: b`. But `b.foo()`'s `super.foo()` reference wasn't dynamically rebound, so it still reported `ParentB` instead of the expected `ParentA`.
+如你所见，引用`this.id`被动态地重绑定所以在两种情况下都报告`: a`而不是`: b`。但是`b.foo()`的`super.foo()`引用没有被动态重绑定，所以它依然报告`ParentB`而不是期望的`ParentA`。
 
-Because `b.foo()` references `super`, it is statically bound to the `ChildB`/`ParentB` hierarchy and cannot be used against the `ChildA`/`ParentA` hierarchy. There is no ES6 solution to this limitation.
+因为`b.foo()`引用`super`，所以它被静态地绑定到了`ChildB`/`ParentB`阶层而不能被用于`ChildA`/`ParentA`阶层。在ES6中没有办法解决这个限制。
 
-`super` seems to work intuitively if you have a static class hierarchy with no cross-pollination. But in all fairness, one of the main benefits of doing `this`-aware coding is exactly that sort of flexibility. Simply, `class` + `super` requires you to avoid such techniques.
+如果你有一个不带移花接木的静态类阶层，那么`super`的工作方式看起来很直观。但公平地说，实施带有`this`的编码的一个主要好处正是这种灵活性。简单地说，`class` + `super`要求你避免使用这样的技术。
 
-The choice boils down to narrowing your object design to these static hierarchies -- `class`, `extends`, and `super` will be quite nice -- or dropping all attempts to "fake" classes and instead embrace dynamic and flexible, classless objects and `[[Prototype]]` delegation (see the *this & Object Prototypes* title of this series).
+你能在对象设计上作出的选择归结为两个：使用这些静态的阶层 —— `class`，`extends`，和`super`将十分不错 —— 要么放弃所有“山寨”类的企图，而接受动态且灵活的，没有类的对象和`[[Prototype]]`委托（参见本系列的 *this与对象原型*）。
 
-#### Subclass Constructor
+#### 子类构造器
 
-Constructors are not required for classes or subclasses; a default constructor is substituted in both cases if omitted. However, the default substituted constructor is different for a direct class versus an extended class.
+对类或子类来说构造器不是必需的；如果构造器被省略，这两种情况下都会有一个默认构造器顶替上来。但是，对于一个直接的类和一个被扩展的类来说，顶替上来的默认构造器是不同的。
 
-Specifically, the default subclass constructor automatically calls the parent constructor, and passes along any arguments. In other words, you could think of the default subclass constructor sort of like this:
+特别地，默认的子类构造器自动地调用父构造器，并且传递所有参数值。换句话说，你可以认为默认的子类构造器有些像这样：
 
 ```js
 constructor(...args) {
@@ -1834,11 +1840,11 @@ constructor(...args) {
 }
 ```
 
-This is an important detail to note. Not all class languages have the subclass constructor automatically call the parent constructor. C++ does, but Java does not. But more importantly, in pre-ES6 classes, such automatic "parent constructor" calling does not happen. Be careful when converting to ES6 `class` if you've been relying on such calls *not* happening.
+这是一个需要注意的重要细节。不是所有支持类的语言的子类构造器都会自动地调用父构造器。C++会，但Java不会。更重要的是，在前ES6的类中，这样的自动“父构造器”调用不会发生。如果你曾经依赖于这样的调用 *不会* 发生，按么当你将代码转换为ES6`class`时就要小心。
 
-Another perhaps surprising deviation/limitation of ES6 subclass constructors: in a constructor of a subclass, you cannot access `this` until `super(..)` has been called. The reason is nuanced and complicated, but it boils down to the fact that the parent constructor is actually the one creating/initializing your instance's `this`. Pre-ES6, it works oppositely; the `this` object is created by the "subclass constructor," and then you  call a "parent constructor" with the context of the "subclass" `this`.
+ES6子类构造器的另一个也许令人吃惊的偏差/限制是：在一个子类的构造器中，在`super(..)`被调用之前你不能访问`this`。其中的原因十分微妙和复杂，但是可以归结为是父构造器在实际上创建/初始化你的实例的`this`。前ES6中，它相反地工作；`this`对象被“子类构造器”创建，然后你使用这个“子类”的`this`上下文环境调用“父构造器”。
 
-Let's illustrate. This works pre-ES6:
+让我们展示一下。这是前ES6版本：
 
 ```js
 function Foo() {
@@ -1850,11 +1856,11 @@ function Bar() {
 	Foo.call( this );
 }
 
-// `Bar` "extends" `Foo`
+// `Bar` “扩展” `Foo`
 Bar.prototype = Object.create( Foo.prototype );
 ```
 
-But this ES6 equivalent is not allowed:
+但是这个ES6等价物不允许：
 
 ```js
 class Foo {
@@ -1863,17 +1869,17 @@ class Foo {
 
 class Bar extends Foo {
 	constructor() {
-		this.b = 2;			// not allowed before `super()`
-		super();			// to fix swap these two statements
+		this.b = 2;			// 在`super()`之前不允许
+		super();			// 可以通过调换这两个语句修正
 	}
 }
 ```
 
-In this case, the fix is simple. Just swap the two statements in the subclass `Bar` constructor. However, if you've been relying pre-ES6 on being able to skip calling the "parent constructor," beware because that won't be allowed anymore.
+在这种情况下，修改很简单。只要在子类`Bar`的构造器中调换两个语句的位置就行了。但是，如果你曾经依赖于前ES6可以跳过“父构造器”调用的话，就要小心这不再被允许了。
 
-#### `extend`ing Natives
+#### `extend`原生类型
 
-One of the most heralded benefits to the new `class` and `extend` design is the ability to (finally!) subclass the built-in natives, like `Array`. Consider:
+新的`class`和`extend`设计中最值得被欢呼的好处之一，就是（终于！）能够为内建原生类型，比如`Array`，创建子类。考虑如下代码：
 
 ```js
 class MyCoolArray extends Array {
@@ -1890,11 +1896,11 @@ a.first();					// 1
 a.last();					// 3
 ```
 
-Prior to ES6, a fake "subclass" of `Array` using manual object creation and linking to `Array.prototype` only partially worked. It missed out on the special behaviors of a real array, such as the automatically updating `length` property. ES6 subclasses should fully work with "inherited" and augmented behaviors as expected!
+在ES6之前，可以使用手动的对象创建并将它链接到`Array.prototype`来制造一个`Array`的“子类”的山寨版，但它仅能部分地工作。它缺失了一个真正数组的特殊行为，比如自动地更新`length`属性。ES6子类应该可以如我们盼望的那样使用“继承”与增强的行为来完整地工作！
 
-Another common pre-ES6 "subclass" limitation is with the `Error` object, in creating custom error "subclasses." When genuine `Error` objects are created, they automatically capture special `stack` information, including the line number and file where the error is created. Pre-ES6 custom error "subclasses" have no such special behavior, which severely limits their usefulness.
+另一个常见的前ES6“子类”的限制与`Error`对象有关，在创建自定义的错误“子类”时。当纯粹的`Error`被创建时，它们自动地捕获特殊的`stack`信息，包括错误被创建的行号和文件。前ES6的自定义错误“子类”没有这样的特殊行为，这严重地限制了它们的用处。
 
-ES6 to the rescue:
+ES6前来拯救：
 
 ```js
 class Oops extends Error {
@@ -1904,20 +1910,20 @@ class Oops extends Error {
 	}
 }
 
-// later:
+// 稍后:
 var ouch = new Oops( "I messed up!" );
 throw ouch;
 ```
 
-The `ouch` custom error object in this previous snippet will behave like any other genuine error object, including capturing `stack`. That's a big improvement!
+前面代码段的`ouch`自定义错误对象将会向任何其他的纯粹错误对象那样动作，包括捕获`stack`。这是一个巨大的改进！
 
 ### `new.target`
 
-ES6 introduces a new concept called a *meta property* (see Chapter 7), in the form of `new.target`.
+ES6引入了一个称为 *元属性* 的新概念（见第七章），用`new.target`的形式表示。
 
-If that looks strange, it is; pairing a keyword with a `.` and a property name is definitely an out-of-the-ordinary pattern for JS.
+如果这看起来很奇怪，是的；将一个带有`.`的关键字与一个属性名配成一对，对JS来说绝对是不同寻常的模式。
 
-`new.target` is a new "magical" value available in all functions, though in normal functions it will always be `undefined`. In any constructor, `new.target` always points at the constructor that `new` actually directly invoked, even if the constructor is in a parent class and was delegated to by a `super(..)` call from a child constructor. Consider:
+`new.target`是一个在所有函数中可用的“魔法”值，虽然在普通的函数中它总是`undefined`。在任意的构造器中，`new.target`总是指向`new`实际直接调用的构造器，即便这个构造器是在一个父类中，而且是通过一个在子构造器中的`super(..)`调用被委托的。
 
 ```js
 class Foo {
@@ -1940,22 +1946,22 @@ var a = new Foo();
 // Foo: Foo
 
 var b = new Bar();
-// Foo: Bar   <-- respects the `new` call-site
+// Foo: Bar   <-- 遵照`new`的调用点
 // Bar: Bar
 
 b.baz();
 // baz: undefined
 ```
 
-The `new.target` meta property doesn't have much purpose in class constructors, except accessing a static property/method (see the next section).
+`new.target`元属性在类构造器中没有太多作用，除了访问一个静态属性/方法（见下一节）。
 
-If `new.target` is `undefined`, you know the function was not called with `new`. You can then force a `new` invocation if that's necessary.
+如果`new.target`是`undefined`，那么你就知道这个函数不是用`new`调用的。然后你就可以强制一个`new`调用，如果有必要的话。
 
 ### `static`
 
-When a subclass `Bar` extends a parent class `Foo`, we already observed that `Bar.prototype` is `[[Prototype]]`-linked to `Foo.prototype`. But additionally, `Bar()` is `[[Prototype]]`-linked to `Foo()`. That part may not have such an obvious reasoning.
+当一个子类`Bar`扩展一个父类`Foo`时，我们已经观察到`Bar.prototype`被`[[Prototype]]`链接到`Foo.prototype`。但是额外地，`Bar()`被`[[Prototype]]`链接到`Foo()`。这部分可能就没有那么明显了。
 
-However, it's quite useful in the case where you declare `static` methods (not just properties) for a class, as these are added directly to that class's function object, not to the function object's `prototype` object. Consider:
+但是，在你为一个类声明`static`方法（不只是属性）时它就十分有用，因为这些静态方法被直接添加到这个类的函数对象上，不是函数对象的`prototype`对象上。考虑如下代码：
 
 ```js
 class Foo {
@@ -1987,17 +1993,17 @@ b.awesome;					// undefined
 b.cool;						// undefined
 ```
 
-Be careful not to get confused that `static` members are on the class's prototype chain. They're actually on the dual/parallel chain between the function constructors.
+小心不要被搞糊涂，认为`static`成员是在类的原型链上的。它们实际上存在与函数构造器中间的一个双重/平行链条上。
 
-#### `Symbol.species` Constructor Getter
+#### `Symbol.species`构造器Getter
 
-One place where `static` can be useful is in setting the `Symbol.species` getter (known internally in the specification as `@@species`) for a derived (child) class. This capability allows a child class to signal to a parent class what constructor should be used -- when not intending the child class's constructor itself -- if any parent class method needs to vend a new instance.
+一个`static`可以十分有用的地方是为一个衍生（子）类设置`Symbol.species`getter（在语言规范内部称为`@@species`）。这种能力允许一个子类通知一个父类应当使用什么样的构造器 —— 当不打算使用子类的构造器本身时 —— 如果有任何父类方法需要产生新的实例的话。
 
-For example, many methods on `Array` create and return a new `Array` instance. If you define a derived class from `Array`, but you want those methods to continue to vend actual `Array` instances instead of from your derived class, this works:
+举个例子，在`Array`上的许多方法都创建并返回一个新的`Array`实例。如果你从`Array`定义一个衍生的类，但你想让这些方法实际上继续产生`Array`实例，而非从你的衍生类中产生实例，那么这就可以工作：
 
 ```js
 class MyCoolArray extends Array {
-	// force `species` to be parent constructor
+	// 强制`species`为父类构造器
 	static get [Symbol.species]() { return Array; }
 }
 
@@ -2008,11 +2014,11 @@ b instanceof MyCoolArray;	// false
 b instanceof Array;			// true
 ```
 
-To illustrate how a parent class method can use a child's species declaration somewhat like `Array#map(..)` is doing, consider:
+为了展示一个父类方法如何可以有些像`Array#map(..)`所做的那样，使用一个子类型声明，考虑如下代码：
 
 ```js
 class Foo {
-	// defer `species` to derived constructor
+	// 将`species`推迟到衍生的构造器中
 	static get [Symbol.species]() { return this; }
 	spawn() {
 		return new this.constructor[Symbol.species]();
@@ -2020,7 +2026,7 @@ class Foo {
 }
 
 class Bar extends Foo {
-	// force `species` to be parent constructor
+	// 强制`species`为父类构造器
 	static get [Symbol.species]() { return Foo; }
 }
 
@@ -2034,15 +2040,15 @@ y instanceof Bar;					// false
 y instanceof Foo;					// true
 ```
 
-The parent class `Symbol.species` does `return this` to defer to any derived class, as you'd normally expect. `Bar` then overrides to manually declare `Foo` to be used for such instance creation. Of course, a derived class can still vend instances of itself using `new this.constructor(..)`.
+父类的`Symbol.species`使用`return this`来推迟到任意的衍生类，就像你通常期望的那样。然后`Bar`手动地声明`Foo`被用于这样的实例创建。当然，一个衍生的类依然可以使用`new this.constructor(..)`生成它本身的实例。
 
-## Review
+## 复习
 
-ES6 introduces several new features that aid in code organization:
+ES6引入了几个在代码组织上提供帮助的新特性：
 
-* Iterators provide sequential access to data or operations. They can be consumed by new language features like `for..of` and `...`.
-* Generators are locally pause/resume capable functions controlled by an iterator. They can be used to programmatically (and interactively, through `yield`/`next(..)` message passing) *generate* values to be consumed via iteration.
-* Modules allow private encapsulation of implementation details with a publicly exported API. Module definitions are file-based, singleton instances, and statically resolved at compile time.
-* Classes provide cleaner syntax around prototype-based coding. The addition of `super` also solves tricky issues with relative references in the `[[Prototype]]` chain.
+* 迭代器提供了对数据和操作的序列化访问。它们可以被`for..of`和`...`这样的新语言特性消费。
+* Generator是由一个迭代器控制的能够在本地暂停/继续的函数。它们可以被用于程序化地（并且是互动地，通过`yield`/`next(..)`消息传递） *生成* 通过迭代器被消费的值。
+* 模块允许实现的细节的私有封装带有一个公开导出的API。模块定义是基于文件的，单例的实例，并且在编译时静态地解析。
+* 类为基于原型的编码提供了更干净的语法。`super`的到来也解决了在`[[Prototype]]`链中进行相对引用的刁钻问题。
 
-These new tools should be your first stop when trying to improve the architecture of your JS projects by embracing ES6.
+在你考虑通过采纳ES6来改进你的JS项目体系结构时，这些新工具应当是你的第一站。

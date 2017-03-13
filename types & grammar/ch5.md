@@ -1,21 +1,21 @@
-# You Don't Know JS: Types & Grammar
-# Chapter 5: Grammar
+# 你不懂JS：类型与文法
+# 第五章：文法
 
-The last major topic we want to tackle is how JavaScript's language syntax works (aka its grammar). You may think you know how to write JS, but there's an awful lot of nuance to various parts of the language grammar that lead to confusion and misconception, so we want to dive into those parts and clear some things up.
+我们想要解决的最后一个主要话题是JavaScript的语法如何工作（也称为它的文法）。你可能认为你懂得如何编写JS，但是语言文法的各个部分中有太多微妙的地方导致了困惑和误解，所以我们想要深入这些部分并搞清楚一些事情。
 
-**Note:** The term "grammar" may be a little less familiar to readers than the term "syntax." In many ways, they are similar terms, describing the *rules* for how the language works. There are nuanced differences, but they mostly don't matter for our discussion here. The grammar for JavaScript is a structured way to describe how the syntax (operators, keywords, etc.) fits together into well-formed, valid programs. In other words, discussing syntax without grammar would leave out a lot of the important details. So our focus here in this chapter is most accurately described as *grammar*, even though the raw syntax of the language is what developers directly interact with.
+**注意：** 对于读者们来说，“文法（grammar）”一词不像“语法（syntax）”一词那么为人熟知。在许多意义上，它们是相似的词，描述语言如何工作的 *规则*。它们有一些微妙的不同，但是大部分对于我们在这里的讨论无关紧要。JavaScript的文法是一种结构化的方式，来描述语法（操作符，关键字，等等）如何组合在一起形成结构良好，合法的程序。换句话说，抛开文法来讨论语法将会忽略许多重要的细节。所以我们在本章中注目的内容的最准确的描述是 *文法*，尽管语言中的纯语法才是开发者们直接交互的。
 
-## Statements & Expressions
+## 语句与表达式
 
-It's fairly common for developers to assume that the term "statement" and "expression" are roughly equivalent. But here we need to distinguish between the two, because there are some very important differences in our JS programs.
+一个很常见的现象是，开发者们假定“语句（statement）”和“表达式（expression）”是大致等价的。但是这里我们需要区分它们俩，因为在我们的JS程序中它们有一些非常重要的区别。
 
-To draw the distinction, let's borrow from terminology you may be more familiar with: the English language.
+为了描述这种区别，让我们借用一下你可能更熟悉的术语：英语。
 
-A "sentence" is one complete formation of words that expresses a thought. It's comprised of one or more "phrases," each of which can be connected with punctuation marks or conjunction words ("and," "or," etc). A phrase can itself be made up of smaller phrases. Some phrases are incomplete and don't accomplish much by themselves, while other phrases can stand on their own. These rules are collectively called the *grammar* of the English language.
+一个“句子（sentence）”是一个表达想法的词汇的完整构造。它由一个或多个“短语（phrase）”组成，它们每一个都可以用标点符号或连词（“和”，“或”等等）连接。一个短语本身可以由更小的短语组成。一些短语是不完整的，而且本身没有太多含义，而另一些短语可以自成一句。这些规则总体地称为英语的 *文法*。
 
-And so it goes with JavaScript grammar. Statements are sentences, expressions are phrases, and operators are conjunctions/punctuation.
+JavaScript文法也类似。语句就是句子，表达式就是短语，而操作符就是连词/标点。
 
-Every expression in JS can be evaluated down to a single, specific value result. For example:
+JS中的每一个表达式都可以被求值而成为一个单独的，具体的结果值。举例来说：
 
 ```js
 var a = 3 * 6;
@@ -23,35 +23,35 @@ var b = a;
 b;
 ```
 
-In this snippet, `3 * 6` is an expression (evaluates to the value `18`). But `a` on the second line is also an expression, as is `b` on the third line. The `a` and `b` expressions both evaluate to the values stored in those variables at that moment, which also happens to be `18`.
+在这个代码段中，`3 * 6`是一个表达式（求值得值`18`）。而第二行的`a`也是一个表达式，第三行的`b`也一样。对表达式`a`和`b`求值都会得到在那一时刻存储在这些变量中的值，也就偶然是`18`。
 
-Moreover, each of the three lines is a statement containing expressions. `var a = 3 * 6` and `var b = a` are called "declaration statements" because they each declare a variable (and optionally assign a value to it). The `a = 3 * 6` and `b = a` assignments (minus the `var`s) are called assignment expressions.
+另外，这三行的每一行都是一个包含表达式的语句。`var a = 3 * 6`和`var b = a`称为“声明语句（declaration statments）”因为它们每一个都声明了一个变量（并选择性地给它赋值）。赋值`a = 3 * 6`和`b = a`（除去`var`）被称为赋值表达式（assignment expressions）。
 
-The third line contains just the expression `b`, but it's also a statement all by itself (though not a terribly interesting one!). This is generally referred to as an "expression statement."
+第三行仅仅含有一个表达式`b`，但是它本身也是一个语句（虽然不是非常有趣的一个！）。这一般称为一个“表达式语句（expression statement）”。
 
-### Statement Completion Values
+### 语句完成值
 
-It's a fairly little known fact that statements all have completion values (even if that value is just `undefined`).
+一个鲜为人知的事实是，所有语句都有完成值（即使这个值只是`undefined`）。
 
-How would you even go about seeing the completion value of a statement?
+你要如何做才能看到一个语句的完成值呢？
 
-The most obvious answer is to type the statement into your browser's developer console, because when you execute it, the console by default reports the completion value of the most recent statement it executed.
+最明显的答案是把语句敲进你的浏览器开发者控制台，因为当你运行它时，默认地控制台会报告最近一次执行的语句的完成值。
 
-Let's consider `var b = a`. What's the completion value of that statement?
+让我们考虑一下`var b = a`。这个语句的完成值是什么？
 
-The `b = a` assignment expression results in the value that was assigned (`18` above), but the `var` statement itself results in `undefined`. Why? Because `var` statements are defined that way in the spec. If you put `var a = 42;` into your console, you'll see `undefined` reported back instead of `42`.
+`b = a`赋值表达式给出的结果是被赋予的值（上面的`18`），但是`var`语句本身给出的结果是`undefined`。为什么？因为在语言规范中`var`语句就是这么定义的。如果你在你的控制台中敲入`var a = 42`，你会看到`undefined`被报告而不是`42`。
 
-**Note:** Technically, it's a little more complex than that. In the ES5 spec, section 12.2 "Variable Statement," the `VariableDeclaration` algorithm actually *does* return a value (a `string` containing the name of the variable declared -- weird, huh!?), but that value is basically swallowed up (except for use by the `for..in` loop) by the `VariableStatement` algorithm, which forces an empty (aka `undefined`) completion value.
+**注意：** 技术上讲，事情要比这复杂一些。在ES5语言规范，12.2部分的“变量语句”中，`VariableDeclaration`算法实际上返回了一个值（一个包含被声明变量的名称的`string` —— 诡异吧！？），但是这个值基本上被`VariableStatement`算法吞掉了（除了在`for..in`循环中使用），而这强制产生一个空的（也就是`undefined`）完成值。
 
-In fact, if you've done much code experimenting in your console (or in a JavaScript environment REPL -- read/evaluate/print/loop tool), you've probably seen `undefined` reported after many different statements, and perhaps never realized why or what that was. Put simply, the console is just reporting the statement's completion value.
+事实上，如果你曾在你的控制台上（或者一个JavaScript环境的REPL —— read/evaluate/print/loop工具）做过很多的代码实验的话，你可能看到过许多不同的语句都报告`undefined`，而且你也许从来没理解它是什么和为什么。简单地说，控制台仅仅报告语句的完成值。
 
-But what the console prints out for the completion value isn't something we can use inside our program. So how can we capture the completion value?
+但是控制台打印出的完成值并不是我们可以在程序中使用的东西。那么我们该如何捕获完成值呢？
 
-That's a much more complicated task. Before we explain *how*, let's explore *why* you would want to do that.
+这是个更加复杂的任务。在我们解释 *如何* 之前，让我们先探索一下 *为什么* 你想这样做。
 
-We need to consider other types of statement completion values. For example, any regular `{ .. }` block has a completion value of the completion value of its last contained statement/expression.
+我们需要考虑其他类型的语句的完成值。例如，任何普通的`{ .. }`块儿都有一个完成值，即它所包含的最后一个语句/表达式的完成值。
 
-Consider:
+考虑如下代码：
 
 ```js
 var b;
@@ -61,13 +61,13 @@ if (true) {
 }
 ```
 
-If you typed that into your console/REPL, you'd probably see `42` reported, since `42` is the completion value of the `if` block, which took on the completion value of its last assignment expression statement `b = 4 + 38`.
+如果你将这段代码敲入你的控制台/REPL，你可能会看到它报告`42`，因为`42`是`if`块儿的完成值，它取自`if`的最后一个复制表达式语句`b = 4 + 38`。
 
-In other words, the completion value of a block is like an *implicit return* of the last statement value in the block.
+换句话说，一个块儿的完成值就像 *隐含地返回* 块儿中最后一个语句的值。
 
-**Note:** This is conceptually familiar in languages like CoffeeScript, which have implicit `return` values from `function`s that are the same as the last statement value in the function.
+**注意：** 这在概念上与CoffeeScript这样的语言很类似，它们隐含地从`function`中`return`值，这些值与函数中最后一个语句的值是相同的。
 
-But there's an obvious problem. This kind of code doesn't work:
+但这里有一个明显的问题。这样的代码是不工作的：
 
 ```js
 var a, b;
@@ -77,13 +77,13 @@ a = if (true) {
 };
 ```
 
-We can't capture the completion value of a statement and assign it into another variable in any easy syntactic/grammatical way (at least not yet!).
+我们不能以任何简单的语法/文法来捕获一个语句的完成值并将它赋值给另一个变量（至少是还不能！）。
 
-So, what can we do?
+那么，我们能做什么？
 
-**Warning**: For demo purposes only -- don't actually do the following in your real code!
+**警告：** 仅用于演示的目的 —— 不要实际地在你的真实代码中做如下内容！
 
-We could use the much maligned `eval(..)` (sometimes pronounced "evil") function to capture this completion value.
+我们可以使用臭名昭著的`eval(..)`（有时读成“evil”）函数来捕获这个完成值。
 
 ```js
 var a, b;
@@ -93,9 +93,9 @@ a = eval( "if (true) { b = 4 + 38; }" );
 a;	// 42
 ```
 
-Yeeeaaahhhh. That's terribly ugly. But it works! And it illustrates the point that statement completion values are a real thing that can be captured not just in our console but in our programs.
+啊呀呀。这太难看了。但是这好用！而且它展示了语句的完成值是一个真实的东西，不仅仅是在控制台中，还可以在我们的程序中被捕获。
 
-There's a proposal for ES7 called "do expression." Here's how it might work:
+有一个称为“do表达式”的ES7提案。这是它可能工作的方式：
 
 ```js
 var a, b;
@@ -109,26 +109,26 @@ a = do {
 a;	// 42
 ```
 
-The `do { .. }` expression executes a block (with one or many statements in it), and the final statement completion value inside the block becomes the completion value *of* the `do` expression, which can then be assigned to `a` as shown.
+`do { .. }`表达式执行一个块儿（其中有一个或多个语句），这个块儿中的最后一个语句的完成值将成为`do`表达式的完成值，它可以像展示的那样被赋值给`a`。
 
-The general idea is to be able to treat statements as expressions -- they can show up inside other statements -- without needing to wrap them in an inline function expression and perform an explicit `return ..`.
+这里的大意是能够将语句作为表达式对待 —— 他们可以出现在其他语句内部 —— 而不必将它们包装在一个内联的函数表达式中，并实施一个明确的`return ..`。
 
-For now, statement completion values are not much more than trivia. But they're probably going to take on more significance as JS evolves, and hopefully `do { .. }` expressions will reduce the temptation to use stuff like `eval(..)`.
+到目前为止，语句的完成值不过是一些琐碎的事情。不顾随着JS的进化它们的重要性可能会进一步提高，而且很有希望的是`do { .. }`表达式将会降低使用`eval(..)`这样的东西的冲动。
 
-**Warning:** Repeating my earlier admonition: avoid `eval(..)`. Seriously. See the *Scope & Closures* title of this series for more explanation.
+**警告：** 重复我刚才的训诫：避开`eval(..)`。真的。更多解释参见本系列的 *作用域与闭包* 一书。
 
-### Expression Side Effects
+### 表达式副作用
 
-Most expressions don't have side effects. For example:
+大多数表达式没有副作用。例如：
 
 ```js
 var a = 2;
 var b = a + 3;
 ```
 
-The expression `a + 3` did not *itself* have a side effect, like for instance changing `a`. It had a result, which is `5`, and that result was assigned to `b` in the statement `b = a + 3`.
+表达式`a + 3`本身并没有副作用，例如改变`a`。它有一个结果，就是`5`，而且这个结果在语句`b = a + 3`中被赋值给`b`。
 
-The most common example of an expression with (possible) side effects is a function call expression:
+一个最常见的（可能）带有副作用的表达式的例子是函数调用表达式：
 
 ```js
 function foo() {
@@ -136,17 +136,17 @@ function foo() {
 }
 
 var a = 1;
-foo();		// result: `undefined`, side effect: changed `a`
+foo();		// 结果：`undefined`，副作用：改变 `a`
 ```
 
-There are other side-effecting expressions, though. For example:
+还有其他的副作用表达式。例如：
 
 ```js
 var a = 42;
 var b = a++;
 ```
 
-The expression `a++` has two separate behaviors. *First*, it returns the current value of `a`, which is `42` (which then gets assigned to `b`). But *next*, it changes the value of `a` itself, incrementing it by one.
+表达式`a++`有两个分离的行为。*首先*，它返回`a`的当前值，也就是`42`（然后它被赋值给`b`）。但 *接下来*，它改变`a`本身的值，将它增加1。
 
 ```js
 var a = 42;
@@ -156,9 +156,9 @@ a;	// 43
 b;	// 42
 ```
 
-Many developers would mistakenly believe that `b` has value `43` just like `a` does. But the confusion comes from not fully considering the *when* of the side effects of the `++` operator.
+许多开发者错误的认为`b`和`a`一样拥有值`43`。这种困惑源自没有完全考虑`++`操作符的副作用在 *什么时候* 发生。
 
-The `++` increment operator and the `--` decrement operator are both unary operators (see Chapter 4), which can be used in either a postfix ("after") position or prefix ("before") position.
+`++`递增操作符和`--`递减操作符都是一元操作符（见第四章），它们既可以用于后缀（“后面”）位置也可用于前缀（“前面”）位置。
 
 ```js
 var a = 42;
@@ -170,11 +170,11 @@ a;		// 43
 a;		// 44
 ```
 
-When `++` is used in the prefix position as `++a`, its side effect (incrementing `a`) happens *before* the value is returned from the expression, rather than *after* as with `a++`.
+当`++`像`++a`这样用于前缀位置时，它的副作用（递增`a`）发生在值从表达式中返回 *之前*，而不是`a++`那样发生在 *之后*。
 
-**Note:** Would you think `++a++` was legal syntax? If you try it, you'll get a `ReferenceError` error, but why? Because side-effecting operators **require a variable reference** to target their side effects to. For `++a++`, the `a++` part is evaluated first (because of operator precedence -- see below), which gives back the value of `a` _before_ the increment. But then it tries to evaluate `++42`, which (if you try it) gives the same `ReferenceError` error, since `++` can't have a side effect directly on a value like `42`.
+**注意：** 你认为`++a++`是一个合法的语法吗？如果你试一下，你将会得到一个`ReferenceError`错误，但为什么？因为有副作用的操作符 **要求一个变量引用** 来作为它们副作用的目标。对于`++a++`来说，`a++`这部分会首先被求值（因为操作符优先级 —— 参见下面的讨论），它会给出`a`在递增 _之前_ 的值。但然后它试着对`++42`求值，这将（如果你试一下）会给出相同的`ReferenceError`错误，因为`++`不能直接在`42`这样的值上施加副作用。
 
-It is sometimes mistakenly thought that you can encapsulate the *after* side effect of `a++` by wrapping it in a `( )` pair, like:
+有时它会被错误地认为，你可以通过将`a++`包近一个`( )`中来封装它的 *后* 副作用，比如：
 
 ```js
 var a = 42;
@@ -184,9 +184,9 @@ a;	// 43
 b;	// 42
 ```
 
-Unfortunately, `( )` itself doesn't define a new wrapped expression that would be evaluated *after* the *after side effect* of the `a++` expression, as we might have hoped. In fact, even if it did, `a++` returns `42` first, and unless you have another expression that reevaluates `a` after the side effect of `++`, you're not going to get `43` from that expression, so `b` will not be assigned `43`.
+不幸的是，`( )`本身不会像我们希望的那样，定义一个新的被包装的表达式，而它会在`a++`表达式的 *后副作用* 之 *后* 求值。事实上，就算它能，`a++`也会首先返回`42`，而且除非你有另一个表达式在`++`的副作用之后对`a`再次求值，你也不会从这个表达式中得到`43`，于是`b`不会被赋值为`43`。
 
-There's an option, though: the `,` statement-series comma operator. This operator allows you to string together multiple standalone expression statements into a single statement:
+虽然，有另一种选择：`,`语句序列逗号操作符。这个操作符允许你将多个独立的表达式语句连成一个单独的语句：
 
 ```js
 var a = 42, b;
@@ -196,11 +196,11 @@ a;	// 43
 b;	// 43
 ```
 
-**Note:** The `( .. )` around `a++, a` is required here. The reason is operator precedence, which we'll cover later in this chapter.
+**注意：** `a++, a`周围的`( .. )`是必需的。其原因的操作符优先级，我们将在本章后面讨论。
 
-The expression `a++, a` means that the second `a` statement expression gets evaluated *after* the *after side effects* of the first `a++` statement expression, which means it returns the `43` value for assignment to `b`.
+表达式`a++, a`意味着第二个`a`语句表达式会在第一个`a++`语句表达式的 *后副作用* 之 *后* 进行求值，这表明它为`b`的赋值返回`43`。
 
-Another example of a side-effecting operator is `delete`. As we showed in Chapter 2, `delete` is used to remove a property from an `object` or a slot from an `array`. But it's usually just called as a standalone statement:
+另一个副作用操作符的例子是`delete`。正如我们在第二章中展示的，`delete`用于从一个`object`或一个`array`值槽中移除一个属性。但它经常作为一个独立语句被调用：
 
 ```js
 var obj = {
@@ -212,13 +212,13 @@ delete obj.a;	// true
 obj.a;			// undefined
 ```
 
-The result value of the `delete` operator is `true` if the requested operation is valid/allowable, or `false` otherwise. But the side effect of the operator is that it removes the property (or array slot).
+如果被请求的操作是合法/可允许的，`delete`操作符的结果值为`true`，否则结果为`false`。但是这个操作符的副作用是它移除了属性（或数组值槽）。
 
-**Note:** What do we mean by valid/allowable? Nonexistent properties, or properties that exist and are configurable (see Chapter 3 of the *this & Object Prototypes* title of this series) will return `true` from the `delete` operator. Otherwise, the result will be `false` or an error.
+**注意：** 我们说合法/可允许是什么意思？不存在的属性，或存在且可配置的属性（见本系列 *this与对象原型* 的第三章）将会从`delete`操作符中返回`true`。否则，其结果将是`false`或者一个错误。
 
-One last example of a side-effecting operator, which may at once be both obvious and nonobvious, is the `=` assignment operator.
+副作用操作符的最后一个例子，可能既是明显的也是不明显的，是`=`赋值操作符。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a;
@@ -227,11 +227,11 @@ a = 42;		// 42
 a;			// 42
 ```
 
-It may not seem like `=` in `a = 42` is a side-effecting operator for the expression. But if we examine the result value of the `a = 42` statement, it's the value that was just assigned (`42`), so the assignment of that same value into `a` is essentially a side effect.
+对于这个表达式来说，`a = 42`中的`=`看起来似乎不是一个副作用操作符。但如果我们检视语句`a = 42`的结果值，会发现它就是刚刚被赋予的值（`42`），所以向`a`赋予的相同的值实质上是一种副作用。
 
-**Tip:** The same reasoning about side effects goes for the compound-assignment operators like `+=`, `-=`, etc. For example, `a = b += 2` is processed first as `b += 2` (which is `b = b + 2`), and the result of *that* `=` assignment is then assigned to `a`.
+**提示：** 相同的原因也适用于`+=`，`-=`这样的复合赋值操作符的副作用。例如，`a = b += 2`被处理为首先进行`b += 2`（也就是`b = b + 2`），然后这个赋值的结果被赋予`a`。
 
-This behavior that an assignment expression (or statement) results in the assigned value is primarily useful for chained assignments, such as:
+这种赋值表达式（语句）得出被赋予的值的行为，主要在链式赋值上十分有用，就像这样：
 
 ```js
 var a, b, c;
@@ -239,18 +239,18 @@ var a, b, c;
 a = b = c = 42;
 ```
 
-Here, `c = 42` is evaluated to `42` (with the side effect of assigning `42` to `c`), then `b = 42` is evaluated to `42` (with the side effect of assigning `42` to `b`), and finally `a = 42` is evaluated (with the side effect of assigning `42` to `a`).
+这里，`c = 42`被求值得出`42`（带有将`42`赋值给`c`的副作用），然后`b = 42`被求值得出`42`（带有将`42`赋值给`b`的副作用），而最后`a = 42`被求值（带有将`42`赋值给`a`的副作用）。
 
-**Warning:** A common mistake developers make with chained assignments is like `var a = b = 42`. While this looks like the same thing, it's not. If that statement were to happen without there also being a separate `var b` (somewhere in the scope) to formally declare `b`, then `var a = b = 42` would not declare `b` directly. Depending on `strict` mode, that would either throw an error or create an accidental global (see the *Scope & Closures* title of this series).
+**警告：** 一个开发者们常犯的错误是将链式赋值写成`var a = b = 42`这样。虽然这看起来是相同的东西，但它不是。如果这个语句发生在没有另外分离的`var b`（在作用域的某处）来正式声明它的情况下，那么`var a = b = 42`将不会直接声明`b`。根据`strict`模式的状态，它要么抛出一个错误，要么无意中创建一个全局变量（参见本系列的 *作用域与闭包*）。
 
-Another scenario to consider:
+另一个要考虑的场景是：
 
 ```js
 function vowels(str) {
 	var matches;
 
 	if (str) {
-		// pull out all the vowels
+		// 找出所有的元音字母
 		matches = str.match( /[aeiou]/g );
 
 		if (matches) {
@@ -262,13 +262,13 @@ function vowels(str) {
 vowels( "Hello World" ); // ["e","o","o"]
 ```
 
-This works, and many developers prefer such. But using an idiom where we take advantage of the assignment side effect, we can simplify by combining the two `if` statements into one:
+这可以工作，而且许多开发者喜欢这么做。但是使用一个我们可以利用赋值副作用的惯用法，可以通过将两个`if`语句组合为一个来进行简化：
 
 ```js
 function vowels(str) {
 	var matches;
 
-	// pull out all the vowels
+	// 找出所有的元音字母
 	if (str && (matches = str.match( /[aeiou]/g ))) {
 		return matches;
 	}
@@ -277,76 +277,75 @@ function vowels(str) {
 vowels( "Hello World" ); // ["e","o","o"]
 ```
 
-**Note:** The `( .. )` around `matches = str.match..` is required. The reason is operator precedence, which we'll cover in the "Operator Precedence" section later in this chapter.
+**注意：** `matches = str.match..`周围的`( .. )`是必需的。其原因是操作符优先级，我们将在本章稍后的“操作符优先级”一节中讨论。
 
-I prefer this shorter style, as I think it makes it clearer that the two conditionals are in fact related rather than separate. But as with most stylistic choices in JS, it's purely opinion which one is *better*.
+我偏好这种短一些的风格，因为我认为它明白地表示了两个条件其实是有关联的，而非分离的。但是与大多数JS中的风格选择一样，哪一种 *更好* 纯粹是个人意见。
 
-### Contextual Rules
+### 上下文规则
 
-There are quite a few places in the JavaScript grammar rules where the same syntax means different things depending on where/how it's used. This kind of thing can, in isolation, cause quite a bit of confusion.
+在JavaScript文法规则中有好几个地方，同样的语法根据它们被使用的地方/方式不同意味着不同的东西。这样的东西可能，孤立的看，导致相当多的困惑。
 
-We won't exhaustively list all such cases here, but just call out a few of the common ones.
+我们不会在这里详尽地罗列所有这些情况，而只是指出常见的几个。
 
-#### `{ .. }` Curly Braces
+#### `{ .. }` 大括号
 
-There's two main places (and more coming as JS evolves!) that a pair of `{ .. }` curly braces will show up in your code. Let's take a look at each of them.
+在你的代码中一对`{ .. }`大括号将主要出现在两种地方（随着JS的进化会有更多！）。让我们来看看它们每一种。
 
-##### Object Literals
+##### 对象字面量
 
-First, as an `object` literal:
+首先，作为一个`object`字面量：
 
 ```js
-// assume there's a `bar()` function defined
+// 假定有一个函数`bar()`的定义
 
 var a = {
 	foo: bar()
 };
 ```
 
-How do we know this is an `object` literal? Because the `{ .. }` pair is a value that's getting assigned to `a`.
+我们怎么知道这是一个`object`字面量？因为`{ .. }`是一个被赋予给`a`的值。
 
-**Note:** The `a` reference is called an "l-value" (aka left-hand value) since it's the target of an assignment. The `{ .. }` pair is an "r-value" (aka right-hand value) since it's used *just* as a value (in this case as the source of an assignment).
+**注意：** `a`这个引用被称为一个“l-值”（也称为左手边的值）因为它是赋值的目标。`{ .. }`是一个“r-值”（也称为右手边的值）因为它仅被作为一个值使用（在这里作为赋值的源）。
 
-##### Labels
+##### 标签
 
-What happens if we remove the `var a =` part of the above snippet?
+如果我们移除上面代码的`var a =`部分会发生什么？
 
 ```js
-// assume there's a `bar()` function defined
+// 假定有一个函数`bar()`的定义
 
 {
 	foo: bar()
 }
 ```
 
-A lot of developers assume that the `{ .. }` pair is just a standalone `object` literal that doesn't get assigned anywhere. But it's actually entirely different.
+许多开发者臆测`{ .. }`只是一个独立的没有被赋值给任何地方的`object`字面量。但事实上完全不同。
 
-Here, `{ .. }` is just a regular code block. It's not very idiomatic in JavaScript (much more so in other languages!) to have a standalone `{ .. }` block like that, but it's perfectly valid JS grammar. It can be especially helpful when combined with `let` block-scoping declarations (see the *Scope & Closures* title in this series).
+这里，`{ .. }`只是一个普通的代码块儿。在JavaScript中拥有一个这样的独立`{ .. }`块儿并不是一个很惯用的形式（在其他语言中要常见得多！），但它是完美合法的JS文法。当与`let`块儿作用域声明组合使用时非常有用（见本系列的 *作用域与闭包*）。
 
-The `{ .. }` code block here is functionally pretty much identical to the code block being attached to some statement, like a `for`/`while` loop, `if` conditional, etc.
+这里的`{ .. }`代码块儿在功能上差不多与附着在一些语句后面的代码块儿是相同的，比如`for`/`while`循环，`if`条件，等等。
 
-But if it's a normal block of code, what's that bizarre looking `foo: bar()` syntax, and how is that legal?
+但如果它是一个一般代码块儿，那么那个看起来异乎寻常的`foo: bar()`语法是什么？它怎么会是合法的呢？
 
-It's because of a little known (and, frankly, discouraged) feature in JavaScript called "labeled statements." `foo` is a label for the statement `bar()` (which has omitted its trailing `;` -- see "Automatic Semicolons" later in this chapter). But what's the point of a labeled statement?
+这是因为一个鲜为人知的（而且，坦白地说，不鼓励使用的）称为“打标签的语句”的JavaScript特性。`foo`是语句`bar()`（这个语句省略了末尾的`;`—— 见本章稍后的“自动分号”）的标签。但一个打了标签的语句有何意义？
 
-If JavaScript had a `goto` statement, you'd theoretically be able to say `goto foo` and have execution jump to that location in code. `goto`s are usually considered terrible coding idioms as they make code much harder to understand (aka "spaghetti code"), so it's a *very good thing* that JavaScript doesn't have a general `goto`.
+如果JavaScript有一个`goto`语句，那么在理论上你就可以说`goto foo`并使程序的执行跳转到代码中的那个位置。`goto`通常被认为是一种糟糕的编码惯用形式，因为它们使代码更难于理解（也称为“面条代码”），所以JavaScript没有一般的`goto`语句是一件 *非常好的事情*。
 
-However, JS *does* support a limited, special form of `goto`: labeled jumps. Both the `continue` and `break` statements can optionally accept a specified label, in which case the program flow "jumps" kind of like a `goto`. Consider:
+然而，JS的确支持一种有限的，特殊形式的`goto`：标签跳转。`continue`和`break`语句都可以选择性地接受一个指定的标签，在这种情况下程序流会有些像`goto`一样“跳转”。考虑一下代码：
 
 ```js
-// `foo` labeled-loop
+// 用`foo`标记的循环
 foo: for (var i=0; i<4; i++) {
 	for (var j=0; j<4; j++) {
-		// whenever the loops meet, continue outer loop
+		// 每当循环相遇，就继续外层循环
 		if (j == i) {
-			// jump to the next iteration of
-			// the `foo` labeled-loop
+			// 跳到被`foo`标记的循环的下一次迭代
 			continue foo;
 		}
 
-		// skip odd multiples
+		// 跳过奇数的乘积
 		if ((j * i) % 2 == 1) {
-			// normal (non-labeled) `continue` of inner loop
+			// 内层循环的普通（没有被标记的） `continue`
 			continue;
 		}
 
@@ -360,19 +359,19 @@ foo: for (var i=0; i<4; i++) {
 // 3 2
 ```
 
-**Note:** `continue foo` does not mean "go to the 'foo' labeled position to continue", but rather, "continue the loop that is labeled 'foo' with its next iteration." So, it's not *really* an arbitrary `goto`.
+**注意：** `continue foo`不意味着“走到标记为‘foo’的位置并继续”，而是，“继续标记为‘foo’的循环，并进行下一次迭代”。所以，它不是一个 *真正的* 随意的`goto`。
 
-As you can see, we skipped over the odd-multiple `3 1` iteration, but the labeled-loop jump also skipped iterations `1 1` and `2 2`.
+如你所见，我们跳过了乘积为奇数的`3 1`迭代，而且被打了标签的循环跳转还跳过了`1 1`和`2 2`的迭代。
 
-Perhaps a slightly more useful form of the labeled jump is with `break __` from inside an inner loop where you want to break out of the outer loop. Without a labeled `break`, this same logic could sometimes be rather awkward to write:
+也许标签跳转的一个稍稍更有用的形式是，使用`break __`从一个内部循环里面跳出外部循环。没有带标签的`break`，同样的逻辑有时写起来非常尴尬：
 
 ```js
-// `foo` labeled-loop
+// 用`foo`标记的循环
 foo: for (var i=0; i<4; i++) {
 	for (var j=0; j<4; j++) {
 		if ((i * j) >= 3) {
 			console.log( "stopping!", i, j );
-			// break out of the `foo` labeled loop
+			// 跳出被`foo`标记的循环
 			break foo;
 		}
 
@@ -389,15 +388,15 @@ foo: for (var i=0; i<4; i++) {
 // stopping! 1 3
 ```
 
-**Note:** `break foo` does not mean "go to the 'foo' labeled position to continue," but rather, "break out of the loop/block that is labeled 'foo' and continue *after* it." Not exactly a `goto` in the traditional sense, huh?
+**注意：** `break foo`不意味着“走到‘foo’标记的位置并继续”，而是，“跳出标记为‘foo’的循环/代码块儿，并继续它 *后面* 的部分”。不是一个传统意义上的`goto`，对吧？
 
-The nonlabeled `break` alternative to the above would probably need to involve one or more functions, shared scope variable access, etc. It would quite likely be more confusing than labeled `break`, so here using a labeled `break` is perhaps the better option.
+对于上面的问题，使用不带标签的`break`将可能会牵连一个或多个函数，共享作用域中变量的访问，等等。它很可能要比带标签的`break`更令人糊涂，所以在这里使用带标签的`break`也许是更好的选择。
 
-A label can apply to a non-loop block, but only `break` can reference such a non-loop label. You can do a labeled `break ___` out of any labeled block, but you cannot `continue ___` a non-loop label, nor can you do a non-labeled `break` out of a block.
+一个标签也可以用于一个非循环的块儿，但只有`break`可以引用这样的非循环标签。你可以使用带标签的`break ___`跳出任何被标记的块儿，但你不能`continue ___`一个非循环标签，也不能用一个不带标签的`break`跳出一个块儿。
 
 ```js
 function foo() {
-	// `bar` labeled-block
+	// 用`bar`标记的块儿
 	bar: {
 		console.log( "Hello" );
 		break bar;
@@ -411,36 +410,36 @@ foo();
 // World
 ```
 
-Labeled loops/blocks are extremely uncommon, and often frowned upon. It's best to avoid them if possible; for example using function calls instead of the loop jumps. But there are perhaps some limited cases where they might be useful. If you're going to use a labeled jump, make sure to document what you're doing with plenty of comments!
+带标签的循环/块儿极不常见，而且经常使人皱眉头。最好尽可能地避开它们；比如使用函数调用取代循环跳转。但是也许在一些有限的情况下它们会有用。如果你打算使用标签跳转，那么就确保使用大量注释在文档中记下你在做什么！
 
-It's a very common belief that JSON is a proper subset of JS, so a string of JSON (like `{"a":42}` -- notice the quotes around the property name as JSON requires!) is thought to be a valid JavaScript program. **Not true!** Try putting `{"a":42}` into your JS console, and you'll get an error.
+一个很常见的想法是，JSON是一个JS的恰当子集，所以一个JSON字符串（比如`{"a":42}` —— 注意属性名周围的引号是JSON必需的！）被认为是一个合法的JavaScript程序。**不是这样的！** 如果你试着把`{"a":42}`敲进你的JS控制台，你会得到一个错误。
 
-That's because statement labels cannot have quotes around them, so `"a"` is not a valid label, and thus `:` can't come right after it.
+这是因为语句标签周围不能有引号，所以`"a"`不是一个合法的标签，因此`:`不能出现在它后面。
 
-So, JSON is truly a subset of JS syntax, but JSON is not valid JS grammar by itself.
+所以，JSON确实是JS语法的子集，但是JSON本身不是合法的JS文法。
 
-One extremely common misconception along these lines is that if you were to load a JS file into a `<script src=..>` tag that only has JSON content in it (like from an API call), the data would be read as valid JavaScript but just be inaccessible to the program. JSON-P (the practice of wrapping the JSON data in a function call, like `foo({"a":42})`) is usually said to solve this inaccessibility by sending the value to one of your program's functions.
+按照这个路线产生的一个极其常见的误解是，如果你将一个JS文件加载进一个`<script src=..>`标签，而它里面仅含有JSON内容的话（就像从API调用中得到那样），这些数据将作为合法的JavaScript被读取，但只是不能从程序中访问。JSON-P（将JSON数据包进一个函数调用的做法，比如`foo({"a":42})`）经常被说成是解决了这种不可访问性，通过向你程序中的一个函数发送这些值。
 
-**Not true!** The totally valid JSON value `{"a":42}` by itself would actually throw a JS error because it'd be interpreted as a statement block with an invalid label. But `foo({"a":42})` is valid JS because in it, `{"a":42}` is an `object` literal value being passed to `foo(..)`. So, properly said, **JSON-P makes JSON into valid JS grammar!**
+**不是这样的！** 实际上完全合法的JSON值`{"a":42}`本身将会抛出一个JS错误，因为它被翻译为一个带有非法标签的语句块儿。但是`foo({"a":42})`是一个合法的JS，因为在它里面，`{"a":42}`是一个被传入`foo(..)`的`object`字面量值。所以，更合适的说法是，**JSON-P使JSON成为合法的JS文法！**
 
-##### Blocks
+##### 块儿
 
-Another commonly cited JS gotcha (related to coercion -- see Chapter 4) is:
+另一个常为人所诟病的JS坑（与强制转换有关 —— 见第四章）是：
 
 ```js
 [] + {}; // "[object Object]"
 {} + []; // 0
 ```
 
-This seems to imply the `+` operator gives different results depending on whether the first operand is the `[]` or the `{}`. But that actually has nothing to do with it!
+这看起来暗示着`+`操作符会根据第一个操作数是`[]`还是`{}`而给出不同的结果。但实际上这与它一点儿关系都没有！
 
-On the first line, `{}` appears in the `+` operator's expression, and is therefore interpreted as an actual value (an empty `object`). Chapter 4 explained that `[]` is coerced to `""` and thus `{}` is coerced to a `string` value as well: `"[object Object]"`.
+在第一行中，`{}`出现在`+`操作符的表达式中，因此被翻译为一个实际的值（一个空`object`）。第四章解释过，`[]`被强制转换为`""`因此`{}`也会被强制转换为一个`string`：`"[object Object]"`。
 
-But on the second line, `{}` is interpreted as a standalone `{}` empty block (which does nothing). Blocks don't need semicolons to terminate them, so the lack of one here isn't a problem. Finally, `+ []` is an expression that *explicitly coerces* (see Chapter 4) the `[]` to a `number`, which is the `0` value.
+但在第二行中，`{}`被翻译为一个独立的`{}`空代码块儿（它什么也不做）。块儿不需要分号来终结它们，所以这里缺少分号不是一个问题。最终，`+ []`是一个将`[]`*明确强制转换* 为`number`的表达式，而它的值是`0`。
 
-##### Object Destructuring
+##### 对象解构
 
-Starting with ES6, another place that you'll see `{ .. }` pairs showing up is with "destructuring assignments" (see the *ES6 & Beyond* title of this series for more info), specifically `object` destructuring. Consider:
+从ES6开始，你将看到`{ .. }`出现的另一个地方是“解构赋值”（更多信息参见本系列的 *ES6与未来*），确切地说是`object`解构。考虑下面的代码：
 
 ```js
 function getData() {
@@ -456,7 +455,7 @@ var { a, b } = getData();
 console.log( a, b ); // 42 "foo"
 ```
 
-As you can probably tell, `var { a , b } = ..` is a form of ES6 destructuring assignment, which is roughly equivalent to:
+正如你可能看出来的，`var { a , b } = ..`是ES6解构赋值的一种形式，它大体等价于：
 
 ```js
 var res = getData();
@@ -464,13 +463,13 @@ var a = res.a;
 var b = res.b;
 ```
 
-**Note:** `{ a, b }` is actually ES6 destructuring shorthand for `{ a: a, b: b }`, so either will work, but it's expected that the shorter `{ a, b }` will be become the preferred form.
+**注意：** `{ a, b }` 实际上是`{ a: a, b: b }`的ES6解构缩写，两者都能工作，但是人们期望短一些的`{ a, b }`能成为首选的形式。
 
-Object destructuring with a `{ .. }` pair can also be used for named function arguments, which is sugar for this same sort of implicit object property assignment:
+使用一个`{ .. }`进行对象解构也可用于被命名的函数参数，这时它是同种类的隐含对象属性赋值的语法糖：
 
 ```js
 function foo({ a, b, c }) {
-	// no need for:
+	// 不再需要：
 	// var a = obj.a, b = obj.b, c = obj.c
 	console.log( a, b, c );
 }
@@ -482,11 +481,11 @@ foo( {
 } );	// 42 "foo" [1, 2, 3]
 ```
 
-So, the context we use `{ .. }` pairs in entirely determines what they mean, which illustrates the difference between syntax and grammar. It's very important to understand these nuances to avoid unexpected interpretations by the JS engine.
+所以，我们使用`{ .. }`的上下文环境整体上决定了它们的含义，这展示了语法和文法之间的区别。理解这些微妙之处以回避JS引擎进行意外的翻译是很重要的。
 
-#### `else if` And Optional Blocks
+#### `else if` 和可选块儿
 
-It's a common misconception that JavaScript has an `else if` clause, because you can do:
+一个常见的误解是JavaScript拥有一个`else if`子句，因为你可以这么做：
 
 ```js
 if (a) {
@@ -500,19 +499,19 @@ else {
 }
 ```
 
-But there's a hidden characteristic of the JS grammar here: there is no `else if`. But `if` and `else` statements are allowed to omit the `{ }` around their attached block if they only contain a single statement. You've seen this many times before, undoubtedly:
+但是这里有一个JS文法隐藏的性质：它没有`else if`。但是如果附着在`if`和`else`语句后面的代码块儿仅包含一个语句时，`if`和`else`语句允许省略这些代码块儿周围的`{ }`。毫无疑问，你以前已经见过这种现象很多次了：
 
 ```js
 if (a) doSomething( a );
 ```
 
-Many JS style guides will insist that you always use `{ }` around a single statement block, like:
+许多JS编码风格指引坚持认为，你应当总是在一个单独的语句块儿周围使用`{ }`，就像：
 
 ```js
 if (a) { doSomething( a ); }
 ```
 
-However, the exact same grammar rule applies to the `else` clause, so the `else if` form you've likely always coded is *actually* parsed as:
+然而，完全相同的文法规则也适用于`else`子句，所以你经常编写的`else if`形式 *实际上* 被解析为：
 
 ```js
 if (a) {
@@ -528,13 +527,13 @@ else {
 }
 ```
 
-The `if (b) { .. } else { .. }` is a single statement that follows the `else`, so you can either put the surrounding `{ }` in or not. In other words, when you use `else if`, you're technically breaking that common style guide rule and just defining your `else` with a single `if` statement.
+`if (b) { .. } else { .. }`是一个紧随着`else`的单独的语句，所以你在它周围放不放一个`{ }`都可以。换句话说，当你使用`else if`的时候，从技术上讲你就打破了那个常见的编码风格指导的规则，而且只是用一个单独的`if`语句定义了你的`else`。
 
-Of course, the `else if` idiom is extremely common and results in one less level of indentation, so it's attractive. Whichever way you do it, just call out explicitly in your own style guide/rules and don't assume things like `else if` are direct grammar rules.
+当然，`else if`惯用法极其常见，而且减少了一级缩进，所以它很吸引人。无论你用哪种方式，就在你自己的编码风格指导/规则中明确地指出它，并且不要臆测`else if`是直接的文法规则。
 
-## Operator Precedence
+## 操作符优先级
 
-As we covered in Chapter 4, JavaScript's version of `&&` and `||` are interesting in that they select and return one of their operands, rather than just resulting in `true` or `false`. That's easy to reason about if there are only two operands and one operator.
+就像我们在第四章中讲解的，JavaScript版本的`&&`和`||`很有趣，因为它们选择并返回它们的操作数之一，而不是仅仅得出`true`或`false`的结果。如果只有两个操作数和一个操作符，这很容易推理。
 
 ```js
 var a = 42;
@@ -544,7 +543,7 @@ a && b;	// "foo"
 a || b;	// 42
 ```
 
-But what about when there's two operators involved, and three operands?
+但是如果牵扯到两个操作符，和三个操作数呢？
 
 ```js
 var a = 42;
@@ -555,13 +554,13 @@ a && b || c; // ???
 a || b && c; // ???
 ```
 
-To understand what those expressions result in, we're going to need to understand what rules govern how the operators are processed when there's more than one present in an expression.
+要明白这些表达式产生什么结果，我们就需要理解当在一个表达式中有多于一个操作符时，什么样的规则统治着操作符被处理的方式。
 
-These rules are called "operator precedence."
+这些规则称为“操作符优先级”。
 
-I bet most readers feel they have a decent grasp on operator precedence. But as with everything else we've covered in this book series, we're going to poke and prod at that understanding to see just how solid it really is, and hopefully learn a few new things along the way.
+我打赌大多数读者都觉得自己已经很好地理解了操作符优先级。但是和我们在本系列丛书中讲解的其他一切东西一样，我们将拨弄这种理解来看看它到底有多扎实，并希望能在这个过程中学到一些新东西。
 
-Recall the example from above:
+回想上面的例子：
 
 ```js
 var a = 42, b;
@@ -571,7 +570,7 @@ a;	// 43
 b;	// 43
 ```
 
-But what would happen if we remove the `( )`?
+要是我们移除了`( )`会怎样？
 
 ```js
 var a = 42, b;
@@ -581,13 +580,13 @@ a;	// 43
 b;	// 42
 ```
 
-Wait! Why did that change the value assigned to `b`?
+等一下！为什么这改变了赋给`b`的值？
 
-Because the `,` operator has a lower precedence than the `=` operator. So, `b = a++, a` is interpreted as `(b = a++), a`. Because (as we explained earlier) `a++` has *after side effects*, the assigned value to `b` is the value `42` before the `++` changes `a`.
+因为`,`操作符要比`=`操作符的优先级低。所以，`b = a++, a`被翻译为`(b = a++), a`。因为（如我们前面讲解的）`a++`拥有 *后副作用*，赋值给`b`的值就是在`++`改变`a`之前的值`42`。
 
-This is just a simple matter of needing to understand operator precedence. If you're going to use `,` as a statement-series operator, it's important to know that it actually has the lowest precedence. Every other operator will more tightly bind than `,` will.
+这只是为了理解操作符优先级所需的一个简单事实。如果你将要把`,`作为一个语句序列操作符使用，那么知道它实际上拥有最低的优先级是很重要的。任何其他的操作符都将要比`,`结合得更紧密。
 
-Now, recall this example from above:
+现在，回想上面的这个例子：
 
 ```js
 if (str && (matches = str.match( /[aeiou]/g ))) {
@@ -595,11 +594,11 @@ if (str && (matches = str.match( /[aeiou]/g ))) {
 }
 ```
 
-We said the `( )` around the assignment is required, but why? Because `&&` has higher precedence than `=`, so without the `( )` to force the binding, the expression would instead be treated as `(str && matches) = str.match..`. But this would be an error, because the result of `(str && matches)` isn't going to be a variable, but instead a value (in this case `undefined`), and so it can't be the left-hand side of an `=` assignment!
+我们说过赋值语句周围的`( )`是必须的，但为什么？因为`&&`拥有的优先级比`=`更高，所以如果没有`( )`来强制结合，这个表达式将被作为`(str && matches) = str.match..`对待。但是这将是个错误，因为`(str && matches)`的结果将不是一个变量（在这里是`undefined`），而是一个值，因此它不能成为`=`赋值的左边！
 
-OK, so you probably think you've got this operator precedence thing down.
+好了，那么你可能认为你已经搞定操作符优先级了。
 
-Let's move on to a more complex example (which we'll carry throughout the next several sections of this chapter) to *really* test your understanding:
+让我们移动到更复杂的例子（在本章下面几节中我们将一直使用这个例子），来 *真正* 测试一下你的理解：
 
 ```js
 var a = 42;
@@ -611,56 +610,56 @@ var d = a && b || c ? c || b ? a : c && b : a;
 d;		// ??
 ```
 
-OK, evil, I admit it. No one would write a string of expressions like that, right? *Probably* not, but we're going to use it to examine various issues around chaining multiple operators together, which *is* a very common task.
+好的，邪恶，我承认。没有人会写这样的表达式串，对吧？*也许* 不会，但是我们将使用它来检视将多个操作符链接在一起时的各种问题，而链接多个操作符是一个非常常见的任务。
 
-The result above is `42`. But that's not nearly as interesting as how we can figure out that answer without just plugging it into a JS program to let JavaScript sort it out.
+上面的结果是`42`。但是这根本没意思，除非我们自己能搞清楚这个答案，而不是将它插进JS程序来让JavaScript搞定它。
 
-Let's dig in.
+让我们深入挖掘一下。
 
-The first question -- it may not have even occurred to you to ask -- is, does the first part (`a && b || c`) behave like `(a && b) || c` or like `a && (b || c)`? Do you know for certain? Can you even convince yourself they are actually different?
+第一个问题 —— 你可能还从来没问过 —— 是，第一个部分（`a && b || c`）是像`(a && b) || c`那样动作，还是像`a && (b || c)`那样动作？你能确定吗？你能说服你自己它们实际上是不同的吗？
 
 ```js
 (false && true) || true;	// true
 false && (true || true);	// false
 ```
 
-So, there's proof they're different. But still, how does `false && true || true` behave? The answer:
+那么，这就是它们不同的证据。但是`false && true || true`到底是如何动作的？答案是：
 
 ```js
 false && true || true;		// true
 (false && true) || true;	// true
 ```
 
-So we have our answer. The `&&` operator is evaluated first and the `||` operator is evaluated second.
+那么我们有了答案。`&&`操作符首先被求值，而`||`操作符第二被求值。
 
-But is that just because of left-to-right processing? Let's reverse the order of operators:
+但这不是因为从左到右的处理顺序吗？让我们把操作符的顺序倒过来：
 
 ```js
 true || false && false;		// true
 
-(true || false) && false;	// false -- nope
-true || (false && false);	// true -- winner, winner!
+(true || false) && false;	// false -- 不
+true || (false && false);	// true -- 这才是胜利者!
 ```
 
-Now we've proved that `&&` is evaluated first and then `||`, and in this case that was actually counter to generally expected left-to-right processing.
+现在我们证明了`&&`首先被求值，然后才是`||`，而且在这个例子中的顺序实际上是与一般希望的从左到右的顺序相反的。
 
-So what caused the behavior? **Operator precedence**.
+那么什么导致了这种行为？**操作符优先级。**
 
-Every language defines its own operator precedence list. It's dismaying, though, just how uncommon it is that JS developers have read JS's list.
+每种语言都定义了自己的操作符优先级列表。虽然令人焦虑，但是JS开发者读过JS的列表却不太常见。
 
-If you knew it well, the above examples wouldn't have tripped you up in the slightest, because you'd already know that `&&` is more precedent than `||`. But I bet a fair amount of readers had to think about it a little bit.
+如果你熟知它，上面的例子一点儿都不会绊到你，因为你已经知道了`&&`要比`||`优先级高。但是我打赌有相当一部分读者不得不将它考虑一会。
 
-**Note:** Unfortunately, the JS spec doesn't really have its operator precedence list in a convenient, single location. You have to parse through and understand all the grammar rules. So we'll try to lay out the more common and useful bits here in a more convenient format. For a complete list of operator precedence, see "Operator Precedence" on the MDN site (* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence).
+**注意：** 不幸的是，JS语言规范没有将它的操作符优先级罗列在一个方便，单独的位置。你不得不通读并理解所有的文法规则。所以我们将试着以一种更方便的格式排列出更常见和更有用的部分。要得到完整的操作符优先级列表，参见MDN网站的“操作符优先级”(* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence)。
 
-### Short Circuited
+### 短接
 
-In Chapter 4, we mentioned in a side note the "short circuiting" nature of operators like `&&` and `||`. Let's revisit that in more detail now.
+在第四章中，我们在一个边注中提到了操作符`&&`和`||`的“短接”性质。让我们更详细地重温它们。
 
-For both `&&` and `||` operators, the right-hand operand will **not be evaluated** if the left-hand operand is sufficient to determine the outcome of the operation. Hence, the name "short circuited" (in that if possible, it will take an early shortcut out).
+对于`&&`和`||`两个操作符来说，如果左手边的操作数足够确定操作的结果，那么右手边的操作数将 **不会被求值**。故而，有了“短接”（如果可能，它就会取捷径退出）这个名字。
 
-For example, with `a && b`, `b` is not evaluated if `a` is falsy, because the result of the `&&` operand is already certain, so there's no point in bothering to check `b`. Likewise, with `a || b`, if `a` is truthy, the result of the operand is already certain, so there's no reason to check `b`.
+例如，说`a && b`，如果`a`是falsy`b`就不会被求值，因为`&&`操作数的结果已经确定了，所以再去麻烦地检查`b`是没有意义的。同样的，说`a || b`，如果`a`是truthy，那么操作的结果就已经确定了，所以没有理由再去检查`b`。
 
-This short circuiting can be very helpful and is commonly used:
+这种短接非常有帮助，而且经常被使用：
 
 ```js
 function doSomething(opts) {
@@ -670,9 +669,9 @@ function doSomething(opts) {
 }
 ```
 
-The `opts` part of the `opts && opts.cool` test acts as sort of a guard, because if `opts` is unset (or is not an `object`), the expression `opts.cool` would throw an error. The `opts` test failing plus the short circuiting means that `opts.cool` won't even be evaluated, thus no error!
+`opts && opts.cool`测试的`opts`部分就像某种保护，因为如果`opts`没有被赋值（或不是一个`object`），那么表达式`opts.cool`就将抛出一个错误。`opts`测试失败加上短接意味着`opts.cool`根本不会被求值，因此没有错误！
 
-Similarly, you can use `||` short circuiting:
+相似地，你可以用`||`短接：
 
 ```js
 function doSomething(opts) {
@@ -682,76 +681,76 @@ function doSomething(opts) {
 }
 ```
 
-Here, we're checking for `opts.cache` first, and if it's present, we don't call the `primeCache()` function, thus avoiding potentially unnecessary work.
+这里，我们首先检查`opts.cache`，如果它存在，我们就不会调用`primeCache()`函数，如此避免了潜在的不必要的工作。
 
-### Tighter Binding
+### 更紧密的绑定
 
-But let's turn our attention back to that earlier complex statement example with all the chained operators, specifically the `? :` ternary operator parts. Does the `? :` operator have more or less precedence than the `&&` and `||` operators?
+让我们把注意力转回前面全是链接的操作符的复杂语句的例子，特别是`? :`三元操作符的部分。`? :`操作对的优先级与`&&`和`||`操作符比起来是高还是低？
 
 ```js
 a && b || c ? c || b ? a : c && b : a
 ```
 
-Is that more like this:
+它是更像这样：
 
 ```js
 a && b || (c ? c || (b ? a : c) && b : a)
 ```
 
-or this?
+还是这样？
 
 ```js
 (a && b || c) ? (c || b) ? a : (c && b) : a
 ```
 
-The answer is the second one. But why?
+答案是第二个。但为什么？
 
-Because `&&` is more precedent than `||`, and `||` is more precedent than `? :`.
+因为`&&`优先级比`||`高，而`||`优先级比`? :`高。
 
-So, the expression `(a && b || c)` is evaluated *first* before the `? :` it participates in. Another way this is commonly explained is that `&&` and `||` "bind more tightly" than `? :`. If the reverse was true, then `c ? c...` would bind more tightly, and it would behave (as the first choice) like `a && b || (c ? c..)`.
+所以，表达式`(a && b || c)`在`? :`参与之前被 *首先* 求值。另一种常见的解释方式是，`&&`和`||`要比`? :`“结合的更紧密”。如果倒过来成立的话，那么`c ? c..`将结合的更紧密，那么它就会如`a && b || (c ? c..)`那样动作（就像第一种选择）。
 
-### Associativity
+### 结合性
 
-So, the `&&` and `||` operators bind first, then the `? :` operator. But what about multiple operators of the same precedence? Do they always process left-to-right or right-to-left?
+所以，`&&`和`||`操作符首先集合，然后是`? :`操作符。但是多个同等优先级的操作符呢？它们总是从左到右或是从右到左地处理吗？
 
-In general, operators are either left-associative or right-associative, referring to whether **grouping happens from the left or from the right**.
+一般来说，操作符不是左结合的就是右结合的，这要看 **分组是从左边发生还是从右边发生。**
 
-It's important to note that associativity is *not* the same thing as left-to-right or right-to-left processing.
+至关重要的是，结合性与从左到右或从右到左的处理 *不是* 同一个东西。
 
-But why does it matter whether processing is left-to-right or right-to-left? Because expressions can have side effects, like for instance with function calls:
+但为什么处理是从左到右或从右到左那么重要？因为表达式可以有副作用，例如函数调用：
 
 ```js
 var a = foo() && bar();
 ```
 
-Here, `foo()` is evaluated first, and then possibly `bar()` depending on the result of the `foo()` expression. That definitely could result in different program behavior than if `bar()` was called before `foo()`.
+这里，`foo()`首先被求值，然后根据表达式`foo()`的结果，`bar()`可能会求值。如果`bar()`在`foo()`之前被调用绝对会得出不同的程序行为。
 
-But this behavior is *just* left-to-right processing (the default behavior in JavaScript!) -- it has nothing to do with the associativity of `&&`. In that example, since there's only one `&&` and thus no relevant grouping here, associativity doesn't even come into play.
+但是这个行为就是从左到右的处理（JavaScript中的默认行为！）—— 它与`&&`的结合性无关。在这个例子中，因为这里只有一个`&&`因此没有相关的分组，所以根本谈不上结合性。
 
-But with an expression like `a && b && c`, grouping *will* happen implicitly, meaning that either `a && b` or `b && c` will be evaluated first.
+但是像`a && b && c`这样的表达式，分组将会隐含地发生，意味着不是`a && b`就是`b && c`会先被求值。
 
-Technically, `a && b && c` will be handled as `(a && b) && c`, because `&&` is left-associative (so is `||`, by the way). However, the right-associative alternative `a && (b && c)` behaves observably the same way. For the same values, the same expressions are evaluated in the same order.
+技术上讲，`a && b && c`将会作为`(a && b) && c`处理，因为`&&`是左结合的（顺带一提，`||`也是）。然而，右结合的`a && (b && c)`也表现出相同的行为。对于相同的值，相同的表达式是按照相同的顺序求值的。
 
-**Note:** If hypothetically `&&` was right-associative, it would be processed the same as if you manually used `( )` to create grouping like `a && (b && c)`. But that still **doesn't mean** that `c` would be processed before `b`. Right-associativity does **not** mean right-to-left evaluation, it means right-to-left **grouping**. Either way, regardless of the grouping/associativity, the strict ordering of evaluation will be `a`, then `b`, then `c` (aka left-to-right).
+**注意：** 如果假设`&&`是右结合的，它就会与你手动使用`( )`建立`a && (b && c)`这样的分组的处理方式一样。但是这仍然 **不意味着** `c`将会在`b`之前被处理。右结合性的意思 **不是** 从右到左求值，它的意思是从右到左 **分组**。不管哪种方式，无论分组/结合性怎样，严格的求值顺序将是`a`，然后`b`，然后`c`（也就是从左到右）。
 
-So it doesn't really matter that much that `&&` and `||` are left-associative, other than to be accurate in how we discuss their definitions.
+因此，除了使我们对它们定义的讨论更准确以外，`&&`和`||`是左结合这件事没有那么重要。
 
-But that's not always the case. Some operators would behave very differently depending on left-associativity vs. right-associativity.
+但事情不总是这样。一些操作符根据左结合性与右结合性将会做出不同的行为。
 
-Consider the `? :` ("ternary" or "conditional") operator:
+考虑`? :`（“三元”或“条件”）操作符：
 
 ```js
 a ? b : c ? d : e;
 ```
 
-`? :` is right-associative, so which grouping represents how it will be processed?
+`? :`是右结合的，那么哪种分组表现了它将被处理的方式？
 
 * `a ? b : (c ? d : e)`
 * `(a ? b : c) ? d : e`
 
-The answer is `a ? b : (c ? d : e)`. Unlike with `&&` and `||` above, the right-associativity here actually matters, as `(a ? b : c) ? d : e` *will* behave differently for some (but not all!) combinations of values.
+答案是`a ? b : (c ? d : e)`。不像上面的`&&`和`||`，在这里右结合性很重要，因为对于一些（不是全部！）值的组合来说`(a ? b : c) ? d : e`的行为将会不同。
 
-One such example:
+一个这样的例子是：
 
 ```js
 true ? false : true ? true : true;		// false
@@ -760,7 +759,7 @@ true ? false : (true ? true : true);	// false
 (true ? false : true) ? true : true;	// true
 ```
 
-Even more nuanced differences lurk with other value combinations, even if the end result is the same. Consider:
+在其他的值的组合中潜伏着更加微妙的不同，即便他们的最终结果是相同的。考虑：
 
 ```js
 true ? false : true ? true : false;		// false
@@ -769,18 +768,18 @@ true ? false : (true ? true : false);	// false
 (true ? false : true) ? true : false;	// false
 ```
 
-From that scenario, the same end result implies that the grouping is moot. However:
+在这个场景中，相同的最终结果暗示着分组是没有实际意义的。然而：
 
 ```js
 var a = true, b = false, c = true, d = true, e = false;
 
-a ? b : (c ? d : e); // false, evaluates only `a` and `b`
-(a ? b : c) ? d : e; // false, evaluates `a`, `b` AND `e`
+a ? b : (c ? d : e); // false, 仅仅对 `a` 和 `b` 求值
+(a ? b : c) ? d : e; // false, 对 `a`, `b` 和 `e` 求值
 ```
 
-So, we've clearly proved that `? :` is right-associative, and that it actually matters with respect to how the operator behaves if chained with itself.
+这样，我们就清楚地证明了`? :`是右结合的，而且在这个操作符与它自己链接的方式上，右结合性是发挥影响的。
 
-Another example of right-associativity (grouping) is the `=` operator. Recall the chained assignment example from earlier in the chapter:
+另一个右结合（分组）的例子是`=`操作符。回想本章早先的链式赋值的例子：
 
 ```js
 var a, b, c;
@@ -788,9 +787,9 @@ var a, b, c;
 a = b = c = 42;
 ```
 
-We asserted earlier that `a = b = c = 42` is processed by first evaluating the `c = 42` assignment, then `b = ..`, and finally `a = ..`. Why? Because of the right-associativity, which actually treats the statement like this: `a = (b = (c = 42))`.
+我们早先断言过，`a = b = c = 42`的处理方式是，首先对`c = 42`赋值求值，然后是`b = ..`，最后是`a = ..`。为什么？因为右结合性，它实际上这样看待这个语句：`a = (b = (c = 42))`。
 
-Remember our running complex assignment expression example from earlier in the chapter?
+记得本章前面，我们的复杂赋值表达式的实例吗？
 
 ```js
 var a = 42;
@@ -802,13 +801,13 @@ var d = a && b || c ? c || b ? a : c && b : a;
 d;		// 42
 ```
 
-Armed with our knowledge of precedence and associativity, we should now be able to break down the code into its grouping behavior like this:
+随着我们使用优先级和结合性的知识把自己武装起来，我们应当可以像这样把这段代码分解为它的分组行为：
 
 ```js
 ((a && b) || c) ? ((c || b) ? a : (c && b)) : a
 ```
 
-Or, to present it indented if that's easier to understand:
+或者，如果这样容易理解的话，可以用缩进表达：
 
 ```js
 (
@@ -828,57 +827,57 @@ Or, to present it indented if that's easier to understand:
 a
 ```
 
-Let's solve it now:
+让我们解析它：
 
-1. `(a && b)` is `"foo"`.
-2. `"foo" || c` is `"foo"`.
-3. For the first `?` test, `"foo"` is truthy.
-4. `(c || b)` is `"foo"`.
-5. For the second `?` test, `"foo"` is truthy.
-6. `a` is `42`.
+1. `(a && b)`是`"foo"`.
+2. `"foo" || c`是`"foo"`.
+3. 对于第一个`?`测试，`"foo"`是truthy。
+4. `(c || b)`是`"foo"`.
+5. 对于第二个`?`测试, `"foo"`是truthy。
+6. `a`是`42`.
 
-That's it, we're done! The answer is `42`, just as we saw earlier. That actually wasn't so hard, was it?
+就是这样，我们搞定了！答案是`42`，正如我们早先看到的。其实它没那么难，不是吗？
 
-### Disambiguation
+### 消除歧义
 
-You should now have a much better grasp on operator precedence (and associativity) and feel much more comfortable understanding how code with multiple chained operators will behave.
+现在你应该对操作符优先级（和结合性）有了更好的把握，并对理解多个链接的操作符如何动作感到更适应了。
 
-But an important question remains: should we all write code understanding and perfectly relying on all the rules of operator precedence/associativity? Should we only use `( )` manual grouping when it's necessary to force a different processing binding/order?
+但还存在一个重要的问题：我们应当一直编写完美地依赖于操作符优先级/结合性的代码吗？我们应该仅在有必要强制一种不同的处理顺序时使用`( )`手动分组吗？
 
-Or, on the other hand, should we recognize that even though such rules *are in fact* learnable, there's enough gotchas to warrant ignoring automatic precedence/associativity? If so, should we thus always use `( )` manual grouping and remove all reliance on these automatic behaviors?
+或者，另一方面，我们应当这样认识吗：虽然这样的规则 *实际上* 是可以学懂的，但是太多的坑让我们不得不忽略自动优先级/结合性？如果是这样，我们应当总是使用`( )`手动分组并移除对这些自动行为的所有依赖吗？
 
-This debate is highly subjective, and heavily symmetrical to the debate in Chapter 4 over *implicit* coercion. Most developers feel the same way about both debates: either they accept both behaviors and code expecting them, or they discard both behaviors and stick to manual/explicit idioms.
+这种争论是非常主观的，而且和第四章中关于 *隐含* 强制转换的争论是强烈对称的。大多数开发者对这两个争论的感觉是一样的：要么他们同时接受这两种行为并使用它们编码，要么他们同时摒弃两种行为并坚持手动/明确的写法。
 
-Of course, I cannot answer this question definitively for the reader here anymore than I could in Chapter 4. But I've presented you the pros and cons, and hopefully encouraged enough deeper understanding that you can make informed rather than hype-driven decisions.
+当然，在这个问题上，我们不能给出比我在第四章中给出的更绝对的答案。但我向你展示了利弊，并且希望促进了你更深刻的理解，以使你可以做出合理而不是人云亦云的决定。
 
-In my opinion, there's an important middle ground. We should mix both operator precedence/associativity *and* `( )` manual grouping into our programs -- I argue the same way in Chapter 4 for healthy/safe usage of *implicit* coercion, but certainly don't endorse it exclusively without bounds.
+在我看来，这里有一个重要的中间立场。我们应当将操作符优先级/结合性 *与* `( )`手动分组两者混合进我们的程序 —— 我在第四章中对于 *隐含的* 强制转换的健康/安全用法做过同样的辩论，但当然不会没有界限地仅仅拥护它。
 
-For example, `if (a && b && c) ..` is perfectly OK to me, and I wouldn't do `if ((a && b) && c) ..` just to explicitly call out the associativity, because I think it's overly verbose.
+例如，对我来说`if (a && b && c) ..`是完全没问题的，而我不会为了明确表现结合性而写出`if ((a && b) && c) ..`，因为我认为这过于繁冗了。
 
-On the other hand, if I needed to chain two `? :` conditional operators together, I'd certainly use `( )` manual grouping to make it absolutely clear what my intended logic is.
+另一方面，如果我需要链接两个`? :`条件操作符，我会理所当然地使用`( )`手动分组来使我意图的逻辑表达的绝对清晰。
 
-Thus, my advice here is similar to that of Chapter 4: **use operator precedence/associativity where it leads to shorter and cleaner code, but use `( )` manual grouping in places where it helps create clarity and reduce confusion.**
+因此，我在这里的意见和在第四章中的相似：**在操作符优先级/结合性可以使代码更短更干净的地方使用操作符优先级/结合性，在`( )`手动分组可以帮你创建更清晰的代码并减少困惑的地方使用`( )`手动分组**
 
-## Automatic Semicolons
+## 自动分号
 
-ASI (Automatic Semicolon Insertion) is when JavaScript assumes a `;` in certain places in your JS program even if you didn't put one there.
+当JavaScript认为在你的JS程序中特定的地方有一个`;`时，就算你没在那里放一个`;`，它就会进行ASI（Automatic Semicolon Insertion —— 自动分号插入）。
 
-Why would it do that? Because if you omit even a single required `;` your program would fail. Not very forgiving. ASI allows JS to be tolerant of certain places where `;` aren't commonly thought  to be necessary.
+为什么它这么做？因为就算你只省略了一个必需的`;`，你的程序就会失败。不是非常宽容。ASI允许JS容忍那些通常被认为是不需要`;`的特定地方省略`;`。
 
-It's important to note that ASI will only take effect in the presence of a newline (aka line break). Semicolons are not inserted in the middle of a line.
+必须注意的是，ASI将仅在换行存在时起作用。分号不会被插入一行的中间。
 
-Basically, if the JS parser parses a line where a parser error would occur (a missing expected `;`), and it can reasonably insert one, it does so. What's reasonable for insertion? Only if there's nothing but whitespace and/or comments between the end of some statement and that line's newline/line break.
+基本上，如果JS解析器在解析一行时发生了解析错误（缺少一个应有的`;`），而且它可以合理的插入一个`;`，它就会这么做。什么样的地方对插入是合理的？仅在一个语句和这一行的换行之间除了空格和/或注释没有别的东西时。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a = 42, b
 c;
 ```
 
-Should JS treat the `c` on the next line as part of the `var` statement? It certainly would if a `,` had come anywhere (even another line) between `b` and `c`. But since there isn't one, JS assumes instead that there's an implied `;` (at the newline) after `b`. Thus, `c;` is left as a standalone expression statement.
+JS应当将下一行的`c`作为`var`语句的一部分看待吗？如果在`b`和`c`之间的任意一个地方出现一个`,`，它当然会的。但是因为没有，所以JS认为在`b`后面有一个隐含的`;`（在换行处）。如此`c;`就剩下来作为一个独立的表达式语句。
 
-Similarly:
+类似地：
 
 ```js
 var a = 42, b = "foo";
@@ -887,33 +886,33 @@ a
 b	// "foo"
 ```
 
-That's still a valid program without error, because expression statements also accept ASI.
+这仍然是一个没有错误的合法程序，因为表达式语句也接受ASI。
 
-There's certain places where ASI is helpful, like for instance:
+有一些特定的地方ASI很有帮助，例如：
 
 ```js
 var a = 42;
 
 do {
 	// ..
-} while (a)	// <-- ; expected here!
+} while (a)	// <-- 这里需要;！
 a;
 ```
 
-The grammar requires a `;` after a `do..while` loop, but not after `while` or `for` loops. But most developers don't remember that! So, ASI helpfully steps in and inserts one.
+文法要求`do..while`循环后面要有一个`;`，但是`while`或`for`循环后面则没有。但是大多数开发者都不记得它！所以ASI帮助性地介入并插入一个。
 
-As we said earlier in the chapter, statement blocks do not require `;` termination, so ASI isn't necessary:
+如我们在本章早先说过的，语句块儿不需要`;`终结，所以ASI是不必要的：
 
 ```js
 var a = 42;
 
 while (a) {
 	// ..
-} // <-- no ; expected here
+} // <-- 这里不需要;
 a;
 ```
 
-The other major case where ASI kicks in is with the `break`, `continue`, `return`, and (ES6) `yield` keywords:
+另一个ASI介入的主要情况是，与`break`，`continue`，`return`，和（ES6）`yield`关键字：
 
 ```js
 function foo(a) {
@@ -923,7 +922,7 @@ function foo(a) {
 }
 ```
 
-The `return` statement doesn't carry across the newline to the `a *= 2` expression, as ASI assumes the `;` terminating the `return` statement. Of course, `return` statements *can* easily break across multiple lines, just not when there's nothing after `return` but the newline/line break.
+这个`return`语句的作用不会超过换行到`a *= 2`表达式，因为ASI认为`;`终结了`return`语句。当然，`return`语句 *可以* 很容易地跨越多行，只要`return`后面不是除了换行外什么都没有就行。
 
 ```js
 function foo(a) {
@@ -933,72 +932,72 @@ function foo(a) {
 }
 ```
 
-Identical reasoning applies to `break`, `continue`, and `yield`.
+同样的道理也适用于`break`，`continue`，和`yield`。
 
-### Error Correction
+### 纠错
 
-One of the most hotly contested *religious wars* in the JS community (besides tabs vs. spaces) is whether to rely heavily/exclusively on ASI or not.
+在JS社区中斗得最火热的 *宗教战争* 之一（除了制表与空格以外），就是是否应当严重/唯一地依赖ASI。
 
-Most, but not all, semicolons are optional, but the two `;`s in the `for ( .. ) ..` loop header are required.
+大多数的，担不是全部，分号是可选的，但是`for ( .. ) ..`循环的头部的两个`;`是必须的。
 
-On the pro side of this debate, many developers believe that ASI is a useful mechanism that allows them to write more terse (and more "beautiful") code by omitting all but the strictly required `;`s (which are very few). It is often asserted that ASI makes many `;`s optional, so a correctly written program *without them* is no different than a correctly written program *with them*.
+在这场争论的正方，许多开发者相信ASI是一种有用的机制，允许他们通过省略除了必须（很少几个）以外的所有`;`写出更简洁（和更“美观”）的代码。他们经常断言因为ASI使许多`;`成为可选的，所以一个 *不带它们* 而正确编写的程序，与 *带着它们* 而正确编写的程序没有区别。
 
-On the con side of the debate, many other developers will assert that there are *too many* places that can be accidental gotchas, especially for newer, less experienced developers, where unintended `;`s being magically inserted change the meaning. Similarly, some developers will argue that if they omit a semicolon, it's a flat-out mistake, and they want their tools (linters, etc.) to catch it before the JS engine *corrects* the mistake under the covers.
+在这场争论的反方，许多开发者将断言有 *太多* 的地方可以成为意想不到的坑了，特别是对那些新来的，缺乏经验的开发者来说，无意间被魔法般插入的`;`改变了程序的含义。类似地，一些开发者将会争论如果他们省略了一个分号，这就是一个直白的错误，而且他们希望他们的工具（linter等等）在JS引擎背地里 *纠正* 它之前就抓住他。
 
-Let me just share my perspective. A strict reading of the spec implies that ASI is an "error correction" routine. What kind of error, you may ask? Specifically, a **parser error**. In other words, in an attempt to have the parser fail less, ASI lets it be more tolerant.
+让我分享一下我的观点。仔细阅读语言规范，会发现它暗示ASI是一个 *纠错* 过程。你可能会问，什么样的错误？明确地讲，是一个 **解析器错误**。换句话说，为了使解析器失败的少一些，ASI让它更宽容。
 
-But tolerant of what? In my view, the only way a **parser error** occurs is if it's given an incorrect/errored program to parse. So, while ASI is strictly correcting parser errors, the only way it can get such errors is if there were first program authoring errors -- omitting semicolons where the grammar rules require them.
+但是宽容什么？在我看来，一个 **解析器错误** 发生的唯一方式是，它被给予了一个不正确/错误的程序去解析。所以虽然ASI在严格地纠正解析器错误，但是它得到这样的错误的唯一方式是，程序首先就写错了 —— 在文法要求使用分号的地方忽略了它们。
 
-So, to put it more bluntly, when I hear someone claim that they want to omit "optional semicolons," my brain translates that claim to "I want to write the most parser-broken program I can that will still work."
+所以，更直率地讲，当我听到有人声称他们想要省略“可选的分号”时，我的大脑就将它翻译为“我想尽量编写最能破坏解析器但依然可以工作的程序。”
 
-I find that to be a ludicrous position to take and the arguments of saving keystrokes and having more "beautiful code" to be weak at best.
+我发现这种立场很荒唐，而且省几下键盘敲击和更“美观的代码”的观点是软弱无力的。
 
-Furthermore, I don't agree that this is the same thing as the spaces vs tabs debate -- that it's purely cosmetic -- but rather I believe it's a fundamental question of writing code that adheres to grammar requirements vs. code that relies on grammar exceptions to just barely skate through.
+进一步讲，我不同意这和空格与制表符的争论是同一种东西 —— 那纯粹是表面上的 —— 我宁愿相信这是一个根本问题：是编写遵循文法要求的代码，还是编写依赖于文法异常但仅仅将之忽略不计的代码。
 
-Another way of looking at it is that relying on ASI is essentially considering newlines to be significant "whitespace." Other languages like Python have true significant whitespace. But is it really appropriate to think of JavaScript as having significant newlines as it stands today?
+另一种看待这个问题的方式是，依赖ASI实质上将换行视为有意义的“空格”。像Python那样的其他语言中有真正的有意义的空格。但是就今天的JavaScript来说，认为它拥有有意义的换行真的合适吗？
 
-My take: **use semicolons wherever you know they are "required," and limit your assumptions about ASI to a minimum.**
+我的意见是：**在你知道分号是“必需的”地方使用分号，并且把你对ASI的臆测限制到最小。**
 
-But don't just take my word for it. Back in 2012, creator of JavaScript Brendan Eich said (http://brendaneich.com/2012/04/the-infernal-semicolon/) the following:
+不要光听我的一面之词。回到2012年，JavaScript的创造者Brendan Eich说过下面的话(http://brendaneich.com/2012/04/the-infernal-semicolon/)：
 
-> The moral of this story: ASI is (formally speaking) a syntactic error correction procedure. If you start to code as if it were a universal significant-newline rule, you will get into trouble.
+> 这个故事的精神是：ASI是一种（正式地说）语法错误纠正过程。如果你在好像有一种普遍的有意义的换行的规则的前提下开始编码，你将会陷入麻烦。
 > ..
-> I wish I had made newlines more significant in JS back in those ten days in May, 1995.
+> 如果回到1995年五月的那十天，我希望我使换行在JS中更有意义。
 > ..
-> Be careful not to use ASI as if it gave JS significant newlines.
+> 如果ASI好像给了JS有意义的换行，那么要小心不要使用它。
 
-## Errors
+## 错误
 
-Not only does JavaScript have different *subtypes* of errors (`TypeError`, `ReferenceError`, `SyntaxError`, etc.), but also the grammar defines certain errors to be enforced at compile time, as compared to all other errors that happen during runtime.
+JavaScript不仅拥有不同的错误 *子类型*（`TypeError`，`ReferenceError`，`SyntaxError`等等），而且和其他在运行时期间发生的错误相比，它的文法还定义了在编译时被强制执行的特定错误。
 
-In particular, there have long been a number of specific conditions that should be caught and reported as "early errors" (during compilation). Any straight-up syntax error is an early error (e.g., `a = ,`), but also the grammar defines things that are syntactically valid but disallowed nonetheless.
+尤其是，早就有许多明确的情况应当被作为“早期错误”（编译期间）被捕获和报告。任何直接的语法错误都是一个早期错误（例如，`a = ,`），而且文法还定义了一些语法上合法但是无论怎样都不允许的东西。
 
-Since execution of your code has not begun yet, these errors are not catchable with `try..catch`; they will just fail the parsing/compilation of your program.
+因为你的代码还没有开始执行，这些错误不能使用`try..catch`捕获；它们只是会在你的程序进行解析/编译时导致失败。
 
-**Tip:** There's no requirement in the spec about exactly how browsers (and developer tools) should report errors. So you may see variations across browsers in the following error examples, in what specific subtype of error is reported or what the included error message text will be.
+**提示：** 在语言规范中没有要求浏览器（和开发者工具）到底应当怎样报告错误。所以在下面的错误例子中，对于哪一种错误的子类型会被报告或它包含什么样的错误消息，你可能会在各种浏览器中看到不同的形式，
 
-One simple example is with syntax inside a regular expression literal. There's nothing wrong with the JS syntax here, but the invalid regex will throw an early error:
+一个简单的例子是正则表达式字面量中的语法。这里的JS语法没有错误，而是不合法的正则表达式将会抛出一个早期错误：
 
 ```js
-var a = /+foo/;		// Error!
+var a = /+foo/;		// 错误！
 ```
 
-The target of an assignment must be an identifier (or an ES6 destructuring expression that produces one or more identifiers), so a value like `42` in that position is illegal and can be reported right away:
+一个赋值的目标必须是一个标识符（或者一个产生一个或多个标识符的ES6解构表达式），所以一个像`42`这样的值在这个位置上是不合法的，因此可以立即被报告：
 
 ```js
 var a;
-42 = a;		// Error!
+42 = a;		// 错误！
 ```
 
-ES5's `strict` mode defines even more early errors. For example, in `strict` mode, function parameter names cannot be duplicated:
+ES5的`strict`模式定义了更多的早期错误。例如，在`strict`模式中，函数参数的名称不能重复：
 
 ```js
-function foo(a,b,a) { }					// just fine
+function foo(a,b,a) { }					// 还好
 
-function bar(a,b,a) { "use strict"; }	// Error!
+function bar(a,b,a) { "use strict"; }	// 错误！
 ```
 
-Another `strict` mode early error is an object literal having more than one property of the same name:
+另一种`strict`模式的早期错误是，一个对象字面量拥有一个以上的同名属性：
 
 ```js
 (function(){
@@ -1007,19 +1006,19 @@ Another `strict` mode early error is an object literal having more than one prop
 	var a = {
 		b: 42,
 		b: 43
-	};			// Error!
+	};			// 错误！
 })();
 ```
 
-**Note:** Semantically speaking, such errors aren't technically *syntax* errors but more *grammar* errors -- the above snippets are syntactically valid. But since there is no `GrammarError` type, some browsers use `SyntaxError` instead.
+**注意：** 从语义上讲，这样的错误技术上不是 *语法* 错误，而是 *文法* 错误 —— 上面的代码段是语法上合法的。但是因为没有`GrammarError`类型，一些浏览器使用`SyntaxError`代替。
 
-### Using Variables Too Early
+### 过早使用变量
 
-ES6 defines a (frankly confusingly named) new concept called the TDZ ("Temporal Dead Zone").
+ES6定义了一个（坦白地说，让人困惑地命名的）新的概念，称为TDZ（“Temporal Dead Zone” —— 时间死区）
 
-The TDZ refers to places in code where a variable reference cannot yet be made, because it hasn't reached its required initialization.
+TDZ指的是代码中还不能使用变量引用的地方，因为它还没有到完成它所必须的初始化。
 
-The most clear example of this is with ES6 `let` block-scoping:
+对此最明白的例子就是ES6的`let`块儿作用域：
 
 ```js
 {
@@ -1028,9 +1027,9 @@ The most clear example of this is with ES6 `let` block-scoping:
 }
 ```
 
-The assignment `a = 2` is accessing the `a` variable (which is indeed block-scoped to the `{ .. }` block) before it's been initialized by the `let a` declaration, so it's in the TDZ for `a` and throws an error.
+赋值`a = 2`在变量`a`（它确实是在`{ .. }`块儿作用域中）被声明`let a`初始化之前就访问它，所以`a`位于TDZ中并抛出一个错误。
 
-Interestingly, while `typeof` has an exception to be safe for undeclared variables (see Chapter 1), no such safety exception is made for TDZ references:
+有趣的是，虽然`typeof`有一个例外，它对于未声明的变量是安全的（见第一章），但是对于TDZ引用却没有这样的安全例外：
 
 ```js
 {
@@ -1040,9 +1039,9 @@ Interestingly, while `typeof` has an exception to be safe for undeclared variabl
 }
 ```
 
-## Function Arguments
+## 函数参数值
 
-Another example of a TDZ violation can be seen with ES6 default parameter values (see the *ES6 & Beyond* title of this series):
+另一个违反TDZ的例子可以在ES6的参数默认值（参见本系列的 *ES6与未来*）中看到：
 
 ```js
 var b = 3;
@@ -1052,9 +1051,9 @@ function foo( a = 42, b = a + b + 5 ) {
 }
 ```
 
-The `b` reference in the assignment would happen in the TDZ for the parameter `b` (not pull in the outer `b` reference), so it will throw an error. However, the `a` in the assignment is fine since by that time it's past the TDZ for parameter `a`.
+在赋值中的`b`引用将在参数`b`的TDZ中发生（不会被拉到外面的`b`引用），所以它会抛出一个错误。然而，赋值中的`a`是没有问题的，因为那时参数`a`的TDZ已经过去了。
 
-When using ES6's default parameter values, the default value is applied to the parameter if you either omit an argument, or you pass an `undefined` value in its place:
+当使用ES6的参数默认值时，如果你省略一个参数，或者你在它的位置上传递一个`undefined`值的话，就会应用这个默认值。
 
 ```js
 function foo( a = 42, b = a + 1 ) {
@@ -1068,9 +1067,9 @@ foo( void 0, 7 );		// 42 7
 foo( null );			// null 1
 ```
 
-**Note:** `null` is coerced to a `0` value in the `a + 1` expression. See Chapter 4 for more info.
+**注意：** 在表达式`a + 1`中`null`被强制转换为值`0`。更多信息参考第四章。
 
-From the ES6 default parameter values perspective, there's no difference between omitting an argument and passing an `undefined` value. However, there is a way to detect the difference in some cases:
+从ES6参数默认值的角度看，忽略一个参数和传递一个`undefined`值之间没有区别。然而，有一个办法可以在一些情况下探测到这种区别：
 
 ```js
 function foo( a = 42, b = a + 1 ) {
@@ -1086,11 +1085,11 @@ foo( 10, undefined );	// 2 10 11 10 undefined
 foo( 10, null );		// 2 10 null 10 null
 ```
 
-Even though the default parameter values are applied to the `a` and `b` parameters, if no arguments were passed in those slots, the `arguments` array will not have entries.
+即便参数默认值被应用到了参数`a`和`b`上，但是如果没有参数传入这些值槽，数组`arguments`也不会有任何元素。
 
-Conversely, if you pass an `undefined` argument explicitly, an entry will exist in the `arguments` array for that argument, but it will be `undefined` and not (necessarily) the same as the default value that was applied to the named parameter for that same slot.
+反过来，如果你明确地传入一个`undefined`参数，在数组`argument`中就会为这个参数存在一个元素，但它将是`undefined`，并且与同一值槽中的被命名参数将被提供的默认值不同。
 
-While ES6 default parameter values can create divergence between the `arguments` array slot and the corresponding named parameter variable, this same disjointedness can also occur in tricky ways in ES5:
+虽然ES6参数默认值会在数组`arguments`的值槽和相应的命名参数变量之间造成差异，但是这种脱节也会以诡异的方式发生在ES5中：
 
 ```js
 function foo(a) {
@@ -1098,13 +1097,13 @@ function foo(a) {
 	console.log( arguments[0] );
 }
 
-foo( 2 );	// 42 (linked)
-foo();		// undefined (not linked)
+foo( 2 );	// 42 (链接了)
+foo();		// undefined (没链接)
 ```
 
-If you pass an argument, the `arguments` slot and the named parameter are linked to always have the same value. If you omit the argument, no such linkage occurs.
+如果你传递一个参数，`arguments`的值槽和命名的参数总是链接到同一个值上。如果你省略这个参数，就没有这样的链接会发生。
 
-But in `strict` mode, the linkage doesn't exist regardless:
+但是在`strict`模式下，这种链接无论怎样都不存在了：
 
 ```js
 function foo(a) {
@@ -1113,19 +1112,19 @@ function foo(a) {
 	console.log( arguments[0] );
 }
 
-foo( 2 );	// 2 (not linked)
-foo();		// undefined (not linked)
+foo( 2 );	// 2 (没链接)
+foo();		// undefined (没链接)
 ```
 
-It's almost certainly a bad idea to ever rely on any such linkage, and in fact the linkage itself is a leaky abstraction that's exposing an underlying implementation detail of the engine, rather than a properly designed feature.
+依赖于这样的链接几乎可以肯定是一个坏主意，而且事实上这种连接本身是一种抽象泄漏，它暴露了引擎的底层实现细节，而不是一个合适的设计特性。
 
-Use of the `arguments` array has been deprecated (especially in favor of ES6 `...` rest parameters -- see the *ES6 & Beyond* title of this series), but that doesn't mean that it's all bad.
+`arguments`数组的使用已经废弃了（特别是被ES6`...`剩余参数取代以后 —— 参见本系列的 *ES6与未来*），但这不意味着它都是不好的。
 
-Prior to ES6, `arguments` is the only way to get an array of all passed arguments to pass along to other functions, which turns out to be quite useful. You can also mix named parameters with the `arguments` array and be safe, as long as you follow one simple rule: **never refer to a named parameter *and* its corresponding `arguments` slot at the same time.** If you avoid that bad practice, you'll never expose the leaky linkage behavior.
+在ES6以前，要得到向另一个函数传递的所有参数值的数组，`arguments`是唯一的办法，它被证实十分有用。你也可以安全地混用被命名参数和`arguments`数组，只要你遵循一个简单的规则：**绝不同时引用一个被命名参数 *和* 它相应的`arguments`值槽**。如果你能避开那种错误的实践，你就永远也不会暴露这种易泄漏的链接行为。
 
 ```js
 function foo(a) {
-	console.log( a + arguments[1] ); // safe!
+	console.log( a + arguments[1] ); // 安全!
 }
 
 foo( 10, 32 );	// 42
@@ -1133,11 +1132,11 @@ foo( 10, 32 );	// 42
 
 ## `try..finally`
 
-You're probably familiar with how the `try..catch` block works. But have you ever stopped to consider the `finally` clause that can be paired with it? In fact, were you aware that `try` only requires either `catch` or `finally`, though both can be present if needed.
+你可能很熟悉`try..catch`块儿是如何工作的。但是你有没有停下来考虑过可以与之成对出现的`finally`子句呢？事实上，你有没有意识到`try`只要求`catch`和`finally`两者之一，虽然如果有需要它们可以同时出现。
 
-The code in the `finally` clause *always* runs (no matter what), and it always runs right after the `try` (and `catch` if present) finish, before any other code runs. In one sense, you can kind of think of the code in a `finally` clause as being in a callback function that will always be called regardless of how the rest of the block behaves.
+在`finally`子句中的代码 *总是* 运行的（无论发生什么），而且它总是在`try`（和`catch`，如果存在的话）完成后立即运行，在其他任何代码之前。从一种意义上说，你似乎可以认为`finally`子句中的代码是一个回调函数，无论块儿中的其他代码如何动作，它总是被调用。
 
-So what happens if there's a `return` statement inside a `try` clause? It obviously will return a value, right? But does the calling code that receives that value run before or after the `finally`?
+那么如果在`try`子句内部有一个`return`语句将会怎样？很明显它将返回一个值，对吧？但是调用端代码是在`finally`之前还是之后才收到这个值呢？
 
 ```js
 function foo() {
@@ -1156,9 +1155,9 @@ console.log( foo() );
 // 42
 ```
 
-The `return 42` runs right away, which sets up the completion value from the `foo()` call. This action completes the `try` clause and the `finally` clause immediately runs next. Only then is the `foo()` function complete, so that its completion value is returned back for the `console.log(..)` statement to use.
+`return 42`立即运行，它设置好`foo()`调用的完成值。这个动作完成了`try`子句而`finally`子句接下来立即运行。只有这之后`foo()`函数才算完成，所以被返回的完成值交给`console.log(..)`语句使用。
 
-The exact same behavior is true of a `throw` inside `try`:
+对于`try`内部的`throw`来说，行为是完全相同的：
 
 ```js
  function foo() {
@@ -1177,7 +1176,7 @@ console.log( foo() );
 // Uncaught Exception: 42
 ```
 
-Now, if an exception is thrown (accidentally or intentionally) inside a `finally` clause, it will override as the primary completion of that function. If a previous `return` in the `try` block had set a completion value for the function, that value will be abandoned.
+现在，如果一个异常从`finally`子句中被抛出（偶然地或有意地），它将会作为这个函数的主要完成值进行覆盖。如果`try`块儿中的前一个`return`已经设置好了这个函数的完成值，那么这个值就会被抛弃。
 
 ```js
 function foo() {
@@ -1195,7 +1194,7 @@ console.log( foo() );
 // Uncaught Exception: Oops!
 ```
 
-It shouldn't be surprising that other nonlinear control statements like `continue` and `break` exhibit similar behavior to `return` and `throw`:
+其他的诸如`continue`和`break`这样的非线性控制语句表现出与`return`和`throw`相似的行为是没什么令人吃惊的：
 
 ```js
 for (var i=0; i<10; i++) {
@@ -1209,11 +1208,11 @@ for (var i=0; i<10; i++) {
 // 0 1 2 3 4 5 6 7 8 9
 ```
 
-The `console.log(i)` statement runs at the end of the loop iteration, which is caused by the `continue` statement. However, it still runs before the `i++` iteration update statement, which is why the values printed are `0..9` instead of `1..10`.
+`console.log(i)`语句在`continue`语句引起的每次循环迭代的末尾运行。然而，它依然是运行在更新语句`i++`之前的，这就是为什么打印出的值是`0..9`而非`1..10`。
 
-**Note:** ES6 adds a `yield` statement, in generators (see the *Async & Performance* title of this series) which in some ways can be seen as an intermediate `return` statement. However, unlike a `return`, a `yield` isn't complete until the generator is resumed, which means a `try { .. yield .. }` has not completed. So an attached `finally` clause will not run right after the `yield` like it does with `return`.
+**注意：** ES6在generator（参见本系列的 *异步与性能*）中增加了`yield`语句，generator从某些方面可以看作是中间的`return`语句。然而，和`return`不同的是，一个`yield`在generator被推进前不会完成，这意味着`try { .. yield .. }`还没有完成。所以附着在其上的`finally`子句将不会像它和`return`一起时那样，在`yield`之后立即运行。
 
-A `return` inside a `finally` has the special ability to override a previous `return` from the `try` or `catch` clause, but only if `return` is explicitly called:
+一个在`finally`内部的`return`有着覆盖前一个`try`或`catch`子句中的`return`的特殊能力，但是仅在`return`被明确调用的情况下：
 
 ```js
 function foo() {
@@ -1221,7 +1220,7 @@ function foo() {
 		return 42;
 	}
 	finally {
-		// no `return ..` here, so no override
+		// 这里没有 `return ..`，所以返回值不会被覆盖
 	}
 }
 
@@ -1230,7 +1229,7 @@ function bar() {
 		return 42;
 	}
 	finally {
-		// override previous `return 42`
+		// 覆盖前面的 `return 42`
 		return;
 	}
 }
@@ -1240,7 +1239,7 @@ function baz() {
 		return 42;
 	}
 	finally {
-		// override previous `return 42`
+		// 覆盖前面的 `return 42`
 		return "Hello";
 	}
 }
@@ -1250,9 +1249,9 @@ bar();	// undefined
 baz();	// "Hello"
 ```
 
-Normally, the omission of `return` in a function is the same as `return;` or even `return undefined;`, but inside a `finally` block the omission of `return` does not act like an overriding `return undefined`; it just lets the previous `return` stand.
+一般来说，在函数中省略`return`和`return;`或者`return undefined;`是相同的，但是在一个`finally`块儿内部，`return`的省略不是用一个`return undefined`覆盖；它只是让前一个`return`继续生效。
 
-In fact, we can really up the craziness if we combine `finally` with labeled `break` (discussed earlier in the chapter):
+事实上，如果将打了标签的`break`（在本章早先讨论过）与`finally`相组合，我们真的可以制造一种疯狂：
 
 ```js
 function foo() {
@@ -1261,7 +1260,7 @@ function foo() {
 			return 42;
 		}
 		finally {
-			// break out of `bar` labeled block
+			// 跳出标记为`bar`的块儿
 			break bar;
 		}
 	}
@@ -1276,32 +1275,32 @@ console.log( foo() );
 // Hello
 ```
 
-But... don't do this. Seriously. Using a `finally` + labeled `break` to effectively cancel a `return` is doing your best to create the most confusing code possible. I'd wager no amount of comments will redeem this code.
+但是……别这么做。说真的。使用一个`finally` + 打了标签的`break`实质上取消了`return`，这是你在尽最大的努力制造最令人困惑的代码。我打赌没有任何注释可以拯救这段代码。
 
 ## `switch`
 
-Let's briefly explore the `switch` statement, a sort-of syntactic shorthand for an `if..else if..else..` statement chain.
+让我们简单探索一下`switch`语句，某种`if..else if..else..`语句链的语法缩写。
 
 ```js
 switch (a) {
 	case 2:
-		// do something
+		// 做一些事
 		break;
 	case 42:
-		// do another thing
+		// 做另一些事
 		break;
 	default:
-		// fallback to here
+		// 这里是后备操作
 }
 ```
 
-As you can see, it evaluates `a` once, then matches the resulting value to each `case` expression (just simple value expressions here). If a match is found, execution will begin in that matched `case`, and will either go until a `break` is encountered or until the end of the `switch` block is found.
+如你所见，它对`a`求值一次，然后将结果值与每个`case`表达式进行匹配（这里只是一些简单的值表达式）。如果找到一个匹配，就会开始执行那个匹配的`case`，它将会持续执行直到遇到一个`break`或者遇到`switch`块儿的末尾。
 
-That much may not surprise you, but there are several quirks about `switch` you may not have noticed before.
+这些可能不会令你吃惊，但是关于`switch`，有几个你以前可能从没注意过的奇怪的地方。
 
-First, the matching that occurs between the `a` expression and each `case` expression is identical to the `===` algorithm (see Chapter 4). Often times `switch`es are used with absolute values in `case` statements, as shown above, so strict matching is appropriate.
+首先，在表达式`a`和每一个`case`表达式之间的匹配与`===`算法（见第四章）是相同的。`switch`经常在`case`语句中使用绝对值，就像上面展示的，因此严格匹配是恰当的。
 
-However, you may wish to allow coercive equality (aka `==`, see Chapter 4), and to do so you'll need to sort of "hack" the `switch` statement a bit:
+然而，你也许希望允许宽松等价（也就是`==`，见第四章），而这么做你需要“黑”一下`switch`语句：
 
 ```js
 var a = "42";
@@ -1314,14 +1313,14 @@ switch (true) {
 		console.log( "42 or '42'" );
 		break;
 	default:
-		// never gets here
+		// 永远不会运行到这里
 }
 // 42 or '42'
 ```
 
-This works because the `case` clause can have any expression (not just simple values), which means it will strictly match that expression's result to the test expression (`true`). Since `a == 42` results in `true` here, the match is made.
+这可以工作是因为`case`子句可以拥有任何表达式（不仅是简单值），这意味着它将用这个表达式的结果与测试表达式（`true`）进行严格匹配。因为这里`a == 42`的结果为`true`，所以匹配成功。
 
-Despite `==`, the `switch` matching itself is still strict, between `true` and `true` here. If the `case` expression resulted in something that was truthy but not strictly `true` (see Chapter 4), it wouldn't work. This can bite you if you're for instance using a "logical operator" like `||` or `&&` in your expression:
+尽管`==`，`switch`的匹配本身依然是严格的，在这里是`true`和`true`之间。如果`case`表达式得出truthy的结果而不是严格的`true`，它就不会工作。例如如果在你的表达式中使用`||`或`&&`这样的“逻辑操作符”，这就可能咬到你：
 
 ```js
 var a = "hello world";
@@ -1329,7 +1328,7 @@ var b = 10;
 
 switch (true) {
 	case (a || b == 10):
-		// never gets here
+		// 永远不会运行到这里
 		break;
 	default:
 		console.log( "Oops" );
@@ -1337,9 +1336,9 @@ switch (true) {
 // Oops
 ```
 
-Since the result of `(a || b == 10)` is `"hello world"` and not `true`, the strict match fails. In this case, the fix is to force the expression explicitly to be a `true` or `false`, such as `case !!(a || b == 10):` (see Chapter 4).
+因为`(a || b == 10)`的结果是`"hello world"`而不是`true`，所以严格匹配失败了。这种情况下，修改的方法是强制表达式明确成为一个`true`或`false`，比如`case !!(a || b == 10):`（见第四章）。
 
-Lastly, the `default` clause is optional, and it doesn't necessarily have to come at the end (although that's the strong convention). Even in the `default` clause, the same rules apply about encountering a `break` or not:
+最后，`default`子句是可选的，而且它不一定非要位于末尾（虽然那是一种强烈的惯例）。即使是在`default`子句中，是否遇到`break`的规则也是一样的：
 
 ```js
 var a = 10;
@@ -1347,7 +1346,7 @@ var a = 10;
 switch (a) {
 	case 1:
 	case 2:
-		// never gets here
+		// 永远不会运行到这里
 	default:
 		console.log( "default" );
 	case 3:
@@ -1360,28 +1359,28 @@ switch (a) {
 // 3
 ```
 
-**Note:** As discussed previously about labeled `break`s, the `break` inside a `case` clause can also be labeled.
+**注意：** 就像我们前面讨论的打标签的`break`，`case`子句内部的`break`也可以被打标签。
 
-The way this snippet processes is that it passes through all the `case` clause matching first, finds no match, then goes back up to the `default` clause and starts executing. Since there's no `break` there, it continues executing in the already skipped over `case 3` block, before stopping once it hits that `break`.
+这段代码的处理方式是，它首先通过所有的`case`子句，没有找到匹配，然后它回到`default`子句开始执行。因为这里没有`break`，它会继续走进已经被跳过的块儿`case 3`，在遇到那个`break`后才会停止。
 
-While this sort of round-about logic is clearly possible in JavaScript, there's almost no chance that it's going to make for reasonable or understandable code. Be very skeptical if you find yourself wanting to create such circular logic flow, and if you really do, make sure you include plenty of code comments to explain what you're up to!
+虽然这种有些迂回的逻辑在JavaScript中是明显可能的，但是它几乎不可能制造出合理或易懂的代码。要对你自己是否想要创建这种环状的逻辑流程保持怀疑，如果你真的想要这么做，确保你留下了大量的代码注释来解释你要做什么！
 
-## Review
+## 复习
 
-JavaScript grammar has plenty of nuance that we as developers should spend a little more time paying closer attention to than we typically do. A little bit of effort goes a long way to solidifying your deeper knowledge of the language.
+JavaScript文法有相当多的微妙之处，我们作为开发者应当比平常多花一点儿时间来关注它。一点儿努力可以帮助你巩固对这个语言更深层次的知识。
 
-Statements and expressions have analogs in English language -- statements are like sentences and expressions are like phrases. Expressions can be pure/self-contained, or they can have side effects.
+语句和表达式在英语中有类似的概念 —— 语句就像句子，而表达式就像短语。表达式可以是纯粹的/自包含的，或者他们可以有副作用。
 
-The JavaScript grammar layers semantic usage rules (aka context) on top of the pure syntax. For example, `{ }` pairs used in various places in your program can mean statement blocks, `object` literals, (ES6) destructuring assignments, or (ES6) named function arguments.
+JavaScript文法层面的语义用法规则（也就是上下文），是在纯粹的语法之上的。例如，用于你程序中不同地方的`{ }`可以意味着块儿，`object`字面量，（ES6）解构语句，或者（ES6）被命名的函数参数。
 
-JavaScript operators all have well-defined rules for precedence (which ones bind first before others) and associativity (how multiple operator expressions are implicitly grouped). Once you learn these rules, it's up to you to decide if precedence/associativity are *too implicit* for their own good, or if they will aid in writing shorter, clearer code.
+JavaScript操作符都有严格定义的优先级（哪一个操作符首先结合）和结合性（多个操作符表达式如何隐含地分组）规则。一旦你学会了这些规则，你就可以自己决定优先级/结合性是否是为了它们自己有利而 *过于明确*，或者它们是否会对编写更短，更干净的代码有所助益。
 
-ASI (Automatic Semicolon Insertion) is a parser-error-correction mechanism built into the JS engine, which allows it under certain circumstances to insert an assumed `;` in places where it is required, was omitted, *and* where insertion fixes the parser error. The debate rages over whether this behavior implies that most `;` are optional (and can/should be omitted for cleaner code) or whether it means that omitting them is making mistakes that the JS engine merely cleans up for you.
+ASI（自动分号插入）是一种内建在JS引擎找中的解析器纠错机制，它允许JS引擎在特定的环境下，在需要`;`但是被省略了的地方，并且插入可以纠正解析错误时，插入一个`;`。有一场争论是关于这种行为是否暗示着大多数`;`都是可选的（而且为了更干净的代码可以/应当省略），或者是否它意味着省略它们是在制造JS引擎帮你扫清的错误。
 
-JavaScript has several types of errors, but it's less known that it has two classifications for errors: "early" (compiler thrown, uncatchable) and "runtime" (`try..catch`able). All syntax errors are obviously early errors that stop the program before it runs, but there are others, too.
+JavaScript有几种类型的错误，但很少有人知道它有两种类别的错误：“早期”（编译器抛出的不可捕获的）和“运行时”（可以`try..catch`的）。所有在程序运行之前就使它停止的语法错误都明显是早期错误，但也有一些别的错误。
 
-Function arguments have an interesting relationship to their formal declared named parameters. Specifically, the `arguments` array has a number of gotchas of leaky abstraction behavior if you're not careful. Avoid `arguments` if you can, but if you must use it, by all means avoid using the positional slot in `arguments` at the same time as using a named parameter for that same argument.
+函数参数值与它们正式声明的命名参数之间有一种有趣的联系。明确地说，如果你不小心，`arguments`数组会有一些泄漏抽象行为的坑。尽可能避开`arguments`，但如果你必须使用它，那就设法避免同时使用`arguments`中带有位置的值槽，和相同参数的命名参数。
 
-The `finally` clause attached to a `try` (or `try..catch`) offers some very interesting quirks in terms of execution processing order. Some of these quirks can be helpful, but it's possible to create lots of confusion, especially if combined with labeled blocks. As always, use `finally` to make code better and clearer, not more clever or confusing.
+附着在`try`（或`try..catch`）上的`finall`在执行处理顺序上提供了一些非常有趣的能力。这些能力中的一些可以很有帮助，但是它也可能制造许多困惑，特别是在与打了标签的块儿组合使用时。像往常一样，为了更好更干净的代码而使用`finally`，不是为了显得更聪明或更糊涂。
 
-The `switch` offers some nice shorthand for `if..else if..` statements, but beware of many common simplifying assumptions about its behavior. There are several quirks that can trip you up if you're not careful, but there's also some neat hidden tricks that `switch` has up its sleeve!
+`switch`为`if..else if..`语句提供了一个不错的缩写形式，但是要小心许多常见的关于它的简化假设。如果你不小心，会有几个奇怪的地方绊倒你，但是`switch`手上也有一些隐藏的高招！

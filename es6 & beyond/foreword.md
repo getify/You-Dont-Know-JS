@@ -1,17 +1,17 @@
-# You Don't Know JS: ES6 & Beyond
-# Foreword
+# 你不懂JS：ES6与未来
+# 序
 
-Kyle Simpson is a thorough pragmatist.
+Kyle Simpson 是一个严谨的实用主义者。
 
-I can't think of higher praise than this. To me, these are two of the most important qualities that a software developer must have. That's right: *must*, not *should*. Kyle's keen ability to tease apart layers of the JavaScript programming language and present them in understandable and meaningful portions is second to none.
+我想不出比这更高的赞美。对我来说，这是一个软件开发者必须具备的两个最重要的素质。是的：*必须*，不是 *应当*。将JavaScript编程语言层层梳理，并将它们用易懂而且有意的部分表现出来，Kyle 的这种敏锐的能力无人能出其右。
 
-*ES6 & Beyond* will be familiar to readers of the *You Don't Know JS* series:  they can expect to be deeply immersed in everything from the obvious, to the very subtle -- revealing semantics that were either taken for granted or never even considered. Until now, the *You Don't Know JS* book series has covered material that has at least some degree of familiarity to its readers. They have either seen or heard about the subject matter; they may even have experience with it. This volume covers material that only a very small portion of the JavaScript developer community has been exposed to: the  evolutionary changes to the language introduced in the ECMAScript 2015 Language Specification.
+对于 *你不懂JS* 系列的读者来说 *ES6与未来* 使人感到十分熟悉：他们将深深地沉浸在从明显到非常微妙的每一件事中 —— 揭示那些要么被想当然地接受、要么甚至从未被考虑过的语义。至今为止，*你不懂JS* 系列丛书已经向它的读者们讲解了他们至少在某种程度上熟悉的内容。他们不是见过就是听说过那些主题很重要；也许他们甚至曾经有过相关的经验。而这一卷讲解了只有在很少一部分的JavaScript开发者社区中才曝光过的内容：在 ECMAScript 2015 语言规范中给这门语言引入的革命性改变。
 
-Over the last couple years, I've witnessed Kyle's tireless efforts to familiarize himself with this material to a level of expertise that is rivaled by only a handful of his professional peers. That's quite a feat, considering that at the time of this writing, the language specification document hasn't been formally published! But what I've said is true, and I've read every word that Kyle's written for this book. I've followed every change, and each time, the content only gets better and provides yet a deeper level of understanding.
+在过去的几年中，我目睹了 Kyle 不知疲倦地努力学习这些内容，直到只有少数专业人士才能与之媲美的专家级水准。这真是一个壮举，试想就在他撰写的时候，语言规范的文档还没有正式发布哩！但我说的是真的，而且我读了 Kyle 为这本书写的每一个字。我追随着每一次修改，而且每一次它的内容只会变得更好，并提供更深一层的理解。
 
-This book is about shaking up your sense of understanding by exposing you to the new and unknown. The intention is to evolve your knowledge in step with your tools by bestowing you with new capabilities. It exists to give you the confidence to fully embrace the next major era of JavaScript programming.
+这本书会将你暴露在新的与未知的事物中来震撼你理解的感官。它意在通过赐予你新的力量来使你的知识更上一个台阶。它存在的目的是为了给你自信，去完全地拥抱JavaScript编程的下一个新纪元。
 
 Rick Waldron<br>
 [@rwaldron](http://twitter.com/rwaldron)<br>
-Open Web Engineer at Bocoup<br>
-Ecma/TC39 Representative for jQuery
+Bocoup的开放Web工程师<br>
+Ecma/TC39 jQuery 代表

@@ -1,77 +1,77 @@
-# You Don't Know JS: Types & Grammar
-# Chapter 4: Coercion
+# 你不懂JS：类型与文法
+# 第四章：强制转换
 
-Now that we much more fully understand JavaScript's types and values, we turn our attention to a very controversial topic: coercion.
+现在我们更全面地了解了JavaScript的类型和值，我们将注意力转向一个极具争议的话题：强制转换。
 
-As we mentioned in Chapter 1, the debates over whether coercion is a useful feature or a flaw in the design of the language (or somewhere in between!) have raged since day one. If you've read other popular books on JS, you know that the overwhelmingly prevalent *message* out there is that coercion is magical, evil, confusing, and just downright a bad idea.
+正如我们在第一章中提到的，关于强制转换到底是一个有用的特性，还是一个语言设计上的缺陷（或位于两者之间！），早就开始就争论不休了。如果你读过关于JS的其他书籍，你就会知道流行在世面上那种淹没一切的 *声音*：强制转换是魔法，是邪恶的，令人困惑的，而且就是彻头彻尾的坏主意。
 
-In the same overall spirit of this book series, rather than running away from coercion because everyone else does, or because you get bitten by some quirk, I think you should run toward that which you don't understand and seek to *get it* more fully.
+本着这个系列丛书的总体精神，我认为你应当直面你不理解的东西并设法更全面地 *搞懂它*。而不是因为大家都这样做，或是你曾经被一些怪东西咬到就逃避强制转换。
 
-Our goal is to fully explore the pros and cons (yes, there *are* pros!) of coercion, so that you can make an informed decision on its appropriateness in your program.
+我们的目标是全面地探索强制转换的优点和缺点（是的，它们 *有* 优点！），这样你就能在程序中对它是否合适做出明智的决定。
 
-## Converting Values
+## 转换值
 
-Converting a value from one type to another is often called "type casting," when done explicitly, and "coercion" when done implicitly (forced by the rules of how a value is used).
+将一个值从一个类型明确地转换到另一个类型通常称为“类型转换（type casting）”，当这个操作隐含地完成时称为“强制转换（coercion）”（根据一个值如何被使用的规则来强制它变换类型）。
 
-**Note:** It may not be obvious, but JavaScript coercions always result in one of the scalar primitive (see Chapter 2) values, like `string`, `number`, or `boolean`. There is no coercion that results in a complex value like `object` or `function`. Chapter 3 covers "boxing," which wraps scalar primitive values in their `object` counterparts, but this is not really coercion in an accurate sense.
+**注意：** 这可能不明显，但是JavaScript强制转换总是得到基本标量值的一种，比如`string`，`number`，或`boolean`。没有强制转换可以得到像`object`和`function`这样的复杂值。第三章讲解了“封箱”，它将一个基本类型标量值包装在它们相应的`object`中，但在准确的意义上这不是真正的强制转换。
 
-Another way these terms are often distinguished is as follows: "type casting" (or "type conversion") occur in statically typed languages at compile time, while "type coercion" is a runtime conversion for dynamically typed languages.
+另一种区别这些术语的常见方法是：“类型转换（type casting/conversion）”发生在静态类型语言的编译时，而“类型强制转换（type coercion）”是动态类型语言的运行时转换。
 
-However, in JavaScript, most people refer to all these types of conversions as *coercion*, so the way I prefer to distinguish is to say "implicit coercion" vs. "explicit coercion."
+然而，在JavaScript中，大多数人将所有这些类型的转换都称为 *强制转换（coercion）*，所以我偏好的区别方式是使用“隐含强制转换（implicit coercion）”与“明确强制转换（explicit coercion）”。
 
-The difference should be obvious: "explicit coercion" is when it is obvious from looking at the code that a type conversion is intentionally occurring, whereas "implicit coercion" is when the type conversion will occur as a less obvious side effect of some other intentional operation.
+其中的区别应当是很明显的：在观察代码时如果一个类型转换明显是有意为之的，那么它就是“明确强制转换”，而如果这个类型转换是做为其他操作的不那么明显的副作用发生的，那么它就是“隐含强制转换”。
 
-For example, consider these two approaches to coercion:
+例如，考虑这两种强制转换的方式：
 
 ```js
 var a = 42;
 
-var b = a + "";			// implicit coercion
+var b = a + "";			// 隐含强制转换
 
-var c = String( a );	// explicit coercion
+var c = String( a );	// 明确强制转换
 ```
 
-For `b`, the coercion that occurs happens implicitly, because the `+` operator combined with one of the operands being a `string` value (`""`) will insist on the operation being a `string` concatenation (adding two strings together), which *as a (hidden) side effect* will force the `42` value in `a` to be coerced to its `string` equivalent: `"42"`.
+对于`b`来说，强制转换是隐含地发生的，因为如果与`+`操作符组合的操作数之一是一个`string`值（`""`），这将使`+`操作成为一个`string`连接（将两个字符串加在一起），而`string`连接的 *一个（隐藏的）副作用* 将`a`中的值`42`强制转换为它的`string`等价物：`"42"`。
 
-By contrast, the `String(..)` function makes it pretty obvious that it's explicitly taking the value in `a` and coercing it to a `string` representation.
+相比之下，`String(..)`函数使一切相当明显，它明确地取得`a`中的值，并把它强制转换为一个`string`表现形式。
 
-Both approaches accomplish the same effect: `"42"` comes from `42`. But it's the *how* that is at the heart of the heated debates over JavaScript coercion.
+两种方式都能达到相同的效果：从`42`变成`"42"`。但它们 *如何* 达到这种效果，才是关于JavaScript强制转换的热烈争论的核心。
 
-**Note:** Technically, there's some nuanced behavioral difference here beyond the stylistic difference. We cover that in more detail later in the chapter, in the "Implicitly: Strings <--> Numbers" section.
+**注意：** 技术上讲，这里有一些在语法形式区别之上的，行为上的微妙区别。我们将在本章稍后，“隐含：Strings <--> Numbers”一节中仔细讲解。
 
-The terms "explicit" and "implicit," or "obvious" and "hidden side effect," are *relative*.
+“明确地”，“隐含地”，或“明显地”和“隐藏的副作用”这些术语，是 *相对的*。
 
-If you know exactly what `a + ""` is doing and you're intentionally doing that to coerce to a `string`, you might feel the operation is sufficiently "explicit." Conversely, if you've never seen the `String(..)` function used for `string` coercion, its behavior might seem hidden enough as to feel "implicit" to you.
+如果你确切地知道`a + ""`是在做什么，并且你有意地这么做来强制转换一个`string`，你可能感觉这个操作已经足够“明确”了。相反，如果你从没见过`String(..)`函数被用于`string`强制转换，那么对你来说它的行为可能看起来太过隐蔽而让你感到“隐含”。
 
-But we're having this discussion of "explicit" vs. "implicit" based on the likely opinions of an *average, reasonably informed, but not expert or JS specification devotee* developer. To whatever extent you do or do not find yourself fitting neatly in that bucket, you will need to adjust your perspective on our observations here accordingly.
+但我们是基于一个 *大众的，充分了解，但不是专家或JS规范爱好者的* 开发者的观点来讨论“明确”与“隐含”的。无论你的程度如何，或是没有在这个范畴内准确地找到自己，你都需要根据我们在这里的观察方式，相应地调整你的角度。
 
-Just remember: it's often rare that we write our code and are the only ones who ever read it. Even if you're an expert on all the ins and outs of JS, consider how a less experienced teammate of yours will feel when they read your code. Will it be "explicit" or "implicit" to them in the same way it is for you?
+记住：我们自己写代码而也只有我们自己会读它，通常是很少见的。即便你是一个精通JS里里外外的专家，也要考虑一个经验没那么丰富的队友在读你的代码时感受如何。对于他们和对于你来说，“明确”或“隐含”的意义相同吗？
 
-## Abstract Value Operations
+## 抽象值操作
 
-Before we can explore *explicit* vs *implicit* coercion, we need to learn the basic rules that govern how values *become* either a `string`, `number`, or `boolean`. The ES5 spec in section 9 defines several "abstract operations" (fancy spec-speak for "internal-only operation") with the rules of value conversion. We will specifically pay attention to: `ToString`, `ToNumber`, and `ToBoolean`, and to a lesser extent, `ToPrimitive`.
+在我们可以探究 *明确* 与 *隐含* 强制转换之前，我们需要学习一些基本规则，是它们控制着值如何 *变成* 一个`string`，`number`，或`boolean`的。ES5语言规范的第9部分用值的变形规则定义了几种“抽象操作”（“仅供内部使用的操作”的高大上说法）。我们将特别关注于：`ToString`，`ToNumber`，和`ToBoolean`，并稍稍关注一下`ToPrimitive`。
 
 ### `ToString`
 
-When any non-`string` value is coerced to a `string` representation, the conversion is handled by the `ToString` abstract operation in section 9.8 of the specification.
+当任何一个非`string`值被强制转换为一个`string`表现形式时，这个转换的过程是由语言规范的9.8部分的`ToString`抽象操作处理的。
 
-Built-in primitive values have natural stringification: `null` becomes `"null"`, `undefined` becomes `"undefined"` and `true` becomes `"true"`. `number`s are generally expressed in the natural way you'd expect, but as we discussed in Chapter 2, very small or very large `numbers` are represented in exponent form:
+内建的基本类型值拥有自然的字符串化形式：`null`变为`"null"`，`undefined`变为`"undefined"`，`true`变为`"true"`。`number`一般会以你期望的自然方式表达，但正如我们在第二章中讨论的，非常小或非常大的`number`将会以指数形式表达：
 
 ```js
-// multiplying `1.07` by `1000`, seven times over
+// `1.07`乘以`1000`，7次
 var a = 1.07 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000;
 
-// seven times three digits => 21 digits
+// 7次乘以3位 => 21位
 a.toString(); // "1.07e21"
 ```
 
-For regular objects, unless you specify your own, the default `toString()` (located in `Object.prototype.toString()`) will return the *internal `[[Class]]`* (see Chapter 3), like for instance `"[object Object]"`.
+对于普通的对象，除非你指定你自己的，默认的`toString()`（可以在`Object.prototype.toString()`找到）将返回 *内部`[[Class]]`*（见第三章），例如`"[object Object]"`。
 
-But as shown earlier, if an object has its own `toString()` method on it, and you use that object in a `string`-like way, its `toString()` will automatically be called, and the `string` result of that call will be used instead.
+但正如早先所展示的，如果一个对象上拥有它自己的`toString()`方法，而你又以一种类似`string`的方式使用这个对象，那么它的`toString()`将会被自动调用，而且这个调用的`string`结果将被使用。
 
-**Note:** The way an object is coerced to a `string` technically goes through the `ToPrimitive` abstract operation (ES5 spec, section 9.1), but those nuanced details are covered in more detail in the `ToNumber` section later in this chapter, so we will skip over them here.
+**注意：** 技术上讲，一个对象被强制转换为一个`string`要通过`ToPrimitive`抽象操作（ES5语言规范，9.1部分），但是那其中的微妙细节将会在本章稍后的`ToNumber`部分中讲解，所以我们在这里先跳过它。
 
-Arrays have an overridden default `toString()` that stringifies as the (string) concatenation of all its values (each stringified themselves), with `","` in between each value:
+数组拥有一个覆盖版本的默认`toString()`，将数组字符串化为它所有的值（每个都字符串化）的（字符串）连接，并用`","`分割每个值。
 
 ```js
 var a = [1,2,3];
@@ -79,30 +79,30 @@ var a = [1,2,3];
 a.toString(); // "1,2,3"
 ```
 
-Again, `toString()` can either be called explicitly, or it will automatically be called if a non-`string` is used in a `string` context.
+重申一次，`toString()`可以明确地被调用，也可以通过在一个需要`string`的上下文环境中使用一个非`string`来自动地被调用。
 
-#### JSON Stringification
+#### JSON字符串化
 
-Another task that seems awfully related to `ToString` is when you use the `JSON.stringify(..)` utility to serialize a value to a JSON-compatible `string` value.
+另一种看起来与`ToString`密切相关的操作是，使用`JSON.stringify(..)`工具将一个值序列化为一个JSON兼容的`string`值。
 
-It's important to note that this stringification is not exactly the same thing as coercion. But since it's related to the `ToString` rules above, we'll take a slight diversion to cover JSON stringification behaviors here.
+重要的是要注意，这种字符串化与强制转换并不完全是同一种东西。但是因为它与上面讲的`ToString`规则有关联，我们将在这里稍微转移一下话题，来讲解JSON字符串化行为。
 
-For most simple values, JSON stringification behaves basically the same as `toString()` conversions, except that the serialization result is *always a `string`*:
+对于最简单的值，JSON字符串化行为基本上和`toString()`转换是相同的，除了序列化的结果 *总是一个`string`*：
 
 ```js
 JSON.stringify( 42 );	// "42"
-JSON.stringify( "42" );	// ""42"" (a string with a quoted string value in it)
+JSON.stringify( "42" );	// ""42"" （一个包含双引号的字符串）
 JSON.stringify( null );	// "null"
 JSON.stringify( true );	// "true"
 ```
 
-Any *JSON-safe* value can be stringified by `JSON.stringify(..)`. But what is *JSON-safe*? Any value that can be represented validly in a JSON representation.
+任何 *JSON安全* 的值都可以被`JSON.stringify(..)`字符串化。但是什么是 *JSON安全的*？任何可以用JSON表现形式合法表达的值。
 
-It may be easier to consider values that are **not** JSON-safe. Some examples: `undefined`s, `function`s, (ES6+) `symbol`s, and `object`s with circular references (where property references in an object structure create a never-ending cycle through each other). These are all illegal values for a standard JSON structure, mostly because they aren't portable to other languages that consume JSON values.
+考虑JSON **不** 安全的值可能更容易一些。一些例子是：`undefined`，`function`，（ES6+）`symbol`，和带有循环引用的`object`（一个对象结构中的属性互相引用而造成了一个永不终结的循环）。对于标准的JSON结构来说这些都是非法的值，主要是因为它们不能移植到消费JSON值的其他语言中。
 
-The `JSON.stringify(..)` utility will automatically omit `undefined`, `function`, and `symbol` values when it comes across them. If such a value is found in an `array`, that value is replaced by `null` (so that the array position information isn't altered). If found as a property of an `object`, that property will simply be excluded.
+`JSON.stringify(..)`工具在遇到`undefined`，`function`，和`symbol`时将会自动地忽略它们。如果在一个`array`中遇到这样的值，它会被替换为`null`（这样数组的位置信息就不会改变）。如果在一个`object`的属性中遇到这样的值，这个属性会被简单地剔除掉。
 
-Consider:
+考虑下面的代码：
 
 ```js
 JSON.stringify( undefined );					// undefined
@@ -112,13 +112,13 @@ JSON.stringify( [1,undefined,function(){},4] );	// "[1,null,null,4]"
 JSON.stringify( { a:2, b:function(){} } );		// "{"a":2}"
 ```
 
-But if you try to `JSON.stringify(..)` an `object` with circular reference(s) in it, an error will be thrown.
+但如果你试着`JSON.stringify(..)`一个带有循环引用的`object`，就会抛出一个错误。
 
-JSON stringification has the special behavior that if an `object` value has a `toJSON()` method defined, this method will be called first to get a value to use for serialization.
+JSON字符串化有一个特殊行为，如果一个`object`值定义了一个`toJSON()`方法，这个方法将会被首先调用，以取得用于序列化的值。
 
-If you intend to JSON stringify an object that may contain illegal JSON value(s), or if you just have values in the `object` that aren't appropriate for the serialization, you should define a `toJSON()` method for it that returns a *JSON-safe* version of the `object`.
+如果你打算JSON字符串化一个可能含有非法JSON值的对象，或者如果这个对象中正好有不适于序列化的值，那么你就应当为它定义一个`toJSON()`方法，返回这个`object`的一个 *JSON安全* 版本。
 
-For example:
+例如：
 
 ```js
 var o = { };
@@ -129,32 +129,32 @@ var a = {
 	d: function(){}
 };
 
-// create a circular reference inside `a`
+// 在`a`内部制造一个循环引用
 o.e = a;
 
-// would throw an error on the circular reference
+// 这回因循环引用而抛出一个错误
 // JSON.stringify( a );
 
-// define a custom JSON value serialization
+// 自定义一个JSON值序列化
 a.toJSON = function() {
-	// only include the `b` property for serialization
+	// 序列化仅包含属性`b`
 	return { b: this.b };
 };
 
 JSON.stringify( a ); // "{"b":42}"
 ```
 
-It's a very common misconception that `toJSON()` should return a JSON stringification representation. That's probably incorrect, unless you're wanting to actually stringify the `string` itself (usually not!). `toJSON()` should return the actual regular value (of whatever type) that's appropriate, and `JSON.stringify(..)` itself will handle the stringification.
+一个很常见的误解是，`toJSON()`应当返回一个JSON字符串化的表现形式。这可能是不正确的，除非你事实上想要字符串化`string`本身（通常不会！）。`toJSON()`应当返回合适的实际普通值（无论什么类型），而`JSON.stringify(..)`自己会处理字符串化。
 
-In other words, `toJSON()` should be interpreted as "to a JSON-safe value suitable for stringification," not "to a JSON string" as many developers mistakenly assume.
+换句话说，`toJSON()`应当被翻译为：“变为一个适用于字符串化的JSON安全的值”，不是像许多开发者错误认为的那样，“变为一个JSON字符串”。
 
-Consider:
+考虑下面的代码：
 
 ```js
 var a = {
 	val: [1,2,3],
 
-	// probably correct!
+	// 可能正确！
 	toJSON: function(){
 		return this.val.slice( 1 );
 	}
@@ -163,7 +163,7 @@ var a = {
 var b = {
 	val: [1,2,3],
 
-	// probably incorrect!
+	// 可能不正确！
 	toJSON: function(){
 		return "[" +
 			this.val.slice( 1 ).join() +
@@ -176,15 +176,15 @@ JSON.stringify( a ); // "[2,3]"
 JSON.stringify( b ); // ""[2,3]""
 ```
 
-In the second call, we stringified the returned `string` rather than the `array` itself, which was probably not what we wanted to do.
+在第二个调用中，我们字符串化了返回的`string`而不是`array`本身，这可能不是我们想要做的。
 
-While we're talking about `JSON.stringify(..)`, let's discuss some lesser-known functionalities that can still be very useful.
+既然我们说到了`JSON.stringify(..)`，那么就让我们来讨论一些不那么广为人知，但是仍然很有用的功能吧。
 
-An optional second argument can be passed to `JSON.stringify(..)` that is called *replacer*. This argument can either be an `array` or a `function`. It's used to customize the recursive serialization of an `object` by providing a filtering mechanism for which properties should and should not be included, in a similar way to how `toJSON()` can prepare a value for serialization.
+`JSON.stringify(..)`的第二个参数值是可选的，它称为 *替换器（replacer）*。这个参数值既可以是一个`array`也可以是一个`function`。与`toJSON()`为序列化准备一个值的方式类似，它提供一种过滤机制，指出一个`object`的哪一个属性应该或不应该被包含在序列化形式中，来自定义这个`object`的递归序列化行为。
 
-If *replacer* is an `array`, it should be an `array` of `string`s, each of which will specify a property name that is allowed to be included in the serialization of the `object`. If a property exists that isn't in this list, it will be skipped.
+如果 *替换器* 是一个`array`，那么它应当是一个`string`的`array`，它的每一个元素指定了允许被包含在这个`object`的序列化形式中的属性名称。如果一个属性不存在于这个列表中，那么它就会被跳过。
 
-If *replacer* is a `function`, it will be called once for the `object` itself, and then once for each property in the `object`, and each time is passed two arguments, *key* and *value*. To skip a *key* in the serialization, return `undefined`. Otherwise, return the *value* provided.
+如果 *替换器* 是一个`function`，那么它会为`object`本身而被调用一次，并且为这个`object`中的每个属性都被调用一次，而且每次都被传入两个参数值，*key* 和 *value*。要在序列化中跳过一个 *key*，可以返回`undefined`。否则，就返回被提供的 *value*。
 
 ```js
 var a = {
@@ -201,9 +201,9 @@ JSON.stringify( a, function(k,v){
 // "{"b":42,"d":[1,2,3]}"
 ```
 
-**Note:** In the `function` *replacer* case, the key argument `k` is `undefined` for the first call (where the `a` object itself is being passed in). The `if` statement **filters out** the property named `"c"`. Stringification is recursive, so the `[1,2,3]` array has each of its values (`1`, `2`, and `3`) passed as `v` to *replacer*, with indexes (`0`, `1`, and `2`) as `k`.
+**注意：** 在`function`*替换器* 的情况下，第一次调用时key参数`k`是`undefined`（而对象`a`本身会被传入）。`if`语句会 **过滤掉** 名称为`c`的属性。字符串化是递归的，所以数组`[1,2,3]`会将它的每一个值（`1`，`2`，和`3`）都作为`v`传递给 *替换器*，并将索引值（`0`，`1`，和`2`）作为`k`。
 
-A third optional argument can also be passed to `JSON.stringify(..)`, called *space*, which is used as indentation for prettier human-friendly output. *space* can be a positive integer to indicate how many space characters should be used at each indentation level. Or, *space* can be a `string`, in which case up to the first ten characters of its value will be used for each indentation level.
+`JSON.stringify(..)`还可以接收第三个可选参数值，称为 *填充符（space）*，在对人类友好的输出中它被用做缩进。*填充符* 可以是一个正整数，用来指示每一级缩进中应当使用多少个空格字符。或者，*填充符* 可以是一个`string`，这时每一级缩进将会使用它的前十个字符。
 
 ```js
 var a = {
@@ -235,32 +235,32 @@ JSON.stringify( a, null, "-----" );
 // }"
 ```
 
-Remember, `JSON.stringify(..)` is not directly a form of coercion. We covered it here, however, for two reasons that relate its behavior to `ToString` coercion:
+记住，`JSON.stringify(..)`并不直接是一种强制转换的形式。但是，我们在这里讨论它，是由于两个与`ToString`强制转换有关联的行为：
 
-1. `string`, `number`, `boolean`, and `null` values all stringify for JSON basically the same as how they coerce to `string` values via the rules of the `ToString` abstract operation.
-2. If you pass an `object` value to `JSON.stringify(..)`, and that `object` has a `toJSON()` method on it, `toJSON()` is automatically called to (sort of) "coerce" the value to be *JSON-safe* before stringification.
+1. `string`，`number`，`boolean`，和`null`值在JSON字符串化时，与它们通过`ToString`抽象操作的规则强制转换为`string`值的方式基本上是相同的。
+2. 如果传递一个`object`值给`JSON.stringify(..)`，而这个`object`上拥有一个`toJSON()`方法，那么在字符串化之前，`toJSON()`就会被自动调用来将这个值（某种意义上）“强制转换”为 *JSON安全* 的。
 
 ### `ToNumber`
 
-If any non-`number` value is used in a way that requires it to be a `number`, such as a mathematical operation, the ES5 spec defines the `ToNumber` abstract operation in section 9.3.
+如果任何非`number`值，以一种要求它是`number`的方式被使用，比如数学操作，就会发生ES5语言规范在9.3部分定义的`ToNumber`抽象操作。
 
-For example, `true` becomes `1` and `false` becomes `0`. `undefined` becomes `NaN`, but (curiously) `null` becomes `0`.
+例如，`true`变为`1`而`false`变为`0`。`undefined`变为`NaN`，而（奇怪的是）`null`变为`0`。
 
-`ToNumber` for a `string` value essentially works for the most part like the rules/syntax for numeric literals (see Chapter 3). If it fails, the result is `NaN` (instead of a syntax error as with `number` literals). One example difference is that `0`-prefixed octal numbers are not handled as octals (just as normal base-10 decimals) in this operation, though such octals are valid as `number` literals (see Chapter 2).
+对于一个`string`值来说，`ToNumber`工作起来很大程度上与数字字面量的规则/语法很相似（见第三章）。如果它失败了，结果将是`NaN`（而不是`number`字面量中会出现的语法错误）。一个不同之处的例子是，在这个操作中`0`前缀的八进制数不会被作为八进制数来处理（而仅作为普通的十进制小数），虽然这样的八进制数作为`number`字面量是合法的。
 
-**Note:** The differences between `number` literal grammar and `ToNumber` on a `string` value are subtle and highly nuanced, and thus will not be covered further here. Consult section 9.3.1 of the ES5 spec for more information.
+**注意：** `number`字面量文法与用于`string`值的`ToNumber`间的区别极其微妙，在这里就不进一步讲解了。更多的信息可以参考ES语言规范的9.3.1部分。
 
-Objects (and arrays) will first be converted to their primitive value equivalent, and the resulting value (if a primitive but not already a `number`) is coerced to a `number` according to the `ToNumber` rules just mentioned.
+对象（以及数组）将会首先被转换为它们的基本类型值的等价物，而后这个结果值（如果它还不是一个`number`基本类型）会根据刚才提到的`ToNumber`规则被强制转换为一个`number`。
 
-To convert to this primitive value equivalent, the `ToPrimitive` abstract operation (ES5 spec, section 9.1) will consult the value (using the internal `DefaultValue` operation -- ES5 spec, section 8.12.8) in question to see if it has a `valueOf()` method. If `valueOf()` is available and it returns a primitive value, *that* value is used for the coercion. If not, but `toString()` is available, it will provide the value for the coercion.
+为了转换为基本类型值的等价物，`ToPrimitive`抽象操作（ES5语言规范，9.1部分）将会查询这个值（使用内部的`DefaultValue`操作 —— ES5语言规范，8.12.8部分），看它有没有`valueOf()`方法。如果`valueOf()`可用并且它返回一个基本类型值，那么 *这个* 值就将用于强制转换。如果不是这样，但`toString()`可用，那么就由它来提供用于强制转换的值。
 
-If neither operation can provide a primitive value, a `TypeError` is thrown.
+如果这两种操作都没提供一个基本类型值，就会抛出一个`TypeError`。
 
-As of ES5, you can create such a noncoercible object -- one without `valueOf()` and `toString()` -- if it has a `null` value for its `[[Prototype]]`, typically created with `Object.create(null)`. See the *this & Object Prototypes* title of this series for more information on `[[Prototype]]`s.
+在ES5中，你可以创建这样一个不可强制转换的对象 —— 没有`valueOf()`和`toString()` —— 如果它的`[[Prototype]]`的值为`null`，这通常是通过`Object.create(null)`来创建的。关于`[[Prototype]]`的详细信息参见本系列的 *this与对象原型*。
 
-**Note:** We cover how to coerce to `number`s later in this chapter in detail, but for this next code snippet, just assume the `Number(..)` function does so.
+**注意：** 我们会在本章稍后讲解如何强制转换至`number`，但对于下面的代码段，想象`Number(..)`函数就是那样做的。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a = {
@@ -290,24 +290,24 @@ Number( [ "abc" ] );	// NaN
 
 ### `ToBoolean`
 
-Next, let's have a little chat about how `boolean`s behave in JS. There's **lots of confusion and misconception** floating out there around this topic, so pay close attention!
+下面，让我们聊一聊在JS中`boolean`如何动作。世面上关于这个话题有 **许多的困惑和误解**，所以集中注意力！
 
-First and foremost, JS has actual keywords `true` and `false`, and they behave exactly as you'd expect of `boolean` values. It's a common misconception that the values `1` and `0` are identical to `true`/`false`. While that may be true in other languages, in JS the `number`s are `number`s and the `boolean`s are `boolean`s. You can coerce `1` to `true` (and vice versa) or `0` to `false` (and vice versa). But they're not the same.
+首先而且最重要的是，JS实际上拥有`true`和`false`关键字，而且它们的行为正如你所期望的`boolean`值一样。一个常见的误解是，值`1`和`0`与`true`/`false`是相同的。虽然这可能在其他语言中是成立的，但在JS中`number`就是`number`，而`boolean`就是`boolean`。你可以将`1`强制转换为`true`（或反之），或将`0`强制转换为`false`（或反之）。但它们不是相同的。
 
-#### Falsy Values
+#### Falsy值
 
-But that's not the end of the story. We need to discuss how values other than the two `boolean`s behave whenever you coerce *to* their `boolean` equivalent.
+但这还不是故事的结尾。我们需要讨论一下，除了这两个`boolean`值以外，当你把其他值强制转换为它们的`boolean`等价物时如何动作。
 
-All of JavaScript's values can be divided into two categories:
+所有的JavaScript值都可以被划分进两个类别：
 
-1. values that will become `false` if coerced to `boolean`
-2. everything else (which will obviously become `true`)
+1. 如果被强制转换为`boolean`，将成为`false`的值
+2. 其它的一切值（很明显将变为`true`）
 
-I'm not just being facetious. The JS spec defines a specific, narrow list of values that will coerce to `false` when coerced to a `boolean` value.
+我不是在出洋相。JS语言规范给那些在强制转换为`boolean`值时将会变为`false`的值定义了一个明确的，小范围的列表。
 
-How do we know what the list of values is? In the ES5 spec, section 9.2 defines a `ToBoolean` abstract operation, which says exactly what happens for all the possible values when you try to coerce them "to boolean."
+我们如何才能知道这个列表中的值是什么？在ES5语言规范中，9.2部分定义了一个`ToBoolean`抽象操作，它讲述了对所有可能的值而言，当你试着强制转换它们为boolean时究竟会发生什么。
 
-From that table, we get the following as the so-called "falsy" values list:
+从这个表格中，我们得到了下面所谓的“falsy”值列表：
 
 * `undefined`
 * `null`
@@ -315,21 +315,21 @@ From that table, we get the following as the so-called "falsy" values list:
 * `+0`, `-0`, and `NaN`
 * `""`
 
-That's it. If a value is on that list, it's a "falsy" value, and it will coerce to `false` if you force a `boolean` coercion on it.
+就是这些。如果一个值在这个列表中，它就是一个“falsy”值，而且当你在它上面进行`boolean`强制转换时它会转换为`false`。
 
-By logical conclusion, if a value is *not* on that list, it must be on *another list*, which we call the "truthy" values list. But JS doesn't really define a "truthy" list per se. It gives some examples, such as saying explicitly that all objects are truthy, but mostly the spec just implies: **anything not explicitly on the falsy list is therefore truthy.**
+通过逻辑上的推论，如果一个值 *不* 在这个列表中，那么它一定在 *另一个列表* 中，也就是我们称为“truthy”值的列表。但是JS没有真正定义一个“truthy”列表。它给出了一些例子，比如它说所有的对象都是truthy，但是语言规范大致上暗示着：**任何没有明确地存在于falsy列表中的东西，都是truthy**。
 
-#### Falsy Objects
+#### Falsy对象
 
-Wait a minute, that section title even sounds contradictory. I literally *just said* the spec calls all objects truthy, right? There should be no such thing as a "falsy object."
+等一下，这一节的标题听起来简直是矛盾的。我 *刚刚才说过* 语言规范将所有对象称为truthy，对吧？应该没有“falsy对象”这样的东西。
 
-What could that possibly even mean?
+这会是什么意思呢？
 
-You might be tempted to think it means an object wrapper (see Chapter 3) around a falsy value (such as `""`, `0` or `false`). But don't fall into that *trap*.
+它可能诱使你认为它意味着一个包装了falsy值（比如`""`，`0`或`false`）的对象包装器（见第三章）。但别掉到这个 *陷阱* 中。
 
-**Note:** That's a subtle specification joke some of you may get.
+**注意：** 这个可能是一个语言规范的微妙笑话。
 
-Consider:
+考虑下面的代码：
 
 ```js
 var a = new Boolean( false );
@@ -337,7 +337,7 @@ var b = new Number( 0 );
 var c = new String( "" );
 ```
 
-We know all three values here are objects (see Chapter 3) wrapped around obviously falsy values. But do these objects behave as `true` or as `false`? That's easy to answer:
+我们知道这三个值都是包装了明显是falsy值的对象（见第三章）。但这些对象是作为`true`还是作为`false`动作呢？这很容易回答：
 
 ```js
 var d = Boolean( a && b && c );
@@ -345,45 +345,45 @@ var d = Boolean( a && b && c );
 d; // true
 ```
 
-So, all three behave as `true`, as that's the only way `d` could end up as `true`.
+所以，三个都作为`true`动作，这是唯一能使`d`得到`true`的方法。
 
-**Tip:** Notice the `Boolean( .. )` wrapped around the `a && b && c` expression -- you might wonder why that's there. We'll come back to that later in this chapter, so make a mental note of it. For a sneak-peek (trivia-wise), try for yourself what `d` will be if you just do `d = a && b && c` without the `Boolean( .. )` call!
+**提示：** 注意包在`a && b && c`表达式外面的`Boolean( .. )` —— 你可能想知道为什么它在这儿。我们会在本章稍后回到这个话题，所以先做个心理准备。为了先睹为快，你可以自己试试如果没有`Boolean( .. )`调用而只有`d = a && b && c`时`d`是什么。
 
-So, if "falsy objects" are **not just objects wrapped around falsy values**, what the heck are they?
+那么，如果“falsy对象” **不是包装着falsy值的对象**，它们是什么鬼东西？
 
-The tricky part is that they can show up in your JS program, but they're not actually part of JavaScript itself.
+刁钻的地方在于，它们可以出现在你的JS程序中，但它们实际上不是JavaScript本身的一部分。
 
-**What!?**
+**什么！？**
 
-There are certain cases where browsers have created their own sort of *exotic* values behavior, namely this idea of "falsy objects," on top of regular JS semantics.
+有些特定的情况，在普通的JS语义之上，浏览器已经创建了它们自己的某种 *外来* 值的行为，也就是这种“falsy对象”的想法。
 
-A "falsy object" is a value that looks and acts like a normal object (properties, etc.), but when you coerce it to a `boolean`, it coerces to a `false` value.
+一个“falsy对象”看起来和动起来都像一个普通对象（属性，等等）的值，但是当你强制转换它为一个`boolean`时，它会变为一个`false`值。
 
-**Why!?**
+**为什么！？**
 
-The most well-known case is `document.all`: an array-like (object) provided to your JS program *by the DOM* (not the JS engine itself), which exposes elements in your page to your JS program. It *used* to behave like a normal object--it would act truthy. But not anymore.
+最著名的例子是`document.all`：一个 *由DOM*（不是JS引擎本身） 给你的JS程序提供的类数组（对象），它向你的JS程序暴露你页面上的元素。它 *曾经* 像一个普通对象那样动作 —— 是一个truthy。但不再是了。
 
-`document.all` itself was never really "standard" and has long since been deprecated/abandoned.
+`document.all`本身从来就不是“标准的”，而且从很早以前就被废弃/抛弃了。
 
-"Can't they just remove it, then?" Sorry, nice try. Wish they could. But there's far too many legacy JS code bases out there that rely on using it.
+“那他们就不能删掉它吗？” 对不起，想得不错。但愿它们能。但是世面上有太多的遗产JS代码库依赖于它。
 
-So, why make it act falsy? Because coercions of `document.all` to `boolean` (like in `if` statements) were almost always used as a means of detecting old, nonstandard IE.
+那么，为什么使它像falsy一样动作？因为从`document.all`到`boolean`的强制转换（比如在`if`语句中）几乎总是用来检测老的，非标准的IE。
 
-IE has long since come up to standards compliance, and in many cases is pushing the web forward as much or more than any other browser. But all that old `if (document.all) { /* it's IE */ }` code is still out there, and much of it is probably never going away. All this legacy code is still assuming it's running in decade-old IE, which just leads to bad browsing experience for IE users.
+IE从很早以前就开始顺应规范了，而且在许多情况下它在推动web向前发展的作用和其他浏览器一样多，甚至更多。但是所有那些老旧的`if (document.all) { /* it's IE */ }`代码依然留在世面上，而且大多数可能永远都不会消失。所有这些遗产代码依然假设它们运行在那些给IE用户带来差劲儿的浏览体验的，几十年前的老IE上，
 
-So, we can't remove `document.all` completely, but IE doesn't want `if (document.all) { .. }` code to work anymore, so that users in modern IE get new, standards-compliant code logic.
+所以，我们不能完全移除`document.all`，但是IE不再想让`if (document.all) { .. }`代码继续工作了，这样现代IE的用户就能得到新的，符合标准的代码逻辑。
 
-"What should we do?" **"I've got it! Let's bastardize the JS type system and pretend that `document.all` is falsy!"
+“我们应当怎么做？” “我知道了！让我们黑进JS的类型系统并假装`document.all`是falsy！”
 
-Ugh. That sucks. It's a crazy gotcha that most JS developers don't understand. But the alternative (doing nothing about the above no-win problems) sucks *just a little bit more*.
+呃。这很烂。这是一个大多数JS开发者们都不理解的疯狂的坑。但是其它的替代方案（对上面两败俱伤的问题什么都不做）还要烂得 *多那么一点点*。
 
-So... that's what we've got: crazy, nonstandard "falsy objects" added to JavaScript by the browsers. Yay!
+所以……这就是我们得到的：由浏览器给JavaScript添加的疯狂，非标准的“falsy对象”。耶！
 
-#### Truthy Values
+#### Truthy值
 
-Back to the truthy list. What exactly are the truthy values? Remember: **a value is truthy if it's not on the falsy list.**
+回到truthy列表。到底什么是truthy值？记住：**如果一个值不在falsy列表中，它就是truthy**。
 
-Consider:
+考虑下面代码：
 
 ```js
 var a = "false";
@@ -395,45 +395,45 @@ var d = Boolean( a && b && c );
 d;
 ```
 
-What value do you expect `d` to have here? It's gotta be either `true` or `false`.
+你期望这里的`d`是什么值？它要么是`true`要么是`false`。
 
-It's `true`. Why? Because despite the contents of those `string` values looking like falsy values, the `string` values themselves are all truthy, because `""` is the only `string` value on the falsy list.
+它是`true`。为什么？因为尽管这些`string`值的内容看起来是falsy值，但是`string`值本身都是truthy，而这是因为在falsy列表中`""`是唯一的`string`值。
 
-What about these?
+那么这些呢？
 
 ```js
-var a = [];				// empty array -- truthy or falsy?
-var b = {};				// empty object -- truthy or falsy?
-var c = function(){};	// empty function -- truthy or falsy?
+var a = [];				// 空数组 -- truthy 还是 falsy?
+var b = {};				// 空对象 -- truthy 还是 falsy?
+var c = function(){};	// 空函数 -- truthy 还是 falsy?
 
 var d = Boolean( a && b && c );
 
 d;
 ```
 
-Yep, you guessed it, `d` is still `true` here. Why? Same reason as before. Despite what it may seem like, `[]`, `{}`, and `function(){}` are *not* on the falsy list, and thus are truthy values.
+是的，你猜到了，这里的`d`依然是`true`。为什么？和前面的原因一样。尽管它们看起来像，但是`[]`，`{}`，和`function(){}` *不在* falsy列表中，因此它们是truthy值。
 
-In other words, the truthy list is infinitely long. It's impossible to make such a list. You can only make a finite falsy list and consult *it*.
+换句话说，truthy列表是无限长的。不可能制成一个这样的列表。你只能制造一个falsy列表并查询它。
 
-Take five minutes, write the falsy list on a post-it note for your computer monitor, or memorize it if you prefer. Either way, you'll easily be able to construct a virtual truthy list whenever you need it by simply asking if it's on the falsy list or not.
+花五分钟，把falsy列表写在便利贴上，然后粘在你的电脑显示器上，或者如果你愿意就记住它。不管哪种方法，你都可以在自己需要的时候通过简单地查询一个值是否在falsy列表中，来构建一个虚拟的truthy列表。
 
-The importance of truthy and falsy is in understanding how a value will behave if you coerce it (either explicitly or implicitly) to a `boolean` value. Now that you have those two lists in mind, we can dive into coercion examples themselves.
+truthy和falsy的重要性在于，理解如果一个值在被（明确地或隐含地）强制转换为`boolean`值的话，它将如何动作。现在你的大脑中有了这两个列表，我们可以深入强制转换的例子本身了。
 
-## Explicit Coercion
+## 明确的强制转换
 
-*Explicit* coercion refers to type conversions that are obvious and explicit. There's a wide range of type conversion usage that clearly falls under the *explicit* coercion category for most developers.
+*明确的* 强制转换指的是明显且明确的类型转换。对于大多数开发者来说，有很多类型转换的用法可以清楚地归类于这种 *明确的* 强制转换。
 
-The goal here is to identify patterns in our code where we can make it clear and obvious that we're converting a value from one type to another, so as to not leave potholes for future developers to trip into. The more explicit we are, the more likely someone later will be able to read our code and understand without undue effort what our intent was.
+我们在这里的目标是，在我们的代码中指明一些模式，在这些模式中我们可以清楚明白地将一个值从一种类型转换至另一种类型，以确保不给未来将读到这段代码的开发者留下任何坑。我们越明确，后来的人就越容易读懂我们的代码，也不必费太多的力气去理解我们的意图。
 
-It would be hard to find any salient disagreements with *explicit* coercion, as it most closely aligns with how the commonly accepted practice of type conversion works in statically typed languages. As such, we'll take for granted (for now) that *explicit* coercion can be agreed upon to not be evil or controversial. We'll revisit this later, though.
+关于 *明确的* 强制转换可能很难找到什么主要的不同意见，因为它与被广泛接受的静态类型语言中的类型转换的工作方式非常接近。因此，我们理所当然地认为（暂且） *明确的* 强制转换可以被认同为不是邪恶的，或没有争议的。虽然我们稍后会回到这个话题。
 
-### Explicitly: Strings <--> Numbers
+### 明确地：Strings <--> Numbers
 
-We'll start with the simplest and perhaps most common coercion operation: coercing values between `string` and `number` representation.
+我们将从最简单，也许是最常见强制转换操作开始：将值在`string`和`number`表现形式之间进行强制转换。
 
-To coerce between `string`s and `number`s, we use the built-in `String(..)` and `Number(..)` functions (which we referred to as "native constructors" in Chapter 3), but **very importantly**, we do not use the `new` keyword in front of them. As such, we're not creating object wrappers.
+为了在`string`和`number`之间进行强制转换，我们使用内建的`String(..)`和`Number(..)`函数（我们在第三章中所指的“原生构造器”），但 **非常重要的是**，我们不在它们前面使用`new`关键字。这样，我们就不是在创建对象包装器。
 
-Instead, we're actually *explicitly coercing* between the two types:
+取而代之的是，我们实际上在两种类型之间进行 *明确地强制转换*：
 
 ```js
 var a = 42;
@@ -446,15 +446,15 @@ b; // "42"
 d; // 3.14
 ```
 
-`String(..)` coerces from any other value to a primitive `string` value, using the rules of the `ToString` operation discussed earlier. `Number(..)` coerces from any other value to a primitive `number` value, using the rules of the `ToNumber` operation discussed earlier.
+`String(..)`使用早先讨论的`ToString`操作的规则，将任意其它的值强制转换为一个基本类型的`string`值。`Number(..)`使用早先讨论过的`ToNumber`操作的规则，将任意其他的值强制转换为一个基本类型的`number`值。
 
-I call this *explicit* coercion because in general, it's pretty obvious to most developers that the end result of these operations is the applicable type conversion.
+我称此为 *明确的* 强制转换是因为，一般对于大多数开发者来说这是十分明显的：这些操作的最终结果是适当的类型转换。
 
-In fact, this usage actually looks a lot like it does in some other statically typed languages.
+实际上，这种用法看起来与其他的静态类型语言中的用法非常相像。
 
-For example, in C/C++, you can say either `(int)x` or `int(x)`, and both will convert the value in `x` to an integer. Both forms are valid, but many prefer the latter, which kinda looks like a function call. In JavaScript, when you say `Number(x)`, it looks awfully similar. Does it matter that it's *actually* a function call in JS? Not really.
+举个例子，在C/C++中，你既可以说`(int)x`也可以说`int(x)`，而且它们都将`x`中的值转换为一个整数。两种形式都是合法的，但是许多人偏向于后者，它看起来有点儿像一个函数调用。在JavaScript中，当你说`Number(x)`时，它看起来极其相似。在JS中它实际上是一个函数调用这个事实重要吗？并非如此。
 
-Besides `String(..)` and `Number(..)`, there are other ways to "explicitly" convert these values between `string` and `number`:
+除了`String(..)`和`Number(..)`，还有其他的方法可以把这些值在`string`和`number`之间进行“明确地”转换：
 
 ```js
 var a = 42;
@@ -467,15 +467,15 @@ b; // "42"
 d; // 3.14
 ```
 
-Calling `a.toString()` is ostensibly explicit (pretty clear that "toString" means "to a string"), but there's some hidden implicitness here. `toString()` cannot be called on a *primitive* value like `42`. So JS automatically "boxes" (see Chapter 3) `42` in an object wrapper, so that `toString()` can be called against the object. In other words, you might call it "explicitly implicit."
+调用`a.toString()`在表面上是明确的（“toString”意味着“变成一个字符串”是很明白的），但是这里有一些藏起来的隐含性。`toString()`不能在像`42`这样的 *基本类型* 值上调用。所以JS会自动地将`42`“封箱”在一个对象包装器中（见第三章），这样`toString()`就可以针对这个对象调用。换句话讲，你可能会叫它“明确的隐含”。
 
-`+c` here is showing the *unary operator* form (operator with only one operand) of the `+` operator. Instead of performing mathematic addition (or string concatenation -- see below), the unary `+` explicitly coerces its operand (`c`) to a `number` value.
+这里的`+c`是`+`操作符的 *一元操作符*（操作符只有一个操作数）形式。取代进行数学加法（或字符串连接 —— 见下面的讨论）的是，一元的`+`明确地将它的操作数（`c`）强制转换为一个`number`值。
 
-Is `+c` *explicit* coercion? Depends on your experience and perspective. If you know (which you do, now!) that unary `+` is explicitly intended for `number` coercion, then it's pretty explicit and obvious. However, if you've never seen it before, it can seem awfully confusing, implicit, with hidden side effects, etc.
+`+c`是 *明确的* 强制转换吗？这要看你的经验和角度。如果你知道（现在你知道了！）一元`+`明确地意味着`number`强制转换，那么它就是相当明确和明显的。但是，如果你以前从没见过它，那么它看起来就极其困惑，晦涩，带有隐含的副作用，等等。
 
-**Note:** The generally accepted perspective in the open-source JS community is that unary `+` is an accepted form of *explicit* coercion.
+**注意：** 在开源的JS社区中一般被接受的观点是，一元`+`是一个 *明确的* 强制转换形式。
 
-Even if you really like the `+c` form, there are definitely places where it can look awfully confusing. Consider:
+即使你真的喜欢`+c`这种形式，它绝对会在有的地方看起来非常令人困惑。考虑下面的代码：
 
 ```js
 var c = "3.14";
@@ -484,23 +484,23 @@ var d = 5+ +c;
 d; // 8.14
 ```
 
-The unary `-` operator also coerces like `+` does, but it also flips the sign of the number. However, you cannot put two `--` next to each other to unflip the sign, as that's parsed as the decrement operator. Instead, you would need to do: `- -"3.14"` with a space in between, and that would result in coercion to `3.14`.
+一元`-`操作符也像`+`一样进行强制转换，但它还会翻转数字的符号。但是你不能放两个减号`--`来使符号翻转回来，因为那将被解释为递减操作符。取代它的是，你需要这么做：`- -"3.14"`，在两个减号之间加入空格，这将会使强制转换的结果为`3.14`。
 
-You can probably dream up all sorts of hideous combinations of binary operators (like `+` for addition) next to the unary form of an operator. Here's another crazy example:
+你可能会想到所有种类的可怕组合 —— 一个二元操作符挨着另一个操作符的一元形式。这里有另一个疯狂的例子：
 
 ```js
 1 + - + + + - + 1;	// 2
 ```
 
-You should strongly consider avoiding unary `+` (or `-`) coercion when it's immediately adjacent to other operators. While the above works, it would almost universally be considered a bad idea. Even `d = +c` (or `d =+ c` for that matter!) can far too easily be confused for `d += c`, which is entirely different!
+当一个一元`+`（或`-`）紧邻其他操作符时，你应当强烈地考虑避免使用它。虽然上面的代码可以工作，但几乎全世界都认为它是一个坏主意。即使是`d = +c`（或者`d =+ c`！）都太容易与`d += c`像混淆了，而后者完全是不同的东西！
 
-**Note:** Another extremely confusing place for unary `+` to be used adjacent to another operator would be the `++` increment operator and `--` decrement operator. For example: `a +++b`, `a + ++b`, and `a + + +b`. See "Expression Side-Effects" in Chapter 5 for more about `++`.
+**注意：** 一元`+`的另一个极端使人困惑的地方是，被用于紧挨着另一个将要作为`++`递增操作符和`--`递减操作符的操作数。例如：`a +++b`，`a + ++b`，和`a + + +b`。更多关于`++`的信息，参见第五章的“表达式副作用”。
 
-Remember, we're trying to be explicit and **reduce** confusion, not make it much worse!
+记住，我们正努力变得明确并 **减少** 困惑，不是把事情弄得更糟！
 
-#### `Date` To `number`
+#### 从`Date`到`number`
 
-Another common usage of the unary `+` operator is to coerce a `Date` object into a `number`, because the result is the unix timestamp (milliseconds elapsed since 1 January 1970 00:00:00 UTC) representation of the date/time value:
+另一个一元`+`操作符的常见用法是将一个`Date`对象强制转换为一个`number`，其结果是这个日期/时间值的unix时间戳（从世界协调时间的1970年1月1日0点开始计算，经过的毫秒数）表现形式：
 
 ```js
 var d = new Date( "Mon, 18 Aug 2014 08:53:06 CDT" );
@@ -508,15 +508,15 @@ var d = new Date( "Mon, 18 Aug 2014 08:53:06 CDT" );
 +d; // 1408369986000
 ```
 
-The most common usage of this idiom is to get the current *now* moment as a timestamp, such as:
+这种习惯性用法经常用于取得当前的 *现在* 时刻的时间戳，比如：
 
 ```js
 var timestamp = +new Date();
 ```
 
-**Note:** Some developers are aware of a peculiar syntactic "trick" in JavaScript, which is that the `()` set on a constructor call (a function called with `new`) is *optional* if there are no arguments to pass. So you may run across the `var timestamp = +new Date;` form. However, not all developers agree that omitting the `()` improves readability, as it's an uncommon syntax exception that only applies to the `new fn()` call form and not the regular `fn()` call form.
+**注意：** 一些开发者知道一个JavaScript中的特别的语法“技巧”，就是在构造器调用（一个带有`new`的函数调用）中如果没有参数值要传递的话，`()`是 *可选的*。所以你可能遇到`var timestamp = +new Date;`形式。然而，不是所有的开发者都同意忽略`()`可以增强可读性，因为它是一种不寻常的语法特例，只能适用于`new fn()`调用形式，而不能用于普通的`fn()`调用形式。
 
-But coercion is not the only way to get the timestamp out of a `Date` object. A noncoercion approach is perhaps even preferable, as it's even more explicit:
+但强制转换不是从`Date`对象中取得时间戳的唯一方法。一个不使用强制转换的方式可能更好，因为它更加明确：
 
 ```js
 var timestamp = new Date().getTime();
@@ -524,13 +524,13 @@ var timestamp = new Date().getTime();
 // var timestamp = (new Date).getTime();
 ```
 
-But an *even more* preferable noncoercion option is to use the ES5 added `Date.now()` static function:
+但是一个 *更更好的* 不使用强制转换的选择是使用ES5加入的`Date.now()`静态函数：
 
 ```js
 var timestamp = Date.now();
 ```
 
-And if you want to polyfill `Date.now()` into older browsers, it's pretty simple:
+而且如果你想要为老版本的浏览器填补`Date.now()`的话，也十分简单：
 
 ```js
 if (!Date.now) {
@@ -540,19 +540,19 @@ if (!Date.now) {
 }
 ```
 
-I'd recommend skipping the coercion forms related to dates. Use `Date.now()` for current *now* timestamps, and `new Date( .. ).getTime()` for getting a timestamp of a specific *non-now* date/time that you need to specify.
+我推荐跳过与日期有关的强制转换形式。使用`Date.now()`来取得当前 *现在* 的时间戳，而使用`new Date( .. ).getTime()`来取得一个需要你指定的 *非现在* 日期/时间的时间戳。
 
-#### The Curious Case of the `~`
+#### 奇异的`~`
 
-One coercive JS operator that is often overlooked and usually very confused is the tilde `~` operator (aka "bitwise NOT"). Many of those who even understand what it does will often times still want to avoid it. But sticking to the spirit of our approach in this book and series, let's dig into it to find out if `~` has anything useful to give us.
+一个经常被忽视并通常让人糊涂的JS强制操作符是波浪线`~`操作符（也叫“按位取反”，“比特非”）。许多理解它在做什么的人也总是想要避开它。但是为了坚持我们在本书和本系列中的精神，让我们深入并找出`~`是否有一些对我们有用的东西。
 
-In the "32-bit (Signed) Integers" section of Chapter 2, we covered how bitwise operators in JS are defined only for 32-bit operations, which means they force their operands to conform to 32-bit value representations. The rules for how this happens are controlled by the `ToInt32` abstract operation (ES5 spec, section 9.5).
+在第二章的“32位（有符号）整数”一节，我们讲解了在JS中位操作符是如何仅为32位操作定义的，这意味着我们强制它们的操作数遵循32位值的表现形式。这个规则如何发生是由`ToInt32`抽象操作（ES5语言规范，9.5部分）控制的。
 
-`ToInt32` first does a `ToNumber` coercion, which means if the value is `"123"`, it's going to first become `123` before the `ToInt32` rules are applied.
+`ToInt32`首先进行`ToNumber`强制转换，这就是说如果值是`"123"`，它在`ToInt32`规则实施之前会首先变成`123`。
 
-While not *technically* coercion itself (since the type doesn't change!), using bitwise operators (like `|` or `~`) with certain special `number` values produces a coercive effect that results in a different `number` value.
+虽然它本身没有 *技术上进行* 强制转换（因为类型没有改变），但对一些特定的特殊`number`值使用位操作符（比如`|`或`~`）会产生一种强制转换效果，这种效果的结果是一个不同的`number`值。
 
-For example, let's first consider the `|` "bitwise OR" operator used in the otherwise no-op idiom `0 | x`, which (as Chapter 2 showed) essentially only does the `ToInt32` conversion:
+举例来说，让我们首先考虑惯用的空操作`0 | x`（在第二种章有展示）中使用的`|`“比特或”操作符，它实质上仅仅进行`ToInt32`转换：
 
 ```js
 0 | -0;			// 0
@@ -561,57 +561,57 @@ For example, let's first consider the `|` "bitwise OR" operator used in the othe
 0 | -Infinity;	// 0
 ```
 
-These special numbers aren't 32-bit representable (since they come from the 64-bit IEEE 754 standard -- see Chapter 2), so `ToInt32` just specifies `0` as the result from these values.
+这些特殊的数字是不可用32位表现的（因为它们源自64位的IEEE 754标准 —— 见第二章），所以`ToInt32`将这些值的结果指定为`0`。
 
-It's debatable if `0 | __` is an *explicit* form of this coercive `ToInt32` operation or if it's more *implicit*. From the spec perspective, it's unquestionably *explicit*, but if you don't understand bitwise operations at this level, it can seem a bit more *implicitly* magical. Nevertheless, consistent with other assertions in this chapter, we will call it *explicit*.
+有争议的是，`0 | __`是否是一种`ToInt32`强制转换操作的 *明确的* 形式，还是更倾向于 *隐含*。从语言规范的角度来说，毫无疑问是 *明确的*，但是如果你没有在这样的层次上理解位操作，它就可能看起来有点像 *隐含的* 魔法。不管怎样，为了与本章中其他的断言保持一致，我们称它为 *明确的*。
 
-So, let's turn our attention back to `~`. The `~` operator first "coerces" to a 32-bit `number` value, and then performs a bitwise negation (flipping each bit's parity).
+那么，让我们把注意力转回`~`。`~`操作符首先将值“强制转换”为一个32位`number`值，然后实施按位取反（翻转每一个比特位）。
 
-**Note:** This is very similar to how `!` not only coerces its value to `boolean` but also flips its parity (see discussion of the "unary `!`" later).
+**注意：** 这与`!`不仅强制转换它的值为`boolean`而且还翻转它的每一位很相似（见后面关于“一元`!`”的讨论）。
 
-But... what!? Why do we care about bits being flipped? That's some pretty specialized, nuanced stuff. It's pretty rare for JS developers to need to reason about individual bits.
+但是……什么！？为什么我们要关心被翻转的比特位？这是一些相当特殊的，微妙的东西。JS开发者需要推理个别比特位是十分少见的。
 
-Another way of thinking about the definition of `~` comes from old-school computer science/discrete Mathematics: `~` performs two's-complement. Great, thanks, that's totally clearer!
+另一种考虑`~`定义的方法是，`~`源自学校中的计算机科学/离散数学：`~`进行二进制取补操作。太好了，谢谢，我完全明白了！
 
-Let's try again: `~x` is roughly the same as `-(x+1)`. That's weird, but slightly easier to reason about. So:
+我们再试一次：`~x`大致与`-(x+1)`相同。这很奇怪，但是稍微容易推理一些。所以：
 
 ```js
 ~42;	// -(42+1) ==> -43
 ```
 
-You're probably still wondering what the heck all this `~` stuff is about, or why it really matters for a coercion discussion. Let's quickly get to the point.
+你可能还在想`~`这个鬼东西到底和什么有关，或者对于强制转换的讨论它究竟有什么要紧。让我们快速进入要点。
 
-Consider `-(x+1)`. What's the only value that you can perform that operation on that will produce a `0` (or `-0` technically!) result? `-1`. In other words, `~` used with a range of `number` values will produce a falsy (easily coercible to `false`) `0` value for the `-1` input value, and any other truthy `number` otherwise.
+考虑一下`-(x+1)`。通过进行这个操作，能够产生结果`0`（或者从技术上说`-0`！）的唯一的值是什么？`-1`。换句话说，`~`用于一个范围的`number`值时，将会为输入值`-1`产生一个falsy（很容易强制转换为`false`）的`0`，而为任意其他的输入产生truthy的`number`。
 
-Why is that relevant?
+为什么这要紧？
 
-`-1` is commonly called a "sentinel value," which basically means a value that's given an arbitrary semantic meaning within the greater set of values of its same type (`number`s). The C-language uses `-1` sentinel values for many functions that return `>= 0` values for "success" and `-1` for "failure."
+`-1`通常称为一个“哨兵值”，它基本上意味着一个在同类型值（`number`）的更大的集合中被赋予了任意的语义。在C语言中许多函数使用哨兵值`-1`，它们返回`>= 0`的值表示“成功”，返回`-1`表示“失败”。
 
-JavaScript adopted this precedent when defining the `string` operation `indexOf(..)`, which searches for a substring and if found returns its zero-based index position, or `-1` if not found.
+JavaScript在定义`string`操作`indexOf(..)`时采纳了这种先例，它搜索一个子字符串，如果找到就返回它从0开始计算的索引位置，没有找到的话就返回`-1`。
 
-It's pretty common to try to use `indexOf(..)` not just as an operation to get the position, but as a `boolean` check of presence/absence of a substring in another `string`. Here's how developers usually perform such checks:
+这样的情况很常见：不仅仅将`indexOf(..)`作为取得位置的操作，而且作为检查一个子字符串存在/不存在于另一个`string`中的`boolean`值。这就是开发者们通常如何进行这样的检查：
 
 ```js
 var a = "Hello World";
 
 if (a.indexOf( "lo" ) >= 0) {	// true
-	// found it!
+	// 找到了！
 }
 if (a.indexOf( "lo" ) != -1) {	// true
-	// found it
+	// 找到了
 }
 
 if (a.indexOf( "ol" ) < 0) {	// true
-	// not found!
+	// 没找到！
 }
 if (a.indexOf( "ol" ) == -1) {	// true
-	// not found!
+	// 没找到！
 }
 ```
 
-I find it kind of gross to look at `>= 0` or `== -1`. It's basically a "leaky abstraction," in that it's leaking underlying implementation behavior -- the usage of sentinel `-1` for "failure" -- into my code. I would prefer to hide such a detail.
+我感觉看着`>= 0`或`== -1`有些恶心。它基本上是一种“抽象泄漏”，这里它将底层的实现行为 —— 使用哨兵值`-1`表示“失败” —— 泄漏到我的代码中。我倒是乐意隐藏这样的细节。
 
-And now, finally, we see why `~` could help us! Using `~` with `indexOf()` "coerces" (actually just transforms) the value **to be appropriately `boolean`-coercible**:
+现在，我们终于看到为什`~`可以帮到我们了！将`~`和`indexOf()`一起使用可以将值“强制转换”（实际上只是变形）为 **可以适当地强制转换为`boolean`的值**：
 
 ```js
 var a = "Hello World";
@@ -619,43 +619,43 @@ var a = "Hello World";
 ~a.indexOf( "lo" );			// -4   <-- truthy!
 
 if (~a.indexOf( "lo" )) {	// true
-	// found it!
+	// 找到了！
 }
 
 ~a.indexOf( "ol" );			// 0    <-- falsy!
 !~a.indexOf( "ol" );		// true
 
 if (!~a.indexOf( "ol" )) {	// true
-	// not found!
+	// 没找到！
 }
 ```
 
-`~` takes the return value of `indexOf(..)` and transforms it: for the "failure" `-1` we get the falsy `0`, and every other value is truthy.
+`~ `拿到`indexOf(..)`的返回值并将它变形：对于“失败”的`-1`我们得到falsy的`0`，而其他的值都是truthy。
 
-**Note:** The `-(x+1)` pseudo-algorithm for `~` would imply that `~-1` is `-0`, but actually it produces `0` because the underlying operation is actually bitwise, not mathematic.
+**注意：** `~`的假想算法`-(x+1)`暗示着`~-1`是`-0`，但是实际上它产生`0`，因为底层的操作其实是按位的，不是数学操作。
 
-Technically, `if (~a.indexOf(..))` is still relying on *implicit* coercion of its resultant `0` to `false` or nonzero to `true`. But overall, `~` still feels to me more like an *explicit* coercion mechanism, as long as you know what it's intended to do in this idiom.
+技术上讲，`if (~a.indexOf(..))`仍然依靠 *隐含的* 强制转换将它的结果`0`变为`false`或非零变为`true`。但总的来说，对我而言`~`更像一种 *明确的* 强制转换机制，只要你知道在这种惯用法中它的意图是什么。
 
-I find this to be cleaner code than the previous `>= 0` / `== -1` clutter.
+我感觉这样的代码要比前面凌乱的`>= 0` / `== -1`更干净。
 
-##### Truncating Bits
+##### 截断比特位
 
-There's one more place `~` may show up in code you run across: some developers use the double tilde `~~` to truncate the decimal part of a `number` (i.e., "coerce" it to a whole number "integer"). It's commonly (though mistakingly) said this is the same result as calling `Math.floor(..)`.
+在你遇到的代码中，还有一个地方可能出现`~`：一些开发者使用双波浪线`~~`来截断一个`number`的小数部分（也就是，将它“强制转换”为一个“整数”）。这通常（虽然是错误的）被说成与调用`Math.floor(..)`的结果相同。
 
-How `~~` works is that the first `~` applies the `ToInt32` "coercion" and does the bitwise flip, and then the second `~` does another bitwise flip, flipping all the bits back to the original state. The end result is just the `ToInt32` "coercion" (aka truncation).
+`~ ~`的工作方式是，第一个`~`实施`ToInt32`“强制转换”并进行按位取反，然后第二个`~`进行另一次按位取反，将每一个比特位都翻转回原来的状态。于是最终的结果就是`ToInt32`“强制转换”（也叫截断）。
 
-**Note:** The bitwise double-flip of `~~` is very similar to the parity double-negate `!!` behavior, explained in the "Explicitly: * --> Boolean" section later.
+**注意：** `~~`的按位双翻转，与双否定`!!`的行为非常相似，它将在稍后的“明确地：* --> Boolean”一节中讲解。
 
-However, `~~` needs some caution/clarification. First, it only works reliably on 32-bit values. But more importantly, it doesn't work the same on negative numbers as `Math.floor(..)` does!
+然而，`~~`需要一些注意/澄清。首先，它仅在32位值上可以可靠地工作。但更重要的是，它在负数上工作的方式与`Math.floor(..)`不同！
 
 ```js
 Math.floor( -49.6 );	// -50
 ~~-49.6;				// -49
 ```
 
-Setting the `Math.floor(..)` difference aside, `~~x` can truncate to a (32-bit) integer. But so does `x | 0`, and seemingly with (slightly) *less effort*.
+把`Math.floor(..)`的不同放在一边，`~~x`可以将值截断为一个（32位）整数。但是`x | 0`也可以，而且看起来还（稍微）*省事儿* 一些。
 
-So, why might you choose `~~x` over `x | 0`, then? Operator precedence (see Chapter 5):
+那么，为什么你可能会选择`~~x`而不是`x | 0`？操作符优先权（见第五章）：
 
 ```js
 ~~1E20 / 10;		// 166199296
@@ -664,13 +664,13 @@ So, why might you choose `~~x` over `x | 0`, then? Operator precedence (see Chap
 (1E20 | 0) / 10;	// 166199296
 ```
 
-Just as with all other advice here, use `~` and `~~` as explicit mechanisms for "coercion" and value transformation only if everyone who reads/writes such code is properly aware of how these operators work!
+正如这里给出的其他建议一样，仅在读/写这样的代码的每一个人都知道这些操作符如何工作的情况下，才将`~`和`~~`作为“强制转换”和将值变形的明确机制。
 
-### Explicitly: Parsing Numeric Strings
+### 明确地：解析数字字符串
 
-A similar outcome to coercing a `string` to a `number` can be achieved by parsing a `number` out of a `string`'s character contents. There are, however, distinct differences between this parsing and the type conversion we examined above.
+将一个`string`强制转换为一个`number`的类似结果，可以通过从`string`的字符内容中解析（parsing）出一个`number`得到。然而在这种解析和我们上面讲解的类型转换之间存在着区别。
 
-Consider:
+考虑下面的代码：
 
 ```js
 var a = "42";
@@ -683,21 +683,21 @@ Number( b );	// NaN
 parseInt( b );	// 42
 ```
 
-Parsing a numeric value out of a string is *tolerant* of non-numeric characters -- it just stops parsing left-to-right when encountered -- whereas coercion is *not tolerant* and fails resulting in the `NaN` value.
+从一个字符串中解析出一个数字是 *容忍* 非数字字符的 —— 从左到右，如果遇到非数字字符就停止解析 —— 而强制转换是 *不容忍* 并且会失败而得出值`NaN`。
 
-Parsing should not be seen as a substitute for coercion. These two tasks, while similar, have different purposes. Parse a `string` as a `number` when you don't know/care what other non-numeric characters there may be on the right-hand side. Coerce a `string` (to a `number`) when the only acceptable values are numeric and something like `"42px"` should be rejected as a `number`.
+解析不应当被视为强制转换的替代品。这两种任务虽然相似，但是有着不同的目的。当你不知道/不关心右手边可能有什么其他的非数字字符时，你可以将一个`string`作为`number`解析。当只有数字才是可接受的值，而且像`"42px"`这样的东西作为数字应当被排除时，就强制转换一个`string`（变为一个`number`）。
 
-**Tip:** `parseInt(..)` has a twin, `parseFloat(..)`, which (as it sounds) pulls out a floating-point number from a string.
+**提示：** `parseInt(..)`有一个孪生兄弟，`parseFloat(..)`，它（听起来）从一个字符串中拉出一个浮点数。
 
-Don't forget that `parseInt(..)` operates on `string` values. It makes absolutely no sense to pass a `number` value to `parseInt(..)`. Nor would it make sense to pass any other type of value, like `true`, `function(){..}` or `[1,2,3]`.
+不要忘了`parseInt(..)`工作在`string`值上。向`parseInt(..)`传递一个`number`绝对没有任何意义。传递其他任何类型也都没有意义，比如`true`， `function(){..}`或`[1,2,3]`。
 
-If you pass a non-`string`, the value you pass will automatically be coerced to a `string` first (see "`ToString`" earlier), which would clearly be a kind of hidden *implicit* coercion. It's a really bad idea to rely upon such a behavior in your program, so never use `parseInt(..)` with a non-`string` value.
+如果你传入一个非`string`，你所传入的值首先将自动地被强制转换为一个`string`（见早先的“`ToString`”），这很明显是一种隐藏的 *隐含* 强制转换。在你的程序中依赖这样的行为真的是一个坏主意，所以永远也不要将`parseInt(..)`与非`string`值一起使用。
 
-Prior to ES5, another gotcha existed with `parseInt(..)`, which was the source of many JS programs' bugs. If you didn't pass a second argument to indicate which numeric base (aka radix) to use for interpreting the numeric `string` contents, `parseInt(..)` would look at the beginning character(s) to make a guess.
+在ES5之前，`parseInt(..)`还存在另外一个坑，这曾是许多JS程序的bug的根源。如果你不传递第二个参数来指定使用哪种进制（也叫基数）来翻译数字的`string`内容，`parseInt(..)`将会根据开头的字符进行猜测。
 
-If the first two characters were `"0x"` or `"0X"`, the guess (by convention) was that you wanted to interpret the `string` as a hexadecimal (base-16) `number`. Otherwise, if the first character was `"0"`, the guess (again, by convention) was that you wanted to interpret the `string` as an octal (base-8) `number`.
+如果开头的两个字符是`"0x"`或`"0X"`，那么猜测（根据惯例）将是你想要将这个`string`翻译为一个16进制`number`。否则，如果第一个字符是`"0"`，那么猜测（也是根据惯例）将是你想要将这个`string`翻译成8进制`number`。
 
-Hexadecimal `string`s (with the leading `0x` or `0X`) aren't terribly easy to get mixed up. But the octal number guessing proved devilishly common. For example:
+16进制的`string`（以`0x`或`0X`开头）没那么容易搞混。但是事实证明8进制数字的猜测过于常见了。比如：
 
 ```js
 var hour = parseInt( selectedHour.value );
@@ -706,42 +706,42 @@ var minute = parseInt( selectedMinute.value );
 console.log( "The time you selected was: " + hour + ":" + minute);
 ```
 
-Seems harmless, right? Try selecting `08` for the hour and `09` for the minute. You'll get `0:0`. Why? because neither `8` nor `9` are valid characters in octal base-8.
+看起来无害，对吧？试着在小时上选择`08`在分钟上选择`09`。你会得到`0:0`。为什么？因为`8`和`9`都不是合法的8进制数。
 
-The pre-ES5 fix was simple, but so easy to forget: **always pass `10` as the second argument**. This was totally safe:
+ES5之前的修改很简单，但是很容易忘：**总是在第二个参数值上传递`10`**。这完全是安全的：
 
 ```js
 var hour = parseInt( selectedHour.value, 10 );
 var minute = parseInt( selectedMiniute.value, 10 );
 ```
 
-As of ES5, `parseInt(..)` no longer guesses octal. Unless you say otherwise, it assumes base-10 (or base-16 for `"0x"` prefixes). That's much nicer. Just be careful if your code has to run in pre-ES5 environments, in which case you still need to pass `10` for the radix.
+在ES5中，`parseInt(..)`不再猜测八进制数了。除非你指定，否则它会假定为10进制（或者为`"0x"`前缀猜测16进制数）。这好多了。只是要小心，如果你的代码不得不运行在前ES5环境中，你仍然需要为基数传递`10`。
 
-#### Parsing Non-Strings
+#### 解析非字符串
 
-One somewhat infamous example of `parseInt(..)`'s behavior is highlighted in a sarcastic joke post a few years ago, poking fun at this JS behavior:
+几年以前有一个挖苦JS的玩笑，使一个关于`parseInt(..)`行为的一个臭名昭著的例子备受关注，它取笑JS的这个行为：
 
 ```js
 parseInt( 1/0, 19 ); // 18
 ```
 
-The assumptive (but totally invalid) assertion was, "If I pass in Infinity, and parse an integer out of that, I should get Infinity back, not 18." Surely, JS must be crazy for this outcome, right?
+这里面设想（但完全不合法）的断言是，“如果我传入一个无限大，并从中解析出一个整数的话，我应该得到一个无限大，不是18”。没错，JS一定是疯了才得出这个结果，对吧？
 
-Though this example is obviously contrived and unreal, let's indulge the madness for a moment and examine whether JS really is that crazy.
+虽然这是个明显故意造成的，不真实的例子，但是让我们放纵这种疯狂一小会儿，来检视一下JS是否真的那么疯狂。
 
-First off, the most obvious sin committed here is to pass a non-`string` to `parseInt(..)`. That's a no-no. Do it and you're asking for trouble. But even if you do, JS politely coerces what you pass in into a `string` that it can try to parse.
+首先，这其中最明显的原罪是将一个非`string`传入了`parseInt(..)`。这是不对的。这么做是自找麻烦。但就算你这么做了，JS也会礼貌地将你传入的东西强制转换为它可以解析的`string`。
 
-Some would argue that this is unreasonable behavior, and that `parseInt(..)` should refuse to operate on a non-`string` value. Should it perhaps throw an error? That would be very Java-like, frankly. I shudder at thinking JS should start throwing errors all over the place so that `try..catch` is needed around almost every line.
+有些人可能会争论说这是一种不合理的行为，`parseInt(..)`应当拒绝在一个非`string`值上操作。它应该抛出一个错误吗？坦白地说，像Java那样。但是一想到JS应当开始在满世界抛出错误，以至于几乎每一行代码都需要用`try..catch`围起来，我就不寒而栗。
 
-Should it return `NaN`? Maybe. But... what about:
+它应当返回`NaN`吗？也许。但是……要是这样呢：
 
 ```js
 parseInt( new String( "42") );
 ```
 
-Should that fail, too? It's a non-`string` value. If you want that `String` object wrapper to be unboxed to `"42"`, then is it really so unusual for `42` to first become `"42"` so that `42` can be parsed back out?
+这也应当失败吗？它是一个非`string`值啊。如果你想让`String`对象包装器被开箱成`"42"`，那么`42`先变成`"42"`，以使`42`可以被解析回来就那么不寻常吗？
 
-I would argue that this half-*explicit*, half-*implicit* coercion that can occur can often be a very helpful thing. For example:
+我会争论说，这种可能发生的半 *明确* 半 *隐含* 的强制转换经常可以成为非常有用的东西。比如：
 
 ```js
 var a = {
@@ -752,19 +752,19 @@ var a = {
 parseInt( a ); // 42
 ```
 
-The fact that `parseInt(..)` forcibly coerces its value to a `string` to perform the parse on is quite sensible. If you pass in garbage, and you get garbage back out, don't blame the trash can -- it just did its job faithfully.
+事实上`parseInt(..)`将它的值强制转换为`string`来实施解析是十分合理的。如果你传垃圾进去，那么你就会得到垃圾，不要责备垃圾桶 —— 它只是忠实地尽自己的责任。
 
-So, if you pass in a value like `Infinity` (the result of `1 / 0` obviously), what sort of `string` representation would make the most sense for its coercion? Only two reasonable choices come to mind: `"Infinity"` and `"∞"`. JS chose `"Infinity"`. I'm glad it did.
+那么，如果你传入像`Infinity`（很明显是`1 / 0`的结果）这样的值，对于它的强制转换来说哪种`string`表现形式最有道理呢？我脑中只有两种合理的选择：`"Infinity"`和`"∞"`。JS选择了`"Infinity"`。我很高兴它这么选。
 
-I think it's a good thing that **all values** in JS have some sort of default `string` representation, so that they aren't mysterious black boxes that we can't debug and reason about.
+我认为在JS中 **所有的值** 都有某种默认的`string`表现形式是一件好事，这样它们就不是我们不能调试和推理的神秘黑箱了。
 
-Now, what about base-19? Obviously, completely bogus and contrived. No real JS programs use base-19. It's absurd. But again, let's indulge the ridiculousness. In base-19, the valid numeric characters are `0` - `9` and `a` - `i` (case insensitive).
+现在，关于19进制呢？很明显，这完全是伪命题和造作。没有真实的JS程序使用19进制。那太荒谬了。但是，让我们再一次放任这种荒谬。在19进制中，合法的数字字符是`0` - `9`和`a` - `i`（大小写无关）。
 
-So, back to our `parseInt( 1/0, 19 )` example. It's essentially `parseInt( "Infinity", 19 )`. How does it parse? The first character is `"I"`, which is value `18` in the silly base-19. The second character `"n"` is not in the valid set of numeric characters, and as such the parsing simply politely stops, just like when it ran across `"p"` in `"42px"`.
+那么，回到我们的`parseInt( 1/0, 19 )`例子。它实质上是`parseInt( "Infinity", 19 )`。它如何解析？第一个字符是`"I"`，在愚蠢的19进制中是值`18`。第二个字符`"n"`不再合法的数字字符集内，所以这样的解析就礼貌地停止了，就像它在`"42px"`中遇到`"p"`那样。
 
-The result? `18`. Exactly like it sensibly should be. The behaviors involved to get us there, and not to an error or to `Infinity` itself, are **very important** to JS, and should not be so easily discarded.
+结果呢？`18`。正如它应该的那样。对JS来说，并非一个错误或者`Infinity`本身，而是将我们带到这里的一系列的行为才是 **非常重要** 的，不应当那么简单地被丢弃。
 
-Other examples of this behavior with `parseInt(..)` that may be surprising but are quite sensible include:
+其他关于`parseInt(..)`行为的，令人吃惊但又十分合理的例子还包括：
 
 ```js
 parseInt( 0.000008 );		// 0   ("0" from "0.000008")
@@ -776,13 +776,13 @@ parseInt( "0x10" );			// 16
 parseInt( "103", 2 );		// 2
 ```
 
-`parseInt(..)` is actually pretty predictable and consistent in its behavior. If you use it correctly, you'll get sensible results. If you use it incorrectly, the crazy results you get are not the fault of JavaScript.
+其实`parseInt(..)`在它的行为上是相当可预见和一致的。如果你正确地使用它，你就能得到合理的结果。如果你不正确地使用它，那么你得到的疯狂结果并不是JavaScript的错。
 
-### Explicitly: * --> Boolean
+### 明确地：* --> Boolean
 
-Now, let's examine coercing from any non-`boolean` value to a `boolean`.
+现在，我们来检视从任意的非`boolean`值到一个`boolean`值的强制转换。
 
-Just like with `String(..)` and `Number(..)` above, `Boolean(..)` (without the `new`, of course!) is an explicit way of forcing the `ToBoolean` coercion:
+正如上面的`String(..)`和`Number(..)`，`Boolean(..)`（当然，不带`new`！）是强制进行`ToBoolean`转换的明确方法：
 
 ```js
 var a = "0";
@@ -800,13 +800,14 @@ Boolean( c ); // true
 
 Boolean( d ); // false
 Boolean( e ); // false
+
 Boolean( f ); // false
 Boolean( g ); // false
 ```
 
-While `Boolean(..)` is clearly explicit, it's not at all common or idiomatic.
+虽然`Boolean(..)`是非常明确的，但是它并不常见也不为人所惯用。
 
-Just like the unary `+` operator coerces a value to a `number` (see above), the unary `!` negate operator explicitly coerces a value to a `boolean`. The *problem* is that it also flips the value from truthy to falsy or vice versa. So, the most common way JS developers explicitly coerce to `boolean` is to use the `!!` double-negate operator, because the second `!` will flip the parity back to the original:
+正如一元`+`操作符将一个值强制转换为一个`number`（参见上面的讨论），一元的`!`否定操作符可以将一个值明确地强制转换为一个`boolean`。*问题* 是它还将值从truthy翻转为falsy，或反之。所以，大多数JS开发者使用`!!`双否定操作符进行`boolean`强制转换，因为第二个`!`将会把它翻转回原本的true或false：
 
 ```js
 var a = "0";
@@ -828,9 +829,9 @@ var g;
 !!g;	// false
 ```
 
-Any of these `ToBoolean` coercions would happen *implicitly* without the `Boolean(..)` or `!!`, if used in a `boolean` context such as an `if (..) ..` statement. But the goal here is to explicitly force the value to a `boolean` to make it clearer that the `ToBoolean` coercion is intended.
+没有`Boolean(..)`或`!!`的话，任何这些`ToBoolean`强制转换都将 *隐含地* 发生，比如在一个`if (..) ..`语句这样使用`boolean`的上下文中。但这里的目标是，明确地强制一个值成为`boolean`来使`ToBoolean`强制转换的意图显得明明白白。
 
-Another example use-case for explicit `ToBoolean` coercion is if you want to force a `true`/`false` value coercion in the JSON serialization of a data structure:
+另一个`ToBoolean`强制转换的用例是，如果你想在数据结构的JSON序列化中强制转换一个`true`/`false`：
 
 ```js
 var a = [
@@ -844,7 +845,7 @@ JSON.stringify( a ); // "[1,null,2,null]"
 
 JSON.stringify( a, function(key,val){
 	if (typeof val == "function") {
-		// force `ToBoolean` coercion of the function
+		// 强制函数进行 `ToBoolean` 转换
 		return !!val;
 	}
 	else {
@@ -854,7 +855,7 @@ JSON.stringify( a, function(key,val){
 // "[1,true,2,true]"
 ```
 
-If you come to JavaScript from Java, you may recognize this idiom:
+如果你是从Java来到JavaScript的话，你可能会认得这个惯用法：
 
 ```js
 var a = 42;
@@ -862,69 +863,69 @@ var a = 42;
 var b = a ? true : false;
 ```
 
-The `? :` ternary operator will test `a` for truthiness, and based on that test will either assign `true` or `false` to `b`, accordingly.
+`? :`三元操作符将会测试`a`的真假，然后根据这个测试的结果相应地将`true`或`false`赋值给`b`。
 
-On its surface, this idiom looks like a form of *explicit* `ToBoolean`-type coercion, since it's obvious that only either `true` or `false` come out of the operation.
+表面上，这个惯用法看起来是一种 *明确的* `ToBoolean`类型强制转换形式，因为很明显它操作的结果要么是`true`要么是`false`。
 
-However, there's a hidden *implicit* coercion, in that the `a` expression has to first be coerced to `boolean` to perform the truthiness test. I'd call this idiom "explicitly implicit." Furthermore, I'd suggest **you should avoid this idiom completely** in JavaScript. It offers no real benefit, and worse, masquerades as something it's not.
+然而，这里有一个隐藏的 *隐含* 强制转换，就是表达式`a`不得不首先被强制转换为`boolean`来进行真假测试。我称这种惯用法为“明确地隐含”。另外，我建议你在JavaScript中 **完全避免这种惯用法**。它不会提供真正的好处，而且会让事情变得更糟。
 
-`Boolean(a)` and `!!a` are far better as *explicit* coercion options.
+对于 *明确的* 强制转换`Boolean(a)`和`!!a`是好得多的选项。
 
-## Implicit Coercion
+## 隐含的强制转换
 
-*Implicit* coercion refers to type conversions that are hidden, with non-obvious side-effects that implicitly occur from other actions. In other words, *implicit coercions* are any type conversions that aren't obvious (to you).
+*隐含的* 强制转换是指这样的类型转换：它们是隐藏的，由于其他的动作隐含地发生的不明显的副作用。换句话说，任何（对你）不明显的类型转换都是 *隐含的强制转换*。
 
-While it's clear what the goal of *explicit* coercion is (making code explicit and more understandable), it might be *too* obvious that *implicit* coercion has the opposite goal: making code harder to understand.
+虽然 *明确的* 强制转换的目的很明白，但是这可能 *太过* 明显 —— *隐含的* 强制转换拥有相反的目的：使代码更难理解。
 
-Taken at face value, I believe that's where much of the ire towards coercion comes from. The majority of complaints about "JavaScript coercion" are actually aimed (whether they realize it or not) at *implicit* coercion.
+从表面上来看，我相信这就是许多关于强制转换的愤怒的源头。绝大多数关于“JavaScript强制转换”的抱怨实际上都指向了（不管他们是否理解它） *隐含的* 强制转换。
 
-**Note:** Douglas Crockford, author of *"JavaScript: The Good Parts"*, has claimed in many conference talks and writings that JavaScript coercion should be avoided. But what he seems to mean is that *implicit* coercion is bad (in his opinion). However, if you read his own code, you'll find plenty of examples of coercion, both *implicit* and *explicit*! In truth, his angst seems to primarily be directed at the `==` operation, but as you'll see in this chapter, that's only part of the coercion mechanism.
+**注意：** Douglas Crockford，*"JavaScript: The Good Parts"* 的作者，在许多会议和他的作品中声称应当避免JavaScript强制转换。但看起来他的意思是 *隐含的* 强制转换是不好的（以他的意见）。然而，如果你读他自己的代码的话，你会发现相当多的强制转换的例子，*明确* 和 *隐含* 都有！事实上，他的担忧主要在于`==`操作，但正如你将在本章中看到的，那只是强制转换机制的一部分。
 
-So, **is implicit coercion** evil? Is it dangerous? Is it a flaw in JavaScript's design? Should we avoid it at all costs?
+那么，**隐含强制转换** 是邪恶的吗？它很危险吗？它是JavaScript设计上的缺陷吗？我们应该尽一切力量避免它吗？
 
-I bet most of you readers are inclined to enthusiastically cheer, "Yes!"
+我打赌大多数读者都倾向于踊跃地欢呼，“是的！”
 
-**Not so fast.** Hear me out.
+**别那么着急**。听我把话说完。
 
-Let's take a different perspective on what *implicit* coercion is, and can be, than just that it's "the opposite of the good explicit kind of coercion." That's far too narrow and misses an important nuance.
+让我们在 *隐含的* 强制转换是什么，和可以是什么这个问题上采取一个不同的角度，而不是仅仅说它是“好的明确强制转换的反面”。这太过狭隘，而且忽视了一个重要的微妙细节。
 
-Let's define the goal of *implicit* coercion as: to reduce verbosity, boilerplate, and/or unnecessary implementation detail that clutters up our code with noise that distracts from the more important intent.
+让我们将 *隐含的* 强制转换的目的定义为：减少搞乱我们代码的繁冗，模板代码，和/或不必要的实现细节，不使它们的噪音掩盖更重要的意图。
 
-### Simplifying Implicitly
+### 用于简化的隐含
 
-Before we even get to JavaScript, let me suggest something pseudo-code'ish from some theoretical strongly typed language to illustrate:
+在我们进入JavaScript以前，我建议使用某个理论上是强类型的语言的假想代码来说明一下：
 
 ```js
 SomeType x = SomeType( AnotherType( y ) )
 ```
 
-In this example, I have some arbitrary type of value in `y` that I want to convert to the `SomeType` type. The problem is, this language can't go directly from whatever `y` currently is to `SomeType`. It needs an intermediate step, where it first converts to `AnotherType`, and then from `AnotherType` to `SomeType`.
+在这个例子中，我在`y`中有一些任意类型的值，想把它转换为`SomeType`类型。问题是，这种语言不能从当前`y`的类型直接走到`SomeType`。它需要一个中间步骤，它首先转换为`AnotherType`，然后从`AnotherType`转换到`SomeType`。
 
-Now, what if that language (or definition you could create yourself with the language) *did* just let you say:
+现在，要是这种语言（或者你可用这种语言创建自己的定义）允许你这么说呢：
 
 ```js
 SomeType x = SomeType( y )
 ```
 
-Wouldn't you generally agree that we simplified the type conversion here to reduce the unnecessary "noise" of the intermediate conversion step? I mean, is it *really* all that important, right here at this point in the code, to see and deal with the fact that `y` goes to `AnotherType` first before then going to `SomeType`?
+难道一般来说你不会同意我们简化了这里的类型转换，降低了中间转换步骤的无谓的“噪音”吗？我的意思是，在这段代码的这一点上，能看到并处理`y`先变为`AnotherType`然后再变为`SomeType`的事实，*真的* 是很重要的一件事吗？
 
-Some would argue, at least in some circumstances, yes. But I think an equal argument can be made of many other circumstances that here, the simplification **actually aids in the readability of the code** by abstracting or hiding away such details, either in the language itself or in our own abstractions.
+有些人可能会争辩，至少在某些环境下，是的。但我想我可以做出相同的争辩说，在许多其他的环境下，不管是通过语言本身的还是我们自己的抽象，这样的简化通过抽象或隐藏这些细节 **确实增强了代码的可读性**。
 
-Undoubtedly, behind the scenes, somewhere, the intermediate conversion step is still happening. But if that detail is hidden from view here, we can just reason about getting `y` to type `SomeType` as a generic operation and hide the messy details.
+毫无疑问，在幕后的某些地方，那个中间的步骤依然是发生的。但如果这样的细节在视野中隐藏起来，我们就可以将使`y`变为类型`SomeType`作为一个泛化操作来推理，并隐藏混乱的细节。
 
-While not a perfect analogy, what I'm going to argue throughout the rest of this chapter is that JS *implicit* coercion can be thought of as providing a similar aid to your code.
+虽然不是一个完美的类比，我要在本章剩余部分争论的是，JS的 *隐含的* 强制转换可以被认为是给你的代码提供了一个类似的辅助。
 
-But, **and this is very important**, that is not an unbounded, absolute statement. There are definitely plenty of *evils* lurking around *implicit* coercion, that will harm your code much more than any potential readability improvements. Clearly, we have to learn how to avoid such constructs so we don't poison our code with all manner of bugs.
+但是，**很重要的是**，这不是一个无边界的，绝对的论断。绝对有许多 *邪恶的东西* 潜伏在 *隐含* 强制转换周围，它们对你的代码造成的损害要比任何潜在的可读性改善厉害的多。很清楚，我们不得不学习如何避免这样的结构，使我们不会用各种bug来毒害我们的代码。
 
-Many developers believe that if a mechanism can do some useful thing **A** but can also be abused or misused to do some awful thing **Z**, then we should throw out that mechanism altogether, just to be safe.
+许多开发者相信，如果一个机制可以做某些有用的事儿 **A**，但也可以被滥用或误用来做某些可怕的事儿 **Z**，那么我们就应当将这种机制整个儿扔掉，仅仅是为了安全。
 
-My encouragement to you is: don't settle for that. Don't "throw the baby out with the bathwater." Don't assume *implicit* coercion is all bad because all you think you've ever seen is its "bad parts." I think there are "good parts" here, and I want to help and inspire more of you to find and embrace them!
+我对你的鼓励是：不要安心于此。不要“把孩子跟洗澡水一起泼出去”。不要因为你只见到过它的“坏的一面”就假设 *隐含* 强制转换都是坏的。我认为这里有“好的一面”，而我想要帮助和启发你们更多的人找到并接纳它们！
 
-### Implicitly: Strings <--> Numbers
+### 隐含地：Strings <--> Numbers
 
-Earlier in this chapter, we explored *explicitly* coercing between `string` and `number` values. Now, let's explore the same task but with *implicit* coercion approaches. But before we do, we have to examine some nuances of operations that will *implicitly* force coercion.
+在本章的早先，我们探索了`string`和`number`值之间的 *明确* 强制转换。现在，让我们使用 *隐含* 强制转换的方式探索相同的任务。但在我们开始之前，我们不得不检视一些将会 *隐含地* 发生强制转换的操作的微妙之处。
 
-The `+` operator is overloaded to serve the purposes of both `number` addition and `string` concatenation. So how does JS know which type of operation you want to use? Consider:
+为了服务于`number`的相加和`string`的连接两个目的，`+`操作符被重载了。那么JS如何知道你想用的是哪一种操作呢？考虑下面的代码：
 
 ```js
 var a = "42";
@@ -937,9 +938,9 @@ a + b; // "420"
 c + d; // 42
 ```
 
-What's different that causes `"420"` vs `42`? It's a common misconception that the difference is whether one or both of the operands is a `string`, as that means `+` will assume `string` concatenation. While that's partially true, it's more complicated than that.
+是什么不同导致了`"420"`和`42`？一个常见的误解是，这个不同之处在于操作数之一或两者是否是一个`string`，这意味着`+`将假设`string`连接。虽然这有一部分是对的，但实际情况要更复杂。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a = [1,2];
@@ -948,25 +949,25 @@ var b = [3,4];
 a + b; // "1,23,4"
 ```
 
-Neither of these operands is a `string`, but clearly they were both coerced to `string`s and then the `string` concatenation kicked in. So what's really going on?
+两个操作数都不是`string`，但很明显它们都被强制转换为`string`然后启动了`string`连接。那么到底发生了什么？
 
-(**Warning:** deeply nitty gritty spec-speak coming, so skip the next two paragraphs if that intimidates you!)
-
------
-
-According to ES5 spec section 11.6.1, the `+` algorithm (when an `object` value is an operand) will concatenate if either operand is either already a `string`, or if the following steps produce a `string` representation. So, when `+` receives an `object` (including `array`) for either operand, it first calls the `ToPrimitive` abstract operation (section 9.1) on the value, which then calls the `[[DefaultValue]]` algorithm (section 8.12.8) with a context hint of `number`.
-
-If you're paying close attention, you'll notice that this operation is now identical to how the `ToNumber` abstract operation handles `object`s (see the "`ToNumber`"" section earlier). The `valueOf()` operation on the `array` will fail to produce a simple primitive, so it then falls to a `toString()` representation. The two `array`s thus become `"1,2"` and `"3,4"`, respectively. Now, `+` concatenates the two `string`s as you'd normally expect: `"1,23,4"`.
+（**警告：** 语言规范式的深度细节就要来了，如果这会吓到你就跳过下面两段！）
 
 -----
 
-Let's set aside those messy details and go back to an earlier, simplified explanation: if either operand to `+` is a `string` (or becomes one with the above steps!), the operation will be `string` concatenation. Otherwise, it's always numeric addition.
+根据ES5语言规范的11.6.1部分，`+`的算法是（当一个操作数是`object`值时），如果两个操作数之一已经是一个`string`，或者下列步骤产生一个`string`表达形式，`+`将会进行连接。所以，当`+`的两个操作数之一收到一个`object`（包括`array`）时，它首先在这个值上调用`ToPrimitive`抽象操作（9.1部分），而它会带着`number`的上下文环境提示来调用`[[DefaultValue]]`算法（8.12.8部分）。
 
-**Note:** A commonly cited coercion gotcha is `[] + {}` vs. `{} + []`, as those two expressions result, respectively, in `"[object Object]"` and `0`. There's more to it, though, and we cover those details in "Blocks" in Chapter 5.
+如果你仔细观察，你会发现这个操作现在和`ToNumber`抽象操作处理`object`的过程是一样的（参见早先的“`ToNumber`”一节）。在`array`上的`valueOf()`操作将会在产生一个简单基本类型时失败，于是它退回到一个`toString()`表现形式。两个`array`因此分别变成了`"1,2"`和`"3,4"`。现在，`+`就如你通常期望的那样连接这两个`string`：`"1,23,4"`。
 
-What's that mean for *implicit* coercion?
+-----
 
-You can coerce a `number` to a `string` simply by "adding" the `number` and the `""` empty `string`:
+让我们把这些乱七八糟的细节放在一边，回到一个早前的，简化的解释：如果`+`的两个操作数之一是一个`string`（或在上面的步骤中成为一个`string`），那么操作就会是`string`连接。否则，它总是数字加法。
+
+**注意：** 关于强制转换，一个经常被引用的坑是`[] + {}`和`{} + []`，这两个表达式的结果分别是`"[object Object]"`和`0`。虽然对此有更多的东西，但是我们将在第五章的“Block”中讲解这其中的细节。
+
+这对 *隐含* 强制转换意味着什么？
+
+你可以简单地通过将`number`和空`string``""`“相加”来把一个`number`强制转换为一个`string`：
 
 ```js
 var a = 42;
@@ -975,17 +976,17 @@ var b = a + "";
 b; // "42"
 ```
 
-**Tip:** Numeric addition with the `+` operator is commutative, which means `2 + 3` is the same as `3 + 2`. String concatenation with `+` is obviously not generally commutative, **but** with the specific case of `""`, it's effectively commutative, as `a + ""` and `"" + a` will produce the same result.
+**提示：** 使用`+`操作符的数字加法是可交换的，这意味着`2 + 3`与`3 + 2`是相同的。使用`+`的字符串连接很明显通常不是可交换的，**但是** 对于`""`的特定情况，它实质上是可交换的，因为`a + ""`和`"" + a`会产生相同的结果。
 
-It's extremely common/idiomatic to (*implicitly*) coerce `number` to `string` with a `+ ""` operation. In fact, interestingly, even some of the most vocal critics of *implicit* coercion still use that approach in their own code, instead of one of its *explicit* alternatives.
+使用一个`+ ""`操作将`number`（*隐含地*）强制转换为`string`是极其常见/惯用的。事实上，有趣的是，一些在口头上批评 *隐含* 强制转换得最严厉的人仍然在他们自己的代码中使用这种方式，而不是使用它的 *明确的* 替代形式。
 
-**I think this is a great example** of a useful form in *implicit* coercion, despite how frequently the mechanism gets criticized!
+在 *隐含* 强制转换的有用形式中，**我认为这是一个很棒的例子**，尽管这种机制那么频繁地被人诟病！
 
-Comparing this *implicit* coercion of `a + ""` to our earlier example of `String(a)` *explicit* coercion, there's one additional quirk to be aware of. Because of how the `ToPrimitive` abstract operation works, `a + ""` invokes `valueOf()` on the `a` value, whose return value is then finally converted to a `string` via the internal `ToString` abstract operation. But `String(a)` just invokes `toString()` directly.
+将`a + ""`这种 *隐含的* 强制转换与我们早先的`String(a)`*明确的* 强制转换的例子相比较，有一个另外的需要小心的奇怪之处。由于`ToPrimitive`抽象操作的工作方式，`a + ""`在值`a`上调用`valueOf()`，它的返回值再最终通过内部的`ToString`抽象操作转换为一个`string`。但是`String(a)`只直接调用`toString()`。
 
-Both approaches ultimately result in a `string`, but if you're using an `object` instead of a regular primitive `number` value, you may not necessarily get the *same* `string` value!
+两种方式的最终结果都是一个`string`，但如果你使用一个`object`而不是一个普通的基本类型`number`的值，你可能不一定得到 *相同的* `string`值！
 
-Consider:
+考虑这段代码：
 
 ```js
 var a = {
@@ -998,9 +999,9 @@ a + "";			// "42"
 String( a );	// "4"
 ```
 
-Generally, this sort of gotcha won't bite you unless you're really trying to create confusing data structures and operations, but you should be careful if you're defining both your own `valueOf()` and `toString()` methods for some `object`, as how you coerce the value could affect the outcome.
+一般来说这样的坑不会咬到你，除非你真的试着创建令人困惑的数据结构和操作，但如果你为某些`object`同时定义了你自己的`valueOf()`和`toString()`方法，你就应当小心，因为你强制转换这些值的方式将影响到结果。
 
-What about the other direction? How can we *implicitly coerce* from `string` to `number`?
+那么另外一个方向呢？我们如何将一个`string` *隐含强制转换* 为一个`number`？
 
 ```js
 var a = "3.14";
@@ -1009,9 +1010,9 @@ var b = a - 0;
 b; // 3.14
 ```
 
-The `-` operator is defined only for numeric subtraction, so `a - 0` forces `a`'s value to be coerced to a `number`. While far less common, `a * 1` or `a / 1` would accomplish the same result, as those operators are also only defined for numeric operations.
+`-`操作符是仅为数字减法定义的，所以`a - 0`强制`a`的值被转换为一个`number`。虽然少见得多，`a * 1`或`a / 1`也会得到相同的结果，因为这些操作符也是仅为数字操作定义的。
 
-What about `object` values with the `-` operator? Similar story as for `+` above:
+那么对`-`操作符使用`object`值会怎样呢？和上面的`+`的故事相似：
 
 ```js
 var a = [3];
@@ -1020,17 +1021,17 @@ var b = [1];
 a - b; // 2
 ```
 
-Both `array` values have to become `number`s, but they end up first being coerced to `strings` (using the expected `toString()` serialization), and then are coerced to `number`s, for the `-` subtraction to perform on.
+两个`array`值都不得不变为`number`，但它们首先会被强制转换为`string`（使用意料之中的`toString()`序列化），然后再强制转换为`number`，以便`-`减法操作可以实施。
 
-So, is *implicit* coercion of `string` and `number` values the ugly evil you've always heard horror stories about? I don't personally think so.
+那么，`string`和`number`值之间的 *隐含* 强制转换还是你总是在恐怖故事当中听到的丑陋怪物吗？我个人不这么认为。
 
-Compare `b = String(a)` (*explicit*) to `b = a + ""` (*implicit*). I think cases can be made for both approaches being useful in your code. Certainly `b = a + ""` is quite a bit more common in JS programs, proving its own utility regardless of *feelings* about the merits or hazards of *implicit* coercion in general.
+比较`b = String(a)`（*明确的*）和`b = a + ""`（*隐含的*）。我认为在你的代码中会出现两种方式都有用的情况。当然`b = a + ""`在JS程序中更常见一些，不管一般意义上 *隐含* 强制转换的好处或害处的 *感觉* 如何，它都提供了自己的用途。
 
-### Implicitly: Booleans --> Numbers
+### 隐含地：Booleans --> Numbers
 
-I think a case where *implicit* coercion can really shine is in simplifying certain types of complicated `boolean` logic into simple numeric addition. Of course, this is not a general-purpose technique, but a specific solution for specific cases.
+我认为 *隐含* 强制转换可以真正闪光的一个情况是，将特定类型的复杂`boolean`逻辑简化为简单的数字加法。当然，这不是一个通用的技术，而是一个特定情况的特定解决方法。
 
-Consider:
+考虑如下代码：
 
 ```js
 function onlyOne(a,b,c) {
@@ -1047,18 +1048,17 @@ onlyOne( b, a, b );	// true
 onlyOne( a, b, a );	// false
 ```
 
-This `onlyOne(..)` utility should only return `true` if exactly one of the arguments is `true` / truthy. It's using *implicit* coercion on the truthy checks and *explicit* coercion on the others, including the final return value.
+这个`onlyOne(..)`工具应当仅在正好有一个参数是`true`/truthy时返回`true`。它在truthy的检查上使用 *隐含的* 强制转换，而在其他的地方使用 *明确的* 强制转换，包括最后的返回值。
 
-But what if we needed that utility to be able to handle four, five, or twenty flags in the same way? It's pretty difficult to imagine implementing code that would handle all those permutations of comparisons.
+但如果我们需要这个工具能够以相同的方式处理四个，五个，或者二十个标志值呢？很难想象处理所有那些比较的排列组合的代码实现。
 
-But here's where coercing the `boolean` values to `number`s (`0` or `1`, obviously) can greatly help:
+但这里是`boolean`值到`number`（很明显，`0`或`1`）的强制转换可以提供巨大帮助的地方：
 
 ```js
 function onlyOne() {
 	var sum = 0;
 	for (var i=0; i < arguments.length; i++) {
-		// skip falsy values. same as treating
-		// them as 0's, but avoids NaN's.
+		// 跳过falsy值。与将它们视为0相同，但是避开NaN
 		if (arguments[i]) {
 			sum += arguments[i];
 		}
@@ -1076,11 +1076,11 @@ onlyOne( b, b );				// false
 onlyOne( b, a, b, b, b, a );	// false
 ```
 
-**Note:** Of course, instead of the `for` loop in `onlyOne(..)`, you could more tersely use the ES5 `reduce(..)` utility, but I didn't want to obscure the concepts.
+**注意：** 当让，除了在`onlyOne(..)`中的`for`循环，你可以更简洁地使用ES5的`reduce(..)`工具，但我不想因此而模糊概念。
 
-What we're doing here is relying on the `1` for `true`/truthy coercions, and numerically adding them all up. `sum += arguments[i]` uses *implicit* coercion to make that happen. If one and only one value in the `arguments` list is `true`, then the numeric sum will be `1`, otherwise the sum will not be `1` and thus the desired condition is not met.
+我们在这里做的事情有赖于`true`/truthy的强制转换结果为`1`，并将它们作为数字加起来。`sum += arguments[i]`通过 *隐含的* 强制转换使这发生。如果在`arguments`列表中有且仅有一个值为`true`，那么这个数字的和将是`1`，否则和就不是`1`而不能使期望的条件成立。
 
-We could of course do this with *explicit* coercion instead:
+我们当然本可以使用 *明确的* 强制转换：
 
 ```js
 function onlyOne() {
@@ -1092,33 +1092,33 @@ function onlyOne() {
 }
 ```
 
-We first use `!!arguments[i]` to force the coercion of the value to `true` or `false`. That's so you could pass non-`boolean` values in, like `onlyOne( "42", 0 )`, and it would still work as expected (otherwise you'd end up with `string` concatenation and the logic would be incorrect).
+我们首先使用`!!arguments[i]`来将这个值强制转换为`true`或`false`。这样你就可以像`onlyOne( "42", 0 )`这样传入非`boolean`值了，而且它依然可以如意料的那样工作（要不然，你将会得到`string`连接，而且逻辑也不正确）。
 
-Once we're sure it's a `boolean`, we do another *explicit* coercion with `Number(..)` to make sure the value is `0` or `1`.
+一旦我们确认它是一个`boolean`，我们就使用`Number(..)`进行另一个 *明确的* 强制转换来确保值是`0`或`1`。
 
-Is the *explicit* coercion form of this utility "better"? It does avoid the `NaN` trap as explained in the code comments. But, ultimately, it depends on your needs. I personally think the former version, relying on *implicit* coercion is more elegant (if you won't be passing `undefined` or `NaN`), and the *explicit* version is needlessly more verbose.
+这个工具的 *明确* 强制转换形式“更好”吗？它确实像代码注释中解释的那样避开了`NaN`的陷阱。但是，这最终要看你的需要。我个人认为前一个版本，依赖于 *隐含的* 强制转换更优雅（如果你不传入`undefined`或`NaN`），而 *明确的* 版本是一种不必要的繁冗。
 
-But as with almost everything we're discussing here, it's a judgment call.
+但与我们在这里讨论的几乎所有东西一样，这是一个主观判断。
 
-**Note:** Regardless of *implicit* or *explicit* approaches, you could easily make `onlyTwo(..)` or `onlyFive(..)` variations by simply changing the final comparison from `1`, to `2` or `5`, respectively. That's drastically easier than adding a bunch of `&&` and `||` expressions. So, generally, coercion is very helpful in this case.
+**注意：** 不管是 *隐含的* 还是 *明确的* 方式，你可以通过将最后的比较从`1`改为`2`或`5`，来分别很容易地制造`onlyTwo(..)`或`onlyFive(..)`。这要比添加一大堆`&&`和`||`表达式要简单太多了。所以，一般来说，在这种情况下强制转换非常有用。
 
-### Implicitly: * --> Boolean
+### 隐含地：* --> Boolean
 
-Now, let's turn our attention to *implicit* coercion to `boolean` values, as it's by far the most common and also by far the most potentially troublesome.
+现在，让我们将注意力转向目标为`boolean`值的 *隐含* 强制转换上，这是目前最常见，并且还是目前潜在的最麻烦的一种。
 
-Remember, *implicit* coercion is what kicks in when you use a value in such a way that it forces the value to be converted. For numeric and `string` operations, it's fairly easy to see how the coercions can occur.
+记住，*隐含的* 强制转换是当你以强制一个值被转换的方式使用这个值时才启动的。对于数字和`string`操作，很容易就能看出这种强制转换是如何发生的。
 
-But, what sort of expression operations require/force (*implicitly*) a `boolean` coercion?
+但是，哪个种类的表达式操作（*隐含地*）要求/强制一个`boolean`转换呢？
 
-1. The test expression in an `if (..)` statement.
-2. The test expression (second clause) in a `for ( .. ; .. ; .. )` header.
-3. The test expression in `while (..)` and `do..while(..)` loops.
-4. The test expression (first clause) in `? :` ternary expressions.
-5. The left-hand operand (which serves as a test expression -- see below!) to the `||` ("logical or") and `&&` ("logical and") operators.
+1. 在一个`if (..)`语句中的测试表达式。
+2. 在一个`for ( .. ; .. ; .. )`头部的测试表达式（第二个子句）。
+3. 在`while (..)`和`do..while(..)`循环中的测试表达式。
+4. 在`? :`三元表达式中的测试表达式（第一个子句）。
+5. `||`（“逻辑或”）和`&&`（“逻辑与”）操作符左手边的操作数（它用作测试表达式 —— 见下面的讨论！）。
 
-Any value used in these contexts that is not already a `boolean` will be *implicitly* coerced to a `boolean` using the rules of the `ToBoolean` abstract operation covered earlier in this chapter.
+在这些上下文环境中使用的，任何还不是`boolean`的值，将通过本章早先讲解的`ToBoolean`抽象操作的规则，被 *隐含地* 强制转换为一个`boolean`。
 
-Let's look at some examples:
+我们来看一些例子：
 
 ```js
 var a = 42;
@@ -1142,25 +1142,25 @@ if ((a && d) || c) {
 }
 ```
 
-In all these contexts, the non-`boolean` values are *implicitly coerced* to their `boolean` equivalents to make the test decisions.
+在所有这些上下文环境中，非`boolean`值被 *隐含地强制转换* 为它们的`boolean`等价物，来决定测试的结果。
 
-### Operators `||` and `&&`
+### `||`和`&&`操作符
 
-It's quite likely that you have seen the `||` ("logical or") and `&&` ("logical and") operators in most or all other languages you've used. So it'd be natural to assume that they work basically the same in JavaScript as in other similar languages.
+很可能你已经在你用过的大多数或所有其他语言中见到过`||`（“逻辑或”）和`&&`（“逻辑与”）操作符了。所以假设它们在JavaScript中的工作方式和其他类似的语言基本上相同是很自然的。
 
-There's some very little known, but very important, nuance here.
+这里有一个鲜为人知的，但很重要的，微妙细节。
 
-In fact, I would argue these operators shouldn't even be called "logical ___ operators", as that name is incomplete in describing what they do. If I were to give them a more accurate (if more clumsy) name, I'd call them "selector operators," or more completely, "operand selector operators."
+其实，我会争辩这些操作符甚至不应当被称为“逻辑__操作符”，因为这样的名称没有完整地描述它们在做什么。如果让我给它们一个更准确的（也更蹩脚的）名称，我会叫它们“选择器操作符”或更完整的，“操作数选择器操作符”。
 
-Why? Because they don't actually result in a *logic* value (aka `boolean`) in JavaScript, as they do in some other languages.
+为什么？因为在JavaScript中它们实际上不会得出一个 *逻辑* 值（也就是`boolean`），这与它们在其他的语言中的表现不同。
 
-So what *do* they result in? They result in the value of one (and only one) of their two operands. In other words, **they select one of the two operand's values**.
+那么它们到底得出什么？它们得出两个操作数中的一个（而且仅有一个）。换句话说，**它们在两个操作数的值中选择一个**。
 
-Quoting the ES5 spec from section 11.11:
+引用ES5语言规范的11.11部分：
 
-> The value produced by a && or || operator is not necessarily of type Boolean. The value produced will always be the value of one of the two operand expressions.
+> 一个&&或||操作符产生的值不见得是Boolean类型。这个产生的值将总是两个操作数表达式其中之一的值。
 
-Let's illustrate:
+让我们展示一下：
 
 ```js
 var a = 42;
@@ -1174,33 +1174,33 @@ c || b;		// "abc"
 c && b;		// null
 ```
 
-**Wait, what!?** Think about that. In languages like C and PHP, those expressions result in `true` or `false`, but in JS (and Python and Ruby, for that matter!), the result comes from the values themselves.
+**等一下，什么！？** 想一想。在像C和PHP这样的语言中，这些表达式结果为`true`或`false`，而在JS中（就此而言还有Python和Ruby！），结果来自于值本身。
 
-Both `||` and `&&` operators perform a `boolean` test on the **first operand** (`a` or `c`). If the operand is not already `boolean` (as it's not, here), a normal `ToBoolean` coercion occurs, so that the test can be performed.
+`||`和`&&`操作符都在 **第一个操作数**（`a`或`c`） 上进行`boolean`测试。如果这个操作数还不是`boolean`（就像在这里一样），就会发生一次普通的`ToBoolean`强制转换，这样测试就可以进行了。
 
-For the `||` operator, if the test is `true`, the `||` expression results in the value of the *first operand* (`a` or `c`). If the test is `false`, the `||` expression results in the value of the *second operand* (`b`).
+对于`||`操作符，如果测试结果为`true`，`||`表达式就将 *第一个操作数* 的值（`a`或`c`）作为结果。如果测试结果为`false`，`||`表达式就将 *第二个操作数* 的值（`b`）作为结果。
 
-Inversely, for the `&&` operator, if the test is `true`, the `&&` expression results in the value of the *second operand* (`b`). If the test is `false`, the `&&` expression results in the value of the *first operand* (`a` or `c`).
+相反地，对于`&&`操作符，如果测试结果为`true`，`&&`表达式将 *第二个操作数* 的值（`b`）作为结果。如果测试结果为`false`，那么`&&`表达式就将 *第一个操作数* 的值（`a`或`c`）作为结果。
 
-The result of a `||` or `&&` expression is always the underlying value of one of the operands, **not** the (possibly coerced) result of the test. In `c && b`, `c` is `null`, and thus falsy. But the `&&` expression itself results in `null` (the value in `c`), not in the coerced `false` used in the test.
+`||`或`&&`表达式的结果总是两个操作数之一的底层值，**不是**（可能是被强制转换来的）测试的结果。在`c && b`中，`c`是`null`，因此是falsy。但是`&&`表达式本身的结果为`null`（`c`中的值），不是用于测试的强制转换来的`false`。
 
-Do you see how these operators act as "operand selectors", now?
+现在你明白这些操作符如何像“操作数选择器”一样工作了吗？
 
-Another way of thinking about these operators:
+另一种考虑这些操作数的方式是：
 
 ```js
 a || b;
-// roughly equivalent to:
+// 大体上等价于：
 a ? a : b;
 
 a && b;
-// roughly equivalent to:
+// 大体上等价于：
 a ? b : a;
 ```
 
-**Note:** I call `a || b` "roughly equivalent" to `a ? a : b` because the outcome is identical, but there's a nuanced difference. In `a ? a : b`, if `a` was a more complex expression (like for instance one that might have side effects like calling a `function`, etc.), then the `a` expression would possibly be evaluated twice (if the first evaluation was truthy). By contrast, for `a || b`, the `a` expression is evaluated only once, and that value is used both for the coercive test as well as the result value (if appropriate). The same nuance applies to the `a && b` and `a ? b : a` expressions.
+**注意：** 我说`a || b`“大体上等价”于`a ? a : b`，是因为虽然结果相同，但是这里有一个微妙的不同。在`a ? a : b`中，如果`a`是一个更复杂的表达式（例如像调用`function`那样可能带有副作用），那么这个表达式`a`将有可能被求值两次（如果第一次求值的结果为truthy）。相比之下，对于`a || b`，表达式`a`仅被求值一次，而且这个值将被同时用于强制转换测试和结果值（如果合适的话）。同样的区别也适用于`a && b`和`a ? b : a`表达式。
 
-An extremely common and helpful usage of this behavior, which there's a good chance you may have used before and not fully understood, is:
+很有可能你在没有完全理解之前你就已经使用了这个行为的一个极其常见，而且很有帮助的用法：
 
 ```js
 function foo(a,b) {
@@ -1214,23 +1214,23 @@ foo();					// "hello world"
 foo( "yeah", "yeah!" );	// "yeah yeah!"
 ```
 
-The `a = a || "hello"` idiom (sometimes said to be JavaScript's version of the C# "null coalescing operator") acts to test `a` and if it has no value (or only an undesired falsy value), provides a backup default value (`"hello"`).
+这种`a = a || "hello"`惯用法（有时被说成C#“null合并操作符”的JavaScript版本）对`a`进行测试，如果它没有值（或仅仅是一个不期望的falsy值），就提供一个后备的默认值（`"hello"`）。
 
-**Be careful**, though!
+但是 **要小心！**
 
 ```js
 foo( "That's it!", "" ); // "That's it! world" <-- Oops!
 ```
 
-See the problem? `""` as the second argument is a falsy value (see `ToBoolean` earlier in this chapter), so the `b = b || "world"` test fails, and the `"world"` default value is substituted, even though the intent probably was to have the explicitly passed `""` be the value assigned to `b`.
+看到问题了吗？作为第二个参数的`""`是一个falsy值（参见本章早先的`ToBoolean`），所以`b = b || "world"`测试失败，而默认值`"world"`被替换上来，即便本来的意图可能是想让明确传入的`""`作为赋给`b`的值。
 
-This `||` idiom is extremely common, and quite helpful, but you have to use it only in cases where *all falsy values* should be skipped. Otherwise, you'll need to be more explicit in your test, and probably use a `? :` ternary instead.
+这种`||`惯用法极其常见，而且十分有用，但是你不得不只在 *所有的falsy值* 应当被跳过时使用它。不然，你就需要在你的测试中更加具体，而且可能应该使用一个`? :`三元操作符。
 
-This *default value assignment* idiom is so common (and useful!) that even those who publicly and vehemently decry JavaScript coercion often use it in their own code!
+这种默认值赋值惯用法是如此常见（和有用！），以至于那些公开激烈诽谤JavaScript强制转换的人都经常在它们的代码中使用！
 
-What about `&&`?
+那么`&&`呢？
 
-There's another idiom that is quite a bit less commonly authored manually, but which is used by JS minifiers frequently. The `&&` operator "selects" the second operand if and only if the first operand tests as truthy, and this usage is sometimes called the "guard operator" (also see "Short Circuited" in Chapter 5) -- the first expression test "guards" the second expression:
+有另一种在手动编写中不那么常见，而在JS压缩器中频繁使用的惯用法。`&&`操作符会“选择”第二个操作数，当且仅当第一个操作数测试为truthy，这种用法有时被称为“守护操作符”（参见第五章的“短接”） —— 第一个表达式的测试“守护”着第二个表达式：
 
 ```js
 function foo() {
@@ -1242,19 +1242,19 @@ var a = 42;
 a && foo(); // 42
 ```
 
-`foo()` gets called only because `a` tests as truthy. If that test failed, this `a && foo()` expression statement would just silently stop -- this is known as "short circuiting" -- and never call `foo()`.
+`foo()`仅在`a`测试为truthy时会被调用。如果这个测试失败，这个`a && foo()`表达式语句将会无声地停止 —— 这被称为“短接” —— 而且永远不会调用`foo()`。
 
-Again, it's not nearly as common for people to author such things. Usually, they'd do `if (a) { foo(); }` instead. But JS minifiers choose `a && foo()` because it's much shorter. So, now, if you ever have to decipher such code, you'll know what it's doing and why.
+重申一次，几乎很少有人手动编写这样的东西。通常，他们会写`if (a) { foo(); }`。但是JS压缩器选择`a && foo()`是因为它短的多。所以，现在，如果你不得不解读这样的代码，你就知道它是在做什么以及为什么了。
 
-OK, so `||` and `&&` have some neat tricks up their sleeve, as long as you're willing to allow the *implicit* coercion into the mix.
+好了，那么`||`和`&&`在它们的功能上有些不错的技巧，只要你乐意让 *隐含的* 强制转换掺和进来。
 
-**Note:** Both the `a = b || "something"` and `a && b()` idioms rely on short circuiting behavior, which we cover in more detail in Chapter 5.
+**注意：** `a = b || "something"`和`a && b()`两种惯用法都依赖于短接行为，我们将在第五章中讲述它的细节。
 
-The fact that these operators don't actually result in `true` and `false` is possibly messing with your head a little bit by now. You're probably wondering how all your `if` statements and `for` loops have been working, if they've included compound logical expressions like `a && (b || c)`.
+现在，这些操作符实际上不会得出`true`和`false`的事实可能使你的头脑有点儿混乱。你可能想知道，如果你的`if`语句和`for`循环包含`a && (b || c)`这样的复合的逻辑表达式，它们到底都是怎么工作的。
 
-Don't worry! The sky is not falling. Your code is (probably) just fine. It's just that you probably never realized before that there was an *implicit* coercion to `boolean` going on **after** the compound expression was evaluated.
+别担心！天没塌下来。你的代码（可能）没有问题。你只是可能从来没有理解在这个符合表达式被求值 **之后**，有一个向`boolean` *隐含的* 强制转换发生了。
 
-Consider:
+考虑这段代码：
 
 ```js
 var a = 42;
@@ -1266,11 +1266,11 @@ if (a && (b || c)) {
 }
 ```
 
-This code still works the way you always thought it did, except for one subtle extra detail. The `a && (b || c)` expression *actually* results in `"foo"`, not `true`. So, the `if` statement *then* forces the `"foo"` value to coerce to a `boolean`, which of course will be `true`.
+这段代码将会像你总是认为的那样工作，除了一个额外的微妙细节。`a && (b || c)`的结果 *实际上* 是`"foo"`，不是`true`。所以，这之后`if`语句强制值`"foo"`转换为一个`boolean`，这理所当然地将是`true`。
 
-See? No reason to panic. Your code is probably still safe. But now you know more about how it does what it does.
+看到了？没有理由惊慌。你的代码可能依然是安全的。但是现在关于它在做什么和如何做，你知道了更多。
 
-And now you also realize that such code is using *implicit* coercion. If you're in the "avoid (implicit) coercion camp" still, you're going to need to go back and make all of those tests *explicit*:
+而且现在你理解了这样的代码使用 *隐含的* 强制转换。如果你依然属于“避开（隐含）强制转换阵营”，那么你就需要退回去并使所有这些测试 *明确*：
 
 ```js
 if (!!a && (!!b || !!c)) {
@@ -1278,15 +1278,15 @@ if (!!a && (!!b || !!c)) {
 }
 ```
 
-Good luck with that! ... Sorry, just teasing.
+祝你好运！...对不起，只是逗个乐儿。
 
-### Symbol Coercion
+### Symbol 强制转换
 
-Up to this point, there's been almost no observable outcome difference between *explicit* and *implicit* coercion -- only the readability of code has been at stake.
+在此为止，在 *明确的* 和 *隐含的* 强制转换之间几乎没有可以观察到的结果上的不同 —— 只有代码的可读性至关重要。
 
-But ES6 Symbols introduce a gotcha into the coercion system that we need to discuss briefly. For reasons that go well beyond the scope of what we'll discuss in this book, *explicit* coercion of a `symbol` to a `string` is allowed, but *implicit* coercion of the same is disallowed and throws an error.
+但是ES6的Symbol在强制转换系统中引入了一个我们需要简单讨论的坑。由于一个明显超出了我们将在本书中讨论的范围的原因，从一个`symbol`到一个`string`的 *明确* 强制转换是允许的，但是相同的 *隐含* 强制转换是不被允许的，而且会抛出一个错误。
 
-Consider:
+考虑如下代码：
 
 ```js
 var s1 = Symbol( "cool" );
@@ -1296,60 +1296,60 @@ var s2 = Symbol( "not cool" );
 s2 + "";						// TypeError
 ```
 
-`symbol` values cannot coerce to `number` at all (throws an error either way), but strangely they can both *explicitly* and *implicitly* coerce to `boolean` (always `true`).
+`symbol`值根本不能强制转换为`number`（不论哪种方式都抛出错误），但奇怪的是它们既可以 *明确地* 也可以 *隐含地* 强制转换为`boolean`（总是`true`）。
 
-Consistency is always easier to learn, and exceptions are never fun to deal with, but we just need to be careful around the new ES6 `symbol` values and how we coerce them.
+一致性总是容易学习的，而对付例外从来就不有趣，但是我们只需要在ES6`symbol`值和我们如何强制转换它们的问题上多加小心。
 
-The good news: it's probably going to be exceedingly rare for you to need to coerce a `symbol` value. The way they're typically used (see Chapter 3) will probably not call for coercion on a normal basis.
+好消息：你需要强制转换一个`symbol`值的情况可能极其少见。它们典型的被使用的方式（见第三章）可能不会用到强制转换。
 
-## Loose Equals vs. Strict Equals
+## 宽松等价与严格等价
 
-Loose equals is the `==` operator, and strict equals is the `===` operator. Both operators are used for comparing two values for "equality," but the "loose" vs. "strict" indicates a **very important** difference in behavior between the two, specifically in how they decide "equality."
+宽松等价是`==`操作符，而严格等价是`===`操作符。两个操作符都被用于比较两个值的“等价性”，但是“宽松”和“严格”暗示着它们行为之间的一个 **非常重要** 的不同，特别是在它们如何决定“等价性”上。
 
-A very common misconception about these two operators is: "`==` checks values for equality and `===` checks both values and types for equality." While that sounds nice and reasonable, it's inaccurate. Countless well-respected JavaScript books and blogs have said exactly that, but unfortunately they're all *wrong*.
+关于这两个操作符的一个非常常见的误解是：“`==`检查值的等价性，而`===`检查值和类型的等价性。”虽然这听起来很好很合理，但是不准确。无数知名的JavaScript书籍和文章都是这么说的，但不幸的是它们都 *错了*。
 
-The correct description is: "`==` allows coercion in the equality comparison and `===` disallows coercion."
+正确的描述是：“`==`允许在等价性比较中进行强制转换，而`===`不允许强制转换”。
 
-### Equality Performance
+### 等价性的性能
 
-Stop and think about the difference between the first (inaccurate) explanation and this second (accurate) one.
+停下来思考一下第一种（不正确的）解释和这第二种（正确的）解释的不同。
 
-In the first explanation, it seems obvious that `===` is *doing more work* than `==`, because it has to *also* check the type. In the second explanation, `==` is the one *doing more work* because it has to follow through the steps of coercion if the types are different.
+在第一种解释中，看起来`===`明显的要比`==`*做更多工作*，因为它还必须检查类型。在第二种解释中，`==`是要 *做更多工作* 的，因为它不得不在类型不同时走过强制转换的步骤。
 
-Don't fall into the trap, as many have, of thinking this has anything to do with performance, though, as if `==` is going to be slower than `===` in any relevant way. While it's measurable that coercion does take *a little bit* of processing time, it's mere microseconds (yes, that's millionths of a second!).
+不要像许多人那样落入陷阱中，认为这会与性能有任何关系，虽然在这个问题上`==`好像要比`===`慢一些。强制转换确实要花费 *一点点* 处理时间，但也就是仅仅几微秒（是的，1微秒就是一秒的百万分之一！）。
 
-If you're comparing two values of the same types, `==` and `===` use the identical algorithm, and so other than minor differences in engine implementation, they should do the same work.
+如果你比较同类型的两个值，`==`和`===`使用的是相同的算法，所以除了在引擎实现上的一些微小的区别，它们做的应当是相同的工作。
 
-If you're comparing two values of different types, the performance isn't the important factor. What you should be asking yourself is: when comparing these two values, do I want coercion or not?
+如果你比较两个不同类型的值，性能也不是重要因素。你应当问自己的是：当比较这两个值时，我想要进行强制转换吗？
 
-If you want coercion, use `==` loose equality, but if you don't want coercion, use `===` strict equality.
+如果你想要进行强制转换，使用`==`宽松等价，但如果你不想进行强制转换，就使用`===`严格等价。
 
-**Note:** The implication here then is that both `==` and `===` check the types of their operands. The difference is in how they respond if the types don't match.
+**注意：** 这里暗示`==`和`===`都会检查它们的操作数的类型。不同之处在于它们在类型不同时如何反应。
 
-### Abstract Equality
+### 抽象等价性
 
-The `==` operator's behavior is defined as "The Abstract Equality Comparison Algorithm" in section 11.9.3 of the ES5 spec. What's listed there is a comprehensive but simple algorithm that explicitly states every possible combination of types, and how the coercions (if necessary) should happen for each combination.
+在ES5语言规范的11.9.3部分中，`==`操作符的行为被定义为“抽象等价性比较算法”。那里列出了一个详尽但简单的算法，它明确地指出了类型的每一种可能的组合，与对于每一种组合强制转化应当如何发生（如果有必要的话）。
 
-**Warning:** When (*implicit*) coercion is maligned as being too complicated and too flawed to be a *useful good part*, it is these rules of "abstract equality" that are being condemned. Generally, they are said to be too complex and too unintuitive for developers to practically learn and use, and that they are prone more to causing bugs in JS programs than to enabling greater code readability. I believe this is a flawed premise -- that you readers are competent developers who write (and read and understand!) algorithms (aka code) all day long. So, what follows is a plain exposition of the "abstract equality" in simple terms. But I implore you to also read the ES5 spec section 11.9.3. I think you'll be surprised at just how reasonable it is.
+**警告：** 当（*隐含的*）强制转换被中伤为太过复杂和缺陷过多而不能成为 *有用的，好的部分* 时，遭到谴责的正是这些“抽象等价”规则。一般上，它们被认为对于开发者来说过于复杂和不直观而不能实际学习和应用，而且在JS程序中，和改善代码的可读性比起来，它倾向于导致更多的bug。我相信这是一种有缺陷的预断 —— 读者都是整天都在写（而且读，理解）算法（也就是代码）的能干的开发者。所以，接下来的是用简单的词语来直白地解读“抽象等价性”。但我恳请你也去读一下ES5规范的11.9.3部分。我想你将会对它是多么合理而感到震惊。
 
-Basically, the first clause (11.9.3.1) says, if the two values being compared are of the same type, they are simply and naturally compared via Identity as you'd expect. For example, `42` is only equal to `42`, and `"abc"` is only equal to `"abc"`.
+基本上，它的第一个条款（11.9.3.1）是在说，如果两个被比较的值是同一类型，它们就像你期望的那样通过等价性简单自然地比较。比如，`42`只和`42`相等，而`"abc"`只和`"abc"`相等。
 
-Some minor exceptions to normal expectation to be aware of:
+在一般期望的结果中，有一些例外需要小心：
 
-* `NaN` is never equal to itself (see Chapter 2)
-* `+0` and `-0` are equal to each other (see Chapter 2)
+* `NaN`永远不等于它自己（见第二章）
+* `+0`和`-0`是相等的（见第二章）
 
-The final provision in clause 11.9.3.1 is for `==` loose equality comparison with `object`s (including `function`s and `array`s). Two such values are only *equal* if they are both references to *the exact same value*. No coercion occurs here.
+条款11.9.3.1的最后一个规定是关于`object`（包括`function`和`array`）的`==`宽松相等性比较。这样的两个值仅在它们引用 *完全相同的值* 时 *相等*。这里没有强制转换发生。
 
-**Note:** The `===` strict equality comparison is defined identically to 11.9.3.1, including the provision about two `object` values. It's a very little known fact that **`==` and `===` behave identically** in the case where two `object`s are being compared!
+**注意：** `===`严格等价比较与11.9.3.1的定义一模一样，包括关于两个`object`的值的规定。很少有人知道，在两个`object`被比较的情况下，**`==`和`===`的行为相同**！
 
-The rest of the algorithm in 11.9.3 specifies that if you use `==` loose equality to compare two values of different types, one or both of the values will need to be *implicitly* coerced. This coercion happens so that both values eventually end up as the same type, which can then directly be compared for equality using simple value Identity.
+11.9.3算法中的剩余部分指出，如果你使用`==`宽松等价来比较两个不同类型的值，它们两者或其中之一将需要被 *隐含地* 强制转换。由于这个强制转换，两个值最终归于同一类型，可以使用简单的值的等价性来直接比较它们相等与否。
 
-**Note:** The `!=` loose not-equality operation is defined exactly as you'd expect, in that it's literally the `==` operation comparison performed in its entirety, then the negation of the result. The same goes for the `!==` strict not-equality operation.
+**注意：** `!=`宽松不等价操作是如你预料的那样定义的，它差不多就是`==`比较操作完整实施，之后对结果取反。这对于`!==`严格不等价操作也是一样的。
 
-#### Comparing: `string`s to `number`s
+#### 比较：`string`与`number`
 
-To illustrate `==` coercion, let's first build off the `string` and `number` examples earlier in this chapter:
+为了展示`==`强制转换，首先让我们建立本章中早先的`string`和`number`的例子：
 
 ```js
 var a = 42;
@@ -1359,28 +1359,28 @@ a === b;	// false
 a == b;		// true
 ```
 
-As we'd expect, `a === b` fails, because no coercion is allowed, and indeed the `42` and `"42"` values are different.
+我们所预料的，`a === b`失败了，因为不允许强制转换，而且值`42`和`"42"`确实是不同的。
 
-However, the second comparison `a == b` uses loose equality, which means that if the types happen to be different, the comparison algorithm will perform *implicit* coercion on one or both values.
+然而，第二个比较`a == b`使用了宽松等价，这意味着如果类型偶然不同，这个比较算法将会对两个或其中一个值实施 *隐含的* 强制转换。
 
-But exactly what kind of coercion happens here? Does the `a` value of `42` become a `string`, or does the `b` value of `"42"` become a `number`?
+那么这里发生的究竟是那种强制转换呢？是`a`的值变成了一个`string`，还是`b`的值`"42"`变成了一个`number`？
 
-In the ES5 spec, clauses 11.9.3.4-5 say:
+在ES5语言规范中，条款11.9.3.4-5说：
 
-> 4. If Type(x) is Number and Type(y) is String,
->    return the result of the comparison x == ToNumber(y).
-> 5. If Type(x) is String and Type(y) is Number,
->    return the result of the comparison ToNumber(x) == y.
+> 4. 如果Type(x)是Number而Type(y)是String，
+>    返回比较x == ToNumber(y)的结果。
+> 5. 如果Type(x)是String而Type(y)是Number，
+>    返回比较ToNumber(x) == y的结果。
 
-**Warning:** The spec uses `Number` and `String` as the formal names for the types, while this book prefers `number` and `string` for the primitive types. Do not let the capitalization of `Number` in the spec confuse you for the `Number()` native function. For our purposes, the capitalization of the type name is irrelevant -- they have basically the same meaning.
+**警告：** 语言规范中使用`Number`和`String`作为类型的正式名称，虽然这本书中偏好使用`number`和`string`指代基本类型。别让语言规范中首字母大写的`Number`与`Number()`原生函数把你给搞糊涂了。对于我们的目的来说，类型名称的首字母大写是无关紧要的 —— 它们基本上是同一个意思。
 
-Clearly, the spec says the `"42"` value is coerced to a `number` for the comparison. The *how* of that coercion has already been covered earlier, specifically with the `ToNumber` abstract operation. In this case, it's quite obvious then that the resulting two `42` values are equal.
+显然，语言规范说为了比较，将值`"42"`强制转换为一个`number`。这个强制转换如何进行已经在前面将结过了，明确地说就是通过`ToNumber`抽象操作。在这种情况下十分明显，两个值`42`是相等的。
 
-#### Comparing: anything to `boolean`
+#### 比较：任何东西与`boolean`
 
-One of the biggest gotchas with the *implicit* coercion of `==` loose equality pops up when you try to compare a value directly to `true` or `false`.
+当你试着将一个值直接与`true`或`false`相比较时，你会遇到`==`宽松等价的 *隐含* 强制转换中最大的一个坑。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a = "42";
@@ -1389,18 +1389,18 @@ var b = true;
 a == b;	// false
 ```
 
-Wait, what happened here!? We know that `"42"` is a truthy value (see earlier in this chapter). So, how come it's not `==` loose equal to `true`?
+等一下，这里发生了什么！？我们知道`"42"`是一个truthy值（见本章早先的部分）。那么它和`true`怎么不是`==`宽松等价的？
 
-The reason is both simple and deceptively tricky. It's so easy to misunderstand, many JS developers never pay close enough attention to fully grasp it.
+其中的原因既简单又刁钻得使人迷惑。它是如此的容易让人误解，许多JS开发者从来不会花费足够多的精力来完全掌握它。
 
-Let's again quote the spec, clauses 11.9.3.6-7:
+让我们再次引用语言规范，条款11.9.3.6-7
 
-> 6. If Type(x) is Boolean,
->    return the result of the comparison ToNumber(x) == y.
-> 7. If Type(y) is Boolean,
->    return the result of the comparison x == ToNumber(y).
+> 6. 如果Type(x)是Boolean，
+>    返回比较 ToNumber(x) == y 的结果。
+> 7. 如果Type(y)是Boolean，
+>    返回比较 x == ToNumber(y) 的结果。
 
-Let's break that down. First:
+我们来把它分解。首先：
 
 ```js
 var x = true;
@@ -1409,9 +1409,9 @@ var y = "42";
 x == y; // false
 ```
 
-The `Type(x)` is indeed `Boolean`, so it performs `ToNumber(x)`, which coerces `true` to `1`. Now, `1 == "42"` is evaluated. The types are still different, so (essentially recursively) we reconsult the algorithm, which just as above will coerce `"42"` to `42`, and `1 == 42` is clearly `false`.
+`Type(x)`确实是`Boolean`，所以它会实施`ToNumber(x)`，将`true`强制转换为`1`。现在，`1 == "42"`会被求值。这里面的类型依然不同，所以（实质上是递归地）我们再次向早先讲解过的算法求解，它将`"42"`强制转换为`42`，而`1 == 42`明显是`false`。
 
-Reverse it, and we still get the same outcome:
+反过来，我们任然得到相同的结果：
 
 ```js
 var x = "42";
@@ -1420,65 +1420,65 @@ var y = false;
 x == y; // false
 ```
 
-The `Type(y)` is `Boolean` this time, so `ToNumber(y)` yields `0`. `"42" == 0` recursively becomes `42 == 0`, which is of course `false`.
+这次`Type(y)`是`Boolean`，所以`ToNumber(y)`给出`0`。`"42" == 0`递归地变为`42 == 0`，这当然是`false`。
 
-In other words, **the value `"42"` is neither `== true` nor `== false`.** At first, that statement might seem crazy. How can a value be neither truthy nor falsy?
+换句话说，**值`"42"`既不`== true`也不`== false`**。猛地一看，这看起来像句疯话。一个值怎么可能既不是truthy也不是falsy呢？
 
-But that's the problem! You're asking the wrong question, entirely. It's not your fault, really. Your brain is tricking you.
+但这就是问题所在！你在问一个完全错误的问题。但这确实不是你的错，你的大脑在耍你。
 
-`"42"` is indeed truthy, but `"42" == true` **is not performing a boolean test/coercion** at all, no matter what your brain says. `"42"` *is not* being coerced to a `boolean` (`true`), but instead `true` is being coerced to a `1`, and then `"42"` is being coerced to `42`.
+`"42"`的确是truthy，但是`"42" == true`根本就 **不是在进行一个boolean测试/强制转换**，不管你的大脑怎么说，`"42"` *没有* 被强制转换为一个`boolean`（`true`），而是`true`被强制转换为一个`1`，而后`"42"`被强制转换为`42`。
 
-Whether we like it or not, `ToBoolean` is not even involved here, so the truthiness or falsiness of `"42"` is irrelevant to the `==` operation!
+不管我们喜不喜欢，`ToBoolean`甚至都没参与到这里，所以`"42"`的真假是与`==`操作无关的！
 
-What *is* relevant is to understand how the `==` comparison algorithm behaves with all the different type combinations. As it regards a `boolean` value on either side of the `==`, a `boolean` always coerces to a `number` *first*.
+而有关的是要理解`==`比较算法对所有不同类型组合如何动作。当`==`的任意一边是一个`boolean`值时，`boolean`总是首先被强制转换为一个`number`。
 
-If that seems strange to you, you're not alone. I personally would recommend to never, ever, under any circumstances, use `== true` or `== false`. Ever.
+如果这对你来讲很奇怪，那么你不是一个人。我个人建议永远，永远，不要在任何情况下，使用`== true`或`== false`。永远。
 
-But remember, I'm only talking about `==` here. `=== true` and `=== false` wouldn't allow the coercion, so they're safe from this hidden `ToNumber` coercion.
+但时要记住，我在此说的仅与`==`有关。`=== true`和`=== false`不允许强制转换，所以它们没有`ToNumber`强制转换，因而是安全的。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a = "42";
 
-// bad (will fail!):
+// 不好（会失败的！）：
 if (a == true) {
 	// ..
 }
 
-// also bad (will fail!):
+// 也不该（会失败的！）：
 if (a === true) {
 	// ..
 }
 
-// good enough (works implicitly):
+// 足够好（隐含地工作）：
 if (a) {
 	// ..
 }
 
-// better (works explicitly):
+// 更好（明确地工作）：
 if (!!a) {
 	// ..
 }
 
-// also great (works explicitly):
+// 也很好（明确地工作）：
 if (Boolean( a )) {
 	// ..
 }
 ```
 
-If you avoid ever using `== true` or `== false` (aka loose equality with `boolean`s) in your code, you'll never have to worry about this truthiness/falsiness mental gotcha.
+如果你在你的代码中一直避免使用`== true`或`== false`（也就是与`boolean`的宽松等价），你将永远不必担心这种真/假的思维陷阱。
 
-#### Comparing: `null`s to `undefined`s
+#### 比较：`null`与`undefined`
 
-Another example of *implicit* coercion can be seen with `==` loose equality between `null` and `undefined` values. Yet again quoting the ES5 spec, clauses 11.9.3.2-3:
+另一个 *隐含* 强制转换的例子可以在`null`和`undefined`值之间的`==`宽松等价中看到。又再一次引述ES5语言规范，条款11.9.3.2-3：
 
-> 2. If x is null and y is undefined, return true.
-> 3. If x is undefined and y is null, return true.
+> 2. 如果x是null而y是undefined，返回true。
+> 3. 如果x是undefined而y是null，返回true。
 
-`null` and `undefined`, when compared with `==` loose equality, equate to (aka coerce to) each other (as well as themselves, obviously), and no other values in the entire language.
+当使用`==`宽松等价比较`null`和`undefined`，它们是互相等价（也就是互相强制转换）的，而且在整个语言中不会等价于其他值了。
 
-What this means is that `null` and `undefined` can be treated as indistinguishable for comparison purposes, if you use the `==` loose equality operator to allow their mutual *implicit* coercion.
+这意味着`null`和`undefined`对于比较的目的来说，如果你使用`==`宽松等价操作符来允许它们互相 *隐含地* 强制转换的话，它们可以被认为是不可区分的。
 
 ```js
 var a = null;
@@ -1496,9 +1496,9 @@ a == 0;		// false
 b == 0;		// false
 ```
 
-The coercion between `null` and `undefined` is safe and predictable, and no other values can give false positives in such a check. I recommend using this coercion to allow `null` and `undefined` to be indistinguishable and thus treated as the same value.
+`null`和`undefined`之间的强制转换是安全且可预见的，而且在这样的检查中没有其他的值会给出测试成立的误报。我推荐使用这种强制转换来允许`null`和`undefined`是不可区分的，如此将它们作为相同的值对待。
 
-For example:
+比如：
 
 ```js
 var a = doSomething();
@@ -1508,9 +1508,9 @@ if (a == null) {
 }
 ```
 
-The `a == null` check will pass only if `doSomething()` returns either `null` or `undefined`, and will fail with any other value, even other falsy values like `0`, `false`, and `""`.
+`a == null`检查仅在`doSomething()`返回`null`或者`undefined`时才会通过，而在任何其他值的情况下将会失败，即便是`0`，`false`，和`""`这样的falsy值。
 
-The *explicit* form of the check, which disallows any such coercion, is (I think) unnecessarily much uglier (and perhaps a tiny bit less performant!):
+这个检查的 *明确* 形式 —— 不允许任何强制转换 —— （我认为）没有必要地难看太多了（而且性能可能有点儿不好！）：
 
 ```js
 var a = doSomething();
@@ -1520,20 +1520,20 @@ if (a === undefined || a === null) {
 }
 ```
 
-In my opinion, the form `a == null` is yet another example where *implicit* coercion improves code readability, but does so in a reliably safe way.
+在我看来，`a == null`的形式是另一个用 *隐含* 强制转换增进了代码可读性的例子，而且是以一种可靠安全的方式。
 
-#### Comparing: `object`s to non-`object`s
+#### 比较：`object`与非`object`
 
-If an `object`/`function`/`array` is compared to a simple scalar primitive (`string`, `number`, or `boolean`), the ES5 spec says in clauses 11.9.3.8-9:
+如果一个`object`/`function`/`array`被与一个简单基本标量（`string`，`number`，或`boolean`）进行比较，ES5语言规范在条款11.9.3.8-9中这样说道：
 
-> 8. If Type(x) is either String or Number and Type(y) is Object,
->    return the result of the comparison x == ToPrimitive(y).
-> 9. If Type(x) is Object and Type(y) is either String or Number,
->    return the result of the comparison ToPrimitive(x) == y.
+> 8. 如果Type(x)是一个String或者Number而Type(y)是一个Object，
+>    返回比较 x == ToPrimitive(y) 的结果。
+> 9. 如果Type(x)是一个Object而Type(y)是String或者Number，
+>    返回比较 ToPrimitive(x) == y 的结果。
 
-**Note:** You may notice that these clauses only mention `String` and `Number`, but not `Boolean`. That's because, as quoted earlier, clauses 11.9.3.6-7 take care of coercing any `Boolean` operand presented to a `Number` first.
+**注意：** 你可能注意到了，这些条款仅提到了`String`和`Number`，而没有`Boolean`。这是因为，正如我们早先引述的，条款11.9.3.6-7首先将任何出现的`Boolean`操作数强制转换为一个`Number`。
 
-Consider:
+考虑如下代码：
 
 ```js
 var a = 42;
@@ -1542,49 +1542,49 @@ var b = [ 42 ];
 a == b;	// true
 ```
 
-The `[ 42 ]` value has its `ToPrimitive` abstract operation called (see the "Abstract Value Operations" section earlier), which results in the `"42"` value. From there, it's just `42 == "42"`, which as we've already covered becomes `42 == 42`, so `a` and `b` are found to be coercively equal.
+值`[ 42 ]`的`ToPrimitive`抽象操作（见先前的“抽象值操作”部分）被调用，结果为值`"42"`。这里它就变为`42 == "42"`，我们已经讲解过这将变为`42 == 42`，所以`a`和`b`被认为是强制转换地等价。
 
-**Tip:** All the quirks of the `ToPrimitive` abstract operation that we discussed earlier in this chapter (`toString()`, `valueOf()`) apply here as you'd expect. This can be quite useful if you have a complex data structure that you want to define a custom `valueOf()` method on, to provide a simple value for equality comparison purposes.
+**提示：** 我们在本章早先讨论过的`ToPrimitive`抽象操作的所以奇怪之处（`toString()`，`valueOf()`），都在这里如你期望的那样适用。如果你有一个复杂的数据结构，而且你想在它上面定义一个`valueOf()`方法来为等价比较提供一个简单值的话，这将十分有用。
 
-In Chapter 3, we covered "unboxing," where an `object` wrapper around a primitive value (like from `new String("abc")`, for instance) is unwrapped, and the underlying primitive value (`"abc"`) is returned. This behavior is related to the `ToPrimitive` coercion in the `==` algorithm:
+在第三章中，我们讲解了“拆箱”，就是一个基本类型值的`object`包装器（例如`new String("abc")`这样的形式）被展开，其底层的基本类型值（`"abc"`）被返回。这种行为与`==`算法中的`ToPrimitive`强制转换有关：
 
 ```js
 var a = "abc";
-var b = Object( a );	// same as `new String( a )`
+var b = Object( a );	// 与`new String( a )`相同
 
 a === b;				// false
 a == b;					// true
 ```
 
-`a == b` is `true` because `b` is coerced (aka "unboxed," unwrapped) via `ToPrimitive` to its underlying `"abc"` simple scalar primitive value, which is the same as the value in `a`.
+`a == b`为`true`是因为`b`通过`ToPrimitive`强制转换为它的底层简单基本标量值`"abc"`，它与`a`中的值是相同的。
 
-There are some values where this is not the case, though, because of other overriding rules in the `==` algorithm. Consider:
+然而由于`==`算法中的其他覆盖规则，有些值是例外。考虑如下代码：
 
 ```js
 var a = null;
-var b = Object( a );	// same as `Object()`
+var b = Object( a );	// 与`Object()`相同
 a == b;					// false
 
 var c = undefined;
-var d = Object( c );	// same as `Object()`
+var d = Object( c );	// 与`Object()`相同
 c == d;					// false
 
 var e = NaN;
-var f = Object( e );	// same as `new Number( e )`
+var f = Object( e );	// 与`new Number( e )`相同
 e == f;					// false
 ```
 
-The `null` and `undefined` values cannot be boxed -- they have no object wrapper equivalent -- so `Object(null)` is just like `Object()` in that both just produce a normal object.
+值`null`和`undefined`不能被装箱 —— 它们没有等价的对象包装器 —— 所以`Object(null)`就像`Object()`一样，它们都仅仅产生一个普通对象。
 
-`NaN` can be boxed to its `Number` object wrapper equivalent, but when `==` causes an unboxing, the `NaN == NaN` comparison fails because `NaN` is never equal to itself (see Chapter 2).
+`NaN`可以被封箱到它等价的`Number`对象包装器中，当`==`导致拆箱时，比较`NaN == NaN`会失败，因为`NaN`永远不会它自己相等（见第二章）。
 
-### Edge Cases
+### 边界情况
 
-Now that we've thoroughly examined how the *implicit* coercion of `==` loose equality works (in both sensible and surprising ways), let's try to call out the worst, craziest corner cases so we can see what we need to avoid to not get bitten with coercion bugs.
+现在我们已经彻底检视了`==`宽松等价的 *隐含* 强制转换是如何工作的（从合理与惊讶两个方式），让我们召唤角落中最差劲儿的，最疯狂的情况，这样我们就能看到我们需要避免什么来防止被强制转换的bug咬到。
 
-First, let's examine how modifying the built-in native prototypes can produce crazy results:
+首先，让我们检视修改内建的原生prototype是如何产生疯狂的结果的：
 
-#### A Number By Any Other Value Would...
+#### 一个拥有其他值的数字将会……
 
 ```js
 Number.prototype.valueOf = function() {
@@ -1594,11 +1594,11 @@ Number.prototype.valueOf = function() {
 new Number( 2 ) == 3;	// true
 ```
 
-**Warning:** `2 == 3` would not have fallen into this trap, because neither `2` nor `3` would have invoked the built-in `Number.prototype.valueOf()` method because both are already primitive `number` values and can be compared directly. However, `new Number(2)` must go through the `ToPrimitive` coercion, and thus invoke `valueOf()`.
+**警告：** `2 == 3`不会掉到这个陷阱中，这是由于`2`和`3`都不会调用内建的`Number.prototype.valueOf()`方法，因为它们已经是基本`number`值，可以直接比较。然而，`new Number(2)`必须通过`ToPrimitive`强制转换，因此调用`valueOf()`。
 
-Evil, huh? Of course it is. No one should ever do such a thing. The fact that you *can* do this is sometimes used as a criticism of coercion and `==`. But that's misdirected frustration. JavaScript is not *bad* because you can do such things, a developer is *bad* **if they do such things**. Don't fall into the "my programming language should protect me from myself" fallacy.
+邪恶吧？当然。任何人都不应当做这样的事情。你 *可以* 这么做，这个事实有时被当成批评强制转换和`==`的根据。但这种沮丧是被误导的。JavaScript不会因为你能做这样的事情而 *不好*，是 **做这样的事的开发者** *不好*。不要陷入“我的编程语言应当保护我不受我自己伤害”的谬论。
 
-Next, let's consider another tricky example, which takes the evil from the previous example to another level:
+接下来，让我们考虑另一个刁钻的例子，它将前一个例子的邪恶带到另一个水平：
 
 ```js
 if (a == 2 && a == 3) {
@@ -1606,9 +1606,9 @@ if (a == 2 && a == 3) {
 }
 ```
 
-You might think this would be impossible, because `a` could never be equal to both `2` and `3` *at the same time*. But "at the same time" is inaccurate, since the first expression `a == 2` happens strictly *before* `a == 3`.
+你可能认为这是不可能的，因为`a`绝不会 *同时* 等于`2`和`3`。但是“同时”是不准确的，因为第一个表达式`a == 2`严格地发生在`a == 3` *之前*。
 
-So, what if we make `a.valueOf()` have side effects each time it's called, such that the first time it returns `2` and the second time it's called it returns `3`? Pretty easy:
+那么，要是我们让`a.valueOf()`在每次被调用时拥有一种副作用，使它第一次被调用时返回`2`而第二次被调用时返回`3`呢？很简单：
 
 ```js
 var i = 2;
@@ -1624,18 +1624,18 @@ if (a == 2 && a == 3) {
 }
 ```
 
-Again, these are evil tricks. Don't do them. But also don't use them as complaints against coercion. Potential abuses of a mechanism are not sufficient evidence to condemn the mechanism. Just avoid these crazy tricks, and stick only with valid and proper usage of coercion.
+重申一次，这些都是邪恶的技巧。不要这么做。也不要用它们来抱怨强制转换。潜在地滥用一种机制并不是谴责这种机制的充分证据。避开这些疯狂的技巧，并坚持强制转换的合法与合理的用法就好了。
 
-#### False-y Comparisons
+#### False-y 比较
 
-The most common complaint against *implicit* coercion in `==` comparisons comes from how falsy values behave surprisingly when compared to each other.
+关于`==`比较中 *隐含* 强制转换的最常见的抱怨，来自于falsy值互相比较时它们如何令人吃惊地动作。
 
-To illustrate, let's look at a list of the corner-cases around falsy value comparisons, to see which ones are reasonable and which are troublesome:
+为了展示，让我们看一个关于falsy值比较的极端例子的列表，来瞧瞧哪一个是合理的，哪一个是麻烦的：
 
 ```js
 "0" == null;			// false
 "0" == undefined;		// false
-"0" == false;			// true -- UH OH!
+"0" == false;			// true -- 噢！
 "0" == NaN;				// false
 "0" == 0;				// true
 "0" == "";				// false
@@ -1643,79 +1643,79 @@ To illustrate, let's look at a list of the corner-cases around falsy value compa
 false == null;			// false
 false == undefined;		// false
 false == NaN;			// false
-false == 0;				// true -- UH OH!
-false == "";			// true -- UH OH!
-false == [];			// true -- UH OH!
+false == 0;				// true -- 噢！
+false == "";			// true -- 噢！
+false == [];			// true -- 噢！
 false == {};			// false
 
 "" == null;				// false
 "" == undefined;		// false
 "" == NaN;				// false
-"" == 0;				// true -- UH OH!
-"" == [];				// true -- UH OH!
+"" == 0;				// true -- 噢！
+"" == [];				// true -- 噢！
 "" == {};				// false
 
 0 == null;				// false
 0 == undefined;			// false
 0 == NaN;				// false
-0 == [];				// true -- UH OH!
+0 == [];				// true -- 噢！
 0 == {};				// false
 ```
 
-In this list of 24 comparisons, 17 of them are quite reasonable and predictable. For example, we know that `""` and `NaN` are not at all equatable values, and indeed they don't coerce to be loose equals, whereas `"0"` and `0` are reasonably equatable and *do* coerce as loose equals.
+在这24个比较的类表中，17个是十分合理和可预见的。比如，我们知道`""`和`"NaN"`是根本不可能相等的值，并且它们确实不会强制转换以成为宽松等价的，而`"0"`和`0`是合理等价的，而且确实强制转换为宽松等价。
 
-However, seven of the comparisons are marked with "UH OH!" because as false positives, they are much more likely gotchas that could trip you up. `""` and `0` are definitely distinctly different values, and it's rare you'd want to treat them as equatable, so their mutual coercion is troublesome. Note that there aren't any false negatives here.
+然而，这些比较中的7个被标上了“噢！”。作为误判的成立，它们更像是会将你陷进去的坑。`""`和`0`绝对是有区别的不同的值，而且你很少会将它们作为等价的，所以它们的互相强制转换是一种麻烦。注意这里没有任何误判的不成立。
 
-#### The Crazy Ones
+#### 疯狂的情况
 
-We don't have to stop there, though. We can keep looking for even more troublesome coercions:
+但是我们不必停留在此。我们可以继续寻找更能引起麻烦的强制转换：
 
 ```js
 [] == ![];		// true
 ```
 
-Oooo, that seems at a higher level of crazy, right!? Your brain may likely trick you that you're comparing a truthy to a falsy value, so the `true` result is surprising, as we *know* a value can never be truthy and falsy at the same time!
+噢，这看起来像是更高层次的疯狂，对吧！？你的大脑可能会欺骗你说，你在将一个truthy和falsy值比较，所以结果`true`是令人吃惊的，因为我们知道一个值不可能同时为truthy和falsy！
 
-But that's not what's actually happening. Let's break it down. What do we know about the `!` unary operator? It explicitly coerces to a `boolean` using the `ToBoolean` rules (and it also flips the parity). So before `[] == ![]` is even processed, it's actually already translated to `[] == false`. We already saw that form in our above list (`false == []`), so its surprise result is *not new* to us.
+但这不是实际发生的事情。让我们把它分解一下。我们了解`!`一元操作符吧？它明确地使用`ToBoolean`规则将操作数强制转换为一个`boolean`（而且它还会翻转真假性）。所以在`[] == ![]`执行之前，它实际上已经被翻译为了`[] == false`。我们已将在上面的列表中见过了这种形式（`false == []`），所以它的令人吃惊的结果对我们来说并不 *新鲜*。
 
-How about other corner cases?
+其它的极端情况呢？
 
 ```js
 2 == [2];		// true
 "" == [null];	// true
 ```
 
-As we said earlier in our `ToNumber` discussion, the right-hand side `[2]` and `[null]` values will go through a `ToPrimitive` coercion so they can be more readily compared to the simple primitives (`2` and `""`, respectively) on the left-hand side. Since the `valueOf()` for `array` values just returns the `array` itself, coercion falls to stringifying the `array`.
+在关于`ToNumber`的讨论中我们说过，右手边的`[2]`和`[null]`值将会通过一个`ToPrimitive`强制转换，以使我们可以方便地与左手边的简单基本类型值进行比较。因为`array`值的`valueOf()`只是返回`array`本身，强制转换会退到`array`的字符串化上。
 
-`[2]` will become `"2"`, which then is `ToNumber` coerced to `2` for the right-hand side value in the first comparison. `[null]` just straight becomes `""`.
+对于第一个比较的右手边的值来说，`[2]`将变为`"2"`，然后它会`ToNumber`强制转换为`2`。`[null]`就直接变成`""`。
 
-So, `2 == 2` and `"" == ""` are completely understandable.
+那么，`2 == 2`和`"" == ""`是完全可以理解的。
 
-If your instinct is to still dislike these results, your frustration is not actually with coercion like you probably think it is. It's actually a complaint against the default `array` values' `ToPrimitive` behavior of coercing to a `string` value. More likely, you'd just wish that `[2].toString()` didn't return `"2"`, or that `[null].toString()` didn't return `""`.
+如果你的直觉依然不喜欢这个结果，那么你的沮丧实际上与你可能认为的强制转换无关。这其实是在抱怨`array`值在强制转换为`string`值时的默认`ToPrimitive`行为。很可能，你只是希望`[2].toString()`不返回`"2"`，或者`[null].toString()`不返回`""`。
 
-But what exactly *should* these `string` coercions result in? I can't really think of any other appropriate `string` coercion of `[2]` than `"2"`, except perhaps `"[2]"` -- but that could be very strange in other contexts!
+但是这些`string`强制转换到底 *应该* 得出什么结果？对于`[2]`的`string`强制转换，除了`"2"`我确实想不出来其他合适的结果，也许是`"[2]"` —— 但这可能会在其他的上下文中很奇怪！
 
-You could rightly make the case that since `String(null)` becomes `"null"`, then `String([null])` should also become `"null"`. That's a reasonable assertion. So, that's the real culprit.
+你可以正确地制造另一个例子：因为`String(null)`变成了`"null"`，那么`String([null])`也应当变成`"null"`。这是个合理的断言。所以，它才是真正的犯人。
 
-*Implicit* coercion itself isn't the evil here. Even an *explicit* coercion of `[null]` to a `string` results in `""`. What's at odds is whether it's sensible at all for `array` values to stringify to the equivalent of their contents, and exactly how that happens. So, direct your frustration at the rules for `String( [..] )`, because that's where the craziness stems from. Perhaps there should be no stringification coercion of `array`s at all? But that would have lots of other downsides in other parts of the language.
+*隐含* 强制转换在这里并不邪恶。即使一个从`[null]`到`string`结果为`""`的 *明确* 强制转换也不。真正奇怪的是，`array`值字符串化为它们内容的等价物是否有道理，和它是如何发生的。所以，应当将你沮丧的原因指向`String( [..] )`的规则，因为这里才是疯狂起源的地方。也许根本就不应该有`array`的字符串化强制转换？但这会在语言的其他部分造成许多的缺点。
 
-Another famously cited gotcha:
+另一个常被引用的著名的坑是：
 
 ```js
 0 == "\n";		// true
 ```
 
-As we discussed earlier with empty `""`, `"\n"` (or `" "` or any other whitespace combination) is coerced via `ToNumber`, and the result is `0`. What other `number` value would you expect whitespace to coerce to? Does it bother you that *explicit* `Number(" ")` yields `0`?
+正如我们早先讨论的空`""`，`"\n"`（或`" "`，或其他任何空格的组合）是通过`ToNumber`强制转换的，而且结果为`0`。你还希望空格被转换为其他的什么`number`值呢？*明确的* `Number()`给出`0`会困扰你吗？
 
-Really the only other reasonable `number` value that empty strings or whitespace strings could coerce to is the `NaN`. But would that *really* be better? The comparison `" " == NaN` would of course fail, but it's unclear that we'd have really *fixed* any of the underlying concerns.
+空字符串和空格字符串可以转换为的，另一个真正唯一合理的`number`值是`NaN`。但这 *真的* 会更好吗？`" " == NaN`的比较当然会失败，但是不清楚我们是否真的 *修正* 了任何底层的问题。
 
-The chances that a real-world JS program fails because `0 == "\n"` are awfully rare, and such corner cases are easy to avoid.
+真实世界中的JS程序由于`0 == "\n"`而失败的几率非常之低，而且这样的极端用例很容比避免。
 
-Type conversions **always** have corner cases, in any language -- nothing specific to coercion. The issues here are about second-guessing a certain set of corner cases (and perhaps rightly so!?), but that's not a salient argument against the overall coercion mechanism.
+在任何语言中，类型转换 **总是** 有极端用例 —— 强制转换也不例外。这里讨论的是特定的一组极端用例的马后炮，但不是针对强制转换整体而言的争论。
 
-Bottom line: almost any crazy coercion between *normal values* that you're likely to run into (aside from intentionally tricky `valueOf()` or `toString()` hacks as earlier) will boil down to the short seven-item list of gotcha coercions we've identified above.
+底线：你可能遇到的几乎所有 *普通值* 间的疯狂强制转换（除了像早先那样有意而为的`valueOf()`或`toString()`黑科技），都能归结为我们在上面指出的7中情况的短列表。
 
-To contrast against these 24 likely suspects for coercion gotchas, consider another list like this:
+对比这24个疑似强制转换的坑，考虑另一个像这样的列表：
 
 ```js
 42 == "43";							// false
@@ -1726,45 +1726,45 @@ To contrast against these 24 likely suspects for coercion gotchas, consider anot
 "foo" == [ "foo" ];					// true
 ```
 
-In these nonfalsy, noncorner cases (and there are literally an infinite number of comparisons we could put on this list), the coercion results are totally safe, reasonable, and explainable.
+在这些非falsy，非极端的用例中（而且我们简直可以向这个列表中添加无限多个比较），强制转换完全是安全，合理，和可解释的。
 
-#### Sanity Check
+#### 可行性检查
 
-OK, we've definitely found some crazy stuff when we've looked deeply into *implicit* coercion. No wonder that most developers claim coercion is evil and should be avoided, right!?
+好的，当我们深入观察 *隐含的* 强制转换时，我确实找到了一些疯狂的东西。难怪大多数开发者声称强制转换是邪恶而且应该避开的，对吧？
 
-But let's take a step back and do a sanity check.
+但是让我们退一步并做一下可行性检查。
 
-By way of magnitude comparison, we have *a list* of seven troublesome gotcha coercions, but we have *another list* of (at least 17, but actually infinite) coercions that are totally sane and explainable.
+通过大量比较，我们得到了一张7个麻烦的，坑人的强制转换的列表，但我们还得到了另一张（至少17个，但实际上有无限多个）完全正常和可以解释的强制转换的列表。
 
-If you're looking for a textbook example of "throwing the baby out with the bathwater," this is it: discarding the entirety of coercion (the infinitely large list of safe and useful behaviors) because of a list of literally just seven gotchas.
+如果你在寻找一本“把孩子和洗澡水一起泼出去”的教科书，这就是了：由于一个仅有7个坑的列表，而抛弃整个强制转换（安全且有效的行为的无限大列表）。
 
-The more prudent reaction would be to ask, "how can I use the countless *good parts* of coercion, but avoid the few *bad parts*?"
+一个更谨慎的反应是问，“我如何使用强制转换的 *好的部分*，而避开这几个 *坏的部分* 呢？”
 
-Let's look again at the *bad* list:
-
-```js
-"0" == false;			// true -- UH OH!
-false == 0;				// true -- UH OH!
-false == "";			// true -- UH OH!
-false == [];			// true -- UH OH!
-"" == 0;				// true -- UH OH!
-"" == [];				// true -- UH OH!
-0 == [];				// true -- UH OH!
-```
-
-Four of the seven items on this list involve `== false` comparison, which we said earlier you should **always, always** avoid. That's a pretty easy rule to remember.
-
-Now the list is down to three.
+然我们再看一次这个 *坏* 列表：
 
 ```js
-"" == 0;				// true -- UH OH!
-"" == [];				// true -- UH OH!
-0 == [];				// true -- UH OH!
+"0" == false;			// true -- 噢！
+false == 0;				// true -- 噢！
+false == "";			// true -- 噢！
+false == [];			// true -- 噢！
+"" == 0;				// true -- 噢！
+"" == [];				// true -- 噢！
+0 == [];				// true -- 噢！
 ```
 
-Are these reasonable coercions you'd do in a normal JavaScript program? Under what conditions would they really happen?
+这个列表中7个项目的4个与`== false`比较有关，我们早先说过你应当 **总是，总是** 避免的。
 
-I don't think it's terribly likely that you'd literally use `== []` in a `boolean` test in your program, at least not if you know what you're doing. You'd probably instead be doing `== ""` or `== 0`, like:
+现在这个列表缩小到了3个项目。
+
+```js
+"" == 0;				// true -- 噢！
+"" == [];				// true -- 噢！
+0 == [];				// true -- 噢！
+```
+
+这些是你在一般的JavaScript程序中使用的合理的强制转换吗？在什么条件下它们会发生？
+
+我不认为你在程序里有很大的可能要在一个`boolean`测试中使用`== []`，至少在你知道自己在做什么的情况下。你可能会使用`== ""`或`== 0`，比如：
 
 ```js
 function doSomething(a) {
@@ -1774,7 +1774,7 @@ function doSomething(a) {
 }
 ```
 
-You'd have an oops if you accidentally called `doSomething(0)` or `doSomething([])`. Another scenario:
+如果你偶然调用了`doSomething(0)`或`doSomething([])`，你就会吓一跳。另一个例子：
 
 ```js
 function doSomething(a,b) {
@@ -1784,50 +1784,50 @@ function doSomething(a,b) {
 }
 ```
 
-Again, this could break if you did something like `doSomething("",0)` or `doSomething([],"")`.
+再一次，如果你调用`doSomething("",0)`或`doSomething([],"")`时，它们会失败。
 
-So, while the situations *can* exist where these coercions will bite you, and you'll want to be careful around them, they're probably not super common on the whole of your code base.
+所以，虽然这些强制转换会咬到你的情况 *可能* 存在，而且你会小心地处理它们，但是它们可能不会在你的代码库中超级常见。
 
-#### Safely Using Implicit Coercion
+#### 安全地使用隐含强制转换
 
-The most important advice I can give you: examine your program and reason about what values can show up on either side of an `==` comparison. To effectively avoid issues with such comparisons, here's some heuristic rules to follow:
+我能给你的最重要的建议是：检查你的程序，并推理什么样的值会出现在`==`比较两边。为了避免这样的比较中的问题，这里有一些可以遵循的启发性规则：
 
-1. If either side of the comparison can have `true` or `false` values, don't ever, EVER use `==`.
-2. If either side of the comparison can have `[]`, `""`, or `0` values, seriously consider not using `==`.
+1. 如果比较的任意一边可能出现`true`或者`false`值，那么就永远，永远不要使用`==`。
+2. 如果比较的任意一边可能出现`[]`，`""`，或`0`这些值，那么认真地考虑不使用`==`。
 
-In these scenarios, it's almost certainly better to use `===` instead of `==`, to avoid unwanted coercion. Follow those two simple rules and pretty much all the coercion gotchas that could reasonably hurt you will effectively be avoided.
+在这些场景中，为了避免不希望的强制转换，几乎可以确定使用`===`要比使用`==`好。遵循这两个简单的规则，可以有效地避免几乎所有可能会伤害你的强制转换的坑。
 
-**Being more explicit/verbose in these cases will save you from a lot of headaches.**
+**在这些情况下，使用更加明确/繁冗的方式会减少很多使你头疼的东西。**
 
-The question of `==` vs. `===` is really appropriately framed as: should you allow coercion for a comparison or not?
+`==`与`===`的问题其实可以更加恰当地表述为：你是否应当在比较中允许强制转换？
 
-There's lots of cases where such coercion can be helpful, allowing you to more tersely express some comparison logic (like with `null` and `undefined`, for example).
+在许多情况下这样的强制转换会很有用，允许你更简练地表述一些比较逻辑（例如，`null`和`undefined`）。
 
-In the overall scheme of things, there's relatively few cases where *implicit* coercion is truly dangerous. But in those places, for safety sake, definitely use `===`.
+对于整体来说，相对有几个 *隐含* 强制转换会真的很危险的情况。但是在这些地方，为了安全起见，绝对要使用`===`。
 
-**Tip:** Another place where coercion is guaranteed *not* to bite you is with the `typeof` operator. `typeof` is always going to return you one of seven strings (see Chapter 1), and none of them are the empty `""` string. As such, there's no case where checking the type of some value is going to run afoul of *implicit* coercion. `typeof x == "function"` is 100% as safe and reliable as `typeof x === "function"`. Literally, the spec says the algorithm will be identical in this situation. So, don't just blindly use `===` everywhere simply because that's what your code tools tell you to do, or (worst of all) because you've been told in some book to **not think about it**. You own the quality of your code.
+**提示：** 另一个强制转换保证 *不会* 咬到你的地方是`typeof`操作符。`typeof`总是将返回给你7中字符串之一（见第一章），它们中没有一个是空`""`字符串。这样，检查某个值的类型时不会有任何情况与 *隐含* 强制转换相冲突。`typeof x == "function"`就像`typeof x === "function"`一样100%安全可靠。从字面意义上将，语言规范说这种情况下它们的算法是相同的。所以，不要只是因为你的代码工具告诉你这么做，或者（最差劲儿的）在某本书中有人告诉你 **不要考虑它**，而盲目地到处使用`===`。你掌管着你的代码的质量。
 
-Is *implicit* coercion evil and dangerous? In a few cases, yes, but overwhelmingly, no.
+*隐含* 强制转换是邪恶和危险的吗？在几个情况下，是的，但总体说来，不是。
 
-Be a responsible and mature developer. Learn how to use the power of coercion (both *explicit* and *implicit*) effectively and safely. And teach those around you to do the same.
+做一个负责任和成熟的开发者。学习如何有效并安全地使用强制转换（*明确的* 和 *隐含的* 两者）的力量。并教你周围的人也这么做。
 
-Here's a handy table made by Alex Dorey (@dorey on GitHub) to visualize a variety of comparisons:
+这里是由Alex Dorey (@dorey on GitHub)制作的一个方便的表格，将各种比较进行了可视化：
 
 <img src="fig1.png" width="600">
 
-Source: https://github.com/dorey/JavaScript-Equality-Table
+出处：https://github.com/dorey/JavaScript-Equality-Table
 
-## Abstract Relational Comparison
+## 抽象关系比较
 
-While this part of *implicit* coercion often gets a lot less attention, it's important nonetheless to think about what happens with `a < b` comparisons (similar to how we just examined `a == b` in depth).
+虽然这部分的 *隐含* 强制转换经常不为人所注意，但无论如何考虑比较`a < b`时发生了什么是很重要的（和我们如何深入检视`a == b`类似）。
 
-The "Abstract Relational Comparison" algorithm in ES5 section 11.8.5 essentially divides itself into two parts: what to do if the comparison involves both `string` values (second half), or anything else (first half).
+在ES5语言规范的11.8.5部分的“抽象关系型比较”算法，实质上把自己分成了两个部分：如果比较涉及两个`string`值要做什么（后半部分），和除此之外的其他值要做什么（前半部分）。
 
-**Note:** The algorithm is only defined for `a < b`. So, `a > b` is handled as `b < a`.
+**注意：** 这个算法仅仅定义了`a < b`。所以，`a > b`作为`b < a`处理。
 
-The algorithm first calls `ToPrimitive` coercion on both values, and if the return result of either call is not a `string`, then both values are coerced to `number` values using the `ToNumber` operation rules, and compared numerically.
+这个算法首先在两个值上调用`ToPrimitive`强制转换，如果两个调用的返回值之一不是`string`，那么就使用`ToNumber`操作规则将这两个值强制转换为`number`值，并进行数字的比较。
 
-For example:
+举例来说：
 
 ```js
 var a = [ 42 ];
@@ -1837,9 +1837,9 @@ a < b;	// true
 b < a;	// false
 ```
 
-**Note:** Similar caveats for `-0` and `NaN` apply here as they did in the `==` algorithm discussed earlier.
+**注意：** 早先讨论的关于`-0`和`NaN`在`==`算法中的类似注意事项也适用于这里。
 
-However, if both values are `string`s for the `<` comparison, simple lexicographic (natural alphabetic) comparison on the characters is performed:
+然而，如果`<`比较的两个值都是`string`的话，就会在字符上进行简单的字典顺序（自然的字母顺序）比较：
 
 ```js
 var a = [ "42" ];
@@ -1848,9 +1848,9 @@ var b = [ "043" ];
 a < b;	// false
 ```
 
-`a` and `b` are *not* coerced to `number`s, because both of them end up as `string`s after the `ToPrimitive` coercion on the two `array`s. So, `"42"` is compared character by character to `"043"`, starting with the first characters `"4"` and `"0"`, respectively. Since `"0"` is lexicographically *less than* than `"4"`, the comparison returns `false`.
+`a`和`b` *不会* 被强制转换为`number`，因为它们会在两个`array`的`ToPrimitive`强制转换后成为`string`。所以，`"42"`将会与`"043"`一个字符一个字符地进行比较，从第一个字符开始，分别是`"4"`和`"0"`。因为`"0"`在字典顺序上 *小于* `"4"`，所以这个比较返回`false`。
 
-The exact same behavior and reasoning goes for:
+完全相同的行为和推理也适用于：
 
 ```js
 var a = [ 4, 2 ];
@@ -1859,9 +1859,9 @@ var b = [ 0, 4, 3 ];
 a < b;	// false
 ```
 
-Here, `a` becomes `"4,2"` and `b` becomes `"0,4,3"`, and those lexicographically compare identically to the previous snippet.
+这里，`a`变成了`"4,2"`而`b`变成了`"0,4,3"`，而字典顺序比较和前一个代码段一模一样。
 
-What about:
+那么这个怎么样：
 
 ```js
 var a = { b: 42 };
@@ -1870,9 +1870,9 @@ var b = { b: 43 };
 a < b;	// ??
 ```
 
-`a < b` is also `false`, because `a` becomes `[object Object]` and `b` becomes `[object Object]`, and so clearly `a` is not lexicographically less than `b`.
+`a < b`也是`false`，因为`a`变成了`[object Object]`而`b`变成了`[object Object]`，所以明显地`a`在字典顺序上不小于`b`。
 
-But strangely:
+但奇怪的是：
 
 ```js
 var a = { b: 42 };
@@ -1886,34 +1886,34 @@ a <= b;	// true
 a >= b;	// true
 ```
 
-Why is `a == b` not `true`? They're the same `string` value (`"[object Object]"`), so it seems they should be equal, right? Nope. Recall the previous discussion about how `==` works with `object` references.
+为什么`a == b`不是`true`？它们是相同的`string`值（`"[object Object]"`），所以看起来它们应当相等，对吧？不。回忆一下前面关于`==`如何与`object`引用进行工作的讨论。
 
-But then how are `a <= b` and `a >= b` resulting in `true`, if `a < b` **and** `a == b` **and** `a > b` are all `false`?
+那么为什么`a <= b`和`a >= b`的结果为`true`，如果`a < b`**和**`a == b`**和**`a > b`都是`false`？
 
-Because the spec says for `a <= b`, it will actually evaluate `b < a` first, and then negate that result. Since `b < a` is *also* `false`, the result of `a <= b` is `true`.
+因为语言规范说，对于`a <= b`，它实际上首先对`b < a`求值，然后反转那个结果。因为`b < a`*也是*`false`，所以`a <= b`的结果为`true`。
 
-That's probably awfully contrary to how you might have explained what `<=` does up to now, which would likely have been the literal: "less than *or* equal to." JS more accurately considers `<=` as "not greater than" (`!(a > b)`, which JS treats as `!(b < a)`). Moreover, `a >= b` is explained by first considering it as `b <= a`, and then applying the same reasoning.
+到目前为止你解释`<=`在做什么的方式可能是：“小于 *或* 等于”。而这可能完全相反，JS更准确地将`<=`考虑为“不大于”（`!(a > b)`，JS将它作为`(!b < a)`）。另外，`a >= b`被解释为它首先被考虑为`b <= a`，然后实施相同的推理。
 
-Unfortunately, there is no "strict relational comparison" as there is for equality. In other words, there's no way to prevent *implicit* coercion from occurring with relational comparisons like `a < b`, other than to ensure that `a` and `b` are of the same type explicitly before making the comparison.
+不幸的是，没有像等价那样的“严格的关系型比较”。换句话说，没有办法防止`a < b`这样的关系型比较发生 *隐含的* 强制转换，除非在进行比较之前就明确地确保`a`和`b`是同种类型。
 
-Use the same reasoning from our earlier `==` vs. `===` sanity check discussion. If coercion is helpful and reasonably safe, like in a `42 < "43"` comparison, **use it**. On the other hand, if you need to be safe about a relational comparison, *explicitly coerce* the values first, before using `<` (or its counterparts).
+使用与我们早先`==`与`===`合理性检查的讨论相同的推理方法。如果强制转换有帮助并且合理安全，比如比较`42 < "43"`，**就使用它**。另一方面，如果你需要在关系型比较上获得安全性，那么在使用`<`（或`>`）之前，就首先 *明确地强制转换* 这些值。
 
 ```js
 var a = [ 42 ];
 var b = "043";
 
-a < b;						// false -- string comparison!
-Number( a ) < Number( b );	// true -- number comparison!
+a < b;						// false -- 字符串比较！
+Number( a ) < Number( b );	// true -- 数字比较！
 ```
 
-## Review
+## 复习
 
-In this chapter, we turned our attention to how JavaScript type conversions happen, called **coercion**, which can be characterized as either *explicit* or *implicit*.
+在这一章中，我们将注意力转向了JavaScript类型转换如何发生，也叫 **强制转换**，按性质来说它要么是 *明确的* 要么是 *隐含的*。
 
-Coercion gets a bad rap, but it's actually quite useful in many cases. An important task for the responsible JS developer is to take the time to learn all the ins and outs of coercion to decide which parts will help improve their code, and which parts they really should avoid.
+强制转换的名声很坏，但它实际上在许多情况下很有帮助。对于负责任的JS开发者来说，一个重要的任务就是花时间去学习强制转换的里里外外，来决定哪一部分将帮助他们改进代码，哪一部分他们真的应该回避。
 
-*Explicit* coercion is code which is obvious that the intent is to convert a value from one type to another. The benefit is improvement in readability and maintainability of code by reducing confusion.
+*明确的* 强制转换时这样一种代码，它很明显地有意将一个值从一种类型转换到另一种类型。它的益处是通过减少困惑来增强了代码的可读性和可维护性。
 
-*Implicit* coercion is coercion that is "hidden" as a side-effect of some other operation, where it's not as obvious that the type conversion will occur. While it may seem that *implicit* coercion is the opposite of *explicit* and is thus bad (and indeed, many think so!), actually *implicit* coercion is also about improving the readability of code.
+*隐含的* 强制转换是作为一些其他操作的“隐藏的”副作用而存在的，将要发生的类型转换并不明显。虽然看起来 *隐含的* 强制转换是 *明确的* 反面，而且因此是不好的（确实，很多人这么认为！），但是实际上 *隐含的* 强制转换也是为了增强代码的可读性。
 
-Especially for *implicit*, coercion must be used responsibly and consciously. Know why you're writing the code you're writing, and how it works. Strive to write code that others will easily be able to learn from and understand as well.
+特别是对于 *隐含的*，强制转换必须被负责地，有意识地使用。懂得为什么你在写你正在写的代码，和它是如何工作的。同时也要努力编写其他人容易学习和理解的代码。

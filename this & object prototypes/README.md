@@ -1,22 +1,22 @@
-# You Don't Know JS: *this* & Object Prototypes
+# 你不懂JS: *this* 与对象原型
 
 <img src="cover.jpg" width="300">
 
 -----
 
-**[Purchase digital/print copy from O'Reilly](http://shop.oreilly.com/product/0636920033738.do)**
+**[从O'Reilly购买数字/印刷版](http://shop.oreilly.com/product/0636920033738.do)**
 
 -----
 
-[Table of Contents](toc.md)
+[目录](toc.md)
 
-* [Foreword](foreword.md) (by [Nick Berardi](https://github.com/nberardi))
-* [Preface](../preface.md)
-* [Chapter 1: *this* Or That?](ch1.md)
-* [Chapter 2: *this* All Makes Sense Now!](ch2.md)
-* [Chapter 3: Objects](ch3.md)
-* [Chapter 4: Mixing (Up) "Class" Objects](ch4.md)
-* [Chapter 5: Prototypes](ch5.md)
-* [Chapter 6: Behavior Delegation](ch6.md)
-* [Appendix A: ES6 *class*](apA.md)
-* [Appendix B: Thank You's!](apB.md)
+* [序](foreword.md)（[Nick Berardi](https://github.com/nberardi)）
+* [前言](../preface.md)
+* [第一章: *this*还是That?](ch1.md)
+* [第二章: *this*豁然开朗!](ch2.md)
+* [第三章: 对象](ch3.md)
+* [第四章: 混合（淆）“类”的对象](ch4.md)
+* [第五章: 原型](ch5.md)
+* [第六章: 行为委托](ch6.md)
+* [附录A: ES6 *class*](apA.md)
+* [附录B: 鸣谢](apB.md)

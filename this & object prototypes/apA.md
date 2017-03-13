@@ -1,19 +1,19 @@
-# You Don't Know JS: *this* & Object Prototypes
-# Appendix A: ES6 `class`
+# 你不懂JS: *this* 与对象原型
+# 附录A: ES6 `class`
 
-If there's any take-away message from the second half of this book (Chapters 4-6), it's that classes are an optional design pattern for code (not a necessary given), and that furthermore they are often quite awkward to implement in a `[[Prototype]]` language like JavaScript.
+如果说本书后半部分（第四到六章）有什么关键信息，那就是类是一种代码的可选设计模式（不是必要的），而且用像JavaScript这样的`[[Prototype]]`语言来实现它总是很尴尬。
 
-This awkwardness is *not* just about syntax, although that's a big part of it. Chapters 4 and 5 examined quite a bit of syntactic ugliness, from verbosity of `.prototype` references cluttering the code, to *explicit pseudo-polymorphism* (see Chapter 4) when you give methods the same name at different levels of the chain and try to implement a polymorphic reference from a lower-level method to a higher-level method. `.constructor` being wrongly interpreted as "was constructed by" and yet being unreliable for that definition is yet another syntactic ugly.
+虽然这种尴尬很大一部分关于语法，但 *不仅* 限于此。第四和第五章审视了相当多的难看语法，从使代码杂乱的`.prototype`引用的繁冗，到 *显式假想多态*：当你在链条的不同层级上给方法相同的命名以试图实现从低层方法到高层方法的多态引用。`.constructor`被错误地解释为“被XX构建”，这成为了一个不可靠的定义，也成为了另一个难看的语法。
 
-But the problems with class design are much deeper. Chapter 4 points out that classes in traditional class-oriented languages actually produce a *copy* action from parent to child to instance, whereas in `[[Prototype]]`, the action is **not** a copy, but rather the opposite -- a delegation link.
+但关于类的设计的问题要深刻多了。第四章指出在传统的面向类语言中，类实际上发生了从父类向子类，由子类向实例的 *拷贝* 动作，而在`[[Prototype]]`中，动作 **不是** 一个拷贝，而是相反——一个委托链接。
 
-When compared to the simplicity of OLOO-style code and behavior delegation (see Chapter 6), which embrace `[[Prototype]]` rather than hide from it, classes stand out as a sore thumb in JS.
+OLOO风格和行为委托接受了`[[Prototype]]`，而不是将它隐藏起来，当比较它们的简单性时，类在JS中的问题就凸显出来。
 
 ## `class`
 
-But we *don't* need to re-argue that case again. I re-mention those issues briefly only so that you keep them fresh in your mind now that we turn our attention to the ES6 `class` mechanism. We'll demonstrate here how it works, and look at whether or not `class` does anything substantial to address any of those "class" concerns.
+我们 *不必* 再次争论这些问题。我在这里简单地重提这些问题仅仅是为了使它们在你的头脑里保持新鲜，以使我们将注意力转向ES6的`class`机制。我们将在这里展示它如何工作，并且看看`class`是否实质上解决了任何这些“类”的问题。
 
-Let's revisit the `Widget` / `Button` example from Chapter 6:
+让我们重温第六章的`Widget`/`Button`例子：
 
 ```js
 class Widget {
@@ -48,23 +48,23 @@ class Button extends Widget {
 }
 ```
 
-Beyond this syntax *looking* nicer, what problems does ES6 solve?
+除了语法上 *看起来* 更好，ES6还解决了什么？
 
-1. There's no more (well, sorta, see below!) references to `.prototype` cluttering the code.
-2. `Button` is declared directly to "inherit from" (aka `extends`) `Widget`, instead of needing to use `Object.create(..)` to replace a `.prototype` object that's linked, or having to set with `.__proto__` or `Object.setPrototypeOf(..)`.
-3. `super(..)` now gives us a very helpful **relative polymorphism** capability, so that any method at one level of the chain can refer relatively one level up the chain to a method of the same name. This includes a solution to the note from Chapter 4 about the weirdness of constructors not belonging to their class, and so being unrelated -- `super()` works inside constructors exactly as you'd expect.
-4. `class` literal syntax has no affordance for specifying properties (only methods). This might seem limiting to some, but it's expected that the vast majority of cases where a property (state) exists elsewhere but the end-chain "instances", this is usually a mistake and surprising (as it's state that's implicitly "shared" among all "instances"). So, one *could* say the `class` syntax is protecting you from mistakes.
-5. `extends` lets you extend even built-in object (sub)types, like `Array` or `RegExp`, in a very natural way. Doing so without `class .. extends` has long been an exceedingly complex and frustrating task, one that only the most adept of framework authors have ever been able to accurately tackle. Now, it will be rather trivial!
+1. 不再有（某种意义上的，继续往下看！）指向`.prototype`的引用来弄乱代码。
+2. `Button`被声明为直接“继承自”（也就是`extends`）`Widget`，而不是需要用`Object.create(..)`来替换`.prototype`链接的对象，或者用`__proto__`和`Object.setPrototypeOf(..)`来设置它。
+3. `super(..)`现在给了我们非常有用的 **相对多态** 的能力，所以在链条上某一个层级上的任何方法，可以引用链条上相对上一层的同名方法。第四章中有一个关于构造器的奇怪现象：构造器不属于它们的类，而且因此与类没有联系。`super(..)`含有一个对此问题的解决方法 —— `super()`会在构造器内部想如你期望的那样工作。
+4. `class`字面语法对指定属性没有什么启发（仅对方法有）。这看起来限制了某些东西，但是绝大多数情况下期望一个属性（状态）存在于链条末端的“实例”以外的地方，这通常是一个错误和令人诧异（因为这个状态被隐含地在所有“实例”中“分享”）的。所以，也可以说`class`语法防止你出现错误。
+5. `extends`甚至允许你用非常自然的方式扩展内建的对象（子）类型，比如`Array`或者`RegExp`。在没有`class .. extends`的情况下这样做一直以来是一个极端复杂而令人沮丧的任务，只有最熟练的框架作者曾经正确地解决过这个问题。现在，它是小菜一碟！
 
-In all fairness, those are some substantial solutions to many of the most obvious (syntactic) issues and surprises people have with classical prototype-style code.
+凭心而论，对大多数明显的（语法上的）问题，和经典的原型风格代码使人诧异的地方，这些确实是实质上的解决方案。
 
-## `class` Gotchas
+## `class`的坑
 
-It's not all bubblegum and roses, though. There are still some deep and profoundly troubling issues with using "classes" as a design pattern in JS.
+然而，它不全是优点。在JS中将“类”作为一种设计模式，仍然有一些深刻和非常令人烦恼的问题。
 
-Firstly, the `class` syntax may convince you a new "class" mechanism exists in JS as of ES6. **Not so.** `class` is, mostly, just syntactic sugar on top of the existing `[[Prototype]]` (delegation!) mechanism.
+首先，`class`语法可能会说服你JS在ES6中存在一个新的“类”机制。**但不是这样。**`class`很大程度上仅仅是一个既存的`[[Prototype]]`（委托）机制的语法糖！
 
-That means `class` is not actually copying definitions statically at declaration time the way it does in traditional class-oriented languages. If you change/replace a method (on purpose or by accident) on the parent "class", the child "class" and/or instances will still be "affected", in that they didn't get copies at declaration time, they are all still using the live-delegation model based on `[[Prototype]]`:
+这意味着`class`实际上不是像传统面向类语言那样，在声明时静态地拷贝定义。如果你在“父类”上更改/替换了一个方法（有意或无意地），子“类”和/或实例将会受到“影响”，因为它们在声明时没有得到一份拷贝，它们依然都使用那个基于`[[Prototype]]`的实时委托模型。
 
 ```js
 class C {
@@ -89,28 +89,25 @@ c2.rand(); // "Random: 867"
 c1.rand(); // "Random: 432" -- oops!!!
 ```
 
-This only seems like reasonable behavior *if you already know* about the delegation nature of things, rather than expecting *copies* from "real classes". So the question to ask yourself is, why are you choosing `class` syntax for something fundamentally different from classes?
+这种行为只有在 *你已经知道了* 关于委托的性质，而不是期待从“真的类”中 *拷贝* 时，才看起来合理。那么你要问自己的问题是，为什么你为了根本上就和类不同的东西选择`class`语法？
 
-Doesn't the ES6 `class` syntax **just make it harder** to see and understand the difference between traditional classes and delegated objects?
+ES6的`class`语法不是使观察和理解传统的类和委托对象间的不同 **变得更困难** 了吗？
 
-`class` syntax *does not* provide a way to declare class member properties (only methods). So if you need to do that to track shared state among instances, then you end up going back to the ugly `.prototype` syntax, like this:
+`class`语法 *没有* 提供声明类的属性成员的方法（仅对方法有）。所以如果你需要跟踪对象间分享的状态，那么你最终会回到难看的`.prototype`语法，像这样：
 
 ```js
 class C {
 	constructor() {
-		// make sure to modify the shared state,
-		// not set a shadowed property on the
-		// instances!
+		// 确保修改的是共享状态
+		// 不是设置实例上的遮蔽属性
 		C.prototype.count++;
 
-		// here, `this.count` works as expected
-		// via delegation
+		// 这里，`this.count`通过委托如我们期望的那样工作
 		console.log( "Hello: " + this.count );
 	}
 }
 
-// add a property for shared state directly to
-// prototype object
+// 直接在原型对象上添加一个共享属性
 C.prototype.count = 0;
 
 var c1 = new C();
@@ -123,17 +120,16 @@ c1.count === 2; // true
 c1.count === c2.count; // true
 ```
 
-The biggest problem here is that it betrays the `class` syntax by exposing (leakage!) `.prototype` as an implementation detail.
+这里最大的问题是，由于它将`.prototype`作为实现细节暴露（泄露！）出来，而背叛了`class`语法的初衷。
 
-But, we also still have the surprise gotcha that `this.count++` would implicitly create a separate shadowed `.count` property on both `c1` and `c2` objects, rather than updating the shared state. `class` offers us no consolation from that issue, except (presumably) to imply by lack of syntactic support that you shouldn't be doing that *at all*.
+而且，我们还依然面临着那个令人诧异的陷阱：`this.count++`将会隐含地在`c1`和`c2`两个对象上创建一个分离的遮蔽属性`.count`，而不是更新共享的状态。`class`没有在这个问题上给我们什么安慰，除了（大概是）通过缺少语法支持来暗示你 *根本* 就不应该这么做。
 
-Moreover, accidental shadowing is still a hazard:
+另外，无意地遮蔽依然是个灾难：
 
 ```js
 class C {
 	constructor(id) {
-		// oops, gotcha, we're shadowing `id()` method
-		// with a property value on the instance
+		// 噢，一个坑，我们用实例上的属性值遮蔽了`id()`方法
 		this.id = id;
 	}
 	id() {
@@ -142,20 +138,20 @@ class C {
 }
 
 var c1 = new C( "c1" );
-c1.id(); // TypeError -- `c1.id` is now the string "c1"
+c1.id(); // TypeError -- `c1.id` 现在是字符串"c1"
 ```
 
-There's also some very subtle nuanced issues with how `super` works. You might assume that `super` would be bound in an analogous way to how `this` gets bound (see Chapter 2), which is that `super` would always be bound to one level higher than whatever the current method's position in the `[[Prototype]]` chain is.
+还有一些关于`super`如何工作的微妙问题。你可能会假设`super`将会以一种类似与`this`得到绑定的方式（间第二章）来被绑定，也就是`super`总是会绑定到当前方法在`[[Prototype]]`链中的位置的更高一层。
 
-However, for performance reasons (`this` binding is already expensive), `super` is not bound dynamically. It's bound sort of "statically", as declaration time. No big deal, right?
+然而，因为性能问题（`this`绑定已经很耗费性能了），`super`不是动态绑定的。它在声明时，被有些“静态地”绑定。不是什么大事儿，对吧？
 
-Ehh... maybe, maybe not. If you, like most JS devs, start assigning functions around to different objects (which came from `class` definitions), in various different ways, you probably won't be very aware that in all those cases, the `super` mechanism under the covers is having to be re-bound each time.
+恩……可能是，可能不是。如果你像大多数JS开发者那样，开始把函数赋值给不同的（来自于`class`定义的）对象，以各种不同的方式，你可能不会意识到在所有这些情况下，底层的`super`机制会不得不每次都重新绑定。
 
-And depending on what sorts of syntactic approaches you take to these assignments, there may very well be cases where the `super` can't be properly bound (at least, not where you suspect), so you may (at time of writing, TC39 discussion is ongoing on the topic) have to manually bind `super` with `toMethod(..)` (kinda like you have to do `bind(..)` for `this` -- see Chapter 2).
+而且根据你每次赋值采取的语法方式不同，很有可能在某些情况下`super`不能被正确地绑定（至少不会像你期望的那样），所以你可能（在写作这里时，TC39正在讨论这个问题）会不得不用`toMethod(..)`来手动绑定`super`（有点儿像你不得不用`bind(..)`绑定`this` —— 见第二章）。
 
-You're used to being able to assign around methods to different objects to *automatically* take advantage of the dynamism of `this` via the *implicit binding* rule (see Chapter 2). But the same will likely not be true with methods that use `super`.
+你曾经可以给不同的对象赋予方法，来通过 *隐含绑定* 规则（见第二章），自动地利用`this`的动态性。但对于使用`super`的方法，同样的事情很可能不会发生。
 
-Consider what `super` should do here (against `D` and `E`):
+考虑这里`super`应当怎样动作（对`D`和`E`）：
 
 ```js
 class P {
@@ -179,62 +175,62 @@ var E = {
 	foo: C.prototype.foo
 };
 
-// Link E to D for delegation
+// E链接到D来进行委托
 Object.setPrototypeOf( E, D );
 
 E.foo(); // "P.foo"
 ```
 
-If you were thinking (quite reasonably!) that `super` would be bound dynamically at call-time, you might expect that `super()` would automatically recognize that `E` delegates to `D`, so `E.foo()` using `super()` should call to `D.foo()`.
+如果你（十分合理地！）认为`super`将会在调用时自动绑定，你可能会期望`super()`将会自动地认识到`E`委托至`D`，所以使用`super()`的`E.foo()`应当调用`D.foo()`。
 
-**Not so.** For performance pragmatism reasons, `super` is not *late bound* (aka, dynamically bound) like `this` is. Instead it's derived at call-time from `[[HomeObject]].[[Prototype]]`, where `[[HomeObject]]` is statically bound at creation time.
+**不是这样。** 由于实用主义的性能原因，`super`不像`this`那样 *延迟绑定*（也就是动态绑定）。相反它从调用时`[[HomeObject]].[[Prototype]]`派生出来，而`[[HomeObject]]`是在声明时静态绑定的。
 
-In this particular case, `super()` is still resolving to `P.foo()`, since the method's `[[HomeObject]]` is still `C` and `C.[[Prototype]]` is `P`.
+在这个特定的例子中，`super()`依然解析为`P.foo()`，因为方法的`[[HomeObject]]`仍然是`C`而且`C.[[Prototype]]`是`P`。
 
-There will *probably* be ways to manually address such gotchas. Using `toMethod(..)` to bind/rebind a method's `[[HomeObject]]` (along with setting the `[[Prototype]]` of that object!) appears to work in this scenario:
+*可能* 会有方法手动地解决这样的陷阱。在这个场景中使用`toMethod(..)`来绑定/重绑定方法的`[[HomeObject]]`（设置这个对象的`[[Prototype]]`一起！）似乎会管用：
 
 ```js
 var D = {
 	foo: function() { console.log( "D.foo" ); }
 };
 
-// Link E to D for delegation
+// E链接到D来进行委托
 var E = Object.create( D );
 
-// manually bind `foo`s `[[HomeObject]]` as
-// `E`, and `E.[[Prototype]]` is `D`, so thus
-// `super()` is `D.foo()`
+// 手动绑定`foo`的`[[HomeObject]]`到
+// `E`, 因为`E.[[Prototype]]`是`D`，所以
+// `super()`是`D.foo()`
 E.foo = C.prototype.foo.toMethod( E, "foo" );
 
 E.foo(); // "D.foo"
 ```
 
-**Note:** `toMethod(..)` clones the method, and takes `homeObject` as its first parameter (which is why we pass `E`), and the second parameter (optionally) sets a `name` for the new method (which keep at "foo").
+**注意：** `toMethod()`克隆这个方法，然后将它的第一个参数作为`homeObject`（这就是为什么我们传入`E`），第二个参数（可选）用来设置新方法的`name`（保持“foo”不变）。
 
-It remains to be seen if there are other corner case gotchas that devs will run into beyond this scenario. Regardless, you will have to be diligent and stay aware of which places the engine automatically figures out `super` for you, and which places you have to manually take care of it. **Ugh!**
+除了这种场景以外，是否还有其他的极端情况会使开发者们落入陷阱还有待观察。无论如何，你将不得不费心保持清醒：在哪里引擎自动为你确定`super`，和在哪里你不得不手动处理它。**噢！**
 
-# Static > Dynamic?
+# 静态优于动态？
 
-But the biggest problem of all about ES6 `class` is that all these various gotchas mean `class` sorta opts you into a syntax which seems to imply (like traditional classes) that once you declare a `class`, it's a static definition of a (future instantiated) thing. You completely lose sight of the fact `C` is an object, a concrete thing, which you can directly interact with.
+但是关于ES6的最大问题是，所有这些种种陷阱意味着`class`有点儿将你带入一种语法，它看起来暗示着（像传统的类那样）一旦你声明一个`class`，它是一个东西的静态定义（将来会实例化）。使你完全忘记了这个事实：`C`是一个对象，一个你可以直接互动的具体的东西。
 
-In traditional class-oriented languages, you never adjust the definition of a class later, so the class design pattern doesn't suggest such capabilities. But **one of the most powerful parts** of JS is that it *is* dynamic, and the definition of any object is (unless you make it immutable) a fluid and mutable *thing*.
+在传统面向类的语言中，你从不会在晚些时候调整类的定义，所以类设计模式不提供这样的能力。但是JS的 **一个最强大的部分** 就是它 *是* 动态的，而且任何对象的定义都是（除非你将它设定为不可变）不固定的可变的 *东西*。
 
-`class` seems to imply you shouldn't do such things, by forcing you into the uglier `.prototype` syntax to do so, or forcing you think about `super` gotchas, etc. It also offers *very little* support for any of the pitfalls that this dynamism can bring.
+`class`看起来在暗示你不应该做这样的事情，通过强制你使用`.prototype`语法才能做到，或强制你考虑`super`的陷阱，等等。而且它对这种动态机制可能带来的一切陷阱 *几乎不* 提供任何支持。
 
-In other words, it's as if `class` is telling you: "dynamic is too hard, so it's probably not a good idea. Here's a static-looking syntax, so code your stuff statically."
+换句话说，`class`好像在告诉你：“动态太坏了，所以这可能不是一个好主意。这里有看似静态语法，把你的东西静态编码。”
 
-What a sad commentary on JavaScript: **dynamic is too hard, let's pretend to be (but not actually be!) static**.
+关于JavaScript的评论是多么悲伤啊：**动态太难了，让我们假装成（但实际上不是！）静态吧**。
 
-These are the reasons why ES6 `class` is masquerading as a nice solution to syntactic headaches, but it's actually muddying the waters further and making things worse for JS and for clear and concise understanding.
+这些就是为什么ES6的`class`伪装成一个语法头痛症的解决方案，但是它实际上把水搅得更浑，而且更不容易对JS形成清晰简明的认识。
 
-**Note:** If you use the `.bind(..)` utility to make a hard-bound function (see Chapter 2), the function created is not subclassable with ES6 `extend` like normal functions are.
+**注意：** 如果你使用`.bind(..)`工具制作一个硬绑定函数（见第二章），那么这个函数是不能像普通函数那样用ES6的`extend`扩展的。
 
-## Review (TL;DR)
+## 复习
 
-`class` does a very good job of pretending to fix the problems with the class/inheritance design pattern in JS. But it actually does the opposite: **it hides many of the problems, and introduces other subtle but dangerous ones**.
+`class`在假装修复JS中的类/继承设计模式的问题上做的很好。但他实际上做的却正相反：**它隐藏了许多问题，而且引入了其他微妙而且危险的东西**。
 
-`class` contributes to the ongoing confusion of "class" in JavaScript which has plagued the language for nearly two decades. In some respects, it asks more questions than it answers, and it feels in totality like a very unnatural fit on top of the elegant simplicity of the `[[Prototype]]` mechanism.
+`class`为折磨了JavaScript语言将近20年的“类”的困扰做出了新的贡献。在某些方面，它问的问题比它解决的多，而且在`[[Prototype]]`机制的优雅和简单之上，它整体上感觉像是一个非常不自然的匹配。
 
-Bottom line: if ES6 `class` makes it harder to robustly leverage `[[Prototype]]`, and hides the most important nature of the JS object mechanism -- **the live delegation links between objects** -- shouldn't we see `class` as creating more troubles than it solves, and just relegate it to an anti-pattern?
+底线：如果ES6`class`使稳健地利用`[[Prototype]]`变得困难，而且隐藏了JS对象机制最重要的性质 —— **对象间的实时委托链接** —— 我们不应该认为`class`产生的麻烦比它解决的更多，并且将它贬低为一种反模式吗？
 
-I can't really answer that question for you. But I hope this book has fully explored the issue at a deeper level than you've ever gone before, and has given you the information you need *to answer it yourself*.
+我真的不能帮你回答这个问题。但我希望这本书已经在你从未经历过的深度上完全地探索了这个问题，而且已经给出了 *你自己回答这个问题* 所需的信息。
