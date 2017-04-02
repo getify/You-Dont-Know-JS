@@ -203,7 +203,7 @@ if (DEBUG) {
 }
 
 // this is a safe existence check
-if (typeof DEBUG !== "undefined") {
+if (typeof DEBUG !== "undefined" && DEBUG) {
 	console.log( "Debugging is starting" );
 }
 ```
