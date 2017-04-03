@@ -9,6 +9,14 @@ The *You Don't Know JS* (*YDKJS*) series stands in stark contrast to the typical
 
 I'm going to use this final chapter to briefly summarize what to expect from the rest of the books in the series, and how to most effectively go about building a foundation of JS learning on top of *YDKJS*.
 
+### Table of contents
+
+* [Scope & Closures](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20%26%20going/ch3.md#scope--closures)
+* [this & Object Prototypes](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20%26%20going/ch3.md#this--object-prototypes)
+* [Types & Grammar](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20%26%20going/ch3.md#types--grammar)
+* [Async & Performance](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20%26%20going/ch3.md#async--performance)
+* [ES6 & Beyond](https://github.com/uppusaikiran/You-Dont-Know-JS/blob/master/up%20%26%20going/ch3.md#es6--beyond)
+
 ## Scope & Closures
 
 Perhaps one of the most fundamental things you'll need to quickly come to terms with is how scoping of variables really works in JavaScript. It's not enough to have anecdotal fuzzy *beliefs* about scope.
