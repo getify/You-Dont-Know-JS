@@ -17,7 +17,7 @@ a[0] === 1;		// true
 a[2][0] === 3;	// true
 ```
 
-You don't need to presize your `array`s (see "Arrays" in Chapter 3), you can just declare them and add values as you see fit:
+You don't need to resize your `array`s (see "Arrays" in Chapter 3), you can just declare them and add values as you see fit:
 
 ```js
 var a = [ ];
