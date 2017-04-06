@@ -2,34 +2,37 @@
 
 ## Table of Contents
 
-* Foreword
-* Preface
-* Chapter 1: Into Programming
-	* Code
-	* Try It Yourself
-	* Operators
-	* Values & Types
-	* Code Comments
-	* Variables
-	* Blocks
-	* Conditionals
-	* Loops
-	* Functions
-	* Practice
-* Chapter 2: Into JavaScript
-	* Values & Types
-	* Variables
-	* Conditionals
-	* Strict Mode
-	* Functions As Values
-	* `this` Keyword
-	* Prototypes
-	* Old & New
-	* Non-JavaScript
-* Chapter 3: Into YDKJS
-	* Scope & Closures
-	* this & Object Prototypes
-	* Types & Grammar
-	* Async & Performance
-	* ES6 & Beyond
-* Appendix A: Acknowledgments
+- [Foreword](foreword.md)
+- [Preface](../preface.md)
+- [Chapter 1: Into Programming](ch1.md)
+	- [Code](ch1.md#code)
+	- [Try It Yourself](ch1.md#try-it-yourself)
+	- [Operators](ch1.md#operators)
+	- [Values & Types](ch1.md#values-types)
+	- [Code Comments](ch1.md#code-comments)
+	- [Variables](ch1.md#variables)
+	- [Blocks](ch1.md#blocks)
+	- [Conditionals](ch1.md#conditionals)
+	- [Loops](ch1.md#loops)
+	- [Functions](ch1.md#functions)
+	- [Practice](ch1.md#practice)
+	- [Review](ch1.md#review)
+- [Chapter 2: Into JavaScript](ch2.md)
+	- [Values & Types](ch2.md#values-types)
+	- [Variables](ch2.md#variables)
+	- [Conditionals](ch2.md#conditionals)
+	- [Strict Mode](ch2.md#strict-mode)
+	- [Functions As Values](ch2.md#functions-as-values)
+	- [`this` Identifier](ch2.md#-this-identifier)
+	- [Prototypes](ch2.md#prototypes)
+	- [Old & New](ch2.md#old-new)
+	- [Non-JavaScript](ch2.md#non-javascript)
+	- [Review](ch2.md#review)
+- [Chapter 3: Into YDKJS](ch3.md)
+	- [Scope & Closures](#scope-closures)
+	- [this & Object Prototypes](#-this-object-prototypes)
+	- [Types & Grammar](#types-grammar)
+	- [Async & Performance](#async-performance)
+	- [ES6 & Beyond](#es6-beyond)
+	- [Review](#review)
+- [Appendix A: Acknowledgments](apA.md)

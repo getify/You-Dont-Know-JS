@@ -2,50 +2,55 @@
 
 ## Table of Contents
 
-* Foreword
-* Preface
-* Chapter 1: Asynchrony: Now & Later
-	* A Program In Chunks
-	* Event Loop
-	* Parallel Threading
-	* Concurrency
-	* Jobs
-	* Statement Ordering
-* Chapter 2: Callbacks
-	* Continuations
-	* Sequential Brain
-	* Trust Issues
-	* Trying To Save Callbacks
-* Chapter 3: Promises
-	* What is a Promise?
-	* Thenable Duck-Typing
-	* Promise Trust
-	* Chain Flow
-	* Error Handling
-	* Promise Patterns
-	* Promise API Recap
-	* Promise Limitations
-* Chapter 4: Generators
-	* Breaking Run-to-completion
-	* Generator'ing Values
-	* Iterating Generators Asynchronously
-	* Generators + Promises
-	* Generator Delegation
-	* Generator Concurrency
-	* Thunks
-	* Pre-ES6 Generators
-* Chapter 5: Program Performance
-	* Web Workers
-	* SIMD
-	* asm.js
-* Chapter 6: Benchmarking & Tuning
-	* Benchmarking
-	* Context Is King
-	* jsPerf.com
-	* Writing Good Tests
-	* Microperformance
-	* Tail Call Optimization (TCO)
-* Appendix A: *asynquence* Library
-* Appendix B: Advanced Async Patterns
-* Appendix C: Acknowledgments
-
+- [Foreword](foreword.md)
+- [Preface](../preface)
+- [Chapter 1: Asynchrony: Now & Later](#chapter-1-asynchrony-now-&-later)
+  - [A Program in Chunks](#a-program-in-chunks)
+  - [Event Loop](#event-loop)
+  - [Parallel Threading](#parallel-threading)
+  - [Concurrency](#concurrency)
+  - [Jobs](#jobs)
+  - [Statement Ordering](#statement-ordering)
+  - [Review](#review)
+- [Chapter 2: Callbacks](#chapter-2-callbacks)
+  - [Continuations](#continuations)
+  - [Sequential Brain](#sequential-brain)
+  - [Trust Issues](#trust-issues)
+  - [Trying to Save Callbacks](#trying-to-save-callbacks)
+  - [Review](#review)
+- [Chapter 3: Promises](#chapter-3-promises)
+  - [What Is a Promise?](#what-is-a-promise)
+  - [Thenable Duck Typing](#thenable-duck-typing)
+  - [Promise Trust](#promise-trust)
+  - [Chain Flow](#chain-flow)
+  - [Error Handling](#error-handling)
+  - [Promise Patterns](#promise-patterns)
+  - [Promise API Recap](#promise-api-recap)
+  - [Promise Limitations](#promise-limitations)
+  - [Review](#review)
+- [Chapter 4: Generators](#chapter-4-generators)
+  - [Breaking Run-to-Completion](#breaking-run-to-completion)
+  - [Generator'ing Values](#generatoring-values)
+  - [Iterating Generators Asynchronously](#iterating-generators-asynchronously)
+  - [Generators + Promises](#generators--promises)
+  - [Generator Delegation](#generator-delegation)
+  - [Generator Concurrency](#generator-concurrency)
+  - [Thunks](#thunks)
+  - [Pre-ES6 Generators](#pre-es6-generators)
+  - [Review](#review)
+- [Chapter 5: Program Performance](#chapter-5-program-performance)
+  - [Web Workers](#web-workers)
+  - [SIMD](#simd)
+  - [asm.js](#asmjs)
+  - [Review](#review)
+- [Chapter 6: Benchmarking & Tuning](#chapter-6-benchmarking-&-tuning)
+  - [Benchmarking](#benchmarking)
+  - [Context Is King](#context-is-king)
+  - [jsPerf.com](#jsperfcom)
+  - [Writing Good Tests](#writing-good-tests)
+  - [Microperformance](#microperformance)
+  - [Tail Call Optimization (TCO)](#tail-call-optimization-tco)
+  - [Review](#review)
+- [Appendix A: -asynquence- Library](apA.md)
+- [Appendix B: Advanced Async Patterns](apB.md)
+- [Appendix C: Acknowledgments](apC.md)

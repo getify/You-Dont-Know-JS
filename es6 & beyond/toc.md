@@ -2,57 +2,65 @@
 
 ## Table of Contents
 
-* Foreword
-* Preface
-* Chapter 1: ES? Now & Future
-	* Versioning
-	* Transpiling
-* Chapter 2: Syntax
-	* Block-Scoped Declarations
-	* Spread / Rest
-	* Default Parameter Values
-	* Destructuring
-	* Object Literal Extensions
-	* Template Literals
-	* Arrow Functions
-	* `for..of` Loops
-	* Regular Expression Extensions
-	* Number Literal Extensions
-	* Unicode
-	* Symbols
-* Chapter 3: Organization
-	* Iterators
-	* Generators
-	* Modules
-	* Classes
-* Chapter 4: Async Flow Control
-	* Promises
-	* Generators + Promises
-* Chapter 5: Collections
-	* TypedArrays
-	* Maps
-	* WeakMaps
-	* Sets
-	* WeakSets
-* Chapter 6: API Additions
-	* `Array`
-	* `Object`
-	* `Math`
-	* `Number`
-	* `String`
-* Chapter 7: Meta Programming
-	* Function Names
-	* Meta Properties
-	* Well Known Symbols
-	* Proxies
-	* `Reflect` API
-	* Feature Testing
-	* Tail Call Optimization (TCO)
-* Chapter 8: Beyond ES6
-	* `async function`s
-	* `Object.observe(..)`
-	* Exponentiation Operator
-	* Object Properties and `...`
-	* `Array#includes(..)`
-	* SIMD
-* Appendix A: Acknowledgments
+* [Foreword](foreword.md)
+* [Preface](../preface)
+- [Chapter 1: ES? Now & Future](ch1.md#chapter-1-es-now-&-future)
+  - [Versioning](ch1.md#versioning)
+  - [Transpiling](ch1.md#transpiling)
+  - [Review](ch1.md#review)
+- [Chapter 2: Syntax](ch2.md#chapter-2-syntax)
+  - [Block-Scoped Declarations](ch2.md#block-scoped-declarations)
+  - [Spread/Rest](ch2.md#spreadrest)
+  - [Default Parameter Values](ch2.md#default-parameter-values)
+  - [Destructuring](ch2.md#destructuring)
+  - [Object Literal Extensions](ch2.md#object-literal-extensions)
+  - [Template Literals](ch2.md#template-literals)
+  - [Arrow Functions](ch2.md#arrow-functions)
+  - [`for..of` Loops](ch2.md#forof-loops)
+  - [Regular Expressions](ch2.md#regular-expressions)
+  - [Number Literal Extensions](ch2.md#number-literal-extensions)
+  - [Unicode](ch2.md#unicode)
+  - [Symbols](ch2.md#symbols)
+- [Chapter 3: Organization](ch3.md#chapter-3-organization)
+  - [Iterators](ch3.md#iterators)
+  - [Generators](ch3.md#generators)
+  - [Modules](ch3.md#modules)
+  - [Classes](ch3.md#classes)
+  - [Review](ch3.md#review)
+- [Chapter 4: Async Flow Control](ch4.md#chapter-4-async-flow-control)
+  - [Promises](ch4.md#promises)
+  - [Generators + Promises](ch4.md#generators--promises)
+  - [Review](ch4.md#review)
+- [Chapter 5: Collections](ch5.md#chapter-5-collections)
+  - [TypedArrays](ch5.md#typedarrays)
+  - [Maps](ch5.md#maps)
+  - [WeakMaps](ch5.md#weakmaps)
+  - [Sets](ch5.md#sets)
+  - [WeakSets](ch5.md#weaksets)
+  - [Review](ch5.md#review)
+- [Chapter 6: API Additions](ch6.md#chapter-6-api-additions)
+  - [`Array`](ch6.md#array)
+  - [`Object`](ch6.md#object)
+  - [`Math`](ch6.md#math)
+  - [`Number`](ch6.md#number)
+  - [`String`](ch6.md#string)
+  - [Review](ch6.md#review)
+- [Chapter 7: Meta Programming](ch7.md#chapter-7-meta-programming)
+  - [Function Names](ch7.md#function-names)
+  - [Meta Properties](ch7.md#meta-properties)
+  - [Well Known Symbols](ch7.md#well-known-symbols)
+  - [Proxies](ch7.md#proxies)
+  - [`Reflect` API](ch7.md#reflect-api)
+  - [Feature Testing](ch7.md#feature-testing)
+  - [Tail Call Optimization (TCO)](ch7.md#tail-call-optimization-tco)
+  - [Review](ch7.md#review)
+- [Chapter 8: Beyond ES6](ch8.md#chapter-8-beyond-es6)
+  - [`async function`s](ch8.md#async-functions)
+  - [`Object.observe(..)`](ch8.md#objectobserve)
+  - [Exponentiation Operator](ch8.md#exponentiation-operator)
+  - [Objects Properties and `...`](ch8.md#objects-properties-and-)
+  - [`Array#includes(..)`](ch8.md#arrayincludes)
+  - [SIMD](ch8.md#simd)
+  - [WebAssembly (WASM)](ch8.md#webassembly-wasm)
+  - [Review](ch8.md#review)
+* [Appendix A: Acknowledgments](apA.md)
