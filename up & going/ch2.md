@@ -780,7 +780,7 @@ function foo() {
 	console.log( this.bar );
 }
 
-var bar = "global";
+bar = "global";
 
 var obj1 = {
 	bar: "obj1",
