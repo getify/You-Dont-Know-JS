@@ -595,7 +595,7 @@ console.log( x, y, z );				// 4 5 6
 
 Pretty cool, right?
 
-But is `{ x, .. }` leaving off the `x: ` part or leaving off the `: x` part? We're actually leaving off the `x: ` part when we use the shorter syntax. That may not seem like an important detail, but you'll understand its importance in just a moment.
+But is `{ x, .. }` leaving off the `x: ` part or leaving off the `: x` part? We're actually leaving off the `: x` part when we use the shorter syntax. That may not seem like an important detail, but you'll understand its importance in just a moment.
 
 If you can write the shorter form, why would you ever write out the longer form? Because that longer form actually allows you to assign a property to a different variable name, which can sometimes be quite useful:
 
