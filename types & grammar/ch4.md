@@ -1069,10 +1069,10 @@ function onlyOne() {
 var a = true;
 var b = false;
 
-onlyOne( b, a );				// true
-onlyOne( b, a, b, b, b );		// true
+onlyOne( b, a );		// true
+onlyOne( b, a, b, b, b );	// true
 
-onlyOne( b, b );				// false
+onlyOne( b, b );		// false
 onlyOne( b, a, b, b, b, a );	// false
 ```
 
@@ -1135,7 +1135,7 @@ while (c) {
 }
 
 c = d ? a : b;
-c;								// "abc"
+c;					// "abc"
 
 if ((a && d) || c) {
 	console.log( "yep" );		// yep
