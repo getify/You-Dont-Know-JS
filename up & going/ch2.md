@@ -226,11 +226,12 @@ The specific list of "falsy" values in JavaScript is as follows:
 * `null`, `undefined`
 * `false`
 
-Any value that's not on this "falsy" list is "truthy." Here are some examples of those:
+Any value that's not on the list above is considered "truthy." Here are some examples of those values:
 
 * `"hello"`
 * `42`
 * `true`
+* `"false"`
 * `[ ]`, `[ 1, "2", 3 ]` (arrays)
 * `{ }`, `{ a: 42 }` (objects)
 * `function foo() { .. }` (functions)
