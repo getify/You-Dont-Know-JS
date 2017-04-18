@@ -279,3 +279,5 @@ In the next chapter, we will learn to find a function's **call-site** to determi
 To learn `this`, you first have to learn what `this` is *not*, despite any assumptions or misconceptions that may lead you down those paths. `this` is neither a reference to the function itself, nor is it a reference to the function's *lexical* scope.
 
 `this` is actually a binding that is made when a function is invoked, and *what* it references is determined entirely by the call-site where the function is called.
+
+[Chapter 2: this All Makes Sense Now!] (https://github.com/getify/You-Dont-Know-JS/blob/master/this%20&%20object%20prototypes/ch2.md)

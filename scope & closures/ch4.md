@@ -219,3 +219,5 @@ What this leads to is that all declarations in a scope, regardless of where they
 Declarations themselves are hoisted, but assignments, even assignments of function expressions, are *not* hoisted.
 
 Be careful about duplicate declarations, especially mixed between normal var declarations and function declarations -- peril awaits if you do!
+
+[Chapter 5: Scope Closure] (https://github.com/getify/You-Dont-Know-JS/blob/master/scope%20%26%20closures/ch5.md)
