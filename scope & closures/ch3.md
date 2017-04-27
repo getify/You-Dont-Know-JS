@@ -579,7 +579,7 @@ See Appendix B for an alternate (more explicit) style of block-scoping which may
 
 ### `const`
 
-In addition to `let`, ES6 introduces `const`, which also creates a block-scoped variable, but whose value is fixed (constant). Any attempt to change that value at a later time results in an error.
+In addition to `let`, ES6 introduces `const`, which also creates a block-scoped variable, but whose binding is fixed (constant). Any attempt to change that binding at a later time results in an error.  The value that the variable refers to, however, is mutable.  If you want to create an immutable object, then use Object.freeze(obj).
 
 ```js
 var foo = true;
