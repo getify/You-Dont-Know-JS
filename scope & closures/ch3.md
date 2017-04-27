@@ -587,13 +587,16 @@ var foo = true;
 if (foo) {
 	var a = 2;
 	const b = 3; // block-scoped to the containing `if`
-
+	const c = {}; // mutable value block-scoped to the containing `if` 
+	
 	a = 3; // just fine!
 	b = 4; // error!
+	c.foo = 42; // just fine!
 }
 
 console.log( a ); // 3
 console.log( b ); // ReferenceError!
+console.log( c ); // [foo: 42]
 ```
 
 ## Review (TL;DR)
