@@ -567,8 +567,8 @@ export awesome;
 
 ```js
 // import the entire "foo" and "bar" modules
-module foo from "foo";
-module bar from "bar";
+import "foo";
+import "bar";
 
 console.log(
 	bar.hello( "rhino" )
@@ -579,7 +579,7 @@ foo.awesome(); // LET ME INTRODUCE: HIPPO
 
 **Note:** Separate files **"foo.js"** and **"bar.js"** would need to be created, with the contents as shown in the first two snippets, respectively. Then, your program would load/import those modules to use them, as shown in the third snippet.
 
-`import` imports one or more members from a module's API into the current scope, each to a bound variable (`hello` in our case). `module` imports an entire module API to a bound variable (`foo`, `bar` in our case). `export` exports an identifier (variable, function) to the public API for the current module. These operators can be used as many times in a module's definition as is necessary.
+`import` imports one or more members from a module's API into the current scope, each to a bound variable (`hello` in our case). It can also import an entire module API to a bound variable (`foo`, `bar` in our case). `export` exports an identifier (variable, function) to the public API for the current module. These operators can be used as many times in a module's definition as is necessary.
 
 The contents inside the *module file* are treated as if enclosed in a scope closure, just like with the function-closure modules seen earlier.
 
