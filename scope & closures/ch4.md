@@ -216,6 +216,13 @@ We can be tempted to look at `var a = 2;` as one statement, but the JavaScript *
 
 What this leads to is that all declarations in a scope, regardless of where they appear, are processed *first* before the code itself is executed. You can visualize this as declarations (variables and functions) being "moved" to the top of their respective scopes, which we call "hoisting".
 
-Declarations themselves are hoisted, but assignments, even assignments of function expressions, are *not* hoisted.
-
+### Declarations themselves are hoisted, but assignments, even assignments of function expressions, are *not* hoisted.
+- are you sure? What about usual example:
+  ```js
+  function foo() {
+    console.log( a );
+    
+    a = 2; // look like this will be hoisted with assignment
+  }
+```
 Be careful about duplicate declarations, especially mixed between normal var declarations and function declarations -- peril awaits if you do!
