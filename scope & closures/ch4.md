@@ -207,8 +207,7 @@ else {
    function foo() { console.log( "b" ); }
 }
 ```
-
-However, it's important to note that this behavior is not reliable and is subject to change in future versions of JavaScript, so it's probably best to avoid declaring functions in blocks.
+However, SpiderMonkey is Mozilla's JavaScript engine throws ReferenceError: foo is not defined, so it's  best to avoid declaring functions in blocks.
 
 ## Review (TL;DR)
 
