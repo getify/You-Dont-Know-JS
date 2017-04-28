@@ -481,10 +481,9 @@ What about the trust issue of never being called? If this is a concern (and it p
 ```js
 function timeoutify(fn,delay) {
 	var intv = setTimeout( function(){
-			intv = null;
-			fn( new Error( "Timeout!" ) );
-		}, delay )
-	;
+		intv = null;
+		fn( new Error( "Timeout!" ) );
+	}, delay );
 
 	return function() {
 		// timeout hasn't happened yet?
