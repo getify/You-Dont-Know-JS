@@ -2234,7 +2234,7 @@ This is more work than just using a `Promise` API polyfill for pre-ES6 Promises,
 
 Once you get hooked on generators, you'll never want to go back to the hell of async spaghetti callbacks!
 
-## Review
+## Review (TL;DR)
 
 Generators are a new ES6 function type that does not run-to-completion like normal functions. Instead, the generator can be paused in mid-completion (entirely preserving its state), and it can later be resumed from where it left off.
 
