@@ -35,7 +35,7 @@ For `b`, the coercion that occurs happens implicitly, because the `+` operator c
 
 By contrast, the `String(..)` function makes it pretty obvious that it's explicitly taking the value in `a` and coercing it to a `string` representation.
 
-Both approaches accomplish the same effect: `"42"` comes from `42`. But it's the *how* that is at the heart of the heated debates over JavaScript coercion.
+Both approaches accomplish the same effect: `42` comes from `"42"`. But it's the *how* that is at the heart of the heated debates over JavaScript coercion.
 
 **Note:** Technically, there's some nuanced behavioral difference here beyond the stylistic difference. We cover that in more detail later in the chapter, in the "Implicitly: Strings <--> Numbers" section.
 
