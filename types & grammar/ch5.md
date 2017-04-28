@@ -1086,11 +1086,11 @@ foo( 10, undefined );	// 2 10 11 10 undefined
 foo( 10, null );		// 2 10 null 10 null
 ```
 
-Even though the default parameter values are applied to the `a` and `b` parameters, if no arguments were passed in those slots, the `arguments` array will not have entries.
+Even though the default parameter values are applied to the `a` and `b` parameters, if no arguments were passed in those slots, the `arguments` object will not have entries.
 
-Conversely, if you pass an `undefined` argument explicitly, an entry will exist in the `arguments` array for that argument, but it will be `undefined` and not (necessarily) the same as the default value that was applied to the named parameter for that same slot.
+Conversely, if you pass an `undefined` argument explicitly, an entry will exist in the `arguments` object for that argument, but it will be `undefined` and not (necessarily) the same as the default value that was applied to the named parameter for that same slot.
 
-While ES6 default parameter values can create divergence between the `arguments` array slot and the corresponding named parameter variable, this same disjointedness can also occur in tricky ways in ES5:
+While ES6 default parameter values can create divergence between the `arguments` object slot and the corresponding named parameter variable, this same disjointedness can also occur in tricky ways in ES5:
 
 ```js
 function foo(a) {
@@ -1119,9 +1119,9 @@ foo();		// undefined (not linked)
 
 It's almost certainly a bad idea to ever rely on any such linkage, and in fact the linkage itself is a leaky abstraction that's exposing an underlying implementation detail of the engine, rather than a properly designed feature.
 
-Use of the `arguments` array has been deprecated (especially in favor of ES6 `...` rest parameters -- see the *ES6 & Beyond* title of this series), but that doesn't mean that it's all bad.
+Use of the `arguments` object has been deprecated (especially in favor of ES6 `...` rest parameters -- see the *ES6 & Beyond* title of this series), but that doesn't mean that it's all bad.
 
-Prior to ES6, `arguments` is the only way to get an array of all passed arguments to pass along to other functions, which turns out to be quite useful. You can also mix named parameters with the `arguments` array and be safe, as long as you follow one simple rule: **never refer to a named parameter *and* its corresponding `arguments` slot at the same time.** If you avoid that bad practice, you'll never expose the leaky linkage behavior.
+Prior to ES6, `arguments` is the only way to get an array of all passed arguments to pass along to other functions, which turns out to be quite useful. You can also mix named parameters with the `arguments` object and be safe, as long as you follow one simple rule: **never refer to a named parameter *and* its corresponding `arguments` slot at the same time.** If you avoid that bad practice, you'll never expose the leaky linkage behavior.
 
 ```js
 function foo(a) {
@@ -1380,7 +1380,7 @@ ASI (Automatic Semicolon Insertion) is a parser-error-correction mechanism built
 
 JavaScript has several types of errors, but it's less known that it has two classifications for errors: "early" (compiler thrown, uncatchable) and "runtime" (`try..catch`able). All syntax errors are obviously early errors that stop the program before it runs, but there are others, too.
 
-Function arguments have an interesting relationship to their formal declared named parameters. Specifically, the `arguments` array has a number of gotchas of leaky abstraction behavior if you're not careful. Avoid `arguments` if you can, but if you must use it, by all means avoid using the positional slot in `arguments` at the same time as using a named parameter for that same argument.
+Function arguments have an interesting relationship to their formal declared named parameters. Specifically, the `arguments` object has a number of gotchas of leaky abstraction behavior if you're not careful. Avoid `arguments` if you can, but if you must use it, by all means avoid using the positional slot in `arguments` at the same time as using a named parameter for that same argument.
 
 The `finally` clause attached to a `try` (or `try..catch`) offers some very interesting quirks in terms of execution processing order. Some of these quirks can be helpful, but it's possible to create lots of confusion, especially if combined with labeled blocks. As always, use `finally` to make code better and clearer, not more clever or confusing.
 
