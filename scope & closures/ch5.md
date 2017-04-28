@@ -551,7 +551,7 @@ export hello;
 
 **foo.js**
 ```js
-// import only `hello()` from the "bar" module
+// import only `hello` from the "bar" module
 import hello from "bar";
 
 var hungry = "hippo";
