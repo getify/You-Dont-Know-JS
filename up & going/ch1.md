@@ -749,7 +749,7 @@ function formatAmount(amount) {
 }
 
 // keep buying phones while you still have money
-while (amount < bank_balance) {
+while (amount + PHONE_PRICE < bank_balance) {
 	// buy a new phone!
 	amount = amount + PHONE_PRICE;
 
