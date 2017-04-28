@@ -210,7 +210,7 @@ function observer(changes){
 	for (var change of changes) {
 		if (change.type == "recalc") {
 			change.object.c =
-				change.object.oldValue +
+				change.oldValue +
 				change.object.a +
 				change.object.b;
 		}
@@ -241,8 +241,8 @@ Object.observe(
 
 changeObj( 3, 11 );
 
-obj.a;			// 12
-obj.b;			// 30
+obj.a;			// 6
+obj.b;			// 33
 obj.c;			// 3
 ```
 
