@@ -194,9 +194,6 @@ var Fib = {
 		var n1 = 1, n2 = 1;
 
 		return {
-			// make the iterator an iterable
-			[Symbol.iterator]() { return this; },
-
 			next() {
 				var current = n2;
 				n2 = n1;
