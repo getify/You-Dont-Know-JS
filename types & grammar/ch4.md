@@ -1830,8 +1830,8 @@ The algorithm first calls `ToPrimitive` coercion on both values, and if the retu
 For example:
 
 ```js
-var a = [ 42 ];
-var b = [ "43" ];
+var a = new Number(42);
+var b = [ "043" ];
 
 a < b;	// true
 b < a;	// false
