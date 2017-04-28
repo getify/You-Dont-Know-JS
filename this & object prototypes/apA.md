@@ -227,7 +227,7 @@ What a sad commentary on JavaScript: **dynamic is too hard, let's pretend to be 
 
 These are the reasons why ES6 `class` is masquerading as a nice solution to syntactic headaches, but it's actually muddying the waters further and making things worse for JS and for clear and concise understanding.
 
-**Note:** If you use the `.bind(..)` utility to make a hard-bound function (see Chapter 2), the function created is not subclassable with ES6 `extend` like normal functions are.
+**Note:** If you use the `.bind(..)` utility to make a hard-bound function (see Chapter 2), the function created is not sub-classable with ES6 `extend` like normal functions are.
 
 ## Review (TL;DR)
 
