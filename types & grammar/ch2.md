@@ -320,7 +320,7 @@ This is also technically valid (notice the space):
 42 .toFixed(3); // "42.000"
 ```
 
-However, with the `number` literal specifically, **this is particularly confusing coding style** and will serve no other purpose but to confuse other developers (and your future self). Avoid it.
+However, with the `number` literal specifically, **this is a particularly confusing coding style** and will serve no other purpose but to confuse other developers (and your future self). Avoid it.
 
 `number`s can also be specified in exponent form, which is common when representing larger `number`s, such as:
 
