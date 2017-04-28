@@ -152,7 +152,7 @@ This should look similar to the following:
 
 <img src="fig2.png" width="500">
 
-Once you submit the input text by clicking "OK," you'll observe that the value you typed is stored in the `age` variable, which we then *output* with `console.log(..)`:
+Once you submit the input text by clicking "OK", you'll observe that the value you typed is stored in the `age` variable, which we then *output* with `console.log(..)`:
 
 <img src="fig3.png" width="500">
 
