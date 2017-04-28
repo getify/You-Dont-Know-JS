@@ -411,6 +411,8 @@ Modules are just functions, so they can receive parameters:
 
 ```js
 function CoolModule(id) {
+	var something = "cool";
+
 	function identify() {
 		console.log( id );
 	}
