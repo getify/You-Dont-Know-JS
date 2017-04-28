@@ -170,12 +170,12 @@ function Foo() {
 	// ...
 }
 
-var a = new Foo();
+var Foo2 = new Foo();
 
 Object.getPrototypeOf( a ) === Foo.prototype; // true
 ```
 
-When `a` is created by calling `new Foo()`, one of the things (see Chapter 2 for all *four* steps) that happens is that `a` gets an internal `[[Prototype]]` link to the object that `Foo.prototype` is pointing at.
+When `Foo2` is created by calling `new Foo()`, one of the things (see Chapter 2 for all *four* steps) that happens is that `Foo2` gets an internal `[[Prototype]]` link to the object that `Foo.prototype` is pointing at.
 
 Stop for a moment and ponder the implications of that statement.
 
@@ -183,7 +183,7 @@ In class-oriented languages, multiple **copies** (aka, "instances") of a class c
 
 But in JavaScript, there are no such copy-actions performed. You don't create multiple instances of a class. You can create multiple objects that `[[Prototype]]` *link* to a common object. But by default, no copying occurs, and thus these objects don't end up totally separate and disconnected from each other, but rather, quite ***linked***.
 
-`new Foo()` results in a new object (we called it `a`), and **that** new object `a` is internally `[[Prototype]]` linked to the `Foo.prototype` object.
+`new Foo()` results in a new object (we called it `Foo2`), and **that** new object `Foo2` is internally `[[Prototype]]` linked to the `Foo.prototype` object.
 
 **We end up with two objects, linked to each other.** That's *it*. We didn't instantiate a class. We certainly didn't do any copying of behavior from a "class" into a concrete object. We just caused two objects to be linked to each other.
 
@@ -228,7 +228,7 @@ function Foo() {
 	// ...
 }
 
-var a = new Foo();
+var Foo2 = new Foo();
 ```
 
 What exactly leads us to think `Foo` is a "class"?
@@ -244,13 +244,13 @@ function Foo() {
 
 Foo.prototype.constructor === Foo; // true
 
-var a = new Foo();
-a.constructor === Foo; // true
+var Foo2 = new Foo();
+Foo2.constructor === Foo; // true
 ```
 
-The `Foo.prototype` object by default (at declaration time on line 1 of the snippet!) gets a public, non-enumerable (see Chapter 3) property called `.constructor`, and this property is a reference back to the function (`Foo` in this case) that the object is associated with. Moreover, we see that object `a` created by the "constructor" call `new Foo()` *seems* to also have a property on it called `.constructor` which similarly points to "the function which created it".
+The `Foo.prototype` object by default (at declaration time on line 1 of the snippet!) gets a public, non-enumerable (see Chapter 3) property called `.constructor`, and this property is a reference back to the function (`Foo` in this case) that the object is associated with. Moreover, we see that object `Foo2` created by the "constructor" call `new Foo()` *seems* to also have a property on it called `.constructor` which similarly points to "the function which created it".
 
-**Note:** This is not actually true. `a` has no `.constructor` property on it, and though `a.constructor` does in fact resolve to the `Foo` function, "constructor" **does not actually mean** "was constructed by", as it appears. We'll explain this strangeness shortly.
+**Note:** This is not actually true. `Foo2` has no `.constructor` property on it, and though `Foo2.constructor` does in fact resolve to the `Foo` function, "constructor" **does not actually mean** "was constructed by", as it appears. We'll explain this strangeness shortly.
 
 Oh, yeah, also... by convention in the JavaScript world, "class"es are named with a capital letter, so the fact that it's `Foo` instead of `foo` is a strong clue that we intend it to be a "class". That's totally obvious to you, right!?
 
@@ -269,13 +269,13 @@ function NothingSpecial() {
 	console.log( "Don't mind me!" );
 }
 
-var a = new NothingSpecial();
+var Foo2 = new NothingSpecial();
 // "Don't mind me!"
 
-a; // {}
+Foo2; // {}
 ```
 
-`NothingSpecial` is just a plain old normal function, but when called with `new`, it *constructs* an object, almost as a side-effect, which we happen to assign to `a`. The **call** was a *constructor call*, but `NothingSpecial` is not, in and of itself, a *constructor*.
+`NothingSpecial` is just a plain old normal function, but when called with `new`, it *constructs* an object, almost as a side-effect, which we happen to assign to `Foo2`. The **call** was a *constructor call*, but `NothingSpecial` is not, in and of itself, a *constructor*.
 
 In other words, in JavaScript, it's most appropriate to say that a "constructor" is **any function called with the `new` keyword** in front of it.
 
@@ -296,32 +296,32 @@ Foo.prototype.myName = function() {
 	return this.name;
 };
 
-var a = new Foo( "a" );
-var b = new Foo( "b" );
+var Foo2 = new Foo( "Foo2" );
+var Foo3 = new Foo( "Foo3" );
 
-a.myName(); // "a"
-b.myName(); // "b"
+Foo2.myName(); // "a"
+Foo3.myName(); // "b"
 ```
 
 This snippet shows two additional "class-orientation" tricks in play:
 
-1. `this.name = name`: adds the `.name` property onto each object (`a` and `b`, respectively; see Chapter 2 about `this` binding), similar to how class instances encapsulate data values.
+1. `this.name = name`: adds the `.name` property onto each object (`Foo2` and `Foo3`, respectively; see Chapter 2 about `this` binding), similar to how class instances encapsulate data values.
 
-2. `Foo.prototype.myName = ...`: perhaps the more interesting technique, this adds a property (function) to the `Foo.prototype` object. Now, `a.myName()` works, but perhaps surprisingly. How?
+2. `Foo.prototype.myName = ...`: perhaps the more interesting technique, this adds a property (function) to the `Foo.prototype` object. Now, `Foo2.myName()` works, but perhaps surprisingly. How?
 
-In the above snippet, it's strongly tempting to think that when `a` and `b` are created, the properties/functions on the `Foo.prototype` object are *copied* over to each of `a` and `b` objects. **However, that's not what happens.**
+In the above snippet, it's strongly tempting to think that when `Foo2` and `Foo3` are created, the properties/functions on the `Foo.prototype` object are *copied* over to each of `a` and `b` objects. **However, that's not what happens.**
 
 At the beginning of this chapter, we explained the `[[Prototype]]` link, and how it provides the fall-back look-up steps if a property reference isn't found directly on an object, as part of the default `[[Get]]` algorithm.
 
-So, by virtue of how they are created, `a` and `b` each end up with an internal `[[Prototype]]` linkage to `Foo.prototype`. When `myName` is not found on `a` or `b`, respectively, it's instead found (through delegation, see Chapter 6) on `Foo.prototype`.
+So, by virtue of how they are created, `Foo2` and `Foo3` each end up with an internal `[[Prototype]]` linkage to `Foo.prototype`. When `myName` is not found on `Foo2` or `Foo3`, respectively, it's instead found (through delegation, see Chapter 6) on `Foo.prototype`.
 
 #### "Constructor" Redux
 
-Recall the discussion from earlier about the `.constructor` property, and how it *seems* like `a.constructor === Foo` being true means that `a` has an actual `.constructor` property on it, pointing at `Foo`? **Not correct.**
+Recall the discussion from earlier about the `.constructor` property, and how it *seems* like `Foo2.constructor === Foo` being true means that `Foo2` has an actual `.constructor` property on it, pointing at `Foo`? **Not correct.**
 
 This is just unfortunate confusion. In actuality, the `.constructor` reference is also *delegated* up to `Foo.prototype`, which **happens to**, by default, have a `.constructor` that points at `Foo`.
 
-It *seems* awfully convenient that an object `a` "constructed by" `Foo` would have access to a `.constructor` property that points to `Foo`. But that's nothing more than a false sense of security. It's a happy accident, almost tangentially, that `a.constructor` *happens* to point at `Foo` via this default `[[Prototype]]` delegation. There's actually several ways that the ill-fated assumption of `.constructor` meaning "was constructed by" can come back to bite you.
+It *seems* awfully convenient that an object `Foo2` "constructed by" `Foo` would have access to a `.constructor` property that points to `Foo`. But that's nothing more than a false sense of security. It's a happy accident, almost tangentially, that `Foo2.constructor` *happens* to point at `Foo` via this default `[[Prototype]]` delegation. There's actually several ways that the ill-fated assumption of `.constructor` meaning "was constructed by" can come back to bite you.
 
 For one, the `.constructor` property on `Foo.prototype` is only there by default on the object created when `Foo` the function is declared. If you create a new object, and replace a function's default `.prototype` object reference, the new object will not by default magically get a `.constructor` on it.
 
