@@ -133,7 +133,7 @@ listen( "click", function handler(evt){
 				request();
 			}
 		} );
-	}, 500) ;
+	}, 500 );
 } );
 ```
 
@@ -160,7 +160,7 @@ Then *later*, we:
 ```js
 setTimeout( function request(..){
 	// ..
-}, 500) ;
+}, 500 ) ;
 ```
 
 Then still *later*, we:
@@ -543,8 +543,7 @@ function asyncify(fn) {
 		intv = setTimeout( function(){
 			intv = null;
 			if (fn) fn();
-		}, 0 )
-	;
+		}, 0 );
 
 	fn = null;
 
