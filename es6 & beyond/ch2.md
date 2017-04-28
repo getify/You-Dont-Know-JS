@@ -139,7 +139,7 @@ This explicitness on your part, which is up to you to maintain with discipline, 
 
 #### `let` + `for`
 
-The only exception I'd make to the preference for the *explicit* form of `let` declaration blocking is a `let` that appears in the header of a `for` loop. The reason may seem nuanced, but I believe it to be one of the more important ES6 features.
+The only exception I'd make to the preference for the *explicit* form of `let` declaration blocking is a `let` that appears in the header of a `for` loop. The reason may seem nuanced, but I believe it to be one of the most important ES6 features.
 
 Consider:
 
