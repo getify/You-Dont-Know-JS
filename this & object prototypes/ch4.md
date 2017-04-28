@@ -67,7 +67,7 @@ But in such languages, you don't really operate directly on `Stack` (unless maki
 
 The traditional metaphor for "class" and "instance" based thinking comes from a building construction.
 
-An architect plans out all the characteristics of a building: how wide, how tall, how many windows and in what locations, even what type of material to use for the walls and roof. She doesn't necessarily care, at this point, *where* the building will be built, nor does she care *how many* copies of that building will be built.
+An architect plans out all the characteristics of a building: how wide, how tall, how many windows and in what locations, even what type of material to use for the walls and roof. The architect might not care, at this point, *where* the building will be built, or *how many* copies of that building will be built.
 
 She also doesn't care very much about the contents of the building -- the furniture, wall paper, ceiling fans, etc. -- only what type of structure they will be contained by.
 
