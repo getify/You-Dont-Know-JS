@@ -398,7 +398,7 @@ For example, the `Number(..)` function acting as a constructor, quoting from the
 >
 > When Number is called as part of a new expression it is a constructor: it initialises the newly created object.
 
-So, pretty much any ol' function, including the built-in object functions like `Number(..)` (see Chapter 3) can be called with `new` in front of it, and that makes that function call a *constructor call*. This is an important but subtle distinction: there's really no such thing as "constructor functions", but rather construction calls *of* functions.
+So, pretty much any old function, including the built-in object functions like `Number(..)` (see Chapter 3) can be called with `new` in front of it, and that makes that function call a *constructor call*. This is an important but subtle distinction: there's really no such thing as "constructor functions", but rather construction calls *of* functions.
 
 When a function is invoked with `new` in front of it, otherwise known as a constructor call, the following things are done automatically:
 
