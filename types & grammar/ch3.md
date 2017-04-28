@@ -480,7 +480,7 @@ Also, be very careful not to use `Array.prototype` as a default value **that wil
 
 **Note:** While we're pointing out these native prototypes and some usefulness, be cautious of relying on them and even more wary of modifying them in any way. See Appendix A "Native Prototypes" for more discussion.
 
-## Review
+## Review (TL;DR)
 
 JavaScript provides object wrappers around primitive values, known as natives (`String`, `Number`, `Boolean`, etc). These object wrappers give the values access to behaviors appropriate for each object subtype (`String#trim()` and `Array#concat(..)`).
 
