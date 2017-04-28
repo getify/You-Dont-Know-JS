@@ -337,7 +337,7 @@ These formats work in current versions of JavaScript:
 0xf3; // hexadecimal for: 243
 0Xf3; // ditto
 
-0363; // octal for: 243
+0o363; // octal for: 243
 ```
 
 **Note:** Starting with ES6 + `strict` mode, the `0363` form of octal literals is no longer allowed (see below for the new form). The `0363` form is still allowed in non-`strict` mode, but you should stop using it anyway, to be future-friendly (and because you should be using `strict` mode by now!).
