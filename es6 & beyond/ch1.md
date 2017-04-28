@@ -117,3 +117,5 @@ Now, JavaScript features land in browsers as they become ready, and it's up to y
 Whatever labels that future JavaScript adopts, it's going to move a lot quicker than it ever has before. Transpilers and shims/polyfills are important tools to keep you on the forefront of where the language is headed.
 
 If there's any narrative important to understand about the new reality for JavaScript, it's that all JS developers are strongly implored to move from the trailing edge of the curve to the leading edge. And learning ES6 is where that all starts!
+
+[Chapter 2: Syntax] (https://github.com/getify/You-Dont-Know-JS/blob/master/es6%20&%20beyond/ch2.md)

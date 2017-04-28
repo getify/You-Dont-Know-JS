@@ -18,3 +18,5 @@ The more you are exposed to JavaScript, the clearer it becomes. Words like closu
 Jenn Lukas<br>
 [jennlukas.com](http://jennlukas.com/), [@jennlukas](https://twitter.com/jennlukas)<br>
 Front-end consultant
+
+[Chapter 1: Into Programming] (https://github.com/getify/You-Dont-Know-JS/blob/master/up%20%26%20going/ch1.md)

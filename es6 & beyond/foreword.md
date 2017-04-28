@@ -15,3 +15,5 @@ Rick Waldron<br>
 [@rwaldron](http://twitter.com/rwaldron)<br>
 Open Web Engineer at Bocoup<br>
 Ecma/TC39 Representative for jQuery
+
+[Chapter 1: ES? Now & Future] (https://github.com/getify/You-Dont-Know-JS/blob/master/es6%20%26%20beyond/ch1.md)

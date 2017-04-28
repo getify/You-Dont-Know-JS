@@ -800,3 +800,5 @@ Finally, don't neglect the power of practice. The best way to learn how to write
 I'm excited you're well on your way to learning how to code, now! Keep it up. Don't forget to check out other beginner programming resources (books, blogs, online training, etc.). This chapter and this book are a great start, but they're just a brief introduction.
 
 The next chapter will review many of the concepts from this chapter, but from a more JavaScript-specific perspective, which will highlight most of the major topics that are addressed in deeper detail throughout the rest of the series.
+
+[Chapter 2: Into JavaScript] (https://github.com/getify/You-Dont-Know-JS/blob/master/up%20&%20going/ch2.md)

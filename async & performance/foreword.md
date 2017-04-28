@@ -20,3 +20,5 @@ Well, I won't block your enjoyment of the book any longer, on with the show! If 
 Jake Archibald<br>
 [jakearchibald.com](http://jakearchibald.com), [@jaffathecake](http://twitter.com/jaffathecake)<br>
 Developer Advocate at Google Chrome
+
+[Chapter 1: Asynchrony: Now & Later] (https://github.com/getify/You-Dont-Know-JS/blob/master/async%20%26%20performance/ch1.md)

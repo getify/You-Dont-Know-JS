@@ -2046,3 +2046,5 @@ ES6 introduces several new features that aid in code organization:
 * Classes provide cleaner syntax around prototype-based coding. The addition of `super` also solves tricky issues with relative references in the `[[Prototype]]` chain.
 
 These new tools should be your first stop when trying to improve the architecture of your JS projects by embracing ES6.
+
+[Chapter 4: Async Flow Control] (https://github.com/getify/You-Dont-Know-JS/blob/master/es6%20%26%20beyond/ch4.md)

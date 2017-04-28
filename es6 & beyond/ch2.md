@@ -2820,3 +2820,5 @@ Most of these are designed to ease the pain points of common programming idioms,
 While features like `=>` arrow functions appear to also be all about shorter and nicer-looking syntax, they actually have very specific behaviors that you should intentionally use only in appropriate situations.
 
 Expanded Unicode support, new tricks for regular expressions, and even a new primitive `symbol` type round out the syntactic evolution of ES6.
+
+[Chapter 3: Organization] (https://github.com/getify/You-Dont-Know-JS/blob/master/es6%20%26%20beyond/ch3.md)

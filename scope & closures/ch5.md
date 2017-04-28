@@ -594,3 +594,8 @@ Closures can trip us up, for instance with loops, if we're not careful to recogn
 Modules require two key characteristics: 1) an outer wrapping function being invoked, to create the enclosing scope 2) the return value of the wrapping function must include reference to at least one inner function that then has closure over the private inner scope of the wrapper.
 
 Now we can see closures all around our existing code, and we have the ability to recognize and leverage them to our own benefit!
+
+[Appendix A: Dynamic Scope] (https://github.com/getify/You-Dont-Know-JS/blob/master/scope%20%26%20closures/apA.md)
+[Appendix B: Polyfilling Block Scope] (https://github.com/getify/You-Dont-Know-JS/blob/master/scope%20%26%20closures/apB.md)
+[Appendix C: Lexical-this] (https://github.com/getify/You-Dont-Know-JS/blob/master/scope%20%26%20closures/apC.md)
+[Appendix D: Acknowledgments] (https://github.com/getify/You-Dont-Know-JS/blob/master/scope%20%26%20closures/apD.md)
