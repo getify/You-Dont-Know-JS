@@ -1,3 +1,5 @@
+#### [⇐ Previous Chapter](ch3.md) | [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch5.md)
+
 # You Don't Know JS: ES6 & Beyond
 # Chapter 4: Async Flow Control
 
@@ -379,3 +381,5 @@ Thankfully, ES6 adds Promises to address one of the major shortcomings of callba
 But it's the combination of Promises with generators that fully realizes the benefits of rearranging our async flow control code to de-emphasize and abstract away that ugly callback soup (aka "hell").
 
 Right now, we can manage these interactions with the aide of various async libraries' runners, but JavaScript is eventually going to support this interaction pattern with dedicated syntax alone!
+
+#### [⇐ Previous Chapter](ch3.md) | [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch5.md)

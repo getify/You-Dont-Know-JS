@@ -1,3 +1,5 @@
+#### [⇐ Previous Chapter](ch2.md) | [Table of Contents](toc.md#table-of-contents) 
+
 # You Don't Know JS: Up & Going
 # Chapter 3: Into YDKJS
 
@@ -102,3 +104,5 @@ The *YDKJS* series is dedicated to the proposition that all JS developers can an
 We take each important area of focus in the language and dedicate a short but very dense book to fully explore all the parts of it that you perhaps thought you knew but probably didn't fully.
 
 "You Don't Know JS" isn't a criticism or an insult. It's a realization that all of us, myself included, must come to terms with. Learning JavaScript isn't an end goal but a process. We don't know JavaScript, yet. But we will!
+
+#### [⇐ Previous Chapter](ch2.md) | [Table of Contents](toc.md#table-of-contents) 

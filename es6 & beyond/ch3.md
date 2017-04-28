@@ -1,3 +1,5 @@
+#### [⇐ Previous Chapter](ch2.md) | [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch4.md)
+
 # You Don't Know JS: ES6 & Beyond
 # Chapter 3: Organization
 
@@ -2046,3 +2048,5 @@ ES6 introduces several new features that aid in code organization:
 * Classes provide cleaner syntax around prototype-based coding. The addition of `super` also solves tricky issues with relative references in the `[[Prototype]]` chain.
 
 These new tools should be your first stop when trying to improve the architecture of your JS projects by embracing ES6.
+
+#### [⇐ Previous Chapter](ch2.md) | [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch4.md)

@@ -1,3 +1,5 @@
+#### [⇐ Previous Chapter](ch1.md) | [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch3.md)
+
 # You Don't Know JS: Async & Performance
 # Chapter 2: Callbacks
 
@@ -605,3 +607,5 @@ Inventing ad hoc logic to solve these trust issues is possible, but it's more di
 We need a generalized solution to **all of the trust issues**, one that can be reused for as many callbacks as we create without all the extra boilerplate overhead.
 
 We need something better than callbacks. They've served us well to this point, but the *future* of JavaScript demands more sophisticated and capable async patterns. The subsequent chapters in this book will dive into those emerging evolutions.
+
+#### [⇐ Previous Chapter](ch1.md) | [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch3.md)

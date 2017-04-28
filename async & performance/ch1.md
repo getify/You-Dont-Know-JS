@@ -1,3 +1,5 @@
+#### [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch2.md)
+
 # You Don't Know JS: Async & Performance
 # Chapter 1: Asynchrony: Now & Later
 
@@ -891,3 +893,5 @@ At any given moment, only one event can be processed from the queue at a time. W
 Concurrency is when two or more chains of events interleave over time, such that from a high-level perspective, they appear to be running *simultaneously* (even though at any given moment only one event is being processed).
 
 It's often necessary to do some form of interaction coordination between these concurrent "processes" (as distinct from operating system processes), for instance to ensure ordering or to prevent "race conditions." These "processes" can also *cooperate* by breaking themselves into smaller chunks and to allow other "process" interleaving.
+
+#### [Table of Contents](toc.md#table-of-contents) | [Next Chapter ⇒](ch2.md)
