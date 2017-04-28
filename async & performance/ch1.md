@@ -859,7 +859,7 @@ c = {
 a = 10;
 b = 30;
 
-a += foo();				// 30
+a += foo();				// 31
 b += c.bar;				// 11
 
 console.log( a + b );	// 42
