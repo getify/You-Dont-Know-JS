@@ -106,7 +106,7 @@ It is assumed that JS will continue to evolve constantly, with browsers rolling 
 
 If you decide to keep the status quo and just wait around for all browsers without a feature supported to go away before you start using the feature, you're always going to be way behind. You'll sadly be missing out on all the innovations designed to make writing JavaScript more effective, efficient, and robust.
 
-## Review
+## Review (TL;DR)
 
 ES6 (some may try to call it ES2015) is just landing as of the time of this writing, and it has lots of new stuff you need to learn!
 

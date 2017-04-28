@@ -786,7 +786,7 @@ For all the string search/inspection methods, if you look for an empty string `"
 
 **Warning:** These methods will not by default accept a regular expression for the search string. See "Regular Expression Symbols" in Chapter 7 for information about disabling the `isRegExp` check that is performed on this first argument.
 
-## Review
+## Review (TL;DR)
 
 ES6 adds many extra API helpers on the various built-in native objects:
 
