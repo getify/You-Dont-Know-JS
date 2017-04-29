@@ -1234,15 +1234,15 @@ There's another idiom that is quite a bit less commonly authored manually, but w
 
 ```js
 function foo() {
-	console.log( a );
+	console.log( a * 2 );
 }
 
 var a = 42;
 
-a && foo(); // 42
+a && foo(); // 82
 ```
 
-`foo()` gets called only because `a` tests as truthy. If that test failed, this `a && foo()` expression statement would just silently stop -- this is known as "short circuiting" -- and never call `foo()`.
+`foo()` gets called only because `a` tests as truthy. We want to make sure that `a` is truthy before calling `foo()` since `foo()` depends on the existence of `a`. If that test failed, this `a && foo()` expression statement would just silently stop -- this is known as "short circuiting" -- and never call `foo()`.
 
 Again, it's not nearly as common for people to author such things. Usually, they'd do `if (a) { foo(); }` instead. But JS minifiers choose `a && foo()` because it's much shorter. So, now, if you ever have to decipher such code, you'll know what it's doing and why.
 
