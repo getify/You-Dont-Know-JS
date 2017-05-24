@@ -381,7 +381,7 @@ Ah, the good ol' fashioned "factorial" algorithm! You might assume that the JS e
 
 But as an anecdote, the same code expressed in C and compiled with advanced optimizations would result in the compiler realizing that the call `factorial(5)` can just be replaced with the constant value `120`, eliminating the function and call entirely!
 
-Moreover, some engines have a practice called "unrolling recursion," where it can realize that the recursion you've expressed can actually be done "easier" (i.e., more optimally) with a loop. It's possible the preceding code could be *rewritten* by a JS engine to run as:
+Moreover, some engines have a practice called "unrolling recursion", where it can realize that the recursion you've expressed can actually be done "easier" (i.e., more optimally) with a loop. It's possible the preceding code could be *rewritten* by a JS engine to run as:
 
 ```js
 function factorial(n) {
