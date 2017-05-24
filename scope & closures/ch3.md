@@ -7,7 +7,7 @@ But what exactly makes a new bubble? Is it only the function? Can other structur
 
 ## Scope From Functions
 
-The most common answer to those questions is that JavaScript has function-based scope. That is, each function you declare creates a bubble for itself, but no other structures create their own scope bubbles. As we'll see in just a little bit, this is not quite true.
+The most common answer to those questions is that JavaScript has function-based scope. That is, each function you define creates a bubble for itself, but no other structures create their own scope bubbles. As we'll see in just a little bit, this is not quite true.
 
 But first, let's explore function scope and its implications.
 
@@ -49,7 +49,7 @@ On the other hand, if you don't take careful precautions, variables existing acr
 
 ## Hiding In Plain Scope
 
-The traditional way of thinking about functions is that you declare a function, and then add code inside it. But the inverse thinking is equally powerful and useful: take any arbitrary section of code you've written, and wrap a function declaration around it, which in effect "hides" the code.
+The traditional way of thinking about functions is that you define a function, and then add code inside it. But the inverse thinking is equally powerful and useful: take any arbitrary section of code you've written, and wrap a function declaration around it, which in effect "hides" the code.
 
 The practical result is to create a scope bubble around the code in question, which means that any declarations (variable or function) in that code will now be tied to the scope of the new wrapping function, rather than the previously enclosing scope. In other words, you can "hide" variables and functions by enclosing them in the scope of a function.
 
