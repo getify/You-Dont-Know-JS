@@ -431,7 +431,9 @@ function foo() {
 }
 
 foo();
-// 5 7 9
+// 5
+// 7
+// 9
 ```
 
 Because of using `let` instead of `var`, `b` will belong only to the `if` statement and thus not to the whole `foo()` function's scope. Similarly, `c` belongs only to the `while` loop. Block scoping is very useful for managing your variable scopes in a more fine-grained fashion, which can make your code much easier to maintain over time.
