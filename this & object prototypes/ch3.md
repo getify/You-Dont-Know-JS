@@ -258,7 +258,7 @@ myArray[0];			// "foo"
 myArray[2];			// "bar"
 ```
 
-Arrays *are* objects, so even though each index is a positive integer, you can *also* add properties onto the array:
+Arrays *are* objects, so even though each index is a non-negative integer, you can *also* add properties onto the array:
 
 ```js
 var myArray = [ "foo", 42, "bar" ];
