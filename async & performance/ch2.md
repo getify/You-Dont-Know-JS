@@ -584,7 +584,7 @@ a++;
 
 Whether the Ajax request is in the cache and resolves to try to call the callback right away, or must be fetched over the wire and thus complete later asynchronously, this code will always output `1` instead of `0` -- `result(..)` cannot help but be invoked asynchronously, which means the `a++` has a chance to run before `result(..)` does.
 
-Yay, another trust issued "solved"! But it's inefficient, and yet again more bloated boilerplate to weigh your project down.
+Yay, another trust issue "solved"! But it's inefficient, and yet again more bloated boilerplate to weigh your project down.
 
 That's just the story, over and over again, with callbacks. They can do pretty much anything you want, but you have to be willing to work hard to get it, and oftentimes this effort is much more than you can or should spend on such code reasoning.
 
