@@ -945,7 +945,7 @@ The `document` variable exists as a global variable when your code is running in
 
 Moreover, the `getElementById(..)` method on `document` looks like a normal JS function, but it's just a thinly exposed interface to a built-in method provided by the DOM from your browser. In some (newer-generation) browsers, this layer may also be in JS, but traditionally the DOM and its behavior is implemented in something more like C/C++.
 
-Another example is with input/output (I/O).
+Another example is the various HTML5 capabilities, such as the File API (I/O), Web Storage, Canvas or WebGL APIs, Typed Arrays or the Shadow DOM (and much more&hellip;).
 
 Everyone's favorite `alert(..)` pops up a message box in the user's browser window. `alert(..)` is provided to your JS program by the browser, not by the JS engine itself. The call you make sends the message to the browser internals and it handles drawing and displaying the message box.
 
