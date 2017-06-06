@@ -372,12 +372,12 @@ The general term for "type checks" that make assumptions about a value's "type" 
 
 ```js
 if (
-	p !== null &&
+	p != null &&
 	(
-		typeof p === "object" ||
-		typeof p === "function"
+		typeof p == "object" ||
+		typeof p == "function"
 	) &&
-	typeof p.then === "function"
+	typeof p.then == "function"
 ) {
 	// assume it's a thenable!
 }
@@ -654,7 +654,7 @@ var p1 = Promise.resolve( 42 );
 
 var p2 = Promise.resolve( p1 );
 
-p1 === p2; // true
+p1 == p2; // true
 ```
 
 Even more importantly, if you pass a non-Promise thenable value to `Promise.resolve(..)`, it will attempt to unwrap that value, and the unwrapping will keep going until a concrete final non-Promise-like value is extracted.
