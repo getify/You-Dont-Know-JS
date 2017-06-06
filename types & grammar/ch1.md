@@ -298,3 +298,6 @@ Many developers will assume "undefined" and "undeclared" are roughly the same th
 JavaScript unfortunately kind of conflates these two terms, not only in its error messages ("ReferenceError: a is not defined") but also in the return values of `typeof`, which is `"undefined"` for both cases.
 
 However, the safety guard (preventing an error) on `typeof` when used against an undeclared variable can be helpful in certain cases.
+
+
+[Next Chapter](./ch2.md)

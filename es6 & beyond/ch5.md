@@ -543,3 +543,6 @@ TypedArrays provide "view"s of binary data buffers that align with various integ
 Maps are key-value pairs where the key can be an object instead of just a string/primitive. Sets are unique lists of values (of any type).
 
 WeakMaps are maps where the key (object) is weakly held, so that GC is free to collect the entry if it's the last reference to an object. WeakSets are sets where the value is weakly held, again so that GC can remove the entry if it's the last reference to that object.
+
+
+[Next Chapter](./ch6.md)
