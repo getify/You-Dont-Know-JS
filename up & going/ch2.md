@@ -738,7 +738,7 @@ function User(){
 // 创建一个 `User` 模块的实例
 var fred = User();
 
-fred.login( "fred", "12Battery34!" );
+fred.doLogin( "fred", "12Battery34!" );
 ```
 
 函数`User()`作为一个外部作用域持有变量`username`和`password`，以及内部`doLogin()`函数；它们都是`User`模块内部的私有细节，是不能从外部世界访问的。
