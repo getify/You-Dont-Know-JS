@@ -207,7 +207,7 @@ In a single-threaded environment, it really doesn't matter that the items in the
 Consider:
 
 ```js
-var a = 20;
+var a = 40;
 
 function foo() {
 	a = a + 1;
