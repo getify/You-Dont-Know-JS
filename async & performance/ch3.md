@@ -1959,20 +1959,20 @@ request( "http://some.url.1/" )
 
 Wow, that was pretty easy!
 
-`Promise.wrap(..)` does **not** produce a Promise. It produces a function that will produce Promises. In a sense, a Promise-producing function could be seen as a "Promise factory." I propose "promisory" as the name for such a thing ("Promise" + "factory").
+`Promise.wrap(..)` does **not** produce a Promise. It produces a function that will produce Promises. In a sense, a Promise-producing function could be seen as a "Promise factory." I propose "promissory" as the name for such a thing ("Promise" + "factory").
 
-The act of wrapping a callback-expecting function to be a Promise-aware function is sometimes referred to as "lifting" or "promisifying". But there doesn't seem to be a standard term for what to call the resultant function other than a "lifted function", so I like "promisory" better as I think it's more descriptive.
+The act of wrapping a callback-expecting function to be a Promise-aware function is sometimes referred to as "lifting" or "promisifying". But there doesn't seem to be a standard term for what to call the resultant function other than a "lifted function", so I like "promissory" better as I think it's more descriptive.
 
-**Note:** Promisory isn't a made-up term. It's a real word, and its definition means to contain or convey a promise. That's exactly what these functions are doing, so it turns out to be a pretty perfect terminology match!
+**Note:** Promissory isn't a made-up term. It's a real word, and its definition means to contain or convey a promise. That's exactly what these functions are doing, so it turns out to be a pretty perfect terminology match!
 
-So, `Promise.wrap(ajax)` produces an `ajax(..)` promisory we call `request(..)`, and that promisory produces Promises for Ajax responses.
+So, `Promise.wrap(ajax)` produces an `ajax(..)` promissory we call `request(..)`, and that promissory produces Promises for Ajax responses.
 
 If all functions were already promisories, we wouldn't need to make them ourselves, so the extra step is a tad bit of a shame. But at least the wrapping pattern is (usually) repeatable so we can put it into a `Promise.wrap(..)` helper as shown to aid our promise coding.
 
-So back to our earlier example, we need a promisory for both `ajax(..)` and `foo(..)`:
+So back to our earlier example, we need a promissory for both `ajax(..)` and `foo(..)`:
 
 ```js
-// make a promisory for `ajax(..)`
+// make a promissory for `ajax(..)`
 var request = Promise.wrap( ajax );
 
 // refactor `foo(..)`, but keep it externally
@@ -1992,10 +1992,10 @@ function foo(x,y,cb) {
 }
 
 // now, for this code's purposes, make a
-// promisory for `foo(..)`
+// promissory for `foo(..)`
 var betterFoo = Promise.wrap( foo );
 
-// and use the promisory
+// and use the promissory
 betterFoo( 11, 31 )
 .then(
 	function fulfilled(text){
@@ -2007,13 +2007,13 @@ betterFoo( 11, 31 )
 );
 ```
 
-Of course, while we're refactoring `foo(..)` to use our new `request(..)` promisory, we could just make `foo(..)` a promisory itself, instead of remaining callback-based and needing to make and use the subsequent `betterFoo(..)` promisory. This decision just depends on whether `foo(..)` needs to stay callback-based compatible with other parts of the code base or not.
+Of course, while we're refactoring `foo(..)` to use our new `request(..)` promissory, we could just make `foo(..)` a promissory itself, instead of remaining callback-based and needing to make and use the subsequent `betterFoo(..)` promissory. This decision just depends on whether `foo(..)` needs to stay callback-based compatible with other parts of the code base or not.
 
 Consider:
 
 ```js
-// `foo(..)` is now also a promisory because it
-// delegates to the `request(..)` promisory
+// `foo(..)` is now also a promissory because it
+// delegates to the `request(..)` promissory
 function foo(x,y) {
 	return request(
 		"http://some.url.1/?x=" + x + "&y=" + y
@@ -2025,7 +2025,7 @@ foo( 11, 31 )
 ..
 ```
 
-While ES6 Promises don't natively ship with helpers for such promisory wrapping, most libraries provide them, or you can make your own. Either way, this particular limitation of Promises is addressable without too much pain (certainly compared to the pain of callback hell!).
+While ES6 Promises don't natively ship with helpers for such promissory wrapping, most libraries provide them, or you can make your own. Either way, this particular limitation of Promises is addressable without too much pain (certainly compared to the pain of callback hell!).
 
 ### Promise Uncancelable
 
