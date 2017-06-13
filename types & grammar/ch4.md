@@ -1825,7 +1825,7 @@ The "Abstract Relational Comparison" algorithm in ES5 section 11.8.5 essentially
 
 **Note:** The algorithm is only defined for `a < b`. So, `a > b` is handled as `b < a`.
 
-The algorithm first calls `ToPrimitive` coercion on both values, and if the return result of either call is not a `string`, then both values are coerced to `number` values using the `ToNumber` operation rules, and compared numerically.
+The algorithm first calls `ToPrimitive` coercion on both values, and if the return results of both calls are not `string`s, then both values are coerced to `number` values using the `ToNumber` operation rules, and compared numerically.
 
 For example:
 
