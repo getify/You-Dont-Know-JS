@@ -376,7 +376,7 @@ for (var i=0; i<10; i++) {
 
 ### `try/catch`
 
-一个鲜为人知的是事实，JavaScript 在 ES3 中明确指出在 `try/catch` 的 `catch` 子句中声明的变量，是属于 `catch` 块儿的块儿作用域的。
+一个鲜为人知的事实是，JavaScript 在 ES3 中明确指出在 `try/catch` 的 `catch` 子句中声明的变量，是属于 `catch` 块儿的块儿作用域的。
 
 例如：
 
@@ -474,7 +474,7 @@ btn.addEventListener( "click", function click(evt){
 }, /*capturingPhase=*/false );
 ```
 
-点击事件的处理器回调函数 `click` 根本不 *需要* `someReallyBigData` 变量。这意味着从理论上讲，在 `process(..)` 运行之后，这个消耗巨大内存的数据结构可以被作为垃圾回收。然而，JS引擎很可能（虽然这要看具体实现）将会仍然将这个结构保持一段时间，因为`click`函数在整个作用域上拥有一个闭包。
+点击事件的处理器回调函数 `click` 根本不 *需要* `someReallyBigData` 变量。这意味着从理论上讲，在 `process(..)` 运行之后，这个消耗巨大内存的数据结构可以被作为垃圾回收。然而，JS引擎很可能（虽然这要看具体实现）仍会将这个结构保持一段时间，因为`click`函数在整个作用域上拥有一个闭包。
 
 块儿作用域可以解决这个问题，使引擎清楚地知道它不必再保持 `someReallyBigData` 了：
 
