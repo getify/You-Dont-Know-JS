@@ -86,7 +86,7 @@ var a = 2;
 foo(); // TypeError: `this` is `undefined`
 ```
 
-一个微妙但是重要的细节是：即便所有的`this`绑定规则都是完全基于调用点，如果`foo()`的 **内容** 没有在`strint mode`下执行，对于 *默认绑定* 来说全局对象是 **唯一** 合法的；`foo()`的调用点的`strict mode`状态与此无关。
+一个微妙但是重要的细节是：即便所有的`this`绑定规则都是完全基于调用点，如果`foo()`的 **内容** 没有在`strict mode`下执行，对于 *默认绑定* 来说全局对象是 **唯一** 合法的；`foo()`的调用点的`strict mode`状态与此无关。
 
 ```js
 function foo() {
