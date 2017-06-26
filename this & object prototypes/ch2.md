@@ -420,7 +420,7 @@ var bar = new foo( 2 );
 console.log( bar.a ); // 2
 ```
 
-通过在前面使用`new`来调用`foo(..)`，我们构建了一个新的对象并这个新对象作为`foo(..)`调用的`this`。 **`new`是函数调用可以绑定`this`的最后一种方式**，我们称之为 *new绑定（new binding）*。
+通过在前面使用`new`来调用`foo(..)`，我们构建了一个新的对象并把这个新对象作为`foo(..)`调用的`this`。 **`new`是函数调用可以绑定`this`的最后一种方式**，我们称之为 *new绑定（new binding）*。
 
 ## 一切皆有顺序
 
@@ -605,6 +605,7 @@ baz.val; // p1p2
     `var bar = obj1.foo()`
 
 4. 否则，使用默认的`this`（**默认绑定**）。如果在`strict mode`下，就是`undefined`，否则是`global`对象。
+
     `var bar = foo()`
 
 以上，就是理解对于普通的函数调用来说的`this`绑定规则所需的全部。是的···几乎是全部。
