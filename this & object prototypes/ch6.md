@@ -350,7 +350,7 @@ $( document ).ready( function(){
 
 OO设计模式告诉我们要在父类中声明一个基础`render(..)`，之后在我们的子类中覆盖它，但不是完全替代它，而是用按钮特定的行为增强这个基础功能。
 
-注意 *显示假想多态* 的丑态，`Widget.call`和`Widget.prototype.render.call`引用是为了伪装从子“类”方法得到“父类”基础方法支持的“super”调用。呃。
+注意 *显式假想多态* 的丑态，`Widget.call`和`Widget.prototype.render.call`引用是为了伪装从子“类”方法得到“父类”基础方法支持的“super”调用。呃。
 
 #### ES6 `class` 语法糖
 
