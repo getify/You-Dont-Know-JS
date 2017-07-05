@@ -791,7 +791,7 @@ var Foo = {
 };
 ```
 
-在这个例子中上面的手动`Foo.bar(x*2)`引用就足够了，但是在许多情况下，一个函数没必要能够这样做，比如使用`this`绑定，函数在委托中被分享到不同的对象，等等。你将会想要使用一个真正的自引用，而函数对象的`name`标识符是实现的最佳方式。
+在这个例子中上面的手动`Foo.bar(x*2)`引用就足够了，但是在许多情况下，一个函数不一定能够这样做，比如使用`this`绑定，函数在委托中被分享到不同的对象，等等。你将会想要使用一个真正的自引用，而函数对象的`name`标识符是实现的最佳方式。
 
 只要小心简明方法的这个注意点，而且如果当你陷入缺少自引用的问题时，**仅仅为这个声明** 放弃简明方法语法，取代以手动的 *命名函数表达式* 声明形式：`baz: function baz(){..}`。
 
@@ -839,7 +839,7 @@ var b1 = new Bar( "b1" );
 为了在这个例子中的实体上进行 *类型自省*， 使用`instanceof`和`.prototype`语义，这里有各种你可能需要实施的检查：
 
 ```js
-// 的`Foo`和`Bar`互相联系
+// `Foo`和`Bar`互相的联系
 Bar.prototype instanceof Foo; // true
 Object.getPrototypeOf( Bar.prototype ) === Foo.prototype; // true
 Foo.prototype.isPrototypeOf( Bar.prototype ); // true
