@@ -42,7 +42,7 @@ myObject.a; // 2
 
 **注意：** 我们马上就会解释`Object.create(..)`是做什么，如何做的。眼下先假设，它创建了一个对象，这个对象带有一个链到指定的对象的`[[Prototype]]`链接，这个链接就是我们要讲解的。
 
-那么，我们现在让`myObject``[[Prototype]]`链到了`anotherObject`。虽然很明显`myObject.a`实际上不存在，但是无论如何属性访问成功了（在`anotherObject`中找到了），而且确实找到了值`2`。
+那么，我们现在让`myObject` `[[Prototype]]`链到了`anotherObject`。虽然很明显`myObject.a`实际上不存在，但是无论如何属性访问成功了（在`anotherObject`中找到了），而且确实找到了值`2`。
 
 但是，如果在`anotherObject`上也没有找到`a`，而且如果它的`[[Prototype]]`链不为空，就沿着它继续查找。
 
