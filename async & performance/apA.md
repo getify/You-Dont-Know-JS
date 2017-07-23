@@ -745,7 +745,7 @@ document.addEventListener( "DOMContentLoaded", domready.next );
 
 在第四章中，我们衍生了一种称为`run(..)`的工具，它可以将 generator 运行至完成，监听被`yield`的 Promise 并使用它们来异步推进 generator。*asynquence* 正好有一个这样的内建工具，称为`runner(..)`。
 
-为了展示，然我们首先建立一些帮助函数：
+为了展示，让我们首先建立一些帮助函数：
 
 ```js
 function doublePr(x) {
