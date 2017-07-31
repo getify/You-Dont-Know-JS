@@ -4,7 +4,7 @@
 
 -----
 
-**[从O'Reilly购买数字/印刷版](http://shop.oreilly.com/product/0636920026327.do)**
+**[从 O'Reilly 购买数字/印刷版](http://shop.oreilly.com/product/0636920026327.do)**
 
 -----
 
@@ -19,5 +19,5 @@
 * [第五章：作用域闭包](ch5.md)
 * [附录A：动态作用域](apA.md)
 * [附录B：填补块儿作用域](apB.md)
-* [附录C：词法this](apC.md)
+* [附录C：词法 this](apC.md)
 * [附录D：鸣谢](apD.md)
