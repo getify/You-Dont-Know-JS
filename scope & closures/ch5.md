@@ -470,6 +470,7 @@ var MyModules = (function Manager() {
 	function define(name, deps, impl) {
 		for (var i=0; i<deps.length; i++) {
 			deps[i] = modules[deps[i]];
+			// above line is confusing me.
 		}
 		modules[name] = impl.apply( impl, deps );
 	}
