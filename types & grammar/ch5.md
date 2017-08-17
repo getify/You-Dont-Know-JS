@@ -883,7 +883,7 @@ Similarly:
 ```js
 var a = 42, b = "foo";
 
-a
+a	// 42
 b	// "foo"
 ```
 
