@@ -1548,7 +1548,7 @@ Promise.map( [p1,p2,p3], function(pr,done){
 
 让我们复习一下我们已经在本章中零散地展开的ES6`Promise`API。
 
-**注意：** 下面的API尽管在ES6中是原生的，但也存在一些语言规范兼容的填补（不光是扩展Promise库），它们定义了`Promise`和与之相关的所有行为，所以即使是在前ES6时代的浏览器中你也以使用原生的Promise。这类填补的其中之一是“Native Promise Only”（http://github.com/getify/native-promise-only），我写的！
+**注意：** 下面的API尽管在ES6中是原生的，但也存在一些语言规范兼容的填补（不光是扩展Promise库），它们定义了`Promise`和与之相关的所有行为，所以即使是在前ES6时代的浏览器中你也以使用原生的Promise。这类填补的其中之一是“[Native Promise Only](http://github.com/getify/native-promise-only)”，我写的！
 
 ### new Promise(..)构造器
 
