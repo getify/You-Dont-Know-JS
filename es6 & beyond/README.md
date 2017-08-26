@@ -4,7 +4,7 @@
 
 -----
 
-**[从O'Reilly购买数字/印刷版](http://shop.oreilly.com/product/0636920033769.do)**
+**[从 O'Reilly 购买数字/印刷版](http://shop.oreilly.com/product/0636920033769.do)**
 
 -----
 
@@ -17,7 +17,8 @@
 * [第三章：组织](ch3.md)
 * [第四章：异步流程控制](ch4.md)
 * [第五章：集合](ch5.md)
-* [第六章：新增API](ch6.md)
+* [第六章：新增 API](ch6.md)
 * [第七章：元编程](ch7.md)
-* [第八章：ES6之后](ch8.md)
+* [第八章：ES6 之后](ch8.md)
 * [附录A：鸣谢](apA.md)
+ 

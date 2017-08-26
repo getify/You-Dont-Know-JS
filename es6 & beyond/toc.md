@@ -15,7 +15,7 @@
 	* 对象字面量扩展
 	* 模板字面量
 	* 箭头函数
-	* `for..of`循环
+	* `for..of` 循环
 	* 正则表达式扩展
 	* 数字字面量扩展
 	* Unicode
@@ -34,7 +34,7 @@
 	* WeakMaps
 	* Sets
 	* WeakSets
-* 第六章：新增API
+* 第六章：新增 API
 	* `Array`
 	* `Object`
 	* `Math`
@@ -48,11 +48,11 @@
 	* `Reflect` API
 	* 特性测试
 	* 尾部调用优化（TCO）
-* 第八章：ES6以后
+* 第八章：ES6 以后
 	* `async function`
 	* `Object.observe(..)`
 	* 指数操作符
-	* 对象属性与`...`
+	* 对象属性与 `...`
 	* `Array#includes(..)`
 	* SIMD
 * 附录A：鸣谢
