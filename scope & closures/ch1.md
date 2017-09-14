@@ -222,7 +222,7 @@ So, revisiting the conversations between *Engine* and *Scope*, we'd overhear:
 
 > ***Engine***: "Hey, *Scope* of `foo`, ever heard of `b`? Got an RHS reference for it."
 
-> ***Scope***: "Nope, never heard of it. Go fish."
+> ***Scope of foo***: "Nope, never heard of it. Go fish."
 
 > ***Engine***: "Hey, *Scope* outside of `foo`, oh you're the global *Scope*, ok cool. Ever heard of `b`? Got an RHS reference for it."
 
