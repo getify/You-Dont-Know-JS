@@ -808,7 +808,9 @@ var myArray = [1, 2, 3];
 for (var i = 0; i < myArray.length; i++) {
 	console.log( myArray[i] );
 }
-// 1 2 3
+// 1
+// 2
+// 3
 ```
 
 This isn't iterating over the values, though, but iterating over the indices, where you then use the index to reference the value, as `myArray[i]`.
