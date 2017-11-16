@@ -313,21 +313,23 @@ Keywords are the obvious ones like `function` and `switch`. Future reserved word
 
 StackOverflow user "art4theSould" creatively worked all these reserved words into a fun little poem (http://stackoverflow.com/questions/26255/reserved-keywords-in-javascript/12114140#12114140):
 
-> Let this long package float,
-> Goto private class if short.
-> While protected with debugger case,
-> Continue volatile interface.
-> Instanceof super synchronized throw,
-> Extends final export throws.
->
-> Try import double enum?
-> - False, boolean, abstract function,
-> Implements typeof transient break!
-> Void static, default do,
-> Switch int native new.
-> Else, delete null public var
-> In return for const, true, char
-> …Finally catch byte.
+```
+Let this long package float,
+Goto private class if short.
+While protected with debugger case,
+Continue volatile interface.
+Instanceof super synchronized throw,
+Extends final export throws.
+
+Try import double enum?
+- False, boolean, abstract function,
+Implements typeof transient break!
+Void static, default do,
+Switch int native new.
+Else, delete null public var
+In return for const, true, char
+…Finally catch byte.
+```
 
 **Note:** This poem includes words that were reserved in ES3 (`byte`, `long`, etc.) that are no longer reserved as of ES5.
 
