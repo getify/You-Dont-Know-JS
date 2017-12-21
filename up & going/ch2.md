@@ -53,7 +53,7 @@ Notice how in this snippet the `a` variable holds every different type of value,
 
 `typeof null` is an interesting case, because it errantly returns `"object"`, when you'd expect it to return `"null"`.
 
-**Warning:** This is a long-standing bug in JS, but one that is likely never going to be fixed. Too much code on the Web relies on the bug and thus fixing it would cause a lot more bugs!
+**Warning:** This is a long-standing bug in JS, but one that is likely never going to be fixed. Too much code on the Web relies on the bug and thus fixing it would cause a lot more bugs! [[reference]](http://2ality.com/2013/10/typeof-null.html)
 
 Also, note `a = undefined`. We're explicitly setting `a` to the `undefined` value, but that is behaviorally no different from a variable that has no value set yet, like with the `var a;` line at the top of the snippet. A variable can get to this "undefined" value state in several different ways, including functions that return no values and usage of the `void` operator.
 
