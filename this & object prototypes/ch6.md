@@ -588,11 +588,11 @@ auth.checkAuth();
 
 我们有所有控制器分享的基本行为，它们是 `success(..)`，`failure(..)` 和 `showDialog(..)`。我们的子类 `LoginController` 和 `AuthController` 覆盖了 `failure(..)` 和 `success(..)` 来增强基本类的行为。还要注意的是，`AuthController` 需要一个 `LoginController` 实例来与登录 form 互动，所以它变成了一个数据属性成员。
 
-另外一件要提的事情是，我们选择一些 *合成* 散布在继承的顶端。`AuthController` 需要知道 `LoginController`，所以我们初始化它（`new LoginController()`），使它一个成为 `this.login` 的类属性成员来引用它，这样 `AuthController` 才可以调用 `LoginController` 上的行为。
+另外一件要提的事情是，我们选择一些 *合成* 散布在继承的顶端。`AuthController` 需要知道 `LoginController`，所以我们初始化它（`new LoginController()`），并用一个称为 `this.login` 的类属性成员来引用它，这样 `AuthController` 才可以调用 `LoginController` 上的行为。
 
 **注意：** 这里可能会存在一丝冲动，就是使 `AuthController` 继承 `LoginController`，或者反过来，这样的话我们就会通过继承链得到 *虚拟合成*。但是这是一个非常清晰的例子，表明对这个问题来讲，将类继承作为模型有什么问题，因为 `AuthController` 和 `LoginController` 都不特化对方的行为，所以它们之间的继承没有太大的意义，除非类是你唯一的设计模式。与此相反的是，我们在一些简单的合成中分层，然后它们就可以合作了，同时它俩都享有继承自父类 `Controller` 的好处。
 
-如果你熟悉面向类（OO）的设计，这都听该看起来十分熟悉和自然。
+如果你熟悉面向类（OO）的设计，这都应该看起来十分熟悉和自然。
 
 ### 去类化
 
