@@ -12,7 +12,7 @@
 
 * [Foreword](foreword.md) (by [Jake Archibald](http://jakearchibald.com))
 * [Preface](../preface.md)
-* [Chapter 1: Asynchrony: Now & Later](ch1.md)
+* [Глава 1: Асинхронность: Сейчас и Потом](ch1.md)
 * [Chapter 2: Callbacks](ch2.md)
 * [Chapter 3: Promises](ch3.md)
 * [Chapter 4: Generators](ch4.md)
