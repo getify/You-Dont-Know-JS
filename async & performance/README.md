@@ -1,4 +1,4 @@
-# You Don't Know JS: Async & Performance
+# Вы не знаете JS: Асинхронность и Производительность
 
 <img src="cover.jpg" width="300">
 
