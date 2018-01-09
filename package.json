@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "test": "yaspeller . -e '.md'"
+  },
+  "dependencies": {
+    "yaspeller": "^4.0.3"
+  }
+}
