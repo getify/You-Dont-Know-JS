@@ -482,7 +482,7 @@ var a = new Foo();
 a instanceof Foo; // true
 ```
 
-`instanceof` 操作符的左侧操作数接收一个普通对象，右侧操作数接收一个 **函数**。`instanceof` 回答的问题是：**在 `a` 的整个 `[[Prototype]]` 链中，有没有出现被那个被 `Foo.prototype` 所随便指向的对象？**
+`instanceof` 操作符的左侧操作数接收一个普通对象，右侧操作数接收一个 **函数**。`instanceof` 回答的问题是：**在 `a` 的整个 `[[Prototype]]` 链中，有没有出现那个被 `Foo.prototype` 所随便指向的对象？**
 
 不幸的是，这意味着如果你拥有可以用于测试的 **函数**（`Foo`，和它带有的 `.prototype` 引用），你只能查询某些对象（`a`）的“祖先”。如果你有两个任意的对象，比如 `a` 和 `b`，而且你想调查是否 *这些对象* 通过 `[[Prototype]]` 链相互关联，单靠 `instanceof` 帮不上什么忙。
 
