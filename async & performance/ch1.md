@@ -337,6 +337,7 @@ b = a * 2;
 
 
 Вариант 1:
+
 ```javascript
 var a = 1;
 var b = 2;
@@ -356,6 +357,7 @@ b; // 22
 ```
 
 Вариант 2:
+
 ```javascript
 var a = 1;
 var b = 2;
