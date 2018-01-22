@@ -1,128 +1,128 @@
-# You Don't Know JS: Async & Performance
-# Chapter 2: Callbacks
+# Вы не знаете JS: Асинхронность и Производительность
+# Глава 2: Колбэки
 
-In Chapter 1, we explored the terminology and concepts around asynchronous programming in JavaScript. Our focus is on understanding the single-threaded (one-at-a-time) event loop queue that drives all "events" (async function invocations). We also explored various ways that concurrency patterns explain the relationships (if any!) between *simultaneously* running chains of events, or "processes" (tasks, function calls, etc.).
+В Главе 1 мы изучили термины и концепции, связанные с асинхронным программированием на JavaScript. Мы сосредоточились на изучении работы однопоточной очереди цикла событий, которая «управляет» всеми событиями (асинхронными вызовами функций). Мы также изучили различные способы, которыми шаблоны параллелизма объясняют взаимосвязь (если она есть!) между одновременно запущенными цепочками событий или «процессами» (задачами, вызовами функций и так далее).
 
-All our examples in Chapter 1 used the function as the individual, indivisible unit of operations, whereby inside the function, statements run in predictable order (above the compiler level!), but at the function-ordering level, events (aka async function invocations) can happen in a variety of orders.
+Все наши примеры в Главе 1 использовали функцию, как индивидуальную, неделимую единицу операций, внутри которой выполнялись операторы в предсказуемом порядке. Однако при вызове этих функций порядок может не соблюдаться.
 
-In all these cases, the function is acting as a "callback," because it serves as the target for the event loop to "call back into" the program, whenever that item in the queue is processed.
+Во всех этих случаях функция действует как «колбэк». Всякий раз она «возвращается» в программу, при обработке этого элемента в очереди цикла событий.
 
-As you no doubt have observed, callbacks are by far the most common way that asynchrony in JS programs is expressed and managed. Indeed, the callback is the most fundamental async pattern in the language.
+Как вы, несомненно, заметили, колбэки на сегодняшний день являются наиболее распространенным способом выражения и управления асинхронностью в программах на JS. Действительно, колбэк — это самый фундаментальный асинхронный шаблон в JS.
 
-Countless JS programs, even very sophisticated and complex ones, have been written upon no other async foundation than the callback (with of course the concurrency interaction patterns we explored in Chapter 1). The callback function is the async work horse for JavaScript, and it does its job respectably.
+Множество JS-программ, даже очень сложных, были написаны с использованием колбэков (разумеется, вместе с шаблонами параллелизма, которые мы исследовали в главе 1). Колбэки - это асинхронная рабочая лошадка для JavaScript, и она выполняет свою работу с достоинством.
 
-Except... callbacks are not without their shortcomings. Many developers are excited by the *promise* (pun intended!) of better async patterns. But it's impossible to effectively use any abstraction if you don't understand what it's abstracting, and why.
+Кроме того... колбэки не лишены недостатков. Многие разработчики в восторге от промисов — лучшего (по сравнению с колбэками) асинхронного шаблона. Но невозможно эффективно использовать абстракцию, если вы не понимаете, какие механизмы лежат в ее основе.
 
-In this chapter, we will explore a couple of those in depth, as motivation for why more sophisticated async patterns (explored in subsequent chapters of this book) are necessary and desired.
+В этой главе мы рассмотрим несколько таких механизмов. Это нужно для понимания необходимости использования более сложных асинхронных шаблонов (они будут рассмотрены в следующих главах).
 
-## Continuations
+## Продолжение
 
-Let's go back to the async callback example we started with in Chapter 1, but let me slightly modify it to illustrate a point:
+Вернемся к примеру колбэка, который мы изучали в главе 1 и немного изменим его:
 
-```js
+```javascript
 // A
 ajax( "..", function(..){
-	// C
+  // C
 } );
 // B
 ```
 
-`// A` and `// B` represent the first half of the program (aka the *now*), and `// C` marks the second half of the program (aka the *later*). The first half executes right away, and then there's a "pause" of indeterminate length. At some future moment, if the Ajax call completes, then the program will pick up where it left off, and *continue* with the second half.
+`//A` и `//B` представляют первую половину программы («сейчас»), часть `//C` вторую половину («потом»). Первая часть выполнится, как надо. Потом наступит пауза неизвестной длительности. В какой-то момент, если Ajax-запрос завершится, программа продолжит выполнение с того места, где она остановилась. Вторая половина будет выполнена.
 
-In other words, the callback function wraps or encapsulates the *continuation* of the program.
+Иными словами, колбэк инкапсулирует «продолжение выполнения» программы.
 
-Let's make the code even simpler:
+Давайте еще упростим наш пример:
 
-```js
+```javascript
 // A
 setTimeout( function(){
-	// C
+  // C
 }, 1000 );
 // B
 ```
 
-Stop for a moment and ask yourself how you'd describe (to someone else less informed about how JS works) the way that program behaves. Go ahead, try it out loud. It's a good exercise that will help my next points make more sense.
+Остановитесь на мгновение и спросите себя, как бы вы объяснили (кому-то менее информированному о том, как работает JS), как ведет себя эта программа. Попробуйте вслух. После этого упражнения, следующие мои вопросы будут более понятными.
 
-Most readers just now probably thought or said something to the effect of: "Do A, then set up a timeout to wait 1,000 milliseconds, then once that fires, do C." How close was your rendition?
+Большинство читателей, вероятно, подумали или сказали что-то вроде: «Выполнится A, затем установится тайм-аут, чтобы подождать 1000 миллисекунд, а затем, выполнится C». Насколько верно ваше предположение?
 
-You might have caught yourself and self-edited to: "Do A, setup the timeout for 1,000 milliseconds, then do B, then after the timeout fires, do C." That's more accurate than the first version. Can you spot the difference?
+Вы, возможно, заметили подвох и сказали: «Выполнится A, затем установится тайм-аут тайм-аут на 1000 миллисекунд, выполнится B, а затем, после того, как тайм-аут пройдет, выполнится C.». Это более точная формулировка, чем первая. Заметили разницу?
 
-Even though the second version is more accurate, both versions are deficient in explaining this code in a way that matches our brains to the code, and the code to the JS engine. The disconnect is both subtle and monumental, and is at the very heart of understanding the shortcomings of callbacks as async expression and management.
+Несмотря на это, обе версии недостаточно объясняют выполнение этого кода.
 
-As soon as we introduce a single continuation (or several dozen as many programs do!) in the form of a callback function, we have allowed a divergence to form between how our brains work and the way the code will operate. Any time these two diverge (and this is by far not the only place that happens, as I'm sure you know!), we run into the inevitable fact that our code becomes harder to understand, reason about, debug, and maintain.
+Как только мы вводим продолжение программы в виде колбэка, появляется расхождение между тем, как работает наш мозг и как работает наш код. При этом мы сталкиваемся с неизбежным фактом того, что наш код становится сложнее понять, анализировать, отлаживать и поддерживать.
 
-## Sequential Brain
+## Последовательное мышление
 
-I'm pretty sure most of you readers have heard someone say (even made the claim yourself), "I'm a multitasker." The effects of trying to act as a multitasker range from humorous (e.g., the silly patting-head-rubbing-stomach kids' game) to mundane (chewing gum while walking) to downright dangerous (texting while driving).
+Я почти уверен, что большинство читателей слышали, как кто-то сказал (или даже сам утверждал): «Я — многозадачник». Многозадачность имеет множество проявлений: от юмористического (например, одновременное поглаживание головы и потирание живота), до обывательского (жевать жвачку при ходьбе), или совершенно опасного (читать во время вождения автомобиля).
 
-But are we multitaskers? Can we really do two conscious, intentional actions at once and think/reason about both of them at exactly the same moment? Does our highest level of brain functionality have parallel multithreading going on?
+Но многозадачники ли мы? Можем ли мы на самом деле делать сразу два осознанных, преднамеренных действия и думать/рассуждать о них в один и тот же момент? Человеческий мозг имеет высший уровень функциональности, но может ли он работать параллельно-мультипоточно?
 
-The answer may surprise you: **probably not.**
+Ответ может вас удивить: скорее всего, нет.
 
-That's just not really how our brains appear to be set up. We're much more single taskers than many of us (especially A-type personalities!) would like to admit. We can really only think about one thing at any given instant.
+Это не так просто, разобраться в «настройках» нашего мозга. Все-таки стоит признаться, что наш мозг гораздо более «однозадачный». Мы действительно можем думать только об одном в любой момент.
 
-I'm not talking about all our involuntary, subconscious, automatic brain functions, such as heart beating, breathing, and eyelid blinking. Those are all vital tasks to our sustained life, but we don't intentionally allocate any brain power to them. Thankfully, while we obsess about checking social network feeds for the 15th time in three minutes, our brain carries on in the background (threads!) with all those important tasks.
+Я не говорю о всех наших непроизвольных, подсознательных, автоматических функциях мозга, таких как сердцебиение, дыхание и мигание век. Все это жизненно важные задачи , но мы не управляем ими намеренно. К счастью, пока мы в 15-й раз за три минуты проверяем ленту социальных сетей, наш мозг продолжает работать в фоновом режиме (потоки!) со всеми этими важными задачами.
 
-We're instead talking about whatever task is at the forefront of our minds at the moment. For me, it's writing the text in this book right now. Am I doing any other higher level brain function at exactly this same moment? Nope, not really. I get distracted quickly and easily -- a few dozen times in these last couple of paragraphs!
+Вместо этого мы говорим о том, какая задача находится в нашей голове в данный момент. Для меня это написание текста в этой книге прямо сейчас. Выполняется ли в этот момент какая-либо другая функция высокого уровня? Нет, не совсем. Я отвлекаюсь быстро и легко — несколько десятков раз пока писал эти строки!
 
-When we *fake* multitasking, such as trying to type something at the same time we're talking to a friend or family member on the phone, what we're actually most likely doing is acting as fast context switchers. In other words, we switch back and forth between two or more tasks in rapid succession, *simultaneously* progressing on each task in tiny, fast little chunks. We do it so fast that to the outside world it appears as if we're doing these things *in parallel*.
+Возникает ощущение «ложной» многозадачности. Мы пытаемся делать разные вещи одновременно, мы разговариваем с другом или членом семьи по телефону. Другими словами, мы переключаемся вперед и назад между двумя или более задачами в быстрой последовательности, одновременно продвигаясь по каждой задаче маленькими шагами. Мы делаем это так быстро, что для внешнего мира кажется, что мы делаем это параллельно.
 
-Does that sound suspiciously like async evented concurrency (like the sort that happens in JS) to you?! If not, go back and read Chapter 1 again!
+Для вас это звучит подозрительно похоже на асинхронный параллелизм (вроде того, что есть в JS)? Если нет, вернитесь и снова прочитайте главу 1!
 
-In fact, one way of simplifying (i.e., abusing) the massively complex world of neurology into something I can remotely hope to discuss here is that our brains work kinda like the event loop queue.
+С радостью упомяну об одной аналогии, упрощающей понимание всей этой неврологии. Наш мозг работает, как очередь цикла событий.
 
-If you think about every single letter (or word) I type as a single async event, in just this sentence alone there are several dozen opportunities for my brain to be interrupted by some other event, such as from my senses, or even just my random thoughts.
+Набор буквы или слова можно представить, как асинхронное событие, которое может прерываться десятком других событий (например, моими чувствами или мыслями).
 
-I don't get interrupted and pulled to another "process" at every opportunity that I could be (thankfully -- or this book would never be written!). But it happens often enough that I feel my own brain is nearly constantly switching to various different contexts (aka "processes"). And that's an awful lot like how the JS engine would probably feel.
+Я не прерываюсь и не перехожу к другому «процессу» при первой возможности (и это хорошо, иначе я бы не дописал эту книгу). Но такие прерывания случаются довольно часто, мой мозг почти постоянно переключается на различные контексты (например, «процессы»).
+И это очень похоже на работу движка JS.
 
-### Doing Versus Planning
+## Выполнение или Планирование
 
-OK, so our brains can be thought of as operating in single-threaded event loop queue like ways, as can the JS engine. That sounds like a good match.
+Хорошо, условимся рассматривать наш мозг работающим в однопоточной очереди цикла событий, как в JS. Неплохое сравнение.
 
-But we need to be more nuanced than that in our analysis. There's a big, observable difference between how we plan various tasks, and how our brains actually operate those tasks.
+Однако существует большая, заметная разница между тем, как мы планируем различные задачи, и как наш мозг фактически управляют этими задачами.
 
-Again, back to the writing of this text as my metaphor. My rough mental outline plan here is to keep writing and writing, going sequentially through a set of points I have ordered in my thoughts. I don't plan to have any interruptions or nonlinear activity in this writing. But yet, my brain is nevertheless switching around all the time.
+Опять же, вернемся к написанию этого текста в качестве метафоры. Моя задача заключается в том, чтобы продолжать писать и писать, последовательно по плану, который я «набросал» в своей голове. Я не планирую никаких прерываний или другой активности при письме. Но тем не менее, мой мозг все же переключается все время.
 
-Even though at an operational level our brains are async evented, we seem to plan out tasks in a sequential, synchronous way. "I need to go to the store, then buy some milk, then drop off my dry cleaning."
+Несмотря на то, что на операционном уровне наш мозг асинхронный, мы, похоже, планируем задачи последовательно, синхронно. «Мне нужно пойти в магазин, потом купить молока, а потом постирать белье».
 
-You'll notice that this higher level thinking (planning) doesn't seem very async evented in its formulation. In fact, it's kind of rare for us to deliberately think solely in terms of events. Instead, we plan things out carefully, sequentially (A then B then C), and we assume to an extent a sort of temporal blocking that forces B to wait on A, and C to wait on B.
+Кажется, что формулировке планирования нет ничего асинхронного. На самом деле, это редкость для нас сознательно думать исключительно о событиях. Вместо этого мы планируем все тщательно, последовательно (A, затем B, затем C), и мы предполагаем своего рода временную блокировку, которая заставляет B ждать события A и C ждать события B.
 
-When a developer writes code, they are planning out a set of actions to occur. If they're any good at being a developer, they're **carefully planning** it out. "I need to set `z` to the value of `x`, and then `x` to the value of `y`," and so forth.
+Когда разработчик пишет код, он планируют выполнить ряд действий. Если это хороший разработчик, он тщательно планирует это. «Мне нужно установить переменной `z` значение `x`, а затем переменной `x` значение `y` и так далее.
 
-When we write out synchronous code, statement by statement, it works a lot like our errands to-do list:
+Когда мы пишем синхронный код, оператор за оператором, он очень похож на ToDo-лист:
 
-```js
-// swap `x` and `y` (via temp variable `z`)
+```javascript
 z = x;
 x = y;
 y = z;
 ```
 
-These three assignment statements are synchronous, so `x = y` waits for `z = x` to finish, and `y = z` in turn waits for `x = y` to finish. Another way of saying it is that these three statements are temporally bound to execute in a certain order, one right after the other. Thankfully, we don't need to be bothered with any async evented details here. If we did, the code gets a lot more complex, quickly!
+Эти три оператора присваивания являются синхронными, а значит `x = y` ждет завершения `z = x`, и `y = z`, в свою очередь, ждет завершения `x = y`. Иными словами эти три действия связаны временем с выполнением в определенном порядке, одно за другим. К счастью, нам не нужно беспокоиться о каких-либо асинхронных событиях здесь. Если бы мы это сделали, код стал бы намного сложнее!
 
-So if synchronous brain planning maps well to synchronous code statements, how well do our brains do at planning out asynchronous code?
+Итак, синхронное планирование мозга хорошо работает с синхронными операторами кода. Насколько хорошо наши мозг работает при планировании асинхронного кода?
 
-It turns out that how we express asynchrony (with callbacks) in our code doesn't map very well at all to that synchronous brain planning behavior.
+Оказывается, описание асинхронности (с помощью колбэков) в нашем коде, не очень хорошо соотносится с синхронной работой мозга.
 
-Can you actually imagine having a line of thinking that plans out your to-do errands like this?
+Можете ли вы представить такую ситуацию?
 
-> "I need to go to the store, but on the way I'm sure I'll get a phone call, so 'Hi, Mom', and while she starts talking, I'll be looking up the store address on GPS, but that'll take a second to load, so I'll turn down the radio so I can hear Mom better, then I'll realize I forgot to put on a jacket and it's cold outside, but no matter, keep driving and talking to Mom, and then the seatbelt ding reminds me to buckle up, so 'Yes, Mom, I am wearing my seatbelt, I always do!'. Ah, finally the GPS got the directions, now..."
+> "Мне нужно съездить в магазин, но я уверен, что по дороге мне позвонят, так что «Привет, мам», и когда она заговорит, я буду искать адрес магазина по GPS, но загрузка займет время, поэтому я выключу радио, чтобы я мог услышать маму лучше, затем я пойму, что забыл надеть куртку, и на улице холодно, но это неважно, продолжу вести машину и разговаривать с мамой, а затем машина напомнит, что я не пристегнут, так что «Да, мама, я пристёгиваю ремень безопасности всегда!». Ах, наконец, GPS загрузил маршрут..."
 
-As ridiculous as that sounds as a formulation for how we plan our day out and think about what to do and in what order, nonetheless it's exactly how our brains operate at a functional level. Remember, that's not multitasking, it's just fast context switching.
+Как бы смешно это ни звучало, но именно так наши мозги работают на функциональном уровне. Помните, что это не многозадачность, это просто быстрое переключение между контекстами.
 
-The reason it's difficult for us as developers to write async evented code, especially when all we have is the callback to do it, is that stream of consciousness thinking/planning is unnatural for most of us.
+Причина, по которой нам сложно разрабатывать асинхронный код, особенно когда все, что у нас есть, это колбэки, заключается в том, что мыслить и планировать «потоком» противоестественно для нас.
 
-We think in step-by-step terms, but the tools (callbacks) available to us in code are not expressed in a step-by-step fashion once we move from synchronous to asynchronous.
+Мы думаем поэтапно, но инструменты (колбэки), доступные нам в коде, не выражаются поэтапно, как только мы переходим от синхронного к асинхронному.
 
-And **that** is why it's so hard to accurately author and reason about async JS code with callbacks: because it's not how our brain planning works.
+И **поэтому** так сложно точно написать и проанализировать асинхронный JS-код с колбэками: потому что работа нашего мозга устроена иначе.
 
-**Note:** The only thing worse than not knowing why some code breaks is not knowing why it worked in the first place! It's the classic "house of cards" mentality: "it works, but not sure why, so nobody touch it!" You may have heard, "Hell is other people" (Sartre), and the programmer meme twist, "Hell is other people's code." I believe truly: "Hell is not understanding my own code." And callbacks are one main culprit.
+**Замечание**: Единственное, что хуже непонимания почему код не работает, это непонимание того, а почему он вообще работал! Это классический пример «карточного домика»: «он стоит, но я не знаю почему, поэтому не трогайте его!» Возможно, вы слышали выражение: «Ад — это другие люди» (Сартр). У программистов есть своя версия: «Ад — это код других людей». Я убежден: «Ад — это непонимание своего собственного кода». И колбэки являются одними из главных виновников.
 
-### Nested/Chained Callbacks
+## Вложенные/связанные колбэки
 
-Consider:
+Рассмотрим такой код:
 
-```js
+```javascript
 listen( "click", function handler(evt){
 	setTimeout( function request(){
 		ajax( "http://some.url.1", function response(text){
@@ -137,56 +137,56 @@ listen( "click", function handler(evt){
 } );
 ```
 
-There's a good chance code like that is recognizable to you. We've got a chain of three functions nested together, each one representing a step in an asynchronous series (task, "process").
+У нас есть цепочка из трех вложенных функций, каждая из которых представляет шаг в асинхронном процессе (задача, «процесс»).
 
-This kind of code is often called "callback hell," and sometimes also referred to as the "pyramid of doom" (for its sideways-facing triangular shape due to the nested indentation).
+Такой код часто называют «callback hell», а иногда даже «пирамидой обреченности» (из за бокового отступа).
 
-But "callback hell" actually has almost nothing to do with the nesting/indentation. It's a far deeper problem than that. We'll see how and why as we continue through the rest of this chapter.
+Но «callback hell» фактически не имеет отношения ко вложенности или отступам. Эта проблема гораздо более глубокая. Дальше мы рассмотрим, что к чему.
 
-First, we're waiting for the "click" event, then we're waiting for the timer to fire, then we're waiting for the Ajax response to come back, at which point it might do it all again.
+Сначала мы ждем события «клика», затем мы ждем, когда таймер выполнится, мы ожидаем ajax-ответа, затем можем повторить все снова.
 
-At first glance, this code may seem to map its asynchrony naturally to sequential brain planning.
+На первый взгляд, асинхронная работа этого кода кажется очевидной.
 
-First (*now*), we:
+Сначала (*сейчас*):
 
-```js
+```javascript
 listen( "..", function handler(..){
 	// ..
 } );
 ```
 
-Then *later*, we:
+*Потом*:
 
-```js
+``` javascript
 setTimeout( function request(..){
 	// ..
 }, 500) ;
 ```
 
-Then still *later*, we:
+*потом* продолжается:
 
-```js
+```javascript
 ajax( "..", function response(..){
 	// ..
 } );
 ```
 
-And finally (most *later*), we:
+Наконец, еще *позже*:
 
-```js
+```javascript
 if ( .. ) {
 	// ..
 }
 else ..
 ```
 
-But there's several problems with reasoning about this code linearly in such a fashion.
+Есть несколько проблем, относительно линейности этого кода.
 
-First, it's an accident of the example that our steps are on subsequent lines (1, 2, 3, and 4...). In real async JS programs, there's often a lot more noise cluttering things up, noise that we have to deftly maneuver past in our brains as we jump from one function to the next. Understanding the async flow in such callback-laden code is not impossible, but it's certainly not natural or easy, even with lots of practice.
+Во-первых, это случайность, что шаги выполнения нашей программы выполняются ступенчато (друг за другом). Реальный код чаще всего содержит гораздо больше запутанностей и нюансов, о которых мы должны помнить, когда переходим от одной функции к другой. Понимание асинхронного процесса в таком коде (с колбэками) не является чем то невозможным. Но это сложно, даже с учетом большой практики.
 
-But also, there's something deeper wrong, which isn't evident just in that code example. Let me make up another scenario (pseudocode-ish) to illustrate it:
+Но в этом коде есть нечто более *глубокое*, неочевидное. Позвольте мне предложить другой пример в виде псевдокода, чтобы проиллюстрировать свою мысль:
 
-```js
+```javascript
 doA( function(){
 	doB();
 
@@ -200,7 +200,7 @@ doA( function(){
 doF();
 ```
 
-While the experienced among you will correctly identify the true order of operations here, I'm betting it is more than a little confusing at first glance, and takes some concerted mental cycles to arrive at. The operations will happen in this order:
+Готов поспорить, что с первого взгляда этот код может сбить с толку. Хотя опытные разработчики, конечно, сразу поняли правильный порядок операций:
 
 * `doA()`
 * `doF()`
@@ -209,11 +209,11 @@ While the experienced among you will correctly identify the true order of operat
 * `doE()`
 * `doD()`
 
-Did you get that right the very first time you glanced at the code?
+А вы поняли правильный порядок с первого раза?
 
-OK, some of you are thinking I was unfair in my function naming, to intentionally lead you astray. I swear I was just naming in top-down appearance order. But let me try again:
+Хорошо, некоторые из вас думают, что я специально выбрал такие имена функций, чтобы преднамеренно ввести вас в заблуждение. Клянусь, я просто назвал их по порядку. Но давайте попробуем еще раз:
 
-```js
+```javascript
 doA( function(){
 	doC();
 
@@ -227,19 +227,19 @@ doA( function(){
 doB();
 ```
 
-Now, I've named them alphabetically in order of actual execution. But I still bet, even with experience now in this scenario, tracing through the `A -> B -> C -> D -> E -> F` order doesn't come natural to many if any of you readers. Certainly, your eyes do an awful lot of jumping up and down the code snippet, right?
+Теперь я вызвал их в алфавитном порядке. Но я все еще держу пари, что для некоторых, порядок `A -> B -> C -> D -> E -> F` кажется неочевидным. Ваши глаза очень много прыгают по коду, не так ли?
 
-But even if that all comes natural to you, there's still one more hazard that could wreak havoc. Can you spot what it is?
+Но даже, если для вас очередность выполнения этого кода очевидна, то есть еще одна опасность. Заметили ее?
 
-What if `doA(..)` or `doD(..)` aren't actually async, the way we obviously assumed them to be? Uh oh, now the order is different. If they're both sync (and maybe only sometimes, depending on the conditions of the program at the time), the order is now `A -> C -> D -> F -> E -> B`.
+Что если, `doA(..)` или `doD(..)` на самом деле не асинхронные, как мы, очевидно, предположили? Ох, теперь порядок отличается. Если обе функции синхронные (такое возможно только в редком случае, в зависимости от условий программы), порядок будет  `A -> C -> D -> F -> E -> B`.
 
-That sound you just heard faintly in the background is the sighs of thousands of JS developers who just had a face-in-hands moment.
+Тот звук который вы сейчас услышали, который вы только что слышали на заднем плане, это вздох тысяч JS-разработчиков, сделавших фейспалм.
 
-Is nesting the problem? Is that what makes it so hard to trace the async flow? That's part of it, certainly.
+Так проблема во вложенности? Неужели из за нее сложно следить за асинхронностью? Отчасти.
 
-But let me rewrite the previous nested event/timeout/Ajax example without using nesting:
+Позвольте, я перепишу наш пример, не используя вложенность:
 
-```js
+```javascript
 listen( "click", handler );
 
 function handler() {
@@ -260,33 +260,29 @@ function response(text){
 }
 ```
 
-This formulation of the code is not hardly as recognizable as having the nesting/indentation woes of its previous form, and yet it's every bit as susceptible to "callback hell." Why?
+Это вариант не так сложно анализировать, как предыдущий со вложенностью. Но тем не менее — это все еще «callback hell». Почему?
 
-As we go to linearly (sequentially) reason about this code, we have to skip from one function, to the next, to the next, and bounce all around the code base to "see" the sequence flow. And remember, this is simplified code in sort of best-case fashion. We all know that real async JS program code bases are often fantastically more jumbled, which makes such reasoning orders of magnitude more difficult.
+Когда мы последовательно рассматриваем этот, мы переходим от одной функции до следующей, следующей и в итоге вырисовываем себе всю карту последовательности. И помните, что это упрощенный код. Мы знаем, что настоящие асинхронные JS-программны порой фантастически запутаны, что делает анализ кода на порядок сложнее.
 
-Another thing to notice: to get steps 2, 3, and 4 linked together so they happen in succession, the only affordance callbacks alone gives us is to hardcode step 2 into step 1, step 3 into step 2, step 4 into step 3, and so on. The hardcoding isn't necessarily a bad thing, if it really is a fixed condition that step 2 should always lead to step 3.
+Хардкод определенно делает код более хрупким, поскольку он не учитывает ситуации, когда что-то идет не так. Например, если шаг 2 *падает*, шаг 3 никогда не выполнится, а шаг 2 не повторится или не перейдет к альтернативному потоку обработки ошибок и т. д.
 
-But the hardcoding definitely makes the code a bit more brittle, as it doesn't account for anything going wrong that might cause a deviation in the progression of steps. For example, if step 2 fails, step 3 never gets reached, nor does step 2 retry, or move to an alternate error handling flow, and so on.
+Все эти проблемы *можно* захардкодить руками, но тогда этот код нельзя будет использовать повторно в других частях программы.
 
-All of these issues are things you *can* manually hardcode into each step, but that code is often very repetitive and not reusable in other steps or in other async flows in your program.
+Несмотря на то, что наш мозг может планировать ряд задач в последовательном виде (это, затем это, а затем и это), восстановление этого процесса происходит очень легко. Например, вы выполняете поручения, и понимаете, что оставили свой список покупок дома. Это незапланированное событие, но ведь оно не завершает ваш день. Ваш мозг легко исправляет эту ситуацию: вы идете домой, забираете список, а затем отправляетесь обратно в магазин.
 
-Even though our brains might plan out a series of tasks in a sequential type of way (this, then this, then this), the evented nature of our brain operation makes recovery/retry/forking of flow control almost effortless. If you're out running errands, and you realize you left a shopping list at home, it doesn't end the day because you didn't plan that ahead of time. Your brain routes around this hiccup easily: you go home, get the list, then head right back out to the store.
+Но хрупкий характер хардкодных колбэков (даже при описанной обработке ошибок) не такой изящный. После того, как вы закончите описывать (предугадывать) все различные варианты, код становится настолько запутанным, что его сложно будет поддерживать или обновлять.
 
-But the brittle nature of manually hardcoded callbacks (even with hardcoded error handling) is often far less graceful. Once you end up specifying (aka pre-planning) all the various eventualities/paths, the code becomes so convoluted that it's hard to ever maintain or update it.
+Вот что такое «callback hell»! Вложенность/отступы — это уже вторично.
 
-**That** is what "callback hell" is all about! The nesting/indentation are basically a side show, a red herring.
+И, если кому то и этого недостаточно, то мы даже не коснулись того, что происходит, когда две или более цепочки этих колбэков выполняются одновременно или когда третий шаг разветвляется на «параллельные» колбэки с помощью «затворов» или «прищепок» ... OMG, мой мозг взорвался, как там ваш?!
 
-And as if all that's not enough, we haven't even touched what happens when two or more chains of these callback continuations are happening *simultaneously*, or when the third step branches out into "parallel" callbacks with gates or latches, or... OMG, my brain hurts, how about yours!?
+Вы понимаете, что наше последовательное, блокирующее поведение в планировании мозга не согласуется с асинхронным кодом в виде колбэков? Это первый серьезный недостаток, заключающийся в том, чтобы выразить суть колбэков: они описывают асинхронность кода, в то время, как наш мозг пытается работать синхронно!
 
-Are you catching the notion here that our sequential, blocking brain planning behaviors just don't map well onto callback-oriented async code? That's the first major deficiency to articulate about callbacks: they express asynchrony in code in ways our brains have to fight just to keep in sync with (pun intended!).
+## Проблемы доверия
 
-## Trust Issues
+Давайте снова рассмотрим понятие колбэка, как продолжения (а.к.а второй половины) нашей программы:
 
-The mismatch between sequential brain planning and callback-driven async JS code is only part of the problem with callbacks. There's something much deeper to be concerned about.
-
-Let's once again revisit the notion of a callback function as the continuation (aka the second half) of our program:
-
-```js
+```javascript
 // A
 ajax( "..", function(..){
 	// C
@@ -294,50 +290,48 @@ ajax( "..", function(..){
 // B
 ```
 
-`// A` and `// B` happen *now*, under the direct control of the main JS program. But `// C` gets deferred to happen *later*, and under the control of another party -- in this case, the `ajax(..)` function. In a basic sense, that sort of hand-off of control doesn't regularly cause lots of problems for programs.
+`// A` и `// B` происходят *сейчас* под прямым управлением основной программы JS. Но выполнение  `// C` откладывается, чтобы произойти позже, и под контролем другой части — функции `ajax(..)`. Как правило такая передача контроля не влечет никаких проблем.
 
-But don't be fooled by its infrequency that this control switch isn't a big deal. In fact, it's one of the worst (and yet most subtle) problems about callback-driven design. It revolves around the idea that sometimes `ajax(..)` (i.e., the "party" you hand your callback continuation to) is not a function that you wrote, or that you directly control. Many times, it's a utility provided by some third party.
+Но не стоит обманываться. Фактически, такая передача контроля, это одна из худших (и в то же время самых тонких) проблем, связанных с колбэками. Она вращается вокруг идеи, что иногда `ajax(..)` (т.е. «часть», с которой вы передаете свой колбэк) — это не функция, которую вы написали, или которую вы непосредственно контролируете. Чаще всего — это утилита, предоставляемая третьей стороной.
 
-We call this "inversion of control," when you take part of your program and give over control of its execution to another third party. There's an unspoken "contract" that exists between your code and the third-party utility -- a set of things you expect to be maintained.
+Мы называем это «инверсией контроля», когда вы берете часть своей программы и *доверяете* ее исполнение третьей стороне. Существует негласный «контракт», который существует между вашим кодом и сторонней утилитой — набор вещей, которые должны поддерживаться.
 
-### Tale of Five Callbacks
+### Сказ о пяти колбэках
 
-It might not be terribly obvious why this is such a big deal. Let me construct an exaggerated scenario to illustrate the hazards of trust at play.
+Важность того, что мы рассмотрели выше, может быть не столь очевидна. Позвольте мне показать выдуманный сценарий, чтобы проиллюстрировать опасность *доверия*.
 
-Imagine you're a developer tasked with building out an ecommerce checkout system for a site that sells expensive TVs. You already have all the various pages of the checkout system built out just fine. On the last page, when the user clicks "confirm" to buy the TV, you need to call a third-party function (provided say by some analytics tracking company) so that the sale can be tracked.
+Представьте, что вы разработчик, которому поручено создать систему проверки электронной торговли для сайта, который продает дорогие телевизоры. У вас уже есть все различные страницы системы проверки, сделанные просто отлично. На последней странице, когда пользователь нажимает «подтвердить», чтобы купить телевизор, вам нужно вызвать стороннюю функцию (предоставленную компанией по отслеживанию аналитики), чтобы можно было отслеживать продажи.
 
-You notice that they've provided what looks like an async tracking utility, probably for the sake of performance best practices, which means you need to pass in a callback function. In this continuation that you pass in, you will have the final code that charges the customer's credit card and displays the thank you page.
+Вы заметили, что предоставленная утилита асинхронная, возможно это сделано ради повышения производительности. Это означает, что вам нужно передать колбэк, чтобы в итоге получить код, который взимает деньги с кредитной карты клиента и отображает страницу с благодарностью.
 
-This code might look like:
+Все это может выглядеть так:
 
-```js
+```javascript
 analytics.trackPurchase( purchaseData, function(){
 	chargeCreditCard();
 	displayThankyouPage();
 } );
 ```
 
-Easy enough, right? You write the code, test it, everything works, and you deploy to production. Everyone's happy!
+Довольно просто, правда? Вы пишете код, тестируете его, все работает, заливаете на прод. Все счастливы!
 
-Six months go by and no issues. You've almost forgotten you even wrote that code. One morning, you're at a coffee shop before work, casually enjoying your latte, when you get a panicked call from your boss insisting you drop the coffee and rush into work right away.
+Шесть месяцев проходят без проблем. Вы почти забыли, что написали этот код. Однажды утром вы перед работой наслаждаетесь латте в кафе, и вдруг получаете тревожный звонок от вашего босса, настаивающего на том, чтобы вы выкинули кофе и прямо сейчас отправлялись в офис.
 
-When you arrive, you find out that a high-profile customer has had his credit card charged five times for the same TV, and he's understandably upset. Customer service has already issued an apology and processed a refund. But your boss demands to know how this could possibly have happened. "Don't we have tests for stuff like this!?"
+Придя на работу, вы узнаете, что у VIP-клиента была снята плата за один и тот же телевизор 5 раз, и он, понятно дело, расстроен. Служба поддержки клиентов уже извинилась и возместила ущерб. Но ваш босс требует разобраться, как это могло произойти. «Разве мы не протестировали этот кейс?»
 
-You don't even remember the code you wrote. But you dig back in and start trying to find out what could have gone awry.
+Проверив логи вы приходите к выводу, что причина заключается в том, что утилита аналитики почему-то вызвала ваш колбэк пять раз вместо одного. Разумеется, в документации об этом ни слова.
 
-After digging through some logs, you come to the conclusion that the only explanation is that the analytics utility somehow, for some reason, called your callback five times instead of once. Nothing in their documentation mentions anything about this.
+Разочарованный, вы обращаетесь в службу поддержки, которая изумлена не меньше вашего. Там решают пообщаться со своимми разработчиками и ответить вам. На следующий день вы получаете длинное письмо, объясняющее, что они обнаружили в своём коде, которое вы быстро пересылаете своему боссу.
 
-Frustrated, you contact customer support, who of course is as astonished as you are. They agree to escalate it to their developers, and promise to get back to you. The next day, you receive a lengthy email explaining what they found, which you promptly forward to your boss.
+По всей видимости, разработчики аналитической компании экспериментировали с кодом, который при определенных условиях повторял вызов колбэка один раз в секунду в течение пяти секунд, перед тем, как уйти в таймаут. Они не собирались выкатывать это в прод, но случилось то, что случилось. Они в замешательстве и долго извиняются. Они подробно описывают, как они определили сбой и что они сделают, чтобы это никогда не повторилось.
 
-Apparently, the developers at the analytics company had been working on some experimental code that, under certain conditions, would retry the provided callback once per second, for five seconds, before failing with a timeout. They had never intended to push that into production, but somehow they did, and they're totally embarrassed and apologetic. They go into plenty of detail about how they've identified the breakdown and what they'll do to ensure it never happens again. Yadda, yadda.
+Что же дальше?
 
-What's next?
+Вы обсуждаете это с вашим боссом, но такой порядок вещей его не устраивает. Он настаивает, и вы неохотно признаете, что больше не можете доверять *им*, и вам нужно будет выяснить, как защитить код от такой уязвимости.
 
-You talk it over with your boss, but he's not feeling particularly comfortable with the state of things. He insists, and you reluctantly agree, that you can't trust *them* anymore (that's what bit you), and that you'll need to figure out how to protect the checkout code from such a vulnerability again.
+После копания в программе вы пишите хак на этот случай. На первый взгляд хак рабочий:
 
-After some tinkering, you implement some simple ad hoc code like the following, which the team seems happy with:
-
-```js
+```javascript
 var tracked = false;
 
 analytics.trackPurchase( purchaseData, function(){
@@ -348,70 +342,69 @@ analytics.trackPurchase( purchaseData, function(){
 	}
 } );
 ```
+**Примечание**: Похоже на то, что мы делали в прошлой главе. По факту мы создали «защелку» для обработки случая многократного вызова колбэка.
 
-**Note:** This should look familiar to you from Chapter 1, because we're essentially creating a latch to handle if there happen to be multiple concurrent invocations of our callback.
+Но затем один из ваших тестировщиков спрашивает: «Что произойдет, если колбек никогда не вызовется?» Об этом вы не подумали, к сожалению.
 
-But then one of your QA engineers asks, "what happens if they never call the callback?" Oops. Neither of you had thought about that.
+Вы начинаете прокручивать все возможные варианты событий, которые могут пойти не так, при вызове колбэка. Вот примерный список таких кейсов:
 
-You begin to chase down the rabbit hole, and think of all the possible things that could go wrong with them calling your callback. Here's roughly the list you come up with of ways the analytics utility could misbehave:
-
-* Call the callback too early (before it's been tracked)
-* Call the callback too late (or never)
-* Call the callback too few or too many times (like the problem you encountered!)
-* Fail to pass along any necessary environment/parameters to your callback
-* Swallow any errors/exceptions that may happen
+* Колбэк вызывается слишком рано (еще до начала трекинга)
+* Колбэк вызывается слишком поздно (или вообще никогда)
+* Колбэк вызывается слишком мало или слишком много раз (проблема с которой вы уже столкнулись!)
+* Невозможно передать параметры для вашего колбэка
+* Возникающие ошибки/исключения могут быть не обработаны
 * ...
 
-That should feel like a troubling list, because it is. You're probably slowly starting to realize that you're going to have to invent an awful lot of ad hoc logic **in each and every single callback** that's passed to a utility you're not positive you can trust.
+Постепенно вы начинаете понимать, что вам придется **изобретать много хаков для каждого колбэка**, передаваемого в стороннюю утилиту, которой вы уже не можете доверять.
 
-Now you realize a bit more completely just how hellish "callback hell" is.
+Теперь вы понимаете, насколько адским бывает «callback hell».
 
-### Not Just Others' Code
+## Не только чужой код
 
-Some of you may be skeptical at this point whether this is as big a deal as I'm making it out to be. Perhaps you don't interact with truly third-party utilities much if at all. Perhaps you use versioned APIs or self-host such libraries, so that its behavior can't be changed out from underneath you.
+Некоторые из вас могут скептически относиться к этой проблеме. Возможно, вы вообще не используете посторонние утилиты. Возможно, вы используете версионные API или хостите собственные библиотеки.
 
-So, contemplate this: can you even *really* trust utilities that you do theoretically control (in your own code base)?
+Но ответьте мне: можете ли вы *доверять* собственным утилитам?
 
-Think of it this way: most of us agree that at least to some extent we should build our own internal functions with some defensive checks on the input parameters, to reduce/prevent unexpected issues.
+Большинство из нас согласятся, что для своих функций мы должны писать проверки входных параметром, тем самым страхуясь от неожиданных ситуаций.
 
-Overly trusting of input:
-```js
+Например, таких. Самонадеянным будет предположение, что на вход функции будут подавать только числа:
+
+```javascript
 function addNumbers(x,y) {
-	// + is overloaded with coercion to also be
-	// string concatenation, so this operation
-	// isn't strictly safe depending on what's
-	// passed in.
+	// + это еще и оператор конкатенации строк
+	// такая операция не может считаться безопасной,
+	// так как сильно зависит от входных параметров
 	return x + y;
 }
 
 addNumbers( 21, 21 );	// 42
 addNumbers( 21, "21" );	// "2121"
 ```
+Добавим проверку данных:
 
-Defensive against untrusted input:
-```js
+```javascript
 function addNumbers(x,y) {
-	// ensure numerical input
+	// проверяем действительно ли аргументы это числа
 	if (typeof x != "number" || typeof y != "number") {
 		throw Error( "Bad parameters" );
 	}
 
-	// if we get here, + will safely do numeric addition
+	// если проверка прошла успешно, то + выполнит именно сложение, а не конкатенацию
 	return x + y;
 }
 
 addNumbers( 21, 21 );	// 42
 addNumbers( 21, "21" );	// Error: "Bad parameters"
 ```
+Или например такой вариант: более читабельный и все еще безопасный:
 
-Or perhaps still safe but friendlier:
-```js
+```javascript
 function addNumbers(x,y) {
-	// ensure numerical input
+	// проверяем действительно ли аргументы это числа
 	x = Number( x );
 	y = Number( y );
 
-	// + will safely do numeric addition
+	// + выполнит именно сложение, а не конкатенацию
 	return x + y;
 }
 
@@ -419,25 +412,23 @@ addNumbers( 21, 21 );	// 42
 addNumbers( 21, "21" );	// 42
 ```
 
-However you go about it, these sorts of checks/normalizations are fairly common on function inputs, even with code we theoretically entirely trust. In a crude sort of way, it's like the programming equivalent of the geopolitical principle of "Trust But Verify."
+Это распространенная практика делать такие проверки. Даже в том коде, которому вы доверяете. Тут работает известный политический принцип — «Доверяй, но проверяй».
 
-So, doesn't it stand to reason that we should do the same thing about composition of async function callbacks, not just with truly external code but even with code we know is generally "under our own control"? **Of course we should.**
+Разве не стоит делать такие проверки и для асинхронных колбэков? **Конечно, стоит.**
 
-But callbacks don't really offer anything to assist us. We have to construct all that machinery ourselves, and it often ends up being a lot of boilerplate/overhead that we repeat for every single async callback.
+Но колбэки не предоставляют нам никаких инструментов для управления собой. Мы должны реализовывать их самостоятельно, и часто это заканчивается тем, что мы используем готовые шаблоны, повторяемые для каждого асинхронного колбэка.
 
-The most troublesome problem with callbacks is *inversion of control* leading to a complete breakdown along all those trust lines.
+Если у вас есть код, использующий колбэки, в том числе и с помощью сторонних утилит, и вы не написали защиту от инверсии контроля, то ваш код заражен прямо сейчас! Хотя симптомы еще не проявились.
 
-If you have code that uses callbacks, especially but not exclusively with third-party utilities, and you're not already applying some sort of mitigation logic for all these *inversion of control* trust issues, your code *has* bugs in it right now even though they may not have bitten you yet. Latent bugs are still bugs.
+Действительно, ад.
 
-Hell indeed.
+## Попытка сохранить коллбеки
 
-## Trying to Save Callbacks
+Существует несколько вариантов дизайна колбэков, которые пытались решить некоторые (не все!) проблемы, которые мы только что рассмотрели. Это доблестная, но обреченная попытка сохранить шаблон колбэков от самоуничтожения.
 
-There are several variations of callback design that have attempted to address some (not all!) of the trust issues we've just looked at. It's a valiant, but doomed, effort to save the callback pattern from imploding on itself.
+Например, продвинутая обработка результатов с помощью отдельных колбэков (один для уведомления об успешном завершении, один для уведомления об ошибке):
 
-For example, regarding more graceful error handling, some API designs provide for split callbacks (one for the success notification, one for the error notification):
-
-```js
+```javascript
 function success(data) {
 	console.log( data );
 }
@@ -449,19 +440,18 @@ function failure(err) {
 ajax( "http://some.url.1", success, failure );
 ```
 
-In APIs of this design, often the `failure()` error handler is optional, and if not provided it will be assumed you want the errors swallowed. Ugh.
+В API этого варианта часто обработчик ошибок `failure()` является необязательным, и если не указано иного, то предполагается, что ошибки будут пропускаться. Непорядок.
 
-**Note:** This split-callback design is what the ES6 Promise API uses. We'll cover ES6 Promises in much more detail in the next chapter.
+**Примечание**: Вариант с раздельными колбэками используют ES6-промисы. Мы рассмотрим их более подробно в следующей главе.
 
-Another common callback pattern is called "error-first style" (sometimes called "Node style," as it's also the convention used across nearly all Node.js APIs), where the first argument of a single callback is reserved for an error object (if any). If success, this argument will be empty/falsy (and any subsequent arguments will be the success data), but if an error result is being signaled, the first argument is set/truthy (and usually nothing else is passed):
+Другой распространенный шаблон архитектуры колбэков  называется «error-first стиль» (иногда называемый «стиль Node», поскольку его использует большинство API-интерфейсов Node.js), где первый аргумент одного колбэка зарезервирован для объекта ошибок (если таковые имеются). В случае успеха, этот аргумент будет пустым/ложным (и любые последующие аргументы будут данными успешной обработки), но если ошибка все же произошла, то аргумент становится истинным, и далее ничего не происходит:
 
-```js
+```javascript
 function response(err,data) {
-	// error?
+	// ошибка?
 	if (err) {
 		console.error( err );
 	}
-	// otherwise, assume success
 	else {
 		console.log( data );
 	}
@@ -470,15 +460,15 @@ function response(err,data) {
 ajax( "http://some.url.1", response );
 ```
 
-In both of these cases, several things should be observed.
+В обоих случаях следует обратить внимание на некоторые вещи:
 
-First, it has not really resolved the majority of trust issues like it may appear. There's nothing about either callback that prevents or filters unwanted repeated invocations. Moreover, things are worse now, because you may get both success and error signals, or neither, and you still have to code around either of those conditions.
+Во-первых, на самом деле этот подход не решает большинство «проблем доверия». В колбэке нет ничего, что предотвращает или фильтрует нежелательные повторные вызовы. Более того, сейчас все еще хуже. Потому что вы можете получить как состояния успеха, так и ошибки, или ни того, ни другого, и вам все равно придется обрабатывать любое из этих условий.
 
-Also, don't miss the fact that while it's a standard pattern you can employ, it's definitely more verbose and boilerplate-ish without much reuse, so you're going to get weary of typing all that out for every single callback in your application.
+Кроме того, не упускайте тот факт, что, хотя это стандартный шаблон, он определенно не годится для повторного использования в другом месте. Вы устанете писать его для **каждого** отдельного колбэка в приложении.
 
-What about the trust issue of never being called? If this is a concern (and it probably should be!), you likely will need to set up a timeout that cancels the event. You could make a utility (proof-of-concept only shown) to help you with that:
+Как насчет проблемы — «колбэк не был вызван»?  Вам, вероятно, потребуется настроить таймаут, который отменяет событие. Вы могли бы написать утилиту (в качестве доказательства концепции):
 
-```js
+```javascript
 function timeoutify(fn,delay) {
 	var intv = setTimeout( function(){
 			intv = null;
@@ -487,7 +477,7 @@ function timeoutify(fn,delay) {
 	;
 
 	return function() {
-		// timeout hasn't happened yet?
+		// таймаут еще не наступил?
 		if (intv) {
 			clearTimeout( intv );
 			fn.apply( this, [ null ].concat( [].slice.call( arguments ) ) );
@@ -496,10 +486,10 @@ function timeoutify(fn,delay) {
 }
 ```
 
-Here's how you use it:
+Используем её здесь:
 
-```js
-// using "error-first style" callback design
+``` javascript
+// используем "error-first style"
 function foo(err,data) {
 	if (err) {
 		console.error( err );
@@ -512,15 +502,15 @@ function foo(err,data) {
 ajax( "http://some.url.1", timeoutify( foo, 500 ) );
 ```
 
-Another trust issue is being called "too early." In application-specific terms, this may actually involve being called before some critical task is complete. But more generally, the problem is evident in utilities that can either invoke the callback you provide *now* (synchronously), or *later* (asynchronously).
+Другой проблема в вызове колбэка «слишком рано». Это может означать вызов до того, как будет завершена какая-то критическая задача. Но в целом проблема наиболее проявляется в утилитах, которые могут либо вызвать колбэк *сейчас* (синхронно), либо *позже* (асинхронно).
 
-This nondeterminism around the sync-or-async behavior is almost always going to lead to very difficult to track down bugs. In some circles, the fictional insanity-inducing monster named Zalgo is used to describe the sync/async nightmares. "Don't release Zalgo!" is a common cry, and it leads to very sound advice: always invoke callbacks asynchronously, even if that's "right away" on the next turn of the event loop, so that all callbacks are predictably async.
+Такая неопределенность почти всегда приводит к очень сложному дебаггингу. В некоторых кругах придумали монстра, вызывающего безумие, по имени Залго. Его используют для описания кошмаров синхронности/асинхронности. «Не выпускай Залго!» часто можно услышать, и это очень хороший совет: всегда вызывайте колбэки асинхронно, даже, если его выполнение придется на следующий «тик» цикла событий.
 
-**Note:** For more information on Zalgo, see Oren Golan's "Don't Release Zalgo!" (https://github.com/oren/oren.github.io/blob/master/posts/zalgo.md) and Isaac Z. Schlueter's "Designing APIs for Asynchrony" (http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony).
+**Примечание**: Более подробно о Залго можно почитать [здесь](https://github.com/oren/oren.github.io/blob/master/posts/zalgo.md) и [здесь](http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony).
 
-Consider:
+Рассмотрим код:
 
-```js
+```javascript
 function result(data) {
 	console.log( a );
 }
@@ -531,13 +521,13 @@ ajax( "..pre-cached-url..", result );
 a++;
 ```
 
-Will this code print `0` (sync callback invocation) or `1` (async callback invocation)? Depends... on the conditions.
+Что мы получим в консоли? `0` — синхронный вызов или `1` — асинхронный вызов? Зависит... от условий.
 
-You can see just how quickly the unpredictability of Zalgo can threaten any JS program. So the silly-sounding "never release Zalgo" is actually incredibly common and solid advice. Always be asyncing.
+Вы можете видеть, насколько быстро непредсказуемость Залго может угрожать любой программе на JS. Таким образом, глупо звучащее «никогда не выпускай Залго» на самом деле распространенный и полезный совет. Только асинхронность!
 
-What if you don't know whether the API in question will always execute async? You could invent a utility like this `asyncify(..)` proof-of-concept:
+Что делать, если вы не знаете, будет ли API всегда выполняться асинхронно? Вы могли бы придумать такую утилиту, как `asyncify(..)`:
 
-```js
+```javascript
 function asyncify(fn) {
 	var orig_fn = fn,
 		intv = setTimeout( function(){
@@ -549,29 +539,22 @@ function asyncify(fn) {
 	fn = null;
 
 	return function() {
-		// firing too quickly, before `intv` timer has fired to
-		// indicate async turn has passed?
 		if (intv) {
 			fn = orig_fn.bind.apply(
 				orig_fn,
-				// add the wrapper's `this` to the `bind(..)`
-				// call parameters, as well as currying any
-				// passed in parameters
 				[this].concat( [].slice.call( arguments ) )
 			);
 		}
-		// already async
 		else {
-			// invoke original function
 			orig_fn.apply( this, arguments );
 		}
 	};
 }
 ```
 
-You use `asyncify(..)` like this:
+И использовать ее так:
 
-```js
+```javascript
 function result(data) {
 	console.log( a );
 }
@@ -581,27 +564,26 @@ var a = 0;
 ajax( "..pre-cached-url..", asyncify( result ) );
 a++;
 ```
+Независимо от того закешировался ли запрос и сразу вызвал колбэк или был сделан запрос и колбэк вызвался позже (асинхронно), этот код всегда будет выводить `1` вместо `0`. `result(..)` вызывается асинхронно, это означает, что `a++` имеет шанс запуститься до `result(..)`.
 
-Whether the Ajax request is in the cache and resolves to try to call the callback right away, or must be fetched over the wire and thus complete later asynchronously, this code will always output `1` instead of `0` -- `result(..)` cannot help but be invoked asynchronously, which means the `a++` has a chance to run before `result(..)` does.
+Да, еще одна проблема решена! Но это неэффективное решение, и оно «раздует» ваше приложение еще сильнее.
 
-Yay, another trust issued "solved"! But it's inefficient, and yet again more bloated boilerplate to weigh your project down.
+Колбэки могут решать самые разные задачи, но вы должны приложить много усилий, чтобы добиться этого. И часто это усилия требуют гораздо больше времени, чем задача которую этот колбэк выполняет.
 
-That's just the story, over and over again, with callbacks. They can do pretty much anything you want, but you have to be willing to work hard to get it, and oftentimes this effort is much more than you can or should spend on such code reasoning.
+Вы можете использовать встроенное API или другую языковую механику для решения этих проблем. Наконец, настала эра ES6, которая предлагает отличные решения, поэтому продолжайте читать дальше!
 
-You might find yourself wishing for built-in APIs or other language mechanics to address these issues. Finally ES6 has arrived on the scene with some great answers, so keep reading!
+## Итоги
 
-## Review
+Обратные вызовы являются основной единицей асинхронности в JS. Но их уже недостаточно для эволюционирующего асинхронного программирования.
 
-Callbacks are the fundamental unit of asynchrony in JS. But they're not enough for the evolving landscape of async programming as JS matures.
+Во-первых, наши мозги планируют вещи по последовательному, блокирующему, однопоточному пути. Но колбэки выражают асинхронный код нелинейно, неестественно для нас, что значительно усложняет анализ такого кода.
 
-First, our brains plan things out in sequential, blocking, single-threaded semantic ways, but callbacks express asynchronous flow in a rather nonlinear, nonsequential way, which makes reasoning properly about such code much harder. Bad to reason about code is bad code that leads to bad bugs.
+Нам нужен способ выразить асинхронность в более синхронной манере, более привычной для нашего мозга.
 
-We need a way to express asynchrony in a more synchronous, sequential, blocking manner, just like our brains do.
+Во-вторых, и, что более важно, колбэки страдают от инверсии контроля. Это заключается в неявной передаче контроля над другой частью (часто с помощью сторонней утилиты), для продолжения выполнения вашей программы. Эта передача контроля приводит нас к списку проблем, например, вызывается ли колбэк чаще, чем мы ожидаем и т.д.
 
-Second, and more importantly, callbacks suffer from *inversion of control* in that they implicitly give control over to another party (often a third-party utility not in your control!) to invoke the *continuation* of your program. This control transfer leads us to a troubling list of trust issues, such as whether the callback is called more times than we expect.
+Написание хаков для решения этих проблем доверия возможно, но это сложнее, код становится неподдерживаемым. Также хаки не дают гарантированной защиты от неявных ошибок.
 
-Inventing ad hoc logic to solve these trust issues is possible, but it's more difficult than it should be, and it produces clunkier and harder to maintain code, as well as code that is likely insufficiently protected from these hazards until you get visibly bitten by the bugs.
+Нам нужно единое решение всех проблем доверия, которое может быть повторно использовано для любого количества колбэков, без дополнительных «костылей» к приложению.
 
-We need a generalized solution to **all of the trust issues**, one that can be reused for as many callbacks as we create without all the extra boilerplate overhead.
-
-We need something better than callbacks. They've served us well to this point, but the *future* of JavaScript demands more sophisticated and capable async patterns. The subsequent chapters in this book will dive into those emerging evolutions.
+Нам нужно что-то лучше колбэков. Они верно нам служили, но будущее JavaScript требует более сложных асинхронных решений. Последующие главы этой книги будут посвящены передовым решениям в области асинхронного программирования.
