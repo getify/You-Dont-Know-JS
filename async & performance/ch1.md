@@ -426,7 +426,7 @@ b; // 180
 onscroll, запрос 1
 onscroll, запрос 2          ответ 1
 onscroll, запрос 3          ответ 2
-response 3
+ответ 3
 onscroll, запрос 4
 onscroll, запрос 5
 onscroll, запрос 6          ответ 4
