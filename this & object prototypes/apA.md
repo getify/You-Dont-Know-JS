@@ -160,7 +160,7 @@ class P {
 
 class C extends P {
 	foo() {
-		super();
+		super.foo();
 	}
 }
 
