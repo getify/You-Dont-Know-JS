@@ -214,7 +214,7 @@ res.value;				// 42
 
 В зависимости от того *кто*, на ваш взгляд, задаёт вопрос, здесь может существовать или не существовать несоответствие между `yield` и `next(..)`.
 
-Но подождите! У нас всё ещё есть на один вызов больше `next()`, если сравнивать с количеством инструкций `yield`.  Поэтому, последний вызов `it.next(7)` снова задаёт вопрос о *следующем* значении, которое создаёт (выводит) генератор. Но инструкций `yield`, которая должна была бы дать ответ, больше не осталось, и что тогда? Кто ответит на этот запрос?
+Но подождите! У нас всё ещё етсь н аодин вызов больше `next()`, если сравнивать с количеством инструкций `yield`. So, последний вызов `it.next(7)` снова задаёт вопрос о *следующем* значении, которое создаёт (выводит) генератор. Но инструкций `yield`, которая должна была бы дать ответ, больше не осталось, и что тогда? Кто ответит на этот запрос?
 
 И здесь инструкция `return` приходит нам на помощь(даёт ответ)!
 
@@ -386,17 +386,17 @@ console.log( a, b );	// 12 18
 
 Мы обсудим параллельность в контексте генераторов более детально в конце главы.
 
-## Generator'ing Values
+## Generator'ing Values Генерирование значений
 
-In the previous section, we mentioned an interesting use for generators, as a way to produce values. This is **not** the main focus in this chapter, but we'd be remiss if we didn't cover the basics, especially because this use case is essentially the origin of the name: generators.
+В предыдущей части мы рассмотрели такой интересный способ использования генераторов, как продуцирование значений. Это не является основной темой этой главы, однако  с нашей стороны было бы серьёзным упущением не пройтись подробно по ключевым концепциям. `*`В особенности, не остановиться на той, чей механизм лёг в основу самого названия  - "генераторы".
 
-We're going to take a slight diversion into the topic of *iterators* for a bit, but we'll circle back to how they relate to generators and using a generator to *generate* values.
+Сейчас мы с вами немного отойдём от темы и уклонимся в стороны изучения *итераторов*, а затем вернёмся назад, чтобы понять, как они связаны с генераторами и использованием генераторов для *генерирования* значений.
 
-### Producers and Iterators
+### Producers and Iterators Продьюсеры и итераторы
 
-Imagine you're producing a series of values where each value has a definable relationship to the previous value. To do this, you're going to need a stateful producer that remembers the last value it gave out.
+Представьте, что вы вычисляете некую серию значений, где каждое значение взаимосвязано с предыдущим. Чтобы сделать такое, вам понадобится некоторый продьюсер, сохраняющий состояние и запоминающий, чему было равно последнее значение.
 
-You can implement something like that straightforwardly using a function closure (see the *Scope & Closures* title of this series):
+Вы можете создать что-то подобное, используя замыкания (подробнее почитать об этом вы можете в части *Замыкания и Области видимости* серии YDKJS):
 
 ```js
 var gimmeSomething = (function(){
@@ -420,13 +420,14 @@ gimmeSomething();		// 33
 gimmeSomething();		// 105
 ```
 
-**Note:** The `nextVal` computation logic here could have been simplified, but conceptually, we don't want to calculate the *next value* (aka `nextVal`) until the *next* `gimmeSomething()` call happens, because in general that could be a resource-leaky design for producers of more persistent or resource-limited values than simple `number`s.
+**Важно:** Мы могли бы значительно упростить вычислительную логику `nextVal`, однако мы намеренно не хотим вычислять *следующее значение* (aka `nextVal`) до того момента, когда будет сделан *следующий* вызов `gimmeSomething()`, в противном случае это был бы довольно ресурсоёмкий (проблематичный) сспособ организации процесса
+`*` because in general that could be a resource-leaky design for producers of more persistent or resource-limited values than simple `number`s.
 
-Generating an arbitrary number series isn't a terribly realistic example. But what if you were generating records from a data source? You could imagine much the same code.
+Генерирование произвольной серии чисел не кажется достаточно реалистичным примером. Но что, если вам необходимо генерировать записи из какого-то источника данных? Вы могли бы представить себе примерно такой же код.
 
-In fact, this task is a very common design pattern, usually solved by iterators. An *iterator* is a well-defined interface for stepping through a series of values from a producer. The JS interface for iterators, as it is in most languages, is to call `next()` each time you want the next value from the producer.
-
-We could implement the standard *iterator* interface for our number series producer:
+На самом деле, это довольно распространённый шаблон проектирования, более известный как итератор. *Итератор* - это вполне определённый (чётко прописанный) интерфейс для движения (прохода) по серии значений с помощью (из) некого продьюсера. Какив большинстве других языков, интерфейс итератора в JavaScript организован с помошью вызова метода `next()` каждый раз, когда мы хотим получить следующее значение.
+ 
+Мы можем реализовать стандартный интерфейс *итератора* для нашего продьюсера серии чисел:
 
 ```js
 var something = (function(){
@@ -436,7 +437,7 @@ var something = (function(){
 		// needed for `for..of` loops
 		[Symbol.iterator]: function(){ return this; },
 
-		// standard iterator interface method
+		// стандартный метод интерфейса итератора
 		next: function(){
 			if (nextVal === undefined) {
 				nextVal = 1;
@@ -456,17 +457,17 @@ something.next().value;		// 33
 something.next().value;		// 105
 ```
 
-**Note:** We'll explain why we need the `[Symbol.iterator]: ..` part of this code snippet in the "Iterables" section. Syntactically though, two ES6 features are at play. First, the `[ .. ]` syntax is called a *computed property name* (see the *this & Object Prototypes* title of this series). It's a way in an object literal definition to specify an expression and use the result of that expression as the name for the property. Next, `Symbol.iterator` is one of ES6's predefined special `Symbol` values (see the *ES6 & Beyond* title of this book series).
+**Важно:** Мы ещё затронем тему, зачем нам нужна вот эта часть в нашем примере `[Symbol.iterator]: ..` в секции про "Итерируемость". Если говорить о синтаксисе, то здесь используется сразу две новые фичи ES6. Первая - это *вычисляемые имена свойств*, для которых используется вот такой синтаксис `[ .. ]` (читайте об этом больше в части *this & Прототипы*). Это способ определить выражение внутри литералов объекта и использовать результат его вычисления в качестве имени свойства. Вторая, `Symbol.iterator` is one of ES6's predefined special `Symbol` values (see the *ES6 & Beyond* title of this book series).
 
-The `next()` call returns an object with two properties: `done` is a `boolean` value signaling the *iterator's* complete status; `value` holds the iteration value.
+Вызов метода `next()` возвращает объект с двумя свойствами: `done` - это поле в качестве значения содержит `boolean` и отражает завершено ли выполнение *итератора*; второе поле, `value`, содержит собственно значение итератора.
 
-ES6 also adds the `for..of` loop, which means that a standard *iterator* can automatically be consumed with native loop syntax:
+ES6 также добавляет сюда цикл `for..of`, что означает, что *итератор* может автоматически выполняться с помощью встроенного синтаксиса цикла:
 
 ```js
 for (var v of something) {
 	console.log( v );
 
-	// don't let the loop run forever!
+	// не давайте циклу выполняться бесконечно!
 	if (v > 500) {
 		break;
 	}
@@ -474,11 +475,11 @@ for (var v of something) {
 // 1 9 33 105 321 969
 ```
 
-**Note:** Because our `something` *iterator* always returns `done:false`, this `for..of` loop would run forever, which is why we put the `break` conditional in. It's totally OK for iterators to be never-ending, but there are also cases where the *iterator* will run over a finite set of values and eventually return a `done:true`.
+**Важно:** Поскольку наш *итератор* `something` всегда возвращает `done:false`, цикл `for..of` будет выполняться бесконечно, поэтому мы поместили внутрь условия инструкцию `break`. Вообще для итераторов это совершенно нормально - выполняться бесконечно, но существуют ситуации, когда *итератору* необходимо пройтись по некоторому конечному числу (набору) значений и затем вернуть `done:true`.
 
-The `for..of` loop automatically calls `next()` for each iteration -- it doesn't pass any values in to the `next()` -- and it will automatically terminate on receiving a `done:true`. It's quite handy for looping over a set of data.
+Цикл `for..of` автоматически вызывает `next()` во время каждой итерации -- и он не передаёт никаких значений в`next()` -- и автоматически прекратит своё выполнение, как только итератор возвратит `done:true`. Таким образом довольно удобно перебирать некий набор данных.
 
-Of course, you could manually loop over iterators, calling `next()` and checking for the `done:true` condition to know when to stop:
+Конечно, мы можем управлять итератором вручную, вызывая`next()` самостоятельно и проверяя значение поля `done` , чтобы знать, где прекратить выпонение итератора:
 
 ```js
 for (
@@ -487,7 +488,7 @@ for (
 ) {
 	console.log( ret.value );
 
-	// don't let the loop run forever!
+	// не позволяйте циклу выполняться бесконечно!
 	if (ret.value > 500) {
 		break;
 	}
@@ -495,9 +496,9 @@ for (
 // 1 9 33 105 321 969
 ```
 
-**Note:** This manual `for` approach is certainly uglier than the ES6 `for..of` loop syntax, but its advantage is that it affords you the opportunity to pass in values to the `next(..)` calls if necessary.
+**Важно:** Такой ручной подход к управлению с использованием `for` выглядит определённо uменее изящным, чем ES6 синтаксис цикла `for..of`, но он предоставляет нам возможность передать значение в вызов `next(..)`, если это необходимо.
 
-In addition to making your own *iterators*, many built-in data structures in JS (as of ES6), like `array`s, also have default *iterators*:
+В дополнение к возможности создания собственной реализации *итераторов*, многие встроенные в JS (а также и в ES6) структуры данных, такие как `массивы`, также по умолчанию содержат в себе *итераторы*:
 
 ```js
 var a = [1,3,5,7,9];
@@ -508,11 +509,11 @@ for (var v of a) {
 // 1 3 5 7 9
 ```
 
-The `for..of` loop asks `a` for its *iterator*, and automatically uses it to iterate over `a`'s values.
+Цикл `for..of` спрашивает `a` for its *iterator*, aи автоматически использует его, чтобы перебирать знаечния в массиве `a`.
 
-**Note:** It may seem a strange omission by ES6, but regular `object`s intentionally do not come with a default *iterator* the way `array`s do. The reasons go deeper than we will cover here. If all you want is to iterate over the properties of an object (with no particular guarantee of ordering), `Object.keys(..)` returns an `array`, which can then be used like `for (var k of Object.keys(obj)) { ..`. Such a `for..of` loop over an object's keys would be similar to a `for..in` loop, except that `Object.keys(..)` does not include properties from the `[[Prototype]]` chain while `for..in` does (see the *this & Object Prototypes* title of this series).
+**Важно:** это может показаться довольно странным упущением стандарта ES6, но обычные `object` намеренно не имеют в себе по умолчанию *итератор*, как `массивы`. И причины этого скрыты намного глубже, чем мы могли бы объяснить здесь. Если вы всё же хотели бы иметь возможность итерироваться по свойствам объекта (однако соблюдение порядка прохода по этим свойствам не гарантировано), `Object.keys(..)` возвращает `массис`, по которому можно пройти с помощью `for (var k of Object.keys(obj)) { ..`. Такой способ использования цикла `for..of` для прохожа по ключам объекта очень похож на принцип действия цикла`for..in`, за исключением того, что `Object.keys(..)` не имеет доступа к свойствам, лежащим в цепочке `[[Prototype]]`, в то время как `for..in` имеет этот функционал (подробнее вы можете почитать об этом в части *this & Протитипы*).
 
-### Iterables
+### Итерируемость
 
 The `something` object in our running example is called an *iterator*, as it has the `next()` method on its interface. But a closely related term is *iterable*, which is an `object` that **contains** an *iterator* that can iterate over its values.
 
