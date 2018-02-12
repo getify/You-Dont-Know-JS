@@ -23,7 +23,7 @@
 
 ### Web ECMAScript
 
-Web ECMAScript语言规范(http://javascript.spec.whatwg.org/)涵盖了官方ECMAScript语言规范与当前浏览器中JavaScript实现之间的不同。
+Web ECMAScript语言规范([http://javascript.spec.whatwg.org/](http://javascript.spec.whatwg.org/))涵盖了官方ECMAScript语言规范与当前浏览器中JavaScript实现之间的不同。
 
 换言之，这些项目是浏览器的“必须品”（为了相互兼容），但是（在本书编写时）没有列在官方语言规范的“Annex B”部分是：
 
@@ -193,7 +193,7 @@ if (!Array.prototype.foobar) {
 
 在你的代码库中引入这样的代码，对给那些没有更新到最新规范的老版本浏览器环境打“补丁”**非常** 有用。为所有你支持的环境创建可预见的代码，使用填补是非常好的方法。
 
-**提示：** ES5-Shim (https://github.com/es-shims/es5-shim) 是一个将项目代码桥接至ES5基准线的完整的shims/polyfills集合，相似地，ES6-Shim (https://github.com/es-shims/es6-shim) 提供了ES6新增的新API的shim。虽然API可以被填补，但新的语法通常是不能的。要桥接语法的部分，你将还需要使用一个ES6到ES5的转译器，比如Traceur (https://github.com/google/traceur-compiler/wiki/GettingStarted)。
+**提示：** ES5-Shim ([https://github.com/es-shims/es5-shim](https://github.com/es-shims/es5-shim)) 是一个将项目代码桥接至ES5基准线的完整的shims/polyfills集合，相似地，ES6-Shim ([https://github.com/es-shims/es6-shim](https://github.com/es-shims/es6-shim)) 提供了ES6新增的新API的shim。虽然API可以被填补，但新的语法通常是不能的。要桥接语法的部分，你将还需要使用一个ES6到ES5的转译器，比如Traceur ([https://github.com/google/traceur-compiler/wiki/GettingStarted](https://github.com/google/traceur-compiler/wiki/GettingStarted))。
 
 如果有一个即将到来的标准，而且关于它叫什么名字和它将如何工作的讨论达成了一致，那么为了兼容面向未来的标准提前创建填补，被称为“prollyfill（probably-fill —— 预填补）”。
 
@@ -311,7 +311,7 @@ ES5语言规范在第7.6.1部分中定义了一套“保留字”，它们不能
 
 像`function`和`switch`这样的关键字是显而易见的。像`enum`之类的未来保留字，虽然它们中的许多（`class`、`extends`等等）现在都已经实际被ES6使用了；但还有另外一些像`interface`之类的仅在strict模式下的保留字。
 
-StackOverflow用户“art4theSould”创造性地将这些保留字编成了一首有趣的小诗(http://stackoverflow.com/questions/26255/reserved-keywords-in-javascript/12114140#12114140)：
+StackOverflow用户“art4theSould”创造性地将这些保留字编成了一首有趣的小诗([http://stackoverflow.com/questions/26255/reserved-keywords-in-javascript/12114140#12114140](http://stackoverflow.com/questions/26255/reserved-keywords-in-javascript/12114140#12114140))：
 
 > Let this long package float,
 > Goto private class if short.

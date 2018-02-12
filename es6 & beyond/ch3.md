@@ -19,7 +19,7 @@ ES6所做的是，为迭代器引入了一个隐含的标准化接口。许多�
 
 ### 接口
 
-在本书写作的时候，ES6的25.1.1.2部分 (https://people.mozilla.org/~jorendorff/es6-draft.html#sec-iterator-interface) 详述了`Iterator`接口，它有如下的要求：
+在本书写作的时候，ES6的25.1.1.2部分 ([https://people.mozilla.org/~jorendorff/es6-draft.html#sec-iterator-interface](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-iterator-interface)) 详述了`Iterator`接口，它有如下的要求：
 
 ```
 Iterator [必须]
@@ -365,7 +365,7 @@ for (var i of 3) {
 
 在这样的情况下，你与其他代码或者未来的JS特性发生冲突的可能性非常低。但是要小心微小的可能性。并在文档中为后人详细记录下你在做什么。
 
-**注意：** 如果你想知道更多细节，我在这篇文章(http://blog.getify.com/iterating-es6-numbers/) 中详细论述了这种特别的技术。而且这段评论(http://blog.getify.com/iterating-es6-numbers/comment-page-1/#comment-535294)甚至为制造一个字符串字符范围提出了一个相似的技巧。
+**注意：** 如果你想知道更多细节，我在这篇文章([http://blog.getify.com/iterating-es6-numbers/](http://blog.getify.com/iterating-es6-numbers/)) 中详细论述了这种特别的技术。而且这段评论([http://blog.getify.com/iterating-es6-numbers/comment-page-1/#comment-535294](http://blog.getify.com/iterating-es6-numbers/comment-page-1/#comment-535294))甚至为制造一个字符串字符范围提出了一个相似的技巧。
 
 ### 消费迭代器
 
@@ -992,7 +992,7 @@ it.next();				// { value: undefined, done: true }
 
 ### 转译一个Generator
 
-有可能在ES6之前的环境中表达generator的能力吗？事实上是可以的，而且有好几种了不起的工具在这么做，包括最著名的Facebook的Regenerator工具 (https://facebook.github.io/regenerator/)。
+有可能在ES6之前的环境中表达generator的能力吗？事实上是可以的，而且有好几种了不起的工具在这么做，包括最著名的Facebook的Regenerator工具 ([https://facebook.github.io/regenerator/](https://facebook.github.io/regenerator/))。
 
 但为了更好地理解generator，让我们试着手动转换一下。基本上讲，我们将制造一个简单的基于闭包的状态机。
 
@@ -1620,7 +1620,7 @@ bar( 25 );				// 11.5
 
 无论这个标签看起来什么样，你可以确信它的内部将会使用默认加载器（或者一个你预先指定好的加载器，就像我们将在下一节中讨论的）。
 
-就像你将在标记中使用的标签一样，ES6没有规定模块加载器本身。它是一个分离的，目前由WHATWG浏览器标准化小组控制的平行的标准。(http://whatwg.github.io/loader/)
+就像你将在标记中使用的标签一样，ES6没有规定模块加载器本身。它是一个分离的，目前由WHATWG浏览器标准化小组控制的平行的标准。([http://whatwg.github.io/loader/](http://whatwg.github.io/loader/))
 
 在本书写作时，接下来的讨论反映了它的API设计的一个早期版本，和一些可能将要改变的东西。
 
@@ -1650,7 +1650,7 @@ Reflect.Loader.import( "foo" ) // 返回一个`"foo"`的promise
 
 直接与模块加载器交互的另外一种用法是，你想要通过配置或者甚至是重定义来定制它的行为。
 
-在本书写作时，有一个被开发好的模块加载器API的填补(https://github.com/ModuleLoader/es6-module-loader)。虽然关于它的细节非常匮乏，而且很可能改变，但是我们可以通过它来探索最终可能固定下来的东西是什么。
+在本书写作时，有一个被开发好的模块加载器API的填补([https://github.com/ModuleLoader/es6-module-loader](https://github.com/ModuleLoader/es6-module-loader))。虽然关于它的细节非常匮乏，而且很可能改变，但是我们可以通过它来探索最终可能固定下来的东西是什么。
 
 `Reflect.Loader.import(..)`调用可能会支持第二个参数，它指定各种选项来定制导入/加载任务。例如：
 

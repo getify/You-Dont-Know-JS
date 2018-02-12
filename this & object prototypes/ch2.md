@@ -16,7 +16,7 @@
 ```js
 function baz() {
     // 调用栈是: `baz`
-    // 我们的调用点是 global scope（全局作用域）
+    // 我们的调用点位于 global scope（全局作用域）
 
     console.log( "baz" );
     bar(); // <-- `bar` 的调用点

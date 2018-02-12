@@ -59,9 +59,9 @@ console.log( "Duration:", (end - start) );
 
 任何有用而且可靠的基准分析应当基于统计学上的实践。我不是要在这里写一章统计学，所以我会带过一些名词：标准差，方差，误差边际。如果你不知道这些名词意味着什么——我在大学上过统计学课程，而我依然对他们有点儿晕——那么实际上你没有资格去写你自己的基准分析逻辑。
 
-幸运的是，一些像John-David Dalton和Mathias Bynens这样的聪明家伙明白这些概念，并且写了一个统计学上的基准分析工具，称为Benchmark.js（http://benchmarkjs.com/）。所以我可以简单地说：“用这个工具就行了。”来终结这个悬念。
+幸运的是，一些像John-David Dalton和Mathias Bynens这样的聪明家伙明白这些概念，并且写了一个统计学上的基准分析工具，称为Benchmark.js（[http://benchmarkjs.com/](http://benchmarkjs.com/)）。所以我可以简单地说：“用这个工具就行了。”来终结这个悬念。
 
-我不会重复他们的整个文档来讲解Benchmark.js如何工作；他们有很棒的API文档（http://benchmarkjs.com/docs）你可以阅读。另外这里还有一些了不起的文章（http://calendar.perfplanet.com/2010/bulletproof-javascript-benchmarks/）（http://monsur.hossa.in/2012/12/11/benchmarkjs.html）讲解细节与方法学。
+我不会重复他们的整个文档来讲解Benchmark.js如何工作；他们有很棒的API文档（[http://benchmarkjs.com/docs](http://benchmarkjs.com/docs)）你可以阅读。另外这里还有一些了不起的文章（[http://calendar.perfplanet.com/2010/bulletproof-javascript-benchmarks/](http://calendar.perfplanet.com/2010/bulletproof-javascript-benchmarks/)）（[http://monsur.hossa.in/2012/12/11/benchmarkjs.html](http://monsur.hossa.in/2012/12/11/benchmarkjs.html)）讲解细节与方法学。
 
 但是为了快速演示一下，这是你如何用Benchmark.js来运行一个快速的性能测试：
 
@@ -192,7 +192,7 @@ var Y2 = Number( foo );
 
 如果在横跨多于一种环境的情况下，你想在任何合理的意义上宣称“X比Y快”，那么你就需要实际测试尽可能多的真实世界的环境。只因为Chrome执行某种X操作比Y快并不意味着所有的浏览器都是这样。而且你还可能想要根据你的用户的人口统计交叉参照多种浏览器测试运行的结果。
 
-有一个为此目的而生的牛X网站，称为jsPerf（http://jsperf.com）。它使用我们前面提到的Benchmark.js库来运行统计上正确且可靠的测试，并且可以让测试运行在一个你可交给其他人的公开URL上。
+有一个为此目的而生的牛X网站，称为jsPerf（[http://jsperf.com](http://jsperf.com)）。它使用我们前面提到的Benchmark.js库来运行统计上正确且可靠的测试，并且可以让测试运行在一个你可交给其他人的公开URL上。
 
 每当一个测试运行后，其结果都被收集并与这个测试一起保存，同时累积的测试结果将在网页上被绘制成图供所有人阅览。
 
@@ -443,7 +443,7 @@ for (var i=0, len = x.length; i < len; i++) {
 
 如果你围绕`x.length`的用法进行性能基准分析，与将它缓存在变量`len`中的用法进行比较，你会发现虽然理论听起来不错，但是在实践中任何测量出的差异都是在统计学上完全没有意义的。
 
-事实上，在像v8这样的引擎中，可以看到(http://mrale.ph/blog/2014/12/24/array-length-caching.html)通过提前缓存长度而不是让引擎帮你处理它会使事情稍稍恶化。不要尝试在聪明上战胜你的JavaScript引擎，当它来到性能优化的地方时你可能会输给它。
+事实上，在像v8这样的引擎中，可以看到([http://mrale.ph/blog/2014/12/24/array-length-caching.html](http://mrale.ph/blog/2014/12/24/array-length-caching.html))通过提前缓存长度而不是让引擎帮你处理它会使事情稍稍恶化。不要尝试在聪明上战胜你的JavaScript引擎，当它来到性能优化的地方时你可能会输给它。
 
 ### 不是所有的引擎都一样
 
@@ -453,7 +453,7 @@ for (var i=0, len = x.length; i < len; i++) {
 
 在JS开发者社区的一些人发起了一项运动，特别是那些使用Node.js工作的人，去分析v8 JavaScript引擎的具体内部实现细节，并决定如何编写定制的JS代码来最大限度的利用v8的工作方式。通过这样的努力你实际上可以在性能优化上达到惊人的高度，所以这种努力的收益可能十分高。
 
-一些针对v8的经常被引用的例子是(https://github.com/petkaantonov/bluebird/wiki/Optimization-killers) ：
+一些针对v8的经常被引用的例子是([https://github.com/petkaantonov/bluebird/wiki/Optimization-killers](https://github.com/petkaantonov/bluebird/wiki/Optimization-killers)) ：
 
 * 不要将`arguments`变量从一个函数传递到任何其他函数中，因为这样的“泄露”放慢了函数实现。
 * 将一个`try..catch`隔离到它自己的函数中。浏览器在优化任何含有`try..catch`的函数时都会苦苦挣扎，所以将这样的结构移动到它自己的函数中意味着你持有不可优化的危害的同时，让其周围的代码是可以优化的。
@@ -504,7 +504,7 @@ for (var i=0, len = x.length; i < len; i++) {
 
 > 程序员们浪费了大量的时间考虑，或者担心，他们的程序中的 **不关键** 部分的速度，而在考虑调试和维护时这些在效率上的企图实际上有很强大的负面影响。我们应当忘记微小的效率，可以说在大概97%的情况下：过早的优化是万恶之源。然而我们不应该忽略那 **关键的** 3%中的机会。[强调]
 
-(http://web.archive.org/web/20130731202547/http://pplab.snu.ac.kr/courses/adv_pl05/papers/p261-knuth.pdf, Computing Surveys, Vol 6, No 4, December 1974)
+([http://web.archive.org/web/20130731202547/http://pplab.snu.ac.kr/courses/adv_pl05/papers/p261-knuth.pdf](http://web.archive.org/web/20130731202547/http://pplab.snu.ac.kr/courses/adv_pl05/papers/p261-knuth.pdf), Computing Surveys, Vol 6, No 4, December 1974)
 
 我相信这样转述Knuth的 *意思* 是合理的：“非关键路径的优化是万恶之源。”所以问题的关键是弄清楚你的代码是否在关键路径上——你应该优化它！——或者不。
 

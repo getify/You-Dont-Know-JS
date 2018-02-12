@@ -1815,7 +1815,7 @@ function doSomething(a,b) {
 
 <img src="fig1.png" width="600">
 
-出处：https://github.com/dorey/JavaScript-Equality-Table
+出处：[https://github.com/dorey/JavaScript-Equality-Table](https://github.com/dorey/JavaScript-Equality-Table)
 
 ## 抽象关系比较
 

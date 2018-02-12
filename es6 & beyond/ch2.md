@@ -5,7 +5,7 @@
 
 然而，ES6增加了好几种需要费些功夫才能习惯的新语法形式。在这一章中，我们将遍历它们来看看葫芦里到底卖的什么药。
 
-**提示：** 在写作本书时，这本书中所讨论的特性中的一些已经被各种浏览器（Firefox，Chrome，等等）实现了，但是有一些仅仅被实现了一部分，而另一些根本就没实现。如果直接尝试这些例子，你的体验可能会夹杂着三种情况。如果是这样，就使用转译器尝试吧，这些特性中的大多数都被那些工具涵盖了。ES6Fiddle（http://www.es6fiddle.net/）是一个了不起的尝试ES6的游乐场，简单易用，它是一个Babel转译器的在线REPL（http://babeljs.io/repl/）。
+**提示：** 在写作本书时，这本书中所讨论的特性中的一些已经被各种浏览器（Firefox，Chrome，等等）实现了，但是有一些仅仅被实现了一部分，而另一些根本就没实现。如果直接尝试这些例子，你的体验可能会夹杂着三种情况。如果是这样，就使用转译器尝试吧，这些特性中的大多数都被那些工具涵盖了。ES6Fiddle（[http://www.es6fiddle.net/](http://www.es6fiddle.net/)）是一个了不起的尝试ES6的游乐场，简单易用，它是一个Babel转译器的在线REPL（[http://babeljs.io/repl/](http://babeljs.io/repl/)）。
 
 ## 块儿作用域声明
 
@@ -2069,7 +2069,7 @@ for ({x: o.a} of [ {x: 1}, {x: 2}, {x: 3} ]) {
 
 我们将在本章稍后的“Unicode”一节中讲解关于Unicode的更多细节。在此，我们将仅仅简要地看一下ES6+正则表达式的新`u`标志，它使这个正则表达式的Unicode匹配成为可能。
 
-JavaScript字符串通常被解释为16位字符的序列，它们对应于 *基本多文种平面（Basic Multilingual Plane (BMP)）* (http://en.wikipedia.org/wiki/Plane_%28Unicode%29)中的字符。但是有许多UTF-16字符在这个范围以外，而且字符串可能含有这些多字节字符。
+JavaScript字符串通常被解释为16位字符的序列，它们对应于 *基本多文种平面（Basic Multilingual Plane (BMP)）* ([http://en.wikipedia.org/wiki/Plane_%28Unicode%29](http://en.wikipedia.org/wiki/Plane_%28Unicode%29))中的字符。但是有许多UTF-16字符在这个范围以外，而且字符串可能含有这些多字节字符。
 
 在ES6之前，正则表达式只能基于BMP字符进行匹配，这意味着在匹配时那些扩展字符被看作是两个分离的字符。这通常不理想。
 
@@ -2098,7 +2098,7 @@ JavaScript字符串通常被解释为16位字符的序列，它们对应于 *基
 
 另外一个重要的注意点是，`u`使像`+`和`*`这样的量词实施于作为一个单独字符的整个Unicode代码点，而不仅仅是字符的 *低端替代符*（也就是符号最右边的一半）。对于出现在字符类中的Unicode字符也是一样，比如`/[💩-💫]/u`。
 
-**注意：** 还有许多关于`u`在正则表达式中行为的细节，对此Mathias Bynens(https://twitter.com/mathias)撰写了大量的作品(https://mathiasbynens.be/notes/es6-unicode-regex)。
+**注意：** 还有许多关于`u`在正则表达式中行为的细节，对此Mathias Bynens([https://twitter.com/mathias](https://twitter.com/mathias))撰写了大量的作品([https://mathiasbynens.be/notes/es6-unicode-regex](https://mathiasbynens.be/notes/es6-unicode-regex))。
 
 ### 粘性标志
 
@@ -2376,7 +2376,7 @@ a.toString( 2 );		// "101010"
 
 ## Unicode
 
-我只能说这一节不是一个穷尽了“关于Unicode你想知道的一切”的资料。我想讲解的是，你需要知道在ES6中对Unicode改变了什么，但是我们不会比这深入太多。Mathias Bynens (http://twitter.com/mathias) 大量且出色地撰写/讲解了关于JS和Unicode (参见 https://mathiasbynens.be/notes/javascript-unicode 和 http://fluentconf.com/javascript-html-2015/public/content/2015/02/18-javascript-loves-unicode)。
+我只能说这一节不是一个穷尽了“关于Unicode你想知道的一切”的资料。我想讲解的是，你需要知道在ES6中对Unicode改变了什么，但是我们不会比这深入太多。Mathias Bynens ([http://twitter.com/mathias](http://twitter.com/mathias)) 大量且出色地撰写/讲解了关于JS和Unicode (参见 [https://mathiasbynens.be/notes/javascript-unicode](https://mathiasbynens.be/notes/javascript-unicode) 和 [http://fluentconf.com/javascript-html-2015/public/content/2015/02/18-javascript-loves-unicode](http://fluentconf.com/javascript-html-2015/public/content/2015/02/18-javascript-loves-unicode))。
 
 从`0x0000`到`0xFFFF`范围内的Unicode字符包含了所有的标准印刷字符（以各种语言），它们都是你可能看到过和互动过的。这组字符被称为 *基本多文种平面（Basic Multilingual Plane (BMP)）*。BMP甚至包含像这个酷雪人一样的有趣字符: ☃ (U+2603)。
 
@@ -2492,7 +2492,7 @@ s1.normalize().length;			// 2
 
 你越深入这个兔子洞，你就越能理解要得到一个“长度”的精确定义是很困难的。我们在视觉上看到的作为一个单独字符绘制的东西 —— 更精确地说，它称为一个 *字形* —— 在程序处理的意义上不总是严格地关联到一个单独的“字符”上。
 
-**提示：** 如果你就是想看看这个兔子洞有多深，看看“字形群集边界（Grapheme Cluster Boundaries）”算法(http://www.Unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries)。
+**提示：** 如果你就是想看看这个兔子洞有多深，看看“字形群集边界（Grapheme Cluster Boundaries）”算法([http://www.Unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries](http://www.Unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries))。
 
 ### 字符定位
 
@@ -2599,7 +2599,7 @@ var \u{2B400} = 42;
 
 关于究竟哪些Unicode字符被允许使用，有一组复杂的规则。另外，有些字符只要不是标识符名称的第一个字符就允许使用。
 
-**注意：** 关于所有这些细节，Mathias Bynens写了一篇了不起的文章 (https://mathiasbynens.be/notes/javascript-identifiers-es6)。
+**注意：** 关于所有这些细节，Mathias Bynens写了一篇了不起的文章 ([https://mathiasbynens.be/notes/javascript-identifiers-es6](https://mathiasbynens.be/notes/javascript-identifiers-es6))。
 
 很少有理由，或者是为了学术上的目的，才会在标识符名称中使用这样不寻常的字符。你通常不会因为依靠这些深奥的功能编写代码而感到舒服。
 
