@@ -212,7 +212,7 @@ This sort of check is useful even if you're not dealing with user-defined variab
 
 ```js
 if (typeof atob === "undefined") {
-	var atob = function() { /*..*/ };
+	atob = function() { /*..*/ };
 }
 ```
 
