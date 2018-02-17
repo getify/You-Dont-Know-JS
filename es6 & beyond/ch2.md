@@ -242,7 +242,7 @@ Consider:
 	}
 }
 
-foo();						// ReferenceError
+foo();						// undefined, we can get access to foo() in window
 ```
 
 The `foo()` function is declared inside the `{ .. }` block, and as of ES6 is block-scoped there. So it's not available outside that block. But also note that it is "hoisted" within the block, as opposed to `let` declarations, which suffer the TDZ error trap mentioned earlier.
