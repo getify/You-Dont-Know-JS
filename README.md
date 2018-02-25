@@ -1,6 +1,6 @@
 # You Don't Know JS (book series)
 
-This is a series of books diving deep into the core mechanisms of the JavaScript language. The first edition of the series is now complete.
+Ito ay serye ng mga libro na tatalakay sa mga malalalim na mekanismo ng JavaScript Language. Ang unang edisyon ng srye ay kumpleto na.
 
 <a href="http://www.ebooks.com/1993212/you-don-t-know-js-up-going/simpson-kyle/"><img src="up %26 going/cover.jpg" width="75"></a>&nbsp;
 <a href="http://www.ebooks.com/1647631/you-don-t-know-js-scope-closures/simpson-kyle/"><img src="scope %26 closures/cover.jpg" width="75"></a>&nbsp;
@@ -9,49 +9,49 @@ This is a series of books diving deep into the core mechanisms of the JavaScript
 <a href="http://www.ebooks.com/1977375/you-don-t-know-js-async-performance/simpson-kyle/"><img src="async %26 performance/cover.jpg" width="75"></a>&nbsp;
 <a href="http://www.ebooks.com/2481820/you-don-t-know-js-es6-beyond/simpson-kyle/"><img src="es6 %26 beyond/cover.jpg" width="75"></a>
 
-Please feel free to contribute to the quality of this content by submitting PR's for improvements to code snippets, explanations, etc. While typo fixes are welcomed, they will likely be caught through normal editing processes, and are thus not necessarily as important for this repository.
+Pakiusap maging kumportable kayo sa pag-aambag sa nilalaman ng libro sa pamamagitan ng pag-sumite ng Pull Requests sa code snippets, pagpapaliwanag at kung ano-ano pa. Ang mga pagsasaayos ng typo ay malugod na tinatanggap, ang mga ito ay isasagawa sa normal na proseso, at hindi kasing importante ng naturang repository.
 
-**To read more about the motivations and perspective behind this book series, check out the [Preface](preface.md).**
+**Para makapagbasa patungkol sa mga motibasyon at pananaw ng seryeng ito, pumunta sa [Preface](preface.md).**
 
-## Titles
+## Titulo
 
-* Read online (free!): ["Up & Going"](up\%20&\%20going/README.md#you-dont-know-js-up--going), Published: [Buy Now](http://www.ebooks.com/1993212/you-don-t-know-js-up-going/simpson-kyle/) in print, but the ebook format is free!
-* Read online (free!): ["Scope & Closures"](scope\%20&\%20closures/README.md#you-dont-know-js-scope--closures), Published: [Buy Now](http://www.ebooks.com/1647631/you-don-t-know-js-scope-closures/simpson-kyle/)
-* Read online (free!): ["this & Object Prototypes"](this\%20&\%20object\%20prototypes/README.md#you-dont-know-js-this--object-prototypes), Published: [Buy Now](http://www.ebooks.com/1734321/you-don-t-know-js-this-object-prototypes/simpson-kyle/)
-* Read online (free!): ["Types & Grammar"](types\%20&\%20grammar/README.md#you-dont-know-js-types--grammar), Published: [Buy Now](http://www.ebooks.com/1935541/you-don-t-know-js-types-grammar/simpson-kyle/)
-* Read online (free!): ["Async & Performance"](async\%20&\%20performance/README.md#you-dont-know-js-async--performance), Published: [Buy Now](http://www.ebooks.com/1977375/you-don-t-know-js-async-performance/simpson-kyle/)
-* Read online (free!): ["ES6 & Beyond"](es6\%20&\%20beyond/README.md#you-dont-know-js-es6--beyond), Published: [Buy Now](http://www.ebooks.com/2481820/you-don-t-know-js-es6-beyond/simpson-kyle/)
+* Basahin online (Libre!): ["Up & Going"](up\%20&\%20going/README.md#you-dont-know-js-up--going), Published: [Buy Now](http://www.ebooks.com/1993212/you-don-t-know-js-up-going/simpson-kyle/) in print, but the ebook format is free!
+* Basahin online (Libre!): ["Scope & Closures"](scope\%20&\%20closures/README.md#you-dont-know-js-scope--closures), Published: [Buy Now](http://www.ebooks.com/1647631/you-don-t-know-js-scope-closures/simpson-kyle/)
+* Basahin online (Libre!): ["this & Object Prototypes"](this\%20&\%20object\%20prototypes/README.md#you-dont-know-js-this--object-prototypes), Published: [Buy Now](http://www.ebooks.com/1734321/you-don-t-know-js-this-object-prototypes/simpson-kyle/)
+* Basahin online (Libre!): ["Types & Grammar"](types\%20&\%20grammar/README.md#you-dont-know-js-types--grammar), Published: [Buy Now](http://www.ebooks.com/1935541/you-don-t-know-js-types-grammar/simpson-kyle/)
+* Basahin online (Libre!): ["Async & Performance"](async\%20&\%20performance/README.md#you-dont-know-js-async--performance), Published: [Buy Now](http://www.ebooks.com/1977375/you-don-t-know-js-async-performance/simpson-kyle/)
+* Basahin online (Libre!): ["ES6 & Beyond"](es6\%20&\%20beyond/README.md#you-dont-know-js-es6--beyond), Published: [Buy Now](http://www.ebooks.com/2481820/you-don-t-know-js-es6-beyond/simpson-kyle/)
 
-## Publishing
+## Paglathala
 
-These books are being released here as drafts, free to read, but are also being edited, produced, and published through O'Reilly.
+Ang mga libro ay nai-release dito bilang mga drafts, libre upang basahin, at nababago, nagagawa, at nailalathala sa pamamagitan ng O'Reilly.
 
-If you like the content you find here, and want to support more content like it, please purchase the books once they are available for sale, through your normal book sources. :)
+Kung nagustuhan mo ang nilalaman ng libro, at kung gusto mong suportahan ang mga ganitong uri ng libro, maging kumportable lang kayo na bumili ng libro kapag ito ay nailathala na sa pamamagitan ng inyong mga nakaugaliang bookstore. :)
 
-If you'd like to contribute financially towards the effort (or any of my other OSS work) aside from purchasing the books, I do have a [patreon](https://www.patreon.com/getify) that I would always appreciate your generosity towards.
+Kung gusto mong magambag pinansyal (o sa kung anumang OSS na gawa ko) maliban sa pagbili ng libro, mayroon akong [patreon](https://www.patreon.com/getify) ito ay lagi kong bibigyan ng halaga.
 
 <a href="https://www.patreon.com/getify">[![patreon.png](https://s13.postimg.org/k9nkc5thz/become_a_patron_button.png)](https://www.patreon.com/getify)</a>
 
-## In-person Training
+## Personal na Pagsasanay
 
-The content for these books derives heavily from a series of training materials I teach professionally (in both public and private-corporate workshop format): "Deep JavaScript Foundations", "Rethinking Async", and "ES6: The Right Parts" workshops.
+Ang nilalaman ng librong ito ay mula sa serye ng training material na itinuturo ko (sa publiko at pribadong corporate workshop format):"Deep JavaScript Foundations", "Rethinking Async", and "ES6: The Right Parts" workshops. 
 
-If you like this content and would like to contact me regarding conducting training on these, or other various JS/HTML5/node.js topics, please reach out to me through email: getify @ gmail
+Kung nagustuhan mo ang nilalaman nito at gusto mo akong makontak patungkol sa pagsasanay na ito, o iba pang JS/HTML5/node.js na paksa, i-email lamang ako sa: getify @ gmail
 
-## Online Video Training
+## Pagsasanay gamit ang Video Online
 
-I also have some JS training material available in on-demand video format. I teach courses through [Frontend Masters](https://FrontendMasters.com), like my [Deep JavaScript Foundations](https://frontendmasters.com/courses/javascript-foundations/) workshop. You can find [all my courses here](https://frontendmasters.com/kyle-simpson/).
+Mayroon din akong JS training material na available sa video-foormat. Nagtuturo ako sa pamamagitan ng [Frontend Masters](https://FrontendMasters.com), gaya ng aking [Deep JavaScript Foundations](https://frontendmasters.com/courses/javascript-foundations/) workshop. You can find [all my courses here](https://frontendmasters.com/kyle-simpson/).
 
-Some of those courses are also distributed on other platforms, like Pluralsight, Lynda.com, and O'Reilly Safari Online.
+Ilan sa mga pagsasanay na ito ay naipamamahagi rin sa ibang platform, gaya ng Pluralsight, Lynda.com, at O'Reilly Safari Online.
 
-## Contributions
+## Kontribusyon
 
-Any contributions you make to this effort **are of course greatly appreciated**.
+Ang anumang kontribusyon na gagawin mo ay **tiyak na bibigyan ng halaga.**.
 
-But **PLEASE** read the [Contributions Guidelines](CONTRIBUTING.md) carefully before submitting a PR.
+Ngunit **PAKIUSAP** basahin ang [Contributions Guidelines](CONTRIBUTING.md) ng mabuti bago magsumite ng PR.
 
-## License & Copyright
+## Lisensya at Karapatang Magpalathala
 
-The materials herein are all (c) 2013-2017 Kyle Simpson.
+Ang lahat ng materyal dito ay (c) 2013-2017 Kyle Simpson.
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License</a>.
