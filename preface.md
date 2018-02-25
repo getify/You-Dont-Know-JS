@@ -1,40 +1,40 @@
 # You Don't Know JS
-# Preface
+# Paunang Salita
 
-I'm sure you noticed, but "JS" in the book series title is not an abbreviation for words used to curse about JavaScript, though cursing at the language's quirks is something we can probably all identify with!
+Nakasisiguro ako na napansin mo, ngunit ang "JS" sa titulo ng serye ay hindi pagpapaikli ng salita para isumpa ang JavaScript, bagaman ang pagsumpa ay isang biro na marahil ay kilala na natin sa programming language
 
-From the earliest days of the web, JavaScript has been a foundational technology that drives interactive experience around the content we consume. While flickering mouse trails and annoying pop-up prompts may be where JavaScript started, nearly 2 decades later, the technology and capability of JavaScript has grown many orders of magnitude, and few doubt its importance at the heart of the world's most widely available software platform: the web.
+Mula sa mga unang araw ng web, and JavaScript ay naging pundasyon na ng teknolohiya na nagmamanyobra sa karanasang interaksyon ng mga nilalamang ating ginagamit. Habang ang flickering ng mouse trails at ang mga nakakaasar na pop-up prompts ay malalamang sa JavaScript nagumpisa, halos dalawang dekada na ang nakakaraan, ang teknolohiya at kakayahan ng JavaScript ay nakapag-palaki ng order ng magnitude, at kakaunti ang nagduda sa importansya sa puso ng pinaka-gamit na software platform sa mundo: ang Web.
 
-But as a language, it has perpetually been a target for a great deal of criticism, owing partly to its heritage but even more to its design philosophy. Even the name evokes, as Brendan Eich once put it, "dumb kid brother" status next to its more mature older brother "Java". But the name is merely an accident of politics and marketing. The two languages are vastly different in many important ways. "JavaScript" is as related to "Java" as "Carnival" is to "Car".
+Ngunit bilang isang programming language, ito ay habang-panahon nang magiging malaking asintahan ng pamumuna, mula sa pagkakautang nito sa kanyang pinanggalingan ngunit lalo na sa disenyo noting politikal. Maging ang pangalan nito, gaya ng minsang sinabi ni Brendan Eich, "hangal na nakababatang kapatid" na katayuan sunod sa mas mature na nakatatandang kapatid na si "Java". Ngunit ang pangalan ay isang aksidente lamang ng politika at marketing. Ang dalawang programming language ay mayroong napakalaking pagkakaiba sa napakaraming importanteng bagay. Ang "JavaScript" ay mayroong kaugnayan sa "Java" gaya ng "Carnival" na may kaugnayan sa "Sasakyan". 
 
-Because JavaScript borrows concepts and syntax idioms from several languages, including proud C-style procedural roots as well as subtle, less obvious Scheme/Lisp-style functional roots, it is exceedingly approachable to a broad audience of developers, even those with just little to no programming experience. The "Hello World" of JavaScript is so simple that the language is inviting and easy to get comfortable with in early exposure.
+Dahil ang JavaScript ay nanghihiram lamang ng konsepto at syntax idioms sa ilang programming language, kasama na ang mapagmataas na pinagmulang pamamaraang estilo ng C pati na rin ang subtle, ang hindi halatang Scheme/Lisp-style functional roots, ito ay lubhang madaling lapitan sa malaking bilang ng mga developers, maging ang mga kakaunti hanggang sa walang kaalaman at kakayahan sa programming. Ang "Hello World" ng JavaScript ay napakadali sa punto na ito na ang nagiimbita na magiging kumportable agad ang developer sa umpisa pa lamang.
 
-While JavaScript is perhaps one of the easiest languages to get up and running with, its eccentricities make solid mastery of the language a vastly less common occurrence than in many other languages. Where it takes a pretty in-depth knowledge of a language like C or C++ to write a full-scale program, full-scale production JavaScript can, and often does, barely scratch the surface of what the language can do.
+Habang ang JavaScript ay marahil isa sa pinaka madaling programming language na paganahin, ang pagka orihinal nito ay ginagawa na ang karunungan ay isang napakalaki at hindi pangkaraniwang pangyayari di gaya ng ibang programming language. Kung saan kinakailangan nito ang isang napakalalim na kaalaman ukol sa programming language gaya ng C o kaya naman ay C++ upang makapag sulat ng isang buong program, ang isang buong produkto ng JavaScript ay may kakayahan, at madalas na, bahagyang madampian ang ibabaw ng kayang gawin ng isang programming language.
 
-Sophisticated concepts which are deeply rooted into the language tend instead to surface themselves in *seemingly* simplistic ways, such as passing around functions as callbacks, which encourages the JavaScript developer to just use the language as-is and not worry too much about what's going on under the hood.
+Ang mga sopistikadong konsepto ay na madalas umuugat ng malalim sa language sa halip na ipaibabaw ang sarili sa *tila* simpleng mga pamamaraan, tuland ng pagpapasa nito palibot sa mga functions bilang callbacks, na humihikayat sa mga JavaScript developers na gamitin ang programming language at hindi mag-alala masyado sa mga nangyayari sa loob ng proyekto.
 
-It is simultaneously a simple, easy-to-use language that has broad appeal, and a complex and nuanced collection of language mechanics which without careful study will elude *true understanding* even for the most seasoned of JavaScript developers.
+Ito ay magkapanaabay na simple, madaling gamiting programming language na may malaking appeal, at may mahirap unawain at nuanced na koleksyon ng langauge mechanics kung saan maaaring maiwas sa *totoong pagkaunawa* kahit sa mga pinaka napapanahong Javascript developers sa mga pagkakataong ito ay hindi mapagaaralan ng mabuti.
 
-Therein lies the paradox of JavaScript, the Achilles' Heel of the language, the challenge we are presently addressing. Because JavaScript *can* be used without understanding, the understanding of the language is often never attained.
+Sa ganyang bagay matatagpuan ang kabalintunaan ng JavaScript, ang kahinaan ng language, ang mga pagsubok na ating kinikilala sa ngayon. Dahil ang Javacript ay *maaaring* magamit kahit na walang nararapat na pagunawa, ang pagunawa sa language ay madalas nang hindi nakakamit.
 
-## Mission
+## Misyon
 
-If at every point that you encounter a surprise or frustration in JavaScript, your response is to add it to the blacklist, as some are accustomed to doing, you soon will be relegated to a hollow shell of the richness of JavaScript.
+Kung sa bawat punto na ikaw ay makakatagpo ng pagaksorpresa o pagkabigo sa JavaScript, ang iyong tugon ay idagdag it sa blacklist, bilang isa sa mga nakasanayan mo nang gawin, darating ang panahon na ikaw ay mapapadpad sa isang guwang ng kayamanan at kasaganaan ng JavaScript.
 
-While this subset has been famously dubbed "The Good Parts", I would implore you, dear reader, to instead consider it the "The Easy Parts", "The Safe Parts", or even "The Incomplete Parts".
+Habang ang subset na ito ay kinikilala bilang "Ang Magagandang Parte", ako ay magmamakaawa sa iyo, mahal kong mambabasa, na imbis na ituring mo ito bilang "Ang Sanaysay na Parte", "Ang Ligtas na Parte", o maging "Ang Hindi Kumpletong Parte".
 
-This *You Don't Know JavaScript* book series offers a contrary challenge: learn and deeply understand *all* of JavaScript, even and especially "The Tough Parts".
+Ang *You Don't Know JavaScript* na serye ng libro ay inaalok ka ng isang salungat na hamon: matutunan at malalim na maintindihan mo ang *lahat* patungkol sa JavaScript, kahit at lalo na "Ang Mahihirap na Parte".
 
-Here, we address head on the tendency of JS developers to learn "just enough" to get by, without ever forcing themselves to learn exactly how and why the language behaves the way it does. Furthermore, we eschew the common advice to *retreat* when the road gets rough.
+Dito, kinikilala namin ang pagtuloy sa mga posibilidad ng JS developers na matutunan "ng tama lang" at makaraos, na hindi pinupuwersa ang kanilang mga sarili na matutunan ng eksakto kung paano at bakit ganito magasal ang language. At iniiwasan din namin ang mga karaniwang payo na *sumuko* kapag naging mahirap na ang mga daang tatahakin.
 
-I am not content, nor should you be, at stopping once something *just works*, and not really knowing *why*. I gently challenge you to journey down that bumpy "road less traveled" and embrace all that JavaScript is and can do. With that knowledge, no technique, no framework, no popular buzzword acronym of the week, will be beyond your understanding.
+Hindi ako kuntento, at dapat maging ikaw din, na tumigil kapag ang isang bagay ay *gumagana na*, at hindi o walang ideya kung *paano*. Malumanay kitang hinahamon na bumiyahe sa matigtig na "kaunting paglalakbay" at yakapin ang lahat at kayang gawin ng JavaScipt. Sa iyong kaalaman, walang teknik, walang balangkas, walang popular na buzzword acronym sa linggo na lalampas sa iyong pang unawa.
 
-These books each take on specific core parts of the language which are most commonly misunderstood or under-understood, and dive very deep and exhaustively into them. You should come away from reading with a firm confidence in your understanding, not just of the theoretical, but the practical "what you need to know" bits.
+Ang bawat libro sa serye ay tatalakay sa pinaka malalim at isang tiyak na parte ng language na madalas hindi naiintindihan. Nararapat na umalis ka mula sa pagbabasa ng iyong pagkaunawa, hindi lang sa mga teorya, kung hindi maging sa praktikal "na anong dapat mong malaman" na parte.
 
-The JavaScript you know *right now* is probably *parts* handed down to you by others who've been burned by incomplete understanding. *That* JavaScript is but a shadow of the true language. You don't *really* know JavaScript, *yet*, but if you dig into this series, you *will*. Read on, my friends. JavaScript awaits you.
+Ang JavaScript na iyong kilala *sa ngayon* ay marahil *parte* lamang na naipasa sa iyo mula sa mga taong hindi nakaintindi ng buo dito. *Ang* JavaScript ay anino ng totoong programming language. Hindi mo nalalaman ng *totoo* ang JavaScript, *hindi pa*, ngunit kung magpupursigi ka sa seryeng ito, *malalaman mo*. Basahin nyo, mga kaibigan ko. Hinihintay na kayo ni JavaScript.
 
-## Summary
+## Buod
 
-JavaScript is awesome. It's easy to learn partially, and much harder to learn completely (or even *sufficiently*). When developers encounter confusion, they usually blame the language instead of their lack of understanding. These books aim to fix that, inspiring a strong appreciation for the language you can now, and *should*, deeply *know*.
+Kahanga-hanga ang JavaScript. Bahagyang madali itong matutunan, at mas mahirap na matutunan ng kabuuan (o kahit *sapat na*). Kapag ang mga developers ay nakatagpo ng pagkalito, madalas nilang sinisisi ang language sa halip na ang kakulangan nila sa kaalaman. Ang mga librong ito ay naglalayon na ayusin ang naturang paguugaling ito, kagila-gilalas at matibay na pagpapahalaga sa language ang nararapat, ang *kinakailangan*, na *malaman* mo ng mas malalim.
 
-Note: Many of the examples in this book assume modern (and future-reaching) JavaScript engine environments, such as ES6. Some code may not work as described if run in older (pre-ES6) engines.
+Tandaan: Marami sa mga halimbawa in librong ito ay ipagpalagay na moderno (at hinaharap) na JavaScipt engine, gaya ng ES6. Ilan sa mga kodigo ay hindi gagana kung pagaganahin sa lumang (pre-ES6) mga engine 
