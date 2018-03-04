@@ -3,7 +3,7 @@
 
 从值的转换到数学计算，ES6给各种内建原生类型和对象增加了许多静态属性和方法来辅助这些常见任务。另外，一些原生类型的实例通过各种新的原型方法获得了新的能力。
 
-**注意：** 大多数这些特性都可以被忠实地填补。我们不会在这里深入这样的细节，但是关于兼容标准的shim/填补，你可以看一下“ES6 Shim”(https://github.com/paulmillr/es6-shim/)。
+**注意：** 大多数这些特性都可以被忠实地填补。我们不会在这里深入这样的细节，但是关于兼容标准的shim/填补，你可以看一下“ES6 Shim”([https://github.com/paulmillr/es6-shim/](https://github.com/paulmillr/es6-shim/))。
 
 ## `Array`
 
@@ -732,7 +732,7 @@ s2 === "\xE9";						// true
 
 `normalize(..)`接受一个可选参数值，它用于指定使用的规范化形式。这个参数值必须是下面四个值中的一个：`"NFC"`（默认），`"NFD"`，`"NFKC"`，或者`"NFKD"`。
 
-**注意：** 规范化形式和它们在字符串上的效果超出了我们要在这里讨论的范围。更多细节参见“Unicode规范化形式”(http://www.unicode.org/reports/tr15/)。
+**注意：** 规范化形式和它们在字符串上的效果超出了我们要在这里讨论的范围。更多细节参见“Unicode规范化形式”([http://www.unicode.org/reports/tr15/](http://www.unicode.org/reports/tr15/))。
 
 ### `String.raw(..)` 静态函数
 

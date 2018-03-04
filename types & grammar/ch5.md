@@ -649,7 +649,7 @@ true || (false && false);	// true -- 这才是胜利者!
 
 如果你熟知它，上面的例子一点儿都不会绊到你，因为你已经知道了`&&`要比`||`优先级高。但是我打赌有相当一部分读者不得不将它考虑一会。
 
-**注意：** 不幸的是，JS语言规范没有将它的操作符优先级罗列在一个方便，单独的位置。你不得不通读并理解所有的文法规则。所以我们将试着以一种更方便的格式排列出更常见和更有用的部分。要得到完整的操作符优先级列表，参见MDN网站的“操作符优先级”(* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence)。
+**注意：** 不幸的是，JS语言规范没有将它的操作符优先级罗列在一个方便，单独的位置。你不得不通读并理解所有的文法规则。所以我们将试着以一种更方便的格式排列出更常见和更有用的部分。要得到完整的操作符优先级列表，参见MDN网站的“操作符优先级”(* [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence))。
 
 ### 短接
 
@@ -958,7 +958,7 @@ function foo(a) {
 
 我的意见是：**在你知道分号是“必需的”地方使用分号，并且把你对ASI的臆测限制到最小。**
 
-不要光听我的一面之词。回到2012年，JavaScript的创造者Brendan Eich说过下面的话(http://brendaneich.com/2012/04/the-infernal-semicolon/)：
+不要光听我的一面之词。回到2012年，JavaScript的创造者Brendan Eich说过下面的话([http://brendaneich.com/2012/04/the-infernal-semicolon/](http://brendaneich.com/2012/04/the-infernal-semicolon/))：
 
 > 这个故事的精神是：ASI是一种（正式地说）语法错误纠正过程。如果你在好像有一种普遍的有意义的换行的规则的前提下开始编码，你将会陷入麻烦。
 > ..

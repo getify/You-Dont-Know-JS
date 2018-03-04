@@ -1178,7 +1178,7 @@ p.then(
 
 ### 绝望的深渊
 
-几年前Jeff Atwood曾经写到：编程语言总是默认地以这样的方式建立，开发者们会掉入“绝望的深渊”（http://blog.codinghorror.com/falling-into-the-pit-of-success/ ）——在这里意外会被惩罚——而你不得不更努力地使它正确。他恳求我们相反地创建“成功的深渊”，就是你会默认地掉入期望的（成功的）行为，而如此你不得不更努力地去失败。
+几年前Jeff Atwood曾经写到：编程语言总是默认地以这样的方式建立，开发者们会掉入“绝望的深渊”（[http://blog.codinghorror.com/falling-into-the-pit-of-success/](http://blog.codinghorror.com/falling-into-the-pit-of-success/) ）——在这里意外会被惩罚——而你不得不更努力地使它正确。他恳求我们相反地创建“成功的深渊”，就是你会默认地掉入期望的（成功的）行为，而如此你不得不更努力地去失败。
 
 毫无疑问，Promise的错误处理是一种“绝望的深渊”的设计。默认情况下，它假定你想让所有的错误都被Promise的状态吞掉，而且如果你忘记监听这个状态，错误就会默默地凋零/死去——通常是绝望的。
 
@@ -1548,7 +1548,7 @@ Promise.map( [p1,p2,p3], function(pr,done){
 
 让我们复习一下我们已经在本章中零散地展开的ES6`Promise`API。
 
-**注意：** 下面的API尽管在ES6中是原生的，但也存在一些语言规范兼容的填补（不光是扩展Promise库），它们定义了`Promise`和与之相关的所有行为，所以即使是在前ES6时代的浏览器中你也以使用原生的Promise。这类填补的其中之一是“Native Promise Only”(http://github.com/getify/native-promise-only)，我写的！
+**注意：** 下面的API尽管在ES6中是原生的，但也存在一些语言规范兼容的填补（不光是扩展Promise库），它们定义了`Promise`和与之相关的所有行为，所以即使是在前ES6时代的浏览器中你也以使用原生的Promise。这类填补的其中之一是“Native Promise Only”([http://github.com/getify/native-promise-only](http://github.com/getify/native-promise-only))，我写的！
 
 ### new Promise(..)构造器
 
@@ -1861,7 +1861,7 @@ click( "#mybtn", function(evt){
 
 但是除了在事件处理器内部定义一整套Promise链看起来很丑以外，这样的设计在某种意义上违背了关注/能力分离原则（SoC）。你可能非常想在一个你的代码不同的地方定义事件处理器：你定义对事件的 *响应*（Promise链）的地方。如果没有帮助机制，在这种模式下这么做很尴尬。
 
-**注意：** 这种限制的另一种表述方法是，如果我们能够构建某种能在它上面进行Promise链监听的“可监听对象（observable）”就好了。有一些库已经建立这些抽象（比如RxJS——http://rxjs.codeplex.com/），但是这种抽象看起来是如此的重，以至于你甚至再也看不到Promise的性质。这样的重抽象带来一个重要的问题：这些机制是否像Promise本身被设计的一样 *可靠*。我们将会在附录B中重新讨论“观察者（Observable）”模式。
+**注意：** 这种限制的另一种表述方法是，如果我们能够构建某种能在它上面进行Promise链监听的“可监听对象（observable）”就好了。有一些库已经建立这些抽象（比如RxJS——[http://rxjs.codeplex.com/](http://rxjs.codeplex.com/)），但是这种抽象看起来是如此的重，以至于你甚至再也看不到Promise的性质。这样的重抽象带来一个重要的问题：这些机制是否像Promise本身被设计的一样 *可靠*。我们将会在附录B中重新讨论“观察者（Observable）”模式。
 
 ### 惰性
 
@@ -2006,7 +2006,7 @@ foo( 11, 31 )
 
 一旦你创建了一个Promise并给它注册了一个完成和/或拒绝处理器，就没有什么你可以从外部做的事情能停止这个进程，即使是某些其他的事情使这个任务变得毫无意义。
 
-**注意：** 许多Promise抽象库都提供取消Promise的功能，但这是一个非常坏的主意！许多开发者都希望Promise被原生地设计为具有外部取消能力，但问题是这将允许Promise的一个消费者/监听器影响某些其他消费者监听同一个Promise的能力。这违反了未来值得可靠性原则（外部不可变），另外就是嵌入了“远距离行为（action at a distance）”的反模式（http://en.wikipedia.org/wiki/Action_at_a_distance_%28computer_programming%29）。不管它看起来多么有用，它实际上会直接将你引回与回调地狱相同的噩梦。
+**注意：** 许多Promise抽象库都提供取消Promise的功能，但这是一个非常坏的主意！许多开发者都希望Promise被原生地设计为具有外部取消能力，但问题是这将允许Promise的一个消费者/监听器影响某些其他消费者监听同一个Promise的能力。这违反了未来值得可靠性原则（外部不可变），另外就是嵌入了“远距离行为（action at a distance）”的反模式（[http://en.wikipedia.org/wiki/Action_at_a_distance_%28computer_programming%29](http://en.wikipedia.org/wiki/Action_at_a_distance_%28computer_programming%29)）。不管它看起来多么有用，它实际上会直接将你引回与回调地狱相同的噩梦。
 
 考虑我们早先的Promise超时场景：
 

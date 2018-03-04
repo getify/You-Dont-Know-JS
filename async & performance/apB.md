@@ -313,7 +313,7 @@ var main = Promise.resolve( {
 
 你越需要自己的流程控制动态，可迭代序列就越显得强大。
 
-**提示：** 在 *asynquence* 的网站(https://github.com/getify/asynquence/blob/master/README.md#iterable-sequences)上可以看到更多关于可迭代序列的信息与示例。
+**提示：** 在 *asynquence* 的网站([https://github.com/getify/asynquence/blob/master/README.md#iterable-sequences](https://github.com/getify/asynquence/blob/master/README.md#iterable-sequences))上可以看到更多关于可迭代序列的信息与示例。
 
 ## 事件响应式
 
@@ -356,11 +356,11 @@ observable
 
 值`observable`不是一个真正的 Promise，但你可以像监听一个 Promise 那样 *监听* 它，所以它们是有密切关联的。事实上，它可以被监听很多次，而且它会在每次事件（`"foobar"`）发生时都发送通知。
 
-**提示：** 我刚刚展示过的这个模式，是响应式编程（reactive programming，也称为 RP）背后的概念和动机的 **大幅度简化**，响应式编程已经由好几种了不起的项目和语言实现/详细论述过了。RP 的一个变种是函数响应式编程（functional reactive programming，FRP），它指的是在数据流之上实施函数式编程技术（不可变性，参照完整性，等等）。“响应式”指的是随着事件的推移散布这种功能，以对事件进行应答。对此感兴趣的读者应当考虑学习“响应式可监听对象”，它源于由微软开发的神奇的“响应式扩展”库(对于 JavaScript 来说是 “RxJS”，http://rxjs.codeplex.com/)；它可要比我刚刚展示过的东西精巧和强大太多了。另外，Andre Staltz 写过一篇出色的文章(https://gist.github.com/staltz/868e7e9bc2a7b8c1f754)，用具体的例子高效地讲解了 RP。
+**提示：** 我刚刚展示过的这个模式，是响应式编程（reactive programming，也称为 RP）背后的概念和动机的 **大幅度简化**，响应式编程已经由好几种了不起的项目和语言实现/详细论述过了。RP 的一个变种是函数响应式编程（functional reactive programming，FRP），它指的是在数据流之上实施函数式编程技术（不可变性，参照完整性，等等）。“响应式”指的是随着事件的推移散布这种功能，以对事件进行应答。对此感兴趣的读者应当考虑学习“响应式可监听对象”，它源于由微软开发的神奇的“响应式扩展”库(对于 JavaScript 来说是 “RxJS”，[http://rxjs.codeplex.com/](http://rxjs.codeplex.com/))；它可要比我刚刚展示过的东西精巧和强大太多了。另外，Andre Staltz 写过一篇出色的文章([https://gist.github.com/staltz/868e7e9bc2a7b8c1f754](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754))，用具体的例子高效地讲解了 RP。
 
 ### ES7 可监听对象
 
-在本书写作时，有一个早期ES7提案，一种称为“Observable（可监听对象）”的新数据类型(https://github.com/jhusain/asyncgenerator#introducing-observable)，它在精神上与我们在这里讲解过的相似，但是绝对更精巧。
+在本书写作时，有一个早期ES7提案，一种称为“Observable（可监听对象）”的新数据类型([https://github.com/jhusain/asyncgenerator#introducing-observable](https://github.com/jhusain/asyncgenerator#introducing-observable))，它在精神上与我们在这里讲解过的相似，但是绝对更精巧。
 
 这种可监听对象的概念是，你在一个流上“监听”事件的方法是传入一个 generator —— 其实 *迭代器* 才是有趣的部分 —— 它的`next(..)`方法会为每一个事件而调用。
 
@@ -517,7 +517,7 @@ var sq3 = ASQ.react(..)
 
 这里的要点是，`ASQ.react(..)`是一个F/RP概念的轻量级适配，使得将一个事件流与一个序列的连接成为可能，因此得名“响应式序列”。对于基本的响应式用法，响应式序列的能力通常是足够的。
 
-**注意：** 这里有一个使用`ASQ.react(..)`来管理UI状态的例子(http://jsbin.com/rozipaki/6/edit?js,output)，和另一个使用`ASQ.react(..)`来处理HTTP请求/应答流的例子(https://gist.github.com/getify/bba5ec0de9d6047b720e)。
+**注意：** 这里有一个使用`ASQ.react(..)`来管理UI状态的例子([http://jsbin.com/rozipaki/6/edit?js,output](http://jsbin.com/rozipaki/6/edit?js,output))，和另一个使用`ASQ.react(..)`来处理HTTP请求/应答流的例子([https://gist.github.com/getify/bba5ec0de9d6047b720e](https://gist.github.com/getify/bba5ec0de9d6047b720e))。
 
 ## Generator 协程
 
@@ -681,11 +681,11 @@ ASQ(
 
 隐藏在底层的 generator 是由`state(..)`帮助函数产生的，实际上被传递给`ASQ#runner(..)`的 generator 是持续并发运行至状态机长度的那一个，它们的每一个都协作地将控制权`yield`给下一个，如此类推。
 
-**注意：** 看看这个“乒乓”的例子(http://jsbin.com/qutabu/1/edit?js,output)，它展示了由`ASQ#runner(..)`驱动的 generator 的协作并发的用法。
+**注意：** 看看这个“乒乓”的例子([http://jsbin.com/qutabu/1/edit?js,output](http://jsbin.com/qutabu/1/edit?js,output))，它展示了由`ASQ#runner(..)`驱动的 generator 的协作并发的用法。
 
 ## 通信序列化处理（CSP）
 
-“通信序列化处理（Communicating Sequential Processes —— CSP）”是由 C. A. R. Hoare 在1978年的一篇学术论文(http://dl.acm.org/citation.cfm?doid=359576.359585)中首先被提出的，后来在1985年的一本同名书籍中被描述过。CSP描述了一种并发“进程”在处理期间进行互动（也就是“通信”）的形式方法。
+“通信序列化处理（Communicating Sequential Processes —— CSP）”是由 C. A. R. Hoare 在1978年的一篇学术论文([http://dl.acm.org/citation.cfm?doid=359576.359585](http://dl.acm.org/citation.cfm?doid=359576.359585))中首先被提出的，后来在1985年的一本同名书籍中被描述过。CSP描述了一种并发“进程”在处理期间进行互动（也就是“通信”）的形式方法。
 
 你可能会回忆起我们在第一章检视过的并发“进程”，所以我们对CSP的探索将会建立在那种理解之上。
 
@@ -744,7 +744,7 @@ run( bar );
 
 **注意：** 预先奉告：这种模式非常强大，但要习惯它有些烧脑。你可能会需要实践它一下，来习惯这种协调并发性的新的思考方式。
 
-有好几个了不起的库已经用 JavaScript 实现了这种风格的CSP，最引人注目的是“js-csp”(https://github.com/ubolonton/js-csp)，由 James Long (http://twitter.com/jlongster)开出的分支(https://github.com/jlongster/js-csp)，以及他特意撰写的作品(http://jlongster.com/Taming-the-Asynchronous-Beast-with-CSP-in-JavaScript)。另外，关于将 ClojureScript 中 go 风格的 core.async CSP 适配到 JS generator 的话题，无论怎么夸赞 David Nolen (http://twitter.com/swannodette) 的许多作品很精彩都不为过 (http://swannodette.github.io/2013/08/24/es6-generators-and-csp)。
+有好几个了不起的库已经用 JavaScript 实现了这种风格的CSP，最引人注目的是“js-csp”([https://github.com/ubolonton/js-csp](https://github.com/ubolonton/js-csp))，由 James Long ([http://twitter.com/jlongster](http://twitter.com/jlongster))开出的分支([https://github.com/jlongster/js-csp](https://github.com/jlongster/js-csp))，以及他特意撰写的作品([http://jlongster.com/Taming-the-Asynchronous-Beast-with-CSP-in-JavaScript](http://jlongster.com/Taming-the-Asynchronous-Beast-with-CSP-in-JavaScript))。另外，关于将 ClojureScript 中 go 风格的 core.async CSP 适配到 JS generator 的话题，无论怎么夸赞 David Nolen ([http://twitter.com/swannodette](http://twitter.com/swannodette)) 的许多作品很精彩都不为过 ([http://swannodette.github.io/2013/08/24/es6-generators-and-csp](http://swannodette.github.io/2013/08/24/es6-generators-and-csp))。
 
 ### asynquence 的 CSP 模拟
 
@@ -819,7 +819,7 @@ ASQ()
 
 如果在 goroutine 运行的末尾`ch`频道还有什么剩余价值的话，它们将被传递进序列的下一个步骤中。所以，为了从最后的 goroutine 中传出消息，把它们`put(..)`进`ch`。就像展示的那样，为了避免最后的那些`put(..)`阻塞，我们通过把`ch`的`buffer_size`设置为`2`（默认是`0`）来将它切换到缓冲模式。
 
-**注意：** 更多使用 *asynquence* 风格CSP的例子可以参见这里(https://gist.github.com/getify/e0d04f1f5aa24b1947ae)。
+**注意：** 更多使用 *asynquence* 风格CSP的例子可以参见这里([https://gist.github.com/getify/e0d04f1f5aa24b1947ae](https://gist.github.com/getify/e0d04f1f5aa24b1947ae))。
 
 ## 复习
 

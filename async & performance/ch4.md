@@ -2178,7 +2178,7 @@ function foo(url) {
 
 但走运的是，已经存在几种工具可以自动地将ES6 generator转换为我们在前一节延伸出的东西。它们不仅帮我们做力气活儿，还可以处理几种我们敷衍而过的情况。
 
-一个这样的工具是regenerator（https://facebook.github.io/regenerator/），由Facebook的聪明伙计们开发的。
+一个这样的工具是regenerator（[https://facebook.github.io/regenerator/](https://facebook.github.io/regenerator/)），由Facebook的聪明伙计们开发的。
 
 如果我们用regenerator来转译我们前面的generator，这就是产生的代码（在编写本文时）：
 

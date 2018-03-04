@@ -61,7 +61,7 @@ var myObject = Object.create( anotherObject );
 for (var k in myObject) {
 	console.log("found: " + k);
 }
-// 找到: a
+// found: a
 
 ("a" in myObject); // true
 ```

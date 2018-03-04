@@ -205,7 +205,7 @@ c; // "oof"
 
 如果你觉得这很难看，没错。不管怎样，对于简单的 `string` 它 *好用*，所以如果你需要某些快速但是“脏”的东西，像这样的方式经常能满足你。
 
-**警告：** 小心！这种方法对含有复杂（unicode）字符（星型字符、多字节字符等）的 `string` **不起作用**。你需要支持 unicode 的更精巧的工具库来准确地处理这种操作。在这个问题上可以咨询 Mathias Bynens 的作品：*Esrever*（https://github.com/mathiasbynens/esrever）。
+**警告：** 小心！这种方法对含有复杂（unicode）字符（星型字符、多字节字符等）的 `string` **不起作用**。你需要支持 unicode 的更精巧的工具库来准确地处理这种操作。在这个问题上可以咨询 Mathias Bynens 的作品：*Esrever*（[https://github.com/mathiasbynens/esrever](https://github.com/mathiasbynens/esrever)）。
 
 另外一种考虑这个问题的方式是：如果你更经常地将你的“string”基本上作为 *字符的数组* 来执行一些任务的话，也许就将它们作为 `array` 而不是作为 `string` 存储更好。你可能会因此省去很多每次都将 `string` 转换为 `array` 的麻烦。无论何时你确实需要 `string` 的表现形式的话，你总是可以调用 *字符的* `array` 的 `join("")` 方法。
 

@@ -261,7 +261,7 @@ a === b;		// false
 
 `a === b`产生`false`，因为强制转换是不允许的，所以简单值的比较很明显将会失败。许多开发者感觉`===`更可靠，所以他们提倡一直使用这种形式而远离`==`。我认为这种观点是非常短视的。我相信`==`是一种可以改进程序的强大工具，*如果你花时间去学习它的工作方式*。
 
-我们不会详细地讲解强制转换在`==`比较中是如何工作的。它的大部分都是相当合理的，但是有一些重要的极端用例要小心。你可以阅读ES5语言规范的11.9.3部分（http://www.ecma-international.org/ecma-262/5.1/）来了解确切的规则，而且与围绕这种机制的所有负面炒作比起来，你会对这它是多么的直白而感到吃惊。
+我们不会详细地讲解强制转换在`==`比较中是如何工作的。它的大部分都是相当合理的，但是有一些重要的极端用例要小心。你可以阅读ES5语言规范的11.9.3部分（[http://www.ecma-international.org/ecma-262/5.1/](http://www.ecma-international.org/ecma-262/5.1/)）来了解确切的规则，而且与围绕这种机制的所有负面炒作比起来，你会对这它是多么的直白而感到吃惊。
 
 为了将这许多细节归纳为一个简单的包装，并帮助你在各种情况下判断是否使用`==`或`===`，这是我的简单规则：
 
@@ -275,7 +275,7 @@ a === b;		// false
 
 如果你在比较两个非基本类型值，比如`object`（包括`function`和`array`），那么你应当特别小心`==`和`===`的比较规则。因为这些值实际上是通过引用持有的，`==`和`===`比较都将简单地检查这个引用是否相同，而不是它们底层的值。
 
-例如，`array`默认情况下会通过使用逗号（`,`）连接所有值来被强制转换为`string`。你可能认为两个内容相同的`array`将是`==`相等的，但它们不是：
+例如，`array`默认情况下会通过使用逗号（`,`）连接所有值来被强制转换为`string`。你可能认为两个内容相同的`array`将是`==`相等的，但它们不是：
 
 
 ```js
@@ -854,7 +854,7 @@ bar.a;		// 42 <-- 委托到 `foo`
 
 ### 填补
 
-“填补（Polyfilling）”是一个人为发明的词（由Remy Sharp创造）（https://remysharp.com/2010/10/08/what-is-a-polyfill）。它是指拿来一个新特性的定义并制造一段行为等价的代码，但是这段代码可以运行在老版本的JS环境中。
+“填补（Polyfilling）”是一个人为发明的词（由Remy Sharp创造）（[https://remysharp.com/2010/10/08/what-is-a-polyfill](https://remysharp.com/2010/10/08/what-is-a-polyfill)）。它是指拿来一个新特性的定义并制造一段行为等价的代码，但是这段代码可以运行在老版本的JS环境中。
 
 例如，ES6定义了一个称为`Number.isNaN(..)`的工具，来为检查`NaN`值提供一种准确无误的方法，同时废弃原来的`isNaN(..)`工具。这个工具可以很容易填补，因此你可开始在你的代码中使用它，而不管最终用户是否在一个ES6浏览器中。
 
@@ -874,7 +874,7 @@ if (!Number.isNaN) {
 
  并不是所有的新特性都可以完全填补。有时一种特性的大部分行为可以被填补，但是仍然存在一些小的偏差。在实现你自己的填补时你应当非常非常小心，来确保你尽可能严格地遵循语言规范。
 
-或者更好地，使用一组你信任的，经受过检验的填补，比如那些由ES5-Shim（https://github.com/es-shims/es5-shim）和ES6-Shim（https://github.com/es-shims/es6-shim）提供的。
+或者更好地，使用一组你信任的，经受过检验的填补，比如那些由ES5-Shim（[https://github.com/es-shims/es5-shim](https://github.com/es-shims/es5-shim)）和ES6-Shim（[https://github.com/es-shims/es6-shim](https://github.com/es-shims/es6-shim)）提供的。
 
 ### 转译
 
@@ -924,8 +924,8 @@ function foo() {
 
 有好几个了不起的转译器供你选择。这是一些在本书写作时存在的好选择：
 
-* Babel (https://babeljs.io) (前身为 6to5): 将 ES6+ 转译为 ES5
-* Traceur (https://github.com/google/traceur-compiler): 将 ES6，ES7，和以后特性转译为 ES5
+* Babel ([https://babeljs.io](https://babeljs.io)) (前身为 6to5): 将 ES6+ 转译为 ES5
+* Traceur ([https://github.com/google/traceur-compiler](https://github.com/google/traceur-compiler)): 将 ES6，ES7，和以后特性转译为 ES5
 
 ## 非JavaScript
 

@@ -322,23 +322,23 @@ arr + 10;				// 25
 
 * `@@match`：一个正则表达式的`Symbol.match`值是使用被给定的正则表达式来匹配一个字符串值的全部或部分的方法。如果你为`String.prototype.match(..)`传递一个正则表达式做范例匹配，它就会被使用。
 
-	 匹配的默认算法写在ES6语言规范的第21.2.5.6部分(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@match)。你可以覆盖这个默认算法并提供额外的正则表达式特性，比如后顾断言。
+	 匹配的默认算法写在ES6语言规范的第21.2.5.6部分([https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@match](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@match))。你可以覆盖这个默认算法并提供额外的正则表达式特性，比如后顾断言。
 
 	 `Symbol.match`还被用于`isRegExp`抽象操作（参见第六章的“字符串检测函数”中的注意部分）来判定一个对象是否意在被用作正则表达式。为了使一个这样的对象不被看作是正则表达式，可以将`Symbol.match`的值设置为`false`（或falsy的东西）强制这个检查失败。
 
 * `@@replace`：一个正则表达式的`Symbol.replace`值是被`String.prototype.replace(..)`使用的方法，来替换一个字符串里面出现的一个或所有字符序列，这些字符序列匹配给出的正则表达式范例。
 
-	 替换的默认算法写在ES6语言规范的第21.2.5.8部分(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@replace)。
+	 替换的默认算法写在ES6语言规范的第21.2.5.8部分([https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@replace](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@replace))。
 
 	 一个覆盖默认算法的很酷的用法是提供额外的`replacer`可选参数值，比如通过用连续的替换值消费可迭代对象来支持`"abaca".replace(/a/g,[1,2,3])`产生`"1b2c3"`。
 
 * `@@search`：一个正则表达式的`Symbol.search`值是被`String.prototype.search(..)`使用的方法，来在一个字符串中检索一个匹配给定正则表达式的子字符串。
 
-	 检索的默认算法写在ES6语言规范的第21.2.5.9部分(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@search)。
+	 检索的默认算法写在ES6语言规范的第21.2.5.9部分([https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@search](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@search))。
 
 * `@@split`：一个正则表达式的`Symbol.split`值是被`String.prototype.split(..)`使用的方法，来将一个字符串在分隔符匹配给定正则表达式的位置分割为子字符串。
 
-	 分割的默认算法写在ES6语言规范的第21.2.5.11部分(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@split)。
+	 分割的默认算法写在ES6语言规范的第21.2.5.11部分([https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@split](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-regexp.prototype-@@split))。
 
 覆盖内建的正则表达式算法不是为心脏脆弱的人准备的！JS带有高度优化的正则表达式引擎，所以你自己的用户代码将很可能慢得多。这种类型的元编程很精巧和强大，但是应当仅用于确实必要或有好处的情况下。
 
@@ -485,7 +485,7 @@ obj === pobj
 
 也许在未来，更多这些语言中的底层基础操作都将是可拦截的，那将给我们更多力量来从JavaScript自身扩展它。
 
-**警告：** 对于代理处理器的使用来说存在某些 *不变量* —— 它们的行为不能被覆盖。例如，`isExtensible(..)`处理器的结果总是被强制转换为一个`boolean`。这些不变量限制了一些你可以使用代理来自定义行为的能力，但是它们这样做只是为了防止你创建奇怪和不寻常（或不合逻辑）的行为。这些不变量的条件十分复杂，所以我们就不再这里全面阐述了，但是这篇博文(http://www.2ality.com/2014/12/es6-proxies.html#invariants)很好地讲解了它们。
+**警告：** 对于代理处理器的使用来说存在某些 *不变量* —— 它们的行为不能被覆盖。例如，`isExtensible(..)`处理器的结果总是被强制转换为一个`boolean`。这些不变量限制了一些你可以使用代理来自定义行为的能力，但是它们这样做只是为了防止你创建奇怪和不寻常（或不合逻辑）的行为。这些不变量的条件十分复杂，所以我们就不再这里全面阐述了，但是这篇博文([http://www.2ality.com/2014/12/es6-proxies.html#invariants](http://www.2ality.com/2014/12/es6-proxies.html#invariants))很好地讲解了它们。
 
 ### 可撤销的代理
 
@@ -1008,7 +1008,7 @@ catch (err) {
 
 最终，管理一个对你特定代码库进行的特性测试列表 —— 你的程序将很少用到ES6的全部 —— 是很容易失控而且易错的。
 
-“https://featuretests.io”的“特性测试服务”为这种挫折提供了解决方案。
+“[https://featuretests.io](https://featuretests.io)”的“特性测试服务”为这种挫折提供了解决方案。
 
 你可以将这个服务的库加载到你的页面中，而它会加载最新的测试定义并运行所有的特性测试。在可能的情况下，它将使用Web Worker的后台处理中这样做，以降低性能上的开销。它还会使用LocalStorage持久化来缓存测试的结果 —— 以一种可以被所有你访问的使用这个服务的站点所共享的方式，这将及大地降低测试需要在每个浏览器实例上运行的频度。
 

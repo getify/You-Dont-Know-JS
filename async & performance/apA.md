@@ -3,7 +3,7 @@
 
 第一章和第二章相当详细地探讨了常见的异步编程模式，以及如何通过回调解决它们。但我们也看到了为什么回调在处理能力上有着致命的缺陷，这将我们带到了第三章和第四章，Promise 与 Generator 为你的异步流程构建提供了一个更加坚实，可信，以及可推理的基础。
 
-我在这本书中好几次提到我自己的异步库 *asynquence* (http://github.com/getify/asynquence) —— “async” + “sequence” = “asynquence”，现在我想简要讲解一下它的工作原理，以及它的独特设计为什么很重要和很有用。
+我在这本书中好几次提到我自己的异步库 *asynquence* ([http://github.com/getify/asynquence](http://github.com/getify/asynquence)) —— “async” + “sequence” = “asynquence”，现在我想简要讲解一下它的工作原理，以及它的独特设计为什么很重要和很有用。
 
 在下一篇附录中，我们将要探索一些高级的异步模式，但为了它们的可用性能够使人接受你可能需要一个库。我们将使用 *asynquence* 来表达这些模式，所以你会想首先在这里花一点时间来了解这个库。
 
@@ -59,7 +59,7 @@
 
 **注意：** 为了这里所有的代码示例，我将使用 *asynquence* 在浏览器全局作用域中的顶层标识符：`ASQ`。如果你通过一个模块系统（在浏览器或服务器中）引入并使用 *asynquence*，你当然可以定义自己喜欢的符号，*asynquence* 不会关心这些！
 
-许多在这里讨论的API方法都内建于 *asynquence* 的核心部分，而其他的API是通过引入可选的“contrib”插件包提供的。要知道一个方法是内建的还是通过插件定义的，可以参见 *asynquence* 的文档：http://github.com/getify/asynquence
+许多在这里讨论的API方法都内建于 *asynquence* 的核心部分，而其他的API是通过引入可选的“contrib”插件包提供的。要知道一个方法是内建的还是通过插件定义的，可以参见 *asynquence* 的文档：[http://github.com/getify/asynquence](http://github.com/getify/asynquence)
 
 ### 步骤
 
