@@ -438,7 +438,7 @@ Promise的性质被有意地设计为给这些顾虑提供有用的，可复用�
 
 Promise被定义为不能受这种顾虑的影响，因为即便是立即完成的Promise（比如 `new Promise(function(resolve){ resolve(42); })`）也不可能被同步地 *监听*。
 
-也就是说，但你在Promise上调用`then(..)`的时候，即便这个Promise已经被解析了，你给`then(..)`提供的回调也将 **总是** 被异步地调用（更多关于这里的内容，参照第一章的"Jobs"）。
+也就是说，当你在Promise上调用`then(..)`的时候，即便这个Promise已经被解析了，你给`then(..)`提供的回调也将 **总是** 被异步地调用（更多关于这里的内容，参照第一章的"Jobs"）。
 
 不必再插入你自己的`setTimeout(..,0)`黑科技了。Promise自动地防止了Zalgo效应。
 
