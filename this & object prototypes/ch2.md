@@ -776,7 +776,7 @@ Let's illustrate arrow-function lexical scope:
 ```js
 function foo() {
 	// return an arrow function
-	return (a) => {
+	return () => {
 		// `this` here is lexically adopted from `foo()`
 		console.log( this.a );
 	};
