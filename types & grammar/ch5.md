@@ -1047,7 +1047,7 @@ Another example of a TDZ violation can be seen with ES6 default parameter values
 ```js
 var b = 3;
 
-function foo( a = 42, b = a + b + 5 ) {
+function foo( a = 42, b = a + b + 5 ) {	// ReferenceError!
 	// ..
 }
 ```
