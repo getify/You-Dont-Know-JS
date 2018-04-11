@@ -1410,11 +1410,11 @@ if (!Promise.observe) {
 		//  наблюдаем за выполнением `pr`
 		pr.then(
 			function fulfilled(msg){
-				// запланированный колбэк (ака задача)
+				// запланированный колбэк (или задача)
 				Promise.resolve( msg ).then( cb );
 			},
 			function rejected(err){
-				// запланированный колбэк (ака задача)
+				// запланированный колбэк (или задача)
 				Promise.resolve( err ).then( cb );
 			}
 		);
