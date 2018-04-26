@@ -514,7 +514,7 @@ ajax( "http://some.url.1", timeoutify( foo, 500 ) );
 
 这种围绕着同步或异步行为的不确定性，几乎总是导致非常难追踪的Bug。在某些圈子中，一个名叫Zalgo的可以导致人精神错乱的虚构怪物被用来描述这种同步/异步的噩梦。经常能听到人们喊“别放出Zalgo！”，而且它引出了一个非常响亮的建议：总是异步地调用回调，即便它是“立即”在事件轮询的下一个迭代中，这样所有的回调都是可预见的异步。
 
-**注意：** 更多关于Zalgo的信息，参见Oren Golan的“Don't Release Zalgo!（不要释放Zalgo！）”(https://github.com/oren/oren.github.io/blob/master/posts/zalgo.md)和Isaac Z. Schlueter的“Designing APIs for Asynchrony（异步API设计）”(http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony)。
+**注意：** 更多关于Zalgo的信息，参见Oren Golan的“Don't Release Zalgo!（不要释放Zalgo！）”（https://github.com/oren/oren.github.io/blob/master/posts/zalgo.md） 和Isaac Z. Schlueter的“Designing APIs for Asynchrony（异步API设计）”（http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony）。
 
 考虑下面的代码：
 
