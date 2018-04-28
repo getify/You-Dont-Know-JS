@@ -117,11 +117,11 @@ Web Worker的常见用途是什么？
 
 谢天谢地，现在我们有了几个更好的选择。
 
-如果你传递一个对象，在另一端一个所谓的“结构化克隆算法（Structured Cloning Algorithm）”（https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/The_structured_clone_algorithm）会用于拷贝/复制这个对象。这个算法相当精巧，甚至可以处理带有循环引用的对象复制。to-string/from-string的性能劣化没有了，但用这种方式我们依然面对着内存用量的翻倍。IE10以上版本，和其他主流浏览器都对此有支持。
+如果你传递一个对象，在另一端一个所谓的“结构化克隆算法（Structured Cloning Algorithm）”（https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/The_structured_clone_algorithm ）会用于拷贝/复制这个对象。这个算法相当精巧，甚至可以处理带有循环引用的对象复制。to-string/from-string的性能劣化没有了，但用这种方式我们依然面对着内存用量的翻倍。IE10以上版本，和其他主流浏览器都对此有支持。
 
-一个更好的选择，特别是对大的数据集合而言，是“Transferable对象”（http://updates.html5rocks.com/2011/12/Transferable-Objects-Lightning-Fast）。它使对象的“所有权”被传送，而对象本身没动。一旦你传送一个对象给Worker，它在原来的位置就空了出来或者不可访问——这消除了共享作用域的多线程编程中的灾难。当然，所有权的传送可以双向进行。
+一个更好的选择，特别是对大的数据集合而言，是“Transferable对象”（http://updates.html5rocks.com/2011/12/Transferable-Objects-Lightning-Fast ）。它使对象的“所有权”被传送，而对象本身没动。一旦你传送一个对象给Worker，它在原来的位置就空了出来或者不可访问——这消除了共享作用域的多线程编程中的灾难。当然，所有权的传送可以双向进行。
 
-选择使用Transferable对象不需要你做太多；任何实现了Transferable接口（https://developer.mozilla.org/en-US/docs/Web/API/Transferable）的数据结构都将自动地以这种方式传递（Firefox和Chrome支持此特性）。
+选择使用Transferable对象不需要你做太多；任何实现了Transferable接口（https://developer.mozilla.org/en-US/docs/Web/API/Transferable ）的数据结构都将自动地以这种方式传递（Firefox和Chrome支持此特性）。
 
 举个例子，有类型的数组如`Uint8Array`（见本系列的 *ES6与未来*）是一个“Transferables”。这是你如何用`postMessage(..)`来传送一个Transferable对象：
 
@@ -194,9 +194,9 @@ addEventListener( "connect", function(evt){
 
 如果浏览器不支持Worker，那就根本没有办法从性能的角度来模拟多线程。Iframe通常被认为可以提供并行环境，但在所有的现代浏览器中它们实际上和主页运行在同一个线程上，所以用它们来模拟并行机制是不够的。
 
-正如我们在第一章中详细讨论的，JS的异步能力（不是并行机制）来自于事件轮询队列，所以你可以用计时器（`setTimeout(..)`等等）来强制模拟的Worker是异步的。然后你只需要提供Worker API的填补就行了。这里有一份列表（https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills#web-workers），但坦白地说它们看起来都不怎么样。
+正如我们在第一章中详细讨论的，JS的异步能力（不是并行机制）来自于事件轮询队列，所以你可以用计时器（`setTimeout(..)`等等）来强制模拟的Worker是异步的。然后你只需要提供Worker API的填补就行了。这里有一份列表（https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills#web-workers ），但坦白地说它们看起来都不怎么样。
 
-我在这里（https://gist.github.com/getify/1b26accb1a09aa53ad25）写了一个填补`Worker`的轮廓。它很基础，但应该满足了简单的`Worker`支持，它的双向信息传递可以正确工作，还有`"onerror"`处理。你可能会扩展它来支持更多特性，比如`terminate()`或模拟共享Worker，只要你觉得合适。
+我在这里（ https://gist.github.com/getify/1b26accb1a09aa53ad25 ）写了一个填补`Worker`的轮廓。它很基础，但应该满足了简单的`Worker`支持，它的双向信息传递可以正确工作，还有`"onerror"`处理。你可能会扩展它来支持更多特性，比如`terminate()`或模拟共享Worker，只要你觉得合适。
 
 **注意：** 你不能模拟同步阻塞，所以这个填补不允许使用`importScripts(..)`。另一个选择可能是转换并传递Worker的代码（一旦Ajax加载后），来重写一个`importScripts(..)`填补的一些异步形式，也许使用一个promise相关的接口。
 
@@ -206,7 +206,7 @@ addEventListener( "connect", function(evt){
 
 使用SIMD，线程不提供并行机制。相反，现代CPU用数字的“向量”提供SIMD能力——想想：指定类型的数组——还有可以在所有这些数字上并行操作的指令；这些是利用底层操作的指令级别的并行机制。
 
-使SIMD能力包含在JavaScript中的努力主要是由Intel带头的（https://01.org/node/1495），名义上是Mohammad Haghighat（在本书写作的时候），与Firefox和Chrome团队合作。SIMD处于早期标准化阶段，而且很有可能被加入未来版本的JavaScript中，很可能在ES7的时间框架内。
+使SIMD能力包含在JavaScript中的努力主要是由Intel带头的（https://01.org/node/1495 ），名义上是Mohammad Haghighat（在本书写作的时候），与Firefox和Chrome团队合作。SIMD处于早期标准化阶段，而且很有可能被加入未来版本的JavaScript中，很可能在ES7的时间框架内。
 
 SIMD JavaScript提议向JS代码暴露短向量类型与API，它们在SIMD可用的系统中将操作直接映射为CPU指令的等价物，同时在非SIMD系统中退回到非并行化操作的“shim”。
 
@@ -229,13 +229,13 @@ SIMD.int32x4.add( v3, v4 );		// [ 20, 121, 1031, 10041 ]
 
 除了`mul()`和`add()`，许多其他操作也很可能被加入，比如`sub()`，`div()`，`abs()`，`neg()`，`sqrt()`，`reciprocal()`，`reciprocalSqrt()` （算数运算），`shuffle()`（重拍向量元素），`and()`，`or()`，`xor()`，`not()`（逻辑运算），`equal()`，`greaterThan()`，`lessThan()` （比较运算），`shiftLeft()`，`shiftRightLogical()`，`shiftRightArithmetic()`（轮换），`fromFloat32x4()`，和`fromInt32x4()`（变换）。
 
-**注意：** 这里有一个SIMD功能的官方“填补”（很有希望，预期的，着眼未来的填补）（https://github.com/johnmccutchan/ecmascript_simd），它描述了许多比我们在这一节中没有讲到的许多计划中的SIMD功能。
+**注意：** 这里有一个SIMD功能的官方“填补”（很有希望，预期的，着眼未来的填补）（https://github.com/johnmccutchan/ecmascript_simd ），它描述了许多比我们在这一节中没有讲到的许多计划中的SIMD功能。
 
 ## asm.js
 
-“asm.js”（http://asmjs.org/）是可以被高度优化的JavaScript语言子集的标志。通过小心地回避那些特定的很难优化的（垃圾回收，强制转换，等等）机制和模式，asm.js风格的代码可以被JS引擎识别，而且用主动地底层优化进行特殊的处理。
+“asm.js”（http://asmjs.org/ ）是可以被高度优化的JavaScript语言子集的标志。通过小心地回避那些特定的很难优化的（垃圾回收，强制转换，等等）机制和模式，asm.js风格的代码可以被JS引擎识别，而且用主动地底层优化进行特殊的处理。
 
-与本章中讨论的其他性能优化机制不同的是，asm.js没必须要是必须被JS语言规范所采纳的东西。确实有一个asm.js规范（http://asmjs.org/spec/latest/），但它主要是追踪一组关于优化的候选对象的推论，而不是JS引擎的需求。
+与本章中讨论的其他性能优化机制不同的是，asm.js没必须要是必须被JS语言规范所采纳的东西。确实有一个asm.js规范（http://asmjs.org/spec/latest/ ），但它主要是追踪一组关于优化的候选对象的推论，而不是JS引擎的需求。
 
 目前还没有新的语法被提案。取而代之的是，ams.js建议了一些方法，用来识别那些符合ams.js规则的既存标准JS语法，并且让引擎相应地实现它们自己的优化功能。
 
@@ -245,7 +245,7 @@ SIMD.int32x4.add( v3, v4 );		// [ 20, 121, 1031, 10041 ]
 
 关于asm.js需要理解的第一件事情是类型和强制转换。如果JS引擎不得不在变量的操作期间一直追踪一个变量内的值的类型，以便于在必要时它可以处理强制转换，那么就会有许多额外的工作使程序处于次优化状态。
 
-**注意：** 为了说明的目的，我们将在这里使用ams.js风格的代码，但要意识到的是你手写这些代码的情况不是很常见。asm.js的本意更多的是作为其他工具的编译目标，比如Emscripten（https://github.com/kripken/emscripten/wiki）。当然你写自己的asm.js代码也是可能的，但是这通常不是一个好主意，因为那样的代码非常底层，而这意味着它会非常耗时而且易错。尽管如此，也会有情况使你想要为了ams.js优化的目的手动调整代码。
+**注意：** 为了说明的目的，我们将在这里使用ams.js风格的代码，但要意识到的是你手写这些代码的情况不是很常见。asm.js的本意更多的是作为其他工具的编译目标，比如Emscripten（https://github.com/kripken/emscripten/wiki ）。当然你写自己的asm.js代码也是可能的，但是这通常不是一个好主意，因为那样的代码非常底层，而这意味着它会非常耗时而且易错。尽管如此，也会有情况使你想要为了ams.js优化的目的手动调整代码。
 
 这里有一些“技巧”，你可以使用它们来提示支持asm.js的JS引擎变量/操作预期的类型是什么，以便于它可以跳过那些强制转换追踪的步骤。
 
@@ -363,6 +363,6 @@ Web Worker让你在一个分离的线程上运行一个JS文件（也就是程�
 
 SIMD提议将CPU级别的并行数学操作映射到JavaScript API上来提供高性能数据并行操作，比如在大数据集合上进行数字处理。
 
-最后，asm.js描述了一个JavaScript的小的子集，它回避了JS中不易优化的部分（比如垃圾回收与强制转换）并让JS引擎通过主动优化识别并运行这样的代码。asm.js可以手动编写，但是极其麻烦且易错，就像手动编写汇编语言。相反，asm.js的主要意图是作为一个从其他高度优化的程序语言交叉编译来的目标——例如，Emscripten（https://github.com/kripken/emscripten/wiki）可以将C/C++转译为JavaScript。
+最后，asm.js描述了一个JavaScript的小的子集，它回避了JS中不易优化的部分（比如垃圾回收与强制转换）并让JS引擎通过主动优化识别并运行这样的代码。asm.js可以手动编写，但是极其麻烦且易错，就像手动编写汇编语言。相反，asm.js的主要意图是作为一个从其他高度优化的程序语言交叉编译来的目标——例如，Emscripten（https://github.com/kripken/emscripten/wiki ）可以将C/C++转译为JavaScript。
 
 虽然在本章没有明确地提及，在很早以前的有关JavaScript的讨论中存在着更激进的想法，包括近似地直接多线程功能（不仅仅是隐藏在数据结构API后面）。无论这是否会明确地发生，还是我们将看到更多并行机制偷偷潜入JS，但是在JS中发生更多程序级别优化的未来是可以确定的。
