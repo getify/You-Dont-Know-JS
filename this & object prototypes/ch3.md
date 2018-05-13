@@ -697,7 +697,7 @@ myObject.a = 2;
 myObject.a; // 4
 ```
 
-**Note:** In this example, we actually store the specified value `2` of the assignment (`[[Put]]` operation) into another variable `_a_`. The `_a_` name is purely by convention for this example and implies nothing special about its behavior -- it's a normal property like any other.
+**Note:** The name of the variable where we store the value of `2` **must** be different than the name of the property. If you defined the getter for `a` to return `this.a`, you'd essentially be telling it to call itself. Attempting to do so results in a `RangeError` being thrown. In this example, we use the variable `_a_`. The `_a_` name is purely by convention for this example and implies nothing special about its behavior -- it's a normal property like any other.
 
 ### Existence
 
