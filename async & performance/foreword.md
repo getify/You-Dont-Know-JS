@@ -1,22 +1,22 @@
-# You Don't Know JS: Async & Performance
-# Foreword
+# Вы не знаете JavaScript: Асинхронность и Производительность
+# Предисловие
 
-Over the years, my employer has trusted me enough to conduct interviews. If we're looking for someone with skills in JavaScript, my first line of questioning… actually that's not true, I first check if the candidate needs the bathroom and/or a drink, because comfort is important, but once I'm past the bit about the candidate's fluid in/out-take, I set about determining if the candidate knows JavaScript, or just jQuery.
+На протяжении многих лет мой работодатель доверяет мне достаточно, чтобы я проводил собеседования. Если мы ищем кого-то с навыками JavaScript, обычно мой первый вопрос это... на самом деле это не правда. Для начала я выясню, нужно ли кандидату отойти в туалет или выпить воды, потому что чувство комфорта является довольно важным. Как только я удостоверюсь в том что с балансом жидкости в организме у кандидата всё в порядке, я начинаю интересоваться его познаниями в JavaScript, или хотя бы jQuery.
 
-Not that there's anything wrong with jQuery. It lets you do a lot without really knowing JavaScript, and that's a feature not a bug. But if the job calls for advanced skills in JavaScript performance and maintainability, you need someone who knows how libraries such as jQuery are put together. You need to be able to harness the core of JavaScript the same way they do.
+Не то чтобы с jQuery что-то было не так. Он позволяет Вам делать многое, без особых знаний JavaScript, и это фича, а не баг. Но в том случае, если задача требует продвинутые знания о производительности и поддерживаемости Javascript кода, Вам нужен кто-то, кто знает как такие библиотеки нужно объединять. Вы должны уметь использовать ядро JavaScript так же, как и они. 
 
-If I want to get a picture of someone's core JavaScript skill, I'm most interested in what they make of closures (you've read that book of this series already, right?) and how to get the most out of asynchronicity, which brings us to this book.
+Если я хочу увидеть всю картину того, насколько кандидат знает JavaScript, в большей степени я заинтересован в том, чтобы узнать что он думает о замыканиях (вы же уже читали книгу из этой серии, верно?) и как получить максимальную отдачу от асинхронности, которая подводит нас к этой книге. 
 
-For starters, you'll be taken through callbacks, the bread and butter of asynchronous programming. Of course, bread and butter does not make for a particularly satisfying meal, but the next course is full of tasty tasty promises!
+Для начала, вы пройдёте через функции обратного вызова, хлеб и масло асинхронного программирования. Конечно, из хлеба и масла не выйдет особо изысканного блюда, но следующий курс полон вкусных-вкусных обещаний! (next course is full of tasty tasty promises - каламбур, намекающий, что вместо функций обратного вызова, стоит использовать Promise. - прим. перев.)
 
-If you don't know promises, now is the time to learn. Promises are now the official way to provide async return values in both JavaScript and the DOM. All future async DOM APIs will use them, many already do, so be prepared! At the time of writing, Promises have shipped in most major browsers, with IE shipping soon. Once you've finished that, I hope you left room for the next course, Generators.
+Если вы не знакомы с промисами, то сейчас самое время в них разобраться. На данный момент, промисы являются общепринятым способом для работы с асинхронностью в JavaScript и DOM. Их будут использовать многие методы из DOM API, а многие уже это делают, так что будьте готовы! На момент написания, промисы уже поддерживаются в большинстве мажорных браузеров, и вскоре появятся в IE. Как только вы закончите с промисами, надеюсь вы приступите к изучению генераторов.
 
-Generators snuck their way into stable versions of Chrome and Firefox without too much pomp and ceremony, because, frankly, they're more complicated than they are interesting. Or, that's what I thought until I saw them combined with promises. There, they become an important tool in readability and maintenance.
+Генераторы пробираются в стабильные версии Chrome и Firefox без особых почестей, потому что, откровенно говоря, они больше запутанные, чем интересные. По крайней мере, я так думал до того, как увидел как они используются в связке с промисами. В таком случае, они становятся довольно важным инструментом для поддержки читабельности кода. 
 
-For dessert, well, I won't spoil the surprise, but prepare to gaze into the future of JavaScript! Features that give you more and more control over concurrency and asynchronicity.
+На десерт, конечно, я не буду портить сюрприз, но приготовьтесь заглянуть в будущее JavaScript! Мы рассмотрим нововведения, которые дадут Вам больше контроля над согласованностью и асинхронностью. 
 
-Well, I won't block your enjoyment of the book any longer, on with the show! If you've already read part of the book before reading this Foreword, give yourself 10 asynchronous points! You deserve them!
+Что ж, я не буду отвлекать вас от наслаждения книгой. Вы уже прочитали часть книги, перед тем как приступили к данному Предисловию, так что получите свои 10 асинхронных очков. Вы их заслужили!
 
-Jake Archibald<br>
+Джейк Арчибальд<br>
 [jakearchibald.com](http://jakearchibald.com), [@jaffathecake](http://twitter.com/jaffathecake)<br>
-Developer Advocate at Google Chrome
+Developer Advocate в Google Chrome
