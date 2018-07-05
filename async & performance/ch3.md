@@ -406,7 +406,7 @@ var v1 = { hello: "world" };
 var v2 = [ "Hello", "World" ];
 ```
 
-`v1`和`v2`都将被假定为是thenalbe的。你不能控制或预测是否有其他代码偶然或恶意地将`then(..)`加到`Object.prototype`，`Array.prototype`，或其他任何原生原型上。而且如果这个指定的函数并不将它的任何参数作为回调调用，那么任何用这样的值被解析的Promise都将无声地永远挂起！疯狂。
+`v1`和`v2`都将被假定为是thenable的。你不能控制或预测是否有其他代码偶然或恶意地将`then(..)`加到`Object.prototype`，`Array.prototype`，或其他任何原生原型上。而且如果这个指定的函数并不将它的任何参数作为回调调用，那么任何用这样的值被解析的Promise都将无声地永远挂起！疯狂。
 
 听起来难以置信或不太可能？也许。
 
