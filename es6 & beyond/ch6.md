@@ -665,10 +665,9 @@ Number.isInteger( 4.2 );			// false
 
 **Note:** In JavaScript, there's no difference between `4`, `4.`, `4.0`, or `4.0000`. All of these would be considered an "integer", and would thus yield `true` from `Number.isInteger(..)`.
 
-In addition, `Number.isInteger(..)` filters out some clearly not-integer values that `x === Math.floor(x)` could potentially mix up:
+In addition, `Number.isInteger(..)` filters out a clearly not-integer value that `x === Math.floor(x)` could potentially mix up:
 
 ```js
-Number.isInteger( NaN );			// false
 Number.isInteger( Infinity );		// false
 ```
 
