@@ -162,7 +162,7 @@ With Promises, the `then(..)` call can actually take two functions, the first fo
 ```js
 add( fetchX(), fetchY() )
 .then(
-	// fullfillment handler
+	// fulfillment handler
 	function(sum) {
 		console.log( sum );
 	},
