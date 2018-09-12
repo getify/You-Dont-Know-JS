@@ -277,7 +277,7 @@ Scope is the set of rules that determines where and how a variable (identifier) 
 
 LHS references result from assignment operations. *Scope*-related assignments can occur either with the `=` operator or by passing arguments to (assign to) function parameters.
 
-The JavaScript *Engine* first compiles code before it executes, and in so doing, it splits up statements like `var a = 2;` into two separate steps:
+The JavaScript *Engine* first compiles code before it executes, in doing so it splits up statements like `var a = 2;` into two separate steps:
 
 1. First, `var a` to declare it in that *Scope*. This is performed at the beginning, before code execution.
 
