@@ -321,7 +321,7 @@ b.myName(); // "b"
 
 这只是一种不幸的混淆。实际上，`.constructor` 引用也 *委托* 到了 `Foo.prototype`，它 **恰好** 有一个指向 `Foo` 的默认属性。
 
-这 *看起来* 方便得可怕，一个被 `Foo` 构建的对象可以访问指向 `Foo` 的 `.constructor` 属性。但这只不过是安全感上的错觉。它是一个欢乐的巧合，几乎是误打误撞，通过默认的 `[[Prototype]]` 委托 `a.constructor` *恰好* 指向 `Foo`。实际上 `.construcor` 意味着“被XX构建”这种注定失败的臆测会以几种方式来咬到你。
+这 *看起来* 方便得可怕，一个被 `Foo` 构建的对象可以访问指向 `Foo` 的 `.constructor` 属性。但这只不过是安全感上的错觉。它是一个欢乐的巧合，几乎是误打误撞，通过默认的 `[[Prototype]]` 委托 `a.constructor` *恰好* 指向 `Foo`。实际上 `.constructor` 意味着“被XX构建”这种注定失败的臆测会以几种方式来咬到你。
 
 第一，在 `Foo.prototype` 上的 `.constructor` 属性仅当 `Foo` 函数被声明时才出现在对象上。如果你创建一个新对象，并用它替换函数默认的 `.prototype` 对象引用，这个新对象上将不会魔法般地得到 `.contructor`。
 
@@ -337,7 +337,7 @@ a1.constructor === Foo; // false!
 a1.constructor === Object; // true!
 ```
 
-`Object(..)` 没有“构建” `a1`，是吧？看起来确实是 `Foo()` “构建了”它。许多开发者认为 `Foo()` 在执行构建，但当你认为“构造器”意味着“被XX构建”时，一切就都崩塌了，因为如果那样的话，`a1.construcor` 应当是 `Foo`，但它不是！
+`Object(..)` 没有“构建” `a1`，是吧？看起来确实是 `Foo()` “构建了”它。许多开发者认为 `Foo()` 在执行构建，但当你认为“构造器”意味着“被XX构建”时，一切就都崩塌了，因为如果那样的话，`a1.constructor` 应当是 `Foo`，但它不是！
 
 发生了什么？`a1` 没有 `.constructor` 属性，所以它沿者 `[[Prototype]]` 链向上委托到了 `Foo.prototype`。但是这个对象也没有 `.constructor`（默认的 `Foo.prototype`  对象就会有！），所以它继续委托，这次轮到了 `Object.prototype`，委托链的最顶端。*那个* 对象上确实拥有 `.constructor`，它指向内建的 `Object(..)` 函数。
 
@@ -352,7 +352,7 @@ function Foo() { /* .. */ }
 
 Foo.prototype = { /* .. */ }; // 创建一个新的 prototype 对象
 
-// 需要正确地“修复”丢失的 `.construcor`
+// 需要正确地“修复”丢失的 `.constructor`
 // 新对象上的属性以 `Foo.prototype` 的形式提供。
 // `defineProperty(..)` 的内容见第三章。
 Object.defineProperty( Foo.prototype, "constructor" , {
@@ -365,7 +365,7 @@ Object.defineProperty( Foo.prototype, "constructor" , {
 
 修复 `.constructor` 要花不少功夫。而且，我们做的一切是为了延续“构造器”意味着“被XX构建”的误解。这是一种昂贵的假象。
 
-事实上，一个对象上的 `.construcor` 默认地随意指向一个函数，而这个函数反过来拥有一个指向被这个对象称为 `.prototype` 的对象。“构造器”和“原型”这两个词仅有松散的默认含义，可能是真的也可能不是真的。最佳方案是提醒你自己，“构造器不是意味着被XX构建”。
+事实上，一个对象上的 `.constructor` 默认地随意指向一个函数，而这个函数反过来拥有一个指向被这个对象称为 `.prototype` 的对象。“构造器”和“原型”这两个词仅有松散的默认含义，可能是真的也可能不是真的。最佳方案是提醒你自己，“构造器不是意味着被XX构建”。
 
 `.constructor` 不是一个魔法般不可变的属性。它是不可枚举的（见上面的代码段），但是它的值是可写的（可以改变），而且，你可以用你感觉合适的任何值在 `[[Prototype]]` 链上的任何对象上添加或覆盖（有意或无意地）名为 `constructor` 的属性。
 
