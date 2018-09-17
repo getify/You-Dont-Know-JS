@@ -385,7 +385,7 @@ Object.defineProperty( Foo.prototype, "constructor" , {
 
 <img src="fig3.png">
 
-回想之前这幅图，它不仅展示了从对象（也就是“实例”）`a1` 到对象 `Foo.prototype` 的委托，而且从 `Bar.prototype` 到 `Foo.prototype`，这酷似类继承的亲自概念。*酷似*，除了方向，箭头表示的是委托链接，而不是拷贝操作。
+回想之前这幅图，它不仅展示了从对象（也就是“实例”）`a1` 到对象 `Foo.prototype` 的委托，而且从 `Bar.prototype` 到 `Foo.prototype`，这酷似类继承的亲子概念。*酷似*，除了方向，箭头表示的是委托链接，而不是拷贝操作。
 
 这里是一段典型的创建这样的链接的“原型风格”代码：
 
