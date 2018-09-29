@@ -854,7 +854,7 @@ bar.a;		// 42 <-- 委托到 `foo`
 
 ### 填补
 
-“填补（Polyfilling）”是一个人为发明的词（由Remy Sharp创造）（https://remysharp.com/2010/10/08/what-is-a-polyfill）。它是指拿来一个新特性的定义并制造一段行为等价的代码，但是这段代码可以运行在老版本的JS环境中。
+“填补（Polyfilling）”是一个人为发明的词（由Remy Sharp创造）（https://remysharp.com/2010/10/08/what-is-a-polyfill ）。它是指拿来一个新特性的定义并制造一段行为等价的代码，但是这段代码可以运行在老版本的JS环境中。
 
 例如，ES6定义了一个称为`Number.isNaN(..)`的工具，来为检查`NaN`值提供一种准确无误的方法，同时废弃原来的`isNaN(..)`工具。这个工具可以很容易填补，因此你可开始在你的代码中使用它，而不管最终用户是否在一个ES6浏览器中。
 
@@ -874,7 +874,7 @@ if (!Number.isNaN) {
 
  并不是所有的新特性都可以完全填补。有时一种特性的大部分行为可以被填补，但是仍然存在一些小的偏差。在实现你自己的填补时你应当非常非常小心，来确保你尽可能严格地遵循语言规范。
 
-或者更好地，使用一组你信任的，经受过检验的填补，比如那些由ES5-Shim（https://github.com/es-shims/es5-shim）和ES6-Shim（https://github.com/es-shims/es6-shim）提供的。
+或者更好地，使用一组你信任的，经受过检验的填补，比如那些由ES5-Shim（https://github.com/es-shims/es5-shim ）和ES6-Shim（https://github.com/es-shims/es6-shim ）提供的。
 
 ### 转译
 
