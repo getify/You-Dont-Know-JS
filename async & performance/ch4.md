@@ -749,7 +749,7 @@ Look at `foo(..)`. If the Ajax request is successful, we call:
 it.next( data );
 ```
 
-That's resuming the generator with the response data, which means that our paused `yield` expression receives that value directly, and then as it restarts the generator code, that value gets assigned to the local variable `text`.
+That's resuming the generator with the response data, which means that our paused `yield` expression receives that value directly, and then as it resumes the generator code, that value gets assigned to the local variable `text`.
 
 Pretty cool, huh?
 
@@ -1579,7 +1579,7 @@ p1
 } );
 ```
 
-`*reqData(..)`'s two instances are both started to make their Ajax requests, then paused with `yield`. Then we choose to resume the first instance when `p1` resolves, and then `p2`'s resolution will restart the second instance. In this way, we use Promise orchestration to ensure that `res[0]` will have the first response and `res[1]` will have the second response.
+`*reqData(..)`'s two instances are both started to make their Ajax requests, then paused with `yield`. Then we choose to resume the first instance when `p1` resolves, and then `p2`'s resolution will resume the second instance. In this way, we use Promise orchestration to ensure that `res[0]` will have the first response and `res[1]` will have the second response.
 
 But frankly, this is awfully manual, and it doesn't really let the generators orchestrate themselves, which is where the true power can lie. Let's try it a different way:
 
