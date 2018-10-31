@@ -77,7 +77,9 @@ A reasonable assumption would be that *Compiler* will produce code that could be
 
 If *Engine* eventually finds a variable, it assigns the value `2` to it. If not, *Engine* will raise its hand and yell out an error!
 
-To summarize: two distinct actions are taken for a variable assignment: First, *Compiler* declares a variable (if not previously declared in the current scope), and second, when executing, *Engine* looks up the variable in *Scope* and assigns to it, if found.
+To summarize: some distinct actions taken for a variable assignment. First, *Engine* looks up the variable in *Scope*, then there are two possibilities:
+    1. Variable **isn't** previously declared in the current scope: *Compiler* declares a variable first and then *Engine* assigns to it.
+    2. Variable **is** declared previously in the current scope: *Scope* hands over the correct reference to *Engine* and *Engine* simply assigns to it.
 
 ### Compiler Speak
 
