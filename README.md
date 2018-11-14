@@ -4,9 +4,9 @@ Aunque este es un repo personal, hace parte del repo de `Staging`, proceso previ
 
 Sin embargo, todas contribuciones habrá un `Contributors` pages en Espanõl. 
 
-¿Cómo hacer un PR?
+# ¿Cómo hacer un PR?
 
-1. Fork este proyecto.
+1. Fork este proyecto y clonar su propio repositorio.
 2. Hacer un branch nuevo `git checkout -b pr/branch-name`
 
 > Tip: Keep your `master` branch pointing at the original repository and make
@@ -23,6 +23,20 @@ Sin embargo, todas contribuciones habrá un `Contributors` pages en Espanõl.
 > branch to use the upstream master branch whenever you run `git pull`. Then you
 > can make all of your pull request branches based on this `master` branch.
 > Whenever you want to update your version of `master`, do a regular `git pull`
+
+
+## PR al momento de haber acabado una traducción
+
+Para este proceso se debe tener en cuenta la seccion que se tradujo con los siguientes parametros:
+
+1. Revisar si el branch ya se encuntre de manera remota para evitar multiples ramas con nombres iguales `git branch -r`. Si el branch existe y falta terminar la traducción o desea corregirlo, hacer el pull correspondiente al branch a editar `git pull origin pr/../..`
+2. Si el branch no existe, al crearlo, el nombre debe seguir la siguiente estructura teniendo en cuenta los títulos que se representan con el signo numeral (#) en el .md. Con base en lo anterior, se espera lo siguiente: `pr/nombre_de_capitulo/#titulo/##subtema/###subtema`.
+3. Realizar el debido push al repositorio de su cuenta. Si ya su traducción se encuentra lista para revisión, hacer el PR para que el revisor quede notificado.
+4. Si ya ha hecho varios commits y piensa subir su versión final, hacer un rebase interactivo en su local a master y dejar un solo commit con el mismo nombre del branch.
+
+## Parametros a tener en cuenta en el momento de la traducción
+
+Esta es una traducción hecha por contribuidores por lo que su interpretacion puede variar de acuerdo al usuario. Es importante tener en cuenta que las anectodas o pensamientos que el autor mencione, traducirlos en primera persona y los demas textos en tercera persona.
 
 # El order de traduccíon será el siguiente
 
