@@ -25,7 +25,12 @@ Sin embargo, todas contribuciones habrá un `Contributors` pages en Espanõl.
 > Whenever you want to update your version of `master`, do a regular `git pull`
 
 
-## PR al momento de haber acabado una traducción
+## PR al momento de iniciar una traducción
+
+`Por favor hacer un PR antes de comenzar una traducción` Esto es un statement a la comunidad de que la persona va a hacer esa traducción y evitar hacer un PR cuando se termina y darce cuenta tarde de que ya alguién trabajó en eso.
+
+La unidad mínima de traducción es en Markdown un bloque de `###` ó `##`, se deben llamar los branches con el siguiente formato: `pr/nombre_de_capitulo/#titulo/##subtema/###subtema`.
+la filosofía de trabajo es: traducir el archivo, y todo trabajo pendiente se deja en inglés, para que sea claro para los colaboradores lo que hace falta por traducir.
 
 Para este proceso se debe tener en cuenta la seccion que se tradujo con los siguientes parametros:
 
