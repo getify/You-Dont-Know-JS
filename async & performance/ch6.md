@@ -129,7 +129,7 @@ Let's think about the results more critically: 10,000,000 operations per second 
 
 Even recent scientific studies showing that maybe the brain can process as quick as 13ms (about 8x faster than previously asserted) would mean that X is still running 125,000 times faster than the human brain can perceive a distinct thing happening. **X is going really, really fast.**
 
-But more importantly, let's talk about the difference between X and Y, the 2,000,000 operations per second difference. If X takes 100ns, and Y takes 80ns, the difference is 20ns, which in the best case is still one 650-thousandth of the interval the human brain can perceive.
+But more importantly, let's talk about the difference between X and Y, the 2,000,000 operations per second difference. If X takes 80ns, and Y takes 100ns, the difference is 20ns, which in the best case is still one 650-thousandth of the interval the human brain can perceive.
 
 What's my point? **None of this performance difference matters, at all!**
 
