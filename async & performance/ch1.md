@@ -859,8 +859,8 @@ c = {
 a = 10;
 b = 30;
 
-a += foo();				// 30
-b += c.bar;				// 11
+a += foo();				// a = 11, console.log(30)
+b += c.bar;				// b = 31, console.log(11)
 
 console.log( a + b );	// 42
 ```
