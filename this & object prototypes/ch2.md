@@ -536,10 +536,7 @@ if (!Function.prototype.bind) {
 			fNOP = function(){},
 			fBound = function(){
 				return fToBind.apply(
-					(
-						this instanceof fNOP &&
-						oThis ? this : oThis
-					),
+					this instanceof fNOP ? this : oThis,
 					aArgs.concat( Array.prototype.slice.call( arguments ) )
 				);
 			}
@@ -558,8 +555,7 @@ if (!Function.prototype.bind) {
 The part that's allowing `new` overriding is:
 
 ```js
-this instanceof fNOP &&
-oThis ? this : oThis
+this instanceof fNOP ? this : oThis
 
 // ... and:
 
