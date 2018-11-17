@@ -362,7 +362,7 @@ The `~` operator here conforms the return value of `indexOf(..)` to a value rang
 
 While I think that's an improvement, others strongly disagree. However, no one can argue that `indexOf(..)`'s searching logic is perfect. It fails to find `NaN` values in the array, for example.
 
-So a proposal has surfaced and gained a lot of support for adding a real boolean-returning array search method, called `includes(..)`:
+So with ES7 has come a real boolean-returning array search method, called `includes(..)`:
 
 ```js
 var vals = [ "foo", "bar", 42, "baz" ];
