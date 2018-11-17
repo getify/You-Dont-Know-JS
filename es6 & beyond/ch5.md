@@ -98,6 +98,8 @@ If the buffer of binary data includes data in non-uniform size/location, this te
 For example, consider a binary buffer that has a 2-byte number (aka "word") at the beginning, followed by two 1-byte numbers, followed by a 32-bit floating point number. Here's how you can access that data with multiple views on the same buffer, offsets, and lengths:
 
 ```js
+var buf = new ArrayBuffer( 20 );
+
 var first = new Uint16Array( buf, 0, 2 )[0],
 	second = new Uint8Array( buf, 2, 1 )[0],
 	third = new Uint8Array( buf, 3, 1 )[0],
