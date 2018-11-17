@@ -593,7 +593,7 @@ p.then(
 		// never gets here :(
 	},
 	function rejected(err){
-		// `err` will be a `TypeError` exception object
+		// `err` will be a `ReferenceError` exception object
 		// from the `foo.bar()` line.
 	}
 );
