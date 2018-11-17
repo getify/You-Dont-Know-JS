@@ -108,7 +108,7 @@ var first = new Uint16Array( buf, 0, 2 )[0],
 
 In addition to the `(buffer,[offset, [length]])` form examined in the previous section, typed array constructors also support these forms:
 
-* [constructor]`(length)`: Creates a new view over a new buffer of `length` bytes
+* [constructor]`(length)`: Creates a new view over a new buffer of `length`  multiplied by TypedArray.BYTES_PER_ELEMENT bytes
 * [constructor]`(typedArr)`: Creates a new view and buffer, and copies the contents from the `typedArr` view
 * [constructor]`(obj)`: Creates a new view and buffer, and iterates over the array-like or object `obj` to copy its contents
 
