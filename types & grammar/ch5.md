@@ -998,7 +998,7 @@ function foo(a,b,a) { }					// just fine
 function bar(a,b,a) { "use strict"; }	// Error!
 ```
 
-Another `strict` mode early error is an object literal having more than one property of the same name:
+In ES5, another `strict` mode early error is an object literal having more than one property of the same name:
 
 ```js
 (function(){
@@ -1010,6 +1010,8 @@ Another `strict` mode early error is an object literal having more than one prop
 	};			// Error!
 })();
 ```
+
+In ES2015 (ES6), this has been removed as computed property names mean there may be duplicate property names which can only be found at runtime.
 
 **Note:** Semantically speaking, such errors aren't technically *syntax* errors but more *grammar* errors -- the above snippets are syntactically valid. But since there is no `GrammarError` type, some browsers use `SyntaxError` instead.
 
