@@ -485,7 +485,7 @@ delete myObject.a;
 myObject.a;				// 2
 ```
 
-As you can see, the last `delete` call failed (silently) because we made the `a` property non-configurable.
+As you can see, the last `delete` operator failed (silently) because we made the `a` property non-configurable.
 
 `delete` is only used to remove object properties (which can be removed) directly from the object in question. If an object property is the last remaining *reference* to some object/function, and you `delete` it, that removes the reference and now that unreferenced object/function can be garbage collected. But, it is **not** proper to think of `delete` as a tool to free up allocated memory as it does in other languages (like C/C++). `delete` is just an object property removal operation -- nothing more.
 
