@@ -96,9 +96,7 @@ Any time you wrap a portion of code into a `function` and specify that it should
 
 ### Async Console
 
-There is no specification or set of requirements around how the `console.*` methods work -- they are not officially part of JavaScript, but are instead added to JS by the *hosting environment* (see the *Types & Grammar* title of this book series).
-
-So, different browsers and JS environments do as they please, which can sometimes lead to confusing behavior.
+The `console.*` methods are not officially part of JavaScript, but are instead added to JS by the *hosting environment* (see the *Types & Grammar* title of this book series). Despite having a standard specification, different browsers and JS environments do as they please, which can sometimes lead to confusing behavior.
 
 In particular, there are some browsers and some conditions that `console.log(..)` does not actually immediately output what it's given. The main reason this may happen is because I/O is a very slow and blocking part of many programs (not just JS). So, it may perform better (from the page/UI perspective) for a browser to handle `console` I/O asynchronously in the background, without you perhaps even knowing that occurred.
 
