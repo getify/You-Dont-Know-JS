@@ -678,7 +678,7 @@ function makeAdder(x) {
 	// inner function `add()` uses `x`, so
 	// it has a "closure" over it
 	function add(y) {
-		return y + x;
+		return x + y;
 	};
 
 	return add;
