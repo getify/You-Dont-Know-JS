@@ -164,7 +164,7 @@ class P {
 
 class C extends P {
 	foo() {
-		super();
+		super.foo();
 	}
 }
 
@@ -210,6 +210,8 @@ E.foo(); // "D.foo"
 ```
 
 **Note:** `toMethod(..)` clones the method, and takes `homeObject` as its first parameter (which is why we pass `E`), and the second parameter (optionally) sets a `name` for the new method (which keep at "foo").
+
+**Update:** `toMethod` was an experimental feature and does not exist in the stable implementation of the language essentially making `super` static. There doesn't seem to be a way of making it dynamic now. 
 
 It remains to be seen if there are other corner case gotchas that devs will run into beyond this scenario. Regardless, you will have to be diligent and stay aware of which places the engine automatically figures out `super` for you, and which places you have to manually take care of it. **Ugh!**
 
