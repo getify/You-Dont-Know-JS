@@ -162,7 +162,7 @@ Deep down in the guts of the *Engine*, the built-in utility `setTimeout(..)` has
 Or, if you're of the jQuery persuasion (or any JS framework, for that matter):
 
 ```js
-function setupBot(name,selector) {
+function setupBot(name, selector) {
 	$( selector ).click( function activator(){
 		console.log( "Activating: " + name );
 	} );
