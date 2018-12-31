@@ -126,16 +126,20 @@ If you want to manually box a primitive value, you can use the `Object(..)` func
 var a = "abc";
 var b = new String( a );
 var c = Object( a );
+var d = Object( false );
 
 typeof a; // "string"
 typeof b; // "object"
 typeof c; // "object"
+typeof d; // "object"
 
 b instanceof String; // true
 c instanceof String; // true
+d instanceof Boolean // true
 
 Object.prototype.toString.call( b ); // "[object String]"
 Object.prototype.toString.call( c ); // "[object String]"
+Object.prototype.toString.call( d ); // "[object Boolean]"
 ```
 
 Again, using the boxed object wrapper directly (like `b` and `c` above) is usually discouraged, but there may be some rare occasions you'll run into where they may be useful.
