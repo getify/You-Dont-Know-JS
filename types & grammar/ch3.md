@@ -127,7 +127,7 @@ var a = "abc";
 var b = new String( a );
 var c = Object( a );
 
-//you can also wrap the value directly
+//you can also pass the primitive value as a parameter to the Object(...) function
 var d = Object( false );
 var e = Object( "Hello World" );
 
