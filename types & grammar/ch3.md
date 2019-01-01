@@ -429,7 +429,7 @@ typeof Function.prototype;			// "function"
 Function.prototype();				// it's an empty function!
 
 RegExp.prototype.toString();		// "/(?:)/" -- empty regex
-"abc".match( RegExp.prototype );	// [""]
+"abc".match( RegExp.prototype.toString() );	// null (when `String#match(...)` does not find a match, it returns null)
 ```
 
 A particularly bad idea, you can even modify these native prototypes (not just adding properties as you're probably familiar with):
