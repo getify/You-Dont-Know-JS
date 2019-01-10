@@ -33,7 +33,7 @@ The characters `a` and `b` are called *variables* (see "Variables"), which are l
 
 By contrast, the `2` is just a value itself, called a *literal value*, because it stands alone without being stored in a variable.
 
-The `=` and `*` characters are *operators* (see "Operators") -- they perform actions with the values and variables such as assignment and mathematic multiplication.
+The `=` and `*` characters are *operators* (see "Operators") -- they perform actions with the values and variables such as assignment and mathematical multiplication.
 
 Most statements in JavaScript conclude with a semicolon (`;`) at the end.
 
