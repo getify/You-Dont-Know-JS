@@ -289,7 +289,7 @@ We won't exhaustively list all such cases here, but just call out a few of the c
 
 #### `{ .. }` Curly Braces
 
-There's two main places (and more coming as JS evolves!) that a pair of `{ .. }` curly braces will show up in your code. Let's take a look at each of them.
+There are two main places (and more coming as JS evolves!) that a pair of `{ .. }` curly braces will show up in your code. Let's take a look at each of them.
 
 ##### Object Literals
 
