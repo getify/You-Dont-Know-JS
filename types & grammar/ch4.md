@@ -452,7 +452,7 @@ I call this *explicit* coercion because in general, it's pretty obvious to most 
 
 In fact, this usage actually looks a lot like it does in some other statically typed languages.
 
-For example, in C/C++, you can say either `(int)x` or `int(x)`, and both will convert the value in `x` to an integer. Both forms are valid, but many prefer the latter, which kinda looks like a function call. In JavaScript, when you say `Number(x)`, it looks awfully similar. Does it matter that it's *actually* a function call in JS? Not really.
+For example, in C++, you can say either `(int)x` or `int(x)`, and both will convert the value in `x` to an integer. Both forms are valid, but many prefer the latter, which kinda looks like a function call. In JavaScript, when you say `Number(x)`, it looks awfully similar. Does it matter that it's *actually* a function call in JS? Not really.
 
 Besides `String(..)` and `Number(..)`, there are other ways to "explicitly" convert these values between `string` and `number`:
 
