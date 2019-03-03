@@ -159,7 +159,7 @@ Let's imagine the above exchange (which processes this code snippet) as a conver
 
 > ***Engine***: Great, thanks! OK, I'm executing `foo`.
 
-> ***Engine***: Hey, *Scope*, I've got an LHS reference for `a`, ever heard of it?
+> ***Engine***: Hey, *Scope*, While executing function `foo` I've got an LHS reference for `a`, ever heard of it?
 
 > ***Scope***: Why yes, I have. *Compiler* declared it as a formal parameter to `foo` just recently. Here you go.
 
