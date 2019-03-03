@@ -236,10 +236,12 @@ To visualize the process of nested *Scope* resolution, I want you to think of th
 
 <img src="fig1.png" width="250">
 
-The building represents our program's nested *Scope* rule set. The first floor of the building represents your currently executing *Scope*, wherever you are. The top level of the building is the global *Scope*.
+The building represents our program's nested *Scope* rule set. The first floor of the building represents your currently executing *Scope*, wherever you are. The top level of the building is the global *Scope*. 
 
-You resolve LHS and RHS references by looking on your current floor, and if you don't find it, taking the elevator to the next floor, looking there, then the next, and so on. Once you get to the top floor (the global *Scope*), you either find what you're looking for, or you don't. But you have to stop regardless.
+You resolve LHS and RHS references by looking on your current floor, and if you don't find it, taking the elevator to the next floor, looking there, then the next, and so on. Note that LHS And RHS references and not checked in the other flats on teh samce level, just upwards. Once you get to the top floor (the global *Scope*), you either find what you're looking for, or you don't. But you have to stop regardless.
 
+ A better analogy is that of a Russian doll. Where several dolls are nested within each other. And you look for the reference  in the current doll. If you dont find it you ask the outer doll and keeping asking each outer doll. If the biggest doll (the outer most doll is the global scope) does not have the refernce you are looking for then you stop. 
+ 
 ## Errors
 
 Why does it matter whether we call it LHS or RHS?
