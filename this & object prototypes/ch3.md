@@ -591,7 +591,7 @@ var myObject = {
 myObject.b; // undefined
 ```
 
-This behavior is different from when you reference *variables* by their identifier names. If you reference a variable that cannot be resolved within the applicable lexical scope look-up, the result is not `undefined` as it is for object properties, but instead a `ReferenceError` is thrown.
+This behavior is different from when you reference *variables* by their identifier names [RHS reference lookup]. If you reference a variable that cannot be resolved within the applicable lexical scope look-up, the result is not `undefined` as it is for object properties, but instead a `ReferenceError` is thrown.
 
 ```js
 var myObject = {
