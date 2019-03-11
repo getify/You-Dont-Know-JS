@@ -511,7 +511,7 @@ This should be surprising if you go back to our "fake" bind helper:
 ```js
 function bind(fn, obj) {
 	return function() {
-		fn.apply( obj, arguments );
+		return fn.apply( obj, arguments );
 	};
 }
 ```
