@@ -440,7 +440,7 @@ Number.isSafeInteger( Math.pow( 2, 53 ) );			// false
 Number.isSafeInteger( Math.pow( 2, 53 ) - 1 );		// true
 ```
 
-To polyfill `Number.isSafeInteger(..)` in pre-ES6 browsers:
+To polyfill `Number.isSafeInteger(..)` in pre-ES6 browsers combine the following with the `Number.isInteger(..)` pre-ES6 polyfill:
 
 ```js
 if (!Number.isSafeInteger) {
