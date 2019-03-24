@@ -193,7 +193,7 @@ var a = {
 	d: [1,2,3]
 };
 
-JSON.stringify( a, ["b","c"] ); // "{"b":42,"c":"42"}"
+JSON.stringify( a, ["b","d"] ); // "{"b":42,"d":[1,2,3]}"
 
 JSON.stringify( a, function(k,v){
 	if (k !== "c") return v;
