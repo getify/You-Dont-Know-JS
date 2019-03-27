@@ -233,9 +233,9 @@ Either way the `this` is changed unexpectedly, you are not really in control of 
 
 ### Explicit Binding
 
-With *implicit binding* as we just saw, we had to mutate the object in question to include a reference on itself to the function, and use this property function reference to indirectly (implicitly) bind `this` to the object.
+With *implicit binding* as we just saw, we had to mutate the object in question to include a property on itself to reference the function, and use this function reference property to indirectly (implicitly) bind `this` to the object.
 
-But, what if you want to force a function call to use a particular object for the `this` binding, without putting a property function reference on the object?
+But, what if you want to force a function call to use a particular object for the `this` binding, without putting a function reference property on the object?
 
 "All" functions in the language have some utilities available to them (via their `[[Prototype]]` -- more on that later) which can be useful for this task. Specifically, functions have `call(..)` and `apply(..)` methods. Technically, JavaScript host environments sometimes provide functions which are special enough (a kind way of putting it!) that they do not have such functionality. But those are few. The vast majority of functions provided, and certainly all functions you will create, do have access to `call(..)` and `apply(..)`.
 
