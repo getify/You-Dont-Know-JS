@@ -1,6 +1,6 @@
 ﻿Attribution-NonCommercial-NoDerivatives 4.0 International
 
-pan
+pan pan
 =======================================================================
 
 Creative Commons Corporation ("Creative Commons") is not a law firm and
