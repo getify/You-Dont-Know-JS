@@ -593,7 +593,7 @@ p.then(
 		// never gets here :(
 	},
 	function rejected(err){
-		// `err` will be a `TypeError` exception object
+		// `err` will be a `ReferenceError` exception object
 		// from the `foo.bar()` line.
 	}
 );
@@ -621,7 +621,7 @@ p.then(
 );
 ```
 
-Wait, that makes it seem like the exception from `foo.bar()` really did get swallowed. Never fear, it didn't. But something deeper is wrong, which is that we've failed to listen for it. The `p.then(..)` call itself returns another promise, and it's *that* promise that will be rejected with the `TypeError` exception.
+Wait, that makes it seem like the exception from `foo.bar()` really did get swallowed. Never fear, it didn't. But something deeper is wrong, which is that we've failed to listen for it. The `p.then(..)` call itself returns another promise, and it's *that* promise that will be rejected with the `ReferenceError` exception.
 
 Why couldn't it just call the error handler we have defined there? Seems like a logical behavior on the surface. But it would violate the fundamental principle that Promises are **immutable** once resolved. `p` was already fulfilled to the value `42`, so it can't later be changed to a rejection just because there's an error in observing `p`'s resolution.
 
