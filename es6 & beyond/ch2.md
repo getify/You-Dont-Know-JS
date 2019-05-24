@@ -1475,7 +1475,7 @@ Computed property names can also appear as the name of a concise method or a con
 
 ```js
 var o = {
-	["f" + "oo"]() { .. }	// computed concise method
+	["f" + "oo"]() { .. },	// computed concise method
 	*["b" + "ar"]() { .. }	// computed concise generator
 };
 ```
