@@ -146,7 +146,7 @@ if (wantA) {
 console.log( myObject[idx] ); // 2
 ```
 
-In objects, property names are **always** strings. If you use any other value besides a `string` (primitive) as the property, it will first be converted to a string. This even includes numbers, which are commonly used as array indexes, so be careful not to confuse the use of numbers between objects and arrays.
+In objects, property names are `strings` expect when using the primitive type `symbol`. If you use any other values besides `string` or `symbol` (primitives) as the property, it will first be converted to a string. This even includes numbers, which are commonly used as array indexes, so be careful not to confuse the use of numbers between objects and arrays.
 
 ```js
 var myObject = { };
