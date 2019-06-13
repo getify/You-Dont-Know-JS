@@ -78,12 +78,12 @@ If `strict mode` is in effect, the global object is not eligible for the *defaul
 function foo() {
 	"use strict";
 
-	console.log( this.a );
+	console.log( this.a ); // TypeError: `this` is `undefined`
 }
 
 var a = 2;
 
-foo(); // TypeError: `this` is `undefined`
+foo();
 ```
 
 A subtle but important detail is: even though the overall `this` binding rules are entirely based on the call-site, the global object is **only** eligible for the *default binding* if the **contents** of `foo()` are **not** running in `strict mode`; the `strict mode` state of the call-site of `foo()` is irrelevant.
