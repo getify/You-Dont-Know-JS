@@ -1,4 +1,4 @@
-# You Don't Know JS: Up & Going
+# You Don't Know JS Yet: Getting Started - 2nd Edition
 
 ## Table of Contents
 

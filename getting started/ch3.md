@@ -1,5 +1,21 @@
-# You Don't Know JS: Up & Going
+# You Don't Know JS Yet: Getting Started - 2nd Edition
 # Chapter 3: Into YDKJS
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 What is this series all about? Put simply, it's about taking seriously the task of learning *all parts of JavaScript*, not just some subset of the language that someone called "the good parts," and not just whatever minimal amount you need to get your job done at work.
 

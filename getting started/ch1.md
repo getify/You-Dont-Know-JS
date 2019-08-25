@@ -1,5 +1,22 @@
-# You Don't Know JS: Up & Going
+# You Don't Know JS Yet: Getting Started - 2nd Edition
 # Chapter 1: Into Programming
+
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 Welcome to the *You Don't Know JS* (*YDKJS*) series.
 
