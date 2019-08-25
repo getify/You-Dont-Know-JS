@@ -1,12 +1,4 @@
-# You Don't Know JS: Async & Performance
-
-<img src="cover.jpg" width="300">
-
------
-
-**[Purchase digital/print copy from O'Reilly](http://shop.oreilly.com/product/0636920033752.do)**
-
------
+# You Don't Know JS Yet: Async & Performance - 2nd Edition
 
 [Table of Contents](toc.md)
 

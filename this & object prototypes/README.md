@@ -1,12 +1,4 @@
-# You Don't Know JS: *this* & Object Prototypes
-
-<img src="cover.jpg" width="300">
-
------
-
-**[Purchase digital/print copy from O'Reilly](http://shop.oreilly.com/product/0636920033738.do)**
-
------
+# You Don't Know JS Yet: *this* & Object Prototypes - 2nd Edition
 
 [Table of Contents](toc.md)
 

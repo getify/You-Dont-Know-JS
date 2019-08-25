@@ -1,12 +1,4 @@
-# You Don't Know JS: Scope & Closures
-
-<img src="cover.jpg" width="300">
-
------
-
-**[Purchase digital/print copy from O'Reilly](http://shop.oreilly.com/product/0636920026327.do)**
-
------
+# You Don't Know JS Yet: Scope & Closures - 2nd Edition
 
 [Table of Contents](toc.md)
 
