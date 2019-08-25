@@ -2,7 +2,7 @@
 
 [Table of Contents](toc.md)
 
-* [Foreword](foreword.md) (by [Jake Archibald](http://jakearchibald.com))
+* [Foreword](foreword.md) (by TBA)
 * [Preface](../preface.md)
 * [Chapter 1: Asynchrony: Now & Later](ch1.md)
 * [Chapter 2: Callbacks](ch2.md)

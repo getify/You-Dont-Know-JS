@@ -2,7 +2,7 @@
 
 [Table of Contents](toc.md)
 
-* [Foreword](foreword.md) (by [Jenn Lukas](http://jennlukas.com))
+* [Foreword](foreword.md) (by TBA)
 * [Preface](../preface.md)
 * [Chapter 1: Into Programming](ch1.md)
 * [Chapter 2: Into JavaScript](ch2.md)

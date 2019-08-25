@@ -2,7 +2,7 @@
 
 [Table of Contents](toc.md)
 
-* [Foreword](foreword.md) (by [Nick Berardi](https://github.com/nberardi))
+* [Foreword](foreword.md) (by TBA)
 * [Preface](../preface.md)
 * [Chapter 1: *this* Or That?](ch1.md)
 * [Chapter 2: *this* All Makes Sense Now!](ch2.md)

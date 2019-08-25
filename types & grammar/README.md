@@ -2,7 +2,7 @@
 
 [Table of Contents](toc.md)
 
-* [Foreword](foreword.md) (by [David Walsh](http://davidwalsh.name))
+* [Foreword](foreword.md) (by TBA)
 * [Preface](../preface.md)
 * [Chapter 1: Types](ch1.md)
 * [Chapter 2: Values](ch2.md)
