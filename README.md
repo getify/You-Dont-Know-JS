@@ -6,7 +6,7 @@ This is a series of books diving deep into the core mechanisms of the JavaScript
 ----
 
 | NOTE: The current edition (2nd) of the book series is a *WORK IN PROGRESS*, and [can be found here](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed).<br><br>The finished previous edition (1st) [can be found here](https://github.com/getify/You-Dont-Know-JS/tree/1st-ed). |
-| --- |
+| :--- |
 
 ----
 ----
