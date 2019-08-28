@@ -1,5 +1,25 @@
-# You Don't Know JS: Types & Grammar
+# You Don't Know JS Yet: Types & Grammar - 2nd Edition
 # Chapter 5: Grammar
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 The last major topic we want to tackle is how JavaScript's language syntax works (aka its grammar). You may think you know how to write JS, but there's an awful lot of nuance to various parts of the language grammar that lead to confusion and misconception, so we want to dive into those parts and clear some things up.
 

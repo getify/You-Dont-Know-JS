@@ -1,5 +1,25 @@
-# You Don't Know JS: Scope & Closures
+# You Don't Know JS Yet: Scope & Closures - 2nd Edition
 # Appendix C: Lexical-this
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 Though this title does not address the `this` mechanism in any detail, there's one ES6 topic which relates `this` to lexical scope in an important way, which we will quickly examine.
 

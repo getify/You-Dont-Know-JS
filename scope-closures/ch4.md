@@ -1,5 +1,25 @@
-# You Don't Know JS: Scope & Closures
+# You Don't Know JS Yet: Scope & Closures - 2nd Edition
 # Chapter 4: Hoisting
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 By now, you should be fairly comfortable with the idea of scope, and how variables are attached to different levels of scope depending on where and how they are declared. Both function scope and block scope behave by the same rules in this regard: any variable declared within a scope is attached to that scope.
 

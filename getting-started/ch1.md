@@ -1,6 +1,9 @@
 # You Don't Know JS Yet: Getting Started - 2nd Edition
 # Chapter 1: Into Programming
 
+| NOTE: |
+| :--- |
+| Work in progress |
 
 .
 

@@ -1,5 +1,25 @@
-# You Don't Know JS: Types & Grammar
+# You Don't Know JS Yet: Types & Grammar - 2nd Edition
 # Chapter 3: Natives
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 Several times in Chapters 1 and 2, we alluded to various built-ins, usually called "natives," like `String` and `Number`. Let's examine those in detail now.
 

@@ -1,5 +1,9 @@
 # You Don't Know JS Yet: Getting Started - 2nd Edition
-# Chapter 3: Into YDKJS
+# Chapter 3: Into YDKJSJ
+
+| NOTE: |
+| :--- |
+| Work in progress |
 
 .
 

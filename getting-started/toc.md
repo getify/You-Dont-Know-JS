@@ -32,4 +32,4 @@
 	* Types & Grammar
 	* Async & Performance
 	* ES6 & Beyond
-* Appendix A: Acknowledgments
+* Appendix A: TODO

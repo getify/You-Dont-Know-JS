@@ -1,5 +1,25 @@
-# You Don't Know JS: *this* & Object Prototypes
+# You Don't Know JS Yet: *this* & Object Prototypes - 2nd Edition
 # Chapter 2: `this` All Makes Sense Now!
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 In Chapter 1, we discarded various misconceptions about `this` and learned instead that `this` is a binding made for each function invocation, based entirely on its **call-site** (how the function is called).
 

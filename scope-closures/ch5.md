@@ -1,5 +1,25 @@
-# You Don't Know JS: Scope & Closures
+# You Don't Know JS Yet: Scope & Closures - 2nd Edition
 # Chapter 5: Scope Closure
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 We arrive at this point with hopefully a very healthy, solid understanding of how scope works.
 

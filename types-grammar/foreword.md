@@ -1,4 +1,6 @@
-# You Don't Know JS: Types & Grammar
+# You Don't Know JS Yet: Types & Grammar - 2nd Edition
 # Foreword
 
-TBA
+| NOTE: |
+| :--- |
+| Work in progress |

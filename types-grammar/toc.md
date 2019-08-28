@@ -1,4 +1,8 @@
-# You Don't Know JS: Types & Grammar
+# You Don't Know JS Yet: Types & Grammar - 2nd Edition
+
+| NOTE: |
+| :--- |
+| Work in progress |
 
 ## Table of Contents
 
@@ -35,5 +39,3 @@
 	* `try..finally`
 	* `switch`
 * Appendix A: Mixed Environment JavaScript
-* Appendix B: Acknowledgments
-

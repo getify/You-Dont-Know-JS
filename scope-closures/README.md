@@ -1,5 +1,9 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
 
+| NOTE: |
+| :--- |
+| Work in progress |
+
 [Table of Contents](toc.md)
 
 * [Foreword](foreword.md) (by TBA)
@@ -12,4 +16,3 @@
 * [Appendix A: Dynamic Scope](apA.md)
 * [Appendix B: Polyfilling Block Scope](apB.md)
 * [Appendix C: Lexical-this](apC.md)
-* [Appendix D: Thank You's!](apD.md)

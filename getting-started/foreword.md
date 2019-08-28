@@ -1,4 +1,6 @@
-# You Don't Know JS Yet: Getting Started
+# You Don't Know JS Yet: Getting Started - 2nd Edition
 # Foreword
 
-TBA
+| NOTE: |
+| :--- |
+| Work in progress |

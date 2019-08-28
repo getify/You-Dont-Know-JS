@@ -1,5 +1,25 @@
-# You Don't Know JS: *this* & Object Prototypes
+# You Don't Know JS Yet: *this* & Object Prototypes - 2nd Edition
 # Chapter 1: `this` Or That?
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 One of the most confused mechanisms in JavaScript is the `this` keyword. It's a special identifier keyword that's automatically defined in the scope of every function, but what exactly it refers to bedevils even seasoned JavaScript developers.
 

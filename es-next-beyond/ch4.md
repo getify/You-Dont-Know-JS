@@ -1,5 +1,25 @@
-# You Don't Know JS: ES6 & Beyond
+# You Don't Know JS Yet: ES.Next & Beyond - 2nd Edition
 # Chapter 4: Async Flow Control
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 It's no secret if you've written any significant amount of JavaScript that asynchronous programming is a required skill. The primary mechanism for managing asynchrony has been the function callback.
 

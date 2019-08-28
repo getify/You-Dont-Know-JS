@@ -1,10 +1,14 @@
 # You Don't Know JS Yet: Getting Started - 2nd Edition
 
+| NOTE: |
+| :--- |
+| Work in progress |
+
 [Table of Contents](toc.md)
 
 * [Foreword](foreword.md) (by TBA)
 * [Preface](../preface.md)
 * [Chapter 1: Into Programming](ch1.md)
 * [Chapter 2: Into JavaScript](ch2.md)
-* [Chapter 3: Into YDKJS](ch3.md)
-* [Appendix A: Thank You's!](apA.md)
+* [Chapter 3: Into YDKJSJ](ch3.md)
+* [Appendix A: TODO](apA.md)

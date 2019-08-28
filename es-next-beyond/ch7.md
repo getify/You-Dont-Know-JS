@@ -1,5 +1,25 @@
-# You Don't Know JS: ES6 & Beyond
+# You Don't Know JS Yet: ES.Next & Beyond - 2nd Edition
 # Chapter 7: Meta Programming
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 Meta programming is programming where the operation targets the behavior of the program itself. In other words, it's programming the programming of your program. Yeah, a mouthful, huh?
 

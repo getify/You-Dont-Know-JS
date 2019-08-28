@@ -1,5 +1,25 @@
-# You Don't Know JS: ES6 & Beyond
+# You Don't Know JS Yet: ES.Next & Beyond - 2nd Edition
 # Chapter 3: Organization
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 It's one thing to write JS code, but it's another to properly organize it. Utilizing common patterns for organization and reuse goes a long way to improving the readability and understandability of your code. Remember: code is at least as much about communicating to other developers as it is about feeding the computer instructions.
 

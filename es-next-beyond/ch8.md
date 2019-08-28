@@ -1,5 +1,25 @@
-# You Don't Know JS: ES6 & Beyond
+# You Don't Know JS Yet: ES.Next & Beyond - 2nd Edition
 # Chapter 8: Beyond ES6
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 At the time of this writing, the final draft of ES6 (*ECMAScript 2015*) is shortly headed toward its final official vote of approval by ECMA. But even as ES6 is being finalized, the TC39 committee is already hard at work on features for ES7/2016 and beyond.
 

@@ -1,5 +1,25 @@
-# You Don't Know JS: ES6 & Beyond
+# You Don't Know JS Yet: ES.Next & Beyond - 2nd Edition
 # Chapter 5: Collections
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 Structured collection and access to data is a critical component of just about any JS program. From the beginning of the language up to this point, the array and the object have been our primary mechanism for creating data structures. Of course, many higher-level data structures have been built on top of these, as user-land libraries.
 

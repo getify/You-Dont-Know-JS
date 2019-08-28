@@ -1,5 +1,25 @@
-# You Don't Know JS: *this* & Object Prototypes
+# You Don't Know JS Yet: *this* & Object Prototypes - 2nd Edition
 # Chapter 5: Prototypes
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 In Chapters 3 and 4, we mentioned the `[[Prototype]]` chain several times, but haven't said what exactly it is. We will now examine prototypes in detail.
 

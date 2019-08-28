@@ -20,12 +20,12 @@ I want to extend a warm and deep thanks to Marc Grabanski and the entire Fronten
 
 ## Titles
 
-* ["Getting Started"](getting-started/README.md)
-* ["Scope & Closures"](scope-closures/README.md)
-* ["this & Object Prototypes"](this-object-prototypes/README.md)
-* ["Types & Grammar"](types-grammar/README.md)
-* ["Async & Performance"](async-performance/README.md)
-* ["ES:Next & Beyond"](es-next-beyond/README.md)
+* [Getting Started](getting-started/README.md)
+* [Scope & Closures](scope-closures/README.md)
+* [this & Object Prototypes](this-object-prototypes/README.md)
+* [Types & Grammar](types-grammar/README.md)
+* [Async & Performance](async-performance/README.md)
+* [ES.Next & Beyond](es-next-beyond/README.md)
 
 ## Publishing
 

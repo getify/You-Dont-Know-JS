@@ -1,4 +1,8 @@
-# You Don't Know JS: ES6 & Beyond
+# You Don't Know JS Yet: ES.Next & Beyond
+
+| NOTE: |
+| :--- |
+| Work in progress |
 
 ## Table of Contents
 
@@ -55,4 +59,4 @@
 	* Object Properties and `...`
 	* `Array#includes(..)`
 	* SIMD
-* Appendix A: Acknowledgments
+* Appendix A: TODO

@@ -1,4 +1,6 @@
-# You Don't Know JS: Async & Performance
+# You Don't Know JS Yet: Async & Performance - 2nd Edition
 # Foreword
 
-TBA
+| NOTE: |
+| :--- |
+| Work in progress |

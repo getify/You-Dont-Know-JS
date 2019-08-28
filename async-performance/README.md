@@ -1,5 +1,9 @@
 # You Don't Know JS Yet: Async & Performance - 2nd Edition
 
+| NOTE: |
+| :--- |
+| Work in progress |
+
 [Table of Contents](toc.md)
 
 * [Foreword](foreword.md) (by TBA)
@@ -12,4 +16,3 @@
 * [Chapter 6: Benchmarking & Tuning](ch6.md)
 * [Appendix A: Library: asynquence](apA.md)
 * [Appendix B: Advanced Async Patterns](apB.md)
-* [Appendix C: Thank You's!](apC.md)

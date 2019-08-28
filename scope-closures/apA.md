@@ -1,5 +1,25 @@
-# You Don't Know JS: Scope & Closures
+# You Don't Know JS Yet: Scope & Closures - 2nd Edition
 # Appendix A: Dynamic Scope
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 In Chapter 2, we talked about "Dynamic Scope" as a contrast to the "Lexical Scope" model, which is how scope works in JavaScript (and in fact, most other languages).
 

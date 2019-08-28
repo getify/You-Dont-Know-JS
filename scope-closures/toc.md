@@ -1,4 +1,8 @@
-# You Don't Know JS: Scope & Closures
+# You Don't Know JS Yet: Scope & Closures - 2nd Edition
+
+| NOTE: |
+| :--- |
+| Work in progress |
 
 ## Table of Contents
 
@@ -30,4 +34,3 @@
 * Appendix A: Dynamic Scope
 * Appendix B: Polyfilling Block Scope
 * Appendix C: Lexical-this
-* Appendix D: Acknowledgments

@@ -1,4 +1,6 @@
-# You Don't Know JS: ES6 & Beyond
+# You Don't Know JS Yet: ES.Next & Beyond - 2nd Edition
 # Foreword
 
-TBA
+| NOTE: |
+| :--- |
+| Work in progress |

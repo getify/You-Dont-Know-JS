@@ -1,5 +1,9 @@
 # You Don't Know JS Yet: Types & Grammar - 2nd Edition
 
+| NOTE: |
+| :--- |
+| Work in progress |
+
 [Table of Contents](toc.md)
 
 * [Foreword](foreword.md) (by TBA)
@@ -10,4 +14,3 @@
 * [Chapter 4: Coercion](ch4.md)
 * [Chapter 5: Grammar](ch5.md)
 * [Appendix A: Mixed Environment JavaScript](apA.md)
-* [Appendix B: Thank You's!](apB.md)

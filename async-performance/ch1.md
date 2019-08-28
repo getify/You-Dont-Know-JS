@@ -1,5 +1,25 @@
-# You Don't Know JS: Async & Performance
+# You Don't Know JS Yet: Async & Performance - 2nd Edition
 # Chapter 1: Asynchrony: Now & Later
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 One of the most important and yet often misunderstood parts of programming in a language like JavaScript is how to express and manipulate program behavior spread out over a period of time.
 

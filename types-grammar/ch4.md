@@ -1,5 +1,25 @@
-# You Don't Know JS: Types & Grammar
+# You Don't Know JS Yet: Types & Grammar - 2nd Edition
 # Chapter 4: Coercion
+
+| NOTE: |
+| :--- |
+| Work in progress |
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
 
 Now that we much more fully understand JavaScript's types and values, we turn our attention to a very controversial topic: coercion.
 

@@ -1,4 +1,8 @@
-# You Don't Know JS: Async & Performance
+# You Don't Know JS Yet: Async & Performance - 2nd Edition
+
+| NOTE: |
+| :--- |
+| Work in progress |
 
 ## Table of Contents
 
@@ -47,5 +51,3 @@
 	* Tail Call Optimization (TCO)
 * Appendix A: *asynquence* Library
 * Appendix B: Advanced Async Patterns
-* Appendix C: Acknowledgments
-

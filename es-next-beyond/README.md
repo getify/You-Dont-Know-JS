@@ -1,4 +1,8 @@
-# You Don't Know JS Yet: ES:Next & Beyond - 2nd Edition
+# You Don't Know JS Yet: ES.Next & Beyond - 2nd Edition
+
+| NOTE: |
+| :--- |
+| Work in progress |
 
 [Table of Contents](toc.md)
 
@@ -12,4 +16,4 @@
 * [Chapter 6: API Additions](ch6.md)
 * [Chapter 7: Meta Programming](ch7.md)
 * [Chapter 8: Beyond ES6](ch8.md)
-* [Appendix A: Thank You's!](apA.md)
+* [Appendix A: TODO](apA.md)

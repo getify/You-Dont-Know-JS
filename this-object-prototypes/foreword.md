@@ -1,4 +1,6 @@
-# You Don't Know JS Yet: *this* & Object Prototypes
+# You Don't Know JS Yet: *this* & Object Prototypes - 2nd Edition
 # Foreword
 
-TBA
+| NOTE: |
+| :--- |
+| Work in progress |

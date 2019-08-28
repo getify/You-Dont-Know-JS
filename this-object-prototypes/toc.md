@@ -1,4 +1,8 @@
-# You Don't Know JS: *this* & Object Prototypes
+# You Don't Know JS Yet: *this* & Object Prototypes - 2nd Edition
+
+| NOTE: |
+| :--- |
+| Work in progress |
 
 ## Table of Contents
 
@@ -36,5 +40,3 @@
 	* Nicer Syntax
 	* Introspection
 * Appendix A: ES6 `class`
-* Appendix B: Acknowledgments
-
