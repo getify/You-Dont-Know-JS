@@ -20,6 +20,8 @@ I want to extend a warm and deep thanks to Marc Grabanski and the entire Fronten
 
 ## Titles
 
+I recommend reading the books in this order:
+
 * [Getting Started](getting-started/README.md)
 * [Scope & Closures](scope-closures/README.md)
 * [this & Object Prototypes](this-object-prototypes/README.md)
