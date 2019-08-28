@@ -13,7 +13,7 @@ This is a series of books diving deep into the core mechanisms of the JavaScript
 
 ## Premier Sponsor
 
-This edition of the **YDKJS** book series is exclusively sponsored by [Frontend Masters](https://frontendmasters.com).
+This edition of the **YDKJS(Y)** book series is exclusively sponsored by [Frontend Masters](https://frontendmasters.com).
 
 Frontend Masters is the gold standard for top-of-the-line expert training material in frontend-oriented software development. With over 150 courses on all things frontend, this should be your first and only stop for quality video training on HTML, CSS, JS, and related technologies.
 

@@ -1,9 +1,15 @@
 ---
 name: Foreign Translation Request
 about: Want to request a translation into a foreign language?
-labels: 
+labels:
 
 ---
+
+Foreign translations are appreciated. However, any such requests should wait until the 2nd edition is complete.
+
+**I will not be accepting any new foreign translations for previous editions.**
+
+----
 
 Please check these issues first:
 
