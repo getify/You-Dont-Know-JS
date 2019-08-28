@@ -27,12 +27,14 @@ I want to extend a warm and deep thanks to Marc Grabanski and the entire Fronten
 
 ## Titles
 
-* ["Getting Started"](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/getting\%20started/README.md)
-* ["Scope & Closures"](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/scope\%20&\%20closures/README.md)
-* ["this & Object Prototypes"](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/this\%20&\%20object\%20prototypes/README.md)
-* ["Types & Grammar"](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/types\%20&\%20grammar/README.md)
-* ["Async & Performance"](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/async\%20&\%20performance/README.md)
-* ["ES:Next & Beyond"](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/esnext\%20&\%20beyond/README.md)
+I recommend reading the books in this order:
+
+* [Getting Started](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/getting-started/README.md)
+* [Scope & Closures](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/scope-closures/README.md)
+* [this & Object Prototypes](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/this-object-prototypes/README.md)
+* [Types & Grammar](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/types-grammar/README.md)
+* [Async & Performance](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/async-performance/README.md)
+* [ES.Next & Beyond](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/es-next-beyond/README.md)
 
 ## Publishing
 
