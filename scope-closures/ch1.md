@@ -115,7 +115,7 @@ In other words, an LHS look-up is done when a variable appears on the left-hand 
 
 Actually, let's be a little more precise. An RHS look-up is indistinguishable, for our purposes, from simply a look-up of the value of some variable, whereas the LHS look-up is trying to find the variable container itself, so that it can assign. In this way, RHS doesn't *really* mean "right-hand side of an assignment" per se, it just, more accurately, means "not left-hand side".
 
-Being slightly glib for a moment, you could also think "RHS" instead means "retrieve his/her source (value)", implying that RHS means "go get the value of...".
+Being slightly glib for a moment, you could also think "LHS" instead means "retrieve his/her source (value)", implying that RHS means "go get the value of...".
 
 Let's dig into that deeper.
 
