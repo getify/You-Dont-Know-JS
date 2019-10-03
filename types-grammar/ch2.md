@@ -206,9 +206,10 @@ Unfortunately, this "borrowing" doesn't work with `array` mutators, because `str
 
 ```js
 Array.prototype.reverse.call( a );
-// still returns a String object wrapper (see Chapter 3)
-// for "foo" :(
+// Throws an error -> Uncaught TypeError: Cannot assign to read only property '0' of object '[object String]'
 ```
+
+In the above code snippet, `a` is first boxed in it's Object wrapper and the resulting object is an array-like object. This object has numbered properties from 0 to n-1 where n is the length of the string. All these properties are non-writable and hence, the snippet above throws an error (because `reverse` method executes in `strict mode`).
 
 Another workaround (aka hack) is to convert the `string` into an `array`, perform the desired operation, then convert it back to a `string`.
 
