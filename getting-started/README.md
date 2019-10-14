@@ -8,7 +8,5 @@
 
 * [Foreword](foreword.md) (by TBA)
 * [Preface](../preface.md)
-* [Chapter 1: Into Programming](ch1.md)
-* [Chapter 2: Into JavaScript](ch2.md)
-* [Chapter 3: Into YDKJSJ](ch3.md)
-* [Appendix A: TODO](apA.md)
+* [Chapter 1: Getting To Know JavaScript](ch1.md)
+* TODO

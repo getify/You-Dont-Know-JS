@@ -4,7 +4,7 @@
 
 * Foreword
 * Preface
-* Chapter 1: Into Programming
+* Chapter 1: Getting To Know JavaScript
 	* Code
 	* Try It Yourself
 	* Operators
@@ -16,20 +16,4 @@
 	* Loops
 	* Functions
 	* Practice
-* Chapter 2: Into JavaScript
-	* Values & Types
-	* Variables
-	* Conditionals
-	* Strict Mode
-	* Functions As Values
-	* `this` Keyword
-	* Prototypes
-	* Old & New
-	* Non-JavaScript
-* Chapter 3: Into YDKJS
-	* Scope & Closures
-	* this & Object Prototypes
-	* Types & Grammar
-	* Async & Performance
-	* ES6 & Beyond
-* Appendix A: TODO
+* TODO
