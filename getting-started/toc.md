@@ -4,16 +4,12 @@
 
 * Foreword
 * Preface
-* Chapter 1: Getting To Know JavaScript
-	* Code
-	* Try It Yourself
-	* Operators
-	* Values & Types
-	* Code Comments
-	* Variables
-	* Blocks
-	* Conditionals
-	* Loops
-	* Functions
-	* Practice
-* TODO
+* Chapter 1: What Is JavaScript?
+	* Name
+	* Many Faces
+	* Specification
+	* Backwards & Forwards
+	* Interpretation vs Compilation
+	* Defined
+* Chapter 2: Getting To Know JS
+	* TODO

@@ -1,5 +1,5 @@
 # You Don't Know JS Yet: Getting Started - 2nd Edition
-# Chapter 1: Getting To Know JavaScript
+# Chapter 1: What Is JavaScript?
 
 | NOTE: |
 | :--- |
@@ -9,7 +9,7 @@ You don't know JS, yet. Neither do I, not fully anyway. None of us do. That's th
 
 But here's where you start that *journey* of getting to know the language a little better. I emphasize the word journey because *knowing JS* is not a destination, it's a direction. No matter how much time you spend with the language, you will always be able to find something else to learn and understand a little better.
 
-In this chapter we'll take care of some background and housekeeping details, and then in the next chapter we'll move into talking about the code parts of the language.
+In this chapter we'll cover some background housekeeping details, and clear up some myths and misconceptions about what the language really is (and isn't!).
 
 ## Name
 
@@ -43,13 +43,31 @@ Whether you call it JavaScript, JS, ECMAScript, or ES2019, it's most definitely 
 
 > "Java is to JavaScript as ham is to hamster." --Jeremey Keith, 2009
 
+## Many Faces
+
+The term "paradigm" in programming language context refers to a broad (almost universal) mindset and approach to structuring code. Within a paradigm, there are myriad variations of style and form that distinguish programs, including countless different libraries and frameworks which leave their unique signature on any given code.
+
+But no matter what a program's individual style may be, the big picture divisions around paradigms are almost always evident at first glance of any program.
+
+Examples of typical paradigm-level code distinctions: procedural, object-oriented (OO/classes), and functional (FP).
+
+Broadly speaking, procedural code is focused on top-down, linear progression through a pre-determined set of operations, collected together in units called procedures. OO code typically orients logic and data into units called classes. FP code stresses functions (pure computations as opposed to procedures) and the adaptations of functions as values.
+
+Paradigms are neither right nor wrong. They're orientations that guide and mold how programmers approach problems and solutions, how they structure and maintain their code.
+
+Some languages are heavily slanted toward one paradigm -- C is procedural, Java/C++ are almost entirely class oriented, and Haskell is FP through and through.
+
+But many languages also support code patterns that can come from, and even mix-n-match from, different paradigms. So called "multi-paradigm languages" offer ultimate flexibility. In some cases, a single program can even have two or more expressions of these paradigms sitting side-by-side.
+
+JavaScript is most definitely a multi-paradigm language. You can write procedural, class-oriented, or FP-style code, and you can make those decisions on a line-by-line basis instead of being forced into an all-or-nothing choice.
+
 ## Specification
 
-I mentioned a moment ago that TC39 -- the technical steering committee that manages JS -- votes on changes to submit to ECMA, the standards body.
+I mentioned earlier that TC39 -- the technical steering committee that manages JS -- votes on changes to submit to ECMA, the standards body.
 
-The set of syntax and behavior that *is* JavaScript is this ES specification.
+The set of syntax and behavior that *is* JavaScript is defined in the ES specification.
 
-ES2019 happens to be the 10th numbered specification/revision since JavaScript's inception, so in the specification's official URL as hosted by ECMA, you'll find "10.0":
+ES2019 happens to be the 10th major numbered specification/revision since JavaScript's inception in 1995, so in the specification's official URL as hosted by ECMA, you'll find "10.0":
 
 https://www.ecma-international.org/ecma-262/10.0/
 
@@ -75,7 +93,7 @@ All major browsers and device makers have committed to keeping their JS implemen
 
 That means you can learn **one JS**, and rely on that same JS everywhere.
 
-## Backwards and Forwards
+## Backwards & Forwards
 
 One of the most foundational principles that guides JavaScript is preservation of *backwards compatibility*. Many are confused by the implications of this term, and often confuse it with a related by different term: *forwards compatibility*.
 
@@ -187,15 +205,13 @@ Always write code using the most appropriate features to communicate its ideas a
 
 Transpilation and polyfilling are two highly effective techniques for addressing that gap between code that uses the latest stable features in the language and the old environments a site or application needs to still support. Since JS isn't going to stop improving, the gap will never go away. Both techniques should be embraced as a standard part of every JS project's production chain going forward.
 
-## Interpretation or Compilation
+## Interpretation vs Compilation
 
-A long-debated question for code written in JS: is it an interpreted script or a compiled program?
-
-The majority opinion seems to be that JS is an interpreted (scripting) language. But the truth is more complicated than that.
+A long-debated question for code written in JS: is it an interpreted script or a compiled program? The majority opinion seems to be that JS is an interpreted (scripting) language. But the truth is more complicated than that.
 
 Let's consider the question in more detail.
 
-First, why do people even debate or care about this? Why does it matter?
+To start, why do people even debate or care about this? Why does it matter?
 
 For much of the history of programming languages, "interpreted" languages and "scripting" languages have been looked down as inferior compared to their compiled counterparts. The reasons for this acrimony are numerous, including a perception of lack of performance optimization, as well as dislike of certain language characteristics, such as scripting languages generally using dynamic typing instead of the "more mature" statically typed languages.
 
@@ -215,28 +231,30 @@ In other words, parsed languages usually also have code generation before execut
 
 JS source code is parsed before it is executed. The specification requires as much, because it calls for "early errors" -- statically determined errors in code, such as a duplicate parameter name -- to be reported before the code starts executing. Those errors cannot be recognized without the code having been parsed.
 
-So JS is a parsed language, but is it compiled? In general, the answer is closer to yes than no. The parsed JS is converted to an optimized (binary) form, and that "code" is subsequently executed; the engine does not commonly switch back into line-by-line execution mode after it has finished all the hard work of parsing.
+So JS is a parsed language, but is it compiled?
 
-To be specific, this "compilation" produces a binary byte code (of sorts), which is then handed to a "JS virtual machine" to execute. Some like to say this VM is "interpreting" the byte code... but then that means Java, which also runs via a VM, is also intrepreted rather than compiled. That contradicts the typical impression that Java is a compiled language.
+The answer is closer to yes than no. The parsed JS is converted to an optimized (binary) form, and that "code" is subsequently executed; the engine does not commonly switch back into line-by-line execution mode after it has finished all the hard work of parsing -- most languages/engines wouldn't, because that would be highly inefficient.
 
-Another wrinkle is that JS engines employ multiple layers of JIT (Just-In-Time) processing, which again could reasonably be labeled either "compilation" or "interpretation". It's actually a fantastically complex situation under the hood of a JS engine.
+To be specific, this "compilation" produces a binary byte code (of sorts), which is then handed to the "JS virtual machine" to execute. Some like to say this VM is "interpreting" the byte code. But then that means Java -- and a dozen other JVM-driven languages, for that matter -- is intrepreted rather than compiled. That contradicts the typical assertion that Java/etc are compiled languages. While Java and JavaScript are very different languages, the question of interpreted/compiled is pretty closely related between them.
 
-So what do all these nitty gritty details boil down to?
+Another wrinkle is that JS engines can employ multiple passes of JIT (Just-In-Time) processing/optimization on the program's code, which again could reasonably be labeled either "compilation" or "interpretation" depending on perspective. It's actually a fantastically complex situation under the hood of a JS engine.
 
-Consider the entire context of how a JS source program is handled: the moment it leaves a developer's editor, it gets transpiled by Babel, then packed by Webpack, then undergoes half a dozen build processes, then it gets delivered in that very different form to a JS engine, and then that engine parses the code to an AST, then the engine converts that AST to a kind-of byte code, then that byte code is converted even further by the optimizing JIT compiler, and finally the JS VM executes the code.
+So what do these nitty gritty details boil down to?
+
+Step back and consider the entire flow of a JS source program: after it leaves a developer's editor, it gets transpiled by Babel, then packed by Webpack (and probably undergoes half a dozen build processes), then it gets delivered in that very different form to a JS engine, then that engine parses the code to an AST, then the engine converts that AST to a kind-of byte code, then that byte code is converted even further by the optimizing JIT compiler, and finally the JS VM executes the code.
 
 Is that more like an interpreted, line-by-line script (such as Bash), or is that more like a compiled language that's processed in one-to-several passes first, before execution?
 
-I think it's clear that in spirit, if not in actuality, JS is a compiled language.
+I think it's clear that in spirit, if not in practice, JS is a compiled language.
 
-And again, the reason that matters is, since JS is compiled, it means we are informed of static errors (such as malformed syntax) before our code is executed. That is a substantively different interaction model than typical "scripting" programs.
+And again, the reason that matters is, since JS is compiled, we are informed of static errors (such as malformed syntax) before our code is executed. That is a substantively different interaction model than we get with traditional "scripting" programs, and arguably more helpful!
 
+## Defined
 
+JS is an implementation of the ECMAScript standard (version ES2019 as of this writing), which is guided by the TC39 committee and hosted by ECMA. It runs in browsers and other JS environments such as Node.js.
 
+JS is a multi-paradigm language, meaning the syntax and capabilities allow a developer to mix-and-match (and bend and reshape!) concepts from various major paradigms, such as procedural, object-oriented (OO/classes), and functional (FP).
 
+JS is a compiled language, meaning the tools (including the JS engine) process and verify a program (reporting any errors!) before it executes.
 
-
-
-
-
-
+With our language now *defined*, let's start getting to know its ins and outs.

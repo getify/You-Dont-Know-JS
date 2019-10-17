@@ -8,5 +8,6 @@
 
 * [Foreword](foreword.md) (by TBA)
 * [Preface](../preface.md)
-* [Chapter 1: Getting To Know JavaScript](ch1.md)
+* [Chapter 1: What Is JavaScript?](ch1.md)
+* [Chapter 2: Getting To Know JS](ch2.md)
 * TODO
