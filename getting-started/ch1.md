@@ -187,5 +187,56 @@ Always write code using the most appropriate features to communicate its ideas a
 
 Transpilation and polyfilling are two highly effective techniques for addressing that gap between code that uses the latest stable features in the language and the old environments a site or application needs to still support. Since JS isn't going to stop improving, the gap will never go away. Both techniques should be embraced as a standard part of every JS project's production chain going forward.
 
+## Interpretation or Compilation
+
+A long-debated question for code written in JS: is it an interpreted script or a compiled program?
+
+The majority opinion seems to be that JS is an interpreted (scripting) language. But the truth is more complicated than that.
+
+Let's consider the question in more detail.
+
+First, why do people even debate or care about this? Why does it matter?
+
+For much of the history of programming languages, "interpreted" languages and "scripting" languages have been looked down as inferior compared to their compiled counterparts. The reasons for this acrimony are numerous, including a perception of lack of performance optimization, as well as dislike of certain language characteristics, such as scripting languages generally using dynamic typing instead of the "more mature" statically typed languages.
+
+Languages typically considered in the "compiled" category usually produce a portable (binary) representation of the program that is distributed for execute later. Since we don't really see that same model with JS -- we distribute the source code, not the binary form -- many claim that disqualifies JS from the category. In reality, the distribution model for a program's "executable" form has become drastically more varied and equally less relevant over the last few decades; to the question at hand, it doesn't really matter so much anymore what form of a program gets passed around.
+
+These misinformed claims and criticisms should be set aside. The real reason it matters to have a clear picture on whether JS is interpreted or compiled relates to the nature of how errors are handled.
+
+Historically, scripted or interpreted languages were executed in generally a top-down and line-by-line fashion; there's typically not an initial pass through the program to process it before execution begins. In those languages, an error on line 5 is not discovered until lines 1 through 4 have already executed. Notably, that error on line 5 might be due to a runtime condition, such as some variable or value having an unsuitable value for an operation, or it may be due to a malformed statement/command on that line. Depending on context, deferring error handling to the line the error occurs on may be a desirable or undesirable effect.
+
+Compare that to languages which do go through a processing step (typically, called parsing) before any execution occurs. In that scenario, an invalid command (such as broken syntax) on line 5 would be caught during this parsing, before any execution has begun, and none of the program would run. For catching syntax (or otherwise "static") errors, generally it's preferred to know about them ahead of any doomed partial execution.
+
+So what do "parsed" languages have in common with "compiled" languages? First, all compiled languages are parsed. So a parsed language is quite a ways down the road toward being compiled already. In classic compilation theory, the last remaining step after parsing is code generation: producing an executable form.
+
+Once any source program has been fully parsed, it's very common that its subsequent execution will, in some form or fashion, include a translation from the parsed form of the program -- usually called an Abstract Syntax Tree (AST) -- to that executable form.
+
+In other words, parsed languages usually also have code generation before execution, so it's not that much of a stretch to say that, in spirit, it's a compiled language.
+
+JS source code is parsed before it is executed. The specification requires as much, because it calls for "early errors" -- statically determined errors in code, such as a duplicate parameter name -- to be reported before the code starts executing. Those errors cannot be recognized without the code having been parsed.
+
+So JS is a parsed language, but is it compiled? In general, the answer is closer to yes than no. The parsed JS is converted to an optimized (binary) form, and that "code" is subsequently executed; the engine does not commonly switch back into line-by-line execution mode after it has finished all the hard work of parsing.
+
+To be specific, this "compilation" produces a binary byte code (of sorts), which is then handed to a "JS virtual machine" to execute. Some like to say this VM is "interpreting" the byte code... but then that means Java, which also runs via a VM, is also intrepreted rather than compiled. That contradicts the typical impression that Java is a compiled language.
+
+Another wrinkle is that JS engines employ multiple layers of JIT (Just-In-Time) processing, which again could reasonably be labeled either "compilation" or "interpretation". It's actually a fantastically complex situation under the hood of a JS engine.
+
+So what do all these nitty gritty details boil down to?
+
+Consider the entire context of how a JS source program is handled: the moment it leaves a developer's editor, it gets transpiled by Babel, then packed by Webpack, then undergoes half a dozen build processes, then it gets delivered in that very different form to a JS engine, and then that engine parses the code to an AST, then the engine converts that AST to a kind-of byte code, then that byte code is converted even further by the optimizing JIT compiler, and finally the JS VM executes the code.
+
+Is that more like an interpreted, line-by-line script (such as Bash), or is that more like a compiled language that's processed in one-to-several passes first, before execution?
+
+I think it's clear that in spirit, if not in actuality, JS is a compiled language.
+
+And again, the reason that matters is, since JS is compiled, it means we are informed of static errors (such as malformed syntax) before our code is executed. That is a substantively different interaction model than typical "scripting" programs.
+
+
+
+
+
+
+
+
 
 
