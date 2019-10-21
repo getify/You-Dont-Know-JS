@@ -12,4 +12,8 @@
 	* What's In an Interpretation?
 	* Defined
 * Chapter 2: Getting To Know JS
+	* Files As Programs
+	* Values
+	* Variables
+	* Functions
 	* TODO
