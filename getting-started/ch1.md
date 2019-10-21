@@ -1,5 +1,5 @@
 # You Don't Know JS Yet: Getting Started - 2nd Edition
-# Chapter 1: What Is JavaScript?
+# Chapter 1: What *Is* JavaScript?
 
 | NOTE: |
 | :--- |
@@ -9,7 +9,9 @@ You don't know JS, yet. Neither do I, not fully anyway. None of us do. That's th
 
 But here's where you start that *journey* of getting to know the language a little better. I emphasize the word journey because *knowing JS* is not a destination, it's a direction. No matter how much time you spend with the language, you will always be able to find something else to learn and understand a little better.
 
-In this chapter we'll cover some background housekeeping details, and clear up some myths and misconceptions about what the language really is (and isn't!).
+In this chapter we'll cover some background housekeeping details, and clear up some myths and misconceptions about what the language really is (and isn't!). This is valuable insight into the identity and process of how JS is organized and maintained; all JS developers should understand it.
+
+But if you already feel pretty solid on JS behind-the-scenes, you may want to skip to Chapter 2 to start surveying the syntax of JS in more detail.
 
 ## Name
 
@@ -93,11 +95,76 @@ All major browsers and device makers have committed to keeping their JS implemen
 
 That means you can learn **one JS**, and rely on that same JS everywhere.
 
+### The Web Rules Everything About (JS)
+
+While the array of environments that run JS is constantly expanding -- from browsers, to servers (Node.js), to robots, to lightbulbs, to... -- the one environment that rules JS is the web. In other words, how JS is implemented for web browsers is, in all practicality, the only reality that matters.
+
+For the most part, the JS defined in the specification and the JS that runs in browser-based JS engines is the same. But there are some differences that must be considered.
+
+Sometimes the JS specification will dictate some new or refined behavior, and yet that won't exactly match with how it works in browser-based JS engines. Such a mismatch is historical: JS engines have had 20+ years of observable behaviors around corner cases of features that have come to be relied on by web content. As such, sometimes the JS engines will refuse to conform to a specification-dictated change because it would break that web content.
+
+In these cases, often TC39 will backtrack and simply choose to conform the specification to the reality of the web. For example, TC39 planned to add a `contains(..)` method for Arrays, but it was found that this name conflicted with old JS frameworks still in use on some sites, so they changed the name to a non-conflicting `includes(..)`. The same happened with a comedic/tragic JS *community crisis* dubbed "smooshgate", where the planned `flatten(..)` method was eventually renamed `flat(..)`.
+
+But occassionally, TC39 will decide the specification should stick firm on some point even though it is unlikely that browser-based JS engines will ever conform.
+
+The solution? Appendix B, "Additional ECMAScript Features for Web Browsers. As of the time of writing, here's the ES2019 Appendix B: https://www.ecma-international.org/ecma-262/10.0/#sec-additional-ecmascript-features-for-web-browsers The JS specification includes this appendix to detail out any known mismatches between the official JS specification and the reality of JS on the web. In other words, these are exceptions that are allowed *only* for web JS; other JS environments must stick to the letter of the law.
+
+Section B.1 and B.2 cover *additions* to JS (syntax and APIs) that web JS includes, again for historical reasons, but which TC39 does not plan to formally specify in the core of JS. Examples include `0`-prefixed octal literals, the global `escape(..)` / `unescape(..)` utilities, String "helpers" like `anchor(..)` and `blink()`, and the RegExp `compile(..)` method. Usage of these *additions* in a non-web JS engine will generally break completely, so use them with great caution.
+
+Section B.3 includes somes conflicts where code may run in both web and non-web JS engines, but where the behavior *could* be observably different, resulting in different outcomes. A notable example of that sort of conflict is for block-scoped function declarations (B.3.3).
+
+Consider what the outcome of this program should be:
+
+```js
+var x = true;
+
+if (x) {
+	function gotcha() {
+		console.log("One!");
+	}
+}
+else {
+	function gotcha() {
+		console.log("Two!");
+	}
+}
+
+gotcha();				// ??
+```
+
+While this may seem straightforward logically (print "One!"), the reality is much uglier. There are **many** different variations of this scenario, and each variation has slightly different semantics.
+
+The best advice for navigating these kinds of Appendix B *gotchas* is to avoid using the constructs at all. Never declare functions in block scopes (like `if` statments), only in function scopes.
+
+### Not All (Web) JS...
+
+Is this code a JS program?
+
+```js
+alert("Hello, JS!");
+```
+
+Depends on how you look at things. The `alert(..)` function shown here is not included in the JS specification. It's in all web JS environments, though. Yet, you won't find it in Appendix B. So what gives?
+
+Various JS environments (like browser JS engines, Node.js, etc) add APIs into the global scope of your JS programs that give you environment-specific capabilities, like being able to pop an alert-style box in the user's browser.
+
+In fact, a wide range of JS-looking APIs, like `fetch(..)`, `getCurrentLocation(..)`, and `getUserMedia(..)`, are all web APIs that look like JS. In Node.js, we can access hundreds of API methods from the built-in modules, like `fs.write(..)`.
+
+Another common example is `console.log(..)` (and all the other `console.*` methods!). These are not specified in JS, but because of their universal utility are defined by pretty much every JS environment, according to a roughly-agreed consensus.
+
+So `alert(..)` and `console.log(..)` are not defined by JS. But they *look* like JS. They are functions and object methods and they obey JS syntax rules. The behaviors behind them are controlled by the environment running the JS engine, but on the surface they definitely have to abide by JS to be able to play in the JS playground.
+
+Most of the cross-browser differences people complain about with "JS is so inconsistent!" claims are actually due to differences in how those environment behaviors work, not in how the JS itself works.
+
+So that `alert(..)` call *is* JS, but it's really just a guest; it's not part of the official JS.
+
 ## Backwards & Forwards
 
 One of the most foundational principles that guides JavaScript is preservation of *backwards compatibility*. Many are confused by the implications of this term, and often confuse it with a related by different term: *forwards compatibility*.
 
-Let's set the record straight. Backwards compatibility means that once something is accepted as valid JS, there will not be a future change to the language that causes that code to become invalid JS. Code written in 1995 -- however primitive or limited it may have been! -- should still work today. As TC39 members often proclaim, "we don't break the web!"
+Let's set the record straight.
+
+Backwards compatibility means that once something is accepted as valid JS, there will not be a future change to the language that causes that code to become invalid JS. Code written in 1995 -- however primitive or limited it may have been! -- should still work today. As TC39 members often proclaim, "we don't break the web!"
 
 The idea is that JS developers can write code with confidence that their code won't stop working unpredictably because a browser update is released. This makes the decision to choose JS for a program a more wise and safe investment, for years into the future.
 
