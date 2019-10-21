@@ -9,7 +9,7 @@
 	* Many Faces
 	* Specification
 	* Backwards & Forwards
-	* Interpretation vs Compilation
+	* What's In an Interpretation?
 	* Defined
 * Chapter 2: Getting To Know JS
 	* TODO
