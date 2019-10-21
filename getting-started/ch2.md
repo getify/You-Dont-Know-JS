@@ -72,7 +72,7 @@ Other than strings, JS programs often contain other primitive literal values suc
 
 ```js
 while (false) {
-	console.log(3.141592);
+    console.log(3.141592);
 }
 ```
 
@@ -107,7 +107,7 @@ Many developers prefer to treat them both consistently in this fashion, which is
 
 ```js
 while (value != undefined) {
-	console.log("Still got something!");
+    console.log("Still got something!");
 }
 ```
 
@@ -148,9 +148,9 @@ Consider:
 var adult = true;
 
 if (adult) {
-	var name = "Kyle";
-	let age = 39;
-	console.log("Shhh, this is a secret!");
+    var name = "Kyle";
+    let age = 39;
+    console.log("Shhh, this is a secret!");
 }
 
 console.log(name);
@@ -179,8 +179,8 @@ const myBirthday = true;
 let age = 39;
 
 if (myBirthday) {
-	age = age + 1;	// OK!
-	myBirthday = false;  // Error!
+    age = age + 1;    // OK!
+    myBirthday = false;  // Error!
 }
 ```
 
@@ -193,7 +193,7 @@ const actors = [ "Morgan Freeman", "Jennifer Anniston" ];
 
 actors[2] = "Tom Cruise";   // OK :(
 
-actors = [];				// Error!
+actors = [];                // Error!
 ```
 
 The best semantic use of a `const` is when you have a simple primitive value that you want to give a useful name to, such as using `myBirthday` instead of `true`. This makes programs easier to read.
@@ -206,7 +206,7 @@ Besides `var` / `let` / `const`, there are other syntactic forms that declare id
 
 ```js
 function hello(name) {
-	console.log(`Hello, ${name}.`);
+    console.log(`Hello, ${name}.`);
 }
 
 hello("Kyle");
@@ -221,10 +221,10 @@ Another syntax that declares a variable is the `catch` clause of a `try..catch` 
 
 ```js
 try {
-	someError();
+    someError();
 }
 catch (err) {
-	console.log(err);
+    console.log(err);
 }
 ```
 

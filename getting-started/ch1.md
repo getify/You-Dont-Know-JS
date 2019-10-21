@@ -119,17 +119,17 @@ Consider what the outcome of this program should be:
 var x = true;
 
 if (x) {
-	function gotcha() {
-		console.log("One!");
-	}
+    function gotcha() {
+        console.log("One!");
+    }
 }
 else {
-	function gotcha() {
-		console.log("Two!");
-	}
+    function gotcha() {
+        console.log("Two!");
+    }
 }
 
-gotcha();				// ??
+gotcha();                // ??
 ```
 
 While this may seem straightforward logically (print "One!"), the reality is much uglier. There are **many** different variations of this scenario, and each variation has slightly different semantics.
@@ -196,12 +196,12 @@ For example, a developer may write a snippet of code like:
 
 ```js
 if (something) {
-	let x = 3;
-	console.log(x);
+    let x = 3;
+    console.log(x);
 }
 else {
-	let x = 4;
-	console.log(x);
+    let x = 4;
+    console.log(x);
 }
 ```
 
@@ -211,12 +211,12 @@ This is how the code would look in the source code tree for that application. Bu
 var x$0;
 var x$1;
 if (something) {
-	x$1 = 3;
-	console.log(x$1);
+    x$1 = 3;
+    console.log(x$1);
 }
 else {
-	x$2 = 4;
-	console.log(x$2);
+    x$2 = 4;
+    console.log(x$2);
 }
 ```
 
@@ -254,9 +254,9 @@ A basic polyfill for `finally(..)` in pre-ES2019 environments could look like th
 
 ```js
 if (!Promise.prototype.finally) {
-	Promise.prototype.finally = function f(fn){
-		return this.then(fn,fn);
-	};
+    Promise.prototype.finally = function f(fn){
+        return this.then(fn,fn);
+    };
 }
 ```
 
