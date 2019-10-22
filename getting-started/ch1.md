@@ -160,7 +160,7 @@ So that `alert(..)` call *is* JS, but it's really just a guest; it's not part of
 
 ## Backwards & Forwards
 
-One of the most foundational principles that guides JavaScript is preservation of *backwards compatibility*. Many are confused by the implications of this term, and often confuse it with a related by different term: *forwards compatibility*.
+One of the most foundational principles that guides JavaScript is preservation of *backwards compatibility*. Many are confused by the implications of this term, and often confuse it with a related but different term: *forwards compatibility*.
 
 Let's set the record straight.
 
@@ -172,7 +172,7 @@ That "guarantee" is no small thing. Maintaining backwards compatibility, stretch
 
 The costs of sticking to this principle should not be casually dismissed. It necessarily creates a very high bar to including changing or extending the language; any decision becomes effectively permanent, mistakes and all. Once it's in JS, it can't be taken out because it might break programs, even if we'd really, really like to remove it!
 
-There are some small exceptions to this rule. JS has made backwards-incompatible changes, but TC39 is extremely cautious in doing so. They study existing code on the web (via browser data gathering) to estimate the impact of such breakage, and browsers ultimately decide and vote on whether they're willing to take the heat from users for a very small scale breakage weighed against the benefits of fixing or improving some aspect of the language for many more sites (and users).
+There are some small exceptions to this rule. JS has had some backwards-incompatible changes, but TC39 is extremely cautious in doing so. They study existing code on the web (via browser data gathering) to estimate the impact of such breakage, and browsers ultimately decide and vote on whether they're willing to take the heat from users for a very small scale breakage weighed against the benefits of fixing or improving some aspect of the language for many more sites (and users).
 
 These kinds of changes are rare, and are almost always in corner cases of usage that are unlikely to be observably breaking in many sites.
 
@@ -184,7 +184,7 @@ HTML and CSS are, by contrast, forwards-compatible, but are not backwards-compat
 
 Since JS is not forwards-compatible, it means that there is always the potential for a gap between code that you can write that's valid JS, and the oldest engine that your site or application needs to support. If you run a program that uses an ES2019 feature in an engine from 2016, you're very likely to see the program break and crash.
 
-If the feature is a new syntax, the program will in general completely fail to compile and run, generally throwing a syntax error. If the feature is an API (such as ES6's `Object.is(..)`), the program may run up to a point but then throw a runtime exception and stop once it encounters the reference to the unknown API.
+If the feature is a new syntax, the program will in general completely fail to compile and run, usually throwing a syntax error. If the feature is an API (such as ES6's `Object.is(..)`), the program may run up to a point but then throw a runtime exception and stop once it encounters the reference to the unknown API.
 
 Does this mean JS developers should always lag behind the pace of progress, using only code which is on the trailing edge of the oldest JS engine environments they need to support? No!
 
@@ -226,7 +226,9 @@ The original snippet relied on `let` to create block-scoped `x` variables in bot
 | :--- |
 | The `let` keyword was added in ES6 (in 2015). The above example of transpiling would only need to apply if an application needed to run in an pre-ES6 supporting JS environment. The example here is just for simplicity of illustration. When ES6 was new, the need for such a transpilation was quite prevalent, but in 2019 it's much less common to need to support pre-ES6 environments. The "target" used for transpiliation is thus a sliding window that shifts upward only as decisions are made for a site/application to stop supporting some old browser/engine. |
 
-You may wonder: why go to the trouble of using a tool to convert from a newer syntax version to an older one? Couldn't we just write the two variables and skip using the `let` keyword? The reason is, it's strongly recommended that developers use the latest version of JS so that their code is clean and communicates its ideas most effectively. Developers focus on writing the clean, new syntax forms, and let the tools take care of producing a forwards-compatible versions of that code that is suitable to deploy and run on the oldest supported JS engine environments.
+You may wonder: why go to the trouble of using a tool to convert from a newer syntax version to an older one? Couldn't we just write the two variables and skip using the `let` keyword? The reason is, it's strongly recommended that developers use the latest version of JS so that their code is clean and communicates its ideas most effectively.
+
+Developers should focus on writing the clean, new syntax forms, and let the tools take care of producing a forwards-compatible version of that code that is suitable to deploy and run on the oldest supported JS engine environments.
 
 ### Filling The Gap
 
@@ -276,13 +278,11 @@ Transpilation and polyfilling are two highly effective techniques for addressing
 
 A long-debated question for code written in JS: is it an interpreted script or a compiled program? The majority opinion seems to be that JS is an interpreted (scripting) language. But the truth is more complicated than that.
 
-Let's consider the question in more detail.
+Let's consider the question in more detail. To start, why do people even debate or care about this? Why does it matter?
 
-To start, why do people even debate or care about this? Why does it matter?
+For much of the history of programming languages, "interpreted" languages and "scripting" languages have been looked down on as inferior compared to their compiled counterparts. The reasons for this acrimony are numerous, including a perception of lack of performance optimization, as well as dislike of certain language characteristics, such as scripting languages generally using dynamic typing instead of the "more mature" statically typed languages.
 
-For much of the history of programming languages, "interpreted" languages and "scripting" languages have been looked down as inferior compared to their compiled counterparts. The reasons for this acrimony are numerous, including a perception of lack of performance optimization, as well as dislike of certain language characteristics, such as scripting languages generally using dynamic typing instead of the "more mature" statically typed languages.
-
-Languages typically considered in the "compiled" category usually produce a portable (binary) representation of the program that is distributed for execute later. Since we don't really see that same model with JS -- we distribute the source code, not the binary form -- many claim that disqualifies JS from the category. In reality, the distribution model for a program's "executable" form has become drastically more varied and equally less relevant over the last few decades; to the question at hand, it doesn't really matter so much anymore what form of a program gets passed around.
+Languages regarded as "compiled" usually produce a portable (binary) representation of the program that is distributed for execution later. Since we don't really observe that kind of model with JS -- we distribute the source code, not the binary form -- many claim that disqualifies JS from the category. In reality, the distribution model for a program's "executable" form has become drastically more varied and also less relevant over the last few decades; to the question at hand, it doesn't really matter so much anymore what form of a program gets passed around.
 
 These misinformed claims and criticisms should be set aside. The real reason it matters to have a clear picture on whether JS is interpreted or compiled relates to the nature of how errors are handled.
 
