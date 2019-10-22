@@ -10,6 +10,7 @@
 	* Specification
 	* Backwards & Forwards
 	* What's In an Interpretation?
+    * Strictly Speaking
 	* Defined
 * Chapter 2: Getting To Know JS
 	* Files As Programs
