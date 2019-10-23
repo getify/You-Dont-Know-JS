@@ -19,3 +19,10 @@
 	* Functions
     * Comparisons
     * Code Organization
+* Chapter 3: Exploring Deeper
+    * Closure
+    * `this` Keyword
+    * Iteration
+    * TODO
+* Appendix A: The Rest (Of The Series)
+    * TODO
