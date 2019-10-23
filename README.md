@@ -24,9 +24,9 @@ I recommend reading the books in this order:
 
 * [Getting Started](getting-started/README.md)
 * [Scope & Closures](scope-closures/README.md)
-* [this & Object Prototypes](this-object-prototypes/README.md)
+* [Objects & Classes](objects-classes/README.md)
 * [Types & Grammar](types-grammar/README.md)
-* [Async & Performance](async-performance/README.md)
+* [Sync & Async](sync-async/README.md)
 * [ES.Next & Beyond](es-next-beyond/README.md)
 
 ## Publishing
