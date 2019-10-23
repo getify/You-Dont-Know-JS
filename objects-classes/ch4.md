@@ -1,4 +1,4 @@
-# You Don't Know JS yet: *this* & Object Prototypes - 2nd Edition
+# You Don't Know JS yet: Objects & Classes - 2nd Edition
 # Chapter 4: Mixing (Up) "Class" Objects
 
 | NOTE: |

@@ -1,4 +1,4 @@
-# You Don't Know JS Yet: Async & Performance - 2nd Edition
+# You Don't Know JS Yet: Sync & Async - 2nd Edition
 # Chapter 3: Promises
 
 | NOTE: |

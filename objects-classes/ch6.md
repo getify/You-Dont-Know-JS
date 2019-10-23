@@ -1,4 +1,4 @@
-# You Don't Know JS Yet: *this* & Object Prototypes - 2nd Edition
+# You Don't Know JS Yet: Objects & Classes - 2nd Edition
 # Chapter 6: Behavior Delegation
 
 | NOTE: |
@@ -57,23 +57,23 @@ Here's some loose pseudo-code for that scenario:
 
 ```js
 class Task {
-	id;
+    id;
 
-	// constructor `Task()`
-	Task(ID) { id = ID; }
-	outputTask() { output( id ); }
+    // constructor `Task()`
+    Task(ID) { id = ID; }
+    outputTask() { output( id ); }
 }
 
 class XYZ inherits Task {
-	label;
+    label;
 
-	// constructor `XYZ()`
-	XYZ(ID,Label) { super( ID ); label = Label; }
-	outputTask() { super(); output( label ); }
+    // constructor `XYZ()`
+    XYZ(ID,Label) { super( ID ); label = Label; }
+    outputTask() { super(); output( label ); }
 }
 
 class ABC inherits Task {
-	// ...
+    // ...
 }
 ```
 
@@ -91,21 +91,21 @@ Here's some simple code to suggest how you accomplish that:
 
 ```js
 var Task = {
-	setID: function(ID) { this.id = ID; },
-	outputID: function() { console.log( this.id ); }
+    setID: function(ID) { this.id = ID; },
+    outputID: function() { console.log( this.id ); }
 };
 
 // make `XYZ` delegate to `Task`
 var XYZ = Object.create( Task );
 
 XYZ.prepareTask = function(ID,Label) {
-	this.setID( ID );
-	this.label = Label;
+    this.setID( ID );
+    this.label = Label;
 };
 
 XYZ.outputTaskDetails = function() {
-	this.outputID();
-	console.log( this.label );
+    this.outputID();
+    console.log( this.label );
 };
 
 // ABC = Object.create( Task );
@@ -202,8 +202,8 @@ var a1 = Object.create( Foo );
 a1; // Object {}
 
 Object.defineProperty( Foo, "constructor", {
-	enumerable: false,
-	value: function Gotcha(){}
+    enumerable: false,
+    value: function Gotcha(){}
 });
 
 a1; // Gotcha {}
@@ -225,19 +225,19 @@ We'll examine some more theoretical ("Foo", "Bar") code, and compare both ways (
 
 ```js
 function Foo(who) {
-	this.me = who;
+    this.me = who;
 }
 Foo.prototype.identify = function() {
-	return "I am " + this.me;
+    return "I am " + this.me;
 };
 
 function Bar(who) {
-	Foo.call( this, who );
+    Foo.call( this, who );
 }
 Bar.prototype = Object.create( Foo.prototype );
 
 Bar.prototype.speak = function() {
-	alert( "Hello, " + this.identify() + "." );
+    alert( "Hello, " + this.identify() + "." );
 };
 
 var b1 = new Bar( "b1" );
@@ -253,18 +253,18 @@ Now, let's implement **the exact same functionality** using *OLOO* style code:
 
 ```js
 var Foo = {
-	init: function(who) {
-		this.me = who;
-	},
-	identify: function() {
-		return "I am " + this.me;
-	}
+    init: function(who) {
+        this.me = who;
+    },
+    identify: function() {
+        return "I am " + this.me;
+    }
 };
 
 var Bar = Object.create( Foo );
 
 Bar.speak = function() {
-	alert( "Hello, " + this.identify() + "." );
+    alert( "Hello, " + this.identify() + "." );
 };
 
 var b1 = Object.create( Bar );
@@ -323,27 +323,27 @@ Let's examine how we'd implement the "class" design in classic-style pure JS wit
 ```js
 // Parent class
 function Widget(width,height) {
-	this.width = width || 50;
-	this.height = height || 50;
-	this.$elem = null;
+    this.width = width || 50;
+    this.height = height || 50;
+    this.$elem = null;
 }
 
 Widget.prototype.render = function($where){
-	if (this.$elem) {
-		this.$elem.css( {
-			width: this.width + "px",
-			height: this.height + "px"
-		} ).appendTo( $where );
-	}
+    if (this.$elem) {
+        this.$elem.css( {
+            width: this.width + "px",
+            height: this.height + "px"
+        } ).appendTo( $where );
+    }
 };
 
 // Child class
 function Button(width,height,label) {
-	// "super" constructor call
-	Widget.call( this, width, height );
-	this.label = label || "Default";
+    // "super" constructor call
+    Widget.call( this, width, height );
+    this.label = label || "Default";
 
-	this.$elem = $( "<button>" ).text( this.label );
+    this.$elem = $( "<button>" ).text( this.label );
 }
 
 // make `Button` "inherit" from `Widget`
@@ -351,22 +351,22 @@ Button.prototype = Object.create( Widget.prototype );
 
 // override base "inherited" `render(..)`
 Button.prototype.render = function($where) {
-	// "super" call
-	Widget.prototype.render.call( this, $where );
-	this.$elem.click( this.onClick.bind( this ) );
+    // "super" call
+    Widget.prototype.render.call( this, $where );
+    this.$elem.click( this.onClick.bind( this ) );
 };
 
 Button.prototype.onClick = function(evt) {
-	console.log( "Button '" + this.label + "' clicked!" );
+    console.log( "Button '" + this.label + "' clicked!" );
 };
 
 $( document ).ready( function(){
-	var $body = $( document.body );
-	var btn1 = new Button( 125, 30, "Hello" );
-	var btn2 = new Button( 150, 40, "World" );
+    var $body = $( document.body );
+    var btn1 = new Button( 125, 30, "Hello" );
+    var btn2 = new Button( 150, 40, "World" );
 
-	btn1.render( $body );
-	btn2.render( $body );
+    btn1.render( $body );
+    btn2.render( $body );
 } );
 ```
 
@@ -380,43 +380,43 @@ We cover ES6 `class` syntax sugar in detail in Appendix A, but let's briefly dem
 
 ```js
 class Widget {
-	constructor(width,height) {
-		this.width = width || 50;
-		this.height = height || 50;
-		this.$elem = null;
-	}
-	render($where){
-		if (this.$elem) {
-			this.$elem.css( {
-				width: this.width + "px",
-				height: this.height + "px"
-			} ).appendTo( $where );
-		}
-	}
+    constructor(width,height) {
+        this.width = width || 50;
+        this.height = height || 50;
+        this.$elem = null;
+    }
+    render($where){
+        if (this.$elem) {
+            this.$elem.css( {
+                width: this.width + "px",
+                height: this.height + "px"
+            } ).appendTo( $where );
+        }
+    }
 }
 
 class Button extends Widget {
-	constructor(width,height,label) {
-		super( width, height );
-		this.label = label || "Default";
-		this.$elem = $( "<button>" ).text( this.label );
-	}
-	render($where) {
-		super.render( $where );
-		this.$elem.click( this.onClick.bind( this ) );
-	}
-	onClick(evt) {
-		console.log( "Button '" + this.label + "' clicked!" );
-	}
+    constructor(width,height,label) {
+        super( width, height );
+        this.label = label || "Default";
+        this.$elem = $( "<button>" ).text( this.label );
+    }
+    render($where) {
+        super.render( $where );
+        this.$elem.click( this.onClick.bind( this ) );
+    }
+    onClick(evt) {
+        console.log( "Button '" + this.label + "' clicked!" );
+    }
 }
 
 $( document ).ready( function(){
-	var $body = $( document.body );
-	var btn1 = new Button( 125, 30, "Hello" );
-	var btn2 = new Button( 150, 40, "World" );
+    var $body = $( document.body );
+    var btn1 = new Button( 125, 30, "Hello" );
+    var btn2 = new Button( 150, 40, "World" );
 
-	btn1.render( $body );
-	btn2.render( $body );
+    btn1.render( $body );
+    btn2.render( $body );
 } );
 ```
 
@@ -432,50 +432,50 @@ Here's our simpler `Widget` / `Button` example, using **OLOO style delegation**:
 
 ```js
 var Widget = {
-	init: function(width,height){
-		this.width = width || 50;
-		this.height = height || 50;
-		this.$elem = null;
-	},
-	insert: function($where){
-		if (this.$elem) {
-			this.$elem.css( {
-				width: this.width + "px",
-				height: this.height + "px"
-			} ).appendTo( $where );
-		}
-	}
+    init: function(width,height){
+        this.width = width || 50;
+        this.height = height || 50;
+        this.$elem = null;
+    },
+    insert: function($where){
+        if (this.$elem) {
+            this.$elem.css( {
+                width: this.width + "px",
+                height: this.height + "px"
+            } ).appendTo( $where );
+        }
+    }
 };
 
 var Button = Object.create( Widget );
 
 Button.setup = function(width,height,label){
-	// delegated call
-	this.init( width, height );
-	this.label = label || "Default";
+    // delegated call
+    this.init( width, height );
+    this.label = label || "Default";
 
-	this.$elem = $( "<button>" ).text( this.label );
+    this.$elem = $( "<button>" ).text( this.label );
 };
 Button.build = function($where) {
-	// delegated call
-	this.insert( $where );
-	this.$elem.click( this.onClick.bind( this ) );
+    // delegated call
+    this.insert( $where );
+    this.$elem.click( this.onClick.bind( this ) );
 };
 Button.onClick = function(evt) {
-	console.log( "Button '" + this.label + "' clicked!" );
+    console.log( "Button '" + this.label + "' clicked!" );
 };
 
 $( document ).ready( function(){
-	var $body = $( document.body );
+    var $body = $( document.body );
 
-	var btn1 = Object.create( Button );
-	btn1.setup( 125, 30, "Hello" );
+    var btn1 = Object.create( Button );
+    btn1.setup( 125, 30, "Hello" );
 
-	var btn2 = Object.create( Button );
-	btn2.setup( 150, 40, "World" );
+    var btn2 = Object.create( Button );
+    btn2.setup( 150, 40, "World" );
 
-	btn1.build( $body );
-	btn2.build( $body );
+    btn1.build( $body );
+    btn2.build( $body );
 } );
 ```
 
@@ -512,98 +512,98 @@ Following the typical class design pattern, we'll break up the task into base fu
 ```js
 // Parent class
 function Controller() {
-	this.errors = [];
+    this.errors = [];
 }
 Controller.prototype.showDialog = function(title,msg) {
-	// display title & message to user in dialog
+    // display title & message to user in dialog
 };
 Controller.prototype.success = function(msg) {
-	this.showDialog( "Success", msg );
+    this.showDialog( "Success", msg );
 };
 Controller.prototype.failure = function(err) {
-	this.errors.push( err );
-	this.showDialog( "Error", err );
+    this.errors.push( err );
+    this.showDialog( "Error", err );
 };
 ```
 
 ```js
 // Child class
 function LoginController() {
-	Controller.call( this );
+    Controller.call( this );
 }
 // Link child class to parent
 LoginController.prototype = Object.create( Controller.prototype );
 LoginController.prototype.getUser = function() {
-	return document.getElementById( "login_username" ).value;
+    return document.getElementById( "login_username" ).value;
 };
 LoginController.prototype.getPassword = function() {
-	return document.getElementById( "login_password" ).value;
+    return document.getElementById( "login_password" ).value;
 };
 LoginController.prototype.validateEntry = function(user,pw) {
-	user = user || this.getUser();
-	pw = pw || this.getPassword();
+    user = user || this.getUser();
+    pw = pw || this.getPassword();
 
-	if (!(user && pw)) {
-		return this.failure( "Please enter a username & password!" );
-	}
-	else if (pw.length < 5) {
-		return this.failure( "Password must be 5+ characters!" );
-	}
+    if (!(user && pw)) {
+        return this.failure( "Please enter a username & password!" );
+    }
+    else if (pw.length < 5) {
+        return this.failure( "Password must be 5+ characters!" );
+    }
 
-	// got here? validated!
-	return true;
+    // got here? validated!
+    return true;
 };
 // Override to extend base `failure()`
 LoginController.prototype.failure = function(err) {
-	// "super" call
-	Controller.prototype.failure.call( this, "Login invalid: " + err );
+    // "super" call
+    Controller.prototype.failure.call( this, "Login invalid: " + err );
 };
 ```
 
 ```js
 // Child class
 function AuthController(login) {
-	Controller.call( this );
-	// in addition to inheritance, we also need composition
-	this.login = login;
+    Controller.call( this );
+    // in addition to inheritance, we also need composition
+    this.login = login;
 }
 // Link child class to parent
 AuthController.prototype = Object.create( Controller.prototype );
 AuthController.prototype.server = function(url,data) {
-	return $.ajax( {
-		url: url,
-		data: data
-	} );
+    return $.ajax( {
+        url: url,
+        data: data
+    } );
 };
 AuthController.prototype.checkAuth = function() {
-	var user = this.login.getUser();
-	var pw = this.login.getPassword();
+    var user = this.login.getUser();
+    var pw = this.login.getPassword();
 
-	if (this.login.validateEntry( user, pw )) {
-		this.server( "/check-auth",{
-			user: user,
-			pw: pw
-		} )
-		.then( this.success.bind( this ) )
-		.fail( this.failure.bind( this ) );
-	}
+    if (this.login.validateEntry( user, pw )) {
+        this.server( "/check-auth",{
+            user: user,
+            pw: pw
+        } )
+        .then( this.success.bind( this ) )
+        .fail( this.failure.bind( this ) );
+    }
 };
 // Override to extend base `success()`
 AuthController.prototype.success = function() {
-	// "super" call
-	Controller.prototype.success.call( this, "Authenticated!" );
+    // "super" call
+    Controller.prototype.success.call( this, "Authenticated!" );
 };
 // Override to extend base `failure()`
 AuthController.prototype.failure = function(err) {
-	// "super" call
-	Controller.prototype.failure.call( this, "Auth Failed: " + err );
+    // "super" call
+    Controller.prototype.failure.call( this, "Auth Failed: " + err );
 };
 ```
 
 ```js
 var auth = new AuthController(
-	// in addition to inheritance, we also need composition
-	new LoginController()
+    // in addition to inheritance, we also need composition
+    new LoginController()
 );
 auth.checkAuth();
 ```
@@ -622,34 +622,34 @@ But, **do we really need to model this problem** with a parent `Controller` clas
 
 ```js
 var LoginController = {
-	errors: [],
-	getUser: function() {
-		return document.getElementById( "login_username" ).value;
-	},
-	getPassword: function() {
-		return document.getElementById( "login_password" ).value;
-	},
-	validateEntry: function(user,pw) {
-		user = user || this.getUser();
-		pw = pw || this.getPassword();
+    errors: [],
+    getUser: function() {
+        return document.getElementById( "login_username" ).value;
+    },
+    getPassword: function() {
+        return document.getElementById( "login_password" ).value;
+    },
+    validateEntry: function(user,pw) {
+        user = user || this.getUser();
+        pw = pw || this.getPassword();
 
-		if (!(user && pw)) {
-			return this.failure( "Please enter a username & password!" );
-		}
-		else if (pw.length < 5) {
-			return this.failure( "Password must be 5+ characters!" );
-		}
+        if (!(user && pw)) {
+            return this.failure( "Please enter a username & password!" );
+        }
+        else if (pw.length < 5) {
+            return this.failure( "Password must be 5+ characters!" );
+        }
 
-		// got here? validated!
-		return true;
-	},
-	showDialog: function(title,msg) {
-		// display success message to user in dialog
-	},
-	failure: function(err) {
-		this.errors.push( err );
-		this.showDialog( "Error", "Login invalid: " + err );
-	}
+        // got here? validated!
+        return true;
+    },
+    showDialog: function(title,msg) {
+        // display success message to user in dialog
+    },
+    failure: function(err) {
+        this.errors.push( err );
+        this.showDialog( "Error", "Login invalid: " + err );
+    }
 };
 ```
 
@@ -659,29 +659,29 @@ var AuthController = Object.create( LoginController );
 
 AuthController.errors = [];
 AuthController.checkAuth = function() {
-	var user = this.getUser();
-	var pw = this.getPassword();
+    var user = this.getUser();
+    var pw = this.getPassword();
 
-	if (this.validateEntry( user, pw )) {
-		this.server( "/check-auth",{
-			user: user,
-			pw: pw
-		} )
-		.then( this.accepted.bind( this ) )
-		.fail( this.rejected.bind( this ) );
-	}
+    if (this.validateEntry( user, pw )) {
+        this.server( "/check-auth",{
+            user: user,
+            pw: pw
+        } )
+        .then( this.accepted.bind( this ) )
+        .fail( this.rejected.bind( this ) );
+    }
 };
 AuthController.server = function(url,data) {
-	return $.ajax( {
-		url: url,
-		data: data
-	} );
+    return $.ajax( {
+        url: url,
+        data: data
+    } );
 };
 AuthController.accepted = function() {
-	this.showDialog( "Success", "Authenticated!" )
+    this.showDialog( "Success", "Authenticated!" )
 };
 AuthController.rejected = function(err) {
-	this.failure( "Auth Failed: " + err );
+    this.failure( "Auth Failed: " + err );
 };
 ```
 
@@ -714,7 +714,7 @@ One of the nicer things that makes ES6's `class` so deceptively attractive (see 
 
 ```js
 class Foo {
-	methodName() { /* .. */ }
+    methodName() { /* .. */ }
 }
 ```
 
@@ -726,14 +726,14 @@ As of ES6, we can use *concise method declarations* in any object literal, so an
 
 ```js
 var LoginController = {
-	errors: [],
-	getUser() { // Look ma, no `function`!
-		// ...
-	},
-	getPassword() {
-		// ...
-	}
-	// ...
+    errors: [],
+    getUser() { // Look ma, no `function`!
+        // ...
+    },
+    getPassword() {
+        // ...
+    }
+    // ...
 };
 ```
 
@@ -744,14 +744,14 @@ Moreover, as of ES6, the clunkier syntax you use (like for the `AuthController` 
 ```js
 // use nicer object literal syntax w/ concise methods!
 var AuthController = {
-	errors: [],
-	checkAuth() {
-		// ...
-	},
-	server(url,data) {
-		// ...
-	}
-	// ...
+    errors: [],
+    checkAuth() {
+        // ...
+    },
+    server(url,data) {
+        // ...
+    }
+    // ...
 };
 
 // NOW, link `AuthController` to delegate to `LoginController`
@@ -766,8 +766,8 @@ There *is* one drawback to concise methods that's subtle but important to note. 
 
 ```js
 var Foo = {
-	bar() { /*..*/ },
-	baz: function baz() { /*..*/ }
+    bar() { /*..*/ },
+    baz: function baz() { /*..*/ }
 };
 ```
 
@@ -775,8 +775,8 @@ Here's the syntactic de-sugaring that expresses how that code will operate:
 
 ```js
 var Foo = {
-	bar: function() { /*..*/ },
-	baz: function baz() { /*..*/ }
+    bar: function() { /*..*/ },
+    baz: function baz() { /*..*/ }
 };
 ```
 
@@ -798,18 +798,18 @@ Item 2 is, unfortunately, **still a drawback to concise methods**. They will not
 
 ```js
 var Foo = {
-	bar: function(x) {
-		if (x < 10) {
-			return Foo.bar( x * 2 );
-		}
-		return x;
-	},
-	baz: function baz(x) {
-		if (x < 10) {
-			return baz( x * 2 );
-		}
-		return x;
-	}
+    bar: function(x) {
+        if (x < 10) {
+            return Foo.bar( x * 2 );
+        }
+        return x;
+    },
+    baz: function baz(x) {
+        if (x < 10) {
+            return baz( x * 2 );
+        }
+        return x;
+    }
 };
 ```
 
@@ -825,10 +825,10 @@ Consider this code which uses `instanceof` (see Chapter 5) for introspecting on 
 
 ```js
 function Foo() {
-	// ...
+    // ...
 }
 Foo.prototype.something = function(){
-	// ...
+    // ...
 }
 
 var a1 = new Foo();
@@ -836,7 +836,7 @@ var a1 = new Foo();
 // later
 
 if (a1 instanceof Foo) {
-	a1.something();
+    a1.something();
 }
 ```
 
@@ -882,7 +882,7 @@ Example:
 
 ```js
 if (a1.something) {
-	a1.something();
+    a1.something();
 }
 ```
 
