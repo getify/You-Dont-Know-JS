@@ -9,7 +9,11 @@ There's no substitute in learning JS other than to just start writing JS. To do 
 
 This chapter is not an exhaustive reference on every bit of syntax of the JS language. It's also not intended to be an "intro to JS" primer.
 
-Instead, we're just going to survey some of the major topic-areas of the language. Our goal is to get a better *feel* for it, so that we can move forward writing our own programs.
+Instead, we're just going to survey some of the major topic-areas of the language. Our goal is to get a better *feel* for it, so that we can move forward writing our own programs with more confidence.
+
+| TIP: |
+| :--- |
+| If you're still getting familiar with JS, I suggest you take your time working through this chapter. Take each section and ponder and explore the topic for awhile. Look through existing JS programs and compare what you see in them to the code and explanations (and opinions!) presented here. You will get a lot more out of the rest of the book series with a solid foundation of JS's *nature*. |
 
 ## Files As Programs
 
@@ -348,21 +352,226 @@ Functions can also be specified in class definitions and object literal definiti
 
 ```js
 class SomethingKindaGreat {
-    coolMethod() { .. }   // look, no commas!
+    // class methods
+    coolMethod() { .. }   // no commas!
     boringMethod() { .. }
 }
 
 var EntirelyDifferent = {
-    coolMethod() { .. },   // don't forget the comma!
+    // object methods
+    coolMethod() { .. },   // commas!
     boringMethod() { .. },
 
-    // old-school (anonymous) function expression
+    // (anonymous) function expression property
     oldSchool: function() { .. }
 };
 ```
 
 Phew! That's a lot of different ways to define functions.
 
-There's no simple shortcut path here, you just have to get really used to all the function forms so you can recognize them in existing code and use them appropriately in the code you write. Study them closely and practice!
+There's no simple shortcut path here; you just have to build familiarity with all the function forms so you can recognize them in existing code and use them appropriately in the code you write. Study them closely and practice!
+
+## Comparisons
+
+Making decisions in programs requires comparing values to determine their identity and relationship to each other. JS has several mechanisms to enable value comparison, so let's take a closer look at them.
+
+### Equal...ish
+
+The most common comparison in JS programs asks the question, "is this X value *the same as* that Y value?" What exactly does "the same as" really mean to JS, though?
+
+For ergonomic and historical reasons, the meaning is more complicated than the obvious *exact identity* sort of matching. Sometimes an equality comparison intends *exact* matching, but other times the desired comparison is a bit broader, allowing *closely similar* or *interchangable* matching. In other words, we must be aware of the nuanced differences between an **equality** comparison and an **equivalence** comparison.
+
+If you've spent any time working with and reading about JS, you've certainly seen the so called "triple-equals" `===` operator, also described as the "strict equality" operator. That seems rather straight forward, right? Surely, "strict" means strict, as in narrow and *exact*.
+
+Not *exact*ly.
+
+Yes, most values participating in an `===` equality comparison will fit with that *exact same* intuition. Consider some examples:
+
+```js
+3 === 3.0;              // true
+"yes" === "yes";        // true
+null === null;          // true
+false === false;        // true
+
+42 === "42";            // false
+"hello" === "Hello";    // false
+true === 1;             // false
+0 === null;             // false
+"" === null;            // false
+null === undefined;     // false
+```
+
+| NOTE: |
+| :--- |
+| Another way `===`'s equality comparison is often described is, "checking both the value and the type". In several of the above examples, like `42 === "42"`, the *type* of both values -- number, string, etc -- does seem to be the distinguishing factor. There's more to it than that, though. **All** value comparisons in JS consider the type of the values being compared, not *just* the `===` operator. Specifically, `===` disallows any sort of type conversion (aka, "coercion") in its comparison, where other JS comparisons *do* allow coercion. |
+
+But the `===` operator does have some nuance to it, a fact many JS developers gloss over, to their detriment. The `===` operator is designed to *lie* in two cases of special values: `NaN` and `-0`. Consider:
+
+```js
+NaN === NaN;            // false
+0 === -0;               // true
+```
+
+In the case of `NaN`, the `===` operator *lies* and says that an occurrence of `NaN` is not equal to another `NaN`. In the case of `-0` -- yes, this is a real, distinct value you can use intentionally in your programs! -- the `===` operator *lies* and says it's equal to the regular `0` value.
+
+| TIP: |
+| :--- |
+| When making such comparisons, since the *lying* is likely bothersome, don't use `===`. For `NaN` comparisons, use the `Number.isNaN(..)` utility, which does not *lie*. For `-0` comparison, use the `Object.is(..)` utility, which also does not *lie*. `Object.is(..)` can also be used for non-*lying* `NaN` checks, if you prefer. Humorously, you could think of `Object.is(..)` as the "quadruple-equals" `====`, the really-really-strict comparison! |
+
+There are deeper historical and technical reasons for these *lies*, but that doesn't change the fact that `===` is not actually *strictly exactly equal* comparison, in the *strictest* sense.
+
+The story gets even more complicated when we consider comparisons of object values (non-primitives). Consider:
+
+```js
+[ 1, 2, 3 ] === [ 1, 2, 3 ];    // false
+{ a: 42 } === { a: 42 }         // false
+(x => x * 2) === (x => x * 2)   // false
+```
+
+What's going on here?
+
+It may seem reasonable to assume that an equality check considers the *nature* or *contents* of the value; after all, `42 === 42` considers the actual `42` value and compares it. But when it comes to objects, a content-aware comparison is generally referred to as "structural equality".
+
+JS does not define `===` as *structural equality* for object values. Instead, `===` uses *identity equality* for object values.
+
+In JS, all object values are held by reference, they are assigned and passed by reference-copy, **and** to our current discussion, they are compared by reference (identity) equality. Consider:
+
+```js
+var x = [ 1, 2, 3 ];
+
+// assignment is by reference-copy, so
+// y references the *same* array as x,
+// not another copy of it.
+var y = x;
+
+y === x;              // true
+y === [ 1, 2, 3 ];    // false
+x === [ 1, 2, 3 ];    // false
+```
+
+In this snippet, `y === x` is true because both variables hold a reference to the same initial array. But the `=== [1,2,3]` comparisons both fail because `y` and `x`, respectively, are being compared to new *different* arrays `[1,2,3]`. The array structure and contents don't matter in this comparison, only the **reference identity**.
+
+JS does not provide a mechanism for structural equality comparison of object values, only reference identity comparison. To do structural equality comparison, you'll need to implement the checks yourself.
+
+But beware, it's more complicated than you'll assume. For example, how might you determine if two function references are "structurally equivalent"? Even stringifying to compare their source code text wouldn't take into account things like closure. JS doesn't provide structural equality comparison because it's almost intractable to handle all the corner cases!
+
+### Coercive Comparisons
+
+Few JS features draw more ire in the broader JS community than the `==` operator, generally referred to as the "loose equality" operator. The majority of all writing and public discourse on JS condemns this operator as poorly designed and dangerous/bug-ridden when used in JS programs. Even the creator of the language himself, Brendan Eich, has lamented how it was designed as a big mistake.
+
+From what I can tell, most of this frustration comes from a pretty short list of confusing corner cases, but a deeper problem is the extremely widespread misconception that it performs its comparisons without considering the types of its compared values.
+
+The `==` operator performs an equality comparison similarly to how the `===` performs it. In fact, both operators consider the type of the values being compared. And if the comparison is between the same value type, both `==` and `===` **do exactly the same thing, no difference whatsoever.**
+
+If the value types being compared are different, the `==` differs from `===` in that it allows coercion before the comparison. In other words, they both want to compare values of like types, but `==` allows type conversions *first*, and once the types have been converted to be the same on both sides, then `==` does the same thing as `===`. Instead of "loose equality", the `==` operator should be described as "coercive equality".
+
+Consider:
+
+```js
+42 == "42";             // true
+1 == true;              // true
+```
+
+In both comparisons, the value types are different, so the `==` causes the non-number values (`"42"` and `true`) to be converted to numbers (`42` and `1`, respectively) before the comparisons are made.
+
+Just being aware of this nature of `==` helps you avoid most of the troublesome corner cases, such as staying away from a gotchas like `"" == 0` or `0 == false`.
+
+You may be thinking, "Oh, well, I will always just avoid any coercive equality comparison (using `===` instead) to avoid those corner cases"! Eh, sorry, that's not quite as likely as you would hope.
+
+There's a pretty good chance that you'll use relational comparison operators like `<`, `>` (and even `<=` and `>=`).
+
+Just like `==`, these operators will perform as if they're "strict" if the types being relationally compared already match, but they'll allow coercion first (generally, to numbers) if the types differ.
+
+Consider:
+
+```js
+var arr = [ "1", "10", "100", "1000" ];
+for (let i = 0; i < arr.length && arr[i] < 500; i++) {
+    // will run 3 times
+}
+```
+
+The `i < arr.length` comparison is "safe" from coercion because `i` and `arr.length` are always numbers. The `arr[i] < 500` invokes coercion, though, because the `arr[i]` values are all strings. Those comparisons thus become `1 < 500`, `10 < 500`, `100 < 500`, and `1000 < 500`. Since that last one is false, the loop stops after its third iteration.
+
+These relational operators typically use numeric comparisons, except in the case where **both** values being compared are already strings; in this case, they use alphabetical (dictionary-like) comparison of the strings:
+
+```js
+var x = "10";
+var y = "9";
+
+x < y;      // true, watch out!
+```
+
+There's no way to get these relational operators to avoid coercion, other than to just never use mismatched types in the comparisons. That's perhaps admirable as a goal, but it's still pretty likely you're going to run into a case where the types *may* differ.
+
+The wiser approach is not to avoid coercive comparisons, but to embrace and learn their ins and outs.
+
+#### Conditionals
+
+Conditional expressions, such as those computed in `if` statements, as well as `while` and `for` loops, perform an implicit value comparison. But what sort? Is it "strict" or "coercive"? Both, actually.
+
+Consider:
+
+```js
+var x = 1;
+
+if (x) {
+    // will run!
+}
+
+while (x) {
+    // will run, once!
+    x = false;
+}
+```
+
+You might think of these `(x)` conditional expressions like this:
+
+```js
+var x = 1;
+
+if (x == true) {
+    // will run!
+}
+
+while (x == true) {
+    // will run, once!
+    x = false;
+}
+```
+
+In this specific case -- the value of `x` being `1` -- that mental model works, but it's not accurate more broadly. Consider:
+
+```js
+var x = "hello";
+
+if (x) {
+    // will run!
+}
+
+if (x == true) {
+    // won't run :(
+}
+```
+
+Oops. So what is the `if` statement actually doing? This is the more accurate mental model.
+
+```js
+var x = "hello";
+
+if (Boolean(x) == true) {
+    // will run
+}
+
+// which is the same as:
+
+if (Boolean(x) === true) {
+    // will run
+}
+```
+
+Since the `Boolean(..)` function always returns a value of type boolean, the `==` vs `===` in that above snippet is irrelevant; they'll both do the same thing. But the important part is to see that before the comparison, a coercion occurs, from whatever type `x` currently is, to boolean.
+
+You just can't get away from coercions in JS comparisons. Buckle down and learn them.
 
 ## TODO

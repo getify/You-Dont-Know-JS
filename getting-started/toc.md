@@ -17,4 +17,5 @@
 	* Values
 	* Variables
 	* Functions
+    * Comparisons
 	* TODO
