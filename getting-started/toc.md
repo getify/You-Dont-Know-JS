@@ -18,4 +18,4 @@
 	* Variables
 	* Functions
     * Comparisons
-	* TODO
+    * Code Organization

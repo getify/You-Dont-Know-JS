@@ -11,9 +11,11 @@ This chapter is not an exhaustive reference on every bit of syntax of the JS lan
 
 Instead, we're just going to survey some of the major topic-areas of the language. Our goal is to get a better *feel* for it, so that we can move forward writing our own programs with more confidence.
 
+However, don't expect this chapter to be a quick read. It's long and there's plenty of detail to chew on. Take your time.
+
 | TIP: |
 | :--- |
-| If you're still getting familiar with JS, I suggest you take your time working through this chapter. Take each section and ponder and explore the topic for awhile. Look through existing JS programs and compare what you see in them to the code and explanations (and opinions!) presented here. You will get a lot more out of the rest of the book series with a solid foundation of JS's *nature*. |
+| If you're still getting familiar with JS, I suggest you reserve plenty of extra time to work through this chapter. Take each section and ponder and explore the topic for awhile. Look through existing JS programs and compare what you see in them to the code and explanations (and opinions!) presented here. You will get a lot more out of the rest of the book and series with a solid foundation of JS's *nature*. |
 
 ## Files As Programs
 
@@ -574,4 +576,367 @@ Since the `Boolean(..)` function always returns a value of type boolean, the `==
 
 You just can't get away from coercions in JS comparisons. Buckle down and learn them.
 
-## TODO
+## Code Organization
+
+Two major patterns for organizing code (data and behavior) are used broadly across the JS ecosystem: classes and modules. These patterns are not mutually exclusive; many programs can and do use both.
+
+In some respects, these patterns are very different. But interestingly, in other ways, they're just different sides of the same coin. Being proficient in JS requires understanding both patterns and where they are appropriate (and not!).
+
+### Classes
+
+The terms "object oriented", "class oriented" and "classes" are all very loaded full of detail and nuance; they're not universal in definition.
+
+We will use a common and somewhat traditional definition here, the one most likely familiar to those with backgrounds in "object oriented" languages like C++ and Java.
+
+A class in a program is a definition of a "type" of custom data structure that includes both data and behaviors that operate on that data. Classes define how such a data structure works, but classes are not themselves concrete values. To get a concrete value that you can use in the program, a class must be *instantiated* (with the `new` keyword) one or more times.
+
+Consider:
+
+```js
+class Page {
+    constructor(text) {
+        this.text = text;
+    }
+
+    print() {
+        console.log(this.text);
+    }
+}
+
+class Notebook {
+    constructor() {
+        this.pages = [];
+    }
+
+    addPage(text) {
+        var page = new Page(text);
+        this.pages.push(page);
+    }
+
+    print() {
+        for (let page of this.pages) {
+            page.print();
+        }
+    }
+}
+
+var mathNotes = new Notebook();
+mathNotes.addPage("Arithmetic: + - * / ...");
+mathNotes.addPage("Trigonometry: sin cos tan ...");
+
+mathNotes.print();
+// ..
+```
+
+In the `Page` class, the data is a string of text stored in a `this.text` member property. The behavior is `print()`, a method that dumps the text to the console.
+
+For the `Notebook` class, the data is an array of `Page` instances. The behavior is `addPage(..)`, a method that instantiates new `Page` pages and adds them to the list, as well as `print()` which prints out all the pages in the notebook.
+
+The statement `mathNotes = new Notebook()` creates an instance of the `Notebook` class, and `page = new Page(text)` is where instances of the `Page` class are created.
+
+Behavior (methods) can only be called on instances (not the classes themselves), such as `mathNotes.addPage(..)` and `page.print()`.
+
+The `class` mechanism allows packaging data (`text` and `pages`) to be organized together with their behaviors (`addPage(..)`, `print()`). The same program could have been built without any `class` definitions, but it would likely have been much less organized, harder to read and reason about, and more susceptible to bugs and subpar maintenance.
+
+#### Class Inheritance
+
+Another aspect inherent to traditional "class oriented" design, though a bit less commonly used in JS, is "inheritance" (and "polymorphism"). Consider:
+
+```js
+class Publication {
+    constructor(title,author,pubDate) {
+        this.title = title;
+        this.author = author;
+        this.pubDate = pubDate;
+    }
+
+    print() {
+        console.log(`
+            Title: ${this.title}
+            By: ${this.author}
+            ${this.pubDate}
+        `);
+    }
+}
+```
+
+This `Publication` class defines a set of common behavior that any publication might need.
+
+Now let's consider more specific types of publication, like `Book` and `BlogPost`:
+
+```js
+class Book extends Publication {
+    constructor(bookDetails) {
+        super(
+            bookDetails.title,
+            bookDetails.author,
+            bookDetails.publishedOn
+        );
+        this.publisher = bookDetails.publisher;
+        this.ISBN = bookDetails.ISBN;
+    }
+
+    print() {
+        super.print();
+        console.log(`
+            Published By: ${this.publisher}
+            ISBN: ${this.ISBN}
+        `);
+    }
+}
+
+class BlogPost extends Publication {
+    constructor(title,author,pubDate,URL) {
+        super(title,author,pubDate);
+        this.URL = URL;
+    }
+
+    print() {
+        super.print();
+        console.log(this.URL);
+    }
+}
+```
+
+Both `Book` and `BlogPost` use the `extends` clause to *extend* the general definition of `Publication` to include additional behavior. The `super(..)` call in each constructor delegates to the parent `Publication` class's constructor for its initialization work, and then they do more specific things according to their respective publication type (aka, "sub-class" or "child class").
+
+Now consider using these child classes:
+
+```js
+var YDKJS = new Book({
+    title: "You Don't Know JS",
+    author: "Kyle Simpson",
+    publishedOn: "June 2014",
+    publisher: "O'reilly",
+    ISBN: "123456-789"
+});
+
+YDKJS.print();
+// Title: You Don't Know JS
+// By: Kyle Simpson
+// June 2014
+// Published By: O'reilly
+// ISBN: 123456-789
+
+var forAgainstLet = new BlogPost(
+    "For and against let",
+    "Kyle Simpson",
+    "October 27, 2014",
+    "https://davidwalsh.name/for-and-against-let"
+);
+
+forAgainstLet.print();
+// Title: For and against let
+// By: Kyle Simpson
+// October 27, 2014
+// https://davidwalsh.name/for-and-against-let
+```
+
+Notice that both child class instances have a `print()` method, which was an override of the *inherited* `print()` method from the parent `Publication` class. Each of those overridden child class `print()` methods call `super.print()` to invoke the inherited version of the `print()` method.
+
+The fact that both the inherited and overriden methods can have the same name and co-exist is called *polymorphism*.
+
+Inheritance is a powerful tool for organizing data/behavior in separate logical units (classes), but allowing the child class to cooperate with the parent by accessing/using its behavior and data.
+
+### Modules
+
+The module pattern has essentially the same goal as the class pattern, which is to group data and behavior together into logical units. Also like classes, modules can "include" or "access" the data and behaviors of other modules, for cooperation sake.
+
+But modules have some important differences from classes. Most notably, the syntax is entirely different.
+
+#### Classic Modules
+
+ES6 added a module syntax form, which we'll look at in a moment. But from the early days of JS, modules was an important and common pattern that was leveraged in countless JS programs, even without a dedicated syntax.
+
+The key hallmarks of a *classic module* are an outer function (that runs at least once), which returns an "instance" of the module with one or more functions exposed that can operate on the module instance's internal (hidden) data.
+
+Because a module of this form is *just a function*, and calling it produces an "instance" of the module, another description for these functions is "module factories".
+
+Consider the classic module form of the earlier `Publication`, `Book`, and `BlogPost` classes:
+
+```js
+function Publication(title,author,pubDate) {
+    var publicAPI = {
+        print() {
+            console.log(`
+                Title: ${title}
+                By: ${author}
+                ${pubDate}
+            `);
+        }
+    };
+
+    return publicAPI;
+}
+
+function Book(bookDetails) {
+    var pub = Publication(
+        bookDetails.title,
+        bookDetails.author,
+        bookDetails.publishedOn
+    );
+
+    var publicAPI = {
+        print() {
+            pub.print();
+            console.log(`
+                Published By: ${bookDetails.publisher}
+                ISBN: ${bookDetails.ISBN}
+            `);
+        }
+    };
+
+    return publicAPI;
+}
+
+function BlogPost(title,author,pubDate,URL) {
+    var pub = Publication(title,author,pubDate);
+
+    var publicAPI = {
+        print() {
+            pub.print();
+            console.log(URL);
+        }
+    };
+
+    return publicAPI;
+}
+```
+
+Comparing these forms to the `class` forms, there are more similarities than differences.
+
+The `class` form stores methods and data on an object instance, which much be accessed with the `this.` prefix. With modules, the methods and data are accessed as identifier variables in scope, without any `this.` prefix.
+
+With `class`, the "API" of an instance is implicit in the class definition -- also, all data and methods are public. With the module factory function, you explicitly create and return an object with any publicly exposed methods, and any data or other unreferenced methods remain private inside the factory function.
+
+| NOTE: |
+| :--- |
+| There are other variations to this factory function form that are quite common across JS, even in 2019; you may run across these forms in different JS programs: AMD ("Asynchronous Module Definition"), UMD ("Universal Module Definition"), and CommonJS (classic Node.js style modules). The variations are minor, though. All of these forms rely on the same basic principles. |
+
+Consider also the usage (aka, "instantiation") of these module factory functions:
+
+```js
+var YDKJS = Book({
+    title: "You Don't Know JS",
+    author: "Kyle Simpson",
+    publishedOn: "June 2014",
+    publisher: "O'reilly",
+    ISBN: "123456-789"
+});
+
+YDKJS.print();
+// Title: You Don't Know JS
+// By: Kyle Simpson
+// June 2014
+// Published By: O'reilly
+// ISBN: 123456-789
+
+var forAgainstLet = BlogPost(
+    "For and against let",
+    "Kyle Simpson",
+    "October 27, 2014",
+    "https://davidwalsh.name/for-and-against-let"
+);
+
+forAgainstLet.print();
+// Title: For and against let
+// By: Kyle Simpson
+// October 27, 2014
+// https://davidwalsh.name/for-and-against-let
+```
+
+The only observable difference here is the lack of using `new`, calling the module factories as normal functions.
+
+#### ES6 Modules
+
+ES6 modules are meant to serve much the same spirit and purpose as the existing *classic modules* just described, especially taking into account important variations and use-cases from AMD, UMD, and CommonJS.
+
+The implementation approach does however differ significantly.
+
+First, there's no wrapping function to *define* a module. The wrapping context is a file. ES6 modules are always file-based; one file, one module.
+
+Second, you don't interact with a module's "API" explicitly, but rather use the `export` keyword to add a variable or method to its public API definition. If something is defined in a module but not `export`ed, then it stays hidden (just as with *classic modules*).
+
+Third, and maybe most noticeably different from previously discussed patterns, you don't "instantiate" an ES6 module, you just `import` it to use its single instance. ES6 modules are, in effect, "singletons", in that there's only one instance ever created, at first `import` in your program, and all other `import`s just receive a reference to that same single instance. If your module needs to support multiple instantiations, you have to provide a *classic module* style factory function on your ES6 module definition for that purpose.
+
+In our running example, we do assume multiple-instantation, so these following snippets will mix both ES6 modules and *classic modules*:.
+
+Consider the file `publication.js`:
+
+```js
+function printDetails(title,author,pubDate) {
+    console.log(`
+        Title: ${title}
+        By: ${author}
+        ${pubDate}
+    `);
+}
+
+export function create(title,author,pubDate) {
+    var publicAPI = {
+        print() {
+            printDetails(title,author,pubDate);
+        }
+    };
+
+    return publicAPI;
+}
+```
+
+To import and use this module, from another ES6 module like `blogpost.js`:
+
+```js
+import { create as createPub } from "publication.js";
+
+function printDetails(pub,URL) {
+    pub.print();
+    console.log(URL);
+}
+
+export function create(title,author,pubDate,URL) {
+    var pub = createPub(title,author,pubDate);
+
+    var publicAPI = {
+        print() {
+            printDetails(pub,URL);
+            pub.print();
+            console.log(URL);
+        }
+    };
+
+    return publicAPI;
+}
+```
+
+And finally, to use this module, we import into another ES6 module like `main.js`:
+
+```js
+import { create as createBlogPost } from "blogpost.js";
+
+var forAgainstLet = createBlogPost(
+    "For and against let",
+    "Kyle Simpson",
+    "October 27, 2014",
+    "https://davidwalsh.name/for-and-against-let"
+);
+
+forAgainstLet.print();
+// Title: For and against let
+// By: Kyle Simpson
+// October 27, 2014
+// https://davidwalsh.name/for-and-against-let
+```
+
+| NOTE: |
+| :--- |
+| The `as createBlogPost` clause in the `import` statement above is optional; if omitted, a top level function just named `create(..)` would be imported. In this case, I'm renaming it for readability sake; its more generic factory name of `create(..)` becomes more semantically descriptive of its purpose as `createBlogPost(..)`. |
+
+As shown, ES6 modules can utilize *classic modules* internally if they need to support multiple-instantiation. Alternatively, we could have exposed a `class` from our module instead of a `create(..)` factory function, with generally the same outcome. However, since you're already using ES6 modules at that point, I'd recommend sticking with *classic modules* instead of `class`.
+
+If your module only needs a single instance, you can skip the extra layers of complexity: `export` its public methods directly.
+
+## Before You Go On
+
+As promised at the top of this chapter, we just glanced over a wide surface area of the main parts of the JS language. Even with this "brief" survey of JS, there's a ton of details herein you should carefully consider and ensure you are comfortable with. I suggest re-reading this chapter, maybe a few times.
+
+In the next chapter, we're going to dive deeper into some important aspects of how JS works. Make sure you take your time with this chapter's material before you proceed.
