@@ -22,6 +22,7 @@
 * Chapter 3: Exploring Deeper
     * Closure
     * `this` Keyword
+    * Prototypes
     * Iteration
     * TODO
 * Appendix A: The Rest (Of The Series)
