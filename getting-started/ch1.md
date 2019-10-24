@@ -9,6 +9,10 @@ You don't know JS, yet. Neither do I, not fully anyway. None of us do. That's th
 
 But here's where you start that *journey* of getting to know the language a little better. I emphasize the word journey because *knowing JS* is not a destination, it's a direction. No matter how much time you spend with the language, you will always be able to find something else to learn and understand a little better.
 
+Keep in mind that even though this book is titled "Getting Started", it's not intended as a beginner/intro book. This book's job is to get you ready for the rest of the series, but it's written assuming you already have at least several months experience programming in JS.
+
+Even if you have a lot of experience in JS, this book should not be skimmed over or skipped. I recommend taking your time to fully process the material here. **A good start is always built on a good foundation.**
+
 In this chapter we'll cover some background housekeeping details, and clear up some myths and misconceptions about what the language really is (and isn't!). This is valuable insight into the identity and process of how JS is organized and maintained; all JS developers should understand it.
 
 But if you already feel pretty solid on JS behind-the-scenes, you may want to skip to Chapter 2 to start surveying the syntax of JS in more detail.
