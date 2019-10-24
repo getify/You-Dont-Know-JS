@@ -7,6 +7,8 @@ If you've read any of the 1st edition of the books, you can expect a refreshed a
 
 If this is your first time to read these books, I'm glad you're here. Prepare for a deep and extensive journey into all the corners of JavaScript.
 
+If you are new to programming or JS, please be aware that these books are not intended as a gentle "intro to JavaScript". This material is, at times, complex and challenging, and goes much deeper than is typical for a first-time learner. You're welcome here no matter what your background is, but these books are written assuming you're already comfortable with JS, with at least 6 - 9 months experience.
+
 ## The Parts
 
 These books approach JavaScript intentionally the opposite of *The Good Parts*. No, not *the bad parts*, but rather, focused on **all the parts**.
@@ -33,7 +35,7 @@ I'm not trying to insult you with criticism about your current lack of knowledge
 
 Seriously, all those were real reactions to the original series title before folks even read the books. And they're baseless.
 
-The primary point of the title "You Don't Know JS Yet" is to point out that most JS developers don't take the time to really understand how the code that they write, works. They know that it works -- that it produces a desired outcome. But they either don't understand exactly *how*, or worse, they have an inaccurate mental model for the *how* that falters on closer scrutiny.
+The primary point of the title "You Don't Know JS Yet" is to point out that most JS developers don't take the time to really understand how the code that they write, works. They know *that* it works -- that it produces a desired outcome. But they either don't understand exactly *how*, or worse, they have an inaccurate mental model for the *how* that falters on closer scrutiny.
 
 I'm presenting a gentle but earnest challenge to you the reader, to set aside the assumptions you have about JS, and approach it with fresh eyes and an invigorated curiosity that leads you to ask *why* for every line of code you write. Why does it do what it does? Why is one way better or more appropriate than the other half dozen ways you could have accomplished it? Why do all the "popular kids" say to do X with your code, but it turns out that Y might be a better choice?
 
@@ -51,11 +53,11 @@ The case doesn't really need to be made for why developers should take JS seriou
 
 But a different, more important case still needs to be made, and these books rise to that challenge.
 
-I've taught more than 5,000 developers from teams and companies all over the world, in more than 25 countries and six continents. And what I've seen is that far too often, what *counts* is generally just the result of the program, not how the program is written or how/why it works.
+I've taught more than 5,000 developers from teams and companies all over the world, in more than 25 countries on six continents. And what I've seen is that far too often, what *counts* is generally just the result of the program, not how the program is written or how/why it works.
 
 My experience not only as a developer but in teaching many other developers tells me: you will always be more effective in your development work if you more completely understand how your code works, than you are solely *just* getting it to produce a desired outcome.
 
-In other words, *good enough to work* is not *good enough*.
+In other words, *good enough to work* is not, and should not be, *good enough*.
 
 All developers regularly struggle with some piece of code not working correctly, and they can't figure out why. But far too often, JS developers will blame this on the language rather than admitting it's their own understanding that is falling short. These books serve as both the question and answer: why did it do *this*, and here's how to get it to do *that* instead.
 
