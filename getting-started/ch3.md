@@ -182,7 +182,154 @@ The benefit of `this`-aware functions -- and their dynamic context -- is the abi
 
 ## Prototypes
 
-TODO
+Where `this` is a characteristic of function execution, a prototype is a characteristic of an object, and specifically resolution of a property access.
+
+Think about a prototype as a linkage between two objects; the linkage is hidden behind the scenes, though there are ways to expose and observe it. This prototype linkage occurs when an object is created; it's linked to another object that already exists.
+
+A series of objects linked together via prototypes is called the "prototype chain".
+
+The purpose of this prototype linkage (ie, from an object B to another object A) is so that accesses against B for properties/methods that B does not have, are *delegated* to A to handle. Delegation of property/method access allows two (or more!) objects to cooperate with each other to perform a task.
+
+Consider defining an object as a normal literal:
+
+```js
+var homework = {
+    topic: "JS"
+};
+```
+
+The `homework` object only has a single property on it: `topic`. However, its default prototype linkage connects to the `Object.prototype` object, which has common built-in methods on it like `toString()` and `valueOf()`, among others.
+
+We can observe this prototype linkage *delegation* from `homework` to `Object.prototype`:
+
+```js
+homework.toString();    // [object Object]
+```
+
+`homework.toString()` works even though `homework` doesn't have a `toString()` method defined; the delegation invokes `Object.prototype.toString()` instead.
+
+### Object Linkage
+
+One way to create an object prototype linkage is to create the object using the `Object.create(..)` utility:
+
+```js
+var homework = {
+    topic: "JS"
+};
+
+var otherHomework = Object.create(homework);
+
+otherHomework.topic;        // "JS"
+```
+
+`Object.create(..)` expects an argument to specify an object to link the newly created object to.
+
+| NOTE: |
+| :--- |
+| `Object.create(null)` creates an object that is not prototype linked, so it's purely just a standalone object; in some circumstances, that may be preferable. |
+
+Delegation through the prototype chain only applies for accesses to lookup the value in a property. If you assign to a property of an object, that will apply directly to the object regardless of where that object is prototype linked to.
+
+Consider:
+
+```js
+homework.topic;
+// "JS"
+
+otherHomework.topic;
+// "JS"
+
+otherHomework.topic = "Math";
+otherHomework.topic;
+// "Math"
+
+homework.topic;
+// "JS" -- not "Math"
+```
+
+The assignment to `topic` creates a property of that name directly on `otherHomework`; there's no affect on the `topic` property on `homework`. The next statement then accesses `otherHomework.topic`, and we see the non-delegated answer from that new property: `"Math"`.
+
+### "Class" Linkage
+
+Another, frankly more convoluted, way of creating an object with a prototype linkage is using the "prototypal class" pattern, from before ES6 `class` was added to the language (see Chapter 2, "Classes").
+
+Consider:
+
+```js
+function Classroom() {
+    // ..
+}
+
+Classroom.prototype.welcome = function hello() {
+    console.log("Welcome, students!");
+};
+
+var mathClass = new Classroom();
+
+mathClass.welcome();
+// Welcome, students!
+```
+
+All functions by default reference an empty object at a property named `prototype`. Despite the confusing naming, this is **not** the function's *prototype* -- where the function is prototype linked to -- but rather the prototype object to *link to* when other objects are created by calling the function with `new`.
+
+We add a `welcome` property to that empty `Classroom.prototype` object, pointing at a `hello()` function.
+
+Then `new Classroom()` creates a new object (assigned to `mathClass`), and prototype links it to the existing `Classroom.prototype` object.
+
+Though `mathClass` does not have a `welcome()` property/function, it successfully delegates to `Classroom.prototype.welcome()`.
+
+This "prototypal class" pattern is now strongly discouraged, in favor of ES6's `class` (see Chapter 2, "Classes"); here's the same code expressed with `class`:
+
+```js
+class Classroom {
+    constructor() {
+        // ..
+    }
+
+    welcome() {
+        console.log("Welcome, students!");
+    }
+}
+
+var mathClass = new Classroom();
+
+mathClass.welcome();
+// Welcome, students!
+```
+
+Under the covers, the same prototype linkage is wired up, but this `class` syntax fits the class-oriented design pattern much more cleanly than "prototypal classes".
+
+### `this` Revisited
+
+One of the main reasons `this` supports dynamic context based on how the function is called is so that method calls on objects which delegate through the prototype chain still maintain the expected `this`.
+
+Consider:
+
+```js
+var homework = {
+    study() {
+        console.log(`Please study ${this.topic}`);
+    }
+};
+
+var jsHomework = Object.create(homework);
+jsHomework.topic = "JS";
+jsHomework.study();
+// Please study JS
+
+var mathHomework = Object.create(homework);
+mathHomework.topic = "Math";
+mathHomework.study();
+// Please study Math
+```
+
+The two objects `jsHomework` and `mathHomework` each prototype link to the single `homework` object, which has the `study()` function. `jsHomework` and `mathHomework` are each given their own `topic` property.
+
+`jsHomework.study()` delegates to `homework.study()`, but its `this` (in `this.topic`) for that execution resolves to `jsHomework` because of how the function is called, so `this.topic` is `"JS"`. Similarly for `mathHomework.study()` delegating to `homework.study()` but still resolving `this` to `mathHomework`, and thus `this.topic` as `"Math"`.
+
+The above code snippet would be far less useful if `this` was resolved to `homework`. Yet, in many other languages, it would seem `this` would be `homework` because the `study()` method is indeed defined on `homework`.
+
+Unlike many other languages, JS's `this` being dynamic is a critical component of allowing prototype delegation, and indeed `class`, to work as expected!
 
 ## Iteration
 
