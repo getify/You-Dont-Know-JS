@@ -1,5 +1,5 @@
 # You Don't Know JS Yet: Getting Started - 2nd Edition
-# Appendix A: Practice
+# Chapter 4: The Rest (of the Series)
 
 | NOTE: |
 | :--- |

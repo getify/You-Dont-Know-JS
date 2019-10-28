@@ -333,7 +333,9 @@ Unlike many other languages, JS's `this` being dynamic is a critical component o
 
 ## Iteration
 
-The iterator pattern has been around for decades, and suggests a standardized approach to consuming data from a source one *chunk* at a time. The idea is that it's more common and helpful iterate the data source -- to progressively handle the collection of data by processing the first part, then the next, and so on, rather than handling the entire set all at once.
+Since programs are essentially built to process data (and make decisions on that data), the patterns used to step through the data has a big impact on the program's readability.
+
+The iterator pattern has been around for decades, and suggests a "standardized" approach to consuming data from a source one *chunk* at a time. The idea is that it's more common and helpful iterate the data source -- to progressively handle the collection of data by processing the first part, then the next, and so on, rather than handling the entire set all at once.
 
 Imagine a data structure that represents a relational database `SELECT` query, which typically organizes the results as rows. If this query had only one or a couple of rows, you could handle the entire result set at once, and assign each row to a local variable, and perform whatever operations on that data that were appropriate.
 
@@ -396,13 +398,13 @@ In both cases, the iterator-spread form of `...` follows the iterator-consumptio
 
 ### Iterables
 
-The iterator-consumption protocol is technically defined for consuming *iterables*; an iterable is any value that can be iterated over.
+The iterator-consumption protocol is technically defined for consuming *iterables*; an iterable is a value that can be iterated over.
 
-The protocol automatically creates an iterator instance from an iterable, and consumes *just that iterator instance*. This means a single iterable could be consumed more than once; each time, a new iterator instance would be used.
+The protocol automatically creates an iterator instance from an iterable, and consumes *just that iterator instance* to its completion. This means a single iterable could be consumed more than once; each time, a new iterator instance would be created and used.
 
-So where can we find iterables?
+So where do we find iterables?
 
-ES6 defined the basic data structure/collection types in JS as iterables. This includes: strings, arrays, Maps, Sets, etc.
+ES6 defined the basic data structure/collection types in JS as iterables. This includes strings, arrays, maps, sets, and others.
 
 Consider:
 
@@ -418,7 +420,7 @@ for (let val of arr) {
 // Array value: 30
 ```
 
-Since arrays are iterables, we can shallow-copy an array using the `...` spread:
+Since arrays are iterables, we can shallow-copy an array using iterator consumption via the `...` spread operator:
 
 ```js
 var arrCopy = [ ...arr ];
@@ -435,36 +437,37 @@ chars;
 //   "w", "o", "r", "l", "d", "!" ]
 ```
 
-A `Map` data structure uses objects as keys, associating any other sort of value with that object.
+A `Map` data structure uses objects as keys, associating a value (of any type) with that object. Maps have a different default iteration than seen above, in that the iteration is not just over the map's values but instead its *entries* -- an *entry* is a tuple (2-element array) including both a key and a value.
 
-Maps iterate slightly differently by default than seen above, in that iteration is over the *entries* of the map. In other words, each consumed iteration value is a tuple (2-element array) that includes the key and the value:
+Consider:
 
 ```js
 // given two DOM elements, `btn1` and `btn2`
+
 var buttonNames = new Map();
 buttonNames.set(btn1,"Button 1");
 buttonNames.set(btn2,"Button 2");
 
-for (let [btn,name] of buttonNames) {
-    console.log(`${name} is: ${btn1}`);
+for (let [btn,btnName] of buttonNames) {
+    btn.addEventListener("click",function onClick(){
+        console.log(`Clicked ${btnName}`);
+    });
 }
-// Button 1 is: ..
-// Button 2 is: ..
 ```
 
-In the `for..of` loop over the default map iteration, we use the `[btn,name]` array destructuring form to break down each consumed tuple into the key (`btn1`, `btn2`) and value (`"Button 1", "Button 2"`).
+In the `for..of` loop over the default map iteration, we use the `[btn,btnName]` syntax (called "array destructuring") to break down each consumed tuple into the respective key/value pairs (`btn1` / `"Button 1"` and `btn2` / `"Button 2"`).
 
-Each of the built-in iterables in JS expose a default iteration that likely matches your intution. But you can also consume more specific iteration types. For example, if we wanted to consume only the values of the above `buttonNames` map, we can call `values()` on to get a values-only iterator:
+Each of the built-in iterables in JS expose a default iteration, one which likely matches your intution. But you can also choose a more specific iteration if necessary. For example, if we want to consume only the values of the above `buttonNames` map, we can call `values()` to get a values-only iterator:
 
 ```js
-for (let val of buttonNames.values()) {
-    console.log(val);
+for (let btnName of buttonNames.values()) {
+    console.log(btnName);
 }
 // Button 1
 // Button 2
 ```
 
-Or if we want the index and value out of an array iteration:
+Or if we want the index *and* value in an array iteration, we can make an entries iterator with the `entries()` method:
 
 ```js
 var arr = [ 10, 20, 30 ];
@@ -477,8 +480,20 @@ for (let [idx,val] of arr.entries()) {
 // [2]: 30
 ```
 
+For the most part, all built-in iterables in JS have three iterator forms available: keys-only (`keys()`), values-only (`values()`), and entries (`entries()`).
+
 | NOTE: |
 | :--- |
-| You may have noticed a nuanced shift that occured in this discussion. We started by talking about consuming **iterators**, but then switched to talking about iterating over **iterables**. The iteration-consumption protocol expects an *iterable*, but the reason we can provide a direct *iterator* is: an iterator is just an iterable of itself! In other words, when JS tries to create an iterator instance **for something that's already an iterator**, it just returns the iterator. |
+| You may have noticed a nuanced shift that occured in this discussion. We started by talking about consuming **iterators**, but then switched to talking about iterating over **iterables**. The iteration-consumption protocol expects an *iterable*, but the reason we can provide a direct *iterator* is, an iterator is just an iterable of itself! In other words, when JS tries to create an iterator instance **from something that's already an iterator**, it just returns the iterator. |
 
-// TODO: Chapter Summary
+Beyond just using built-in iterables, you can also ensure your own data structures adhere to the iteration protocol; doing so means you opt into the ability to consume your data with `for..of` loops and the `...` operator. "Standardizing" on this protocol means code that is overall more readily recognizable and readable.
+
+## Asking Why
+
+The intended take-away from this chapter is that there's a lot more to JS under the hood than is obvious from glancing at the surface.
+
+As you are *getting started* learning and knowing JS more closely, one of the most important skills you can practice and bolster is curiosity, and the art of asking "why?" when you encounter something in the language.
+
+Even though this chapter has gone deeper on some of the topics, many details have been entirely skimmed over. There's much more to learn here, and the path to that starts with you asking the *right* questions of the code.
+
+In the final chapter of this book, we're going to briefly look at how to approach the rest of the *You Don't Know JS Yet* book series. Also, don't miss Appendix A, which has some practice code to review some of the main topics covered in this book.

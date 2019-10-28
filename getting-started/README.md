@@ -11,4 +11,5 @@
 * [Chapter 1: What Is JavaScript?](ch1.md)
 * [Chapter 2: Getting To Know JS](ch2.md)
 * [Chapter 3: Exploring Deeper](ch3.md)
-* TODO
+* [Chapter 4: The Rest (of the Series)](ch4.md)
+* [Appendix A: Practice](apA.md)

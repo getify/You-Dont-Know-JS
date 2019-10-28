@@ -19,11 +19,14 @@
 	* Functions
     * Comparisons
     * Code Organization
+    * Before You Go On
 * Chapter 3: Exploring Deeper
     * Closure
     * `this` Keyword
     * Prototypes
     * Iteration
+    * Asking Why
+* Chapter 4: The Rest (of the Series)
     * TODO
-* Appendix A: The Rest (Of The Series)
+* Appendix A: Practice
     * TODO
