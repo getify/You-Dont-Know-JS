@@ -27,6 +27,7 @@
     * Iteration
     * Asking Why
 * Chapter 4: The Rest (of the Series)
+    * In Order
     * TODO
 * Appendix A: Practice
     * TODO
