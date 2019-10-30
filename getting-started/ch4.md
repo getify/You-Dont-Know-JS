@@ -7,15 +7,49 @@
 
 This book surveys most of what you need to be aware of as you *get started* with JS. The goal is to fill in gaps that readers newer to JS might have tripped over in their early encounters with the language. I also hope that we've hinted at enough detail throughout to pique your curiosity to want to dig more into the language.
 
-The rest of the books in this series are where we will unpack all of the language, in far greater detail than we could have done in a few brief chapters here.
+The rest of the books in this series are where we will unpack all of the rest of the language, in far greater detail than we could have done in a few brief chapters here.
 
 Remember to take your time, though. Rather than rushing onto the next book in an attempt to churn through all the books expediently, spend some time going back over the material in this book. Spend some more time looking through code in your current projects, and comparing what you see to what's been discussed here.
 
-When you're ready to move on, this chapter provides a brief roadmap of what to expect from the rest of the book series, and how I suggest you proceed.
+When you're ready, this final chapter provides a brief preview and roadmap of what to expect from the rest of the book series, and how I suggest you proceed. Also, don't skip Appendix A, *Practice, Practice, Practice!*
+
+## Pillar 1: Scope and Closure
+
+The organization of variables into units of scope (functions, blocks) is one of the most foundational characteristics of any language; perhaps no other characteristic has a greater impact on how programs behave.
+
+Scopes are like buckets, and variables are like marbles you put into those buckets. The scope model of a language is like the rules that help you determine which color marbles go in which matching-color buckets.
+
+Scopes nest inside each other, and for any given expression or statement, only variables at that level of scope nesting, or in higher/outer scopes, are accessible; variables from lower/inner scopes are hidden and inaccessible.
+
+This is how scopes behave in most languages, which is called lexical scope. The scope unit boundaries, and how variables are organized in them, is determined at the time the program is parsed (compiled). In other words, it's an author-time decision: where you locate a function/scope in the program determines what the scope structure of that part of the program will be.
+
+JS is lexically scoped, though many claim it isn't, because of two particular characteristics of its model that are not present in other lexically scoped languages.
+
+The first is commonly called *hoisting*: when all variables declared anywhere in a scope are treated as if they're declared at the beginning of the scope. The other is that `var` declared variables are function scoped, even if they appear inside a block.
+
+| NOTE: |
+| :--- |
+| It's often claimed that only `var` declarations are hoisted, but that `let` and `const` are not -- due to their "temporal dead zone" (TDZ) behavior. But this claim is incorrect; all three declarators indeed are *hoisted*, because identifiers declared with any of these keywords are observable (if not usable!) throughout the entire scope. The actual difference is, `var` declarations are **also** auto-initialized to `undefined` at the beginning of a scope, so that they are usable throughout the entire scope. By contrast, `let` and `const` declarations are not initialized until their statements are executed, meaning those identifiers are present but cannot be used until then (ie, TDZ). |
+
+Neither hoisting nor function-scoped `var` are sufficient to back the claim that JS is not lexically scoped, any more than TDZ (also unique to JS's `let` and `const` declarations) would. These are just unique parts of the language that should be learned and understood by all JS developers.
+
+Closure is a natural result of lexical scope when the language has functions as first-class values, as JS does. When a function makes reference to variables from an outer scope, and that function is passed around as a value and executed in other scopes, it maintains access to its original scope variables; this is closure.
+
+Across all of programming, but especially in JS, closure drives many of the most important programming patterns, including modules.
+
+To dig further into scope, closures, and how modules work, read book 2, *Scope & Closures*.
+
+## Pillar 2: Prototypes
+
+TODO
+
+## Pillar 3: Types and Coercion
+
+TODO
 
 ## In Order
 
-One of the most common questions I get is, "what order should I read the books?" There's a straightforward answer here, but it also depends.
+One of the most common questions I get is, "What order should I read the books?" There's a straightforward answer here, but it also depends.
 
 My suggestion for most readers is, this how best to proceed through this series:
 
@@ -25,18 +59,48 @@ My suggestion for most readers is, this how best to proceed through this series:
 
 3. In *Objects & Classes*, focus on the second pillar of JS: how JS's `this` works, how object prototypes support delegation, and how prototypes enable the `class` mechanism for OO-style code organization.
 
-4. In *Types & Grammar*, tackle the third and final pillar of JS: types and type coercion, as well as how JS's syntax and grammar impact the code we write.
+4. In *Types & Grammar*, tackle the third and final pillar of JS: types and type coercion, as well as how JS's syntax and grammar define how we write our code.
 
-5. With the **three pillars** down, *Sync & Async* then explores how flow control can model state change in our programs, both synchronously (right away) and asynchronously (over time).
+5. With the **three pillars** solidly in place, *Sync & Async* then explores how we use flow control to model state change in our programs, both synchronously (right away) and asynchronously (over time).
 
-6. The series concludes with *ES.Next & Beyond*, a forward look at the near- and mid-term future of JS, including a variety of features that are likely coming to your JS programs before too long.
+6. The series concludes with *ES.Next & Beyond*, a forward look at the near- and mid-term future of JS, including a variety of features likely coming to your JS programs before too long.
 
 That's the intended order to read this book series.
 
-However, books 2, 3, and 4 can generally be read in any order, depending on which topic you feel most curious about and comfortable exploring first. I don't recommend you skip any of these three books, even if you feel you're already comfortable at quick glance.
+However, books 2, 3, and 4 can generally be read in any order, depending on which topic you feel most curious about and comfortable exploring first. But I don't recommend you skip any of these three books -- not even types/coercion, as some of you will be tempted to do! -- even if you feel you're already comfortable with that topic at quick glance.
 
-Book 5 (*Sync & Async*) is crucial for deeply understanding JS, but if you start digging in and it's too intimidating, this book can be deferred until you're more experienced with the language. The more JS you've written (and struggled with!), the more you'll appreciate this book.
+Book 5 (*Sync & Async*) is crucial for deeply understanding JS, but if you start digging in and find it's too intimidating, this book can be deferred until you're more experienced with the language. The more JS you've written (and struggled with!), the more you'll come to appreciate this book.
 
-And the final book in the series somewhat stands alone. It can be read at the end, as I suggest, or right after *Getting Started* if you're looking for a shortcut to broaden your radar of what JS is all about. This book will also tend to get more updates going forward in the future, so it will probably need to be re-visited on a regular basis.
+The final book in the series, *ES.Next & Beyond*, in some respects stands alone. It can be read at the end, as I suggest, or right after *Getting Started* if you're looking for a shortcut to broaden your radar of what JS is all about. This book will also be more likely to receive updates in the future, so you'll probably want to re-visit it occasionally.
 
-## TODO
+## With The Grain
+
+A final note on continuing your learning journey with JS, and your path through the rest of this book series: be aware of the *grain*.
+
+First, consider the *grain* of how most people approach and use JS. You've probably already noticed that these books cut against that *grain* in many respects. In YDKJSY, I respect you the reader enough to explain all the parts of JS, not only some select popular parts. I believe you're both capable and deserving of that knowledge.
+
+But that is not what you'll find from a lot of other material out there. It also means that the more you follow and adhere to the guidance from these books -- that you think carefully and analyze for yourself what's best in your code -- the more you will stand out. That can be a good and bad thing.
+
+I've had many people tell me that they quoted some topic/explanation from these books during a job interview, and the interviewer told the candidate they were wrong; indeed, people have reportedly lost out on job offers as a result.
+
+As much as possible, I endeavor in these books to provide completely accurate information about JS, informed generally from the specification itself. But I also dose out quite a bit of my opinions on how you can interpret and use JS to the best benefit in your programs. I don't present opinion as fact, or vice versa. You'll always know which is which in these books.
+
+Facts about JS are not really up for debate. Either the specification says something, or it doesn't. If you don't like what the specification says, or my relaying of it, take that up with TC39! If you're in an interview and they claim you're wrong on the facts, ask them right then and there if you can look it up in the specification. If the interviewer won't relent, then you shouldn't want to work there anyway.
+
+But if you choose to align with my opinions, you have to be prepared to back up that choice with *why* you feel that way. Don't just parrot what I say. Own your opinions. Defend them. And if someone you're hoping to work with disagrees, walk away with your head held high.
+
+In other words, don't be afraid to go against the *grain*, as I have done with these books and all my teachings. Nobody can tell you how you will best make use of JS; that's for you to decide. I'm merely trying to empower you, the reader, in coming to your own conclusions, no matter what they are.
+
+On the other hand, there's a *grain* you really should pay attention to and follow: the *grain* of how JS works, at the language level. There are things that work well and naturally in JS, given the right practice and approach, and there are things you really shouldn't try to do in the language.
+
+Can you make your JS program look like a Java, C#, or Perl program? What about Python or Ruby, or even PHP? To varying degrees, sure you can. But should you?
+
+No, I don't think you should. I think you should learn and embrace the JS way, and make your JS programs as JS'y as is practical. Some will think that means sloppy and informal programming, but I don't mean that at all. I just mean that JS has a lot of patterns and idioms that are recognizably "JS", and going with that *grain* is the general path to best success.
+
+Finally, maybe the most important *grain* to be aware of and follow is how the existing program(s) you're working on, and developers you're working with, do stuff. Don't read these books and then try to change that *grain* in your existing projects over night. That approach will always fail.
+
+You'll have to shift these things little by little, over time. Work on building consensus with your fellow developers on why it's important to change an approach, but do so with just one small topic at a time, and let before-and-after code comparisons do most of the talking. Bring everyone on the team together to discuss, and push for decisions that are based on the evidence from the code rather than just "our senior devs have always done it this way".
+
+That's the most important advice I can leave you with. Always keep looking for better ways to use what JS gives us to author more readable code. Everyone who works on your code, including your future self, will thank you!
+
+Before you move on to the next book in the series, *Scope & Closures*, check out and practice the snippets in Appendix A, *Practice, Practice, Practice!*

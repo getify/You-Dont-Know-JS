@@ -28,6 +28,9 @@
     * Asking Why
 * Chapter 4: The Rest (of the Series)
     * In Order
-    * TODO
-* Appendix A: Practice
+    * Pillar 1: Scope and Closure
+    * Pillar 2: Prototypes
+    * Pillar 3: Types and Coercion
+    * With The Grain
+* Appendix A: Practice, Practice, Practice!
     * TODO
