@@ -221,7 +221,7 @@ hello("Kyle");
 
 Here, the identifier `hello` is created in the outer scope, and it's also automatically associated so that it references the function. But the named parameter `name` is created only inside the function, and thus is only accessible inside that function's scope.
 
-Both `hello` and `name` act generally as if they were declared with `var`.
+`hello` acts as if it was declared with `var` where as `name` declares as if declared with `let`.
 
 Another syntax that declares a variable is the `catch` clause of a `try..catch` statement:
 
