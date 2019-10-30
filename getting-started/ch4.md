@@ -35,7 +35,7 @@ Neither hoisting nor function-scoped `var` are sufficient to back the claim that
 
 Closure is a natural result of lexical scope when the language has functions as first-class values, as JS does. When a function makes reference to variables from an outer scope, and that function is passed around as a value and executed in other scopes, it maintains access to its original scope variables; this is closure.
 
-Across all of programming, but especially in JS, closure drives many of the most important programming patterns, including modules.
+Across all of programming, but especially in JS, closure drives many of the most important programming patterns, including modules. As I see it, modules are as *with the grain* as you can get, when it comes to code organization in JS.
 
 To dig further into scope, closures, and how modules work, read Book 2, *Scope & Closures*.
 
@@ -53,15 +53,33 @@ Classes are just one pattern you can build on top of such power. But another app
 
 But class inheritance gets almost all the attention. And the rest goes to functional programming (FP), as the sort of "anti-class" way of designing programs. This saddens me, because it snuffs out any chance for exploration of delegation as a viable alternative.
 
-I encourage you to spend plenty of time deep in Book 3, *Objects & Classes*, to see how object delegation holds far more potential than we've perhaps realized. This isn't an anti-`class` message, but it is intentionally a "classes aren't the only way to use objects" message that I want more JS developers to consider. Object delegation is, I would argue, more *with the grain* of JS, than classes (more on *grains* in a bit).
+I encourage you to spend plenty of time deep in Book 3, *Objects & Classes*, to see how object delegation holds far more potential than we've perhaps realized. This isn't an anti-`class` message, but it is intentionally a "classes aren't the only way to use objects" message that I want more JS developers to consider.
+
+Object delegation is, I would argue, far more *with the grain* of JS, than classes (more on *grains* in a bit).
 
 ## Pillar 3: Types and Coercion
 
-TODO
+The third pillar of JS is by far the most overlooked part of JS's identity.
+
+The vast majority of developers have strong misconceptions about how *types* work in programming languages, and especially how they work in JS. A tidal wave of interest in the broader JS community has begun to shift to "static typing" approaches, using type-aware tooling like TypeScript or Flow.
+
+I agree that JS developers should learn more about types, and should learn more about how JS manages type conversions. I also agree that type-aware tooling can help developers, assuming they have gained and used this knowledge in the first place!
+
+But I don't agree at all that the inevitable conclusion of this is to decide JS's type mechanism is bad and that we need to cover up JS's types with solutions outside the language. We don't have to follow the "static typing" way to be smart and solid with types in our programs. There are other options, if you're just willing to go *against the grain* of the crowd, and *with the grain* of JS (again, more on that below).
+
+Arguably, this pillar is more important than the other two, in the sense that no JS program will do anything useful if it doesn't properly leverage JS's value types, as well as how values are converted (coerced) between types.
+
+Even if you love TypeScript / Flow, you are not going to get the most out of those tools or coding approaches if you aren't deeply familiar with how the language manages value types.
+
+I can't fully make the case here, for you to learn about JS types and coercion; that's what the whole Book 4, *Types & Grammar* is for! But please don't skip over this topic because you've always heard that we can just use `===` and forget about the rest.
+
+Your foundation in JS is shaky and incomplete at best, without this pillar!
 
 ## In Order
 
-One of the most common questions I get is, "What order should I read the books?" There's a straightforward answer here, but it also depends.
+So now you have a better sense of what's left to explore in JS.
+
+But one of the most common questions I get is, "What order should I read the books?" There's a straightforward answer here, but it also depends.
 
 My suggestion for most readers is, this how best to proceed through this series:
 
@@ -87,21 +105,21 @@ The final book in the series, *ES.Next & Beyond*, in some respects stands alone.
 
 ## With The Grain
 
-A final note on continuing your learning journey with JS, and your path through the rest of this book series: be aware of the *grain*.
+A final note on continuing your learning journey with JS, and your path through the rest of this book series: be aware of the *grain* -- recall various references to *grain* earlier in this chapter.
 
 First, consider the *grain* of how most people approach and use JS. You've probably already noticed that these books cut against that *grain* in many respects. In YDKJSY, I respect you the reader enough to explain all the parts of JS, not only some select popular parts. I believe you're both capable and deserving of that knowledge.
 
-But that is not what you'll find from a lot of other material out there. It also means that the more you follow and adhere to the guidance from these books -- that you think carefully and analyze for yourself what's best in your code -- the more you will stand out. That can be a good and bad thing.
+But that is not what you'll find from a lot of other material out there. It also means that the more you follow and adhere to the guidance from these books -- that you think carefully and analyze for yourself what's best in your code -- the more you will stand out. That can be a good and bad thing. If you ever want to break out from the crowd, you're going to have to break from how the crowd does it!
 
-I've had many people tell me that they quoted some topic/explanation from these books during a job interview, and the interviewer told the candidate they were wrong; indeed, people have reportedly lost out on job offers as a result.
+But I've also had many people tell me that they quoted some topic/explanation from these books during a job interview, and the interviewer told the candidate they were wrong; indeed, people have reportedly lost out on job offers as a result.
 
 As much as possible, I endeavor in these books to provide completely accurate information about JS, informed generally from the specification itself. But I also dose out quite a bit of my opinions on how you can interpret and use JS to the best benefit in your programs. I don't present opinion as fact, or vice versa. You'll always know which is which in these books.
 
-Facts about JS are not really up for debate. Either the specification says something, or it doesn't. If you don't like what the specification says, or my relaying of it, take that up with TC39! If you're in an interview and they claim you're wrong on the facts, ask them right then and there if you can look it up in the specification. If the interviewer won't relent, then you shouldn't want to work there anyway.
+Facts about JS are not really up for debate. Either the specification says something, or it doesn't. If you don't like what the specification says, or my relaying of it, take that up with TC39! If you're in an interview and they claim you're wrong on the facts, ask them right then and there if you can look it up in the specification. If the interviewer won't re-consider, then you shouldn't want to work there anyway.
 
-But if you choose to align with my opinions, you have to be prepared to back up that choice with *why* you feel that way. Don't just parrot what I say. Own your opinions. Defend them. And if someone you're hoping to work with disagrees, walk away with your head held high.
+But if you choose to align with my opinions, you have to be prepared to back up those choices with *why* you feel that way. Don't just parrot what I say. Own your opinions. Defend them. And if someone you were hoping to work with disagrees, walk away with your head still held high. It's a big JS, and there's plenty of room for lots of different ways.
 
-In other words, don't be afraid to go against the *grain*, as I have done with these books and all my teachings. Nobody can tell you how you will best make use of JS; that's for you to decide. I'm merely trying to empower you, the reader, in coming to your own conclusions, no matter what they are.
+In other words, don't be afraid to go against the *grain*, as I have done with these books and all my teachings. Nobody can tell you how you will best make use of JS; that's for you to decide. I'm merely trying to empower you in coming to your own conclusions, no matter what they are.
 
 On the other hand, there's a *grain* you really should pay attention to and follow: the *grain* of how JS works, at the language level. There are things that work well and naturally in JS, given the right practice and approach, and there are things you really shouldn't try to do in the language.
 
@@ -109,10 +127,10 @@ Can you make your JS program look like a Java, C#, or Perl program? What about P
 
 No, I don't think you should. I think you should learn and embrace the JS way, and make your JS programs as JS'y as is practical. Some will think that means sloppy and informal programming, but I don't mean that at all. I just mean that JS has a lot of patterns and idioms that are recognizably "JS", and going with that *grain* is the general path to best success.
 
-Finally, maybe the most important *grain* to be aware of and follow is how the existing program(s) you're working on, and developers you're working with, do stuff. Don't read these books and then try to change that *grain* in your existing projects over night. That approach will always fail.
+Finally, maybe the most important *grain* to be recognize is how the existing program(s) you're working on, and developers you're working with, do stuff. Don't read these books and then try to change that *all that grain* in your existing projects over night. That approach will always fail.
 
-You'll have to shift these things little by little, over time. Work on building consensus with your fellow developers on why it's important to change an approach, but do so with just one small topic at a time, and let before-and-after code comparisons do most of the talking. Bring everyone on the team together to discuss, and push for decisions that are based on the evidence from the code rather than just "our senior devs have always done it this way".
+You'll have to shift these things little by little, over time. Work on building consensus with your fellow developers on why it's important to re-visit and re-consider an approach. But do so with just one small topic at a time, and let before-and-after code comparisons do most of the talking. Bring everyone on the team together to discuss, and push for decisions that are based on analysis and evidence from the code rather than the inertia of, "our senior devs have always done it this way".
 
 That's the most important advice I can leave you with. Always keep looking for better ways to use what JS gives us to author more readable code. Everyone who works on your code, including your future self, will thank you!
 
-Before you move on to the next book in the series, *Scope & Closures*, check out and practice the snippets in Appendix A, *Practice, Practice, Practice!*
+Before you move on to the next book in the series, *Scope & Closures*, check out and practice the snippets in Appendix A, *Practice, Practice, Practice!* Did I mention you should go practice? There's no better way to learn code than to write it.
