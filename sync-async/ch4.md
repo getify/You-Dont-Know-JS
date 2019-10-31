@@ -21,6 +21,10 @@
 
 ----
 
+| NOTE: |
+| :--- |
+| Everything below here is previous text from 1st edition, and is only here for reference while 2nd edition work is underway. **Please ignore this stuff.** |
+
 In Chapter 2, we identified two key drawbacks to expressing async flow control with callbacks:
 
 * Callback-based async doesn't fit how our brain plans out steps of a task.

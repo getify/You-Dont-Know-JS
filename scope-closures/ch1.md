@@ -21,6 +21,10 @@
 
 ----
 
+| NOTE: |
+| :--- |
+| Everything below here is previous text from 1st edition, and is only here for reference while 2nd edition work is underway. **Please ignore this stuff.** |
+
 One of the most fundamental paradigms of nearly all programming languages is the ability to store values in variables, and later retrieve or modify those values. In fact, the ability to store values and pull values out of variables is what gives a program *state*.
 
 Without such a concept, a program could perform some tasks, but they would be extremely limited and not terribly interesting.

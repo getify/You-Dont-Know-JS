@@ -21,6 +21,10 @@
 
 ----
 
+| NOTE: |
+| :--- |
+| Everything below here is previous text from 1st edition, and is only here for reference while 2nd edition work is underway. **Please ignore this stuff.** |
+
 In Chapters 1 and 2, we explained how the `this` binding points to various objects depending on the call-site of the function invocation. But what exactly are objects, and why do we need to point to them? We will explore objects in detail in this chapter.
 
 ## Syntax

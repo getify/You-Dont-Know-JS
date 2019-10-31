@@ -27,10 +27,10 @@
     * Iteration
     * Asking Why
 * Chapter 4: The Rest (of the Series)
-    * In Order
     * Pillar 1: Scope and Closure
     * Pillar 2: Prototypes
     * Pillar 3: Types and Coercion
+    * In Order
     * With The Grain
 * Appendix A: Practice, Practice, Practice!
     * TODO

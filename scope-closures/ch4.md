@@ -21,6 +21,10 @@
 
 ----
 
+| NOTE: |
+| :--- |
+| Everything below here is previous text from 1st edition, and is only here for reference while 2nd edition work is underway. **Please ignore this stuff.** |
+
 By now, you should be fairly comfortable with the idea of scope, and how variables are attached to different levels of scope depending on where and how they are declared. Both function scope and block scope behave by the same rules in this regard: any variable declared within a scope is attached to that scope.
 
 But there's a subtle detail of how scope attachment works with declarations that appear in various locations within a scope, and that detail is what we will examine here.
@@ -99,9 +103,9 @@ In other words, **the egg (declaration) comes before the chicken (assignment)**.
 foo();
 
 function foo() {
-	console.log( a ); // undefined
+    console.log( a ); // undefined
 
-	var a = 2;
+    var a = 2;
 }
 ```
 
@@ -111,11 +115,11 @@ It's also important to note that hoisting is **per-scope**. So while our previou
 
 ```js
 function foo() {
-	var a;
+    var a;
 
-	console.log( a ); // undefined
+    console.log( a ); // undefined
 
-	a = 2;
+    a = 2;
 }
 
 foo();
@@ -127,7 +131,7 @@ Function declarations are hoisted, as we just saw. But function expressions are 
 foo(); // not ReferenceError, but TypeError!
 
 var foo = function bar() {
-	// ...
+    // ...
 };
 ```
 
@@ -140,7 +144,7 @@ foo(); // TypeError
 bar(); // ReferenceError
 
 var foo = function bar() {
-	// ...
+    // ...
 };
 ```
 
@@ -153,8 +157,8 @@ foo(); // TypeError
 bar(); // ReferenceError
 
 foo = function() {
-	var bar = ...self...
-	// ...
+    var bar = ...self...
+    // ...
 }
 ```
 
@@ -170,11 +174,11 @@ foo(); // 1
 var foo;
 
 function foo() {
-	console.log( 1 );
+    console.log( 1 );
 }
 
 foo = function() {
-	console.log( 2 );
+    console.log( 2 );
 };
 ```
 
@@ -182,13 +186,13 @@ foo = function() {
 
 ```js
 function foo() {
-	console.log( 1 );
+    console.log( 1 );
 }
 
 foo(); // 1
 
 foo = function() {
-	console.log( 2 );
+    console.log( 2 );
 };
 ```
 
@@ -200,15 +204,15 @@ While multiple/duplicate `var` declarations are effectively ignored, subsequent 
 foo(); // 3
 
 function foo() {
-	console.log( 1 );
+    console.log( 1 );
 }
 
 var foo = function() {
-	console.log( 2 );
+    console.log( 2 );
 };
 
 function foo() {
-	console.log( 3 );
+    console.log( 3 );
 }
 ```
 

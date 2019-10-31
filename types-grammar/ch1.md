@@ -21,6 +21,10 @@
 
 ----
 
+| NOTE: |
+| :--- |
+| Everything below here is previous text from 1st edition, and is only here for reference while 2nd edition work is underway. **Please ignore this stuff.** |
+
 Most developers would say that a dynamic language (like JS) does not have *types*. Let's see what the ES5.1 specification (http://www.ecma-international.org/ecma-262/5.1/) has to say on the topic:
 
 > Algorithms within this specification manipulate values each of which has an associated type. The possible value types are exactly those defined in this clause. Types are further sub classified into ECMAScript language types and specification types.
