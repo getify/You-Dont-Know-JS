@@ -899,8 +899,6 @@ export function create(title,author,pubDate,URL) {
     var publicAPI = {
         print() {
             printDetails(pub,URL);
-            pub.print();
-            console.log(URL);
         }
     };
 
