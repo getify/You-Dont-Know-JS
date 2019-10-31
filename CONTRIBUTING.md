@@ -18,9 +18,13 @@ The intended **best reading experience** are the published books (either ebook o
 
 ## Editions
 
-The current edition (*work in progress*) of the books is the 2nd edition. While these 2nd edition books are in progress, feel free to provide any contributions.
+The current edition (*work in progress*) of the books is the 2nd edition. While these 2nd edition books are in progress, contributions are OK, but **there's no need to jump the gun early** while I'm still working on stuff. That's what "work in progress" means. :)
 
-I **am not accepting any contributions** for previous edition books.
+| NOTE: |
+| :--- |
+| **ALSO**, please note that while a book is in progress, the previous 1st edition text may be included at the bottom of each file, and marked as such. Please ignore this text, as contributions there are not relevant. |
+
+I **am not accepting any contributions** for 1st edition books.
 
 ## Typos?
 
