@@ -215,12 +215,12 @@ This is how the code would look in the source code tree for that application. Bu
 var x$0;
 var x$1;
 if (something) {
-    x$1 = 3;
-    console.log(x$1);
+    x$0 = 3;
+    console.log(x$0);
 }
 else {
-    x$2 = 4;
-    console.log(x$2);
+    x$1 = 4;
+    console.log(x$1);
 }
 ```
 
