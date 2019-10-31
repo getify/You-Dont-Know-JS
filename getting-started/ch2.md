@@ -124,6 +124,23 @@ hitchhikersGuide[ Symbol("meaning of life") ];
 // 42
 ```
 
+For distinguishing values, the `typeof` operator tells you its built-in type, if primitive, or `"object"` otherwise:
+
+```js
+typeof 42;                // "number"
+typeof "abc";             // "string"
+typeof true;              // "boolean"
+typeof undefined;         // "undefined"
+typeof null;              // "object" -- oops, JS bug!
+typeof { "a": 1 };        // "object"
+typeof [1,2,3];           // "object"
+typeof function foo(){};  // "function"
+```
+
+| NOTE: |
+| :--- |
+| `typeof null` unfortunately returns `"object"` instead of the expected `"null"`. Also, `typeof` returns `"function"` for functions, but not an expected `"array"` for arrays. |
+
 ## Variables
 
 To be explicit about something that may not have been obvious in the previous section: in JS programs, values can either appear as literal values (as many of the above examples illustrate), or they can be held in variables; think of variables as just containers for values.
