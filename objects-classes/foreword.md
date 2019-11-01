@@ -1,4 +1,4 @@
-# You Don't Know JS Yet: *this* & Object Prototypes - 2nd Edition
+# You Don't Know JS Yet: Objects & Classes - 2nd Edition
 # Foreword
 
 | NOTE: |
