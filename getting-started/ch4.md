@@ -1,5 +1,5 @@
 # You Don't Know JS Yet: Getting Started - 2nd Edition
-# Chapter 4: The Rest (of the Series)
+# Chapter 4: The Rest
 
 | NOTE: |
 | :--- |
@@ -11,7 +11,7 @@ The rest of the books in this series are where we will unpack all of the rest of
 
 Remember to take your time, though. Rather than rushing onto the next book in an attempt to churn through all the books expediently, spend some time going back over the material in this book. Spend some more time looking through code in your current projects, and comparing what you see to what's been discussed here.
 
-When you're ready, this final chapter provides a brief preview and roadmap of what to expect from the rest of the book series, and how I suggest you proceed. Also, don't skip Appendix A, *Practice, Practice, Practice!*
+When you're ready, this final chapter provides a brief preview and roadmap of what to expect from the rest of the book series, and how I suggest you proceed. Also, don't skip Appendix A, "Practice, Practice, Practice!"
 
 ## Pillar 1: Scope and Closure
 
@@ -127,10 +127,10 @@ Can you make your JS program look like a Java, C#, or Perl program? What about P
 
 No, I don't think you should. I think you should learn and embrace the JS way, and make your JS programs as JS'y as is practical. Some will think that means sloppy and informal programming, but I don't mean that at all. I just mean that JS has a lot of patterns and idioms that are recognizably "JS", and going with that *grain* is the general path to best success.
 
-Finally, maybe the most important *grain* to be recognize is how the existing program(s) you're working on, and developers you're working with, do stuff. Don't read these books and then try to change that *all that grain* in your existing projects over night. That approach will always fail.
+Finally, maybe the most important *grain* to recognize is how the existing program(s) you're working on, and developers you're working with, do stuff. Don't read these books and then try to change *all that grain* in your existing projects over night. That approach will always fail.
 
 You'll have to shift these things little by little, over time. Work on building consensus with your fellow developers on why it's important to re-visit and re-consider an approach. But do so with just one small topic at a time, and let before-and-after code comparisons do most of the talking. Bring everyone on the team together to discuss, and push for decisions that are based on analysis and evidence from the code rather than the inertia of, "our senior devs have always done it this way".
 
 That's the most important advice I can leave you with. Always keep looking for better ways to use what JS gives us to author more readable code. Everyone who works on your code, including your future self, will thank you!
 
-Before you move on to the next book in the series, *Scope & Closures*, check out and practice the snippets in Appendix A, *Practice, Practice, Practice!* Did I mention you should go practice? There's no better way to learn code than to write it.
+Before you move on to the next book in the series, *Scope & Closures*, check out and practice the snippets in Appendix A, "Practice, Practice, Practice!" Did I mention you should go practice!? There's no better way to learn code than to write it.

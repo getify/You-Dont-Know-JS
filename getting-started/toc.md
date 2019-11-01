@@ -26,7 +26,7 @@
     * Prototypes
     * Iteration
     * Asking Why
-* Chapter 4: The Rest (of the Series)
+* Chapter 4: The Rest
     * Pillar 1: Scope and Closure
     * Pillar 2: Prototypes
     * Pillar 3: Types and Coercion
