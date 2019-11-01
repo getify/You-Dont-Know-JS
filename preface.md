@@ -23,7 +23,7 @@ Don't buy the lie that you should only learn and use a small collection of *good
 
 Every part of JS is useful. Some parts are more useful than others. Some parts require you to be more careful and intentional.
 
-I find it absurd to try to be a truly effective JavaScript developer while only using a small sliver of what the language has to offer. Can you imagine a construction worker with a toolbox full of tools, who only uses his hammer and scoffs at the screwdriver or tape measure as inferior? That's just silly.
+I find it absurd to try to be a truly effective JavaScript developer while only using a small sliver of what the language has to offer. Can you imagine a construction worker with a toolbox full of tools, who only uses their hammer and scoffs at the screwdriver or tape measure as inferior? That's just silly.
 
 My unreserved claim is that you should go about learning all parts of JavaScript, and where appropriate, use them! And if I may be so bold as to suggest: it's time to discard any other JS books which tell you otherwise.
 
