@@ -33,4 +33,7 @@
     * In Order
     * With The Grain
 * Appendix A: Practice, Practice, Practice!
-    * TODO
+    * Practicing Comparisons
+    * Practicing Closure
+    * Practicing Prototypes
+    * Suggested Solutions
