@@ -82,7 +82,9 @@ var reel = {
         if (this.position == null) {
             this.position = randMax(this.symbols.length - 1);
         }
-        this.position = (this.position + 100 + randMax(100)) % this.symbols.length;
+        this.position = (
+            this.position + 100 + randMax(100)
+        ) % this.symbols.length;
     },
     display() {
         if (this.position == null) {
@@ -252,7 +254,9 @@ var reel = {
         if (this.position == null) {
             this.position = randMax(this.symbols.length - 1);
         }
-        this.position = (this.position + 100 + randMax(100)) % this.symbols.length;
+        this.position = (
+            this.position + 100 + randMax(100)
+        ) % this.symbols.length;
     },
     display() {
         if (this.position == null) {
@@ -278,9 +282,11 @@ var slotMachine = {
 
         // display all 3 lines on the slot machine
         for (let linePos = -1; linePos <= 1; linePos++) {
-            let line = this.reels.map(function getReelLine(reel){
+            let line = this.reels.map(function getSlot(reel){
                 var slot = Object.create(reel);
-                slot.position = (reel.symbols.length + reel.position + linePos) % reel.symbols.length;
+                slot.position = (
+                    reel.symbols.length + reel.position + linePos
+                ) % reel.symbols.length;
                 return reel.display.call(slot);
             });
             lines.push(line.join(" | "));
