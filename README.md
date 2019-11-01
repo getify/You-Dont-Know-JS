@@ -5,7 +5,7 @@ This is a series of books diving deep into the core mechanisms of the JavaScript
 ----
 ----
 
-| NOTE: The current edition (2nd) of the book series is a *WORK IN PROGRESS*, and [can be found here](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed).<br><br>The finished previous edition (1st) [can be found here](https://github.com/getify/You-Dont-Know-JS/tree/1st-ed). |
+| NOTE: The current edition (2nd) of the book series is a *WORK IN PROGRESS*, and [can be found here](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/README.md).<br><br>The finished previous edition (1st) [can be found here](https://github.com/getify/You-Dont-Know-JS/tree/1st-ed/README.md). |
 | :--- |
 
 ----
@@ -27,13 +27,13 @@ I want to extend a warm and deep thanks to Marc Grabanski and the entire Fronten
 
 ## Titles
 
-I recommend reading the books in this order:
+I recommend reading the second-edition books in this order:
 
 * [Getting Started](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/getting-started/README.md)
 * [Scope & Closures](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/scope-closures/README.md)
-* [this & Object Prototypes](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/this-object-prototypes/README.md)
+* [Objects & Classes](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/objects-classes/README.md)
 * [Types & Grammar](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/types-grammar/README.md)
-* [Async & Performance](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/async-performance/README.md)
+* [Sync & Async](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/sync-async/README.md)
 * [ES.Next & Beyond](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/es-next-beyond/README.md)
 
 ## Publishing
