@@ -22,7 +22,7 @@ I want to extend a warm and deep thanks to Marc Grabanski and the entire Fronten
 
 I recommend reading the books in this order:
 
-* [Getting Started](getting-started/README.md)
+* [Get Started](get-started/README.md)
 * [Scope & Closures](scope-closures/README.md)
 * [Objects & Classes](objects-classes/README.md)
 * [Types & Grammar](types-grammar/README.md)
