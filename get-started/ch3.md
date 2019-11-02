@@ -100,7 +100,7 @@ for (let [idx,btn] of buttons.entries()) {
 
 Because this loop is using `let` declarations, each iteration gets new block-scoped (aka, local) `idx` and `btn` variables;  the loop also creates a new inner `onClick(..)` function each time. That inner function closes over `idx`, preserving it for as long as the click handler is set on the `btn`. So when each button is clicked, its handler can print its associated index value, because the handler remembers its respective `idx` variable.
 
-Rememeber: this closure is not over the value (like `1` or `3`), but over the variable `idx` itself.
+Remember: this closure is not over the value (like `1` or `3`), but over the variable `idx` itself.
 
 Closure is one of the most prevalent and important programming patterns in any language. But that's especially true of JS; it's hard to imagine doing anything useful without leveraging closure in one way or another.
 
