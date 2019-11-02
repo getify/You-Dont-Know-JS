@@ -29,7 +29,7 @@ I want to extend a warm and deep thanks to Marc Grabanski and the entire Fronten
 
 I recommend reading the second-edition books in this order:
 
-* [Getting Started](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/getting-started/README.md)
+* [Get Started](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/get-started/README.md)
 * [Scope & Closures](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/scope-closures/README.md)
 * [Objects & Classes](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/objects-classes/README.md)
 * [Types & Grammar](https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/types-grammar/README.md)
