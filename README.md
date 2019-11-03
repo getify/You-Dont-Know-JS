@@ -23,7 +23,7 @@ I teach [all my workshops](https://frontendmasters.com/kyle-simpson) exclusively
 
 I want to extend a warm and deep thanks to Marc Grabanski and the entire Frontend Masters team, not only for their excellent work with the video training platform, but for their unwavering support of me and of the "You Don't Know JS" books!
 
-----
+-----
 
 ## Titles
 
