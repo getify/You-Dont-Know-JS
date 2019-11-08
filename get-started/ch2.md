@@ -68,7 +68,7 @@ Assuming this program has already defined a variable `firstName` with the string
 The back-tick `` ` ``-delimited string can be used without including interpolated expressions, but that defeats the whole purpose of that additional syntax.
 
 ```js
-console.log(`Am I confusing you by omitting interpolotion?`);
+console.log(`Am I confusing you by omitting interpolation?`);
 // Am I confusing you by omitting interpolation?
 ```
 
