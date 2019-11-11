@@ -5,18 +5,18 @@
 * Foreword
 * Preface
 * Chapter 1: What Is JavaScript?
-	* Name
-	* Many Faces
-	* Specification
-	* Backwards & Forwards
-	* What's In an Interpretation?
+    * Name
+    * Many Faces
+    * Specification
+    * Backwards & Forwards
+    * What's In an Interpretation?
     * Strictly Speaking
-	* Defined
+    * Defined
 * Chapter 2: Getting To Know JS
-	* Files As Programs
-	* Values
-	* Variables
-	* Functions
+    * Files As Programs
+    * Values
+    * Variables
+    * Functions
     * Comparisons
     * Code Organization
     * Before You Go On

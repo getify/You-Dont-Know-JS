@@ -140,6 +140,40 @@ The key take-aways from the marbles & buckets metaphor:
 
 Another useful metaphor for the process of analyzing variables and the scopes they come from is to imagine various conversations that go on inside the engine as code is processed and then executed. We can "listen in" on these conversations to get a better conceptual foundation for how scopes work.
 
+Recall this program from earlier, which we'll use as the subject of our conversations:
+
+```js
+var students = [
+    { id: 14, name: "Kyle" },
+    { id: 73, name: "Suzy" },
+    { id: 112, name: "Frank" },
+    { id: 6, name: "Sarah" }
+];
+
+function getStudentName(studentID) {
+    for (let student of students) {
+        if (student.id == studentID) {
+            return student.name;
+        }
+    }
+}
+
+var nextStudent = getStudentName(73);
+nextStudent;
+```
+
+Let's now meet the members of the JS engine that will have conversations as they process that program:
+
+1. *Engine*: responsible for start-to-finish compilation and execution of our JavaScript program.
+
+2. *Compiler*: one of *Engine*'s friends; handles all the dirty work of parsing and code-generation (see previous section).
+
+3. *Scope Manager*: another friend of *Engine*; collects and maintains a look-up list of all the declared variables/identifiers, and enforces a set of rules as to how these are accessible to currently executing code.
+
+For you to *fully understand* how JavaScript works, you need to begin to *think* like *Engine* (and friends) think, ask the questions they ask, and answer their questions likewise.
+
+
+
 .
 
 .
@@ -160,21 +194,7 @@ Another useful metaphor for the process of analyzing variables and the scopes th
 | :--- |
 | Everything below here is previous text from 1st edition, and is only here for reference while 2nd edition work is underway. **Please ignore this stuff.** |
 
-## Understanding Scope
 
-The way we will approach learning about scope is to think of the process in terms of a conversation. But, *who* is having the conversation?
-
-### The Cast
-
-Let's meet the cast of characters that interact to process the program `var a = 2;`, so we understand their conversations that we'll listen in on shortly:
-
-1. *Engine*: responsible for start-to-finish compilation and execution of our JavaScript program.
-
-2. *Compiler*: one of *Engine*'s friends; handles all the dirty work of parsing and code-generation (see previous section).
-
-3. *Scope*: another friend of *Engine*; collects and maintains a look-up list of all the declared identifiers (variables), and enforces a strict set of rules as to how these are accessible to currently executing code.
-
-For you to *fully understand* how JavaScript works, you need to begin to *think* like *Engine* (and friends) think, ask the questions they ask, and answer those questions the same.
 
 ### Back & Forth
 
