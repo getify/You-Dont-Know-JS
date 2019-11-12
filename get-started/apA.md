@@ -145,7 +145,7 @@ const dayStart = "07:30";
 const dayEnd = "17:45";
 
 function scheduleMeeting(startTime,durationMinutes) {
-    var [ meetingStartHour, meetingStartMinutes ] =
+    var [ , meetingStartHour, meetingStartMinutes ] =
         startTime.match(/^(\d{1,2}):(\d{2})$/) || [];
 
     durationMinutes = Number(durationMinutes);
