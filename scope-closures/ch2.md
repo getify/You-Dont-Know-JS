@@ -1,5 +1,336 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 2: Lexical Scope
+# Chapter 2: Understanding Scope
+
+In Chapter 1, we explored how scope is determined at code compilation, a model called "lexical scope".
+
+Before we get to the nuts and bolts of how using lexical scope in our programs, we should make sure we have a good conceptual foundation for how scope works. This chapter will illustrate *scope* by listening in on "conversations" inside the JS engine as it processes and executes our programs.
+
+## Buckets of Marbles
+
+One metaphor I've found effective in understanding scope is sorting colored marbles into buckets of their matching color.
+
+Imagine you come across a pile of marbles, and notice that all the marbles are colored red, blue, or green. To sort all the marbles, let's drop the red ones into a red bucket, green into a green bucket, and blue into a blue bucket. After sorting, when you later need a green marble, you already know the green bucket is where to go to get it.
+
+In this metaphor, the marbles are the variables in our program. The buckets are scopes (functions and blocks), which we just conceptually assign individual colors for our discussion purposes. The color of each marble is thus determined by which *color* scope we find the marble originally created in.
+
+Let's annotate the program example from Chapter 1 with scope color labels:
+
+```js
+// outer/global scope: RED
+
+var students = [
+    { id: 14, name: "Kyle" },
+    { id: 73, name: "Suzy" },
+    { id: 112, name: "Frank" },
+    { id: 6, name: "Sarah" }
+];
+
+function getStudentName(studentID) {
+    // function scope: BLUE
+
+    for (let student of students) {
+        // loop scope: GREEN
+
+        if (student.id == studentID) {
+            return student.name;
+        }
+    }
+}
+
+var nextStudent = getStudentName(73);
+console.log(nextStudent);
+// "Suzy"
+```
+
+We designate 3 scope colors: RED (outermost global scope), BLUE (scope of function `getStudentName(..)`), and GREEN (scope of/inside the `for` loop).
+
+The RED marbles are variables/identifiers originally declared in the RED scope:
+
+* `students`
+
+* `getStudentName`
+
+* `nextStudent`
+
+The only BLUE marble, the function parameter declared in the BLUE scope:
+
+* `studentID`
+
+The only GREEN marble, the loop iterator declared in the GREEN scope:
+
+* `student`
+
+As the JS engine processes a program (during compilation), and finds a declaration for a variable/identifier, it essentially asks, "which *color* scope am I currently in?" The variable/identifier is designated as that same *color*, meaning it belongs to that bucket.
+
+The GREEN bucket is wholly nested inside of the BLUE bucket, and similarly the BLUE bucket is wholly nested inside the RED bucket. Scopes can nest inside each other as shown, to any depth of nesting as your program needs. But scopes can never cross boundaries, meaning no scope is ever partially in two parent scopes.
+
+References (non-declarations) to variables/identifiers can be made from either the current scope, or any scope above/outside the current scope, but never to lower/nested scopes. So an expression in the RED bucket only has access to RED marbles, not BLUE or GREEN. An expression in the BLUE bucket can reference either BLUE or RED marbles, not GREEN. And an expression in the GREEN bucket has access to RED, BLUE, and GREEN marbles.
+
+We can conceptualize the process of determining these marble colors during runtime as a lookup. At first, the `students` variable reference in the `for` loop-statement has no color, so we ask the current scope if it has a marble matching that name. Since it doesn't, the lookup continues with the next outer/containing scope, and so on. When the RED bucket is reached, a marble of the name `students` is found, so the loop-statement's `students` variable is determined to be a red marble.
+
+The `if (student.id == studentID)` is similarly determined to reference a GREEN marble named `student` and a BLUE marble `studentID`.
+
+| NOTE: |
+| :--- |
+| The JS engine doesn't generally determine these marble colors during run-time; the "lookup" here is a rhetorical device to help you understand the concepts. During compilation, most or all variable references will be from already-known scope buckets, so their color is determined at that, and stored with each marble reference to avoid unnecessary lookups as the program runs. |
+
+The key take-aways from the marbles & buckets metaphor:
+
+* Variables are declared in certain scopes, which can be thought of as colored marbles in matching-color buckets.
+
+* Any reference to a variable of that same name in that scope, or any deeper nested scope, will be a marble of that same color.
+
+* The determination of buckets, colors, and marbles is all done during compilation. This information is used during code execution.
+
+## A Conversation Among Friends
+
+Another useful metaphor for the process of analyzing variables and the scopes they come from is to imagine various conversations that go on inside the engine as code is processed and then executed. We can "listen in" on these conversations to get a better conceptual foundation for how scopes work.
+
+Let's now meet the members of the JS engine that will have conversations as they process that program:
+
+1. *Engine*: responsible for start-to-finish compilation and execution of our JavaScript program.
+
+2. *Compiler*: one of *Engine*'s friends; handles all the dirty work of parsing and code-generation (see previous section).
+
+3. *Scope Manager*: another friend of *Engine*; collects and maintains a look-up list of all the declared variables/identifiers, and enforces a set of rules as to how these are accessible to currently executing code.
+
+For you to *fully understand* how JavaScript works, you need to begin to *think* like *Engine* (and friends) think, ask the questions they ask, and answer their questions likewise.
+
+To explore these conversations, recall again our running program example:
+
+```js
+var students = [
+    { id: 14, name: "Kyle" },
+    { id: 73, name: "Suzy" },
+    { id: 112, name: "Frank" },
+    { id: 6, name: "Sarah" }
+];
+
+function getStudentName(studentID) {
+    for (let student of students) {
+        if (student.id == studentID) {
+            return student.name;
+        }
+    }
+}
+
+var nextStudent = getStudentName(73);
+
+console.log(nextStudent);
+// "Suzy"
+```
+
+Let's examine how JS is going to process that program, specifically starting with the first statement. The array and its contents are just basic JS value literals (and thus unaffected by any scoping concerns), so our focus here will be on the `var students = [ .. ]` declaration and initialization-assignment parts.
+
+We typically think of that as a single statement, but that's not how our friend *Engine* sees it. In fact, *Engine* sees two distinct operations, one which *Compiler* will handle during compilation, and the other which *Engine* will handle during execution.
+
+The first thing *Compiler* will do with this program is perform lexing to break it down into tokens, which it will then parse into a tree (AST).
+
+But when *Compiler* gets to code-generation, there's more detail to consider than may be obvious. A reasonable assumption would be that *Compiler* will produce code such as: "Allocate memory for a variable, label it `students`, then stick a reference to the array into that variable." Unfortunately, that's not quite complete.
+
+Here's how *Compiler* will proceed:
+
+1. Encountering `var students`, *Compiler* asks *Scope Manager* to see if a variable named `students` already exists for that particular scope bucket. If so, *Compiler* ignores this declaration and moves on. Otherwise, *Compiler* prepares code that, at execution time, asks *Scope Manager* to declare a new variable called `students` in that scope bucket.
+
+2. *Compiler* then produces code for *Engine* to later execute, to handle the `students = []` assignment. The code *Engine* runs will first ask *Scope Manager* if there is a variable called `students` accessible in the current scope bucket. If not, *Engine* looks elsewhere (see "Nested Scope" below).
+
+If *Engine* (eventually) finds a variable, it assigns the reference of the `[ .. ]` array to it. If not, *Engine* will raise its hand and yell out an error!
+
+To summarize: two distinct actions are taken for a variable assignment: First, *Compiler* sets up the declaration of a scope variable (if not previously declared in the current scope), and second, while executing, *Engine* asks *Scope Manager* to look up the variable, and assigns to it, if found.
+
+### Lookup Failures
+
+When *Engine* eventually executes the code that *Compiler* produced for step (2) in the previous section, it has to consult *Scope Manager* to look-up the variable `students` to see if it has been declared, and if so, which scope it's in. *Scope Manager* handles lookup failures differently depending on the the role a variable/identifier serves (i.e., *target* vs. *scope* from Chapter 1).
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+----
+
+| NOTE: |
+| :--- |
+| Everything below here is previous text from 1st edition, and is only here for reference while 2nd edition work is underway. **Please ignore this stuff.** |
+
+### Engine/Scope Conversation
+
+```js
+function foo(a) {
+    console.log( a ); // 2
+}
+
+foo( 2 );
+```
+
+Let's imagine the above exchange (which processes this code snippet) as a conversation. The conversation would go a little something like this:
+
+> ***Engine***: Hey *Scope*, I have an RHS reference for `foo`. Ever heard of it?
+
+> ***Scope***: Why yes, I have. *Compiler* declared it just a second ago. He's a function. Here you go.
+
+> ***Engine***: Great, thanks! OK, I'm executing `foo`.
+
+> ***Engine***: Hey, *Scope*, I've got an LHS reference for `a`, ever heard of it?
+
+> ***Scope***: Why yes, I have. *Compiler* declared it as a formal parameter to `foo` just recently. Here you go.
+
+> ***Engine***: Helpful as always, *Scope*. Thanks again. Now, time to assign `2` to `a`.
+
+> ***Engine***: Hey, *Scope*, sorry to bother you again. I need an RHS look-up for `console`. Ever heard of it?
+
+> ***Scope***: No problem, *Engine*, this is what I do all day. Yes, I've got `console`. He's built-in. Here ya go.
+
+> ***Engine***: Perfect. Looking up `log(..)`. OK, great, it's a function.
+
+> ***Engine***: Yo, *Scope*. Can you help me out with an RHS reference to `a`. I think I remember it, but just want to double-check.
+
+> ***Scope***: You're right, *Engine*. Same guy, hasn't changed. Here ya go.
+
+> ***Engine***: Cool. Passing the value of `a`, which is `2`, into `log(..)`.
+
+> ...
+
+### Quiz
+
+Check your understanding so far. Make sure to play the part of *Engine* and have a "conversation" with the *Scope*:
+
+```js
+function foo(a) {
+    var b = a;
+    return a + b;
+}
+
+var c = foo( 2 );
+```
+
+1. Identify all the LHS look-ups (there are 3!).
+
+2. Identify all the RHS look-ups (there are 4!).
+
+**Note:** See the chapter review for the quiz answers!
+
+## Nested Scope
+
+We said that *Scope* is a set of rules for looking up variables by their identifier name. There's usually more than one *Scope* to consider, however.
+
+Just as a block or function is nested inside another block or function, scopes are nested inside other scopes. So, if a variable cannot be found in the immediate scope, *Engine* consults the next outer containing scope, continuing until found or until the outermost (aka, global) scope has been reached.
+
+Consider:
+
+```js
+function foo(a) {
+    console.log( a + b );
+}
+
+var b = 2;
+
+foo( 2 ); // 4
+```
+
+The RHS reference for `b` cannot be resolved inside the function `foo`, but it can be resolved in the *Scope* surrounding it (in this case, the global).
+
+So, revisiting the conversations between *Engine* and *Scope*, we'd overhear:
+
+> ***Engine***: "Hey, *Scope* of `foo`, ever heard of `b`? Got an RHS reference for it."
+
+> ***Scope***: "Nope, never heard of it. Go fish."
+
+> ***Engine***: "Hey, *Scope* outside of `foo`, oh you're the global *Scope*, ok cool. Ever heard of `b`? Got an RHS reference for it."
+
+> ***Scope***: "Yep, sure have. Here ya go."
+
+The simple rules for traversing nested *Scope*: *Engine* starts at the currently executing *Scope*, looks for the variable there, then if not found, keeps going up one level, and so on. If the outermost global scope is reached, the search stops, whether it finds the variable or not.
+
+### Building on Metaphors
+
+To visualize the process of nested *Scope* resolution, I want you to think of this tall building.
+
+<img src="fig1.png" width="250">
+
+The building represents our program's nested *Scope* rule set. The first floor of the building represents your currently executing *Scope*, wherever you are. The top level of the building is the global *Scope*.
+
+You resolve LHS and RHS references by looking on your current floor, and if you don't find it, taking the elevator to the next floor, looking there, then the next, and so on. Once you get to the top floor (the global *Scope*), you either find what you're looking for, or you don't. But you have to stop regardless.
+
+## Errors
+
+Why does it matter whether we call it LHS or RHS?
+
+Because these two types of look-ups behave differently in the circumstance where the variable has not yet been declared (is not found in any consulted *Scope*).
+
+Consider:
+
+```js
+function foo(a) {
+    console.log( a + b );
+    b = a;
+}
+
+foo( 2 );
+```
+
+When the RHS look-up occurs for `b` the first time, it will not be found. This is said to be an "undeclared" variable, because it is not found in the scope.
+
+If an RHS look-up fails to ever find a variable, anywhere in the nested *Scope*s, this results in a `ReferenceError` being thrown by the *Engine*. It's important to note that the error is of the type `ReferenceError`.
+
+By contrast, if the *Engine* is performing an LHS look-up and arrives at the top floor (global *Scope*) without finding it, and if the program is not running in "Strict Mode" [^note-strictmode], then the global *Scope* will create a new variable of that name **in the global scope**, and hand it back to *Engine*.
+
+*"No, there wasn't one before, but I was helpful and created one for you."*
+
+"Strict Mode" [^note-strictmode], which was added in ES5, has a number of different behaviors from normal/relaxed/lazy mode. One such behavior is that it disallows the automatic/implicit global variable creation. In that case, there would be no global *Scope*'d variable to hand back from an LHS look-up, and *Engine* would throw a `ReferenceError` similarly to the RHS case.
+
+Now, if a variable is found for an RHS look-up, but you try to do something with its value that is impossible, such as trying to execute-as-function a non-function value, or reference a property on a `null` or `undefined` value, then *Engine* throws a different kind of error, called a `TypeError`.
+
+`ReferenceError` is *Scope* resolution-failure related, whereas `TypeError` implies that *Scope* resolution was successful, but that there was an illegal/impossible action attempted against the result.
+
+## Review (TL;DR)
+
+Scope is the set of rules that determines where and how a variable (identifier) can be looked-up. This look-up may be for the purposes of assigning to the variable, which is an LHS (left-hand-side) reference, or it may be for the purposes of retrieving its value, which is an RHS (right-hand-side) reference.
+
+LHS references result from assignment operations. *Scope*-related assignments can occur either with the `=` operator or by passing arguments to (assign to) function parameters.
+
+The JavaScript *Engine* first compiles code before it executes, and in so doing, it splits up statements like `var a = 2;` into two separate steps:
+
+1. First, `var a` to declare it in that *Scope*. This is performed at the beginning, before code execution.
+
+2. Later, `a = 2` to look up the variable (LHS reference) and assign to it if found.
+
+Both LHS and RHS reference look-ups start at the currently executing *Scope*, and if need be (that is, they don't find what they're looking for there), they work their way up the nested *Scope*, one scope (floor) at a time, looking for the identifier, until they get to the global (top floor) and stop, and either find it, or don't.
+
+Unfulfilled RHS references result in `ReferenceError`s being thrown. Unfulfilled LHS references result in an automatic, implicitly-created global of that name (if not in "Strict Mode" [^note-strictmode]), or a `ReferenceError` (if in "Strict Mode" [^note-strictmode]).
+
+### Quiz Answers
+
+```js
+function foo(a) {
+    var b = a;
+    return a + b;
+}
+
+var c = foo( 2 );
+```
+
+1. Identify all the LHS look-ups (there are 3!).
+
+    **`c = ..`, `a = 2` (implicit param assignment) and `b = ..`**
+
+2. Identify all the RHS look-ups (there are 4!).
+
+    **`foo(2..`, `= a;`, `a + ..` and `.. + b`**
+
+
+[^note-strictmode]: MDN: [Strict Mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode)
+
+
 
 | NOTE: |
 | :--- |

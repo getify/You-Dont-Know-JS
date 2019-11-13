@@ -8,25 +8,28 @@
 
 * Foreword
 * Preface
-* Chapter 1: What is Scope?
+* Chapter 1: How is Scope Compiled?
     * About This Book
-    * Brief Intro To Code Compilation
-    * Understanding Scope
-    * Nested Scope
-    * Errors
-* Chapter 2: Lexical Scope
+    * Compiling Code
+    * Compiler Speak
+    * Lexical Scope
+* Chapter 2: Understanding Scope
+    * Buckets of Marbles
+    * A Conversation Among Friends
+    * TODO
+* Chapter 3: Using Scope
     * Lex-time
     * Cheating Lexical
-* Chapter 3: Function vs. Block Scope
+* Chapter 4: Function vs. Block Scope
     * Scope From Functions
     * Hiding In Plain Scope
     * Functions As Scopes
     * Blocks As Scopes
-* Chapter 4: Hoisting
+* Chapter 5: Hoisting
     * Chicken Or The Egg?
     * The Compiler Strikes Again
     * Functions First
-* Chapter 5: Scope Closures
+* Chapter 6: Scope Closures
     * Enlightenment
     * Nitty Gritty
     * Now I Can See
