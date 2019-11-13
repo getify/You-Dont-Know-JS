@@ -160,7 +160,7 @@ function getStudentName(studentID) {
 }
 
 var nextStudent = getStudentName(73);
-nextStudent;
+console.log(nextStudent);
 // "Suzy"
 ```
 
@@ -227,7 +227,9 @@ function getStudentName(studentID) {
 }
 
 var nextStudent = getStudentName(73);
-nextStudent;
+
+console.log(nextStudent);
+// "Suzy"
 ```
 
 Let's now meet the members of the JS engine that will have conversations as they process that program:
@@ -240,25 +242,97 @@ Let's now meet the members of the JS engine that will have conversations as they
 
 For you to *fully understand* how JavaScript works, you need to begin to *think* like *Engine* (and friends) think, ask the questions they ask, and answer their questions likewise.
 
-Let's start with how JS is going to that program, starting with the first statement. The contents of the array are just basic JS value literals (and thus unaffected by any scoping concerns), so let's focus on the `var students = [ .. ]` part.
+Let's examine how JS is going to process that program, specifically starting with the first statement. The array and its contents are just basic JS value literals (and thus unaffected by any scoping concerns), so our focus here will be on the `var students = [ .. ]` declaration and initialization-assignment parts.
 
-We typically think of that as a single statement. But that's not how our friend *Engine* sees it. In fact, *Engine* sees two distinct operations, one which *Compiler* will handle during compilation, and one which *Engine* will handle during execution.
+We typically think of that as a single statement, but that's not how our friend *Engine* sees it. In fact, *Engine* sees two distinct operations, one which *Compiler* will handle during compilation, and the other which *Engine* will handle during execution.
 
-So, let's break down how *Engine* and friends will approach the program, starting with that first statement.
+The first thing *Compiler* will do with this program is perform lexing to break it down into tokens, which it will then parse into a tree (AST).
 
-The first thing *Compiler* will do with this program is perform lexing to break it down into tokens, which it will then parse into a tree (AST). But when *Compiler* gets to code-generation, it will treat this program somewhat differently than perhaps assumed.
+But when *Compiler* gets to code-generation, there's more detail to consider than may be obvious. A reasonable assumption would be that *Compiler* will produce code such as: "Allocate memory for a variable, label it `students`, then stick a reference to the array into that variable." Unfortunately, that's not quite complete.
 
-A reasonable assumption would be that *Compiler* will produce code that could be summed up as: "Allocate memory for a variable, label it `students`, then stick a reference to the array into that variable." Unfortunately, that's not quite complete.
+Here's how *Compiler* will proceed:
 
-*Compiler* will instead proceed as:
+1. Encountering `var students`, *Compiler* asks *Scope Manager* to see if a variable named `students` already exists for that particular scope bucket. If so, *Compiler* ignores this declaration and moves on. Otherwise, *Compiler* prepares code that, at execution time, asks *Scope Manager* to declare a new variable called `students` in that scope bucket.
 
-1. Encountering `var students`, *Compiler* asks *Scope Manager* to see if a variable `students` already exists for that particular scope collection. If so, *Compiler* ignores this declaration and moves on. Otherwise, *Compiler* prepares code that, at execution time, asks *Scope Manager* to declare a new variable called `students` for that scope collection.
+2. *Compiler* then produces code for *Engine* to later execute, to handle the `students = []` assignment. The code *Engine* runs will first ask *Scope Manager* if there is a variable called `students` accessible in the current scope bucket. If not, *Engine* looks elsewhere (see "Nested Scope" below).
 
-2. *Compiler* then produces code for *Engine* to later execute, to handle the `students = []` assignment. The code *Engine* runs will first ask *Scope Manager* if there is a variable called `students` accessible in the current scope collection. If so, *Engine* uses that variable. If not, *Engine* looks *elsewhere* (see "Nested Scope" section below).
-
-If *Engine* eventually finds a variable, it assigns the reference of the `[ .. ]` array to it. If not, *Engine* will raise its hand and yell out an error!
+If *Engine* (eventually) finds a variable, it assigns the reference of the `[ .. ]` array to it. If not, *Engine* will raise its hand and yell out an error!
 
 To summarize: two distinct actions are taken for a variable assignment: First, *Compiler* sets up the declaration of a scope variable (if not previously declared in the current scope), and second, while executing, *Engine* asks *Scope Manager* to look up the variable, and assigns to it, if found.
+
+### Compiler Speak
+
+When *Engine* executes the code that *Compiler* produced for step (2), it has to look-up the variable `students` to see if it has been declared, by consulting *Scope Manager*. But the nature of the look-up *Engine* performs affects the outcome of the look-up.
+
+Other than declarations, all occurrences of variables/identifiers in a program serve in one of two "roles": either they're the *target* of an assignment or they're the *source* of a value.
+
+| NOTE: |
+| :--- |
+| When I first learned compiler theory in my Computer Science degree, we were taught the terms "LHS" (aka, *target*) and "RHS" (aka, *source*) for these roles. As you might guess from the "L" and the "R", the acronyms mean "Left-Hand Side" and "Right-Hand Side", respectively, as in left and right sides of an `=` assignment operator. However, assignment targets and sources don't always literally appear on the left or right of an `=`, so it's probably less confusing to think in terms of *target* / *source* instead of *left* / *right*. |
+
+How do you know if a variable is a *target*? Check if there is a value anywhere that is being assigned to it; if so, it's a *target*. If not, then the variable is serving a *source* role instead.
+
+#### Targets
+
+Let's look at our program example with respect to these roles. Consider:
+
+```js
+students = [
+    /* .. */
+];
+```
+
+This statement is clearly an assignment operation; remember, the `var students` part is handled entirely as a declaration at compile time, and is thus irrelevant during execution. Same with the `nextStudent = getStudentName(73)` statement.
+
+There are three other *target* assignment operations in the code that are perhaps less obvious.
+
+```js
+for (let student of students) {
+```
+
+That statement assigns a value to `student` for each iteration of the loop. Another *target* reference:
+
+```js
+getStudentName(73)
+```
+
+But how is that an assignment to a *target*? Look closely: the argument `73` is assigned to the parameter `studentID`.
+
+And there's one last (subtle) *target* reference in our program. Can you spot it?
+
+..
+
+..
+
+..
+
+Did you identify this one?
+
+```js
+function getStudentName(studentID) {
+```
+
+A function declaration is a special case of a *target* reference. You could think of it like `var getStudentName = function(studentID)`, but that's not exactly accurate. An identifier `getStudentName` is declared (at compile-time), but the `= function(studentID)` part is also handled at compilation; the association between `getStudentName` and the function is automatically set up at the beginning of the scope rather than waiting for an `=` assignment statement to be executed.
+
+| NOTE: |
+| :--- |
+| This immediate automatic function assignment from function declarations is referred to as "function hoisting", and will be covered more in Chapter 4. |
+
+#### Sources
+
+So we've identified all five *target* references in the program. The other variable references must then be *source* references (because that's the only other option!).
+
+In `for (let student of students)`, we said that `student` is a *target*, but `students` is the *source* reference. In the statement `if (student.id == studentID)`, both `student` and `studentID` are *source* references. `student` is also a *source* reference in `return student.name`.
+
+In `getStudentName(73)`, `getStudentName` is a *source* reference (which we hope resolves to a function reference value). In `console.log(nextStudent)`, `console` is a *source* reference, as is `nextStudent`.
+
+| NOTE: |
+| :--- |
+| In case you were wondering, `id`, `name`, and `log` are all properties, not variable references. |
+
+#### Lookup Failures
+
+Why does *target* vs. *source* matter? The role a variable/identifier serves will affect the nature of the lookup that *Scope Manager* will perform, specifically how failures in the lookup will be handled.
 
 .
 
@@ -279,68 +353,6 @@ To summarize: two distinct actions are taken for a variable assignment: First, *
 | NOTE: |
 | :--- |
 | Everything below here is previous text from 1st edition, and is only here for reference while 2nd edition work is underway. **Please ignore this stuff.** |
-
-### Compiler Speak
-
-We need a little bit more compiler terminology to proceed further with understanding.
-
-When *Engine* executes the code that *Compiler* produced for step (2), it has to look-up the variable `a` to see if it has been declared, and this look-up is consulting *Scope*. But the type of look-up *Engine* performs affects the outcome of the look-up.
-
-In our case, it is said that *Engine* would be performing an "LHS" look-up for the variable `a`. The other type of look-up is called "RHS".
-
-I bet you can guess what the "L" and "R" mean. These terms stand for "Left-hand Side" and "Right-hand Side".
-
-Side... of what? **Of an assignment operation.**
-
-In other words, an LHS look-up is done when a variable appears on the left-hand side of an assignment operation, and an RHS look-up is done when a variable appears on the right-hand side of an assignment operation.
-
-Actually, let's be a little more precise. An RHS look-up is indistinguishable, for our purposes, from simply a look-up of the value of some variable, whereas the LHS look-up is trying to find the variable container itself, so that it can assign. In this way, RHS doesn't *really* mean "right-hand side of an assignment" per se, it just, more accurately, means "not left-hand side".
-
-Being slightly glib for a moment, you could also think "RHS" instead means "retrieve his/her source (value)", implying that RHS means "go get the value of...".
-
-Let's dig into that deeper.
-
-When I say:
-
-```js
-console.log( a );
-```
-
-The reference to `a` is an RHS reference, because nothing is being assigned to `a` here. Instead, we're looking-up to retrieve the value of `a`, so that the value can be passed to `console.log(..)`.
-
-By contrast:
-
-```js
-a = 2;
-```
-
-The reference to `a` here is an LHS reference, because we don't actually care what the current value is, we simply want to find the variable as a target for the `= 2` assignment operation.
-
-**Note:** LHS and RHS meaning "left/right-hand side of an assignment" doesn't necessarily literally mean "left/right side of the `=` assignment operator". There are several other ways that assignments happen, and so it's better to conceptually think about it as: "who's the target of the assignment (LHS)" and "who's the source of the assignment (RHS)".
-
-Consider this program, which has both LHS and RHS references:
-
-```js
-function foo(a) {
-	console.log( a ); // 2
-}
-
-foo( 2 );
-```
-
-The last line that invokes `foo(..)` as a function call requires an RHS reference to `foo`, meaning, "go look-up the value of `foo`, and give it to me." Moreover, `(..)` means the value of `foo` should be executed, so it'd better actually be a function!
-
-There's a subtle but important assignment here. **Did you spot it?**
-
-You may have missed the implied `a = 2` in this code snippet. It happens when the value `2` is passed as an argument to the `foo(..)` function, in which case the `2` value is **assigned** to the parameter `a`. To (implicitly) assign to parameter `a`, an LHS look-up is performed.
-
-There's also an RHS reference for the value of `a`, and that resulting value is passed to `console.log(..)`. `console.log(..)` needs a reference to execute. It's an RHS look-up for the `console` object, then a property-resolution occurs to see if it has a method called `log`.
-
-Finally, we can conceptualize that there's an LHS/RHS exchange of passing the value `2` (by way of variable `a`'s RHS look-up) into `log(..)`. Inside of the native implementation of `log(..)`, we can assume it has parameters, the first of which (perhaps called `arg1`) has an LHS reference look-up, before assigning `2` to it.
-
-**Note:** You might be tempted to conceptualize the function declaration `function foo(a) {...` as a normal variable declaration and assignment, such as `var foo` and `foo = function(a){...`. In so doing, it would be tempting to think of this function declaration as involving an LHS look-up.
-
-However, the subtle but important difference is that *Compiler* handles both the declaration and the value definition during code-generation, such that when *Engine* is executing code, there's no processing necessary to "assign" a function value to `foo`. Thus, it's not really appropriate to think of a function declaration as an LHS look-up assignment in the way we're discussing them here.
 
 ### Engine/Scope Conversation
 
