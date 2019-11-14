@@ -8,16 +8,17 @@
 
 * Foreword
 * Preface
-* Chapter 1: How is Scope Compiled?
+* Chapter 1: How Is Scope Compiled?
     * About This Book
     * Compiling Code
     * Compiler Speak
     * Lexical Scope
-* Chapter 2: Understanding Scope
+* Chapter 2: Understanding Lexical Scope
     * Buckets of Marbles
     * A Conversation Among Friends
-    * TODO
-* Chapter 3: Using Scope
+    * Nested Scope
+    * Continue The Conversation
+* Chapter 3: Working With Scope
     * Lex-time
     * Cheating Lexical
 * Chapter 4: Function vs. Block Scope

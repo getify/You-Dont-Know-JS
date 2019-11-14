@@ -1,9 +1,11 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 3: Using Scope
+# Chapter 3: Working With Scope
 
 | NOTE: |
 | :--- |
 | Work in progress |
+
+TODO
 
 .
 

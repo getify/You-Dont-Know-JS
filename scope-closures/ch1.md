@@ -61,7 +61,7 @@ To state it as simply as possible, a JS program is processed in (at least) two p
 
 The breakdown of a parsing/compilation phase separate from the subsequent execution phase is observable fact, not theory or opinion. While the JS specification does not require "compilation" explicitly, it requires behavior which is essentially only practical in a compile-then-execute cadence.
 
-There are three program characteristics you can use to prove this to yourself: syntax errors, "early errors", and hoisting" (covered in Chapter 4).
+There are three program characteristics you can use to prove this to yourself: syntax errors, "early errors", and hoisting" (covered in Chapter 5).
 
 Consider this program:
 
@@ -155,7 +155,7 @@ Other than declarations, all occurrences of variables/identifiers in a program s
 | :--- |
 | When I first learned compiler theory in my Computer Science degree, we were taught the terms "LHS" (aka, *target*) and "RHS" (aka, *source*) for these roles. As you might guess from the "L" and the "R", the acronyms mean "Left-Hand Side" and "Right-Hand Side", respectively, as in left and right sides of an `=` assignment operator. However, assignment targets and sources don't always literally appear on the left or right of an `=`, so it's probably less confusing to think in terms of *target* / *source* instead of *left* / *right*. |
 
-How do you know if a variable is a *target*? Check if there is a value anywhere that is being assigned to it; if so, it's a *target*. If not, then the variable is serving a *source* role instead.
+How do you know if a variable is a *target*? Check if there is a value anywhere that is being assigned to it; if so, it's a *target*. If not, then the variable is a *source* instead.
 
 ### Targets
 
@@ -201,7 +201,7 @@ A function declaration is a special case of a *target* reference. You could thin
 
 | NOTE: |
 | :--- |
-| This immediate automatic function assignment from function declarations is referred to as "function hoisting", and will be covered more in Chapter 4. |
+| This immediate automatic function assignment from function declarations is referred to as "function hoisting", and will be covered more in Chapter 5. |
 
 ### Sources
 
