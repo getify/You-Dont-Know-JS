@@ -248,13 +248,13 @@ This sort of accident (almost certain to lead to bugs eventually) is a great exa
 
 ### Building On Metaphors
 
-To visualize nested scope resolution, a third useful metaphor is a tall building:
+To visualize nested scope resolution, a third useful metaphor is an office building:
 
 <img src="fig1.png" width="250">
 
 The building represents our program's nested scope rule set. The first floor of the building represents the currently executing scope. The top level of the building is the global scope.
 
-You resolve *target* and *source* variables references by first looking on the current floor, and if you don't find it, taking the elevator to the next floor, looking there, then the next, and so on. Once you get to the top floor (the global scope), you either find what you're looking for, or you don't. But you have to stop regardless.
+You resolve a *target* or *source* variable reference by first looking on the current floor, and if you don't find it, taking the elevator to the next floor, looking there, then the next, and so on. Once you get to the top floor (the global scope), you either find what you're looking for, or you don't. But you have to stop regardless.
 
 ## Continue The Conversation
 

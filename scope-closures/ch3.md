@@ -5,7 +5,49 @@
 | :--- |
 | Work in progress |
 
-TODO
+Through Chapters 1 and 2, we defined *lexical scope* as the set of rules (determined at compile time) for how the identifiers/variables in a program are organized into units of scope (functions, blocks), as well as how lookups of these identifiers works during run-time.
+
+For conceptual understanding, we illustrated lexical scope with several metaphors: marbles & buckets, conversations, and office buildings.
+
+Now we'll dig into some of the nitty gritty details of working with lexical scope in our programs.
+
+## Nested Scopes, Revisited
+
+Again, recall our running example program:
+
+```js
+var students = [
+    { id: 14, name: "Kyle" },
+    { id: 73, name: "Suzy" },
+    { id: 112, name: "Frank" },
+    { id: 6, name: "Sarah" }
+];
+
+function getStudentName(studentID) {
+    for (let student of students) {
+        if (student.id == studentID) {
+            return student.name;
+        }
+    }
+}
+
+var nextStudent = getStudentName(73);
+
+console.log(nextStudent);
+// "Suzy"
+```
+
+There are three scopes nested together in this code example. It may be helpful to visualize these scopes as if colored bubbles surrounded each scope.
+
+<img src="fig2.png" width="500">
+
+1. **Bubble 1** (RED) encompasses the global scope, which has three identifiers/variables: `students`, `getStudentName`, and `nextStudent`.
+
+2. **Bubble 2** (BLUE) encompasses the scope of the function `getStudentName(..)`, which has just one identifier/variable: the parameter `studentID`.
+
+3. **Bubble 3** (GREEN) encompasses the scope of the `for`-loop, which has just one identifier/variable: `student`.
+
+Scope bubbles are defined by where the functions or blocks of scope are written, which one is nested inside the other, etc. A scope is entirely contained within its parent scope; a bubble cannot be partially in two outer bubbles.
 
 .
 
@@ -26,55 +68,6 @@ TODO
 | NOTE: |
 | :--- |
 | Everything below here is previous text from 1st edition, and is only here for reference while 2nd edition work is underway. **Please ignore this stuff.** |
-
-In Chapters 1 and 2, we defined "scope" as the set of rules that govern how the *Engine* can look up a variable by its identifier name and find it, either in the current *Scope*, or in any of the *Nested Scopes* it's contained within.
-
-There are two predominant models for how scope works. The first of these is by far the most common, used by the vast majority of programming languages. It's called **Lexical Scope**, and we will examine it in-depth. The other model, which is still used by some languages (such as Bash scripting, some modes in Perl, etc.) is called **Dynamic Scope**.
-
-Dynamic Scope is covered in Appendix A. I mention it here only to provide a contrast with Lexical Scope, which is the scope model that JavaScript employs.
-
-## Lex-time
-
-As we discussed in Chapter 1, the first traditional phase of a standard language compiler is called lexing (aka, tokenizing). If you recall, the lexing process examines a string of source code characters and assigns semantic meaning to the tokens as a result of some stateful parsing.
-
-It is this concept which provides the foundation to understand what lexical scope is and where the name comes from.
-
-To define it somewhat circularly, lexical scope is scope that is defined at lexing time. In other words, lexical scope is based on where variables and blocks of scope are authored, by you, at write time, and thus is (mostly) set in stone by the time the lexer processes your code.
-
-**Note:** We will see in a little bit there are some ways to cheat lexical scope, thereby modifying it after the lexer has passed by, but these are frowned upon. It is considered best practice to treat lexical scope as, in fact, lexical-only, and thus entirely author-time in nature.
-
-Let's consider this block of code:
-
-```js
-function foo(a) {
-
-    var b = a * 2;
-
-    function bar(c) {
-        console.log( a, b, c );
-    }
-
-    bar(b * 3);
-}
-
-foo( 2 ); // 2 4 12
-```
-
-There are three nested scopes inherent in this code example. It may be helpful to think about these scopes as bubbles inside of each other.
-
-<img src="fig2.png" width="500">
-
-**Bubble 1** encompasses the global scope, and has just one identifier in it: `foo`.
-
-**Bubble 2** encompasses the scope of `foo`, which includes the three identifiers: `a`, `bar` and `b`.
-
-**Bubble 3** encompasses the scope of `bar`, and it includes just one identifier: `c`.
-
-Scope bubbles are defined by where the blocks of scope are written, which one is nested inside the other, etc. In the next chapter, we'll discuss different units of scope, but for now, let's just assume that each function creates a new bubble of scope.
-
-The bubble for `bar` is entirely contained within the bubble for `foo`, because (and only because) that's where we chose to define the function `bar`.
-
-Notice that these nested bubbles are strictly nested. We're not talking about Venn diagrams where the bubbles can cross boundaries. In other words, no bubble for some function can simultaneously exist (partially) inside two other outer scope bubbles, just as no function can partially be inside each of two parent functions.
 
 ### Look-ups
 

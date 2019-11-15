@@ -19,8 +19,8 @@
     * Nested Scope
     * Continue The Conversation
 * Chapter 3: Working With Scope
-    * Lex-time
-    * Cheating Lexical
+    * Nested Scopes, Revisited
+    * TODO
 * Chapter 4: Function vs. Block Scope
     * Scope From Functions
     * Hiding In Plain Scope

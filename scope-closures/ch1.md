@@ -231,4 +231,6 @@ It's important to note that compilation doesn't actually *do anything* in terms 
 
 Instead, compilation creates a map of all the lexical scopes that the program will need as it executes. In practice, this essentially amounts to inserted code that will define all the scopes (aka, "lexical environments") and register all the identifiers for each scope.
 
-So scopes are planned out during compilation -- that's why refer to "lexical scope" as a compile-time decision -- but they aren't actually created until run-time. Each scope is instantiated in memory each time it needs to run.
+So scopes are planned out during compilation -- that's why we refer to "lexical scope" as a compile-time decision -- but they aren't actually created until run-time. Each scope is instantiated in memory each time it needs to run.
+
+In the next chapter, we'll build a deeper conceptual understanding of lexical scope.
