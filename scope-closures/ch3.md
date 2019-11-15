@@ -37,9 +37,12 @@ console.log(nextStudent);
 // "Suzy"
 ```
 
-There are three scopes nested together in this code example. It may be helpful to visualize these scopes as if colored bubbles surrounded each scope.
+There are three scopes nested together in this code example. It may be helpful to visualize these scopes as if colored bubbles surrounded each scope:
 
-<img src="fig2.png" width="500">
+<figure>
+    <img src="fig2.png" width="500" alt="Nested Scope Bubbles" align="center">
+    <figcaption><em>Fig. 2: Nested Scope Bubbles</em></figcaption>
+</figure>
 
 1. **Bubble 1** (RED) encompasses the global scope, which has three identifiers/variables: `students`, `getStudentName`, and `nextStudent`.
 
