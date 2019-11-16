@@ -61,7 +61,7 @@ To state it as simply as possible, a JS program is processed in (at least) two p
 
 The breakdown of a parsing/compilation phase separate from the subsequent execution phase is observable fact, not theory or opinion. While the JS specification does not require "compilation" explicitly, it requires behavior which is essentially only practical in a compile-then-execute cadence.
 
-There are three program characteristics you can use to prove this to yourself: syntax errors, "early errors", and hoisting" (covered in Chapter 5).
+There are three program characteristics you can use to prove this to yourself: syntax errors, "early errors", and "hoisting" (covered in Chapter 5).
 
 Consider this program:
 
