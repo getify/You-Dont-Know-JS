@@ -50,7 +50,7 @@ There are three scopes nested together in this code example. It may be helpful t
 
 3. **Bubble 3** (GREEN) encompasses the scope of the `for`-loop, which has just one identifier/variable: `student`.
 
-Scope bubbles are defined by where the functions or blocks of scope are written, which one is nested inside the other, etc. A scope is entirely contained within its parent scope; a bubble cannot be partially in two outer bubbles.
+Scope bubbles are defined based on where the functions / blocks of scope are written, the nesting inside each other, etc. A scope is always entirely contained within its parent scope -- a scope bubble is never partially in two outer scope bubbles.
 
 .
 
