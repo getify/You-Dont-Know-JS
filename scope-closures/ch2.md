@@ -3,9 +3,9 @@
 
 In Chapter 1, we explored how scope is determined at code compilation, a model called "lexical scope".
 
-Before we get to the nuts and bolts of how using lexical scope in our programs, we should make sure we have a good conceptual foundation for how scope works. This chapter will illustrate *scope* by listening in on "conversations" inside the JS engine as it processes and executes our programs.
+Before we get to the nuts and bolts of how using lexical scope in our programs, we should make sure we have a good conceptual foundation for how scope works. This chapter will illustrate *scope* with several metaphors. The goal here is to *think* about how your program is handled by the JS engine in ways that more closely match how the JS engine actually works.
 
-## Buckets of Marbles
+## Buckets, and Bubbles, and Marbles... Oh My!
 
 One metaphor I've found effective in understanding scope is sorting colored marbles into buckets of their matching color.
 
@@ -42,45 +42,50 @@ console.log(nextStudent);
 // "Suzy"
 ```
 
-We designate 3 scope colors: RED (outermost global scope), BLUE (scope of function `getStudentName(..)`), and GREEN (scope of/inside the `for` loop).
+We've designated 3 scope colors with code comments: RED (outermost global scope), BLUE (scope of function `getStudentName(..)`), and GREEN (scope of/inside the `for` loop). But it still may be difficult to recognize the boundaries of these scope buckets when looking at a code listing.
 
-The RED marbles are variables/identifiers originally declared in the RED scope:
+Figure 2 tries to make the scope boundaries easier to visualize by drawing colored bubbles around each scope:
 
-* `students`
+<figure>
+    <img src="fig2.png" width="500" alt="Nested Scope Bubbles" align="center">
+    <figcaption><em>Fig. 2: Nested Scope Bubbles</em></figcaption>
+</figure>
 
-* `getStudentName`
+1. **Bubble 1** (RED) encompasses the global scope, which has three identifiers/variables: `students` (line 1), `getStudentName` (line 8), and `nextStudent` (line 16).
 
-* `nextStudent`
+2. **Bubble 2** (BLUE) encompasses the scope of the function `getStudentName(..)` (line 8), which has just one identifier/variable: the parameter `studentID` (line 8).
 
-The only BLUE marble, the function parameter declared in the BLUE scope:
+3. **Bubble 3** (GREEN) encompasses the scope of the `for`-loop (line 9), which has just one identifier/variable: `student` (line 9).
 
-* `studentID`
+Scope bubbles are determined during compilation based on where the functions / blocks of scope are written, the nesting inside each other, etc. Each scope bubble is entirely contained within its parent scope bubble -- a scope is never partially in two different outer scopes.
 
-The only GREEN marble, the loop iterator declared in the GREEN scope:
+Each marble (variable/identifier) is colored based on which bubble (bucket) it's declared in, not the color of the scope it may be accessed from (e.g., `students` on line 9 and `studentID` on line 10).
 
-* `student`
+| NOTE: |
+| :--- |
+| Remember we asserted in Chapter 1 that `id`, `name`, and `log` are all properties, not variables; in other words, they're not marbles in buckets, so they don't get colored based on any the rules we're discussing in this book. To understand how such property accesses are handled, see Book 3 *Objects & Classes*. |
 
-As the JS engine processes a program (during compilation), and finds a declaration for a variable/identifier, it essentially asks, "which *color* scope am I currently in?" The variable/identifier is designated as that same *color*, meaning it belongs to that bucket.
+As the JS engine processes a program (during compilation), and finds a declaration for a variable, it essentially asks, "which *color* scope (bubble, bucket) am I currently in?" The variable is designated as that same *color*, meaning it belongs to that bucket/bubble.
 
-The GREEN bucket is wholly nested inside of the BLUE bucket, and similarly the BLUE bucket is wholly nested inside the RED bucket. Scopes can nest inside each other as shown, to any depth of nesting as your program needs. But scopes can never cross boundaries, meaning no scope is ever partially in two parent scopes.
+The GREEN bucket is wholly nested inside of the BLUE bucket, and similarly the BLUE bucket is wholly nested inside the RED bucket. Scopes can nest inside each other as shown, to any depth of nesting as your program needs.
 
 References (non-declarations) to variables/identifiers can be made from either the current scope, or any scope above/outside the current scope, but never to lower/nested scopes. So an expression in the RED bucket only has access to RED marbles, not BLUE or GREEN. An expression in the BLUE bucket can reference either BLUE or RED marbles, not GREEN. And an expression in the GREEN bucket has access to RED, BLUE, and GREEN marbles.
 
-We can conceptualize the process of determining these marble colors during runtime as a lookup. At first, the `students` variable reference in the `for` loop-statement has no color, so we ask the current scope if it has a marble matching that name. Since it doesn't, the lookup continues with the next outer/containing scope, and so on. When the RED bucket is reached, a marble of the name `students` is found, so the loop-statement's `students` variable is determined to be a red marble.
+We can conceptualize the process of determining these non-declaration marble colors during runtime as a lookup. Since the `students` variable reference in the `for`-loop statement on line 9 is not a declaration, it has no color. So we ask the current scope bucket (BLUE) if it has a marble matching that name. Since it doesn't, the lookup continues with the next outer/containing scope (RED). The RED bucket has a marble of the name `students`, so the loop-statement's `students` variable is determined to be a RED marble.
 
-The `if (student.id == studentID)` is similarly determined to reference a GREEN marble named `student` and a BLUE marble `studentID`.
+The `if (student.id == studentID)` on line 10 is similarly determined to reference a GREEN marble named `student` and a BLUE marble `studentID`.
 
 | NOTE: |
 | :--- |
 | The JS engine doesn't generally determine these marble colors during run-time; the "lookup" here is a rhetorical device to help you understand the concepts. During compilation, most or all variable references will be from already-known scope buckets, so their color is determined at that, and stored with each marble reference to avoid unnecessary lookups as the program runs. More on this in the next chapter. |
 
-The key take-aways from the marbles & buckets metaphor:
+The key take-aways from marbles & buckets (and bubbles!):
 
 * Variables are declared in certain scopes, which can be thought of as colored marbles in matching-color buckets.
 
-* Any reference to a variable of that same name in that scope, or any deeper nested scope, will be a marble of that same color.
+* Any reference to a variable of that same name in that scope, or any deeper nested scope, will be a marble of that same color -- unless an intervening scope "shadows" the variable declaration; see Chapter 3 "Shadowing.
 
-* The determination of buckets, colors, and marbles is all done during compilation. This information is used during code execution.
+* The determination of colored buckets, and the marbles they contain, happens during compilation. This information is used for variable (marble color) "lookups" during code execution.
 
 ## A Conversation Among Friends
 
@@ -248,7 +253,7 @@ This sort of accident (almost certain to lead to bugs eventually) is a great exa
 
 ### Building On Metaphors
 
-To visualize nested scope resolution, a third useful metaphor is an office building:
+To visualize nested scope resolution, yet another useful metaphor may be an office building:
 
 <img src="fig1.png" width="250">
 

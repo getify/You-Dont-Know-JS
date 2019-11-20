@@ -14,7 +14,7 @@
     * Compiler Speak
     * Lexical Scope
 * Chapter 2: Understanding Lexical Scope
-    * Buckets of Marbles
+    * Buckets, and Bubbles, and Marbles... Oh My!
     * A Conversation Among Friends
     * Nested Scope
     * Continue The Conversation
