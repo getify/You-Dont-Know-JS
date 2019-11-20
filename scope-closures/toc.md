@@ -20,6 +20,7 @@
     * Continue The Conversation
 * Chapter 3: Working With Scope
     * Nested Scopes, Revisited
+    * What's the Global?
     * TODO
 * Chapter 4: Function vs. Block Scope
     * Scope From Functions
