@@ -7,7 +7,7 @@
 
 Through Chapters 1 and 2, we defined *lexical scope* as the set of rules (determined at compile time) for how the identifiers/variables in a program are organized into units of scope (functions, blocks), as well as how lookups of these identifiers works during run-time.
 
-For conceptual understanding, we illustrated lexical scope with several metaphors: marbles & buckets, conversations, and office buildings.
+For conceptual understanding, lexical scope was illustrated as several metaphors: marbles & buckets, conversations, and office buildings.
 
 Now we'll dig into some of the nitty gritty details of working with lexical scope in our programs.
 
@@ -44,13 +44,46 @@ There are three scopes nested together in this code example. It may be helpful t
     <figcaption><em>Fig. 2: Nested Scope Bubbles</em></figcaption>
 </figure>
 
-1. **Bubble 1** (RED) encompasses the global scope, which has three identifiers/variables: `students`, `getStudentName`, and `nextStudent`.
+1. **Bubble 1** (RED) encompasses the global scope, which has three identifiers/variables: `students` (line 1), `getStudentName` (line 8), and `nextStudent` (line 16).
 
-2. **Bubble 2** (BLUE) encompasses the scope of the function `getStudentName(..)`, which has just one identifier/variable: the parameter `studentID`.
+2. **Bubble 2** (BLUE) encompasses the scope of the function `getStudentName(..)` (line 8), which has just one identifier/variable: the parameter `studentID` (line 8).
 
-3. **Bubble 3** (GREEN) encompasses the scope of the `for`-loop, which has just one identifier/variable: `student`.
+3. **Bubble 3** (GREEN) encompasses the scope of the `for`-loop (line 9), which has just one identifier/variable: `student` (line 9).
 
-Scope bubbles are defined based on where the functions / blocks of scope are written, the nesting inside each other, etc. A scope is always entirely contained within its parent scope -- a scope bubble is never partially in two outer scope bubbles.
+Scope bubbles are determined during compilation based on where the functions / blocks of scope are written, the nesting inside each other, etc. Each scope bubble is entirely contained within its parent scope bubble -- a scope is never partially in two different outer scopes.
+
+Each marble (variable/identifier) is colored based on which bubble (bucket) it's declared in, not the color of the scope it may be accessed from (e.g., `students` on line 9 and `studentID` on line 10).
+
+| NOTE: |
+| :--- |
+| Remember we asserted in Chapter 1 that `id`, `name`, and `log` are all properties, not variables; in other words, they're not marbles in buckets, so they don't get colored based on any the rules we're discussing in this book. To understand how such property accesses are handled, see Book 3 *Objects & Classes*. |
+
+### "Lookup" Is (Mostly) Conceptual
+
+In Chapter 2, we described the run-time access of a variable as a "lookup", where the *Engine* has to start by asking the current scope's *Scope Manager* if it knows about an identifier/variable, and proceeding upward/outward back through the chain of nested scopes (toward the global scope) until found, if ever. This description of the lookup process works for conceptual understanding, but it's not generally how things work in practice.
+
+The color of a marble (what bucket it comes from) -- the meta information of what scope a variable/identifier originates from -- is *usually* known during the initial compilation processing. Because of how lexical scope works, a marble's color will not change based on anything that can happen during run-time.
+
+Since the marble's color is known from compilation, and it's immutable, this information will likely be stored with (or at least accessible from) each variable/identifier's entry in the AST; that information is then used in generating the executable instructions that constitute the program's run-time. In other words, the run-time *Engine* doesn't need to lookup and figure out which scope bucket a variable/identifier comes from. That information is already known!
+
+Avoiding the need for a run-time lookup is a key optimization benefit for lexical scope. Scope is fixed at author-time/compile-time, and unaffected by run-time conditions, so no run-time lookup is necessary.
+
+But I said "...usually known..." earlier with respect to a marble's color determination during compilation. In what case would it not be known during compilation?
+
+Consider a reference to a variable/identifier isn't declared in any lexically available scopes in the current file -- see *Get Started*, Chapter 1, which asserts that each file is its own separate program from the perspective of JS compilation. If no declaration is found, that's not *necessarily* an error. Another file (program) in the run-time may indeed declare that variable/identifier in the shared global scope. So the ultimate determination of whether the variable/identifier was ever appropriately declared in some available bucket may need to be deferred to the run-time.
+
+The take-away? Any reference to a variable/identifier in our program that's initially *undeclared* is left as an uncolored marble during that file's compilation; this color cannot be determined until other relevant file(s) have been compiled and the application run-time begins.
+
+In that respect, some sort of run-time "lookup" for the variable/identifier would be needed to resolve the color of this uncolored marble. If the variable/identfier was eventually discovered in the global scope bucket, the color of the global scope applies. But this run-time deferred lookup would only be needed once at most, since nothing else during run-time could later change that marble's color.
+
+| NOTE: |
+| :--- |
+| Recall Chapter 2 "Lookup Failures", which covers what happens if a marble is still uncolored by the time its reference is executed. |
+
+### Shadowing
+
+// TODO
+// global variable == global object property
 
 .
 
@@ -71,28 +104,6 @@ Scope bubbles are defined based on where the functions / blocks of scope are wri
 | NOTE: |
 | :--- |
 | Everything below here is previous text from 1st edition, and is only here for reference while 2nd edition work is underway. **Please ignore this stuff.** |
-
-### Look-ups
-
-The structure and relative placement of these scope bubbles fully explains to the *Engine* all the places it needs to look to find an identifier.
-
-In the above code snippet, the *Engine* executes the `console.log(..)` statement and goes looking for the three referenced variables `a`, `b`, and `c`. It first starts with the innermost scope bubble, the scope of the `bar(..)` function. It won't find `a` there, so it goes up one level, out to the next nearest scope bubble, the scope of `foo(..)`. It finds `a` there, and so it uses that `a`. Same thing for `b`. But `c`, it does find inside of `bar(..)`.
-
-Had there been a `c` both inside of `bar(..)` and inside of `foo(..)`, the `console.log(..)` statement would have found and used the one in `bar(..)`, never getting to the one in `foo(..)`.
-
-**Scope look-up stops once it finds the first match**. The same identifier name can be specified at multiple layers of nested scope, which is called "shadowing" (the inner identifier "shadows" the outer identifier). Regardless of shadowing, scope look-up always starts at the innermost scope being executed at the time, and works its way outward/upward until the first match, and stops.
-
-**Note:** Global variables are also automatically properties of the global object (`window` in browsers, etc.), so it *is* possible to reference a global variable not directly by its lexical name, but instead indirectly as a property reference of the global object.
-
-```js
-window.a
-```
-
-This technique gives access to a global variable which would otherwise be inaccessible due to it being shadowed. However, non-global shadowed variables cannot be accessed.
-
-No matter *where* a function is invoked from, or even *how* it is invoked, its lexical scope is **only** defined by where the function was declared.
-
-The lexical scope look-up process *only* applies to first-class identifiers, such as the `a`, `b`, and `c`. If you had a reference to `foo.bar.baz` in a piece of code, the lexical scope look-up would apply to finding the `foo` identifier, but once it locates that variable, object property-access rules take over to resolve the `bar` and `baz` properties, respectively.
 
 ## Cheating Lexical
 
