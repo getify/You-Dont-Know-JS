@@ -197,11 +197,11 @@ Did you identify this one?
 function getStudentName(studentID) {
 ```
 
-A function declaration is a special case of a *target* reference. You could think of it like `var getStudentName = function(studentID)`, but that's not exactly accurate. An identifier `getStudentName` is declared (at compile-time), but the `= function(studentID)` part is also handled at compilation; the association between `getStudentName` and the function is automatically set up at the beginning of the scope rather than waiting for an `=` assignment statement to be executed.
+A `function` declaration is a special case of a *target* reference. You could think of it like `var getStudentName = function(studentID)`, but that's not exactly accurate. An identifier `getStudentName` is declared (at compile-time), but the `= function(studentID)` part is also handled at compilation; the association between `getStudentName` and the function is automatically set up at the beginning of the scope rather than waiting for an `=` assignment statement to be executed.
 
 | NOTE: |
 | :--- |
-| This immediate automatic function assignment from function declarations is referred to as "function hoisting", and will be covered more in Chapter 5. |
+| This immediate automatic function assignment from `function` declarations is referred to as "function hoisting", and will be covered more in Chapter 5. |
 
 ### Sources
 
@@ -223,7 +223,7 @@ It should be clear by now that scope is determined as the program is compiled, a
 
 Neither of these techniques *should* be used -- they're both very bad ideas, and you should be using strict mode anyway -- but it's important to be aware of them in case you run across code that does.
 
-The `eval(..)` function receives a string of code to compile and execute on the fly during the program run-time. If that string of code has a `var` or function declaration in it, those declarations will modify the scope that the `eval(..)` is currently executing in:
+The `eval(..)` function receives a string of code to compile and execute on the fly during the program run-time. If that string of code has a `var` or `function` declaration in it, those declarations will modify the scope that the `eval(..)` is currently executing in:
 
 ```js
 function badIdea() {
