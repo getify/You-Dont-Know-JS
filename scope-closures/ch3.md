@@ -34,7 +34,7 @@ function getStudentName(studentID) {
 var nextStudent = getStudentName(73);
 
 console.log(nextStudent);
-// "Suzy"
+// Suzy
 ```
 
 What color is the `students` variable reference in the `for`-loop?
@@ -82,13 +82,13 @@ function printStudent(studentName) {
 }
 
 printStudent("Frank");
-// "FRANK"
+// FRANK
 
 printStudent(studentName);
-// "SUZY"
+// SUZY
 
 console.log(studentName);
-// "Suzy"
+// Suzy
 ```
 
 | TIP: |
@@ -103,13 +103,15 @@ With the conceptual notion of the "lookup", we asserted that it starts with the 
 
 This is a key component of lexical scope behavior, called *shadowing*. The BLUE `studentName` variable (parameter) shadows the RED `studentName`. So, the parameter shadows (or is shadowing) the shadowed global variable. Repeat that sentence to yourself a few times to make sure you have the terminology straight!
 
-When you choose to shadow a variable from an outer scope, one direct impact is that from that scope inward/downward (through any nested scopes), it's now impossible for any marble to be colored as the shadowed variable (RED, in this case). In other words, any `studentName` identifier reference will mean that parameter variable, never the global `studentName` variable. It's lexically impossible to reference the global `studentName` anywhere inside of the `printStudent(..)` function.
+That's why the re-assignment of `studentName` affects only the inner (parameter) variable, the BLUE `studentName`, not the global RED `studentName`.
+
+When you choose to shadow a variable from an outer scope, one direct impact is that from that scope inward/downward (through any nested scopes), it's now impossible for any marble to be colored as the shadowed variable (RED, in this case). In other words, any `studentName` identifier reference will mean that parameter variable, never the global `studentName` variable. It's lexically impossible to reference the global `studentName` anywhere inside of the `printStudent(..)` function (or any inner scopes it may contain).
 
 #### Global Unshadowing Trick
 
-It is still possible to access the global variable, but not through a typical lexical identifier reference.
+It is still possible to access a global variable, but not through a typical lexical identifier reference.
 
-In the global scope (RED), `var` declarations and `function`-declarations also expose themselves as properties (of the same name as the identifier) on the *global object*. If you've done JS coding in a browser environment, you're probably used to thinking about the global object as `window`. That's not *entirely* accurate, but it's good enough for us to use in discussion for now. In a bit, we'll explore the global scope/object topic more.
+In the global scope (RED), `var` declarations and `function`-declarations also expose themselves as properties (of the same name as the identifier) on the *global object* -- essentially an object representation of the global scope. If you've done JS coding in a browser environment, you probably identify the global object as `window`. That's not *entirely* accurate, but it's good enough for us to use in discussion for now. In a bit, we'll explore the global scope/object topic more.
 
 Consider this program, specifically executed as a standalone .js file in a browser environment:
 
@@ -128,13 +130,13 @@ printStudent("Frank");
 
 Notice the `window.studentName` reference? This expression is accessing the global variable `studentName` as a property on `window` (which we're pretending for now is synonomous with the global object). That's the only way to access a shadowed variable from inside the scope where the shadowing variable is present.
 
-The `window.studentName` is a mirror of the global `studentName` variable, not a snapshot copy. Changes to one are reflected in the other, in either direction. Think of `window.studentName` as a getter/setter that accesses the actual `studentName` variable.
-
 | WARNING: |
 | :--- |
 | Leveraging this technique is not very good practice, as it's limited in utility, confusing for readers of your code, and likely to invite bugs to your program. Don't shadow a global variable that you need to access, and conversely, don't access a global variable that you've shadowed. |
 
-Also, this little "trick" only works for accessing a global scope variable (that was declared with `var` or `function`). Other forms of global scope variable declarations do not create mirrored global object properties:
+The `window.studentName` is a mirror of the global `studentName` variable, not a snapshot copy. Changes to one are reflected in the other, in either direction. Think of `window.studentName` as a getter/setter that accesses the actual `studentName` variable. As a matter of fact, you can even *add* a variable to the global scope by creating/setting a property on the global object (`window`).
+
+This little "trick" only works for accessing a global scope variable (that was declared with `var` or `function`). Other forms of global scope variable declarations do not create mirrored global object properties:
 
 ```js
 var one = 1;
@@ -206,6 +208,10 @@ Oh! So does this `another` technique prove me wrong in my above claim of the `sp
 `special: special` is copying the value of the `special` parameter variable into another container (a property of the same name). Of course if you put a value in another container, shadowing no longer applies (unless `another` was shadowed, too!). But that doesn't mean we're accessing the parameter `special`, it means we're accessing the value it had at that moment, but by way of another container (object property). We cannot, for example, reassign that BLUE `special` to another value from inside `keepLooking()`.
 
 Another "But...!?" you may be about to raise: what if I'd used objects or arrays as the values instead of the numbers (`112358132134`, etc)? Would us having references to objects instead of copies of primitive values "fix" the inaccessibility? No. Mutating the contents of the object value via such a reference copy is **not** the same thing as lexically accessing the variable itself. We still couldn't reassign the BLUE `special`.
+
+#### Illegal Shadowing
+
+// TODO: var crossing let, etc
 
 ## The Global Scope?
 
@@ -317,15 +323,76 @@ Most developers agree that the global scope shouldn't just be a dumping ground f
 
 It might seem obvious that the global scope is located in the outermost portion of a file; that is, not inside any function or other block. But it's not quite as simple as that.
 
+Different JS environments handle the scopes of your programs, in particular the global scope, differently. It's extremely common for JS developers to have misconceptions in this regard.
+
 #### Pure Global
 
-Perhaps this is a surprising claim, but with resepct to treatment of the global scope, the most *pure* environment JS can be run in is as a standalone .js file loaded in a web page environment in a browser. I don't mean "pure" as in nothing added, but rather in terms of minimal intrusion on the code or interference with its execution semantics.
+With resepct to treatment of the global scope, the most *pure* (not completely!) environment JS can be run in is as a standalone .js file loaded in a web page environment in a browser. I don't mean "pure" as in nothing automatically added -- lots may be added! -- but rather in terms of minimal intrusion on the code or interference with its behavior.
 
-// TODO: (global) Node, developer console, Module, JS file (window, self in workers), globalThis
+Consider this simple .js file:
+
+```js
+var studentName = "Kyle";
+
+function hello() {
+    console.log(`Hello, ${studentName}!`);
+}
+
+hello();
+// Hello, Kyle!
+```
+
+This code may be loaded in a webpage environment using an inline `<script>` tag, a `<script src=..>` script tag in the markup, or even a dynamically created `<script>` DOM element. In all three cases, the `studentName` and `hello` identifiers are declared in the global scope.
+
+That's the default behavior one would expect from a reading of the JS specification. That's what I mean by *pure*. That won't always be true of other JS environments, and that's often surprising to JS developers.
+
+#### Web Workers
+
+// TODO
+
+#### Developer Tools Console/REPL
+
+Using the console/REPL (Read-Evaluate-Print-Loop) in your browser's Developer Tools feels like a pretty straightforward JS environment at first glance. But it's not, really.
+
+Developer Tools are... tools for developers. Their primary purpose is to make life easier for developers. They prioritize DX (Developer Experience). It is *not* a goal of such tools to accurately and purely reflect all nuances of strict-spec JS behavior. As such, there's many quirks that may act as "gotchas" if you're treating the console as a *pure* JS environment.
+
+This convenience is a good thing, by the way! I'm glad developer tools make developers' lives easier! I'm glad we have nice UX charms like auto-complete of variables/properties, etc. I'm just pointing out that we can't and shouldn't expect such tools to *always* adhere strictly to the way JS programs are handled, because that's not the purpose of these tools.
+
+Since such tools vary in behavior from browser to browser, and since they change (sometimes rather frequently), I'm not going to "hardcode" any of the specific details into this text, thereby ensuring this book text is outdated quickly.
+
+But I'll just hint at some examples of quirks that have been true at various points in different browser console environments, to reinforce my point about not assuming native JS behavior:
+
+* Whether a `var` or function declaration in the top-level "global scope" of the console actually creates a real global variable (and mirrored `window` property, and vice versa!).
+
+* What happens with multiple `let` and `const` declarations in the top-level "global scope".
+
+* Whether `"use strict";` on one line-entry (pressing `<enter>` after) enables strict mode for the rest of that console session, the way it would on the first line of a .js file, as well as whether you can use `"use strict";` beyond the "first line" and still get strict mode turned on for that session.
+
+* How non-strict mode `this` default-binding works for function calls, and whether the "global object" used will contain expected global variables.
+
+* How "hoisting" (see Chapter 5) works across line entries.
+
+* ...several others
+
+The developer console is not trying to pretend to be a JS compiler that handles your entered code the same way the JS engine handles a .js file. It's trying to make it easy for you to quickly enter one or a few lines of code and see the results. These are entirely different use-cases, and as such, it's unreasonable to assume one tool handling both equally.
+
+Don't trust what behavior you see in a developer console as representing *exact* JS semantics. Think of it as a "JS friendly" environment. That's useful in its own right.
+
+#### ES6+ Modules
+
+// TODO
+
+#### Node
+
+// TODO
+
+#### Global This
+
+// TODO
 
 ## Temporal Dead Zone (TDZ)
 
-// TODO
+// TODO: TDZ, redeclarations, loop declarations
 
 .
 

@@ -39,7 +39,7 @@ function getStudentName(studentID) {
 
 var nextStudent = getStudentName(73);
 console.log(nextStudent);
-// "Suzy"
+// Suzy
 ```
 
 We've designated 3 scope colors with code comments: RED (outermost global scope), BLUE (scope of function `getStudentName(..)`), and GREEN (scope of/inside the `for` loop). But it still may be difficult to recognize the boundaries of these scope buckets when looking at a code listing.
@@ -122,7 +122,7 @@ function getStudentName(studentID) {
 var nextStudent = getStudentName(73);
 
 console.log(nextStudent);
-// "Suzy"
+// Suzy
 ```
 
 Let's examine how JS is going to process that program, specifically starting with the first statement. The array and its contents are just basic JS value literals (and thus unaffected by any scoping concerns), so our focus here will be on the `var students = [ .. ]` declaration and initialization-assignment parts.
