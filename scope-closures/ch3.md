@@ -213,7 +213,7 @@ Another "But...!?" you may be about to raise: what if I'd used objects or arrays
 
 // TODO: var crossing let, etc
 
-## The Global Scope?
+## Why Global Scope?
 
 We've referenced the "global scope" a number of times already, but we should dig into that topic in more detail. We'll start by exploring whether the global scope is (still) useful and relevant to writing JS programs, and then look at differences in how the global scope is *found* in different JS environments.
 
@@ -319,13 +319,13 @@ In addition to (potentially) accounting for where an application's code resides 
 
 Most developers agree that the global scope shouldn't just be a dumping ground for every variable in your application. That's a mess of bugs just waiting to happen. But it's also undeniable that the global scope is an important *glue* for virtually every JS application.
 
-### Where's The Global Scope?
+## Where Exactly Is This Global Scope?
 
 It might seem obvious that the global scope is located in the outermost portion of a file; that is, not inside any function or other block. But it's not quite as simple as that.
 
 Different JS environments handle the scopes of your programs, in particular the global scope, differently. It's extremely common for JS developers to have misconceptions in this regard.
 
-#### Browser "Window"
+### Browser "Window"
 
 With resepct to treatment of the global scope, the most *pure* (not completely!) environment JS can be run in is as a standalone .js file loaded in a web page environment in a browser. I don't mean "pure" as in nothing automatically added -- lots may be added! -- but rather in terms of minimal intrusion on the code or interference with its behavior.
 
@@ -359,7 +359,7 @@ window.hello();
 
 That's the default behavior one would expect from a reading of the JS specification. That's what I mean by *pure*. That won't always be true of other JS environments, and that's often surprising to JS developers.
 
-##### Shadowing Revisited
+#### Shadowing Revisited
 
 Recall the discussion of shadowing from earlier? An unusual consequence of the difference between a global variable and a global property of the same name is that a global object property can be shadowed by a global variable:
 
@@ -376,7 +376,7 @@ The `let` declaration adds a `something` global variable, which shadows the `som
 
 While it's *possible* to shadow in this manner, it's almost certainly a bad idea to do so. Don't create a divergence between the global object and the global scope.
 
-##### What's In A Name?
+#### What's In A Name?
 
 I asserted that this browser-hosted JS environment has the most *pure* global scope behavior we'll see. Things are not entirely *pure*, however.
 
@@ -395,7 +395,7 @@ But the truly weird behavior is that even though we assigned the number `42` to 
 
 With the exception some rare corner cases like `window.name`, JS running as a standalone file in a browser page has some of the most *pure* global scope behavior we're likely to encounter.
 
-#### Web Workers
+### Web Workers
 
 Web Workers are a web platform extension for typical browser-JS behavior, which allows a JS file to run in a completely separate thread (operating system wise) from the thread that's running the main browser-hosted JS.
 
@@ -424,7 +424,7 @@ Just as with main JS programs, `var` and `function` declarations create mirrored
 
 So again, the global scope behavior we're seeing here is about as *pure* as it gets for running JS programs.
 
-#### Developer Tools Console/REPL
+### Developer Tools Console/REPL
 
 Using the console/REPL (Read-Evaluate-Print-Loop) in your browser's Developer Tools feels like a pretty straightforward JS environment at first glance. But it's not, really.
 
@@ -452,7 +452,7 @@ The developer console is not trying to pretend to be a JS compiler that handles 
 
 Don't trust what behavior you see in a developer console as representing *exact* to-the-letter JS semantics. Think of it as a "JS friendly" environment. That's useful in its own right.
 
-#### ES6+ Modules
+### ES6+ Modules
 
 ES6 introduced first-class support for the module pattern (which we'll cover more in Chapter 6). One of the most obvious impacts of this mechanism is how it changes the behavior of observably top-level scope in a file.
 
@@ -481,7 +481,7 @@ The module's top-level scope is descended from the global scope, almost as if th
 
 ES6+ modules encourage a minimization of reliance on the global scope, where you import whatever modules you may need for the current module to operate. As such, you less often see usage of the global scope or its global object. However, as noted earlier, there are still plenty of JS and web globals that you will continue to access from the global scope, whether you realize it or not!
 
-#### Node
+### Node
 
 As of time of this writing, Node recently added support for ES6+ modules. But additionally, Node has from the beginning supported a module format referred to as "Common JS", which looks like this:
 
@@ -546,7 +546,7 @@ Here we add `studentName` as a property on the `global` object, and then in the 
 
 Remember, `global` is not defined by JS, it's defined by Node.
 
-#### Global This
+### Global This
 
 Reviewing where we've been so far, depending on which JS environment our code is running in, a program may or may not be able to:
 

@@ -21,7 +21,8 @@
     * Continue The Conversation
 * Chapter 3: Working With Scope
     * Nested Scopes, Revisited
-    * The Global Scope?
+    * Why Global Scope?
+    * Where Exactly Is This Global Scope?
     * Temporal Dead Zone (TDZ)
     * TODO
 * Chapter 4: Function vs. Block Scope
