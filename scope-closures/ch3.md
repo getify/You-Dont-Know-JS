@@ -211,7 +211,52 @@ Another "But...!?" you may be about to raise: what if I'd used objects or arrays
 
 #### Illegal Shadowing
 
-// TODO: var crossing let, etc
+Not all combinations of declaration shadowing are allowed. One case to be aware of is that `let` can shadow `var`, but `var` cannot shadow `let`.
+
+Consider:
+
+```js
+function something() {
+    var special = "JavaScript";
+    {
+        let special = 42;   // totally fine shadowing
+        // ..
+    }
+}
+
+function another() {
+    // ..
+    {
+        let special = "JavaScript";
+        {
+            var special = "JavaScript";   // Syntax Error
+            // ..
+        }
+    }
+}
+```
+
+Notice in the `another()` function, the inner `var special` declaration is attempting to declare a function-wide `special`, which in and of itself is fine (as shown by the `something()` function).
+
+The Syntax Error description in this case indicates that `special` has already been defined, but that error message is a little misleading (again, no such error happens in `something()`, as shadowing is generally allowed just fine). The real reason it's raised as a Syntax Error is because the `var` is basically trying to "cross the boundary" of the `let` declaration of the same name, which is not allowed.
+
+The boundary crossing effectively stops at each function boundary, so this variant raises no exception:
+
+```js
+function another() {
+    // ..
+    {
+        let special = "JavaScript";
+
+        whatever(function callback(){
+            var special = "JavaScript";   // totally fine shadowing
+            // ..
+        });
+    }
+}
+```
+
+Just remember: `let` can shadow `var`, but not the other way around.
 
 ## Why Global Scope?
 
