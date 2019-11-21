@@ -109,11 +109,11 @@ saySomething();
 
 The noted `ReferenceError` occurs on the line with the statement `greeting = "Howdy"`. What's being indicated is that the `greeting` variable for that statement is the one from the next line, `let greeting = "Hi"`, rather than from the previous statement `var greeting = "Hello"`.
 
-The only way the JS engine could know, at the line where the error is thrown, that the *next statement* would declare a block-scoped variable of the same name (`greeting`) -- which creates the conflict of accessing the variable too early, while in its so called "TDZ", Temporal Dead Zone -- is if the JS engine had already processed this code in an earlier pass, and already set up all the scopes and their variable associations. This processing of scopes and declarations can only accurately be done by parsing the program before execution.
+The only way the JS engine could know, at the line where the error is thrown, that the *next statement* would declare a block-scoped variable of the same name (`greeting`) -- which creates the conflict of accessing the variable too early, while in its so called "TDZ", Temporal Dead Zone (see Chapter 3) -- is if the JS engine had already processed this code in an earlier pass, and already set up all the scopes and their variable associations. This processing of scopes and declarations can only accurately be done by parsing the program before execution.
 
 | WARNING: |
 | :--- |
-| It's often asserted that `let` and `const` declarations are not "hoisted", as an explanation of the occurence of the "TDZ" behavior just illustrated. This is not accurate. If these kinds of declarations were not hoisted, then `greeting = "Howdy"` assignment would simply be targetting the `var greeting` variable from the outer (function) scope, with no need to throw an error, because the block-scoped `greeting` wouldn't *exist* yet. The existence of the TDZ error proves that the block-scoped `greeting` was indeed "hoisted" to the top of that block scope. |
+| It's often asserted that `let` and `const` declarations are not "hoisted", as an explanation of the occurence of the "TDZ" (Chapter 3) behavior just illustrated. This is not accurate. If these kinds of declarations were not hoisted, then `greeting = "Howdy"` assignment would simply be targetting the `var greeting` variable from the outer (function) scope, with no need to throw an error, because the block-scoped `greeting` wouldn't *exist* yet. The existence of the TDZ error proves that the block-scoped `greeting` was indeed "hoisted" to the top of that block scope. |
 
 Hopefully you're now convinced that JS programs are parsed before any execution begins. But does that prove they are compiled?
 

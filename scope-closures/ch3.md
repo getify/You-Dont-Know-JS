@@ -207,9 +207,125 @@ Oh! So does this `another` technique prove me wrong in my above claim of the `sp
 
 Another "But...!?" you may be about to raise: what if I'd used objects or arrays as the values instead of the numbers (`112358132134`, etc)? Would us having references to objects instead of copies of primitive values "fix" the inaccessibility? No. Mutating the contents of the object value via such a reference copy is **not** the same thing as lexically accessing the variable itself. We still couldn't reassign the BLUE `special`.
 
-## What's The Global?
+## The Global Scope?
+
+We've referenced the "global scope" a number of times already, but we should dig into that topic in more detail. We'll start by exploring whether the global scope is (still) useful and relevant to writing JS programs, and then look at differences in how the global scope is *found* in different JS environments.
+
+It's likely no surprise to readers that most applications are composed of multiple (sometimes many!) individual JS files. So how exactly do all those separate files get stitched together in a single run-time context by the JS engine?
+
+With respect to browser-executed applications, there are 3 main ways:
+
+1. If you're exclusively using ES6+ modules (not transpiling those away into some other bundle format), then these files are loaded individually by the JS environment. Each module then `import`s references to whichever other modules it needs to access. The separate module files cooperate with each other exclusively through these shared imports, without needing any scopes.
+
+2. If you're using a bundler in your build process, all the files are typically concatenated together before delivery to the browser and JS engine, which then only processes one big file. Even with all the pieces of the application being co-located in a single file, some mechanism is necessary for each piece to register a *name* to be referred to by other pieces, as well as some facility for that access to be made.
+
+    In some approaches, the entire contents of the file are wrapped in a single enclosing scope (such as a wrapper function/IIFE, UMD-like module, etc), so each piece can register itself for access by other pieces by way of local variables in that shared scope.
+
+    For example:
+
+    ```js
+    (function outerScope(){
+        var moduleOne = (function one(){
+            // ..
+        })();
+
+        var moduleTwo = (function two(){
+            // ..
+
+            function callModuleOne() {
+                moduleOne.someMethod();
+            }
+
+            // ..
+        })();
+    })();
+    ```
+
+    As shown, the `moduleOne` and `moduleTwo` local variables inside the `outerScope()` function scope are declared so that these modules can access each other for their cooperation.
+
+    While the scope of `outerScope()` is a function and not the full environment global scope, it does act as a sort of "application-wide scope", a bucket where all the top-level identifiers can be stored, even if not in the real global scope. So it's kind of like a stand-in for the global scope in that respect.
+
+3. Whether a bundler is used for an application, or whether the (non-ES6 module) files are simply loaded in the browser individually (via `<script>` tags or other dynamic JS loading), if there is no single surrounding scope encompassing all these pieces, the **global scope** is the only way for them to cooperate with each other.
+
+    A bundled file of this sort often looks something like this:
+
+    ```js
+    var moduleOne = (function one(){
+        // ..
+    })();
+    var moduleTwo = (function two(){
+        // ..
+
+        function callModuleOne() {
+            moduleOne.someMethod();
+        }
+
+        // ..
+    })();
+    ```
+
+    Here, since there is no surrounding function scope, these `moduleOne` and `moduleTwo` declarations are simply processed in the global scope. This is effectively the same as if the file hadn't been concatenated:
+
+    module1.js:
+
+    ```js
+    var moduleOne = (function one(){
+        // ..
+    })();
+    ```
+
+    module2.js:
+
+    ```js
+    var moduleTwo = (function two(){
+        // ..
+
+        function callModuleOne() {
+            moduleOne.someMethod();
+        }
+
+        // ..
+    })();
+    ```
+
+    Again, if these files are loaded as normal standalone .js files in a browser environment, each top-level variable declaration will end up as a global variable, since the global scope is the only shared resource between these two separate files (programs, from the perspective of the JS engine).
+
+In addition to (potentially) accounting for where an application's code resides during run-time, and how each piece is able to access the other pieces to cooperate, the global scope is also where:
+
+* JS exposes its built-ins:
+
+    - primitives: `undefined`, `null`, `Infinity`, `NaN`
+    - natives: `Date()`, `Object()`, `String()`, etc
+    - global functions: `eval()`, `parseInt()`, etc
+    - namespaces: `Math`, `Atomics`, `JSON`
+    - friends of JS: `Intl`, `WebAssembly`
+
+* The environment that is hosting JS exposes its built-ins:
+
+    - `console` (and its methods)
+    - the DOM (`window`, `document`, etc)
+    - timers (`setTimeout(..)`, etc)
+    - web platform APIs: `navigator`, `history`, geolocation, WebRTC, etc<br><br>
+
+    | NOTE: |
+    | :--- |
+    | Node also exposes several elements "globally", but they're technically not in its `global` scope: `require()`, `__dirname`, `URL`, etc. |
+
+Most developers agree that the global scope shouldn't just be a dumping ground for every variable in your application. That's a mess of bugs just waiting to happen. But it's also undeniable that the global scope is an important *glue* for virtually every JS application.
+
+### Where's The Global Scope?
+
+It might seem obvious that the global scope is located in the outermost portion of a file; that is, not inside any function or other block. But it's not quite as simple as that.
+
+#### Pure Global
+
+Perhaps this is a surprising claim, but with resepct to treatment of the global scope, the most *pure* environment JS can be run in is as a standalone .js file loaded in a web page environment in a browser. I don't mean "pure" as in nothing added, but rather in terms of minimal intrusion on the code or interference with its execution semantics.
 
 // TODO: (global) Node, developer console, Module, JS file (window, self in workers), globalThis
+
+## Temporal Dead Zone (TDZ)
+
+// TODO
 
 .
 
