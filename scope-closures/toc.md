@@ -12,6 +12,7 @@
     * About This Book
     * Compiling Code
     * Compiler Speak
+    * Cheating: Run-Time Scope Modifications
     * Lexical Scope
 * Chapter 2: Understanding Lexical Scope
     * Buckets, and Bubbles, and Marbles... Oh My!

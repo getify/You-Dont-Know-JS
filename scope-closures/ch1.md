@@ -146,7 +146,7 @@ function getStudentName(studentID) {
 var nextStudent = getStudentName(73);
 
 console.log(nextStudent);
-// "Suzy"
+// Suzy
 ```
 
 Other than declarations, all occurrences of variables/identifiers in a program serve in one of two "roles": either they're the *target* of an assignment or they're the *source* of a value.
@@ -217,11 +217,46 @@ In `getStudentName(73)`, `getStudentName` is a *source* reference (which we hope
 
 What's the importance of understanding *targets* vs. *sources*? In Chapter 2, we'll revisit this topic and cover how a variable's role impacts its lookup (specifically, if the lookup fails).
 
+## Cheating: Run-Time Scope Modifications
+
+It should be clear by now that scope is determined as the program is compiled, and should not be affected by any run-time conditions. However, in non-strict mode, there are technically still two ways to cheat this rule, and modify the scopes during the run-time.
+
+Neither of these techniques *should* be used -- they're both very bad ideas, and you should be using strict mode anyway -- but it's important to be aware of them in case you run across code that does.
+
+The `eval(..)` function receives a string of code to compile and execute on the fly during the program run-time. If that string of code has a `var` or function declaration in it, those declarations will modify the scope that the `eval(..)` is currently executing in:
+
+```js
+function badIdea() {
+    eval("var oops = 'Ugh!';");
+    console.log(oops);
+}
+
+badIdea();
+// Ugh!
+```
+
+If the `eval(..)` had not been present, the `oops` variable in `console.log(oops)` would not exist, and would throw a Reference Error. But `eval(..)` modifies the scope of the `badIdea()` function at run-time. This is a bad idea for many reasons, including the performance hit of modifying the already compiled and optimized scope, every time `badIdea()` runs. Don't do it!
+
+The second cheat is the `with` keyword, which essentially dynamically turns an object into a local scope -- its properties are treated as identifiers in that scope's block:
+
+```js
+var badIdea = {
+    oops: "Ugh!"
+};
+
+with (badIdea) {
+    console.log(oops);
+    // Ugh!
+}
+```
+
+The global scope was not modified here, but `badIdea` was turned into a scope at run-time rather than compile-time. Again, this is a terrible idea, for performance and readability reasons. Don't!
+
+At all costs, avoid `eval(..)` (at least, `eval(..)` creating declarations) and `with`. As mentioned, neither of these cheats is available in strict mode, so if you just use strict mode -- you should! -- then the temptation is removed.
+
 ## Lexical Scope
 
-For a language whose scope is determined at compile time, its scope model is called "lexical scope". This term "lexical" is related to the "lexing" stage of compilation.
-
-The key concept is that the lexical scope of a program is controlled entirely by the placement of functions, blocks, and scopes, in relation to each other.
+For a language whose scope is determined at compile time, its scope model is called "lexical scope". This term "lexical" is related to the "lexing" stage of compilation. The key concept is that the lexical scope of a program is controlled entirely by the placement of functions, blocks, and scopes, in relation to each other.
 
 If you place a variable declaration inside a function, the compiler handles this declaration as it's parsing the function, and associates that declaration with the function's scope. If a variable is block-scope declared (`let` / `const`), then it's associated with the nearest enclosing `{ .. }` block, rather than its enclosing function (as with `var`).
 
@@ -229,7 +264,7 @@ A reference (*target* or *source*) for a variable must be resolved to coming fro
 
 It's important to note that compilation doesn't actually *do anything* in terms of reserving memory for scopes and variables.
 
-Instead, compilation creates a map of all the lexical scopes that the program will need as it executes. In practice, this essentially amounts to inserted code that will define all the scopes (aka, "lexical environments") and register all the identifiers for each scope.
+Instead, compilation creates a map of all the lexical scopes that the program will need as it executes. You can think of this plan/map as inserted code that will define all the scopes (aka, "lexical environments") and register all the identifiers for each scope.
 
 So scopes are planned out during compilation -- that's why we refer to "lexical scope" as a compile-time decision -- but they aren't actually created until run-time. Each scope is instantiated in memory each time it needs to run.
 
