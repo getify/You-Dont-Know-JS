@@ -359,7 +359,28 @@ window.hello();
 
 That's the default behavior one would expect from a reading of the JS specification. That's what I mean by *pure*. That won't always be true of other JS environments, and that's often surprising to JS developers.
 
-Things are not entirely *pure*, however. For example:
+##### Shadowing Revisited
+
+Recall the discussion of shadowing from earlier? An unusual consequence of the difference between a global variable and a global property of the same name is that a global object property can be shadowed by a global variable:
+
+```js
+window.something = 42;
+
+let something = "Kyle";
+
+console.log(something);
+// Kyle
+```
+
+The `let` declaration adds a `something` global variable, which shadows the `something` global object property.
+
+While it's *possible* to shadow in this manner, it's almost certainly a bad idea to do so. Don't create a divergence between the global object and the global scope.
+
+##### What's In A Name?
+
+I asserted that this browser-hosted JS environment has the most *pure* global scope behavior we'll see. Things are not entirely *pure*, however.
+
+Consider:
 
 ```js
 var name = 42;
@@ -368,16 +389,11 @@ console.log(typeof name, name);
 // string 42
 ```
 
-`window.name` is a pre-defined "global" in a browser context, a special variable that behaves as a getter/setter and insists on a string value. An unusual consequence of it being pre-defined on `window` is that it can be "shadowed" directly in the global scope:
+`window.name` is a pre-defined "global" in a browser context; it's a property on the global object, so it seems like a normal global variable (though it's anything but "normal"). We used `var` for the declaration, which doesn't shadow the pre-defined `name` global property. That means, effectively, the `var` declaration is ignored, since there's already a global scope object property of that name. As we discussed in the previous section, had we use `let name`, we would have shadowed `window.name` with a separate global `name` variable.
 
-```js
-let name = 42;
+But the truly weird behavior is that even though we assigned the number `42` to `name`, when we then retrieve its value, it's a string `"42"`! In this case, the weirdness is because `window.name` is actually a getter/setter on the global object, which insists on a string value. Wow!
 
-console.log(typeof name, name);
-// number 42
-```
-
-With the exception of a few rare corner cases like this, JS running as a standalone file in a browser page has the most *pure* global scope behavior we're likely to encounter.
+With the exception some rare corner cases like `window.name`, JS running as a standalone file in a browser page has some of the most *pure* global scope behavior we're likely to encounter.
 
 #### Web Workers
 
@@ -404,7 +420,9 @@ self.studentID;
 // undefined
 ```
 
-Just as with main JS programs, `var` and `function` declarations create mirrored properties on the global object, where other declarations (`let`, etc) do not.
+Just as with main JS programs, `var` and `function` declarations create mirrored properties on the global object (aka, `self`), where other declarations (`let`, etc) do not.
+
+So again, the global scope behavior we're seeing here is about as *pure* as it gets for running JS programs.
 
 #### Developer Tools Console/REPL
 
