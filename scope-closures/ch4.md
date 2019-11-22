@@ -1,5 +1,5 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 4: Function vs. Block Scope
+# Chapter 4: Block Scope
 
 | NOTE: |
 | :--- |

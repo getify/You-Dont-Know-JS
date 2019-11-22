@@ -61,7 +61,7 @@ To state it as simply as possible, a JS program is processed in (at least) two p
 
 The breakdown of a parsing/compilation phase separate from the subsequent execution phase is observable fact, not theory or opinion. While the JS specification does not require "compilation" explicitly, it requires behavior which is essentially only practical in a compile-then-execute cadence.
 
-There are three program characteristics you can use to prove this to yourself: syntax errors, "early errors", and hoisting" (covered in Chapter 5).
+There are three program characteristics you can use to prove this to yourself: syntax errors, "early errors", and hoisting (covered in Chapter 3).
 
 Consider this program:
 
@@ -109,11 +109,11 @@ saySomething();
 
 The noted `ReferenceError` occurs on the line with the statement `greeting = "Howdy"`. What's being indicated is that the `greeting` variable for that statement is the one from the next line, `let greeting = "Hi"`, rather than from the previous statement `var greeting = "Hello"`.
 
-The only way the JS engine could know, at the line where the error is thrown, that the *next statement* would declare a block-scoped variable of the same name (`greeting`) -- which creates the conflict of accessing the variable too early, while in its so called "TDZ", Temporal Dead Zone (see Chapter 3) -- is if the JS engine had already processed this code in an earlier pass, and already set up all the scopes and their variable associations. This processing of scopes and declarations can only accurately be done by parsing the program before execution.
+The only way the JS engine could know, at the line where the error is thrown, that the *next statement* would declare a block-scoped variable of the same name (`greeting`) -- which creates the conflict of accessing the variable too early, while in its so called "TDZ", Temporal Dead Zone (see Chapter 3) -- is if the JS engine had already processed this code in an earlier pass, and already set up all the scopes and their variable associations. This processing of scopes and declarations can only accurately be done by parsing the program before execution, and it's called "hoisting" (see Chapter 3).
 
 | WARNING: |
 | :--- |
-| It's often asserted that `let` and `const` declarations are not "hoisted", as an explanation of the occurence of the "TDZ" (Chapter 3) behavior just illustrated. This is not accurate. If these kinds of declarations were not hoisted, then `greeting = "Howdy"` assignment would simply be targetting the `var greeting` variable from the outer (function) scope, with no need to throw an error, because the block-scoped `greeting` wouldn't *exist* yet. The existence of the TDZ error proves that the block-scoped `greeting` was indeed "hoisted" to the top of that block scope. |
+| It's often asserted that `let` and `const` declarations are not hoisted, as an explanation of the occurence of the "TDZ" (Chapter 3) behavior just illustrated. This is not accurate. If these kinds of declarations were not hoisted, then `greeting = "Howdy"` assignment would simply be targetting the `var greeting` variable from the outer (function) scope, with no need to throw an error; the block-scoped `greeting` wouldn't *exist* yet. But the TDZ error itself proves that the block-scoped `greeting` must have been hoisted to the top of that block scope! |
 
 Hopefully you're now convinced that JS programs are parsed before any execution begins. But does that prove they are compiled?
 
@@ -201,7 +201,7 @@ A `function` declaration is a special case of a *target* reference. You could th
 
 | NOTE: |
 | :--- |
-| This immediate automatic function assignment from `function` declarations is referred to as "function hoisting", and will be covered more in Chapter 5. |
+| This immediate automatic function assignment from `function` declarations is referred to as "function hoisting", and will be covered in Chapter 3. |
 
 ### Sources
 

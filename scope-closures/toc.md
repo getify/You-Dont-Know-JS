@@ -23,9 +23,9 @@
     * Nested Scopes, Revisited
     * Why Global Scope?
     * Where Exactly Is This Global Scope?
-    * Temporal Dead Zone (TDZ)
+    * When Can I Use A Variable?
     * TODO
-* Chapter 4: Function vs. Block Scope
+* Chapter 4: Block Scope
     * Scope From Functions
     * Hiding In Plain Scope
     * Functions As Scopes

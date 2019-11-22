@@ -11,6 +11,10 @@ For conceptual understanding, lexical scope was illustrated with several metapho
 
 Now we'll dig into some of the nitty gritty details of working with lexical scope in our programs.
 
+| TIP: |
+| :--- |
+| This chapter is pretty long and detailed. Make sure to take your time working through it, and practice the concepts and code frequently. Don't rush! |
+
 ## Nested Scopes, Revisited
 
 Again, recall our running example program:
@@ -632,7 +636,123 @@ const theGlobalScopeObject =
 
 Phew! At least now you're more aware of the breadth of topic on the global scope and global scope object.
 
-## Temporal Dead Zone (TDZ)
+## When Can I Use A Variable?
+
+At what point does a variable become available to use in a certain part of a program? There may seem to be an obvious answer: *after* the variable has been declared/created. Right? Not quite.
+
+Consider:
+
+```js
+greeting();
+// Hello!
+
+function greeting() {
+    console.log("Hello!");
+}
+```
+
+This code works fine. You may have seen or even written code like it before. But did you ever wonder how or why it works? Specifically, why can you access the identifier `greeting` from line 1 (to retrieve and execute a function reference), even though the `greeting()` function declaration doesn't occur until line 3?
+
+Recall how Chapter 1 pointed out that all identifiers are registered to their respective scopes during compile time. Moreover, every identifier is *created* at the beginning of the scope it belongs to, **every time that scope is entered**. The term for registering a variable at the top of its enclosing scope, even though its declaration may appear further down in the scope, is called **hoisting**.
+
+But hoisting alone doesn't fully answer the posed question. Sure, we can see an identifier called `greeting` from the beginning of the scope, but why can we **call** the `greeting()` function before it's been declared?
+
+In other words, how does `greeting` have any value in it, like the function reference, when the scope first begins? That's an additional characteristic of `function` declarations, called "function hoisting". When a `function` declaration's name identifier is registered at the top of a scope, it is additionally initialized to that function's reference.
+
+Function hoisting only applies to formal `function` declarations, not to function expression assignments. Consider:
+
+```js
+greeting();
+// Type Error
+
+var greeting = function greeting() {
+    console.log("Hello!");
+};
+```
+
+Line one (`greeting();`) throws an error. But the *kind* of error thrown is very important to notice. A Type Error means we're trying to do something with a value that is not allowed. Indeed, the error message would, depending on your JS environment, say something like "'undefined' is not a function", or alternately, "'greeting' is not a function".
+
+We should notice that the error is **not** a Reference Error. It's not telling us that it couldn't find `greeting` as an identifier in the scope. It's telling us that `greeting` doesn't hold a function reference at that moment.
+
+What does it hold?
+
+Variables declared with `var` are, in addition to being hoisted, also automatically initialized to `undefined` at the beginning of the scope. Once they're initialized, they're available to be used (assigned to, retrieved, etc). So on that first line, `greeting` exists, but it holds only the default `undefined` value. It's not until line 3 that `greeting` gets assigned the function reference.
+
+Pay close attention to the distinction here. A `function` declaration is hoisted and initialized to its function value (again, called "function hoisting"). By contrast, a `var` variable is hoisted, but it's only initialized to `undefined`. Any subsequent function expression assignments to that variable don't happen until that statement is reached during run-time execution.
+
+In both cases, the name of the identifier is hoisted. But the value association doesn't get handled at initialization time unless the identifier came from a `function` declaration.
+
+Let's look at another example of "variable hoisting":
+
+```js
+greeting = "Hello!";
+console.log(greeting);
+// Hello!
+
+var greeting = "Howdy!";
+```
+
+The `greeting` variable is available to be assigned to by the time we reach line 1. Why? There's two necessary parts: the identifier was hoisted, and it was automatically initialized to `undefined`.
+
+### Yet Another Metaphor
+
+Chapter 2 was full of metaphors (to illustrate scope), but here we are faced with yet another: hoisting itself is a metaphor. It's a visualization of how JS handles variable and `function` declarations.
+
+When most people explain what the word "hoisting" means, they describe the idea of "lifting" -- like hoisting or lifting a heavy weight upward -- the identifiers all the way to the top of a scope. Typically, they will assert that JS would *rewrite* that program before it executes it, so that it looks more like this:
+
+```js
+var greeting;           // hoisted declaration at the top
+
+greeting = "Hello!";    // the original line 1
+console.log(greeting);
+// Hello!
+
+greeting = "Howdy!";    // `var` is gone!
+```
+
+The hoisting metaphor proposes that JS pre-processes the original program and re-arranges it slightly, so that all the declarations had been moved to the top of their respective scopes, before it executes it.
+
+Moreover, the hoisting metaphor asserts that `function` declarations are, in their entirety, hoisted to the top of each scope, as well.
+
+So this original program:
+
+```js
+studentName = "Suzy"
+greeting();
+// Hello Suzy!
+
+function greeting() {
+    console.log(`Hello ${ studentName }!`);
+}
+
+var studentName;
+```
+
+Is said to be *re-written* by the JS engine to look like this, before it's executed:
+
+```js
+function greeting() {
+    console.log(`Hello ${ studentName }!`);
+}
+var studentName;
+
+studentName = "Suzy";
+greeting();
+// Hello Suzy!
+```
+
+This hoisting metaphor is convenient; its benefit is if we hand wave over the magical look-ahead pre-processing necessary to find all these declarations buried deep in scopes and somehow move (hoist) them to the top, then we can think about the program as if it's executed by the JS engine in a **single pass**, top-down. Single-pass seems more simple than Chapter 1's assertion of a 2-phase processing.
+
+Hoisting as re-ordering code may be an attractive simplification, but it's not accurate. The JS engine doesn't actually rewrite the code. It can't magically look-ahead and find declarations. The only way to accurately find them, as well as all the scope boundaries in the program, would be to fully parse the code. Guess what parsing is? The first phase of the 2-phase processing! There's no magical cheating that gets around that fact.
+
+So if "hoisting" as a metaphor is inaccurate, what should we do with the term? It's still useful -- indeed, even members of TC39 regularly use it -- but we shouldn't think of it as the re-ordering of code.
+
+Instead, use "hoisting" to refer to the automatic registration of a variable at the beginning of a scope, each time that scope is entered. Hoisting is part of the setup of the scopes that the compiler durings during the first phase, and sets up the program instructions to instantiate at run-time.
+
+
+
+
+
 
 // TODO: TDZ, redeclarations, loop declarations
 
