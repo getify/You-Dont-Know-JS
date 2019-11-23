@@ -698,10 +698,10 @@ The `greeting` variable is available to be assigned to by the time we reach line
 
 Chapter 2 was full of metaphors (to illustrate scope), but here we are faced with yet another: hoisting itself is a metaphor. It's a visualization of how JS handles variable and `function` declarations.
 
-When most people explain what the word "hoisting" means, they describe the idea of "lifting" -- like hoisting or lifting a heavy weight upward -- the identifiers all the way to the top of a scope. Typically, they will assert that JS would *rewrite* that program before it executes it, so that it looks more like this:
+When most people explain what "hoisting" means, they will describe "lifting" -- like lifting a heavy weight upward -- the identifiers all the way to the top of a scope. Typically, they will assert that the JS engine will *rewrite* that program before it executes it, so that it looks more like this:
 
 ```js
-var greeting;           // hoisted declaration at the top
+var greeting;           // hoisted declaration moved to the top
 
 greeting = "Hello!";    // the original line 1
 console.log(greeting);
@@ -710,11 +710,9 @@ console.log(greeting);
 greeting = "Howdy!";    // `var` is gone!
 ```
 
-The hoisting metaphor proposes that JS pre-processes the original program and re-arranges it slightly, so that all the declarations had been moved to the top of their respective scopes, before it executes it.
+The hoisting metaphor proposes that JS pre-processes the original program and re-arranges it slightly, so that all the declarations have been moved to the top of their respective scopes, before execution. Moreover, the hoisting metaphor asserts that `function` declarations are, in their entirety, hoisted to the top of each scope, as well.
 
-Moreover, the hoisting metaphor asserts that `function` declarations are, in their entirety, hoisted to the top of each scope, as well.
-
-So this original program:
+Consider:
 
 ```js
 studentName = "Suzy"
@@ -728,7 +726,7 @@ function greeting() {
 var studentName;
 ```
 
-Is said to be *re-written* by the JS engine to look like this, before it's executed:
+The "rule" of the hoisting metaphor is that function declarations get hoisted first, then variables immediately after all the functions. Thus, hoisting suggests that program is *re-written* by the JS engine to look like this:
 
 ```js
 function greeting() {
@@ -741,13 +739,17 @@ greeting();
 // Hello Suzy!
 ```
 
-This hoisting metaphor is convenient; its benefit is if we hand wave over the magical look-ahead pre-processing necessary to find all these declarations buried deep in scopes and somehow move (hoist) them to the top, then we can think about the program as if it's executed by the JS engine in a **single pass**, top-down. Single-pass seems more simple than Chapter 1's assertion of a 2-phase processing.
+The hoisting metaphor is convenient. Its benefit is allowing us to hand wave over the magical look-ahead pre-processing necessary to find all these declarations buried deep in scopes and somehow move (hoist) them to the top; we can then think about the program as if it's executed by the JS engine in a **single pass**, top-down. Single-pass seems more straightforward than Chapter 1's assertion of a 2-phase processing.
 
-Hoisting as re-ordering code may be an attractive simplification, but it's not accurate. The JS engine doesn't actually rewrite the code. It can't magically look-ahead and find declarations. The only way to accurately find them, as well as all the scope boundaries in the program, would be to fully parse the code. Guess what parsing is? The first phase of the 2-phase processing! There's no magical cheating that gets around that fact.
+Hoisting as re-ordering code may be an attractive simplification, but it's not accurate. The JS engine doesn't actually rewrite the code. It can't magically look-ahead and find declarations. The only way to accurately find them, as well as all the scope boundaries in the program, would be to fully parse the code. Guess what parsing is? The first phase of the 2-phase processing! There's no magical mental gymnastics that gets around that fact.
 
-So if "hoisting" as a metaphor is inaccurate, what should we do with the term? It's still useful -- indeed, even members of TC39 regularly use it -- but we shouldn't think of it as the re-ordering of code.
+So if "hoisting" as a metaphor is inaccurate, what should we do with the term? It's still useful -- indeed, even members of TC39 regularly use it! -- but we shouldn't think of it as the re-ordering of code.
 
-Instead, use "hoisting" to refer to the automatic registration of a variable at the beginning of a scope, each time that scope is entered. Hoisting is part of the setup of the scopes that the compiler durings during the first phase, and sets up the program instructions to instantiate at run-time.
+| WARNING: |
+| :--- |
+| Incorrect or incomplete mental models may seem sufficient because they may occasionally lead to accidental right answers. But in the long run it's harder to accurately analyze and predict outcomes if you're not thinking closely to how the JS engine works. |
+
+"Hoisting" should refer to the **compile-time operation** of generating run-time instructions for the automatic registration of a variable at the beginning of its scope, each time that scope is entered.
 
 
 
