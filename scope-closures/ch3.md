@@ -9,11 +9,11 @@ Through Chapters 1 and 2, we defined *lexical scope* as the set of rules (determ
 
 For conceptual understanding, lexical scope was illustrated with several metaphors: marbles & buckets (bubbles!), conversations, and a tall office building.
 
-Now we'll dig into some of the nitty gritty details of working with lexical scope in our programs.
+Now it's time to sift through a bunch of nuts and bolts of working with lexical scope in our programs. There's a lot more to scope than you probably think. This is one of those chapters that really hammers home just how much we all *don't know* about scope.
 
 | TIP: |
 | :--- |
-| This chapter is pretty long and detailed. Make sure to take your time working through it, and practice the concepts and code frequently. Don't rush! |
+| This chapter is very long and detailed. Make sure to take your time working through it, and practice the concepts and code frequently. Don't rush! |
 
 ## Nested Scopes, Revisited
 
@@ -1165,32 +1165,129 @@ This is silly. There's no reason to declare `i` in that position with a `const`,
 
 ### Uninitialized
 
-// TODO: TDZ
+With `var` declarations, the variable is "hoisted" to the top of its scope. But it's also automatically initialized to the `undefined` value, so that the variable can be used throughout the entire scope.
 
-.
+However, `let` and `const` declarations are not quite the same in this respect.
 
-.
+Consider:
 
-.
+```js
+console.log(studentName);
+// ReferenceError
 
-.
+let studentName = "Suzy";
+```
 
-.
-
-.
-
-.
-
-----
+The result of this program is that a Reference Error is thrown on the first line. Depending on your JS environment, the error message may say something like: "Cannot access 'studentName' before initialization."
 
 | NOTE: |
 | :--- |
-| Everything below here is previous text from 1st edition, and is only here for reference while 2nd edition work is underway. **Please ignore this stuff.** |
+| The error message as seen here used to be much more vague or misleading. Thankfully, I and others were successfully able to lobby for JS engines to improve this error message so it tells you what's wrong. |
 
-## Review (TL;DR)
+That error message is very instructive as to what's wrong. `studentName` exists on line 1, but it's not been initialized, so it cannot be used yet. Let's try this:
 
-Lexical scope means that scope is defined by author-time decisions of where functions are declared. The lexing phase of compilation is essentially able to know where and how all identifiers are declared, and thus predict how they will be looked-up during execution.
+```js
+studentName = "Suzy";   // let's try to initialize it!
+// ReferenceError
 
-Two mechanisms in JavaScript can "cheat" lexical scope: `eval(..)` and `with`. The former can modify existing lexical scope (at runtime) by evaluating a string of "code" which has one or more declarations in it. The latter essentially creates a whole new lexical scope (again, at runtime) by treating an object reference *as* a "scope" and that object's properties as scoped identifiers.
+console.log(studentName);
 
-The downside to these mechanisms is that it defeats the *Engine*'s ability to perform compile-time optimizations regarding scope look-up, because the *Engine* has to assume pessimistically that such optimizations will be invalid. Code *will* run slower as a result of using either feature. **Don't use them.**
+let studentName;
+```
+
+Oops. We still get the Reference Error, but now on the first line where we're trying to assign to (aka, initialize!) this so-called "uninitialized" variable `studentName`. What's the deal!?
+
+The real question is, how do we initialize an uninitialized variable? For `let` / `const`, the **only way** to do so is with the assignment attached to a declaration statement. An assignment by itself is insufficient!
+
+Consider:
+
+```js
+// some other code
+
+let studentName = "Suzy";
+
+console.log(studentName);
+// Suzy
+```
+
+Here, we are initializing the `studentName`, in this case to `"Suzy"` instead of `undefined`, by way of the `let` declaration statement form that's coupled with an assignment.
+
+Alternately:
+
+```js
+// ..
+
+let studentName;
+// or:
+// let studentName = undefined;
+
+// ..
+
+studentName = "Suzy";
+
+console.log(studentName);
+// Suzy
+```
+
+| NOTE: |
+| :--- |
+| That's interesting! Recall from earlier, we said that `var studentName;` is *not* the same as `var studentName = undefined;`, but here with `let`, they behave the same. The difference comes down to the fact that `var studentName` automatically initializes at the top of the scope, where `let studentName` does not. |
+
+Recall that we asserted a few times so far that *Compiler* ends up removing any `var` / `let` / `const` declaration statements, replacing them with the instructions at the top of each scope to register the appropriate identifiers.
+
+So if we analyze what's going on here, we see that an additional nuance is that *Compiler* is also adding an instruction in the middle of the program, at the point where the variable `studentName` was declared, to do the auto-initialization. We cannot use the variable at any point prior to that initialization occuring. The same goes for `const` as it does for `let`.
+
+The term coined by TC39 to refer to this *period of time* from the entering of a scope to where the auto-initialization of the variable occurs, is: Temporal Dead Zone (TDZ). The TDZ is the time window where a variable exists but is still uninitialized, and therefore cannot be accessed in any way. Only the execution of the instructions left by *Compiler* at the point of the original declaration can do that initialization. After that moment, the TDZ is over, and the variable is free to be used for the rest of the scope.
+
+By the way, "temporal" in TDZ does indeed refer to *time* not *position-in-code*. Consider:
+
+```js
+askQuestion();
+// ReferenceError
+
+let studentName = "Suzy";
+
+function askQuestion() {
+    console.log(`${ studentName }, what do you think?`);
+}
+```
+
+Even though positionally the `console.log(..)` referencing `studentName` comes *after* the `let studentName` declaration, timing wise the `askQuestion()` function is invoked *before*, while `studentName` is still in its TDZ!
+
+Many have claimed that TDZ means `let` and `const` do not hoist. But I think this is an inaccurate, or at least misleading, claim. I think the real difference with `let` and `const` is that they do not get automatically initialized, the way `var` does. The *debate* then is if the auto-initialization is *part of* hoisting, or not? I think auto-registration of a variable at the top of the scope (i.e., what I call "hoisting") and auto-initialization are separate and shouldn't be lumped together under the term single term "hoisting".
+
+We already know `let` and `const` don't auto-intialize at the top of the scope. But let's prove that `let` and `const` *do* hoist (auto-register at the top of the scope), courtesy of our friend shadowing (see earlier in this chapter):
+
+```js
+var studentName = "Kyle";
+
+{
+    console.log(studentName);
+    // ???
+
+    // ..
+
+    let studentName = "Suzy";
+
+    console.log(studentName);
+    // Suzy
+}
+```
+
+What's going to happen with the first `console.log(..)` statement? If `let studentName` didn't hoist to the top of the scope, then it *should* print `"Kyle"`, right? At that moment, it seems, only the outer `studentName` would exist.
+
+But instead, we're going to get a TDZ error at that first `console.log(..)`, because in fact, the inner scope's `studentName` **was** hoisted (auto-registered at the top of the scope). But what **didn't** happen (yet!) was the auto-initialization of that inner `studentName`; it's still unintialized at that moment, hence the TDZ violation!
+
+So to summarize, TDZ errors occur because `let` / `const` declarations *do* hoist their declarations to the top of their scopes, but unlike `var`, they defer the auto-initialization of their variables until the moment in the code's sequencing where the original declaration appeared. This window of time, whatever its length, is the TDZ.
+
+How can you avoid TDZ errors? My advice: always put your `let` and `const` declarations at the top of any scope. Shrink the TDZ window to zero (or near zero) time, and then it'll be moot.
+
+Why is TDZ even a thing? Why didn't TC39 dictate that `let` / `const` auto-initialize the way `var` does? We'll cover the *why* of TDZ in Appendix A.
+
+## Scope Closed
+
+Phew! That was quite a long and involved chapter! Take some deep breaths and try to let that all sink in. OK, now take a few more.
+
+Before moving on, let me just remind you once again: this stuff is complex and challenging. It's OK if you're feeling mentally worn out -- I certainly am after writing it. Don't rush to keep reading, but instead take your time to review the material from this chapter, analyze your own code, and practice these techniques.
+
+The importance specifically of block scope deserves its own full discussion, so that's where we turn our attention next.

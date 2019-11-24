@@ -24,7 +24,7 @@
     * Why Global Scope?
     * Where Exactly Is This Global Scope?
     * When Can I Use A Variable?
-    * TODO
+    * Scope Closed
 * Chapter 4: Block Scope
     * Scope From Functions
     * Hiding In Plain Scope
