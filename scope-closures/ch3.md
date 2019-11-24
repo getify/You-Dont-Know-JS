@@ -264,7 +264,127 @@ Just remember: `let` can shadow `var`, but not the other way around.
 
 ### Function Name Scope
 
-// TODO: cover named function expressions
+As you're probably aware, a `function` declaration looks like this:
+
+```js
+function askQuestion() {
+    // ..
+}
+```
+
+And as discussed in Chapter 1 and 2, such a `function` declaration will create a variable in the enclosing scope (in this case, the global scope) named `askQuestion`.
+
+What about this program?
+
+```js
+var askQuestion = function() {
+    // ..
+};
+```
+
+The same thing is true with respect to the variable `askQuestion` being created. But since we have a `function` expression -- a function definition used as value instead of as a declaration -- this function definition will not "hoist" (covered later in this Chapter).
+
+But hoisting is only one difference between `function` declarations and `function` expressions. The other major difference is what happens to the name identifier on the function.
+
+Consider the assignment of a named `function` expression:
+
+```js
+var askQuestion = function ofTheTeacher(){
+    // ..
+};
+```
+
+We know `askQuestion` ends up in the outer scope. But what about the `ofTheTeacher` identifier? For `function` declarations, the name identifier ends up in the outer/enclosing scope, so it would seem reasonable to assume that's the case here. But it's not.
+
+`ofTheTeacher` is declared as a variable **inside the function itself**:
+
+```js
+var askQuestion = function ofTheTeacher() {
+    console.log(ofTheTeacher);
+};
+
+askQuestion();
+// function ofTheTeacher()...
+
+console.log(ofTheTeacher);
+// ReferenceError: 'ofTheTeacher' is not defined
+```
+
+Not only is `ofTheTeacher` declared inside the function rather than outside, but it's also created as read-only:
+
+```js
+var askQuestion = function ofTheTeacher() {
+    "use strict";
+    ofTheTeacher = 42;   // this assignment fails
+
+    //..
+};
+
+askQuestion();
+// TypeError
+```
+
+Because we used strict mode, the assignment failure is reported as a Type Error; in non-strict mode, such an assignment fails silently with no exception.
+
+What about when a `function` expression has no name identifier?
+
+```js
+var askQuestion = function(){
+   // ..
+};
+```
+
+A `function` expression with a name identifier is referred to as a "named function expression", and one without a name identifier is referred to as an "anonymous function expression". Anonymous function expressions have no name identifier, and so have no effect on either the outer/enclosing scope or their own.
+
+| NOTE: |
+| :--- |
+| We'll discuss named vs. anonymous `function` expressions in much more detail, including what factors affect the decision to use one or the other, in Appendix A. |
+
+### Arrow Functions
+
+ES6 added an additional `function` expression form, called "arrow functions":
+
+```js
+var askQuestion = () => {
+    // ..
+};
+```
+
+The `=>` arrow function doesn't require the word `function` to define it. Also, the `( .. )` around the parameter list is optional in some simple cases. Likewise, the `{ .. }` around the function body is optional in some simple cases. And when the `{ .. }` are omitted, a return value is computed without using a `return` keyword.
+
+| NOTE: |
+| :--- |
+| The attractiveness of `=>` arrow functions is often sold as "shorter syntax", and that's claimed to equate to objectively more readable functions. This claim is dubious at best, and outright misguided in general. We'll dig into the "readability" of function forms in Appendix A. |
+
+Arrow functions are lexically anonymous, meaning they have no directly related identifier that references the function. The assignment to `askQuestion` creates an inferred name of "askQuestion", but that's **not the same thing as being non-anonymous**:
+
+```js
+var askQuestion = () => {
+    // ..
+};
+
+askQuestion.name;   // askQuestion
+```
+
+Arrow functions achieve their syntactic brevity at the expense of having to mentally juggle a bunch of variations for different forms/conditions. Just a few for example:
+
+```js
+() => 42
+
+id => id.toUpperCase()
+
+(id,name) => ({ id, name })
+
+(...args) => {
+    return args[args.length - 1];
+};
+```
+
+The real reason I bring up arrow functions is because of the common but incorrect claim that arrow functions somehow behave differently with respect to lexical scope from standard `function` functions.
+
+This is incorrect.
+
+Other than being anonymous (and having no declarative form), arrow functions have the same rules with respect to lexical scope as `function` functions do. An arrow function, with or without `{ .. }` around its body, still creates a separate, inner nested bucket of scope. Variable declarations inside this nested scope bucket behave the same as in `function` functions.
 
 ## Why Global Scope?
 
@@ -551,7 +671,7 @@ hello();
 module.exports.hello = hello;
 ```
 
-Node essentially wraps such code in a function, so that the `var` and `function` declarations are contained in that module's scope, **not** added as global variables.
+Node essentially wraps such code in a function, so that the `var` and `function` declarations are contained in that module's scope, **not** treated as global variables.
 
 Think of the above code when processed by Node sorta like this (illustrative, not actual):
 
@@ -663,7 +783,7 @@ But hoisting alone doesn't fully answer the posed question. Sure, we can see an 
 
 In other words, how does `greeting` have any value in it, like the function reference, when the scope first begins? That's an additional characteristic of `function` declarations, called "function hoisting". When a `function` declaration's name identifier is registered at the top of a scope, it is additionally initialized to that function's reference.
 
-Function hoisting only applies to formal `function` declarations, not to function expression assignments. Consider:
+Function hoisting only applies to formal `function` declarations, not to `function` expression assignments. Consider:
 
 ```js
 greeting();
@@ -682,7 +802,7 @@ What does it hold?
 
 Variables declared with `var` are, in addition to being hoisted, also automatically initialized to `undefined` at the beginning of the scope. Once they're initialized, they're available to be used (assigned to, retrieved, etc). So on that first line, `greeting` exists, but it holds only the default `undefined` value. It's not until line 3 that `greeting` gets assigned the function reference.
 
-Pay close attention to the distinction here. A `function` declaration is hoisted and initialized to its function value (again, called "function hoisting"). By contrast, a `var` variable is hoisted, but it's only initialized to `undefined`. Any subsequent function expression assignments to that variable don't happen until that statement is reached during run-time execution.
+Pay close attention to the distinction here. A `function` declaration is hoisted and initialized to its function value (again, called "function hoisting"). By contrast, a `var` variable is hoisted, but it's only initialized to `undefined`. Any subsequent `function` expression assignments to that variable don't happen until that statement is reached during run-time execution.
 
 In both cases, the name of the identifier is hoisted. But the value association doesn't get handled at initialization time unless the identifier came from a `function` declaration.
 
