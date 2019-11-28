@@ -26,6 +26,7 @@
     * When Can I Use A Variable?
     * Scope Closed
 * Chapter 4: Block Scope
+    * Least Exposure
     * Scope From Functions
     * Hiding In Plain Scope
     * Functions As Scopes

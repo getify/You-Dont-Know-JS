@@ -1,6 +1,20 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
 # Chapter 4: Block Scope
 
+If you made it this far, through that long Chapter 3, you're likely feeling a lot more aware of, and hopefully more comfortable with, the breadth and depth of scopes and their impact on your code.
+
+Now, we want to narrow our focus to one specific form of scope: block scope. Ironically, just as we're narrowing our focus in this chapter, so too is block scope about narrowing the focus of a larger scope down to a smaller slice chunk.
+
+## Least Exposure
+
+It makes sense that functions have their own scopes. But why do we need blocks to serve as scopes as well?
+
+Software engineering articulates a fundamental pattern, typically applied to software security, called "The Principle of Least Privilege" (POLP, https://en.wikipedia.org/wiki/Principle_of_least_privilege). A variation of this principle that applies to our current discussion is typically styled as "Least Exposure".
+
+POLP expresses a defensive posture to software architecture: components of the system should be designed to operate with least privilege, least access, least exposure. If each piece is connected with minimum-necessary capabilities, the system is overall stronger from a security standpoint, because a compromise or failure of one piece has a minimized impact on the rest of the system.
+
+If PLOP tells us about system-level components, the *Exposure* variant (POLE) can be focused on a lower level: our exploration of how scopes interact with each other in our programs.
+
 | NOTE: |
 | :--- |
 | Work in progress |
