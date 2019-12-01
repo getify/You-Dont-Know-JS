@@ -27,10 +27,8 @@
     * Scope Closed
 * Chapter 4: Block Scope
     * Least Exposure
-    * Scope From Functions
-    * Hiding In Plain Scope
-    * Functions As Scopes
-    * Blocks As Scopes
+    * Hiding In Plain (Function) Scope
+    * Scoping With Blocks
 * Chapter 5: Hoisting
     * Chicken Or The Egg?
     * The Compiler Strikes Again

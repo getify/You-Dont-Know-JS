@@ -27,7 +27,221 @@ Think of it this way: why wouldn't you just place all the variables of your prog
 
 3. **Unintended Dependency**: if you expose variables/functions unnecessarily, it invites other developers to use and depend on those otherwise *private* pieces. While that doesn't break your program today, it creates a refactoring hazard in the future, because now you cannot as easily refactor that variable or function without potentially breaking other parts of the software that you don't control. For example, If your code relies on an array of numbers, and you later decide it's better to use some other data structure instead of an array, you now must take on the liability of fixing other affected parts of the software.
 
-POLE, as applied to scoping, essentially says, expose the bare minimum necessary, each each scope level, and keep everything else private. If you design your software accordingly, you have a much greater chance of avoiding (or at least minimizing) these 3 hazards.
+POLE, as applied to variable/function scoping, essentially says, default to exposing the bare minimum necessary, keeping everything else as private as possible. Declare variables in as small and deeply nested of scopes as possible, rather than placing everything in the global (or even outer function) scope.
+
+If you design your software accordingly, you have a much greater chance of avoiding (or at least minimizing) these 3 hazards.
+
+Consider:
+
+```js
+function diff(x,y) {
+    if (x > y) {
+        let tmp = x;
+        x = y;
+        y = tmp;
+    }
+
+    return y - x;
+}
+```
+
+In this `diff(..)` function, we want to ensure that `y` is greater than or equal to `x`, so that when we subtract (`y - x`), the result is `0` or larger. If `x` is larger, we swap `x` and `y` using a `tmp` variable.
+
+In this simple example, it doesn't seem to matter whether `tmp` is inside the `if` block or whether it belongs at the function level -- but it certainly shouldn't be a global variable! However, following the POLE principle, `tmp` should be as hidden in scope as possible. So we block scope `tmp` (using `let`) to the `if` block.
+
+## Hiding In Plain (Function) Scope
+
+It should now be clear why it's important to hide our variable and function declarations in the lowest (most deeply nested) scopes possible. But how do we do so?
+
+You've already seen `let` (and `const`) declarations, which are block scoped declarators, and we'll come back to them in more detail shortly. But what about hiding `var` or `function` declarations in blocks? That can easily be done by wrapping a `function` scope around a declaration.
+
+Let's consider an example where `function` scoping can be useful.
+
+The mathematical operation "factorial" (notated as "6!") is the multiplication of a given integer against all successively lower integers down to `1` -- actually, you can stop at `2` since multiplying `1` does nothing. Because of the nature of the math involved, once an integer's factorial has been calculated, we shouldn't need to do that work again, as it'll always be the same answer.
+
+So if you naively calculate factorial for `6`, then calculate factorial for `7`, the result is unnecessarily re-calculating the factorials of all the integers up to and including `6`. Assuming you're willing to trade memory for speed, you can solve that wasted computation by caching each integer's factorial as it's calculated, as we do here:
+
+```js
+var cache = {};
+
+function factorial(x) {
+    if (x < 2) return 1;
+    if (x in cache) return cache(x);
+    cache[x] = x * factorial(x - 1);
+    return cache[x];
+}
+
+factorial(6);
+// 720
+
+cache;
+// {
+//     "2": 2,
+//     "3": 6,
+//     "4": 24,
+//     "5": 120,
+//     "6": 720
+// }
+
+factorial(7);
+// 5040
+```
+
+We're storing all the computed factorials in `cache` so that across multiple calls to `factorial(..)`, the answers remain. But the `cache` variable is pretty obviously a *private* detail of how `factorial(..)` works, not something that should be exposed in an outer scope -- especially not the global scope.
+
+| NOTE: |
+| :--- |
+| `factorial(..)` here is recursive -- a call to itself is made from inside -- but that's just for brevity of code sake; a non-recursive implementation would yield the same scoping analysis with respect to `cache`. |
+
+However, fixing this over-exposure issue is not as simple as hiding the `cache` variable inside `factorial(..)`, as it may seem. Since we need `cache` to survive multiple calls, it must be located in a scope outside that function. So what can we do?
+
+Define another scope for `cache` to live in!
+
+```js
+function hideTheCache() {
+    var cache = {};
+
+    function factorial(x) {
+        if (x < 2) return 1;
+        if (x in cache) return cache(x);
+        cache[x] = x * factorial(x - 1);
+        return cache[x];
+    }
+
+    return factorial;
+}
+
+var factorial = hideTheCache();
+
+factorial(6);
+// 720
+
+factorial(7);
+// 5040
+```
+
+The `hideTheCache()` function serves no other purpose than to create a scope for `cache` to survive in across multiple calls to `factorial(..)`. But for `factorial(..)` to have access to `cache`, we have to put `factorial(..)` inside `hideTheCache()` as well. Then we return `factorial(..)` -- the function reference itself, as a value -- from `hideTheCache()`, and store it back in an outer scope variable, also named `factorial`. Now we can call `factorial(..)` (multiple times!); its persistent `cache` stays hidden but accessible only to `factorial(..)`!
+
+OK, but... it's going to be tedious to define (and name!) a `hideTheCache(..)` function each time such a need for variable hiding occurs, especially since we'll likely want to avoid name collisions with this function by giving each occurrence a unique name. Ugh.
+
+| NOTE: |
+| :--- |
+| This technique -- caching a function's computed output to optimize performance when repeated calls of the same inputs are expected -- is quite common in the Functional Programming (FP) world, referred to as "memoization". FP libraries typically provide a utility for memoization of functions, which would take the place of `hideTheCache(..)` above. Memoization is beyond the *scope* (pun intended!) of our discussion. See my "Functional-Light JavaScript" book for more information. |
+
+Rather than defining a new and uniquely named function each time one of those scope-only-for-the-purpose-of-hiding-a-variable situations occurs, a perhaps better solution is to use a function expression:
+
+```js
+var factorial = (function hideTheCache() {
+    var cache = {};
+
+    function factorial(x) {
+        if (x < 2) return 1;
+        if (x in cache) return cache(x);
+        cache[x] = x * factorial(x - 1);
+        return cache[x];
+    }
+
+    return factorial;
+})();
+
+factorial(6);
+// 720
+
+factorial(7);
+// 5040
+```
+
+Wait! This is still using a function to create the scope for hiding `cache`, and in this case, the function is still named `hideTheCache`, so how does that solve anything?
+
+Recall from Chapter 3 "Function Name Scope" what happens to the name identifier from a function expression. Since `hideTheCache(..)` is defined as a `function` expression instead of a `function` declaration, its name is in its own scope -- essentially the same scope as `cache` -- rather than in the outer (global, in this case) scope.
+
+That means we could name every single occurrence of such a function expression the exact same name, and never have any collision. More appropriately, we could name each occurrence based on whatever it is we're trying to hide, and not worry that whatever name we choose is going to collide with any other function-that-hides-a-variable in the program.
+
+In fact, as we mentioned in Chapter 3, we *could* just leave off the function name entirely -- thus defining an "anonymous function expression" instead. Appendix A will re-visit the topic of whether names are useful for such functions.
+
+### Invoking Function Expressions Immediately
+
+But there's another important bit in the above program that was easy to miss: the line at the end of the `function` expression that contains `})();`.
+
+Notice that we surrounded the entire `function` expression in a set of `( .. )`, and then on the end, we added that second `()` parentheses set; that's actually calling the `function` expression we just defined. Moreover, in this case, the first set of surrounding `( .. )` around the function expression is not strictly necessary, but we used them for readability sake.
+
+So, in other words, we're defining a `function` expression that's immediately invoked. This common pattern has a (very creative!) name: Immediately Invoked Function Expression (IIFE).
+
+IIFEs are useful when we want to create a scope to hide variables/functions. Since they are expressions, they can be used in **any** place in a JS program where an expression is allowed. IIFEs can be named, as with `hideTheCache()`, or (much more commonly!) unnamed/anonymous. And they can be standalone or, as above, part of another statement -- `hideTheCache()` returns the `factorial()` function reference which is then assigned to a variable `factorial`.
+
+Here's an example of a standalone (anonymous) IIFE:
+
+```js
+// outer scope
+
+(function(){
+
+    // inner hidden scope
+
+})();
+
+// more outer scope
+```
+
+Unlike earlier with `hideTheCache()`, where the outer surrounding `(..)` were noted as being an optional stylistic choice, for standalone IIFEs, they're **necessary**, to distinguish the `function` as an expression and not a statement. So for consistency, it's best to always surround IIFE `function`s with `( .. )`.
+
+| NOTE: |
+| :--- |
+| Technically, the surrounding `( .. )` aren't the only syntactic way to ensure a `function` in an IIFE is treated by the JS parser as a function expression. We'll look at some other options in Appendix A. |
+
+### Function Boundaries
+
+Be aware that using an IIFE to define a scope can have some unintended consequences, depending on the code around it. Because an IIFE is a full function, the function boundary alters the behavior of certain statements/constructs.
+
+For example, a `return` statement in some piece of code would change its meaning if then wrapped in an IIFE, because now the `return` would refer to the IIFE's function. Non-arrow IIFEs also change the binding of a `this` keyword. And statements like `break` and `continue` do operate across an IIFE function boundary to control an outer loop or block.
+
+So, if the code you need to wrap a scope around has `return`, `this`, `break`, or `continue` in it, an IIFE is probably not the best approach. In that case, you might look to create the scope with a block instead of a function.
+
+## Scoping With Blocks
+
+You should by this point feel fairly comfortable with creating scopes to prevent unnecessary identifier exposure.
+
+And so far, we looked at doing this via `function` (i.e., IIFE) scope. But let's now consider using `let` declarations with nested blocks:
+
+```js
+function sortNamesByLength(names) {
+    var buckets = [];
+
+    for (let name of names) {
+        if (buckets[name.length] == null) {
+            buckets[name.length] = [];
+        }
+        buckets[name.length].push(name);
+    }
+
+    // a block to narrow the scope
+    {
+        let sortedNames = [];
+
+        for (let bucket of buckets) {
+            if (bucket) {
+                // sort each bucket alphanumerically
+                bucket.sort();
+
+                // append the sorted names to our running list
+                sortedNames = [ ...sortedNames, ...bucket ];
+            }
+        }
+
+        return sortedNames;
+    }
+}
+
+sortNamesByLength([
+    "Sally",
+    "Suzy",
+    "Frank",
+    "John",
+    "Jennifer",
+    "Scott"
+]);
+// [ "John", "Suzy", "Frank", "Sally", "Scott", "Jennifer" ]
+```
 
 | NOTE: |
 | :--- |
@@ -52,327 +266,6 @@ POLE, as applied to scoping, essentially says, expose the bare minimum necessary
 | NOTE: |
 | :--- |
 | Everything below here is previous text from 1st edition, and is only here for reference while 2nd edition work is underway. **Please ignore this stuff.** |
-
-As we explored in Chapter 2, scope consists of a series of "bubbles" that each act as a container or bucket, in which identifiers (variables, functions) are declared. These bubbles nest neatly inside each other, and this nesting is defined at author-time.
-
-But what exactly makes a new bubble? Is it only the function? Can other structures in JavaScript create bubbles of scope?
-
-## Scope From Functions
-
-The most common answer to those questions is that JavaScript has function-based scope. That is, each function you declare creates a bubble for itself, but no other structures create their own scope bubbles. As we'll see in just a little bit, this is not quite true.
-
-But first, let's explore function scope and its implications.
-
-Consider this code:
-
-```js
-function foo(a) {
-    var b = 2;
-
-    // some code
-
-    function bar() {
-        // ...
-    }
-
-    // more code
-
-    var c = 3;
-}
-```
-
-In this snippet, the scope bubble for `foo(..)` includes identifiers `a`, `b`, `c` and `bar`. **It doesn't matter** *where* in the scope a declaration appears, the variable or function belongs to the containing scope bubble, regardless. We'll explore how exactly *that* works in the next chapter.
-
-`bar(..)` has its own scope bubble. So does the global scope, which has just one identifier attached to it: `foo`.
-
-Because `a`, `b`, `c`, and `bar` all belong to the scope bubble of `foo(..)`, they are not accessible outside of `foo(..)`. That is, the following code would all result in `ReferenceError` errors, as the identifiers are not available to the global scope:
-
-```js
-bar(); // fails
-
-console.log( a, b, c ); // all 3 fail
-```
-
-However, all these identifiers (`a`, `b`, `c`, `foo`, and `bar`) are accessible *inside* of `foo(..)`, and indeed also available inside of `bar(..)` (assuming there are no shadow identifier declarations inside `bar(..)`).
-
-Function scope encourages the idea that all variables belong to the function, and can be used and reused throughout the entirety of the function (and indeed, accessible even to nested scopes). This design approach can be quite useful, and certainly can make full use of the "dynamic" nature of JavaScript variables to take on values of different types as needed.
-
-On the other hand, if you don't take careful precautions, variables existing across the entirety of a scope can lead to some unexpected pitfalls.
-
-## Hiding In Plain Scope
-
-The traditional way of thinking about functions is that you declare a function, and then add code inside it. But the inverse thinking is equally powerful and useful: take any arbitrary section of code you've written, and wrap a function declaration around it, which in effect "hides" the code.
-
-The practical result is to create a scope bubble around the code in question, which means that any declarations (variable or function) in that code will now be tied to the scope of the new wrapping function, rather than the previously enclosing scope. In other words, you can "hide" variables and functions by enclosing them in the scope of a function.
-
-Why would "hiding" variables and functions be a useful technique?
-
-There's a variety of reasons motivating this scope-based hiding. They tend to arise from the software design principle "Principle of Least Privilege" [^note-leastprivilege], also sometimes called "Least Authority" or "Least Exposure". This principle states that in the design of software, such as the API for a module/object, you should expose only what is minimally necessary, and "hide" everything else.
-
-This principle extends to the choice of which scope to contain variables and functions. If all variables and functions were in the global scope, they would of course be accessible to any nested scope. But this would violate the "Least..." principle in that you are (likely) exposing many variables or functions which you should otherwise keep private, as proper use of the code would discourage access to those variables/functions.
-
-For example:
-
-```js
-function doSomething(a) {
-    b = a + doSomethingElse( a * 2 );
-
-    console.log( b * 3 );
-}
-
-function doSomethingElse(a) {
-    return a - 1;
-}
-
-var b;
-
-doSomething( 2 ); // 15
-```
-
-In this snippet, the `b` variable and the `doSomethingElse(..)` function are likely "private" details of how `doSomething(..)` does its job. Giving the enclosing scope "access" to `b` and `doSomethingElse(..)` is not only unnecessary but also possibly "dangerous", in that they may be used in unexpected ways, intentionally or not, and this may violate pre-condition assumptions of `doSomething(..)`.
-
-A more "proper" design would hide these private details inside the scope of `doSomething(..)`, such as:
-
-```js
-function doSomething(a) {
-    function doSomethingElse(a) {
-        return a - 1;
-    }
-
-    var b;
-
-    b = a + doSomethingElse( a * 2 );
-
-    console.log( b * 3 );
-}
-
-doSomething( 2 ); // 15
-```
-
-Now, `b` and `doSomethingElse(..)` are not accessible to any outside influence, instead controlled only by `doSomething(..)`. The functionality and end-result has not been affected, but the design keeps private details private, which is usually considered better software.
-
-### Collision Avoidance
-
-Another benefit of "hiding" variables and functions inside a scope is to avoid unintended collision between two different identifiers with the same name but different intended usages. Collision results often in unexpected overwriting of values.
-
-For example:
-
-```js
-function foo() {
-    function bar(a) {
-        i = 3; // changing the `i` in the enclosing scope's for-loop
-        console.log( a + i );
-    }
-
-    for (var i=0; i<10; i++) {
-        bar( i * 2 ); // oops, infinite loop ahead!
-    }
-}
-
-foo();
-```
-
-The `i = 3` assignment inside of `bar(..)` overwrites, unexpectedly, the `i` that was declared in `foo(..)` at the for-loop. In this case, it will result in an infinite loop, because `i` is set to a fixed value of `3` and that will forever remain `< 10`.
-
-The assignment inside `bar(..)` needs to declare a local variable to use, regardless of what identifier name is chosen. `var i = 3;` would fix the problem (and would create the previously mentioned "shadowed variable" declaration for `i`). An *additional*, not alternate, option is to pick another identifier name entirely, such as `var j = 3;`. But your software design may naturally call for the same identifier name, so utilizing scope to "hide" your inner declaration is your best/only option in that case.
-
-#### Global "Namespaces"
-
-A particularly strong example of (likely) variable collision occurs in the global scope. Multiple libraries loaded into your program can quite easily collide with each other if they don't properly hide their internal/private functions and variables.
-
-Such libraries typically will create a single variable declaration, often an object, with a sufficiently unique name, in the global scope. This object is then used as a "namespace" for that library, where all specific exposures of functionality are made as properties of that object (namespace), rather than as top-level lexically scoped identifiers themselves.
-
-For example:
-
-```js
-var MyReallyCoolLibrary = {
-    awesome: "stuff",
-    doSomething: function() {
-        // ...
-    },
-    doAnotherThing: function() {
-        // ...
-    }
-};
-```
-
-#### Module Management
-
-Another option for collision avoidance is the more modern "module" approach, using any of various dependency managers. Using these tools, no libraries ever add any identifiers to the global scope, but are instead required to have their identifier(s) be explicitly imported into another specific scope through usage of the dependency manager's various mechanisms.
-
-It should be observed that these tools do not possess "magic" functionality that is exempt from lexical scoping rules. They simply use the rules of scoping as explained here to enforce that no identifiers are injected into any shared scope, and are instead kept in private, non-collision-susceptible scopes, which prevents any accidental scope collisions.
-
-As such, you can code defensively and achieve the same results as the dependency managers do without actually needing to use them, if you so choose. See the Chapter 5 for more information about the module pattern.
-
-## Functions As Scopes
-
-We've seen that we can take any snippet of code and wrap a function around it, and that effectively "hides" any enclosed variable or function declarations from the outside scope inside that function's inner scope.
-
-For example:
-
-```js
-var a = 2;
-
-function foo() { // <-- insert this
-
-    var a = 3;
-    console.log( a ); // 3
-
-} // <-- and this
-foo(); // <-- and this
-
-console.log( a ); // 2
-```
-
-While this technique "works", it is not necessarily very ideal. There are a few problems it introduces. The first is that we have to declare a named-function `foo()`, which means that the identifier name `foo` itself "pollutes" the enclosing scope (global, in this case). We also have to explicitly call the function by name (`foo()`) so that the wrapped code actually executes.
-
-It would be more ideal if the function didn't need a name (or, rather, the name didn't pollute the enclosing scope), and if the function could automatically be executed.
-
-Fortunately, JavaScript offers a solution to both problems.
-
-```js
-var a = 2;
-
-(function foo(){ // <-- insert this
-
-    var a = 3;
-    console.log( a ); // 3
-
-})(); // <-- and this
-
-console.log( a ); // 2
-```
-
-Let's break down what's happening here.
-
-First, notice that the wrapping function statement starts with `(function...` as opposed to just `function...`. While this may seem like a minor detail, it's actually a major change. Instead of treating the function as a standard declaration, the function is treated as a function-expression.
-
-**Note:** The easiest way to distinguish declaration vs. expression is the position of the word "function" in the statement (not just a line, but a distinct statement). If "function" is the very first thing in the statement, then it's a function declaration. Otherwise, it's a function expression.
-
-The key difference we can observe here between a function declaration and a function expression relates to where its name is bound as an identifier.
-
-Compare the previous two snippets. In the first snippet, the name `foo` is bound in the enclosing scope, and we call it directly with `foo()`. In the second snippet, the name `foo` is not bound in the enclosing scope, but instead is bound only inside of its own function.
-
-In other words, `(function foo(){ .. })` as an expression means the identifier `foo` is found *only* in the scope where the `..` indicates, not in the outer scope. Hiding the name `foo` inside itself means it does not pollute the enclosing scope unnecessarily.
-
-### Anonymous vs. Named
-
-You are probably most familiar with function expressions as callback parameters, such as:
-
-```js
-setTimeout( function(){
-    console.log("I waited 1 second!");
-}, 1000 );
-```
-
-This is called an "anonymous function expression", because `function()...` has no name identifier on it. Function expressions can be anonymous, but function declarations cannot omit the name -- that would be illegal JS grammar.
-
-Anonymous function expressions are quick and easy to type, and many libraries and tools tend to encourage this idiomatic style of code. However, they have several draw-backs to consider:
-
-1. Anonymous functions have no useful name to display in stack traces, which can make debugging more difficult.
-
-2. Without a name, if the function needs to refer to itself, for recursion, etc., the **deprecated** `arguments.callee` reference is unfortunately required. Another example of needing to self-reference is when an event handler function wants to unbind itself after it fires.
-
-3. Anonymous functions omit a name that is often helpful in providing more readable/understandable code. A descriptive name helps self-document the code in question.
-
-**Inline function expressions** are powerful and useful -- the question of anonymous vs. named doesn't detract from that. Providing a name for your function expression quite effectively addresses all these draw-backs, but has no tangible downsides. The best practice is to always name your function expressions:
-
-```js
-setTimeout( function timeoutHandler(){ // <-- Look, I have a name!
-    console.log( "I waited 1 second!" );
-}, 1000 );
-```
-
-### Invoking Function Expressions Immediately
-
-```js
-var a = 2;
-
-(function foo(){
-
-    var a = 3;
-    console.log( a ); // 3
-
-})();
-
-console.log( a ); // 2
-```
-
-Now that we have a function as an expression by virtue of wrapping it in a `( )` pair, we can execute that function by adding another `()` on the end, like `(function foo(){ .. })()`. The first enclosing `( )` pair makes the function an expression, and the second `()` executes the function.
-
-This pattern is so common, a few years ago the community agreed on a term for it: **IIFE**, which stands for **I**mmediately **I**nvoked **F**unction **E**xpression.
-
-Of course, IIFE's don't need names, necessarily -- the most common form of IIFE is to use an anonymous function expression. While certainly less common, naming an IIFE has all the aforementioned benefits over anonymous function expressions, so it's a good practice to adopt.
-
-```js
-var a = 2;
-
-(function IIFE(){
-
-    var a = 3;
-    console.log( a ); // 3
-
-})();
-
-console.log( a ); // 2
-```
-
-There's a slight variation on the traditional IIFE form, which some prefer: `(function(){ .. }())`. Look closely to see the difference. In the first form, the function expression is wrapped in `( )`, and then the invoking `()` pair is on the outside right after it. In the second form, the invoking `()` pair is moved to the inside of the outer `( )` wrapping pair.
-
-These two forms are identical in functionality. **It's purely a stylistic choice which you prefer.**
-
-Another variation on IIFE's which is quite common is to use the fact that they are, in fact, just function calls, and pass in argument(s).
-
-For instance:
-
-```js
-var a = 2;
-
-(function IIFE( global ){
-
-    var a = 3;
-    console.log( a ); // 3
-    console.log( global.a ); // 2
-
-})( window );
-
-console.log( a ); // 2
-```
-
-We pass in the `window` object reference, but we name the parameter `global`, so that we have a clear stylistic delineation for global vs. non-global references. Of course, you can pass in anything from an enclosing scope you want, and you can name the parameter(s) anything that suits you. This is mostly just stylistic choice.
-
-Another application of this pattern addresses the (minor niche) concern that the default `undefined` identifier might have its value incorrectly overwritten, causing unexpected results. By naming a parameter `undefined`, but not passing any value for that argument, we can guarantee that the `undefined` identifier is in fact the undefined value in a block of code:
-
-```js
-undefined = true; // setting a land-mine for other code! avoid!
-
-(function IIFE( undefined ){
-
-    var a;
-    if (a === undefined) {
-        console.log( "Undefined is safe here!" );
-    }
-
-})();
-```
-
-Still another variation of the IIFE inverts the order of things, where the function to execute is given second, *after* the invocation and parameters to pass to it. This pattern is used in the UMD (Universal Module Definition) project. Some people find it a little cleaner to understand, though it is slightly more verbose.
-
-```js
-var a = 2;
-
-(function IIFE( def ){
-    def( window );
-})(function def( global ){
-
-    var a = 3;
-    console.log( a ); // 3
-    console.log( global.a ); // 2
-
-});
-```
-
-The `def` function expression is defined in the second-half of the snippet, and then passed as a parameter (also called `def`) to the `IIFE` function defined in the first half of the snippet. Finally, the parameter `def` (the function) is invoked, passing `window` in as the `global` parameter.
 
 ## Blocks As Scopes
 
