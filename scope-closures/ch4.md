@@ -3,17 +3,31 @@
 
 If you made it this far, through that long Chapter 3, you're likely feeling a lot more aware of, and hopefully more comfortable with, the breadth and depth of scopes and their impact on your code.
 
-Now, we want to narrow our focus to one specific form of scope: block scope. Ironically, just as we're narrowing our focus in this chapter, so too is block scope about narrowing the focus of a larger scope down to a smaller slice chunk.
+Now, we want to focus on one specific form of scope: block scope. Just as we're narrowing our discussion focus in this chapter, so too is block scope about narrowing the focus of a larger scope down to a smaller subset of our program.
 
 ## Least Exposure
 
-It makes sense that functions have their own scopes. But why do we need blocks to serve as scopes as well?
+It makes sense that functions define their own scopes. But why do we need blocks to create scopes as well?
 
-Software engineering articulates a fundamental pattern, typically applied to software security, called "The Principle of Least Privilege" (POLP, https://en.wikipedia.org/wiki/Principle_of_least_privilege). A variation of this principle that applies to our current discussion is typically styled as "Least Exposure".
+Software engineering articulates a fundamental pattern, typically applied to software security, called "The Principle of Least Privilege" (POLP, https://en.wikipedia.org/wiki/Principle_of_least_privilege). And a variation of this principle that applies to our current discussion is typically labeled "Least Exposure".
 
-POLP expresses a defensive posture to software architecture: components of the system should be designed to operate with least privilege, least access, least exposure. If each piece is connected with minimum-necessary capabilities, the system is overall stronger from a security standpoint, because a compromise or failure of one piece has a minimized impact on the rest of the system.
+POLP expresses a defensive posture to software architecture: components of the system should be designed to function with least privilege, least access, least exposure. If each piece is connected with minimum-necessary capabilities, the overall system is stronger from a security standpoint, because a compromise or failure of one piece has a minimized impact on the rest of the system.
 
-If PLOP tells us about system-level components, the *Exposure* variant (POLE) can be focused on a lower level: our exploration of how scopes interact with each other in our programs.
+If PLOP focuses on system-level component design, the *Exposure* variant (POLE) can be focused on a lower level; we'll apply it to our exploration of how scopes interact with each other.
+
+In following POLE, what do we want to minimize the exposure of? The variables registered in each scope.
+
+Think of it this way: why wouldn't you just place all the variables of your program out in the global scope? That probably immediately feels like a bad idea, but it's worth considering why that is. When variables used by one part of the program are exposed to another part of the program, via scope, there are 3 main hazards that can arise:
+
+1. **Naming Collisions**: if you use a common and useful variable/function name in two different parts of the program, but the identifier comes from one shared scope (like the global scope), then name collision occurs, and it's very likely that bugs will occur as one part uses the variable/function in a way the other part doesn't expect. For example, imagine if all your loops used a single global `i` index variable, and then it happened that one loop in a function was run during an iteration of a loop from another function, and now the shared `i` variable has an unexpected value.
+
+2. **Unexpected Behavior**: if you expose variables/functions whose usage is otherwise *private* to a piece of the program, it allows other developers to use them in ways you didn't intend, which can violate expected behavior and cause bugs. For example, if your part of the program assumes an array contains all numbers, but someone else's code accesses and modifies the array to include booleans or strings, your code may then misbehave in unexpected ways.
+
+    Worse, exposure of *private* details invites those with mal-intent to try to work around limitations you have imposed, to do things with your part of the software that shouldn't be allowed.
+
+3. **Unintended Dependency**: if you expose variables/functions unnecessarily, it invites other developers to use and depend on those otherwise *private* pieces. While that doesn't break your program today, it creates a refactoring hazard in the future, because now you cannot as easily refactor that variable or function without potentially breaking other parts of the software that you don't control. For example, If your code relies on an array of numbers, and you later decide it's better to use some other data structure instead of an array, you now must take on the liability of fixing other affected parts of the software.
+
+POLE, as applied to scoping, essentially says, expose the bare minimum necessary, each each scope level, and keep everything else private. If you design your software accordingly, you have a much greater chance of avoiding (or at least minimizing) these 3 hazards.
 
 | NOTE: |
 | :--- |
