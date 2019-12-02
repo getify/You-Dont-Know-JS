@@ -822,7 +822,7 @@ function BlogPost(title,author,pubDate,URL) {
 
 Comparing these forms to the `class` forms, there are more similarities than differences.
 
-The `class` form stores methods and data on an object instance, which much be accessed with the `this.` prefix. With modules, the methods and data are accessed as identifier variables in scope, without any `this.` prefix.
+The `class` form stores methods and data on an object instance, which must be accessed with the `this.` prefix. With modules, the methods and data are accessed as identifier variables in scope, without any `this.` prefix.
 
 With `class`, the "API" of an instance is implicit in the class definition -- also, all data and methods are public. With the module factory function, you explicitly create and return an object with any publicly exposed methods, and any data or other unreferenced methods remain private inside the factory function.
 
