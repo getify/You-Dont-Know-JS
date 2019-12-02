@@ -409,7 +409,7 @@ ES6 defined the basic data structure/collection types in JS as iterables. This i
 Consider:
 
 ```js
-// an array is an interable
+// an array is an iterable
 var arr = [ 10, 20, 30 ];
 
 for (let val of arr) {
@@ -457,7 +457,7 @@ for (let [btn,btnName] of buttonNames) {
 
 In the `for..of` loop over the default map iteration, we use the `[btn,btnName]` syntax (called "array destructuring") to break down each consumed tuple into the respective key/value pairs (`btn1` / `"Button 1"` and `btn2` / `"Button 2"`).
 
-Each of the built-in iterables in JS expose a default iteration, one which likely matches your intution. But you can also choose a more specific iteration if necessary. For example, if we want to consume only the values of the above `buttonNames` map, we can call `values()` to get a values-only iterator:
+Each of the built-in iterables in JS expose a default iteration, one which likely matches your intuition. But you can also choose a more specific iteration if necessary. For example, if we want to consume only the values of the above `buttonNames` map, we can call `values()` to get a values-only iterator:
 
 ```js
 for (let btnName of buttonNames.values()) {
@@ -484,7 +484,7 @@ For the most part, all built-in iterables in JS have three iterator forms availa
 
 | NOTE: |
 | :--- |
-| You may have noticed a nuanced shift that occured in this discussion. We started by talking about consuming **iterators**, but then switched to talking about iterating over **iterables**. The iteration-consumption protocol expects an *iterable*, but the reason we can provide a direct *iterator* is, an iterator is just an iterable of itself! In other words, when JS tries to create an iterator instance **from something that's already an iterator**, it just returns the iterator. |
+| You may have noticed a nuanced shift that occurred in this discussion. We started by talking about consuming **iterators**, but then switched to talking about iterating over **iterables**. The iteration-consumption protocol expects an *iterable*, but the reason we can provide a direct *iterator* is, an iterator is just an iterable of itself! In other words, when JS tries to create an iterator instance **from something that's already an iterator**, it just returns the iterator. |
 
 Beyond just using built-in iterables, you can also ensure your own data structures adhere to the iteration protocol; doing so means you opt into the ability to consume your data with `for..of` loops and the `...` operator. "Standardizing" on this protocol means code that is overall more readily recognizable and readable.
 
