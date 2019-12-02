@@ -1000,7 +1000,7 @@ const studentName = "Frank";
 const studentName = "Suzy";   // obviously this must be an error
 ```
 
-Since `const` "re-declaration" must be disallowed (on technical grounds), TC39 essentially felt that `let` "re-declaration" should disallow it as well.
+Since `const` "re-declaration" must be disallowed (on technical grounds), TC39 essentially felt that `let` "re-declaration" should be disallowed as well.
 
 #### Loops
 

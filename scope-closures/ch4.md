@@ -1,6 +1,10 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
 # Chapter 4: Block Scope
 
+| NOTE: |
+| :--- |
+| Work in progress |
+
 If you made it this far, through that long Chapter 3, you're likely feeling a lot more aware of, and hopefully more comfortable with, the breadth and depth of scopes and their impact on your code.
 
 Now, we want to focus on one specific form of scope: block scope. Just as we're narrowing our discussion focus in this chapter, so too is block scope about narrowing the focus of a larger scope down to a smaller subset of our program.
@@ -43,6 +47,9 @@ function diff(x,y) {
 
     return y - x;
 }
+
+diff(3,7);      // 4
+diff(7,5);      // 2
 ```
 
 In this `diff(..)` function, we want to ensure that `y` is greater than or equal to `x`, so that when we subtract (`y - x`), the result is `0` or larger. If `x` is larger, we swap `x` and `y` using a `tmp` variable.
@@ -157,11 +164,11 @@ factorial(7);
 
 Wait! This is still using a function to create the scope for hiding `cache`, and in this case, the function is still named `hideTheCache`, so how does that solve anything?
 
-Recall from "Function Name Scope" in Chapter 3, what happens to the name identifier from a function expression. Since `hideTheCache(..)` is defined as a `function` expression instead of a `function` declaration, its name is in its own scope -- essentially the same scope as `cache` -- rather than in the outer/global scope.
+Recall from "Function Name Scope" (Chapter 3), what happens to the name identifier from a function expression. Since `hideTheCache(..)` is defined as a `function` expression instead of a `function` declaration, its name is in its own scope -- essentially the same scope as `cache` -- rather than in the outer/global scope.
 
 That means we could name every single occurrence of such a function expression the exact same name, and never have any collision. More appropriately, we could name each occurrence semantically based on whatever it is we're trying to hide, and not worry that whatever name we choose is going to collide with any other `function` expression scope in the program.
 
-In fact, as we mentioned in Chapter 3, we *could* just leave off the function name entirely -- thus defining an "anonymous `function` expression" instead. Appendix A will explore the importance of names for such functions.
+In fact, as we discussed in "Function Name Scope" (Chapter 3), we *could* just leave off the name entirely -- thus defining an "anonymous `function` expression" instead. Appendix A will explore the importance of names for such functions.
 
 ### Invoking Function Expressions Immediately
 
@@ -205,17 +212,109 @@ So, if the code you need to wrap a scope around has `return`, `this`, `break`, o
 
 You should by this point feel fairly comfortable with creating scopes to prevent unnecessary identifier exposure.
 
-And so far, we looked at doing this via `function` (i.e., IIFE) scope. But let's now consider using `let` declarations with nested blocks:
+And so far, we looked at doing this via `function` (i.e., IIFE) scope. But let's now consider using `let` declarations with nested blocks. In general, any `{ .. }` curly-brace pair which is a statement will act as a block, but **not necessarily** as a scope. A block only becomes a scope if it needs to, to contain any block-scoped declarations (i.e., `let` or `const`) present within it.
+
+Consider:
+
+```js
+{
+    let thisIsNowAScope = true;
+
+    for (let i = 0; i < 5; i++) {
+        // this is also a scope, activated each iteration
+
+        if (i % 2 == 0) {
+            // this is just a block, not a scope
+            console.log(i);
+        }
+    }
+}
+// 0 2 4
+```
+
+| NOTE: |
+| :--- |
+| Not all `{ .. }` curly-brace pairs create blocks (and thus are eligible to become scopes). Object literals use `{ .. }` curly-brace pairs to delimit their key-value lists, but such objects are **not** scopes. `class` uses `{ .. }` curly-braces around its body definition, but this is not a block or scope. A `function` uses `{ .. } ` around its body, but this is not technically a block -- it's a single statement for the function body -- though it *is* a (function) scope. The `{ .. }` curly-brace pair around the `case` clauses of a `switch` statement does not define a block/scope. |
+
+Blocks can be defined as part of a statement (like an `if` or `for`), or as bare standalone block statements, as shown in the outermost `{ .. }` curly brace pair in the snippet above. An explicit block of this sort, without any declarations (and thus, not actually a scope) serves no operational purpose, though it can be useful as a stylistic signal.
+
+Explicit blocks were always valid JS syntax, but since they couldn't be a scope, they were extremely uncommon prior to ES6's introduction of `let` / `const`. Now they're starting to catch on a little bit.
+
+In most languages that support block scoping, an explicit block scope is a very common pattern for creating a narrow slice of scope for one or a few variables. So following the POLE principle, we should embrace this pattern more widespread in JS as well; use block scoping to narrow the exposure of identifiers to the minimum practical.
+
+An explicit block scope can be useful even inside of another block (whether it's a scope or not).
+
+For example:
+
+```js
+if (somethingHappened) {
+    // this is a block, but not a scope
+
+    {
+        // this is an explicit block scope
+        let msg = somethingHappened.message();
+        notifyOthers(msg);
+    }
+
+    recoverFromSomething();
+}
+```
+
+Here, the `{ .. }` curly-brace pair inside the `if` statement is an even smaller inner explicit block scope for `msg`, since that variable is not needed for the entire `if` block. Most developers would just block-scope `msg` to the `if` block and move on. When there's only a few lines to consider, it's a toss-up judgement call. As code grows, these issues become more pronounced.
+
+So does it matter enough to add the extra `{ .. }` pair and indentation level? I think you should follow POLE and always define the smallest block (within reason!) for each variable. So I would recommend using the extra explicit block scope.
+
+| WARNING: |
+| :--- |
+| Recall the discussion of TDZ errors from "Uninitialized" (Chapter 3). My suggestion to minimize the risk of TDZ errors with `let` (or `const`) declarations is to always put the declarations at the top of any scope. If you find yourself putting a `let` declaration in the middle of a scope block, first think, "Oh, no! TDZ alert!". Then recognize that if this `let` declaration isn't actually needed for the whole block, you could/should use an inner explicit block scope to further narrow its exposure! |
+
+Another example making use of an explicit block scope:
+
+```js
+function getNextMonthStart(dateStr) {
+    var nextMonth, year;
+
+    {
+        let curMonth;
+        [ , year, curMonth ] = dateStr.match(/(\d{4})-(\d{2})-\d{2}/) || [];
+        nextMonth = (Number(curMonth) % 12) + 1;
+    }
+
+    // did we cross a year boundary?
+    if (nextMonth == 1) {
+        year++;
+    }
+
+    return `${ year }-${ String(nextMonth).padStart(2,"0") }-01`;
+}
+
+getNextMonthStart("2019-12-25");
+// 2020-01-01
+```
+
+Let's first identify the scopes and their identifiers:
+
+1. The outer/global scope has one identifier, the function `getNextMonthStart(..)`.
+
+2. The function scope for `getNextMonthStart(..)` has three identifiers: `dateStr` (the parameter), `nextMonth`, and `year`.
+
+3. The `{ .. }` curly-brace pair defines an inner block scope that includes one variable: `curMonth`.
+
+So why did we put `curMonth` in an explicit block scope instead of just alongside `nextMonth` and `year` in the top-level function scope? Because `curMonth` is only needed for those first two statements. Exposing it at the function scope level is, in essence, over-exposing it.
+
+This example is small, so the hazards are pretty minimal in over-exposing the scoping of `curMonth`. But the benefits of the POLE principle are best achieved when you adopt the mindset of minimizing scope exposure as a habit. If you follow the principle consistently even in the small cases, it will serve you more as your programs grow.
+
+Let's now look at an even more substantial example:
 
 ```js
 function sortNamesByLength(names) {
     var buckets = [];
 
-    for (let name of names) {
-        if (buckets[name.length] == null) {
-            buckets[name.length] = [];
+    for (let firstName of names) {
+        if (buckets[firstName.length] == null) {
+            buckets[firstName.length] = [];
         }
-        buckets[name.length].push(name);
+        buckets[firstName.length].push(firstName);
     }
 
     // a block to narrow the scope
@@ -247,314 +346,190 @@ sortNamesByLength([
 // [ "John", "Suzy", "Frank", "Sally", "Scott", "Jennifer" ]
 ```
 
-| NOTE: |
-| :--- |
-| Work in progress |
+There are six identifiers declared across five different scopes. Could all of these variables have existed in the single outer/global scope? Technically, yes, since they're all uniquely named and thus have no name collisions. But this would be really poor code organization, and would likely lead to both confusion and future bugs.
 
-.
+We split them out into each inner nested scope as appropriate. Each variable is defined at the innermost scope possible for the program to operate as desired.
 
-.
+`sortedNames` could have been defined in the top-level function scope, but it's only needed for the second half of this function. To avoid over-exposing that variable in a higher level scope, we again follow POLE and block-scope it in the inner block scope.
 
-.
+### `var` AND `let`
 
-.
-
-.
-
-.
-
-.
-
-----
+Next, let's talk about the declaration `var buckets`. That variable is used across the entire function (except the final `return` statement). Any variable that is needed across all (or even most) of a function should be declared so that such usage is obvious.
 
 | NOTE: |
 | :--- |
-| Everything below here is previous text from 1st edition, and is only here for reference while 2nd edition work is underway. **Please ignore this stuff.** |
+| The parameter `names` isn't used across the whole function, but there's no way limit the scope of a parameter, so it behaves as a function-wide declaration regardless. |
 
-## Blocks As Scopes
+So why did we use `var` instead of `let` to declare the `buckets` variable? There's both stylistic and technical reasons to choose `var` here.
 
-While functions are the most common unit of scope, and certainly the most wide-spread of the design approaches in the majority of JS in circulation, other units of scope are possible, and the usage of these other scope units can lead to even better, cleaner to maintain code.
-
-Many languages other than JavaScript support Block Scope, and so developers from those languages are accustomed to the mindset, whereas those who've primarily only worked in JavaScript may find the concept slightly foreign.
-
-But even if you've never written a single line of code in block-scoped fashion, you are still probably familiar with this extremely common idiom in JavaScript:
+Stylistically, `var` has always, from the earliest days of JS, signaled "variable that belongs to a whole function". As we asserted in "Lexical Scope" (Chapter 1), `var` attaches to the nearest enclosing function scope, no matter where it appears. That's true even if `var` appears inside a block:
 
 ```js
-for (var i=0; i<10; i++) {
-    console.log( i );
+function diff(x,y) {
+    if (x > y) {
+        var tmp = x;    // `tmp` is function-scoped
+        x = y;
+        y = tmp;
+    }
+
+    return y - x;
 }
 ```
 
-We declare the variable `i` directly inside the for-loop head, most likely because our *intent* is to use `i` only within the context of that for-loop, and essentially ignore the fact that the variable actually scopes itself to the enclosing scope (function or global).
+Even though `var` is inside a block, its declaration is function-scoped (to `diff(..)`), not block-scoped.
 
-That's what block-scoping is all about. Declaring variables as close as possible, as local as possible, to where they will be used. Another example:
+While you can declare `var` inside a block (and still have it be function-scoped), I would recommend you minimize this approach except in a few specific cases (discussed in Appendix A). Otherwise, `var` should be reserved for use in the top-level scope of a function.
+
+Why not just use `let` in that same location? Because `var` is visually distinct from `let` and therefore signals clearly, "this variable is function-scoped". Using `let` in the top-level scope, especially if not in the first few lines of a function, especially when all the other declarations in blocks use `let`, does not visually draw attention to the difference with the function-scoped declaration.
+
+In other words, I feel `var` better communicates function-scoped than `let` does, and `let` both communicates (and achieves!) block-scoping where `var` is insufficient. As long as your programs are going to need both function-scoped and block-scoped variables, the most sensible and readable approach is to use both `var` AND `let` together, each for their own best purpose.
+
+There are other stylistic and operational reasons to choose `var` or `let` in different scenarios. We'll explore the case for `var` alongside `let` in more detail in Appendix A.
+
+| WARNING: |
+| :--- |
+| My advice to use `var` AND `let` here is controversial. It's far more common to hear assertions like, "var is broken, let fixes it" and, "never use var, let is the replacement". Those opinions are as valid as my opinions, but they're just opinions; `var` is not factually broken or deprecated. It has worked since early JS and it will continue to always work as long as JS is around. |
+
+### When To `let`?
+
+My advice to reserve `var` for (mostly only) a top-level function scope means that all other declarations should use `let`. But you may still be wondering how to decide where each declaration in your program belongs?
+
+POLE already guides you on those decisions, but let's make sure we explicitly state it. The way to decide is not based on which keyword you want to use. The way to decide is to ask, "What is the most minimal scope exposure that's sufficient for this variable?" Once that is answered, you'll know if a variable belongs in a block scope or the function scope. If you decide initially that a variable should be block-scoped, and later realize it needs to be elevated to be function-scoped, then that dictates a change not only in the location of that variable's declaration, but also the keyword used. The decision making process really should proceed like that
+
+If a declaration belongs in a block scope, use `let`. If it belongs in the function scope, use `var` (again, my opinion).
+
+But another way to sort of visualize this decision making is to consider the pre-ES6 version of a program. For example, let's recall `diff(..)` from earlier:
 
 ```js
-var foo = true;
+function diff(x,y) {
+    var tmp;
 
-if (foo) {
-    var bar = foo * 2;
-    bar = something( bar );
-    console.log( bar );
+    if (x > y) {
+        tmp = x;
+        x = y;
+        y = tmp;
+    }
+
+    return y - x;
 }
 ```
 
-We are using a `bar` variable only in the context of the if-statement, so it makes a kind of sense that we would declare it inside the if-block. However, where we declare variables is not relevant when using `var`, because they will always belong to the enclosing scope. This snippet is essentially "fake" block-scoping, for stylistic reasons, and relying on self-enforcement not to accidentally use `bar` in another place in that scope.
+In this version of `diff(..)`, `tmp` is clearly declared in the function scope. Is that appropriate for `tmp`? I would argue, no. `tmp` is only needed for those few statements. It's not needed once we get to the `return` statement. It should therefore be block-scoped.
 
-Block scope is a tool to extend the earlier "Principle of Least ~~Privilege~~ Exposure" [^note-leastprivilege] from hiding information in functions to hiding information in blocks of our code.
-
-Consider the for-loop example again:
+Prior to ES6, we didn't have `let` so we couldn't *actually* block-scope it. But we could do the next-best thing:
 
 ```js
-for (var i=0; i<10; i++) {
-    console.log( i );
+function diff(x,y) {
+    if (x > y) {
+        // `tmp` is still function-scoped, but
+        // it signals block-scoping stylistically
+        var tmp = x;
+        x = y;
+        y = tmp;
+    }
+
+    return y - x;
 }
 ```
 
-Why pollute the entire scope of a function with the `i` variable that is only going to be (or only *should be*, at least) used for the for-loop?
+Placing the `var` declaration for `tmp` inside the `if` statement signals to the reader of the code that `tmp` belongs to that block. Even though JS doesn't enforce that scoping, the stylistic signal still has benefit for the reader of your code.
 
-But more importantly, developers may prefer to *check* themselves against accidentally (re)using variables outside of their intended purpose, such as being issued an error about an unknown variable if you try to use it in the wrong place. Block-scoping (if it were possible) for the `i` variable would make `i` available only for the for-loop, causing an error if `i` is accessed elsewhere in the function. This helps ensure variables are not re-used in confusing or hard-to-maintain ways.
+Now, you can just locate any `var` that's inside a block of this sort and switch it to `let` to enforce the signal already being sent stylistically.
 
-But, the sad reality is that, on the surface, JavaScript has no facility for block scope.
+Another example that used to be commonly based on `var` but which should pretty much always be `let` is a `for` loop:
 
-That is, until you dig a little further.
+```js
+for (var i = 0; i < 5; i++) {
+    // do something
+}
+```
 
-### `with`
+No matter where such a loop is defined, the `i` should basically always be used only inside the loop, in which case POLE tells us it should be declared with `let` instead of `var`:
 
-We learned about `with` in Chapter 2. While it is a frowned upon construct, it *is* an example of (a form of) block scope, in that the scope that is created from the object only exists for the lifetime of that `with` statement, and not in the enclosing scope.
+```js
+for (let i = 0; i < 5; i++) {
+    // do something
+}
+```
 
-### `try/catch`
+Basically the only time switching a `var` to a `let` in this way would "break" your code is if you were relying on accessing the loop's iterator (`i`) outside/after the loop, such as:
 
-It's a *very* little known fact that JavaScript in ES3 specified the variable declaration in the `catch` clause of a `try/catch` to be block-scoped to the `catch` block.
+```js
+for (var i = 0; i < 5; i++) {
+    if (checkValue(i)) {
+        break;
+    }
+}
 
-For instance:
+if (i < 5) {
+    console.log("The loop stopped early!");
+}
+```
+
+This usage pattern is not terribly uncommon, but most feel it signals poor code structure. A better approach is to introduce another outer-scoped variable:
+
+```js
+var lastI;
+
+for (let i = 0; i < 5; i++) {
+    lastI = i;
+    if (checkValue(i)) {
+        break;
+    }
+}
+
+if (lastI < 5) {
+    console.log("The loop stopped early!");
+}
+```
+
+`lastI` is needed across this whole scope (function or global), so it's declared with `var`. `i` is only needed in (each) loop iteration, so it's declared with `let`.
+
+### What's The Catch?
+
+So far we've asserted that `var` and parameters are function-scoped, and `let` / `const` signal block-scoped declarations. There's one little exception to call out: the `catch` clause.
+
+Since the introduction of `try..catch` way back in ES3, the `catch` clause has held an additional (little-known) block-scoping declaration capability:
 
 ```js
 try {
-    undefined(); // illegal operation to force an exception!
+    doesntExist();
 }
 catch (err) {
-    console.log( err ); // works!
+    console.log(err);
+    // ReferenceError: 'doesntExist' is not defined
+    // ^^^^ this is printed from the caught exception
+
+    let onlyHere = true;
+    var outerVariable = true;
 }
 
-console.log( err ); // ReferenceError: `err` not found
+console.log(outerVariable);     // true
+
+console.log(err);
+// ReferenceError: 'err' is not defined
+// ^^^^ this is another thrown (uncaught) exception
 ```
 
-As you can see, `err` exists only in the `catch` clause, and throws an error when you try to reference it elsewhere.
+The `err` variable declared by the `catch` clause is block-scoped to that block. This clause block can have other block-scoped declarations via `let`. But a `var` declaration inside this block still attaches to the outer function/global scope.
 
-**Note:** While this behavior has been specified and true of practically all standard JS environments (except perhaps old IE), many linters seem to still complain if you have two or more `catch` clauses in the same scope which each declare their error variable with the same identifier name. This is not actually a re-definition, since the variables are safely block-scoped, but the linters still seem to, annoyingly, complain about this fact.
-
-To avoid these unnecessary warnings, some devs will name their `catch` variables `err1`, `err2`, etc. Other devs will simply turn off the linting check for duplicate variable names.
-
-The block-scoping nature of `catch` may seem like a useless academic fact, but see Appendix B for more information on just how useful it might be.
-
-### `let`
-
-Thus far, we've seen that JavaScript only has some strange niche behaviors which expose block scope functionality. If that were all we had, and *it was* for many, many years, then block scoping would not be terribly useful to the JavaScript developer.
-
-Fortunately, ES6 changes that, and introduces a new keyword `let` which sits alongside `var` as another way to declare variables.
-
-The `let` keyword attaches the variable declaration to the scope of whatever block (commonly a `{ .. }` pair) it's contained in. In other words, `let` implicitly hijacks any block's scope for its variable declaration.
+ES2019 (recently, at the time of writing) changed `catch` clauses so their declaration is optional. If you need to catch *that* an exception occurred (so you can gracefully recover), but you don't care about the error value itself, you can omit that declaration:
 
 ```js
-var foo = true;
-
-if (foo) {
-    let bar = foo * 2;
-    bar = something( bar );
-    console.log( bar );
+try {
+    doOptionOne();
 }
-
-console.log( bar ); // ReferenceError
-```
-
-Using `let` to attach a variable to an existing block is somewhat implicit. It can confuse you if you're not paying close attention to which blocks have variables scoped to them, and are in the habit of moving blocks around, wrapping them in other blocks, etc., as you develop and evolve code.
-
-Creating explicit blocks for block-scoping can address some of these concerns, making it more obvious where variables are attached and not. Usually, explicit code is preferable over implicit or subtle code. This explicit block-scoping style is easy to achieve, and fits more naturally with how block-scoping works in other languages:
-
-```js
-var foo = true;
-
-if (foo) {
-    { // <-- explicit block
-        let bar = foo * 2;
-        bar = something( bar );
-        console.log( bar );
-    }
-}
-
-console.log( bar ); // ReferenceError
-```
-
-We can create an arbitrary block for `let` to bind to by simply including a `{ .. }` pair anywhere a statement is valid grammar. In this case, we've made an explicit block *inside* the if-statement, which may be easier as a whole block to move around later in refactoring, without affecting the position and semantics of the enclosing if-statement.
-
-**Note:** For another way to express explicit block scopes, see Appendix B.
-
-In Chapter 4, we will address hoisting, which talks about declarations being taken as existing for the entire scope in which they occur.
-
-However, declarations made with `let` will *not* hoist to the entire scope of the block they appear in. Such declarations will not observably "exist" in the block until the declaration statement.
-
-```js
-{
-   console.log( bar ); // ReferenceError!
-   let bar = 2;
+catch {  // catch-declaration omitted
+    doOptionTwoInstead();
 }
 ```
 
-#### Garbage Collection
+In this case, the `catch` block is **not** a scope unless a `let` declaration is added inside it.
 
-Another reason block-scoping is useful relates to closures and garbage collection to reclaim memory. We'll briefly illustrate here, but the closure mechanism is explained in detail in Chapter 5.
+### Functions Declarations In Blocks (FiB)
 
-Consider:
+// TODO: wooboy, this is a doozie
 
-```js
-function process(data) {
-    // do something interesting
-}
+## Blocked Over
 
-var someReallyBigData = { .. };
-
-process( someReallyBigData );
-
-var btn = document.getElementById( "my_button" );
-
-btn.addEventListener( "click", function click(evt){
-    console.log("button clicked");
-}, /*capturingPhase=*/false );
-```
-
-The `click` function click handler callback doesn't *need* the `someReallyBigData` variable at all. That means, theoretically, after `process(..)` runs, the big memory-heavy data structure could be garbage collected. However, it's quite likely (though implementation dependent) that the JS engine will still have to keep the structure around, since the `click` function has a closure over the entire scope.
-
-Block-scoping can address this concern, making it clearer to the engine that it does not need to keep `someReallyBigData` around:
-
-```js
-function process(data) {
-    // do something interesting
-}
-
-// anything declared inside this block can go away after!
-{
-    let someReallyBigData = { .. };
-
-    process( someReallyBigData );
-}
-
-var btn = document.getElementById( "my_button" );
-
-btn.addEventListener( "click", function click(evt){
-    console.log("button clicked");
-}, /*capturingPhase=*/false );
-```
-
-Declaring explicit blocks for variables to locally bind to is a powerful tool that you can add to your code toolbox.
-
-#### `let` Loops
-
-A particular case where `let` shines is in the for-loop case as we discussed previously.
-
-```js
-for (let i=0; i<10; i++) {
-    console.log( i );
-}
-
-console.log( i ); // ReferenceError
-```
-
-Not only does `let` in the for-loop header bind the `i` to the for-loop body, but in fact, it **re-binds it** to each *iteration* of the loop, making sure to re-assign it the value from the end of the previous loop iteration.
-
-Here's another way of illustrating the per-iteration binding behavior that occurs:
-
-```js
-{
-    let j;
-    for (j=0; j<10; j++) {
-        let i = j; // re-bound for each iteration!
-        console.log( i );
-    }
-}
-```
-
-The reason why this per-iteration binding is interesting will become clear in Chapter 5 when we discuss closures.
-
-Because `let` declarations attach to arbitrary blocks rather than to the enclosing function's scope (or global), there can be gotchas where existing code has a hidden reliance on function-scoped `var` declarations, and replacing the `var` with `let` may require additional care when refactoring code.
-
-Consider:
-
-```js
-var foo = true, baz = 10;
-
-if (foo) {
-    var bar = 3;
-
-    if (baz > bar) {
-        console.log( baz );
-    }
-
-    // ...
-}
-```
-
-This code is fairly easily re-factored as:
-
-```js
-var foo = true, baz = 10;
-
-if (foo) {
-    var bar = 3;
-
-    // ...
-}
-
-if (baz > bar) {
-    console.log( baz );
-}
-```
-
-But, be careful of such changes when using block-scoped variables:
-
-```js
-var foo = true, baz = 10;
-
-if (foo) {
-    let bar = 3;
-
-    if (baz > bar) { // <-- don't forget `bar` when moving!
-        console.log( baz );
-    }
-}
-```
-
-See Appendix B for an alternate (more explicit) style of block-scoping which may provide easier to maintain/refactor code that's more robust to these scenarios.
-
-### `const`
-
-In addition to `let`, ES6 introduces `const`, which also creates a block-scoped variable, but whose value is fixed (constant). Any attempt to change that value at a later time results in an error.
-
-```js
-var foo = true;
-
-if (foo) {
-    var a = 2;
-    const b = 3; // block-scoped to the containing `if`
-
-    a = 3; // just fine!
-    b = 4; // error!
-}
-
-console.log( a ); // 3
-console.log( b ); // ReferenceError!
-```
-
-## Review (TL;DR)
-
-Functions are the most common unit of scope in JavaScript. Variables and functions that are declared inside another function are essentially "hidden" from any of the enclosing "scopes", which is an intentional design principle of good software.
-
-But functions are by no means the only unit of scope. Block-scope refers to the idea that variables and functions can belong to an arbitrary block (generally, any `{ .. }` pair) of code, rather than only to the enclosing function.
-
-Starting with ES3, the `try/catch` structure has block-scope in the `catch` clause.
-
-In ES6, the `let` keyword (a cousin to the `var` keyword) is introduced to allow declarations of variables in any arbitrary block of code. `if (..) { let a = 2; }` will declare a variable `a` that essentially hijacks the scope of the `if`'s `{ .. }` block and attaches itself there.
-
-Though some seem to believe so, block scope should not be taken as an outright replacement of `var` function scope. Both functionalities co-exist, and developers can and should use both function-scope and block-scope techniques where respectively appropriate to produce better, more readable/maintainable code.
-
-[^note-leastprivilege]: [Principle of Least Privilege](http://en.wikipedia.org/wiki/Principle_of_least_privilege)
+// TODO: quick summary, hand-off to next chapter
