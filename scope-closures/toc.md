@@ -29,6 +29,8 @@
     * Least Exposure
     * Hiding In Plain (Function) Scope
     * Scoping With Blocks
+    * Function Declarations In Blocks
+    * Blocked Over
 * Chapter 5: Hoisting
     * Chicken Or The Egg?
     * The Compiler Strikes Again

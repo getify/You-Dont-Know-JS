@@ -282,7 +282,7 @@ var askQuestion = function() {
 };
 ```
 
-The same thing is true with respect to the variable `askQuestion` being created. But since we have a `function` expression -- a function definition used as value instead of as a declaration -- this function definition will not "hoist" (covered later in this Chapter).
+The same thing is true with respect to the variable `askQuestion` being created. But since we have a `function` expression -- a function definition used as value instead of as a declaration -- this function definition will not "hoist" (covered later in this chapter).
 
 But hoisting is only one difference between `function` declarations and `function` expressions. The other major difference is what happens to the name identifier on the function.
 
@@ -617,7 +617,7 @@ But I'll just hint at some examples of quirks that have been true at various poi
 
 * How non-strict mode `this` default-binding works for function calls, and whether the "global object" used will contain expected global variables.
 
-* How "hoisting" (see Chapter 5) works across multiple line entries.
+* How hoisting (covered later in this chapter) works across multiple line entries.
 
 * ...several others
 
@@ -777,13 +777,15 @@ function greeting() {
 
 This code works fine. You may have seen or even written code like it before. But did you ever wonder how or why it works? Specifically, why can you access the identifier `greeting` from line 1 (to retrieve and execute a function reference), even though the `greeting()` function declaration doesn't occur until line 3?
 
-Recall how Chapter 1 pointed out that all identifiers are registered to their respective scopes during compile time. Moreover, every identifier is *created* at the beginning of the scope it belongs to, **every time that scope is entered**. The term for registering a variable at the top of its enclosing scope, even though its declaration may appear further down in the scope, is called **hoisting**.
+Recall how Chapter 1 pointed out that all identifiers are registered to their respective scopes during compile time. Moreover, every identifier is *created* at the beginning of the scope it belongs to, **every time that scope is entered**.
+
+The term for registering a variable at the top of its enclosing scope, even though its declaration may appear further down in the scope, is called **hoisting**.
 
 But hoisting alone doesn't fully answer the posed question. Sure, we can see an identifier called `greeting` from the beginning of the scope, but why can we **call** the `greeting()` function before it's been declared?
 
 In other words, how does `greeting` have any value in it, like the function reference, when the scope first begins? That's an additional characteristic of `function` declarations, called "function hoisting". When a `function` declaration's name identifier is registered at the top of a scope, it is additionally initialized to that function's reference.
 
-Function hoisting only applies to formal `function` declarations, not to `function` expression assignments. Consider:
+Function hoisting only applies to formal `function` declarations (which appear outside of blocks -- see FiB in Chapter 4), not to `function` expression assignments. Consider:
 
 ```js
 greeting();
@@ -802,7 +804,7 @@ What does it hold?
 
 Variables declared with `var` are, in addition to being hoisted, also automatically initialized to `undefined` at the beginning of the scope. Once they're initialized, they're available to be used (assigned to, retrieved, etc). So on that first line, `greeting` exists, but it holds only the default `undefined` value. It's not until line 3 that `greeting` gets assigned the function reference.
 
-Pay close attention to the distinction here. A `function` declaration is hoisted and initialized to its function value (again, called "function hoisting"). By contrast, a `var` variable is hoisted, but it's only initialized to `undefined`. Any subsequent `function` expression assignments to that variable don't happen until that statement is reached during run-time execution.
+Pay close attention to the distinction here. A `function` declaration is hoisted and initialized to its function value (again, called "function hoisting"). By contrast, a `var` variable is hoisted, but it's only auto-initialized to `undefined`. Any subsequent `function` expression assignments to that variable don't happen until that statement is reached during run-time execution.
 
 In both cases, the name of the identifier is hoisted. But the value association doesn't get handled at initialization time unless the identifier came from a `function` declaration.
 
@@ -817,6 +819,10 @@ var greeting = "Howdy!";
 ```
 
 The `greeting` variable is available to be assigned to by the time we reach line 1. Why? There's two necessary parts: the identifier was hoisted, and it was automatically initialized to `undefined`.
+
+| NOTE: |
+| :--- |
+| Variable hoisting probably feels a bit unnatural to use in a program. But is function hoisting also a bad idea? We'll explore this in more detail in Appendix A. |
 
 ### Yet Another Metaphor
 
