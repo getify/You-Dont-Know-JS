@@ -31,7 +31,7 @@ The only way multiple standalone .js files act as a single program is by sharing
 
 Since ES6, JS has also supported a module format in addition to the typical standalone JS program format. Modules are also file-based. If a file is loaded via module-loading mechanism such as an `import` statement or a `<script type=module>` tag, all its code is treated as a single module.
 
-Though you wouldn't typically think about a module -- basically, a collection of state and publicly-exposed methods to operate on that state -- as a standalone program, JS does in fact still treat each module separately. Similiar to how "global scope" allows standalone files to mix together at runtime, importing a module into another allows runtime interoperation between them.
+Though you wouldn't typically think about a module -- basically, a collection of state and publicly-exposed methods to operate on that state -- as a standalone program, JS does in fact still treat each module separately. Similar to how "global scope" allows standalone files to mix together at runtime, importing a module into another allows runtime interoperation between them.
 
 Regardless of which code organization pattern (and loading mechanism) is used for a file -- standalone or module -- you should still think of each file as its own (mini) program, which may then cooperate with other (mini) programs to perform the functions of your overall application.
 
@@ -191,7 +191,7 @@ But `var` is still useful in that it communicates "this variable will be seen by
 
 | NOTE: |
 | :--- |
-| It's very common to suggest that `var` should be avoided in favor of `let` (or `const`!), generally because of perceived confusion over how the scoping behavior of `var` has worked since the beginning of JS. I believe this to be overly restrictive advice and ultimately unhelpful. It's assuming you are unable to learn and use a feature properly in combination with other features. I belive you *can* and *should* learn any features available, and use them where appropriate! |
+| It's very common to suggest that `var` should be avoided in favor of `let` (or `const`!), generally because of perceived confusion over how the scoping behavior of `var` has worked since the beginning of JS. I believe this to be overly restrictive advice and ultimately unhelpful. It's assuming you are unable to learn and use a feature properly in combination with other features. I believe you *can* and *should* learn any features available, and use them where appropriate! |
 
 A third declaration form is `const`. It's like `let` but has an additional limitation that it must be given a value at the moment it's declared, and cannot be re-assigned a different value later.
 
@@ -212,7 +212,7 @@ The `myBirthday` constant is not allowed to be re-assigned.
 `const` declared variables are not "unchangeable", they just cannot be re-assigned. It's ill-advised to use `const` with object values, because those values can still be changed even though the variable can't be re-assigned. This leads to potential confusion down the line, so I think it's wise to avoid situations like:
 
 ```js
-const actors = [ "Morgan Freeman", "Jennifer Anniston" ];
+const actors = [ "Morgan Freeman", "Jennifer Aniston" ];
 
 actors[2] = "Tom Cruise";   // OK :(
 
@@ -312,7 +312,7 @@ awesomeFunction.name;
 
 This function expression is a *named function expression*, since the identifier `someName` is directly associated with the function expression at compile time; the association with the identifier `awesomeFunction` still doesn't happen until runtime at the time of that statement. Those two identifiers don't have to match; sometimes it makes sense to have them be different, othertimes it's better to have them be the same.
 
-Notice also that the explicit function name, the identifier `someName`, takes precedence when assignging a *name* for the `name` property.
+Notice also that the explicit function name, the identifier `someName`, takes precedence when assigning a *name* for the `name` property.
 
 Should function expressions be named or anonymous? Opinions vary widely on this. Most developers tend to be unconcerned with using anonymous functions. They're shorter, and unquestionably more common in the broad sphere of JS code out there.
 
@@ -320,7 +320,7 @@ Should function expressions be named or anonymous? Opinions vary widely on this.
 | :--- |
 | If a function exists in your program, it has a purpose; otherwise, take it out! If it has a purpose, it has a natural name that describes that purpose. If it has a name, you the code author should include that name in the code, so that the reader does not have to infer that name from reading and mentally executing that function's source code. Even a trivial function body like `x * 2` has to be read to infer a name like "double" or "multBy2"; that brief extra mental work is unnecessary when you could just take a second to name the function "double" or "multBy2" *once*, saving the reader that repeated mental work every time it's read in the future. |
 
-There are, regretably in some respects, many other function definition forms in JS in 2019.
+There are, regrettably in some respects, many other function definition forms in JS in 2019.
 
 Here are some more declaration forms:
 
@@ -822,7 +822,7 @@ function BlogPost(title,author,pubDate,URL) {
 
 Comparing these forms to the `class` forms, there are more similarities than differences.
 
-The `class` form stores methods and data on an object instance, which much be accessed with the `this.` prefix. With modules, the methods and data are accessed as identifier variables in scope, without any `this.` prefix.
+The `class` form stores methods and data on an object instance, which must be accessed with the `this.` prefix. With modules, the methods and data are accessed as identifier variables in scope, without any `this.` prefix.
 
 With `class`, the "API" of an instance is implicit in the class definition -- also, all data and methods are public. With the module factory function, you explicitly create and return an object with any publicly exposed methods, and any data or other unreferenced methods remain private inside the factory function.
 
@@ -876,7 +876,7 @@ Second, you don't interact with a module's "API" explicitly, but rather use the 
 
 Third, and maybe most noticeably different from previously discussed patterns, you don't "instantiate" an ES6 module, you just `import` it to use its single instance. ES6 modules are, in effect, "singletons", in that there's only one instance ever created, at first `import` in your program, and all other `import`s just receive a reference to that same single instance. If your module needs to support multiple instantiations, you have to provide a *classic module* style factory function on your ES6 module definition for that purpose.
 
-In our running example, we do assume multiple-instantation, so these following snippets will mix both ES6 modules and *classic modules*:.
+In our running example, we do assume multiple-instantiation, so these following snippets will mix both ES6 modules and *classic modules*:.
 
 Consider the file `publication.js`:
 
