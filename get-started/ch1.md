@@ -31,7 +31,7 @@ In other words, JavaScript was a marketing ploy to try to position this language
 
 There are some superficial resemblances between JavaScript's code and Java code. But those are actually mostly from a common root: C (and to an extent, C++).
 
-For example, we use the `{` to begin a block of code and the `}` to end that block of code, just like C/C++ and Java. We also use the `;` to punctuate the end of a statment.
+For example, we use the `{` to begin a block of code and the `}` to end that block of code, just like C/C++ and Java. We also use the `;` to punctuate the end of a statement.
 
 In fact, the relationships run even deeper than the superficial. Oracle (via Sun), the company that still owns and runs Java, also owns the official trademark for the name "JavaScript" (via Netscape). This trademark is almost never enforced, and likely couldn't be at this point.
 
@@ -47,7 +47,7 @@ In other words, JavaScript (in your browser, or in Node.js) is *an* implementati
 
 Whether you call it JavaScript, JS, ECMAScript, or ES2019, it's most definitely not a variant of the Java language!
 
-> "Java is to JavaScript as ham is to hamster." --Jeremey Keith, 2009
+> "Java is to JavaScript as ham is to hamster." --Jeremy Keith, 2009
 
 ## Many Faces
 
@@ -109,13 +109,13 @@ Sometimes the JS specification will dictate some new or refined behavior, and ye
 
 In these cases, often TC39 will backtrack and simply choose to conform the specification to the reality of the web. For example, TC39 planned to add a `contains(..)` method for Arrays, but it was found that this name conflicted with old JS frameworks still in use on some sites, so they changed the name to a non-conflicting `includes(..)`. The same happened with a comedic/tragic JS *community crisis* dubbed "smooshgate", where the planned `flatten(..)` method was eventually renamed `flat(..)`.
 
-But occassionally, TC39 will decide the specification should stick firm on some point even though it is unlikely that browser-based JS engines will ever conform.
+But occasionally, TC39 will decide the specification should stick firm on some point even though it is unlikely that browser-based JS engines will ever conform.
 
 The solution? Appendix B, "Additional ECMAScript Features for Web Browsers. As of the time of writing, here's the ES2019 Appendix B: https://www.ecma-international.org/ecma-262/10.0/#sec-additional-ecmascript-features-for-web-browsers The JS specification includes this appendix to detail out any known mismatches between the official JS specification and the reality of JS on the web. In other words, these are exceptions that are allowed *only* for web JS; other JS environments must stick to the letter of the law.
 
 Section B.1 and B.2 cover *additions* to JS (syntax and APIs) that web JS includes, again for historical reasons, but which TC39 does not plan to formally specify in the core of JS. Examples include `0`-prefixed octal literals, the global `escape(..)` / `unescape(..)` utilities, String "helpers" like `anchor(..)` and `blink()`, and the RegExp `compile(..)` method. Usage of these *additions* in a non-web JS engine will generally break completely, so use them with great caution.
 
-Section B.3 includes somes conflicts where code may run in both web and non-web JS engines, but where the behavior *could* be observably different, resulting in different outcomes. A notable example of that sort of conflict is for block-scoped function declarations (B.3.3).
+Section B.3 includes some conflicts where code may run in both web and non-web JS engines, but where the behavior *could* be observably different, resulting in different outcomes. A notable example of that sort of conflict is for block-scoped function declarations (B.3.3).
 
 Consider what the outcome of this program should be:
 
@@ -138,7 +138,7 @@ gotcha();                // ??
 
 While this may seem straightforward logically (print "One!"), the reality is much uglier. There are **many** different variations of this scenario, and each variation has slightly different semantics.
 
-The best advice for navigating these kinds of Appendix B *gotchas* is to avoid using the constructs at all. Never declare functions in block scopes (like `if` statments), only in function scopes.
+The best advice for navigating these kinds of Appendix B *gotchas* is to avoid using the constructs at all. Never declare functions in block scopes (like `if` statements), only in function scopes.
 
 ### Not All (Web) JS...
 
@@ -172,7 +172,7 @@ Backwards compatibility means that once something is accepted as valid JS, there
 
 The idea is that JS developers can write code with confidence that their code won't stop working unpredictably because a browser update is released. This makes the decision to choose JS for a program a more wise and safe investment, for years into the future.
 
-That "guarantee" is no small thing. Maintaining backwards compatibility, stretched out across almost 25 years of the language's history, creates an enormous burden and a whole slew of unique challenges. You'd be hard pressed to find any other example in all of computing of such a committment to backwards compatibility.
+That "guarantee" is no small thing. Maintaining backwards compatibility, stretched out across almost 25 years of the language's history, creates an enormous burden and a whole slew of unique challenges. You'd be hard pressed to find any other example in all of computing of such a commitment to backwards compatibility.
 
 The costs of sticking to this principle should not be casually dismissed. It necessarily creates a very high bar to including changing or extending the language; any decision becomes effectively permanent, mistakes and all. Once it's in JS, it can't be taken out because it might break programs, even if we'd really, really like to remove it!
 
@@ -306,7 +306,7 @@ So JS is a parsed language, but is it compiled?
 
 The answer is closer to yes than no. The parsed JS is converted to an optimized (binary) form, and that "code" is subsequently executed; the engine does not commonly switch back into line-by-line execution mode after it has finished all the hard work of parsing -- most languages/engines wouldn't, because that would be highly inefficient.
 
-To be specific, this "compilation" produces a binary byte code (of sorts), which is then handed to the "JS virtual machine" to execute. Some like to say this VM is "interpreting" the byte code. But then that means Java -- and a dozen other JVM-driven languages, for that matter -- is intrepreted rather than compiled. That contradicts the typical assertion that Java/etc are compiled languages. While Java and JavaScript are very different languages, the question of interpreted/compiled is pretty closely related between them.
+To be specific, this "compilation" produces a binary byte code (of sorts), which is then handed to the "JS virtual machine" to execute. Some like to say this VM is "interpreting" the byte code. But then that means Java -- and a dozen other JVM-driven languages, for that matter -- is interpreted rather than compiled. That contradicts the typical assertion that Java/etc are compiled languages. While Java and JavaScript are very different languages, the question of interpreted/compiled is pretty closely related between them.
 
 Another wrinkle is that JS engines can employ multiple passes of JIT (Just-In-Time) processing/optimization on the program's code, which again could reasonably be labeled either "compilation" or "interpretation" depending on perspective. It's actually a fantastically complex situation under the hood of a JS engine.
 
