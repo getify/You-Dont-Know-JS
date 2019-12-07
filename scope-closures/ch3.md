@@ -9,7 +9,7 @@ Through Chapters 1 and 2, we defined *lexical scope* as the set of rules (determ
 
 For conceptual understanding, lexical scope was illustrated with several metaphors: marbles & buckets (bubbles!), conversations, and a tall office building.
 
-Now it's time to sift through a bunch of nuts and bolts of working with lexical scope in our programs. There's a lot more to scope than you probably think. This is one of those chapters that really hammers home just how much we all *don't know* about scope.
+Now it's time to shift through a bunch of nuts and bolts of working with lexical scope in our programs. There's a lot more to scope than you probably think. This is one of those chapters that really hammers home just how much we all *don't know* about scope.
 
 | TIP: |
 | :--- |
