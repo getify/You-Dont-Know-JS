@@ -5,9 +5,10 @@
 * Foreword
 * Preface
 * Chapter 1: What Is JavaScript?
-    * Name
+    * About This Book
+    * What's With That Name?
+    * Language Specification
     * Many Faces
-    * Specification
     * Backwards & Forwards
     * What's In an Interpretation?
     * Strictly Speaking
