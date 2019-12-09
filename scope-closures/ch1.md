@@ -1,5 +1,5 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 1: How is Scope Compiled?
+# Chapter 1: How is Scope Determined?
 
 | NOTE: |
 | :--- |

@@ -8,7 +8,7 @@
 
 * Foreword
 * Preface
-* Chapter 1: How Is Scope Compiled?
+* Chapter 1: How Is Scope Determined?
     * About This Book
     * Compiling Code
     * Compiler Speak
