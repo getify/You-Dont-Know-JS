@@ -32,7 +32,9 @@
     * Pillar 3: Types and Coercion
     * In Order
     * With The Grain
-* Appendix A: Practice, Practice, Practice!
+* Appendix A: Exploring Further
+    * TODO
+* Appendix B: Practice, Practice, Practice!
     * Practicing Comparisons
     * Practicing Closure
     * Practicing Prototypes

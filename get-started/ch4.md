@@ -11,7 +11,7 @@ The rest of the books in this series are where we will unpack all of the rest of
 
 Remember to take your time, though. Rather than rushing onto the next book in an attempt to churn through all the books expediently, spend some time going back over the material in this book. Spend some more time looking through code in your current projects, and comparing what you see to what's been discussed here.
 
-When you're ready, this final chapter provides a brief preview and roadmap of what to expect from the rest of the book series, and how I suggest you proceed. Also, don't skip Appendix A, "Practice, Practice, Practice!"
+When you're ready, this final chapter provides a brief preview and roadmap of what to expect from the rest of the book series, and how I suggest you proceed. Also, don't skip Appendix B, "Practice, Practice, Practice!"
 
 ## Pillar 1: Scope and Closure
 
@@ -133,4 +133,4 @@ You'll have to shift these things little by little, over time. Work on building 
 
 That's the most important advice I can leave you with. Always keep looking for better ways to use what JS gives us to author more readable code. Everyone who works on your code, including your future self, will thank you!
 
-Before you move on to the next book in the series, *Scope & Closures*, check out and practice the snippets in Appendix A, "Practice, Practice, Practice!" Did I mention you should go practice!? There's no better way to learn code than to write it.
+Before you move on to the next book in the series, *Scope & Closures*, check out and practice the snippets in Appendix B, "Practice, Practice, Practice!" Did I mention you should go practice!? There's no better way to learn code than to write it.

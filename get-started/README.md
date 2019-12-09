@@ -12,4 +12,5 @@
 * [Chapter 2: Getting To Know JS](ch2.md)
 * [Chapter 3: Exploring Deeper](ch3.md)
 * [Chapter 4: The Rest](ch4.md)
-* [Appendix A: Practice, Practice, Practice!](apA.md)
+* [Appendix A: Exploring Further](apA.md)
+* [Appendix B: Practice, Practice, Practice!](apB.md)

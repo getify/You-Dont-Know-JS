@@ -496,4 +496,4 @@ As you are *getting started* learning and knowing JS more closely, one of the mo
 
 Even though this chapter has gone deeper on some of the topics, many details have been entirely skimmed over. There's much more to learn here, and the path to that starts with you asking the *right* questions of the code.
 
-In the final chapter of this book, we're going to briefly look at how to approach the rest of the *You Don't Know JS Yet* book series. Also, don't miss Appendix A, which has some practice code to review some of the main topics covered in this book.
+In the final chapter of this book, we're going to briefly look at how to approach the rest of the *You Don't Know JS Yet* book series. Also, don't miss Appendix B of this book, which has some practice code to review some of the main topics covered in this book.
