@@ -599,35 +599,19 @@ So again, the global scope behavior we're seeing here is about as *pure* as it g
 
 ### Developer Tools Console/REPL
 
-Using the console/REPL (Read-Evaluate-Print-Loop) in your browser's Developer Tools feels like a pretty straightforward JS environment at first glance. But it's not, really.
+Recall from "Get Started" Chapter 1 that Developer Tools don't create a completely authentic JS environment. They do process JS code, but they also bend the UX of the interaction in favor of being friendly to developers (aka, "Developer Experience", DX).
 
-Developer Tools are... tools for developers. Their primary purpose is to make life easier for developers. They prioritize DX (Developer Experience). It is *not* a goal of such tools to accurately and purely reflect all nuances of strict-spec JS behavior. As such, there's many quirks that may act as "gotchas" if you're treating the console as a *pure* JS environment.
+In many cases, favoring DX when entering short JS snippets over the normal strict steps expected for processing a full JS program produces observable differences in behavior of code. For example, certain error conditions applicable to a JS program may be relaxed and not displayed when the code is entered into a developer tool.
 
-This convenience is a good thing, by the way! I'm glad developer tools make developers' lives easier! I'm glad we have nice UX charms like auto-complete of variables/properties, etc. I'm just pointing out that we can't and shouldn't expect such tools to *always* adhere strictly to the way JS programs are handled, because that's not the purpose of these tools.
+With respect to our discussions here about scope, such observable differences in behavior may include the behavior of the global scope, hoisting (discussed later in this chapter), and block-scoping declarators (`let` / `const`, see Chapter 4) when used in the outermost scope.
 
-Since such tools vary in behavior from browser to browser, and since they change (sometimes rather frequently), I'm not going to "hardcode" any of the specific details into this text, thereby ensuring this book text is outdated quickly.
+Even though while using the console/REPL it seems like statements entered in the outermost scope are being processed in the real global scope, that's not strictly accurate. The tool emulates that to an extent, but it's emulation, not strict adherence. These tool environments prioritize developer convenience, which means that at times (such as with our current discussions regarding scope), observed behavior may deviate from the JS specification.
 
-But I'll just hint at some examples of quirks that have been true at various points in different browser console environments, to reinforce my point about not assuming native JS behavior:
+The take-away is that Developer Tools, while being very convenient and useful for a variety of developer activities, are **not** suitable environments to determine or verify some of the explicit and nuanced behaviors of an actual JS program context.
 
-* Whether a `var` or `function` declaration in the top-level "global scope" of the console actually creates a real global variable (and mirrored `window` property, and vice versa!).
+### ES Modules (ESM)
 
-* What happens with multiple `let` and `const` declarations in the top-level "global scope".
-
-* Whether `"use strict";` on one line-entry (pressing `<enter>` after) enables strict mode for the rest of that console session, the way it would on the first line of a .js file, as well as whether you can use `"use strict";` beyond the "first line" and still get strict mode turned on for that session.
-
-* How non-strict mode `this` default-binding works for function calls, and whether the "global object" used will contain expected global variables.
-
-* How hoisting (covered later in this chapter) works across multiple line entries.
-
-* ...several others
-
-The developer console is not trying to pretend to be a JS compiler that handles your entered code the same way the JS engine handles a .js file. It's trying to make it easy for you to quickly enter a few lines of code and quickly see the results. These are entirely different use-cases, and as such, it's unreasonable to expect one tool handle both equally.
-
-Don't trust what behavior you see in a developer console as representing *exact* to-the-letter JS semantics. Think of it as a "JS friendly" environment. That's useful in its own right.
-
-### ES Modules
-
-ES6 introduced first-class support for the module pattern (which we'll cover more in Chapter 6). One of the most obvious impacts of this mechanism is how it changes the behavior of observably top-level scope in a file.
+ES6 introduced first-class support for the module pattern (which we'll cover more in Chapter 6). One of the most obvious impacts of using ESM is how it changes the behavior of observably top-level scope in a file.
 
 Recall this code snippet from earlier:
 
@@ -652,7 +636,7 @@ This is not to say that global variables cannot exist in such programs. It's jus
 
 The module's top-level scope is descended from the global scope, almost as if the entire contents of the module were wrapped in a function. Thus, all variables that exist in the global scope (whether they're on the global object or not!) are available as lexical identifiers from inside the module's scope.
 
-ES modules encourage a minimization of reliance on the global scope, where you import whatever modules you may need for the current module to operate. As such, you less often see usage of the global scope or its global object. However, as noted earlier, there are still plenty of JS and web globals that you will continue to access from the global scope, whether you realize it or not!
+ESM encourages a minimization of reliance on the global scope, where you import whatever modules you may need for the current module to operate. As such, you less often see usage of the global scope or its global object. However, as noted earlier, there are still plenty of JS and web globals that you will continue to access from the global scope, whether you realize it or not!
 
 ### Node
 

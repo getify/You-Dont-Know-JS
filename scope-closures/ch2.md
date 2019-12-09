@@ -38,6 +38,7 @@ function getStudentName(studentID) {
 }
 
 var nextStudent = getStudentName(73);
+
 console.log(nextStudent);
 // Suzy
 ```
