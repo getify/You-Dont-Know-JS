@@ -311,35 +311,65 @@ Languages regarded as "compiled" usually produce a portable (binary) representat
 
 These misinformed claims and criticisms should be set aside. The real reason it matters to have a clear picture on whether JS is interpreted or compiled relates to the nature of how errors are handled.
 
-Historically, scripted or interpreted languages were executed in generally a top-down and line-by-line fashion; there's typically not an initial pass through the program to process it before execution begins. In those languages, an error on line 5 is not discovered until lines 1 through 4 have already executed. Notably, that error on line 5 might be due to a runtime condition, such as some variable or value having an unsuitable value for an operation, or it may be due to a malformed statement/command on that line. Depending on context, deferring error handling to the line the error occurs on may be a desirable or undesirable effect.
+Historically, scripted or interpreted languages were executed in generally a top-down and line-by-line fashion; there's typically not an initial pass through the program to process it before execution begins (see Figure 1).
 
-Compare that to languages which do go through a processing step (typically, called parsing) before any execution occurs. In that scenario, an invalid command (such as broken syntax) on line 5 would be caught during this parsing, before any execution has begun, and none of the program would run. For catching syntax (or otherwise "static") errors, generally it's preferred to know about them ahead of any doomed partial execution.
+<figure>
+    <img src="fig1.png" width="650" alt="Interpreting a script to execute it" align="center">
+    <figcaption><em>Fig. 1: Interpreted/Scripted Execution</em></figcaption>
+    <br><br>
+</figure>
+
+In scripted or interpreted languages, an error on line 5 of a program won't be discovered until lines 1 through 4 have already executed. Notably, the error on line 5 might be due to a runtime condition, such as some variable or value having an unsuitable value for an operation, or it may be due to a malformed statement/command on that line. Depending on context, deferring error handling to the line the error occurs on may be a desirable or undesirable effect.
+
+Compare that to languages which do go through a processing step (typically, called parsing) before any execution occurs, as illustrated in Figure 2:
+
+<figure>
+    <img src="fig2.png" width="650" alt="Parsing, compiling, and executing a program" align="center">
+    <figcaption><em>Fig. 2: Parsing + Compilation + Execution</em></figcaption>
+    <br><br>
+</figure>
+
+In this processing model, an invalid command (such as broken syntax) on line 5 would be caught during the parsing phase, before any execution has begun, and none of the program would run. For catching syntax (or otherwise "static") errors, generally it's preferred to know about them ahead of any doomed partial execution.
 
 So what do "parsed" languages have in common with "compiled" languages? First, all compiled languages are parsed. So a parsed language is quite a ways down the road toward being compiled already. In classic compilation theory, the last remaining step after parsing is code generation: producing an executable form.
 
 Once any source program has been fully parsed, it's very common that its subsequent execution will, in some form or fashion, include a translation from the parsed form of the program -- usually called an Abstract Syntax Tree (AST) -- to that executable form.
 
-In other words, parsed languages usually also have code generation before execution, so it's not that much of a stretch to say that, in spirit, it's a compiled language.
+In other words, parsed languages usually also perform code generation before execution, so it's not that much of a stretch to say that, in spirit, they're compiled languages.
 
 JS source code is parsed before it is executed. The specification requires as much, because it calls for "early errors" -- statically determined errors in code, such as a duplicate parameter name -- to be reported before the code starts executing. Those errors cannot be recognized without the code having been parsed.
 
-So JS is a parsed language, but is it compiled?
+So **JS is a parsed language**, but is it *compiled*?
 
-The answer is closer to yes than no. The parsed JS is converted to an optimized (binary) form, and that "code" is subsequently executed; the engine does not commonly switch back into line-by-line execution mode after it has finished all the hard work of parsing -- most languages/engines wouldn't, because that would be highly inefficient.
+The answer is closer to yes than no. The parsed JS is converted to an optimized (binary) form, and that "code" is subsequently executed (Figure 2); the engine does not commonly switch back into line-by-line execution (like Figure 2) mode after it has finished all the hard work of parsing -- most languages/engines wouldn't, because that would be highly inefficient.
 
-To be specific, this "compilation" produces a binary byte code (of sorts), which is then handed to the "JS virtual machine" to execute. Some like to say this VM is "interpreting" the byte code. But then that means Java -- and a dozen other JVM-driven languages, for that matter -- is interpreted rather than compiled. That contradicts the typical assertion that Java/etc are compiled languages. While Java and JavaScript are very different languages, the question of interpreted/compiled is pretty closely related between them.
+To be specific, this "compilation" produces a binary byte code (of sorts), which is then handed to the "JS virtual machine" to execute. Some like to say this VM is "interpreting" the byte code. But then that means Java, and a dozen other JVM-driven languages, for that matter, are interpreted rather than compiled. Of course, that contradicts the typical assertion that Java/etc are compiled languages.
 
-Another wrinkle is that JS engines can employ multiple passes of JIT (Just-In-Time) processing/optimization on the program's code, which again could reasonably be labeled either "compilation" or "interpretation" depending on perspective. It's actually a fantastically complex situation under the hood of a JS engine.
+Interestingly, while Java and JavaScript are very different languages, the question of interpreted/compiled is pretty closely related between them!
 
-So what do these nitty gritty details boil down to?
+Another wrinkle is that JS engines can employ multiple passes of JIT (Just-In-Time) processing/optimization on the generated code (post parsing), which again could reasonably be labeled either "compilation" or "interpretation" depending on perspective. It's actually a fantastically complex situation under the hood of a JS engine.
 
-Step back and consider the entire flow of a JS source program: after it leaves a developer's editor, it gets transpiled by Babel, then packed by Webpack (and perhaps half a dozen other build processes), then it gets delivered in that very different form to a JS engine. That JS engine parses the code to an AST, then the engine converts that AST to a kind-of byte code, a binary intermediate representation (IR), which is then refined/converted even further by the optimizing JIT compiler. Finally, the JS VM executes the program.
+So what do these nitty gritty details boil down to? Step back and consider the entire flow of a JS source program:
 
-// TODO: insert figure for interpreted vs compiled
+1. After a program leaves a developer's editor, it gets transpiled by Babel, then packed by Webpack (and perhaps half a dozen other build processes), then it gets delivered in that very different form to a JS engine.
 
-Is JS handled more like an interpreted, line-by-line script (such as Bash), or is it handled more like a compiled language that's processed in one-to-several passes first, before execution?
+2. The JS engine parses the code to an AST.
 
-I think it's clear that in spirit, if not in practice, JS is a compiled language.
+3. Then the engine converts that AST to a kind-of byte code, a binary intermediate representation (IR), which is then refined/converted even further by the optimizing JIT compiler.
+
+4. Finally, the JS VM executes the program.
+
+To visualize thoses steps, again:
+
+<figure>
+    <img src="fig3.png" width="650" alt="Steps of JS compilation and execution" align="center">
+    <figcaption><em>Fig. 3: Parsing, Compiling, and Executing JS</em></figcaption>
+    <br><br>
+</figure>
+
+Is JS handled more like an interpreted, line-by-line script, as in Figure 1, or is it handled more like a compiled language that's processed in one-to-several passes first, before execution (as in Figures 2 and 3)?
+
+I think it's clear that in spirit, if not in practice, **JS is a compiled language**.
 
 And again, the reason that matters is, since JS is compiled, we are informed of static errors (such as malformed syntax) before our code is executed. That is a substantively different interaction model than we get with traditional "scripting" programs, and arguably more helpful!
 
