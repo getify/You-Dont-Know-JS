@@ -64,17 +64,18 @@ You've already seen `let` (and `const`) declarations, which are block scoped dec
 
 Let's consider an example where `function` scoping can be useful.
 
-The mathematical operation "factorial" (notated as "6!") is the multiplication of a given integer against all successively lower integers down to `1` -- actually, you can stop at `2` since multiplying `1` does nothing. In other words, "6!" is the same as "6 * 5!" as well as "6 * 5 * 4!" and so on. Because of the nature of the math involved, once any given integer's factorial has been calculated, we shouldn't need to do that work again, as it'll always be the same answer.
+The mathematical operation "factorial" (notated as "6!") is the multiplication of a given integer against all successively lower integers down to `1` -- actually, you can stop at `2` since multiplying `1` does nothing. In other words, "6!" is the same as "6 * 5!", which is the same as "6 * 5 * 4!", and so on. Because of the nature of the math involved, once any given integer's factorial (like "4!") has been calculated, we shouldn't need to do that work again, as it'll always be the same answer.
 
-So if you naively calculate factorial for `6`, then calculate factorial for `7`, you might unnecessarily re-calculate the factorials of all the integers from 1 up to 6. If you're willing to trade memory for speed, you can solve that wasted computation by caching each integer's factorial as it's calculated:
+So if you naively calculate factorial for `6`, then later want to calculate factorial for `7`, you might unnecessarily re-calculate the factorials of all the integers from 1 up to 6. If you're willing to trade memory for speed, you can solve that wasted computation by caching each integer's factorial as it's calculated:
 
 ```js
 var cache = {};
 
 function factorial(x) {
     if (x < 2) return 1;
-    if (x in cache) return cache(x);
-    cache[x] = x * factorial(x - 1);
+    if (!(x in cache)) {
+        cache[x] = x * factorial(x - 1);
+    }
     return cache[x];
 }
 
@@ -114,8 +115,9 @@ function hideTheCache() {
     function factorial(x) {
         // inner scope
         if (x < 2) return 1;
-        if (x in cache) return cache(x);
-        cache[x] = x * factorial(x - 1);
+        if (!(x in cache)) {
+            cache[x] = x * factorial(x - 1);
+        }
         return cache[x];
     }
 
@@ -147,8 +149,9 @@ var factorial = (function hideTheCache() {
 
     function factorial(x) {
         if (x < 2) return 1;
-        if (x in cache) return cache(x);
-        cache[x] = x * factorial(x - 1);
+        if (!(x in cache)) {
+            cache[x] = x * factorial(x - 1);
+        }
         return cache[x];
     }
 
