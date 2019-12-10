@@ -1,9 +1,5 @@
 # You Don't Know JS Yet: Get Started - 2nd Edition
 
-| NOTE: |
-| :--- |
-| Work in progress |
-
 [Table of Contents](toc.md)
 
 * [Foreword](foreword.md) (by [Brian Holt](https://twitter.com/holtbt))

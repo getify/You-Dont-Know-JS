@@ -1,11 +1,9 @@
 # You Don't Know JS Yet: Get Started - 2nd Edition
 # Chapter 2: Surveying JS
 
-| NOTE: |
-| :--- |
-| Work in progress |
+The best way to learn JS is to start writing JS.
 
-The best way to learn JS is to start writing JS. To do that, you need to know how the language works, and that's what we'll focus on here. Even if you've programmed in other languages before, take your time getting comfortable with JS, and make sure to practice each piece.
+To do that, you need to know how the language works, and that's what we'll focus on here. Even if you've programmed in other languages before, take your time getting comfortable with JS, and make sure to practice each piece.
 
 This chapter is not an exhaustive reference on every bit of syntax of the JS language. It's also not intended to be a complete "intro to JS" primer.
 

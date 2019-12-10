@@ -31,8 +31,8 @@
     * Pillar 1: Scope and Closure
     * Pillar 2: Prototypes
     * Pillar 3: Types and Coercion
-    * In Order
     * With The Grain
+    * In Order
 * Appendix A: Exploring Further
     * Values vs References
     * So Many Function Forms

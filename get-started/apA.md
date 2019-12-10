@@ -1,10 +1,6 @@
 # You Don't Know JS Yet: Get Started - 2nd Edition
 # Appendix B: Exploring Further
 
-| NOTE: |
-| :--- |
-| Work in progress |
-
 In this appendix, we're going to explore some topics from the main chapter text in a bit more detail.
 
 ## Values vs References
