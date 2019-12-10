@@ -1039,7 +1039,7 @@ What about "re-declaration" with other loop forms, like `for`-loops?
 ```js
 for (let i = 0; i < 3; i++) {
     let value = i * 10;
-    console.log(`${i}: ${value}`);
+    console.log(`${ i }: ${ value }`);
 }
 // 0: 0
 // 1: 10
@@ -1057,7 +1057,7 @@ To answer that, consider what scope `i` is in? It might seem like it would be in
     for ( ; $$i < 3; $$i++) {
         let i = $$i;   // here's our actual loop `i`!
         let value = i * 10;
-        console.log(`${i}: ${value}`);
+        console.log(`${ i }: ${ value }`);
     }
     // 0: 0
     // 1: 10
