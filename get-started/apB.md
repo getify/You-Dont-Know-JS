@@ -9,7 +9,7 @@ In this appendix, we'll explore some exercises and their suggested solutions. Th
 
 ## Practicing Comparisons
 
-Let's practice working with value types and comparisons where coercion will need to be involved.
+Let's practice working with value types and comparisons (Chapter 4, Pillar 3) where coercion will need to be involved.
 
 `scheduleMeeting(..)` should take a start time (in 24hr format as a string "hh:mm") and a meeting duration (number of minutes). It should return `true` if the meeting falls entirely within the work day (according to the times specified in `dayStart` and `dayEnd`); return `false` if the meeting violates the work day bounds.
 
@@ -34,7 +34,7 @@ Try to solve this yourself first. Consider the usage of equality and relational 
 
 ## Practicing Closure
 
-Now let's practice with closure.
+Now let's practice with closure (Chapter 4, Pillar 1).
 
 The `range(..)` function takes a number as its first argument, representing the first number in a desired range of numbers. The second argument is also a number representing the end of the desired range (inclusive). If the second argument is omitted, then another function should be returned that expects that argument.
 
@@ -63,7 +63,7 @@ Once you have code that works, *compare* your solution(s) to the code in "Sugges
 
 ## Practicing Prototypes
 
-Let's work on `this` and objects linked via prototype.
+Finally, let's work on `this` and objects linked via prototype (Chapter 4, Pillar 2).
 
 Define a slot machine with 3 reels that can individually `spin()`, and then `display()` the current contents of all the reels.
 
@@ -138,7 +138,7 @@ Once you have code that works, *compare* your solution(s) to the code in "Sugges
 
 Keep in mind that these suggested solutions are just that: suggestions. There's many different ways to solve these practice exercises. Compare your approach to what you see here, and consider the pros and cons of each.
 
-Suggested solution for "Comparisons" practice:
+Suggested solution for "Comparisons" (Pillar 3) practice:
 
 ```js
 const dayStart = "07:30";
@@ -199,7 +199,7 @@ scheduleMeeting("17:30",30);    // false
 scheduleMeeting("18:00",15);    // false
 ```
 
-Suggested solution for "Closure" practice:
+Suggested solution for "Closure" (Pillar 1) practice:
 
 ```js
 function range(start,end) {
@@ -241,7 +241,7 @@ start3(0);     // []
 start4(6);     // [4,5,6]
 ```
 
-Suggested solution for "Prototypes" practice:
+Suggested solution for "Prototypes" (Pillar 2) practice:
 
 ```js
 function randMax(max) {

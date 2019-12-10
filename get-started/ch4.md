@@ -1,5 +1,5 @@
 # You Don't Know JS Yet: Get Started - 2nd Edition
-# Chapter 4: The Rest
+# Chapter 4: The Bigger Picture
 
 | NOTE: |
 | :--- |
@@ -9,9 +9,9 @@ This book surveys what you need to be aware of as you *get started* with JS. The
 
 The rest of the books in this series are where we will unpack all of the rest of the language, in far greater detail than we could have done in a few brief chapters here.
 
-Remember to take your time, though. Rather than rushing onto the next book in an attempt to churn through all the books expediently, spend some time going back over the material in this book. Spend some more time looking through code in your current projects, and comparing what you see to what's been discussed here.
+Remember to take your time, though. Rather than rushing onto the next book in an attempt to churn through all the books expediently, spend some time going back over the material in this book. Spend some more time looking through code in your current projects, and comparing what you see to what's been discussed so far.
 
-When you're ready, this final chapter provides a brief preview and roadmap of what to expect from the rest of the book series, and how I suggest you proceed. Also, don't skip Appendix B, "Practice, Practice, Practice!"
+When you're ready, this final chapter divides the organization of the JS language into three main pillars, then offers a brief roadmap of what to expect from the rest of the book series, and how I suggest you proceed. Also, don't skip the appendices, especially Appendix B, "Practice, Practice, Practice!".
 
 ## Pillar 1: Scope and Closure
 
@@ -83,17 +83,17 @@ But one of the most common questions I get is, "What order should I read the boo
 
 My suggestion for most readers is, this how best to proceed through this series:
 
-1. Get started on a solid foundation of JS with *Getting Started* (this book).
+1. Get started on a solid foundation of JS with *Get Started* (Book 1) -- good news, you've almost finished this book already!
 
-2. In *Scope & Closures*, learn the first pillar of JS:  lexical scope, how that supports closure, and how the module pattern organizes code.
+2. In *Scope & Closures* (Book 2), learn the first pillar of JS:  lexical scope, how that supports closure, and how the module pattern organizes code.
 
-3. In *Objects & Classes*, focus on the second pillar of JS: how JS's `this` works, how object prototypes support delegation, and how prototypes enable the `class` mechanism for OO-style code organization.
+3. In *Objects & Classes* (Book 3), focus on the second pillar of JS: how JS's `this` works, how object prototypes support delegation, and how prototypes enable the `class` mechanism for OO-style code organization.
 
-4. In *Types & Grammar*, tackle the third and final pillar of JS: types and type coercion, as well as how JS's syntax and grammar define how we write our code.
+4. In *Types & Grammar* (Book 4), tackle the third and final pillar of JS: types and type coercion, as well as how JS's syntax and grammar define how we write our code.
 
-5. With the **three pillars** solidly in place, *Sync & Async* then explores how we use flow control to model state change in our programs, both synchronously (right away) and asynchronously (over time).
+5. With the **three pillars** solidly in place, *Sync & Async* (Book 5) then explores how we use flow control to model state change in our programs, both synchronously (right away) and asynchronously (over time).
 
-6. The series concludes with *ES.Next & Beyond*, a forward look at the near- and mid-term future of JS, including a variety of features likely coming to your JS programs before too long.
+6. The series concludes with *ES.Next & Beyond* (Book 6), a forward look at the near- and mid-term future of JS, including a variety of features likely coming to your JS programs before too long.
 
 That's the intended order to read this book series.
 
