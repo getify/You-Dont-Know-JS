@@ -1,5 +1,5 @@
 # You Don't Know JS Yet: Get Started - 2nd Edition
-# Chapter 2: Getting To Know JS
+# Chapter 2: Surveying JS
 
 | NOTE: |
 | :--- |
