@@ -45,11 +45,11 @@ console.log(nextStudent);
 
 We've designated 3 scope colors with code comments: RED (outermost global scope), BLUE (scope of function `getStudentName(..)`), and GREEN (scope of/inside the `for` loop). But it still may be difficult to recognize the boundaries of these scope buckets when looking at a code listing.
 
-Figure 2 tries to make the scope boundaries easier to visualize by drawing colored bubbles around each scope:
+Figure 1 tries to make the scope boundaries easier to visualize by drawing colored bubbles around each scope:
 
 <figure>
-    <img src="fig2.png" width="500" alt="Nested Scope Bubbles" align="center">
-    <figcaption><em>Fig. 2: Nested Scope Bubbles</em></figcaption>
+    <img src="fig1.png" width="500" alt="Nested Scope Bubbles" align="center">
+    <figcaption><em>Fig. 1: Nested Scope Bubbles</em></figcaption>
 </figure>
 
 1. **Bubble 1** (RED) encompasses the global scope, which has three identifiers/variables: `students` (line 1), `getStudentName` (line 8), and `nextStudent` (line 16).
@@ -256,7 +256,11 @@ This sort of accident (almost certain to lead to bugs eventually) is a great exa
 
 To visualize nested scope resolution, yet another useful metaphor may be an office building:
 
-<img src="fig1.png" width="250">
+<figure>
+    <img src="fig2.png" width="250" alt="Scope &quot;Building&quot;" align="center">
+    <figcaption><em>Fig. 2: Scope "Building"</em></figcaption>
+    <br><br>
+</figure>
 
 The building represents our program's nested scope rule set. The first floor of the building represents the currently executing scope. The top level of the building is the global scope.
 
