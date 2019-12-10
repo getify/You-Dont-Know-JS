@@ -34,7 +34,10 @@
     * In Order
     * With The Grain
 * Appendix A: Exploring Further
-    * TODO
+    * Values vs References
+    * So Many Function Forms
+    * Coercive Conditional Comparison
+    * Prototypal "Classes"
 * Appendix B: Practice, Practice, Practice!
     * Practicing Comparisons
     * Practicing Closure

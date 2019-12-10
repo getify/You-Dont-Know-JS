@@ -11,17 +11,23 @@ In Chapter 2, our focus was on syntax, patterns, and behaviors. Here, our attent
 
 It should be noted that this material is still not an exhaustive exposition of JS; that's what the rest of the book series is for! Here, our goal is still just to *get started*, and more comfortable with, the *feel* of JS, how it ebbs and flows.
 
-This chapter should begin to answer some of the "Why?" questions that are likely cropping up as you explore JS.
+Be aware: this chapter digs much deeper than you're likely used to thinking about a programming language. My goal is to help you appreciate the core of how JS works, what makes it tick. This chapter will begin to answer some of the "Why?" questions that are may be cropping up as you explore JS.
+
+Don't go so quickly through this material that you get lost in the weeds. As I've said a dozen times already, **take your time**. Even still, you'll probably finish this chapter with remaining questions. That's OK, though, because there's a whole book series ahead of you to explore!
 
 ## Closure
 
-What is Closure?
+Perhaps without realizing it, almost every JS developer has made use of closure. In fact, closure is one of the most pervasive programming functionalities across a majority of languages. It might even be as important to understand as variables or loops, that's how fundamental it is.
+
+Yet it feels kind of hidden, almost magical. And it's often talked about in either very abstract or very informal terms, which does little to help us nail down exactly what it is.
+
+It's critical we be able to recognize where closure is used in our programs, as the presence or lack of closure is sometimes the cause of bugs (or even the source of performance impairments).
+
+So can we define closure in a pragmatic way that tries to bring some concrete clarity to the topic?
 
 > Closure is the ability of a function to remember and continue to access variables defined outside its scope, even when that function is executed in a different scope.
 
-Perhaps without realizing it, almost every JS developer has made use of closure. It's important to be able to recognize where it's in use in your programs, as the presence or lack of closure is sometimes the cause of bugs (or even performance impairments).
-
-From the definition above, we see two parts that are critical. First, closure is a characteristic of a function. Objects don't get closures, functions do. Second, to observe a closure, you must execute a function in a different scope than where that function was originally defined.
+We see two definitional characteristics here. First, closure is part of the nature of a function. Objects don't get closures, functions do. Second, to observe a closure, you must execute a function in a different scope than where that function was originally defined.
 
 Consider:
 
@@ -45,7 +51,7 @@ howdy("Grant");
 // Howdy, Grant!
 ```
 
-First, the `greeting(..)` outer function is executed, creating an instance of the inner function `who(..)`; that function closes over the variable `msg`, the parameter from the outer scope of `greeting(..)`. We return that inner function, and assign its reference to the `hello` variable. Then we call `greeting(..)` a second time, creating a new inner function instance, with a new closure over a new `msg`, and return that reference to be assigned to `howdy`.
+First, the `greeting(..)` outer function is executed, creating an instance of the inner function `who(..)`; that function closes over the variable `msg`, which is the parameter from the outer scope of `greeting(..)`. When that inner function is returned, its reference is assigned to the `hello` variable in the outer scope. Then we call `greeting(..)` a second time, creating a new inner function instance, with a new closure over a new `msg`, and return that reference to be assigned to `howdy`.
 
 When the `greeting(..)` function finishes running, normally we would expect all of its variables to be garbage collected (removed from memory). We'd expect each `msg` to go away, but they don't. The reason is closure. Since the inner function instances are still alive (assigned to `hello` and `howdy`, respectively), their closures are still preserving the `msg` variables.
 
@@ -103,6 +109,8 @@ Because this loop is using `let` declarations, each iteration gets new block-sco
 Remember: this closure is not over the value (like `1` or `3`), but over the variable `idx` itself.
 
 Closure is one of the most prevalent and important programming patterns in any language. But that's especially true of JS; it's hard to imagine doing anything useful without leveraging closure in one way or another.
+
+If you're still feeling unclear or shaky about closure, the majority of "Scope & Closures" (Book 2 of this series) is focused on the topic.
 
 ## `this` Keyword
 
@@ -219,7 +227,8 @@ var homework = {
 
 var otherHomework = Object.create(homework);
 
-otherHomework.topic;        // "JS"
+otherHomework.topic;
+// "JS"
 ```
 
 `Object.create(..)` expects an argument to specify an object to link the newly created object to.
@@ -249,55 +258,9 @@ homework.topic;
 
 The assignment to `topic` creates a property of that name directly on `otherHomework`; there's no affect on the `topic` property on `homework`. The next statement then accesses `otherHomework.topic`, and we see the non-delegated answer from that new property: `"Math"`.
 
-### "Class" Linkage
-
-Another, frankly more convoluted, way of creating an object with a prototype linkage is using the "prototypal class" pattern, from before ES6 `class` was added to the language (see Chapter 2, "Classes").
-
-Consider:
-
-```js
-function Classroom() {
-    // ..
-}
-
-Classroom.prototype.welcome = function hello() {
-    console.log("Welcome, students!");
-};
-
-var mathClass = new Classroom();
-
-mathClass.welcome();
-// Welcome, students!
-```
-
-All functions by default reference an empty object at a property named `prototype`. Despite the confusing naming, this is **not** the function's *prototype* -- where the function is prototype linked to -- but rather the prototype object to *link to* when other objects are created by calling the function with `new`.
-
-We add a `welcome` property to that empty `Classroom.prototype` object, pointing at a `hello()` function.
-
-Then `new Classroom()` creates a new object (assigned to `mathClass`), and prototype links it to the existing `Classroom.prototype` object.
-
-Though `mathClass` does not have a `welcome()` property/function, it successfully delegates to `Classroom.prototype.welcome()`.
-
-This "prototypal class" pattern is now strongly discouraged, in favor of ES6's `class` (see Chapter 2, "Classes"); here's the same code expressed with `class`:
-
-```js
-class Classroom {
-    constructor() {
-        // ..
-    }
-
-    welcome() {
-        console.log("Welcome, students!");
-    }
-}
-
-var mathClass = new Classroom();
-
-mathClass.welcome();
-// Welcome, students!
-```
-
-Under the covers, the same prototype linkage is wired up, but this `class` syntax fits the class-oriented design pattern much more cleanly than "prototypal classes".
+| NOTE: |
+| :--- |
+| Another, frankly more convoluted, way of creating an object with a prototype linkage is using the "prototypal class" pattern, from before `class` (see Chapter 2, "Classes") was added in ES6. We'll cover this topic in more detail in Appendix A, "Prototypal 'Classes'". |
 
 ### `this` Revisited
 
@@ -494,6 +457,6 @@ The intended take-away from this chapter is that there's a lot more to JS under 
 
 As you are *getting started* learning and knowing JS more closely, one of the most important skills you can practice and bolster is curiosity, and the art of asking "why?" when you encounter something in the language.
 
-Even though this chapter has gone deeper on some of the topics, many details have been entirely skimmed over. There's much more to learn here, and the path to that starts with you asking the *right* questions of the code.
+Even though this chapter has gone quite deep on some of the topics, many details have still been entirely skimmed over. There's much more to learn here, and the path to that starts with you asking the *right* questions of your code. Asking the right questions is a critical skill of becoming a better developer.
 
-In the final chapter of this book, we're going to briefly look at how to approach the rest of the *You Don't Know JS Yet* book series. Also, don't miss Appendix B of this book, which has some practice code to review some of the main topics covered in this book.
+In the final chapter of this book, we're going to briefly look at how JS is divided, as covered across the rest of the *You Don't Know JS Yet* book series. Also, don't skip Appendix B of this book, which has some practice code to review some of the main topics covered in this book.
