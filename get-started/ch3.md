@@ -34,7 +34,7 @@ Consider:
 ```js
 function greeting(msg) {
     return function who(name) {
-        console.log(`${msg}, ${name}!`);
+        console.log(`${ msg }, ${ name }!`);
     };
 }
 
@@ -84,7 +84,7 @@ Closure is most common when working with asynchronous code, such as with callbac
 ```js
 function getSomeData(url) {
     ajax(url,function onResponse(resp){
-        console.log(`Response (from ${url}): ${resp}`);
+        console.log(`Response (from ${ url }): ${ resp }`);
     });
 }
 
@@ -99,7 +99,7 @@ It's not necessary that the outer scope be a function -- it usually is, but not 
 ```js
 for (let [idx,btn] of buttons.entries()) {
     btn.addEventListener("click",function onClick(evt){
-       console.log(`Clicked on button (${idx})!`);
+       console.log(`Clicked on button (${ idx })!`);
     });
 }
 ```
@@ -132,7 +132,7 @@ Consider:
 function classroom(teacher) {
     return function study() {
         console.log(
-            `${teacher} wants you to study ${this.topic}`
+            `${ teacher } wants you to study ${ this.topic }`
         );
     };
 }
@@ -271,7 +271,7 @@ Consider:
 ```js
 var homework = {
     study() {
-        console.log(`Please study ${this.topic}`);
+        console.log(`Please study ${ this.topic }`);
     }
 };
 
@@ -324,7 +324,7 @@ var it = /* .. */;
 
 // loop over its results one at a time
 for (let val of it) {
-    console.log(`Iterator value: ${val}`);
+    console.log(`Iterator value: ${ val }`);
 }
 // Iterator value: ..
 // Iterator value: ..
@@ -376,7 +376,7 @@ Consider:
 var arr = [ 10, 20, 30 ];
 
 for (let val of arr) {
-    console.log(`Array value: ${val}`);
+    console.log(`Array value: ${ val }`);
 }
 // Array value: 10
 // Array value: 20
@@ -413,7 +413,7 @@ buttonNames.set(btn2,"Button 2");
 
 for (let [btn,btnName] of buttonNames) {
     btn.addEventListener("click",function onClick(){
-        console.log(`Clicked ${btnName}`);
+        console.log(`Clicked ${ btnName }`);
     });
 }
 ```
@@ -436,7 +436,7 @@ Or if we want the index *and* value in an array iteration, we can make an entrie
 var arr = [ 10, 20, 30 ];
 
 for (let [idx,val] of arr.entries()) {
-    console.log(`[${idx}]: ${val}`);
+    console.log(`[${ idx }]: ${ val }`);
 }
 // [0]: 10
 // [1]: 20

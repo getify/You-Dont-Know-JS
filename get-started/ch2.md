@@ -271,7 +271,7 @@ Besides `var` / `let` / `const`, there are other syntactic forms that declare id
 
 ```js
 function hello(name) {
-    console.log(`Hello, ${name}.`);
+    console.log(`Hello, ${ name }.`);
 }
 
 hello("Kyle");
@@ -595,9 +595,9 @@ class Publication {
 
     print() {
         console.log(`
-            Title: ${this.title}
-            By: ${this.author}
-            ${this.pubDate}
+            Title: ${ this.title }
+            By: ${ this.author }
+            ${ this.pubDate }
         `);
     }
 }
@@ -622,8 +622,8 @@ class Book extends Publication {
     print() {
         super.print();
         console.log(`
-            Published By: ${this.publisher}
-            ISBN: ${this.ISBN}
+            Published By: ${ this.publisher }
+            ISBN: ${ this.ISBN }
         `);
     }
 }
@@ -702,9 +702,9 @@ function Publication(title,author,pubDate) {
     var publicAPI = {
         print() {
             console.log(`
-                Title: ${title}
-                By: ${author}
-                ${pubDate}
+                Title: ${ title }
+                By: ${ author }
+                ${ pubDate }
             `);
         }
     };
@@ -723,8 +723,8 @@ function Book(bookDetails) {
         print() {
             pub.print();
             console.log(`
-                Published By: ${bookDetails.publisher}
-                ISBN: ${bookDetails.ISBN}
+                Published By: ${ bookDetails.publisher }
+                ISBN: ${ bookDetails.ISBN }
             `);
         }
     };
@@ -807,9 +807,9 @@ Consider the file `publication.js`:
 ```js
 function printDetails(title,author,pubDate) {
     console.log(`
-        Title: ${title}
-        By: ${author}
-        ${pubDate}
+        Title: ${ title }
+        By: ${ author }
+        ${ pubDate }
     `);
 }
 
