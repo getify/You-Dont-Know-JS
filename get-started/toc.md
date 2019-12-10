@@ -16,12 +16,12 @@
 * Chapter 2: Surveying JS
     * Files As Programs
     * Values
-    * Variables
+    * Declaring And Using Variables
     * Functions
     * Comparisons
-    * Code Organization
-    * Before You Go On
-* Chapter 3: Digging Into JS
+    * How We Organize In JS
+    * The Rabbit Hole Deepens
+* Chapter 3: Digging To The Roots Of JS
     * Closure
     * `this` Keyword
     * Prototypes

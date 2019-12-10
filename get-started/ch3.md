@@ -1,13 +1,13 @@
 # You Don't Know JS Yet: Get Started - 2nd Edition
-# Chapter 3: Digging Into JS
+# Chapter 3: Digging To The Roots Of JS
 
 | NOTE: |
 | :--- |
 | Work in progress |
 
-If you've read Chapters 1 and 2, and taken the time to digest and percolate, you're hopefully starting to *get* JS a little more. If you skipped them (especially Chapter 2), I recommend you re-consider and spend some time with that material.
+If you've read Chapters 1 and 2, and taken the time to digest and percolate, you're hopefully starting to *get* JS a little more. If you skipped/skimmed them (especially Chapter 2), I recommend you consider going back to spend some more time with that material.
 
-In Chapter 2, our focus was on syntax, patterns, and behaviors. Here, our attention shifts to some of the lower-level characteristics of JS that underpin virtually every line of code we write.
+In Chapter 2, our focus was on syntax, patterns, and behaviors. Here, our attention shifts to some of the lower-level root characteristics of JS that underpin virtually every line of code we write.
 
 It should be noted that this material is still not an exhaustive exposition of JS; that's what the rest of the book series is for! Here, our goal is still just to *get started*, and more comfortable with, the *feel* of JS, how it ebbs and flows.
 
