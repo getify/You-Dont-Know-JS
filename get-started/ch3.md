@@ -218,7 +218,7 @@ homework.toString();    // [object Object]
 
 ### Object Linkage
 
-One way to create an object prototype linkage is to create the object using the `Object.create(..)` utility:
+To define an object prototype linkage, you can create the object using the `Object.create(..)` utility:
 
 ```js
 var homework = {
@@ -231,7 +231,7 @@ otherHomework.topic;
 // "JS"
 ```
 
-`Object.create(..)` expects an argument to specify an object to link the newly created object to.
+`Object.create(..)` expects an argument to specify an object to link the newly created object to, and returns the newly created (and linked!) object.
 
 | NOTE: |
 | :--- |
@@ -264,7 +264,7 @@ The assignment to `topic` creates a property of that name directly on `otherHome
 
 ### `this` Revisited
 
-One of the main reasons `this` supports dynamic context based on how the function is called is so that method calls on objects which delegate through the prototype chain still maintain the expected `this`.
+We covered the `this` keyword earlier, but its true importance shines when considering how it powers prototype-delegated function calls. Indeed, one of the main reasons `this` supports dynamic context based on how the function is called is so that method calls on objects which delegate through the prototype chain still maintain the expected `this`.
 
 Consider:
 
