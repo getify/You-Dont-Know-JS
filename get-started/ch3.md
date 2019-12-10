@@ -256,7 +256,7 @@ homework.topic;
 // "JS" -- not "Math"
 ```
 
-The assignment to `topic` creates a property of that name directly on `otherHomework`; there's no affect on the `topic` property on `homework`. The next statement then accesses `otherHomework.topic`, and we see the non-delegated answer from that new property: `"Math"`.
+The assignment to `topic` creates a property of that name directly on `otherHomework`; there's no effect on the `topic` property on `homework`. The next statement then accesses `otherHomework.topic`, and we see the non-delegated answer from that new property: `"Math"`.
 
 | NOTE: |
 | :--- |
