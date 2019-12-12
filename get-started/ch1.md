@@ -15,7 +15,7 @@ Following this background chapter, the rest of the book lays out a high-level ma
 
 In particular, Chapter 4 identifies three main pillars around which the JS language is organized: scope/closures, prototypes/objects, and types/coercion. JS is a broad and sophisticated language, with many features and capabilities. But all of JS is founded on these three foundational pillars.
 
-Keep in mind that even though this book is titled "Getting Started", it's **not intended as a beginner/intro book**. This book's main job is to get you ready for studying JS deeply throughout the rest of the series; it's written assuming you already have familiarity with JS over at least several months experience before moving on in YDKJSY. So to get the most out *Getting Started*, make sure you spend plenty of time writing JS code to build up your experience.
+Keep in mind that even though this book is titled "Get Started", it's **not intended as a beginner/intro book**. This book's main job is to get you ready for studying JS deeply throughout the rest of the series; it's written assuming you already have familiarity with JS over at least several months experience before moving on in YDKJSY. So to get the most out *Get Started*, make sure you spend plenty of time writing JS code to build up your experience.
 
 Even if you've already written a lot of JS before, this book should not be skimmed over or skipped; take your time to fully process the material here. **A good start always depends on a solid first step.**
 
@@ -53,7 +53,7 @@ Whether you call it JavaScript, JS, ECMAScript, or ES2019, it's most definitely 
 
 ## Language Specification
 
-I mentioned TC39, the technical steering committee that manages JS. They are primarily tasked with managing the official specification for the language. They meet regularly to vote on any agreed changes, which they then submit to ECMA, the standards organization.
+I mentioned TC39, the technical steering committee that manages JS. Their primary task is managing the official specification for the language. They meet regularly to vote on any agreed changes, which they then submit to ECMA, the standards organization.
 
 JS's syntax and behavior are defined in the ES specification.
 
@@ -127,7 +127,7 @@ So an `alert(..)` call *is* JS, but `alert` itself is really just a guest, not p
 
 ### It's Not Always JS
 
-Using the console/REPL (Read-Evaluate-Print-Loop) in your browser's Developer Tools feels like a pretty straightforward JS environment at first glance. But it's not, really.
+Using the console/REPL (Read-Evaluate-Print-Loop) in your browser's Developer Tools (or Node) feels like a pretty straightforward JS environment at first glance. But it's not, really.
 
 Developer Tools are... tools for developers. Their primary purpose is to make life easier for developers. They prioritize DX (Developer Experience). It is *not* a goal of such tools to accurately and purely reflect all nuances of strict-spec JS behavior. As such, there's many quirks that may act as "gotchas" if you're treating the console as a *pure* JS environment.
 

@@ -137,11 +137,11 @@ names[1];
 // Kyle
 ```
 
-JS arrays can hold any value type, either primitive or object (including other arrays).
+JS arrays can hold any value type, either primitive or object (including other arrays). As we'll see towards the end of Chapter 3, even functions are values that can be held in arrays or objects.
 
 | NOTE: |
 | :--- |
-| Another entity you'll encounter in JS programs that, like arrays, is a special kind of object is a function. We'll cover these in more detail in a bit. |
+| Functions, like arrays, are a special kind (aka, sub-type) of object. We'll cover functions in more detail in a bit. |
 
 Objects are more general: an unordered, keyed collection of any various values. In other words, you access the element by a string location name (aka "key" or "property") rather than by its numeric position (as with arrays). For example:
 
@@ -750,7 +750,7 @@ The `class` form stores methods and data on an object instance, which must be ac
 
 With `class`, the "API" of an instance is implicit in the class definition -- also, all data and methods are public. With the module factory function, you explicitly create and return an object with any publicly exposed methods, and any data or other unreferenced methods remain private inside the factory function.
 
-There are other variations to this factory function form that are quite common across JS, even in 2019; you may run across these forms in different JS programs: AMD ("Asynchronous Module Definition"), UMD ("Universal Module Definition"), and CommonJS (classic Node.js style modules). The variations are minor, though. All of these forms rely on the same basic principles.
+There are other variations to this factory function form that are quite common across JS, even in 2019; you may run across these forms in different JS programs: AMD ("Asynchronous Module Definition"), UMD ("Universal Module Definition"), and CommonJS (classic Node.js style modules). The variations, however, are minor (yet not quite compatible). Still, all of these forms rely on the same basic principles.
 
 Consider also the usage (aka, "instantiation") of these module factory functions:
 

@@ -3,17 +3,15 @@
 
 If you've read Chapters 1 and 2, and taken the time to digest and percolate, you're hopefully starting to *get* JS a little more. If you skipped/skimmed them (especially Chapter 2), I recommend you consider going back to spend some more time with that material.
 
-In Chapter 2, our focus was on syntax, patterns, and behaviors. Here, our attention shifts to some of the lower-level root characteristics of JS that underpin virtually every line of code we write.
+In Chapter 2, we surveyed syntax, patterns, and behaviors at a high level. In this chapter, our attention shifts to some of the lower-level root characteristics of JS that underpin virtually every line of code we write.
 
-It should be noted that this material is still not an exhaustive exposition of JS; that's what the rest of the book series is for! Here, our goal is still just to *get started*, and more comfortable with, the *feel* of JS, how it ebbs and flows.
+Be aware: this chapter digs much deeper than you're likely used to thinking about a programming language. My goal is to help you appreciate the core of how JS works, what makes it tick. This chapter should begin to answer some of the "Why?" questions that are may be cropping up as you explore JS. However, this material is still not an exhaustive exposition of the language; that's what the rest of the book series is for! Our goal here is still just to *get started*, and become more comfortable with, the *feel* of JS, how it ebbs and flows.
 
-Be aware: this chapter digs much deeper than you're likely used to thinking about a programming language. My goal is to help you appreciate the core of how JS works, what makes it tick. This chapter will begin to answer some of the "Why?" questions that are may be cropping up as you explore JS.
-
-Don't go so quickly through this material that you get lost in the weeds. As I've said a dozen times already, **take your time**. Even still, you'll probably finish this chapter with remaining questions. That's OK, though, because there's a whole book series ahead of you to explore!
+Don't run so quickly through this material that you get lost in the weeds. As I've said a dozen times already, **take your time**. Even still, you'll probably finish this chapter with remaining questions. That's OK, because there's a whole book series ahead of you keep exploring!
 
 ## Iteration
 
-Since programs are essentially built to process data (and make decisions on that data), the patterns used to step through the data has a big impact on the program's readability.
+Since programs are essentially built to process data (and make decisions on that data), the patterns used to step through the data have a big impact on the program's readability.
 
 The iterator pattern has been around for decades, and suggests a "standardized" approach to consuming data from a source one *chunk* at a time. The idea is that it's more common and helpful iterate the data source -- to progressively handle the collection of data by processing the first part, then the next, and so on, rather than handling the entire set all at once.
 

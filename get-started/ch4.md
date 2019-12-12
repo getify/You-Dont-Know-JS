@@ -35,7 +35,7 @@ To dig further into scope, closures, and how modules work, read Book 2, *Scope &
 
 The second pillar of the language is the prototypes system. We covered this topic in-depth in Chapter 3 ("Prototypes"), but I just want to make a few more comments about its importance.
 
-JS is one of very few languages where you have the option to create objects bespoke, without any need for defining their structure in a class first.
+JS is one of very few languages where you have the option to create objects directly and explicitly, without first defining their structure in a class.
 
 For many years, people implemented the class design pattern on top of prototypes -- so called, "prototypal inheritance" (see Appendix A) -- and then with the advent of ES6's `class` keyword, the language doubled-down on its inclination towards OO/class style programming.
 
