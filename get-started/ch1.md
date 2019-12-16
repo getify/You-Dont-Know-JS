@@ -425,7 +425,7 @@ The strict mode pragma must appear at the top of a file, with only whitespace or
 
 | WARNING: |
 | :--- |
-| Something to be aware of is that even a stray `;` all by itself appearing before the strict mide pragma will render the pragma useless; no errors are thrown because it's valid JS to have a string literal expression in a statement position, but it also will silently *not* turn on strict mode! |
+| Something to be aware of is that even a stray `;` all by itself appearing before the strict mode pragma will render the pragma useless; no errors are thrown because it's valid JS to have a string literal expression in a statement position, but it also will silently *not* turn on strict mode! |
 
 Strict mode can alternatively be turned on per-function scope, with exactly the same rules/admonitions about its positioning):
 
