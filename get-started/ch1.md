@@ -446,7 +446,7 @@ Many have wondered if there would ever be a time when JS made strict mode the de
 
 However, there are a few factors that reduce the future impact of this non-default "obscurity" of strict mode.
 
-For one, virtually all transpiled code ends up in strict mode even if the original source code isn't written as such. Most JS code in production has been transpiled, so that means most JS is already adhering to strict mode It's possible to undo that assumption, but you really have to go out of your way to do so, so it's highly unlikely.
+For one, virtually all transpiled code ends up in strict mode even if the original source code isn't written as such. Most JS code in production has been transpiled, so that means most JS is already adhering to strict mode. It's possible to undo that assumption, but you really have to go out of your way to do so, so it's highly unlikely.
 
 Moreover, a wide shift is happening towards more/most new JS code being written using the ES6 module format. ES6 modules assume strict mode, so all code in such files is automatically defaulted to strict mode.
 
