@@ -6,7 +6,7 @@
 
 [Table of Contents](toc.md)
 
-* [Foreword](foreword.md) (by TBA)
+* [Foreword](foreword.md) (by Sarah Drasner)
 * [Preface](../preface.md)
 * [Chapter 1: How Is Scope Determined?](ch1.md)
 * [Chapter 2: Understanding Lexical Scope](ch2.md)
