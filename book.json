@@ -1,0 +1,41 @@
+{
+	"title": "You-Dont-Know-JS",
+	"gitbook": "3.2.3",
+	"language": "zh-hans",
+	"plugins": [
+		"advanced-emoji@^0.2.2",
+		"tbfed-pagefooter@^0.0.1",
+		"anchor-navigation-ex@^1.0.13",
+		"theme-default@^1.0.7",
+		"-lunr",
+		"-search",
+		"search-plus@^1.0.3",
+		"sectionx@^3.1.0",
+		"emphasize@^1.1.0",
+		"splitter@^0.0.8",
+		"alerts@^0.2.0",
+		"expandable-chapters@^0.2.0"
+	],
+	"pluginsConfig": {
+		"tbfed-pagefooter": {
+			"copyright":"Copyright &copy [user]",
+			"modify_label": "last modification",
+			"modify_format": "YYYY-MM-DD"
+		},
+		"anchor-navigation-ex": {
+			"showLevel": true,
+			"multipleH1": true,
+			"showGoTop": true,
+			"associatedWithSummary": true
+		},
+		"theme-default":{
+			"showLevel": true
+		},
+		"sectionx": {
+			"tag": "b"
+		},
+		"chart": {
+			"type": "highcharts"
+		}
+	}
+}

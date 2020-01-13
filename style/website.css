@@ -1,0 +1,91 @@
+/* CSS for website */
+
+body {
+	font-size: 15px;
+}
+
+/* summary */
+.book-summary ul.summary li.header {
+	font-weight: bolder;
+	border-bottom: 1px solid #eee;
+	border-top: 1px solid #eee;
+	background-color: #f5f5f5;
+}
+
+.book-summary ul.summary li a {
+	text-indent: 1em;
+}
+
+.book-summary ul.summary li a:hover {
+	color: #26CB7C;
+}
+
+.book-summary ul.summary li.active > a {
+	color: #26CB7C;
+}
+
+/* content */
+.markdown-section a {
+	color: #26CB7C;
+}
+
+
+.markdown-section a:hover {
+	color: #26CB7C;
+}
+
+
+/* video.js plugin */
+.video-js {
+	width: 100%;
+	height: 100%;
+}
+
+
+/* content h2~5 style */
+.markdown-section h1,
+.markdown-section h2,
+.markdown-section h3,
+.markdown-section h4,
+.markdown-section h5 {
+	padding-bottom: 0.3em;
+	border-bottom: 1px solid #eee;
+	font-family: "Times New Roman", Georgia, serif;
+}
+
+
+/* scrollbar */
+::-webkit-scrollbar {
+	width: 5px;
+	height: 4px;
+}
+
+::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+	border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	/*background: rgba(223,240,216,1);*/
+	-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(225, 246, 143, 1);
+}
+
+
+::-webkit-scrollbar-thumb:window-inactive {
+	background: rgba(255, 0, 0, 0.4);
+}
+
+/* code */
+pre {
+	background-color: #F5F8FA !important;
+}
+
+code {
+	color: #0c5176 !important;
+}
