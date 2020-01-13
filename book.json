@@ -6,20 +6,25 @@
 		"advanced-emoji@^0.2.2",
 		"tbfed-pagefooter@^0.0.1",
 		"anchor-navigation-ex@^1.0.13",
+		"favicon@^0.0.2",
 		"theme-default@^1.0.7",
 		"-lunr",
 		"-search",
 		"search-plus@^1.0.3",
 		"sectionx@^3.1.0",
+		"local-video@^1.0.1",
 		"emphasize@^1.1.0",
 		"splitter@^0.0.8",
 		"alerts@^0.2.0",
-		"expandable-chapters@^0.2.0"
+		"expandable-chapters@^0.2.0",
+		"chart@^0.2.1",
+		"github@^2.0.0",
+		"github-buttons@^3.0.0"
 	],
 	"pluginsConfig": {
 		"tbfed-pagefooter": {
-			"copyright":"Copyright &copy [user]",
-			"modify_label": "last modification",
+			"copyright": "Copyright &copy (User)",
+			"modify_label": "Last modified: ",
 			"modify_format": "YYYY-MM-DD"
 		},
 		"anchor-navigation-ex": {
@@ -28,7 +33,16 @@
 			"showGoTop": true,
 			"associatedWithSummary": true
 		},
-		"theme-default":{
+		"favicon": {
+			"shortcut": "assets/favicon.ico",
+			"bookmark": "assets/favicon.ico",
+			"appleTouch": "assets/images/apple-touch-icon.png",
+			"appleTouchMore": {
+				"120x120": "assets/images/apple-touch-icon-120x120.png",
+				"180x180": "assets/images/apple-touch-icon-180x180.png"
+			}
+		},
+		"theme-default": {
 			"showLevel": true
 		},
 		"sectionx": {
@@ -36,6 +50,20 @@
 		},
 		"chart": {
 			"type": "highcharts"
+		},
+		"github": {
+			"url": "https://github.com/getify/You-Dont-Know-JS"
+		},
+		"github-buttons": {
+			"buttons": [
+				{
+					"user": "getify",
+					"repo": "You-Dont-Know-JS",
+					"type": "star",
+					"size": "small",
+					"count": true
+				}
+			]
 		}
 	}
 }
