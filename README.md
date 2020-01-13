@@ -29,6 +29,31 @@ I recommend reading the books in this order:
 * [Sync & Async](sync-async/README.md)
 * [ES.Next & Beyond](es-next-beyond/README.md)
 
+---
+
+## Read With GitBook
+
+First you need to install nodejs so that you can use `yarn` or `NPM`.
+
+And Then install the following command sequence to read in the local page:
+
+```bash
+# Install Gitbook
+yarn global add gitbook-cli / npm install -g gitbook-cli
+
+# Into Repo
+cd You-Dont-Know-JS
+
+# Install Gitbook Plugins
+gitbook install
+
+# The Last, Run `gitbook serve`
+
+gitbook serve
+```
+
+Now, You can open it in a browser(`localhost:4000`)
+
 ## Publishing
 
 As always, you'll be able to read these books online here entirely for free.
