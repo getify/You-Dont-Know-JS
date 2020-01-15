@@ -391,7 +391,7 @@ The first argument to `Object.create(..)` specifies an object to link the newly 
 Figure 4 shows how the three objects (`otherHomework`, `homework`, and `Object.prototype`) are linked in a prototype chain:
 
 <figure>
-    <img src="fig4.png" width="200" alt="Prototype chain with 3 objects" align="center">
+    <img src="resources/fig4.png" width="200" alt="Prototype chain with 3 objects" align="center">
     <figcaption><em>Fig. 4: Objects in a prototype chain</em></figcaption>
     <br><br>
 </figure>
@@ -420,7 +420,7 @@ The assignment to `topic` creates a property of that name directly on `otherHome
 Figure 5 shows the objects/properties after the assignment that creates the `otherHomework.topic` property:
 
 <figure>
-    <img src="fig5.png" width="200" alt="3 objects linked, with shadowed property" align="center">
+    <img src="resources/fig5.png" width="200" alt="3 objects linked, with shadowed property" align="center">
     <figcaption><em>Fig. 5: Shadowed property 'topic'</em></figcaption>
     <br><br>
 </figure>
@@ -458,7 +458,7 @@ mathHomework.study();
 The two objects `jsHomework` and `mathHomework` each prototype link to the single `homework` object, which has the `study()` function. `jsHomework` and `mathHomework` are each given their own `topic` property (see Figure 6).
 
 <figure>
-    <img src="fig6.png" width="495" alt="4 objects prototype linked" align="center">
+    <img src="resources/fig6.png" width="495" alt="4 objects prototype linked" align="center">
     <figcaption><em>Fig. 6: Two objects linked to a common parent</em></figcaption>
     <br><br>
 </figure>
