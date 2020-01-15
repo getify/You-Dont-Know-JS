@@ -275,19 +275,32 @@ pr
 
 This code uses an ES2019 feature, the `finally(..)` method on the promise prototype. If this code were used in a pre-ES2019 environment, the `finally(..)` method would not exist, and an error would occur.
 
-A basic polyfill for `finally(..)` in pre-ES2019 environments could look like this:
+A polyfill for `finally(..)` in pre-ES2019 environments could look like this:
 
 ```js
 if (!Promise.prototype.finally) {
     Promise.prototype.finally = function f(fn){
-        return this.then(fn,fn);
+        return this.then(
+            function t(v){
+                return Promise.resolve( fn() )
+                    .then(function t(){
+                        return v;
+                    });
+            },
+            function c(e){
+                return Promise.resolve( fn() )
+                    .then(function t(){
+                        throw e;
+                    });
+            }
+        );
     };
 }
 ```
 
-| NOTE: |
+| WARNING: |
 | :--- |
-| This is only a simple illustration of a naive polyfill for `finally(..)`. Don't use this approach in your code; always use a robust, official polyfill wherever possible, such as the collection of polyfills/shims in ES-Shim. |
+| This is only a simple illustration of a basic (not entirely spec-compliant) polyfill for `finally(..)`. Don't use this polyfill in your code; always use a robust, official polyfill wherever possible, such as the collection of polyfills/shims in ES-Shim. |
 
 The `if` statement protects the polyfill definition by preventing it from running in any environment where the JS engine has already defined that method. In older environments, the polyfill is defined, but in newer environments the `if` statement is quietly skipped.
 
