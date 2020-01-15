@@ -7,7 +7,7 @@ To do that, you need to know how the language works, and that's what we'll focus
 
 This chapter is not an exhaustive reference on every bit of syntax of the JS language. It's also not intended to be a complete "intro to JS" primer.
 
-Instead, we're just going to survey some of the major topic-areas of the language. Our goal is to get a better *feel* for it, so that we can move forward writing our own programs with more confidence. We'll revisit many of these topics in successively more detail as you go through the rest of this book, and the rest of the series.
+Instead, we're just going to survey some of the major topic areas of the language. Our goal is to get a better *feel* for it, so that we can move forward writing our own programs with more confidence. We'll revisit many of these topics in successively more detail as you go through the rest of this book, and the rest of the series.
 
 Please don't expect this chapter to be a quick read. It's long and there's plenty of detail to chew on. Take your time.
 
@@ -15,7 +15,7 @@ Please don't expect this chapter to be a quick read. It's long and there's plent
 | :--- |
 | If you're still getting familiar with JS, I suggest you reserve plenty of extra time to work through this chapter. Take each section and ponder and explore the topic for awhile. Look through existing JS programs and compare what you see in them to the code and explanations (and opinions!) presented here. You will get a lot more out of the rest of the book and series with a solid foundation of JS's *nature*. |
 
-## Each File Is A Program
+## Each File is a Program
 
 Almost every website (web application) you use is comprised of many different JS files (typically with the .js file extension). It's tempting to think of the whole thing (the application) as one program. But JS sees it differently.
 
@@ -25,7 +25,7 @@ The reason this matters is primarily around error handling. Since JS treats file
 
 It may surprise you to consider separate .js files as separate JS programs. From the perspective of your usage of an application, it sure seems like one big program. That's because the execution of the application allows these individual *programs* to cooperate and act as one program.
 
-The only way multiple standalone .js files act as a single program is by sharing their state (and access to their public functionality) via the "global scope". They mix together in this global scope namespace, so at runtime they act as as whole.
+The only way multiple standalone .js files act as a single program is by sharing their state (and access to their public functionality) via the "global scope." They mix together in this global scope namespace, so at runtime they act as as whole.
 
 | NOTE: |
 | :--- |
@@ -33,9 +33,9 @@ The only way multiple standalone .js files act as a single program is by sharing
 
 Since ES6, JS has also supported a module format in addition to the typical standalone JS program format. Modules are also file-based. If a file is loaded via module-loading mechanism such as an `import` statement or a `<script type=module>` tag, all its code is treated as a single module.
 
-Though you wouldn't typically think about a module -- basically, a collection of state and publicly-exposed methods to operate on that state -- as a standalone program, JS does in fact still treat each module separately. Similar to how "global scope" allows standalone files to mix together at runtime, importing a module into another allows runtime interoperation between them.
+Though you wouldn't typically think about a module—basically, a collection of state and publicly exposed methods to operate on that state—as a standalone program, JS does in fact still treat each module separately. Similar to how "global scope" allows standalone files to mix together at runtime, importing a module into another allows runtime interoperation between them.
 
-Regardless of which code organization pattern (and loading mechanism) is used for a file -- standalone or module -- you should still think of each file as its own (mini) program, which may then cooperate with other (mini) programs to perform the functions of your overall application.
+Regardless of which code organization pattern (and loading mechanism) is used for a file (standalone or module), you should still think of each file as its own (mini) program, which may then cooperate with other (mini) programs to perform the functions of your overall application.
 
 ## Values
 
@@ -76,7 +76,7 @@ console.log(`Am I confusing you by omitting interpolation?`);
 
 The better approach is to use `"` or `'` (again, pick one and stick to it!) for strings *unless you need* interpolation; reserve `` ` `` only for strings that will include interpolated expressions.
 
-Other than strings, JS programs often contain other primitive literal values such as booleans and numbers.
+Other than strings, JS programs often contain other primitive literal values such as booleans and numbers:
 
 ```js
 while (false) {
@@ -90,7 +90,7 @@ In this case, the loop will never run (and nothing will be printed), because we 
 
 The number `3.141592` is, as you may know, an approximation of mathematical PI to the first six digits. Rather than embed such a value, however, you would typically use the predefined `Math.PI` value for that purpose. Another variation on numbers is the `bigint` (big-integer) primitive type, which is used for storing arbitrarily large numbers.
 
-Numbers are most often used in programs for counting steps, such as loop iterations, and accessing information in numeric positions (ie, an array index). We'll cover arrays/objects in a little bit, but as an example, if there was an array called `names`, we could access the element in its second position like this:
+Numbers are most often used in programs for counting steps, such as loop iterations, and accessing information in numeric positions (i.e., an array index). We'll cover arrays/objects in a little bit, but as an example, if there was an array called `names`, we could access the element in its second position like this:
 
 ```js
 console.log(`My name is ${ names[1] }.`);
@@ -109,7 +109,7 @@ while (value != undefined) {
 }
 ```
 
-The final primitive value to be aware of is a symbol, which is a special-purpose value that behaves as a hidden unguessable value. Symbols are almost exclusively used as special keys on objects.
+The final primitive value to be aware of is a symbol, which is a special-purpose value that behaves as a hidden unguessable value. Symbols are almost exclusively used as special keys on objects:
 
 ```js
 hitchhikersGuide[ Symbol("meaning of life") ];
@@ -137,7 +137,7 @@ names[1];
 // Kyle
 ```
 
-JS arrays can hold any value type, either primitive or object (including other arrays). As we'll see towards the end of Chapter 3, even functions are values that can be held in arrays or objects.
+JS arrays can hold any value type, either primitive or object (including other arrays). As we'll see toward the end of Chapter 3, even functions are values that can be held in arrays or objects.
 
 | NOTE: |
 | :--- |
@@ -177,13 +177,13 @@ typeof function Hello(){};  // "function"
 | :--- |
 | `typeof null` unfortunately returns `"object"` instead of the expected `"null"`. Also, `typeof` returns the specific `"function"` for functions, but not the expected `"array"` for arrays. |
 
-Converting from one value type to another, such as from string to number, is referred to in JS as "coercion". We'll cover this in more detail later in this chapter.
+Converting from one value type to another, such as from string to number, is referred to in JS as "coercion." We'll cover this in more detail later in this chapter.
 
-Primitive values and object values behave differently when they're assigned or passed around. We'll cover these details in Appendix A, "Values vs References".
+Primitive values and object values behave differently when they're assigned or passed around. We'll cover these details in Appendix A, "Values vs References."
 
-## Declaring And Using Variables
+## Declaring and Using Variables
 
-To be explicit about something that may not have been obvious in the previous section: in JS programs, values can either appear as literal values (as many of the above examples illustrate), or they can be held in variables; think of variables as just containers for values.
+To be explicit about something that may not have been obvious in the previous section: in JS programs, values can either appear as literal values (as many of the preceding examples illustrate), or they can be held in variables; think of variables as just containers for values.
 
 Variables have to be declared (created) to be used. There are various syntax forms that declare variables (aka, "identifiers"), and each form has different implied behaviors.
 
@@ -297,7 +297,7 @@ The `err` is a block-scoped variable that exists only inside the `catch` clause,
 
 The word "function" has a variety of meanings in programming. For example, in the world of Functional Programming, "function" has a precise mathematical definition and implies a strict set of rules to abide by.
 
-In JS, we should consider "function" to take the broader meaning of another related term: "procedure". A procedure is a collection of statements that can be invoked one or more times, may be provided some inputs, and may give back one or more outputs.
+In JS, we should consider "function" to take the broader meaning of another related term: "procedure." A procedure is a collection of statements that can be invoked one or more times, may be provided some inputs, and may give back one or more outputs.
 
 In earlier days of JS, the way to define a function looked like this:
 
@@ -323,7 +323,7 @@ var awesomeFunction = function(coolThings) {
 
 This function is an expression that is assigned to the variable `awesomeFunction`. Different from the function declaration form, a function expression is not associated with its identifier until that statement during runtime.
 
-It's extremely important to note that in JS, functions are values that can be assigned (as shown in this snippet) and passed around. In fact, JS functions are a special type of the object value type. Not all languages treat functions as values, but it's essential for a language to support the Functional Programming pattern, as JS does.
+It's extremely important to note that in JS, functions are values that can be assigned (as shown in this snippet) and passed around. In fact, JS functions are a special type of the object value type. Not all languages treat functions as values, but it's essential for a language to support the functional programming pattern, as JS does.
 
 JS functions can receive parameter input:
 
@@ -374,7 +374,7 @@ whatToSay.greeting();
 
 In this snippet, references to three functions (`greeting()`, `question()`, and `answer()`) are included in the object held by `whatToSay`. Each function can be called by accessing the property to retrieve the function reference value. Compare this straightforward style of defining functions on an object to the more sophisticated `class` syntax discussed later in this chapter.
 
-There are many varied forms that `function`s take in JS. We dig into these variations in Appendix A, "So Many Function Forms".
+There are many varied forms that `function`s take in JS. We dig into these variations in Appendix A, "So Many Function Forms."
 
 ## Comparisons
 
@@ -382,11 +382,11 @@ Making decisions in programs requires comparing values to determine their identi
 
 ### Equal...ish
 
-The most common comparison in JS programs asks the question, "is this X value *the same as* that Y value?" What exactly does "the same as" really mean to JS, though?
+The most common comparison in JS programs asks the question, "Is this X value *the same as* that Y value?" What exactly does "the same as" really mean to JS, though?
 
-For ergonomic and historical reasons, the meaning is more complicated than the obvious *exact identity* sort of matching. Sometimes an equality comparison intends *exact* matching, but other times the desired comparison is a bit broader, allowing *closely similar* or *interchangable* matching. In other words, we must be aware of the nuanced differences between an **equality** comparison and an **equivalence** comparison.
+For ergonomic and historical reasons, the meaning is more complicated than the obvious *exact identity* sort of matching. Sometimes an equality comparison intends *exact* matching, but other times the desired comparison is a bit broader, allowing *closely similar* or *interchangeable* matching. In other words, we must be aware of the nuanced differences between an **equality** comparison and an **equivalence** comparison.
 
-If you've spent any time working with and reading about JS, you've certainly seen the so called "triple-equals" `===` operator, also described as the "strict equality" operator. That seems rather straight forward, right? Surely, "strict" means strict, as in narrow and *exact*.
+If you've spent any time working with and reading about JS, you've certainly seen the so-called "triple-equals" `===` operator, also described as the "strict equality" operator. That seems rather straightforward, right? Surely, "strict" means strict, as in narrow and *exact*.
 
 Not *exact*ly.
 
@@ -408,7 +408,7 @@ null === undefined;     // false
 
 | NOTE: |
 | :--- |
-| Another way `===`'s equality comparison is often described is, "checking both the value and the type". In several of the above examples, like `42 === "42"`, the *type* of both values -- number, string, etc -- does seem to be the distinguishing factor. There's more to it than that, though. **All** value comparisons in JS consider the type of the values being compared, not *just* the `===` operator. Specifically, `===` disallows any sort of type conversion (aka, "coercion") in its comparison, where other JS comparisons *do* allow coercion. |
+| Another way `===`'s equality comparison is often described is, "checking both the value and the type". In several of the examples we've looked at so far, like `42 === "42"`, the *type* of both values (number, string, etc.) does seem to be the distinguishing factor. There's more to it than that, though. **All** value comparisons in JS consider the type of the values being compared, not *just* the `===` operator. Specifically, `===` disallows any sort of type conversion (aka, "coercion") in its comparison, where other JS comparisons *do* allow coercion. |
 
 But the `===` operator does have some nuance to it, a fact many JS developers gloss over, to their detriment. The `===` operator is designed to *lie* in two cases of special values: `NaN` and `-0`. Consider:
 
@@ -417,7 +417,7 @@ NaN === NaN;            // false
 0 === -0;               // true
 ```
 
-In the case of `NaN`, the `===` operator *lies* and says that an occurrence of `NaN` is not equal to another `NaN`. In the case of `-0` -- yes, this is a real, distinct value you can use intentionally in your programs! -- the `===` operator *lies* and says it's equal to the regular `0` value.
+In the case of `NaN`, the `===` operator *lies* and says that an occurrence of `NaN` is not equal to another `NaN`. In the case of `-0` (yes, this is a real, distinct value you can use intentionally in your programs!), the `===` operator *lies* and says it's equal to the regular `0` value.
 
 | TIP: |
 | :--- |
@@ -435,7 +435,7 @@ The story gets even more complicated when we consider comparisons of object valu
 
 What's going on here?
 
-It may seem reasonable to assume that an equality check considers the *nature* or *contents* of the value; after all, `42 === 42` considers the actual `42` value and compares it. But when it comes to objects, a content-aware comparison is generally referred to as "structural equality".
+It may seem reasonable to assume that an equality check considers the *nature* or *contents* of the value; after all, `42 === 42` considers the actual `42` value and compares it. But when it comes to objects, a content-aware comparison is generally referred to as "structural equality."
 
 JS does not define `===` as *structural equality* for object values. Instead, `===` uses *identity equality* for object values.
 
@@ -472,7 +472,7 @@ From what I can tell, most of this frustration comes from a pretty short list of
 
 The `==` operator performs an equality comparison similarly to how the `===` performs it. In fact, both operators consider the type of the values being compared. And if the comparison is between the same value type, both `==` and `===` **do exactly the same thing, no difference whatsoever.**
 
-If the value types being compared are different, the `==` differs from `===` in that it allows coercion before the comparison. In other words, they both want to compare values of like types, but `==` allows type conversions *first*, and once the types have been converted to be the same on both sides, then `==` does the same thing as `===`. Instead of "loose equality", the `==` operator should be described as "coercive equality".
+If the value types being compared are different, the `==` differs from `===` in that it allows coercion before the comparison. In other words, they both want to compare values of like types, but `==` allows type conversions *first*, and once the types have been converted to be the same on both sides, then `==` does the same thing as `===`. Instead of "loose equality," the `==` operator should be described as "coercive equality."
 
 Consider:
 
@@ -483,7 +483,7 @@ Consider:
 
 In both comparisons, the value types are different, so the `==` causes the non-number values (`"42"` and `true`) to be converted to numbers (`42` and `1`, respectively) before the comparisons are made.
 
-Just being aware of this nature of `==` -- that it prefers primitive and numeric comparisons -- helps you avoid most of the troublesome corner cases, such as staying away from a gotchas like `"" == 0` or `0 == false`.
+Just being aware of this nature of `==`—that it prefers primitive and numeric comparisons—helps you avoid most of the troublesome corner cases, such as staying away from a gotchas like `"" == 0` or `0 == false`.
 
 You may be thinking, "Oh, well, I will always just avoid any coercive equality comparison (using `===` instead) to avoid those corner cases"! Eh, sorry, that's not quite as likely as you would hope.
 
@@ -515,9 +515,9 @@ There's no way to get these relational operators to avoid coercion, other than t
 
 The wiser approach is not to avoid coercive comparisons, but to embrace and learn their ins and outs.
 
-Coercive comparisons crop up in other places in JS, such as conditionals (`if`, etc), which we'll revisit in Appendix A, "Coercive Conditional Comparison".
+Coercive comparisons crop up in other places in JS, such as conditionals (`if`, etc.), which we'll revisit in Appendix A, "Coercive Conditional Comparison."
 
-## How We Organize In JS
+## How We Organize in JS
 
 Two major patterns for organizing code (data and behavior) are used broadly across the JS ecosystem: classes and modules. These patterns are not mutually exclusive; many programs can and do use both. Other programs will stick with just one pattern, or even neither!
 
@@ -525,9 +525,9 @@ In some respects, these patterns are very different. But interestingly, in other
 
 ### Classes
 
-The terms "object oriented", "class oriented" and "classes" are all very loaded full of detail and nuance; they're not universal in definition.
+The terms "object-oriented," "class-oriented," and "classes" are all very loaded full of detail and nuance; they're not universal in definition.
 
-We will use a common and somewhat traditional definition here, the one most likely familiar to those with backgrounds in "object oriented" languages like C++ and Java.
+We will use a common and somewhat traditional definition here, the one most likely familiar to those with backgrounds in "object-oriented" languages like C++ and Java.
 
 A class in a program is a definition of a "type" of custom data structure that includes both data and behaviors that operate on that data. Classes define how such a data structure works, but classes are not themselves concrete values. To get a concrete value that you can use in the program, a class must be *instantiated* (with the `new` keyword) one or more times.
 
@@ -571,7 +571,7 @@ mathNotes.print();
 
 In the `Page` class, the data is a string of text stored in a `this.text` member property. The behavior is `print()`, a method that dumps the text to the console.
 
-For the `Notebook` class, the data is an array of `Page` instances. The behavior is `addPage(..)`, a method that instantiates new `Page` pages and adds them to the list, as well as `print()` which prints out all the pages in the notebook.
+For the `Notebook` class, the data is an array of `Page` instances. The behavior is `addPage(..)`, a method that instantiates new `Page` pages and adds them to the list, as well as `print()` (which prints out all the pages in the notebook).
 
 The statement `mathNotes = new Notebook()` creates an instance of the `Notebook` class, and `page = new Page(text)` is where instances of the `Page` class are created.
 
@@ -581,7 +581,7 @@ The `class` mechanism allows packaging data (`text` and `pages`) to be organized
 
 #### Class Inheritance
 
-Another aspect inherent to traditional "class oriented" design, though a bit less commonly used in JS, is "inheritance" (and "polymorphism"). Consider:
+Another aspect inherent to traditional "class-oriented" design, though a bit less commonly used in JS, is "inheritance" (and "polymorphism"). Consider:
 
 ```js
 class Publication {
@@ -748,9 +748,9 @@ Comparing these forms to the `class` forms, there are more similarities than dif
 
 The `class` form stores methods and data on an object instance, which must be accessed with the `this.` prefix. With modules, the methods and data are accessed as identifier variables in scope, without any `this.` prefix.
 
-With `class`, the "API" of an instance is implicit in the class definition -- also, all data and methods are public. With the module factory function, you explicitly create and return an object with any publicly exposed methods, and any data or other unreferenced methods remain private inside the factory function.
+With `class`, the "API" of an instance is implicit in the class definition—also, all data and methods are public. With the module factory function, you explicitly create and return an object with any publicly exposed methods, and any data or other unreferenced methods remain private inside the factory function.
 
-There are other variations to this factory function form that are quite common across JS, even in 2019; you may run across these forms in different JS programs: AMD ("Asynchronous Module Definition"), UMD ("Universal Module Definition"), and CommonJS (classic Node.js style modules). The variations, however, are minor (yet not quite compatible). Still, all of these forms rely on the same basic principles.
+There are other variations to this factory function form that are quite common across JS, even in 2019; you may run across these forms in different JS programs: AMD (Asynchronous Module Definition), UMD (Universal Module Definition), and CommonJS (classic Node.js-style modules). The variations, however, are minor (yet not quite compatible). Still, all of these forms rely on the same basic principles.
 
 Consider also the usage (aka, "instantiation") of these module factory functions:
 
@@ -788,15 +788,15 @@ The only observable difference here is the lack of using `new`, calling the modu
 
 #### ES Modules
 
-ES modules (ESM), introduced to the JS language in ES6, are meant to serve much the same spirit and purpose as the existing *classic modules* just described, especially taking into account important variations and use-cases from AMD, UMD, and CommonJS.
+ES modules (ESM), introduced to the JS language in ES6, are meant to serve much the same spirit and purpose as the existing *classic modules* just described, especially taking into account important variations and use cases from AMD, UMD, and CommonJS.
 
-The implementation approach does however differ significantly.
+The implementation approach does, however, differ significantly.
 
 First, there's no wrapping function to *define* a module. The wrapping context is a file. ESMs are always file-based; one file, one module.
 
 Second, you don't interact with a module's "API" explicitly, but rather use the `export` keyword to add a variable or method to its public API definition. If something is defined in a module but not `export`ed, then it stays hidden (just as with *classic modules*).
 
-Third, and maybe most noticeably different from previously discussed patterns, you don't "instantiate" an ES module, you just `import` it to use its single instance. ESMs are, in effect, "singletons", in that there's only one instance ever created, at first `import` in your program, and all other `import`s just receive a reference to that same single instance. If your module needs to support multiple instantiations, you have to provide a *classic module* style factory function on your ESM definition for that purpose.
+Third, and maybe most noticeably different from previously discussed patterns, you don't "instantiate" an ES module, you just `import` it to use its single instance. ESMs are, in effect, "singletons," in that there's only one instance ever created, at first `import` in your program, and all other `import`s just receive a reference to that same single instance. If your module needs to support multiple instantiations, you have to provide a *classic module-style* factory function on your ESM definition for that purpose.
 
 In our running example, we do assume multiple-instantiation, so these following snippets will mix both ESM and *classic modules*:.
 
@@ -866,7 +866,7 @@ forAgainstLet.print();
 
 | NOTE: |
 | :--- |
-| The `as createBlogPost` clause in the `import` statement above is optional; if omitted, a top level function just named `create(..)` would be imported. In this case, I'm renaming it for readability sake; its more generic factory name of `create(..)` becomes more semantically descriptive of its purpose as `createBlogPost(..)`. |
+| The `as createBlogPost` clause in the `import` statement is optional; if omitted, a top-level function just named `create(..)` would be imported. In this case, I'm renaming it for readability sake; its more generic factory name of `create(..)` becomes more semantically descriptive of its purpose as `createBlogPost(..)`. |
 
 As shown, ES modules can use *classic modules* internally if they need to support multiple-instantiation. Alternatively, we could have exposed a `class` from our module instead of a `create(..)` factory function, with generally the same outcome. However, since you're already using ESM at that point, I'd recommend sticking with *classic modules* instead of `class`.
 
