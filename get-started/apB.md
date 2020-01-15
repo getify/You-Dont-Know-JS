@@ -155,7 +155,7 @@ function scheduleMeeting(startTime,durationMinutes) {
         let meetingEndHour = Number(meetingStartHour) + durationHours;
         let meetingEndMinutes = Number(meetingStartMinutes) + durationMinutes;
 
-        if (meetingEndMinutes > 60) {
+        if (meetingEndMinutes >= 60) {
             meetingEndHour = meetingEndHour + 1;
             meetingEndMinutes = meetingEndMinutes - 60;
         }
