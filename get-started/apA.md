@@ -109,7 +109,7 @@ In my opinion, if a function exists in your program, it has a purpose; otherwise
 
 If a function has a name, you the code author should include that name in the code, so that the reader does not have to infer that name from reading and mentally executing that function's source code. Even a trivial function body like `x * 2` has to be read to infer a name like "double" or "multBy2"; that brief extra mental work is unnecessary when you could just take a second to name the function "double" or "multBy2" *once*, saving the reader that repeated mental work every time it's read in the future.
 
-There are, regrettably in some respects, many other function definition forms in JS as of late 2019 (maybe more in the future!).
+There are, regrettably in some respects, many other function definition forms in JS as of early 2020 (maybe more in the future!).
 
 Here are some more declaration forms:
 
@@ -255,7 +255,7 @@ You just can't get away from coercions in JS comparisons. Buckle down and learn 
 
 In Chapter 3, we introduced prototypes and showed how we can link objects through a prototype chain.
 
-Another way of wiring up such prototype linkages served as the (honestly, ugly) predecessor to the elegance of the ES6 `class` system (see Chapter 2), and is referred to as prototypal classes.
+Another way of wiring up such prototype linkages served as the (honestly, ugly) predecessor to the elegance of the ES6 `class` system (see Chapter 2, "Classes"), and is referred to as prototypal classes.
 
 | TIP: |
 | :--- |

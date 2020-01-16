@@ -18,5 +18,6 @@ So, do your future self a favor and dig into this book and unlock the knowledge 
 Because, as I found out myself, you probably don't know JavaScript (yet).
 
 Brian Holt<br>
-Senior Program Manager on Visual Studio Code and Node.js on Azure<br>
+Senior Program Manager<br>
+Visual Studio Code and Node.js on Azure<br>
 Microsoft

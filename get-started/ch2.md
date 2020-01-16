@@ -462,7 +462,7 @@ But beware, it's more complicated than you'll assume. For example, how might you
 
 ### Coercive Comparisons
 
-As mentioned earlier, coercion means a value of one type being converted to its respective representation in another type (to whatever extent possible). As we'll discuss in Chapter 4, coercion is a core pillar of the JS language, not some optional feature that can reasonably be avoided.
+Coercion means a value of one type being converted to its respective representation in another type (to whatever extent possible). As we'll discuss in Chapter 4, coercion is a core pillar of the JS language, not some optional feature that can reasonably be avoided.
 
 But where coercion meets comparison operators (like equality), confusion and frustration unfortunately crop up more often than not.
 
@@ -750,7 +750,7 @@ The `class` form stores methods and data on an object instance, which must be ac
 
 With `class`, the "API" of an instance is implicit in the class definition—also, all data and methods are public. With the module factory function, you explicitly create and return an object with any publicly exposed methods, and any data or other unreferenced methods remain private inside the factory function.
 
-There are other variations to this factory function form that are quite common across JS, even in 2019; you may run across these forms in different JS programs: AMD (Asynchronous Module Definition), UMD (Universal Module Definition), and CommonJS (classic Node.js-style modules). The variations, however, are minor (yet not quite compatible). Still, all of these forms rely on the same basic principles.
+There are other variations to this factory function form that are quite common across JS, even in 2020; you may run across these forms in different JS programs: AMD (Asynchronous Module Definition), UMD (Universal Module Definition), and CommonJS (classic Node.js-style modules). The variations, however, are minor (yet not quite compatible). Still, all of these forms rely on the same basic principles.
 
 Consider also the usage (aka, "instantiation") of these module factory functions:
 

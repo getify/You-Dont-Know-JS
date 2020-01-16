@@ -95,7 +95,7 @@ In these cases, often TC39 will backtrack and simply choose to conform the speci
 
 But occasionally, TC39 will decide the specification should stick firm on some point even though it is unlikely that browser-based JS engines will ever conform.
 
-The solution? Appendix B, "Additional ECMAScript Features for Web Browsers" (as of the time of writing, here's the ES2019 Appendix B: https://www.ecma-international.org/ecma-262/10.0/#sec-additional-ecmascript-features-for-web-browsers). The JS specification includes this appendix to detail out any known mismatches between the official JS specification and the reality of JS on the web. In other words, these are exceptions that are allowed *only* for web JS; other JS environments must stick to the letter of the law.
+The solution? Appendix B, "Additional ECMAScript Features for Web Browsers".[^specApB] The JS specification includes this appendix to detail out any known mismatches between the official JS specification and the reality of JS on the web. In other words, these are exceptions that are allowed *only* for web JS; other JS environments must stick to the letter of the law.
 
 Section B.1 and B.2 cover *additions* to JS (syntax and APIs) that web JS includes, again for historical reasons, but which TC39 does not plan to formally specify in the core of JS. Examples include `0`-prefixed octal literals, the global `escape(..)` / `unescape(..)` utilities, String "helpers" like `anchor(..)` and `blink()`, and the RegExp `compile(..)` method.
 
@@ -145,7 +145,7 @@ But I'll just hint at some examples of quirks that have been true at various poi
 
 * How non-strict mode `this` default-binding works for function calls, and whether the "global object" used will contain expected global variables.
 
-* How hoisting (see "Scope & Closures," Chapter 3) works across multiple line entries.
+* How hoisting (see Book 2, *Scope & Closures*) works across multiple line entries.
 
 * ...several others
 
@@ -247,7 +247,7 @@ The original snippet relied on `let` to create block-scoped `x` variables in bot
 
 | NOTE: |
 | :--- |
-| The `let` keyword was added in ES6 (in 2015). The preceding example of transpiling would only need to apply if an application needed to run in a pre-ES6 supporting JS environment. The example here is just for simplicity of illustration. When ES6 was new, the need for such a transpilation was quite prevalent, but in 2019 it's much less common to need to support pre-ES6 environments. The "target" used for transpiliation is thus a sliding window that shifts upward only as decisions are made for a site/application to stop supporting some old browser/engine. |
+| The `let` keyword was added in ES6 (in 2015). The preceding example of transpiling would only need to apply if an application needed to run in a pre-ES6 supporting JS environment. The example here is just for simplicity of illustration. When ES6 was new, the need for such a transpilation was quite prevalent, but in 2020 it's much less common to need to support pre-ES6 environments. The "target" used for transpiliation is thus a sliding window that shifts upward only as decisions are made for a site/application to stop supporting some old browser/engine. |
 
 You may wonder: why go to the trouble of using a tool to convert from a newer syntax version to an older one? Couldn't we just write the two variables and skip using the `let` keyword? The reason is, it's strongly recommended that developers use the latest version of JS so that their code is clean and communicates its ideas most effectively.
 
@@ -474,3 +474,5 @@ JS is a multi-paradigm language, meaning the syntax and capabilities allow a dev
 JS is a compiled language, meaning the tools (including the JS engine) process and verify a program (reporting any errors!) before it executes.
 
 With our language now *defined*, let's start getting to know its ins and outs.
+
+[^specApB]: ECMAScript 2019 Language Specification, Appendix B: Additional ECMAScript Features for Web Browsers, https://www.ecma-international.org/ecma-262/10.0/#sec-additional-ecmascript-features-for-web-browsers (latest as of time of this writing in January 2020)

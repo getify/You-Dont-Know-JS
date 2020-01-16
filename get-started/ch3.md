@@ -261,7 +261,7 @@ Remember: this closure is not over the value (like `1` or `3`), but over the var
 
 Closure is one of the most prevalent and important programming patterns in any language. But that's especially true of JS; it's hard to imagine doing anything useful without leveraging closure in one way or another.
 
-If you're still feeling unclear or shaky about closure, the majority of "Scope & Closures" (Book 2 of this series) is focused on the topic.
+If you're still feeling unclear or shaky about closure, the majority of Book 2, *Scope & Closures* is focused on the topic.
 
 ## `this` Keyword
 

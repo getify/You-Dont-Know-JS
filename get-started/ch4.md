@@ -37,7 +37,7 @@ The second pillar of the language is the prototypes system. We covered this topi
 
 JS is one of very few languages where you have the option to create objects directly and explicitly, without first defining their structure in a class.
 
-For many years, people implemented the class design pattern on top of prototypes—so-called "prototypal inheritance" (see Appendix A)—and then with the advent of ES6's `class` keyword, the language doubled-down on its inclination toward OO/class-style programming.
+For many years, people implemented the class design pattern on top of prototypes—so-called "prototypal inheritance" (see Appendix A, "Prototypal 'Classes'")—and then with the advent of ES6's `class` keyword, the language doubled-down on its inclination toward OO/class-style programming.
 
 But I think that focus has obscured the beauty and power of the prototype system: the ability for two objects to simply connect with each other and cooperate dynamically (during function/method execution) through sharing a `this` context.
 
@@ -119,7 +119,7 @@ My suggestion for most readers is to proceed through this series in this order:
 
 That's the intended order to read this book series.
 
-However, books 2, 3, and 4 can generally be read in any order, depending on which topic you feel most curious about and comfortable exploring first. But I don't recommend you skip any of these three books—not even *Types & Grammar*, as some of you will be tempted to do!—even if you think you already have that topic down.
+However, Books 2, 3, and 4 can generally be read in any order, depending on which topic you feel most curious about and comfortable exploring first. But I don't recommend you skip any of these three books—not even *Types & Grammar*, as some of you will be tempted to do!—even if you think you already have that topic down.
 
 Book 5 (*Sync & Async*) is crucial for deeply understanding JS, but if you start digging in and find it's too intimidating, this book can be deferred until you're more experienced with the language. The more JS you've written (and struggled with!), the more you'll come to appreciate this book. So don't be afraid to come back to it at a later time.
 
