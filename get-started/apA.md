@@ -276,7 +276,7 @@ mathClass.welcome();
 // Welcome, students!
 ```
 
-Here, a `mathClass` object is linked via its prototype to a `Classroom` object. Through this link, the `mathClass.welcome()` function call is delegated to the method defined on `Classroom`.
+Here, a `mathClass` object is linked via its prototype to a `Classroom` object. Through this linkage, the function call `mathClass.welcome()` is delegated to the method defined on `Classroom`.
 
 The prototypal class pattern would have labeled this delegation behavior "inheritance," and alternatively have defined it (with the same behavior) as:
 
@@ -297,11 +297,11 @@ mathClass.welcome();
 
 All functions by default reference an empty object at a property named `prototype`. Despite the confusing naming, this is **not** the function's *prototype* (where the function is prototype linked to), but rather the prototype object to *link to* when other objects are created by calling the function with `new`.
 
-We add a `welcome` property to that empty `Classroom.prototype` object, pointing at a `hello()` function.
+We add a `welcome` property on that empty object (called `Classroom.prototype`), pointing at the `hello()` function.
 
 Then `new Classroom()` creates a new object (assigned to `mathClass`), and prototype links it to the existing `Classroom.prototype` object.
 
-Though `mathClass` does not have a `welcome()` property/function, it successfully delegates to `Classroom.prototype.welcome()`.
+Though `mathClass` does not have a `welcome()` property/function, it successfully delegates to the function `Classroom.prototype.welcome()`.
 
 This "prototypal class" pattern is now strongly discouraged, in favor of using ES6's `class` mechanism:
 

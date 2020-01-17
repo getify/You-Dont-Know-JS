@@ -33,7 +33,7 @@ The only way multiple standalone .js files act as a single program is by sharing
 
 Since ES6, JS has also supported a module format in addition to the typical standalone JS program format. Modules are also file-based. If a file is loaded via module-loading mechanism such as an `import` statement or a `<script type=module>` tag, all its code is treated as a single module.
 
-Though you wouldn't typically think about a module—basically, a collection of state and publicly exposed methods to operate on that state—as a standalone program, JS does in fact still treat each module separately. Similar to how "global scope" allows standalone files to mix together at runtime, importing a module into another allows runtime interoperation between them.
+Though you wouldn't typically think about a module—a collection of state and publicly exposed methods to operate on that state—as a standalone program, JS does in fact still treat each module separately. Similar to how "global scope" allows standalone files to mix together at runtime, importing a module into another allows runtime interoperation between them.
 
 Regardless of which code organization pattern (and loading mechanism) is used for a file (standalone or module), you should still think of each file as its own (mini) program, which may then cooperate with other (mini) programs to perform the functions of your overall application.
 
@@ -70,7 +70,9 @@ Assuming this program has already defined a variable `firstName` with the string
 The back-tick `` ` ``-delimited string can be used without including interpolated expressions, but that defeats the whole purpose of that alternate string literal syntax:
 
 ```js
-console.log(`Am I confusing you by omitting interpolation?`);
+console.log(
+    `Am I confusing you by omitting interpolation?`
+);
 // Am I confusing you by omitting interpolation?
 ```
 
@@ -167,10 +169,10 @@ typeof 42;                  // "number"
 typeof "abc";               // "string"
 typeof true;                // "boolean"
 typeof undefined;           // "undefined"
-typeof null;                // "object" -- oops, JS bug!
+typeof null;                // "object" -- oops, bug!
 typeof { "a": 1 };          // "object"
 typeof [1,2,3];             // "object"
-typeof function Hello(){};  // "function"
+typeof function hello(){};  // "function"
 ```
 
 | WARNING: |
@@ -252,7 +254,9 @@ The `myBirthday` constant is not allowed to be re-assigned.
 `const` declared variables are not "unchangeable", they just cannot be re-assigned. It's ill-advised to use `const` with object values, because those values can still be changed even though the variable can't be re-assigned. This leads to potential confusion down the line, so I think it's wise to avoid situations like:
 
 ```js
-const actors = [ "Morgan Freeman", "Jennifer Aniston" ];
+const actors = [
+    "Morgan Freeman", "Jennifer Aniston"
+];
 
 actors[2] = "Tom Cruise";   // OK :(
 
@@ -620,7 +624,7 @@ class Book extends Publication {
     print() {
         super.print();
         console.log(`
-            Published By: ${ this.publisher }
+            Publisher: ${ this.publisher }
             ISBN: ${ this.ISBN }
         `);
     }
@@ -648,7 +652,7 @@ var YDKJS = new Book({
     title: "You Don't Know JS",
     author: "Kyle Simpson",
     publishedOn: "June 2014",
-    publisher: "O'reilly",
+    publisher: "O'Reilly",
     ISBN: "123456-789"
 });
 
@@ -656,7 +660,7 @@ YDKJS.print();
 // Title: You Don't Know JS
 // By: Kyle Simpson
 // June 2014
-// Published By: O'reilly
+// Publisher: O'Reilly
 // ISBN: 123456-789
 
 var forAgainstLet = new BlogPost(
@@ -721,7 +725,7 @@ function Book(bookDetails) {
         print() {
             pub.print();
             console.log(`
-                Published By: ${ bookDetails.publisher }
+                Publisher: ${ bookDetails.publisher }
                 ISBN: ${ bookDetails.ISBN }
             `);
         }
@@ -759,7 +763,7 @@ var YDKJS = Book({
     title: "You Don't Know JS",
     author: "Kyle Simpson",
     publishedOn: "June 2014",
-    publisher: "O'reilly",
+    publisher: "O'Reilly",
     ISBN: "123456-789"
 });
 
@@ -767,7 +771,7 @@ YDKJS.print();
 // Title: You Don't Know JS
 // By: Kyle Simpson
 // June 2014
-// Published By: O'reilly
+// Publisher: O'Reilly
 // ISBN: 123456-789
 
 var forAgainstLet = BlogPost(
@@ -848,9 +852,9 @@ export function create(title,author,pubDate,URL) {
 And finally, to use this module, we import into another ES module like `main.js`:
 
 ```js
-import { create as createBlogPost } from "blogpost.js";
+import { create as newBlogPost } from "blogpost.js";
 
-var forAgainstLet = createBlogPost(
+var forAgainstLet = newBlogPost(
     "For and against let",
     "Kyle Simpson",
     "October 27, 2014",
@@ -866,7 +870,7 @@ forAgainstLet.print();
 
 | NOTE: |
 | :--- |
-| The `as createBlogPost` clause in the `import` statement is optional; if omitted, a top-level function just named `create(..)` would be imported. In this case, I'm renaming it for readability sake; its more generic factory name of `create(..)` becomes more semantically descriptive of its purpose as `createBlogPost(..)`. |
+| The `as newBlogPost` clause in the `import` statement is optional; if omitted, a top-level function just named `create(..)` would be imported. In this case, I'm renaming it for readability sake; its more generic factory name of `create(..)` becomes more semantically descriptive of its purpose as `newBlogPost(..)`. |
 
 As shown, ES modules can use *classic modules* internally if they need to support multiple-instantiation. Alternatively, we could have exposed a `class` from our module instead of a `create(..)` factory function, with generally the same outcome. However, since you're already using ESM at that point, I'd recommend sticking with *classic modules* instead of `class`.
 

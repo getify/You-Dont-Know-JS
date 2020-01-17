@@ -73,10 +73,14 @@ function randMax(max) {
 }
 
 var reel = {
-    symbols: [ "♠", "♥", "♦", "♣", "☺", "★", "☾", "☀" ],
+    symbols: [
+        "♠", "♥", "♦", "♣", "☺", "★", "☾", "☀"
+    ],
     spin() {
         if (this.position == null) {
-            this.position = randMax(this.symbols.length - 1);
+            this.position = randMax(
+                this.symbols.length - 1
+            );
         }
         this.position = (
             this.position + 100 + randMax(100)
@@ -84,7 +88,9 @@ var reel = {
     },
     display() {
         if (this.position == null) {
-            this.position = randMax(this.symbols.length - 1);
+            this.position = randMax(
+                this.symbols.length - 1
+            );
         }
         return this.symbols[this.position];
     }
@@ -150,14 +156,20 @@ function scheduleMeeting(startTime,durationMinutes) {
         typeof meetingStartHour == "string" &&
         typeof meetingStartMinutes == "string"
     ) {
-        let durationHours = Math.floor(durationMinutes / 60);
-        durationMinutes = durationMinutes - (durationHours * 60);
-        let meetingEndHour = Number(meetingStartHour) + durationHours;
-        let meetingEndMinutes = Number(meetingStartMinutes) + durationMinutes;
+        let durationHours =
+            Math.floor(durationMinutes / 60);
+        durationMinutes =
+            durationMinutes - (durationHours * 60);
+        let meetingEndHour =
+            Number(meetingStartHour) + durationHours;
+        let meetingEndMinutes =
+            Number(meetingStartMinutes) +
+            durationMinutes;
 
         if (meetingEndMinutes >= 60) {
             meetingEndHour = meetingEndHour + 1;
-            meetingEndMinutes = meetingEndMinutes - 60;
+            meetingEndMinutes =
+                meetingEndMinutes - 60;
         }
 
         // re-compose fully-qualified time strings
@@ -174,7 +186,7 @@ function scheduleMeeting(startTime,durationMinutes) {
         }`;
 
         // NOTE: since expressions are all strings,
-        // comparisons here are alphabetic, but that's
+        // comparisons here are alphabetic, but it's
         // safe here since they're fully qualified
         // time strings (ie, "07:15" < "07:30")
         return (
@@ -245,10 +257,14 @@ function randMax(max) {
 }
 
 var reel = {
-    symbols: [ "♠", "♥", "♦", "♣", "☺", "★", "☾", "☀" ],
+    symbols: [
+        "♠", "♥", "♦", "♣", "☺", "★", "☾", "☀"
+    ],
     spin() {
         if (this.position == null) {
-            this.position = randMax(this.symbols.length - 1);
+            this.position = randMax(
+                this.symbols.length - 1
+            );
         }
         this.position = (
             this.position + 100 + randMax(100)
@@ -256,7 +272,9 @@ var reel = {
     },
     display() {
         if (this.position == null) {
-            this.position = randMax(this.symbols.length - 1);
+            this.position = randMax(
+                this.symbols.length - 1
+            );
         }
         return this.symbols[this.position];
     }
@@ -277,14 +295,20 @@ var slotMachine = {
         var lines = [];
 
         // display all 3 lines on the slot machine
-        for (let linePos = -1; linePos <= 1; linePos++) {
-            let line = this.reels.map(function getSlot(reel){
-                var slot = Object.create(reel);
-                slot.position = (
-                    reel.symbols.length + reel.position + linePos
-                ) % reel.symbols.length;
-                return reel.display.call(slot);
-            });
+        for (
+            let linePos = -1; linePos <= 1; linePos++
+        ) {
+            let line = this.reels.map(
+                function getSlot(reel){
+                    var slot = Object.create(reel);
+                    slot.position = (
+                        reel.symbols.length +
+                        reel.position +
+                        linePos
+                    ) % reel.symbols.length;
+                    return reel.display.call(slot);
+                }
+            );
             lines.push(line.join(" | "));
         }
 

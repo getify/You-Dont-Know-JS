@@ -235,12 +235,14 @@ Closure is most common when working with asynchronous code, such as with callbac
 ```js
 function getSomeData(url) {
     ajax(url,function onResponse(resp){
-        console.log(`Response (from ${ url }): ${ resp }`);
+        console.log(
+            `Response (from ${ url }): ${ resp }`
+        );
     });
 }
 
 getSomeData("https://some.url/wherever");
-// Response (from https://some.url/wherever): ..whatever..
+// Response (from https://some.url/wherever): ...
 ```
 
 The inner function `onResponse(..)` is closed over `url`, and thus preserves and remembers it until the Ajax call returns and executes `onResponse(..)`. Even though `getSomeData(..)` finishes right away, the `url` parameter variable is kept alive in the closure for as long as needed.
@@ -249,7 +251,7 @@ It's not necessary that the outer scope be a function—it usually is, but not a
 
 ```js
 for (let [idx,btn] of buttons.entries()) {
-    btn.addEventListener("click",function onClick(evt){
+    btn.addEventListener("click",function onClick(){
        console.log(`Clicked on button (${ idx })!`);
     });
 }
@@ -283,7 +285,7 @@ Consider:
 function classroom(teacher) {
     return function study() {
         console.log(
-            `${ teacher } wants you to study ${ this.topic }`
+            `${ teacher } says to study ${ this.topic }`
         );
     };
 }
@@ -297,11 +299,11 @@ The outer `classroom(..)` function makes no reference to a `this` keyword, so it
 | :--- |
 | `study()` is also closed over the `teacher` variable from its outer scope. |
 
-The inner `study()` function is returned from `classroom("Kyle")` and assigned to a variable called `assignment`. So how can `assignment()` (aka `study()`) be called?
+The inner `study()` function returned by `classroom("Kyle")` is assigned to a variable called `assignment`. So how can `assignment()` (aka `study()`) be called?
 
 ```js
 assignment();
-// Kyle wants you to study undefined  -- Oops :(
+// Kyle says to study undefined  -- Oops :(
 ```
 
 In this snippet, we call `assignment()` as a plain, normal function, without providing it any *execution context*.
@@ -317,7 +319,7 @@ var homework = {
 };
 
 homework.assignment();
-// Kyle wants you to study JS
+// Kyle says to study JS
 ```
 
 A copy of the `assignment` function reference is set as a property on the `homework` object, and then it's called as `homework.assignment()`. That means the `this` for that function call will be the `homework` object. Hence, `this.topic` resolves to `"JS"`.
@@ -330,10 +332,10 @@ var otherHomework = {
 };
 
 assignment.call(otherHomework);
-// Kyle wants you to study Math
+// Kyle says to study Math
 ```
 
-A third way to invoke a function is with the `call(..)` method, which takes an object (`otherHomework` here) to use for setting the `this` reference for the function call. `this.topic` thus resolves to `"Math"`.
+A third way to invoke a function is with the `call(..)` method, which takes an object (`otherHomework` here) to use for setting the `this` reference for the function call. `this.topic` resolves to `"Math"`.
 
 The same context-aware function invoked three different ways, gives different answers each time for what object `this` will reference.
 
@@ -463,7 +465,7 @@ The two objects `jsHomework` and `mathHomework` each prototype link to the singl
     <br><br>
 </figure>
 
-`jsHomework.study()` delegates to `homework.study()`, but its `this` (in `this.topic`) for that execution resolves to `jsHomework` because of how the function is called, so `this.topic` is `"JS"`. Similarly for `mathHomework.study()` delegating to `homework.study()` but still resolving `this` to `mathHomework`, and thus `this.topic` as `"Math"`.
+`jsHomework.study()` delegates to `homework.study()`, but its `this` (`this.topic`) for that execution resolves to `jsHomework` because of how the function is called, so `this.topic` is `"JS"`. Similarly for `mathHomework.study()` delegating to `homework.study()` but still resolving `this` to `mathHomework`, and thus `this.topic` as `"Math"`.
 
 The preceding code snippet would be far less useful if `this` was resolved to `homework`. Yet, in many other languages, it would seem `this` would be `homework` because the `study()` method is indeed defined on `homework`.
 
