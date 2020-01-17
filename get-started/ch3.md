@@ -335,7 +335,7 @@ assignment.call(otherHomework);
 // Kyle says to study Math
 ```
 
-A third way to invoke a function is with the `call(..)` method, which takes an object (`otherHomework` here) to use for setting the `this` reference for the function call. `this.topic` resolves to `"Math"`.
+A third way to invoke a function is with the `call(..)` method, which takes an object (`otherHomework` here) to use for setting the `this` reference for the function call. The property reference `this.topic` resolves to `"Math"`.
 
 The same context-aware function invoked three different ways, gives different answers each time for what object `this` will reference.
 

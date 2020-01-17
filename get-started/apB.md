@@ -207,6 +207,8 @@ scheduleMeeting("17:30",30);    // false
 scheduleMeeting("18:00",15);    // false
 ```
 
+----
+
 Suggested solution for "Closure" (Pillar 1) practice:
 
 ```js
@@ -248,6 +250,8 @@ start3(0);     // []
 
 start4(6);     // [4,5,6]
 ```
+
+----
 
 Suggested solution for "Prototypes" (Pillar 2) practice:
 

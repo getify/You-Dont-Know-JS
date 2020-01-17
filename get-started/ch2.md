@@ -581,7 +581,7 @@ The statement `mathNotes = new Notebook()` creates an instance of the `Notebook`
 
 Behavior (methods) can only be called on instances (not the classes themselves), such as `mathNotes.addPage(..)` and `page.print()`.
 
-The `class` mechanism allows packaging data (`text` and `pages`) to be organized together with their behaviors (`addPage(..)`, `print()`). The same program could have been built without any `class` definitions, but it would likely have been much less organized, harder to read and reason about, and more susceptible to bugs and subpar maintenance.
+The `class` mechanism allows packaging data (`text` and `pages`) to be organized together with their behaviors (e.g., `addPage(..)` and `print()`). The same program could have been built without any `class` definitions, but it would likely have been much less organized, harder to read and reason about, and more susceptible to bugs and subpar maintenance.
 
 #### Class Inheritance
 

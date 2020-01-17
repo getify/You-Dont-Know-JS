@@ -61,7 +61,7 @@ In other words, *good enough to work* is not, and should not be, *good enough*.
 
 All developers regularly struggle with some piece of code not working correctly, and they can't figure out why. But far too often, JS developers will blame this on the language rather than admitting it's their own understanding that is falling short. These books serve as both the question and answer: why did it do *this*, and here's how to get it to do *that* instead.
 
-My mission with YDKJSY is to empower every single JavaScript developer to fully own the JS they write, to understand it and to write with intention and clarity.
+My mission with YDKJSY is to empower every single JS developer to fully own the code they write, to understand it and to write with intention and clarity.
 
 ## The Path
 
