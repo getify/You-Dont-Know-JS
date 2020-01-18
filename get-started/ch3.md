@@ -160,11 +160,11 @@ for (let [idx,val] of arr.entries()) {
 
 For the most part, all built-in iterables in JS have three iterator forms available: keys-only (`keys()`), values-only (`values()`), and entries (`entries()`).
 
+Beyond just using built-in iterables, you can also ensure your own data structures adhere to the iteration protocol; doing so means you opt into the ability to consume your data with `for..of` loops and the `...` operator. "Standardizing" on this protocol means code that is overall more readily recognizable and readable.
+
 | NOTE: |
 | :--- |
-| You may have noticed a nuanced shift that occurred in this discussion. We started by talking about consuming **iterators**, but then switched to talking about iterating over **iterables**. The iteration-consumption protocol expects an *iterable*, but the reason we can provide a direct *iterator* is that an iterator is just an iterable of itself! In other words, when JS tries to create an iterator instance **from something that's already an iterator**, it just returns the iterator. |
-
-Beyond just using built-in iterables, you can also ensure your own data structures adhere to the iteration protocol; doing so means you opt into the ability to consume your data with `for..of` loops and the `...` operator. "Standardizing" on this protocol means code that is overall more readily recognizable and readable.
+| You may have noticed a nuanced shift that occurred in this discussion. We started by talking about consuming **iterators**, but then switched to talking about iterating over **iterables**. The iteration-consumption protocol expects an *iterable*, but the reason we can provide a direct *iterator* is that an iterator is just an iterable of itself! When creating an iterator instance from an existing iterator, the iterator itself is returned. |
 
 ## Closure
 
@@ -172,11 +172,11 @@ Perhaps without realizing it, almost every JS developer has made use of closure.
 
 Yet it feels kind of hidden, almost magical. And it's often talked about in either very abstract or very informal terms, which does little to help us nail down exactly what it is.
 
-It's critical we be able to recognize where closure is used in our programs, as the presence or lack of closure is sometimes the cause of bugs (or even the source of performance impairments).
+We need to be able to recognize where closure is used in programs, as the presence or lack of closure is sometimes the cause of bugs (or even the cause of performance issues).
 
-So can we define closure in a pragmatic way that tries to bring some concrete clarity to the topic?
+So let's define closure in a pragmatic and concrete way:
 
-> Closure is the ability of a function to remember and continue to access variables defined outside its scope, even when that function is executed in a different scope.
+> Closure is when a function remembers and continues to access variables from outside its scope, even when the function is executed in a different scope.
 
 We see two definitional characteristics here. First, closure is part of the nature of a function. Objects don't get closures, functions do. Second, to observe a closure, you must execute a function in a different scope than where that function was originally defined.
 
@@ -247,7 +247,7 @@ getSomeData("https://some.url/wherever");
 
 The inner function `onResponse(..)` is closed over `url`, and thus preserves and remembers it until the Ajax call returns and executes `onResponse(..)`. Even though `getSomeData(..)` finishes right away, the `url` parameter variable is kept alive in the closure for as long as needed.
 
-It's not necessary that the outer scope be a function—it usually is, but not always—just that there be at least one variable in an outer scope than an inner function accesses, and thus closes over.
+It's not necessary that the outer scope be a function—it usually is, but not always—just that there be at least one variable in an outer scope accessed from an inner function:
 
 ```js
 for (let [idx,btn] of buttons.entries()) {
@@ -269,17 +269,15 @@ If you're still feeling unclear or shaky about closure, the majority of Book 2, 
 
 One of JS's most powerful mechanisms is also one of its most misunderstood: the `this` keyword. One common misconception is that a function's `this` refers to the function itself. Because of how `this` works in other languages, another misconception is that `this` points the instance that a method belongs to. Both are incorrect.
 
-As discussed previously, when a function is defined, it is *attached* to its enclosing scope via closure. Scope is the set of rules that controls how references to identifiers (variables) are determined.
+As discussed previously, when a function is defined, it is *attached* to its enclosing scope via closure. Scope is the set of rules that controls how references to variables are resolved.
 
 But functions also have another characteristic besides their scope that influences what they can access. This characteristic is best described as an *execution context*, and it's exposed to the function via its `this` keyword.
 
 Scope is static and contains a fixed set of variables available at the moment and location you define a function, but a function's execution *context* is dynamic, entirely dependent on **how it is called** (regardless of where it is defined or even called from).
 
-It's important to realize: `this` is not a fixed characteristic of a function based on the function's definition, but rather a dynamic characteristic that's determined each time the function is called.
+`this` is not a fixed characteristic of a function based on the function's definition, but rather a dynamic characteristic that's determined each time the function is called.
 
 One way to think about the *execution context* is that it's a tangible object whose properties are made available to a function while it executes. Compare that to scope, which can also be thought of as an *object*; except, the *scope object* is hidden inside the JS engine, it's always the same for that function, and its *properties* take the form of identifier variables available inside the function.
-
-Consider:
 
 ```js
 function classroom(teacher) {
@@ -289,7 +287,6 @@ function classroom(teacher) {
         );
     };
 }
-
 var assignment = classroom("Kyle");
 ```
 
@@ -386,10 +383,6 @@ otherHomework.topic;
 
 The first argument to `Object.create(..)` specifies an object to link the newly created object to, and then returns the newly created (and linked!) object.
 
-| NOTE: |
-| :--- |
-| `Object.create(null)` creates an object that is not prototype linked anywhere, so it's purely just a standalone object; in some circumstances, that may be preferable. |
-
 Figure 4 shows how the three objects (`otherHomework`, `homework`, and `Object.prototype`) are linked in a prototype chain:
 
 <figure>
@@ -399,6 +392,10 @@ Figure 4 shows how the three objects (`otherHomework`, `homework`, and `Object.p
 </figure>
 
 Delegation through the prototype chain only applies for accesses to lookup the value in a property. If you assign to a property of an object, that will apply directly to the object regardless of where that object is prototype linked to.
+
+| TIP: |
+| :--- |
+| `Object.create(null)` creates an object that is not prototype linked anywhere, so it's purely just a standalone object; in some circumstances, that may be preferable. |
 
 Consider:
 

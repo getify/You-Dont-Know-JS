@@ -25,11 +25,11 @@ The reason this matters is primarily around error handling. Since JS treats file
 
 It may surprise you to consider separate .js files as separate JS programs. From the perspective of your usage of an application, it sure seems like one big program. That's because the execution of the application allows these individual *programs* to cooperate and act as one program.
 
-The only way multiple standalone .js files act as a single program is by sharing their state (and access to their public functionality) via the "global scope." They mix together in this global scope namespace, so at runtime they act as as whole.
-
 | NOTE: |
 | :--- |
 | Many projects use build process tools that end up combining separate files from the project into a single file to be delivered to a web page. When this happens, JS treats this single combined file as the entire program. |
+
+The only way multiple standalone .js files act as a single program is by sharing their state (and access to their public functionality) via the "global scope." They mix together in this global scope namespace, so at runtime they act as as whole.
 
 Since ES6, JS has also supported a module format in addition to the typical standalone JS program format. Modules are also file-based. If a file is loaded via module-loading mechanism such as an `import` statement or a `<script type=module>` tag, all its code is treated as a single module.
 
@@ -41,11 +41,10 @@ Regardless of which code organization pattern (and loading mechanism) is used fo
 
 The most fundamental unit of information in a program is a value. Values are data. They're how the program maintains state. Values come in two forms in JS: **primitive** and **object**.
 
-Values are embedded in our programs using *literals*. For example:
+Values are embedded in programs using *literals*:
 
 ```js
-console.log("My name is Kyle.");
-// My name is Kyle.
+greeting("My name is Kyle.");
 ```
 
 In this program, the value `"My name is Kyle."` is a primitive string literal; strings are ordered collections of characters, usually used to represent words and sentences.
@@ -259,7 +258,6 @@ const actors = [
 ];
 
 actors[2] = "Tom Cruise";   // OK :(
-
 actors = [];                // Error!
 ```
 
@@ -267,7 +265,7 @@ The best semantic use of a `const` is when you have a simple primitive value tha
 
 | TIP: |
 | :--- |
-| If you stick to using `const` only with primitive values, you never have the confusion of the difference between re-assignment (not allowed) and mutation (allowed)! That's the safest and best way to use `const`. |
+| If you stick to using `const` only with primitive values, you avoid any confusion of re-assignment (not allowed) vs. mutation (allowed)! That's the safest and best way to use `const`. |
 
 Besides `var` / `let` / `const`, there are other syntactic forms that declare identifiers (variables) in various scopes. For example:
 
@@ -280,11 +278,9 @@ hello("Kyle");
 // Hello, Kyle.
 ```
 
-Here, the identifier `hello` is created in the outer scope, and it's also automatically associated so that it references the function. But the named parameter `name` is created only inside the function, and thus is only accessible inside that function's scope.
+The identifier `hello` is created in the outer scope, and it's also automatically associated so that it references the function. But the named parameter `name` is created only inside the function, and thus is only accessible inside that function's scope. `hello` and `name` generally behave as `var`-declared.
 
-Both `hello` and `name` act generally as if they were declared with `var`.
-
-Another syntax that declares a variable is the `catch` clause of a `try..catch` statement:
+Another syntax that declares a variable is a `catch` clause:
 
 ```js
 try {
@@ -303,7 +299,7 @@ The word "function" has a variety of meanings in programming. For example, in th
 
 In JS, we should consider "function" to take the broader meaning of another related term: "procedure." A procedure is a collection of statements that can be invoked one or more times, may be provided some inputs, and may give back one or more outputs.
 
-In earlier days of JS, the way to define a function looked like this:
+From the early days of JS, function definition looked like:
 
 ```js
 function awesomeFunction(coolThings) {
@@ -312,7 +308,7 @@ function awesomeFunction(coolThings) {
 }
 ```
 
-This is called a function declaration because it appears as a statement by itself, not as an expression that's part of another statement. The association between the identifier `awesomeFunction` and the function value happens immediately during the compile phase of the code, before that code is executed.
+This is called a function declaration because it appears as a statement by itself, not as an expression in another statement. The association between the identifier `awesomeFunction` and the function value happens during the compile phase of the code, before that code is executed.
 
 In contrast to a function declaration statement, a function expression can be defined and assigned like this:
 
@@ -336,11 +332,10 @@ function greeting(myName) {
     console.log(`Hello, ${ myName }!`);
 }
 
-greeting("Kyle");
-// Hello, Kyle!
+greeting("Kyle");   // Hello, Kyle!
 ```
 
-In this snippet, `myName` is called a parameter, which acts as a local variable inside the function. Functions can be defined to receive any number of parameters, from none upward, as you see fit. Each parameter is assigned the argument value that you pass in that position (`"Kyle"`, here) of the function call.
+In this snippet, `myName` is called a parameter, which acts as a local variable inside the function. Functions can be defined to receive any number of parameters, from none upward, as you see fit. Each parameter is assigned the argument value that you pass in that position (`"Kyle"`, here) of the call.
 
 Functions also can return values using the `return` keyword:
 
@@ -351,8 +346,7 @@ function greeting(myName) {
 
 var msg = greeting("Kyle");
 
-console.log(msg);
-// Hello, Kyle!
+console.log(msg);   // Hello, Kyle!
 ```
 
 You can only `return` a single value, but if you have more values to return, you can wrap them up into a single object/array.
@@ -423,9 +417,7 @@ NaN === NaN;            // false
 
 In the case of `NaN`, the `===` operator *lies* and says that an occurrence of `NaN` is not equal to another `NaN`. In the case of `-0` (yes, this is a real, distinct value you can use intentionally in your programs!), the `===` operator *lies* and says it's equal to the regular `0` value.
 
-| TIP: |
-| :--- |
-| When making such comparisons, since the *lying* is likely bothersome, don't use `===`. For `NaN` comparisons, use the `Number.isNaN(..)` utility, which does not *lie*. For `-0` comparison, use the `Object.is(..)` utility, which also does not *lie*. `Object.is(..)` can also be used for non-*lying* `NaN` checks, if you prefer. Humorously, you could think of `Object.is(..)` as the "quadruple-equals" `====`, the really-really-strict comparison! |
+Since the *lying* about such comparisons is likely bothersome, it's best to avoid using `===` for them. For `NaN` comparisons, use the `Number.isNaN(..)` utility, which does not *lie*. For `-0` comparison, use the `Object.is(..)` utility, which also does not *lie*. `Object.is(..)` can also be used for non-*lying* `NaN` checks, if you prefer. Humorously, you could think of `Object.is(..)` as the "quadruple-equals" `====`, the really-really-strict comparison! |
 
 There are deeper historical and technical reasons for these *lies*, but that doesn't change the fact that `===` is not actually *strictly exactly equal* comparison, in the *strictest* sense.
 

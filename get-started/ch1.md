@@ -213,7 +213,7 @@ Does this mean JS developers should always lag behind the pace of progress, usin
 
 But it does mean that JS developers need to take special care to address this gap.
 
-For new and incompatible syntax, the solution is transpiling. Transpiling is a contrived and community-invented term to describe using a tool to convert the source code of a program from one form to another (but still as textual source code). Typically, forwards-compatibility problems related to syntax are solved by using a transpiler (the most common one being Babel (https://babeljs.io)) to convert from that newer JS syntax version to an equivalent of code that uses an older syntax.
+For new and incompatible syntax, the solution is transpiling. Transpiling is a contrived and community-invented term to describe using a tool to convert the source code of a program from one form to another (but still as textual source code). Typically, forwards-compatibility problems related to syntax are solved by using a transpiler (the most common one being Babel (https://babeljs.io)) to convert from that newer JS syntax version to an equivalent older syntax.
 
 For example, a developer may write a snippet of code like:
 
@@ -231,8 +231,7 @@ else {
 This is how the code would look in the source code tree for that application. But when producing the file(s) to deploy to the public website, the Babel transpiler might convert that code to look like this:
 
 ```js
-var x$0;
-var x$1;
+var x$0, x$1;
 if (something) {
     x$0 = 3;
     console.log(x$0);
@@ -418,29 +417,24 @@ The benefits of strict mode far outweigh the costs, but old habits die hard and 
 
 Why strict mode? Strict mode shouldn't be thought of as a restriction on what you can't do, but rather as a guide to the best way to do things so that the JS engine has the best chance of optimizing and efficiently running the code. Most JS code is worked on by teams of developers, so the *strict*-ness of strict mode (along with tooling like linters!) often helps collaboration on code by avoiding some of the more problematic mistakes that slip by in non-strict mode.
 
-Most strict mode controls are in the form of *early errors*, meaning errors that aren't strictly syntax errors but are still thrown at compile time (before the code is run). For example, strict mode disallows naming two function parameters the same, and results in an early error. Some other strict mode controls are only observable during runtime, such as how the `this` keyword defaults to `undefined` instead of the global object.
+Most strict mode controls are in the form of *early errors*, meaning errors that aren't strictly syntax errors but are still thrown at compile time (before the code is run). For example, strict mode disallows naming two function parameters the same, and results in an early error. Some other strict mode controls are only observable at runtime, such as how `this` defaults to `undefined` instead of the global object.
 
 Rather than fighting and arguing with strict mode, like a kid who just wants to defy whatever their parents tell them not to do, the best mindset is that strict mode is like a linter reminding you how JS *should* be written to have the highest quality and best chance at performance. If you find yourself feeling handcuffed, trying to work around strict mode, that should be a blaring red warning flag that you need to back up and rethink the whole approach.
 
-Strict mode is switched on per program (per file!) like this:
+Strict mode is switched on per file with a special pragma (nothing allowed before it except comments/whitespace):
 
 ```js
 // only whitespace and comments are allowed
 // before the use-strict pragma
-
 "use strict";
-
-// everything in this file runs in strict
-// mode
+// the rest of the file runs in strict mode
 ```
-
-The strict mode pragma must appear at the top of a file, with only whitespace or comments being allowed before it.
 
 | WARNING: |
 | :--- |
 | Something to be aware of is that even a stray `;` all by itself appearing before the strict mode pragma will render the pragma useless; no errors are thrown because it's valid JS to have a string literal expression in a statement position, but it also will silently *not* turn on strict mode! |
 
-Strict mode can alternatively be turned on per-function scope, with exactly the same rules/admonitions about its positioning):
+Strict mode can alternatively be turned on per-function scope, with exactly the same rules about its surroundings:
 
 ```js
 function someOperations() {
