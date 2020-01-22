@@ -706,11 +706,11 @@ function Publication(title,author,pubDate) {
     return publicAPI;
 }
 
-function Book(bookDetails) {
+function Book(title, author, publishedOn) {
     var pub = Publication(
-        bookDetails.title,
-        bookDetails.author,
-        bookDetails.publishedOn
+        title,
+        author,
+        publishedOn
     );
 
     var publicAPI = {
