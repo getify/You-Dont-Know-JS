@@ -603,11 +603,11 @@ Now let's consider more specific types of publication, like `Book` and `BlogPost
 
 ```js
 class Book extends Publication {
-    constructor(bookDetails) {
+    constructor(title, author, publishedOn) {
         super(
-            bookDetails.title,
-            bookDetails.author,
-            bookDetails.publishedOn
+            title,
+            author,
+            publishedOn
         );
         this.publisher = bookDetails.publisher;
         this.ISBN = bookDetails.ISBN;
