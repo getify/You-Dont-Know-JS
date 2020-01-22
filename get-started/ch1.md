@@ -303,7 +303,7 @@ if (!Promise.prototype.finally) {
 
 The `if` statement protects the polyfill definition by preventing it from running in any environment where the JS engine has already defined that method. In older environments, the polyfill is defined, but in newer environments the `if` statement is quietly skipped.
 
-Transpilers like Babel typically detect which polyfills your code needs and provide them automatically for you. But occassionally you may need to include/define them explicitly, which works similar to the snippet we just looked at.
+Transpilers like Babel typically detect which polyfills your code needs and provide them automatically for you. But occasionally you may need to include/define them explicitly, which works similar to the snippet we just looked at.
 
 Always write code using the most appropriate features to communicate its ideas and intent effectively. In general, this means using the most recent stable JS version. Avoid negatively impacting the code's readability by trying to manually adjust for the syntax/API gaps. That's what tools are for!
 

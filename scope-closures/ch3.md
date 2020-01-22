@@ -132,7 +132,7 @@ printStudent("Frank");
 // "Suzy"
 ```
 
-Notice the `window.studentName` reference? This expression is accessing the global variable `studentName` as a property on `window` (which we're pretending for now is synonomous with the global object). That's the only way to access a shadowed variable from inside the scope where the shadowing variable is present.
+Notice the `window.studentName` reference? This expression is accessing the global variable `studentName` as a property on `window` (which we're pretending for now is synonymous with the global object). That's the only way to access a shadowed variable from inside the scope where the shadowing variable is present.
 
 | WARNING: |
 | :--- |
