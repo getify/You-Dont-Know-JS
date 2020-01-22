@@ -377,8 +377,7 @@ var homework = {
 
 var otherHomework = Object.create(homework);
 
-otherHomework.topic;
-// "JS"
+otherHomework.topic;   // "JS"
 ```
 
 The first argument to `Object.create(..)` specifies an object to link the newly created object to, and then returns the newly created (and linked!) object.
