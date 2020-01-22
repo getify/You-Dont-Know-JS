@@ -1876,7 +1876,7 @@ Regardless of whether you like to deal with the thunkories explicitly or not, th
 
 So what's all this thunk stuff have to do with generators?
 
-Comparing thunks to promises generally: they're not directly interchangable as they're not equivalent in behavior. Promises are vastly more capable and trustable than bare thunks.
+Comparing thunks to promises generally: they're not directly interchangeable as they're not equivalent in behavior. Promises are vastly more capable and trustable than bare thunks.
 
 But in another sense, they both can be seen as a request for a value, which may be async in its answering.
 
