@@ -671,7 +671,7 @@ forAgainstLet.print();
 
 Notice that both child class instances have a `print()` method, which was an override of the *inherited* `print()` method from the parent `Publication` class. Each of those overridden child class `print()` methods call `super.print()` to invoke the inherited version of the `print()` method.
 
-The fact that both the inherited and overriden methods can have the same name and co-exist is called *polymorphism*.
+The fact that both the inherited and overridden methods can have the same name and co-exist is called *polymorphism*.
 
 Inheritance is a powerful tool for organizing data/behavior in separate logical units (classes), but allowing the child class to cooperate with the parent by accessing/using its behavior and data.
 
