@@ -794,7 +794,7 @@ Second, you don't interact with a module's "API" explicitly, but rather use the 
 
 Third, and maybe most noticeably different from previously discussed patterns, you don't "instantiate" an ES module, you just `import` it to use its single instance. ESMs are, in effect, "singletons," in that there's only one instance ever created, at first `import` in your program, and all other `import`s just receive a reference to that same single instance. If your module needs to support multiple instantiations, you have to provide a *classic module-style* factory function on your ESM definition for that purpose.
 
-In our running example, we do assume multiple-instantiation, so these following snippets will mix both ESM and *classic modules*:.
+In our running example, we do assume multiple-instantiation, so these following snippets will mix both ESM and *classic modules*.
 
 Consider the file `publication.js`:
 
