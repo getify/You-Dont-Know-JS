@@ -5,37 +5,58 @@
 | :--- |
 | Work in progress |
 
-One key foundation of programming languages is storing values in variables and retrieving those values later. In fact, this process is the primary way we model program *state*. A program without *state* is a pretty uninteresting program, so this topic is at the very heart of what it means to write programs.
+I bet you have a pretty good sense of how to create variables and store values in them. But how closely have you considered the mechanisms used by the engine to organize and manage these variables?
 
-But to understand how variables work, we should first ask: where do variables *live*? In other words, how are your program's variables organized and accessed by the JS engine?
+I don't mean how the memory is allocated on the computer, but rather: how does JS know which variables are accessible by any given statement, and what happens if it finds two variables of the same name?
 
-These questions imply the need for a well-defined set of rules for managing variables, called *scope*. The first step to understanding scope is discuss how the JS engine processes and executes a program.
+The answers to these questions take the form of a set of well-defined rules called scope. We'll expound these rules in great detail throughout the book.
+
+Our first step is to study how the JS engine processes (compiles) our program before it executes it.
 
 ## About This Book
 
-If you already finished *Get Started* (the first book of this series), you're in the right spot! If not, before you proceed I encourage you to *start there* for the best foundation.
+Welcome to book 2 in the *You Don't Know JS Yet* series! If you already finished *Get Started* (the first book), you're in the right spot! If not, before you proceed I encourage you to *start there* for the best foundation.
 
-Our focus in this second book is the first pillar (of three!) in the JS language: the scope system and its function closures, and how these mechanisms enable the module design pattern.
+Our focus here is the first of three pillars in the JS language: the scope system and its function closures, and how these mechanisms enable the module design pattern.
 
-JS is typically classified as an interpreted scripting language, so it's assumed that programs are processed in a single, top-down pass. But JS is in fact parsed/compiled in a separate phase **before execution begins**. The code author's decisions on where to place variables, functions, and blocks with respect to each other are analyzed according to the rules of scope, during the initial parsing/compilation phase. The resulting scope is unaffected by run-time conditions.
+JS is typically classified as an interpreted scripting language, so it's assumed by most that JS programs are processed in a single, top-down pass. But JS is in fact parsed/compiled in a separate phase **before execution begins**. The code author's decisions on where to place variables, functions, and blocks with respect to each other are analyzed according to the rules of scope, during the initial parsing/compilation phase. The resulting scope is unaffected by run-time conditions.
 
 JS functions are themselves values, meaning they can be assigned and passed around just like numbers or strings. But since these functions hold and access variables, they maintain their original scope no matter where in the program the functions are eventually executed. This is called closure.
 
 Modules are a pattern for code organization characterized by a collection of public methods that have access (via closure) to variables and functions that are hidden inside the internal scope of the module.
 
+## Compiled vs. Interpreted
+
+You may have heard of *code compilation* before, but perhaps it seems like a mysterious black box where source code goes in one end and programs come out the other.
+
+It's not mysterious or magical, though. Code compilation is a set of steps that process the text of your code and turn it into a list of instructions the computer can understand. Typically, the whole source code is transformed at once, and those resulting instructions are saved as output (usually in a file) that can later be executed.
+
+You also may have heard that code can be *interpreted*, but how is that different from being *compiled*?
+
+Interpretation performs a similar task to compilation, in that it transforms your program into machine-understandable instructions. But the processing model is fairly different. Unlike a program being compiled all at once, with interpretation the source code is typically transformed line-by-line; each line or statement is immediately executed before proceeding to processing the next line of the source code.
+
+Figure 1 illustrates the difference between compilation and interpretation:
+
+<figure>
+    <img src="fig1.png" width="500" alt="Code Compilation and Code Interpretation" align="center">
+    <figcaption><em>Fig. 1: Compiled vs Interpreted</em></figcaption>
+</figure>
+
+Are these two processing models mutually exclusive? Generally yes. However, the topic is more nuanced, because interpretation can actually take other forms than just operating line-by-line on source code text. Modern JS engines employ variations of both compilation and interpretation in the handling of JS programs.
+
+Recall that this topic is discussed in detail in the section "What's in an Interpretation?" of Chapter 1 of the *Get Started* book. Our conclusion there is that JS is most accurately portrayed as a **compiled language**. For the benefit of readers here, the following sections will revist and expand on that debate.
+
 ## Compiling Code
 
-Depending on your level of experience with various languages, you may be surprised to learn that JS is compiled, even though it's typically labeled as "dynamic" or "interpreted". JS is *not* typically compiled well in advance, as are many traditionally-compiled languages, nor are the results of compilation portable among various distributed JS engines. Nevertheless, the JS engine essentially performs similar steps as other traditional language compilers.
+Why does it even matter whether JS is compiled or not?
 
-The reason we need to talk about code compilation to understand scope is because JS's scope is entirely determined during this phase.
+JS's scope is entirely determined during compilation, so you cannot effectively understand scope without exploring JS's compilation.
 
-A program is generally processed by a compiler in three basic stages:
+In classic compiler theory, a program is processed by a compiler in three basic stages:
 
 1. **Tokenizing/Lexing:** breaking up a string of characters into meaningful (to the language) chunks, called tokens. For instance, consider the program: `var a = 2;`. This program would likely be broken up into the following tokens: `var`, `a`, `=`, `2`, and `;`. Whitespace may or may not be persisted as a token, depending on whether it's meaningful or not.
 
-| NOTE: |
-| :--- |
-| The difference between tokenizing and lexing is subtle and academic, but it centers on whether or not these tokens are identified in a *stateless* or *stateful* way. Put simply, if the tokenizer were to invoke stateful parsing rules to figure out whether `a` should be considered a distinct token or just part of another token, *that* would be **lexing**. |
+    (The difference between tokenizing and lexing is subtle and academic, but it centers on whether or not these tokens are identified in a *stateless* or *stateful* way. Put simply, if the tokenizer were to invoke stateful parsing rules to figure out whether `a` should be considered a distinct token or just part of another token, *that* would be **lexing**.)
 
 2. **Parsing:** taking a stream (array) of tokens and turning it into a tree of nested elements, which collectively represent the grammatical structure of the program. This tree is called an "AST" (<b>A</b>bstract <b>S</b>yntax <b>T</b>ree).
 
@@ -47,7 +68,7 @@ A program is generally processed by a compiler in three basic stages:
 
 | NOTE: |
 | :--- |
-| The implementation details of a JS engine (utilizing system memory resources, etc) is much deeper than we will dig here. We'll keep our focus on the observable behavior of our programs and let the JS engine manage those system abstractions. |
+| The implementation details of a JS engine (utilizing system memory resources, etc) is much deeper than we will dig here. We'll keep our focus on the observable behavior of our programs and let the JS engine manage those system-level abstractions. |
 
 The JS engine is vastly more complex than *just* those three stages. In the process of parsing and code-generation, there are steps to optimize the performance of the execution, including collapsing redundant elements, etc. In fact, code can even be re-compiled and re-optimized during the progression of execution.
 
@@ -57,27 +78,34 @@ JS engines don't have the luxury of plenty of time to optimize, because JS compi
 
 ### Required: Two Phases
 
-To state it as simply as possible, a JS program is processed in (at least) two phases: parsing/compilation first, then execution.
+To state it as simply as possible, the most important observation we can make about processing of JS programs is that it occurs in (at least) two phases: parsing/compilation first, then execution.
 
 The breakdown of a parsing/compilation phase separate from the subsequent execution phase is observable fact, not theory or opinion. While the JS specification does not require "compilation" explicitly, it requires behavior which is essentially only practical in a compile-then-execute cadence.
 
-There are three program characteristics you can use to prove this to yourself: syntax errors, "early errors", and hoisting (covered in Chapter 3).
+There are three program characteristics you can observe to prove this to yourself: syntax errors, early errors, and hoisting (covered in Chapter 3).
+
+#### Syntax Errors From The Start
 
 Consider this program:
 
 ```js
 var greeting = "Hello";
+
 console.log(greeting);
+
 greeting = ."Hi";
 // SyntaxError: unexpected token .
 ```
 
-This program produces no output (`"Hello"` is not printed), but instead throws a `SyntaxError` about the unexpected `.` token right before the `"Hi"` string. Since the syntax error happens after the well-formed `console.log(..)` statement, if JS was executing top-down line by line, one would expect the `"Hello"` message being printed before the syntax error being thrown. That doesn't happen. In fact, the only way the JS engine could know about the syntax error on the third line, before executing the first and second lines, is because the JS engine first parses this entire program before any of it is executed.
+This program produces no output (`"Hello"` is not printed), but instead throws a `SyntaxError` about the unexpected `.` token right before the `"Hi"` string. Since the syntax error happens after the well-formed `console.log(..)` statement, if JS was executing top-down line by line, one would expect the `"Hello"` message being printed before the syntax error being thrown. That doesn't happen. In fact, the only way the JS engine could know about the syntax error on the third line, before executing the first and second lines, is by the JS engine first parsing the entire program before any of it is executed.
+
+#### Early Errors
 
 Next, consider:
 
 ```js
 console.log("Howdy");
+
 saySomething("Hello","Hi");
 // Uncaught SyntaxError: Duplicate parameter name not allowed in this context
 
@@ -87,9 +115,15 @@ function saySomething(greeting,greeting) {
 }
 ```
 
-The `"Howdy"` message is not printed, despite being a well-formed statement. Instead, just like the previous snippet, the `SyntaxError` here is thrown before the program is executed. In this case, it's because strict-mode (opted in for only the `saySomething(..)` function in this program) forbids, among many other things, functions to have duplicate parameter names; this has always been allowed in non-strict mode. This is not a syntax error in the sense of being a malformed string of tokens (like `."Hi"` above), but is required by the specification to be thrown as an "early error" for strict-mode programs.
+The `"Howdy"` message is not printed, despite being a well-formed statement.
 
-How does the JS engine know that the `greeting` parameter has been duplicated? How does it know that the `saySomething(..)` function is even in strict-mode while processing the parameter list (the `"use strict"` pragma appears only in the function body)? Again, the only reasonable answer to these questions is that the code must first be parsed before execution.
+Instead, just like the snippet in the previous section, the `SyntaxError` here is thrown before the program is executed. In this case, it's because strict-mode (opted in for only the `saySomething(..)` function here) forbids, among many other things, functions to have duplicate parameter names; this has always been allowed in non-strict mode. The error thrown is not a syntax error in the sense of being a malformed string of tokens (like `."Hi"` prior), but is nonetheless required by the specification to be thrown as an "early error" (for strict-mode code) before any execution begins.
+
+But how does the JS engine know that the `greeting` parameter has been duplicated? How does it know that the `saySomething(..)` function is even in strict-mode while processing the parameter list (the `"use strict"` pragma appears only later, in the function body)?
+
+Again, the only reasonable answer to these questions is that the code must first be *fully* parsed before any execution occurs.
+
+#### Hoisting
 
 Finally, consider:
 
@@ -97,7 +131,7 @@ Finally, consider:
 function saySomething() {
     var greeting = "Hello";
     {
-        greeting = "Howdy";
+        greeting = "Howdy";  // <-- the error is here
         let greeting = "Hi";
         console.log(greeting);
     }
@@ -107,25 +141,31 @@ saySomething();
 // ReferenceError: Cannot access 'greeting' before initialization
 ```
 
-The noted `ReferenceError` occurs on the line with the statement `greeting = "Howdy"`. What's being indicated is that the `greeting` variable for that statement is the one from the next line, `let greeting = "Hi"`, rather than from the previous statement `var greeting = "Hello"`.
+The noted `ReferenceError` occurs from the line with the statement `greeting = "Howdy"`. What's happening is that the `greeting` variable for that statement comes from the declaration on the next line, `let greeting = "Hi"`, rather than from the previous `var greeting = "Hello"` statement.
 
-The only way the JS engine could know, at the line where the error is thrown, that the *next statement* would declare a block-scoped variable of the same name (`greeting`) -- which creates the conflict of accessing the variable too early, while in its so called "TDZ", Temporal Dead Zone (see Chapter 3) -- is if the JS engine had already processed this code in an earlier pass, and already set up all the scopes and their variable associations. This processing of scopes and declarations can only accurately be done by parsing the program before execution, and it's called "hoisting" (see Chapter 3).
+The only way the JS engine could know, at the line where the error is thrown, that the *next statement* would declare a block-scoped variable of the same name (`greeting`) is if the JS engine had already processed this code in an earlier pass, and already set up all the scopes and their variable associations. This processing of scopes and declarations can only accurately be done by parsing the program before execution, and it's called "hoisting" (see Chapter 3).
+
+The `ReferenceError` here technically comes from `greeting = "Howdy"` accessing the `greeting` variable **too early**, a conflict referred to as the Temporal Dead Zone (TDZ). Chapter 3 will cover this in more detail.
 
 | WARNING: |
 | :--- |
-| It's often asserted that `let` and `const` declarations are not hoisted, as an explanation of the occurrence of the "TDZ" (Chapter 3) behavior just illustrated. This is not accurate. If these kinds of declarations were not hoisted, then `greeting = "Howdy"` assignment would simply be targeting the `var greeting` variable from the outer (function) scope, with no need to throw an error; the block-scoped `greeting` wouldn't *exist* yet. But the TDZ error itself proves that the block-scoped `greeting` must have been hoisted to the top of that block scope! |
+| It's often asserted that `let` and `const` declarations are not hoisted, as an explanation of the TDZ behavior just illustrated. But this is not accurate. If `let` and `const` declarations were not hoisted, then the `greeting = "Howdy"` assignment would simply be referring to declaration from the `var greeting` statement in the outer (function) scope, and would not need to throw an error. In other words, the block-scoped `greeting` wouldn't *exist* yet. However, the presence of the TDZ error proves that the block-scoped `greeting` must indeed already exist, and thus must have been hoisted to the top of that block scope! Don't worry if that's still confusing right now. We'll come back to it in Chapter 3. |
 
-Hopefully you're now convinced that JS programs are parsed before any execution begins. But does that prove they are compiled?
+Hopefully you're now convinced that JS programs are parsed before any execution begins. But does it prove they are compiled?
 
-This is an interesting question to ponder. Could JS parse a program, but then execute that program by *interpreting* the AST node-by-node **without** compiling the program in between? Yes, that is *possible*, but it's extremely unlikely, because it would be highly inefficient performance wise. It's hard to imagine a scenario where a production-quality JS engine would go to all the trouble of parsing a program into an AST, but not then convert (aka, "compile") that AST into the most efficient (binary) representation for the engine to then execute.
+This is an interesting question to ponder. Could JS parse a program, but then execute that program by *interpreting* operations represented in the AST **without** first compiling the program? Yes, that is *possible*. But it's extremely unlikely, mostly because it would be highly inefficient performance wise.
 
-Many have endeavored to split hairs with this terminology, as there's plenty of nuance to fuel "well, actually..." interjections. But in spirit and in practice, what the JS engine is doing in processing JS programs is **much more alike compilation** than different.
+It's hard to imagine a scenario where a production-quality JS engine would go to all the trouble of parsing a program into an AST, but not then convert (aka, "compile") that AST into the most efficient (binary) representation for the engine to then execute.
 
-Classifying JS as a compiled language is not about a distribution model for its binary (or byte-code) executable representations, but about keeping a clear distinction in our minds about the phase where JS code is processed and analyzed, which indisputedly happens observably *before* the code starts to be executed. We need proper mental models for how the JS engine treats our code if we want to understand JS effectively.
+Many have endeavored to split hairs with this terminology, as there's plenty of nuance and "well, actually..." interjections. But in spirit and in practice, what the engine is doing in processing JS programs is **much more alike compilation** than not.
+
+Classifying JS as a compiled language is not about a distribution model for its binary (or byte-code) executable representations, but about keeping a clear distinction in our minds about the phase where JS code is processed and analyzed, which observably and indisputedly happens *before* the code starts to be executed. We need proper mental models of how the JS engine treats our code if we want to understand JS and scope effectively.
 
 ## Compiler Speak
 
-Let's define a simple JS program to analyze over the next few chapters:
+Since we now have a solid understanding of the two-phase processing of a JS program (compile, then execute), let's turn our attention to how the JS engine identifies variables and determines the scopes of a program as it is compiled.
+
+First, let's define a simple JS program to use for analysis over the next several chapters:
 
 ```js
 var students = [
@@ -151,15 +191,15 @@ console.log(nextStudent);
 
 Other than declarations, all occurrences of variables/identifiers in a program serve in one of two "roles": either they're the *target* of an assignment or they're the *source* of a value.
 
-| NOTE: |
-| :--- |
-| When I first learned compiler theory in my Computer Science degree, we were taught the terms "LHS" (aka, *target*) and "RHS" (aka, *source*) for these roles. As you might guess from the "L" and the "R", the acronyms mean "Left-Hand Side" and "Right-Hand Side", respectively, as in left and right sides of an `=` assignment operator. However, assignment targets and sources don't always literally appear on the left or right of an `=`, so it's probably less confusing to think in terms of *target* / *source* instead of *left* / *right*. |
+(When I first learned compiler theory in my Computer Science degree, we were taught the terms "LHS" (aka, *target*) and "RHS" (aka, *source*) for these roles, respectively. As you might guess from the "L" and the "R", the acronyms mean "Left-Hand Side" and "Right-Hand Side", as in left and right sides of an `=` assignment operator. However, assignment targets and sources don't always literally appear on the left or right of an `=`, so it's probably clearer to think in terms of *target* / *source* instead of *left* / *right*.)
 
-How do you know if a variable is a *target*? Check if there is a value anywhere that is being assigned to it; if so, it's a *target*. If not, then the variable is a *source* instead.
+How do you know if a variable is a *target*? Check if there is a value that is being assigned to it; if so, it's a *target*. If not, then the variable is a *source*.
+
+For the JS engine to handle a program, it must first label each occurrence of a variable as *target* or *source*. We'll dig in now to how each role is determined.
 
 ### Targets
 
-Let's look at our program example with respect to these roles. Consider:
+What makes a variable a *target*? Consider:
 
 ```js
 students = [
@@ -256,16 +296,18 @@ At all costs, avoid `eval(..)` (at least, `eval(..)` creating declarations) and 
 
 ## Lexical Scope
 
-For a language whose scope is determined at compile time, its scope model is called "lexical scope". This term "lexical" is related to the "lexing" stage of compilation. The key concept is that the lexical scope of a program is controlled entirely by the placement of functions, blocks, and scopes, in relation to each other.
+We've demonstrated that JS's scope is determined at compile time. The term for that form of scope is "lexical scope". This word "lexical" is related to the "lexing" stage of compilation, as discussed earlier in this chapter.
+
+To draw this chapter down to a useful conclusion, the key idea of "lexical scope" is that it's controlled entirely by the placement of functions, blocks, and variable declarations, in relation to each other.
 
 If you place a variable declaration inside a function, the compiler handles this declaration as it's parsing the function, and associates that declaration with the function's scope. If a variable is block-scope declared (`let` / `const`), then it's associated with the nearest enclosing `{ .. }` block, rather than its enclosing function (as with `var`).
 
-A reference (*target* or *source*) for a variable must be resolved to coming from one of the scopes that are *lexically available*, otherwise the variable is said to be "undeclared" (which usually results in an error!). If the variable is not in the current scope, the next outer/enclosing scope will be consulted. This process of stepping out one level of scope nesting continues until either a matching variable declaration can be found, or the global scope is reached and there's nowhere else to go.
+Furthermore, a reference (*target* or *source* role) for a variable must be resolved as coming from one of the scopes that are *lexically available* to it; otherwise the variable is said to be "undeclared" (which usually results in an error!). If the variable is not declared in the current scope, the next outer/enclosing scope will be consulted. This process of stepping out one level of scope nesting continues until either a matching variable declaration can be found, or the global scope is reached and there's nowhere else to go.
 
-It's important to note that compilation doesn't actually *do anything* in terms of reserving memory for scopes and variables.
+It's important to note that compilation doesn't actually *do anything* in terms of reserving memory for scopes and variables. None of the program has been executed just because it's been compiled.
 
-Instead, compilation creates a map of all the lexical scopes that the program will need as it executes. You can think of this plan/map as inserted code that will define all the scopes (aka, "lexical environments") and register all the identifiers for each scope.
+Instead, compilation creates a map of all the lexical scopes that the program will need while it executes. You can think of this plan/map as inserted code that will define all the scopes (aka, "lexical environments") and register all the identifiers (variables) for each scope.
 
-So scopes are planned out during compilation -- that's why we refer to "lexical scope" as a compile-time decision -- but they aren't actually created until run-time. Each scope is instantiated in memory each time it needs to run.
+Scopes are planned out during compilation -- that's why we refer to "lexical scope" as a compile-time decision -- but they aren't actually created until run-time. Each scope is instantiated in memory each time it needs to run.
 
-In the next chapter, we'll build a deeper conceptual understanding of lexical scope.
+In the next chapter, we'll dig into the conceptual foundations of lexical scope.

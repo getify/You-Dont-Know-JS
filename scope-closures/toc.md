@@ -10,6 +10,7 @@
 * Preface
 * Chapter 1: How Is Scope Determined?
     * About This Book
+    * Compiled vs. Interpreted
     * Compiling Code
     * Compiler Speak
     * Cheating: Run-Time Scope Modifications
