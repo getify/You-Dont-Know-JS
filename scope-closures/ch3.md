@@ -763,36 +763,38 @@ This code works fine. You may have seen or even written code like it before. But
 
 Recall how Chapter 1 pointed out that all identifiers are registered to their respective scopes during compile time. Moreover, every identifier is *created* at the beginning of the scope it belongs to, **every time that scope is entered**.
 
-The term for registering a variable at the top of its enclosing scope, even though its declaration may appear further down in the scope, is called **hoisting**.
+The term most commonly used for making a variable available from the beginning of its enclosing scope, even though its declaration may appear further down in the scope, is called **hoisting**.
 
 But hoisting alone doesn't fully answer the posed question. Sure, we can see an identifier called `greeting` from the beginning of the scope, but why can we **call** the `greeting()` function before it's been declared?
 
-In other words, how does `greeting` have any value in it, like the function reference, when the scope first begins? That's an additional characteristic of `function` declarations, called "function hoisting". When a `function` declaration's name identifier is registered at the top of a scope, it is additionally initialized to that function's reference.
+In other words, how does `greeting` have any value in it (the function reference), as soon as the scope first begins? That's a special characteristic of `function` declarations, called *function hoisting*. When a `function` declaration's name identifier is registered at the top of a scope, it is additionally initialized to that function's reference.
 
-Function hoisting only applies to formal `function` declarations (which appear outside of blocks -- see FiB in Chapter 4), not to `function` expression assignments. Consider:
+*Function hoisting* only applies to formal `function` declarations (specifically those which appear outside of blocks -- see "FiB" in Chapter 4), not to `function` expression assignments. Consider:
 
 ```js
 greeting();
-// Type Error
+// TypeError
 
 var greeting = function greeting() {
     console.log("Hello!");
 };
 ```
 
-Line one (`greeting();`) throws an error. But the *kind* of error thrown is very important to notice. A Type Error means we're trying to do something with a value that is not allowed. Indeed, the error message would, depending on your JS environment, say something like "'undefined' is not a function", or alternately, "'greeting' is not a function".
+Line one (`greeting();`) throws an error. But the *kind* of error thrown is very important to notice. A `TypeError` means we're trying to do something with a value that is not allowed. Depending on your JS environment, the error message would say something like, "'undefined' is not a function", or preferably, "'greeting' is not a function".
 
-We should notice that the error is **not** a Reference Error. It's not telling us that it couldn't find `greeting` as an identifier in the scope. It's telling us that `greeting` doesn't hold a function reference at that moment.
+Notice that the error is **not** a `ReferenceError`. It's not telling us that it couldn't find `greeting` as an identifier in the scope. It's telling us that `greeting` was found but doesn't hold a function reference at that moment. Only functions can be invoked, so attempting to invoke some non-function value results in an error.
 
-What does it hold?
+But what does `greeting` hold?
 
-Variables declared with `var` are, in addition to being hoisted, also automatically initialized to `undefined` at the beginning of the scope. Once they're initialized, they're available to be used (assigned to, retrieved, etc). So on that first line, `greeting` exists, but it holds only the default `undefined` value. It's not until line 3 that `greeting` gets assigned the function reference.
+In addition to being hoisted, variables declared with `var` are also automatically initialized to `undefined` at the beginning of the scope. Once they're initialized, they're available to be used (assigned to, retrieved from, etc) throughout the whole scope.
 
-Pay close attention to the distinction here. A `function` declaration is hoisted and initialized to its function value (again, called "function hoisting"). By contrast, a `var` variable is hoisted, but it's only auto-initialized to `undefined`. Any subsequent `function` expression assignments to that variable don't happen until that statement is reached during run-time execution.
+So on that first line, `greeting` exists, but it holds only the default `undefined` value. It's not until line 3 that `greeting` gets assigned the function reference.
 
-In both cases, the name of the identifier is hoisted. But the value association doesn't get handled at initialization time unless the identifier came from a `function` declaration.
+Pay close attention to the distinction here. A `function` declaration is hoisted **and initialized to its function value** (again, called *function hoisting*). A `var` variable is also hoisted, but it's only auto-initialized to `undefined`. Any subsequent `function` expression assignments to that variable don't happen until that statement is reached during run-time execution.
 
-Let's look at another example of "variable hoisting":
+In both cases, the name of the identifier is hoisted. But the function value association doesn't get handled at initialization time unless the identifier was created in a formal `function` declaration.
+
+Let's look at another example of *variable hoisting*:
 
 ```js
 greeting = "Hello!";
@@ -802,17 +804,17 @@ console.log(greeting);
 var greeting = "Howdy!";
 ```
 
-The `greeting` variable is available to be assigned to by the time we reach line 1. Why? There's two necessary parts: the identifier was hoisted, and it was automatically initialized to `undefined`.
+Though `greeting` isn't declared until line 4, it's available to be assigned to as early as line 1. Why? There's two necessary parts to explain that: the identifier was hoisted, **and** it was automatically initialized to the value `undefined`.
 
 | NOTE: |
 | :--- |
-| Variable hoisting probably feels a bit unnatural to use in a program. But is function hoisting also a bad idea? We'll explore this in more detail in Appendix A. |
+| *Variable hoisting* of this sort probably feels unnatural, and many readers might rightly want to avoid it in their programs. But should *function hoisting* also be avoided? We'll explore this in more detail in Appendix A. |
 
-### Yet Another Metaphor
+### Hoisting: Yet Another Metaphor
 
-Chapter 2 was full of metaphors (to illustrate scope), but here we are faced with yet another: hoisting itself is a metaphor. It's a visualization of how JS handles variable and `function` declarations.
+Chapter 2 was full of metaphors (to illustrate scope), but here we are faced with yet another: hoisting itself. Rather than citing hoisting as a concrete execution step the JS engine performs, it's more useful as a visualization of various actions JS takes in setting up the program before execution.
 
-When most people explain what "hoisting" means, they will describe "lifting" -- like lifting a heavy weight upward -- the identifiers all the way to the top of a scope. Typically, they will assert that the JS engine will *rewrite* that program before it executes it, so that it looks more like this:
+The typical assertion of what hoisting means is: *lifting* -- like lifting a heavy weight upward -- the identifiers all the way to the top of a scope. The explanation often given is that the JS engine will *rewrite* that program before execution, so that it looks more like this:
 
 ```js
 var greeting;           // hoisted declaration moved to the top
@@ -824,7 +826,7 @@ console.log(greeting);
 greeting = "Howdy!";    // `var` is gone!
 ```
 
-The hoisting metaphor proposes that JS pre-processes the original program and re-arranges it slightly, so that all the declarations have been moved to the top of their respective scopes, before execution. Moreover, the hoisting metaphor asserts that `function` declarations are, in their entirety, hoisted to the top of each scope, as well.
+The hoisting (metaphor) proposes that JS pre-processes the original program and re-arranges it slightly, so that all the declarations have been moved to the top of their respective scopes, before execution. Moreover, the hoisting metaphor asserts that `function` declarations are, in their entirety, hoisted to the top of each scope, as well.
 
 Consider:
 
@@ -857,13 +859,13 @@ The hoisting metaphor is convenient. Its benefit is allowing us to hand wave ove
 
 Hoisting as re-ordering code may be an attractive simplification, but it's not accurate. The JS engine doesn't actually rewrite the code. It can't magically look-ahead and find declarations. The only way to accurately find them, as well as all the scope boundaries in the program, would be to fully parse the code. Guess what parsing is? The first phase of the 2-phase processing! There's no magical mental gymnastics that gets around that fact.
 
-So if "hoisting" as a metaphor is inaccurate, what should we do with the term? It's still useful -- indeed, even members of TC39 regularly use it! -- but we shouldn't think of it as the re-ordering of code.
+So if the hoisting metaphor is (at best) inaccurate, what should we do with the term? It's still useful -- indeed, even members of TC39 regularly use it! -- but we shouldn't think of it as actual re-ordering of code.
 
 | WARNING: |
 | :--- |
-| Incorrect or incomplete mental models may seem sufficient because they can occasionally lead to accidental right answers. But in the long run it's harder to accurately analyze and predict outcomes if you're not thinking closely to how the JS engine works. |
+| Incorrect or incomplete mental models may seem sufficient because they can occasionally lead to accidental right answers. But in the long run it's harder to accurately analyze and predict outcomes if your thinking isn't particularly aligned with how the JS engine works. |
 
-"Hoisting" should refer to the **compile-time operation** of generating run-time instructions for the automatic registration of a variable at the beginning of its scope, each time that scope is entered.
+I assert that hoisting *should* refer to the **compile-time operation** of generating run-time instructions for the automatic registration of a variable at the beginning of its scope, each time that scope is entered.
 
 ### Re-declaration?
 
@@ -883,7 +885,7 @@ console.log(studentName);
 // ???
 ```
 
-What do you expect to be printed as that second message? Many think the second `var studentName` has re-declared the variable (and "reset" it), so they expect `undefined` to be printed.
+What do you expect to be printed as that second message? Many believe the second `var studentName` has re-declared the variable (and thus "reset" it), so they expect `undefined` to be printed.
 
 But is there such a thing as a variable being "re-declared" in the same scope? No.
 
@@ -1244,7 +1246,9 @@ function askQuestion() {
 
 Even though positionally the `console.log(..)` referencing `studentName` comes *after* the `let studentName` declaration, timing wise the `askQuestion()` function is invoked *before*, while `studentName` is still in its TDZ!
 
-Many have claimed that TDZ means `let` and `const` do not hoist. But I think this is an inaccurate, or at least misleading, claim. I think the real difference with `let` and `const` is that they do not get automatically initialized, the way `var` does. The *debate* then is if the auto-initialization is *part of* hoisting, or not? I think auto-registration of a variable at the top of the scope (i.e., what I call "hoisting") and auto-initialization are separate and shouldn't be lumped together under the term single term "hoisting".
+Many have claimed that TDZ means `let` and `const` do not hoist. But I think this is an inaccurate, or at least misleading, claim.
+
+I assert that the real difference with `let` and `const` is that they do not get automatically initialized, the way `var` does. The *debate* then is if the auto-initialization is *part of* hoisting, or not? I think auto-registration of a variable at the top of the scope (i.e., what I call "hoisting") and auto-initialization (to `undefined`) are distinct operations and shouldn't be lumped together under the single term "hoisting".
 
 We already know `let` and `const` don't auto-intialize at the top of the scope. But let's prove that `let` and `const` *do* hoist (auto-register at the top of the scope), courtesy of our friend shadowing (see earlier in this chapter):
 
@@ -1268,7 +1272,7 @@ What's going to happen with the first `console.log(..)` statement? If `let stude
 
 But instead, we're going to get a TDZ error at that first `console.log(..)`, because in fact, the inner scope's `studentName` **was** hoisted (auto-registered at the top of the scope). But what **didn't** happen (yet!) was the auto-initialization of that inner `studentName`; it's still unintialized at that moment, hence the TDZ violation!
 
-So to summarize, TDZ errors occur because `let` / `const` declarations *do* hoist their declarations to the top of their scopes, but unlike `var`, they defer the auto-initialization of their variables until the moment in the code's sequencing where the original declaration appeared. This window of time, whatever its length, is the TDZ.
+So to summarize, TDZ errors occur because `let` / `const` declarations *do* hoist their declarations to the top of their scopes, but unlike `var`, they defer the auto-initialization of their variables until the moment in the code's sequencing where the original declaration appeared. This window of time (hint: temporal), whatever its length, is the TDZ.
 
 How can you avoid TDZ errors? My advice: always put your `let` and `const` declarations at the top of any scope. Shrink the TDZ window to zero (or near zero) time, and then it'll be moot.
 
