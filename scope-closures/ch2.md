@@ -5,7 +5,7 @@ In Chapter 1, we explored how scope is determined at code compilation, a model c
 
 Before we get to the nuts and bolts of how using lexical scope in our programs, we should make sure we have a good conceptual foundation for how scope works. This chapter will illustrate *scope* with several metaphors. The goal here is to *think* about how your program is handled by the JS engine in ways that more closely match how the JS engine actually works.
 
-## Buckets, and Bubbles, and Marbles... Oh My!
+## Marbles, and Buckets, and Bubbles... Oh My!
 
 One metaphor I've found effective in understanding scope is sorting colored marbles into buckets of their matching color.
 
@@ -68,13 +68,13 @@ Each marble (variable/identifier) is colored based on which bubble (bucket) it's
 
 As the JS engine processes a program (during compilation), and finds a declaration for a variable, it essentially asks, "which *color* scope (bubble, bucket) am I currently in?" The variable is designated as that same *color*, meaning it belongs to that bucket/bubble.
 
-The GREEN bucket is wholly nested inside of the BLUE bucket, and similarly the BLUE bucket is wholly nested inside the RED bucket. Scopes can nest inside each other as shown, to any depth of nesting as your program needs.
+The GREEN(3) bucket is wholly nested inside of the BLUE(2) bucket, and similarly the BLUE(2) bucket is wholly nested inside the RED(1) bucket. Scopes can nest inside each other as shown, to any depth of nesting as your program needs.
 
-References (non-declarations) to variables/identifiers can be made if their declarations are either in the current scope, or any scope above/outside the current scope, but never for declarations from lower/nested scopes. So an expression in the RED bucket only has access to RED marbles, not BLUE or GREEN. An expression in the BLUE bucket can reference either BLUE or RED marbles, not GREEN. And an expression in the GREEN bucket has access to RED, BLUE, and GREEN marbles.
+References (non-declarations) to variables/identifiers can be made if their declarations are either in the current scope, or any scope above/outside the current scope, but never for declarations from lower/nested scopes. So an expression in the RED(1) bucket only has access to RED(1) marbles, **not** BLUE(2) or GREEN(3). An expression in the BLUE(2) bucket can reference either BLUE(2) or RED(1) marbles, **not** GREEN(3). And an expression in the GREEN(3) bucket has access to RED(1), BLUE(2), and GREEN(3) marbles.
 
-We can conceptualize the process of determining these non-declaration marble colors during runtime as a lookup. Since the `students` variable reference in the `for`-loop statement on line 9 is not a declaration, it has no color. So we ask the current scope bucket (BLUE) if it has a marble matching that name. Since it doesn't, the lookup continues with the next outer/containing scope (RED). The RED bucket has a marble of the name `students`, so the loop-statement's `students` variable is determined to be a RED marble.
+We can conceptualize the process of determining these non-declaration marble colors during runtime as a lookup. Since the `students` variable reference in the `for`-loop statement on line 9 is not a declaration, it has no color. So we ask the current BLUE(2) scope bucket if it has a marble matching that name. Since it doesn't, the lookup continues with the next outer/containing scope: RED(1). The RED(1) bucket has a marble of the name `students`, so the loop-statement's `students` variable is determined to be a RED(1) marble.
 
-The `if (student.id == studentID)` on line 10 is similarly determined to reference a GREEN marble named `student` and a BLUE marble `studentID`.
+The `if (student.id == studentID)` on line 10 is similarly determined to reference a GREEN(3) marble named `student` and a BLUE(2) marble `studentID`.
 
 | NOTE: |
 | :--- |
@@ -248,9 +248,21 @@ console.log(nextStudent);
 // "Suzy" -- oops, an accidental-global variable!
 ```
 
+> ***Engine***: Hey *Scope Manager* (for the function), I have a *target* reference for `nextStudent`, ever heard of it?
+
+> ***(Function) Scope Manager***: Nope, never heard of it. Try the next outer scope.
+
+> ***Engine***: Hey *Scope Manager* (for the global scope), I have a *target* reference for `nextStudent`, ever heard of it?
+
+> ***(Global) Scope Manager***: Nope, but since we're in non-strict mode, I helped you out and just created a global variable for you, here you go.
+
 Yuck.
 
-This sort of accident (almost certain to lead to bugs eventually) is a great example of the protections of strict-mode, and why it's such a bad idea not to use it. Never rely on accidental global variables like that. Always use strict-mode, and always formally declare your variables. You'll then get a helpful `ReferenceError` if you ever mistakenly try to assign to a not-declared variable.
+This sort of accident (almost certain to lead to bugs eventually) is a great example of the protections of strict-mode, and why it's such a bad idea not to use it. In strict-mode, the ***Global Scope Manager*** would instead have responded:
+
+> ***(Global) Scope Manager***: Nope, never heard of it. Sorry, but I've got to throw a `ReferenceError`.
+
+Never rely on accidental global variables. Always use strict-mode, and always formally declare your variables. You'll then get a helpful `ReferenceError` if you ever mistakenly try to assign to a not-declared variable.
 
 ### Building On Metaphors
 
@@ -268,7 +280,7 @@ You resolve a *target* or *source* variable reference by first looking on the cu
 
 ## Continue The Conversation
 
-By this point, hopefully you feel more solid on what scope is and how the JS engine determines it while compiling your code.
+By this point, hopefully you feel more solid with what scope is and how the JS engine determines it while compiling your code.
 
 Before *continuing*, go find some code in one of your projects and run through the conversations. If you find yourself confused or tripped up, spend time reviewing this material.
 

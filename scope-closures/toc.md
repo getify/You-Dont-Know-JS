@@ -16,7 +16,7 @@
     * Cheating: Run-Time Scope Modifications
     * Lexical Scope
 * Chapter 2: Understanding Lexical Scope
-    * Buckets, and Bubbles, and Marbles... Oh My!
+    * Marbles, and Buckets, and Bubbles... Oh My!
     * A Conversation Among Friends
     * Nested Scope
     * Continue The Conversation
