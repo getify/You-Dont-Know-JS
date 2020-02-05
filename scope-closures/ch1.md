@@ -35,11 +35,12 @@ You also may have heard that code can be *interpreted*, but how is that differen
 
 Interpretation performs a similar task to compilation, in that it transforms your program into machine-understandable instructions. But the processing model is fairly different. Unlike a program being compiled all at once, with interpretation the source code is typically transformed line-by-line; each line or statement is immediately executed before proceeding to processing the next line of the source code.
 
-Figure 1 illustrates the difference between compilation and interpretation:
+Figure 1 illustrates compilation and interpretation of a program:
 
 <figure>
-    <img src="fig1.png" width="500" alt="Code Compilation and Code Interpretation" align="center">
-    <figcaption><em>Fig. 1: Compiled vs Interpreted</em></figcaption>
+    <img src="fig1.png" width="650" alt="Code Compilation and Code Interpretation" align="center">
+    <figcaption><em>Fig. 1: Compiled vs Interpreted Code</em></figcaption>
+    <br><br>
 </figure>
 
 Are these two processing models mutually exclusive? Generally yes. However, the topic is more nuanced, because interpretation can actually take other forms than just operating line-by-line on source code text. Modern JS engines employ variations of both compilation and interpretation in the handling of JS programs.
