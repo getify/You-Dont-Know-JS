@@ -5,11 +5,11 @@
 | :--- |
 | Work in progress |
 
-I bet you have a pretty good sense of how to create variables and store values in them. But how closely have you considered the mechanisms used by the engine to organize and manage these variables?
+Once you've written at least a few lines of code, you're already a programmer! So by this point, I bet you have a decent sense of how to create variables and store values in them. But how closely have you considered the mechanisms used by the engine to organize and manage these variables?
 
 I don't mean how the memory is allocated on the computer, but rather: how does JS know which variables are accessible by any given statement, and what happens if it finds two variables of the same name?
 
-The answers to these questions take the form of a set of well-defined rules called scope. We'll expound these rules in great detail throughout the book.
+The answers to questions like these take the form of a set of well-defined rules called scope. We'll expound these rules in great detail throughout the book.
 
 Our first step is to study how the JS engine processes (compiles) our program before it executes it.
 
