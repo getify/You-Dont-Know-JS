@@ -115,13 +115,13 @@ Here are some more declaration forms:
 
 ```js
 // generator function declaration
-function *two() { .. }
+function* two() { .. }
 
 // async function declaration
 async function three() { .. }
 
 // async generator function declaration
-async function *four() { .. }
+async function* four() { .. }
 
 // named function export declaration (ES6 modules)
 export function five() { .. }
