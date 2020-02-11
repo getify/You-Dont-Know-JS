@@ -15,26 +15,37 @@
     * Compiler Speak
     * Cheating: Run-Time Scope Modifications
     * Lexical Scope
-* Chapter 2: Understanding Lexical Scope
+* Chapter 2: Illustrating Lexical Scope
     * Marbles, and Buckets, and Bubbles... Oh My!
     * A Conversation Among Friends
     * Nested Scope
     * Continue The Conversation
-* Chapter 3: Working With Scope
-    * Nested Scopes, Revisited
+* Chapter 3: The Scope Chain
+    * "Lookup" Is (Mostly) Conceptual
+    * Shadowing
+    * Function Name Scope
+    * Arrow Functions
+    * Backing Out
+* Chapter 4: Global Scope
     * Why Global Scope?
     * Where Exactly Is This Global Scope?
+    * Global This
+    * Globally Aware
+* Chapter 5: Working with Variables
     * When Can I Use A Variable?
-    * Scope Closed
-* Chapter 4: Block Scope
+    * Hoisting: Yet Another Metaphor
+    * Re-declaration?
+    * Uninitialized Variables (aka, TDZ)
+    * Finally Initialized
+* Chapter 6: Limiting Scope Exposure
     * Least Exposure
     * Hiding In Plain (Function) Scope
     * Scoping With Blocks
     * Function Declarations In Blocks
     * Blocked Over
-* Chapter 5: Closures
+* Chapter 7: Closures
     * TODO
-* Chapter 6: Module Pattern
+* Chapter 8: Module Pattern
     * TODO
 * Appendix A: Exploring Further
 * Appendix B: Practice

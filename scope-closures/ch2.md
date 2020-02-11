@@ -1,9 +1,9 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 2: Understanding Lexical Scope
+# Chapter 2: Illustrating Lexical Scope
 
 In Chapter 1, we explored how scope is determined at code compilation, a model called "lexical scope".
 
-Before we get to the nuts and bolts of how using lexical scope in our programs, we should make sure we have a good conceptual foundation for how scope works. This chapter will illustrate *scope* with several metaphors. The goal here is to *think* about how your program is handled by the JS engine in ways that more closely match how the JS engine actually works.
+To properly *reason* about your programs, it's important to have a solid conceptual foundation of how scope works. This chapter will illustrate *scope* with several metaphors. The goal here is to *think* about how your program is handled by the JS engine in ways that more closely match how the JS engine actually works.
 
 ## Marbles, and Buckets, and Bubbles... Oh My!
 
@@ -284,4 +284,4 @@ By this point, hopefully you feel more solid with what scope is and how the JS e
 
 Before *continuing*, go find some code in one of your projects and run through the conversations. If you find yourself confused or tripped up, spend time reviewing this material.
 
-As we move forward, we want to look in much more detail at how we use lexical scope in our programs.
+As we move to the next chapter, we'll explore how the collection of lexical scopes in a program work together as a chain.

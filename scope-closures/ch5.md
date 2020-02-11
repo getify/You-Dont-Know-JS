@@ -1,347 +1,562 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 5: Closures
+# Chapter 5: Working with Variables
 
 | NOTE: |
 | :--- |
 | Work in progress |
 
-.
+By now, you should have a decent grasp of the mental model for the nesting of scopes, from the global scope downward -- a program's scope chain.
 
-.
+But just knowing which scope a variable comes from is only part of the story. If a declaration for a variable appears anywhere other than the very first statement of a scope, what can we say about any references to that identifier that occur *before* the declaration?
 
-.
+Though it may seem like a variable just *shouldn't exist* in a scope until the moment its declaration is encountered, we'll explore
 
-.
+## When Can I Use A Variable?
 
-.
+At what point does a variable become available to use in a certain part of a program? There may seem to be an obvious answer: *after* the variable has been declared/created. Right? Not quite.
 
-.
+Consider:
 
-.
+```js
+greeting();
+// Hello!
 
-----
+function greeting() {
+    console.log("Hello!");
+}
+```
+
+This code works fine. You may have seen or even written code like it before. But did you ever wonder how or why it works? Specifically, why can you access the identifier `greeting` from line 1 (to retrieve and execute a function reference), even though the `greeting()` function declaration doesn't occur until line 3?
+
+Recall how Chapter 1 pointed out that all identifiers are registered to their respective scopes during compile time. Moreover, every identifier is *created* at the beginning of the scope it belongs to, **every time that scope is entered**.
+
+The term most commonly used for making a variable available from the beginning of its enclosing scope, even though its declaration may appear further down in the scope, is called **hoisting**.
+
+But hoisting alone doesn't fully answer the posed question. Sure, we can see an identifier called `greeting` from the beginning of the scope, but why can we **call** the `greeting()` function before it's been declared?
+
+In other words, how does `greeting` have any value in it (the function reference), as soon as the scope first begins? That's a special characteristic of `function` declarations, called *function hoisting*. When a `function` declaration's name identifier is registered at the top of a scope, it is additionally initialized to that function's reference.
+
+*Function hoisting* only applies to formal `function` declarations (specifically those which appear outside of blocks -- see "FiB" in Chapter 4), not to `function` expression assignments. Consider:
+
+```js
+greeting();
+// TypeError
+
+var greeting = function greeting() {
+    console.log("Hello!");
+};
+```
+
+Line one (`greeting();`) throws an error. But the *kind* of error thrown is very important to notice. A `TypeError` means we're trying to do something with a value that is not allowed. Depending on your JS environment, the error message would say something like, "'undefined' is not a function", or preferably, "'greeting' is not a function".
+
+Notice that the error is **not** a `ReferenceError`. It's not telling us that it couldn't find `greeting` as an identifier in the scope. It's telling us that `greeting` was found but doesn't hold a function reference at that moment. Only functions can be invoked, so attempting to invoke some non-function value results in an error.
+
+But what does `greeting` hold?
+
+In addition to being hoisted, variables declared with `var` are also automatically initialized to `undefined` at the beginning of the scope. Once they're initialized, they're available to be used (assigned to, retrieved from, etc) throughout the whole scope.
+
+So on that first line, `greeting` exists, but it holds only the default `undefined` value. It's not until line 3 that `greeting` gets assigned the function reference.
+
+Pay close attention to the distinction here. A `function` declaration is hoisted **and initialized to its function value** (again, called *function hoisting*). A `var` variable is also hoisted, but it's only auto-initialized to `undefined`. Any subsequent `function` expression assignments to that variable don't happen until that statement is reached during run-time execution.
+
+In both cases, the name of the identifier is hoisted. But the function value association doesn't get handled at initialization time unless the identifier was created in a formal `function` declaration.
+
+Let's look at another example of *variable hoisting*:
+
+```js
+greeting = "Hello!";
+console.log(greeting);
+// Hello!
+
+var greeting = "Howdy!";
+```
+
+Though `greeting` isn't declared until line 4, it's available to be assigned to as early as line 1. Why? There's two necessary parts to explain that: the identifier was hoisted, **and** it was automatically initialized to the value `undefined`.
 
 | NOTE: |
 | :--- |
-| Everything below here is previous text from 1st edition, and is only here for reference while 2nd edition work is underway. Please ignore. |
+| *Variable hoisting* of this sort probably feels unnatural, and many readers might rightly want to avoid it in their programs. But should *function hoisting* also be avoided? We'll explore this in more detail in Appendix A. |
 
-We arrive at this point with hopefully a very healthy, solid understanding of how scope works.
+## Hoisting: Yet Another Metaphor
 
-We turn our attention to an incredibly important, but persistently elusive, *almost mythological*, part of the language: **closure**. If you have followed our discussion of lexical scope thus far, the payoff is that closure is going to be, largely, anticlimactic, almost self-obvious. *There's a man behind the wizard's curtain, and we're about to see him*. No, his name is not Crockford!
+Chapter 2 was full of metaphors (to illustrate scope), but here we are faced with yet another: hoisting itself. Rather than asserting hoisting as a concrete execution step the JS engine performs, it's more useful as a visualization of various actions JS takes in setting up the program **before execution**.
 
-If however you have nagging questions about lexical scope, now would be a good time to go back and review Chapter 2 before proceeding.
-
-## Enlightenment
-
-For those who are somewhat experienced in JavaScript, but have perhaps never fully grasped the concept of closures, *understanding closure* can seem like a special nirvana that one must strive and sacrifice to attain.
-
-I recall years back when I had a firm grasp on JavaScript, but had no idea what closure was. The hint that there was *this other side* to the language, one which promised even more capability than I already possessed, teased and taunted me. I remember reading through the source code of early frameworks trying to understand how it actually worked. I remember the first time something of the "module pattern" began to emerge in my mind. I remember the *a-ha!* moments quite vividly.
-
-What I didn't know back then, what took me years to understand, and what I hope to impart to you presently, is this secret: **closure is all around you in JavaScript, you just have to recognize and embrace it.** Closures are not a special opt-in tool that you must learn new syntax and patterns for. No, closures are not even a weapon that you must learn to wield and master as Luke trained in The Force.
-
-Closures happen as a result of writing code that relies on lexical scope. They just happen. You do not even really have to intentionally create closures to take advantage of them. Closures are created and used for you all over your code. What you are *missing* is the proper mental context to recognize, embrace, and leverage closures for your own will.
-
-The enlightenment moment should be: **oh, closures are already occurring all over my code, I can finally *see* them now.** Understanding closures is like when Neo sees the Matrix for the first time.
-
-## Nitty Gritty
-
-OK, enough hyperbole and shameless movie references.
-
-Here's a down-n-dirty definition of what you need to know to understand and recognize closures:
-
-> Closure is when a function is able to remember and access its lexical scope even when that function is executing outside its lexical scope.
-
-Let's jump into some code to illustrate that definition.
+The typical assertion of what hoisting means is: *lifting* -- like lifting a heavy weight upward -- any identifiers all the way to the top of a scope. The explanation often given is that the JS engine will *rewrite* that program before execution, so that it looks more like this:
 
 ```js
-function foo() {
-    var a = 2;
+var greeting;           // hoisted declaration moved to the top
 
-    function bar() {
-        console.log( a ); // 2
+greeting = "Hello!";    // the original line 1
+console.log(greeting);
+// Hello!
+
+greeting = "Howdy!";    // `var` is gone!
+```
+
+The hoisting (metaphor) proposes that JS pre-processes the original program and re-arranges it slightly, so that all the declarations have been moved to the top of their respective scopes, before execution. Moreover, the hoisting metaphor asserts that `function` declarations are, in their entirety, hoisted to the top of each scope, as well.
+
+Consider:
+
+```js
+studentName = "Suzy"
+greeting();
+// Hello Suzy!
+
+function greeting() {
+    console.log(`Hello ${ studentName }!`);
+}
+
+var studentName;
+```
+
+The "rule" of the hoisting metaphor is that function declarations get hoisted first, then variables immediately after all the functions. Thus, hoisting suggests that program is *re-written* by the JS engine to look like this:
+
+```js
+function greeting() {
+    console.log(`Hello ${ studentName }!`);
+}
+var studentName;
+
+studentName = "Suzy";
+greeting();
+// Hello Suzy!
+```
+
+The hoisting metaphor is convenient. Its benefit is allowing us to hand wave over the magical look-ahead pre-processing necessary to find all these declarations buried deep in scopes and somehow move (hoist) them to the top; we can thus think about the program as if it's executed by the JS engine in a **single pass**, top-down.
+
+Single-pass seems more straightforward than Chapter 1's assertion of a 2-phase processing.
+
+Hoisting as re-ordering code may be an attractive simplification, but it's not accurate. The JS engine doesn't actually rewrite the code. It can't magically look-ahead and find declarations. The only way to accurately find them, as well as all the scope boundaries in the program, would be to fully parse the code. Guess what parsing is? The first phase of the 2-phase processing! There's no magical mental gymnastics that gets around that fact.
+
+So if the hoisting metaphor is (at best) inaccurate, what should we do with the term? It's still useful -- indeed, even members of TC39 regularly use it! -- but we shouldn't think of it as actual re-ordering of code.
+
+| WARNING: |
+| :--- |
+| Incorrect or incomplete mental models may seem sufficient because they can occasionally lead to accidental right answers. But in the long run it's harder to accurately analyze and predict outcomes if your thinking isn't particularly aligned with how the JS engine works. |
+
+I assert that hoisting *should* refer to the **compile-time operation** of generating run-time instructions for the automatic registration of a variable at the beginning of its scope, each time that scope is entered.
+
+## Re-declaration?
+
+What do you think happens when variable is declared more than once in the same scope?
+
+Consider:
+
+```js
+var studentName = "Frank";
+
+console.log(studentName);
+// Frank
+
+var studentName;
+
+console.log(studentName);
+// ???
+```
+
+What do you expect to be printed as that second message? Many believe the second `var studentName` has re-declared the variable (and thus "reset" it), so they expect `undefined` to be printed.
+
+But is there such a thing as a variable being "re-declared" in the same scope? No.
+
+If you consider this program from the perspective of the hoisting metaphor, the code would be re-ordered like this for execution purposes:
+
+```js
+var studentName;
+var studentName;    // this is clearly a pointless no-op!
+
+studentName = "Frank";
+console.log(studentName);
+// Frank
+
+console.log(studentName);
+// Frank
+```
+
+Since hoisting is actually about registering a variable at the beginning of a scope, there's nothing to be done in the middle of the scope where the original program actually had the second `var studentName` statement. It's just a no-op(eration), a dead pointless statement.
+
+| TIP: |
+| :--- |
+| In our conversation-style from Chapter 2, *Compiler* would find the second `var` declaration statement and ask the *Scope Manager* if it had already seen a `studentName` identifier; since it had, there wouldn't be anything else to do. |
+
+It's also important to point out that `var studentName;` doesn't mean `var studentName = undefined;`, as most people assume. Let's prove they're different by considering this variation of the program:
+
+```js
+var studentName = "Frank";
+
+console.log(studentName);
+// Frank
+
+var studentName = undefined;   // let's add the initialization explicitly
+
+console.log(studentName);
+// undefined
+```
+
+See how the explicit `= undefined` initialization produces a different outcome than assuming it still happens implicitly even if omitted? In the next section, we'll revisit this topic of initialization of variables from their declarations.
+
+So a repeated `var` declaration of the same identifier name in a scope is effectively a do-nothing statement. What about repeating a declaration within a scope using `let` or `const`?
+
+```js
+let studentName = "Frank";
+
+console.log(studentName);
+
+let studentName = "Suzy";
+```
+
+This program will not execute, but instead immediately throw a Syntax Error. Depending on your JS environment, the error message will indicate something like: "Identifier 'studentName' has already been declared." In other words, this is a case where attempted "re-declaration" is explicitly not allowed!
+
+It's not just that two declarations involving `let` will throw this error. If either declaration uses `let`, the other can be either `let` or `var`, and an error will still occur, as illustrated with these two variations:
+
+```js
+var studentName = "Frank";
+let studentName = "Suzy";
+```
+
+```js
+let studentName = "Frank";
+var studentName = "Suzy";
+```
+
+In both cases, a Syntax Error is thrown on the *second* declaration. In other words, the only way to "re-declare" a variable is to use `var` for all (two or more) of its declarations.
+
+But why disallow it? The reason for the error is not technical per se, as `var` "re-declaration" has always been allowed; clearly, the same allowance could have been made for `let`. But it's really more of a "social engineering" issue. "Re-declaration" of variables is seen by some, including many on the TC39 body, as a bad habit that can lead to program bugs.
+
+So when ES6 introduced `let`, they decided to prevent "re-declaration" with an error. When *Compiler* asks *Scope Manager* about a declaration, if that identifier has already been declared, and if either/both declarations were made with `let`, an error is thrown. The intended signal to the developer is, "Stop relying on sloppy re-declaration!".
+
+| NOTE: |
+| :--- |
+| This is of course a stylistic opinion, not really a technical argument. Many developers agree with it, and that's probably in part why TC39 included the error (as well as conforming to `const`). But a reasonable case could have been made that staying consistent with `var`'s precedent was more prudent, and that such opinion-enforcement was best left to opt-in tooling like linters. We'll explore whether `var` (and its associated behavior) can still be useful in Appendix A. |
+
+### Constants?
+
+The `const` keyword is a little more constrained than `let`. Like `let`, `const` cannot be repeated with the same identifier in the same scope. But there's actually an overriding technical reason why that sort of "re-declaration" is disallowed, unlike `let` which disallows "re-declaration" mostly for stylistic reasons.
+
+The `const` keyword requires a variable to be initialized:
+
+```js
+const empty;   // SyntaxError
+```
+
+`const` declarations create variables that cannot be re-assigned:
+
+```js
+const studentName = "Frank";
+console.log(studentName);
+// Frank
+
+studentName = "Suzy";   // TypeError
+```
+
+The `studentName` variable cannot be re-assigned because it's declared with a `const`.
+
+| WARNING: |
+| :--- |
+| The error thrown when re-assigning to `studentName` is a Type Error, not a Syntax Error. The subtle distinction here is actually pretty important, but unfortunately far too easy to miss. Syntax Errors represent faults in the program that stop it from even starting execution. Type Errors represent faults that arise during program execution. In the above snippet, `"Frank"` is printed out before we process the re-assignment of `studentName`, which then throws the error. |
+
+So if `const` declarations cannot be re-assigned, and `const` declarations always require assignments, then we have a clear technical reason why `const` must disallow any "re-declarations":
+
+```js
+const studentName = "Frank";
+const studentName = "Suzy";   // obviously this must be an error
+```
+
+Since `const` "re-declaration" must be disallowed (on technical grounds), TC39 essentially felt that `let` "re-declaration" should be disallowed as well.
+
+### Loops
+
+So it's clear from our previous discussion that JS doesn't really want us to "re-declare" our variables within the same scope. That probably seems like a straightforward admonition, until you consider what it means repeated execution of declaration statements in loops.
+
+Consider:
+
+```js
+var keepGoing = true;
+
+while (keepGoing) {
+    let value = Math.random();
+    if (value > 0.5) {
+        keepGoing = false;
     }
-
-    bar();
 }
-
-foo();
 ```
 
-This code should look familiar from our discussions of Nested Scope. Function `bar()` has *access* to the variable `a` in the outer enclosing scope because of lexical scope look-up rules (in this case, it's an RHS reference look-up).
+Is `value` being "re-declared" repeatedly in this program? Will we get errors thrown?
 
-Is this "closure"?
+No.
 
-Well, technically... *perhaps*. But by our what-you-need-to-know definition above... *not exactly*. I think the most accurate way to explain `bar()` referencing `a` is via lexical scope look-up rules, and those rules are *only* (an important!) **part** of what closure is.
+All the rules of scope (including "re-declaration" of `let`-created variables) are applied *per scope instance*. In other words, each time a scope is entered during execution, everything resets.
 
-From a purely academic perspective, what is said of the above snippet is that the function `bar()` has a *closure* over the scope of `foo()` (and indeed, even over the rest of the scopes it has access to, such as the global scope in our case). Put slightly differently, it's said that `bar()` closes over the scope of `foo()`. Why? Because `bar()` appears nested inside of `foo()`. Plain and simple.
+Each loop iteration is its own new scope instance, and within each scope instance, `value` is only being declared once. So there's no attempted "re-declaration", and thus no error.
 
-But, closure defined in this way is not directly *observable*, nor do we see closure *exercised* in that snippet. We clearly see lexical scope, but closure remains sort of a mysterious shifting shadow behind the code.
-
-Let us then consider code which brings closure into full light:
+Before we consider other loop forms, what if the `value` declaration in the previous snippet were changed to a `var`?
 
 ```js
-function foo() {
-    var a = 2;
+var keepGoing = true;
 
-    function bar() {
-        console.log( a );
+while (keepGoing) {
+    var value = Math.random();
+    if (value > 0.5) {
+        keepGoing = false;
     }
-
-    return bar;
 }
-
-var baz = foo();
-
-baz(); // 2 -- Whoa, closure was just observed, man.
 ```
 
-The function `bar()` has lexical scope access to the inner scope of `foo()`. But then, we take `bar()`, the function itself, and pass it *as* a value. In this case, we `return` the function object itself that `bar` references.
+Is `value` being "re-declared" here, especially since we know `var` allows it? No. Because `var` is not treated as a block-scoping declaration (see Chapter 4), it attaches itself to the global scope. So there's just one `value`, in the same (global, in this case) scope as `keepGoing`. No "re-declaration"!
 
-After we execute `foo()`, we assign the value it returned (our inner `bar()` function) to a variable called `baz`, and then we actually invoke `baz()`, which of course is invoking our inner function `bar()`, just by a different identifier reference.
+One way to keep this all straight is to remember that `var`, `let`, and `const` do not exist in the code by the time it starts to execute. They're handled entirely by the compiler.
 
-`bar()` is executed, for sure. But in this case, it's executed *outside* of its declared lexical scope.
-
-After `foo()` executed, normally we would expect that the entirety of the inner scope of `foo()` would go away, because we know that the *Engine* employs a *Garbage Collector* that comes along and frees up memory once it's no longer in use. Since it would appear that the contents of `foo()` are no longer in use, it would seem natural that they should be considered *gone*.
-
-But the "magic" of closures does not let this happen. That inner scope is in fact *still* "in use", and thus does not go away. Who's using it? **The function `bar()` itself**.
-
-By virtue of where it was declared, `bar()` has a lexical scope closure over that inner scope of `foo()`, which keeps that scope alive for `bar()` to reference at any later time.
-
-**`bar()` still has a reference to that scope, and that reference is called closure.**
-
-So, a few microseconds later, when the variable `baz` is invoked (invoking the inner function we initially labeled `bar`), it duly has *access* to author-time lexical scope, so it can access the variable `a` just as we'd expect.
-
-The function is being invoked well outside of its author-time lexical scope. **Closure** lets the function continue to access the lexical scope it was defined in at author-time.
-
-Of course, any of the various ways that functions can be *passed around* as values, and indeed invoked in other locations, are all examples of observing/exercising closure.
+What about "re-declaration" with other loop forms, like `for`-loops?
 
 ```js
-function foo() {
-    var a = 2;
+for (let i = 0; i < 3; i++) {
+    let value = i * 10;
+    console.log(`${ i }: ${ value }`);
+}
+// 0: 0
+// 1: 10
+// 2: 20
+```
 
-    function baz() {
-        console.log( a ); // 2
+It should be clear that there's only one `value` declared per scope instance. But what about `i`? Is it being "re-declared"?
+
+To answer that, consider what scope `i` is in? It might seem like it would be in the outer (in this case, global) scope, but it's not. It's in the scope of `for`-loop body, just like `value` is. In fact, you could sorta think about that loop in this more verbose equivalent form:
+
+```js
+{
+    let $$i = 0;  // a fictional variable for illustration
+
+    for ( ; $$i < 3; $$i++) {
+        let i = $$i;   // here's our actual loop `i`!
+        let value = i * 10;
+        console.log(`${ i }: ${ value }`);
     }
-
-    bar( baz );
-}
-
-function bar(fn) {
-    fn(); // look ma, I saw closure!
+    // 0: 0
+    // 1: 10
+    // 2: 20
 }
 ```
 
-We pass the inner function `baz` over to `bar`, and call that inner function (labeled `fn` now), and when we do, its closure over the inner scope of `foo()` is observed, by accessing `a`.
+Now it should be clear: the illustrative `$$i`, as well as `i` and `value` variables, are all declared exactly once per scope instance. No "re-declaration" here.
 
-These passings-around of functions can be indirect, too.
+What about other `for`-loop forms?
 
 ```js
-var fn;
+for (let index in students) {
+    // this is fine
+}
 
-function foo() {
-    var a = 2;
+for (let student of students) {
+    // so is this
+}
+```
 
-    function baz() {
-        console.log( a );
+Same thing with `for..in` and `for..of` loops: the declared variable is treated as *inside* the loop body, and thus is handled per iteration (aka, per scope instance). No "re-declaration".
+
+OK, I know you're thinking that I sound like a broken record at this point. But let's explore how `const` impacts these looping constructs.
+
+Consider:
+
+```js
+var keepGoing = true;
+
+while (keepGoing) {
+    const value = Math.random();   // ooo, a shiny constant!
+    if (value > 0.5) {
+        keepGoing = false;
     }
-
-    fn = baz; // assign `baz` to global variable
 }
-
-function bar() {
-    fn(); // look ma, I saw closure!
-}
-
-foo();
-
-bar(); // 2
 ```
 
-Whatever facility we use to *transport* an inner function outside of its lexical scope, it will maintain a scope reference to where it was originally declared, and wherever we execute it, that closure will be exercised.
+Just like the `let` variant of this program we saw earlier, `const` is being run exactly once within each loop iteration, so it's safe from "re-declaration" troubles. But things get more complicated when we talk about `for`-loops.
 
-## Now I Can See
-
-The previous code snippets are somewhat academic and artificially constructed to illustrate *using closure*. But I promised you something more than just a cool new toy. I promised that closure was something all around you in your existing code. Let us now *see* that truth.
+`for..in` and `for..of` are fine to use with `const`:
 
 ```js
-function wait(message) {
-
-    setTimeout( function timer(){
-        console.log( message );
-    }, 1000 );
-
+for (const index in students) {
+    // this is fine
 }
 
-wait( "Hello, closure!" );
-```
-
-We take an inner function (named `timer`) and pass it to `setTimeout(..)`. But `timer` has a scope closure over the scope of `wait(..)`, indeed keeping and using a reference to the variable `message`.
-
-A thousand milliseconds after we have executed `wait(..)`, and its inner scope should otherwise be long gone, that inner function `timer` still has closure over that scope.
-
-Deep down in the guts of the *Engine*, the built-in utility `setTimeout(..)` has reference to some parameter, probably called `fn` or `func` or something like that. *Engine* goes to invoke that function, which is invoking our inner `timer` function, and the lexical scope reference is still intact.
-
-**Closure.**
-
-Or, if you're of the jQuery persuasion (or any JS framework, for that matter):
-
-```js
-function setupBot(name,selector) {
-    $( selector ).click( function activator(){
-        console.log( "Activating: " + name );
-    } );
-}
-
-setupBot( "Closure Bot 1", "#bot_1" );
-setupBot( "Closure Bot 2", "#bot_2" );
-```
-
-I am not sure what kind of code you write, but I regularly write code which is responsible for controlling an entire global drone army of closure bots, so this is totally realistic!
-
-(Some) joking aside, essentially *whenever* and *wherever* you treat functions (which access their own respective lexical scopes) as first-class values and pass them around, you are likely to see those functions exercising closure. Be that timers, event handlers, Ajax requests, cross-window messaging, web workers, or any of the other asynchronous (or synchronous!) tasks, when you pass in a *callback function*, get ready to sling some closure around!
-
-**Note:** Chapter 3 introduced the IIFE pattern. While it is often said that IIFE (alone) is an example of observed closure, I would somewhat disagree, by our definition above.
-
-```js
-var a = 2;
-
-(function IIFE(){
-    console.log( a );
-})();
-```
-
-This code "works", but it's not strictly an observation of closure. Why? Because the function (which we named "IIFE" here) is not executed outside its lexical scope. It's still invoked right there in the same scope as it was declared (the enclosing/global scope that also holds `a`). `a` is found via normal lexical scope look-up, not really via closure.
-
-While closure might technically be happening at declaration time, it is *not* strictly observable, and so, as they say, *it's a tree falling in the forest with no one around to hear it.*
-
-Though an IIFE is not *itself* an example of closure, it absolutely creates scope, and it's one of the most common tools we use to create scope which can be closed over. So IIFEs are indeed heavily related to closure, even if not exercising closure themselves.
-
-Put this book down right now, dear reader. I have a task for you. Go open up some of your recent JavaScript code. Look for your functions-as-values and identify where you are already using closure and maybe didn't even know it before.
-
-I'll wait.
-
-Now... you see!
-
-## Loops + Closure
-
-The most common canonical example used to illustrate closure involves the humble for-loop.
-
-```js
-for (var i=1; i<=5; i++) {
-    setTimeout( function timer(){
-        console.log( i );
-    }, i*1000 );
+for (const student of students) {
+    // this is also fine
 }
 ```
 
-**Note:** Linters often complain when you put functions inside of loops, because the mistakes of not understanding closure are **so common among developers**. We explain how to do so properly here, leveraging the full power of closure. But that subtlety is often lost on linters and they will complain regardless, assuming you don't *actually* know what you're doing.
-
-The spirit of this code snippet is that we would normally *expect* for the behavior to be that the numbers "1", "2", .. "5" would be printed out, one at a time, one per second, respectively.
-
-In fact, if you run this code, you get "6" printed out 5 times, at the one-second intervals.
-
-**Huh?**
-
-Firstly, let's explain where `6` comes from. The terminating condition of the loop is when `i` is *not* `<=5`. The first time that's the case is when `i` is 6. So, the output is reflecting the final value of the `i` after the loop terminates.
-
-This actually seems obvious on second glance. The timeout function callbacks are all running well after the completion of the loop. In fact, as timers go, even if it was `setTimeout(.., 0)` on each iteration, all those function callbacks would still run strictly after the completion of the loop, and thus print `6` each time.
-
-But there's a deeper question at play here. What's *missing* from our code to actually have it behave as we semantically have implied?
-
-What's missing is that we are trying to *imply* that each iteration of the loop "captures" its own copy of `i`, at the time of the iteration. But, the way scope works, all 5 of those functions, though they are defined separately in each loop iteration, all **are closed over the same shared global scope**, which has, in fact, only one `i` in it.
-
-Put that way, *of course* all functions share a reference to the same `i`. Something about the loop structure tends to confuse us into thinking there's something else more sophisticated at work. There is not. There's no difference than if each of the 5 timeout callbacks were just declared one right after the other, with no loop at all.
-
-OK, so, back to our burning question. What's missing? We need more ~~cowbell~~ closured scope. Specifically, we need a new closured scope for each iteration of the loop.
-
-We learned in Chapter 3 that the IIFE creates scope by declaring a function and immediately executing it.
-
-Let's try:
+But not the general `for`-loop:
 
 ```js
-for (var i=1; i<=5; i++) {
-    (function(){
-        setTimeout( function timer(){
-            console.log( i );
-        }, i*1000 );
-    })();
+for (const i = 0; i < 3; i++) {
+    // oops, this is going to fail
+    // after the first iteration
 }
 ```
 
-Does that work? Try it. Again, I'll wait.
+What's wrong here? We could use `let` just fine in this construct, and we asserted that it creates a new `i` for each loop iteration scope, so it doesn't even seem to be a "re-declaration".
 
-I'll end the suspense for you. **Nope.** But why? We now obviously have more lexical scope. Each timeout function callback is indeed closing over its own per-iteration scope created respectively by each IIFE.
-
-It's not enough to have a scope to close over **if that scope is empty**. Look closely. Our IIFE is just an empty do-nothing scope. It needs *something* in it to be useful to us.
-
-It needs its own variable, with a copy of the `i` value at each iteration.
+Let's mentally "expand" that loop like we did earlier:
 
 ```js
-for (var i=1; i<=5; i++) {
-    (function(){
-        var j = i;
-        setTimeout( function timer(){
-            console.log( j );
-        }, j*1000 );
-    })();
+{
+    const $$i = 0;  // a fictional variable for illustration
+
+    for ( ; $$i < 3; $$i++) {
+        const i = $$i;   // here's our actual loop `i`!
+        // ..
+    }
 }
 ```
 
-**Eureka! It works!**
+Do you spot the problem? Our `i` is indeed just created once inside the loop. That's not the problem. The problem is the conceptual `$$i` that must be incremented each time with the `$$i++` expression. That's re-assignment, which isn't allowed for constants.
 
-A slight variation some prefer is:
+Remember, this "expanded" form is only a conceptual model to help you intuit the source of the problem. You might wonder if JS could have made the `const $$i = 0` instead into `let $ii = 0`, which would then allow `const` to work with our classic `for`-loop? It's possible, but then it would have been creating potentially surprising exceptions to `for`-loop semantics.
+
+In other words, it's a rather arbitrary (and likely confusing) nuanced exception to allow `i++` in the `for`-loop header to skirt strictness the `const` assignment, but not allow other re-assignments of `i` inside the loop iteration, as is sometimes done. As such, the more straightforward answer is: `const` can't be used with the classic `for`-loop form because of the re-assignment.
+
+Interestingly, if you don't do re-assignment, then it's valid:
 
 ```js
-for (var i=1; i<=5; i++) {
-    (function(j){
-        setTimeout( function timer(){
-            console.log( j );
-        }, j*1000 );
-    })( i );
+var keepGoing = true;
+
+for (const i = 0; keepGoing; ) {
+    keepGoing = (Math.random() > 0.5);
+    // ..
 }
 ```
 
-Of course, since these IIFEs are just functions, we can pass in `i`, and we can call it `j` if we prefer, or we can even call it `i` again. Either way, the code works now.
+This is silly. There's no reason to declare `i` in that position with a `const`, since the whole point of such a variable in that position is **to be used for counting iterations**. Just use a different loop form, like a `while` loop.
 
-The use of an IIFE inside each iteration created a new scope for each iteration, which gave our timeout function callbacks the opportunity to close over a new scope for each iteration, one which had a variable with the right per-iteration value in it for us to access.
+## Uninitialized Variables (aka, TDZ)
 
-Problem solved!
+With `var` declarations, the variable is "hoisted" to the top of its scope. But it's also automatically initialized to the `undefined` value, so that the variable can be used throughout the entire scope.
 
-### Block Scoping Revisited
+However, `let` and `const` declarations are not quite the same in this respect.
 
-Look carefully at our analysis of the previous solution. We used an IIFE to create new scope per-iteration. In other words, we actually *needed* a per-iteration **block scope**. Chapter 3 showed us the `let` declaration, which hijacks a block and declares a variable right there in the block.
-
-**It essentially turns a block into a scope that we can close over.** So, the following awesome code "just works":
+Consider:
 
 ```js
-for (var i=1; i<=5; i++) {
-    let j = i; // yay, block-scope for closure!
-    setTimeout( function timer(){
-        console.log( j );
-    }, j*1000 );
+console.log(studentName);
+// ReferenceError
+
+let studentName = "Suzy";
+```
+
+The result of this program is that a `ReferenceError` is thrown on the first line. Depending on your JS environment, the error message may say something like: "Cannot access 'studentName' before initialization."
+
+| NOTE: |
+| :--- |
+| The error message as seen here used to be much more vague or misleading. Thankfully, I and others were successfully able to lobby for JS engines to improve this error message so it tells you what's wrong. |
+
+That error message is very instructive as to what's wrong. `studentName` exists on line 1, but it's not been initialized, so it cannot be used yet. Let's try this:
+
+```js
+studentName = "Suzy";   // let's try to initialize it!
+// ReferenceError
+
+console.log(studentName);
+
+let studentName;
+```
+
+Oops. We still get the Reference Error, but now on the first line where we're trying to assign to (aka, initialize!) this so-called "uninitialized" variable `studentName`. What's the deal!?
+
+The real question is, how do we initialize an uninitialized variable? For `let` / `const`, the **only way** to do so is with the assignment attached to a declaration statement. An assignment by itself is insufficient!
+
+Consider:
+
+```js
+// some other code
+
+let studentName = "Suzy";
+
+console.log(studentName);
+// Suzy
+```
+
+Here, we are initializing the `studentName`, in this case to `"Suzy"` instead of `undefined`, by way of the `let` declaration statement form that's coupled with an assignment.
+
+Alternately:
+
+```js
+// ..
+
+let studentName;
+// or:
+// let studentName = undefined;
+
+// ..
+
+studentName = "Suzy";
+
+console.log(studentName);
+// Suzy
+```
+
+| NOTE: |
+| :--- |
+| That's interesting! Recall from earlier, we said that `var studentName;` is *not* the same as `var studentName = undefined;`, but here with `let`, they behave the same. The difference comes down to the fact that `var studentName` automatically initializes at the top of the scope, where `let studentName` does not. |
+
+Recall that we asserted a few times so far that *Compiler* ends up removing any `var` / `let` / `const` declaration statements, replacing them with the instructions at the top of each scope to register the appropriate identifiers.
+
+So if we analyze what's going on here, we see that an additional nuance is that *Compiler* is also adding an instruction in the middle of the program, at the point where the variable `studentName` was declared, to do the auto-initialization. We cannot use the variable at any point prior to that initialization occuring. The same goes for `const` as it does for `let`.
+
+The term coined by TC39 to refer to this *period of time* from the entering of a scope to where the auto-initialization of the variable occurs, is: Temporal Dead Zone (TDZ). The TDZ is the time window where a variable exists but is still uninitialized, and therefore cannot be accessed in any way. Only the execution of the instructions left by *Compiler* at the point of the original declaration can do that initialization. After that moment, the TDZ is over, and the variable is free to be used for the rest of the scope.
+
+By the way, "temporal" in TDZ does indeed refer to *time* not *position-in-code*. Consider:
+
+```js
+askQuestion();
+// ReferenceError
+
+let studentName = "Suzy";
+
+function askQuestion() {
+    console.log(`${ studentName }, what do you think?`);
 }
 ```
 
-*But, that's not all!* (in my best Bob Barker voice). There's a special behavior defined for `let` declarations used in the head of a for-loop. This behavior says that the variable will be declared not just once for the loop, **but each iteration**. And, it will, helpfully, be initialized at each subsequent iteration with the value from the end of the previous iteration.
+Even though positionally the `console.log(..)` referencing `studentName` comes *after* the `let studentName` declaration, timing wise the `askQuestion()` function is invoked *before*, while `studentName` is still in its TDZ!
+
+There's a common misconception that TDZ means `let` and `const` do not hoist. I think this is an inaccurate, or at least misleading, claim.
+
+The actual difference is that `let` / `const` declarations do not automatically initialize, the way `var` does. The *debate* then is if the auto-initialization is *part of* hoisting, or not? I think auto-registration of a variable at the top of the scope (i.e., what I call "hoisting") and auto-initialization (to `undefined`) are distinct operations and shouldn't be lumped together under the single term "hoisting".
+
+We've already seen `let` and `const` don't auto-initialize at the top of the scope. But let's prove that `let` and `const` *do* hoist (auto-register at the top of the scope), courtesy of our friend shadowing (see "Shadowing" in Chapter 3):
 
 ```js
-for (let i=1; i<=5; i++) {
-    setTimeout( function timer(){
-        console.log( i );
-    }, i*1000 );
+var studentName = "Kyle";
+
+{
+    console.log(studentName);
+    // ???
+
+    // ..
+
+    let studentName = "Suzy";
+
+    console.log(studentName);
+    // Suzy
 }
 ```
 
-How cool is that? Block scoping and closure working hand-in-hand, solving all the world's problems. I don't know about you, but that makes me a happy JavaScripter.
+What's going to happen with the first `console.log(..)` statement? If `let studentName` didn't hoist to the top of the scope, then it *should* print `"Kyle"`, right? At that moment, it seems, only the outer `studentName` would exist, so that's which variable the `console.log(..)` should access and print.
 
-## Review (TL;DR)
+But instead, we're going to get a TDZ error at that first `console.log(..)`, because in fact, the inner scope's `studentName` **was** hoisted (auto-registered at the top of the scope). But what **didn't** happen (yet!) was the auto-initialization of that inner `studentName`; it's still unintialized at that moment, hence the TDZ violation!
 
-Closure seems to the un-enlightened like a mystical world set apart inside of JavaScript which only the few bravest souls can reach. But it's actually just a standard and almost obvious fact of how we write code in a lexically scoped environment, where functions are values and can be passed around at will.
+So to summarize, TDZ errors occur because `let` / `const` declarations *do* hoist their declarations to the top of their scopes, but unlike `var`, they defer the auto-initialization of their variables until the moment in the code's sequencing where the original declaration appeared. This window of time (hint: temporal), whatever its length, is the TDZ.
 
-**Closure is when a function can remember and access its lexical scope even when it's invoked outside its lexical scope.**
+How can you avoid TDZ errors?
 
-Closures can trip us up, for instance with loops, if we're not careful to recognize them and how they work. But they are also an immensely powerful tool, enabling patterns like *modules* in their various forms.
+My advice: always put your `let` and `const` declarations at the top of any scope. Shrink the TDZ window to zero (or near zero) time, and then it'll be moot.
 
-Modules require two key characteristics: 1) an outer wrapping function being invoked, to create the enclosing scope 2) the return value of the wrapping function must include reference to at least one inner function that then has closure over the private inner scope of the wrapper.
+But why is TDZ even a thing? Why didn't TC39 dictate that `let` / `const` auto-initialize the way `var` does? Just be patient, we'll come back to explore the *why* of TDZ in Appendix A.
 
-Now we can see closures all around our existing code, and we have the ability to recognize and leverage them to our own benefit!
+## Finally Initialized
+
+Working with variables has much more nuance than it seems at first glance. *Hoisting*, *(re)declaration*, and the *TDZ* are common sources of confusion for developers, especially those who have worked in other languages before coming to JS. Before moving on, make sure your mental model is more grounded with these aspects of JS scope and variables.
+
+Hoisting is generally cited as an explicit mechanism of the JS engine, but it's really more a metaphor to describe the various ways JS handles variable declarations during compilation. But even as a metaphor, hoisting offers useful structure for thinking about the life-cycle of a variable -- when it's created, when it's available to use, when it goes away.
+
+Declaration and re-declaration of variables tend to cause confusion when thought of as run-time operations. But if you shift to compile-time thinking for these operations, the quirks and *shadows* begin to shrink away.
+
+The TDZ (temporal dead zone) error is strange and frustrating when encountered. Fortunately, TDZ is relatively straightforward to avoid if you're careful to place `let` / `const` declarations at the top of any scope.
+
+After overcoming these stumbling blocks of variable scope, the next chapter examines what factors impact our decisions to locate variable declarations in specific scopes, especially nested blocks.

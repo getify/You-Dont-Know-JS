@@ -311,4 +311,4 @@ Instead, compilation creates a map of all the lexical scopes that the program wi
 
 Scopes are planned out during compilation -- that's why we refer to "lexical scope" as a compile-time decision -- but they aren't actually created until run-time. Each scope is instantiated in memory each time it needs to run.
 
-In the next chapter, we'll dig into the conceptual foundations of lexical scope.
+In the next chapter, we'll sketch out the conceptual foundations of lexical scope.
