@@ -207,20 +207,27 @@ Unlike earlier with `hideTheCache()`, where the outer surrounding `(..)` were no
 
 Be aware that using an IIFE to define a scope can have some unintended consequences, depending on the code around it. Because an IIFE is a full function, the function boundary alters the behavior of certain statements/constructs.
 
-For example, a `return` statement in some piece of code would change its meaning if then wrapped in an IIFE, because now the `return` would refer to the IIFE's function. Non-arrow function IIFEs also change the binding of a `this` keyword. And statements like `break` and `continue` won't operate across an IIFE function boundary to control an outer loop or block.
+For example, a `return` statement in some piece of code would change its meaning if then wrapped in an IIFE, because now the `return` would refer to the IIFE's function. Non-arrow function IIFEs also change the binding of a `this` keyword -- more on that in the "Objects & Classes" book. And statements like `break` and `continue` won't operate across an IIFE function boundary to control an outer loop or block.
 
 So, if the code you need to wrap a scope around has `return`, `this`, `break`, or `continue` in it, an IIFE is probably not the best approach. In that case, you might look to create the scope with a block instead of a function.
 
 ## Scoping With Blocks
 
-You should by this point feel fairly comfortable with creating scopes to prevent unnecessary identifier exposure.
+You should by this point feel fairly comfortable with creating scopes to limit identifier exposure.
 
-And so far, we looked at doing this via `function` (i.e., IIFE) scope. But let's now consider using `let` declarations with nested blocks. In general, any `{ .. }` curly-brace pair which is a statement will act as a block, but **not necessarily** as a scope. A block only becomes a scope if it needs to, to contain any block-scoped declarations (i.e., `let` or `const`) present within it.
+So far, we looked at doing this via `function` (i.e., IIFE) scope. But let's now consider using `let` declarations with nested blocks. In general, any `{ .. }` curly-brace pair which is a statement will act as a block, but **not necessarily** as a scope.
+
+A block only becomes a scope if it needs to, to contain any block-scoped declarations (i.e., `let` or `const`) present within it.
 
 Consider:
 
 ```js
 {
+    // not necessarily a scope (yet)
+
+    // ..
+
+    // now we know the block needs to be a scope
     let thisIsNowAScope = true;
 
     for (let i = 0; i < 5; i++) {
@@ -235,17 +242,23 @@ Consider:
 // 0 2 4
 ```
 
-| NOTE: |
-| :--- |
-| Not all `{ .. }` curly-brace pairs create blocks (and thus are eligible to become scopes). Object literals use `{ .. }` curly-brace pairs to delimit their key-value lists, but such objects are **not** scopes. `class` uses `{ .. }` curly-braces around its body definition, but this is not a block or scope. A `function` uses `{ .. } ` around its body, but this is not technically a block -- it's a single statement for the function body -- though it *is* a (function) scope. The `{ .. }` curly-brace pair around the `case` clauses of a `switch` statement does not define a block/scope. |
+Not all `{ .. }` curly-brace pairs create blocks (and thus are eligible to become scopes):
 
-Blocks can be defined as part of a statement (like an `if` or `for`), or as bare standalone block statements, as shown in the outermost `{ .. }` curly brace pair in the snippet above. An explicit block of this sort, without any declarations (and thus, not actually a scope) serves no operational purpose, though it can be useful as a stylistic signal.
+* Object literals use `{ .. }` curly-brace pairs to delimit their key-value lists, but such objects are **not** scopes.
 
-Explicit blocks were always valid JS syntax, but since they couldn't be a scope, they were extremely uncommon prior to ES6's introduction of `let` / `const`. Now they're starting to catch on a little bit.
+* `class` uses `{ .. }` curly-braces around its body definition, but this is not a block or scope.
 
-In most languages that support block scoping, an explicit block scope is a very common pattern for creating a narrow slice of scope for one or a few variables. So following the POLE principle, we should embrace this pattern more widespread in JS as well; use block scoping to narrow the exposure of identifiers to the minimum practical.
+* A `function` uses `{ .. } ` around its body, but this is not technically a block -- it's a single statement for the function body -- though it *is* a (function) scope.
 
-An explicit block scope can be useful even inside of another block (whether it's a scope or not).
+* The `{ .. }` curly-brace pair around the `case` clauses of a `switch` statement does not define a block/scope.
+
+Other than such non-block examples, a `{ .. }` curly-brace pair can define a block attached to a statement (like an `if` or `for`), or stand alone by itself -- see the outermost `{ .. }` curly brace pair in the previous snippet. An explicit block of this sort, without any declarations (and thus, not actually a scope) serves no operational purpose, though it can be useful as a stylistic signal.
+
+Explicit blocks have always been valid JS syntax, but since prior to ES6's `let` / `const` they couldn't be a scope, they have been quite uncommon. Post ES6, they're starting to catch on a little bit.
+
+In most languages that support block scoping, an explicit block scope is an extremely common pattern for creating a narrow slice of scope for one or a few variables. So following the POLE principle, we should embrace this pattern more widespread in JS as well; use (explicit) block scoping to narrow the exposure of identifiers to the minimum practical.
+
+An explicit block scope can be useful even inside of another block (whether the outer block is a scope or not).
 
 For example:
 
@@ -254,7 +267,8 @@ if (somethingHappened) {
     // this is a block, but not a scope
 
     {
-        // this is an explicit block scope
+        // this is both a block and an
+        // explicit block scope
         let msg = somethingHappened.message();
         notifyOthers(msg);
     }
@@ -263,13 +277,13 @@ if (somethingHappened) {
 }
 ```
 
-Here, the `{ .. }` curly-brace pair inside the `if` statement is an even smaller inner explicit block scope for `msg`, since that variable is not needed for the entire `if` block. Most developers would just block-scope `msg` to the `if` block and move on. When there's only a few lines to consider, it's a toss-up judgement call. As code grows, these issues become more pronounced.
+Here, the `{ .. }` curly-brace pair inside the `if` statement is an even smaller inner explicit block scope for `msg`, since that variable is not needed for the entire `if` block. Most developers would just block-scope `msg` to the `if` block and move on. And to be fair, when there's only a few lines to consider, it's a toss-up judgement call. But as code grows, these over-exposure issues become more pronounced.
 
-So does it matter enough to add the extra `{ .. }` pair and indentation level? I think you should follow POLE and always define the smallest block (within reason!) for each variable. So I would recommend using the extra explicit block scope.
+So does it matter enough to add the extra `{ .. }` pair and indentation level? I think you should follow POLE and always (within reason!) define the smallest block for each variable. So I recommend using the extra explicit block scope.
 
-| TIP: |
-| :--- |
-| Recall the discussion of TDZ errors from "Uninitialized Variables (TDZ)" (Chapter 5). My suggestion there was to minimize the risk of TDZ errors with `let` / `const` declarations is to always put those declarations at the top of their scope. If you find yourself placing a `let` declaration in the middle of a scope block, first think, "Oh, no! TDZ alert!". Recognize that if this `let` declaration isn't actually needed for the first half of that block, you should use an inner explicit block scope to further narrow its exposure! |
+Recall the discussion of TDZ errors from "Uninitialized Variables (TDZ)" (Chapter 5). My suggestion there was to minimize the risk of TDZ errors with `let` / `const` declarations is to always put those declarations at the top of their scope.
+
+If you find yourself placing a `let` declaration in the middle of a scope block, first think, "Oh, no! TDZ alert!". Recognize that if this `let` declaration isn't actually needed for the first half of that block, you should use an inner explicit block scope to further narrow its exposure!
 
 Another example making use of an explicit block scope:
 
@@ -393,11 +407,13 @@ There are other stylistic and operational reasons to choose `var` or `let` in di
 | :--- |
 | My advice to use `var` AND `let` here is controversial. It's far more common to hear assertions like, "var is broken, let fixes it" and, "never use var, let is the replacement". Those opinions are as valid as my opinions, but they're just opinions; `var` is not factually broken or deprecated. It has worked since early JS and it will continue to always work as long as JS is around. |
 
-### When To `let`?
+### Where To `let`?
 
 My advice to reserve `var` for (mostly only) a top-level function scope means that all other declarations should use `let`. But you may still be wondering how to decide where each declaration in your program belongs?
 
-POLE already guides you on those decisions, but let's make sure we explicitly state it. The way to decide is not based on which keyword you want to use. The way to decide is to ask, "What is the most minimal scope exposure that's sufficient for this variable?" Once that is answered, you'll know if a variable belongs in a block scope or the function scope. If you decide initially that a variable should be block-scoped, and later realize it needs to be elevated to be function-scoped, then that dictates a change not only in the location of that variable's declaration, but also the keyword used. The decision making process really should proceed like that
+POLE already guides you on those decisions, but let's make sure we explicitly state it. The way to decide is not based on which keyword you want to use. The way to decide is to ask, "What is the most minimal scope exposure that's sufficient for this variable?"
+
+Once that is answered, you'll know if a variable belongs in a block scope or the function scope. If you decide initially that a variable should be block-scoped, and later realize it needs to be elevated to be function-scoped, then that dictates a change not only in the location of that variable's declaration, but also the keyword used. The decision making process really should proceed like that.
 
 If a declaration belongs in a block scope, use `let`. If it belongs in the function scope, use `var` (again, my opinion).
 
@@ -417,7 +433,7 @@ function diff(x,y) {
 }
 ```
 
-In this version of `diff(..)`, `tmp` is clearly declared in the function scope. Is that appropriate for `tmp`? I would argue, no. `tmp` is only needed for those few statements. It's not needed once we get to the `return` statement. It should therefore be block-scoped.
+In this version of `diff(..)`, `tmp` is clearly declared in the function scope. Is that appropriate for `tmp`? I would argue, no. `tmp` is only needed for those few statements. It's not needed for the `return` statement. It should therefore be block-scoped.
 
 Prior to ES6, we didn't have `let` so we couldn't *actually* block-scope it. But we could do the next-best thing:
 
@@ -425,7 +441,8 @@ Prior to ES6, we didn't have `let` so we couldn't *actually* block-scope it. But
 function diff(x,y) {
     if (x > y) {
         // `tmp` is still function-scoped, but
-        // it signals block-scoping stylistically
+        // the placement here stylistically
+        // signals block-scoping
         var tmp = x;
         x = y;
         y = tmp;
@@ -437,7 +454,7 @@ function diff(x,y) {
 
 Placing the `var` declaration for `tmp` inside the `if` statement signals to the reader of the code that `tmp` belongs to that block. Even though JS doesn't enforce that scoping, the stylistic signal still has benefit for the reader of your code.
 
-Now, you can just locate any `var` that's inside a block of this sort and switch it to `let` to enforce the signal already being sent stylistically.
+Now, you can just find any `var` that's inside a block of this sort and switch it to `let` to enforce the signal already being sent stylistically.
 
 Another example that used to be commonly based on `var` but which should pretty much always be `let` is a `for` loop:
 
@@ -516,28 +533,26 @@ console.log(err);
 
 The `err` variable declared by the `catch` clause is block-scoped to that block. This clause block can have other block-scoped declarations via `let`. But a `var` declaration inside this block still attaches to the outer function/global scope.
 
-ES2019 (recently, at the time of writing) changed `catch` clauses so their declaration is optional. If you need to catch *that an exception occurred* (so you can gracefully recover), but you don't care about the error value itself, you can omit that declaration:
+ES2019 (recently, at the time of writing) changed `catch` clauses so their declaration is optional; if the declaration is omitted, the `catch` block is no longer (by default) a scope.
+
+So if you need to catch *that an exception occurred* (so you can gracefully recover), but you don't care about the error value itself, you can omit the `catch` error declaration:
 
 ```js
 try {
     doOptionOne();
 }
-catch {  // catch-declaration omitted
+catch {   // catch-declaration omitted
     doOptionTwoInstead();
 }
 ```
 
-| NOTE: |
-| :--- |
-| In this case, the `catch` block is **not** a scope unless a `let` declaration is added inside it. |
+This is a small but delightful simplification of syntax for a fairly common use-case, and may also be slightly more performant in removing an unncessary scope!
 
-This is a small but delightful simplification of syntax for a fairly common use-case!
+## Function Declarations In Blocks (FiB)
 
-## Functions Declarations In Blocks (FiB)
+We've seen now that `let` / `const` declarations are block-scoped, and `var` declarations are function-scoped. So what about `function` declarations that appear directly inside blocks? As a feature, this is called "FiB".
 
-We've seen now that `let` / `const` declarations are block-scoped, and `var` declarations are function-scoped. So what about `function` declarations that appear directly inside blocks (as a feature, called "FiB")?
-
-We typically think of `function` declarations like they're the equivalent of a `var` declaration. So are they function-scoped?
+We typically think of `function` declarations like they're the equivalent of a `var` declaration. So are they function-scoped like `var` is?
 
 No, and yes. I know... that's confusing. Let's dig in.
 
@@ -555,21 +570,21 @@ ask();
 
 What do you expect for this program to do? Three reasonable outcomes:
 
-1. The `ask()` call might fail with a Reference Error exception, because the `ask` identifier is block-scoped to the `if` block scope and thus isn't available in the outer/global scope.
+1. The `ask()` call might fail with a `ReferenceError` exception, because the `ask` identifier is block-scoped to the `if` block scope and thus isn't available in the outer/global scope.
 
-2. The `ask()` call might fail with a Type Error exception, because the `ask` identifier exists, but it's `undefined` (since the `if` statement doesn't run) and thus not a callable function.
+2. The `ask()` call might fail with a `TypeError` exception, because the `ask` identifier exists, but it's `undefined` (since the `if` statement doesn't run) and thus not a callable function.
 
 3. The `ask()` call might run correctly, printing out the "Does it run?" message.
 
-Here's the confusing part: depending on which JS environment you try that code snippet in, you may get different results! This is one of those few crazy areas where existing legacy behavior interferes with getting a predictable outcome.
+Here's the confusing part: depending on which JS environment you try that code snippet in, you may get different results! This is one of those few crazy areas where existing legacy behavior interferes with a predictable outcome.
 
 The JS specification says that `function` declarations inside of blocks are block-scoped, so the answer should be (1). However, most browser-based JS engines (including v8 which comes from Chrome but is also used in Node) will behave as (2), meaning the identifier is scoped outside the `if` block but the function value is not automatically initialized, so it remains `undefined`.
 
-Why are browser JS engines allowed to behave contrary to the specification? Because these engines already had certain behaviors around FiB before ES6 introduced block scoping, and there was concern that changing to adhere to the specification might break some existing website JS code. As such, an exception was made in Appendix B of the specification, which allows certain deviations for browser JS engines (only!).
+Why are browser JS engines allowed to behave contrary to the specification? Because these engines already had certain behaviors around FiB before ES6 introduced block scoping, and there was concern that changing to adhere to the specification might break some existing website JS code. As such, an exception was made in Appendix B of the JS specification, which allows certain deviations for browser JS engines (only!).
 
 | NOTE: |
 | :--- |
-| You wouldn't typically categorize Node as being a browser JS environment, since it usually runs on a server. But it's an interesting corner case since it shares the v8 engine with the Chrome (and Edge, now) browsers. Since v8 is first a browser JS engine, it follows this Appendix B exception, which then means that the browser exceptions are extended to Node. |
+| You wouldn't typically categorize Node as being a browser JS environment, since it usually runs on a server. But it's an interesting corner case since it shares the v8 engine with the Chrome (and Edge, now) browsers. Since v8 is first a browser JS engine, it adopts this Appendix B exception, which then means that the browser exceptions are extended to Node. |
 
 One of the most common use-cases for placing a `function` declaration in a block is to conditionally define a function one way or another (like with an `if..else` statement) depending on some environment state. For example:
 
@@ -586,13 +601,13 @@ else {
 }
 ```
 
-It's tempting to structure code this way for performance reasons, since the `typeof Array.isArray` check is only performed once, as opposed to defining just one `isArray(..)` and putting the `if` statement inside it, where the check then runs unnecessarily on every call.
+It's tempting to structure code this way for performance reasons, since the `typeof Array.isArray` check is only performed once, as opposed to defining just one `isArray(..)` and putting the `if` statement inside it -- the check would then run unnecessarily on every call.
 
 | WARNING: |
 | :--- |
 | In addition to the risks of FiB deviations, one problem with the conditional-definition of functions is that it is harder to debug such a program. If you end up with a bug in the `isArray(..)` function, you first have to figure out *which* `isArray(..)` function definition is actually applied! Sometimes, the bug is that the wrong one got applied because the conditional check was incorrect! If you allow a program to define multiple versions of a function, that program is always harder to reason about and maintain. |
 
-In addition to the situations in the above snippets, there are several other corner cases around FiB you can be bitten by; such behaviors in various browsers and non-browser JS environments (that is, JS engines that aren't primarily browser based) will likely vary.
+In addition to the situations in the above snippets, there are several other corner cases around FiB you to be wary of; such behaviors in various browsers and non-browser JS environments (that is, JS engines that aren't primarily browser based) will likely vary.
 
 For example:
 
@@ -622,15 +637,15 @@ function ask() {
 }
 ```
 
-Recall that function hoisting as described in "When Can I Use A Variable?" (Chapter 3) might suggest that the final `ask()` in this snippet, with "Maybe..." as its message, would hoist above the call to `ask()`. Since it's the last function declaration of that name, it should "win", right? Unfortunately, no.
+Recall that function hoisting as described in "When Can I Use A Variable?" (in Chapter 5) might suggest that the final `ask()` in this snippet, with "Maybe..." as its message, would hoist above the call to `ask()`. Since it's the last function declaration of that name, it should "win", right? Unfortunately, no.
 
-It's not my intention to document all these weird corner cases, nor to try to explain why each of them behaves a certain way. That information is, in my opinion, useless legacy trivia.
+It's not my intention to document all these weird corner cases, nor to try to explain why each of them behaves a certain way. That information is, in my opinion, arcane legacy trivia.
 
 My real concern with FiB is, what advice can I give to ensure your code behaves predictably in all circumstances?
 
-As far as I'm concerned, the only practical answer to avoiding the vagaries of FiB is to simply avoid FiB entirely. In other words, never place a `function` declaration directly inside any block. Always place `function` declarations at the top-level scope of a function (or in the global scope).
+As far as I'm concerned, the only practical answer to avoiding the vagaries of FiB is to simply avoid FiB entirely. In other words, never place a `function` declaration directly inside any block. Always place `function` declarations anywhere in the top-level scope of a function (or in the global scope).
 
-So for the earlier `if..else` example, my suggestion is to avoid conditionally defining functions if at all possible. Yes it may be slightly less performant, but this is a better overall option in my opinion:
+So for the earlier `if..else` example, my suggestion is to avoid conditionally defining functions if at all possible. Yes it may be slightly less performant, but this is the better overall approach:
 
 ```js
 function isArray(a) {
