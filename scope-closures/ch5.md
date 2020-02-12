@@ -36,7 +36,7 @@ But hoisting alone doesn't fully answer the posed question. Sure, we can see an 
 
 In other words, how does `greeting` have any value in it (the function reference), as soon as the scope first begins? That's a special characteristic of `function` declarations, called *function hoisting*. When a `function` declaration's name identifier is registered at the top of a scope, it is additionally initialized to that function's reference.
 
-*Function hoisting* only applies to formal `function` declarations (specifically those which appear outside of blocks -- see "FiB" in Chapter 4), not to `function` expression assignments. Consider:
+*Function hoisting* only applies to formal `function` declarations (specifically those which appear outside of blocks -- see "FiB" in Chapter 6), not to `function` expression assignments. Consider:
 
 ```js
 greeting();
@@ -75,13 +75,13 @@ Though `greeting` isn't declared until line 4, it's available to be assigned to 
 
 | NOTE: |
 | :--- |
-| *Variable hoisting* of this sort probably feels unnatural, and many readers might rightly want to avoid it in their programs. But should *function hoisting* also be avoided? We'll explore this in more detail in Appendix A. |
+| *Variable hoisting* of this sort probably feels unnatural, and many readers might rightly want to avoid it in their programs. But should *function hoisting* also be avoided? We'll explore these angles of hoisting in more detail in Appendix A. |
 
 ## Hoisting: Yet Another Metaphor
 
-Chapter 2 was full of metaphors (to illustrate scope), but here we are faced with yet another: hoisting itself. Rather than asserting hoisting as a concrete execution step the JS engine performs, it's more useful as a visualization of various actions JS takes in setting up the program **before execution**.
+Chapter 2 was full of metaphors (to illustrate scope), but here we are faced with yet another: hoisting itself. Rather than hoisting being a concrete execution step the JS engine performs, it's more useful to think of hoisting as a visualization of various actions JS takes in setting up the program **before execution**.
 
-The typical assertion of what hoisting means is: *lifting* -- like lifting a heavy weight upward -- any identifiers all the way to the top of a scope. The explanation often given is that the JS engine will *rewrite* that program before execution, so that it looks more like this:
+The typical assertion of what hoisting means: *lifting* -- like lifting a heavy weight upward -- any identifiers all the way to the top of a scope. The explanation often cited is that the JS engine will actually *rewrite* that program before execution, so that it looks more like this:
 
 ```js
 var greeting;           // hoisted declaration moved to the top
@@ -109,7 +109,7 @@ function greeting() {
 var studentName;
 ```
 
-The "rule" of the hoisting metaphor is that function declarations get hoisted first, then variables immediately after all the functions. Thus, hoisting suggests that program is *re-written* by the JS engine to look like this:
+The "rule" of the hoisting metaphor is that function declarations are hoisted first, then variables immediately after all the functions. Thus, hoisting suggests that program is *re-written* by the JS engine to look like this:
 
 ```js
 function greeting() {

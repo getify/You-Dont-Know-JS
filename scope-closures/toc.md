@@ -44,7 +44,7 @@
     * Function Declarations In Blocks
     * Blocked Over
 * Chapter 7: Closures
-    * Defined By Observation
+    * See The Closure
 * Chapter 8: Module Pattern
     * TODO
 * Appendix A: Exploring Further
