@@ -5,6 +5,83 @@
 | :--- |
 | Work in progress |
 
+Up to this point, we've focused on the ins and outs of lexical scope, and how that affects the organization and usage of variables in our programs.
+
+Our attention again shifts broader in abstraction, to how closure helps functions preserve access to their lexical scope chain, across time and invocation. Closure is grounded in the rules of lexical scope.
+
+If you've ever written a callback that accesses variables outside its own scope, chances are you've already encountered closures, even if you didn't recognize them. Indeed, you may find the revelation of what closure is rather anti-climatic.
+
+Even still, closure is one of the most important language characteristics ever invented in programming, and is absolutely critical to mastering JS and effectively leveraging design patterns like modules (covered in the next chapter).
+
+## Defined By Observation
+
+Closure is originally a mathematical concept, from lambda calculus. But I'm not going to list out math formulas or use a bunch of jargon to define it.
+
+Instead, I'm going to use a practical perspective to illuminate closure. I want to define closure in terms of what we can observe in different behavior of our programs, as opposed to if closure was not present in JS.
+
+First, closure is a behavioral characteristic of functions. If you aren't dealing with a function, closure does not apply. An object cannot have closure, nor does a class have closure (though its function methods might). Only functions.
+
+For closure to be observed, a function must be executed, and specifically it must be executed from a different branch of the scope chain from where it was originally defined. A function executing in the same scope it was defined would not exhibit any observably different behavior with or without closure being possible, so by my observational perspective on the definition, that is not closure.
+
+Let's look at some code:
+
+```js
+function lookupStudent(studentID) {
+    var students = [
+        { id: 14, name: "Kyle" },
+        { id: 73, name: "Suzy" },
+        { id: 112, name: "Frank" },
+        { id: 6, name: "Sarah" }
+    ];
+
+    return function greetStudent(greeting){
+        var studentName;
+
+        for (let student of students) {
+            if (student.id == studentID) {
+                studentName = student.name;
+                break;
+            }
+        }
+
+        return `${ greeting }, ${ studentName }!`;
+    };
+}
+
+var chosenStudents = [
+    lookupStudent(6),
+    lookupStudent(112)
+];
+
+// accessing the function's name:
+chosenStudents[0].name;
+// greetStudent
+
+chosenStudents[0]("Hello");
+// Hello, Sarah!
+
+chosenStudents[1]("Howdy");
+// Howdy, Frank!
+```
+
+The first thing to notice about this code is that the `lookupStudent(..)` outer function creates and returns an inner function called `greetStudent(..)`. The `lookupStudent(..)` function is called twice, producing two separate instances of its inner `greetStudent(..)` function, both of which are saved into the `chosenStudents` array.
+
+We verify that's the case by checking the `.name` property of the returned function saved in `chosenStudents[0]`, and it's indeed an instance of the inner `greetStudent(..)`.
+
+After each call to `lookupStudent(..)` finishes, it would seem like all its inner variables would be discarded and GC'd (garbage collected). The inner function is the only thing that seems to be returned and preserved. But here's where the behavior differs in ways we can start to observe.
+
+While `greetStudent(..)` does receive a single argument as the parameter named `greeting`, it also makes reference to both `students` and `studentID`, identifiers which come from the enclosing scope of `lookupStudent(..)`. Each of those references from the inner function to the variable in an outer scope is called a *closure*. In academic terms, each instance of `greetStudent(..)` *closes over* the outer variables `students` and `studentID`.
+
+So what do those closures do here, in a concrete, observable sense?
+
+They allow `greetStudent(..)` to continue to access those outer variables even after the outer scope is finished (when each call to `lookupStudent(..)` completes). Instead of each set of `students` and `studentID` being GC'd, they stay around in memory, so that at a later time when either instance of the `greetStudent(..)` function is invoked, those variables are still there, holding their current values.
+
+If JS functions did not have closure, the completion of each `lookupStudent(..)` call would immediately tear down its scope and GC the `students` and `studentID` variables. When we later tried to call one of the `greetStudent(..)` functions, what would then happen?
+
+If `greetStudent(..)` tried to access what it thought was a BLUE(1) marble, but that marble did not actually exist (anymore), the reasonable assumption is we should get a `ReferenceError`, right?
+
+So the fact that `chosenStudents[0]("Hello")` is able to execute as expected, and give us the message "Hello, Sarah!", is a direct observation of closure!
+
 .
 
 .
