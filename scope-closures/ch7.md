@@ -98,7 +98,7 @@ add10To(15);    // 25
 add42To(9);     // 51
 ```
 
-Each instance of the inner `addTo(..)` function is closing over its respective `x` variable (with values `10` and `42`, respectively), so those `x`'s don't go away just because `adder(..)` finishes. When we later invoke one of those inner `addTo(..)` instances, such as the `add10To(15)` call, its closed over `x` variable still exists and still holds the original `10` value. The operation is thus able to perform `10 + 15` and return the answer `25`.
+Each instance of the inner `addTo(..)` function is closing over its own `x` variable (with values `10` and `42`, respectively), so those `x`'s don't go away just because `adder(..)` finishes. When we later invoke one of those inner `addTo(..)` instances, such as the `add10To(15)` call, its closed over `x` variable still exists and still holds the original `10` value. The operation is thus able to perform `10 + 15` and return the answer `25`.
 
 In both the previous examples, we accessed and read the value from a variable that was part of a closure. But closure is a preservation of the full variable itself, which means we're not limited to merely reading a value; the closed-over variable can be updated (reassigned) as well.
 
@@ -156,10 +156,10 @@ Closure is most commonly encountered with callbacks:
 ```js
 function lookupStudentRecord(studentID) {
     ajax(
-        `https://some.api/student/${studentID}`,
+        `https://some.api/student/${ studentID }`,
         function onRecord(record) {
             console.log(
-                `${record.name} (${studentID})`
+                `${ record.name } (${ studentID })`
             );
         }
     );
@@ -179,7 +179,7 @@ Event handlers are another common example of closure:
 function listenForClicks(btn,label) {
     btn.addEventListener("click",function onClick(){
         console.log(
-            `The ${label} button was clicked!`
+            `The ${ label } button was clicked!`
         );
     });
 }
@@ -305,6 +305,13 @@ The key parts of this definition are:
 
 * must be invoked in a different branch of the scope chain from the variable(s)
 
+## Closure Lifecycle
+
+Since closure is inherently tied to a function instance, its closure over a variable lasts as long as there is still a reference to that function.
+
+If 10 functions all close over the same variable, and over time 9 of these function references are discarded, the remaining function still preserves that variable. Once that final function then is discarded, the last closure over that variable is gone, and the variable itself can be GC'd.
+
+This has an important impact on building efficient and performant programs, because closure can easily prevent the GC of a variable that you're otherwise done with, which leads to run-away memory usage over time.
 .
 
 .
