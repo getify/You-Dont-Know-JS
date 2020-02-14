@@ -423,20 +423,87 @@ The key parts of this definition are:
 
 * must be invoked in a different branch of the scope chain from the variable(s)
 
-An observation-oriented definition like this reminds us that we shouldn't dismiss closure as some indirect, academic after thought. Instead, we need to look for and plan around the direct and concrete effects closure has on our program behavior.
-
-## Why Closure?
-
-// TODO
+This observation-oriented definition reminds us that we shouldn't dismiss closure as some indirect, academic trivia. Instead, we need to look and plan for the direct, concrete effects closure has on our program behavior.
 
 ## The Closure Lifecycle
 
 Since closure is inherently tied to a function instance, its closure over a variable lasts as long as there is still a reference to that function.
 
-If 10 functions all close over the same variable, and over time 9 of these function references are discarded, the remaining function still preserves that variable. Once that final function then is discarded, the last closure over that variable is gone, and the variable itself can be GC'd.
+If 10 functions all close over the same variable, and over time 9 of these function references are discarded, the remaining function reference still preserves that variable. Once that final function reference is discarded, the last closure over that variable is gone, and the variable itself is GC'd.
 
-This has an important impact on building efficient and performant programs, because closure can easily prevent the GC of a variable that you're otherwise done with, which leads to run-away memory usage over time.
+This has an important impact on building efficient and performant programs, because closure can unexpectedly prevent the GC of a variable that you're otherwise done with, which leads to run-away memory usage over time.
 
-One question we need to tackle: should we think of closure as over just the referenced variable(s) in an inner function, or is closure preserving the entire scope chain (with all its variables)?
+One question we need to tackle: should we think of closure as applied to just the referenced variable(s) in an inner function, or is closure preserving the entire scope chain with all its variables?
+
+Consider:
+
+```js
+function manageStudentGrades(studentRecords) {
+    var grades = studentRecords.map(getGrade);
+
+    return addGrade;
+
+
+    // ************************
+
+    function getGrade(record){
+        return record.grade;
+    }
+
+    function sortAndTrimGradesList() {
+        // sort by grades, descending
+        grades.sort(function desc(g1,g2){
+            return g2 - g1;
+        });
+
+        // only keep the top 10 grades
+        grades = grades.slice(0,10);
+    }
+
+    function addGrade(newGrade) {
+        grades.push(newGrade);
+        sortAndTrimGradesList();
+        return grades;
+    }
+}
+
+var addNextGrade = manageStudentGrades([
+    { id: 14, name: "Kyle", grade: 86 },
+    { id: 73, name: "Suzy", grade: 87 },
+    { id: 112, name: "Frank", grade: 75 },
+    // ..many more records..
+    { id: 6, name: "Sarah", 91 }
+]);
+
+// later
+
+addNextGrade(81);
+addNextGrade(68);
+// [ .., .., ... ]
+```
+
+Let's break down what's happening in this program.
+
+The outer function `manageStudentGrades(..)` takes a list of student records, and returns a function we call `addNextGrade(..)`. Each time we call that function, we pass a grade in, and we get back a current list of the top 10 grades, sorted descending (see `sortAndTrimGradesList()`).
+
+From the end of the original `manageStudentGrades(..)` call and between the multiple `addNextGrade(..)` calls, the `grades` variable has been closed over (inside `addGrade(..)`), so that's how the running list of top grades is maintained. Remember, it's a closure over the variable `grades`, not its value (the array it holds).
+
+That's not the only closure involved, however. Can you spot other variables being closed over?
+
+Did you see that `addGrade(..)` references `sortAndTrimGradesList`? That means it's also closed over that variable, which happens to hold the associated function `sortAndTrimGradesList()`. That second inner function has to stay around so that `addGrade(..)` can keep calling it.
+
+What else is closed over?
+
+What about the `getGrade` variable (and its function)? Is it closed over? It's referenced by the outer scope of `manageStudentGrades(..)`, used by the initial `.map(getGrade)` call. But it's not referenced inside of `addGrade(..)` or `sortAndTrimGradesList()` (both of which themselves are kept alive by closure).
+
+What about the (potentially) large list of student records we pass in as `studentRecords`? Is that variable being closed over? If it is, then that means that array of student records is never getting GC'd, which leads to this program continuing to consume a larger amount of memory than we might assume. But if we look closely again, none of the inner functions that are preserved via closure are referencing `studentRecords`.
+
+Conceptually, closure is **per variable**. So we'd say that since `getGrade` and `studentRecords` are *not* referenced, then they're not closed over, and therefore they are freely available for GC right after the initial `manageStudentGrades(..)` completes.
+
+// TODO
+
+## Why Closure?
+
+Now that we have a better sense of what closure is and how it works, let's explore the motivations behind leveraging closure.
 
 // TODO

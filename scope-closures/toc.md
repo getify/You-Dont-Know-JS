@@ -45,8 +45,8 @@
     * Blocked Over
 * Chapter 7: Closures
     * See The Closure
-    * Why Closure?
     * The Closure Lifecycle
+    * Why Closure?
 * Chapter 8: Module Pattern
     * TODO
 * Appendix A: Exploring Further
