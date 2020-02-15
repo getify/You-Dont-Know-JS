@@ -15,9 +15,21 @@ Indeed, you may actually find this chapter's revelation of what closure is rathe
 
 Even still, closure is one of the most important language characteristics ever invented in programming -- it underlies major programming paradigms, including Functional Programming (FP), modules, and even class-oriented design. Getting comfortable with closure is required for mastering JS and effectively leveraging important design patterns.
 
+## Big Picture
+
+Covering all aspects of closure involves a daunting amount of discussion and code throughout this chapter. Make sure to take your time and feel comfortable with each bit before moving onto the next.
+
+Even still, it's helpful to start with a quick glance at *why* we're digging so deeply into this topic.
+
+Recall Chapter 6's message: the *least exposure* (POLE) principle encourages us to use block (and function) scoping to limit the scope exposure of variables. This helps keep code understandable and maintainable, and also helps avoid some scoping pitfalls (i.e., name collision, etc).
+
+Closure expands this approach: for variables we need to use over time, instead of placing them in larger outer scopes, we can more narrowly scope them but still preserve access inside function references. Functions *remember* their referenced scoped variables via closure.
+
+Our goal in this book is not merely to understand scope, but to more effectively use it in the structure of our programs. Closure is central to these efforts.
+
 ## See The Closure
 
-Closure is originally a mathematical concept, from lambda calculus. But I'm not going to list out math formulas or use a bunch of jargon to define it.
+Closure is originally a mathematical concept, from lambda calculus. But I'm not going to list out math formulas or use a bunch of notation and jargon to define it.
 
 Instead, I'm going to use a practical perspective to illuminate closure. I want to define closure in terms of what we can observe in different behavior of our programs, as opposed to if closure was not present in JS.
 
