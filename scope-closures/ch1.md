@@ -1,29 +1,29 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 1: How is Scope Determined?
+# Chapter 1: What's The Scope?
 
 | NOTE: |
 | :--- |
 | Work in progress |
 
-Once you've written at least a few lines of code, you're already a programmer! So by this point, I bet you have a decent sense of how to create variables and store values in them. But how closely have you considered the mechanisms used by the engine to organize and manage these variables?
+By the time you've written your first few programs, you're probably starting to feel more comfortable with creating variables and storing values in them. Working with variables is one of the most foundational things we do in programming!
 
-I don't mean how the memory is allocated on the computer, but rather: how does JS know which variables are accessible by any given statement, and what happens if it finds two variables of the same name?
+But you may not have considered very closely the underlying mechanisms used by the engine to organize and manage these variables. I don't mean how the memory is allocated on the computer, but rather: how does JS know which variables are accessible by any given statement, and how does it handle two variables of the same name?
 
-The answers to questions like these take the form of a set of well-defined rules called scope. We'll expound these rules in great detail throughout the book.
+The answers to questions like these take the form of well-defined rules called scope. This book will dig through all aspects of scope -- how it works, what it's useful for, gotchas to avoid -- and then point toward common patterns that guide the structure of programs.
 
-Our first step is to study how the JS engine processes (compiles) our program before it executes it.
+And our first step is to uncover how the JS engine processes our program **before** it runs.
 
 ## About This Book
 
 Welcome to book 2 in the *You Don't Know JS Yet* series! If you already finished *Get Started* (the first book), you're in the right spot! If not, before you proceed I encourage you to *start there* for the best foundation.
 
-Our focus here is the first of three pillars in the JS language: the scope system and its function closures, and how these mechanisms enable the module design pattern.
+Our focus here is the first of three pillars in the JS language: the scope system and its function closures, as well as the power of the module design pattern.
 
-JS is typically classified as an interpreted scripting language, so it's assumed by most that JS programs are processed in a single, top-down pass. But JS is in fact parsed/compiled in a separate phase **before execution begins**. The code author's decisions on where to place variables, functions, and blocks with respect to each other are analyzed according to the rules of scope, during the initial parsing/compilation phase. The resulting scope is unaffected by run-time conditions.
+JS is typically classified as an interpreted scripting language, so it's assumed by most that JS programs are processed in a single, top-down pass. But JS is in fact parsed/compiled in a separate phase **before execution begins**. The code author's decisions on where to place variables, functions, and blocks with respect to each other are analyzed according to the rules of scope, during the initial parsing/compilation phase. The resulting scope layout is generally unaffected by run-time conditions.
 
-JS functions are themselves values, meaning they can be assigned and passed around just like numbers or strings. But since these functions hold and access variables, they maintain their original scope no matter where in the program the functions are eventually executed. This is called closure.
+JS functions are themselves first-class values; they can be assigned and passed around just like numbers or strings. But since these functions hold and access variables, they maintain their original scope no matter where in the program the functions are eventually executed. This is called closure.
 
-Modules are a pattern for code organization characterized by a collection of public methods that have access (via closure) to variables and functions that are hidden inside the internal scope of the module.
+Modules are a code organization pattern characterized by a set of public methods that have privileged access (via closure) to hidden variables and functions in the internal scope of the module.
 
 ## Compiled vs. Interpreted
 
@@ -35,23 +35,23 @@ You also may have heard that code can be *interpreted*, but how is that differen
 
 Interpretation performs a similar task to compilation, in that it transforms your program into machine-understandable instructions. But the processing model is fairly different. Unlike a program being compiled all at once, with interpretation the source code is typically transformed line-by-line; each line or statement is immediately executed before proceeding to processing the next line of the source code.
 
-Figure 1 illustrates compilation and interpretation of a program:
+Figure 1 illustrates compilation vs. interpretation of programs:
 
 <figure>
     <img src="fig1.png" width="650" alt="Code Compilation and Code Interpretation" align="center">
-    <figcaption><em>Fig. 1: Compiled vs Interpreted Code</em></figcaption>
+    <figcaption><em>Fig. 1: Compiled vs. Interpreted Code</em></figcaption>
     <br><br>
 </figure>
 
-Are these two processing models mutually exclusive? Generally yes. However, the topic is more nuanced, because interpretation can actually take other forms than just operating line-by-line on source code text. Modern JS engines employ variations of both compilation and interpretation in the handling of JS programs.
+Are these two processing models mutually exclusive? Generally, yes. However, the issue is more nuanced, because interpretation can actually take other forms than just operating line-by-line on source code text. Modern JS engines actually employ numerous variations of both compilation and interpretation in the handling of JS programs.
 
-Recall that this topic is discussed in detail in the section "What's in an Interpretation?" of Chapter 1 of the *Get Started* book. Our conclusion there is that JS is most accurately portrayed as a **compiled language**. For the benefit of readers here, the following sections will revist and expand on that debate.
+Recall that we surveyed compliation and interpretation in Chapter 1 of the *Get Started* book. Our conclusion there is that JS is most accurately portrayed as a **compiled language**. For the benefit of readers here, the following sections will revist and expand on that assertion.
 
 ## Compiling Code
 
-Why does it even matter whether JS is compiled or not?
+But first, why does it even matter whether JS is compiled or not?
 
-JS's scope is entirely determined during compilation, so you cannot effectively understand scope without exploring JS's compilation.
+Scope is primarily determined during compilation, so you cannot effectively understand scope without exploring compilation.
 
 In classic compiler theory, a program is processed by a compiler in three basic stages:
 
@@ -297,18 +297,16 @@ At all costs, avoid `eval(..)` (at least, `eval(..)` creating declarations) and 
 
 ## Lexical Scope
 
-We've demonstrated that JS's scope is determined at compile time. The term for that form of scope is "lexical scope". This word "lexical" is related to the "lexing" stage of compilation, as discussed earlier in this chapter.
+We've demonstrated that JS's scope is determined at compile time; the term for this kind of scope is "lexical scope". "Lexical" is associated with the "lexing" stage of compilation, as discussed earlier in this chapter.
 
-To draw this chapter down to a useful conclusion, the key idea of "lexical scope" is that it's controlled entirely by the placement of functions, blocks, and variable declarations, in relation to each other.
+To narrow this chapter down to a useful conclusion, the key idea of "lexical scope" is that it's controlled entirely by the placement of functions, blocks, and variable declarations, in relation to each other.
 
 If you place a variable declaration inside a function, the compiler handles this declaration as it's parsing the function, and associates that declaration with the function's scope. If a variable is block-scope declared (`let` / `const`), then it's associated with the nearest enclosing `{ .. }` block, rather than its enclosing function (as with `var`).
 
 Furthermore, a reference (*target* or *source* role) for a variable must be resolved as coming from one of the scopes that are *lexically available* to it; otherwise the variable is said to be "undeclared" (which usually results in an error!). If the variable is not declared in the current scope, the next outer/enclosing scope will be consulted. This process of stepping out one level of scope nesting continues until either a matching variable declaration can be found, or the global scope is reached and there's nowhere else to go.
 
-It's important to note that compilation doesn't actually *do anything* in terms of reserving memory for scopes and variables. None of the program has been executed just because it's been compiled.
+It's important to note that compilation doesn't actually *do anything* in terms of reserving memory for scopes and variables. None of the program has been executed yet.
 
-Instead, compilation creates a map of all the lexical scopes that the program will need while it executes. You can think of this plan/map as inserted code that will define all the scopes (aka, "lexical environments") and register all the identifiers (variables) for each scope.
+Instead, compilation creates a map of all the lexical scopes that lays out what the program will need while it executes. You can think of this plan as inserted code for the run-time, which defines all the scopes (aka, "lexical environments") and registers all the identifiers (variables) for each scope.
 
-Scopes are planned out during compilation -- that's why we refer to "lexical scope" as a compile-time decision -- but they aren't actually created until run-time. Each scope is instantiated in memory each time it needs to run.
-
-In the next chapter, we'll sketch out the conceptual foundations of lexical scope.
+In other words, while scopes are identified during compilation, they're not actually created until run-time, each time a scope needs to run. In the next chapter, we'll sketch out the conceptual foundations for lexical scope.

@@ -8,7 +8,7 @@
 
 * Foreword
 * Preface
-* Chapter 1: How Is Scope Determined?
+* Chapter 1: What's The Scope?
     * About This Book
     * Compiled vs. Interpreted
     * Compiling Code
@@ -26,13 +26,13 @@
     * Function Name Scope
     * Arrow Functions
     * Backing Out
-* Chapter 4: Global Scope
+* Chapter 4: Around the Global Scope
     * Why Global Scope?
     * Where Exactly Is This Global Scope?
     * Global This
     * Globally Aware
-* Chapter 5: Working with Variables
-    * When Can I Use A Variable?
+* Chapter 5: The (not so) Secret Lifecycle of Variables
+    * When Can I Use a Variable?
     * Hoisting: Yet Another Metaphor
     * Re-declaration?
     * Uninitialized Variables (aka, TDZ)
@@ -43,9 +43,10 @@
     * Scoping With Blocks
     * Function Declarations In Blocks
     * Blocked Over
-* Chapter 7: Closures
+* Chapter 7: Using Closures
+    * Big Picture
     * See The Closure
-    * The Closure Lifecycle
+    * The Lifecycle of Closures
     * Why Closure?
 * Chapter 8: Module Pattern
     * TODO

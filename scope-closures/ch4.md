@@ -1,32 +1,30 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 4: Global Scope
+# Chapter 4: Around the Global Scope
 
 | NOTE: |
 | :--- |
 | Work in progress |
 
-Chapter 3 mentioned the "global scope" several times, but you may still be wondering why a program's outermost scope is all that important in modern JS? The vast majority of work seems to be done inside of functions and modules rather than globally.
+Chapter 3 mentions the "global scope" several times, but you may still be wondering why a program's outermost scope is all that important in modern JS? The vast majority of work is done inside of functions and modules rather than globally.
 
-The global scope of a JS program is a rich topic, with much more utility and nuance than you would likely assume. This chapter first explores whether the global scope is (still) useful and relevant to writing JS programs, then looks at differences in how to *find* the global scope in different JS environments.
+The global scope of a JS program is a rich topic, with much more utility and nuance than you would likely assume. This chapter first explores how the global scope is (still) useful and relevant to writing JS programs, then looks at differences in where and *how to access* the global scope in different JS environments.
 
 ## Why Global Scope?
-
-We've referenced the "global scope" a number of times already, but we should dig into that topic in more detail.
 
 It's likely no surprise to readers that most applications are composed of multiple (sometimes many!) individual JS files. So how exactly do all those separate files get stitched together in a single run-time context by the JS engine?
 
 With respect to browser-executed applications, there are 3 main ways:
 
-1. If you're exclusively using ES modules (not transpiling those into some other module-bundle format), then these files are loaded individually by the JS environment. Each module then `import`s references to whichever other modules it needs to access. The separate module files cooperate with each other exclusively through these shared imports, without needing any scopes.
+1. If you're exclusively using ES modules (not transpiling those into some other module-bundle format), these files are loaded individually by the JS environment. Each module then `import`s references to whichever other modules it needs to access. The separate module files cooperate with each other exclusively through these shared imports, without needing any scopes.
 
-2. If you're using a bundler in your build process, all the files are typically concatenated together before delivery to the browser and JS engine, which then only processes one big file. Even with all the pieces of the application being co-located in a single file, some mechanism is necessary for each piece to register a *name* to be referred to by other pieces, as well as some facility for that access to be made.
+2. If you're using a bundler in your build process, all the files are typically concatenated together before delivery to the browser and JS engine, which then only processes one big file. Even with all the pieces of the application co-located in a single file, some mechanism is necessary for each piece to register a *name* to be referred to by other pieces, as well as some facility for that access to occur.
 
-    In some approaches, the entire contents of the file are wrapped in a single enclosing scope (such as a wrapper function, UMD-like module, etc), so each piece can register itself for access by other pieces by way of local variables in that shared scope.
+    In some approaches, the entire contents of the file are wrapped in a single enclosing scope, such as a wrapper function, universal module (UMD), etc. Each piece can register itself for access from other pieces by way of local variables in that shared scope.
 
     For example:
 
     ```js
-    (function outerScope(){
+    (function wrappingOuterScope(){
         var moduleOne = (function one(){
             // ..
         })();
@@ -43,11 +41,11 @@ With respect to browser-executed applications, there are 3 main ways:
     })();
     ```
 
-    As shown, the `moduleOne` and `moduleTwo` local variables inside the `outerScope()` function scope are declared so that these modules can access each other for their cooperation.
+    As shown, the `moduleOne` and `moduleTwo` local variables inside the `wrappingOuterScope()` function scope are declared so that these modules can access each other for their cooperation.
 
-    While the scope of `outerScope()` is a function and not the full environment global scope, it does act as a sort of "application-wide scope", a bucket where all the top-level identifiers can be stored, even if not in the real global scope. So it's kind of like a stand-in for the global scope in that respect.
+    While the scope of `wrappingOuterScope()` is a function and not the full environment global scope, it does act as a sort of "application-wide scope", a bucket where all the top-level identifiers can be stored, though not in the real global scope. It's kind of like a stand-in for the global scope in that respect.
 
-3. Whether a bundler is used for an application, or whether the (non-ES module) files are simply loaded in the browser individually (via `<script>` tags or other dynamic JS loading), if there is no single surrounding scope encompassing all these pieces, the **global scope** is the only way for them to cooperate with each other.
+3. Whether a bundler tool is used for an application, or whether the (non-ES module) files are simply loaded in the browser individually (via `<script>` tags or other dynamic JS resource loading), if there is no single surrounding scope encompassing all these pieces, the **global scope** is the only way for them to cooperate with each other.
 
     A bundled file of this sort often looks something like this:
 
@@ -66,7 +64,7 @@ With respect to browser-executed applications, there are 3 main ways:
     })();
     ```
 
-    Here, since there is no surrounding function scope, these `moduleOne` and `moduleTwo` declarations are simply processed in the global scope. This is effectively the same as if the file hadn't been concatenated:
+    Here, since there is no surrounding function scope, these `moduleOne` and `moduleTwo` declarations are simply dropped into the global scope. This is effectively the same as if the files hadn't been concatenated, but loaded separately:
 
     module1.js:
 
@@ -90,7 +88,7 @@ With respect to browser-executed applications, there are 3 main ways:
     })();
     ```
 
-    Again, if these files are loaded as normal standalone .js files in a browser environment, each top-level variable declaration will end up as a global variable, since the global scope is the only shared resource between these two separate files (programs, from the perspective of the JS engine).
+    Again, if these files are loaded separately as normal standalone .js files in a browser environment, each top-level variable declaration will end up as a global variable, since the global scope is the only shared resource between these two separate files -- they're independent programs, from the perspective of the JS engine.
 
 In addition to (potentially) accounting for where an application's code resides during run-time, and how each piece is able to access the other pieces to cooperate, the global scope is also where:
 
@@ -119,11 +117,11 @@ Most developers agree that the global scope shouldn't just be a dumping ground f
 
 It might seem obvious that the global scope is located in the outermost portion of a file; that is, not inside any function or other block. But it's not quite as simple as that.
 
-Different JS environments handle the scopes of your programs, in particular the global scope, differently. It's extremely common for JS developers to have misconceptions in this regard.
+Different JS environments handle the scopes of your programs, in particular the global scope, differently. It's quite common for JS developers to have misconceptions without even realizing it.
 
 ### Browser "Window"
 
-With resepct to treatment of the global scope, the most *pure* (not completely!) environment JS can be run in is as a standalone .js file loaded in a web page environment in a browser. I don't mean "pure" as in nothing automatically added -- lots may be added! -- but rather in terms of minimal intrusion on the code or interference with its behavior.
+With resepct to treatment of the global scope, the most *pure* environment JS can be run in is as a standalone .js file loaded in a web page environment in a browser. I don't mean "pure" as in nothing automatically added -- lots may be added! -- but rather in terms of minimal intrusion on the code or interference with its expected global scope behavior.
 
 Consider this simple .js file:
 
@@ -153,11 +151,15 @@ window.hello();
 // Hello, Kyle!
 ```
 
-That's the default behavior one would expect from a reading of the JS specification. That's what I mean by *pure*. That won't always be true of other JS environments, and that's often surprising to JS developers.
+That's the default behavior one would expect from a reading of the JS specification: the outer scope *is* the global scope and `studentName` is legitimately created as global variable.
 
-#### Shadowing Globals
+That's what I mean by *pure*. But unfortunately, that won't always be true of other JS environments, and that's often surprising to JS developers.
 
-Recall the discussion of shadowing from Chapter 3? An unusual consequence of the difference between a global variable and a global property of the same name is that a global object property can be shadowed by a global variable:
+#### Globals Shadowing Globals
+
+Recall the discussion of shadowing (and global unshadowing) from Chapter 3, where one variable declaration can override and prevent access to a declaration of the same name from an outer scope.
+
+An unusual consequence of the difference between a global variable and a global property of the same name is that, within just the global scope, a global object property can be shadowed by a global variable:
 
 ```js
 window.something = 42;
@@ -166,15 +168,20 @@ let something = "Kyle";
 
 console.log(something);
 // Kyle
+
+console.log(window.something);
+// 42
 ```
 
-The `let` declaration adds a `something` global variable, which shadows the `something` global object property.
+The `let` declaration adds a `something` global variable but not a global object property (see Chapter 3). The effect then is that the `something` global shadows the `something` global object property.
 
-While it's *possible* to shadow in this manner, it's almost certainly a bad idea to do so. Don't create a divergence between the global object and the global scope.
+While such nuance is possible, it's almost certainly a bad idea to do so. Readers of your code will almost certainly be tripped up. Don't create a divergence between the global object and the global scope.
+
+A simple way to avoid this gotcha with global declarations: always use `var` for globals. Reserve `let` and `const` for block scopes (see "Scoping With Blocks" in Chapter 6).
 
 #### What's In A (Window) Name?
 
-I asserted that this browser-hosted JS environment has the most *pure* global scope behavior we'll see. Things are not entirely *pure*, however.
+I asserted that this browser-hosted JS environment has the most *pure* global scope behavior we'll see. However, it's not entirely *pure*.
 
 Consider:
 
@@ -185,11 +192,13 @@ console.log(typeof name, name);
 // string 42
 ```
 
-`window.name` is a pre-defined "global" in a browser context; it's a property on the global object, so it seems like a normal global variable (though it's anything but "normal"). We used `var` for the declaration, which doesn't shadow the pre-defined `name` global property. That means, effectively, the `var` declaration is ignored, since there's already a global scope object property of that name. As we discussed in the previous section, had we use `let name`, we would have shadowed `window.name` with a separate global `name` variable.
+`window.name` is a pre-defined "global" in a browser context; it's a property on the global object, so it seems like a normal global variable (though it's anything but "normal").
 
-But the truly weird behavior is that even though we assigned the number `42` to `name`, when we then retrieve its value, it's a string `"42"`! In this case, the weirdness is because `window.name` is actually a getter/setter on the global object, which insists on a string value. Wow!
+We used `var` for our declaration, which **does not** shadow the pre-defined `name` global property. That means, effectively, the `var` declaration is ignored, since there's already a global scope object property of that name. As we discussed in the previous section, had we use `let name`, we would have shadowed `window.name` with a separate global `name` variable.
 
-With the exception some rare corner cases like `window.name`, JS running as a standalone file in a browser page has some of the most *pure* global scope behavior we're likely to encounter.
+But the truly surprising behavior is that even though we assigned the number `42` to `name` (and thus `window.name`), when we then retrieve its value, it's a string `"42"`! In this case, the weirdness is because `window.name` is actually a getter/setter on the global object, which insists on its value being a string value. Wow!
+
+With the exception of some rare corner cases like `window.name`, JS running as a standalone file in a browser page has some of the most *pure* global scope behavior we will encounter.
 
 ### Web Workers
 
@@ -226,7 +235,7 @@ Recall from "Get Started" Chapter 1 that Developer Tools don't create a complete
 
 In many cases, favoring DX when entering short JS snippets over the normal strict steps expected for processing a full JS program produces observable differences in behavior of code. For example, certain error conditions applicable to a JS program may be relaxed and not displayed when the code is entered into a developer tool.
 
-With respect to our discussions here about scope, such observable differences in behavior may include the behavior of the global scope, hoisting (discussed later in this chapter), and block-scoping declarators (`let` / `const`, see Chapter 4) when used in the outermost scope.
+With respect to our discussions here about scope, such observable differences in behavior may include the behavior of the global scope, hoisting (discussed later in this chapter), and block-scoping declarators (`let` / `const`, see Chapter 5) when used in the outermost scope.
 
 Even though while using the console/REPL it seems like statements entered in the outermost scope are being processed in the real global scope, that's not strictly accurate. The tool emulates that to an extent, but it's emulation, not strict adherence. These tool environments prioritize developer convenience, which means that at times (such as with our current discussions regarding scope), observed behavior may deviate from the JS specification.
 
@@ -371,8 +380,8 @@ Phew! That's certainly not ideal, but it works if you find yourself needing a re
 
 ## Globally Aware
 
-The global scope is present and relevant to every JS program, even though modern patterns for organizing code into modules de-emphasizes reliance on storing identifiers in that namespace.
+The global scope is present and relevant in every JS program, even though modern patterns for organizing code into modules de-emphasizes much of the reliance on storing identifiers in that namespace.
 
-With the proliferation of our code far beyond the confines of the browser, it's especially important to have a solid grasp on the differences in how the global scope (and global scope object!) behaves across different JS environments.
+Still, as our code proliferates more and more beyond the confines of the browser, it's especially important we have a solid grasp on the differences in how the global scope (and global scope object!) behaves across different JS environments.
 
-With the big picture of global scope now clarified, the next chapter begins dissecting the rules of lexical scope that impact how and when variables can be used.
+With the big picture of global scope now sharper in focus, the next chapter again descends into the finer details of lexical scope, examining how and when variables can be used.

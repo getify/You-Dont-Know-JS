@@ -1,9 +1,9 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
 # Chapter 2: Illustrating Lexical Scope
 
-In Chapter 1, we explored how scope is determined at code compilation, a model called "lexical scope".
+In Chapter 1, we explored how scope is determined during code compilation, a model called "lexical scope".
 
-To properly *reason* about your programs, it's important to have a solid conceptual foundation of how scope works. This chapter will illustrate *scope* with several metaphors. The goal here is to *think* about how your program is handled by the JS engine in ways that more closely match how the JS engine actually works.
+To properly *reason* about our programs, it's important to have a solid conceptual foundation of how scope works. This chapter will illustrate *scope* with several metaphors. The goal here is to *think* about how your program is handled by the JS engine in ways that more closely align with how the JS engine actually works.
 
 ## Marbles, and Buckets, and Bubbles... Oh My!
 
@@ -45,11 +45,11 @@ console.log(nextStudent);
 
 We've designated 3 scope colors with code comments: RED (outermost global scope), BLUE (scope of function `getStudentName(..)`), and GREEN (scope of/inside the `for` loop). But it still may be difficult to recognize the boundaries of these scope buckets when looking at a code listing.
 
-Figure 2 tries to make the scope boundaries easier to visualize by drawing colored bubbles around each scope:
+Figure 2 helps visualize the boundaries of this program's scopes by drawing colored bubbles (aka, buckets) around each:
 
 <figure>
-    <img src="fig2.png" width="500" alt="Nested Scope Bubbles" align="center">
-    <figcaption><em>Fig. 2: Nested Scope Bubbles</em></figcaption>
+    <img src="fig2.png" width="500" alt="Colored Scope Bubbles" align="center">
+    <figcaption><em>Fig. 2: Colored Scope Bubbles</em></figcaption>
 </figure>
 
 1. **Bubble 1** (RED) encompasses the global scope, which has three identifiers/variables: `students` (line 1), `getStudentName` (line 8), and `nextStudent` (line 16).
@@ -280,8 +280,8 @@ You resolve a *target* or *source* variable reference by first looking on the cu
 
 ## Continue The Conversation
 
-By this point, hopefully you feel more solid with what scope is and how the JS engine determines it while compiling your code.
+By this point, you should feel more solid with what scope is and how the JS engine determines it from your code.
 
-Before *continuing*, go find some code in one of your projects and run through the conversations. If you find yourself confused or tripped up, spend time reviewing this material.
+Before *continuing*, go find some code in one of your projects and run through the conversations. Seriously, actually say it out loud. Find a friend and practice each role with them. If you find yourself confused or tripped up, spend more time reviewing this material.
 
-As we move to the next chapter, we'll explore how the collection of lexical scopes in a program work together as a chain.
+As we move to the next chapter, we'll explore how the collection of lexical scopes in a program are connected in a chain.

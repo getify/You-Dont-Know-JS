@@ -1,5 +1,5 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 7: Closures
+# Chapter 7: Using Closures
 
 | NOTE: |
 | :--- |
@@ -9,23 +9,23 @@ Up to this point, we've focused on the ins and outs of lexical scope, and how th
 
 Our attention again shifts broader in abstraction, to the historically somewhat daunting topic of closure. Don't worry! You don't need an advanced Computer Science degree to make sense of it.
 
-As a matter of fact, we already saw an example of closure in the previous chapter, and you've almost certainly already used it in your own programs. If you've ever written a callback that accesses variables outside its own scope... guess what!? Closure.
+As a matter of fact, we already saw an example of closure in the previous chapter, and you've almost certainly already used it in your own programs. If you've ever written a callback that accesses variables outside its own scope... guess what!? That's closure.
 
 Indeed, you may actually find this chapter's revelation of what closure is rather... anticlimactic.
 
-Even still, closure is one of the most important language characteristics ever invented in programming -- it underlies major programming paradigms, including Functional Programming (FP), modules, and even class-oriented design. Getting comfortable with closure is required for mastering JS and effectively leveraging important design patterns.
+Even still, closure is one of the most important language characteristics ever invented in programming -- it underlies major programming paradigms, including Functional Programming (FP), modules, and even a bit of class-oriented design. Getting comfortable with closure is required for mastering JS and effectively leveraging many important design patterns throughout your code.
 
 ## Big Picture
 
-Covering all aspects of closure involves a daunting amount of discussion and code throughout this chapter. Make sure to take your time and feel comfortable with each bit before moving onto the next.
+Addressing all aspects of closure presents a daunting mountain of discussion and code throughout this chapter. Make sure to take your time and ensure you're comfortable with each bit before moving onto the next.
 
 Even still, it's helpful to start with a quick glance at *why* we're digging so deeply into this topic.
 
-Recall Chapter 6's message: the *least exposure* (POLE) principle encourages us to use block (and function) scoping to limit the scope exposure of variables. This helps keep code understandable and maintainable, and also helps avoid some scoping pitfalls (i.e., name collision, etc).
+Recall Chapter 6's message: the *least exposure* (POLE) principle encourages us to use block (and function) scoping to limit the scope exposure of variables. This helps keep code be understandable and maintainable, and helps avoid many scoping pitfalls (i.e., name collision, etc).
 
-Closure expands this approach: for variables we need to use over time, instead of placing them in larger outer scopes, we can more narrowly scope them but still preserve access inside function references. Functions *remember* their referenced scoped variables via closure.
+Closure expands this approach: for variables we need to use over time, instead of placing them in larger outer scopes, we can encapsulate (more narrowly scope) them but still preserve access from inside functions, for broader use. Functions *remember* these referenced scoped variables via closure.
 
-Our goal in this book is not merely to understand scope, but to more effectively use it in the structure of our programs. Closure is central to these efforts.
+Our broad goal in this book is not merely to understand scope, but to more effectively use it in the structure of our programs. Closure is central to these efforts.
 
 ## See The Closure
 
@@ -258,7 +258,9 @@ Now, each function is closed over a separate (new) variable from each iteration 
 
 Again remember, even if we were using asynchrony in this program, such as passing these `fn()` functions into `setTimeout(..)` or some event handler subscription, the same principle of closure would apply.
 
-There's another little quirk or trick that JS gives us with block-declared variables in `for`-loop headers:
+There's another little quirk or trick that JS gives us with block-declared variables in `for`-loop headers. Recall "Loops" in Chapter 7, which illustrated how a `let` declaration in a `for` loop actually creates not just one variable for the loop, but creates a new variable for *each iteration* of the loop. That's exactly what we need for our closures!
+
+Consider:
 
 ```js
 var fns = [];
@@ -277,7 +279,7 @@ fns[1]();   // 1
 fns[2]();   // 2
 ```
 
-If you use `let` (or `const`) in a `for`-loop header, not only does JS block-scope the declaration to the loop, but actually to **each iteration of the loop**. In other words, 3 `i`'s are created, one for each loop, so the closure *just works* as expected.
+Since we're using `let`, 3 `i`'s are created, one for each loop, so the closure *just works* as expected.
 
 ### Common Closures
 

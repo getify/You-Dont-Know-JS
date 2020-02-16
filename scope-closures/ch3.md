@@ -5,22 +5,24 @@
 | :--- |
 | Work in progress |
 
-Chapters 1 and 2 laid down concrete definitions of *lexical scope* (and its parts) and metaphors for its conceptual underpinning. Before proceeding with this chapter, try explaining (written or aloud) in your own words what lexical scope is and why it's useful to understand.
+Chapters 1 and 2 laid down both concrete definitions of *lexical scope* (and its parts) and metaphors for its conceptual underpinning. Before proceeding with this chapter, find someone else to explain (written or aloud), in your own words, what lexical scope is and why it's useful to understand.
 
-Now it's time to dig into the nuts and bolts, so expect that things will get a lot more detailed from here forward. Stick with it, though, because these discussions really hammer home just how much we all *don't know* about scope. Make sure to take your time with the text and all the code snippets provided.
+That seems like a step you might skip, but I've found it really does help to take the time to reformulate these ideas as explanations to others. That helps our brains digest what we're learning!
+
+Now it's time to dig into the nuts and bolts, so expect that things will get a lot more detailed from here forward. Stick with it, though, because these discussions really hammer home just how much we all *don't know* about scope, yet. Make sure to take your time with the text and all the code snippets provided.
 
 To refresh the context of our running example, let's recall the color-coded illustration of the nested scope bubbles, from Chapter 2, Figure 2:
 
 <figure>
-    <img src="fig2.png" width="500" alt="Nested Scope Bubbles" align="center">
-    <figcaption><em>Fig. 2 (Ch. 2): Nested Scope Bubbles</em></figcaption>
+    <img src="fig2.png" width="500" alt="Colored Scope Bubbles" align="center">
+    <figcaption><em>Fig. 2 (Ch. 2): Colored Scope Bubbles</em></figcaption>
 </figure>
 
 The connections between scopes that are nested within other scopes is called the scope chain, which determines how and where variables can be accessed.
 
 ## "Lookup" Is (Mostly) Conceptual
 
-In Figure 2, notice the color of the `students` variable reference in the `for`-loop? How exactly did we determine that it's a RED(1) marble?
+In Figure 2, notice the color of the `students` variable reference in the `for`-loop. How exactly did we determine that it's a RED(1) marble?
 
 In Chapter 2, we described the run-time access of a variable as a "lookup", where the *Engine* has to start by asking the current scope's *Scope Manager* if it knows about an identifier/variable, and proceeding upward/outward back through the chain of nested scopes (toward the global scope) until found, if ever. The lookup stops as soon as the first matching named declaration in a scope bucket is found.
 
@@ -378,8 +380,8 @@ Other than being anonymous (and having no declarative form), arrow functions hav
 
 ## Backing Out
 
-When a function (of any form) is declared, a new scope is created. The positioning of scopes inside each other creates a natural scope hierarchy throughout the program, called the scope chain. The scope chain controls variable access.
+When a function (declaration or expression) is defined, a new scope is created. The positioning of scopes inside each other creates a natural scope hierarchy throughout the program, called the scope chain. The scope chain controls variable access.
 
-Each new scope offers a clean slate, holding its own set of variables. When a variable name is repeated at different levels of the scope chain, shadowing occurs, which limits variable access.
+Each new scope offers a clean slate, a space to hold its own set of variables. When a variable name is repeated at different levels of the scope chain, shadowing occurs, which prevents access to the outer variable from that point inward.
 
-As we step back out from these nested details, our focus in the next chapter shifts to the first scope all JS programs contend with: the global scope.
+As we begin to step back out from these deeper details, the next chapter shifts focus to the first scope all JS programs contain: the global scope.

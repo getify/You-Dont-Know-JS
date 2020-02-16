@@ -7,7 +7,7 @@
 
 So far our focus has been on explaining the mechanics of how scopes and variables work. With that foundation firmly in place, our attention now rises to a higher level of thinking: the decisions and patterns we apply across the whole program.
 
-First, we're going to look at how and why we should be using the scope of blocks to organize our program's variables, specifically to reduce their scope over-exposure.
+To begin, we're going to look at how and why we should be using different levels of scope (functions and blocks) to organize our program's variables, specifically to reduce scope over-exposure.
 
 ## Least Exposure
 
@@ -409,7 +409,7 @@ There are other stylistic and operational reasons to choose `var` or `let` in di
 
 ### Where To `let`?
 
-My advice to reserve `var` for (mostly only) a top-level function scope means that all other declarations should use `let`. But you may still be wondering how to decide where each declaration in your program belongs?
+My advice to reserve `var` for (mostly) only a top-level function scope means that all other declarations should use `let`. But you may still be wondering how to decide where each declaration in your program belongs?
 
 POLE already guides you on those decisions, but let's make sure we explicitly state it. The way to decide is not based on which keyword you want to use. The way to decide is to ask, "What is the most minimal scope exposure that's sufficient for this variable?"
 
@@ -454,7 +454,7 @@ function diff(x,y) {
 
 Placing the `var` declaration for `tmp` inside the `if` statement signals to the reader of the code that `tmp` belongs to that block. Even though JS doesn't enforce that scoping, the stylistic signal still has benefit for the reader of your code.
 
-Now, you can just find any `var` that's inside a block of this sort and switch it to `let` to enforce the signal already being sent stylistically.
+Now, you can just find any `var` that's inside a block of this sort and switch it to `let` to enforce the signal already being sent stylistically. That's a good usage of `let` in my opinion.
 
 Another example that used to be commonly based on `var` but which should pretty much always be `let` is a `for` loop:
 
@@ -486,7 +486,7 @@ if (i < 5) {
 }
 ```
 
-This usage pattern is not terribly uncommon, but most feel it signals poor code structure. A better approach is to introduce another outer-scoped variable:
+This usage pattern is not terribly uncommon, but most feel it signals poor code structure. A better approach is to introduce another outer-scoped variable for that purpose:
 
 ```js
 var lastI;
@@ -503,7 +503,7 @@ if (lastI < 5) {
 }
 ```
 
-`lastI` is needed across this whole scope (function or global), so it's declared with `var`. `i` is only needed in (each) loop iteration, so it's declared with `let`.
+`lastI` is needed across this whole scope, so it's declared with `var`. `i` is only needed in (each) loop iteration, so it's declared with `let`.
 
 ### What's The Catch?
 
@@ -683,6 +683,6 @@ FiB is not worth it, and should be avoided.
 
 The whole point of lexical scoping rules in a programming language is so we can appropriately organize our program's variables, both for operational as well as stylistic code communication purposes.
 
-And one of the most important organizational techniques we can learn to get better at is to ensure that no variable is over-exposed to unnecessary scopes (POLE). Hopefully you now appreciate block scoping much more deeply than before.
+And one of the most important organizational techniques we can get better at is to ensure that no variable is over-exposed to unnecessary scopes (POLE). Hopefully you now appreciate block scoping much more deeply than before.
 
-This whole discussion of lexical scoping so far in the book is intended to build up a solid foundation of understanding so we can tackle the topic of closure effectively, which we look at in the next chapter.
+The book so far has focused on building a strong foundation of understanding of lexical scope. Hopefully you feel like you're standing on much more solid ground. From that base, we now jump into the weighty topic of closure in the next chapter.
