@@ -38,7 +38,7 @@ Interpretation performs a similar task to compilation, in that it transforms you
 Figure 1 illustrates compilation vs. interpretation of programs:
 
 <figure>
-    <img src="fig1.png" width="650" alt="Code Compilation and Code Interpretation" align="center">
+    <img src="images/fig1.png" width="650" alt="Code Compilation and Code Interpretation" align="center">
     <figcaption><em>Fig. 1: Compiled vs. Interpreted Code</em></figcaption>
     <br><br>
 </figure>

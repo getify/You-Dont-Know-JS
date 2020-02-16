@@ -48,6 +48,8 @@
     * See The Closure
     * The Lifecycle of Closures
     * Why Closure?
+    * An Alternate Perspective
+    * Closer to Closure
 * Chapter 8: Module Pattern
     * TODO
 * Appendix A: Exploring Further

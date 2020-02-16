@@ -99,9 +99,9 @@ But we don't get an error. The fact that `chosenStudents[0]("Hello")` is able to
 Let's examine one of the canonical examples often cited for closure:
 
 ```js
-function adder(x) {
-    return function addTo(y){
-        return x + y;
+function adder(num1) {
+    return function addTo(num2){
+        return num1 + num2;
     };
 }
 
@@ -112,7 +112,7 @@ add10To(15);    // 25
 add42To(9);     // 51
 ```
 
-Each instance of the inner `addTo(..)` function is closing over its own `x` variable (with values `10` and `42`, respectively), so those `x`'s don't go away just because `adder(..)` finishes. When we later invoke one of those inner `addTo(..)` instances, such as the `add10To(15)` call, its closed over `x` variable still exists and still holds the original `10` value. The operation is thus able to perform `10 + 15` and return the answer `25`.
+Each instance of the inner `addTo(..)` function is closing over its own `num1` variable (with values `10` and `42`, respectively), so those `num1`'s don't go away just because `adder(..)` finishes. When we later invoke one of those inner `addTo(..)` instances, such as the `add10To(15)` call, its closed over `num1` variable still exists and still holds the original `10` value. The operation is thus able to perform `10 + 15` and return the answer `25`.
 
 An important detail might have been too easy to gloss over in that previous paragraph, so let's reinforce it: closure is associated with an instance of a function, rather than its static lexical definition. In the above snippet, there's just one inner `addTo(..)` function inside `adder(..)`, so it might seem like that would imply a single closure.
 
@@ -126,7 +126,17 @@ In the prior 2 examples from the previous sections, we **read the value from a v
 
 Closure is actually a live link, a preservation of the full variable itself. We're not limited to merely reading its value; the closed-over variable can be updated (reassigned) as well.
 
-Consider:
+Figure 4 depicts the function instances and scope links:
+
+<figure>
+    <img src="images/fig4.png" width="400" alt="Function instances linked to scopes via closure" align="center">
+    <figcaption><em>Fig. 4: Visualizing Closures</em></figcaption>
+    <br><br>
+</figure>
+
+As shown in Figure 4, each call to `adder(..)` creates a new BLUE(2) scope containing a `num1` variable, as well as a new instance of `addTo(..)` function as a GREEN(3) scope. Notice that the function instances (`addTo10(..)` and `addTo42(..)`) are present in and invoked from the RED(1) scope.
+
+Now let's look at an example where the closed-over variable is updated, not just read:
 
 ```js
 function makeCounter() {
@@ -152,7 +162,7 @@ hits();     // 3
 
 The `count` variable is closed over by the inner `getCurrent()` function, which keeps it around instead of it being subjected to GC. The `hits()` function calls access *and* update this variable, returning an incrementing count each time.
 
-It is not necessary for the outer scope to be a function, only that there be an inner function present inside the outer scope:
+It's not necessary for the outer scope to be a function, only that there be an inner function present inside the outer scope:
 
 ```js
 var hits;
@@ -173,7 +183,7 @@ hits();     // 3
 
 | NOTE: |
 | :--- |
-| I deliberately did not define `getCurrent()` as a function declaration in this example, but rather as a function expression assignment. This has nothing to do with closure, but with the dangerous quirks of FiB as discussed in Chapter 6. |
+| I deliberately defined `getCurrent()` as a `function` expression instead of a `function` declaration. This has nothing to do with closure, but with the dangerous quirks of FiB as discussed in Chapter 6. |
 
 Because closure is not a snapshot of a value, but rather a live link to a variable, developers sometimes get tripped up trying to use closure to preserve a desired value.
 
@@ -621,14 +631,80 @@ function manageStudentGrades(studentRecords) {
 }
 ```
 
-We're not removing `studentRecords` from the closure scope; that we cannot control. We're simply ensuring that even if `studentRecords` remains in the closure scope, it's not holding onto memory unnecessarily with referencing the potentially large array of data.
+We're not removing `studentRecords` from the closure scope; that we cannot control. We're simply ensuring that even if `studentRecords` remains in the closure scope, it's not holding onto memory unnecessarily with referencing the potentially large array of data. Again, in many cases JS might automatically optimize this code to the same effect, but it's still a good habit to make sure we don't keep any significant amount of device memory tied up any longer than necessary.
 
-We also technically don't need the function `getGrade()` anymore after the `.map(getGrade)` call completes, so we could even possibly eek out a tiny bit more memory by freeing up that reference so its value isn't tied up either. That's likely unnecessary in this example, but broadly this is a technique to be aware of if you're profiling the memory performance of a critical part of your application and find too much being retained.
+As a matter of fact, we also technically don't need the function `getGrade()` anymore after the `.map(getGrade)` call completes. If profiling our application showed this was a critical area of excess memory use, we could possibly eek out a tiny bit more memory by freeing up that reference so its value isn't tied up either. That's probably unnecessary in this toy example, but broadly this is a technique to be aware of if you're optimizing the memory footprint of your application.
 
-The takeaway: it's important to know where closures appear our programs, and what variables are (or may be) included. We need to manage these closures so we're only holding onto what's needed and not wasting memory.
+The takeaway: it's important to know where closures appear our programs, and what variables are (or may be) included. We should manage these closures so we're only holding onto what's needed and not wasting memory.
+
+## An Alternate Perspective
+
+Reviewing our working definition for closure, recall the assertion that functions are "first-class values" that can be passed aroudn the program, just like any other value. Closure is the association between that function and the scope/variables outside of itself.
+
+Let's recall a code example from earlier in this chapter, annotated with its relevant scope bubble colors (see Chapter 2):
+
+```js
+// outer/global scope: RED(1)
+
+function adder(num1) {
+    // function scope: BLUE(2)
+
+    return function addTo(num2){
+        // function scope: GREEN(3)
+
+        return num1 + num2;
+    };
+}
+
+var add10To = adder(10);
+var add42To = adder(42);
+
+add10To(15);    // 25
+add42To(9);     // 51
+```
+
+Our current perspective (as illustrated in Figure 4, repeated here for convenience) suggests that wherever a function has been passed, to then be invoked, closure preserves a hidden link back to the original scope to facilitate the access to the closed-over variables.
+
+<figure>
+    <img src="images/fig4.png" width="400" alt="Function instances linked to scopes via closure" align="center">
+    <figcaption><em>Fig. 4: Visualizing Closures</em></figcaption>
+    <br><br>
+</figure>
+
+But there's another way of thinking about closure, and more precisely how functions are *passed around*, that may help strengthen your mental models.
+
+This alternate model de-emphasizes "functions as first-class values", and instead embraces how functions (like all non-primitive values) are held by reference in JS, and assigned/passed by reference-copy -- see Appendix A of the *Get Started* book for more information.
+
+Instead of thinking about the inner function instance of `addTo(..)` moving to the outer RED(1) scope via the `return`, we can recognize that functions (function instances) actually just stay in place in their scope environment, of course with their scope-chain intact.
+
+So what gets *moved* to the RED(1) scope is just a reference to the in-place function instance, rather than the function itself. Figure 5 depicts the function instances remaining in place, pointed to by the `addTo10` and `addTo42` references, respectively:
+
+<figure>
+    <img src="images/fig5.png" width="400" alt="Function instances inside scopes via closure, linked to by references" align="center">
+    <figcaption><em>Fig. 5: Visualizing Closures (Alternate)</em></figcaption>
+    <br><br>
+</figure>
+
+As shown in Figure 5, each call to `adder(..)` still creates a new BLUE(2) scope containing a `num1` variable, as well as a new instance of `addTo(..)` function as a GREEN(3) scope. But what's different from Figure 4 is, now these GREEN(3) instances remain in place, naturally nested inside of their BLUE(2) scope instances. The `addTo10` and `addTo42` references are the values moved to the RED(1) outer scope, not the function instances themselves.
+
+When `addTo10(15)` is called, the `addTo(..)` function instance (still in place in its original BLUE(1) scope environment) is invoked. Since the function instance itself never moved, of course it still has natural access to its scope chain. Same with the `addTo42(9)` call -- nothing special here beyond lexical scope.
+
+So what then *is* closure? In the first model, closure is the *magic* that lets a function maintain a link to its original scope chain even as that function moves around in other scopes. In this alternate model, functions stay in place and keep accessing their original scope chain just like they always could.
+
+Closure would thus shift to describing the *magic* of keeping alive a function instance (its scope environment) plus its entire scope chain, whenever there's at least one reference to that function instance floating around in any other part of the program.
+
+That definition of closure is less observational and a bit less familiar-sounding compared to the traditional academic perspective. But that's OK, because the benefit is, we simplify closure to a straightforward combination of mechanisms like value-references and in-place function instances.
+
+The previous model (Figure 4) is not *wrong* at describing closure in JS, it's just more conceptually aligned with a general, academic perspective on closure. The additional model (Figure 5) can be seen as a bit more aligned with how JS actually works.
+
+Both perspectives/models are useful in appreciating the behavior of closure, but the reader may find one a little easier to juggle than the other. Whichever you prefer, the observable behaviors in our program are the same.
 
 ## Why Closure?
 
-Now that we have a better sense of what closure is and how it works, let's explore the motivations behind leveraging closure.
+Now that we have a well-rounded sense of what closure is and how it works, let's explore some of the ways we can improve our code structure and organization.
+
+// TODO
+
+## Closer to Closure
 
 // TODO

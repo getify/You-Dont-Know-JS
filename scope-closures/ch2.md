@@ -48,7 +48,7 @@ We've designated 3 scope colors with code comments: RED (outermost global scope)
 Figure 2 helps visualize the boundaries of this program's scopes by drawing colored bubbles (aka, buckets) around each:
 
 <figure>
-    <img src="fig2.png" width="500" alt="Colored Scope Bubbles" align="center">
+    <img src="images/fig2.png" width="500" alt="Colored Scope Bubbles" align="center">
     <figcaption><em>Fig. 2: Colored Scope Bubbles</em></figcaption>
 </figure>
 
@@ -228,13 +228,30 @@ One of the most important aspects of lexical scope is that any time an identifie
 
 When *Engine* exhausts all *lexically available* scopes and still cannot resolve the lookup of an identifier, an error condition then exists. However, depending on the mode of the program (strict-mode or not) and the role of the variable (i.e., *target* vs. *source*; see Chapter 1), this error condition will be handled differently.
 
-If the variable is a *source*, an unresolved identifier lookup is considered an undeclared (unknown, missing) variable, which results in a `ReferenceError` being thrown. Also, if the variable is a *target*, and the code at that point is running in strict-mode, the variable is considered undeclared and throws a `ReferenceError`.
+#### Undefined Mess
 
-| WARNING: |
-| :--- |
-| The error message for an undeclared variable condition, in most JS environments, will likely say, "Reference Error: XYZ is not defined". The phrase "not defined" seems almost identical to the term "undefined", as far as the English language goes. But these two are very different in JS, and this error message unfortunately creates a likely confusion. "Not defined" really means "not declared", or rather "undeclared", as in a variable that was never formally declared in any *lexically available* scope. By contrast, "undefined" means a variable was found (declared), but the variable otherwise has no value in it at the moment, so it defaults to the `undefined` value. Yes, this terminology mess is confusing and terribly unfortunate. |
+If the variable is a *source*, an unresolved identifier lookup is considered an undeclared (unknown, missing) variable, which always results in a `ReferenceError` being thrown. Also, if the variable is a *target*, and the code at that point is running in strict-mode, the variable is considered undeclared and similarly throws a `ReferenceError`.
 
-However, if the variable is a *target* and strict-mode is not in effect, a confusing and surprising legacy behavior occurs. The extremely unfortunate outcome is that the global scope's *Scope Manager* will just create an **accidental global variable** to fulfill that target assignment!
+The error message for an undeclared variable condition, in most JS environments, will likely report, "Reference Error: XYZ is not defined". The phrase "not defined" seems almost identical to the term "undefined", as far as the English language goes. But these two are very different in JS, and this error message unfortunately creates a common confusion.
+
+"Not defined" really means "not declared", or rather "undeclared", as in a variable that has no matching formal declaration in any *lexically available* scope. By contrast, "undefined" really means a variable was found (declared), but the variable otherwise has no value in it at the moment, so it defaults to the `undefined` value.
+
+To perpetuate the confusion even further, JS's `typeof` operator returns the string `"undefined"` for variables of either sort:
+
+```js
+var studentName;
+typeof studentName;     // "undefined"
+
+typeof doesntExist;     // "undefined"
+```
+
+These two variable references are in very different situations, but JS sure does muddy the waters. The terminology mess is confusing and terribly unfortunate. Unfortunately, JS developers just have to pay close attention to not
+
+#### Global... What!?
+
+If the variable is a *target* and strict-mode is not in effect, a confusing and surprising legacy behavior kicks in. The deeply unfortunate outcome is that the global scope's *Scope Manager* will just create an **accidental global variable** to fulfill that target assignment!
+
+Consider:
 
 ```js
 function getStudentName() {
@@ -248,17 +265,19 @@ console.log(nextStudent);
 // "Suzy" -- oops, an accidental-global variable!
 ```
 
+Here's how that *conversation* would go:
+
 > ***Engine***: Hey *Scope Manager* (for the function), I have a *target* reference for `nextStudent`, ever heard of it?
 
 > ***(Function) Scope Manager***: Nope, never heard of it. Try the next outer scope.
 
 > ***Engine***: Hey *Scope Manager* (for the global scope), I have a *target* reference for `nextStudent`, ever heard of it?
 
-> ***(Global) Scope Manager***: Nope, but since we're in non-strict mode, I helped you out and just created a global variable for you, here you go.
+> ***(Global) Scope Manager***: Nope, but since we're in non-strict mode, I helped you out and just created a global variable for you, here you go!
 
 Yuck.
 
-This sort of accident (almost certain to lead to bugs eventually) is a great example of the protections of strict-mode, and why it's such a bad idea not to use it. In strict-mode, the ***Global Scope Manager*** would instead have responded:
+This sort of accident (almost certain to lead to bugs eventually) is a great example of the protections of strict-mode, and why it's such a bad idea to *not* use it. In strict-mode, the ***Global Scope Manager*** would instead have responded:
 
 > ***(Global) Scope Manager***: Nope, never heard of it. Sorry, but I've got to throw a `ReferenceError`.
 
@@ -269,7 +288,7 @@ Never rely on accidental global variables. Always use strict-mode, and always fo
 To visualize nested scope resolution, yet another useful metaphor may be an office building, such as Figure 3:
 
 <figure>
-    <img src="fig3.png" alt="Scope &quot;Building&quot;" align="center">
+    <img src="images/fig3.png" alt="Scope &quot;Building&quot;" align="center">
     <figcaption><em>Fig. 3: Scope "Building"</em></figcaption>
     <br><br>
 </figure>
