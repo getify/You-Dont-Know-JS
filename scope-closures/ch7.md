@@ -667,7 +667,7 @@ Our current perspective (as illustrated in Figure 4, repeated here for convenien
 
 <figure>
     <img src="images/fig4.png" width="400" alt="Function instances linked to scopes via closure" align="center">
-    <figcaption><em>Fig. 4: Visualizing Closures</em></figcaption>
+    <figcaption><em>Fig. 4 (repeat): Visualizing Closures</em></figcaption>
     <br><br>
 </figure>
 
@@ -675,9 +675,9 @@ But there's another way of thinking about closure, and more precisely how functi
 
 This alternate model de-emphasizes "functions as first-class values", and instead embraces how functions (like all non-primitive values) are held by reference in JS, and assigned/passed by reference-copy -- see Appendix A of the *Get Started* book for more information.
 
-Instead of thinking about the inner function instance of `addTo(..)` moving to the outer RED(1) scope via the `return`, we can recognize that functions (function instances) actually just stay in place in their scope environment, of course with their scope-chain intact.
+Instead of thinking about the inner function instance of `addTo(..)` moving to the outer RED(1) scope via the `return`, we can envision that function instances actually just stay in place in their scope environment, of course with their scope-chain intact.
 
-So what gets *moved* to the RED(1) scope is just a reference to the in-place function instance, rather than the function itself. Figure 5 depicts the function instances remaining in place, pointed to by the `addTo10` and `addTo42` references, respectively:
+What gets *moved* to the RED(1) scope is just a reference to the in-place function instance, rather than the function instance itself. Figure 5 depicts the function instances remaining in place, pointed to by the `addTo10` and `addTo42` references, respectively:
 
 <figure>
     <img src="images/fig5.png" width="400" alt="Function instances inside scopes via closure, linked to by references" align="center">
@@ -685,17 +685,17 @@ So what gets *moved* to the RED(1) scope is just a reference to the in-place fun
     <br><br>
 </figure>
 
-As shown in Figure 5, each call to `adder(..)` still creates a new BLUE(2) scope containing a `num1` variable, as well as a new instance of `addTo(..)` function as a GREEN(3) scope. But what's different from Figure 4 is, now these GREEN(3) instances remain in place, naturally nested inside of their BLUE(2) scope instances. The `addTo10` and `addTo42` references are the values moved to the RED(1) outer scope, not the function instances themselves.
+As shown in Figure 5, each call to `adder(..)` still creates a new BLUE(2) scope containing a `num1` variable, as well as an instance of the `addTo(..)` function as a GREEN(3) scope. But what's different from Figure 4 is, now these GREEN(3) instances remain in place, naturally nested inside of their BLUE(2) scope instances. The `addTo10` and `addTo42` references are the values placed in the RED(1) outer scope, not the function instances themselves.
 
 When `addTo10(15)` is called, the `addTo(..)` function instance (still in place in its original BLUE(1) scope environment) is invoked. Since the function instance itself never moved, of course it still has natural access to its scope chain. Same with the `addTo42(9)` call -- nothing special here beyond lexical scope.
 
-So what then *is* closure? In the first model, closure is the *magic* that lets a function maintain a link to its original scope chain even as that function moves around in other scopes. In this alternate model, functions stay in place and keep accessing their original scope chain just like they always could.
+So what then *is* closure, if not the *magic* that lets a function maintain a link to its original scope chain even as that function moves around in other scopes? In this alternate model, functions stay in place and keep accessing their original scope chain just like they always could.
 
-Closure would thus shift to describing the *magic* of keeping alive a function instance (its scope environment) plus its entire scope chain, whenever there's at least one reference to that function instance floating around in any other part of the program.
+Closure now describes the *magic* of keeping alive a function instance, along with its whole scope environment and chain, for as long as there's at least one reference to that function instance floating around in any other part of the program.
 
-That definition of closure is less observational and a bit less familiar-sounding compared to the traditional academic perspective. But that's OK, because the benefit is, we simplify closure to a straightforward combination of mechanisms like value-references and in-place function instances.
+That definition of closure is less observational and a bit less familiar-sounding compared to the traditional academic perspective. But it's nonetheless still useful, because the benefit is, we can simplify explanation of closure to a straightforward combination of mechanisms like references and in-place function instances.
 
-The previous model (Figure 4) is not *wrong* at describing closure in JS, it's just more conceptually aligned with a general, academic perspective on closure. The additional model (Figure 5) can be seen as a bit more aligned with how JS actually works.
+The previous model (Figure 4) is not *wrong* at describing closure in JS. It's just more conceptually inspired, an academic perspective on closure. By contrast, the alternate model (Figure 5) could be described as a bit more aligned with how JS actually works.
 
 Both perspectives/models are useful in appreciating the behavior of closure, but the reader may find one a little easier to juggle than the other. Whichever you prefer, the observable behaviors in our program are the same.
 
