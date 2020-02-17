@@ -830,8 +830,18 @@ So what does closure do for our programs?
 
 * Closure can improve efficiency by allowing a function instance to remember previously determined information instead of having to compute it each time.
 
-* Closure can improve code readability, limiting scope-exposure by encapsulating variable(s) inside function instances, while still making sure the information in those variables is accessible for future use. The resultant narrower, more specialized function instances are cleaner to interact with, since the preserved information doesn't need to be passed in.
+* Closure can improve code readability, bounding scope-exposure by encapsulating variable(s) inside function instances, while still making sure the information in those variables is accessible for future use. The resultant narrower, more specialized function instances are cleaner to interact with, since the preserved information doesn't need to be passed in.
 
 ## Closer to Closure
 
-// TODO
+As we close down this really dense chapter, just take some deep breaths and a few moments to let all that sink in. Seriously, this is a lot of information for anyone to consume, so it's entirely reasonable if your head is kind of spinning right now.
+
+This chapter presented two models for mentally grasping closure:
+
+* Observational: closure is a function instance remembering its outer variables even as that function is passed around and executed in other scopes.
+
+* Implementational: closure is a function instance and its scope environment being preserved in-place while any references to it are passed around and executed in other scopes.
+
+Closure allows a function to remember information, which makes instances of that function more efficient and easier to interact with. Closure also creates more effective bounding of scope-exposure for variables, which improves code organization and readability.
+
+Before you move on, take some time to re-articulate this summary in your own words, explaining what closure is and why it's helpful in your programs. When you're ready, the main book text concludes with a final chapter exploring the module pattern.
