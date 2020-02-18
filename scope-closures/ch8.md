@@ -33,309 +33,158 @@ These are some of the main benefits of organizing JS programs into modules.
 
 A module is a collection of related data and functions (often referred to as methods in this context), characterized by a division between hidden *private* details and *public*, accessible details, usually called the "public API".
 
-// TODO
+Modules should be stateful -- they need to maintain some information -- otherwise, it's not really a module. If all you have is a collection of related functions, but no data, then you don't have encapsulation and thus you don't have a module.
 
-.
+The better term for a collection of *stateless* functions is a namespace:
 
-.
+```js
+// namespace, not module
+var Utils = {
+    cancelEvt(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        evt.stopImmediatePropagation();
+    },
+    wait(ms) {
+        return new Promise(function c(res){
+            setTimeout(res,ms);
+        });
+    },
+    isValidEmail(email) {
+        return /[^@]+@[^@.]+\.[^@.]+/.test(email);
+    }
+};
+```
 
-.
+`Utils` here is a useful collection of utilities, yet they're all state-independent functions. Gathering functionality together is generally good pratice, but that doesn't make this a module. Rather, we've defined a `Utils` namespace and organized the functions under it.
 
-.
+Further, even if you have data and stateful functions together, if you're not limiting the visibility of any of it, then it's falling short of the POLE side of encapsulation and is probably not useful to label as a module:
 
-.
+```js
+var Student = {
+    records: [
+        { id: 14, name: "Kyle", grade: 86 },
+        { id: 73, name: "Suzy", grade: 87 },
+        { id: 112, name: "Frank", grade: 75 },
+        { id: 6, name: "Sarah", grade: 91 }
+    ],
+    getName(studentID) {
+        var student = this.records.find(
+            student => student.id == studentID
+        );
+        return student.name;
+    }
+};
 
-.
+Student.getName(73);
+// Suzy
+```
 
-.
-
-----
+Since `records` is publicly accessible data, not hidden behind a public API, `Student` here isn't truly a module. What is it? `Student` does have the data-plus-functionality aspect of encapsulation, but not the visibility-control aspect, so it's an instance of a general data structure.
 
 | NOTE: |
 | :--- |
-| Everything below here is previous text from 1st edition, and is only here for reference while 2nd edition work is underway. Please ignore. |
+| Another aspect of the spirit of the module pattern is embracing modularization through loose-coupling. In this chapter, we're focusing more narrowly on implementing modules, so we'll defer the bigger-picture discussion of how modules can be designed to interact well with each other to Appendix A. |
 
-## Modules
+### Classic Modules
 
-There are other code patterns which leverage the power of closure but which do not on the surface appear to be about callbacks. Let's examine the most powerful of them: *the module*.
-
-```js
-function foo() {
-    var something = "cool";
-    var another = [1, 2, 3];
-
-    function doSomething() {
-        console.log( something );
-    }
-
-    function doAnother() {
-        console.log( another.join( " ! " ) );
-    }
-}
-```
-
-As this code stands right now, there's no observable closure going on. We simply have some private data variables `something` and `another`, and a couple of inner functions `doSomething()` and `doAnother()`, which both have lexical scope (and thus closure!) over the inner scope of `foo()`.
-
-But now consider:
+Let's turn `Student` into a module. We'll start with what's called the "classic module pattern", which also used to be referred to as the "revealing module pattern" when it first emerged in the early 2000's.
 
 ```js
-function CoolModule() {
-    var something = "cool";
-    var another = [1, 2, 3];
-
-    function doSomething() {
-        console.log( something );
-    }
-
-    function doAnother() {
-        console.log( another.join( " ! " ) );
-    }
-
-    return {
-        doSomething: doSomething,
-        doAnother: doAnother
-    };
-}
-
-var foo = CoolModule();
-
-foo.doSomething(); // cool
-foo.doAnother(); // 1 ! 2 ! 3
-```
-
-This is the pattern in JavaScript we call *module*. The most common way of implementing the module pattern is often called "Revealing Module", and it's the variation we present here.
-
-Let's examine some things about this code.
-
-Firstly, `CoolModule()` is just a function, but it *has to be invoked* for there to be a module instance created. Without the execution of the outer function, the creation of the inner scope and the closures would not occur.
-
-Secondly, the `CoolModule()` function returns an object, denoted by the object-literal syntax `{ key: value, ... }`. The object we return has references on it to our inner functions, but *not* to our inner data variables. We keep those hidden and private. It's appropriate to think of this object return value as essentially a **public API for our module**.
-
-This object return value is ultimately assigned to the outer variable `foo`, and then we can access those property methods on the API, like `foo.doSomething()`.
-
-**Note:** It is not required that we return an actual object (literal) from our module. We could just return back an inner function directly. jQuery is actually a good example of this. The `jQuery` and `$` identifiers are the public API for the jQuery "module", but they are, themselves, just a function (which can itself have properties, since all functions are objects).
-
-The `doSomething()` and `doAnother()` functions have closure over the inner scope of the module "instance" (arrived at by actually invoking `CoolModule()`). When we transport those functions outside of the lexical scope, by way of property references on the object we return, we have now set up a condition by which closure can be observed and exercised.
-
-To state it more simply, there are two "requirements" for the module pattern to be exercised:
-
-1. There must be an outer enclosing function, and it must be invoked at least once (each time creates a new module instance).
-
-2. The enclosing function must return back at least one inner function, so that this inner function has closure over the private scope, and can access and/or modify that private state.
-
-An object with a function property on it alone is not *really* a module. An object which is returned from a function invocation which only has data properties on it and no closured functions is not *really* a module, in the observable sense.
-
-The code snippet above shows a standalone module creator called `CoolModule()` which can be invoked any number of times, each time creating a new module instance. A slight variation on this pattern is when you only care to have one instance, a "singleton" of sorts:
-
-```js
-var foo = (function CoolModule() {
-    var something = "cool";
-    var another = [1, 2, 3];
-
-    function doSomething() {
-        console.log( something );
-    }
-
-    function doAnother() {
-        console.log( another.join( " ! " ) );
-    }
-
-    return {
-        doSomething: doSomething,
-        doAnother: doAnother
-    };
-})();
-
-foo.doSomething(); // cool
-foo.doAnother(); // 1 ! 2 ! 3
-```
-
-Here, we turned our module function into an IIFE (see Chapter 3), and we *immediately* invoked it and assigned its return value directly to our single module instance identifier `foo`.
-
-Modules are just functions, so they can receive parameters:
-
-```js
-function CoolModule(id) {
-    function identify() {
-        console.log( id );
-    }
-
-    return {
-        identify: identify
-    };
-}
-
-var foo1 = CoolModule( "foo 1" );
-var foo2 = CoolModule( "foo 2" );
-
-foo1.identify(); // "foo 1"
-foo2.identify(); // "foo 2"
-```
-
-Another slight but powerful variation on the module pattern is to name the object you are returning as your public API:
-
-```js
-var foo = (function CoolModule(id) {
-    function change() {
-        // modifying the public API
-        publicAPI.identify = identify2;
-    }
-
-    function identify1() {
-        console.log( id );
-    }
-
-    function identify2() {
-        console.log( id.toUpperCase() );
-    }
+var Student = (function defineStudent(){
+    var records = [
+        { id: 14, name: "Kyle", grade: 86 },
+        { id: 73, name: "Suzy", grade: 87 },
+        { id: 112, name: "Frank", grade: 75 },
+        { id: 6, name: "Sarah", grade: 91 }
+    ];
 
     var publicAPI = {
-        change: change,
-        identify: identify1
+        getName
     };
 
     return publicAPI;
-})( "foo module" );
 
-foo.identify(); // foo module
-foo.change();
-foo.identify(); // FOO MODULE
-```
+    // ************************
 
-By retaining an inner reference to the public API object inside your module instance, you can modify that module instance **from the inside**, including adding and removing methods, properties, *and* changing their values.
-
-### Modern Modules
-
-Various module dependency loaders/managers essentially wrap up this pattern of module definition into a friendly API. Rather than examine any one particular library, let me present a *very simple* proof of concept **for illustration purposes (only)**:
-
-```js
-var MyModules = (function Manager() {
-    var modules = {};
-
-    function define(name, deps, impl) {
-        for (var i=0; i<deps.length; i++) {
-            deps[i] = modules[deps[i]];
-        }
-        modules[name] = impl.apply( impl, deps );
+    function getName(studentID) {
+        var student = records.find(
+            student => student.id == studentID
+        );
+        return student.name;
     }
-
-    function get(name) {
-        return modules[name];
-    }
-
-    return {
-        define: define,
-        get: get
-    };
 })();
+
+Student.getName(73);
+// Suzy
 ```
 
-The key part of this code is `modules[name] = impl.apply(impl, deps)`. This is invoking the definition wrapper function for a module (passing in any dependencies), and storing the return value, the module's API, into an internal list of modules tracked by name.
+`Student` is now an instance of a module. It features a public API with a single method: `getName(..)`. This method is able to access the private hidden `records` data.
 
-And here's how I might use it to define some modules:
+| WARNING: |
+| :--- |
+| I should point out that the explicit student data being hard-coded into this module definition is just for our illustration purposes. A typical module in your program will receive this data from an outside source, typically loaded from databases, JSON data files, Ajax calls, etc. The data is then injected into the module instance typically through some method(s) of the module's public API. |
+
+How does it work?
+
+Notice that the instance of the module is created by the `defineStudent()` IIFE being executed. This IIFE returns the object (named `publicAPI`) which has a property on it referencing the inner `getName(..)` function.
+
+The naming of the object as `publicAPI` is purely stylistic preference on my part. The object can be named whatever you like (JS doesn't care), or you can just return an object directly without assigning it to any internal named variable. I like to assign it to `publicAPI` because it nicely labels what the object is, and also is a handy reference to the module's public API from inside itself, if needed.
+
+From the outside, `Student.getName(..)` invokes this exposed inner function, which maintains access to the inner `records` variable via closure.
+
+By the way, you don't *have* to return an object with a function as one of its properties. You could just return a function directly, in place of the object. That still satisfies all the core bits of a classic module.
+
+The use of an IIFE implies that our module only ever needs a single central instance, which is commonly referred to as a "singleton". Indeed, this specific example is simple enough that there's no obvious reason we'd need anything more than just one instance of the `Student` module.
+
+But if we did want to define a module that supported multiple instances in our program, we can slightly tweak the code:
 
 ```js
-MyModules.define( "bar", [], function(){
-    function hello(who) {
-        return "Let me introduce: " + who;
-    }
+function defineStudent() {
+    var records = [
+        { id: 14, name: "Kyle", grade: 86 },
+        { id: 73, name: "Suzy", grade: 87 },
+        { id: 112, name: "Frank", grade: 75 },
+        { id: 6, name: "Sarah", grade: 91 }
+    ];
 
-    return {
-        hello: hello
+    var publicAPI = {
+        getName
     };
-} );
 
-MyModules.define( "foo", ["bar"], function(bar){
-    var hungry = "hippo";
+    return publicAPI;
 
-    function awesome() {
-        console.log( bar.hello( hungry ).toUpperCase() );
+    // ************************
+
+    function getName(studentID) {
+        var student = records.find(
+            student => student.id == studentID
+        );
+        return student.name;
     }
-
-    return {
-        awesome: awesome
-    };
-} );
-
-var bar = MyModules.get( "bar" );
-var foo = MyModules.get( "foo" );
-
-console.log(
-    bar.hello( "hippo" )
-); // Let me introduce: hippo
-
-foo.awesome(); // LET ME INTRODUCE: HIPPO
-```
-
-Both the "foo" and "bar" modules are defined with a function that returns a public API. "foo" even receives the instance of "bar" as a dependency parameter, and can use it accordingly.
-
-Spend some time examining these code snippets to fully understand the power of closures put to use for our own good purposes. The key take-away is that there's not really any particular "magic" to module managers. They fulfill both characteristics of the module pattern I listed above: invoking a function definition wrapper, and keeping its return value as the API for that module.
-
-In other words, modules are just modules, even if you put a friendly wrapper tool on top of them.
-
-### Future Modules
-
-ES6 adds first-class syntax support for the concept of modules. When loaded via the module system, ES6 treats a file as a separate module. Each module can both import other modules or specific API members, as well export their own public API members.
-
-**Note:** Function-based modules aren't a statically recognized pattern (something the compiler knows about), so their API semantics aren't considered until run-time. That is, you can actually modify a module's API during the run-time (see earlier `publicAPI` discussion).
-
-By contrast, ES6 Module APIs are static (the APIs don't change at run-time). Since the compiler knows *that*, it can (and does!) check during (file loading and) compilation that a reference to a member of an imported module's API *actually exists*. If the API reference doesn't exist, the compiler throws an "early" error at compile-time, rather than waiting for traditional dynamic run-time resolution (and errors, if any).
-
-ES6 modules **do not** have an "inline" format, they must be defined in separate files (one per module). The browsers/engines have a default "module loader" (which is overridable, but that's well-beyond our discussion here) which synchronously loads a module file when it's imported.
-
-Consider:
-
-**bar.js**
-```js
-function hello(who) {
-    return "Let me introduce: " + who;
 }
 
-export hello;
+var fullTime = defineStudent();
+fullTime.getName(73);
+// Suzy
 ```
 
-**foo.js**
-```js
-// import only `hello()` from the "bar" module
-import hello from "bar";
+Rather than specifying `defineStudent()` as an IIFE, we just define it as a normal standalone function, which is commonly referred to in this pattern as a "module factory" function.
 
-var hungry = "hippo";
+We then call the module factory, producing an instance of the module that we name `fullTime`. `fullTime.getName(..)` can now invoke the method on that specific instance.
 
-function awesome() {
-    console.log(
-        hello( hungry ).toUpperCase()
-    );
-}
+So to clarify what makes something a classic module:
 
-export awesome;
-```
+* there must be an outer scope, typically from a module factory function running at least once.
 
-```js
-// import the entire "foo" and "bar" modules
-module foo from "foo";
-module bar from "bar";
+* the module's inner scope must have at least one piece of hidden information that represents state for the module.
 
-console.log(
-    bar.hello( "rhino" )
-); // Let me introduce: rhino
+* the module must return on its public API a reference to at least one function that has closure over the hidden module state (so that this state is actually preserved).
 
-foo.awesome(); // LET ME INTRODUCE: HIPPO
-```
+### Module Variations
 
-**Note:** Separate files **"foo.js"** and **"bar.js"** would need to be created, with the contents as shown in the first two snippets, respectively. Then, your program would load/import those modules to use them, as shown in the third snippet.
+// TODO
 
-`import` imports one or more members from a module's API into the current scope, each to a bound variable (`hello` in our case). `module` imports an entire module API to a bound variable (`foo`, `bar` in our case). `export` exports an identifier (variable, function) to the public API for the current module. These operators can be used as many times in a module's definition as is necessary.
+## Modern ES Modules
 
-The contents inside the *module file* are treated as if enclosed in a scope closure, just like with the function-closure modules seen earlier.
-
-## Review (TL;DR)
-
-Closure seems to the un-enlightened like a mystical world set apart inside of JavaScript which only the few bravest souls can reach. But it's actually just a standard and almost obvious fact of how we write code in a lexically scoped environment, where functions are values and can be passed around at will.
-
-**Closure is when a function can remember and access its lexical scope even when it's invoked outside its lexical scope.**
-
-Closures can trip us up, for instance with loops, if we're not careful to recognize them and how they work. But they are also an immensely powerful tool, enabling patterns like *modules* in their various forms.
-
-Modules require two key characteristics: 1) an outer wrapping function being invoked, to create the enclosing scope 2) the return value of the wrapping function must include reference to at least one inner function that then has closure over the private inner scope of the wrapper.
-
-Now we can see closures all around our existing code, and we have the ability to recognize and leverage them to our own benefit!
+// TODO

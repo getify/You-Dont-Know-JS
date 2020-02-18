@@ -49,16 +49,11 @@ function lookupStudent(studentID) {
     ];
 
     return function greetStudent(greeting){
-        var studentName;
+        var student = students.find(
+            student => student.id == studentID
+        );
 
-        for (let student of students) {
-            if (student.id == studentID) {
-                studentName = student.name;
-                break;
-            }
-        }
-
-        return `${ greeting }, ${ studentName }!`;
+        return `${ greeting }, ${ student.name }!`;
     };
 }
 
@@ -96,7 +91,21 @@ If `greetStudent(..)` tried to access what it thought was a BLUE(1) marble, but 
 
 But we don't get an error. The fact that `chosenStudents[0]("Hello")` is able to execute as expected, and give us the message "Hello, Sarah!", means it was still able to access the `students` and `studentID` variables. This is a direct observation of closure!
 
-Let's examine one of the canonical examples often cited for closure:
+### Pointed Closure
+
+Actually, we glossed over a little detail in the previous discussion which I'm guessing many readers missed!
+
+Because of how terse the syntax for `=>` arrow functions is, it's easy to forget that they still create a scope (as asserted in "Arrow Functions" in Chapter 3). The `student => student.id == studentID` arrow function is creating another scope bubble inside the `greetStudent(..)` function scope.
+
+Building on our colored buckets/bubbles metaphor from Chapter 2, if we were creating a colored diagram for this code, there's a fourth scope at this innermost nesting level, so we'd need a fourth color; perhaps we'd pick ORANGE(4) for that scope.
+
+In any case, the BLUE(2) `studentID` reference is actually inside the ORANGE(4) scope rather than the GREEN(3) scope of `greetStudent(..)`. The consequence here is that this arrow function passed as a callback to the array's `find(..)` method holds the closure over `studentID`, rather than `greetStudent(..)`.
+
+That's not that big of a deal, as everything still works as expected. It's just important not to skip over the fact that even tiny arrow functions can get in on the closure party.
+
+### Adding Up Closures
+
+Let's examine one of the canonical examples most often cited for closure:
 
 ```js
 function adder(num1) {
@@ -122,7 +131,7 @@ Even though closure is based on lexical scope, which is handled at compile-time,
 
 ### Live Link, Not a Snapshot
 
-In the prior 2 examples from the previous sections, we **read the value from a variable** that was part of a closure. That can make it sort of feel like closure is a snapshot of a value at some given moment. Indeed, that's an extremely common misconception.
+In the prior 2 examples from the previous sections, we **read the value from a variable** that was held in a closure. That can make it sort of feel like closure is just a snapshot of a value at some given moment. Indeed, that's an extremely common misconception.
 
 Closure is actually a live link, a preservation of the full variable itself. We're not limited to merely reading its value; the closed-over variable can be updated (reassigned) as well.
 
@@ -698,6 +707,10 @@ That definition of closure is less observational and a bit less familiar-soundin
 The previous model (Figure 4) is not *wrong* at describing closure in JS. It's just more conceptually inspired, an academic perspective on closure. By contrast, the alternate model (Figure 5) could be described as a bit more aligned with how JS actually works.
 
 Both perspectives/models are useful in appreciating the behavior of closure, but the reader may find one a little easier to juggle than the other. Whichever you prefer, the observable behaviors in our program are the same.
+
+| NOTE: |
+| :--- |
+| Technically, this alternate model for closure affects whether we consider synchronous callbacks as examples of closure or not. More on this nuance in Appendix A. |
 
 ## Why Closure?
 

@@ -53,5 +53,6 @@
 * Chapter 8: The Module Pattern
     * Encapsulation and POLE
     * What is a Module?
+    * Modern ES Modules
 * Appendix A: Exploring Further
 * Appendix B: Practice

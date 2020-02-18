@@ -242,7 +242,7 @@ A `function` declaration is a special case of a *target* reference. You could th
 
 | NOTE: |
 | :--- |
-| This immediate automatic function assignment from `function` declarations is referred to as "function hoisting", and will be covered in Chapter 3. |
+| This automatic function assignment from `function` declarations is referred to as "function hoisting", and is covered in Chapter 5. |
 
 ### Sources
 

@@ -13,7 +13,7 @@ Imagine you come across a pile of marbles, and notice that all the marbles are c
 
 In this metaphor, the marbles are the variables in our program. The buckets are scopes (functions and blocks), which we just conceptually assign individual colors for our discussion purposes. The color of each marble is thus determined by which *color* scope we find the marble originally created in.
 
-Let's annotate the program example from Chapter 1 with scope color labels:
+Let's annotate the running program example from Chapter 1 with scope color labels:
 
 ```js
 // outer/global scope: RED
