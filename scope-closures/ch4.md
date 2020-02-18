@@ -159,7 +159,7 @@ That's what I mean by *pure*. But unfortunately, that won't always be true of ot
 
 Recall the discussion of shadowing (and global unshadowing) from Chapter 3, where one variable declaration can override and prevent access to a declaration of the same name from an outer scope.
 
-An unusual consequence of the difference between a global variable and a global property of the same name is that, within just the global scope, a global object property can be shadowed by a global variable:
+An unusual consequence of the difference between a global variable and a global property of the same name is that, within only the global scope, a global object property can be shadowed by a global variable:
 
 ```js
 window.something = 42;
@@ -231,19 +231,25 @@ So again, the global scope behavior we're seeing here is about as *pure* as it g
 
 ### Developer Tools Console/REPL
 
-Recall from "Get Started" Chapter 1 that Developer Tools don't create a completely authentic JS environment. They do process JS code, but they also bend the UX of the interaction in favor of being friendly to developers (aka, "Developer Experience", DX).
+Recall from *Get Started* Chapter 1 that Developer Tools don't create a completely adherent JS environment. They do process JS code, but they also bend the UX of the interaction in favor of being most friendly to developers (aka, developer experience -- DX).
 
-In many cases, favoring DX when entering short JS snippets over the normal strict steps expected for processing a full JS program produces observable differences in behavior of code. For example, certain error conditions applicable to a JS program may be relaxed and not displayed when the code is entered into a developer tool.
+In some cases, favoring DX when typing in short JS snippets, over the normal strict steps expected for processing a full JS program, produces observable differences in code behavior between programs and tools. For example, certain error conditions applicable to a JS program may be relaxed and not displayed when the code is entered into a developer tool.
 
-With respect to our discussions here about scope, such observable differences in behavior may include the behavior of the global scope, hoisting (discussed later in this chapter), and block-scoping declarators (`let` / `const`, see Chapter 5) when used in the outermost scope.
+With respect to our discussions here about scope, such observable differences in behavior may include:
+
+* the behavior of the global scope
+
+* hoisting (see Chapter 5)
+
+* block-scoping declarators (`let` / `const`, see Chapter 6) when used in the outermost scope
 
 Even though while using the console/REPL it seems like statements entered in the outermost scope are being processed in the real global scope, that's not strictly accurate. The tool emulates that to an extent, but it's emulation, not strict adherence. These tool environments prioritize developer convenience, which means that at times (such as with our current discussions regarding scope), observed behavior may deviate from the JS specification.
 
-The take-away is that Developer Tools, while being very convenient and useful for a variety of developer activities, are **not** suitable environments to determine or verify some of the explicit and nuanced behaviors of an actual JS program context.
+The take-away is that Developer Tools, while optimized to be convenient and useful for a variety of developer activities, are **not** suitable environments to determine or verify some of the explicit and nuanced behaviors of an actual JS program context.
 
 ### ES Modules (ESM)
 
-ES6 introduced first-class support for the module pattern (which we'll cover more in Chapter 6). One of the most obvious impacts of using ESM is how it changes the behavior of observably top-level scope in a file.
+ES6 introduced first-class support for the module pattern (see Chapter 8). One of the most obvious impacts of using ESM is how it changes the behavior of observably top-level scope in a file.
 
 Recall this code snippet from earlier:
 
@@ -274,7 +280,7 @@ ESM encourages a minimization of reliance on the global scope, where you import 
 
 One aspect of Node that often catches JS developers off-guard is that Node treats every single .js file that it loads, including the main one you start the Node process with, as a *module* (ES module or CommonJS module). The practical effect is that the top-level of your Node programs **is not actually the global scope**, the way it is when loading a non-module file in the browser.
 
-As of time of this writing, Node recently added support for ES modules. But additionally, Node has from the beginning supported a module format referred to as "Common JS", which looks like this:
+As of time of this writing, Node has recently added support for ES modules. But additionally, Node has from the beginning supported a module format referred to as "CommonJS", which looks like this:
 
 ```js
 var studentName = "Kyle";
@@ -289,9 +295,9 @@ hello();
 module.exports.hello = hello;
 ```
 
-Node essentially wraps such code in a function, so that the `var` and `function` declarations are contained in that module's scope, **not** treated as global variables.
+Node effectively wraps such code in a function, so that the `var` and `function` declarations are contained in that function's scope, **not** treated as global variables.
 
-Think of the above code when processed by Node sorta like this (illustrative, not actual):
+Envision the above code as being processed by Node like this (illustrative, not actual):
 
 ```js
 function Module(module,require,__dirname,...) {
@@ -308,11 +314,11 @@ function Module(module,require,__dirname,...) {
 }
 ```
 
-Node then (again, essentially) invokes the added `Module(..)` function to run your module. You can clearly see here why `studentName` and `hello` identifiers are thus not global, but rather declared in the module scope.
+Node then essentially invokes the added `Module(..)` function to run your module. You can clearly see here why `studentName` and `hello` identifiers are thus not global, but rather declared in the module scope.
 
-As noted earlier, Node defines a number of "globals" like `require()`, but they're not actually identifiers in the global scope. They're provided in the available scope to every module, essentially a bit like the parameters listed in the `Module(..)` declaration function.
+As noted earlier, Node defines a number of "globals" like `require()`, but they're not actually identifiers in the global scope (nor properties of the global object). They're made available in the scope of every module, essentially a bit like the parameters listed in the `Module(..)` declaration function.
 
-So how do you define actual global variables in Node? The only way to do so is to add properties to another of Node's automatically provided "globals", which is unsurprisignly called `global`. `global` is ostensibly (if not actually) a reference to the real global scope object, somewhat like using `window` in a browser JS environment.
+So how do you define actual global variables in Node? The only way to do so is to add properties to another of Node's automatically provided "globals", which is unsurprisignly called `global`. `global` is ostensibly a reference to the real global scope object, somewhat like using `window` in a browser JS environment.
 
 Consider:
 
@@ -331,7 +337,7 @@ module.exports.hello = hello;
 
 Here we add `studentName` as a property on the `global` object, and then in the `console.log(..)` statement we're able to access `studentName` as a normal global variable.
 
-Remember, the identifier `global` is not defined by JS, it's defined by Node.
+Remember, the identifier `global` is not defined by JS; specifically, it's defined by Node.
 
 ## Global This
 

@@ -50,7 +50,8 @@
     * Why Closure?
     * An Alternate Perspective
     * Closer to Closure
-* Chapter 8: Module Pattern
-    * TODO
+* Chapter 8: The Module Pattern
+    * Encapsulation and POLE
+    * What is a Module?
 * Appendix A: Exploring Further
 * Appendix B: Practice

@@ -1,9 +1,39 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 8: Module Pattern
+# Chapter 8: The Module Pattern
 
 | NOTE: |
 | :--- |
 | Work in progress |
+
+We've examined every angle of lexical scope, from the breadth of the global scope down through nested block scopes, into the intricasies of the variable lifecycle. Then we leveraged lexical scope to understand the power of closure. Throughout all the discussion so far, the underlying thread has been that understanding and mastering scope and closure is central to properly structuring and organizing our code, especially where we store information in variables.
+
+Take a moment to reflect on how far you've come in this journey so far; you've taken big steps in getting to know JS more deeply!
+
+In this chapter, we wrap up the main text of the book by exploring one of the most important code organization patterns in all of programming: the module. As we'll see, modules are inherently built from what we've already covered. Modules are the payoff for your efforts in learning lexical scope and closure.
+
+To whatever extent these topics may still feel a bit abstract or mostly academic, our goal here is to appreciate where modules elevate our thinking to concrete, practical impact on how we write programs.
+
+## Encapsulation and POLE
+
+Encapsulation is often cited as a principle of object-oriented (OO) programming, but it's more fundamental and broadly applicable than that. The goal of encapsulation is the bundling or co-location of information (data) and behavior (functions) that serve a common purpose.
+
+Independent of any syntax or code mechanisms, the spirit of encapsulation can be realized in something as simple as organizing bits of the program with common purpose into separate files. If we bundle everything that powers a list of search results into a single file called "search-list.js", we're encapsulating that part of the program.
+
+A modern trend in front-end programming to organize applications around Component architecture pushes encapsulation even further. It feels natural to consolidate everything that constitutes the search results list -- even beyond code, to include presentational markup and styling -- into a single unit of program logic, something tangible we can interact with. So we label that collection the "SearchList" component.
+
+Another key goal is the control of visibility of certain aspects of the encapsulated data and functionality. Recall the POLE principle from Chapter 6, which seeks to defensively guard against various *dangers* of over-exposure; these apply not only to variables but also functions. In JS, we most often accomplish visibility control through the mechanics of lexical scope.
+
+The idea is to group alike program bits together, and selectively limit programmatic access to certain parts which can reasonably be described as *private* details. What's not considered *private* is then by default *public*, accessible to the whole program.
+
+The natural effect of this effort is better code organization. It's easier to build and maintain software when we know where things are, with clear and obvious boundaries and connection points. It's also easier to maintain quality if we avoid the pitfalls of over-exposed data and functionality.
+
+These are some of the main benefits of organizing JS programs into modules.
+
+## What is a Module?
+
+A module is a collection of related data and functions (often referred to as methods in this context), characterized by a division between hidden *private* details and *public*, accessible details, usually called the "public API".
+
+// TODO
 
 .
 
