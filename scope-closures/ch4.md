@@ -251,7 +251,7 @@ The take-away is that Developer Tools, while optimized to be convenient and usef
 
 ES6 introduced first-class support for the module pattern (see Chapter 8). One of the most obvious impacts of using ESM is how it changes the behavior of observably top-level scope in a file.
 
-Recall this code snippet from earlier:
+Recall this code snippet from earlier (which we'll adjust to ESM format by using the `export` keyword):
 
 ```js
 var studentName = "Kyle";
@@ -268,7 +268,7 @@ export hello;
 
 If that code were in a file that was loaded as an ES module, it would still run exactly the same. However, the observable effects, from the overall application perspective, would be different.
 
-Despite being declared at the top-level of the (module) file, the outermost obvious scope, `studentName` and `hello` are not global variables. Instead, they are module-wide, or if you prefer, "module-global".
+Despite being declared at the top-level of the (module) file, in the outermost obvious scope, `studentName` and `hello` are not global variables. Instead, they are module-wide, or if you prefer, "module-global".
 
 However, in a module there's no implicit "global scope object" (or "module-global object") for these top-level declarations to be added to as properties, as there is when declarations appear in the top-level of non-module JS files. This is not to say that global variables cannot exist or be accessed in such programs. It's just that global variables don't get *created* by declaring variables in the top-level scope of a module.
 
@@ -278,7 +278,7 @@ ESM encourages a minimization of reliance on the global scope, where you import 
 
 ### Node
 
-One aspect of Node that often catches JS developers off-guard is that Node treats every single .js file that it loads, including the main one you start the Node process with, as a *module* (ES module or CommonJS module). The practical effect is that the top-level of your Node programs **is not actually the global scope**, the way it is when loading a non-module file in the browser.
+One aspect of Node that often catches JS developers off-guard is that Node treats every single .js file that it loads, including the main one you start the Node process with, as a *module* (ES module or CommonJS module). The practical effect is that the top-level of your Node programs **is never actually the global scope**, the way it is when loading a non-module file in the browser.
 
 As of time of this writing, Node has recently added support for ES modules. But additionally, Node has from the beginning supported a module format referred to as "CommonJS", which looks like this:
 
@@ -314,9 +314,9 @@ function Module(module,require,__dirname,...) {
 }
 ```
 
-Node then essentially invokes the added `Module(..)` function to run your module. You can clearly see here why `studentName` and `hello` identifiers are thus not global, but rather declared in the module scope.
+Node then essentially invokes the added `Module(..)` function to run your module. You can clearly see here why `studentName` and `hello` identifiers are not global, but rather declared in the module scope.
 
-As noted earlier, Node defines a number of "globals" like `require()`, but they're not actually identifiers in the global scope (nor properties of the global object). They're made available in the scope of every module, essentially a bit like the parameters listed in the `Module(..)` declaration function.
+As noted earlier, Node defines a number of "globals" like `require()`, but they're not actually identifiers in the global scope (nor properties of the global object). They're injected in the scope of every module, essentially a bit like the parameters listed in the `Module(..)` declaration function.
 
 So how do you define actual global variables in Node? The only way to do so is to add properties to another of Node's automatically provided "globals", which is unsurprisignly called `global`. `global` is ostensibly a reference to the real global scope object, somewhat like using `window` in a browser JS environment.
 
@@ -341,17 +341,17 @@ Remember, the identifier `global` is not defined by JS; specifically, it's defin
 
 ## Global This
 
-Reviewing where we've been so far, depending on which JS environment our code is running in, a program may or may not be able to:
+Reviewing the JS environments we've looked at so far, a program may or may not be able to:
 
 * declare a global variable in the top-level scope with `var` or `function` declarations -- or `let`, `const`, and `class`.
 
-* also add global variables declarations as properties of the global scope object if `var` or `function` were used for the declaration.
+* also add global variables declarations as properties of the global scope object if `var` or `function` are used for the declaration.
 
 * refer to the global scope object (for adding or retrieving global variables, as properties) with `window`, `self`, or `global`.
 
 I think it's fair to say that global scope access and behavior is more complicated than most developers assume, as the preceding sections have illustrated. But the complexity is never more obvious than in trying to articulate a broadly applicable reference to the global scope object.
 
-Another "trick" for getting a reliable reference to this global scope object might look like:
+Another "trick" for getting a reference to this global scope object looks like:
 
 ```js
 const theGlobalScopeObject = (new Function("return this"))();
@@ -359,15 +359,15 @@ const theGlobalScopeObject = (new Function("return this"))();
 
 | NOTE: |
 | :--- |
-| A function can be dynamically constructed from code stored in a string value with the `Function()` constructor, similar to `eval(..)` (see "Cheating: Run-Time Scope Modifications" in Chapter 1). Such a function will automatically be run in non-strict mode (for legacy reasons) when invoked as shown (the normal `()` function invocation); thus, its `this` will be the global object. See Book 3 *Objects & Classes* for more information. |
+| A function can be dynamically constructed from code stored in a string value with the `Function()` constructor, similar to `eval(..)` (see "Cheating: Run-Time Scope Modifications" in Chapter 1). Such a function will automatically be run in non-strict mode (for legacy reasons) when invoked with the normal `()` function invocation as shown; its `this` will be the global object. See Book 3 *Objects & Classes* for more information on determining `this` bindings. |
 
 So, we have `window`, `self`, `global`, and this ugly `new Function(..)` trick. That's a lot of different ways to try to get at this global object.
 
 Why not introduce yet another!?!?
 
-As of ES2020, JS has finally defined a standardized reference to the global scope object, called `globalThis`. So, subject to the recency of the JS engines your code runs in, you can then use `globalThis` in place of any of those other approaches.
+As of ES2020, JS has finally defined a standardized reference to the global scope object, called `globalThis`. So, subject to the recency of the JS engines your code runs in, you can use `globalThis` in place of any of those other approaches.
 
-You might even attempt a cross-environment polyfill approach that's safer across pre-`globalThis` JS environments, such as:
+We could attempt to use a cross-environment polyfill approach that's safer across pre-`globalThis` JS environments, such as:
 
 ```js
 const theGlobalScopeObject =
@@ -380,9 +380,7 @@ const theGlobalScopeObject =
 
 Phew! That's certainly not ideal, but it works if you find yourself needing a reliable global scope reference.
 
-| NOTE: |
-| :--- |
-| The name `globalThis` was fairly controversial while the feature was being added to JS. Specifically, I and many others felt the "this" reference in the name was fairly misleading, since the reason you access this object is to access to the global scope, never to access some sort of global/default `this` binding. There were many other names considered, but for a variety of reasons ruled out. Unfortunately, the name chosen ended up as a last resort. If you plan to interact with the global scope object in your programs, to reduce confusion, I recommend you choose a better name, such as (the laughably long but accurate!) `theGlobalScopeObject` above. |
+(The name `globalThis` was fairly controversial while the feature was being added to JS. Specifically, I and many others felt the "this" reference in the name was fairly misleading, since the reason you access this object is to access to the global scope, never to access some sort of global/default `this` binding. There were many other names considered, but for a variety of reasons ruled out. Unfortunately, the name chosen ended up as a last resort. If you plan to interact with the global scope object in your programs, to reduce confusion, I strongly recommend you choose a better name, such as (the laughably long but accurate!) `theGlobalScopeObject` above.)
 
 ## Globally Aware
 

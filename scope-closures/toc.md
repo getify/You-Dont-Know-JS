@@ -53,6 +53,8 @@
 * Chapter 8: The Module Pattern
     * Encapsulation and POLE
     * What is a Module?
-    * Modern ES Modules
+    * Node CommonJS Modules
+    * Modern ES Modules (ESM)
+    * Out of Scope
 * Appendix A: Exploring Further
 * Appendix B: Practice

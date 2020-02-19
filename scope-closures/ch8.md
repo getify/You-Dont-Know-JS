@@ -33,9 +33,9 @@ These are some of the main benefits of organizing JS programs into modules.
 
 A module is a collection of related data and functions (often referred to as methods in this context), characterized by a division between hidden *private* details and *public*, accessible details, usually called the "public API".
 
-Modules should be stateful -- they need to maintain some information -- otherwise, it's not really a module. If all you have is a collection of related functions, but no data, then you don't have encapsulation and thus you don't have a module.
+A modules should be stateful -- it needs to maintain some information -- otherwise, it's not really a module. If all you have is a collection of related functions, but no data, then you don't have encapsulation and thus you don't have a module.
 
-The better term for a collection of *stateless* functions is a namespace:
+The better term for a grouping of *stateless* functions is a namespace:
 
 ```js
 // namespace, not module
@@ -58,7 +58,9 @@ var Utils = {
 
 `Utils` here is a useful collection of utilities, yet they're all state-independent functions. Gathering functionality together is generally good pratice, but that doesn't make this a module. Rather, we've defined a `Utils` namespace and organized the functions under it.
 
-Further, even if you have data and stateful functions together, if you're not limiting the visibility of any of it, then it's falling short of the POLE side of encapsulation and is probably not useful to label as a module:
+Further, even if you have data and stateful functions bundled together, if you're not limiting the visibility of any of it, then it's falling short of the POLE aspect of encapsulation and is probably not useful to label as a module.
+
+Consider:
 
 ```js
 var Student = {
@@ -80,15 +82,17 @@ Student.getName(73);
 // Suzy
 ```
 
-Since `records` is publicly accessible data, not hidden behind a public API, `Student` here isn't truly a module. What is it? `Student` does have the data-plus-functionality aspect of encapsulation, but not the visibility-control aspect, so it's an instance of a general data structure.
+Since `records` is publicly accessible data, not hidden behind a public API, `Student` here isn't really a module. What is it? `Student` does have the data-plus-functionality aspect of encapsulation, but not the visibility-control aspect; it's just an instance of a general data structure.
 
 | NOTE: |
 | :--- |
-| Another aspect of the spirit of the module pattern is embracing modularization through loose-coupling. In this chapter, we're focusing more narrowly on implementing modules, so we'll defer the bigger-picture discussion of how modules can be designed to interact well with each other to Appendix A. |
+| A broader concern of the module pattern is fully embracing system modularization through loose-coupling and other program architecture concerns. That's a complex topic well beyond the bounds of our discussion, but is worth further study beyond this book. |
 
 ### Classic Modules
 
-Let's turn `Student` into a module. We'll start with what's called the "classic module pattern", which also used to be referred to as the "revealing module pattern" when it first emerged in the early 2000's.
+Let's turn `Student` into a module. We'll start with what's called the "classic module pattern", which also was referred to as the "revealing module pattern" when it first emerged in the early 2000's.
+
+Consider:
 
 ```js
 var Student = (function defineStudent(){
@@ -114,6 +118,8 @@ var Student = (function defineStudent(){
         return student.name;
     }
 })();
+
+// later
 
 Student.getName(73);
 // Suzy
@@ -164,6 +170,8 @@ function defineStudent() {
     }
 }
 
+// later
+
 var fullTime = defineStudent();
 fullTime.getName(73);
 // Suzy
@@ -181,10 +189,79 @@ So to clarify what makes something a classic module:
 
 * the module must return on its public API a reference to at least one function that has closure over the hidden module state (so that this state is actually preserved).
 
-### Module Variations
+You may run across other variations on this classic module approach, which we'll look at in more detail in Appendix A.
+
+## Node CommonJS Modules
+
+In Chapter 4, we introduced the CommonJS module format used by Node. Unlike the classic module format described earlier, where you could bundle the module factory or IIFE alongside any other code including other modules, CommonJS modules are file-based; one module per file.
+
+Let's tweak our module example to adhere to that format:
+
+```js
+module.exports.getName = getName;
+
+// ************************
+
+var records = [
+    { id: 14, name: "Kyle", grade: 86 },
+    { id: 73, name: "Suzy", grade: 87 },
+    { id: 112, name: "Frank", grade: 75 },
+    { id: 6, name: "Sarah", grade: 91 }
+];
+
+function getName(studentID) {
+    var student = records.find(
+        student => student.id == studentID
+    );
+    return student.name;
+}
+```
+
+The `records` and `getName` identifiers are in the top-level scope of this module, but that's not the global scope (as explained in Chapter 4). As such, everything here is *by default* private to the module.
+
+To expose something on the public API of a CommonJS module, you add a property to the empty object provided by `module.exports`. In some older legacy code, you may run across references to just a bare `exports`, but for code clarity you should always fully qualify that reference with the `module.` prefix.
+
+For style purposes, I like to put my "exports" at the top and my module implementation at the bottom. But these exports can be placed anywhere. I strongly recommend collecting them all together, either at the top or bottom of your file.
+
+Some developers have the habit of replacing the default exports object, like this:
+
+```js
+module.exports = {
+    // ..exports..
+};
+```
+
+There are some quirks with this approach, including unexpected behavior if multiple such modules circularly depend on each other. As such, I recommend against replacing the object. If you want to assign multiple exports at once, using the object literal style, you can do this instead:
+
+```js
+Object.assign(module.exports,{
+   // .. exports ..
+});
+```
+
+What's happening here is defining the `{ .. }` object literal with your module's public API specified, and then `Object.assign(..)` is doing a shallow copy of all those properties onto the existing `module.exports` object. This is a nice balance of convenience and safer module behavior.
+
+To include another module into your module/program, use Node's `require(..)` method. Assuming the above module is located at "/path/to/student.js", this is how we can access it:
+
+```js
+var Student = require("/path/to/student.js");
+
+Student.getName(73);
+// Suzy
+```
+
+`Student` now references the public API of our example module.
+
+CommonJS modules behave as singleton instances, similar to the IIFE module definition style presented above. No matter how many times you `require(..)` the same module, you just get additional references to the single module instance.
+
+| NOTE: |
+| :--- |
+| Typically, you'll see Node modules loaded like this: `require("student")`. Node has an algorithm for resolving such non-absolute paths specified in the string, which includes assuming a ".js" file extension and looking for the module inside the project's "node_modules" sub-directory. Consult Node's current documentation for more information. |
+
+## Modern ES Modules (ESM)
 
 // TODO
 
-## Modern ES Modules
+## Out of Scope
 
 // TODO
