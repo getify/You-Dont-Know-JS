@@ -710,7 +710,7 @@ Both perspectives/models are useful in appreciating the behavior of closure, but
 
 | NOTE: |
 | :--- |
-| Technically, this alternate model for closure affects whether we consider synchronous callbacks as examples of closure or not. More on this nuance in Appendix A. |
+| Technically, this alternate model for closure affects whether we consider synchronous callbacks as observances of closure or not. More on this nuance in Appendix A. |
 
 ## Why Closure?
 
