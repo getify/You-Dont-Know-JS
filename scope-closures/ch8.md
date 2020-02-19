@@ -131,7 +131,7 @@ Student.getName(73);
 | :--- |
 | I should point out that the explicit student data being hard-coded into this module definition is just for our illustration purposes. A typical module in your program will receive this data from an outside source, typically loaded from databases, JSON data files, Ajax calls, etc. The data is then injected into the module instance typically through some method(s) of the module's public API. |
 
-How does it work?
+How does the classic module format work?
 
 Notice that the instance of the module is created by the `defineStudent()` IIFE being executed. This IIFE returns the object (named `publicAPI`) which has a property on it referencing the inner `getName(..)` function.
 
@@ -139,7 +139,9 @@ The naming of the object as `publicAPI` is purely stylistic preference on my par
 
 From the outside, `Student.getName(..)` invokes this exposed inner function, which maintains access to the inner `records` variable via closure.
 
-By the way, you don't *have* to return an object with a function as one of its properties. You could just return a function directly, in place of the object. That still satisfies all the core bits of a classic module.
+You don't *have* to return an object with a function as one of its properties. You could just return a function directly, in place of the object. That still satisfies all the core bits of a classic module.
+
+By virtue of how lexical scope works, defining variables and functions inside your outer module definition function makes everything *by default* private. Only properties added to the public API object returned from the function will be exported for external use.
 
 The use of an IIFE implies that our module only ever needs a single central instance, which is commonly referred to as a "singleton". Indeed, this specific example is simple enough that there's no obvious reason we'd need anything more than just one instance of the `Student` module.
 
@@ -254,13 +256,126 @@ Student.getName(73);
 
 CommonJS modules behave as singleton instances, similar to the IIFE module definition style presented above. No matter how many times you `require(..)` the same module, you just get additional references to the single module instance.
 
+`require(..)` is an all-or-nothing mechanism; it includes a reference of the entire exposed public API of the module. To effectively access only part of the API, the typical approach looks like this:
+
+```js
+var getName = require("/path/to/student.js").getName;
+```
+
+Similar to the classic module format, the publicly exported methods of a CommonJS module's API hold closures over the internal module details. That's how the module singleton state is maintained across the lifetime of your program.
+
 | NOTE: |
 | :--- |
 | Typically, you'll see Node modules loaded like this: `require("student")`. Node has an algorithm for resolving such non-absolute paths specified in the string, which includes assuming a ".js" file extension and looking for the module inside the project's "node_modules" sub-directory. Consult Node's current documentation for more information. |
 
 ## Modern ES Modules (ESM)
 
-// TODO
+The ESM format shares several similarities with the CommonJS format. ESM is file-based, and module instances are singletons. Additionally, everything specified inside an ESM file is *by default* private, unless explicitly exported.
+
+One notable difference is that ESM files are assumed to be strict-mode, without needing a `"use strict"` pragma at the top. There's no way to define an ESM as non-strict-mode.
+
+Instead of `module.exports` in CommonJS, ESM uses an `export` keyword to expose something on the public API of the module. Instead of Node's `require(..)`, you use the `import` keyword to import some or all of its API.
+
+Let's tweak the code in the "students.js" file from the previous section to fit the ESM format:
+
+```js
+export getName;
+
+// ************************
+
+var records = [
+    { id: 14, name: "Kyle", grade: 86 },
+    { id: 73, name: "Suzy", grade: 87 },
+    { id: 112, name: "Frank", grade: 75 },
+    { id: 6, name: "Sarah", grade: 91 }
+];
+
+function getName(studentID) {
+    var student = records.find(
+        student => student.id == studentID
+    );
+    return student.name;
+}
+```
+
+The only change here is the `export getName` statement. As before, `export` statements can appear anywhere throughout the file, though `export` must be at the top-level scope; it cannot be inside any other block or function.
+
+ESM offers a fair bit of variation on how the `export` statements can be specified. For example:
+
+```js
+export function getName(studentID) {
+    // ..
+}
+```
+
+Even though `export` appears before the `function` keyword here, this form is a `function` declaration that also happens to be exported. That is, the `getName` identifier is *function hoisted* (see Chapter 5), so it's available throughout the whole scope of the module.
+
+Another allowed variation:
+
+```js
+export default function getName(studentID) {
+    // ..
+}
+```
+
+This is a so-called "default export", which has different semantics from other exports. In essence, a "default export" is a short-hand for consumers of the module when they `import`, giving them a terser syntax when they only need this single default API member.
+
+Non-`default` exports are referred to as "named exports".
+
+The `import` keyword -- like `export`, must be used only at the top-level of an ESM outside of any blocks or functions -- also has a number of variations in syntax. The first is referred to as "named import":
+
+```js
+import { getName } from "/path/to/students.js";
+
+getName(73);
+// Suzy
+```
+
+As you can see, this form imports only the specifically named public API members from a module (skipping anything not named explicitly), and it adds those identifiers to the top-level scope of the current module. This type of import is a familiar style from package imports in languages like Java.
+
+Multiple API members can be listed inside the `{ .. }` set, separated with commas. A named import can also be *renamed* with `as`:
+
+```js
+import { getName as getStudentName }
+   from "/path/to/students.js";
+
+getStudentName(73);
+// Suzy
+```
+
+If `getName` is a "default export" of the module, we could instead import it like this:
+
+```js
+import getName from "/path/to/students.js";
+
+getName(73);
+// Suzy
+```
+
+The only difference here is dropping the `{ }` around the import binding. If you want to mix a default import with other named imports:
+
+```js
+import { default as getName, /* .. other names .. */ }
+   from "/path/to/students.js";
+
+getName(73);
+// Suzy
+```
+
+By contrast, the other major variation on `import` is called "namespace import":
+
+```js
+import * as Student from "/path/to/students.js";
+
+Student.getName(73);
+// Suzy
+```
+
+As is likely obvious, the `*` imports everything exported to the API, default and named, and stores it all under the single namespace identifier as specified. This approach closely matches the classic form of modules for most of JS's history.
+
+| NOTE: |
+| :--- |
+| As of the time of this writing, modern browsers have supported ESM for a few years now, but Node's support for ESM is fairly recent, and has been evolving for quite awhile. The evolution is likely to continue for another year or more, as the introduction of ESM to JS back in ES6 created a number of challenging compatibility concerns for Node's interop with CommonJS modules. Consult Node's ESM documentation for all the latest details: https://nodejs.org/api/esm.html |
 
 ## Out of Scope
 
