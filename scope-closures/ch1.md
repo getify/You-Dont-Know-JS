@@ -118,7 +118,7 @@ function saySomething(greeting,greeting) {
 
 The `"Howdy"` message is not printed, despite being a well-formed statement.
 
-Instead, just like the snippet in the previous section, the `SyntaxError` here is thrown before the program is executed. In this case, it's because strict-mode (opted in for only the `saySomething(..)` function here) forbids, among many other things, functions to have duplicate parameter names; this has always been allowed in non-strict mode. The error thrown is not a syntax error in the sense of being a malformed string of tokens (like `."Hi"` prior), but is nonetheless required by the specification to be thrown as an "early error" (for strict-mode code) before any execution begins.
+Instead, just like the snippet in the previous section, the `SyntaxError` here is thrown before the program is executed. In this case, it's because strict-mode (opted in for only the `saySomething(..)` function here) forbids, among many other things, functions to have duplicate parameter names; this has always been allowed in non-strict-mode. The error thrown is not a syntax error in the sense of being a malformed string of tokens (like `."Hi"` prior), but is nonetheless required by the specification to be thrown as an "early error" (for strict-mode code) before any execution begins.
 
 But how does the JS engine know that the `greeting` parameter has been duplicated? How does it know that the `saySomething(..)` function is even in strict-mode while processing the parameter list (the `"use strict"` pragma appears only later, in the function body)?
 
@@ -260,9 +260,9 @@ What's the importance of understanding *targets* vs. *sources*? In Chapter 2, we
 
 ## Cheating: Run-Time Scope Modifications
 
-It should be clear by now that scope is determined as the program is compiled, and should not be affected by any run-time conditions. However, in non-strict mode, there are technically still two ways to cheat this rule, and modify the scopes during the run-time.
+It should be clear by now that scope is determined as the program is compiled, and should not be affected by any run-time conditions. However, in non-strict-mode, there are technically still two ways to cheat this rule, and modify the scopes during the run-time.
 
-Neither of these techniques *should* be used -- they're both very bad ideas, and you should be using strict mode anyway -- but it's important to be aware of them in case you run across code that does.
+Neither of these techniques *should* be used -- they're both very bad ideas, and you should be using strict-mode anyway -- but it's important to be aware of them in case you run across code that does.
 
 The `eval(..)` function receives a string of code to compile and execute on the fly during the program run-time. If that string of code has a `var` or `function` declaration in it, those declarations will modify the scope that the `eval(..)` is currently executing in:
 
@@ -293,7 +293,7 @@ with (badIdea) {
 
 The global scope was not modified here, but `badIdea` was turned into a scope at run-time rather than compile-time. Again, this is a terrible idea, for performance and readability reasons. Don't!
 
-At all costs, avoid `eval(..)` (at least, `eval(..)` creating declarations) and `with`. As mentioned, neither of these cheats is available in strict mode, so if you just use strict mode -- you should! -- then the temptation is removed.
+At all costs, avoid `eval(..)` (at least, `eval(..)` creating declarations) and `with`. As mentioned, neither of these cheats is available in strict-mode, so if you just use strict-mode (you should!) then the temptation is removed.
 
 ## Lexical Scope
 

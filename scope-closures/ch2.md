@@ -273,7 +273,7 @@ Here's how that *conversation* would go:
 
 > ***Engine***: Hey *Scope Manager* (for the global scope), I have a *target* reference for `nextStudent`, ever heard of it?
 
-> ***(Global) Scope Manager***: Nope, but since we're in non-strict mode, I helped you out and just created a global variable for you, here you go!
+> ***(Global) Scope Manager***: Nope, but since we're in non-strict-mode, I helped you out and just created a global variable for you, here you go!
 
 Yuck.
 

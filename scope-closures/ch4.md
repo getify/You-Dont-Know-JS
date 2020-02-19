@@ -359,7 +359,7 @@ const theGlobalScopeObject = (new Function("return this"))();
 
 | NOTE: |
 | :--- |
-| A function can be dynamically constructed from code stored in a string value with the `Function()` constructor, similar to `eval(..)` (see "Cheating: Run-Time Scope Modifications" in Chapter 1). Such a function will automatically be run in non-strict mode (for legacy reasons) when invoked with the normal `()` function invocation as shown; its `this` will be the global object. See Book 3 *Objects & Classes* for more information on determining `this` bindings. |
+| A function can be dynamically constructed from code stored in a string value with the `Function()` constructor, similar to `eval(..)` (see "Cheating: Run-Time Scope Modifications" in Chapter 1). Such a function will automatically be run in non-strict-mode (for legacy reasons) when invoked with the normal `()` function invocation as shown; its `this` will be the global object. See Book 3 *Objects & Classes* for more information on determining `this` bindings. |
 
 So, we have `window`, `self`, `global`, and this ugly `new Function(..)` trick. That's a lot of different ways to try to get at this global object.
 

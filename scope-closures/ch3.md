@@ -316,7 +316,7 @@ askQuestion();
 // TypeError
 ```
 
-Because we used strict mode, the assignment failure is reported as a `TypeError`; in non-strict mode, such an assignment fails silently with no exception.
+Because we used strict-mode, the assignment failure is reported as a `TypeError`; in non-strict-mode, such an assignment fails silently with no exception.
 
 What about when a `function` expression has no name identifier?
 
