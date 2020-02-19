@@ -55,6 +55,6 @@
     * What is a Module?
     * Node CommonJS Modules
     * Modern ES Modules (ESM)
-    * Out of Scope
+    * Exit Scope
 * Appendix A: Exploring Further
 * Appendix B: Practice

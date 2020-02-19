@@ -377,6 +377,12 @@ As is likely obvious, the `*` imports everything exported to the API, default an
 | :--- |
 | As of the time of this writing, modern browsers have supported ESM for a few years now, but Node's support for ESM is fairly recent, and has been evolving for quite awhile. The evolution is likely to continue for another year or more, as the introduction of ESM to JS back in ES6 created a number of challenging compatibility concerns for Node's interop with CommonJS modules. Consult Node's ESM documentation for all the latest details: https://nodejs.org/api/esm.html |
 
-## Out of Scope
+## Exit Scope
 
-// TODO
+Whether you use the classic module format (browser or Node), CommonJS format (in Node), or ESM format (browser or Node), one of the most effective ways to structure and organize your program's functionality and data is with the module pattern.
+
+The module pattern is the conclusion of our journey in this book of learning how we can use the rules of lexical scope to place variables and functions in proper locations. POLE is the defensive *private by default* posture we take to making sure that we avoid over-exposure and interact only with the minimal public API surface area necessary.
+
+And underlying modules, the *magic* of how all our module state is maintained is closures leveraging the lexical scope system.
+
+That's it for the main text. Congratulations on quite a journey so far! As I've said numerous times throughout, it's time to pause, reflect, and practice what we've just discussed. When you're comfortable and ready, check out the appendices, which dig deeper into some of the corners of these topics, and also give some practice exercises to solidify what you've learned.
