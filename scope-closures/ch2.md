@@ -288,7 +288,7 @@ Never rely on accidental global variables. Always use strict-mode, and always fo
 To visualize nested scope resolution, yet another useful metaphor may be an office building, such as Figure 3:
 
 <figure>
-    <img src="images/fig3.png" alt="Scope &quot;Building&quot;" align="center">
+    <img src="images/fig3.png" width="250" alt="Scope &quot;Building&quot;" align="center">
     <figcaption><em>Fig. 3: Scope "Building"</em></figcaption>
     <br><br>
 </figure>
