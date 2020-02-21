@@ -117,11 +117,11 @@ whatsTheDealHere(3);
 // parameter 'id' (via closure): 3
 ```
 
-The strange bit here is the first console message. Why doesn't that print `undefined`, since at that moment, the shadowing `id` local variable has just been `var id` declared, which Chapter 5 asserts is typically auto-initialized to `undefined` at the top of its scope.
+The strange bit here is the first console message. At that moment, the shadowing `id` local variable has just been `var id` declared, which Chapter 5 asserts is typically auto-initialized to `undefined` at the top of its scope. Why doesn't it print `undefined`?
 
 In this specific corner case (for legacy compat reasons), JS doesn't auto-initialize `id` to `undefined`, but rather to the value of the `id` parameter (`3`)!
 
-Though the two `id`s look at that moment like they're one variable, they're actually still separate (and in separate scopes). The `id = 5` causes the divergence to become observable, where the `id` parameter stays `3` and the local variable becomes `5`.
+Though the two `id`s look at that moment like they're one variable, they're actually still separate (and in separate scopes). The `id = 5` assignment makes the divergence observable, where the `id` parameter stays `3` and the local variable becomes `5`.
 
 My advice to avoid getting bitten by these weird nuances:
 
@@ -141,7 +141,7 @@ var askQuestion = function ofTheTeacher(){
 };
 ```
 
-It's true that `ofTheTeacher` is not added to the enclosing scope (where `askQuestion` is declared), but it's also not *just* added to the scope of the function, the way you're likely assuming. Another strange corner case of implied scope.
+It's true that `ofTheTeacher` is not added to the enclosing scope (where `askQuestion` is declared), but it's also not *just* added to the scope of the function, the way you're likely assuming. It's another strange corner case of implied scope.
 
 The name identifier of a function expression is in its own implied scope, nested between the outer enclosing scope and the main inner function scope.
 
@@ -154,9 +154,9 @@ var askQuestion = function ofTheTeacher(){
 };
 ```
 
-The `let` declaration form does not allow re-declaration (see Chapter 5). But this is perfectly legal shadowing, not re-declaration, because the two `ofTheTeacher`s are in separate scopes.
+The `let` declaration form does not allow re-declaration (see Chapter 5). But this is perfectly legal shadowing, not re-declaration, because the two `ofTheTeacher` identifiers are in separate scopes.
 
-You'll rarely run into any case where the scope of a function's name identifier matters. But again, it's good to know how these mechanisms actually work. To avoid being bitten, just don't shadow function name identifiers.
+You'll rarely run into any case where the scope of a function's name identifier matters. But again, it's good to know how these mechanisms actually work. To avoid being bitten, don't shadow function name identifiers.
 
 ## Anonymous vs. Named Functions
 
