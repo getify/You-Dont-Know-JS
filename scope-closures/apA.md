@@ -425,7 +425,141 @@ However you define your IIFEs, give them some love by giving them names.
 
 ## Hoisting: Functions and Variables
 
+Chapter 5 identified both *function hoisting* and *variable hoisting*. Since hoisting is often cited as mistake in the design of JS, I wanted to briefly explore why both these forms of hoisting *can* be beneficial and should still be considered.
 
+First, *function hoisting*. To review, this program works because of *function hoisting*:
+
+```js
+getStudents();
+
+// ..
+
+function getStudents() {
+    // ..
+}
+```
+
+The `function` declaration is hoisted during compilation, which means that `getStudents` is an identifier declared for the entire scope. Additionally, the `getStudents` identifier is auto-initialized with the function reference, again at the beginning of the scope.
+
+Why is this useful? The reason I prefer to take advantage of *function hoisting* is that it puts the *executable* code in any scope at the top, and any further declarations (functions) below. This means it's easier to find the code that will run in any given area, rather than having to scroll and scroll, hoping to find the end of a scope/function somewhere.
+
+I take advantage of this positioning in all levels of scope:
+
+```js
+getStudents();
+
+// *************
+
+function getStudents() {
+    var whatever = doSomething();
+
+    // other stuff
+
+    return whatever;
+
+    // *************
+
+    function doSomething() {
+        // ..
+    }
+}
+```
+
+When I first open a file like that, the very first line is executable code that kicks off its behavior. That's very easy to spot! Then, if I ever need to go find and inspect `getStudents()`, I like that its first line is also executable code. Only if I need to see the details of `doSomething()` do I go and find its definition down below.
+
+In other words, I think *function hoisting* makes code more readable by making the reading of code more flowing and progressive, from top to bottom.
+
+What about *variable hoisting*? Remember, this only applies to `var` declarations, not `let` or `const`.
+
+Before I continue, I'll just admit: in almost all cases, I completely agree that *variable hoisting* is a bad idea:
+
+```js
+pleaseDontDoThis = "bad idea";
+
+// much later
+
+var pleaseDontDoThis;
+```
+
+While that kind of inverted ordering was helpful for *function hoisting*, here I think it's usualy going to make code harder to understand.
+
+But there's one exception that I've found, somewhat rarely, in my own coding. It has to do with where I place my `var` declarations inside a module definition.
+
+Here's how I typically structure my CommonJS module definitions in Node:
+
+```js
+// dependencies
+var aModuleINeed = require("very-helpful");
+var anotherModule = require("kinda-helpful");
+
+// public API
+var publicAPI = Object.assign(module.exports,{
+    getStudents,
+    addStudents,
+    // ..
+});
+
+// ********************************
+// private implementation
+
+var cache = { };
+var otherData = [ ];
+
+function getStudents() {
+    // ..
+}
+
+function addStudents() {
+    // ..
+}
+
+function otherPrivateStuff() {
+    // ..
+}
+```
+
+Notice how the `cache` and `otherData` variables are in the "private" section of the module layout? That's because I don't plan to expose them publicly. So I organize the module so they're located along side the other implementation details of the module.
+
+But I've had a few rare cases where I needed the assignments of those values to happen *above*, before I declare the exported public API of the module. For instance:
+
+```js
+// public API
+var publicAPI = Object.assign(module.exports,{
+    getStudents,
+    addStudents,
+    // ..
+
+    refreshData: refreshData.bind(cache)
+});
+```
+
+I need the `cache` variable to have already been assigned a value, because that value is used in the initialization of the public API.
+
+Should I just move the `var cache = { .. }` up to the top, above this public API initialization? Well, perhaps. But now it's less obvious that `var cache` really is a *private* implementation detail.
+
+Here's the compromise I've used, again somewhat rarely:
+
+```js
+cache = {};
+
+// public API
+var publicAPI = Object.assign(module.exports,{
+    getStudents,
+    addStudents,
+    // ..
+
+    refreshData: refreshData.bind(cache)
+});
+
+// ********************************
+// private implementation
+
+var cache;
+```
+
+See the *variable hoisting*? I've declared the `cache` down where it belongs, logically, but in this rare case I've used it up above, in the area where its initialization is needed earlier.
+
+That's literally the only case I've ever found for leveraging *variable hoisting* -- specifically, for assigning to a variable earlier in a scope than its declaration. But, I think it's a reasonable exception to employ with caution.
 
 ## The Case for `var`
 
