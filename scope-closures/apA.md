@@ -371,11 +371,61 @@ So, in the rare cases you need *lexical this*, use an arrow function. It's the b
 
 ### IIFE Variations
 
-// TODO
+All functions should have names. I said that a few times, right!? That includes IIFEs.
+
+```js
+(function(){
+    // don't do this!
+})();
+
+(function doThisInstead(){
+    // ..
+})();
+```
+
+How do we come up with a name for an IIFE? Identify what the IIFE is there for. Why do you need a scope there? Are you hiding a cache variable for student records?
+
+```js
+var getStudents = (function StoreStudentRecords(){
+    var studentRecords = [];
+
+    return function getStudents() {
+        // ..
+    }
+})();
+```
+
+I named the IIFE `StoreStudentRecords` because that's what it's doing: storing student records. Every IIFE should have a name. No exceptions.
+
+IIFEs are typically defined by placing `( .. )` around the `function` expression, as shown in those previous snippets. But that's not the only way to define an IIFE. Technically, the only reason we're using that first surrounding set of `( .. )` is just so the `function` keyword isn't in a position to be a `function` declaration. But there are other syntactic ways to do so:
+
+```js
+!function thisIsAnIIFE(){
+    // ..
+}();
+
++function soIsThisOne(){
+    // ..
+}();
+```
+
+The `!`, `+`, and several other unary operators (operators with one operand) can all be placed in front of `function` to turn it into an expression. Then the final `()` call is valid, which makes it an IIFE.
+
+I actually kind of like using the `void` unary operator when defining a standalone IIFE:
+
+```js
+void function yepItsAnIIFE() {
+    // ..
+}();
+```
+
+The reason I like `void` is, it communicates at the beginning of the function that this IIFE won't be returning any value.
+
+However you define your IIFEs, give them some love by giving them names.
 
 ## Hoisting: Functions and Variables
 
-// TODO
+
 
 ## The Case for `var`
 
