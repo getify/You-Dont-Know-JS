@@ -274,7 +274,7 @@ var askQuestion = function(){
 };
 ```
 
-The same thing is true with respect to the variable `askQuestion` being created. But since we have a `function` expression -- a function definition used as value instead of as a declaration -- this function definition will not "hoist" (covered later in this chapter).
+The same thing is true with respect to the variable `askQuestion` being created. But since we have a `function` expression -- a function definition used as value instead of a standalone declaration -- this function definition will not "hoist" (covered later in this chapter).
 
 One major difference between `function` declarations and `function` expressions is what happens to the name identifier of the function.
 
@@ -288,7 +288,7 @@ var askQuestion = function ofTheTeacher(){
 
 We know `askQuestion` ends up in the outer scope. But what about the `ofTheTeacher` identifier? For `function` declarations, the name identifier ends up in the outer/enclosing scope, so it would seem reasonable to assume that's the case here. But it's not.
 
-`ofTheTeacher` is declared as a variable **inside the function itself**:
+`ofTheTeacher` is declared as an identifier **inside the function itself**:
 
 ```js
 var askQuestion = function ofTheTeacher() {
@@ -301,6 +301,10 @@ askQuestion();
 console.log(ofTheTeacher);
 // ReferenceError: 'ofTheTeacher' is not defined
 ```
+
+| NOTE: |
+| :--- |
+| Actually, `ofTheTeacher` is not exactly *in the scope of the function*. Appendix A, "Implied Scopes" will explain. |
 
 Not only is `ofTheTeacher` declared inside the function rather than outside, but it's also created as read-only:
 

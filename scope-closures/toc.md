@@ -57,8 +57,8 @@
     * Modern ES Modules (ESM)
     * Exit Scope
 * Appendix A: Exploring Further
+    * Implied Scopes
     * Anonymous vs. Named Functions
-    * Function: Form Over Readability?
     * Hoisting: Functions and Variables
     * The Case for `var`
     * What's the Deal with TDZ?

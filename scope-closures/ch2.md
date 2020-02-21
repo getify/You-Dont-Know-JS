@@ -58,6 +58,10 @@ Figure 2 helps visualize the boundaries of this program's scopes by drawing colo
 
 3. **Bubble 3** (GREEN) encompasses the scope of the `for`-loop (line 9), which has just one identifier/variable: `student` (line 9).
 
+| NOTE: |
+| :--- |
+| Technically, the parameter `studentID` is not exactly in the BLUE(2) scope. We'll unwind that confusion in "Implied Scopes" in Appendix A. |
+
 Scope bubbles are determined during compilation based on where the functions / blocks of scope are written, the nesting inside each other, etc. Each scope bubble is entirely contained within its parent scope bubble -- a scope is never partially in two different outer scopes.
 
 Each marble (variable/identifier) is colored based on which bubble (bucket) it's declared in, not the color of the scope it may be accessed from (e.g., `students` on line 9 and `studentID` on line 10).
