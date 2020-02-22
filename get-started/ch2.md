@@ -126,7 +126,7 @@ Besides primitives, the other value type in JS is an object value.
 As mentioned earlier, arrays are a special type of object that's comprised of an ordered and numerically indexed list of data:
 
 ```js
-names = [ "Frank", "Kyle", "Peter", "Susan" ];
+var names = [ "Frank", "Kyle", "Peter", "Susan" ];
 
 names.length;
 // 4
@@ -147,17 +147,17 @@ JS arrays can hold any value type, either primitive or object (including other a
 Objects are more general: an unordered, keyed collection of any various values. In other words, you access the element by a string location name (aka "key" or "property") rather than by its numeric position (as with arrays). For example:
 
 ```js
-name = {
+var me = {
     first: "Kyle",
     last: "Simpson",
     age: 39,
     specialties: [ "JS", "Table Tennis" ]
 };
 
-console.log(`My name is ${ name.first }.`);
+console.log(`My name is ${ me.first }.`);
 ```
 
-Here, `name` represents an object, and `first` represents the name of a location of information in that object (value collection). Another syntax option that accesses information in an object by its property/key uses the square-brackets `[ ]`, such as  `name["first"]`.
+Here, `me` represents an object, and `first` represents the name of a location of information in that object (value collection). Another syntax option that accesses information in an object by its property/key uses the square-brackets `[ ]`, such as  `me["first"]`.
 
 ### Value Type Determination
 
@@ -191,7 +191,7 @@ Variables have to be declared (created) to be used. There are various syntax for
 For example, consider the `var` statement:
 
 ```js
-var name = "Kyle";
+var myName = "Kyle";
 var age;
 ```
 
@@ -200,7 +200,7 @@ The `var` keyword declares a variable to be used in that part of the program, an
 Another similar keyword is `let`:
 
 ```js
-let name = "Kyle";
+let myName = "Kyle";
 let age;
 ```
 
@@ -212,19 +212,19 @@ Consider:
 var adult = true;
 
 if (adult) {
-    var name = "Kyle";
+    var myName = "Kyle";
     let age = 39;
     console.log("Shhh, this is a secret!");
 }
 
-console.log(name);
+console.log(myName);
 // Kyle
 
 console.log(age);
 // Error!
 ```
 
-The attempt to access `age` outside of the `if` statement results in an error, because `age` was block-scoped to the `if`, whereas `name` was not.
+The attempt to access `age` outside of the `if` statement results in an error, because `age` was block-scoped to the `if`, whereas `myName` was not.
 
 Block-scoping is very useful for limiting how widespread variable declarations are in our programs, which helps prevent accidental overlap of their names.
 
@@ -270,15 +270,15 @@ The best semantic use of a `const` is when you have a simple primitive value tha
 Besides `var` / `let` / `const`, there are other syntactic forms that declare identifiers (variables) in various scopes. For example:
 
 ```js
-function hello(name) {
-    console.log(`Hello, ${ name }.`);
+function hello(myName) {
+    console.log(`Hello, ${ myName }.`);
 }
 
 hello("Kyle");
 // Hello, Kyle.
 ```
 
-The identifier `hello` is created in the outer scope, and it's also automatically associated so that it references the function. But the named parameter `name` is created only inside the function, and thus is only accessible inside that function's scope. `hello` and `name` generally behave as `var`-declared.
+The identifier `hello` is created in the outer scope, and it's also automatically associated so that it references the function. But the named parameter `myName` is created only inside the function, and thus is only accessible inside that function's scope. `hello` and `myName` generally behave as `var`-declared.
 
 Another syntax that declares a variable is a `catch` clause:
 
