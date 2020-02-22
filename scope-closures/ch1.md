@@ -83,7 +83,7 @@ To state it as simply as possible, the most important observation we can make ab
 
 The breakdown of a parsing/compilation phase separate from the subsequent execution phase is observable fact, not theory or opinion. While the JS specification does not require "compilation" explicitly, it requires behavior which is essentially only practical in a compile-then-execute cadence.
 
-There are three program characteristics you can observe to prove this to yourself: syntax errors, early errors, and hoisting (covered in Chapter 3).
+There are three program characteristics you can observe to prove this to yourself: syntax errors, early errors, and hoisting (covered in Chapter 5).
 
 #### Syntax Errors From The Start
 
@@ -144,13 +144,13 @@ saySomething();
 
 The noted `ReferenceError` occurs from the line with the statement `greeting = "Howdy"`. What's happening is that the `greeting` variable for that statement comes from the declaration on the next line, `let greeting = "Hi"`, rather than from the previous `var greeting = "Hello"` statement.
 
-The only way the JS engine could know, at the line where the error is thrown, that the *next statement* would declare a block-scoped variable of the same name (`greeting`) is if the JS engine had already processed this code in an earlier pass, and already set up all the scopes and their variable associations. This processing of scopes and declarations can only accurately be done by parsing the program before execution, and it's called "hoisting" (see Chapter 3).
+The only way the JS engine could know, at the line where the error is thrown, that the *next statement* would declare a block-scoped variable of the same name (`greeting`) is if the JS engine had already processed this code in an earlier pass, and already set up all the scopes and their variable associations. This processing of scopes and declarations can only accurately be done by parsing the program before execution, and it's called "hoisting" (see Chapter 5).
 
-The `ReferenceError` here technically comes from `greeting = "Howdy"` accessing the `greeting` variable **too early**, a conflict referred to as the Temporal Dead Zone (TDZ). Chapter 3 will cover this in more detail.
+The `ReferenceError` here technically comes from `greeting = "Howdy"` accessing the `greeting` variable **too early**, a conflict referred to as the Temporal Dead Zone (TDZ). Chapter 5 will cover this in more detail.
 
 | WARNING: |
 | :--- |
-| It's often asserted that `let` and `const` declarations are not hoisted, as an explanation of the TDZ behavior just illustrated. But this is not accurate. If `let` and `const` declarations were not hoisted, then the `greeting = "Howdy"` assignment would simply be referring to declaration from the `var greeting` statement in the outer (function) scope, and would not need to throw an error. In other words, the block-scoped `greeting` wouldn't *exist* yet. However, the presence of the TDZ error proves that the block-scoped `greeting` must indeed already exist, and thus must have been hoisted to the top of that block scope! Don't worry if that's still confusing right now. We'll come back to it in Chapter 3. |
+| It's often asserted that `let` and `const` declarations are not hoisted, as an explanation of the TDZ behavior just illustrated. But this is not accurate. If `let` and `const` declarations were not hoisted, then the `greeting = "Howdy"` assignment would simply be referring to declaration from the `var greeting` statement in the outer (function) scope, and would not need to throw an error. In other words, the block-scoped `greeting` wouldn't *exist* yet. However, the presence of the TDZ error proves that the block-scoped `greeting` must indeed already exist, and thus must have been hoisted to the top of that block scope! Don't worry if that's still confusing right now. We'll come back to it in Chapter 5. |
 
 Hopefully you're now convinced that JS programs are parsed before any execution begins. But does it prove they are compiled?
 

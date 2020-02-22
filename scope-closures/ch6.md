@@ -281,7 +281,7 @@ Here, the `{ .. }` curly-brace pair inside the `if` statement is an even smaller
 
 So does it matter enough to add the extra `{ .. }` pair and indentation level? I think you should follow POLE and always (within reason!) define the smallest block for each variable. So I recommend using the extra explicit block scope.
 
-Recall the discussion of TDZ errors from "Uninitialized Variables (TDZ)" (Chapter 5). My suggestion there was to minimize the risk of TDZ errors with `let` / `const` declarations is to always put those declarations at the top of their scope.
+Recall the discussion of TDZ errors from "Uninitialized Variables (TDZ)" (Chapter 5). My suggestion there was: to minimize the risk of TDZ errors with `let` / `const` declarations, always put those declarations at the top of their scope.
 
 If you find yourself placing a `let` declaration in the middle of a scope block, first think, "Oh, no! TDZ alert!". Recognize that if this `let` declaration isn't actually needed for the first half of that block, you should use an inner explicit block scope to further narrow its exposure!
 
