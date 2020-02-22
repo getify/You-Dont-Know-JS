@@ -11,7 +11,7 @@ Some people find diving too deeply into the rare corner cases creates nothing bu
 
 I believe it's better to be empowered by knowledge of how things work than to just gloss over details with assumptions and lack of curiosity. Ultimately, you will encounter situations where something bubbles up from a piece you hadn't explored. In other words, you won't get to spend all your time riding on the smooth *happy path*. Wouldn't you rather be prepared for the inevitable bumps of off-roading?
 
-These discussions will also be more heavily influenced by my opinions than the main text was, so keep that in mind as you consume and consider what is presented. This appendix is a bit like a collection of mini-blog posts that expound on the book topics.
+These discussions will also be more heavily influenced by my opinions than the main text was, so keep that in mind as you consume and consider what is presented. This appendix is a bit like a collection of mini-blog posts that expound on various book topics. It's long and way in the weeds, so take your time and don't rush through everything here.
 
 ## Implied Scopes
 
@@ -766,8 +766,154 @@ But alas, that's not how it landed. `let` has a TDZ because `const` needs a TDZ,
 
 ## Are Synchronous Callbacks Still Closures?
 
-// TODO
+Chapter 7 presented two different models for wrapping your head around closure:
+
+* closure is a function instance remembering its outer variables even as that function is passed around and **invoked in** other scopes.
+
+* closure is a function instance and its scope environment being preserved in-place while any references to it are passed around and **invoked from** other scopes.
+
+These models are not wildly divergent, but they do approach from a different perspective. And that different perspective changes what we should call a closure or not.
+
+### What is a Callback?
+
+Before we revisit closure, let me spend a brief moment addressing the word "callback". It's a generally accepted norm that saying "callback" is synonymous with both *asynchronous callbacks* and *synchronous callbacks*. I don't think I agree that this is a good idea, so I want to explain why and propose we move away from that.
+
+Let's first consider an *asynchronous callback*, a function reference that will be invoked at some future *later* point. What does "callback" mean, in this sense?
+
+I think it means that the current code has finished or paused, suspended itself, and that when the function in question is invoked later, execution is coming back into the suspended program and resuming it. Specifically, the point of re-entry is the code that was wrapped in the function reference:
+
+```js
+setTimeout(function waitForASecond(){
+    // this is where JS should call back into
+    // the program when the timer has elapsed
+},1000);
+
+// this is where the current program finishes
+// or suspends
+```
+
+In this context, "calling back" makes a lot of sense. The JS engine is resuming our suspended program by *calling back in* at a specific location. OK, so a callback is asynchronous.
+
+### Synchronous Callback?
+
+But what of *synchronous callbacks*? Consider:
+
+```js
+function getLabels(studentIDs) {
+    return studentIDs.map(
+        function formatIDLabel(id){
+            return `Student ID: ${
+               String(id).padStart(6)
+            }`;
+        }
+    );
+}
+
+getLabels([ 14, 73, 112, 6 ]);
+// [
+//    "Student ID: 000014",
+//    "Student ID: 000073",
+//    "Student ID: 000112",
+//    "Student ID: 000006"
+// ]
+```
+
+Should we refer to `formatIDLabel(..)` as a callback? Is the `map(..)` utility really *calling back* into our program by invoking the function we provided?
+
+There's nothing to *call back into* per se, because the program hasn't paused or exited. We're passing a function (reference) from one part of the program to another part of the program, and then it's immediately invoked.
+
+There's other established terms that might match what we're doing -- passing in a function (reference) so that another part of the program can invoke it on our behalf. You might think of this as *Dependency Injection* (DI) or *Inversion of Control* (IoC).
+
+DI can be summarized as passing in necessary part(s) of functionality to another part of the program so that it can invoke them to complete its work. That's a decent description for the `map(..)` call above, isn't it? The `map(..)` utility knows to iterate over the list's values, but it doesn't know what to *do* with those values. That's why we pass it the `formatIDLabel(..)` function. We pass in the dependency.
+
+IoC is a pretty similar, related concept. Inversion of control means that instead of the current area of your program controlling what's happening, you hand control off to another part of the program. We wrapped the logic for computing a label string in the function `formatIDLabel(..)`, then gave invocation control to the `map(..)` utility.
+
+Notably, Martin Fowler cites IoC as the difference between a framework and a library: with a library, you call its functions; with a framework, it calls your functions. [^fowlerIOC]
+
+In the context of our discussion, either DI or IoC could work as an alternate label for a *synchronous callback*.
+
+But I have an alternate suggestion. Let's just refer to (the things formerly known as) *synchronous callbacks*, as *inter-invoked functions* (IIFs). Yes, exactly, I'm making a play on IIFEs. These kinds of functions are *inter-invoked*, meaning: something else invokes them, as opposed to IIFEs, which invoke themselves immediately.
+
+What's the difference between an *asynchronous callback* and an IIF? An *asynchronous callback* is an IIF that's invoked asynchronously rather than synchronously.
+
+### Synchronous Closure?
+
+Now that we've re-labeled *synchronous callbacks* as IIFs, we can return to our main question: are IIFs an example of closure? Obviously, the IIF would have to reference variable(s) from an outer scope for it to have any chance of being a closure. The `formatIDLabel(..)` IIF from earlier does not reference any variables outside its own scope, so it's definitely not a closure.
+
+What about an IIF that does have external references, is that closure?
+
+```js
+function printLabels(labels) {
+    var list = document.getElementByID("labelsList");
+
+    labels.forEach(
+        function renderLabel(label){
+            var li = document.createELement("li");
+            li.innerText = label;
+            list.appendChild(li);
+        }
+    );
+}
+```
+
+The inner `renderLabel(..)` IIF references `list` from the enclosing scope, so it's an IIF that *could* have closure. But here's where the definition/model we choose for closure matters:
+
+* If `renderLabel(..)` is a **function that gets passed somewhere else**, and that function is then invoked, then yes, `renderLabel(..)` is exercising a closure, because closure is what preserved its access to the original scope chain.
+
+* But if, as in the alternate conceptual model from Chapter 7, `renderLabel(..)` stays in place, and only a reference to it is passed to `forEach(..)`, is there any need for closure to preserve the scope chain of `renderLabel(..)`, while it executes synchronously right inside its own scope? No. That's just normal lexical scope.
+
+To understand why, consider this alternate form of `printLabels(..)`:
+
+```js
+function printLabels(labels) {
+    var list = document.getElementByID("labelsList");
+
+    for (let label of labels) {
+        // just a normal function call in its own
+        // scope, right? That's not really closure!
+        renderLabel(label);
+    }
+
+    // **************
+
+    function renderLabel(label) {
+        var li = document.createELement("li");
+        li.innerText = label;
+        list.appendChild(li);
+    }
+}
+```
+
+These two versions of `printLabels(..)` are essentially the same. The latter one is not an example of closure, at least not in any useful or observable sense. It's just lexical scope.
+
+The former version, with `forEach(..)` calling our function reference, is essentially the same thing. It's not closure, it's just a plain ol' lexical scope function call.
+
+By the way, Chapter 7 briefly mentioned partial application and currying (which *do* rely on closure!). This is a great example where manual currying can be used:
+
+```js
+function printLabels(labels) {
+    var list = document.getElementByID("labelsList");
+    var renderLabel = renderTo(list);
+
+    // definitely closure this time!
+    labels.forEach( renderLabel(label) );
+
+    // **************
+
+    function renderTo(list) {
+        return function createLabel(label){
+            var li = document.createELement("li");
+            li.innerText = label;
+            list.appendChild(li);
+        };
+    }
+}
+```
+
+The inner function `createLabel(..)` (aka, `renderLabel(..)`) is closed over `list`, so closure is definitely being utilized.
 
 ## Classic Module Variations
 
 // TODO
+
+[^fowlerIOC]: *Inversion of Control*, Martin Fowler, https://martinfowler.com/bliki/InversionOfControl.html, 26 June 2005.
