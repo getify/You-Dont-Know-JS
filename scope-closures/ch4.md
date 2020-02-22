@@ -19,7 +19,7 @@ With respect to browser-executed applications, there are 3 main ways:
 
 2. If you're using a bundler in your build process, all the files are typically concatenated together before delivery to the browser and JS engine, which then only processes one big file. Even with all the pieces of the application co-located in a single file, some mechanism is necessary for each piece to register a *name* to be referred to by other pieces, as well as some facility for that access to occur.
 
-    In some approaches, the entire contents of the file are wrapped in a single enclosing scope, such as a wrapper function, universal module (UMD), etc. Each piece can register itself for access from other pieces by way of local variables in that shared scope.
+    In some approaches, the entire contents of the file are wrapped in a single enclosing scope, such as a wrapper function, universal module (UMD -- see Appendix A), etc. Each piece can register itself for access from other pieces by way of local variables in that shared scope.
 
     For example:
 

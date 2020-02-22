@@ -135,7 +135,7 @@ How does the classic module format work?
 
 Notice that the instance of the module is created by the `defineStudent()` IIFE being executed. This IIFE returns the object (named `publicAPI`) which has a property on it referencing the inner `getName(..)` function.
 
-The naming of the object as `publicAPI` is purely stylistic preference on my part. The object can be named whatever you like (JS doesn't care), or you can just return an object directly without assigning it to any internal named variable. I like to assign it to `publicAPI` because it nicely labels what the object is, and also is a handy reference to the module's public API from inside itself, if needed.
+The naming of the object as `publicAPI` is stylistic preference on my part. The object can be named whatever you like (JS doesn't care), or you can just return an object directly without assigning it to any internal named variable. More on this choice in Appendix A.
 
 From the outside, `Student.getName(..)` invokes this exposed inner function, which maintains access to the inner `records` variable via closure.
 
