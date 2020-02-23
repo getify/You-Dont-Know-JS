@@ -66,4 +66,7 @@
     * Classic Module Variations
 * Appendix B: Practice
     * Buckets of Marbles
+    * Closure (PART 1)
+    * Closure (PART 2)
+    * Closure (PART 3)
     * Solutions
