@@ -69,4 +69,5 @@
     * Closure (PART 1)
     * Closure (PART 2)
     * Closure (PART 3)
+    * Modules
     * Suggested Solutions
