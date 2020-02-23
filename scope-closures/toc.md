@@ -65,3 +65,5 @@
     * Are Synchronous Callbacks Still Closures?
     * Classic Module Variations
 * Appendix B: Practice
+    * Buckets of Marbles
+    * Solutions
