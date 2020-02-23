@@ -139,7 +139,7 @@ OK, but... it's going to be tedious to define (and name!) a `hideTheCache(..)` f
 
 | NOTE: |
 | :--- |
-| The illustrated technique -- caching a function's computed output to optimize performance when repeated calls of the same inputs are expected -- is quite common in the Functional Programming (FP) world, canonically referred to as "memoization". FP libraries will provide a utility for memoization of functions, which would take the place of `hideTheCache(..)` above. Memoization is beyond the *scope* (pun intended!) of our discussion. See my "Functional-Light JavaScript" book for more information. |
+| The illustrated technique -- caching a function's computed output to optimize performance when repeated calls of the same inputs are expected -- is quite common in the Functional Programming (FP) world, canonically referred to as "memoization"; this caching relies on closure (see Chapter 7). Also, there are memory usage concerns to consider, which is addressed in "A Word About Memory" in Appendix B. FP libraries will usually provide an optimized and vetted utility for memoization of functions, which would take the place of `hideTheCache(..)` above. Memoization is beyond the *scope* (pun intended!) of our discussion, but see my "Functional-Light JavaScript" book for more information! |
 
 Rather than defining a new and uniquely named function each time one of those scope-only-for-the-purpose-of-hiding-a-variable situations occurs, a perhaps better solution is to use a function expression:
 

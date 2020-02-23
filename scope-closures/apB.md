@@ -3,13 +3,13 @@
 
 This appendix aims to give you a few interesting exercises to test and solidify your understanding of the main topics from this book. It's a good idea to try out the exercises yourself -- in an actual code editor! -- instead of skipping straight to the solutions at the end. No cheating!
 
-These exercises don't have a specific right answer that you have to get exactly. Your approach may differ some (or a lot!) from the solution I present, and that's OK.
+These exercises don't have a specific right answer that you have to get exactly. Your approach may differ some (or a lot!) from the solutions I present, and that's OK.
 
-I'm not judging you on how you write your code. My only goal is that you come away from this book feeling confident that you can tackle these sorts of coding tasks built on a strong foundation of knowledge. That's the only objective, here. If you're happy with your code, I am, too!
+I'm not judging you on how you write your code. My hope is that you come away from this book feeling confident that you can tackle these sorts of coding tasks built on a strong foundation of knowledge. That's the only objective, here. If you're happy with your code, I am, too!
 
 ## Buckets of Marbles
 
-Remember Figure 2 from back in Chapter 2?
+Remember Figure 2 from back in Chapter 2, the one with the colored bubbles/buckets?
 
 <figure>
     <img src="images/fig2.png" width="300" alt="Colored Scope Bubbles" align="center">
@@ -31,15 +31,97 @@ This exercise asks you to write a program -- any program! -- that contains neste
 
 * At least one variable reference must resolve to a variable declaration at least two levels higher in the scope chain.
 
+| TIP: |
+| :--- |
+| You *can* just write junk foo/bar/baz type code for this exercise, but I suggest you try to come up with some sort of non-trivial code that at least does something kind of reasonable. |
+
+Try out the exercise for yourself, then check out a suggested solution at the end of this appendix.
+
 ## Closure (PART 1)
 
-// TODO
+Let's first practice closure with some common computer-math operations: determining if a value is prime (has no divisors other than 1 and itself), and generating a list of prime factors (divisors) for a given number.
+
+For example:
+
+```js
+isPrime(11);        // true
+isPrime(12);        // false
+
+factorize(11);      // [ 11 ]
+factorize(12);      // [ 3, 2, 2 ] --> 3*2*2=12
+```
+
+Here's a decent implementation of `isPrime(..)` that I adapted from the Math.js library:
+
+```js
+function isPrime(v) {
+    if (v <= 3) {
+        return v > 1;
+    }
+    if (v % 2 == 0 || v % 3 == 0) {
+        return false;
+    }
+    var vSqrt = Math.sqrt(v);
+    for (let i = 5; i <= vSqrt; i += 6) {
+        if (v % i == 0 || v % (i + 2) == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+```
+
+Reference: https://github.com/josdejong/mathjs/blob/develop/src/function/utils/isPrime.js
+
+And here's a somewhat basic implementation of `factorize(..)` (not to be confused with `factorial(..)` from Chapter 6):
+
+```js
+function factorize(v) {
+    if (!isPrime(v)) {
+        let i = Math.floor(Math.sqrt(v));
+        while (v % i != 0) {
+            i--;
+        }
+        return [
+            ...factorize(i),
+            ...factorize(v / i)
+        ];
+    }
+    return [v];
+}
+```
+
+| NOTE: |
+| :--- |
+| I call this basic because it's not optimized for performance. It's binary-recursive (which isn't tail-call optimizable), and it creates a lot of intermediate array copies. It also doesn't order the discovered factors in any way. There are many, many other algorithms for this task, but I wanted to use something short and roughly understandable for our exercise. |
+
+If you were to call `isPrime(4327)` multiple times in a program, you can see that it would go through all its dozens of comparison/computation steps every time. If you consider `factorize(..)`, it's calling `isPrime(..)` many times as it computes the list of factors. And there's a good chance most of those calls are repeats. That's a lot of wasted work!
+
+The first part of this exercise is to use closure to implement a cache to remember the results of `isPrime(..)`, so that the primality (`true` or `false`) of a given number is only ever computed once. Hint: we essentially showed this sort of caching in Chapter 6 with `factorial(..)`.
+
+If you look at `factorize(..)`, it's implemented with recursion, meaning it calls itself repeatedly. That again means we may likely see a lot of wasted calls to compute prime factors for the same number. So the second part of the exercise is to use the same closure cache technique for `factorize(..)`.
+
+Use separate closures for caching of `isPrime(..)` and `factorize(..)`, rather than putting them inside a single scope.
+
+### A Word About Memory
+
+I want to share a little quick note about this closure cache technique and the impacts it has on your application's performance.
+
+We can see that in saving the repeated calls, we improve computation speed, in some cases by a dramatic amount. But this usage of closure is making an explicit tradeoff that you should be very aware of.
+
+The tradeoff is memory. We're essentially growing our cache (in memory) unboundedly. If the functions in question were called many millions of times with unique inputs, we'd be chewing up a lot of memory. This can definitely be worth the expense, but only if we think it's likely to see the repetition of common inputs so that we're often taking advantage of the cache.
+
+If every single call will have a unique input, and the cache is essentially never *used* to any benefit, this is an inappropriate technique that wastes memory.
+
+It also might be a good idea to have a more sophisticated caching approach, such as an LRU (least recently used) cache, that limits its size; as it runs up to the limit, an LRU evicts the values that are... well, least recently used!
+
+The downside here is that LRU is quite non-trivial in its own right. You'll want to use a highly optimized implementation of LRU, and be keenly aware of all the tradeoffs at play.
 
 ## Closure (PART 2)
 
-In this exercise, we're going to again use closure to define a `toggle(..)` utility that gives us a toggler with a memory.
+In this exercise, we're going to again practive closure by defining a `toggle(..)` utility that gives us a value toggler.
 
-You will pass one or more values (as arguments) into `toggle(..)`, and get back a function. That returned function will alternate/rotate between all the passed in values in order, one at a time, as it's called.
+You will pass one or more values (as arguments) into `toggle(..)`, and get back a function. That returned function will alternate/rotate between all the passed in values in order, one at a time, as it's called repeatedly.
 
 ```js
 function toggle(/* .. */) {
@@ -61,7 +143,7 @@ speed();      // "fast"
 speed();      // "slow"
 ```
 
-The corner case of passing in no values to `toggle(..)` is trivial an unimportant, but it makes most sense for that toggler instance to just always return `undefined`.
+The corner case of passing in no values to `toggle(..)` is not important; such a toggler instance can just always return `undefined`.
 
 ## Closure (PART 3)
 
@@ -179,9 +261,19 @@ function formatTotal(display) {
 
 Don't worry too much about how `formatTotal(..)` works. Most of its logic is a bunch of handling to limit the calculator display to 11 characters max, even if negatives, repeating decimals, or even "e+" exponential notation is required.
 
-## Solutions
+Again, don't get too mired in the mud around the calculator behavior. Focus on the *memory* of closure.
 
-The "Buckets of Marbles" exercise could be solved with the following code:
+## Suggested Solutions
+
+Hopefully you've tried out the exercises before you're reading this part. No cheating!
+
+Remember, these suggested solutions are just a few of a whole bunch of different ways to approach the problems. They're not "the right answer", but they are intended to be illustrative of a reasonable way to approach each exercise.
+
+The most important benefit you can get from reading these suggested solutions is to compare them to your code and analyze why we each made similar or different choices. Don't get into too much bikeshedding; try to stay focused on the main topic rather than the small details.
+
+### Suggested: Buckets of Marbles
+
+The "Buckets of Marbles" exercise could be solved like this:
 
 ```js
 // RED(1)
@@ -227,11 +319,69 @@ findPrimes(howMany);
 // ]
 ```
 
-The closure exercise (PART 1) could be solved like this:
+### Suggested: Closure (PART 1)
 
-// TODO
+The closure exercise (PART 1) `isPrime(..)` / `factorize(..)` could be solved like this:
 
-The closure exercise (PART 2) could be solved like this:
+```js
+var isPrime = (function isPrime(v){
+    var primes = {};
+
+    return function isPrime(v) {
+        if (v in primes) {
+            return primes[v];
+        }
+        if (v <= 3) {
+            return (primes[v] = v > 1);
+        }
+        if (v % 2 == 0 || v % 3 == 0) {
+            return (primes[v] = false);
+        }
+        let vSqrt = Math.sqrt(v);
+        for (let i = 5; i <= vSqrt; i += 6) {
+            if (v % i == 0 || v % (i + 2) == 0) {
+                return (primes[v] = false);
+            }
+        }
+        return (primes[v] = true);
+    };
+})();
+
+var factorize = (function factorize(v){
+    var factors = {};
+
+    return function findFactors(v) {
+        if (v in factors) {
+            return factors[v];
+        }
+        if (!isPrime(v)) {
+            let i = Math.floor(Math.sqrt(v));
+            while (v % i != 0) {
+                i--;
+            }
+            return (factors[v] = [
+                ...findFactors(i),
+                ...findFactors(v / i)
+            ]);
+        }
+        return (factors[v] = [v]);
+    };
+})();
+```
+
+The general approach I used here for each utility was:
+
+1. wrap an IIFE to define the scope for the cache variable to reside
+
+2. on each underlying call, first check the cache and if present, return
+
+3. at each place where a `return` was happening originally, assign to the cache and just return the results of that assignment operation -- this is a space savings trick mostly just for brevity in the book.
+
+I also renamed the inner function from `factorize(..)` to `findFactors(..)`. That's not technically necessary, but it helps it make clearer which function the recursive calls are.
+
+### Suggested: Closure (PART 2)
+
+The closure exercise (PART 2) `toggle(..)` could be solved like this:
 
 ```js
 function toggle(...vals) {
@@ -264,7 +414,9 @@ speed();      // "fast"
 speed();      // "slow"
 ```
 
-The closure exercise (PART 3) could be solved like this:
+### Suggested: Closure (PART 3)
+
+The closure exercise (PART 3) `calculator()` could be solved like this:
 
 ```js
 // from earlier:

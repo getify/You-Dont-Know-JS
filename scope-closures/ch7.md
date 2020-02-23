@@ -9,7 +9,7 @@ Up to this point, we've focused on the ins and outs of lexical scope, and how th
 
 Our attention again shifts broader in abstraction, to the historically somewhat daunting topic of closure. Don't worry! You don't need an advanced Computer Science degree to make sense of it.
 
-As a matter of fact, we already saw an example of closure in the previous chapter, and you've almost certainly already used it in your own programs. If you've ever written a callback that accesses variables outside its own scope... guess what!? That's closure.
+As a matter of fact, we already saw an example of closure in the previous chapter (`factorial(..)` in Chapter 6), and you've almost certainly already used it in your own programs. If you've ever written a callback that accesses variables outside its own scope... guess what!? That's closure.
 
 Indeed, you may actually find this chapter's revelation of what closure is rather... anticlimactic.
 
