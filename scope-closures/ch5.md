@@ -212,7 +212,30 @@ console.log(studentName);
 
 See how the explicit `= undefined` initialization produces a different outcome than assuming it still happens implicitly even if omitted? In the next section, we'll revisit this topic of initialization of variables from their declarations.
 
-So a repeated `var` declaration of the same identifier name in a scope is effectively a do-nothing statement. What about repeating a declaration within a scope using `let` or `const`?
+A repeated `var` declaration of the same identifier name in a scope is effectively a do-nothing statement. Here's another illustration, this time across a function of the same name:
+
+```js
+var greeting;
+
+function greeting() {
+    console.log("Hello!");
+}
+
+// basically, a no-op
+var greeting;
+
+typeof greeting;        // "function"
+
+var greeting = "Hello!";
+
+typeof greeting;        // "string"
+```
+
+The first `greeting` declaration registers the identifier to the scope, and because it's a `var` the auto-initialization will be `undefined`. The `function` declaration doesn't need to re-register the identifier, but because of *function hoisting* it overrides the auto-initialization to the function reference. The second `var greeting` by itself doesn't do anything since `greeting` is already an identifier and *function hoisting* already takes precedence for the auto-initialization.
+
+Actually assigning `"Hello!"` to `greeting` changes its value from the initial function `greeting()` to the string; `var` itself doesn't.
+
+What about repeating a declaration within a scope using `let` or `const`?
 
 ```js
 let studentName = "Frank";
