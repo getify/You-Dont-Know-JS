@@ -250,7 +250,7 @@ The original snippet relied on `let` to create block-scoped `x` variables in bot
 
 You may wonder: why go to the trouble of using a tool to convert from a newer syntax version to an older one? Couldn't we just write the two variables and skip using the `let` keyword? The reason is, it's strongly recommended that developers use the latest version of JS so that their code is clean and communicates its ideas most effectively.
 
-Developers should focus on writing the clean, new syntax forms, and let the tools take care of producing a forwards-compatible version of that code that is suitable to deploy and run on the oldest-supported JS engine environments.
+Developers should focus on writing the clean, new syntax forms, and let the tools take care of producing a backwards-compatible version of that code that is suitable to deploy and run on the oldest-supported JS engine environments.
 
 ### Filling the Gaps
 
