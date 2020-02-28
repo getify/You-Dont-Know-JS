@@ -7,7 +7,7 @@ The global scope of a JS program is a rich topic, with much more utility and nua
 
 ## Why Global Scope?
 
-It's likely no surprise to readers that most applications are composed of multiple (sometimes many!) individual JS files. So how exactly do all those separate files get stitched together in a single run-time context by the JS engine?
+It's likely no surprise to readers that most applications are composed of multiple (sometimes many!) individual JS files. So how exactly do all those separate files get stitched together in a single runtime context by the JS engine?
 
 With respect to browser-executed applications, there are three main ways.
 
@@ -86,7 +86,7 @@ And finally, the third way: whether a bundler tool is used for an application, o
 
     Again, if these files are loaded separately as normal standalone .js files in a browser environment, each top-level variable declaration will end up as a global variable, since the global scope is the only shared resource between these two separate files—they're independent programs, from the perspective of the JS engine.
 
-In addition to (potentially) accounting for where an application's code resides during run-time, and how each piece is able to access the other pieces to cooperate, the global scope is also where:
+In addition to (potentially) accounting for where an application's code resides during runtime, and how each piece is able to access the other pieces to cooperate, the global scope is also where:
 
 * JS exposes its built-ins:
 
@@ -355,7 +355,7 @@ const theGlobalScopeObject = (new Function("return this"))();
 
 | NOTE: |
 | :--- |
-| A function can be dynamically constructed from code stored in a string value with the `Function()` constructor, similar to `eval(..)` (see "Cheating: Run-Time Scope Modifications" in Chapter 1). Such a function will automatically be run in non-strict-mode (for legacy reasons) when invoked with the normal `()` function invocation as shown; its `this` will be the global object. See the third book in the series, *Objects & Classes*, for more information on determining `this` bindings. |
+| A function can be dynamically constructed from code stored in a string value with the `Function()` constructor, similar to `eval(..)` (see "Cheating: Runtime Scope Modifications" in Chapter 1). Such a function will automatically be run in non-strict-mode (for legacy reasons) when invoked with the normal `()` function invocation as shown; its `this` will be the global object. See the third book in the series, *Objects & Classes*, for more information on determining `this` bindings. |
 
 So, we have `window`, `self`, `global`, and this ugly `new Function(..)` trick. That's a lot of different ways to try to get at this global object.
 
