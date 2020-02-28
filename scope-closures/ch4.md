@@ -1,11 +1,7 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
 # Chapter 4: Around the Global Scope
 
-| NOTE: |
-| :--- |
-| Work in progress |
-
-Chapter 3 mentions the "global scope" several times, but you may still be wondering why a program's outermost scope is all that important in modern JS? The vast majority of work is done inside of functions and modules rather than globally.
+Chapter 3 mentions the "global scope" several times, but you may still be wondering why a program's outermost scope is all that important in modern JS. The vast majority of work is done inside of functions and modules rather than globally.
 
 The global scope of a JS program is a rich topic, with much more utility and nuance than you would likely assume. This chapter first explores how the global scope is (still) useful and relevant to writing JS programs, then looks at differences in where and *how to access* the global scope in different JS environments.
 
@@ -13,13 +9,13 @@ The global scope of a JS program is a rich topic, with much more utility and nua
 
 It's likely no surprise to readers that most applications are composed of multiple (sometimes many!) individual JS files. So how exactly do all those separate files get stitched together in a single run-time context by the JS engine?
 
-With respect to browser-executed applications, there are 3 main ways:
+With respect to browser-executed applications, there are three main ways.
 
-1. If you're exclusively using ES modules (not transpiling those into some other module-bundle format), these files are loaded individually by the JS environment. Each module then `import`s references to whichever other modules it needs to access. The separate module files cooperate with each other exclusively through these shared imports, without needing any scopes.
+First, if you're exclusively using ES modules (not transpiling those into some other module-bundle format), these files are loaded individually by the JS environment. Each module then `import`s references to whichever other modules it needs to access. The separate module files cooperate with each other exclusively through these shared imports, without needing any scopes.
 
-2. If you're using a bundler in your build process, all the files are typically concatenated together before delivery to the browser and JS engine, which then only processes one big file. Even with all the pieces of the application co-located in a single file, some mechanism is necessary for each piece to register a *name* to be referred to by other pieces, as well as some facility for that access to occur.
+Second, if you're using a bundler in your build process, all the files are typically concatenated together before delivery to the browser and JS engine, which then only processes one big file. Even with all the pieces of the application co-located in a single file, some mechanism is necessary for each piece to register a *name* to be referred to by other pieces, as well as some facility for that access to occur.
 
-    In some approaches, the entire contents of the file are wrapped in a single enclosing scope, such as a wrapper function, universal module (UMD -- see Appendix A), etc. Each piece can register itself for access from other pieces by way of local variables in that shared scope.
+    In some approaches, the entire contents of the file are wrapped in a single enclosing scope, such as a wrapper function, universal module (UMD—see Appendix A), etc. Each piece can register itself for access from other pieces by way of local variables in that shared scope.
 
     For example:
 
@@ -43,9 +39,9 @@ With respect to browser-executed applications, there are 3 main ways:
 
     As shown, the `moduleOne` and `moduleTwo` local variables inside the `wrappingOuterScope()` function scope are declared so that these modules can access each other for their cooperation.
 
-    While the scope of `wrappingOuterScope()` is a function and not the full environment global scope, it does act as a sort of "application-wide scope", a bucket where all the top-level identifiers can be stored, though not in the real global scope. It's kind of like a stand-in for the global scope in that respect.
+    While the scope of `wrappingOuterScope()` is a function and not the full environment global scope, it does act as a sort of "application-wide scope," a bucket where all the top-level identifiers can be stored, though not in the real global scope. It's kind of like a stand-in for the global scope in that respect.
 
-3. Whether a bundler tool is used for an application, or whether the (non-ES module) files are simply loaded in the browser individually (via `<script>` tags or other dynamic JS resource loading), if there is no single surrounding scope encompassing all these pieces, the **global scope** is the only way for them to cooperate with each other.
+And finally, the third way: whether a bundler tool is used for an application, or whether the (non-ES module) files are simply loaded in the browser individually (via `<script>` tags or other dynamic JS resource loading), if there is no single surrounding scope encompassing all these pieces, the **global scope** is the only way for them to cooperate with each other:
 
     A bundled file of this sort often looks something like this:
 
@@ -88,7 +84,7 @@ With respect to browser-executed applications, there are 3 main ways:
     })();
     ```
 
-    Again, if these files are loaded separately as normal standalone .js files in a browser environment, each top-level variable declaration will end up as a global variable, since the global scope is the only shared resource between these two separate files -- they're independent programs, from the perspective of the JS engine.
+    Again, if these files are loaded separately as normal standalone .js files in a browser environment, each top-level variable declaration will end up as a global variable, since the global scope is the only shared resource between these two separate files—they're independent programs, from the perspective of the JS engine.
 
 In addition to (potentially) accounting for where an application's code resides during run-time, and how each piece is able to access the other pieces to cooperate, the global scope is also where:
 
@@ -109,7 +105,7 @@ In addition to (potentially) accounting for where an application's code resides 
 
     | NOTE: |
     | :--- |
-    | Node also exposes several elements "globally", but they're technically not in its `global` scope: `require()`, `__dirname`, `module`, `URL`, etc. |
+    | Node also exposes several elements "globally," but they're technically not in its `global` scope: `require()`, `__dirname`, `module`, `URL`, and so on. |
 
 Most developers agree that the global scope shouldn't just be a dumping ground for every variable in your application. That's a mess of bugs just waiting to happen. But it's also undeniable that the global scope is an important *glue* for virtually every JS application.
 
@@ -117,11 +113,11 @@ Most developers agree that the global scope shouldn't just be a dumping ground f
 
 It might seem obvious that the global scope is located in the outermost portion of a file; that is, not inside any function or other block. But it's not quite as simple as that.
 
-Different JS environments handle the scopes of your programs, in particular the global scope, differently. It's quite common for JS developers to have misconceptions without even realizing it.
+Different JS environments handle the scopes of your programs—in particular, the global scope—differently. It's quite common for JS developers to have misconceptions without even realizing it.
 
 ### Browser "Window"
 
-With resepct to treatment of the global scope, the most *pure* environment JS can be run in is as a standalone .js file loaded in a web page environment in a browser. I don't mean "pure" as in nothing automatically added -- lots may be added! -- but rather in terms of minimal intrusion on the code or interference with its expected global scope behavior.
+With resepct to treatment of the global scope, the most *pure* environment JS can be run in is as a standalone .js file loaded in a web page environment in a browser. I don't mean "pure" as in nothing automatically added—lots may be added!—but rather in terms of minimal intrusion on the code or interference with its expected global scope behavior.
 
 Consider this simple .js file:
 
@@ -136,7 +132,7 @@ hello();
 // Hello, Kyle!
 ```
 
-This code may be loaded in a webpage environment using an inline `<script>` tag, a `<script src=..>` script tag in the markup, or even a dynamically created `<script>` DOM element. In all three cases, the `studentName` and `hello` identifiers are declared in the global scope.
+This code may be loaded in a web page environment using an inline `<script>` tag, a `<script src=..>` script tag in the markup, or even a dynamically created `<script>` DOM element. In all three cases, the `studentName` and `hello` identifiers are declared in the global scope.
 
 That means if you access the global object (commonly, `window` in the browser), you'll find properties of those same names there:
 
@@ -179,7 +175,7 @@ While such nuance is possible, it's almost certainly a bad idea to do so. Reader
 
 A simple way to avoid this gotcha with global declarations: always use `var` for globals. Reserve `let` and `const` for block scopes (see "Scoping With Blocks" in Chapter 6).
 
-#### What's In A (Window) Name?
+#### What's in a (Window) Name?
 
 I asserted that this browser-hosted JS environment has the most *pure* global scope behavior we'll see. However, it's not entirely *pure*.
 
@@ -194,7 +190,7 @@ console.log(typeof name, name);
 
 `window.name` is a pre-defined "global" in a browser context; it's a property on the global object, so it seems like a normal global variable (though it's anything but "normal").
 
-We used `var` for our declaration, which **does not** shadow the pre-defined `name` global property. That means, effectively, the `var` declaration is ignored, since there's already a global scope object property of that name. As we discussed in the previous section, had we use `let name`, we would have shadowed `window.name` with a separate global `name` variable.
+We used `var` for our declaration, which **does not** shadow the pre-defined `name` global property. That means, effectively, the `var` declaration is ignored, since there's already a global scope object property of that name. As we discussed in the previous section, had we used `let name`, we would have shadowed `window.name` with a separate global `name` variable.
 
 But the truly surprising behavior is that even though we assigned the number `42` to `name` (and thus `window.name`), when we then retrieve its value, it's a string `"42"`! In this case, the weirdness is because `window.name` is actually a getter/setter on the global object, which insists on its value being a string value. Wow!
 
@@ -204,11 +200,11 @@ With the exception of some rare corner cases like `window.name`, JS running as a
 
 Web Workers are a web platform extension for typical browser-JS behavior, which allows a JS file to run in a completely separate thread (operating system wise) from the thread that's running the main browser-hosted JS.
 
-Since these web worker programs run on a separate thread, they're restricted in their communications with the main application thread, to avoid/control race conditions and other complications. Web worker code does not have access to the DOM, for example. Some web APIs are however made available to the worker, such as `navigator`.
+Since these Web Worker programs run on a separate thread, they're restricted in their communications with the main application thread, to avoid/control race conditions and other complications. Web Worker code does not have access to the DOM, for example. Some web APIs are, however, made available to the worker, such as `navigator`.
 
-Since a web worker is treated as a wholly separate program, it does not share the global scope with the main JS program. However, the browser's JS engine is still running the code, so we can expect similar *purity* of its global scope behavior. But there is no DOM access, so the `window` alias for the global scope doesn't exist.
+Since a Web Worker is treated as a wholly separate program, it does not share the global scope with the main JS program. However, the browser's JS engine is still running the code, so we can expect similar *purity* of its global scope behavior. But there is no DOM access, so the `window` alias for the global scope doesn't exist.
 
-In a web worker, a global object reference is typically made with `self`:
+In a Web Worker, a global object reference is typically made with `self`:
 
 ```js
 var studentName = "Kyle";
@@ -231,19 +227,19 @@ So again, the global scope behavior we're seeing here is about as *pure* as it g
 
 ### Developer Tools Console/REPL
 
-Recall from *Get Started* Chapter 1 that Developer Tools don't create a completely adherent JS environment. They do process JS code, but they also bend the UX of the interaction in favor of being most friendly to developers (aka, developer experience -- DX).
+Recall from Chapter 1 in *Get Started* that Developer Tools don't create a completely adherent JS environment. They do process JS code, but they also bend the UX of the interaction in favor of being most friendly to developers (aka, developer experience, or DX).
 
 In some cases, favoring DX when typing in short JS snippets, over the normal strict steps expected for processing a full JS program, produces observable differences in code behavior between programs and tools. For example, certain error conditions applicable to a JS program may be relaxed and not displayed when the code is entered into a developer tool.
 
 With respect to our discussions here about scope, such observable differences in behavior may include:
 
-* the behavior of the global scope
+* The behavior of the global scope
 
-* hoisting (see Chapter 5)
+* Hoisting (see Chapter 5)
 
-* block-scoping declarators (`let` / `const`, see Chapter 6) when used in the outermost scope
+* Block-scoping declarators (`let` / `const`, see Chapter 6) when used in the outermost scope
 
-Even though while using the console/REPL it seems like statements entered in the outermost scope are being processed in the real global scope, that's not strictly accurate. The tool emulates that to an extent, but it's emulation, not strict adherence. These tool environments prioritize developer convenience, which means that at times (such as with our current discussions regarding scope), observed behavior may deviate from the JS specification.
+Although it might seem, while using the console/REPL, like statements entered in the outermost scope are being processed in the real global scope, that's not strictly accurate. The tool emulates that to an extent, but it's emulation, not strict adherence. These tool environments prioritize developer convenience, which means that at times (such as with our current discussions regarding scope), observed behavior may deviate from the JS specification.
 
 The take-away is that Developer Tools, while optimized to be convenient and useful for a variety of developer activities, are **not** suitable environments to determine or verify some of the explicit and nuanced behaviors of an actual JS program context.
 
@@ -268,7 +264,7 @@ export hello;
 
 If that code were in a file that was loaded as an ES module, it would still run exactly the same. However, the observable effects, from the overall application perspective, would be different.
 
-Despite being declared at the top-level of the (module) file, in the outermost obvious scope, `studentName` and `hello` are not global variables. Instead, they are module-wide, or if you prefer, "module-global".
+Despite being declared at the top level of the (module) file, in the outermost obvious scope, `studentName` and `hello` are not global variables. Instead, they are module-wide, or if you prefer, "module-global."
 
 However, in a module there's no implicit "global scope object" (or "module-global object") for these top-level declarations to be added to as properties, as there is when declarations appear in the top-level of non-module JS files. This is not to say that global variables cannot exist or be accessed in such programs. It's just that global variables don't get *created* by declaring variables in the top-level scope of a module.
 
@@ -278,7 +274,7 @@ ESM encourages a minimization of reliance on the global scope, where you import 
 
 ### Node
 
-One aspect of Node that often catches JS developers off-guard is that Node treats every single .js file that it loads, including the main one you start the Node process with, as a *module* (ES module or CommonJS module). The practical effect is that the top-level of your Node programs **is never actually the global scope**, the way it is when loading a non-module file in the browser.
+One aspect of Node that often catches JS developers off-guard is that Node treats every single .js file that it loads, including the main one you start the Node process with, as a *module* (ES module or CommonJS module). The practical effect is that the top level of your Node programs **is never actually the global scope**, the way it is when loading a non-module file in the browser.
 
 As of time of this writing, Node has recently added support for ES modules. But additionally, Node has from the beginning supported a module format referred to as "CommonJS", which looks like this:
 
@@ -297,7 +293,7 @@ module.exports.hello = hello;
 
 Node effectively wraps such code in a function, so that the `var` and `function` declarations are contained in that function's scope, **not** treated as global variables.
 
-Envision the above code as being processed by Node like this (illustrative, not actual):
+Envision the preceding code as being processed by Node like this (illustrative, not actual):
 
 ```js
 function Module(module,require,__dirname,...) {
@@ -318,7 +314,7 @@ Node then essentially invokes the added `Module(..)` function to run your module
 
 As noted earlier, Node defines a number of "globals" like `require()`, but they're not actually identifiers in the global scope (nor properties of the global object). They're injected in the scope of every module, essentially a bit like the parameters listed in the `Module(..)` declaration function.
 
-So how do you define actual global variables in Node? The only way to do so is to add properties to another of Node's automatically provided "globals", which is unsurprisignly called `global`. `global` is ostensibly a reference to the real global scope object, somewhat like using `window` in a browser JS environment.
+So how do you define actual global variables in Node? The only way to do so is to add properties to another of Node's automatically provided "globals," which is unsurprisignly called `global`. `global` is ostensibly a reference to the real global scope object, somewhat like using `window` in a browser JS environment.
 
 Consider:
 
@@ -343,11 +339,11 @@ Remember, the identifier `global` is not defined by JS; specifically, it's defin
 
 Reviewing the JS environments we've looked at so far, a program may or may not be able to:
 
-* declare a global variable in the top-level scope with `var` or `function` declarations -- or `let`, `const`, and `class`.
+* Declare a global variable in the top-level scope with `var` or `function` declarations—or `let`, `const`, and `class`.
 
-* also add global variables declarations as properties of the global scope object if `var` or `function` are used for the declaration.
+* Also add global variables declarations as properties of the global scope object if `var` or `function` are used for the declaration.
 
-* refer to the global scope object (for adding or retrieving global variables, as properties) with `window`, `self`, or `global`.
+* Refer to the global scope object (for adding or retrieving global variables, as properties) with `window`, `self`, or `global`.
 
 I think it's fair to say that global scope access and behavior is more complicated than most developers assume, as the preceding sections have illustrated. But the complexity is never more obvious than in trying to articulate a broadly applicable reference to the global scope object.
 
@@ -359,7 +355,7 @@ const theGlobalScopeObject = (new Function("return this"))();
 
 | NOTE: |
 | :--- |
-| A function can be dynamically constructed from code stored in a string value with the `Function()` constructor, similar to `eval(..)` (see "Cheating: Run-Time Scope Modifications" in Chapter 1). Such a function will automatically be run in non-strict-mode (for legacy reasons) when invoked with the normal `()` function invocation as shown; its `this` will be the global object. See Book 3 *Objects & Classes* for more information on determining `this` bindings. |
+| A function can be dynamically constructed from code stored in a string value with the `Function()` constructor, similar to `eval(..)` (see "Cheating: Run-Time Scope Modifications" in Chapter 1). Such a function will automatically be run in non-strict-mode (for legacy reasons) when invoked with the normal `()` function invocation as shown; its `this` will be the global object. See the third book in the series, *Objects & Classes*, for more information on determining `this` bindings. |
 
 So, we have `window`, `self`, `global`, and this ugly `new Function(..)` trick. That's a lot of different ways to try to get at this global object.
 
@@ -380,7 +376,7 @@ const theGlobalScopeObject =
 
 Phew! That's certainly not ideal, but it works if you find yourself needing a reliable global scope reference.
 
-(The name `globalThis` was fairly controversial while the feature was being added to JS. Specifically, I and many others felt the "this" reference in the name was fairly misleading, since the reason you access this object is to access to the global scope, never to access some sort of global/default `this` binding. There were many other names considered, but for a variety of reasons ruled out. Unfortunately, the name chosen ended up as a last resort. If you plan to interact with the global scope object in your programs, to reduce confusion, I strongly recommend you choose a better name, such as (the laughably long but accurate!) `theGlobalScopeObject` above.)
+(The name `globalThis` was fairly controversial while the feature was being added to JS. Specifically, I and many others felt the "this" reference in the name was fairly misleading, since the reason you access this object is to access to the global scope, never to access some sort of global/default `this` binding. There were many other names considered, but for a variety of reasons ruled out. Unfortunately, the name chosen ended up as a last resort. If you plan to interact with the global scope object in your programs, to reduce confusion, I strongly recommend choosing a better name, such as (the laughably long but accurate!) `theGlobalScopeObject` used here.)
 
 ## Globally Aware
 
