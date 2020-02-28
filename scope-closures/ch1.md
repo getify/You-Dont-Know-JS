@@ -19,7 +19,7 @@ Welcome to book 2 in the *You Don't Know JS Yet* series! If you already finished
 
 Our focus here is the first of three pillars in the JS language: the scope system and its function closures, as well as the power of the module design pattern.
 
-JS is typically classified as an interpreted scripting language, so it's assumed by most that JS programs are processed in a single, top-down pass. But JS is in fact parsed/compiled in a separate phase **before execution begins**. The code author's decisions on where to place variables, functions, and blocks with respect to each other are analyzed according to the rules of scope, during the initial parsing/compilation phase. The resulting scope layout is generally unaffected by run-time conditions.
+JS is typically classified as an interpreted scripting language, so it's assumed by most that JS programs are processed in a single, top-down pass. But JS is in fact parsed/compiled in a separate phase **before execution begins**. The code author's decisions on where to place variables, functions, and blocks with respect to each other are analyzed according to the rules of scope, during the initial parsing/compilation phase. The resulting scope layout is generally unaffected by runtime conditions.
 
 JS functions are themselves first-class values; they can be assigned and passed around just like numbers or strings. But since these functions hold and access variables, they maintain their original scope no matter where in the program the functions are eventually executed. This is called closure.
 
@@ -258,13 +258,13 @@ In `getStudentName(73)`, `getStudentName` is a *source* reference (which we hope
 
 What's the importance of understanding *targets* vs. *sources*? In Chapter 2, we'll revisit this topic and cover how a variable's role impacts its lookup (specifically, if the lookup fails).
 
-## Cheating: Run-Time Scope Modifications
+## Cheating: Runtime Scope Modifications
 
-It should be clear by now that scope is determined as the program is compiled, and should not be affected by any run-time conditions. However, in non-strict-mode, there are technically still two ways to cheat this rule, and modify the scopes during run time.
+It should be clear by now that scope is determined as the program is compiled, and should not be affected by any runtime conditions. However, in non-strict-mode, there are technically still two ways to cheat this rule, and modify the scopes during runtime.
 
 Neither of these techniques *should* be used—they're both very bad ideas, and you should be using strict-mode anyway—but it's important to be aware of them in case you run across code that does.
 
-The `eval(..)` function receives a string of code to compile and execute on the fly during the program run time. If that string of code has a `var` or `function` declaration in it, those declarations will modify the scope that the `eval(..)` is currently executing in:
+The `eval(..)` function receives a string of code to compile and execute on the fly during the program runtime. If that string of code has a `var` or `function` declaration in it, those declarations will modify the scope that the `eval(..)` is currently executing in:
 
 ```js
 function badIdea() {
@@ -276,7 +276,7 @@ badIdea();
 // Ugh!
 ```
 
-If the `eval(..)` had not been present, the `oops` variable in `console.log(oops)` would not exist, and would throw a Reference Error. But `eval(..)` modifies the scope of the `badIdea()` function at run time. This is a bad idea for many reasons, including the performance hit of modifying the already compiled and optimized scope, every time `badIdea()` runs. Don't do it!
+If the `eval(..)` had not been present, the `oops` variable in `console.log(oops)` would not exist, and would throw a Reference Error. But `eval(..)` modifies the scope of the `badIdea()` function at runtime. This is a bad idea for many reasons, including the performance hit of modifying the already compiled and optimized scope, every time `badIdea()` runs. Don't do it!
 
 The second cheat is the `with` keyword, which essentially dynamically turns an object into a local scope—its properties are treated as identifiers in that scope's block:
 
@@ -291,7 +291,7 @@ with (badIdea) {
 }
 ```
 
-The global scope was not modified here, but `badIdea` was turned into a scope at run time rather than compile time. Again, this is a terrible idea, for performance and readability reasons. Don't!
+The global scope was not modified here, but `badIdea` was turned into a scope at runtime rather than compile time. Again, this is a terrible idea, for performance and readability reasons. Don't!
 
 At all costs, avoid `eval(..)` (at least, `eval(..)` creating declarations) and `with`. As mentioned, neither of these cheats is available in strict-mode, so if you just use strict-mode (you should!) then the temptation is removed.
 
@@ -307,6 +307,6 @@ Furthermore, a reference (*target* or *source* role) for a variable must be reso
 
 It's important to note that compilation doesn't actually *do anything* in terms of reserving memory for scopes and variables. None of the program has been executed yet.
 
-Instead, compilation creates a map of all the lexical scopes that lays out what the program will need while it executes. You can think of this plan as inserted code for the run time, which defines all the scopes (aka, "lexical environments") and registers all the identifiers (variables) for each scope.
+Instead, compilation creates a map of all the lexical scopes that lays out what the program will need while it executes. You can think of this plan as inserted code for the runtime, which defines all the scopes (aka, "lexical environments") and registers all the identifiers (variables) for each scope.
 
-In other words, while scopes are identified during compilation, they're not actually created until run time, each time a scope needs to run. In the next chapter, we'll sketch out the conceptual foundations for lexical scope.
+In other words, while scopes are identified during compilation, they're not actually created until runtime, each time a scope needs to run. In the next chapter, we'll sketch out the conceptual foundations for lexical scope.
