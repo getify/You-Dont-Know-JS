@@ -82,7 +82,7 @@ The `if (student.id == studentID)` on line 10 is similarly determined to referen
 
 | NOTE: |
 | :--- |
-| The JS engine doesn't generally determine these marble colors during run-time; the "lookup" here is a rhetorical device to help you understand the concepts. During compilation, most or all variable references will be from already-known scope buckets, so their color is determined at that, and stored with each marble reference to avoid unnecessary lookups as the program runs. More on this in the next chapter. |
+| The JS engine doesn't generally determine these marble colors during runtime; the "lookup" here is a rhetorical device to help you understand the concepts. During compilation, most or all variable references will be from already-known scope buckets, so their color is determined at that, and stored with each marble reference to avoid unnecessary lookups as the program runs. More on this in the next chapter. |
 
 The key take-aways from marbles & buckets (and bubbles!):
 
