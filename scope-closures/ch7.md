@@ -7,25 +7,17 @@
 
 Up to this point, we've focused on the ins and outs of lexical scope, and how that affects the organization and usage of variables in our programs.
 
-Our attention again shifts broader in abstraction, to the historically somewhat daunting topic of closure. Don't worry! You don't need an advanced Computer Science degree to make sense of it.
+Our attention again shifts broader in abstraction, to the historically somewhat daunting topic of closure. Don't worry! You don't need an advanced Computer Science degree to make sense of it. Our broad goal in this book is not merely to understand scope, but to more effectively use it in the structure of our programs; closure is central to that effort.
 
-As a matter of fact, we already saw an example of closure in the previous chapter (`factorial(..)` in Chapter 6), and you've almost certainly already used it in your own programs. If you've ever written a callback that accesses variables outside its own scope... guess what!? That's closure.
+Recall Chapter 6's main conclusion: the *least exposure* principle (POLE) encourages us to use block (and function) scoping to limit the scope exposure of variables. This helps keep code understandable and maintainable, and helps avoid many scoping pitfalls (i.e., name collision, etc).
 
-Indeed, you may actually find this chapter's revelation of what closure is rather... anticlimactic.
+Closure builds on this approach: for variables we need to use over time, instead of placing them in larger outer scopes, we can encapsulate (more narrowly scope) them but still preserve access from inside functions, for broader use. Functions *remember* these referenced scoped variables via closure.
 
-Even still, closure is one of the most important language characteristics ever invented in programming -- it underlies major programming paradigms, including Functional Programming (FP), modules, and even a bit of class-oriented design. Getting comfortable with closure is required for mastering JS and effectively leveraging many important design patterns throughout your code.
+We already saw an example of this kind of closure in the previous chapter (`factorial(..)` in Chapter 6), and you've almost certainly already used it in your own programs. If you've ever written a callback that accesses variables outside its own scope... guess what!? That's closure.
 
-## Big Picture
+Closure is one of the most important language characteristics ever invented in programming -- it underlies major programming paradigms, including Functional Programming (FP), modules, and even a bit of class-oriented design. Getting comfortable with closure is required for mastering JS and effectively leveraging many important design patterns throughout your code.
 
-Addressing all aspects of closure presents a daunting mountain of discussion and code throughout this chapter. Make sure to take your time and ensure you're comfortable with each bit before moving onto the next.
-
-Before we jump in, I think it's helpful to start with a quick glance at *why* we're digging so deeply into this topic.
-
-Recall Chapter 6's take-away: the *least exposure* principle (POLE) encourages us to use block (and function) scoping to limit the scope exposure of variables. This helps keep code understandable and maintainable, and helps avoid many scoping pitfalls (i.e., name collision, etc).
-
-Closure expands this approach: for variables we need to use over time, instead of placing them in larger outer scopes, we can encapsulate (more narrowly scope) them but still preserve access from inside functions, for broader use. Functions *remember* these referenced scoped variables via closure.
-
-Our broad goal in this book is not merely to understand scope, but to more effectively use it in the structure of our programs. Closure is central to these efforts.
+Addressing all aspects of closure requires a daunting mountain of discussion and code throughout this chapter. Make sure to take your time and ensure you're comfortable with each bit before moving onto the next.
 
 ## See The Closure
 
@@ -33,9 +25,9 @@ Closure is originally a mathematical concept, from lambda calculus. But I'm not 
 
 Instead, I'm going to use a practical perspective to describe closure. We'll define closure in terms of what we can observe in different behavior of our programs, as opposed to if closure was not present in JS.
 
-First, closure is a behavioral characteristic of functions. If you aren't dealing with a function, closure does not apply. An object cannot have closure, nor does a class have closure (though its functions/methods might). Only functions have closure.
+First, closure is a behavior of functions and only functions. If you aren't dealing with a function, closure does not apply. An object cannot have closure, nor does a class have closure (though its functions/methods might). Only functions have closure.
 
-For closure to be observed, a function must be invoked, and specifically it must be invoked in a different branch of the scope chain from where it was originally defined. A function executing in the same scope it was defined would not exhibit any observably different behavior with or without closure being possible; by my observational perspective and definition, that is not closure.
+For closure to be observed, a function must be invoked, and specifically it must be invoked in a different branch of the scope chain from where it was originally defined. A function executing in the same scope it was defined would not exhibit any observably different behavior with or without closure being possible; by the observational perspective and definition, that is not closure.
 
 Let's look at some code, annotated with its relevant scope bubble colors (see Chapter 2):
 
@@ -147,7 +139,7 @@ Even though closure is based on lexical scope, which is handled at compile-time,
 
 In both examples from the previous sections, we **read the value from a variable** that was held in a closure. That makes it feel like closure might be a snapshot of a value at some given moment. Indeed, that's a common misconception.
 
-Closure is actually a live link, a preservation of the full variable itself. We're not limited to merely reading a preserved value; the closed-over variable can be updated (reassigned) as well.
+Closure is actually a live link, preserving access to the full variable itself. We're not limited to merely reading a value; the closed-over variable can be updated (re-assigned) as well! By closing over a variable in a function, we can keep using that variable (read and write) as long as that function reference exists in the program, and from anywhere we want to invoke that function. This is why closure is such a powerful technique used widely across so many areas of programming!
 
 Figure 4 depicts the function instances and scope links:
 
@@ -185,7 +177,7 @@ hits();     // 3
 
 The `count` variable is closed over by the inner `getCurrent()` function, which keeps it around instead of it being subjected to GC. The `hits()` function calls access *and* update this variable, returning an incrementing count each time.
 
-Though the enclosing scope of a closure is typically from function, that's not actually required. There only needs to be an inner function present inside an outer scope:
+Though the enclosing scope of a closure is typically from a function, that's not actually required; there only needs to be an inner function present inside an outer scope:
 
 ```js
 var hits;
@@ -208,7 +200,7 @@ hits();     // 3
 | :--- |
 | I deliberately defined `getCurrent()` as a `function` expression instead of a `function` declaration. This has nothing to do with closure, but with the dangerous quirks of FiB as discussed in Chapter 6. |
 
-Because closure is not a snapshot of a value, but rather a live link to a variable, developers sometimes get tripped up trying to use closure to preserve a desired value.
+Because it's so common to mistake closure as value-oriented instead of variable-oriented, developers sometimes get tripped up trying to use closure to snapshot-preserve a value from some moment in time.
 
 Consider:
 
@@ -233,43 +225,41 @@ greeting();
 // Hello, Suzy!
 ```
 
-A common mistake assumes that closure captures the current value of whatever variable(s) it references, when defining a function at a certain point in the program. The assumption would be that `greeting()` should return "Hello, Frank!".
+By defining `greeting()` (aka, `hello()`) when `studentName` holds the value `"Frank"` (before the re-assignment to `"Suzy"`), the mistaken assumption is often that the closure will capture `"Frank"`. But `greeting()` is closed over the variable `studentName`, not its value. Whenever `greeting()` is invoked, the current value of the variable (`"Suzy"`, in this case) is reflected.
 
-But `greeting()` (aka, `hello()`) is closed over `studentName`, not its value. When `greeting()` is invoked, the current value of the variable (`"Suzy"`) is reflected.
-
-The classic illustration of this mistake is creating closure inside a loop:
+The classic illustration of this mistake is defining functions inside a loop:
 
 ```js
-var fns = [];
+var keeps = [];
 
 for (var i = 0; i < 3; i++) {
-    fns[i] = function fn(){
+    keeps[i] = function keepI(){
         // closure over `i`
         return i;
     };
 }
 
-fns[0]();   // 3 -- WHY!?
-fns[1]();   // 3
-fns[2]();   // 3
+keeps[0]();   // 3 -- WHY!?
+keeps[1]();   // 3
+keeps[2]();   // 3
 ```
 
 | NOTE: |
 | :--- |
-| This closure example is typically cited with a `setTimeout(..)` or some other callback like an event handler, inside the loop. I've simplified the example by storing function callbacks in an array, so that we don't need to consider asynchronous timing in our analysis. The closure principle is the same, regardless. |
+| This kind of closure illustration typically uses a `setTimeout(..)` or some other callback like an event handler, inside the loop. I've simplified the example by storing function references in an array, so that we don't need to consider asynchronous timing in our analysis. The closure principle is the same, regardless. |
 
-You might have expected the `fns[0]()` invocation to return `0`, since that function was created when `i` was `0` (the first iteration of the loop). But that incorrect thinking stems from the belief that closure captures values instead of linking variables.
+You might have expected the `keeps[0]()` invocation to return `0`, since that function was created during the first iteration of the loop when `i` was `0`. But again, that assumption stems from thinking of closure as value-oriented rather than variable-oriented.
 
-In the loop snippet above, something about the syntax of a `for`-loop tricks us into thinking that each iteration gets its own new `i` variable, but in fact, there's just one `i` for the program, since it was declared with `var`.
+Something about the structure of a `for`-loop can trick us into thinking that each iteration gets its own new `i` variable; in fact, this program only has one `i` since it was declared with `var`.
 
-Each saved function returns `3`, because by the end of the loop, the single `i` variable in the program has been assigned `3`. Each of the 3 functions in the `fns` array do have individual closures, but they're all closed over that same `i` variable.
+Each saved function returns `3`, because by the end of the loop, the single `i` variable in the program has been assigned `3`. Each of the 3 functions in the `keeps` array do have individual closures, but they're all closed over that same `i` variable.
 
-A single variable can obviously only ever hold one value at a time. So if you want to preserve/capture multiple values, you need a different variable to hold each.
+Of course, a single variable can only ever hold one value at any given moment. So if you want to preserve multiple values, you need a different variable for each.
 
-How could we do that? Let's create a new variable for each iteration:
+How could we do that in the loop snippet? Let's create a new variable for each iteration:
 
 ```js
-var fns = [];
+var keeps = [];
 
 for (var i = 0; i < 3; i++) {
     // new variable `j` created each iteration,
@@ -277,44 +267,46 @@ for (var i = 0; i < 3; i++) {
     // this moment.
     let j = i;
 
-    fns[i] = function fn(){
-        return j;   // close over `j` not `i`
+    // the `i` here isn't being closed over,
+    // so it's fine to immediately use its
+    // current value in each loop iteration
+    keeps[i] = function keepEachJ(){
+        // close over `j`, not `i`!
+        return j;
     };
 }
 
-fns[0]();   // 0
-fns[1]();   // 1
-fns[2]();   // 2
+keeps[0]();   // 0
+keeps[1]();   // 1
+keeps[2]();   // 2
 ```
 
-Now, each function is closed over a separate (new) variable from each iteration (even though all of them are named `j`!). And each `j` gets a copy of the value of `i` at that point in the loop iteration, and that `j` never gets re-assigned. So all 3 functions maintain their respective and expected values: `0`, `1`, and `2`.
+Each function is now closed over a separate (new) variable from each iteration, even though all of them are named `j`. And each `j` gets a copy of the value of `i` at that point in the loop iteration; that `j` never gets re-assigned. So all 3 functions now return their expected values: `0`, `1`, and `2`!
 
-Again remember, even if we were using asynchrony in this program, such as passing these `fn()` functions into `setTimeout(..)` or some event handler subscription, the same kind of closure behavior would be observed.
+Again remember, even if we were using asynchrony in this program, such as passing each inner `keepEachJ()` functions into `setTimeout(..)` or some event handler subscription, the same kind of closure behavior would still be observed.
 
-Recall the "Loops" section in Chapter 5, which illustrates how a `let` declaration in a `for` loop actually creates not just one variable for the loop, but creates a new variable for *each iteration* of the loop. That trick/quirk is exactly what we need for our closures!
-
-Consider:
+Recall the "Loops" section in Chapter 5, which illustrates how a `let` declaration in a `for` loop actually creates not just one variable for the loop, but actually creates a new variable for *each iteration* of the loop. That trick/quirk is exactly what we need for our loop closures:
 
 ```js
-var fns = [];
+var keeps = [];
 
 for (let i = 0; i < 3; i++) {
-    // the `let i` gives us a new `i`
-    // for each iteration automatically!
+    // the `let i` gives us a new `i` for
+    // each iteration, automatically!
 
-    fns[i] = function fn(){
+    keeps[i] = function keepEachI(){
         return i;
     };
 }
 
-fns[0]();   // 0
-fns[1]();   // 1
-fns[2]();   // 2
+keeps[0]();   // 0
+keeps[1]();   // 1
+keeps[2]();   // 2
 ```
 
 Since we're using `let`, 3 `i`'s are created, one for each loop, so each of the 3 closures *just work* as expected.
 
-### Common Closures
+### Common Closures: Ajax and Events
 
 Closure is most commonly encountered with asynchronous callbacks:
 

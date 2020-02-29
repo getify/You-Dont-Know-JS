@@ -44,7 +44,6 @@
     * Function Declarations In Blocks
     * Blocked Over
 * Chapter 7: Using Closures
-    * Big Picture
     * See The Closure
     * The Lifecycle of Closures
     * Why Closure?
