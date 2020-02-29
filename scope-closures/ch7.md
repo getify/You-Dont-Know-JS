@@ -23,9 +23,9 @@ Addressing all aspects of closure requires a daunting mountain of discussion and
 
 Closure is originally a mathematical concept, from lambda calculus. But I'm not going to list out math formulas or use a bunch of notation and jargon to define it.
 
-Instead, I'm going to use a practical perspective to describe closure. We'll define closure in terms of what we can observe in different behavior of our programs, as opposed to if closure was not present in JS.
+Instead, I'm going to use a practical perspective to describe closure. We'll start by defining closure in terms of what we can observe in different behavior of our programs, as opposed to if closure was not present in JS. However, later in this chapter, we're going to flip closure around to look at it from an *alternate perspective*.
 
-First, closure is a behavior of functions and only functions. If you aren't dealing with a function, closure does not apply. An object cannot have closure, nor does a class have closure (though its functions/methods might). Only functions have closure.
+Closure is a behavior of functions and only functions. If you aren't dealing with a function, closure does not apply. An object cannot have closure, nor does a class have closure (though its functions/methods might). Only functions have closure.
 
 For closure to be observed, a function must be invoked, and specifically it must be invoked in a different branch of the scope chain from where it was originally defined. A function executing in the same scope it was defined would not exhibit any observably different behavior with or without closure being possible; by the observational perspective and definition, that is not closure.
 
@@ -466,7 +466,7 @@ The key parts of this definition are:
 
 This observation-oriented definition reminds us that we shouldn't dismiss closure as some indirect, academic trivia. Instead, we need to look and plan for the direct, concrete effects closure has on our program behavior.
 
-## The Closure Lifecycle
+## The Closure Lifecycle and Garbage Collection (GC)
 
 Since closure is inherently tied to a function instance, its closure over a variable lasts as long as there is still a reference to that function.
 
@@ -535,7 +535,9 @@ Another question we need to tackle: should we think of closure as applied only t
 
 In other words, in the previous event subscription snippet, is the inner `onClick(..)` function closed over only `cb`, or is it also closed over `clickHandler`, `clickHandlers`, and `btn`?
 
-Conceptually, closure is **per variable** rather than *per scope*. But the reality is more complicated than that.
+Conceptually, closure is **per variable** rather than *per scope*. Ajax callbacks, event handlers, and all other forms of function closures are typically assumed to close over only what they explicitly reference.
+
+But the reality is more complicated than that.
 
 Another program to consider:
 
@@ -628,9 +630,11 @@ So all the variables were definitely preserved via closure, despite not being ex
 
 Many modern JS engines do apply an *optimization* that removes any variables from a closure scope that aren't explicitly referenced. However, as we see with `eval(..)`, there are situations where such an optimization cannot be applied, and the closure scope continues to contain all its original variables.
 
-Even as recent as a few years ago, many JS engines did not apply this optimization; it's possible your websites may still run in such browsers, especially on older or lower-end devices. And the fact that it's an optional optimization in the first place, rather than a requirement of the specification, means that we shouldn't casually over-assume its applicability.
+Even as recent as a few years ago, many JS engines did not apply this optimization; it's possible your websites may still run in such browsers, especially on older or lower-end devices. That means it's possible that long-lived closures such as event handlers may be holding onto memory much longer than we would have assumed.
 
-In cases where a variable holds a large value (like an object or array) and that variable is present in a closure scope, if you don't want that variable and value to be preserved, it's safer (from a memory usage perspective) to manually discard the value rather than relying on closure optimization and GC.
+And the fact that it's an optional optimization in the first place, rather than a requirement of the specification, means that we shouldn't just casually over-assume its applicability.
+
+In cases where a variable holds a large value (like an object or array) and that variable is present in a closure scope, if you don't need that value anymore and don't want that memory held, it's safer (from a memory usage perspective) to manually discard the value rather than relying on closure optimization and GC.
 
 Let's apply a *fix* to the earlier `manageStudentGrades(..)` example to ensure the potentially large array held in `studentRecords` is not caught up in a closure scope unnecessarily:
 
@@ -648,7 +652,7 @@ function manageStudentGrades(studentRecords) {
 }
 ```
 
-We're not removing `studentRecords` from the closure scope; that we cannot control. We're ensuring that even if `studentRecords` remains in the closure scope, it's not holding onto memory unnecessarily in referencing the potentially large array of data.
+We're not removing `studentRecords` from the closure scope; that we cannot control. We're ensuring that even if `studentRecords` remains in the closure scope, that variable is no longer referencing the potentially large array of data.
 
 Again, in many cases JS might automatically optimize the program to the same effect. But it's still a good habit to explicitly make sure we don't keep any significant amount of device memory tied up any longer than necessary.
 
@@ -822,9 +826,9 @@ function setupButtonHandler(btn) {
 
 Now `makeRequest(..)` is closed over `requestURL` and `requestData`, which is a little bit cleaner to understand.
 
-A common technique in the Functional Programming (FP) paradigm that relies on closure is called partial application (related: currying). Briefly, we can alter functions that require multiple inputs so some inputs are provided up front, and other inputs are provided later; the initial inputs are remembered via closure. Once all inputs have been provided, the underlying action is performed.
+Two similar techniques in the Functional Programming (FP) paradigm that rely on closure are partial application and currying. Briefly, we can alter the *shape* of functions that require multiple inputs so some inputs are provided up front, and other inputs are provided later; the initial inputs are remembered via closure. Once all inputs have been provided, the underlying action is performed.
 
-By creating a function instance that encapsulates some information inside (via closure), the function-with-stored-information can later be used directly without needing to re-provide that input.
+By creating a function instance that encapsulates some information inside (via closure), the function-with-stored-information can later be used directly without needing to re-provide that input. This makes that part of the code cleaner, and also offers the opportunity to use better semantic names for partially-applied functions.
 
 Inspired by partial application, we can further improve the above code:
 
@@ -845,15 +849,9 @@ function setupButtonHandler(btn) {
 }
 ```
 
-The `requestURL` and `requestData` inputs are provided ahead of time, resulting in a partially-applied function (`makeRequest(..)`), which we name `handler`. When the event eventually fires, the final input (`evt`, even though it's ignored) is passed to `handler()`, completing its inputs and triggering the underlying Ajax request.
+The `requestURL` and `requestData` inputs are provided ahead of time, resulting in a partially-applied function (`makeRequest(..)`), which we label `handler`. When the event eventually fires, the final input (`evt`, even though it's ignored) is passed to `handler()`, completing its inputs and triggering the underlying Ajax request.
 
 Behavior wise, this program is pretty similar to the previous one, with the same kind of closure. But by isolating the creation of `makeRequest(..)` in a separate utility (`defineHandler(..)`), we make that definition more reusable across the program. We also explicitly limit the closure scope to only the two variables needed.
-
-Let's summarize what closure does for our programs:
-
-* Closure can improve efficiency by allowing a function instance to remember previously determined information instead of having to compute it each time.
-
-* Closure can improve code readability, bounding scope-exposure by encapsulating variable(s) inside function instances, while still making sure the information in those variables is accessible for future use. The resultant narrower, more specialized function instances are cleaner to interact with, since the preserved information doesn't need to be passed in every invocation.
 
 ## Closer to Closure
 
@@ -865,6 +863,10 @@ This chapter presents two models for mentally tackling closure:
 
 * Implementational: closure is a function instance and its scope environment being preserved in-place while any references to it are passed around and **invoked from** other scopes.
 
-Closure allows a function to remember information, which makes instances of that function more efficient and easier to interact with. Closure also creates more effective bounding of scope-exposure for variables, which improves code organization and readability.
+Summarizing the benefits of closure:
 
-Before you move on, take some time to re-articulate this summary in your own words, explaining what closure is and why it's helpful in your programs. When you're ready, the main book text concludes with a final chapter exploring the module pattern.
+* Closure can improve efficiency by allowing a function instance to remember previously determined information instead of having to compute it each time.
+
+* Closure can improve code readability, bounding scope-exposure by encapsulating variable(s) inside function instances, while still making sure the information in those variables is accessible for future use. The resultant narrower, more specialized function instances are cleaner to interact with, since the preserved information doesn't need to be passed in every invocation.
+
+Before you move on, take some time to restate this summary *in your own words*, explaining what closure is and why it's helpful in your programs. When you're ready, the main book text concludes with a final chapter exploring the module pattern.

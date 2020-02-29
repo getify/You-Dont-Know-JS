@@ -45,7 +45,7 @@
     * Blocked Over
 * Chapter 7: Using Closures
     * See The Closure
-    * The Lifecycle of Closures
+    * The Closure Lifecycle and Garbage Collection (GC)
     * Why Closure?
     * An Alternate Perspective
     * Closer to Closure
