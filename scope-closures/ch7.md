@@ -857,16 +857,16 @@ Behavior wise, this program is pretty similar to the previous one, with the same
 
 As we close down this really dense chapter, just take some deep breaths and a few moments to let all that sink in. Seriously, that's a lot of information for anyone to consume! It's entirely reasonable if your head is kind of spinning right now.
 
-This chapter presents two models for mentally tackling closure:
+We explored two models for mentally tackling closure:
 
 * Observational: closure is a function instance remembering its outer variables even as that function is passed around and **invoked in** other scopes.
 
 * Implementational: closure is a function instance and its scope environment being preserved in-place while any references to it are passed around and **invoked from** other scopes.
 
-Summarizing the benefits of closure:
+Summarizing the benefits to our programs:
 
 * Closure can improve efficiency by allowing a function instance to remember previously determined information instead of having to compute it each time.
 
 * Closure can improve code readability, bounding scope-exposure by encapsulating variable(s) inside function instances, while still making sure the information in those variables is accessible for future use. The resultant narrower, more specialized function instances are cleaner to interact with, since the preserved information doesn't need to be passed in every invocation.
 
-Before you move on, take some time to restate this summary *in your own words*, explaining what closure is and why it's helpful in your programs. When you're ready, the main book text concludes with a final chapter exploring the module pattern.
+Before you move on, take some time to restate this summary *in your own words*, explaining what closure is and why it's helpful in your programs. When you're ready, the main book text concludes with a final chapter that builds on top of closure with the module pattern.
