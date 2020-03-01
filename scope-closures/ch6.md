@@ -1,10 +1,6 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
 # Chapter 6: Limiting Scope Exposure
 
-| NOTE: |
-| :--- |
-| Work in progress |
-
 So far our focus has been on explaining the mechanics of how scopes and variables work. With that foundation firmly in place, our attention now rises to a higher level of thinking: the decisions and patterns we apply across the whole program.
 
 To begin, we're going to look at how and why we should be using different levels of scope (functions and blocks) to organize our program's variables, specifically to reduce scope over-exposure.

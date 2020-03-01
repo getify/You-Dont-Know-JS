@@ -1,10 +1,6 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
 # Chapter 7: Using Closures
 
-| NOTE: |
-| :--- |
-| Work in progress |
-
 Up to this point, we've focused on the ins and outs of lexical scope, and how that affects the organization and usage of variables in our programs.
 
 Our attention again shifts broader in abstraction, to the historically somewhat daunting topic of closure. Don't worry! You don't need an advanced Computer Science degree to make sense of it. Our broad goal in this book is not merely to understand scope, but to more effectively use it in the structure of our programs; closure is central to that effort.
