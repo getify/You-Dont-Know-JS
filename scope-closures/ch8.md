@@ -1,29 +1,27 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
 # Chapter 8: The Module Pattern
 
-| NOTE: |
-| :--- |
-| Work in progress |
+In this chapter, we wrap up the main text of the book by exploring one of the most important code organization patterns in all of programming: the module. As we'll see, modules are inherently built from what we've already covered: the payoff for your efforts in learning lexical scope and closure.
 
-We've examined every angle of lexical scope, from the breadth of the global scope down through nested block scopes, into the intricasies of the variable lifecycle. Then we leveraged lexical scope to understand the power of closure. Throughout all the discussion so far, the underlying thread has been that understanding and mastering scope and closure is central to properly structuring and organizing our code, especially where we store information in variables.
+We've examined every angle of lexical scope, from the breadth of the global scope down through nested block scopes, into the intricasies of the variable lifecycle. Then we leveraged lexical scope to understand the full power of closure.
 
 Take a moment to reflect on how far you've come in this journey so far; you've taken big steps in getting to know JS more deeply!
 
-In this chapter, we wrap up the main text of the book by exploring one of the most important code organization patterns in all of programming: the module. As we'll see, modules are inherently built from what we've already covered. Modules are the payoff for your efforts in learning lexical scope and closure.
+The central theme of this book has been that understanding and mastering scope and closure is key in properly structuring and organizing our code, especially the decisions on where to store information in variables.
 
-To whatever extent these topics may still feel a bit abstract or mostly academic, our goal here is to appreciate where modules elevate our thinking to concrete, practical impact on how we write programs.
+Our goal in this final chapter is to appreciate how modules embody the importance of these topics, elevating from abstract concepts to concrete, practical improvements in building programs.
 
-## Encapsulation and POLE
+## Encapsulation and Least Exposure (POLE)
 
 Encapsulation is often cited as a principle of object-oriented (OO) programming, but it's more fundamental and broadly applicable than that. The goal of encapsulation is the bundling or co-location of information (data) and behavior (functions) that together serve a common purpose.
 
-Independent of any syntax or code mechanisms, the spirit of encapsulation can be realized in something as simple as organizing bits of the program with common purpose into specific files. If we bundle everything that powers a list of search results into a single file called "search-list.js", we're encapsulating that part of the program.
+Independent of any syntax or code mechanisms, the spirit of encapsulation can be realized in something as simple as organizing bits of the program with common purpose, into separate files. If we bundle everything that powers a list of search results into a single file called "search-list.js", we're encapsulating that part of the program.
 
-A modern trend in front-end programming to organize applications around Component architecture pushes encapsulation even further. It feels natural to consolidate everything that constitutes the search results list -- even beyond code, to include presentational markup and styling -- into a single unit of program logic, something tangible we can interact with. So we label that collection the "SearchList" component.
+The recent trend in modern front-end programming to organize applications around Component architecture pushes encapsulation even further. For many, it feels natural to consolidate everything that constitutes the search results list -- even beyond code, including presentational markup and styling -- into a single unit of program logic, something tangible we can interact with. And then we label that collection the "SearchList" component.
 
-Another key goal is the control of visibility of certain aspects of the encapsulated data and functionality. Recall the POLE principle from Chapter 6, which seeks to defensively guard against various *dangers* of over-exposure; these apply not only to variables but also functions. In JS, we most often accomplish visibility control through the mechanics of lexical scope.
+Another key goal is the control of visibility of certain aspects of the encapsulated data and functionality. Recall the *least privilege* principle (POLE) from Chapter 6, which seeks to defensively guard against various *dangers* of scope over-exposure; these affect both variables and functions. In JS, we most often implement visibility control through the mechanics of lexical scope.
 
-The idea is to group alike program bits together, and selectively limit programmatic access to certain parts which can reasonably be described as *private* details. What's not considered *private* is then by default *public*, accessible to the whole program.
+The idea is to group alike program bits together, and selectively limit programmatic access to certain parts which can reasonably be described as *private* details. What's not considered *private* is then set as *public*, accessible to the whole program.
 
 The natural effect of this effort is better code organization. It's easier to build and maintain software when we know where things are, with clear and obvious boundaries and connection points. It's also easier to maintain quality if we avoid the pitfalls of over-exposed data and functionality.
 
@@ -31,11 +29,19 @@ These are some of the main benefits of organizing JS programs into modules.
 
 ## What is a Module?
 
-A module is a collection of related data and functions (often referred to as methods in this context), characterized by a division between hidden *private* details and *public*, accessible details, usually called the "public API".
+A module is a collection of related data and functions (often referred to as methods in this context), characterized by a division between hidden *private* details and *public* accessible details, usually called the "public API".
 
-A modules should be stateful -- it needs to maintain some information -- otherwise, it's not really a module. If all you have is a collection of related functions, but no data, then you don't have encapsulation and thus you don't have a module.
+A module is also stateful: it maintains some information over time, along with functionality to access and update that information.
 
-The better term for a grouping of *stateless* functions is a namespace:
+| NOTE: |
+| :--- |
+| A broader concern of the module pattern is fully embracing system-level modularization through loose-coupling and other program architecture techniques. That's a complex topic well beyond the bounds of our discussion, but is worth further study beyond this book. |
+
+To get a better sense of what a module is, let's compare some module characteristics to useful code patterns that aren't quite modules.
+
+### Namespaces (Stateless Grouping)
+
+If you group a set of related functions together, without data, then you don't really have the expected encapsulation of a module. The better term for this grouping of *stateless* functions is a namespace:
 
 ```js
 // namespace, not module
@@ -58,11 +64,14 @@ var Utils = {
 
 `Utils` here is a useful collection of utilities, yet they're all state-independent functions. Gathering functionality together is generally good pratice, but that doesn't make this a module. Rather, we've defined a `Utils` namespace and organized the functions under it.
 
-Further, even if you have data and stateful functions bundled together, if you're not limiting the visibility of any of it, then it's falling short of the POLE aspect of encapsulation and is probably not useful to label as a module.
+### Data Structures (Stateful Grouping)
+
+Even if you bundle data and stateful functions together, if you're not limiting the visibility of any parts, then you're stopping short of the POLE aspect of encapsulation; it's probably not helpful to label that a module.
 
 Consider:
 
 ```js
+// data structure, not module
 var Student = {
     records: [
         { id: 14, name: "Kyle", grade: 86 },
@@ -82,15 +91,15 @@ Student.getName(73);
 // Suzy
 ```
 
-Since `records` is publicly accessible data, not hidden behind a public API, `Student` here isn't really a module. What is it? `Student` does have the data-plus-functionality aspect of encapsulation, but not the visibility-control aspect; it's just an instance of a general data structure.
+Since `records` is publicly accessible data, not hidden behind a public API, `Student` here isn't really a module.
 
-| NOTE: |
-| :--- |
-| A broader concern of the module pattern is fully embracing system modularization through loose-coupling and other program architecture concerns. That's a complex topic well beyond the bounds of our discussion, but is worth further study beyond this book. |
+`Student` does have the data-and-functionality aspect of encapsulation, but not the visibility-control aspect. It's best to label this an instance of a data structure.
 
-### Classic Modules
+### Modules (Stateful Access Control)
 
-Let's turn `Student` into a module. We'll start with what's called the "classic module pattern", which also was referred to as the "revealing module pattern" when it first emerged in the early 2000's.
+To embody the full spirit of the module pattern, we not only need grouping and state, but also access control through visibility (private vs. public).
+
+Let's turn `Student` from the previous section into a module. We'll start with a form called the "classic module", which also was referred to as the "revealing module" when it first emerged in the early 2000's.
 
 Consider:
 
@@ -133,9 +142,9 @@ Student.getName(73);
 
 How does the classic module format work?
 
-Notice that the instance of the module is created by the `defineStudent()` IIFE being executed. This IIFE returns the object (named `publicAPI`) which has a property on it referencing the inner `getName(..)` function.
+Notice that the instance of the module is created by the `defineStudent()` IIFE being executed. This IIFE returns an object (named `publicAPI`) that has a property on it referencing the inner `getName(..)` function.
 
-The naming of the object as `publicAPI` is stylistic preference on my part. The object can be named whatever you like (JS doesn't care), or you can just return an object directly without assigning it to any internal named variable. More on this choice in Appendix A.
+Naming the object `publicAPI` is stylistic preference on my part. The object can be named whatever you like (JS doesn't care), or you can just return an object directly without assigning it to any internal named variable. More on this choice in Appendix A.
 
 From the outside, `Student.getName(..)` invokes this exposed inner function, which maintains access to the inner `records` variable via closure.
 
@@ -144,6 +153,8 @@ You don't *have* to return an object with a function as one of its properties. Y
 By virtue of how lexical scope works, defining variables and functions inside your outer module definition function makes everything *by default* private. Only properties added to the public API object returned from the function will be exported for external use.
 
 The use of an IIFE implies that our module only ever needs a single central instance, which is commonly referred to as a "singleton". Indeed, this specific example is simple enough that there's no obvious reason we'd need anything more than just one instance of the `Student` module.
+
+#### Module Factory (Multiple Instances)
 
 But if we did want to define a module that supported multiple instances in our program, we can slightly tweak the code:
 
@@ -182,6 +193,8 @@ fullTime.getName(73);
 Rather than specifying `defineStudent()` as an IIFE, we just define it as a normal standalone function, which is commonly referred to in this pattern as a "module factory" function.
 
 We then call the module factory, producing an instance of the module that we name `fullTime`. `fullTime.getName(..)` can now invoke the method on that specific instance.
+
+#### Classic Module Definition
 
 So to clarify what makes something a classic module:
 
@@ -381,8 +394,8 @@ As is likely obvious, the `*` imports everything exported to the API, default an
 
 Whether you use the classic module format (browser or Node), CommonJS format (in Node), or ESM format (browser or Node), one of the most effective ways to structure and organize your program's functionality and data is with the module pattern.
 
-The module pattern is the conclusion of our journey in this book of learning how we can use the rules of lexical scope to place variables and functions in proper locations. POLE is the defensive *private by default* posture we take to making sure that we avoid over-exposure and interact only with the minimal public API surface area necessary.
+The module pattern is the conclusion of our journey in this book of learning how we can use the rules of lexical scope to place variables and functions in proper locations. POLE is the defensive *private by default* posture we take, making sure we avoid over-exposure and interact only with the minimal public API surface area necessary.
 
-And underlying modules, the *magic* of how all our module state is maintained is closures leveraging the lexical scope system.
+And underneath modules, the *magic* of how all our module state is maintained is closures leveraging the lexical scope system.
 
-That's it for the main text. Congratulations on quite a journey so far! As I've said numerous times throughout, it's time to pause, reflect, and practice what we've just discussed. When you're comfortable and ready, check out the appendices, which dig deeper into some of the corners of these topics, and also give some practice exercises to solidify what you've learned.
+That's it for the main text. Congratulations on quite a journey so far! As I've said numerous times throughout, it's a really good idea to pause, reflect, and practice what we've just discussed. When you're comfortable and ready, check out the appendices, which dig deeper into some of the corners of these topics, and also challenge you with some practice exercises to solidify what you've learned.

@@ -50,7 +50,7 @@
     * An Alternate Perspective
     * Closer to Closure
 * Chapter 8: The Module Pattern
-    * Encapsulation and POLE
+    * Encapsulation and Least Exposure (POLE)
     * What is a Module?
     * Node CommonJS Modules
     * Modern ES Modules (ESM)
