@@ -15,7 +15,10 @@ These discussions will also be more heavily influenced by my opinions than the m
 
 ## Implied Scopes
 
-Scopes are sometimes created in non-obvious places. In practice, these implied scopes don't often impact your program behavior, but it's still useful to know they're happening.
+Scopes are sometimes created in non-obvious places. In practice, these implied scopes don't often impact your program behavior, but it's still useful to know they're happening. Keep an eye out for the following surprising scopes:
+
+* Parameter scope
+* Function name scope
 
 ### Parameter Scope
 
@@ -162,9 +165,19 @@ You'll rarely run into any case where the scope of a function's name identifier 
 
 As discussed in Chapter 3, functions can be expressed either in named or anonymous form. It's vastly more common to use the anonymous form, but is that a good idea?
 
+As you contemplate naming your functions, some highlights to consider:
+
+* Name inference is incomplete
+* Lexical names allow self-reference
+* Names are useful descriptions
+* Arrow function have no lexical names
+* IIFEs also need names
+
+### Explicit or Inferred Names?
+
 Every function in your program has a purpose. If it doesn't have a purpose, take it out, because you're just wasting space. If it *does* have a purpose, there *is* a name or descriptor of that purpose.
 
-So far most seem to agree with me. But does that mean we should always put that name into the code? I would say, unequivocally, yes.
+So far many readers likely agree with me. But does that mean we should always put that name into the code? Here's where I'll raise more than a few eyebrows. I would say, unequivocally: yes!
 
 First of all, "anonymous" showing up in stack traces is just not all that helpful to debugging:
 
@@ -255,7 +268,7 @@ config.cb.name;
 
 These are referred to as *inferred* names. Inferred names are fine, but they don't really address the full concerns I have.
 
-### So... What Else?
+### Missing Names?
 
 Yes, these inferred names might show up in stack traces, which is definitely better than "anonymous" showing up. But...
 
@@ -310,6 +323,8 @@ btn.addEventListener("click",function(){
 ```
 
 Leaving off the lexical name from your callback makes it harder to reliably self-reference the function. You *could* declare a variable in an enclosing scope that references the function, but this variable is *controlled* by that enclosing scope -- it could be re-assigned, etc -- so it's not as reliable as the function having its own internal self-reference.
+
+### Names are Descriptors
 
 Lastly, and I think most importantly of all, leaving off a name from a function makes it harder for the reader to tell what the function's purpose is, at a quick glance. They have to read more of the code, including the code inside the function, and the surrounding code outside the function, to figure it out.
 
@@ -427,7 +442,14 @@ However you define your IIFEs, give them some love by giving them names.
 
 Chapter 5 identified both *function hoisting* and *variable hoisting*. Since hoisting is often cited as mistake in the design of JS, I wanted to briefly explore why both these forms of hoisting *can* be beneficial and should still be considered.
 
-First, *function hoisting*. To review, this program works because of *function hoisting*:
+Give hoisting a deeper level of consideration by considering the merits of:
+
+* Executable code first, function declarations last
+* Semantic placement of variable declarations
+
+### Function Hoisting
+
+To review, this program works because of *function hoisting*:
 
 ```js
 getStudents();
@@ -469,7 +491,9 @@ When I first open a file like that, the very first line is executable code that 
 
 In other words, I think *function hoisting* makes code more readable by making the reading of code more flowing and progressive, from top to bottom.
 
-What about *variable hoisting*? Remember, this only applies to `var` declarations, not `let` or `const`.
+### Variable Hoisting
+
+What about *variable hoisting*? Even though `let` and `const` hoist, you cannot use those variables in their TDZ (see Chapter 5). So, the following discussion only applies to `var` declarations.
 
 Before I continue, I'll just admit: in almost all cases, I completely agree that *variable hoisting* is a bad idea:
 
@@ -565,13 +589,22 @@ That's literally the only case I've ever found for leveraging *variable hoisting
 
 Speaking of *variable hoisting*, let's have some real talk for a bit about `var`, a favorite villain devs like to blame for many of the woes of JS development. In Chapter 5, we explored `let` / `const` and promised we'd revisit where `var` falls in the whole mix.
 
+As I lay out the case, don't miss:
+
+* `var` was never broken
+* `let` is your friend
+* `const` has limited utility
+* The best of both worlds: `var` *and* `let`
+
+### Don't Throw Out `var`
+
 `var` is fine, and works just fine. It's been around for 25 years, and it'll be around and useful and functional for another 25 years or more. Claims that `var` is broken, deprecated, outdated, dangerous, or ill-designed are bogus bandwagoning.
 
 Does that mean `var` is the right declarator for every single declaration in your program? Certainly not. But it still has its place in your programs. Refusing to use it because someone on the team chose an aggressive linter opinion that chokes on `var` is cutting off your nose to spite your face.
 
 OK, now that I've got you really riled up, let me try to explain my assertions.
 
-First of all, I'm a fan of `let`, for block-scoped declarations. I really dislike TDZ and I think that was a mistake. But `let` is great. I use it often. In fact, I probably use it as much or more than I use `var`.
+For the record, I'm a fan of `let`, for block-scoped declarations. I really dislike TDZ and I think that was a mistake. But `let` is great. I use it often. In fact, I probably use it as much or more than I use `var`.
 
 ### `const`antly Confused
 
@@ -709,9 +742,17 @@ Don't just throw away a useful tool like `var` because someone shamed you into t
 
 The TDZ (temporal dead zone) was explained in Chapter 5. We illustrated how it occurs, but we skimmed over any explanation of *why* it was necessary to introduce in the first place. Let's look briefly at the origins of TDZ.
 
-It comes from `const`, actually.
+Some breadcrumbs in the TDZ origin story:
 
-First, TC39 had to decide whether `const` (and `let`) were going to hoist to the top of their blocks. They decided these declarations would hoist, similar to how `var` does. Had that not been the case, I think the fear was confusion with partial-scope shadowing, such as:
+* `const`s should never change
+* It's all about time
+* Should `let` behave more like `const` or `var`?
+
+### Where It All Started
+
+TDZ comes from `const`, actually.
+
+During early ES6 development work, TC39 had to decide whether `const` (and `let`) were going to hoist to the top of their blocks. They decided these declarations would hoist, similar to how `var` does. Had that not been the case, I think the fear was confusion with partial-scope shadowing, such as:
 
 ```js
 let greeting = "Hi!";
@@ -756,6 +797,8 @@ We call this period of time the "dead zone", aka the "temporal dead zone" (TDZ).
 
 OK, that line of reasoning does make some sense, I must admit.
 
+### Who `let` the TDZ?
+
 But that's just `const`. What about `let`?
 
 Well, TC39 made the decision, since we need a TDZ for `const`, we might as well have a TDZ for `let` as well. *In fact, if we make let have a TDZ, then we kill off all that ugly variable hoisting people do.* So there was a consistency perspective and, perhaps, a bit of social engineering to alter developers' behavior.
@@ -773,6 +816,13 @@ Chapter 7 presented two different models for wrapping your head around closure:
 * closure is a function instance and its scope environment being preserved in-place while any references to it are passed around and **invoked from** other scopes.
 
 These models are not wildly divergent, but they do approach from a different perspective. And that different perspective changes what we should call a closure or not.
+
+Don't get lost following this rabbit trail through closures and callbacks:
+
+* Calling back to what (or where)?
+* Maybe "synchronous callback" isn't the best label
+* ***IIF*** functions don't move around, why would they need closure?
+* Deferring over time is key to closure
 
 ### What is a Callback?
 
@@ -888,6 +938,8 @@ These two versions of `printLabels(..)` are essentially the same. The latter one
 
 The former version, with `forEach(..)` calling our function reference, is essentially the same thing. It's not closure, it's just a plain ol' lexical scope function call.
 
+### Defer To Closure
+
 By the way, Chapter 7 briefly mentioned partial application and currying (which *do* rely on closure!). This is a great example where manual currying can be used:
 
 ```js
@@ -912,6 +964,8 @@ function printLabels(labels) {
 
 The inner function `createLabel(..)` (aka, `renderLabel(..)`) is closed over `list`, so closure is definitely being utilized.
 
+Closure allows us to remember `list` for later, while we defer execution of the actual label-creation logic from the `renderTo(..)` call to the subsequent `forEach(..)` invocations of the `createLabel(..)` IIF. That may only be a brief moment here, but any amount of time could pass as closure bridges from call to call.
+
 ## Classic Module Variations
 
 Chapter 8 explained the classic module pattern, which can look like this:
@@ -931,6 +985,14 @@ var StudentList = (function defineModule(Student){
 ```
 
 Notice that we're passing `Student` (another module instance) in as a dependency.
+
+Some hints for recognizing common module variations:
+
+* Does the module know about its own API?
+* Even if we use a fancy module loader, it's just a classic module
+* Some modules need to work universally
+
+### Where's My API?
 
 There are several useful variations of this pattern to be aware of. Firstly, most classic modules don't define and use a `publicAPI` the way I have done in this code. Instead, they typically look like:
 
@@ -958,7 +1020,9 @@ I strongly prefer, and always use myself, the former `publicAPI` form. Two reaso
 
     Whatever the case may be, it just seems rather silly to me that we *wouldn't* maintain our own reference to our own API, right?
 
-Another variation on the classic module form is AMD-style modules (asynchronous module definition, popular several years ago), such as those supported by the RequireJS utility:
+### Asynchronous Module Defintion (AMD)
+
+Another variation on the classic module form is AMD-style modules (popular several years back), such as those supported by the RequireJS utility:
 
 ```js
 define(["./Student"],function StudentList(Student){
@@ -976,7 +1040,9 @@ If you look closely at `StudentList`, it's a classic module factory function. In
 
 This is based on exactly the same principles (including how the closure works!) as we saw with classic modules.
 
-The final variation we'll look at is UMD (universal module definition). UMD is less a specific, exact format and more a collection of very similar formats. It was designed to create better interop (without any tool conversion) for modules that may be loaded in browsers, by AMD-style loaders, or in Node. I personally still publish many of my utility libraries using a form of UMD.
+### Universal Modules (UMD)
+
+The final variation we'll look at is UMD, which is less a specific, exact format and more a collection of very similar formats. It was designed to create better interop (without any tool conversion) for modules that may be loaded in browsers, by AMD-style loaders, or in Node. I personally still publish many of my utility libraries using a form of UMD.
 
 Here's the typical structure of a UMD:
 
@@ -1021,6 +1087,6 @@ The final `()` that normally invokes an IIFE is being passed 3 arguments: `"Stud
 
 `definition(..)` is invoked to actually define our module, and you'll notice that, sure enough, that's just a classic module form. `name` and `context` are optionally used to help with the environment/loader registration of our module instance.
 
-There's no question that as of the time of this writing, ESM (ES Modules) are becoming popular and widespread rapidly. But with millions and millions of modules written over the last 20 years all using some pre-ESM variation of classic modules, they're still very important to be able to understand and read when you come across them.
+There's no question that as of the time of this writing, ESM (ES Modules) are becoming popular and widespread rapidly. But with millions and millions of modules written over the last 20 years all using some pre-ESM variation of classic modules, they're still very important to be able to read and understand when you come across them.
 
 [^fowlerIOC]: *Inversion of Control*, Martin Fowler, https://martinfowler.com/bliki/InversionOfControl.html, 26 June 2005.
