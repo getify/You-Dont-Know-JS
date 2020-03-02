@@ -1,11 +1,7 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
 # Appendix B: Practice
 
-| NOTE: |
-| :--- |
-| Work in progress |
-
-This appendix aims to give you a few interesting exercises to test and solidify your understanding of the main topics from this book. It's a good idea to try out the exercises yourself -- in an actual code editor! -- instead of skipping straight to the solutions at the end. No cheating!
+This appendix aims to give you a few interesting exercises to test and solidify your understanding of the main topics from this book. It's a good idea to try out the exercises yourself—in an actual code editor!—instead of skipping straight to the solutions at the end. No cheating!
 
 These exercises don't have a specific right answer that you have to get exactly. Your approach may differ some (or a lot!) from the solutions I present, and that's OK.
 
@@ -21,13 +17,13 @@ Remember Figure 2 from back in Chapter 2, the one with the colored bubbles/bucke
     <br><br>
 </figure>
 
-This exercise asks you to write a program -- any program! -- that contains nested functions and block scopes, which satisifies these constraints:
+This exercise asks you to write a program—any program!—that contains nested functions and block scopes, which satisifies these constraints:
 
-* If you color all the scopes (including the global scope!) different colors, you need at least 6 colors. Make sure to add a code comment labeling each scope with its color.
+* If you color all the scopes (including the global scope!) different colors, you need at least six colors. Make sure to add a code comment labeling each scope with its color.
 
     BONUS: identify any implied scopes your code may have.
 
-* Each scope has at least 1 identifier.
+* Each scope has at least one identifier.
 
 * Contains at least two function scopes and at least two block scopes.
 
@@ -37,9 +33,9 @@ This exercise asks you to write a program -- any program! -- that contains neste
 
 | TIP: |
 | :--- |
-| You *can* just write junk foo/bar/baz type code for this exercise, but I suggest you try to come up with some sort of non-trivial code that at least does something kind of reasonable. |
+| You *can* just write junk foo/bar/baz-type code for this exercise, but I suggest you try to come up with some sort of non-trivial code that at least does something kind of reasonable. |
 
-Try out the exercise for yourself, then check out the suggested solution at the end of this appendix.
+Try the exercise for yourself, then check out the suggested solution at the end of this appendix.
 
 ## Closure (PART 1)
 
@@ -107,27 +103,27 @@ If you look at `factorize(..)`, it's implemented with recursion, meaning it call
 
 Use separate closures for caching of `isPrime(..)` and `factorize(..)`, rather than putting them inside a single scope.
 
-Try out the exercise for yourself, then check out the suggested solution at the end of this appendix.
+Try the exercise for yourself, then check out the suggested solution at the end of this appendix.
 
 ### A Word About Memory
 
 I want to share a little quick note about this closure cache technique and the impacts it has on your application's performance.
 
-We can see that in saving the repeated calls, we improve computation speed, in some cases by a dramatic amount. But this usage of closure is making an explicit tradeoff that you should be very aware of.
+We can see that in saving the repeated calls, we improve computation speed (in some cases, by a dramatic amount). But this usage of closure is making an explicit trade-off that you should be very aware of.
 
-The tradeoff is memory. We're essentially growing our cache (in memory) unboundedly. If the functions in question were called many millions of times with unique inputs, we'd be chewing up a lot of memory. This can definitely be worth the expense, but only if we think it's likely to see the repetition of common inputs so that we're often taking advantage of the cache.
+The trade-off is memory. We're essentially growing our cache (in memory) unboundedly. If the functions in question were called many millions of times with unique inputs, we'd be chewing up a lot of memory. This can definitely be worth the expense, but only if we think it's likely to see the repetition of common inputs so that we're often taking advantage of the cache.
 
 If every single call will have a unique input, and the cache is essentially never *used* to any benefit, this is an inappropriate technique that wastes memory.
 
 It also might be a good idea to have a more sophisticated caching approach, such as an LRU (least recently used) cache, that limits its size; as it runs up to the limit, an LRU evicts the values that are... well, least recently used!
 
-The downside here is that LRU is quite non-trivial in its own right. You'll want to use a highly optimized implementation of LRU, and be keenly aware of all the tradeoffs at play.
+The downside here is that LRU is quite non-trivial in its own right. You'll want to use a highly optimized implementation of LRU, and be keenly aware of all the trade-offs at play.
 
 ## Closure (PART 2)
 
 In this exercise, we're going to again practive closure by defining a `toggle(..)` utility that gives us a value toggler.
 
-You will pass one or more values (as arguments) into `toggle(..)`, and get back a function. That returned function will alternate/rotate between all the passed in values in order, one at a time, as it's called repeatedly.
+You will pass one or more values (as arguments) into `toggle(..)`, and get back a function. That returned function will alternate/rotate between all the passed-in values in order, one at a time, as it's called repeatedly.
 
 ```js
 function toggle(/* .. */) {
@@ -151,7 +147,7 @@ speed();      // "slow"
 
 The corner case of passing in no values to `toggle(..)` is not important; such a toggler instance can just always return `undefined`.
 
-Try out the exercise for yourself, then check out the suggested solution at the end of this appendix.
+Try the exercise for yourself, then check out the suggested solution at the end of this appendix.
 
 ## Closure (PART 3)
 
@@ -271,7 +267,7 @@ Don't worry too much about how `formatTotal(..)` works. Most of its logic is a b
 
 Again, don't get too mired in the mud around the calculator behavior. Focus on the *memory* of closure.
 
-Try out the exercise for yourself, then check out the suggested solution at the end of this appendix.
+Try the exercise for yourself, then check out the suggested solution at the end of this appendix.
 
 ## Modules
 
@@ -343,7 +339,7 @@ useCalc(calc,"+3=");            // +3=ERR
 useCalc(calc,"51=");            // 51
 ```
 
-Try out the exercise for yourself, then check out the suggested solution at the end of this appendix.
+Try the exercise for yourself, then check out the suggested solution at the end of this appendix.
 
 As you work on this exercise, also spend some time considering the pros/cons of representing the calculator as a module as opposed to the closure-function approach from the previous exercise.
 
@@ -355,7 +351,7 @@ BONUS #2: try converting your module to other module formats, including: UMD, Co
 
 Hopefully you've tried out the exercises before you're reading this part. No cheating!
 
-Remember, these suggested solutions are just a few of a whole bunch of different ways to approach the problems. They're not "the right answer", but they are intended to be illustrative of a reasonable way to approach each exercise.
+Remember, these suggested solutions are just a few of a whole bunch of different ways to approach the problems. They're not "the right answer," but they are intended to be illustrative of a reasonable way to approach each exercise.
 
 The most important benefit you can get from reading these suggested solutions is to compare them to your code and analyze why we each made similar or different choices. Don't get into too much bikeshedding; try to stay focused on the main topic rather than the small details.
 
@@ -459,11 +455,11 @@ var factorize = (function factorize(v){
 
 The general approach I used here for each utility was:
 
-1. wrap an IIFE to define the scope for the cache variable to reside
+1. Wrap an IIFE to define the scope for the cache variable to reside.
 
-2. on each underlying call, first check the cache and if present, return
+2. On each underlying call, first check the cache and if present, return.
 
-3. at each place where a `return` was happening originally, assign to the cache and just return the results of that assignment operation -- this is a space savings trick mostly just for brevity in the book.
+3. At each place where a `return` was happening originally, assign to the cache and just return the results of that assignment operation—this is a space savings trick mostly just for brevity in the book.
 
 I also renamed the inner function from `factorize(..)` to `findFactors(..)`. That's not technically necessary, but it helps it make clearer which function the recursive calls are.
 
