@@ -1,13 +1,13 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
 # Appendix A: Exploring Further
 
-We will now explore a number of nuances and edges around many of the topics covered in the main text of this book. This is optional, supporting material.
+We will now explore a number of nuances and edges around many of the topics covered in the main text of this book. This appendix is optional, supporting material.
 
-Some people find diving too deeply into the rare corner cases creates nothing but noise and distraction, and that developers are better served by sticking to the well-tread surfaces. My approach has been criticized as being impractical and counterproductive. I understand and appreciate that perspective, even if I don't necessarily share it.
+Some people find diving too deeply into the nuanced corner cases and varying opinions creates nothing but noise and distraction—supposedly, developers are better served by sticking to the commonly-tread paths. My approach has been criticized as being impractical and counterproductive. I understand and appreciate that perspective, even if I don't necessarily share it.
 
 I believe it's better to be empowered by knowledge of how things work than to just gloss over details with assumptions and lack of curiosity. Ultimately, you will encounter situations where something bubbles up from a piece you hadn't explored. In other words, you won't get to spend all your time riding on the smooth *happy path*. Wouldn't you rather be prepared for the inevitable bumps of off-roading?
 
-These discussions will also be more heavily influenced by my opinions than the main text was, so keep that in mind as you consume and consider what is presented. This appendix is a bit like a collection of mini-blog posts that expound on various book topics. It's long and way in the weeds, so take your time and don't rush through everything here.
+These discussions will also be more heavily influenced by my opinions than the main text was, so keep that in mind as you consume and consider what is presented. This appendix is a bit like a collection of mini-blog posts that elaborate on various book topics. It's long and deep in the weeds, so take your time and don't rush through everything here.
 
 ## Implied Scopes
 
@@ -32,7 +32,7 @@ function getStudentName(studentID) {
 }
 ```
 
-Here, `studentID` is a considered a "simple" parameter, so it does behave essentially as if it's in the BLUE(2) function scope. But if we change it to be a non-simple parameter, that's no longer technically the case. Parameter forms considered non-simple include parameters with default values, rest parameters (using `...`), and destructured parameters.
+Here, `studentID` is a considered a "simple" parameter, so it does behave as a member of the BLUE(2) function scope. But if we change it to be a non-simple parameter, that's no longer technically the case. Parameter forms considered non-simple include parameters with default values, rest parameters (using `...`), and destructured parameters.
 
 Consider:
 
@@ -46,9 +46,9 @@ function getStudentName(/* BLUE(2) */ studentID = 0) {
 }
 ```
 
-Here, the parameter list essentially becomes its own scope, and the function's main scope is then nested inside *that* scope.
+Here, the parameter list essentially becomes its own scope, and the function's scope is then nested inside *that* scope.
 
-Why? And what difference does it make? The non-simple parameter forms introduce various corner cases, so the parameter list becomes its own scope to more effectively deal with them.
+Why? What difference does it make? The non-simple parameter forms introduce various corner cases, so the parameter list becomes its own scope to more effectively deal with them.
 
 Consider:
 
@@ -90,7 +90,7 @@ whatsTheDealHere(3);
 // 3
 ```
 
-Uh oh! The `var id = 5` is shadowing the `id` parameter, and the closure of the `defaultID()` function is over the parameter, not the function variable. This proves that there's a scope bubble around the parameter list.
+Uh oh! The `var id = 5` is shadowing the `id` parameter, but the closure of the `defaultID()` function is over the parameter, not the shadowing variable in the function body. This proves there's a scope bubble around the parameter list.
 
 But it gets even crazier than that!
 
@@ -109,7 +109,7 @@ function whatsTheDealHere(id,defaultID = () => id) {
 }
 
 whatsTheDealHere(3);
-// local variable 'id': 3
+// local variable 'id': 3   <--- Huh!? Weird!
 // parameter 'id' (via closure): 3
 // reassigning 'id' to 5
 // local variable 'id': 5
@@ -155,7 +155,7 @@ var askQuestion = function ofTheTeacher(){
 
 The `let` declaration form does not allow re-declaration (see Chapter 5). But this is perfectly legal shadowing, not re-declaration, because the two `ofTheTeacher` identifiers are in separate scopes.
 
-You'll rarely run into any case where the scope of a function's name identifier matters. But again, it's good to know how these mechanisms actually work. To avoid being bitten, don't shadow function name identifiers.
+You'll rarely run into any case where the scope of a function's name identifier matters. But again, it's good to know how these mechanisms actually work. To avoid being bitten, never shadow function name identifiers.
 
 ## Anonymous vs. Named Functions
 
@@ -166,14 +166,14 @@ As you contemplate naming your functions, some highlights to consider:
 * Name inference is incomplete
 * Lexical names allow self-reference
 * Names are useful descriptions
-* Arrow function have no lexical names
+* Arrow functions have no lexical names
 * IIFEs also need names
 
 ### Explicit or Inferred Names?
 
 Every function in your program has a purpose. If it doesn't have a purpose, take it out, because you're just wasting space. If it *does* have a purpose, there *is* a name or descriptor of that purpose.
 
-So far many readers likely agree with me. But does that mean we should always put that name into the code? Here's where I'll raise more than a few eyebrows. I would say, unequivocally: yes!
+So far many readers likely agree with me. But does that mean we should always put that name into the code? Here's where I'll raise more than a few eyebrows. I say, unequivocally, yes!
 
 First of all, "anonymous" showing up in stack traces is just not all that helpful to debugging:
 
@@ -213,7 +213,7 @@ See how `waitAMoment` and `allUpper` names appear and give the stack trace more 
 
 | NOTE: |
 | :--- |
-| The unfortunate "anonymous" that still shows up there refers to the fact that `Array.map(..)` isn't present in our file, but is built into the JS engine. It's not from any confusion our program introduces by taking readability shortcuts. |
+| The unfortunate "&lt;anonymous>" that still shows up refers to the fact that the implementation of `Array.map(..)` isn't present in our program, but is built into the JS engine. It's not from any confusion our program introduces with readability shortcuts. |
 
 By the way, let's make sure we're on the same page about what a named function is:
 
@@ -226,7 +226,7 @@ ajax("some.url",function thisIsAlsoNamed(){
    // ..
 });
 
-var notAName = function(){
+var notNamed = function(){
     // ..
 };
 
@@ -237,7 +237,7 @@ makeRequest({
     }
 });
 
-var stillNotAName = function butThisIs(){
+var stillNotNamed = function butThisIs(){
     // ..
 };
 ```
@@ -245,7 +245,7 @@ var stillNotAName = function butThisIs(){
 "But wait!", you say. Some of those *are* named, right!?
 
 ```js
-var notAName = function(){
+var notNamed = function(){
     // ..
 };
 
@@ -255,14 +255,14 @@ var config = {
     }
 };
 
-notAName.name;
-// notAName
+notNamed.name;
+// notNamed
 
 config.cb.name;
 // cb
 ```
 
-These are referred to as *inferred* names. Inferred names are fine, but they don't really address the full concerns I have.
+These are referred to as *inferred* names. Inferred names are fine, but they don't really address the full concern I'm discussing.
 
 ### Missing Names?
 
@@ -279,9 +279,9 @@ ajax("some.url",function(){
 // ""
 ```
 
-Oops. Anonymous `function` expressions passed as callbacks are incapable of receiving an inferred name. The vast majority of all `function` expressions, especially anonymous ones, are used as callback arguments. None of these get a name.
+Oops. Anonymous `function` expressions passed as callbacks are incapable of receiving an inferred name, so `cb.name` value holds just the empty string `""`. The vast majority of all `function` expressions, especially anonymous ones, are used as callback arguments; none of these get a name. So relying on name inference is incomplete, at best.
 
-That's not all:
+And it's not just callbacks that fall short on inference:
 
 ```js
 var config = {};
@@ -298,9 +298,13 @@ noName.name
 // ""
 ```
 
-Any assignment of a `function` expression that's not a *simple assignment* will also skip name inferencing. So, in other words, unless you're careful and intentional about it, essentially almost all anonymous `function` expressions in your program will in fact have no name at all.
+Any assignment of a `function` expression that's not a *simple assignment* will also fail name inferencing. So, in other words, unless you're careful and intentional about it, essentially almost all anonymous `function` expressions in your program will in fact have no name at all.
+
+Name inference is just... not enough.
 
 And even if a `function` expression *does* get an inferred name, that still doesn't count as being a full named function.
+
+### Who am I?
 
 Without a lexical name identifier, the function has no internal way to refer to itself. Self-reference is important for things like recursion and event handling:
 
@@ -320,8 +324,6 @@ btn.addEventListener("click",function(){
 
 Leaving off the lexical name from your callback makes it harder to reliably self-reference the function. You *could* declare a variable in an enclosing scope that references the function, but this variable is *controlled* by that enclosing scope—it could be re-assigned, etc.—so it's not as reliable as the function having its own internal self-reference.
 
-### Names Are Descriptors
-
 ### Names are Descriptors
 
 Lastly, and I think most importantly of all, leaving off a name from a function makes it harder for the reader to tell what the function's purpose is, at a quick glance. They have to read more of the code, including the code inside the function, and the surrounding code outside the function, to figure it out.
@@ -340,13 +342,13 @@ Consider:
 // [ 1, 3, 5 ]
 ```
 
-There's just no reasonable argument to be made that **omitting** the name `keepOnlyOdds` from the first callback more effectively communicates to the reader the purpose of this callback. You saved 13 characters. But we lost important information. The name `keepOnlyOdds` very clearly tells the reader, at a quick first glance, what's happening.
+There's just no reasonable argument to be made that **omitting** the name `keepOnlyOdds` from the first callback more effectively communicates to the reader the purpose of this callback. You saved 13 characters, but lost important readability information. The name `keepOnlyOdds` very clearly tells the reader, at a quick first glance, what's happening.
 
 The JS engine doesn't care about the name. But human readers of your code absolutely do.
 
 Can the reader look at `v % 2 == 1` and figure out what it's doing? Sure. But they have to infer the purpose (and name) by mentally executing the code. Even a brief pause to do so slows down reading of the code. A good descriptive name makes this process almost effortless and instant.
 
-Think of it this way: how many times does the author of this code need to figure out the purpose of a function before adding the name to the code? About once. Maybe two or three times if they need to adjust the name. But how many times will readers of this code have to figure out the name/purpose? Every single time this line is ever read. Hundreds of times. Thousands. More?
+Think of it this way: how many times does the author of this code need to figure out the purpose of a function before adding the name to the code? About once. Maybe two or three times if they need to adjust the name. But how many times will readers of this code have to figure out the name/purpose? Every single time this line is ever read. Hundreds of times? Thousands? More?
 
 No matter the length or complexity of the function, my assertion is, the author should figure out a good descriptive name and add it to the code. Even the one-liner functions in `map(..)` and `then(..)` statements should be named:
 
@@ -360,7 +362,7 @@ lookupTheRecords(someData)
 
 The name `extractSalesRecords` tells the reader the purpose of this `then(..)` handler *better* than just inferring that purpose from mentally executing `return resp.allSales`.
 
-The only excuse for not including a name on a function is either laziness (don't want to type a few extra characters) or uncreativity (can't come up with a good name). If you can't figure out a good name, you don't understand the function and its purpose yet. The function is probably poorly designed, or it does too many things, and should be re-worked. Once you have a well-designed, single-purpose function, its proper name should become evident.
+The only excuse for not including a name on a function is either laziness (don't want to type a few extra characters) or uncreativity (can't come up with a good name). If you can't figure out a good name, you likely don't understand the function and its purpose yet. The function is perhaps poorly designed, or it does too many things, and should be re-worked. Once you have a well-designed, single-purpose function, its proper name should become evident.
 
 Here's a trick I use: while first writing a function, if I don't fully understand its purpose and can't think of a good name to use, I just use `TODO` as the name. That way, later when reviewing my code, I'm likely to find those name placeholders, and I'm more inclined (and more prepared!) to go back and figure out a better name, rather than just leave it as `TODO`.
 
@@ -374,13 +376,13 @@ Don't use them as a general replacement for regular functions. They're more conc
 
 Arrow functions have a purpose, but that purpose is not to save keystrokes. Arrow functions have *lexical this* behavior, which is somewhat beyond the bounds of our discussion in this book.
 
-Briefly: arrow functions don't define a `this` identifier keyword at all. If you use a `this` inside an arrow function, it behaves exactly as any other variable reference, which is that the scope chain is consulted to find a function scope (non-arrow function) where it is defined, and to use that one.
+Briefly: arrow functions don't define a `this` identifier keyword at all. If you use a `this` inside an arrow function, it behaves exactly as any other variable reference, which is that the scope chain is consulted to find a function scope (non-arrow function) where it *is* defined, and to use that one.
 
-In other words, arrow functions treat `this` like any lexical variable.
+In other words, arrow functions treat `this` like any other lexical variable.
 
-If you are in the habit of using hacks like `var self = this`, or if you like to call `.bind(this)` on inner `function` expressions, just to force them to inherit a `this` from an outer function like it was a lexical variable, then `=>` arrow functions are the better option. They're designed specifically to fix that problem.
+If you're used to hacks like `var self = this`, or if you prefer to call `.bind(this)` on inner `function` expressions, just to force them to inherit a `this` from an outer function like it was a lexical variable, then `=>` arrow functions are absolutely the better option. They're designed specifically to fix that problem.
 
-So, in the rare cases you need *lexical this*, use an arrow function. It's the best tool for that job. But just be aware that in doing so, you're accepting the downsides of an anonymous function. You should spend other efforts to mitigate the readability *cost*, such as descriptive variable names and code comments.
+So, in the rare cases you need *lexical this*, use an arrow function. It's the best tool for that job. But just be aware that in doing so, you're accepting the downsides of an anonymous function. You should expend additional effort to mitigate the readability *cost*, such as more descriptive variable names and code comments.
 
 ### IIFE Variations
 
@@ -396,7 +398,7 @@ All functions should have names. I said that a few times, right!? That includes 
 })();
 ```
 
-How do we come up with a name for an IIFE? Identify what the IIFE is there for. Why do you need a scope there? Are you hiding a cache variable for student records?
+How do we come up with a name for an IIFE? Identify what the IIFE is there for. Why do you need a scope in that spot? Are you hiding a cache variable for student records?
 
 ```js
 var getStudents = (function StoreStudentRecords(){
@@ -410,7 +412,7 @@ var getStudents = (function StoreStudentRecords(){
 
 I named the IIFE `StoreStudentRecords` because that's what it's doing: storing student records. Every IIFE should have a name. No exceptions.
 
-IIFEs are typically defined by placing `( .. )` around the `function` expression, as shown in those previous snippets. But that's not the only way to define an IIFE. Technically, the only reason we're using that first surrounding set of `( .. )` is just so the `function` keyword isn't in a position to be a `function` declaration. But there are other syntactic ways to do so:
+IIFEs are typically defined by placing `( .. )` around the `function` expression, as shown in those previous snippets. But that's not the only way to define an IIFE. Technically, the only reason we're using that first surrounding set of `( .. )` is just so the `function` keyword isn't in a position to qualify as a `function` declaration to the JS parser. But there are other syntactic ways to avoid being parsed as a declaration:
 
 ```js
 !function thisIsAnIIFE(){
@@ -420,9 +422,13 @@ IIFEs are typically defined by placing `( .. )` around the `function` expression
 +function soIsThisOne(){
     // ..
 }();
+
+~function andThisOneToo(){
+    // ..
+}();
 ```
 
-The `!`, `+`, and several other unary operators (operators with one operand) can all be placed in front of `function` to turn it into an expression. Then the final `()` call is valid, which makes it an IIFE.
+The `!`, `+`, `~`, and several other unary operators (operators with one operand) can all be placed in front of `function` to turn it into an expression. Then the final `()` call is valid, which makes it an IIFE.
 
 I actually kind of like using the `void` unary operator when defining a standalone IIFE:
 
@@ -432,7 +438,7 @@ void function yepItsAnIIFE() {
 }();
 ```
 
-I like `void` because it communicates at the beginning of the function that this IIFE won't be returning any value.
+The benefit of `void` is, it clearly communicates at the beginning of the function that this IIFE won't be returning any value.
 
 However you define your IIFEs, show them some love by giving them names.
 
@@ -461,9 +467,9 @@ function getStudents() {
 
 The `function` declaration is hoisted during compilation, which means that `getStudents` is an identifier declared for the entire scope. Additionally, the `getStudents` identifier is auto-initialized with the function reference, again at the beginning of the scope.
 
-Why is this useful? The reason I prefer to take advantage of *function hoisting* is that it puts the *executable* code in any scope at the top, and any further declarations (functions) below. This means it's easier to find the code that will run in any given area, rather than having to scroll and scroll, hoping to find the end of a scope/function somewhere.
+Why is this useful? The reason I prefer to take advantage of *function hoisting* is that it puts the *executable* code in any scope at the top, and any further declarations (functions) below. This means it's easier to find the code that will run in any given area, rather than having to scroll and scroll, hoping to find a trailing `}` marking the end of a scope/function somewhere.
 
-I take advantage of this positioning in all levels of scope:
+I take advantage of this inverse positioning in all levels of scope:
 
 ```js
 getStudents();
@@ -487,13 +493,15 @@ function getStudents() {
 
 When I first open a file like that, the very first line is executable code that kicks off its behavior. That's very easy to spot! Then, if I ever need to go find and inspect `getStudents()`, I like that its first line is also executable code. Only if I need to see the details of `doSomething()` do I go and find its definition down below.
 
-In other words, I think *function hoisting* makes code more readable by making the reading of code more flowing and progressive, from top to bottom.
+In other words, I think *function hoisting* makes code more readable through a flowing, progressive reading order, from top to bottom.
 
 ### Variable Hoisting
 
-What about *variable hoisting*? Even though `let` and `const` hoist, you cannot use those variables in their TDZ (see Chapter 5). So, the following discussion only applies to `var` declarations.
+What about *variable hoisting*?
 
-Before I continue, I'll just admit: in almost all cases, I completely agree that *variable hoisting* is a bad idea:
+Even though `let` and `const` hoist, you cannot use those variables in their TDZ (see Chapter 5). So, the following discussion only applies to `var` declarations.
+
+Before I continue, I'll admit: in almost all cases, I completely agree that *variable hoisting* is a bad idea:
 
 ```js
 pleaseDontDoThis = "bad idea";
@@ -503,11 +511,11 @@ pleaseDontDoThis = "bad idea";
 var pleaseDontDoThis;
 ```
 
-While that kind of inverted ordering was helpful for *function hoisting*, here I think it's usualy going to make code harder to understand.
+While that kind of inverted ordering was helpful for *function hoisting*, here I think it usually makes code harder to reason about.
 
-But there's one exception that I've found, somewhat rarely, in my own coding. It has to do with where I place my `var` declarations inside a module definition.
+But there's one exception that I've found, somewhat rarely, in my own coding. It has to do with where I place my `var` declarations inside a CommonJS module definition.
 
-Here's how I typically structure my CommonJS module definitions in Node:
+Here's how I typically structure my module definitions in Node:
 
 ```js
 // dependencies
@@ -540,7 +548,7 @@ function otherPrivateStuff() {
 }
 ```
 
-Notice how the `cache` and `otherData` variables are in the "private" section of the module layout? That's because I don't plan to expose them publicly. So I organize the module so they're located alongside the other implementation details of the module.
+Notice how the `cache` and `otherData` variables are in the "private" section of the module layout? That's because I don't plan to expose them publicly. So I organize the module so they're located alongside the other hidden implementation details of the module.
 
 But I've had a few rare cases where I needed the assignments of those values to happen *above*, before I declare the exported public API of the module. For instance:
 
@@ -551,11 +559,11 @@ var publicAPI = Object.assign(module.exports,{
     addStudents,
     // ..
 
-    refreshData: refreshData.bind(cache)
+    refreshData: refreshData.bind(null,cache)
 });
 ```
 
-I need the `cache` variable to have already been assigned a value, because that value is used in the initialization of the public API.
+I need the `cache` variable to have already been assigned a value, because that value is used in the initialization of the public API (the `.bind(..)` partial-application).
 
 Should I just move the `var cache = { .. }` up to the top, above this public API initialization? Well, perhaps. But now it's less obvious that `var cache` really is a *private* implementation detail.
 
@@ -570,7 +578,7 @@ var publicAPI = Object.assign(module.exports,{
     addStudents,
     // ..
 
-    refreshData: refreshData.bind(cache)
+    refreshData: refreshData.bind(null,cache)
 });
 
 // ********************************
@@ -579,22 +587,13 @@ var publicAPI = Object.assign(module.exports,{
 var cache /* = {}*/;
 ```
 
-See the *variable hoisting*? I've declared the `cache` down where it belongs, logically, but in this rare case I've used it up above, in the area where its initialization is needed earlier. I even left a hint at the value that's assigned to `cache` in a code comment.
+See the *variable hoisting*? I've declared the `cache` down where it belongs, logically, but in this rare case I've used it earlier up above, in the area where its initialization is needed. I even left a hint at the value that's assigned to `cache` in a code comment.
 
-That's literally the only case I've ever found for leveraging *variable hoisting*—specifically, for assigning to a variable earlier in a scope than its declaration. But I think it's a reasonable exception to employ with caution.
+That's literally the only case I've ever found for leveraging *variable hoisting* to assign a variable earlier in a scope than its declaration. But I think it's a reasonable exception to employ with caution.
 
 ## The Case for `var`
 
-Speaking of *variable hoisting*, let's have some real talk for a bit about `var`, a favorite villain devs like to blame for many of the woes of JS development. In Chapter 5, we explored `let`/`const` and promised we'd revisit where `var` falls in the whole mix.
-
-As I lay out the case, don't miss:
-
-* `var` was never broken
-* `let` is your friend
-* `const` has limited utility
-* The best of both worlds: `var` *and* `let`
-
-### Don't Throw Out `var`
+Speaking of *variable hoisting*, let's have some real talk for a bit about `var`, a favorite villain devs love to blame for many of the woes of JS development. In Chapter 5, we explored `let`/`const` and promised we'd revisit where `var` falls in the whole mix.
 
 As I lay out the case, don't miss:
 
@@ -609,9 +608,9 @@ As I lay out the case, don't miss:
 
 Does that mean `var` is the right declarator for every single declaration in your program? Certainly not. But it still has its place in your programs. Refusing to use it because someone on the team chose an aggressive linter opinion that chokes on `var` is cutting off your nose to spite your face.
 
-OK, now that I've got you really riled up, let me try to explain my assertions.
+OK, now that I've got you really riled up, let me try to explain my position.
 
-For the record, I'm a fan of `let`, for block-scoped declarations. I really dislike TDZ and I think that was a mistake. But `let` is great. I use it often. In fact, I probably use it as much or more than I use `var`.
+For the record, I'm a fan of `let`, for block-scoped declarations. I really dislike TDZ and I think that was a mistake. But `let` itself is great. I use it often. In fact, I probably use it as much or more than I use `var`.
 
 ### `const`antly Confused
 
@@ -631,29 +630,29 @@ Using a `const` with a mutable value (like an array or object) is asking for a f
 
 I just don't think we should set those traps. The only time I ever use `const` is when I'm assigning an already-immutable value (like `42` or `"Hello, friends!"`), and when it's clearly a "constant" in the sense of being a named placeholder for a literal value, for semantic purposes. That's what `const` is best used for. That's pretty rare in my code, though.
 
-If variable re-assignment were a big deal, then `const` would be more useful. But variable re-assignment just isn't that big of a deal. There's a long list of things that lead to bugs in programs, and "accidental re-assignment" is way, way down that list.
+If variable re-assignment were a big deal, then `const` would be more useful. But variable re-assignment just isn't that big of a deal in terms of causing bugs. There's a long list of things that lead to bugs in programs, but "accidental re-assignment" is way, way down that list.
 
-Combine that with the fact that `const` (and `let`) are supposed to be used in blocks, and blocks are supposed to be short, and you have a really small window of your code where a `const` declaration is legitimately helping you. A `const` on line 1 of your ten-line block only tells you something about the next nine lines. And the thing it tells you is already obvious by glancing down those nine lines: the variable is never on the left-hand side of an `=`; it's not re-assigned.
+Combine that with the fact that `const` (and `let`) are supposed to be used in blocks, and blocks are supposed to be short, and you have a really small area of your code where a `const` declaration is even applicable. A `const` on line 1 of your ten-line block only tells you something about the next nine lines. And the thing it tells you is already obvious by glancing down at those nine lines: the variable is never on the left-hand side of an `=`; it's not re-assigned.
 
-That's it, that's all `const` really does. Other than that, it's not very useful. Compared to the confusion of value vs. assignment immutability, `const` loses a lost of its luster.
+That's it, that's all `const` really does. Other than that, it's not very useful. Stacked up against to the significant confusion of value vs. assignment immutability, `const` loses a lot of its luster.
 
-A `let` (or `var`!) that's never re-assigned is behaviorally a "constant", even though it doesn't have the compiler guarantee.
+A `let` (or `var`!) that's never re-assigned is already behaviorally a "constant", even though it doesn't have the compiler guarantee. That's good enough in most cases.
 
 ### `var` *and* `let`
 
-In my mind, `const` is pretty rarely useful, so this is only two-horse race between `let` and `var`. But it's not really a race either, because there doesn't have to be just one winner. They both win... different races.
+In my mind, `const` is pretty rarely useful, so this is only two-horse race between `let` and `var`. But it's not really a race either, because there doesn't have to be just one winner. They can both win... different races.
 
-The fact is, you should be using both `var` and `let` in your programs. They are not interchangeable. You shouldn't use `var` where a `let` is called for, but you also shouldn't use `let` where a `var` is most appropriate.
+The fact is, you should be using both `var` and `let` in your programs. They are not interchangeable: you shouldn't use `var` where a `let` is called for, but you also shouldn't use `let` where a `var` is most appropriate.
 
 So where should we still use `var`? Under what circumstances is it a better choice than `let`?
 
-For one, I always use `var` in the top-level scope of any function, regardless of whether that's at the beginning, middle, or end of the function. I also `var` in the global scope, though I try to minimize usage of the global scope.
+For one, I always use `var` in the top-level scope of any function, regardless of whether that's at the beginning, middle, or end of the function. I also use `var` in the global scope, though I try to minimize usage of the global scope.
 
-Why use `var` for function scoping? Because that's exactly what `var` does. There literally is no better tool for the job of function scoping a declaration than a declarator who has, for 25 years, done exactly that.
+Why use `var` for function scoping? Because that's exactly what `var` does. There literally is no better tool for the job of function scoping a declaration than a declarator that has, for 25 years, done exactly that.
 
-You *could* use `let` in this top-level scope, but it's not the best tool for that job. I also find that if you use `let` everywhere, then you lose clarity on which declarations are designed to be localized and which ones are to be used throughout the function.
+You *could* use `let` in this top-level scope, but it's not the best tool for that job. I also find that if you use `let` everywhere, then it's less obvious which declarations are designed to be localized and which ones are intended to be used throughout the function.
 
-By contrast, I rarely ever use a `var` inside a block. That's what `let` is for. Use the best tool for the job. If you see a `let`, it tells you that you're dealing with a localized declaration. If you see `var`, it tells you that you're dealing with a function-wide declaration. Simple as that.
+By contrast, I rarely use a `var` inside a block. That's what `let` is for. Use the best tool for the job. If you see a `let`, it tells you that you're dealing with a localized declaration. If you see `var`, it tells you that you're dealing with a function-wide declaration. Simple as that.
 
 ```js
 function getStudents(data) {
@@ -673,7 +672,7 @@ function getStudents(data) {
 
 The `studentRecords` variable is intended for use across the whole function. `var` is the best declarator to tell the reader that. By contrast, `record` and `id` are intended for use only in the narrower scope of the loop iteration, so `let` is the best tool for that job.
 
-In addition to this *best tool* semantic argument, `var` has a few other characteristics that, in certain circumstances, make it more preferable.
+In addition to this *best tool* semantic argument, `var` has a few other characteristics that, in certain limited circumstances, make it more powerful.
 
 One example is when a loop is exclusively using a variable, but its conditional clause cannot see block-scoped declarations inside the iteration:
 
@@ -688,14 +687,14 @@ function commitAction() {
 
 Here, `result` is clearly only used inside the block, so we use `let`. But `done` is a bit different. It's only useful for the loop, but the `while` clause cannot see `let` declarations that appear inside the loop. So we compromise and use `var`, so that `done` is hoisted to the outer scope where it can be seen.
 
-The alternative—declaring `done` outside the loop—separates it from where it's first used, and either neccesitates picking a default value to assign, or worse, leaving it unassigned and thus looking ambiguous to the reader. I think `var` inside the loop is slightly preferable here.
+The alternative—declaring `done` outside the loop—separates it from where it's first used, and either neccesitates picking a default value to assign, or worse, leaving it unassigned and thus looking ambiguous to the reader. I think `var` inside the loop is preferable here.
 
-Another helpful characteristic of `var` is declarations inside unintended blocks. Unintended blocks are blocks that are created because the syntax requires a block, but where the intent of the developer is not really to create a localized scope block. The best illustration of unintended scope is the `try..catch` statement:
+Another helpful characteristic of `var` is seen with declarations inside unintended blocks. Unintended blocks are blocks that are created because the syntax requires a block, but where the intent of the developer is not really to create a localized scope. The best illustration of unintended scope is the `try..catch` statement:
 
 ```js
 function getStudents() {
     try {
-        // not really a block
+        // not really a block scope
 
         var records = fromCache("students");
     }
@@ -710,11 +709,11 @@ function getStudents() {
 
 There are other ways to structure this code, yes. But I think this is the *best* way, given various trade-offs.
 
-I don't want to declare `records` (with `var` or `let`) outside of the `try` block, and then assign to it in one or both blocks. I prefer initial declarations to always be as close as possible (ideally, same line) to the first usage of the variable. In this simple example, that would only be a couple of lines distance, but in real code it can grow to many more lines. The bigger the gap, the harder it is to figure out what variable from what scope you're assigning to. `var` makes it less ambiguous.
+I don't want to declare `records` (with `var` or `let`) outside of the `try` block, and then assign to it in one or both blocks. I prefer initial declarations to always be as close as possible (ideally, same line) to the first usage of the variable. In this simple example, that would only be a couple of lines distance, but in real code it can grow to many more lines. The bigger the gap, the harder it is to figure out what variable from what scope you're assigning to. `var` used at the actual assignment makes it less ambiguous.
 
-Also notice I used `var` in both the `try` and `catch` blocks. That's because I want to signal to the reader that no matter which path occurs, `records` always gets declared. Technically, that's because `var` is hoisted once to the function scope. But it's still a nice semantic signal to remind the reader of what either `var` will ensure. If `var` were only used in one of the blocks, and you were only reading the other block, you couldn't easily tell where `records` was coming from.
+Also notice I used `var` in both the `try` and `catch` blocks. That's because I want to signal to the reader that no matter which path is taken, `records` always gets declared. Technically, that works because `var` is hoisted once to the function scope. But it's still a nice semantic signal to remind the reader what either `var` ensures. If `var` were only used in one of the blocks, and you were only reading the other block, you wouldn't as easily discover where `records` was coming from.
 
-This is, in my opinion, a little superpower of `var`. Not only can it escape the unintentional `try..catch` blocks, but it's allowed to appear multiple times in a function's scope. You can't do that with `let`, but you can do it with `var`. It's not bad, it's actually a helpful feature. Think of `var` more like a declarative annotation that's reminding you, each usage, where the variable comes from. "Ah ha, right, it belongs to the function."
+This is, in my opinion, a little superpower of `var`. Not only can it escape the unintentional `try..catch` blocks, but it's allowed to appear multiple times in a function's scope. You can't do that with `let`. It's not bad, it's actually a little helpful feature. Think of `var` more like a declarative annotation that's reminding you, each usage, where the variable comes from. "Ah ha, right, it belongs to the whole function."
 
 This repeated-annotation superpower is useful in other cases, too. For example:
 
@@ -741,13 +740,13 @@ I'm perfectly fine with re-using variables for multiple purposes throughout a fu
 
 Again, sadly, `let` cannot do this.
 
-There are other nuances and scenarios when `var` turns out to offer some assistance, but I'm not going to belabor the point any further. The takeaway is that `var` can be useful in our programs alongside `let` (and the occassional `const`).
+There are other nuances and scenarios when `var` turns out to offer some assistance, but I'm not going to belabor the point any further. The takeaway is that `var` can be useful in our programs alongside `let` (and the occassional `const`). Are you willing to creatively use the tools the JS language provides to tell a richer story to your readers?
 
 Don't just throw away a useful tool like `var` because someone shamed you into thinking it wasn't cool anymore. Don't avoid `var` because you got confused once years ago. Learn these tools and use them each for what they're best at.
 
 ## What's the Deal with TDZ?
 
-The TDZ (temporal dead zone) was explained in Chapter 5. We illustrated how it occurs, but we skimmed over any explanation of *why* it was necessary to introduce in the first place. Let's look briefly at the origins of TDZ.
+The TDZ (temporal dead zone) was explained in Chapter 5. We illustrated how it occurs, but we skimmed over any explanation of *why* it was necessary to introduce in the first place. Let's look briefly at the motivations of TDZ.
 
 Some breadcrumbs in the TDZ origin story:
 
@@ -759,7 +758,7 @@ Some breadcrumbs in the TDZ origin story:
 
 TDZ comes from `const`, actually.
 
-During early ES6 development work, TC39 had to decide whether `const` (and `let`) were going to hoist to the top of their blocks. They decided these declarations would hoist, similar to how `var` does. Had that not been the case, I think the fear was confusion with partial-scope shadowing, such as:
+During early ES6 development work, TC39 had to decide whether `const` (and `let`) were going to hoist to the top of their blocks. They decided these declarations would hoist, similar to how `var` does. Had that not been the case, I think some of the fear was confusion with mid-scope shadowing, such as:
 
 ```js
 let greeting = "Hi!";
@@ -770,14 +769,14 @@ let greeting = "Hi!";
 
     // .. a bunch of lines of code ..
 
-    // shadowing the `greeting` variable
+    // now shadowing the `greeting` variable
     let greeting = "Hello, friends!";
 
     // ..
 }
 ```
 
-What do we do with that `console.log(..)` statement? Would it make any sense to JS devs for it to print "Hi!"? Seems like that could be a gotcha, to have shadowing in the second half of the block, but not the first half. Not very intuitive, JS-like behavior. So `let` and `const` have to hoist to the top of the block, visible throughout.
+What should we do with that `console.log(..)` statement? Would it make any sense to JS devs for it to print "Hi!"? Seems like that could be a gotcha, to have shadowing kick in only for the second half of the block, but not the first half. That's not very intuitive, JS-like behavior. So `let` and `const` have to hoist to the top of the block, visible throughout.
 
 But if `let` and `const` hoist to the top of the block (like `var` hoists to the top of a function), why don't `let` and `const` auto-initialize (to `undefined`) the way `var` does? Here was the main concern:
 
@@ -796,11 +795,11 @@ But if `let` and `const` hoist to the top of the block (like `var` hoists to the
 
 Let's imagine that `studentName` not only hoisted to the top of this block, but was also auto-initialized to `undefined`. For the first half of the block, `studentName` could be observed to have the `undefined` value, such as with our `console.log(..)` statement. Once the `const studentName = ..` statement is reached, now `studentName` is assigned `"Frank"`. From that point forward, `studentName` can't ever be re-assigned.
 
-But, is it strange or surprising that basically a constant observably had two different values, first `undefined`, then `"Frank"`? That does seem to go against what we think a `const` constant means; it should only ever be observed with one value.
+But, is it strange or surprising that a constant observably has two different values, first `undefined`, then `"Frank"`? That does seem to go against what we think a `const`ant means; it should only ever be observable with one value.
 
 So... now we have a problem. We can't auto-initialize `studentName` to `undefined` (or any other value for that matter). But the variable has to exist throughout the whole scope. What do we do with the period of time from when it first exists (beginning of scope) and when it's assigned its value?
 
-We call this period of time the "dead zone," aka the "temporal dead zone" (TDZ). To prevent confusion, it was determined that any sort of access of a variable while it's in its TDZ is illegal and must result in the TDZ error.
+We call this period of time the "dead zone," as in the "temporal dead zone" (TDZ). To prevent confusion, it was determined that any sort of access of a variable while in its TDZ is illegal and must result in the TDZ error.
 
 OK, that line of reasoning does make some sense, I must admit.
 
@@ -808,21 +807,21 @@ OK, that line of reasoning does make some sense, I must admit.
 
 But that's just `const`. What about `let`?
 
-Well, TC39 made the decision, since we need a TDZ for `const`, we might as well have a TDZ for `let` as well. *In fact, if we make let have a TDZ, then we kill off all that ugly variable hoisting people do.* So there was a consistency perspective and, perhaps, a bit of social engineering to alter developers' behavior.
+Well, TC39 made the decision: since we need a TDZ for `const`, we might as well have a TDZ for `let` as well. *In fact, if we make let have a TDZ, then we discourage all that ugly variable hoisting people do.* So there was a consistency perspective and, perhaps, a bit of social engineering to shift developers' behavior.
 
-My counter-argument would be: if you're favoring consistency, be consistent with `var` instead of `const`. That's especially true since they had already chosen consistency with `var` for the whole hoisting-to-the-top-of-the-scope thing. Let `const` be its own unique deal with a TDZ, and let the answer to TDZ purely be: just avoid the TDZ by always declaring your constants at the top of the scope. I think this would have been more reasonable.
+My counter-argument would be: if you're favoring consistency, be consistent with `var` instead of `const`; `let` is definitely more like `var` than `let`. That's especially true since they had already chosen consistency with `var` for the whole hoisting-to-the-top-of-the-scope thing. Let `const` be its own unique deal with a TDZ, and let the answer to TDZ purely be: just avoid the TDZ by always declaring your constants at the top of the scope. I think this would have been more reasonable.
 
-But alas, that's not how it landed. `let` has a TDZ because `const` needs a TDZ, because `let` and `const` mimic `var` in their hoisting to the top of the (block) scope. There ya go.
+But alas, that's not how it landed. `let` has a TDZ because `const` needs a TDZ, because `let` and `const` mimic `var` in their hoisting to the top of the (block) scope. There ya go. Too circular? Read it again a few times.
 
 ## Are Synchronous Callbacks Still Closures?
 
-Chapter 7 presented two different models for wrapping your head around closure:
+Chapter 7 presented two different models for tackling closure:
 
 * Closure is a function instance remembering its outer variables even as that function is passed around and **invoked in** other scopes.
 
 * Closure is a function instance and its scope environment being preserved in-place while any references to it are passed around and **invoked from** other scopes.
 
-These models are not wildly divergent, but they do approach from a different perspective. And that different perspective changes what we should call a closure or not.
+These models are not wildly divergent, but they do approach from a different perspective. And that different perspective changes what we identify as a closure.
 
 Don't get lost following this rabbit trail through closures and callbacks:
 
@@ -833,11 +832,11 @@ Don't get lost following this rabbit trail through closures and callbacks:
 
 ### What is a Callback?
 
-Before we revisit closure, let me spend a brief moment addressing the word "callback." It's a generally accepted norm that saying "callback" is synonymous with both *asynchronous callbacks* and *synchronous callbacks*. I don't think I agree that this is a good idea, so I want to explain why and propose we move away from that.
+Before we revisit closure, let me spend a brief moment addressing the word "callback." It's a generally accepted norm that saying "callback" is synonymous with both *asynchronous callbacks* and *synchronous callbacks*. I don't think I agree that this is a good idea, so I want to explain why and propose we move away from that to another term.
 
-Let's first consider an *asynchronous callback*, a function reference that will be invoked at some future *later* point. What does "callback" mean, in this sense?
+Let's first consider an *asynchronous callback*, a function reference that will be invoked at some future *later* point. What does "callback" mean, in this case?
 
-I think it means that the current code has finished or paused, suspended itself, and that when the function in question is invoked later, execution is coming back into the suspended program and resuming it. Specifically, the point of re-entry is the code that was wrapped in the function reference:
+It means that the current code has finished or paused, suspended itself, and that when the function in question is invoked later, execution is entering back into the suspended program, resuming it. Specifically, the point of re-entry is the code that was wrapped in the function reference:
 
 ```js
 setTimeout(function waitForASecond(){
@@ -853,7 +852,7 @@ In this context, "calling back" makes a lot of sense. The JS engine is resuming 
 
 ### Synchronous Callback?
 
-But what of *synchronous callbacks*? Consider:
+But what about *synchronous callbacks*? Consider:
 
 ```js
 function getLabels(studentIDs) {
@@ -883,15 +882,15 @@ There's other established terms that might match what we're doing—passing in a
 
 DI can be summarized as passing in necessary part(s) of functionality to another part of the program so that it can invoke them to complete its work. That's a decent description for the `map(..)` call above, isn't it? The `map(..)` utility knows to iterate over the list's values, but it doesn't know what to *do* with those values. That's why we pass it the `formatIDLabel(..)` function. We pass in the dependency.
 
-IoC is a pretty similar, related concept. Inversion of control means that instead of the current area of your program controlling what's happening, you hand control off to another part of the program. We wrapped the logic for computing a label string in the function `formatIDLabel(..)`, then gave invocation control to the `map(..)` utility.
+IoC is a pretty similar, related concept. Inversion of control means that instead of the current area of your program controlling what's happening, you hand control off to another part of the program. We wrapped the logic for computing a label string in the function `formatIDLabel(..)`, then handed invocation control to the `map(..)` utility.
 
 Notably, Martin Fowler cites IoC as the difference between a framework and a library: with a library, you call its functions; with a framework, it calls your functions. [^fowlerIOC]
 
 In the context of our discussion, either DI or IoC could work as an alternative label for a *synchronous callback*.
 
-But I have an alternative suggestion. Let's just refer to (the things formerly known as) *synchronous callbacks*, as *inter-invoked functions* (IIFs). Yes, exactly, I'm making a play on IIFEs. These kinds of functions are *inter-invoked*, meaning: something else invokes them, as opposed to IIFEs, which invoke themselves immediately.
+But I have a different suggestion. Let's refer to (the functions formerly known as) *synchronous callbacks*, as *inter-invoked functions* (IIFs). Yes, exactly, I'm playing off IIFEs. These kinds of functions are *inter-invoked*, meaning: another entity invokes them, as opposed to IIFEs, which invoke themselves immediately.
 
-What's the difference between an *asynchronous callback* and an IIF? An *asynchronous callback* is an IIF that's invoked asynchronously rather than synchronously.
+What's the relationship between an *asynchronous callback* and an IIF? An *asynchronous callback* is an IIF that's invoked asynchronously instead of synchronously.
 
 ### Synchronous Closure?
 
@@ -915,9 +914,11 @@ function printLabels(labels) {
 
 The inner `renderLabel(..)` IIF references `list` from the enclosing scope, so it's an IIF that *could* have closure. But here's where the definition/model we choose for closure matters:
 
-* If `renderLabel(..)` is a **function that gets passed somewhere else**, and that function is then invoked, then yes, `renderLabel(..)` is exercising a closure, because closure is what preserved its access to the original scope chain.
+* If `renderLabel(..)` is a **function that gets passed somewhere else**, and that function is then invoked, then yes, `renderLabel(..)` is exercising a closure, because closure is what preserved its access to its original scope chain.
 
-* But if, as in the alternative conceptual model from Chapter 7, `renderLabel(..)` stays in place, and only a reference to it is passed to `forEach(..)`, is there any need for closure to preserve the scope chain of `renderLabel(..)`, while it executes synchronously right inside its own scope? No. That's just normal lexical scope.
+* But if, as in the alternative conceptual model from Chapter 7, `renderLabel(..)` stays in place, and only a reference to it is passed to `forEach(..)`, is there any need for closure to preserve the scope chain of `renderLabel(..)`, while it executes synchronously right inside its own scope?
+
+No. That's just normal lexical scope.
 
 To understand why, consider this alternative form of `printLabels(..)`:
 
@@ -941,13 +942,13 @@ function printLabels(labels) {
 }
 ```
 
-These two versions of `printLabels(..)` are essentially the same. The latter one is not an example of closure, at least not in any useful or observable sense. It's just lexical scope.
+These two versions of `printLabels(..)` are essentially the same.
 
-The former version, with `forEach(..)` calling our function reference, is essentially the same thing. It's not closure, it's just a plain ol' lexical scope function call.
+The latter one is definitely not an example of closure, at least not in any useful or observable sense. It's just lexical scope. The former version, with `forEach(..)` calling our function reference, is essentially the same thing. It's also not closure, but rather just a plain ol' lexical scope function call.
 
 ### Defer to Closure
 
-By the way, Chapter 7 briefly mentioned partial application and currying (which *do* rely on closure!). This is a great example where manual currying can be used:
+By the way, Chapter 7 briefly mentioned partial application and currying (which *do* rely on closure!). This is a interesting scenario where manual currying can be used:
 
 ```js
 function printLabels(labels) {
@@ -971,7 +972,7 @@ function printLabels(labels) {
 
 The inner function `createLabel(..)` (aka, `renderLabel(..)`) is closed over `list`, so closure is definitely being utilized.
 
-Closure allows us to remember `list` for later, while we defer execution of the actual label-creation logic from the `renderTo(..)` call to the subsequent `forEach(..)` invocations of the `createLabel(..)` IIF. That may only be a brief moment here, but any amount of time could pass as closure bridges from call to call.
+Closure allows us to remember `list` for later, while we defer execution of the actual label-creation logic from the `renderTo(..)` call to the subsequent `forEach(..)` invocations of the `createLabel(..)` IIF. That may only be a brief moment here, but any amount of time could pass, as closure bridges from call to call.
 
 ## Classic Module Variations
 
@@ -988,12 +989,11 @@ var StudentList = (function defineModule(Student){
     };
 
     return publicAPI;
+
 })(Student);
 ```
 
-Notice that we're passing `Student` (another module instance) in as a dependency.
-
-Some hints for recognizing common module variations:
+Notice that we're passing `Student` (another module instance) in as a dependency. But there's lots of useful variations on this module form you may encounter. Some hints for recognizing these variations:
 
 * Does the module know about its own API?
 * Even if we use a fancy module loader, it's just a classic module
@@ -1001,7 +1001,7 @@ Some hints for recognizing common module variations:
 
 ### Where's My API?
 
-There are several useful variations of this pattern to be aware of. First, most classic modules don't define and use a `publicAPI` the way I have done in this code. Instead, they typically look like:
+First, most classic modules don't define and use a `publicAPI` the way I have shown in this code. Instead, they typically look like:
 
 ```js
 var StudentList = (function defineModule(Student){
@@ -1012,27 +1012,28 @@ var StudentList = (function defineModule(Student){
             // ..
         }
     };
+
 })(Student);
 ```
 
 The only difference here is directly returning the object that serves as the public API for the module, as opposed to first saving it to an inner `publicAPI` variable. This is by far how most classic modules are defined.
 
-I strongly prefer, and always use myself, the former `publicAPI` form. Two reasons:
+But I strongly prefer, and always use myself, the former `publicAPI` form. Two reasons:
 
 * `publicAPI` is a semantic descriptor that aids readability by making it more obvious what the purpose of the object is.
 
-* Storing an inner `publicAPI` variable that references the same external public API object can be useful if you need to access or modify the API during the lifetime of the module.
+* Storing an inner `publicAPI` variable that references the same external public API object returned, can be useful if you need to access or modify the API during the lifetime of the module.
 
-    For example, you may want to call one of the publicly exposed functions, from inside the module. Also, you may want to add or remove methods depending on certain conditions, or update the value of an exposed property.
+    For example, you may want to call one of the publicly exposed functions, from inside the module. Or, you may want to add or remove methods depending on certain conditions, or update the value of an exposed property.
 
-    Whatever the case may be, it just seems rather silly to me that we *wouldn't* maintain our own reference to our own API, right?
+    Whatever the case may be, it just seems rather silly to me that we *wouldn't* maintain a reference to access our own API. Right?
 
 ### Asynchronous Module Defintion (AMD)
 
 Another variation on the classic module form is AMD-style modules (popular several years back), such as those supported by the RequireJS utility:
 
 ```js
-define(["./Student"],function StudentList(Student){
+define([ "./Student" ],function StudentList(Student){
     var elems = [];
 
     return {
@@ -1043,13 +1044,13 @@ define(["./Student"],function StudentList(Student){
 });
 ```
 
-If you look closely at `StudentList`, it's a classic module factory function. Inside the machinery of `define(..)` (included with RequireJS), the `StudentList(..)` function is executed, passing to it any other module instances declared as dependencies. The return value is an object representing the public API for the module.
+If you look closely at `StudentList(..)`, it's a classic module factory function. Inside the machinery of `define(..)` (provided by RequireJS), the `StudentList(..)` function is executed, passing to it any other module instances declared as dependencies. The return value is an object representing the public API for the module.
 
-This is based on exactly the same principles (including how the closure works!) as we saw with classic modules.
+This is based on exactly the same principles (including how the closure works!) as we explored with classic modules.
 
 ### Universal Modules (UMD)
 
-The final variation we'll look at is UMD, which is less a specific, exact format and more a collection of very similar formats. It was designed to create better interop (without any tool conversion) for modules that may be loaded in browsers, by AMD-style loaders, or in Node. I personally still publish many of my utility libraries using a form of UMD.
+The final variation we'll look at is UMD, which is less a specific, exact format and more a collection of very similar formats. It was designed to create better interop (without any build-tool conversion) for modules that may be loaded in browsers, by AMD-style loaders, or in Node. I personally still publish many of my utility libraries using a form of UMD.
 
 Here's the typical structure of a UMD:
 
@@ -1086,13 +1087,13 @@ Here's the typical structure of a UMD:
 });
 ```
 
-Though it may look a little unusual, UMD is really just an IIFE.
+Though it may look a bit unusual, UMD is really just an IIFE.
 
-What's different is that the main `function` expression part of the IIFE contains a series of `if..else if` statements to detect which of the three supported environments the module is being loaded in.
+What's different is that the main `function` expression part (at the top) of the IIFE contains a series of `if..else if` statements to detect which of the three supported environments the module is being loaded in.
 
-The final `()` that normally invokes an IIFE is being passed three arguments: `"StudentsList"`, `this`, and another `function` expression. If you match those arguments to their parameters, you'll see they are: `name`, `context`, and `definition`, respectively. `this` is generally the `window` (aka, global object); see Chapter 4.
+The final `()` that normally invokes an IIFE is being passed three arguments: `"StudentsList"`, `this`, and another `function` expression. If you match those arguments to their parameters, you'll see they are: `name`, `context`, and `definition`, respectively. `"StudentList"` (`name`) is the name label for the module, primarily in case it's defined as a global variable. `this` (`context`) is generally the `window` (aka, global object; see Chapter 4) for defining the module by its name.
 
-`definition(..)` is invoked to actually define our module, and you'll notice that, sure enough, that's just a classic module form. `name` and `context` are optionally used to help with the environment/loader registration of our module instance.
+`definition(..)` is invoked to actually retrieve the definition of the module, and you'll notice that, sure enough, that's just a classic module form!
 
 There's no question that as of the time of this writing, ESM (ES Modules) are becoming popular and widespread rapidly. But with millions and millions of modules written over the last 20 years, all using some pre-ESM variation of classic modules, they're still very important to be able to read and understand when you come across them.
 
