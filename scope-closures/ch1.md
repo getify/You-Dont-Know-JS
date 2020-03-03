@@ -199,7 +199,7 @@ Other than declarations, all occurrences of variables/identifiers in a program s
 
 How do you know if a variable is a *target*? Check if there is a value that is being assigned to it; if so, it's a *target*. If not, then the variable is a *source*.
 
-For the JS engine to properly handle a program's variabls, it must first label each occurrence of a variable as *target* or *source*. We'll dig in now to how each role is determined.
+For the JS engine to properly handle a program's variables, it must first label each occurrence of a variable as *target* or *source*. We'll dig in now to how each role is determined.
 
 ### Targets
 
