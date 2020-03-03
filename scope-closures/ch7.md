@@ -19,7 +19,7 @@ Addressing all aspects of closure requires a daunting mountain of discussion and
 
 Closure is originally a mathematical concept, from lambda calculus. But I'm not going to list out math formulas or use a bunch of notation and jargon to define it.
 
-Instead, I'm going to use a practical perspective to describe closure. We'll start by defining closure in terms of what we can observe in different behavior of our programs, as opposed to if closure was not present in JS. However, later in this chapter, we're going to flip closure around to look at it from an *alternative perspective*.
+Instead, I'm going to focus on a practical perspective. We'll start by defining closure in terms of what we can observe in different behavior of our programs, as opposed to if closure was not present in JS. However, later in this chapter, we're going to flip closure around to look at it from an *alternative perspective*.
 
 Closure is a behavior of functions and only functions. If you aren't dealing with a function, closure does not apply. An object cannot have closure, nor does a class have closure (though its functions/methods might). Only functions have closure.
 
@@ -101,13 +101,13 @@ var student = students.find(
 );
 ```
 
-The BLUE(2) `studentID` reference is actually inside the ORANGE(4) scope rather than the GREEN(3) scope of `greetStudent(..)`. The consequence here is that this arrow function passed as a callback to the array's `find(..)` method has to hold the closure over `studentID`, rather than `greetStudent(..)`.
+The BLUE(2) `studentID` reference is actually inside the ORANGE(4) scope rather than the GREEN(3) scope of `greetStudent(..)`; also, the `student` parameter of the arrow function is ORANGE(4), shadowing the GREEN(3) `student`.
 
-That's not of too much consequence, as everything still works as expected. It's just important not to skip over the fact that even tiny arrow functions can get in on the closure party.
+The consequence here is that this arrow function passed as a callback to the array's `find(..)` method has to hold the closure over `studentID`, rather than `greetStudent(..)` holding that closure. That's not too big of a deal, as everything still works as expected. It's just important not to skip over the fact that even tiny arrow functions can get in on the closure party.
 
 ### Adding Up Closures
 
-Let's examine one of the canonical examples most often cited for closure:
+Let's examine one of the canonical examples often cited for closure:
 
 ```js
 function adder(num1) {
@@ -129,7 +129,7 @@ An important detail might have been too easy to gloss over in that previous para
 
 But actually, every time the outer `adder(..)` function runs, a *new* inner `addTo(..)` function instance is created, and for each new instance, a new closure. So each inner function instance (labeled `add10To(..)` and `add42To(..)` in our program) has its own closure over its own instance of the scope environment from that execution of `adder(..)`.
 
-Even though closure is based on lexical scope, which is handled at compile time, closure is more precisely a runtime characteristic of function instances.
+Even though closure is based on lexical scope, which is handled at compile time, closure is more precisely described as a runtime characteristic of function instances.
 
 ### Live Link, Not a Snapshot
 
@@ -248,7 +248,7 @@ You might have expected the `keeps[0]()` invocation to return `0`, since that fu
 
 Something about the structure of a `for`-loop can trick us into thinking that each iteration gets its own new `i` variable; in fact, this program only has one `i` since it was declared with `var`.
 
-Each saved function returns `3`, because by the end of the loop, the single `i` variable in the program has been assigned `3`. Each of the three functions in the `keeps` array do have individual closures, but they're all closed over that same `i` variable.
+Each saved function returns `3`, because by the end of the loop, the single `i` variable in the program has been assigned `3`. Each of the three functions in the `keeps` array do have individual closures, but they're all closed over that same shared `i` variable.
 
 Of course, a single variable can only ever hold one value at any given moment. So if you want to preserve multiple values, you need a different variable for each.
 
@@ -279,7 +279,7 @@ keeps[2]();   // 2
 
 Each function is now closed over a separate (new) variable from each iteration, even though all of them are named `j`. And each `j` gets a copy of the value of `i` at that point in the loop iteration; that `j` never gets re-assigned. So all three functions now return their expected values: `0`, `1`, and `2`!
 
-Again remember, even if we were using asynchrony in this program, such as passing each inner `keepEachJ()` functions into `setTimeout(..)` or some event handler subscription, the same kind of closure behavior would still be observed.
+Again remember, even if we were using asynchrony in this program, such as passing each inner `keepEachJ()` function into `setTimeout(..)` or some event handler subscription, the same kind of closure behavior would still be observed.
 
 Recall the "Loops" section in Chapter 5, which illustrates how a `let` declaration in a `for` loop actually creates not just one variable for the loop, but actually creates a new variable for *each iteration* of the loop. That trick/quirk is exactly what we need for our loop closures:
 
@@ -374,11 +374,11 @@ say("Kyle");
 // Hello, Kyle!
 ```
 
-The inner function `output()` accesses the variables `greeting` and `myName` from an enclosing scope. But the invocation of `output()` happens in that same scope, where of course `greeting` and `myName` are still available; that's just lexical scope, not closure.
+The inner function `output()` accesses the variables `greeting` and `myName` from its enclosing scope. But the invocation of `output()` happens in that same scope, where of course `greeting` and `myName` are still available; that's just lexical scope, not closure.
 
 Any lexically scoped language whose functions didn't support closure would still behave this same way.
 
-In fact, global scope variables essentially cannot be (observably) closed over, because they're always accessible from everywhere. No function can ever be invoked in any part of the scope chain that is not descended from the global scope.
+In fact, global scope variables essentially cannot be (observably) closed over, because they're always accessible from everywhere. No function can ever be invoked in any part of the scope chain that is not a descendant of the global scope.
 
 Consider:
 
@@ -460,7 +460,7 @@ The key parts of this definition are:
 
 * Must be invoked in a different branch of the scope chain from the variable(s)
 
-This observation-oriented definition reminds us that we shouldn't dismiss closure as some indirect, academic trivia. Instead, we need to look and plan for the direct, concrete effects closure has on our program behavior.
+This observation-oriented definition reminds us that we shouldn't dismiss closure as some indirect, academic trivia. Instead, we should look and plan for the direct, concrete effects closure has on our program behavior.
 
 ## The Closure Lifecycle and Garbage Collection (GC)
 
@@ -468,7 +468,7 @@ Since closure is inherently tied to a function instance, its closure over a vari
 
 If ten functions all close over the same variable, and over time nine of these function references are discarded, the lone remaining function reference still preserves that variable. Once that final function reference is discarded, the last closure over that variable is gone, and the variable itself is GC'd.
 
-This has an important impact on building efficient and performant programs, because closure can unexpectedly prevent the GC of a variable that you're otherwise done with, which can lead to run-away memory usage over time. That's why it's important to discard function references (and thus their closures) when they're not needed anymore.
+This has an important impact on building efficient and performant programs. Closure can unexpectedly prevent the GC of a variable that you're otherwise done with, which leads to run-away memory usage over time. That's why it's important to discard function references (and thus their closures) when they're not needed anymore.
 
 Consider:
 
@@ -581,13 +581,13 @@ addNextGrade(68);
 // [ .., .., ... ]
 ```
 
-The outer function `manageStudentGrades(..)` takes a list of student records, and returns a function reference (`addGrade(..)`), which we externally label `addNextGrade(..)`. Each time we call `addNextGrade(..)` with a grade, we get back a current list of the top 10 grades, sorted descending (see `sortAndTrimGradesList()`).
+The outer function `manageStudentGrades(..)` takes a list of student records, and returns a function reference (`addGrade(..)`), which we externally label `addNextGrade(..)`. Each time we call `addNextGrade(..)` with a new grade, we get back a current list of the top 10 grades, sorted numerically descending (see `sortAndTrimGradesList()`).
 
-From the end of the original `manageStudentGrades(..)` call, and between the multiple `addNextGrade(..)` calls, the `grades` variable is preserved via closure (inside `addGrade(..)`); that's how the running list of top grades is maintained. Remember, it's a closure over the variable `grades`, not the array it holds.
+From the end of the original `manageStudentGrades(..)` call, and between the multiple `addNextGrade(..)` calls, the `grades` variable is preserved via closure (inside `addGrade(..)`); that's how the running list of top grades is maintained. Remember, it's a closure over the variable `grades` itself, not the array it holds.
 
 That's not the only closure involved, however. Can you spot other variables being closed over?
 
-Did you spot that `addGrade(..)` references `sortAndTrimGradesList`? That means it's also closed over that variable, which happens to hold a reference to the `sortAndTrimGradesList()` function. That second inner function has to stay around so that `addGrade(..)` can keep calling it, which also means any variables *it* closes over stick around—though, in this case, nothing extra is closed over there.
+Did you spot that `addGrade(..)` references `sortAndTrimGradesList`? That means it's also closed over that identifier, which happens to hold a reference to the `sortAndTrimGradesList()` function. That second inner function has to stay around so that `addGrade(..)` can keep calling it, which also means any variables *it* closes over stick around—though, in this case, nothing extra is closed over there.
 
 What else is closed over?
 
@@ -595,7 +595,7 @@ Consider the `getGrade` variable (and its function); is it closed over? It's ref
 
 What about the (potentially) large list of student records we pass in as `studentRecords`? Is that variable closed over? If it is, the array of student records is never getting GC'd, which leads to this program holding onto a larger amount of memory than we might assume. But if we look closely again, none of the inner functions reference `studentRecords`.
 
-According to the *per variable* definition of closure, since `getGrade` and `studentRecords` are *not* referenced in the inner functions, they're not closed over. They should be freely available for GC right after the initial `manageStudentGrades(..)` completes.
+According to the *per variable* definition of closure, since `getGrade` and `studentRecords` are *not* referenced by the inner functions, they're not closed over. They should be freely available for GC right after the `manageStudentGrades(..)` call completes.
 
 Indeed, try debugging this code in a recent JS engine, like v8 in Chrome, placing a breakpoint inside the `addGrade(..)` function. You may notice that the inspector **does not** list the `studentRecords` variable. That's proof, debugging-wise anyway, that the engine does not maintain `studentRecords` via closure. Phew!
 
@@ -622,9 +622,9 @@ info("grade");
 
 Notice that the inner function `getInfo(..)` is not explicitly closed over any of `id`, `name`, or `grade` variables. And yet, calls to `info(..)` seem to still be able to access the variables, albeit through use of the `eval(..)` lexical scope cheat (see Chapter 1).
 
-So all the variables were definitely preserved via closure, despite not being explicitly listed in the inner function. Does that disprove the *per variable* assertion in favor of *per scope*? Not exactly, either.
+So all the variables were definitely preserved via closure, despite not being explicitly referenced by the inner function. So does that disprove the *per variable* assertion in favor of *per scope*? Depends.
 
-Many modern JS engines do apply an *optimization* that removes any variables from a closure scope that aren't explicitly referenced. However, as we see with `eval(..)`, there are situations where such an optimization cannot be applied, and the closure scope continues to contain all its original variables.
+Many modern JS engines do apply an *optimization* that removes any variables from a closure scope that aren't explicitly referenced. However, as we see with `eval(..)`, there are situations where such an optimization cannot be applied, and the closure scope continues to contain all its original variables. In other words, closure must be *per scope*, implementation wise, and then an optional optimization trims down the scope to only what was closed over (a similar outcome as *per variable* closure).
 
 Even as recent as a few years ago, many JS engines did not apply this optimization; it's possible your websites may still run in such browsers, especially on older or lower-end devices. That means it's possible that long-lived closures such as event handlers may be holding onto memory much longer than we would have assumed.
 
@@ -648,11 +648,11 @@ function manageStudentGrades(studentRecords) {
 }
 ```
 
-We're not removing `studentRecords` from the closure scope; that we cannot control. We're ensuring that even if `studentRecords` remains in the closure scope, that variable is no longer referencing the potentially large array of data.
+We're not removing `studentRecords` from the closure scope; that we cannot control. We're ensuring that even if `studentRecords` remains in the closure scope, that variable is no longer referencing the potentially large array of data; the array can be GC'd.
 
-Again, in many cases JS might automatically optimize the program to the same effect. But it's still a good habit to explicitly make sure we don't keep any significant amount of device memory tied up any longer than necessary.
+Again, in many cases JS might automatically optimize the program to the same effect. But it's still a good habit to be careful and explicitly make sure we don't keep any significant amount of device memory tied up any longer than necessary.
 
-As a matter of fact, we also technically don't need the function `getGrade()` anymore after the `.map(getGrade)` call completes. If profiling our application showed this was a critical area of excess memory use, we could possibly eek out a tiny bit more memory by freeing up that reference so its value isn't tied up either. That's probably unnecessary in this toy example, but generally this is a technique to keep in mind if you're optimizing the memory footprint of your application.
+As a matter of fact, we also technically don't need the function `getGrade()` anymore after the `.map(getGrade)` call completes. If profiling our application showed this was a critical area of excess memory use, we could possibly eek out a tiny bit more memory by freeing up that reference so its value isn't tied up either. That's likely unnecessary in this toy example, but this is a general technique to keep in mind if you're optimizing the memory footprint of your application.
 
 The takeaway: it's important to know where closures appear in our programs, and what variables are (or may be!) included. We should manage these closures carefully so we're only holding onto what's minimally needed and not wasting memory.
 
@@ -682,7 +682,7 @@ add10To(15);    // 25
 add42To(9);     // 51
 ```
 
-Our current perspective suggests that wherever a function has been passed to be invoked, closure preserves a hidden link back to the original scope to facilitate the access to the closed-over variables. Figure 4, repeated here for convenience, illustrates this notion:
+Our current perspective suggests that wherever a function is passed and invoked, closure preserves a hidden link back to the original scope to facilitate the access to the closed-over variables. Figure 4, repeated here for convenience, illustrates this notion:
 
 <figure>
     <img src="images/fig4.png" width="400" alt="Function instances linked to scopes via closure" align="center">
@@ -690,13 +690,13 @@ Our current perspective suggests that wherever a function has been passed to be 
     <br><br>
 </figure>
 
-But there's another way of thinking about closure, and more precisely the nature of functions being *passed around*, that may help deepen your mental models.
+But there's another way of thinking about closure, and more precisely the nature of functions being *passed around*, that may help deepen the mental models.
 
 This alternative model de-emphasizes "functions as first-class values," and instead embraces how functions (like all non-primitive values) are held by reference in JS, and assigned/passed by reference-copy—see Appendix A of the *Get Started* book for more information.
 
 Instead of thinking about the inner function instance of `addTo(..)` moving to the outer RED(1) scope via the `return` and assignment, we can envision that function instances actually just stay in place in their own scope environment, of course with their scope-chain intact.
 
-What gets *moved* to the RED(1) scope is **just a reference** to the in-place function instance, rather than the function instance itself. Figure 5 depicts the inner function instances remaining in place, pointed to by the RED(1) `addTo10` and `addTo42` references, respectively:
+What gets *sent* to the RED(1) scope is **just a reference** to the in-place function instance, rather than the function instance itself. Figure 5 depicts the inner function instances remaining in place, pointed to by the RED(1) `addTo10` and `addTo42` references, respectively:
 
 <figure>
     <img src="images/fig5.png" width="400" alt="Function instances inside scopes via closure, linked to by references" align="center">
@@ -714,7 +714,7 @@ Closure instead describes the *magic* of **keeping alive a function instance**, 
 
 That definition of closure is less observational and a bit less familiar-sounding compared to the traditional academic perspective. But it's nonetheless still useful, because the benefit is that we simplify explanation of closure to a straightforward combination of references and in-place function instances.
 
-The previous model (Figure 4) is not *wrong* at describing closure in JS. It's just more conceptually inspired, an academic perspective on closure. By contrast, the alternative model (Figure 5) could be described as a bit more implementation aligned, how JS actually works.
+The previous model (Figure 4) is not *wrong* at describing closure in JS. It's just more conceptually inspired, an academic perspective on closure. By contrast, the alternative model (Figure 5) could be described as a bit more implementation focused, how JS actually works.
 
 Both perspectives/models are useful in understanding closure, but the reader may find one a little easier to hold than the other. Whichever you choose, the observable outcomes in our program are the same.
 
@@ -799,11 +799,11 @@ With the `setupButtonHandler(..)` approach, the `data-kind` attribute is retriev
 
 | NOTE: |
 | :--- |
-| `evt` is still passed to `makeRequest(..)`, though in this case we're not using it anymore. It's listed only for consistency with the previous snippet. |
+| `evt` is still passed to `makeRequest(..)`, though in this case we're not using it anymore. It's still listed, for consistency with the previous snippet. |
 
 By placing `recordKind` inside `setupButtonHandler(..)`, we limit the scope exposure of that variable to a more appropriate subset of the program; storing it globally would have been worse for code organization and readability. Closure lets the inner `makeRequest()` function instance *remember* this variable and access whenever it's needed.
 
-Building on this pattern, we could have looked up the URL and data once at setup:
+Building on this pattern, we could have looked up both the URL and data once, at setup:
 
 ```js
 function setupButtonHandler(btn) {
@@ -820,13 +820,13 @@ function setupButtonHandler(btn) {
 }
 ```
 
-Now `makeRequest(..)` is closed over `requestURL` and `requestData`, which is a little bit cleaner to understand.
+Now `makeRequest(..)` is closed over `requestURL` and `requestData`, which is a little bit cleaner to understand, and also slightly more performant.
 
-Two similar techniques in the Functional Programming (FP) paradigm that rely on closure are partial application and currying. Briefly, we can alter the *shape* of functions that require multiple inputs so some inputs are provided up front, and other inputs are provided later; the initial inputs are remembered via closure. Once all inputs have been provided, the underlying action is performed.
+Two similar techniques from the Functional Programming (FP) paradigm that rely on closure are partial application and currying. Briefly, with these techniques, we alter the *shape* of functions that require multiple inputs so some inputs are provided up front, and other inputs are provided later; the initial inputs are remembered via closure. Once all inputs have been provided, the underlying action is performed.
 
-By creating a function instance that encapsulates some information inside (via closure), the function-with-stored-information can later be used directly without needing to re-provide that input. This makes that part of the code cleaner, and also offers the opportunity to use better semantic names for partially applied functions.
+By creating a function instance that encapsulates some information inside (via closure), the function-with-stored-information can later be used directly without needing to re-provide that input. This makes that part of the code cleaner, and also offers the opportunity to label partially applied functions with better semantic names.
 
-Inspired by partial application, we can further improve the preceding code:
+Adapting partial application, we can further improve the preceding code:
 
 ```js
 function defineHandler(requestURL,requestData) {
@@ -845,9 +845,9 @@ function setupButtonHandler(btn) {
 }
 ```
 
-The `requestURL` and `requestData` inputs are provided ahead of time, resulting in a partially applied function (`makeRequest(..)`), which we label `handler`. When the event eventually fires, the final input (`evt`, even though it's ignored) is passed to `handler()`, completing its inputs and triggering the underlying Ajax request.
+The `requestURL` and `requestData` inputs are provided ahead of time, resulting in a partially applied function (`makeRequest(..)`), which we locally label `handler`. When the event eventually fires, the final input (`evt`, even though it's ignored) is passed to `handler()`, completing its inputs and triggering the underlying Ajax request.
 
-Behavior-wise, this program is pretty similar to the previous one, with the same kind of closure. But by isolating the creation of `makeRequest(..)` in a separate utility (`defineHandler(..)`), we make that definition more reusable across the program. We also explicitly limit the closure scope to only the two variables needed.
+Behavior-wise, this program is pretty similar to the previous one, with the same type of closure. But by isolating the creation of `makeRequest(..)` in a separate utility (`defineHandler(..)`), we make that definition more reusable across the program. We also explicitly limit the closure scope to only the two variables needed.
 
 ## Closer to Closure
 
