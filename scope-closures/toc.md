@@ -1,14 +1,10 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
 
-| NOTE: |
-| :--- |
-| Work in progress |
-
 ## Table of Contents
 
 * Foreword
 * Preface
-* Chapter 1: What's The Scope?
+* Chapter 1: What's the Scope?
     * About This Book
     * Compiled vs. Interpreted
     * Compiling Code
@@ -19,7 +15,7 @@
     * Marbles, and Buckets, and Bubbles... Oh My!
     * A Conversation Among Friends
     * Nested Scope
-    * Continue The Conversation
+    * Continue the Conversation
 * Chapter 3: The Scope Chain
     * "Lookup" Is (Mostly) Conceptual
     * Shadowing
@@ -31,7 +27,7 @@
     * Where Exactly Is This Global Scope?
     * Global This
     * Globally Aware
-* Chapter 5: The (not so) Secret Lifecycle of Variables
+* Chapter 5: The (Not So) Secret Lifecycle of Variables
     * When Can I Use a Variable?
     * Hoisting: Yet Another Metaphor
     * Re-declaration?
@@ -39,15 +35,15 @@
     * Finally Initialized
 * Chapter 6: Limiting Scope Exposure
     * Least Exposure
-    * Hiding In Plain (Function) Scope
-    * Scoping With Blocks
-    * Function Declarations In Blocks
+    * Hiding in Plain (Function) Scope
+    * Scoping with Blocks
+    * Function Declarations in Blocks
     * Blocked Over
 * Chapter 7: Using Closures
-    * See The Closure
+    * See the Closure
     * The Closure Lifecycle and Garbage Collection (GC)
     * Why Closure?
-    * An Alternate Perspective
+    * An Alternative Perspective
     * Closer to Closure
 * Chapter 8: The Module Pattern
     * Encapsulation and Least Exposure (POLE)

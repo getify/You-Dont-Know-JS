@@ -3,7 +3,7 @@
 
 In this chapter, we wrap up the main text of the book by exploring one of the most important code organization patterns in all of programming: the module. As we'll see, modules are inherently built from what we've already covered: the payoff for your efforts in learning lexical scope and closure.
 
-We've examined every angle of lexical scope, from the breadth of the global scope down through nested block scopes, into the intricasies of the variable lifecycle. Then we leveraged lexical scope to understand the full power of closure.
+We've examined every angle of lexical scope, from the breadth of the global scope down through nested block scopes, into the intricacies of the variable lifecycle. Then we leveraged lexical scope to understand the full power of closure.
 
 Take a moment to reflect on how far you've come in this journey so far; you've taken big steps in getting to know JS more deeply!
 
@@ -17,9 +17,9 @@ Encapsulation is often cited as a principle of object-oriented (OO) programming,
 
 Independent of any syntax or code mechanisms, the spirit of encapsulation can be realized in something as simple as organizing bits of the program with common purpose, into separate files. If we bundle everything that powers a list of search results into a single file called "search-list.js", we're encapsulating that part of the program.
 
-The recent trend in modern front-end programming to organize applications around Component architecture pushes encapsulation even further. For many, it feels natural to consolidate everything that constitutes the search results list -- even beyond code, including presentational markup and styling -- into a single unit of program logic, something tangible we can interact with. And then we label that collection the "SearchList" component.
+The recent trend in modern front-end programming to organize applications around Component architecture pushes encapsulation even further. For many, it feels natural to consolidate everything that constitutes the search results list—even beyond code, including presentational markup and styling—into a single unit of program logic, something tangible we can interact with. And then we label that collection the "SearchList" component.
 
-Another key goal is the control of visibility of certain aspects of the encapsulated data and functionality. Recall the *least privilege* principle (POLE) from Chapter 6, which seeks to defensively guard against various *dangers* of scope over-exposure; these affect both variables and functions. In JS, we most often implement visibility control through the mechanics of lexical scope.
+Another key goal is the control of visibility of certain aspects of the encapsulated data and functionality. Recall from Chapter 6 the *least privilege* principle (POLE), which seeks to defensively guard against various *dangers* of scope over-exposure; these affect both variables and functions. In JS, we most often implement visibility control through the mechanics of lexical scope.
 
 The idea is to group alike program bits together, and selectively limit programmatic access to certain parts which can reasonably be described as *private* details. What's not considered *private* is then set as *public*, accessible to the whole program.
 
@@ -27,9 +27,9 @@ The natural effect of this effort is better code organization. It's easier to bu
 
 These are some of the main benefits of organizing JS programs into modules.
 
-## What is a Module?
+## What Is a Module?
 
-A module is a collection of related data and functions (often referred to as methods in this context), characterized by a division between hidden *private* details and *public* accessible details, usually called the "public API".
+A module is a collection of related data and functions (often referred to as methods in this context), characterized by a division between hidden *private* details and *public* accessible details, usually called the "public API."
 
 A module is also stateful: it maintains some information over time, along with functionality to access and update that information.
 
@@ -99,7 +99,7 @@ Since `records` is publicly accessible data, not hidden behind a public API, `St
 
 To embody the full spirit of the module pattern, we not only need grouping and state, but also access control through visibility (private vs. public).
 
-Let's turn `Student` from the previous section into a module. We'll start with a form called the "classic module", which also was referred to as the "revealing module" when it first emerged in the early 2000's.
+Let's turn `Student` from the previous section into a module. We'll start with a form called the "classic module," which also was referred to as the "revealing module" when it first emerged in the early 2000s.
 
 Consider:
 
@@ -152,7 +152,7 @@ You don't *have* to return an object with a function as one of its properties. Y
 
 By virtue of how lexical scope works, defining variables and functions inside your outer module definition function makes everything *by default* private. Only properties added to the public API object returned from the function will be exported for external use.
 
-The use of an IIFE implies that our module only ever needs a single central instance, which is commonly referred to as a "singleton". Indeed, this specific example is simple enough that there's no obvious reason we'd need anything more than just one instance of the `Student` module.
+The use of an IIFE implies that our module only ever needs a single central instance, which is commonly referred to as a "singleton." Indeed, this specific example is simple enough that there's no obvious reason we'd need anything more than just one instance of the `Student` module.
 
 #### Module Factory (Multiple Instances)
 
@@ -198,11 +198,11 @@ We then call the module factory, producing an instance of the module that we nam
 
 So to clarify what makes something a classic module:
 
-* there must be an outer scope, typically from a module factory function running at least once.
+* There must be an outer scope, typically from a module factory function running at least once.
 
-* the module's inner scope must have at least one piece of hidden information that represents state for the module.
+* The module's inner scope must have at least one piece of hidden information that represents state for the module.
 
-* the module must return on its public API a reference to at least one function that has closure over the hidden module state (so that this state is actually preserved).
+* The module must return on its public API a reference to at least one function that has closure over the hidden module state (so that this state is actually preserved).
 
 You may run across other variations on this classic module approach, which we'll look at in more detail in Appendix A.
 
@@ -256,7 +256,7 @@ Object.assign(module.exports,{
 
 What's happening here is defining the `{ .. }` object literal with your module's public API specified, and then `Object.assign(..)` is doing a shallow copy of all those properties onto the existing `module.exports` object. This is a nice balance of convenience and safer module behavior.
 
-To include another module into your module/program, use Node's `require(..)` method. Assuming the above module is located at "/path/to/student.js", this is how we can access it:
+To include another module into your module/program, use Node's `require(..)` method. Assuming this module is located at "/path/to/student.js", this is how we can access it:
 
 ```js
 var Student = require("/path/to/student.js");
@@ -267,7 +267,7 @@ Student.getName(73);
 
 `Student` now references the public API of our example module.
 
-CommonJS modules behave as singleton instances, similar to the IIFE module definition style presented above. No matter how many times you `require(..)` the same module, you just get additional references to the single module instance.
+CommonJS modules behave as singleton instances, similar to the IIFE module definition style presented before. No matter how many times you `require(..)` the same module, you just get additional references to the single module instance.
 
 `require(..)` is an all-or-nothing mechanism; it includes a reference of the entire exposed public API of the module. To effectively access only part of the API, the typical approach looks like this:
 
@@ -331,11 +331,11 @@ export default function getName(studentID) {
 }
 ```
 
-This is a so-called "default export", which has different semantics from other exports. In essence, a "default export" is a short-hand for consumers of the module when they `import`, giving them a terser syntax when they only need this single default API member.
+This is a so-called "default export," which has different semantics from other exports. In essence, a "default export" is a shorthand for consumers of the module when they `import`, giving them a terser syntax when they only need this single default API member.
 
-Non-`default` exports are referred to as "named exports".
+Non-`default` exports are referred to as "named exports."
 
-The `import` keyword -- like `export`, must be used only at the top-level of an ESM outside of any blocks or functions -- also has a number of variations in syntax. The first is referred to as "named import":
+The `import` keyword—like `export`, must be used only at the top level of an ESM outside of any blocks or functions—also has a number of variations in syntax. The first is referred to as "named import":
 
 ```js
 import { getName } from "/path/to/students.js";
@@ -388,7 +388,7 @@ As is likely obvious, the `*` imports everything exported to the API, default an
 
 | NOTE: |
 | :--- |
-| As of the time of this writing, modern browsers have supported ESM for a few years now, but Node's support for ESM is fairly recent, and has been evolving for quite awhile. The evolution is likely to continue for another year or more, as the introduction of ESM to JS back in ES6 created a number of challenging compatibility concerns for Node's interop with CommonJS modules. Consult Node's ESM documentation for all the latest details: https://nodejs.org/api/esm.html |
+| As of the time of this writing, modern browsers have supported ESM for a few years now, but Node's support for ESM is fairly recent, and has been evolving for quite a while. The evolution is likely to continue for another year or more, as the introduction of ESM to JS back in ES6 created a number of challenging compatibility concerns for Node's interop with CommonJS modules. Consult Node's ESM documentation for all the latest details: https://nodejs.org/api/esm.html |
 
 ## Exit Scope
 

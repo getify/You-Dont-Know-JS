@@ -1,15 +1,11 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 1: What's The Scope?
-
-| NOTE: |
-| :--- |
-| Work in progress |
+# Chapter 1: What's the Scope?
 
 By the time you've written your first few programs, you're probably starting to feel more comfortable with creating variables and storing values in them. Working with variables is one of the most foundational things we do in programming!
 
 But you may not have considered very closely the underlying mechanisms used by the engine to organize and manage these variables. I don't mean how the memory is allocated on the computer, but rather: how does JS know which variables are accessible by any given statement, and how does it handle two variables of the same name?
 
-The answers to questions like these take the form of well-defined rules called scope. This book will dig through all aspects of scope -- how it works, what it's useful for, gotchas to avoid -- and then point toward common patterns that guide the structure of programs.
+The answers to questions like these take the form of well-defined rules called scope. This book will dig through all aspects of scope—how it works, what it's useful for, gotchas to avoid—and then point toward common patterns that guide the structure of programs.
 
 And our first step is to uncover how the JS engine processes our program **before** it runs.
 
@@ -19,7 +15,7 @@ Welcome to book 2 in the *You Don't Know JS Yet* series! If you already finished
 
 Our focus here is the first of three pillars in the JS language: the scope system and its function closures, as well as the power of the module design pattern.
 
-JS is typically classified as an interpreted scripting language, so it's assumed by most that JS programs are processed in a single, top-down pass. But JS is in fact parsed/compiled in a separate phase **before execution begins**. The code author's decisions on where to place variables, functions, and blocks with respect to each other are analyzed according to the rules of scope, during the initial parsing/compilation phase. The resulting scope layout is generally unaffected by run-time conditions.
+JS is typically classified as an interpreted scripting language, so it's assumed by most that JS programs are processed in a single, top-down pass. But JS is in fact parsed/compiled in a separate phase **before execution begins**. The code author's decisions on where to place variables, functions, and blocks with respect to each other are analyzed according to the rules of scope, during the initial parsing/compilation phase. The resulting scope layout is generally unaffected by runtime conditions.
 
 JS functions are themselves first-class values; they can be assigned and passed around just like numbers or strings. But since these functions hold and access variables, they maintain their original scope no matter where in the program the functions are eventually executed. This is called closure.
 
@@ -33,7 +29,7 @@ It's not mysterious or magical, though. Code compilation is a set of steps that 
 
 You also may have heard that code can be *interpreted*, but how is that different from being *compiled*?
 
-Interpretation performs a similar task to compilation, in that it transforms your program into machine-understandable instructions. But the processing model is fairly different. Unlike a program being compiled all at once, with interpretation the source code is typically transformed line-by-line; each line or statement is immediately executed before proceeding to processing the next line of the source code.
+Interpretation performs a similar task to compilation, in that it transforms your program into machine-understandable instructions. But the processing model is fairly different. Unlike a program being compiled all at once, with interpretation the source code is typically transformed line by line; each line or statement is immediately executed before proceeding to processing the next line of the source code.
 
 Figure 1 illustrates compilation vs. interpretation of programs:
 
@@ -43,7 +39,7 @@ Figure 1 illustrates compilation vs. interpretation of programs:
     <br><br>
 </figure>
 
-Are these two processing models mutually exclusive? Generally, yes. However, the issue is more nuanced, because interpretation can actually take other forms than just operating line-by-line on source code text. Modern JS engines actually employ numerous variations of both compilation and interpretation in the handling of JS programs.
+Are these two processing models mutually exclusive? Generally, yes. However, the issue is more nuanced, because interpretation can actually take other forms than just operating line by line on source code text. Modern JS engines actually employ numerous variations of both compilation and interpretation in the handling of JS programs.
 
 Recall that we surveyed compliation and interpretation in Chapter 1 of the *Get Started* book. Our conclusion there is that JS is most accurately portrayed as a **compiled language**. For the benefit of readers here, the following sections will revist and expand on that assertion.
 
@@ -63,15 +59,15 @@ In classic compiler theory, a program is processed by a compiler in three basic 
 
     For example, the tree for `var a = 2;` might start with a top-level node called `VariableDeclaration`, with a child node called `Identifier` (whose value is `a`), and another child called `AssignmentExpression` which itself has a child called `NumericLiteral` (whose value is `2`).
 
-3. **Code Generation:** taking an AST and turning it into executable code. This part varies greatly depending on the language, the platform it's targeting, etc.
+3. **Code Generation:** taking an AST and turning it into executable code. This part varies greatly depending on the language, the platform it's targeting, and other factors.
 
-    The JS engine takes our above described AST for `var a = 2;` and turns it into a set of machine instructions to actually *create* a variable called `a` (including reserving memory, etc.), and then store a value into `a`.
+    The JS engine takes the just described AST for `var a = 2;` and turns it into a set of machine instructions to actually *create* a variable called `a` (including reserving memory, etc.), and then store a value into `a`.
 
 | NOTE: |
 | :--- |
-| The implementation details of a JS engine (utilizing system memory resources, etc) is much deeper than we will dig here. We'll keep our focus on the observable behavior of our programs and let the JS engine manage those system-level abstractions. |
+| The implementation details of a JS engine (utilizing system memory resources, etc.) is much deeper than we will dig here. We'll keep our focus on the observable behavior of our programs and let the JS engine manage those system-level abstractions. |
 
-The JS engine is vastly more complex than *just* those three stages. In the process of parsing and code-generation, there are steps to optimize the performance of the execution, including collapsing redundant elements, etc. In fact, code can even be re-compiled and re-optimized during the progression of execution.
+The JS engine is vastly more complex than *just* those three stages. In the process of parsing and code generation, there are steps to optimize the performance of the execution (i.e., collapsing redundant elements). In fact, code can even be re-compiled and re-optimized during the progression of execution.
 
 So, I'm painting only with broad strokes here. But you'll see shortly why *these* details we *do* cover, even at a high level, are relevant.
 
@@ -81,11 +77,11 @@ JS engines don't have the luxury of plenty of time to optimize, because JS compi
 
 To state it as simply as possible, the most important observation we can make about processing of JS programs is that it occurs in (at least) two phases: parsing/compilation first, then execution.
 
-The breakdown of a parsing/compilation phase separate from the subsequent execution phase is observable fact, not theory or opinion. While the JS specification does not require "compilation" explicitly, it requires behavior which is essentially only practical in a compile-then-execute cadence.
+The breakdown of a parsing/compilation phase separate from the subsequent execution phase is observable fact, not theory or opinion. While the JS specification does not require "compilation" explicitly, it requires behavior that is essentially only practical in a compile-then-execute cadence.
 
 There are three program characteristics you can observe to prove this to yourself: syntax errors, early errors, and hoisting (covered in Chapter 5).
 
-#### Syntax Errors From The Start
+#### Syntax Errors from the Start
 
 Consider this program:
 
@@ -192,7 +188,7 @@ console.log(nextStudent);
 
 Other than declarations, all occurrences of variables/identifiers in a program serve in one of two "roles": either they're the *target* of an assignment or they're the *source* of a value.
 
-(When I first learned compiler theory in my Computer Science degree, we were taught the terms "LHS" (aka, *target*) and "RHS" (aka, *source*) for these roles, respectively. As you might guess from the "L" and the "R", the acronyms mean "Left-Hand Side" and "Right-Hand Side", as in left and right sides of an `=` assignment operator. However, assignment targets and sources don't always literally appear on the left or right of an `=`, so it's probably clearer to think in terms of *target* / *source* instead of *left* / *right*.)
+(When I first learned compiler theory while earning my computer science degree, we were taught the terms "LHS" (aka, *target*) and "RHS" (aka, *source*) for these roles, respectively. As you might guess from the "L" and the "R", the acronyms mean "Left-Hand Side" and "Right-Hand Side", as in left and right sides of an `=` assignment operator. However, assignment targets and sources don't always literally appear on the left or right of an `=`, so it's probably clearer to think in terms of *target* / *source* instead of *left* / *right*.)
 
 How do you know if a variable is a *target*? Check if there is a value that is being assigned to it; if so, it's a *target*. If not, then the variable is a *source*.
 
@@ -238,7 +234,7 @@ Did you identify this one?
 function getStudentName(studentID) {
 ```
 
-A `function` declaration is a special case of a *target* reference. You could think of it like `var getStudentName = function(studentID)`, but that's not exactly accurate. An identifier `getStudentName` is declared (at compile-time), but the `= function(studentID)` part is also handled at compilation; the association between `getStudentName` and the function is automatically set up at the beginning of the scope rather than waiting for an `=` assignment statement to be executed.
+A `function` declaration is a special case of a *target* reference. You could think of it like `var getStudentName = function(studentID)`, but that's not exactly accurate. An identifier `getStudentName` is declared (at compile time), but the `= function(studentID)` part is also handled at compilation; the association between `getStudentName` and the function is automatically set up at the beginning of the scope rather than waiting for an `=` assignment statement to be executed.
 
 | NOTE: |
 | :--- |
@@ -258,13 +254,13 @@ In `getStudentName(73)`, `getStudentName` is a *source* reference (which we hope
 
 What's the importance of understanding *targets* vs. *sources*? In Chapter 2, we'll revisit this topic and cover how a variable's role impacts its lookup (specifically, if the lookup fails).
 
-## Cheating: Run-Time Scope Modifications
+## Cheating: Runtime Scope Modifications
 
-It should be clear by now that scope is determined as the program is compiled, and should not be affected by any run-time conditions. However, in non-strict-mode, there are technically still two ways to cheat this rule, and modify the scopes during the run-time.
+It should be clear by now that scope is determined as the program is compiled, and should not be affected by any runtime conditions. However, in non-strict-mode, there are technically still two ways to cheat this rule, and modify the scopes during runtime.
 
-Neither of these techniques *should* be used -- they're both very bad ideas, and you should be using strict-mode anyway -- but it's important to be aware of them in case you run across code that does.
+Neither of these techniques *should* be used—they're both very bad ideas, and you should be using strict-mode anyway—but it's important to be aware of them in case you run across code that does.
 
-The `eval(..)` function receives a string of code to compile and execute on the fly during the program run-time. If that string of code has a `var` or `function` declaration in it, those declarations will modify the scope that the `eval(..)` is currently executing in:
+The `eval(..)` function receives a string of code to compile and execute on the fly during the program runtime. If that string of code has a `var` or `function` declaration in it, those declarations will modify the scope that the `eval(..)` is currently executing in:
 
 ```js
 function badIdea() {
@@ -276,9 +272,9 @@ badIdea();
 // Ugh!
 ```
 
-If the `eval(..)` had not been present, the `oops` variable in `console.log(oops)` would not exist, and would throw a Reference Error. But `eval(..)` modifies the scope of the `badIdea()` function at run-time. This is a bad idea for many reasons, including the performance hit of modifying the already compiled and optimized scope, every time `badIdea()` runs. Don't do it!
+If the `eval(..)` had not been present, the `oops` variable in `console.log(oops)` would not exist, and would throw a Reference Error. But `eval(..)` modifies the scope of the `badIdea()` function at runtime. This is a bad idea for many reasons, including the performance hit of modifying the already compiled and optimized scope, every time `badIdea()` runs. Don't do it!
 
-The second cheat is the `with` keyword, which essentially dynamically turns an object into a local scope -- its properties are treated as identifiers in that scope's block:
+The second cheat is the `with` keyword, which essentially dynamically turns an object into a local scope—its properties are treated as identifiers in that scope's block:
 
 ```js
 var badIdea = {
@@ -291,7 +287,7 @@ with (badIdea) {
 }
 ```
 
-The global scope was not modified here, but `badIdea` was turned into a scope at run-time rather than compile-time. Again, this is a terrible idea, for performance and readability reasons. Don't!
+The global scope was not modified here, but `badIdea` was turned into a scope at runtime rather than compile time. Again, this is a terrible idea, for performance and readability reasons. Don't!
 
 At all costs, avoid `eval(..)` (at least, `eval(..)` creating declarations) and `with`. As mentioned, neither of these cheats is available in strict-mode, so if you just use strict-mode (you should!) then the temptation is removed.
 
@@ -299,7 +295,7 @@ At all costs, avoid `eval(..)` (at least, `eval(..)` creating declarations) and 
 
 We've demonstrated that JS's scope is determined at compile time; the term for this kind of scope is "lexical scope". "Lexical" is associated with the "lexing" stage of compilation, as discussed earlier in this chapter.
 
-To narrow this chapter down to a useful conclusion, the key idea of "lexical scope" is that it's controlled entirely by the placement of functions, blocks, and variable declarations, in relation to each other.
+To narrow this chapter down to a useful conclusion, the key idea of "lexical scope" is that it's controlled entirely by the placement of functions, blocks, and variable declarations, in relation to one another.
 
 If you place a variable declaration inside a function, the compiler handles this declaration as it's parsing the function, and associates that declaration with the function's scope. If a variable is block-scope declared (`let` / `const`), then it's associated with the nearest enclosing `{ .. }` block, rather than its enclosing function (as with `var`).
 
@@ -307,6 +303,6 @@ Furthermore, a reference (*target* or *source* role) for a variable must be reso
 
 It's important to note that compilation doesn't actually *do anything* in terms of reserving memory for scopes and variables. None of the program has been executed yet.
 
-Instead, compilation creates a map of all the lexical scopes that lays out what the program will need while it executes. You can think of this plan as inserted code for the run-time, which defines all the scopes (aka, "lexical environments") and registers all the identifiers (variables) for each scope.
+Instead, compilation creates a map of all the lexical scopes that lays out what the program will need while it executes. You can think of this plan as inserted code for the runtime, which defines all the scopes (aka, "lexical environments") and registers all the identifiers (variables) for each scope.
 
-In other words, while scopes are identified during compilation, they're not actually created until run-time, each time a scope needs to run. In the next chapter, we'll sketch out the conceptual foundations for lexical scope.
+In other words, while scopes are identified during compilation, they're not actually created until runtime, each time a scope needs to run. In the next chapter, we'll sketch out the conceptual foundations for lexical scope.
