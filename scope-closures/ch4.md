@@ -175,6 +175,33 @@ While such nuance is possible, it's almost certainly a bad idea to do so. Reader
 
 A simple way to avoid this gotcha with global declarations: always use `var` for globals. Reserve `let` and `const` for block scopes (see "Scoping With Blocks" in Chapter 6).
 
+#### DOM Globals
+
+One surprising behavior in the global scope you may encounter with browser-based JS applications: a DOM element with an `id` attribute automatically creates a global variable that references it.
+
+Consider this markup:
+
+```text
+<ul id="my-todo-list">
+   <li id="first">Write a book</li>
+   ..
+</ul>
+```
+
+And the JS for that page could include:
+
+```js
+first;
+// <li id="first"> .. </li>
+
+window["my-todo-list"];
+// <ul id="my-todo-list"> .. </ul>
+```
+
+If the `id` value is a valid lexical name (like `first`), the lexical variable is created. If not, the only way to access that global is through the global object (`window[..]`).
+
+The auto-registration of all `id`-bearing DOM elements as global variables is an old legacy browser behavior that can nevertheless never be removed because so many old sites still rely on it. My advice is never to use these global variables, even though they will always be silently created.
+
 #### What's in a (Window) Name?
 
 I asserted that this browser-hosted JS environment has the most *pure* global scope behavior we'll see. However, it's not entirely *pure*.
