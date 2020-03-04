@@ -62,7 +62,7 @@ var Utils = {
 };
 ```
 
-`Utils` here is a useful collection of utilities, yet they're all state-independent functions. Gathering functionality together is generally good pratice, but that doesn't make this a module. Rather, we've defined a `Utils` namespace and organized the functions under it.
+`Utils` here is a useful collection of utilities, yet they're all state-independent functions. Gathering functionality together is generally good practice, but that doesn't make this a module. Rather, we've defined a `Utils` namespace and organized the functions under it.
 
 ### Data Structures (Stateful Grouping)
 

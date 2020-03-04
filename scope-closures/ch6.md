@@ -554,7 +554,7 @@ catch {   // catch-declaration omitted
 }
 ```
 
-This is a small but delightful simplification of syntax for a fairly common use case, and may also be slightly more performant in removing an unncessary scope!
+This is a small but delightful simplification of syntax for a fairly common use case, and may also be slightly more performant in removing an unnecessary scope!
 
 ## Function Declarations in Blocks (FiB)
 

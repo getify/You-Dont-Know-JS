@@ -17,7 +17,7 @@ Remember Figure 2 from back in Chapter 2?
     <br><br>
 </figure>
 
-This exercise asks you to write a program—any program!—that contains nested functions and block scopes, which satisifies these constraints:
+This exercise asks you to write a program—any program!—that contains nested functions and block scopes, which satisfies these constraints:
 
 * If you color all the scopes (including the global scope!) different colors, you need at least six colors. Make sure to add a code comment labeling each scope with its color.
 
