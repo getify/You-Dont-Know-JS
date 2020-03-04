@@ -129,7 +129,7 @@ An important detail might have been too easy to gloss over in that previous para
 
 But actually, every time the outer `adder(..)` function runs, a *new* inner `addTo(..)` function instance is created, and for each new instance, a new closure. So each inner function instance (labeled `add10To(..)` and `add42To(..)` in our program) has its own closure over its own instance of the scope environment from that execution of `adder(..)`.
 
-Even though closure is based on lexical scope, which is handled at compile time, closure is more precisely described as a runtime characteristic of function instances.
+Even though closure is based on lexical scope, which is handled at compile time, closure is observed as a runtime characteristic of function instances.
 
 ### Live Link, Not a Snapshot
 
@@ -720,7 +720,7 @@ Both perspectives/models are useful in understanding closure, but the reader may
 
 | NOTE: |
 | :--- |
-| This alternative model for closure does affect whether we classify synchronous callbacks as observances of closure or not. More on this nuance in Appendix A. |
+| This alternative model for closure does affect whether we classify synchronous callbacks as examples of closure or not. More on this nuance in Appendix A. |
 
 ## Why Closure?
 

@@ -681,4 +681,4 @@ useCalc(calc,"51=");            // 51
 
 That's it for the exercises and this book! Congratulations on your achievement! When you're ready, move on to Book 3, *Objects & Classes*.
 
-[^MathJSisPrime]: *Math.js: isPrime(..)*, <a href="https://github.com/josdejong/mathjs/blob/develop/src/function/utils/isPrime.js">https://github.com/josdejong/mathjs/blob/develop/src/function/utils/isPrime.js</a>, 3 March 2020.
+[^MathJSisPrime]: *Math.js: isPrime(..)*, https://github.com/josdejong/mathjs/blob/develop/src/function/utils/isPrime.js, 3 March 2020.

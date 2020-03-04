@@ -115,11 +115,11 @@ These are just some of the many *globals* your programs will interact with.
 
 Most developers agree that the global scope shouldn't just be a dumping ground for every variable in your application. That's a mess of bugs just waiting to happen. But it's also undeniable that the global scope is an important *glue* for practically every JS application.
 
-## Where Exactly Is This Global Scope?
+## Where Exactly is this Global Scope?
 
 It might seem obvious that the global scope is located in the outermost portion of a file; that is, not inside any function or other block. But it's not quite as simple as that.
 
-Different JS environments handle the scopes of your programs—in particular, the global scope—differently. It's quite common for JS developers to harbor misconceptions without even realizing it.
+Different JS environments handle the scopes of your programs, especially the global scope, differently. It's quite common for JS developers to harbor misconceptions without even realizing it.
 
 ### Browser "Window"
 

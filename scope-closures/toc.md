@@ -24,7 +24,7 @@
     * Backing Out
 * Chapter 4: Around the Global Scope
     * Why Global Scope?
-    * Where Exactly Is This Global Scope?
+    * Where Exactly is this Global Scope?
     * Global This
     * Globally Aware
 * Chapter 5: The (Not So) Secret Lifecycle of Variables

@@ -100,7 +100,7 @@ function whatsTheDealHere(id,defaultID = () => id) {
 
     console.log(`local variable 'id': ${ id }`);
     console.log(
-        `parameter 'id' (via closure): ${ defaultID() }`
+        `parameter 'id' (closure): ${ defaultID() }`
     );
 
     console.log("reassigning 'id' to 5");
@@ -108,16 +108,16 @@ function whatsTheDealHere(id,defaultID = () => id) {
 
     console.log(`local variable 'id': ${ id }`);
     console.log(
-        `parameter 'id' (via closure): ${ defaultID() }`
+        `parameter 'id' (closure): ${ defaultID() }`
     );
 }
 
 whatsTheDealHere(3);
 // local variable 'id': 3   <--- Huh!? Weird!
-// parameter 'id' (via closure): 3
+// parameter 'id' (closure): 3
 // reassigning 'id' to 5
 // local variable 'id': 5
-// parameter 'id' (via closure): 3
+// parameter 'id' (closure): 3
 ```
 
 The strange bit here is the first console message. At that moment, the shadowing `id` local variable has just been `var id` declared, which Chapter 5 asserts is typically auto-initialized to `undefined` at the top of its scope. Why doesn't it print `undefined`?
@@ -1102,4 +1102,4 @@ The final `()` that normally invokes an IIFE is being passed three arguments: `"
 
 There's no question that as of the time of this writing, ESM (ES Modules) are becoming popular and widespread rapidly. But with millions and millions of modules written over the last 20 years, all using some pre-ESM variation of classic modules, they're still very important to be able to read and understand when you come across them.
 
-[^fowlerIOC]: *Inversion of Control*, Martin Fowler, <a href="https://martinfowler.com/bliki/InversionOfControl.html">https://martinfowler.com/bliki/InversionOf Control.html</a>, 26 June 2005.
+[^fowlerIOC]: *Inversion of Control*, Martin Fowler, https://martinfowler.com/bliki/InversionOfControl.html, 26 June 2005.

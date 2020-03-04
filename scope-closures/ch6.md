@@ -686,7 +686,8 @@ var isArray = function isArray(a) {
 // override the definition, if you must
 if (typeof Array.isArray == "undefined") {
     isArray = function isArray(a) {
-        return Object.prototype.toString.call(a) == "[object Array]";
+        return Object.prototype.toString.call(a)
+            == "[object Array]";
     };
 }
 ```
@@ -705,4 +706,4 @@ And one of the most important organizational techniques is to ensure that no var
 
 Hopefully by you feel like you're standing on much more solid ground with understanding lexical scope. From that base, the next chapter jumps into the weighty topic of closure.
 
-[^POLP]: *Principle of Least Privilege*, <a href="https://en.wikipedia.org/wiki/Principle_of_least_privilege">https://en.wikipedia.org/wiki/Principle_of_least_privilege</a>, 3 March 2020.
+[^POLP]: *Principle of Least Privilege*, https://en.wikipedia.org/wiki/Principle_of_least_privilege, 3 March 2020.

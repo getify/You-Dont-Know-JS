@@ -82,7 +82,7 @@ console.log(studentName);
 
 The `studentName` variable on line 1 (the `var studentName = ..` statement) creates a RED(1) marble. The same named variable is declared as a BLUE(2) marble on line 3, the parameter in the `printStudent(..)` function definition.
 
-So the question is, what color marble is `studentName` in the `studentName = studentName.toUpperCase()` and `console.log(studentName)` statements? All three `studentName` references here will be BLUE(2). Why?
+What color marble will `studentName` be in the `studentName = studentName.toUpperCase()` assignment statement and the `console.log(studentName)` statement? All three `studentName` references will be BLUE(2).
 
 With the conceptual notion of the "lookup," we asserted that it starts with the current scope and works its way outward/upward, stopping as soon as a matching variable is found. The BLUE(2) `studentName` is found right away. The RED(1) `studentName` is never even considered.
 
@@ -272,7 +272,7 @@ var askQuestion = function(){
 };
 ```
 
-The same thing is true with respect to the variable `askQuestion` being created. But since we have a `function` expression—a function definition used as value instead of a standalone declaration—the function itself will not "hoist" (see Chapter 5).
+The same is true for the variable `askQuestion` being created. But since it's a `function` expression—a function definition used as value instead of a standalone declaration—the function itself will not "hoist" (see Chapter 5).
 
 One major difference between `function` declarations and `function` expressions is what happens to the name identifier of the function.
 

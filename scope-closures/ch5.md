@@ -95,8 +95,7 @@ Chapter 2 was full of metaphors (to illustrate scope), but here we are faced wit
 The typical assertion of what hoisting means: *lifting*—like lifting a heavy weight upward—any identifiers all the way to the top of a scope. The explanation often asserted is that the JS engine will actually *rewrite* that program before execution, so that it looks more like this:
 
 ```js
-var greeting;           // hoisted declaration moved
-                        // to the top
+var greeting;           // hoisted declaration
 
 greeting = "Hello!";    // the original line 1
 console.log(greeting);
