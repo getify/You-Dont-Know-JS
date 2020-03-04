@@ -95,7 +95,8 @@ Chapter 2 was full of metaphors (to illustrate scope), but here we are faced wit
 The typical assertion of what hoisting means: *lifting*—like lifting a heavy weight upward—any identifiers all the way to the top of a scope. The explanation often asserted is that the JS engine will actually *rewrite* that program before execution, so that it looks more like this:
 
 ```js
-var greeting;           // hoisted declaration moved to the top
+var greeting;           // hoisted declaration moved
+                        // to the top
 
 greeting = "Hello!";    // the original line 1
 console.log(greeting);
@@ -177,7 +178,7 @@ If you consider this program from the perspective of the hoisting metaphor, the 
 
 ```js
 var studentName;
-var studentName;    // this is clearly a pointless no-op!
+var studentName;    // clearly a pointless no-op!
 
 studentName = "Frank";
 console.log(studentName);
@@ -569,7 +570,7 @@ askQuestion();
 let studentName = "Suzy";
 
 function askQuestion() {
-    console.log(`${ studentName }, what do you think?`);
+    console.log(`${ studentName }, do you know?`);
 }
 ```
 
@@ -599,7 +600,7 @@ var studentName = "Kyle";
 
 What's going to happen with the first `console.log(..)` statement? If `let studentName` didn't hoist to the top of the scope, then the first `console.log(..)` *should* print `"Kyle"`, right? At that moment, it would seem, only the outer `studentName` exists, so that's the variable `console.log(..)` should access and print.
 
-But instead, a TDZ error is thrown at that first `console.log(..)`, because in fact, the inner scope's `studentName` **was** hoisted (auto-registered at the top of the scope). What **didn't** happen (yet!) was the auto-initialization of that inner `studentName`; it's still unintialized at that moment, hence the TDZ violation!
+But instead, the first `console.log(..)` throws a TDZ error, because in fact, the inner scope's `studentName` **was** hoisted (auto-registered at the top of the scope). What **didn't** happen (yet!) was the auto-initialization of that inner `studentName`; it's still unintialized at that moment, hence the TDZ violation!
 
 So to summarize, TDZ errors occur because `let`/`const` declarations *do* hoist their declarations to the top of their scopes, but unlike `var`, they defer the auto-initialization of their variables until the moment in the code's sequencing where the original declaration appeared. This window of time (hint: temporal), whatever its length, is the TDZ.
 

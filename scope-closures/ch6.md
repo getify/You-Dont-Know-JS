@@ -9,7 +9,7 @@ To begin, we're going to look at how and why we should be using different levels
 
 It makes sense that functions define their own scopes. But why do we need blocks to create scopes as well?
 
-Software engineering articulates a fundamental discipline, typically applied to software security, called "The Principle of Least Privilege" (POLP, https://en.wikipedia.org/wiki/Principle_of_least_privilege). And a variation of this principle that applies to our current discussion is typically labeled as "Least Exposure" (POLE).
+Software engineering articulates a fundamental discipline, typically applied to software security, called "The Principle of Least Privilege" (POLP). [^POLP] And a variation of this principle that applies to our current discussion is typically labeled as "Least Exposure" (POLE).
 
 POLP expresses a defensive posture to software architecture: components of the system should be designed to function with least privilege, least access, least exposure. If each piece is connected with minimum-necessary capabilities, the overall system is stronger from a security standpoint, because a compromise or failure of one piece has a minimized impact on the rest of the system.
 
@@ -235,7 +235,8 @@ Consider:
     let thisIsNowAScope = true;
 
     for (let i = 0; i < 5; i++) {
-        // this is also a scope, activated each iteration
+        // this is also a scope, activated each
+        // iteration
 
         if (i % 2 == 0) {
             // this is just a block, not a scope
@@ -310,7 +311,9 @@ function getNextMonthStart(dateStr) {
         year++;
     }
 
-    return `${ year }-${ String(nextMonth).padStart(2,"0") }-01`;
+    return `${ year }-${
+            String(nextMonth).padStart(2,"0")
+        }-01`;
 }
 
 getNextMonthStart("2019-12-25");
@@ -351,8 +354,12 @@ function sortNamesByLength(names) {
                 // sort each bucket alphanumerically
                 bucket.sort();
 
-                // append the sorted names to our running list
-                sortedNames = [ ...sortedNames, ...bucket ];
+                // append the sorted names to our
+                // running list
+                sortedNames = [
+                    ...sortedNames,
+                    ...bucket
+                ];
             }
         }
 
@@ -368,7 +375,8 @@ sortNamesByLength([
     "Jennifer",
     "Scott"
 ]);
-// [ "John", "Suzy", "Frank", "Sally", "Scott", "Jennifer" ]
+// [ "John", "Suzy", "Frank", "Sally",
+//   "Scott", "Jennifer" ]
 ```
 
 There are six identifiers declared across five different scopes. Could all of these variables have existed in the single outer/global scope? Technically, yes, since they're all uniquely named and thus have no name collisions. But this would be really poor code organization, and would likely lead to both confusion and future bugs.
@@ -558,7 +566,7 @@ This is a small but delightful simplification of syntax for a fairly common use 
 
 ## Function Declarations in Blocks (FiB)
 
-We've seen now that `let`/`const` declarations are block-scoped, and `var` declarations are function-scoped. So what about `function` declarations that appear directly inside blocks? As a feature, this is called "FiB."
+We've seen now that declarations using `let` or `const` are block-scoped, and `var` declarations are function-scoped. So what about `function` declarations that appear directly inside blocks? As a feature, this is called "FiB."
 
 We typically think of `function` declarations like they're the equivalent of a `var` declaration. So are they function-scoped like `var` is?
 
@@ -604,7 +612,8 @@ if (typeof Array.isArray != "undefined") {
 }
 else {
     function isArray(a) {
-        return Object.prototype.toString.call(a) == "[object Array]";
+        return Object.prototype.toString.call(a)
+            == "[object Array]";
     }
 }
 ```
@@ -661,7 +670,8 @@ function isArray(a) {
         return Array.isArray(a);
     }
     else {
-        return Object.prototype.toString.call(a) == "[object Array]";
+        return Object.prototype.toString.call(a)
+            == "[object Array]";
     }
 }
 ```
@@ -694,3 +704,5 @@ The point of lexical scoping rules in a programming language is so we can approp
 And one of the most important organizational techniques is to ensure that no variable is over-exposed to unnecessary scopes (POLE). Hopefully you now appreciate block scoping much more deeply than before.
 
 Hopefully by you feel like you're standing on much more solid ground with understanding lexical scope. From that base, the next chapter jumps into the weighty topic of closure.
+
+[^POLP]: *Principle of Least Privilege*, <a href="https://en.wikipedia.org/wiki/Principle_of_least_privilege">https://en.wikipedia.org/wiki/Principle_of_least_privilege</a>, 3 March 2020.

@@ -374,7 +374,7 @@ getName(73);
 The only difference here is dropping the `{ }` around the import binding. If you want to mix a default import with other named imports:
 
 ```js
-import { default as getName, /* .. other names .. */ }
+import { default as getName, /* .. others .. */ }
    from "/path/to/students.js";
 
 getName(73);

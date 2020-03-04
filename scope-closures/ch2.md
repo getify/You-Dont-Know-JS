@@ -301,7 +301,7 @@ Never rely on accidental global variables. Always use strict-mode, and always fo
 
 ### Building On Metaphors
 
-To visualize nested scope resolution, yet another useful metaphor I like is an office building, as in Figure 3:
+To visualize nested scope resolution, I prefer yet another metaphor, an office building, as in Figure 3:
 
 <figure>
     <img src="images/fig3.png" width="250" alt="Scope &quot;Building&quot;" align="center">

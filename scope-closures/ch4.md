@@ -385,7 +385,8 @@ I think it's fair to say that global scope access and behavior is more complicat
 Yet another "trick" for obtaining a reference to the global scope object looks like:
 
 ```js
-const theGlobalScopeObject = (new Function("return this"))();
+const theGlobalScopeObject =
+    (new Function("return this"))();
 ```
 
 | NOTE: |
@@ -402,10 +403,10 @@ We could even attempt to define a cross-environment polyfill that's safer across
 
 ```js
 const theGlobalScopeObject =
-    (typeof globalThis !== "undefined") ? globalThis :
-    (typeof global !== "undefined") ? global :
-    (typeof window !== "undefined") ? window :
-    (typeof self !== "undefined") ? self :
+    (typeof globalThis != "undefined") ? globalThis :
+    (typeof global != "undefined") ? global :
+    (typeof window != "undefined") ? window :
+    (typeof self != "undefined") ? self :
     (new Function("return this"))();
 ```
 

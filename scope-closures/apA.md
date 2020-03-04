@@ -39,7 +39,7 @@ Consider:
 ```js
 // outer/global scope: RED(1)
 
-function getStudentName(/* BLUE(2) */ studentID = 0) {
+function getStudentName(/*BLUE(2)*/ studentID = 0) {
     // function scope: GREEN(3)
 
     // ..
@@ -99,13 +99,17 @@ function whatsTheDealHere(id,defaultID = () => id) {
     var id;
 
     console.log(`local variable 'id': ${ id }`);
-    console.log(`parameter 'id' (via closure): ${ defaultID() }`);
+    console.log(
+        `parameter 'id' (via closure): ${ defaultID() }`
+    );
 
     console.log("reassigning 'id' to 5");
     id = 5;
 
     console.log(`local variable 'id': ${ id }`);
-    console.log(`parameter 'id' (via closure): ${ defaultID() }`);
+    console.log(
+        `parameter 'id' (via closure): ${ defaultID() }`
+    );
 }
 
 whatsTheDealHere(3);
@@ -186,7 +190,8 @@ btn.addEventListener("click",function(){
     },100);
 });
 
-// Uncaught TypeError: Cannot read property 'toUpperCase' of null
+// Uncaught TypeError: Cannot read property
+// 'toUpperCase' of null
 //     at myProgram.js:4
 //     at Array.map (<anonymous>)
 //     at myProgram.js:3
@@ -970,7 +975,7 @@ function printLabels(labels) {
 }
 ```
 
-The inner function `createLabel(..)` (aka, `renderLabel(..)`) is closed over `list`, so closure is definitely being utilized.
+The inner function `createLabel(..)`, which we assign to `renderLabel`, is closed over `list`, so closure is definitely being utilized.
 
 Closure allows us to remember `list` for later, while we defer execution of the actual label-creation logic from the `renderTo(..)` call to the subsequent `forEach(..)` invocations of the `createLabel(..)` IIF. That may only be a brief moment here, but any amount of time could pass, as closure bridges from call to call.
 
@@ -1097,4 +1102,4 @@ The final `()` that normally invokes an IIFE is being passed three arguments: `"
 
 There's no question that as of the time of this writing, ESM (ES Modules) are becoming popular and widespread rapidly. But with millions and millions of modules written over the last 20 years, all using some pre-ESM variation of classic modules, they're still very important to be able to read and understand when you come across them.
 
-[^fowlerIOC]: *Inversion of Control*, Martin Fowler, https://martinfowler.com/bliki/InversionOfControl.html, 26 June 2005.
+[^fowlerIOC]: *Inversion of Control*, Martin Fowler, <a href="https://martinfowler.com/bliki/InversionOfControl.html">https://martinfowler.com/bliki/InversionOf Control.html</a>, 26 June 2005.

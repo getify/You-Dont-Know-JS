@@ -82,7 +82,7 @@ console.log(studentName);
 
 The `studentName` variable on line 1 (the `var studentName = ..` statement) creates a RED(1) marble. The same named variable is declared as a BLUE(2) marble on line 3, the parameter in the `printStudent(..)` function definition.
 
-So the question is, what color marble is being referenced in the `studentName = studentName.toUpperCase()` statement, and indeed the next statement, `console.log(studentName)`? All three `studentName` references here will be BLUE(2). Why?
+So the question is, what color marble is `studentName` in the `studentName = studentName.toUpperCase()` and `console.log(studentName)` statements? All three `studentName` references here will be BLUE(2). Why?
 
 With the conceptual notion of the "lookup," we asserted that it starts with the current scope and works its way outward/upward, stopping as soon as a matching variable is found. The BLUE(2) `studentName` is found right away. The RED(1) `studentName` is never even considered.
 
@@ -161,7 +161,7 @@ lookingFor(112358132134);
 // 42
 ```
 
-The global RED(1) `special` is shadowed by the BLUE(2) `special` (parameter), and the BLUE(2) `special` is itself shadowed by the GREEN(3) `special` inside `keepLooking()`. We can still access RED(1) `special` indirectly as `window.special`. But there's no way for `keepLooking()` to access the BLUE(2) `special` that holds the number `112358132134`.
+The global RED(1) `special` is shadowed by the BLUE(2) `special` (parameter), and the BLUE(2) `special` is itself shadowed by the GREEN(3) `special` inside `keepLooking()`. We can still access the RED(1) `special` using the indirect reference `window.special`. But there's no way for `keepLooking()` to access the BLUE(2) `special` that holds the number `112358132134`.
 
 ### Copying Is Not Accessing
 
@@ -219,7 +219,9 @@ function another() {
     {
         let special = "JavaScript";
         {
-            var special = "JavaScript";   // Syntax Error
+            var special = "JavaScript";
+            // ^^^ Syntax Error
+
             // ..
         }
     }

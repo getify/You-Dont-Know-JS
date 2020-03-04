@@ -51,7 +51,7 @@ factorize(11);      // [ 11 ]
 factorize(12);      // [ 3, 2, 2 ] --> 3*2*2=12
 ```
 
-Here's a decent implementation of `isPrime(..)` that I adapted from the Math.js library:
+Here's an implementation of `isPrime(..)`, adapted from the Math.js library: [^MathJSisPrime]
 
 ```js
 function isPrime(v) {
@@ -70,8 +70,6 @@ function isPrime(v) {
     return true;
 }
 ```
-
-Reference: https://github.com/josdejong/mathjs/blob/develop/src/function/utils/isPrime.js
 
 And here's a somewhat basic implementation of `factorize(..)` (not to be confused with `factorial(..)` from Chapter 6):
 
@@ -359,7 +357,7 @@ The most important benefit you can get from reading these suggested solutions is
 
 ### Suggested: Buckets of Marbles
 
-The *Buckets of Marbles Exercise* could be solved like this:
+The *Buckets of Marbles Exercise* can be solved like this:
 
 ```js
 // RED(1)
@@ -407,7 +405,7 @@ findPrimes(howMany);
 
 ### Suggested: Closure (PART 1)
 
-The *Closure Exercise (PART 1)* `isPrime(..)` / `factorize(..)` could be solved like this:
+The *Closure Exercise (PART 1)* for `isPrime(..)` and `factorize(..)`, can be solved like this:
 
 ```js
 var isPrime = (function isPrime(v){
@@ -467,7 +465,7 @@ I also renamed the inner function from `factorize(..)` to `findFactors(..)`. Tha
 
 ### Suggested: Closure (PART 2)
 
-The *Closure Exercise (PART 2)* `toggle(..)` could be solved like this:
+The *Closure Exercise (PART 2)* `toggle(..)` can be solved like this:
 
 ```js
 function toggle(...vals) {
@@ -504,7 +502,7 @@ speed();      // "slow"
 
 ### Suggested: Closure (PART 3)
 
-The *Closure Exercise (PART 3)* `calculator()` could be solved like this:
+The *Closure Exercise (PART 3)* `calculator()` can be solved like this:
 
 ```js
 // from earlier:
@@ -591,7 +589,7 @@ useCalc(calc,"51=");            // 51
 
 ### Suggested: Modules
 
-The *Modules Exercise* `calculator()` could be solved like this:
+The *Modules Exercise* `calculator()` can be solved like this:
 
 ```js
 // from earlier:
@@ -682,3 +680,5 @@ useCalc(calc,"51=");            // 51
 ```
 
 That's it for the exercises and this book! Congratulations on your achievement! When you're ready, move on to Book 3, *Objects & Classes*.
+
+[^MathJSisPrime]: *Math.js: isPrime(..)*, <a href="https://github.com/josdejong/mathjs/blob/develop/src/function/utils/isPrime.js">https://github.com/josdejong/mathjs/blob/develop/src/function/utils/isPrime.js</a>, 3 March 2020.
