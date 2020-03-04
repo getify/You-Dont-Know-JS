@@ -96,27 +96,21 @@ The typical assertion of what hoisting means: *lifting*—like lifting a heavy w
 
 ```js
 var greeting;           // hoisted declaration
-
 greeting = "Hello!";    // the original line 1
-console.log(greeting);
-// Hello!
-
+console.log(greeting);  // Hello!
 greeting = "Howdy!";    // `var` is gone!
 ```
 
-The hoisting (metaphor) proposes that JS pre-processes the original program and re-arranges it a bit, so that all the declarations have been moved to the top of their respective scopes, before execution. Moreover, the hoisting metaphor asserts that `function` declarations are, in their entirety, hoisted to the top of each scope.
-
-Consider:
+The hoisting (metaphor) proposes that JS pre-processes the original program and re-arranges it a bit, so that all the declarations have been moved to the top of their respective scopes, before execution. Moreover, the hoisting metaphor asserts that `function` declarations are, in their entirety, hoisted to the top of each scope. Consider:
 
 ```js
-studentName = "Suzy"
+studentName = "Suzy";
 greeting();
 // Hello Suzy!
 
 function greeting() {
     console.log(`Hello ${ studentName }!`);
 }
-
 var studentName;
 ```
 
@@ -141,7 +135,7 @@ Hoisting as a mechanism for re-ordering code may be an attractive simplification
 
 Guess what parsing is? The first phase of the two-phase processing! There's no magical mental gymnastics that gets around that fact.
 
-So if the hoisting metaphor is (at best) inaccurate, what should we do with the term? I think it's still useful—indeed, even members of TC39 regularly use it!—but I don't think we claim it's an actual re-arrangement of code.
+So if the hoisting metaphor is (at best) inaccurate, what should we do with the term? I think it's still useful—indeed, even members of TC39 regularly use it!—but I don't think we should claim it's an actual re-arrangement of source code.
 
 | WARNING: |
 | :--- |
@@ -149,24 +143,19 @@ So if the hoisting metaphor is (at best) inaccurate, what should we do with the 
 
 I assert that hoisting *should* be used to refer to the **compile-time operation** of generating runtime instructions for the automatic registration of a variable at the beginning of its scope, each time that scope is entered.
 
-That's a subtle but important shift, from suggesting hoisting as a runtime behavior to its proper place among the compile-time tasks.
+That's a subtle but important shift, from hoisting as a runtime behavior to its proper place among compile-time tasks.
 
 ## Re-declaration?
 
-What do you think happens when a variable is declared more than once in the same scope?
-
-Consider:
+What do you think happens when a variable is declared more than once in the same scope? Consider:
 
 ```js
 var studentName = "Frank";
-
 console.log(studentName);
 // Frank
 
 var studentName;
-
-console.log(studentName);
-// ???
+console.log(studentName);   // ???
 ```
 
 What do you expect to be printed for that second message? Many believe the second `var studentName` has re-declared the variable (and thus "reset" it), so they expect `undefined` to be printed.
@@ -197,20 +186,14 @@ It's also important to point out that `var studentName;` doesn't mean `var stude
 
 ```js
 var studentName = "Frank";
-
-console.log(studentName);
-// Frank
+console.log(studentName);   // Frank
 
 var studentName;
-
-console.log(studentName);
-// Frank <--- still!
+console.log(studentName);   // Frank <--- still!
 
 // let's add the initialization explicitly
 var studentName = undefined;
-
-console.log(studentName);
-// undefined <--- see!?
+console.log(studentName);   // undefined <--- see!?
 ```
 
 See how the explicit `= undefined` initialization produces a different outcome than assuming it happens implicitly when omitted? In the next section, we'll revisit this topic of initialization of variables from their declarations.
@@ -254,23 +237,29 @@ It's not just that two declarations involving `let` will throw this error. If ei
 
 ```js
 var studentName = "Frank";
+
 let studentName = "Suzy";
 ```
 
+and:
+
 ```js
 let studentName = "Frank";
+
 var studentName = "Suzy";
 ```
 
 In both cases, a `SyntaxError` is thrown on the *second* declaration. In other words, the only way to "re-declare" a variable is to use `var` for all (two or more) of its declarations.
 
-But why disallow it? The reason for the error is not technical per se, as `var` "re-declaration" has always been allowed; clearly, the same allowance could have been made for `let`. But it's really more of a "social engineering" issue. "Re-declaration" of variables is seen by some, including many on the TC39 body, as a bad habit that can lead to program bugs.
+But why disallow it? The reason for the error is not technical per se, as `var` "re-declaration" has always been allowed; clearly, the same allowance could have been made for `let`.
 
-So when ES6 introduced `let`, they decided to prevent "re-declaration" with an error. When *Compiler* asks *Scope Manager* about a declaration, if that identifier has already been declared, and if either/both declarations were made with `let`, an error is thrown. The intended signal to the developer is "Stop relying on sloppy re-declaration!"
+It's really more of a "social engineering" issue. "Re-declaration" of variables is seen by some, including many on the TC39 body, as a bad habit that can lead to program bugs. So when ES6 introduced `let`, they decided to prevent "re-declaration" with an error.
 
 | NOTE: |
 | :--- |
 | This is of course a stylistic opinion, not really a technical argument. Many developers agree with the position, and that's probably in part why TC39 included the error (as well as `let` conforming to `const`). But a reasonable case could have been made that staying consistent with `var`'s precedent was more prudent, and that such opinion-enforcement was best left to opt-in tooling like linters. In Appendix A, we'll explore whether `var` (and its associated behavior, like "re-declaration") can still be useful in modern JS. |
+
+When *Compiler* asks *Scope Manager* about a declaration, if that identifier has already been declared, and if either/both declarations were made with `let`, an error is thrown. The intended signal to the developer is "Stop relying on sloppy re-declaration!"
 
 ### Constants?
 
@@ -311,13 +300,10 @@ Since `const` "re-declaration" must be disallowed (on those technical grounds), 
 
 ### Loops
 
-So it's clear from our previous discussion that JS doesn't really want us to "re-declare" our variables within the same scope. That probably seems like a straightforward admonition, until you consider what it means for repeated execution of declaration statements in loops.
-
-Consider:
+So it's clear from our previous discussion that JS doesn't really want us to "re-declare" our variables within the same scope. That probably seems like a straightforward admonition, until you consider what it means for repeated execution of declaration statements in loops. Consider:
 
 ```js
 var keepGoing = true;
-
 while (keepGoing) {
     let value = Math.random();
     if (value > 0.5) {
@@ -326,19 +312,14 @@ while (keepGoing) {
 }
 ```
 
-Is `value` being "re-declared" repeatedly in this program? Will we get errors thrown?
-
-No.
+Is `value` being "re-declared" repeatedly in this program? Will we get errors thrown? No.
 
 All the rules of scope (including "re-declaration" of `let`-created variables) are applied *per scope instance*. In other words, each time a scope is entered during execution, everything resets.
 
-Each loop iteration is its own new scope instance, and within each scope instance, `value` is only being declared once. So there's no attempted "re-declaration," and thus no error.
-
-Before we consider other loop forms, what if the `value` declaration in the previous snippet were changed to a `var`?
+Each loop iteration is its own new scope instance, and within each scope instance, `value` is only being declared once. So there's no attempted "re-declaration," and thus no error. Before we consider other loop forms, what if the `value` declaration in the previous snippet were changed to a `var`?
 
 ```js
 var keepGoing = true;
-
 while (keepGoing) {
     var value = Math.random();
     if (value > 0.5) {
@@ -403,13 +384,10 @@ for (let student of students) {
 
 Same thing with `for..in` and `for..of` loops: the declared variable is treated as *inside* the loop body, and thus is handled per iteration (aka, per scope instance). No "re-declaration."
 
-OK, I know you're thinking that I sound like a broken record at this point. But let's explore how `const` impacts these looping constructs.
-
-Consider:
+OK, I know you're thinking that I sound like a broken record at this point. But let's explore how `const` impacts these looping constructs. Consider:
 
 ```js
 var keepGoing = true;
-
 while (keepGoing) {
     // ooo, a shiny constant!
     const value = Math.random();
@@ -514,17 +492,11 @@ let studentName;
 
 Oops. We still get the `ReferenceError`, but now on the first line where we're trying to assign to (aka, initialize!) this so-called "uninitialized" variable `studentName`. What's the deal!?
 
-The real question is, how do we initialize an uninitialized variable? For `let`/`const`, the **only way** to do so is with an assignment attached to a declaration statement. An assignment by itself is insufficient!
-
-Consider:
+The real question is, how do we initialize an uninitialized variable? For `let`/`const`, the **only way** to do so is with an assignment attached to a declaration statement. An assignment by itself is insufficient! Consider:
 
 ```js
-// some other code
-
 let studentName = "Suzy";
-
-console.log(studentName);
-// Suzy
+console.log(studentName);   // Suzy
 ```
 
 Here, we are initializing the `studentName` (in this case, to `"Suzy"` instead of `undefined`) by way of the `let` declaration statement form that's coupled with an assignment.

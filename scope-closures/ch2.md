@@ -42,14 +42,12 @@ function getStudentName(studentID) {
 }
 
 var nextStudent = getStudentName(73);
-
-console.log(nextStudent);
-// Suzy
+console.log(nextStudent);   // Suzy
 ```
 
 We've designated three scope colors with code comments: RED (outermost global scope), BLUE (scope of function `getStudentName(..)`), and GREEN (scope of/inside the `for` loop). But it still may be difficult to recognize the boundaries of these scope buckets when looking at a code listing.
 
-Figure 2 helps visualize the boundaries of this program's scopes by drawing colored bubbles (aka, buckets) around each:
+Figure 2 helps visualize the boundaries of the scopes by drawing colored bubbles (aka, buckets) around each:
 
 <figure>
     <img src="images/fig2.png" width="500" alt="Colored Scope Bubbles" align="center">

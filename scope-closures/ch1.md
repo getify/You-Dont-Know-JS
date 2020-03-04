@@ -31,13 +31,13 @@ You also may have heard that code can be *interpreted*, so how is that different
 
 Interpretation performs a similar task to compilation, in that it transforms your program into machine-understandable instructions. But the processing model is different. Unlike a program being compiled all at once, with interpretation the source code is transformed line by line; each line or statement is executed before immediately proceeding to processing the next line of the source code.
 
-Figure 1 illustrates compilation vs. interpretation of programs:
-
 <figure>
     <img src="images/fig1.png" width="650" alt="Code Compilation and Code Interpretation" align="center">
     <figcaption><em>Fig. 1: Compiled vs. Interpreted Code</em></figcaption>
     <br><br>
 </figure>
+
+Figure 1 illustrates compilation vs. interpretation of programs.
 
 Are these two processing models mutually exclusive? Generally, yes. However, the issue is more nuanced, because interpretation can actually take other forms than just operating line by line on source code text. Modern JS engines actually employ numerous variations of both compilation and interpretation in the handling of JS programs.
 
@@ -79,7 +79,7 @@ To state it as simply as possible, the most important observation we can make ab
 
 The separation of a parsing/compilation phase from the subsequent execution phase is observable fact, not theory or opinion. While the JS specification does not require "compilation" explicitly, it requires behavior that is essentially only practical with a compile-then-execute approach.
 
-There are three program characteristics you can observe to prove this to yourself: syntax errors, early errors, and hoisting (covered more in Chapter 5).
+There are three program characteristics you can observe to prove this to yourself: syntax errors, early errors, and hoisting.
 
 #### Syntax Errors from the Start
 
@@ -123,7 +123,7 @@ The error thrown is not a syntax error in the sense of being a malformed string 
 
 But how does the JS engine know that the `greeting` parameter has been duplicated? How does it know that the `saySomething(..)` function is even in strict-mode while processing the parameter list (the `"use strict"` pragma appears only later, in the function body)?
 
-Again, the only reasonable answer to these questions is that the code must first be *fully* parsed before any execution occurs.
+Again, the only reasonable explanation is that the code must first be *fully* parsed before any execution occurs.
 
 #### Hoisting
 
@@ -207,9 +207,7 @@ For the JS engine to properly handle a program's variables, it must first label 
 What makes a variable a *target*? Consider:
 
 ```js
-students = [
-    /* .. */
-];
+students = [ // ..
 ```
 
 This statement is clearly an assignment operation; remember, the `var students` part is handled entirely as a declaration at compile time, and is thus irrelevant during execution; we left it out for clarity and focus. Same with the `nextStudent = getStudentName(73)` statement.
@@ -275,27 +273,22 @@ function badIdea() {
     eval("var oops = 'Ugh!';");
     console.log(oops);
 }
-
-badIdea();
-// Ugh!
+badIdea();   // Ugh!
 ```
 
-If the `eval(..)` had not been present, the `oops` variable in `console.log(oops)` would not exist, and would throw a `ReferenceError`. But `eval(..)` modifies the scope of the `badIdea()` function at runtime. This is a bad idea for many reasons, including the performance hit of modifying the already compiled and optimized scope, every time `badIdea()` runs. Don't do it!
+If the `eval(..)` had not been present, the `oops` variable in `console.log(oops)` would not exist, and would throw a `ReferenceError`. But `eval(..)` modifies the scope of the `badIdea()` function at runtime. This is bad for many reasons, including the performance hit of modifying the already compiled and optimized scope, every time `badIdea()` runs.
 
 The second cheat is the `with` keyword, which essentially dynamically turns an object into a local scope—its properties are treated as identifiers in that new scope's block:
 
 ```js
-var badIdea = {
-    oops: "Ugh!"
-};
+var badIdea = { oops: "Ugh!" };
 
 with (badIdea) {
-    console.log(oops);
-    // Ugh!
+    console.log(oops);   // Ugh!
 }
 ```
 
-The global scope was not modified here, but `badIdea` was turned into a scope at runtime rather than compile time, and its property `oops` becomes a variable in that scope. Again, this is a terrible idea, for performance and readability reasons. Don't!
+The global scope was not modified here, but `badIdea` was turned into a scope at runtime rather than compile time, and its property `oops` becomes a variable in that scope. Again, this is a terrible idea, for performance and readability reasons.
 
 At all costs, avoid `eval(..)` (at least, `eval(..)` creating declarations) and `with`. Again, neither of these cheats is available in strict-mode, so if you just use strict-mode (you should!) then the temptation goes away!
 

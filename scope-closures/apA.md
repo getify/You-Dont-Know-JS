@@ -165,7 +165,7 @@ You'll rarely run into any case where the scope of a function's name identifier 
 
 As discussed in Chapter 3, functions can be expressed either in named or anonymous form. It's vastly more common to use the anonymous form, but is that a good idea?
 
-As you contemplate naming your functions, some highlights to consider:
+As you contemplate naming your functions, consider:
 
 * Name inference is incomplete
 * Lexical names allow self-reference
@@ -175,7 +175,7 @@ As you contemplate naming your functions, some highlights to consider:
 
 ### Explicit or Inferred Names?
 
-Every function in your program has a purpose. If it doesn't have a purpose, take it out, because you're just wasting space. If it *does* have a purpose, there *is* a name or descriptor of that purpose.
+Every function in your program has a purpose. If it doesn't have a purpose, take it out, because you're just wasting space. If it *does* have a purpose, there *is* a name for that purpose.
 
 So far many readers likely agree with me. But does that mean we should always put that name into the code? Here's where I'll raise more than a few eyebrows. I say, unequivocally, yes!
 
@@ -189,7 +189,6 @@ btn.addEventListener("click",function(){
         });
     },100);
 });
-
 // Uncaught TypeError: Cannot read property
 // 'toUpperCase' of null
 //     at myProgram.js:4
@@ -207,7 +206,6 @@ btn.addEventListener("click",function onClick(){
         });
     },100);
 });
-
 // Uncaught TypeError: v.toUpperCase is not a function
 //     at allUpper (myProgram.js:4)
 //     at Array.map (<anonymous>)
@@ -284,9 +282,9 @@ ajax("some.url",function(){
 // ""
 ```
 
-Oops. Anonymous `function` expressions passed as callbacks are incapable of receiving an inferred name, so `cb.name` value holds just the empty string `""`. The vast majority of all `function` expressions, especially anonymous ones, are used as callback arguments; none of these get a name. So relying on name inference is incomplete, at best.
+Oops. Anonymous `function` expressions passed as callbacks are incapable of receiving an inferred name, so `cb.name` holds just the empty string `""`. The vast majority of all `function` expressions, especially anonymous ones, are used as callback arguments; none of these get a name. So relying on name inference is incomplete, at best.
 
-And it's not just callbacks that fall short on inference:
+And it's not just callbacks that fall short with inference:
 
 ```js
 var config = {};
@@ -375,7 +373,7 @@ All functions need names. Every single one. No exceptions. Any name you omit is 
 
 ### Arrow Functions
 
-Arrow functions are **always** anonymous, even if (rarely) they're used in a way that gives them an inferred name. I just spent several pages explaining why anonymous functions are a bad idea. So you can probably guess what I think about arrow functions.
+Arrow functions are **always** anonymous, even if (rarely) they're used in a way that gives them an inferred name. I just spent several pages explaining why anonymous functions are a bad idea, so you can probably guess what I think about arrow functions.
 
 Don't use them as a general replacement for regular functions. They're more concise, yes, but that brevity comes at the cost of omitting key visual delimiters that help our brains quickly parse out what we're reading. And, to the point of this discussion, they're anonymous, which makes them worse for readability from that angle as well.
 
@@ -449,7 +447,7 @@ However you define your IIFEs, show them some love by giving them names.
 
 ## Hoisting: Functions and Variables
 
-Chapter 5 identified both *function hoisting* and *variable hoisting*. Since hoisting is often cited as mistake in the design of JS, I wanted to briefly explore why both these forms of hoisting *can* be beneficial and should still be considered.
+Chapter 5 articulated both *function hoisting* and *variable hoisting*. Since hoisting is often cited as mistake in the design of JS, I wanted to briefly explore why both these forms of hoisting *can* be beneficial and should still be considered.
 
 Give hoisting a deeper level of consideration by considering the merits of:
 
@@ -504,15 +502,12 @@ In other words, I think *function hoisting* makes code more readable through a f
 
 What about *variable hoisting*?
 
-Even though `let` and `const` hoist, you cannot use those variables in their TDZ (see Chapter 5). So, the following discussion only applies to `var` declarations.
-
-Before I continue, I'll admit: in almost all cases, I completely agree that *variable hoisting* is a bad idea:
+Even though `let` and `const` hoist, you cannot use those variables in their TDZ (see Chapter 5). So, the following discussion only applies to `var` declarations. Before I continue, I'll admit: in almost all cases, I completely agree that *variable hoisting* is a bad idea:
 
 ```js
 pleaseDontDoThis = "bad idea";
 
 // much later
-
 var pleaseDontDoThis;
 ```
 
@@ -547,10 +542,6 @@ function getStudents() {
 function addStudents() {
     // ..
 }
-
-function otherPrivateStuff() {
-    // ..
-}
 ```
 
 Notice how the `cache` and `otherData` variables are in the "private" section of the module layout? That's because I don't plan to expose them publicly. So I organize the module so they're located alongside the other hidden implementation details of the module.
@@ -562,27 +553,21 @@ But I've had a few rare cases where I needed the assignments of those values to 
 var publicAPI = Object.assign(module.exports,{
     getStudents,
     addStudents,
-    // ..
-
     refreshData: refreshData.bind(null,cache)
 });
 ```
 
 I need the `cache` variable to have already been assigned a value, because that value is used in the initialization of the public API (the `.bind(..)` partial-application).
 
-Should I just move the `var cache = { .. }` up to the top, above this public API initialization? Well, perhaps. But now it's less obvious that `var cache` really is a *private* implementation detail.
-
-Here's the compromise I've used, again somewhat rarely:
+Should I just move the `var cache = { .. }` up to the top, above this public API initialization? Well, perhaps. But now it's less obvious that `var cache` is a *private* implementation detail. Here's the compromise I've (somewhat rarely) used:
 
 ```js
-cache = {};
+cache = {};   // used here, but declared below
 
 // public API
 var publicAPI = Object.assign(module.exports,{
     getStudents,
     addStudents,
-    // ..
-
     refreshData: refreshData.bind(null,cache)
 });
 
@@ -617,7 +602,7 @@ OK, now that I've got you really riled up, let me try to explain my position.
 
 For the record, I'm a fan of `let`, for block-scoped declarations. I really dislike TDZ and I think that was a mistake. But `let` itself is great. I use it often. In fact, I probably use it as much or more than I use `var`.
 
-### `const`antly Confused
+### `const`-antly Confused
 
 `const` on the other hand, I don't use as often. I'm not going to dig into all the reasons why, but it comes down to `const` not *carrying its own weight*. That is, while there's a tiny bit of benefit of `const` in some cases, that benefit is outweighed by the long history of troubles around `const` confusion in a variety of languages, long before it ever showed up in JS.
 
@@ -700,14 +685,12 @@ Another helpful characteristic of `var` is seen with declarations inside uninten
 function getStudents() {
     try {
         // not really a block scope
-
         var records = fromCache("students");
     }
     catch (err) {
         // oops, fall back to a default
         var records = [];
     }
-
     // ..
 }
 ```
@@ -720,21 +703,19 @@ Also notice I used `var` in both the `try` and `catch` blocks. That's because I 
 
 This is, in my opinion, a little superpower of `var`. Not only can it escape the unintentional `try..catch` blocks, but it's allowed to appear multiple times in a function's scope. You can't do that with `let`. It's not bad, it's actually a little helpful feature. Think of `var` more like a declarative annotation that's reminding you, each usage, where the variable comes from. "Ah ha, right, it belongs to the whole function."
 
-This repeated-annotation superpower is useful in other cases, too. For example:
+This repeated-annotation superpower is useful in other cases:
 
 ```js
 function getStudents() {
     var data = [];
 
     // do something with data
-
     // .. 50 more lines of code ..
 
     // purely an annotation to remind us
     var data;
 
     // use data again
-
     // ..
 }
 ```
@@ -808,7 +789,7 @@ We call this period of time the "dead zone," as in the "temporal dead zone" (TDZ
 
 OK, that line of reasoning does make some sense, I must admit.
 
-### Who `let` the TDZ?
+### Who `let` the TDZ Out?
 
 But that's just `const`. What about `let`?
 

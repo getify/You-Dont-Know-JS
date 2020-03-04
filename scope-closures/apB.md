@@ -9,7 +9,7 @@ There's no judging you on how you write your code. My hope is that you come away
 
 ## Buckets of Marbles
 
-Remember Figure 2 from back in Chapter 2, the one with the colored bubbles/buckets?
+Remember Figure 2 from back in Chapter 2?
 
 <figure>
     <img src="images/fig2.png" width="300" alt="Colored Scope Bubbles" align="center">
@@ -679,6 +679,6 @@ useCalc(calc,"+3=");            // +3=ERR
 useCalc(calc,"51=");            // 51
 ```
 
-That's it for the exercises and this book! Congratulations on your achievement! When you're ready, move on to Book 3, *Objects & Classes*.
+That's it for this book, congratulations on your achievement! When you're ready, move on to Book 3, *Objects & Classes*.
 
 [^MathJSisPrime]: *Math.js: isPrime(..)*, https://github.com/josdejong/mathjs/blob/develop/src/function/utils/isPrime.js, 3 March 2020.

@@ -187,21 +187,19 @@ So, in other words, we're defining a `function` expression that's then immediate
 
 An IIFE is useful when we want to create a scope to hide variables/functions. Since it's an expression, it can be used in **any** place in a JS program where an expression is allowed. An IIFE can be named, as with `hideTheCache()`, or (much more commonly!) unnamed/anonymous. And it can be standalone or, as before, part of another statement—`hideTheCache()` returns the `factorial()` function reference which is then `=` assigned to the variable `factorial`.
 
-For comparison, here's an example of a standalone (anonymous) IIFE:
+For comparison, here's an example of a standalone IIFE:
 
 ```js
 // outer scope
 
 (function(){
-
     // inner hidden scope
-
 })();
 
 // more outer scope
 ```
 
-Unlike earlier with `hideTheCache()`, where the outer surrounding `(..)` were noted as being an optional stylistic choice, for a standalone IIFE, they're **required**, to distinguish the `function` as an expression and not a statement. So for consistency, it's best to always surround an IIFE `function` with `( .. )`.
+Unlike earlier with `hideTheCache()`, where the outer surrounding `(..)` were noted as being an optional stylistic choice, for a standalone IIFE they're **required**; they distinguish the `function` as an expression, not a statement. For consistency, however, always surround an IIFE `function` with `( .. )`.
 
 | NOTE: |
 | :--- |
@@ -221,9 +219,7 @@ You should by this point feel fairly comfortable with the merits of creating sco
 
 So far, we looked at doing this via `function` (i.e., IIFE) scope. But let's now consider using `let` declarations with nested blocks. In general, any `{ .. }` curly-brace pair which is a statement will act as a block, but **not necessarily** as a scope.
 
-A block only becomes a scope if it needs to, to contain any block-scoped declarations (i.e., `let` or `const`) present within it.
-
-Consider:
+A block only becomes a scope if necessary, to contain its block-scoped declarations (i.e., `let` or `const`). Consider:
 
 ```js
 {
@@ -237,7 +233,6 @@ Consider:
     for (let i = 0; i < 5; i++) {
         // this is also a scope, activated each
         // iteration
-
         if (i % 2 == 0) {
             // this is just a block, not a scope
             console.log(i);
@@ -290,9 +285,9 @@ So does it matter enough to add the extra `{ .. }` pair and indentation level? I
 
 Recall the discussion of TDZ errors from "Uninitialized Variables (TDZ)" (Chapter 5). My suggestion there was: to minimize the risk of TDZ errors with `let`/`const` declarations, always put those declarations at the top of their scope.
 
-If you find yourself placing a `let` declaration in the middle of a scope, first think, "Oh, no! TDZ alert!" If this `let` declaration isn't actually needed for the first half of that block, you can and should use an inner explicit block scope to further narrow its exposure!
+If you find yourself placing a `let` declaration in the middle of a scope, first think, "Oh, no! TDZ alert!" If this `let` declaration isn't needed in the first half of that block, you should use an inner explicit block scope to further narrow its exposure!
 
-Another example making use of an explicit block scope:
+Another example with an explicit block scope:
 
 ```js
 function getNextMonthStart(dateStr) {
@@ -306,7 +301,6 @@ function getNextMonthStart(dateStr) {
         nextMonth = (Number(curMonth) % 12) + 1;
     }
 
-    // did we cross a year boundary?
     if (nextMonth == 1) {
         year++;
     }
@@ -315,20 +309,18 @@ function getNextMonthStart(dateStr) {
             String(nextMonth).padStart(2,"0")
         }-01`;
 }
-
-getNextMonthStart("2019-12-25");
-// 2020-01-01
+getNextMonthStart("2019-12-25");   // 2020-01-01
 ```
 
 Let's first identify the scopes and their identifiers:
 
 1. The outer/global scope has one identifier, the function `getNextMonthStart(..)`.
 
-2. The function scope for `getNextMonthStart(..)` has three identifiers: `dateStr` (the parameter), `nextMonth`, and `year`.
+2. The function scope for `getNextMonthStart(..)` has three: `dateStr` (parameter), `nextMonth`, and `year`.
 
 3. The `{ .. }` curly-brace pair defines an inner block scope that includes one variable: `curMonth`.
 
-So why did we put `curMonth` in an explicit block scope instead of just alongside `nextMonth` and `year` in the top-level function scope? Because `curMonth` is only needed for those first two statements. Exposing it at the function scope level is over-exposing it.
+So why put `curMonth` in an explicit block scope instead of just alongside `nextMonth` and `year` in the top-level function scope? Because `curMonth` is only needed for those first two statements; at the function scope level it's over-exposed.
 
 This example is small, so the hazards of over-exposing `curMonth` are pretty limited. But the benefits of the POLE principle are best achieved when you adopt the mindset of minimizing scope exposure by default, as a habit. If you follow the principle consistently even in the small cases, it will serve you more as your programs grow.
 
@@ -570,9 +562,7 @@ We've seen now that declarations using `let` or `const` are block-scoped, and `v
 
 We typically think of `function` declarations like they're the equivalent of a `var` declaration. So are they function-scoped like `var` is?
 
-No and yes. I know... that's confusing. Let's dig in.
-
-Consider:
+No and yes. I know... that's confusing. Let's dig in:
 
 ```js
 if (false) {
@@ -580,7 +570,6 @@ if (false) {
         console.log("Does this run?");
     }
 }
-
 ask();
 ```
 
@@ -600,7 +589,7 @@ Why are browser JS engines allowed to behave contrary to the specification? Beca
 
 | NOTE: |
 | :--- |
-| You wouldn't typically categorize Node as being a browser JS environment, since it usually runs on a server. But it's an interesting corner case since it shares the v8 engine with the Chrome (and Edge, now) browsers. Since v8 is first a browser JS engine, it adopts this Appendix B exception, which then means that the browser exceptions are extended to Node. |
+| You wouldn't typically categorize Node as a browser JS environment, since it usually runs on a server. But Node's v8 engine is shared with Chrome (and Edge) browsers. Since v8 is first a browser JS engine, it adopts this Appendix B exception, which then means that the browser exceptions are extended to Node. |
 
 One of the most common use cases for placing a `function` declaration in a block is to conditionally define a function one way or another (like with an `if..else` statement) depending on some environment state. For example:
 
@@ -622,11 +611,9 @@ It's tempting to structure code this way for performance reasons, since the `typ
 
 | WARNING: |
 | :--- |
-| In addition to the risks of FiB deviations, another problem with the conditional-definition of functions is that it is harder to debug such a program. If you end up with a bug in the `isArray(..)` function, you first have to figure out *which* `isArray(..)` function implementation is actually running! Sometimes, the bug is that the wrong one got applied because the conditional check was incorrect! If you allow a program to define multiple versions of a function, that program is always harder to reason about and maintain. |
+| In addition to the risks of FiB deviations, another problem with conditional-definition of functions is it's harder to debug such a program. If you end up with a bug in the `isArray(..)` function, you first have to figure out *which* `isArray(..)` implementation is actually running! Sometimes, the bug is that the wrong one was applied because the conditional check was incorrect! If you define multiple versions of a function, that program is always harder to reason about and maintain. |
 
-In addition to the situations in the above snippets, there are several other corner cases around FiB you to be wary of; such behaviors in various browsers and non-browser JS environments (that is, JS engines that aren't primarily browser based) will likely vary.
-
-For example:
+In addition to the previous snippets, several other FiB corner cases are lurking; such behaviors in various browsers and non-browser JS environments (JS engines that aren't browser based) will likely vary. For example:
 
 ```js
 if (true) {

@@ -90,7 +90,7 @@ This is a key aspect of lexical scope behavior, called *shadowing*. The BLUE(2) 
 
 That's why the re-assignment of `studentName` affects only the inner (parameter) variable: the BLUE(2) `studentName`, not the global RED(1) `studentName`.
 
-When you choose to shadow a variable from an outer scope, one direct impact is that from that scope inward/downward (through any nested scopes) it's now impossible for any marble to be colored as the shadowed variable—(RED(1), in this case). In other words, any `studentName` identifier reference will correspond to that parameter variable, never the global `studentName` variable. It's lexically impossible to reference the global `studentName` anywhere inside of the `printStudent(..)` function (or from any nested scopes it may contain).
+When you choose to shadow a variable from an outer scope, one direct impact is that from that scope inward/downward (through any nested scopes) it's now impossible for any marble to be colored as the shadowed variable—(RED(1), in this case). In other words, any `studentName` identifier reference will correspond to that parameter variable, never the global `studentName` variable. It's lexically impossible to reference the global `studentName` anywhere inside of the `printStudent(..)` function (or from any nested scopes).
 
 ### Global Unshadowing Trick
 
@@ -123,7 +123,9 @@ The `window.studentName` is a mirror of the global `studentName` variable, not a
 | :--- |
 | Remember: just because you *can* doesn't mean you *should*. Don't shadow a global variable that you need to access, and conversely, avoid using this trick to access a global variable that you've shadowed. And definitely don't confuse readers of your code by creating global variables as `window` properties instead of with formal declarations! |
 
-This little "trick" only works for accessing a global scope variable (not a shadowed variable from a nested scope), and even then, only one that was declared with `var` or `function`. Other forms of global scope declarations do not create mirrored global object properties:
+This little "trick" only works for accessing a global scope variable (not a shadowed variable from a nested scope), and even then, only one that was declared with `var` or `function`.
+
+Other forms of global scope declarations do not create mirrored global object properties:
 
 ```js
 var one = 1;
@@ -193,31 +195,33 @@ lookingFor(112358132134);
 
 Oh! So does this `another` object technique disprove my claim that the `special` parameter is "completely inaccessible" from inside `keepLooking()`? No, the claim is still correct.
 
-`special: special` is copying the value of the `special` parameter variable into another container (a property of the same name). Of course, if you put a value in another container, shadowing no longer applies (unless `another` was shadowed, too!). But that doesn't mean we're accessing the parameter `special`; it means we're accessing the copy of the value it had at that moment, by way of *another* container (object property). We cannot, for example, reassign that BLUE(2) `special` parameter to a different value from inside `keepLooking()`.
+`special: special` is copying the value of the `special` parameter variable into another container (a property of the same name). Of course, if you put a value in another container, shadowing no longer applies (unless `another` was shadowed, too!). But that doesn't mean we're accessing the parameter `special`; it means we're accessing the copy of the value it had at that moment, by way of *another* container (object property). We cannot reassign the BLUE(2) `special` parameter to a different value from inside `keepLooking()`.
 
 Another "But...!?" you may be about to raise: what if I'd used objects or arrays as the values instead of the numbers (`112358132134`, etc.)? Would us having references to objects instead of copies of primitive values "fix" the inaccessibility?
 
-No. Mutating the contents of the object value via a reference copy is **not** the same thing as lexically accessing the variable itself. We still couldn't reassign the BLUE(2) `special` parameter.
+No. Mutating the contents of the object value via a reference copy is **not** the same thing as lexically accessing the variable itself. We still can't reassign the BLUE(2) `special` parameter.
 
 ### Illegal Shadowing
 
-Not all combinations of declaration shadowing are allowed. One case to be aware of is that `let` can shadow `var`, but `var` cannot shadow `let`.
-
-Consider:
+Not all combinations of declaration shadowing are allowed. `let` can shadow `var`, but `var` cannot shadow `let`:
 
 ```js
 function something() {
     var special = "JavaScript";
+
     {
         let special = 42;   // totally fine shadowing
+
         // ..
     }
 }
 
 function another() {
     // ..
+
     {
         let special = "JavaScript";
+
         {
             var special = "JavaScript";
             // ^^^ Syntax Error
@@ -230,13 +234,16 @@ function another() {
 
 Notice in the `another()` function, the inner `var special` declaration is attempting to declare a function-wide `special`, which in and of itself is fine (as shown by the `something()` function).
 
-The syntax error description in this case indicates that `special` has already been defined, but that error message is a little misleading—again, no such error happens in `something()`, as shadowing is generally allowed just fine. The real reason it's raised as a `SyntaxError` is because the `var` is basically trying to "cross the boundary" of (or hop over) the `let` declaration of the same name, which is not allowed.
+The syntax error description in this case indicates that `special` has already been defined, but that error message is a little misleading—again, no such error happens in `something()`, as shadowing is generally allowed just fine.
+
+The real reason it's raised as a `SyntaxError` is because the `var` is basically trying to "cross the boundary" of (or hop over) the `let` declaration of the same name, which is not allowed.
 
 That boundary-crossing prohibition effectively stops at each function boundary, so this variant raises no exception:
 
 ```js
 function another() {
     // ..
+
     {
         let special = "JavaScript";
 
@@ -274,9 +281,7 @@ var askQuestion = function(){
 
 The same is true for the variable `askQuestion` being created. But since it's a `function` expression—a function definition used as value instead of a standalone declaration—the function itself will not "hoist" (see Chapter 5).
 
-One major difference between `function` declarations and `function` expressions is what happens to the name identifier of the function.
-
-Consider the assignment of a named `function` expression:
+One major difference between `function` declarations and `function` expressions is what happens to the name identifier of the function. Consider a named `function` expression:
 
 ```js
 var askQuestion = function ofTheTeacher(){
@@ -284,9 +289,7 @@ var askQuestion = function ofTheTeacher(){
 };
 ```
 
-We know `askQuestion` ends up in the outer scope. But what about the `ofTheTeacher` identifier? For formal `function` declarations, the name identifier ends up in the outer/enclosing scope, so it may be reasonable to assume that's the case here. But it's not.
-
-`ofTheTeacher` is declared as an identifier **inside the function itself**:
+We know `askQuestion` ends up in the outer scope. But what about the `ofTheTeacher` identifier? For formal `function` declarations, the name identifier ends up in the outer/enclosing scope, so it may be reasonable to assume that's the case here. But `ofTheTeacher` is declared as an identifier **inside the function itself**:
 
 ```js
 var askQuestion = function ofTheTeacher() {

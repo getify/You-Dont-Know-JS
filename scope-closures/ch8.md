@@ -99,9 +99,7 @@ Since `records` is publicly accessible data, not hidden behind a public API, `St
 
 To embody the full spirit of the module pattern, we not only need grouping and state, but also access control through visibility (private vs. public).
 
-Let's turn `Student` from the previous section into a module. We'll start with a form I call the "classic module," which was originally referred to as the "revealing module" when it first emerged in the early 2000s.
-
-Consider:
+Let's turn `Student` from the previous section into a module. We'll start with a form I call the "classic module," which was originally referred to as the "revealing module" when it first emerged in the early 2000s. Consider:
 
 ```js
 var Student = (function defineStudent(){
@@ -128,17 +126,14 @@ var Student = (function defineStudent(){
     }
 })();
 
-// later
-
-Student.getName(73);
-// Suzy
+Student.getName(73);   // Suzy
 ```
 
 `Student` is now an instance of a module. It features a public API with a single method: `getName(..)`. This method is able to access the private hidden `records` data.
 
 | WARNING: |
 | :--- |
-| I should point out that the explicit student data being hard-coded into this module definition is just for our illustration purposes. A typical module in your program will receive this data from an outside source, typically loaded from databases, JSON data files, Ajax calls, etc. The data is then injected into the module instance typically through some method(s) of the module's public API. |
+| I should point out that the explicit student data being hard-coded into this module definition is just for our illustration purposes. A typical module in your program will receive this data from an outside source, typically loaded from databases, JSON data files, Ajax calls, etc. The data is then injected into the module instance typically through method(s) on the module's public API. |
 
 How does the classic module format work?
 
@@ -184,11 +179,8 @@ function defineStudent() {
     }
 }
 
-// later
-
 var fullTime = defineStudent();
-fullTime.getName(73);
-// Suzy
+fullTime.getName(73);            // Suzy
 ```
 
 Rather than specifying `defineStudent()` as an IIFE, we just define it as a normal standalone function, which is commonly referred to in this context as a "module factory" function.
@@ -285,17 +277,13 @@ Similar to the classic module format, the publicly exported methods of a CommonJ
 
 | NOTE: |
 | :--- |
-| Typically, you'll see Node modules loaded like this: `require("student")`. Node has an algorithm for resolving such non-absolute paths (like `"student"`), which includes assuming a ".js" file extension and looking for the module inside the project's "node_modules" sub-directory. Consult Node's current documentation for more information. |
+| In Node `require("student")` statements, non-absolute paths (`"student"`) assume a ".js" file extension and search "node_modules". |
 
 ## Modern ES Modules (ESM)
 
-The ESM format shares several similarities with the CommonJS format. ESM is file-based, and module instances are singletons. Additionally, everything specified inside an ESM is *by default* private, unless explicitly exported.
+The ESM format shares several similarities with the CommonJS format. ESM is file-based, and module instances are singletons, with everything private *by default*. One notable difference is that ESM files are assumed to be strict-mode, without needing a `"use strict"` pragma at the top. There's no way to define an ESM as non-strict-mode.
 
-One notable difference is that ESM files are assumed to be strict-mode, without needing a `"use strict"` pragma at the top. There's no way to define an ESM as non-strict-mode.
-
-Instead of `module.exports` in CommonJS, ESM uses an `export` keyword to expose something on the public API of the module. Instead of Node's `require(..)`, you use the `import` keyword to import some or all of its API.
-
-Let's tweak the code in the "students.js" file from the previous section to use the ESM format:
+Instead of `module.exports` in CommonJS, ESM uses an `export` keyword to expose something on the public API of the module. The `import` keyword replaces the `require(..)` statement. Let's adjust "students.js" to use the ESM format:
 
 ```js
 export getName;
@@ -346,13 +334,12 @@ The `import` keyword—like `export`, it must be used only at the top level of a
 ```js
 import { getName } from "/path/to/students.js";
 
-getName(73);
-// Suzy
+getName(73);   // Suzy
 ```
 
 As you can see, this form imports only the specifically named public API members from a module (skipping anything not named explicitly), and it adds those identifiers to the top-level scope of the current module. This type of import is a familiar style to those used to package imports in languages like Java.
 
-Multiple API members can be listed inside the `{ .. }` set, separated with commas. A named import can also be *renamed* with `as`:
+Multiple API members can be listed inside the `{ .. }` set, separated with commas. A named import can also be *renamed* with the `as` keyword:
 
 ```js
 import { getName as getStudentName }
@@ -362,13 +349,12 @@ getStudentName(73);
 // Suzy
 ```
 
-If `getName` is a "default export" of the module, we could instead import it like this:
+If `getName` is a "default export" of the module, we can import it like this:
 
 ```js
 import getName from "/path/to/students.js";
 
-getName(73);
-// Suzy
+getName(73);   // Suzy
 ```
 
 The only difference here is dropping the `{ }` around the import binding. If you want to mix a default import with other named imports:
@@ -377,8 +363,7 @@ The only difference here is dropping the `{ }` around the import binding. If you
 import { default as getName, /* .. others .. */ }
    from "/path/to/students.js";
 
-getName(73);
-// Suzy
+getName(73);   // Suzy
 ```
 
 By contrast, the other major variation on `import` is called "namespace import":
@@ -386,8 +371,7 @@ By contrast, the other major variation on `import` is called "namespace import":
 ```js
 import * as Student from "/path/to/students.js";
 
-Student.getName(73);
-// Suzy
+Student.getName(73);   // Suzy
 ```
 
 As is likely obvious, the `*` imports everything exported to the API, default and named, and stores it all under the single namespace identifier as specified. This approach most closely matches the form of classic modules for most of JS's history.

@@ -177,16 +177,13 @@ Though the enclosing scope of a closure is typically from a function, that's not
 
 ```js
 var hits;
-
 {   // an outer scope (but not a function)
     let count = 0;
-
     hits = function getCurrent(){
         count = count + 1;
         return count;
     };
 }
-
 hits();     // 1
 hits();     // 2
 hits();     // 3
@@ -194,11 +191,9 @@ hits();     // 3
 
 | NOTE: |
 | :--- |
-| I deliberately defined `getCurrent()` as a `function` expression instead of a `function` declaration. This has nothing to do with closure, but with the dangerous quirks of FiB as discussed in Chapter 6. |
+| I deliberately defined `getCurrent()` as a `function` expression instead of a `function` declaration. This isn't about closure, but with the dangerous quirks of FiB (Chapter 6). |
 
-Because it's so common to mistake closure as value-oriented instead of variable-oriented, developers sometimes get tripped up trying to use closure to snapshot-preserve a value from some moment in time.
-
-Consider:
+Because it's so common to mistake closure as value-oriented instead of variable-oriented, developers sometimes get tripped up trying to use closure to snapshot-preserve a value from some moment in time. Consider:
 
 ```js
 var studentName = "Frank";
@@ -258,20 +253,18 @@ How could we do that in the loop snippet? Let's create a new variable for each i
 var keeps = [];
 
 for (var i = 0; i < 3; i++) {
-    // new variable `j` created each iteration,
-    // which gets a copy of the value of `i` at
-    // this moment.
+    // new `j` created each iteration, which gets
+    // a copy of the value of `i` at this moment
     let j = i;
 
-    // the `i` here isn't being closed over,
-    // so it's fine to immediately use its
-    // current value in each loop iteration
+    // the `i` here isn't being closed over, so
+    // it's fine to immediately use its current
+    // value in each loop iteration
     keeps[i] = function keepEachJ(){
         // close over `j`, not `i`!
         return j;
     };
 }
-
 keeps[0]();   // 0
 keeps[1]();   // 1
 keeps[2]();   // 2
@@ -289,12 +282,10 @@ var keeps = [];
 for (let i = 0; i < 3; i++) {
     // the `let i` gives us a new `i` for
     // each iteration, automatically!
-
     keeps[i] = function keepEachI(){
         return i;
     };
 }
-
 keeps[0]();   // 0
 keeps[1]();   // 1
 keeps[2]();   // 2
@@ -304,7 +295,7 @@ Since we're using `let`, three `i`'s are created, one for each loop, so each of 
 
 ### Common Closures: Ajax and Events
 
-Closure is most commonly encountered with asynchronous callbacks:
+Closure is most commonly encountered with callbacks:
 
 ```js
 function lookupStudentRecord(studentID) {
@@ -630,7 +621,7 @@ Even as recent as a few years ago, many JS engines did not apply this optimizati
 
 And the fact that it's an optional optimization in the first place, rather than a requirement of the specification, means that we shouldn't just casually over-assume its applicability.
 
-In cases where a variable holds a large value (like an object or array) and that variable is present in a closure scope, if you don't need that value anymore and don't want that memory held, it's safer (from a memory usage perspective) to manually discard the value rather than relying on closure optimization and GC.
+In cases where a variable holds a large value (like an object or array) and that variable is present in a closure scope, if you don't need that value anymore and don't want that memory held, it's safer (memory usage) to manually discard the value rather than relying on closure optimization/GC.
 
 Let's apply a *fix* to the earlier `manageStudentGrades(..)` example to ensure the potentially large array held in `studentRecords` is not caught up in a closure scope unnecessarily:
 
@@ -643,7 +634,6 @@ function manageStudentGrades(studentRecords) {
     studentRecords = null;
 
     return addGrade;
-
     // ..
 }
 ```
@@ -654,7 +644,7 @@ Again, in many cases JS might automatically optimize the program to the same eff
 
 As a matter of fact, we also technically don't need the function `getGrade()` anymore after the `.map(getGrade)` call completes. If profiling our application showed this was a critical area of excess memory use, we could possibly eek out a tiny bit more memory by freeing up that reference so its value isn't tied up either. That's likely unnecessary in this toy example, but this is a general technique to keep in mind if you're optimizing the memory footprint of your application.
 
-The takeaway: it's important to know where closures appear in our programs, and what variables are (or may be!) included. We should manage these closures carefully so we're only holding onto what's minimally needed and not wasting memory.
+The takeaway: it's important to know where closures appear in our programs, and what variables are included. We should manage these closures carefully so we're only holding onto what's minimally needed and not wasting memory.
 
 ## An Alternative Perspective
 
@@ -752,15 +742,12 @@ function makeRequest(evt) {
 // <button data-kind="studentIDs">
 //    Register Students
 // </button>
-
 btn.addEventListener("click",makeRequest);
 ```
 
 The `makeRequest(..)` utility only receives an `evt` object from a click event. From there, it has to retrieve the `data-kind` attribute from the target button element, and use that value to lookup both a URL for the API endpoint as well as what data should be included in the Ajax request.
 
-This works OK, but it's unfortunate (inefficient, more confusing) that the event handler has to read a DOM attribute each time it's fired. Why couldn't an event handler *remember* this value?
-
-Let's try using closure to improve the code:
+This works OK, but it's unfortunate (inefficient, more confusing) that the event handler has to read a DOM attribute each time it's fired. Why couldn't an event handler *remember* this value? Let's try using closure to improve the code:
 
 ```js
 var APIendpoints = {
@@ -851,13 +838,13 @@ Behavior-wise, this program is pretty similar to the previous one, with the same
 
 ## Closer to Closure
 
-As we close down this really dense chapter, just take some deep breaths and a few moments to let all that sink in. Seriously, that's a lot of information for anyone to consume! It's entirely reasonable if your head is kind of spinning right now.
+As we close down a dense chapter, take some deep breaths let it all sink in. Seriously, that's a lot of information for anyone to consume!
 
 We explored two models for mentally tackling closure:
 
-* Observational: closure is a function instance remembering its outer variables even as that function is passed around and **invoked in** other scopes.
+* Observational: closure is a function instance remembering its outer variables even as that function is passed to and **invoked in** other scopes.
 
-* Implementational: closure is a function instance and its scope environment being preserved in-place while any references to it are passed around and **invoked from** other scopes.
+* Implementational: closure is a function instance and its scope environment preserved in-place while any references to it are passed around and **invoked from** other scopes.
 
 Summarizing the benefits to our programs:
 
@@ -865,4 +852,4 @@ Summarizing the benefits to our programs:
 
 * Closure can improve code readability, bounding scope-exposure by encapsulating variable(s) inside function instances, while still making sure the information in those variables is accessible for future use. The resultant narrower, more specialized function instances are cleaner to interact with, since the preserved information doesn't need to be passed in every invocation.
 
-Before you move on, take some time to restate this summary *in your own words*, explaining what closure is and why it's helpful in your programs. When you're ready, the main book text concludes with a final chapter that builds on top of closure with the module pattern.
+Before you move on, take some time to restate this summary *in your own words*, explaining what closure is and why it's helpful in your programs. The main book text concludes with a final chapter that builds on top of closure with the module pattern.
