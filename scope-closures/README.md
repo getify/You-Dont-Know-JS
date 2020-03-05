@@ -1,5 +1,13 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
 
+<img src="images/cover.png" width="300">
+
+-----
+
+**[Purchase ebook/PDF from Leanpub](https://leanpub.com/ydkjsy-scope-closures)**
+
+-----
+
 [Table of Contents](toc.md)
 
 * [Foreword](foreword.md) (by [Sarah Drasner](https://sarah.dev/))
