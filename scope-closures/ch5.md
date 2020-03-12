@@ -303,7 +303,7 @@ Since `const` "re-declaration" must be disallowed (on those technical grounds), 
 So it's clear from our previous discussion that JS doesn't really want us to "re-declare" our variables within the same scope. That probably seems like a straightforward admonition, until you consider what it means for repeated execution of declaration statements in loops. Consider:
 
 ```js
-var keepGoing = true;
+let keepGoing = true;
 while (keepGoing) {
     let value = Math.random();
     if (value > 0.5) {
