@@ -2,6 +2,9 @@
 
 This is a series of books diving deep into the core mechanisms of the JavaScript language.
 
+<a href="https://leanpub.com/ydkjsy-get-started"><img src="get-started/images/cover.png" width="75"></a>&nbsp;&nbsp;
+<a href="https://leanpub.com/ydkjsy-scope-closures"><img src="scope-closures/images/cover.png" width="75"></a>&nbsp;&nbsp;...
+
 **To read more about the motivations and perspective behind this book series, check out the [Preface](preface.md).**
 
 ## Premier Sponsor
@@ -24,10 +27,10 @@ I recommend reading the books in this order:
 
 * [Get Started](get-started/README.md)
 * [Scope & Closures](scope-closures/README.md)
-* [Objects & Classes](objects-classes/README.md)
-* [Types & Grammar](types-grammar/README.md)
-* [Sync & Async](sync-async/README.md)
-* [ES.Next & Beyond](es-next-beyond/README.md)
+* Objects & Classes
+* Types & Grammar
+* Sync & Async
+* ES.Next & Beyond
 
 ## Publishing
 
