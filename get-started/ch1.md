@@ -367,7 +367,7 @@ So what do these nitty-gritty details boil down to? Step back and consider the e
 
 4. Finally, the JS VM executes the program.
 
-To visualize thoses steps, again:
+To visualize those steps, again:
 
 <figure>
     <img src="images/fig3.svg" width="650" alt="Steps of JS compilation and execution" align="center">
