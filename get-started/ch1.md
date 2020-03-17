@@ -15,7 +15,7 @@ Following this background chapter, the rest of the book lays out a high-level ma
 
 In particular, Chapter 4 identifies three main pillars around which the JS language is organized: scope/closures, prototypes/objects, and types/coercion. JS is a broad and sophisticated language, with many features and capabilities. But all of JS is founded on these three foundational pillars.
 
-Keep in mind that even though this book is titled "Get Started," it's **not intended as a beginner/intro book**. This book's main job is to get you ready for studying JS deeply throughout the rest of the series; it's written assuming you already have familiarity with JS over at least several months experience before moving on in YDKJSY. So to get the most out *Get Started*, make sure you spend plenty of time writing JS code to build up your experience.
+Keep in mind that even though this book is titled "Get Started," it's **not intended as a beginner/intro book**. This book's main job is to get you ready for studying JS deeply throughout the rest of the series; it's written assuming you already have familiarity with JS over at least several months experience before moving on in YDKJSY. So, to get the most out of *Get Started*, make sure you spend plenty of time writing JS code to build up your experience.
 
 Even if you've already written a lot of JS before, this book should not be skimmed over or skipped; take your time to fully process the material here. **A good start always depends on a solid first step.**
 
@@ -71,7 +71,7 @@ Stage 0 means roughly, someone on TC39 thinks it's a worthy idea and plans to ch
 
 Once a proposal reaches "Stage 4" status, it is eligible to be included in the next yearly revision of the language. It can take anywhere from several months to a few years for a proposal to work its way through these stages.
 
-All proposals are managed in the open, on TC39's Github repository: https://github.com/tc39/proposals
+All proposals are managed *in the open* on TC39's Github repository: https://github.com/tc39/proposals
 
 Anyone, whether on TC39 or not, is welcome to participate in these public discussions and the processes for working on the proposals. However, only TC39 members can attend meetings and vote on the proposals and changes. So in effect, the voice of a TC39 member carries a lot of weight in where JS will go.
 
@@ -143,7 +143,7 @@ But I'll just hint at some examples of quirks that have been true at various poi
 
 * Whether `"use strict";` on one line-entry (pressing `<enter>` after) enables strict mode for the rest of that console session, the way it would on the first line of a .js file, as well as whether you can use `"use strict";` beyond the "first line" and still get strict mode turned on for that session.
 
-* How non-strict mode `this` default-binding works for function calls, and whether the "global object" used will contain expected global variables.
+* How, in non-strict mode, `this` default-binding works for function calls, and whether the "global object" used will contain expected global variables.
 
 * How hoisting (see Book 2, *Scope & Closures*) works across multiple line entries.
 
