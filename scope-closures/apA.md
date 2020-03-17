@@ -624,7 +624,7 @@ If variable re-assignment were a big deal, then `const` would be more useful. Bu
 
 Combine that with the fact that `const` (and `let`) are supposed to be used in blocks, and blocks are supposed to be short, and you have a really small area of your code where a `const` declaration is even applicable. A `const` on line 1 of your ten-line block only tells you something about the next nine lines. And the thing it tells you is already obvious by glancing down at those nine lines: the variable is never on the left-hand side of an `=`; it's not re-assigned.
 
-That's it, that's all `const` really does. Other than that, it's not very useful. Stacked up against to the significant confusion of value vs. assignment immutability, `const` loses a lot of its luster.
+That's it, that's all `const` really does. Other than that, it's not very useful. Stacked up against the significant confusion of value vs. assignment immutability, `const` loses a lot of its luster.
 
 A `let` (or `var`!) that's never re-assigned is already behaviorally a "constant", even though it doesn't have the compiler guarantee. That's good enough in most cases.
 
