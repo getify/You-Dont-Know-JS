@@ -942,7 +942,7 @@ function printLabels(labels) {
     var renderLabel = renderTo(list);
 
     // definitely closure this time!
-    labels.forEach( renderLabel(label) );
+    labels.forEach( renderLabel );
 
     // **************
 
