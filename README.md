@@ -27,10 +27,10 @@ I recommend reading the books in this order:
 
 * [Get Started](get-started/README.md)
 * [Scope & Closures](scope-closures/README.md)
-* Objects & Classes
-* Types & Grammar
-* Sync & Async
-* ES.Next & Beyond
+* [Objects & Classes](objects-classes/README.md)
+* [Types & Grammar](types-grammar/README.md)
+* [Sync & Async](sync-async/README.md)
+* [ES.Next & Beyond](es-next-beyond/README.md)
 
 ## Publishing
 
