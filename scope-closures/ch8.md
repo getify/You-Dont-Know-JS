@@ -286,7 +286,7 @@ The ESM format shares several similarities with the CommonJS format. ESM is file
 Instead of `module.exports` in CommonJS, ESM uses an `export` keyword to expose something on the public API of the module. The `import` keyword replaces the `require(..)` statement. Let's adjust "students.js" to use the ESM format:
 
 ```js
-export getName;
+export { getName };
 
 // ************************
 
@@ -305,7 +305,7 @@ function getName(studentID) {
 }
 ```
 
-The only change here is the `export getName` statement. As before, `export` statements can appear anywhere throughout the file, though `export` must be at the top-level scope; it cannot be inside any other block or function.
+The only change here is the `export { getName }` statement. As before, `export` statements can appear anywhere throughout the file, though `export` must be at the top-level scope; it cannot be inside any other block or function.
 
 ESM offers a fair bit of variation on how the `export` statements can be specified. For example:
 
