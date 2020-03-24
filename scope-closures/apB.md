@@ -468,19 +468,14 @@ I also renamed the inner function from `factorize(..)` to `findFactors(..)`. Tha
 The *Closure Exercise (PART 2)* `toggle(..)` can be solved like this:
 
 ```js
-function toggle(...vals) {
-    var unset = {};
-    var cur = unset;
-
-    return function next(){
-        // save previous value back at
-        // the end of the list
-        if (cur != unset) {
-            vals.push(cur);
-        }
-        cur = vals.shift();
-        return cur;
-    };
+function toggle(){
+    var i = 0
+    var list = arguments
+    return function(){
+      if(i===list.length)
+         i = 0
+      return list[i++]    
+    }
 }
 
 var hello = toggle("hello");
