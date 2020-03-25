@@ -153,7 +153,7 @@ Now let's examine an example where the closed-over variable is updated:
 function makeCounter() {
     var count = 0;
 
-    return getCurrent(){
+    return function getCurrent() {
         count = count + 1;
         return count;
     };
