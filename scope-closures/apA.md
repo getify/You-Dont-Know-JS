@@ -189,8 +189,7 @@ btn.addEventListener("click",function(){
         });
     },100);
 });
-// Uncaught TypeError: Cannot read property
-// 'toUpperCase' of null
+// Uncaught TypeError: v.toUpperCase is not a function
 //     at myProgram.js:4
 //     at Array.map (<anonymous>)
 //     at myProgram.js:3
