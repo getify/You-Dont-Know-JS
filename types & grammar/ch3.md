@@ -415,7 +415,7 @@ By virtue of prototype delegation (see the *this & Object Prototypes* title in t
 ```js
 var a = " abc ";
 
-a.indexOf( "c" ); // 3
+a.indexOf( "c" ); // 2
 a.toUpperCase(); // " ABC "
 a.trim(); // "abc"
 ```
