@@ -22,10 +22,10 @@
     * How We Organize in JS
     * The Rabbit Hole Deepens
 * Chapter 3: Digging To The Roots Of JS
+    * Iteration
     * Closure
     * `this` Keyword
     * Prototypes
-    * Iteration
     * Asking "Why?"
 * Chapter 4: The Bigger Picture
     * Pillar 1: Scope and Closure
