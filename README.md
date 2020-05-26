@@ -1,3 +1,7 @@
+
+
+# I am not really changing anything here. I am just teaching my friend how git works :) 
+
 # You Don't Know JS Yet (book series) - 2nd Edition
 
 This is a series of books diving deep into the core mechanisms of the JavaScript language. This is the **second edition** of the book series:
