@@ -310,7 +310,7 @@ var slotMachine = {
                         reel.position +
                         linePos
                     ) % reel.symbols.length;
-                    return reel.display.call(slot);
+                    return slot.display();
                 }
             );
             lines.push(line.join(" | "));
