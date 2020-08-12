@@ -1,0 +1,10 @@
+image:
+  file: .gitpod.Dockerfile
+vscode:
+  extensions:
+    - gitduck.code-streaming@0.1.19:RXILT8f/xwHb6pExTCYwBw==
+    - genuitecllc.codetogether@2.1.0:eZg1osLJ9axpcVQrZdSdvw==
+    - vsls-contrib.codetour@0.0.33:iE864lCLSbwy9cG9lCgaYw==
+    - gitduck.code-streaming@0.1.19:RXILT8f/xwHb6pExTCYwBw==
+    - jebbs.plantuml@2.13.12:q7DiD6H5NTesaWYIXmeMMQ==
+    - adpyke.codesnap@1.0.27:x5fuIBtlRw4o0shdGIS5+w==
