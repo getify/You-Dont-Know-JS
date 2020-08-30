@@ -933,7 +933,7 @@ The latter one is definitely not an example of closure, at least not in any usef
 
 ### Defer to Closure
 
-By the way, Chapter 7 briefly mentioned partial application and currying (which *do* rely on closure!). This is a interesting scenario where manual currying can be used:
+By the way, Chapter 7 briefly mentioned partial application and currying (which *do* rely on closure!). This is an interesting scenario where manual currying can be used:
 
 ```js
 function printLabels(labels) {
