@@ -16,5 +16,5 @@ Because it’s not enough to be able to duplicate jQuery snippets into your webs
 The more you are exposed to JavaScript, the clearer it becomes. Words like closures, objects, and methods might seem out of reach to you now, but this book will help those terms come into clarity. I want you to keep those two feelings of before and after you learn something in mind as you begin this book. It might seem daunting, but you’ve picked up this book because you are starting an awesome journey to hone your knowledge. *Up & Going* is the start of our path to understanding programming. Enjoy the lightbulb moments!
 
 Jenn Lukas<br>
-[jennlukas.com](http://jennlukas.com/), [@jennlukas](https://twitter.com/jennlukas)<br>
+[@jennlukas](https://twitter.com/jennlukas)<br>
 Front-end consultant
