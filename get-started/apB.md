@@ -153,49 +153,49 @@ function scheduleMeeting(startTime,durationMinutes) {
     durationMinutes = Number(durationMinutes);
 
     if (
-        typeof meetingStartHour == "string" &&
-        typeof meetingStartMinutes == "string"
+        typeof meetingStartHour != "string" ||
+        typeof meetingStartMinutes != "string"
     ) {
-        let durationHours =
-            Math.floor(durationMinutes / 60);
-        durationMinutes =
-            durationMinutes - (durationHours * 60);
-        let meetingEndHour =
-            Number(meetingStartHour) + durationHours;
-        let meetingEndMinutes =
-            Number(meetingStartMinutes) +
-            durationMinutes;
+        return false;
+    }
+        
+    let durationHours =
+        Math.floor(durationMinutes / 60);
+    durationMinutes =
+        durationMinutes - (durationHours * 60);
+    let meetingEndHour =
+        Number(meetingStartHour) + durationHours;
+    let meetingEndMinutes =
+        Number(meetingStartMinutes) +
+        durationMinutes;
 
-        if (meetingEndMinutes >= 60) {
-            meetingEndHour = meetingEndHour + 1;
-            meetingEndMinutes =
-                meetingEndMinutes - 60;
-        }
-
-        // re-compose fully-qualified time strings
-        // (to make comparison easier)
-        let meetingStart = `${
-            meetingStartHour.padStart(2,"0")
-        }:${
-            meetingStartMinutes.padStart(2,"0")
-        }`;
-        let meetingEnd = `${
-            String(meetingEndHour).padStart(2,"0")
-        }:${
-            String(meetingEndMinutes).padStart(2,"0")
-        }`;
-
-        // NOTE: since expressions are all strings,
-        // comparisons here are alphabetic, but it's
-        // safe here since they're fully qualified
-        // time strings (ie, "07:15" < "07:30")
-        return (
-            meetingStart >= dayStart &&
-            meetingEnd <= dayEnd
-        );
+    if (meetingEndMinutes >= 60) {
+        meetingEndHour = meetingEndHour + 1;
+        meetingEndMinutes =
+            meetingEndMinutes - 60;
     }
 
-    return false;
+    // re-compose fully-qualified time strings
+    // (to make comparison easier)
+    let meetingStart = `${
+        meetingStartHour.padStart(2,"0")
+    }:${
+        meetingStartMinutes.padStart(2,"0")
+    }`;
+    let meetingEnd = `${
+        String(meetingEndHour).padStart(2,"0")
+    }:${
+        String(meetingEndMinutes).padStart(2,"0")
+    }`;
+
+    // NOTE: since expressions are all strings,
+    // comparisons here are alphabetic, but it's
+    // safe here since they're fully qualified
+    // time strings (ie, "07:15" < "07:30")
+    return (
+        meetingStart >= dayStart &&
+        meetingEnd <= dayEnd
+    );
 }
 
 scheduleMeeting("7:00",15);     // false
@@ -220,12 +220,10 @@ function range(start,end) {
             return getRange(start,end);
         };
     }
-    else {
-        end = Number(end) || 0;
-        return getRange(start,end);
-    }
-
-
+    
+    end = Number(end) || 0;
+    return getRange(start,end);
+    
     // **********************
 
     function getRange(start,end) {
