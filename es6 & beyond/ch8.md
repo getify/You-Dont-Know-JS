@@ -241,8 +241,8 @@ Object.observe(
 
 changeObj( 3, 11 );
 
-obj.a;			// 12
-obj.b;			// 30
+obj.a;			// 6
+obj.b;			// 33
 obj.c;			// 3
 ```
 
