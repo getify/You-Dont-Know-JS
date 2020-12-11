@@ -12,6 +12,7 @@ To refresh the context of our running example, let's recall the color-coded illu
 <figure>
     <img src="images/fig2.png" width="500" alt="Colored Scope Bubbles" align="center">
     <figcaption><em>Fig. 2 (Ch. 2): Colored Scope Bubbles</em></figcaption>
+    <br><br>
 </figure>
 
 The connections between scopes that are nested within other scopes is called the scope chain, which determines the path along which variables can be accessed. The chain is directed, meaning the lookup moves upward/outward only.
