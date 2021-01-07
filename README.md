@@ -1,63 +1,63 @@
-# You Don't Know JS Yet (book series) - 2nd Edition
+# Серія книг "Ти поки що не знаєш JS". Друге видання
 
-This is a series of books diving deep into the core mechanisms of the JavaScript language. This is the **second edition** of the book series:
+Це серія книг, що заглиблюються в основні механізми мови JavaScript. Це **друге видання** серії книг:
 
 <a href="https://leanpub.com/ydkjsy-get-started"><img src="get-started/images/cover.png" width="75"></a>&nbsp;&nbsp;
 <a href="https://leanpub.com/ydkjsy-scope-closures"><img src="scope-closures/images/cover.png" width="75"></a>&nbsp;&nbsp;...
 
-**To read more about the motivations and perspective behind this book series, check out the [Preface](preface.md).**
+**Щоб дізнатись більше про мотивацію та перспективи цієї серії книг, перегляньте [Передмову](preface.md).**
 
-If you're looking for the previous **first edition** books, [they can be found here](https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/README.md).
+Якщо вам потрібні книги попереднього **першого видання**, [ви знайдете їх тут](https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/README.md).
 
-## Premier Sponsor
+## Основний спонсор
 
-This edition of the **YDKJS** book series is exclusively sponsored by [Frontend Masters](https://frontendmasters.com).
+Це видання серії книг **YDKJS** фінансується виключно [Frontend Masters](https://frontendmasters.com).
 
-Frontend Masters is the gold standard for top-of-the-line expert training material in frontend-oriented software development. With over 150 courses on all things frontend, this should be your first and only stop for quality video training on HTML, CSS, JS, and related technologies.
-
-----
-
-I teach [all my workshops](https://frontendmasters.com/kyle-simpson) exclusively through Frontend Masters. If you like this book content, please check out my video training courses.
-
-I want to extend a warm and deep thanks to Marc Grabanski and the entire Frontend Masters team, not only for their excellent work with the video training platform, but for their unwavering support of me and of the "You Don't Know JS" books!
+Frontend Masters – золотий стандарт найсучасніших експертних навчальних матеріалів для фахівців з розробки програмного забезпечення у сфері фронтенду. Frontend Masters має понад 150 курсів з різноманітних тем, що стосуються фронтенду, і має бути вашою першою і єдиною зупинкою у пошуку якісних навчальних відеоматеріалів з HTML, CSS, JS та суміжних технологій.
 
 ----
 
-## Titles
+Я викладаю [усі свої семінари](https://frontendmasters.com/kyle-simpson) виключно через платформу Frontend Masters. Якщо вам подобається вміст цієї книги, перегляньте мої навчальні відеокурси.
 
-I recommend reading the **second edition** books in this order:
+Я хочу висловити теплу та глибоку подяку Марку Грабанські(Marc Grabanski) та всій команді Frontend Masters не тільки за їх прекрасну роботу над відеотренінговою платформою, але і за їхню непохитну підтримку мені та книгам "Ти не знаєш JS"!
 
-* [Get Started](get-started/README.md) | [Buy on Leanpub](https://leanpub.com/ydkjsy-get-started) | [Buy on Amazon](https://www.amazon.com/dp/B084BNMN7T)
-* [Scope & Closures](scope-closures/README.md) | [Buy on Leanpub](https://leanpub.com/ydkjsy-scope-closures) | [Buy on Amazon](https://www.amazon.com/dp/B08634PZ3N)
-* Objects & Classes (not yet started)
-* Types & Grammar (not yet started)
-* Sync & Async (not yet started)
-* ES.Next & Beyond (not yet started)
+----
 
-If you're looking for the previous **first edition** books, [they can be found here](https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/README.md).
+## Книги
 
-## Publishing
+Я рекомендую читати книги **другого видання** в такому порядку:
 
-As always, you'll be able to read these books online here entirely for free.
+* [Get Started](get-started/README.md) | [Купити на Leanpub](https://leanpub.com/ydkjsy-get-started) | [Купити на Amazon](https://www.amazon.com/dp/B084BNMN7T)
+* [Області видимості та замикання](scope-closures/README.md) | [Купити на Leanpub](https://leanpub.com/ydkjsy-scope-closures) | [Купити на Amazon](https://www.amazon.com/dp/B08634PZ3N)
+* Об'єкти та класи (роботу ще не розпочато)
+* Типи і граматики (роботу ще не розпочато)
+* Sync & Async (роботу ще не розпочато)
+* ES.Next і далі (роботу ще не розпочато)
 
-This edition of the books is being self-published through [GetiPub](https://geti.pub) publishing. The published books will be made available for sale through normal book retail sources.
+Якщо вам потрібні книги попереднього **першого видання**, [ви знайдете їх тут](https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/README.md).
 
-If you'd like to contribute financially towards the effort (or any of my other OSS efforts) aside from purchasing the published books, please consider these options:
+## Публікації
 
-* [Github Sponsorship](https://github.com/users/getify/sponsorship)
+Як завжди, ви зможете читати ці книги тут онлайн абсолютно безкоштовно.
+
+Це видання книжок надруковано у видавництві [GetiPub](https://geti.pub). Видані книги будуть доступні для купівлі через звичайні джерела роздрібної торгівлі книгами.
+
+Якщо ви хочете підтримати фінансово цей проєкт (або будь-які інші мої зусилля з розробки OSS), окрім придбання опублікованих книг, розгляньте наступні варіанти:
+
+* [Спонсорство на Github](https://github.com/users/getify/sponsorship)
 * [Patreon](https://www.patreon.com/getify)
 * [Paypal](https://www.paypal.me/getify)
 
-## Contributions
+## Участь у проєкті
 
-Please feel free to contribute to the quality of this content by submitting PRs for improvements to code snippets, explanations, etc. While typo fixes are welcomed, they will likely be caught through normal editing/publishing processes, **so please don't worry about them right now.**
+Будь ласка, не соромтеся робити внесок у якість вмісту цього репозиторію, надсилаючи пулреквести для вдосконалення фрагментів коду, пояснень тощо. Хоча виправлення типографічних помилок вітаються, такі помилки, швидше за все, будуть виправлені під час редагування та публікації, тому, будь ласка, **не турбуйтеся про них прямо зараз.**
 
-Any contributions you make to this effort **are of course greatly appreciated**.
+Звичайно, ми **дуже вдячні** за будь-який внесок, який ви зробите у цей проєкт.
 
-But **PLEASE** read the [Contributions Guidelines](CONTRIBUTING.md) carefully before submitting a PR.
+Однак, **БУДЬ ЛАСКА**, прочитайте уважно [вказівки щодо участі у проєкті](CONTRIBUTING.md) перед відкриттям пулреквестів.
 
-## License & Copyright
+## Ліцензія та авторське право
 
-The materials herein are all &copy; 2019-2020 Kyle Simpson.
+Права на усі матеріали, наведені в цьому репозиторії, належать Кайлу Сімпсону. &copy; 2019-2020
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License</a>.
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />Робота ліцензована за ліцензією <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License</a>.

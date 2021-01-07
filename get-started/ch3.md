@@ -1,43 +1,43 @@
-# You Don't Know JS Yet: Get Started - 2nd Edition
-# Chapter 3: Digging to the Roots of JS
+# Серія "Ти поки що не знаєш JS". Книга 1: "Перші кроки". Друге видання
+# Глава 3: Шлях до самого коріння JS
 
-If you've read Chapters 1 and 2, and taken the time to digest and percolate, you're hopefully starting to *get* JS a little more. If you skipped/skimmed them (especially Chapter 2), I recommend going back to spend some more time with that material.
+Сподіваюся, що після прочитання та засвоєння глав 1 і 2 ви починаєте *розуміти* JS трохи краще. Якщо ви пропустили їх або прочитали неуважно, особливо главу 2, я рекомендую повернутися та приділити більше уваги цьому матеріалу.
 
-In Chapter 2, we surveyed syntax, patterns, and behaviors at a high level. In this chapter, our attention shifts to some of the lower-level root characteristics of JS that underpin virtually every line of code we write.
+У главі 2 ми оглянули синтаксис, шаблони та поведінку, проте не заглиблювались у подробиці. У цій главі наша увага переходить до деяких кореневих характеристик JS нижчого рівня, які лежать в основі практично кожного рядка коду, який ми пишемо.
 
-Be aware: this chapter digs much deeper than you're likely used to thinking about a programming language. My goal is to help you appreciate the core of how JS works, what makes it tick. This chapter should begin to answer some of the "Why?" questions that may be cropping up as you explore JS. However, this material is still not an exhaustive exposition of the language; that's what the rest of the book series is for! Our goal here is still just to *get started*, and become more comfortable with, the *feel* of JS, how it ebbs and flows.
+Майте на увазі: ця глава заглиблюється у роботу мов програмування сильніше, ніж ви, напевно, звикли. Моя мета в тому, щоб допомогти вам зрозуміти суть того, як працює JS, суть механізму у нього в середині. Ця глава має дати перші відповіді на деякі питання, які можуть виникати під час вивчення JS. Однак цей матеріал не є вичерпним викладенням мови; для цього призначена решта серії книг! Наша ціль у цій главі, як і у попередніх – лише *розпочати* й почуватися комфортніше, *відчути* JS, його сильні та слабкі сторони.
 
-Don't run so quickly through this material that you get lost in the weeds. As I've said a dozen times already, **take your time**. Even still, you'll probably finish this chapter with remaining questions. That's OK, because there's a whole book series ahead of you to keep exploring!
+Не пробігайте цей матеріал надто швидко, бо можете загубитися. Як я вже говорив з десяток разів, **не поспішайте**. Навіть так після цієї глави у вас скоріш за все залишаться питання. Це нормально, адже у вас попереду ще ціла серія книг, щоб продовжувати дослідження!
 
-## Iteration
+## Ітерація
 
-Since programs are essentially built to process data (and make decisions on that data), the patterns used to step through the data have a big impact on the program's readability.
+Оскільки програми по суті будують для обробки даних і прийняття рішень щодо цих даних, великий вплив на читабельність програми мають шаблони перебору даних.
 
-The iterator pattern has been around for decades, and suggests a "standardized" approach to consuming data from a source one *chunk* at a time. The idea is that it's more common and helpful to iterate the data source—to progressively handle the collection of data by processing the first part, then the next, and so on, rather than handling the entire set all at once.
+Шаблон "Ітератор" існує десятки років і пропонує "стандартизований" підхід до споживання даних з певного джерела по одному *фрагменту* за раз. Ідея в тому, що ітерувати джерело даних, тобто поступово обробляти колекцію даних по одному фрагменту за раз, а не весь набір даних одночасно – це і більш розповсюджений підхід, і більш зручний.
 
-Imagine a data structure that represents a relational database `SELECT` query, which typically organizes the results as rows. If this query had only one or a couple of rows, you could handle the entire result set at once, and assign each row to a local variable, and perform whatever operations on that data that were appropriate.
+Уявіть собі структуру даних, яка представляє результат роботи запиту `SELECT` до реляційної бази даних. Цей запит зазвичай організовує результати у вигляді рядків. Якщо за запитом знайшовся лише один рядок або невелика кількість рядків, ви можете обробляти весь результат одразу: призначити кожен рядок локальній змінній та виконувати будь-які необхідні операції з тими даними.
 
-But if the query has 100 or 1,000 (or more!) rows, you'll need iterative processing to deal with this data (typically, a loop).
+Проте якщо запит повертає 100, 1000 або навіть більше рядків, вам доведеться обробляти дані ітеративно (як правило, у циклі).
 
-The iterator pattern defines a data structure called an "iterator" that has a reference to an underlying data source (like the query result rows), which exposes a method like `next()`. Calling `next()` returns the next piece of data (i.e., a "record" or "row" from a database query).
+Шаблон "Ітератор" визначає структуру даних, яка називається "ітератор". Ця структура має посилання на базове джерело даних (наприклад, рядки результату запиту), яке надає метод, що називається `next()` чи подібний до нього. Виклик `next()` повертає наступний фрагмент даних. У нашому прикладі це буде наступний запис або наступний рядок із запиту до бази даних.
 
-You don't always know how many pieces of data that you will need to iterate through, so the pattern typically indicates completion by some special value or exception once you iterate through the entire set and *go past the end*.
+Ви не завжди знаєте, скільки фрагментів даних вам треба переглянути, тому як правило шаблон передбачає повернення спеціального значення, що вказує на завершення ітерації або на помилку, щоб ви знали, що перебрали всі наявні елементи та пройшли повз останній.
 
-The importance of the iterator pattern is in adhering to a *standard* way of processing data iteratively, which creates cleaner and easier to understand code, as opposed to having every data structure/source define its own custom way of handling its data.
+Значення шаблону ітератора полягає у дотриманні *стандартного* способу обробки даних ітеративно, що забезпечує чистіший та легший для розуміння код, на противагу тому, що кожна структура даних або джерело визначатиме свій власний спосіб обробки своїх даних.
 
-After many years of various JS community efforts around mutually agreed-upon iteration techniques, ES6 standardized a specific protocol for the iterator pattern directly in the language. The protocol defines a `next()` method whose return is an object called an *iterator result*; the object has `value` and `done` properties, where `done` is a boolean that is `false` until the iteration over the underlying data source is complete.
+Після багатьох років зусиль JS-спільноти щодо узгоджених методів ітерації ES6 стандартизував конкретний протокол для шаблону "Ітератор" безпосередньо в мові. Протокол визначає метод `next()`, значенням якого є об'єкт, що називається *результатом ітератора*; об'єкт має властивості `value` і `done`, де `done` є булевим значенням, що дорівнюватиме `false`, доки ітерація базового джерела даних не завершиться.
 
-### Consuming Iterators
+### Споживання ітераторів
 
-With the ES6 iteration protocol in place, it's workable to consume a data source one value at a time, checking after each `next()` call for `done` to be `true` to stop the iteration. But this approach is rather manual, so ES6 also included several mechanisms (syntax and APIs) for standardized consumption of these iterators.
+З появою протоколу ітерації в ES6 стало можливо споживати джерело даних по одному значенню за раз, перевіряючи після кожного виклику `next()`, чи значення `done` дорівнює `true`, щоб зупинити ітерацію. Але цей підхід вимагає ручного управління, тому ES6 також включав кілька механізмів (новий синтаксис та програмні інтерфейси) для стандартизованого споживання цих ітераторів.
 
-One such mechanism is the `for..of` loop:
+Одним з таких механізмів є цикл `for..of`:
 
 ```js
-// given an iterator of some data source:
+// припустимо, що є ітератор певної структури даних:
 var it = /* .. */;
 
-// loop over its results one at a time
+// проходимо у циклі результати ітерації по одному за раз
 for (let val of it) {
     console.log(`Iterator value: ${ val }`);
 }
@@ -46,48 +46,48 @@ for (let val of it) {
 // ..
 ```
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| We'll omit the manual loop equivalent here, but it's definitely less readable than the `for..of` loop! |
+| У цьому прикладі ми не наводимо еквівалентний ручний цикл, але він, безумовно, менш читабельний, ніж цикл `for..of`! |
 
-Another mechanism that's often used for consuming iterators is the `...` operator. This operator actually has two symmetrical forms: *spread* and *rest* (or *gather*, as I prefer). The *spread* form is an iterator-consumer.
+Іншим механізмом, який часто використовується для споживання ітераторів, є оператор `...`. Цей оператор насправді має дві симетричні форми: *spread* та *rest* (другий я б назвав *gather*, тобто "збирання"). Форма *spread* є споживанням ітератора.
 
-To *spread* an iterator, you have to have *something* to spread it into. There are two possibilities in JS: an array or an argument list for a function call.
+Щоб "заспредити", тобто розкласти ітератор, потрібно мати *щось*, куди покласти результат. JS пропонує дві можливості: масив або список аргументів для виклику функції.
 
-An array spread:
+Розкладання ітератора у масив:
 
 ```js
-// spread an iterator into an array,
-// with each iterated value occupying
-// an array element position.
+// розкладання ітератора у масив,
+// де кожне значення ітератора
+// займає одне місце у масиві
 var vals = [ ...it ];
 ```
 
-A function call spread:
+Виклик функції:
 
 ```js
-// spread an iterator into a function,
-// call with each iterated value
-// occupying an argument position.
+// розкладання ітератора у виклику функції,
+// де кожне значення ітератора
+// займає місце одного аргументу
 doSomethingUseful( ...it );
 ```
 
-In both cases, the iterator-spread form of `...` follows the iterator-consumption protocol (the same as the `for..of` loop) to retrieve all available values from an iterator and place (aka, spread) them into the receiving context (array, argument list).
+В обох випадках форма розкладання ітератора `...` слідує протоколу споживання ітератора (так само як цикл `for..of`) для отримання всіх доступних значень з ітератора та розміщення їх у контекст отримання (масив, список аргументів).
 
-### Iterables
+### Ітеровані сутності
 
-The iterator-consumption protocol is technically defined for consuming *iterables*; an iterable is a value that can be iterated over.
+З технічної точки зору протокол споживання ітератора визначений для споживання *ітерованих сутностей*; ітерована сутність – це значення, яка піддається ітерації.
 
-The protocol automatically creates an iterator instance from an iterable, and consumes *just that iterator instance* to its completion. This means a single iterable could be consumed more than once; each time, a new iterator instance would be created and used.
+Протокол автоматично створює екземпляр ітератора з ітерованої сутності і споживає *саме цей екземпляр ітератора* до його вичерпання. Це означає, що одну ітеровану сутність можна споживати більше одного разу; кожного разу створюватиметься та використовуватиметься новий екземпляр ітератора.
 
-So where do we find iterables?
+То де взяти ітеровані сутності?
 
-ES6 defined the basic data structure/collection types in JS as iterables. This includes strings, arrays, maps, sets, and others.
+ES6 визначив певні базові структури даних та типи колекцій в JS як ітеровані сутності. Сюди входять рядки, масиви, мапи, множини тощо.
 
-Consider:
+Розглянемо:
 
 ```js
-// an array is an iterable
+// масив є ітерованою сутністю
 var arr = [ 10, 20, 30 ];
 
 for (let val of arr) {
@@ -97,14 +97,12 @@ for (let val of arr) {
 // Array value: 20
 // Array value: 30
 ```
-
-Since arrays are iterables, we can shallow-copy an array using iterator consumption via the `...` spread operator:
-
+Оскільки масиви є ітерованими сутностями, ми можемо поверхнево скопіювати масив, споживаючи ітератор оператором `...`:
 ```js
 var arrCopy = [ ...arr ];
 ```
 
-We can also iterate the characters in a string one at a time:
+Ми також можемо перебрати символи в рядку:
 
 ```js
 var greeting = "Hello world!";
@@ -115,12 +113,12 @@ chars;
 //   "w", "o", "r", "l", "d", "!" ]
 ```
 
-A `Map` data structure uses objects as keys, associating a value (of any type) with that object. Maps have a different default iteration than seen here, in that the iteration is not just over the map's values but instead its *entries*. An *entry* is a tuple (2-element array) including both a key and a value.
+Структура даних `Map` використовує об'єкти як ключі, з якими поєднує значення будь-якого типу. Мапи мають іншу ітерацію за замовчуванням, ніж така, яку ми бачили у попередніх прикладах, оскільки ітерація перебирає не значення Мапи, а *записи*. *Запис* - це кортеж (2-елементний масив), що включає як ключ, так і значення.
 
-Consider:
+Розглянемо:
 
 ```js
-// given two DOM elements, `btn1` and `btn2`
+// припустимо, що є два DOM-елементи, `btn1` та `btn2`
 
 var buttonNames = new Map();
 buttonNames.set(btn1,"Button 1");
@@ -133,9 +131,9 @@ for (let [btn,btnName] of buttonNames) {
 }
 ```
 
-In the `for..of` loop over the default map iteration, we use the `[btn,btnName]` syntax (called "array destructuring") to break down each consumed tuple into the respective key/value pairs (`btn1` / `"Button 1"` and `btn2` / `"Button 2"`).
+У циклі `for..of` над ітерацією мапи за замовчуванням ми використовуємо синтаксис `[btn, btnName]` (який називається "деструктуризація масиву"), щоб розбити кожен спожитий кортеж на відповідні пари "ключ і значення" (`btn1` та `"Button 1"` і `btn2` та `"Button 2"`).
 
-Each of the built-in iterables in JS expose a default iteration, one which likely matches your intuition. But you can also choose a more specific iteration if necessary. For example, if we want to consume only the values of the above `buttonNames` map, we can call `values()` to get a values-only iterator:
+Кожна вбудована ітерована сутність в JS визначає ітерацію за замовчуванням, яка, скоріш за все, відповідає тому, як ви її уявляєте. Але ви також можете вибрати більш конкретну ітерацію, коли це необхідно. Наприклад, якщо ми хочемо споживати лише значення наведеної вище мапи `buttonNames`, ми можемо викликати `values​​()`, щоб отримати ітератор лише для значень:
 
 ```js
 for (let btnName of buttonNames.values()) {
@@ -145,7 +143,7 @@ for (let btnName of buttonNames.values()) {
 // Button 2
 ```
 
-Or if we want the index *and* value in an array iteration, we can make an entries iterator with the `entries()` method:
+Або якщо нам потрібні значення індексу *та* значення під час ітерації масиву, ми можемо зробити ітератор по записах методом `entries()`:
 
 ```js
 var arr = [ 10, 20, 30 ];
@@ -158,29 +156,30 @@ for (let [idx,val] of arr.entries()) {
 // [2]: 30
 ```
 
-For the most part, all built-in iterables in JS have three iterator forms available: keys-only (`keys()`), values-only (`values()`), and entries (`entries()`).
+Здебільшого всі вбудовані ітеровані сутності в JS мають три форми ітераторів: перебір ключів (`keys()`), значень  (`values()`) та записів (`entries()`).
 
-Beyond just using built-in iterables, you can also ensure your own data structures adhere to the iteration protocol; doing so means you opt into the ability to consume your data with `for..of` loops and the `...` operator. "Standardizing" on this protocol means code that is overall more readily recognizable and readable.
+Ви можете використовувати ітерацію, запропоновану мовою, але також ви також можете додати підтримку протоколу ітерації власним структурам даних; це означає, що ви вибираєте можливість використовувати ваші дані за допомогою циклів `for..of` та оператора `...`. "Стандартизація" цього протоколу означає, що код стає більш легко впізнаваним і читабельним.
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| You may have noticed a nuanced shift that occurred in this discussion. We started by talking about consuming **iterators**, but then switched to talking about iterating over **iterables**. The iteration-consumption protocol expects an *iterable*, but the reason we can provide a direct *iterator* is that an iterator is just an iterable of itself! When creating an iterator instance from an existing iterator, the iterator itself is returned. |
+| Можливо, ви помітили зміну, яка відбулася в нашій дискусії. Ми почали з розмови про споживання **ітераторів**, але потім перейшли до розмови про перебір **ітерованих сутностей**. Протокол ітерації та споживання очікує *ітеровану сутність*, але причина, з якої ми можемо надати прямий *ітератор*, полягає в тому, що ітератор сам по собі є ітерованою сутністю! При створенні екземпляра ітератора з наявного ітератора повертається сам ітератор. |
 
-## Closure
+## Замикання
 
-Perhaps without realizing it, almost every JS developer has made use of closure. In fact, closure is one of the most pervasive programming functionalities across a majority of languages. It might even be as important to understand as variables or loops; that's how fundamental it is.
 
-Yet it feels kind of hidden, almost magical. And it's often talked about in either very abstract or very informal terms, which does little to help us nail down exactly what it is.
+Я припускаю, що майже кожен розробник JS користувався замиканнями, інколи не усвідомлюючи цього. Насправді замикання є однією з найбільш поширених функціональних можливостей програмування у багатьох мовах. Розуміння замикань може бути так само важливим, як розуміння змінних або циклів; ось наскільки це принципово.
 
-We need to be able to recognize where closure is used in programs, as the presence or lack of closure is sometimes the cause of bugs (or even the cause of performance issues).
+І все-таки замикання справляють враження тайни чи магії. Про них часто говорять або дуже абстрактно, або дуже неформально, що мало допомагає нам зрозуміти, що вони таке.
 
-So let's define closure in a pragmatic and concrete way:
+Ми повинні вміти розпізнавати, де в програмах використовується замикання, оскільки наявність або відсутність замикання іноді є причиною помилок (чи навіть причиною проблем зі швидкодією).
 
-> Closure is when a function remembers and continues to access variables from outside its scope, even when the function is executed in a different scope.
+Тож дамо замиканням прагматичне і конкретне визначення:
 
-We see two definitional characteristics here. First, closure is part of the nature of a function. Objects don't get closures, functions do. Second, to observe a closure, you must execute a function in a different scope than where that function was originally defined.
+> Замикання – це коли функція запам'ятовує змінні поза межами своєї області видимості та може звернутися до них,  навіть коли виконується в іншій області видимості.
 
-Consider:
+Тут ми бачимо дві визначальні характеристики. Перша: замикання є частиною природи функції. Об'єкти не створюють замикання, їх створюють лише функції. Друга: щоб побачити замикання, ви повинні виконати функцію в іншій области видимості, ніж та, де ця функція була визначена.
+
+Розглянемо приклад:
 
 ```js
 function greeting(msg) {
@@ -202,11 +201,11 @@ howdy("Grant");
 // Howdy, Grant!
 ```
 
-First, the `greeting(..)` outer function is executed, creating an instance of the inner function `who(..)`; that function closes over the variable `msg`, which is the parameter from the outer scope of `greeting(..)`. When that inner function is returned, its reference is assigned to the `hello` variable in the outer scope. Then we call `greeting(..)` a second time, creating a new inner function instance, with a new closure over a new `msg`, and return that reference to be assigned to `howdy`.
+Спочатку виконується зовнішня функція `greeting(..)`, що створює екземпляр внутрішньої функції `who(..)`; ця функція замикає змінну `msg`, яка є параметром із зовнішньої області видимості `greeting(..)`. Коли ця внутрішня функція закінчує роботу, її посилання призначається змінній `hello` у зовнішній області видимості. Потім ми вдруге викликаємо `greeting(..)`, створюючи новий екземпляр внутрішньої функції, з новим замиканням нового значення `msg`, і повертаємо це посилання, яке буде призначене для `howdy`.
 
-When the `greeting(..)` function finishes running, normally we would expect all of its variables to be garbage collected (removed from memory). We'd expect each `msg` to go away, but they don't. The reason is closure. Since the inner function instances are still alive (assigned to `hello` and `howdy`, respectively), their closures are still preserving the `msg` variables.
+Коли функція `greeting(..)` завершує свою роботи, ми очікуємо, що всі її змінні будуть видалені з пам'яті прибиральником сміття (garbage collector). Нам здається, що усі екземпляри `msg` мають зникнути, але цього не відбувається. Причина – замикання. Оскільки внутрішні екземпляри функцій все ще живі (зверніть увагу на присвоєні `hello` та `howdy`, відповідно), їх замикання все ще зберігають змінні `msg`.
 
-These closures are not a snapshot of the `msg` variable's value; they are a direct link and preservation of the variable itself. That means closure can actually observe (or make!) updates to these variables over time.
+Проте ці замикання не є статичним відбитком значення змінної `msg`; вони представляють прямий зв'язок із самою змінною. Це означає, що замикання може фактично відстежувати оновлення або навіть оновлювати значення цих змінних з часом.
 
 ```js
 function counter(step = 1) {
@@ -228,9 +227,9 @@ incBy3();       // 6
 incBy3();       // 9
 ```
 
-Each instance of the inner `increaseCount()` function is closed over both the `count` and `step` variables from its outer `counter(..)` function's scope. `step` remains the same over time, but `count` is updated on each invocation of that inner function. Since closure is over the variables and not just snapshots of the values, these updates are preserved.
+Кожен екземпляр внутрішньої функції `yieldCount()` замикає змінні `count` та `step` з області видимості зовнішньої функції `counter(..)`. `step` залишається незмінним з часом, але `count` оновлюється при кожному виклику цієї внутрішньої функції. Оскільки замикання зберігає самі змінні, а не лише їхні значення у певний момент часу, ці оновлення також зберігаються.
 
-Closure is most common when working with asynchronous code, such as with callbacks. Consider:
+Замикання найчастіше можна спостерігати при роботі з асинхронним кодом, наприклад, з функціями зворотного виклику(callbacks). Розглянемо:
 
 ```js
 function getSomeData(url) {
@@ -245,9 +244,9 @@ getSomeData("https://some.url/wherever");
 // Response (from https://some.url/wherever): ...
 ```
 
-The inner function `onResponse(..)` is closed over `url`, and thus preserves and remembers it until the Ajax call returns and executes `onResponse(..)`. Even though `getSomeData(..)` finishes right away, the `url` parameter variable is kept alive in the closure for as long as needed.
+Внутрішня функція `onResponse(..)` замикає `url` і, таким чином, зберігає та запам'ятовує цю змінну, поки Ajax-виклик не повернеться і не виконає `onResponse(..) `. Попри те, що `getSomeData(..)` закінчує свою роботу одразу, змінна параметра `url` зберігається в замиканні стільки часу, скільки потрібно.
 
-It's not necessary that the outer scope be a function—it usually is, but not always—just that there be at least one variable in an outer scope accessed from an inner function:
+Не обов’язково, щоб зовнішня область видимості була функцією. Зазвичай це так, але не завжди. Треба лише, щоб у зовнішній області була принаймні одна змінна, до якої можна отримати доступ із внутрішньої функції:
 
 ```js
 for (let [idx,btn] of buttons.entries()) {
@@ -257,27 +256,27 @@ for (let [idx,btn] of buttons.entries()) {
 }
 ```
 
-Because this loop is using `let` declarations, each iteration gets new block-scoped (aka, local) `idx` and `btn` variables;  the loop also creates a new inner `onClick(..)` function each time. That inner function closes over `idx`, preserving it for as long as the click handler is set on the `btn`. So when each button is clicked, its handler can print its associated index value, because the handler remembers its respective `idx` variable.
+Оскільки цей цикл використовує декларації `let`, кожна ітерація отримує нові змінні `idx` та `btn` з блокової області видимості (тобто, локальні); цикл також щоразу створює нову внутрішню функцію `onClick(..)`. Ця внутрішня функція замикає змінну `idx`, зберігаючи її до тих пір, поки на `btn` існує функція, що обробляє натискання. Отже, щоразу як натискається кожна з кнопок, обробник цієї кнопки може надрукувати відповідне значення індексу, оскільки обробник запам'ятовує відповідну змінну `idx`.
 
-Remember: this closure is not over the value (like `1` or `3`), but over the variable `idx` itself.
+Пам'ятайте: це замикання зберігає не значення (наприклад, `1` або `3`), а саму змінну `idx`.
 
-Closure is one of the most prevalent and important programming patterns in any language. But that's especially true of JS; it's hard to imagine doing anything useful without leveraging closure in one way or another.
+Замикання – один з найпоширеніших і найважливіших шаблонів програмування будь-якою мовою. Але замикання особливо важливі для JS; важко уявити, як можна зробити щось корисне, не використовуючи замикання в той чи інший спосіб.
 
-If you're still feeling unclear or shaky about closure, the majority of Book 2, *Scope & Closures* is focused on the topic.
+Якщо ви все ще маєте питання або відчуваєте хиткість своїх знань про замикання, то майте на увазі, що більшість Книги 2 *Області видимості та замикання* зосереджена саме на цій темі.
 
-## `this` Keyword
+## Ключове слово `this`
 
-One of JS's most powerful mechanisms is also one of its most misunderstood: the `this` keyword. One common misconception is that a function's `this` refers to the function itself. Because of how `this` works in other languages, another misconception is that `this` points the instance that a method belongs to. Both are incorrect.
+Один з найпотужніших механізмів в JS є також одним з найбільш неправильно зрозумілих: ключове слово `this`. Поширеним хибним уявленням є думка, що `this` у функції вказує на саму функцію. Через те, як `this` працює в інших мовах, іншим хибним уявленням є те, що `this` вказує на екземпляр, якому належить метод. Обидва твердження помилкові.
 
-As discussed previously, when a function is defined, it is *attached* to its enclosing scope via closure. Scope is the set of rules that controls how references to variables are resolved.
+Як вже обговорювалося раніше, при визначенні функція *приєднується* до навколишньої області видимості за допомогою замикання. Область видимості – це набір правил, який контролює спосіб розв’язування посилань на змінні.
 
-But functions also have another characteristic besides their scope that influences what they can access. This characteristic is best described as an *execution context*, and it's exposed to the function via its `this` keyword.
+Але окрім області видимості функції мають ще одну характеристику, яка впливає на те, до чого вони мають доступ. Цю характеристику найкраще описати як *контекст виконання*. Функція доступається до цього контексту за допомогою ключового слова `this`.
 
-Scope is static and contains a fixed set of variables available at the moment and location you define a function, but a function's execution *context* is dynamic, entirely dependent on **how it is called** (regardless of where it is defined or even called from).
+Область видимості є статичною і містить фіксований набір змінних, доступних на цей момент, та місце, де ви визначаєте функцію, але *контекст* виконання функції є динамічним, тобто повністю залежить від того, **як** ви викликаєте функцію (незалежно від того, де вона визначена або навіть де викликається).
 
-`this` is not a fixed characteristic of a function based on the function's definition, but rather a dynamic characteristic that's determined each time the function is called.
+`this` – це не фіксована характеристика функції, заснована на визначенні функції, а швидше динамічна характеристика, яка визначається заново щоразу, коли функція викликається.
 
-One way to think about the *execution context* is that it's a tangible object whose properties are made available to a function while it executes. Compare that to scope, which can also be thought of as an *object*; except, the *scope object* is hidden inside the JS engine, it's always the same for that function, and its *properties* take the form of identifier variables available inside the function.
+Можна уявити *контекст виконання* як матеріальний об'єкт, властивості якого стають доступними функції під час її виконання. Порівняйте цю модель з областю видимості, яку також можна сприймати як *об'єкт*; на відміну від контексту виконання, *об'єкт* області видимості прихований усередині рушія JS, він завжди однаковий для певної функції, а його *властивості* мають вигляд ідентифікаторів, доступних всередині функції.
 
 ```js
 function classroom(teacher) {
@@ -290,24 +289,24 @@ function classroom(teacher) {
 var assignment = classroom("Kyle");
 ```
 
-The outer `classroom(..)` function makes no reference to a `this` keyword, so it's just like any other function we've seen so far. But the inner `study()` function does reference `this`, which makes it a `this`-aware function. In other words, it's a function that is dependent on its *execution context*.
+Зовнішня функція `classroom(..)` не посилається на ключове слово `this`, тому вона подібна до будь-якої іншої функції, яку ми бачили до цього часу. Але внутрішня функція `study()` посилається на `this`, що робить її `this`-свідомою. Іншими словами, це функція, яка залежить від *контексту виконання*.
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| `study()` is also closed over the `teacher` variable from its outer scope. |
+| "study()" також замикає змінну `teacher` із зовнішньої області видимості. |
 
-The inner `study()` function returned by `classroom("Kyle")` is assigned to a variable called `assignment`. So how can `assignment()` (aka `study()`) be called?
+Внутрішня функція `study()`, яку повернув виклик `classroom("Kyle")`, присвоюється змінній, яка називається `assignment`. То як можна викликати `assignment()` (він же `study()`)?
 
 ```js
 assignment();
-// Kyle says to study undefined  -- Oops :(
+// Kyle says to study undefined  -- Отакої :(
 ```
 
-In this snippet, we call `assignment()` as a plain, normal function, without providing it any *execution context*.
+У цьому фрагменті ми викликаємо `assignment()` як звичайну функцію, не надаючи їй жодного *контексту виконання*.
 
-Since this program is not in strict mode (see Chapter 1, "Strictly Speaking"), context-aware functions that are called **without any context specified** default the context to the global object (`window` in the browser). As there is no global variable named `topic` (and thus no such property on the global object), `this.topic` resolves to `undefined`.
+Оскільки ця програма виконується не в строгому режимі (див. Главу 1, "Строго кажучи"), функції, що знають про контекст, проте викликаються **без надання контексту**, за замовчуванням отримують в якості контексту глобальний об'єкт (`window` у браузері). Оскільки глобальної змінної на ім'я `topic` немає (отже, такої властивості на глобальному об'єкті теж немає), `this.topic` має значення `undefined`.
 
-Now consider:
+Тепер розглянемо такий код:
 
 ```js
 var homework = {
@@ -319,9 +318,9 @@ homework.assignment();
 // Kyle says to study JS
 ```
 
-A copy of the `assignment` function reference is set as a property on the `homework` object, and then it's called as `homework.assignment()`. That means the `this` for that function call will be the `homework` object. Hence, `this.topic` resolves to `"JS"`.
+Копія посилання на функцію `assignment` призначається як значення властивості об'єкта `homework`, а потім вона викликається як `homework.assignment()`. Це означає, що `this` для цього виклику функції буде об'єктом `homework`. Отже, `this.topic` перетворюється на `"JS"`.
 
-Lastly:
+І нарешті:
 
 ```js
 var otherHomework = {
@@ -332,23 +331,23 @@ assignment.call(otherHomework);
 // Kyle says to study Math
 ```
 
-A third way to invoke a function is with the `call(..)` method, which takes an object (`otherHomework` here) to use for setting the `this` reference for the function call. The property reference `this.topic` resolves to `"Math"`.
+Третім способом виклику функції є метод `call(..)`, який бере об'єкт (тут `otherHomework`) для встановлення посилання `this` для виклику функції. Посилання на властивість `this.topic` перетворюється на `"Math"`.
 
-The same context-aware function invoked three different ways, gives different answers each time for what object `this` will reference.
+Одна і та сама контекстно-свідома функція, що викликається трьома різними способами, щоразу дає різні відповіді на те, на який об'єкт посилається `this`.
 
-The benefit of `this`-aware functions—and their dynamic context—is the ability to more flexibly re-use a single function with data from different objects. A function that closes over a scope can never reference a different scope or set of variables. But a function that has dynamic `this` context awareness can be quite helpful for certain tasks.
+Перевага функцій, що знають про `this`, та їх динамічного контексту полягає в можливості гнучкішого повторного використання однієї функції з даними різних об'єктів. Функція, яка замикає область видимості, ніколи не може посилатися на іншу область або набір змінних. Але функція, яка має динамічне усвідомлення контексту `this`, може бути дуже корисною для певних завдань.
 
-## Prototypes
+## Прототипи
 
-Where `this` is a characteristic of function execution, a prototype is a characteristic of an object, and specifically resolution of a property access.
+Якщо `this` є характеристикою виконання функції, то прототип – це характеристика об'єкта, а саме спосіб визначення доступу до властивості.
 
-Think about a prototype as a linkage between two objects; the linkage is hidden behind the scenes, though there are ways to expose and observe it. This prototype linkage occurs when an object is created; it's linked to another object that already exists.
+Думайте про прототип як про зв'язок між двома об'єктами; цей зв'язок прихований за лаштунками, хоча є способи викрити його та дослідити. Поєднання прототипів відбувається під час створення об'єкту: об'єкт прив'язується до іншого наявного об'єкта.
 
-A series of objects linked together via prototypes is called the "prototype chain."
+Серія об'єктів, пов'язаних між собою прототипами, називається "ланцюжком прототипів".
 
-The purpose of this prototype linkage (i.e., from an object B to another object A) is so that accesses against B for properties/methods that B does not have, are *delegated* to A to handle. Delegation of property/method access allows two (or more!) objects to cooperate with each other to perform a task.
+Призначення цього зв’язку прототипу (тобто від об’єкта B до іншого об’єкта A) полягає в тому, що доступ до властивостей чи методів, яких B не має, *делегувався* для обробки об’єкту A. Делегування доступу властивості та методу дозволяє двом або більше об'єктам взаємодіяти для виконання завдання.
 
-Consider defining an object as a normal literal:
+Наприклад, визначимо об’єкт як звичайний літерал:
 
 ```js
 var homework = {
@@ -356,19 +355,19 @@ var homework = {
 };
 ```
 
-The `homework` object only has a single property on it: `topic`. However, its default prototype linkage connects to the `Object.prototype` object, which has common built-in methods on it like `toString()` and `valueOf()`, among others.
+Об'єкт `homework` має лише одну властивість: `topic`. Однак його зв’язок прототипу за замовчуванням підключається до об’єкта `Object.prototype`, який має загальновбудовані в ньому методи, такі як `toString()` та `valueOf()`, серед іншого.
 
-We can observe this prototype linkage *delegation* from `homework` to `Object.prototype`:
+Ми можемо спостерігати це *делегування* від `homework` до `Object.prototype`:
 
 ```js
 homework.toString();    // [object Object]
 ```
 
-`homework.toString()` works even though `homework` doesn't have a `toString()` method defined; the delegation invokes `Object.prototype.toString()` instead.
+`homework.toString()` працює, хоча в `homework` не визначено метод `toString()`; виклик делегується до `Object.prototype.toString()`.
 
-### Object Linkage
+### З'єднання об'єктів
 
-To define an object prototype linkage, you can create the object using the `Object.create(..)` utility:
+Щоб визначити з'єднання прототипу об'єкта, ви можете створити об'єкт за допомогою утиліти `Object.create(..)`:
 
 ```js
 var homework = {
@@ -380,23 +379,23 @@ var otherHomework = Object.create(homework);
 otherHomework.topic;   // "JS"
 ```
 
-The first argument to `Object.create(..)` specifies an object to link the newly created object to, and then returns the newly created (and linked!) object.
+Перший аргумент `Object.create(..)` визначає об'єкт, з яким потрібно поєднати новостворений об'єкт, а потім повертається новостворений і зв'язаний об'єкт.
 
-Figure 4 shows how the three objects (`otherHomework`, `homework`, and `Object.prototype`) are linked in a prototype chain:
+На малюнку 4 показано, як три об'єкти (`otherHomework`,`homework` та `Object.prototype`) пов'язані ланцюжком прототипів:
 
 <figure>
-    <img src="images/fig4.png" width="200" alt="Prototype chain with 3 objects" align="center">
-    <figcaption><em>Fig. 4: Objects in a prototype chain</em></figcaption>
+    <img src="images/fig4.svg" width="200" alt="Прототивний ланцюжок з 3 об'єктами" align="center">
+    <figcaption><em>Рис. 4: Об'єкти в прототипному ланцюжку</em></figcaption>
     <br><br>
 </figure>
 
-Delegation through the prototype chain only applies for accesses to lookup the value in a property. If you assign to a property of an object, that will apply directly to the object regardless of where that object is prototype linked to.
+Делегування через ланцюжок прототипів застосовується лише для доступу до значення властивості. Якщо ви натомість призначаєте значення властивості об’єкта, то призначення відбудеться саме в цьому об'єкті, незалежно від того, де цей об’єкт пов’язаний з прототипом.
 
-| TIP: |
+| ПОРАДА: |
 | :--- |
-| `Object.create(null)` creates an object that is not prototype linked anywhere, so it's purely just a standalone object; in some circumstances, that may be preferable. |
+| `Object.create(null)` створює об'єкт, прототип якого ні до чого не прив'язаний, тому це окремий об'єкт; за деяких обставин це може бути бажаним ефектом. |
 
-Consider:
+Розглянемо:
 
 ```js
 homework.topic;
@@ -413,27 +412,27 @@ homework.topic;
 // "JS" -- not "Math"
 ```
 
-The assignment to `topic` creates a property of that name directly on `otherHomework`; there's no effect on the `topic` property on `homework`. The next statement then accesses `otherHomework.topic`, and we see the non-delegated answer from that new property: `"Math"`.
+Призначення `topic` створює властивість з цією назвою безпосередньо на `otherHomework`; немає ніякого впливу на властивість `topic` у `homework`. Наступна інструкція отримує доступ до `otherHomework.topic`, і ми бачимо безпосередню (неделеговану) відповідь із цієї нової властивості: `"Math"`.
 
-Figure 5 shows the objects/properties after the assignment that creates the `otherHomework.topic` property:
+На рисунку 5 показані об'єкти та властивості після призначення, яке створює властивість `otherHomework.topic`:
 
 <figure>
-    <img src="images/fig5.png" width="200" alt="3 objects linked, with shadowed property" align="center">
-    <figcaption><em>Fig. 5: Shadowed property 'topic'</em></figcaption>
+    <img src="images/fig5.svg" width="200" alt="Поєдано 3 об'єкти, з перекриттям однієї з властивотсей" align="center">
+    <figcaption><em>Рис. 5: Перекрита властивість 'topic'</em></figcaption>
     <br><br>
 </figure>
 
-The `topic` on `otherHomework` is "shadowing" the property of the same name on the `homework` object in the chain.
+Властивість `topic` в об'єкті `otherHomework` перекриває однойменну властивість об'єкта `homework` у ланцюжку.
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| Another frankly more convoluted but perhaps still more common way of creating an object with a prototype linkage is using the "prototypal class" pattern, from before `class` (see Chapter 2, "Classes") was added in ES6. We'll cover this topic in more detail in Appendix A, "Prototypal 'Classes'". |
+| Іншим, відверто більш заплутаним, але, можливо, ще більш розповсюдженим способом створення об'єкта з визначеним прототипом є використання шаблону "prototypal class", до того, як `class` (див. Главу 2, "Класи") було додано до ES6. Ми докладніше розглянемо цю тему в Додатку А, "Прототипні "класи"". |
 
-### `this` Revisited
+### Повернення до `this`
 
-We covered the `this` keyword earlier, but its true importance shines when considering how it powers prototype-delegated function calls. Indeed, one of the main reasons `this` supports dynamic context based on how the function is called is so that method calls on objects which delegate through the prototype chain still maintain the expected `this`.
+Ми розглядали ключове слово `this` раніше, але його справжнє значення стає очевиднішим при розгляді того, як воно забезпечує делегування виклику функцій по прототипному ланцюжку. Дійсно, одна з головних причин, що `this` підтримує динамічний контекст, що залежить від способу виклику функції, полягає в тому, що метод викликає об'єкти, які делегують через ланцюжок прототипів, як і раніше підтримують очікуване значення `this`.
 
-Consider:
+Розглянемо:
 
 ```js
 var homework = {
@@ -453,26 +452,26 @@ mathHomework.study();
 // Please study Math
 ```
 
-The two objects `jsHomework` and `mathHomework` each prototype link to the single `homework` object, which has the `study()` function. `jsHomework` and `mathHomework` are each given their own `topic` property (see Figure 6).
+Прототипи двох об'єктів `jsHomework` і `mathHomework` пов'язані з єдиним об'єктом `homework`, який має функцію `study()`. `jsHomework` і `mathHomework` отримують власні властивості `topic` (див. малюнок 6).
 
 <figure>
-    <img src="images/fig6.png" width="495" alt="4 objects prototype linked" align="center">
-    <figcaption><em>Fig. 6: Two objects linked to a common parent</em></figcaption>
+    <img src="images/fig6.svg" width="495" alt="4 об'єкти поєднані прототипами" align="center">
+    <figcaption><em>Рис. 6: Два об'єкти поєднано зі спільним батьківським об'єктом</em></figcaption>
     <br><br>
 </figure>
 
-`jsHomework.study()` delegates to `homework.study()`, but its `this` (`this.topic`) for that execution resolves to `jsHomework` because of how the function is called, so `this.topic` is `"JS"`. Similarly for `mathHomework.study()` delegating to `homework.study()` but still resolving `this` to `mathHomework`, and thus `this.topic` as `"Math"`.
+`jsHomework.study()` делегує виклик до `homework.study()`, але його `this` (`this.topic`) для цього виконання дорівнює `jsHomework` через те, як викликається функція, так що `this.topic` є `"JS"`. Подібним чином для `mathHomework.study()`, делегуючи виклик до `homework.study()`, але все одно вирішуючи `this` до` mathHomework`, а отже `this.topic` як `"Math"`.
 
-The preceding code snippet would be far less useful if `this` was resolved to `homework`. Yet, in many other languages, it would seem `this` would be `homework` because the `study()` method is indeed defined on `homework`.
+Попередній фрагмент коду був би набагато менш корисним, якби `this` вказувало на `homework`. Однак з точки зору багатьох інших мов здається, що `this` було б `homework`, оскільки метод `study()` справді визначений на об'єкті `homework`.
 
-Unlike many other languages, JS's `this` being dynamic is a critical component of allowing prototype delegation, and indeed `class`, to work as expected!
+На відміну від багатьох інших мов, динамічний `this` у JS – це важливий компонент, який дозволяє делегування між прототипами і належну роботу `class`!
 
-## Asking "Why?"
+## Про важливість питання "Чому так?"
 
-The intended take-away from this chapter is that there's a lot more to JS under the hood than is obvious from glancing at the surface.
+З цього розділу ви мали зрозуміти, що "під капотом" JS значно більше деталей, ніж видно на поверхні.
 
-As you are *getting started* learning and knowing JS more closely, one of the most important skills you can practice and bolster is curiosity, and the art of asking "Why?" when you encounter something in the language.
+В міру того, як ви *починаєте* вивчати та пізнавати JS зблизька, однією з найважливіших навичок, яку ви можете здобути та розвивати, є допитливість та мистецтво запитувати "Чому так?", коли стикаєтесь з будь-чим у мові.
 
-Even though this chapter has gone quite deep on some of the topics, many details have still been entirely skimmed over. There's much more to learn here, and the path to that starts with you asking the *right* questions of your code. Asking the right questions is a critical skill of becoming a better developer.
+Попри те, що ця глава заглибилась у деякі теми, багато деталей було пропущено. Тут можна дізнатися ще багато чого, і шлях до цих нових знань починається з *правильних* питань про свій код. Правильно поставити запитання – критично важлива навичка для того, хто хоче ставати кращим розробником.
 
-In the final chapter of this book, we're going to briefly look at how JS is divided, as covered across the rest of the *You Don't Know JS Yet* book series. Also, don't skip Appendix B of this book, which has some practice code to review some of the main topics covered in this book.
+В останній главі цієї книги ми коротко розглянемо, на які частини поділяється JS, як описано в решті серії книг *Ти ще не знаєш JS*. Крім того, не пропускайте Додаток B цієї книги, який містить вправи для закріплення деяких важливих тем, висвітлених в цій книзі.

@@ -1,45 +1,45 @@
-# You Don't Know JS Yet: Get Started - 2nd Edition
+# Серія "Ти поки що не знаєш JS". Книга 1: "Перші кроки". Друге видання
 
-## Table of Contents
+## Зміст
 
-* Foreword
-* Preface
-* Chapter 1: What Is JavaScript?
-    * About This Book
-    * What's With That Name?
-    * Language Specification
-    * Many Faces
-    * Backwards & Forwards
-    * What's in an Interpretation?
-    * Strictly Speaking
-    * Defined
-* Chapter 2: Surveying JS
-    * Each File is a Program
-    * Values
-    * Declaring and Using Variables
-    * Functions
-    * Comparisons
-    * How We Organize in JS
-    * The Rabbit Hole Deepens
-* Chapter 3: Digging To The Roots Of JS
-    * Iteration
-    * Closure
-    * `this` Keyword
-    * Prototypes
-    * Asking "Why?"
-* Chapter 4: The Bigger Picture
-    * Pillar 1: Scope and Closure
-    * Pillar 2: Prototypes
-    * Pillar 3: Types and Coercion
-    * With the Grain
-    * In Order
-* Appendix A: Exploring Further
-    * Values vs. References
-    * So Many Function Forms
-    * Coercive Conditional Comparison
-    * Prototypal "Classes"
-* Appendix B: Practice, Practice, Practice!
-    * Practicing Comparisons
-    * Practicing Closure
-    * Practicing Prototypes
-    * Suggested Solutions
+* Передмова
+* Вступ
+* Глава 1: Що таке JavaScript?
+    * Про цю книгу
+    * А що з назвою?
+    * Специфікація мови
+    * Мова з багатьма обличчями
+    * Пряма та зворотна сумісність
+    * А що там з інтерпретацією?
+    * Строго кажучи
+    * Визначення
+* Глава 2: Огляд JS
+    * Кожний файл – це програма
+    * Значення
+    * Оголошення та використання значень
+    * Функції
+    * Порівняння
+    * Як ми організуємо код в JS
+    * Кроляча нора стає все глибшою
+* Глава 3: Шлях до самого коріння JS
+    * Ітерація
+    * Замикання
+    * Ключове слово `this`
+    * Прототипи
+    * Про важливість питання "Чому так?"
+* Глава 4: Загальна картина мови
+    * Опора №1: Області видимості та замикання
+    * Опора №2: Прототипи
+    * Опора №3: Типи та приведення типів
+    * Згідно природі мови
+    * По черзі
+* Додаток A: Продовжуємо дослідження
+    * Значення та посилання: в чому різниця
+    * Так багато видів функцій
+    * Умовне порівняння із приведенням типів
+    * Прототипні "класи"
+* Додаток B: Прийшов час практики!
+    * Вправа на порівняння
+    * Вправа з використання замикань
+    * Вправа з використання прототипів
+    * Пропоновані рішення

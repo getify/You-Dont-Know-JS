@@ -1,57 +1,58 @@
-# You Don't Know JS Yet: Get Started - 2nd Edition
-# Chapter 2: Surveying JS
+# Серія "Ти поки що не знаєш JS". Книга 1: "Перші кроки". Друге видання
+# Глава 2: Огляд JS
 
-The best way to learn JS is to start writing JS.
+Найкращий спосіб вивчити JS - почати на ньому писати.
 
-To do that, you need to know how the language works, and that's what we'll focus on here. Even if you've programmed in other languages before, take your time getting comfortable with JS, and make sure to practice each piece.
+Для цього треба знати, як працює мова, і саме на цьому ми зупинимося у цій главі. Навіть якщо ви раніше програмували на інших мовах, не поспішайте при знайомстві з JS, і обов’язково відпрацьовуйте кожен нюанс.
 
-This chapter is not an exhaustive reference on every bit of syntax of the JS language. It's also not intended to be a complete "intro to JS" primer.
+Ця глава не є вичерпним довідником з синтаксису мови JS. Вона також не призначена бути повноцінним "вступом до JS".
 
-Instead, we're just going to survey some of the major topic areas of the language. Our goal is to get a better *feel* for it, so that we can move forward writing our own programs with more confidence. We'll revisit many of these topics in successively more detail as you go through the rest of this book, and the rest of the series.
+Натомість ми оглянемо деякі з основних тематичних розділів мови. Наша мета – покращити *відчуття мови*, щоб ми могли рухатись далі й писали програми з більшою впевненістю. В решті цієї книги та в інших книгах серії ми повернемося до багатьох з цих тем та розглянемо їх детальніше.
 
-Please don't expect this chapter to be a quick read. It's long and there's plenty of detail to chew on. Take your time.
+Будь ласка, не очікуйте швидко впоратися з цим розділом. Він довгий та містить багато деталей, над якими варто подумати. Не поспішайте.
 
-| TIP: |
+| ПОРАДА: |
 | :--- |
-| If you're still getting familiar with JS, I suggest you reserve plenty of extra time to work through this chapter. Take each section and ponder and explore the topic for awhile. Look through existing JS programs and compare what you see in them to the code and explanations (and opinions!) presented here. You will get a lot more out of the rest of the book and series with a solid foundation of JS's *nature*. |
+| Якщо щойно почали знайомитися з JS, я пропоную вам закласти багато часу для роботи над цим розділом. Візьміть кожну частину і розмірковуйте над нею, заглибтеся в тему. Перегляньте наявні програми на JS і порівняйте те, що ви бачите в них, з кодом та поясненнями (та поглядами!), які представлені тут. Маючи міцне розуміння *природи* JS, ви отримаєте набагато більше від решти книги та всієї серії. |
 
-## Each File is a Program
+## Кожний файл – це програма
 
-Almost every website (web application) you use is comprised of many different JS files (typically with the .js file extension). It's tempting to think of the whole thing (the application) as one program. But JS sees it differently.
+Майже кожен вебсайт або вебзастосунок, який ви використовуєте, складається з безлічі JS-файлів (зазвичай це файли з розширенням .js). Спокусливо розглядати їх усі (весь застосунок) як одну програму. Але JS бачить ситуацію інакше.
 
-In JS, each standalone file is its own separate program.
+У JS кожен файл - це окрема програма.
 
-The reason this matters is primarily around error handling. Since JS treats files as programs, one file may fail (during parse/compile or execution) and that will not necessarily prevent the next file from being processed. Obviously, if your application depends on five .js files, and one of them fails, the overall application will probably only partially operate, at best. It's important to ensure that each file works properly, and that to whatever extent possible, they handle failure in other files as gracefully as possible.
+Для розуміння процесу обробки помилок важливо це усвідомлювати. Оскільки JS обробляє файли як окремі програми, один файл може спричинити помилку (під час парсингу, компіляції або виконання), і це не обов'язково заважатиме обробці наступного файлу. Очевидно, що якщо ваша програма складається з п’яти .js-файлів, а один з них містить помилку, в кращому випадку застосунок буде працювати лише частково. Важливо переконатися, що кожен файл працює належним чином, і, наскільки це можливо, обробляє помилки в інших файлах якомога граційніше.
 
-It may surprise you to consider separate .js files as separate JS programs. From the perspective of your usage of an application, it sure seems like one big program. That's because the execution of the application allows these individual *programs* to cooperate and act as one program.
+Можливо, вас здивує розгляд окремих .js-файлів як окремих програм, адже з точки зору користувача це одна велика програма. Це можливо, бо виконання застосунку дозволяє цим окремим *програмам* взаємодіяти та діяти як одна програма.
 
-| NOTE: |
+
+| ЗАУВАЖЕННЯ: |
 | :--- |
-| Many projects use build process tools that end up combining separate files from the project into a single file to be delivered to a web page. When this happens, JS treats this single combined file as the entire program. |
+| У багатьох проєктах використовуються інструменти процесу збірки, які в підсумку об'єднують окремі файли проєкту в один файл для доставки на веб-сторінку. Коли це трапляється, JS обробляє цей єдиний файл як  програму. |
 
-The only way multiple standalone .js files act as a single program is by sharing their state (and access to their public functionality) via the "global scope." They mix together in this global scope namespace, so at runtime they act as as whole.
+Єдиний спосіб, в який кілька автономних .js-файлів діють як одна програма, - це спільний доступ до їх стану (і до їх публічних функціональних можливостей) через "глобальну область видимості". Вони поєднуються в цьому просторі імен глобальної області видимості, тому під час виконання діють як єдине ціле.
 
-Since ES6, JS has also supported a module format in addition to the typical standalone JS program format. Modules are also file-based. If a file is loaded via module-loading mechanism such as an `import` statement or a `<script type=module>` tag, all its code is treated as a single module.
+На додаток до типового окремого формату програми з моменту появи ES6 JS також підтримує формат модулів. Модулі також базуються на файлах. Якщо файл завантажується за допомогою механізму завантаження модуля, такого як оператор `import` або тег `<type type = module>`, весь код файлу розглядається як єдиний модуль.
 
-Though you wouldn't typically think about a module—a collection of state and publicly exposed methods to operate on that state—as a standalone program, JS does in fact still treat each module separately. Similar to how "global scope" allows standalone files to mix together at runtime, importing a module into another allows runtime interoperation between them.
+Хоча ви зазвичай не думаєте про модуль, тобто, сукупність стану та публічних методів для роботи з цим станом, як про автономну програму, насправді JS все одно трактує кожен модуль окремо. Подібно до того, як "глобальна область видимості" дозволяє автономним файлам змішуватися під час виконання, імпорт одного модуля в інший дозволяє взаємодію між ними.
 
-Regardless of which code organization pattern (and loading mechanism) is used for a file (standalone or module), you should still think of each file as its own (mini) program, which may then cooperate with other (mini) programs to perform the functions of your overall application.
+Незалежно від того, який шаблон організації коду (і механізм завантаження) використовується для певного файлу (як окремий файл або модуль), ви все одно повинні думати про кожен файл як про окрему (міні-)програму, яка потім може взаємодіяти з іншими (міні-)програмами для виконання функції вашого застосунку.
 
-## Values
+## Значення
 
-The most fundamental unit of information in a program is a value. Values are data. They're how the program maintains state. Values come in two forms in JS: **primitive** and **object**.
+Найбільш фундаментальною одиницею інформації в програмі є значення(value). Значення - це дані. За допомогою значень програма зберігає свій стан. Значення у JS бувають у двох формах: **примітивні значення** та **об'єкти**.
 
-Values are embedded in programs using *literals*:
+Значення вводяться у програми за допомогою *літералів*:
 
 ```js
 greeting("My name is Kyle.");
 ```
 
-In this program, the value `"My name is Kyle."` is a primitive string literal; strings are ordered collections of characters, usually used to represent words and sentences.
+У цій програмі значення `"My name is Kyle."` є примітивним рядковим літералом; рядки - це впорядковані набори символів, які зазвичай використовуються для представлення слів і речень.
 
-I used the double-quote `"` character to *delimit* (surround, separate, define) the string value. But I could have used the single-quote `'` character as well. The choice of which quote character is entirely stylistic. The important thing, for the sake of code readability and maintainability, is to pick one and to use it consistently throughout the program.
+Я використав символ подвійних лапок `"`, щоб *розмежувати* (оточити, відокремити, визначити) рядкове значення. Але я міг використати і символ з одинарними лапками `'`. Вибір символу лапок цілком стилістичний. Важливо заради читабельності та простоти підтримки коду обрати один вид лапок і використовувати його послідовно по усій програмі.
 
-Another option to delimit a string literal is to use the back-tick `` ` `` character. However, this choice is not merely stylistic; there's a behavioral difference as well. Consider:
+Іншим варіантом розмежування рядкового літерала є використання зворотних лапок: ``` ``. Однак цей вибір впливає не тільки на стиль коду; також з'являється різниця у поведінці. Розглянемо:
 
 ```js
 console.log("My name is ${ firstName }.");
@@ -64,20 +65,20 @@ console.log(`My name is ${ firstName }.`);
 // My name is Kyle.
 ```
 
-Assuming this program has already defined a variable `firstName` with the string value `"Kyle"`, the `` ` ``-delimited string then resolves the variable expression (indicated with `${ .. }`) to its current value. This is called **interpolation**.
+Припускаючи, що програма вже визначила змінну `firstName` із рядковим значенням `"Kyle"`, рядок з ` `` ` обрахує поточне значення виразу, відокремленого символами `${ .. }`, та підставить це значення. Це називається **інтерполяцією**.
 
-The back-tick `` ` ``-delimited string can be used without including interpolated expressions, but that defeats the whole purpose of that alternate string literal syntax:
+Рядок зі зворотними лапками `` ` `` можна використовувати і без інтерпольованих виразів, але це суперечить цілі цього альтернативного синтаксису рядкового літерала:
 
 ```js
 console.log(
     `Am I confusing you by omitting interpolation?`
 );
-// Am I confusing you by omitting interpolation?
+// Чи не дивно, що тут немає інтерполяції?
 ```
 
-The better approach is to use `"` or `'` (again, pick one and stick to it!) for strings *unless you need* interpolation; reserve `` ` `` only for strings that will include interpolated expressions.
+Кращий підхід - використовувати для рядків `"` або `'` (нагадаю, що треба вибрати щось одне і дотримуватися свого вибору), хіба що вам потрібна *інтерполяція*. Залиште `` ` `` лише для рядків, які містять інтерпольовані вирази.
 
-Other than strings, JS programs often contain other primitive literal values such as booleans and numbers:
+Крім рядків, програми на JS часто містять інші літерали примітивних значень, такі як булеві значення та числа:
 
 ```js
 while (false) {
@@ -85,24 +86,24 @@ while (false) {
 }
 ```
 
-`while` represents a loop type, a way to repeat operations *while* its condition is true.
+`while` являє собою тип циклу: спосіб повторення операцій, доки(тобто, "while" англійською) умова відповідає дійсності.
 
-In this case, the loop will never run (and nothing will be printed), because we used the `false` boolean value as the loop conditional. `true` would have resulted in a loop that keeps going forever, so be careful!
+У наведеному прикладі цикл ніколи не запускатиметься і у консоль нічого не буде виведено, оскільки ми використали логічне значення `false` для умови. Натомість `true` призвело б до створення нескінченного циклу, будьте обережні з цим!
 
-The number `3.141592` is, as you may know, an approximation of mathematical PI to the first six digits. Rather than embed such a value, however, you would typically use the predefined `Math.PI` value for that purpose. Another variation on numbers is the `bigint` (big-integer) primitive type, which is used for storing arbitrarily large numbers.
+Число `3.141592` - це, як ви знаєте, наближення математичного числа PI до перших шести цифр. Однак замість того, щоб вставляти таке значення, ви зазвичай використовуєте заздалегідь визначене значення `Math.PI` для цієї мети. Ще однією варіацією чисел є примітивний тип `bigint` (велике ціле число), який використовується для зберігання довільно великих чисел.
 
-Numbers are most often used in programs for counting steps, such as loop iterations, and accessing information in numeric positions (i.e., an array index). We'll cover arrays/objects in a little bit, but as an example, if there was an array called `names`, we could access the element in its second position like this:
+Числа найчастіше використовуються в програмах для підрахунку кроків, як-от ітерацій циклу, та для доступу до інформації в числових позиціях (тобто як індекс масиву). До масивів та об’єктів ми ще дійдемо, але ось приклад. Якби існував масив на ім'я `names ', ми могли б отримати доступ до елемента на другій позиції так:
 
 ```js
 console.log(`My name is ${ names[1] }.`);
 // My name is Kyle.
 ```
 
-We used `1` for the element in the second position, instead of `2`, because like in most programming languages, JS array indices are 0-based (`0` is the first position).
+Для елемента у другій позиції ми використовували індекс `1`, а не` 2`, оскільки подібно до більшості мов програмування, індекси масивів у JS починаються з 0 (де `0` - перша позиція).
 
-In addition to strings, numbers, and booleans, two other *primitive* values in JS programs are `null` and `undefined`. While there are differences between them (some historic and some contemporary), for the most part both values serve the purpose of indicating *emptiness* (or absence) of a value.
+На додаток до рядків, чисел та булевих значень, у програмах на JS є ще два *примітивні* значення: `null` та `undefined`. Хоча між ними існують відмінності (як історичні, так і сучасні), здебільшого обидва значення служать меті вказати на *порожнечу* (або відсутність) значення.
 
-Many developers prefer to treat them both consistently in this fashion, which is to say that the values are assumed to be indistinguishable. If care is taken, this is often possible. However, it's safest and best to use only `undefined` as the single empty value, even though `null` seems attractive in that it's shorter to type!
+Багато розробників вважають за краще ставитися до них обох послідовно таким чином, тобто, вважати, що значення `null` та `undefined` не відрізняються. Якщо зберігати обережність, часто це можливо. Однак найбезпечніше і найкраще використовувати як вказівку на порожнє значення лише `undefined`, хоча `null` здається привабливим тим, що його швидше писати.
 
 ```js
 while (value != undefined) {
@@ -110,20 +111,20 @@ while (value != undefined) {
 }
 ```
 
-The final primitive value to be aware of is a symbol, which is a special-purpose value that behaves as a hidden unguessable value. Symbols are almost exclusively used as special keys on objects:
+Останнім примітивним значенням, про яке слід пам’ятати, є символ – спеціальне значення, що поводиться як приховане значення, яке не можна вгадати. Символи майже завжди використовуються як спеціальні ключі на об'єктах:
 
 ```js
 hitchhikersGuide[ Symbol("meaning of life") ];
 // 42
 ```
 
-You won't encounter direct usage of symbols very often in typical JS programs. They're mostly used in low-level code such as in libraries and frameworks.
+В типових програмах на JS ви нечасто зустрінете пряме використання символів. Вони в основному використовуються в низькорівневому коді, такому як код бібліотек та фреймворків.
 
-### Arrays And Objects
+### Масиви та об'єкти
 
-Besides primitives, the other value type in JS is an object value.
+Окрім примітивів, іншим типом значення в JS є об'єкт.
 
-As mentioned earlier, arrays are a special type of object that's comprised of an ordered and numerically indexed list of data:
+Як вже згадувалося раніше, масиви - це особливий тип об'єкта, який складається з упорядкованого та індексованого числами списку даних:
 
 ```js
 var names = [ "Frank", "Kyle", "Peter", "Susan" ];
@@ -138,13 +139,13 @@ names[1];
 // Kyle
 ```
 
-JS arrays can hold any value type, either primitive or object (including other arrays). As we'll see toward the end of Chapter 3, even functions are values that can be held in arrays or objects.
+Масиви в JS можуть містити значення будь-яких типів, примітивні або об’єктні (зокрема інші масиви). Як ми побачимо наприкінці розділу 3, навіть функції можна зберігати в масивах або об'єктах.
 
-| NOTE: |
+| ЗАУВАЖЕННЯ: |
 | :--- |
-| Functions, like arrays, are a special kind (aka, sub-type) of object. We'll cover functions in more detail in a bit. |
+| Функції, як масиви, є особливим видом (він же підтип) об'єкта. Ми розглянемо функції детальніше дуже скоро. |
 
-Objects are more general: an unordered, keyed collection of any various values. In other words, you access the element by a string location name (aka "key" or "property") rather than by its numeric position (as with arrays). For example:
+Об'єкти є більш загальними: це невпорядкована колекція довільних значень з доступом за ключем. Іншими словами, ви отримуєте доступ до елемента за допомогою назви місця його розташування, а не за числовим положенням, як у масивів. Ми називаємо ці назви "ключами" або "властивостями". Наприклад:
 
 ```js
 var me = {
@@ -157,11 +158,11 @@ var me = {
 console.log(`My name is ${ me.first }.`);
 ```
 
-Here, `me` represents an object, and `first` represents the name of a location of information in that object (value collection). Another syntax option that accesses information in an object by its property/key uses the square-brackets `[ ]`, such as  `me["first"]`.
+Тут `me` представляє об'єкт, а `first` - назву місця розташування інформації в цьому об'єкті (в колекції значень). Інший варіант синтаксису, який дозволяє отримати доступ до інформації в об'єкті за його властивістю або ключем, використовує квадратні дужки `[ ]`, наприклад `me["first"]`.
 
-### Value Type Determination
+### Визначення типу значень
 
-For distinguishing values, the `typeof` operator tells you its built-in type, if primitive, or `"object"` otherwise:
+Якщо потрібно визначити тип значення, оператор `typeof` повідомить вам його вбудований тип: один з примітивних типів або `"object"`:
 
 ```js
 typeof 42;                  // "number"
@@ -174,39 +175,39 @@ typeof [1,2,3];             // "object"
 typeof function hello(){};  // "function"
 ```
 
-| WARNING: |
+| ПОПЕРЕДЖЕННЯ: |
 | :--- |
-| `typeof null` unfortunately returns `"object"` instead of the expected `"null"`. Also, `typeof` returns the specific `"function"` for functions, but not the expected `"array"` for arrays. |
+| `typeof null` на жаль повертає `"object"` замість очікуваного `"null"`. Крім того, `typeof` повертає `"function"` для функцій, проте не розраховуйте не `"array"` для масивів. |
 
-Converting from one value type to another, such as from string to number, is referred to in JS as "coercion." We'll cover this in more detail later in this chapter.
+Перетворення з одного типу значення на інший, наприклад з рядка на число, в JS називається "приведенням типів". Ми розглянемо цю тему докладніше далі в цій главі.
 
-Primitive values and object values behave differently when they're assigned or passed around. We'll cover these details in Appendix A, "Values vs References."
+Примітивні значення та значення об’єктного типу поводяться по-різному, коли їх присвоюють або передають. Ми розглянемо ці подробиці в Додатку А "Значення та посилання: в чому різниця".
 
-## Declaring and Using Variables
+## Оголошення та використання значень
 
-To be explicit about something that may not have been obvious in the previous section: in JS programs, values can either appear as literal values (as many of the preceding examples illustrate), or they can be held in variables; think of variables as just containers for values.
+Проговоримо про те, що, можливо, не було очевидним з попереднього розділу: у програмах на JS значення можуть мати форму літералів (як це показано на багатьох попередніх прикладах), або вони можуть міститися у змінних; розглядайте змінні як просто контейнери для значень.
 
-Variables have to be declared (created) to be used. There are various syntax forms that declare variables (aka, "identifiers"), and each form has different implied behaviors.
+Змінні повинні бути оголошені (створені) до використання. Існують різні форми синтаксису, які оголошують змінні (вони ж "ідентифікатори"), і кожна форма передбачає певну поведінку.
 
-For example, consider the `var` statement:
+Наприклад, розглянемо інструкцію `var`:
 
 ```js
 var myName = "Kyle";
 var age;
 ```
 
-The `var` keyword declares a variable to be used in that part of the program, and optionally allows an initial assignment of a value.
+Ключове слово `var` оголошує змінну, яка буде використана в цій частині програми, і, за бажанням, дозволяє присвоїти початкове значення.
 
-Another similar keyword is `let`:
+Іншим подібним ключовим словом є `let`:
 
 ```js
 let myName = "Kyle";
 let age;
 ```
 
-The `let` keyword has some differences to `var`, with the most obvious being that `let` allows a more limited access to the variable than `var`. This is called "block scoping" as opposed to regular or function scoping.
+Ключове слово `let` має деякі відмінності від `var`, причому найбільш очевидним є те, що `let` краще дозволяє   обмежувати доступ до змінної, ніж `var`. Це називається блоковою областю видимості, на противагу звичайній або "функційній" області видимості.
 
-Consider:
+Розглянемо:
 
 ```js
 var adult = true;
@@ -224,19 +225,19 @@ console.log(age);
 // Error!
 ```
 
-The attempt to access `age` outside of the `if` statement results in an error, because `age` was block-scoped to the `if`, whereas `myName` was not.
+Спроба отримати доступ до `age` поза інструкцією `if` призводить до помилки, оскільки `age` був обмежений областю видимості до `if`, тоді як `myName` – ні.
 
-Block-scoping is very useful for limiting how widespread variable declarations are in our programs, which helps prevent accidental overlap of their names.
+Блокова область видимості дуже корисна для обмеження поширеності оголошень змінних у наших програмах, що допомагає запобігти випадковому перекриванню їх імен.
 
-But `var` is still useful in that it communicates "this variable will be seen by a wider scope (of the whole function)". Both declaration forms can be appropriate in any given part of a program, depending on the circumstances.
+Але `var` все-таки корисний тим, що дає зрозуміти: "ця змінна буде розглядатися в рамках ширшої області видимості (всієї функції)". Обидві форми оголошення можуть відповідати будь-якій частині програми залежно від обставин.
 
-| NOTE: |
+| ЗАУВАЖЕННЯ: |
 | :--- |
-| It's very common to suggest that `var` should be avoided in favor of `let` (or `const`!), generally because of perceived confusion over how the scoping behavior of `var` has worked since the beginning of JS. I believe this to be overly restrictive advice and ultimately unhelpful. It's assuming you are unable to learn and use a feature properly in combination with other features. I believe you *can* and *should* learn any features available, and use them where appropriate! |
+| Широко поширена думка, що слід уникати `var` на користь `let` (або `const` тощо), як правило, через помітну плутанину щодо того, як область видимості `var` працювала з початку JS. Я вважаю, що це надмірно обмежувальна і, зрештою, шкідлива порада. Припускається, що ви не можете навчитися правильно використовувати цю можливість мови в поєднанні з іншими. Я вірю, що ви *можете* і *повинні* вивчити будь-які доступні можливості мови та використовувати їх там, де це доречно! |
 
-A third declaration form is `const`. It's like `let` but has an additional limitation that it must be given a value at the moment it's declared, and cannot be re-assigned a different value later.
+Третя форма оголошення - `const`. Це як `let`, але з додатковим обмеженням: цій змінній потрібно надати значення в момент оголошення, і пізніше їй не можна призначити інше.
 
-Consider:
+Розглянемо:
 
 ```js
 const myBirthday = true;
@@ -248,9 +249,9 @@ if (myBirthday) {
 }
 ```
 
-The `myBirthday` constant is not allowed to be re-assigned.
+Константа `myBirthday` не може бути перепризначена.
 
-`const` declared variables are not "unchangeable", they just cannot be re-assigned. It's ill-advised to use `const` with object values, because those values can still be changed even though the variable can't be re-assigned. This leads to potential confusion down the line, so I think it's wise to avoid situations like:
+Змінні, оголошені через `const`, не є "незмінними", їх просто неможливо перепризначити. Не рекомендується використовувати `const` зі значеннями об'єктів, оскільки ці значення все ще можуть бути змінені, навіть попри те, що змінну не можна перепризначити. Це призводить до потенційної плутанини, тому я думаю, що розумно уникати ситуацій, як ця:
 
 ```js
 const actors = [
@@ -261,13 +262,14 @@ actors[2] = "Tom Cruise";   // OK :(
 actors = [];                // Error!
 ```
 
-The best semantic use of a `const` is when you have a simple primitive value that you want to give a useful name to, such as using `myBirthday` instead of `true`. This makes programs easier to read.
+Найбільш коректне з семантичної точки зору використання `const` - це коли у вас є просте примітивне значення, якому ви хочете дати корисне ім'я, наприклад, використовувати `myBirthday` замість `true`. Це полегшує читання програм.
 
-| TIP: |
+
+| ПОРАДА: |
 | :--- |
-| If you stick to using `const` only with primitive values, you avoid any confusion of re-assignment (not allowed) vs. mutation (allowed)! That's the safest and best way to use `const`. |
+| Якщо ви дотримуєтесь використання `const` лише з примітивними значеннями, ви не будете плутати перепризначення (яке заборонене) та мутацію значення (це можна). Це найбезпечніший і найкращий спосіб використання `const`. |
 
-Besides `var` / `let` / `const`, there are other syntactic forms that declare identifiers (variables) in various scopes. For example:
+Окрім `var`, `let` і `const`, існують інші синтаксичні форми, які оголошують ідентифікатори (змінні) у різних областях видимості. Наприклад:
 
 ```js
 function hello(myName) {
@@ -278,9 +280,9 @@ hello("Kyle");
 // Hello, Kyle.
 ```
 
-The identifier `hello` is created in the outer scope, and it's also automatically associated so that it references the function. But the named parameter `myName` is created only inside the function, and thus is only accessible inside that function's scope. `hello` and `myName` generally behave as `var`-declared.
+Ідентифікатор `hello` створюється у зовнішній області видимості, і він також автоматично поєднується зі значеннями, щоб посилатися на функцію. Але іменований параметр `myName` створюється лише всередині функції і доступний лише в області видимості цієї функції. `hello` та `myName` в цілому поводяться як змінні, оголошені через `var`.
 
-Another syntax that declares a variable is a `catch` clause:
+Іншим синтаксисом, який оголошує змінну, є інструкція `catch`:
 
 ```js
 try {
@@ -291,15 +293,15 @@ catch (err) {
 }
 ```
 
-The `err` is a block-scoped variable that exists only inside the `catch` clause, as if it had been declared with `let`.
+`err`  - це змінна з блоковою областю видимості, яка існує лише всередині блоку "catch", наче вона була оголошена за допомогою `let`.
 
-## Functions
+## Функції
 
-The word "function" has a variety of meanings in programming. For example, in the world of Functional Programming, "function" has a precise mathematical definition and implies a strict set of rules to abide by.
+Слово "функція" має різноманітне значення в програмуванні. Наприклад, у світі функційного програмування "функція" має точне математичне визначення і передбачає строгий набір правил, яких слід дотримуватися.
 
-In JS, we should consider "function" to take the broader meaning of another related term: "procedure." A procedure is a collection of statements that can be invoked one or more times, may be provided some inputs, and may give back one or more outputs.
+У JS ми маємо розглядати термін "функція" як розширення значення іншого спорідненого терміна: "процедура". Процедура - це сукупність інструкцій, що можна викликати один або кілька разів, які можуть отримувати деякі вхідні дані і можуть повертати одне або кілька вихідних значень.
 
-From the early days of JS, function definition looked like:
+З перших днів JS визначення функції виглядало так:
 
 ```js
 function awesomeFunction(coolThings) {
@@ -308,9 +310,9 @@ function awesomeFunction(coolThings) {
 }
 ```
 
-This is called a function declaration because it appears as a statement by itself, not as an expression in another statement. The association between the identifier `awesomeFunction` and the function value happens during the compile phase of the code, before that code is executed.
+Це називається декларацією функції, оскільки вона виступає як інструкція сама по собі, а не як вираз в іншій інструкції. Зв'язок між ідентифікатором `awesomeFunction` і значенням функції створюється під час фази компіляції коду, перш ніж цей код буде виконаний.
 
-In contrast to a function declaration statement, a function expression can be defined and assigned like this:
+На відміну від оператора оголошення функції, функційний вираз можна визначити та призначити таким чином:
 
 ```js
 // let awesomeFunction = ..
@@ -321,11 +323,11 @@ var awesomeFunction = function(coolThings) {
 };
 ```
 
-This function is an expression that is assigned to the variable `awesomeFunction`. Different from the function declaration form, a function expression is not associated with its identifier until that statement during runtime.
+Ця функція є виразом, який присвоюється змінній `awesomeFunction`. На відміну від форми оголошення функції, вираз функції не пов'язаний з її ідентифікатором, поки ця інструкція не буде виконана під час виконання.
 
-It's extremely important to note that in JS, functions are values that can be assigned (as shown in this snippet) and passed around. In fact, JS functions are a special type of the object value type. Not all languages treat functions as values, but it's essential for a language to support the functional programming pattern, as JS does.
+Надзвичайно важливо зазначити, що в JS функції - це значення, які можна призначити (як показано в цьому фрагменті) і передавати. Насправді функції JS є особливим підтипом об'єктного типу. Не всі мови розглядають функції як значення, але для мови, яка подібно до JS хоче підтримувати функційний шаблон програмування, це критично важливо.
 
-JS functions can receive parameter input:
+Функції в JS можуть отримувати параметри:
 
 ```js
 function greeting(myName) {
@@ -335,9 +337,9 @@ function greeting(myName) {
 greeting("Kyle");   // Hello, Kyle!
 ```
 
-In this snippet, `myName` is called a parameter, which acts as a local variable inside the function. Functions can be defined to receive any number of parameters, from none upward, as you see fit. Each parameter is assigned the argument value that you pass in that position (`"Kyle"`, here) of the call.
+У цьому фрагменті коду `myName` називається параметром, який діє як локальна змінна всередині функції. Функції можуть бути визначені для отримання будь-якої кількості параметрів або жодного, як вам зручно. Кожному параметру присвоюється значення аргументу, яке ви передаєте в цій позиції під час виклику. В нашому прикладі – "Кайл".
 
-Functions also can return values using the `return` keyword:
+Також функції можуть повертати значення за допомогою ключового слова `return`:
 
 ```js
 function greeting(myName) {
@@ -349,9 +351,9 @@ var msg = greeting("Kyle");
 console.log(msg);   // Hello, Kyle!
 ```
 
-You can only `return` a single value, but if you have more values to return, you can wrap them up into a single object/array.
+Ви можете повернути лише одне значення, але якщо у вас є більше значень для повернення, ви можете огорнути їх одним об'єктом чи масивом.
 
-Since functions are values, they can be assigned as properties on objects:
+Оскільки функції є значеннями, їх можна призначати властивостями об'єктів:
 
 ```js
 var whatToSay = {
@@ -370,25 +372,25 @@ whatToSay.greeting();
 // Hello!
 ```
 
-In this snippet, references to three functions (`greeting()`, `question()`, and `answer()`) are included in the object held by `whatToSay`. Each function can be called by accessing the property to retrieve the function reference value. Compare this straightforward style of defining functions on an object to the more sophisticated `class` syntax discussed later in this chapter.
+У цьому фрагменті посилання на три функції (`greeting()`, `question()` та `answer()`) включені в об'єкт, що знаходиться у змінній `whatToSay`. Кожну функцію можна викликати, звертаючись до властивості об'єкта по посилання на потрібну функцію. Порівняйте цей прямий стиль визначення функцій на об'єкті з більш витонченим синтаксисом класів, який ми обговорюватимемо далі в цій главі.
 
-There are many varied forms that `function`s take in JS. We dig into these variations in Appendix A, "So Many Function Forms."
+Є багато різноманітних форм, які приймають функції в JS. Ми розбираємось у цих варіаціях у Додатку А, "Так багато форм функцій".
 
-## Comparisons
+## Порівняння
 
-Making decisions in programs requires comparing values to determine their identity and relationship to each other. JS has several mechanisms to enable value comparison, so let's take a closer look at them.
+Прийняття рішень у програмах вимагає порівняння значень для визначення їхньої ідентичності та відносин між ними. JS пропонує кілька механізмів порівняння значення, тож розглянемо їх ближче.
 
-### Equal...ish
+### Рівність. Ну, приблизна рівність.
 
-The most common comparison in JS programs asks the question, "Is this X value *the same as* that Y value?" What exactly does "the same as" really mean to JS, though?
+Найпоширеніше порівняння в програмах JS ставить запитання: "Чи значення X це *те саме, що* значення Y?" Що означає "те саме" для JS?
 
-For ergonomic and historical reasons, the meaning is more complicated than the obvious *exact identity* sort of matching. Sometimes an equality comparison intends *exact* matching, but other times the desired comparison is a bit broader, allowing *closely similar* or *interchangeable* matching. In other words, we must be aware of the nuanced differences between an **equality** comparison and an **equivalence** comparison.
+З ергономічних та історичних причин значення рівності є складнішим, ніж очевидне *точний збіг*. Іноді порівняння рівності має на меті *точне* узгодження, але інший раз бажане порівняння є дещо ширшим, дозволяючи *близько подібне* або *взаємозамінне* узгодження. Іншими словами, ми повинні пам’ятати про нюансні відмінності між порівнянням **рівності** та порівнянням **еквівалентності**.
 
-If you've spent any time working with and reading about JS, you've certainly seen the so-called "triple-equals" `===` operator, also described as the "strict equality" operator. That seems rather straightforward, right? Surely, "strict" means strict, as in narrow and *exact*.
+Якщо ви попрацювали з JS вже деякий час і читали про неї, ви, безсумнівно, бачили так званий оператор "потрійна рівність" `===`, який також називають оператором "строгої рівності". Його значення здається досить очевидним, чи не так? Авжеж, "строгий" означає строгий, як у вузькому та *точному* сенсі.
 
-Not *exact*ly.
+Не зовсім.
 
-Yes, most values participating in an `===` equality comparison will fit with that *exact same* intuition. Consider some examples:
+Так, більшість значень, що беруть участь у порівнянні рівності через `===`, відповідають опису "це те саме". Розглянемо кілька прикладів:
 
 ```js
 3 === 3.0;              // true
@@ -404,24 +406,24 @@ true === 1;             // false
 null === undefined;     // false
 ```
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| Another way `===`'s equality comparison is often described is, "checking both the value and the type". In several of the examples we've looked at so far, like `42 === "42"`, the *type* of both values (number, string, etc.) does seem to be the distinguishing factor. There's more to it than that, though. **All** value comparisons in JS consider the type of the values being compared, not *just* the `===` operator. Specifically, `===` disallows any sort of type conversion (aka, "coercion") in its comparison, where other JS comparisons *do* allow coercion. |
+| Інший спосіб порівняння рівності, яким часто описується рівність `===`, це "перевірка як значення, так і типу". У кількох прикладах, які ми розглядали до цього часу, наприклад, `42 ==="42"`, *тип* обох значень (число, рядок тощо), здається, є відмітним фактором. Однак справа не тільки у цьому. **Усі** порівняння значень у JS враховують тип значень, а не *тільки* оператор `===`. Точніше кажучи, `===` забороняє будь-яке перетворення типу (будь-яке "приведення типів") при порівнянні, тоді як інші порівняння в JS *дозволяють* приведення типів. |
 
-But the `===` operator does have some nuance to it, a fact many JS developers gloss over, to their detriment. The `===` operator is designed to *lie* in two cases of special values: `NaN` and `-0`. Consider:
+Але оператор `===` має певний нюанс. Це факт, який багато розробників JS продивляються на свою шкоду. Оператор `===` призначений *брехати* у двох випадках особливих значень: `NaN` та` -0`. Розглянемо:
 
 ```js
 NaN === NaN;            // false
 0 === -0;               // true
 ```
 
-In the case of `NaN`, the `===` operator *lies* and says that an occurrence of `NaN` is not equal to another `NaN`. In the case of `-0` (yes, this is a real, distinct value you can use intentionally in your programs!), the `===` operator *lies* and says it's equal to the regular `0` value.
+У випадку `NaN` оператор `===` *бреше* і каже, що входження `NaN` не дорівнює іншому `NaN`. У разі `-0` (так, це справжнє, чітке значення, яке ви можете умисно використовувати у своїх програмах!), Оператор `===` *бреше* і каже, що воно дорівнює звичайному значенню `0`.
 
-Since the *lying* about such comparisons can be bothersome, it's best to avoid using `===` for them. For `NaN` comparisons, use the `Number.isNaN(..)` utility, which does not *lie*. For `-0` comparison, use the `Object.is(..)` utility, which also does not *lie*. `Object.is(..)` can also be used for non-*lying* `NaN` checks, if you prefer. Humorously, you could think of `Object.is(..)` as the "quadruple-equals" `====`, the really-really-strict comparison!
+Оскільки *брехня* щодо таких порівнянь може бути проблемою, краще уникати використання `===` для них. Для порівняння `NaN` використовуйте утиліту `Number.isNaN(..)`, яка не *бреше*. Для порівняння `-0` використовуйте утиліту `Object.is(..)`, яка також не *бреше*. `Object.is(..)` також можна використовувати для *чесних* перевірок на `NaN`, якщо вам подобається. Жартома ви могли б розглядати `Object.is(..)` як "чотирикратну рівність `====`, чесно-чесно строге порівняння.
 
-There are deeper historical and technical reasons for these *lies*, but that doesn't change the fact that `===` is not actually *strictly exactly equal* comparison, in the *strictest* sense.
+Існують глибші історичні та технічні причини для цієї *брехні*, але це не змінює той факт, що `===` насправді не є *строго точно рівним* порівнянням, у *найсуворішому* розумінні.
 
-The story gets even more complicated when we consider comparisons of object values (non-primitives). Consider:
+Історія ускладнюється ще більше, коли ми розглядаємо порівняння значень об’єктів, а не примітивних значень. Розглянемо:
 
 ```js
 [ 1, 2, 3 ] === [ 1, 2, 3 ];    // false
@@ -429,20 +431,20 @@ The story gets even more complicated when we consider comparisons of object valu
 (x => x * 2) === (x => x * 2)   // false
 ```
 
-What's going on here?
+Що тут відбувається?
 
-It may seem reasonable to assume that an equality check considers the *nature* or *contents* of the value; after all, `42 === 42` considers the actual `42` value and compares it. But when it comes to objects, a content-aware comparison is generally referred to as "structural equality."
+Може здатися розумним припустити, що перевірка рівності враховує *природу* або *вміст* значення; врешті-решт, `42 === 42` враховує фактичне значення `42` і порівнює його. Але коли справа стосується об’єктів, порівняння, що враховує зміст, зазвичай називають „структурною рівністю”.
 
-JS does not define `===` as *structural equality* for object values. Instead, `===` uses *identity equality* for object values.
+JS не визначає `===` як *структурну рівність* для значень об'єкта. Натомість `===` використовує *рівність за ідентичністю* для значень об'єкта.
 
-In JS, all object values are held by reference (see "Values vs References" in Appendix A), are assigned and passed by reference-copy, **and** to our current discussion, are compared by reference (identity) equality. Consider:
+У JS усі значення об'єктів зберігаються за посиланням (див. "Значення та посилання: в чому різниця" у Додатку А), присвоюються та передаються за допомогою посилання-копії **та** в контексті нашого поточного обговорення, порівнюються за посиланням (перевіряються на ідентичність). Розглянемо:
 
 ```js
 var x = [ 1, 2, 3 ];
 
-// assignment is by reference-copy, so
-// y references the *same* array as x,
-// not another copy of it.
+// призначення виконується через копіювання посилання, тому
+// y посилається на *той самий* масив, що і x,
+// а не на окрему копію цього масиву.
 var y = x;
 
 y === x;              // true
@@ -450,84 +452,84 @@ y === [ 1, 2, 3 ];    // false
 x === [ 1, 2, 3 ];    // false
 ```
 
-In this snippet, `y === x` is true because both variables hold a reference to the same initial array. But the `=== [1,2,3]` comparisons both fail because `y` and `x`, respectively, are being compared to new *different* arrays `[1,2,3]`. The array structure and contents don't matter in this comparison, only the **reference identity**.
+У цьому фрагменті значення `y === x` є істинним, оскільки обидві змінні містять посилання на один і той самий початковий масив. Але порівняння `=== [1,2,3]` дає негативний результат, оскільки `y` та `x`, відповідно, порівнюються з новими *іншим* масивом `[1,2,3]`. Структура масиву та вміст у цьому порівнянні не мають значення, лише **ідентичність посилання**.
 
-JS does not provide a mechanism for structural equality comparison of object values, only reference identity comparison. To do structural equality comparison, you'll need to implement the checks yourself.
+JS не пропонує механізму порівняння структурної рівності значень об'єктів, лише порівняння за ідентичністю посилання. Для порівняння структурної рівності вам доведеться здійснити перевірку самостійно.
 
-But beware, it's more complicated than you'll assume. For example, how might you determine if two function references are "structurally equivalent"? Even stringifying to compare their source code text wouldn't take into account things like closure. JS doesn't provide structural equality comparison because it's almost intractable to handle all the corner cases!
+Але будьте обережні: це складніше, ніж ви думаєте. Наприклад, як ви можете визначити, чи є два посилання на функції "структурно еквівалентними"? Навіть порівняння коду функцій не візьме до уваги такі речі, як замикання. JS не забезпечує порівняння структурної рівності, оскільки майже неможливо описати всі межові випадки.
 
-### Coercive Comparisons
+### Порівняння з приведенням типів
 
-Coercion means a value of one type being converted to its respective representation in another type (to whatever extent possible). As we'll discuss in Chapter 4, coercion is a core pillar of the JS language, not some optional feature that can reasonably be avoided.
+Приведення типів означає, що значення одного типу перетворюється на відповідне представлення цього значення в іншому типі (наскільки це можливо). Як ми обговоримо в розділі 4, приведення типів є основною однією за опор мови JS, а не якоюсь необов'язковою функцією, якої можна обґрунтовано уникнути.
 
-But where coercion meets comparison operators (like equality), confusion and frustration unfortunately crop up more often than not.
+Але там, де приведення типів зустрічається з операторами порівняння (наприклад, рівність), на жаль, сум'яття та розчарування, виникають особливо часто.
 
-Few JS features draw more ire in the broader JS community than the `==` operator, generally referred to as the "loose equality" operator. The majority of all writing and public discourse on JS condemns this operator as poorly designed and dangerous/bug-ridden when used in JS programs. Even the creator of the language himself, Brendan Eich, has lamented how it was designed as a big mistake.
+Мало можливостей JS викликають більший гнів у широкій JS-спільноті, ніж оператор `==`, який зазвичай називають оператором "вільної рівності". Більшість публікацій та відкритих дискусій про JS засуджує цей оператор як погано розроблений та небезпечний чи такий, що призводить до помилок в програмах на JS. Навіть сам творець мови, Брендан Ейх, нарікав, що це була велика помилка.
 
-From what I can tell, most of this frustration comes from a pretty short list of confusing corner cases, but a deeper problem is the extremely widespread misconception that it performs its comparisons without considering the types of its compared values.
+З того, що я можу сказати, більша частина цього розчарування походить від досить короткого списку заплутаних межових випадків, але глибшою проблемою є надзвичайно поширена хибна віра в те, що оператор `==` начебто проводить порівняння, не враховуючи типи порівняних значень.
 
-The `==` operator performs an equality comparison similarly to how the `===` performs it. In fact, both operators consider the type of the values being compared. And if the comparison is between the same value type, both `==` and `===` **do exactly the same thing, no difference whatsoever.**
+Оператор `==` виконує порівняння рівності, аналогічно тому, як виконує його `===`. Насправді обидва оператори враховують тип значень, що порівнюються. І якщо порівняння проводиться між значеннями одного типу, як `==`, так і `===` **роблять те саме**.
 
-If the value types being compared are different, the `==` differs from `===` in that it allows coercion before the comparison. In other words, they both want to compare values of like types, but `==` allows type conversions *first*, and once the types have been converted to be the same on both sides, then `==` does the same thing as `===`. Instead of "loose equality," the `==` operator should be described as "coercive equality."
+Якщо типи значень, що порівнюються, різні, значення `==` відрізняється від `===` тим, що воно дозволяє приведення типів перед порівнянням. Іншими словами, обидва оператори прагнуть порівнювати значення одного типу, але `==` дозволяє  *спочатку* перетворити типи операндів, і як тільки типи були перетворені на однакові з обох сторін, тоді `==` робить те саме, що і `===`. Замість "вільної рівності", оператор `==` слід описувати як "рівність з приведенням типів".
 
-Consider:
+Порівняйте:
 
 ```js
 42 == "42";             // true
 1 == true;              // true
 ```
 
-In both comparisons, the value types are different, so the `==` causes the non-number values (`"42"` and `true`) to be converted to numbers (`42` and `1`, respectively) before the comparisons are made.
+В обох порівняннях типи значень різні, тому значення `==` призводить до перетворення нечислових значень (`"42"` та `true`) на числа (`42` та `1` відповідно) перед проведенням порівняння.
 
-Just being aware of this nature of `==`—that it prefers primitive numeric comparisons—helps you avoid most of the troublesome corner cases, such as staying away from a gotchas like `"" == 0` or `0 == false`.
+Просто усвідомлення цієї природи `==`, а саме те, що цей оператор віддає перевагу примітивним числовим порівнянням, допомагає вам уникнути більшості проблемних межових випадків, та триматися якомога далі від несподіванок, які можуть виникнути при порівняннях `"" == 0` або `0 == false`.
 
-You may be thinking, "Oh, well, I will just always avoid any coercive equality comparison (using `===` instead) to avoid those corner cases"! Eh, sorry, that's not quite as likely as you would hope.
+Ви можете подумати: "Ну що ж, тоді я просто завжди уникатиму будь-якого порівняння з приведенням типів, тобто, завжди обиратиму `===`, щоб уникнути цих межових випадків!". Е, вибачте, це не зовсім так імовірно, як ви сподівались.
 
-There's a pretty good chance that you'll use relational comparison operators like `<`, `>` (and even `<=` and `>=`).
+Існує досить великий шанс, що ви будете використовувати оператори реляційного порівняння, такі як `<`, `>` (і навіть `<=` і `>=`).
 
-Just like `==`, these operators will perform as if they're "strict" if the types being relationally compared already match, but they'll allow coercion first (generally, to numbers) if the types differ.
+Так само як `==`, ці оператори будуть діяти так, ніби вони "строгі", якщо типи, що реляційно порівнюються, вже збігаються, але вони дозволять спочатку приведення типів (як правило, до чисел), якщо типи відрізняються.
 
-Consider:
+Розглянемо:
 
 ```js
 var arr = [ "1", "10", "100", "1000" ];
 for (let i = 0; i < arr.length && arr[i] < 500; i++) {
-    // will run 3 times
+    // виконається тричі
 }
 ```
 
-The `i < arr.length` comparison is "safe" from coercion because `i` and `arr.length` are always numbers. The `arr[i] < 500` invokes coercion, though, because the `arr[i]` values are all strings. Those comparisons thus become `1 < 500`, `10 < 500`, `100 < 500`, and `1000 < 500`. Since that fourth one is false, the loop stops after its third iteration.
+Порівняння `i < arr.length` захищене від приведення типів, оскільки `i` та `arr.length` завжди є числами. Однак аргумент `arr [i] < 500` викликає приведення типів, оскільки значення `arr[i]`- це рядки. Таким чином, ці порівняння перетворюються на `1 < 500`, `10 < 500`, `100 < 500` та `1000 < 500`. Оскільки четвертий випадок не істинний, цикл зупиняється після третьої ітерації.
 
-These relational operators typically use numeric comparisons, except in the case where **both** values being compared are already strings; in this case, they use alphabetical (dictionary-like) comparison of the strings:
+Ці реляційні оператори зазвичай використовують числові порівняння, за винятком випадку, коли **обидва** значення, що порівнюються, вже є рядками; в цьому випадку вони використовують алфавітне (словникове) порівняння рядків:
 
 ```js
 var x = "10";
 var y = "9";
 
-x < y;      // true, watch out!
+x < y;      // true, будьте уважні!
 ```
 
-There's no way to get these relational operators to avoid coercion, other than to just never use mismatched types in the comparisons. That's perhaps admirable as a goal, but it's still pretty likely you're going to run into a case where the types *may* differ.
+Не існує жодного способу примусити ці реляційні оператори не робити приведення типів, окрім як просто ніколи не використовувати невідповідні типи в порівняннях. Це, мабуть, чудова ціль, але все ж досить ймовірно, що ви зіткнетеся з випадком, коли типи *можуть* відрізнятися.
 
-The wiser approach is not to avoid coercive comparisons, but to embrace and learn their ins and outs.
+Мудріший підхід полягає не в тому, щоб уникати примусових порівнянь, а в тому, щоб знати та розуміти їхні тонкощі.
 
-Coercive comparisons crop up in other places in JS, such as conditionals (`if`, etc.), which we'll revisit in Appendix A, "Coercive Conditional Comparison."
+Порівняння з приведенням типів з’являються в інших місцях JS, таких як умовні умови (`if` тощо), до яких ми повернемося в Додатку А, "Умовне порівняння з приведенням типів".
 
-## How We Organize in JS
+## Як ми організуємо код в JS
 
-Two major patterns for organizing code (data and behavior) are used broadly across the JS ecosystem: classes and modules. These patterns are not mutually exclusive; many programs can and do use both. Other programs will stick with just one pattern, or even neither!
+Дві основні схеми організації коду, тобто, даних та поведінки, широко використовуються в екосистемі JS: класи та модулі. Ці шаблони не є взаємозаперечними; багато програм можуть і використовують обидва. Інші програми будуть дотримуватися лише одного шаблону, або навіть жодного.
 
-In some respects, these patterns are very different. But interestingly, in other ways, they're just different sides of the same coin. Being proficient in JS requires understanding both patterns and where they are appropriate (and not!).
+У деяких аспектах ці шаблони дуже різні. Але цікаво, що в інших відношеннях це просто різні сторони однієї медалі. Щоб володіти JS, потрібно знати не тільки самі шаблони, але і де вони доречні, а де – ні.
 
-### Classes
+### Класи
 
-The terms "object-oriented," "class-oriented," and "classes" are all very loaded full of detail and nuance; they're not universal in definition.
+Терміни "об'єктно-орієнтований", "класово-орієнтований" та "класи" дуже завантажені, деталізовані та багаті на нюанси; вони не універсальні у визначенні.
 
-We will use a common and somewhat traditional definition here, the one most likely familiar to those with backgrounds in "object-oriented" languages like C++ and Java.
+Ми будемо використовувати загальноприйняте і дещо традиційне визначення, ймовірно, знайоме людям із досвідом в "об'єктно-орієнтованих" мовах, як-от C++ та Java.
 
-A class in a program is a definition of a "type" of custom data structure that includes both data and behaviors that operate on that data. Classes define how such a data structure works, but classes are not themselves concrete values. To get a concrete value that you can use in the program, a class must be *instantiated* (with the `new` keyword) one or more times.
+Клас у програмі - це визначення "типу" власної структури даних, що включає як дані, так і поведінку, що працює з цими даними. Класи визначають, як працює така структура даних, але самі класи не є конкретними значеннями. Щоб отримати конкретне значення, яке можна використовувати в програмі, клас треба *інстанціювати* (створити екземпляр класу за допомогою ключового слова `new`) один або кілька разів.
 
-Consider:
+Розглянемо:
 
 ```js
 class Page {
@@ -565,19 +567,19 @@ mathNotes.print();
 // ..
 ```
 
-In the `Page` class, the data is a string of text stored in a `this.text` member property. The behavior is `print()`, a method that dumps the text to the console.
+У класі `Page` дані є рядком тексту, що зберігається у властивості `this.text`.  Поведінкою є метод `print()`, який виводить текст у консоль.
 
-For the `Notebook` class, the data is an array of `Page` instances. The behavior is `addPage(..)`, a method that instantiates new `Page` pages and adds them to the list, as well as `print()` (which prints out all the pages in the notebook).
+Для класу `Notebook` дані є масивом екземплярів класу `Page`. Поведінка – це метод `addPage(..)`, який створює екземпляри нових сторінок `Page` та додає їх до списку, а також `print()`, який друкує всі сторінки зошиту.
 
-The statement `mathNotes = new Notebook()` creates an instance of the `Notebook` class, and `page = new Page(text)` is where instances of the `Page` class are created.
+Вираз `mathNotes = new Notebook()` створює екземпляр класу `Notebook`, а `page = new Page(text)` - це місце, де створюються екземпляри класу `Page`.
 
-Behavior (methods) can only be called on instances (not the classes themselves), such as `mathNotes.addPage(..)` and `page.print()`.
+Поведінку (методи) можна викликати лише на екземплярах (а не на самих класах), таких як `mathNotes.addPage(..)` та `page.print()`.
 
-The `class` mechanism allows packaging data (`text` and `pages`) to be organized together with their behaviors (e.g., `addPage(..)` and `print()`). The same program could have been built without any `class` definitions, but it would likely have been much less organized, harder to read and reason about, and more susceptible to bugs and subpar maintenance.
+Механізм класів дозволяє згрупувати дані (`text` та `pages`) разом з поведінкою (наприклад, `addPage(..)` та `print()`). Цю програму можна було б побудувати без будь-яких визначень класу, але вона, швидше за все, була б набагато гірше організованою, важчою для читання та міркувань, більш відкритою до помилок та незручною у підтримці.
 
-#### Class Inheritance
+#### Наслідування у класах
 
-Another aspect inherent to traditional "class-oriented" design, though a bit less commonly used in JS, is "inheritance" (and "polymorphism"). Consider:
+Іншим аспектом, властивим традиційному "класово-орієнтованому" дизайну, хоча і дещо рідше використовуваному в JS, є "наслідування" (і "поліморфізм"). Розглянемо:
 
 ```js
 class Publication {
@@ -597,9 +599,9 @@ class Publication {
 }
 ```
 
-This `Publication` class defines a set of common behavior that any publication might need.
+Цей клас `Publication` визначає набір загальних особливостей поведінки, які можуть знадобитися будь-якій публікації.
 
-Now let's consider more specific types of publication, like `Book` and `BlogPost`:
+Тепер розглянемо більш конкретні типи публікацій, такі як `Book` та `BlogPost`:
 
 ```js
 class Book extends Publication {
@@ -635,9 +637,9 @@ class BlogPost extends Publication {
 }
 ```
 
-Both `Book` and `BlogPost` use the `extends` clause to *extend* the general definition of `Publication` to include additional behavior. The `super(..)` call in each constructor delegates to the parent `Publication` class's constructor for its initialization work, and then they do more specific things according to their respective publication type (aka, "sub-class" or "child class").
+Як `Book`, так і `BlogPost` використовують ключове слово "extends", щоб *розширити* загальне визначення `Publication` додатковою поведінкою. Виклик `super(..)` у кожному конструкторі делегує ініціалізацію конструкторові батьківського класу `Publication`, а потім `Book` та `BlogPost` роблять більш конкретні дії відповідно до свого типу публікації (він же "підклас" або "дочірній клас").
 
-Now consider using these child classes:
+Тепер розгляньте можливість використання таких дочірніх класів:
 
 ```js
 var YDKJS = new Book({
@@ -669,27 +671,27 @@ forAgainstLet.print();
 // https://davidwalsh.name/for-and-against-let
 ```
 
-Notice that both child class instances have a `print()` method, which was an override of the *inherited* `print()` method from the parent `Publication` class. Each of those overridden child class `print()` methods call `super.print()` to invoke the inherited version of the `print()` method.
+Зверніть увагу, що обидва екземпляри дочірнього класу мають метод `print()`, який переписав метод `print()`, *успадкований* від батьківського класу `Publication`. Кожен із цих перевизначених дочірніх методів `print()` викликає `super.print()`, щоб викликати успадковану версію методу `print()`.
 
-The fact that both the inherited and overridden methods can have the same name and co-exist is called *polymorphism*.
+Той факт, що як успадковані, так і перевизначені методи можуть мати однакову назву та співіснувати, називається *поліморфізмом*.
 
-Inheritance is a powerful tool for organizing data/behavior in separate logical units (classes), but allowing the child class to cooperate with the parent by accessing/using its behavior and data.
+Наслідування є потужним інструментом, що організує дані та поведінку в окремі логічні одиниці (класи), але дозволяє дочірньому класу взаємодіяти з батьківським шляхом доступу до його даних або використання його поведінки.
 
-### Modules
+### Модулі
 
-The module pattern has essentially the same goal as the class pattern, which is to group data and behavior together into logical units. Also like classes, modules can "include" or "access" the data and behaviors of other modules, for cooperation's sake.
+Шаблон модуля має, по суті, ту ж мету, що і шаблон класу, а саме згрупувати дані та поведінку в логічні одиниці. Як і класи, модулі можуть "включати" або "отримувати доступ" до даних та поведінки інших модулів для взаємодії.
 
-But modules have some important differences from classes. Most notably, the syntax is entirely different.
+Але модулі мають деякі важливі відмінності від класів. Найголовніше відмінність полягає у синтаксисі.
 
-#### Classic Modules
+#### Класичні модулі
 
-ES6 added a module syntax form to native JS syntax, which we'll look at in a moment. But from the early days of JS, modules was an important and common pattern that was leveraged in countless JS programs, even without a dedicated syntax.
+ES6 додав до власного синтаксису JS форму синтаксису модуля, яку ми розглянемо за мить. Проте з перших часів існування JS модулі були важливим і загальновизнаним шаблоном, який використовувався у незліченних програмах JS, навіть без спеціального синтаксису.
 
-The key hallmarks of a *classic module* are an outer function (that runs at least once), which returns an "instance" of the module with one or more functions exposed that can operate on the module instance's internal (hidden) data.
+Ключовими ознаками *класичного модуля* є зовнішня функція (яка відпрацьовує принаймні один раз), що повертає "екземпляр" модуля. Екземпляр модуля надає доступ до однієї або декількох функцій, що мають доступ до внутрішніх (прихованих) даних екземпляра модуля.
 
-Because a module of this form is *just a function*, and calling it produces an "instance" of the module, another description for these functions is "module factories".
+Оскільки модуль в такій формі *є просто функцією*, і його виклик створює "екземпляр" модуля, ці функції також можна описати як "фабрики модулів".
 
-Consider the classic module form of the earlier `Publication`, `Book`, and `BlogPost` classes:
+Розглянемо класичну форму модуля попередніх класів `Publication`,` Book` та `BlogPost`:
 
 ```js
 function Publication(title,author,pubDate) {
@@ -740,15 +742,15 @@ function BlogPost(title,author,pubDate,URL) {
 }
 ```
 
-Comparing these forms to the `class` forms, there are more similarities than differences.
+Порівнюючи ці форми з формами «класу», ми можемо відмітити, що є більше подібності, ніж відмінностей.
 
-The `class` form stores methods and data on an object instance, which must be accessed with the `this.` prefix. With modules, the methods and data are accessed as identifier variables in scope, without any `this.` prefix.
+Форма `class` зберігає методи та дані на екземплярі об'єкта, до яких можна отримати доступ з префіксом `this.`. З модулями доступ до методів і даних здійснюється за ідентифікатором змінних в області видимості без жодного `this.`
 
-With `class`, the "API" of an instance is implicit in the class definition—also, all data and methods are public. With the module factory function, you explicitly create and return an object with any publicly exposed methods, and any data or other unreferenced methods remain private inside the factory function.
+З `class`, програмний інтерфейс екземпляра є неявним у визначенні класу. Також усі дані та методи є загальнодоступними. За допомогою функції-фабрики модулів ви явно створюєте та повертаєте об'єкт з будь-якими публічними методами, а будь-які дані чи інші методи без посилань залишаються приватними всередині фабричної функції.
 
-There are other variations to this factory function form that are quite common across JS, even in 2020; you may run across these forms in different JS programs: AMD (Asynchronous Module Definition), UMD (Universal Module Definition), and CommonJS (classic Node.js-style modules). The variations are minor (not quite compatible). However, all of these forms rely on the same basic principles.
+Існують інші варіанти цієї фабричної функції, досить поширеними в JS, навіть у 2020 році; ви можете запускати ці форми в різних програмах JS: AMD (Asynchronous Module Definition), UMD (Universal Module Definition) та CommonJS (класичні модулі в стилі Node.js). Між ними існують незначні варіації (модулі не зовсім сумісні). Однак усі ці форми спираються на ті самі принципи.
 
-Consider also the usage (aka, "instantiation") of these module factory functions:
+Розглянемо також використання (так зване створення екземпляру) цих фабричних функцій для створення модулів:
 
 ```js
 var YDKJS = Book({
@@ -780,23 +782,23 @@ forAgainstLet.print();
 // https://davidwalsh.name/for-and-against-let
 ```
 
-The only observable difference here is the lack of using `new`, calling the module factories as normal functions.
+Єдиною помітною різницею тут є відсутність `new`. Фабричні функції, що створюють модулі, викликаються як звичайні функції.
 
-#### ES Modules
+#### ES-модулі
 
-ES modules (ESM), introduced to the JS language in ES6, are meant to serve much the same spirit and purpose as the existing *classic modules* just described, especially taking into account important variations and use cases from AMD, UMD, and CommonJS.
+Модулі ES (ESM), введені в JS з версією ES6, за духом і метою мають відповідати щойно описаним *класичним модулям*, особливо враховуючи важливі варіації та випадки використання від AMD, UMD та CommonJS.
 
-The implementation approach does, however, differ significantly.
+Однак підхід до реалізації істотно відрізняється.
 
-First, there's no wrapping function to *define* a module. The wrapping context is a file. ESMs are always file-based; one file, one module.
+По-перше, немає функції-обгортки для *визначення* модуля. Контекст обгортки - це файл. ESM завжди відповідають файлу; один файл, один модуль.
 
-Second, you don't interact with a module's "API" explicitly, but rather use the `export` keyword to add a variable or method to its public API definition. If something is defined in a module but not `export`ed, then it stays hidden (just as with *classic modules*).
+По-друге, ви не взаємодієте з програмним інтерфейсом модуля явно. Натомість ви використовуєте ключове слово `export`, щоб додати змінну або метод до визначення його загальнодоступного інтерфейсу. Якщо щось визначено в модулі, але не експортовано, воно залишається прихованим (як і в *класичних модулях*).
 
-Third, and maybe most noticeably different from previously discussed patterns, you don't "instantiate" an ES module, you just `import` it to use its single instance. ESMs are, in effect, "singletons," in that there's only one instance ever created, at first `import` in your program, and all other `import`s just receive a reference to that same single instance. If your module needs to support multiple instantiations, you have to provide a *classic module-style* factory function on your ESM definition for that purpose.
+По-третє, і, можливо, це найбільш помітна відмінність від раніше обговорюваних шаблонів, ви не "створюєте новий екземпляр" модуля ES, ви просто імпортуєте його єдиний наявний екземпляр для використання. ESM фактично є "сінглтоном", оскільки в вашій програмі був створений лише один екземпляр при першому `import`, а всі інші `import` просто отримують посилання на той самий екземпляр. Якщо ваш модуль має існувати в декількох екземплярах, для цього вам слід надати *стандартну функцію класичного модуля* у вашому визначенні ESM.
 
-In our running example, we do assume multiple-instantiation, so these following snippets will mix both ESM and *classic modules*.
+У нашому прикладі ми припускаємо багаторазове створення екземплярів, тому наступні фрагменти поєднують як ESM, так і *класичні модулі*.
 
-Consider the file `publication.js`:
+Розглянемо файл `publication.js`:
 
 ```js
 function printDetails(title,author,pubDate) {
@@ -818,7 +820,7 @@ export function create(title,author,pubDate) {
 }
 ```
 
-To import and use this module, from another ES module like `blogpost.js`:
+Щоб імпортувати та використовувати цей модуль з іншого модуля ES, такого як `blogpost.js`, зробимо так:
 
 ```js
 import { create as createPub } from "publication.js";
@@ -841,7 +843,7 @@ export function create(title,author,pubDate,URL) {
 }
 ```
 
-And finally, to use this module, we import into another ES module like `main.js`:
+І нарешті, імпортуємо наш модуль в інший модуль ES, такий як `main.js`:
 
 ```js
 import { create as newBlogPost } from "blogpost.js";
@@ -860,18 +862,18 @@ forAgainstLet.print();
 // https://davidwalsh.name/for-and-against-let
 ```
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| The `as newBlogPost` clause in the `import` statement is optional; if omitted, a top-level function just named `create(..)` would be imported. In this case, I'm renaming it for readability's sake; its more generic factory name of `create(..)` becomes more semantically descriptive of its purpose as `newBlogPost(..)`. |
+| Конструкція `as newBlogPost` в інструкції `import` є необов’язковою; якщо її опустити, буде імпортовано функцію верхнього рівня з назвою `create(..)`. У цьому випадку я перейменовую його заради читабельності; `newBlogPost(..)`  краще описує його семантику, ніж узагальнена назва `create(..)`. |
 
-As shown, ES modules can use *classic modules* internally if they need to support multiple-instantiation. Alternatively, we could have exposed a `class` from our module instead of a `create(..)` factory function, with generally the same outcome. However, since you're already using ESM at that point, I'd recommend sticking with *classic modules* instead of `class`.
+Як показано, ES-модулі всередині можуть використовувати *класичні модулі*, якщо їм потрібно підтримувати багаторазове створення екземплярів. Замість фабричної функції `create(..)` ми могли б експортувати `class` з нашого модуля з тим самим результатом. Однак, оскільки ви вже використовуєте ESM, я б рекомендував дотримуватися *класичних модулів* замість `class`.
 
-If your module only needs a single instance, you can skip the extra layers of complexity: `export` its public methods directly.
+Якщо ваш модуль потребує лише одного екземпляра, ви можете пропустити зайві шари складності: експортуйте його публічні методи безпосередньо.
 
-## The Rabbit Hole Deepens
+## Кроляча нора стає все глибшою
 
-As promised at the top of this chapter, we just glanced over a wide surface area of the main parts of the JS language. Your head may still be spinning, but that's entirely natural after such a firehose of information!
+Як і було обіцяно на початку цієї глави, ми лише оглянули широку поверхню основних частин мови JS. Можливо, у вас все ще крутиться голова, адже це цілком природно після такої потоку інформації!
 
-Even with just this "brief" survey of JS, we covered or hinted at a ton of details you should carefully consider and ensure you are comfortable with. I'm serious when I suggest: re-read this chapter, maybe several times.
+Навіть протягом цього «короткого» огляду JS ми висвітлили чи натякнули на тонну деталей, які ви повинні ретельно обдумати та переконатися, що добре їх розумієте. Я цілком серйозно рекомендую перечитати цю главу кілька разів.
 
-In the next chapter, we're going to dig much deeper into some important aspects of how JS works at its core. But before you follow that rabbit hole deeper, make sure you've taken adequate time to fully digest what we've just covered here.
+У наступній главі ми збираємось набагато глибше вивчити деякі важливі аспекти роботи JS. Але перед тим, як глибше зануритися у кролячу нору, переконайтеся, що ви повністю засвоїли те, що ми щойно описали тут.

@@ -1,20 +1,20 @@
-# You Don't Know JS Yet: Get Started - 2nd Edition
+# Серія "Ти поки що не знаєш JS". Книга 1: "Перші кроки". Друге видання
 
 <img src="images/cover.png" width="300">
 
 -----
 
-**[Purchase ebook/PDF from Leanpub](https://leanpub.com/ydkjsy-get-started)**
+**[Купити ebook чи PDF на Leanpub](https://leanpub.com/ydkjsy-get-started)**
 
 -----
 
-[Table of Contents](toc.md)
+[Зміст](toc.md)
 
-* [Foreword](foreword.md) (by [Brian Holt](https://twitter.com/holtbt))
-* [Preface](../preface.md)
-* [Chapter 1: What Is JavaScript?](ch1.md)
-* [Chapter 2: Surveying JS](ch2.md)
-* [Chapter 3: Digging to the Roots of JS](ch3.md)
-* [Chapter 4: The Bigger Picture](ch4.md)
-* [Appendix A: Exploring Further](apA.md)
-* [Appendix B: Practice, Practice, Practice!](apB.md)
+* [Передмова](foreword.md) (від [Брайана Голта](https://twitter.com/holtbt))
+* [Вступ](../preface.md)
+* [Глава 1: Що таке JavaScript?](ch1.md)
+* [Глава 2: Огляд JS](ch2.md)
+* [Глава 3: Шлях до самого коріння JS](ch3.md)
+* [Глава 4: Загальна картина мови](ch4.md)
+* [Додаток A: Продовжуємо дослідження](apA.md)
+* [Додаток B: Прийшов час практики!](apB.md)
