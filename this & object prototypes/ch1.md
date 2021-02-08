@@ -270,7 +270,7 @@ We said earlier that `this` is not an author-time binding but a runtime binding.
 
 When a function is invoked, an activation record, otherwise known as an execution context, is created. This record contains information about where the function was called from (the call-stack), *how* the function was invoked, what parameters were passed, etc. One of the properties of this record is the `this` reference which will be used for the duration of that function's execution.
 
-In the next chapter, we will learn to find a function's **call-site** to determine how its execution will bind `this`.
+In the [next chapter](https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/this%20%26%20object%20prototypes/ch2.md), we will learn to find a function's **call-site** to determine how its execution will bind `this`.
 
 ## Review (TL;DR)
 
