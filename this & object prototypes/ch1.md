@@ -33,8 +33,8 @@ var you = {
 	name: "Reader"
 };
 
-identify.call( me ); // KYLE
-identify.call( you ); // READER
+console.log(identify.call( me )); // KYLE
+console.log(identify.call( you )); // READER
 
 speak.call( me ); // Hello, I'm KYLE
 speak.call( you ); // Hello, I'm READER
