@@ -133,22 +133,23 @@ Finally, consider:
 function saySomething() {
     var greeting = "Hello";
     {
-        greeting = "Howdy";  // error comes from here
-        let greeting = "Hi";
+        greeting = "Hi";  // variable hoisting in block scope
+        let greeting;
         console.log(greeting);
     }
+    console.log(greeting)
 }
 
 saySomething();
-// ReferenceError: Cannot access 'greeting' before
-// initialization
+// Output: "Hi"
+//         "Hello"
 ```
 
-The noted `ReferenceError` occurs from the line with the statement `greeting = "Howdy"`. What's happening is that the `greeting` variable for that statement belongs to the declaration on the next line, `let greeting = "Hi"`, rather than to the previous `var greeting = "Hello"` statement.
+What's happening is that the `greeting = "Hi"` variable for that statement belongs to the declaration on the next line, `let greeting;, rather than to the previous `var greeting = "Hello"` statement.
 
-The only way the JS engine could know, at the line where the error is thrown, that the *next statement* would declare a block-scoped variable of the same name (`greeting`) is if the JS engine had already processed this code in an earlier pass, and already set up all the scopes and their variable associations. This processing of scopes and declarations can only accurately be accomplished by parsing the program before execution.
+The only way the JS engine could know, if that the *next statement* would declare a block-scoped variable of the same name (`greeting`) is if the JS engine had already processed this code in an earlier pass, and already set up all the scopes and their variable associations. This processing of scopes and declarations can only accurately be accomplished by parsing the program before execution.
 
-The `ReferenceError` here technically comes from `greeting = "Howdy"` accessing the `greeting` variable **too early**, a conflict referred to as the Temporal Dead Zone (TDZ). Chapter 5 will cover this in more detail.
+The first output here technically comes from `greeting = "Hi"`, a conflict referred to as the Temporal Dead Zone (TDZ). Chapter 5 will cover this in more detail.
 
 | WARNING: |
 | :--- |
