@@ -1,89 +1,90 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 1: What's the Scope?
 
-By the time you've written your first few programs, you're likely getting somewhat comfortable with creating variables and storing values in them. Working with variables is one of the most foundational things we do in programming!
+# 1장: 스코프란 무엇인가?
 
-But you may not have considered very closely the underlying mechanisms used by the engine to organize and manage these variables. I don't mean how the memory is allocated on the computer, but rather: how does JS know which variables are accessible by any given statement, and how does it handle two variables of the same name?
+처음 몇 가지 프로그램을 작성하다보면 변수를 생성하고 값을 저장하는 데 다소 익숙해진다. 변수를 사용하는 것은 우리가 프로그래밍을 하는데 가장 기본적인 것 중의 하나이다.
 
-The answers to questions like these take the form of well-defined rules called scope. This book will dig through all aspects of scope—how it works, what it's useful for, gotchas to avoid—and then point toward common scope patterns that guide the structure of programs.
+그러나 당신은 이 변수를 정리하고 관리하기 위한 엔진의 내부 동작방식을 아주 가까이 살펴보지 않았을 수 있다. 나는 메모리가 컴퓨터에 어떻게 할당되는지를 얘기하는 것이 아니라, 어떻게 JS가 주어진 구문에서 변수에 접근할 수 있는가를 알고 있으며 같은 이름을 가진 두 변수를 어떻게 처리하는지를 말한다.
 
-Our first step is to uncover how the JS engine processes our program **before** it runs.
+이 질문의 답변은 스코프라고 부르는 잘 정의된 규칙의 모습으로 나타난다. 이 책은 스코프의 모든 측면-작동방식, 유용성, 피해야할 사항-을 깊게 살펴볼 것이고, 프로그램 구조를 가이드하는 일반적인 스코프 패턴을 중심으로도 깊게 살펴볼 것이다.
 
-## About This Book
+첫 번째 단계는 JS 엔진이 프로그램을 **실행하기 전에** 어떻게 처리하는지 알아내는 것이다.
 
-Welcome to book 2 in the *You Don't Know JS Yet* series! If you already finished *Get Started* (the first book), you're in the right spot! If not, before you proceed I encourage you to *start there* for the best foundation.
+## 이 책에 관하여
 
-Our focus will be the first of three pillars in the JS language: the scope system and its function closures, as well as the power of the module design pattern.
+*You Don't Know JS Yet* ​​시리즈의 2편(권?)에 온 걸 환영한다! *Get Started* (1편)을 이미 봤다면 올바른 위치에 있는 것이다! 그렇지 않다면 진행하기 전 기초를 다지기 위해 *1편을 먼저 보고 오는 것을* 권장한다.
 
-JS is typically classified as an interpreted scripting language, so it's assumed by most that JS programs are processed in a single, top-down pass. But JS is in fact parsed/compiled in a separate phase **before execution begins**. The code author's decisions on where to place variables, functions, and blocks with respect to each other are analyzed according to the rules of scope, during the initial parsing/compilation phase. The resulting scope structure is generally unaffected by runtime conditions.
+우리는 JS 언어의 세 가지 큰 핵심 중 첫 번째에 집중할 것이다. 첫 번째 핵심은 스코프 시스템이고 그 외에는 함수 클로저, 모듈 디자인 패턴의 강력함이다.
 
-JS functions are themselves first-class values; they can be assigned and passed around just like numbers or strings. But since these functions hold and access variables, they maintain their original scope no matter where in the program the functions are eventually executed. This is called closure.
+JS는 보통 즉시 실행되는<sub>interpreted</sub> 스크립트 언어로 분류되므로 대부분의 JS 프로그램은 단일 하향식으로 처리된다고 가정한다. 그러나 JS는 실제로 **실행이 시작되기 전에** 별도의 단계로 파싱/컴파일된다. 변수, 함수 및 블록을 어디에 넣을 것인지에 대한 코드 작성자의 결정은 초기 파싱/컴파일 단계동안 스코프 규칙에 따라 분석된다. 이 결과로 스코프 구조가 생기는 건 일반적으로 런타임 환경의 영향을 받지 않는다.
 
-Modules are a code organization pattern characterized by public methods that have privileged access (via closure) to hidden variables and functions in the internal scope of the module.
+JS 함수는 그 자체로 일급 객체다. 수와 문자열처럼 할당하고 전달할 수 있다. 그러나 이러한 함수는 변수를 가지고 접근하므로, 함수는 프로그램에서 최종적으로 실행되는 위치에 관계없이 원래 스코프를 유지한다. 이것을 클로저<sub>closure</sub>라고 한다.
 
-## Compiled vs. Interpreted
+모듈은 내부 스코프에 숨겨진 변수와 함수에 특별한 접근(클로저)이 가능한 공개 메서드라는 특징이 있는 코드 구성 패턴이다.
 
-You may have heard of *code compilation* before, but perhaps it seems like a mysterious black box where source code slides in one end and executable programs pop out the other.
+## 컴파일 vs 인터프리트
 
-It's not mysterious or magical, though. Code compilation is a set of steps that process the text of your code and turn it into a list of instructions the computer can understand. Typically, the whole source code is transformed at once, and those resulting instructions are saved as output (usually in a file) that can later be executed.
+이전에 *코드 컴파일*에 대해 들어봤겠지만, 그것은 아마도 소스코드가 한 쪽 끝에서 들어가면 실행 프로그램이 다른 쪽 끝에서 나오는 신비한 블랙박스처럼 보일 것이다.
 
-You also may have heard that code can be *interpreted*, so how is that different from being *compiled*?
+하지만 신비롭거나 마술같은 건 아니다. 코드 컴파일은 코드의 텍스트를 처리하는 단계의 집합이고 컴퓨터가 이해할 수 있는 명령어 목록으로 변환하는 과정이다. 대게 전체 소스 코드는 한번에 변환되며 이 결과로 나오는 명령어는 나중에 실행할 수 있는 출력(보통 하나의 파일)으로 저장된다.
 
-Interpretation performs a similar task to compilation, in that it transforms your program into machine-understandable instructions. But the processing model is different. Unlike a program being compiled all at once, with interpretation the source code is transformed line by line; each line or statement is executed before immediately proceeding to processing the next line of the source code.
+또한 코드가 *인터프리트<sub>interpreted</sub>* 될 수 있다고 들어봤을텐데, 이건 *컴파일*이 되는 것과 어떻게 다를까?
+
+인터프리트<sub>Intepretation</sub>는 컴파일과 비슷한 작업을 수행한다. 즉 프로그램을 기계가 이해 가능한 명령어로 변환한다. 하지만 그 처리하는 모델은 다르다. 한번에 컴파일되는 프로그램과 달리, 인터프리트는 소스 코드가 라인 단위로 변환된다. 각 라인이나 구문은 소스 코드의 다음 라인을 처리하기 위해 직전에 실행된다.
 
 <figure>
-    <img src="images/fig1.png" width="650" alt="Code Compilation and Code Interpretation" align="center">
-    <figcaption><em>Fig. 1: Compiled vs. Interpreted Code</em></figcaption>
+    <img src="images/fig1.png" width="650" alt="코드 컴파일과 코드 인터프리트" align="center">
+    <figcaption><em>그림 1: 컴파일과 인터프리트 코드 비교</em></figcaption>
     <br><br>
 </figure>
 
-Figure 1 illustrates compilation vs. interpretation of programs.
+그림 1은 프로그램의 컴파일과 인터프리트에 대한 비교를 보인다.
 
-Are these two processing models mutually exclusive? Generally, yes. However, the issue is more nuanced, because interpretation can actually take other forms than just operating line by line on source code text. Modern JS engines actually employ numerous variations of both compilation and interpretation in the handling of JS programs.
+이 두 가지 처리 모델은 상호 배타적일까? 일반적으로는 그렇다. 하지만 더 미묘한 차이가 있는데, 인터프리트는 소스 코드 텍스트를 한 줄 씩 수행한다기보다 실제로는 다른 형태를 취할 수 있다. 최근의 JS 엔진은 실제로 프로그램을 다룰 때 몇 가지 변형으로 컴파일과 인터프리트 둘 다를 이용한다.
 
-Recall that we surveyed this topic in Chapter 1 of the *Get Started* book. Our conclusion there is that JS is most accurately portrayed as a **compiled language**. For the benefit of readers here, the following sections will revisit and expand on that assertion.
+*Get Started*책의 챕터 1에서 이 주제를 살펴봤던 걸 기억해라. 결론은 JS가 **컴파일 언어**로서 가장 정확하게 설명된다는 것이다. 여기 독자들의 편의를 위해서 다음 섹션에서 그 주장을 다시 검토하고 확장할 것이다.
 
-## Compiling Code
+## 코드 컴파일
 
-But first, why does it even matter whether JS is compiled or not?
+하지만 먼저, 왜 JS가 컴파일이 되는지 아닌지가 중요한 문제일까?
 
-Scope is primarily determined during compilation, so understanding how compilation and execution relate is key in mastering scope.
+스코프는 주로 컴파일 중에 결정되므로, 어떻게 컴파일과 실행이 관계되는지 이해하는 것이 스코프를 이해하는 열쇠이다.
 
-In classic compiler theory, a program is processed by a compiler in three basic stages:
+기존 컴파일러 이론에서는 프로그램은 3가지 기본 스테이지로 컴파일러에 의해 처리된다.
 
-1. **Tokenizing/Lexing:** breaking up a string of characters into meaningful (to the language) chunks, called tokens. For instance, consider the program: `var a = 2;`. This program would likely be broken up into the following tokens: `var`, `a`, `=`, `2`, and `;`. Whitespace may or may not be persisted as a token, depending on whether it's meaningful or not.
+1. **토큰화<sub>Tokenizing</sub>/어휘 분석<sub>Lexing</sub>:** 문자열을 토큰이라는 언어상 의미있는 조각으로 쪼갠다. 예를 들어, `var a = 2;`라는 프로그램을 생각해보자. 이 프로그램은 다음에 나오는 토큰으로 쪼갤 수 있다: `var`, `a`, `=`, `2` 그리고 `;`. 공백은 의미가 있는지에 따라 토큰으로 유지될 수 도 있고 아닐 수 도 있다.
 
-    (The difference between tokenizing and lexing is subtle and academic, but it centers on whether or not these tokens are identified in a *stateless* or *stateful* way. Put simply, if the tokenizer were to invoke stateful parsing rules to figure out whether `a` should be considered a distinct token or just part of another token, *that* would be **lexing**.)
+    (토큰화와 어휘 분석의 차이는 미묘하고 학술적이지만, 토큰이 *상태없음*이나 *상태있음* 방식으로 식별되는지 여부에 중점을 둔다. 간단히 말해서, 만약 토큰화가 `a`가 분리된 토큰인지 다른 토큰의 일부인지를 파악하기 위해 상태있는 파싱 규칙을 적용했다면, **어휘 분석**이 된다.)
 
-2. **Parsing:** taking a stream (array) of tokens and turning it into a tree of nested elements, which collectively represent the grammatical structure of the program. This is called an Abstract Syntax Tree (AST).
+2. **파싱<sub>Parsing</sub>:** 토큰의 스트림(배열)을 가져와서 프로그램의 문법적 구조를 집합적으로 표현하는 중첩된 요소의 트리로 변환하는 것이다. 이를 추상 구문 트리<sub>Abstract Syntax Tree</sub>(AST)라고 한다.
 
-    For example, the tree for `var a = 2;` might start with a top-level node called `VariableDeclaration`, with a child node called `Identifier` (whose value is `a`), and another child called `AssignmentExpression` which itself has a child called `NumericLiteral` (whose value is `2`).
+    예제로 `var a = 2;`에 대한 트리는 `VariableDeclaration`이라는 최상위 레벨 노드로 시작될 지도 모른다. 이 노드는 (값이 `a`인) `Identifier`라는 자식 노드를 가지고, 이 노드는 또 `AssignmentExpression`라는 자식 노드를 가지고, 이 노드는 또 (값이 `2`인) `NumericLiteral`라는 자식 노드를 가진다.
 
-3. **Code Generation:** taking an AST and turning it into executable code. This part varies greatly depending on the language, the platform it's targeting, and other factors.
+3. **코드 생성:** AST를 가지고 실행 가능한 코드로 변환한다. 이 부분은 언어, 대상 플랫폼, 다른 요인에 따라 크게 달라진다.
 
-    The JS engine takes the just described AST for `var a = 2;` and turns it into a set of machine instructions to actually *create* a variable called `a` (including reserving memory, etc.), and then store a value into `a`.
+    JS 엔진은 방금 설명한 `var a = 2;`에 대한 AST를 가지고 실제로 (메모리 예약 같은 것도 포함하는) `a`라는 변수를 *생성*하기 위해 일련의 기계 명령어로 변환한다. 그리고나서 `a`에 값을 저장한다.
 
-| NOTE: |
-| :--- |
-| The implementation details of a JS engine (utilizing system memory resources, etc.) is much deeper than we will dig here. We'll keep our focus on the observable behavior of our programs and let the JS engine manage those deeper system-level abstractions. |
+| 참고:                                                                                                                                                                                                                        |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| JS 엔진의 세부적인 구현(시스템 메모리 자원을 활용하는 것 등)은 우리가 여기서 파볼 것 보다 더 깊다. 우리는 프로그램의 관찰할 수 있는 행동에 초점을 유지할 것이고 JS 엔진은 더 깊은 시스템 레벨 추상화를 관리하도록 둘 것이다. |
 
-The JS engine is vastly more complex than *just* these three stages. In the process of parsing and code generation, there are steps to optimize the performance of the execution (i.e., collapsing redundant elements). In fact, code can even be re-compiled and re-optimized during the progression of execution.
+JS 엔진은 *고작* 이 세 단계보다는 훨씬 더 복잡하다. 파싱 및 코드 생성 과정에서 실행 성능을 최적화하는(예: 중복 요소 축소) 단계가 있다. 실제로 코드는 심지어 다시 컴파일 될 수 있고 실행 중에도 다시 최적화 될 수 있다.
 
-So, I'm painting only with broad strokes here. But you'll see shortly why *these* details we *do* cover, even at a high level, are relevant.
+그래서 나는 여기서 큰 흐름만 설명하고 있다. 하지만 우리가 *다루는* *이러한* 세부 내용들이 높은 레벨에서도 관련성이 있는 이유를 곧 알게 될 것이다.
 
-JS engines don't have the luxury of an abundance of time to perform their work and optimizations, because JS compilation doesn't happen in a build step ahead of time, as with other languages. It usually must happen in mere microseconds (or less!) right before the code is executed. To ensure the fastest performance under these constraints, JS engines use all kinds of tricks (like JITs, which lazy compile and even hot re-compile); these are well beyond the "scope" of our discussion here.
+JS 엔진은 작업 및 최적화를 수행할 시간이 충분하지 않다. JS 컴파일은 다른 언어처럼 빌드 단계에서 미리 일어나지 않기 때문이다. 보통 코드가 실행되기 직전 마이크로 초 (또는 그 이하!)이내에 일어나야 합니다. 이러한 제약 조건에서 가장 빠른 성능을 보장하기 위해, JS 엔진은 모든 종류의 트릭(지연 컴파일 및 핫 재컴파일을 하는 JITs 같은)을 사용한다. 이는 여기서 우리가 논의하는 "범위(scope)"를 훨씬 넘어선 것이다.
 
-### Required: Two Phases
+### 필수: 두 단계
 
-To state it as simply as possible, the most important observation we can make about processing of JS programs is that it occurs in (at least) two phases: parsing/compilation first, then execution.
+가능한 간단하게 설명하기 위해서, 가장 중요한 점은 JS 프로그램의 처리가 (적어도) 두 단계(1. 파싱/컴파일, 2. 실행)에서 발생한다는 점이다.
 
-The separation of a parsing/compilation phase from the subsequent execution phase is observable fact, not theory or opinion. While the JS specification does not require "compilation" explicitly, it requires behavior that is essentially only practical with a compile-then-execute approach.
+파싱/컴파일 단계와 후속 실행 단계의 분리는 관찰 가능한 사실이고 이론이나 의견이 아니다. JS 명세서는 "컴파일"을 명시적으로 요구하지는 않지만, 본질적으로 컴파일 후 실행하는 방식을 요구한다.
 
-There are three program characteristics you can observe to prove this to yourself: syntax errors, early errors, and hoisting.
+이를 증명하기 위해 관찰 가능한 3가지 프로그램 특성은 구문 에러<sub>syntax errors</sub>, 빠른 에러<sub>early errors</sub> 그리고 호이스팅<sub>hoisting</sub>이다.
 
-#### Syntax Errors from the Start
+#### 시작할 때의 구문 에러
 
-Consider this program:
+이 프로그램을 생각해보자.
 
 ```js
 var greeting = "Hello";
@@ -94,90 +95,91 @@ greeting = ."Hi";
 // SyntaxError: unexpected token .
 ```
 
-This program produces no output (`"Hello"` is not printed), but instead throws a `SyntaxError` about the unexpected `.` token right before the `"Hi"` string. Since the syntax error happens after the well-formed `console.log(..)` statement, if JS was executing top-down line by line, one would expect the `"Hello"` message being printed before the syntax error being thrown. That doesn't happen.
+이 프로그램은 출력물("Hello"가 출력되지 않음)을 생성하지 않고, 예측하지 못한 `.` 토큰( `"Hi"` 문자열 앞 부분)에 대해 `구문 에러`를 발생시킨다. 구문 에러가 정상적인 형태로 작성된 `console.log(...)` 이후에 발생하므로, JS가 한 줄씩 하향식으로 실행하고 있다면, 구문 에러가 발생하기 전에 `"Hello"` 메시지가 출력될 것이라고 예상할 수 있다. 하지만 이러한 일은 발생하지 않는다.
 
-In fact, the only way the JS engine could know about the syntax error on the third line, before executing the first and second lines, is by the JS engine first parsing the entire program before any of it is executed.
+사실, JS 엔진이 첫째와 둘째 줄을 실행하기 전에 셋째 줄의 구문 에러를 알 수 있는 유일한 방법은, JS 엔진이 실행이 되기 전에 프로그램 전체를 먼저 파싱하는 것이다.
 
 #### Early Errors
 
-Next, consider:
+#### 빠른 에러
+
+다음을 생각해보자:
 
 ```js
 console.log("Howdy");
 
-saySomething("Hello","Hi");
-// Uncaught SyntaxError: Duplicate parameter name not
-// allowed in this context
+saySomething("Hello", "Hi");
+// Uncaught SyntaxError: Duplicate parameter name not allowed in this context
 
-function saySomething(greeting,greeting) {
+function saySomething(greeting, greeting) {
     "use strict";
     console.log(greeting);
 }
 ```
 
-The `"Howdy"` message is not printed, despite being a well-formed statement.
+정상 구문임에도 불구하고 `"Howdy"` 메시지는 출력되지 않는다.
 
-Instead, just like the snippet in the previous section, the `SyntaxError` here is thrown before the program is executed. In this case, it's because strict-mode (opted in for only the `saySomething(..)` function here) forbids, among many other things, functions to have duplicate parameter names; this has always been allowed in non-strict-mode.
+대신에 이전 단락의 코드처럼, 여기서 `SyntaxError`가 프로그램이 실행되기전에 발생한다.
+이 경우는 엄격 모드<sub>strict-mode</sub>(여기 `saySomething(..)` 함수에서만 활성화된)가 많은 다른 것들 중에서도 중복된 매개변수 이름을 가진 함수를 금지하기 때문이다. 비엄격 모드<sub>non-strict-mode</sub>에서는 항상 허용되는 것이었다.
 
-The error thrown is not a syntax error in the sense of being a malformed string of tokens (like `."Hi"` prior), but in strict-mode is nonetheless required by the specification to be thrown as an "early error" before any execution begins.
+이 에러 발생이 잘못된 문자열 토큰(이전의 `."Hi"`같은)이라는 의미의 구문 에러는 아니다. 그렇기는 하지만 엄격 모드에서는 실행이 시작되기 전에 "빠른 에러"로서 던져지는 것이 명세로 정해져 있다.
 
-But how does the JS engine know that the `greeting` parameter has been duplicated? How does it know that the `saySomething(..)` function is even in strict-mode while processing the parameter list (the `"use strict"` pragma appears only later, in the function body)?
+하지만 JS 엔진이 어떻게 `greeting` 매개변수가 중복된 것을 알까요? 어떻게 매개변수 목록을 처리하는 동안(`"use strict"` 전처리문<sub>pragma</sub>은 이후 함수 내용안에서 보인다.) `saySomething(..)` 함수가 엄격 모드에 있다는 것도 알까?
 
-Again, the only reasonable explanation is that the code must first be *fully* parsed before any execution occurs.
+다시 말해서, 합리적인 설명은 코드는 실행되기전에 *완전히* 파싱이 제일 먼저 된다는 것이다.
 
-#### Hoisting
+#### 호이스팅
 
-Finally, consider:
+마지막으로 생각해보자.:
 
 ```js
 function saySomething() {
     var greeting = "Hello";
     {
-        greeting = "Howdy";  // error comes from here
+        greeting = "Howdy"; // 에러는 여기서 난다.
         let greeting = "Hi";
         console.log(greeting);
     }
 }
 
 saySomething();
-// ReferenceError: Cannot access 'greeting' before
-// initialization
+// ReferenceError: Cannot access 'greeting' before initialization
 ```
 
-The noted `ReferenceError` occurs from the line with the statement `greeting = "Howdy"`. What's happening is that the `greeting` variable for that statement belongs to the declaration on the next line, `let greeting = "Hi"`, rather than to the previous `var greeting = "Hello"` statement.
+위 `ReferenceError`는 `greeting = "Howdy"` 구문이 있는 행에서 발생한다. 이 구문의 `greeting` 변수는 이전 `var greeting = "Hello"` 구문보다는, 다음 행인 `let greeting = "Hi"` 선언문에 속하는 것이다.
 
-The only way the JS engine could know, at the line where the error is thrown, that the *next statement* would declare a block-scoped variable of the same name (`greeting`) is if the JS engine had already processed this code in an earlier pass, and already set up all the scopes and their variable associations. This processing of scopes and declarations can only accurately be accomplished by parsing the program before execution.
+JS 엔진이 에러가 발생한 행에서 "다음 구문"이 같은 이름(`greeting`)의 블록 범위 변수를 선언할 것을 알 수 있는 유일한 방법은 이전 단계에서 이 코드를 이미 처리했고 모든 스코프와 그것의 변수 관계를 설정한 경우입니다. 스코프와 선언문의 처리는 오직 실행 전에 프로그램을 파싱하는 것으로만 정확하게 완수할 수 있다.
 
-The `ReferenceError` here technically comes from `greeting = "Howdy"` accessing the `greeting` variable **too early**, a conflict referred to as the Temporal Dead Zone (TDZ). Chapter 5 will cover this in more detail.
+여기서 `ReferenceError`는 기술적으로 `greeting = "Howdy"`에서 `greeting`변수에 **너무 일찍**접근해 발생하는데, 사각지대<sub>Temporal Dead Zone</sub>(TDZ)라고 불리는 이 충돌은 챕터5에서 더 자세히 다룰 예정이다.
 
-| WARNING: |
-| :--- |
-| It's often asserted that `let` and `const` declarations are not hoisted, as an explanation of the TDZ behavior just illustrated. But this is not accurate. We'll come back and explain both the hoisting and TDZ of `let`/`const` in Chapter 5. |
+| 주의사항:                                                                                                                                                                                                       |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 방금 설명한 TDZ 동작의 설명처럼, `let`과 `const`선언은 호이스팅되지 않는다고 종종 주장된다. 그러나 이는 정확하지 않다. `let`/`const`의 사각지대와 호이스팅에 대한 설명은 챕터5에서 다시 진행하도록 한다. |
 
-Hopefully you're now convinced that JS programs are parsed before any execution begins. But does it prove they are compiled?
+이제 JS 프로그램이 어떤 실행이 시작되기도 전에 파싱된다는 점에 확신을 가질 수 있기를 바란다. 그러나 이러한 점들이 컴파일되었다는 것을 증명하는 것일까?
 
-This is an interesting question to ponder. Could JS parse a program, but then execute that program by *interpreting* operations represented in the AST **without** first compiling the program? Yes, that is *possible*. But it's extremely unlikely, mostly because it would be extremely inefficient performance wise.
+이는 심사숙고해볼만한 흥미로운 주제다. JS가 프로그램을 파싱할 수 있지만, 컴파일되지 **않은** 추상 구문 트리로 표현된 *인터프리트* 연산자로 이루어진 프로그램을 실행할 수 있을까? 물론 *가능*하다. 그러나 이는 극히 드문 일인데, 성능 측면에서 극한의 비효율성을 보이기 때문이다.
 
-It's hard to imagine a production-quality JS engine going to all the trouble of parsing a program into an AST, but not then converting (aka, "compiling") that AST into the most efficient (binary) representation for the engine to then execute.
+JS 엔진의 생산 품질이 프로그램을 추상 구문 트리로 파싱하는데는 모든 어려움을 겪지만, 이후 추상 구문 트리를 엔진이 실행하는데 가장 효율적인 (바이너리)로 변환(일명 "컴파일")하지 않는다고는 상상하기 어렵다.
 
-Many have endeavored to split hairs with this terminology, as there's plenty of nuance and "well, actually..." interjections floating around. But in spirit and in practice, what the engine is doing in processing JS programs is **much more alike compilation** than not.
+많은 사람들이 "잘, 사실은..."이 많이 들어가 많은 뉘앙스를 가지는 이러한 용어를 명확히 하려고 노력했다. 그러나 고민과 시행착오 끝에, 엔진이 JS 프로그램에서 하는 일은 *컴파일과 훨씬 더 비슷*하다.
 
-Classifying JS as a compiled language is not concerned with the distribution model for its binary (or byte-code) executable representations, but rather in keeping a clear distinction in our minds about the phase where JS code is processed and analyzed; this phase observably and indisputedly happens *before* the code starts to be executed.
+JS를 컴파일 언어로 구분하는 것은 실행 가능함을 표현하는 바이너리(혹은 바이트 코드)와 같은 분산 모델과 관계 없이, JS코드가 처리되고 분석되는 단계를 우리 마음에서 명확히 구분하는 것이다. 이 단계는 눈에 보이고 논란의 여지 없이 코드가 실행 시작되기 *이전에* 발생한다.
 
-We need proper mental models of how the JS engine treats our code if we want to understand JS and scope effectively.
+JS와 scope에 대해 효과적으로 이해하기를 원한다면, 우리는 어떻게 JS엔진이 우리 코드를 다루는지에 대한 적절한 멘탈 모델이 필요하다.
 
-## Compiler Speak
+## 컴파일러 이야기
 
-With awareness of the two-phase processing of a JS program (compile, then execute), let's turn our attention to how the JS engine identifies variables and determines the scopes of a program as it is compiled.
+JS 프로그램의 두 단계 처리(컴파일, 그리고 실행)를 인식하며, JS엔진이 어떻게 변수들을 식별하고 컴파일되는 프로그램의 스코프를 어떻게 결정하는지 살펴보자.
 
-First, let's examine a simple JS program to use for analysis over the next several chapters:
+먼저, 다음 몇 챕터들에 걸쳐 분석에 사용할 간단한 JS 프로그램을 살펴보자.
 
 ```js
 var students = [
     { id: 14, name: "Kyle" },
     { id: 73, name: "Suzy" },
     { id: 112, name: "Frank" },
-    { id: 6, name: "Sarah" }
+    { id: 6, name: "Sarah" },
 ];
 
 function getStudentName(studentID) {
@@ -194,116 +196,118 @@ console.log(nextStudent);
 // Suzy
 ```
 
-Other than declarations, all occurrences of variables/identifiers in a program serve in one of two "roles": either they're the *target* of an assignment or they're the *source* of a value.
+선언을 제외하고, 프로그램에서의 변수/식별자의 모든 생성은 2가지 역할 중 하나를 수행한다. 할당으로써 *타깃*<sub>Targets</sub>이거나, 값으로써 *소스*<sub>source</sub>이다.
 
-(When I first learned compiler theory while earning my computer science degree, we were taught the terms "LHS" (aka, *target*) and "RHS" (aka, *source*) for these roles, respectively. As you might guess from the "L" and the "R", the acronyms mean "Left-Hand Side" and "Right-Hand Side", as in left and right sides of an `=` assignment operator. However, assignment targets and sources don't always literally appear on the left or right of an `=`, so it's probably clearer to think in terms of *target* / *source* rather than *left* / *right*.)
+(내가 컴퓨터 공학 학위를 따는 동안 처음 컴파일러 이론을 배울 때, 우리는 각각 이러한 역할에 대해 "LHS"(일명 *타깃*)와 "RHS"(일명 *소스*)라는 용어를 배웠다. "L"과 "R"에서 "왼쪽"과 "오른쪽"을 뜻하는 약칭임을 추측할 수 있었을 것인데, `=` 할당 연산자의 왼쪽과 오른쪽을 의미한다. 그러나, 타깃과 소스 할당은 `=`의 왼쪽과 오른쪽에서 항상 그대로 나타나지 않아, *왼쪽*/*오른쪽*이라는 용어보다는 *타깃*/*소스* 용어로 생각하고 있는것이 명확할 것이다.)
 
-How do you know if a variable is a *target*? Check if there is a value that is being assigned to it; if so, it's a *target*. If not, then the variable is a *source*.
+변수가 *타깃*인 것을 어떻게 알 수 있을까? 그것에 할당된 값이 있는지 확인해보고, 만약 그렇다면 그것은 *타깃*이다. 그렇지 않다면 그 변수는 *소스*다.
 
-For the JS engine to properly handle a program's variables, it must first label each occurrence of a variable as *target* or *source*. We'll dig in now to how each role is determined.
+프로그램의 변수들을 처리하는 JS엔진은 먼저 각 변수들이 처음 생성됨에 따라 *타깃*인지 *소스*인지를 라벨링해야 한다. 이제 각 역할이 어떻게 결정되는지 살펴보겠다.
 
-### Targets
+### 타깃
 
-What makes a variable a *target*? Consider:
+무엇이 변수를 *타깃*으로 만들까? 생각해보자:
 
 ```js
 students = [ // ..
 ```
 
-This statement is clearly an assignment operation; remember, the `var students` part is handled entirely as a declaration at compile time, and is thus irrelevant during execution; we left it out for clarity and focus. Same with the `nextStudent = getStudentName(73)` statement.
+이 구문은 명확하게 할당하는 연산이다. `var students` 부분의 선언은 전적으로 컴파일 시점에 처리되므로 실행중과는 관련이 없다는 점을 기억해라. 집중과 명확성을 위해서 이 부분은 생략했다. `nextStudent = getStudentName(73)` 구문도 동일하다.
 
-But there are three other *target* assignment operations in the code that are perhaps less obvious. One of them:
+그러나 코드에 3개의 다른 *타깃* 할당 연산이 있는데 이 부분은 아마 덜 애매할 것이다.
+그 중 하나는
 
 ```js
 for (let student of students) {
 ```
 
-That statement assigns a value to `student` for each iteration of the loop. Another *target* reference:
+이 구문은 for each 반복문으로 `student` 값에 할당한다. 다른 *타깃* 부분은
 
 ```js
-getStudentName(73)
+getStudentName(73);
 ```
 
-But how is that an assignment to a *target*? Look closely: the argument `73` is assigned to the parameter `studentID`.
+그러나 여기서 *타깃*할당이 어떻게 이루어지는 것일까? 자세히 살펴보면 `73` 매개변수가 `studentID` 매개변수로 할당된다.
 
-And there's one last (subtle) *target* reference in our program. Can you spot it?
-
-..
+그리고 우리 프로그램에서 마지막 (미묘한) *타깃* 참조가 있다. 이 부분을 발견했나?
 
 ..
 
 ..
 
-Did you identify this one?
+..
+
+이걸 확인했나?
 
 ```js
 function getStudentName(studentID) {
 ```
 
-A `function` declaration is a special case of a *target* reference. You can think of it sort of like `var getStudentName = function(studentID)`, but that's not exactly accurate. An identifier `getStudentName` is declared (at compile time), but the `= function(studentID)` part is also handled at compilation; the association between `getStudentName` and the function is automatically set up at the beginning of the scope rather than waiting for an `=` assignment statement to be executed.
+`function` 선언은 *타깃* 참조의 특이한 케이스다. 일종의 `var getStudentName = function(studentID)`라고 생각할 수 있지만 정확하지는 않다. `getStudentName` 식별자는 (컴파일 시) 선언되지만, `= function(studentID)`부분 또한 컴파일 시 처리된다. `getStudentName`과 함수의 연결은 `=` 할당 구문이 실행되기를 기다리지 않고 스코프의 시작 시에 자동으로 설정된다.
 
-| NOTE: |
-| :--- |
-| This automatic association of function and variable is referred to as "function hoisting", and is covered in detail in Chapter 5. |
+| 비고:                                                                                   |
+| :-------------------------------------------------------------------------------------- |
+| 이 함수와 변수 자동 할당은 "함수 호이스팅"이라하고, 챕터5에서 세부적으로 다룰 것이다. |
 
-### Sources
+### 소스
 
-So we've identified all five *target* references in the program. The other variable references must then be *source* references (because that's the only other option!).
+그래서 프로그램에서의 5개 *타깃* 참조 모두를 식별했다. 다른 변수 참조들은 무조건 *소스* 참조여야 한다.(유일한 다른 옵션이기 때문이다!)
 
-In `for (let student of students)`, we said that `student` is a *target*, but `students` is a *source* reference. In the statement `if (student.id == studentID)`, both `student` and `studentID` are *source* references. `student` is also a *source* reference in `return student.name`.
+`for (let student of students)`에서, `studnet`는 *타깃*이라고 했지만, `students`는 *소스*참고가 된다. `if (student.id == studentID)` 구문에서는 `student`와 `studentID` 모두 *소스*참고가 된다. `student`는 또한 `return student.name`에서도 *소스*참조가 된다.
 
-In `getStudentName(73)`, `getStudentName` is a *source* reference (which we hope resolves to a function reference value). In `console.log(nextStudent)`, `console` is a *source* reference, as is `nextStudent`.
+In `getStudentName(73)`, `getStudentName` is a *소스* reference (which we hope resolves to a function reference value). In `console.log(nextStudent)`, `console` is a _source_ reference, as is `nextStudent`.
+`getStudentName(73)`에서 `getStudentName`는 *소스* 참조다.(함수 참조 값으로 해석되기를 바란다.) `console.log(nextStudent)`에서 `console`은 `nextStudent`와 마찬가지로 *소스* 참조다.
 
-| NOTE: |
-| :--- |
-| In case you were wondering, `id`, `name`, and `log` are all properties, not variable references. |
+| 비고:                                                                                   |
+| :-------------------------------------------------------------------------------------- |
+| 희망했던 케이스에서, `id`, `name`, 그리고 `log` 모두 변수 참조가 아니라 속성값들이다. |
 
-What's the practical importance of understanding *targets* vs. *sources*? In Chapter 2, we'll revisit this topic and cover how a variable's role impacts its lookup (specifically, if the lookup fails).
+*타겟* vs *소스*를 이해하는데 중요한 부분은 무엇일까? 챕터 2에서 이 주제를 다시 살펴보고 변수의 역할이 조회에 미치는 영향(특히 조회에 실패하는 경우)에 대해 설명할 것이다.
 
-## Cheating: Runtime Scope Modifications
+## 속임수: 런타임 스코프 수정
 
-It should be clear by now that scope is determined as the program is compiled, and should not generally be affected by runtime conditions. However, in non-strict-mode, there are technically still two ways to cheat this rule, modifying a program's scopes during runtime.
+이제 스코프가 프로그램이 컴파일될 때 결정되는지와, 일반적으로 런타임 환경에 영향받지 않을 것임에 대해서는 명확해졌을 것이다. 그러나, 엄격 모드가 아닌 경우에는, 프로그램의 스코프를 런타임에 수정하며 이 규칙을 어길 수 있는 2가지 기술이 있다.
 
-Neither of these techniques *should* be used—they're both dangerous and confusing, and you should be using strict-mode (where they're disallowed) anyway. But it's important to be aware of them in case you run across them in some programs.
+이러한 기술은 *사용하면 안된다.* 위험하고 혼란스러울 수 있기 때문에 어쨌든 엄격 모드(허용되지 않는 경우)를 사용해야한다. 그러나 일부 프로그램에서 실행되는 경우에 대비하는 것도 중요하다.
 
-The `eval(..)` function receives a string of code to compile and execute on the fly during the program runtime. If that string of code has a `var` or `function` declaration in it, those declarations will modify the current scope that the `eval(..)` is currently executing in:
+`eval(..)`함수는 프로그램 런타임동안 즉시 컴파일하고 실행할 코드 문자열을 받는다. 만약 코드 문자열에 `var`나 `function` 선언이 안에 있다면, 이러한 선언들이 `eval(..)`이 현재 실행중인 현재 스코프를 수정할 것이다.:
 
 ```js
 function badIdea() {
     eval("var oops = 'Ugh!';");
     console.log(oops);
 }
-badIdea();   // Ugh!
+badIdea(); // Ugh!
 ```
 
-If the `eval(..)` had not been present, the `oops` variable in `console.log(oops)` would not exist, and would throw a `ReferenceError`. But `eval(..)` modifies the scope of the `badIdea()` function at runtime. This is bad for many reasons, including the performance hit of modifying the already compiled and optimized scope, every time `badIdea()` runs.
+`eval(..)`이 없었다면, `oops`는 존재하지 않았고, `ReferenceError`를 발생시켰을 것이다. 그러나 `eval(...)`이 `badIdea()`함수의 스코프를 런타임에 수정한다. 이미 컴파일되고 최적화된 스코프를 `badIdea()`를 실행할 때마다 수정함으로써 성능 저하되는 부분을 포함해 여러 이유로 좋지 않다.
 
-The second cheat is the `with` keyword, which essentially dynamically turns an object into a local scope—its properties are treated as identifiers in that new scope's block:
+두 번째 속임수는 `with` 키워드인데, 본질적이고 동적으로 객체를 지역 스코프의 속성으로 변환한다. 이 지역 스코프 속성은 새 스코프 블록에서 식별자로 다뤄진다.
 
 ```js
 var badIdea = { oops: "Ugh!" };
 
 with (badIdea) {
-    console.log(oops);   // Ugh!
+    console.log(oops); // Ugh!
 }
 ```
 
-The global scope was not modified here, but `badIdea` was turned into a scope at runtime rather than compile time, and its property `oops` becomes a variable in that scope. Again, this is a terrible idea, for performance and readability reasons.
+여기서 전역 스코프는 수정되지 않았으나, `badIdea`는 컴파일하면서가 아닌 런타임에서 스코프로 바뀌었고, `oops` 속성은 해당 scope에서의 변수가 되었다. 다시 말해, 이는 성능과 가독성 모든 면에서 끔찍한 아이디어다.
 
-At all costs, avoid `eval(..)` (at least, `eval(..)` creating declarations) and `with`. Again, neither of these cheats is available in strict-mode, so if you just use strict-mode (you should!) then the temptation goes away!
+어떠한 경우에도, `eval(..)`(적어도 `eval(..)`이 새로 선언하는 것)과 `with`를 사용하는 것은 피해라. 다시 말해, 두 가지 속임수 모두 엄격 모드에서 사용할 수 없고, 당신이 엄격 모드(사용해야만 한다!)를 사용한다면 이를 사용하고싶은 유혹에서 피할 수 있다!
 
-## Lexical Scope
+## 렉시컬 스코프<sub>Lexical Scope</sub>
 
-We've demonstrated that JS's scope is determined at compile time; the term for this kind of scope is "lexical scope". "Lexical" is associated with the "lexing" stage of compilation, as discussed earlier in this chapter.
+JS 스코프가 컴파일 시에 결정된다는 점은 증명했다. 이러한 스코프 종류를 "렉시컬 스코프"라고 한다. "렉시컬"은 챕터 앞부분에서 설명한대로 컴파일 단계의 "어휘 분석"<sub>Lexing</sub>과 관계가 있다.
 
-To narrow this chapter down to a useful conclusion, the key idea of "lexical scope" is that it's controlled entirely by the placement of functions, blocks, and variable declarations, in relation to one another.
+이번 챕터를 유용한 결론으로 좁히기 위해서, "렉시컬 스코프"의 핵심 아이디어는 이것이 함수, 블록 및 변수 선언의 배치에 전적으로 제어된다는 것이다.
 
-If you place a variable declaration inside a function, the compiler handles this declaration as it's parsing the function, and associates that declaration with the function's scope. If a variable is block-scope declared (`let` / `const`), then it's associated with the nearest enclosing `{ .. }` block, rather than its enclosing function (as with `var`).
+변수 선언을 함수 안에 위치시키면 컴파일러는 이 함수를 파싱하면서 선언을 처리한다. 그리고 컴파일러는 함수 스코프와 선언된 변수를 연결한다. 변수가 (`let`/`const`)로 선언된 블록 스코프면, 이는 이를 둘러싸는 함수(`var`와 마찬가지로)가 아닌 가장 가깝게 둘러싸는 `{ .. }` 블록과 연결된다.
 
-Furthermore, a reference (*target* or *source* role) for a variable must be resolved as coming from one of the scopes that are *lexically available* to it; otherwise the variable is said to be "undeclared" (which usually results in an error!). If the variable is not declared in the current scope, the next outer/enclosing scope will be consulted. This process of stepping out one level of scope nesting continues until either a matching variable declaration can be found, or the global scope is reached and there's nowhere else to go.
+더 나아가 변수 참조(*타깃* 혹은 *소스* 역할)는 *렉시컬로 사용 가능한* 스코프중 하나에서 오는 것으로 결정되어야 한다. 그렇지 않으면 변수는 "선언되지 않음"이라고 한다.(일반적으로 에러가 발생한다!) 변수가 현재 스코프에서 선언되지 않았다면, 다음 외부/포함하는 스코프를 참조할 것이다. 이 중첩 스코프 레벨을 하나씩 빠져나가는 과정은 일치하는 변수 선언을 찾거나 전역 스코프에 도달해 더이상 갈 곳이 없을 때까지 계속한다.
 
-It's important to note that compilation doesn't actually *do anything* in terms of reserving memory for scopes and variables. None of the program has been executed yet.
+사실 스코프나 변수에 대한 메모리를 예약하는 측면에서 컴파일은 실제로 *아무것도 실행하지 않는다*는 점이 중요하다. 아직 아무 프로그램도 실행되지 않았다.
 
-Instead, compilation creates a map of all the lexical scopes that lays out what the program will need while it executes. You can think of this plan as inserted code for use at runtime, which defines all the scopes (aka, "lexical environments") and registers all the identifiers (variables) for each scope.
+대신, 컴파일은 프로그램이 실행되는 동안 필요한 것을 배치하는 모든 렉시컬 스코프의 맵을 생성한다. 모든 스코프(일명 "렉시컬 환경")를 정의하고 각 스코프에 대한 모든 식별자(변수)를 등록하는 이 계획을 런타임에 사용하기 위해 삽입된 코드라고 생각할 수 있다.
 
-In other words, while scopes are identified during compilation, they're not actually created until runtime, each time a scope needs to run. In the next chapter, we'll sketch out the conceptual foundations for lexical scope.
+즉, 스코프는 컴파일 시에 식별되지만, 실제로는 런타임의 각 스코프가 실행되는 시점까지 생성되지는 않는다. 다음 챕터에서는 렉시컬 스코프에 대한 개념을 파악해볼 것이다.
