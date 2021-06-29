@@ -1,51 +1,53 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 3: The Scope Chain
+# 3장: 스코프 체인<sub>Scope Chain</sub>
 
-Chapters 1 and 2 laid down a concrete definition of *lexical scope* (and its parts) and illustrated helpful metaphors for its conceptual foundation. Before proceeding with this chapter, find someone else to explain (written or aloud), in your own words, what lexical scope is and why it's useful to understand.
+챕터 1과 2에서는 렉시컬 스코프(와 구성하는 요소)에 대해 구체적인 정의를 내리고 그 개념적인 기초에 도움이 될만한 비유를 설명했다. 이 챕터를 진행하기 전에, 렉시컬 스코프가 무엇이고 왜 그것이 유용한지 당신이 직접 (글이나 말로)설명해줄 다른 사람을 찾아 보아라.
 
-That seems like a step you might skip, but I've found it really does help to take the time to reformulate these ideas as explanations to others. That helps our brains digest what we're learning!
+건너뛸 수도 있는 단계처럼 보이지만, 이런 생각을 시간을 들여 다른 사람들에게 설명할 수 있도록 재구성하는 것이 정말로 도움이 된다는 것을 알게 되었다. 이런 과정은 배운 내용을 뇌가 소화하도록 도와주기 때문이다.
 
-Now it's time to dig into the nuts and bolts, so expect that things will get a lot more detailed from here forward. Stick with it, though, because these discussions really hammer home just how much we all *don't know* about scope, yet. Make sure to take your time with the text and all the code snippets provided.
+이제 요점을 파헤칠 시간이다. 지금부터는 좀 더 자세한 내용을 살펴볼 것이다. 그래도 위 방법을 계속 사용해보라. 위와 같은(these) 토론은 우리가 아직 스코프<sub>scope</sub>에 대해 얼마나 모르는지를 확실히 알려줄 것이기 때문이다. 이 글(이 글이 어떤 내용인지 모르겠음)과 코드를 시간을 내서 읽어보아라.
 
-To refresh the context of our running example, let's recall the color-coded illustration of the nested scope bubbles, from Chapter 2, Figure 2:
+실행중인 예제의 컨텍스트를 새로 고치기 위해 2장, 그림 2의 중첩 된 스코프 버블 그림을 다시 살펴보자.
 
 <figure>
     <img src="images/fig2.png" width="500" alt="Colored Scope Bubbles" align="center">
-    <figcaption><em>Fig. 2 (Ch. 2): Colored Scope Bubbles</em></figcaption>
+    <figcaption><em>그림 2: 색깔있는 스코프 버블</em></figcaption>
     <br><br>
 </figure>
 
-The connections between scopes that are nested within other scopes is called the scope chain, which determines the path along which variables can be accessed. The chain is directed, meaning the lookup moves upward/outward only.
+또 다른 스코프의 내부로 중첩되어 있는 스코프 간의 연결을 스코프 체인이라고 하며, 이 연결을 통해서 변수에 접근할 수 있는 경로를 결정한다. 이 체인은 방향성이 있다. 바깥쪽으로만(upward/outward only) 룩업을 수행할 수 있기 때문이다.
 
-## "Lookup" Is (Mostly) Conceptual
+## "룩업"은 (거의) 개념적이다.
 
-In Figure 2, notice the color of the `students` variable reference in the `for`-loop. How exactly did we determine that it's a RED(1) marble?
+그림 2에서, `for` 반복문에서 참조하는 `students` 변수의 색상에 주목하라. 우리는 어떻게 이 변수를 빨강(1) 구슬로 정확하게 결정할 수 있었을까?
 
-In Chapter 2, we described the runtime access of a variable as a "lookup," where the *Engine* has to start by asking the current scope's *Scope Manager* if it knows about an identifier/variable, and proceeding upward/outward back through the chain of nested scopes (toward the global scope) until found, if ever. The lookup stops as soon as the first matching named declaration in a scope bucket is found.
+2장에서 우리는 런타임에 변수에 접근하는 과정을 "룩업"이라고 설명했는데, 이 과정에서 *엔진*은 현재 스코프의 *스코프 매니저*에게 식별자/변수를 알고 있는지 물어보면서, 그 식별자/변수를 찾을 때까지 중첩된 스코프 체인을 통해 (전역 스코프를 향해) 바깥쪽(upward/outward)으로 진행해야한다. 스코프 양동이안에서 일치하는 첫 번째 선언을 찾아내면 즉시 룩업이 중단된다.
 
-The lookup process thus determined that `students` is a RED(1) marble, because we had not yet found a matching variable name as we traversed the scope chain, until we arrived at the final RED(1) global scope.
+최종 글로벌 스코프에 도달하기 전까지 스코프 체인을 통과할 때 일치하는 변수 이름을 찾지 못해 '학생'이 '빨간색(1) 대리석'으로 판정됐다.
+마지막 빨강(1) 전역 스코프에 도달할 때까지 스코프 체인을 따라가는 동안 알맞은 변수 이름을 찾아내지 못했기 때문에, 이 룩업 과정에서 `students`가 빨강(1) 구슬이라는 것을 알 수 있다.
 
-Similarly, `studentID` in the `if`-statement is determined to be a BLUE(2) marble.
+비슷한 방법으로 `if`조건문에 있는 `studentID`를 파랑(2) 구슬로 확정할 수 있다.
 
-This suggestion of a runtime lookup process works well for conceptual understanding, but it's not actually how things usually work in practice.
+런타임 룩업 과정에 대한 이 제안은 개념적인 이해에는 효과적이지만, 실제로 이렇게 동작하지는 않는다.
 
-The color of a marble's bucket (aka, meta information of what scope a variable originates from) is *usually determined* during the initial compilation processing. Because lexical scope is pretty much finalized at that point, a marble's color will not change based on anything that can happen later during runtime.
+구슬의 양동이 색상(변수가 비롯된 범위에 대한 메타 정보)은 초기 컴파일 과정중에 *대부분 결정*된다. 렉시컬 스코프가 이 시점에서 거의 마무리되기 때문에 구슬의 색상은 이후 런타임 도중에 발생하는 작업에 의해서는 변경되지 않을 것이다.
 
-Since the marble's color is known from compilation, and it's immutable, this information would likely be stored with (or at least accessible from) each variable's entry in the AST; that information is then used explicitly by the executable instructions that constitute the program's runtime.
+구슬의 색상이 컴파일에 의해 알려진 다음 바뀌지 않으므로, 이 정보는 AST에 있는 각 변수의 입력과 함께 저장될 것이다.(적어도 접근할 수 있을 것이다.) 그리고 이 정보는 프로그램의 런타임을 구성하는 실행 지침에 따라 명시적으로 사용될 것이다.
 
-In other words, *Engine* (from Chapter 2) doesn't need to lookup through a bunch of scopes to figure out which scope bucket a variable comes from. That information is already known! Avoiding the need for a runtime lookup is a key optimization benefit of lexical scope. The runtime operates more performantly without spending time on all these lookups.
+다시 말해, (2장의) *엔진*은 변수가 유래한 스코프 양동이를 알아내기 위해 여러 스코프를 룩업하는 작업이 필요하지 않다. 그 정보는 이미 알려져 있다! 런타임 룩업이 필요한 상황을 피하는 것이 바로 렉시컬 스코프의 핵심적인 최적화 장점이다.
 
-But I said "...usually determined..." just a moment ago, with respect to figuring out a marble's color during compilation. So in what case would it ever *not* be known during compilation?
+하지만 나는 조금 전에 컴파일중에 구슬의 색상을 알아내는 것과 관련하여 "대부분 결정"된다고 말한 바 있다. 그렇다면 어떤 경우에 컴파일하는 동안에도 알아내지 *못하는* 것일까?
 
-Consider a reference to a variable that isn't declared in any lexically available scopes in the current file—see *Get Started*, Chapter 1, which asserts that each file is its own separate program from the perspective of JS compilation. If no declaration is found, that's not *necessarily* an error. Another file (program) in the runtime may indeed declare that variable in the shared global scope.
+현재 파일(*Get Started* 1장 참조. JS 컴파일 관점에서 각 파일은 자체적으로 개별적인 프로그램임을 확실히 하고있다.)에서 어휘적으로 사용 가능한 스코프 어디에도 선언되지 않은 변수에 대한 참조를 생각해보라. 선언을 찾지 못했더라도 *반드시* 에러인 것은 아니다. 런타임 상태인 다른 파일(프로그램)이 공유하는 전역변수에 대신 선언했을지도 모른다.
 
-So the ultimate determination of whether the variable was ever appropriately declared in some accessible bucket may need to be deferred to the runtime.
+그래서 그 변수가 접근 가능한 양동이에 적절하게 선언되었는지에 대한 여부의 최종 결정은 런타임까지 연기해야 할 수도 있다.
 
-Any reference to a variable that's initially *undeclared* is left as an uncolored marble during that file's compilation; this color cannot be determined until other relevant file(s) have been compiled and the application runtime commences. That deferred lookup will eventually resolve the color to whichever scope the variable is found in (likely the global scope).
+초기에 *선언되지 않은* 변수에 대한 참조는 컴파일되는 동안 색이 없는 구슬로 남게 된다. 이 구슬의 색상은 관련된 다른 파일이 컴파일되고 그 프로그램의 런타임 상태가 시작될때까지 정해질 수 없다. 이렇게 미뤄진 룩업은 결국 변수가 발견된 스코프(아마도 전역 스코프)의 색상으로 결정할 것이다.
 
-However, this lookup would only be needed once per variable at most, since nothing else during runtime could later change that marble's color.
+하지만, 이 룩업은 변수당 최대 한 번만 필요하다. 런타임중에 벌어지는 어떤 상황도 뒤늦게 구슬의 색상을 바꿀 수는 없기 때문이다.
 
-The "Lookup Failures" section in Chapter 2 covers what happens if a marble is ultimately still uncolored at the moment its reference is runtime executed.
+
+2장의 "룩업 실패" 섹션은 참조가 실행되는 순간까지도 여전히 구슬에 색이 없는 경우에 어떤 일이 일어나는지를 다루고 있다.
 
 ## Shadowing
 
