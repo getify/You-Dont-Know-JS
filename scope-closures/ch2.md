@@ -1,26 +1,26 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 2: Illustrating Lexical Scope
+# 2장: 렉시컬 스코프<sub>Lexical Scope</sub> 설명하기
 
-In Chapter 1, we explored how scope is determined during code compilation, a model called "lexical scope." The term "lexical" refers to the first stage of compilation (lexing/parsing).
+1장에서 스코프<sub>scope</sub>가 "렉시컬 스코프"라 부르는 모델로 어떻게 코드 컴파일 중에 결정되는지 살펴봤다. "렉시컬<sub>lexical</sub>" 용어는 컴파일(렉싱<sub>lexing</sub>/파싱<sub>parsing</sub>)의 첫번째 단계에 관련이 있다.
 
-To properly *reason* about our programs, it's important to have a solid conceptual foundation of how scope works. If we rely on guesses and intuition, we may accidentally get the right answers some of the time, but many other times we're far off. This isn't a recipe for success.
+프로그램에 대한 적절한 *근거*를 위해서는 스코프가 작동하는 방식에 대한 탄탄한 개념적 기반을 가지는 것이 중요하다. 만약 추측과 직관에 의지한다면 가끔은 뜻하지 않게 정답을 얻을 수도 있지만, 대부분 크게 벗어난다. 이는 성공을 위한 비법이 아니다.
 
-Like way back in grade school math class, getting the right answer isn't enough if we don't show the correct steps to get there! We need to build accurate and helpful mental models as foundation moving forward.
+초등학교 수학 수업에서처럼, 거기에 가기 위한 올바른 단계를 보여주지 않는다면 정답을 맞추는 것만으로는 충분하지 않다. 나아가기 위한 디딤돌로써 정확하고 도움이 되는 멘탈 모델<sub>mental models</sub>을 만들 필요가 있다.
 
-This chapter will illustrate *scope* with several metaphors. The goal here is to *think* about how your program is handled by the JS engine in ways that more closely align with how the JS engine actually works.
+이 장에서는 *스코프*를 몇 가지 비유<sub>metaphors</sub>와 함께 설명한다. 여기서의 목표는 프로그램이 어떻게 JS 엔진에 의해 처리되는지에 대해 JS 엔진이 실제로 작동하는 방식에 더 밀접하게 맞추는 방식으로 *생각하는* 것이다.
 
-## Marbles, and Buckets, and Bubbles... Oh My!
+## 구슬과 양동이와 버블<sub>Bubbles</sub>... 이런!
 
-One metaphor I've found effective in understanding scope is sorting colored marbles into buckets of their matching color.
+스코프를 이해하는 데 효과적인 한 가지 비유는 색깔있는 구슬을 같은 색을 가진 양동이에 넣어 분류하는 것이다.
 
-Imagine you come across a pile of marbles, and notice that all the marbles are colored red, blue, or green. Let's sort all the marbles, dropping the red ones into a red bucket, green into a green bucket, and blue into a blue bucket. After sorting, when you later need a green marble, you already know the green bucket is where to go to get it.
+우연히 구슬 더미를 발견했다고 상상해라. 그리고 모든 구슬이 빨강, 파랑 또는 초록색인 것을 주목해라. 모든 구슬을 빨간색 구슬은 빨간색 양동이에, 초록색 구슬은 초록색 양동이에 그리고 파란색 구슬은 파란색 양동이에 떨어트려서 분류하자. 분류 후에는, 나중에 초록색 구슬이 필요할 때 그것을 얻기 위해 갈 곳은 초록색 양동이라는 것을 이미 알게 된다.
 
-In this metaphor, the marbles are the variables in our program. The buckets are scopes (functions and blocks), which we just conceptually assign individual colors for our discussion purposes. The color of each marble is thus determined by which *color* scope we find the marble originally created in.
+이 비유에서 구슬은 프로그램의 변수이다. 양동이는 스코프(함수와 블록)이다. 단지 개념적으로 논의 목적을 위해 개별 색상을 할당했다. 각 구슬의 색상은 이와 같이 본래 만들어진 구슬을 알게되는 *색상* 스코프에 의해서 밝혀진다.
 
-Let's annotate the running program example from Chapter 1 with scope color labels:
+1장의 실행 프로그램 예제에 스코프 색상 라벨로 주석을 달아보자.
 
 ```js
-// outer/global scope: RED
+// 외부/전역 스코프: 빨강
 
 var students = [
     { id: 14, name: "Kyle" },
@@ -30,10 +30,10 @@ var students = [
 ];
 
 function getStudentName(studentID) {
-    // function scope: BLUE
+    // 함수 스코프: 파랑
 
     for (let student of students) {
-        // loop scope: GREEN
+        // 반복문 스코프: 초록
 
         if (student.id == studentID) {
             return student.name;
@@ -45,72 +45,72 @@ var nextStudent = getStudentName(73);
 console.log(nextStudent);   // Suzy
 ```
 
-We've designated three scope colors with code comments: RED (outermost global scope), BLUE (scope of function `getStudentName(..)`), and GREEN (scope of/inside the `for` loop). But it still may be difficult to recognize the boundaries of these scope buckets when looking at a code listing.
+코드 주석을 가진 세 가지 스코프 색상을 지정했다. 빨강(가장 바깥 전역 스코프), 파랑(함수 `getStudentName(..)`의 스코프), 그리고 초록(`for` 반복문의/안의 스코프)이다. 그러나 나열된 코드를 볼 때 이러한 스코프 양동이의 경계를 인식하기는 여전히 어려울 수 있다.
 
-Figure 2 helps visualize the boundaries of the scopes by drawing colored bubbles (aka, buckets) around each:
+그림 2는 색깔있는 버블(일명 양동이)을 각각 둘러 그림으로써 스코프의 경계를 시각화하는 데 도움이 된다.
 
 <figure>
     <img src="images/fig2.png" width="500" alt="Colored Scope Bubbles" align="center">
-    <figcaption><em>Fig. 2: Colored Scope Bubbles</em></figcaption>
+    <figcaption><em>그림 2: 색깔있는 스코프 버블</em></figcaption>
 </figure>
 
-1. **Bubble 1** (RED) encompasses the global scope, which holds three identifiers/variables: `students` (line 1), `getStudentName` (line 8), and `nextStudent` (line 16).
+1. **버블 1** (빨강)은 세 개의 식별자/변수를 가지고 있는 전역 스코프를 둘러싼다: `students` (1행), `getStudentName` (8행)과 `nextStudent` (16행).
 
-2. **Bubble 2** (BLUE) encompasses the scope of the function `getStudentName(..)` (line 8), which holds just one identifier/variable: the parameter `studentID` (line 8).
+2. **버블 2** (파랑)은 단지 하나의 식별자/변수를 가지고 있는 함수 `getStudentName(..)` (8행)의 스코프를 둘러싼다: 매개변수 `studentID` (8행).
 
-3. **Bubble 3** (GREEN) encompasses the scope of the `for`-loop (line 9), which holds just one identifier/variable: `student` (line 9).
+3. **버블 3** (초록)은 단지 하나의 식별자/변수를 가지고 있는 `for` 반복문 (9행)의 스코프를 둘러싼다: `student` (9행).
 
-| NOTE: |
+| 비고: |
 | :--- |
-| Technically, the parameter `studentID` is not exactly in the BLUE(2) scope. We'll unwind that confusion in "Implied Scopes" in Appendix A. For now, it's close enough to label `studentID` a BLUE(2) marble. |
+| 기술적으로 매개변수 `studentID`는 정확히 파랑(2) 스코프에 있지 않다. 우리는 부록 A의 "암묵적 스코프"에서 이런 혼동을 풀 것이다. 지금은 `studentID`에 파랑(2) 구슬이라는 딱지를 붙이는 것으로 거의 충분하다. |
 
-Scope bubbles are determined during compilation based on where the functions/blocks of scope are written, the nesting inside each other, and so on. Each scope bubble is entirely contained within its parent scope bubble—a scope is never partially in two different outer scopes.
+스코프 버블은 스코프의 함수/블록이 작성되는 위치, 서로 중첩되는 위치 등에 따라 컴파일 중에 결정된다. 두 개의 다른 외부 스코프에 부분적으로 포함되지 않는 각 스코프 버블은 부모 스코프 버블 안에 완전히 포함된다.
 
-Each marble (variable/identifier) is colored based on which bubble (bucket) it's declared in, not the color of the scope it may be accessed from (e.g., `students` on line 9 and `studentID` on line 10).
+각 구슬(변수/식별자)은 어떤 버블(양동이)에서 선언되었는지에 따라 색상이 지정되며, 접근 가능할 수 있는 스코프의 색상이 아니다(예: 9행의 `students`와 10행의 `studentID`).
 
-| NOTE: |
+| 비고: |
 | :--- |
-| Remember we asserted in Chapter 1 that `id`, `name`, and `log` are all properties, not variables; in other words, they're not marbles in buckets, so they don't get colored based on any the rules we're discussing in this book. To understand how such property accesses are handled, see the third book in the series, *Objects & Classes*. |
+| 1장에서 `id`, `name`과 `log`는 모두 변수가 아닌 속성<sub>properties</sub>라고 주장한 것을 기억해라. 다른 말로 양동이 안의 구슬이 아니다. 그래서 이 책에서 논하는 어떤 규칙에 기초하여 색이 지정되지 않았다. 그러한 속성 접근이 어떻게 다뤄지는지 이해하기 위해서는 시리즈의 세번째 책 *Objects & Classes*를 보자. |
 
-As the JS engine processes a program (during compilation), and finds a declaration for a variable, it essentially asks, "Which *color* scope (bubble or bucket) am I currently in?" The variable is designated as that same *color*, meaning it belongs to that bucket/bubble.
+JS 엔진은 (컴파일 중에) 프로그램을 처리하고 변수 선언을 찾을 때, 근본적으로 "내가 현재 어떤 *색상* 스코프(버블 또는 양동이)에 있지?"라고 묻는다. 변수는 같은 *색상*으로 지정되며 이는 그 양동이/버블에 속함을 의미한다.
 
-The GREEN(3) bucket is wholly nested inside of the BLUE(2) bucket, and similarly the BLUE(2) bucket is wholly nested inside the RED(1) bucket. Scopes can nest inside each other as shown, to any depth of nesting as your program needs.
+초록(3) 양동이는 파랑(2) 양동이 안에 완전히 중첩되어 있다. 그리고 마찬가지로 파랑(2) 양동이는 빨강(1) 양동이 안에 완전히 중첩되어 있다. 스코프는 보여지는 대로 프로그램이 필요한 중첩의 깊이까지 각자 내부에 중첩될 수 있다.
 
-References (non-declarations) to variables/identifiers are allowed if there's a matching declaration either in the current scope, or any scope above/outside the current scope, but not with declarations from lower/nested scopes.
+변수/식별자에 대한 참조(선언이 아닌)는 만약 현재 스코프 또는 현재 스코프의 상위/외부 스코프에 일치하는 선언이 있다면 허용되지만, 하위/내부 스코프의 선언은 허용되지 않는다.
 
-An expression in the RED(1) bucket only has access to RED(1) marbles, **not** BLUE(2) or GREEN(3). An expression in the BLUE(2) bucket can reference either BLUE(2) or RED(1) marbles, **not** GREEN(3). And an expression in the GREEN(3) bucket has access to RED(1), BLUE(2), and GREEN(3) marbles.
+빨강(1) 양동이에 있는 표현식은 빨강(1) 구슬에만 접근 권한이 있다. 파랑(2)이나 초록(3) 구슬이 **아니다**. 파랑(2) 양동이에 있는 표현식은 파랑(2)이나 빨강(1) 구슬 둘다 참조할 수 있다. 초록(3) 구슬이 **아니다**. 그리고 초록(3) 양동이에 있는 표현식은 빨강(1), 파랑(2) 그리고 초록(3) 구슬에 접근 권한이 있다.
 
-We can conceptualize the process of determining these non-declaration marble colors during runtime as a lookup. Since the `students` variable reference in the `for`-loop statement on line 9 is not a declaration, it has no color. So we ask the current BLUE(2) scope bucket if it has a marble matching that name. Since it doesn't, the lookup continues with the next outer/containing scope: RED(1). The RED(1) bucket has a marble of the name `students`, so the loop-statement's `students` variable reference is determined to be a RED(1) marble.
+런타임<sub>runtime</sub> 중에 이런 선언이 아닌 구슬 색상을 결정하는 처리를 룩업<sub>lookup</sub>으로 개념화할 수 있다. 9행의 `for` 반복문에서 `students` 변수 참조는 선언이 아니기 때문에 색깔이 없다. 그래서 현재 파랑(2) 스코프 양동이에 일치하는 이름을 가진 구슬이 있는지 물어본다. 없기 때문에, 룩업은 다음 외부/포함 스코프인 빨강(1)으로 계속 진행한다. 빨강(1) 양동이는 `students`라는 구슬을 가지고 있다. 그래서 반복문의 `students` 변수 참조는 빨강(1) 구슬로 결정된다.
 
-The `if (student.id == studentID)` statement on line 10 is similarly determined to reference a GREEN(3) marble named `student` and a BLUE(2) marble `studentID`.
+10행의 `if (student.id == studentID)` 구문은 마찬가지로 `student`라는 초록(3) 구슬과 `studentID`라는 파랑(3) 구슬을 참조하는 것으로 결정된다.
 
-| NOTE: |
+| 비고: |
 | :--- |
-| The JS engine doesn't generally determine these marble colors during runtime; the "lookup" here is a rhetorical device to help you understand the concepts. During compilation, most or all variable references will match already-known scope buckets, so their color is already determined, and stored with each marble reference to avoid unnecessary lookups as the program runs. More on this nuance in Chapter 3. |
+| JS 엔진은 일반적으로 런타임 중에 이런 구슬 색상을 결정하지 않는다. 여기서 "룩업"은 여러분이 개념을 이해할 수 있도록 도와주는 수사적인 장치이다. 컴파일 중에 대부분 또는 모든 변수 참조는 이미 알려진 스코프 양동이에 일치할 것이다. 그래서 그 색상은 이미 결정되어 있으며 프로그램이 실행될 때 불필요한 조회를 피하기 위해 각 구슬 참조와 함께 저장된다. 3장에서 이 미묘한 차이에 대해 더 알아보자. |
 
-The key take-aways from marbles & buckets (and bubbles!):
+구슬과 양동이 (그리고 버블!)의 주요 요점 정리:
 
-* Variables are declared in specific scopes, which can be thought of as colored marbles from matching-color buckets.
+* 변수는 특정한 스코프에 선언되며, 이는 일치하는 색의 양동이로부터 온 색이 있는 구슬이라고 볼 수 있다.
 
-* Any variable reference that appears in the scope where it was declared, or appears in any deeper nested scopes, will be labeled a marble of that same color—unless an intervening scope "shadows" the variable declaration; see "Shadowing" in Chapter 3.
+* 선언된 스코프에 나타나거나 더 깊은 중첩 스코프에 나타나는 변수 참조는, 간섭 스코프가 변수 선언에 "그늘을 드리우"지 않는 한 같은 색상의 구슬로 지정될 것이다. 3장에서 "Shadowing"을 보자.
 
-* The determination of colored buckets, and the marbles they contain, happens during compilation. This information is used for variable (marble color) "lookups" during code execution.
+* 색이 있는 양동이와 거기 있는 구슬의 결정은 컴파일 중에 일어난다. 이 정보는 코드 실행<sub>execution</sub> 중에 변수(구슬 색상) "룩업"에 사용된다.
 
-## A Conversation Among Friends
+## 친구 사이의 대화
 
-Another useful metaphor for the process of analyzing variables and the scopes they come from is to imagine various conversations that occur inside the engine as code is processed and then executed. We can "listen in" on these conversations to get a better conceptual foundation for how scopes work.
+변수와 스코프가 어디서부터 왔는지 분석하는 과정을 위한 유용한 비유는 코드가 처리되고 실행되는 동안에 엔진 안에서 일어나는 다양한 대화를 상상하는 것이다. 우리는 스코프가 어떻게 동작하는지 더 나은 개념적 기반을 얻기 위해 이 대화를 "엿듣을" 수 있다.
 
-Let's now meet the members of the JS engine that will have conversations as they process our program:
+프로그램을 처리하는 동안 대화를 할 JS 엔진의 구성원을 지금 만나보자:
 
-* *Engine*: responsible for start-to-finish compilation and execution of our JavaScript program.
+* *엔진*: JavaScript 프로그램의 시작부터 완료까지 컴파일과 실행을 담당한다.
 
-* *Compiler*: one of *Engine*'s friends; handles all the dirty work of parsing and code-generation (see previous section).
+* *컴파일러*: *엔진*의 친구 중 하나. 파싱과 코드 생성의 더러운 작업을 모두 처리한다(이전 섹션 참고).
 
-* *Scope Manager*: another friend of *Engine*; collects and maintains a lookup list of all the declared variables/identifiers, and enforces a set of rules as to how these are accessible to currently executing code.
+* *스코프 매니저*: *엔진*의 다른 친구. 선언된 모든 변수/식별자의 룩업 목록을 수집하고 유지하며, 현재 실행하는 코드에서 접근 가능한 방법에 대한 규칙 집합을 적용한다.
 
-For you to *fully understand* how JavaScript works, you need to begin to *think* like *Engine* (and friends) think, ask the questions they ask, and answer their questions likewise.
+JavaScript가 작동하는 방식을 *완전히 이해*하려면 *엔진*(및 친구)처럼 *생각*하는 것을 시작하고, 질문하고, 답할 필요가 있다.
 
-To explore these conversations, recall again our running program example:
+대화를 살펴보기 위해 실행 중인 프로그램 예제를 다시 한 번 상기하자:
 
 ```js
 var students = [
@@ -134,121 +134,121 @@ console.log(nextStudent);
 // Suzy
 ```
 
-Let's examine how JS is going to process that program, specifically starting with the first statement. The array and its contents are just basic JS value literals (and thus unaffected by any scoping concerns), so our focus here will be on the `var students = [ .. ]` declaration and initialization-assignment parts.
+JS가 어떻게 프로그램을 처리할 것인지, 구체적으로 첫번째 구문부터 조사하자. 배열과 그것의 내용은 단지 기본적인 JS 값 리터럴<sub>literals</sub>이다(따라서 스코프 문제에는 영향을 받지 않음). 그래서 여기서의 초점은 `var students = [ .. ]` 선언과 초기 할당 부분이 될 것이다.
 
-We typically think of that as a single statement, but that's not how our friend *Engine* sees it. In fact, JS treats these as two distinct operations, one which *Compiler* will handle during compilation, and the other which *Engine* will handle during execution.
+우리는 일반적으로 단 하나의 구문으로서 생각하지만, 우리의 친구 *엔진*이 보는 방식은 아니다. 실제로 JS는 두 가지 개별 작업으로 취급한다. 하나는 *컴파일러*가 컴파일 중에 다룰 것이고 다른 하나는 *엔진*이 실행중에 다룰 것이다.
 
-The first thing *Compiler* will do with this program is perform lexing to break it down into tokens, which it will then parse into a tree (AST).
+이 프로그램을 가지고 *컴파일러*가 할 첫번째 것은 토큰으로 나누기위해 렉싱을 수행하고 트리(AST)로 파싱한다.
 
-Once *Compiler* gets to code generation, there's more detail to consider than may be obvious. A reasonable assumption would be that *Compiler* will produce code for the first statement such as: "Allocate memory for a variable, label it `students`, then stick a reference to the array into that variable." But that's not the whole story.
+*컴파일러*가 코드 생성에 착수하면, 분명한 것보다 더 많은 세부 사항을 고려해야 한다. 합리적인 가정은 *컴파일러*가 "변수에 대한 메모리를 할당하고, `students` 레이블을 지정하고, 배열에 대한 참조를 이 변수에 붙인다"와 같은 첫 번째 구문에 대한 코드를 생성한다는 것이다. 하지만 이것이 전부는 아니다.
 
-Here's the steps *Compiler* will follow to handle that statement:
+*컴파일러*가 이 구문을 다루기 위해 전개되는 단계가 있다:
 
-1. Encountering `var students`, *Compiler* will ask *Scope Manager* to see if a variable named `students` already exists for that particular scope bucket. If so, *Compiler* would ignore this declaration and move on. Otherwise, *Compiler* will produce code that (at execution time) asks *Scope Manager* to create a new variable called `students` in that scope bucket.
+1. `var students`를 접하면 *컴파일러*는 *스코프 매니저*에게 특정 스코프 양동이에 `students`라는 변수가 이미 존재하는지 물을 것이다. 만약 그렇다면, *컴파일러*는 이 선언을 무시하고 이동한다. 그렇지 않으면 *컴파일러*는 (실행 타임에) 스코프 양동이에 `students`라 불리는 새 변수를 생성하도록 *스코프 매니저*에게 요청하는 코드를 생성할 것이다.
 
-2. *Compiler* then produces code for *Engine* to later execute, to handle the `students = []` assignment. The code *Engine* runs will first ask *Scope Manager* if there is a variable called `students` accessible in the current scope bucket. If not, *Engine* keeps looking elsewhere (see "Nested Scope" below). Once *Engine* finds a variable, it assigns the reference of the `[ .. ]` array to it.
+2. *컴파일러*는  `students = []` 할당을 다루기 위해 나중에 실행할 *엔진*을 위한 코드를 생성한다. *엔진*이 실행하는 코드는 먼저 *스코프 매니저*에게 현재 스코프 양동이에서 접근할 수 있는 `students`라는 변수가 있는지 물을 것이다. 그렇지 않다면 *엔진*은 계속 다른 곳을 찾는다(아래 "중첩 스코프" 참고). *엔진*이 변수를 찾으면 `[ .. ]` 배열의 참조를 할당한다.
 
-In conversational form, the first phase of compilation for the program might play out between *Compiler* and *Scope Manager* like this:
+대화 형식으로, 프로그램을 위한 컴파일의 첫번째 단계는 아래처럼 *컴파일러*와 *스코프 매니저* 사이에서 진행될지도 모른다:
 
-> ***Compiler***: Hey, *Scope Manager* (of the global scope), I found a formal declaration for an identifier called `students`, ever heard of it?
+> ***컴파일러***: 안녕, (전역 스코프의) *스코프 매니저*야. `students`라 부르는 식별자에 대한 공식적인 선언을 찾았는데, 들어본 적 있니?
 
-> ***(Global) Scope Manager***: Nope, never heard of it, so I just created it for you.
+> ***(전역) 스코프 매니저***: 아니, 들어본 적 없어서 지금 막 만들었어.
 
-> ***Compiler***: Hey, *Scope Manager*, I found a formal declaration for an identifier called `getStudentName`, ever heard of it?
+> ***컴파일러***: 안녕, *스코프 매니저*야. `getStudentName`이라 부르는 식별자에 대한 공식적인 선언을 찾았는데, 들어본 적 있니?
 
-> ***(Global) Scope Manager***: Nope, but I just created it for you.
+> ***(전역) 스코프 매니저***: 아니, 들어본 적 없어서 지금 막 만들었어.
 
-> ***Compiler***: Hey, *Scope Manager*, `getStudentName` points to a function, so we need a new scope bucket.
+> ***컴파일러***: 안녕, *스코프 매니저*야. `getStudentName`는 함수를 가리켜서 새 스코프 양동이가 필요해.
 
-> ***(Function) Scope Manager***: Got it, here's the scope bucket.
+> ***(함수) 스코프 매니저***: 알았어, 여기 스코프 양동이야.
 
-> ***Compiler***: Hey, *Scope Manager* (of the function), I found a formal parameter declaration for `studentID`, ever heard of it?
+> ***컴파일러***: 안녕, (함수의) *스코프 매니저*야. `studentID`이라 부르는 식별자에 대한 공식적인 선언을 찾았는데, 들어본 적 있니?
 
-> ***(Function) Scope Manager***: Nope, but now it's created in this scope.
+> ***(함수) 스코프 매니저***: 없어, 하지만 지금 이 스코프에 만들었어.
 
-> ***Compiler***: Hey, *Scope Manager* (of the function), I found a `for`-loop that will need its own scope bucket.
-
-> ...
-
-The conversation is a question-and-answer exchange, where **Compiler** asks the current *Scope Manager* if an encountered identifier declaration has already been encountered. If "no," *Scope Manager* creates that variable in that scope. If the answer is "yes," then it's effectively skipped over since there's nothing more for that *Scope Manager* to do.
-
-*Compiler* also signals when it runs across functions or block scopes, so that a new scope bucket and *Scope Manager* can be instantiated.
-
-Later, when it comes to execution of the program, the conversation will shift to *Engine* and *Scope Manager*, and might play out like this:
-
-> ***Engine***: Hey, *Scope Manager* (of the global scope), before we begin, can you look up the identifier `getStudentName` so I can assign this function to it?
-
-> ***(Global) Scope Manager***: Yep, here's the variable.
-
-> ***Engine***: Hey, *Scope Manager*, I found a *target* reference for `students`, ever heard of it?
-
-> ***(Global) Scope Manager***: Yes, it was formally declared for this scope, so here it is.
-
-> ***Engine***: Thanks, I'm initializing `students` to `undefined`, so it's ready to use.
-
-> Hey, *Scope Manager* (of the global scope), I found a *target* reference for `nextStudent`, ever heard of it?
-
-> ***(Global) Scope Manager***: Yes, it was formally declared for this scope, so here it is.
-
-> ***Engine***: Thanks, I'm initializing `nextStudent` to `undefined`, so it's ready to use.
-
-> Hey, *Scope Manager* (of the global scope), I found a *source* reference for `getStudentName`, ever heard of it?
-
-> ***(Global) Scope Manager***: Yes, it was formally declared for this scope. Here it is.
-
-> ***Engine***: Great, the value in `getStudentName` is a function, so I'm going to execute it.
-
-> ***Engine***: Hey, *Scope Manager*, now we need to instantiate the function's scope.
+> ***컴파일러***: 안녕, (함수의) *스코프 매니저*야. 스코프 양동이가 필요한 `for` 반복문을 찾았어.
 
 > ...
 
-This conversation is another question-and-answer exchange, where *Engine* first asks the current *Scope Manager* to look up the hoisted `getStudentName` identifier, so as to associate the function with it. *Engine* then proceeds to ask *Scope Manager* about the *target* reference for `students`, and so on.
+이 대화는 질의 응답 교환으로, **컴파일러**가 *스코프 매니저*에게 마주친 식별자 선언이 이미 발견되었는지 묻는다. "아니오"라면, *스코프 매니저*는 스코프에 변수를 생성한다. "예"라면, *스코프 매니저*가 더 이상 할 것이 없으므로 실질적으로 건너뛴다.
 
-To review and summarize how a statement like `var students = [ .. ]` is processed, in two distinct steps:
+*컴파일러*는 함수나 블록 스코프를 지나갈 때도 새 스코프 양동이와 *스코프 매니저*가 실체화 될 수 있는 신호를 보낸다.
 
-1. *Compiler* sets up the declaration of the scope variable (since it wasn't previously declared in the current scope).
+나중에 프로그램의 실행 단계에 왔을 때, 대화는 *엔진*과 *스코프 매니저*로 전환되고, 아래처럼 진행될지도 모른다:
 
-2. While *Engine* is executing, to process the assignment part of the statement, *Engine* asks *Scope Manager* to look up the variable, initializes it to `undefined` so it's ready to use, and then assigns the array value to it.
+> ***엔진***: 안녕, (전역 스코프의) *스코프 매니저*야. 시작하기 전에, 내가 함수를 할당할 수 있도록 네가 식별자 `getStudentName`를 찾아줄 수 있니?
 
-## Nested Scope
+> ***(전역) 스코프 매니저***: 응, 여기 변수가 있어.
 
-When it comes time to execute the `getStudentName()` function, *Engine* asks for a *Scope Manager* instance for that function's scope, and it will then proceed to look up the parameter (`studentID`) to assign the `73` argument value to, and so on.
+> ***엔진***: 안녕, *스코프 매니저*야. `students`에 대한 *타깃* 참조를 찾았는데, 들어본 적 있니?
 
-The function scope for `getStudentName(..)` is nested inside the global scope. The block scope of the `for`-loop is similarly nested inside that function scope. Scopes can be lexically nested to any arbitrary depth as the program defines.
+> ***(전역) 스코프 매니저***: 응, 이 스코프에서 공식적으로 선언됐어. 여기 있어.
 
-Each scope gets its own *Scope Manager* instance each time that scope is executed (one or more times). Each scope automatically has all its identifiers registered at the start of the scope being executed (this is called "variable hoisting"; see Chapter 5).
+> ***엔진***: 고마워, `students`를 `undefined`로 초기화하는 중이야. 사용할 준비가 됐어.
 
-At the beginning of a scope, if any identifier came from a `function` declaration, that variable is automatically initialized to its associated function reference. And if any identifier came from a `var` declaration (as opposed to `let`/`const`), that variable is automatically initialized to `undefined` so that it can be used; otherwise, the variable remains uninitialized (aka, in its "TDZ," see Chapter 5) and cannot be used until its full declaration-and-initialization are executed.
+> 안녕, (전역 스코프의) *스코프 매니저*야. `nextStudent`에 대한 *타깃* 참조를 찾았는데, 들어본 적 있니?
 
-In the `for (let student of students) {` statement, `students` is a *source* reference that must be looked up. But how will that lookup be handled, since the scope of the function will not find such an identifier?
+> ***(전역) 스코프 매니저***: 응, 이 스코프에서 공식적으로 선언됐어. 여기 있어.
 
-To explain, let's imagine that bit of conversation playing out like this:
+> ***엔진***: 고마워, `nextStudent`를 `undefined`로 초기화하는 중이야. 사용할 준비가 됐어.
 
-> ***Engine***: Hey, *Scope Manager* (for the function), I have a *source* reference for `students`, ever heard of it?
+> 안녕, (전역 스코프의) *스코프 매니저*야. `getStudentName`에 대한 *소스* 참조를 찾았는데, 들어본 적 있니?
 
-> ***(Function) Scope Manager***: Nope, never heard of it. Try the next outer scope.
+> ***(전역) 스코프 매니저***: 응, 이 스코프에서 공식적으로 선언됐어. 여기 있어.
 
-> ***Engine***: Hey, *Scope Manager* (for the global scope), I have a *source* reference for `students`, ever heard of it?
+> ***엔진***: 좋아, `getStudentName`의 값은 함수야. 이걸 실행할꺼야.
 
-> ***(Global) Scope Manager***: Yep, it was formally declared, here it is.
+> ***엔진***: 안녕, *스코프 매니저*야. 지금 우리는 이 함수의 스코프를 실체화할 필요가 있어.
 
 > ...
 
-One of the key aspects of lexical scope is that any time an identifier reference cannot be found in the current scope, the next outer scope in the nesting is consulted; that process is repeated until an answer is found or there are no more scopes to consult.
+이 대화는 다른 질의 응답 교환으로, *엔진*이 먼저 *스코프 매니저*에게 호이스트된<sub>hoisted</sub>`getStudentName` 식별자를 찾고 함수를 연관시키기 위해 묻는다. 그 다음에 *엔진*은 *스코프 매니저*에게 `students`에 대한 *타깃* 참조 등을 묻기 위해 나아간다.
 
-### Lookup Failures
+`var students = [ .. ]`같은 구문이 처리되는 방식을 다음 두 가지 단계로 복습하고 요약한다:
 
-When *Engine* exhausts all *lexically available* scopes (moving outward) and still cannot resolve the lookup of an identifier, an error condition then exists. However, depending on the mode of the program (strict-mode or not) and the role of the variable (i.e., *target* vs. *source*; see Chapter 1), this error condition will be handled differently.
+1. *컴파일러*는 (현재 스코프에서 이전에 선언된 적이 없다면) 스코프 변수의 선언을 설정한다.
 
-#### Undefined Mess
+2. *엔진*은 실행하는 동안, 구문의 할당 부분을 처리하고, *스코프 매니저*에게 변수 찾는 것을 요청하고, `undefined`로 초기화하여 사용할 준비를 한다. 그리고 배열 값을 할당한다.
 
-If the variable is a *source*, an unresolved identifier lookup is considered an undeclared (unknown, missing) variable, which always results in a `ReferenceError` being thrown. Also, if the variable is a *target*, and the code at that moment is running in strict-mode, the variable is considered undeclared and similarly throws a `ReferenceError`.
+## 중첩 스코프
 
-The error message for an undeclared variable condition, in most JS environments, will look like, "Reference Error: XYZ is not defined." The phrase "not defined" seems almost identical to the word "undefined," as far as the English language goes. But these two are very different in JS, and this error message unfortunately creates a persistent confusion.
+`getStudentName()` 함수를 실행할 때가 되면, *엔진*은 이 함수 스코프에 대한 *스코프 매니저* 인스턴스를 요청하고, 그런 다음 매개변수(`studentID`)를 조회해서 인수값 `73`을 할당하고 기타 등등의 일을 진행할 것이다.
 
-"Not defined" really means "not declared"—or, rather, "undeclared," as in a variable that has no matching formal declaration in any *lexically available* scope. By contrast, "undefined" really means a variable was found (declared), but the variable otherwise has no other value in it at the moment, so it defaults to the `undefined` value.
+`getStudentName(..)`에 대한 함수 스코프는 전역 스코프 안에 중첩되어 있다. `for` 반복문에 대한 블록 스코프는 비슷하게 함수 스코프 안에 중첩되어 있다. 스코프는 프로그램이 정의하는 대로 어떤 임의의 깊이에도 어휘적으로<sub>lexically</sub> 중첩될 수 있다.
 
-To perpetuate the confusion even further, JS's `typeof` operator returns the string `"undefined"` for variable references in either state:
+각 스코프는 실행될 때 마다(한 번 이상) 자신만의 *스코프 매니저* 인스턴스를 가진다. 각 스코프는 실행되고 있는 스코프의 시작 지점에서 등록된 모든 식별자를 자동으로 가진다("변수 호이스팅"이라고 한다. 5장 참고).
+
+스코프의 시작 지점에서, 만약 어떤 식별자가 `함수` 선언에서 왔다면, 해당 변수는 연관된 함수 참조로 자동으로 초기화된다. 그리고 어떤 식별자가 `var` 선언(`let`/`const`가 아니라)에서 왔다면 해당 변수는 사용될 수 있도록 `undefined`로 자동으로 초기화된다. 그렇지 않으면, 해당 변수는 초기화되지 않은 상태("TDZ"로 알려진, 5장 참고)로 남겨지고 완전한 선언과 초기화가 실행될 때까지 사용될 수 없다.
+
+`for (let student of students) {` 구문에서 `students`는 조회되어야만 하는 *소스* 참조이다. 하지만 함수의 스코프는 이런 식별자를 못찾을 텐데, 룩업은 어떻게 처리될 것인가?
+
+설명하기 위해 다음과 같은 짧은 대화가 진행된다고 가정해보자:
+
+> ***엔진***: 안녕, (함수를 위한) *스코프 매니저*야. 나는 `students`에 대한 *소스* 참조를 가지고 있어. 들어본 적 있니?
+
+> ***(함수) 스코프 매니저***: 아니, 전혀 들어본 적 없어. 바로 바깥의 스코프를 살펴보자.
+
+> ***엔진***: 안녕, (전역 스코프를 위한) *스코프 매니저*야. 나는 `students`에 대한 *소스* 참조를 가지고 있어. 들어본 적 있니?
+
+> ***(전역) 스코프 매니저***: 응, 정식 선언되어 있어. 여기 있어.
+
+> ...
+
+렉시컬 스코프의 주요 측면 중 하나는 식별자 참조를 현재 스코프에서 찾을 수 없을 때마다, 중첩하고 있는 바로 바깥의 스코프가 참고된다. 이 과정은 답을 찾거나 참고할 스코프가 더 이상 없을 때까지 반복된다.
+
+### 룩업 실패
+
+*엔진*이 *어휘적으로 사용 가능한* 스코프를 (바깥으로 이동하면서) 모두 소진했고 여전히 식별자 룩업을 해결할 수 없을 때, 에러 상태가 발생한다. 그러나 프로그램의 모드(엄격 모드인지 아닌지)와 변수의 역할(예: *타깃*과 *소스*, 1장 참고)에 따라, 이 에러 상태는 다르게 처리 될 것이다.
+
+#### 엉망진창인 Undefined
+
+만약 변수가 *소스*라면 해결되지 않은 식별자 룩업은 선언되지 않은(알 수 없는, 누락된) 변수로 간주되는데, 항상 `ReferenceError`가 발생한다. 또한 변수가 *타깃*이고 그 순간에 코드가 엄격 모드로 실행 중이라면 변수는 선언되지 않은 것으로 간주되고 마찬가지로 `ReferenceError`가 발생한다.
+
+선언되지 않은 변수 상태에 대한 에러 메시지는 대부분의 JS 환경에서 "Reference Error: XYZ is not defined."로 표시될 것이다. "not defined"라는 표현은 영어에 관한 한 "undefined"라는 단어와 거의 똑같은 것으로 보인다. 하지만 JS에서 이 두 가지는 전혀 다르고, 이 에러 메시지는 안타깝게도 지속적인 혼란을 야기한다.
+
+"Not defined"는 실제로 *어휘적으로 사용 가능한* 스코프에서 일치하는 정식 선언이 없는 변수로서 "선언되지 않음"이거나 더 정확히 말하면 "비선언"을 의미한다. 반면에 "undefined"는 실제로 변수가 발견(선언)된 것을 의미하지만, 그 순간에 달리 다른 값이 없는 변수이고, `undefined`가 기본값이다.
+
+혼란을 더욱 더 지속시키는 것은, JS의 `typeof` 연산자는 다음 각각의 상태에서 변수 참조에 대해 문자열 `"undefined"`를 반환한다는 것이다:
 
 ```js
 var studentName;
@@ -257,64 +257,64 @@ typeof studentName;     // "undefined"
 typeof doesntExist;     // "undefined"
 ```
 
-These two variable references are in very different conditions, but JS sure does muddy the waters. The terminology mess is confusing and terribly unfortunate. Unfortunately, JS developers just have to pay close attention to not mix up *which kind* of "undefined" they're dealing with!
+두 변수 참조는 매우 다른 상황에 있지만 JS는 확실히 물을 흐리고 있다. 엉망진창인 용어는 혼란스럽고 끔찍하게 유감스럽다. 유감스럽게도 JS 개발자들은 다루고 있는 "undefined"가 *어떤 종류인지* 혼동하지 않도록 정확히 주의를 기울여야 한다.
 
-#### Global... What!?
+#### 전역... 뭐라고!?
 
-If the variable is a *target* and strict-mode is not in effect, a confusing and surprising legacy behavior kicks in. The troublesome outcome is that the global scope's *Scope Manager* will just create an **accidental global variable** to fulfill that target assignment!
+만약 변수가 *타깃*이고 엄격 모드가 적용되지 않는다면, 혼란스럽고 놀라운 레거시 동작이 시작된다. 골칫거리인 결과는 전역 스코프의 *스코프 매니저*가 타깃 할당을 수행하기 위해 **우발적인 전역 변수**를 그냥 생성할 것이라는 것이다.
 
-Consider:
+아래를 자세히 보자:
 
 ```js
 function getStudentName() {
-    // assignment to an undeclared variable :(
+    // 선언되지 않은 변수에 할당 :(
     nextStudent = "Suzy";
 }
 
 getStudentName();
 
 console.log(nextStudent);
-// "Suzy" -- oops, an accidental-global variable!
+// "Suzy" -- 이런, 우발적인 전역 변수다!
 ```
 
-Here's how that *conversation* will proceed:
+*대화*가 진행될 방식은 다음과 같다:
 
-> ***Engine***: Hey, *Scope Manager* (for the function), I have a *target* reference for `nextStudent`, ever heard of it?
+> ***엔진***: 안녕, (함수를 위한) *스코프 매니저*야. 나는 `nextStudent`에 대한 *타깃* 참조를 가지고 있어. 들어본 적 있니?
 
-> ***(Function) Scope Manager***: Nope, never heard of it. Try the next outer scope.
+> ***(함수) 스코프 매니저***: 아니, 전혀 들어본 적 없어. 바로 바깥의 스코프를 살펴보자.
 
-> ***Engine***: Hey, *Scope Manager* (for the global scope), I have a *target* reference for `nextStudent`, ever heard of it?
+> ***엔진***: 안녕, (전역 스코프를 위한) *스코프 매니저*야. 나는 `nextStudent`에 대한 *타깃* 참조를 가지고 있어. 들어본 적 있니?
 
-> ***(Global) Scope Manager***: Nope, but since we're in non-strict-mode, I helped you out and just created a global variable for you, here it is!
+> ***(전역) 스코프 매니저***: 아니, 하지만 비엄격 모드에 있기 때문에 너를 도와줬고 지금 막 전역 변수를 생성했어. 여기 있어!
 
-Yuck.
+우웩.
 
-This sort of accident (almost certain to lead to bugs eventually) is a great example of the beneficial protections offered by strict-mode, and why it's such a bad idea *not* to be using strict-mode. In strict-mode, the ***Global Scope Manager*** would instead have responded:
+이런 류의 사고(결국 버그로 이어질 것이 거의 확실한)는 엄격 모드에 의해 제공되는 이로운 보호 기능의 아주 좋은 예이고, 엄격 모드를 사용하지 *않는* 것이 얼마나 나쁜 생각인지 보여주는 이유이다. 엄격 모드에서 ***전역 스코프 매니저***는 다음과 같이 응답한다:
 
-> ***(Global) Scope Manager***: Nope, never heard of it. Sorry, I've got to throw a `ReferenceError`.
+> ***(전역) 스코프 매니저***: 아니, 전혀 들어본 적 없어. 미안해, `ReferenceError`를 던져야해.
 
-Assigning to a never-declared variable *is* an error, so it's right that we would receive a `ReferenceError` here.
+한번도 선언되지 않은 변수에 할당하는 것은 *에러다*. 그래서 여기서 `ReferenceError`를 받는 것이 옳다.
 
-Never rely on accidental global variables. Always use strict-mode, and always formally declare your variables. You'll then get a helpful `ReferenceError` if you ever mistakenly try to assign to a not-declared variable.
+우발적인 전역 변수에 의존하지 말아라. 항상 엄격 모드를 사용하고, 항상 정식으로 변수를 선언해라. 실수로 선언되지 않은 변수에 할당하려는 시도를 한다면 도움이 되는 `ReferenceError`를 얻을 것이다.
 
-### Building On Metaphors
+### 빌딩으로 비유하기
 
-To visualize nested scope resolution, I prefer yet another metaphor, an office building, as in Figure 3:
+중첩된 스코프 해상도를 시각화하기 위해서, 그림 3과 같은 또 다른 비유인 회사 빌딩을 선호한다:
 
 <figure>
-    <img src="images/fig3.png" width="250" alt="Scope &quot;Building&quot;" align="center">
-    <figcaption><em>Fig. 3: Scope "Building"</em></figcaption>
+    <img src="images/fig3.png" width="250" alt="스코프 &quot;빌딩&quot;" align="center">
+    <figcaption><em>그림 3: 스코프 "빌딩"</em></figcaption>
     <br><br>
 </figure>
 
-The building represents our program's nested scope collection. The first floor of the building represents the currently executing scope. The top level of the building is the global scope.
+이 빌딩은 우리 프로그램의 중첩된 스코프 더미를 나타낸다. 빌딩의 1층은 현재 실행 중인 스코프를 나타낸다. 빌딩의 최상층은 전역 스코프이다.
 
-You resolve a *target* or *source* variable reference by first looking on the current floor, and if you don't find it, taking the elevator to the next floor (i.e., an outer scope), looking there, then the next, and so on. Once you get to the top floor (the global scope), you either find what you're looking for, or you don't. But you have to stop regardless.
+먼저 현재 층에서 보는 것으로 *타깃*이나 *소스* 변수 참조를 해결한다. 그리고 찾을 수 없다면, 다음 층(예: 바깥 스코프)으로 가기 위해 엘리베이터 타기, 거기서 보기, 그리고 나서 다음 층, 등등. 최상층(전역 스코프)에 도달하면, 찾던지 못찾던지 둘 중 하나다. 하지만 상관없이 멈춰야만 한다.
 
-## Continue the Conversation
+## 대화 계속하기
 
-By this point, you should be developing richer mental models for what scope is and how the JS engine determines and uses it from your code.
+이 시점에서, 스코프가 무엇이고 JS 엔진이 코드를 결정하고 사용하는 방법에 대한 더 풍부한 멘탈 모델을 개발해야 한다.
 
-Before *continuing*, go find some code in one of your projects and run through these conversations. Seriously, actually speak out loud. Find a friend and practice each role with them. If either of you find yourself confused or tripped up, spend more time reviewing this material.
+"계속하기" 전에, 당신의 프로젝트 중 하나에서 코드를 찾고 이런 대화를 진행해라. 진지하게, 정말로 큰소리로 말해라. 친구를 찾아서 그들과 함께 각 역할을 연습해라. 둘 중 누구라도 혼란스럽거나 잘못된 것을 발견한다면, 이 자료를 복습하는 것에 더 시간을 써라.
 
-As we move (up) to the next (outer) chapter, we'll explore how the lexical scopes of a program are connected in a chain.
+바로 다음(바깥의) 장으로 넘어(위로)가서는, 프로그램의 렉시컬 스코프가 체인으로 연결되는 방법을 알아볼 것이다.
