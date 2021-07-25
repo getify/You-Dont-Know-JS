@@ -2,7 +2,7 @@
 
 Specifically quoting these guidelines regarding typos:
 
-> Typos?
+> Typos? 
 >
 > Please don't worry about minor text typos. These will almost certainly be caught during the editing process.
 >
