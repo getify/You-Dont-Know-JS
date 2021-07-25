@@ -25,3 +25,4 @@ To summarize, the steps for a foreign language translation are:
 3. File an issue asking for a branch to be made on our main repo, named for that [language's ISO code](http://www.lingoes.net/en/translator/langcode.htm)
 4. Once the branch is created, you can PR to merge your translated work in
 5. Once the merge is complete, I will promote you to a repository maintainer so you can manage any further translation maintenance work on your own branch of this repo
+ 
