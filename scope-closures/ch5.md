@@ -1,17 +1,17 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 5: The (Not So) Secret Lifecycle of Variables
+# 5장: 변수의 비밀 라이프사이클
 
-By now you should have a decent grasp of the nesting of scopes, from the global scope downward—called a program's scope chain.
+이제 여러분은 전역 스코프에서 하위의 프로그램의 스코프를 호출하는 스코프들의 중첩에 대해 이제 어느정도 이해하고 있을 것이다.
 
-But just knowing which scope a variable comes from is only part of the story. If a variable declaration appears past the first statement of a scope, how will any references to that identifier *before* the declaration behave? What happens if you try to declare the same variable twice in a scope?
+그러나 변수가 어떤 스코프로부터 오는지에 대해서는 잘 모를 것이다. 만약 변수 선언이 스코프 첫 번째 문<sub>statement</sub> 이후에 선언되었다면, 선언 전에 해당 식별자에 대한 참조는 어떻게 동작할까? 만약 동일한 변수를 스코프안에 두 번 선언한 경우는?
 
-JS's particular flavor of lexical scope is rich with nuance in how and when variables come into existence and become available to the program.
+JS의 렉시컬 스코프에 대한 특별한 특징은 어떻게 그리고 언제 변수가 프로그램에 존재하게 되고 사용가능한지에 대한 다양한 뉘앙스를 가진다.
 
-## When Can I Use a Variable?
+## 언제 변수를 사용할 수 있을까?
 
-At what point does a variable become available to use within its scope? There may seem to be an obvious answer: *after* the variable has been declared/created. Right? Not quite.
+변수는 언제 그것의 스코프 내에서 사용할 수 있게 될까? 명백한 답이 있는 것 같기도 하다: 변수가 *선언/작성된 후* 말이다. 그럴까? 하지만 이것은 충분한 답변이 아니다.
 
-Consider:
+다음 코드를 살펴보자:
 
 ```js
 greeting();
@@ -22,25 +22,25 @@ function greeting() {
 }
 ```
 
-This code works fine. You may have seen or even written code like it before. But did you ever wonder how or why it works? Specifically, why can you access the identifier `greeting` from line 1 (to retrieve and execute a function reference), even though the `greeting()` function declaration doesn't occur until line 4?
+이 코드는 잘 작동한다. 전에도 이런 코드를 보거나 작성해 본 적이 있을 것이다. 하지만 그게 어떻게, 왜 작동하는지 궁금해 한 적 있는가? 구체적으로, 4행까지는 `greeting` 함수 선언이 일어나지 않는데 왜 1행(함수 참조 검색 및 실행)에서 `greeting` 식별자에 접근할 수 있는가?
 
-Recall Chapter 1 points out that all identifiers are registered to their respective scopes during compile time. Moreover, every identifier is *created* at the beginning of the scope it belongs to, **every time that scope is entered**.
+1장에서 설명했듯이 컴파일 시간 동안 모든 식별자가 해당 스코프에 등록된다. 또한 모든 식별자는 **자신이 속한 스코프가 시작 될때마다** 해당 스코프의 시작 부분에 *만들어진다*.
 
-The term most commonly used for a variable being visible from the beginning of its enclosing scope, even though its declaration may appear further down in the scope, is called **hoisting**.
+변수 선언이 스코프 내에서 더 아래쪽으로 나타나더라도 변수를 해당 스코프의 처음부터 볼 수 있는 경우를 주로 **호이스팅<sub>hoisting</sub>**라고 명칭한다.
 
-But hoisting alone doesn't fully answer the question. We can see an identifier called `greeting` from the beginning of the scope, but why can we **call** the `greeting()` function before it's been declared?
+하지만 호이스팅만으로는 질문에 충분한 답이 되지 않는다. 우리는 스코프 처음부터 `greeting`이라는 식별자를 볼 수 있는데, 왜 우리는 `greeting` 함수가 선언되기 전에 `greeting`' 함수 **호출**를할 수 있을까?
 
-In other words, how does the variable `greeting` have any value (the function reference) assigned to it, from the moment the scope starts running? The answer is a special characteristic of formal `function` declarations, called *function hoisting*. When a `function` declaration's name identifier is registered at the top of its scope, it's additionally auto-initialized to that function's reference. That's why the function can be called throughout the entire scope!
+다시 말해, 스코프가 실행되기 시작하는 순간부터, 어떻게 변수 `greeting`는 어떤 값(함수 참조)을 가지게 될까? 정답은 *함수 호이스팅*이라는 공식`function` 선언의 특성 때문이다. `function` 선언의 이름 식별자가 해당 스코프의 맨 위에 등록되면 해당 함수 참조값으로 자동 초기화된다. 그렇기 때문에 함수를 전체 스코프에서 호출할 수 있다!
 
-One key detail is that both *function hoisting* and `var`-flavored *variable hoisting* attach their name identifiers to the nearest enclosing **function scope** (or, if none, the global scope), not a block scope.
+한 가지 중요한 세부 사항은 *함수 호이스팅*과 `var` 가 취하는 *변수 호이스팅* 모두 이름 식별자를 블록 스코프가 아닌 가장 가까운 **함수 스코프**(이것이 없는 경우는 전역 스코프)에 등록한다는 것이다.
 
-| NOTE: |
+| 비고: |
 | :--- |
-| Declarations with `let` and `const` still hoist (see the TDZ discussion later in this chapter). But these two declaration forms attach to their enclosing block rather than just an enclosing function as with `var` and `function` declarations. See "Scoping with Blocks" in Chapter 6 for more information. |
+| `let`과 `const`가 포함된 선언문은 여전히 호이스팅(이 장 뒷부분의 TDZ 설명 참조)을 수행한다. 그러나 이 두 가지 선언 양식은 단순히 `var`와 `function` 선언처럼 이를 감싸는 함수가 아닌 감싸는 블록에 등록한다. 자세한 내용은 6장의 "블록으로 스코프 지정"을 참조해라. |
 
-### Hoisting: Declaration vs. Expression
+### 호이스팅: 선언 vs. 표현식
 
-*Function hoisting* only applies to formal `function` declarations (specifically those which appear outside of blocks—see "FiB" in Chapter 6), not to `function` expression assignments. Consider:
+*함수 호이스팅*은 공식 `function` 선언(특히 함수 선언이 있는 블록 (6장 "FiB" 참고) 외부에 나타나는)에만 적용되며, `function` 표현식 할당에는 적용되지 않는다. 다음 코드를 살펴보자:
 
 ```js
 greeting();
@@ -51,23 +51,23 @@ var greeting = function greeting() {
 };
 ```
 
-Line 1 (`greeting();`) throws an error. But the *kind* of error thrown is very important to notice. A `TypeError` means we're trying to do something with a value that is not allowed. Depending on your JS environment, the error message would say something like, "'undefined' is not a function," or more helpfully, "'greeting' is not a function."
+1행(`greeting();`)은 오류를 발생시킨다. 그러나 발생한 오류의 *종류*는 매우 중요하다. `TypeError`는 허용되지 않는 값을 사용하여 작업을 시도하고 있음을 의미한다. JS 환경에 따라 "'undefined'는 함수가 아니다" 또는 더욱 자세히 "'greeting'"는 함수가 아니다."와 같은 오류 메시지가 표시된다.
 
-Notice that the error is **not** a `ReferenceError`. JS isn't telling us that it couldn't find `greeting` as an identifier in the scope. It's telling us that `greeting` was found but doesn't hold a function reference at that moment. Only functions can be invoked, so attempting to invoke some non-function value results in an error.
+위의 오류는  `ReferenceError`가 *아니다*. JS는 스코프에서 식별자로서의 `greeting`을 찾지 못했다고 말하지 않고 있다. `greeting`이 발견됐지만 그 시점에 함수 참조가 없다는 얘기다. 함수만 호출할 수 있으므로 일부 비함수 값을 호출하려고 하면 오류가 발생한다.
 
-But what does `greeting` hold, if not the function reference?
+함수 참조가 아니라면, `greeting`이 가진 값은 무엇일까?
 
-In addition to being hoisted, variables declared with `var` are also automatically initialized to `undefined` at the beginning of their scope—again, the nearest enclosing function, or the global. Once initialized, they're available to be used (assigned to, retrieved from, etc.) throughout the whole scope.
+호이스팅 외에도, `var`로 선언된 변수도 스코프,가장 가까운 감싸는 함수 또는 전역의 시작에서 자동으로 `undefined`으로 초기화된다. 초기화되면 전체 스코프에서 사용할 수 있다(할당, 검색 등).
 
-So on that first line, `greeting` exists, but it holds only the default `undefined` value. It's not until line 4 that `greeting` gets assigned the function reference.
+즉 첫 번째 줄에 `greeting`이 존재하지만, 이것은 기본 '`undefined` 값만 가지고 있다. 4행에서야 `greeting`'이 기능 참조를 할당받는다.
 
-Pay close attention to the distinction here. A `function` declaration is hoisted **and initialized to its function value** (again, called *function hoisting*). A `var` variable is also hoisted, and then auto-initialized to `undefined`. Any subsequent `function` expression assignments to that variable don't happen until that assignment is processed during runtime execution.
+여기에서 구별에 주의하라. `function` 선언은 호이스팅되고 **해당 함수 값으로 초기화**된다(*함수 호이스팅*이라고 함). 'var' 변수도 호이스팅된 다음 `undefined`으로 자동 초기화된다. 런타임 실행 중에 할당이 처리되기 전에는 해당 변수에 대한 후속 `function` 식 할당이 수행되지 않는다.
 
-In both cases, the name of the identifier is hoisted. But the function reference association isn't handled at initialization time (beginning of the scope) unless the identifier was created in a formal `function` declaration.
+두 경우 모두 식별자의 이름이 호이스탕된다. 그러나 식별자가 공식 `function` 선언에서 생성되지 않는 한 함수 참조 연결은 초기화 시(스코프 시작) 처리되지 않는다.
 
-### Variable Hoisting
+### 변수 호이스팅
 
-Let's look at another example of *variable hoisting*:
+*변수 호이스팅*의 다른 예를 살펴보자.
 
 ```js
 greeting = "Hello!";
@@ -77,22 +77,22 @@ console.log(greeting);
 var greeting = "Howdy!";
 ```
 
-Though `greeting` isn't declared until line 5, it's available to be assigned to as early as line 1. Why?
+5행까지는 `greeting`이 선언되지 않지만, 1행에서 할당이 가능하다. 그 이유는 무엇일까?
 
-There's two necessary parts to the explanation:
+설명에는 두 가지 필요한 부분이 있다.
 
-* the identifier is hoisted,
-* **and** it's automatically initialized to the value `undefined` from the top of the scope.
+* 식별자가 호이스트 되었다.
+* ** 그리고 ** 식별자는 스코프의 최상단에서 `undefined`으로 초기화되었다.
 
-| NOTE: |
+| 비고: |
 | :--- |
-| Using *variable hoisting* of this sort probably feels unnatural, and many readers might rightly want to avoid relying on it in their programs. But should all hoisting (including *function hoisting*) be avoided? We'll explore these different perspectives on hoisting in more detail in Appendix A. |
+| 이러한 종류의 *변수 호이스팅*을 사용하는 것은 아마도 부자연스럽게 느껴질 것이고, 여러분들은 당연히 당신의 프로그램에서 그것에 의존하는 것을 피하고 싶어할 것이다. 그러나 모든 호이스팅(*함수 호이스팅* 포함)을 피해야 할까? 우리는 호이스팅에 대한 이러한 다양한 관점에 대해 부록 A에서 자세히 살펴볼 것이다. |
 
-## Hoisting: Yet Another Metaphor
+## 호이스팅: 또다른 비유
 
-Chapter 2 was full of metaphors (to illustrate scope), but here we are faced with yet another: hoisting itself. Rather than hoisting being a concrete execution step the JS engine performs, it's more useful to think of hoisting as a visualization of various actions JS takes in setting up the program **before execution**.
+제2장은 비유들로 가득 차 있었지만(스코프를 설명하기 위해서), 여기서 우리는 또 다른 비유에 마주하게 되었다: 호이스팅 그 자체말이다. 호이스팅은 JS 엔진이 수행하는 구체적인 실행 단계이기보다는 프로그램 **실행 전**을 설정하기 위해 JS가 수행하는 다양한 작업의 시각화라고 생각하면 더 유용할 것이다.
 
-The typical assertion of what hoisting means: *lifting*—like lifting a heavy weight upward—any identifiers all the way to the top of a scope. The explanation often asserted is that the JS engine will actually *rewrite* that program before execution, so that it looks more like this:
+호이스팅의 의미에 대한 일반적인 주장: 식별자를 *리프팅*(무거운 중량을 위로 들어올리는 것) 하여 스코프의 맨 위까지 올린다. 종종 JS 엔진이 실행 전에 해당 프로그램을 실제로 *재작성*하므로 다음과 더 비슷해 보인다는 주장이 제기되기도 한다.
 
 ```js
 var greeting;           // hoisted declaration
@@ -101,7 +101,7 @@ console.log(greeting);  // Hello!
 greeting = "Howdy!";    // `var` is gone!
 ```
 
-The hoisting (metaphor) proposes that JS pre-processes the original program and re-arranges it a bit, so that all the declarations have been moved to the top of their respective scopes, before execution. Moreover, the hoisting metaphor asserts that `function` declarations are, in their entirety, hoisted to the top of each scope. Consider:
+호이스팅 비유법은 실행 전에 모든 선언이 각각의 스코프의 맨 위로 이동되도록 원래 프로그램을 사전 처리하고 약간 다시 정렬할 것을 제안한다. 게다가, `function` 선언 전체가 각 스코프의 최상위에 올려져 있다고 호스팅 비유는 주장한다. 다음을 살펴보자:
 
 ```js
 studentName = "Suzy";
@@ -114,7 +114,7 @@ function greeting() {
 var studentName;
 ```
 
-The "rule" of the hoisting metaphor is that function declarations are hoisted first, then variables are hoisted immediately after all the functions. Thus, the hoisting story suggests that program is *re-arranged* by the JS engine to look like this:
+호이스팅 비유법의 "규칙"은 함수 선언을 먼저 올린 다음 변수를 모든 함수 뒤에 바로 올리는 것이다. 따라서, 호이스팅 사례는 다음과 같이 보이는 JS 엔진에 의해 프로그램이 *재편성*되었음을 시사한다.
 
 ```js
 function greeting() {
@@ -127,27 +127,27 @@ greeting();
 // Hello Suzy!
 ```
 
-This hoisting metaphor is convenient. Its benefit is allowing us to hand wave over the magical look-ahead pre-processing necessary to find all these declarations buried deep in scopes and somehow move (hoist) them to the top; we can just think about the program as if it's executed by the JS engine in a **single pass**, top-down.
+이 호이스팅 비유법은 편리하다. 그 이점은 스코프 깊숙이 파묻혀 있는 모든 선언을 찾아 어떻게든 상단으로 이동(호이스트)하는 데 필요한 전 처리를 마법처럼 미리 보게 해준다. 프로그램을 **단일 패스**, 하향식으로 실행하는 것처럼 생각하면 된다.
 
-Single-pass definitely seems more straightforward than Chapter 1's assertion of a two-phase processing.
+1장의 2단계 처리 방식 보다 단일 패스가 더 간단해 보인다.
 
-Hoisting as a mechanism for re-ordering code may be an attractive simplification, but it's not accurate. The JS engine doesn't actually re-arrange the code. It can't magically look ahead and find declarations; the only way to accurately find them, as well as all the scope boundaries in the program, would be to fully parse the code.
+코드 순서 재조정 메커니즘으로 호이스팅하는 것이 간단하다는 점에서 매력적일 수는 있지만 정확하지는 않을 수 있다. JS 엔진은 실제로 코드를 다시 정렬하지 않는다. 마술적으로 선언을 미리 보고 찾을 수는 없다. 코드를 파싱하는 것이 선언을 정확히 찾는 유일한 방법이다.
 
-Guess what parsing is? The first phase of the two-phase processing! There's no magical mental gymnastics that gets around that fact.
+파싱이 뭔지 아는가? 2단계 처리의 첫 번째 단계! 그 사실을 피할 수 있는 마법의 멘탈 체조는 없다.
 
-So if the hoisting metaphor is (at best) inaccurate, what should we do with the term? I think it's still useful—indeed, even members of TC39 regularly use it!—but I don't think we should claim it's an actual re-arrangement of source code.
+그렇다면 만약 호이스트 비유법이 (기껏해야) 부정확하다면, 우리는 이 용어를 어떻게 해야 할까? 나는 그것이 여전히 유용하다고 생각한다. 실제로 TC39의 회원들도 정기적으로 사용하고 있다!—하지만 소스 코드를 실제로 다시 배열한 것이라고 주장할 필요는 없다고 생각한다.
 
-| WARNING: |
+| 주의: |
 | :--- |
-| Incorrect or incomplete mental models often still seem sufficient because they can occasionally lead to accidental right answers. But in the long run it's harder to accurately analyze and predict outcomes if your thinking isn't particularly aligned with how the JS engine works. |
+| 부정확하거나 불완전한 멘탈 모델은 종종 우연한 정답으로 이어질 수 있기 때문에 충분해 보일 수도 있다. 그러나 장기적으로는 여러분의 생각이 JS 엔진의 작동 방식과 특별히 일치하지 않을 경우 결과를 정확하게 분석하고 예측하는 것이 더 어렵다. |
 
-I assert that hoisting *should* be used to refer to the **compile-time operation** of generating runtime instructions for the automatic registration of a variable at the beginning of its scope, each time that scope is entered.
+나는 호이스팅을 **꼭** 사용하여 해당 스코프가 시작될 때마다 해당 스코프 시작 시 변수의 자동 등록을 위한 런타임 명령을 생성하는 **컴파일 시간 작업**을(를) 나타내야 한다고 주장한다.
 
-That's a subtle but important shift, from hoisting as a runtime behavior to its proper place among compile-time tasks.
+이는 런타임 동작으로서의 호이스팅에서 컴파일 시간 작업 사이의 적절한 위치로 미묘하지만 중요한 전환이다.
 
-## Re-declaration?
+## 재선언?
 
-What do you think happens when a variable is declared more than once in the same scope? Consider:
+변수가 동일한 스코프에서 두 번 이상 선언되면 어떻게 된다고 생각하는가? 다음을 살펴보자:
 
 ```js
 var studentName = "Frank";
@@ -158,11 +158,11 @@ var studentName;
 console.log(studentName);   // ???
 ```
 
-What do you expect to be printed for that second message? Many believe the second `var studentName` has re-declared the variable (and thus "reset" it), so they expect `undefined` to be printed.
+두 번째 메시지는 무엇을 출력할까? 대부분은 두 번째 `var studentName`이 변수를 다시 선언(따라서 '재설정')했다고 생각하기 때문에 `undefined`이 출력될 것으로 예상할 것이다.
 
-But is there such a thing as a variable being "re-declared" in the same scope? No.
+하지만 변수가 같은 스코프에서 "재선언"될 수 있을까? 아니다.
 
-If you consider this program from the perspective of the hoisting metaphor, the code would be re-arranged like this for execution purposes:
+호이스팅 비유법 관점에서 이 프로그램을 고려할 경우, 코드는 실행 목적으로 다음과 같이 다시 배열된다.
 
 ```js
 var studentName;
@@ -176,29 +176,29 @@ console.log(studentName);
 // Frank
 ```
 
-Since hoisting is actually about registering a variable at the beginning of a scope, there's nothing to be done in the middle of the scope where the original program actually had the second `var studentName` statement. It's just a no-op(eration), a pointless statement.
+실제로 호이스팅은 스코프의 시작 부분에 변수를 등록하는 것이기 때문에, 재배열 되기 전의 프로그램에서 두 번째 'var studentname' 문구를 가지고 있던 스코프 중간에 수행할 수 있는 작업이 없다. 그것은 어떠한 동작도 하지않으며 무의미한 진술일 뿐이다.
 
 | TIP: |
 | :--- |
-| In the style of the conversation narrative from Chapter 2, *Compiler* would find the second `var` declaration statement and ask the *Scope Manager* if it had already seen a `studentName` identifier; since it had, there wouldn't be anything else to do. |
+| 2장의 대화 서술 방식으로 설명하자면, *컴파일러*는 두 번째 `var` 선언문을 찾아 *스코프 매니저*에게 `studentName` 식별자를 이미 보았는지 물어본다; 스코프 매니저는 이를 보았기 때문에 더이상 할 것은 없다. |
 
-It's also important to point out that `var studentName;` doesn't mean `var studentName = undefined;`, as most assume. Let's prove they're different by considering this variation of the program:
+대부분이 생각하는 것처럼 `var studentName;`이  `var studentName = undefined`을 의미하는 것은 아니라는 점도 중요하다. 프로그램의 변형을 통해 이 둘이 다르다는 것을 증명해 보자.
 
 ```js
 var studentName = "Frank";
 console.log(studentName);   // Frank
 
 var studentName;
-console.log(studentName);   // Frank <--- still!
+console.log(studentName);   // Frank <--- 여전히!
 
-// let's add the initialization explicitly
+// 좀 더 명확하게 하기 위해 초기화를 추가해보자
 var studentName = undefined;
-console.log(studentName);   // undefined <--- see!?
+console.log(studentName);   // undefined <--- 보았는가!?
 ```
 
-See how the explicit `= undefined` initialization produces a different outcome than assuming it happens implicitly when omitted? In the next section, we'll revisit this topic of initialization of variables from their declarations.
+명시적으로 `= undefined` 초기화한 것과 이것이 암묵적으로 생략되었을 때는 어떻게 다른 결과를 낳을까? 다음 섹션에서는 선언에서의 변수 초기화 주제를 다시 살펴보자.
 
-A repeated `var` declaration of the same identifier name in a scope is effectively a do-nothing operation. Here's another illustration, this time across a function of the same name:
+스코프에서 동일한 식별자 이름을 반복적으로 'var' 선언하는 것은 사실상 아무것도 하지 않는 작업이다. 다음은 같은 이름의 함수가 반복될 때에 대한 설명이다.
 
 ```js
 var greeting;
@@ -207,7 +207,7 @@ function greeting() {
     console.log("Hello!");
 }
 
-// basically, a no-op
+// 기본적으로 아무 일도 하지 않는다.
 var greeting;
 
 typeof greeting;        // "function"
@@ -217,11 +217,11 @@ var greeting = "Hello!";
 typeof greeting;        // "string"
 ```
 
-The first `greeting` declaration registers the identifier to the scope, and because it's a `var` the auto-initialization will be `undefined`. The `function` declaration doesn't need to re-register the identifier, but because of *function hoisting* it overrides the auto-initialization to use the function reference. The second `var greeting` by itself doesn't do anything since `greeting` is already an identifier and *function hoisting* already took precedence for the auto-initialization.
+첫 번째 `greeting` 선언은 식별자를 스코프에 등록하며, `var`이기 때문에 자동 초기화는 `undefined`을 할당한다. `function` 선언은 식별자를 다시 등록할 필요가 없지만 *함수 호이스팅* 때문에 함수 참조를 사용하도록 자동 초기화를 재정한다. 이미 `greeting`이 식별자이고 자동초기화에는 *함수 호이스팅*이 우선이었기 때문에 두 번째 `greeting`만으로는 아무것도 할 수 없다.
 
-Actually assigning `"Hello!"` to `greeting` changes its value from the initial function `greeting()` to the string; `var` itself doesn't have any effect.
+실제로 '`"Hello!"`를 `greeting`에 할당하면 첫 함수인 `greeting()`에서 문자열로 값이 바뀌지만, `var` 자체는 아무런 효과가 없다.
 
-What about repeating a declaration within a scope using `let` or `const`?
+스코프 내에서 `let`이나 `const`를 이용해 선언을 반복하는 것은 어떨까.
 
 ```js
 let studentName = "Frank";
@@ -231,9 +231,9 @@ console.log(studentName);
 let studentName = "Suzy";
 ```
 
-This program will not execute, but instead immediately throw a `SyntaxError`. Depending on your JS environment, the error message will indicate something like: "studentName has already been declared." In other words, this is a case where attempted "re-declaration" is explicitly not allowed!
+이 프로그램은 실행되지 않고 즉시 `SyntaxError`를 발생시킨다. JS 환경에 따라 "studentName이 이미 선언되었습니다."와 같은 오류 메시지가 표시된다. 즉, 시도된 "재선언"이 명시적으로 허용되지 않는 경우이다!
 
-It's not just that two declarations involving `let` will throw this error. If either declaration uses `let`, the other can be either `let` or `var`, and the error will still occur, as illustrated with these two variations:
+단순히 `let`을 포함한 이 두 선언이 이런 오류를 낳는 것은 아니다. 두 선언 중 하나가 `let`을 사용할 경우 다른 선언은 `let` 또는 `var`가 될 수 있으며, 다음 두 변형에서 볼 수 있듯이 오류가 계속 발생한다.
 
 ```js
 var studentName = "Frank";
@@ -241,7 +241,7 @@ var studentName = "Frank";
 let studentName = "Suzy";
 ```
 
-and:
+그리고:
 
 ```js
 let studentName = "Frank";
@@ -249,29 +249,29 @@ let studentName = "Frank";
 var studentName = "Suzy";
 ```
 
-In both cases, a `SyntaxError` is thrown on the *second* declaration. In other words, the only way to "re-declare" a variable is to use `var` for all (two or more) of its declarations.
+두 경우 모두 *두 번째* 선언에 `SyntaxError`가 발생한다. 즉, 변수를 '재선언'하는 유일한 방법은 선언의 전부(2개 이상)에 'var'를 사용하는 것이다.
 
-But why disallow it? The reason for the error is not technical per se, as `var` "re-declaration" has always been allowed; clearly, the same allowance could have been made for `let`.
+그런데 왜 그걸 허용하지 않을까? 오류의 원인은 기술적인 것이 아니라 `var` "재선언"이 항상 허용되어 왔기 때문이다. `let`은 허용되지 않는다.
 
-It's really more of a "social engineering" issue. "Re-declaration" of variables is seen by some, including many on the TC39 body, as a bad habit that can lead to program bugs. So when ES6 introduced `let`, they decided to prevent "re-declaration" with an error.
+이것은 정말로 "사회 공학"에 더 가까운 문제이다. TC39 본문 등 일부에서는 변수 "재선언"이 프로그램 버그로 이어질 수 있는 악습으로 보고 있다. 그래서 ES6는 `let`을 도입할 때 오류로 "재선언"을 막기로 했다.
 
-| NOTE: |
+| 비고: |
 | :--- |
-| This is of course a stylistic opinion, not really a technical argument. Many developers agree with the position, and that's probably in part why TC39 included the error (as well as `let` conforming to `const`). But a reasonable case could have been made that staying consistent with `var`'s precedent was more prudent, and that such opinion-enforcement was best left to opt-in tooling like linters. In Appendix A, we'll explore whether `var` (and its associated behavior, like "re-declaration") can still be useful in modern JS. |
+| 이것은 물론 형식적인 의견이지 기술적인 주장은 아니다. 많은 개발자들이 이 의견에 동의하고 있으며, 그 때문에 TC39이 그것을 오류로 포함한 것이다(`const`와 같이 동작하는 `let`도 마찬가지로). 그러나 일부 경우는 이 전에 사용된`var` 일관성을 유지하는 것이 더 중요했고, 그러한 경우는 린터 같은 도구를 채택하는 것이 최선일 수 있다. 부록 A에서는 `var`(그리고 "재선언"과 같은 관련 동작)이 여전히 현대 JS에서 유용할 수 있는지 여부를 살펴보겠다. |
 
-When *Compiler* asks *Scope Manager* about a declaration, if that identifier has already been declared, and if either/both declarations were made with `let`, an error is thrown. The intended signal to the developer is "Stop relying on sloppy re-declaration!"
+*컴파일러*가 선언에 대해 *스코프 매니저*에게 질문할 때, 해당 식별자가 이미 선언되었는지 여부 및 둘 중 하나가 'let'으로 지정된 경우 오류가 발생합니다. 개발자에게 보내는 신호는 "허술한 재선언에 의존하지 말라!"이다.
 
-### Constants?
+### 상수
 
-The `const` keyword is more constrained than `let`. Like `let`, `const` cannot be repeated with the same identifier in the same scope. But there's actually an overriding technical reason why that sort of "re-declaration" is disallowed, unlike `let` which disallows "re-declaration" mostly for stylistic reasons.
+`const` 키워드는 `let`보다 더 제약이 많다. `let`처럼 같은 스코프의 동일 식별자로 `const`를 반복할 수 없다. 그러나 형식적인 이유로 "재선언"을 허용하지 않는 `let`와는 달리, 그러한 종류의 "재선언"이 허용되지 않는 중요한 기술적 이유가 실제로 있다.
 
-The `const` keyword requires a variable to be initialized, so omitting an assignment from the declaration results in a `SyntaxError`:
+`const` 키워드는 변수를 초기화해야 하므로 선언에서 할당을 생략하면 `SyntaxError`가 발생한다.
 
 ```js
 const empty;   // SyntaxError
 ```
 
-`const` declarations create variables that cannot be re-assigned:
+`const` 선언은 다시 할당할 수 없는 변수를 만든다.
 
 ```js
 const studentName = "Frank";
@@ -281,26 +281,26 @@ console.log(studentName);
 studentName = "Suzy";   // TypeError
 ```
 
-The `studentName` variable cannot be re-assigned because it's declared with a `const`.
+`studentName` 변수는 `const`로 선언되어 있으므로 재할당할 수 없다.
 
-| WARNING: |
+| 주의: |
 | :--- |
-| The error thrown when re-assigning `studentName` is a `TypeError`, not a `SyntaxError`. The subtle distinction here is actually pretty important, but unfortunately far too easy to miss. Syntax errors represent faults in the program that stop it from even starting execution. Type errors represent faults that arise during program execution. In the preceding snippet, `"Frank"` is printed out before we process the re-assignment of `studentName`, which then throws the error. |
+| `studentName`을 재할당할 때 발생하는 오류는 `TypeError`이지 `SyntaxError`가 아니다. 여기서의 미묘한 차이는 사실 꽤 중요하지만 불행하게도 놓치기 너무 쉽다. SyntaxError는 실행조차 시작하지 못하게 하는 프로그램의 결함을 나타낸다. TypeError는 프로그램 실행 중에 발생하는 장애를 나타낸다. 앞의 스니펫에서는 `studentName` 재할당을 진행하기 전에 `"Frank"`가 출력되어 오류가 발생한다. |
 
-So if `const` declarations cannot be re-assigned, and `const` declarations always require assignments, then we have a clear technical reason why `const` must disallow any "re-declarations": any `const` "re-declaration" would also necessarily be a `const` re-assignment, which can't be allowed!
+그러므로 만일 `const` 선언을 재할당할 수 없고 `const` 선언이 항상 할당을 요구할때, `const`가 재선언을 할 수 없는 분명한 기술적 이유가 있다: `const` 재선언은 `const` 재할당을 의미하고 재할당은 허용되지 않기 때문이다.
 
 ```js
 const studentName = "Frank";
 
-// obviously this must be an error
+// 무조건 에러를 발생시킨다.
 const studentName = "Suzy";
 ```
 
-Since `const` "re-declaration" must be disallowed (on those technical grounds), TC39 essentially felt that `let` "re-declaration" should be disallowed as well, for consistency. It's debatable if this was the best choice, but at least we have the reasoning behind the decision.
+TC39는 (이러한 기술적 이유로) `const` '재선언'을 불허해야 하기 때문에 일관성을 위해 `let` '재선언'도 불허해야 한다고 느꼈다. 이게 최선의 선택이었는지는 논란의 여지가 있지만, 적어도 우리는 그 결정의 이면에 있는 이유를 가지고 있다.
 
-### Loops
+### 루프
 
-So it's clear from our previous discussion that JS doesn't really want us to "re-declare" our variables within the same scope. That probably seems like a straightforward admonition, until you consider what it means for repeated execution of declaration statements in loops. Consider:
+따라서 이전 논의에서 우리는 JS는 동일한 스코프 내에서 변수를 "재선언"하는 것을 원하지 않는 것을 알 수 있다. 루프에서 선언문을 반복적으로 실행하는 것이 무엇을 의미하는지 고려하기 전까지는 이 말은 간단한 훈계처럼 보일 것이다. 다음을 살펴보자:
 
 ```js
 var keepGoing = true;
@@ -312,11 +312,11 @@ while (keepGoing) {
 }
 ```
 
-Is `value` being "re-declared" repeatedly in this program? Will we get errors thrown? No.
+`value`가 이 프로그램에서 반복적으로 '재선언'되고 있는 것일까? 오류가 발생할까? 아니다.
 
-All the rules of scope (including "re-declaration" of `let`-created variables) are applied *per scope instance*. In other words, each time a scope is entered during execution, everything resets.
+스코프의 모든 규칙(`let` 생성 변수의 "재선언" 포함)은 *스코프 인스턴스당* 적용된다. 즉, 실행 중에 스코프를 시작될 때마다 모든 항목이 재설정된다.
 
-Each loop iteration is its own new scope instance, and within each scope instance, `value` is only being declared once. So there's no attempted "re-declaration," and thus no error. Before we consider other loop forms, what if the `value` declaration in the previous snippet were changed to a `var`?
+각 루프 이터레이션마다 고유한 새 스코프 인스턴스를 가지며 각 스코프 인스턴스 내에서 '값'은 한 번만 선언된다. 따라서 "재선언" 시도도 없고, 따라서 오류도 없다. 다른 루프 형식을 고려하기 전에 이전 스니펫의 '값' 선언이 'var'로 변경되면 어떻게 될까?
 
 ```js
 var keepGoing = true;
@@ -328,13 +328,13 @@ while (keepGoing) {
 }
 ```
 
-Is `value` being "re-declared" here, especially since we know `var` allows it? No. Because `var` is not treated as a block-scoping declaration (see Chapter 6), it attaches itself to the global scope. So there's just one `value` variable, in the same scope as `keepGoing` (global scope, in this case). No "re-declaration" here, either!
+특히 'var'가 허용한다는 것을 알고 있기 때문에 여기서 `value`가 '재선언'되는 것일까? 아니다. 'var'는 블록 스코프 지정 선언(6장 참조)으로 취급되지 않기 때문에 전역 스코프에 등록된다. 따라서 `value` 변수는 `keepGoing`(이 경우 전역 스코프)와 같은 스코프 안에 딱 하나 있을 뿐이다. 여기도 "재선언"은 없다!
 
-One way to keep this all straight is to remember that `var`, `let`, and `const` keywords are effectively *removed* from the code by the time it starts to execute. They're handled entirely by the compiler.
+이 모든 것을 바로잡을 수 있는 한 가지 방법은 실행이 시작될 때쯤 코드로부터 `var`, `let`, `const` 키워드가 효과적으로 *제거된다는 것*을 기억하는 것이다. 그것들은 전적으로 컴파일러에 의해 처리된다.
 
-If you mentally erase the declarator keywords and then try to process the code, it should help you decide if and when (re-)declarations might occur.
+선언자 키워드를 개념적으로 지운 다음 코드를 처리하려고 할 경우, 선언이 발생할 수 있는지 여부와 시기를 결정하는 데 도움이 된다.
 
-What about "re-declaration" with other loop forms, like `for`-loops?
+`for` 루프와 같은 다른 루프 형식의 "재선언"은 어떨까?
 
 ```js
 for (let i = 0; i < 3; i++) {
@@ -346,17 +346,17 @@ for (let i = 0; i < 3; i++) {
 // 2: 20
 ```
 
-It should be clear that there's only one `value` declared per scope instance. But what about `i`? Is it being "re-declared"?
+스코프 인스턴스당 선언된 `value`가 하나뿐임을 분명히 해야 한다. 하지만 `i`는 어떤가? "재선언"되는 건가?
 
-To answer that, consider what scope `i` is in. It might seem like it would be in the outer (in this case, global) scope, but it's not. It's in the scope of `for`-loop body, just like `value` is. In fact, you could sorta think about that loop in this more verbose equivalent form:
+이에 답하려면 `i`가 어느 스코프에 속하는지 생각해 보아야 한다. 외부(이 경우 전역) 스코프에 있을 것으로 보이지만 그렇지 않다. `value`처럼 `for` 루프 본체 스코프 안에 있다. 이 루프를 조금더 풀어서 작성하여 살펴보자.
 
 ```js
 {
-    // a fictional variable for illustration
+    // 설명을 위한 가상의 변수
     let $$i = 0;
 
     for ( /* nothing */; $$i < 3; $$i++) {
-        // here's our actual loop `i`!
+        // 이것이 실제 루프의 `i` 변수이다!
         let i = $$i;
 
         let value = i * 10;
@@ -368,28 +368,28 @@ To answer that, consider what scope `i` is in. It might seem like it would be in
 }
 ```
 
-Now it should be clear: the `i` and `value` variables are both declared exactly once **per scope instance**. No "re-declaration" here.
+이제 명확하다. `i` 변수와 `value` 변수는 모두 **스코프 인스턴스당** 정확하게 한 번 선언된다. 여기엔 "재선언"이 없다.
 
-What about other `for`-loop forms?
+다른 `for` 루프 형태는 어떤가?
 
 ```js
 for (let index in students) {
-    // this is fine
+    // 이 코드는 문제 없다.
 }
 
 for (let student of students) {
-    // so is this
+    // 이 코드 또한 문제 없다.
 }
 ```
 
-Same thing with `for..in` and `for..of` loops: the declared variable is treated as *inside* the loop body, and thus is handled per iteration (aka, per scope instance). No "re-declaration."
+`for..in`과`for..of` 도 마찬가지다: 선언된 변수는 루프 본체 내부에서 처리되므로, 반복마다(일명 스코프 인스턴스별로) 처리된다. "재선언"은 없다.
 
-OK, I know you're thinking that I sound like a broken record at this point. But let's explore how `const` impacts these looping constructs. Consider:
+지금 내가 하는 소리가 고장난 레코드 같다고 생각할 것이다. 그러나 `const`가 이러한 루프 구조물에 어떤 영향을 미치는지 알아보자. 다음을 살펴보자:
 
 ```js
 var keepGoing = true;
 while (keepGoing) {
-    // ooo, a shiny constant!
+    // 오, 갓 생성되서 광택이 나는 constant!
     const value = Math.random();
     if (value > 0.5) {
         keepGoing = false;
@@ -397,21 +397,21 @@ while (keepGoing) {
 }
 ```
 
-Just like the `let` variant of this program we saw earlier, `const` is being run exactly once within each loop iteration, so it's safe from "re-declaration" troubles. But things get more complicated when we talk about `for`-loops.
+앞서 살펴본 이 프로그램의 `let` 변수처럼 `const`가 루프 반복마다 정확히 한 번씩 실행되기 때문에 '재선언' 문제로부터 안전하다. 그러나 우리가 `for` 루프 이야기를 할 때 상황은 더 복잡해진다.
 
-`for..in` and `for..of` are fine to use with `const`:
+`for..in` 과 `for..of`는 `const`와 함께 사용되어도 문제 없다:
 
 ```js
 for (const index in students) {
-    // this is fine
+    // 이 코드는 문제 없다.
 }
 
 for (const student of students) {
-    // this is also fine
+    // 이 코드 또한 문제 없다.
 }
 ```
 
-But not the general `for`-loop:
+그러나 일반적인 `for` 루프는 아니다:
 
 ```js
 for (const i = 0; i < 3; i++) {
@@ -420,9 +420,9 @@ for (const i = 0; i < 3; i++) {
 }
 ```
 
-What's wrong here? We could use `let` just fine in this construct, and we asserted that it creates a new `i` for each loop iteration scope, so it doesn't even seem to be a "re-declaration."
+무엇이 문제인가? 우리는 이 구조에서 그냥 `let`을 사용할 수도 있고, 각각의 루프 반복 스코프에 대해 새로운 `i`를 만들 수 있다고 주장했기 때문에 "재선언"도 아닌 것 같다.
 
-Let's mentally "expand" that loop like we did earlier:
+전에 했던 것처럼 이 루프를 개념적으로 "확장"해서 살펴보자:
 
 ```js
 {
@@ -437,15 +437,15 @@ Let's mentally "expand" that loop like we did earlier:
 }
 ```
 
-Do you spot the problem? Our `i` is indeed just created once inside the loop. That's not the problem. The problem is the conceptual `$$i` that must be incremented each time with the `$$i++` expression. That's **re-assignment** (not "re-declaration"), which isn't allowed for constants.
+당신은 문제를 발견했나? 우리의 `i`는 정말 루프 안에서 한 번 만들어질 뿐이다. 그게 문제가 아니다. 문제는 '$i++' 표현식으로 매번 늘려야 하는 개념적인 '$i'다. 상수에 허용되지 않는 **재할당**("재선언"이 아님)이다.
 
-Remember, this "expanded" form is only a conceptual model to help you intuit the source of the problem. You might wonder if JS could have effectively made the `const $$i = 0` instead into `let $ii = 0`, which would then allow `const` to work with our classic `for`-loop? It's possible, but then it could have introduced potentially surprising exceptions to `for`-loop semantics.
+이 "확장" 양식은 문제의 원인을 직관하는 데 도움이 되는 개념적 모델일 뿐이다. JS가 'const $i = 0'을 'let $ii = 0'으로 효과적으로 만들 수 있었는지 궁금할 것이다. 그렇다면 'const'가 우리의 고전적인 'for' 루프와 함께 동작할 수 있을까? 그럴 수도 있지만, 그렇다면 잠재적으로 `for` 루프에 대해 놀랄만한 예외를 도입했을 수도 있다.
 
-For example, it would have been a rather arbitrary (and likely confusing) nuanced exception to allow `i++` in the `for`-loop header to skirt strictness of the `const` assignment, but not allow other re-assignments of `i` inside the loop iteration, as is sometimes useful.
+예를 들어, `for` 루프 헤더에서 `i++`가 `const` 할당의 엄격함을 회피할 수 있도록 허용한 것은 다소 자의적인(그리고 혼동될 가능성이 있는) 뉘앙스에서 예외일 수 있지만, 루프 반복 내에서 `i`의 다른 재할당은 때로는 유용하지 않을 수 있다.
 
-The straightforward answer is: `const` can't be used with the classic `for`-loop form because of the required re-assignment.
+분명한 대답은 `const`는 재할당이 요구되기 때문에 고전적인 `for` 루프 형식과 함께 사용할 수 없다는 것이다.
 
-Interestingly, if you don't do re-assignment, then it's valid:
+흥미롭게도 재할당을 하지 않으면 유효하다.
 
 ```js
 var keepGoing = true;
@@ -456,15 +456,15 @@ for (const i = 0; keepGoing; /* nothing here */ ) {
 }
 ```
 
-That works, but it's pointless. There's no reason to declare `i` in that position with a `const`, since the whole point of such a variable in that position is **to be used for counting iterations**. Just use a different loop form, like a `while` loop, or use a `let`!
+이 코드는 작동은 하지만 무의미하다. 해당 위치의 변수의 목적은 **반복문을 계속 진행시키기 위해 사용되는 것이기** 때문에 `const`를 사용하여 해당 위치에 `i`를 선언할 이유가 없다. 그냥 `while` 루프와 같은 다른 루프 형식을 사용하거나 `let`을 사용해라!
 
-## Uninitialized Variables (aka, TDZ)
+## 초기화되지 않는 변수들 (aka, TDZ)
 
-With `var` declarations, the variable is "hoisted" to the top of its scope. But it's also automatically initialized to the `undefined` value, so that the variable can be used throughout the entire scope.
+`var` 선언을 사용하면, 변수가 스코프의 최상단으로 "호이스팅"된다. 그러나 이 값은 자동으로 `undefined` 값으로 초기화되므로 변수를 스코프 전체에서 사용할 수 있다.
 
-However, `let` and `const` declarations are not quite the same in this respect.
+그러나 이런 점에서 `let`'과 `const` 선언은 다르다.
 
-Consider:
+살펴보자:
 
 ```js
 console.log(studentName);
@@ -473,16 +473,16 @@ console.log(studentName);
 let studentName = "Suzy";
 ```
 
-The result of this program is that a `ReferenceError` is thrown on the first line. Depending on your JS environment, the error message may say something like: "Cannot access studentName before initialization."
+이 프로그램의 결과로 첫 번째 줄에 `ReferenceError`가 던져진다. JS 환경에 따라, "초기화 전에 studentName에 접근할 수 없습니다."와 같은 오류 메시지가 표시될 수 있다.
 
-| NOTE: |
+| 비고: |
 | :--- |
-| The error message as seen here used to be much more vague or misleading. Thankfully, several of us in the community were successfully able to lobby for JS engines to improve this error message so it more accurately tells you what's wrong! |
+| 여기서 확인한 오류 메시지는 이전에는 훨씬 더 모호하거나 오해의 소지가 있었다. 다행히도, 이 오류 메시지를 개선하기 위해 커뮤니티의 여러 명이 JS 엔진을 위한 로비를 성공적으로 수행하였고, 지금은 문제가 무엇인지 더 정확하게 알 수 있게 되었다! |
 
-That error message is quite indicative of what's wrong: `studentName` exists on line 1, but it's not been initialized, so it cannot be used yet. Let's try this:
+이 오류 메시지는 무엇이 문제인지를 잘 전달하고있다: `studentName`이 1행에 존재하지만 초기화되지 않아 아직 사용할 수 없다. 다음을 시도해보자.
 
 ```js
-studentName = "Suzy";   // let's try to initialize it!
+studentName = "Suzy";   // 이 변수를 초기화 해보자!
 // ReferenceError
 
 console.log(studentName);
@@ -490,18 +490,18 @@ console.log(studentName);
 let studentName;
 ```
 
-Oops. We still get the `ReferenceError`, but now on the first line where we're trying to assign to (aka, initialize!) this so-called "uninitialized" variable `studentName`. What's the deal!?
+이런. `ReferenceError`가 계속 발생하지만, 지금은 소위 '초기화 되지 않은' 변수인 `studentName`을 할당(초기화)하려는 첫 번째 행에서 발생하고 있다 . 이게 무슨 일인가!
 
-The real question is, how do we initialize an uninitialized variable? For `let`/`const`, the **only way** to do so is with an assignment attached to a declaration statement. An assignment by itself is insufficient! Consider:
+문제는 초기화되지 않은 변수를 초기화하려면 어떻게 해야 할까? `let`/`const`의 경우, **유일한 방법**은 선언문에 할당이 등록되는 것이다. 할당만으로는 부족하다! 다음을 살펴보자:
 
 ```js
 let studentName = "Suzy";
 console.log(studentName);   // Suzy
 ```
 
-Here, we are initializing the `studentName` (in this case, to `"Suzy"` instead of `undefined`) by way of the `let` declaration statement form that's coupled with an assignment.
+여기서는, 할당과 결합된 `let` 선언문 형식을 통해 `studentName`(이 경우 `undefined`이 아닌 `"Suzy"`)로 초기화한다.
 
-Alternatively:
+대안적으로는:
 
 ```js
 // ..
@@ -518,21 +518,21 @@ console.log(studentName);
 // Suzy
 ```
 
-| NOTE: |
+| 비고: |
 | :--- |
-| That's interesting! Recall from earlier, we said that `var studentName;` is *not* the same as `var studentName = undefined;`, but here with `let`, they behave the same. The difference comes down to the fact that `var studentName` automatically initializes at the top of the scope, where `let studentName` does not. |
+| 흥미롭다! 앞에서 우리는 `var studentName;`은 `var studentName = undefined;`'과  *같지 않다*고 말했지만 여기서 `let`을 사용하면 동일하게 행동한다. 차이점은 `var studentName`이 자동으로 초기화되지만 `let studentName`은 초기화되지 않는다는 점이다. |
 
-Remember that we've asserted a few times so far that *Compiler* ends up removing any `var`/`let`/`const` declarators, replacing them with the instructions at the top of each scope to register the appropriate identifiers.
+지금까지 *Compiler*가 모든 `var`/`let`/`const` 선언자를 제거하고 각 범위의 맨 위에 적절한 식별자를 등록하는 명령문으로 교체한다고 몇 차례 주장했다.
 
-So if we analyze what's going on here, we see that an additional nuance is that *Compiler* is also adding an instruction in the middle of the program, at the point where the variable `studentName` was declared, to handle that declaration's auto-initialization. We cannot use the variable at any point prior to that initialization occuring. The same goes for `const` as it does for `let`.
+따라서 여기서 무슨 일이 벌어지고 있는지 분석해보면 *Compiler*가 프로그램 중간에 `studentName` 변수가 선언된 시점에 해당 선언의 자동 초기화를 처리하라는 명령문을 추가하고 있다는 것을 알 수 있다. 초기화 전에는 변수를 사용할 수 없다. `const`도 `let`과 마찬가지다.
 
-The term coined by TC39 to refer to this *period of time* from the entering of a scope to where the auto-initialization of the variable occurs is: Temporal Dead Zone (TDZ).
+TC39가 스코프 시작부터 변수의 자동 초기화가 발생하는 곳까지 *기간*을(를) 나타내기 위해 만든 용어는 다음과 같다. TDZ(일시적 사각 지대<sub>Temporal Dead Zone</sub>)이다.
 
-The TDZ is the time window where a variable exists but is still uninitialized, and therefore cannot be accessed in any way. Only the execution of the instructions left by *Compiler* at the point of the original declaration can do that initialization. After that moment, the TDZ is done, and the variable is free to be used for the rest of the scope.
+TDZ는 변수가 존재하지만 여전히 초기화되지 않은 시간 창이므로 어떤 방법으로도 접근할 수 없다. 원래 선언 시 *Compiler*가 남긴 명령의 실행만이 이 초기화를 수행할 수 있다. 그 후, TDZ가 완료되고, 변수는 나머지 스코프에서 자유롭게 사용할 수 있다.
 
-A `var` also has technically has a TDZ, but it's zero in length and thus unobservable to our programs! Only `let` and `const` have an observable TDZ.
+`var`도 기술적으로는 TDZ를 가지고 있지만, 길이가 0이기 때문에 우리 프로그램에서는 관찰할 수 없다! 관측 가능한 TDZ는 `let`과 `const`에만 있다.
 
-By the way, "temporal" in TDZ does indeed refer to *time* not *position in code*. Consider:
+그런데 TDZ의 "임시<sub>temporal</sub>"는 *코드에서의 위치*가 아닌 *시간*을 의미한다. 다음을 살펴보자:
 
 ```js
 askQuestion();
@@ -545,13 +545,13 @@ function askQuestion() {
 }
 ```
 
-Even though positionally the `console.log(..)` referencing `studentName` comes *after* the `let studentName` declaration, timing wise the `askQuestion()` function is invoked *before* the `let` statement is encountered, while `studentName` is still in its TDZ! Hence the error.
+위치적으로 `studentName`을 지칭하는 `console.log(..)`가 `let studentName` 선언 뒤에 나오지만, `studentName`이 TDZ에 있는 동안 `askQuestion()` 함수가 `let` 선언문 *전*에 호출된다! 따라서 오류가 발생하다.
 
-There's a common misconception that TDZ means `let` and `const` do not hoist. This is an inaccurate, or at least slightly misleading, claim. They definitely hoist.
+흔히 TDZ는 `let`과 `const`는 '호이스팅'하지않는다는 오해를 하고 있다. 이것은 부정확하거나 적어도 약간 오해의 소지가 있는 주장이다. 그것들은 분명이 호이스팅 된다.
 
-The actual difference is that `let`/`const` declarations do not automatically initialize at the beginning of the scope, the way `var` does. The *debate* then is if the auto-initialization is *part of* hoisting, or not? I think auto-registration of a variable at the top of the scope (i.e., what I call "hoisting") and auto-initialization at the top of the scope (to `undefined`) are distinct operations and shouldn't be lumped together under the single term "hoisting."
+실제 차이점은 `let`/`const` 선언이 `var`처럼 스코프 시작 시 자동으로 초기화되지 않는다는 점이다. 그렇다면 *논의점*은 자동 초기화가 *호스팅의 일부*인지 여부이다. 나는 변수의 상위 등록(즉, "호이스팅")과 상위 변수의 자동 초기화(`undefined`으로 함)는 별개의 작업이며 단일 용어 "호이스팅"으로 묶이면 안 된다고 생각한다.
 
-We've already seen that `let` and `const` don't auto-initialize at the top of the scope. But let's prove that `let` and `const` *do* hoist (auto-register at the top of the scope), courtesy of our friend shadowing (see "Shadowing" in Chapter 3):
+우리는 이미 `let`과 `const`가 스코프 상단에서 자동 초기화되지 않는 것을 보았다. 하지만 섀도잉(3장의 "섀도잉"을 참고)에 대한 예의로 `let`과 `const`가 *호이스팅(스코프 상단에 자동 등록) 하는것*을 증명해보자! 
 
 ```js
 var studentName = "Kyle";
@@ -569,26 +569,26 @@ var studentName = "Kyle";
 }
 ```
 
-What's going to happen with the first `console.log(..)` statement? If `let studentName` didn't hoist to the top of the scope, then the first `console.log(..)` *should* print `"Kyle"`, right? At that moment, it would seem, only the outer `studentName` exists, so that's the variable `console.log(..)` should access and print.
+첫 번째 `console.log(..)`문은 어떻게 될까? `let studentName`이 스코프의 맨 위로 올라가지 않으면 첫 번째 `console.log(..)`는 `"Kyle"`을 출력한다. 맞는가? 그 때는 외부의 `studentName`만 존재하는 것처럼 보일 것이고, 그것이 바로  `console.log(..)`가 접근하고 출력하는 값이다.
 
-But instead, the first `console.log(..)` throws a TDZ error, because in fact, the inner scope's `studentName` **was** hoisted (auto-registered at the top of the scope). What **didn't** happen (yet!) was the auto-initialization of that inner `studentName`; it's still uninitialized at that moment, hence the TDZ violation!
+그러나 우리와 생각과 달리 `console.log(..)`는 TDZ error를 던진다. 실제로 내부 스코프의 `studentName` *호이스팅 되었기* 때문에(스코프의 맨 위에 자동 등록됨) TDZ 오류가 발생한다.내부 `studentName`의 자동 초기화는 아직 **발생하지 않았다**. 아직 초기화되지 않았으므로 TDZ 위반이다.
 
-So to summarize, TDZ errors occur because `let`/`const` declarations *do* hoist their declarations to the top of their scopes, but unlike `var`, they defer the auto-initialization of their variables until the moment in the code's sequencing where the original declaration appeared. This window of time (hint: temporal), whatever its length, is the TDZ.
+요약하자면 TDZ 오류는 `let`/`const` 선언이 스코프 상위로 올리기 때문에 발생하지만, `var`와 달리, 원래 선언이 나타난 코드 시퀀싱의 순간까지 변수의 자동 초기화를 지연한다. 결정이 미뤄진 상태(힌트: 일시적<sub>temporal</sub>)가, 그 시점이 언제인지 상관없이, TDZ이다.
 
-How can you avoid TDZ errors?
+어떻게 TDZ 에러를 피할 수 있을까?
 
-My advice: always put your `let` and `const` declarations at the top of any scope. Shrink the TDZ window to zero (or near zero) length, and then it'll be moot.
+내가 조언하는 것은 항상 당신의 `let`과 `const` 선언을 어떤 스코프에서도 최우선 순위에 두라는 것이다. TDZ 창을 0(또는 0) 길이로 축소하면 의미가 없어진다.
 
-But why is TDZ even a thing? Why didn't TC39 dictate that `let`/`const` auto-initialize the way `var` does? Just be patient, we'll come back to explore the *why* of TDZ in Appendix A.
+그런데 왜 TDZ가 중요할까? TC39는 왜 `var`처럼 `let`/`const`를 자동 초기화하지 않았을까? 기다려 보라, 부록 A에서 TDZ의 *이유*에 대해 살펴볼 것이다.
 
-## Finally Initialized
+## 드디어 초기화를 모두 다루었다
 
-Working with variables has much more nuance than it seems at first glance. *Hoisting*, *(re)declaration*, and the *TDZ* are common sources of confusion for developers, especially those who have worked in other languages before coming to JS. Before moving on, make sure your mental model is fully grounded on these aspects of JS scope and variables.
+변수를 가지고 일하는 것은 언뜻 보기보다 훨씬 많은 뉘앙스를 가지고 있다. *호이스팅*, *(재) 선언* 및 *TDZ*은 개발자, 특히 JS에 오기 전에 다른 언어로 작업한 경험이 있는 개발자을 혼란스럽게 하는 것들이다. 다음으로 넘어가기 전에 JS 스코프 및 변수의 이러한 측면에 대한 멘탈 모델이 완전히 정립되어 있는지 확인하라.
 
-Hoisting is generally cited as an explicit mechanism of the JS engine, but it's really more a metaphor to describe the various ways JS handles variable declarations during compilation. But even as a metaphor, hoisting offers useful structure for thinking about the life-cycle of a variable—when it's created, when it's available to use, when it goes away.
+호이스팅 일반적으로 JS 엔진의 명시적 메커니즘으로 인용되지만, 실제로는 컴파일 중에 JS가 변수 선언을 처리하는 다양한 방법을 설명하는 비유법이다. 하지만 비유적으로라도, 호이스팅은 변수의 수명 주기를 생각할 수 있는 유용한 구조를 제공한다.
 
-Declaration and re-declaration of variables tend to cause confusion when thought of as runtime operations. But if you shift to compile-time thinking for these operations, the quirks and *shadows* diminish.
+변수의 선언 및 재선언은 런타임 작업으로 간주될 때 혼란을 야기하는 경향이 있다. 그러나 이러한 작업에 대한 컴파일 타임 작업으로 사고 방식으로 전환하면, 기이한 점과 *불명확한 점*이 줄어든다.
 
-The TDZ (temporal dead zone) error is strange and frustrating when encountered. Fortunately, TDZ is relatively straightforward to avoid if you're always careful to place `let`/`const` declarations at the top of any scope.
+TDZ(일시적인 사각지대 <sub>Temporal Dead Zone</sub>) 오류가 발생하면 이상하고 답답하다. 다행히도 어느 스코프에서나 `let`/`const` 선언을 최우선 순위에 둔다며, TDZ는 피하기가 쉽다.
 
-As you successfully navigate these twists and turns of variable scope, the next chapter will lay out the factors that guide our decisions to place our declarations in various scopes, especially nested blocks.
+이러한 변수 스코프의 우여 곡절을 성공적으로 다루었기 때문에, 다음 장에서는 선언을 다양한 범위, 특히 중첩된 블록에 배치하기 위한 결정을 안내하는 요소를 설명할 것이다.
