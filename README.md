@@ -1,5 +1,15 @@
 # You Don't Know JS Yet (book series) - 2nd Edition
 
+----
+----
+
+<a href="https://www.kickstarter.com/projects/getify/you-dont-know-js-yet-second-edition-books"><img height=50 src="https://user-images.githubusercontent.com/150330/133367559-8bf97df5-e200-453a-b18e-66f597759e2e.png"></a>
+
+LOOK! **Please [support the Kickstarter](https://www.kickstarter.com/projects/getify/you-dont-know-js-yet-second-edition-books)** to finish the remaining four books in the 2nd edition series.
+
+----
+----
+
 This is a series of books diving deep into the core mechanisms of the JavaScript language. This is the **second edition** of the book series:
 
 <a href="https://leanpub.com/ydkjsy-get-started"><img src="get-started/images/cover.png" width="75"></a>&nbsp;&nbsp;
