@@ -3,11 +3,11 @@
 ----
 ----
 
-<a href="https://www.kickstarter.com/projects/getify/you-dont-know-js-yet-second-edition-books"><img height=50 src="https://user-images.githubusercontent.com/150330/133367559-8bf97df5-e200-453a-b18e-66f597759e2e.png"></a>
+<a href="https://www.kickstarter.com/projects/getify/you-dont-know-js-yet-second-edition-books?ref=1cxjks"><img height=50 src="https://user-images.githubusercontent.com/150330/133367559-8bf97df5-e200-453a-b18e-66f597759e2e.png"></a>
 
-LOOK! **Please [support the Kickstarter](https://www.kickstarter.com/projects/getify/you-dont-know-js-yet-second-edition-books)** to finish the remaining four books in the 2nd edition series.
+LOOK! **Please [support the Kickstarter](https://www.kickstarter.com/projects/getify/you-dont-know-js-yet-second-edition-books?ref=1cxjks)** to finish the remaining four books in the 2nd edition series.
 
-<a href="https://www.kicktraq.com/projects/getify/you-dont-know-js-yet-second-edition-books/" target="_blank"><img src="https://www.kicktraq.com/projects/getify/you-dont-know-js-yet-second-edition-books/minichart.png" alt="&quot;You Don't Know JS Yet&quot; second edition books -- Kicktraq Mini" title="&quot;You Don't Know JS Yet&quot; second edition books -- Kicktraq Mini"></a>
+<a href="https://www.kickstarter.com/projects/getify/you-dont-know-js-yet-second-edition-books?ref=1cxjks" target="_blank"><img src="https://www.kicktraq.com/projects/getify/you-dont-know-js-yet-second-edition-books/minichart.png" alt="&quot;You Don't Know JS Yet&quot; second edition books -- Kicktraq Mini" title="&quot;You Don't Know JS Yet&quot; second edition books -- Kicktraq Mini"></a>
 
 ----
 ----
