@@ -7,6 +7,8 @@
 
 LOOK! **Please [support the Kickstarter](https://www.kickstarter.com/projects/getify/you-dont-know-js-yet-second-edition-books)** to finish the remaining four books in the 2nd edition series.
 
+<a href="https://www.kicktraq.com/projects/getify/you-dont-know-js-yet-second-edition-books/" target="_blank"><img src="https://www.kicktraq.com/projects/getify/you-dont-know-js-yet-second-edition-books/minichart.png" alt="&quot;You Don't Know JS Yet&quot; second edition books -- Kicktraq Mini" title="&quot;You Don't Know JS Yet&quot; second edition books -- Kicktraq Mini"></a>
+
 ----
 ----
 
