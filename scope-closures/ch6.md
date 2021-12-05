@@ -1,43 +1,43 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 6: Limiting Scope Exposure
+# Chapter 6: 스코프 노출을 제한하기
 
-So far our focus has been explaining the mechanics of how scopes and variables work. With that foundation now firmly in place, our attention raises to a higher level of thinking: decisions and patterns we apply across the whole program.
+지금까지 스코프와 변수가 어떻게 작동하는지 그 동작 방식을 설명하는 것에 집중했다. 이러한 기초 지식이 확고히 자리 잡으면서 우리의 관점은 프로그램 전체에 적용되는 결정과 패턴까지 확장되며, 이전보다 높은 수준으로 상승하게 된다.
 
-To begin, we're going to look at how and why we should be using different levels of scope (functions and blocks) to organize our program's variables, specifically to reduce scope over-exposure.
+먼저, 프로그램 변수를 스코프의 과다한 노출을 줄이는 방식으로 조직하기 위해 다른 스코프 레벨(함수와 블록)을 사용해야 하는 이유와 방법에 대해 알아볼 것이다.
 
-## Least Exposure
+## 노출의 최소화
 
-It makes sense that functions define their own scopes. But why do we need blocks to create scopes as well?
+함수가 자체 스코프를 정의하다는 것은 이해가 될 것이다. 하지만, 스코프를 생성하기 위해 다시 블록이 필요한 이유는 무엇일까?
 
-Software engineering articulates a fundamental discipline, typically applied to software security, called "The Principle of Least Privilege" (POLP). [^POLP] And a variation of this principle that applies to our current discussion is typically labeled as "Least Exposure" (POLE).
+소프트웨어 엔지니어링에서는 일반적으로 소프트웨어 보안에 적용되는 기본 원칙으로 "최소 권한 원칙<sub>The Principle of Least Privilege</sub>"(POLP). [^POLP]을 명시하고 있다. 그리고 현재 논의하고 있는 것에 적용되는 이 원칙의 변형으로 흔히 "최소 노출<sub>Least Exposure</sub"(POLE)이란 것이 있다.
 
-POLP expresses a defensive posture to software architecture: components of the system should be designed to function with least privilege, least access, least exposure. If each piece is connected with minimum-necessary capabilities, the overall system is stronger from a security standpoint, because a compromise or failure of one piece has a minimized impact on the rest of the system.
+POLP는 소프트웨어 아키텍처에 대한 방어태새를 나타낸다. 시스템의 구성 요소는 최소 권한, 최소 접근, 최소 노출로 작동하도록 설계되어야 한다. 각 부분이 최소한의 필요 기능으로 연결되어 있어야 하나의 부분이 손상되거나 실패하더라도 시스템의 나머지 부분에 미치는 영향이 최소화되기 때문에 보안 측면에서 전체 시스템이 더 강력해진다.
 
-If POLP focuses on system-level component design, the POLE *Exposure* variant focuses on a lower level; we'll apply it to how scopes interact with each other.
+POLP가 시스템 수준의 구성요소 설계에 초점을 맞춘다면 *POLE*은 더 낮은 수준에 초점을 맞춘다. 여기서는 스코프가 서로 상호 작용하는 방식에 적용할 것이다.
 
-In following POLE, what do we want to minimize the exposure of? Simply: the variables registered in each scope.
+다음 POLE에서 노출을 최소화하려는 것은 무엇일까? 단순히 각 스코프에 등록된 변수이다.
 
-Think of it this way: why shouldn't you just place all the variables of your program out in the global scope? That probably immediately feels like a bad idea, but it's worth considering why that is. When variables used by one part of the program are exposed to another part of the program, via scope, there are three main hazards that often arise:
+이렇게 생각해보자. 프로그램의 모든 변수를 전역 스코프에 배치한다면 어떨까? 당장은 나쁜 아이디어라고 느껴지겠지만, 왜 그런지 생각해 볼 필요가 있다. 프로그램의 한 부분에서 사용하는 변수가 스코프를 통해 프로그램의 다른 부분에 노출되는 경우 다음과 같은 세 가지 주요 위험이 발생한다.
 
-* **Naming Collisions**: if you use a common and useful variable/function name in two different parts of the program, but the identifier comes from one shared scope (like the global scope), then name collision occurs, and it's very likely that bugs will occur as one part uses the variable/function in a way the other part doesn't expect.
+* **네이밍 충돌**: 프로그램의 서로 다른 두 부분에서 공통적이고 유용한 변수/함수 이름을 사용하지만 식별자가 하나의 (전역 스코프처럼) 공유된 스코프에서 온 경우 이름 충돌이 발생한다. 이런 경우, 다른 부분의 코드에서 예상하지 못한 방식으로 변수/함수를 사용할 때 버그가 발생하기 쉽다.
 
-    For example, imagine if all your loops used a single global `i` index variable, and then it happens that one loop in a function is running during an iteration of a loop from another function, and now the shared `i` variable gets an unexpected value.
+    예를 들어, 모든 반복문에서 하나의 전역 변수의 이름으로 'i'를 사용했을때, 어떤 함수에서 반복문 내부를 반복하는 동안 다른 함수의 반복문이 실행되어 공유된 'i' 변수가 예기치 않은 값을 얻게 될 것을 생각해보라.
 
-* **Unexpected Behavior**: if you expose variables/functions whose usage is otherwise *private* to a piece of the program, it allows other developers to use them in ways you didn't intend, which can violate expected behavior and cause bugs.
+* **예상치 않은 동작**: 용도가 *프라이빗*한 변수/함수를 프로그램의 일부에 노출하면 다른 개발자가 의도하지 않은 방식으로 사용할 수 있으므로 예상된 동작을 위반하고 버그를 발생시킬 수 있다.
 
-    For example, if your part of the program assumes an array contains all numbers, but someone else's code accesses and modifies the array to include booleans and strings, your code may then misbehave in unexpected ways.
+    예를 들어, 당신의 프로그램 한 부분은 어떤 배열이 숫자만 포함되어 있을것으로 추정하고 있었는데 다른 사용자의 코드는 그 배열이 참/거짓 값과 문자열을 포함하도록 수정할 수 있다. 이 경우, 예기치 않은 방식으로 코드가 잘못 동작할 수 있다.
 
-    Worse, exposure of *private* details invites those with mal-intent to try to work around limitations you have imposed, to do things with your part of the software that shouldn't be allowed.
+    게다가 *프라이빗*한 세부 정보가 노출되면 의도하지 않은 사용자가 당신이 도입한 제약 사항을 침범하려 시도하게 되고 소프트웨어 내부의 허용되지 않는 부분을 사용해 작업을 수행할 것이다.
 
-* **Unintended Dependency**: if you expose variables/functions unnecessarily, it invites other developers to use and depend on those otherwise *private* pieces. While that doesn't break your program today, it creates a refactoring hazard in the future, because now you cannot as easily refactor that variable or function without potentially breaking other parts of the software that you don't control.
+* **의도하지 않은 종속성**: 변수/함수를 불필요하게 노출하면 다른 개발자가 *프라이빗*한 부분을 사용하고 의존하게 된다. 지금 바로 프로그램이 중단되는 것은 아니지만 향후 리팩토링 위험을 발생시킨다. 왜냐하면 이제 제어하지 않는 소프트웨어의 일부를 잠재적으로 손상시키지 않고서 변수나 기능을 쉽게 리팩토링할 수 없기 때문이다.
 
-    For example, if your code relies on an array of numbers, and you later decide it's better to use some other data structure instead of an array, you now must take on the liability of adjusting other affected parts of the software.
+    예를 들어, 숫자 배열에 의존하는 코드를 사용하다가 배열 대신 다른 데이터 구조를 사용하는 것이 낫다고 판단한 경우, 이제 당신은 소프트웨어에서 영향받는 다른 부분을 조정할 책임을 져야 한다.
 
-POLE, as applied to variable/function scoping, essentially says, default to exposing the bare minimum necessary, keeping everything else as private as possible. Declare variables in as small and deeply nested of scopes as possible, rather than placing everything in the global (or even outer function) scope.
+POLE은 변수/함수 스코프 지정에 적용하는 것으로 기본적으로 필요한 최소한의 노출을 기본 설정하며 다른 모든 것은 최대한 비공개로 유지한다. 또한 모든 항목을 전역(또는 외부 함수) 스코프에 배치하지 말고 가능한 작고 깊게 중첩된 스코프에서 변수를 선언한다.
 
-If you design your software accordingly, you have a much greater chance of avoiding (or at least minimizing) these three hazards.
+위의 조언대로 소프트웨어를 설계할 경우 이러한 세 가지 위험을 피할(적어도 최소화할) 수 있는 가능성이 훨씬 커진다.
 
-Consider:
+다음 코드를 살펴보자:
 
 ```js
 function diff(x,y) {
@@ -54,21 +54,21 @@ diff(3,7);      // 4
 diff(7,5);      // 2
 ```
 
-In this `diff(..)` function, we want to ensure that `y` is greater than or equal to `x`, so that when we subtract (`y - x`), the result is `0` or larger. If `x` is initially larger (the result would be negative!), we swap `x` and `y` using a `tmp` variable, to keep the result positive.
+위의 'diff(..)' 함수에서 우리는 'y'가 'x'보다 크거나 같도록 하여 ('y - x') 뺄 때 결과가 '0' 이상이 되도록 하고자 한다. 처음에 'x'가 더 크면(결과는 음수가 된다!), 'tmp' 변수를 사용해서 'x'와 'y'를 교환하고 결과를 양수로 유지한다.
 
-In this simple example, it doesn't seem to matter whether `tmp` is inside the `if` block or whether it belongs at the function level—it certainly shouldn't be a global variable! However, following the POLE principle, `tmp` should be as hidden in scope as possible. So we block scope `tmp` (using `let`) to the `if` block.
+위 단순한 예시에서, `tmp`가 `if` 블록 안에 있는지, 함수 스코프에 속하는지 여부는 중요하지 않아 보인다. 물론 전역 변수가 되어서는 안 됩니다! 그러나 POLE 원칙에 따라 `tmp`는 가능한한 스코프 내부에 숨겨야한다. 그래서 (`let`을 사용하여) `tmp`의 스코프를`if` 블록까지로 차단한다.
 
-## Hiding in Plain (Function) Scope
+## 평범한(함수) 스코프에 숨기기
 
-It should now be clear why it's important to hide our variable and function declarations in the lowest (most deeply nested) scopes possible. But how do we do so?
+이제, 변수와 함수 선언을 가능한 가장 (깊게 중첩된) 아래의 스코프로 숨기는 것이 중요한 이유를 확실히 알게 되었다. 그러나 이것은 어떻게 하는 것일까?
 
-We've already seen the `let` and `const` keywords, which are block scoped declarators; we'll come back to them in more detail shortly. But first, what about hiding `var` or `function` declarations in scopes? That can easily be done by wrapping a `function` scope around a declaration.
+이미 블록 스코프의 선언문인 `let`과 `const` 키워드를 다루었고, 조만간 다시 자세히 살펴보겠다. 그 전에 먼저 `var`나 `function` 선언을 스코프 내부에 숨기는 것은 어떨까? 선언문을 `function` 스코프로 감싸서 쉽게 숨길 수 있다.
 
-Let's consider an example where `function` scoping can be useful.
+`function` 스코프 지정이 유용할 수 있는 예를 들어보자.
 
-The mathematical operation "factorial" (notated as "6!") is the multiplication of a given integer against all successively lower integers down to `1`—actually, you can stop at `2` since multiplying `1` does nothing. In other words, "6!" is the same as "6 * 5!", which is the same as "6 * 5 * 4!", and so on. Because of the nature of the math involved, once any given integer's factorial (like "4!") has been calculated, we shouldn't need to do that work again, as it'll always be the same answer.
+수학 연산자인 "팩토리얼"("6!"으로 표기)은 주어진 정수부터 `1`까지 내려가며 연속으로 곱한 값이다. 사실 `1`을 곱하는 것은 의미가 없으므로 `2`에서 멈출 수 있다. 즉, "6!"은 "6 * 5!"와 같고 "6 * 5 * 4!" 등과 같다. 관련된 수학적 특성 때문에, 주어진 정수의 팩토리얼(예: "4!") 값은 달라지지 않으므로 한 번만 계산하고 다시 계산할 필요가 없다.
 
-So if you naively calculate factorial for `6`, then later want to calculate factorial for `7`, you might unnecessarily re-calculate the factorials of all the integers from 2 up to 6. If you're willing to trade memory for speed, you can solve that wasted computation by caching each integer's factorial as it's calculated:
+따라서 아무런 계획 없이 `6`에 대한 팩토리얼을 계산한 다음 `7`에 대한 팩토리얼을 계산한다면 2에서 6까지 모든 정수의 팩토리얼을 불필요하게 다시 계산할 수도 있다. 만약 메모리와 속도를 교환할 의향이 있다면 계산 시 각 정수의 팩토리얼을 캐싱하여 불필요한 연산을 아낄 수 있다.
 
 ```js
 var cache = {};
@@ -97,21 +97,21 @@ factorial(7);
 // 5040
 ```
 
-We're storing all the computed factorials in `cache` so that across multiple calls to `factorial(..)`, the previous computations remain. But the `cache` variable is pretty obviously a *private* detail of how `factorial(..)` works, not something that should be exposed in an outer scope—especially not the global scope.
+위 코드에서는 계산한 팩토리얼 값을 `cache`에 저장하여 여러 번 `factorial(...)`을 호출하더라도 이전에 계산한 값을 유지하도록 한다. 하지만 `cache` 변수는 `factorial(..)` 동작 방식에 관련된 상당히 *프라이빗*한 세부사항으로, 특히 글로벌 스코프에는 노출하지 말아야 하는 요소이다.
 
-| NOTE: |
+| 비고: |
 | :--- |
-| `factorial(..)` here is recursive—a call to itself is made from inside—but that's just for brevity of code sake; a non-recursive implementation would yield the same scoping analysis with respect to `cache`. |
+| 이 `factorial(..)`은 내부에서 자신을 다시 호출하기 때문에 재귀적인데, 코드를 단지 간결하게 하기 위함이었다. 재귀적이지 않게 구현하더라도 `cache`와 관련된 스코프에 대한 분석은 동일할 것이다. |
 
-However, fixing this over-exposure issue is not as simple as hiding the `cache` variable inside `factorial(..)`, as it might seem. Since we need `cache` to survive multiple calls, it must be located in a scope outside that function. So what can we do?
+그러나 이러한 과노출 문제를 해결하는 것은 `cache` 변수를 `factorial(..)` 안에 숨기는 것만으로 끝나지 않는다. 여러번 호출하더라도 `cache`를 유지해야 하므로 해당 함수의 바깥 스코프에 두어야 한다. 그렇다면 이 문제를 어떻게 해결할 수 있을까?
 
-Define another middle scope (between the outer/global scope and the inside of `factorial(..)`) for `cache` to be located:
+`cache`가 위치할 다른 중간 스코프(외부/전역 스코프와 `factorial(..)`의 내부 사이)를 정의하자.
 
 ```js
-// outer/global scope
+// 외부/전역 스코프
 
 function hideTheCache() {
-    // "middle scope", where we hide `cache`
+    // `cache`를 숨길 "중간 스코프"
     var cache = {};
 
     return factorial;
@@ -119,7 +119,7 @@ function hideTheCache() {
     // **********************
 
     function factorial(x) {
-        // inner scope
+        // 내부 스코프
         if (x < 2) return 1;
         if (!(x in cache)) {
             cache[x] = x * factorial(x - 1);
@@ -137,15 +137,15 @@ factorial(7);
 // 5040
 ```
 
-The `hideTheCache()` function serves no other purpose than to create a scope for `cache` to persist in across multiple calls to `factorial(..)`. But for `factorial(..)` to have access to `cache`, we have to define `factorial(..)` inside that same scope. Then we return the function reference, as a value from `hideTheCache()`, and store it in an outer scope variable, also named `factorial`. Now as we call `factorial(..)` (multiple times!), its persistent `cache` stays hidden yet accessible only to `factorial(..)`!
+`hideTheCache()` 함수는 `factorial(..)`을 여러 번 호출하더라도 `cache`가 값을 유지할 수 있도록 하는 스코프를 만드는 것 외에 다른 목적이 없다. 그러나 `factorial(..)`이 `cache`에 접근하기 위해서는 같은 스코프 내부에 `factorial(..)`을 정의해야 한다. 그 다음엔 함수 참조를 `hideTheCache()`의 값으로 반환하고 `factorial`이라는 외부 스코프 변수에 저장한다. 이제 (여러 번) `factorial(..)`를 호출해도 유지되는 `cache`는 숨겨진 채로 남게 되지만 `factorial(..)`에서만 접근할 수 있다!
 
-OK, but... it's going to be tedious to define (and name!) a `hideTheCache(..)` function scope each time such a need for variable/function hiding occurs, especially since we'll likely want to avoid name collisions with this function by giving each occurrence a unique name. Ugh.
+좋다, 하지만... 변수나 함수를 숨겨야 할 일이 있을 때마다 매번 `hideTheCache(..)`함수 스코프(와 이름)를 정의하는 것은 지루할 것이다. 특히 각 항목에 고유한 이름을 지정하여 이 함수와 이름이 충돌하지 않도록 해야 하기 때문이다. 으윽
 
 | NOTE: |
 | :--- |
-| The illustrated technique—caching a function's computed output to optimize performance when repeated calls of the same inputs are expected—is quite common in the Functional Programming (FP) world, canonically referred to as "memoization"; this caching relies on closure (see Chapter 7). Also, there are memory usage concerns (addressed in "A Word About Memory" in Appendix B). FP libraries will usually provide an optimized and vetted utility for memoization of functions, which would take the place of `hideTheCache(..)` here. Memoization is beyond the *scope* (pun intended!) of our discussion, but see my *Functional-Light JavaScript* book for more information. |
+| 동일한 입력으로 호출하는 것이 반복될 것으로 예상되는 경우, 성능을 최적화하기 위해 함수에서 계산한 결과를 캐싱하는 이 기법은 함수형 프로그래밍 세계에서는 매우 일반적이다. 이 기법은 "메모이제이션"으로 불리며 클로저(7창 참조)에 의존한다. 또한 메모리 사용량 문제가 있다. (부록 B의 "메모리에 대해서"에서 다룰 예정) 함수형 프로그래밍 라이브러리는 주로 함수의 메모이제이션에 최적화된 기능을 제공하며, 이 기능은 `hideTheCache(..)`를 대체한다. 메모이제이션은 지금 논의하고 있는 내용의 *스코프* (의도한 말장난!)를 벗어난다. 자세한 내용이 궁금하다면 *Functional-Light JavaScript* 책을 참조하라. |
 
-Rather than defining a new and uniquely named function each time one of those scope-only-for-the-purpose-of-hiding-a-variable situations occurs, a perhaps better solution is to use a function expression:
+이렇게 '변수를 숨기기 위한 목적만으로 스코프를 생성'해야 하는 상황이 발생할 때마다 고유한 이름을 붙여서 새로운 함수를 정의하는 대신 다음과 같은 함수 표현식을 사용하는 것이 더 나을 수 있다.
 
 ```js
 var factorial = (function hideTheCache() {
@@ -169,72 +169,72 @@ factorial(7);
 // 5040
 ```
 
-Wait! This is still using a function to create the scope for hiding `cache`, and in this case, the function is still named `hideTheCache`, so how does that solve anything?
+잠깐! 이 함수는 여전히 `cache`를 숨기기 위한 스코프를 만드는 목적으로 함수를 사용하고 있으며 위 경우에 함수의 이름은 여전히 `hideTheCache`이다. 그러면 이 문제는 어떻게 해결될까?
 
-Recall from "Function Name Scope" (in Chapter 3), what happens to the name identifier from a `function` expression. Since `hideTheCache(..)` is defined as a `function` expression instead of a `function` declaration, its name is in its own scope—essentially the same scope as `cache`—rather than in the outer/global scope.
+"함수 이름 스코프"(3장)를 참조하여 `function` 표현식에서 이름 식별자가 어떻게 되는지 확인하라. `hideTheCache(..)`를 `function`' 선언 대신 `function` 표현식으로 정의했기 때문에 이 이름은 외부/전역 스코프가 아닌 자체 스코프, 기본적으로 `cache`와 동일한 스코프에 있다.
 
-That means we can name every single occurrence of such a function expression the exact same name, and never have any collision. More appropriately, we can name each occurrence semantically based on whatever it is we're trying to hide, and not worry that whatever name we choose is going to collide with any other `function` expression scope in the program.
+즉, 이렇게 함수 표현식을 사용한 부분마다 내부에서 함수의 이름을 동일하게 지정할 수 있으며, 충돌이 발생하지 않는다. 좀 더 적절하게, 숨기려는 것이 무엇이든 간에 각각의 함수에 의미론적으로 이름을 지정할 수 있고, 어떤 이름을 선택하든 프로그램의 다른 `function` 표현식의 스코프와 충돌할 것이라는 걱정은 하지 않아도 된다.
 
-In fact, we *could* just leave off the name entirely—thus defining an "anonymous `function` expression" instead. But Appendix A will discuss the importance of names even for such scope-only functions.
+실제로 이름 전체를 *생략할 수도 있고*, 따라서 그 대신 "익명의 `function` 표현식"을 정의할 수 있다. 그러나 부록 A에서는 그러한 스코프 전용 함수에 대해서도 이름의 중요성에 대해 설명할 것이다.
 
-### Invoking Function Expressions Immediately
+### 함수 표현식을 바로 실행하기
 
-There's another important bit in the previous factorial recursive program that's easy to miss: the line at the end of the `function` expression that contains `})();`.
+위에서 다룬 팩토리얼 재귀 함수 코드에 지나치기 쉬운 중요한 부분이 있다. 바로 `function` 표현식의 마지막 줄에 있는 `})();` 부분이다.
 
-Notice that we surrounded the entire `function` expression in a set of `( .. )`, and then on the end, we added that second `()` parentheses set; that's actually calling the `function` expression we just defined. Moreover, in this case, the first set of surrounding `( .. )` around the function expression is not strictly necessary (more on that in a moment), but we used them for readability sake anyway.
+`function` 표현식 전체를 `( .. )`로 감싸고 있다는 것에 주목하라. 마지막 부분에 두 번째로 `()` 괄호 한 쌍을 추가했는데 이 부분이 방금 `function` 표현식으로 정의한 함수를 호출하는 것이다. 이 때, 함수 표현식을 감싸는 첫 번째 `( .. )` 괄호가 꼭 필요한 것은 아니지만 가독성을 위해 사용한다.
+ 
+즉, 위 코드는 즉시 실행되는 `function` 표현식을 정의하고 있다. 흔히 사용하는 이 패턴의 (매우 기발한) 이름은 바로 즉시 실행 함수 표현식<sub>Immediately Invoked Function Expression</sub>(IIFE)이다.
 
-So, in other words, we're defining a `function` expression that's then immediately invoked. This common pattern has a (very creative!) name: Immediately Invoked Function Expression (IIFE).
+IIFE는 변수/함수를 숨기기 위해 새 스코프를 생성해야 할 때 유용하다. 단지 표현식이기 때문에, 표현식을 사용할 수 있는 JS 프로그램의 **모든** 위치에서 사용할 수 있다. IIFE에는 `hideTheCache()` 같은 이름을 붙여 줄 수도 있고 (좀 더 일반적으로) 익명으로 사용할 수도 있다. 또, 이 표현식은 독립적으로 사용할 수도 있고 다른 구문의 일부로 사용할 수도 있다. 위 코드에서는 `hideTheCache()`가 `factorial()` 함수 참조를 반환하는데 이것을 `=`을 통해 `factorial` 변수에 할당하고 있다.
 
-An IIFE is useful when we want to create a scope to hide variables/functions. Since it's an expression, it can be used in **any** place in a JS program where an expression is allowed. An IIFE can be named, as with `hideTheCache()`, or (much more commonly!) unnamed/anonymous. And it can be standalone or, as before, part of another statement—`hideTheCache()` returns the `factorial()` function reference which is then `=` assigned to the variable `factorial`.
-
-For comparison, here's an example of a standalone IIFE:
+IIFE를 독립적으로 사용하는 예제와 비교해보자:
 
 ```js
-// outer scope
+// 외부 스코프
 
 (function(){
-    // inner hidden scope
+    // 안으로 숨긴 스코프
 })();
 
-// more outer scope
+// 이어지는 외부 스코프
 ```
 
-Unlike earlier with `hideTheCache()`, where the outer surrounding `(..)` were noted as being an optional stylistic choice, for a standalone IIFE they're **required**; they distinguish the `function` as an expression, not a statement. For consistency, however, always surround an IIFE `function` with `( .. )`.
+앞서 살펴본 `hideTheCache()`에서는 외부를 둘러싸는 `(..)`가 겉모습을 위한 선택지에 불과했지만, IIFE를 독립적으로 사용하는 이 예제에서는 **필수적**인 것이 되었다. `function`을 구문이 아닌 표현식으로 구별해야 하기 때문이다. 물론, 일관성을 위해 IIFE `function`은 항상  `( .. )`로 감싸야 한다. 
 
-| NOTE: |
+| 비고: |
 | :--- |
-| Technically, the surrounding `( .. )` aren't the only syntactic way to ensure the `function` in an IIFE is treated by the JS parser as a function expression. We'll look at some other options in Appendix A. |
+| 기술적인 관점으로 보면, `( .. )`로 감싸는 기법만이 JS 파서가 IIFE 내부의 `function`를 함수 표현식으로 취급하도록 하는 유일한 구문론적 방법은 아니다. 이 외의 방법은 부록 A에서 살펴볼 것이다. |
 
-#### Function Boundaries
+#### 함수 경계
 
-Beware that using an IIFE to define a scope can have some unintended consequences, depending on the code around it. Because an IIFE is a full function, the function boundary alters the behavior of certain statements/constructs.
+IIFE를 사용하여 스코프를 정의할 때는 주변 코드에 따라서 의도하지 않은 결과가 나올 수 있으므로 주의해야 한다. IIFE는 완전히 함수이기 때문에, 함수의 경계가 특정한 구문/구성요소의 동작을 변경할 수 있다.
 
-For example, a `return` statement in some piece of code would change its meaning if an IIFE is wrapped around it, because now the `return` would refer to the IIFE's function. Non-arrow function IIFEs also change the binding of a `this` keyword—more on that in the *Objects & Classes* book. And statements like `break` and `continue` won't operate across an IIFE function boundary to control an outer loop or block.
+예를 들어, 코드의 특정 부분을 IIFE로 감싸게 되면 내부의 `return`의 의미는 달라질 수도 있다. 이 경우 `return`은 IIFE의 함수를 의미하기 때문이다. 화살표 함수로 작성하지 않은 IIFE도 `this` 키워드의 바인딩을 변경한다. (자세한 내용은 *Objects & Classs* 책을 참조하라) 그리고 `break`와 `continue`와 같은 키워드는 외부 루프나 블록을 제어하기 위해 IIFE 함수의 경계를 넘나들지 않는다.
 
-So, if the code you need to wrap a scope around has `return`, `this`, `break`, or `continue` in it, an IIFE is probably not the best approach. In that case, you might look to create the scope with a block instead of a function.
+따라서, 스코프로 감싸야 할 코드에 `return`, `this`, `break`, `continue` 등이 있다면 IIFE가 최선의 방법이 아닐 것이다. 이 경우 함수 대신 블록을 사용하여 스코프를 만들 수 있다.
 
-## Scoping with Blocks
+## 블록으로 스코프 지정하기
 
-You should by this point feel fairly comfortable with the merits of creating scopes to limit identifier exposure.
+이쯤 되면 식별자의 노출을 제한하기 위해 스코프를 생성하는 것의 장점을 이해할 수 있어야 한다.
 
-So far, we looked at doing this via `function` (i.e., IIFE) scope. But let's now consider using `let` declarations with nested blocks. In general, any `{ .. }` curly-brace pair which is a statement will act as a block, but **not necessarily** as a scope.
+지금까지는 (IIFE를 사용하여)  `function` 으로 스코프를 지정하는 법을 알아보았다. 지금부터는  `let` 선언과 중첩된 블록을 사용하는 방법을 살펴보자. 일반적으로 구문으로 사용한 `{ .. }` 중괄호 한 쌍은 블록 역할을 하지만, 그렇다고 해서 스코프 역할을 **항상 하는 것은 아니다.**
 
-A block only becomes a scope if necessary, to contain its block-scoped declarations (i.e., `let` or `const`). Consider:
+블록 스코프를 사용하는 선언을 포함(예를 들어, `let` 또는 `const`를 사용할 때)하기 위해 필요한 경우에만 스코프로 동작한다. 다음을 살펴보자:
 
 ```js
 {
-    // not necessarily a scope (yet)
+    // (아직) 스코프가 필요하지 않다.
 
     // ..
 
-    // now we know the block needs to be a scope
+    // 이제, 이 블록은 스코프가 될 필요가 있다는 것을 알게 된다.
     let thisIsNowAScope = true;
 
     for (let i = 0; i < 5; i++) {
-        // this is also a scope, activated each
-        // iteration
+        // 여기도 개별적으로 활성화된 스코프이다.
+        // 반복문
         if (i % 2 == 0) {
-            // this is just a block, not a scope
+            // 여기는 스코프가 아닌 평범한 블록이다.
             console.log(i);
         }
     }
@@ -242,33 +242,32 @@ A block only becomes a scope if necessary, to contain its block-scoped declarati
 // 0 2 4
 ```
 
-Not all `{ .. }` curly-brace pairs create blocks (and thus are eligible to become scopes):
+모든 `{ .. }` 중괄호가 블록을 생성하는 것은 아니다. (따라서, 스코프가 되지도 못한다.):
 
-* Object literals use `{ .. }` curly-brace pairs to delimit their key-value lists, but such object values are **not** scopes.
+* 객체 리터럴에서 키-값 쌍을 명시하기 위해 `{ .. }` 중괄호를 사용하지만, 이러한 객체의 값에 스코프가 있는 건 **아니다**.
 
-* `class` uses `{ .. }` curly-braces around its body definition, but this is not a block or scope.
+* `class`는 몸체를 정의하는 부분을 `{ .. }` 중괄호를 사용해 감싸지만, 블록이나 스코프는 아니다.
 
-* A `function` uses `{ .. } ` around its body, but this is not technically a block—it's a single statement for the function body. It *is*, however, a (function) scope.
+* `function`는 몸체를 `{ .. } ` 중괄호를 사용해 감싸지만, 기술적으로 블록이 아니라 함수의 몸체를 나타내는 단일 구문이다. 하지만,이것은 (함수) 스코프가 *맞다.*
 
-* The `{ .. }` curly-brace pair on a `switch` statement (around the set of `case` clauses) does not define a block/scope.
+* `switch`문에서 (`case`절을 감싸는) `{ .. }` 중괄호는 블록/스코프를 정의하지 않는다.
 
-Other than such non-block examples, a `{ .. }` curly-brace pair can define a block attached to a statement (like an `if` or `for`), or stand alone by itself—see the outermost `{ .. }` curly brace pair in the previous snippet. An explicit block of this sort—if it has no declarations, it's not actually a scope—serves no operational purpose, though it can still be useful as a semantic signal.
+이렇게 블록이 아닌 경우를 제외하고, `{ .. }` 중괄호는 (`if` 또는 `for` 같은) 구문에 추가한 블록을 정의하거나 단독으로 사용할 수도 있다. 이전 코드에서 가장 바깥쪽 `{ .. }` 중괄호 쌍을 다시 보아라. 이런 종류(선언이 없어서 실제로는 스코프가 아닌 경우)의 명시적인 블록은 의미를 나타내는 용도로는 여전히 유용하지만, 사용해야 할 목적을 제공하진 않는다.
 
-Explicit standalone `{ .. }` blocks have always been valid JS syntax, but since they couldn't be a scope prior to ES6's `let`/`const`, they are quite rare. However, post ES6, they're starting to catch on a little bit.
+명시적이고 독립적인 `{ .. }` 블록은 이제까지 유효한 JS 문법이었지만, ES6의 `let`/`const` 이전에는 스코프가 될 수 없었기 때문에 거의 사용하지 않았다. 하지만 ES6 이후 이 방식은 조금씩 인기를 얻기 시작했다.
 
-In most languages that support block scoping, an explicit block scope is an extremely common pattern for creating a narrow slice of scope for one or a few variables. So following the POLE principle, we should embrace this pattern more widespread in JS as well; use (explicit) block scoping to narrow the exposure of identifiers to the minimum practical.
+블록 스코프를 지원하는 대부분의 언어에서, 명시적인 블록 스코프는 여러개의 변수를 위해 작은 스코프를 생성하는데에 매우 자주 쓰이는 패턴이다. 따라서 POLE 원칙에 따라, JS에 이 패턴을 더 널리 수용해야 한다. 식별자의 노출을 최소한으로 좁히기 위해 (명시적) 블록 범위를 사용해야 한다. 식별자의 노출을 최소화하기 위해 (명시적) 블록 스코프를 사용하자.
 
-An explicit block scope can be useful even inside of another block (whether the outer block is a scope or not).
+명시적 블록 스코프는 (외부 블록이 스코프가 아니더라도) 다른 블록의 내부에서 유용할 수 있다.
 
-For example:
+예를 들어:
 
 ```js
 if (somethingHappened) {
-    // this is a block, but not a scope
+    // 이것은 블록이지만 스코프는 아니다.
 
     {
-        // this is both a block and an
-        // explicit scope
+        // 이것은 블록이면서 명시적 스코프이다.
         let msg = somethingHappened.message();
         notifyOthers(msg);
     }
@@ -279,15 +278,15 @@ if (somethingHappened) {
 }
 ```
 
-Here, the `{ .. }` curly-brace pair **inside** the `if` statement is an even smaller inner explicit block scope for `msg`, since that variable is not needed for the entire `if` block. Most developers would just block-scope `msg` to the `if` block and move on. And to be fair, when there's only a few lines to consider, it's a toss-up judgement call. But as code grows, these over-exposure issues become more pronounced.
+위의 예시처럼 `if`문의 **내부**에 위치한 `{ .. }` 중괄호 쌍은 훨씬 작은 명시적 블록 스코프이며 `msg`를 위해 존재한다. 그 변수가 `if` 블록 전체에서 필요하지 않기 때문이다. 대부분의 개발자는 `msg`의 블록 스코프를 `if` 블록에 두고 넘어간다. 그리고 엄밀히 말하자면, 신경써야 할 코드의 양이 많지 않을 때, 느낌대로 내린 결정일 것이다. 결국 코드가 많아질수록, 이런 과다한 노출 문제는 더욱 돋보이게 된다.
 
-So does it matter enough to add the extra `{ .. }` pair and indentation level? I think you should follow POLE and always (within reason!) define the smallest block for each variable. So I recommend using the extra explicit block scope as shown.
+그렇다면 코드에 `{ .. }` 중괄호 한 쌍과 들여쓰기를 추가하는 것이 정말로 중요한걸까? 당신은 POLE 원칙을 지켜야 하고 언제나 (합리적인 범위 내에서) 각 변수에 대해 가장 작은 블록을 정의해야 한다고 생각한다. 그래서 위의 예시처럼 명시적인 블록 스코프를 사용하는 것이 좋다.
 
-Recall the discussion of TDZ errors from "Uninitialized Variables (TDZ)" (Chapter 5). My suggestion there was: to minimize the risk of TDZ errors with `let`/`const` declarations, always put those declarations at the top of their scope.
+5장 "초기화되지 않는 변수들 (TDZ)"에서 다룬 TDZ 오류를 떠올려보자. TDZ 오류를 최소화하기 위해 `let`/`const` 선언을 사용하고 이 선언을 스코프의 가장 첫 부분에 두어야 한다고 제안한 바 있다.
 
-If you find yourself placing a `let` declaration in the middle of a scope, first think, "Oh, no! TDZ alert!" If this `let` declaration isn't needed in the first half of that block, you should use an inner explicit block scope to further narrow its exposure!
+만약 스코프의 중간 지점에 `let` 선언을 하려는 자신을 발견한다면, 먼저 "안돼! TDZ 경보!" 라고 생각하라. 만약 이 `let` 선언이 블록의 스코프의 상단에서 필요하지 않다면, 내부에 명시적인 블록 스코프를 사용하여 이 변수의 노출을 줄여야 한다.
 
-Another example with an explicit block scope:
+명시적 블록 스코프를 사용하는 다른 예시:
 
 ```js
 function getNextMonthStart(dateStr) {
@@ -312,19 +311,19 @@ function getNextMonthStart(dateStr) {
 getNextMonthStart("2019-12-25");   // 2020-01-01
 ```
 
-Let's first identify the scopes and their identifiers:
+먼저 스코프와 해당하는 식별자를 알아보자:
 
-1. The outer/global scope has one identifier, the function `getNextMonthStart(..)`.
+1. 외부/전역 스코프에는 한 개의 식별자가 있다: `getNextMonthStart(..)` 함수
 
-2. The function scope for `getNextMonthStart(..)` has three: `dateStr` (parameter), `nextMonth`, and `year`.
+2. `getNextMonthStart(..)` 함수 스코프에는 세 개의 식별자가 있다: (매개변수)`dateStr`, `nextMonth`, 그리고 `year`
 
-3. The `{ .. }` curly-brace pair defines an inner block scope that includes one variable: `curMonth`.
+3. `{ .. }` 중괄호 한 쌍은 변수 하나를 포함하는 내부 블록 스코프를 정의하고 있다: `curMonth`
 
-So why put `curMonth` in an explicit block scope instead of just alongside `nextMonth` and `year` in the top-level function scope? Because `curMonth` is only needed for those first two statements; at the function scope level it's over-exposed.
+그렇다면 왜 `curMonth`을 `nextMonth`와 `year`와 같은 최상위 함수 스코프 대신 명시적 블록 스코프에 두었을까? 왜냐하면 `curMonth`는 처음 두 개의 구문에서만 필요하기 때문이다. 이런 변수를 함수 스코프에 둔다면 과다 노출인 셈이다.
 
-This example is small, so the hazards of over-exposing `curMonth` are pretty limited. But the benefits of the POLE principle are best achieved when you adopt the mindset of minimizing scope exposure by default, as a habit. If you follow the principle consistently even in the small cases, it will serve you more as your programs grow.
+이 예시 코드는 양이 적기 때문에 `curMonth`의 과다 노출로 인한 위험도 상당히 적은 편이다. 하지만 스코프의 노출을 최소화하는 방식을 기본적인 습관처럼 사용하면 POLE의 장점이 힘을 발휘한다. 사소한 경우에도 이 원칙을 지속적으로 적용한다면, 프로그램이 커지면서 더 많은 장점을 제공할 것이다.
 
-Let's now look at an even more substantial example:
+조금 더 실질적인 예시를 살펴보자:
 
 ```js
 function sortNamesByLength(names) {
@@ -337,17 +336,16 @@ function sortNamesByLength(names) {
         buckets[firstName.length].push(firstName);
     }
 
-    // a block to narrow the scope
+    // 스코프를 좁히기 위한 블록
     {
         let sortedNames = [];
 
         for (let bucket of buckets) {
             if (bucket) {
-                // sort each bucket alphanumerically
+                // 각 bucket을 사전순으로 정렬
                 bucket.sort();
 
-                // append the sorted names to our
-                // running list
+                // 정렬한 데이터를 실행 리스트에 추가
                 sortedNames = [
                     ...sortedNames,
                     ...bucket
@@ -371,28 +369,28 @@ sortNamesByLength([
 //   "Scott", "Jennifer" ]
 ```
 
-There are six identifiers declared across five different scopes. Could all of these variables have existed in the single outer/global scope? Technically, yes, since they're all uniquely named and thus have no name collisions. But this would be really poor code organization, and would likely lead to both confusion and future bugs.
+다섯 스코프에 걸쳐 여섯 개의 식별자가 있다. 이 모든 변수가 한 외부/전역 스코프에 존재할 수 있을까? 기술적으로 가능하다. 모두 고유한 이름이 지정되어 이름 충돌이 없기 때문이다. 하지만 이런 경우, 코드의 구성을 매우 부실하게 하여 혼란이나 버그를 유발할 수 있다.
 
-We split them out into each inner nested scope as appropriate. Each variable is defined at the innermost scope possible for the program to operate as desired.
+필요에 따라 한 스코프를 내부의 중첩 스코프로 여러 개로 나누자. 프로그램이 의도한대로 동작할 수 있는 가장 안쪽의 스코프에서 각 변수를 정의하게 된다.
 
-`sortedNames` could have been defined in the top-level function scope, but it's only needed for the second half of this function. To avoid over-exposing that variable in a higher level scope, we again follow POLE and block-scope it in the inner explicit block scope.
+최상위 함수 스코프에서 `sortedNames`를 정의할 수도 있었지만, 이 변수는 함수의 후반부에서만 필요하다. 상위 스코프에서 변수의 과다 노출을 막기 위해, POLE 원칙을 따라 내부의 명시적 블록 스코프를 지정했다.
 
-### `var` *and* `let`
+### `var` *그리고* `let`
 
-Next, let's talk about the declaration `var buckets`. That variable is used across the entire function (except the final `return` statement). Any variable that is needed across all (or even most) of a function should be declared so that such usage is obvious.
+다음으로 `var buckets`라고 선언한 부분을 살펴보자. 이 변수를 (마지막 `return`문을 제외한) 함수 전체에서 사용하고 있다. 함수의 전체(또는 대부분)에 걸쳐 필요한 변수는 용도가 명확하게 보이도록 선언해야 한다.
 
-| NOTE: |
+| 비고: |
 | :--- |
-| The parameter `names` isn't used across the whole function, but there's no way limit the scope of a parameter, so it behaves as a function-wide declaration regardless. |
+| 매개변수 `names`는 함수 전체에서 사용하고 있진 않지만 스코프를 제한할 수 있는 방법이 없기 때문에 위 방법과는 상관없이 함수 전체에서의 선언으로 동작한다. |
 
-So why did we use `var` instead of `let` to declare the `buckets` variable? There's both semantic and technical reasons to choose `var` here.
+그렇다면 왜 `let` 대신 `var`로 `buckets` 변수를 선언했을까? `var`를 선택한 의미적인 이유, 기술적인 이유가 둘 다 있다.
 
-Stylistically, `var` has always, from the earliest days of JS, signaled "variable that belongs to a whole function." As we asserted in "Lexical Scope" (Chapter 1), `var` attaches to the nearest enclosing function scope, no matter where it appears. That's true even if `var` appears inside a block:
+문체적으로, `var`는 JS의 초창기부터 항상 "함수 전체에 속하는 변수"를 나타냈다. 1장 "Lexical Scope"에서 주정한 것과 같이, `var`는 어디에 나타도 가장 가까운 함수 스코프 내부에 속하게 된다. 블록 안에서 `var`가 나와도 마찬가지다.
 
 ```js
 function diff(x,y) {
     if (x > y) {
-        var tmp = x;    // `tmp` is function-scoped
+        var tmp = x;    // `tmp`은 함수 스코프에 있다.
         x = y;
         y = tmp;
     }
@@ -401,31 +399,31 @@ function diff(x,y) {
 }
 ```
 
-Even though `var` is inside a block, its declaration is function-scoped (to `diff(..)`), not block-scoped.
+`var`는 블록 안에 있지만, 이 선언은 블록 스코프가 아닌 함수 스코프(`diff(..)`)에 속한다.
 
-While you can declare `var` inside a block (and still have it be function-scoped), I would recommend against this approach except in a few specific cases (discussed in Appendix A). Otherwise, `var` should be reserved for use in the top-level scope of a function.
+블록 내에서 `var`로 선언할 수 있지만(그래도 함수 스코프에 속하게 됨) 몇 가지 구체적인 경우(부록 A에서 설명)를 제외하고는 이런 방식을 사용하지 않는게 좋다. 그렇지 않으면 `var`는 함수의 최상위 스코프에서 사용해야 한다.
 
-Why not just use `let` in that same location? Because `var` is visually distinct from `let` and therefore signals clearly, "this variable is function-scoped." Using `let` in the top-level scope, especially if not in the first few lines of a function, and when all the other declarations in blocks use `let`, does not visually draw attention to the difference with the function-scoped declaration.
+같은 위치에서 `let`을 사용하면 어떨까? `var`는 `let`과 시각적으로 구별될 뿐만 아니라 "이 변수는 함수 스코프에 속한다."란 의미를 갖기 때문이다. 함수 내부의 최상위 스코프(그리고 특히 함수의 초반부가 아닌 위치)에서 `let`을 사용하면서 같은 블록 내의 다른 선언에도 모두 `let`를 사용한다면 함수 스코프 선언과의 차이점에 대해 시각적으로 주의를 끌지 못할 것이다. 
 
-In other words, I feel `var` better communicates function-scoped than `let` does, and `let` both communicates (and achieves!) block-scoping where `var` is insufficient. As long as your programs are going to need both function-scoped and block-scoped variables, the most sensible and readable approach is to use both `var` *and* `let` together, each for their own best purpose.
+다시말해서 `var`은 `let`보다 더 함수 스코프로 지정되었다는 의미를 더 잘 전달한다고 느낄 수 있다. 그리고 `let` 또한 `var`로 충분히 설명할 수 없는 블록 스코프에 속한다는 의미를 더 잘 전달(하고 달성)할 수 있게 된다. 프로그램이 함수 스코프 변수와 블록 스코프 변수를 모두 필요로 하는 한, 가장 합리적이면서 가독성이 좋은 방법은 `var` *그리고* `let`을 각각의 목적에 맞게 함께 사용하는 것이다.
 
-There are other semantic and operational reasons to choose `var` or `let` in different scenarios. We'll explore the case for `var` *and* `let` in more detail in Appendix A.
+특정 상황에서 `var` 또는 `let`을 구분해 사용하게 되는 의미와 실행 측면에서 또 다른 이유가 있다. 부록 A에서 `var` *그리고* `let`의 자세한 내용을 더 살펴볼 것이다.
 
-| WARNING: |
+| 주의: |
 | :--- |
-| My recommendation to use both `var` *and* `let` is clearly controversial and contradicts the majority. It's far more common to hear assertions like, "var is broken, let fixes it" and, "never use var, let is the replacement." Those opinions are valid, but they're merely opinions, just like mine. `var` is not factually broken or deprecated; it has worked since early JS and it will continue to work as long as JS is around. |
+| `var` *그리고* `let`을 동시에 사용하는 방법은 분명히 논란의 여지가 있고 다수의 의견과도 엇갈린다. "var는 고장났기 때문에 let으로 고쳐라"라든지 "var를 사용하지 말고 let으로 대체하라"하는 주장을 훨씬 더 흔히 들을 수 있다. 이런 의견도 타당하지만 위에서 주장했던 내용과 마찬가지로 단지 의견일 뿐이다. `var`는 실제로 고장이났다거나 사라지게 될 것은 아니고 JS 초기부터 그래왔던 것처럼 앞으로도 JS가 있는 한 계속 작동할 것이다.
 
-### Where To `let`?
+### `let`이 있어야할 곳은?
 
-My advice to reserve `var` for (mostly) only a top-level function scope means that most other declarations should use `let`. But you may still be wondering how to decide where each declaration in your program belongs?
+`var`를 (거의) 최상위 함수 스코프에서만 사용하라는 말은 대부분의 다른 경우에는 `let`으로 선언해야 한다는 것을 의미한다. 하지만 이 조언대로 하려고 해도 여전히 프로그램의 각 선언을 어떤 스코프에 속하도록 배치할지 고민하게 될 것이다.
 
-POLE already guides you on those decisions, but let's make sure we explicitly state it. The way to decide is not based on which keyword you want to use. The way to decide is to ask, "What is the most minimal scope exposure that's sufficient for this variable?"
+POLE가 이미 위와 같은 고민에 도움을 주고 있긴 하지만, 좀 더 명확하게 설명해보자. 위와 같은 문제를 해결하는 방법은 어떤 키워드를 사용할지 결정하는 것이 아니다. 정확한 방법은 "이 변수에게 충분한 최소한의 스코프 노출은 무엇입니까?"란 질문을 던지는 것이다.
 
-Once that is answered, you'll know if a variable belongs in a block scope or the function scope. If you decide initially that a variable should be block-scoped, and later realize it needs to be elevated to be function-scoped, then that dictates a change not only in the location of that variable's declaration, but also the declarator keyword used. The decision-making process really should proceed like that.
+이 질문의 답을 찾으면, 그 변수가 블록 스코프에 속하는지 함수 스코프에 속하는지 알게 될 것이다. 처음에 변수를 블록 스코프로 지정해두었다가 함수 스코프로 상향 조정해야하는 상황이 올 때, 해당 변수의 선언 위치뿐만 아니라 사용된 선언자 키워드까지 같이 수정하면 된다. 이런 식으로 의사결정 과정을 진행해야 한다.
 
-If a declaration belongs in a block scope, use `let`. If it belongs in the function scope, use `var` (again, just my opinion).
+선언이 블록 스코프에 속하면 `let`을 사용하라. 함수 스코프에 속하면 `var`(다시 말하지만, 필자의 의견이다)를 사용하라.
 
-But another way to sort of visualize this decision making is to consider the pre-ES6 version of a program. For example, let's recall `diff(..)` from earlier:
+하지만 이런 결정을 시각화하는 또 다른 방법은 ES6 이전의 프로그램을 고려해보는 것이다. 예를 들어, 앞에서 나왔던 `diff(..)`을 다시 살펴보자:
 
 ```js
 function diff(x,y) {
@@ -441,16 +439,16 @@ function diff(x,y) {
 }
 ```
 
-In this version of `diff(..)`, `tmp` is clearly declared in the function scope. Is that appropriate for `tmp`? I would argue, no. `tmp` is only needed for those few statements. It's not needed for the `return` statement. It should therefore be block-scoped.
+이 버전의 `diff(..)`에서는 `tmp`를 정확히 함수 스코프 내에 선언한다. 이것이 `tmp`에게 적합할까? 아니라고 할 수 있다. `tmp`은 오직 일부 구문에서만 필요하다. `return` 구문 에서도 필요 없다. 그러므로 블록 스코프를 지정해주어야 한다.
 
-Prior to ES6, we didn't have `let` so we couldn't *actually* block-scope it. But we could do the next-best thing in signaling our intent:
+ES6 이전에는 `let`이 없어서 블록 스코프를 *실제로* 지정할 수 없었다. 하지만 이런 의도를 알리는 차선책을 생각해볼 수 있다:
 
 ```js
 function diff(x,y) {
     if (x > y) {
-        // `tmp` is still function-scoped, but
-        // the placement here semantically
-        // signals block-scoping
+        // `tmp`는 여전히 함수 스코프에 속한다.
+        // 하지만 여기에 배치했다는 것은
+        // 의미론적으로 블록 스코프에 속한다는 뜻을 나타낸다.
         var tmp = x;
         x = y;
         y = tmp;
@@ -460,27 +458,27 @@ function diff(x,y) {
 }
 ```
 
-Placing the `var` declaration for `tmp` inside the `if` statement signals to the reader of the code that `tmp` belongs to that block. Even though JS doesn't enforce that scoping, the semantic signal still has benefit for the reader of your code.
+`tmp`에 대한 `var` 선언을 `if` 구문 내부에 두면, `tmp`가 그 블록에 속한다는 것을 코드를 읽는 사람에게 전달할 수 있다. JS가 이 스코프에 대해서 강제하지 않지만, 그 의미론적인 신호는 코드를 읽는 사람에게 장점을 발휘한다.
 
-Following this perspective, you can find any `var` that's inside a block of this sort and switch it to `let` to enforce the semantic signal already being sent. That's proper usage of `let` in my opinion.
+이런 관점으로 보면, 이런 종류의 블록 안에 있는 그 어떤 `var`라도 찾아내  `let`으로 교체해서 이미 전달하고 있는 의미론적인 신호를 강제할 수 있다. 그것이 `let`의 적절한 사용법이다.
 
-Another example that was historically based on `var` but which should now pretty much always use `let` is the `for` loop:
+역사적으로 `var` 를 기초로 두고 있었지만 이제는 `let`을 항상 사용해야 하는 또 다른 예는 `for` 반복문이다:
 
 ```js
 for (var i = 0; i < 5; i++) {
-    // do something
+    // 무언가 처리한다.
 }
 ```
 
-No matter where such a loop is defined, the `i` should basically always be used only inside the loop, in which case POLE dictates it should be declared with `let` instead of `var`:
+이러한 반복문을 정의하는 위치에 관계없이, 기본적으로 `i`는 항상 반복문 안에서만 사용해야 하며, 이 경우 POLE는 `var` 대신 `let`으로 선언해야 하도록 지시한다:
 
 ```js
 for (let i = 0; i < 5; i++) {
-    // do something
+    // 무언가 처리한다.
 }
 ```
 
-Almost the only case where switching a `var` to a `let` in this way would "break" your code is if you were relying on accessing the loop's iterator (`i`) outside/after the loop, such as:
+이런 식으로 `var`를 `let`으로 교체하면 코드가 "깨질" 수 있는 거의 유일한 경우는 다음과 같이 반복문의 바깥이나 뒤에서 반복자(`i`)에 접근하는 경우이다.
 
 ```js
 for (var i = 0; i < 5; i++) {
@@ -490,11 +488,11 @@ for (var i = 0; i < 5; i++) {
 }
 
 if (i < 5) {
-    console.log("The loop stopped early!");
+    console.log("반복문이 일찍 멈췄다!");
 }
 ```
 
-This usage pattern is not terribly uncommon, but most feel it smells like poor code structure. A preferable approach is to use another outer-scoped variable for that purpose:
+이런 사용 패턴은 매우 드물게 보이는 것이 아니지만, 대부분은 코드 구조가 좋지 않다고 느낀다. 바람직한 방법은 목적에 맞는 다른 외부 스코프의 변수를 사용하는 것이다.
 
 ```js
 var lastI;
@@ -507,17 +505,17 @@ for (let i = 0; i < 5; i++) {
 }
 
 if (lastI < 5) {
-    console.log("The loop stopped early!");
+    console.log("반복문이 일찍 멈췄다!");
 }
 ```
 
-`lastI` is needed across this whole scope, so it's declared with `var`. `i` is only needed in (each) loop iteration, so it's declared with `let`.
+전체 스코프에 걸쳐 `lastI`가 필요하기 때문에  `var`로 선언했다. `i`는 (각) 반복문을 반복할 때에만 필요하므로 `let`으로 선언했다.
 
-### What's the Catch?
+### Catch는 무엇인가?
 
-So far we've asserted that `var` and parameters are function-scoped, and `let`/`const` signal block-scoped declarations. There's one little exception to call out: the `catch` clause.
+지금까지 `var`와 매개변수는 함수 스코프에 속하고, `let`/`const`는 블록 스코프에 속하는 선언임을 확인했다. 그런데, 여기서 한 가지 예외가 있다. 바로 `catch` 구문이다.
 
-Since the introduction of `try..catch` back in ES3 (in 1999), the `catch` clause has used an additional (little-known) block-scoping declaration capability:
+1999년 ES3으로 `try...catch`가 도입된 이후 `catch` 구문은 (거의 알려지지 않은) 추가적인 블록 스코프를 지정하는 선언 기능을 갖고 있었다:
 
 ```js
 try {
@@ -539,30 +537,30 @@ console.log(err);
 // ^^^^ this is another thrown (uncaught) exception
 ```
 
-The `err` variable declared by the `catch` clause is block-scoped to that block. This `catch` clause block can hold other block-scoped declarations via `let`. But a `var` declaration inside this block still attaches to the outer function/global scope.
+`catch`문에서 선언한 `err` 변수는 해당 블록의 (블록) 스코프에 속하게 된다. 이 `catch`문의 블록에서 `let`과 같은 블록 스코프 선언을 사용할 수 있다. 하지만, 이 블록에서도 `var` 선언은 여전히 외부의 함수/전역 스코프에 속하게 된다.
 
-ES2019 (recently, at the time of writing) changed `catch` clauses so their declaration is optional; if the declaration is omitted, the `catch` block is no longer (by default) a scope; it's still a block, though!
+(이 글을 작성한 시점에서 가장 최근인) ES2019에서 `catch`문은 변수 선언을 생략할 수 있도록 바뀌었다. 선언을 생략하면 `catch` 블록은 더 이상 (기본적으로) 스코프로 동작하지 않는다. 여전히 블록이긴 해도 말이다.
 
-So if you need to react to the condition *that an exception occurred* (so you can gracefully recover), but you don't care about the error value itself, you can omit the `catch` declaration:
+그래서 *오류가 발생한* 상태에는 (안전하게 복구할 수 있도록) 대응해야 하지만, 오류 값 자체는 중요하지 않을 때, `catch`의 변수 선언을 생략할 수 있다:
 
 ```js
 try {
     doOptionOne();
 }
-catch {   // catch-declaration omitted
+catch {   // catch 선언을 생략함
     doOptionTwoInstead();
 }
 ```
 
-This is a small but delightful simplification of syntax for a fairly common use case, and may also be slightly more performant in removing an unnecessary scope!
+위 내용은 상당히 일반적인 사용 사례를 고려하여, 약간이지만 적절하게 문법을 단순화한 것이다. 그리고 불필요한 스코프를 줄이는데에도 약간이나마 더 효과적일 수 있다.
 
-## Function Declarations in Blocks (FiB)
+## 블록에서의 함수 선언<sub>Function Declarations in Blocks</sub> (FiB)
 
-We've seen now that declarations using `let` or `const` are block-scoped, and `var` declarations are function-scoped. So what about `function` declarations that appear directly inside blocks? As a feature, this is called "FiB."
+`let`이나 `const`를 사용하면 블록 스코프에 속하고 `var`는 함수 스코프에 속한다는 것을 알아보았다. 그렇다면 블록 안에서 직접 `function`선언을 사용하면 어떻게 될까? 이런 함수를 "FiB"라고 한다.
 
-We typically think of `function` declarations like they're the equivalent of a `var` declaration. So are they function-scoped like `var` is?
+일반적으로 `function` 선언을 `var` 선언처럼 생각하기도 한다.  그렇다면 `var` 처럼 함수 스코프로 지정이 될까?
 
-No and yes. I know... that's confusing. Let's dig in:
+아니기도 하고 맞기도 하다. 약간 혼란스러운데, 예제를 자세히 살펴보자:
 
 ```js
 if (false) {
@@ -573,25 +571,25 @@ if (false) {
 ask();
 ```
 
-What do you expect for this program to do? Three reasonable outcomes:
+위 코드가 어떻게 동작할 것으로 예상하는가? 다음 세 가지 결과를 생각해볼 수 있다:
 
-1. The `ask()` call might fail with a `ReferenceError` exception, because the `ask` identifier is block-scoped to the `if` block scope and thus isn't available in the outer/global scope.
+1. `ask()`를 호출하면 실패하고 `ReferenceError` 예외가 발생할 것이다. `ask` 식별자가 `if` 블록 스코프에 속하므로 외부/전역 스코프에서는 사용할 수 없기 때문이다.
 
-2. The `ask()` call might fail with a `TypeError` exception, because the `ask` identifier exists, but it's `undefined` (since the `if` statement doesn't run) and thus not a callable function.
+2. `ask()`를 호출하면 실패하고 `TypeError` 예외가 발생할 것이다. `ask` 식별자가 존재하지만 (`if` 문 내부는 실행하지 않으므로) `undefined` 이라서 호출할 수 있는 함수가 아니기 때문이다.
 
-3. The `ask()` call might run correctly, printing out the "Does it run?" message.
+3. `ask()`를 호출하면 문제 없이 동작하여 "Does it run?" 문구를 출력할 것이다.
 
-Here's the confusing part: depending on which JS environment you try that code snippet in, you may get different results! This is one of those few crazy areas where existing legacy behavior betrays a predictable outcome.
+여기에 혼란스러운 부분이 있는데, 위 코드를 어떤 JS 환경에서 실행하는지에 따라 다른 결과가 나올 수 있기 때문이다! 이런 경우가 바로 기존 동작에서 예측 가능했던 결과를 내지 못하게 하는 이상한 영역 중 하나이다.
 
-The JS specification says that `function` declarations inside of blocks are block-scoped, so the answer should be (1). However, most browser-based JS engines (including v8, which comes from Chrome but is also used in Node) will behave as (2), meaning the identifier is scoped outside the `if` block but the function value is not automatically initialized, so it remains `undefined`.
+JS 명세에 따르면 블록 내부의 `function` 선언은 블록 스코프에 속하므로 (1)과 같은 결과가 나와야 한다. 그러나 대부분 브라우저를 기반으로 하는 JS 엔진(Chrome에서 나왔지만 Node에서도 사용하는 v8를 포함)은  (2)와 같이 동작한다. 식별자는 `if` 블록의 외부 스코프로 지정되지만 함수 값이 자동으로 초기화되지는 않으므로 `undefined`를 유지하게 된다.
 
-Why are browser JS engines allowed to behave contrary to the specification? Because these engines already had certain behaviors around FiB before ES6 introduced block scoping, and there was concern that changing to adhere to the specification might break some existing website JS code. As such, an exception was made in Appendix B of the JS specification, which allows certain deviations for browser JS engines (only!).
+브라우저 JS 엔진이 명세에 맞지 않는 동작을 허용하는 이유는 무엇일까? 이 엔진은 이미 ES6에서 블록 스코프가 나오기 이전에 이미 FiB에 대한 동작을 정의하고 있었기 때문이다. 그래서, 명세에 따른 방식으로 동작을 변경할 경우, 기존의 웹사이트 JS 코드의 동작에 문제가 생길 수 있다는 우려가 있었다. 이렇게, JS 명세의 부록 B에서 예외가 만들어졌고, 이 예외는 브라우저 JS 엔진(만)의 이런 동작 차이를 허용하고 있다.
 
-| NOTE: |
+| 비고: |
 | :--- |
-| You wouldn't typically categorize Node as a browser JS environment, since it usually runs on a server. But Node's v8 engine is shared with Chrome (and Edge) browsers. Since v8 is first a browser JS engine, it adopts this Appendix B exception, which then means that the browser exceptions are extended to Node. |
+| 일반적으로 Node는 주로 서버에서 실행하므로 브라우저 JS 환경으로 분류하지 않는다. 하지만 Node의 v8 엔진은 Chrome(그리고 Edge)에서도 사용하고 있다. v8를 브라우저 JS 엔진으로 사용하기 때문에 부록 B 예외를 적용하게 되었으며, 브라우저 예외가 Node까지 확장된다는 것을 의미한다. |
 
-One of the most common use cases for placing a `function` declaration in a block is to conditionally define a function one way or another (like with an `if..else` statement) depending on some environment state. For example:
+`function` 선언을 블록 내부에 배치하는 가장 일반적인 사용법 중 하나는 어떤 환경인지에 따라 (`if..else`문을 이용하여) 함수를 조건부로 정의하는 것이다. 예를 들어:
 
 ```js
 if (typeof Array.isArray != "undefined") {
@@ -607,13 +605,13 @@ else {
 }
 ```
 
-It's tempting to structure code this way for performance reasons, since the `typeof Array.isArray` check is only performed once, as opposed to defining just one `isArray(..)` and putting the `if` statement inside it—the check would then run unnecessarily on every call.
+성능상의 이유로 이런 식으로 코드의 구조를 잡는 것이 매력적일 것이다. `isArray(..)`를 정의하고 내부에 `if`문을 넣어 실행할 때마다 매번 불필요하게 조건식을 검사하는 대신, `typeof Array.isArray` 검사를 한 번만 수행할 수 있기 때문이다.
 
-| WARNING: |
+| 주의: |
 | :--- |
-| In addition to the risks of FiB deviations, another problem with conditional-definition of functions is it's harder to debug such a program. If you end up with a bug in the `isArray(..)` function, you first have to figure out *which* `isArray(..)` implementation is actually running! Sometimes, the bug is that the wrong one was applied because the conditional check was incorrect! If you define multiple versions of a function, that program is always harder to reason about and maintain. |
+| FiB 동작 차이로 인한 위험성 외에도, 조건적으로 함수를 정의하는 경우의 또 다른 문제점은 바로 디버깅하기 어렵다는 것이다. `isArray(..)` 함수에 버그가 있다는 걸 알게 되면, 가장 먼저 어떤 `isArray(..)`의 구현을 실제로 실행하고 있는지 파악해야 한다. 때때로, 이런 버그는 초기 조건식의 오류로 잘못된 구현을 적용하게 되어 발생하기도 한다! 함수를 여러 버전으로 정의하게 되면, 그 프로그램을 파악하고 유지 보수하기 어렵다. |
 
-In addition to the previous snippets, several other FiB corner cases are lurking; such behaviors in various browsers and non-browser JS environments (JS engines that aren't browser based) will likely vary. For example:
+상기한 코드 외에도 FiB의 여러가지 예외 동작이 더 숨어 있다. 다양한 브라우저와 브라우저 외 JS 환경(브라우저 기반이 아닌 JS 엔진)에서 FiB는 다양하게 동작할 것이다. 예를 들어:
 
 ```js
 if (true) {
@@ -641,15 +639,15 @@ function ask() {
 }
 ```
 
-Recall that function hoisting as described in "When Can I Use a Variable?" (in Chapter 5) might suggest that the final `ask()` in this snippet, with "Wait, maybe..." as its message, would hoist above the call to `ask()`. Since it's the last function declaration of that name, it should "win," right? Unfortunately, no.
+5장의 "언제 변수를 사용할 수 있을까?"에서 설명한 함수 호이스팅을 상기하라. "Wait, maybe..." 메시지를 출력하는 위 코드의 마지막 `ask()`가 `ask()`를 호출하기 전 위치로 호이스팅 될 것이다. 그렇다면 같은 이름으로 하는 마지막 함수 선언이므로 마지막 `ask()`로 실행하게 될까? 아쉽지만 아니다.
 
-It's not my intention to document all these weird corner cases, nor to try to explain why each of them behaves a certain way. That information is, in my opinion, arcane legacy trivia.
+이런 예외 동작을 모두 정리한다거나 왜 각자마다 특정한 방식으로 동작하는지 설명하려고 하는 것은 아니다. 이런 정보는 그저 불가사의하고 사소한 레거시라고 생각한다.
 
-My real concern with FiB is, what advice can I give to ensure your code behaves predictably in all circumstances?
+FiB에 대해 가장 중요한 것은, 코드가 모든 상황에서 언제나 예측 가능한 방식으로 동작하도록 하려면 어떻게 해야할지 아는 것이다.
 
-As far as I'm concerned, the only practical answer to avoiding the vagaries of FiB is to simply avoid FiB entirely. In other words, never place a `function` declaration directly inside any block. Always place `function` declarations anywhere in the top-level scope of a function (or in the global scope).
+일반적으로, FiB의 예외 상황을 피하는 가장 실용적인 방법은 바로 FiB를 사용하지 않는 것이다. 즉, 어떤 블록 내부에라도 `function` 선언을 직접 사용하지 말아라. `function` 선언은 항상 함수의 최상위 스코프(또는 전역 스코프)에 해야 한다.
 
-So for the earlier `if..else` example, my suggestion is to avoid conditionally defining functions if at all possible. Yes, it may be slightly less performant, but this is the better overall approach:
+그래서 상기한 `if..else` 예제에서는, 가능한한 함수를 조건부로 정의하지 않는 것을 권장한다. 그렇다. 성능상의 이득은 줄어들지만 이런 방식이 조금 더 나은 접근법이다:
 
 ```js
 function isArray(a) {
@@ -663,14 +661,14 @@ function isArray(a) {
 }
 ```
 
-If that performance hit becomes a critical path issue for your application, I suggest you consider this approach:
+만약 성능 저하가 애플리케이션에서 가장 치명적인 문제가 된다면, 다음과 같이 접근해볼 것을 제안한다:
 
 ```js
 var isArray = function isArray(a) {
     return Array.isArray(a);
 };
 
-// override the definition, if you must
+// 필요하다면, 정의를 오버라이드한다.
 if (typeof Array.isArray == "undefined") {
     isArray = function isArray(a) {
         return Object.prototype.toString.call(a)
@@ -679,18 +677,18 @@ if (typeof Array.isArray == "undefined") {
 }
 ```
 
-It's important to notice that here I'm placing a `function` **expression**, not a declaration, inside the `if` statement. That's perfectly fine and valid, for `function` expressions to appear inside blocks. Our discussion about FiB is about avoiding `function` **declarations** in blocks.
+여기서 `if`문 내부에 함수를 선언한 것이 아니라 `function` **표현식**을 사용했다는 것에 주목하라. `function` 표현식을 블록 내부에 배치하는 것은 완벽하고 유효한 방법이다. FiB에 대해 이야기 하고 있는 내용이 바로 블록 내부의 `function` **선언**을 피하는 것이기 때문이다.
 
-Even if you test your program and it works correctly, the small benefit you may derive from using FiB style in your code is far outweighed by the potential risks in the future for confusion by other developers, or variances in how your code runs in other JS environments.
+프로그램이 올바르게 작동하더라도, FiB 방식을 코드에 적용하여 얻을 수 있는 약간의 이점은 다른 개발자가 느낄 혼란으로 인한 잠재적인 위험이나 다른 JS 환경에서 실행하는 방식으로 인한 동작 차이에 비하면 너무나 작다.
 
-FiB is not worth it, and should be avoided.
+FiB는 그럴 가치가 없으며 반드시 피해야 한다.
 
-## Blocked Over
+## 마무리
 
-The point of lexical scoping rules in a programming language is so we can appropriately organize our program's variables, both for operational as well as semantic code communication purposes.
+프로그래밍 언어에서 렉시컬 스코프 지정의 핵심은 운영적인 관점이나 코드의 의미를 통한 소통의 관점 모두를 고려하여 적절하게 프로그램의 변수를 구성할 수 있도록 하는 것이다.
 
-And one of the most important organizational techniques is to ensure that no variable is over-exposed to unnecessary scopes (POLE). Hopefully you now appreciate block scoping much more deeply than before.
+그리고 가장 중요한 조직화 기법중 하나는 변수가 불필요한 스코프까지 과다하게 노출되지 않도록 하는 것(POLE)이다. 블록 스코프 지정의 장점을 이전보다 더 깊게 이해하길 바란다.
 
-Hopefully by now you feel like you're standing on much more solid ground with understanding lexical scope. From that base, the next chapter jumps into the weighty topic of closure.
+지금쯤이면 렉시컬 스코프에 대한 이해와 함께 훨씬 더 단단한 기반위에 서 있는 것처럼 느낄 수 있을 것이다. 이것을 바탕으로 다음 장에서는 클로저라는 중요한 주제로 넘어갈 것이다.
 
-[^POLP]: *Principle of Least Privilege*, https://en.wikipedia.org/wiki/Principle_of_least_privilege, 3 March 2020.
+[^POLP]: *Principle of Least Privilege*, https://en.wikipedia.org/wiki/Principle_of_least_privilege, 2020년 3월 3일.
