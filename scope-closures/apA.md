@@ -651,7 +651,7 @@ function getStudents(data) {
         let id = `student-${ record.id }`;
         studentRecords.push({
             id,
-            record.name
+            name: record.name
         });
     }
 
