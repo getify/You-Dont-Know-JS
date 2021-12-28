@@ -115,7 +115,7 @@ chars;
 //   "w", "o", "r", "l", "d", "!" ]
 ```
 
-A `Map` data structure uses objects as keys, associating a value (of any type) with that object. Maps have a different default iteration than seen here, in that the iteration is not just over the map's values but instead its *entries*. An *entry* is a tuple (2-element array) including both a key and a value.
+A `Map` data structure uses any value (both objects and primitive values) as keys, associating a value (of any type) with that object. Maps have a different default iteration than seen here, in that the iteration is not just over the map's values but instead its *entries*. An *entry* is a tuple (2-element array) including both a key and a value.
 
 Consider:
 
