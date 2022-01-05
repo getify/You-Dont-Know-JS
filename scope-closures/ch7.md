@@ -1,37 +1,37 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 7: Using Closures
+# 챕터 7: 클로저 사용하기
 
-Up to this point, we've focused on the ins and outs of lexical scope, and how that affects the organization and usage of variables in our programs.
+지금까지, 렉시컬 스코프의 내부와 외부가 프로그램의 변수 구성과 사용에 어떤 영향을 미치는지에 초점을 맞추었다.
 
-Our attention again shifts broader in abstraction, to the historically somewhat daunting topic of closure. Don't worry! You don't need an advanced computer science degree to make sense of it. Our broad goal in this book is not merely to understand scope, but to more effectively use it in the structure of our programs; closure is central to that effort.
+우리의 관심은 역사적으로 다소 어려운 주제인 클로저로 추상적으로 다시 확대된다. 걱정하지 마라! 이를 이해하기 위해 고급 컴퓨터 공학 학위가 필요하지는 않다. 이 책의 큰 목표는 단지 스코프를 이해하는 것이 아니라, 프로그램의 구조에 스코프를 더 효과적으로 사용하는 것이다; 클로저는 그 노력의 핵심이다.
 
-Recall the main conclusion of Chapter 6: the *least exposure* principle (POLE) encourages us to use block (and function) scoping to limit the scope exposure of variables. This helps keep code understandable and maintainable, and helps avoid many scoping pitfalls (i.e., name collision, etc.).
+챕터6의 결론을 상기해라: "*최소 노출* 원리<sub>Least Exposure</sub>"(POLE)는 변수의 스코프 노출을 제한하기 위해서 블록(혹은 함수)스코프 사용을 장려한다.이는 코드를 이해하고 유지보수하기 쉽게 도와주고 스코프 함정(i.e. 네이밍 충돌 등)을 피하는데 도움이 된다.
 
-Closure builds on this approach: for variables we need to use over time, instead of placing them in larger outer scopes, we can encapsulate (more narrowly scope) them but still preserve access from inside functions, for broader use. Functions *remember* these referenced scoped variables via closure.
+클로저는 이런 접근 방식을 기반으로 한다: 시간이 지나도 사용해야하는 변수의 경우, 더 큰 외부 스코프에 변수들을 위치시키는 대신, 함수 내부에서의 접근은 보존해서 (더 좁은 스코프로) 더 넓은 사용이 가능하게끔 캡슐화 할 수 있다. 함수들은 클로저를 통해 참조된 변수의 스코프를 *기억한다.*
 
-We already saw an example of this kind of closure in the previous chapter (`factorial(..)` in Chapter 6), and you've almost certainly already used it in your own programs. If you've ever written a callback that accesses variables outside its own scope... guess what!? That's closure.
+이미 이전 챕터(챕터6의 `factorial(..)`)에서 이러한 종류의 클로저 예시를 본 적이 있고, 아마 프로그램에서 이미 사용해봤을 것이다. 스코프 외부에서 변수를 접근하는 콜백을 작성해본 경험이 있다면... 이게 뭘까!? 바로 클로저다.
 
-Closure is one of the most important language characteristics ever invented in programming—it underlies major programming paradigms, including Functional Programming (FP), modules, and even a bit of class-oriented design. Getting comfortable with closure is required for mastering JS and effectively leveraging many important design patterns throughout your code.
+클로저는 프로그래밍에서 발명된 가장 중요한 언어 특성 중 하나다. 클로저는 FP(함수형 프로그래밍<sub>Functional Programming</sub>), 모듈 및 클래스 지향 설계의 일부분을 포함한 주요 프로그래밍 패러다임의 기반이 된다. 클로저에 익숙해지는 것은 JS를 마스터하고 코드에서 많은 중요한 디자인 패턴을 효과적으로 활용하는 데 필요하다.
 
-Addressing all aspects of closure requires a daunting mountain of discussion and code throughout this chapter. Make sure to take your time and ensure you're comfortable with each bit before moving onto the next.
+클로저의 모든 측면을 다루려면 이 장 전체에 걸쳐 토론과 코드의 험난한 여정이 필요하다. 다음 단계로 넘어가기 전에 시간을 갖고 각 부분들에 익숙해졌는지 확인해라.
 
-## See the Closure
+## 클로저 살펴보기
 
-Closure is originally a mathematical concept, from lambda calculus. But I'm not going to list out math formulas or use a bunch of notation and jargon to define it.
+클로저는 원래 수학적인 개념으로 람다 대수에서 유래했다. 그러나 수학적인 공식을 나열하거나 이를 정의하기 위해 많은 표기법이나 전문용어는 사용하지는 않을 것이다.
 
-Instead, I'm going to focus on a practical perspective. We'll start by defining closure in terms of what we can observe in different behavior of our programs, as opposed to if closure was not present in JS. However, later in this chapter, we're going to flip closure around to look at it from an *alternative perspective*.
+대신, 실용적인 관점으로 살펴볼 것이다. 클로저가 JS에 없다고 가정한 상황과 비교해서 프로그램의 다른 동작에서 관찰할 수 있는 관점에서 클로저를 정의하는 것으로 시작할 것이다. 그러나 이 장의 뒷부분 *대안적 관점*에서 클로저를 보는 관점을 뒤집을 것이다.
 
-Closure is a behavior of functions and only functions. If you aren't dealing with a function, closure does not apply. An object cannot have closure, nor does a class have closure (though its functions/methods might). Only functions have closure.
+클로저는 함수의 동작이며 함수일 뿐이다. 함수를 다루지 않는다면 클로저가 적용되지 않는다. 객체에는 클로저가 있을 수 없으며 클래스에도 클로저가 없다(해당 함수/메서드가 있을 수 있음). 오직 함수에만 클로저가 있다.
 
-For closure to be observed, a function must be invoked, and specifically it must be invoked in a different branch of the scope chain from where it was originally defined. A function executing in the same scope it was defined would not exhibit any observably different behavior with or without closure being possible; by the observational perspective and definition, that is not closure.
+클로저를 관찰하려면 함수가 반드시 실행되어야 하고, 원래 정의된 스코프 체인과 다른 분기의 스코프에서 실행되어야 한다. 정의된 동일한 스코프에서 실행되는 함수는 클로저가 가능한지 여부에 관계없이 관찰 가능한 다른 동작이 없다. 관찰적 관점과 정의에 따르면, 그것은 클로저가 아닙니다.
 
-Let's look at some code, annotated with its relevant scope bubble colors (see Chapter 2):
+관련있는 스코프 버블색들이 주석으로 달린 코드를 보자(챕터2 참고):
 
 ```js
-// outer/global scope: RED(1)
+// 외부/글로벌 스코프: 빨강(1)
 
 function lookupStudent(studentID) {
-    // function scope: BLUE(2)
+    // 함수 스코프: 파랑(2)
 
     var students = [
         { id: 14, name: "Kyle" },
@@ -41,7 +41,7 @@ function lookupStudent(studentID) {
     ];
 
     return function greetStudent(greeting){
-        // function scope: GREEN(3)
+        // 함수 스코프: 초록(3)
 
         var student = students.find(
             student => student.id == studentID
@@ -56,7 +56,7 @@ var chosenStudents = [
     lookupStudent(112)
 ];
 
-// accessing the function's name:
+// 함수명 접근:
 chosenStudents[0].name;
 // greetStudent
 
@@ -67,47 +67,47 @@ chosenStudents[1]("Howdy");
 // Howdy, Frank!
 ```
 
-The first thing to notice about this code is that the `lookupStudent(..)` outer function creates and returns an inner function called `greetStudent(..)`. `lookupStudent(..)` is called twice, producing two separate instances of its inner `greetStudent(..)` function, both of which are saved into the `chosenStudents` array.
+이 코드에서 가장 먼저 주목해야 할 것은 `lookupStudent(..)` 외부 함수가 `greetStudent(..)`라는 내부 함수를 생성하고 반환한다는 것이다. `lookupStudent(..)`는 두 번 호출되어 내부 `greetStudent(..)` 함수의 두 개의 개별 인스턴스를 생성하며 둘 다 `chosenStudents` 배열에 저장된다.
 
-We verify that's the case by checking the `.name` property of the returned function saved in `chosenStudents[0]`, and it's indeed an instance of the inner `greetStudent(..)`.
+`chosenStudents[0]`에 저장된 반환된 함수의 `.name` 속성을 확인하여 이 경우인지 확인하고, 실제로 이는 안에 있는 `greetStudent(..)`의 인스턴스이다.
 
-After each call to `lookupStudent(..)` finishes, it would seem like all its inner variables would be discarded and GC'd (garbage collected). The inner function is the only thing that seems to be returned and preserved. But here's where the behavior differs in ways we can start to observe.
+`lookupStudent(..)`에 대한 각 호출이 완료된 후 모든 내부 변수가 삭제되고 GC 되는 (garbage collected) 것 처럼 보인다. 내부 함수가 반환되고 보존되는 유일한 것으로 보인다. 그러나 여기에서 우리가 관찰하기 시작할 수 있는 다른 동작이 나온다.
 
-While `greetStudent(..)` does receive a single argument as the parameter named `greeting`, it also makes reference to both `students` and `studentID`, identifiers which come from the enclosing scope of `lookupStudent(..)`. Each of those references from the inner function to the variable in an outer scope is called a *closure*. In academic terms, each instance of `greetStudent(..)` *closes over* the outer variables `students` and `studentID`.
+`greetStudent(..)`는 `greeting`이라는 매개변수로 하나의 인수를 받지만 이를 포함하는 `lookupStudent(..)` 스코프에서 오는 식별자인 `students`와 `studentID`를 모두 참조한다. 내부 함수에서 외부 스코프의 변수에 대한 각 참조를 *클로저*라고 한다. 학문적 용어로 쓰면, `greetStudent(..)`의 각 인스턴스는 외부 변수 `students`와 `studentID`를 *클로즈 오버*(closes over)한다고 한다.
 
-So what do those closures do here, in a concrete, observable sense?
+그렇다면 이러한 클로저들에서 구체적이고 관찰 가능한 의미는 무엇일까?
 
-Closure allows `greetStudent(..)` to continue to access those outer variables even after the outer scope is finished (when each call to `lookupStudent(..)` completes). Instead of the instances of `students` and `studentID` being GC'd, they stay around in memory. At a later time when either instance of the `greetStudent(..)` function is invoked, those variables are still there, holding their current values.
+클로저를 사용하면 `greetStudent(..)`의 외부 스코프가 완료된 후에도 외부 변수에 계속 접근할 수 있다(`lookupStudent(..)`에 대한 각 호출이 완료될 때). `students` 와 `studentID`의 인스턴스가 GC되지 않고 메모리에 남아있다. 나중에 `greetStudent(..)` 함수의 인스턴스 중 하나가 호출될 때 해당 변수는 현재 값을 유지하면서 여전히 존재한다.
 
-If JS functions did not have closure, the completion of each `lookupStudent(..)` call would immediately tear down its scope and GC the `students` and `studentID` variables. When we later called one of the `greetStudent(..)` functions, what would then happen?
+JS 함수에 클로저가 없다면 각 `lookupStudent(..)` 호출이 완료되면 해당 스코프가 즉시 해제되고 `students`와 `studentID` 변수가 GC된다. 나중에 `greetStudent(..)` 함수 중 하나를 호출하면 어떻게 될까?
 
-If `greetStudent(..)` tried to access what it thought was a BLUE(2) marble, but that marble did not actually exist (anymore), the reasonable assumption is we should get a `ReferenceError`, right?
+`greetStudent(..)`가 파랑(2) 구슬이라고 생각한 것에 액세스하려고 시도하지만 그 구슬이 실제로 존재하지 않는다면(더 이상), 합리적인 가정은 `ReferenceError`가 발생하는 것이다, 맞지?
 
-But we don't get an error. The fact that the execution of `chosenStudents[0]("Hello")` works and returns us the message "Hello, Sarah!", means it was still able to access the `students` and `studentID` variables. This is a direct observation of closure!
+하지만 오류는 발생하지 않는다. `chosenStudents[0]("Hello")` 이 동작하고 "Hello, Sarah!" 메시지를 반환한다는 사실은 여전히 `students`와 `studentID` 변수에 액세스할 수 있음을 의미한다. 이것은 클로저의 직접적인 관찰이다!
 
-### Pointed Closure
+### 클로저에 집중하기
 
-Actually, we glossed over a little detail in the previous discussion which I'm guessing many readers missed!
+사실 이전 논의에서 약간 세세한 부분들은 넘겼는데 아마 많은 분들이 놓쳤을 것이다!
 
-Because of how terse the syntax for `=>` arrow functions is, it's easy to forget that they still create a scope (as asserted in "Arrow Functions" in Chapter 3). The `student => student.id == studentID` arrow function is creating another scope bubble inside the `greetStudent(..)` function scope.
+`=>` 화살표 함수 문법의 간결성때문에 이 또한 스코프를 만든다는 것을 잊기 쉽다(챕터 3의 "화살표 함수" 부분에서 언급). `student => student.id == studentID` 화살표 함수는 `greetStudent(..)` 함수 스코프 안에 또 다른 스코프 버블을 생성한다.
 
-Building on the metaphor of colored buckets and bubbles from Chapter 2, if we were creating a colored diagram for this code, there's a fourth scope at this innermost nesting level, so we'd need a fourth color; perhaps we'd pick ORANGE(4) for that scope:
+챕터 2의 구슬과 양동이를 색칠하면서 비유했던 것에 기반하여 이 코드에 대한 색 다이어그램을 만들어본다면, 중첩 레벨의 가장 안쪽에 4번째 스코프가 있게 되고, 4번째 색이 필요하게 된다; 이 스코프를 위해 오렌지색(4)을 추가할 것이다.
 
 ```js
 var student = students.find(
     student =>
-        // function scope: ORANGE(4)
+        // 함수 스코프: 오렌지(4)
         student.id == studentID
 );
 ```
 
-The BLUE(2) `studentID` reference is actually inside the ORANGE(4) scope rather than the GREEN(3) scope of `greetStudent(..)`; also, the `student` parameter of the arrow function is ORANGE(4), shadowing the GREEN(3) `student`.
+파랑(2) `studentID`의 참조는 초록(3) 스코프 `greetStudent(..)`가 아닌 오렌지(4) 스코프 내부에 있다.; 또한, 화살표 함수의 `student` 인자는 오렌지(4)고, 초록(3) `student`를 섀도잉한다.
 
-The consequence here is that this arrow function passed as a callback to the array's `find(..)` method has to hold the closure over `studentID`, rather than `greetStudent(..)` holding that closure. That's not too big of a deal, as everything still works as expected. It's just important not to skip over the fact that even tiny arrow functions can get in on the closure party.
+여기서 중요한 점은 `greetStudent(..)`가 이 클로저를 들고있다기보다는 배열의 `find(..)` 메소드 콜백으로 넘겨진 화살표 함수가 `studentID`를 클로즈 오버 해야한다는 것이다. 예상대로 잘 동작하니 큰 문제는 아니다. 그저 작은 화살표 함수도 클로저 모임에 참여할 수 있다는 사실을 모른체하지만 않으면 된다.
 
-### Adding Up Closures
+### 클로저 추가하기
 
-Let's examine one of the canonical examples often cited for closure:
+클로저에 대해 자주 인용되는 표준 예 중 하나를 살펴보자.
 
 ```js
 function adder(num1) {
@@ -123,31 +123,31 @@ add10To(15);    // 25
 add42To(9);     // 51
 ```
 
-Each instance of the inner `addTo(..)` function is closing over its own `num1` variable (with values `10` and `42`, respectively), so those `num1`'s don't go away just because `adder(..)` finishes. When we later invoke one of those inner `addTo(..)` instances, such as the `add10To(15)` call, its closed-over `num1` variable still exists and still holds the original `10` value. The operation is thus able to perform `10 + 15` and return the answer `25`.
+각 인스턴스의 내부 `addTo(..)` 함수는 각각의 `num1` 변수를 클로즈 오버 하고있다. 그래서 `num1`은 `adder(..)`가 종료되어도 사라지지 않는다. 이후 `add10To(15)` 호출같이 내부 `addTo(..)` 인스턴스들 중 하나를 실행시킬 때 클로즈 오버된 `num1` 변수는 아직 존재하고 아직 원래 값 `10`을 가지고 있다. 따라서 `10 + 15`를 수행하고 `25` 답을 반환할 수 있다.
 
-An important detail might have been too easy to gloss over in that previous paragraph, so let's reinforce it: closure is associated with an instance of a function, rather than its single lexical definition. In the preceding snippet, there's just one inner `addTo(..)` function defined inside `adder(..)`, so it might seem like that would imply a single closure.
+중요한 세부 사항을 이전 단락에서 쉽게 지나쳤을 수 있으므로, 이를 보강해보자: 클로저는 함수의 단일 렉시컬 선언보다는 함수의 인스턴스와 관련이 있다. 앞의 내용에 따르면, `adder(..)` 내부에 오직 하나의 내부 함수 `addTo(..)`가 정의되어있는데, 이 때문에 단일 클로저가 적용되는 것 처럼 보일 것이다.
 
-But actually, every time the outer `adder(..)` function runs, a *new* inner `addTo(..)` function instance is created, and for each new instance, a new closure. So each inner function instance (labeled `add10To(..)` and `add42To(..)` in our program) has its own closure over its own instance of the scope environment from that execution of `adder(..)`.
+그러나 사실, 바깥 `adder(..)` 함수가 실행될 때마다, *새로운* 내부 `addTo(..)` 함수 인스턴스가 각각 새 인스턴스와 새 클로저로 생성된다. 그래서 각 내부 함수 인스턴스(우리 프로그램에서 `add10To(..)`와 `add42To(..)`로 라벨링된)는 `adder(..)` 실행으로부터 각각의 스코프 환경 인스턴스를 클로즈 오버한다.
 
-Even though closure is based on lexical scope, which is handled at compile time, closure is observed as a runtime characteristic of function instances.
+비록 클로저가 컴파일 시 관리되는 렉시컬 스코프를 기반으로 하지만, 클로저는 함수 인스턴스들의 런타임 특성으로 관찰된다.
 
-### Live Link, Not a Snapshot
+### 스냅샷이 아닌 실시간 연결
 
-In both examples from the previous sections, we **read the value from a variable** that was held in a closure. That makes it feel like closure might be a snapshot of a value at some given moment. Indeed, that's a common misconception.
+이전 섹션의 두 예시에서, **변수에서 값을 읽고** 이 값은 클로저에 저장되었다. 이는 클로저가 마치 어떤 순간의 값 스냅샷인 것 처럼 느껴질 수 있다. 사실 이는 흔한 오해다.
 
-Closure is actually a live link, preserving access to the full variable itself. We're not limited to merely reading a value; the closed-over variable can be updated (re-assigned) as well! By closing over a variable in a function, we can keep using that variable (read and write) as long as that function reference exists in the program, and from anywhere we want to invoke that function. This is why closure is such a powerful technique used widely across so many areas of programming!
+클로저는 사실 전체 변수 그 자체에 대한 접근을 보존하는 실시간 연결이다. 우리는 값을 읽는 것에만 국한되지 않고 클로즈 오버된 변수는 업데이트(재할당)될 수도 있다! 함수 내부의 변수를 클로즈 오버 함으로써, 이 함수의 주소가 프로그램에 존재하거나 우리가 원하는 어디서든 함수를 실행해 변수를 계속 사용(읽기와 쓰기)할 수 있다. 이게 클로저가 강력한 기술로써 프로그래밍의 많은 영역에 걸쳐서 사용되는 이유이다!
 
-Figure 4 depicts the function instances and scope links:
+그림 4에서 함수 인스턴스들과 스코프 링크를 묘사한다.
 
 <figure>
     <img src="images/fig4.png" width="400" alt="Function instances linked to scopes via closure" align="center">
-    <figcaption><em>Fig. 4: Visualizing Closures</em></figcaption>
+    <figcaption><em>그림 4: 클로저 시각화</em></figcaption>
     <br><br>
 </figure>
 
-As shown in Figure 4, each call to `adder(..)` creates a new BLUE(2) scope containing a `num1` variable, as well as a new instance of `addTo(..)` function as a GREEN(3) scope. Notice that the function instances (`addTo10(..)` and `addTo42(..)`) are present in and invoked from the RED(1) scope.
+그림 4에서 보여지듯, 각 `adder(..)` 호출들은 `num1` 변수를 포함하는 새로운 파랑(2) 스코프를 생성한다. 새로운 파랑 스코프는 초록(3) 스코프인 `addTo(..)` 함수의 새로운 인스턴스이다. 함수 인스턴스들(`addTo10(..)`과 `addTo42(..)`)은 빨강(1) 스코프로부터 실행되고 존재하고 있는 부분을 명심해라.
 
-Now let's examine an example where the closed-over variable is updated:
+이제 클로즈 오버된 변수가 업데이트되는 예시를 살펴보자:
 
 ```js
 function makeCounter() {
@@ -161,23 +161,23 @@ function makeCounter() {
 
 var hits = makeCounter();
 
-// later
+// 잠시 후
 
 hits();     // 1
 
-// later
+// 잠시 후
 
 hits();     // 2
 hits();     // 3
 ```
 
-The `count` variable is closed over by the inner `getCurrent()` function, which keeps it around instead of it being subjected to GC. The `hits()` function calls access *and* update this variable, returning an incrementing count each time.
+`count` 변수는 내부 `getCurrent()` 함수에 의해 클로즈 오버되고, GC 대상이 되지 않고 유지된다. `hits()` 함수는 이 변수에 대한 접근과 업데이트를 하고, 증가된 숫자를 매번 반환한다.
 
-Though the enclosing scope of a closure is typically from a function, that's not actually required; there only needs to be an inner function present inside an outer scope:
+클로저의 감싸는 스코프는 일반적으로 함수에서 있지만 필수사항은 아니다. 외부 스코프 내부에 내부 함수만 있으면 된다.
 
 ```js
 var hits;
-{   // an outer scope (but not a function)
+{   // 바깥 스코프 (함수는 아닌)
     let count = 0;
     hits = function getCurrent(){
         count = count + 1;
@@ -189,79 +189,79 @@ hits();     // 2
 hits();     // 3
 ```
 
-| NOTE: |
+| 비고: |
 | :--- |
-| I deliberately defined `getCurrent()` as a `function` expression instead of a `function` declaration. This isn't about closure, but with the dangerous quirks of FiB (Chapter 6). |
+| 여기서 의도적으로 `getCurrent()`를 `함수` 선언식 대신 `함수` 표현식으로 선언하였다. 이것은 클로저에 대한 것은 아니지만, FiB(Function Declarations in Block)의 위험한 단점이 있다(챕터 6) |
 
-Because it's so common to mistake closure as value-oriented instead of variable-oriented, developers sometimes get tripped up trying to use closure to snapshot-preserve a value from some moment in time. Consider:
+클로저를 변수 지향적이 아닌 값 지향적으로 착각하는 것이 매우 일반적이기 때문에 개발자는 때때로 클로저를 사용하여 특정 순간의 값을 스냅샷으로 보존하려고 시도하는 실수를 한다. 다음 코드를 살펴보자:
 
 ```js
 var studentName = "Frank";
 
 var greeting = function hello() {
-    // we are closing over `studentName`,
-    // not "Frank"
+    // `studentName`을 클로즈 오버,
+    // "Frank"가 아닌
     console.log(
         `Hello, ${ studentName }!`
     );
 }
 
-// later
+// 잠시 후
 
 studentName = "Suzy";
 
-// later
+// 잠시 후
 
 greeting();
 // Hello, Suzy!
 ```
 
-By defining `greeting()` (aka, `hello()`) when `studentName` holds the value `"Frank"` (before the re-assignment to `"Suzy"`), the mistaken assumption is often that the closure will capture `"Frank"`. But `greeting()` is closed over the variable `studentName`, not its value. Whenever `greeting()` is invoked, the current value of the variable (`"Suzy"`, in this case) is reflected.
+`greeting()` (`hello()`라고도 하는) 함수를 선언하면서 `studentName`은 `"Frank"`라는 값을 가지고 있는데(`"Suzy"`가 재할당되기 전에), 잘못된 가정은 클로저가 `"Frank"`를 저장한다는 것이다. 그러나 `greeting()`은 `studnetName` 변수를 클로즈 오버하지 값을 클로즈 오버하는건 아니다. 언제든지 `greeting()`이 실행되면, 현재의 변수(여기서는 `"Suzy"`)를 반영한다.
 
-The classic illustration of this mistake is defining functions inside a loop:
+이 실수의 전형적인 예로는 반복문 안에 함수를 정의하는 것이다.
 
 ```js
 var keeps = [];
 
 for (var i = 0; i < 3; i++) {
     keeps[i] = function keepI(){
-        // closure over `i`
+        // `i`가 클로즈 오버됨
         return i;
     };
 }
 
-keeps[0]();   // 3 -- WHY!?
+keeps[0]();   // 3 -- 왜!?
 keeps[1]();   // 3
 keeps[2]();   // 3
 ```
 
-| NOTE: |
+| 비고: |
 | :--- |
-| This kind of closure illustration typically uses a `setTimeout(..)` or some other callback like an event handler, inside the loop. I've simplified the example by storing function references in an array, so that we don't need to consider asynchronous timing in our analysis. The closure principle is the same, regardless. |
+| 이러한 클로저 형식은 전형적으로 `setTimeout(..)`나 이벤트 핸들러같은 다른 콜백을 반복문 안에서 사용한다. 여기서는 함수 주소를 배열에 저장하는걸로 예시를 간소화해서 비동기 타이밍은 고려할 필요가 없었다. 클로저 원칙은 역시 동일하다. |
 
-You might have expected the `keeps[0]()` invocation to return `0`, since that function was created during the first iteration of the loop when `i` was `0`. But again, that assumption stems from thinking of closure as value-oriented rather than variable-oriented.
+아마 `keeps[0]()` 실행 결과가 `0`을 반환하는 것을 기대했을 것이다. 함수가 반복문의 첫 반복 `i`가 0일때 생성되었기 때문이다. 하지만 이 가정은 클로저가 변수 지향적인게 아니라 값 지향적으로 생각한 것에서 생긴 생각이다.
 
-Something about the structure of a `for`-loop can trick us into thinking that each iteration gets its own new `i` variable; in fact, this program only has one `i` since it was declared with `var`.
+`for` 반복문 구조에서 각 반복마다 새로운 `i` 변수를 가진다고 속일 수도 있다. 사실 이 프로그램에서는 `var`로 선언되었기 때문에 오직 하나의 `i`만 가진다.
 
-Each saved function returns `3`, because by the end of the loop, the single `i` variable in the program has been assigned `3`. Each of the three functions in the `keeps` array do have individual closures, but they're all closed over that same shared `i` variable.
+각 저장된 함수들은 `3`을 반환하는데, 반복문 끝에서 이 하나의 `i` 변수는 `3`으로 할당되기 때문이다. `keeps` 배열의 각 세 함수들은 각각의 클로저를 가지고는 있지만, 이들 모두가 공유된 `i` 변수를 클로즈 오버하고 있다.
 
-Of course, a single variable can only ever hold one value at any given moment. So if you want to preserve multiple values, you need a different variable for each.
+물론, 단일 변수는 특정 시간에 하나의 값만 가질 수 있다. 그래서 만약 여러 변수들을 저장하고 싶으면, 각각 다른 변수들이 필요하다.
 
-How could we do that in the loop snippet? Let's create a new variable for each iteration:
+반복문 구문에서 이를 어떻게 할 수 있을까? 각 반복마다 새로운 변수를 만들어보자.
 
 ```js
 var keeps = [];
 
 for (var i = 0; i < 3; i++) {
-    // new `j` created each iteration, which gets
-    // a copy of the value of `i` at this moment
+    // 새로운 `j`를 각 반복마다 생성하고,
+    // 이 순간 `i`의 값을 복사해 저장한다.
     let j = i;
 
-    // the `i` here isn't being closed over, so
-    // it's fine to immediately use its current
-    // value in each loop iteration
+    // 여기서 `i`는 클로즈 오버되지 않아서,
+    // 각 반복마다의 현재 값을
+    // 즉시 사용해도 괜찮다
     keeps[i] = function keepEachJ(){
-        // close over `j`, not `i`!
+        // 클로즈 오버된 `j` 사용, `i`가 아님!
         return j;
     };
 }
@@ -270,18 +270,18 @@ keeps[1]();   // 1
 keeps[2]();   // 2
 ```
 
-Each function is now closed over a separate (new) variable from each iteration, even though all of them are named `j`. And each `j` gets a copy of the value of `i` at that point in the loop iteration; that `j` never gets re-assigned. So all three functions now return their expected values: `0`, `1`, and `2`!
+모든 변수들이 `j`로 네이밍 되어있음에도 불구하고, 이제 각 함수는 매 반복마다 각각의 (새로운) 변수를 클로즈 오버한다. 그리고 각 `j`는 반복문의 시점마다의 `i` 값을 복사한다; `j`는 전혀 재할당되지 않는다. 그래서 이제 세 함수들 모두 예상된 값을 반환한다: `0`, `1`, 그리고 `2`!
 
-Again remember, even if we were using asynchrony in this program, such as passing each inner `keepEachJ()` function into `setTimeout(..)` or some event handler subscription, the same kind of closure behavior would still be observed.
+다시 강조한다. 이 프로그램에서 내부의 `keepEachJ()`가 `setTimeout(..)`이나 다른 이벤트 핸들러 구독같은 비동기한 방식으로 사용한다고 해도, 같은 방식의 클로저 동작을 관찰할 수 있다.
 
-Recall the "Loops" section in Chapter 5, which illustrates how a `let` declaration in a `for` loop actually creates not just one variable for the loop, but actually creates a new variable for *each iteration* of the loop. That trick/quirk is exactly what we need for our loop closures:
+챕터 5의 "반복문" 섹션을 상기해보자. `for` 반복문에서 `let` 선언을 설명할 때 사실 반복문에 대해서 오직 한 변수만 생성하는게 아니라, *각 반복*마다 새로운 변수를 생성한다고 했다. 이러한 트릭이자 기이한 특징은 클로저 반복문에서 정확하게 필요한 것이다.
 
 ```js
 var keeps = [];
 
 for (let i = 0; i < 3; i++) {
-    // the `let i` gives us a new `i` for
-    // each iteration, automatically!
+    // `let i`는 새로운 `i`를 준다
+    // 각 반복마다, 자동적으로!
     keeps[i] = function keepEachI(){
         return i;
     };
@@ -291,11 +291,11 @@ keeps[1]();   // 1
 keeps[2]();   // 2
 ```
 
-Since we're using `let`, three `i`'s are created, one for each loop, so each of the three closures *just work* as expected.
+`let`을 사용함으로써, 각 반복마다 하나씩 총 3개의 `i`가 생성되고, 그래서 세 클로저들은 예상했던대로 *그냥 동작한다.*
 
-### Common Closures: Ajax and Events
+### 일반적인 클로저: Ajax와 이벤트
 
-Closure is most commonly encountered with callbacks:
+클로저는 콜백에서 가장 일반적으로 발생한다.
 
 ```js
 function lookupStudentRecord(studentID) {
@@ -313,11 +313,11 @@ lookupStudentRecord(114);
 // Frank (114)
 ```
 
-The `onRecord(..)` callback is going to be invoked at some point in the future, after the response from the Ajax call comes back. This invocation will happen from the internals of the `ajax(..)` utility, wherever that comes from. Furthermore, when that happens, the `lookupStudentRecord(..)` call will long since have completed.
+`onRecord(..)` 콜백은 Ajax 호출로부터 응답이 온 이후의 미래 시점에 실행될 것이다. 이 실행은 `ajax(..)` 유틸리티 내부에서 발생할 것이다. 더구나, 실행되는 시점은 `lookupStudentRecord(..)` 호출이 완료된지 오래된 시점이다.
 
-Why then is `studentID` still around and accessible to the callback? Closure.
+그렇다면 왜 `studentID`의 주변에 아직 있고 콜백으로 접근할 수 있는걸까? 클로저다.
 
-Event handlers are another common usage of closure:
+이벤트 핸들러는 클로저의 또 다른 일반적인 사용법이다.
 
 ```js
 function listenForClicks(btn,label) {
@@ -333,21 +333,21 @@ var submitBtn = document.getElementById("submit-btn");
 listenForClicks(submitBtn,"Checkout");
 ```
 
-The `label` parameter is closed over by the `onClick(..)` event handler callback. When the button is clicked, `label` still exists to be used. This is closure.
+`label` 파라미터는 `onClick(..)` 이벤트 핸들러 콜백에 의해 클로즈 오버된다. 버튼이 클릭될 때, 사용될 `label`은 여전히 존재한다. 이것이 클로저다.
 
-### What If I Can't See It?
+### 이걸 볼 수 없다면?
 
-You've probably heard this common adage:
+다음과 같은 속담을 들어봤을거다:
 
-> If a tree falls in the forest but nobody is around to hear it, does it make a sound?
+> 숲속에서 나무가 쓰러져도 이 소리를 들을 사람이 없다면, 이건 소리를 낸걸까?
 
-It's a silly bit of philosophical gymnastics. Of course from a scientific perspective, sound waves are created. But the real point: *does it matter* if the sound happens?
+이건 약간 철학적인 문제다. 물론 과학적인 관점에서 보면, 음파가 생성된다. 하지만 진짜 요점은: 소리가 나도 *그것이 중요한가?*
 
-Remember, the emphasis in our definition of closure is observability. If a closure exists (in a technical, implementation, or academic sense) but it cannot be observed in our programs, *does it matter?* No.
+기억해라. 클로저에 대한 우리의 정의에서 강조점은 관찰 가능하다는 것이다. 클로저가 존재(기술적, 구현적, 학문적인 관점에서)하지만 우리 프로그램에서 관찰될 수 없다면, *그것이 중요한가?* 아니다.
 
-To reinforce this point, let's look at some examples that are *not* observably based on closure.
+이 점을 강조하기 위해서 클로저를 기반하지 *않은* 몇 가지 예시를 살펴볼 것이다.
 
-For example, invoking a function that makes use of lexical scope lookup:
+예시로 렉시컬 스코프 참조를 사용하는 함수를 실행하는 것:
 
 ```js
 function say(myName) {
@@ -365,13 +365,13 @@ say("Kyle");
 // Hello, Kyle!
 ```
 
-The inner function `output()` accesses the variables `greeting` and `myName` from its enclosing scope. But the invocation of `output()` happens in that same scope, where of course `greeting` and `myName` are still available; that's just lexical scope, not closure.
+내부 함수 `output()`에서 이를 감싸는 스코프의 변수 `greeting`과 `myName`에 접근한다. 그러나 `output()`의 실행이 같은 스코프에서 발생하고, `greeting`과 `myName`은 당연하게 아직 접근이 가능하다; 이는 그냥 렉시컬 스코프고 클로저가 아니다.
 
-Any lexically scoped language whose functions didn't support closure would still behave this same way.
+클로저를 지원하지 않는 렉시컬 스코프 언어 어떤 것도 이와 동일한 방식으로 동작할 것이다.
 
-In fact, global scope variables essentially cannot be (observably) closed over, because they're always accessible from everywhere. No function can ever be invoked in any part of the scope chain that is not a descendant of the global scope.
+사실 전역 스코프 변수는 본질적으로(관찰적으로) 클로즈 오버될 수 없다. 왜냐하면 이들은 어디에서든 항상 접근이 가능하기 때문이다. 전역 스코프의 자손이 아닌 스코프 체인에서 실행될 수 있는 함수는 없다.
 
-Consider:
+다음 코드를 살펴보자:
 
 ```js
 var students = [
@@ -393,11 +393,11 @@ student();
 // Kyle
 ```
 
-The inner `firstStudent()` function does reference `students`, which is a variable outside its own scope. But since `students` happens to be from the global scope, no matter where that function is invoked in the program, its ability to access `students` is nothing more special than normal lexical scope.
+`firstStudent()` 내부 함수는 스코프 바깥의 변수 `students`를 참조한다. 그러나 `students`는 전역 스코프로부터 발생했으므로, 함수가 프로그램 어디에서 실행되는지와 상관없고, `students`에 대한 접근은 일반 렉시컬 스코프와 다를게 없다.
 
-All function invocations can access global variables, regardless of whether closure is supported by the language or not. Global variables don't need to be closed over.
+언어에서 클로저가 지원하든 안하든 모든 함수 실행은 전역 변수에 접근할 수 있다. 전역 변수는 클로즈 오버될 필요가 없다.
 
-Variables that are merely present but never accessed don't result in closure:
+변수가 단지 존재만 하고 접근되지 않는다면 클로저가 사용되지 않는다.
 
 ```js
 function lookupStudent(studentID) {
@@ -413,11 +413,11 @@ student();
 // Nobody's here yet.
 ```
 
-The inner function `nobody()` doesn't close over any outer variables—it only uses its own variable `msg`. Even though `studentID` is present in the enclosing scope, `studentID` is not referred to by `nobody()`. The JS engine doesn't need to keep `studentID` around after `lookupStudent(..)` has finished running, so GC wants to clean up that memory!
+내부 함수 `nobody()`는 바깥 변수를 클로즈 오버하지 않는다. 오직 자신의 변수 `msg`만 사용한다. `studentID`가 둘러싸는 스코프에 존재한다고 할지라도, `studentID`는 `nobody()`에서 참조되지 않았다. JS 엔진은 `lookupStudent(..)` 실행을 마친 후에는 `studentID`를 주변에 놔둘 필요가 없고, 그래서 GC는 메모리에서 정리하려고 시도한다!
 
-Whether JS functions support closure or not, this program would behave the same. Therefore, no observed closure here.
+JS 함수가 클로저를 지원하든 안하든, 프로그램은 동일하게 동작한다. 그러므로, 여기서 클로저는 관찰되지 않는다.
 
-If there's no function invocation, closure can't be observed:
+함수 호출이 없다면, 클로저는 관찰되지 않는다:
 
 ```js
 function greetStudent(studentName) {
@@ -430,38 +430,38 @@ function greetStudent(studentName) {
 
 greetStudent("Kyle");
 
-// nothing else happens
+// 다른 일은 일어나지 않는다.
 ```
 
-This one's tricky, because the outer function definitely does get invoked. But the inner function is the one that *could* have had closure, and yet it's never invoked; the returned function here is just thrown away. So even if technically the JS engine created closure for a brief moment, it was not observed in any meaningful way in this program.
+이것은 까다롭다. 바깥 함수는 분명히 실행되었기 때문이다. 그러나 내부 함수는 클로저를 가질 *수도* 있었던 것이고, 아직 전혀 실행되지 않았다; 여기서 반환된 함수는 그냥 버려진다. 그래서 기술적으로 JS 엔진은 잠깐동안 클로저를 생성하지만, 프로그램에서 의미있는 방향으로는 관찰되지 않는다.
 
-A tree may have fallen... but we didn't hear it, so we don't care.
+나무는 쓰러졌을 것이다... 하지만 우리는 이를 듣지 못했으므로 상관쓰지 않는다.
 
-### Observable Definition
+### 관찰 가능한 정의
 
-We're now ready to define closure:
+우리는 이제 클로저를 정의할 준비가 되었다:
 
-> Closure is observed when a function uses variable(s) from outer scope(s) even while running in a scope where those variable(s) wouldn't be accessible.
+> 클로저는 함수가 변수(들)에 접근할 수 없는 스코프에서 실행되는 동안에도 바깥 스코프(들)의 변수(들)을 사용할 때 관찰된다.
 
-The key parts of this definition are:
+이 정의에서 중요한 부분은 다음이다:
 
-* Must be a function involved
+* 함수가 반드시 실행되어야 한다.
 
-* Must reference at least one variable from an outer scope
+* 적어도 한 개의 바깥 스코프의 변수를 참조해야한다.
 
-* Must be invoked in a different branch of the scope chain from the variable(s)
+* 변수(들)과 다른 분기의 스코프 체인에서 호출되어야 한다.
 
-This observation-oriented definition means we shouldn't dismiss closure as some indirect, academic trivia. Instead, we should look and plan for the direct, concrete effects closure has on our program behavior.
+이러한 관찰 지향적인 정의는 간접적인, 학술적인 상식으로 클로저를 치부해서는 안된다는 것을 의미한다. 대신, 클로저가 우리 프로그램 동작에 미치는 직접적이고 구체적인 영향을 살펴보고 계획해야한다.
 
-## The Closure Lifecycle and Garbage Collection (GC)
+## 클로저 생명주기와 가비지 컬렉션(GC)
 
-Since closure is inherently tied to a function instance, its closure over a variable lasts as long as there is still a reference to that function.
+클로저가 본질적으로 함수 인스턴스와 연결되어있기 때문에, 변수에 대한 클로저는 함수에 대한 참조가 있는 동안에는 지속된다.
 
-If ten functions all close over the same variable, and over time nine of these function references are discarded, the lone remaining function reference still preserves that variable. Once that final function reference is discarded, the last closure over that variable is gone, and the variable itself is GC'd.
+만약 10개의 함수가 모두 같은 변수를 클로즈 오버하고, 시간이 지남에 따라서 9개의 함수 참조가 폐기된다면, 유일하게 남은 함수 참조가 여전히 변수를 보존한다. 최종 함수의 참조가 폐기되면 변수에 대한 마지막 클로저가 사라지고 변수 자체가 GC된다.
 
-This has an important impact on building efficient and performant programs. Closure can unexpectedly prevent the GC of a variable that you're otherwise done with, which leads to run-away memory usage over time. That's why it's important to discard function references (and thus their closures) when they're not needed anymore.
+이는 효율적이고 성능 좋은 프로그램을 구축하는데 중요한 영향을 미친다. 클로저는 예상치 못한 다른 방법으로 만들어진 변수의 GC를 막을 수 있는데 이는 시간이 지남에 따라서 메모리 사용량 폭주를 야기한다. 이 때문에 함수 참조(및 그에 따른 클로저)가 더 이상 필요없을 때 폐기되는 것이 중요하다.
 
-Consider:
+다음 코드를 살펴보자:
 
 ```js
 function manageBtnClickEvents(btn) {
@@ -481,8 +481,8 @@ function manageBtnClickEvents(btn) {
             );
         }
         else {
-            // passing no callback unsubscribes
-            // all click handlers
+            // 콜백을 전달하지 않으면
+            // 모든 클릭 핸들러들 구독취소한다
             for (let handler of clickHandlers) {
                 btn.removeEventListener(
                     "click",
@@ -499,34 +499,34 @@ function manageBtnClickEvents(btn) {
 var onSubmit = manageBtnClickEvents(mySubmitBtn);
 
 onSubmit(function checkout(evt){
-    // handle checkout
+    // checkout을 핸들링한다
 });
 
 onSubmit(function trackAction(evt){
-    // log action to analytics
+    // 분석을 위해 로그를 출력한다
 });
 
-// later, unsubscribe all handlers:
+// 나중에 모든 핸들러들을 구독취소한다:
 onSubmit();
 ```
 
-In this program, the inner `onClick(..)` function holds a closure over the passed in `cb` (the provided event callback). That means the `checkout()` and `trackAction()` function expression references are held via closure (and cannot be GC'd) for as long as these event handlers are subscribed.
+프로그램에서 내부 `onClick(..)` 함수는 전달된 `cb`(제공된 이벤트 콜백)에 대한 클로저를 갖는다. 이는 `checkout()`과 `trackAction()` 함수 표현식 참조는 이러한 이벤트 핸들러가 구독되는 동안 클로저를 통해 유지된다(그리고 GC될 수 없다).
 
-When we call `onSubmit()` with no input on the last line, all event handlers are unsubscribed, and the `clickHandlers` array is emptied. Once all click handler function references are discarded, the closures of `cb` references to `checkout()` and `trackAction()` are discarded.
+마지막 라인에서 입력값 없이 `onSubmit()`을 호출할 때, 모든 이벤트 핸들러들은 구독 취소되고, `clickHandlers` 배열은 비어진다. 모든 클릭 핸들러 함수 참조들이 폐기되면, `checkout()`과 `trackAction()`을 참조하는 `cb` 클로저가 폐기된다.
 
-When considering the overall health and efficiency of the program, unsubscribing an event handler when it's no longer needed can be even more important than the initial subscription!
+프로그램의 전반적인 상태와 효율성을 고려할 때, 이벤트 핸들러가 더 이상 필요하지 않을 때 구독 취소하는 것이 초기 구독보다 더 중요할 수 있다!
 
-### Per Variable or Per Scope?
+### 변수마다 혹은 스코프마다?
 
-Another question we need to tackle: should we think of closure as applied only to the referenced outer variable(s), or does closure preserve the entire scope chain with all its variables?
+우리가 해결해야 할 또 다른 질문: 클로저를 참조된 외부 변수에만 적용되는 것으로 생각해야 할까, 아니면 모든 변수와 함께 전체 스코프 체인을 보존해야 할까?
 
-In other words, in the previous event subscription snippet, is the inner `onClick(..)` function closed over only `cb`, or is it also closed over `clickHandler`, `clickHandlers`, and `btn`?
+즉, 이전 이벤트 구독에 대한 짧은 코드에서, 내부 `onClick(..)` 함수는 오직 `cb`만 클로즈 오버 하고있을까, 아니면 `clickHandler`, `clickHandlers`, 및 `btn`도 클로즈 오버 하고있을까?
 
-Conceptually, closure is **per variable** rather than *per scope*. Ajax callbacks, event handlers, and all other forms of function closures are typically assumed to close over only what they explicitly reference.
+개념적으로는, 클로저는 **스코프마다**라기보다는 **변수마다**이다. Ajax 콜백, 이벤트 핸들러 및 기타 모든 형태의 함수 클로저는 일반적으로 명시적으로 참조하는 것만 클로즈 오버하는 것으로 가정한다.
 
-But the reality is more complicated than that.
+그러나 실제로는 이보다 더 복잡하다.
 
-Another program to consider:
+다른 프로그램을 고려해보자:
 
 ```js
 function manageStudentGrades(studentRecords) {
@@ -541,12 +541,12 @@ function manageStudentGrades(studentRecords) {
     }
 
     function sortAndTrimGradesList() {
-        // sort by grades, descending
+        // 등급 순으로 내림차순 정렬
         grades.sort(function desc(g1,g2){
             return g2 - g1;
         });
 
-        // only keep the top 10 grades
+        // 상위 10개 등급만 저장
         grades = grades.slice(0,10);
     }
 
@@ -561,42 +561,42 @@ var addNextGrade = manageStudentGrades([
     { id: 14, name: "Kyle", grade: 86 },
     { id: 73, name: "Suzy", grade: 87 },
     { id: 112, name: "Frank", grade: 75 },
-    // ..many more records..
+    // ..많은 다른 기록들..
     { id: 6, name: "Sarah", grade: 91 }
 ]);
 
-// later
+// 나중에
 
 addNextGrade(81);
 addNextGrade(68);
 // [ .., .., ... ]
 ```
 
-The outer function `manageStudentGrades(..)` takes a list of student records, and returns an `addGrade(..)` function reference, which we externally label `addNextGrade(..)`. Each time we call `addNextGrade(..)` with a new grade, we get back a current list of the top 10 grades, sorted numerically descending (see `sortAndTrimGradesList()`).
+외부 함수 `manageStudentGrades(..)`는 학생 기록 목록을 입력받고, 외부적으로 `addNextGrade(..)`라고 라벨링된 `addGrade(..)` 함수 참조를 반환한다. 새 등급으로 `addNextGrade(..)`를 호출할 때마다, 숫자 내림차순으로 정렬된 상위 10개 등급의 현재 목록을 다시 가져온다(`sortAndTrimGradesList()` 참조).
 
-From the end of the original `manageStudentGrades(..)` call, and between the multiple `addNextGrade(..)` calls, the `grades` variable is preserved inside `addGrade(..)` via closure; that's how the running list of top grades is maintained. Remember, it's a closure over the variable `grades` itself, not the array it holds.
+기존 `manageStudentGrades(..)` 호출의 끝이면서 여러 `addNextGrade(..)` 호출 사이에서 `grades` 변수는 클로저를 통해 `addGrade(..)` 내부에 보존된다; 이것이 상위 등급 목록이 유지되는 방식이다. 이것은 변수 `grades`에 대한 클로즈 오버이지, 그것이 가지고있는 배열(`studentRecords`)이 아니라는 점을 기억해라. 
 
-That's not the only closure involved, however. Can you spot other variables being closed over?
+그러나 이것이 유일하게 존재하는 클로저는 아니다. 클로즈 오버되는 다른 변수를 찾을 수 있나?
 
-Did you spot that `addGrade(..)` references `sortAndTrimGradesList`? That means it's also closed over that identifier, which happens to hold a reference to the `sortAndTrimGradesList()` function. That second inner function has to stay around so that `addGrade(..)` can keep calling it, which also means any variables *it* closes over stick around—though, in this case, nothing extra is closed over there.
+`addGrade(..)`가 `sortAndTrimGradesList`를 참조하는 부분을 발견했나? 이는 `sortAndTrimGradesList()` 함수 참조를 보유한 이 식별자 또한 클로즈 오버한다는 것을 의미한다. 이 두 번째 내부 함수는 `addGrade(..)`가 이를 호출할 수 있도록 주변에 두어야하고, 이는 또한 *그것* -> *그것(`addGrade`)*이 클로즈 오버하는 모든 변수가 주변에 고정되어있음을 의미한다. 하지만 이 케이스에서는, 추가로 여기(`addGrade`)에 클로즈 오버되는 것이 없다.
 
-What else is closed over?
+또 무엇이 클로즈 오버되나?
 
-Consider the `getGrade` variable (and its function); is it closed over? It's referenced in the outer scope of `manageStudentGrades(..)` in the `.map(getGrade)` call. But it's not referenced in `addGrade(..)` or `sortAndTrimGradesList()`.
+`getGrade` 변수(그리고 그것의 함수)를 고려해보자; 이것은 클로즈 오버되어있나? 이는 `.map(getGrade)` 호출의 바깥 스코프의 `manageStudentGrades(..)`에서 참조된다. 그러나 `addGrade(..)`나 `sortAndTrimGradesList()`에서 참조되지는 않는다.
 
-What about the (potentially) large list of student records we pass in as `studentRecords`? Is that variable closed over? If it is, the array of student records is never getting GC'd, which leads to this program holding onto a larger amount of memory than we might assume. But if we look closely again, none of the inner functions reference `studentRecords`.
+`studentRecords`로 넘기는 (잠재적으로)많은 학생 기록 목록은 어떨까? 이 변수는 클로즈 오버 되어있나? 만약 그렇다면, 학생 기록들 배열은 절대로 GC되지 않고, 이는 우리가 예상하는 것 보다 더 많은 메모리 양을 보유하게 된다. 그러나 자세히 봐보면, 어떤 내부 함수에서도 `studentRecords`를 참조하지 않고 있다.
 
-According to the *per variable* definition of closure, since `getGrade` and `studentRecords` are *not* referenced by the inner functions, they're not closed over. They should be freely available for GC right after the `manageStudentGrades(..)` call completes.
+클로저의 *각 변수마다* 정의되는 것에 따르고, `getGrade`와 `studentRecords`는 내부 함수에 의해 참조되지 *않으므로* 이들은 클로즈 오버되지 않는다. 이들은 `manageStudentGrades(..)` 호출이 완료된 직후 GC에서 자유롭게 사용할 수 있어야 한다.
 
-Indeed, try debugging this code in a recent JS engine, like v8 in Chrome, placing a breakpoint inside the `addGrade(..)` function. You may notice that the inspector **does not** list the `studentRecords` variable. That's proof, debugging-wise anyway, that the engine does not maintain `studentRecords` via closure. Phew!
+실제로 Chrome의 v8과 같은 최신 JS 엔진에서 이 코드를 디버깅하여 `addGrade(..)` 함수 내부에 중단점을 배치한다. 인스펙터<sub>inspector</sub>는 `studentRecords` 변수를 나열하지 **않는다**. 어쨌든 디버깅 측면에서 엔진이 클로저를 통해 `studentRecords`를 유지하지 않는다는 증거다. 휴!
 
-But how reliable is this observation as proof? Consider this (rather contrived!) program:
+그러나 이 관찰이 증거로서 얼마나 믿을 수 있을까? 이 (상당히 부자연스러운!) 프로그램을 보자:
 
 ```js
 function storeStudentInfo(id,name,grade) {
     return function getInfo(whichValue){
-        // warning:
-        //   using `eval(..)` is a bad idea!
+        // 주의:
+        //   `eval(..)`을 사용하는 것은 나쁜 생각이다!
         var val = eval(whichValue);
         return val;
     };
@@ -611,26 +611,26 @@ info("grade");
 // 87
 ```
 
-Notice that the inner function `getInfo(..)` is not explicitly closed over any of `id`, `name`, or `grade` variables. And yet, calls to `info(..)` seem to still be able to access the variables, albeit through use of the `eval(..)` lexical scope cheat (see Chapter 1).
+내부 함수 `getInfo(..)`는 `id`, `name` 또는 `grade` 변수에 대해 명시적으로 클로즈 오버되어있지 않은 점을 유의해라. 그럼에도 불구하고, `info(..)` 호출은 아직 변수에 접근할 수 있는 것으로 보이고, 비록 `eval(..)` 사용을 통한 렉시컬 스코프 속임수일지라도(챕터 1 참고) 말이다.
 
-So all the variables were definitely preserved via closure, despite not being explicitly referenced by the inner function. So does that disprove the *per variable* assertion in favor of *per scope*? Depends.
+따라서 내부 함수에서 명시적으로 참조하지 않음에도 불구하고, 모든 변수는 클로저를 통해 확실히 보존되었다. 그렇다면 이게 *변수마다*에 반증되고 *스코프마다*라는 주장에 찬성하는 것일까? 아직 결정되지 않았다.
 
-Many modern JS engines do apply an *optimization* that removes any variables from a closure scope that aren't explicitly referenced. However, as we see with `eval(..)`, there are situations where such an optimization cannot be applied, and the closure scope continues to contain all its original variables. In other words, closure must be *per scope*, implementation wise, and then an optional optimization trims down the scope to only what was closed over (a similar outcome as *per variable* closure).
+많은 최신 JS 엔진은 클로저 스코프에서 명시적으로 참조되지 않는 변수를 제거하는 *최적화*를 적용힌다. 그러나 `eval(..)`에서 볼 수 있듯이 이러한 최적화를 적용할 수 없는 상황이 있고 클로저 스코프에 원래 변수가 모두 포함되어 있다. 다시 말해서, 클로저는 구현적 관점으로는 *스코프마다*여야 하며, 그런 다음 선택적 최적화가 스코프를 클로즈 오버된 것(*변수마다* 클로저와 유사한 결과)으로만 축소한다.
 
-Even as recent as a few years ago, many JS engines did not apply this optimization; it's possible your websites may still run in such browsers, especially on older or lower-end devices. That means it's possible that long-lived closures such as event handlers may be holding onto memory much longer than we would have assumed.
+몇 년 전만 해도, 많은 JS 엔진이 이러한 최적화를 적용하지 않았다. 너의 웹사이트도 아직 그러한 브라우저나, 특히 저사양의 오래된 장치에서 실행될 수 있다. 이는 이벤트 핸들러같이 오랫동안 유지되는 클로저들이 우리가 생각한 것 보다 더 오래 메모리에 유지될 수 있다는 것이다.
 
-And the fact that it's an optional optimization in the first place, rather than a requirement of the specification, means that we shouldn't just casually over-assume its applicability.
+그리고 사실 이는 필수적인 명세가 아닌 선택적인 최적화인데 이는 우리가 무심코 적용 가능성을 과대평가해서는 안된다는 것을 의미한다.
 
-In cases where a variable holds a large value (like an object or array) and that variable is present in a closure scope, if you don't need that value anymore and don't want that memory held, it's safer (memory usage) to manually discard the value rather than relying on closure optimization/GC.
+변수에 큰 값(객체나 배열같은)을 저장하고 이 변수가 스코프 클로저에 존재하는 경우, 이 변수가 더 이상 필요하지 않고, 메모리에 저장되지 않기를 원한다면, 수동으로 값을 버리는 것이 클로저의 최적화나 GC에 의존하는 것 보다 (메모리 사용 측면에서)안전하다.
 
-Let's apply a *fix* to the earlier `manageStudentGrades(..)` example to ensure the potentially large array held in `studentRecords` is not caught up in a closure scope unnecessarily:
+이전의 `manageStudentGrades(..)` 예제에서 `studentRecords`에 있는 잠재적으로 큰 배열이 불필요하게 클로저 스코프에 걸리지 않도록 *수정*해보자:
 
 ```js
 function manageStudentGrades(studentRecords) {
     var grades = studentRecords.map(getGrade);
 
-    // unset `studentRecords` to prevent unwanted
-    // memory retention in the closure
+    // 클로저에서 원치 않는 메모리 보유를 방지하기 위해서
+    // `studentRecords` 를 설정 해제하자
     studentRecords = null;
 
     return addGrade;
@@ -638,28 +638,28 @@ function manageStudentGrades(studentRecords) {
 }
 ```
 
-We're not removing `studentRecords` from the closure scope; that we cannot control. We're ensuring that even if `studentRecords` remains in the closure scope, that variable is no longer referencing the potentially large array of data; the array can be GC'd.
+`studentRecords`를 클로저 스코프로부터 없애지는 않는다; 우리가 조작할 수 없는 영역이다. `studentRecords`가 클로저 스코프에 남아있더라도 이 변수는 더이상 잠재적으로 큰 배열의 데이터를 참조하지 않게끔은 할 수 있다; 배열은 GC될 수 있다.
 
-Again, in many cases JS might automatically optimize the program to the same effect. But it's still a good habit to be careful and explicitly make sure we don't keep any significant amount of device memory tied up any longer than necessary.
+다시 말하지만, 많은 경우 JS가 자동적으로 프로그램을 동일한 효과로 최적화할 것이다. 그러나 많은 양의 장치 메모리가 필요 이상으로 묶여있지 않도록 주의하고 명시적으로 확인하는 것은 여전히 좋은 습관이다.
 
-As a matter of fact, we also technically don't need the function `getGrade()` anymore after the `.map(getGrade)` call completes. If profiling our application showed this was a critical area of excess memory use, we could possibly eek out a tiny bit more memory by freeing up that reference so its value isn't tied up either. That's likely unnecessary in this toy example, but this is a general technique to keep in mind if you're optimizing the memory footprint of your application.
+사실 `.map(getGrade)` 호출이 완료된 이후에는 기술적으로 더이상 `getGrade()` 함수는 필요하지 않다. 만약 어플리케이션을 프로파일링 결과가 메모리 사용의 치명적인 부분임이 보여지면, 아마 해당 참조값이 묶여 있지 않도록 참조를 해제하여 약간의 메모리를 확보할 수 있을 것이다. 이 임시 예시에서는 불필요할 수 있겠지만, 일반 어플리케이션에서 메모리 사용을 최적화한다면 염두해두어야하는 일반적인 기술이다.
 
-The takeaway: it's important to know where closures appear in our programs, and what variables are included. We should manage these closures carefully so we're only holding onto what's minimally needed and not wasting memory.
+요약: 프로그램에서 어디에 클로저가 나타나는지를 알고 어떤 변수들이 포함되는지 아는 것이 중요하다. 이 클로저들을 메모리에서 낭비 없이 최소한으로 필요한 부분만 가지고 있게끔 조심히 관리해야 한다.
 
-## An Alternative Perspective
+## 대안적 관점
 
-Reviewing our working definition for closure, the assertion is that functions are "first-class values" that can be passed around the program, just like any other value. Closure is the link-association that connects that function to the scope/variables outside of itself, no matter where that function goes.
+클로저의 동작 정의를 검토하면, 함수는 "일급 객체"로 프로그램에서 다른 값들처럼 전달될 수 있다는 주장이다. 클로저는 함수가 어디로 가던지 해당 함수를 바깥의 스코프/변수와 연결하는 링크 연결이다.
 
-Let's recall a code example from earlier in this chapter, again with relevant scope bubble colors annotated:
+이 장의 앞부분에서 스코프 버블 색상이 주석으로 표시된 코드 예제를 다시 살펴보자.
 
 ```js
-// outer/global scope: RED(1)
+// 외부/전역 스코프: 빨강(1)
 
 function adder(num1) {
-    // function scope: BLUE(2)
+    // 함수 스코프: 파랑(2)
 
     return function addTo(num2){
-        // function scope: GREEN(3)
+        // 함수 스코프: 초록(3)
 
         return num1 + num2;
     };
@@ -672,51 +672,51 @@ add10To(15);    // 25
 add42To(9);     // 51
 ```
 
-Our current perspective suggests that wherever a function is passed and invoked, closure preserves a hidden link back to the original scope to facilitate the access to the closed-over variables. Figure 4, repeated here for convenience, illustrates this notion:
+우리의 현재 관점은 어디서든지 함수가 전달되고 실행되면 클로저는 클로즈 오버된 변수에 대한 접근을 유용하게 하기 위해 기존 스코프에 대한 숨겨진 연결을 보존한다고 제안한다. 편의를 위해서 또 나왔는데 그림 4는 이 개념을 보여준다.
 
 <figure>
     <img src="images/fig4.png" width="400" alt="Function instances linked to scopes via closure" align="center">
-    <figcaption><em>Fig. 4 (repeat): Visualizing Closures</em></figcaption>
+    <figcaption><em>그림 4 (반복): 클로저 시각화</em></figcaption>
     <br><br>
 </figure>
 
-But there's another way of thinking about closure, and more precisely the nature of functions being *passed around*, that may help deepen the mental models.
+그러나 클로저에 대해 생각하는 또 다른 방법이 있다. 더 정확하게 함수의 *전달되는* 특성 차이를 보면 멘탈 모델을 심화하는 데 도움이 될 수 있다.
 
-This alternative model de-emphasizes "functions as first-class values," and instead embraces how functions (like all non-primitive values) are held by reference in JS, and assigned/passed by reference-copy—see Appendix A of the *Get Started* book for more information.
+이 대안 모델은 "일급 객체로써의 함수"를 강조하지 않고 대신 JS에서 함수(모든 비원시 값과 마찬가지로)가 참조로 유지되고 참조 복사에 의해 할당/전달되는 방식을 수용한다. 자세한 내용은 *Get Started*책의 부록 A를 참고해라.
 
-Instead of thinking about the inner function instance of `addTo(..)` moving to the outer RED(1) scope via the `return` and assignment, we can envision that function instances actually just stay in place in their own scope environment, of course with their scope-chain intact.
+`return` 이나 할당을 통해 외부의 빨강(1) 스코프로 이동하는 `addTo(..)`의 내부 함수 인스턴스에 대해 생각하는 대신, 함수 인스턴스가 실제로 자신의 스코프 환경 제자리에 유지되는 것을 상상할 수 있다. 물론 스코프 체인이 손상되지 않은 상태에서다.
 
-What gets *sent* to the RED(1) scope is **just a reference** to the in-place function instance, rather than the function instance itself. Figure 5 depicts the inner function instances remaining in place, pointed to by the RED(1) `addTo10` and `addTo42` references, respectively:
+빨강(1) 스코프로 *보내지는* 것은 함수 인스턴스 자체가 아니라 내부 함수 인스턴스에 대한 **오직 참조**다. 그림 5는 빨강(1) `addTo10` 와 `addTo42` 참조 각각이 가리키는 내부 함수 인스턴스가 제자리에 남아 있음을 보여준다.
 
 <figure>
     <img src="images/fig5.png" width="400" alt="Function instances inside scopes via closure, linked to by references" align="center">
-    <figcaption><em>Fig. 5: Visualizing Closures (Alternative)</em></figcaption>
+    <figcaption><em>그림 5: 클로저 시각화(대안)</em></figcaption>
     <br><br>
 </figure>
 
-As shown in Figure 5, each call to `adder(..)` still creates a new BLUE(2) scope containing a `num1` variable, as well as an instance of the GREEN(3) `addTo(..)` scope. But what's different from Figure 4 is, now these GREEN(3) instances remain in place, naturally nested inside of their BLUE(2) scope instances. The `addTo10` and `addTo42` references are moved to the RED(1) outer scope, not the function instances themselves.
+그림 5에서 보여지듯, `adder(..)`에 대한 각 호출은 여전히 `num1` 변수를 포함하는 새로운 파랑(2) 스코프를 생성하고, 초록(3) `addTo(..)` 스코프의 인스턴스도 생성한다. 그러나 그림 4와의 차이점은, 초록(3) 인스턴스들이 파랑(2) 스코프 인스턴스 내부에 자연스럽게 중첩되어 내부에 남아있다는 점이다. `addTo10`와 `addTo42` 함수 인스턴스 자체가 아닌 참조가 빨강(1) 외부 스코프로 옮겨진다.
 
-When `addTo10(15)` is called, the `addTo(..)` function instance (still in place in its original BLUE(2) scope environment) is invoked. Since the function instance itself never moved, of course it still has natural access to its scope chain. Same with the `addTo42(9)` call—nothing special here beyond lexical scope.
+`addTo10(15)`가 호출될 때, `addTo(..)` 함수 인스턴스(기존 파랑(2) 스코프 환경 내부에 아직 존재하는)가 실행된다. 함수 인스턴스 자체는 전혀 움직이지 않았으므로, 당연하게 여전히 스코프 체인으로 자연스럽게 접근할 수 있다. `addTo42(9)` 호출과 동일하다. 여기서 렉시컬 스코프를 넘어서는 특별한 것은 없다.
 
-So what then *is* closure, if not the *magic* that lets a function maintain a link to its original scope chain even as that function moves around in other scopes? In this alternative model, functions stay in place and keep accessing their original scope chain just like they always could.
+그렇다면 함수가 다른 스코프로 이동하더라도 기존 스코프 체인의 연결을 유지하는것은 *마법*이 아니여도 *클로저인가*? 이 대안 모델에서 함수는 원래 위치에 있으면서 항상 그랬듯 기존 스코프 체인을 접근한다.
 
-Closure instead describes the *magic* of **keeping alive a function instance**, along with its whole scope environment and chain, for as long as there's at least one reference to that function instance floating around in any other part of the program.
+대신 클로저는 프로그램의 다른 부분에서 해당 함수 인스턴스에 대한 참조가 하나 이상 있는 한 전체 스코프 환경과 체인에서 **함수 인스턴스를 유지**하는 *마법*을 설명한다.
 
-That definition of closure is less observational and a bit less familiar-sounding compared to the traditional academic perspective. But it's nonetheless still useful, because the benefit is that we simplify explanation of closure to a straightforward combination of references and in-place function instances.
+이 클로저에 대한 정의는 전통적인 학문적 관점과 비교하면 덜 친숙하게 들린다. 그러나 제자리에 있는 함수 인스턴스와 참조의 직접적인 조합에 대한 클로저 설명을 단순화한다는 장점이 있기 때문에 그럼에도 불구하고 여전히 유용하다.
 
-The previous model (Figure 4) is not *wrong* at describing closure in JS. It's just more conceptually inspired, an academic perspective on closure. By contrast, the alternative model (Figure 5) could be described as a bit more implementation focused, how JS actually works.
+이전 모델(그림 4)가 JS에서 클로저를 설명할 때 *틀리지는* 않았다. 클로저에 대한 학문적인 관점의 개념으로 영감을 받은 것이다. 대조적으로, 대안 모델(그림 5)는 JS가 실제로 동작하는 방식에 초점을 맞춘 구현으로 설명될 수 있다.
 
-Both perspectives/models are useful in understanding closure, but the reader may find one a little easier to hold than the other. Whichever you choose, the observable outcomes in our program are the same.
+두 관점/모델 모두 클로저를 이해하는데 유용하지만 독자는 어느 하나가 더 이해하기 쉬울 수도 있다. 어느것을 선택했든지 우리 프로그램에서 관찰 가능한 결과는 동일하다.
 
-| NOTE: |
+| 비고: |
 | :--- |
-| This alternative model for closure does affect whether we classify synchronous callbacks as examples of closure or not. More on this nuance in Appendix A. |
+| 클로저를 위한 이 대안 모델은 동기 콜백을 클로저의 예시로 분류할지 여부에 영향을 미친다. 이 뉘앙스에 대한 자세한 내용은 부록 A를 참고해라. |
 
-## Why Closure?
+## 왜 클로저인가?
 
-Now that we have a well-rounded sense of what closure is and how it works, let's explore some ways it can improve the code structure and organization of an example program.
+이제 클로저가 무엇이며 어떻게 동작하는지에 대한 전반적인 이해를 하였으므로, 예제 프로그램 코드 구조와 구성을 개선할 수 있는 몇 가지 방법을 살펴보자.
 
-Imagine you have a button on a page that when clicked, should retrieve and send some data via an Ajax request. Without using closure:
+클릭하면 Ajax 요청을 통해 일부 데이터를 검색하고 보내야하는 버튼이 페이지에 있다고 상상해보자. 클로저를 사용하지 않고:
 
 ```js
 var APIendpoints = {
@@ -745,9 +745,9 @@ function makeRequest(evt) {
 btn.addEventListener("click",makeRequest);
 ```
 
-The `makeRequest(..)` utility only receives an `evt` object from a click event. From there, it has to retrieve the `data-kind` attribute from the target button element, and use that value to lookup both a URL for the API endpoint as well as what data should be included in the Ajax request.
+`makeRequest(..)` 유틸리티는 클릭 이벤트에서 `evt` 객체만 받는다. 거기에서 대상 버튼 요소에서 `data-kind` 속성을 검색해야한다. 그리고 해당 값을 사용하여 API 엔드포인트에 대한 URL과 Ajax 요청에 포함되어야하는 데이터를 모두 조회해야 한다.
 
-This works OK, but it's unfortunate (inefficient, more confusing) that the event handler has to read a DOM attribute each time it's fired. Why couldn't an event handler *remember* this value? Let's try using closure to improve the code:
+이것은 정상적으로 동작한다. 하지만 이벤트 핸들러가 실행될 때마다 DOM 속성을 읽어야 하는 것은 불행하다(비효율적이고 혼란스럽다). 이벤트 핸들러가 왜 이 값을 *기억*하지 못할까? 코드를 개선하기 위해 클로저를 사용해보자:
 
 ```js
 var APIendpoints = {
@@ -782,15 +782,15 @@ function setupButtonHandler(btn) {
 setupButtonHandler(btn);
 ```
 
-With the `setupButtonHandler(..)` approach, the `data-kind` attribute is retrieved once and assigned to the `recordKind` variable at initial setup. `recordKind` is then closed over by the inner `makeRequest(..)` click handler, and its value is used on each event firing to look up the URL and data that should be sent.
+`setupButtonHandler(..)` 접근 방식을 사용하면 `data-kind` 속성이 한 번 검색되고 초기 설정에서 `recordKind` 변수에 할당된다. 그런 다음 `recordKind`는 내부 `makeRequest(..)` 클릭 핸들러에 의해 클로즈 오버되고 해당 값은 전송되어야하는 URL과 데이터 조회를 위해 각 이벤트가 실행될 때 사용된다.
 
-| NOTE: |
+| 비고: |
 | :--- |
-| `evt` is still passed to `makeRequest(..)`, though in this case we're not using it anymore. It's still listed, for consistency with the previous snippet. |
+| `evt`는 여전히 `makeRequest(..)`에 전달되지만 이 경우에는 더 이상 사용하지 않는다. 이전 스니펫과의 일관성을 위해서 쓴 것이다. |
 
-By placing `recordKind` inside `setupButtonHandler(..)`, we limit the scope exposure of that variable to a more appropriate subset of the program; storing it globally would have been worse for code organization and readability. Closure lets the inner `makeRequest()` function instance *remember* this variable and access whenever it's needed.
+`setupButtonHandler(..)` 내부에 `recordKind`를 배치하여 해당 변수의 스코프 노출을 프로그램의 보다 적절한 하위 집합으로 제한한다. 전역적으로 저장하면 코드 구성과 가독성이 나빠진다. 클로저는 내부 `makeRequest()` 함수 인스턴스가 이 변수를 *기억하고* 필요할 때마다 액세스할 수 있도록 한다.
 
-Building on this pattern, we could have looked up both the URL and data once, at setup:
+이 패턴을 기반으로 설정 시 URL과 데이터를 한 번에 조회할 수 있다.
 
 ```js
 function setupButtonHandler(btn) {
@@ -807,13 +807,13 @@ function setupButtonHandler(btn) {
 }
 ```
 
-Now `makeRequest(..)` is closed over `requestURL` and `requestData`, which is a little bit cleaner to understand, and also slightly more performant.
+이제 `makeRequest(..)`는 `requestURL`와 `requestData`에 대해 클로즈 오버 되어있다. 이는 이해하기에 더 명확하고 성능도 조금 향상되었다.
 
-Two similar techniques from the Functional Programming (FP) paradigm that rely on closure are partial application and currying. Briefly, with these techniques, we alter the *shape* of functions that require multiple inputs so some inputs are provided up front, and other inputs are provided later; the initial inputs are remembered via closure. Once all inputs have been provided, the underlying action is performed.
+클로저에 의존하는 함수형 프로그래밍(FP) 패러다임의 두 가지 유사한 기술은 부분 적용<sub>partial application</sub>과 커링<sub>currying</sub>이다. 간단히 말해서, 이러한 기술을 사용해 여러 입력이 필요한 함수의 *모양*을 변경해 일부 입력은 미리 제공하고 다른 입력은 나중에 제공한다. 초기 입력은 클로저를 통해서 기억된다. 모든 입력이 제공되면 기본 동작이 수행된다.
 
-By creating a function instance that encapsulates some information inside (via closure), the function-with-stored-information can later be used directly without needing to re-provide that input. This makes that part of the code cleaner, and also offers the opportunity to label partially applied functions with better semantic names.
+내부에 일부 정보를 캡슐화해 함수 인스턴스를 생성하면(클로저를 통해서) 나중에 입력을 다시 제공할 필요 없이 저장된 정보가 있는 함수를 직접 사용할 수 있다. 이것은 코드의 해당 부분을 더 깔끔하게 만들고, 부분적으로 적용된 함수들에 더 나은 의미의 이름을 붙일 수 있는 기회를 제공한다.
 
-Adapting partial application, we can further improve the preceding code:
+부분 적용을 적용하면 앞의 코드를 더 개선할 수 있다.
 
 ```js
 function defineHandler(requestURL,requestData) {
@@ -832,24 +832,24 @@ function setupButtonHandler(btn) {
 }
 ```
 
-The `requestURL` and `requestData` inputs are provided ahead of time, resulting in the `makeRequest(..)` partially applied function, which we locally label `handler`. When the event eventually fires, the final input (`evt`, even though it's ignored) is passed to `handler()`, completing its inputs and triggering the underlying Ajax request.
+`requestURL`과 `requestData` 입력이 미리 제공되어 `makeRequest(..)`가 부분적으로 적용된 함수가 되며 로컬에서 `handler`라는 레이블이 지정된다. 이벤트가 발생하면 최종 입력(`evt`, 비록 무시될지라도)이 `handler()`로 전달되고, 입력을 완료하고 기본 Ajax 요청을 발생시킨다.
 
-Behavior-wise, this program is pretty similar to the previous one, with the same type of closure. But by isolating the creation of `makeRequest(..)` in a separate utility (`defineHandler(..)`), we make that definition more reusable across the program. We also explicitly limit the closure scope to only the two variables needed.
+동작 면에서 이 프로그램은 동일한 유형의 클로저를 사용해 이전 프로그램과 매우 유사하다. 그러나 별도의 유틸리티(`defineHandler(..)`)에서 `makeRequest(..)`의 생성을 분리하여, 프로그램 전체에서 해당 정의를 재사용할 수 있도록 한다. 또한 클로저 스코프를 필요한 두 개의 변수로만 명시적으로 제한한다.
 
-## Closer to Closure
+## 클로저로 더 가까이
 
-As we close down a dense chapter, take some deep breaths let it all sink in. Seriously, that's a lot of information for anyone to consume!
+빽뺵한 챕터를 마치면서, 휴식을 좀 취하면서 모든게 충분히 이해되도록 해라. 진심으로, 이는 누구에게나 습득하기에 많은 정보다!
 
-We explored two models for mentally tackling closure:
+우리는 까다로운 클로저의 개념을 정리하기 위해 두 가지 모델을 탐색했다.
 
-* Observational: closure is a function instance remembering its outer variables even as that function is passed to and **invoked in** other scopes.
+* 관찰: 클로저는 해당 함수가 다른 스코프로 전달되고 **호출**되더라도 외부 변수를 기억하는 함수 인스턴스이다.
 
-* Implementational: closure is a function instance and its scope environment preserved in-place while any references to it are passed around and **invoked from** other scopes.
+* 구현: 클로저는 함수 인스턴스와 해당 스코프 환경이 제자리에 유지되는 동안 이에 대한 참조가 전달되고 다른 스코프에서 **호출**된다.
 
-Summarizing the benefits to our programs:
+프로그램이 얻는 이점 요약: 
 
-* Closure can improve efficiency by allowing a function instance to remember previously determined information instead of having to compute it each time.
+* 클로저는 함수 인스턴스가 매번 계산하지 않고 이전에 결정된 정보를 기억하도록 하여 효율성을 향상시킬 수 있다.
 
-* Closure can improve code readability, bounding scope-exposure by encapsulating variable(s) inside function instances, while still making sure the information in those variables is accessible for future use. The resultant narrower, more specialized function instances are cleaner to interact with, since the preserved information doesn't need to be passed in every invocation.
+* 클로저는 코드 가독성을 향상시키고 함수 인스턴스 내부에 변수를 캡슐화해 스코프 노출을 제한하는 동시에 해당 변수의 정보가 이후 사용됨을 위해 액세스할 수 있도록 보증한다. 보존된 정보는 모든 호출에서 전달될 필요가 없기 때문에 결과적으로 더 집중적이고 전문화된 함수 인스턴스와 깔끔하게 상호작용할 수 있다.
 
-Before you move on, take some time to restate this summary *in your own words*, explaining what closure is and why it's helpful in your programs. The main book text concludes with a final chapter that builds on top of closure with the module pattern.
+계속 진행하기 전에 시간을 내어 이 요약을 *자신의 말로* 다시 설명하고 클로저가 무엇이며 프로그램에서 왜 도움이 되는지 설명해봐라. 책은 모듈 패턴으로 클로저 위에 구축되는 마지막 챕터로 끝난다.
