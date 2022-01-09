@@ -61,14 +61,15 @@ function foo() {
 	console.log( this.a );
 }
 
-var a = 2;
+a = 2;
 
 foo(); // 2
 ```
 
-The first thing to note, if you were not already aware, is that variables declared in the global scope, as `var a = 2` is, are synonymous with global-object properties of the same name. They're not copies of each other, they *are* each other. Think of it as two sides of the same coin.
+The first thing to note, if you were not already aware, is that variables declared in the global scope, as `a = 2` is, are synonymous with global-object properties of the same name. They're not copies of each other, they *are* each other. Think of it as two sides of the same coin. 
+If a variables declared in the global scope, as `var a = 2`, are global scope variables, not the global-object properties.
 
-Secondly, we see that when `foo()` is called, `this.a` resolves to our global variable `a`. Why? Because in this case, the *default binding* for `this` applies to the function call, and so points `this` at the global object.
+Secondly, we see that when `foo()` is called, `this.a` resolves to our global-object property `a`. Why? Because in this case, the *default binding* for `this` applies to the function call, and so points `this` at the global object.
 
 How do we know that the *default binding* rule applies here? We examine the call-site to see how `foo()` is called. In our snippet, `foo()` is called with a plain, un-decorated function reference. None of the other rules we will demonstrate will apply here, so the *default binding* applies instead.
 
@@ -169,7 +170,7 @@ var obj = {
 
 var bar = obj.foo; // function reference/alias!
 
-var a = "oops, global"; // `a` also property on global object
+a = "oops, global"; // `a` also property on global object
 
 bar(); // "oops, global"
 ```
