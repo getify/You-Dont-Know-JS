@@ -1,17 +1,17 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Foreword
+# 추천사
 
-If I look over the books on my bookshelf, I can clearly see which of these titles are well loved. Well loved in this sense meaning they are a little worn. Their binding is broken, their pages are tattered, there might even be a spilled drink smear or two. What’s ironic to me is that the most loved of my books often _**look**_ the least cared for, though honestly the opposite is true.
+제 책장에 있는 책을 훑어보면 어떤 책이 사랑을 받고 있는지 확연히 알 수 있습니다. 사랑받고 있다는 의미는 조금 낡았다는 의미입니다. 묶인 부분은 깨졌고, 종이도 너덜너덜해졌고, 심지어 엎질러진 음료수도 한두 개 있을 수 있습니다. 아이러니한 점은 그 반대겠지만 제 책 중 가장 사랑받은 책이 종종 가장 관리가 안된 것처럼 *보인다는* 것입니다.
 
-*Scope and Closures* (1st ed.) is one of my most loved books. It’s small, but the binding is coming undone. The pages are worn and dog-eared. It’s a bit rumpled. It’s not a book I’ve read once. I’ve picked it up again and again in the many years since it was originally published.
+*스코프<sub>scope</sub>와 클로저<sub>closures</sub>*(1판)은 가장 사랑하는 책 중 하나입니다. 얇지만 묶인 부분이 풀리고 있습니다. 종이는 해졌고 모서리도 많이 접혔습니다. 약간 구겨지기도 했습니다. 한번 읽은 책이 아닙니다. 첫 출판 이후로 수년동안 읽고 또 읽었습니다.
 
-For me, it’s also been a benchmark for my own personal progression through JavaScript. When I first read it in 2014, I was familiar with the concepts but the depth of my understanding was admittedly not as deep as the thin volume.
+저에게는 JavaScript를 통한 제 발전을 위한 벤치마크이기도 했습니다. 2014년에 처음 읽었을 때 개념은 친숙했지만 이해의 깊이는 얇은 두께만큼 깊지 않았습니다.
 
-Over the years, even though I wasn’t necessarily feeling my own improvement on a day-to-day basis, each one of the concepts became more approachable. I’d smile to myself, realizing how far I’d come with the help of these guides. It became apparent there was an inverse correlation between how well I treated the book and how much I loved it.
+수년이 지나고 나날이 나아지는 것을 느끼지는 못했지만 각 개념은 이해하기 더 쉬워졌습니다. 이 가이드의 도움으로 제가 어디까지 왔는지 깨닫고 혼자 미소지었습니다.
 
-When Kyle asked me to write the Foreword for the 2nd edition, I was floored. It’s not often you’re asked to write about a book that’s been so formative for your own understanding and career, *Scope and Closures* in particular. I remember the day I first understood closures, the first time I used one well. The satisfaction was great, in part because the symmetry of the idea was compelling to me. Before I even picked this book up, I was already enamoured with closures. And yet, there’s a difference between being able to execute code successfully and fully explore the concepts with any depth. This book took my base understanding and drew it out, helped me master it.
+Kyle이 2판의 추천사를 써달라고 했을 때 당황했습니다. 당신의 이해력과 경력에 도움이 된 책에 대하여 써달라는 요청을 받는 것은 자주 있는 일이 아닙니다. 특히 *스코프와 클로저*라면 말입니다. 클로저를 처음으로 이해하던 날, 잘 사용하던 순간을 기억합니다. 만족도가 높았고 부분적으로 아이디어의 균형이 매력적이었습니다. 이 책을 집어 들기도 전에 이미 클로저에 반했습니다. 그렇다 하더라도 코드를 성공적으로 실행할 수 있게 되는 것과 개념을 깊이 있게 탐구하는 것 사이에는 차이가 있습니다. 이 책은 제가 기본을 이해하게 해주었고 그것을 이끌어내어 숙달할 수 있도록 도와주었습니다.
 
-This book is deceptively short. It’s helpful that it’s small because it’s dense with useful knowledge. Since it is compact, I’d suggest you give yourself time to absorb each page. Take your time with it. Treat the book with care, and by that I mean, wear it down.
+이 책은 믿을 수 없을 정도로 짧습니다. 유용한 지식이 풍부해서 작다는 것이 도움이 됩니다. 촘촘하기 때문에 각 페이지를 흡수할 수 있는 시간을 갖는 것이 좋습니다. 천천히 하세요. 책이 헤지도록 꼼꼼히 보세요.
 
 Sarah Drasner<br>
 Head of Developer Experience<br>
