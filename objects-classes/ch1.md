@@ -1,5 +1,5 @@
 # You Don't Know JS Yet: Objects & Classes - 2nd Edition
-# Chapter 1: TODO
+# Chapter 1: Object Foundations
 
 | NOTE: |
 | :--- |
@@ -27,12 +27,87 @@ It's quite an understatement to say a lot has changed in the JS landscape in the
 
 Now, we still need to talk about how `this` works, and how that relates to methods invoked against various objects. And `class` actually operates (mostly!) via the prototype chain deep under the covers. But JS developers in 2022 are almost never writing code to explicitly wire up prototypal inheritance anymore. And as much as I personally wish differently, class design patterns -- not "behavior delegation" -- are how the majority of data and behavior organization (data structures) in JS are expressed.
 
-This book reflects JS's current reality; thus the new sub-title, new focus and organization of topics, and complete re-write of the previous edition's text.
+This book reflects JS's current reality: thus the new sub-title, new organization and focus of topics, and complete re-write of the previous edition's text.
 
+## Objects As Containers
 
+One common way of wrapping up multiple values in a single container is with an object. Objects are collections of key/value pairs. There are also sub-types of object in JS with specialized behaviors, such as arrays and even functions; more on these later.
 
-// SUMMARY TODO:
+Regular objects in JS are typically declared with literal syntax, like this:
+
+```js
+myObj = {
+    // ..
+};
+```
+
+**Note:** There's an alternate way to create an object (using `myObj = new Object()`), but this is not common or preferred, and is almost never the appropriate way to go about it. Stick with object literal syntax.
+
+Inside the object, you associate one or more values with named locations (aka, "keys", "properties"), like this:
+
+```js
+myObj = {
+    favoriteNumber: 42,
+    isDeveloper: true,
+    firstName: "Kyle"
+};
+```
+
+You may notice that this syntax resembles a related syntax called "JSON" (JavaScript Object Notation):
+
+```json
+{
+    "favoriteNumber": 42,
+    "isDeveloper": true,
+    "firstName": "Kyle"
+}
+```
+
+In JSON, the property names must be quoted with `"` double-quote characters.
+
+However, in JS programs, an object literal does not require quoted property names -- you *can* quote them (`'` or `"` delimited), but it's usually optional. There are however characters that are valid in a property name which cannot be included without surrounding quotes, such as leading numbers or whitespace:
+
+```js
+myObj = {
+    favoriteNumber: 42,
+    isDeveloper: true,
+    firstName: "Kyle",
+    "2 nicknames": [ "getify", "ydkjs" ]
+};
+```
+
+Property names in object literals are always treated as string values, with the exception of numeric property "names":
+
+```js
+anotherObj = {
+    42: "<-- this property name will remain a number",
+    true: "<-- this property name will be converted to a string",
+    myObj: "<-- ...and so will this one"
+};
+```
+
+The `42` property name will remain a number, whereas the `true` property name as shown will become the string `"true"`, and the `myObj` property name will coerce the object to a string, generally the default `"[object Object]"`.
+
+Property access can be done with the `.` operator or the `[ .. ]` brackets. Generally, the `.` operator is preferred, unless the property name contains characters that must be quoted, in which case the `[ .. ]` is required.
+
+```js
+myObj.favoriteNumber;    // 42
+myObj.isDeveloper;       // true
+
+myObj["2 nicknames"];    // [ "getify", "ydkjs" ]
+
+anotherObj[42];          // "<-- this property name will..."
+anotherObj["42"];        // "<-- this property name will..."
+```
+
+Notice that even though numeric property "names" remain as numbers, property access via the `[ .. ]` brackets will coerce a string representation of a number, like `"42"`, to the `42` numeric equivalent, and then access the associated property accordingly.
+
+// TODO
+
+## Objects Overview
+
+Objects are not just containers for multiple values
 
 Prototypes are internal linkages between objects that allow property or method access against one object -- if the property/method requested is absent -- to be handled by "delegating" that access to another object. When the delegation involves a method, the context for the method to run in is shared from the initial object to the target object via the `this` keyword.
 
-Prior to ES6, the prototype system was how developers expressed (i.e., emulated) the class design pattern in JS -- so-called "prototypal inheritance". ES6 introduced the `class` keyword as a syntactic affordance to embrace and centralize the prevalence of varied class design approaches. Ostensibly, `class` was introduced as "sugar" built on top of manual/explicit prototypal class
+Prior to ES6, the prototype system was how developers expressed (i.e., emulated) the class design pattern in JS -- so-called "prototypal inheritance". ES6 introduced the `class` keyword as a syntactic affordance to embrace and centralize the prevalence of varied class design approaches. Ostensibly, `class` was introduced as "sugar" built on top of manual/explicit prototypal classes.

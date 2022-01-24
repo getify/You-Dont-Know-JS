@@ -8,7 +8,8 @@
 
 * Foreword
 * Preface
-* Chapter 1: TODO
+* Chapter 1: Object Foundations
     * About This Book
-    * TODO
+    * Object As Containers
+    * Objects Overview
 * Appendix A: TODO
