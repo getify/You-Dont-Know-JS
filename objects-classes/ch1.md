@@ -57,7 +57,7 @@ It's easy to get confused what pairs of `{ .. }` mean, since JS overloads the cu
 
 Though it can sometimes be challenging as you read code, look for whether a `{ .. }` curly brace pair is used in the program where a value/expression is valid to appear; if so, it's an object literal, otherwise it's one of the other overloaded uses.
 
-### Defining Properties
+## Defining Properties
 
 Inside the object literal curly braces, you define properties (name and value) with `propertyName: propertyValue` pairs, like this:
 
@@ -94,7 +94,7 @@ myObj = {
 
 In this case, `favoriteNumber` is not holding a numeric value, but rather a function reference. To compute the result, that function reference must be explicitly executed.
 
-#### Looks Like JSON?
+### Looks Like JSON?
 
 You may notice that this object-literal syntax resembles "JSON" (JavaScript Object Notation):
 
@@ -123,7 +123,7 @@ myObj = {
 };
 ```
 
-#### Property Names
+### Property Names
 
 Property names in object literals are almost always treated/coeced as string values. One exception to this is for numeric (or "numeric looking") property "names":
 
@@ -152,7 +152,7 @@ anotherObj = {
 
 The expression `"x" + (21 * 2)`, which must appear inside of `[ .. ]` brackets, is computed immediately, and the result (`"x42"`) is used as the property name.
 
-#### Symbols As Property Names
+### Symbols As Property Names
 
 ES6 added a new primitive value type of `Symbol`, which is often used as a special property name for storing and retieving property values. They're created via the `Symbol(..)` function call (**without** the `new` keyword), which accepts an optional description string used only for friendlier debugging purposes; if specified, the description is inaccessible to the JS program and thus not used for any other purpose than debug output.
 
@@ -178,7 +178,7 @@ The computed property name used to define the property on `anotherObj` will be t
 
 Because symbols are globally unique in your program, there's **no** chance of accidental collision where one part of the program might accidentally define a property name the same as another part of the program tried defined/assigned.
 
-#### Concise Properties
+### Concise Properties
 
 When defining an object literal, it's common to use a property name that's the same as an existing in-scope identifier that holds the value you want to assign.
 
@@ -208,7 +208,7 @@ The property name is `"coolFact"` (string), and the value assigned to the proper
 
 At first, this shorthand convenience may seem confusing. But as you get more familiar with seeing this very common and popular feature being used, you'll likely favor it for typing (and reading!) less.
 
-#### Concise Methods
+### Concise Methods
 
 Another similar shorthand is defining functions/methods in an object literal using a more concise form:
 
@@ -248,7 +248,7 @@ anotherObj = {
 };
 ```
 
-#### Object Spread
+### Object Spread
 
 Another way to define properties at object literal creation time is with a form of the `...` syntax -- it's not technically an operator, but it certainly seems like one -- often referred to as "object spread".
 
@@ -272,7 +272,7 @@ Also, consider these property definition operations to happen "in order", from t
 
 | NOTE: |
 | :--- |
-| Object spread also only copies *owned* properties (those directly on the object) that are *enumerable* (allowed to be enumerated/listed). It does not duplicate the property -- as in, actually mimic the property's exact characteristics -- but rather do a simple assignment style copy. We'll cover more such details in "Object Characteristics" later in this chapter. |
+| Object spread also only copies *owned* properties (those directly on the object) that are *enumerable* (allowed to be enumerated/listed). It does not duplicate the property -- as in, actually mimic the property's exact characteristics -- but rather do a simple assignment style copy. We'll cover more such details in the "Property Descriptors" section of the next chapter. |
 
 A common way `...` object spread is used is for performing *shallow* object duplication:
 
@@ -284,7 +284,7 @@ Keep in mind you cannot `...` spread into an existing object value; the `...` ob
 
 But if you instead want to copy object properties (shallowly) into an *existing* object, see the "Assigning Properties" section later in this chapter (with coverage of `Object.assign(..)`).
 
-#### Deep Object Copy
+### Deep Object Copy
 
 Also, since `...` doesn't do full, deep object duplication, the object spread is generally only suitable for duplicating objects that hold simple, primitive values only, not references to other objects.
 
@@ -304,7 +304,7 @@ myObjCopy = structuredClone(myObj);
 
 The underlying algorithm behind this built-in utility supports duplicating circular references, as well as **many more** types of values than the `JSON` round-trip trick. However, this algorithm still has its limits, including no support for cloning functions or DOM elements.
 
-### Accessing Properties
+## Accessing Properties
 
 Property access of an existing object is preferably done with the `.` operator:
 
@@ -347,7 +347,7 @@ myObj[`${ howMany(1) } nicknames`];   // [ "getify", "ydkjs" ]
 
 In this snippet, the expression is a back-tick delimited `` `template string literal` `` with an interpolated expression of the function call `howMany(1)`. The overall result of that expression is the string value `"2 nicknames"`, which is then used as the property name to access.
 
-#### Object Entries
+### Object Entries
 
 You can get a listing of the properties in an object, as an array of tuples (two-element sub-arrays) holding the property name and value:
 
@@ -362,7 +362,7 @@ Object.entries(myObj);
 // [ ["favoriteNumber",42], ["isDeveloper",true], ["firstName":"Kyle"] ]
 ```
 
-Added in ES6, `Object.entries(..)` retieves this list of entries -- containing only owned an enumerable properties; see "Object Characteristics" later in this chapter -- from a source object.
+Added in ES6, `Object.entries(..)` retieves this list of entries -- containing only owned an enumerable properties; see the "Property Descriptors" section in the next chapter -- from a source object.
 
 Such a list can be looped/iterated over, potentially assigning properties to another existing object. However, it's also possible to create a new object from a list of entries, using `Object.fromEntries(..)` (added in ES2019):
 
@@ -373,7 +373,7 @@ myObjShallowCopy = Object.fromEntries( Object.entries(myObj) );
 // myObjShallowCopy = { ...myObj };
 ```
 
-#### Destructuring
+### Destructuring
 
 Another approach to accessing properties is through object destructuring (added in ES6). Think of destructuring as defining a "pattern" that describes what an object value is supposed to "look like" (structurally), and then asking JS to follow that "pattern" to systematically access the contents of an object value.
 
@@ -444,7 +444,7 @@ fave;  // 42
 
 Object destructuring syntax is generally preferred for its declarative and more readable style, over the heavily imperative pre-ES6 equivalents. But don't go overboard with destructuring. Sometimes just doing `x = someObj.x` is perfectly fine!
 
-#### Conditional Property Access
+### Conditional Property Access
 
 Recently (in ES2020), a feature known as "optional chaining" was added to JS, which augments property access capabilities (especially nested property access). The primary form is the two-character compound operator `?.`, like `A?.B`.
 
@@ -498,7 +498,7 @@ Everything asserted about how `?.` behaves goes the same for `?.[`.
 | :--- |
 | There's a third form of this feature, named "optional call", which uses `?.(` as the operator. It's used for performing a non-null'ish check on a property before executing the function value in the property. For example, instead of `myObj.someFunc(42)`, you can do `myObj.someFunc?.(42)`. The `?.(` checks to make sure `myObj.someFunc` is non-null'ish before invoking it (with the `(42)` part). While that may sound like a useful feature, I think this is dangerous enough to warrant complete avoidance of this form/construct.<br><br>My concern is that `?.(` makes it seem as if we're ensuring that the function is "callable" before calling it, when in fact we're only checking if it's non-null'ish. Unlike `?.` which can allow a "safe" `.` access against a non-null'ish value that's also not an object, the `?.(` non-null'ish check isn't similarly "safe". If the property in question has any non-null'ish, non-function value in it, like `true` or `"Hello"`, the `(42)` call part will be invoked and yet throw a JS exception. So in other words, this form is unfortunately masquerading as more "safe" than it actually is, and should thus be avoided in essentially all circumstances. If a property value can ever *not be* a function, do a more fullsome check for its function'ness before trying to invoke it. Don't pretend that `?.(` is doing that for you, or future readers/maintainers of your code (including your future self!) will likely regret it. |
 
-#### Accessing Properties On Non-Objects
+### Accessing Properties On Non-Objects
 
 This may sound counter-intuitive, but you can generally access properties/methods from values that aren't themselves objects:
 
@@ -523,7 +523,7 @@ Note that `null` and `undefined` can be object-ified, by calling `Object(null)` 
 | :--- |
 | Boxing has a counterpart: unboxing. For example, the JS engine will take an object wrapper -- like a `Number` object wrapped around `42` -- created with `Number(42)` or `Object(42)` -- and unwrap it to retrieve the underlying primitive `42`, whenever a mathematical operation (like `*` or `-`) encounters such an object. Unboxing behavior is way out of scope for our discussion, but is covered fully in the aforementioned "Types & Grammar" title. |
 
-### Assiging Properties
+## Assiging Properties
 
 Whether a property is defined at the time of object literal definition, or added later, the assignment of a property value is done with the `=` operator, as any other normal assignment would be:
 
@@ -533,7 +533,7 @@ myObj.favoriteNumber = 123;
 
 If the `favoriteNumber` property doesn't already exist, that statement will create a new property of that name and assign its value. But if it already exists, that statement will re-assign its value.
 
-It's also possible to assign one or more properties at once -- assuming the source properties (name and value) are in another object -- using the `Object.assign(..)` (added in ES6) method:
+It's also possible to assign one or more properties at once -- assuming the source properties (name and value pairs) are in another object -- using the `Object.assign(..)` (added in ES6) method:
 
 ```js
 // shallow copy all (owned and enumerable) properties
@@ -554,211 +554,8 @@ Object.assign(
 
 `Object.assign(..)` takes the first object as target, and the second (and optionally subsequent) objects as source(s). Copying is done in the same manner as described earlier in the "Object Spread" section.
 
-## Object Characteristics
-
-To understand the object mechanism in JS, we need to look more closely at a number of characteristics of objects (and their properties) which can affect the behavior when interacting with them.
-
-### Property Descriptors
-
-Each property on an object is internally described by what's known as a "property descriptor". This is, itself, an object with several properties on it, dictating how the outer property behaves on the object in question.
-
-We can retrieve a property descriptor for any existing property using `Object.getOwnPropertyDescriptor(..)` (ES5):
-
-```js
-myObj = {
-    favoriteNumber: 42,
-    isDeveloper: true,
-    firstName: "Kyle"
-};
-
-Object.getOwnPropertyDescriptor(myObj,"favoriteNumber");
-// {
-//     value: 42,
-//     enumerable: true,
-//     writable: true,
-//     configurable: true
-// }
-```
-
-We can even use such a descriptor to define a new property on an object, using `Object.defineProperty(..)` (ES5):
-
-```js
-anotherObj = {};
-
-Object.defineProperty(anotherObj,"fave",{
-    value: 42,
-    enumerable: true,     // default if omitted
-    writable: true,       // default if omitted
-    configurable: true    // default if omitted
-});
-
-anotherObj.fave;          // 42
-```
-
-If an existing property has not already been marked as non-configurable (with `configurable: false` in its descriptor), it can always be re-defined/overwritten using `Object.defineProperty(..)`.
-
-| WARNING: |
-| :--- |
-| A number of earlier sections in this chapter refer to "copying" or "duplicating" properties. One might assume such copying/duplication would be at the property descriptor level. However, none of those operations actually work that way; they all do simple `=` style access and assignment, which has the effect of ignoring any nuances in how the underlying descriptor for a property is defined. |
-
-#### Accessor Properties
-
-A property descriptor usually defines a `value` property, as shown above. However, a special kind of property, known as an "accessor property" (aka, a getter/setter), can be defined. For these a property like this, its descriptor does not define a fixed `value` property, but would instead look something like this:
-
-```js
-{
-    get() { .. },    // function to invoke when retrieving the value
-    set(v) { .. },   // function to invoke when assigning the value
-    // .. enumerable, etc
-}
-```
-
-A getter looks like a property access (`obj.prop`), but under the covers it invokes the `get()` method as defined; it's sort of like if you had done `obj.prop()`. A setter looks like a property assignment (`obj.prop = value`), but it invokes the `set(..)` method as defined; it's sort of like if you had done `obj.prop(value)`.
-
-Let's illustrate a getter/setter accessor property:
-
-```js
-anotherObj = {};
-
-Object.defineProperty(anotherObj,"fave",{
-    get() { console.log("Getting 'fave' value!"); return 123; },
-    set(v) { console.log(`Ignoring ${v} assignment.`); }
-});
-
-anotherObj.fave;
-// Getting 'fave' value!
-// 123
-
-anotherObj.fave = 42;
-// Ignoring 42 assignment.
-
-anotherObj.fave;
-// Getting 'fave' value!
-// 123
-```
-
-#### Enumerable, Writable, Configurable
-
-Besides `value` or `get()` / `set(..)`, the other 3 attributes of a property are, as shown above:
-
-* `enumerable`
-* `writable`
-* `configurable`
-
-The `enumerable` attribute controls whether the property will appear in various enumerations of object properties, such as `Object.keys(..)`, `Object.entries(..)`, `for..in` loops, and the copying that occurs with the `...` object spread and `Object.assign(..)`. Most properties should be left enumerable, but you can mark certain special properties on an object as non-enumerable if they shouldn't be iterated/copied.
-
-The `writable` attribute controls whether a `value` assignment (via `=`) is allowed. To make a property "read only", define it with `writable: false`. However, as long as the property is still configurable, `Object.defineProperty(..)` can still change the value by setting `value` differently.
-
-The `configurable` attribute controls whether a property's **descriptor** can be re-defined/overwritten. A property that's `configurable: false` is locked to its definition, and any further attempts to change it with `Object.defineProperty(..)` will fail. A non-configurable property can still be assigned new values (via `=`), as long as `writable: true` is still set on the property's descriptor.
-
-### `[[Prototype]]`
+## Container Overview
 
 // TODO
 
-## Sub-Object Types
-
-There are a variety of specialized sub-types of objects. By far, the two most common ones you'll interact with are arrays and `function`s.
-
-### Arrays
-
-Arrays are objects that are specifically intended to be **numerically indexed**, rather than using string named property locations. They are still objects, so a named property like `favoriteNumber` is legal. But it's greatly frowned upon to mix named properties into numerically indexed arrays.
-
-Arrays are preferably defined with literal syntax (similar to objects), but with the `[ .. ]` square brackets rather than `{ .. }` curly brackets:
-
-```js
-myList = [ 23, 42, 109 ];
-```
-
-JS allows any mixture of value types in arrays, including objects, other arrays, functions, etc. As you're likely already aware, arrays are "zero-indexed", meaning the first element in the array is at the index `0`, not `1`:
-
-```js
-myList = [ 23, 42, 109 ];
-
-myList[0];      // 23
-myList[1];      // 42
-```
-
-Recall that any string property name on an object that "looks like" a number -- is able to be validly coerced to a string -- will actually be treated like a number. The same goes for arrays. You should always use `42` as a numeric index (aka, property name), but if you use the string `"42"`, JS will coerce that to a number for you.
-
-```js
-// "2" works as an index here, but it's not advised
-myList["2"];    // 109
-```
-
-One exception to the "no named properties on arrays" rule is that all arrays automatically expose a `length` property, which is automatically kept updated with the "length" of the array.
-
-```js
-myList = [ 23, 42, 109 ];
-
-myList.length;   // 3
-
-// "push" another value onto the end of the list
-myList.push("Hello");
-
-myList.length;   // 4
-```
-
-| WARNING: |
-| :--- |
-| Many JS developers incorrectly believe that array `length` is basically a *getter* (see "Accessor Properties" earlier), but it's not. The offshoot is that these developers feel like it's "expensive" to access this property -- as if JS has to on-the-fly recompute the length -- and will thus do things like capture/store the length of an array before doing a non-mutating loop over it. This used to be "best practice" from a performance perspective. But for at least 10 years now, that's actually been an anti-pattern, because the JS engine is more efficient at managing the `length` property than our JS code is at trying to "outsmart" the engine to avoid invoking something we think is a *getter*. It's more efficient to let the JS engine do its job, and just access the property whenever and however often it's needed. |
-
-#### Empty Slots
-
-JS arrays also have a really unfortunate "flaw" in their design, referred to as "empty slots". If you assign an index of an array more than one position beyond the current end of the array, JS will leave the in between slots "empty" rather than auto-assigning them to `undefined` as you might expect:
-
-```js
-myList = [ 23, 42, 109 ];
-myList.length;              // 3
-
-myList[14] = "Hello";
-myList.length;              // 15
-
-myList;                     // [ 23, 42, 109, empty x 11, "Hello" ]
-
-// looks like a real slot with a
-// real `undefined` value in it,
-// but beware, it's a trick!
-myList[9];                  // undefined
-```
-
-You might wonder why empty slots are so bad? One reason: there are APIs in JS, like array's `map(..)`, where empty slots are suprisingly skipped over! Never, ever intentionally create empty slots in your arrays. This in undebateably one of JS's "bad parts".
-
-### Functions
-
-I don't have much specifically to say about functions here, other than to point out that they are also sub-object-types. This means that in addition to being executable, they can also have named properties added to or accessed from them.
-
-Functions have two pre-defined properties you may find yourself interacting with, specifially for meta-programming purposes:
-
-```js
-function help(opt1,opt2,...remainingOpts) {
-    // ..
-}
-
-help.name;          // "help"
-help.length;        // 2
-```
-
-The `length` of a function is the count of its explicitly defined parameters, up to but not including a parameter that either has a default value defined (e.g., `param = 42`) or a "rest parameter" (e.g., `...remainingOpts`).
-
-#### Avoid Setting Function Properties
-
-You should avoid assigning properties on function objects. If you're looking to store extra information associated with a function, use a separate `Map(..)` (or `WeakMap(..)`) with the function object as the key, and the extra information as the value.
-
-```js
-extraInfo = new Map();
-
-extraInfo.set(help,"this is some important information");
-
-// later:
-extraInfo.get(help);   // "this is some important information"
-```
-
-## Objects Overview
-
-Objects are not just containers for multiple values, though that's the context for most interactions with objects.
-
-Prototypes are internal linkages between objects that allow property or method access against one object -- if the property/method requested is absent -- to be handled by "delegating" that access to another object. When the delegation involves a method, the context for the method to run in is shared from the initial object to the target object via the `this` keyword.
-
-Prior to ES6, the prototype system was how developers expressed (i.e., emulated) the class design pattern in JS -- so-called "prototypal inheritance". ES6 introduced the `class` keyword as a syntactic affordance to embrace and centralize the prevalence of varied class design approaches. Ostensibly, `class` was introduced as "sugar" built on top of manual/explicit prototypal classes.
-
-[^structuredClone]: Structured Clone Algorithm, HTML Specification, https://html.spec.whatwg.org/multipage/structured-data.html#structured-cloning
+[^structuredClone]: "Structured Clone Algorithm", HTML Specification, https://html.spec.whatwg.org/multipage/structured-data.html#structured-cloning

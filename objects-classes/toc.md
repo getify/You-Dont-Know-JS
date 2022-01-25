@@ -10,8 +10,14 @@
 * Preface
 * Chapter 1: Object Foundations
     * About This Book
-    * Object As Containers
-    * Object Characteristics
-    * Sub-Object Types
-    * Objects Overview
+    * Objects As Containers
+    * Defining Properties
+    * Accessing Properties
+    * Assigning Properties
+    * Container Overview
+* Chapter 2: How Objects Work
+    * Property Descriptors
+    * `[[Prototype]]` Chain
+    * Object Sub-Types
+    * Behavior Overview
 * Appendix A: TODO
