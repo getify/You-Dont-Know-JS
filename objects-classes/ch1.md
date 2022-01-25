@@ -248,9 +248,63 @@ anotherObj = {
 };
 ```
 
+#### Object Spread
+
+Another way to define properties at object literal creation time is with a form of the `...` syntax -- it's not technically an operator, but it certainly seems like one -- often referred to as "object spread".
+
+The `...` when used inside an object literal will "spread" out the contents (properties, aka key/value pairs) of another object value into the object being defined:
+
+```js
+anotherObj = {
+    favoriteNumber: 12,
+
+    ...myObj,   // object spread, shallow copies `myObj`
+
+    greeting: "Hello!"
+}
+```
+
+The spreading of `myObj`'s properties is shallow, in that it only copies the top-level properties from `myObj`; any values those properties hold are simply assigned over. If any of those values are references to other objects, the references themselves are assigned (by copy), but the underlying object values are *not* duplicated -- so you end up with multiple shared references to the same object(s).
+
+You can think of object spreading like a `for` loop that runs through the properties one at a time and does an `=` style assignment from the source object (`myObj`) to the target object (`anotherObj`).
+
+Also, consider these property definition operations to happen "in order", from top to bottom of the object literal. In the above snippet, since `myObj` has a `favoriteNumber` property, the object spread will end up overwriting the `favoriteNumber: 12` property assignment from the previous line. Moreover, if `myObj` had contained a `greeting` property that was copied over, the next line (`greeting: "Hello!"`) would override that property definition.
+
+| NOTE: |
+| :--- |
+| Object spread also only copies *owned* properties (those directly on the object) that are *enumerable* (allowed to be enumerated/listed). It does not duplicate the property -- as in, actually mimic the property's exact characteristics -- but rather do a simple assignment style copy. We'll cover more such details in "Object Characteristics" later in this chapter. |
+
+A common way `...` object spread is used is for performing *shallow* object duplication:
+
+```js
+myObjCopy = { ...myObj };
+```
+
+Keep in mind you cannot `...` spread into an existing object value; the `...` object spread syntax can only appear inside the `{ .. }` object literal, which is creating a new object value.
+
+##### Deep Object Copy
+
+Also, since `...` doesn't do full, deep object duplication, the object spread is generally only suitable for duplicating objects that hold simple, primitive values only, not references to other objects.
+
+Deep object duplication is an incredibly complex and nuanced operation. Duplicating a value like `42` is obvious and straightforward, but what does it mean to copy a function (which is a special kind of object, also held by reference), or to copy an external (not entirely in JS) object reference, such as a DOM element? And what happens if an object has circular references (like where a nested descendant object holds a reference back up to an outer ancestor object)? There's a variety of opinions in the wild about how all these corner cases should be handled, and thus no single standard exists for deep object duplication.
+
+For deep object duplication, the standard approaches have been:
+
+1. Use a library utility that declares a specific opinion on how the duplication behaviors/nuances should be handled.
+
+2. Use the `JSON.parse(JSON.stringify(..))` round-trip trick -- this only "works" correctly if there are no circular references, and if there are no values in the object that cannot be properly serialized with JSON (such as functions).
+
+Recently, though, a third option has landed. This is not a JS feature, but rather a companion API provided to JS by environments like the web platform. Objects can be deep copied now using `structuredClone(..)`[^stucturedClone].
+
+```js
+myObjCopy = structuredClone(myObj);
+```
+
+The underlying algorithm behind this built-in utility supports duplicating circular references, as well as **many more** types of values than the `JSON` round-trip trick. However, this algorithm still has its limits, including no support for cloning functions or DOM elements.
+
 ### Accessing Properties
 
-Property access is preferably done with the `.` operator:
+Property access of an existing object is preferably done with the `.` operator:
 
 ```js
 myObj.favoriteNumber;    // 42
@@ -290,6 +344,77 @@ myObj[`${ howMany(1) } nicknames`];   // [ "getify", "ydkjs" ]
 ```
 
 In this snippet, the expression is a back-tick delimited `` `template string literal` `` with an interpolated expression of the function call `howMany(1)`. The overall result of that expression is the string value `"2 nicknames"`, which is then used as the property name to access.
+
+#### Destructuring
+
+Another approach to accessing properties is through object destructuring (added in ES6). Think of destructuring as defining a "pattern" that describes what an object value is supposed to "look like" (structurally), and then asking JS to follow that "pattern" to systematically access the contents of an object value.
+
+The end result of object destructuring is not another object, but rather one or more assignments to other targets (variables, etc) of the values from the source object.
+
+Imagine this sort of pre-ES6 code:
+
+```js
+myObj = {
+    favoriteNumber: 42,
+    isDeveloper: true,
+    firstName: "Kyle"
+};
+
+const favoriteNumber = (
+    myObj.favoriteNumber !== undefined ? myObj.favoriteNumber : 42
+);
+const isDev = myObj.favoriteNumber;
+const firstName = myObj.firstName;
+const lname = (
+    myObj.lastName !== undefined ? myObj.lastName : "--missing--"
+);
+```
+
+Those accesses of the property values, and assignments to other identifiers, is generally called "manual destructuring". To use the declarative object destructuring syntax, it might look like this:
+
+```js
+myObj = {
+    favoriteNumber: 42,
+    isDeveloper: true,
+    firstName: "Kyle"
+};
+
+const { favoriteNumber = 12 } = myObj;
+const {
+    isDeveloper: isDev,
+    firstName: firstName,
+    lastName: lname = "--missing--"
+} = myObj;
+
+favoriteNumber;   // 42
+isDev;            // true
+firstName;        // "Kyle"
+lname;            // "--missing--"
+```
+
+As shown, the `{ .. }` object destucturing resembles an object literal value definition, but it appears on the left-hand side of the `=` operator rather than on the right-hand side where an object value expression would appear. That makes the `{ .. }` on the left-hand side a destructuring pattern rather than another object definition.
+
+The `{ favoriteNumber } = myObj` destructuring tells JS to find a property named `favoriteNumber` on the object, and to assign its value to an identifier of the same name. The single instance of the `favoriteNumber` identifier in the pattern is similar to "concise properties" as discussed earlier in this chapter: if the source (property name) and target (identifier) are the same, you can omit one of them and only list it once.
+
+The `= 12` part tells JS to provide `12` as a default value for the assignment to `favoriteNumber`, if the source object either doesn't have a `favoriteNumber` property, or if the property holds an `undefined` value.
+
+In the second destructuring pattern, the `isDeveloper: isDev` pattern is instructing JS to find a property named `isDeveloper` on the source object, and assign its value to an identifier named `isDev`. It's sort of a "renaming" of the source to the target. By contrast, `firstName: firstName` is providing the source and target for an assignment, but is redundant since they're identical; a single `firstName` would have sufficed here, and is generally more preferred.
+
+The `lastName: lname = "--missing--"` combines both source-target renaming and a default value (if the `lastName` source property is missing or `undefined`).
+
+The above snippet combines object destructuring with variable declarations -- in this example, `const` is used, but `var` and `let` work as well -- but it's not inherently a declaration mechanism. Destructuring is about access and assignment (source to target), so it can operate against existing targets rather than declaring new ones:
+
+```js
+let fave;
+
+// surrounding ( ) are required syntax here,
+// when a declarator is not used
+({ favoriteNumber: fave } = myObj);
+
+fave;  // 42
+```
+
+Object destructuring syntax is generally preferred for its declarative and more readable style, over the heavily imperative pre-ES6 equivalents. But don't go overboard with destructuring. Sometimes just doing `x = someObj.x` is perfectly fine!
 
 #### Conditional Property Access
 
@@ -345,6 +470,14 @@ Everything asserted about how `?.` behaves goes the same for `?.[`.
 | :--- |
 | There's a third form of this feature, named "optional call", which uses `?.(` as the operator. It's used for performing a non-null'ish check on a property before executing the function value in the property. For example, instead of `myObj.someFunc(42)`, you can do `myObj.someFunc?.(42)`. The `?.(` checks to make sure `myObj.someFunc` is non-null'ish before invoking it (with the `(42)` part). While that may sound like a useful feature, I think this is dangerous enough to warrant complete avoidance of this form/construct.<br><br>My concern is that `?.(` makes it seem as if we're ensuring that the function is "callable" before calling it, when in fact we're only checking if it's non-null'ish. Unlike `?.` which can allow a "safe" `.` access against a non-null'ish value that's also not an object, the `?.(` non-null'ish check isn't similarly "safe". If the property in question has any non-null'ish, non-function value in it, like `true` or `"Hello"`, the `(42)` call part will be invoked and yet throw a JS exception. So in other words, this form is unfortunately masquerading as more "safe" than it actually is, and should thus be avoided in essentially all circumstances. If a property value can ever *not be* a function, do a more fullsome check for its function'ness before trying to invoke it. Don't pretend that `?.(` is doing that for you, or future readers/maintainers of your code (including your future self!) will likely regret it. |
 
+### Assiging Properties
+
+Whether a property is defined at the time of object literal definition, or added later, the assignment of a property value is done with the
+
+// TODO
+
+## Object Characteristics
+
 // TODO
 
 ## Objects Overview
@@ -354,3 +487,5 @@ Objects are not just containers for multiple values
 Prototypes are internal linkages between objects that allow property or method access against one object -- if the property/method requested is absent -- to be handled by "delegating" that access to another object. When the delegation involves a method, the context for the method to run in is shared from the initial object to the target object via the `this` keyword.
 
 Prior to ES6, the prototype system was how developers expressed (i.e., emulated) the class design pattern in JS -- so-called "prototypal inheritance". ES6 introduced the `class` keyword as a syntactic affordance to embrace and centralize the prevalence of varied class design approaches. Ostensibly, `class` was introduced as "sugar" built on top of manual/explicit prototypal classes.
+
+[^structuredClone]: Structured Clone Algorithm, HTML Specification, https://html.spec.whatwg.org/multipage/structured-data.html#structured-cloning
