@@ -12,5 +12,6 @@
     * About This Book
     * Object As Containers
     * Object Characteristics
+    * Sub-Object Types
     * Objects Overview
 * Appendix A: TODO
