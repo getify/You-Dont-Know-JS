@@ -359,7 +359,7 @@ myObj = {
 };
 
 Object.entries(myObj);
-// [ ["favoriteNumber",42], ["isDeveloper",true], ["firstName":"Kyle"] ]
+// [ ["favoriteNumber",42], ["isDeveloper",true], ["firstName","Kyle"] ]
 ```
 
 Added in ES6, `Object.entries(..)` retieves this list of entries -- containing only owned an enumerable properties; see the "Property Descriptors" section in the next chapter -- from a source object.
