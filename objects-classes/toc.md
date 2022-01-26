@@ -20,7 +20,9 @@
     * Containers Are Collections Of Properties
 * Chapter 2: How Objects Work
     * Property Descriptors
-    * `[[Prototype]]` Chain
     * Object Sub-Types
+    * Object Characteristics
+    * Extending the MOP
+    * `[[Prototype]]` Chain
     * Objects Behavior
 * Appendix A: TODO
