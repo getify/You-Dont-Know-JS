@@ -178,12 +178,14 @@ The computed property name used to define the property on `anotherObj` will be t
 
 Because symbols are globally unique in your program, there's **no** chance of accidental collision where one part of the program might accidentally define a property name the same as another part of the program tried defined/assigned.
 
+Symbols are also useful to hook into special default behaviors of objects, and we'll cover that in more detail in "Extending the MOP" in the next chapter.
+
 ### Concise Properties
 
 When defining an object literal, it's common to use a property name that's the same as an existing in-scope identifier that holds the value you want to assign.
 
 ```js
-coolFact = "The first person convicted of speeding was going 8 mph";
+coolFact = "the first person convicted of speeding was going 8 mph";
 
 anotherObj = {
     coolFact: coolFact
@@ -200,7 +202,7 @@ In this situation, where the property name and value expression identifier are i
 coolFact = "the first person convicted of speeding was going 8 mph";
 
 anotherObj = {
-    coolFact
+    coolFact   // <-- concise property short-hand
 };
 ```
 
@@ -533,6 +535,10 @@ myObj.favoriteNumber = 123;
 
 If the `favoriteNumber` property doesn't already exist, that statement will create a new property of that name and assign its value. But if it already exists, that statement will re-assign its value.
 
+| WARNING: |
+| :--- |
+| An `=` assignment to a property may fail (silently or throwing an exception), or it may not directly assign the value but instead invoke a *setter* function that performs some operation(s). More details on these behaviors in the next chapter. |
+
 It's also possible to assign one or more properties at once -- assuming the source properties (name and value pairs) are in another object -- using the `Object.assign(..)` (added in ES6) method:
 
 ```js
@@ -552,10 +558,149 @@ Object.assign(
 );
 ```
 
-`Object.assign(..)` takes the first object as target, and the second (and optionally subsequent) objects as source(s). Copying is done in the same manner as described earlier in the "Object Spread" section.
+`Object.assign(..)` takes the first object as target, and the second (and optionally subsequent) object(s) as source(s). Copying is done in the same manner as described earlier in the "Object Spread" section.
 
-## Container Overview
+## Deleting Properties
 
-// TODO
+Once a property is defined on an object, the only way to remove it is with the `delete` operator:
+
+```js
+anotherObj = {
+    counter: 123
+};
+
+anotherObj.counter;   // 123
+
+delete anotherObj.counter;
+
+anotherObj.counter;   // undefined
+```
+
+Contrary to common misconception, the JS `delete` operator does **not** directly do any deallocation/freeing up of memory, through garbage collection (GC). The only thing it does is remove a property from an object. If the value in the property was a reference (to another object/etc), and there are no other surviving references to that value once the property is removed, that value would likely then be eligible for removal in a future sweep of the GC.
+
+Calling `delete` on anything other than an object property is a misuse of the `delete` operator, and will either fail silently (in non-strict mode) or throw an exception (in strict mode).
+
+Deleting a property from an object is distinct from assigning it a value like `undefined` or `null`. A property assigned `undefined`, either initially or later, is still present on the object, and might still be revealed when enumerating the contents
+
+## Determining Container Contents
+
+You can determine an object's contents in a variety of ways. To ask an object if it has a specific property:
+
+```js
+myObj = {
+    favoriteNumber: 42,
+    coolFact: "the first person convicted of speeding was going 8 mph",
+    beardLength: undefined,
+    nicknames: [ "getify", "ydkjs" ]
+};
+
+"favoriteNumber" in myObj;            // true
+
+myObj.hasOwnProperty("coolFact");     // true
+myObj.hasOwnProperty("beardLength");  // true
+
+myObj.nicknames = undefined;
+myObj.hasOwnProperty("nicknames");    // true
+
+delete myObj.nicknames;
+myObj.hasOwnProperty("nicknames");    // false
+```
+
+There *is* an important difference between how the `in` operator and the `hasOwnProperty(..)` method behave. The `in` operator will check not only the target object specified, but if not found there, it will also consult the object's `[[Prototype]]` chain (covered in the next chapter). By contrast, `hasOwnProperty(..)` only consults the target object.
+
+If you're paying close attention, you may have noticed that `myObj` appears to have a method property called `hasOwnProperty(..)` on it, even though we didn't define such. That's because `hasOwnProperty(..)` is defined as a built-in on `Object.prototype`, which by default is "inherited by" all normal objects. There is risk inherent to accessing such an "inherited" method, though. Again, more on prototypes in the next chapter.
+
+### Better Existence Check
+
+ES2022 (almost official at time of writing) has already settled on a new feature, `Object.hasOwn(..)`. It does essentially the same thing as `hasOwnProperty(..)`, but it's invoked as a static helper external to the object value instead of via the object's `[[Prototype]]`, making it safer and more consistent in usage:
+
+```js
+// instead of:
+myObj.hasOwnProperty("favoriteNumber")
+
+// we should now prefer:
+Object.hasOwn(myObj,"favoriteNumber")
+```
+
+Even though (at time of writing) this feature is just now emerging in JS, there are polyfills that make this API available in your programs even when running in a previous JS environment that doesn't yet have the feature defined. For example, a quick stand-in polyfill sketch:
+
+```js
+// simple polyfill sketch for `Object.hasOwn(..)`
+if (!Object.hasOwn) {
+    Object.hasOwn = function hasOwn(obj,propName) {
+        return Object.prototype.hasOwnProperty.call(obj,propName);
+    };
+}
+```
+
+Including a polyfill patch such as that in your program means you can safely start using `Object.hasOwn(..)` for property existence checks no matter whether a JS environment has `Object.hasOwn(..)` built in yet or not.
+
+### Listing All Container Contents
+
+We already discussed the `Object.entries(..)` API earlier, which tells us what properties an object has (as long as they're enumerable -- more in the next chapter).
+
+There's a variety of other mechanisms available, as well. `Object.keys(..)` gives us list of the enumerable property names (aka, keys) in an object -- names only, no values; `Object.values(..)` instead gives us list of all values held in enumerable properties.
+
+But what if we wanted to get *all* the keys in an object (enumerable or not)? `Object.getOwnPropertyNames(..)` seems to do what we want, in that it's like `Object.keys(..)` but also returns non-enumerable property names. However, this list **will not** include any Symbol property names, as those are treated as special locations on the object. `Object.getOwnPropertySymbols(..)` returns all of an object's Symbol properties. So if you concatenate both of those lists together, you'd have all the direct (*owned*) contents of an object.
+
+Yet as we've implied several times already, and will cover in full detail in the next chapter, an object also can also "inherit" contents from its `[[Prototype]]` chain. These are not considered *owned* contents, so they won't show up in any of these lists.
+
+Recall that the `in` operator will potentially traverse the entire chain looking for the existence of a property. Similarly, a `for..in` loop will traverse the chain and list any enumerable (owned or inhertied) properties. But there's no built-in API that will traverse the whole chain and return a list of the combined set of both *owned* and *inherited* contents.
+
+## Temporary Containers
+
+Using a container to hold multiple values is sometimes just a temporary transport mechanism, such as when you want to pass multiple values to a function via a single argument, or when you want a function to return multiple values:
+
+```js
+function formatValues({ one, two, three }) {
+    // the actual object passed in as an
+    // argument is not accessible, since
+    // we destructured it into three
+    // separate variables
+
+    one = one.toUpperCase();
+    two = `--${two}--`;
+    three = three.substring(0,5);
+
+    // this object is only to transport
+    // all three values in a single
+    // return statement
+    return { one, two, three };
+}
+
+// destructuring the return value from
+// the function, because that returned
+// object is just a temporary container
+// to transport us multiple values
+const { one, two, three } =
+
+    // this object argument is a temporary
+    // transport for multiple input values
+    formatValues({
+       one: "Kyle",
+       two: "Simpson"
+       three: "getify"
+    });
+
+one;     // "KYLE"
+two;     // "--Simpson--"
+three;   // "getif"
+```
+
+The object literal passed into `formatValues(..)` is immediately parameter destructured, so inside the function we only deal with three separate variables (`one`, `two`, and `three`). The object literal `return`ed from the function is also immediately destructured, so again we only deal with three separate variables (`one`, `two`, `three`).
+
+This snippet illustrates the idiom/pattern that an object is sometimes just a temporary transport container rather than a meaningful value in and of itself.
+
+## Containers Are Collections Of Properties
+
+The most common usage of objects is as containers for multiple values. We create and manage property container objects by:
+
+* defining properties (named locations), either at object creation time or later
+* assigning values, either at object creation time or later
+* accessing values later, using the location names (property names)
+* deleteing properties via `delete`
+* determining container contents with `in`, `hasOwnProperty(..)` / `hasOwn(..)`, `Object.entries(..)` / `Object.keys(..)`, etc
+
+But there's a lot more to objects than just static collections of property names and values. In the next chapter, we'll dive under the hood to look at how they actually work.
 
 [^structuredClone]: "Structured Clone Algorithm", HTML Specification, https://html.spec.whatwg.org/multipage/structured-data.html#structured-cloning

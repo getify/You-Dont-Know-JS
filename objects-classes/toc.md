@@ -14,10 +14,13 @@
     * Defining Properties
     * Accessing Properties
     * Assigning Properties
-    * Container Overview
+    * Deleting Properties
+    * Determining Container Contents
+    * Temporary Containers
+    * Containers Are Collections Of Properties
 * Chapter 2: How Objects Work
     * Property Descriptors
     * `[[Prototype]]` Chain
     * Object Sub-Types
-    * Behavior Overview
+    * Objects Behavior
 * Appendix A: TODO
