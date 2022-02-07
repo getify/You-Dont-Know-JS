@@ -284,7 +284,7 @@ myObj = {
 };
 ```
 
-That should look familiar from Chapter 1. But what you *don't see* in this code is that the object there was automatically linked to (via its internal `[[Prototype]]`) to that automatically built-in, but weirdly named, `Object.prototype` object.
+That should look familiar from Chapter 1. But what you *don't see* in this code is that the object there was automatically linked (via its internal `[[Prototype]]`) to that automatically built-in, but weirdly named, `Object.prototype` object.
 
 When we do things like:
 
@@ -362,13 +362,13 @@ It can be quite useful to create an object with no `[[Prototype]]` linkage to `O
 
 Moreover, an object with an empty `[[Prototype]]` is safe from any accidental "inheritance" collision between its own property names and the ones it "inherits" from elsewhere. These types of (useful!) objects are sometimes referred to in popular parlance as "dictionary objects".
 
-### `[[Prototype]]` vs `.prototype`
+### `[[Prototype]]` vs `prototype`
 
 Notice that public property name `prototype` in the name/location of this special object, `Object.prototype`? What's that all about?
 
 `Object` is the `Object(..)` function; by default, all functions (which are objects!) have such a `prototype` property on them, pointing at an object.
 
-Any here's where the name conflict between `[[Prototype]]` and `.prototype` really bites us. The `prototype` property on a function doesn't define any linkage that the function itself experiences. Indeed, functions (as objects) have their own internal `[[Prototype]]` linkage somewhere else -- more on that in a second.
+Any here's where the name conflict between `[[Prototype]]` and `prototype` really bites us. The `prototype` property on a function doesn't define any linkage that the function itself experiences. Indeed, functions (as objects) have their own internal `[[Prototype]]` linkage somewhere else -- more on that in a second.
 
 Rather, the `prototype` property on a function refers to an object that should be *linked to* by any other object that is created when calling that function with the `new` keyword:
 
