@@ -1,56 +1,56 @@
 # You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Appendix A: Exploring Further
+# 부록 A: 더 살펴보기
 
-We will now explore a number of nuances and edges around many of the topics covered in the main text of this book. This appendix is optional, supporting material.
+우리는 이제 이 책의 본문에서 다룬 많은 주제를 중심으로 여러 뉘앙스와 가장자리를 탐구할 것이다. 이 부록은 선택사항이고 참고자료이다.
 
-Some people find diving too deeply into the nuanced corner cases and varying opinions creates nothing but noise and distraction—supposedly, developers are better served by sticking to the commonly-tread paths. My approach has been criticized as being impractical and counterproductive. I understand and appreciate that perspective, even if I don't necessarily share it.
+어떤 사람들은 미묘한 구석 사례를 너무 깊이 들어간다는 것을 알아챈다. 다양한 의견은 소음과 산만함을 야기할 뿐이다. 개발자는 일반적으로 행해지는 길을 고수하면서 더 큰 이득을 얻는다. 나의 접근방식은 비실용적이고 비생산적이라는 비판을 받아왔다. 그것을 공유하지는 않더라도 그런 관점을 이해하고 감사하게 생각한다.
 
-I believe it's better to be empowered by knowledge of how things work than to just gloss over details with assumptions and lack of curiosity. Ultimately, you will encounter situations where something bubbles up from a piece you hadn't explored. In other words, you won't get to spend all your time riding on the smooth *happy path*. Wouldn't you rather be prepared for the inevitable bumps of off-roading?
+단지 추측과 호기심 부족으로 세부사항을 얼버무리는 것보다 일이 어떻게 돌아가는지에 대한 지식에 의해 힘을 얻는 것이 더 낫다고 믿는다. 궁극적으로 당신은 당신이 탐험하지 않은 조각에서 무언가가 거품을 내는 상황에 직면하게 될 것 이다. 다시 말해서 여러분은 모든 시간을 부드러운 *행복한 길*을 가는데 쓸 수 없을 것이다. 거친 길의 피할 수 없는 돌발에 대비하는 것이 낫지 않을까?
 
-These discussions will also be more heavily influenced by my opinions than the main text was, so keep that in mind as you consume and consider what is presented. This appendix is a bit like a collection of mini-blog posts that elaborate on various book topics. It's long and deep in the weeds, so take your time and don't rush through everything here.
+이러한 논의도 본문보다 나의 의견에 더 강하게 영향을 받을 것이다. 그러므로 이를 염두에 두고 내용을 고민해야 한다. 이 부록은 다양한 책 주제를 바탕으로 한 미니 블로그 글 모음집이다. 길고 깊은 잡초이기 때문에 천천히 하고 서두르지 마라.
 
-## Implied Scopes
+## 암묵적 스코프<sub>scopes</sub>
 
-Scopes are sometimes created in non-obvious places. In practice, these implied scopes don't often impact your program behavior, but it's still useful to know they're happening. Keep an eye out for the following surprising scopes:
+스코프는 때때로 분명하지 않은 장소에 만들어진다. 실제로 이러한 암묵적 스코프는 프로그램 동작에 자주 영향을 미치지는 않지만, 실제로 발생한다는 것을 아는 것은 아주 도움이 된다. 깜짝 놀랄만한 스코프를 아래에서 살펴보자.
 
-* Parameter scope
-* Function name scope
+* 매개변수<sub>parameter</sub> 스코프
+* 함수 이름 스코프
 
-### Parameter Scope
+### 매개변수 스코프
 
-The conversation metaphor in Chapter 2 implies that function parameters are basically the same as locally declared variables in the function scope. But that's not always true.
+2장에서의 대화 비유<sub>metaphor</sub>는 함수 매개변수가 기본적으로 함수 스코프에 지역적으로 선언된 변수와 같다는 것을 암시한다. 하지만 항상 그렇지는 않다.
 
-Consider:
+아래를 보자.
 
 ```js
-// outer/global scope: RED(1)
+// 외부/전역 스코프: 빨강(1)
 
 function getStudentName(studentID) {
-    // function scope: BLUE(2)
+    // 함수 스코프: 파랑(2)
 
     // ..
 }
 ```
 
-Here, `studentID` is a considered a "simple" parameter, so it does behave as a member of the BLUE(2) function scope. But if we change it to be a non-simple parameter, that's no longer technically the case. Parameter forms considered non-simple include parameters with default values, rest parameters (using `...`), and destructured parameters.
+여기서 `studentID`는 "단순" 매개변수로 보인다. 그래서 그것은 파랑(2) 함수 스코프의 멤버로 행동한다. 그러나 만약 우리가 그것을 단순하지 않은 매개변수로 바꾼다면 엄밀히 더 이상 그렇지 않다. 단순하지 않은 매개변수 형식은 기본값이 있는 매개변수, (`...`를 사용하는) 나머지 매개변수<sub>rest parameters</sub> 그리고 구조 분해 할당된<sub>destructured</sub> 매개변수가 있다.
 
-Consider:
+아래를 보자.
 
 ```js
-// outer/global scope: RED(1)
+// 외부/전역 스코프: 빨강(1)
 
-function getStudentName(/*BLUE(2)*/ studentID = 0) {
-    // function scope: GREEN(3)
+function getStudentName(/*파랑(2)*/ studentID = 0) {
+    // 함수 스코프: 초록(3)
 
     // ..
 }
 ```
 
-Here, the parameter list essentially becomes its own scope, and the function's scope is then nested inside *that* scope.
+여기서 매개변수 목록은 본질적으로 자체 스코프가 되며 함수의 스코프는 *그* 스코프안으로 중첩된다.
 
-Why? What difference does it make? The non-simple parameter forms introduce various corner cases, so the parameter list becomes its own scope to more effectively deal with them.
+왜? 어떤 차이가 그렇게 만들지? 단순하지 않은 매개변수 형식은 다양한 코너 케이스<sub>corner cases</sub>가 있기 때문에 매개변수 목록은 자체 스코프가 되어 그것들을 더 효과적으로 처리할 수 있다.
 
-Consider:
+아래를 보자.
 
 ```js
 function getStudentName(studentID = maxID, maxID) {
@@ -58,7 +58,7 @@ function getStudentName(studentID = maxID, maxID) {
 }
 ```
 
-Assuming left-to-right operations, the default `= maxID` for the `studentID` parameter requires a `maxID` to already exist (and to have been initialized). This code produces a TDZ error (Chapter 5). The reason is that `maxID` is declared in the parameter scope, but it's not yet been initialized because of the order of parameters. If the parameter order is flipped, no TDZ error occurs:
+왼쪽에서 오른쪽으로 수행되는 연산을 가정하면 `studentID` 매개변수의 기본값 `= maxID`는 `maxID`가 이미 존재하길(그리고 초기화도 된) 기대한다. 이 코드는 TDZ 에러(5장)를 발생시킨다. `maxID`가 매개변수 스코프에 선언되었지만 매개변수 순서상 아직 초기화되지 않았기 때문이다. 만약 매개변수 순서가 바뀐다면 TDZ 에러는 발생하지 않는다.
 
 ```js
 function getStudentName(maxID,studentID = maxID) {
@@ -66,7 +66,7 @@ function getStudentName(maxID,studentID = maxID) {
 }
 ```
 
-The complication gets even more *in the weeds* if we introduce a function expression into the default parameter position, which then can create its own closure (Chapter 7) over parameters in this implied parameter scope:
+기본 매개변수 자리에 함수 표현식을 도입하면 복잡성은 *어려운 환경속에서* 더욱 커진다. 그러면 암묵적 매개변수 스코프 범위에서 매개변수에 대한 자체 클로저(7장)을 생성할 수 있다.
 
 ```js
 function whatsTheDealHere(id,defaultID = () => id) {
@@ -78,7 +78,7 @@ whatsTheDealHere(3);
 // 5
 ```
 
-That snippet probably makes sense, because the `defaultID()` arrow function closes over the `id` parameter/variable, which we then re-assign to `5`. But now let's introduce a shadowing definition of `id` in the function scope:
+`defaultID()` 화살표 함수는 `id` 매개변수/변수를 클로즈 오버<sub>closes over</sub>하고, `5`로 재할당하기 때문에 이 코드는 말이 된다. 하지만 지금은 함수 스코프에서 `id`를 가리는 정의를 넣어보자.
 
 ```js
 function whatsTheDealHere(id,defaultID = () => id) {
@@ -90,9 +90,9 @@ whatsTheDealHere(3);
 // 3
 ```
 
-Uh oh! The `var id = 5` is shadowing the `id` parameter, but the closure of the `defaultID()` function is over the parameter, not the shadowing variable in the function body. This proves there's a scope bubble around the parameter list.
+워우! `var id = 5`는 `id` 매개변수를 가리고 있다. 그러나 `defaultID()` 함수의 클로저는 함수 본체의 가리고 있는 변수가 아닌 매개변수를 가진다. 이건 매개변수 목록을 둘러싼 스코프 버블이 있다는 것을 증명한다.
 
-But it gets even crazier than that!
+하지만 그것보다 더 미친짓을 보도록 하자!
 
 ```js
 function whatsTheDealHere(id,defaultID = () => id) {
@@ -120,23 +120,23 @@ whatsTheDealHere(3);
 // parameter 'id' (closure): 3
 ```
 
-The strange bit here is the first console message. At that moment, the shadowing `id` local variable has just been `var id` declared, which Chapter 5 asserts is typically auto-initialized to `undefined` at the top of its scope. Why doesn't it print `undefined`?
+여기서 이상한 점은 첫번째 콘솔 메세지이다. 이 순간에 가리고 있는 `id` 지역 변수는 그냥 선언된 `var id`이다. 5장의 논점은 보통 스코프의 상단에서 `undefined`로 자동 초기화된다는 것이다. 왜 `undefined`를 출력하지 않는가?
 
-In this specific corner case (for legacy compat reasons), JS doesn't auto-initialize `id` to `undefined`, but rather to the value of the `id` parameter (`3`)!
+이런 특정한 코너 케이스에서(오래된 호환성을 이유로), JS는 `id`를 `undefined`로 자동 초기화하지 않지만 `id` 매개변수의 값(`3`)으로 대신한다.
 
-Though the two `id`s look at that moment like they're one variable, they're actually still separate (and in separate scopes). The `id = 5` assignment makes the divergence observable, where the `id` parameter stays `3` and the local variable becomes `5`.
+이 순간에 2개의 `id`가 하나의 변수처럼 보일지라도, 실제로는 아직 분리(그리고 분리된 스코프로)되고 있다. `id = 5` 할당은 관찰할 수 있는 분기를 만드는데, `id` 매개변수는 `3`으로 유지하고 지역 변수는 `5`가 된다.
 
-My advice to avoid getting bitten by these weird nuances:
+이런 이상한 뉘앙스에 물리는 걸 피하기 위한 내 충고는 아래와 같다.
 
-* Never shadow parameters with local variables
+* 지역 변수를 가진 매개변수를 가리지말라.
 
-* Avoid using a default parameter function that closes over any of the parameters
+* 매개변수가 어떤 것이라도 클로즈 오버하는 기본 매개변수 함수를 사용하는 것을 피하라.
 
-At least now you're aware and can be careful about the fact that the parameter list is its own scope if any of the parameters are non-simple.
+적어도 지금은 매개변수 목록이 매개변수가 어떤 것이라도 단순하지 않다면 자체 스코프라는 사실에 대해 깨닫고 조심할 수 있다.
 
-### Function Name Scope
+### 함수 이름 스코프
 
-In the "Function Name Scope" section in Chapter 3, I asserted that the name of a function expression is added to the function's own scope. Recall:
+3장의 "함수 이름 스코프" 섹션에서는 함수 표현식의 이름은 함수 자체 스코프에 추가된다고 주장했다. 상기해보자.
 
 ```js
 var askQuestion = function ofTheTeacher(){
@@ -144,22 +144,22 @@ var askQuestion = function ofTheTeacher(){
 };
 ```
 
-It's true that `ofTheTeacher` is not added to the enclosing scope (where `askQuestion` is declared), but it's also not *just* added to the scope of the function, the way you're likely assuming. It's another strange corner case of implied scope.
+`ofTheTeacher`는 둘러싸인 스코프(`askQuestion`이 선언된 곳)에 추가되지 않는다는 사실이다. 하지만 짐작할 수 있는 방식으로 함수의 스코프에 *그냥* 추가되는 것도 아니다. 암묵적 스코프의 또다른 이상한 코너 케이스이다.
 
-The name identifier of a function expression is in its own implied scope, nested between the outer enclosing scope and the main inner function scope.
+함수 표현식의 이름 식별자는 둘러싸인 스코프와 안쪽의 함수 스코프 사이에 중첩된 자신의 암묵적 스코프 안에 있다.
 
-If `ofTheTeacher` was in the function's scope, we'd expect an error here:
+만약 `ofTheTeacher`가 함수의 스코프안에 있었다면 아래와 같은 에러가 예상된다.
 
 ```js
 var askQuestion = function ofTheTeacher(){
-    // why is this not a duplicate declaration error?
+    // 왜 중복 선언 에러가 아니지?
     let ofTheTeacher = "Confused, yet?";
 };
 ```
 
-The `let` declaration form does not allow re-declaration (see Chapter 5). But this is perfectly legal shadowing, not re-declaration, because the two `ofTheTeacher` identifiers are in separate scopes.
+`let` 선언 형식은 재선언을 허락하지 않는다(5장 참고). 하지만 이건 완전히 유효한 가리기이고, 재선언이 아니다. 2개의 `ofTheTeacher` 식별자는 분리된 스코프에 있기 때문이다.
 
-You'll rarely run into any case where the scope of a function's name identifier matters. But again, it's good to know how these mechanisms actually work. To avoid being bitten, never shadow function name identifiers.
+함수의 이름 식별자 스코프가 문제되는 경우는 거의 없을 것이다. 하지만 다시, 이런 메커니즘이 어떻게 동작하는지 아는 것은 좋다. 물리는 것을 피하기 위해서는 함수 이름 식별자를 가리지 말아라.
 
 ## Anonymous vs. Named Functions
 
