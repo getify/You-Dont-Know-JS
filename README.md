@@ -42,15 +42,27 @@ Any contributions you make to this effort **are of course greatly appreciated**.
 
 But **PLEASE** read the [Contributions Guidelines](CONTRIBUTING.md) carefully before submitting a PR.
 
-## Premier Sponsor
+## Thank You To These Wonderful Sponsors
 
-The first two books of the second edition are exclusively sponsored by [Frontend Masters](https://frontendmasters.com).
+[![Doppler Logo (dark)](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/external-logos/doppler_logo-light.svg)](https://www.doppler.com/?utm_campaign=github_repo&utm_medium=referral&utm_content=awesomeforbeginners&utm_source=github#gh-light-mode-only)
 
-Frontend Masters is the gold standard for top-of-the-line expert training material in frontend-oriented software development. With over 150 courses on all things frontend, this should be your first and only stop for quality video training on HTML, CSS, JS, and related technologies.
+[![Doppler Logo(light)](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/external-logos/doppler_logo.svg)](https://www.doppler.com/?utm_campaign=github_repo&utm_medium=referral&utm_content=awesomeforbeginners&utm_source=github#gh-dark-mode-only)
+
+<a href="https://www.doppler.com/?utm_campaign=github_repo&utm_medium=referral&utm_content=awesomeforbeginners&utm_source=github">**All your environment variables, in one place**</a>
+
+Stop struggling with scattered API keys, hacking together home-brewed tools, and avoiding access controls. Keep your team and servers in sync with <a href="https://www.doppler.com/?utm_campaign=github_repo&utm_medium=referral&utm_content=awesomeforbeginners&utm_source=github">Doppler</a>.
 
 ----
 
-I teach [all my workshops](https://frontendmasters.com/kyle-simpson) exclusively through Frontend Masters. If you like this book content, please check out my video training courses.
+[![Frontend Masters Logo (dark)](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/external-logos/fem_logo-light.svg)](https://frontendmasters.com#gh-light-mode-only)
+
+[![Frontend Masters Logo (light)](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/external-logos/fem_logo.svg)](https://frontendmasters.com#gh-dark-mode-only)
+
+**The first two books of the second edition** are exclusively sponsored by **[Frontend Masters](https://frontendmasters.com)**.
+
+Frontend Masters is the gold standard for top-of-the-line expert training material in frontend-oriented software development. With over 150 courses on all things frontend, this should be your first and only stop for quality video training on HTML, CSS, JS, and related technologies.
+
+**Note:** I teach [all my workshops](https://frontendmasters.com/kyle-simpson) exclusively through Frontend Masters. If you like this book content, please check out my video training courses.
 
 I want to extend a warm and deep thanks to Marc Grabanski and the entire Frontend Masters team, not only for their excellent work with the video training platform, but for their unwavering support of me and of the "You Don't Know JS" books!
 
