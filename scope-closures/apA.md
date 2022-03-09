@@ -885,11 +885,11 @@ What about an IIF that does have external references, is that closure?
 
 ```js
 function printLabels(labels) {
-    var list = document.getElementByID("labelsList");
+    var list = document.getElementById("labelsList");
 
     labels.forEach(
         function renderLabel(label){
-            var li = document.createELement("li");
+            var li = document.createElement("li");
             li.innerText = label;
             list.appendChild(li);
         }
@@ -909,7 +909,7 @@ To understand why, consider this alternative form of `printLabels(..)`:
 
 ```js
 function printLabels(labels) {
-    var list = document.getElementByID("labelsList");
+    var list = document.getElementById("labelsList");
 
     for (let label of labels) {
         // just a normal function call in its own
@@ -920,7 +920,7 @@ function printLabels(labels) {
     // **************
 
     function renderLabel(label) {
-        var li = document.createELement("li");
+        var li = document.createElement("li");
         li.innerText = label;
         list.appendChild(li);
     }
@@ -937,7 +937,7 @@ By the way, Chapter 7 briefly mentioned partial application and currying (which 
 
 ```js
 function printLabels(labels) {
-    var list = document.getElementByID("labelsList");
+    var list = document.getElementById("labelsList");
     var renderLabel = renderTo(list);
 
     // definitely closure this time!
@@ -947,7 +947,7 @@ function printLabels(labels) {
 
     function renderTo(list) {
         return function createLabel(label){
-            var li = document.createELement("li");
+            var li = document.createElement("li");
             li.innerText = label;
             list.appendChild(li);
         };
