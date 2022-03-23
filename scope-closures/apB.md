@@ -269,24 +269,24 @@ Again, don't get too mired in the mud around calculator-specific behavior. Focus
 
 Try the exercise for yourself, then check out the suggested solution at the end of this appendix.
 
-## Modules
+## 모듈
 
-This exercise is to convert the calculator from Closure (PART 3) into a module.
+이 연습문제는 계산기를 클로저(3장)에서 모듈로 변환한다.
 
-We're not adding any additional functionality to the calculator, only changing its interface. Instead of calling a single function `calc(..)`, we'll be calling specific methods on the public API for each "keypress" of our calculator. The outputs stay the same.
+계산기에 추가 기능을 넣지 않고, 인터페이스만 변경하고 있다. 단일 함수 `calc(..)`를 호출하는 대신에 계산기의 "키 입력(keypress)"마다 공개 API에서 특정 메서드를 호출할 것이다. 출력은 같다.
 
-This module should be expressed as a classic module factory function called `calculator()`, instead of a singleton IIFE, so that multiple calculators can be created if desired.
+모듈은 싱글톤 IIFE 대신에 `calculator()`라 부르는 클래식 모듈 팩토리로서 표현하게 된다. 그래서 여러개의 계산기가 원하는 만큼 생성될 수 있다.
 
-The public API should include the following methods:
+공개 API는 아래 메서드를 포함해야 한다.
 
-* `number(..)` (input: the character/number "pressed")
+* `number(..)` (입력: 임의의 문자/숫자를 "눌렀을 때(pressed)")
 * `plus()`
 * `minus()`
 * `mult()`
 * `div()`
 * `eq()`
 
-Usage would look like:
+사용법은 아래와 같다.
 
 ```js
 var calc = calculator();
@@ -300,7 +300,7 @@ calc.number("2");     // 2
 calc.eq();            // 75
 ```
 
-`formatTotal(..)` remains the same from that previous exercise. But the `useCalc(..)` helper needs to be adjusted to work with the module API:
+`formatTotal(..)`은 이전 연습문제와 같다. 그러나 `useCalc(..)` 헬퍼는 모듈 API와 같이 동작하기 위해 조정될 필요가 있다.
 
 ```js
 function useCalc(calc,keys) {
@@ -339,13 +339,13 @@ useCalc(calc,"+3=");            // +3=ERR
 useCalc(calc,"51=");            // 51
 ```
 
-Try the exercise for yourself, then check out the suggested solution at the end of this appendix.
+연습문제를 풀어보고, 부록의 끝에 있는 해결 방안을 확인해라.
 
-As you work on this exercise, also spend some time considering the pros/cons of representing the calculator as a module as opposed to the closure-function approach from the previous exercise.
+이 연습문제를 풀어봄으로써, 이전 연습문제의 클로저 함수 접근 방식에 비해 계산기를 모듈로서 나타낼 때의 장/단점을 고려하게 된다.
 
-BONUS: write out a few sentences explaining your thoughts.
+보너스: 너의 생각을 설명하는 몇 가지 문장을 써봐라.
 
-BONUS #2: try converting your module to other module formats, including: UMD, CommonJS, and ESM (ES Modules).
+보너스 #2: 모듈을 UMD, CommonJS, and ESM (ES 모듈)를 포함하여 다른 모듈 형식으로 변환해봐라.
 
 ## 해결 방안 예시
 
