@@ -125,24 +125,25 @@ myObj = {
 
 ### Property Names
 
-Property names in object literals are almost always treated/coeced as string values. One exception to this is for numeric (or "numeric looking") property "names":
+Property names in object literals are almost always treated/coeced as string values. One exception to this is for integer (or "integer looking") property "names":
 
 ```js
 anotherObj = {
-    42: "<-- this property name will remain a number",
-    "41": "<-- this property name will be coerced to a number",
-    true: "<-- this property name will be converted to a string",
-    myObj: "<-- ...and so will this one"
+    42:       "<-- this property name will be treated as an integer",
+    "41":     "<-- ...and so will this one",
+
+    true:     "<-- this property name will be treated as a string",
+    [myObj]:  "<-- ...and so will this one"
 };
 ```
 
-The `42` property name will remain a number, and the `"41"` string value will be coerced to a numeric property name since it *looks like* a number. By contrast, the `true` value will become the string property name `"true"`, and the `myObj` identifier reference will coerce the object's value to a string (generally the default `"[object Object]"`).
+The `42` property name will be treated as an integer property name (aka, index); the `"41"` string value will also be treated as such since it *looks like* an integer. By contrast, the `true` value will become the string property name `"true"`, and the `myObj` identifier reference, *computed* via the surrounding `[ .. ]`, will coerce the object's value to a string (generally the default `"[object Object]"`).
 
 | WARNING: |
 | :--- |
-| If you need to actually use an object as a key/property name, never rely on this string coercion; its behavior is surprising and almost certainly not what's expected, so program bugs are likely to occur. Instead, use a more specialized data structure, called a `Map` (added in ES6), where objects used as property "names" are left as-is instead of being coerced to a string value. |
+| If you need to actually use an object as a key/property name, never rely on this computed string coercion; its behavior is surprising and almost certainly not what's expected, so program bugs are likely to occur. Instead, use a more specialized data structure, called a `Map` (added in ES6), where objects used as property "names" are left as-is instead of being coerced to a string value. |
 
-You can also *compute* the **property name** (distinct from computing the property value) at the time of object literal definition:
+As with with `[myObj]` above, you can *compute* any **property name** (distinct from computing the property value) at the time of object literal definition:
 
 ```js
 anotherObj = {

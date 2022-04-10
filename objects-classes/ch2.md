@@ -148,14 +148,14 @@ myList[0];      // 23
 myList[1];      // 42
 ```
 
-Recall that any string property name on an object that "looks like" a number -- is able to be validly coerced to a string -- will actually be treated like a number. The same goes for arrays. You should always use `42` as a numeric index (aka, property name), but if you use the string `"42"`, JS will coerce that to a number for you.
+Recall that any string property name on an object that "looks like" an integer -- is able to be validly coerced to a numeric integer -- will actually be treated like an integer property (aka, integer index). The same goes for arrays. You should always use `42` as an integer index (aka, property name), but if you use the string `"42"`, JS will assume you meant that as an integer and do that for you.
 
 ```js
-// "2" works as an index here, but it's not advised
+// "2" works as an integer index here, but it's not advised
 myList["2"];    // 109
 ```
 
-One exception to the "no named properties on arrays" rule is that all arrays automatically expose a `length` property, which is automatically kept updated with the "length" of the array.
+One exception to the "no named properties on arrays" *rule* is that all arrays automatically expose a `length` property, which is automatically kept updated with the "length" of the array.
 
 ```js
 myList = [ 23, 42, 109 ];
