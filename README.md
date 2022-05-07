@@ -30,7 +30,7 @@ This edition of the books is being self-published through [GetiPub](https://geti
 
 If you'd like to contribute financially towards the effort (or any of my other OSS efforts) aside from purchasing the published books, please consider these options:
 
-* [Github Sponsorship](https://github.com/users/getify/sponsorship)
+* [GitHub Sponsorship](https://github.com/users/getify/sponsorship)
 * [Patreon](https://www.patreon.com/getify)
 * [Paypal](https://www.paypal.me/getify)
 

@@ -382,7 +382,7 @@ Briefly: arrow functions don't define a `this` identifier keyword at all. If you
 
 In other words, arrow functions treat `this` like any other lexical variable.
 
-If you're used to hacks like `var self = this`, or if you prefer to call `.bind(this)` on inner `function` expressions, just to force them to inherit a `this` from an outer function like it was a lexical variable, then `=>` arrow functions are absolutely the better option. They're designed specifically to fix that problem.
+If you're used to hack like `var self = this`, or if you prefer to call `.bind(this)` on inner `function` expressions, just to force them to inherit a `this` from an outer function like it was a lexical variable, then `=>` arrow functions are absolutely the better option. They're designed specifically to fix that problem.
 
 So, in the rare cases you need *lexical this*, use an arrow function. It's the best tool for that job. But just be aware that in doing so, you're accepting the downsides of an anonymous function. You should expend additional effort to mitigate the readability *cost*, such as more descriptive variable names and code comments.
 
@@ -933,7 +933,7 @@ The latter one is definitely not an example of closure, at least not in any usef
 
 ### Defer to Closure
 
-By the way, Chapter 7 briefly mentioned partial application and currying (which *do* rely on closure!). This is a interesting scenario where manual currying can be used:
+By the way, Chapter 7 briefly mentioned partial application and currying (which *do* rely on closure!). This is an interesting scenario where manual currying can be used:
 
 ```js
 function printLabels(labels) {
@@ -1013,7 +1013,7 @@ But I strongly prefer, and always use myself, the former `publicAPI` form. Two r
 
     Whatever the case may be, it just seems rather silly to me that we *wouldn't* maintain a reference to access our own API. Right?
 
-### Asynchronous Module Defintion (AMD)
+### Asynchronous Module Definition (AMD)
 
 Another variation on the classic module form is AMD-style modules (popular several years back), such as those supported by the RequireJS utility:
 

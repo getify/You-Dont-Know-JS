@@ -290,7 +290,7 @@ function hello() {
 hello();
 // Hello, Kyle!
 
-export hello;
+export { hello };
 ```
 
 If that code is in a file that's loaded as an ES module, it will still run exactly the same. However, the observable effects, from the overall application perspective, will be different.

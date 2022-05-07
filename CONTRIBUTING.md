@@ -6,7 +6,7 @@ However, if you choose to contribute content (not just typo corrections) to this
 
 ## Reading Experience (Chapter/Section links, etc)
 
-I understand that reading one long .md file, with no relative cross links to other sections/etc, is not the preferred reading experience for most of you. As such, it's totally reasonable to want to file an issue/PR to add those kinds of features.
+I understand that reading one long .md file, with no relative cross links to other sections/etc., is not the preferred reading experience for most of you. As such, it's totally reasonable to want to file an issue/PR to add those kinds of features.
 
 This topic has been brought up many times, and I've considered it. For now, I **do not** accept these kinds of changes into the repo.
 
