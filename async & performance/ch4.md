@@ -1491,7 +1491,7 @@ Of course, `yield`-delegation can keep following as many delegation steps as you
 function *foo(val) {
 	if (val > 1) {
 		// generator recursion
-		val = yield *foo( val - 1 );
+		return yield *foo( val - 1 );
 	}
 
 	return yield request( "http://some.url/?v=" + val );
