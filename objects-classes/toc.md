@@ -25,4 +25,6 @@
     * Extending the MOP
     * `[[Prototype]]` Chain
     * Objects Behavior
+* Chapter 3: Objects As Classes
+    * TODO
 * Appendix A: TODO

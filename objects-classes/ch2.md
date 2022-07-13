@@ -274,7 +274,7 @@ We already saw several implications of `[[Prototype]]` linkage in Chapter 1. For
 
 | WARNING: |
 | :--- |
-| That `Object.prototype` name itself can be confusing, since it uses a property called `prototype`. How are `[[Prototype]]` and `prototype` related!? Put such questions/confusion on pause for a bit, as we'll come back an explain the differences between `[[Prototype]]` and `prototype` soon. For the moment, just assume the presence of this important but weirdly named built-in object, `Object.prototype`. |
+| That `Object.prototype` name itself can be confusing, since it uses a property called `prototype`. How are `[[Prototype]]` and `prototype` related!? Put such questions/confusion on pause for a bit, as we'll come back an explain the differences between `[[Prototype]]` and `prototype` later in this chapter. For the moment, just assume the presence of this important but weirdly named built-in object, `Object.prototype`. |
 
 Let's consider some code:
 
@@ -291,20 +291,20 @@ When we do things like:
 ```js
 myObj.toString();                             // "[object Object]"
 
-myObj.hasOwnPropertyName("favoriteNumber");   // true
+myObj.hasOwnProperty("favoriteNumber");   // true
 ```
 
-We're taking advantage of this internal `[[Prototype]]` linkage, without really realizing it. Since `myObj` does not have `toString` or `hasOwnPropertyName` properties defined on it, those property accesses actually end up **DELEGATING** the access to continue its lookup along the `[[Prototype]]` chain.
+We're taking advantage of this internal `[[Prototype]]` linkage, without really realizing it. Since `myObj` does not have `toString` or `hasOwnProperty` properties defined on it, those property accesses actually end up **DELEGATING** the access to continue its lookup along the `[[Prototype]]` chain.
 
-Since `myObj` is `[[Prototype]]`-linked to the object named `Object.prototype`, the lookup for `toString` and `hasOwnPropertyName` properties continues on that object; and indeed, these methods are found there!
+Since `myObj` is `[[Prototype]]`-linked to the object named `Object.prototype`, the lookup for `toString` and `hasOwnProperty` properties continues on that object; and indeed, these methods are found there!
 
-The ability for `myObj.toString` to access the `toString` property even though it doesn't actually have it, is commonly referred to as "inheritance", or more specifically, "prototypal inheritance". The `toString` and `hasOwnPropertyName` properties, along with many others, are said to be "inherited properties" on `myObj`.
+The ability for `myObj.toString` to access the `toString` property even though it doesn't actually have it, is commonly referred to as "inheritance", or more specifically, "prototypal inheritance". The `toString` and `hasOwnProperty` properties, along with many others, are said to be "inherited properties" on `myObj`.
 
 | NOTE: |
 | :--- |
 | I have a lot of frustrations with the usage of the word "inheritance" here -- it should be called "delegation"! --  but that's what most people refer to it as, so we'll begrudgingly comply and use that same terminology for now (albeit under protest, with " quotes). I'll save my objections for an appendix of this book. |
 
-`Object.prototype` has several built-in properties and methods, all of which are "inherited" by any object that is `[[Prototype]]`-linked, either directly or through another object's linkage, to `Object.prototype`.
+`Object.prototype` has several built-in properties and methods, all of which are "inherited" by any object that is `[[Prototype]]`-linked, either directly or indirectly through another object's linkage, to `Object.prototype`.
 
 Some common "inherited" properties from `Object.prototype` include:
 
@@ -314,6 +314,32 @@ Some common "inherited" properties from `Object.prototype` include:
 * `valueOf()`
 * `hasOwnProperty(..)`
 * `isPrototypeOf(..)`
+
+Recall `hasOwnProperty(..)`, which we saw earlier gives us a boolean check for whether a certain property (by string name) is owned by an object:
+
+```js
+myObj = {
+    favoriteNumber: 42
+};
+
+myObj.hasOwnProperty("favoriteNumber");   // true
+```
+
+It's always been considered somewhat unfortunate (semantic organization, naming conflicts, etc) that such an important utility as `hasOwnProperty(..)` was included on the Object `[[Prototype]]` chain as an instance method, instead of being defined as a static utility.
+
+As of ES2022, JS has finally added the static version of this utility: `Object.hasOwn(..)`.
+
+```js
+myObj = {
+    favoriteNumber: 42
+};
+
+Object.hasOwn(myObj,"favoriteNumber");   // true
+```
+
+This form is now considered the more preferable and robust option, and the instance method (`hasOwnProperty(..)`) form should now generally be avoided.
+
+Somewhat unfortunately and inconsisently, there's not (yet, as of time of writing) corresponding static utilities, like `Object.isPrototype(..)` (instead of the instance method `isPrototypeOf(..)`). But at least `Object.hasOwn(..)` exists, so that's progress.
 
 ### Creating An Object With A Different `[[Prototype]]`
 
@@ -335,15 +361,17 @@ Alternately, but less preferably, you can use the `{ .. }` literal syntax along 
 
 ```js
 myObj = {
-    __proto__: differentObj
+    __proto__: differentObj,
+
+    // .. the rest of the object definition
 };
 ```
 
 | WARNING: |
 | :--- |
-| The strange looking `__proto__` property existed in some JS engines for more than 20 years, but was only standardized in JS as of ES6. Even still, it was added in Appendix B of the specification[^specApB], which lists features that TC39 begrudgingly includes because they exist popularly in various browser-based JS engines and therefore are a de-facto reality even if they didn't originate with TC39. This feature is thus "guaranteed" by the spec to exist in all conforming browser-based JS engines, but is not necessarily guaranteed to work in other independent JS engines. Node.js uses the JS engine (v8) from the Chrome browser, so Node.js gets `__proto__` by default/accident. Be careful when using `__proto__` to be aware of all the JS engine environments your code will run in. |
+| The strange looking `__proto__` property has been in some JS engines for more than 20 years, but was only standardized in JS as of ES6 (in 2015). Even still, it was added in Appendix B of the specification[^specApB], which lists features that TC39 begrudgingly includes because they exist popularly in various browser-based JS engines and therefore are a de-facto reality even if they didn't originate with TC39. This feature is thus "guaranteed" by the spec to exist in all conforming browser-based JS engines, but is not necessarily guaranteed to work in other independent JS engines. Node.js uses the JS engine (v8) from the Chrome browser, so Node.js gets `__proto__` by default/accident. Be careful when using `__proto__` to be aware of all the JS engine environments your code will run in. |
 
-Whether you use `Object.create(..)` or `__proto__`, the object in question will be `[[Prototype]]`-linked to a different object than the default `Object.prototype`.
+Whether you use `Object.create(..)` or `__proto__`, the created object in question will usually be `[[Prototype]]`-linked to a different object than the default `Object.prototype`.
 
 #### Empty `[[Prototype]]` Linkage
 
@@ -355,7 +383,7 @@ However, you can also define objects with their own `null` value for `[[Prototyp
 emptyObj = Object.create(null);
 // or: emptyObj = { __proto__: null }
 
-empty.toString;   // undefined
+emptyObj.toString;   // undefined
 ```
 
 It can be quite useful to create an object with no `[[Prototype]]` linkage to `Object.prototype`. For example, as mentioned in Chapter 1, the `in` and `for..in` constructs will consult the `[[Prototype]]` chain for inherited properties. But this may be undesirable, as you may not want something like `"toString" in myObj` to resolve successfully.
@@ -366,11 +394,11 @@ Moreover, an object with an empty `[[Prototype]]` is safe from any accidental "i
 
 Notice that public property name `prototype` in the name/location of this special object, `Object.prototype`? What's that all about?
 
-`Object` is the `Object(..)` function; by default, all functions (which are objects!) have such a `prototype` property on them, pointing at an object.
+`Object` is the `Object(..)` function; by default, all functions (which are themselves objects!) have such a `prototype` property on them, pointing at an object.
 
 Any here's where the name conflict between `[[Prototype]]` and `prototype` really bites us. The `prototype` property on a function doesn't define any linkage that the function itself experiences. Indeed, functions (as objects) have their own internal `[[Prototype]]` linkage somewhere else -- more on that in a second.
 
-Rather, the `prototype` property on a function refers to an object that should be *linked to* by any other object that is created when calling that function with the `new` keyword:
+Rather, the `prototype` property on a function refers to an object that should be *linked TO* by any other object that is created when calling that function with the `new` keyword:
 
 ```js
 myObj = {};
@@ -379,15 +407,15 @@ myObj = {};
 myObj = new Object();
 ```
 
-Since the `{ .. }` object literal syntax is essentially the same as a `new Object()` call, the built-in object named/located at `Object.prototype` is used as the internal `[[Prototype]]` linkage for the new object we create and name `myObj`.
+Since the `{ .. }` object literal syntax is essentially the same as a `new Object()` call, the built-in object named/located at `Object.prototype` is used as the internal `[[Prototype]]` value for the new object we create and name `myObj`.
 
 Phew! Talk about a topic made significantly more confusing just because of the name overlap between `[[Prototype]]` and `prototype`!
 
 ----
 
-But where do functions themselves (as objects!) link to, `[[Prototype]]` wise? They link to `Function.prototype`, yet another built-in object, located at the `prototype` property on the `Function` function.
+But where do functions themselves (as objects!) link to, `[[Prototype]]` wise? They link to `Function.prototype`, yet another built-in object, located at the `prototype` property on the `Function(..)` function.
 
-In other words, you could think of functions themselves as having been "created" by a `new Function(..)` call, and then `[[Prototype]]`-linked to the `Function.prototype` object. This object contains properties/methods all functions "inherit" by default, such as `toString()` (to serialize the source code of a function) and `call(..)` / `apply(..)` / `bind(..)` (we'll explain these later in this book).
+In other words, you can think of functions themselves as having been "created" by a `new Function(..)` call, and then `[[Prototype]]`-linked to the `Function.prototype` object. This object contains properties/methods all functions "inherit" by default, such as `toString()` (to string serialize the source code of a function) and `call(..)` / `apply(..)` / `bind(..)` (we'll explain these later in this book).
 
 ## Objects Behavior
 

@@ -96,7 +96,7 @@ In this case, `favoriteNumber` is not holding a numeric value, but rather a func
 
 ### Looks Like JSON?
 
-You may notice that this object-literal syntax resembles "JSON" (JavaScript Object Notation):
+You may notice that this object-literal syntax we've seen thus far resembles a related syntax, "JSON" (JavaScript Object Notation):
 
 ```json
 {
@@ -106,7 +106,7 @@ You may notice that this object-literal syntax resembles "JSON" (JavaScript Obje
 }
 ```
 
-The biggest differences between object literals and JSON are:
+The biggest differences between JS's object literals and JSON are, for objects defined as JSON:
 
 1. property names must be quoted with `"` double-quote characters
 
@@ -122,6 +122,8 @@ myObj = {
     "2 nicknames": [ "getify", "ydkjs" ]
 };
 ```
+
+One other minor difference is, JSON syntax -- that is, text that will be *parsed* as JSON, such as from a `.json` file -- is stricter than general JS. For example, JS allows comments (`// ..` and `/* .. */`), and trailing `,` commas in object and array expressions; JSON does not allow any of these. Thankfully, JSON does still allow arbitrary whitespace.
 
 ### Property Names
 
