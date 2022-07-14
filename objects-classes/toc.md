@@ -26,5 +26,6 @@
     * `[[Prototype]]` Chain
     * Objects Behavior
 * Chapter 3: Objects As Classes
-    * TODO
+    * The `class` Keyword
+    * Class Instance `this`
 * Appendix A: TODO
