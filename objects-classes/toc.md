@@ -26,6 +26,7 @@
     * `[[Prototype]]` Chain
     * Objects Behavior
 * Chapter 3: Objects As Classes
+    * When Should I Class-Orient My Code?
     * The `class` Keyword
     * Class Instance `this`
 * Appendix A: TODO
