@@ -1138,6 +1138,145 @@ But it fails, as shown by the last statement in that snippet. Beware that gotcha
 
 OK, we've laid out a bunch of disparate class features. I want to wrap up this chapter by trying to illustrate a sampling of these capabilities in a single example that's a little less basic/contrived.
 
-// TODO
+```js
+class CalendarItem {
+    static #UNSET = Symbol("unset")
+    static #isUnset(v) {
+        return v === this.#UNSET;
+    }
+    static isSameItem(item1,item2) {
+        if (#ID in item1 && #ID in item2) {
+            return item1.#ID === item2.#ID;
+        }
+        else {
+            return false;
+        }
+    }
+
+    #ID = CalendarItem.#UNSET
+    #setID(id) {
+        if (CalendarItem.#isUnset(this.#ID)) {
+            this.#ID = id;
+        }
+        else {
+            throw new Error("ID is already set");
+        }
+    }
+
+    description = null
+    startDateTime = null
+
+    constructor() {
+        var id = Math.round(Math.random() * 1e9);
+        this.#setID(id);
+    }
+    getID() {
+        if (!CalendarItem.#isUnset(this.#ID)) {
+            return this.#ID;
+        }
+        else {
+            throw new Error("ID is unset");
+        }
+    }
+    getDateTimeStr() {
+        if (this.startDateTime instanceof Date) {
+            return this.startDateTime.toUTCString();
+        }
+    }
+    summary() {
+        console.log(`(${
+            this.getID()
+        }) ${
+            this.description
+        } at ${
+            this.getDateTimeStr()
+        }`);
+    }
+}
+
+class Reminder extends CalendarItem {
+    #complete = false
+
+    constructor(description,startDateTime) {
+        super();
+
+        this.description = description;
+        this.startDateTime = startDateTime;
+    }
+    isComplete() {
+        return !!this.#complete;
+    }
+    markComplete() {
+        this.#complete = true;
+    }
+    summary() {
+        if (this.isComplete()) {
+            console.log(`(${this.getID()}) Complete.`);
+        }
+        else {
+            super.summary();
+        }
+    }
+}
+
+class Meeting extends CalendarItem {
+    endDateTime = null
+
+    #getEndDateTimeStr() {
+        if (this.startDateTime instanceof Date) {
+            return this.endDateTime.toUTCString();
+        }
+    }
+
+    constructor(description,startDateTime,endDateTime) {
+        super();
+
+        this.description = description;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+    }
+    getDateTimeStr() {
+        return `${
+            super.getDateTimeStr()
+        } - ${
+            this.#getEndDateTimeStr()
+        }`;
+    }
+}
+```
+
+Take some time to read and digest those `class` definitions. Note which of the `class` features from this chapter that you see being used.
+
+| NOTE: |
+| :--- |
+| One question you may have: why didn't I move the common logic of `description` and `startDateTime` setting from both subclass constructors into the single base constructor. This is a nuanced point, but it's not my intention that `CalendarItem` ever be directly instantiated; it's what in class-oriented terms we refer to as an "abstract class". That's why I'm using `new.target` to throw an error if the `CalendarItem` class is ever directly instantiated! |
+
+Let's now see these three classes in use:
+
+```js
+var callParents = new Reminder(
+    "Call parents to say hi",
+    new Date("July 7, 2022 11:00:00 UTC")
+);
+callParents.summary();
+// (586380912) Call parents to say hi at Thu,
+// 07 Jul 2022 11:00:00 GMT
+
+callParents.markComplete();
+callParents.summary();
+// (586380912) Complete.
+
+var interview = new Meeting(
+    "Job Interview: ABC Tech",
+    new Date("June 23, 2022 08:30:00 UTC"),
+    new Date("June 23, 2022 09:15:00 UTC")
+);
+interview.summary();
+// (994337604) Job Interview: ABC Tech at Thu,
+// 23 Jun 2022 08:30:00 GMT - Thu, 23 Jun 2022
+// 09:15:00 GMT
+```
+
+By the way, there's probably a million different ways to structure the above code logic. I'm by no means claiming this is the *right* or *best* way to do so. As an exercise for the reader, try your hand and writing it yourself, and take note of things you did differently than my approach.
 
 [^POLP]: *Principle of Least Privilege*, https://en.wikipedia.org/wiki/Principle_of_least_privilege, 15 July 2022.
