@@ -5,7 +5,7 @@
 | :--- |
 | Work in progress |
 
-The class-design pattern generally entails defining a general definition for a *type of thing* (class), including data (members) and behaviors (methods), and then creating one or more concrete *instances* of this class definition as actual objects that can interact and perform tasks. Moreover, class-orientation allows declaring a relationship between two or more classes, through what's called "inheritance", to derive new and augmented "subclasses" that mix-n-match and even re-define behaviors.
+The class-design pattern generally entails defining a definition for a *type of thing* (class), including data (members) and behaviors (methods), and then creating one or more concrete *instances* of this class definition as actual objects that can interact and perform tasks. Moreover, class-orientation allows declaring a relationship between two or more classes, through what's called "inheritance", to derive new and augmented "subclasses" that mix-n-match and even re-define behaviors.
 
 Prior to ES6 (2015), JS developers mimicked aspects of class-oriented (aka "object-oriented") design using plain functions and objects, along with the `[[Prototype]]` mechanism (as explained in the previous chapter) -- so called "prototypal classes".
 
@@ -287,6 +287,76 @@ var thing = new SomethingCool();
 
 thing.DEFAULT_GREETING;     // Hello!
 ```
+
+#### Avoid This
+
+One pattern that has emerged and grown quite popular, but which I firmly believe is an anti-pattern for `class`, looks like the following:
+
+```js
+class SomethingCool {
+    number = 21
+    getNumber = () => this.number * 2
+
+    speak() { /* .. */ }
+}
+
+var another = new SomethingCool();
+
+another.getNumber();    // 42
+```
+
+See the field holding an `=>` arrow function? I say this is a no-no. But why? Let's unwind what's going on.
+
+First, why do this? Because JS developers seem to be perpetually frustrated by the dynamic `this` binding rules (see a subsequent chapter), so they force a `this` binding via the `=>` arrow function. That way, no matter how `getNumber()` is invoked, it's always `this`-locked to the particular instance. That's an understandable convenience to desire, but... it betrays the very nature of the `this` / `[[Prototype]]` pillar of the language. How?
+
+Let's consider the equivalent code to the previous snippet:
+
+```js
+class SomethingCool {
+    constructor() {
+        this.number = 21;
+        this.getNumber = () => this.number * 2;
+    }
+
+    speak() { /* .. */ }
+}
+
+var another = new SomethingCool();
+
+another.getNumber();    // 42
+```
+
+Can you spot the problem? Look closely. I'll wait.
+
+...
+
+We've made it clear repeatedly so far that `class` definitions put their methods on the class constructor's `prototype` object, such that there's just one function and it's inherited (shared) by all instances. That's what will happen with `speak()` in the above snippet.
+
+But what about `getNumber()`? That's essentially a class method, but it won't be handled by JS quite the same as `speak()` will. Consider:
+
+```js
+Object.hasOwn(another,"number");            // true
+Object.hasOwn(another,"speak");             // false
+Object.hasOwn(another,"getNumber");         // true -- oops!
+```
+
+You see? By defining a function value and attaching it as a field/member property, we're losing the shared prototypal method'ness of the function, and it's becoming just like any per-instance property. That means we're creating a new function property **for each instance**, rather than it being created just once on the class constructor's `prototype`.
+
+That's wasteful in performance and memory, even if by a tiny bit. That alone should be enough to avoid it.
+
+But I would argue that way more importantly, what you've done with this pattern is invalidate the very reason why using `class` and `this`-aware methods is even remotely useful/powerful!
+
+If you go to all the trouble to define class methods with `this.` references throughout them, but then you lock/bind all those methods to a specific object instance, you've basically travelled all the way around the world just to go next door.
+
+If all you want is function(s) that are statically fixed to a particular "context", and don't need any dynamicism or sharing, what you want is... **closure**. And you're in luck: I wrote a whole book in this series on how to use closure so functions remember/access their statically defined scope (aka "context"). That's a way more appropriate, and simpler to code, way to get what you're doing.
+
+Don't abuse/misuse `class` and turn it into a over-hyped, glorified collection of closure.
+
+I'm *not* saying: "never use `=>` arrow functions inside classes".
+
+I *am* saying: "never attach an `=>` arrow function as an instance property in place of a dynamic prototypal class method, either out of mindless habit, or laziness in typing fewer characters, or misguided `this`-binding convenience."
+
+In a subsequent chapter, we'll dive deep into how to understand and properly leverage the full power of the dynamic `this` mechanism.
 
 ## Class Extension
 
