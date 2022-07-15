@@ -94,7 +94,6 @@ class SomethingCool {
     greeting() {
         console.log("Hello!");
     }
-
     appreciate() {
         console.log("Thanks!");
     }
@@ -179,7 +178,6 @@ class SomethingCool {
     constructor() {
         console.log("Here's your new instance!");
     }
-
     greeting() {
         console.log("Hello!");
     }
@@ -208,7 +206,6 @@ class SomethingCool {
         // add a property to the current instance
         this.number = 42;
     }
-
     speak() {
         // access the property from the current instance
         console.log(`My favorite number is ${ this.number }!`);
@@ -238,7 +235,6 @@ class SomethingCool {
     constructor() {
         // no need for the constructor here
     }
-
     speak() {
         // access the property from the current instance
         console.log(`My favorite number is ${ this.number }!`);
@@ -317,7 +313,6 @@ class SomethingCool {
         this.number = 21;
         this.getNumber = () => this.number * 2;
     }
-
     speak() { /* .. */ }
 }
 
@@ -417,7 +412,6 @@ class SomethingCool extends Something {
     greeting() {
         return `Here's ${this.what}!`;
     }
-
     speak() {
         console.log( this.greeting().toUpperCase() );
     }
@@ -448,7 +442,6 @@ class SomethingCool extends Something {
     greeting() {
         return `Wow! ${ super.greeting() }!`;
     }
-
     speak() {
         console.log( this.greeting().toUpperCase() );
     }
@@ -471,7 +464,6 @@ class Something {
     constructor(what = "something") {
         this.what = what;
     }
-
     greeting() {
         return `That's ${this.what}!`;
     }
@@ -481,7 +473,6 @@ class SomethingCool extends Something {
     constructor() {
         super("something cooler");
     }
-
     speak() {
         console.log( this.greeting().toUpperCase() );
     }
@@ -520,7 +511,6 @@ class SomethingCool extends Something {
     greeting() {
         return `Here's ${this.what}!`;
     }
-
     speak() {
         console.log( this.greeting().toUpperCase() );
     }
@@ -553,7 +543,179 @@ As nice as the `class` syntax is, don't forget what's really happening under the
 
 ## Static Class Behavior
 
-// TODO
+We've so far emphasized two different locations for data or behavior (methods) to reside: on the constructor's prototype, or on the instance. But there's a third option: on the constructor (function object) itself.
+
+In a traditional class-oriented system, methods defined on a class are not concrete things you could ever invoke or interact with. You have to instantiate a class to have a concrete object to invoke those methods with. Prototypal languages like JS blur this line a bit: all class-defined methods are "real" functions residing on the constructor's prototype, and you could therefore invoke them. But as I asserted earlier, you really *should not* do so, as this is not how JS assumes you will write your `class`es, and there are some weird corner-case behaviors you may run into. Best to stay on the narrow path that `class` lays out for you.
+
+Not all behavior that we define and want to associate/organize with a class *needs* to be aware of an instance. Moreover, sometimes a class needs to publicly define data (like constants) that developers using that class need to access, independent of any instance they may or may not have created.
+
+So, how does a class system enable defining such data and behavior that should be available with a class but independent of (unaware of) instantiated objects? **Static properties and functions**.
+
+| NOTE: |
+| :--- |
+| I'll use "static property" / "static function", rather than "member" / "method", just so it's clearer that there's a distinction between instance-bound members / instance-aware methods, and non-instance properties and instance-unaware functions. |
+
+We use the `static` keyword in our `class` bodies to distinguish these definitions:
+
+```js
+class Point2d {
+    // class statics
+    static origin = new Point2d(0,0)
+    static distance(point1,point2) {
+        return Math.sqrt(
+            ((point2.x - point1.x) ** 2) +
+            ((point2.y - point1.y) ** 2)
+        );
+    }
+
+    // instance members and methods
+    x
+    y
+    constructor(x,y) {
+        this.x = x;
+        this.y = y;
+    }
+    toString() {
+        return `(${this.x},${this.y})`;
+    }
+}
+
+console.log(`Starting point: ${Point2d.origin}`);
+// Starting point: (0,0)
+
+var next = new Point2d(3,4);
+console.log(`Next point: ${next}`);
+// Next point: (3,4)
+
+console.log(`Distance: ${
+    Point2d.distance( Point2d.origin, next )
+}`);
+// Distance: 5
+```
+
+The `Point2d.origin` is a static property, which just so happens to hold a constructed instance of our class. And `Point2d.distance(..)` is a static function that computes the 2-dimensional cartesian distance between two points.
+
+Of course, we could have put these two somewhere other than as `static`s on the class definition. But since they're directly related to the `Point2d` class, it makes *most sense* to organize them there.
+
+| NOTE: |
+| :--- |
+| Don't forget that when you use the `class` syntax, the name `Point2d` is actually the name of a constructor function that JS defines. So `Point2d.origin` is just a regular property access on that function object. That's what I meant at the top of this section when I referred to a third location for storing *things* related to classes; in JS, `static`s are stored as properties on the constructor function. Take care not to confuse those with properties stored on the constructor's `prototype` (methods) and properties stored on the instance (members). |
+
+### Static Property Initializations
+
+The value in a static initialization (`static whatever = ..`) can include `this` references, which refers to the class itself (actually, the constructor) rather than to an instance:
+
+```js
+class Point2d {
+    // class statics
+    static originX = 0
+    static originY = 0
+    static origin = new this(this.originX,this.originY)
+
+    // ..
+}
+```
+
+| WARNING: |
+| :--- |
+| I don't recommend actually doing the `new this(..)` trick I've illustrated here. That's just for illustration purposes. The code would read more cleanly with `new Point2d(this.originX,this.originY)`, so prefer that approach. |
+
+An important detail not to gloss over: unlike public field initializations, which only happen once an instantiation (with `new`) occurs, class static initializations always run *immediately* after the `class` has been defined. Moreover, the order of static initializations matters; you can think of the statements as if they're being evaluated one at a time.
+
+Also like class members, static properties do not have to be initialized (default: `undefined`), but it's much more common to do so. There's not much utility in declaring a static property with no initialized value (`static whatever`); Accessing either `Point2d.whatever` or `Point2d.nonExistent` would both result in `undefined`.
+
+Recently (in ES2022), the `static` keyword was extended so it can now define a block inside the `class` body for more sophisticated initialization of `static`s:
+
+```js
+class Point2d {
+    // class statics
+    static origin = new Point2d(0,0)
+    static distance(point1,point2) {
+        return Math.sqrt(
+            ((point2.x - point1.x) ** 2) +
+            ((point2.y - point1.y) ** 2)
+        );
+    }
+
+    // static initialization block (as of ES2022)
+    static {
+        let outerPoint = new Point2d(6,8);
+        this.maxDistance = this.distance(
+            this.origin,
+            outerPoint
+        );
+    }
+
+    // ..
+}
+
+Point2d.maxDistance;        // 10
+```
+
+The `let outerPoint = ..` here is not a special `class` feature; it's exactly like a normal `let` declaration in any normal block of scope (see the "Scope & Closures" book of this series). We're merely declaring a localized instance of `Point2d` assigned to `outerPoint`, then using that value to derive the assignment to the `maxDistance` static property.
+
+Static initialization blocks are also useful for things like `try..catch` statements around expression computations.
+
+### Static Inheritance
+
+Class statics are inherited by subclasses (obviously, as statics!), can be overriden, and `super` can be used for base class references (and static function polymorphism), all in much the same way as inheritance works with instance members/methods:
+
+```js
+class Point2d {
+    static origin = /* .. */
+    static distance(x,y) { /* .. */ }
+
+    static {
+        // ..
+        this.maxDistance = /* .. */;
+    }
+
+    // ..
+}
+
+class Point3d extends Point2d {
+    // class statics
+    static origin = new Point3d(
+        // here, `this.origin` references wouldn't
+        // work (self-referential), so we use
+        // `super.origin` references instead
+        super.origin.x, super.origin.y, 0
+    )
+    static distance(point1,point2) {
+        // here, super.distance(..) is Point2d.distance(..),
+        // if we needed to invoke it
+
+        return Math.sqrt(
+            ((point2.x - point1.x) ** 2) +
+            ((point2.y - point1.y) ** 2) +
+            ((point2.z - point1.z) ** 2)
+        );
+    }
+
+    // instance members/methods
+    z
+    constructor(x,y,z) {
+        super(x,y);     // <-- don't forget this line!
+        this.z = z;
+    }
+    toString() {
+        return `(${this.x},${this.y},${this.z})`;
+    }
+}
+
+Point2d.maxDistance;        // 10
+Point3d.maxDistance;        // 10
+```
+
+As you can see, the static property `maxDistance` we defined on `Point2d` was inherited as a static property on `Point3d`.
+
+| TIP: |
+| :--- |
+| Remember: any time you define a subclass constructor, you'll need to call `super(..)` in it, usually as the first statement. I find that all too easy to forget. |
+
+Don't skip over the underlying JS behavior here. Just like method inheritance discussed earlier, the static "inheritance" is *not* a copying of these static properties/functions from base class to subclass; it's sharing via the `[[Prototype]]` chain. Specifically, the constructor function `Point3d()` has its `[[Prototype]]` linkage changed by JS (from the default of `Function.prototype`) to `Point2d`, which is what allows `Point3d.maxDistance` to delegate to `Point2d.maxDistance`.
+
+It's also interesting, perhaps only historically now, to note that static inheritance -- which was part of the original ES6 `class` mechanism feature set! -- was one specific feature that went beyond "just syntax sugar". Static inheritance, as we see it illustrated here, was *not* possible to achieve/emulate in JS prior to ES6, in the old prototypal-class style of code. It's a special new behavior introduced only as of ES6.
 
 ## Private Class Behavior
 
