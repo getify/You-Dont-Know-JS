@@ -719,4 +719,187 @@ It's also interesting, perhaps only historically now, to note that static inheri
 
 ## Private Class Behavior
 
+Everything we've discussed so far as part of a `class` definition is publicly visible/accessible, either as static properties/functions on the class, methods on the constructor's `prototype`, or member properties on the instance.
+
+But how do you store information that cannot be seen from outside the class? This was one of the most asked for features, and biggest complaints with JS's `class`, up until it was finally addressed in ES2022.
+
+`class` now supports new syntax for declaring private fields (instance members) and private methods. In addition, private static properties/functions are possible.
+
+### Motivation?
+
+Before we illustrate how to do `class` privates, it bears contemplating why this is a helpful feature?
+
+With closure-oriented design patterns (again, see the "Scope & Closures" book of this series), we automatically get "privacy" built-in. When you declare a variable inside a scope, it cannot be seen outside that scope. Period. Reducing the scope visibility of a declaration is helpful in preventing namespace collisions (identical variable names).
+
+But it's even more important to ensure proper "defensive" design of software, the so called "Principle of Least Privilege" [^POLP]. POLP states that we should only expose a piece of information or capability in our software to the smallest surface area necessary.
+
+Over-exposure opens our software up to several issues that complicate software security/maintenance, including another piece of code acting maliciously to do something our code didn't expect or intend. Moreover, there's the less critical but still as problematic concern of other parts of our software relying on (using) parts of our code that we should have reserved as hidden implementation detail. Once other code relies on our code's implementation details, we stop being able to refactor our code without potentially breaking other parts of the program.
+
+So, in short, we *should* hide implementation details if they're not necessary to be exposed. In this sense, JS's `class` system feels a bit too permissive in that everything defaults to being public. Class-private features are a welcomed addition to more proper software design.
+
+#### Too Private?
+
+All that said, I have to throw a bit of a damper on the class-private party.
+
+I've suggested strongly that you should only use `class` if you're going to really take advantage of most or all of what class-orientation gives you. Otherwise, you'd be better suited using other core pillar features of JS for organizing code, such as with the closure pattern.
+
+One of the most important aspects of class-orientation is subclass inheritance, as we've seen illustrated numerous times so far in this chapter. Guess what happens to a private member/method in a base class, when it's extended by a subclass?
+
+Private members/methods are private **only to the class they're defined in**, and are **not** inherited in any way by a subclass. Uh oh.
+
+That might not seem like too big of a concern, until you start working with `class` and private members/methods in real software. You might quickly run up against a situation where you need to access a private method, or more often even, just a private member, from the subclass, so that the subclass can extend/augment the behavior of the base class as desired. And you might scream in frustration pretty quickly once you realize this is not possible.
+
+What comes next is inevitably an awkward decision: do you just go back to making it public, so the subclass can access it? Ugh. Or, worse, do you try to re-design the base class to contort the design of its members/methods, such that the lack of access is partially worked around. That often involves exhausting over-parameterization (with privates as default parameter values) of methods, and other such tricks. Double ugh.
+
+There's not a particularly great answer here, to be honest. If you have experience with class-orientation in more traditional class languages like Java or C++, you're probably dubious as to why we don't have *protected* visibility in between *public* and *private*. That's exactly what *protected* is for: keeping something private to a class AND any of its subclasses. Those languages also have *friend* features, but that's beyond the scope of our discussion here.
+
+Sadly, not only does JS not have *protected* visibility, it seems (even as useful as it is!) to be unlikely as a JS feature. It's been discussed in great detail for over a decade (before ES6 was even a thing), and there've been multiple proposals for it.
+
+I shouldn't say it will *never* happen, because that's not solid ground to stake on in any software. But it's very unlikely, because it actually betrays the very pillar that `class` is built on. If you are curious, or (more likely) certain that there's just *got to be a way*, I'll cover the incompatibility of *protected* visibility within JS's mechanisms in an appendix.
+
+The point here is, as of now, JS has no *protected* visibility, and it won't any time soon. And *protected* visibility is actually, in practice, way more useful than *private* visibility.
+
+So we return to the question: **Why should you care to make any `class` contents private?**
+
+If I'm being honest: maybe you shouldn't. Or maybe you should. That's up to you. Just go into it aware of the stumbling blocks.
+
+### Private Members/Methods
+
+You're excited to finally see the syntax for magical *private* visibility, right? Please don't shoot the messenger if you feel angered or sad at what you're about to see.
+
+```js
+class SomethingStrange {
+    #mySecretNumber = 42
+
+    #changeMySecret() {
+        // ooo, tricky tricky!
+        this.#mySecretNumber *= Math.random();
+    }
+
+    guessMySecret(v) {
+        if (v === this.#mySecretNumber) {
+            console.log("You win!");
+            this.#changeMySecret();
+        }
+        else {
+            console.log("Nope, try again.");
+        }
+    }
+}
+
+var thing = new SomethingStrange();
+
+this.guessMySecret(42);
+// You win!!
+
+this.guessMySecret(42);
+// Nope, try again.
+```
+
+No, JS didn't do the sensible thing and introduce a `private` keyword like they did with `static`. Instead, they introduced the `#`. (insert lame joke about social-media millienials loving hashtags, or something)
+
+| TIP: |
+| :--- |
+| And yes, there's a million and one discussions about why not. I could spend chapters recounting the whole history, but honestly I just don't care to. I think this syntax is ugly, and many others do, too. And some love it! If you're in the latter camp, though I rarely do something like this, I'm just going to say: **just accept it**. It's too late for any more debate or pleading. |
+
+The `#whatever` syntax (including `this.#whatever` form) is only valid inside `class` bodies. It will throw syntax errors if used outside of a `class`.
+
+Unlike public fields/instance members, private fields/instance members *must* be declared in the `class` body. You cannot add a private member to a class declaration dynamically while in the constructor method; `this.#whatever = ..` type assignments only work if the `#whatever` private field is declared in the class body. Moreover, though private fields can be re-assigned, they cannot be `delete`d from an instance, the way a public field/class member can.
+
+#### Exfiltration
+
+Even though a method or member may be declared with *private* visibility, they can still be exfiltrated (extracted) from a class instance:
+
+```js
+var number, func;
+
+class SomethingStrange {
+    #myPrivateNumber = 42
+    #mySecretFunc() {
+        return this.#myPrivateNumber;
+    }
+
+    constructor() {
+        number = this.#myPrivateNumber;
+        func = this.#mySecretFunc;
+    }
+}
+
+var thing = new SomethingStrange();
+
+number;             // 42
+func;               // function #mySecreFunc() { .. }
+func.call(thing);   // 42
+
+func.call({});
+// TypeError: Cannot read private member #myPrivateNumber
+// from an object whose class did not declare it
+```
+
+The main reason for me pointing this out is to be careful when using private methods as callbacks (or in any way passing them to other parts of the program). There's nothing stopping you from doing so, which can create a bit of an unintended privacy disclosure.
+
+#### Existence Check
+
+I think this use-case is somewhat contrived/unusual, but... you may want to check to see if a private field/method exists on an object (including the current `this` instance). Keep in mind that only the `class` itself knows about, and can therefore check for, any such a private field/method; such checks are almost always going to be in a static function.
+
+Doing could be rather convoluted, because if you access a private field that didn't already exist, you get a JS exception thrown, which would lead to ugly `try..catch` logic. But there's a cleaner approach:
+
+```js
+class SomethingStrange {
+    static checkGuess(thing,v) {
+        // "ergonomic brand check"
+        if (#myPrivateNumber in thing) {
+            return thing.guessMySecret(v);
+        }
+    }
+
+    #myPrivateNumber = 42;
+
+    // ..
+}
+
+var thing = new SomethingStrange();
+
+SomethingStrage.checkGuess(thing,42);
+// You win!!
+```
+
+### Private Statics
+
+Static properties and functions can also use `#` to be marked as private:
+
+```js
+class SomethingStrange {
+    static #errorMsg = "Not available."
+    static #printError() {
+        console.log(this.#errorMsg);
+    }
+
+    static checkGuess(thing,v) {
+        // "ergonomic brand check"
+        if (#myPrivateNumber in thing) {
+            return thing.guessMySecret(v);
+        }
+        else {
+            this.#printError();
+        }
+    }
+
+    #myPrivateNumber = 42;
+
+    // ..
+}
+```
+
+Private statics are similarly not-inherited just as private members/methods are not.
+
+| WARNING: |
+| :--- |
+| Be careful with `this` references inside public static functions that make reference to private static functions. While the public static functions will be inherited by derived subclasses, the private static functions are not, which will cause such `this.#..` references to fail. |
+
+## Class Example
+
 // TODO
+
+[^POLP]: *Principle of Least Privilege*, https://en.wikipedia.org/wiki/Principle_of_least_privilege, 15 July 2022.
+

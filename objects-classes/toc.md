@@ -32,4 +32,5 @@
     * Class Extension
     * Static Class Behavior
     * Private Class Behavior
+    * Class Example
 * Appendix A: TODO
