@@ -425,10 +425,6 @@ The way object and their properties work in JS is referred to as the "metaobject
 
 Prototypes are internal linkages between objects that allow property or method access against one object -- if the property/method requested is absent -- to be handled by "delegating" that access lookup to another object. When the delegation involves a method, the context for the method to run in is shared from the initial object to the target object via the `this` keyword.
 
-
-// TODO: move to a later chapter
-Prior to ES6, the prototype system was how developers expressed (i.e., emulated) the class design pattern in JS -- so-called "prototypal inheritance". ES6 introduced the `class` keyword as a syntactic affordance to embrace and centralize the prevalence of varied class design approaches. Ostensibly, `class` was introduced as "sugar" built on top of manual/explicit prototypal classes.
-
 [^mop]: "Metaobject", Wikipedia, https://en.wikipedia.org/wiki/Metaobject
 
 [^specApB]: ECMAScript 2021 Language Specification, Appendix B: Additional ECMAScript Features for Web Browsers, https://262.ecma-international.org/12.0/#sec-additional-ecmascript-features-for-web-browsers (latest as of time of this writing in January 2022)

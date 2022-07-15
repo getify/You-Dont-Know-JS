@@ -330,14 +330,14 @@ Can you spot the problem? Look closely. I'll wait.
 
 ...
 
-We've made it clear repeatedly so far that `class` definitions put their methods on the class constructor's `prototype` object, such that there's just one function and it's inherited (shared) by all instances. That's what will happen with `speak()` in the above snippet.
+We've made it clear repeatedly so far that `class` definitions put their methods on the class constructor's `prototype` object -- that's where they belong! -- such that there's just one of each function and it's inherited (shared) by all instances. That's what will happen with `speak()` in the above snippet.
 
 But what about `getNumber()`? That's essentially a class method, but it won't be handled by JS quite the same as `speak()` will. Consider:
 
 ```js
-Object.hasOwn(another,"number");            // true
-Object.hasOwn(another,"speak");             // false
-Object.hasOwn(another,"getNumber");         // true -- oops!
+Object.hasOwn(another,"number");            // true -- good
+Object.hasOwn(another,"speak");             // false -- good
+Object.hasOwn(another,"getNumber");         // true -- oops :(
 ```
 
 You see? By defining a function value and attaching it as a field/member property, we're losing the shared prototypal method'ness of the function, and it's becoming just like any per-instance property. That means we're creating a new function property **for each instance**, rather than it being created just once on the class constructor's `prototype`.
@@ -346,15 +346,15 @@ That's wasteful in performance and memory, even if by a tiny bit. That alone sho
 
 But I would argue that way more importantly, what you've done with this pattern is invalidate the very reason why using `class` and `this`-aware methods is even remotely useful/powerful!
 
-If you go to all the trouble to define class methods with `this.` references throughout them, but then you lock/bind all those methods to a specific object instance, you've basically travelled all the way around the world just to go next door.
+If you go to all the trouble to define class methods with `this.` references throughout them, but then you lock/bind most or all of those methods to a specific object instance, you've basically travelled all the way around the world just to go next door.
 
-If all you want is function(s) that are statically fixed to a particular "context", and don't need any dynamicism or sharing, what you want is... **closure**. And you're in luck: I wrote a whole book in this series on how to use closure so functions remember/access their statically defined scope (aka "context"). That's a way more appropriate, and simpler to code, way to get what you're doing.
+If all you want are function(s) that are statically fixed to a particular "context", and don't need any dynamicism or sharing, what you want is... **closure**. And you're in luck: I wrote a whole book in this series ("Scope & Closures") on how to use closure so functions remember/access their statically defined scope (aka "context"). That's a way more appropriate, and simpler to code, approach to get what you're after.
 
 Don't abuse/misuse `class` and turn it into a over-hyped, glorified collection of closure.
 
-I'm *not* saying: "never use `=>` arrow functions inside classes".
+To be clear, I'm *not* saying: never use `=>` arrow functions inside classes.
 
-I *am* saying: "never attach an `=>` arrow function as an instance property in place of a dynamic prototypal class method, either out of mindless habit, or laziness in typing fewer characters, or misguided `this`-binding convenience."
+I *am* saying: never attach an `=>` arrow function as an instance property in place of a dynamic prototypal class method, either out of mindless habit, or laziness in typing fewer characters, or misguided `this`-binding convenience.
 
 In a subsequent chapter, we'll dive deep into how to understand and properly leverage the full power of the dynamic `this` mechanism.
 
