@@ -1,5 +1,5 @@
 # You Don't Know JS Yet: Objects & Classes - 2nd Edition
-# Chapter 3: Objects as Classes
+# Chapter 3: Classy Objects
 
 | NOTE: |
 | :--- |
@@ -23,11 +23,11 @@ Class-orientation is a design pattern, which means it's a choice for how you org
 
 So how do you know when you should use classes?
 
-In a theoretical sense, class-orientation is a way of dividing up the business domain of a program into one or more pieces that can each be defined by an "is-a" classification; that's grouping a thing into the set (or sets) of characteristics that thing shares with other things. You would say "X is a Y", meaning X has all the characteristics of a thing of kind Y.
+In a theoretical sense, class-orientation is a way of dividing up the business domain of a program into one or more pieces that can each be defined by an "is-a" classification: grouping a thing into the set (or sets) of characteristics that thing shares with other similar things. You would say "X is a Y", meaning X has (at least) all the characteristics of a thing of kind Y.
 
-For example, consider computers. We could say a computer is electrical, since it uses electrical current as power. It's furthermore electronic, because it manipulates the electrical current beyond simply routing electrons around to produce heat and motion (electrical/magnetic fields). A basic desk lamp is electrical, but not particularly electronic.
+For example, consider computers. We could say a computer is electrical, since it uses electrical current (voltage, amps, etc) as power. It's furthermore electronic, because it manipulates the electrical current beyond simply routing electrons around (electrical/magnetic fields), creating a meaningful circuit to manipulate the current into performing more complex tasks. By contrast, a basic desk lamp is electrical, but not really electronic.
 
-We could thus define a class `Electrical` to describe what electrical devices need and can do, and that might include receiving an electrical current (voltage, amps, etc). We could then define a further class `Electronic`, and define that it also uses electrical current, but that it further more creates meaningful circuits to manipulate that current, performing more complex tasks than simple electrical devices.
+We could thus define a class `Electrical` to describe what electrical devices need and can do. We could then define a further class `Electronic`, and define that in addition to being electrical, `Electronic` things manipulate electricity to create more specialized outcomes.
 
 Here's where class-orientation starts to shine. Rather than re-define all the `Electrical` characteristics in the `Electronic` class, we can define `Electronic` in such a way that it "shares" or "inherits" those characteristics from `Electrical`, and then augments/redefines the unique behaviors that make a device electronic. This relationship between the two classes -- called "inheritance" -- is a key aspect of class-orientation.
 
@@ -39,33 +39,33 @@ But moving from the theoretical into in a bit more pragmatic perspective: if you
 
 Here's a short illustration.
 
-A couple of decades ago, right after I had gone through nearly all of a Computer Science degree in college, I found myself sitting in my first professional software developer job. I was tasked with building, all by myself, a timesheet and payroll tracking system. I built the backend in PHP (using MySQL for the DB) and JS for the interface (early as it was in its maturity way back around the turn of the century).
+A couple of decades ago, right after I had gone through nearly all of a Computer Science degree in college, I found myself sitting in my first professional software developer job. I was tasked with building, all by myself, a timesheet and payroll tracking system. I built the backend in PHP (using MySQL for the DB) and used JS for the interface (early as it was in its maturity way back around the turn of the century).
 
-So I defined the concept of a "timesheet" entity as a collection of 2-3 "week" entities, and each "week" as a collection of 5-7 "day" entities, and each "day" as a collection of "task" entities.
+Since my CS degree had emphasized class-orientation heavily throughout my courses, I was eager to put all that theory to work. For my program's design, I defined the concept of a "timesheet" entity as a collection of 2-3 "week" entities, and each "week" as a collection of 5-7 "day" entities, and each "day" as a collection of "task" entities.
 
-If I wanted to know how many hours were logged into a timesheet instance, I could call a `totalTime()` operation on that instance. The timesheet defined this operation by looping over its collection of weeks, correspondingly calling `totalTime()` on each of them, and summing the results. Each week did the same for all its days, and each day did the same for all its tasks.
+If I wanted to know how many hours were logged into a timesheet instance, I could call a `totalTime()` operation on that instance. The timesheet defined this operation by looping over its collection of weeks, calling `totalTime()` on each of them and summing the values. Each week did the same for all its days, and each day did the same for all its tasks.
 
-The notion being illustrated here, one of the fundamentals of design patterns like class-orientation, is called *encapsulation*. Each entity level encapsulated (e.g., controlled, hid) internal details (data and behavior) while presenting a useful external interface.
+The notion being illustrated here, one of the fundamentals of design patterns like class-orientation, is called *encapsulation*. Each entity level encapsulated (e.g., controlled, hid, abstracted) internal details (data and behavior) while presenting a useful external interface.
 
-But encapsulation alone isn't a sufficient justification for class-orientation. Other design patterns can give you nice encapsulation.
+But encapsulation alone isn't a sufficient justification for class-orientation. Other design patterns offer sufficient encapsulation.
 
 How did my class design take advantage of inheritance? I had a base class that defined a set of operations like `totalTime()`, and each of my entity class types extended/subclassed this base class. That meant that each of them inherited this summation-of-total-time capability, but where each of them applied their own extensions and definitions for the internal details of *how* to do that work.
 
-There's another aspect of the design pattern at play, which is *composition*: each entity was defined as a collection of other entities.
+There's yet another aspect of the design pattern at play, which is *composition*: each entity was defined as a collection of other entities.
 
 ### Single vs Multiple
 
 I mentioned above that a pragmatic way of deciding if you need class-orientation is if your program is going to have multiple instances of a single kind/type of behavior (aka, "class"). In the timesheet example, we had 4 classes: Timesheet, Week, Day, and Task. But for each class, we had multiple instances of each at once.
 
-Had we instead only needed a single instance of a class, like just one `Computer` that was an instance of the `Electronic` class, class-orientation may not offer quite as much benefit. In particular, if the program didn't need to create an instance of the `Electrical` class, then there's no particular benefit to separating `Electrical` from `Electronic`, so we aren't really getting any help from the inheritance aspect of class-orientation.
+Had we instead only needed a single instance of a class, like just one `Computer` thing that was an instance of the `Electronic` class, which was a subclass of the `Electrical` class, then class-orientation may not offer quite as much benefit. In particular, if the program doesn't need to create an instance of the `Electrical` class, then there's no particular benefit to separating `Electrical` from `Electronic`, so we aren't really getting any help from the inheritance aspect of class-orientation.
 
-So, if you find yourself dividing up a business problem domain into different "classes" of entities, but in the program you are only ever going to have one concrete *thing* of one kind/definition of behavior (aka, "class"), you might not actually need class-orientation. There are other design patterns which may be a more efficient match to your effort.
+So, if you find yourself designing a program by dividing up a business problem domain into different "classes" of entities, but in the actual code of the program you are only ever need one concrete *thing* of one kind/definition of behavior (aka, "class"), you might very well not actually need class-orientation. There are other design patterns which may be a more efficient match to your effort.
 
-But if you find yourself wanting to define classes and subclasses which inherit from them, and if you're going to be instantiating one or more of those classes multiple times, class-orientation is a good candidate. And to do class-orientation in JS, you're going to pull out the `class` keyword.
+But if you find yourself wanting to define classes, and subclasses which inherit from them, and if you're going to be instantiating one or more of those classes multiple times, then class-orientation is a good candidate. And to do class-orientation in JS, you're going to need the `class` keyword.
 
-## The `class` Keyword
+## Keep It `class`y
 
-The `class` keyword defines either a declaration or expression for a class. As a declaration, a class definition appears in a statement position and looks like this:
+`class` defines either a declaration or expression for a class. As a declaration, a class definition appears in a statement position and looks like this:
 
 ```js
 class SomethingCool {
@@ -107,7 +107,7 @@ Inside a `class` body, methods are defined without the `function` keyword, and t
 
 One special method that all classes have is called a "constructor". If omitted, there's a default empty constructor assumed in the definition.
 
-If defined, this constructor gets invoked any time a `new` instance of the class is created:
+The constructor is invoked any time a `new` instance of the class is created:
 
 ```js
 class SomethingCool {
@@ -120,13 +120,13 @@ var thing = new SomethingCool();
 // Here's your new instance!
 ```
 
-Even though the syntax implies a function actually named `constructor` exists, JS will not create such a function; instead it defines a function as specified, but with the name of the class (`SomethingCool` above):
+Even though the syntax implies a function actually named `constructor` exists, JS defines a function as specified, but with the name of the class (`SomethingCool` above):
 
 ```js
 typeof SomethingCool;       // "function"
 ```
 
-It's not *just* a function, though; this special kind of function behaves a bit differently:
+It's not *just* a regular function, though; this special kind of function behaves a bit differently:
 
 ```js
 SomethingCool.toString();
@@ -143,7 +143,7 @@ SomethingCool.call({});
 // be invoked without 'new'
 ```
 
-You can construct as many different instances of a class as you want:
+You can construct as many different instances of a class as you need:
 
 ```js
 var one = new SomethingCool();
@@ -155,7 +155,7 @@ Each of `one`, `two`, and `three` here are objects that are independent instance
 
 | NOTE: |
 | :--- |
-| Each of the `one`, `two`, and `three` objects have a `[[Prototype]]` linkage to the `SomethingCool.prototype` object. In this code, `SomethingCool` is both a `class` definition and the constructor function of the same name. See Chapter 2 for more details. |
+| Each of the `one`, `two`, and `three` objects have a `[[Prototype]]` linkage to the `SomethingCool.prototype` object (see Chapter 2). In this code, `SomethingCool` is both a `class` definition and the constructor function of the same name. |
 
 If you add a property to the object `one`:
 
@@ -172,7 +172,7 @@ three.value;    // undefined
 
 ### Class Methods
 
-As shown above, a class definition can include one or more method definitions. Each method definition is added to the `prototype` object of the constructor:
+As shown above, a class definition can include one or more method definitions:
 
 ```js
 class SomethingCool {
@@ -190,15 +190,15 @@ var thing = new SomethingCool();
 thing.greeting();        // Hello!
 ```
 
-Just to be clear: the `greeting` property (method) *looks like* it's on (owned by) the `thing` object here. But that's a mirage.
+The `greeting` property (method) *looks like* it exists on (is owned by) the `thing` object here. But that's a mirage. Each class method is added to the `prototype` object of the constructor.
 
-Actually, `greeting` only exists at `SomethingCool.prototype.greeting`. But since `thing` is `[[Prototype]]` linked to `SomethingCool.prototype` (see Chapter 2), the `thing.greeting()` reference traverses the `[[Prototype]]` chain and finds the method to execute.
+So, `greeting(..)` only exists as `SomethingCool.prototype.greeting`. Since `thing` is `[[Prototype]]` linked to `SomethingCool.prototype` (see Chapter 2) via the `new` keyword instantiation, the `thing.greeting()` reference traverses the `[[Prototype]]` chain and finds the method to execute.
 
-Class methods should only be invoked via an instance; `SomethingCool.greeting()` doesn't work because there *is no* such property `SomethingCool.greeting`. You *could* invoke `SomethingCool.prototype.greeting()`, but that's not generally proper/advised in standard class-oriented coding. Always access methods via the instances.
+Class methods should only be invoked via an instance; `SomethingCool.greeting()` doesn't work because there *is no* such property. You *could* invoke `SomethingCool.prototype.greeting()`, but that's not generally proper/advised in standard class-oriented coding. Always access class methods via the instances.
 
 ## Class Instance `this`
 
-We will cover the `this` keyword in much more detail in a subsequent chapter. But as it relates to class-oriented code, the `this` keyword generally refers to the current instance that's the context of any method invocation.
+We will cover the `this` keyword in much more detail in a subsequent chapter. But as it relates to class-oriented code, the `this` keyword generally refers to the current instance that is the context of any method invocation.
 
 In the constructor, as well as any methods, you can use `this.` to either add or access properties on the current instance:
 
@@ -224,6 +224,267 @@ thing.speak();      // My favorite number is 42!
 
 Any properties not holding function values, which are added to a class instance (usually via the constructor), are referred to as *members*, as opposed to the term *methods* for executable functions.
 
-While the `thing.speak()` method is running, the `this` reference inside that method is pointing at the same object that `thing` references. That's why both `thing.number` and `this.number` reveal the same `42` value that the constructor set with its `this.number = 42` operation.
+While the `thing.speak()` method is running, its `this` reference is pointing at the same object that `thing` references. That's why both `thing.number` and `this.number` reveal the same `42` value that the constructor set with its `this.number = 42` operation.
+
+### Public Fields
+
+Instead of defining a class instance member imperatively via `this.` in the constructor or a method, classes can declaratively define *fields* in the `class` body, which correspond directly to members that will be created on each instance:
+
+```js
+class SomethingCool {
+    // this is a public field
+    number = 42
+
+    constructor() {
+        // no need for the constructor here
+    }
+
+    speak() {
+        // access the property from the current instance
+        console.log(`My favorite number is ${ this.number }!`);
+    }
+}
+
+var thing = new SomethingCool();
+
+thing.number;       // 42
+
+thing.speak();      // My favorite number is 42!
+```
+
+Public fields can have a value initialization, as shown above, but that's not required. If you don't initialize a field in the class definition, you almost always should initialize it in the constructor.
+
+Fields can also reference each other, via natural `this.` access syntax:
+
+```js
+class SomethingCool {
+    // these are public fields
+    myName
+    number = 21
+    myAge = this.number * 2
+
+    // ..
+}
+```
+
+| TIP: |
+| :--- |
+| You can think of public field declarations as if they appear at the top of the constructor, each prefixed with an implied `this.` that you get to omit in the declarative `class` body form. |
+
+Just like computed property names (see Chapter 1), field names can be computed:
+
+```js
+var greetingProp = "default_greeting";
+
+class SomethingCool {
+    // computed public field
+    [greetingProp.toUpperCase()] = "Hello!"
+
+    // ..
+}
+
+var thing = new SomethingCool();
+
+thing.DEFAULT_GREETING;     // Hello!
+```
+
+## Class Extension
+
+The way to unlock the power of class inheritance is through the `extends` keyword, which defines a relationship between two classes:
+
+```js
+class Something {
+    what = "something"
+
+    greeting() {
+        return `That's ${this.what}!`;
+    }
+}
+
+class SomethingCool extends Something {
+    what = "something cool"
+
+    speak() {
+        console.log( this.greeting().toUpperCase() );
+    }
+}
+
+var thing = new Something();
+
+thing.greeting();
+// That's something!
+
+var another = new SomethingCool();
+
+another.speak();
+// THAT'S SOMETHING COOL!
+```
+
+Take a few moments to re-read that code snippet and make sure you fully understand what's happening.
+
+The base class `Something` defines a field (member) called `what`, and gives it the initial value `"something"`. It also defines a `greeting()` method that accesses this instance member and returns a string value. We see that behavior illustrated in the `thing.greeting()` method call.
+
+But the `SomethingCool` class extends `Something`, making `SomethingCool` a derived-class, child-class, or (most commonly) subclass. In `SomethingCool`, the same `what` property that's inherited from `Something` is re-initialized with a different `"something cool"` value. It also adds a new method, `speak()`, which itself calls `this.greeting()`.
+
+When `another.speak()` is invoked, the inherited `this.greeting()` is thus invoked, and that method makes reference to `this.what`. Since `this` is pointing at the class instance (aka, `another`), the value it finds is now `"something cool"` (instead of `"something"` from the `thing` object's `what` member).
+
+### Overriding Methods
+
+In addition to overriding a field/member in a subclass, you can also override (redefine) a method:
+
+```js
+class Something {
+    what = "something"
+
+    greeting() {
+        return `That's ${this.what}!`;
+    }
+}
+
+class SomethingCool extends Something {
+    what = "something cool"
+
+    greeting() {
+        return `Here's ${this.what}!`;
+    }
+
+    speak() {
+        console.log( this.greeting().toUpperCase() );
+    }
+}
+
+var another = new SomethingCool();
+
+another.speak();
+// HERE'S SOMETHING COOL!
+```
+
+The `SomethingCool` subclass overrides the inherited `greeting()` method to give it different behavior. However, you can still instantiate the base `Something` class, which would then give an object that uses the original (`"That's ..."`) definition for `greeting()`.
+
+If you want to access an inherited method from a subclass even if it's been overriden, you can use `super` instead of `this`:
+
+```js
+class Something {
+    what = "something"
+
+    greeting() {
+        return `That's ${this.what}!`;
+    }
+}
+
+class SomethingCool extends Something {
+    what = "something cool"
+
+    greeting() {
+        return `Wow! ${ super.greeting() }!`;
+    }
+
+    speak() {
+        console.log( this.greeting().toUpperCase() );
+    }
+}
+
+var another = new SomethingCool();
+
+another.speak();
+// WOW! THAT'S SOMETHING COOL!
+```
+
+The ability for methods of the same name, at different levels of the inheritance hierarchy, to exhibit different behavior when either accessed directly, or relatively with `super`, is called *polymorphism*. It's a very powerful part of class-orientation, when used appropriately.
+
+### That's Super!
+
+In addition to a subclass method accessing an inherited method definition (even if overriden on the subclass) via `super.` reference, a subclass constructor can manually invoke the inherited base class constructor via `super(..)` function invocation:
+
+```js
+class Something {
+    constructor(what = "something") {
+        this.what = what;
+    }
+
+    greeting() {
+        return `That's ${this.what}!`;
+    }
+}
+
+class SomethingCool extends Something {
+    constructor() {
+        super("something cooler");
+    }
+
+    speak() {
+        console.log( this.greeting().toUpperCase() );
+    }
+}
+
+var another = new SomethingCool();
+
+another.speak();
+// THAT'S SOMETHING COOLER!
+```
+
+| WARNING: |
+| :--- |
+| An explicitly defined subclass constructor *must* call `super(..)` to run the inherited class's initialization, and that must occur before the subclass constructor makes any references to `this` or finishes/returns. Otherwise, a runtime exception will be thrown when that subclass constructor is invoked (via `new`). If you omit the subclass constructor, the default constructor automatically invokes `super()` for you. |
+
+### "Inheritance" Is Sharing, Not Copying
+
+It may seem as if `SomethingCool`, when it `extends` the `Something` class, is essence getting a *copy* of all the behavior defined in `Something`. Moreover, it may seem as if the concrete object instance `another` is has *copied down* to it all the methods from `SomethingCool` (and by extension, also from `Something`).
+
+However, that's not the correct mental model to use for JS's implementation of class-orientation.
+
+Recall this base class and subclass definition, as well as instantiation of `another`:
+
+```js
+class Something {
+    what = "something"
+
+    greeting() {
+        return `That's ${this.what}!`;
+    }
+}
+
+class SomethingCool extends Something {
+    what = "something cool"
+
+    greeting() {
+        return `Here's ${this.what}!`;
+    }
+
+    speak() {
+        console.log( this.greeting().toUpperCase() );
+    }
+}
+
+var another = new SomethingCool();
+```
+
+If you inspect the `another` object, you'll see it only has the `what` property (instance member) on it, but not the `greeting()` or `speak()` methods:
+
+```js
+Object.hasOwn(another,"what");                       // true
+
+Object.hasOwn(another,"greeting");                   // false
+Object.hasOwn(another,"speak");                      // false
+```
+
+Where are those methods located? On the prototype object(s):
+
+```js
+Object.hasOwn(SomethingCool.prototype,"greeting");   // true
+Object.hasOwn(SomethingCool.prototype,"speak");      // true
+
+Object.hasOwn(Something.prototype,"greeting");       // true
+```
+
+And `another` has access to those methods via its `[[Prototype]]` linkage (see Chapter 2). In other words, the prototype objects **share access** to those methods with the subclass(es) and instance(s). The methods stay in place, and are not copied down the inheritance chain.
+
+As nice as the `class` syntax is, don't forget what's really happening under the syntax: JS is *just* wiring up objects on the `[[Prototype]]` chain.
+
+## Static Class Behavior
+
+// TODO
+
+## Private Class Behavior
 
 // TODO

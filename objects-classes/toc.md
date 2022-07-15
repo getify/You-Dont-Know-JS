@@ -25,8 +25,11 @@
     * Extending the MOP
     * `[[Prototype]]` Chain
     * Objects Behavior
-* Chapter 3: Objects As Classes
+* Chapter 3: Classy Objects
     * When Should I Class-Orient My Code?
-    * The `class` Keyword
+    * Keep It `class`y
     * Class Instance `this`
+    * Class Extension
+    * Static Class Behavior
+    * Private Class Behavior
 * Appendix A: TODO
