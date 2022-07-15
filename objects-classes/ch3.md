@@ -68,7 +68,7 @@ But if you find yourself wanting to define classes, and subclasses which inherit
 `class` defines either a declaration or expression for a class. As a declaration, a class definition appears in a statement position and looks like this:
 
 ```js
-class SomethingCool {
+class Point2d {
     // ..
 }
 ```
@@ -77,12 +77,12 @@ As an expression, a class definition appears in a value position and can either 
 
 ```js
 // named class expression
-const something = class SomethingCool {
+const pointClass = class Point2d {
     // ..
 };
 
 // anonymous class expression
-const another = class {
+const anotherClass = class {
     // ..
 };
 ```
@@ -90,12 +90,12 @@ const another = class {
 The contents of a `class` body typically include one or more method definitions:
 
 ```js
-class SomethingCool {
-    greeting() {
-        console.log("Hello!");
+class Point2d {
+    setX(x) {
+        // ..
     }
-    appreciate() {
-        console.log("Thanks!");
+    setY(y) {
+        // ..
     }
 }
 ```
@@ -109,52 +109,52 @@ One special method that all classes have is called a "constructor". If omitted, 
 The constructor is invoked any time a `new` instance of the class is created:
 
 ```js
-class SomethingCool {
+class Point2d {
     constructor() {
         console.log("Here's your new instance!");
     }
 }
 
-var thing = new SomethingCool();
+var point = new Point2d();
 // Here's your new instance!
 ```
 
-Even though the syntax implies a function actually named `constructor` exists, JS defines a function as specified, but with the name of the class (`SomethingCool` above):
+Even though the syntax implies a function actually named `constructor` exists, JS defines a function as specified, but with the name of the class (`Point2d` above):
 
 ```js
-typeof SomethingCool;       // "function"
+typeof Point2d;       // "function"
 ```
 
 It's not *just* a regular function, though; this special kind of function behaves a bit differently:
 
 ```js
-SomethingCool.toString();
-// class SomethingCool {
+Point2d.toString();
+// class Point2d {
 //   ..
 // }
 
-SomethingCool();
-// TypeError: Class constructor SomethingCool cannot
+Point2d();
+// TypeError: Class constructor Point2d cannot
 // be invoked without 'new'
 
-SomethingCool.call({});
-// TypeError: Class constructor SomethingCool cannot
+Point2d.call({});
+// TypeError: Class constructor Point2d cannot
 // be invoked without 'new'
 ```
 
 You can construct as many different instances of a class as you need:
 
 ```js
-var one = new SomethingCool();
-var two = new SomethingCool();
-var three = new SomethingCool();
+var one = new Point2d();
+var two = new Point2d();
+var three = new Point2d();
 ```
 
-Each of `one`, `two`, and `three` here are objects that are independent instances of the `SomethingCool` class.
+Each of `one`, `two`, and `three` here are objects that are independent instances of the `Point2d` class.
 
 | NOTE: |
 | :--- |
-| Each of the `one`, `two`, and `three` objects have a `[[Prototype]]` linkage to the `SomethingCool.prototype` object (see Chapter 2). In this code, `SomethingCool` is both a `class` definition and the constructor function of the same name. |
+| Each of the `one`, `two`, and `three` objects have a `[[Prototype]]` linkage to the `Point2d.prototype` object (see Chapter 2). In this code, `Point2d` is both a `class` definition and the constructor function of the same name. |
 
 If you add a property to the object `one`:
 
@@ -174,25 +174,27 @@ three.value;    // undefined
 As shown above, a class definition can include one or more method definitions:
 
 ```js
-class SomethingCool {
+class Point2d {
     constructor() {
         console.log("Here's your new instance!");
     }
-    greeting() {
-        console.log("Hello!");
+    setX(x) {
+        console.log(`Setting x to: ${x}`);
+        // ..
     }
 }
 
-var thing = new SomethingCool();
+var point = new Point2d();
 
-thing.greeting();        // Hello!
+point.setX(3);
+// Setting x to: 3
 ```
 
-The `greeting` property (method) *looks like* it exists on (is owned by) the `thing` object here. But that's a mirage. Each class method is added to the `prototype` object of the constructor.
+The `setX` property (method) *looks like* it exists on (is owned by) the `point` object here. But that's a mirage. Each class method is added to the `prototype`object, a property of the constructor function.
 
-So, `greeting(..)` only exists as `SomethingCool.prototype.greeting`. Since `thing` is `[[Prototype]]` linked to `SomethingCool.prototype` (see Chapter 2) via the `new` keyword instantiation, the `thing.greeting()` reference traverses the `[[Prototype]]` chain and finds the method to execute.
+So, `setX(..)` only exists as `Point2d.prototype.greeting`. Since `point` is `[[Prototype]]` linked to `Point2d.prototype` (see Chapter 2) via the `new` keyword instantiation, the `point.setX(..)` reference traverses the `[[Prototype]]` chain and finds the method to execute.
 
-Class methods should only be invoked via an instance; `SomethingCool.greeting()` doesn't work because there *is no* such property. You *could* invoke `SomethingCool.prototype.greeting()`, but that's not generally proper/advised in standard class-oriented coding. Always access class methods via the instances.
+Class methods should only be invoked via an instance; `Point2d.setX(..)` doesn't work because there *is no* such property. You *could* invoke `Point2d.prototype.setX(..)`, but that's not generally proper/advised in standard class-oriented coding. Always access class methods via the instances.
 
 ## Class Instance `this`
 
@@ -201,51 +203,50 @@ We will cover the `this` keyword in much more detail in a subsequent chapter. Bu
 In the constructor, as well as any methods, you can use `this.` to either add or access properties on the current instance:
 
 ```js
-class SomethingCool {
-    constructor() {
-        // add a property to the current instance
-        this.number = 42;
+class Point2d {
+    constructor(x,y) {
+        // add properties to the current instance
+        this.x = x;
+        this.y = y;
     }
-    speak() {
-        // access the property from the current instance
-        console.log(`My favorite number is ${ this.number }!`);
+    toString() {
+        // access the properties from the current instance
+        console.log(`(${this.x},${this.y})`);
     }
 }
 
-var thing = new SomethingCool();
+var point = new Point2d(3,4);
 
-thing.number;       // 42
+point.x;                // 3
+point.y;                // 4
 
-thing.speak();      // My favorite number is 42!
+point.toString();       // (3,4)
 ```
 
 Any properties not holding function values, which are added to a class instance (usually via the constructor), are referred to as *members*, as opposed to the term *methods* for executable functions.
 
-While the `thing.speak()` method is running, its `this` reference is pointing at the same object that `thing` references. That's why both `thing.number` and `this.number` reveal the same `42` value that the constructor set with its `this.number = 42` operation.
+While the `point.toString()` method is running, its `this` reference is pointing at the same object that `point` references. That's why both `point.x` and `this.x` reveal the same `3` value that the constructor set with its `this.x = x` operation.
 
 ### Public Fields
 
 Instead of defining a class instance member imperatively via `this.` in the constructor or a method, classes can declaratively define *fields* in the `class` body, which correspond directly to members that will be created on each instance:
 
 ```js
-class SomethingCool {
+class Point2d {
     // this is a public field
-    number = 42
+    x = 0
+    y = 0
 
-    constructor() {
-        // no need for the constructor here
+    constructor(x,y) {
+        // set properties (fields) on the current instance
+        this.x = x;
+        this.y = y;
     }
-    speak() {
-        // access the property from the current instance
-        console.log(`My favorite number is ${ this.number }!`);
+    toString() {
+        // access the properties from the current instance
+        console.log(`(${this.x},${this.y})`);
     }
 }
-
-var thing = new SomethingCool();
-
-thing.number;       // 42
-
-thing.speak();      // My favorite number is 42!
 ```
 
 Public fields can have a value initialization, as shown above, but that's not required. If you don't initialize a field in the class definition, you almost always should initialize it in the constructor.
@@ -253,11 +254,11 @@ Public fields can have a value initialization, as shown above, but that's not re
 Fields can also reference each other, via natural `this.` access syntax:
 
 ```js
-class SomethingCool {
+class Point3d {
     // these are public fields
-    myName
-    number = 21
-    myAge = this.number * 2
+    x
+    y = 4
+    z = this.y * 5
 
     // ..
 }
@@ -270,18 +271,21 @@ class SomethingCool {
 Just like computed property names (see Chapter 1), field names can be computed:
 
 ```js
-var greetingProp = "default_greeting";
+var coordName = "x";
 
-class SomethingCool {
+class Point2d {
     // computed public field
-    [greetingProp.toUpperCase()] = "Hello!"
+    [coordName.toUpperCase()] = 42
 
     // ..
 }
 
-var thing = new SomethingCool();
+var point = new Point2d(3,4);
 
-thing.DEFAULT_GREETING;     // Hello!
+point.x;        // 3
+point.y;        // 4
+
+point.X;        // 42
 ```
 
 #### Avoid This
@@ -289,53 +293,60 @@ thing.DEFAULT_GREETING;     // Hello!
 One pattern that has emerged and grown quite popular, but which I firmly believe is an anti-pattern for `class`, looks like the following:
 
 ```js
-class SomethingCool {
-    number = 21
-    getNumber = () => this.number * 2
+class Point2d {
+    x = null
+    getDoubleX = () => this.x * 2
 
-    speak() { /* .. */ }
+    constructor(x,y) {
+        this.x = x;
+        this.y = y;
+    }
+    toString() { /* .. */ }
 }
 
-var another = new SomethingCool();
+var point = new Point2d(3,4);
 
-another.getNumber();    // 42
+point.getDoubleX();    // 6
 ```
 
 See the field holding an `=>` arrow function? I say this is a no-no. But why? Let's unwind what's going on.
 
-First, why do this? Because JS developers seem to be perpetually frustrated by the dynamic `this` binding rules (see a subsequent chapter), so they force a `this` binding via the `=>` arrow function. That way, no matter how `getNumber()` is invoked, it's always `this`-locked to the particular instance. That's an understandable convenience to desire, but... it betrays the very nature of the `this` / `[[Prototype]]` pillar of the language. How?
+First, why do this? Because JS developers seem to be perpetually frustrated by the dynamic `this` binding rules (see a subsequent chapter), so they force a `this` binding via the `=>` arrow function. That way, no matter how `getDoubleX()` is invoked, it's always `this`-locked to the particular instance. That's an understandable convenience to desire, but... it betrays the very nature of the `this` / `[[Prototype]]` pillar of the language. How?
 
 Let's consider the equivalent code to the previous snippet:
 
 ```js
-class SomethingCool {
-    constructor() {
-        this.number = 21;
-        this.getNumber = () => this.number * 2;
+class Point2d {
+    constructor(x,y) {
+        this.x = null;
+        this.getDoubleX = () => this.x * 2;
+
+        this.x = x;
+        this.y = y;
     }
-    speak() { /* .. */ }
+    toString() { /* .. */ }
 }
 
-var another = new SomethingCool();
+var point = new Point2d(3,4);
 
-another.getNumber();    // 42
+point.getDoubleX();    // 6
 ```
 
 Can you spot the problem? Look closely. I'll wait.
 
 ...
 
-We've made it clear repeatedly so far that `class` definitions put their methods on the class constructor's `prototype` object -- that's where they belong! -- such that there's just one of each function and it's inherited (shared) by all instances. That's what will happen with `speak()` in the above snippet.
+We've made it clear repeatedly so far that `class` definitions put their methods on the class constructor's `prototype` object -- that's where they belong! -- such that there's just one of each function and it's inherited (shared) by all instances. That's what will happen with `toString()` in the above snippet.
 
-But what about `getNumber()`? That's essentially a class method, but it won't be handled by JS quite the same as `speak()` will. Consider:
+But what about `getDoubleX()`? That's essentially a class method, but it won't be handled by JS quite the same as `toString()` will. Consider:
 
 ```js
-Object.hasOwn(another,"number");            // true -- good
-Object.hasOwn(another,"speak");             // false -- good
-Object.hasOwn(another,"getNumber");         // true -- oops :(
+Object.hasOwn(point,"x");               // true -- good
+Object.hasOwn(point,"toString");        // false -- good
+Object.hasOwn(point,"getDoubleX");      // true -- oops :(
 ```
 
-You see? By defining a function value and attaching it as a field/member property, we're losing the shared prototypal method'ness of the function, and it's becoming just like any per-instance property. That means we're creating a new function property **for each instance**, rather than it being created just once on the class constructor's `prototype`.
+You see now? By defining a function value and attaching it as a field/member property, we're losing the shared prototypal method'ness of the function, and it becomes just like any per-instance property. That means we're creating a new function property **for each instance**, rather than it being created just once on the class constructor's `prototype`.
 
 That's wasteful in performance and memory, even if by a tiny bit. That alone should be enough to avoid it.
 
@@ -358,99 +369,107 @@ In a subsequent chapter, we'll dive deep into how to understand and properly lev
 The way to unlock the power of class inheritance is through the `extends` keyword, which defines a relationship between two classes:
 
 ```js
-class Something {
-    what = "something"
+class Point2d {
+    x = 3
+    y = 4
 
-    greeting() {
-        return `That's ${this.what}!`;
+    getX() {
+        return this.x;
     }
 }
 
-class SomethingCool extends Something {
-    what = "something cool"
+class Point3d extends Point2d {
+    x = 21
+    y = 10
+    z = 5
 
-    speak() {
-        console.log( this.greeting().toUpperCase() );
+    printDoubleX() {
+        console.log(`double x: ${this.getX() * 2}`);
     }
 }
 
-var thing = new Something();
+var point new Point2d();
 
-thing.greeting();
-// That's something!
+point.getX();                   // 3
 
-var another = new SomethingCool();
+var anotherPoint = new Point3d();
 
-another.speak();
-// THAT'S SOMETHING COOL!
+anotherPoint.getX();            // 21
+anotherPoint.printDoubleX();    // double x: 42
 ```
 
 Take a few moments to re-read that code snippet and make sure you fully understand what's happening.
 
-The base class `Something` defines a field (member) called `what`, and gives it the initial value `"something"`. It also defines a `greeting()` method that accesses this instance member and returns a string value. We see that behavior illustrated in the `thing.greeting()` method call.
+The base class `Point2d` defines fields (members) called `x` and `y`, and gives them the initial values `3` and `4`, respectively. It also defines a `getX()` method that accesses this `x` instance member and returns it. We see that behavior illustrated in the `point.getX()` method call.
 
-But the `SomethingCool` class extends `Something`, making `SomethingCool` a derived-class, child-class, or (most commonly) subclass. In `SomethingCool`, the same `what` property that's inherited from `Something` is re-initialized with a different `"something cool"` value. It also adds a new method, `speak()`, which itself calls `this.greeting()`.
+But the `Point3d` class extends `Point2d`, making `Point3d` a derived-class, child-class, or (most commonly) subclass. In `Point3d`, the same `x` property that's inherited from `Point2d` is re-initialized with a different `21` value, as is the `y` overriden to value from `4`, to `10`.
 
-When `another.speak()` is invoked, the inherited `this.greeting()` is thus invoked, and that method makes reference to `this.what`. Since `this` is pointing at the class instance (aka, `another`), the value it finds is now `"something cool"` (instead of `"something"` from the `thing` object's `what` member).
+It also adds a new `z` field/member method, as well as a `printDoubleX()` method, which itself calls `this.getX()`.
+
+When `anotherPoint.printDoubleX()` is invoked, the inherited `this.getX()` is thus invoked, and that method makes reference to `this.x`. Since `this` is pointing at the class instance (aka, `anotherPoint`), the value it finds is now `21` (instead of `3` from the `point` object's `x` member).
 
 ### Overriding Methods
 
 In addition to overriding a field/member in a subclass, you can also override (redefine) a method:
 
 ```js
-class Something {
-    what = "something"
+class Point2d {
+    x = 3
+    y = 4
 
-    greeting() {
-        return `That's ${this.what}!`;
+    getX() {
+        return this.x;
     }
 }
 
-class SomethingCool extends Something {
-    what = "something cool"
+class Point3d extends Point2d {
+    x = 21
+    y = 10
+    z = 5
 
-    greeting() {
-        return `Here's ${this.what}!`;
+    getX() {
+        return this.x * 2;
     }
-    speak() {
-        console.log( this.greeting().toUpperCase() );
+    printX() {
+        console.log(`double x: ${this.getX()}`);
     }
 }
 
-var another = new SomethingCool();
+var point = new Point3d();
 
-another.speak();
-// HERE'S SOMETHING COOL!
+point.printX();       // double x: 42
 ```
 
-The `SomethingCool` subclass overrides the inherited `greeting()` method to give it different behavior. However, you can still instantiate the base `Something` class, which would then give an object that uses the original (`"That's ..."`) definition for `greeting()`.
+The `Point3d` subclass overrides the inherited `getX()` method to give it different behavior. However, you can still instantiate the base `Point2d` class, which would then give an object that uses the original (`"That's ..."`) definition for `greeting()`.
 
 If you want to access an inherited method from a subclass even if it's been overriden, you can use `super` instead of `this`:
 
 ```js
-class Something {
-    what = "something"
+class Point2d {
+    x = 3
+    y = 4
 
-    greeting() {
-        return `That's ${this.what}!`;
+    getX() {
+        return this.x;
     }
 }
 
-class SomethingCool extends Something {
-    what = "something cool"
+class Point3d extends Point2d {
+    x = 21
+    y = 10
+    z = 5
 
-    greeting() {
-        return `Wow! ${ super.greeting() }!`;
+    getX() {
+        return this.x * 2;
     }
-    speak() {
-        console.log( this.greeting().toUpperCase() );
+    printX() {
+        console.log(`x: ${super.getX()}`);
     }
 }
 
-var another = new SomethingCool();
+var point = new Point3d();
 
-another.speak();
-// WOW! THAT'S SOMETHING COOL!
+point.printX();       // x: 21
 ```
 
 The ability for methods of the same name, at different levels of the inheritance hierarchy, to exhibit different behavior when either accessed directly, or relatively with `super`, is called *polymorphism*. It's a very powerful part of class-orientation, when used appropriately.
@@ -460,84 +479,82 @@ The ability for methods of the same name, at different levels of the inheritance
 In addition to a subclass method accessing an inherited method definition (even if overriden on the subclass) via `super.` reference, a subclass constructor can manually invoke the inherited base class constructor via `super(..)` function invocation:
 
 ```js
-class Something {
-    constructor(what = "something") {
-        this.what = what;
-    }
-    greeting() {
-        return `That's ${this.what}!`;
-    }
-}
-
-class SomethingCool extends Something {
-    constructor() {
-        super("something cooler");
-    }
-    speak() {
-        console.log( this.greeting().toUpperCase() );
+class Point2d {
+    x
+    y
+    constructor(x,y) {
+        this.x = x;
+        this.y = y;
     }
 }
 
-var another = new SomethingCool();
+class Point3d extends Point2d {
+    z
+    constructor(x,y,z) {
+        super(x,y);
+        this.z = z;
+    }
+    toString() {
+        console.log(`(${this.x},${this.y},${this.z})`);
+    }
+}
 
-another.speak();
-// THAT'S SOMETHING COOLER!
+var point = new Point3d(3,4,5);
+
+point.toString();       // (3,4,5)
 ```
 
 | WARNING: |
 | :--- |
-| An explicitly defined subclass constructor *must* call `super(..)` to run the inherited class's initialization, and that must occur before the subclass constructor makes any references to `this` or finishes/returns. Otherwise, a runtime exception will be thrown when that subclass constructor is invoked (via `new`). If you omit the subclass constructor, the default constructor automatically invokes `super()` for you. |
+| An explicitly defined subclass constructor *must* call `super(..)` to run the inherited class's initialization, and that must occur before the subclass constructor makes any references to `this` or finishes/returns. Otherwise, a runtime exception will be thrown when that subclass constructor is invoked (via `new`). If you omit the subclass constructor, the default constructor automatically thankfully invokes `super()` for you. |
 
 ### "Inheritance" Is Sharing, Not Copying
 
-It may seem as if `SomethingCool`, when it `extends` the `Something` class, is essence getting a *copy* of all the behavior defined in `Something`. Moreover, it may seem as if the concrete object instance `another` is has *copied down* to it all the methods from `SomethingCool` (and by extension, also from `Something`).
+It may seem as if `Point3d`, when it `extends` the `Point2d` class, is in essence getting a *copy* of all the behavior defined in `Point2d`. Moreover, it may seem as if the concrete object instance `point` receives, *copied down* to it, all the methods from `Point3d` (and by extension, also from `Point2d`).
 
-However, that's not the correct mental model to use for JS's implementation of class-orientation.
-
-Recall this base class and subclass definition, as well as instantiation of `another`:
+However, that's not the correct mental model to use for JS's implementation of class-orientation. Recall this base class and subclass definition, as well as instantiation of `another`:
 
 ```js
-class Something {
-    what = "something"
-
-    greeting() {
-        return `That's ${this.what}!`;
+class Point2d {
+    x
+    y
+    constructor(x,y) {
+        this.x = x;
+        this.y = y;
     }
 }
 
-class SomethingCool extends Something {
-    what = "something cool"
-
-    greeting() {
-        return `Here's ${this.what}!`;
+class Point3d extends Point2d {
+    z
+    constructor(x,y,z) {
+        super(x,y);
+        this.z = z;
     }
-    speak() {
-        console.log( this.greeting().toUpperCase() );
+    toString() {
+        console.log(`(${this.x},${this.y},${this.z})`);
     }
 }
 
-var another = new SomethingCool();
+var point = new Point3d(3,4,5);
 ```
 
-If you inspect the `another` object, you'll see it only has the `what` property (instance member) on it, but not the `greeting()` or `speak()` methods:
+If you inspect the `point` object, you'll see it only has the `x`, `y`, and `z` properties (instance members) on it, but not the `toString()` method:
 
 ```js
-Object.hasOwn(another,"what");                       // true
+Object.hasOwn(point,"x");                       // true
+Object.hasOwn(point,"y");                       // true
+Object.hasOwn(point,"z");                       // true
 
-Object.hasOwn(another,"greeting");                   // false
-Object.hasOwn(another,"speak");                      // false
+Object.hasOwn(point,"toString");                // false
 ```
 
-Where are those methods located? On the prototype object(s):
+Where is that method located? On the prototype object:
 
 ```js
-Object.hasOwn(SomethingCool.prototype,"greeting");   // true
-Object.hasOwn(SomethingCool.prototype,"speak");      // true
-
-Object.hasOwn(Something.prototype,"greeting");       // true
+Object.hasOwn(Point3d.prototype,"toString");    // true
 ```
 
-And `another` has access to those methods via its `[[Prototype]]` linkage (see Chapter 2). In other words, the prototype objects **share access** to those methods with the subclass(es) and instance(s). The methods stay in place, and are not copied down the inheritance chain.
+And `point` has access to that method via its `[[Prototype]]` linkage (see Chapter 2). In other words, the prototype objects **share access** to their method(s) with the subclass(es) and instance(s). The method(s) stay in place, and are not copied down the inheritance chain.
 
 As nice as the `class` syntax is, don't forget what's really happening under the syntax: JS is *just* wiring up objects on the `[[Prototype]]` chain.
 
