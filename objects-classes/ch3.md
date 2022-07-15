@@ -508,6 +508,79 @@ point.toString();       // (3,4,5)
 | :--- |
 | An explicitly defined subclass constructor *must* call `super(..)` to run the inherited class's initialization, and that must occur before the subclass constructor makes any references to `this` or finishes/returns. Otherwise, a runtime exception will be thrown when that subclass constructor is invoked (via `new`). If you omit the subclass constructor, the default constructor automatically thankfully invokes `super()` for you. |
 
+#### Which Class?
+
+You may need to determine in a constructor if that class is being instantiated directly, or being instantiated from a subclass with a `super()` call. We can use a special "pseudo property" `new.target`:
+
+```js
+class Point2d {
+    // ..
+
+    constructor(x,y) {
+        if (new.target === Point2) {
+            console.log("Constructing 'Point2d' instance");
+        }
+    }
+
+    // ..
+}
+
+class Point3d extends Point2d {
+    // ..
+
+    constructor(x,y,z) {
+        super(x,y);
+
+        if (new.target === Point3d) {
+            console.log("Constructing 'Point3d' instance");
+        }
+    }
+
+    // ..
+}
+
+var point = new Point2d(3,4);
+// Constructing 'Point2d' instance
+
+var anotherPoint = new Point3d(3,4,5);
+// Constructing 'Point3d' instance
+```
+
+### But Which Kind Of Instance?
+
+You may want to introspect a certain object instance to see if it's an instance of a specific class. We do this with the `instanceof` operator:
+
+```js
+class Point2d { /* .. */ }
+class Point3d extends Point2d { /* .. */ }
+
+var point = new Point2d(3,4);
+
+point instanceof Point2d;           // true
+point instanceof Point3d;           // false
+
+var anotherPoint = new Point3d(3,4,5);
+
+anotherPoint instanceof Point2d;    // true
+anotherPoint instanceof Point3d;    // true
+```
+
+It may seem strange to see `anotherPoint instanceof Point2d` result in `true`. That's because `instanceof` is traversing the entire class inheritance hierarchy (the `[[Prototype]]` chain) until it finds a match.
+
+If you instead wanted to check if the object instance was *only and directly* created by a certain class, check the instance's `constructor` property.
+
+```js
+point.constructor === Point2d;          // true
+point.constructor === Point3d;          // false
+
+anotherPoint.constructor === Point2d;   // false
+anotherPoint.constructor === Point3d;   // true
+```
+
+| NOTE: |
+| :--- |
+| The `constructor` property shown here is *not* actually present on (owned) the `point` or `anotherPoint` instance objects. So where does it come from!? It's on each object's `[[Prototype]]` linked prototype object: `Point2d.prototype.constructor === Point2d` and `Point3d.prototype.constructor === Point3d`. |
+
 ### "Inheritance" Is Sharing, Not Copying
 
 It may seem as if `Point3d`, when it `extends` the `Point2d` class, is in essence getting a *copy* of all the behavior defined in `Point2d`. Moreover, it may seem as if the concrete object instance `point` receives, *copied down* to it, all the methods from `Point3d` (and by extension, also from `Point2d`).
@@ -1068,4 +1141,3 @@ OK, we've laid out a bunch of disparate class features. I want to wrap up this c
 // TODO
 
 [^POLP]: *Principle of Least Privilege*, https://en.wikipedia.org/wiki/Principle_of_least_privilege, 15 July 2022.
-
