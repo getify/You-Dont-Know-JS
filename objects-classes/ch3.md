@@ -768,32 +768,33 @@ If I'm being honest: maybe you shouldn't. Or maybe you should. That's up to you.
 You're excited to finally see the syntax for magical *private* visibility, right? Please don't shoot the messenger if you feel angered or sad at what you're about to see.
 
 ```js
-class SomethingStrange {
-    #mySecretNumber = 42
-
-    #changeMySecret() {
-        // ooo, tricky tricky!
-        this.#mySecretNumber *= Math.random();
+class Point2d {
+    // statics
+    static samePoint(point1,point2) {
+        return point1.#ID === point2.#ID;
     }
 
-    guessMySecret(v) {
-        if (v === this.#mySecretNumber) {
-            console.log("You win!");
-            this.#changeMySecret();
-        }
-        else {
-            console.log("Nope, try again.");
-        }
+    // privates
+    #ID = null
+    #assignID() {
+        this.#ID = Math.round(Math.random() * 1e9);
+    }
+
+    // publics
+    x
+    y
+    constructor(x,y) {
+        this.#assignID();
+        this.x = x;
+        this.y = y;
     }
 }
 
-var thing = new SomethingStrange();
+var one = new Point2d(3,4);
+var two = new Point2d(3,4);
 
-this.guessMySecret(42);
-// You win!!
-
-this.guessMySecret(42);
-// Nope, try again.
+Point2d.samePoint(one,two);         // false
+Point2d.samePoint(one,one);         // true
 ```
 
 No, JS didn't do the sensible thing and introduce a `private` keyword like they did with `static`. Instead, they introduced the `#`. (insert lame joke about social-media millienials loving hashtags, or something)
@@ -806,98 +807,246 @@ The `#whatever` syntax (including `this.#whatever` form) is only valid inside `c
 
 Unlike public fields/instance members, private fields/instance members *must* be declared in the `class` body. You cannot add a private member to a class declaration dynamically while in the constructor method; `this.#whatever = ..` type assignments only work if the `#whatever` private field is declared in the class body. Moreover, though private fields can be re-assigned, they cannot be `delete`d from an instance, the way a public field/class member can.
 
-#### Exfiltration
+#### Subclassing + Privates
 
-Even though a method or member may be declared with *private* visibility, they can still be exfiltrated (extracted) from a class instance:
+I warned earlier that subclassing with classes that have private members/methods can be a limiting trap. But that doesn't mean they cannot be used together.
+
+Because "inheritance" in JS is sharing (through the `[[Prototype]]` chain), if you invoke an inherited method in a subclass, and that inherited method in turn accesses/invokes privates in its host (base) class, this works fine:
 
 ```js
-var number, func;
+class Point2d { /* .. */ }
 
-class SomethingStrange {
-    #myPrivateNumber = 42
-    #mySecretFunc() {
-        return this.#myPrivateNumber;
-    }
-
-    constructor() {
-        number = this.#myPrivateNumber;
-        func = this.#mySecretFunc;
+class Point3d extends Point2d {
+    z
+    constructor(x,y,z) {
+        super(x,y);
+        this.z = z;
     }
 }
 
-var thing = new SomethingStrange();
-
-number;             // 42
-func;               // function #mySecreFunc() { .. }
-func.call(thing);   // 42
-
-func.call({});
-// TypeError: Cannot read private member #myPrivateNumber
-// from an object whose class did not declare it
+var one = new Point3d(3,4,5);
 ```
 
-The main reason for me pointing this out is to be careful when using private methods as callbacks (or in any way passing them to other parts of the program). There's nothing stopping you from doing so, which can create a bit of an unintended privacy disclosure.
+The `super(x,y)` call in this constructor invokes the inherited base class constructor (`Point2d(..)`), which itself accesses `Point2d`'s private method `#assignID()` (see the earlier snippet). No exception is thrown, even though `Point3d` cannot directly see or access the `#ID` / `#assignID()` privates that are indeed stored on the instance (named `one` here).
+
+In fact, even the inherited `static samePoint(..)` function will work from either `Point3d` or `Point2d`:
+
+```js
+Point2d.samePoint(one,one);         // true
+Point3d.samePoint(one,one);         // true
+```
+
+Actually, that shouldn't be that suprising, since:
+
+```js
+Point2d.samePoint === Point3d.samePoint;
+```
+
+The inherited function reference is *the exact same function* as the base function reference; it's not some copy of the function. Because the function in question has no `this` reference in it, no matter from where it's invoked, it should produce the same outcome.
+
+It's still a shame though that `Point3d` has no way to access/influence, or indeed even knowledge of, the `#ID` / `#assignID()` privates from `Point2d`:
+
+```js
+class Point2d { /* .. */ }
+
+class Point3d extends Point2d {
+    z
+    constructor(x,y,z) {
+        super(x,y);
+        this.z = z;
+
+        console.log(this.#ID);      // will throw!
+    }
+}
+```
+
+| WARNING: |
+| :--- |
+| Notice that this snippet throws an early static syntax error at the time of defining the `Point3d` class, before ever even getting a chance to create an instance of the class. The same exception would be thrown if the reference was `super.#ID` instead of `this.#ID`. |
 
 #### Existence Check
 
-I think this use-case is somewhat contrived/unusual, but... you may want to check to see if a private field/method exists on an object (including the current `this` instance). Keep in mind that only the `class` itself knows about, and can therefore check for, any such a private field/method; such checks are almost always going to be in a static function.
+Keep in mind that only the `class` itself knows about, and can therefore check for, such a private field/method.
 
-Doing could be rather convoluted, because if you access a private field that didn't already exist, you get a JS exception thrown, which would lead to ugly `try..catch` logic. But there's a cleaner approach:
+You may want to check to see if a private field/method exists on an object instance. For example (as shown below), you may have a static function or method in a class, which receives an external object reference passed in. To check to see if the passed-in object reference is of this same class (and therefore has the same private members/methods in it), you basically need to do a "brand check" against the object.
+
+Such a check could be rather convoluted, because if you access a private field that doesn't already exist on the object, you get a JS exception thrown, requiring ugly `try..catch` logic.
+
+But there's a cleaner approach, so called an "ergonomic brand check", using the `in` keyword:
 
 ```js
-class SomethingStrange {
-    static checkGuess(thing,v) {
-        // "ergonomic brand check"
-        if (#myPrivateNumber in thing) {
-            return thing.guessMySecret(v);
+class Point2d {
+    // statics
+    static samePoint(point1,point2) {
+        // "ergonomic brand checks"
+        if (#ID in point1 && #ID in point2) {
+            return point1.#ID === point2.#ID;
         }
+        return false;
     }
 
-    #myPrivateNumber = 42;
+    // privates
+    #ID = null
+    #assignID() {
+        this.#ID = Math.round(Math.random() * 1e9);
+    }
 
-    // ..
+    // publics
+    x
+    y
+    constructor(x,y) {
+        this.#assignID();
+        this.x = x;
+        this.y = y;
+    }
 }
 
-var thing = new SomethingStrange();
+var one = new Point2d(3,4);
+var two = new Point2d(3,4);
 
-SomethingStrage.checkGuess(thing,42);
-// You win!!
+Point2d.samePoint(one,two);         // false
+Point2d.samePoint(one,one);         // true
 ```
+
+The `#privateField in someObject` check will not throw an exception if the field isn't found, so it's safe to use without `try..catch` and use its simple boolean result.
+
+#### Exfiltration
+
+Even though a member/method may be declared with *private* visibility, it can still be exfiltrated (extracted) from a class instance:
+
+```js
+var id, func;
+
+class Point2d {
+    // privates
+    #ID = null
+    #assignID() {
+        this.#ID = Math.round(Math.random() * 1e9);
+    }
+
+    // publics
+    x
+    y
+    constructor(x,y) {
+        this.#assignID();
+        this.x = x;
+        this.y = y;
+
+        // exfiltration
+        id = this.#ID;
+        func = this.#assignID;
+    }
+}
+
+var point = new Point2d(3,4);
+
+id;                     // 7392851012 (...for example)
+
+func;                   // function #assignID() { .. }
+func.call(point,42);
+
+func.call({},100);
+// TypeError: Cannot write private member #ID to an
+// object whose class did not declare it
+```
+
+The main concern here is to be careful when passing private methods as callbacks (or in any way exposing privates to other parts of the program). There's nothing stopping you from doing so, which can create a bit of an unintended privacy disclosure.
 
 ### Private Statics
 
 Static properties and functions can also use `#` to be marked as private:
 
 ```js
-class SomethingStrange {
-    static #errorMsg = "Not available."
+class Point2d {
+    static #errorMsg = "Out of bounds."
     static #printError() {
-        console.log(this.#errorMsg);
+        console.log(`Error: ${this.#errorMsg}`);
     }
 
-    static checkGuess(thing,v) {
-        // "ergonomic brand check"
-        if (#myPrivateNumber in thing) {
-            return thing.guessMySecret(v);
+    // publics
+    x
+    y
+    constructor(x,y) {
+        if (x > 100 || y > 100) {
+            Point2d.#printError();
         }
-        else {
-            this.#printError();
-        }
+        this.x = x;
+        this.y = y;
     }
+}
 
-    #myPrivateNumber = 42;
+var one = new Point2d(30,400);
+// Error: Out of bounds.
+```
+
+The `#printError()` static private function here has a `this`, but that's referencing the `Point2d` class, not an instance. As such, the `#errorMsg` and `#printError()` are independent of instances and thus are best as statics. Moreover, there's no reason for them to be accessible outside the class, so they're marked private.
+
+Remember: private statics are similarly not-inherited by subclasses just as private members/methods are not.
+
+#### Subclassing Gotcha
+
+Recall that inherited methods, invoked from a subclass, have no trouble accessing (via `this.#whatever` style references) any privates from their own base class:
+
+```js
+class Point2d {
+    // ..
+
+    getID() {
+        return this.#ID;
+    }
 
     // ..
 }
+
+class Point3d extends Point2d {
+    // ..
+
+    printID() {
+        console.log(`ID: ${this.getID()}`);
+    }
+}
+
+var point = new Point3d(3,4,5);
+point.printID();
+// ID: ..
 ```
 
-Private statics are similarly not-inherited just as private members/methods are not.
+That works just fine.
 
-| WARNING: |
-| :--- |
-| Be careful with `this` references inside public static functions that make reference to private static functions. While the public static functions will be inherited by derived subclasses, the private static functions are not, which will cause such `this.#..` references to fail. |
+Unfortunately, and (to me) a little unexpectedly/inconsistently, the same is not true of private statics accessed from inherited public static functions:
+
+```js
+class Point2d {
+    static #errorMsg = "Out of bounds."
+    static printError() {
+        console.log(`Error: ${this.#errorMsg}`);
+    }
+
+    // ..
+}
+
+class Point3d extends Point2d {
+    // ..
+}
+
+Point2d.printError();
+// Error: Out of bounds.
+
+Point3d.printError === Point2d.printError;
+// true
+
+Point3d.printError();
+// TypeError: Cannot read private member #errorMsg
+// from an object whose class did not declare it
+```
+
+The `printError()` static is inherited (shared via `[[Prototype]]`) from `Point2d` to `Point3d` just fine, which is why the function references are identical. Like the non-static snippet just above, you might have expected the `Point3d.printError()` static invocation to resolve via the `[[Prototype]]` chain to its original base class (`Point2d`) location, thereby letting it access the base class's `#errorMsg` static private.
+
+But it fails, as shown by the last statement in that snippet. Beware that gotcha!
 
 ## Class Example
+
+OK, we've laid out a bunch of disparate class features. I want to wrap up this chapter by trying to illustrate a sampling of these capabilities in a single example that's a little less basic/contrived.
 
 // TODO
 
