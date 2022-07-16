@@ -565,7 +565,33 @@ anotherPoint instanceof Point2d;    // true
 anotherPoint instanceof Point3d;    // true
 ```
 
-It may seem strange to see `anotherPoint instanceof Point2d` result in `true`. That's because `instanceof` is traversing the entire class inheritance hierarchy (the `[[Prototype]]` chain) until it finds a match.
+It may seem strange to see `anotherPoint instanceof Point2d` result in `true`. To understand why better, perhaps it's useful to visualize both `[[Prototype]]` chains:
+
+```
+Point2d.prototype
+        /       \
+       /         \
+      /           \
+  point   Point3d.prototype
+                    \
+                     \
+                      \
+                    anotherPoint
+```
+
+The `instanceof` operator doesn't just look at the current object, but rather traverses the entire class inheritance hierarchy (the `[[Prototype]]` chain) until it finds a match. Thus, `anotherPoint` is an instance of both `Point3d` and `Point2d`.
+
+To illustrate this fact a little more obviously, another (less ergonomic) way of going about the same kind of check as `instanceof` is with the (inherited from `Object.prototype`) utility, `isPrototypeOf(..)`:
+
+```js
+Point2d.prototype.isPrototypeOf(point);             // true
+Point3d.prototype.isPrototypeOf(point);             // false
+
+Point2d.prototype.isPrototypeOf(anotherPoint);      // true
+Point3d.prototype.isPrototypeOf(anotherPoint);      // true
+```
+
+This utility makes it a little clearer why both `Point2d.prototype.isPrototypeOf(anotherPoint)` and `anotherPoint instanceof Point2d` result in `true`: the object `Point2d.prototype` *is* in the `[[Prototype]]` chain of `anotherPoint`.
 
 If you instead wanted to check if the object instance was *only and directly* created by a certain class, check the instance's `constructor` property.
 
@@ -583,9 +609,9 @@ anotherPoint.constructor === Point3d;   // true
 
 ### "Inheritance" Is Sharing, Not Copying
 
-It may seem as if `Point3d`, when it `extends` the `Point2d` class, is in essence getting a *copy* of all the behavior defined in `Point2d`. Moreover, it may seem as if the concrete object instance `point` receives, *copied down* to it, all the methods from `Point3d` (and by extension, also from `Point2d`).
+It may seem as if `Point3d`, when it `extends` the `Point2d` class, is in essence getting a *copy* of all the behavior defined in `Point2d`. Moreover, it may seem as if the concrete object instance `anotherPoint` receives, *copied down* to it, all the methods from `Point3d` (and by extension, also from `Point2d`).
 
-However, that's not the correct mental model to use for JS's implementation of class-orientation. Recall this base class and subclass definition, as well as instantiation of `another`:
+However, that's not the correct mental model to use for JS's implementation of class-orientation. Recall this base class and subclass definition, as well as instantiation of `anotherPoint`:
 
 ```js
 class Point2d {
@@ -608,28 +634,28 @@ class Point3d extends Point2d {
     }
 }
 
-var point = new Point3d(3,4,5);
+var anotherPoint = new Point3d(3,4,5);
 ```
 
-If you inspect the `point` object, you'll see it only has the `x`, `y`, and `z` properties (instance members) on it, but not the `toString()` method:
+If you inspect the `anotherPoint` object, you'll see it only has the `x`, `y`, and `z` properties (instance members) on it, but not the `toString()` method:
 
 ```js
-Object.hasOwn(point,"x");                       // true
-Object.hasOwn(point,"y");                       // true
-Object.hasOwn(point,"z");                       // true
+Object.hasOwn(anotherPoint,"x");                       // true
+Object.hasOwn(anotherPoint,"y");                       // true
+Object.hasOwn(anotherPoint,"z");                       // true
 
-Object.hasOwn(point,"toString");                // false
+Object.hasOwn(anotherPoint,"toString");                // false
 ```
 
-Where is that method located? On the prototype object:
+Where is that `toString()` method located? On the prototype object:
 
 ```js
 Object.hasOwn(Point3d.prototype,"toString");    // true
 ```
 
-And `point` has access to that method via its `[[Prototype]]` linkage (see Chapter 2). In other words, the prototype objects **share access** to their method(s) with the subclass(es) and instance(s). The method(s) stay in place, and are not copied down the inheritance chain.
+And `b` has access to that method via its `[[Prototype]]` linkage (see Chapter 2). In other words, the prototype objects **share access** to their method(s) with the subclass(es) and instance(s). The method(s) stay in place, and are not copied down the inheritance chain.
 
-As nice as the `class` syntax is, don't forget what's really happening under the syntax: JS is *just* wiring up objects on the `[[Prototype]]` chain.
+As nice as the `class` syntax is, don't forget what's really happening under the syntax: JS is *just* wiring up objects to each other along a `[[Prototype]]` chain.
 
 ## Static Class Behavior
 
@@ -1167,8 +1193,13 @@ class CalendarItem {
     startDateTime = null
 
     constructor() {
-        var id = Math.round(Math.random() * 1e9);
-        this.#setID(id);
+        if (new.target !== CalendarItem) {
+            let id = Math.round(Math.random() * 1e9);
+            this.#setID(id);
+        }
+        else {
+            throw new Error("Don't instantiate 'CalendarItem' directly.");
+        }
     }
     getID() {
         if (!CalendarItem.#isUnset(this.#ID)) {
@@ -1223,7 +1254,7 @@ class Meeting extends CalendarItem {
     endDateTime = null
 
     #getEndDateTimeStr() {
-        if (this.startDateTime instanceof Date) {
+        if (this.endDateTime instanceof Date) {
             return this.endDateTime.toUTCString();
         }
     }
@@ -1254,16 +1285,16 @@ Take some time to read and digest those `class` definitions. Note which of the `
 Let's now see these three classes in use:
 
 ```js
-var callParents = new Reminder(
-    "Call parents to say hi",
+var callMyParents = new Reminder(
+    "Call my parents to say hi",
     new Date("July 7, 2022 11:00:00 UTC")
 );
-callParents.summary();
-// (586380912) Call parents to say hi at Thu,
-// 07 Jul 2022 11:00:00 GMT
+callMyParents.summary();
+// (586380912) Call my parents to say hi at
+// Thu, 07 Jul 2022 11:00:00 GMT
 
-callParents.markComplete();
-callParents.summary();
+callMyParents.markComplete();
+callMyParents.summary();
 // (586380912) Complete.
 
 var interview = new Meeting(
