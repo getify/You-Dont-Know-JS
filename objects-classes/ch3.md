@@ -1170,6 +1170,18 @@ class CalendarItem {
     static #isUnset(v) {
         return v === this.#UNSET;
     }
+    static #error(num) {
+        return this[`ERROR_${num}`];
+    }
+    static {
+        for (let [idx,msg] of [
+            "ID is already set.",
+            "ID is unset.",
+            "Don't instantiate 'CalendarItem' directly.",
+        ].entries()) {
+            this[`ERROR_${(idx+1)*100}`] = msg;
+        }
+    }
     static isSameItem(item1,item2) {
         if (#ID in item1 && #ID in item2) {
             return item1.#ID === item2.#ID;
@@ -1185,7 +1197,7 @@ class CalendarItem {
             this.#ID = id;
         }
         else {
-            throw new Error("ID is already set");
+            throw new Error(CalendarItem.#error(100));
         }
     }
 
@@ -1198,7 +1210,7 @@ class CalendarItem {
             this.#setID(id);
         }
         else {
-            throw new Error("Don't instantiate 'CalendarItem' directly.");
+            throw new Error(CalendarItem.#error(300));
         }
     }
     getID() {
@@ -1206,7 +1218,7 @@ class CalendarItem {
             return this.#ID;
         }
         else {
-            throw new Error("ID is unset");
+            throw new Error(CalendarItem.#error(200));
         }
     }
     getDateTimeStr() {
@@ -1226,8 +1238,9 @@ class CalendarItem {
 }
 
 class Reminder extends CalendarItem {
-    #complete = false
+    #complete = false;  // <-- no ASI, semicolon needed
 
+    [Symbol.toStringTag] = "Reminder"
     constructor(description,startDateTime) {
         super();
 
@@ -1251,14 +1264,15 @@ class Reminder extends CalendarItem {
 }
 
 class Meeting extends CalendarItem {
-    endDateTime = null
-
     #getEndDateTimeStr() {
         if (this.endDateTime instanceof Date) {
             return this.endDateTime.toUTCString();
         }
     }
 
+    endDateTime = null;  // <-- no ASI, semicolon needed
+
+    [Symbol.toStringTag] = "Meeting"
     constructor(description,startDateTime,endDateTime) {
         super();
 
@@ -1276,11 +1290,11 @@ class Meeting extends CalendarItem {
 }
 ```
 
-Take some time to read and digest those `class` definitions. Note which of the `class` features from this chapter that you see being used.
+Take some time to read and digest those `class` definitions. Did you spot most of the `class` features we talked about in this chapter?
 
 | NOTE: |
 | :--- |
-| One question you may have: why didn't I move the common logic of `description` and `startDateTime` setting from both subclass constructors into the single base constructor. This is a nuanced point, but it's not my intention that `CalendarItem` ever be directly instantiated; it's what in class-oriented terms we refer to as an "abstract class". That's why I'm using `new.target` to throw an error if the `CalendarItem` class is ever directly instantiated! |
+| One question you may have: why didn't I move the repeated logic of `description` and `startDateTime` setting from both subclass constructors into the single base constructor? This is a nuanced point, but it's not my intention that `CalendarItem` ever be directly instantiated; it's what in class-oriented terms we refer to as an "abstract class". That's why I'm using `new.target` to throw an error if the `CalendarItem` class is ever directly instantiated! So I don't want to imply by signature that the `CalendarItem(..)` constructor should ever be directly used. |
 
 Let's now see these three classes in use:
 
@@ -1289,24 +1303,48 @@ var callMyParents = new Reminder(
     "Call my parents to say hi",
     new Date("July 7, 2022 11:00:00 UTC")
 );
+callMyParents.toString();
+// [object Reminder]
 callMyParents.summary();
 // (586380912) Call my parents to say hi at
 // Thu, 07 Jul 2022 11:00:00 GMT
-
 callMyParents.markComplete();
 callMyParents.summary();
 // (586380912) Complete.
+callMyParents instanceof Reminder;
+// true
+callMyParents instanceof CalendarItem;
+// true
+callMyParents instanceof Meeting;
+// false
+
 
 var interview = new Meeting(
     "Job Interview: ABC Tech",
     new Date("June 23, 2022 08:30:00 UTC"),
     new Date("June 23, 2022 09:15:00 UTC")
 );
+interview.toString();
+// [object Meeting]
 interview.summary();
 // (994337604) Job Interview: ABC Tech at Thu,
 // 23 Jun 2022 08:30:00 GMT - Thu, 23 Jun 2022
 // 09:15:00 GMT
+interview instanceof Meeting;
+// true
+interview instanceof CalendarItem;
+// true
+interview instanceof Reminder;
+// false
+
+
+Reminder.isSameItem(callMyParents,callMyParents);
+// true
+Meeting.isSameItem(callMyParents,interview);
+// false
 ```
+
+Admittedly, some bits of this example are a little contrived. But honestly, I think pretty much all of this is plausible and reasonable usages of the various `class` features.
 
 By the way, there's probably a million different ways to structure the above code logic. I'm by no means claiming this is the *right* or *best* way to do so. As an exercise for the reader, try your hand and writing it yourself, and take note of things you did differently than my approach.
 
