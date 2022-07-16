@@ -33,4 +33,8 @@
     * Static Class Behavior
     * Private Class Behavior
     * Class Example
+* Chapter 4: This Works
+    * This Aware
+    * Can We Get On With This?
+    * // TODO
 * Appendix A: TODO
