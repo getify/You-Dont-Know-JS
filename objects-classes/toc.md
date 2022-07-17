@@ -35,6 +35,6 @@
     * Class Example
 * Chapter 4: This Works
     * This Aware
-    * Can We Get On With This?
+    * This Is It!
     * // TODO
 * Appendix A: TODO
