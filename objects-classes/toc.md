@@ -36,5 +36,6 @@
 * Chapter 4: This Works
     * This Aware
     * This Is It!
-    * // TODO
+    * An Arrow Points Somewhere
+    * Variations
 * Appendix A: TODO

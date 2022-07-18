@@ -295,6 +295,7 @@ One pattern that has emerged and grown quite popular, but which I firmly believe
 ```js
 class Point2d {
     x = null
+    y = null
     getDoubleX = () => this.x * 2
 
     constructor(x,y) {
@@ -311,7 +312,7 @@ point.getDoubleX();    // 6
 
 See the field holding an `=>` arrow function? I say this is a no-no. But why? Let's unwind what's going on.
 
-First, why do this? Because JS developers seem to be perpetually frustrated by the dynamic `this` binding rules (see a subsequent chapter), so they force a `this` binding via the `=>` arrow function. That way, no matter how `getDoubleX()` is invoked, it's always `this`-locked to the particular instance. That's an understandable convenience to desire, but... it betrays the very nature of the `this` / `[[Prototype]]` pillar of the language. How?
+First, why do this? Because JS developers seem to be perpetually frustrated by the dynamic `this` binding rules (see Chapter 4), so they force a `this` binding via the `=>` arrow function. That way, no matter how `getDoubleX()` is invoked, it's always `this`-bound to the particular instance. That's an understandable convenience to desire, but... it betrays the very nature of the `this` / `[[Prototype]]` pillar of the language. How?
 
 Let's consider the equivalent code to the previous snippet:
 
@@ -319,6 +320,7 @@ Let's consider the equivalent code to the previous snippet:
 class Point2d {
     constructor(x,y) {
         this.x = null;
+        this.y = null;
         this.getDoubleX = () => this.x * 2;
 
         this.x = x;
