@@ -457,11 +457,17 @@ var infoForm = {
     theSubmitBtn: null,
 
     init() {
-        this.theFormElem = document.getElementById("the-info-form");
-        this.theSubmitBtn = theFormElem.querySelector("button[type=submit]");
+        this.theFormElem =
+            document.getElementById("the-info-form");
+        this.theSubmitBtn =
+            theFormElem.querySelector("button[type=submit]");
 
         // is *this* the call-site?
-        this.theSubmitBtn.addEventListener("click",this.clickHandler,false);
+        this.theSubmitBtn.addEventListener(
+            "click",
+            this.clickHandler,
+            false
+        );
     },
 
     // ..
@@ -1086,12 +1092,123 @@ Before we close out our lengthy discussion of `this`, there's a few irregular va
 
 ### Indirect Function Calls
 
-// TODO
+Recall this example from earlier in the chapter?
+
+```js
+var point = {
+    x: null,
+    y: null,
+
+    init(x,y) {
+        this.x = x;
+        this.y = y;
+    },
+    rotate(angleRadians) { /* .. */ },
+    toString() { /* .. */ },
+};
+
+var init = point.init;
+init(3,4);                  // broken!
+```
+
+This is broken because the `init(3,4)` call-site doesn't provide the necessary `this`-assignment signal. But there's other ways to observe a similar breakage. For example:
+
+```js
+(1,point.init)(3,4);        // broken!
+```
+
+This strange looking syntax is first evaluating an expression `(1,point.init)`, which is a comma series expression. The result of such an expression is the final evaluated value, which in this case is the function reference (held by `point.init`).
+
+So the outcome puts that function reference onto the expression stack, and then invokes that value with `(3,4)`. That's an indirect invocation of the function. And what's the result? It actually matches the *default context* assignment rule (#4) we looked at earlier in the chapter.
+
+Thus, in non-strict mode, the `this` for the `point.init(..)` call will be `globalThis`. Had we been in strict-mode, it would have been `undefined`, and the `this.x = x` operation would then have thrown an exception for invalidly accessing the `x` property on the `undefined` value.
+
+There's several different ways to get an indirect function invocation. For example:
+
+```js
+(()=>point.init)()(3,4);    // broken!
+```
+
+And another example of indirect function invocation is the Immediately Invoked Function Expression (IIFE) pattern:
+
+```js
+(function(){
+    // `this` assigned via "default" rule
+})();
+```
+
+As you can see, the function expression value is put onto the expression stack, and then it's invoked with the `()` on the end.
+
+But what about this code:
+
+```js
+(point.init)(3,4);
+```
+
+What will be the outcome of that code?
+
+By the same reasoning we've seen in the previous examples, it stands to reason that the `point.init` expression puts the function value onto the expression stack, and then invoked indirectly with `(3,4)`.
+
+Not quite, though! JS grammar has a special rule to handle the invocation form `(someIdentifier)(..)` as if it had been `someIdentifier(..)` (without the `(..)` around the identifier name).
+
+Wondering why you might want to ever force the *default context* for `this` assignment via an indirect function invocation?
+
+### Accessing `globalThis`
+
+Before we answer that, let's introduce another way of performing indirect function `this` assignment. Thus far, the indirect function invocation patterns shown are sensitive to strict-mode. But what if we wanted an indirect function `this` assignment that doesn't respect strict-mode.
+
+The `Function(..)` constructor takes a string of code and dynamically defines the equivalent function. However, it always does so as if that function had been declared in the global scope. And furthermore, it ensures such function *does not* run in strict-mode, no matter the strict-mode status of the program. That's the same outcome as running an indirect
+
+One niche usage of such strict-mode agnostic indirect function `this` assignment is for getting a reliable reference to the true global object prior to when the JS specification actually defined the `globalThis` identifier (for example, in a polyfill for it):
+
+```js
+"use strict";
+
+var gt = new Function("return this")();
+gt === globalThis;                      // true
+```
+
+In fact, a similar outcome, using the comma operator trick (see previous section) and `eval(..)`:
+
+```js
+"use strict";
+
+function getGlobalThis() {
+    return (1,eval)("this");
+}
+
+getGlobalThis() === getGlobalThis;      // true
+```
+
+| NOTE: |
+| :--- |
+| `eval("this")` would be sensitive to strict-mode, but `(1,eval)("this")` is not, and therefor reliably gives us the `globalThis` in any program. |
+
+Unfortunately, the `new Function(..)` and `(1,eval)(..)` approaches both have an important limitation: that code will be blocked in browser-based JS code if the the app is served with certain Content-Security-Policy (CSP) restrictions, disallowing dynamic code evaluation (for security reasons).
+
+Can we get around this? Yes, mostly. [^globalThisPolyfill]
+
+The JS specification says that a getter function on the global object, or on any object that inherits from it, runs with `this` as `globalThis`, regardless of the program's strict mode.
+
+```js
+// Adapted from: https://mathiasbynens.be/notes/globalthis#robust-polyfill
+function getGlobalThis() {
+    Object.defineProperty(Object.prototype,"__get_globalthis__",{
+        get() { return this; },
+        configurable: true
+    });
+    var gt = __get_globalthis__;
+    delete Object.prototype.__get_globalthis__;
+    return gt;
+}
+
+getGlobalThis() === getGlobalThis;      // true
+```
+
+Yeah, that's super gnarly. But that's JS `this` for you!
 
 ### Template Tag Functions
 
 // TODO
 
-### Function Constructor
-
-// TODO
+[^globalThisPolyfill]: "A horrifying globalThis polyfill in universal JavaScript", Mathias Bynens, April 18 2019, https://mathiasbynens.be/notes/globalthis#robust-polyfill, Accessed July 2022.
