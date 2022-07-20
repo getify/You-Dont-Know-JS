@@ -1177,7 +1177,7 @@ function getGlobalThis() {
     return (1,eval)("this");
 }
 
-getGlobalThis() === getGlobalThis;      // true
+getGlobalThis() === globalThis;      // true
 ```
 
 | NOTE: |
@@ -1188,7 +1188,7 @@ Unfortunately, the `new Function(..)` and `(1,eval)(..)` approaches both have an
 
 Can we get around this? Yes, mostly. [^globalThisPolyfill]
 
-The JS specification says that a getter function on the global object, or on any object that inherits from it, runs with `this` as `globalThis`, regardless of the program's strict mode.
+The JS specification says that a getter function defined on the global object, or on any object that inherits from it (like `Object.prototype`), runs the getter function with `this` context assigned to `globalThis`, regardless of the program's strict-mode.
 
 ```js
 // Adapted from: https://mathiasbynens.be/notes/globalthis#robust-polyfill
@@ -1202,13 +1202,53 @@ function getGlobalThis() {
     return gt;
 }
 
-getGlobalThis() === getGlobalThis;      // true
+getGlobalThis() === globalThis;      // true
 ```
 
 Yeah, that's super gnarly. But that's JS `this` for you!
 
 ### Template Tag Functions
 
-// TODO
+There's one more unusual variation of function invocation we should cover: tagged template functions.
+
+Template strings -- what I prefer to call interpolated literals -- can be "tagged" with a prefix function, which is invoked with the parsed contents of the template literal:
+
+```js
+function tagFn(/* .. */) {
+    // ..
+}
+
+tagFn`actually a function invocation!`;
+```
+
+As you can see, there's no `(..)` invocation syntax, just the tag function (`tagFn`) appearing before the `` `template literal` ``; whitespace is allowed between them, but is very uncommon.
+
+Despite the strange appearance, the function `tagFn(..)` will be invoked. It's passed the list of one or more string literals that were parsed from the template literal, along with any interpolated expression values that were encountered.
+
+We're not going to cover all the ins and outs of tagged template functions -- they're seriously one of the most powerful and interesting features ever added to JS -- but since we're talking about `this` assignment in function invocations, for completeness sake we need to talk about how `this` will be assigned.
+
+The other form for tag functions you may encounter is:
+
+```js
+var someObj = {
+    tagFn() { /* .. */ }
+};
+
+someObj.tagFn`also a function invocation!`;
+```
+
+Here's the easy explanation: `` tagFn`..` `` and `` someObj.tagFn`..` `` will each have `this`-assignment behavior corresponding to call-sites as `tagFn(..)` and `someObj.tagFn(..)`, respectively. In other words, `` tagFn`..` `` behaves by the *default context* assignment rule (#4), and `` someObj.tagFn`..` `` behaves by the *implicit context* assignment rule (#3).
+
+Luckily for us, we don't need to worry about the `new` or `call(..)` / `apply(..)` assignment rules, as those forms aren't possible with tag functions.
+
+It should be pointed out that it's pretty rare for a tagged template literal function to be defined as `this`-aware, so it's fairly unlikely you'll need to apply these rules. But just in case, now you're in the *know*.
+
+## Stay Aware
+
+So, that's `this`. I'm willing to bet for many of you, it was a bit more... shall we say, involved... than you might have been expecting.
+
+The good news, perhaps, is that in practice you don't often trip over all these different complexities. But the more you use `this`, the more it requires you, and the readers of your code, to understand how it actually works.
+
+The lesson here is that you should be intentional and aware of all aspects of `this` before you go sprinkling it about your code. Make sure you're using it most effectively and taking full advantage of this important pillar of JS.
 
 [^globalThisPolyfill]: "A horrifying globalThis polyfill in universal JavaScript", Mathias Bynens, April 18 2019, https://mathiasbynens.be/notes/globalthis#robust-polyfill, Accessed July 2022.
