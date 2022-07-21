@@ -12,4 +12,5 @@
 * [Chapter 2: How Objects Work](ch2.md)
 * [Chapter 3: Classy Objects](ch3.md)
 * [Chapter 4: This Works](ch4.md)
+* [Chapter 5: Delegation](ch5.md)
 * TODO

@@ -39,4 +39,7 @@
     * An Arrow Points Somewhere
     * Variations
     * Stay Aware
+* Chapter 5: Delegation
+    * Preamble
+    * What's A Constructor, Anyway?
 * Appendix A: TODO
