@@ -42,4 +42,6 @@
 * Chapter 5: Delegation
     * Preamble
     * What's A Constructor, Anyway?
+    * Ditching Class Thinking
+    * TODO
 * Appendix A: TODO

@@ -343,6 +343,10 @@ var anotherPoint;
 
 Clearly, the `new` invocation streamlines that set of manual steps!
 
+| TIP: |
+| :--- |
+| The `Object.setPrototypeOf(..)` in step 2 could also have been done via the `__proto__` property, such as `tmpObj.__proto__ = point.init.prototype`, or even as part of the object literal (step 1) with `tmpObj = { __proto__: point.init.prototype }`. |
+
 Skipping some of the formality of these steps, let's recall an earlier snippet and see how `new` approximates a similar outcome:
 
 ```js
