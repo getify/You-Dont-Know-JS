@@ -43,5 +43,7 @@
     * Preamble
     * What's A Constructor, Anyway?
     * Ditching Class Thinking
-    * TODO
+    * Delegation Illustrated
+    * Composing Peer Objects
+    * Why *This*?
 * Appendix A: TODO
