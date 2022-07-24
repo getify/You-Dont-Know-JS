@@ -15,8 +15,8 @@ I recommend reading the **second edition** books in this order:
 
 * [Get Started](get-started/README.md) | [Buy on Leanpub](https://leanpub.com/ydkjsy-get-started) | [Buy on Amazon](https://www.amazon.com/dp/B084BNMN7T)
 * [Scope & Closures](scope-closures/README.md) | [Buy on Leanpub](https://leanpub.com/ydkjsy-scope-closures) | [Buy on Amazon](https://www.amazon.com/dp/B08634PZ3N)
-* [Objects & Classes](objects-classes/README.md) (draft in progress)
-* Types & Grammar (not yet started)
+* [Objects & Classes](objects-classes/README.md) (draft stable)
+* [Types & Grammar](types-grammar/README.md) (draft in progress)
 * Sync & Async (not yet started)
 * ES.Next & Beyond (not yet started)
 

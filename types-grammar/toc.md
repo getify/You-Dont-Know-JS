@@ -8,5 +8,8 @@
 
 * Foreword
 * Preface
-* Chapter 1: TODO
-	* TODO
+* Chapter 1: Primitives
+	* Core Values
+    * Value Immutability
+    * Assignments Are Value Copies
+    * TODO
