@@ -46,4 +46,11 @@
     * Delegation Illustrated
     * Composing Peer Objects
     * Why *This*?
-* Appendix A: TODO
+* TODO:
+    * object wrappers (String, Boolean, etc)
+    * object coercions (valueof, tostring, boxing)
+    * well-known symbols extension points on objects
+    * proxies
+    * old "prototypal class" style
+    * "inheritance" objections
+    * protected visibility

@@ -15,7 +15,7 @@ At the time of ES6's `class` being introduced, this new dedicated syntax was alm
 
 Even though `class` now bears almost no resemblance to older "prototypal class" code style, the JS engine is still *just* wiring up objects to each other through the existing `[[Prototype]]` mechanism. In other words, `class` is not its own separate pillar of the language (as `[[Prototype]]` is), but more like the fancy, decorative *Capital* that tops the pillar/column.
 
-That said, since `class` style code has now replaced virtually all previous "prototypal class" coding, the main text here focuses only on `class` and its various particulars. For historical purposes, we'll briefly cover the old "prototypal class" style in Appendix A.
+That said, since `class` style code has now replaced virtually all previous "prototypal class" coding, the main text here focuses only on `class` and its various particulars. For historical purposes, we'll briefly cover the old "prototypal class" style in an appendix.
 
 ## When Should I Class-Orient My Code?
 
@@ -409,6 +409,10 @@ But the `Point3d` class extends `Point2d`, making `Point3d` a derived-class, chi
 It also adds a new `z` field/member method, as well as a `printDoubleX()` method, which itself calls `this.getX()`.
 
 When `anotherPoint.printDoubleX()` is invoked, the inherited `this.getX()` is thus invoked, and that method makes reference to `this.x`. Since `this` is pointing at the class instance (aka, `anotherPoint`), the value it finds is now `21` (instead of `3` from the `point` object's `x` member).
+
+### Extending Expressions
+
+// TODO: cover `class Foo extends ..` where `..` is an expression, not a class-name
 
 ### Overriding Methods
 
