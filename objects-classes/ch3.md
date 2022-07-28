@@ -102,6 +102,10 @@ class Point2d {
 
 Inside a `class` body, methods are defined without the `function` keyword, and there's no `,` or `;` separators between the method definitions.
 
+| NOTE: |
+| :--- |
+| Inside a `class` block, all code runs in strict-mode even without the `"use strict"` pragma present in the file or its functions. In particular, this impacts the `this` behavior for function calls, as explained in Chapter 4. |
+
 ### The Constructor
 
 One special method that all classes have is called a "constructor". If omitted, there's a default empty constructor assumed in the definition.

@@ -149,9 +149,11 @@ What will `this` reference when `init(3,4)` is invoked like that?
 
 *It depends.*
 
-Uh oh. Depends? That sounds confusing. Don't worry, it's not as bad as it sounds. The *default context* assignment depends on whether the code is in strict-mode or not. But thankfully, virtually all JS code these days is running in strict-mode. So most of the time, the *default assignment* context won't "depend" on anything.
+Uh oh. Depends? That sounds confusing.
 
-In strict-mode, the *default context* is pretty straightforward: it's `undefined`. That's it!
+Don't worry, it's not as bad as it sounds. The *default context* assignment depends on whether the code is in strict-mode or not. But thankfully, virtually all JS code these days is running in strict-mode; for example, ESM (ES Modules) always run in strict-mode, as does code inside a `class` block. And virtually all transpiled JS code (via Babel, TypeScript, etc) is written to declare strict-mode.
+
+So almost all of the time, modern JS code will be running in strict-mode, and thus the *default assignment* context won't "depend" on anything; it's pretty straightforward: `undefined`. That's it!
 
 | NOTE: |
 | :--- |
@@ -174,7 +176,7 @@ Stop for a moment and consider: why would JS choose to default the context to `u
 
 Because a `this`-aware function **always needs a `this`**. The invocation `init(3,4)` isn't providing a `this`, so that *is* a mistake, and *should* raise an exception so the mistake can be corrected. The lesson: never invoke a `this`-aware function without providing it a `this`!
 
-Just for completeness sake: in non-strict mode, the *default context* is the global object -- JS defines it as `globalThis`, which in browser JS is essentially an alias to `window`, and in Node it's `global`. So, when `init(3,4)` runs in non-strict mode, the `this.x` expression is `globalThis.x` -- also known as `window.x` in the browser, or `global.x` in Node. Thus, `globalThis.x` gets set as `3` and `globalThis.y` gets set as `4`.
+Just for completeness sake: in the less common non-strict mode, the *default context* is the global object -- JS defines it as `globalThis`, which in browser JS is essentially an alias to `window`, and in Node it's `global`. So, when `init(3,4)` runs in non-strict mode, the `this.x` expression is `globalThis.x` -- also known as `window.x` in the browser, or `global.x` in Node. Thus, `globalThis.x` gets set as `3` and `globalThis.y` gets set as `4`.
 
 ```js
 // no strict-mode here, beware!
