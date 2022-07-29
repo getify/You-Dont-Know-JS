@@ -39,14 +39,14 @@ typeof 42n;             // "bigint"
 typeof Symbol("42");    // "symbol"
 ```
 
-The `typeof` operator, when used against a variable, is reporting the value-type of the value in the variable:
+The `typeof` operator, when used against a variable instead of a value, is reporting the value-type of *the value in the variable*:
 
 ```js
 greeting = "Hello";
 typeof greeting;        // "string"
 ```
 
-Again, JS variables themselves don't have types. They hold any arbitrary value, which itself has a value-type.
+JS variables themselves don't have types. They hold any arbitrary value, which itself has a value-type.
 
 ### Empty Values
 
@@ -58,7 +58,7 @@ The `null` value-type has an unexpected `typeof` result. Instead of `"null"`, we
 typeof null;            // "object"
 ```
 
-No, that doesn't mean that `null` is somehow a special kind of object. It's just a legacy of early days of JS, which cannot be changed because of how much code out in the wild it could break.
+No, that doesn't mean that `null` is somehow a special kind of object. It's just a legacy of early days of JS, which cannot be changed because of how much code out in the wild it would break.
 
 The `undefined` type is reported both for explicit `undefined` values and any place where a seemingly missing value is encountered:
 
@@ -79,15 +79,90 @@ typeof whatever[10];            // "undefined"
 
 | NOTE: |
 | :--- |
-| The `typeof nonExistent` expression is referring to an undeclared variable `nonExisttent`. Normally, an undeclared variable reference might cause an exception (in strict mode), but the `typeof` operator is afforded the special ability to safely access even non-existent identifiers and calmly return `"undefined"` instead of throwing an exception. |
+| The `typeof nonExistent` expression is referring to an undeclared variable `nonExisttent`. Normally, accessing an undeclared variable reference would cause an exception, but the `typeof` operator is afforded the special ability to safely access even non-existent identifiers and calmly return `"undefined"` instead of throwing an exception. |
 
-However, each respective type has exactly one value, of the same name. So `null` is the only value in the `null` value-type, and `undefined` is the only value in the `undefined` value-type.
+However, each respective "empty" type has exactly one value, of the same name. So `null` is the only value in the `null` value-type, and `undefined` is the only value in the `undefined` value-type.
 
-// TODO
+#### Null'ish
+
+Semantically, `null` and `undefined` types both represent emptiness, or absence of another affirmative, meaningful value.
+
+| NOTE: |
+| :--- |
+| JS operations which behave the same whether `null` or `undefined` is encountered, are referred to as "null'ish" (or "nullish"). I guess "undefined'ish" would look/sound too weird! |
+
+For a lot of JS, especially the code developers write, these two *nullish* values are interchangeable; the decision to intentionally use/assign `null` or `undefined` in any given scenario is situation dependent and left up to the developer.
+
+JS provides a number of capabilities for helping treat the two nullish values as indistinguishable.
+
+For example, the `==` (coercive-equality comparision) operator specifically treats `null` and `undefined` as coercively equal to each other, but to no other values in the language. As such, as `.. == null` check is safe to perform if you want to check if a value is specifically either `null` or `undefined`:
+
+```js
+if (greeting == null) {
+    // greeting is nullish/empty
+}
+```
+
+Another (recent) addition to JS is the `??` (nullish-coalescing) operator:
+
+```js
+who = myName ?? "User";
+
+// equivalent to:
+who = (myName != null) ? myName : "User";
+```
+
+As the ternary equivalent illustrates, `??` checks to see if `myName` is non-nullish, and if so, returns its value. Otherwise, it returns the other operand (here, `"User"`).
+
+Along with `??`, JS also added the `?.` (nullish conditional-chaining) operator:
+
+```js
+record = {
+    shippingAddress: {
+        street: "123 JS Lane",
+        city: "Browserville",
+        state: "XY"
+    }
+};
+
+console.log( record?.shippingAddress?.street );
+// 123 JS Lane
+
+console.log( record?.billingAddress?.street );
+// undefined
+```
+
+The `?.` operator checks the value immediately preceding (to the left) value, and if it's nullish, the operator stops and returns an `undefined` value. Otherwise, it performs the `.` property access against that value and continues with the expression.
+
+Just to be clear: `record?.` is saying, "check `record` for nullish before `.` property access". Additionally, `billingAddress?.` is saying, "check `billingAddress` for nullish before `.` property access".
+
+| WARNING: |
+| :--- |
+| Some JS developers believe that the newer `?.` is superior to `.`, and should thus almost always be used instead of `.`. I believe that's an unwise perspective. First of all, it's adding extra visual clutter, which should only be done if you're getting benefit from it. Secondly, you should be aware of, and planning for, the emptiness of some value, to justify using `?.`. If you always expect a non-nullish value to be present in some expression, using `?.` to access a property on it is not only unnecessary/wasteful, but also could potentially hide future bugs where your assumption of value-presence had failed but `?.` covered it up. As with most features in JS, use `.` where it's most appropriate, and use `?.` where it's most appropriate. Never substitute one when the other is more appropriate. |
+
+#### Distint'ish
+
+It's important to keep in mind that `null` and `undefined` *are* actually distinct types, and thus `null` is quite noticeably distinct from `undefined`. You can, carefully, construct programs that mostly treat them as indistinguishable. But that requires care and discipline by the developer. From JS's perspective, they're often distinct.
+
+There are cases where `null` and `undefined` will trigger different behavior by the language, which is important to keep in mind. We won't cover all the cases exhaustively here, but here's on example:
+
+```js
+function greet(msg = "Hello") {
+    console.log(msg);
+}
+
+greet();            // Hello
+greet(undefined);   // Hello
+greet("Hi");        // Hi
+
+greet(null);        // null
+```
+
+The `= ..` clause on a parameter is referred to as the "parameter default". It only kicks in and assigns its default value to the parameter if the argument in that position is missing, or is exactly the `undefined` value. If you pass `null`, that clause doesn't trigger, and `null` is thus assigned to the parameter.
 
 ### Boolean Values
 
-The `boolean` type contains two values: `true` and `false`.
+The `boolean` type contains two values: `false` and `true`.
 
 // TODO
 
