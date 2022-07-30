@@ -190,11 +190,73 @@ The `!` operator negates/flips a boolean value to the other one: `false` becomes
 
 ### String Values
 
-The `string` type contains any value which is a collection of one or more characters:
+The `string` type contains any value which is a collection of one or more characters, delimited (surrounding on either side) by quote characters:
 
 ```js
 myName = "Kyle";
 ```
+
+Strings can be delimited by double-quotes (`"`), single-quotes (`'`), or back-ticks (`` ` ``). The ending delimiter must always match the starting delimiter.
+
+Strings have an intrinsic length which corresponds to how many code-points they contain. This does not necessarily correspond to the number of visible characters you type between the start and end delimiters (aka, the string literal). It can sometimes be a little confusing to keep straight the difference between a string literal and the underlying string value, so pay close attention.
+
+If `"` or `'` are used to delimit a string literal, the contents are only parsed for *character-escape sequences*: `\` followed by one or more characters that JS recognizes and parses with special meaning. Any other characters in a string that don't parse as escape-sequences (single-character or multi-character), are inserted as-is into the string value.
+
+#### Single-Character Escapes
+
+For single-character escape sequences, the following characters are recognized after a `\`: `bfnrtv0'"\`. For example,  `\n` (new-line), `\t` (tab), etc.
+
+If a `\` is followed by any other character (except `x` and `u` -- explained below), like for example `\g`, such a sequence is parsed as just the literal character itself (`g`), dropping the preceding `\`.
+
+If you want to include a `"` in the middle of a `"`-delimited string literal, use the `\"` escape sequence. Similarly, if you're including a `'` character in the middle of a `'`-delimited string literal, use the `\'` escape sequence. By contrast, a `'` does *not* need to be escaped inside a `"`-delimited string, nor vice versa.
+
+```js
+myName = "Kyle Simpson (aka, \"getify\")";
+
+console.log(myName);
+// Kyle Simpson (aka, "getify")
+```
+
+To include a literal `\` backslash character in a string literal, use the `\\` (two backslashes) character-escape sequence. So, then... what would `\\\` (three backslashes) parse as? The first two `\`'s would be a `\\` escape sequence, thereby inserting just a single `\` character in the string value. The remaining third `\` would just escape whatever character comes immediately after it.
+
+```js
+windowsDriveLocation =
+    "C:\\\"Program Files\\Common Files\\\"";
+
+console.log(windowsDriveLocation);
+// C:\"Program Files\Common Files\"
+```
+
+| TIP: |
+| :--- |
+| What about four backslashes `\\\\` in a string literal? Well, that's just two `\\` escape sequences next to each other, so it results in two adjacent backslashes (`\\`) in the underlying string value. If you're paying attention, you'll see there's an odd/even pattern rule here. You should thus be able to deciper any odd (`\\\\\`, `\\\\\\\\\`, etc) or even (`\\\\\\`, `\\\\\\\\\\`, etc) number of backslashes in a string literal. |
+
+#### Multi-Character Escapes
+
+Multi-character escape sequences may be hexadecimal or unicode sequences.
+
+Hexidecimal escape sequences are used to encode any of the base ASCII characters (codes 0-255), and look like `\x` followed by exactly two hexidecimal characters (`0-9` and `a-f` / `A-F` -- case insensitive). For example, the escape-sequence `\xA9` (or `\xa9`) corresponds to the ASCII character with code-point `169`: `©` (copyright symbol).
+
+Unicode escape sequences encode any of the characters in the unicode set whose code-point values are from 0-65535, and look like `\u` followed by exactly four hexidecimal characters. For example, the escape-sequence `\u00A9` (or `\u00a9`) corresponds to that same `©` symbol, while `\u263A` (or `\u263a`) corresponds to the unicode character with code-point `9786`: `☺` (smiley face symbol).
+
+When any character-escape sequence (regardless of length) is recognized, the single character it represents is inserted into the string, rather than the original separate characters. So, in the string `"\u263A"`, there's only one (smiley) character, not six individual characters.
+
+#### Line Continuation
+
+The `\` followed by an actual new-line character (not just literal `n`) is a special case, and it creates what's called a line-continuation:
+
+```js
+greeting = "Hello \
+Friends!";
+
+console.log(greeting);
+// Hello
+// Friends!
+```
+
+As you can see, the new-line at the end of the `greeting = ` line is immediately preceded by a `\`, which allows this string literal to continue onto the subsequent line. Without the escaping `\` before it, a new-line appearing in a `"` or `'` delimited string literal would actually produce a JS syntax parsing error.
+
+The new-line itself is still in the string value.
 
 // TODO
 
