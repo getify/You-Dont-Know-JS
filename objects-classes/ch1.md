@@ -706,4 +706,4 @@ The most common usage of objects is as containers for multiple values. We create
 
 But there's a lot more to objects than just static collections of property names and values. In the next chapter, we'll dive under the hood to look at how they actually work.
 
-[^structuredClone]: "Structured Clone Algorithm", HTML Specification, https://html.spec.whatwg.org/multipage/structured-data.html#structured-cloning, Accessed July 2022.
+[^structuredClone]: "Structured Clone Algorithm", HTML Specification; https://html.spec.whatwg.org/multipage/structured-data.html#structured-cloning ; Accessed July 2022

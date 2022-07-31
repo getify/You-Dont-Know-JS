@@ -1257,4 +1257,4 @@ The good news, perhaps, is that in practice you don't often trip over all these 
 
 The lesson here is that you should be intentional and aware of all aspects of `this` before you go sprinkling it about your code. Make sure you're using it most effectively and taking full advantage of this important pillar of JS.
 
-[^globalThisPolyfill]: "A horrifying globalThis polyfill in universal JavaScript", Mathias Bynens, April 18 2019, https://mathiasbynens.be/notes/globalthis#robust-polyfill, Accessed July 2022.
+[^globalThisPolyfill]: "A horrifying globalThis polyfill in universal JavaScript"; Mathias Bynens; April 18 2019; https://mathiasbynens.be/notes/globalthis#robust-polyfill ; Accessed July 2022
