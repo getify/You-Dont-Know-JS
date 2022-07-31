@@ -439,6 +439,49 @@ Number.isInteger(42.000000);    // true
 Number.isInteger(42.0000001);   // false
 ```
 
+#### Parsing vs Coercion
+
+If a string value holds numeric-looking contents, you may need to convert from that string value to a `number`, for mathematical operation purposes.
+
+However, it's very important to distinguish between parsing-conversion and coercive-conversion.
+
+We can parse-convert with JS's built-in `parseInt(..)` or `parseFloat(..)` utilities:
+
+```js
+someNumericText = "123.456";
+
+parseInt(someNumericText,10);               // 123
+parseFloat(someNumericText);                // 123.456
+
+parseInt("42",10) === parseFloat("42");     // true
+
+parseInt("512px");                          // 512
+```
+
+Parsing is a character-by-character (left-to-right) operation, that pulls out numeric-looking characters from the string, and puts them into a `number` value. Parsing stops once it encounters a character that's non-numeric (e.g., not `-`, `.` or `0`-`9`). If parsing fails on the first character, both utilities return the special `NaN` value (see "Invalid Number" below).
+
+When `parseInt(..)` encounters the `.`, it stops, leaving only the `123` in the result `number` value. `parseFloat(..)` by contrast accepts this character, and keeps right on parsing.
+
+The `parseInt(..)` utility specifically, takes as a second argument the `radix`: the numeric base to assume for parsing the string characters into a `number`. `10` is for standard base-10 numbers, `8` is for octal, and `16` is hexadecimal. Any other `radix`, like `23`, assumes `0` - `9` followed by `a` - `z` (case insensitive) character ordination.
+
+If `radix` is omitted, the behavior of `parseInt(..)` is rather nuanced and confusing, in that it attempts to make a best-guess based on what it sees in the first character. This leads to lots of subtle bugs, so never rely on the default auto-guessing; always specify an explicit radix (like `10` in the calls above).
+
+`parseFloat(..)` always parses with a radix of `10`.
+
+In contrast to parsing-conversion, coercive-conversion is an all-or-nothing sort of operation. Either the entire contents of the string are recognized as numeric (integer or floating-point), or the whole conversion fails (resulting in `NaN` -- again, see "Invalid Number" later in this chapter).
+
+Coercive-conversion can be done explicitly with the `Number(..)` function (no `new` keyword) or with the unary `+` operator in front of the value:
+
+```js
+someNumericText = "123.456";
+
+Number(someNumericText);        // 123.456
++someNumericText;               // 123.456
+
+Number("512px");                // NaN
++"512px";                       // NaN
+```
+
 #### IEEE-754 Bitwise Binary Representations
 
 IEEE-754[^IEEE754] is a technical standard for binary representation of decimal numbers. It's widely used by most computer programming languages, including JS, Python, Ruby, etc.
@@ -671,9 +714,15 @@ Without having a signed zero value, you couldn't tell which direction such an it
 
 #### Invalid Number
 
-Mathematical operations can sometimes produce an invalid result. For example, if you try to divide a number by a string (`42 / "Kyle"`), that's an invalid mathematical operation.
+Mathematical operations can sometimes produce an invalid result. For example:
 
-Another type of invalid numeric operation is trying to convert/coerce a non-numeric type of value to a `number`. We can do so with either the `Number(..)` function (no `new` keyword) or with the unary `+` operator in front of the value:
+```js
+42 / "Kyle";            // NaN
+```
+
+It's probably obvious, but if you try to divide a number by a string, that's an invalid mathematical operation.
+
+Another type of invalid numeric operation is trying to coercively-convert a non-numeric resembling value to a `number`. As discussed earlier, we can do so with either the `Number(..)` function or the unary `+` operator:
 
 ```js
 myAge = Number("just a number");
@@ -683,7 +732,7 @@ myAge;                  // NaN
 +undefined;             // NaN
 ```
 
-All such invalid operations (mathematical or numeric) produce the special `number` value called `NaN`.
+All such invalid operations (mathematical or coercive/numeric) produce the special `number` value called `NaN`.
 
 The historical root of "NaN" (including from the IEEE-754[^IEEE754] specification) is as an acronym for "Not a Number". Unfortunately, that meaning produces confusion, since `NaN` is *absolutely* a `number`.
 
@@ -749,13 +798,45 @@ myBigInt = 9007199254740991n;
 myBigInt + 2n;                  // 9007199254740993n -- phew!
 ```
 
+As you can see, the `bigint` value-type is able to do precise arithmetic above the integer limit of the `number` value-type.
+
 | WARNING: |
 | :--- |
 | Notice that the `+` operator required `.. + 2n` instead of just `.. + 2`? You cannot mix `number` and `bigint` value-types in the same expression. This restriction is annoying, but it protects your program from invalid mathematical operations that would give non-obvious unexpected results. |
 
-As shown, the `bigint` value-type is able to do precise arithmetic above the integer limit of the `number` value-type.
+A `bigint` value can also be created with the `BigInt(..)` function; for example, to convert a whole (integer) `number` value to a `bigint`:
 
-// TODO
+```js
+myAge = 42n;
+
+inc = 1;
+
+myAge += BigInt(inc);
+
+myAge;              // 43n
+```
+
+| WARNING: |
+| :--- |
+| Though it may seem counter-intuitive to some readers, `BigInt(..)` is *always* called without the `new` keyword. If `new` is used, an exception will be thrown. |
+
+That's definitely one of the most common usages of the `BigInt(..)` function: to convert `number`s to `bigint`s, for mathematical operation purposes.
+
+But it's not that uncommon to have large integer values represented as strings, especially if those values are coming to the JS environment from other locations, or via exchange formats, which themselves do not support `bigint`-style values.
+
+As such, `BigInt(..)` is useful to parse those string values and convert them to `bigint`s:
+
+```js
+myBigInt = BigInt("12345678901234567890");
+
+myBigInt;                       // 12345678901234567890n
+```
+
+Unlike `parseInt(..)`, if any character in the string is non-numeric (`0-9` digits or `-`), including `.` or even a trailing `n` suffix character, an exception will be thrown. In other words, `BigInt(..)` is all-or-nothing in its parsing/conversion.
+
+| NOTE: |
+| :--- |
+| I think it's absurd that `BigInt(..)` won't accept the trailing `n` character while string parsing (and effectively ignore it). I lobbied vehemently for that in the TC39 process, but was ultimately denied. In my opinion, it's now a tiny little wart on JS, but a wart nonetheless. |
 
 ### Symbol Values
 
@@ -764,6 +845,10 @@ The `symbol` type contains special opaque values called "symbols". These values 
 ```js
 secret = Symbol("my secret");
 ```
+
+| WARNING: |
+| :--- |
+| Just as with `BigInt(..)`, the `Symbol(..)` function must be called without the `new` keyword. |
 
 The `"my secret"` string passed into the `Symbol` is *not* the symbol value itself, even though it seems that way. It's an optional descriptive label, used only for debugging purposes for the benefit of the developer.
 
