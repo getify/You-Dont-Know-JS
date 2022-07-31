@@ -9,7 +9,7 @@
 * Foreword
 * Preface
 * Chapter 1: Primitives
-	* Core Values
+	* Built-in Values
     * Value Immutability
     * Assignments Are Value Copies
     * TODO
