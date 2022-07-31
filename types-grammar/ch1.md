@@ -224,7 +224,7 @@ myName = "Kyle";
 
 Strings can be delimited by double-quotes (`"`), single-quotes (`'`), or back-ticks (`` ` ``). The ending delimiter must always match the starting delimiter.
 
-Strings have an intrinsic length which corresponds to how many code-points they contain.
+Strings have an intrinsic length which corresponds to how many code-points -- actually, code-units, more on that in a moment -- they contain.
 
 ```js
 myName = "Kyle";
@@ -232,7 +232,7 @@ myName = "Kyle";
 myName.length;      // 4
 ```
 
-This does not necessarily correspond to the number of visible characters you type between the start and end delimiters (aka, the string literal). It can sometimes be a little confusing to keep straight the difference between a string literal and the underlying string value, so pay close attention.
+This does not necessarily correspond to the number of visible characters present between the start and end delimiters (aka, the string literal). It can sometimes be a little confusing to keep straight the difference between a string literal and the underlying string value, so pay close attention.
 
 #### JS Character Encodings
 
@@ -240,11 +240,11 @@ What type of character encoding does JS use for string characters?
 
 One might assume UTF-8 (8-bit) or UTF-16 (16-bit). It's actually more complicated, because you also need to consider UCS-2 (2-byte Universal Character Set), which is similar to UTF-16, but not quite the same. [^UTFUCS]
 
-The first 65,535 code points in Unicode is called the BMP (Basic Multilingual Plane). All the rest of the code points are grouped into 16 so called "supplemental planes" or "astral planes". When representing Unicode characters from the BMP, it's pretty straightforward.
+The first group of 65,535 code points in Unicode is called the BMP (Basic Multilingual Plane). All the rest of the code points are grouped into 16 so called "supplemental planes" or "astral planes". When representing Unicode characters from the BMP, it's pretty straightforward, as they can *fit* neatly into single JS characters.
 
 But when representing extended characters outside the BMP, JS actually represents these characters code-points as a pairing of two separate code units, called *surrogate halves*.
 
-For example, the Unicode code point `127878` (hexadecimal `1F386`) is `🎆` (fireworks symbol). JS stores this as two surrogate halve code units, `U+D83C` and `U+DF86`.
+For example, the Unicode code point `127878` (hexadecimal `1F386`) is `🎆` (fireworks symbol). JS stores this in the string value as two surrogate-halve code units: `U+D83C` and `U+DF86`.
 
 This has implications on the length of strings, because a single visible character like the `🎆` fireworks symbol, when in a JS string, is a counted as 2 characters for the purposes of the string length!
 
@@ -254,36 +254,40 @@ We'll revisit Unicode characters shortly.
 
 If `"` or `'` are used to delimit a string literal, the contents are only parsed for *character-escape sequences*: `\` followed by one or more characters that JS recognizes and parses with special meaning. Any other characters in a string that don't parse as escape-sequences (single-character or multi-character), are inserted as-is into the string value.
 
-For single-character escape sequences, the following characters are recognized after a `\`: `bfnrtv0'"\`. For example,  `\n` (new-line), `\t` (tab), etc.
+For single-character escape sequences, the following characters are recognized after a `\`: `b`, `f`, `n`, `r`, `t`, `v`, `0`, `'`, `"`, and `\`. For example,  `\n` means new-line, `\t` means tab, etc.
 
-If a `\` is followed by any other character (except `x` and `u` -- explained below), like for example `\g`, such a sequence is parsed as just the literal character itself (`g`), dropping the preceding `\`.
+If a `\` is followed by any other character (except `x` and `u` -- explained below), like for example `\k`, that sequence is interpted as the `\` being an unnecessary escape, which is thus dropped, leaving just the literal character itself (`k`).
 
-If you want to include a `"` in the middle of a `"`-delimited string literal, use the `\"` escape sequence. Similarly, if you're including a `'` character in the middle of a `'`-delimited string literal, use the `\'` escape sequence. By contrast, a `'` does *not* need to be escaped inside a `"`-delimited string, nor vice versa.
+To include a `"` in the middle of a `"`-delimited string literal, use the `\"` escape sequence. Similarly, if you're including a `'` character in the middle of a `'`-delimited string literal, use the `\'` escape sequence. By contrast, a `'` does *not* need to be escaped inside a `"`-delimited string, nor vice versa.
 
 ```js
-myName = "Kyle Simpson (aka, \"getify\")";
+myTitle = "Kyle Simpson (aka, \"getify\"), former O'Reilly author";
 
-console.log(myName);
-// Kyle Simpson (aka, "getify")
+console.log(myTitle);
+// Kyle Simpson (aka, "getify"), former O'Reilly author
 ```
 
-To include a literal `\` backslash character in a string literal, use the `\\` (two backslashes) character-escape sequence. So, then... what would `\\\` (three backslashes) parse as? The first two `\`'s would be a `\\` escape sequence, thereby inserting just a single `\` character in the string value. The remaining third `\` would just escape whatever character comes immediately after it.
+In text, forward slash `/` is most common. But occasionally, you need a backward slash `\`. To include a literal `\` backslash character without it performing as the start of a character-escape sequence, use the `\\` (double backslashes).
+
+So, then... what would `\\\` (three backslashes) in a string parse as? The first two `\`'s would be a `\\` escape sequence, thereby inserting just a single `\` character in the string value, and the remaining `\` would just escape whatever character comes immediately after it.
+
+One place backslashes show up commonly is in Windows file paths, which use the `\` separator instead of the `/` separator used in linux/unix style paths:
 
 ```js
-windowsDriveLocation =
-    "C:\\\"Program Files\\Common Files\\\"";
+windowsFontsPath =
+    "C:\\Windows\\Fonts\\";
 
-console.log(windowsDriveLocation);
-// C:\"Program Files\Common Files\"
+console.log(windowsFontsPath);
+// C:\Windows\Fonts\"
 ```
 
 | TIP: |
 | :--- |
-| What about four backslashes `\\\\` in a string literal? Well, that's just two `\\` escape sequences next to each other, so it results in two adjacent backslashes (`\\`) in the underlying string value. If you're paying attention, you'll see there's an odd/even pattern rule here. You should thus be able to deciper any odd (`\\\\\`, `\\\\\\\\\`, etc) or even (`\\\\\\`, `\\\\\\\\\\`, etc) number of backslashes in a string literal. |
+| What about four backslashes `\\\\` in a string literal? Well, that's just two `\\` escape sequences next to each other, so it results in two adjacent backslashes (`\\`) in the underlying string value. You might recognize there's an odd/even rule pattern at play. You should thus be able to deciper any odd (`\\\\\`, `\\\\\\\\\`, etc) or even (`\\\\\\`, `\\\\\\\\\\`, etc) number of backslashes in a string literal. |
 
 #### Multi-Character Escapes
 
-Multi-character escape sequences may be hexadecimal or unicode sequences.
+Multi-character escape sequences may be hexadecimal or Unicode sequences.
 
 Hexidecimal escape sequences are used to encode any of the base ASCII characters (codes 0-255), and look like `\x` followed by exactly two hexadecimal characters (`0-9` and `a-f` / `A-F` -- case insensitive). For example, `A9` or `a9` are decimal value `169`, which corresponds to:
 
@@ -301,13 +305,13 @@ For any normal character that can be typed on a keyboard, such as `"a"`, it's us
 
 ##### Unicode
 
-Unicode escape sequences encode any of the characters in the unicode set whose code-point values range from 0-65535, and look like `\u` followed by exactly four hexadecimal characters. For example, the escape-sequence `\u00A9` (or `\u00a9`) corresponds to that same `©` symbol, while `\u263A` (or `\u263a`) corresponds to the unicode character with code-point `9786`: `☺` (smiley face symbol).
+Unicode escape sequences encode any of the characters in the Unicode set whose code-point values range from 0-65535. They look like `\u` followed by exactly four hexadecimal characters. For example, the escape-sequence `\u00A9` (or `\u00a9`) corresponds to that same `©` symbol, while `\u263A` (or `\u263a`) corresponds to the Unicode character with code-point `9786`: `☺` (smiley face symbol).
 
 When any character-escape sequence (regardless of length) is recognized, the single character it represents is inserted into the string, rather than the original separate characters. So, in the string `"\u263A"`, there's only one (smiley) character, not six individual characters.
 
-Unicode code-points can go well above `65535` (`FFFF` in hexadecimal), up to a maximum of `1114111` (`10FFFF` in hexadecimal). For example, `1F4A9` is decimal code-point `128169`, which corresponds to the funny `💩` (pile of poo) character.
+Unicode code-points can go well above `65535` (`FFFF` in hexadecimal), up to a maximum of `1114111` (`10FFFF` in hexadecimal). For example, `1F4A9` (or `1f4a9`)is decimal code-point `128169`, which corresponds to the funny `💩` (pile of poo) symbol.
 
-But `"\u1F4A9"` wouldn't work as expected, since it would be parsed as `\u1F4A` as a unicode escape sequence, followed by just the `9` literal character. To address this limitation, a variation of unicode escape sequences was introduced in ES6, to allow an arbitrary number of hexadecimal characters after the `\u`, by surrounding them with `{ .. }` curly braces:
+But `\u1F4A9` wouldn't work to include this character in a string, since it would be parsed as the Unicode escape sequence `\u1F4A`, followed by a literal `9` character. To address this limitation, a variation of Unicode escape sequences was introduced to allow an arbitrary number of hexadecimal characters after the `\u`, by surrounding them with `{ .. }` curly braces:
 
 ```js
 myReaction = "\u{1F4A9}";
@@ -316,7 +320,7 @@ console.log(myReaction);
 // 💩
 ```
 
-Recall the earlier discussion of extended (non-BMP) Unicode characters, *surrogate halves*? The same `💩` could also be defined with the explicit code-units:
+Recall the earlier discussion of extended (non-BMP) Unicode characters and *surrogate halves*? The same `💩` could also be defined with the two explicit code-units:
 
 ```js
 myReaction = "\uD83D\uDCA9";
@@ -325,14 +329,14 @@ console.log(myReaction);
 // 💩
 ```
 
-All three representations of this same character are stored internally by JS identically and are indistinguishable:
+All three representations of this same character are stored internally by JS identically, and are indistinguishable:
 
 ```js
 "💩" === "\u{1F4A9}";                // true
 "\u{1F4A9}" === "\uD83D\uDCA9";     // true
 ```
 
-Even though JS doesn't care which way such a character is represented, consider the readability differences carefully when authoring your code.
+Even though JS doesn't care which way such a character is represented in your program, consider the readability differences carefully when authoring your code.
 
 #### Line Continuation
 
@@ -380,11 +384,19 @@ Everything between the `{ .. }` in such a template literal is an arbitrary JS ex
 | :--- |
 | This feature is commonly called "template literals" or "template strings", but I think that's confusing. "Template" is usually referred to in programming contexts as a reusable definition that can be re-evaluated with different data. For example, *template engines* for pages, email templates for newsletter campaigns, etc. This JS feature is not re-usable. It's a literal, and it produces a single, immediate value (usually a string). You can put such a value in a function, and call the function multiple times. But then the function is acting as the template, not the the literal itself. I prefer instead to refer to this feature as *interpolated literals*, or the funny, shortened *interpoliterals*, as I think this name is more accurately descriptive. |
 
-Some JS developers believe that this style of string literal is preferable to use for *all* strings, even if you're not doing any expression interpolation. I disagree. I think it should only be used when interpolating, and classic `".."` or `'..'` delimited strings should be used for non-interpolated string definitions.
+Template literals usually result in a string value, but not always. A form of template literal that may look kind of strange is called a *tagged template literal*:
+
+```js
+price = formatCurrency`The cost is: ${totalCost}`;
+```
+
+Here, `formatCurrency` is a tag applied to the template literal value, which actually invokes `formatCurrency(..)` as a function, passing it the string literals and interpolated expressions parsed from the value. This function can then assemble those in any way it sees fit -- such as formatting a `number` value as currency in the current locale -- and return whatever value, string or otherwise, that it wants. So tagged template literals are not always strings. But untagged template literals will always be strings.
+
+Some JS developers believe that untagged template literal strings are preferable to use for *all* strings, even if not doing any expression interpolation. I disagree. I think it should only be used when interpolating, and classic `".."` or `'..'` delimited strings should be used for non-interpolated string definitions.
 
 Moreover, there are a few places where `` `..` `` style strings are disallowed. For example, the `"use strict"` pragma cannot use back-ticks, or the pragma will be silently ignored (and thus the program accidentally runs in non-strict mode). Also, this style of strings cannot be used in quoted property names of object literals, or in the ES Module `import .. from ..` module-specifier clause.
 
-My advice: use `` `..` `` delimited strings where allowed, and only when interpolation is needed, but keep using `".."` or `'..'` delimited strings for all other strings.
+My advice: use `` `..` `` delimited strings where allowed, but only when interpolation is needed, and keep using `".."` or `'..'` delimited strings for all other strings.
 
 ### Number Values
 
