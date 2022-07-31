@@ -618,6 +618,86 @@ Depending on how you interpret "smallest", you could either answer `0` or... `Nu
 Number.MIN_SAFE_INTEGER;    // -9007199254740991
 ```
 
+#### Double Zeros
+
+It may surprise you to learn that JS has two zeros: `0`, and `-0` (negative zero). But what on earth is a "negative zero"? A mathematician would surely balk at such a notion.
+
+This isn't just a funny JS quirk; it's mandated by the IEEE-754[^IEEE754] specification. All floating point numbers are signed, including zero. And though JS does kind of hide the existence of `-0`, it's entirely possible to produce it and to detect it:
+
+```js
+function isNegZero(v) {
+    return v == 0 && (1 / v) == -Infinity;
+}
+
+regZero = 0 / 1;
+negZero = 0 / -1;
+
+regZero === negZero;        // true -- oops!
+Object.is(-0,regZero);      // false -- phew!
+Object.is(-0,negZero);      // true
+
+isNegZero(regZero);         // false
+isNegZero(negZero);         // true
+```
+
+You may wonder why we'd ever need such a thing as `-0`. It can be useful when using numbers to represent both the magnitude of movement (speed) of some item (like a game character or an animation) and also its direction (e.g., negative = left, positive = right).
+
+Without having a signed zero value, you couldn't tell which direction such an item was pointing at the moment it came to rest.
+
+#### Invalid Number
+
+Mathematical operations can sometimes produce an invalid result. For example, if you try to divide a number by a string (`42 / "Kyle"`), that's an invalid mathematical operation.
+
+Another type of invalid numeric operation is trying to convert/coerce a non-numeric type of value to a `number`. We can do so with either the `Number(..)` function (no `new` keyword) or with the unary `+` operator in front of the value:
+
+```js
+myAge = Number("just a number");
+
+myAge;                  // NaN
+
++undefined;             // NaN
+```
+
+All such invalid operations (mathematical or numeric) produce the special `number` value called `NaN`.
+
+The historical root of "NaN" (including from the IEEE-754[^IEEE754] specification) is as an acronym for "Not a Number". Unfortunately, that meaning produces confusion, since `NaN` is *absolutely* a `number`.
+
+| TIP: |
+| :--- |
+| Why is `NaN` a `number`?!? Think of the opposite: what if a mathematical/numeric operation, like `+` or `/`, produced a non-`number` value (like `null`, `undefined`, etc)? Wouldn't that be really strange and unexpected? What if they threw exceptions, so that you had to `try..catch` all your math? The only sensible behavior is, numeric/mathematical operations should *always* produce a `number`, even if that value is invalid because it came from an invalid operation. |
+
+To avoid such confusion, I strongly prefer to define "NaN" as any of the following instead:
+
+* "iNvalid Number"
+* "Not actual Number"
+* "Not available Number"
+* "Not applicable Number"
+
+`NaN` is a special value in JS, in that it's the only value in the language that lacks the *identity property* -- it's never equal to itself.
+
+```js
+NaN === NaN;            // false
+```
+
+So unfortunately, the `===` operator cannot check a value to see if it's `NaN`. But there are some ways to do so:
+
+```js
+politicianIQ = "nothing" / Infinity;
+
+Number.isNaN(politicianIQ);         // true
+
+Object.is(NaN,politicianIQ);        // true
+[ NaN ].includes(politicianIQ);     // true
+```
+
+Here's a fact of virtually all JS programs, whether you realize it or not: `NaN` happens. Seriously, almost all programs that do any math or numeric conversions are subject to `NaN` showing up.
+
+If you're not properly checking for `NaN` in your programs where you do math or numeric conversions, I can say with some degree of certainty: you probably have a number bug in your program somewhere, and it just hasn't bitten you yet (that you know of!).
+
+| WARNING: |
+| :--- |
+| JS originally provided a global function called `isNaN(..)` for `NaN` checking, but it unfortunately has a long-standing coercion bug. `isNaN("Kyle")` returns `true`, even though the string value `"Kyle"` is most definitely *not* the `NaN` value. This is because the global `isNaN(..)` function forces any non-`number` argument to coerce to a `number` first, before checking for `NaN`. Coercing `"Kyle"` to a `number` produces `NaN`, so now the function sees a `NaN` and returns `true`! This buggy global `isNaN(..)` still exists in JS, but should never be used. When `NaN` checking, always use `Number.isNaN(..)`, `Object.is(..)`, etc. |
+
 ### BigInteger Values
 
 As the maximum safe integer in JS `number`s is `9007199254740991`, such a relatively low limit can present a problem if a JS program needs to do larger integer math, or even just hold values like 64-bit integer IDs (e.g., Twitter Tweet IDs).
