@@ -9,9 +9,11 @@ In Chapter 1 of the "Objects & Classes" book of this series, we confronted the c
 
 Here, we'll look at the core value types of JS, specifically the non-object types called *primitives*.
 
-## Built-in Values
+## Value Types
 
-JS provides seven built-in, primitive (non-object) value types:
+JS doesn't apply types to variables or properties -- what I call, "container types" -- but rather, values themselves have types -- what I call, "value types".
+
+The language provides seven built-in, primitive (non-object) value types:
 
 * `null`
 * `undefined`
@@ -21,9 +23,7 @@ JS provides seven built-in, primitive (non-object) value types:
 * `bigint`
 * `symbol`
 
-JS doesn't apply types to variables or properties -- what I call, "container types" -- but rather, values themselves have types -- what I call, "value types".
-
-These value-types define collections of one or more concrete values. Each value-type has a shared set of expected behaviors for all values of that type.
+These value-types define collections of one or more concrete values, each with a set of shared behaviors for all values of that type.
 
 ### Type-Of
 
@@ -48,7 +48,7 @@ typeof greeting;        // "string"
 
 JS variables themselves don't have types. They hold any arbitrary value, which itself has a value-type.
 
-### Empty Values
+## Empty Values
 
 The `null` and `undefined` types both typically represent an emptiness or absence of value.
 
@@ -83,7 +83,7 @@ typeof whatever[10];            // "undefined"
 
 However, each respective "empty" type has exactly one value, of the same name. So `null` is the only value in the `null` value-type, and `undefined` is the only value in the `undefined` value-type.
 
-#### Null'ish
+### Null'ish
 
 Semantically, `null` and `undefined` types both represent general emptiness, or absence of another affirmative, meaningful value.
 
@@ -164,7 +164,7 @@ The `?.(` operator seems like it is checking to see if `someFunc(..)` is a valid
 | :--- |
 | Because of that gotcha, I *strongly dislike* this operator form, and caution anyone against ever using it. I think it's a poorly conceived feature that does more harm (to JS itself, and to programs) than good. There's very few JS features I would go so far as to say, "never use it." But this is one of the truly *bad parts* of the language, in my opinion. |
 
-#### Distinct'ish
+### Distinct'ish
 
 It's important to keep in mind that `null` and `undefined` *are* actually distinct types, and thus `null` can be noticeably different from `undefined`. You can, carefully, construct programs that mostly treat them as indistinguishable. But that requires care and discipline by the developer. From JS's perspective, they're more often distinct.
 
@@ -186,7 +186,7 @@ The `= ..` clause on a parameter is referred to as the "parameter default". It o
 
 There's no *right* or *wrong* way to use `null` or `undefined` in a program. So the takeaway is: be careful when choosing one value or the other. And if you're using them interchangeably, be extra careful.
 
-### Boolean Values
+## Boolean Values
 
 The `boolean` type contains two values: `false` and `true`.
 
@@ -214,7 +214,7 @@ while (!isComplete) {
 
 The `!` operator negates/flips a boolean value to the other one: `false` becomes `true`, and `true` becomes `false`.
 
-### String Values
+## String Values
 
 The `string` type contains any value which is a collection of one or more characters, delimited (surrounding on either side) by quote characters:
 
@@ -234,7 +234,7 @@ myName.length;      // 4
 
 This does not necessarily correspond to the number of visible characters present between the start and end delimiters (aka, the string literal). It can sometimes be a little confusing to keep straight the difference between a string literal and the underlying string value, so pay close attention.
 
-#### JS Character Encodings
+### JS Character Encodings
 
 What type of character encoding does JS use for string characters?
 
@@ -250,7 +250,7 @@ This has implications on the length of strings, because a single visible charact
 
 We'll revisit Unicode characters shortly.
 
-#### Escape Sequences
+### Escape Sequences
 
 If `"` or `'` are used to delimit a string literal, the contents are only parsed for *character-escape sequences*: `\` followed by one or more characters that JS recognizes and parses with special meaning. Any other characters in a string that don't parse as escape-sequences (single-character or multi-character), are inserted as-is into the string value.
 
@@ -285,7 +285,7 @@ console.log(windowsFontsPath);
 | :--- |
 | What about four backslashes `\\\\` in a string literal? Well, that's just two `\\` escape sequences next to each other, so it results in two adjacent backslashes (`\\`) in the underlying string value. You might recognize there's an odd/even rule pattern at play. You should thus be able to deciper any odd (`\\\\\`, `\\\\\\\\\`, etc) or even (`\\\\\\`, `\\\\\\\\\\`, etc) number of backslashes in a string literal. |
 
-#### Multi-Character Escapes
+### Multi-Character Escapes
 
 Multi-character escape sequences may be hexadecimal or Unicode sequences.
 
@@ -303,7 +303,7 @@ For any normal character that can be typed on a keyboard, such as `"a"`, it's us
 "a" === "\x61";             // true
 ```
 
-##### Unicode
+#### Unicode
 
 Unicode escape sequences encode any of the characters in the Unicode set whose code-point values range from 0-65535. They look like `\u` followed by exactly four hexadecimal characters. For example, the escape-sequence `\u00A9` (or `\u00a9`) corresponds to that same `©` symbol, while `\u263A` (or `\u263a`) corresponds to the Unicode character with code-point `9786`: `☺` (smiley face symbol).
 
@@ -338,7 +338,7 @@ All three representations of this same character are stored internally by JS ide
 
 Even though JS doesn't care which way such a character is represented in your program, consider the readability differences carefully when authoring your code.
 
-#### Line Continuation
+### Line Continuation
 
 The `\` followed by an actual new-line character (not just literal `n`) is a special case, and it creates what's called a line-continuation:
 
@@ -358,7 +358,7 @@ Because the end-of-line `\` turns the new-line character into a line continuatio
 | :--- |
 | This line-continuation feature is often referred to as "multi-line strings", but I think that's a confusing label. As you can see, the string value itself doesn't have multiple lines, it only was defined across multiple lines via the line continuations. A multi-line string would actually have multiple lines in the underlying value. |
 
-#### Template Literals
+### Template Literals
 
 I mentioned earlier that strings can alternately be delimited with `` `..` `` back-ticks:
 
@@ -423,7 +423,7 @@ Moreover, there are a few places where `` `..` `` style strings are disallowed. 
 
 My take: use `` `..` `` delimited strings where allowed, but only when interpolation/multi-line is needed; and keep using `".."` or `'..'` delimited strings for everything else.
 
-### Number Values
+## Number Values
 
 The `number` type contains any numeric value (whole number or decimal), such as `-42` or `3.1415926`. These values are represented by the JS engine as 64-bit, IEEE-754 double-precision binary floating-point values. [^IEEE754]
 
@@ -439,7 +439,7 @@ Number.isInteger(42.000000);    // true
 Number.isInteger(42.0000001);   // false
 ```
 
-#### Parsing vs Coercion
+### Parsing vs Coercion
 
 If a string value holds numeric-looking contents, you may need to convert from that string value to a `number`, for mathematical operation purposes.
 
@@ -482,7 +482,7 @@ Number("512px");                // NaN
 +"512px";                       // NaN
 ```
 
-#### IEEE-754 Bitwise Binary Representations
+### IEEE-754 Bitwise Binary Representations
 
 IEEE-754[^IEEE754] is a technical standard for binary representation of decimal numbers. It's widely used by most computer programming languages, including JS, Python, Ruby, etc.
 
@@ -525,7 +525,7 @@ Notice how the previous bit pattern and this one differ by quite a few bits in t
 
 Now you understand a *bit more* about how IEEE-754 works!
 
-##### Floating Point Imprecision
+#### Floating Point Imprecision
 
 One of the classic gotchas of any IEEE-754 number system in any programming language -- NOT UNIQUELY JS! -- is that not all operations and values can fit neatly into the IEEE-754 representations.
 
@@ -567,7 +567,7 @@ Pretty much all programmers need to be aware of IEEE-754 and make sure they are 
 | :--- |
 | Shortly, we'll cover `Number.EPSILON`, which offers an approach to working around this floating point error situation when comparing numbers. |
 
-#### Number Limits
+### Number Limits
 
 As might be evident now that you've seen how IEEE-754 works, the 52 bits of the number's base must be shared, representing both the whole number portion (if any) as well as the decimal portion (if any), of the intended `number` value. Essentially, the larger the whole number portion to be represented, the less bits are available for the decimal portion, and vice versa.
 
@@ -630,7 +630,7 @@ Number.MIN_VALUE;               // 5e-324 <-- usually!
 
 Most JS engines seem to have a minimum representable value around `5E-324` (about `2^-1074`). Depending on the engine and/or platform, a different value may be exposed. Be careful about any program logic that relies on such implementation-dependent values.
 
-#### Safely Small
+### Safely Small
 
 There's another *very small* `number` value you may want to use:
 
@@ -660,7 +660,7 @@ Since JS cannot represent a difference between two values smaller than this `Num
 | :--- |
 | If your program needs to deal with smaller values, or more specifically, smaller differences between values, than `2^-52`, you should absolutely *not use* the `number` value-type. There are decimal-emulation libraries that can offer arbitrary (small or large) precision. Or pick a different language than JS. |
 
-#### Safe Integer Limits
+### Safe Integer Limits
 
 Since `Number.MAX_VALUE` is an integer, you might assume that it's the largest integer in the language. But that's not really accurate.
 
@@ -686,7 +686,7 @@ Depending on how you interpret "smallest", you could either answer `0` or... `Nu
 Number.MIN_SAFE_INTEGER;    // -9007199254740991
 ```
 
-#### Double Zeros
+### Double Zeros
 
 It may surprise you to learn that JS has two zeros: `0`, and `-0` (negative zero). But what on earth is a "negative zero"? A mathematician would surely balk at such a notion.
 
@@ -712,7 +712,7 @@ You may wonder why we'd ever need such a thing as `-0`. It can be useful when us
 
 Without having a signed zero value, you couldn't tell which direction such an item was pointing at the moment it came to rest.
 
-#### Invalid Number
+### Invalid Number
 
 Mathematical operations can sometimes produce an invalid result. For example:
 
@@ -772,7 +772,7 @@ If you're not properly checking for `NaN` in your programs where you do math or 
 | :--- |
 | JS originally provided a global function called `isNaN(..)` for `NaN` checking, but it unfortunately has a long-standing coercion bug. `isNaN("Kyle")` returns `true`, even though the string value `"Kyle"` is most definitely *not* the `NaN` value. This is because the global `isNaN(..)` function forces any non-`number` argument to coerce to a `number` first, before checking for `NaN`. Coercing `"Kyle"` to a `number` produces `NaN`, so now the function sees a `NaN` and returns `true`! This buggy global `isNaN(..)` still exists in JS, but should never be used. When `NaN` checking, always use `Number.isNaN(..)`, `Object.is(..)`, etc. |
 
-### BigInteger Values
+## BigInteger Values
 
 As the maximum safe integer in JS `number`s is `9007199254740991`, such a relatively low limit can present a problem if a JS program needs to do larger integer math, or even just hold values like 64-bit integer IDs (e.g., Twitter Tweet IDs).
 
@@ -838,7 +838,7 @@ Unlike `parseInt(..)`, if any character in the string is non-numeric (`0-9` digi
 | :--- |
 | I think it's absurd that `BigInt(..)` won't accept the trailing `n` character while string parsing (and effectively ignore it). I lobbied vehemently for that in the TC39 process, but was ultimately denied. In my opinion, it's now a tiny little wart on JS, but a wart nonetheless. |
 
-### Symbol Values
+## Symbol Values
 
 The `symbol` type contains special opaque values called "symbols". These values can only be created by the `Symbol(..)` function:
 
@@ -855,36 +855,6 @@ The `"my secret"` string passed into the `Symbol` is *not* the symbol value itse
 The underlying value returned from `Symbol(..)` is a special kind of value that resists the program/developer inspecting anything about its underlying representation. That's what I mean by "opaque".
 
 Symbols are guaranteed by the JS engine to be unique (only within the program itself), and are unguessable. In other words, a duplicate symbol value can never be created in a program.
-
-// TODO
-
-## Value Immutability
-
-All primitive values are immutable, meaning nothing in a JS program can reach into the inside of the value and modify it in any way.
-
-New values are created through operations, but these do not modify the original value.
-
-```js
-42 + 1;             // 43
-
-"Hello" + "!";      // "Hello!"
-```
-
-The values `43` and `"Hello!"` are new, distinct values from the `42` and `"Hello"` values, respectively.
-
-// TODO
-
-## Assignments Are Value Copies
-
-Any assignment of a value from one variable/container to another is a *value-copy*.
-
-```js
-myAge = 42;
-
-yourAge = myAge;        // assigned by value-copy
-```
-
-Here, the `myAge` and `yourAge` variables each have their own copy of the number value `42`. That means if we later re-assign `myAge` to `43` when I have a birthday, it doesn't affect the `42` that's still assigned to `yourAge`.
 
 // TODO
 

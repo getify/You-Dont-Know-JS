@@ -9,7 +9,14 @@
 * Foreword
 * Preface
 * Chapter 1: Primitives
-	* Built-in Values
+	* Value Types
+    * Empty Values
+    * Boolean Values
+    * String Values
+    * Number Values
+    * BigInteger Values
+    * Symbol Values
+* Chapter 2: Value Behavior
     * Value Immutability
     * Assignments Are Value Copies
     * TODO
