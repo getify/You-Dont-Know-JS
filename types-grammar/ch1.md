@@ -378,11 +378,30 @@ greeting = `Hello, ${myName}!`;
 console.log(greeting);      // Hello, Kyle!
 ```
 
-Everything between the `{ .. }` in such a template literal is an arbitrary JS expression. It can be simple variables, or complex JS programs, or anything in between.
+Everything between the `{ .. }` in such a template literal is an arbitrary JS expression. It can be simple variables like `myName`, or complex JS programs, or anything in between (even another template literal expression!).
 
 | TIP: |
 | :--- |
-| This feature is commonly called "template literals" or "template strings", but I think that's confusing. "Template" is usually referred to in programming contexts as a reusable definition that can be re-evaluated with different data. For example, *template engines* for pages, email templates for newsletter campaigns, etc. This JS feature is not re-usable. It's a literal, and it produces a single, immediate value (usually a string). You can put such a value in a function, and call the function multiple times. But then the function is acting as the template, not the the literal itself. I prefer instead to refer to this feature as *interpolated literals*, or the funny, shortened *interpoliterals*, as I think this name is more accurately descriptive. |
+| This feature is commonly called "template literals" or "template strings", but I think that's confusing. "Template" usually means, in programming contexts, a reusable set of text that can be re-evaluated with different data. For example, *template engines* for pages, email templates for newsletter campaigns, etc. This JS feature is not re-usable. It's a literal, and it produces a single, immediate value (usually a string). You can put such a value in a function, and call the function multiple times. But then the function is acting as the template, not the the literal itself. I prefer instead to refer to this feature as *interpolated literals*, or the funny, short-hand: *interpoliterals*. I just think that name is more accurately descriptive. |
+
+Template literals also have an interesting different behavior with respect to new-lines, compared to classic `"` or `'` delimited strings. Recall that for those strings, a line-continuation required a `\` at the end of each line, right before a new-line. Not so, with template literals!
+
+```js
+myPoem = `
+Roses are red
+Violets are blue
+C3PO's a funny robot
+and so R2.`;
+
+console.log(myPoem);
+//
+// Roses are red
+// Violets are blue
+// C3PO's a funny robot
+// and so R2.
+```
+
+Line-continuations with template literals do *not require* escaping. However, that means the new-line is part of the string, even the first new-line above. In other words, `myPoem` above holds a truly *multi-line string*, as shown. However, if you `\` escape the end of any line in a template literal, the new-line will be omitted, just like with non-template literal strings.
 
 Template literals usually result in a string value, but not always. A form of template literal that may look kind of strange is called a *tagged template literal*:
 
@@ -390,13 +409,19 @@ Template literals usually result in a string value, but not always. A form of te
 price = formatCurrency`The cost is: ${totalCost}`;
 ```
 
-Here, `formatCurrency` is a tag applied to the template literal value, which actually invokes `formatCurrency(..)` as a function, passing it the string literals and interpolated expressions parsed from the value. This function can then assemble those in any way it sees fit -- such as formatting a `number` value as currency in the current locale -- and return whatever value, string or otherwise, that it wants. So tagged template literals are not always strings. But untagged template literals will always be strings.
+Here, `formatCurrency` is a tag applied to the template literal value, which actually invokes `formatCurrency(..)` as a function, passing it the string literals and interpolated expressions parsed from the value. This function can then assemble those in any way it sees fit -- such as formatting a `number` value as currency in the current locale -- and return whatever value, string or otherwise, that it wants.
 
-Some JS developers believe that untagged template literal strings are preferable to use for *all* strings, even if not doing any expression interpolation. I disagree. I think it should only be used when interpolating, and classic `".."` or `'..'` delimited strings should be used for non-interpolated string definitions.
+So tagged template literals are not always strings; they can be any value. But untagged template literals *will always be* strings.
+
+Some JS developers believe that untagged template literal strings are best to use for *all* strings, even if not using any expression interpolation or multiple lines. I disagree. I think they should only be used when interpolating (or multi-line'ing).
+
+| TIP: |
+| :--- |
+| The principle I always apply in making such determinations: use the closest-matched, and least capable, feature/tool, for any task. |
 
 Moreover, there are a few places where `` `..` `` style strings are disallowed. For example, the `"use strict"` pragma cannot use back-ticks, or the pragma will be silently ignored (and thus the program accidentally runs in non-strict mode). Also, this style of strings cannot be used in quoted property names of object literals, or in the ES Module `import .. from ..` module-specifier clause.
 
-My advice: use `` `..` `` delimited strings where allowed, but only when interpolation is needed, and keep using `".."` or `'..'` delimited strings for all other strings.
+My take: use `` `..` `` delimited strings where allowed, but only when interpolation/multi-line is needed; and keep using `".."` or `'..'` delimited strings for everything else.
 
 ### Number Values
 
