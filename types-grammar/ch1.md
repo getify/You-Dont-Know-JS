@@ -458,15 +458,19 @@ parseInt("42",10) === parseFloat("42");     // true
 parseInt("512px");                          // 512
 ```
 
-Parsing is a character-by-character (left-to-right) operation, that pulls out numeric-looking characters from the string, and puts them into a `number` value. Parsing stops once it encounters a character that's non-numeric (e.g., not `-`, `.` or `0`-`9`). If parsing fails on the first character, both utilities return the special `NaN` value (see "Invalid Number" below).
+| NOTE: |
+| :--- |
+| Parsing is only relevant for string values, as it's a character-by-character (left-to-right) operation. It doesn't make sense to parse the contents of a `boolean`, nor to parse the contents of a `number` or a `null`; there's nothing to parse. If you pass anything other than a string value to `parseInt(..)` / `parseFloat(..)`, those utilties first convert that value to a string and then try to parse it. That's almost certainly problematic (leading to bugs) or wasteful -- `parseInt(42)` is silly, and `parseInt(42.3)` is an abuse of `parseInt(..)` to do the job of `Math.floor(..)`. |
 
-When `parseInt(..)` encounters the `.`, it stops, leaving only the `123` in the result `number` value. `parseFloat(..)` by contrast accepts this character, and keeps right on parsing.
+Parsing pulls out numeric-looking characters from the string value, and puts them into a `number` value, stopping once it encounters a character that's non-numeric (e.g., not `-`, `.` or `0`-`9`). If parsing fails on the first character, both utilities return the special `NaN` value (see "Invalid Number" below), indicating the operation was invalid and failed.
 
-The `parseInt(..)` utility specifically, takes as a second argument the `radix`: the numeric base to assume for parsing the string characters into a `number`. `10` is for standard base-10 numbers, `8` is for octal, and `16` is hexadecimal. Any other `radix`, like `23`, assumes `0` - `9` followed by `a` - `z` (case insensitive) character ordination.
+When `parseInt(..)` encounters the `.` in `"123.456"`, it stops, using just the `123` in the resulting `number` value. `parseFloat(..)` by contrast accepts this `.` character, and keeps right on parsing a float with any decimal digits after the `.`.
 
-If `radix` is omitted, the behavior of `parseInt(..)` is rather nuanced and confusing, in that it attempts to make a best-guess based on what it sees in the first character. This leads to lots of subtle bugs, so never rely on the default auto-guessing; always specify an explicit radix (like `10` in the calls above).
+The `parseInt(..)` utility specifically, takes as an optional -- but *actually*, rather necessary -- second argument, `radix`: the numeric base to assume for interpreting the string characters for the `number` (range `2` - `36`). `10` is for standard base-10 numbers, `2` is for binary, `8` is for octal, and `16` is for hexadecimal. Any other unusual `radix`, like `23`, assumes digits in order, `0` - `9` followed by the `a` - `z` (case insensitive) character ordination. If the specified radix is outside the `2` - `36` range, `parseInt(..)` fails as invalid and returns the `NaN` value.
 
-`parseFloat(..)` always parses with a radix of `10`.
+If `radix` is omitted, the behavior of `parseInt(..)` is rather nuanced and confusing, in that it attempts to make a best-guess for a radix, based on what it sees in the first character. This historically has lead to lots of subtle bugs, so never rely on the default auto-guessing; always specify an explicit radix (like `10` in the calls above).
+
+`parseFloat(..)` always parses with a radix of `10`, so no second argument is accepted.
 
 In contrast to parsing-conversion, coercive-conversion is an all-or-nothing sort of operation. Either the entire contents of the string are recognized as numeric (integer or floating-point), or the whole conversion fails (resulting in `NaN` -- again, see "Invalid Number" later in this chapter).
 
@@ -482,11 +486,101 @@ Number("512px");                // NaN
 +"512px";                       // NaN
 ```
 
+### Other Numeric Representations
+
+In addition to defining numbers using traditional base-10 numerals (`0`-`9`), JS supports defining whole-number-only number literals in three other bases: binary (base-2), octal (base-8), and hexadecimal (base-16).
+
+```js
+// binary
+myAge = 0b101010;
+myAge;              // 42
+
+// octal
+myAge = 0o52;
+myAge;              // 42
+
+// hexadecimal
+myAge = 0x2a;
+myAge;              // 42
+```
+
+As you can see, the prefixes `0b` (binary), `0o` (octal), and `0x` (hexadecimal) signal defining numbers in the different bases, but decimals are not allowed on these numeric literals.
+
+| NOTE: |
+| :--- |
+| JS syntax allows `0B`, `0O`, and `0X` prefixes as well. However, please don't ever use those uppercase prefix forms. I think any sensible person would agree: `0O` is much easier to confuse at a glance than `0o` (which is, itself, a bit visually ambiguous at a glance). Always stick to the lowercase prefix forms! |
+
+It's important to realize that you're not defining a *different number*, just using a different form to produce the same underlying numeric value.
+
+By default, JS represents the underlying numeric value in output/string fashion with standard base-10 form. However, `number` values have a built-in `toString(..)` method that produces a string representation in any specified base/radix (as with `parseInt(..)`, in the range `2` - `36`):
+
+```js
+myAge = 42;
+
+myAge.toString(2);          // "101010"
+myAge.toString(8);          // "52"
+myAge.toString(16);         // "2a"
+myAge.toString(23);         // "1j"
+myAge.toString(36);         // "16"
+```
+
+You can round-trip any arbitrary-radix string representation back into a `number` using `parseInt(..)`, with the appropriate radix:
+
+```js
+myAge = 42;
+
+parseInt(myAge.toString("23"),23);      // 42
+```
+
+Another allowed form for specifying number literals is using scientific notation:
+
+```js
+myAge = 4.2E1;      // or 4.2e1 or 4.2e+1
+
+myAge;              // 42
+```
+
+`4.2E1` (or `4.2e1`) means, `4.2 * (10 ** 1)` (`10` to the `1` power). The exponent can optionally have a sign `+` or `-`. If the sign is omitted, it's assumed to be `+`. A negative exponent makes the number smaller (moves the decimal leftward) rather than larger (moving the decimal rightward):
+
+```js
+4.2E-3;             // 0.0042
+```
+
+This scientific notation form is especially useful for readability when specifying larger powers of `10`:
+
+```js
+someBigPowerOf10 = 1000000000;
+
+// vs:
+
+someBigPowerOf10 = 1e9;
+```
+
+By default, JS will represent (e.g., as string values, etc) either very large or very small numbers -- specifically, if the values require more than 21 digits of precision --  using this same scientific notation:
+
+```js
+ratherBigNumber = 123 ** 11;
+ratherBigNumber.toString();     // "9.748913698143826e+22"
+
+prettySmallNumber = 123 ** -11;
+prettySmallNumber.toString();   // "1.0257553107587752e-23"
+```
+
+Another readability affordance for numeric literals is the ability to insert `_` as a digit separator wherever its convenient/meaningful to do so. For example:
+
+```js
+someBigPowerOf10 = 1_000_000_000;
+
+totalCostInPennies = 123_45;  // vs 12_345
+```
+
+The decision to use `12345` (no separator), `12_345` (like "12,345"), or `123_45` (like "123.45") is entirely up to the author of the code; JS ignores the separators. But depending on the context, `123_45` could be more semantically meaningful (readability wise) than the more traditional three-digit-grouping-from-the-right-separated-with-commas style mimicked with `12_345`.
+
 ### IEEE-754 Bitwise Binary Representations
 
 IEEE-754[^IEEE754] is a technical standard for binary representation of decimal numbers. It's widely used by most computer programming languages, including JS, Python, Ruby, etc.
 
-In 64-bit IEEE-754 -- so called "double-precision" because originally IEEE-754 used to be 32-bit, and now it's double that! -- the 64 bits are divided into 52 bits for the number's base value (aka, "fraction", "mantissa", or "significand"), 11 bits for the exponent to raise that value to, and 1 bit for the sign of the ultimate value.
+In 64-bit IEEE-754 -- so called "double-precision" because originally IEEE-754 used to be 32-bit, and now it's double that! -- the 64 bits are divided into three sections: 52 bits for the number's base value (aka, "fraction", "mantissa", or "significand"), 11 bits for the exponent to raise `2` to before multiplying, and 1 bit for the sign of the ultimate value.
 
 These bits are arranged left-to-right, as so (S = Sign Bit, E = Exponent Bit, M = Mantissa Bit):
 
@@ -497,7 +591,8 @@ MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
 
 So, the number `42` (or `42.000000`) would be represented by these bits:
 
-```js
+```
+// 42:
 01000000010001010000000000000000
 00000000000000000000000000000000
 ```
@@ -516,12 +611,13 @@ As you might be able to tell now, this IEEE-754 number representation standard i
 
 The number `42.0000001`, which is only different from `42.000000` by just `0.0000001`, would be represented by these bits:
 
-```js
+```
+// 42.0000001:
 01000000010001010000000000000000
 00000000110101101011111110010101
 ```
 
-Notice how the previous bit pattern and this one differ by quite a few bits in the trailing positions! The binary decimal fraction containing all those extra `1` bits (`1.010100000000..01011111110010101`) converts to base-10 as `1.31250000312500003652`, which multipled by `32` gives us `42.0000001`.
+Notice how the previous bit pattern and this one differ by quite a few bits in the trailing positions! The binary decimal fraction containing all those extra `1` bits (`1.010100000000...01011111110010101`) converts to base-10 as `1.31250000312500003652`, which multipled by `32` gives us exactly `42.0000001`.
 
 Now you understand a *bit more* about how IEEE-754 works!
 
@@ -774,11 +870,11 @@ If you're not properly checking for `NaN` in your programs where you do math or 
 
 ## BigInteger Values
 
-As the maximum safe integer in JS `number`s is `9007199254740991`, such a relatively low limit can present a problem if a JS program needs to do larger integer math, or even just hold values like 64-bit integer IDs (e.g., Twitter Tweet IDs).
+As the maximum safe integer in JS `number`s is `9007199254740991` (see above), such a relatively low limit can present a problem if a JS program needs to perform larger integer math, or even just hold values like 64-bit integer IDs (e.g., Twitter Tweet IDs).
 
 For that reason, JS provides the alternate `bigint` type (BigInteger), which can store arbitrarily large (theoretically not limited, except by finite machine memory and/or JS implementation) integers.
 
-To distinguish a `bigint` from a `number` value, which could otherwise both look the same (`42`), JS requires an `n` suffix on `bigint` values:
+To distinguish a `bigint` from a whole (integer) `number` value, which would otherwise both look the same (`42`), JS requires an `n` suffix on `bigint` values:
 
 ```js
 myAge = 42n;        // this is a bigint, not a number
@@ -796,6 +892,8 @@ Number.MAX_SAFE_INTEGER + 2;    // 9007199254740992 -- oops!
 myBigInt = 9007199254740991n;
 
 myBigInt + 2n;                  // 9007199254740993n -- phew!
+
+myBigInt ** 2n;                 // 81129638414606663681390495662081n
 ```
 
 As you can see, the `bigint` value-type is able to do precise arithmetic above the integer limit of the `number` value-type.
@@ -822,9 +920,9 @@ myAge;              // 43n
 
 That's definitely one of the most common usages of the `BigInt(..)` function: to convert `number`s to `bigint`s, for mathematical operation purposes.
 
-But it's not that uncommon to have large integer values represented as strings, especially if those values are coming to the JS environment from other locations, or via exchange formats, which themselves do not support `bigint`-style values.
+But it's not that uncommon to represent large integer values as strings, especially if those values are coming to the JS environment from other language environments, or via certain exchange formats, which themselves do not support `bigint`-style values.
 
-As such, `BigInt(..)` is useful to parse those string values and convert them to `bigint`s:
+As such, `BigInt(..)` is useful to coerce those string values to `bigint`s:
 
 ```js
 myBigInt = BigInt("12345678901234567890");
@@ -832,11 +930,11 @@ myBigInt = BigInt("12345678901234567890");
 myBigInt;                       // 12345678901234567890n
 ```
 
-Unlike `parseInt(..)`, if any character in the string is non-numeric (`0-9` digits or `-`), including `.` or even a trailing `n` suffix character, an exception will be thrown. In other words, `BigInt(..)` is all-or-nothing in its parsing/conversion.
+Unlike `parseInt(..)`, if any character in the string is non-numeric (`0-9` digits or `-`), including `.` or even a trailing `n` suffix character, an exception will be thrown. In other words, `BigInt(..)` is an all-or-nothing coercion-conversion, not a parsing-conversion.
 
 | NOTE: |
 | :--- |
-| I think it's absurd that `BigInt(..)` won't accept the trailing `n` character while string parsing (and effectively ignore it). I lobbied vehemently for that in the TC39 process, but was ultimately denied. In my opinion, it's now a tiny little wart on JS, but a wart nonetheless. |
+| I think it's absurd that `BigInt(..)` won't accept the trailing `n` character while string coercing (and thus effectively ignore it). I lobbied vehemently for that behavior, in the TC39 process, but was ultimately denied. In my opinion, it's now a tiny little gotcha wart on JS, but a wart nonetheless. |
 
 ## Symbol Values
 
