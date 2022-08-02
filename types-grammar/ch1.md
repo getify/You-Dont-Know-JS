@@ -222,6 +222,8 @@ The `string` type contains any value which is a collection of one or more charac
 myName = "Kyle";
 ```
 
+JS does not distinguish a single character as a different type as some languages do; `"a"` is a string just like `"abc"` is.
+
 Strings can be delimited by double-quotes (`"`), single-quotes (`'`), or back-ticks (`` ` ``). The ending delimiter must always match the starting delimiter.
 
 Strings have an intrinsic length which corresponds to how many code-points -- actually, code-units, more on that in a moment -- they contain.
