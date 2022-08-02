@@ -226,7 +226,7 @@ JS does not distinguish a single character as a different type as some languages
 
 Strings can be delimited by double-quotes (`"`), single-quotes (`'`), or back-ticks (`` ` ``). The ending delimiter must always match the starting delimiter.
 
-Strings have an intrinsic length which corresponds to how many code-points -- actually, code-units, more on that in a moment -- they contain.
+Strings have an intrinsic length which corresponds to how many code-points -- actually, code-units, more on that in a bit -- they contain.
 
 ```js
 myName = "Kyle";
@@ -236,21 +236,33 @@ myName.length;      // 4
 
 This does not necessarily correspond to the number of visible characters present between the start and end delimiters (aka, the string literal). It can sometimes be a little confusing to keep straight the difference between a string literal and the underlying string value, so pay close attention.
 
+| NOTE: |
+| :--- |
+| We'll cover length computation of strings in detail, in Chapter 2. |
+
 ### JS Character Encodings
 
 What type of character encoding does JS use for string characters?
 
-One might assume UTF-8 (8-bit) or UTF-16 (16-bit). It's actually more complicated, because you also need to consider UCS-2 (2-byte Universal Character Set), which is similar to UTF-16, but not quite the same. [^UTFUCS]
+You've probably heard of "Unicode" and perhaps even "UTF-8" (8-bit) or "UTF-16" (16-bit). If you're like me (before doing the research it took to write this text), you might have just hand-waved and decided that's all you need to know about character encodings in JS strings.
 
-The first group of 65,535 code points in Unicode is called the BMP (Basic Multilingual Plane). All the rest of the code points are grouped into 16 so called "supplemental planes" or "astral planes". When representing Unicode characters from the BMP, it's pretty straightforward, as they can *fit* neatly into single JS characters.
+But... it's not. Not even close.
 
-But when representing extended characters outside the BMP, JS actually represents these characters code-points as a pairing of two separate code units, called *surrogate halves*.
+It turns out, you need to understand how a variety of aspects of Unicode work, and even to consider concepts from UCS-2 (2-byte Universal Character Set), which is similar to UTF-16, but not quite the same. [^UTFUCS]
 
-For example, the Unicode code point `127878` (hexadecimal `1F386`) is `🎆` (fireworks symbol). JS stores this in the string value as two surrogate-halve code units: `U+D83C` and `U+DF86`.
+Unicode defines all the "characters" we can represent universally in computer programs, by assigning a specific number to each, called code-points. These numbers range from `0` all the way up to a maximum of `1114111` (`10FFFF` in hexadecimal).
+
+The standard notation for Unicode characters is `U+` followed by 4-6 hexadecimal characters. For example, the `❤` (heart symbol) is code-point `10084` (`2764` in hexadecimal), and is thus notated with `U+2764`.
+
+The first group of 65,535 code points in Unicode is called the BMP (Basic Multilingual Plane). These can all be represented with 16 bits (2 bytes). When representing Unicode characters from the BMP, it's fairly straightforward, as they can *fit* neatly into single UTF-16 JS characters.
+
+All the rest of the code points are grouped into 16 so called "supplemental planes" or "astral planes". These code-points require more than 16 bits to represent -- 21 bits to be exact -- so when representing extended/supplemental characters above the BMP, JS actually stores these code-points as a pairing of two adjacent 16-bit code units, called *surrogate halves*.
+
+For example, the Unicode code point `127878` (hexadecimal `1F386`) is `🎆` (fireworks symbol). JS stores this in a string value as two surrogate-halve code units: `U+D83C` and `U+DF86`.
 
 This has implications on the length of strings, because a single visible character like the `🎆` fireworks symbol, when in a JS string, is a counted as 2 characters for the purposes of the string length!
 
-We'll revisit Unicode characters shortly.
+We'll revisit Unicode characters in a bit, and then cover more accurately computing string length in Chapter 2.
 
 ### Escape Sequences
 
@@ -305,13 +317,15 @@ For any normal character that can be typed on a keyboard, such as `"a"`, it's us
 "a" === "\x61";             // true
 ```
 
-#### Unicode
+#### Unicode In Strings
 
-Unicode escape sequences encode any of the characters in the Unicode set whose code-point values range from 0-65535. They look like `\u` followed by exactly four hexadecimal characters. For example, the escape-sequence `\u00A9` (or `\u00a9`) corresponds to that same `©` symbol, while `\u263A` (or `\u263a`) corresponds to the Unicode character with code-point `9786`: `☺` (smiley face symbol).
+Unicode escape sequences alone can encode any of the characters from the Unicode BMP. They look like `\u` followed by exactly four hexadecimal characters.
+
+For example, the escape-sequence `\u00A9` (or `\u00a9`) corresponds to that same `©` symbol, while `\u263A` (or `\u263a`) corresponds to the Unicode character with code-point `9786`: `☺` (smiley face symbol).
 
 When any character-escape sequence (regardless of length) is recognized, the single character it represents is inserted into the string, rather than the original separate characters. So, in the string `"\u263A"`, there's only one (smiley) character, not six individual characters.
 
-Unicode code-points can go well above `65535` (`FFFF` in hexadecimal), up to a maximum of `1114111` (`10FFFF` in hexadecimal). For example, `1F4A9` (or `1f4a9`)is decimal code-point `128169`, which corresponds to the funny `💩` (pile of poo) symbol.
+But as explained earlier, many Unicode code-points are well above `65535`. For example, `1F4A9` (or `1f4a9`) is decimal code-point `128169`, which corresponds to the funny `💩` (pile-of-poo) symbol.
 
 But `\u1F4A9` wouldn't work to include this character in a string, since it would be parsed as the Unicode escape sequence `\u1F4A`, followed by a literal `9` character. To address this limitation, a variation of Unicode escape sequences was introduced to allow an arbitrary number of hexadecimal characters after the `\u`, by surrounding them with `{ .. }` curly braces:
 
@@ -322,7 +336,7 @@ console.log(myReaction);
 // 💩
 ```
 
-Recall the earlier discussion of extended (non-BMP) Unicode characters and *surrogate halves*? The same `💩` could also be defined with the two explicit code-units:
+Recall the earlier discussion of extended (non-BMP) Unicode characters and *surrogate halves*? The same `💩` could also be defined with two explicit code-units, that form a surrogate pair:
 
 ```js
 myReaction = "\uD83D\uDCA9";
@@ -339,6 +353,56 @@ All three representations of this same character are stored internally by JS ide
 ```
 
 Even though JS doesn't care which way such a character is represented in your program, consider the readability differences carefully when authoring your code.
+
+| NOTE: |
+| :--- |
+| Even though `💩` looks like a single character, its internal representation affects things like the length computation of a string with that character in it. We'll cover length computation of strings in Chapter 2. |
+
+##### Unicode Normalization
+
+A further wrinkle in Unicode string handling is that even certain single BMP characters can be represented in different ways.
+
+For example, the `"é"` character can either be represented as itself (code-point `233`, aka `\xe9` or `\u00e9` or `\u{e9}`), or as the combination of two code-points: the `"e"` character (code-point `101`, aka `\x65`, `\u0065`, `\u{65}`) and the *combining tilde* (code-point `769`, aka `\u0301`, `\u{301}`).
+
+Consider:
+
+```js
+eTilde1 = "é";
+eTilde2 = "\u00e9";
+eTilde3 = "\u0065\u0301";
+
+console.log(eTilde1);       // é
+console.log(eTilde2);       // é
+console.log(eTilde3);       // é
+```
+
+However, the way the `"é"` character is internally stored affects things like `length` computation of the containing string, as well as equality comparison:
+
+```js
+eTilde1.length;             // 2
+eTilde2.length;             // 1
+eTilde3.length;             // 2
+
+eTilde1 === eTilde2;        // false
+eTilde1 === eTilde3;        // true
+```
+
+This internal representation difference can be quite challenging if not carefully planned for. Fortunately, JS provides a `normalize(..)` utility method on strings to help:
+
+```js
+eTilde1 = "é"
+eTilde2 = "\u{e9}";
+eTilde3 = "\u{65}\u{301}";
+
+eTilde1.normalize("NFC") === eTilde2;
+eTilde2.normalize("NFD") === eTilde3;
+```
+
+The `"NFC"` normalization mode combines adjacent code-points into the *composed* code-point (if possible), whereas the `"NFD"` normalization mode splits a single code-point into its *decomposed* code-points (if possible).
+
+And there can actually be more than two individual *decomposed* code-points that make up a single *composed* code-point; some international language symbols (Chinese, Japanese, etc) are *composed* of three or four code-points layered together!
+
+When dealing with Unicode strings that will be compared, sorted, or length analyzed, it's very important to keep Unicode normalization in mind, and use it where necessary.
 
 ### Line Continuation
 

@@ -132,11 +132,25 @@ yourAge;            // 42 <-- unchanged
 
 String values have a number of specific behaviors that every JS developer should be aware of.
 
-As previously mentioned, string values have a `length` property that automatically exposes the number of characters (actually, code units). This property can only be accessed; attempts to set it are silently ignored.
+### Length Computation
+
+As mentioned in Chapter 1, string values have a `length` property that automatically exposes the length of the string; this property can only be accessed; attempts to set it are silently ignored.
+
+The reported `length` value somewhat corresponds to the number of characters in the string (actually, code-units), but as we saw in Chapter 1, it's more complex when Unicode characters are involved.
+
+Most people visually distinguish symbols as separate characters; this notion of an independent visual symbol is referred to as a *grapheme*. So when counting the "length" of a string, we typically mean that we're counting the number of graphemes.
+
+But that's not how the computer deals with characters.
+
+In JS, each *character* is a code-unit (16 bits), with a code-point value at or below `65535`. The `length` property of a string always counts the number of code-units in the string value, not code-points. A code-unit might represent a single character by itself, or it may be part of a surrogate pair, or it may be combined with an adjacent *combining* symbol. As such, `length` doesn't match the typical notion of counting graphemes.
+
+To obtain a *grapheme length* for a string that matches typical expectations, the string value first needs to be normalized with `normalize("NFC")` (see "Normalizing Unicode" in Chapter 1) to produce *composed* code-units, in case any characters in it were originally stored *decomposed* as separate code-units.
+
+// TODO
 
 ### String Character Access
 
-Though strings are not actually arrays, JS allows `[ .. ]` array-style access of its character at a numeric (`0`-based) index:
+Though strings are not actually arrays, JS allows `[ .. ]` array-style access of a character at a numeric (`0`-based) index:
 
 ```js
 greeting = "Hello!";
@@ -169,6 +183,43 @@ greeting;               // Hello, Kyle!
 The `+` operator will act as a string concatenation if either of the two operands (values on left or right sides of the operator) are already a string.
 
 If one operand is a string and the other is not, the one that's not a string will be coerced to its string representation for the purposes of the concatenation.
+
+### Character Iteration
+
+Strings are not arrays, but they certainly mimick arrays closely in many ways. One such behavior is that, like arrays, strings are iterables. This means that the characters (code-units) of a string can be iterated individually:
+
+```js
+myName = "Kyle";
+
+for (let char of myName) {
+    console.log(char);
+}
+// K
+// y
+// l
+// e
+
+chars = [ ...myName ];
+chars;
+// [ "K", "y", "l", "e" ]
+```
+
+Values, such as strings and arrays, are iterables (via `...`, `for..of`, and `Array.from(..)`), if they expose an iterator-producing method at the special symbol property location `Symbol.iterator` (see "Well-Known Symbols" in Chapter 1):
+
+```js
+myName = "Kyle";
+it = myName[Symbol.iterator]();
+
+it.next();      // { value: "K", done: false }
+it.next();      // { value: "y", done: false }
+it.next();      // { value: "l", done: false }
+it.next();      // { value: "e", done: false }
+it.next();      // { value: undefined, done: true }
+```
+
+| NOTE: |
+| :--- |
+| The specifics of the iterator protocol, including the fact that the `{ value: "e" .. }` result still shows `done: false`, are covered in detail in the "Sync & Async" title of this series. |
 
 ### String Methods
 
@@ -212,7 +263,13 @@ Strings provide a whole slew of additional string-specific methods (as propertie
 
 * `replace(..)`: returns a new string with a replacement from the original string, of one or more matching occurrences of the specified regular-expression match
 
+* `normalize(..)`: produces a new string with Unicode normalization (see "Unicode Normalization" in Chapter 1) having been performed on the contents
+
 * `big()`, `blink()`, `bold()`, `fixed()`, `fontcolor()`, `fontsize()`, `italics()`, `link()`, `small()`, `strike()`, `sub()`, and `sup()`: historically, these were useful in generating HTML string snippets; they're now deprecated and should be avoided
+
+| WARNING: |
+| :--- |
+| Many of the methods described above rely on position indices. As mentioned earlier in the "Length Computations" section, these positions are dependent on the internal contents of the string value, which means that if an extended Unicode character is present and takes up two code-unit slots, that will count as two index positions instead of one. Failing to account for Unicode surrogate pairs is a common source of bugs in JS string handling, especially when dealing with non-English internationalized language characters. |
 
 ### Static String Helpers
 
