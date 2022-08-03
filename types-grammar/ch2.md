@@ -249,13 +249,13 @@ thumbsDown.length;              // 4 -- oops!
 
 As you can see, these are two distinct code-points (not a surrogate pair) that, by virtue of their ordering and adjacency, cause the computer's Unicode rendering to draw the thumbs-down symbol but with a darker skin tone than its default. The computed string length is thus `2`.
 
-| WARNING: |
-| :--- |
-| As a Twitter user, you might expect to be able to put 280 thumbs-down emoji into a single tweet, since it looks like a single character. But Twitter counts each such emoji as two characters, so you only get 140. Surprisingly, twitter counts the `"👎"` (default thumbs-down), `"👎🏾"` (dark-skin tone thumbs-down), and even the `"👩‍👩‍👦‍👦"` (family emoji grapheme cluster) all as two characters each, even though their string lengths (from JS's perspective) are `2`, `4`, and `7`, respectively. Twitter must have some sort of custom Unicode handling implemented in the tools. |
-
 It would take replicating most of a platform's complex Unicode rendering logic to be able to recognize such clusters of code-points as a single "character" for length-counting sake. There are libraries that purport to do so, but they're not necessarily perfect, and they come at a hefty cost in terms of extra code.
 
-Counting the "length" of a string to match our human intuitions is a remarkably challenging task. We can get acceptable approximations in many cases, but there's plenty of other cases that confound our programs.
+| NOTE: |
+| :--- |
+| As a Twitter user, you might expect to be able to put 280 thumbs-down emoji into a single tweet, since it looks like a single character. Twitter counts the `"👎"` (default thumbs-down), the `"👎🏾"` (medium-dark-skintone thumbs-down), and even the `"👩‍👩‍👦‍👦"` (family emoji grapheme cluster) all as 2 characters each, even though their respective string lengths (from JS's perspective) are `2`, `4`, and `7`; thus, you can only fit half the number of emojis (140 instead of 280) in a tweet. In fact, Twitter implemented this change in 2018 to specifically level the counting of all Unicode characters, at 2 characters per symbol. [^TwitterUnicode] That was a welcomed change for Twitter users, especially those who want to use emoji characters that are most representative of intended gender, skintone, etc. Still, it *is* curious that the choice was made to count the symbols as 2 characters each, instead of the more intuitive 1 character each. |
+
+Counting the *length* of a string to match our human intuitions is a remarkably challenging task, perhaps more of an art than a science. We can get acceptable approximations in many cases, but there's plenty of other cases that may confound our programs.
 
 ### String Concatenation
 
@@ -332,3 +332,5 @@ The following string utility functions are proviced directly on the `String` obj
 ## Number Behaviors
 
 // TODO
+
+[^TwitterUnicode]: "New update to the Twitter-Text library: Emoji character count"; Andy Piper; Oct 2018; https://twittercommunity.com/t/new-update-to-the-twitter-text-library-emoji-character-count/114607 ; Accessed July 2022

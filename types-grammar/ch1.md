@@ -262,7 +262,7 @@ For example, the Unicode code point `127878` (hexadecimal `1F386`) is `🎆` (fi
 
 This has implications on the length of strings, because a single visible character like the `🎆` fireworks symbol, when in a JS string, is a counted as 2 characters for the purposes of the string length!
 
-We'll revisit Unicode characters in a bit, and then cover more accurately computing string length in Chapter 2.
+We'll revisit Unicode characters in a bit, and then cover the challenges of computing string length in Chapter 2.
 
 ### Escape Sequences
 
