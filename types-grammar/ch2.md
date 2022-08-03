@@ -132,22 +132,6 @@ yourAge;            // 42 <-- unchanged
 
 String values have a number of specific behaviors that every JS developer should be aware of.
 
-### Length Computation
-
-As mentioned in Chapter 1, string values have a `length` property that automatically exposes the length of the string; this property can only be accessed; attempts to set it are silently ignored.
-
-The reported `length` value somewhat corresponds to the number of characters in the string (actually, code-units), but as we saw in Chapter 1, it's more complex when Unicode characters are involved.
-
-Most people visually distinguish symbols as separate characters; this notion of an independent visual symbol is referred to as a *grapheme*. So when counting the "length" of a string, we typically mean that we're counting the number of graphemes.
-
-But that's not how the computer deals with characters.
-
-In JS, each *character* is a code-unit (16 bits), with a code-point value at or below `65535`. The `length` property of a string always counts the number of code-units in the string value, not code-points. A code-unit might represent a single character by itself, or it may be part of a surrogate pair, or it may be combined with an adjacent *combining* symbol. As such, `length` doesn't match the typical notion of counting graphemes.
-
-To obtain a *grapheme length* for a string that matches typical expectations, the string value first needs to be normalized with `normalize("NFC")` (see "Normalizing Unicode" in Chapter 1) to produce *composed* code-units, in case any characters in it were originally stored *decomposed* as separate code-units.
-
-// TODO
-
 ### String Character Access
 
 Though strings are not actually arrays, JS allows `[ .. ]` array-style access of a character at a numeric (`0`-based) index:
@@ -169,20 +153,6 @@ If the value/expression resolves to a number outside the integer range of `0` - 
 | NOTE: |
 | :--- |
 |  We'll cover coercion in-depth later in the book. |
-
-### String Concatenation
-
-Two or more string values can be concatenated (combined) into a new string value, using the `+` operator:
-
-```js
-greeting = "Hello, " + "Kyle!";
-
-greeting;               // Hello, Kyle!
-```
-
-The `+` operator will act as a string concatenation if either of the two operands (values on left or right sides of the operator) are already a string.
-
-If one operand is a string and the other is not, the one that's not a string will be coerced to its string representation for the purposes of the concatenation.
 
 ### Character Iteration
 
@@ -220,6 +190,86 @@ it.next();      // { value: undefined, done: true }
 | NOTE: |
 | :--- |
 | The specifics of the iterator protocol, including the fact that the `{ value: "e" .. }` result still shows `done: false`, are covered in detail in the "Sync & Async" title of this series. |
+
+### Length Computation
+
+As mentioned in Chapter 1, string values have a `length` property that automatically exposes the length of the string; this property can only be accessed; attempts to set it are silently ignored.
+
+The reported `length` value somewhat corresponds to the number of characters in the string (actually, code-units), but as we saw in Chapter 1, it's more complex when Unicode characters are involved.
+
+Most people visually distinguish symbols as separate characters; this notion of an independent visual symbol is referred to as a *grapheme*, or a *grapheme cluster*. So when counting the "length" of a string, we typically mean that we're counting the number of graphemes.
+
+But that's not how the computer deals with characters.
+
+In JS, each *character* is a code-unit (16 bits), with a code-point value at or below `65535`. The `length` property of a string always counts the number of code-units in the string value, not code-points. A code-unit might represent a single character by itself, or it may be part of a surrogate pair, or it may be combined with an adjacent *combining* symbol, or part of a grapheme cluster. As such, `length` doesn't match the typical notion of counting visual characters/graphemes.
+
+To get closer to an expected/intuitive *grapheme length* for a string, the string value first needs to be normalized with `normalize("NFC")` (see "Normalizing Unicode" in Chapter 1) to produce any *composed* code-units (where possible), in case any characters were originally stored *decomposed* as separate code-units.
+
+For example:
+
+```js
+favoriteItem = "teléfono";
+favoriteItem.length;            // 9 -- uh oh!
+
+favoriteItem = favoriteItem.normalize("NFC");
+favoriteItem.length;            // 8 -- phew!
+```
+
+Unfortunately, as we saw in Chapter 1, we'll still have the possibility of characters of code-point greater the `65535`, and thus needing a surrogate pair to be represented. Such characters will count double in the `length`:
+
+```js
+// "☎" === "\u260E"
+oldTelephone = "☎";
+oldTelephone.length;            // 1
+
+// "📱" === "\u{1F4F1}" === "\uD83D\uDCF1"
+cellphone = "📱";
+cellphone.length;               // 2 -- oops!
+```
+
+So what do we do?
+
+One fix is to use character iteration (via `...` operator) as we saw in the previous section, since it automatically returns each combined character from a surrogate pair:
+
+```js
+cellphone = "📱";
+cellphone.length;               // 2 -- oops!
+[ ...cellphone ].length;        // 1 -- phew!
+```
+
+But, unfortunately, grapheme clusters (as explained in Chapter 1) throw yet another wrench into a string's length computation. For example, if we take the thumbs down emoji (`"\u{1F44E}"` and add to it the skin-tone modifier for medium-dark skin (`"\u{1F3FE}"`), we get:
+
+```js
+// "👎🏾" = "\u{1F44E}\u{1F3FE}"
+thumbsDown = "👎🏾";
+
+thumbsDown.length;              // 4 -- oops!
+[ ...thumbsDown ].length;       // 2 -- oops!
+```
+
+As you can see, these are two distinct code-points (not a surrogate pair) that, by virtue of their ordering and adjacency, cause the computer's Unicode rendering to draw the thumbs-down symbol but with a darker skin tone than its default. The computed string length is thus `2`.
+
+| WARNING: |
+| :--- |
+| As a Twitter user, you might expect to be able to put 280 thumbs-down emoji into a single tweet, since it looks like a single character. But Twitter counts each such emoji as two characters, so you only get 140. Surprisingly, twitter counts the `"👎"` (default thumbs-down), `"👎🏾"` (dark-skin tone thumbs-down), and even the `"👩‍👩‍👦‍👦"` (family emoji grapheme cluster) all as two characters each, even though their string lengths (from JS's perspective) are `2`, `4`, and `7`, respectively. Twitter must have some sort of custom Unicode handling implemented in the tools. |
+
+It would take replicating most of a platform's complex Unicode rendering logic to be able to recognize such clusters of code-points as a single "character" for length-counting sake. There are libraries that purport to do so, but they're not necessarily perfect, and they come at a hefty cost in terms of extra code.
+
+Counting the "length" of a string to match our human intuitions is a remarkably challenging task. We can get acceptable approximations in many cases, but there's plenty of other cases that confound our programs.
+
+### String Concatenation
+
+Two or more string values can be concatenated (combined) into a new string value, using the `+` operator:
+
+```js
+greeting = "Hello, " + "Kyle!";
+
+greeting;               // Hello, Kyle!
+```
+
+The `+` operator will act as a string concatenation if either of the two operands (values on left or right sides of the operator) are already a string.
+
+If one operand is a string and the other is not, the one that's not a string will be coerced to its string representation for the purposes of the concatenation.
 
 ### String Methods
 

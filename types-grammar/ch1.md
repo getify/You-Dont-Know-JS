@@ -299,6 +299,26 @@ console.log(windowsFontsPath);
 | :--- |
 | What about four backslashes `\\\\` in a string literal? Well, that's just two `\\` escape sequences next to each other, so it results in two adjacent backslashes (`\\`) in the underlying string value. You might recognize there's an odd/even rule pattern at play. You should thus be able to deciper any odd (`\\\\\`, `\\\\\\\\\`, etc) or even (`\\\\\\`, `\\\\\\\\\\`, etc) number of backslashes in a string literal. |
 
+#### Line Continuation
+
+The `\` character followed by an actual new-line character (not just literal `n`) is a special case, and it creates what's called a line-continuation:
+
+```js
+greeting = "Hello \
+Friends!";
+
+console.log(greeting);
+// Hello Friends!
+```
+
+As you can see, the new-line at the end of the `greeting = ` line is immediately preceded by a `\`, which allows this string literal to continue onto the subsequent line. Without the escaping `\` before it, a new-line -- the actual new-line, not the `\n` character escape sequence -- appearing in a `"` or `'` delimited string literal would actually produce a JS syntax parsing error.
+
+Because the end-of-line `\` turns the new-line character into a line continuation, the new-line character is omitted from the string, as shown by the `console.log(..)` output.
+
+| NOTE: |
+| :--- |
+| This line-continuation feature is often referred to as "multi-line strings", but I think that's a confusing label. As you can see, the string value itself doesn't have multiple lines, it only was defined across multiple lines via the line continuations. A multi-line string would actually have multiple lines in the underlying value. We'll revisit this topic later in this chapter when we cover Template Literals. |
+
 ### Multi-Character Escapes
 
 Multi-character escape sequences may be hexadecimal or Unicode sequences.
@@ -360,7 +380,7 @@ Even though JS doesn't care which way such a character is represented in your pr
 
 ##### Unicode Normalization
 
-A further wrinkle in Unicode string handling is that even certain single BMP characters can be represented in different ways.
+Another wrinkle in Unicode string handling is that even certain single BMP characters can be represented in different ways.
 
 For example, the `"é"` character can either be represented as itself (code-point `233`, aka `\xe9` or `\u00e9` or `\u{e9}`), or as the combination of two code-points: the `"e"` character (code-point `101`, aka `\x65`, `\u0065`, `\u{65}`) and the *combining tilde* (code-point `769`, aka `\u0301`, `\u{301}`).
 
@@ -387,10 +407,16 @@ eTilde1 === eTilde2;        // false
 eTilde1 === eTilde3;        // true
 ```
 
+One particular challenge is that you may copy-paste a string with an `"é"` character visible in it, and that character may have been in the *composed* or *decomposed* form. But there's no visual way to tell, and yet the underlying string value will be different depending:
+
+```js
+"é" === "é";           // false!!
+```
+
 This internal representation difference can be quite challenging if not carefully planned for. Fortunately, JS provides a `normalize(..)` utility method on strings to help:
 
 ```js
-eTilde1 = "é"
+eTilde1 = "é";
 eTilde2 = "\u{e9}";
 eTilde3 = "\u{65}\u{301}";
 
@@ -400,29 +426,27 @@ eTilde2.normalize("NFD") === eTilde3;
 
 The `"NFC"` normalization mode combines adjacent code-points into the *composed* code-point (if possible), whereas the `"NFD"` normalization mode splits a single code-point into its *decomposed* code-points (if possible).
 
-And there can actually be more than two individual *decomposed* code-points that make up a single *composed* code-point; some international language symbols (Chinese, Japanese, etc) are *composed* of three or four code-points layered together!
+And there can actually be more than two individual *decomposed* code-points that make up a single *composed* code-point -- for example, a single character could have several diacritical marks applied to it.
 
 When dealing with Unicode strings that will be compared, sorted, or length analyzed, it's very important to keep Unicode normalization in mind, and use it where necessary.
 
-### Line Continuation
+##### Unicode Grapheme Clusters
 
-The `\` followed by an actual new-line character (not just literal `n`) is a special case, and it creates what's called a line-continuation:
+A final complication of Unicode string handling is the support for clustering of multiple adjacent code-points into a single visually distinct symbol, referred to as a *grapheme* (or a *grapheme cluster*).
+
+An example would be a family emoji such as `"👩‍👩‍👦‍👦"`, which is actually made up of 7 code-points that all cluster/group together into a single visual symbol.
+
+Consider:
 
 ```js
-greeting = "Hello \
-Friends!";
+familyEmoji = "\u{1f469}\u{200d}\u{1f469}\u{200d}\u{1f466}\u{200d}\u{1f466}";
 
-console.log(greeting);
-// Hello Friends!
+familyEmoji;            // 👩‍👩‍👦‍👦
 ```
 
-As you can see, the new-line at the end of the `greeting = ` line is immediately preceded by a `\`, which allows this string literal to continue onto the subsequent line. Without the escaping `\` before it, a new-line -- the actual new-line, not the `\n` character escape sequence -- appearing in a `"` or `'` delimited string literal would actually produce a JS syntax parsing error.
+This emoji is *not* a single registered Unicode code-point, and as such, there's no *normalization* that can be performed to compose these 7 separate code-points into a single entity. The visual rendering logic for such composite symbols is quite complex, well beyond what most of JS developers want to embed into our programs. Libraries do exist for handling some of this logic, but they're often large and still don't necessarily cover all of the nuances/variations.
 
-Because the end-of-line `\` turns the new-line character into a line continuation, the new-line character is omitted from the string, as shown by the `console.log(..)` output.
-
-| NOTE: |
-| :--- |
-| This line-continuation feature is often referred to as "multi-line strings", but I think that's a confusing label. As you can see, the string value itself doesn't have multiple lines, it only was defined across multiple lines via the line continuations. A multi-line string would actually have multiple lines in the underlying value. |
+This kind of complexity significantly affects length computations, comparison, sorting, and many other common string-oriented operations.
 
 ### Template Literals
 
