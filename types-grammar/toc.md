@@ -20,4 +20,6 @@
 * Chapter 2: Value Behaviors
     * Primitive Immutability
     * Primitive Assignments
+    * String Behaviors
+    * Number Behaviors
     * TODO

@@ -267,9 +267,29 @@ greeting = "Hello, " + "Kyle!";
 greeting;               // Hello, Kyle!
 ```
 
-The `+` operator will act as a string concatenation if either of the two operands (values on left or right sides of the operator) are already a string.
+The `+` operator will act as a string concatenation if either of the two operands (values on left or right sides of the operator) are already a string (even an empty string `""`).
 
-If one operand is a string and the other is not, the one that's not a string will be coerced to its string representation for the purposes of the concatenation.
+If one operand is a string and the other is not, the one that's not a string will be coerced to its string representation for the purposes of the concatenation:
+
+```js
+userCount = 7;
+
+status = "There are " + userCount + " users online";
+
+status;         // There are 7 users online
+```
+
+String concatenation of this sort is essentially interpolation of data into the string, which is the main purpose of template literals (see Chapter 1). So the following code will have the same outcome but is generally considered to be the more preferred approach:
+
+```js
+userCount = 7;
+
+status = `There are ${userCount} users online`;
+
+status;         // There are 7 users online
+```
+
+Other options for string concatenation include `"one".concat("two","three")` and `[ "one", "two", "three" ].join("")`, but these kinds of approaches are only preferable when the number of strings to concatenate is dependent on runtime conditions/computation. If the string has a fixed/known set of content, as above, template literals are the better option.
 
 ### String Methods
 
@@ -301,7 +321,7 @@ Strings provide a whole slew of additional string-specific methods (as propertie
 
 * `trimStart()` / `trimEnd()` / `trim()`: produces a new string value with whitespace trimmed from the start of the string (left in LTR locales, right in RTL locales), or the end of the string (right in LTR locales, left in RTL locales), or both
 
-* `repeat(..)`: produces a new string with the string argument value repeated the specified number of times
+* `repeat(..)`: produces a new string with the original string value repeated the specified number of times
 
 * `split(..)`: produces an array of string values as split at the specified string or regular-expression boundaries
 
@@ -319,7 +339,17 @@ Strings provide a whole slew of additional string-specific methods (as propertie
 
 | WARNING: |
 | :--- |
-| Many of the methods described above rely on position indices. As mentioned earlier in the "Length Computations" section, these positions are dependent on the internal contents of the string value, which means that if an extended Unicode character is present and takes up two code-unit slots, that will count as two index positions instead of one. Failing to account for Unicode surrogate pairs is a common source of bugs in JS string handling, especially when dealing with non-English internationalized language characters. |
+| Many of the methods described above rely on position indices. As mentioned earlier in the "Length Computation" section, these positions are dependent on the internal contents of the string value, which means that if an extended Unicode character is present and takes up two code-unit slots, that will count as two index positions instead of one. Failing to account for *decomposed* code-units, surrogate pairs, and grapheme cluseters is a common source of bugs in JS string handling. |
+
+These string methods can all be called directly on a literal value, or on a variable/property that's holding a string value. When applicable, they produce a new string value rather than modifying the existing string value (since strings are immutable):
+
+```js
+"all these letters".toUpperCase();      // ALL THESE LETTERS
+
+greeting = "Hello!";
+greeting.repeat(2);                     // Hello!Hello!
+greeting;                               // Hello!
+```
 
 ### Static String Helpers
 
@@ -328,6 +358,17 @@ The following string utility functions are proviced directly on the `String` obj
 * `String.fromCharCode(..)` / `String.fromCodePoint(..)`: produce a string from one or more arguments representing the code-units (`fromCharCode(..)`) or whole code-points (`fromCodePoint(..)`)
 
 * `String.raw(..)`: a default template-tag function that allows interpolation on a template literal but prevents character escape sequences from being parsed, so they remain in their *raw* individual input characters from the literal
+
+Moreover, most values (especially primitives) can be explicitly coerced to their string equivalent by passing them to the `String(..)` function (no `new` keyword). For example:
+
+```js
+String(true);           // "true"
+String(42);             // "42"
+String(Infinity);       // "Infinity"
+String(undefined);      // "undefined"
+```
+
+We'll cover much more detail about such type coercions in a later chapter.
 
 ## Number Behaviors
 
