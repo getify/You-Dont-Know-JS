@@ -291,9 +291,9 @@ status;         // There are 7 users online
 
 Other options for string concatenation include `"one".concat("two","three")` and `[ "one", "two", "three" ].join("")`, but these kinds of approaches are only preferable when the number of strings to concatenate is dependent on runtime conditions/computation. If the string has a fixed/known set of content, as above, template literals are the better option.
 
-### String Methods
+### String Value Methods
 
-Strings provide a whole slew of additional string-specific methods (as properties):
+String values provide a whole slew of additional string-specific methods (as properties):
 
 * `charAt(..)`: produces a new string value at the numeric index, similar to `[ .. ]`; unlike `[ .. ]`, the result is always a string, either the character at position `0` (if a valid number outside the indices range), or the empty string `""` (if missing/invalid index)
 
@@ -308,6 +308,8 @@ Strings provide a whole slew of additional string-specific methods (as propertie
 * `toUpperCase()`: produces a new string value that's all uppercase characters
 
 * `toLowerCase()`: produces a new string value that's all lowercase characters
+
+* `toLocaleUpperCase()` / `toLocaleLowerCase()`: uses locale mappings for uppercase or lowercase operations
 
 * `concat(..)`: produces a new string value that's the concatenation of the original string and all of the string value arguments passed in
 
@@ -335,7 +337,9 @@ Strings provide a whole slew of additional string-specific methods (as propertie
 
 * `normalize(..)`: produces a new string with Unicode normalization (see "Unicode Normalization" in Chapter 1) having been performed on the contents
 
-* `big()`, `blink()`, `bold()`, `fixed()`, `fontcolor()`, `fontsize()`, `italics()`, `link()`, `small()`, `strike()`, `sub()`, and `sup()`: historically, these were useful in generating HTML string snippets; they're now deprecated and should be avoided
+* `localCompare(..)`: function that compares two strings according to the current locale (useful for sorting); returns `-1` if the original string value is comes before the argument string value lexicographically, `1` if the original string value comes after the argument string value lexicographically, and `0` if the two strings are identical
+
+* `anchor()`, `big()`, `blink()`, `bold()`, `fixed()`, `fontcolor()`, `fontsize()`, `italics()`, `link()`, `small()`, `strike()`, `sub()`, and `sup()`: historically, these were useful in generating HTML string snippets; they're now deprecated and should be avoided
 
 | WARNING: |
 | :--- |
@@ -372,6 +376,40 @@ We'll cover much more detail about such type coercions in a later chapter.
 
 ## Number Behaviors
 
-// TODO
+Numbers are used for a variety of tasks in our programs, usually for mathematical computations. Pay close attention to how JS numbers behave, to ensure the outcomes are as expected.
+
+### Number Value Methods
+
+Number values provide the following methods as number-specific methods (as properties):
+
+* `toExponential(..)`: TODO
+
+* `toFixed(..)`: TODO
+
+* `toLocaleString(..)`: TODO
+
+* `toPrecision(..)`: TODO
+
+### Static Number Properties
+
+* `Number.EPSILON`: TODO
+
+* `Number.NaN`: TODO
+
+* `Number.MIN_SAFE_INTEGER` / `Number.MAX_SAFE_INTEGER`: TODO
+
+* `Number.MIN_VALUE` / `Number.MAX_VALUE`: TODO
+
+* `Number.NEGATIVE_INFINITY` / `Number.POSITIVE_INFINITY`: TODO
+
+### Static Number Helpers
+
+* `Number.isFinite(..)`: TODO
+
+* `Number.isInteger(..)` / `Number.isSafeInteger(..)`: TODO
+
+* `Number.isNaN(..)`: TODO
+
+* `Number.parseFloat(..)` / `Number.parseInt(..)`: TODO
 
 [^TwitterUnicode]: "New update to the Twitter-Text library: Emoji character count"; Andy Piper; Oct 2018; https://twittercommunity.com/t/new-update-to-the-twitter-text-library-emoji-character-count/114607 ; Accessed July 2022
