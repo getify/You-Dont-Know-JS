@@ -562,6 +562,10 @@ If `radix` is omitted, the behavior of `parseInt(..)` is rather nuanced and conf
 
 `parseFloat(..)` always parses with a radix of `10`, so no second argument is accepted.
 
+| WARNING: |
+| :--- |
+| One surprising difference between `parseInt(..)` and `parseFloat(..)` is that `parseInt(..)` will not fully parse scientific notation (e.g., `"1.23e+5"`), instead stopping at the `.` as it's not valid for integers; in fact, even `"1e+5"` stops at the `"e"`. `parseFloat(..)` on the other hand fully parses scientific notation as expected. |
+
 In contrast to parsing-conversion, coercive-conversion is an all-or-nothing sort of operation. Either the entire contents of the string are recognized as numeric (integer or floating-point), or the whole conversion fails (resulting in `NaN` -- again, see "Invalid Number" later in this chapter).
 
 Coercive-conversion can be done explicitly with the `Number(..)` function (no `new` keyword) or with the unary `+` operator in front of the value:
@@ -646,7 +650,7 @@ someBigPowerOf10 = 1000000000;
 someBigPowerOf10 = 1e9;
 ```
 
-By default, JS will represent (e.g., as string values, etc) either very large or very small numbers -- specifically, if the values require more than 21 digits of precision --  using this same scientific notation:
+By default, JS will represent (e.g., as string values, etc) either very large or very small numbers -- specifically, if the values require more than 21 digits of precision -- using this same scientific notation:
 
 ```js
 ratherBigNumber = 123 ** 11;
@@ -656,7 +660,19 @@ prettySmallNumber = 123 ** -11;
 prettySmallNumber.toString();   // "1.0257553107587752e-23"
 ```
 
-Another readability affordance for numeric literals is the ability to insert `_` as a digit separator wherever its convenient/meaningful to do so. For example:
+Numbers with smaller absolute values (closer to `0`) than these thresholds can still be forced into scientific notation form (as strings):
+
+```js
+plainBoringNumber = 42;
+
+plainBoringNumber.toExponential();      // "4.2e+1"
+plainBoringNumber.toExponential(0);     // "4e+1"
+plainBoringNumber.toExponential(4);     // "4.2000e+1"
+```
+
+The optional argument to `toExponential(..)` specifies the number of decimal digits to include in the string representation.
+
+Another readability affordance for specifying numeric literals in code is the ability to insert `_` as a digit separator wherever its convenient/meaningful to do so. For example:
 
 ```js
 someBigPowerOf10 = 1_000_000_000;
@@ -870,6 +886,13 @@ Depending on how you interpret "smallest", you could either answer `0` or... `Nu
 
 ```js
 Number.MIN_SAFE_INTEGER;    // -9007199254740991
+```
+
+And JS provides a utiltity to determine if a value is an integer in this safe range (`-2^53 + 1` - `2^53 - 1`):
+
+```js
+Number.isSafeInteger(2 ** 53);      // false
+Number.isSafeInteger(2 ** 53 - 1);  // true
 ```
 
 ### Double Zeros

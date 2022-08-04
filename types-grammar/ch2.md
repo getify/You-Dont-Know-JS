@@ -355,7 +355,7 @@ greeting.repeat(2);                     // Hello!Hello!
 greeting;                               // Hello!
 ```
 
-### Static String Helpers
+### Static `String` Helpers
 
 The following string utility functions are proviced directly on the `String` object, rather than as methods on individual string values:
 
@@ -382,34 +382,57 @@ Numbers are used for a variety of tasks in our programs, usually for mathematica
 
 Number values provide the following methods as number-specific methods (as properties):
 
-* `toExponential(..)`: TODO
+* `toExponential(..)`: produces a string representation of the number using scientific notation (e.g., `"4.2e+1"`)
 
-* `toFixed(..)`: TODO
+* `toFixed(..)`: produces a non-scientific-notation string representation of the number with the specified number of decimal places (rounding or zero-padding as necessary)
 
-* `toLocaleString(..)`: TODO
+* `toPrecision(..)`: like `toFixed(..)`, except it applies the numeric argument as the number of significant digits (i.e., precision) including both the whole number and decimal places if any
 
-* `toPrecision(..)`: TODO
+* `toLocaleString(..)`: produces a string representation of the number according to the current locale
 
-### Static Number Properties
+### Static `Number` Properties
 
-* `Number.EPSILON`: TODO
+* `Number.EPSILON`: The smallest value possible between `1` and the next highest number
 
-* `Number.NaN`: TODO
+* `Number.NaN`: The same as the global `NaN` symbol, the special invalid number
 
-* `Number.MIN_SAFE_INTEGER` / `Number.MAX_SAFE_INTEGER`: TODO
+* `Number.MIN_SAFE_INTEGER` / `Number.MAX_SAFE_INTEGER`: The positive and negative integers with the largest absolute value (furthest from `0`)
 
-* `Number.MIN_VALUE` / `Number.MAX_VALUE`: TODO
+* `Number.MIN_VALUE` / `Number.MAX_VALUE`: The minimum (positive value closest to `0`) and the maximum (positive value furthest from `0`) representable by the `number` type
 
-* `Number.NEGATIVE_INFINITY` / `Number.POSITIVE_INFINITY`: TODO
+* `Number.NEGATIVE_INFINITY` / `Number.POSITIVE_INFINITY`: Same as `-Infinity` and `Infinity`, the values that represent the largest (non-finite) values furthest from `0`
 
-### Static Number Helpers
+### Static `Number` Helpers
 
-* `Number.isFinite(..)`: TODO
+* `Number.isFinite(..)`: returns a boolean indicating if the value is finite -- a `number` that's not `NaN` and nor one of the two infinities
 
-* `Number.isInteger(..)` / `Number.isSafeInteger(..)`: TODO
+* `Number.isInteger(..)` / `Number.isSafeInteger(..)`: both return booleans indicating if the value is a whole `number` with no decimal places, and if it's within the *safe* range for integers (`-2^53 + 1` - `2^53 - 1`)
 
-* `Number.isNaN(..)`: TODO
+* `Number.isNaN(..)`: The bug-fixed version of the global `isNaN(..)` utility, which identifies if the argument provided is the special `NaN` value
 
-* `Number.parseFloat(..)` / `Number.parseInt(..)`: TODO
+* `Number.parseFloat(..)` / `Number.parseInt(..)`: utilties to parse string values for numeric digits, left-to-right, until the end of the string or the first non-float (or non-integer) character is encountered
+
+### Static `Math` Namespace
+
+Since the main usage of `number` values is for performing mathematical operations, JS includes many standard mathematical constants and operation utilities on the `Math` namespace.
+
+There's a bunch of these, so I'll omit listing every single one. But here's a few for illustration purposes:
+
+```js
+Math.PI;                        // 3.141592653589793
+
+// absolute value
+Math.abs(-32.6);                // 32.6
+
+// rounding
+Math.round(-32.6);              // -33
+
+// min/max selection
+Math.min(100,Math.max(0,42));   // 42
+```
+
+### Mathematical Operators
+
+// TODO
 
 [^TwitterUnicode]: "New update to the Twitter-Text library: Emoji character count"; Andy Piper; Oct 2018; https://twittercommunity.com/t/new-update-to-the-twitter-text-library-emoji-character-count/114607 ; Accessed July 2022
