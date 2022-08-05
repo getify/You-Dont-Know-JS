@@ -686,7 +686,9 @@ The decision to use `12345` (no separator), `12_345` (like "12,345"), or `123_45
 
 IEEE-754[^IEEE754] is a technical standard for binary representation of decimal numbers. It's widely used by most computer programming languages, including JS, Python, Ruby, etc.
 
-In 64-bit IEEE-754 -- so called "double-precision" because originally IEEE-754 used to be 32-bit, and now it's double that! -- the 64 bits are divided into three sections: 52 bits for the number's base value (aka, "fraction", "mantissa", or "significand"), 11 bits for the exponent to raise `2` to before multiplying, and 1 bit for the sign of the ultimate value.
+I'm not going to cover it exhaustively, but I think a brief primer on how numbers work in languages like JS is more than warranted, given how few programmers have *any* familiarity with it.
+
+In 64-bit IEEE-754 -- so called "double-precision", because originally IEEE-754 used to be 32-bit, and now it's double that! -- the 64 bits are divided into three sections: 52 bits for the number's base value (aka, "fraction", "mantissa", or "significand"), 11 bits for the exponent to raise `2` to before multiplying, and 1 bit for the sign of the ultimate value.
 
 These bits are arranged left-to-right, as so (S = Sign Bit, E = Exponent Bit, M = Mantissa Bit):
 
@@ -709,7 +711,7 @@ The 11-bit exponent is binary `10000000100`, which in base-10 is `1028`. But in 
 
 | NOTE: |
 | :--- |
-| If the subtracting `1023` from the exponent value gives a negative (e.g., `-3`), that's still interpreted as `2`'s exponent. Raising `2` to negative numbers just produces smaller and smaller values. |
+| If the subtracting `1023` from the exponent value gives a negative (e.g., `-3`), that's still interpreted as `2`'s exponent; raising `2` to negative numbers just produces smaller and smaller values. |
 
 The remaining 52 bits give us the base value `01010000...`, interpreted as binary decimal `1.0101000...` (with all trailing zeros). Converting *that* to base-10, we get `1.3125000...`. Finally, then multiply that by `32` already computed from the exponent. The result: `42`.
 
@@ -725,49 +727,7 @@ The number `42.0000001`, which is only different from `42.000000` by just `0.000
 
 Notice how the previous bit pattern and this one differ by quite a few bits in the trailing positions! The binary decimal fraction containing all those extra `1` bits (`1.010100000000...01011111110010101`) converts to base-10 as `1.31250000312500003652`, which multipled by `32` gives us exactly `42.0000001`.
 
-Now you understand a *bit more* about how IEEE-754 works!
-
-#### Floating Point Imprecision
-
-One of the classic gotchas of any IEEE-754 number system in any programming language -- NOT UNIQUELY JS! -- is that not all operations and values can fit neatly into the IEEE-754 representations.
-
-The most common illustration is:
-
-```js
-point3a = 0.1 + 0.2;
-point3b = 0.3;
-
-point3a;                        // 0.30000000000000004
-point3b;                        // 0.3
-
-point3a === point3b;            // false <-- oops!
-```
-
-The operation `0.1 + 0.2` ends up creating floating-point error (drift), where the value stored is actually `0.30000000000000004`.
-
-The respective bit representations are:
-
-```
-// 0.30000000000000004
-00111111110100110011001100110011
-00110011001100110011001100110100
-
-// 0.3
-00111111110100110011001100110011
-00110011001100110011001100110011
-```
-
-If you look closely at those bit patterns, only the last 2 bits differ, from `00` to `11`. But that's enough for those two numbers to be unequal!
-
-Again, just to reinforce: this behavior is **NOT IN ANY WAY** unique to JS. This is exactly how any IEEE-754 conforming programming language will work in the same scenario. As I asserted above, the majority of all programming languages use IEEE-754, and thus they will all suffer this same fate.
-
-The temptation to make fun of JS for `0.1 + 0.2 !== 0.3` is strong. But it's completely bogus.
-
-Pretty much all programmers need to be aware of IEEE-754 and make sure they are careful about these kinds of gotchas. It's somewhat amazing, in a disappointing way, how few of them have any idea how IEEE-754 works. If you've taken your time reading and understanding the last several sections of this chapter, you're now in that rare tiny percentage who actually put in the effort to understand the numbers in their programs!
-
-| TIP: |
-| :--- |
-| Shortly, we'll cover `Number.EPSILON`, which offers an approach to working around this floating point error situation when comparing numbers. |
+We'll revisit more details about floating-point (im)precision in Chapter 2. But now you understand a *bit more* about how IEEE-754 works!
 
 ### Number Limits
 
@@ -831,36 +791,6 @@ Number.MIN_VALUE;               // 5e-324 <-- usually!
 ```
 
 Most JS engines seem to have a minimum representable value around `5E-324` (about `2^-1074`). Depending on the engine and/or platform, a different value may be exposed. Be careful about any program logic that relies on such implementation-dependent values.
-
-### Safely Small
-
-There's another *very small* `number` value you may want to use:
-
-```js
-Number.EPSILON;                 // 2.220446049250313e-16
-```
-
-*Epsilon* is defined as the smallest difference JS can represent between `1` and the next value greater than `1`. While this value is implementation/platform dependent, it's typically about `2.2E16`, or `2^-52`. This value is the maximum amount of floating-point representation error (as discussed earlier), so it represents the threshold above which two values are *actually* different rather just skewed by error.
-
-Thus, `Number.EPSILON` can used as a *very small* tolerance value to ensure number comparisons are *safe*:
-
-```js
-function safeNumberEquals(a,b) {
-    return Math.abs(a - b) < Number.EPSILON;
-}
-
-point3a = 0.1 + 0.2;
-point3b = 0.3;
-
-// are these safely "equal"?
-safeNumberEquals(point3a,point3b);      // true
-```
-
-Since JS cannot represent a difference between two values smaller than this `Number.EPSILON`, it should be safe to treat any two number values as "equal" (indistinguishable in JS, anyway) if their difference is less than `Number.EPSILON`.
-
-| WARNING: |
-| :--- |
-| If your program needs to deal with smaller values, or more specifically, smaller differences between values, than `2^-52`, you should absolutely *not use* the `number` value-type. There are decimal-emulation libraries that can offer arbitrary (small or large) precision. Or pick a different language than JS. |
 
 ### Safe Integer Limits
 

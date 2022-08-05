@@ -257,6 +257,18 @@ It would take replicating most of a platform's complex Unicode rendering logic t
 
 Counting the *length* of a string to match our human intuitions is a remarkably challenging task, perhaps more of an art than a science. We can get acceptable approximations in many cases, but there's plenty of other cases that may confound our programs.
 
+### Locale Ordering
+
+Depending on the language/locale in effect for the JS program, the contents of a string may be interpreted as being ordered from left-to-right (LTR) or right-to-left (RTL). As such, many of the string methods we'll cover later use logical descriptors in their names, like "start", "end", "begin", "end", and "last", rather than terms like "left" and "right".
+
+// TODO: index positions in [..] vs methods, `Intl` API, etc
+
+### String Comparison
+
+String values can be compared (for both equality and relational ordering) to other string values, using various built-in operators. It's important to keep in mind that such comparisons are sensitive to the actual string contents, including especially the underlying code-points from non-BPM Unicode characters.
+
+// TODO
+
 ### String Concatenation
 
 Two or more string values can be concatenated (combined) into a new string value, using the `+` operator:
@@ -378,9 +390,146 @@ We'll cover much more detail about such type coercions in a later chapter.
 
 Numbers are used for a variety of tasks in our programs, usually for mathematical computations. Pay close attention to how JS numbers behave, to ensure the outcomes are as expected.
 
+### Floating Point Imprecision
+
+We need to revisit our discussion of IEEE-754 from Chapter 1.
+
+One of the classic gotchas of any IEEE-754 number system in any programming language -- NOT UNIQUELY JS! -- is that not all operations and values can fit neatly into the IEEE-754 representations.
+
+The most common illustration is:
+
+```js
+point3a = 0.1 + 0.2;
+point3b = 0.3;
+
+point3a;                        // 0.30000000000000004
+point3b;                        // 0.3
+
+point3a === point3b;            // false <-- oops!
+```
+
+The operation `0.1 + 0.2` ends up creating floating-point error (drift), where the value stored is actually `0.30000000000000004`.
+
+The respective bit representations are:
+
+```
+// 0.30000000000000004
+00111111110100110011001100110011
+00110011001100110011001100110100
+
+// 0.3
+00111111110100110011001100110011
+00110011001100110011001100110011
+```
+
+If you look closely at those bit patterns, only the last 2 bits differ, from `00` to `11`. But that's enough for those two numbers to be unequal!
+
+Again, just to reinforce: this behavior is **NOT IN ANY WAY** unique to JS. This is exactly how any IEEE-754 conforming programming language will work in the same scenario. As I asserted above, the majority of all programming languages use IEEE-754, and thus they will all suffer this same fate.
+
+The temptation to make fun of JS for `0.1 + 0.2 !== 0.3` is strong, I know. But here it's completely bogus.
+
+| NOTE: |
+| :--- |
+| Pretty much all programmers need to be aware of IEEE-754 and make sure they are careful about these kinds of gotchas. It's somewhat amazing, in a disappointing way, how few of them have any idea how IEEE-754 works. If you've taken your time reading and understanding these concepts so far, you're now in that rare tiny percentage who actually put in the effort to understand the numbers in their programs! |
+
+One way to work around such floating-point imprecision is this *very small* `number` value:
+
+```js
+Number.EPSILON;                 // 2.220446049250313e-16
+```
+
+*Epsilon* is defined as the smallest difference JS can represent between `1` and the next value greater than `1`. While this value is implementation/platform dependent, it's typically about `2.2E16`, or `2^-52`. This value is the maximum amount of floating-point representation error (as discussed earlier), so it represents the threshold above which two values are *actually* different rather just skewed by floating-point error.
+
+Thus, `Number.EPSILON` can used as a *very small* tolerance value to ensure number comparisons are *safe*:
+
+```js
+function safeNumberEquals(a,b) {
+    return Math.abs(a - b) < Number.EPSILON;
+}
+
+point3a = 0.1 + 0.2;
+point3b = 0.3;
+
+// are these safely "equal"?
+safeNumberEquals(point3a,point3b);      // true
+```
+
+Since JS cannot represent a difference between two values smaller than this `Number.EPSILON`, it should be safe to treat any two number values as "equal" (indistinguishable in JS, anyway) if their difference is less than `Number.EPSILON`.
+
+| WARNING: |
+| :--- |
+| If your program needs to deal with smaller values than `2^-52`, or more specifically, smaller differences between values, you should absolutely *not use* the JS `number` value-type. There are decimal-emulation libraries that can offer arbitrary (small or large) precision. Or pick a different language than JS. |
+
+### Numeric Comparison
+
+Like strings, number values can be compared (for both equality and relational ordering) using the same operators.
+
+Remember that no matter what form the number value took when being specified (base-10, octal, hexadecimal, exponential, etc), the underlying value is what will be compared. Also keep in mind the floating point imprecision issues discussed in the previous section, as the comparisons will be sensitive to the exact binary contents, even if the difference between two numbers is much smaller than the `Number.EPSILON` threshold.
+
+// TODO
+
+### Mathematical Operators
+
+As I asserted earlier, the main reason to have numbers in a programming language is to perform mathematical operations with them. So let's talk about how we do so.
+
+The basic arithmetic operators are `+` (addition), `-` (subtraction), `*` (multiplication), and `/` (division). Also available are the operators `**` (exponentiation) and `%` (modulo, aka *division remainder*).
+
+| NOTE: |
+| :--- |
+| As we've already seen, the `+` operator is overloaded to work with both numbers and strings. When one or both operands is a string, the result is a string concatenation (including coercing either operand to a string if necessary). But if neither operand is a string, the result is a numeric addition, as expected. |
+
+All these mathematical operators are *binary*, meaning they expect two value operands, one on either side of the operator; they all expect the operands to be number values. If either or both operands are non-numbers, the non-number operand(s) is/are coerced to numbers to perform the operation. We'll cover coercion in detail in a later chapter.
+
+Consider:
+
+```js
+40 + 2;                 // 42
+44 - 2;                 // 42
+21 * 2;                 // 42
+84 / 2;                 // 42
+7 ** 2;                 // 49
+49 % 2;                 // 1
+
+40 + "2";               // "402" (string concatenation)
+44 - "2";               // 42 (because "2" is coerced to 2)
+21 * "2";               // 42 (..ditto..)
+84 / "2";               // 42 (..ditto..)
+"7" ** "2";             // 49 (both operands are coerced to numbers)
+"49" % "2";             // 1 (..ditto..)
+```
+
+The `+` and `-` operators also come in a *unary* form, meaning they only have one operand; again, the operand is expected to be a number, and coerced to a number if not:
+
+```js
++42;                    // 42
+-42;                    // -42
+
++"42";                  // 42
+-"42";                  // -42
+```
+
+You might have noticed that `-42` looks like it's just a "negative forty-two" numeric literal. That's not quite right. A nuance of JS syntax is that it doesn't recognize negative numeric literals. Instead, JS treats this as a positive numeric literal `42` that's preceded, and negated, by the unary `-` operator in front of it.
+
+Somewhat surprisingly, then:
+
+```js
+-42;                    // -42
+- 42;                   // -42
+-
+    42;                 // -42
+```
+
+As you can see, whitespace (and even new lines) are allowed between the `-` unary operator and its operand; actually, this is true of all operators and operands.
+
+### Bitwise Operators
+
+Since `number` values have a specific binary representation (IEEE-754), there are several bitwise operators to perform bit-level operations.
+
+// TODO
+
 ### Number Value Methods
 
-Number values provide the following methods as number-specific methods (as properties):
+Number values provide the following methods (as properties) for number-specific operations:
 
 * `toExponential(..)`: produces a string representation of the number using scientific notation (e.g., `"4.2e+1"`)
 
@@ -389,6 +538,42 @@ Number values provide the following methods as number-specific methods (as prope
 * `toPrecision(..)`: like `toFixed(..)`, except it applies the numeric argument as the number of significant digits (i.e., precision) including both the whole number and decimal places if any
 
 * `toLocaleString(..)`: produces a string representation of the number according to the current locale
+
+```js
+myAge = 42;
+
+myAge.toExponential(3);         // "4.200e+1"
+```
+
+One particular nuance of JS syntax is that `.` can be ambiguous when dealing with number literals and property/method access.
+
+If a `.` comes immediately (no whitespace) after a numeric literal digit, and there's not already a `.` decimal in the number value, the `.` is assumed to be a starting the decimal portion of the number. But if the position of the `.` is unambiguously *not* part of the numeric literal, then it's always treated as a property access.
+
+```js
+42 .toExponential(3);           // "4.200e+1"
+```
+
+Here, the whitespace disambiguates the `.`, designating it as a property/method access. It's perhaps more common/preferred to use `(..)` instead of whitespace for such disambiguation:
+
+```js
+(42).toExponential(3);          // "4.200e+1"
+```
+
+An unusual-looking effect of this JS parsing grammar rule:
+
+```js
+42..toExponential(3);           // "4.200e+1"
+```
+
+So called the "double-dot" idiom, the first `.` in this expression is a decimal, and thus the second `.` is unambiguously *not* a decimal, but rather a property/method access.
+
+Also, notice there's no digits after the first `.`; it's perfectly legal syntax to leave a trailing `.` on a numeric literal:
+
+```js
+myAge = 41. + 1.;
+
+myAge;                          // 42
+```
 
 ### Static `Number` Properties
 
@@ -400,11 +585,11 @@ Number values provide the following methods as number-specific methods (as prope
 
 * `Number.MIN_VALUE` / `Number.MAX_VALUE`: The minimum (positive value closest to `0`) and the maximum (positive value furthest from `0`) representable by the `number` type
 
-* `Number.NEGATIVE_INFINITY` / `Number.POSITIVE_INFINITY`: Same as `-Infinity` and `Infinity`, the values that represent the largest (non-finite) values furthest from `0`
+* `Number.NEGATIVE_INFINITY` / `Number.POSITIVE_INFINITY`: Same as global `-Infinity` and `Infinity`, the values that represent the largest (non-finite) values furthest from `0`
 
 ### Static `Number` Helpers
 
-* `Number.isFinite(..)`: returns a boolean indicating if the value is finite -- a `number` that's not `NaN` and nor one of the two infinities
+* `Number.isFinite(..)`: returns a boolean indicating if the value is finite -- a `number` that's not `NaN`, nor one of the two infinities
 
 * `Number.isInteger(..)` / `Number.isSafeInteger(..)`: both return booleans indicating if the value is a whole `number` with no decimal places, and if it's within the *safe* range for integers (`-2^53 + 1` - `2^53 - 1`)
 
@@ -431,8 +616,10 @@ Math.round(-32.6);              // -33
 Math.min(100,Math.max(0,42));   // 42
 ```
 
-### Mathematical Operators
+Unlike `Number`, which is also the `Number(..)` function (for number coercion), `Math` is just an object that holds these properties and static function utilities; it cannot be called as a function.
 
-// TODO
+| WARNING: |
+| :--- |
+| One peculiar member of the `Math` namespace is `Math.random()`, for producing a random floating point value between `0` and `1.0`. It's unusual to consider random number generation -- a task that's inherently stateful/side-effect'ing -- as a mathematical operation. It's also long been a footgun security-wise, as the pseudo-random number generator (PRNG) that JS uses is *not* secure (can be predicted) from a cryptography perspective. The web platform stepped in several years ago with the safer `crypto.getRandomValues(..)` API (based on a better PRNG), which fills a typed-array with random bits that can be interpreted as one or more integers (of type-specified maximum magnitude). Using `Math.random()` is universally discouraged now. |
 
 [^TwitterUnicode]: "New update to the Twitter-Text library: Emoji character count"; Andy Piper; Oct 2018; https://twittercommunity.com/t/new-update-to-the-twitter-text-library-emoji-character-count/114607 ; Accessed July 2022
