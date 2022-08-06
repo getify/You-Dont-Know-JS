@@ -464,15 +464,94 @@ Since JS cannot represent a difference between two values smaller than this `Num
 
 Like strings, number values can be compared (for both equality and relational ordering) using the same operators.
 
-Remember that no matter what form the number value took when being specified (base-10, octal, hexadecimal, exponential, etc), the underlying value is what will be compared. Also keep in mind the floating point imprecision issues discussed in the previous section, as the comparisons will be sensitive to the exact binary contents, even if the difference between two numbers is much smaller than the `Number.EPSILON` threshold.
+Remember that no matter what form the number value takes when being specified as a literal (base-10, octal, hexadecimal, exponential, etc), the underlying value stored is what will be compared. Also keep in mind the floating point imprecision issues discussed in the previous section, as the comparisons will be sensitive to the exact binary contents, even if the difference between two numbers is much smaller than the `Number.EPSILON` threshold.
 
-// TODO
+#### Numeric Equality
+
+Just like strings, equality comparisons for numbers use either the `==` / `===` operators or `Object.is(..)`. Also recall that if the types of both operands are the same, `==` performs identically to `===`.
+
+```js
+42 == 42;                   // true
+42 === 42;                  // true
+
+42 == 43;                   // false
+42 === 43;                  // false
+
+Object.is(42,42);           // true
+Object.is(42,43);           // false
+```
+
+For `==` coercive equality (when the operand types don't match), if either operand is not a string value, `==` prefers a numeric equality check (meaning both operands are coerced to numbers).
+
+```js
+42 == "42";                 // true
+```
+
+In this snippet, the coercive equality coerces `"42"` to `42`, not `42` to `"42"`. Once both types are the same (`number`), then their values are compared for exact equality, the same as `===` would.
+
+Recall that JS doesn't distinguish between values like `42`, `42.0`, and `42.000000`; under the covers, they're all the same. Unsurpisingly, the `==` and `===` equality checks verify that:
+
+```js
+42 == 42.0;                 // true
+42.0 == 42.00000;           // true
+42.00 === 42.000;           // true
+```
+
+The intuition you likely have is, if two numbers are literally the same, they're equal. And that's how JS interprets it. But `0.3` is not literally the same as the result of `0.1 + 0.2`, because (as we saw earlier), the latter produces an underlying value that's *very close* to `0.3`, but is not exactly identical.
+
+What's interesting is, the two values are *so close* that their difference is less than the `Number.EPSILON` threshold, so JS can't actually represent that difference *accurately*.
+
+You might then think, at least informally, that such JS numbers should be "equal", since the difference between them is too small to represent. But notice: JS *can* represent that there *is* a difference, which is why you see that `4` at the very end of the decimal when JS evaluates `0.1 + 0.2`. And you *could* type out the number literal `0.00000000000000004` (aka, `4e-17`), being that difference between `0.3` and `0.1 + 0.2`.
+
+What JS cannot do, with its IEEE-754 floating point numbers, is represent a number that small in an *accurate* enough way that operations on it produce expected results. It's too small to be fully and properly represented in the `number` type JS provides.
+
+So `0.1 + 0.2 == 0.3` resolves to `false`, because there's a difference between the two values, even though JS can't accurately represent or do anything with a value as small as that difference.
+
+Also like we saw with strings, the `!=` (coercive not-equal) and `!==` (strict-not-equal) operators work with numbers. `x != y` is basically `!(x == y)`, and `x !== y` is basically `!(x === y)`.
+
+There are two frustrating exceptions in numeric equality (whether you use `==` or `===`):
+
+```js
+NaN === NaN;                // false -- ugh!
+-0 === 0;                   // true -- ugh!
+```
+
+`NaN` is never equal to itself (even with `===`), and `-0` is always equal to `0` (even with `===`). It sometimes surprises folks that even `===` has these two exceptions in it.
+
+However, the `Object.is(..)` equality check has neither of these exceptions, so for equality comparisons with `NaN` and `-0`, avoid the `==` / `===` operators and use `Object.is(..)` -- or for `NaN` specifically, `Number.isNaN(..)`.
+
+#### Numeric Relational Comparisons
+
+In addition to equality checks between numbers, JS supports relational comparisons: `<`, `<=`, `>`, and `>=`. The `<` (less-than) and `>` (greater-than) operations should be fairly self explanatory:
+
+```js
+41 < 42;                    // true
+0.1 + 0.2 > 0.3;            // true
+```
+
+The `<` and `>` operators are also coercive, like `==` is, meaning that any non-number values are coerced to numbers -- unless both operands are already strings, as we saw earlier.
+
+Unfortunately, the `<` and `>` have no strict-comparison equivalent the way `===` avoids the coercion of `==`. The `<` and `>` operators are always coercive, and there's no way in JS to avoid that.
+
+The `<=` (less-than-or-equal) and `>=` (greater-than-or-equal) operators are effectively a shorthand for a compound check.
+
+```js
+42 <= 42;                   // true
+(42 < 42) || (42 == 42);    // true
+
+42 >= 42;                   // true
+(42 > 42) || (42 == 42);    // true
+```
+
+| NOTE: |
+| :--- |
+| Here's an interesting bit of specification nuance: JS doesn't actually define the `>` and `>=` relational comparisons independently. Instead, it defines them as the negation of their complement counterparts. So `x > y` is treated by JS as `!(x <= y)`, and `x >= y` is treated by JS as `!(x < y)`. So JS only needs to specify how `<`, `<=`, and `!` work, and thus gets `>` and `>=` for free! |
 
 ### Mathematical Operators
 
 As I asserted earlier, the main reason to have numbers in a programming language is to perform mathematical operations with them. So let's talk about how we do so.
 
-The basic arithmetic operators are `+` (addition), `-` (subtraction), `*` (multiplication), and `/` (division). Also available are the operators `**` (exponentiation) and `%` (modulo, aka *division remainder*).
+The basic arithmetic operators are `+` (addition), `-` (subtraction), `*` (multiplication), and `/` (division). Also available are the operators `**` (exponentiation) and `%` (modulo, aka *division remainder*). There are also `+=`, `-=`, `*=`, `/=`, `**=`, and `%=` forms of the operators, which additionally assign the result back to the left operand -- must be a valid assignment target like a variable or property.
 
 | NOTE: |
 | :--- |
@@ -521,11 +600,71 @@ Somewhat surprisingly, then:
 
 As you can see, whitespace (and even new lines) are allowed between the `-` unary operator and its operand; actually, this is true of all operators and operands.
 
+#### Increment and Decrement
+
+There are two other unary numeric operators: `++` (increment) and `--` decrement. They both perform their respective operation and then reassign the result to the operand -- must be a valid assignment target like a variable or property.
+
+You may sort of think of `++` as equivalent to `+= 1`, and `--` as equivalent to `-= 1`:
+
+```js
+myAge = 42;
+
+myAge++;
+myAge;                  // 43
+
+numberOfHeadHairs--;
+```
+
+However, these are special operators in that they can appear in a postfix (after the operand) position, as above, or in a prefix (before the operand) position:
+
+```js
+myAge = 42;
+
+++myAge;
+myAge;                  // 43
+
+--numberofHeadHairs;
+```
+
+It may seem peculiar that prefix and postfix positions seem to give the same result (incrementing or decrementing) in such examples. The difference is subtle, and isn't related to the final reassigned result. We'll revisit these particular operators in a later chapter to dig into the positional differences.
+
 ### Bitwise Operators
 
-Since `number` values have a specific binary representation (IEEE-754), there are several bitwise operators to perform bit-level operations.
+JS provides several bitwise operators to perform bit-level operations on number values.
 
-// TODO
+However, these bit operations are not performed against the packed bit-pattern of IEEE-754 numbers (see Chapter 1). Instead, the operand number is first converted to a 32-bit signed *integer*, the bit operation is performed, and then the result is converted back into an IEEE-754 number.
+
+Keep in mind, just like any other primitive operators, these just compute new values, not actually modifying a value in place.
+
+* `&` (bitwise AND): Performs an AND operation with each corresponding bit from the two operands; `42 & 36 === 32` (i.e., `0b00...101010 & 0b00...100100 === 0b00..100000`)
+
+* `|` (bitwise OR): Performs an OR operation with each corresponding bit from the two operands; `42 | 36 === 46` (i.e., `0b00...101010 | 0b00...100100 === 0b00...101110`)
+
+* `^` (bitwise XOR): Performs an XOR (eXclusive-OR) operation with each corresponding bit from the two operands; `42 ^ 36 === 14` (i.e., `0b00...101010 ^ 0b00...100100 === 0b00...001110`)
+
+* `~` (bitwise NOT): Performs a NOT operation against the bits of a single operand; `~42 === -43` (i.e., `~0b00...101010 === 0b11...010101`); using 2's complement, the signed integer has the first bit set to `1` meaning negative, and the rest of the bits (when flipped back, according to 2's complement, which is 1's complement bit flipping and then adding `1`) would be `43` (`0b10...101011`); the equivalent of `~` in decimal number arithmetic is `~x === -(x + 1)`, so `~42 === -43`
+
+* `<<` (left shift): Performs a left-shift of the bits of the left operand by the count of bits specified by the right operand; `42 << 3 == 336` (i.e., `0b00...101010 << 3 === 0b00...101010000`)
+
+* `>>` (right shift): Performs a sign-propagating right-shift of the bits of the left operand by the count of bits specified by the right operand, discarding the bits that fall off the right side; whatever the leftmost bit is (`0`, or `1` is negative) is copied in as bits on the left (thereby preserving the sign of the original value in the result); `42 >> 3 === 5` (i.e., `0b00..101010 >> 3 === 0b00...000101`)
+
+* `>>>` (zero-fill right shift, aka unsigned right shift): Performs the same right-shift as `>>`, but `0` fills on the bits shifted in from the left side instead of copying the leftmost bit (thereby ignoring the sign of the original value in the result); `42 >>> 3 === 5` but `-43 >>> 3 === 536870906` (i.e., `0b11...010101 >>> 3 === 0b0001...111010`)
+
+* `&=`, `|=`, `<<=`, `>>=`, and `>>>=` (bitwise operators with assignment): Performs the corresponding bitwise operation, but then assigns the result to the left operand (which must be a valid assignment target, like a variable or property, not just a literal value); note that `~=` is missing from the list, because there is no such "binary negate with assignment" operator
+
+In all honesty, bitwise operations are not very common in JS. But you may sometimes see a statement like:
+
+```js
+myGPA = 3.54;
+
+myGPA | 0;              // 3
+```
+
+Since the bitwise operators act only on 32-bit integers, the `| 0` operation truncates (i.e., `Math.trunc(..)`) any decimal value, leaving only the integer.
+
+| WARNING: |
+| :--- |
+| A common misconception is that `| 0` is like *floor* (i.e., `Math.floor(..)`). The result of `| 0` agrees with `Math.floor(..)` on positive numbers, but differs on negative numbers, because by standard definition, *floor* is an operation that rounds-down towards `-Infinity`. `| 0` merely discards the decimal bits, which is in fact truncation. |
 
 ### Number Value Methods
 
