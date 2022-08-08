@@ -22,4 +22,4 @@
     * Primitive Assignments
     * String Behaviors
     * Number Behaviors
-    * TODO
+    * Primitives Are Foundational

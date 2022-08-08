@@ -855,6 +855,10 @@ You may wonder why we'd ever need such a thing as `-0`. It can be useful when us
 
 Without having a signed zero value, you couldn't tell which direction such an item was pointing at the moment it came to rest.
 
+| NOTE: |
+| :--- |
+| While JS defines a signed zero in the `number` type, there is no corresponding signed zero in the `bigint` number type. As such, `-0n` is just interpreted as `0n`, and the two are indistinguishable. |
+
 ### Invalid Number
 
 Mathematical operations can sometimes produce an invalid result. For example:

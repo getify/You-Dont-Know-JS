@@ -941,6 +941,12 @@ myAge = 41. + 1.;
 myAge;                          // 42
 ```
 
+Values of `bigint` type cannot have decimals, so the parsing is unambiguous that a `.` after a literal (with the trailing `n`) is always a property access:
+
+```js
+42n.toString();                 // 42
+```
+
 ### Static `Number` Properties
 
 * `Number.EPSILON`: The smallest value possible between `1` and the next highest number
@@ -987,6 +993,47 @@ Unlike `Number`, which is also the `Number(..)` function (for number coercion), 
 | WARNING: |
 | :--- |
 | One peculiar member of the `Math` namespace is `Math.random()`, for producing a random floating point value between `0` and `1.0`. It's unusual to consider random number generation -- a task that's inherently stateful/side-effect'ing -- as a mathematical operation. It's also long been a footgun security-wise, as the pseudo-random number generator (PRNG) that JS uses is *not* secure (can be predicted) from a cryptography perspective. The web platform stepped in several years ago with the safer `crypto.getRandomValues(..)` API (based on a better PRNG), which fills a typed-array with random bits that can be interpreted as one or more integers (of type-specified maximum magnitude). Using `Math.random()` is universally discouraged now. |
+
+### BigInts and Numbers Don't Mix
+
+As we covered in Chapter 1, values of `number` type and `bigint` type cannot mix in the same operations. That can trip you up even if you're doing a simple increment of the value (like in a loop):
+
+```js
+myAge = 42n;
+
+myAge + 1;                  // TypeError thrown!
+myAge += 1;                 // TypeError thrown!
+
+myAge + 1n;                 // 43n
+myAge += 1n;                // 43n
+
+myAge++;
+myAge;                      // 44n
+```
+
+As such, if you're using both `number` and `bigint` values in your programs, you'll need to manually coerce one value-type to the other somewhat regularly. The `BigInt(..)` function (no `new` keyword) can coerce a `number` value to `bigint`. Vice versa, to go the other direction from `bigint` to `number`, use the `Number(..)` function (again, no `new` keyword):
+
+```js
+BigInt(42);                 // 42n
+
+Number(42n);                // 42
+```
+
+Keep in mind though: coercing between these types has some risk:
+
+```js
+BigInt(4.2);                // RangeError thrown!
+BigInt(NaN);                // RangeError thrown!
+BigInt(Infinity);           // RangeError thrown!
+
+Number(2n ** 1024n);        // Infinity
+```
+
+## Primitives Are Foundational
+
+Over the last two chapters, we've dug deep into how primitive values behave in JS. I bet more than a few readers were, like me, ready to skip over these topics. But now, hopefully, you see the importance of understanding these concepts.
+
+The story doesn't end here, though. Far from it! In the next chapter, we'll turn our attention to understanding JS's object types (objects, arrays, etc).
 
 [^TwitterUnicode]: "New update to the Twitter-Text library: Emoji character count"; Andy Piper; Oct 2018; https://twittercommunity.com/t/new-update-to-the-twitter-text-library-emoji-character-count/114607 ; Accessed July 2022
 
