@@ -275,15 +275,23 @@ hebrewHello = "\u{5e9}\u{5dc}\u{5d5}\u{5dd}";
 console.log(hebrewHello);                       // שלום
 ```
 
+Notice that the first listed character in the string literal (`"\u{5e9}"`) is actually the right-most character when the string is rendered?
+
+Even though Hebrew is an RTL language, you don't actually type the characters in the string literal in reversed (RTL) order the way they should be rendered. You enter the characters in logical order, where position `0` is the first character, position `1` is the second character, etc. The rendering layer is where RTL characters are reversed to be shown in their correct order.
+
+That also means that if you access `hebrewHello[0]` (or `hebrewHello.charAt(0)`) -- to get the character as position `0` -- you get `"ש"` because that's logically the first character of the string, not `"ם"` (logically the last character of the string). Index-positional access follows the logical position, not the rendered position.
+
+Here's the same example in another RTL language, Arabic:
+
 ```js
 arabicHello = "\u{631}\u{62d}\u{628}\u{627}";
 
 console.log(arabicHello);                       // رحبا
+
+console.log(arabicHello[0]);                    // ر
 ```
 
-If you access `hebrewHello[0]` -- to get the character as position `0` -- you might expect the letter `"ם"`, but instead you get `"ש"` because Hebrew is RTL. So in other words, JS applies index positioning based on the LTR/RTL of the locale (including as embedded in the string contents themselves).
-
-JS programs can force the in-effect language/locale, using various `Intl` APIs such as `Intl.Collator`: [^INTLCollator]
+JS programs can force a specific language/locale, using various `Intl` APIs such as `Intl.Collator`: [^INTLCollator]
 
 ```js
 germanStringSorter = new Intl.Collator("de");
@@ -301,7 +309,6 @@ germanStringSorter.compare("Z","z");
 caseFirstSorter = new Intl.Collator("de",{ caseFirst: "upper", });
 caseFirstSorter.compare("Z","z");
 // -1 (or negative number)
-
 ```
 
 Multiple-word strings can be segmented using `Intl.Segmenter`: [^INTLSegmenter]
