@@ -256,9 +256,9 @@ The standard notation for Unicode characters is `U+` followed by 4-6 hexadecimal
 
 The first group of 65,535 code points in Unicode is called the BMP (Basic Multilingual Plane). These can all be represented with 16 bits (2 bytes). When representing Unicode characters from the BMP, it's fairly straightforward, as they can *fit* neatly into single UTF-16 JS characters.
 
-All the rest of the code points are grouped into 16 so called "supplemental planes" or "astral planes". These code-points require more than 16 bits to represent -- 21 bits to be exact -- so when representing extended/supplemental characters above the BMP, JS actually stores these code-points as a pairing of two adjacent 16-bit code units, called *surrogate halves*.
+All the rest of the code points are grouped into 16 so called "supplemental planes" or "astral planes". These code-points require more than 16 bits to represent -- 21 bits to be exact -- so when representing extended/supplemental characters above the BMP, JS actually stores these code-points as a pairing of two adjacent 16-bit code units, called *surrogate halves* (or *surrogate pairs*).
 
-For example, the Unicode code point `127878` (hexadecimal `1F386`) is `🎆` (fireworks symbol). JS stores this in a string value as two surrogate-halve code units: `U+D83C` and `U+DF86`.
+For example, the Unicode code point `127878` (hexadecimal `1F386`) is `🎆` (fireworks symbol). JS stores this in a string value as two surrogate-halve code units: `U+D83C` and `U+DF86`. Keep in mind that these two parts of the whole character do *not* standalone; they're only valid/meaningful when paired immediately adjacent to each other.
 
 This has implications on the length of strings, because a single visible character like the `🎆` fireworks symbol, when in a JS string, is a counted as 2 characters for the purposes of the string length!
 
@@ -396,7 +396,9 @@ console.log(eTilde2);       // é
 console.log(eTilde3);       // é
 ```
 
-However, the way the `"é"` character is internally stored affects things like `length` computation of the containing string, as well as equality comparison:
+The string literal assigned to `eTilde3` in this snippet stores the accent mark as a separate *combining mark* symbol. Like surrogate pairs, a combining mark only makes sense in connection with the symbol it's adjacent to (usually after).
+
+The rendering of the Unicode symbol should be the same regardless, but how the `"é"` character is internally stored affects things like `length` computation of the containing string, as well as equality and relational comparison (more on these in Chapter 2):
 
 ```js
 eTilde1.length;             // 2
@@ -407,7 +409,7 @@ eTilde1 === eTilde2;        // false
 eTilde1 === eTilde3;        // true
 ```
 
-One particular challenge is that you may copy-paste a string with an `"é"` character visible in it, and that character may have been in the *composed* or *decomposed* form. But there's no visual way to tell, and yet the underlying string value will be different depending:
+One particular challenge is that you may copy-paste a string with an `"é"` character visible in it, and that character you copied may have been in the *composed* or *decomposed* form. But there's no visual way to tell, and yet the underlying string value in the literal will be different:
 
 ```js
 "é" === "é";           // false!!
@@ -445,6 +447,8 @@ familyEmoji;            // 👩‍👩‍👦‍👦
 ```
 
 This emoji is *not* a single registered Unicode code-point, and as such, there's no *normalization* that can be performed to compose these 7 separate code-points into a single entity. The visual rendering logic for such composite symbols is quite complex, well beyond what most of JS developers want to embed into our programs. Libraries do exist for handling some of this logic, but they're often large and still don't necessarily cover all of the nuances/variations.
+
+Unlike surrogate pairs and combining marks, the symbols in grapheme clusters can in fact act as standalone characters, but have the special combining behavior when placed adjactent to each other.
 
 This kind of complexity significantly affects length computations, comparison, sorting, and many other common string-oriented operations.
 

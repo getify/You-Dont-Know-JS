@@ -253,21 +253,253 @@ It would take replicating most of a platform's complex Unicode rendering logic t
 
 | NOTE: |
 | :--- |
-| As a Twitter user, you might expect to be able to put 280 thumbs-down emoji into a single tweet, since it looks like a single character. Twitter counts the `"👎"` (default thumbs-down), the `"👎🏾"` (medium-dark-skintone thumbs-down), and even the `"👩‍👩‍👦‍👦"` (family emoji grapheme cluster) all as 2 characters each, even though their respective string lengths (from JS's perspective) are `2`, `4`, and `7`; thus, you can only fit half the number of emojis (140 instead of 280) in a tweet. In fact, Twitter implemented this change in 2018 to specifically level the counting of all Unicode characters, at 2 characters per symbol. [^TwitterUnicode] That was a welcomed change for Twitter users, especially those who want to use emoji characters that are most representative of intended gender, skintone, etc. Still, it *is* curious that the choice was made to count the symbols as 2 characters each, instead of the more intuitive 1 character each. |
+| As a Twitter user, you might expect to be able to put 280 thumbs-down emojis into a single tweet, since it looks like a single character. Twitter counts the `"👎"` (default thumbs-down), the `"👎🏾"` (medium-dark-skintone thumbs-down), and even the `"👩‍👩‍👦‍👦"` (family emoji grapheme cluster) all as 2 characters each, even though their respective string lengths (from JS's perspective) are `2`, `4`, and `7`; thus, you can only fit half the number of emojis (140 instead of 280) in a tweet. In fact, Twitter implemented this change in 2018 to specifically level the counting of all Unicode characters, at 2 characters per symbol. [^TwitterUnicode] That was a welcomed change for Twitter users, especially those who want to use emoji characters that are most representative of intended gender, skintone, etc. Still, it *is* curious that Twitter chose to count all Unicode/emoji symbols as 2 characters each, instead of the more intuitive 1 character (grapheme) each. |
 
 Counting the *length* of a string to match our human intuitions is a remarkably challenging task, perhaps more of an art than a science. We can get acceptable approximations in many cases, but there's plenty of other cases that may confound our programs.
 
-### Locale Ordering
+### Internationalization (i18n) and Localization (l10n)
 
-Depending on the language/locale in effect for the JS program, the contents of a string may be interpreted as being ordered from left-to-right (LTR) or right-to-left (RTL). As such, many of the string methods we'll cover later use logical descriptors in their names, like "start", "end", "begin", "end", and "last", rather than terms like "left" and "right".
+To serve the growing need for JS programs to operate as expected in any international language/culture context, the ECMAScript committee also publishes the ECMAScript Internationalization API. [^INTLAPI]
 
-// TODO: index positions in [..] vs methods, `Intl` API, etc
+A JS program defaults to a locale/language according to the environment running the program (web browser page, Node instance, etc). The in-effect locale affects sorting (and value comparisons), formatting, and several other assumed behaviors. Such altered behaviors are perhaps a bit more obvious with strings, but they can also be seen with numbers (and dates!).
+
+But string characters also can have language/locale information embedded in them, which takes precedence over the environment default. If the string character is ambiguous/shared in terms of its language/locale (such as `"a"`), the default environment setting is used.
+
+Depending on the contents of the string, it may be interpreted as being ordered from left-to-right (LTR) or right-to-left (RTL). As such, many of the string methods we'll cover later use logical descriptors in their names, like "start", "end", "begin", "end", and "last", rather than directional terms like "left" and "right".
+
+For example, Hebrew and Arabic are both common RTL languages:
+
+```js
+hebrewHello = "\u{5e9}\u{5dc}\u{5d5}\u{5dd}";
+
+console.log(hebrewHello);                       // שלום
+```
+
+```js
+arabicHello = "\u{631}\u{62d}\u{628}\u{627}";
+
+console.log(arabicHello);                       // رحبا
+```
+
+If you access `hebrewHello[0]` -- to get the character as position `0` -- you might expect the letter `"ם"`, but instead you get `"ש"` because Hebrew is RTL. So in other words, JS applies index positioning based on the LTR/RTL of the locale (including as embedded in the string contents themselves).
+
+JS programs can force the in-effect language/locale, using various `Intl` APIs such as `Intl.Collator`: [^INTLCollator]
+
+```js
+germanStringSorter = new Intl.Collator("de");
+
+listOfGermanWords = [ /* .. */ ];
+
+germanStringSorter.compare("Hallo","Welt");
+// -1 (or negative number)
+
+// examples adapted from MDN:
+//
+germanStringSorter.compare("Z","z");
+// 1 (or positive number)
+
+caseFirstSorter = new Intl.Collator("de",{ caseFirst: "upper", });
+caseFirstSorter.compare("Z","z");
+// -1 (or negative number)
+
+```
+
+Multiple-word strings can be segmented using `Intl.Segmenter`: [^INTLSegmenter]
+
+```js
+arabicHelloWorld = "\u{645}\u{631}\u{62d}\u{628}\u{627} \
+\u{628}\u{627}\u{644}\u{639}\u{627}\u{644}\u{645}";
+
+console.log(arabicHelloWorld);      // مرحبا بالعالم
+
+arabicSegmenter = new Intl.Segmenter("ar",{ granularity: "word" });
+
+for (
+    let { segment: word, isWordLike } of
+    arabicSegmenter.segment(arabicHelloWorld)
+) {
+    if (isWordLike) {
+        console.log(word);
+    }
+}
+// مرحبا
+//لعالم
+```
+
+| NOTE: |
+| :--- |
+| The `segment(..)` method (from instances of`Intl.Segmenter`) returns a standard JS iterator, which the `for..of` loop here consumes. More on iteration protocols in the "Sync & Async" title of this series. |
 
 ### String Comparison
 
 String values can be compared (for both equality and relational ordering) to other string values, using various built-in operators. It's important to keep in mind that such comparisons are sensitive to the actual string contents, including especially the underlying code-points from non-BPM Unicode characters.
 
-// TODO
+Both equality and relational comparison are case-sensitive, for any characters where uppercase and lowercase are well-defined. To make case-insensitive comparisons, normalize the casing of both values first (with `toUpperCase()` or `toLowerCase()`).
+
+#### String Equality
+
+The `===` and `==` operators (along with their negated counterparts `!==` and `!=`, respectively) are the most common way equality comparisons are made for primitive values, including string values:
+
+```js
+"my name" === "my n\x61me";               // true
+
+"my name" !== String.raw`my n\x61me`;     // true
+```
+
+The `===` operator[^StrictEquality] -- often referred to as "strict equality" -- first checks to see if the types match, and if not, returns `false` right away. If the types match, then it checks to see if the values are the same; for strings, this is a per-code-unit comparison, from start to end.
+
+Despite the "strict" naming, there are nuances to `===` (such as `-0` and `NaN` handling), but we'll cover those later.
+
+##### Coercive Equality
+
+By contrast, the `==` operator[^LooseEquality] -- often referred to as "loose equality" -- performs *coercive equality*: if the value-types of the two operands do not match, `==` first coerces one or both operands until the value-types *do* match, and then it hands off the comparison internally to `===`.
+
+Coercion is an extremely important topic -- it's an inherent part of the JS types system, one of the language's 3 pillars -- but we're only going to briefly introduce it here in this chapter, and revisit it in detail later.
+
+| NOTE: |
+| :--- |
+| You may have heard the oft-quoted, but nevertheless inaccurate, explanation that the difference between `==` and `===` is that `==` compares the values while `==` compares both the values and the types. Not true, and you can read the spec yourself to verify -- both `isStrictlyEqual(..)` and `isLooselyEqual(..)` specification algorithms are linked as footnotes in the preceding paragraphs. To summarize, though: both `==` and `===` are aware of and sensitive to the types of the operands. If the operand types are the same, both operators do literally the exact same thing; if the types differ, `==` forces coercion until the types match, whereas `===` returns `false` immediately. |
+
+It's extremely common for developers to assert that the `==` operator is confusing and too hard to use without surprises (thus the near universal preference for `===`). I think that's totally bogus, and in fact, JS developers should be defaulting to `==` (and avoiding `===` if possible). But we need a lot more discussion to back such a controversial statement; hold onto your objections until we revisit it later.
+
+For now, to gain some intuition about the coercive nature of `==`, the most illuminating observation is that if the types don't match, `==` *prefers* numeric comparison. That means it will attempt to convert both operands to numbers, and then perform the equality check (the same as `===`).
+
+So, as it relates to our present discussion, actual string equality can *only be* checked if both operands are already strings:
+
+```js
+// actual string equality check (via === internally):
+"42" == "42";           // true
+```
+
+`==` does not really perform string equality checks itself. If the operand value-types are both strings, `==` just hands off the comparison to `===`. If they're not both strings, the coercive steps in `==` will reduce the comparison matching to numeric instead of string:
+
+```js
+// numeric (not string!) equality check:
+42 == "42";             // true
+```
+
+We'll cover numeric equality later in this chapter.
+
+##### *Really* Strict Equality
+
+In addition to `==` and `===`, JS provides the `Object.is(..)` utility, which returns `true` if both arguments are *exactly identical*, and `false` otherwise (no exceptions or nuances):
+
+```js
+Object.is("42",42);             // false
+
+Object.is("42","\x34\x32");     // true
+```
+
+Since `===` adds a `=` onto the end of `==` to make it more strict in behavior, I kind of half-joke that the `Object.is(..)` utility is like a `====` (a fourth `=` added) operator, for the really-truly-strict-no-exceptions kind of equality checking!
+
+That said, `===` (and `==` by virtue of its internal delegation to `===`) are *extremely predictable*, with no weird exceptions, when it comes to comparing two actually-already-string values. I strongly recommend using `==` for such checks (or `===`), and reserve `Object.is(..)` for the corner cases (which are numeric).
+
+#### String Relational Comparisons
+
+In addition to equality checks between strings, JS supports relational comparisons between primitive values, like strings: `<`, `<=`, `>`, and `>=`.
+
+The `<` (less-than) and `>` (greater-than) operations compare two string values lexicographically -- like you would sort words in a dictionary -- and should thus be fairly self explanatory:
+
+```js
+"hello" < "world";          // true
+```
+
+| NOTE: |
+| :--- |
+| As mentioned earlier, the running JS program has a default locale, and these operators compare according to that locale. |
+
+Like `==`, the `<` and `>` operators are numerically coercive. Any non-number values are coerced to numbers. So the only way to do a relational comparison with strings is to ensure both operands are already string values.
+
+Perhaps somewhat surprisingly, the `<` and `>` have no strict-comparison equivalent, the way `===` avoids the coercion of `==`. These operators are always coercive (when the types don't match), and there's no way in JS to avoid that.
+
+So what happens when both values are *numeric-looking* strings?
+
+```js
+"100" < "11";               // true
+```
+
+Numerically, of course, `100` should *not be* less than `11`.
+
+But relational comparisons between two strings use the lexicographic ordering. So the second `"0"` character (in `"100"`) is less than the second `"1"` (in `"11"`), and thus `"100"` would be sorted in a *dictionary* before `"11"`. The relational operators only coerce to numbers if the operand types are not already strings.
+
+The `<=` (less-than-or-equal) and `>=` (greater-than-or-equal) operators are effectively a shorthand for a compound check.
+
+```js
+"hello" <= "hello";                             // true
+("hello" < "hello") || ("hello" == "hello");    // true
+
+"hello" >= "hello";                             // true
+("hello" > "hello") || ("hello" == "hello");    // true
+```
+
+| NOTE: |
+| :--- |
+| Here's an interesting bit of specification nuance: JS doesn't actually define the `>` and `>=` relational comparisons independently. Instead, it defines them as the negation of their complement counterparts. So `x > y` is treated by JS as `!(x <= y)`, and `x >= y` is treated by JS as `!(x < y)`. So JS only needs to specify how `<`, `<=`, and `!` work, and thus gets `>` and `>=` for free! |
+
+##### Locale-Aware Relational Comparisons
+
+As I mentioned a moment ago, the relational operators assume and use the current in-effect locale. However, it can sometimes be useful to force a specific locale for comparisons (such as when sorting a list of strings).
+
+JS provides the method `localCompare(..)` on JS strings for this purpose:
+
+```js
+"hello".localeCompare("world");
+// -1 (or negative number)
+
+"world".localeCompare("hello","en");
+// 1 (or positive number)
+
+"hello".localeCompare("hello","en",{ ignorePunctuation: true });
+// 0
+
+// examples from MDN:
+//
+// in German, ä sorts before z
+"ä".localeCompare("z","de");
+// -1 (or negative number) // a negative value
+
+// in Swedish, ä sorts after z
+"ä".localeCompare("z","sv");
+// 1 (or positive number)
+```
+
+The optional second and third arguments to `localeCompare(..)` control which locale to use, via the `Intl.Collator` API[^INTLCollatorApi], as covered earlier.
+
+You might use `localeCompare(..)` when sorting an array of strings:
+
+```js
+studentNames = [
+    "Lisa",
+    "Kyle",
+    "Jason"
+];
+
+// Array::sort() mutates the array in place
+studentNames.sort(function alphabetizeNames(name1,name2){
+    return name1.localeCompare(name2);
+});
+
+studentNames;
+// [ "Jason", "Kyle", "Lisa" ]
+```
+
+But as discussed earlier, a more straightforward way (and slightly more performant when sorting many strings) is using `Intl.Collator` directly:
+
+```js
+studentNames = [
+    "Lisa",
+    "Kyle",
+    "Jason"
+];
+
+nameSorter = new Intl.Collator("en");
+
+// Array::sort() mutates the array in place
+studentNames.sort(nameSorter.compare);
+
+studentNames;
+// [ "Jason", "Kyle", "Lisa" ]
+```
 
 ### String Concatenation
 
@@ -349,7 +581,7 @@ String values provide a whole slew of additional string-specific methods (as pro
 
 * `normalize(..)`: produces a new string with Unicode normalization (see "Unicode Normalization" in Chapter 1) having been performed on the contents
 
-* `localCompare(..)`: function that compares two strings according to the current locale (useful for sorting); returns `-1` if the original string value is comes before the argument string value lexicographically, `1` if the original string value comes after the argument string value lexicographically, and `0` if the two strings are identical
+* `localCompare(..)`: function that compares two strings according to the current locale (useful for sorting); returns a negative number (usually `-1` but not guaranteed) if the original string value is comes before the argument string value lexicographically, a positive number (usually `1` but not guaranteed) if the original string value comes after the argument string value lexicographically, and `0` if the two strings are identical
 
 * `anchor()`, `big()`, `blink()`, `bold()`, `fixed()`, `fontcolor()`, `fontsize()`, `italics()`, `link()`, `small()`, `strike()`, `sub()`, and `sup()`: historically, these were useful in generating HTML string snippets; they're now deprecated and should be avoided
 
@@ -388,7 +620,7 @@ We'll cover much more detail about such type coercions in a later chapter.
 
 ## Number Behaviors
 
-Numbers are used for a variety of tasks in our programs, usually for mathematical computations. Pay close attention to how JS numbers behave, to ensure the outcomes are as expected.
+Numbers are used for a variety of tasks in our programs, but mostly for mathematical computations. Pay close attention to how JS numbers behave, to ensure the outcomes are as expected.
 
 ### Floating Point Imprecision
 
@@ -484,10 +716,11 @@ Object.is(42,43);           // false
 For `==` coercive equality (when the operand types don't match), if either operand is not a string value, `==` prefers a numeric equality check (meaning both operands are coerced to numbers).
 
 ```js
+// numeric (not string!) comparison
 42 == "42";                 // true
 ```
 
-In this snippet, the coercive equality coerces `"42"` to `42`, not `42` to `"42"`. Once both types are the same (`number`), then their values are compared for exact equality, the same as `===` would.
+In this snippet, the coercive equality coerces `"42"` to `42`, not vice versa (`42` to `"42"`). Once both types are `number`, then their values are compared for exact equality, the same as `===` would.
 
 Recall that JS doesn't distinguish between values like `42`, `42.0`, and `42.000000`; under the covers, they're all the same. Unsurpisingly, the `==` and `===` equality checks verify that:
 
@@ -522,30 +755,17 @@ However, the `Object.is(..)` equality check has neither of these exceptions, so 
 
 #### Numeric Relational Comparisons
 
-In addition to equality checks between numbers, JS supports relational comparisons: `<`, `<=`, `>`, and `>=`. The `<` (less-than) and `>` (greater-than) operations should be fairly self explanatory:
+Just like with string values, the JS relational operators (`<`, `<=`, `>`, and `>=`) operate with numbers. The `<` (less-than) and `>` (greater-than) operations should be fairly self explanatory:
 
 ```js
 41 < 42;                    // true
-0.1 + 0.2 > 0.3;            // true
+
+0.1 + 0.2 > 0.3;            // true (ugh, IEEE-754)
 ```
 
-The `<` and `>` operators are also coercive, like `==` is, meaning that any non-number values are coerced to numbers -- unless both operands are already strings, as we saw earlier.
+Remember: just like `==`, the `<` and `>` operators are also coercive, meaning that any non-number values are coerced to numbers -- unless both operands are already strings, as we saw earlier. There are no strict relational comparison operators.
 
-Unfortunately, the `<` and `>` have no strict-comparison equivalent the way `===` avoids the coercion of `==`. The `<` and `>` operators are always coercive, and there's no way in JS to avoid that.
-
-The `<=` (less-than-or-equal) and `>=` (greater-than-or-equal) operators are effectively a shorthand for a compound check.
-
-```js
-42 <= 42;                   // true
-(42 < 42) || (42 == 42);    // true
-
-42 >= 42;                   // true
-(42 > 42) || (42 == 42);    // true
-```
-
-| NOTE: |
-| :--- |
-| Here's an interesting bit of specification nuance: JS doesn't actually define the `>` and `>=` relational comparisons independently. Instead, it defines them as the negation of their complement counterparts. So `x > y` is treated by JS as `!(x <= y)`, and `x >= y` is treated by JS as `!(x < y)`. So JS only needs to specify how `<`, `<=`, and `!` work, and thus gets `>` and `>=` for free! |
+If you're doing relational comparisons between numbers, the only way to avoid coercion is to ensure that the comparisons always have two numbers. Otherwise, these operators will do *coercive relational* comparisons similar to how `==` performs *coercive equality* comparisons.
 
 ### Mathematical Operators
 
@@ -762,3 +982,13 @@ Unlike `Number`, which is also the `Number(..)` function (for number coercion), 
 | One peculiar member of the `Math` namespace is `Math.random()`, for producing a random floating point value between `0` and `1.0`. It's unusual to consider random number generation -- a task that's inherently stateful/side-effect'ing -- as a mathematical operation. It's also long been a footgun security-wise, as the pseudo-random number generator (PRNG) that JS uses is *not* secure (can be predicted) from a cryptography perspective. The web platform stepped in several years ago with the safer `crypto.getRandomValues(..)` API (based on a better PRNG), which fills a typed-array with random bits that can be interpreted as one or more integers (of type-specified maximum magnitude). Using `Math.random()` is universally discouraged now. |
 
 [^TwitterUnicode]: "New update to the Twitter-Text library: Emoji character count"; Andy Piper; Oct 2018; https://twittercommunity.com/t/new-update-to-the-twitter-text-library-emoji-character-count/114607 ; Accessed July 2022
+
+[^INTLAPI]: ECMAScript 2022 Internationalization API Specification; https://402.ecma-international.org/9.0/ ; Accessed August 2022
+
+[^INTLCollator]: "Intl.Collator", MDN; https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator ; Accessed August 2022
+
+[^INTLSegmenter]: "Intl.Segmenter", MDN; https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter ; Accessed August 2022
+
+[^StrictEquality]: "7.2.16 IsStrictlyEqual(x,y)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-isstrictlyequal ; Accessed August 2022
+
+[^LooseEquality]: "7.2.15 IsLooselyEqual(x,y)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-islooselyequal ; Accessed August 2022
