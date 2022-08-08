@@ -9,8 +9,7 @@ We are all better off for the time, effort and resources that Kyle pours into fo
 
 Even as a successful professional software engineer, I keep Kyle's works close at hand. At times these tomes are helpful in explaining deeply complex concepts to teammates and peers, while other times they serve as refreshers for myself, because there's always some interesting take-away or new perspective to gain.
 
-Rick Waldron
-@rwaldron
-Lead Software Engineer
-Lightning Web Security
+Rick Waldron (@rwaldron)<br>
+Lead Software Engineer<br>
+Lightning Web Security<br>
 Salesforce
