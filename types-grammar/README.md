@@ -10,4 +10,5 @@
 * [Preface](../preface.md)
 * [Chapter 1: Primitives](ch1.md)
 * [Chapter 2: Value Behaviors](ch2.md)
-* Chapter 3: TODO
+* [Chapter 3: Object Values](ch3.md)
+* Chapter 4: TODO

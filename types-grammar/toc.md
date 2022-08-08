@@ -23,3 +23,7 @@
     * String Behaviors
     * Number Behaviors
     * Primitives Are Foundational
+* Chapter 3: Object Values
+    * Nature Of Objects
+    * Primitives As Objects
+    * TODO
