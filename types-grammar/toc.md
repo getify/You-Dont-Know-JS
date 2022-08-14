@@ -25,5 +25,8 @@
     * Primitives Are Foundational
 * Chapter 3: Object Values
     * Nature Of Objects
-    * Primitives As Objects
+    * Fundamental Objects
+    * TODO
+* Chapter 4: Coercing Values
+    * Abstracts
     * TODO

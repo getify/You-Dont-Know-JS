@@ -14,7 +14,7 @@ The "Objects & Classes" title of this series covers objects in-depth already, so
 The `object` value-type comprises several sub-types with specialized behaviors. These include:
 
 * general objects
-* primitive objects
+* fundamental objects (boxed primitives)
 * arrays
 * regular expressions
 * functions (aka, "callable objects")
@@ -23,7 +23,7 @@ But one shared characteristic is that all objects are capable of acting as colle
 
 // TODO
 
-## Primitives As Objects
+## Fundamental Objects
 
 In Chapter 2, I briefly mentioned *auto-boxing*, which we'll now revisit.
 
