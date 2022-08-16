@@ -671,15 +671,17 @@ The temptation to make fun of JS for `0.1 + 0.2 !== 0.3` is strong, I know. But 
 | :--- |
 | Pretty much all programmers need to be aware of IEEE-754 and make sure they are careful about these kinds of gotchas. It's somewhat amazing, in a disappointing way, how few of them have any idea how IEEE-754 works. If you've taken your time reading and understanding these concepts so far, you're now in that rare tiny percentage who actually put in the effort to understand the numbers in their programs! |
 
-One way to work around such floating-point imprecision is this *very small* `number` value:
+#### Epsilon Threshold
+
+A common piece of advice to work around such floating-point imprecision uses this *very small* `number` value defined by JS:
 
 ```js
 Number.EPSILON;                 // 2.220446049250313e-16
 ```
 
-*Epsilon* is defined as the smallest difference JS can represent between `1` and the next value greater than `1`. While this value is implementation/platform dependent, it's typically about `2.2E16`, or `2^-52`. This value is the maximum amount of floating-point representation error (as discussed earlier), so it represents the threshold above which two values are *actually* different rather just skewed by floating-point error.
+*Epsilon* is the smallest difference JS can represent between `1` and the next value greater than `1`. While this value is technically implementation/platform dependent, it's generally about `2.2E-16`, or `2^-52`.
 
-Thus, `Number.EPSILON` can used as a *very small* tolerance value to ensure number comparisons are *safe*:
+To those not paying close enough attention to the details here -- including my past self! -- it's generally assumed that any skew in floating point precision from a single operation should never be greater than `Number.EPSILON`. Thus, in theory, we can use `Number.EPSILON` as a *very small* tolerance value to ensure number equality comparisons are *safe*:
 
 ```js
 function safeNumberEquals(a,b) {
@@ -693,17 +695,36 @@ point3b = 0.3;
 safeNumberEquals(point3a,point3b);      // true
 ```
 
-Since JS cannot represent a difference between two values smaller than this `Number.EPSILON`, it should be safe to treat any two number values as "equal" (indistinguishable in JS, anyway) if their difference is less than `Number.EPSILON`.
-
 | WARNING: |
 | :--- |
-| If your program needs to deal with smaller values than `2^-52`, or more specifically, smaller differences between values, you should absolutely *not use* the JS `number` value-type. There are decimal-emulation libraries that can offer arbitrary (small or large) precision. Or pick a different language than JS. |
+| In the first edition "Types & Grammar" book, I indeed recommended exactly this approach. I was wrong. I should have researched the topic more closely. |
+
+But, it turns out, this approach isn't safe at all:
+
+```js
+point3a = 10.1 + 0.2;
+point3b = 10.3;
+
+safeNumberEquals(point3a,point3b);      // false :(
+```
+
+Well... that's a bummer!
+
+Unfortunately, `Number.EPSILON` only works as a "safely equal" error threshold for certain small numbers/operations, and in other cases, it's far too small, and yields false negatives.
+
+You could scale `Number.EPSILON` by some factor to produce a larger threshold that avoids false negatives but still filters out all the floating point skew in your program. But what factor to use is entirely a manual judgement call based on what magnitude of values, and operations on them, your program will entail. There's no automatic way to compute a reliable, universal threshold.
+
+Unless you really know what you're doing, you should just *not* use this `Number.EPSILON` threshold approach at all.
+
+| TIP: |
+| :--- |
+| If you'd like to read more details and solid advice on this topic, I highly recommend reading this post. [^EpsilonBad] But if we can't use `Number.EPSILON` to avoid the perils of floating-point skew, what do we do? If you can avoid floating-point altogether by scaling all your numbers up so they're all whole number integers (or bigints) while performing math, do so. Only deal with decimal values when you have to output/represent a final value after all the math is done. If that's not possible/practical, use an arbitrary precision decimal emulation library and avoid `number` values entirely. Or do your math in another external programming environment that's not based on IEEE-754. |
 
 ### Numeric Comparison
 
 Like strings, number values can be compared (for both equality and relational ordering) using the same operators.
 
-Remember that no matter what form the number value takes when being specified as a literal (base-10, octal, hexadecimal, exponential, etc), the underlying value stored is what will be compared. Also keep in mind the floating point imprecision issues discussed in the previous section, as the comparisons will be sensitive to the exact binary contents, even if the difference between two numbers is much smaller than the `Number.EPSILON` threshold.
+Remember that no matter what form the number value takes when being specified as a literal (base-10, octal, hexadecimal, exponential, etc), the underlying value stored is what will be compared. Also keep in mind the floating point imprecision issues discussed in the previous section, as the comparisons will be sensitive to the exact binary contents.
 
 #### Numeric Equality
 
@@ -1046,3 +1067,5 @@ The story doesn't end here, though. Far from it! In the next chapter, we'll turn
 [^StrictEquality]: "7.2.16 IsStrictlyEqual(x,y)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-isstrictlyequal ; Accessed August 2022
 
 [^LooseEquality]: "7.2.15 IsLooselyEqual(x,y)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-islooselyequal ; Accessed August 2022
+
+[^EpsilonBad]: "PLEASE don't follow the code recipe in the accepted answer", Stack Overflow; Daniel Scott; July 2019; https://stackoverflow.com/a/56967003/228852 ; Accessed August 2022
