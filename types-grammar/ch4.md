@@ -15,6 +15,45 @@ The JS specification details a number of *abstract operations*[^AbstractOperatio
 
 These operations *look* as if they're real functions that could be called, such as `ToString(..)` or `ToNumber(..)`. But by *abstract*, we mean they only exist conceptually by these names; they aren't functions we can *directly* invoke in our programs. Instead, we invoke them implicitly/indirectly depending on the statements/expressions in our programs.
 
+### ToBoolean
+
+Decision making (conditional branching) always requires a boolean `true` or `false` value. But it's extremely common to want to make these decisions based on non-boolean value conditions, such as whether a string is empty or has anything in it.
+
+When non-boolean values are encountered in a context that requires a boolean -- such as the condition clause of an `if` statement or `for` loop -- the `ToBoolean(..)`[^ToBoolean] abstract operation is invoked to facilitate the coercion.
+
+All values in JS are in one of two buckets: *truthy* or *falsy*. Truthy values coerce via the `ToBoolean()` operation to `true`, whereas falsy values coerce to `false`:
+
+```
+// ToBoolean() is abstract
+
+ToBoolean(undefined);               // false
+ToBoolean(null);                    // false
+ToBoolean("");                      // false
+ToBoolean(0);                       // false
+ToBoolean(-0);                      // false
+ToBoolean(0n);                      // false
+ToBoolean(NaN);                     // false
+```
+
+Simple rule: *any other value* that's not in the above list is truthy and coerces via `ToBoolean()` to `true`:
+
+```
+ToBoolean("hello");                 // true
+ToBoolean(42);                      // true
+ToBoolean([ 1, 2, 3 ]);             // true
+ToBoolean({ a: 1 });                // true
+```
+
+Even values like `"   "` (string with only whitespace), `[]` (empty array), and `{}` (empty object), which may seem intuitively like they're more "false" than "true", nevertheless coerce to `true`.
+
+| WARNING: |
+| :--- |
+| There *are* narrow, tricky exceptions to this truthy rule. For example, the web platform has deprecated the long-standing `document.all` collection/array feature, though it cannot be removed entirely -- that would break too many sites. Even where `document.all` is still defined, it behaves as a "falsy object" that coerces to `false`; that means legacy conditional checks like `if (document.all) { .. }` no longer pass. |
+
+The `ToBoolean()` coercion operation is basically a lookup table rather than an algorithm of steps to use in coercions a non-boolean to a boolean. Thus, some developers assert that this isn't *really* coercion the way other abstract coercion operations are. I think that's bogus. `ToBoolean()` converts from non-boolean value-types to a boolean, and that's clear cut type coercion (even if it's a very simple lookup instead of an algorithm).
+
+Keep in mind: these rules of boolean coercion only apply when `ToBoolean()` is actually invoked. There are constructs/idioms in the JS language that may appear to involve boolean coercion but which don't actually do so.
+
 ### ToPrimitive
 
 Any value that's not already a primitive can be reduced to a primitive using the `ToPrimitive()` (specifically, `OrdinaryToPrimitive()`[^OrdinaryToPrimitive]) abstract operation.  Generally, the `ToPrimitive()` is given a *hint* to tell it whether a `number` or `string` is preferred.
@@ -160,6 +199,8 @@ ToNumber([]);                       // 0
 By virtue of `ToPrimitive(..,"number")` delegation, these objects all have their default `valueOf()` method (inherited via `[[Prototype]]`) invoked.
 
 [^AbstractOperations]: "7.1 Type Conversion", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-type-conversion ; Accessed August 2022
+
+[^ToBoolean]: "7.1.2 ToBoolean(argument)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-toboolean ; Accessed August 2022
 
 [^OrdinaryToPrimitive]: "7.1.1.1 OrdinaryToPrimitive(O,hint)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-ordinarytoprimitive ; Accessed August 2022
 
