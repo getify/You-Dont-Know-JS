@@ -222,6 +222,105 @@ ToNumber([]);                       // 0
 
 By virtue of `ToPrimitive(..,"number")` delegation, these objects all have their default `valueOf()` method (inherited via `[[Prototype]]`) invoked.
 
+### Equality Comparison
+
+When JS needs to determine if two values are the *same value*, it invokes the `SameValue()`[^SameValue] operation, which delegates to a variety of related sub-operations.
+
+This operation is very narrow and strict, and performs no coercion or any other special case exceptions. If two values are *exactly* the same, the result is `true`, otherwise it's `false`:
+
+```
+// SameValue() is abstract
+
+SameValue("hello","\x68ello");          // true
+SameValue("\u{1F4F1}","\uD83D\uDCF1");  // true
+SameValue(42,42);                       // true
+SameValue(NaN,NaN);                     // true
+
+SameValue("\u00e9","\u0065\u0301");     // false
+SameValue(0,-0);                        // false
+SameValue([1,2,3],[1,2,3]);             // false
+```
+
+A variation of these operations is `SameValueZero()` and its associated sub-operations. The main difference is that these operations treat `0` and `-0` as indistinguishable.
+
+```
+// SameValueZero() is abstract
+
+SameValueZero(0,-0);                    // true
+```
+
+If the values are numeric (`number` or `bigint`), `SameValue()` and `SameValueZero()` both delegate to sub-operations of the same names, specialized for each `number` and `bigint` type, respectively.
+
+Otherwise, `SameValueNonNumeric()` is the sub-operation delegated to if the values being compared are both non-numeric:
+
+```
+// SameValueNonNumeric() is abstract
+
+SameValueNonNumeric("hello","hello");   // true
+
+SameValueNonNumeric([1,2,3],[1,2,3]);   // false
+```
+
+#### Higher-Abstracted Equality
+
+Different from `SameValue()` and its variations, the specification also defines two important higher-abstraction abstract equality comparison operations:
+
+* `IsStrictlyEqual()`[^StrictEquality]
+* `IsLooselyEqual()`[^LooseEquality]
+
+The `IsStrictlyEqual()` operation immediately returns `false` if the value-types being compared are different.
+
+If the value-types are the same, `IsStrictlyEqual()` delegates to sub-operations for comparing `number` or `bigint` values. You might logically expect these delegated sub-operations to be the aforementioned numeric-specialized `SameValue()` / `SameValueZero()` operations. However, `IsStrictlyEqual()` instead delegates to `Number:equal()`[^NumberEqual] or `BigInt:equal()`[^BigIntEqual].
+
+The difference between `Number:SameValue()` and `Number:equal()` is that the latter defines corner cases for `0` vs `-0` comparison:
+
+```
+// all of these are abstract operations
+
+Number:SameValue(0,-0);             // false
+Number:SameValueZero(0,-0);         // true
+Number:equal(0,-0);                 // true
+```
+
+These operations also differ in `NaN` vs `NaN` comparison:
+
+```
+Number:SameValue(NaN,NaN);          // true
+Number:equal(NaN,NaN);              // false
+```
+
+| WARNING: |
+| :--- |
+| So in other words, despite its name, `IsStrictlyEqual()` is not quite as "strict" as `SameValue()`, in that it *lies* when comparisons of `-0` or `NaN` are involved. |
+
+The `IsLooselyEqual()` operation also inspects the value-types being compared; if they're the same, it immediately delegates to `IsStrictlyEqual()`.
+
+But if the value-types being compared are different, `IsLooselyEqual()` performs a variety of *coercive equality* steps. It's important to note that this algorithm is always trying to reduce the comparison down to where both value-types are the same (and it tends to prefer `number` / `bigint`).
+
+The steps of the *coercive equality* portion of the algorithm can roughly be summarized as follows:
+
+1. If either value is `null` and the other is `undefined`, `IsLooselyEqual()` returns `true`. In other words, this algorithm applies *nullish* equality, in that `null` and `undefined` are coercively equal to each other (and to no other values).
+
+2. If either value is a `number` and the other is a `string`, the `string` value is coerced to a `number` via `ToNumber()`.
+
+3. If either value is a `bigint` and the other is a `string`, the `string` value is coerced to a `bigint` via `StringToBigInt()`.
+
+4. If either value is a `boolean`, it's coerced to a `number`.
+
+5. If either value is a non-primitive (object, etc), it's coerced to a primitive with `ToPrimitive()`; though a *hint* is not explicitly provided, the default behavior will be as if `"number"` was the hint.
+
+Each time a coercion is performed in the above steps, the algorithm is *recursively* reinvoked with the new value(s). That process continues until the types are the same, and then the comparison is delegated to the `IsStrictlyEqual()` operation.
+
+What can we take from this algorithm? First, we see there is a bias toward `number` (or `bigint`) comparison; it nevers coerce values to `string` or `boolean` value-types.
+
+Importantly, we see that both `IsLooselyEqual()` and `IsStrictlyEqual()` are type-sensitive. `IsStrictlyEqual()` immediately bails if the types mismatch, whereas `IsLooselyEqual()` performs the extra work to coerce mismatching value-types to be the same value-types (again, ideally, `number` or `bigint`).
+
+Moreover, if/once the types are the same, both operations are identical -- `IsLooselyEqual()` delegates to `IsStrictlyEqual()`.
+
+### Relational Comparison
+
+// TODO
+
 [^AbstractOperations]: "7.1 Type Conversion", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-type-conversion ; Accessed August 2022
 
 [^ToBoolean]: "7.1.2 ToBoolean(argument)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-toboolean ; Accessed August 2022
@@ -241,3 +340,13 @@ By virtue of `ToPrimitive(..,"number")` delegation, these objects all have their
 [^NumberConstructor]: "21.1.1 The Number Constructor", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-number-constructor ; Accessed August 2022
 
 [^NumberFunction]: "21.1.1.1 Number(value)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-number-constructor-number-value ; Accessed August 2022
+
+[^SameValue]: "7.2.11 SameValue(x,y)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-samevalue ; Accessed August 2022
+
+[^StrictEquality]: "7.2.16 IsStrictlyEqual(x,y)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-isstrictlyequal ; Accessed August 2022
+
+[^LooseEquality]: "7.2.15 IsLooselyEqual(x,y)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-islooselyequal ; Accessed August 2022
+
+[^NumberEqual]: "6.1.6.1.13 Number:equal(x,y)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-numeric-types-number-equal ; Accessed August 2022
+
+[^BigIntEqual]: "6.1.6.2.13 BigInt:equal(x,y)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-numeric-types-bigint-equal ; Accessed August 2022
