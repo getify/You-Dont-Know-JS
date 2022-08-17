@@ -183,6 +183,30 @@ ToNumber(Symbol("42"));             // TypeError exception thrown
 | :--- |
 | Calling the `Number()`[^NumberFunction] concrete function (without `new` operator) is generally thought of as *merely* invoking the `ToNumber()` abstract operation to coerce a value to a number. While that's mostly true, it's not entirely so. `Number(42n)` works, whereas the abstract `ToNumber(42n)` itself throws an exception. |
 
+#### Other Abstract Numeric Conversions
+
+In addition to `ToNumber()`, the specification defines `ToNumeric()`, which is essentially invokes `ToPrimitive()` on a value, then conditionally invokes `ToNumber()` if the value is *not* already a `bigint` value-type.
+
+There are also a wide variety of abstract operations related to converting values to very specific subsets of the general `number` type:
+
+* `ToIntegerOrInfinity()`
+* `ToInt32()`
+* `ToUint32()`
+* `ToInt16()`
+* `ToUint16()`
+* `ToInt8()`
+* `ToUint8()`
+* `ToUint8Clamp()`
+
+Other operations related to `bigint`:
+
+* `ToBigInt()`
+* `StringToBigInt()`
+* `ToBigInt64()`
+* `ToBigUint64()`
+
+You can probably infer the purpose of these operations from their names, and/or from consulting their algorithms in the specification. For most JS operations, it's more likely that a higher-level operation like `ToNumber()` is invoked, rather than these specific ones.
+
 #### Default `valueOf()`
 
 When `ToNumber()` is performed on object value-types, it instead invokes the `ToPrimitive()` operation (as explained earlier), with `"number"` as its *hinted* type:
@@ -211,6 +235,8 @@ By virtue of `ToPrimitive(..,"number")` delegation, these objects all have their
 [^StringFunction]: "22.1.1.1 String(value)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-string-constructor-string-value ; Accessed August 2022
 
 [^ToNumber]: "7.1.4 ToNumber(argument)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-tonumber ; Accessed August 2022
+
+[^ToNumeric]: "7.1.3 ToNumeric(argument)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-tonumeric ; Accessed August 2022
 
 [^NumberConstructor]: "21.1.1 The Number Constructor", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-number-constructor ; Accessed August 2022
 
