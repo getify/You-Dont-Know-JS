@@ -441,7 +441,7 @@ The `<=` (less-than-or-equal) and `>=` (greater-than-or-equal) operators are eff
 
 | NOTE: |
 | :--- |
-| Here's an interesting bit of specification nuance: JS doesn't actually define the `>` and `>=` relational comparisons independently. Instead, it defines them as the negation of their complement counterparts. So `x > y` is treated by JS as `!(x <= y)`, and `x >= y` is treated by JS as `!(x < y)`. So JS only needs to specify how `<`, `<=`, and `!` work, and thus gets `>` and `>=` for free! |
+| Here's an interesting bit of specification nuance: JS doesn't actually define the underlying greater-than (for `>`) or greater-than-or-equal (for `>=`) operations. Instead, it defines them by reversing the arguments to their *less-than* complement counterparts. So `x > y` is treated by JS essentially as `y <= x`, and `x >= y` is treated by JS essentially as `y < x`. So JS only needs to specify how `<` and `==` work, and thus gets `>` and `>=` for free! |
 
 ##### Locale-Aware Relational Comparisons
 

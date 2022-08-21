@@ -694,6 +694,10 @@ I'm not going to cover it exhaustively, but I think a brief primer on how number
 
 In 64-bit IEEE-754 -- so called "double-precision", because originally IEEE-754 used to be 32-bit, and now it's double that! -- the 64 bits are divided into three sections: 52 bits for the number's base value (aka, "fraction", "mantissa", or "significand"), 11 bits for the exponent to raise `2` to before multiplying, and 1 bit for the sign of the ultimate value.
 
+| NOTE: |
+| :--- |
+| Since only 52 of the 64 bits are actually used to represent the base value, `number` doesn't actually have `2^64` values in it. According to the specification for the `number` type[^NumberType], the number of values is precisely `2^64 - 2^53 + 3`, or about 18 quintillion, split about evenly between positive and negative numbers. |
+
 These bits are arranged left-to-right, as so (S = Sign Bit, E = Exponent Bit, M = Mantissa Bit):
 
 ```js
@@ -881,7 +885,9 @@ myAge;                  // NaN
 
 All such invalid operations (mathematical or coercive/numeric) produce the special `number` value called `NaN`.
 
-The historical root of "NaN" (including from the IEEE-754[^IEEE754] specification) is as an acronym for "Not a Number". Unfortunately, that meaning produces confusion, since `NaN` is *absolutely* a `number`.
+The historical root of "NaN" (from the IEEE-754[^IEEE754] specification) is as an acronym for "Not a Number". Technically, there are about 9 quadrillion values in the 64-bit IEEE-754 number space designated as "NaN", but JS treats all of them indistinguishably as the single `NaN` value.
+
+Unfortunately, that *not a number* meaning produces confusion, since `NaN` is *absolutely* a `number`.
 
 | TIP: |
 | :--- |
@@ -1111,3 +1117,5 @@ Before we move on to discussing JS's built-in object value type, we want to take
 [^UTFUCS]: "JavaScript’s internal character encoding: UCS-2 or UTF-16?"; Mathias Bynens; January 20 2012; https://mathiasbynens.be/notes/javascript-encoding ; Accessed July 2022
 
 [^IEEE754]: "IEEE-754"; https://en.wikipedia.org/wiki/IEEE_754 ; Accessed July 2022
+
+[^NumberType]: "6.1.6.1 The Number Type", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-ecmascript-language-types-number-type ; Accessed August 2022

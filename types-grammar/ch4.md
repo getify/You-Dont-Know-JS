@@ -270,7 +270,7 @@ Different from `SameValue()` and its variations, the specification also defines 
 
 The `IsStrictlyEqual()` operation immediately returns `false` if the value-types being compared are different.
 
-If the value-types are the same, `IsStrictlyEqual()` delegates to sub-operations for comparing `number` or `bigint` values. You might logically expect these delegated sub-operations to be the aforementioned numeric-specialized `SameValue()` / `SameValueZero()` operations. However, `IsStrictlyEqual()` instead delegates to `Number:equal()`[^NumberEqual] or `BigInt:equal()`[^BigIntEqual].
+If the value-types are the same, `IsStrictlyEqual()` delegates to sub-operations for comparing `number` or `bigint` values. [^NumericAbstractOps] You might logically expect these delegated sub-operations to be the aforementioned numeric-specialized `SameValue()` / `SameValueZero()` operations. However, `IsStrictlyEqual()` instead delegates to `Number:equal()`[^NumberEqual] or `BigInt:equal()`[^BigIntEqual].
 
 The difference between `Number:SameValue()` and `Number:equal()` is that the latter defines corner cases for `0` vs `-0` comparison:
 
@@ -319,7 +319,66 @@ Moreover, if/once the types are the same, both operations are identical -- `IsLo
 
 ### Relational Comparison
 
-// TODO
+When values are compared relationally -- that is, is one value "less than" another? -- there's one specific abstract operation that is invoked: `IsLessThan()`. [^LessThan]
+
+```
+// IsLessThan() is abstract
+
+IsLessThan(1,2, /*LeftFirst=*/ true );            // true
+```
+
+There is no `IsGreaterThan()` operation; instead, the first two arguments to `IsLessThan()` can be reversed to accomplish a "greater than" comparison. To preserve left-to-right evaluation semantics (in the case of nuanced side-effects), `isLessThan()` also takes a third argument (`LeftFirst`); if `false`, this indicates a comparison was reversed and the second parameter should be evaluated before the first.
+
+```
+IsLessThan(1,2, /*LeftFirst=*/ true );            // true
+
+// equivalent of a fictional "IsGreaterThan()"
+IsLessThan(2,1, /*LeftFirst=*/ false );          // false
+```
+
+Similar to `IsLooselyEqual()`, the `IsLessThan()` operation is *coercive*, meaning that it first ensures that the value-types of its two values match, and prefers numeric comparisons. There is no `IsStrictLessThan()` for non-coercive relational comparison.
+
+As an example of coercive relational comparison, if the type of one value is `string` and the type of the other is `bigint`, the `string` is coerced to a `bigint` with the aforementioned `StringToBigInt()` operation. Once the types are the same, `IsLessThan()` proceeds as described in the following sections.
+
+#### String Comparison
+
+When both value are type `string`, `IsLessThan()` checks to see if the lefthand value is a prefix (the first *n* characters[^StringPrefix]) of the righthand; if so, `true` is returned.
+
+If neither string is a prefix of the other, the first character position (start-to-end direction, not left-to-right) that's different between the two strings, is compared for their respective code-unit (numeric) values; the result is then returned.
+
+Generally, code-units follow intuitive lexicographic (aka, dictionary) order:
+
+```
+IsLessThan("a","b", /*LeftFirst=*/ true );        // true
+```
+
+Even digits are treated as characters (not numbers):
+
+```
+IsLessThan("101","12", /*LeftFirst=*/ true );     // true
+```
+
+There's even a bit of embedded *humor* in the unicode code-unit ordering:
+
+```
+IsLessThan("🐔","🥚", /*LeftFirst=*/ true );      // true
+```
+
+At least now we've answered the age old question of *which comes first*?!
+
+#### Numeric Comparison
+
+For numeric comparisons, `IsLessThan()` defers to either the `Number:lessThan()` or `BigInt.lessThan()` operation[^NumericAbstractOps], respectively:
+
+```
+IsLessThan(41,42, /*LeftFirst=*/ true );         // true
+
+IsLessThan(-0,0, /*LeftFirst=*/ true );          // false
+
+IsLessThan(NaN,1 /*LeftFirst=*/ true );          // false
+
+IsLessThan(41n,42n, /*LeftFirst=*/ true );       // true
+```
 
 [^AbstractOperations]: "7.1 Type Conversion", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-type-conversion ; Accessed August 2022
 
@@ -347,6 +406,12 @@ Moreover, if/once the types are the same, both operations are identical -- `IsLo
 
 [^LooseEquality]: "7.2.15 IsLooselyEqual(x,y)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-islooselyequal ; Accessed August 2022
 
+[^NumericAbstractOps]: "6.1.6 Numeric Types", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-numeric-types ; Accessed August 2022
+
 [^NumberEqual]: "6.1.6.1.13 Number:equal(x,y)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-numeric-types-number-equal ; Accessed August 2022
 
 [^BigIntEqual]: "6.1.6.2.13 BigInt:equal(x,y)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-numeric-types-bigint-equal ; Accessed August 2022
+
+[^LessThan]: "7.2.14 IsLessThan(x,y,LeftFirst)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-islessthan ; Accessed August 2022
+
+[^StringPrefix]: "7.2.9 IsStringPrefix(p,q)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-isstringprefix ; Accessed August 2022
