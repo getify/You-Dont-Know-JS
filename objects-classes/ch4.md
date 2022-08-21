@@ -290,13 +290,23 @@ We've so far seen three different ways of context assignment at the function cal
 A fourth way to call a function, and assign the `this` for that invocation, is with the `new` keyword:
 
 ```js
-var point = { /* .. */ };
+var point = {
+    // ..
+
+    init: function() { /* .. */ }
+
+    // ..
+};
 
 var anotherPoint = new point.init(3,4);
 
 anotherPoint.x;     // 3
 anotherPoint.y;     // 4
 ```
+
+| TIP: |
+| :--- |
+| This example has a bit of nuance to be explained. The `init: function() { .. }` form shown here -- specifically, a function expression assigned to a property -- is required for the function to be validly called with the `new` keyword. From previous snippets, the concise method form of `init() { .. }` defines a function that *cannot* be called with `new`. |
 
 You've typically seen `new` used with `class` for creating instances. But as an underlying mechanism of the JS language, `new` is not inherently a `class` operation.
 
