@@ -571,7 +571,96 @@ Nevertheless, as I mentioned at the start of this chapter, Brendan Eich endorses
 
 ### To Number
 
-// TODO
+Numeric coercions are a bit more complicated than string coercions, since we can be talking about either `number` or `bigint` as the target type. There's also a much smaller set of values that can be validly represented numerically (everything else becomes `NaN`).
+
+Let's start with the `Number(..)` and `BigInt(..)` functions (no `new` keywords):
+
+```js
+Number("42");                   // 42
+Number("-3.141596");            // -3.141596
+Number("-0");                   // -0
+
+BigInt("42");                   // 42n
+BigInt("-0");                   // 0n
+```
+
+`Number` coercion which fails (not recognized) results in `NaN` (see "Invalid Number" in Chapter 1), whereas `BigInt` throws an exception:
+
+```js
+Number("123px");                // NaN
+
+BigInt("123px");
+// SyntaxError: Cannot convert 123px to a BigInt
+```
+
+Moreover, even though `42n` is valid syntax as a literal `bigint`, the string `"42n"` is never a recognized string representation of a `bigint`, by either of the coercive function forms:
+
+```js
+Number("42n");                  // NaN
+
+BigInt("42n");
+// SyntaxError: Cannot convert 42n to a BigInt
+```
+
+However, we *can* coerce numeric strings with other representations of the numbers than typical base-10 decimals (see Chapter 1 for more information):
+
+```js
+Number("0b101010");             // 42
+
+BigInt("0b101010");             // 42n
+```
+
+Typically, `Number(..)` and `BigInt(..)` receive string values, but that's not actually required. For example, `true` and `false` coerce to their typical numeric equivalents:
+
+```js
+Number(true);                   // 1
+Number(false);                  // 0
+
+BigInt(true);                   // 1n
+BigInt(false);                  // 0n
+```
+
+You can also generally coerce between `number` and `bigint` types:
+
+```js
+Number(42n);                    // 42
+Number(42n ** 1000n);           // Infinity
+
+BigInt(42);                     // 42n
+```
+
+We can also use the `+` unary operator, which is commonly assumed to coerce the same as the `Number(..)` function:
+
+```js
++"42";                          // 42
++"0b101010";                    // 42
+```
+
+Be careful though. If the coercions are unsafe/invalid in certain ways, exceptions are thrown:
+
+```js
+BigInt(3.141596);
+// RangeError: The number 3.141596 cannot be converted to a BigInt
+
++42n;
+// TypeError: Cannot convert a BigInt value to a number
+```
+
+Clearly, `3.141596` does not safely coerce to an integer, let alone a `bigint`.
+
+But `+42n` throwing an exception is an interesting case. By contrast, `Number(42n)` works fine, so it's a bit surprising that `+42n` fails.
+
+| WARNING: |
+| :--- |
+| That surprise is especially palpable since prepending a `+` in front of a number is typically assumed to just mean a "positive number", the same way `-` in front a number is assumed to mean a "negative number". As explained in Chapter 1, however, JS numeric syntax (`number` and `bigint`) recognize no syntax for "negative values". All numeric literals are parsed as "positive" by default. If a `+` or `-` is prepended, those are treated as unary operators applied against the parsed (positive) number. |
+
+OK, so `+42n` is parsed as `+(42n)`. But still... why is `+` throwing an exception here?
+
+You might recall earlier when we showed that JS allows *explicit* string coercion of symbol values, but disallows *implicit* string coercions? The same thing is going on here. JS language design interprets unary `+` in front of a `bigint` value as an *implicit* `ToNumber()` coercion (thus disallowed!), but `Number(..)` is interpreted as an *explicit* `ToNumber()` coercion (thus allowed!).
+
+In other words, contrary to popular assumption/assertion, `Number(..)` and `+` are not interchangable. I think `Number(..)` is the safer/more reliable form.
+
+Like string coercions, if you perform a numeric coercion on a non-primitive object value, the `ToPrimitive()` operation is activated to first turn it into some primitive value
 
 ### To Primitive
 
@@ -674,7 +763,38 @@ Again, as we saw in the "To Number" section, `42` can safely be coerced to `42n`
 
 We've seen that `toString()` and `valueOf()` are invoked, variously, as certain `string` and `number` / `bigint` coercions are performed.
 
-What about `boolean` coercions?
+#### No Primitive Found?
+
+If `ToPrimitive()` fails to produce a primitive value, an exception will be thrown:
+
+```js
+spyObject4 = {
+    toString() {
+        console.log("toString() invoked!");
+        return [];
+    },
+    valueOf() {
+        console.log("valueOf() invoked!");
+        return {};
+    }
+};
+
+String(spyObject4);
+// toString() invoked!
+// valueOf() invoked!
+// TypeError: Cannot convert object to primitive value
+
+Number(spyObject4);
+// valueOf() invoked!
+// toString() invoked!
+// TypeError: Cannot convert object to primitive value
+```
+
+If you're going to define custom to-primitive coercions via `toString()` / `valueOf()`, make sure to return a primitive from at least one of them!
+
+#### Object To Boolean
+
+What about `boolean` coercions of objects?
 
 ```js
 Boolean(spyObject);
@@ -700,7 +820,7 @@ while (spyObject) {
 
 Each of these are activating `ToBoolean()`. But if you recall from earlier, *that* algorithm never delegates to `ToPrimitive()`; thus, we don't see "valueOf() invoked!" being logged out.
 
-#### Unboxing
+#### Unboxing: Wrapper To Primitive
 
 A special form of objects that are often `ToPrimitive()` coerced: boxed/wrapped primitives (as seen in Chapter 3). This particular object-to-primitive coercion is often referred to as *unboxing*.
 
@@ -737,42 +857,42 @@ Remember, this is because `ToBoolean()` does *not* reduce an object to its primi
 As we've seen, you can always define a `toString()` on an object to have *it* invoked by the appropriate `ToPrimitive()` coercion. But another option is to override the `Symbol.toStringTag`:
 
 ```js
-spyObject4a = {};
-String(spyObject4a);
+spyObject5a = {};
+String(spyObject5a);
 // "[object Object]"
-spyObject4a.toString();
+spyObject5a.toString();
 // "[object Object]"
 
-spyObject4b = {
+spyObject5b = {
     [Symbol.toStringTag]: "my-spy-object"
 };
-String(spyObject4b);
+String(spyObject5b);
 // "[object my-spy-object]"
-spyObject4b.toString();
+spyObject5b.toString();
 // "[object my-spy-object]"
 
-spyObject4c = {
+spyObject5c = {
     get [Symbol.toStringTag]() {
         return `myValue:${this.myValue}`;
     },
     myValue: 42
 };
-String(spyObject4c);
+String(spyObject5c);
 // "[object myValue:42]"
-spyObject4c.toString();
+spyObject5c.toString();
 // "[object myValue:42]"
 ```
 
 `Symbol.toStringTag` is intended to define a custom string value to describe the object whenever its default `toString()` operation is invoked directly, or implicitly via coercion; in its absence, the value used is `"Object"` in the common `"[object Object]"` output.
 
-The `get ..` syntax in `spyObject4c` is defining a *getter*. That means when JS tries to access this `Symbol.toStringTag` as a property (as normal), this gettter code instead causes the function we specify to be invoked to compute the result. We can run any arbitrary logic inside this getter to dynamically determine a string *tag* for use by the default `toString()` method.
+The `get ..` syntax in `spyObject5c` is defining a *getter*. That means when JS tries to access this `Symbol.toStringTag` as a property (as normal), this gettter code instead causes the function we specify to be invoked to compute the result. We can run any arbitrary logic inside this getter to dynamically determine a string *tag* for use by the default `toString()` method.
 
 #### Overriding `ToPrimitive`
 
 You can alternately override the whole default `ToPrimitive()` operation for any object, by setting the special symbol property `Symbol.toPrimitive` to hold a function:
 
 ```js
-spyObject5 = {
+spyObject6 = {
     [Symbol.toPrimitive](hint) {
         console.log(`toPrimitive(${hint}) invoked!`);
         return 25;
@@ -787,19 +907,19 @@ spyObject5 = {
     },
 };
 
-String(spyObject5);
+String(spyObject6);
 // toPrimitive(string) invoked!
 // "25"   <--- not "10"
 
-spyObject5 + "";
+spyObject6 + "";
 // toPrimitive(default) invoked!
 // "25"   <--- not "42"
 
-Number(spyObject5);
+Number(spyObject6);
 // toPrimitive(number) invoked!
 // 25     <--- not 42 or "25"
 
-+spyObject5;
++spyObject6;
 // toPrimitive(number) invoked!
 // 25
 ```
@@ -807,6 +927,10 @@ Number(spyObject5);
 As you can see, if you define this function on an object, it's used entirely in replacement of the default `ToPrimitive()` abstract operation. Since `hint` is still provided to this invoked function (`[Symbol.toPrimitive](..)`), you could in theory implement your own version of the algorithm, invoking a `toString()`, `valueOf()`, or any other method on the object (`this` context reference).
 
 Or you can just manually define a return value as shown above. Regardless, JS will *not* automatically invoke either `toString()` or `valueOf()` methods.
+
+| WARNING: |
+| :--- |
+| As discussed prior in "No Primitive Found?", if the defined `Symbol.toPrimitive` function does not actually return a value that's a primitive, an exception will be thrown about being unable to "...convert object to primitive value". Make sure to always return an actual primitive value from such a function! |
 
 ### Nullish
 
