@@ -78,7 +78,7 @@ Even values like `"   "` (string with only whitespace), `[]` (empty array), and 
 
 | WARNING: |
 | :--- |
-| There *are* narrow, tricky exceptions to this truthy rule. For example, the web platform has deprecated the long-standing `document.all` collection/array feature, though it cannot be removed entirely -- that would break too many sites. Even where `document.all` is still defined, it behaves as a "falsy object" that coerces to `false`; that means legacy conditional checks like `if (document.all) { .. }` no longer pass. |
+| There *are* narrow, tricky exceptions to this truthy rule. For example, the web platform has deprecated the long-standing `document.all` collection/array feature, though it cannot be removed entirely -- that would break too many sites. Even where `document.all` is still defined, it behaves as a "falsy object"[^ExoticFalsyObjects] -- `undefined` which then coerces to `false`; this means legacy conditional checks like `if (document.all) { .. }` no longer pass. |
 
 The `ToBoolean()` coercion operation is basically a lookup table rather than an algorithm of steps to use in coercions a non-boolean to a boolean. Thus, some developers assert that this isn't *really* coercion the way other abstract coercion operations are. I think that's bogus. `ToBoolean()` converts from non-boolean value-types to a boolean, and that's clear cut type coercion (even if it's a very simple lookup instead of an algorithm).
 
@@ -96,7 +96,7 @@ ToPrimitive({ a: 1 },"string");          // "[object Object]"
 ToPrimitive({ a: 1 },"number");          // NaN
 ```
 
-The `ToPrimitive()` operation will look on the object provided, for either a `toString()` method or a `valueOf()` method; the order it looks for those is controlled by the *hint*.
+The `ToPrimitive()` operation will look on the object provided, for either a `toString()` method or a `valueOf()` method; the order it looks for those is controlled by the *hint*. `"string"` means check in `toString()` / `valueOf()` order, whereas `"number"` (or no *hint*) means check in `valueOf()` / `toString()` order.
 
 If the method returns a value matching the *hinted* type, the operation is finished. But if the method doesn't return a value of the *hinted* type, `ToPrimitive()` will then look for and invoke the other method (if found).
 
@@ -476,10 +476,6 @@ My take: `Boolean(..)` is the most preferable *explicit* coercion form. Further,
 
 Since most developers, including famous names like Doug Crockford, also in practice use implicit (`boolean`) coercions in their `if`[^CrockfordIfs] and loop statements, I think we can say that at least *some forms* of *implicit* coercion are widely acceptable, regardless of the rhetoric to the contrary.
 
-### To Primitive
-
-// TODO
-
 ### To String
 
 As with `ToBoolean()`, there are a number of ways to activate the `ToString()` coercion (as discussed earlier in the chapter). The decision of which approach is similarly subjective.
@@ -555,6 +551,10 @@ undefined + "";                 // "undefined"
 
 The `+ ""` idiom for string coercion takes advantage of the `+` overloading, without altering the final coerced string value. By the way, all of these work the same with the operands reversed (i.e., `"" + ..`).
 
+| WARNING: |
+| :--- |
+| An extremely common misconception is that `String(x)` and `x + ""` are basically equivalent coercions, respectively just *explicit* vs *implicit* in form. But, that's not quite true! We'll revisit this in the "To Primitive" section later in this chapter. |
+
 Some feel this is an *explicit* coercion, but I think it's clearly more *implicit*, in that it's taking advantage of the `+` overloading; further, the `""` is indirectly used to activate the coercion without modifying it. Moreover, consider what happens when this idiom is applied with a symbol value:
 
 ```js
@@ -573,6 +573,241 @@ Nevertheless, as I mentioned at the start of this chapter, Brendan Eich endorses
 
 // TODO
 
+### To Primitive
+
+Most operators in JS, including those we've see with coercions to `string` and `number`, are designed to run against primitive values. When any of these operators is used instead against an object value, the abstract `ToPrimitive` algorithm (as described earlier) is activated to coerce the object to a primitive.
+
+Let's set up an object we can use to inspect how different operations behave:
+
+```js
+spyObject = {
+    toString() {
+        console.log("toString() invoked!");
+        return "10";
+    },
+    valueOf() {
+        console.log("valueOf() invoked!");
+        return 42;
+    },
+};
+```
+
+This object defines both the `toString()` and `valueOf()` methods, and each one returns a different type of value (`string` vs `number`).
+
+Let's try some of the coercion operations we've already seen:
+
+```js
+String(spyObject);
+// toString() invoked!
+// "10"
+
+spyObject + "";
+// valueOf() invoked!
+// "42"
+```
+
+Whoa! I bet that surprised a few of you readers; it certainly did me. It's so common for people to assert that `String(..)` and `+ ""` are equivalent forms of activating the `ToString()` operation. But they're clearly not!
+
+The difference comes down to the *hint* that each operation provides to `ToPrimitive()`. `String(..)` clearly provides `"string"` as the *hint*, whereas the `+ ""` idiom provides no *hint* (similar to *hinting* `"number"`). But don't miss this detail: even though `+ ""` invokes `valueOf()`, when that returns a `number` primitive value of `42`, that value is then coerced to a string (via `ToString()`), so we get `"42"` instead of `42`.
+
+Let's keep going:
+
+```js
+Number(spyObject);
+// valueOf() invoked!
+// 42
+
++spyObject;
+// valueOf() invoked!
+// 42
+```
+
+This example implies that `Number(..)` and the unary `+` operator both perform the same `ToPrimitive()` coercion (with *hint* of `"number"`), which in our case returns `42`. Since that's already a `number` as requested, the value comes out without further ado.
+
+But what if a `valueOf()` returns a `bigint`?
+
+```js
+spyObject2 = {
+    valueOf() {
+        console.log("valueOf() invoked!");
+        return 42n;  // bigint!
+    }
+};
+
+Number(spyObject2);
+// valueOf() invoked!
+// 42     <--- look, not a bigint!
+
++spyObject2;
+// valueOf() invoked!
+// TypeError: Cannot convert a BigInt value to a number
+```
+
+We saw this difference earlier in the "To Number" section. JS allows an *explicit* coercion of the `42n` bigint value to the `42` number value, but it disallows what it considers to be an *implicit* coercion form.
+
+What about the `BigInt(..)` (no `new` keyword) coercion function?
+
+```js
+BigInt(spyObject);
+// valueOf() invoked!
+// 42n    <--- look, a bigint!
+
+BigInt(spyObject2);
+// valueOf() invoked!
+// 42n
+
+// *******************************
+
+spyObject3 = {
+    valueOf() {
+        console.log("valueOf() invoked!");
+        return 42.3;
+    }
+};
+
+BigInt(spyObject3);
+// valueOf() invoked!
+// RangeError: The number 42.3 cannot be converted to a BigInt
+```
+
+Again, as we saw in the "To Number" section, `42` can safely be coerced to `42n`. On the other hand, `42.3` cannot safely be coerced to a `bigint`.
+
+We've seen that `toString()` and `valueOf()` are invoked, variously, as certain `string` and `number` / `bigint` coercions are performed.
+
+What about `boolean` coercions?
+
+```js
+Boolean(spyObject);
+// true
+
+!spyObject;
+// false
+
+if (spyObject) {
+    console.log("if!");
+}
+// if!
+
+result = spyObject ? "ternary!" : "nope";
+// "ternary!"
+
+while (spyObject) {
+    console.log("while!");
+    break;
+}
+// while!
+```
+
+Each of these are activating `ToBoolean()`. But if you recall from earlier, *that* algorithm never delegates to `ToPrimitive()`; thus, we don't see "valueOf() invoked!" being logged out.
+
+#### Unboxing
+
+A special form of objects that are often `ToPrimitive()` coerced: boxed/wrapped primitives (as seen in Chapter 3). This particular object-to-primitive coercion is often referred to as *unboxing*.
+
+Consider:
+
+```js
+hello = new String("hello");
+String(hello);                  // "hello"
+hello + "";                     // "hello"
+
+fortyOne = new Number(41);
+Number(fortyOne);               // 41
+fortyOne + 1;                   // 42
+```
+
+The object wrappers `hello` and `fortyOne` above have `toString()` and `valueOf()` methods configured on them, to behave similarly to the `spyObject` / etc objects from our previous examples.
+
+A special case to be careful of with wrapped-object primitives is with `Boolean()`:
+
+```js
+nope = new Boolean(false);
+Boolean(nope);                  // true   <--- oops!
+!!nope;                         // true   <--- oops!
+```
+
+Remember, this is because `ToBoolean()` does *not* reduce an object to its primitive form with `ToPrimitive`; it merely looks up the value in its internal table, and since normal (non-exotic[^ExoticFalsyObjects]) objects are always truthy, `true` comes out.
+
+| NOTE: |
+| :--- |
+| It's a nasty little gotcha. A case could certainly be made that `new Boolean(false)` should configure itself internally as an exotic "falsy object". [^ExoticFalsyObjects] Unfortunately, that change now, 25 years into JS's history, could easily create breakage in programs. As such, JS has left this gotcha untouched. |
+
+#### Overriding Default `toString()`
+
+As we've seen, you can always define a `toString()` on an object to have *it* invoked by the appropriate `ToPrimitive()` coercion. But another option is to override the `Symbol.toStringTag`:
+
+```js
+spyObject4a = {};
+String(spyObject4a);
+// "[object Object]"
+spyObject4a.toString();
+// "[object Object]"
+
+spyObject4b = {
+    [Symbol.toStringTag]: "my-spy-object"
+};
+String(spyObject4b);
+// "[object my-spy-object]"
+spyObject4b.toString();
+// "[object my-spy-object]"
+
+spyObject4c = {
+    get [Symbol.toStringTag]() {
+        return `myValue:${this.myValue}`;
+    },
+    myValue: 42
+};
+String(spyObject4c);
+// "[object myValue:42]"
+spyObject4c.toString();
+// "[object myValue:42]"
+```
+
+`Symbol.toStringTag` is intended to define a custom string value to describe the object whenever its default `toString()` operation is invoked directly, or implicitly via coercion; in its absence, the value used is `"Object"` in the common `"[object Object]"` output.
+
+The `get ..` syntax in `spyObject4c` is defining a *getter*. That means when JS tries to access this `Symbol.toStringTag` as a property (as normal), this gettter code instead causes the function we specify to be invoked to compute the result. We can run any arbitrary logic inside this getter to dynamically determine a string *tag* for use by the default `toString()` method.
+
+#### Overriding `ToPrimitive`
+
+You can alternately override the whole default `ToPrimitive()` operation for any object, by setting the special symbol property `Symbol.toPrimitive` to hold a function:
+
+```js
+spyObject5 = {
+    [Symbol.toPrimitive](hint) {
+        console.log(`toPrimitive(${hint}) invoked!`);
+        return 25;
+    },
+    toString() {
+        console.log("toString() invoked!");
+        return "10";
+    },
+    valueOf() {
+        console.log("valueOf() invoked!");
+        return 42;
+    },
+};
+
+String(spyObject5);
+// toPrimitive(string) invoked!
+// "25"   <--- not "10"
+
+spyObject5 + "";
+// toPrimitive(default) invoked!
+// "25"   <--- not "42"
+
+Number(spyObject5);
+// toPrimitive(number) invoked!
+// 25     <--- not 42 or "25"
+
++spyObject5;
+// toPrimitive(number) invoked!
+// 25
+```
+
+As you can see, if you define this function on an object, it's used entirely in replacement of the default `ToPrimitive()` abstract operation. Since `hint` is still provided to this invoked function (`[Symbol.toPrimitive](..)`), you could in theory implement your own version of the algorithm, invoking a `toString()`, `valueOf()`, or any other method on the object (`this` context reference).
+
+Or you can just manually define a return value as shown above. Regardless, JS will *not* automatically invoke either `toString()` or `valueOf()` methods.
+
 ### Nullish
 
 // TODO
@@ -588,6 +823,8 @@ Nevertheless, as I mentioned at the start of this chapter, Brendan Eich endorses
 [^AbstractOperations]: "7.1 Type Conversion", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-type-conversion ; Accessed August 2022
 
 [^ToBoolean]: "7.1.2 ToBoolean(argument)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-toboolean ; Accessed August 2022
+
+[^ExoticFalsyObjects]: "B.3.6 The [[IsHTMLDDA]] Internal Slot", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-IsHTMLDDA-internal-slot ; Accessed August 2022
 
 [^OrdinaryToPrimitive]: "7.1.1.1 OrdinaryToPrimitive(O,hint)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-ordinarytoprimitive ; Accessed August 2022
 
