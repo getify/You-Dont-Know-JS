@@ -29,4 +29,5 @@
     * TODO
 * Chapter 4: Coercing Values
     * Abstracts
+    * Explicit vs. Implicit Coercions
     * TODO
