@@ -28,6 +28,7 @@
     * Fundamental Objects
     * TODO
 * Chapter 4: Coercing Values
+    * Coercion: Explicit vs Implicit
     * Abstracts
-    * Explicit vs. Implicit Coercions
+    * Concrete Coercions
     * TODO
