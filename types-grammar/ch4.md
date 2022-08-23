@@ -1075,6 +1075,135 @@ But another minor fact you might consider: in performance benchmarks I've run ma
 
 I'd observe that even many diehard `===` fans tend to concede that `== null` is at least one such case where `==` is preferable.
 
+#### `==` Boolean Gotcha
+
+Aside from some coercive corner cases we'll address in the next section, probably the biggest gotcha to be aware of with `==` has to do with booleans.
+
+Pay very close attention here, as it's one of the biggest reasons people get bitten by, and then come to despise, `==`. If you take my simple advice (at the end of this section), you'll never be a victim!
+
+Consider the following snippet, and let's assume for a minute that `isLoggedIn` is *not* holding a `boolean` value (`true` or `false`):
+
+```js
+if (isLoggedIn) {
+    // ..
+}
+
+// vs:
+
+if (isLoggedIn == true) {
+    // ..
+}
+```
+
+We've already covered the first `if` statement form. We know `if` expects a `boolean`, so in this case `isLoggedIn` will be coerced to a `boolean` using the lookup table in the `ToBoolean()` abstract operation. Pretty straightforward to predict, right?
+
+But take a look at the `isLoggedIn == true` expression. Do you think it's going to behave the same way?
+
+If your instinct was *yes*, you've just fallen into a tricky little trap. Recall early in this chapter when I warned that the rules of `ToBoolean()` coercion only apply if the JS operation is actually activating that algorithm. Here, it seems like JS must be doing so, because `== true` seems so clearly a "boolean related" type of comparison.
+
+But nope. Go re-read the `IsLooselyEqual()` algorithm (for `==`) earlier in the chapter. Go on, I'll wait. If you don't like my summary, go read the specification algorithm[^LooseEquality] itself.
+
+OK, do you see anything in there that mentions invoking `ToBoolean()` under any circumstance?
+
+Nope!
+
+Remember: when the types of the two `==` operands are not the same, it prefers to coerce them both to numbers.
+
+What might be in `isLoggedIn`, if it's not a `boolean`? Well, it could be a string value like `"yes"`, for example. In that form, `if ("yes") { .. }` would clearly pass the conditional check and execute the block.
+
+But what's going to happen with the `==` form of the `if` conditional? It's going to act like this:
+
+```js
+// (1)
+"yes" == true
+
+// (2)
+"yes" == 1
+
+// (3)
+NaN == 1
+
+// (4)
+NaN === 1           // false
+```
+
+So in other words, if `isLoggedIn` holds a value like `"yes"`, the `if (isLoggedIn) { .. }` block will pass the conditional check, but the `if (isLoggedIn == true)` check will not. Ugh!
+
+What if `isLoggedIn` held the string `"true"`?
+
+```js
+// (1)
+"true" == true
+
+// (2)
+"true" == 1
+
+// (3)
+NaN == 1
+
+// (4)
+NaN === 1           // false
+```
+
+Facepalm.
+
+Here's a pop quiz: what value would `isLoggedIn` need to hold for both forms of the `if` statement conditional to pass?
+
+...
+
+...
+
+...
+
+...
+
+What if `isLoggedIn` was holding the number `1`? `1` is truthy, so the `if (isLoggedIn)` form passes. And the other `==` form that involves coercion:
+
+```js
+// (1)
+1 == true
+
+// (2)
+1 == 1
+
+// (3)
+1 === 1             // true
+```
+
+But if `isLoggedIn` was instead holding the string `"1"`? Again, `"1"` is truthy, but what about the `==` coercion?
+
+```js
+// (1)
+"1" == true
+
+// (2)
+"1" == 1
+
+// (3)
+1 == 1
+
+// (4)
+1 === 1             // true
+```
+
+OK, so `1` and `"1"` are two values that `isLoggedIn` can hold that are safe to coerce along with `true` in a `==` equality check. But basically almost no other values are safe for `isLoggedIn` to hold.
+
+We have a similar gotcha if the check is `== false`. What values are safe in such a comparison? `""` and `0` work. But:
+
+```js
+if ([] == false) {
+    // this will run!
+}
+```
+
+`[]` is a truthy value, but it's also coercively equal to `false`?! Ouch.
+
+What are we to make of these gotchas with `== true` and `== false` checks? I have a plain and simple answer.
+
+Never, ever, under any circumstances, perform a `==` check if either side of the comparison is a `true` or `false` value. It looks like it's going to behave as a nice `ToBoolean()` coercion, but it slyly won't, and will instead be ensnared in a variety of coercion corner cases (addressed in the next section). And avoid the `===` forms, too.
+
+When you're dealing with booleans, stick to the implicitly coercive forms that are genuinely activating `ToBoolean()`, such as `if (isLoggedIn)`, and stay away from the `==` / `===` forms.
+
 ## Coercion Corner Cases
 
 I've been clear in expressing my pro-coercion opinion thus far. And it *is* just an opinion, though it's based on interpreting facts gleaned from studying the language specification and observable JS behaviors.
