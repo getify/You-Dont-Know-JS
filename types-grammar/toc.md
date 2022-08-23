@@ -31,4 +31,6 @@
     * Coercion: Explicit vs Implicit
     * Abstracts
     * Concrete Coercions
+    * Coercion Corner Cases
+    * Type Awareness
     * TODO
