@@ -964,7 +964,25 @@ We can see the `0` / `-0` misdirection of `SameValueZero()` here:
 (new Map([[ 0, "ok" ]])).has(-0);   // true  <--- :(
 ```
 
-In these cases, there's a *coercion* (of sorts!) that treats `-0` and `0` as indistinguishable. No, that's not technically a *coercion* in that the type is not being changed, but I'm sort of fudging the definition to *include* this case in our broader discussion of coercion here.
+In these cases, there's a *coercion* (of sorts!) that treats `-0` and `0` as indistinguishable. No, that's not technically a "coercion" in that the type is not being changed, but I'm sort of fudging the definition to *include* this case in our broader discussion of coercion here.
+
+Contrast the `includes()` / `has()` methods here, which activate `SameValueZero()`, with the good ol' `indexOf(..)` array utility, which instead activates `IsStrictlyEqual()` instead. This algorithm is slightly more "coercive" than `SameValueZero()`, in that it prevents `NaN` values from ever being treated as equal to each other:
+
+```js
+[ 1, 2, NaN ].indexOf(NaN);         // -1  <--- not found
+```
+
+If these nuanced quirks of `includes(..)` and `indexOf(..)` bother you, when searching -- looking for an equality match within -- for a value in an array, you can avoid any "coercive" quicks and *force* the strictest `SameValue()` equality matching, via `Object.is(..)`:
+
+```js
+vals = [ 0, 1, 2, -0, NaN ];
+
+vals.find(v => Object.is(v,-0));            // -0
+vals.find(v => Object.is(v,NaN));           // NaN
+
+vals.findIndex(v => Object.is(v,-0));       // 3
+vals.findIndex(v => Object.is(v,NaN));      // 4
+```
 
 #### Equality Operators: `==` vs `===`
 
@@ -1005,7 +1023,55 @@ I'll be revisiting this topic to make the case for preferring `==` over `===`, l
 
 #### Nullish Coercion
 
-// TODO
+We've already seen a number of JS operations that are nullish -- treating `null` and `undefined` as coercively equal to each other, including the `?.` optional-chaining operator and the `??` nullish-coalescing operator (see "Null'ish" in Chapter 1).
+
+But `==` is the most obvious place that JS exposes nullish coercive equality:
+
+```js
+null == undefined;              // true
+```
+
+Neither `null` nor `undefined` will ever be coercively equal to any other value in the language, other than to each other. That means `==` makes it ergonomic to treat these two values as indistinguishable.
+
+You might take advantage of this capability as such:
+
+```js
+if (someData == null) {
+    // `someData` is "unset" (either null or undefined),
+    // so set it to some default value
+}
+
+// OR:
+
+if (someData != null) {
+    // `someData` is set (neither null nor undefined),
+    // so use it somehow
+}
+```
+
+Remember that `!=` is the negation of `==`, whereas `!==` is the negation of `===`. Don't match the count of `=`s unless you want to confuse yourself!
+
+Compare these two approaches:
+
+```js
+if (someData == null) {
+    // ..
+}
+
+// vs:
+
+if (someData === null || someData === undefined) {
+    // ..
+}
+```
+
+Both `if` statements will behave exactly identically. Which one would you rather write, and which one would you rather read later?
+
+To be fair, some of you prefer the more verbose `===` equivalent. And that's OK. I disagree, I think the `==` version of this check is *much* better. And I also maintain that the `==` version is more consistent in stylistic spirit with how the other nullish operators like `?.` and `??` act.
+
+But another minor fact you might consider: in performance benchmarks I've run many times, JS engines can perform the single `== null` check as shown *slightly faster* than the combination of two `===` checks. In other words, there's a tiny but measurable benefit to letting JS's `==` perform the *implicit* nullish coercion than in trying to *explicitly* list out both checks yourself.
+
+I'd observe that even many diehard `===` fans tend to concede that `== null` is at least one such case where `==` is preferable.
 
 ## Coercion Corner Cases
 
