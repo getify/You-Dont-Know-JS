@@ -1456,6 +1456,18 @@ Let me make something absolutely clear, though: none of this is `==`'s fault. It
 
 ## Type Awareness
 
+We've sliced up and examined coercion from every conceivable angle, starting from the abstract internals of the specification, moving to the concrete expressions and statements that actually trigger the coercions.
+
+But what's the point of all this? Is the detail in this chapter, and indeed this whole book up to this point, mostly just trivia? I don't think so.
+
+Let's return to the observations/questions I posed way back at the beginning of this long chapter.
+
+There's no shortage of opinions (especially negative) about coercion. The nearly universally held position is that coercion is mostly/entirely a *bad part* of JS's language design. But inspite of that reality, most every developer, in most every JS program ever written, faces the reality that coercion cannot be avoided.
+
+In other words, no matter what you do, you won't be able to get away from the need to be aware of, understand, and manage JS's value-types and the conversions them.
+
+Surely you're thinking at this moment: "Why can't I just use TypeScript and make all my types static, avoiding all the confusion of dynamic typing and coercion?"
+
 // TODO
 
 [^EichCoercion]: "The State of JavaScript - Brendan Eich", comment thread, Hacker News; Oct 9 2012; https://news.ycombinator.com/item?id=4632704 ; Accessed August 2022
