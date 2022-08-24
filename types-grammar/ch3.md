@@ -25,6 +25,8 @@ But one shared characteristic is that all objects are capable of acting as colle
 
 ## Fundamental Objects
 
-In Chapter 2, I briefly mentioned *auto-boxing*, which we'll now revisit.
+In Chapter 2, I briefly mentioned *auto-boxing*, which we'll now revisit. [^AutoBoxing]
 
 // TODO
+
+[^AutoBoxing]: "6.2.4.6 PutValue(V,W)", Step 5.a, ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-putvalue ; Accessed August 2022
