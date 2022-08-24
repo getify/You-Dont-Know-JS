@@ -191,13 +191,13 @@ myList;                     // [ 23, 42, 109, empty x 11, "Hello" ]
 myList[9];                  // undefined
 ```
 
-You might wonder why empty slots are so bad? One reason: there are APIs in JS, like array's `map(..)`, where empty slots are suprisingly skipped over! Never, ever intentionally create empty slots in your arrays. This in undebateably one of JS's "bad parts".
+You might wonder why empty slots are so bad? One reason: there are APIs in JS, like array's `map(..)`, where empty slots are surprisingly skipped over! Never, ever intentionally create empty slots in your arrays. This in undebateably one of JS's "bad parts".
 
 ### Functions
 
 I don't have much specifically to say about functions here, other than to point out that they are also sub-object-types. This means that in addition to being executable, they can also have named properties added to or accessed from them.
 
-Functions have two pre-defined properties you may find yourself interacting with, specifially for meta-programming purposes:
+Functions have two pre-defined properties you may find yourself interacting with, specifically for meta-programming purposes:
 
 ```js
 function help(opt1,opt2,...remainingOpts) {

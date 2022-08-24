@@ -15,7 +15,7 @@ The object mechanism is certainly the most flexible and powerful container type 
 
 Why are prototypes (along with the `this` keyword, covered later in the book) so core to JS as to be one of its three pillars? Among other things, prototypes are how JS's object system can express the class design pattern, one of the most widely relied on design patterns in all of programming.
 
-So our journey here will start with objects, build up a compelete understanding of prototypes, de-mystify the `this` keyword, and explore the `class` system.
+So our journey here will start with objects, build up a complete understanding of prototypes, de-mystify the `this` keyword, and explore the `class` system.
 
 ## About This Book
 
@@ -145,7 +145,7 @@ The `42` property name will be treated as an integer property name (aka, index);
 | :--- |
 | If you need to actually use an object as a key/property name, never rely on this computed string coercion; its behavior is surprising and almost certainly not what's expected, so program bugs are likely to occur. Instead, use a more specialized data structure, called a `Map` (added in ES6), where objects used as property "names" are left as-is instead of being coerced to a string value. |
 
-As with with `[myObj]` above, you can *compute* any **property name** (distinct from computing the property value) at the time of object literal definition:
+As with `[myObj]` above, you can *compute* any **property name** (distinct from computing the property value) at the time of object literal definition:
 
 ```js
 anotherObj = {
@@ -197,7 +197,7 @@ anotherObj = {
 
 | NOTE: |
 | :--- |
-| That would have been the same thing as the quoted property name definition `"coolFact": coolFact`, but JS developers rarely quote property names unless strictly necessary. Indeed, it's idiomatic to avoid the quotes unless required, so it's discouraged to include them unneccessarily. |
+| That would have been the same thing as the quoted property name definition `"coolFact": coolFact`, but JS developers rarely quote property names unless strictly necessary. Indeed, it's idiomatic to avoid the quotes unless required, so it's discouraged to include them unnecessarily. |
 
 In this situation, where the property name and value expression identifier are identical, you can omit the property-name portion of the property definition, as a so-called "concise property" definition:
 
@@ -367,7 +367,7 @@ Object.entries(myObj);
 // [ ["favoriteNumber",42], ["isDeveloper",true], ["firstName","Kyle"] ]
 ```
 
-Added in ES6, `Object.entries(..)` retieves this list of entries -- containing only owned an enumerable properties; see the "Property Descriptors" section in the next chapter -- from a source object.
+Added in ES6, `Object.entries(..)` retrieves this list of entries -- containing only owned an enumerable properties; see the "Property Descriptors" section in the next chapter -- from a source object.
 
 Such a list can be looped/iterated over, potentially assigning properties to another existing object. However, it's also possible to create a new object from a list of entries, using `Object.fromEntries(..)` (added in ES2019):
 
@@ -382,7 +382,7 @@ myObjShallowCopy = Object.fromEntries( Object.entries(myObj) );
 
 Another approach to accessing properties is through object destructuring (added in ES6). Think of destructuring as defining a "pattern" that describes what an object value is supposed to "look like" (structurally), and then asking JS to follow that "pattern" to systematically access the contents of an object value.
 
-The end result of object destructuring is not another object, but rather one or more assignments to other targets (variables, etc) of the values from the source object.
+The end result of object destructuring is not another object, but rather one or more assignments to other targets (variables, etc.) of the values from the source object.
 
 Imagine this sort of pre-ES6 code:
 
@@ -528,7 +528,7 @@ Note that `null` and `undefined` can be object-ified, by calling `Object(null)` 
 | :--- |
 | Boxing has a counterpart: unboxing. For example, the JS engine will take an object wrapper -- like a `Number` object wrapped around `42` -- created with `Number(42)` or `Object(42)` -- and unwrap it to retrieve the underlying primitive `42`, whenever a mathematical operation (like `*` or `-`) encounters such an object. Unboxing behavior is way out of scope for our discussion, but is covered fully in the aforementioned "Types & Grammar" title. |
 
-## Assiging Properties
+## Assigning Properties
 
 Whether a property is defined at the time of object literal definition, or added later, the assignment of a property value is done with the `=` operator, as any other normal assignment would be:
 
@@ -646,9 +646,9 @@ There's a variety of other mechanisms available, as well. `Object.keys(..)` give
 
 But what if we wanted to get *all* the keys in an object (enumerable or not)? `Object.getOwnPropertyNames(..)` seems to do what we want, in that it's like `Object.keys(..)` but also returns non-enumerable property names. However, this list **will not** include any Symbol property names, as those are treated as special locations on the object. `Object.getOwnPropertySymbols(..)` returns all of an object's Symbol properties. So if you concatenate both of those lists together, you'd have all the direct (*owned*) contents of an object.
 
-Yet as we've implied several times already, and will cover in full detail in the next chapter, an object also can also "inherit" contents from its `[[Prototype]]` chain. These are not considered *owned* contents, so they won't show up in any of these lists.
+Yet as we've implied several times already, and will cover in full detail in the next chapter, an object also can "inherit" contents from its `[[Prototype]]` chain. These are not considered *owned* contents, so they won't show up in any of these lists.
 
-Recall that the `in` operator will potentially traverse the entire chain looking for the existence of a property. Similarly, a `for..in` loop will traverse the chain and list any enumerable (owned or inhertied) properties. But there's no built-in API that will traverse the whole chain and return a list of the combined set of both *owned* and *inherited* contents.
+Recall that the `in` operator will potentially traverse the entire chain looking for the existence of a property. Similarly, a `for..in` loop will traverse the chain and list any enumerable (owned or inherited) properties. But there's no built-in API that will traverse the whole chain and return a list of the combined set of both *owned* and *inherited* contents.
 
 ## Temporary Containers
 
@@ -681,7 +681,7 @@ const { one, two, three } =
     // transport for multiple input values
     formatValues({
        one: "Kyle",
-       two: "Simpson"
+       two: "Simpson",
        three: "getify"
     });
 
@@ -701,7 +701,7 @@ The most common usage of objects is as containers for multiple values. We create
 * defining properties (named locations), either at object creation time or later
 * assigning values, either at object creation time or later
 * accessing values later, using the location names (property names)
-* deleteing properties via `delete`
+* deleting properties via `delete`
 * determining container contents with `in`, `hasOwnProperty(..)` / `hasOwn(..)`, `Object.entries(..)` / `Object.keys(..)`, etc
 
 But there's a lot more to objects than just static collections of property names and values. In the next chapter, we'll dive under the hood to look at how they actually work.
