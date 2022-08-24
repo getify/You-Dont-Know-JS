@@ -676,7 +676,127 @@ You might recall earlier when we showed that JS allows *explicit* string coercio
 
 In other words, contrary to popular assumption/assertion, `Number(..)` and `+` are not interchangable. I think `Number(..)` is the safer/more reliable form.
 
-Like string coercions, if you perform a numeric coercion on a non-primitive object value, the `ToPrimitive()` operation is activated to first turn it into some primitive value
+#### Mathematical Operations
+
+Mathematical operators (e.g., `+`, `-`, `*`, `/`, `%`, and `**`) expect their operands to be numeric. If you use a non-`number` with them, that value will be coerced to a `number` for the purposes of the mathematical computation.
+
+Similar to how `x + ""` is an idiom for coercing `x` to a string, an expression like `x - 0` safely coerces `x` to a number.
+
+| WARNING: |
+| :--- |
+| `x + 0` isn't quite as safe, since the `+` operator is overloaded to perform string concatenation if either operand is already a string. The `-` minus operator isn't overloaded like that, so the only coercion will be to `number`. Of course, `x * 1`, `x / 1`, and even `x ** 1` would also generally be equivalent mathematicaly, but those are much less common, and probably should be avoided as likely confusing to readers of your code. Even `x % 1` seems like it should be safe, but it can introduce floating-point skew (see "Floating Point Imprecision" in Chapter 2). |
+
+Regardless of what mathematical operator is used, if the coercion fails, a `NaN` is the result, and all of these operators will propagate the `NaN` out as their result.
+
+#### Bitwise Operations
+
+Bitwise operators (e.g., `|`, `&`, `^`, `>>`, `<<`, and `<<<`) all expect number operands, but specifically they clamp these values to 32-bit integers.
+
+If you're sure the numbers you're dealing with are safely within the 32-bit integer range, `x | 0` is another common expression idiom that has the effect of coercing `x` to a `number` if necessary.
+
+Moreover, since JS engines know these values will be integers, there's potential for them to optimize for integer-only math if they see `x | 0`. This is one of several recommended "type annotations" from the ASM.js[^ASMjs] efforts from years ago.
+
+#### Property Access
+
+Property access of objects (and index access of arrays) is another place where implicit coercion can occur.
+
+Consider:
+
+```js
+myObj = {};
+
+myObj[3] = "hello";
+myObj["3"] = "world";
+
+console.log( myObj );
+```
+
+What do you expect from the contents of this object? Do you expect two different properties, numeric `3` (holding `"hello"`) and string `"3"` (holding `"world"`)? Or do you think both properties are in the same location?
+
+If you try that code, you'll see that indeed we get an object with a single property, and it holds the `"world"` value. That means that JS is internally coercing either the `3` to `"3"`, or vice versa, when those properties accesses are made.
+
+Interestingly, the developer console may very well represent the object sort of like this:
+
+```js
+console.log( myObj );
+// {3: 'world'}
+```
+
+Does that `3` there indicate the property is a numeric `3`? Not quite. Try adding another property to `myObj`:
+
+```js
+myObj.something = 42;
+
+console.log( myObj )
+// {3: 'world', something: 42}
+```
+
+We can see that this developer console doesn't quote string property keys, so we can't infer anything from `3` versus if the console had used `"3"` for the key name.
+
+Let's instead try consulting the specification for the object value[^ObjectValue], where we find:
+
+> A property key value is either an ECMAScript String value or a Symbol value. All String and Symbol values, including the empty String, are valid as property keys. A property name is a property key that is a String value.
+
+OK! So, in JS, objects only hold string (or symbol) properties. That must mean that the numeric `3` is coerced to a string `"3"`, right?
+
+In the same section of the specification, we further read:
+
+> An integer index is a String-valued property key that is a canonical numeric String (see 7.1.21) and whose numeric value is either +0𝔽 or a positive integral Number ≤ 𝔽(253 - 1). An array index is an integer index whose numeric value i is in the range +0𝔽 ≤ i < 𝔽(232 - 1).
+
+If a property key (like `"3"`) *looks* like a number, it's treated as an integer index. Hmmm... that almost seems to suggest the opposite of what we just posited, right?
+
+Nevertheless, we know from the previous quote that property keys are *only* strings (or symbols). So it must be that "integer index" here is not describing the actual location, but rather the intentional usage of `3` in JS code, as a developer-expressed "integer index"; JS must still then actually store it at the location of the "canonical numeric String".
+
+Consider attempts to use other value-types, like `true`, `null`, `undefined`, or even non-primitives (other objects):
+
+```js
+myObj[true] = 100;
+myObj[null] = 200;
+myObj[undefined] = 300;
+myObj[ {a:1} ] = 400;
+
+console.log(myObj);
+// {3: 'world', something: 42, true: 100, null: 200,
+// undefined: 300, [object Object]: 400}
+```
+
+As you can see, all of those other value-types were coerced to strings for the purposes of object property names.
+
+But before we convince ourselves of this interpretation that everything (even numbers) is coerced to strings, let's look at an array example:
+
+```js
+myArr = [];
+
+myArr[3] = "hello";
+myArr["3"] = "world";
+
+console.log( myArr );
+// [empty × 3, 'world']
+```
+
+The developer console will likely represent an array a bit differently than a plain object. Nevertheless, we still see that this array only has the single `"world"` value in it, at the numeric index position corresponding to `3`.
+
+That kind of output sort of implies the opposite of our previous interpretation: that the values of an array are being stored only at numeric positions. If we add another string property-name to `myArr`:
+
+```js
+myArr.something = 42;
+console.log( myArr );
+// [empty × 3, 'world', something: 42]
+```
+
+Now we see that this developer console represents the numerically indexed positions in the array *without* the property names (locations), but the `something` property is named in the output.
+
+It's also true that JS engines like v8 tend to, for performance optimization reasons, special-case object properties that are numeric-looking strings as actually being stored in numeric positions as if they were arrays. So even if the JS program acts as if the property name is `"3"`, in fact under the covers, v8 might be treating it as if coerced to `3`!
+
+What can take from all this?
+
+The specification clearly tells us that the behavior of object properties is for them to be treated like strings (or symbols). That means we can assume that using `3` to access a location on an object will have the internal effect of coercing that property name to `"3"`.
+
+But with arrays, we observe a sort of opposite semantic: using `"3"` as a property name has the effect of accessing the numerically indexed `3` position, as if the string was coerced to the number. But that's mostly just an offshot of the fact that arrays always tend to behave as numerically indexed, and/or perhaps a reflection of underlying implementation/optimization details in the JS engine.
+
+The important part is, we need to recognize that objects cannot simply use any value as a property name. If it's anything other than a string or a number, we can expect that there *will be* a coercion of that value.
+
+We need to expect and plan for that rather than allowing it to surprise us with bugs down the road!
 
 ### To Primitive
 
@@ -1385,3 +1505,5 @@ Let me make something absolutely clear, though: none of this is `==`'s fault. It
 [^StringPrefix]: "7.2.9 IsStringPrefix(p,q)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-isstringprefix ; Accessed August 2022
 
 [^SymbolString]: "String(symbol)", ESDiscuss mailing list; Aug 12 2014; https://esdiscuss.org/topic/string-symbol ; Accessed August 2022
+
+[^ASMjs]: "ASM.js - Working Draft"; Aug 18 2014; http://asmjs.org/spec/latest/ ; Accessed August 2022
