@@ -29,7 +29,7 @@ In fact, I think you'd be hard pressed to name hardly any other well-known sourc
 
 However, here's an observation I've made over the years: most of the folks who publicly condemn *implicit coercion*, actually use *implicit coercion* in their own code. Hmmmm...
 
-Douglas Crockford says to avoid the mistake of *implicit coercion*[^CrockfordCoercion], but his code uses `if (..)` statements with non-boolean values evaluated. [^CrockfordIfs] Many have dismissed my pointing that out in the past, with the claim that `ToBoolean()` isn't *really* coercion. Ummm... ok?
+Douglas Crockford says to avoid the mistake of *implicit coercion*[^CrockfordCoercion], but his code uses `if (..)` statements with non-boolean values evaluated. [^CrockfordIfs] Many have dismissed my pointing that out in the past, with the claim that conversion-to-booelan isn't *really* coercion. Ummm... ok?
 
 Brendan Eich says he regrets *implicit coercion*, but yet he openly endorses[^BrendanToString] idioms like `x + ""` (and others!) to coerce the value in `x` to a string (we'll cover this later); and that's most definitely an *implicit coercion*.
 
@@ -82,7 +82,7 @@ Even values like `"   "` (string with only whitespace), `[]` (empty array), and 
 
 The `ToBoolean()` coercion operation is basically a lookup table rather than an algorithm of steps to use in coercions a non-boolean to a boolean. Thus, some developers assert that this isn't *really* coercion the way other abstract coercion operations are. I think that's bogus. `ToBoolean()` converts from non-boolean value-types to a boolean, and that's clear cut type coercion (even if it's a very simple lookup instead of an algorithm).
 
-Keep in mind: these rules of boolean coercion only apply when `ToBoolean()` is actually activated. There are constructs/idioms in the JS language that may appear to involve boolean coercion but which don't actually do so.
+Keep in mind: these rules of boolean coercion only apply when `ToBoolean()` is actually activated. There are constructs/idioms in the JS language that may appear to involve boolean coercion but which don't actually do so. More on these later.
 
 ### ToPrimitive
 
@@ -464,17 +464,33 @@ if (specialNumber) {
 
 The `if` statement requires a `boolean` for the conditional to make its control-flow decision. If you pass it a non-`boolean`, a `ToBoolean()` *coercion* is performed.
 
+Unlike previous `ToBoolean()` coercion expressions, like `Boolean(..)` or `!!`, this `if` coercion is ephemeral, in that our JS program never sees the result of the coercion; it's just used internally by the `if`. Some may feel it's not *really* coercion if the program doesn't preserve/use the value. But I strongly disagree, because the coercion most definitely affects the program's behavior.
+
+Many other statement types also activate the `ToBoolean()` coercion, including the `? :` ternary conditional, and `for` / `while` loops. We also have `&&` (logical-AND) and `||` (logical-OR) operators. For example:
+
+```js
+isLoggedIn = user.sessionID || req.cookie["Session-ID"];
+
+isAdmin = isLoggedIn && ("admin" in user.permissions);
+```
+
+For both operators, the lefthand expression is first evaluated; if it's not already a `boolean`, a `ToBoolean()` coercion is activated to produce a value for the conditional decision.
+
 | NOTE: |
 | :--- |
-| Many other statement types also activate the `ToBoolean()` coercion, including the `? :` ternary, and `for` / `while` loops. |
+| To briefly explain these operators: for `||`, if the lefthand expression value (post-coercion, if necessary) is `true`, the pre-coercion value is returned; otherwise the righthand expression is evaluated and returned (no coercion). For `&&`, if the lefthand expression value (post-coercion, if necessary) is `false`, the pre-coercion value is returned; otherwise, the righthand expression is evaluated and returned (no coercion). In other words, both `&&` and `||` force a `ToBoolean()` coercion of the lefthand operand for making the decision, but neither operator's final result is actually coerced to a `boolean`. |
 
-Is `if (..)` here illustrating an *explicit* coercion or an *implicit* coercion? Again, I think it depends on your perspective. The specification dictates pretty explicitly that `if` only works with `boolean` conditional values. But a strong argument can be made that any coercion is a secondary effect to the main job of `if`, which is to make a control-flow decision.
+In the previous snippet, despite the naming implications, it's unlikely that `isLoggedIn` will actually be a `boolean`; and if it's truthy, `isAdmin` also won't be a `boolean`. That kind of code is quite common, but it's definitely dangerous that the assumed resultant `boolean` types aren't actually there. We'll revisit this example, and these operators, in the next chapter.
 
-In fact, as mentioned earlier in the `ToBoolean()` discussion, some developers don't consider *any* invocation of `ToBoolean()` to be a coercion. But I think that's too much of a stretch.
+Are these kinds of statements/expressions (e.g., `if (..)`, `||`, `&&`, etc) illustrating *explicit* coercion or *implicit* coercion in their conditional decision making?
 
-My take: `Boolean(..)` is the most preferable *explicit* coercion form. Further, I think `if` / `for` / `while` statements are *implicitly* coercing non-`boolean`s, but I'm OK with that.
+Again, I think it depends on your perspective. The specification dictates pretty explicitly that they only make their decisions with `boolean` conditional values, requiring coercion if a non-`boolean` is received. On the other hand, a strong argument can also be made that any internal coercion is a secondary (implicit) effect to the main job of `if` / `&&` / etc.
 
-Since most developers, including famous names like Doug Crockford, also in practice use implicit (`boolean`) coercions in their `if`[^CrockfordIfs] and loop statements, I think we can say that at least *some forms* of *implicit* coercion are widely acceptable, regardless of the rhetoric to the contrary.
+Further, as mentioned earlier in the `ToBoolean()` discussion, some folks don't consider *any* activation of `ToBoolean()` to be a coercion.
+
+I think that's too much of a stretch, though. My take: `Boolean(..)` is the most preferable *explicit* coercion form. I think `!!`, `if`, `for`, `while`, `&&`, and `||` are all *implicitly* coercing non-`boolean`s, but I'm OK with that.
+
+Since most developers, including famous names like Doug Crockford, also in practice use implicit (`boolean`) coercions in their code[^CrockfordIfs], I think we can say that at least *some forms* of *implicit* coercion are widely acceptable, regardless of the ubiquitous rhetoric to the contrary.
 
 ### To String
 
