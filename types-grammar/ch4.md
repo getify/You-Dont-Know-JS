@@ -29,7 +29,7 @@ In fact, I think you'd be hard pressed to name hardly any other well-known sourc
 
 However, here's an observation I've made over the years: most of the folks who publicly condemn *implicit coercion*, actually use *implicit coercion* in their own code. Hmmmm...
 
-Douglas Crockford says to avoid the mistake of *implicit coercion*[^CrockfordCoercion], but his code uses `if (..)` statements with non-boolean values evaluated. [^CrockfordIfs] Many have dismissed my pointing that out in the past, with the claim that `ToBoolean()` isn't *really* coercion. Ummm... ok?
+Douglas Crockford says to avoid the mistake of *implicit coercion*[^CrockfordCoercion], but his code uses `if (..)` statements with non-boolean values evaluated. [^CrockfordIfs] Many have dismissed my pointing that out in the past, with the claim that conversion-to-booelan isn't *really* coercion. Ummm... ok?
 
 Brendan Eich says he regrets *implicit coercion*, but yet he openly endorses[^BrendanToString] idioms like `x + ""` (and others!) to coerce the value in `x` to a string (we'll cover this later); and that's most definitely an *implicit coercion*.
 
@@ -82,7 +82,7 @@ Even values like `"   "` (string with only whitespace), `[]` (empty array), and 
 
 The `ToBoolean()` coercion operation is basically a lookup table rather than an algorithm of steps to use in coercions a non-boolean to a boolean. Thus, some developers assert that this isn't *really* coercion the way other abstract coercion operations are. I think that's bogus. `ToBoolean()` converts from non-boolean value-types to a boolean, and that's clear cut type coercion (even if it's a very simple lookup instead of an algorithm).
 
-Keep in mind: these rules of boolean coercion only apply when `ToBoolean()` is actually activated. There are constructs/idioms in the JS language that may appear to involve boolean coercion but which don't actually do so.
+Keep in mind: these rules of boolean coercion only apply when `ToBoolean()` is actually activated. There are constructs/idioms in the JS language that may appear to involve boolean coercion but which don't actually do so. More on these later.
 
 ### ToPrimitive
 
@@ -464,17 +464,33 @@ if (specialNumber) {
 
 The `if` statement requires a `boolean` for the conditional to make its control-flow decision. If you pass it a non-`boolean`, a `ToBoolean()` *coercion* is performed.
 
+Unlike previous `ToBoolean()` coercion expressions, like `Boolean(..)` or `!!`, this `if` coercion is ephemeral, in that our JS program never sees the result of the coercion; it's just used internally by the `if`. Some may feel it's not *really* coercion if the program doesn't preserve/use the value. But I strongly disagree, because the coercion most definitely affects the program's behavior.
+
+Many other statement types also activate the `ToBoolean()` coercion, including the `? :` ternary conditional, and `for` / `while` loops. We also have `&&` (logical-AND) and `||` (logical-OR) operators. For example:
+
+```js
+isLoggedIn = user.sessionID || req.cookie["Session-ID"];
+
+isAdmin = isLoggedIn && ("admin" in user.permissions);
+```
+
+For both operators, the lefthand expression is first evaluated; if it's not already a `boolean`, a `ToBoolean()` coercion is activated to produce a value for the conditional decision.
+
 | NOTE: |
 | :--- |
-| Many other statement types also activate the `ToBoolean()` coercion, including the `? :` ternary, and `for` / `while` loops. |
+| To briefly explain these operators: for `||`, if the lefthand expression value (post-coercion, if necessary) is `true`, the pre-coercion value is returned; otherwise the righthand expression is evaluated and returned (no coercion). For `&&`, if the lefthand expression value (post-coercion, if necessary) is `false`, the pre-coercion value is returned; otherwise, the righthand expression is evaluated and returned (no coercion). In other words, both `&&` and `||` force a `ToBoolean()` coercion of the lefthand operand for making the decision, but neither operator's final result is actually coerced to a `boolean`. |
 
-Is `if (..)` here illustrating an *explicit* coercion or an *implicit* coercion? Again, I think it depends on your perspective. The specification dictates pretty explicitly that `if` only works with `boolean` conditional values. But a strong argument can be made that any coercion is a secondary effect to the main job of `if`, which is to make a control-flow decision.
+In the previous snippet, despite the naming implications, it's unlikely that `isLoggedIn` will actually be a `boolean`; and if it's truthy, `isAdmin` also won't be a `boolean`. That kind of code is quite common, but it's definitely dangerous that the assumed resultant `boolean` types aren't actually there. We'll revisit this example, and these operators, in the next chapter.
 
-In fact, as mentioned earlier in the `ToBoolean()` discussion, some developers don't consider *any* invocation of `ToBoolean()` to be a coercion. But I think that's too much of a stretch.
+Are these kinds of statements/expressions (e.g., `if (..)`, `||`, `&&`, etc) illustrating *explicit* coercion or *implicit* coercion in their conditional decision making?
 
-My take: `Boolean(..)` is the most preferable *explicit* coercion form. Further, I think `if` / `for` / `while` statements are *implicitly* coercing non-`boolean`s, but I'm OK with that.
+Again, I think it depends on your perspective. The specification dictates pretty explicitly that they only make their decisions with `boolean` conditional values, requiring coercion if a non-`boolean` is received. On the other hand, a strong argument can also be made that any internal coercion is a secondary (implicit) effect to the main job of `if` / `&&` / etc.
 
-Since most developers, including famous names like Doug Crockford, also in practice use implicit (`boolean`) coercions in their `if`[^CrockfordIfs] and loop statements, I think we can say that at least *some forms* of *implicit* coercion are widely acceptable, regardless of the rhetoric to the contrary.
+Further, as mentioned earlier in the `ToBoolean()` discussion, some folks don't consider *any* activation of `ToBoolean()` to be a coercion.
+
+I think that's too much of a stretch, though. My take: `Boolean(..)` is the most preferable *explicit* coercion form. I think `!!`, `if`, `for`, `while`, `&&`, and `||` are all *implicitly* coercing non-`boolean`s, but I'm OK with that.
+
+Since most developers, including famous names like Doug Crockford, also in practice use implicit (`boolean`) coercions in their code[^CrockfordIfs], I think we can say that at least *some forms* of *implicit* coercion are widely acceptable, regardless of the ubiquitous rhetoric to the contrary.
 
 ### To String
 
@@ -660,7 +676,127 @@ You might recall earlier when we showed that JS allows *explicit* string coercio
 
 In other words, contrary to popular assumption/assertion, `Number(..)` and `+` are not interchangable. I think `Number(..)` is the safer/more reliable form.
 
-Like string coercions, if you perform a numeric coercion on a non-primitive object value, the `ToPrimitive()` operation is activated to first turn it into some primitive value
+#### Mathematical Operations
+
+Mathematical operators (e.g., `+`, `-`, `*`, `/`, `%`, and `**`) expect their operands to be numeric. If you use a non-`number` with them, that value will be coerced to a `number` for the purposes of the mathematical computation.
+
+Similar to how `x + ""` is an idiom for coercing `x` to a string, an expression like `x - 0` safely coerces `x` to a number.
+
+| WARNING: |
+| :--- |
+| `x + 0` isn't quite as safe, since the `+` operator is overloaded to perform string concatenation if either operand is already a string. The `-` minus operator isn't overloaded like that, so the only coercion will be to `number`. Of course, `x * 1`, `x / 1`, and even `x ** 1` would also generally be equivalent mathematicaly, but those are much less common, and probably should be avoided as likely confusing to readers of your code. Even `x % 1` seems like it should be safe, but it can introduce floating-point skew (see "Floating Point Imprecision" in Chapter 2). |
+
+Regardless of what mathematical operator is used, if the coercion fails, a `NaN` is the result, and all of these operators will propagate the `NaN` out as their result.
+
+#### Bitwise Operations
+
+Bitwise operators (e.g., `|`, `&`, `^`, `>>`, `<<`, and `<<<`) all expect number operands, but specifically they clamp these values to 32-bit integers.
+
+If you're sure the numbers you're dealing with are safely within the 32-bit integer range, `x | 0` is another common expression idiom that has the effect of coercing `x` to a `number` if necessary.
+
+Moreover, since JS engines know these values will be integers, there's potential for them to optimize for integer-only math if they see `x | 0`. This is one of several recommended "type annotations" from the ASM.js[^ASMjs] efforts from years ago.
+
+#### Property Access
+
+Property access of objects (and index access of arrays) is another place where implicit coercion can occur.
+
+Consider:
+
+```js
+myObj = {};
+
+myObj[3] = "hello";
+myObj["3"] = "world";
+
+console.log( myObj );
+```
+
+What do you expect from the contents of this object? Do you expect two different properties, numeric `3` (holding `"hello"`) and string `"3"` (holding `"world"`)? Or do you think both properties are in the same location?
+
+If you try that code, you'll see that indeed we get an object with a single property, and it holds the `"world"` value. That means that JS is internally coercing either the `3` to `"3"`, or vice versa, when those properties accesses are made.
+
+Interestingly, the developer console may very well represent the object sort of like this:
+
+```js
+console.log( myObj );
+// {3: 'world'}
+```
+
+Does that `3` there indicate the property is a numeric `3`? Not quite. Try adding another property to `myObj`:
+
+```js
+myObj.something = 42;
+
+console.log( myObj )
+// {3: 'world', something: 42}
+```
+
+We can see that this developer console doesn't quote string property keys, so we can't infer anything from `3` versus if the console had used `"3"` for the key name.
+
+Let's instead try consulting the specification for the object value[^ObjectValue], where we find:
+
+> A property key value is either an ECMAScript String value or a Symbol value. All String and Symbol values, including the empty String, are valid as property keys. A property name is a property key that is a String value.
+
+OK! So, in JS, objects only hold string (or symbol) properties. That must mean that the numeric `3` is coerced to a string `"3"`, right?
+
+In the same section of the specification, we further read:
+
+> An integer index is a String-valued property key that is a canonical numeric String (see 7.1.21) and whose numeric value is either +0𝔽 or a positive integral Number ≤ 𝔽(253 - 1). An array index is an integer index whose numeric value i is in the range +0𝔽 ≤ i < 𝔽(232 - 1).
+
+If a property key (like `"3"`) *looks* like a number, it's treated as an integer index. Hmmm... that almost seems to suggest the opposite of what we just posited, right?
+
+Nevertheless, we know from the previous quote that property keys are *only* strings (or symbols). So it must be that "integer index" here is not describing the actual location, but rather the intentional usage of `3` in JS code, as a developer-expressed "integer index"; JS must still then actually store it at the location of the "canonical numeric String".
+
+Consider attempts to use other value-types, like `true`, `null`, `undefined`, or even non-primitives (other objects):
+
+```js
+myObj[true] = 100;
+myObj[null] = 200;
+myObj[undefined] = 300;
+myObj[ {a:1} ] = 400;
+
+console.log(myObj);
+// {3: 'world', something: 42, true: 100, null: 200,
+// undefined: 300, [object Object]: 400}
+```
+
+As you can see, all of those other value-types were coerced to strings for the purposes of object property names.
+
+But before we convince ourselves of this interpretation that everything (even numbers) is coerced to strings, let's look at an array example:
+
+```js
+myArr = [];
+
+myArr[3] = "hello";
+myArr["3"] = "world";
+
+console.log( myArr );
+// [empty × 3, 'world']
+```
+
+The developer console will likely represent an array a bit differently than a plain object. Nevertheless, we still see that this array only has the single `"world"` value in it, at the numeric index position corresponding to `3`.
+
+That kind of output sort of implies the opposite of our previous interpretation: that the values of an array are being stored only at numeric positions. If we add another string property-name to `myArr`:
+
+```js
+myArr.something = 42;
+console.log( myArr );
+// [empty × 3, 'world', something: 42]
+```
+
+Now we see that this developer console represents the numerically indexed positions in the array *without* the property names (locations), but the `something` property is named in the output.
+
+It's also true that JS engines like v8 tend to, for performance optimization reasons, special-case object properties that are numeric-looking strings as actually being stored in numeric positions as if they were arrays. So even if the JS program acts as if the property name is `"3"`, in fact under the covers, v8 might be treating it as if coerced to `3`!
+
+What can take from all this?
+
+The specification clearly tells us that the behavior of object properties is for them to be treated like strings (or symbols). That means we can assume that using `3` to access a location on an object will have the internal effect of coercing that property name to `"3"`.
+
+But with arrays, we observe a sort of opposite semantic: using `"3"` as a property name has the effect of accessing the numerically indexed `3` position, as if the string was coerced to the number. But that's mostly just an offshot of the fact that arrays always tend to behave as numerically indexed, and/or perhaps a reflection of underlying implementation/optimization details in the JS engine.
+
+The important part is, we need to recognize that objects cannot simply use any value as a property name. If it's anything other than a string or a number, we can expect that there *will be* a coercion of that value.
+
+We need to expect and plan for that rather than allowing it to surprise us with bugs down the road!
 
 ### To Primitive
 
@@ -1021,7 +1157,7 @@ In fact, `==` and `===` are both type-sensitive, each checking the types of thei
 
 It's a nearly universally held opinion that `==` should be avoided in favor of `===`. I may be one of the only developers who publicly advocates a clear and straight-faced case for the opposite. I think the main reason people instead prefer `===`, beyond simply conforming to the status quo, is a lack of taking the time to actually understand `==`.
 
-I'll be revisiting this topic to make the case for preferring `==` over `===`, later in this chapter. All I ask is, no matter how strongly you currently disagree with me, try to keep an open mindset.
+I'll be revisiting this topic to make the case for preferring `==` over `===`, later in this chapter, in "Type Aware Equality". All I ask is, no matter how strongly you currently disagree with me, try to keep an open mindset.
 
 #### Nullish Coercion
 
@@ -1320,6 +1456,395 @@ Let me make something absolutely clear, though: none of this is `==`'s fault. It
 
 ## Type Awareness
 
+We've now sliced and diced and examined coercion from every conceivable angle, starting from the abstract internals of the specification, then moving to the concrete expressions and statements that actually trigger the coercions.
+
+But what's the point of all this? Is the detail in this chapter, and indeed this whole book up to this point, mostly just trivia? Eh, I don't think so.
+
+Let's return to the observations/questions I posed way back at the beginning of this long chapter.
+
+There's no shortage of opinions (especially negative) about coercion. The nearly universally held position is that coercion is mostly/entirely a *bad part* of JS's language design. But inspite of that reality, most every developer, in most every JS program ever written, faces the reality that coercion cannot be avoided.
+
+In other words, no matter what you do, you won't be able to get away from the need to be aware of, understand, and manage JS's value-types and the conversions them. Contrary to common assumptions, embracing a dynamically-typed (or even a weakly-typed) language, does *not* mean being careless or unaware of types.
+
+Type-aware programming is always, always better than type ignorant/agnostic programming.
+
+### Uhh... TypeScript?
+
+Surely you're thinking at this moment: "Why can't I just use TypeScript and declare all my types statically, avoiding all the confusion of dynamic typing and coercion?"
+
+| NOTE: |
+| :--- |
+| I have many more detailed thoughts on TypeScript and the larger role it plays in our ecosystem; I'll save those opinions for the appendix ("Thoughts on TypeScript"). |
+
+Let's start by addressing head on the ways TypeScript does, and does not, aid in type-aware programming, as I'm advocating.
+
+TypeScript is both **statically-typed** (meaning types are declared at author time and checked at compile-time) and **strongly-typed** (meaning variables/containers are typed, and these associations are enforced; strongly-typed systems also disallow *implicit* coercion). The greatest strength of TypeScript is that it typically forces both the author of the code, and the reader of the code, to confront the types comprising most (ideally, all!) of a program. That's definitely a good thing.
+
+By contrast, JS is **dynamically-typed** (meaning types are discovered and managed purely at runtime) and **weakly-typed** (meaning variables/containers are not typed, so there's no associations to enforce, and variables can thus hold any value-types; weakly-typed systems allow any form of coercion).
+
+| NOTE: |
+| :--- |
+| I'm hand-waving at a pretty high level here, and intentionally not diving deeply into lots of nuance on the static/dynamic and strong/weak typing spectrums. If you're feeling the urge to "Well, actually..." me at this moment, please just hold on a bit and let me lay out my arguments. |
+
+### Type-Awareness *Without* TypeScript
+
+Does a dynamically-typed system automatically mean you're programming with less type-awareness? Many would argue that, but I disagree.
+
+I do not at all think that declaring static types (annotations, as in TypeScript) is the only way to accomplish effective type-awareness. Clearly, though, proponents of static-typing believe that's is the *best* way.
+
+Let me illustrate type-awareness without TypeScript's static typing. Consider this variable declaration:
+
+```js
+let API_BASE_URL = "https://some.tld/api/2";
+```
+
+Is that statement in any way *type-aware*? Sure, there's no `: string` annotation after `API_BASE_URL`. But I definitely think it *is* still type-aware! We clearly see the value-type (`string`) of the value being assigned to `API_BASE_URL`.
+
+| WARNING: |
+| :--- |
+| Don't get distracted by the `let` declaration being re-assignable (as opposed to a `const`). JS's `const` is *not* a first-class feature of its type system. We don't really gain additional type-awareness simply because we know that reassignment of a `const` variable is disallowed by the JS engine. If the code is structured well -- ahem, structured with type-awareness as a priority -- we can just read the code and see clearly that `API_BASE_URL` is *not* reassigned and is thus still the value-type it was previously assigned. From a type-awareness perspective, that's effectively the same thing as if it *couldn't* be reassigned. |
+
+If I later want to do something like:
+
+```js
+// are we using the secure API URL?
+isSecureAPI = /^https/.test(API_BASE_URL);
+```
+
+I know the regular-expression `test(..)` method expects a string, and since I know `API_BASE_URL` is holding a string, I know that operation is type-safe.
+
+Similarly, since I know the simple rules of `ToBoolean()` coercion as it relates to string values, I know this kind of statement is also type-safe:
+
+```js
+// do we have an API URL determined yet?
+if (API_BASE_URL) {
+    // ..
+}
+```
+
+But if later, I start to type something like this:
+
+```js
+APIVersion = Number(API_BASE_URL);
+```
+
+A warning siren triggers in my head. Since I know there's some very specific rules about how string values coerce to numbers, I recognize that this operation is **not** type-safe. So I instead approach it differently:
+
+```js
+// pull out the version number from API URL
+versionDigit = API_BASE_URL.match(/\/api\/(\d+)$/)[1];
+
+// make sure the version is actually a number
+APIVersion = Number(versionDigit);
+```
+
+I know that `API_BASE_URL` is a string, and I further know the format of its contents includes `".../api/{digits}"` at the end. That lets me know that the regular expression match will succeed, so the `[1]` array accesss is type-safe.
+
+I also know that `versionDigit` will hold a string, because that's what regular-expression matches return. Now, I know it's safe to coerce that numeric-digit string into a number with `Number(..)`.
+
+By my definition, that kind of thinking, and that style of coding, is type-aware. Type-awareness in coding means thinking carefully about whether or not such things will be *clear* and *obvious* to the reader of the code.
+
+### Type-Awareness *With* TypeScript
+
+TypeScript fans will point out that TypeScript can, via type inference, do static typing (enforcement) without ever needing a single type annotation in the program. So all the code examples I shared in the previous section, TypeScript can also handle, and provide its flavor of compile-time static type enforcement.
+
+In other words, TypeScript will give us the same kind of benefit in type checking, whichever of these two we write:
+
+```ts
+let API_BASE_URL: string = "https://some.tld/api/2";
+
+// vs:
+
+let API_BASE_URL = "https://some.tld/api/2";
+```
+
+But there's no free-lunch. We have some issues we need to confront. First of all, TypeScript does *not* trigger an error here:
+
+```js
+API_BASE_URL = "https://some.tld/api/2";
+
+APIVersion = Number(API_BASE_URL);
+// NaN
+```
+
+Intuitively, *I* want a type-aware system to understand why that's unsafe. But maybe that's just too much to ask. Or perhaps if we actually define a more narrow/specific type for that `API_BASE_URL` variable, than simply `string`, it might help? We can use a TypeScript trick called "Template Literal Types": [^TSLiteralTypes]
+
+```ts
+type VersionedURL = `https://some.tld/api/${number}`;
+
+API_BASE_URL: VersionedURL = "https://some.tld/api/2";
+
+APIVersion = Number(API_BASE_URL);
+// NaN
+```
+
+Nope, TypeScript still doesn't see any problem with that. Yes, I know there's an explanation for why (how `Number(..)` itself is typed).
+
+| NOTE: |
+| :--- |
+| I imagine the really smart folks who *know* TypeScript well have creative ideas on how we can contort ourselves into raising an error there. Maybe there's even a dozen different ways to force TypeScript to trigger on that code. But that's not really the point. |
+
+My point is, we cannot fully rely on TypeScript types to solve all our problems, letting us check out and remain blissfully unaware of the nuances of types and, in this case, coercion behaviors.
+
+But! You're surely objecting to this line of argument, desperate to assert that even if TypeScript can't understand some specific situation, surely using TypeScript doesn't make it *worse*! Right!?
+
+Let's look at what TypeScript has to say[^TSExample1] about this line:
+
+```ts
+type VersionedURL = `https://some.tld/api/${number}`;
+
+let API_BASE_URL: VersionedURL = "https://some.tld/api/2";
+
+let versionDigit = API_BASE_URL.match(/\/api\/(\d+)$/)[1];
+// Object is possibly 'null'.
+```
+
+The error indicates that the `[1]` access isn't type-safe, because if the regular expression fails to find any match on the string, `match(..)` returns `null`.
+
+You see, even though *I* can reason about the contents of the string compared to how the regular expression is written, and even if *I* went to the trouble to make it super clear to TypeScript exactly what those specific string contents are, it's not quite smart enough to line those two up to see that it's actually fully type-safe to assume the match happens.
+
+| TIP: |
+| :--- |
+| Is it really the job of, and best use of, a type-aware tool to be contorted to express every single possible nuance of type-safety? We don't need perfect and universal tools to derive immense amounts of benefit from the stuff they *can* do. |
+
+Moreover, comparing the code style in the previous section to the code in this section (with or without the annotations), is TypeScript actually making our coding more type-aware?
+
+Like, does that `type VersionedURL = ..` and `API_BASE_URL: VersionedURL` stuff *actually* make our code more clearly type-aware? I don't necessarily think so.
+
+### TypeScript Intelligence
+
+Yes, I hear you screaming at me through the computer screen. Yes, I know that TypeScript provides what type information it discovers (or infers) to your code editor, which comes through in the form of intelligent autocompletes, helpful inline warning markers, etc.
+
+But I'm arguing that even *those* don't, in and of themselves, make you more type-aware as a developer
+
+Why? Because type-awareness is *not* just about the authoring experience. It's also about the reading experience, maybe even moreso. And not all places/mechanisms where code is read, have access to benefit from all the extra intelligence.
+
+Look, the magic of a language-server pumping intelligence into your code editor is unquestionably amazing. It's cool and super helpful.
+
+And I don't begrudge TypeScript as a tool inferring things about my **JS code** and giving me hints and suggestions through delightful code editor integrations. I just don't necessarily want to *have* to annotate type information in some extremely specific way just to silence the tool's complaints.
+
+### The Bar Above TypeScript
+
+But even if I did/had all that, it's still not ***sufficient*** for me to be fully type-aware, both as a code-author and as a code-reader.
+
+These tools don't catch every type error that can happen, no matter how much we want to tell ourselves they can, and no matter how many hoops and contortions we endure to wish it so. All the efforts to coax and *coerce* a tool into catching those nuanced errors, through endlessly increasing complexity of type syntax tricks, is... at best, misplaced effort.
+
+Moreover, no such tool is immune to false positives, complaining about things which aren't actually errors; these tools will never be as smart as we are as humans. You're really wasting your time in chasing down some quirky syntax trick to quite down the tool's complaints.
+
+There's just no subsitute, if you want to truly be a type-aware code-author and code-reader, from learning how the language's built-in type systems work. And yes, that means every single developer on your team needs to spend the efforts to learn it. You can't water this stuff down just to be more attainable for less experienced developers on the project/team.
+
+Even if we granted that you could avoid 100% of all *implicit* coercions -- you can't -- you are absolutely going to face the need to *explicit* coercions -- all programs do!
+
+And if your response to that fact is to suggest that you'll just offload the mental burden of understanding them to a tool like TypeScript... then I'm sorry to tell you, but you're plainly and painfully falling short of the *type-aware* bar that I'm challenging all developers to strive towards.
+
+I'm not advocating, here, for you to ditch TypeScript. If you like it, fine. But I am very explicitly and passionately challenging you: stop using TypeScript as a crutch. Stop prostrating yourself to appease the TypeScript engine overlords. Stop foolishly chasing every type rabbit down every syntactic hole.
+
+From my observation, there's a tragic, inverse relationship between usage of type-aware tooling (like TypeScript) and the desire/effort to pursue actual type-awareness as a code-author and code-reader. The more you rely on TypeScript, the more it seems you're tempted and encouraged to shift your attention away from JS's type system (and especially, from coercion) to the alternate TypeScript type system.
+
+Unfortunately, TypeScript can never fully escape JS's type system, because TypeScript's types are *erased* by the compiler, and what's left is just JS that the JS engine has to contend with.
+
+| TIP: |
+| :--- |
+| Imagine if someone handed you a cup of filtered water to drink. And just before you took a sip, they said, "We extracted that water from the ground near a waste dump. But don't worry, we used a perfectly great filter, and that water is totally safe!" How much do you trust that filter? More to my overall point, wouldn't you feel more comfortable drinking that water if you understood everything about the source of the water, all the processes of filtration, and everything that was *in* the water of the glass in your hand!? Or is trusting that filter good enough? |
+
+### Type Aware Equality
+
+I'll close this long, winding chapter with one final illustration, modeling how I think developers should -- armed with more critical thinking than bandwagon conformism -- approach type-aware coding, whether you use a tool like TypeScript or not.
+
+We'll yet again revisit equality comparisons (`==` vs `===`), from the perspective of type-awareness. Earlier in this chapter, I promised that I would make the case for `==` over `===`, so here it goes.
+
+Let's restate/summarize what we know about `==` and `===` so far:
+
+1. If the types of the operands for `==` match, it behaves *exactly the same* as `===`.
+
+2. If the types of the operands for `===` do not match, it will always return `false`.
+
+3. If the types of the operands for `==` do not match, it will allow coercion of either operand (generally preferring numeric type-values), until the types finally match; once they match, see (1).
+
+OK, so let's take those facts and analyze how they might interact in our program.
+
+If you are making an equality comparison of `x` and `y` like this:
+
+```js
+if ( /* are x and y equal */ ) {
+    // ..
+}
+```
+
+What are the possible conditions we may be in, with respect to the types of `x` and `y`?
+
+1. We might know exactly what type(s) `x` and `y` could be, because we know how those variables are getting assigned.
+
+2. Or we might not be able to tell what those types could be. It could be that `x` or `y` could be any type, or at least any of several different types, such that the possible combinations of types in the comparison are too complex to understand/predict.
+
+Can we agree that (1) is far preferable to (2)? Can we further agree that (1) represents having written our code in a type-aware fashion, whereas (2) represents code that is decidedly type-*unaware*?
+
+If you're using TypeScript, you're very likely to be aware of the types of `x` and `y`, right? Even if you're not using TypeScript, we've already shown that you can take intentional steps to write your code in such a way that the types of `x` and `y` are known and obvious.
+
+#### (2) Unknown Types
+
+If you're in scenario (2), I'm going to assert that your code is in a problem state. Your code is less-than-ideal. Your code needs to be refactored. The best thing to do, if you find code in this state, is... fix it!
+
+Change the code so it's type-aware. If that means using TypeScript, and even inserting some type annotations, do so. Or if you feel you can get to the type-aware state with *just JS*, do that. Either way, do whatever you can to get to scenario (1).
+
+If you cannot ensure the code doing this equality comparison between `x` and `y` is type-aware, and you have no other options, then you absolutely *must* use the `===` strict-equality operator. Not doing so would be supremely irresponsible.
+
+```js
+if (x === y) {
+    // ..
+}
+```
+
+If you don't know anything about the types, how could you (or any other future reader of your code) have any idea how the coercive steps in `==` are going to behave!? You can't.
+
+The only responsible thing to do is, avoid coercion and use `===`.
+
+But don't lose sight of this fact: you're only picking `===` as a last resort, when your code is so type-unaware -- ahem, type-broken! -- as to have no other choice.
+
+#### (1) Known Types
+
+OK, let's instead assume you're in scenario (1). You know the types of `x` and `y`. It's very clear in the code what this narrow set of types participating in the equality check can be.
+
+Great!
+
+But there's still two possible sub-conditions you may be in:
+
+* (1a): `x` and `y` might already be of the same type, whether that be both are `string`s, `number`s, etc.
+
+* (1b): `x` and `y` might be of different types.
+
+Let's consider each of these cases individually.
+
+##### (1a) Known Matching Types
+
+If the types in the equality comparison match (whatever they are), we already know for certain that `==` and `===` do exactly the same thing. There's absolutely no difference.
+
+Except, `==` *is* shorter by one character. Most developers feel instinctively that the most terse but equivalent version of something is often most preferable. That's not universal, of course, but it's a general preference at least.
+
+```js
+// this is best
+if (x == y) {
+    // ..
+}
+```
+
+In this particular case, an extra `=` would do nothing for us to make the code more clear. In fact, it actually would make the comparison worse!
+
+```js
+// this is strictly worse here!
+if (x === y) {
+    // ..
+}
+```
+
+Why is it worse?
+
+Because in scenario (2), we already established that `===` is used for the last-resort when we don't know enough/anything about the types to be able to predict the outcome. We use `===` when we want to make sure we're avoiding coercion when we know coercion could occur.
+
+But that doesn't apply here! We already know that no coercion would occur. There's no reason to confuse the reader with a `===` here. If you use `===` in a place where you already *know* the types -- and moreover, they're matched! -- that actually might send a mixed signal to the reader. They might have assumed they knew what would happen in the equality check, but then they see the `===` and they second guess themselves!
+
+Again, to state it plainly, if you know the types of an equality comparison, and you know they match, there's only one right choice: `==`.
+
+```js
+// stick to this option
+if (x == y) {
+    // ..
+}
+```
+
+##### (1b) Known Mismatched Types
+
+OK, we're in our final scenario. We need to compare `x` and `y`, and we know their types, but we also know their types are **NOT** the same.
+
+Which operator should we use here?
+
+If you pick `===`, you've made a huge mistake. Why!? Because `===` used with known-mismatched types will never, ever, ever return `true`. It will always fail.
+
+```js
+// `x` and `y` have different types?
+if (x === y) {
+    // congratulations, this code in here will NEVER run
+}
+```
+
+OK. So, `===` is out when the types are known and mismatched. What's our only other choice?
+
+Well, actually, we again have two options. We *could* decide:
+
+* (1b-1): Let's change the code so we're not trying to do an equality check with known mismatched types; that could involve explicitly coercing one or both values so they types now match, in which case pop back up to scenario (1a).
+
+* (1b-2): If we're going to compare known mismatched types for equality, and we want any hope of that check ever passing, we *must* used `==`, because it's the only one of the equality operators which can coerce one or both operands until the types match.
+
+```js
+// `x` and `y` have different types,
+// so let's allow JS to coerce them
+// for equality comparison
+if (x == y) {
+    // .. (so, you're saying there's a chance?)
+}
+```
+
+That's it. We're done. We've looked at every possible type-sensitive equality comparison condition (between `x` and `y`).
+
+#### Summarizing Type-Sensitive Equality Comparison
+
+The case for always preferring `==` over `===` is as follows:
+
+1. Whether you use TypeScript or not -- but especially if you *do* use TypeScript -- the goal should be to have every single part of the code, including all equality comparisons, be *type-aware*.
+
+2. If you know the types, you should always prefer `==`.
+
+    - In the case where the types match, `==` is both shorter and more proper for the check.
+
+    - In the case where the types are not matched, `==` is the only operator that can coerce operand(s) until the types match, so it's the only way such a check could ever hope to pass
+
+3. Finally, only if you *can't* know/predict the types, for some frustrating reason, and you have no other option, fall back to using `===` as a last resort. And probably add a code comment there admitting why `===` is being used, and maybe prompting some future developer to later change the code to fix that deficiency and remove the crutch of `===`.
+
+#### TypeScript's Inconsistency Problem
+
+Let me be super clear: if you're using TypeScript properly, and you know the types of an equality comparison, using `===` for that comparison is just plain *wrong*! Period.
+
+The problem is, TypeScript strangely and frustratingly still requires you to use `===`, unless it already knows that the types are matched.
+
+That's because TypeScript either doesn't fully understand type-awareness and coercion, or -- and this is even more infuriating! -- it fully understands but it still despises JS's type system so much as to eschew even the most basic of type-aware reasoning.
+
+Don't believe me? Think I'm being too harsh? Try this in TypeScript: [^TSExample2]
+
+```js
+let result = (42 == "42");
+// This condition will always return 'false' since
+// the types 'number' and 'string' have no overlap.
+```
+
+I am at a loss for words to describe how aggravating that is to me. If you've paid attention to this long, heavy chapter, you know that TypeScript is basically telling a lie here. Of course `42 == "42"` will produce `true` in JS.
+
+Well, it's not a lie, but it's exposing a fundamental truth that so many still don't fully appreciate: TypeScript completely tosses out the normal rules of JS's type system, because TypeScript's position is that JS's type system -- and especially, implicit coercion -- are bad, and need to be replaced.
+
+In TypeScript's world, `42` and `"42"` can never be equal to each other. Hence the error message. But in JS land, `42` and `"42"` are absolutely coercively equal to each other. And I believe I've made a strong case here that they *should be* assumed to be safely coercively equivalent.
+
+What bothers me even more is, TypeScript has a variety of inconsistencies in this respect. TypeScript is perfectly fine with the *implicit* coercion in this code:
+
+```js
+irony = `The value '42' and ${42} are coercively equal.`;
+```
+
+The `42` gets implicitly coerced to a string when interpolating it into the sentence. Why is TypeScript ok with this implicit coercion, but not the `42 == "42"` implicit coercion?
+
+TypeScript has no complaints about this code, either:
+
+```js
+API_BASE_URL = "https://some.tld/api/2";
+if (API_BASE_URL) {
+    // ..
+}
+```
+
+Why is `ToBoolean()` an OK implicit coercion, but `ToNumber()` in the `==` algorithm is not?
+
+I will leave you to ponder this: do you really think it's a good idea to write code that will ultimately run in a JS engine, but use a tool and style of code that has intentionally ejected most of an entire pillar of the JS language? Moreover, is it fine that it's also flip-flopped with a variety of inconsistent exceptions, simply to cater to the old habits of JS developers?
+
+## What's Left?
+
 // TODO
 
 [^EichCoercion]: "The State of JavaScript - Brendan Eich", comment thread, Hacker News; Oct 9 2012; https://news.ycombinator.com/item?id=4632704 ; Accessed August 2022
@@ -1369,3 +1894,11 @@ Let me make something absolutely clear, though: none of this is `==`'s fault. It
 [^StringPrefix]: "7.2.9 IsStringPrefix(p,q)", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-isstringprefix ; Accessed August 2022
 
 [^SymbolString]: "String(symbol)", ESDiscuss mailing list; Aug 12 2014; https://esdiscuss.org/topic/string-symbol ; Accessed August 2022
+
+[^ASMjs]: "ASM.js - Working Draft"; Aug 18 2014; http://asmjs.org/spec/latest/ ; Accessed August 2022
+
+[^TSExample1]: "TypeScript Playground"; https://tinyurl.com/ydkjs-ts-example-1 ; Accessed August 2022
+
+[^TSExample2]: "TypeScript Playground"; https://tinyurl.com/ydkjs-ts-example-2 ; Accessed August 2022
+
+[^TSLiteralTypes]: "TypeScript 4.1, Template Literal Types"; https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-1.html#template-literal-types ; Accessed August 2022
