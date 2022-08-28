@@ -1,5 +1,5 @@
 # You Don't Know JS Yet: Types & Grammar - 2nd Edition
-# Chapter 2: Value Behaviors
+# Chapter 2: Primitive Behaviors
 
 | NOTE: |
 | :--- |
@@ -98,7 +98,7 @@ Additionally, most of the primitive value-types define their own methods with sp
 
 | NOTE: |
 | :--- |
-| Technically, these sorts of property/method accesses on primitive values are facilitated by an implicit coercive behavior called *auto-boxing*, which we'll cover in the next chapter. |
+| As already briefly mentioned in Chapter 1, technically, these sorts of property/method accesses on primitive values are facilitated by an implicit coercive behavior called *auto-boxing*. We'll cover this in detail in "Automatic Objects" in Chapter 3. |
 
 ## Primitive Assignments
 
