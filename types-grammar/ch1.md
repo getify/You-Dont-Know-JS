@@ -1,5 +1,5 @@
 # You Don't Know JS Yet: Types & Grammar - 2nd Edition
-# Chapter 1: Primitives
+# Chapter 1: Primitive Values
 
 | NOTE: |
 | :--- |
@@ -13,17 +13,17 @@ Here, we'll look at the core value types of JS, specifically the non-object type
 
 JS doesn't apply types to variables or properties -- what I call, "container types" -- but rather, values themselves have types -- what I call, "value types".
 
-The language provides seven built-in, primitive (non-object) value types:
+The language provides seven built-in, primitive (non-object) value types: [^PrimitiveValues]
 
-* `null`
 * `undefined`
+* `null`
 * `boolean`
-* `string`
 * `number`
 * `bigint`
 * `symbol`
+* `string`
 
-These value-types define collections of one or more concrete values, each with a set of shared behaviors for all values of that type.
+These value-types define collections of one or more concrete values, each with a set of shared behaviors for all values of each type.
 
 ### Type-Of
 
@@ -47,6 +47,48 @@ typeof greeting;        // "string"
 ```
 
 JS variables themselves don't have types. They hold any arbitrary value, which itself has a value-type.
+
+### Non-objects?
+
+What specifically makes the 7 primitive value types distinct from the object value types (and sub-types)? Why shouldn't we just consider them all as essentially *objects* under the covers?
+
+Consider:
+
+```js
+myName = "Kyle";
+
+myName.nickname = "getify";
+
+console.log(myName.nickname);           // undefined
+```
+
+This snippet appears to silently fail to add a `nickname` property to a primitive string. Taken at face value, that might imply that primitives are really just objects under the covers, as many have (wrongly) asserted over the years.
+
+| WARNING: |
+| :--- |
+| One might explain that silent failure as an example of *auto-boxing* (see "Automatic Objects" in Chapter 3), where the primitive is implicitly converted to a `String` instance wrapper object while attempting to assign the property, and then this internal object is thrown away after the statement completes. In fact, I said exactly that in the first edition of this book. But I was wrong; oops! |
+
+Something deeper is at play, as we see in this version of the previous snippet:
+
+```js
+"use strict";
+
+myName = "Kyle";
+
+myName.nickname = "getify";
+// TypeError: Cannot create property 'nickname'
+// on string 'Kyle'
+```
+
+Interesting! In strict-mode, JS enforces a restriction that disallows setting a new property on a primitive value, as if implicitly promoting it to a new object.
+
+By contrast, in non-strict mode, JS allows the violation to go unmentioned. So why? Because strict-mode was added to the language in ES5.1 (2011), more than 15 years in, and such a change would have broken existing programs had it not been defined as sensitive to the new strict-mode declaration.
+
+So what can we conclude about the distinction between primitives and objects? Primitives are values that *are not allowed to have properties*; only objects are allowed such.
+
+| TIP: |
+| :--- |
+| This particular distinction seems to be contradicted by expressions like `"hello".length`; even in strict-mode, it returns the expected value `5`. So it certainly *seems* like the string has a `length` property! But, as just previously mentioned, the correct explanation is *auto-boxing*; we'll cover the topic in "Automatic Objects" in Chapter 3. |
 
 ## Empty Values
 
@@ -1108,11 +1150,27 @@ If the registry doesn't have a symbol under that specified *key*, a new symbol (
 
 Going in the opposite direction, if you have the symbol value itself, and want to retrieve the *key* it's registered under, `Symbol.keyFor(..)` takes the symbol itself as input, and returns the *key* (if any). That's useful in case it's more convenient to pass around the *key* string value than the symbol itself.
 
+### Object or Primitive?
+
+Unlike other primitives like `42`, where you can create multiple copies of the same value, symbols *do* act more like specific object references in that they're always completely unique (for purposes of value assignment and equality comparison). The specification also categorizes the `Symbol()` function under the "Fundamental Objects" section, calling the function a "constructor", and even defining its `prototype` property.
+
+However, as mentioned earlier, `new` cannot be used with `Symbol(..)`; this is similar to the `BigInt()` "constructor". We clearly know `bigint` values are primitives, so `symbol` values seem to be of the same *kind*.
+
+And in the specification's "Terms and Definitions", it lists symbol as a primitive value. [^PrimitiveValues] Moreover, the values themselves are used in JS programs as primitives rather than objects. For example, symbols are primarily used as keys in objects -- we know objects cannot use other object values as keys! -- along with strings, which are also primitives.
+
+As mentioned earlier, some JS engines even internally implement symbols as unique, monotonically incrementing integers (primitives!).
+
+Finally, as explained at the top of this chapter, we know primitive values are *not allowed* to have properties set on them, but are *auto-boxed* (see "Automatic Objects" in Chapter 3) internally to the corresponding object-wrapper type to facilitate property/method access. Symbols follow all these exact behaviors, the same as all the other primitives.
+
+All this considered, I think symbols are *much more* like primitives than objects, so that's how I present them in this book.
+
 ## Primitives Are Built-In Types
 
 We've now dug deeply into the seven primitive (non-object) value types that JS provides automatically built-in.
 
 Before we move on to discussing JS's built-in object value type, we want to take a closer look at the kinds of behaviors we can expect from JS values. We'll do so in-depth, in the next chapter.
+
+[^PrimitiveValues]: "4.4.5 primitive value", ECMAScript 2022 Language Specification; https://tc39.es/ecma262/#sec-primitive-value ; Accessed August 2022
 
 [^UTFUCS]: "JavaScript’s internal character encoding: UCS-2 or UTF-16?"; Mathias Bynens; January 20 2012; https://mathiasbynens.be/notes/javascript-encoding ; Accessed July 2022
 
