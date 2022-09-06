@@ -396,7 +396,7 @@ myObj = {
 const favoriteNumber = (
     myObj.favoriteNumber !== undefined ? myObj.favoriteNumber : 42
 );
-const isDev = myObj.favoriteNumber;
+const isDev = myObj.isDeveloper;
 const firstName = myObj.firstName;
 const lname = (
     myObj.lastName !== undefined ? myObj.lastName : "--missing--"
