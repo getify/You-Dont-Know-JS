@@ -165,6 +165,7 @@ For distinguishing values, the `typeof` operator tells you its built-in type, if
 
 ```js
 typeof 42;                  // "number"
+typeof 42n;                 // "bigint"
 typeof "abc";               // "string"
 typeof true;                // "boolean"
 typeof undefined;           // "undefined"
