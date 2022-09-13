@@ -800,7 +800,7 @@ We need to expect and plan for that rather than allowing it to surprise us with 
 
 ### To Primitive
 
-Most operators in JS, including those we've see with coercions to `string` and `number`, are designed to run against primitive values. When any of these operators is used instead against an object value, the abstract `ToPrimitive` algorithm (as described earlier) is activated to coerce the object to a primitive.
+Most operators in JS, including those we've seen with coercions to `string` and `number`, are designed to run against primitive values. When any of these operators is used instead against an object value, the abstract `ToPrimitive` algorithm (as described earlier) is activated to coerce the object to a primitive.
 
 Let's set up an object we can use to inspect how different operations behave:
 
@@ -1490,7 +1490,7 @@ By contrast, JS is **dynamically-typed** (meaning types are discovered and manag
 
 Does a dynamically-typed system automatically mean you're programming with less type-awareness? Many would argue that, but I disagree.
 
-I do not at all think that declaring static types (annotations, as in TypeScript) is the only way to accomplish effective type-awareness. Clearly, though, proponents of static-typing believe that's is the *best* way.
+I do not at all think that declaring static types (annotations, as in TypeScript) is the only way to accomplish effective type-awareness. Clearly, though, proponents of static-typing believe that is the *best* way.
 
 Let me illustrate type-awareness without TypeScript's static typing. Consider this variable declaration:
 
