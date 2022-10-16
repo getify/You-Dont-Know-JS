@@ -270,7 +270,7 @@ class Point3d {
 
 | TIP: |
 | :--- |
-| You can think of public field declarations as if they appear at the top of the constructor, each prefixed with an implied `this.` that you get to omit in the declarative `class` body form. |
+| You can mostly think of public field declarations as if they appear at the top of the `constructor(..)`, each prefixed with an implied `this.` that you get to omit in the declarative `class` body form. But, there's a catch! See "That's Super!" later for more information about it. |
 
 Just like computed property names (see Chapter 1), field names can be computed:
 
@@ -486,7 +486,7 @@ The ability for methods of the same name, at different levels of the inheritance
 
 ### That's Super!
 
-In addition to a subclass method accessing an inherited method definition (even if overriden on the subclass) via `super.` reference, a subclass constructor can manually invoke the inherited base class constructor via `super(..)` function invocation:
+In addition to a subclass method accessing an inherited method definition (even if overriden on the subclass) via `super.` reference, a subclass constructor must manually invoke the inherited base class constructor via `super(..)` function invocation:
 
 ```js
 class Point2d {
@@ -516,7 +516,44 @@ point.toString();       // (3,4,5)
 
 | WARNING: |
 | :--- |
-| An explicitly defined subclass constructor *must* call `super(..)` to run the inherited class's initialization, and that must occur before the subclass constructor makes any references to `this` or finishes/returns. Otherwise, a runtime exception will be thrown when that subclass constructor is invoked (via `new`). If you omit the subclass constructor, the default constructor automatically thankfully invokes `super()` for you. |
+| An explicitly defined subclass constructor *must* call `super(..)` to run the inherited class's initialization, and that must occur before the subclass constructor makes any references to `this` or finishes/returns. Otherwise, a runtime exception will be thrown when that subclass constructor is invoked (via `new`). If you omit the subclass constructor, the default constructor automatically -- thankfully! -- invokes `super()` for you. |
+
+One nuance to be aware of: if you define a field (public or private) inside a subclass, and explicitly define a `constructor(..)` for this subclass, the field initializations will be processed not at the top of the constructor, but *between* the `super(..)` call and any subsequent code in the constructor.
+
+Pay close attention to the order of console messages here:
+
+```js
+class Point2d {
+    x
+    y
+    constructor(x,y) {
+        console.log("Running Point2d(..) constructor");
+        this.x = x;
+        this.y = y;
+    }
+}
+
+class Point3d extends Point2d {
+    z = console.log("Initializing field 'z'")
+
+    constructor(x,y,z) {
+        console.log("Running Point3d(..) constructor");
+        super(x,y);
+
+        console.log(`Setting instance property 'z' to ${z}`);
+        this.z = z;
+    }
+    toString() {
+        console.log(`(${this.x},${this.y},${this.z})`);
+    }
+}
+
+var point = new Point3d(3,4,5);
+// Running Point3d(..) constructor
+// Running Point2d(..) constructor
+// Initializing field 'z'
+// Setting instance property 'z' to 5
+```
 
 #### Which Class?
 
