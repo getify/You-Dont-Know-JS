@@ -394,7 +394,7 @@ class Point3d extends Point2d {
     }
 }
 
-var point new Point2d();
+var point = new Point2d();
 
 point.getX();                   // 3
 

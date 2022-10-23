@@ -933,7 +933,7 @@ The latter one is definitely not an example of closure, at least not in any usef
 
 ### Defer to Closure
 
-By the way, Chapter 7 briefly mentioned partial application and currying (which *do* rely on closure!). This is a interesting scenario where manual currying can be used:
+By the way, Chapter 7 briefly mentioned partial application and currying (which *do* rely on closure!). This is an interesting scenario where manual currying can be used:
 
 ```js
 function printLabels(labels) {
@@ -1013,7 +1013,7 @@ But I strongly prefer, and always use myself, the former `publicAPI` form. Two r
 
     Whatever the case may be, it just seems rather silly to me that we *wouldn't* maintain a reference to access our own API. Right?
 
-### Asynchronous Module Defintion (AMD)
+### Asynchronous Module Definition (AMD)
 
 Another variation on the classic module form is AMD-style modules (popular several years back), such as those supported by the RequireJS utility:
 
