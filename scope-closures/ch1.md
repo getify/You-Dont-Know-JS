@@ -207,7 +207,7 @@ For the JS engine to properly handle a program's variables, it must first label 
 What makes a variable a *target*? Consider:
 
 ```js
-students = [ // ..
+var students = [ // ..
 ```
 
 This statement is clearly an assignment operation; remember, the `var students` part is handled entirely as a declaration at compile time, and is thus irrelevant during execution; we left it out for clarity and focus. Same with the `nextStudent = getStudentName(73)` statement.
