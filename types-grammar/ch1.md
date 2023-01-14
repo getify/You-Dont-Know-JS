@@ -312,7 +312,7 @@ If `"` or `'` are used to delimit a string literal, the contents are only parsed
 
 For single-character escape sequences, the following characters are recognized after a `\`: `b`, `f`, `n`, `r`, `t`, `v`, `0`, `'`, `"`, and `\`. For example,  `\n` means new-line, `\t` means tab, etc.
 
-If a `\` is followed by any other character (except `x` and `u` -- explained below), like for example `\k`, that sequence is interpted as the `\` being an unnecessary escape, which is thus dropped, leaving just the literal character itself (`k`).
+If a `\` is followed by any other character (except `x` and `u` -- explained below), like for example `\k`, that sequence is interpreted as the `\` being an unnecessary escape, which is thus dropped, leaving just the literal character itself (`k`).
 
 To include a `"` in the middle of a `"`-delimited string literal, use the `\"` escape sequence. Similarly, if you're including a `'` character in the middle of a `'`-delimited string literal, use the `\'` escape sequence. By contrast, a `'` does *not* need to be escaped inside a `"`-delimited string, nor vice versa.
 
@@ -365,7 +365,7 @@ Because the end-of-line `\` turns the new-line character into a line continuatio
 
 Multi-character escape sequences may be hexadecimal or Unicode sequences.
 
-Hexidecimal escape sequences are used to encode any of the base ASCII characters (codes 0-255), and look like `\x` followed by exactly two hexadecimal characters (`0-9` and `a-f` / `A-F` -- case insensitive). For example, `A9` or `a9` are decimal value `169`, which corresponds to:
+Hexadecimal escape sequences are used to encode any of the base ASCII characters (codes 0-255), and look like `\x` followed by exactly two hexadecimal characters (`0-9` and `a-f` / `A-F` -- case insensitive). For example, `A9` or `a9` are decimal value `169`, which corresponds to:
 
 ```js
 copyright = "\xA9";  // or "\xa9"
@@ -490,7 +490,7 @@ familyEmoji;            // 👩‍👩‍👦‍👦
 
 This emoji is *not* a single registered Unicode code-point, and as such, there's no *normalization* that can be performed to compose these 7 separate code-points into a single entity. The visual rendering logic for such composite symbols is quite complex, well beyond what most of JS developers want to embed into our programs. Libraries do exist for handling some of this logic, but they're often large and still don't necessarily cover all of the nuances/variations.
 
-Unlike surrogate pairs and combining marks, the symbols in grapheme clusters can in fact act as standalone characters, but have the special combining behavior when placed adjactent to each other.
+Unlike surrogate pairs and combining marks, the symbols in grapheme clusters can in fact act as standalone characters, but have the special combining behavior when placed adjacent to each other.
 
 This kind of complexity significantly affects length computations, comparison, sorting, and many other common string-oriented operations.
 
@@ -555,7 +555,7 @@ Some JS developers believe that untagged template literal strings are best to us
 | :--- |
 | The principle I always apply in making such determinations: use the closest-matched, and least capable, feature/tool, for any task. |
 
-Moreover, there are a few places where `` `..` `` style strings are disallowed. For example, the `"use strict"` pragma cannot use back-ticks, or the pragma will be silently ignored (and thus the program accidentally runs in non-strict mode). Also, this style of strings cannot be used in quoted property names of object literals, or in the ES Module `import .. from ..` module-specifier clause.
+Moreover, there are a few places where `` `..` `` style strings are disallowed. For example, the `"use strict"` pragma cannot use back-ticks, or the pragma will be silently ignored (and thus the program accidentally runs in non-strict mode). Also, this style of strings cannot be used in quoted property names of object literals, destruturing patterns, or in the ES Module `import .. from ..` module-specifier clause.
 
 My take: use `` `..` `` delimited strings where allowed, but only when interpolation/multi-line is needed; and keep using `".."` or `'..'` delimited strings for everything else.
 

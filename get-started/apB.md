@@ -138,7 +138,7 @@ Once you have code that works, *compare* your solution(s) to the code in "Sugges
 
 ## Suggested Solutions
 
-Keep in mind that these suggested solutions are just that: suggestions. There's many different ways to solve these practice exercises. Compare your approach to what you see here, and consider the pros and cons of each.
+Keep in mind that these suggested solutions are just that: suggestions. There are many different ways to solve these practice exercises. Compare your approach to what you see here, and consider the pros and cons of each.
 
 Suggested solution for "Comparisons" (Pillar 3) practice:
 

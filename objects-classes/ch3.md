@@ -196,7 +196,7 @@ point.setX(3);
 
 The `setX` property (method) *looks like* it exists on (is owned by) the `point` object here. But that's a mirage. Each class method is added to the `prototype`object, a property of the constructor function.
 
-So, `setX(..)` only exists as `Point2d.prototype.greeting`. Since `point` is `[[Prototype]]` linked to `Point2d.prototype` (see Chapter 2) via the `new` keyword instantiation, the `point.setX(..)` reference traverses the `[[Prototype]]` chain and finds the method to execute.
+So, `setX(..)` only exists as `Point2d.prototype.setX`. Since `point` is `[[Prototype]]` linked to `Point2d.prototype` (see Chapter 2) via the `new` keyword instantiation, the `point.setX(..)` reference traverses the `[[Prototype]]` chain and finds the method to execute.
 
 Class methods should only be invoked via an instance; `Point2d.setX(..)` doesn't work because there *is no* such property. You *could* invoke `Point2d.prototype.setX(..)`, but that's not generally proper/advised in standard class-oriented coding. Always access class methods via the instances.
 
@@ -237,7 +237,7 @@ Instead of defining a class instance member imperatively via `this.` in the cons
 
 ```js
 class Point2d {
-    // this is a public field
+    // these are public fields
     x = 0
     y = 0
 
@@ -270,7 +270,7 @@ class Point3d {
 
 | TIP: |
 | :--- |
-| You can think of public field declarations as if they appear at the top of the constructor, each prefixed with an implied `this.` that you get to omit in the declarative `class` body form. |
+| You can mostly think of public field declarations as if they appear at the top of the `constructor(..)`, each prefixed with an implied `this.` that you get to omit in the declarative `class` body form. But, there's a catch! See "That's Super!" later for more information about it. |
 
 Just like computed property names (see Chapter 1), field names can be computed:
 
@@ -394,7 +394,7 @@ class Point3d extends Point2d {
     }
 }
 
-var point new Point2d();
+var point = new Point2d();
 
 point.getX();                   // 3
 
@@ -450,7 +450,7 @@ var point = new Point3d();
 point.printX();       // double x: 42
 ```
 
-The `Point3d` subclass overrides the inherited `getX()` method to give it different behavior. However, you can still instantiate the base `Point2d` class, which would then give an object that uses the original (`"That's ..."`) definition for `greeting()`.
+The `Point3d` subclass overrides the inherited `getX()` method to give it different behavior. However, you can still instantiate the base `Point2d` class, which would then give an object that uses the original (`return this.x;`) definition for `getX()`.
 
 If you want to access an inherited method from a subclass even if it's been overriden, you can use `super` instead of `this`:
 
@@ -482,11 +482,11 @@ var point = new Point3d();
 point.printX();       // x: 21
 ```
 
-The ability for methods of the same name, at different levels of the inheritance hierarchy, to exhibit different behavior when either accessed directly, or relatively with `super`, is called *polymorphism*. It's a very powerful part of class-orientation, when used appropriately.
+The ability for methods of the same name, at different levels of the inheritance hierarchy, to exhibit different behavior when either accessed directly, or relatively with `super`, is called *method polymorphism*. It's a very powerful part of class-orientation, when used appropriately.
 
 ### That's Super!
 
-In addition to a subclass method accessing an inherited method definition (even if overriden on the subclass) via `super.` reference, a subclass constructor can manually invoke the inherited base class constructor via `super(..)` function invocation:
+In addition to a subclass method accessing an inherited method definition (even if overriden on the subclass) via `super.` reference, a subclass constructor must manually invoke the inherited base class constructor via `super(..)` function invocation:
 
 ```js
 class Point2d {
@@ -516,7 +516,46 @@ point.toString();       // (3,4,5)
 
 | WARNING: |
 | :--- |
-| An explicitly defined subclass constructor *must* call `super(..)` to run the inherited class's initialization, and that must occur before the subclass constructor makes any references to `this` or finishes/returns. Otherwise, a runtime exception will be thrown when that subclass constructor is invoked (via `new`). If you omit the subclass constructor, the default constructor automatically thankfully invokes `super()` for you. |
+| An explicitly defined subclass constructor *must* call `super(..)` to run the inherited class's initialization, and that must occur before the subclass constructor makes any references to `this` or finishes/returns. Otherwise, a runtime exception will be thrown when that subclass constructor is invoked (via `new`). If you omit the subclass constructor, the default constructor automatically -- thankfully! -- invokes `super()` for you. |
+
+One nuance to be aware of: if you define a field (public or private) inside a subclass, and explicitly define a `constructor(..)` for this subclass, the field initializations will be processed not at the top of the constructor, but *between* the `super(..)` call and any subsequent code in the constructor.
+
+Pay close attention to the order of console messages here:
+
+```js
+class Point2d {
+    x
+    y
+    constructor(x,y) {
+        console.log("Running Point2d(..) constructor");
+        this.x = x;
+        this.y = y;
+    }
+}
+
+class Point3d extends Point2d {
+    z = console.log("Initializing field 'z'")
+
+    constructor(x,y,z) {
+        console.log("Running Point3d(..) constructor");
+        super(x,y);
+
+        console.log(`Setting instance property 'z' to ${z}`);
+        this.z = z;
+    }
+    toString() {
+        console.log(`(${this.x},${this.y},${this.z})`);
+    }
+}
+
+var point = new Point3d(3,4,5);
+// Running Point3d(..) constructor
+// Running Point2d(..) constructor
+// Initializing field 'z'
+// Setting instance property 'z' to 5
+```
+
+As the console messages illustrate, the `z = ..` field initialization happens *immediately after* the `super(x,y)` call, *before* the ``console.log(`Setting instance...`)`` is executed. Perhaps think of it like the field initializations attached to the end of the `super(..)` call, so they run before anything else in the constructor does.
 
 #### Which Class?
 
@@ -663,7 +702,7 @@ Where is that `toString()` method located? On the prototype object:
 Object.hasOwn(Point3d.prototype,"toString");    // true
 ```
 
-And `b` has access to that method via its `[[Prototype]]` linkage (see Chapter 2). In other words, the prototype objects **share access** to their method(s) with the subclass(es) and instance(s). The method(s) stay in place, and are not copied down the inheritance chain.
+And `anotherPoint` has access to that method via its `[[Prototype]]` linkage (see Chapter 2). In other words, the prototype objects **share access** to their method(s) with the subclass(es) and instance(s). The method(s) stay in place, and are not copied down the inheritance chain.
 
 As nice as the `class` syntax is, don't forget what's really happening under the syntax: JS is *just* wiring up objects to each other along a `[[Prototype]]` chain.
 
