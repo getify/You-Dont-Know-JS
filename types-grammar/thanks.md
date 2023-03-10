@@ -14,4 +14,5 @@ A special thanks to:
 * Appgrader
 * Coyotiv School of Software Engineering
 * Gaspar Radu
+* IonutBihari
 
