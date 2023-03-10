@@ -16,5 +16,6 @@ A special thanks to:
 * Gaspar Radu
 * IonutBihari
 * jmarti705
+* John Liu
 
 
