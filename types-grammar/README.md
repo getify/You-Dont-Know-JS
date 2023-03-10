@@ -13,3 +13,4 @@
 * [Chapter 3: Object Values](ch3.md)
 * [Chapter 4: Coercing Values](ch4.md)
 * Chapter 5: TODO
+* [Thank You!](thanks.md)

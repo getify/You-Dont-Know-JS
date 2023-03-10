@@ -46,6 +46,7 @@
     * Delegation Illustrated
     * Composing Peer Objects
     * Why *This*?
+* Thank You!
 * TODO:
     * object wrappers (String, Boolean, etc)
     * object coercions (valueof, tostring, boxing)

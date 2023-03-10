@@ -13,4 +13,4 @@
 * [Chapter 3: Classy Objects](ch3.md)
 * [Chapter 4: This Works](ch4.md)
 * [Chapter 5: Delegation](ch5.md)
-* TODO
+* [Thank You!](thanks.md)

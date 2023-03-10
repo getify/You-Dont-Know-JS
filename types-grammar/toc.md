@@ -40,3 +40,4 @@
     * Coercion Corner Cases
     * Type Awareness
     * What's Left?
+* Thank You!
