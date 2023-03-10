@@ -15,4 +15,5 @@ A special thanks to:
 * Coyotiv School of Software Engineering
 * Gaspar Radu
 * IonutBihari
+* jmarti705
 
