@@ -71,15 +71,16 @@ myObj = {
 
 The values you assign to the properties can be literals, as shown, or can be computed by expression:
 
+Using arrow method
 ```js
-function twenty() { return 20; }
+const twenty=() => 20; 
 
 myObj = {
-    favoriteNumber: (twenty() + 1) * 2,
+    favoriteNumber: twenty + 1 * 2,
 };
 ```
 
-The expression `(twenty() + 1) * 2` is evaluated immediately, with the result (`42`) assigned as the property value.
+The expression `(twenty + 1) * 2` is evaluated immediately, with the result (`42`) assigned as the property value.
 
 Developers sometimes wonder if there's a way to define an expression for a property value where the expression is "lazy", meaning it's not computed at the time of assignment, but defined later. JS does not have lazy expressions, so the only way to do so is for the expression to be wrapped in a function:
 
