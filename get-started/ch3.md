@@ -98,7 +98,7 @@ for (let val of arr) {
 // Array value: 30
 ```
 
-Since arrays are iterables, we can shallow-copy an array using iterator consumption via the `...` spread operator:
+Since arrays are iterables, we can deep-copy a one dimension array using iterator consumption via the `...` spread operator:
 
 ```js
 var arrCopy = [ ...arr ];
