@@ -1,4 +1,4 @@
-# You Don't Know JS Yet: Get Started - 2nd Edition
+# 你不知道的 JavaScript：开始 - 第二版
 # Chapter 1: What *Is* JavaScript?
 
 You don't know JS, yet. Neither do I, not fully anyway. None of us do. But we can all start getting to know JS better.

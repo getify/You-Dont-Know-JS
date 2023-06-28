@@ -1,4 +1,4 @@
-# You Don't Know JS Yet: Get Started - 2nd Edition
+# 你不知道的 JavaScript：开始 - 第二版
 # Chapter 2: Surveying JS
 
 The best way to learn JS is to start writing JS.

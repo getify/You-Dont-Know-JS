@@ -1,4 +1,4 @@
-# You Don't Know JS Yet: Get Started - 2nd Edition
+# 你不知道的 JavaScript：开始 - 第二版
 # Foreword
 
 The first time I saw a tweet advertising the crowdfunding campaign for the original book series *You Don't Know JS*, I thought to myself that whoever the hell this Kyle Simpson is can get bent. Of course I know JavaScript! At the time I had been working in JavaScript for many years with some of tech's biggest names, so I felt justified in looking down my nose at this sweeping claim.

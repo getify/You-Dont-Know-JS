@@ -1,4 +1,4 @@
-# You Don't Know JS Yet: Get Started - 2nd Edition
+# 你不知道的 JavaScript：开始 - 第二版
 
 ## Table of Contents
 
