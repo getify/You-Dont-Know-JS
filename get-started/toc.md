@@ -1,45 +1,45 @@
 # 你不知道的 JavaScript：开始 - 第二版
 
-## Table of Contents
+## 目录
 
-* Foreword
-* Preface
-* Chapter 1: What Is JavaScript?
-    * About This Book
-    * What's With That Name?
-    * Language Specification
-    * Many Faces
-    * Backwards & Forwards
-    * What's in an Interpretation?
-    * Strictly Speaking
-    * Defined
-* Chapter 2: Surveying JS
-    * Each File is a Program
-    * Values
-    * Declaring and Using Variables
-    * Functions
-    * Comparisons
-    * How We Organize in JS
-    * The Rabbit Hole Deepens
-* Chapter 3: Digging To The Roots Of JS
-    * Iteration
-    * Closure
-    * `this` Keyword
-    * Prototypes
-    * Asking "Why?"
-* Chapter 4: The Bigger Picture
-    * Pillar 1: Scope and Closure
-    * Pillar 2: Prototypes
-    * Pillar 3: Types and Coercion
-    * With the Grain
-    * In Order
-* Appendix A: Exploring Further
-    * Values vs. References
-    * So Many Function Forms
-    * Coercive Conditional Comparison
-    * Prototypal "Classes"
-* Appendix B: Practice, Practice, Practice!
-    * Practicing Comparisons
-    * Practicing Closure
-    * Practicing Prototypes
-    * Suggested Solutions
+* 前言
+* 序
+* 第 1 章：什么是 JavaScript？
+    * 关于本书
+    * 名字的由来
+    * 语言规范
+    * 多面性
+    * 过去 & 未来
+    * 解释过程中都有什么？
+    * 严格模式的讨论
+    * 定义
+* 第 2 章：JS 概观
+    * 每个文件都是一个程序
+    * 值
+    * 声明和使用变量
+    * 函数
+    * 对比
+    * 如何在 JS 中组织代码
+    * 欲穷其林
+* 第 3 章：JS 寻根究底
+    * 循环
+    * 闭包
+    * `this` 关键字
+    * 原型
+    * 提问 ”为什么？“
+* 第 4 章：前景展望
+    * 栏目 1: 作用域与闭包
+    * 栏目 2: 原型
+    * 栏目 3: 强类型
+    * 保持警惕
+    * 按部就班
+* 附录A：进一步的探索
+    * 值 vs 引用
+    * 千变万化的函数
+    * 强制性条件比较
+    * "类"的原型
+* 附录B：练习、练习、再练习！
+    * 相等性练习
+    * 闭包练习
+    * 原型练习
+    * 建议的解决方案
