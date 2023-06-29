@@ -1,57 +1,57 @@
 # 你不知道的 JavaScript：开始 - 第二版
-# Chapter 1: What *Is* JavaScript?
+# 第 1 章：什么是 JavaScript？
 
-You don't know JS, yet. Neither do I, not fully anyway. None of us do. But we can all start getting to know JS better.
+目前为止你还不了解  JS。我也不了解，反正不完全了解。我们都不了解。但我们都可以开始更好地了解 JS。
 
-In this first chapter of the first book of the *You Don't Know JS Yet* (YDKJSY) series, we will take some time to build a foundation to move forward on. We need to start by covering a variety of important background housekeeping details, clearing up some myths and misconceptions about what the language really is (and isn't!).
+在*你不知道的 JavaScript*（YDKJSY）系列第一本书的第一章中，我们将花一些时间来建立一个基础，以便继续前行。我们需要从涵盖各种重要的背景细节开始，澄清一些关于语言真正是什么（和不是什么！）的神话和误解。
 
-This is valuable insight into the identity and process of how JS is organized and maintained; all JS developers should understand it. If you want to get to know JS, this is how to *get started* taking the first steps in that journey.
+这是对如何组织和维护 JS 的特征和过程的宝贵见解；所有 JS 的开发者都应该了解它。如果你想了解 JS，这就是如何*开始*迈出这段旅程的第一步。
 
-## About This Book
+## 关于本书
 
-I emphasize the word journey because *knowing JS* is not a destination, it's a direction. No matter how much time you spend with the language, you will always be able to find something else to learn and understand a little better. So don't look at this book as something to rush through for a quick achievement. Instead, patience and persistence are best as you take these first few steps.
+我强调旅程这个词是因为*了解  JS* 不是目的，而是一个方向。无论你在这门语言上花了多少时间，你总能找到更好的东西来学习和理解它。所以不要把这本书看成是急于求成的东西。相反，在你迈出这最初的几步时，耐心和毅力是最好的。
 
-Following this background chapter, the rest of the book lays out a high-level map of what you will find as you dig into and study JS with the YDKJSY books.
+在这一章节之后，本书的其余部分列出了一张高层次的图谱用来说明你在使用 YDKJSY 书籍挖掘和研究 JS 时将发现什么。
 
-In particular, Chapter 4 identifies three main pillars around which the JS language is organized: scope/closures, prototypes/objects, and types/coercion. JS is a broad and sophisticated language, with many features and capabilities. But all of JS is founded on these three foundational pillars.
+特别是第四章指出了 JS 语言的三个主要支柱：作用域/闭包、原型/对象，以及类型/强制转换。JS 是一种广泛而复杂的语言，有许多特性和能力。但是所有的 JS 都是建立在这三个基本支柱之上的。
 
-Keep in mind that even though this book is titled "Get Started," it's **not intended as a beginner/intro book**. This book's main job is to get you ready for studying JS deeply throughout the rest of the series; it's written assuming you already have familiarity with JS over at least several months experience before moving on in YDKJSY. So to get the most out of *Get Started*, make sure you spend plenty of time writing JS code to build up your experience.
+请记住，尽管这本书的标题是 "开始"，但它**不是作为一本初学者/入门书**的。本书的主要工作是让你为在本系列的其它部分深入学习 JS 做好准备；它的写作是假设你在学习 YDKJSY 之前已经有了至少几个月的熟练的 JS 的经验。因此，为了从*开始*中获得最大的收益，请确保你拥有花大量的时间编写 JS 代码的经验。
 
-Even if you've already written a lot of JS before, this book should not be skimmed over or skipped; take your time to fully process the material here. **A good start always depends on a solid first step.**
+即使你以前已经写过很多 JS，这本书也不应该被略过或跳过；要花时间充分理解这里的内容。**不积跬步，无以至千里；不积小流，无以成江海**。
 
-## What's With That Name?
+## 名字的由来
 
-The name JavaScript is probably the most mistaken and misunderstood programming language name.
+JavaScript 这个名字可能是最错误和容易被误解的编程语言名称。
 
-Is this language related to Java? Is it only the script form for Java? Is it only for writing scripts and not real programs?
+这种语言与 Java 有关吗？它只是 Java 的脚本形式吗？它只用于编写脚本而不是真正的程序吗？
 
-The truth is, the name JavaScript is an artifact of marketing shenanigans. When Brendan Eich first conceived of the language, he code-named it Mocha. Internally at Netscape, the brand LiveScript was used. But when it came time to publicly name the language, "JavaScript" won the vote.
+事实上，JavaScript 这个名字是营销诡计的一个产物。当 Brendan Eich 第一次构思这种语言时，他将其命名为 Mocha。网景内部则使用 LiveScript。但到了公开命名该语言的时候，“JavaScript” 赢得了投票。
 
-Why? Because this language was originally designed to appeal to an audience of mostly Java programmers, and because the word "script" was popular at the time to refer to lightweight programs. These lightweight "scripts" would be the first ones to embed inside of pages on this new thing called the web!
+为什么呢？因为这种语言最初是为了吸引大部分 Java 程序员而设计的，而且“脚本”这个词在当时很流行，指的是轻量级程序。这些轻量级的“脚本”将是第一个在网络这个新事物上嵌入页面的！
 
-In other words, JavaScript was a marketing ploy to try to position this language as a palatable alternative to writing the heavier and more well-known Java of the day. It could just as easily have been called "WebJava," for that matter.
+换而言之，JavaScript 是一种营销策略，试图将这种语言定位为一种可接受的替代品，以替代当时更重、更知名的 Java。就这一点而言，它也可以很容易地被称为 "WebJava"。
 
-There are some superficial resemblances between JavaScript's code and Java code. Those similarities don't particularly come from shared development, but from both languages targeting developers with assumed syntax expectations from C (and to an extent, C++).
+JavaScript 的代码和 Java 的代码之间有一些表面上的相似之处。这些相似之处并不是共同发展的理念，而是因为两种语言都以 C 语言（在某种程度上，C++）的假设语法期望为目标的开发者。
 
-For example, we use the `{` to begin a block of code and the `}` to end that block of code, just like C/C++ and Java. We also use the `;` to punctuate the end of a statement.
+例如，我们用`{`来开始一个代码块，用`}`来结束这个代码块，就像 C/C++ 和 Java 一样。我们还使用`;`来标明语句的结束。
 
-In some ways, legal relationships run even deeper than the syntax. Oracle (via Sun), the company that still owns and runs Java, also owns the official trademark for the name "JavaScript" (via Netscape). This trademark is almost never enforced, and likely couldn't be at this point.
+在某些方面，法律关系甚至比语法更深。甲骨文公司（通过 Sun 公司），这个仍然拥有并运行 Java 的公司，也拥有 "JavaScript" 这个名字的官方商标（通过网景通信）。这个商标几乎从来没有被执行过，而且现在很可能也不能被执行。
 
-For these reasons, some have suggested we use JS instead of JavaScript. That is a very common shorthand, if not a good candidate for an official language branding itself. Indeed, these books use JS almost exclusively to refer to the language.
+出于这些原因，有些人建议我们使用 JS 而不是 JavaScript。这是一个非常常见的简写，如果不是一个官方语言品牌本身的良好候选者的话。事实上，这些书籍几乎完全使用 JS 来指代这种语言。
 
-Further distancing the language from the Oracle-owned trademark, the official name of the language specified by TC39 and formalized by the ECMA standards body is **ECMAScript**. And indeed, since 2016, the official language name has also been suffixed by the revision year; as of this writing, that's ECMAScript 2019, or otherwise abbreviated ES2019.
+为了进一步将该语言与甲骨文公司拥有的商标拉开距离，TC39 规定并由 ECMA 标准机构正式确定的语言的官方名称是 **ECMAScript**。事实上，自2016年以来，官方语言名称也以修订年份作为后缀；截至本文撰写之时，为 ECMAScript 2019，或缩写为 ES2019。
 
-In other words, the JavaScript/JS that runs in your browser or in Node.js, is *an* implementation of the ES2019 standard.
+换句话说，在你的浏览器或 Node.js 中运行的 JavaScript/JS，是基于 ES2019 *标准*的实现。
 
 | NOTE: |
 | :--- |
-| Don't use terms like "JS6" or "ES8" to refer to the language. Some do, but those terms only serve to perpetuate confusion. "ES20xx" or just "JS" are what you should stick to. |
+| 不要使用诸如 “JS6” 或 “ES8” 之类的术语来指代该语言。有些人会这样做，但这些术语只会使混乱持续下去。你应该坚持使用 “ES20xx” 或只是 “JS”。 |
 
-Whether you call it JavaScript, JS, ECMAScript, or ES2019, it's most definitely not a variant of the Java language!
+无论你叫它 JavaScript、JS、ECMAScript 还是 ES2019，它都绝对不是 Java 语言的一个变体！
 
-> "Java is to JavaScript as ham is to hamster." --Jeremy Keith, 2009
+> "Java 之于 JavaScript 就像雷锋之于雷峰塔。" --Jeremy Keith, 2009
 
-## Language Specification
+## 语言规范
 
 I mentioned TC39, the technical steering committee that manages JS. Their primary task is managing the official specification for the language. They meet regularly to vote on any agreed changes, which they then submit to ECMA, the standards organization.
 
@@ -153,7 +153,7 @@ The developer console is not trying to pretend to be a JS compiler that handles 
 
 Don't trust what behavior you see in a developer console as representing *exact* to-the-letter JS semantics; for that, read the specification. Instead, think of the console as a "JS-friendly" environment. That's useful in its own right.
 
-## Many Faces
+## 多面性
 
 The term "paradigm" in programming language context refers to a broad (almost universal) mindset and approach to structuring code. Within a paradigm, there are myriad variations of style and form that distinguish programs, including countless different libraries and frameworks that leave their unique signature on any given code.
 
@@ -175,7 +175,7 @@ But many languages also support code patterns that can come from, and even mix a
 
 JavaScript is most definitely a multi-paradigm language. You can write procedural, class-oriented, or FP-style code, and you can make those decisions on a line-by-line basis instead of being forced into an all-or-nothing choice.
 
-## Backwards & Forwards
+## 过去 & 未来
 
 One of the most foundational principles that guides JavaScript is preservation of *backwards compatibility*. Many are confused by the implications of this term, and often confuse it with a related but different term: *forwards compatibility*.
 
@@ -309,7 +309,7 @@ Always write code using the most appropriate features to communicate its ideas a
 
 Transpilation and polyfilling are two highly effective techniques for addressing that gap between code that uses the latest stable features in the language and the old environments a site or application needs to still support. Since JS isn't going to stop improving, the gap will never go away. Both techniques should be embraced as a standard part of every JS project's production chain going forward.
 
-## What's in an Interpretation?
+## 解释过程中都有什么？
 
 A long-debated question for code written in JS: is it an interpreted script or a compiled program? The majority opinion seems to be that JS is an interpreted (scripting) language. But the truth is more complicated than that.
 
@@ -409,7 +409,7 @@ This book isn't about WASM, so I won't spend much more time discussing it, excep
 
 But let me just state simply: WASM will not replace JS. WASM significantly augments what the web (including JS) can accomplish. That's a great thing, entirely orthogonal to whether some people will use it as an escape hatch from having to write JS.
 
-## *Strict*ly Speaking
+## *严格*模式的讨论
 
 Back in 2009 with the release of ES5, JS added *strict mode* as an opt-in mechanism for encouraging better JS programs.
 
@@ -459,7 +459,7 @@ Moreover, a wide shift is happening toward more/most new JS code being written u
 
 Taken together, strict mode is largely the de facto default even though technically it's not actually the default.
 
-## Defined
+## 定义
 
 JS is an implementation of the ECMAScript standard (version ES2019 as of this writing), which is guided by the TC39 committee and hosted by ECMA. It runs in browsers and other JS environments such as Node.js.
 
