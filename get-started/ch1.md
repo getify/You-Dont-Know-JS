@@ -1,7 +1,8 @@
 # 你不知道的 JavaScript：开始 - 第二版
+
 # 第 1 章：什么是 JavaScript？
 
-目前为止你还不了解  JS。我也不了解，反正不完全了解。我们都不了解。但我们都可以开始更好地了解 JS。
+目前为止你还不了解 JS。我也不了解，反正不完全了解。我们都不了解。但我们都可以开始更好地了解 JS。
 
 在*你不知道的 JavaScript*（YDKJSY）系列第一本书的第一章中，我们将花一些时间来建立一个基础，以便继续前行。我们需要从涵盖各种重要的背景细节开始，澄清一些关于语言真正是什么（和不是什么！）的神话和误解。
 
@@ -9,7 +10,7 @@
 
 ## 关于本书
 
-我强调旅程这个词是因为*了解  JS* 不是目的，而是一个方向。无论你在这门语言上花了多少时间，你总能找到更好的东西来学习和理解它。所以不要把这本书看成是急于求成的东西。相反，在你迈出这最初的几步时，耐心和毅力是最好的。
+我强调旅程这个词是因为*了解 JS* 不是目的，而是一个方向。无论你在这门语言上花了多少时间，你总能找到更好的东西来学习和理解它。所以不要把这本书看成是急于求成的东西。相反，在你迈出这最初的几步时，耐心和毅力是最好的。
 
 在这一章节之后，本书的其余部分列出了一张高层次的图谱用来说明你在使用 YDKJSY 书籍挖掘和研究 JS 时将发现什么。
 
@@ -39,434 +40,426 @@ JavaScript 的代码和 Java 的代码之间有一些表面上的相似之处。
 
 出于这些原因，有些人建议我们使用 JS 而不是 JavaScript。这是一个非常常见的简写，如果不是一个官方语言品牌本身的良好候选者的话。事实上，这些书籍几乎完全使用 JS 来指代这种语言。
 
-为了进一步将该语言与甲骨文公司拥有的商标拉开距离，TC39 规定并由 ECMA 标准机构正式确定的语言的官方名称是 **ECMAScript**。事实上，自2016年以来，官方语言名称也以修订年份作为后缀；截至本文撰写之时，为 ECMAScript 2019，或缩写为 ES2019。
+为了进一步将该语言与甲骨文公司拥有的商标拉开距离，TC39 规定并由 ECMA 标准机构正式确定的语言的官方名称是 **ECMAScript**。事实上，自 2016 年以来，官方语言名称也以修订年份作为后缀；截至本文撰写之时，为 ECMAScript 2019，或缩写为 ES2019。
 
 换句话说，在你的浏览器或 Node.js 中运行的 JavaScript/JS，是基于 ES2019 *标准*的实现。
 
-| NOTE: |
-| :--- |
+| NOTE:                                                                                                                                   |
+| :-------------------------------------------------------------------------------------------------------------------------------------- |
 | 不要使用诸如 “JS6” 或 “ES8” 之类的术语来指代该语言。有些人会这样做，但这些术语只会使混乱持续下去。你应该坚持使用 “ES20xx” 或只是 “JS”。 |
 
 无论你叫它 JavaScript、JS、ECMAScript 还是 ES2019，它都绝对不是 Java 语言的一个变体！
 
-> "Java 之于 JavaScript 就像雷锋之于雷峰塔。" --Jeremy Keith, 2009
+> "Java 之于 JavaScript 就像雷锋之于雷峰塔。" -Jeremy Keith, 2009
 
 ## 语言规范
 
-I mentioned TC39, the technical steering committee that manages JS. Their primary task is managing the official specification for the language. They meet regularly to vote on any agreed changes, which they then submit to ECMA, the standards organization.
+我提到了管理 JS 的技术指导委员会 TC39，他们的主要任务是管理语言的官方规范。他们定期开会，对任何商定的修改进行表决，然后将其提交给标准组织 ECMA。
 
-JS's syntax and behavior are defined in the ES specification.
+JS 的语法和行为是在 ES 规范中定义的。
 
-ES2019 happens to be the 10th major numbered specification/revision since JS's inception in 1995, so in the specification's official URL as hosted by ECMA, you'll find "10.0":
+ES2019 恰好是 JS 自 1995 年成立以来的第 10 个主要编号规范/修订版，因此在 ECMA 规范的官方 URL 中，您会发现“10.0”：
 
 https://www.ecma-international.org/ecma-262/10.0/
 
-The TC39 committee is comprised of between 50 and about 100 different people from a broad section of web-invested companies, such as browser makers (Mozilla, Google, Apple) and device makers (Samsung, etc). All members of the committee are volunteers, though many of them are employees of these companies and so may receive compensation in part for their duties on the committee.
+TC39 委员会由 50 至约 100 名不同的人员组成，他们来自广泛的网络投资公司，如浏览器制造商（Mozilla、谷歌、苹果）和设备制造商（三星等）。委员会的所有成员都是志愿者，尽管他们中的许多人是这些公司的员工，但也可能因其在委员会的职责而获得部分报酬。
 
-TC39 meets generally about every other month, usually for about three days, to review work done by members since the last meeting, discuss issues, and vote on proposals. Meeting locations rotate among member companies willing to host.
+TC39 一般每隔一个月召开一次会议，通常为期三天，审查成员自上次会议以来所做的工作，讨论问题，并对提案进行表决。会议地点由愿意主办的成员公司轮流决定。
 
-All TC39 proposals progress through a five-stage process—of course, since we're programmers, it's 0-based!—Stage 0 through Stage 4. You can read more about the Stage process here: https://tc39.es/process-document/
+所有的 TC39 提案都要经过五个阶段的过程—当然，因为我们是程序员，所以是以 0 来开始的！—阶段 0 到阶段 4。你可以在这里阅读更多关于该阶段过程的信息：https://tc39.es/process-document/
 
-Stage 0 means roughly, someone on TC39 thinks it's a worthy idea and plans to champion and work on it. That means lots of ideas that non-TC39 members "propose," through informal means such as social media or blog posts, are really "pre-stage 0." You have to get a TC39 member to champion a proposal for it to be considered "Stage 0" officially.
+阶段 0 的意思是，TC39 的某个人认为这是一个有价值的想法，并计划支持和努力实现它。这意味着很多非 TC39 成员通过社交媒体或博客文章等非正式途径 "提出 "的想法实际上是 "阶段 0 之前的"。你必须得到 TC39 成员的支持，它才能被正式视为 "阶段 0"。
 
-Once a proposal reaches "Stage 4" status, it is eligible to be included in the next yearly revision of the language. It can take anywhere from several months to a few years for a proposal to work its way through these stages.
+一旦一个提案达到 "阶段 4 "的状态，它就有资格被纳入下一年的语言修订中。一项提案可能需要几个月到几年的时间来完成这些阶段的工作。
 
-All proposals are managed in the open, on TC39's Github repository: https://github.com/tc39/proposals
+所有提案都在 TC39 的 GitHub 存储库上进行公开管理：https://github.com/tc39/proposals
 
-Anyone, whether on TC39 or not, is welcome to participate in these public discussions and the processes for working on the proposals. However, only TC39 members can attend meetings and vote on the proposals and changes. So in effect, the voice of a TC39 member carries a lot of weight in where JS will go.
+任何人，无论是否是 TC39 的成员，都欢迎参与这些公开讨论和提案的工作进程。但是只有 TC39 成员可以参加会议，并对提案和修改进行投票。因此，TC39 成员的声音对 JS 的走向有很大的影响。
 
-Contrary to some established and frustratingly perpetuated myth, there are *not* multiple versions of JavaScript in the wild. There's just **one JS**, the official standard as maintained by TC39 and ECMA.
+与一些既定的、令人沮丧的神话传说相反，并不存在多个版本的 JavaScript。只有**一个 JS**，即由 TC39 和 ECMA 维护的官方标准。
 
-Back in the early 2000s, when Microsoft maintained a forked and reverse-engineered (and not entirely compatible) version of JS called "JScript," there were legitimately "multiple versions" of JS. But those days are long gone. It's outdated and inaccurate to make such claims about JS today.
+早在 21 世纪初，当微软维护一个名为 "JScript" 的分叉和逆向工程（但并不完全兼容）JS 版本时，JS 就在那时有了合法的“多个版本”。但是那些日子已经一去不复返了。今天对 JS 做出这样的断言是过时和不准确的。
 
-All major browsers and device makers have committed to keeping their JS implementations compliant with this one central specification. Of course, engines implement features at different times. But it should never be the case that the v8 engine (Chrome's JS engine) implements a specified feature differently or incompatibly as compared to the SpiderMonkey engine (Mozilla's JS engine).
+所有主要的浏览器和设备制造商都承诺使他们的 JS 实现符合这一个中心规范。当然，引擎在不同时期实现的功能也不同。但是，V8 引擎（Chrome 的 JS 引擎）与 SpiderMonkey 引擎（ Mozilla 的 JS 引擎）相比，在实现特定的功能时，不应该出现不同或不兼容的情况。
 
-That means you can learn **one JS**, and rely on that same JS everywhere.
+这意味着你可以学习**一种版本的 JS**，并在任何地方都使用它。
 
-### The Web Rules Everything About (JS)
+### 网络主宰着（JS）的一切
 
-While the array of environments that run JS is constantly expanding (from browsers, to servers (Node.js), to robots, to lightbulbs, to...), the one environment that rules JS is the web. In other words, how JS is implemented for web browsers is, in all practicality, the only reality that matters.
+虽然运行 JS 的平台在不断扩大（从浏览器，到服务器（Node.js），到机器人，到灯泡，到......），但统治 JS 的还是环境是网络。换句话说，JS 如何在网络浏览器上实现，在所有的实际情况下，是唯一重要的现实。
 
-For the most part, the JS defined in the specification and the JS that runs in browser-based JS engines is the same. But there are some differences that must be considered.
+在大多数情况下，规范中定义的 JS 和基于浏览器的 JS 引擎中运行的 JS 是一样的。但也有一些必须考虑的差异。
 
-Sometimes the JS specification will dictate some new or refined behavior, and yet that won't exactly match with how it works in browser-based JS engines. Such a mismatch is historical: JS engines have had 20+ years of observable behaviors around corner cases of features that have come to be relied on by web content. As such, sometimes the JS engines will refuse to conform to a specification-dictated change because it would break that web content.
+有时 JS 规范会规定一些新的或改进的行为，但这与基于浏览器的 JS 引擎的工作方式不完全匹配。这种不匹配是历史遗留问题： JS 引擎已经有 20 多年的可观察到的行为，围绕着那些已经被网络内容所依赖的功能的角落案例。因此，有时 JS 引擎会拒绝符合规范规定的变化，因为这会破坏现有的网络内容。
 
-In these cases, often TC39 will backtrack and simply choose to conform the specification to the reality of the web. For example, TC39 planned to add a `contains(..)` method for Arrays, but it was found that this name conflicted with old JS frameworks still in use on some sites, so they changed the name to a non-conflicting `includes(..)`. The same happened with a comedic/tragic JS *community crisis* dubbed "smooshgate," where the planned `flatten(..)` method was eventually renamed `flat(..)`.
+在这些情况下，往往 TC39 会反其道而行之，只是选择让规范符合网络的现实。例如，TC39 计划为数组增加一个`contains(..)`方法，但发现这个名字与一些网站仍在使用的旧 JS 框架相冲突，所以他们把这个名字改为不冲突的`includes(..)`。同样的情况也发生在被称为 "[smooshgate](https://developer.chrome.com/blog/smooshgate/)" 的喜剧/悲剧性 JS *社区危机*中，计划中的`flatten(..)`方法最终被改名为`flat(..)`。
 
-But occasionally, TC39 will decide the specification should stick firm on some point even though it is unlikely that browser-based JS engines will ever conform.
+但偶尔，TC39 会决定规范应该在某些方面坚持到底，尽管基于浏览器的 JS 引擎不太可能符合规范。
 
-The solution? Appendix B, "Additional ECMAScript Features for Web Browsers".[^specApB] The JS specification includes this appendix to detail out any known mismatches between the official JS specification and the reality of JS on the web. In other words, these are exceptions that are allowed *only* for web JS; other JS environments must stick to the letter of the law.
+解决方案？附录 B，“用于 Web 浏览器的附加 ECMAScript 功能”。[^specApB] JS 规范包括本附录，以详细说明官方 JS 规范与 JS 在网络上的实际情况之间的任何已知不匹配。换句话说，这些是只允*网络 JS* 的例外情况；其他 JS 环境必须遵守规范。
 
-Section B.1 and B.2 cover *additions* to JS (syntax and APIs) that web JS includes, again for historical reasons, but which TC39 does not plan to formally specify in the core of JS. Examples include `0`-prefixed octal literals, the global `escape(..)` / `unescape(..)` utilities, String "helpers" like `anchor(..)` and `blink()`, and the RegExp `compile(..)` method.
+B.1 和 B.2 章节涵盖了网络 JS 的*附加功能*（语法和 API），这也是出于历史原因，但 TC39 并不打算在 JS 的核心中正式规定。例子包括`0`前缀的八进制字，全局的`escape(..)`/`unescape(..)`工具，字符串"助手"如`anchor(..)`和`blink()`，以及 RegExp`compile(..)`方法。
 
-Section B.3 includes some conflicts where code may run in both web and non-web JS engines, but where the behavior *could* be observably different, resulting in different outcomes. Most of the listed changes involve situations that are labeled as early errors when code is running in strict mode.
+B.3 章节包括一些冲突，在这些冲突中，代码可能同时在网络和非网络 JS 引擎中运行，但其行为*可能*明显不同，导致不同的结果。大多数列出的变化涉及到代码在严格模式下运行时被标记为早期错误的情况。
 
-Appendix B *gotchas* aren't encountered very often, but it's still a good idea to avoid these constructs to be future safe. Wherever possible, adhere to the JS specification and don't rely on behavior that's only applicable in certain JS engine environments.
+附录 B [`gotchas`](https://zh.wikipedia.org/zh-cn/Gotcha_(%E7%BC%96%E7%A8%8B) "Gotcha，在计算机编程领域中是指在系统或程序、程序设计语言中，合法有效，但是会误解意思的构造，程式容易造成错误，或是一些易于使用但其结果不如期望的构造。字面上是got you的简写，常用于口语，直译为： “逮着你了”、“捉弄到你了”、“你中计了" 、“骗到你了”。") 并不经常遇到，但为了未来的安全，避免这些结构仍然是个好主意。在可能的情况下，遵守 JS 规范，不要依赖只适用于某些 JS 引擎环境的行为。
 
-### Not All (Web) JS...
+### (网络) JS 并非一切...
 
-Is this code a JS program?
+这段代码是一个 JS 程序吗？
 
 ```js
 alert("Hello, JS!");
 ```
 
-Depends on how you look at things. The `alert(..)` function shown here is not included in the JS specification, but it *is* in all web JS environments. Yet, you won't find it in Appendix B, so what gives?
+这要看你怎么看问题了。这里显示的 `alert(..)` 函数没有包括在 JS 规范中，但*它*在所有的网络 JS 环境中都存在。然而，你不会在附录 B 中找到它，那么是什么原因呢？
 
-Various JS environments (like browser JS engines, Node.js, etc.) add APIs into the global scope of your JS programs that give you environment-specific capabilities, like being able to pop an alert-style box in the user's browser.
+各种 JS 环境（如浏览器 JS 引擎、Node.JS 等）将 API 添加到 JS 程序的全局范围中，为您提供特定于环境的功能，例如能够在用户的浏览器中弹出警报样式框。
 
-In fact, a wide range of JS-looking APIs, like `fetch(..)`, `getCurrentLocation(..)`, and `getUserMedia(..)`, are all web APIs that look like JS. In Node.js, we can access hundreds of API methods from various built-in modules, like `fs.write(..)`.
+事实上，许多看起来像 JS 的 API，如 `fetch(..)`、`getCurrentLocation(..)`和 `getUserMedia(..)`，都是看起来像 JS 一样的 web API。在 Node.js 中，我们可以从各种内置模块访问数百个 API 方法，比如 `fs.write(..)`。.
 
-Another common example is `console.log(..)` (and all the other `console.*` methods!). These are not specified in JS, but because of their universal utility are defined by pretty much every JS environment, according to a roughly agreed consensus.
+另一个常见的例子是 `console.log(.)`（以及所有其他的 `console.*` 方法！）。这些都不是在 JS 中定义的，但由于它们的普遍效用，几乎每个 JS 环境都根据一个大致同意的共识来定义。
 
-So `alert(..)` and `console.log(..)` are not defined by JS. But they *look* like JS. They are functions and object methods and they obey JS syntax rules. The behaviors behind them are controlled by the environment running the JS engine, but on the surface they definitely have to abide by JS to be able to play in the JS playground.
+所以 `alert(..)` 和 `console.log(..)` 并不是由 JS 定义的。但是它们*看起来*像 JS。它们是函数和对象方法，它们遵守 JS 的语法规则。它们背后的行为是由运行 JS 引擎的环境控制的，但从表面上看，它们肯定要遵守 JS 才能在 JS 地盘上玩耍。
 
-Most of the cross-browser differences people complain about with "JS is so inconsistent!" claims are actually due to differences in how those environment behaviors work, not in how the JS itself works.
+人们抱怨的 "JS 太不一致了！"的跨浏览器差异，大部分实际上是由于这些环境行为的工作方式不同，而不是 JS 本身的工作方式。
 
-So an `alert(..)` call *is* JS, but `alert` itself is really just a guest, not part of the official JS specification.
+因此，`alert(..)` 调用*是* JS，但 `alert` 本身实际上只是一个客人，不是官方 JS 规范的一部分。
 
-### It's Not Always JS
+### 不一定是 JS 的问题
 
-Using the console/REPL (Read-Evaluate-Print-Loop) in your browser's Developer Tools (or Node) feels like a pretty straightforward JS environment at first glance. But it's not, really.
+在浏览器的开发工具（或 Node）中使用控制台/REPL（读取(Read)-评估(Evaluate)-打印(Print)-循环(Loop)），乍看之下感觉是一个相当直接的 JS 环境。但其实不然。
 
-Developer Tools are... tools for developers. Their primary purpose is to make life easier for developers. They prioritize DX (Developer Experience). It is *not* a goal of such tools to accurately and purely reflect all nuances of strict-spec JS behavior. As such, there's many quirks that may act as "gotchas" if you're treating the console as a *pure* JS environment.
+开发者工具是......给开发者使用的工具。它们的主要目的是使开发者的生活更容易。他们优先考虑 DX（开发者体验）。这些工具的目标并*不是*准确和纯粹地反映严格规范的 JS 行为的所有细微差别。因此，如果你把控制台当作一个*纯* JS 的环境，有许多怪异行为可能会成为 "麻烦"。
 
-This convenience is a good thing, by the way! I'm glad Developer Tools make developers' lives easier! I'm glad we have nice UX charms like auto-complete of variables/properties, etc. I'm just pointing out that we can't and shouldn't expect such tools to *always* adhere strictly to the way JS programs are handled, because that's not the purpose of these tools.
+顺便说一下，这种便利是件好事 我很高兴开发工具让开发者的生活更轻松 我很高兴我们有漂亮的用户体验，比如变量/属性的自动完成，等等。我只是指出，我们不能也不应该期望这种工具*总是*严格遵守 JS 程序的处理方式，因为这不是这些工具的目的。
 
-Since such tools vary in behavior from browser to browser, and since they change (sometimes rather frequently), I'm not going to "hardcode" any of the specific details into this text, thereby ensuring this book text is outdated quickly.
+由于这类工具在不同的浏览器中的行为各不相同，而且由于它们的变化（有时相当频繁），我不打算将任何具体细节 "硬编码 "到本文中，从而确保这本书的文本很快就会过时。
 
-But I'll just hint at some examples of quirks that have been true at various points in different JS console environments, to reinforce my point about not assuming native JS behavior while using them:
+但我只是列举一些在不同的 JS 控制台环境中，在不同的时间点上出现的怪异行为的例子，以加强我关于在使用时不要假设本地 JS 行为的观点:
 
-* Whether a `var` or `function` declaration in the top-level "global scope" of the console actually creates a real global variable (and mirrored `window` property, and vice versa!).
+-   控制台顶层 "全局范围 "中的 "var" 或 "function" 声明是否实际创建了一个真正的全局变量（以及镜像的 "window" 属性，反之亦然！）。
 
-* What happens with multiple `let` and `const` declarations in the top-level "global scope."
+-   顶层 "全局范围 "中的多个 `let` 和 `const` 声明会发生什么。
 
-* Whether `"use strict";` on one line-entry (pressing `<enter>` after) enables strict mode for the rest of that console session, the way it would on the first line of a .js file, as well as whether you can use `"use strict";` beyond the "first line" and still get strict mode turned on for that session.
+-   `"use strict";`在一行中（按`<enter>`后）是否为该控制台会话的其余部分启用严格模式，就像在 .js 文件的第一行一样，以及你是否可以在 "第一行 "之外使用`"use strict";`，并且仍然为该会话打开严格模式。
 
-* How non-strict mode `this` default-binding works for function calls, and whether the "global object" used will contain expected global variables.
+-   非严格模式的 `this` 默认绑定对函数调用的作用，以及使用的 "全局对象 "是否会包含预期的全局变量。
 
-* How hoisting (see Book 2, *Scope & Closures*) works across multiple line entries.
+-   变量提升（见第二册，_作用域与闭包_）如何在多行输入中发挥作用。
 
-* ...several others
+-   ......
 
-The developer console is not trying to pretend to be a JS compiler that handles your entered code exactly the same way the JS engine handles a .js file. It's trying to make it easy for you to quickly enter a few lines of code and see the results immediately. These are entirely different use cases, and as such, it's unreasonable to expect one tool to handle both equally.
+开发者控制台并不试图假装是一个 JS 编译器，它处理你输入的代码与 JS 引擎处理 .js 文件的方式完全相同。它只是想让你轻松地快速输入几行代码并立即看到结果。这些是完全不同的用例，因此，期望一个工具能同样处理这两种情况是不合理的。
 
-Don't trust what behavior you see in a developer console as representing *exact* to-the-letter JS semantics; for that, read the specification. Instead, think of the console as a "JS-friendly" environment. That's useful in its own right.
+不要相信你在开发者控制台中看到的行为是代表*精准*的 JS 语义；对于这一点，请阅读规范。相反，把控制台看成是一个 "JS 友好 "的环境。这本身就很有用。
 
 ## 多面性
 
-The term "paradigm" in programming language context refers to a broad (almost universal) mindset and approach to structuring code. Within a paradigm, there are myriad variations of style and form that distinguish programs, including countless different libraries and frameworks that leave their unique signature on any given code.
+在编程语言方面，"范式 "一词指的是一种广泛的（几乎是普遍的）思维方式和结构化代码的方法。在一个范式中，有无数的风格和形式的变化来区分程序，包括无数不同的库和框架，在任何给定的代码上留下他们独特的印记。
 
-But no matter what a program's individual style may be, the big picture divisions around paradigms are almost always evident at first glance of any program.
+但是，无论一个程序的个人风格如何，围绕范式的大局划分几乎总是在任何程序的第一眼就能看出来。
 
-Typical paradigm-level code categories include procedural, object-oriented (OO/classes), and functional (FP):
+典型的范式级代码类别包括面向过程、面向对象(OO/classes)和函数式(FP)：
 
-* Procedural style organizes code in a top-down, linear progression through a pre-determined set of operations, usually collected together in related units called procedures.
+-   面向过程风格以自上而下的方式组织代码，通过一组预先确定的操作进行线性进展，通常收集在一起的相关单元称为过程。
 
-* OO style organizes code by collecting logic and data together into units called classes.
+-   面向对象风格通过将逻辑和数据收集在一起，形成称为类的单元来组织代码。
 
-* FP style organizes code into functions (pure computations as opposed to procedures), and the adaptations of those functions as values.
+-   函数式风格将代码组织成函数（相对于程序的纯计算），并将这些函数的自应性作为值。
 
-Paradigms are neither right nor wrong. They're orientations that guide and mold how programmers approach problems and solutions, how they structure and maintain their code.
+范式既没有对错。它们是指导和塑造程序员如何处理问题和解决方案的方向，以及他们如何结构和维护他们的代码。
 
-Some languages are heavily slanted toward one paradigm—C is procedural, Java/C++ are almost entirely class oriented, and Haskell is FP through and through.
+有些语言严重偏向于一种范式—C 语言是面向过程的，Java/C++ 几乎完全是面向对象的，而 Haskell 是彻头彻尾的函数式语言。
 
-But many languages also support code patterns that can come from, and even mix and match from, different paradigms. So called "multi-paradigm languages" offer ultimate flexibility. In some cases, a single program can even have two or more expressions of these paradigms sitting side by side.
+但是，许多语言也支持可以来自不同范式的代码模式，甚至可以从不同范式中进行混合和匹配。所谓的 "多范式语言 "提供了终极的灵活性。在某些情况下，一个程序甚至可以有两个或更多的这些范式的表达。
 
-JavaScript is most definitely a multi-paradigm language. You can write procedural, class-oriented, or FP-style code, and you can make those decisions on a line-by-line basis instead of being forced into an all-or-nothing choice.
+JavaScript 无疑是一种多范式的语言。你可以写面向过程的、面向对象的或函数式风格的代码，而且你可以在每一行的基础上做出这些决定，而不是被迫做一个全有或全无的选择。
 
 ## 过去 & 未来
 
-One of the most foundational principles that guides JavaScript is preservation of *backwards compatibility*. Many are confused by the implications of this term, and often confuse it with a related but different term: *forwards compatibility*.
+JavaScript 的最基本的原则之一是保持*向后兼容性*。许多人对这个术语的含义感到困惑，并经常将其与一个相关但不同的术语混淆： _向前兼容_。
 
-Let's set the record straight.
+让我们把事情弄清楚。
 
-Backwards compatibility means that once something is accepted as valid JS, there will not be a future change to the language that causes that code to become invalid JS. Code written in 1995—however primitive or limited it may have been!—should still work today. As TC39 members often proclaim, "we don't break the web!"
+向后兼容意味着，一旦某些东西被接受为有效的 JS，将来就不会有语言的变化导致该代码成为无效的 JS。1995 年写的代码—无论它是多么原始或有限！今天应该仍然可以工作。正如 TC39 成员经常宣称的，"我们不会破坏网络！"
 
-The idea is that JS developers can write code with confidence that their code won't stop working unpredictably because a browser update is released. This makes the decision to choose JS for a program a more wise and safe investment, for years into the future.
+我们的想法是，JS 开发者可以放心地编写代码，他们的代码不会因为浏览器的更新发布而不可预测地停止工作。这使得为程序选择 JS 的决定在未来几年都是一个更明智和安全的投资。
 
-That "guarantee" is no small thing. Maintaining backwards compatibility, stretched out across almost 25 years of the language's history, creates an enormous burden and a whole slew of unique challenges. You'd be hard pressed to find many other examples in computing of such a commitment to backwards compatibility.
+这种 "保证 "不是小事。为了维护向后兼容性，该语言跨越了近 25 年的历史，创造了一个巨大的负担和一系列独特的挑战。你很难在计算机领域找到许多其它承诺向后兼容的例子。
 
-The costs of sticking to this principle should not be casually dismissed. It necessarily creates a very high bar to including changing or extending the language; any decision becomes effectively permanent, mistakes and all. Once it's in JS, it can't be taken out because it might break programs, even if we'd really, really like to remove it!
+坚持这一原则的代价不应该被随意忽视。它必然会对包括改变或扩展语言创造一个非常高的门槛；任何决定都会成为有效的永久性的，错误以及其它所有的东西。一旦它出现在 JS 中，就不能再去掉了，因为它可能会破坏程序，即使我们真的很想把它去掉！
 
-There are some small exceptions to this rule. JS has had some backwards-incompatible changes, but TC39 is extremely cautious in doing so. They study existing code on the web (via browser data gathering) to estimate the impact of such breakage, and browsers ultimately decide and vote on whether they're willing to take the heat from users for a very small-scale breakage weighed against the benefits of fixing or improving some aspect of the language for many more sites (and users).
+这条规则也有一些小的例外。JS 有一些向后兼容的变化，但 TC39 在这样做的时候是非常谨慎的。他们研究网络上现有的代码（通过浏览器数据收集）来估计这种破坏的影响，浏览器最终决定并投票决定他们是否愿意为一个非常小规模的破坏承受来自用户的压力，而不是为更多的网站（和用户）修复或改进语言的某些方面的好处。
 
-These kinds of changes are rare, and are almost always in corner cases of usage that are unlikely to be observably breaking in many sites.
+这类变化是罕见的，而且几乎总是在使用的角落里，在许多网站中不太可能被观察到的破坏。
 
-Compare *backwards compatibility* to its counterpart, *forwards compatibility*. Being forwards-compatible means that including a new addition to the language in a program would not cause that program to break if it were run in an older JS engine. **JS is not forwards-compatible**, despite many wishing such, and even incorrectly believing the myth that it is.
+将*后向兼容*与它的对应物*前向兼容*进行比较。向前兼容是指在程序中加入新的语言，如果在旧的 JS 引擎中运行，不会导致该程序崩溃。**JS 不是向前兼容的**，尽管许多人希望如此，甚至错误地相信它是向前兼容的神话。
 
-HTML and CSS, by contrast, are forwards-compatible but not backwards-compatible. If you dug up some HTML or CSS written back in 1995, it's entirely possible it would not work (or work the same) today. But, if you use a new feature from 2019 in a browser from 2010, the page isn't "broken" -- the unrecognized CSS/HTML is skipped over, while the rest of the CSS/HTML would be processed accordingly.
+相比之下，HTML 和 CSS 是向前兼容的，但不是向后兼容的。如果你挖出一些 1995 年写的 HTML 或 CSS，它完全有可能在今天无法工作（或工作方式相同）。但是，如果你在 2010 年的浏览器中使用 2019 年的新功能，页面就不会 "被破坏"--未被识别的 CSS/HTML 会被跳过，而其余的 CSS/HTML 会被正常处理。
 
-It may seem desirable for forwards-compatibility to be included in programming language design, but it's generally impractical to do so. Markup (HTML) or styling (CSS) are declarative in nature, so it's much easier to "skip over" unrecognized declarations with minimal impact to other recognized declarations.
+在编程语言的设计中包含向前兼容似乎是可取的，但一般来说，这样做是不切实际的。标签 (HTML) 或样式 (CSS) 在本质上是声明性的，所以"跳过"不被承认的声明要容易得多，对其他被承认的声明的影响最小
 
-But chaos and non-determinism would ensue if a programming language engine selectively skipped statements (or even expressions!) that it didn't understand, as it's impossible to ensure that a subsequent part of the program wasn't expecting the skipped-over part to have been processed.
+但是，如果一个编程语言引擎有选择地跳过它不理解的语句（甚至表达式！），就会出现混乱和非确定性，因为它不可能确保程序的后续部分不期望被跳过的部分得到处理。
 
-Though JS isn't, and can't be, forwards-compatible, it's critical to recognize JS's backwards compatibility, including the enduring benefits to the web and the constraints and difficulties it places on JS as a result.
+尽管 JS 不是，也不可能是向前兼容的，但认识到 JS 的向后兼容是至关重要的，包括对网络的持久好处以及因此而对 JS 造成的限制和困难。
 
-### Jumping the Gaps
+### 跳过差异
 
-Since JS is not forwards-compatible, it means that there is always the potential for a gap between code that you can write that's valid JS, and the oldest engine that your site or application needs to support. If you run a program that uses an ES2019 feature in an engine from 2016, you're very likely to see the program break and crash.
+由于 JS 不是向前兼容的，这意味着在你能写的有效 JS 的代码和你的网站或应用程序需要支持的最古老的引擎之间总是有可能存在差异。如果你在 2016 年的引擎中运行一个使用 ES2019 功能的程序，你很有可能看到程序中断和崩溃。
 
-If the feature is a new syntax, the program will in general completely fail to compile and run, usually throwing a syntax error. If the feature is an API (such as ES6's `Object.is(..)`), the program may run up to a point but then throw a runtime exception and stop once it encounters the reference to the unknown API.
+如果该特性是一种新的语法，程序一般会完全无法编译和运行，通常会抛出一个语法错误。如果该特征是一个 API（如 ES6 的 `Object.is(..)`），程序可能会运行到某一点，但一旦遇到对未知 API 的引用，就会抛出一个运行时异常并停止。
 
-Does this mean JS developers should always lag behind the pace of progress, using only code that is on the trailing edge of the oldest JS engine environments they need to support? No!
+这是否意味着 JS 开发者应该永远落后于进步的步伐，只使用他们需要支持的最古老的 JS 引擎环境的落后的代码？并不是这样！
 
-But it does mean that JS developers need to take special care to address this gap.
+但这确实意味着 JS 开发者需要特别注意解决这一差异。
 
-For new and incompatible syntax, the solution is transpiling. Transpiling is a contrived and community-invented term to describe using a tool to convert the source code of a program from one form to another (but still as textual source code). Typically, forwards-compatibility problems related to syntax are solved by using a transpiler (the most common one being Babel (https://babeljs.io)) to convert from that newer JS syntax version to an equivalent older syntax.
+对于新的和不兼容的语法，解决方案是转译。转译是一个社区发明的术语，用来描述使用一个工具将程序的源代码从一种形式转换为另一种形式（但仍为文本源代码）。通常，与语法有关的向前兼容问题是通过使用转译器（最常见的是 Babel (https://babeljs.io)）来解决的，将较新的 JS 语法版本转换为等效的旧语法。
 
-For example, a developer may write a snippet of code like:
+例如，一个开发人员可能会写一个代码片段:
 
 ```js
 if (something) {
     let x = 3;
     console.log(x);
-}
-else {
+} else {
     let x = 4;
     console.log(x);
 }
 ```
 
-This is how the code would look in the source code tree for that application. But when producing the file(s) to deploy to the public website, the Babel transpiler might convert that code to look like this:
+这就是该应用程序的源代码中的代码。但当部署到公共网站时，Babel 转码器可能会将代码转换为这样的样子：
 
 ```js
 var x$0, x$1;
 if (something) {
     x$0 = 3;
     console.log(x$0);
-}
-else {
+} else {
     x$1 = 4;
     console.log(x$1);
 }
 ```
 
-The original snippet relied on `let` to create block-scoped `x` variables in both the `if` and `else` clauses which did not interfere with each other. An equivalent program (with minimal re-working) that Babel can produce just chooses to name two different variables with unique names, producing the same non-interference outcome.
+原来的片段依靠 `let` 在 `if` 和 `else` 中创建块范围的 `x` 变量，它们不会相互干扰。Babel 能产生的等效程序（只需最少的重新工作）只是选择用唯一的名字命名两个不同的变量，产生同样的不干涉结果。
 
-| NOTE: |
-| :--- |
-| The `let` keyword was added in ES6 (in 2015). The preceding example of transpiling would only need to apply if an application needed to run in a pre-ES6 supporting JS environment. The example here is just for simplicity of illustration. When ES6 was new, the need for such a transpilation was quite prevalent, but in 2020 it's much less common to need to support pre-ES6 environments. The "target" used for transpiliation is thus a sliding window that shifts upward only as decisions are made for a site/application to stop supporting some old browser/engine. |
+| NOTE:                                                                                                                                                                                                                                                                                                                                                      |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `let` 关键字是在 ES6（2015 年）添加的。前面的转译例子只需要在应用程序需要在 ES6 之前的支持 JS 环境中运行时适用。这里的例子只是为了简单说明问题。当 ES6 还是比较新的时候，这种转译的需求是相当普遍的，但在 2020 年，需要支持 ES6 之前的环境就不那么常见了。因此，用于转换的 "目标 "是灵活的，只有在网站/应用程序决定停止支持某些旧的浏览器/引擎时才会使用。 |
 
-You may wonder: why go to the trouble of using a tool to convert from a newer syntax version to an older one? Couldn't we just write the two variables and skip using the `let` keyword? The reason is, it's strongly recommended that developers use the latest version of JS so that their code is clean and communicates its ideas most effectively.
+你可能会问：为什么要麻烦地使用一个工具从较新的语法版本转换到较旧的版本？难道我们不能直接写两个变量而跳过使用 `let` 关键字吗？原因是，强烈建议开发者使用最新版本的 JS，这样他们的代码才会干净，才能最有效地传达其思想。
 
-Developers should focus on writing the clean, new syntax forms, and let the tools take care of producing a forwards-compatible version of that code that is suitable to deploy and run on the oldest-supported JS engine environments.
+开发人员应该专注于编写干净的、新的语法形式，并让工具来处理产生该代码的向前兼容版本，以适合在最古老的支持的 JS 引擎环境中部署和运行。
 
-### Filling the Gaps
+### 填补差异
 
-If the forwards-compatibility issue is not related to new syntax, but rather to a missing API method that was only recently added, the most common solution is to provide a definition for that missing API method that stands in and acts as if the older environment had already had it natively defined. This pattern is called a polyfill (aka "shim").
+如果向前兼容的问题与新的语法无关，而是与最近才添加的缺失的 API 方法有关，最常见的解决方案是为那个缺失的 API 方法提供一个定义，就像旧环境已经有了它的原生定义一样。这种模式被称为 polyfill（又称 "shim"）。
 
-Consider this code:
+思考一下这段代码：
 
 ```js
-// getSomeRecords() returns us a promise for some
-// data it will fetch
+// getSomeRecords() 返回给我们一个 promise
+// 它将获取数据
 var pr = getSomeRecords();
 
-// show the UI spinner while we get the data
+// 当我们获取数据时，显示加载界面。
 startSpinner();
 
-pr
-.then(renderRecords)   // render if successful
-.catch(showError)      // show an error if not
-.finally(hideSpinner)  // always hide the spinner
+pr.then(renderRecords) // 如果成功则渲染
+    .catch(showError) // 如果失败显示错误
+    .finally(hideSpinner); // 总是隐藏加载界面
 ```
 
-This code uses an ES2019 feature, the `finally(..)` method on the promise prototype. If this code were used in a pre-ES2019 environment, the `finally(..)` method would not exist, and an error would occur.
+这段代码使用了 ES2019，即 promise 原型上的 `finally(..)` 方法。如果在 ES2019 之前的环境中使用此代码，则 `finally(..)` 方法将不存在，并且会发生错误。
 
-A polyfill for `finally(..)` in pre-ES2019 environments could look like this:
+在 ES2019 之前的环境中， `finally(..)` 的 polyfill 可以是这样的：
 
 ```js
 if (!Promise.prototype.finally) {
-    Promise.prototype.finally = function f(fn){
+    Promise.prototype.finally = function f(fn) {
         return this.then(
-            function t(v){
-                return Promise.resolve( fn() )
-                    .then(function t(){
-                        return v;
-                    });
+            function t(v) {
+                return Promise.resolve(fn()).then(function t() {
+                    return v;
+                });
             },
-            function c(e){
-                return Promise.resolve( fn() )
-                    .then(function t(){
-                        throw e;
-                    });
+            function c(e) {
+                return Promise.resolve(fn()).then(function t() {
+                    throw e;
+                });
             }
         );
     };
 }
 ```
 
-| WARNING: |
-| :--- |
-| This is only a simple illustration of a basic (not entirely spec-compliant) polyfill for `finally(..)`. Don't use this polyfill in your code; always use a robust, official polyfill wherever possible, such as the collection of polyfills/shims in ES-Shim. |
+| WARNING:                                                                                                                                                                        |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 这只是对`finally(..)`的基本（不完全符合规范）polyfill 的一个简单说明。不要在你的代码中使用这个 polyfill；应尽可能地使用强大的官方 polyfill，例如 ES-Shim 中的 polyfills/shims。 |
 
-The `if` statement protects the polyfill definition by preventing it from running in any environment where the JS engine has already defined that method. In older environments, the polyfill is defined, but in newer environments the `if` statement is quietly skipped.
+`if` 语句通过防止它在任何 JS 引擎已经定义了该方法的环境下运行来保护 polyfill 定义。在旧的环境中，polyfill 被定义，但在新的环境中，`if` 语句被悄悄地跳过。
 
-Transpilers like Babel typically detect which polyfills your code needs and provide them automatically for you. But occasionally you may need to include/define them explicitly, which works similar to the snippet we just looked at.
+像 Babel 这样的转译器通常会检测你的代码需要哪些 polyfills，并自动为你提供。但有时你可能需要明确地包含或定义它们，这与我们刚才看的片段的工作原理类似。
 
-Always write code using the most appropriate features to communicate its ideas and intent effectively. In general, this means using the most recent stable JS version. Avoid negatively impacting the code's readability by trying to manually adjust for the syntax/API gaps. That's what tools are for!
+始终使用最合适的功能来编写代码，以有效地传达其想法和意图。一般来说，这意味着使用最新的稳定 JS 版本。避免因为试图手动调整语法/API 的差距而对代码的可读性产生负面影响。这就是工具的作用!
 
-Transpilation and polyfilling are two highly effective techniques for addressing that gap between code that uses the latest stable features in the language and the old environments a site or application needs to still support. Since JS isn't going to stop improving, the gap will never go away. Both techniques should be embraced as a standard part of every JS project's production chain going forward.
+转译和 polyfilling 是两种非常有效的技术，可以解决使用语言中最新的稳定功能的代码与网站或应用程序仍然需要支持的旧环境之间的差距。由于 JS 不会停止改进，这种差距将永远不会消失。这两种技术都应该作为每个 JS 项目的生产链的标准部分来使用和推广。
 
-## 解释过程中都有什么？
+## “解释“的本质
 
-A long-debated question for code written in JS: is it an interpreted script or a compiled program? The majority opinion seems to be that JS is an interpreted (scripting) language. But the truth is more complicated than that.
+对于用 JS 编写的代码，有一个争论已久的问题：它是一个解释的脚本还是一个编译的程序？大多数人的看法似乎是 JS 是一种解释型（脚本）语言。但事实比这更复杂。
 
-For much of the history of programming languages, "interpreted" languages and "scripting" languages have been looked down on as inferior compared to their compiled counterparts. The reasons for this acrimony are numerous, including the perception that there is a lack of performance optimization, as well as dislike of certain language characteristics, such as scripting languages generally using dynamic typing instead of the "more mature" statically typed languages.
+在编程语言的大部分历史中，"解释"语言和 "脚本"语言一直被看不起，认为比它们的编译语言要差。造成这种争论的原因很多，包括认为缺乏性能优化，以及不喜欢某些语言的特点，例如脚本语言通常使用动态类型，而不是 "更成熟"的静态类型语言。
 
-Languages regarded as "compiled" usually produce a portable (binary) representation of the program that is distributed for execution later. Since we don't really observe that kind of model with JS (we distribute the source code, not the binary form), many claim that disqualifies JS from the category. In reality, the distribution model for a program's "executable" form has become drastically more varied and also less relevant over the last few decades; to the question at hand, it doesn't really matter so much anymore what form of a program gets passed around.
+被认为是 "编译"的语言通常会产生一个可移植的（二进制）程序表示，然后再分发执行。由于我们没有真正观察到 JS 的那种模式（我们分发源代码，而不是二进制形式），许多人声称这使 JS 失去了分类的资格。实际上，在过去的几十年里，程序的 "可执行 "形式的分发模式已经变得多种多样，而且也不那么重要了；对于目前的问题来说，程序的哪种形式被传递出去已经不那么重要了。
 
-These misinformed claims and criticisms should be set aside. The real reason it matters to have a clear picture on whether JS is interpreted or compiled relates to the nature of how errors are handled.
+这些误导性的说法和批评应该被搁置。清楚地了解 JS 是被解释还是被编译的真正原因，与如何处理错误的性质有关。
 
-Historically, scripted or interpreted languages were executed in generally a top-down and line-by-line fashion; there's typically not an initial pass through the program to process it before execution begins (see Figure 1).
+从历史上看，脚本语言或解释语言的执行方式一般是自上而下、逐行执行的；在开始执行之前，通常没有对程序进行初步的处理（见图1）。
 
 <figure>
     <img src="images/fig1.png" width="650" alt="Interpreting a script to execute it" align="center">
-    <figcaption><em>Fig. 1: Interpreted/Scripted Execution</em></figcaption>
+    <figcaption><em>图1：解释 型/脚本的执行</em></figcaption>
     <br><br>
 </figure>
 
-In scripted or interpreted languages, an error on line 5 of a program won't be discovered until lines 1 through 4 have already executed. Notably, the error on line 5 might be due to a runtime condition, such as some variable or value having an unsuitable value for an operation, or it may be due to a malformed statement/command on that line. Depending on context, deferring error handling to the line the error occurs on may be a desirable or undesirable effect.
+在脚本语言或解释语言中，程序第5行的错误在第1至第4行已经执行后才会被发现。值得注意的是，第5行的错误可能是由于运行时的条件造成的，例如某些变量或数值不适合操作，也可能是由于该行的语句/命令格式不正确。根据上下文，将错误处理推迟到错误发生的那一行可能是一个理想的或不理想的效果。
 
-Compare that to languages which do go through a processing step (typically, called parsing) before any execution occurs, as illustrated in Figure 2:
+如图2所示，与那些在执行之前确实要经过一个处理步骤（通常称为解析）的语言进行比较：
 
 <figure>
     <img src="images/fig2.png" width="650" alt="Parsing, compiling, and executing a program" align="center">
-    <figcaption><em>Fig. 2: Parsing + Compilation + Execution</em></figcaption>
+    <figcaption><em>图 2: 解析 + 编译 + 执行</em></figcaption>
     <br><br>
 </figure>
 
-In this processing model, an invalid command (such as broken syntax) on line 5 would be caught during the parsing phase, before any execution has begun, and none of the program would run. For catching syntax (or otherwise "static") errors, generally it's preferred to know about them ahead of any doomed partial execution.
+在这种处理模式下，第5行的无效命令（比如语法错误）将在解析阶段被捕获，在任何执行开始之前，程序都不会运行。对于捕捉语法（或其他 "静态"）错误，一般来说，最好是在任何部分执行之前知道它们。
 
-So what do "parsed" languages have in common with "compiled" languages? First, all compiled languages are parsed. So a parsed language is quite a ways down the road toward being compiled already. In classic compilation theory, the last remaining step after parsing is code generation: producing an executable form.
+那么，"解析"语言与 "编译"语言有什么共同点？首先，所有的编译语言都是经过解析的。所以，解析过的语言在走向编译的道路上已经走了很远。在经典的编译理论中，解析之后剩下的最后一步是代码生成：产生一个可执行的形式。
 
-Once any source program has been fully parsed, it's very common that its subsequent execution will, in some form or fashion, include a translation from the parsed form of the program—usually called an Abstract Syntax Tree (AST)—to that executable form.
+常见的情况下，一旦任何源程序被完全解析，它的后续执行将以某种形式或方式包括从程序的解析形式，通常称为抽象语法树 (AST) —到可执行形式的翻译。
 
-In other words, parsed languages usually also perform code generation before execution, so it's not that much of a stretch to say that, in spirit, they're compiled languages.
+换句话说，解析语言通常也在执行前进行代码生成，所以说在认知中，它们是编译语言也不为过。
 
-JS source code is parsed before it is executed. The specification requires as much, because it calls for "early errors"—statically determined errors in code, such as a duplicate parameter name—to be reported before the code starts executing. Those errors cannot be recognized without the code having been parsed.
+JS 源代码在执行前被解析。该规范要求如此，因为它要求在代码开始执行之前报告 "早期错误"—代码中系统确定的错误，如重复的参数名称。如果不对代码进行解析，这些错误就无法被识别。
 
-So **JS is a parsed language**, but is it *compiled*?
+那么，**JS是一种解释性语言**，但它是*编译过*的吗？
 
-The answer is closer to yes than no. The parsed JS is converted to an optimized (binary) form, and that "code" is subsequently executed (Figure 2); the engine does not commonly switch back into line-by-line execution (like Figure 1) mode after it has finished all the hard work of parsing—most languages/engines wouldn't, because that would be highly inefficient.
+答案是接近于"是"而不是"不是"。被解析的 JS 被转换为优化的（二进制）形式，该"代码"随后被执行（图2）；引擎在完成所有艰苦的解析工作后，通常不会切换回逐行执行（如图1）模式—大多数语言/引擎不会这样做，因为这样做的效率非常低。
 
-To be specific, this "compilation" produces a binary byte code (of sorts), which is then handed to the "JS virtual machine" to execute. Some like to say this VM is "interpreting" the byte code. But then that means Java, and a dozen other JVM-driven languages, for that matter, are interpreted rather than compiled. Of course, that contradicts the typical assertion that Java/etc are compiled languages.
+具体来说，这种"编译"产生一个二进制字节码（某种意义上），然后交给 "JS 虚拟机 "执行。有些人喜欢说这个虚拟机是"解释"字节码的。但这意味着 Java，以及其他十几种 JVM 驱动的语言，都是解释的，而不是编译的。当然，这与 Java 或其他语言是编译语言的典型论断相矛盾。
 
-Interestingly, while Java and JavaScript are very different languages, the question of interpreted/compiled is pretty closely related between them!
+有趣的是，虽然 Java 和 JavaScript 是非常不同的语言，但解释/编译的问题在它们之间却有着相当密切的关系
 
-Another wrinkle is that JS engines can employ multiple passes of JIT (Just-In-Time) processing/optimization on the generated code (post parsing), which again could reasonably be labeled either "compilation" or "interpretation" depending on perspective. It's actually a fantastically complex situation under the hood of a JS engine.
+另一个问题是，JS 引擎可以对生成的代码进行多次 JIT（即时）处理/优化（解析后），这也可以合理地被称为 "编译 "或 "解释"，这取决于个人观点。实际上，在 JS 引擎的内部，这是一个非常复杂的情况。
 
-So what do these nitty-gritty details boil down to? Step back and consider the entire flow of a JS source program:
+那么，这些琐碎的细节可以归结为什么呢？退一步讲，考虑一个 JS 程序的整个流程：
 
-1. After a program leaves a developer's editor, it gets transpiled by Babel, then packed by Webpack (and perhaps half a dozen other build processes), then it gets delivered in that very different form to a JS engine.
+1. 当一个程序离开开发者的编辑器后，它被 Babel 转译，然后被 Webpack 打包（也许还有其他的构建过程），然后以这种非常不同的形式交付给 JS 引擎。
+2. JS 引擎将代码解析成 AST。
+3. 然后，引擎将AST转换为一种字节码，即中介码（IR），然后由优化的 JIT 编译器进一步完善/转换。
+4. 最后，JS VM 执行该程序。
 
-2. The JS engine parses the code to an AST.
-
-3. Then the engine converts that AST to a kind-of byte code, a binary intermediate representation (IR), which is then refined/converted even further by the optimizing JIT compiler.
-
-4. Finally, the JS VM executes the program.
-
-To visualize those steps, again:
+为了更直观地了解这些步骤：
 
 <figure>
     <img src="images/fig3.png" width="650" alt="Steps of JS compilation and execution" align="center">
-    <figcaption><em>Fig. 3: Parsing, Compiling, and Executing JS</em></figcaption>
+    <figcaption><em>图3：解析、编译和执行 JS</em></figcaption>
     <br><br>
 </figure>
 
-Is JS handled more like an interpreted, line-by-line script, as in Figure 1, or is it handled more like a compiled language that's processed in one-to-several passes first, before execution (as in Figures 2 and 3)?
+JS 的处理方式是更像一个解释的、逐行的脚本，如图1，还是更像一个编译的语言，在执行前先进行一到几次处理（如图2和3）？
 
-I think it's clear that in spirit, if not in practice, **JS is a compiled language**.
+我认为显而易见，在认知中，如果不是在现实中，**JS是一种编译语言**。
 
-And again, the reason that matters is, since JS is compiled, we are informed of static errors (such as malformed syntax) before our code is executed. That is a substantively different interaction model than we get with traditional "scripting" programs, and arguably more helpful!
+再说一遍，这很重要，因为 JS 是被编译的，在我们的代码被执行之前，我们就被告知了静态错误（如错误的语法）。这与我们在传统的"脚本"程序中得到的互动模式有很大的不同，可以说是更有帮助的！
 
 ### Web Assembly (WASM)
 
-One dominating concern that has driven a significant amount of JS's evolution is performance, both how quickly JS can be parsed/compiled and how quickly that compiled code can be executed.
+推动 JS 发展的一个主要问题是性能，包括 JS 的解析/编译速度和编译后的代码的执行速度。
 
-In 2013, engineers from Mozilla Firefox demonstrated a port of the Unreal 3 game engine from C to JS. The ability for this code to run in a browser JS engine at full 60fps performance was predicated on a set of optimizations that the JS engine could perform specifically because the JS version of the Unreal engine's code used a style of code that favored a subset of the JS language, named "ASM.js".
+在2013年，来自 Mozilla 火狐的工程师展示了将虚幻3游戏引擎从 C 语言移植到 JS 的过程。这段代码能够以 60fps 的性能在浏览器的 JS 引擎中运行，是以 JS 引擎能够进行的一系列优化为前提的，因为虚幻引擎的 JS 版本的代码使用了名为 "ASM.js" 的一种倾向于 JS 语言子集的代码风格。
 
-This subset is valid JS written in ways that are somewhat uncommon in normal coding, but which signal certain important typing information to the engine that allow it to make key optimizations. ASM.js was introduced as one way of addressing the pressures on the runtime performance of JS.
+这个子集是有效的 JS，其编写方式在正常编码中有些不常见，但它向引擎发出了某些重要的类型化信息，使其能够进行关键的优化。ASM.js 是作为解决 JS 运行时性能的压力的一种方式被引入的。
 
-But it's important to note that ASM.js was never intended to be code that was authored by developers, but rather a representation of a program having been transpiled from another language (such as C), where these typing "annotations" were inserted automatically by the tooling.
+但需要注意的是，ASM.js 从来就不是由开发人员编写的代码，而是一个从另一种语言（如 C）转译过来的程序的代表，这些"注释"是由工具软件自动插入的。
 
-Several years after ASM.js demonstrated the validity of tooling-created versions of programs that can be processed more efficiently by the JS engine, another group of engineers (also, initially, from Mozilla) released Web Assembly (WASM).
+在 ASM.js 证明了工具创建的程序版本可以被 JS 引擎更有效地处理的有效性几年后，另一组工程师（最初也来自 Mozilla）发布了 Web Assembly (WASM)。
 
-WASM is similar to ASM.js in that its original intent was to provide a path for non-JS programs (C, etc.) to be converted to a form that could run in the JS engine. Unlike ASM.js, WASM chose to additionally get around some of the inherent delays in JS parsing/compilation before a program can execute, by representing the program in a form that is entirely unlike JS.
+WASM 与 ASM.js 类似，它的初衷是为非 JS 程序（C等）提供一个路径，将其转换为可以在 JS 引擎中运行的形式。与 ASM.js 不同的是，WASM 选择在程序执行前额外绕过 JS 解析/编译中的一些固有延迟，以一种完全不同于JS 的形式表示程序。
 
-WASM is a representation format more akin to Assembly (hence, its name) that can be processed by a JS engine by skipping the parsing/compilation that the JS engine normally does. The parsing/compilation of a WASM-targeted program happen ahead of time (AOT); what's distributed is a binary-packed program ready for the JS engine to execute with very minimal processing.
+WASM 是一种更类似于汇编的表示形式（名字的由来），可以被 JS 引擎处理，跳过 JS 引擎通常进行的解析/编译。WASM 目标程序的解析/编译是提前进行的(AOT)；分发的是一个二进制打包的程序，JS 引擎可以用最少的处理来执行。
 
-An initial motivation for WASM was clearly the potential performance improvements. While that continues to be a focus, WASM is additionally motivated by the desire to bring more parity for non-JS languages to the web platform. For example, if a language like Go supports threaded programming, but JS (the language) does not, WASM offers the potential for such a Go program to be converted to a form the JS engine can understand, without needing a threads feature in the JS language itself.
+WASM 的最初动机显然是潜在的性能改进。虽然这仍然是一个重点，但 WASM 的另一个动机是希望为网络平台带来更多非 JS 语言的平等性。例如，如果像 Go 这样的语言支持线程编程，但 JS（语言）不支持，那么 WASM 就有可能将这样的 Go 程序转换为 JS 引擎能够理解的形式，而不需要 JS 语言本身的线程功能。
 
-In other words, WASM relieves the pressure to add features to JS that are mostly/exclusively intended to be used by transpiled programs from other languages. That means JS feature development can be judged (by TC39) without being skewed by interests/demands in other language ecosystems, while still letting those languages have a viable path onto the web.
+换句话说，WASM 减轻了为 JS 添加功能的压力，这些功能主要/完全是为了被其他语言的转写程序使用。这意味着JS 功能的开发可以（由 TC39）进行判断，而不被其他语言生态系统的兴趣/需求所歪曲，同时仍然让这些语言在网络上有一个可行的路径。
 
-Another perspective on WASM that's emerging is, interestingly, not even directly related to the web (W). WASM is evolving to become a cross-platform virtual machine (VM) of sorts, where programs can be compiled once and run in a variety of different system environments.
+关于 WASM 的另一个正在出现有趣的用途，甚至与网络(web, WASM 中的 w)没有直接关系。WASM 正在发展成为一种跨平台的虚拟机(VM)，程序可以被编译一次并在各种不同的系统环境中运行。
 
-So, WASM isn't only for the web, and WASM also isn't JS. Ironically, even though WASM runs in the JS engine, the JS language is one of the least suitable languages to source WASM programs with, because WASM relies heavily on static typing information. Even TypeScript (TS)—ostensibly, JS + static types—is not quite suitable (as it stands) to transpile to WASM, though language variants like AssemblyScript are attempting to bridge the gap between JS/TS and WASM.
+所以，WASM 并不只适用于网络，而且 WASM 也不是 JS。具有讽刺意味的是，尽管 WASM 在 JS 引擎中运行，但JS 语言是最不适合用于 WASM 程序源的语言之一，因为 WASM 严重依赖静态类型信息。即使是 TypeScript (TS)—JS + 静态类型—也不太适合（就目前而言）转译到 WASM，尽管像 AssemblyScript 这样的语言变体正试图弥补JS/TS 和 WASM 之间的差距。
 
-This book isn't about WASM, so I won't spend much more time discussing it, except to make one final point. *Some* folks have suggested WASM points to a future where JS is excised from, or minimized in, the web. These folks often harbor ill feelings about JS, and want some other language—any other language!—to replace it. Since WASM lets other languages run in the JS engine, on its face this isn't an entirely fanciful fairytale.
+这本书不是关于 WASM 的，所以我不会花更多的时间来讨论它，只是想提出最后一点。有些人认为 WASM 指向了 JS 从网络中被删除或最小化的未来。这些人通常对 JS 怀有恶感，并希望有其他语言—任何其他语言！—来取代它。由于 WASM 允许其他语言在 JS 引擎中运行，从表面上看，这并不是一个完全幻想的童话故事。
 
-But let me just state simply: WASM will not replace JS. WASM significantly augments what the web (including JS) can accomplish. That's a great thing, entirely orthogonal to whether some people will use it as an escape hatch from having to write JS.
+但让我简单地说明一下： WASM 不会取代 JS。WASM 极大地增强了网络（包括 JS）所能实现的功能。这是一件伟大的事情，与一些人是否会把它作为逃避编写 JS 的借口完全不相干。
 
 ## *严格*模式的讨论
 
-Back in 2009 with the release of ES5, JS added *strict mode* as an opt-in mechanism for encouraging better JS programs.
+早在2009年，随着 ES5 的发布，JS 增加了_严格模式_作为鼓励更好的 JS 程序的选择机制。
 
-The benefits of strict mode far outweigh the costs, but old habits die hard and the inertia of existing (aka "legacy") code bases is really hard to shift. So sadly, more than 10 years later, strict mode's *optionality* means that it's still not necessarily the default for JS programmers.
+严格模式的好处远远大于成本，但旧习难改，现有（又称 "遗留"）代码库的惯性真的很难改变。因此，可悲的是，10多年过去了，严格模式的可选性意味着它仍然不是 JS 程序员的默认模式。
 
-Why strict mode? Strict mode shouldn't be thought of as a restriction on what you can't do, but rather as a guide to the best way to do things so that the JS engine has the best chance of optimizing and efficiently running the code. Most JS code is worked on by teams of developers, so the *strict*-ness of strict mode (along with tooling like linters!) often helps collaboration on code by avoiding some of the more problematic mistakes that slip by in non-strict mode.
+为什么是严格模式？严格模式不应该被认为是对你不能做什么的限制，而应该被认为是对做事的最佳方式的指导，这样 JS 引擎就有了优化和有效运行代码的最佳机会。大多数 JS 代码都是由开发人员组成的团队完成的，所以严格模式的_严格性（以及像 linters 这样的工具！）往往有助于代码的协作，避免在非严格模式下出现的一些更有问题的错误。
 
-Most strict mode controls are in the form of *early errors*, meaning errors that aren't strictly syntax errors but are still thrown at compile time (before the code is run). For example, strict mode disallows naming two function parameters the same, and results in an early error. Some other strict mode controls are only observable at runtime, such as how `this` defaults to `undefined` instead of the global object.
+大多数严格模式的控制都是以_早期错误_的形式出现的，也就是说，这些错误不是严格意义上的语法错误，但在编译时（代码运行前）仍会被抛出。例如，严格模式不允许将两个函数参数命名为相同的参数，这将导致一个早期错误。其他一些严格模式的控制只有在运行时才能观察到，比如 `this` 默认为 `undefined` 而不是全局对象。
 
-Rather than fighting and arguing with strict mode, like a kid who just wants to defy whatever their parents tell them not to do, the best mindset is that strict mode is like a linter reminding you how JS *should* be written to have the highest quality and best chance at performance. If you find yourself feeling handcuffed, trying to work around strict mode, that should be a blaring red warning flag that you need to back up and rethink the whole approach.
+最好的心态是，严格模式就像一个提醒你 JS 应该如何编写才能获得最高的质量和最好的性能的检查工具，而不是像一个只想违抗父母告诉他们不要做的事情的孩子一样，与严格模式对抗和争论。如果你发现自己感到束手束脚，试图绕过严格模式工作，这应该是一个响亮的红色警告标志，说明你需要后退并重新思考整个方法。
 
-Strict mode is switched on per file with a special pragma (nothing allowed before it except comments/whitespace):
+严格模式是通过一个特殊的编译器指令来开启每个文件的（除了注释/空白以外，在它前面不允许有任何东西）：
 
 ```js
-// only whitespace and comments are allowed
-// before the use-strict pragma
+// 在使用 use strict 之前
+// 只允许使用空格和注释
 "use strict";
-// the rest of the file runs in strict mode
+// 文件的其余部分以严格模式运行
 ```
 
-| WARNING: |
-| :--- |
-| Something to be aware of is that even a stray `;` all by itself appearing before the strict mode pragma will render the pragma useless; no errors are thrown because it's valid JS to have a string literal expression in a statement position, but it also will silently *not* turn on strict mode! |
+| WARNING:                                                     |
+| :----------------------------------------------------------- |
+| 需要注意的是，即使在严格模式编译器指令之前出现一个游离的 `;`，也会使编译器指令失去作用；但不会出现错误，因为在语句位置有一个字符串字面表达式是有效的JS，不过它也会默默地_不_开启严格模式！ |
 
-Strict mode can alternatively be turned on per-function scope, with exactly the same rules about its surroundings:
+严格模式也可以在每个函数内开启，对其周围环境的规则完全相同：
 
 ```js
 function someOperations() {
-    // whitespace and comments are fine here
+    // 空格和注释在这里都可以
     "use strict";
 
-    // all this code will run in strict mode
+    // 这里的所有代码将在严格模式下运行
 }
 ```
 
-Interestingly, if a file has strict mode turned on, the function-level strict mode pragmas are disallowed. So you have to pick one or the other.
+有趣的是，如果一个文件开启了严格模式，那么函数级的严格模式是不允许的。所以你必须二选一。
 
-The **only** valid reason to use a per-function approach to strict mode is when you are converting an existing non-strict mode program file and need to make the changes little by little over time. Otherwise, it's vastly better to simply turn strict mode on for the entire file/program.
+**唯一**使用范围模式的理由是，当你正在转换一个现有的非严格模式的程序文件，并且需要在一段时间内一点一点地进行修改时，才会对严格模式使用逐个功能的方法。否则，对整个文件/程序简单地打开严格模式会好得多。
 
-Many have wondered if there would ever be a time when JS made strict mode the default? The answer is, almost certainly not. As we discussed earlier around backwards compatibility, if a JS engine update started assuming code was strict mode even if it's not marked as such, it's possible that this code would break as a result of strict mode's controls.
+很多人都想知道，是否会有一天 JS 将严格模式作为默认模式？答案是，几乎肯定不会。正如我们之前讨论的关于向后兼容性的问题，如果 JS 引擎的更新开始假定代码是严格模式，即使它没有被标记为严格模式，那么这些代码就有可能因为严格模式的控制而被破坏。
 
-However, there are a few factors that reduce the future impact of this non-default "obscurity" of strict mode.
+然而，有几个因素降低了严格模式这种非默认的"隐蔽性"对未来的影响。
 
-For one, virtually all transpiled code ends up in strict mode even if the original source code isn't written as such. Most JS code in production has been transpiled, so that means most JS is already adhering to strict mode. It's possible to undo that assumption, but you really have to go out of your way to do so, so it's highly unlikely.
+首先，几乎所有转译的代码最终都是严格模式，即使原始的源代码没有这样写。生产中的大多数 JS 代码都被转译了，所以这意味着大多数 JS 已经遵守了严格模式。撤销这一假设是有可能的，但你必须自己做才行，所以这是几乎不可能的。
 
-Moreover, a wide shift is happening toward more/most new JS code being written using the ES6 module format. ES6 modules assume strict mode, so all code in such files is automatically defaulted to strict mode.
+此外，一个广泛的转变正在发生，即更多/大多数新的 JS 代码正在使用 ES6 模块格式编写。ES6 模块假定为严格模式，因此此类文件中的所有代码都自动默认为严格模式。
 
-Taken together, strict mode is largely the de facto default even though technically it's not actually the default.
+综合来看，严格模式在很大程度上是事实上的默认模式，尽管从技术角度来看它实际上不是默认模式。
 
 ## 定义
 
-JS is an implementation of the ECMAScript standard (version ES2019 as of this writing), which is guided by the TC39 committee and hosted by ECMA. It runs in browsers and other JS environments such as Node.js.
+JS 是 ECMAScript 标准的一个实现（截至本文撰写时为 ES2019 版本），由 TC39 委员会指导，ECMA 主持。它在浏览器和其他 JS 环境中运行，如 Node.js。
 
-JS is a multi-paradigm language, meaning the syntax and capabilities allow a developer to mix and match (and bend and reshape!) concepts from various major paradigms, such as procedural, object-oriented (OO/classes), and functional (FP).
+JS 是一种多范式语言，这意味着其语法和功能允许开发者混合和匹配（巧捷万端！）来自各种主要范式的概念，如面向过程、面向对象 (OO/classes) 和函数式 (FP)。
 
-JS is a compiled language, meaning the tools (including the JS engine) process and verify a program (reporting any errors!) before it executes.
+JS 是一种编译语言，意味着工具（包括 JS 引擎）在程序执行前会对其进行处理和验证（抛出存在的错误！）。
 
-With our language now *defined*, let's start getting to know its ins and outs.
+现在我们的语言已经_定义_了，让我们开始了解它的内在和外在。
 
-[^specApB]: ECMAScript 2019 Language Specification, Appendix B: Additional ECMAScript Features for Web Browsers, https://www.ecma-international.org/ecma-262/10.0/#sec-additional-ecmascript-features-for-web-browsers (latest as of time of this writing in January 2020)
+[^specApB]: ECMAScript 2019 语言规范，附录B：网络浏览器的附加 ECMAScript 功能，https://www.ecma-international.org/ecma-262/10.0/#sec-additional-ecmascript-features-for-web-browsers (截至本文撰写时 2020年1月最新版)
