@@ -1,4 +1,4 @@
-# 你不知道的 JavaScript：开始 - 第二版
+# 你不知道的 JavaScript：入门 - 第二版
 
 # 第 2 章：JS 概观
 
