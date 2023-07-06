@@ -1,16 +1,16 @@
 # 你不知道的 JavaScript：入门 - 第二版
 
-# Appendix A: Exploring Further
+# 附录 A：进一步的探索
 
-In this appendix, we're going to explore some topics from the main chapter text in a bit more detail. Think of this content as an optional preview of some of the more nuanced details covered throughout the rest of the book series.
+在本附录中，我们将对主要章节文本中的一些主题进行更详细的探讨。把这些内容看作是本系列书籍其余部分所涉及的一些更细微的细节的可选预览。
 
-## Values vs. References
+## 值 vs 引用
 
-In Chapter 2, we introduced the two main types of values: primitives and objects. But we didn't discuss yet one key difference between the two: how these values are assigned and passed around.
+在第二章中，我们介绍了两种主要的值类型：基本类型和对象。但我们还没有讨论这两者之间的一个关键区别：这些值是如何被分配和传递的。
 
-In many languages, the developer can choose between assigning/passing a value as the value itself, or as a reference to the value. In JS, however, this decision is entirely determined by the kind of value. That surprises a lot of developers from other languages when they start using JS.
+在许多语言中，开发者可以选择将一个值作为值本身进行赋值/传递，或者作为值的引用。然而，在 JS 中，这个决定完全由值的类型决定。这让很多来自其他语言的开发者在开始使用 JS 时感到惊讶。
 
-If you assign/pass a value itself, the value is copied. For example:
+如果你分配/传递一个值本身，这个值就被复制了。比如说：
 
 ```js
 var myName = "Kyle";
@@ -18,9 +18,9 @@ var myName = "Kyle";
 var yourName = myName;
 ```
 
-Here, the `yourName` variable has a separate copy of the `"Kyle"` string from the value that's stored in `myName`. That's because the value is a primitive, and primitive values are always assigned/passed as **value copies**.
+在这里，`yourName` 变量有一个单独的 `"Kyle"` 字符串的副本，与存储在 `myName` 中的值不同。这是因为该值是一个基本类型，而基本类型值总是作为**值副本**被分配/传递。
 
-Here's how you can prove there's two separate values involved:
+下面是你如何证明有两个独立的值的参考：
 
 ```js
 var myName = "Kyle";
@@ -36,11 +36,11 @@ console.log(yourName);
 // Kyle
 ```
 
-See how `yourName` wasn't affected by the re-assignment of `myName` to `"Frank"`? That's because each variable holds its own copy of the value.
+看到 `yourName` 没有受到 `myName` 重新分配到 `"Frank"` 的影响吗？这是因为每个变量都有自己的值的副本。
 
-By contrast, references are the idea that two or more variables are pointing at the same value, such that modifying this shared value would be reflected by access via any of those references. In JS, only object values (arrays, objects, functions, etc.) are treated as references.
+相比之下，引用是指两个或更多的变量指向同一个值，这样修改这个共享的值就会通过任何一个引用的访问反映出来。在 JS 中，只有对象值（数组、对象、函数等）被视为引用。
 
-Consider:
+假设以下代码：
 
 ```js
 var myAddress = {
@@ -51,20 +51,20 @@ var myAddress = {
 
 var yourAddress = myAddress;
 
-// I've got to move to a new house!
+// 我要搬到新房子里去!
 myAddress.street = "456 TS Ave";
 
 console.log(yourAddress.street);
 // 456 TS Ave
 ```
 
-Because the value assigned to `myAddress` is an object, it's held/assigned by reference, and thus the assignment to the `yourAddress` variable is a copy of the reference, not the object value itself. That's why the updated value assigned to the `myAddress.street` is reflected when we access `yourAddress.street`. `myAddress` and `yourAddress` have copies of the reference to the single shared object, so an update to one is an update to both.
+因为分配给 `myAddress` 的值是一个对象，它是通过引用持有/分配的，因此分配给 `yourAddress` 变量的是一个引用的拷贝，而不是对象值本身。这就是为什么当我们访问 `yourAddress.street` 时，分配给 `myAddress.street` 的更新值被反映出来。`myAddress` 和 `yourAddress` 都有对单一共享对象的引用副本，所以对其中一个的更新就是对两个的更新。
 
-Again, JS chooses the value-copy vs. reference-copy behavior based on the value type. Primitives are held by value, objects are held by reference. There's no way to override this in JS, in either direction.
+同样，JS 根据值的类型来选择值复制和引用复制的行为。基本类型是通过值持有的，对象是通过引用持有的。在 JS 中没有办法重写这一点，无论哪种。
 
-## So Many Function Forms
+## 千变万化的函数
 
-Recall this snippet from the "Functions" section in Chapter 2:
+回顾一下第二章中"喊出"部分的这个片段：
 
 ```js
 var awesomeFunction = function (coolThings) {
@@ -73,20 +73,20 @@ var awesomeFunction = function (coolThings) {
 };
 ```
 
-The function expression here is referred to as an _anonymous function expression_, since it has no name identifier between the `function` keyword and the `(..)` parameter list. This point confuses many JS developers because as of ES6, JS performs a "name inference" on an anonymous function:
+这里的函数表达式被称为_匿名函数表达式_，因为它在 `function` 关键字和 `(..)` 参数列表之间没有名称标识。这一点让很多 JS 开发者感到困惑，因为从 ES6 开始，JS 对匿名函数进行了"名称推断"：
 
 ```js
 awesomeFunction.name;
 // "awesomeFunction"
 ```
 
-The `name` property of a function will reveal either its directly given name (in the case of a declaration) or its inferred name in the case of an anonymous function expression. That value is generally used by developer tools when inspecting a function value or when reporting an error stack trace.
+一个函数的 `name` 属性将显示其直接给出的名称（在声明的情况下）或在匿名函数表达式的情况下推断出的名称。开发者工具在检查函数值或报告错误堆栈跟踪时通常使用该值。
 
-So even an anonymous function expression _might_ get a name. However, name inference only happens in limited cases such as when the function expression is assigned (with `=`). If you pass a function expression as an argument to a function call, for example, no name inference occurs; the `name` property will be an empty string, and the developer console will usually report "(anonymous function)".
+因此，即使是一个匿名的函数表达式也可能得到一个名字。然而，名字推理只发生在有限的情况下，例如当函数表达式被赋值时（用 `=`）。如果你将一个函数表达式作为参数传递给一个函数调用，就不会发生名称推理；`name` 属性将是一个空字符串，开发者控制台通常会报告为"（匿名函数/ anonymous function）"。
 
-Even if a name is inferred, **it's still an anonymous function.** Why? Because the inferred name is a metadata string value, not an available identifier to refer to the function. An anonymous function doesn't have an identifier to use to refer to itself from inside itself—for recursion, event unbinding, etc.
+即使推断出了一个名字，**它仍然是一个匿名函数。**为什么？因为推断出来的名字是一个元数据字符串值，而不是一个可用来引用函数的标识符。一个匿名函数没有一个标识符可以用来从自身内部引用它，用于递归、事件解除绑定等。
 
-Compare the anonymous function expression form to:
+将匿名函数的表达形式比作如下代码：
 
 ```js
 // let awesomeFunction = ..
@@ -100,46 +100,46 @@ awesomeFunction.name;
 // "someName"
 ```
 
-This function expression is a _named function expression_, since the identifier `someName` is directly associated with the function expression at compile time; the association with the identifier `awesomeFunction` still doesn't happen until runtime at the time of that statement. Those two identifiers don't have to match; sometimes it makes sense to have them be different, other times it's better to have them be the same.
+这个函数表达式是一个_命名的函数表达式_，因为标识符 `someName` 在编译时直接与函数表达式相关联；与标识符 `awesomeFunction` 的关联直到运行时才发生在该语句中。这两个标识符不一定要匹配；有时让它们不同是有意义的，其他时候让它们相同是更好的。
 
-Notice also that the explicit function name, the identifier `someName`, takes precedence when assigning a _name_ for the `name` property.
+还要注意的是，在为 `name` 属性指定 _name_ 时，显式函数名，即标识符 `someName`，具有优先权。
 
-Should function expressions be named or anonymous? Opinions vary widely on this. Most developers tend to be unconcerned with using anonymous functions. They're shorter, and unquestionably more common in the broad sphere of JS code out there.
+函数表达式应该是命名的还是匿名的？在这个问题上，人们的看法大相径庭。大多数开发者倾向于不关心并使用匿名函数。它们更短，而且在广泛的 JS 代码领域无疑更常见。
 
-In my opinion, if a function exists in your program, it has a purpose; otherwise, take it out! And if it has a purpose, it has a natural name that describes that purpose.
+在我看来，如果一个函数存在于你的程序中，它就有一个目的；否则，就把它去掉！如果它有目的，它就有一个描述目的的自然名称！如果它有一个目的，它就有一个自然的名字来描述这个目的。
 
-If a function has a name, you the code author should include that name in the code, so that the reader does not have to infer that name from reading and mentally executing that function's source code. Even a trivial function body like `x * 2` has to be read to infer a name like "double" or "multBy2"; that brief extra mental work is unnecessary when you could just take a second to name the function "double" or "multBy2" _once_, saving the reader that repeated mental work every time it's read in the future.
+如果一个函数有一个名字，你这个代码作者应该在代码中包含这个名字，这样读者就不必通过阅读和心理执行该函数的源代码来推断这个名字。即使是像 `x * 2` 这样的微不足道的函数，也必须通过阅读来推断出一个像 "double" 或 "multBy2" 这样的名字；当你只需花一秒钟来命名该函数为 "double" 或 "multBy2" _一次_时，这种短暂的额外的脑力劳动是不必要的，这样可以节省读者今后每次阅读时的重复脑力劳动。
 
-There are, regrettably in some respects, many other function definition forms in JS as of early 2020 (maybe more in the future!).
+遗憾的是，在某些方面，截至 2020 年初，JS 中还有许多其他的函数定义形式（也许将来会有更多！）。
 
-Here are some more declaration forms:
+下面是一些更多的声明形式：
 
 ```js
-// generator function declaration
+// 声明 generator 函数
 function *two() { .. }
 
-// async function declaration
+// 声明 async 函数
 async function three() { .. }
 
-// async generator function declaration
+// 声明 async generator 函数
 async function *four() { .. }
 
-// named function export declaration (ES6 modules)
+// 声明导出的命名函数 (ES6 模块化)
 export function five() { .. }
 ```
 
-And here are some more of the (many!) function expression forms:
+这里还有一些（更多！）表达形式：
 
 ```js
-// IIFE
+// IIFE（立即调用函数表达式）
 (function(){ .. })();
 (function namedIIFE(){ .. })();
 
-// asynchronous IIFE
+// 异步 IIFE
 (async function(){ .. })();
 (async function namedAIIFE(){ .. })();
 
-// arrow function expressions
+// 箭头函数表达式
 var f;
 f = () => 42;
 f = x => x * 2;
@@ -155,114 +155,114 @@ someOperation( x => x * 2 );
 // ..
 ```
 
-Keep in mind that arrow function expressions are **syntactically anonymous**, meaning the syntax doesn't provide a way to provide a direct name identifier for the function. The function expression may get an inferred name, but only if it's one of the assignment forms, not in the (more common!) form of being passed as a function call argument (as in the last line of the snippet).
+请记住，箭头函数表达式是**具名**的，这意味着该语法不提供为函数提供直接名称标识的方法。函数表达式可以得到一个推断的名字，但只有当它是赋值形式之一时，而不是作为函数调用参数传递的（更常见！）形式（如片段的最后一行）。
 
-Since I don't think anonymous functions are a good idea to use frequently in your programs, I'm not a fan of using the `=>` arrow function form. This kind of function actually has a specific purpose (i.e., handling the `this` keyword lexically), but that doesn't mean we should use it for every function we write. Use the most appropriate tool for each job.
+由于我认为在你的程序中频繁使用匿名函数不是一个好主意，所以我不喜欢使用 `=>` 箭头函数。这种函数实际上有一个特定的用途（即以词法处理 `this` 关键字），但这并不意味着我们应该将它用于我们编写的每一个函数。应当为每项工作使用最合适的工具。
 
-Functions can also be specified in class definitions and object literal definitions. They're typically referred to as "methods" when in these forms, though in JS this term doesn't have much observable difference over "function":
+函数也可以在类定义和对象字面定义中指定。在这些形式中，它们通常被称为"方法"，尽管在 JS 中，这个术语与"函数"没有什么明显的区别：
 
 ```js
 class SomethingKindaGreat {
-    // class methods
-    coolMethod() { .. }   // no commas!
+    // 类的方法
+    coolMethod() { .. }   // 不加逗号！
     boringMethod() { .. }
 }
 
 var EntirelyDifferent = {
     // object methods
-    coolMethod() { .. },   // commas!
+    coolMethod() { .. },   // 需要逗号！
     boringMethod() { .. },
 
-    // (anonymous) function expression property
+    // (匿名) 函数表达式属性
     oldSchool: function() { .. }
 };
 ```
 
-Phew! That's a lot of different ways to define functions.
+看！这么多种定义函数的方法。
 
-There's no simple shortcut path here; you just have to build familiarity with all the function forms so you can recognize them in existing code and use them appropriately in the code you write. Study them closely and practice!
+这里没有简单的捷径；你只需要熟悉所有的函数形式，这样你就可以在现有的代码中识别它们，并在你写的代码中适当地使用它们。仔细研究它们，并加以练习!
 
-## Coercive Conditional Comparison
+## 强制条件比较
 
-Yes, that section name is quite a mouthful. But what are we talking about? We're talking about conditional expressions needing to perform coercion-oriented comparisons to make their decisions.
+是的，这一节的名字很拗口。但我们在谈论什么呢？我们在谈论条件表达式需要进行面向强制的比较来做出决定。
 
-`if` and `? :`-ternary statements, as well as the test clauses in `while` and `for` loops, all perform an implicit value comparison. But what sort? Is it "strict" or "coercive"? Both, actually.
+`if` 和 `?:` 三元运算，以及 `while` 和 `for` 循环中的测试语句，都执行隐式转换。但是是哪一种呢？是"严格的"还是"强制的"？实际上，两者都有。
 
-Consider:
+假设以下代码：
 
 ```js
 var x = 1;
 
 if (x) {
-    // will run!
+    // 会运行！
 }
 
 while (x) {
-    // will run, once!
+    // 只会运行一次！
     x = false;
 }
 ```
 
-You might think of these `(x)` conditional expressions like this:
+你可以这样思考以下这些 `(x)` 的条件表达式：
 
 ```js
 var x = 1;
 
 if (x == true) {
-    // will run!
+    // 会运行！
 }
 
 while (x == true) {
-    // will run, once!
+    // 只会运行一次！
     x = false;
 }
 ```
 
-In this specific case -- the value of `x` being `1` -- that mental model works, but it's not accurate more broadly. Consider:
+在这个特定的案例中，`x` 的值是 `1`，这种值是有效的，但它在更广泛的范围内并不准确。思考一下：
 
 ```js
 var x = "hello";
 
 if (x) {
-    // will run!
+    // 会运行！
 }
 
 if (x == true) {
-    // won't run :(
+    // 不会运行 :(
 }
 ```
 
-Oops. So what is the `if` statement actually doing? This is the more accurate mental model:
+那么， `if` 语句实际上在做什么？这是更准确的表达：
 
 ```js
 var x = "hello";
 
 if (Boolean(x) == true) {
-    // will run
+    // 会运行！
 }
 
-// which is the same as:
+// 这与以下情况相同：
 
 if (Boolean(x) === true) {
-    // will run
+    // 会运行！
 }
 ```
 
-Since the `Boolean(..)` function always returns a value of type boolean, the `==` vs `===` in this snippet is irrelevant; they'll both do the same thing. But the important part is to see that before the comparison, a coercion occurs, from whatever type `x` currently is, to boolean.
+由于 `Boolean(..)` 函数总是返回一个布尔类型的值，所以这个片段中的 `==` 与 `===` 并不相关；它们都会做同样的事情。但重要的是，在比较之前，发生了一个强制类型转换，从当前的 `x` 类型到布尔类型。
 
-You just can't get away from coercions in JS comparisons. Buckle down and learn them.
+在 JS 的比较中，你就是无法摆脱类型转换。仔细钻研，学习它们。
 
-## Prototypal "Classes"
+## ”类“的原型
 
-In Chapter 3, we introduced prototypes and showed how we can link objects through a prototype chain.
+在第三章中，我们介绍了原型，并展示了我们如何通过原型链连接对象。
 
-Another way of wiring up such prototype linkages served as the (honestly, ugly) predecessor to the elegance of the ES6 `class` system (see Chapter 2, "Classes"), and is referred to as prototypal classes.
+另一种建立这种原型连接的方式是 ES6 的 `class`（见第二章，"类"）的优雅的前身（说实话，很丑），被称为原型类(prototypal classes)。
 
-| TIP:                                                                                                                                       |
-| :----------------------------------------------------------------------------------------------------------------------------------------- |
-| While this style of code is quite uncommon in JS these days, it's still perplexingly rather common to be asked about it in job interviews! |
+| TIP:                                                         |
+| :----------------------------------------------------------- |
+| 提示:虽然这种风格的代码在现在的 JS 中很不常见，但在求职面试中还是相当普遍，被问到这种问题还是令人费解的！ |
 
-Let's first recall the `Object.create(..)` style of coding:
+让我们首先回顾一下 `Object.create(..)` 的编码风格：
 
 ```js
 var Classroom = {
@@ -277,9 +277,9 @@ mathClass.welcome();
 // Welcome, students!
 ```
 
-Here, a `mathClass` object is linked via its prototype to a `Classroom` object. Through this linkage, the function call `mathClass.welcome()` is delegated to the method defined on `Classroom`.
+在这里，一个 `mathClass` 对象通过其原型与 `Classroom` 对象链接。通过这种联系，函数调用 `mathClass.welcome()` 被委托给 `Classroom` 上定义的方法。
 
-The prototypal class pattern would have labeled this delegation behavior "inheritance," and alternatively have defined it (with the same behavior) as:
+原型类模式会将这种委托行为称为"继承"，或者将其定义为（具有相同的行为）：
 
 ```js
 function Classroom() {
@@ -296,15 +296,15 @@ mathClass.welcome();
 // Welcome, students!
 ```
 
-All functions by default reference an empty object at a property named `prototype`. Despite the confusing naming, this is **not** the function's _prototype_ (where the function is prototype linked to), but rather the prototype object to _link to_ when other objects are created by calling the function with `new`.
+所有的函数都默认在一个名为 `prototype` 的属性处引用一个空对象。尽管命名很混乱，但这并**不是**函数的_原型_（函数的原型被链接到这里），而是通过调用函数的 `new` 来构建其他对象时要链接的原型对象。
 
-We add a `welcome` property on that empty object (called `Classroom.prototype`), pointing at the `hello()` function.
+我们在那个空对象（称为 `Classroom.prototype`）上添加一个 `welcome` 属性，指向 `hello()`  函数。
 
-Then `new Classroom()` creates a new object (assigned to `mathClass`), and prototype links it to the existing `Classroom.prototype` object.
+然后 `new Classroom()` 创建一个新的对象（分配给 `mathClass`），并将其原型链接到现有的 `Classroom.prototype` 对象。
 
-Though `mathClass` does not have a `welcome()` property/function, it successfully delegates to the function `Classroom.prototype.welcome()`.
+尽管 `mathClass` 没有 `welcome()` 属性/函数，但它成功地委托给了`Classroom.prototype.welcome()` 函数。
 
-This "prototypal class" pattern is now strongly discouraged, in favor of using ES6's `class` mechanism:
+这种"原型类"模式现在被强烈抵制，而倾向于使用 ES6 的 `class` 机制：
 
 ```js
 class Classroom {
@@ -323,4 +323,4 @@ mathClass.welcome();
 // Welcome, students!
 ```
 
-Under the covers, the same prototype linkage is wired up, but this `class` syntax fits the class-oriented design pattern much more cleanly than "prototypal classes".
+同样的原型链接被连接起来，但这种"类"的语法比"原型类"更符合面向类的设计模式。
