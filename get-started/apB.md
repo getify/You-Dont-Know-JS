@@ -1,14 +1,14 @@
 # 你不知道的 JavaScript：开始 - 第二版
 
-# Appendix B: Practice, Practice, Practice!
+# 附录 B: 温故而知新
 
-In this appendix, we'll explore some exercises and their suggested solutions. These are just to _get you started_ with practice over the concepts from the book.
+在本附录中，我们将探讨一些练习和它们的建议解决方案。这些只是为了让你开始练习书中的概念。
 
-## Practicing Comparisons
+## 相等性练习
 
-Let's practice working with value types and comparisons (Chapter 4, Pillar 3) where coercion will need to be involved.
+让我们练习一下与值类型和比较的工作（第 4 章，重要组成 3），在这里需要涉及到强制类型转换。
 
-`scheduleMeeting(..)` should take a start time (in 24-hour format as a string "hh:mm") and a meeting duration (number of minutes). It should return `true` if the meeting falls entirely within the work day (according to the times specified in `dayStart` and `dayEnd`); return `false` if the meeting violates the work day bounds.
+`scheduleMeeting(..)` 应该接受一个开始时间（24 小时格式的字符串 "hh:mm"）和一个会议持续时间（分钟数）。如果会议完全在工作日内（根据 `dayStart` 和 `dayEnd` 中指定的时间），它应该返回 `true`；如果会议违反了工作日的范围，则返回 `false`。
 
 ```js
 const dayStart = "07:30";
@@ -27,13 +27,13 @@ scheduleMeeting("17:30", 30); // false
 scheduleMeeting("18:00", 15); // false
 ```
 
-Try to solve this yourself first. Consider the usage of equality and relational comparison operators, and how coercion impacts this code. Once you have code that works, _compare_ your solution(s) to the code in "Suggested Solutions" at the end of this appendix.
+首先尝试自己解决这个问题。考虑关系比较运算符的用法，以及强制类型转换如何影响这段代码。一旦你有了可行的代码，请将你的解决方案与本附录末尾"建议的解决方案"中的代码进行比较。
 
-## Practicing Closure
+## 闭包练习
 
-Now let's practice with closure (Chapter 4, Pillar 1).
+现在我们来练习一下闭包（第 4 章，重要组成 1）。
 
-The `range(..)` function takes a number as its first argument, representing the first number in a desired range of numbers. The second argument is also a number representing the end of the desired range (inclusive). If the second argument is omitted, then another function should be returned that expects that argument.
+`range(..)` 函数的第一个参数是一个数字，代表所需数字范围内的第一个数字。第二个参数也是一个数字，代表所需范围的终点（包括）。如果第二个参数被省略，那么应该返回另一个期望该参数的函数。
 
 ```js
 function range(start, end) {
@@ -54,19 +54,19 @@ start3(0); // []
 start4(6); // [4,5,6]
 ```
 
-Try to solve this yourself first.
+首先尝试自己解决这个问题。
 
-Once you have code that works, _compare_ your solution(s) to the code in "Suggested Solutions" at the end of this appendix.
+一旦你有了可以使用的代码，请将你的解决方案与本附录末尾"建议的解决方案"中的代码进行比较。
 
-## Practicing Prototypes
+## 原型练习
 
-Finally, let's work on `this` and objects linked via prototype (Chapter 4, Pillar 2).
+最后，让我们来研究 `this` 和对象的原型链（第 4 章，重要组成 2）。
 
-Define a slot machine with three reels that can individually `spin()`, and then `display()` the current contents of all the reels.
+定义一个有三个转轮的老虎机，可以单独旋转(`spin()`)，然后显示(`display()`)所有转轮的当前内容。
 
-The basic behavior of a single reel is defined in the `reel` object below. But the slot machine needs individual reels—objects that delegate to `reel`, and which each have a `position` property.
+单个转盘的基本行为被定义在下面的 `reel` 对象中。但是老虎机需要单独的转盘—委托给 `reel` 的对象，并且每个对象都有一个 `position` 属性。
 
-A reel only _knows how_ to `display()` its current slot symbol, but a slot machine typically shows three symbols per reel: the current slot (`position`), one slot above (`position - 1`), and one slot below (`position + 1`). So displaying the slot machine should end up displaying a 3 x 3 grid of slot symbols.
+一个转盘只知道如何显示(`display()`)它当前的老虎机符号，但老虎机通常在每个转盘上显示三个符号：当前转盘 (`position`)，上一个转盘 (`position - 1`)，下一个转盘 (`position + 1`)。所以显示老虎机最终应该显示一个 3×3 的老虎机符号网格。
 
 ```js
 function randMax(max) {
@@ -118,23 +118,21 @@ slotMachine.display();
 // ☺ | ♦ | ★
 ```
 
-Try to solve this yourself first.
+首先尝试自己解决这个问题。
 
-Hints:
+提示：
 
--   Use the `%` modulo operator for wrapping `position` as you access symbols circularly around a reel.
+-   使用 `%` 运算符来计算 `position`，因为你在 reel 上循环访问符号。
+-   使用 `Object.create(..)` 来创建一个对象并将其原型链接到另一个对象。一旦链接，对象在方法调用过程中共享 `this` 上下文。
+-   你可以使用另一个临时对象（再次使用 `Object.create(..)`），它有自己的 `position`，而不是直接修改 reel 对象来显示三个位置中的每一个。
 
--   Use `Object.create(..)` to create an object and prototype-link it to another object. Once linked, delegation allows the objects to share `this` context during method invocation.
+一旦你有了可以使用的代码，请将你的解决方案与本附录末尾"建议的解决方案"中的代码进行比较。
 
--   Instead of modifying the reel object directly to show each of the three positions, you can use another temporary object (`Object.create(..)` again) with its own `position`, to delegate from.
+## 建议的解决方案
 
-Once you have code that works, _compare_ your solution(s) to the code in "Suggested Solutions" at the end of this appendix.
+请记住，这些建议的解决方案仅仅是：建议。有许多不同的方法来解决这些习题。将你的方法与你在这里看到的进行比较，并考虑每种方法的优点和缺点。
 
-## Suggested Solutions
-
-Keep in mind that these suggested solutions are just that: suggestions. There are many different ways to solve these practice exercises. Compare your approach to what you see here, and consider the pros and cons of each.
-
-Suggested solution for "Comparisons" (Pillar 3) practice:
+对相等性练习实践的建议解决方案：
 
 ```js
 const dayStart = "07:30";
@@ -191,7 +189,7 @@ scheduleMeeting("18:00", 15); // false
 
 ---
 
-Suggested solution for "Closure" (Pillar 1) practice:
+对闭包练习实践的建议解决方案：
 
 ```js
 function range(start, end) {
@@ -233,7 +231,7 @@ start4(6); // [4,5,6]
 
 ---
 
-Suggested solution for "Prototypes" (Pillar 2) practice:
+对原型练习实践的建议解决方案：
 
 ```js
 function randMax(max) {
@@ -296,4 +294,4 @@ slotMachine.display();
 // ☺ | ♦ | ★
 ```
 
-That's it for this book. But now it's time to look for real projects to practice these ideas on. Just keep coding, because that's the best way to learn!
+这本书的内容就到此为止。但现在是时候寻找真正的项目来实践这些想法了。继续编码吧，因为这是最好的学习方法！
