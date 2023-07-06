@@ -1,4 +1,4 @@
-# 你不知道的 JavaScript：开始 - 第二版
+# 你不知道的 JavaScript：入门 - 第二版
 
 <img src="images/cover.png" width="300">
 
@@ -16,5 +16,5 @@
 -   [第 2 章：JS 概观](ch2.md)
 -   [第 3 章：JS 寻根究底](ch3.md)
 -   [第 4 章：前景展望](ch4.md)
--   [附录A：进一步的探索](apA.md)
--   [附录B：练习、练习、再练习！](apB.md)
+-   [附录 A：进一步的探索](apA.md)
+-   [附录 B：练习、练习、再练习！](apB.md)

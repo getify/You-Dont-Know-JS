@@ -13,10 +13,10 @@
 
 我建议按照这个顺序阅读**第二版**书籍：
 
-* [开始](get-started/README.md) | [在 Leanpub 上购买](https://leanpub.com/ydkjsy-get-started) | [在亚马逊上购买](https://www.amazon.com/dp/B084BNMN7T)
+* [入门](get-started/README.md) | [在 Leanpub 上购买](https://leanpub.com/ydkjsy-get-started) | [在亚马逊上购买](https://www.amazon.com/dp/B084BNMN7T)
 * [作用域与闭包](scope-closures/README.md) | [在 Leanpub 上购买](https://leanpub.com/ydkjsy-scope-closures) | [在亚马逊上购买](https://www.amazon.com/dp/B08634PZ3N)
 * [对象与类](objects-classes/README.md) （稳定版草稿）
-* [类型和语法](types-grammar/README.md) （正在起草）
+* [类型与语法](types-grammar/README.md) （正在起草）
 * 同步与异步 （尚未开始）
 * ES.Next 和未来 （尚未开始）
 
