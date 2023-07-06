@@ -1,6 +1,6 @@
 # 你不知道的 JavaScript：入门 - 第二版
 
-# 第 2 章：JS 概观
+# 第二章：JS 概观
 
 学习 JS 的最好方法就是开始写 JS。
 
@@ -665,7 +665,7 @@ var forAgainstLet = new BlogPost(
     "For and against let",
     "Kyle Simpson",
     "October 27, 2014",
-    "https://davidwalsh.name/for-and-against-let",
+    "https://davidwalsh.name/for-and-against-let"
 );
 
 forAgainstLet.print();
@@ -716,7 +716,7 @@ function Book(bookDetails) {
     var pub = Publication(
         bookDetails.title,
         bookDetails.author,
-        bookDetails.publishedOn,
+        bookDetails.publishedOn
     );
 
     var publicAPI = {
@@ -776,7 +776,7 @@ var forAgainstLet = BlogPost(
     "For and against let",
     "Kyle Simpson",
     "October 27, 2014",
-    "https://davidwalsh.name/for-and-against-let",
+    "https://davidwalsh.name/for-and-against-let"
 );
 
 forAgainstLet.print();
@@ -856,7 +856,7 @@ var forAgainstLet = newBlogPost(
     "For and against let",
     "Kyle Simpson",
     "October 27, 2014",
-    "https://davidwalsh.name/for-and-against-let",
+    "https://davidwalsh.name/for-and-against-let"
 );
 
 forAgainstLet.print();

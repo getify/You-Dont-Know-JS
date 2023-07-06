@@ -6,7 +6,7 @@
 
 ## 相等性练习
 
-让我们练习一下与值类型和比较的工作（第 4 章，重要组成 3），在这里需要涉及到强制类型转换。
+让我们练习一下与值类型和比较的工作（第四章，重要组成 3），在这里需要涉及到强制类型转换。
 
 `scheduleMeeting(..)` 应该接受一个开始时间（24 小时格式的字符串 "hh:mm"）和一个会议持续时间（分钟数）。如果会议完全在工作日内（根据 `dayStart` 和 `dayEnd` 中指定的时间），它应该返回 `true`；如果会议违反了工作日的范围，则返回 `false`。
 
@@ -31,7 +31,7 @@ scheduleMeeting("18:00", 15); // false
 
 ## 闭包练习
 
-现在我们来练习一下闭包（第 4 章，重要组成 1）。
+现在我们来练习一下闭包（第四章，重要组成 1）。
 
 `range(..)` 函数的第一个参数是一个数字，代表所需数字范围内的第一个数字。第二个参数也是一个数字，代表所需范围的终点（包括）。如果第二个参数被省略，那么应该返回另一个期望该参数的函数。
 
@@ -162,10 +162,10 @@ function scheduleMeeting(startTime, durationMinutes) {
         // (to make comparison easier)
         let meetingStart = `${meetingStartHour.padStart(
             2,
-            "0",
+            "0"
         )}:${meetingStartMinutes.padStart(2, "0")}`;
         let meetingEnd = `${String(meetingEndHour).padStart(2, "0")}:${String(
-            meetingEndMinutes,
+            meetingEndMinutes
         ).padStart(2, "0")}`;
 
         // NOTE: since expressions are all strings,
