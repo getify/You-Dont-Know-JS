@@ -5,7 +5,7 @@
 | :--- |
 | Work in progress |
 
-In Chapter 1 of the "Objects & Classes" book of this series, we confronted the common misconception that "everything in JS is an object". We now circle back to that topic, and again dispell that myth.
+In Chapter 1 of the "Objects & Classes" book of this series, we confronted the common misconception that "everything in JS is an object". We now circle back to that topic, and again dispel that myth.
 
 Here, we'll look at the core value types of JS, specifically the non-object types called *primitives*.
 
@@ -137,7 +137,7 @@ For a lot of JS, especially the code developers write, these two *nullish* value
 
 JS provides a number of capabilities for helping treat the two nullish values as indistinguishable.
 
-For example, the `==` (coercive-equality comparision) operator specifically treats `null` and `undefined` as coercively equal to each other, but to no other values in the language. As such, a `.. == null` check is safe to perform if you want to check if a value is specifically either `null` or `undefined`:
+For example, the `==` (coercive-equality comparison) operator specifically treats `null` and `undefined` as coercively equal to each other, but to no other values in the language. As such, a `.. == null` check is safe to perform if you want to check if a value is specifically either `null` or `undefined`:
 
 ```js
 if (greeting == null) {
@@ -596,7 +596,7 @@ parseInt("512px");                          // 512
 
 | NOTE: |
 | :--- |
-| Parsing is only relevant for string values, as it's a character-by-character (left-to-right) operation. It doesn't make sense to parse the contents of a `boolean`, nor to parse the contents of a `number` or a `null`; there's nothing to parse. If you pass anything other than a string value to `parseInt(..)` / `parseFloat(..)`, those utilties first convert that value to a string and then try to parse it. That's almost certainly problematic (leading to bugs) or wasteful -- `parseInt(42)` is silly, and `parseInt(42.3)` is an abuse of `parseInt(..)` to do the job of `Math.floor(..)`. |
+| Parsing is only relevant for string values, as it's a character-by-character (left-to-right) operation. It doesn't make sense to parse the contents of a `boolean`, nor to parse the contents of a `number` or a `null`; there's nothing to parse. If you pass anything other than a string value to `parseInt(..)` / `parseFloat(..)`, those utilities first convert that value to a string and then try to parse it. That's almost certainly problematic (leading to bugs) or wasteful -- `parseInt(42)` is silly, and `parseInt(42.3)` is an abuse of `parseInt(..)` to do the job of `Math.floor(..)`. |
 
 Parsing pulls out numeric-looking characters from the string value, and puts them into a `number` value, stopping once it encounters a character that's non-numeric (e.g., not `-`, `.` or `0`-`9`). If parsing fails on the first character, both utilities return the special `NaN` value (see "Invalid Number" below), indicating the operation was invalid and failed.
 
@@ -775,7 +775,7 @@ The number `42.0000001`, which is only different from `42.000000` by just `0.000
 00000000110101101011111110010101
 ```
 
-Notice how the previous bit pattern and this one differ by quite a few bits in the trailing positions! The binary decimal fraction containing all those extra `1` bits (`1.010100000000...01011111110010101`) converts to base-10 as `1.31250000312500003652`, which multipled by `32` gives us exactly `42.0000001`.
+Notice how the previous bit pattern and this one differ by quite a few bits in the trailing positions! The binary decimal fraction containing all those extra `1` bits (`1.010100000000...01011111110010101`) converts to base-10 as `1.31250000312500003652`, which multiplied by `32` gives us exactly `42.0000001`.
 
 We'll revisit more details about floating-point (im)precision in Chapter 2. But now you understand a *bit more* about how IEEE-754 works!
 
@@ -868,7 +868,7 @@ Depending on how you interpret "smallest", you could either answer `0` or... `Nu
 Number.MIN_SAFE_INTEGER;    // -9007199254740991
 ```
 
-And JS provides a utiltity to determine if a value is an integer in this safe range (`-2^53 + 1` - `2^53 - 1`):
+And JS provides a utility to determine if a value is an integer in this safe range (`-2^53 + 1` - `2^53 - 1`):
 
 ```js
 Number.isSafeInteger(2 ** 53);      // false
@@ -1098,7 +1098,7 @@ Object.defineProperty(myInfo,"__private_id_dont_touch",{
 });
 ```
 
-By convention only, most developers know that if a property name is prefixed with `_` (or even moreso, `__`!), that means it's "pseudo-private" and to leave it alone unless they're really supposed to access it.
+By convention only, most developers know that if a property name is prefixed with `_` (or even more so, `__`!), that means it's "pseudo-private" and to leave it alone unless they're really supposed to access it.
 
 Symbols basically serve the same use-case, but a bit more ergonomically than the prefixing approach.
 
