@@ -191,7 +191,7 @@ myList;                     // [ 23, 42, 109, empty x 11, "Hello" ]
 myList[9];                  // undefined
 ```
 
-You might wonder why empty slots are so bad? One reason: there are APIs in JS, like array's `map(..)`, where empty slots are suprisingly skipped over! Never, ever intentionally create empty slots in your arrays. This in undebateably one of JS's "bad parts".
+You might wonder why empty slots are so bad? One reason: there are APIs in JS, like array's `map(..)`, where empty slots are surprisingly skipped over! Never, ever intentionally create empty slots in your arrays. This in undebateably one of JS's "bad parts".
 
 ### Functions
 
@@ -339,7 +339,7 @@ Object.hasOwn(myObj,"favoriteNumber");   // true
 
 This form is now considered the more preferable and robust option, and the instance method (`hasOwnProperty(..)`) form should now generally be avoided.
 
-Somewhat unfortunately and inconsisently, there's not (yet, as of time of writing) corresponding static utilities, like `Object.isPrototype(..)` (instead of the instance method `isPrototypeOf(..)`). But at least `Object.hasOwn(..)` exists, so that's progress.
+Somewhat unfortunately and inconsistently, there's not (yet, as of time of writing) corresponding static utilities, like `Object.isPrototype(..)` (instead of the instance method `isPrototypeOf(..)`). But at least `Object.hasOwn(..)` exists, so that's progress.
 
 ### Creating An Object With A Different `[[Prototype]]`
 
