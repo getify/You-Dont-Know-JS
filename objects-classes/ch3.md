@@ -408,7 +408,7 @@ Take a few moments to re-read that code snippet and make sure you fully understa
 
 The base class `Point2d` defines fields (members) called `x` and `y`, and gives them the initial values `3` and `4`, respectively. It also defines a `getX()` method that accesses this `x` instance member and returns it. We see that behavior illustrated in the `point.getX()` method call.
 
-But the `Point3d` class extends `Point2d`, making `Point3d` a derived-class, child-class, or (most commonly) subclass. In `Point3d`, the same `x` property that's inherited from `Point2d` is re-initialized with a different `21` value, as is the `y` overriden to value from `4`, to `10`.
+But the `Point3d` class extends `Point2d`, making `Point3d` a derived-class, child-class, or (most commonly) subclass. In `Point3d`, the same `x` property that's inherited from `Point2d` is re-initialized with a different `21` value, as is the `y` overridden to value from `4`, to `10`.
 
 It also adds a new `z` field/member method, as well as a `printDoubleX()` method, which itself calls `this.getX()`.
 
@@ -452,7 +452,7 @@ point.printX();       // double x: 42
 
 The `Point3d` subclass overrides the inherited `getX()` method to give it different behavior. However, you can still instantiate the base `Point2d` class, which would then give an object that uses the original (`return this.x;`) definition for `getX()`.
 
-If you want to access an inherited method from a subclass even if it's been overriden, you can use `super` instead of `this`:
+If you want to access an inherited method from a subclass even if it's been overridden, you can use `super` instead of `this`:
 
 ```js
 class Point2d {
@@ -1001,7 +1001,7 @@ Point2d.samePoint(one,one);         // true
 Point3d.samePoint(one,one);         // true
 ```
 
-Actually, that shouldn't be that suprising, since:
+Actually, that shouldn't be that surprising, since:
 
 ```js
 Point2d.samePoint === Point3d.samePoint;

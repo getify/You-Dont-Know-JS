@@ -157,7 +157,7 @@ The expression `"x" + (21 * 2)`, which must appear inside of `[ .. ]` brackets, 
 
 ### Symbols As Property Names
 
-ES6 added a new primitive value type of `Symbol`, which is often used as a special property name for storing and retieving property values. They're created via the `Symbol(..)` function call (**without** the `new` keyword), which accepts an optional description string used only for friendlier debugging purposes; if specified, the description is inaccessible to the JS program and thus not used for any other purpose than debug output.
+ES6 added a new primitive value type of `Symbol`, which is often used as a special property name for storing and retrieving property values. They're created via the `Symbol(..)` function call (**without** the `new` keyword), which accepts an optional description string used only for friendlier debugging purposes; if specified, the description is inaccessible to the JS program and thus not used for any other purpose than debug output.
 
 ```js
 myPropSymbol = Symbol("optional, developer-friendly description");
@@ -197,7 +197,7 @@ anotherObj = {
 
 | NOTE: |
 | :--- |
-| That would have been the same thing as the quoted property name definition `"coolFact": coolFact`, but JS developers rarely quote property names unless strictly necessary. Indeed, it's idiomatic to avoid the quotes unless required, so it's discouraged to include them unneccessarily. |
+| That would have been the same thing as the quoted property name definition `"coolFact": coolFact`, but JS developers rarely quote property names unless strictly necessary. Indeed, it's idiomatic to avoid the quotes unless required, so it's discouraged to include them unnecessarily. |
 
 In this situation, where the property name and value expression identifier are identical, you can omit the property-name portion of the property definition, as a so-called "concise property" definition:
 
@@ -301,7 +301,7 @@ For deep object duplication, the standard approaches have been:
 
 2. Use the `JSON.parse(JSON.stringify(..))` round-trip trick -- this only "works" correctly if there are no circular references, and if there are no values in the object that cannot be properly serialized with JSON (such as functions).
 
-Recently, though, a third option has landed. This is not a JS feature, but rather a companion API provided to JS by environments like the web platform. Objects can be deep copied now using `structuredClone(..)`[^stucturedClone].
+Recently, though, a third option has landed. This is not a JS feature, but rather a companion API provided to JS by environments like the web platform. Objects can be deep copied now using `structuredClone(..)`[^structuredClone].
 
 ```js
 myObjCopy = structuredClone(myObj);
@@ -528,7 +528,7 @@ Note that `null` and `undefined` can be object-ified, by calling `Object(null)` 
 | :--- |
 | Boxing has a counterpart: unboxing. For example, the JS engine will take an object wrapper -- like a `Number` object wrapped around `42` -- created with `Number(42)` or `Object(42)` -- and unwrap it to retrieve the underlying primitive `42`, whenever a mathematical operation (like `*` or `-`) encounters such an object. Unboxing behavior is way out of scope for our discussion, but is covered fully in the aforementioned "Types & Grammar" title. |
 
-## Assiging Properties
+## Assigning Properties
 
 Whether a property is defined at the time of object literal definition, or added later, the assignment of a property value is done with the `=` operator, as any other normal assignment would be:
 
@@ -648,7 +648,7 @@ But what if we wanted to get *all* the keys in an object (enumerable or not)? `O
 
 Yet as we've implied several times already, and will cover in full detail in the next chapter, an object can also "inherit" contents from its `[[Prototype]]` chain. These are not considered *owned* contents, so they won't show up in any of these lists.
 
-Recall that the `in` operator will potentially traverse the entire chain looking for the existence of a property. Similarly, a `for..in` loop will traverse the chain and list any enumerable (owned or inhertied) properties. But there's no built-in API that will traverse the whole chain and return a list of the combined set of both *owned* and *inherited* contents.
+Recall that the `in` operator will potentially traverse the entire chain looking for the existence of a property. Similarly, a `for..in` loop will traverse the chain and list any enumerable (owned or inherited) properties. But there's no built-in API that will traverse the whole chain and return a list of the combined set of both *owned* and *inherited* contents.
 
 ## Temporary Containers
 
@@ -701,7 +701,7 @@ The most common usage of objects is as containers for multiple values. We create
 * defining properties (named locations), either at object creation time or later
 * assigning values, either at object creation time or later
 * accessing values later, using the location names (property names)
-* deleteing properties via `delete`
+* deleting properties via `delete`
 * determining container contents with `in`, `hasOwnProperty(..)` / `hasOwn(..)`, `Object.entries(..)` / `Object.keys(..)`, etc
 
 But there's a lot more to objects than just static collections of property names and values. In the next chapter, we'll dive under the hood to look at how they actually work.

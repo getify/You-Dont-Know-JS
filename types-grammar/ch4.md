@@ -5,7 +5,7 @@
 | :--- |
 | Work in progress |
 
-We've thouroughly covered all of the different *types* of values in JS. And along the way, more than a few times, we mentioned the notion of converting -- actually, coercing -- from one type of value to another.
+We've thoroughly covered all of the different *types* of values in JS. And along the way, more than a few times, we mentioned the notion of converting -- actually, coercing -- from one type of value to another.
 
 In this chapter, we'll dive deep into coercion and uncover all its mysteries.
 
@@ -29,7 +29,7 @@ In fact, I think you'd be hard pressed to name hardly any other well-known sourc
 
 However, here's an observation I've made over the years: most of the folks who publicly condemn *implicit coercion*, actually use *implicit coercion* in their own code. Hmmmm...
 
-Douglas Crockford says to avoid the mistake of *implicit coercion*[^CrockfordCoercion], but his code uses `if (..)` statements with non-boolean values evaluated. [^CrockfordIfs] Many have dismissed my pointing that out in the past, with the claim that conversion-to-booelan isn't *really* coercion. Ummm... ok?
+Douglas Crockford says to avoid the mistake of *implicit coercion*[^CrockfordCoercion], but his code uses `if (..)` statements with non-boolean values evaluated. [^CrockfordIfs] Many have dismissed my pointing that out in the past, with the claim that conversion-to-boolean isn't *really* coercion. Ummm... ok?
 
 Brendan Eich says he regrets *implicit coercion*, but yet he openly endorses[^BrendanToString] idioms like `x + ""` (and others!) to coerce the value in `x` to a string (we'll cover this later); and that's most definitely an *implicit coercion*.
 
@@ -341,7 +341,7 @@ The steps of the *coercive equality* portion of the algorithm can roughly be sum
 
 Each time a coercion is performed in the above steps, the algorithm is *recursively* reactivated with the new value(s). That process continues until the types are the same, and then the comparison is delegated to the `IsStrictlyEqual()` operation.
 
-What can we take from this algorithm? First, we see there is a bias toward `number` (or `bigint`) comparison; it nevers coerce values to `string` or `boolean` value-types.
+What can we take from this algorithm? First, we see there is a bias toward `number` (or `bigint`) comparison; it never coerce values to `string` or `boolean` value-types.
 
 Importantly, we see that both `IsLooselyEqual()` and `IsStrictlyEqual()` are type-sensitive. `IsStrictlyEqual()` immediately bails if the types mismatch, whereas `IsLooselyEqual()` performs the extra work to coerce mismatching value-types to be the same value-types (again, ideally, `number` or `bigint`).
 
@@ -450,7 +450,7 @@ So... which of the two, `Boolean(..)` or `!!`, do you consider to be more of an 
 
 Given the flipping that `!` does, which must then be undone with another `!`, I'd say `Boolean(..)` is *more* explicit -- at the job of coercing a non-`boolean` to a `boolean` -- than `!!` is. But surveying open-source JS code, the `!!` is used far more often.
 
-If we're defining *explicit* as, "most directly and obviously perfoming an action", `Boolean(..)` edges out `!!`. But if we're defining *explicit* as, "most recognizably performing an action", `!!` might have the edge. Is there a definitive answer here?
+If we're defining *explicit* as, "most directly and obviously performing an action", `Boolean(..)` edges out `!!`. But if we're defining *explicit* as, "most recognizably performing an action", `!!` might have the edge. Is there a definitive answer here?
 
 While you're pondering that question, let's look at another JS mechanism that activates `ToBoolean()` under the covers:
 
@@ -684,7 +684,7 @@ Similar to how `x + ""` is an idiom for coercing `x` to a string, an expression 
 
 | WARNING: |
 | :--- |
-| `x + 0` isn't quite as safe, since the `+` operator is overloaded to perform string concatenation if either operand is already a string. The `-` minus operator isn't overloaded like that, so the only coercion will be to `number`. Of course, `x * 1`, `x / 1`, and even `x ** 1` would also generally be equivalent mathematicaly, but those are much less common, and probably should be avoided as likely confusing to readers of your code. Even `x % 1` seems like it should be safe, but it can introduce floating-point skew (see "Floating Point Imprecision" in Chapter 2). |
+| `x + 0` isn't quite as safe, since the `+` operator is overloaded to perform string concatenation if either operand is already a string. The `-` minus operator isn't overloaded like that, so the only coercion will be to `number`. Of course, `x * 1`, `x / 1`, and even `x ** 1` would also generally be equivalent mathematically, but those are much less common, and probably should be avoided as likely confusing to readers of your code. Even `x % 1` seems like it should be safe, but it can introduce floating-point skew (see "Floating Point Imprecision" in Chapter 2). |
 
 Regardless of what mathematical operator is used, if the coercion fails, a `NaN` is the result, and all of these operators will propagate the `NaN` out as their result.
 
@@ -1021,7 +1021,7 @@ spyObject5c.toString();
 
 `Symbol.toStringTag` is intended to define a custom string value to describe the object whenever its default `toString()` operation is invoked directly, or implicitly via coercion; in its absence, the value used is `"Object"` in the common `"[object Object]"` output.
 
-The `get ..` syntax in `spyObject5c` is defining a *getter*. That means when JS tries to access this `Symbol.toStringTag` as a property (as normal), this gettter code instead causes the function we specify to be invoked to compute the result. We can run any arbitrary logic inside this getter to dynamically determine a string *tag* for use by the default `toString()` method.
+The `get ..` syntax in `spyObject5c` is defining a *getter*. That means when JS tries to access this `Symbol.toStringTag` as a property (as normal), this getter code instead causes the function we specify to be invoked to compute the result. We can run any arbitrary logic inside this getter to dynamically determine a string *tag* for use by the default `toString()` method.
 
 #### Overriding `ToPrimitive`
 
@@ -1151,7 +1151,7 @@ Now, recall and review the steps discussed earlier in the chapter for the `IsLoo
     Here, the `"42"` string is coerced to a `42` number (not vice versa), and thus the comparison is then `42 == 42`, and must clearly return `true`.
 
 
-Armed with this knowledge, we'll now dispell the common myth that only `===` checks the type and value, while `==` checks only the value. Not true!
+Armed with this knowledge, we'll now dispel the common myth that only `===` checks the type and value, while `==` checks only the value. Not true!
 
 In fact, `==` and `===` are both type-sensitive, each checking the types of their operands. The `==` operator allows coercion of mismatched types, whereas `===` disallows any coercion.
 
@@ -1538,7 +1538,7 @@ versionDigit = API_BASE_URL.match(/\/api\/(\d+)$/)[1];
 APIVersion = Number(versionDigit);
 ```
 
-I know that `API_BASE_URL` is a string, and I further know the format of its contents includes `".../api/{digits}"` at the end. That lets me know that the regular expression match will succeed, so the `[1]` array accesss is type-safe.
+I know that `API_BASE_URL` is a string, and I further know the format of its contents includes `".../api/{digits}"` at the end. That lets me know that the regular expression match will succeed, so the `[1]` array access is type-safe.
 
 I also know that `versionDigit` will hold a string, because that's what regular-expression matches return. Now, I know it's safe to coerce that numeric-digit string into a number with `Number(..)`.
 
@@ -1617,7 +1617,7 @@ Yes, I hear you screaming at me through the computer screen. Yes, I know that Ty
 
 But I'm arguing that even *those* don't, in and of themselves, make you more type-aware as a developer
 
-Why? Because type-awareness is *not* just about the authoring experience. It's also about the reading experience, maybe even moreso. And not all places/mechanisms where code is read, have access to benefit from all the extra intelligence.
+Why? Because type-awareness is *not* just about the authoring experience. It's also about the reading experience, maybe even more so. And not all places/mechanisms where code is read, have access to benefit from all the extra intelligence.
 
 Look, the magic of a language-server pumping intelligence into your code editor is unquestionably amazing. It's cool and super helpful.
 
@@ -1631,7 +1631,7 @@ These tools don't catch every type error that can happen, no matter how much we 
 
 Moreover, no such tool is immune to false positives, complaining about things which aren't actually errors; these tools will never be as smart as we are as humans. You're really wasting your time in chasing down some quirky syntax trick to quite down the tool's complaints.
 
-There's just no subsitute, if you want to truly be a type-aware code-author and code-reader, from learning how the language's built-in type systems work. And yes, that means every single developer on your team needs to spend the efforts to learn it. You can't water this stuff down just to be more attainable for less experienced developers on the project/team.
+There's just no substitute, if you want to truly be a type-aware code-author and code-reader, from learning how the language's built-in type systems work. And yes, that means every single developer on your team needs to spend the efforts to learn it. You can't water this stuff down just to be more attainable for less experienced developers on the project/team.
 
 Even if we granted that you could avoid 100% of all *implicit* coercions -- you can't -- you are absolutely going to face the need to *explicit* coercions -- all programs do!
 
