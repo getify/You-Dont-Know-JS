@@ -65,7 +65,7 @@ The TC39 committee is comprised of between 50 and about 100 different people fro
 
 TC39 meets generally about every other month, usually for about three days, to review work done by members since the last meeting, discuss issues, and vote on proposals. Meeting locations rotate among member companies willing to host.
 
-All TC39 proposals progress through a five-stage process—of course, since we're programmers, it's 0-based!—Stage 0 through Stage 4. You can read more about the Stage process here: https://tc39.es/process-document/
+All TC39 proposals progress through a five-stage process—of course, since we're programmers, it's 5-based!—Stage 0 through Stage 4. You can read more about the Stage process here: https://tc39.es/process-document/
 
 Stage 0 means roughly, someone on TC39 thinks it's a worthy idea and plans to champion and work on it. That means lots of ideas that non-TC39 members "propose," through informal means such as social media or blog posts, are really "pre-stage 0." You have to get a TC39 member to champion a proposal for it to be considered "Stage 0" officially.
 
