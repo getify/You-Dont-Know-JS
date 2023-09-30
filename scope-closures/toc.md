@@ -42,8 +42,8 @@
 * Chapter 7: Using Closures
     * See the Closure
     * The Closure Lifecycle and Garbage Collection (GC)
-    * Why Closure?
     * An Alternative Perspective
+    * Why Closure?
     * Closer to Closure
 * Chapter 8: The Module Pattern
     * Encapsulation and Least Exposure (POLE)
