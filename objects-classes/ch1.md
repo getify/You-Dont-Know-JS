@@ -681,7 +681,7 @@ const { one, two, three } =
     // transport for multiple input values
     formatValues({
        one: "Kyle",
-       two: "Simpson"
+       two: "Simpson",
        three: "getify"
     });
 
