@@ -1,6 +1,6 @@
-# 你不知道的 JavaScript：入门 - 第二版
+# 你并不了解 JavaScript：入门 - 第二版
 
-<img src="images/cover.png" width="300">
+<img src="./images/cover.png" width="300">
 
 ---
 
@@ -14,7 +14,7 @@
 -   [序](../preface.md)
 -   [第一章：什么是 JavaScript？](ch1.md)
 -   [第二章：JS 概观](ch2.md)
--   [第三章：JS 寻根究底](ch3.md)
--   [第四章：前景展望](ch4.md)
--   [附录 A：进一步的探索](apA.md)
--   [附录 B：练习、练习、再练习！](apB.md)
+-   [第三章：寻根究底](ch3.md)
+-   [第四章：大局观](ch4.md)
+-   [附录 A：欲穷千里目，更上一层楼](apA.md)
+-   [附录 B：温故而知新](apB.md)

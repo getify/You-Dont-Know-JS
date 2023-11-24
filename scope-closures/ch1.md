@@ -1,89 +1,90 @@
-# You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 1: What's the Scope?
+# 你并不了解 JavaScript：作用域与闭包 - 第二版
 
-By the time you've written your first few programs, you're likely getting somewhat comfortable with creating variables and storing values in them. Working with variables is one of the most foundational things we do in programming!
+# 第一章：什么是作用域？
 
-But you may not have considered very closely the underlying mechanisms used by the engine to organize and manage these variables. I don't mean how the memory is allocated on the computer, but rather: how does JS know which variables are accessible by any given statement, and how does it handle two variables of the same name?
+当你编写了最初的几个程序后，你可能会对创建变量并在其中存储值感到有些得心应手了。使用变量是我们编程中最基础的工作之一！
 
-The answers to questions like these take the form of well-defined rules called scope. This book will dig through all aspects of scope—how it works, what it's useful for, gotchas to avoid—and then point toward common scope patterns that guide the structure of programs.
+但你可能没有仔细考虑过引擎用来组织和管理这些变量的底层机制。我指的不是内存在计算机上是如何分配的，而是 JS 是如何知道任何给定语句可以访问哪些变量的，以及如何处理两个同名变量？
 
-Our first step is to uncover how the JS engine processes our program **before** it runs.
+类似这些问题的答案都以明确的规则定义形式出现，这些规则被称为作用域。本书将深入探讨作用域的方方面面：它是如何工作的、有什么用处、要避免哪些麻烦，然后列出程序结构的常见作用域模式。
 
-## About This Book
+我们的第一步是揭示 JS 引擎如何在程序运行**之前**处理我们的程序的。
 
-Welcome to book 2 in the *You Don't Know JS Yet* series! If you already finished *Get Started* (the first book), you're in the right spot! If not, before you proceed I encourage you to *start there* for the best foundation.
+## 关于本书
 
-Our focus will be the first of three pillars in the JS language: the scope system and its function closures, as well as the power of the module design pattern.
+欢迎阅读《你并不了解 JavaScript》系列第二部！如果你已经读完了*入门*（第一册），那你就来对地方了！如果没有，在继续阅读之前，我建议您*从入门开始*，以便打下最好的基础。
 
-JS is typically classified as an interpreted scripting language, so it's assumed by most that JS programs are processed in a single, top-down pass. But JS is in fact parsed/compiled in a separate phase **before execution begins**. The code author's decisions on where to place variables, functions, and blocks with respect to each other are analyzed according to the rules of scope, during the initial parsing/compilation phase. The resulting scope structure is generally unaffected by runtime conditions.
+我们将重点关注 JS 语言三大支柱中的第一支柱：作用域系统及其函数闭包，以及模块设计模式的强大功能。
 
-JS functions are themselves first-class values; they can be assigned and passed around just like numbers or strings. But since these functions hold and access variables, they maintain their original scope no matter where in the program the functions are eventually executed. This is called closure.
+JS 通常被归类为解释型脚本语言，因此大多数人都认为 JS 程序是自上而下一次性处理的。但事实上，JS 是在**开始执行**前的一个单独阶段进行解析/编译的。在初始解析/编译阶段，代码编写者会根据作用域规则分析变量、函数和代码块之间的位置关系。由此产生的作用域结构一般不受运行时条件的影响。
 
-Modules are a code organization pattern characterized by public methods that have privileged access (via closure) to hidden variables and functions in the internal scope of the module.
+JS 函数本身就是[头等公民](https://developer.mozilla.org/zh-CN/docs/Glossary/First-class_Function)；它们可以像数字或字符串一样被赋值和传递。并且，由于这些函数持有和访问变量，因此无论函数最终在程序中的哪个位置执行，它们都能保持原有的作用域。这就是所谓的闭包。
 
-## Compiled vs. Interpreted
+模块是一种代码组织模式，其特点是公共方法具有访问模块内部隐藏变量和函数的权限（通过闭包）。
 
-You may have heard of *code compilation* before, but perhaps it seems like a mysterious black box where source code slides in one end and executable programs pop out the other.
+## 编译型与解释型
 
-It's not mysterious or magical, though. Code compilation is a set of steps that process the text of your code and turn it into a list of instructions the computer can understand. Typically, the whole source code is transformed at once, and those resulting instructions are saved as output (usually in a file) that can later be executed.
+您可能听说过*代码编译*，但它就像一个神秘的黑盒子，源代码从一端滑入，可执行程序从另一端弹出。
 
-You also may have heard that code can be *interpreted*, so how is that different from being *compiled*?
+不过，这并非神秘莫测。代码编译是处理代码文本并将其转化为计算机可以理解的指令列表的一系列步骤。通常情况下，整个源代码会被一次性转换，而这些转换后的指令会被保存为输出（通常是文件），然后就可以被执行。
 
-Interpretation performs a similar task to compilation, in that it transforms your program into machine-understandable instructions. But the processing model is different. Unlike a program being compiled all at once, with interpretation the source code is transformed line by line; each line or statement is executed before immediately proceeding to processing the next line of the source code.
+您可能还听说过代码可以*解释*，那么这与*编译*有什么区别呢？
+
+解释执行的任务与编译类似，都是将程序转化为机器可理解的指令。但处理模式不同。与一次性编译程序不同，解释程序是逐行转换源代码；每一行或每一条语句都要先执行，然后才立即处理下一行源代码。
 
 <figure>
-    <img src="images/fig1.png" width="650" alt="Code Compilation and Code Interpretation" align="center">
-    <figcaption><em>Fig. 1: Compiled vs. Interpreted Code</em></figcaption>
+    <img src="./images/fig1.png" width="650" alt="Code Compilation and Code Interpretation" align="center">
+    <figcaption><em>图 1：编译代码与解释代码</em></figcaption>
     <br><br>
 </figure>
 
-Figure 1 illustrates compilation vs. interpretation of programs.
+图 1 说明了程序的编译与解释。
 
-Are these two processing models mutually exclusive? Generally, yes. However, the issue is more nuanced, because interpretation can actually take other forms than just operating line by line on source code text. Modern JS engines actually employ numerous variations of both compilation and interpretation in the handling of JS programs.
+这两种处理模式相互排斥吗？一般来说，是的。不过，这个问题更加微妙的是解释代码实际上可以采取其他形式，而不仅仅是逐行操作源代码文本。现代 JS 引擎在处理 JS 程序时，实际上采用了编译和解释的多种变体。
 
-Recall that we surveyed this topic in Chapter 1 of the *Get Started* book. Our conclusion there is that JS is most accurately portrayed as a **compiled language**. For the benefit of readers here, the following sections will revisit and expand on that assertion.
+记得我们在《入门》一书的第 1 章中讨论过这个话题。我们的结论是，JS 最准确的描述是一种**编译语言**。为了读者的利益，以下章节将重新讨论并扩展这一论断。
 
-## Compiling Code
+## 编译代码
 
-But first, why does it even matter whether JS is compiled or not?
+但首先，JS 是否编译又有什么关系呢？
 
-Scope is primarily determined during compilation, so understanding how compilation and execution relate is key in mastering scope.
+作用域主要是在编译过程中确定的，因此了解编译和执行之间的关系是掌握作用域的关键。
 
-In classic compiler theory, a program is processed by a compiler in three basic stages:
+根据经典的编译器理论，编译器对程序的处理分为三个基本阶段：
 
-1. **Tokenizing/Lexing:** breaking up a string of characters into meaningful (to the language) chunks, called tokens. For instance, consider the program: `var a = 2;`. This program would likely be broken up into the following tokens: `var`, `a`, `=`, `2`, and `;`. Whitespace may or may not be persisted as a token, depending on whether it's meaningful or not.
+1. **标记化/词法：** 将字符串分解成有意义的（对语言而言）块，称为标记。例如，请看下面的程序 `var a = 2;`。这个程序可能会被分解成以下标记：`var`、`a`、`=`、`2`和`;`。空白可以作为一个标记，也可以不作为一个标记，这取决于它是否有意义。
 
-    (The difference between tokenizing and lexing is subtle and academic, but it centers on whether or not these tokens are identified in a *stateless* or *stateful* way. Put simply, if the tokenizer were to invoke stateful parsing rules to figure out whether `a` should be considered a distinct token or just part of another token, *that* would be **lexing**.)
+    (标记化和词法之间的区别是微妙的、学术性的，但其核心在于这些标记是以*无状态*还是*有状态*的方式识别的。简单地说，如果标记化器调用有状态的解析规则来确定 `a` 应该被视为一个独立的标记，还是只是另一个标记的一部分，那就是**词法**）。
 
-2. **Parsing:** taking a stream (array) of tokens and turning it into a tree of nested elements, which collectively represent the grammatical structure of the program. This is called an Abstract Syntax Tree (AST).
+2. **解析：** 获取标记流（数组）并将其转化为嵌套元素树，这些嵌套元素共同代表了程序的语法结构。这就是所谓的抽象语法树 (AST)。
 
-    For example, the tree for `var a = 2;` might start with a top-level node called `VariableDeclaration`, with a child node called `Identifier` (whose value is `a`), and another child called `AssignmentExpression` which itself has a child called `NumericLiteral` (whose value is `2`).
+    例如 `var a = 2;` 的语法树可能以一个名为 `VariableDeclaration` 的顶层节点开始，它有一个名为 `Identifier` 的子节点（其值为 `a`）和另一个名为 `AssignmentExpression` 的子节点（其本身有一个名为 `NumericLiteral` 的子节点（其值为 `2`）。
 
-3. **Code Generation:** taking an AST and turning it into executable code. This part varies greatly depending on the language, the platform it's targeting, and other factors.
+3. **代码生成：** 提取 AST 并将其转化为可执行代码。这部分因语言、目标平台和其他因素的不同而有很大差异。
 
-    The JS engine takes the just described AST for `var a = 2;` and turns it into a set of machine instructions to actually *create* a variable called `a` (including reserving memory, etc.), and then store a value into `a`.
+    JS 引擎将刚才描述的 AST 中的 `var a = 2;` 转化为一组机器指令，以实际*创建*一个名为 `a` 的变量（包括预留内存等），然后将一个值存储到 `a` 中。
 
-| NOTE: |
-| :--- |
-| The implementation details of a JS engine (utilizing system memory resources, etc.) is much deeper than we will dig here. We'll keep our focus on the observable behavior of our programs and let the JS engine manage those deeper system-level abstractions. |
+| 注意：                                                                                                                                          |
+| :---------------------------------------------------------------------------------------------------------------------------------------------- |
+| JS 引擎的实现细节（利用系统内存资源等）远比我们在此讨论的要深入得多。我们将继续关注程序的可观察行为，让 JS 引擎来管理这些更深层次的系统级抽象。 |
 
-The JS engine is vastly more complex than *just* these three stages. In the process of parsing and code generation, there are steps to optimize the performance of the execution (i.e., collapsing redundant elements). In fact, code can even be re-compiled and re-optimized during the progression of execution.
+JS 引擎*远比*这三个阶段复杂得多。在解析和代码生成的过程中，还有一些优化执行性能的步骤（即折叠冗余元素）。事实上，代码甚至可以在执行过程中重新编译和优化。
 
-So, I'm painting only with broad strokes here. But you'll see shortly why *these* details we *do* cover, even at a high level, are relevant.
+所以，我在这里只是粗略地描述一下。但你很快就会明白，为什么我们涉及的*这些细节*，即使是高层次的，也是相关的。
 
-JS engines don't have the luxury of an abundance of time to perform their work and optimizations, because JS compilation doesn't happen in a build step ahead of time, as with other languages. It usually must happen in mere microseconds (or less!) right before the code is executed. To ensure the fastest performance under these constraints, JS engines use all kinds of tricks (like JITs, which lazy compile and even hot re-compile); these are well beyond the "scope" of our discussion here.
+JS 引擎没有充裕的时间来进行工作和优化，因为 JS 编译不像其他语言那样在构建步骤中提前进行。编译通常必须在代码执行前的几微秒（或更短时间）内完成。为了确保在这些限制条件下实现最快的性能，JS 引擎使用了各种技巧（如 JIT、懒编译甚至热重新编译）；这些远远超出了我们在此讨论的「作用域」。
 
-### Required: Two Phases
+### 必经的两个阶段
 
-To state it as simply as possible, the most important observation we can make about processing of JS programs is that it occurs in (at least) two phases: parsing/compilation first, then execution.
+尽可能简单地说，我们对 JS 程序处理的最重要看法是，它（至少）分为两个阶段：首先是解析/编译，然后是执行。
 
-The separation of a parsing/compilation phase from the subsequent execution phase is observable fact, not theory or opinion. While the JS specification does not require "compilation" explicitly, it requires behavior that is essentially only practical with a compile-then-execute approach.
+解析/编译阶段与后续执行阶段的分离是可以观察到的事实，而不是理论或观点。虽然 JS 规范并没有明确要求「编译」，但它所要求的行为基本上只有编译-执行方法才切实可行。
 
-There are three program characteristics you can observe to prove this to yourself: syntax errors, early errors, and hoisting.
+您可以通过观察以下三个程序特征来证明这一点：语法错误、早期错误和变量提升。
 
-#### Syntax Errors from the Start
+#### 从一开始就出现语法错误
 
-Consider this program:
+思考一下这个程序：
 
 ```js
 var greeting = "Hello";
@@ -94,46 +95,46 @@ greeting = ."Hi";
 // SyntaxError: unexpected token .
 ```
 
-This program produces no output (`"Hello"` is not printed), but instead throws a `SyntaxError` about the unexpected `.` token right before the `"Hi"` string. Since the syntax error happens after the well-formed `console.log(..)` statement, if JS was executing top-down line by line, one would expect the `"Hello"` message being printed before the syntax error being thrown. That doesn't happen.
+该程序不会有任何输出（`"Hello"` 不会被打印），而是会抛出一个 `SyntaxError`，原因是在 `"Hi"` 字符串之前出现了一个意外的 `.` 标记。你可能认为语法错误发生在语法没问题的 `console.log(..)` 语句之后，如果 JS 是自上而下逐行执行的，那么在抛出语法错误之前就会打印出 `"Hello"` 消息。但事实并非如此。
 
-In fact, the only way the JS engine could know about the syntax error on the third line, before executing the first and second lines, is by the JS engine first parsing the entire program before any of it is executed.
+事实上，在执行第一行和第二行之前，JS 引擎要想知道第三行的语法错误，唯一的办法就是在执行任何程序之前先解析整个程序。
 
-#### Early Errors
+#### 早期错误
 
-Next, consider:
+下一个思考：
 
 ```js
 console.log("Howdy");
 
-saySomething("Hello","Hi");
+saySomething("Hello", "Hi");
 // Uncaught SyntaxError: Duplicate parameter name not
 // allowed in this context
 
-function saySomething(greeting,greeting) {
+function saySomething(greeting, greeting) {
     "use strict";
     console.log(greeting);
 }
 ```
 
-The `"Howdy"` message is not printed, despite being a well-formed statement.
+尽管 `"Howdy"` 信息是一个格式良好的语句，但却没有打印出来。
 
-Instead, just like the snippet in the previous section, the `SyntaxError` here is thrown before the program is executed. In this case, it's because strict-mode (opted in for only the `saySomething(..)` function here) forbids, among many other things, functions to have duplicate parameter names; this has always been allowed in non-strict-mode.
+相反，就像上一节中的代码段一样，这里的 `SyntaxError` 会在程序执行前被抛出。在这种情况下，这是因为严格模式（此处只特指 `saySomething(..)` 函数）禁止函数有重复的参数名，而在非严格模式下，这一直是允许的。
 
-The error thrown is not a syntax error in the sense of being a malformed string of tokens (like `."Hi"` prior), but in strict-mode is nonetheless required by the specification to be thrown as an "early error" before any execution begins.
+抛出的错误并不是语法错误，也不是畸形的标记串（如之前的 `. "Hi"`），但在严格模式下，规范要求在开始执行前作为「早期错误」抛出。
 
-But how does the JS engine know that the `greeting` parameter has been duplicated? How does it know that the `saySomething(..)` function is even in strict-mode while processing the parameter list (the `"use strict"` pragma appears only later, in the function body)?
+但是，JS 引擎如何知道 `greeting` 参数被重复使用了呢？在处理参数列表时，它如何知道 `saySomething(..)` 函数处于严格模式的呢（ `"use strict"` 只出现在后面的函数里）？
 
-Again, the only reasonable explanation is that the code must first be *fully* parsed before any execution occurs.
+再次说明，唯一合理的解释是，在执行任何代码之前，必须先对代码进行*完整*的解析。
 
-#### Hoisting
+#### 变量提升
 
-Finally, consider:
+最终思考：
 
 ```js
 function saySomething() {
     var greeting = "Hello";
     {
-        greeting = "Howdy";  // error comes from here
+        greeting = "Howdy"; // 错误来自这里
         let greeting = "Hi";
         console.log(greeting);
     }
@@ -144,40 +145,40 @@ saySomething();
 // initialization
 ```
 
-The noted `ReferenceError` occurs from the line with the statement `greeting = "Howdy"`. What's happening is that the `greeting` variable for that statement belongs to the declaration on the next line, `let greeting = "Hi"`, rather than to the previous `var greeting = "Hello"` statement.
+注意到的 `ReferenceError` 出现在语句 `greeting = "Howdy"`的那一行。发生这种情况的原因是，该语句的 `greeting` 变量属于下一行的声明 `let greeting = "Hi"`，而不是前一条语句 `var greeting = "Hello"`。
 
-The only way the JS engine could know, at the line where the error is thrown, that the *next statement* would declare a block-scoped variable of the same name (`greeting`) is if the JS engine had already processed this code in an earlier pass, and already set up all the scopes and their variable associations. This processing of scopes and declarations can only accurately be accomplished by parsing the program before execution.
+JS 引擎要想知道*下一条语句*将声明一个同名的块作用域变量（`greeting`）会出错，唯一的办法就是 JS 引擎已经在之前处理过这段代码，并设置了所有作用域及其变量关联。只有在执行前解析程序，才能准确地完成作用域和声明的处理。
 
-The `ReferenceError` here technically comes from `greeting = "Howdy"` accessing the `greeting` variable **too early**, a conflict referred to as the Temporal Dead Zone (TDZ). Chapter 5 will cover this in more detail.
+这里的 `ReferenceError` 从技术上讲是由于 `greeting = "Howdy"` **过早**访问了 `greeting` 变量，这种冲突被称为暂时性死区 (TDZ)。第 5 章将对此进行详细介绍。
 
-| WARNING: |
-| :--- |
-| It's often asserted that `let` and `const` declarations are not hoisted, as an explanation of the TDZ behavior just illustrated. But this is not accurate. We'll come back and explain both the hoisting and TDZ of `let`/`const` in Chapter 5. |
+| 警告：                                                                                                                                                     |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 人们经常断言，`let` 和 `const` 声明不会导致变量提升，这是对 TDZ 行为的一种解释。但这种说法并不准确。我们将在第 5 章中解释 `let`/`const` 的变量提升和 TDZ。 |
 
-Hopefully you're now convinced that JS programs are parsed before any execution begins. But does it prove they are compiled?
+希望你现在已经确信，JS 程序在开始执行之前是经过解析的。但这能证明它们是经过编译的吗？
 
-This is an interesting question to ponder. Could JS parse a program, but then execute that program by *interpreting* operations represented in the AST **without** first compiling the program? Yes, that is *possible*. But it's extremely unlikely, mostly because it would be extremely inefficient performance wise.
+这是一个值得思考的有趣问题。JS 能否解析一个程序，然后通过**解释** AST 中的操作来执行该程序，而**不需要**首先编译该程序？是的，这是*可行的*。但可能性极小，主要是因为这样做的性能效率极低。
 
-It's hard to imagine a production-quality JS engine going to all the trouble of parsing a program into an AST, but not then converting (aka, "compiling") that AST into the most efficient (binary) representation for the engine to then execute.
+很难想象一个高质量的 JS 引擎会费尽心思将程序解析成 AST，但却不将 AST 转换（又称「编译」）成最有效的（二进制）表示形式供引擎执行。
 
-Many have endeavored to split hairs with this terminology, as there's plenty of nuance and "well, actually..." interjections floating around. But in spirit and in practice, what the engine is doing in processing JS programs is **much more alike compilation** than not.
+许多人都在努力对这一术语进行区分，因为其中有许多细微差别和「实际上......」的插话。但无论在精神上还是在实践中，引擎在处理 JS 程序时所做的工作**更像是编译**但非编译。
 
-Classifying JS as a compiled language is not concerned with the distribution model for its binary (or byte-code) executable representations, but rather in keeping a clear distinction in our minds about the phase where JS code is processed and analyzed; this phase observably and indisputedly happens *before* the code starts to be executed.
+将 JS 归类为编译语言并不涉及其二进制（或字节码）可执行表示的分发模式，而是要在我们的头脑中保持对 JS 代码处理和分析阶段的明确区分；这一阶段在代码开始执行*之前*就已发生，这是可以观察到的，也是无可争议的。
 
-We need proper mental models of how the JS engine treats our code if we want to understand JS and scope effectively.
+如果我们想有效地理解 JS 和作用域，就需要对 JS 引擎如何处理我们的代码建立正确的心智模型。
 
-## Compiler Speak
+## 编译器说
 
-With awareness of the two-phase processing of a JS program (compile, then execute), let's turn our attention to how the JS engine identifies variables and determines the scopes of a program as it is compiled.
+了解了 JS 程序的两阶段处理过程（编译，然后执行）后，我们再来看看 JS 引擎在编译程序时是如何识别变量和确定程序作用域的。
 
-First, let's examine a simple JS program to use for analysis over the next several chapters:
+首先，让我们研究一个简单的 JS 程序，用于接下来几章的分析：
 
 ```js
 var students = [
     { id: 14, name: "Kyle" },
     { id: 73, name: "Suzy" },
     { id: 112, name: "Frank" },
-    { id: 6, name: "Sarah" }
+    { id: 6, name: "Sarah" },
 ];
 
 function getStudentName(studentID) {
@@ -194,116 +195,116 @@ console.log(nextStudent);
 // Suzy
 ```
 
-Other than declarations, all occurrences of variables/identifiers in a program serve in one of two "roles": either they're the *target* of an assignment or they're the *source* of a value.
+除声明外，程序中出现的所有变量/标识符都有两种「角色」：要么是赋值的*目标*，要么是值的*来源*。
 
-(When I first learned compiler theory while earning my computer science degree, we were taught the terms "LHS" (aka, *target*) and "RHS" (aka, *source*) for these roles, respectively. As you might guess from the "L" and the "R", the acronyms mean "Left-Hand Side" and "Right-Hand Side", as in left and right sides of an `=` assignment operator. However, assignment targets and sources don't always literally appear on the left or right of an `=`, so it's probably clearer to think in terms of *target* / *source* rather than *left* / *right*.)
+(我在攻读计算机科学学位时第一次学习编译器理论，当时我们学习的术语 "LHS"（又称*目标*）和 "RHS"（又称*源*）分别表示这些角色。正如你可能从 "L" 和 "R" 中猜到的，这两个缩写词的意思是左手边 ("Left-Hand Side") 和右手边 ("Right-Hand Side")，就像 `=` 赋值运算符的左侧和右侧。不过，赋值目标和赋值源并不总是出现在 `=` 的左侧或右侧，所以用*目标*/*源*而不是*左*/*右*来表示可能更清楚）。
 
-How do you know if a variable is a *target*? Check if there is a value that is being assigned to it; if so, it's a *target*. If not, then the variable is a *source*.
+如何知道一个变量是否是*目标*？检查是否有一个值正在分配给它；如果有，它就是*目标*。如果没有，那么该变量就是*源*。
 
-For the JS engine to properly handle a program's variables, it must first label each occurrence of a variable as *target* or *source*. We'll dig in now to how each role is determined.
+为了让 JS 引擎正确处理程序中的变量，它必须首先将每个变量标记为*目标*或*源*。我们现在就来深入探讨如何确定每种角色。
 
-### Targets
+### 目标
 
-What makes a variable a *target*? Consider:
+是什么让变量成为*目标*？思考一下：
 
 ```js
 students = [ // ..
 ```
 
-This statement is clearly an assignment operation; remember, the `var students` part is handled entirely as a declaration at compile time, and is thus irrelevant during execution; we left it out for clarity and focus. Same with the `nextStudent = getStudentName(73)` statement.
+这条语句显然是一个赋值操作；请记住，`var students` 部分在编译时完全是作为声明处理的，因此在执行时无关紧要；为了清晰和突出重点，我们把它省略了。`nextStudent = getStudentName(73)` 语句也是如此。
 
-But there are three other *target* assignment operations in the code that are perhaps less obvious. One of them:
+不过，代码中还有三个*目标*赋值操作可能不太明显。其中之一是：
 
 ```js
 for (let student of students) {
 ```
 
-That statement assigns a value to `student` for each iteration of the loop. Another *target* reference:
+该语句会在循环的每次迭代中为 `student` 赋值。另一个*目标*引用：
 
 ```js
-getStudentName(73)
+getStudentName(73);
 ```
 
-But how is that an assignment to a *target*? Look closely: the argument `73` is assigned to the parameter `studentID`.
+但这怎么会是对*目标*的赋值呢？仔细看：参数 `73` 被赋值给了参数 `studentID`.
 
-And there's one last (subtle) *target* reference in our program. Can you spot it?
-
-..
+在我们的程序中，还有最后一个（微妙的）*目标*参考。你能发现吗？
 
 ..
 
 ..
 
-Did you identify this one?
+..
+
+你认出这个了吗？
 
 ```js
 function getStudentName(studentID) {
 ```
 
-A `function` declaration is a special case of a *target* reference. You can think of it sort of like `var getStudentName = function(studentID)`, but that's not exactly accurate. An identifier `getStudentName` is declared (at compile time), but the `= function(studentID)` part is also handled at compilation; the association between `getStudentName` and the function is automatically set up at the beginning of the scope rather than waiting for an `=` assignment statement to be executed.
+一个 `function` 的声明是*目标*引用的一种特殊情况。你可以把它想象成 `var getStudentName = function(studentID)`，但这并不完全准确。一个标识符 `getStudentName` 是在编译时声明的，但 `= function(studentID)` 部分也是在编译时处理的；`getStudentName` 和函数之间的关联是在作用域开始时自动建立的，而不是等待 `=` 赋值语句被执行。
 
-| NOTE: |
-| :--- |
-| This automatic association of function and variable is referred to as "function hoisting", and is covered in detail in Chapter 5. |
+| 注意：                                                              |
+| :------------------------------------------------------------------ |
+| 这种函数与变量的自动关联被称为「函数提升」，将在第 5 章中详细介绍。 |
 
-### Sources
+### 源
 
-So we've identified all five *target* references in the program. The other variable references must then be *source* references (because that's the only other option!).
+这样，我们就确定了程序中所有五个*目标*引用。其他变量引用必须是*源*引用（因为这是唯一的选择！）。
 
-In `for (let student of students)`, we said that `student` is a *target*, but `students` is a *source* reference. In the statement `if (student.id == studentID)`, both `student` and `studentID` are *source* references. `student` is also a *source* reference in `return student.name`.
+在 `for (let student of students)`中，我们说 `student` 是*目标*，而 `students` 是*源*引用。在语句 `if (student.id == studentID)` 中，`student` 和 `studentID` 都是*源*引用。在 `return student.name` 中，`student`也是*源*引用。
 
-In `getStudentName(73)`, `getStudentName` is a *source* reference (which we hope resolves to a function reference value). In `console.log(nextStudent)`, `console` is a *source* reference, as is `nextStudent`.
+在 `getStudentName(73)` 中，`getStudentName` 是*源*引用（我们希望它能解析为函数引用值）。在`console.log(nextStudent)` 中，`console` 和 `nextStudent` 都是*源*引用。
 
-| NOTE: |
-| :--- |
-| In case you were wondering, `id`, `name`, and `log` are all properties, not variable references. |
+| 注意：                                                            |
+| :---------------------------------------------------------------- |
+| 如果你想知道的话 `id`、`name` 和 `log` 都是属性，而不是变量引用。 |
 
-What's the practical importance of understanding *targets* vs. *sources*? In Chapter 2, we'll revisit this topic and cover how a variable's role impacts its lookup (specifically, if the lookup fails).
+了解*目标*与*源*有什么实际意义呢？在第 2 章中，我们将再次讨论这一主题，并介绍变量的角色如何影响其查找（特别是在查找失败的情况下）。
 
-## Cheating: Runtime Scope Modifications
+## 取巧：修改运行时的作用域
 
-It should be clear by now that scope is determined as the program is compiled, and should not generally be affected by runtime conditions. However, in non-strict-mode, there are technically still two ways to cheat this rule, modifying a program's scopes during runtime.
+现在应该清楚了，作用域是在程序编译时确定的，一般不会受运行时条件的影响。不过，在非严格模式下，技术上仍有两种方法可以欺骗这一规则，即在运行时修改程序的作用域。
 
-Neither of these techniques *should* be used—they're both dangerous and confusing, and you should be using strict-mode (where they're disallowed) anyway. But it's important to be aware of them in case you run across them in some programs.
+这两种技术都*不应该*使用 — 它们既危险又容易混淆，无论如何你都应该使用严格模式（不允许使用它们）。不过，如果你在某些程序中遇到了它们，还是有必要了解一下。
 
-The `eval(..)` function receives a string of code to compile and execute on the fly during the program runtime. If that string of code has a `var` or `function` declaration in it, those declarations will modify the current scope that the `eval(..)` is currently executing in:
+`eval(..)` 函数接收一串代码，并在程序运行时编译和执行。如果该代码串中有 `var` 或 `function` 声明，这些声明将修改 `eval(..)` 当前执行的作用域：
 
 ```js
 function badIdea() {
     eval("var oops = 'Ugh!';");
     console.log(oops);
 }
-badIdea();   // Ugh!
+badIdea(); // Ugh!
 ```
 
-If the `eval(..)` had not been present, the `oops` variable in `console.log(oops)` would not exist, and would throw a `ReferenceError`. But `eval(..)` modifies the scope of the `badIdea()` function at runtime. This is bad for many reasons, including the performance hit of modifying the already compiled and optimized scope, every time `badIdea()` runs.
+如果没有 `eval(..)`，`console.log(oops)` 中的 `oops` 变量将不存在，并将抛出一个 `ReferenceError`。但是，`eval(..)` 在运行时修改了`badIdea()` 函数的作用域。这是不好的，原因有很多，包括每次运行 `badIdea()` 时修改已编译和优化的作用域对性能的影响。
 
-The second cheat is the `with` keyword, which essentially dynamically turns an object into a local scope—its properties are treated as identifiers in that new scope's block:
+第二个欺骗手段是 `with` 关键字，它基本上是动态地将一个对象变成一个本地作用域 — 它的属性在这个新作用域的块中被视为标识符：
 
 ```js
 var badIdea = { oops: "Ugh!" };
 
 with (badIdea) {
-    console.log(oops);   // Ugh!
+    console.log(oops); // Ugh!
 }
 ```
 
-The global scope was not modified here, but `badIdea` was turned into a scope at runtime rather than compile time, and its property `oops` becomes a variable in that scope. Again, this is a terrible idea, for performance and readability reasons.
+全局作用域在这里没有被修改，但 `badIdea` 在运行时而不是在编译时变成了一个作用域，它的属性 `oops` 变成了该作用域中的一个变量。出于性能和可读性的考虑，这同样是一个糟糕的想法。
 
-At all costs, avoid `eval(..)` (at least, `eval(..)` creating declarations) and `with`. Again, neither of these cheats is available in strict-mode, so if you just use strict-mode (you should!) then the temptation goes away!
+无论如何，都要避免使用 `eval(..)`（至少要避免使用 `eval(..)` 创建声明）和 `with`。同样，严格模式下也不能使用这两种欺骗手段，所以如果你只使用严格模式（你应该这样做！），那么诱惑就会消失！
 
-## Lexical Scope
+## 词法作用域
 
-We've demonstrated that JS's scope is determined at compile time; the term for this kind of scope is "lexical scope". "Lexical" is associated with the "lexing" stage of compilation, as discussed earlier in this chapter.
+我们已经证明 JS 的作用域是在编译时确定的；这种作用域的术语是「词法作用域」。正如本章前面所讨论的，「词法」与编译的「词法」阶段有关。
 
-To narrow this chapter down to a useful conclusion, the key idea of "lexical scope" is that it's controlled entirely by the placement of functions, blocks, and variable declarations, in relation to one another.
+本章的主要观点是，「词法作用域」完全由函数、代码块和变量声明之间的位置关系来控制。
 
-If you place a variable declaration inside a function, the compiler handles this declaration as it's parsing the function, and associates that declaration with the function's scope. If a variable is block-scope declared (`let` / `const`), then it's associated with the nearest enclosing `{ .. }` block, rather than its enclosing function (as with `var`).
+如果将变量声明放在函数中，编译器会在解析函数时处理该声明，并将该声明与函数的作用域相关联。如果变量是以块作用域声明的（`let` / `const`），那么它会与最近的外层 `{ .. }` 块相关联，而不是与其外层函数相关联（与 `var` 相同）。
 
-Furthermore, a reference (*target* or *source* role) for a variable must be resolved as coming from one of the scopes that are *lexically available* to it; otherwise the variable is said to be "undeclared" (which usually results in an error!). If the variable is not declared in the current scope, the next outer/enclosing scope will be consulted. This process of stepping out one level of scope nesting continues until either a matching variable declaration can be found, or the global scope is reached and there's nowhere else to go.
+此外，一个变量的引用（*目标*或*源*角色）必须被解析为来自于对它来说*词法可用*的作用域之一；否则，该变量将被称为「未声明」（通常会导致错误！）。如果变量不是在当前作用域中声明的，那么将查询下一个外层/封闭作用域。这种一步步向外递增的过程会一直持续下去，直到找到匹配的变量声明，或者达到全局作用域而无处可去为止。
 
-It's important to note that compilation doesn't actually *do anything* in terms of reserving memory for scopes and variables. None of the program has been executed yet.
+需要注意的是，在为作用域和变量保留内存方面，编译实际上并没有*做任何事情*。没有程序在执行。
 
-Instead, compilation creates a map of all the lexical scopes that lays out what the program will need while it executes. You can think of this plan as inserted code for use at runtime, which defines all the scopes (aka, "lexical environments") and registers all the identifiers (variables) for each scope.
+相反，编译会创建一个所有词法作用域的映射，列出程序在执行时需要的内容。你可以将该计划视为运行时使用的插入代码，它定义了所有作用域（又称「词法环境」），并为每个作用域注册了所有标识符（变量）。
 
-In other words, while scopes are identified during compilation, they're not actually created until runtime, each time a scope needs to run. In the next chapter, we'll sketch out the conceptual foundations for lexical scope.
+换句话说，虽然作用域是在编译过程中确定的，但直到运行时，每次需要运行作用域时，才会真正创建作用域。在下一章中，我们将勾画出词法作用域的概念基础。

@@ -1,57 +1,58 @@
-# You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Appendix B: Practice
+# 你并不了解 JavaScript：作用域与闭包 - 第二版
 
-This appendix aims to give you some challenging and interesting exercises to test and solidify your understanding of the main topics from this book. It's a good idea to try out the exercises yourself—in an actual code editor!—instead of skipping straight to the solutions at the end. No cheating!
+# 附录 B：练习
 
-These exercises don't have a specific right answer that you have to get exactly. Your approach may differ some (or a lot!) from the solutions presented, and that's OK.
+本附录旨在为您提供一些具有挑战性的有趣练习，以测试和巩固您对本书主要内容的理解。最好能用实际的代码编辑器亲自尝试一下这些练习，而不是直接跳到最后的解答。不要作弊！
 
-There's no judging you on how you write your code. My hope is that you come away from this book feeling confident that you can tackle these sorts of coding tasks built on a strong foundation of knowledge. That's the only objective, here. If you're happy with your code, I am, too!
+这些练习并没有特定的正确答案，你必须准确的理解它。您的方法可能与所提供的解决方案有一些（或很大！）不同，这没关系。
 
-## Buckets of Marbles
+我们不会因为你如何编写代码而对你进行评判。我希望你能从本书中获得自信，相信自己可以在扎实的知识基础上完成这些编码任务。这就是本书的唯一目的。如果你对自己的代码感到满意，我也会！
 
-Remember Figure 2 from back in Chapter 2?
+## 弹珠桶
+
+还记得第 2 章中的图 2 吗？
 
 <figure>
-    <img src="images/fig2.png" width="300" alt="Colored Scope Bubbles" align="center">
-    <figcaption><em>Fig. 2 (Ch. 2): Colored Scope Bubbles</em></figcaption>
+    <img src="./images/fig2.png" width="300" alt="彩色作用域气泡" align="center">
+    <figcaption><em>图 2（第 2 章）： 彩色作用域气泡</em></figcaption>
     <br><br>
 </figure>
 
-This exercise asks you to write a program—any program!—that contains nested functions and block scopes, which satisfies these constraints:
+本练习要求你编写一个包含嵌套函数和块作用域的程序（任何程序！），并满足这些限制条件：
 
-* If you color all the scopes (including the global scope!) different colors, you need at least six colors. Make sure to add a code comment labeling each scope with its color.
+-   如果将所有作用域（包括全局作用域！）都染成不同的颜色，则至少需要六种颜色。请务必添加代码注释，为每个作用域标注其颜色。
 
-    BONUS: identify any implied scopes your code may have.
+    附加题：识别代码可能具有的任何隐式作用域。
 
-* Each scope has at least one identifier.
+-   每个作用域至少有一个标识符。
 
-* Contains at least two function scopes and at least two block scopes.
+-   包含至少两个函数作用域和至少两个块作用域。
 
-* At least one variable from an outer scope must be shadowed by a nested scope variable (see Chapter 3).
+-   至少有一个外部作用域变量必须被嵌套作用域变量所遮蔽（见第 3 章）。
 
-* At least one variable reference must resolve to a variable declaration at least two levels higher in the scope chain.
+-   至少有一个变量引用必须解析到作用域链中至少高两级的变量声明。
 
-| TIP: |
-| :--- |
-| You *can* just write junk foo/bar/baz-type code for this exercise, but I suggest you try to come up with some sort of non-trivial real'ish code that at least does something kind of reasonable. |
+| 贴士：                                                                                                                    |
+| :------------------------------------------------------------------------------------------------------------------------ |
+| 你*可以*写一些无意义的 foo/bar/baz 之类的代码来做这个练习，但我建议你试着写一些非繁琐的真实代码，至少能做一些合理的事情。 |
 
-Try the exercise for yourself, then check out the suggested solution at the end of this appendix.
+请自己尝试一下，然后查看本附录末尾的参考答案。
 
-## Closure (PART 1)
+## 闭包（第 1 部分）
 
-Let's first practice closure with some common computer-math operations: determining if a value is prime (has no divisors other than 1 and itself), and generating a list of prime factors (divisors) for a given number.
+首先，让我们通过一些常见的计算机数学运算来练习闭包：判断一个数值是否是质数（除了 1 和它本身之外没有其他除数），以及生成给定数字的质因数（除数）列表。
 
-For example:
+例如：
 
 ```js
-isPrime(11);        // true
-isPrime(12);        // false
+isPrime(11); // true
+isPrime(12); // false
 
-factorize(11);      // [ 11 ]
-factorize(12);      // [ 3, 2, 2 ] --> 3*2*2=12
+factorize(11); // [ 11 ]
+factorize(12); // [ 3, 2, 2 ] --> 3*2*2=12
 ```
 
-Here's an implementation of `isPrime(..)`, adapted from the Math.js library: [^MathJSisPrime]
+下面是 <ruby><code>isPrime(..)</code><rt>是否是质数</rt></ruby> 的实现，改编自 Math.js 库：[^MathJSisPrime]
 
 ```js
 function isPrime(v) {
@@ -71,7 +72,7 @@ function isPrime(v) {
 }
 ```
 
-And here's a somewhat basic implementation of `factorize(..)` (not to be confused with `factorial(..)` from Chapter 6):
+下面是 <ruby><code>factorize(..)</code><rt>因式分解</rt></ruby> 不要与第 6 章中的 `factorial(..)`混淆）的基本实现：
 
 ```js
 function factorize(v) {
@@ -80,48 +81,45 @@ function factorize(v) {
         while (v % i != 0) {
             i--;
         }
-        return [
-            ...factorize(i),
-            ...factorize(v / i)
-        ];
+        return [...factorize(i), ...factorize(v / i)];
     }
     return [v];
 }
 ```
 
-| NOTE: |
-| :--- |
-| I call this basic because it's not optimized for performance. It's binary-recursive (which isn't tail-call optimizable), and it creates a lot of intermediate array copies. It also doesn't order the discovered factors in any way. There are many, many other algorithms for this task, but I wanted to use something short and roughly understandable for our exercise. |
+| 注意：                                                                                                                                                                                                                                       |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 我之所以称其为「基本」，是因为它没有进行性能优化。它是二进制递归的（没有尾调优化），而且会创建大量的中间数组副本。它也没有以任何方式对发现的因子进行排序。有很多其他算法可以完成这项任务，但我想用一些简短且易于理解的算法来完成我们的练习。 |
 
-If you were to call `isPrime(4327)` multiple times in a program, you can see that it would go through all its dozens of comparison/computation steps every time. If you consider `factorize(..)`, it's calling `isPrime(..)` many times as it computes the list of factors. And there's a good chance most of those calls are repeats. That's a lot of wasted work!
+如果你在一个程序中多次调用 `isPrime(4327)` ，你可以看到它每次都要经历几十个比较/计算步骤。如果考虑到 `factorize(..)`，它在计算因数列表时会多次调用 `isPrime(..)`。而这些调用很有可能大部分都是重复的。这就浪费了很多性能！
 
-The first part of this exercise is to use closure to implement a cache to remember the results of `isPrime(..)`, so that the primality (`true` or `false`) of a given number is only ever computed once. Hint: we already showed this sort of caching in Chapter 6 with `factorial(..)`.
+本练习的第一部分是使用闭包实现缓存，以记住 `isPrime(..)` 的结果，这样给定数字的基元性（`true` 或 `false`）只需计算一次。提示：在第 6 章中，我们已经用 `factorial(..)` 演示了这种缓存。
 
-If you look at `factorize(..)`, it's implemented with recursion, meaning it calls itself repeatedly. That again means we may likely see a lot of wasted calls to compute prime factors for the same number. So the second part of the exercise is to use the same closure cache technique for `factorize(..)`.
+如果你看一下 `factorize(..)`，它是通过递归实现的，这意味着它会重复调用自己。这同样意味着我们可能会看到大量浪费的调用，来计算同一个数字的质因数。因此，练习的第二部分是对 `factorize(..)` 使用相同的闭包缓存技术优化。
 
-Use separate closures for caching of `isPrime(..)` and `factorize(..)`, rather than putting them inside a single scope.
+使用单独的闭包缓存 `isPrime(..)` 和 `factorize(..)`，而不是将它们放在一个作用域中。
 
-Try the exercise for yourself, then check out the suggested solution at the end of this appendix.
+请自己尝试一下，然后查看本附录末尾的参考答案。
 
-### A Word About Memory
+### 关于内存
 
-I want to share a little quick note about this closure cache technique and the impacts it has on your application's performance.
+我想和大家分享一下关于这种闭包缓存技术的小提示，以及它对应用程序性能的影响。
 
-We can see that in saving the repeated calls, we improve computation speed (in some cases, by a dramatic amount). But this usage of closure is making an explicit trade-off that you should be very aware of.
+我们可以看到，通过节省重复调用，我们提高了计算速度（在某些情况下，速度会大幅提高）。但是，这种闭包的使用是一种明确的权衡，你应该非常清楚。
 
-The trade-off is memory. We're essentially growing our cache (in memory) unboundedly. If the functions in question were called many millions of times with mostly unique inputs, we'd be chewing up a lot of memory. This can definitely be worth the expense, but only if we think it's likely we see repetition of common inputs so that we're taking advantage of the cache.
+代价就是内存。我们的缓存（内存）基本上是无限制增长的。如果相关函数被调用了数百万次，且大部分输入都是唯一的，那么我们就会占用大量内存。这样做绝对是值得的，但前提是我们认为我们很可能会看到重复的共同输入，这样我们才能利用缓存。
 
-If most every call will have a unique input, and the cache is essentially never *used* to any benefit, this is an inappropriate technique to employ.
+如果每次调用都有一个唯一的输入，而缓存基本上从未被*使用*过，那么采用这种技术就不合适了。
 
-It also might be a good idea to have a more sophisticated caching approach, such as an LRU (least recently used) cache, that limits its size; as it runs up to the limit, an LRU evicts the values that are... well, least recently used!
+此外，采用更复杂的缓存方法（如 LRU（最近最少使用）缓存）来限制缓存的大小也是一个好主意；当缓存运行到极限时，LRU 会驱逐......嗯，最近最少使用的值！[^LRU]
 
-The downside here is that LRU is quite non-trivial in its own right. You'll want to use a highly optimized implementation of LRU, and be keenly aware of all the trade-offs at play.
+缺点是 LRU 本身并不简单。你需要使用高度优化的 LRU 实现，并清楚地意识到所有的权衡取舍。
 
-## Closure (PART 2)
+## 闭包（第 2 部分）
 
-In this exercise, we're going to again practive closure by defining a `toggle(..)` utility that gives us a value toggler.
+在本练习中，我们将再次通过定义一个 `toggle(..)` 工具来练习闭包，该工具将为我们提供一个值切换器。
 
-You will pass one or more values (as arguments) into `toggle(..)`, and get back a function. That returned function will alternate/rotate between all the passed-in values in order, one at a time, as it's called repeatedly.
+您将向 `toggle(..)` 传递一个或多个值（作为参数），并返回一个函数。在反复调用时，返回的函数将按顺序在所有传入的值之间交替/轮换，每次一个。
 
 ```js
 function toggle(/* .. */) {
@@ -129,29 +127,29 @@ function toggle(/* .. */) {
 }
 
 var hello = toggle("hello");
-var onOff = toggle("on","off");
-var speed = toggle("slow","medium","fast");
+var onOff = toggle("on", "off");
+var speed = toggle("slow", "medium", "fast");
 
-hello();      // "hello"
-hello();      // "hello"
+hello(); // "hello"
+hello(); // "hello"
 
-onOff();      // "on"
-onOff();      // "off"
-onOff();      // "on"
+onOff(); // "on"
+onOff(); // "off"
+onOff(); // "on"
 
-speed();      // "slow"
-speed();      // "medium"
-speed();      // "fast"
-speed();      // "slow"
+speed(); // "slow"
+speed(); // "medium"
+speed(); // "fast"
+speed(); // "slow"
 ```
 
-The corner case of passing in no values to `toggle(..)` is not very important; such a toggler instance could just always return `undefined`.
+没有向 `toggle(..)` 传递任何值的边缘情况并不重要；这样的 toggler 实例可以总是返回 `undefined`。
 
-Try the exercise for yourself, then check out the suggested solution at the end of this appendix.
+请自己尝试一下，然后查看本附录末尾的参考答案。
 
-## Closure (PART 3)
+## 闭包（第 3 部分）
 
-In this third and final exercise on closure, we're going to implement a basic calculator. The `calculator()` function will produce an instance of a calculator that maintains its own state, in the form of a function (`calc(..)`, below):
+在第三个也是最后一个关于闭包的练习中，我们将实现一个基本的计算器。<ruby><code>calculator(..)</code><rt>计算器</rt></ruby> 函数将生成一个计算器实例，它以函数的形式（`calc(..)`，下同）保持自己的状态：
 
 ```js
 function calculator() {
@@ -161,234 +159,204 @@ function calculator() {
 var calc = calculator();
 ```
 
-Each time `calc(..)` is called, you'll pass in a single character that represents a keypress of a calculator button. To keep things more straightforward, we'll restrict our calculator to supporting entering only digits (0-9), arithmetic operations (+, -, \*, /), and "=" to compute the operation. Operations are processed strictly in the order entered; there's no "( )" grouping or operator precedence.
+每次调用 `calc(..)`，你都要输入一个字符，它代表按下计算器按钮的一次按键操作。为了保持简单明了，我们将限制计算器只支持输入数字 (0-9)）、算术运算 (+, -, \*, /) 和 "=" 来计算运算。运算严格按照输入的顺序进行，没有 "( )" 分组或运算符优先。
 
-We don't support entering decimals, but the divide operation can result in them. We don't support entering negative numbers, but the "-" operation can result in them. So, you should be able to produce any negative or decimal number by first entering an operation to compute it. You can then keep computing with that value.
+我们不支持输入小数，但除法运算可以产生小数。我们不支持输入负数，但 "-" 操作可以产生负数。因此，只要先输入一个运算来计算负数或小数，就可以得出任何负数或小数。然后，您就可以继续使用该值进行计算。
 
-The return of `calc(..)` calls should mimic what would be shown on a real calculator, like reflecting what was just pressed, or computing the total when pressing "=".
+`calc(..)` 调用的返回值应模拟真实计算器上的显示，如反映刚按下的内容，或在按下 "=" 时计算总数。
 
-For example:
+例如：
 
 ```js
-calc("4");     // 4
-calc("+");     // +
-calc("7");     // 7
-calc("3");     // 3
-calc("-");     // -
-calc("2");     // 2
-calc("=");     // 75
-calc("*");     // *
-calc("4");     // 4
-calc("=");     // 300
-calc("5");     // 5
-calc("-");     // -
-calc("5");     // 5
-calc("=");     // 0
+calc("4"); // 4
+calc("+"); // +
+calc("7"); // 7
+calc("3"); // 3
+calc("-"); // -
+calc("2"); // 2
+calc("="); // 75
+calc("*"); // *
+calc("4"); // 4
+calc("="); // 300
+calc("5"); // 5
+calc("-"); // -
+calc("5"); // 5
+calc("="); // 0
 ```
 
-Since this usage is a bit clumsy, here's a `useCalc(..)` helper, that runs the calculator with characters one at a time from a string, and computes the display each time:
+由于这种用法有点笨拙，这里有一个 `useCalc(..)` 助手，它可以使用字符串中的字符一个一个地运行计算器，并计算每次的显示结果：
 
 ```js
-function useCalc(calc,keys) {
-    return [...keys].reduce(
-        function showDisplay(display,key){
-            var ret = String( calc(key) );
-            return (
-                display +
-                (
-                  (ret != "" && key == "=") ?
-                      "=" :
-                      ""
-                ) +
-                ret
-            );
-        },
-        ""
-    );
+function useCalc(calc, keys) {
+    return [...keys].reduce(function showDisplay(display, key) {
+        var ret = String(calc(key));
+        return display + (ret != "" && key == "=" ? "=" : "") + ret;
+    }, "");
 }
 
-useCalc(calc,"4+3=");           // 4+3=7
-useCalc(calc,"+9=");            // +9=16
-useCalc(calc,"*8=");            // *5=128
-useCalc(calc,"7*2*3=");         // 7*2*3=42
-useCalc(calc,"1/0=");           // 1/0=ERR
-useCalc(calc,"+3=");            // +3=ERR
-useCalc(calc,"51=");            // 51
+useCalc(calc, "4+3="); // 4+3=7
+useCalc(calc, "+9="); // +9=16
+useCalc(calc, "*8="); // *5=128
+useCalc(calc, "7*2*3="); // 7*2*3=42
+useCalc(calc, "1/0="); // 1/0=ERR
+useCalc(calc, "+3="); // +3=ERR
+useCalc(calc, "51="); // 51
 ```
 
-The most sensible usage of this `useCalc(..)` helper is to always have "=" be the last character entered.
+使用 `useCalc(..)` 助手的最合理方法是始终将 "=" 作为最后输入的字符。
 
-Some of the formatting of the totals displayed by the calculator require special handling. I'm providing this `formatTotal(..)` function, which your calculator should use whenever it's going to return a current computed total (after an `"="` is entered):
+计算器显示的总计的某些格式需要特殊处理。我提供了这个 `formatTotal(..)` 函数，只要计算器要返回当前计算的总数（在输入 `"="` 后），就应该使用这个函数：
 
 ```js
 function formatTotal(display) {
     if (Number.isFinite(display)) {
-        // constrain display to max 11 chars
+        // 将显示限制为最大11个字符
         let maxDigits = 11;
-        // reserve space for "e+" notation?
+        // 为 "e+" 符号保留空间?
         if (Math.abs(display) > 99999999999) {
             maxDigits -= 6;
         }
-        // reserve space for "-"?
+        // 为 "-" 预留位置?
         if (display < 0) {
             maxDigits--;
         }
 
-        // whole number?
+        // 整数？
         if (Number.isInteger(display)) {
-            display = display
-                .toPrecision(maxDigits)
-                .replace(/\.0+$/,"");
+            display = display.toPrecision(maxDigits).replace(/\.0+$/, "");
         }
-        // decimal
+        // 小数
         else {
-            // reserve space for "."
+            // 为 "." 预留空间
             maxDigits--;
-            // reserve space for leading "0"?
-            if (
-                Math.abs(display) >= 0 &&
-                Math.abs(display) < 1
-            ) {
+            // 为前导 "0" 预留空间？
+            if (Math.abs(display) >= 0 && Math.abs(display) < 1) {
                 maxDigits--;
             }
-            display = display
-                .toPrecision(maxDigits)
-                .replace(/0+$/,"");
+            display = display.toPrecision(maxDigits).replace(/0+$/, "");
         }
-    }
-    else {
+    } else {
         display = "ERR";
     }
     return display;
 }
 ```
 
-Don't worry too much about how `formatTotal(..)` works. Most of its logic is a bunch of handling to limit the calculator display to 11 characters max, even if negatives, repeating decimals, or even "e+" exponential notation is required.
+不要太在意 `formatTotal(..)` 的工作原理。它的大部分逻辑是限制计算器显示最多 11 个字符的一系列处理，即使需要使用负数、重复小数甚至科学记数法 "e+"。
 
-Again, don't get too mired in the mud around calculator-specific behavior. Focus on the *memory* of closure.
+再次强调，不要陷入计算器特定行为的泥潭。把重点放在闭包的*内存*上。
 
-Try the exercise for yourself, then check out the suggested solution at the end of this appendix.
+请亲自尝试练习，然后查看本附录末尾的参考答案。
 
-## Modules
+## 模块
 
-This exercise is to convert the calculator from Closure (PART 3) into a module.
+本练习是将闭包（第 3 部分）中的计算器转换成模块。
 
-We're not adding any additional functionality to the calculator, only changing its interface. Instead of calling a single function `calc(..)`, we'll be calling specific methods on the public API for each "keypress" of our calculator. The outputs stay the same.
+我们不会为计算器添加任何额外功能，只是更改其接口。我们将不再调用单个函数 `calc(..)`，而是为计算器的每次「按键」调用公共 API 中的特定方法。输出保持不变。
 
-This module should be expressed as a classic module factory function called `calculator()`, instead of a singleton IIFE, so that multiple calculators can be created if desired.
+该模块应表示为一个名为 `calculator()` 的传统模块工厂函数，而不是一个单例 IIFE，以便根据需要创建多个计算器。
 
-The public API should include the following methods:
+公共 API 应包括以下方法：
 
-* `number(..)` (input: the character/number "pressed")
-* `plus()`
-* `minus()`
-* `mult()`
-* `div()`
-* `eq()`
+-   `number(..)`(输入：「按下」的字符/数字）
+-   `plus()`
+-   `minus()`
+-   `mult()`
+-   `div()`
+-   `eq()`
 
-Usage would look like:
+使用方法如下：
 
 ```js
 var calc = calculator();
 
-calc.number("4");     // 4
-calc.plus();          // +
-calc.number("7");     // 7
-calc.number("3");     // 3
-calc.minus();         // -
-calc.number("2");     // 2
-calc.eq();            // 75
+calc.number("4"); // 4
+calc.plus(); // +
+calc.number("7"); // 7
+calc.number("3"); // 3
+calc.minus(); // -
+calc.number("2"); // 2
+calc.eq(); // 75
 ```
 
-`formatTotal(..)` remains the same from that previous exercise. But the `useCalc(..)` helper needs to be adjusted to work with the module API:
+`formatTotal(..)` 与之前的练习保持一致。但需要调整 `useCalc(..)` 助手，以便与模块 API 配合使用：
 
 ```js
-function useCalc(calc,keys) {
+function useCalc(calc, keys) {
     var keyMappings = {
         "+": "plus",
         "-": "minus",
         "*": "mult",
         "/": "div",
-        "=": "eq"
+        "=": "eq",
     };
 
-    return [...keys].reduce(
-        function showDisplay(display,key){
-            var fn = keyMappings[key] || "number";
-            var ret = String( calc[fn](key) );
-            return (
-                display +
-                (
-                  (ret != "" && key == "=") ?
-                      "=" :
-                      ""
-                ) +
-                ret
-            );
-        },
-        ""
-    );
+    return [...keys].reduce(function showDisplay(display, key) {
+        var fn = keyMappings[key] || "number";
+        var ret = String(calc[fn](key));
+        return display + (ret != "" && key == "=" ? "=" : "") + ret;
+    }, "");
 }
 
-useCalc(calc,"4+3=");           // 4+3=7
-useCalc(calc,"+9=");            // +9=16
-useCalc(calc,"*8=");            // *5=128
-useCalc(calc,"7*2*3=");         // 7*2*3=42
-useCalc(calc,"1/0=");           // 1/0=ERR
-useCalc(calc,"+3=");            // +3=ERR
-useCalc(calc,"51=");            // 51
+useCalc(calc, "4+3="); // 4+3=7
+useCalc(calc, "+9="); // +9=16
+useCalc(calc, "*8="); // *5=128
+useCalc(calc, "7*2*3="); // 7*2*3=42
+useCalc(calc, "1/0="); // 1/0=ERR
+useCalc(calc, "+3="); // +3=ERR
+useCalc(calc, "51="); // 51
 ```
 
-Try the exercise for yourself, then check out the suggested solution at the end of this appendix.
+请自己尝试一下，然后查看本附录末尾的参考答案。
 
-As you work on this exercise, also spend some time considering the pros/cons of representing the calculator as a module as opposed to the closure-function approach from the previous exercise.
+在做这个练习时，还需要花一些时间考虑将计算器表示为模块而不是前面练习中的闭包函数方法的优缺点。
 
-BONUS: write out a few sentences explaining your thoughts.
+附加题：写一些注释解释你的想法。
 
-BONUS #2: try converting your module to other module formats, including: UMD, CommonJS, and ESM (ES Modules).
+附加题 #2：尝试将模块转换为其他模块格式，包括：UMD、CommonJS 和 ESM（ES 模块）。
 
-## Suggested Solutions
+## 参考答案
 
-Hopefully you've tried out the exercises before you're reading this far. No cheating!
+希望您在阅读到这里之前，已经尝试过这些练习。不要作弊！
 
-Remember, each suggested solution is just one of a bunch of different ways to approach the problems. They're not "the right answer," but they do illustrate a reasonable way to approach each exercise.
+请记住，每个参考答案只是处理问题的多种不同方法之一。它们并不是「正确答案」，但确实说明了处理每个练习的合理方法。
 
-The most important benefit you can get from reading these suggested solutions is to compare them to your code and analyze why we each made similar or different choices. Don't get into too much bikeshedding; try to stay focused on the main topic rather than the small details.
+阅读这些参考答案的最大益处在于将它们与您的代码进行比较，并分析我们各自做出相似或不同选择的原因。不要过多地纠缠于「帕金森琐碎定律[^帕金森琐碎定律]」；尽量将注意力集中在主题上，而不是小细节上。
 
-### Suggested: Buckets of Marbles
+### 建议：弹珠桶
 
-The *Buckets of Marbles Exercise* can be solved like this:
+*弹珠桶练习*可以这样解决[^埃拉托斯特尼筛法]：
 
 ```js
-// RED(1)
+// 红色(1)
 const howMany = 100;
 
-// Sieve of Eratosthenes
+// 埃拉托斯特尼筛法
 function findPrimes(howMany) {
-    // BLUE(2)
+    // 蓝色(2)
     var sieve = Array(howMany).fill(true);
     var max = Math.sqrt(howMany);
 
     for (let i = 2; i < max; i++) {
-        // GREEN(3)
+        // 绿色(3)
         if (sieve[i]) {
-            // ORANGE(4)
-            let j = Math.pow(i,2);
+            // 橙色(4)
+            let j = Math.pow(i, 2);
             for (let k = j; k < howMany; k += i) {
-                // PURPLE(5)
+                // 紫色(5)
                 sieve[k] = false;
             }
         }
     }
 
     return sieve
-        .map(function getPrime(flag,prime){
-            // PINK(6)
+        .map(function getPrime(flag, prime) {
+            // 粉色(6)
             if (flag) return prime;
             return flag;
         })
-        .filter(function onlyPrimes(v){
-            // YELLOW(7)
+        .filter(function onlyPrimes(v) {
+            // 黄色(7)
             return !!v;
         })
         .slice(1);
@@ -403,12 +371,12 @@ findPrimes(howMany);
 // ]
 ```
 
-### Suggested: Closure (PART 1)
+### 建议：闭包（第 1 部分）
 
-The *Closure Exercise (PART 1)* for `isPrime(..)` and `factorize(..)`, can be solved like this:
+_闭包练习（第 3 部分）_ 的 `isPrime(..)` 和`factorize(..)`可以这样解决：
 
 ```js
-var isPrime = (function isPrime(v){
+var isPrime = (function isPrime(v) {
     var primes = {};
 
     return function isPrime(v) {
@@ -431,7 +399,7 @@ var isPrime = (function isPrime(v){
     };
 })();
 
-var factorize = (function factorize(v){
+var factorize = (function factorize(v) {
     var factors = {};
 
     return function findFactors(v) {
@@ -443,38 +411,33 @@ var factorize = (function factorize(v){
             while (v % i != 0) {
                 i--;
             }
-            return (factors[v] = [
-                ...findFactors(i),
-                ...findFactors(v / i)
-            ]);
+            return (factors[v] = [...findFactors(i), ...findFactors(v / i)]);
         }
         return (factors[v] = [v]);
     };
 })();
 ```
 
-The general steps I used for each utility:
+我使用每种实用工具的一般步骤：
 
-1. Wrap an IIFE to define the scope for the cache variable to reside.
+1. 包裹一个 IIFE，以定义缓存变量所在的作用域。
+2. 在底层调用中，首先检查缓存，如果已经知道结果，则返回。
+3. 在每一个原本 `return` 的地方，将赋值操作赋给缓存，然后返回赋值操作的结果，这是一个节省空间的技巧，主要是为了在书中简洁明了。
 
-2. In the underlying call, first check the cache, and if a result is already known, return.
+我还将内部函数从 `factorize(..)` 重命名为 `findFactors(..)`。这在技术上并无必要，但它有助于更清楚地说明递归调用调用的是哪个函数。
 
-3. At each place where a `return` was happening originally, assign to the cache and just return the results of that assignment operation—this is a space savings trick mostly just for brevity in the book.
+### 建议：闭包（第 2 部分）
 
-I also renamed the inner function from `factorize(..)` to `findFactors(..)`. That's not technically necessary, but it helps it make clearer which function the recursive calls invoke.
-
-### Suggested: Closure (PART 2)
-
-The *Closure Exercise (PART 2)* `toggle(..)` can be solved like this:
+_闭包练习（第 2 部分）_ 的 `toggle(..)` 可以这样解：
 
 ```js
 function toggle(...vals) {
     var unset = {};
     var cur = unset;
 
-    return function next(){
-        // save previous value back at
-        // the end of the list
+    return function next() {
+        // 将前一个值保存回
+        // 列表末尾
         if (cur != unset) {
             vals.push(cur);
         }
@@ -484,28 +447,28 @@ function toggle(...vals) {
 }
 
 var hello = toggle("hello");
-var onOff = toggle("on","off");
-var speed = toggle("slow","medium","fast");
+var onOff = toggle("on", "off");
+var speed = toggle("slow", "medium", "fast");
 
-hello();      // "hello"
-hello();      // "hello"
+hello(); // "hello"
+hello(); // "hello"
 
-onOff();      // "on"
-onOff();      // "off"
-onOff();      // "on"
+onOff(); // "on"
+onOff(); // "off"
+onOff(); // "on"
 
-speed();      // "slow"
-speed();      // "medium"
-speed();      // "fast"
-speed();      // "slow"
+speed(); // "slow"
+speed(); // "medium"
+speed(); // "fast"
+speed(); // "slow"
 ```
 
-### Suggested: Closure (PART 3)
+### 建议：闭包（第 3 部分）
 
-The *Closure Exercise (PART 3)* `calculator()` can be solved like this:
+_闭包练习（第 3 部分）_ 的 `calculator(..)` 可以这样解：
 
 ```js
-// from earlier:
+// 前置代码：
 //
 // function useCalc(..) { .. }
 // function formatTotal(..) { .. }
@@ -519,80 +482,69 @@ function calculator() {
 
     // ********************
 
-    function pressKey(key){
-        // number key?
+    function pressKey(key) {
+        //  数字键？
         if (/\d/.test(key)) {
             currentVal += key;
             return key;
         }
-        // operator key?
+        // 操作键？
         else if (/[+*/-]/.test(key)) {
-            // multiple operations in a series?
-            if (
-                currentOper != "=" &&
-                currentVal != ""
-            ) {
-                // implied '=' keypress
+            // 在一个系列中进行多个操作？
+            if (currentOper != "=" && currentVal != "") {
+                // 隐含 '=' 键
                 pressKey("=");
-            }
-            else if (currentVal != "") {
+            } else if (currentVal != "") {
                 currentTotal = Number(currentVal);
             }
             currentOper = key;
             currentVal = "";
             return key;
         }
-        // = key?
-        else if (
-            key == "=" &&
-            currentOper != "="
-        ) {
-            currentTotal = op(
-                currentTotal,
-                currentOper,
-                Number(currentVal)
-            );
+        // = 键？
+        else if (key == "=" && currentOper != "=") {
+            currentTotal = op(currentTotal, currentOper, Number(currentVal));
             currentOper = "=";
             currentVal = "";
             return formatTotal(currentTotal);
         }
         return "";
-    };
+    }
 
-    function op(val1,oper,val2) {
+    function op(val1, oper, val2) {
         var ops = {
-            // NOTE: using arrow functions
-            // only for brevity in the book
-            "+": (v1,v2) => v1 + v2,
-            "-": (v1,v2) => v1 - v2,
-            "*": (v1,v2) => v1 * v2,
-            "/": (v1,v2) => v1 / v2
+            // 注意：书中使用箭头功能
+            // 只是为了简洁明了
+            "+": (v1, v2) => v1 + v2,
+            "-": (v1, v2) => v1 - v2,
+            "*": (v1, v2) => v1 * v2,
+            "/": (v1, v2) => v1 / v2,
         };
-        return ops[oper](val1,val2);
+        return ops[oper](val1, val2);
     }
 }
 
 var calc = calculator();
 
-useCalc(calc,"4+3=");           // 4+3=7
-useCalc(calc,"+9=");            // +9=16
-useCalc(calc,"*8=");            // *5=128
-useCalc(calc,"7*2*3=");         // 7*2*3=42
-useCalc(calc,"1/0=");           // 1/0=ERR
-useCalc(calc,"+3=");            // +3=ERR
-useCalc(calc,"51=");            // 51
+useCalc(calc, "4+3="); // 4+3=7
+useCalc(calc, "+9="); // +9=16
+useCalc(calc, "*8="); // *5=128
+useCalc(calc, "7*2*3="); // 7*2*3=42
+useCalc(calc, "1/0="); // 1/0=ERR
+useCalc(calc, "+3="); // +3=ERR
+useCalc(calc, "51="); // 51
 ```
 
-| NOTE: |
-| :--- |
-| Remember: this exercise is about closure. Don't focus too much on the actual mechanics of a calculator, but rather on whether you are properly *remembering* the calculator state across function calls. |
+| 注意：                                                                                                       |
+| :----------------------------------------------------------------------------------------------------------- |
+| 记住：本练习是关于闭包的。不要过于关注计算器的实际机制，而要关注在调用函数时是否正确地*记住*了计算器的状态。 |
 
-### Suggested: Modules
+### 建议：模块
 
-The *Modules Exercise* `calculator()` can be solved like this:
+*模块练习*中的 `calculator()` 可以这样解决：
 
 ```js
-// from earlier:
+// 前置代码：
 //
 // function useCalc(..) { .. }
 // function formatTotal(..) { .. }
@@ -605,10 +557,18 @@ function calculator() {
     var publicAPI = {
         number,
         eq,
-        plus() { return operator("+"); },
-        minus() { return operator("-"); },
-        mult() { return operator("*"); },
-        div() { return operator("/"); }
+        plus() {
+            return operator("+");
+        },
+        minus() {
+            return operator("-");
+        },
+        mult() {
+            return operator("*");
+        },
+        div() {
+            return operator("/");
+        },
     };
 
     return publicAPI;
@@ -624,13 +584,9 @@ function calculator() {
     }
 
     function eq() {
-        // = key?
+        // = 键？
         if (currentOper != "=") {
-            currentTotal = op(
-                currentTotal,
-                currentOper,
-                Number(currentVal)
-            );
+            currentTotal = op(currentTotal, currentOper, Number(currentVal));
             currentOper = "=";
             currentVal = "";
             return formatTotal(currentTotal);
@@ -639,15 +595,11 @@ function calculator() {
     }
 
     function operator(key) {
-        // multiple operations in a series?
-        if (
-            currentOper != "=" &&
-            currentVal != ""
-        ) {
-            // implied '=' keypress
+        // 在一个系列中进行多个操作？
+        if (currentOper != "=" && currentVal != "") {
+            // 隐含 '=' 键
             eq();
-        }
-        else if (currentVal != "") {
+        } else if (currentVal != "") {
             currentTotal = Number(currentVal);
         }
         currentOper = key;
@@ -655,30 +607,32 @@ function calculator() {
         return key;
     }
 
-    function op(val1,oper,val2) {
+    function op(val1, oper, val2) {
         var ops = {
-            // NOTE: using arrow functions
-            // only for brevity in the book
-            "+": (v1,v2) => v1 + v2,
-            "-": (v1,v2) => v1 - v2,
-            "*": (v1,v2) => v1 * v2,
-            "/": (v1,v2) => v1 / v2
+            // 注意：书中使用箭头功能
+            // 只是为了简洁明了
+            "+": (v1, v2) => v1 + v2,
+            "-": (v1, v2) => v1 - v2,
+            "*": (v1, v2) => v1 * v2,
+            "/": (v1, v2) => v1 / v2,
         };
-        return ops[oper](val1,val2);
+        return ops[oper](val1, val2);
     }
 }
 
 var calc = calculator();
 
-useCalc(calc,"4+3=");           // 4+3=7
-useCalc(calc,"+9=");            // +9=16
-useCalc(calc,"*8=");            // *5=128
-useCalc(calc,"7*2*3=");         // 7*2*3=42
-useCalc(calc,"1/0=");           // 1/0=ERR
-useCalc(calc,"+3=");            // +3=ERR
-useCalc(calc,"51=");            // 51
+useCalc(calc, "4+3="); // 4+3=7
+useCalc(calc, "+9="); // +9=16
+useCalc(calc, "*8="); // *5=128
+useCalc(calc, "7*2*3="); // 7*2*3=42
+useCalc(calc, "1/0="); // 1/0=ERR
+useCalc(calc, "+3="); // +3=ERR
+useCalc(calc, "51="); // 51
 ```
 
-That's it for this book, congratulations on your achievement! When you're ready, move on to Book 3, *Objects & Classes*.
+本书到此结束，祝贺你取得的成绩！准备好后，请继续阅读第 3 册*对象与类*。
 
-[^MathJSisPrime]: *Math.js: isPrime(..)*, https://github.com/josdejong/mathjs/blob/develop/src/function/utils/isPrime.js, 3 March 2020.
+[^MathJSisPrime]: _Math.js: isPrime(..)_, https://github.com/josdejong/mathjs/blob/develop/src/function/utils/isPrime.js, 2020年3月3日。
+[^LRU]: Cache replacement policies, https://en.wikipedia.org/wiki/Cache_replacement_policies, 2023年11月2日。
+[^埃拉托斯特尼筛法]: 埃拉托斯特尼筛法, https://zh.wikipedia.org/wiki/, 2023年9月27日。

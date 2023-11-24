@@ -1,18 +1,21 @@
-# You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Foreword
+# 你并不了解 JavaScript：作用域与闭包 - 第二版
 
-If I look over the books on my bookshelf, I can clearly see which of these titles are well loved. Well loved in this sense meaning they are a little worn. Their binding is broken, their pages are tattered, there might even be a spilled drink smear or two. What’s ironic to me is that the most loved of my books often _**look**_ the least cared for, though honestly the opposite is true.
+# 前言
 
-*Scope and Closures* (1st ed.) is one of my most loved books. It’s small, but the binding is coming undone. The pages are worn and dog-eared. It’s a bit rumpled. It’s not a book I’ve read once. I’ve picked it up again and again in the many years since it was originally published.
+如果我翻翻书架上的书，就能清楚地看到我对其中哪些书爱不释手。所谓「爱不释手」，是指它们有些破旧。它们的装订破损，书页破烂，甚至可能还有一两处打翻的饮料污渍。颇具讽刺意味的是，最受我喜爱的书往往**看起来**是最不被爱惜的，虽然老实说事实恰恰相反。
 
-For me, it’s also been a benchmark for my own personal progression through JavaScript. When I first read it in 2014, I was familiar with the concepts but the depth of my understanding was admittedly not as deep as the thin volume.
+_作用域与闭包_（第 1 版）是我最喜爱的书籍之一。书虽小，但装订已经松动，书页已经破旧不堪，有点皱巴巴的。这是一本反复阅读的书。在它最初出版后的许多年里，我一次又一次地拿起它。
 
-Over the years, even though I wasn’t necessarily feeling my own improvement on a day-to-day basis, each one of the concepts became more approachable. I’d smile to myself, realizing how far I’d come with the help of these guides. It became apparent there was an inverse correlation between how well I treated the book and how much I loved it.
+对我来说，它也是我个人学习 JavaScript 的一个基准。当我在 2014 年第一次阅读这本书时，我虽然已经熟悉了其中的概念，但我承认我的理解深度还不如这本薄薄的书。
 
-When Kyle asked me to write the Foreword for the 2nd edition, I was floored. It’s not often you’re asked to write about a book that’s been so formative for your own understanding and career, *Scope and Closures* in particular. I remember the day I first understood closures, the first time I used one well. The satisfaction was great, in part because the symmetry of the idea was compelling to me. Before I even picked this book up, I was already enamoured with closures. And yet, there’s a difference between being able to execute code successfully and fully explore the concepts with any depth. This book took my base understanding and drew it out, helped me master it.
+多年来，尽管我不一定每天都能感受到自己的进步，但每一个概念都变得更加平易近人。我会对自己微笑，意识到在这些指南的帮助下，我已经取得了很大的进步。很明显，这本书的新旧程度与我对它的喜爱程度成反比。
 
-This book is deceptively short. It’s helpful that it’s small because it’s dense with useful knowledge. Since it is compact, I’d suggest you give yourself time to absorb each page. Take your time with it. Treat the book with care, and by that I mean, wear it down.
+当 Kyle 邀请我为第二版撰写前言时，我非常激动。很少有人会邀请你为一本对你的理解和职业生涯具有重大影响的书撰写前言，尤其是*作用域与闭包*这本书。我还记得我第一次理解闭包的那一天，也是我第一次很好地使用闭包。我感到非常满足，部分原因是这个想法的对称性让我信服。在我拿起这本书之前，我就已经对闭包着迷了。然而，成功执行代码与深入探索概念之间还是有区别的。这本书将我的基础理解引向更深的层次，帮助我掌握了它。
 
-Sarah Drasner<br>
-Head of Developer Experience<br>
+这本书短小精悍。它虽然小巧但很有帮助，因为它蕴含了大量有用的知识。由于篇幅紧凑，我建议您给自己一些时间来消化每一页。慢慢来，小心对待这本书，我的意思是，把它磨坏。
+
+<div>
+Sarah Drasner<br/>
+开发者体验主管<br/>
 Netlify
+</div>

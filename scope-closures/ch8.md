@@ -1,50 +1,51 @@
-# You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 8: The Module Pattern
+# 你并不了解 JavaScript：作用域与闭包 - 第二版
 
-In this chapter, we wrap up the main text of the book by exploring one of the most important code organization patterns in all of programming: the module. As we'll see, modules are inherently built from what we've already covered: the payoff for your efforts in learning lexical scope and closure.
+# 第八章：模块化模式
 
-We've examined every angle of lexical scope, from the breadth of the global scope down through nested block scopes, into the intricacies of the variable lifecycle. Then we leveraged lexical scope to understand the full power of closure.
+在本章中，我们将通过探索所有编程中最重要的代码组织模式之一：模块，来结束本书的正文。正如我们将看到的那样，模块本质上是由我们已经讲过的内容构建而成：这是你学习词法作用域和闭包所付出努力的回报。
 
-Take a moment to reflect on how far you've come in this journey so far; you've taken big steps in getting to know JS more deeply!
+我们研究了词法作用域的各个角度，从全局作用域的广度到嵌套的块作用域，再到错综复杂的变量生命周期。然后，我们利用词法作用域来了解闭包的全部功能。
 
-The central theme of this book has been that understanding and mastering scope and closure is key in properly structuring and organizing our code, especially the decisions on where to store information in variables.
+花点时间回顾一下，你在这段旅程中已经走了多远；在更深入地了解 JS 方面，你已经迈出了一大步！
 
-Our goal in this final chapter is to appreciate how modules embody the importance of these topics, elevating them from abstract concepts to concrete, practical improvements in building programs.
+本书的核心主题是，理解并掌握作用域和闭包是正确构建和组织代码的关键，尤其是决定在变量中存储信息的位置。
 
-## Encapsulation and Least Exposure (POLE)
+在最后一章中，我们的目标是了解模块如何体现这些主题的重要性，如何将它们从抽象概念提升为构建程序中具体而实用的改进。
 
-Encapsulation is often cited as a principle of object-oriented (OO) programming, but it's more fundamental and broadly applicable than that. The goal of encapsulation is the bundling or co-location of information (data) and behavior (functions) that together serve a common purpose.
+## 封装和最小暴露 (POLE)
 
-Independent of any syntax or code mechanisms, the spirit of encapsulation can be realized in something as simple as using separate files to hold bits of the overall program with common purpose. If we bundle everything that powers a list of search results into a single file called "search-list.js", we're encapsulating that part of the program.
+封装经常被作为面向对象 (OO) 编程的一项原则，但它的基础性和广泛适用性远不止于此。封装的目的是将信息（数据）和行为（功能）捆绑在一起或置于同一位置，共同达到一个目的。
 
-The recent trend in modern front-end programming to organize applications around Component architecture pushes encapsulation even further. For many, it feels natural to consolidate everything that constitutes the search results list—even beyond code, including presentational markup and styling—into a single unit of program logic, something tangible we can interact with. And then we label that collection the "SearchList" component.
+与任何语法或代码机制无关，封装的精神可以通过一些简单的事情来实现，比如使用单独的文件来保存整个程序中具有共同目的的部分。如果我们将为搜索结果列表提供功能的所有内容都打包到一个名为 "search-list.js" 的文件中，我们就封装了程序的这一部分。
 
-Another key goal is the control of visibility of certain aspects of the encapsulated data and functionality. Recall from Chapter 6 the *least exposure* principle (POLE), which seeks to defensively guard against various *dangers* of scope over-exposure; these affect both variables and functions. In JS, we most often implement visibility control through the mechanics of lexical scope.
+现代前端编程最近的趋势是围绕组件架构来组织应用程序，这进一步推动了封装。对于许多人来说，将构成搜索结果列表的所有内容（甚至包括代码以外的内容，包括呈现标记和样式）整合到一个单一的程序逻辑单元中，即我们可以与之交互的有形内容中，感觉很自然。然后，我们给这个集合贴上 "SearchList" 组件的标签。
 
-The idea is to group alike program bits together, and selectively limit programmatic access to the parts we consider *private* details. What's not considered *private* is then marked as *public*, accessible to the whole program.
+另一个关键目标是控制封装数据和功能某些方面的可见性。请回顾第 6 章中的*最小暴露原则 (POLE)*，该原则旨在防御各种作用域过度暴露的*危险*；这些危险同时影响变量和函数。在 JS 中，我们通常通过词法作用域的机制来实现可见性控制。
 
-The natural effect of this effort is better code organization. It's easier to build and maintain software when we know where things are, with clear and obvious boundaries and connection points. It's also easier to maintain quality if we avoid the pitfalls of over-exposed data and functionality.
+这样做的目的是将程序中相似的片段组合在一起，有选择性地限制程序对我们认为*私有*细节部分的访问。不被视为*私有*的部分则被标记为*公共*，整个程序都可以访问。
 
-These are some of the main benefits of organizing JS programs into modules.
+这种努力的自然会得到更好的代码组织。当我们知道事物的位置、清晰明确的边界和连接点时，构建和维护软件就会变得更加容易。如果我们能避免过度暴露数据和功能的隐患，也就更容易保证质量。
 
-## What Is a Module?
+这些就是将 JS 程序组织成模块的一些主要好处。
 
-A module is a collection of related data and functions (often referred to as methods in this context), characterized by a division between hidden *private* details and *public* accessible details, usually called the "public API."
+## 什么是模块？
 
-A module is also stateful: it maintains some information over time, along with functionality to access and update that information.
+模块是相关数据和函数（在此通常称为方法）的集合，其特点是分为隐藏的*私有*细节和*公共*可访问的细节，通常称为「公共 API」。
 
-| NOTE: |
-| :--- |
-| A broader concern of the module pattern is fully embracing system-level modularization through loose-coupling and other program architecture techniques. That's a complex topic well beyond the bounds of our discussion, but is worth further study beyond this book. |
+模块也是有状态的：它随着时间的推移维护一些信息，以及访问和更新这些信息的功能。
 
-To get a better sense of what a module is, let's compare some module characteristics to useful code patterns that aren't quite modules.
+| 注意：                                                                                                                                                       |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 模块模式的一个更广泛的关注点是，通过解耦和其他程序架构技术，全面拥抱系统级模块化。这是一个复杂的话题，远远超出了我们的讨论范围，但值得在本书之外进一步研究。 |
 
-### Namespaces (Stateless Grouping)
+为了更好地理解什么是模块，让我们将模块的一些特征与非模块的有用代码模式进行比较。
 
-If you group a set of related functions together, without data, then you don't really have the expected encapsulation a module implies. The better term for this grouping of *stateless* functions is a namespace:
+### 命名空间（无状态分组）
+
+如果你将一组相关的函数组合在一起，但不包含数据，那么你就没有真正意义上的模块封装。命名空间 (namespace) 是这种*无状态*函数分组的更贴切的术语：
 
 ```js
-// namespace, not module
+// 命名空间，而不是模块
 var Utils = {
     cancelEvt(evt) {
         evt.preventDefault();
@@ -52,66 +53,64 @@ var Utils = {
         evt.stopImmediatePropagation();
     },
     wait(ms) {
-        return new Promise(function c(res){
-            setTimeout(res,ms);
+        return new Promise(function c(res) {
+            setTimeout(res, ms);
         });
     },
     isValidEmail(email) {
         return /[^@]+@[^@.]+\.[^@.]+/.test(email);
-    }
+    },
 };
 ```
 
-`Utils` here is a useful collection of utilities, yet they're all state-independent functions. Gathering functionality together is generally good practice, but that doesn't make this a module. Rather, we've defined a `Utils` namespace and organized the functions under it.
+这里的 `Utils` 是实用工具的集合，但它们都是与状态无关的函数。将功能集合在一起通常是一种好的做法，但这并不能使其成为一个模块。相反，我们定义了一个 `Utils` 命名空间，并在其下组织了这些函数。
 
-### Data Structures (Stateful Grouping)
+### 数据结构（有状态分组）
 
-Even if you bundle data and stateful functions together, if you're not limiting the visibility of any of it, then you're stopping short of the POLE aspect of encapsulation; it's not particularly helpful to label that a module.
+即使你把数据和有状态函数捆绑在一起，如果你没有限制其中任何一个函数的可见性，那么你就没有达到封装的 POLE 层面；给它贴上模块的标签也没什么用。
 
-Consider:
+想想看：
 
 ```js
-// data structure, not module
+// 数据结构，而不是模块
 var Student = {
     records: [
         { id: 14, name: "Kyle", grade: 86 },
         { id: 73, name: "Suzy", grade: 87 },
         { id: 112, name: "Frank", grade: 75 },
-        { id: 6, name: "Sarah", grade: 91 }
+        { id: 6, name: "Sarah", grade: 91 },
     ],
     getName(studentID) {
-        var student = this.records.find(
-            student => student.id == studentID
-        );
+        var student = this.records.find((student) => student.id == studentID);
         return student.name;
-    }
+    },
 };
 
 Student.getName(73);
 // Suzy
 ```
 
-Since `records` is publicly accessible data, not hidden behind a public API, `Student` here isn't really a module.
+由于 `records` 是可公开访问的数据，而不是隐藏在公共 API 后面的数据，因此这里的 `Student` 并不是一个真正的模块。
 
-`Student` does have the data-and-functionality aspect of encapsulation, but not the visibility-control aspect. It's best to label this an instance of a data structure.
+`Student` 确实具有封装的数据和功能方面，但不具有可见性控制方面。最好给它贴上数据结构实例的标签。
 
-### Modules (Stateful Access Control)
+### 模块（状态访问控制）
 
-To embody the full spirit of the module pattern, we not only need grouping and state, but also access control through visibility (private vs. public).
+要充分体现模块模化的精神，我们不仅需要分组和状态，还需要通过可见性（私有与公用）进行访问控制。
 
-Let's turn `Student` from the previous section into a module. We'll start with a form I call the "classic module," which was originally referred to as the "revealing module" when it first emerged in the early 2000s. Consider:
+让我们把上一节中的 `Student` 变成一个模块。我们将从一种我称之为「传统模块」的形式开始，这种模块在 2000 年代初首次出现时被称为「揭示模块」。思考一下：
 
 ```js
-var Student = (function defineStudent(){
+var Student = (function defineStudent() {
     var records = [
         { id: 14, name: "Kyle", grade: 86 },
         { id: 73, name: "Suzy", grade: 87 },
         { id: 112, name: "Frank", grade: 75 },
-        { id: 6, name: "Sarah", grade: 91 }
+        { id: 6, name: "Sarah", grade: 91 },
     ];
 
     var publicAPI = {
-        getName
+        getName,
     };
 
     return publicAPI;
@@ -119,52 +118,50 @@ var Student = (function defineStudent(){
     // ************************
 
     function getName(studentID) {
-        var student = records.find(
-            student => student.id == studentID
-        );
+        var student = records.find((student) => student.id == studentID);
         return student.name;
     }
 })();
 
-Student.getName(73);   // Suzy
+Student.getName(73); // Suzy
 ```
 
-`Student` is now an instance of a module. It features a public API with a single method: `getName(..)`. This method is able to access the private hidden `records` data.
+`Student` 现在是一个模块实例。它有一个公共 API，只有一个方法：`getName(..)`。该方法可以访问隐藏的私有 `records` 数据。
 
-| WARNING: |
-| :--- |
-| I should point out that the explicit student data being hard-coded into this module definition is just for our illustration purposes. A typical module in your program will receive this data from an outside source, typically loaded from databases, JSON data files, Ajax calls, etc. The data is then injected into the module instance typically through method(s) on the module's public API. |
+| 警告：                                                                                                                                                                                                                      |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 我需要指出的是，将明确的学生数据硬编码到模块定义中只是为了说明问题。程序中的典型模块将从外部来源接收数据，通常是从数据库、JSON 数据文件、Ajax 调用等加载的数据。然后，这些数据通常会通过模块公共 API 上的方法注入模块实例。 |
 
-How does the classic module format work?
+传统模块模式是如何运作的？
 
-Notice that the instance of the module is created by the `defineStudent()` IIFE being executed. This IIFE returns an object (named `publicAPI`) that has a property on it referencing the inner `getName(..)` function.
+请注意，模块实例是通过执行 `defineStudent()` IIFE 创建的。该 IIFE 返回一个对象（名为 `publicAPI`），该对象上有一个引用内部 `getName(..)` 函数的属性。
 
-Naming the object `publicAPI` is stylistic preference on my part. The object can be named whatever you like (JS doesn't care), or you can just return an object directly without assigning it to any internal named variable. More on this choice in Appendix A.
+将对象命名为 `publicAPI` 是我的风格偏好。对象可以随心所欲地命名（JS 并不关心），也可以直接返回对象，而不将其赋值给任何内部命名变量。附录 A 将详细介绍这种选择。
 
-From the outside, `Student.getName(..)` invokes this exposed inner function, which maintains access to the inner `records` variable via closure.
+从外部看，`Student.getName(..)` 会调用这个公开的内部函数，该函数通过闭包保持对内部 `records` 变量的访问。
 
-You don't *have* to return an object with a function as one of its properties. You could just return a function directly, in place of the object. That still satisfies all the core bits of a classic module.
+你并不*一定*要返回一个以函数作为属性之一的对象。你可以直接返回一个函数来代替对象。这样仍然可以满足传统模块的所有核心要求。
 
-By virtue of how lexical scope works, defining variables and functions inside your outer module definition function makes everything *by default* private. Only properties added to the public API object returned from the function will be exported for external public use.
+根据词法作用域的工作原理，在外层模块定义函数中定义变量和函数，默认情况下会将所有内容都设为私有。只有添加到函数返回的公共 API 对象中的属性才会被导出供外部公共使用。
 
-The use of an IIFE implies that our program only ever needs a single central instance of the module, commonly referred to as a "singleton." Indeed, this specific example is simple enough that there's no obvious reason we'd need anything more than just one instance of the `Student` module.
+使用 IIFE 意味着我们的程序只需要模块的一个中心实例，也就是通常所说的「单例」。事实上，这个例子非常简单，没有明显的理由让我们只需要一个 `Student` 模块实例。
 
-#### Module Factory (Multiple Instances)
+#### 模块工厂（多实例）
 
-But if we did want to define a module that supported multiple instances in our program, we can slightly tweak the code:
+但如果我们确实想在程序中定义一个支持多个实例的模块，我们可以对代码稍作调整：
 
 ```js
-// factory function, not singleton IIFE
+// 工厂函数，而不是单例 IIFE
 function defineStudent() {
     var records = [
         { id: 14, name: "Kyle", grade: 86 },
         { id: 73, name: "Suzy", grade: 87 },
         { id: 112, name: "Frank", grade: 75 },
-        { id: 6, name: "Sarah", grade: 91 }
+        { id: 6, name: "Sarah", grade: 91 },
     ];
 
     var publicAPI = {
-        getName
+        getName,
     };
 
     return publicAPI;
@@ -172,38 +169,34 @@ function defineStudent() {
     // ************************
 
     function getName(studentID) {
-        var student = records.find(
-            student => student.id == studentID
-        );
+        var student = records.find((student) => student.id == studentID);
         return student.name;
     }
 }
 
 var fullTime = defineStudent();
-fullTime.getName(73);            // Suzy
+fullTime.getName(73); // Suzy
 ```
 
-Rather than specifying `defineStudent()` as an IIFE, we just define it as a normal standalone function, which is commonly referred to in this context as a "module factory" function.
+我们并没有将 `defineStudent()` 指定为 IIFE，而是将其定义为一个普通的独立函数，在这里通常称为「模块工厂」函数。
 
-We then call the module factory, producing an instance of the module that we label `fullTime`. This module instance implies a new instance of the inner scope, and thus a new closure that `getName(..)` holds over `records`. `fullTime.getName(..)` now invokes the method on that specific instance.
+然后，我们调用模块工厂，生成一个标为 `fullTime` 的模块实例。这个模块实例意味着一个新的内部作用域实例，因此，`getName(..)` 对 `records` 拥有一个新的闭包。现在，`fullTime.getName(..)` 将调用该特定实例上的方法。
 
-#### Classic Module Definition
+#### 传统模块的定义
 
-So to clarify what makes something a classic module:
+因此，为了澄清什么是传统模块：
 
-* There must be an outer scope, typically from a module factory function running at least once.
+-   必须有一个外部作用域，通常是至少运行一次的模块工厂函数。
+-   模块的内部作用域必须至少有一条代表模块状态的隐藏信息。
+-   模块必须在其公共 API 中返回至少一个函数的引用，该函数对隐藏的模块状态具有闭包（以便实际保留该状态）。
 
-* The module's inner scope must have at least one piece of hidden information that represents state for the module.
+我们将在附录 A 中详细介绍这种传统模块方法的其他变体。
 
-* The module must return on its public API a reference to at least one function that has closure over the hidden module state (so that this state is actually preserved).
+## Node CommonJS 模块
 
-You'll likely run across other variations on this classic module approach, which we'll look at in more detail in Appendix A.
+在第 4 章中，我们介绍了 Node 使用的 CommonJS 模块格式。与前面介绍的传统模块格式不同，CommonJS 模块是基于文件的；每个文件一个模块。
 
-## Node CommonJS Modules
-
-In Chapter 4, we introduced the CommonJS module format used by Node. Unlike the classic module format described earlier, where you could bundle the module factory or IIFE alongside any other code including other modules, CommonJS modules are file-based; one module per file.
-
-Let's tweak our module example to adhere to that format:
+让我们调整一下模块示例，使其符合这种格式：
 
 ```js
 module.exports.getName = getName;
@@ -214,43 +207,41 @@ var records = [
     { id: 14, name: "Kyle", grade: 86 },
     { id: 73, name: "Suzy", grade: 87 },
     { id: 112, name: "Frank", grade: 75 },
-    { id: 6, name: "Sarah", grade: 91 }
+    { id: 6, name: "Sarah", grade: 91 },
 ];
 
 function getName(studentID) {
-    var student = records.find(
-        student => student.id == studentID
-    );
+    var student = records.find((student) => student.id == studentID);
     return student.name;
 }
 ```
 
-The `records` and `getName` identifiers are in the top-level scope of this module, but that's not the global scope (as explained in Chapter 4). As such, everything here is *by default* private to the module.
+`records` 和 `getName` 标识符位于本模块的顶层作用域，但这不是全局作用域（如第 4 章所述）。因此，这里的所有内容*默认*都是模块的私有内容。
 
-To expose something on the public API of a CommonJS module, you add a property to the empty object provided as `module.exports`. In some older legacy code, you may run across references to just a bare `exports`, but for code clarity you should always fully qualify that reference with the `module.` prefix.
+要在 CommonJS 模块的公共 API 上公开某些内容，需要向作为 `module.exports` 提供的空对象添加一个属性。在一些较旧的遗留代码中，您可能会遇到对仅有的 `exports` 的引用，但为了代码的清晰度，您应始终使用 `module.` 前缀对该引用进行完全限定。
 
-For style purposes, I like to put my "exports" at the top and my module implementation at the bottom. But these exports can be placed anywhere. I strongly recommend collecting them all together, either at the top or bottom of your file.
+出于风格考虑，我喜欢将 "exports" 放在顶部，而将模块实现放在底部。但这些导出可以放在任何地方。我强烈建议将它们集中在一起，放在文件的顶部或底部。
 
-Some developers have the habit of replacing the default exports object, like this:
+有些开发人员习惯于替换默认导出为对象，就像这样：
 
 ```js
-// defining a new object for the API
+// 为 API 定义新对象
 module.exports = {
     // ..exports..
 };
 ```
 
-There are some quirks with this approach, including unexpected behavior if multiple such modules circularly depend on each other. As such, I recommend against replacing the object. If you want to assign multiple exports at once, using object literal style definition, you can do this instead:
+这种方法有一些怪异之处，包括多个此类模块相互循环依赖时出现意外行为。因此，我建议不要替换对象。如果你想使用对象字面风格定义一次分配多个导出，你可以这样做：
 
 ```js
-Object.assign(module.exports,{
-   // .. exports ..
+Object.assign(module.exports, {
+    // .. exports ..
 });
 ```
 
-What's happening here is defining the `{ .. }` object literal with your module's public API specified, and then `Object.assign(..)` is performing a shallow copy of all those properties onto the existing `module.exports` object, instead of replacing it This is a nice balance of convenience and safer module behavior.
+这里做的事情是在定义 `{ .. }` 然后，`Object.assign(..)` 将所有这些属性浅拷贝到现有的 `module.exports` 对象上，而不是替换它。
 
-To include another module instance into your module/program, use Node's `require(..)` method. Assuming this module is located at "/path/to/student.js", this is how we can access it:
+要在模块/程序中包含另一个模块实例，请使用 Node 的 `require(..)` 方法。假设该模块位于 "/path/to/student.js"，我们可以这样访问它：
 
 ```js
 var Student = require("/path/to/student.js");
@@ -259,31 +250,31 @@ Student.getName(73);
 // Suzy
 ```
 
-`Student` now references the public API of our example module.
+现在，`Student` 引用了我们示例模块的公共 API。
 
-CommonJS modules behave as singleton instances, similar to the IIFE module definition style presented before. No matter how many times you `require(..)` the same module, you just get additional references to the single shared module instance.
+CommonJS 模块表现为单例，类似于之前介绍的 IIFE 模块定义风格。无论你多少次 `require(..)` 同一个模块，你都只会得到对单个共享模块实例的额外引用。
 
-`require(..)` is an all-or-nothing mechanism; it includes a reference of the entire exposed public API of the module. To effectively access only part of the API, the typical approach looks like this:
+`require(..)` 是一种全有或全无的机制；它包括对模块整个公开 API 的引用。如果只想有效地访问 API 的一部分，典型的方法如下：
 
 ```js
 var getName = require("/path/to/student.js").getName;
 
-// or alternately:
+// 或者使用：
 
 var { getName } = require("/path/to/student.js");
 ```
 
-Similar to the classic module format, the publicly exported methods of a CommonJS module's API hold closures over the internal module details. That's how the module singleton state is maintained across the lifetime of your program.
+与传统模块格式类似，CommonJS 模块 API 的公开导出方法对模块内部细节进行闭包。这就是模块单例状态在整个程序生命周期中的维护方式。
 
-| NOTE: |
-| :--- |
-| In Node `require("student")` statements, non-absolute paths (`"student"`) assume a ".js" file extension and search "node_modules". |
+| 注意：                                                                                                        |
+| :------------------------------------------------------------------------------------------------------------ |
+| 在 Node `require("student")` 语句中，非绝对路径（`"student"`）假定文件扩展名为 ".js"，并搜索 "node_modules"。 |
 
-## Modern ES Modules (ESM)
+## 现代 ES 模块 (ESM)
 
-The ESM format shares several similarities with the CommonJS format. ESM is file-based, and module instances are singletons, with everything private *by default*. One notable difference is that ESM files are assumed to be strict-mode, without needing a `"use strict"` pragma at the top. There's no way to define an ESM as non-strict-mode.
+ESM 格式与 CommonJS 格式有几处相似之处。ESM 基于文件，模块实例是单例，*默认情况下*所有内容都是私有的。一个显著的不同点是，ESM 文件被假定为严格模式，而无需在顶部添加 `"use strict"` 编译指示。没有办法将 ESM 定义为非严格模式。
 
-Instead of `module.exports` in CommonJS, ESM uses an `export` keyword to expose something on the public API of the module. The `import` keyword replaces the `require(..)` statement. Let's adjust "students.js" to use the ESM format:
+与 CommonJS 中的 `module.exports` 不同，ESM 使用 `export` 关键字来公开模块的公共 API。`import` 关键字取代了 `require(..)` 语句。让我们调整 "students.js" 以使用 ESM 格式：
 
 ```js
 export { getName };
@@ -294,20 +285,18 @@ var records = [
     { id: 14, name: "Kyle", grade: 86 },
     { id: 73, name: "Suzy", grade: 87 },
     { id: 112, name: "Frank", grade: 75 },
-    { id: 6, name: "Sarah", grade: 91 }
+    { id: 6, name: "Sarah", grade: 91 },
 ];
 
 function getName(studentID) {
-    var student = records.find(
-        student => student.id == studentID
-    );
+    var student = records.find((student) => student.id == studentID);
     return student.name;
 }
 ```
 
-The only change here is the `export { getName }` statement. As before, `export` statements can appear anywhere throughout the file, though `export` must be at the top-level scope; it cannot be inside any other block or function.
+这里唯一的变化是 `export { getName }` 语句。和以前一样，`export` 语句可以出现在整个文件的任何地方，但 `export` 必须位于顶层作用域；它不能位于任何其他代码块或函数内部。
 
-ESM offers a fair bit of variation on how the `export` statements can be specified. For example:
+对于如何指定 `export` 语句，ESM 提供了相当多的写法。例如：
 
 ```js
 export function getName(studentID) {
@@ -315,9 +304,9 @@ export function getName(studentID) {
 }
 ```
 
-Even though `export` appears before the `function` keyword here, this form is still a `function` declaration that also happens to be exported. That is, the `getName` identifier is *function hoisted* (see Chapter 5), so it's available throughout the whole scope of the module.
+尽管 `export` 出现在这里的 `function` 关键字之前，但这个表单仍然是一个 `function` 声明，而且恰好也是导出的。也就是说，`getName`标识符是*函数提升*（参见第 5 章），因此它在整个模块作用域内都可用。
 
-Another allowed variation:
+另一种写法：
 
 ```js
 export default function getName(studentID) {
@@ -325,69 +314,67 @@ export default function getName(studentID) {
 }
 ```
 
-This is a so-called "default export," which has different semantics from other exports. In essence, a "default export" is a shorthand for consumers of the module when they `import`, giving them a terser syntax when they only need this single default API member.
+这就是所谓的「默认导出」，其语义与其他导出不同。从本质上讲，「默认导出」是模块消费者在「导入」时的一种速记，当他们只需要这个单一的默认 API 成员时，会给他们提供一种更简洁的语法。
 
-Non-`default` exports are referred to as "named exports."
+非默认 (`default`) 导出称为「命名导出」。
 
-The `import` keyword—like `export`, it must be used only at the top level of an ESM outside of any blocks or functions—also has a number of variations in syntax. The first is referred to as "named import":
+`import` 关键字与 `export` 关键字一样，只能在任何模块或函数之外的 ESM 顶层使用，其语法也有多种变化。第一种称为「命名导入」：
 
 ```js
 import { getName } from "/path/to/students.js";
 
-getName(73);   // Suzy
+getName(73); // Suzy
 ```
 
-As you can see, this form imports only the specifically named public API members from a module (skipping anything not named explicitly), and it adds those identifiers to the top-level scope of the current module. This type of import is a familiar style to those used to package imports in languages like Java.
+如您所见，这种形式只导入模块中已明确命名的公共 API 成员（跳过任何未明确命名的成员），并将这些标识符添加到当前模块的顶层作用域中。这种导入方式对于那些习惯于使用 Java 等语言中的包导入的人来说并不陌生。
 
-Multiple API members can be listed inside the `{ .. }` set, separated with commas. A named import can also be *renamed* with the `as` keyword:
+可在 `{ .. }` 集合中列出多个 API 成员，中间用逗号隔开。还可以使用 `as` 关键字对已命名的导入进行*重命名*：
 
 ```js
-import { getName as getStudentName }
-   from "/path/to/students.js";
+import { getName as getStudentName } from "/path/to/students.js";
 
 getStudentName(73);
 // Suzy
 ```
 
-If `getName` is a "default export" of the module, we can import it like this:
+如果 `getName` 是模块的「默认导出」，我们可以这样导入它：
 
 ```js
 import getName from "/path/to/students.js";
 
-getName(73);   // Suzy
+getName(73); // Suzy
 ```
 
-The only difference here is dropping the `{ }` around the import binding. If you want to mix a default import with other named imports:
+这里唯一的区别是去掉了导入周围的 `{ }`。如果要将默认导入与其他已命名的导入混合使用：
 
 ```js
-import { default as getName, /* .. others .. */ }
-   from "/path/to/students.js";
+import { default as getName /* .. others .. */ } from "/path/to/students.js";
 
-getName(73);   // Suzy
+getName(73); // Suzy
 ```
 
-By contrast, the other major variation on `import` is called "namespace import":
+相比之下，`import` 的另一个主要变体称为「命名空间导入」：
 
 ```js
 import * as Student from "/path/to/students.js";
 
-Student.getName(73);   // Suzy
+Student.getName(73); // Suzy
 ```
 
-As is likely obvious, the `*` imports everything exported to the API, default and named, and stores it all under the single namespace identifier as specified. This approach most closely matches the form of classic modules for most of JS's history.
+显而易见，`*` 会导入所有输出到 API 的内容，包括默认内容和已命名内容，并将其存储在指定的单一命名空间标识符下。这种方法最接近 JS 历史上大多数传统模块的形式。
 
-| NOTE: |
-| :--- |
-| As of the time of this writing, modern browsers have supported ESM for a few years now, but Node's stable'ish support for ESM is fairly recent, and has been evolving for quite a while. The evolution is likely to continue for another year or more; the introduction of ESM to JS back in ES6 created a number of challenging compatibility concerns for Node's interop with CommonJS modules. Consult Node's ESM documentation for all the latest details: https://nodejs.org/api/esm.html |
+| 注意：                                                                                                                                                                                                                                                                                                                                    |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 截至本文撰写之时，现代浏览器支持 ESM 已有数年时间，而 Node 对 ESM 的稳定支持则是最近才开始的，并且已经发展了相当长的一段时间。这种演进可能还要持续一年或更长时间；ES6 将 ESM 引入 JS 时，为 Node 与 CommonJS 模块的互操作带来了许多具有挑战性的兼容性问题。有关所有最新细节，请查阅 Node 的 ESM 文档：<https://nodejs.org/api/esm.html>。 |
 
-## Exit Scope
+## 周天圆满
 
-Whether you use the classic module format (browser or Node), CommonJS format (in Node), or ESM format (browser or Node), modules are one of the most effective ways to structure and organize your program's functionality and data.
+无论是使用经典的模块格式（浏览器或 Node）、CommonJS 格式（在 Node 中）还是 ESM 格式（浏览器或 Node），模块都是结构化和组织程序功能和数据的最有效方法之一。
 
-The module pattern is the conclusion of our journey in this book of learning how we can use the rules of lexical scope to place variables and functions in proper locations. POLE is the defensive *private by default* posture we always take, making sure we avoid over-exposure and interact only with the minimal public API surface area necessary.
+模块模式是我们在本书中学习如何使用词法作用域规则将变量和函数放置在适当位置的旅程的终点。POLE 是我们一贯采取的*默认情况下的私有*防御姿态，确保我们避免过度暴露，只与最小的公共 API 表面区域进行必要的交互。
 
-And underneath modules, the *magic* of how all our module state is maintained is closures leveraging the lexical scope system.
+在模块之下，利用词法作用域系统的闭包是维护所有模块状态的*法宝*。
 
-That's it for the main text. Congratulations on quite a journey so far! As I've said numerous times throughout, it's a really good idea to pause, reflect, and practice what we've just discussed.
+正文到此结束。恭喜你完成了这一段旅程！正如我在整个过程中多次说过的，暂停、思考和实践我们刚刚讨论的内容是一个非常好的主意。
 
-When you're comfortable and ready, check out the appendices, which dig deeper into some of the corners of these topics, and also challenge you with some practice exercises to solidify what you've learned.
+当您感到舒适并准备就绪时，请查看附录，这些附录深入探讨了这些主题的一些角落，还通过一些练习题来巩固您所学的知识。

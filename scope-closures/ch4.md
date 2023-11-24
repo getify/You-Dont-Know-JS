@@ -1,33 +1,34 @@
-# You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 4: Around the Global Scope
+# 你并不了解 JavaScript：作用域与闭包 - 第二版
 
-Chapter 3 mentioned the "global scope" several times, but you may still be wondering why a program's outermost scope is all that important in modern JS. The vast majority of work is now done inside of functions and modules rather than globally.
+# 第四章：全局作用域
 
-Is it good enough to just assert, "Avoid using the global scope," and be done with it?
+第 3 章多次提到了「全局作用域」，但您可能仍想知道为什么程序的最外层作用域在现代 JS 中如此重要。现在，绝大多数工作都是在函数和模块内部完成的，而不是在全局作用域内。
 
-The global scope of a JS program is a rich topic, with much more utility and nuance than you would likely assume. This chapter first explores how the global scope is (still) useful and relevant to writing JS programs today, then looks at differences in where and *how to access* the global scope in different JS environments.
+仅仅断言「避免使用全局作用域」就够了吗？
 
-Fully understanding the global scope is critical in your mastery of using lexical scope to structure your programs.
+JS 程序的全局作用域是一个内容丰富的话题，其实用性和细微差别远远超出你的想象。本章首先探讨了全局作用域在今天编写 JS 程序中（仍然）是如何有用和相关的，然后探讨了在不同的 JS 环境中访问全局作用域的位置和*方式*的差异。
 
-## Why Global Scope?
+充分理解全局作用域对于掌握使用词法作用域来构建程序至关重要。
 
-It's likely no surprise to readers that most applications are composed of multiple (sometimes many!) individual JS files. So how exactly do all those separate files get stitched together in a single runtime context by the JS engine?
+## 为什么是全局作用域？
 
-With respect to browser-executed applications, there are three main ways.
+大多数应用程序都是由多个（有时是很多！）独立的 JS 文件组成的，读者对此可能并不陌生。那么，JS 引擎究竟是如何将所有这些独立文件拼接到一个运行时上下文中的呢？
 
-First, if you're directly using ES modules (not transpiling them into some other module-bundle format), these files are loaded individually by the JS environment. Each module then `import`s references to whichever other modules it needs to access. The separate module files cooperate with each other exclusively through these shared imports, without needing any shared outer scope.
+关于浏览器执行应用程序，主要有三种方式。
 
-Second, if you're using a bundler in your build process, all the files are typically concatenated together before delivery to the browser and JS engine, which then only processes one big file. Even with all the pieces of the application co-located in a single file, some mechanism is necessary for each piece to register a *name* to be referred to by other pieces, as well as some facility for that access to occur.
+首先，如果您直接使用 ES 模块（而不是将它们转换成其他模块包的格式），JS 环境会单独加载这些文件。然后，每个模块会 `import` 它需要访问的其他模块的引用。独立的模块文件只通过这些共享导入相互合作，而不需要任何共享的外层作用域。
 
-In some build setups, the entire contents of the file are wrapped in a single enclosing scope, such as a wrapper function, universal module (UMD—see Appendix A), etc. Each piece can register itself for access from other pieces by way of local variables in that shared scope. For example:
+其次，如果您在构建过程中使用了打包工具，那么所有文件通常都会在交付给浏览器和 JS 引擎之前串联在一起，然后只处理一个大文件。即使应用程序的所有部分都位于一个文件中，也需要建立某种机制，让每个部分都能注册一个*名称*，以便被其他部分引用，还需要建立某种设施，以便进行访问。
+
+在某些编译设置中，文件的全部内容都被封装在一个单一的外层作用域中，如封装函数、通用模块（UMD — 见附录 A）等。每个片段都可以通过共享作用域中的局部变量注册自己，以便其他片段访问。例如
 
 ```js
-(function wrappingOuterScope(){
-    var moduleOne = (function one(){
+(function wrappingOuterScope() {
+    var moduleOne = (function one() {
         // ..
     })();
 
-    var moduleTwo = (function two(){
+    var moduleTwo = (function two() {
         // ..
 
         function callModuleOne() {
@@ -39,19 +40,19 @@ In some build setups, the entire contents of the file are wrapped in a single en
 })();
 ```
 
-As shown, the `moduleOne` and `moduleTwo` local variables inside the `wrappingOuterScope()` function scope are declared so that these modules can access each other for their cooperation.
+如上所示，`wrappingOuterScope()` 函数作用域内的 `moduleOne` 和 `moduleTwo` 局部变量的声明是为了让这些模块可以互相访问，以实现合作。
 
-While the scope of `wrappingOuterScope()` is a function and not the full environment global scope, it does act as a sort of "application-wide scope," a bucket where all the top-level identifiers can be stored, though not in the real global scope. It's kind of like a stand-in for the global scope in that respect.
+虽然 `wrappingOuterScope()` 的作用域是一个函数，而不是整个环境的全局作用域，但它确实充当了一种「全应用程序作用域」，一个可以存储所有顶级标识符的容器，尽管它不在真正的全局作用域中。在这方面，它有点像全局作用域的替身。
 
-And finally, the third way: whether a bundler tool is used for an application, or whether the (non-ES module) files are simply loaded in the browser individually (via `<script>` tags or other dynamic JS resource loading), if there is no single surrounding scope encompassing all these pieces, the **global scope** is the only way for them to cooperate with each other:
+最后是第三种方式：无论应用程序使用的是打包工具，还是（非 ES 模块）文件只是在浏览器中单独加载（通过 `<script>` 标签或其他动态 JS 资源加载），如果没有包含所有这些部分的单一作用域，那么**全局作用域**就是它们相互合作的唯一方式：
 
-A bundled file of this sort often looks something like this:
+这类文件通常看起来像这样：
 
 ```js
-var moduleOne = (function one(){
+var moduleOne = (function one() {
     // ..
 })();
-var moduleTwo = (function two(){
+var moduleTwo = (function two() {
     // ..
 
     function callModuleOne() {
@@ -62,12 +63,12 @@ var moduleTwo = (function two(){
 })();
 ```
 
-Here, since there is no surrounding function scope, these `moduleOne` and `moduleTwo` declarations are simply dropped into the global scope. This is effectively the same as if the files hadn't been concatenated, but loaded separately:
+在这里，由于周围没有函数作用域，这些 `moduleOne` 和 `moduleTwo` 声明被简单地放到了全局作用域中。这实际上等同于没有串联文件，而是单独加载文件：
 
 module1.js:
 
 ```js
-var moduleOne = (function one(){
+var moduleOne = (function one() {
     // ..
 })();
 ```
@@ -75,7 +76,7 @@ var moduleOne = (function one(){
 module2.js:
 
 ```js
-var moduleTwo = (function two(){
+var moduleTwo = (function two() {
     // ..
 
     function callModuleOne() {
@@ -86,80 +87,80 @@ var moduleTwo = (function two(){
 })();
 ```
 
-If these files are loaded separately as normal standalone .js files in a browser environment, each top-level variable declaration will end up as a global variable, since the global scope is the only shared resource between these two separate files—they're independent programs, from the perspective of the JS engine.
+如果在浏览器环境中将这些文件作为普通的独立 .js 文件单独加载，每个顶层变量声明最终都将成为全局变量，因为全局作用域是这两个独立文件之间唯一的共享资源。从 JS 引擎的角度来看，它们是独立的程序。
 
-In addition to (potentially) accounting for where an application's code resides during runtime, and how each piece is able to access the other pieces to cooperate, the global scope is also where:
+除了（有可能）说明运行时应用程序的代码所在位置，以及每个部分如何访问其他部分以进行合作外，全局作用域也是一个重要因素：
 
-* JS exposes its built-ins:
+-   JS 提供的内置组件:
 
-    - primitives: `undefined`, `null`, `Infinity`, `NaN`
-    - natives: `Date()`, `Object()`, `String()`, etc.
-    - global functions: `eval()`, `parseInt()`, etc.
-    - namespaces: `Math`, `Atomics`, `JSON`
-    - friends of JS: `Intl`, `WebAssembly`
+    -   原始值： `undefined`, `null`, `Infinity`, `NaN`
+    -   内置： `Date()`, `Object()`, `String()`, 等等。
+    -   全局函数：`eval()`, `parseInt()`, 等等。
+    -   命名空间：`Math`, `Atomics`, `JSON`
+    -   JS 的朋友们：`Intl`, `WebAssembly`
 
-* The environment hosting the JS engine exposes its own built-ins:
+-   托管 JS 引擎的环境提供的内置功能：
 
-    - `console` (and its methods)
-    - the DOM (`window`, `document`, etc)
-    - timers (`setTimeout(..)`, etc)
-    - web platform APIs: `navigator`, `history`, geolocation, WebRTC, etc.
+    -   `console` (以及它的函数)
+    -   DOM (`window`, `document`, 等等)
+    -   timers (`setTimeout(..)`, 等等)
+    -   web 平台 API: `navigator`, `history`, geolocation, WebRTC, 等等。
 
-These are just some of the many *globals* your programs will interact with.
+这些只是您的程序将与之交互的众多 _globals_ 中的一部分。
 
-| NOTE: |
-| :--- |
-| Node also exposes several elements "globally," but they're technically not in the `global` scope: `require()`, `__dirname`, `module`, `URL`, and so on. |
+| 注意：                                                                                                                              |
+| :---------------------------------------------------------------------------------------------------------------------------------- |
+| Node 还在「全局」作用域内公开了几个元素，但从技术上讲，它们并不在 `global` 作用域内：`require()`, `__dirname`, `module`, `URL` 等。 |
 
-Most developers agree that the global scope shouldn't just be a dumping ground for every variable in your application. That's a mess of bugs just waiting to happen. But it's also undeniable that the global scope is an important *glue* for practically every JS application.
+大多数开发人员都认为，全局作用域不应该只是应用程序中每个变量的垃圾场。这样做会导致错误丛生。但同样不可否认的是，全局作用域几乎是每个 JS 应用程序的重要「粘合剂」。
 
-## Where Exactly is this Global Scope?
+## 全局作用域具体范围是什么？
 
-It might seem obvious that the global scope is located in the outermost portion of a file; that is, not inside any function or other block. But it's not quite as simple as that.
+全局作用域位于文件的最外层，即不在任何函数或其他代码块内，这一点似乎显而易见。但事实并非如此简单。
 
-Different JS environments handle the scopes of your programs, especially the global scope, differently. It's quite common for JS developers to harbor misconceptions without even realizing it.
+不同的 JS 环境会以不同的方式处理程序的作用域，尤其是全局作用域。JS 开发人员经常会在不知不觉中产生误解。
 
-### Browser "Window"
+### 浏览器 "Window"
 
-With respect to treatment of the global scope, the most *pure* environment JS can be run in is as a standalone .js file loaded in a web page environment in a browser. I don't mean "pure" as in nothing automatically added—lots may be added!—but rather in terms of minimal intrusion on the code or interference with its expected global scope behavior.
+关于全作用域的处理，JS 最*纯粹*的运行环境是在浏览器的网页环境中运行独立的 .js 文件。我说的「纯粹」并不是指没有自动添加任何东西，而是指对代码的侵入或对其预期全局作用域行为的干扰最小。
 
-Consider this .js file:
+假设有一个这样的 .js 文件：
 
 ```js
 var studentName = "Kyle";
 
 function hello() {
-    console.log(`Hello, ${ studentName }!`);
+    console.log(`Hello, ${studentName}!`);
 }
 
 hello();
 // Hello, Kyle!
 ```
 
-This code may be loaded in a web page environment using an inline `<script>` tag, a `<script src=..>` script tag in the markup, or even a dynamically created `<script>` DOM element. In all three cases, the `studentName` and `hello` identifiers are declared in the global scope.
+这段代码可以在网页环境中使用内联 `<script>` 标签加载或者 `<script src=..>` script 标签，甚至是动态创建的 `<script>` DOM 元素。在这三种情况下，`studentName` 和 `hello` 标识符都是在全局作用域声明的。
 
-That means if you access the global object (commonly, `window` in the browser), you'll find properties of those same names there:
+这意味着，如果访问全局对象（通常是浏览器中的 `window`），就会在那里找到这些相同名称的属性：
 
 ```js
 var studentName = "Kyle";
 
 function hello() {
-    console.log(`Hello, ${ window.studentName }!`);
+    console.log(`Hello, ${window.studentName}!`);
 }
 
 window.hello();
 // Hello, Kyle!
 ```
 
-That's the default behavior one would expect from a reading of the JS specification: the outer scope *is* the global scope and `studentName` is legitimately created as global variable.
+这正是阅读 JS 规范时所期望的默认行为：外层作用域*是*全局作用域，而 `studentName` 被合法地创建为全局变量。
 
-That's what I mean by *pure*. But unfortunately, that won't always be true of all JS environments you encounter, and that's often surprising to JS developers.
+这就是我所说的*纯粹*。但遗憾的是，这并不总是你所遇到的所有 JS 环境的真实情况，而这往往会让 JS 开发人员感到惊讶。
 
-#### Globals Shadowing Globals
+#### 全局遮蔽全局
 
-Recall the discussion of shadowing (and global unshadowing) from Chapter 3, where one variable declaration can override and prevent access to a declaration of the same name from an outer scope.
+回想一下第 3 章中关于遮蔽（和解除全局遮蔽）的讨论，其中一个变量声明可以覆盖并阻止从外层作用域访问同名的声明。
 
-An unusual consequence of the difference between a global variable and a global property of the same name is that, within just the global scope itself, a global object property can be shadowed by a global variable:
+全局变量和同名的全局属性之间的一个不同寻常的结果是，在全局作用域内，全局对象属性可以被全局变量遮蔽：
 
 ```js
 window.something = 42;
@@ -173,19 +174,19 @@ console.log(window.something);
 // 42
 ```
 
-The `let` declaration adds a `something` global variable but not a global object property (see Chapter 3). The effect then is that the `something` lexical identifier shadows the `something` global object property.
+`let` 声明添加了一个 `something` 全局变量，但没有添加全局对象属性（参见第 3 章）。这样做的结果是 `something` 词法标识符会影响 `something` 全局对象属性。
 
-It's almost certainly a bad idea to create a divergence between the global object and the global scope. Readers of your code will almost certainly be tripped up.
+在全局对象和全局作用域之间产生分歧肯定是个坏主意。你的代码读者很大概率会被绊倒。
 
-A simple way to avoid this gotcha with global declarations: always use `var` for globals. Reserve `let` and `const` for block scopes (see "Scoping with Blocks" in Chapter 6).
+避免全局声明出现这种问题的简单方法是：全局声明始终使用 `var`。将 `let` 和 `const` 保留给块作用域（参见第 6 章「块作用域」）。
 
-#### DOM Globals
+#### 全局 DOM
 
-I asserted that a browser-hosted JS environment has the most *pure* global scope behavior we'll see. However, it's not entirely *pure*.
+我曾断言，浏览器托管的 JS 环境拥有我们将看到的最*纯粹*的全局作用域行为。然而，它并不完全*纯粹*。
 
-One surprising behavior in the global scope you may encounter with browser-based JS applications: a DOM element with an `id` attribute automatically creates a global variable that references it.
+在基于浏览器的 JS 应用程序中，您可能会在全局作用域内遇到一个令人惊讶的行为：带有 `id` 属性的 DOM 元素会自动创建一个引用它的全局变量。
 
-Consider this markup:
+请看以下代码：
 
 ```text
 <ul id="my-todo-list">
@@ -194,7 +195,7 @@ Consider this markup:
 </ul>
 ```
 
-And the JS for that page could include:
+但是这个页面的 JS 可能出现：
 
 ```js
 first;
@@ -204,13 +205,13 @@ window["my-todo-list"];
 // <ul id="my-todo-list">..</ul>
 ```
 
-If the `id` value is a valid lexical name (like `first`), the lexical variable is created. If not, the only way to access that global is through the global object (`window[..]`).
+如果 `id` 值是一个有效的词法名称（如 `first`），则会创建词法变量。否则，访问全局变量的唯一途径是通过全局对象 (`window[..]`)。
 
-The auto-registration of all `id`-bearing DOM elements as global variables is an old legacy browser behavior that nevertheless must remain because so many old sites still rely on it. My advice is never to use these global variables, even though they will always be silently created.
+将所有带有 `id` 的 DOM 元素自动注册为全局变量是一种古老的传统浏览器行为，但由于许多老网站仍然依赖于这种行为，因此这种行为必须保留。我的建议是永远不要使用这些全局变量，尽管它们总是会被静默创建。
 
-#### What's in a (Window) Name?
+#### (Window) 名称有什么含义？
 
-Another global scope oddity in browser-based JS:
+基于浏览器的 JS 中的另一个全局作用域怪现象：
 
 ```js
 var name = 42;
@@ -219,30 +220,30 @@ console.log(name, typeof name);
 // "42" string
 ```
 
-`window.name` is a pre-defined "global" in a browser context; it's a property on the global object, so it seems like a normal global variable (yet it's anything but "normal").
+在浏览器上下文中，`window.name` 是一个预定义的「全局」；它是全局对象上的一个属性，因此看起来就像一个普通的全局变量（但它并不「普通」）。
 
-We used `var` for our declaration, which **does not** shadow the pre-defined `name` global property. That means, effectively, the `var` declaration is ignored, since there's already a global scope object property of that name. As we discussed earlier, had we used `let name`, we would have shadowed `window.name` with a separate global `name` variable.
+我们在声明中使用了 `var`，它**不会**对预定义的 `name` 全局属性产生遮蔽。这实际上意味着，`var` 声明会被忽略，因为已经有了一个全局作用域对象属性的名称。正如我们之前讨论过的，如果我们使用 `let name`，我们就会使用一个单独的全局变量 `name` 来遮蔽 `window.name` 。
 
-But the truly surprising behavior is that even though we assigned the number `42` to `name` (and thus `window.name`), when we then retrieve its value, it's a string `"42"`! In this case, the weirdness is because `name` is actually a pre-defined getter/setter on the `window` object, which insists on its value being a string value. Yikes!
+但真正令人惊讶的行为是，尽管我们将数字 `42` 赋值给了 `name`（因此也赋值给了 `window.name`），但当我们检索其值时，它却是一个字符串 `"42"`！在这种情况下，出现这种奇怪的情况是因为 `name` 实际上是 `window` 对象上的一个预定义 getter/setter，它坚持其值必须是一个字符串值。哎呀！
 
-With the exception of some rare corner cases like DOM element ID's and `window.name`, JS running as a standalone file in a browser page has some of the most *pure* global scope behavior we will encounter.
+除了 DOM 元素 ID 和 `window.name` 等极少数情况外，在浏览器页面中作为独立文件运行的 JS 具有我们会遇到的最*纯粹*的全局作用域行为。
 
 ### Web Workers
 
-Web Workers are a web platform extension on top of browser-JS behavior, which allows a JS file to run in a completely separate thread (operating system wise) from the thread that's running the main JS program.
+Web Workers 是 browser-JS 行为之上的网络平台扩展，它允许 JS 文件在与运行主 JS 程序的线程完全独立的线程中运行（从操作系统角度看）。
 
-Since these Web Worker programs run on a separate thread, they're restricted in their communications with the main application thread, to avoid/limit race conditions and other complications. Web Worker code does not have access to the DOM, for example. Some web APIs are, however, made available to the worker, such as `navigator`.
+由于这些 Web Worker 程序运行在单独的线程上，因此它们与主程序线程的通信受到限制，以避免/限制竞争条件和其他复杂情况。例如，Web Worker 代码不能访问 DOM。不过，Web Worker 可以使用某些 Web API，如 `navigator`。
 
-Since a Web Worker is treated as a wholly separate program, it does not share the global scope with the main JS program. However, the browser's JS engine is still running the code, so we can expect similar *purity* of its global scope behavior. Since there is no DOM access, the `window` alias for the global scope doesn't exist.
+由于 Web Worker 被视为一个完全独立的程序，因此它不会与主 JS 程序共享全局作用域。不过，浏览器的 JS 引擎仍在运行代码，因此我们可以期待其全局作用域行为具有类似的*纯净度*。由于不存在 DOM 访问，因此全局作用域的 `window` 别名并不存在。
 
-In a Web Worker, the global object reference is typically made using `self`:
+在 Web Worker 中，全局对象引用通常使用 `self`：
 
 ```js
 var studentName = "Kyle";
 let studentID = 42;
 
 function hello() {
-    console.log(`Hello, ${ self.studentName }!`);
+    console.log(`Hello, ${self.studentName}!`);
 }
 
 self.hello();
@@ -252,33 +253,33 @@ self.studentID;
 // undefined
 ```
 
-Just as with main JS programs, `var` and `function` declarations create mirrored properties on the global object (aka, `self`), where other declarations (`let`, etc) do not.
+与主 JS 程序一样，`var` 和 `function` 声明会在全局对象（又称 `self`）上创建镜像属性，而其他声明（`let` 等）则不会。
 
-So again, the global scope behavior we're seeing here is about as *pure* as it gets for running JS programs; perhaps it's even more *pure* since there's no DOM to muck things up!
+因此，我们在这里看到的全局作用域行为对于运行的 JS 程序来说是*纯粹*的；由于没有 DOM 的干扰，也许会更加*纯粹*！
 
-### Developer Tools Console/REPL
+### 开发人员工具控制台/REPL
 
-Recall from Chapter 1 in *Get Started* that Developer Tools don't create a completely adherent JS environment. They do process JS code, but they also lean in favor of the UX interaction being most friendly to developers (aka, developer experience, or DX).
+回顾*入门*中的第 1 章，开发者工具并不能创建一个完全贴合 JS 的环境。它们会处理 JS 代码，但也会偏向于对开发人员最友好的用户体验交互（又称开发人员体验或 DX）。
 
-In some cases, favoring DX when typing in short JS snippets, over the normal strict steps expected for processing a full JS program, produces observable differences in code behavior between programs and tools. For example, certain error conditions applicable to a JS program may be relaxed and not displayed when the code is entered into a developer tool.
+在某些情况下，在键入简短的 JS 代码段时偏向于使用 DX，而不是处理完整 JS 程序所需的常规严格步骤，会在程序和工具之间产生可观察到的代码行为差异。例如，在将代码输入开发工具时，适用于 JS 程序的某些错误条件可能会被放宽而不显示。
 
-With respect to our discussions here about scope, such observable differences in behavior may include:
+就我们在这里讨论的作用域言，这种可观察到的行为差异可能包括：
 
-* The behavior of the global scope
+-   全局作用域的行为
 
-* Hoisting (see Chapter 5)
+-   提升 (见第 5 章)
 
-* Block-scoping declarators (`let` / `const`, see Chapter 6) when used in the outermost scope
+-   在最外层作用域使用 Block-scoping 声明符时(`let` / `const`, 见第 6 章)
 
-Although it might seem, while using the console/REPL, that statements entered in the outermost scope are being processed in the real global scope, that's not quite accurate. Such tools typically emulate the global scope position to an extent; it's emulation, not strict adherence. These tool environments prioritize developer convenience, which means that at times (such as with our current discussions regarding scope), observed behavior may deviate from the JS specification.
+虽然在使用控制台/REPL 时，在最外层作用域输入的语句似乎是在真正的全局作用域中处理的，但这并不十分准确。这类工具通常会在一定程度上模拟全局作用域的位置；这只是模拟，而不是严格遵守。这些工具环境优先考虑的是开发人员的便利性，这意味着有时（比如我们当前关于作用域的讨论），观察到的行为可能会偏离 JS 规范。
 
-The take-away is that Developer Tools, while optimized to be convenient and useful for a variety of developer activities, are **not** suitable environments to determine or verify explicit and nuanced behaviors of an actual JS program context.
+我们的结论是，开发者工具虽然经过优化，对各种开发者活动非常方便和有用，但**不**适合用来确定或验证实际 JS 程序上下文的明确和细微行为。
 
-### ES Modules (ESM)
+### ES 模块 (ESM)
 
-ES6 introduced first-class support for the module pattern (covered in Chapter 8). One of the most obvious impacts of using ESM is how it changes the behavior of the observably top-level scope in a file.
+ES6 引入了对模块模式的一流支持（将在第 8 章中介绍）。使用 ESM 最明显的影响之一是它如何改变文件中可观察到的顶级作用域的行为。
 
-Recall this code snippet from earlier (which we'll adjust to ESM format by using the `export` keyword):
+回顾一下前面的代码片段（我们将使用 `export` 关键字将其调整为 ESM 格式）：
 
 ```js
 var studentName = "Kyle";
@@ -293,29 +294,29 @@ hello();
 export hello;
 ```
 
-If that code is in a file that's loaded as an ES module, it will still run exactly the same. However, the observable effects, from the overall application perspective, will be different.
+如果该代码位于作为 ES 模块加载的文件中，其运行方式仍然完全相同。不过，从整个应用程序的角度来看，可观察到的效果将有所不同。
 
-Despite being declared at the top level of the (module) file, in the outermost obvious scope, `studentName` and `hello` are not global variables. Instead, they are module-wide, or if you prefer, "module-global."
+尽管 `studentName` 和 `hello` 被声明在（模块）文件的顶层，显而易见时在最外层的作用域内，但它们并不是全局变量。相反，它们是模块作用域内的变量，如果你愿意，也可以称为「模块全局变量」。
 
-However, in a module there's no implicit "module-wide scope object" for these top-level declarations to be added to as properties, as there is when declarations appear in the top-level of non-module JS files. This is not to say that global variables cannot exist or be accessed in such programs. It's just that global variables don't get *created* by declaring variables in the top-level scope of a module.
+然而，在模块中，这些顶层声明并没有隐式的「模块作用域象」可以作为属性添加到模块中，而当声明出现在非模块 JS 文件的顶层时，就会出现这种情况。这并不是说全局变量不能存在或不能在此类程序中被访问。这只是说，全局变量不会通过在模块的顶层作用域中声明变量来*创建*。
 
-The module's top-level scope is descended from the global scope, almost as if the entire contents of the module were wrapped in a function. Thus, all variables that exist in the global scope (whether they're on the global object or not!) are available as lexical identifiers from inside the module's scope.
+模块的顶级作用域是从全局作用域降级而来的，就好像模块的全部内容都被封装在一个函数中一样。因此，存在于全局作用域中的所有变量（无论它们是否在全局对象上！）都可以在模块的作用域中作为词法标识符使用。
 
-ESM encourages a minimization of reliance on the global scope, where you import whatever modules you may need for the current module to operate. As such, you less often see usage of the global scope or its global object.
+ESM 鼓励尽量减少对全局作用域的依赖，您可以导入当前模块运行所需的任何模块。因此，您较少看到使用全局作用域或其全局对象。
 
-However, as noted earlier, there are still plenty of JS and web globals that you will continue to access from the global scope, whether you realize it or not!
+不过，如前所述，无论您意识到与否，仍有大量的 JS 和 Web 全局将继续从全局作用域访问！
 
 ### Node
 
-One aspect of Node that often catches JS developers off-guard is that Node treats every single .js file that it loads, including the main one you start the Node process with, as a *module* (ES module or CommonJS module, see Chapter 8). The practical effect is that the top level of your Node programs **is never actually the global scope**, the way it is when loading a non-module file in the browser.
+Node 的一个方面常常让 JS 开发人员措手不及，那就是 Node 将加载的每个 .js 文件（包括启动 Node 进程时使用的主文件）都视为*模块*（ES 模块或 CommonJS 模块，参见第 8 章）。这样做的实际效果是，Node 程序的顶层**实际上并不是全局作用域**，就像在浏览器中加载非模块文件时那样。
 
-As of time of this writing, Node has recently added support for ES modules. But additionally, Node has from its beginning supported a module format referred to as "CommonJS", which looks like this:
+截至本文撰写之时，Node 最近新增了对 ES 模块的支持。此外，Node 从一开始就支持一种称为 "CommonJS" 的模块格式，它看起来像这样：
 
 ```js
 var studentName = "Kyle";
 
 function hello() {
-    console.log(`Hello, ${ studentName }!`);
+    console.log(`Hello, ${studentName}!`);
 }
 
 hello();
@@ -324,9 +325,9 @@ hello();
 module.exports.hello = hello;
 ```
 
-Before processing, Node effectively wraps such code in a function, so that the `var` and `function` declarations are contained in that wrapping function's scope, **not** treated as global variables.
+在处理之前，Node 会有效地将此类代码封装在一个函数中，这样 `var` 和 `function` 声明就包含在封装函数的作用域中，而**不会**被视为全局变量。
 
-Envision the preceding code as being seen by Node as this (illustrative, not actual):
+将前面的代码想象成 Node 看到的样子（示例，非实际）：
 
 ```js
 function Module(module,require,__dirname,...) {
@@ -343,19 +344,19 @@ function Module(module,require,__dirname,...) {
 }
 ```
 
-Node then essentially invokes the added `Module(..)` function to run your module. You can clearly see here why `studentName` and `hello` identifiers are not global, but rather declared in the module scope.
+然后，Node 会调用 `Module(..)` 函数来运行模块。在这里，您可以清楚地看到为什么 `studentName` 和 `hello` 标识符不是全局的，而是在模块作用域中声明的。
 
-As noted earlier, Node defines a number of "globals" like `require()`, but they're not actually identifiers in the global scope (nor properties of the global object). They're injected in the scope of every module, essentially a bit like the parameters listed in the `Module(..)` function declaration.
+如前所述，Node 定义了许多类似 `require()` 的「全局」，但它们实际上并不是全局作用域中的标识符（也不是全局对象的属性）。它们被注入到每个模块的作用域中，本质上有点像 `Module(..)` 函数声明中列出的参数。
 
-So how do you define actual global variables in Node? The only way to do so is to add properties to another of Node's automatically provided "globals," which is ironically called `global`. `global` is a reference to the real global scope object, somewhat like using `window` in a browser JS environment.
+那么，如何在 Node 中定义实际的全局变量呢？唯一的方法就是在 Node 自动提供的另一个「全局」中添加属性，具有讽刺意味的是，这个「全局」被称为`global`。`global` 是对真正全局作用域对象的引用，有点像在浏览器 JS 环境中使用 `window` 一样。
 
-Consider:
+思考一下：
 
 ```js
 global.studentName = "Kyle";
 
 function hello() {
-    console.log(`Hello, ${ studentName }!`);
+    console.log(`Hello, ${studentName}!`);
 }
 
 hello();
@@ -364,58 +365,59 @@ hello();
 module.exports.hello = hello;
 ```
 
-Here we add `studentName` as a property on the `global` object, and then in the `console.log(..)` statement we're able to access `studentName` as a normal global variable.
+在这里，我们将 `studentName` 添加为 `global` 对象的一个属性，然后在 `console.log(..)` 语句中，我们就可以将 `studentName` 作为一个普通的全局变量来访问。
 
-Remember, the identifier `global` is not defined by JS; it's specifically defined by Node.
+请记住，标识符 `global` 不是由 JS 定义的，而是由 Node 专门定义的。
 
 ## Global This
 
-Reviewing the JS environments we've looked at so far, a program may or may not:
+回顾我们迄今为止所看到的 JS 环境，程序可能有，也可能没有：
 
-* Declare a global variable in the top-level scope with `var` or `function` declarations—or `let`, `const`, and `class`.
+-   在顶层作用域中使用 `var` 或 `function` 声明或 `let`, `const` 和 `class` 声明全局变量。
+-   如果使用了 `var` 或 `function` 声明，还可将全局变量声明添加为全局作用域对象的属性。
+-   使用 `window`、`self` 或 `global` 引用全局作用域对象（用于添加或检索全局变量或者作为属性）。
 
-* Also add global variables declarations as properties of the global scope object if `var` or `function` are used for the declaration.
+我认为可以这样说，全局作用域的访问和行为比大多数开发人员想象的要复杂得多，前面的章节已经说明了这一点。但是，这种复杂性在试图确定对全局作用域对象的通用引用时表现得最为明显。
 
-* Refer to the global scope object (for adding or retrieving global variables, as properties) with `window`, `self`, or `global`.
+获取全局作用域对象引用的另一个「把戏」是：
 
-I think it's fair to say that global scope access and behavior is more complicated than most developers assume, as the preceding sections have illustrated. But the complexity is never more obvious than in trying to nail down a universally applicable reference to the global scope object.
+```js
+const theGlobalScopeObject = new Function("return this")();
+```
 
-Yet another "trick" for obtaining a reference to the global scope object looks like:
+| 注意：                                                                                                                                                                                                                                                                                                                       |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 可以使用 `Function()` 构造函数从存储在字符串值中的代码动态构造函数，类似于 `eval(..)`（请参阅第 1 章中的「取巧：修改运行时的作用域」）。如图所示，当使用普通的 `()` 函数调用时，这样的函数将自动以非严格模式运行（出于遗留原因）；其 `this` 指向全局对象。有关确定 `this` 绑定的更多信息，请参阅本系列丛书第三册*对象与类*。 |
+
+因此，我们有了 `window`、`self`、`global` 和这个丑陋的 `new Function(..)` 把戏。有很多不同的方法来获取这个全局对象。各有利弊。
+
+要不再介绍一个！？！？
+
+从 ES2020 开始，JS 终于定义了对全局作用域对象的标准化引用，称为 `globalThis`。因此，根据您代码运行的 JS 引擎的最新情况，您可以使用 `globalThis` 代替任何其他方法。
+
+我们甚至可以尝试定义一种跨环境的 polyfill，让之前不支持 `globalThis` 的 JS 环境中更安全，例如
 
 ```js
 const theGlobalScopeObject =
-    (new Function("return this"))();
+    typeof globalThis != "undefined"
+        ? globalThis
+        : typeof global != "undefined"
+          ? global
+          : typeof window != "undefined"
+            ? window
+            : typeof self != "undefined"
+              ? self
+              : new Function("return this")();
 ```
 
-| NOTE: |
-| :--- |
-| A function can be dynamically constructed from code stored in a string value with the `Function()` constructor, similar to `eval(..)` (see "Cheating: Runtime Scope Modifications" in Chapter 1). Such a function will automatically be run in non-strict-mode (for legacy reasons) when invoked with the normal `()` function invocation as shown; its `this` will point at the global object. See the third book in the series, *Objects & Classes*, for more information on determining `this` bindings. |
+呼！这当然不是最理想的，但如果你需要一个可靠的全局作用域参考，它还是有用的。
 
-So, we have `window`, `self`, `global`, and this ugly `new Function(..)` trick. That's a lot of different ways to try to get at this global object. Each has its pros and cons.
+（在将该功能添加到 JS 时，`globalThis` 这个拟议名称曾引起相当大的争议。具体来说，我和其他许多人都认为名称中的 "this" 引用具有误导性，因为引用此对象的原因是访问全局作用域，而不是访问某种全局/默认的 `this` 绑定。我们曾考虑过许多其他名称，但由于种种原因都被排除了。不幸的是，最终选择的名称是不得已而为之。如果您打算在您的程序中与全局作用域对象交互，为了减少混淆，我强烈建议您选择一个更好的名称，比如这里使用的（长得可笑但准确的！）`theGlobalScopeObject`（全局作用域对象）。）
 
-Why not introduce yet another!?!?
+## 掌握全局作用域
 
-As of ES2020, JS has finally defined a standardized reference to the global scope object, called `globalThis`. So, subject to the recency of the JS engines your code runs in, you can use `globalThis` in place of any of those other approaches.
+尽管将代码组织成模块的现代模式下不再强调在命名空间中存储标识符的重要性，但全局作用域在每一个 JS 程序中都存在并与之相关。
 
-We could even attempt to define a cross-environment polyfill that's safer across pre-`globalThis` JS environments, such as:
+尽管如此，随着我们的代码越来越多地超出浏览器的限制，掌握全局作用域（和全局作用域对象！）在不同 JS 环境中的行为差异就显得尤为重要。
 
-```js
-const theGlobalScopeObject =
-    (typeof globalThis != "undefined") ? globalThis :
-    (typeof global != "undefined") ? global :
-    (typeof window != "undefined") ? window :
-    (typeof self != "undefined") ? self :
-    (new Function("return this"))();
-```
-
-Phew! That's certainly not ideal, but it works if you find yourself needing a reliable global scope reference.
-
-(The proposed name `globalThis` was fairly controversial while the feature was being added to JS. Specifically, I and many others felt the "this" reference in its name was misleading, since the reason you reference this object is to access to the global scope, never to access some sort of global/default `this` binding. There were many other names considered, but for a variety of reasons ruled out. Unfortunately, the name chosen ended up as a last resort. If you plan to interact with the global scope object in your programs, to reduce confusion, I strongly recommend choosing a better name, such as (the laughably long but accurate!) `theGlobalScopeObject` used here.)
-
-## Globally Aware
-
-The global scope is present and relevant in every JS program, even though modern patterns for organizing code into modules de-emphasizes much of the reliance on storing identifiers in that namespace.
-
-Still, as our code proliferates more and more beyond the confines of the browser, it's especially important we have a solid grasp on the differences in how the global scope (and global scope object!) behave across different JS environments.
-
-With the big picture of global scope now sharper in focus, the next chapter again descends into the deeper details of lexical scope, examining how and when variables can be used.
+有了全局作用域的全貌，下一章将再次深入词法作用域的细节，研究如何以及何时使用变量。

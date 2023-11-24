@@ -1,63 +1,64 @@
-# You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 3: The Scope Chain
+# 你并不了解 JavaScript：作用域与闭包 - 第二版
 
-Chapters 1 and 2 laid down a concrete definition of *lexical scope* (and its parts) and illustrated helpful metaphors for its conceptual foundation. Before proceeding with this chapter, find someone else to explain (written or aloud), in your own words, what lexical scope is and why it's useful to understand.
+# 第三章：作用域链
 
-That seems like a step you might skip, but I've found it really does help to take the time to reformulate these ideas as explanations to others. That helps our brains digest what we're learning!
+第 1 章和第 2 章为*词法作用域*（及其组成部分）下了一个具体的定义，并为其概念基础提供了有用的隐喻。在继续学习本章之前，请找其他人用你自己的话（书面或大声）解释什么是词法作用域，以及为什么理解它是有用的。
 
-Now it's time to dig into the nuts and bolts, so expect that things will get a lot more detailed from here forward. Stick with it, though, because these discussions really hammer home just how much we all *don't know* about scope, yet. Make sure to take your time with the text and all the code snippets provided.
+这一步似乎可以省略，但我发现，花时间把这些想法重新表述为对他人的解释，确实很有帮助。这有助于我们的大脑消化所学知识！
 
-To refresh the context of our running example, let's recall the color-coded illustration of the nested scope bubbles, from Chapter 2, Figure 2:
+现在是深入探讨具体问题的时候了，所以从现在开始，事情会变得更加详细。不过请坚持下去，因为这些讨论确实会让我们明白，我们对作用域还有多少*不了解*。请务必慢慢阅读文本和提供的所有代码片段。
+
+为了重温我们正在运行的示例的上下文，让我们回顾一下第 2 章图 2 中嵌套作用域气泡的彩色编码图示：
 
 <figure>
-    <img src="images/fig2.png" width="500" alt="Colored Scope Bubbles" align="center">
-    <figcaption><em>Fig. 2 (Ch. 2): Colored Scope Bubbles</em></figcaption>
+    <img src="./images/fig2.png" width="500" alt="Colored Scope Bubbles" align="center">
+    <figcaption><em>图 2（第 2 章）： 彩色作用域气泡</em></figcaption>
     <br><br>
 </figure>
 
-The connections between scopes that are nested within other scopes is called the scope chain, which determines the path along which variables can be accessed. The chain is directed, meaning the lookup moves upward/outward only.
+嵌套在其他作用域中的作用域之间的连接称为作用域链，它决定了变量的访问路径。作用域链是定向的，这意味着查找只能向上/向外移动。
 
-## "Lookup" Is (Mostly) Conceptual
+## 「查找」（大部分）是概念性的
 
-In Figure 2, notice the color of the `students` variable reference in the `for`-loop. How exactly did we determine that it's a RED(1) marble?
+在图 2 中，请注意 `for` 循环中引用的 `students` 变量的颜色。我们究竟是如何确定它是一个 红色 (1) 弹珠的呢？
 
-In Chapter 2, we described the runtime access of a variable as a "lookup," where the *Engine* has to start by asking the current scope's *Scope Manager* if it knows about an identifier/variable, and proceeding upward/outward back through the chain of nested scopes (toward the global scope) until found, if ever. The lookup stops as soon as the first matching named declaration in a scope bucket is found.
+在第 2 章中，我们将变量的运行时访问描述为「查找」，在查找过程中，*引擎*必须先询问当前作用域的*作用域管理器*是否知道某个标识符/变量，然后通过嵌套作用域链（朝向全局作用域）向上/向外查找，直到找到为止（如果有的话）。一旦在作用域桶中找到第一个匹配的命名声明，查找就会停止。
 
-The lookup process thus determined that `students` is a RED(1) marble, because we had not yet found a matching variable name as we traversed the scope chain, until we arrived at the final RED(1) global scope.
+因此，查找过程确定了 `students` 是一个 红色 (1) 全局作用域，因为我们在遍历作用域链时还没有找到匹配的变量名，直到我们到达最终的红色 (1) 全局作用域。
 
-Similarly, `studentID` in the `if`-statement is determined to be a BLUE(2) marble.
+同样，`if` 语句中的 `studentID` 也被确定为蓝色 (2) 弹珠。
 
-This suggestion of a runtime lookup process works well for conceptual understanding, but it's not actually how things usually work in practice.
+这种运行时查找过程的暗示在概念上很好理解，但实际上在实际操作中并非如此。
 
-The color of a marble's bucket (aka, meta information of what scope a variable originates from) is *usually determined* during the initial compilation processing. Because lexical scope is pretty much finalized at that point, a marble's color will not change based on anything that can happen later during runtime.
+弹珠桶的颜色（也就是变量来自哪个作用域的元信息）通常是在初始编译处理过程中确定的。由于词法作用域在此时已基本确定，因此弹珠的颜色不会因运行时可能发生的任何情况而改变。
 
-Since the marble's color is known from compilation, and it's immutable, this information would likely be stored with (or at least accessible from) each variable's entry in the AST; that information is then used explicitly by the executable instructions that constitute the program's runtime.
+由于弹珠的颜色在编译时就已知晓，而且不可更改，因此该信息很可能与 AST 中每个变量的条目一起存储（或至少可从条目中访问）；然后构成程序运行时的可执行指令会明确使用该信息。
 
-In other words, *Engine* (from Chapter 2) doesn't need to lookup through a bunch of scopes to figure out which scope bucket a variable comes from. That information is already known! Avoiding the need for a runtime lookup is a key optimization benefit of lexical scope. The runtime operates more performantly without spending time on all these lookups.
+换句话说，_引擎_（来自第 2 章）不需要在一堆作用域中查找变量来自哪个作用域桶。这些信息都是已知的！避免运行时查找是词法作用域的一个关键优化优势。无需在所有这些查找上花费时间，运行时就能更高效地运行。
 
-But I said "...usually determined..." just a moment ago, with respect to figuring out a marble's color during compilation. So in what case would it ever *not* be known during compilation?
+但我刚才说「......通常是确定的......」，说的是在编译过程中确定弹珠的颜色。那么，在什么情况下，在编译过程中会*不*知道呢？
 
-Consider a reference to a variable that isn't declared in any lexically available scopes in the current file—see *Get Started*, Chapter 1, which asserts that each file is its own separate program from the perspective of JS compilation. If no declaration is found, that's not *necessarily* an error. Another file (program) in the runtime may indeed declare that variable in the shared global scope.
+当前文件中的任何词法作用域中都没有声明变量的引用 — 参见 _入门_ 第 1 章，该章中提到，从 JS 编译的角度来看，每个文件都是独立的程序。如果找不到任何声明，这并不*一定*是错误。运行时中的另一个文件（程序）可能确实在共享全局作用域中声明了该变量。
 
-So the ultimate determination of whether the variable was ever appropriately declared in some accessible bucket may need to be deferred to the runtime.
+因此，最终确定变量是否曾在某个可访问的桶中进行过适当的声明，可能需要推迟到运行时进行。
 
-Any reference to a variable that's initially *undeclared* is left as an uncolored marble during that file's compilation; this color cannot be determined until other relevant file(s) have been compiled and the application runtime commences. That deferred lookup will eventually resolve the color to whichever scope the variable is found in (likely the global scope).
+在编译文件的过程中，任何对最初*未声明*的变量的引用都是未着色的弹珠；在编译完其他相关文件并开始应用程序运行之前，无法确定其颜色。这种延迟查找最终会将颜色解析为变量所在的作用域（可能是全局作用域）。
 
-However, this lookup would only be needed once per variable at most, since nothing else during runtime could later change that marble's color.
+不过，每个变量最多只需要进行一次查询，因为在运行过程中，没有任何其他因素可以改变弹珠的颜色。
 
-The "Lookup Failures" section in Chapter 2 covers what happens if a marble is ultimately still uncolored at the moment its reference is runtime executed.
+第 2 章中的「查找失败」一节介绍了在运行时执行某个弹珠的引用时，如果该弹珠最终仍未着色会发生什么情况。
 
-## Shadowing
+## 遮蔽 (Shadowing)[^变量遮蔽]
 
-"Shadowing" might sound mysterious and a little bit sketchy. But don't worry, it's completely legit!
+「遮蔽」听起来可能很神秘，而且有点不靠谱。但别担心，它是完全合法的！
 
-Our running example for these chapters uses different variable names across the scope boundaries. Since they all have unique names, in a way it wouldn't matter if all of them were just stored in one bucket (like RED(1)).
+我们这几章的运行示例在不同的作用域中使用了不同的变量名。由于它们都有唯一的名称，因此从某种程度上说，如果所有变量都存储在一个桶中（如红色 (1)）也没有关系。
 
-Where having different lexical scope buckets starts to matter more is when you have two or more variables, each in different scopes, with the same lexical names. A single scope cannot have two or more variables with the same name; such multiple references would be assumed as just one variable.
+当您有两个或更多变量时，拥有不同的词法作用域桶开始变得更重要，每个变量都在不同的作用域中，但具有相同的词法名称。一个作用域中不能有两个或更多同名变量；这种多重引用将被视为一个变量。
 
-So if you need to maintain two or more variables of the same name, you must use separate (often nested) scopes. And in that case, it's very relevant how the different scope buckets are laid out.
+因此，如果需要维护两个或多个同名变量，就必须使用不同的（通常是嵌套的）作用域。在这种情况下，如何布局不同的作用域桶就非常重要了。
 
-Consider:
+思考一下：
 
 ```js
 var studentName = "Suzy";
@@ -77,31 +78,31 @@ console.log(studentName);
 // Suzy
 ```
 
-| TIP: |
-| :--- |
-| Before you move on, take some time to analyze this code using the various techniques/metaphors we've covered in the book. In particular, make sure to identify the marble/bubble colors in this snippet. It's good practice! |
+| 贴士：                                                                                                                                 |
+| :------------------------------------------------------------------------------------------------------------------------------------- |
+| 在继续之前，请花一些时间使用我们在书中介绍的各种技术/隐喻来分析这段代码。特别是，请务必识别这段代码中的弹珠/气泡颜色。这是很好的练习！ |
 
-The `studentName` variable on line 1 (the `var studentName = ..` statement) creates a RED(1) marble. The same named variable is declared as a BLUE(2) marble on line 3, the parameter in the `printStudent(..)` function definition.
+第 1 行的 `studentName` 变量（语句 `var studentName = ..`）创建了一个红色 (1) 弹珠。在第 3 行，即 `printStudent(..)` 函数定义的参数中，同样命名的变量被声明为蓝色 (2) 弹珠。
 
-What color marble will `studentName` be in the `studentName = studentName.toUpperCase()` assignment statement and the `console.log(studentName)` statement? All three `studentName` references will be BLUE(2).
+在 `studentName = studentName.toUpperCase()` 赋值语句和 `console.log(studentName)` 语句中，`studentName` 将是什么颜色的弹珠？所有三个 `studentName` 引用都将是蓝色 (2)。
 
-With the conceptual notion of the "lookup," we asserted that it starts with the current scope and works its way outward/upward, stopping as soon as a matching variable is found. The BLUE(2) `studentName` is found right away. The RED(1) `studentName` is never even considered.
+根据「查找」的概念，我们断言它会从当前作用域开始向外/向上查找，一旦找到匹配的变量就停止。蓝色 (2) `studentName` 立即被找到。红色 (1) `studentName` 甚至从未被考虑过。
 
-This is a key aspect of lexical scope behavior, called *shadowing*. The BLUE(2) `studentName` variable (parameter) shadows the RED(1) `studentName`. So, the parameter is shadowing the (shadowed) global variable. Repeat that sentence to yourself a few times to make sure you have the terminology straight!
+这是词法作用域行为的一个关键方面，称为*遮蔽*。蓝色 (2) `studentName` 变量（参数）会对红色 (1) `studentName` 产生遮蔽。因此，参数对全局变量产生了遮蔽。请多重复几遍这句话，以确保您对术语的理解是正确的！
 
-That's why the re-assignment of `studentName` affects only the inner (parameter) variable: the BLUE(2) `studentName`, not the global RED(1) `studentName`.
+这就是为什么重新分配 `studentName` 只影响内部（参数）变量：蓝色 (2) `studentName`，而不是全局的红色 (1) `studentName`。
 
-When you choose to shadow a variable from an outer scope, one direct impact is that from that scope inward/downward (through any nested scopes) it's now impossible for any marble to be colored as the shadowed variable—(RED(1), in this case). In other words, any `studentName` identifier reference will correspond to that parameter variable, never the global `studentName` variable. It's lexically impossible to reference the global `studentName` anywhere inside of the `printStudent(..)` function (or from any nested scopes).
+当您选择从外层作用域对变量进行遮蔽处理时，一个直接的影响是，从该作用域向内/向下（通过任何嵌套的作用域），现在任何弹珠都不可能被着色为被遮蔽处理的变量（本例中为红色 (1)）。换句话说，任何 `studentName` 标识符引用都将对应于该参数变量，而绝不会对应于全局的 `studentName` 变量。从词法上讲，在 `printStudent(..)` 函数内部的任何地方（或任何嵌套作用域）都不可能引用全局 `studentName` 变量。
 
-### Global Unshadowing Trick
+### 全局无遮蔽把戏
 
-Please beware: leveraging the technique I'm about to describe is not very good practice, as it's limited in utility, confusing for readers of your code, and likely to invite bugs to your program. I'm covering it only because you may run across this behavior in existing programs, and understanding what's happening is critical to not getting tripped up.
+请注意：使用我将要描述的技术并不是很好的做法，因为它的实用性有限，会让你的代码读者感到困惑，而且很可能会给你的程序带来错误。我之所以介绍它，只是因为你可能会在现有程序中遇到这种行为，而了解发生了什么是避免被绊倒的关键。
 
-It *is* possible to access a global variable from a scope where that variable has been shadowed, but not through a typical lexical identifier reference.
+在全局变量已被遮蔽化的作用域中访问该变量*是*可能的，但不是通过典型的词法标识符引用。
 
-In the global scope (RED(1)), `var` declarations and `function` declarations also expose themselves as properties (of the same name as the identifier) on the *global object*—essentially an object representation of the global scope. If you've written JS for a browser environment, you probably recognize the global object as `window`. That's not *entirely* accurate, but it's good enough for our discussion. In the next chapter, we'll explore the global scope/object topic more.
+在全局作用域（红色 (1)）中，`var` 声明和 `function` 声明也会作为*全局 (global ) 对象*（本质上是全局作用域的对象表示）上的属性（与标识符同名）暴露自己。如果您为浏览器环境编写过 JS，您可能会将全局对象识别为 `window`。这并不*完全*准确，但对于我们的讨论来说已经足够了。在下一章中，我们将进一步探讨全局作用域/对象的话题。
 
-Consider this program, specifically executed as a standalone .js file in a browser environment:
+请看这个程序，它是在浏览器环境中作为独立的 .js 文件执行的：
 
 ```js
 var studentName = "Suzy";
@@ -116,17 +117,17 @@ printStudent("Frank");
 // "Suzy"
 ```
 
-Notice the `window.studentName` reference? This expression is accessing the global variable `studentName` as a property on `window` (which we're pretending for now is synonymous with the global object). That's the only way to access a shadowed variable from inside a scope where the shadowing variable is present.
+注意到 `window.studentName` 引用了吗？这个表达式正在访问作为 `window` 属性的全局变量 `studentName`（我们现在假定它与全局对象同义）。这是从存在遮蔽变量的作用域内部访问遮蔽变量的唯一方法。
 
-The `window.studentName` is a mirror of the global `studentName` variable, not a separate snapshot copy. Changes to one are still seen from the other, in either direction. You can think of `window.studentName` as a getter/setter that accesses the actual `studentName` variable. As a matter of fact, you can even *add* a variable to the global scope by creating/setting a property on the global object.
+`window.studentName` 是全局 `studentName` 变量的镜像，而不是单独的快照副本。对其中一个变量的更改仍然可以从另一个变量中看到，无论方向如何。您可以将 `window.studentName` 视为访问实际 `studentName` 变量的 getter/setter。事实上，您甚至可以通过在全局对象上创建/设置一个属性，在全局作用域中*添加*一个变量。
 
-| WARNING: |
-| :--- |
-| Remember: just because you *can* doesn't mean you *should*. Don't shadow a global variable that you need to access, and conversely, avoid using this trick to access a global variable that you've shadowed. And definitely don't confuse readers of your code by creating global variables as `window` properties instead of with formal declarations! |
+| 警告：                                                                                                                                                                                             |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 记住：*可以*并不意味着*应该*。不要对需要访问的全局变量进行遮蔽处理，反之，也要避免使用此技巧访问已被遮蔽处理的全局变量。绝对不要将全局变量创建为 `window` 属性而不是正式声明，从而混淆代码的读者！ |
 
-This little "trick" only works for accessing a global scope variable (not a shadowed variable from a nested scope), and even then, only one that was declared with `var` or `function`.
+这个小「把戏」只适用于访问全局作用域变量（而不是来自嵌套作用域的遮蔽变量），而且只适用于使用 `var` 或 `function` 声明的变量。
 
-Other forms of global scope declarations do not create mirrored global object properties:
+其他形式的全局作用域声明不会创建镜像全局对象属性：
 
 ```js
 var one = 1;
@@ -134,13 +135,13 @@ let notOne = 2;
 const notTwo = 3;
 class notThree {}
 
-console.log(window.one);       // 1
-console.log(window.notOne);    // undefined
-console.log(window.notTwo);    // undefined
-console.log(window.notThree);  // undefined
+console.log(window.one); // 1
+console.log(window.notOne); // undefined
+console.log(window.notTwo); // undefined
+console.log(window.notThree); // undefined
 ```
 
-Variables (no matter how they're declared!) that exist in any other scope than the global scope are completely inaccessible from a scope where they've been shadowed:
+存在于全局作用域以外的任何其他作用域中的变量（无论它们是如何声明的！），在它们已被遮蔽化的作用域中是完全不可访问的：
 
 ```js
 var special = 42;
@@ -164,24 +165,24 @@ lookingFor(112358132134);
 // 42
 ```
 
-The global RED(1) `special` is shadowed by the BLUE(2) `special` (parameter), and the BLUE(2) `special` is itself shadowed by the GREEN(3) `special` inside `keepLooking()`. We can still access the RED(1) `special` using the indirect reference `window.special`. But there's no way for `keepLooking()` to access the BLUE(2) `special` that holds the number `112358132134`.
+全局的红色 (1) `special` 被蓝色 (2) `special`（参数）遮蔽，而蓝色 (2) `special`本身又被 `keepLooking()`内的绿色 (3) `special`遮蔽。我们仍然可以使用间接引用 `window.special` 访问红色 (1) `special`。但 `keepLooking()` 无法访问保存数字 `112358132134` 的蓝色 (2) `special` 。
 
-### Copying Is Not Accessing
+### 复制不是访问
 
-I've been asked the following "But what about...?" question dozens of times. Consider:
+下面这个「但是......呢？」的问题我已经被问过几十次了。思考一下：
 
 ```js
 var special = 42;
 
 function lookingFor(special) {
     var another = {
-        special: special
+        special: special,
     };
 
     function keepLooking() {
         var special = 3.141592;
         console.log(special);
-        console.log(another.special);  // Ooo, tricky!
+        console.log(another.special); // Ooo, tricky!
         console.log(window.special);
     }
 
@@ -194,24 +195,24 @@ lookingFor(112358132134);
 // 42
 ```
 
-Oh! So does this `another` object technique disprove my claim that the `special` parameter is "completely inaccessible" from inside `keepLooking()`? No, the claim is still correct.
+哦！那么，这种「另一种」对象技术是否推翻了我的说法，即在 `keepLooking()` 中「完全无法访问」`special` 参数？不，这个说法仍然正确。
 
-`special: special` is copying the value of the `special` parameter variable into another container (a property of the same name). Of course, if you put a value in another container, shadowing no longer applies (unless `another` was shadowed, too!). But that doesn't mean we're accessing the parameter `special`; it means we're accessing the copy of the value it had at that moment, by way of *another* container (object property). We cannot reassign the BLUE(2) `special` parameter to a different value from inside `keepLooking()`.
+`special: special` 是将 `special` 参数变量的值复制到另一个容器（同名属性）中。当然，如果把一个值放到另一个容器中，遮蔽就不再适用了（除非 `another` 也被遮蔽化了！）。但这并不意味着我们正在访问参数 `special`；而是意味着我们正在通过*另一个*容器（对象属性）访问它当时所具有的值的副本。我们不能在 `keepLooking()` 中将蓝色 (2) `special` 参数重新赋值。
 
-Another "But...!?" you may be about to raise: what if I'd used objects or arrays as the values instead of the numbers (`112358132134`, etc.)? Would us having references to objects instead of copies of primitive values "fix" the inaccessibility?
+你可能会提出另一个「但是......？」的问题：如果我用对象或数组代替数字（`112358132134` 等）作为值呢？我们有了对象的引用而不是原始值的副本，就能「解决」无法访问的问题吗？
 
-No. Mutating the contents of the object value via a reference copy is **not** the same thing as lexically accessing the variable itself. We still can't reassign the BLUE(2) `special` parameter.
+通过引用副本更改对象值的内容与通过词法访问变量本身并不是一回事。我们仍然无法重新分配蓝色 (2) `special` 参数。
 
-### Illegal Shadowing
+### 非法遮蔽
 
-Not all combinations of declaration shadowing are allowed. `let` can shadow `var`, but `var` cannot shadow `let`:
+并非所有的声明遮蔽方式都是允许的。`let` 可以对 `var` 产生遮蔽，但 `var` 不能对 `let` 产生遮蔽：
 
 ```js
 function something() {
     var special = "JavaScript";
 
     {
-        let special = 42;   // totally fine shadowing
+        let special = 42; // 完全 ok 的遮蔽
 
         // ..
     }
@@ -233,13 +234,13 @@ function another() {
 }
 ```
 
-Notice in the `another()` function, the inner `var special` declaration is attempting to declare a function-wide `special`, which in and of itself is fine (as shown by the `something()` function).
+注意在 `another()` 函数中，内部的 `var special` 声明试图声明一个函数作用域内的 `special`，这本身是没有问题的（如 `something()` 函数所示）。
 
-The syntax error description in this case indicates that `special` has already been defined, but that error message is a little misleading—again, no such error happens in `something()`, as shadowing is generally allowed just fine.
+在这种情况下，语法错误描述表明 `special` 已经被定义，但该错误信息有点误导。同样，在 `something()` 中不会出现这种错误，因为通常允许遮蔽。
 
-The real reason it's raised as a `SyntaxError` is because the `var` is basically trying to "cross the boundary" of (or hop over) the `let` declaration of the same name, which is not allowed.
+它被当作 `SyntaxError` 引发的真正原因是 `var` 基本上是在试图「越界」（或跳过）同名的 `let` 声明，而这是不允许的。
 
-That boundary-crossing prohibition effectively stops at each function boundary, so this variant raises no exception:
+禁止跨越作用域的规定实际上止于每个函数作用域，因此这个变体也不例外：
 
 ```js
 function another() {
@@ -248,8 +249,8 @@ function another() {
     {
         let special = "JavaScript";
 
-        ajax("https://some.url",function callback(){
-            // totally fine shadowing
+        ajax("https://some.url", function callback() {
+            // 完全 ok 的遮蔽
             var special = "JavaScript";
 
             // ..
@@ -258,11 +259,11 @@ function another() {
 }
 ```
 
-Summary: `let` (in an inner scope) can always shadow an outer scope's `var`. `var` (in an inner scope) can only shadow an outer scope's `let` if there is a function boundary in between.
+摘要: `let`（在内作用域中）总是可以遮蔽外作用域的 `var`。内作用域中的 `var` 只有在两者之间有函数作用域的情况下才会对外作用域中的 `let` 产生遮蔽。
 
-## Function Name Scope
+## 函数名的作用域
 
-As you've seen by now, a `function` declaration looks like this:
+正如你现在已经看到的，`function` 声明看起来像这样：
 
 ```js
 function askQuestion() {
@@ -270,27 +271,27 @@ function askQuestion() {
 }
 ```
 
-And as discussed in Chapters 1 and 2, such a `function` declaration will create an identifier in the enclosing scope (in this case, the global scope) named `askQuestion`.
+正如第 1 章和第 2 章所讨论的，这样的 `function` 声明将在外层作用域（这里是全局作用域）中创建一个名为 `askQuestion` 的标识符。
 
-What about this program?
+那以下代码呢？
 
 ```js
-var askQuestion = function(){
+var askQuestion = function () {
     // ..
 };
 ```
 
-The same is true for the variable `askQuestion` being created. But since it's a `function` expression—a function definition used as value instead of a standalone declaration—the function itself will not "hoist" (see Chapter 5).
+正在创建的变量 `askQuestion` 也是如此。但由于它是一个 `function` 表达式吗，一个用作值的函数定义，而不是一个独立的声明。函数本身不会「提升」（参见第 5 章）。
 
-One major difference between `function` declarations and `function` expressions is what happens to the name identifier of the function. Consider a named `function` expression:
+函数声明与函数表达式的一个主要区别是函数名称标识符的处理。请考虑命名的 `function` 表达式：
 
 ```js
-var askQuestion = function ofTheTeacher(){
+var askQuestion = function ofTheTeacher() {
     // ..
 };
 ```
 
-We know `askQuestion` ends up in the outer scope. But what about the `ofTheTeacher` identifier? For formal `function` declarations, the name identifier ends up in the outer/enclosing scope, so it may be reasonable to assume that's the case here. But `ofTheTeacher` is declared as an identifier **inside the function itself**:
+我们知道 `askQuestion` 最后会进入外层作用域。但是 `ofTheTeacher` 的标识符呢？对于正式的 `function` 声明，名称标识符会在外层/封闭的作用域中结束，因此可以合理地认为这里的情况也是如此。但 `ofTeacher` 被声明为**函数本身内部的标识符**：
 
 ```js
 var askQuestion = function ofTheTeacher() {
@@ -304,16 +305,16 @@ console.log(ofTheTeacher);
 // ReferenceError: ofTheTeacher is not defined
 ```
 
-| NOTE: |
-| :--- |
-| Actually, `ofTheTeacher` is not exactly *in the scope of the function*. Appendix A, "Implied Scopes" will explain further. |
+| 注意：                                                                                     |
+| :----------------------------------------------------------------------------------------- |
+| 实际上，`ofTheTeacher` 并不完全*在函数的作用域内*。附录 A 中「隐式作用域」会有进一步解释。 |
 
-Not only is `ofTheTeacher` declared inside the function rather than outside, but it's also defined as read-only:
+`ofTheTeacher` 不仅是在函数内部而不是外部声明的，而且还被定义为只读：
 
 ```js
 var askQuestion = function ofTheTeacher() {
     "use strict";
-    ofTheTeacher = 42;   // TypeError
+    ofTheTeacher = 42; // TypeError
 
     //..
 };
@@ -322,25 +323,25 @@ askQuestion();
 // TypeError
 ```
 
-Because we used strict-mode, the assignment failure is reported as a `TypeError`; in non-strict-mode, such an assignment fails silently with no exception.
+由于我们使用了严格模式，赋值失败会被报告为「类型错误 (TypeError)」；而在非严格模式下，这种赋值失败是无声的，不会抛出异常。
 
-What about when a `function` expression has no name identifier?
+函数表达式没有名称标识符时怎么办？
 
 ```js
-var askQuestion = function(){
-   // ..
+var askQuestion = function () {
+    // ..
 };
 ```
 
-A `function` expression with a name identifier is referred to as a "named function expression," but one without a name identifier is referred to as an "anonymous function expression." Anonymous function expressions clearly have no name identifier that affects either scope.
+有名称标识符的函数表达式称为「[命名函数表达式](https://developer.mozilla.org/zh-CN/docs/web/JavaScript/Reference/Operators/function#命名函数表达式（named_function_expression）)」，而没有名称标识符的则称为「匿名函数表达式」。匿名函数表达式显然没有名称标识符来影响任何作用域。
 
-| NOTE: |
-| :--- |
-| We'll discuss named vs. anonymous `function` expressions in much more detail, including what factors affect the decision to use one or the other, in Appendix A. |
+| 注意：                                                                            |
+| :-------------------------------------------------------------------------------- |
+| 我们将在附录 A 中更详细地讨论命名表达式和匿名函数表达式，包括影响使用它们的因素。 |
 
-## Arrow Functions
+## 箭头函数
 
-ES6 added an additional `function` expression form to the language, called "arrow functions":
+ES6 在语言中添加了一种额外的函数表达式，称为「箭头函数」：
 
 ```js
 var askQuestion = () => {
@@ -348,46 +349,48 @@ var askQuestion = () => {
 };
 ```
 
-The `=>` arrow function doesn't require the word `function` to define it. Also, the `( .. )` around the parameter list is optional in some simple cases. Likewise, the `{ .. }` around the function body is optional in some cases. And when the `{ .. }` are omitted, a return value is sent out without using a `return` keyword.
+箭头函数 `=>` 不需要使用 `function` 来定义。此外，在某些简单的情况下，参数列表两侧的 `( .. )` 是可选的。同样，函数体两侧的 `{ .. }` 在某些情况下也是可选的。如果省略了 `{ .. }` 将直接返回值，而无需使用 `return` 关键字。
 
-| NOTE: |
-| :--- |
-| The attractiveness of `=>` arrow functions is often sold as "shorter syntax," and that's claimed to equate to objectively more readable code. This claim is dubious at best, and I believe outright misguided. We'll dig into the "readability" of various function forms in Appendix A. |
+| 注意：                                                                                                                                                          |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 箭头函数 `=>` 常常被说成是「语法糖」，并声称这等同于客观上更可读的代码。这种说法是可疑的，我认为完全是一种误导。我们将在附录 A 中探讨各种函数形式的「可读性」。 |
 
-Arrow functions are lexically anonymous, meaning they have no directly related identifier that references the function. The assignment to `askQuestion` creates an inferred name of "askQuestion", but that's **not the same thing as being non-anonymous**:
+箭头函数在词法上是匿名的，这意味着它们没有直接相关的标识符来引用函数。对 `askQuestion` 的赋值创建了一个推断名称 "askQuestion"，但**这和匿名可不一样**：
 
 ```js
 var askQuestion = () => {
     // ..
 };
 
-askQuestion.name;   // askQuestion
+askQuestion.name; // askQuestion
 ```
 
-Arrow functions achieve their syntactic brevity at the expense of having to mentally juggle a bunch of variations for different forms/conditions. Just a few, for example:
+箭头函数的语法简洁，是以不得不在头脑中为不同的形式/条件变来变去为代价的。举几个例子
 
 ```js
 () => 42;
 
-id => id.toUpperCase();
+(id) => id.toUpperCase();
 
-(id,name) => ({ id, name });
+(id, name) => ({ id, name });
 
 (...args) => {
     return args[args.length - 1];
 };
 ```
 
-The real reason I bring up arrow functions is because of the common but incorrect claim that arrow functions somehow behave differently with respect to lexical scope from standard `function` functions.
+我谈论箭头函数的真正原因是，箭头函数在词法作用域方面的行为与标准的 `function` 函数有所不同，这种说法很常见，但并不正确。
 
-This is incorrect.
+这是不正确的。
 
-Other than being anonymous (and having no declarative form), `=>` arrow functions have the same lexical scope rules as `function` functions do. An arrow function, with or without `{ .. }` around its body, still creates a separate, inner nested bucket of scope. Variable declarations inside this nested scope bucket behave the same as in a `function` scope.
+除了匿名（没有声明形式）之外，`=>` 箭头函数与 `function` 函数具有相同的词法作用域规则。一个箭头函数，带或不带 `{ .. }` ，仍然会创建一个单独的、内部嵌套的作用域桶。在这个嵌套的作用域桶中的变量声明与在 `function` 作用域中的行为相同。
 
-## Backing Out
+## 思维转换
 
-When a function (declaration or expression) is defined, a new scope is created. The positioning of scopes nested inside one another creates a natural scope hierarchy throughout the program, called the scope chain. The scope chain controls variable access, directionally oriented upward and outward.
+当定义一个函数（声明或表达式）时，就会创建一个新的作用域。作用域相互嵌套，在整个程序中形成了一个自然的作用域层次结构，称为作用域链。作用域链控制变量的访问，向上和向外的。
 
-Each new scope offers a clean slate, a space to hold its own set of variables. When a variable name is repeated at different levels of the scope chain, shadowing occurs, which prevents access to the outer variable from that point inward.
+每一个新的作用域都是一片净土，都有自己的变量空间。当一个变量名在作用域链的不同层级重复出现时，就会产生遮蔽，阻止从该层级向内访问外层变量。
 
-As we step back out from these finer details, the next chapter shifts focus to the primary scope all JS programs include: the global scope.
+当我们从这些更微小的细节中走出来时，下一章的重点将转移到所有 JS 程序都包含的主要作用域：全局作用域。
+
+[^变量遮蔽]: _在程序设计中，变量遮蔽（英语：variable shadowing，或称变量隐藏）指的是：当新变量与旧有变量同名，此名称暂时不再可用于访问旧有变量_，https://zh.wikipedia.org/zh-cn/%E8%AE%8A%E6%95%B8%E9%81%AE%E8%94%BD ，2022年12月19日。
