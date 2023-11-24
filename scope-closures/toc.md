@@ -1,68 +1,68 @@
-# You Don't Know JS Yet: Scope & Closures - 2nd Edition
+# 你并不了解 JavaScript：作用域与闭包 - 第二版
 
-## Table of Contents
+## 目录
 
-* Foreword
-* Preface
-* Chapter 1: What's the Scope?
-    * About This Book
-    * Compiled vs. Interpreted
-    * Compiling Code
-    * Compiler Speak
-    * Cheating: Run-Time Scope Modifications
-    * Lexical Scope
-* Chapter 2: Illustrating Lexical Scope
-    * Marbles, and Buckets, and Bubbles... Oh My!
-    * A Conversation Among Friends
-    * Nested Scope
-    * Continue the Conversation
-* Chapter 3: The Scope Chain
-    * "Lookup" Is (Mostly) Conceptual
-    * Shadowing
-    * Function Name Scope
-    * Arrow Functions
-    * Backing Out
-* Chapter 4: Around the Global Scope
-    * Why Global Scope?
-    * Where Exactly is this Global Scope?
-    * Global This
-    * Globally Aware
-* Chapter 5: The (Not So) Secret Lifecycle of Variables
-    * When Can I Use a Variable?
-    * Hoisting: Yet Another Metaphor
-    * Re-declaration?
-    * Uninitialized Variables (aka, TDZ)
-    * Finally Initialized
-* Chapter 6: Limiting Scope Exposure
-    * Least Exposure
-    * Hiding in Plain (Function) Scope
-    * Scoping with Blocks
-    * Function Declarations in Blocks
-    * Blocked Over
-* Chapter 7: Using Closures
-    * See the Closure
-    * The Closure Lifecycle and Garbage Collection (GC)
-    * An Alternative Perspective
-    * Why Closure?
-    * Closer to Closure
-* Chapter 8: The Module Pattern
-    * Encapsulation and Least Exposure (POLE)
-    * What is a Module?
-    * Node CommonJS Modules
-    * Modern ES Modules (ESM)
-    * Exit Scope
-* Appendix A: Exploring Further
-    * Implied Scopes
-    * Anonymous vs. Named Functions
-    * Hoisting: Functions and Variables
-    * The Case for `var`
-    * What's the Deal with TDZ?
-    * Are Synchronous Callbacks Still Closures?
-    * Classic Module Variations
-* Appendix B: Practice
-    * Buckets of Marbles
-    * Closure (PART 1)
-    * Closure (PART 2)
-    * Closure (PART 3)
-    * Modules
-    * Suggested Solutions
+-   前言
+-   序
+-   第一章：什么是作用域？
+    -   关于本书
+    -   编译型与解释型
+    -   编译代码
+    -   编译器说
+    -   取巧：修改运行时的作用域
+    -   词法作用域
+-   第二章：图解作用域词法
+    -   弹珠、水桶和气泡……哦，我的老伙计！
+    -   朋友之间的对话
+    -   作用域嵌套
+    -   未完待续
+-   第三章：作用域链
+    -   "查找"（大部分）是概念性的
+    -   遮蔽 (Shadowing)
+    -   函数名的作用域
+    -   箭头函数
+    -   思维转换
+-   第四章：全局作用域
+    -   为什么是全局作用域？
+    -   全局作用域具体范围是什么？
+    -   Global This
+    -   掌握全局作用域
+-   第五章：（并不）神秘的变量生命周期
+    -   何时使用变量？
+    -   变量提升：另一种隐喻
+    -   重复声明？
+    -   未初始化变量警告（又称 TDZ 暂时性死区）
+    -   终于初始化
+-   第六章：限制作用域的过度暴露
+    -   最少暴露
+    -   隐藏在普通（函数）作用域内
+    -   块的作用域
+    -   块中的声明函数
+    -   刀过竹解
+-   第七章：闭包的使用
+    -   来看看闭包
+    -   闭包生命周期和垃圾回收（GC）
+    -   为什么是闭包？
+    -   一种替代观点
+    -   完美谢幕
+-   第八章：模块化模式
+    -   封装和最小暴露 (POLE)
+    -   什么是模块？
+    -   Node CommonJS 模块
+    -   现代 ES 模块 (ESM)
+    -   周天圆满
+-   附录 A：欲穷千里目，更上一层楼
+    -   隐式作用域
+    -   匿名函数与具名函数
+    -   提升：函数和变量
+    -   使用 `var` 的理由
+    -   TDZ 是怎么回事？
+    -   同步回调还是闭包吗？
+    -   类模块的变体
+-   附录 B：练习
+    -   弹珠桶
+    -   闭包（第一部分）
+    -   闭包（第二部分）
+    -   闭包（第三部分）
+    -   模块
+    -   参考答案

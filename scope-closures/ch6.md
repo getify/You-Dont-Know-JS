@@ -1,46 +1,47 @@
-# You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 6: Limiting Scope Exposure
+# 你并不了解 JavaScript：作用域与闭包 - 第二版
 
-So far our focus has been explaining the mechanics of how scopes and variables work. With that foundation now firmly in place, our attention raises to a higher level of thinking: decisions and patterns we apply across the whole program.
+# 第六章：限制作用域的过度暴露
 
-To begin, we're going to look at how and why we should be using different levels of scope (functions and blocks) to organize our program's variables, specifically to reduce scope over-exposure.
+到目前为止，我们的重点是解释作用域和变量的工作原理。有了坚实的基础，我们的注意力将转移到更高层次的思考上：我们应用于整个程序的决策和模式。
 
-## Least Exposure
+首先，我们要看看如何以及为什么要使用不同级别的作用域（函数和块）来组织程序的变量，特别是要减少作用域的过度暴露。
 
-It makes sense that functions define their own scopes. But why do we need blocks to create scopes as well?
+## 最小暴露
 
-Software engineering articulates a fundamental discipline, typically applied to software security, called "The Principle of Least Privilege" (POLP). [^POLP] And a variation of this principle that applies to our current discussion is typically labeled as "Least Exposure" (POLE).
+函数定义自己的作用域是合情合理的。但为什么我们还需要块来创建作用域呢？
 
-POLP expresses a defensive posture to software architecture: components of the system should be designed to function with least privilege, least access, least exposure. If each piece is connected with minimum-necessary capabilities, the overall system is stronger from a security standpoint, because a compromise or failure of one piece has a minimized impact on the rest of the system.
+软件工程阐明了一门基本学科，通常应用于软件安全，称为「最小权限原则」(POLP)。[^POLP]而适用于我们当前讨论的这一原则的变体通常被称为「最小暴露」(POLE)。
 
-If POLP focuses on system-level component design, the POLE *Exposure* variant focuses on a lower level; we'll apply it to how scopes interact with each other.
+POLP 表达了对软件架构的一种防御姿态：系统组件应设计为以最小权限、最小访问、最小暴露的方式运行。如果每个组件都以最低限度的必要功能连接起来，那么从安全的角度来看，整个系统就会更强大，因为一个组件的受损或失效对系统其他组件的影响就会降到最低。
 
-In following POLE, what do we want to minimize the exposure of? Simply: the variables registered in each scope.
+如果说 POLP 侧重于系统级的组件设计，那么 POLE *暴露*变体则侧重于更低层次；我们将把它应用于作用域之间的交互。
 
-Think of it this way: why shouldn't you just place all the variables of your program out in the global scope? That probably immediately feels like a bad idea, but it's worth considering why that is. When variables used by one part of the program are exposed to another part of the program, via scope, there are three main hazards that often arise:
+在遵循 POLE 的过程中，我们要尽量减少哪些变量的暴露？很简单：在每个作用域中注册的变量。
 
-* **Naming Collisions**: if you use a common and useful variable/function name in two different parts of the program, but the identifier comes from one shared scope (like the global scope), then name collision occurs, and it's very likely that bugs will occur as one part uses the variable/function in a way the other part doesn't expect.
+你可以这样想：为什么不把程序中的所有变量都放在全局作用域中呢？这可能会让人立刻觉得这是个坏主意，但值得考虑一下为什么会这样。当程序的一部分使用的变量通过作用域暴露给程序的另一部分时，通常会产生三大危害：
 
-    For example, imagine if all your loops used a single global `i` index variable, and then it happens that one loop in a function is running during an iteration of a loop from another function, and now the shared `i` variable gets an unexpected value.
+-   **命名碰撞**：如果在程序的两个不同部分中使用了一个共同的、有用的变量/函数名，但标识符来自一个共享作用域（如全局作用域），那么就会发生命名碰撞，很可能会出现错误，因为一部分以另一部分意想不到的方式使用了该变量/函数。
 
-* **Unexpected Behavior**: if you expose variables/functions whose usage is otherwise *private* to a piece of the program, it allows other developers to use them in ways you didn't intend, which can violate expected behavior and cause bugs.
+    例如，试想一下，如果您的所有循环都使用了一个全局 `i` 索引变量，然后一个函数中的一个循环在另一个函数的循环迭代期间运行，现在共享的 `i` 变量得到了一个意想不到的值。
 
-    For example, if your part of the program assumes an array contains all numbers, but someone else's code accesses and modifies the array to include booleans and strings, your code may then misbehave in unexpected ways.
+-   **意想不到的行为**：如果你将变量/函数的用途公开，而这些变量/函数的用途在程序中是*私有*的，那么其他开发人员就可以用你没有想到的方式使用它们，这可能会违反预期行为并导致错误。
 
-    Worse, exposure of *private* details invites those with mal-intent to try to work around limitations you have imposed, to do things with your part of the software that shouldn't be allowed.
+    例如，如果你的程序假定数组包含所有数字，但其他人的代码访问并修改了数组，使其包含布尔和字符串，那么你的代码可能会出现意想不到的错误行为。
 
-* **Unintended Dependency**: if you expose variables/functions unnecessarily, it invites other developers to use and depend on those otherwise *private* pieces. While that doesn't break your program today, it creates a refactoring hazard in the future, because now you cannot as easily refactor that variable or function without potentially breaking other parts of the software that you don't control.
+    更糟糕的是，暴露*隐私*细节会招致那些居心不良的人试图绕过你施加的限制，用你的那部分软件做一些不该做的事情。
 
-    For example, if your code relies on an array of numbers, and you later decide it's better to use some other data structure instead of an array, you now must take on the liability of adjusting other affected parts of the software.
+-   **意外的依赖**：如果你不必要地暴露变量/函数，就会招致其他开发人员使用和依赖这些原本*私人*的部分。虽然这不会破坏你现在的程序，但会给将来的重构带来隐患，因为现在你不可能轻易地重构该变量或函数，而不会破坏软件中你无法控制的其他部分。[^1]
 
-POLE, as applied to variable/function scoping, essentially says, default to exposing the bare minimum necessary, keeping everything else as private as possible. Declare variables in as small and deeply nested of scopes as possible, rather than placing everything in the global (or even outer function) scope.
+    例如，如果您的代码依赖于数字数组，而您后来决定最好使用其他数据结构而不是数组，那么您现在就必须承担调整软件其他受影响部分的责任。
 
-If you design your software accordingly, you have a much greater chance of avoiding (or at least minimizing) these three hazards.
+POLE 应用于变量/函数的作用域时，主要是说，默认情况下只暴露必要的最低限度，其他一切尽可能保持私有。在尽可能小的深度嵌套作用域中声明变量，而不是把所有东西都放在全局（甚至外层函数）作用域中。
 
-Consider:
+如果在设计软件时考虑到这一点，就有更大的机会避免（或至少减少）这三种危害。
+
+思考一下：
 
 ```js
-function diff(x,y) {
+function diff(x, y) {
     if (x > y) {
         let tmp = x;
         x = y;
@@ -50,25 +51,25 @@ function diff(x,y) {
     return y - x;
 }
 
-diff(3,7);      // 4
-diff(7,5);      // 2
+diff(3, 7); // 4
+diff(7, 5); // 2
 ```
 
-In this `diff(..)` function, we want to ensure that `y` is greater than or equal to `x`, so that when we subtract (`y - x`), the result is `0` or larger. If `x` is initially larger (the result would be negative!), we swap `x` and `y` using a `tmp` variable, to keep the result positive.
+在这个 `diff(..)`函数中，我们要确保 `y` 大于或等于 `x`，这样当我们减去 (`y-x`)，结果就是 `0` 或更大。如果 `x` 最初较大（结果将为负数！），我们将使用 `tmp` 变量交换 `x` 和 `y`，以保持结果为正数。
 
-In this simple example, it doesn't seem to matter whether `tmp` is inside the `if` block or whether it belongs at the function level—it certainly shouldn't be a global variable! However, following the POLE principle, `tmp` should be as hidden in scope as possible. So we block scope `tmp` (using `let`) to the `if` block.
+在这个简单的例子中，`tmp` 是否在 `if` 代码块中或是否属于函数级似乎并不重要。它当然不应该是一个全局变量！然而，根据 POLE 原则，`tmp` 应尽可能隐藏在作用域中。因此，我们将 `tmp` 的作用域屏蔽（使用 `let` ）到 `if` 代码块中。
 
-## Hiding in Plain (Function) Scope
+## 隐藏在普通（函数）作用域内
 
-It should now be clear why it's important to hide our variable and function declarations in the lowest (most deeply nested) scopes possible. But how do we do so?
+现在我们应该清楚为什么要尽可能将变量和函数声明隐藏在最低（嵌套最深）的作用域中了。但我们该如何做呢？
 
-We've already seen the `let` and `const` keywords, which are block scoped declarators; we'll come back to them in more detail shortly. But first, what about hiding `var` or `function` declarations in scopes? That can easily be done by wrapping a `function` scope around a declaration.
+我们已经看到了 `let` 和 `const` 关键字，它们是块作用域声明符；稍后我们将更详细地讨论它们。但首先，如何在作用域中隐藏 `var` 或 `function` 声明呢？这可以通过在声明周围包装一个 `function` 作用域来轻松实现。
 
-Let's consider an example where `function` scoping can be useful.
+让我们举一个例子来说明 `function` 作用域的作用。
 
-The mathematical operation "factorial" (notated as "6!") is the multiplication of a given integer against all successively lower integers down to `1`—actually, you can stop at `2` since multiplying `1` does nothing. In other words, "6!" is the same as "6 * 5!", which is the same as "6 * 5 * 4!", and so on. Because of the nature of the math involved, once any given integer's factorial (like "4!") has been calculated, we shouldn't need to do that work again, as it'll always be the same answer.
+数学运算「阶乘」[^2]（写为 "6!"）是一个给定整数与所有依次低至 `1` 的整数相乘—实际上，你可以停在 `2` ，因为与 `1` 相乘没有任何作用。换句话说，"6!" 等同于 "6 _5!" ，同样等同于 "6_ 5 \* 4!"，以此类推。由于所涉及数学的性质，一旦计算出任何给定整数的阶乘（如 "4!"），我们就不需要再做这项工作了，因为答案总是一样的。
 
-So if you naively calculate factorial for `6`, then later want to calculate factorial for `7`, you might unnecessarily re-calculate the factorials of all the integers from 2 up to 6. If you're willing to trade memory for speed, you can solve that wasted computation by caching each integer's factorial as it's calculated:
+因此，如果你天真地计算了 `6` 的阶乘，然后又想计算 `7` 的阶乘，你可能会不必要地重新计算从 2 到 6 的所有整数的阶乘。如果你愿意用内存来换取速度，你可以在计算时缓存每个整数的阶乘来解决这种浪费：
 
 ```js
 var cache = {};
@@ -97,21 +98,21 @@ factorial(7);
 // 5040
 ```
 
-We're storing all the computed factorials in `cache` so that across multiple calls to `factorial(..)`, the previous computations remain. But the `cache` variable is pretty obviously a *private* detail of how `factorial(..)` works, not something that should be exposed in an outer scope—especially not the global scope.
+我们将所有计算出的阶乘存储在 `cache` 中，这样在多次调用 `factorial(..)` 时，之前的计算结果就会保留下来。但 `cache` 变量显然是 `factorial(..)` 工作原理中的一个*私有*细节，不应该暴露在外部作用域中，尤其是全局作用域。
 
-| NOTE: |
-| :--- |
-| `factorial(..)` here is recursive—a call to itself is made from inside—but that's just for brevity of code sake; a non-recursive implementation would yield the same scoping analysis with respect to `cache`. |
+| 注意：                                                                                                             |
+| :----------------------------------------------------------------------------------------------------------------- |
+| 这里的 `factorial(..)`是递归的—从内部调用自身，但这只是为了代码的简洁；非递归的实现会产生与 `cache` 相同的作用域。 |
 
-However, fixing this over-exposure issue is not as simple as hiding the `cache` variable inside `factorial(..)`, as it might seem. Since we need `cache` to survive multiple calls, it must be located in a scope outside that function. So what can we do?
+然而，要解决这个过度暴露的问题，并不像看起来那样简单，只需将 `cache` 变量隐藏在 `factorial(..)` 中即可。因为我们需要 `cache` 在多次调用后仍能存活，所以它必须位于该函数之外的作用域中。那么我们该怎么办呢？
 
-Define another middle scope (between the outer/global scope and the inside of `factorial(..)`) for `cache` to be located:
+为 `cache` 定义另一个中间作用域（介于外部/全局作用域和 `factorial(..)` 内部之间）：
 
 ```js
-// outer/global scope
+// 外层/全局作用域
 
 function hideTheCache() {
-    // "middle scope", where we hide `cache`
+    // "中间作用域"，在这里我们隐藏了 `cache`
     var cache = {};
 
     return factorial;
@@ -119,7 +120,7 @@ function hideTheCache() {
     // **********************
 
     function factorial(x) {
-        // inner scope
+        // 内部作用域
         if (x < 2) return 1;
         if (!(x in cache)) {
             cache[x] = x * factorial(x - 1);
@@ -137,15 +138,15 @@ factorial(7);
 // 5040
 ```
 
-The `hideTheCache()` function serves no other purpose than to create a scope for `cache` to persist in across multiple calls to `factorial(..)`. But for `factorial(..)` to have access to `cache`, we have to define `factorial(..)` inside that same scope. Then we return the function reference, as a value from `hideTheCache()`, and store it in an outer scope variable, also named `factorial`. Now as we call `factorial(..)` (multiple times!), its persistent `cache` stays hidden yet accessible only to `factorial(..)`!
+`hideTheCache()` 函数除了为 `cache` 创建一个作用域，以便在多次调用 `factorial(..)` 时持续存在之外，没有其他作用。但为了让 `factorial(..)`能够访问 `cache`，我们必须在同一个作用域中定义 `factorial(..)`。然后，我们从 `hideTheCache()` 返回函数引用作为值，并将其存储在外作用域变量中，该变量也命名为 `factorial`。现在，当我们调用 `factorial(..)`（多次！）时，其持久的 `cache` 将保持隐藏，但只有 `factorial(..)`可以访问！
 
-OK, but... it's going to be tedious to define (and name!) a `hideTheCache(..)` function scope each time such a need for variable/function hiding occurs, especially since we'll likely want to avoid name collisions with this function by giving each occurrence a unique name. Ugh.
+好吧，但是......每次需要隐藏变量/函数时，都要定义（并命名！）`hideTheCache(..)` 函数作用域，这将会非常繁琐，尤其是我们可能希望通过为每次出现的函数命名一个唯一的名称来避免名称冲突。唉。
 
-| NOTE: |
-| :--- |
-| The illustrated technique—caching a function's computed output to optimize performance when repeated calls of the same inputs are expected—is quite common in the Functional Programming (FP) world, canonically referred to as "memoization"; this caching relies on closure (see Chapter 7). Also, there are memory usage concerns (addressed in "A Word About Memory" in Appendix B). FP libraries will usually provide an optimized and vetted utility for memoization of functions, which would take the place of `hideTheCache(..)` here. Memoization is beyond the *scope* (pun intended!) of our discussion, but see my *Functional-Light JavaScript* book for more information. |
+| 注意：                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 图解技术：缓存函数的计算输出[^3]中提到，重复调用相同输入时优化性能在函数式编程（FP）领域非常常见，通常称为「记忆函数 (memoization)」；这种缓存依赖于闭包（参见第 7 章）。此外，还有内存使用方面的问题（在附录 B 的「内存问题」中讨论）。FP 库通常会为函数的内存化提供一个经过优化和审查的实用程序，在这里它将取代 `hideTheCache(..)`。记忆函数超出了我们的讨论*范围*（双关语！_scope_ 译作范围的同时也可理解为作用域），更多信息请参阅我（原作者）的 _Functional-Light JavaScript_[^4] 一书。 |
 
-Rather than defining a new and uniquely named function each time one of those scope-only-for-the-purpose-of-hiding-a-variable situations occurs, a perhaps better solution is to use a function expression:
+与每次都定义一个新的、唯一命名的函数相比，也许更好的解决方案是使用函数表达式：
 
 ```js
 var factorial = (function hideTheCache() {
@@ -169,72 +170,72 @@ factorial(7);
 // 5040
 ```
 
-Wait! This is still using a function to create the scope for hiding `cache`, and in this case, the function is still named `hideTheCache`, so how does that solve anything?
+等等！这仍然是在使用一个函数来创建隐藏 `cache` 的作用域，而且在这种情况下，该函数仍然被命名为 `hideTheCache`，这又能解决什么问题呢？
 
-Recall from "Function Name Scope" (in Chapter 3), what happens to the name identifier from a `function` expression. Since `hideTheCache(..)` is defined as a `function` expression instead of a `function` declaration, its name is in its own scope—essentially the same scope as `cache`—rather than in the outer/global scope.
+回顾一下「函数名的作用域」（第 3 章），函数表达式的名称标识符会发生什么变化。由于 `hideTheCache(..)` 被定义为一个 `function` 表达式而不是一个 `function` 声明，所以它的名称在它自己的作用域中，基本上与 `cache` 相同而不是在外层/全局作用域中。
 
-That means we can name every single occurrence of such a function expression the exact same name, and never have any collision. More appropriately, we can name each occurrence semantically based on whatever it is we're trying to hide, and not worry that whatever name we choose is going to collide with any other `function` expression scope in the program.
+这意味着，我们可以将此类函数表达式的每一次出现都命名为完全相同的名称，而绝不会出现任何冲突。更恰当地说，我们可以根据我们试图隐藏的内容，对每个出现的表达式进行语义命名，而不必担心我们选择的任何名称会与程序中的任何其他函数表达式作用域相冲突。
 
-In fact, we *could* just leave off the name entirely—thus defining an "anonymous `function` expression" instead. But Appendix A will discuss the importance of names even for such scope-only functions.
+事实上，我们完全*可以*不使用名称，而是定义一个「匿名函数表达式」。但附录 A 将讨论名称的重要性，即使是对于这种 scope-only 的函数。
 
-### Invoking Function Expressions Immediately
+# 立即调用函数表达式 (IIFE)
 
-There's another important bit in the previous factorial recursive program that's easy to miss: the line at the end of the `function` expression that contains `})();`.
+在前面的阶乘递归程序中，还有一个很容易被忽略的重要部分：函数表达式末尾包含 `})();` 的那一行。
 
-Notice that we surrounded the entire `function` expression in a set of `( .. )`, and then on the end, we added that second `()` parentheses set; that's actually calling the `function` expression we just defined. Moreover, in this case, the first set of surrounding `( .. )` around the function expression is not strictly necessary (more on that in a moment), but we used them for readability sake anyway.
+请注意，我们用一组 `( .. )` 包围了整个函数表达式，然后在最后添加了第二组 `()` 括号；这实际上是在调用我们刚刚定义的函数表达式。此外，在这种情况下，函数表达式周围的第一组 `( .. )` 严格来说并不是必需的（稍后会详细说明），但为了便于阅读，我们还是使用了它们。
 
-So, in other words, we're defining a `function` expression that's then immediately invoked. This common pattern has a (very creative!) name: Immediately Invoked Function Expression (IIFE).
+换句话说，我们正在定义一个函数表达式，然后立即调用它。这种常见的模式有一个非常有创意的名字：立即调用函数表达式 (IIFE)。
 
-An IIFE is useful when we want to create a scope to hide variables/functions. Since it's an expression, it can be used in **any** place in a JS program where an expression is allowed. An IIFE can be named, as with `hideTheCache()`, or (much more commonly!) unnamed/anonymous. And it can be standalone or, as before, part of another statement—`hideTheCache()` returns the `factorial()` function reference which is then `=` assigned to the variable `factorial`.
+当我们想创建一个隐藏变量/函数的作用域时，IIFE 就会派上用场。因为它是一个表达式，所以可以用在 JS 程序中任何允许使用表达式的地方。IIFE 可以命名，如 `hideTheCache()`，也可以（更常见！）不命名/匿名。它可以是独立的，也可以是另一个语句的一部分：`hideTheCache()` 返回 `factorial()` 函数引用，然后 `=` 赋值给变量 `factorial`。
 
-For comparison, here's an example of a standalone IIFE:
+下面是一个独立 IIFE 的示例，以资比较：
 
 ```js
-// outer scope
+// 外层作用域
 
-(function(){
-    // inner hidden scope
+(function () {
+    // 内部隐藏作用域
 })();
 
-// more outer scope
+// 更多外层作用域
 ```
 
-Unlike earlier with `hideTheCache()`, where the outer surrounding `(..)` were noted as being an optional stylistic choice, for a standalone IIFE they're **required**; they distinguish the `function` as an expression, not a statement. For consistency, however, always surround an IIFE `function` with `( .. )`.
+与之前的 `hideTheCache()` 不同，外围的 `(..)` 被认为是一种可选的样式选择，而对于独立的 IIFE，它们是 **必须的**；它们将 `function` 区分为一个表达式，而不是一个语句。不过，为了保持一致，在 IIFE `function` 的周围一定要加上 `( .. )` 。
 
-| NOTE: |
-| :--- |
-| Technically, the surrounding `( .. )` aren't the only syntactic way to ensure the `function` in an IIFE is treated by the JS parser as a function expression. We'll look at some other options in Appendix A. |
+| 注意：                                                                                                                                    |
+| :---------------------------------------------------------------------------------------------------------------------------------------- |
+| 从技术上讲，周围的 `( .. )` 并不是确保 JS 解析器将 IIFE 中的 `function` 视为函数表达式的唯一语法方式。我们将在附录 A 中查看其他一些选择。 |
 
-#### Function Boundaries
+#### 函数边界
 
-Beware that using an IIFE to define a scope can have some unintended consequences, depending on the code around it. Because an IIFE is a full function, the function boundary alters the behavior of certain statements/constructs.
+请注意，使用 IIFE 定义作用域可能会产生一些意想不到的后果，这取决于它周围的代码。因为 IIFE 是一个完整的函数，函数边界会改变某些语句/结构体的行为。
 
-For example, a `return` statement in some piece of code would change its meaning if an IIFE is wrapped around it, because now the `return` would refer to the IIFE's function. Non-arrow function IIFEs also change the binding of a `this` keyword—more on that in the *Objects & Classes* book. And statements like `break` and `continue` won't operate across an IIFE function boundary to control an outer loop or block.
+例如，如果代码中的 `return` 语句被 IIFE 包住，它的含义就会改变，因为现在 `return` 指的是 IIFE 的函数。非箭头函数 IIFE 也会改变 `this` 关键字的绑定，更多内容请参阅*对象与类*一书。像 `break` 和 `continue` 这样的语句不会跨越 IIFE 函数边界来控制外循环或代码块。
 
-So, if the code you need to wrap a scope around has `return`, `this`, `break`, or `continue` in it, an IIFE is probably not the best approach. In that case, you might look to create the scope with a block instead of a function.
+因此，如果您需要封装作用域的代码中包含 `return`、`this`、`break` 或 `continue` 字符，那么 IIFE 可能不是最好的方法。在这种情况下，您可以使用代码块而不是函数来创建作用域。
 
-## Scoping with Blocks
+## 块的作用域
 
-You should by this point feel fairly comfortable with the merits of creating scopes to limit identifier exposure.
+至此，您应该对创建作用域以限制标识符暴露的优点感到相当满意了。
 
-So far, we looked at doing this via `function` (i.e., IIFE) scope. But let's now consider using `let` declarations with nested blocks. In general, any `{ .. }` curly-brace pair which is a statement will act as a block, but **not necessarily** as a scope.
+到目前为止，我们已经了解了如何通过函数（即 IIFE）作用域来实现这一点。现在我们来考虑使用嵌套代码块中的 `let` 声明。一般来说，任何`{ .. }` 作为语句的大括号对将作为一个块，但**不一定**作为作用域。
 
-A block only becomes a scope if necessary, to contain its block-scoped declarations (i.e., `let` or `const`). Consider:
+块只有在必要时才成为作用域，以包含其块作用域声明（即 `let` 或 `const`）。思考一下：
 
 ```js
 {
-    // not necessarily a scope (yet)
+    // 不一定（尚未）是作用域
 
     // ..
 
-    // now we know the block needs to be a scope
+    // 现在我们知道该区块需要是一个作用域
     let thisIsNowAScope = true;
 
     for (let i = 0; i < 5; i++) {
-        // this is also a scope, activated each
-        // iteration
+        // 每次循环这也是一个作用域
+        // 迭代
         if (i % 2 == 0) {
-            // this is just a block, not a scope
+            // 这只是一个块，不是作用域
             console.log(i);
         }
     }
@@ -242,33 +243,30 @@ A block only becomes a scope if necessary, to contain its block-scoped declarati
 // 0 2 4
 ```
 
-Not all `{ .. }` curly-brace pairs create blocks (and thus are eligible to become scopes):
+并非所有的 `{ .. }` 大括号都会创建块（因此有资格成为作用域）：
 
-* Object literals use `{ .. }` curly-brace pairs to delimit their key-value lists, but such object values are **not** scopes.
+-   对象字面使用 `{ .. }` 大括号对来分隔键值对，但这种对象值**不是**作用域。
+-   `class` 在其主体定义周围使用了 `{ .. }` 大括号，但这不是一个块或作用域。
+-   `function` 在其主体周围使用 `{ .. }` 围绕着它的主体，但从技术上讲，这并不是一个块：它是函数主体的单个语句。但它*是*一个（函数）作用域。
+-   `switch` 语句上的一对 `{ .. }` 大括号（围绕 `case` 子句集）并不定义块/作用域。
 
-* `class` uses `{ .. }` curly-braces around its body definition, but this is not a block or scope.
+除了这些非代码块示例之外， `{ .. }` 大括号对可以定义一个附在语句（如 `if` 或 `for`）之后的块，也可以单独定义，见上一段中最外层的 `{ .. }` 括号对。对于这种显式块如果它没有声明，实际上就不是一个作用域，没有任何操作上的用途，尽管它作为语义信号仍然有用。
 
-* A `function` uses `{ .. } ` around its body, but this is not technically a block—it's a single statement for the function body. It *is*, however, a (function) scope.
+明确的独立 `{ .. }` 块一直都是有效的 JS 语法，但由于在 ES6 的 `let`/`const` 之前它们不能作为作用域，所以它们非常罕见。不过，在 ES6 之后，它们开始逐渐流行起来。
 
-* The `{ .. }` curly-brace pair on a `switch` statement (around the set of `case` clauses) does not define a block/scope.
+在大多数支持块作用域的语言中，显式块作用域是一种极为常见的模式，用于为一个或几个变量创建狭小的作用域。因此，根据 POLE 原则，我们也应该在 JS 中更广泛地采用这种模式；使用（显式）块作用域将标识符的暴露范围缩小到最小。
 
-Other than such non-block examples, a `{ .. }` curly-brace pair can define a block attached to a statement (like an `if` or `for`), or stand alone by itself—see the outermost `{ .. }` curly brace pair in the previous snippet. An explicit block of this sort—if it has no declarations, it's not actually a scope—serves no operational purpose, though it can still be useful as a semantic signal.
+即使在另一个块内部，显式块作用域也是有用的（无论外部块是否是一个作用域）。
 
-Explicit standalone `{ .. }` blocks have always been valid JS syntax, but since they couldn't be a scope prior to ES6's `let`/`const`, they are quite rare. However, post ES6, they're starting to catch on a little bit.
-
-In most languages that support block scoping, an explicit block scope is an extremely common pattern for creating a narrow slice of scope for one or a few variables. So following the POLE principle, we should embrace this pattern more widespread in JS as well; use (explicit) block scoping to narrow the exposure of identifiers to the minimum practical.
-
-An explicit block scope can be useful even inside of another block (whether the outer block is a scope or not).
-
-For example:
+例如：
 
 ```js
 if (somethingHappened) {
-    // this is a block, but not a scope
+    // 这是一个块但不是作用域
 
     {
-        // this is both a block and an
-        // explicit scope
+        // 这既是一个块
+        // 也是一个显式作用域
         let msg = somethingHappened.message();
         notifyOthers(msg);
     }
@@ -279,15 +277,15 @@ if (somethingHappened) {
 }
 ```
 
-Here, the `{ .. }` curly-brace pair **inside** the `if` statement is an even smaller inner explicit block scope for `msg`, since that variable is not needed for the entire `if` block. Most developers would just block-scope `msg` to the `if` block and move on. And to be fair, when there's only a few lines to consider, it's a toss-up judgement call. But as code grows, these over-exposure issues become more pronounced.
+在这里，`{ .. }` 大括号对在 `if` 语句的**内部**，是 `msg` 的一个更小的内部显式代码块作用域，因为整个 `if` 代码块都不需要该变量。大多数开发人员都会直接将 `msg` 代码块作用到 `if` 代码块中，然后继续开发。公平地说，当只需要考虑几行代码时，这是一个折腾人的判断。但随着代码的增加，这些过度暴露的问题就会变得更加明显。
 
-So does it matter enough to add the extra `{ .. }` pair and indentation level? I think you should follow POLE and always (within reason!) define the smallest block for each variable. So I recommend using the extra explicit block scope as shown.
+那么，添加额外的 `{ .. }` 和缩进级别是否足够重要？我认为您应该遵循 POLE，始终（在合理作用域内）为每个变量定义最小的块。因此，我建议使用如图所示的额外显式块作用域。
 
-Recall the discussion of TDZ errors from "Uninitialized Variables (TDZ)" (Chapter 5). My suggestion there was: to minimize the risk of TDZ errors with `let`/`const` declarations, always put those declarations at the top of their scope.
+回顾「未初始化变量警告 (TDZ)」（第 5 章）中对 TDZ 误差的讨论。我在那里提出的建议是：为了尽量减少使用 `let`/`const` 声明时出现 TDZ 错误的风险，应始终将这些声明放在其作用域的顶端。
 
-If you find yourself placing a `let` declaration in the middle of a scope, first think, "Oh, no! TDZ alert!" If this `let` declaration isn't needed in the first half of that block, you should use an inner explicit block scope to further narrow its exposure!
+如果你发现自己在一个作用域中间放置了一个 `let` 声明，首先要想的是「哦，不！TDZ 警报！」如果该代码块的前半部分不需要这个 `let` 声明，您就应该使用内部显式代码块作用域来进一步缩小它的暴露范围！
 
-Another example with an explicit block scope:
+另一个明确块作用域的例子：
 
 ```js
 function getNextMonthStart(dateStr) {
@@ -295,9 +293,7 @@ function getNextMonthStart(dateStr) {
 
     {
         let curMonth;
-        [ , year, curMonth ] = dateStr.match(
-                /(\d{4})-(\d{2})-\d{2}/
-            ) || [];
+        [, year, curMonth] = dateStr.match(/(\d{4})-(\d{2})-\d{2}/) || [];
         nextMonth = (Number(curMonth) % 12) + 1;
     }
 
@@ -305,26 +301,22 @@ function getNextMonthStart(dateStr) {
         year++;
     }
 
-    return `${ year }-${
-            String(nextMonth).padStart(2,"0")
-        }-01`;
+    return `${year}-${String(nextMonth).padStart(2, "0")}-01`;
 }
-getNextMonthStart("2019-12-25");   // 2020-01-01
+getNextMonthStart("2019-12-25"); // 2020-01-01
 ```
 
-Let's first identify the scopes and their identifiers:
+首先让我们来确定作用域及其标识符：
 
-1. The outer/global scope has one identifier, the function `getNextMonthStart(..)`.
+1. 外部/全局作用域有一个标识符，即函数 `getNextMonthStart(..)`。
+2. `getNextMonthStart(..)` 的函数作用域有三个：`dateStr`（参数）、`nextMonth` 和 `year`。
+3. `{ .. }` 大括号对定义了一个包含一个变量的内部块作用域： `curMonth`。
 
-2. The function scope for `getNextMonthStart(..)` has three: `dateStr` (parameter), `nextMonth`, and `year`.
+那么，为什么要将 `curMonth` 放在显式的块作用域中，而不是在顶级函数作用域中与 `nextMonth` 和 `year` 放在一起呢？因为 `curMonth` 只需要用于前两个语句；在函数作用域级别，它已经过度暴露了。
 
-3. The `{ .. }` curly-brace pair defines an inner block scope that includes one variable: `curMonth`.
+这个示例很小，因此过度暴露 `curMonth` 的危害非常有限。但是，当您把默认情况下最小化作用域暴露作为一种习惯时，POLE 原则的好处就能发挥得淋漓尽致。如果您能始终如一地遵循该原则，即使是在很小的情况下，随着程序的发展，它也会为您提供更多的作用。
 
-So why put `curMonth` in an explicit block scope instead of just alongside `nextMonth` and `year` in the top-level function scope? Because `curMonth` is only needed for those first two statements; at the function scope level it's over-exposed.
-
-This example is small, so the hazards of over-exposing `curMonth` are pretty limited. But the benefits of the POLE principle are best achieved when you adopt the mindset of minimizing scope exposure by default, as a habit. If you follow the principle consistently even in the small cases, it will serve you more as your programs grow.
-
-Let's now look at an even more substantial example:
+现在我们来看一个更有说服力的例子：
 
 ```js
 function sortNamesByLength(names) {
@@ -337,21 +329,17 @@ function sortNamesByLength(names) {
         buckets[firstName.length].push(firstName);
     }
 
-    // a block to narrow the scope
+    // 一个块，以缩小作用域
     {
         let sortedNames = [];
 
         for (let bucket of buckets) {
             if (bucket) {
-                // sort each bucket alphanumerically
+                // 按字母数字对每个桶进行排序
                 bucket.sort();
 
-                // append the sorted names to our
-                // running list
-                sortedNames = [
-                    ...sortedNames,
-                    ...bucket
-                ];
+                // 将排序后的名称添加到运行列表中
+                sortedNames = [...sortedNames, ...bucket];
             }
         }
 
@@ -359,40 +347,33 @@ function sortNamesByLength(names) {
     }
 }
 
-sortNamesByLength([
-    "Sally",
-    "Suzy",
-    "Frank",
-    "John",
-    "Jennifer",
-    "Scott"
-]);
+sortNamesByLength(["Sally", "Suzy", "Frank", "John", "Jennifer", "Scott"]);
 // [ "John", "Suzy", "Frank", "Sally",
 //   "Scott", "Jennifer" ]
 ```
 
-There are six identifiers declared across five different scopes. Could all of these variables have existed in the single outer/global scope? Technically, yes, since they're all uniquely named and thus have no name collisions. But this would be really poor code organization, and would likely lead to both confusion and future bugs.
+在五个不同的作用域中声明了六个标识符。这些变量是否都可以存在于一个外部/全局作用域中？从技术上讲，是可以的，因为它们的名称都是唯一的，因此不会发生名称冲突。但这样的代码组织实在是太糟糕了，很可能会导致混乱和将来的错误。
 
-We split them out into each inner nested scope as appropriate. Each variable is defined at the innermost scope possible for the program to operate as desired.
+我们根据需要将它们分割到每个内部嵌套作用域中。每个变量都定义在程序运行所需的最内层作用域。
 
-`sortedNames` could have been defined in the top-level function scope, but it's only needed for the second half of this function. To avoid over-exposing that variable in a higher level scope, we again follow POLE and block-scope it in the inner explicit block scope.
+`sortedNames` 本来可以在顶层函数作用域中定义，但这个函数的后半部分才需要它。为了避免在更高级的作用域中过度暴露该变量，我们再次遵循 POLE 的做法，在内部显式块作用域中对其进行块作用域定义。
 
-### `var` *and* `let`
+### `var` _和_ `let`
 
-Next, let's talk about the declaration `var buckets`. That variable is used across the entire function (except the final `return` statement). Any variable that is needed across all (or even most) of a function should be declared so that such usage is obvious.
+接下来，让我们来谈谈 `var buckets` 声明。该变量用于整个函数（除了最后的 `return` 语句）。任何需要在函数的全部（甚至大部分）部分使用的变量，都应该声明得一目了然。
 
-| NOTE: |
-| :--- |
-| The parameter `names` isn't used across the whole function, but there's no way limit the scope of a parameter, so it behaves as a function-wide declaration regardless. |
+| 注意：                                                                                                  |
+| :------------------------------------------------------------------------------------------------------ |
+| 参数 `names` 并未在整个函数中使用，但没有办法限制参数的作用域，因此无论如何，它都是函数作用域内的声明。 |
 
-So why did we use `var` instead of `let` to declare the `buckets` variable? There's both semantic and technical reasons to choose `var` here.
+那么，为什么我们使用 `var` 而不是 `let` 来声明 `buckets` 变量呢？选择 `var` 既有语义上的原因，也有技术上的原因。
 
-Stylistically, `var` has always, from the earliest days of JS, signaled "variable that belongs to a whole function." As we asserted in "Lexical Scope" (Chapter 1), `var` attaches to the nearest enclosing function scope, no matter where it appears. That's true even if `var` appears inside a block:
+在风格上，`var` 从最早的 JS 开始就表示「属于整个函数的变量」。正如我们在「词法作用域」（第 1 章）中所断言的，`var` 不管出现在哪里，都会依附于最近的外层函数作用域。即使 `var` 出现在一个块中也是如此：
 
 ```js
-function diff(x,y) {
+function diff(x, y) {
     if (x > y) {
-        var tmp = x;    // `tmp` is function-scoped
+        var tmp = x; // `tmp` 是函数作用域
         x = y;
         y = tmp;
     }
@@ -401,34 +382,34 @@ function diff(x,y) {
 }
 ```
 
-Even though `var` is inside a block, its declaration is function-scoped (to `diff(..)`), not block-scoped.
+即使 `var` 位于代码块内部，它的声明也是函数作用域的（对 `diff(..)`），而不是代码块作用域的。
 
-While you can declare `var` inside a block (and still have it be function-scoped), I would recommend against this approach except in a few specific cases (discussed in Appendix A). Otherwise, `var` should be reserved for use in the top-level scope of a function.
+虽然您可以在代码块中声明 `var`（并且它仍然是函数作用域），但我建议您不要采用这种方法，除非在少数特殊情况下（在附录 A 中讨论）。否则，`var` 应保留给函数的顶级作用域使用。
 
-Why not just use `let` in that same location? Because `var` is visually distinct from `let` and therefore signals clearly, "this variable is function-scoped." Using `let` in the top-level scope, especially if not in the first few lines of a function, and when all the other declarations in blocks use `let`, does not visually draw attention to the difference with the function-scoped declaration.
+为什么不在同一位置使用 `let` 呢？因为 `var` 与 `let` 在视觉上截然不同，因此可以清楚地表明「此变量属于函数作用域」。在顶层作用域中使用 `let`，尤其是如果不是在函数的前几行中使用，并且在代码块中的所有其他声明都使用 `let` 时，并不会在视觉上引起人们注意与函数作用域声明的区别。
 
-In other words, I feel `var` better communicates function-scoped than `let` does, and `let` both communicates (and achieves!) block-scoping where `var` is insufficient. As long as your programs are going to need both function-scoped and block-scoped variables, the most sensible and readable approach is to use both `var` *and* `let` together, each for their own best purpose.
+换句话说，我觉得 `var` 比 `let` 更好地传达了函数作用域，而 `let` 既传达了（也实现了！）块作用域，而 `var` 则不够。只要你的程序既需要函数作用域变量又需要块作用域变量，那么最明智、最易读的方法就是同时使用 `var` _和_ `let` 这两种变量，它们各自都有自己的最佳用途。
 
-There are other semantic and operational reasons to choose `var` or `let` in different scenarios. We'll explore the case for `var` *and* `let` in more detail in Appendix A.
+在不同的情况下，选择 `var` 或 `let` 还有其他语义和操作上的原因。我们将在附录 A 中更详细地探讨 `var` _和_ `let` 的情况。
 
-| WARNING: |
-| :--- |
-| My recommendation to use both `var` *and* `let` is clearly controversial and contradicts the majority. It's far more common to hear assertions like, "var is broken, let fixes it" and, "never use var, let is the replacement." Those opinions are valid, but they're merely opinions, just like mine. `var` is not factually broken or deprecated; it has worked since early JS and it will continue to work as long as JS is around. |
+| 警告：                                                                                                                                                                                                                                                                                                          |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 我建议同时使用 `var` _和_ `let` 显然是有争议的，而且与大多数人的观点相悖。更常见的说法是：「var 是坏的，let 能修复它」和「永远不要使用 var，let 是替代品」。这些观点都有道理，但它们只是观点，就像我的观点一样。事实上， `var` 并没有坏掉或被弃用；它从早期的 JS 开始就一直有效，只要 JS 还在，它就会一直有效。 |
 
-### Where To `let`?
+### 在哪里使用 `let`？
 
-My advice to reserve `var` for (mostly) only a top-level function scope means that most other declarations should use `let`. But you may still be wondering how to decide where each declaration in your program belongs?
+我建议将 `var` 保留给（大部分）仅用于顶级函数作用域，这意味着其他大多数声明都应使用 `let`。但您可能仍想知道如何决定程序中每个声明的归属？
 
-POLE already guides you on those decisions, but let's make sure we explicitly state it. The way to decide is not based on which keyword you want to use. The way to decide is to ask, "What is the most minimal scope exposure that's sufficient for this variable?"
+POLE 已经为您的决策提供了指导，但我们还是要明确指出这一点。决定的方式不是基于你想使用哪个关键字。决定的方法是问：「对这个变量来说，最起码的作用域暴露是什么？」
 
-Once that is answered, you'll know if a variable belongs in a block scope or the function scope. If you decide initially that a variable should be block-scoped, and later realize it needs to be elevated to be function-scoped, then that dictates a change not only in the location of that variable's declaration, but also the declarator keyword used. The decision-making process really should proceed like that.
+一旦回答了这个问题，你就会知道变量属于块作用域还是函数作用域。如果一开始决定某个变量应属于块作用域，但后来意识到需要将其提升为函数作用域，那么不仅需要改变变量的声明位置，还需要改变所使用的声明器关键字。决策过程确实应该这样进行。
 
-If a declaration belongs in a block scope, use `let`. If it belongs in the function scope, use `var` (again, just my opinion).
+如果声明属于块作用域，则使用 `let`。如果声明属于函数作用域，则使用 `var`（再次重申，这只是我的观点）。
 
-But another way to sort of visualize this decision making is to consider the pre-ES6 version of a program. For example, let's recall `diff(..)` from earlier:
+但另一种可视化决策的方法是考虑程序的 ES6 前版本。例如，让我们回顾一下之前的 `diff(..)` ：
 
 ```js
-function diff(x,y) {
+function diff(x, y) {
     var tmp;
 
     if (x > y) {
@@ -441,16 +422,16 @@ function diff(x,y) {
 }
 ```
 
-In this version of `diff(..)`, `tmp` is clearly declared in the function scope. Is that appropriate for `tmp`? I would argue, no. `tmp` is only needed for those few statements. It's not needed for the `return` statement. It should therefore be block-scoped.
+在这个版本的 `diff(..)` 中，`tmp` 被清楚地声明在函数作用域中。这对 `tmp` 来说合适吗？我认为不合适。`tmp` 只需要在这几个语句中使用。在 `return` 语句中不需要它。因此，它应该是块作用域。
 
-Prior to ES6, we didn't have `let` so we couldn't *actually* block-scope it. But we could do the next-best thing in signaling our intent:
+在 ES6 之前，我们没有`let`，因此无法对其进行实际的块作用域化。不过，我们可以做一个次好的事情来表明我们的意图：
 
 ```js
-function diff(x,y) {
+function diff(x, y) {
     if (x > y) {
-        // `tmp` is still function-scoped, but
-        // the placement here semantically
-        // signals block-scoping
+        // `tmp` 仍然在函数作用域
+        // 但放置在这里
+        // 在语义上表示块作用域
         var tmp = x;
         x = y;
         y = tmp;
@@ -460,27 +441,27 @@ function diff(x,y) {
 }
 ```
 
-Placing the `var` declaration for `tmp` inside the `if` statement signals to the reader of the code that `tmp` belongs to that block. Even though JS doesn't enforce that scoping, the semantic signal still has benefit for the reader of your code.
+将 `tmp` 的 `var` 声明放在 `if` 语句中，向代码读者发出了 `tmp` 属于该代码块的信号。尽管 JS 并不强制执行该作用域定义，但语义信号仍会给代码读者带来好处。
 
-Following this perspective, you can find any `var` that's inside a block of this sort and switch it to `let` to enforce the semantic signal already being sent. That's proper usage of `let` in my opinion.
+从这个角度看，你可以找到这种代码块中的任何 `var` 并将其切换为 `let` 以执行已经发送的语义信号。在我看来，这才是 `let` 的正确用法。
 
-Another example that was historically based on `var` but which should now pretty much always use `let` is the `for` loop:
+另一个历史上使用 `var` 但现在几乎总是使用 `let` 的例子是 `for` 循环：
 
 ```js
 for (var i = 0; i < 5; i++) {
-    // do something
+    // 做点什么
 }
 ```
 
-No matter where such a loop is defined, the `i` should basically always be used only inside the loop, in which case POLE dictates it should be declared with `let` instead of `var`:
+无论在哪里定义了这样的循环，`i` 基本上都只能在循环内部使用，在这种情况下，POLE 规定应该用 `let` 而不是 `var` 来声明它：
 
 ```js
 for (let i = 0; i < 5; i++) {
-    // do something
+    // 做点什么
 }
 ```
 
-Almost the only case where switching a `var` to a `let` in this way would "break" your code is if you were relying on accessing the loop's iterator (`i`) outside/after the loop, such as:
+将 `var` 替换为 `let` 几乎是唯一会「破坏」代码的情况，那就是在循环之外/之后访问循环的迭代器 (`i`)，例如：
 
 ```js
 for (var i = 0; i < 5; i++) {
@@ -494,7 +475,7 @@ if (i < 5) {
 }
 ```
 
-This usage pattern is not terribly uncommon, but most feel it smells like poor code structure. A preferable approach is to use another outer-scoped variable for that purpose:
+这种使用模式并不罕见，但大多数人都觉得它的代码结构很糟糕。更可取的方法是使用另一个外层作用域变量：
 
 ```js
 var lastI;
@@ -511,58 +492,57 @@ if (lastI < 5) {
 }
 ```
 
-`lastI` is needed across this whole scope, so it's declared with `var`. `i` is only needed in (each) loop iteration, so it's declared with `let`.
+整个作用域都需要 `lastI`，所以用 `var` 声明。只有在（每次）循环迭代中才需要 `i`，所以用 `let` 声明。
 
-### What's the Catch?
+### Catch 是什么？
 
-So far we've asserted that `var` and parameters are function-scoped, and `let`/`const` signal block-scoped declarations. There's one little exception to call out: the `catch` clause.
+到目前为止，我们已经断言 `var` 和参数是函数作用域，而 `let`/`const` 则是块作用域声明。有一个小例外需要指出：`catch` 子句。
 
-Since the introduction of `try..catch` back in ES3 (in 1999), the `catch` clause has used an additional (little-known) block-scoping declaration capability:
+自从在 ES3（1999 年）中引入 `try..catch` 以来，`catch` 子句一直使用附加的（鲜为人知的）块作用域声明功能：
 
 ```js
 try {
     doesntExist();
-}
-catch (err) {
+} catch (err) {
     console.log(err);
     // ReferenceError: 'doesntExist' is not defined
-    // ^^^^ message printed from the caught exception
+    // ^^^^ 从捕获的异常中打印的消息
 
     let onlyHere = true;
     var outerVariable = true;
 }
 
-console.log(outerVariable);     // true
+console.log(outerVariable); // true
 
 console.log(err);
 // ReferenceError: 'err' is not defined
-// ^^^^ this is another thrown (uncaught) exception
+// ^^^^ 这是另一个抛出（未捕获）的异常
 ```
 
-The `err` variable declared by the `catch` clause is block-scoped to that block. This `catch` clause block can hold other block-scoped declarations via `let`. But a `var` declaration inside this block still attaches to the outer function/global scope.
+由 `catch` 子句声明的 `err` 变量是该代码块的块作用域。这个 `catch` 子句块可以通过 `let` 保存其他块作用域声明。但该代码块中的 `var` 声明仍会附加到外层函数/全局作用域。
 
-ES2019 (recently, at the time of writing) changed `catch` clauses so their declaration is optional; if the declaration is omitted, the `catch` block is no longer (by default) a scope; it's still a block, though!
+ES2019 （最近，在撰写本文时）更改了 `catch` 子句，使其声明成为可选项；如果省略声明，则 `catch` 代码块不再是（默认情况下）作用域；但它仍然是一个代码块！
 
-So if you need to react to the condition *that an exception occurred* (so you can gracefully recover), but you don't care about the error value itself, you can omit the `catch` declaration:
+因此，如果您需要对异常发生的条件做出反应（以便优雅地恢复），但不关心错误值本身，则可以省略 `catch` 声明：
 
 ```js
 try {
     doOptionOne();
-}
-catch {   // catch-declaration omitted
+} catch {
+    // 省略 catch 的声明
     doOptionTwoInstead();
 }
 ```
 
-This is a small but delightful simplification of syntax for a fairly common use case, and may also be slightly more performant in removing an unnecessary scope!
+对于一个相当常见的用例来说，这是对语法的一个微小但却令人高兴的简化，而且在删除不必要的作用域方面也可能略胜一筹！
 
-## Function Declarations in Blocks (FiB)
+## 块中的声明函数 (FiB)
 
-We've seen now that declarations using `let` or `const` are block-scoped, and `var` declarations are function-scoped. So what about `function` declarations that appear directly inside blocks? As a feature, this is called "FiB."
+我们已经看到，使用 `let` 或 `const` 的声明是块作用域，而 `var` 声明是函数作用域。那么，直接出现在代码块中的 `function` 声明又是怎么回事呢？作为一种特性，这被称为 "FiB"。
 
-We typically think of `function` declarations like they're the equivalent of a `var` declaration. So are they function-scoped like `var` is?
+我们通常认为 `function` 声明等同于 `var` 声明。那么，它们的函数作用域是否与 `var` 相同？
 
-No and yes. I know... that's confusing. Let's dig in:
+是又不是。我知道......这很令人困惑。让我们深入了解一下：
 
 ```js
 if (false) {
@@ -573,47 +553,43 @@ if (false) {
 ask();
 ```
 
-What do you expect for this program to do? Three reasonable outcomes:
+您期望该程序做些什么？三个合理的结果：
 
-1. The `ask()` call might fail with a `ReferenceError` exception, because the `ask` identifier is block-scoped to the `if` block scope and thus isn't available in the outer/global scope.
+1. 调用 `ask()` 时可能会出现 `ReferenceError` 异常，因为 `ask` 标识符是块作用域中的 `if` 块作用域，因此在外部/全局作用域中不可用。
+2. `ask()` 调用可能会因 `TypeError` 异常而失败，因为 `ask` 标识符虽然存在，但它是 `undefined` 的（因为 `if` 语句没有运行），因此不是一个可调用函数。
+3. `ask()` 调用可能会正确运行，并打印出 "Does this run?"
 
-2. The `ask()` call might fail with a `TypeError` exception, because the `ask` identifier exists, but it's `undefined` (since the `if` statement doesn't run) and thus not a callable function.
+令人困惑的是：根据您在哪个 JS 环境中尝试该代码片段，可能会得到不同的结果！这是现有遗留行为暴露出可预测结果的少数几个疯狂领域之一。
 
-3. The `ask()` call might run correctly, printing out the "Does it run?" message.
+根据 JS 规范，块内的 `function` 声明具有块作用域，因此答案应该是 (1)。然而，大多数基于浏览器的 JS 引擎（包括 v8，它来自 Chrome 浏览器，但也用于 Node）会表现为 (2)，这意味着标识符的作用域在 `if` 块之外，但函数值不会自动初始化，因此它仍然是 `undefined`。
 
-Here's the confusing part: depending on which JS environment you try that code snippet in, you may get different results! This is one of those few crazy areas where existing legacy behavior betrays a predictable outcome.
+为什么允许浏览器 JS 引擎的行为违背规范？因为在 ES6 引入块作用域之前，这些引擎就已经有了与 FiB 相关的某些行为，而且有人担心，如果修改为遵守规范，可能会破坏某些现有的网站 JS 代码。因此，在 JS 规范的附录 B 中规定了例外情况，允许浏览器 JS 引擎（仅限！）做出某些偏离。
 
-The JS specification says that `function` declarations inside of blocks are block-scoped, so the answer should be (1). However, most browser-based JS engines (including v8, which comes from Chrome but is also used in Node) will behave as (2), meaning the identifier is scoped outside the `if` block but the function value is not automatically initialized, so it remains `undefined`.
+| 注意：                                                                                                                                                                                                                   |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 你通常不会把 Node 归类为浏览器 JS 环境，因为它通常在服务器上运行。但 Node 的 v8 引擎与 Chrome（和 Edge）浏览器共享。由于 v8 首先是一个浏览器 JS 引擎，因此它采用了附录 B 中的例外，这就意味着浏览器例外也扩展到了 Node。 |
 
-Why are browser JS engines allowed to behave contrary to the specification? Because these engines already had certain behaviors around FiB before ES6 introduced block scoping, and there was concern that changing to adhere to the specification might break some existing website JS code. As such, an exception was made in Appendix B of the JS specification, which allows certain deviations for browser JS engines (only!).
-
-| NOTE: |
-| :--- |
-| You wouldn't typically categorize Node as a browser JS environment, since it usually runs on a server. But Node's v8 engine is shared with Chrome (and Edge) browsers. Since v8 is first a browser JS engine, it adopts this Appendix B exception, which then means that the browser exceptions are extended to Node. |
-
-One of the most common use cases for placing a `function` declaration in a block is to conditionally define a function one way or another (like with an `if..else` statement) depending on some environment state. For example:
+在代码块中放置 `function` 声明的最常见用例之一，是根据某些环境状态，以某种方式有条件地定义函数（如使用 `if..else` 语句）。例如：
 
 ```js
 if (typeof Array.isArray != "undefined") {
     function isArray(a) {
         return Array.isArray(a);
     }
-}
-else {
+} else {
     function isArray(a) {
-        return Object.prototype.toString.call(a)
-            == "[object Array]";
+        return Object.prototype.toString.call(a) == "[object Array]";
     }
 }
 ```
 
-It's tempting to structure code this way for performance reasons, since the `typeof Array.isArray` check is only performed once, as opposed to defining just one `isArray(..)` and putting the `if` statement inside it—the check would then run unnecessarily on every call.
+出于性能考虑，这样构建代码很有诱惑力，因为 `typeof Array.isArray` 检查只执行一次，而不是只定义一个 `isArray(..)` 并将 `if` 语句放在其中，这样每次调用时都会执行不必要的检查。
 
-| WARNING: |
-| :--- |
-| In addition to the risks of FiB deviations, another problem with conditional-definition of functions is it's harder to debug such a program. If you end up with a bug in the `isArray(..)` function, you first have to figure out *which* `isArray(..)` implementation is actually running! Sometimes, the bug is that the wrong one was applied because the conditional check was incorrect! If you define multiple versions of a function, that program is always harder to reason about and maintain. |
+| 警告：                                                                                                                                                                                                                                                                                      |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 除了 FiB 偏差的风险之外，函数的条件定义的另一个问题是调试这样的程序更加困难。如果最终在`isArray(..)`函数中发现了一个错误，那么首先必须弄清楚`isArray(..)`的实际运行情况！有时，错误是由于条件检查不正确而应用了错误的实现！如果定义了一个函数的多个版本，程序的推理和维护就会变得更加困难。 |
 
-In addition to the previous snippets, several other FiB corner cases are lurking; such behaviors in various browsers and non-browser JS environments (JS engines that aren't browser based) will likely vary. For example:
+除了前面的片段，还潜伏着其他一些 FiB 情况；在各种浏览器和非浏览器 JS 环境（非基于浏览器的 JS 引擎）中，此类行为可能会有所不同。例如：
 
 ```js
 if (true) {
@@ -641,56 +617,58 @@ function ask() {
 }
 ```
 
-Recall that function hoisting as described in "When Can I Use a Variable?" (in Chapter 5) might suggest that the final `ask()` in this snippet, with "Wait, maybe..." as its message, would hoist above the call to `ask()`. Since it's the last function declaration of that name, it should "win," right? Unfortunately, no.
+回想一下「何时使用变量？」(第 5 章）中所述，本代码段中最后一个以 "Wait, maybe..." 为信息的`ask()` 函数应该提升在 `ask()` 的调用之上。因为它是该名称的最后一个函数声明，所以它应该「赢」，对吗？很遗憾，不是。
 
-It's not my intention to document all these weird corner cases, nor to try to explain why each of them behaves a certain way. That information is, in my opinion, arcane legacy trivia.
+我无意记录所有这些奇怪的角落情况，也不想解释它们为什么会以某种方式出现。在我看来，这些信息都是神秘的遗产[^5]。
 
-My real concern with FiB is, what advice can I give to ensure your code behaves predictably in all circumstances?
+对于 FiB，我真正关心的是，我能给出什么建议来确保你的代码在任何情况下都能可预测地运行？
 
-As far as I'm concerned, the only practical answer to avoiding the vagaries of FiB is to simply avoid FiB entirely. In other words, never place a `function` declaration directly inside any block. Always place `function` declarations anywhere in the top-level scope of a function (or in the global scope).
+在我看来，要避免 FiB 的变幻莫测，唯一切实可行的办法就是完全避免 FiB。换句话说，永远不要将 `function` 声明直接放在任何代码块中。始终将 `function` 声明放在函数顶层作用域（或全局作用域）的任何地方。
 
-So for the earlier `if..else` example, my suggestion is to avoid conditionally defining functions if at all possible. Yes, it may be slightly less performant, but this is the better overall approach:
+因此，对于前面的 `if..else` 示例，我的建议是尽可能避免有条件地定义函数。是的，这可能会稍微降低性能，但这是顾全大局的方法：
 
 ```js
 function isArray(a) {
     if (typeof Array.isArray != "undefined") {
         return Array.isArray(a);
-    }
-    else {
-        return Object.prototype.toString.call(a)
-            == "[object Array]";
+    } else {
+        return Object.prototype.toString.call(a) == "[object Array]";
     }
 }
 ```
 
-If that performance hit becomes a critical path issue for your application, I suggest you consider this approach:
+如果性能下降成为应用程序的关键路径问题，我建议您考虑这种方法：
 
 ```js
 var isArray = function isArray(a) {
     return Array.isArray(a);
 };
 
-// override the definition, if you must
+// 如果必要的话，覆盖该定义
 if (typeof Array.isArray == "undefined") {
     isArray = function isArray(a) {
-        return Object.prototype.toString.call(a)
-            == "[object Array]";
+        return Object.prototype.toString.call(a) == "[object Array]";
     };
 }
 ```
 
-It's important to notice that here I'm placing a `function` **expression**, not a declaration, inside the `if` statement. That's perfectly fine and valid, for `function` expressions to appear inside blocks. Our discussion about FiB is about avoiding `function` **declarations** in blocks.
+需要注意的是，这里我在 `if` 语句中放置了一个 `function` **表达式**，而不是一个声明。在代码块中出现 `function` 表达式是完全正确的。我们关于 FiB 的讨论是关于避免在代码块中使用 `function` **声明**。
 
-Even if you test your program and it works correctly, the small benefit you may derive from using FiB style in your code is far outweighed by the potential risks in the future for confusion by other developers, or variances in how your code runs in other JS environments.
+即使您测试了您的程序并能正确运行，但在代码中使用 FiB 样式所带来的微小好处，远不能抵消将来被其他开发人员混淆的潜在风险，或您的代码在其他 JS 环境中运行的差异。
 
-FiB is not worth it, and should be avoided.
+FiB 不值得一试，应该避免它。
 
-## Blocked Over
+## 刀过竹解
 
-The point of lexical scoping rules in a programming language is so we can appropriately organize our program's variables, both for operational as well as semantic code communication purposes.
+在编程语言中使用词法作用域规则的意义在于，我们可以适当地组织程序中的变量，以达到操作和语义代码交流的目的。
 
-And one of the most important organizational techniques is to ensure that no variable is over-exposed to unnecessary scopes (POLE). Hopefully you now appreciate block scoping much more deeply than before.
+最重要的组织技巧之一就是确保没有变量过度暴露在不必要的作用域 (POLE) 中。希望你现在对块作用域的理解比以前更深刻了。
 
-Hopefully by now you feel like you're standing on much more solid ground with understanding lexical scope. From that base, the next chapter jumps into the weighty topic of closure.
+希望到此为止，你对词法作用域的理解已经有了更坚实的基础。在此基础上，下一章将进入闭包这一重要话题。
 
-[^POLP]: *Principle of Least Privilege*, https://en.wikipedia.org/wiki/Principle_of_least_privilege, 3 March 2020.
+[^POLP]: _最小权限原则_， <https://zh.wikipedia.org/wiki/%E6%9C%80%E5%B0%8F%E6%9D%83%E9%99%90%E5%8E%9F%E5%88%99>， 2021年12月26日。
+[^1]: _苹果底层开源代码被发现包含兼容微信的代码_，<https://www.oschina.net/news/127177/apple-libmalloc-compliance-with-wechat>， 2021年1月20日。
+[^2]: _阶乘_， <https://zh.wikipedia.org/zh-cn/%E9%9A%8E%E4%B9%98>， 2023年8月23日。
+[^3]: _Incremental Computation via Function Caching_， <https://dl.acm.org/doi/pdf/10.1145/75277.75305>， 1989年。
+[^4]: _getify/Functional-Light-JS: Pragmatic, balanced FP in JavaScript_， <https://github.com/getify/Functional-Light-JS>， 2016年8月17日。
+[^5]: _代码异味_， <https://zh.wikipedia.org/zh-cn/%E4%BB%A3%E7%A0%81%E5%BC%82%E5%91%B3>， 2021年12月16日。

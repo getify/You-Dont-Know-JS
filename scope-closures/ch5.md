@@ -1,17 +1,18 @@
-# You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 5: The (Not So) Secret Lifecycle of Variables
+# 你并不了解 JavaScript：作用域与闭包 - 第二版
 
-By now you should have a decent grasp of the nesting of scopes, from the global scope downward—called a program's scope chain.
+# 第五章：（并不）神秘的变量生命周期
 
-But just knowing which scope a variable comes from is only part of the story. If a variable declaration appears past the first statement of a scope, how will any references to that identifier *before* the declaration behave? What happens if you try to declare the same variable twice in a scope?
+现在，您应该对从全局作用域到程序的作用域链的嵌套有了一定的了解了。
 
-JS's particular flavor of lexical scope is rich with nuance in how and when variables come into existence and become available to the program.
+但仅仅知道变量来自哪个作用域还只是管中窥豹。如果变量的声明出现在作用域的第一条语句之后，那么在声明之前对该标识符的任何引用将如何表现？如果在作用域中两次声明同一个变量会发生什么？
 
-## When Can I Use a Variable?
+JS 的特殊词法作用域在变量如何以及何时出现并提供给程序使用方面有着丰富的细微差别。
 
-At what point does a variable become available to use within its scope? There may seem to be an obvious answer: *after* the variable has been declared/created. Right? Not quite.
+## 何时可以使用变量？
 
-Consider:
+变量在什么时候可以在其作用域内使用？答案似乎显而易见： 在变量被声明/创建*之后*。对吗？不尽然。
+
+思考一下：
 
 ```js
 greeting();
@@ -22,25 +23,25 @@ function greeting() {
 }
 ```
 
-This code works fine. You may have seen or even written code like it before. But did you ever wonder how or why it works? Specifically, why can you access the identifier `greeting` from line 1 (to retrieve and execute a function reference), even though the `greeting()` function declaration doesn't occur until line 4?
+这段代码运行良好。您以前可能见过或写过类似的代码。但你是否想过它是如何或为什么能运行的？具体地说，为什么您可以从第 1 行开始访问标识符 `greeting`（以检索和执行函数引用），尽管 `greeting()` 函数声明直到第 4 行才出现？
 
-Recall Chapter 1 points out that all identifiers are registered to their respective scopes during compile time. Moreover, every identifier is *created* at the beginning of the scope it belongs to, **every time that scope is entered**.
+回顾第一章，所有标识符都在编译时注册到各自的作用域中。此外，每个标识符都是在其所属作用域的起始位置*创建的*，**每次进入该作用域时**。
 
-The term most commonly used for a variable being visible from the beginning of its enclosing scope, even though its declaration may appear further down in the scope, is called **hoisting**.
+最常用的术语是**变量提升(hoisting)** 变量从其外层作用域的起始位置开始可见，即使它的声明可能出现在作用域的更下面。
 
-But hoisting alone doesn't fully answer the question. We can see an identifier called `greeting` from the beginning of the scope, but why can we **call** the `greeting()` function before it's been declared?
+但仅仅是变量提升并不能完全回答这个问题。我们可以从作用域的开头看到一个名为 `greeting` 的标识符，但为什么我们可以在声明 `greeting()` 函数之前**调用**它呢？
 
-In other words, how does the variable `greeting` have any value (the function reference) assigned to it, from the moment the scope starts running? The answer is a special characteristic of formal `function` declarations, called *function hoisting*. When a `function` declaration's name identifier is registered at the top of its scope, it's additionally auto-initialized to that function's reference. That's why the function can be called throughout the entire scope!
+换句话说，从作用域开始运行的那一刻起，变量 `greeting` 如何被赋值（函数引用）？答案是这是 `function` 声明的一个特殊特性，称为*函数提升 (function hoisting)*。当一个 `function` 声明的名称标识符被注册在其作用域的顶部时，它就会被自动初始化为该函数的引用。这就是为什么该函数可以在整个作用域中被调用！
 
-One key detail is that both *function hoisting* and `var`-flavored *variable hoisting* attach their name identifiers to the nearest enclosing **function scope** (or, if none, the global scope), not a block scope.
+一个关键的细节是*函数提升*和 `var` 声明的*变量提升*都将它们的名称标识符附加到最近的外层 **function scope** 中（如果没有，则附加到全局作用域），而不是块作用域。
 
-| NOTE: |
-| :--- |
-| Declarations with `let` and `const` still hoist (see the TDZ discussion later in this chapter). But these two declaration forms attach to their enclosing block rather than just an enclosing function as with `var` and `function` declarations. See "Scoping with Blocks" in Chapter 6 for more information. |
+| 注意：                                                                                                                                                                                                        |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 带有 `let` 和 `const` 的声明仍然可以提升（参见本章后面关于 TDZ 的讨论）。但这两种声明形式附加于它们的外层块，而不是像 `var` 和 `function` 声明那样只附加于外层函数。更多信息请参阅第 6 章中的「块的作用域」。 |
 
-### Hoisting: Declaration vs. Expression
+### 提升： 声明 (Declaration) vs. 表达 (Expression)
 
-*Function hoisting* only applies to formal `function` declarations (specifically those which appear outside of blocks—see "FiB" in Chapter 6), not to `function` expression assignments. Consider:
+*函数提升*仅适用于正式的函数声明（特别是那些出现在代码块之外的声明，参见第 6 章中的 "FiB"），不适用于函数表达式赋值。思考一下：
 
 ```js
 greeting();
@@ -51,23 +52,23 @@ var greeting = function greeting() {
 };
 ```
 
-Line 1 (`greeting();`) throws an error. But the *kind* of error thrown is very important to notice. A `TypeError` means we're trying to do something with a value that is not allowed. Depending on your JS environment, the error message would say something like, "'undefined' is not a function," or more helpfully, "'greeting' is not a function."
+第 1 行 (`greeting();`) 抛出了一个错误。但要注意的是抛出的是*哪种*错误。类型错误 (`TypeError`) 意味着我们试图对一个不允许的值进行操作。根据你的 JS 环境，错误信息会类似于 "'undefined' is not a function" 或者更有用的说法是 "'greeting' is not a function"。
 
-Notice that the error is **not** a `ReferenceError`. JS isn't telling us that it couldn't find `greeting` as an identifier in the scope. It's telling us that `greeting` was found but doesn't hold a function reference at that moment. Only functions can be invoked, so attempting to invoke some non-function value results in an error.
+请注意，该错误并**不是** `ReferenceError`（引用错误）。JS 并没有告诉我们它无法在作用域中找到作为标识符的 `greeting`。它是在告诉我们，虽然找到了 `greeting`，但当时并没有函数引用。只有函数才能被调用，因此试图调用某个非函数值会导致错误。
 
-But what does `greeting` hold, if not the function reference?
+但是，如果不是函数引用，`greeting` 又是什么呢？
 
-In addition to being hoisted, variables declared with `var` are also automatically initialized to `undefined` at the beginning of their scope—again, the nearest enclosing function, or the global. Once initialized, they're available to be used (assigned to, retrieved from, etc.) throughout the whole scope.
+除了被提升之外，使用 `var` 声明的变量在其作用域开始时也会被自动初始化为 `undefined`，同样，在最近的外层函数或全局中。一旦初始化，它们就可以在整个作用域中被使用（赋值、检索等）。
 
-So on that first line, `greeting` exists, but it holds only the default `undefined` value. It's not until line 4 that `greeting` gets assigned the function reference.
+因此，在第一行，`greeting` 已经存在，但它只保留了默认的`undefined`值。直到第 4 行，`greeting` 才被分配了函数引用。
 
-Pay close attention to the distinction here. A `function` declaration is hoisted **and initialized to its function value** (again, called *function hoisting*). A `var` variable is also hoisted, and then auto-initialized to `undefined`. Any subsequent `function` expression assignments to that variable don't happen until that assignment is processed during runtime execution.
+请注意这里的区别。函数声明被提升**并初始化其为函数值**（_函数提升_）。 `var` 声明的变量也被提升，然后自动初始化为 `undefined`。随后对该变量的任何 `function` 表达式赋值都要等到运行时执行过程中处理该赋值时才会发生。
 
-In both cases, the name of the identifier is hoisted. But the function reference association isn't handled at initialization time (beginning of the scope) unless the identifier was created in a formal `function` declaration.
+在这两种情况下，标识符的名称都会被提升。但除非标识符是在正式的 `function` 声明中创建的，否则在初始化时（作用域的开始）函数引用关联不会被处理。
 
-### Variable Hoisting
+### 变量提升
 
-Let's look at another example of *variable hoisting*:
+让我们再来看一个*变量提升*的例子：
 
 ```js
 greeting = "Hello!";
@@ -77,31 +78,31 @@ console.log(greeting);
 var greeting = "Howdy!";
 ```
 
-Though `greeting` isn't declared until line 5, it's available to be assigned to as early as line 1. Why?
+虽然 `greeting` 在第 5 行才被声明，但它早在第 1 行就可以被赋值了。为什么？
 
-There's two necessary parts to the explanation:
+这其中有两个必要的说明：
 
-* the identifier is hoisted,
-* **and** it's automatically initialized to the value `undefined` from the top of the scope.
+-   标识符被提升，
+-   **并**从作用域的顶部自动初始化为`undefined`值。
 
-| NOTE: |
-| :--- |
-| Using *variable hoisting* of this sort probably feels unnatural, and many readers might rightly want to avoid relying on it in their programs. But should all hoisting (including *function hoisting*) be avoided? We'll explore these different perspectives on hoisting in more detail in Appendix A. |
+| 注意：                                                                                                                                                                                                      |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 使用这种*变量提升*可能会让人感觉不自然，许多读者可能会理所当然地希望在自己的程序中避免使用这种情况。但是，是否应该避免所有的提升（包括*函数提升*）呢？我们将在附录 A 中更详细地探讨关于提升的这些不同观点。 |
 
-## Hoisting: Yet Another Metaphor
+## 提升：又一个隐喻
 
-Chapter 2 was full of metaphors (to illustrate scope), but here we are faced with yet another: hoisting itself. Rather than hoisting being a concrete execution step the JS engine performs, it's more useful to think of hoisting as a visualization of various actions JS takes in setting up the program **before execution**.
+第 2 章中有很多隐喻（用来说明作用域），但这里我们又要面对另一个隐喻：提升本身。与其说「提升」是 JS 引擎执行的一个具体执行步骤，不如将「提升」视为 JS 在**执行前**设置程序时所采取的各种行动的可视化。
 
-The typical assertion of what hoisting means: *lifting*—like lifting a heavy weight upward—any identifiers all the way to the top of a scope. The explanation often asserted is that the JS engine will actually *rewrite* that program before execution, so that it looks more like this:
+提升的传统含义是什么？_举起 (lifting)_：就像把重物向上提升一样，将任何标识符一直提升到作用域的顶部。通常的解释是，JS 引擎实际上会在执行前*重写*该程序，使其看起来更像这样：
 
 ```js
-var greeting;           // hoisted declaration
-greeting = "Hello!";    // the original line 1
-console.log(greeting);  // Hello!
-greeting = "Howdy!";    // `var` is gone!
+var greeting; // 提升声明
+greeting = "Hello!"; // 原来的第一行
+console.log(greeting); // Hello!
+greeting = "Howdy!"; // `var` 消失了！
 ```
 
-The hoisting (metaphor) proposes that JS pre-processes the original program and re-arranges it a bit, so that all the declarations have been moved to the top of their respective scopes, before execution. Moreover, the hoisting metaphor asserts that `function` declarations are, in their entirety, hoisted to the top of each scope. Consider:
+提升（隐喻）建议 JS 在执行前对原始程序进行预处理并稍作重新排列，以便将所有声明移至各自作用域的顶部。此外，提升隐喻还断言，「函数」声明会被全部提升到每个作用域的顶部。思考一下：
 
 ```js
 studentName = "Suzy";
@@ -109,16 +110,16 @@ greeting();
 // Hello Suzy!
 
 function greeting() {
-    console.log(`Hello ${ studentName }!`);
+    console.log(`Hello ${studentName}!`);
 }
 var studentName;
 ```
 
-The "rule" of the hoisting metaphor is that function declarations are hoisted first, then variables are hoisted immediately after all the functions. Thus, the hoisting story suggests that program is *re-arranged* by the JS engine to look like this:
+提升隐喻的「规则」是提升函数声明，然后在所有函数之后紧接着提升变量。因此，「提升」的故事表明，JS 引擎会将程序*重新编排*，使其看起来像这样：
 
 ```js
 function greeting() {
-    console.log(`Hello ${ studentName }!`);
+    console.log(`Hello ${studentName}!`);
 }
 var studentName;
 
@@ -127,27 +128,27 @@ greeting();
 // Hello Suzy!
 ```
 
-This hoisting metaphor is convenient. Its benefit is allowing us to hand wave over the magical look-ahead pre-processing necessary to find all these declarations buried deep in scopes and somehow move (hoist) them to the top; we can just think about the program as if it's executed by the JS engine in a **single pass**, top-down.
+这种「提升」的隐喻很方便。它的好处在于，我们可以省去那些神奇的前瞻性预处理，将所有这些深埋在作用域中的声明以某种方式移动（提升）到顶部；我们只需将程序看作是由 JS 引擎自上而下地**一次性执行**的。
 
-Single-pass definitely seems more straightforward than Chapter 1's assertion of a two-phase processing.
+与第 1 章中关于两阶段处理的说法相比，单阶段处理无疑显得更加简单明了。
 
-Hoisting as a mechanism for re-ordering code may be an attractive simplification, but it's not accurate. The JS engine doesn't actually re-arrange the code. It can't magically look ahead and find declarations; the only way to accurately find them, as well as all the scope boundaries in the program, would be to fully parse the code.
+提升作为一种重新排序代码的机制可能是一种有吸引力的简化，但它并不准确。JS 引擎实际上并不会重新排列代码。它无法神奇地提前找到声明；准确找到声明以及程序中所有作用域边界的唯一方法是完全解析代码。
 
-Guess what parsing is? The first phase of the two-phase processing! There's no magical mental gymnastics that gets around that fact.
+猜猜什么是解析？二相处理的第一阶段！没有什么神奇的脑力体操能绕过这一事实。
 
-So if the hoisting metaphor is (at best) inaccurate, what should we do with the term? I think it's still useful—indeed, even members of TC39 regularly use it!—but I don't think we should claim it's an actual re-arrangement of source code.
+那么，如果「提升」这个词的隐喻（充其量）不准确，我们该如何处理这个词呢？我认为它仍然有用。事实上，甚至 TC39 的成员也经常使用它！但我认为我们不应该声称它是对源代码的实际重新编排。
 
-| WARNING: |
-| :--- |
-| Incorrect or incomplete mental models often still seem sufficient because they can occasionally lead to accidental right answers. But in the long run it's harder to accurately analyze and predict outcomes if your thinking isn't particularly aligned with how the JS engine works. |
+| 警告：                                                                                                                                                             |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 不正确或不完整的心智模型往往看起来够用，因为它们偶尔会意外地带来正确的答案。但从长远来看，如果你的思维与 JS 引擎的工作方式不完全一致，就很难准确地分析和预测结果。 |
 
-I assert that hoisting *should* be used to refer to the **compile-time operation** of generating runtime instructions for the automatic registration of a variable at the beginning of its scope, each time that scope is entered.
+我断言，「提升」*应该*用来指**编译时的操作**，即每次进入变量的作用域时，生成运行时指令，以便在其作用域的起始位置自动注册该变量。
 
-That's a subtle but important shift, from hoisting as a runtime behavior to its proper place among compile-time tasks.
+这是一个微妙而重要的转变，从作为运行时行为的提升转变为编译时任务中的适当位置。
 
-## Re-declaration?
+## 重复声明？
 
-What do you think happens when a variable is declared more than once in the same scope? Consider:
+如果在同一作用域中多次声明变量，你认为会发生什么情况？思考一下：
 
 ```js
 var studentName = "Frank";
@@ -155,18 +156,18 @@ console.log(studentName);
 // Frank
 
 var studentName;
-console.log(studentName);   // ???
+console.log(studentName); // ???
 ```
 
-What do you expect to be printed for that second message? Many believe the second `var studentName` has re-declared the variable (and thus "reset" it), so they expect `undefined` to be printed.
+您希望打印出的第二条信息是什么？许多人认为第二个 `var studentName` 重新声明了变量（从而「重置」了变量），因此他们认为会打印出 `undefined`。
 
-But is there such a thing as a variable being "re-declared" in the same scope? No.
+但在同一作用域中是否存在「重新声明」变量的情况呢？没有。
 
-If you consider this program from the perspective of the hoisting metaphor, the code would be re-arranged like this for execution purposes:
+如果从提升隐喻的角度来考虑这个程序，为了执行的目的，代码可以这样重新编排：
 
 ```js
 var studentName;
-var studentName;    // clearly a pointless no-op!
+var studentName; // 显然是在做无用功！
 
 studentName = "Frank";
 console.log(studentName);
@@ -176,29 +177,29 @@ console.log(studentName);
 // Frank
 ```
 
-Since hoisting is actually about registering a variable at the beginning of a scope, there's nothing to be done in the middle of the scope where the original program actually had the second `var studentName` statement. It's just a no-op(eration), a pointless statement.
+由于提升实际上是在作用域的开头注册变量，因此在作用域的中间没有什么可做的，在那里原程序实际上有第二条 `var studentName` 语句。这只是一个 no-op(eration)，一个毫无意义的语句。
 
-| TIP: |
-| :--- |
-| In the style of the conversation narrative from Chapter 2, *Compiler* would find the second `var` declaration statement and ask the *Scope Manager* if it had already seen a `studentName` identifier; since it had, there wouldn't be anything else to do. |
+| 贴士：                                                                                                                                                           |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 按照第 2 章的对话叙述方式，*编译器*会找到第二个 `var` 声明语句，并询问 *作用域管理员*是否已经看到了 `studentName` 标识符；既然已经看到了，就没有其他事情可做了。 |
 
-It's also important to point out that `var studentName;` doesn't mean `var studentName = undefined;`, as most assume. Let's prove they're different by considering this variation of the program:
+还需要指出的是，`var studentName;` 并不是大多数人认为的 `var studentName = undefined;`。让我们通过考虑这个程序的变体来证明它们是不同的：
 
 ```js
 var studentName = "Frank";
-console.log(studentName);   // Frank
+console.log(studentName); // Frank
 
 var studentName;
-console.log(studentName);   // Frank <--- still!
+console.log(studentName); // Frank <--- 依旧！
 
-// let's add the initialization explicitly
+// 让我们显式地添加初始化
 var studentName = undefined;
-console.log(studentName);   // undefined <--- see!?
+console.log(studentName); // undefined <--- 看！？
 ```
 
-See how the explicit `= undefined` initialization produces a different outcome than assuming it happens implicitly when omitted? In the next section, we'll revisit this topic of initialization of variables from their declarations.
+看到显式的 `= undefined` 初始化与省略隐式初始化所产生的不同结果了吗？在下一节中，我们将重新讨论变量声明中的初始化问题。
 
-A repeated `var` declaration of the same identifier name in a scope is effectively a do-nothing operation. Here's another illustration, this time across a function of the same name:
+在作用域中重复声明相同标识符名称的 `var` 实际上是一种无用的操作。下面是另一个例子，这次是在一个同名函数中：
 
 ```js
 var greeting;
@@ -207,21 +208,21 @@ function greeting() {
     console.log("Hello!");
 }
 
-// basically, a no-op
+// 基本上是无意义的
 var greeting;
 
-typeof greeting;        // "function"
+typeof greeting; // "function"
 
 var greeting = "Hello!";
 
-typeof greeting;        // "string"
+typeof greeting; // "string"
 ```
 
-The first `greeting` declaration registers the identifier to the scope, and because it's a `var` the auto-initialization will be `undefined`. The `function` declaration doesn't need to re-register the identifier, but because of *function hoisting* it overrides the auto-initialization to use the function reference. The second `var greeting` by itself doesn't do anything since `greeting` is already an identifier and *function hoisting* already took precedence for the auto-initialization.
+第一个 `greeting` 声明将标识符注册到作用域中，因为它是一个 `var` ，所以自动初始化将是 `undefined`。 `function` 的声明不需要重新注册标识符，但由于*函数提升*，它会覆盖自动初始化以使用函数引用。第二个 `var greeting` 本身没有任何作用，因为 `greeting` 已经是一个标识符，而且*函数提升*已经优先于自动初始化。
 
-Actually assigning `"Hello!"` to `greeting` changes its value from the initial function `greeting()` to the string; `var` itself doesn't have any effect.
+实际上，将 `"Hello!"` 赋值给 `greeting` 会将其值从初始函数 `greeting()` 变为字符串；而 `var` 本身没有任何影响。
 
-What about repeating a declaration within a scope using `let` or `const`?
+那么使用 `let` 或 `const` 在作用域内重复声明会如何？
 
 ```js
 let studentName = "Frank";
@@ -231,9 +232,9 @@ console.log(studentName);
 let studentName = "Suzy";
 ```
 
-This program will not execute, but instead immediately throw a `SyntaxError`. Depending on your JS environment, the error message will indicate something like: "studentName has already been declared." In other words, this is a case where attempted "re-declaration" is explicitly not allowed!
+该程序不会执行，而是会立即抛出 `SyntaxError`（语法错误）。根据您的 JS 环境，错误信息将显示如下内容 "studentName has already been declared."。换句话说，这是明确不允许尝试「重复声明」的情况！
 
-It's not just that two declarations involving `let` will throw this error. If either declaration uses `let`, the other can be either `let` or `var`, and the error will still occur, as illustrated with these two variations:
+不仅仅是涉及 `let` 的两个声明会产生这个错误。如果其中一个声明使用了 `let`, 另一个声明可以是 `let` 或 `var`，错误仍然会发生，如下面两个变体所示：
 
 ```js
 var studentName = "Frank";
@@ -241,7 +242,7 @@ var studentName = "Frank";
 let studentName = "Suzy";
 ```
 
-and:
+以及：
 
 ```js
 let studentName = "Frank";
@@ -249,58 +250,58 @@ let studentName = "Frank";
 var studentName = "Suzy";
 ```
 
-In both cases, a `SyntaxError` is thrown on the *second* declaration. In other words, the only way to "re-declare" a variable is to use `var` for all (two or more) of its declarations.
+在这两种情况下，都会在*二次*声明中抛出一个 `SyntaxError`。换句话说，「重复声明」变量的唯一方法是在所有（两个或两个以上）声明中使用 `var`。
 
-But why disallow it? The reason for the error is not technical per se, as `var` "re-declaration" has always been allowed; clearly, the same allowance could have been made for `let`.
+但为什么不允许呢？错误的原因并不在于技术本身，因为 `var` 的「重复声明」一直是被允许的；显然，`let` 也可以有同样的允许。
 
-It's really more of a "social engineering" issue. "Re-declaration" of variables is seen by some, including many on the TC39 body, as a bad habit that can lead to program bugs. So when ES6 introduced `let`, they decided to prevent "re-declaration" with an error.
+这其实更像是一个「社会工程」问题。包括 TC39 成员在内的一些人认为，「重复声明」变量是一种可能导致程序错误的坏习惯。因此，当 ES6 引入 `let` 时，他们决定用一个错误来防止「重新声明」。
 
-| NOTE: |
-| :--- |
-| This is of course a stylistic opinion, not really a technical argument. Many developers agree with the position, and that's probably in part why TC39 included the error (as well as `let` conforming to `const`). But a reasonable case could have been made that staying consistent with `var`'s precedent was more prudent, and that such opinion-enforcement was best left to opt-in tooling like linters. In Appendix A, we'll explore whether `var` (and its associated behavior, like "re-declaration") can still be useful in modern JS. |
+| 注意：                                                                                                                                                                                                                                                                                                                                                                                                |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 当然，这只是一种风格上的观点，并非真正的技术论据。许多开发者都同意这一立场，这可能也是 TC39 包含这一错误（以及 `let` 符合 `const`）的部分原因。但有一个合理的理由可以证明，与 `var` 的先例保持一致是更谨慎的做法，而且这种意见执行最好留给像 [linters](https://zh.wikipedia.org/zh-cn/Lint) 这样的选择性工具。在附录 A 中，我们将探讨 `var`（及其相关行为，如「重复声明」）在现代 JS 中是否仍然有用。 |
 
-When *Compiler* asks *Scope Manager* about a declaration, if that identifier has already been declared, and if either/both declarations were made with `let`, an error is thrown. The intended signal to the developer is "Stop relying on sloppy re-declaration!"
+当*编译器*向*作用域管理员*询问一个声明时，如果该标识符已经被声明过，而且其中一个/两个声明都是用 `let` 进行的，那么就会产生一个错误。向开发人员发出的信号是：「不要再依赖马虎的重复声明了！」
 
-### Constants?
+### 常量？
 
-The `const` keyword is more constrained than `let`. Like `let`, `const` cannot be repeated with the same identifier in the same scope. But there's actually an overriding technical reason why that sort of "re-declaration" is disallowed, unlike `let` which disallows "re-declaration" mostly for stylistic reasons.
+`const` 关键字比 `let` 受到更多限制。和 `let` 一样，`const` 不能在同一作用域中重复使用相同的标识符。但实际上，不允许这种「重复声明」是有技术原因的，不像 `let` 主要是出于风格上的原因而不允许「重复声明」。
 
-The `const` keyword requires a variable to be initialized, so omitting an assignment from the declaration results in a `SyntaxError`:
+`const` 关键字要求对变量进行初始化，因此在声明中省略赋值会导致 `SyntaxError`（语法错误）：
 
 ```js
 const empty;   // SyntaxError
 ```
 
-`const` declarations create variables that cannot be re-assigned:
+`const` 声明创建的变量不能重新赋值：
 
 ```js
 const studentName = "Frank";
 console.log(studentName);
 // Frank
 
-studentName = "Suzy";   // TypeError
+studentName = "Suzy"; // TypeError
 ```
 
-The `studentName` variable cannot be re-assigned because it's declared with a `const`.
+`studentName` 变量不能被重新赋值，因为它是用 `const` 声明的。
 
-| WARNING: |
-| :--- |
-| The error thrown when re-assigning `studentName` is a `TypeError`, not a `SyntaxError`. The subtle distinction here is actually pretty important, but unfortunately far too easy to miss. Syntax errors represent faults in the program that stop it from even starting execution. Type errors represent faults that arise during program execution. In the preceding snippet, `"Frank"` is printed out before we process the re-assignment of `studentName`, which then throws the error. |
+| 警告：                                                                                                                                                                                                                                                                                                             |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 重新分配 `studentName` 时抛出的错误是`TypeError`，而不是`SyntaxError`。这里的细微差别实际上非常重要，但不幸的是很容易被忽略。语法错误代表程序中的故障，甚至会阻止程序开始执行。类型错误代表程序执行过程中出现的故障。在前面的代码段中，`"Frank"` 在我们处理 `studentName` 的重新赋值之前被打印出来，然后产生错误。 |
 
-So if `const` declarations cannot be re-assigned, and `const` declarations always require assignments, then we have a clear technical reason why `const` must disallow any "re-declarations": any `const` "re-declaration" would also necessarily be a `const` re-assignment, which can't be allowed!
+因此，如果 `const` 声明不能重新赋值，而 `const` 声明总是需要赋值，那么我们就有了一个明确的技术理由来解释为什么 `const` 必须禁止任何"重复声明"：任何 `const` 的"重复声明"也必然是 `const` 的重新赋值，而这是不允许的！
 
 ```js
 const studentName = "Frank";
 
-// obviously this must be an error
+// 显然这是一个错误
 const studentName = "Suzy";
 ```
 
-Since `const` "re-declaration" must be disallowed (on those technical grounds), TC39 essentially felt that `let` "re-declaration" should be disallowed as well, for consistency. It's debatable if this was the best choice, but at least we have the reasoning behind the decision.
+由于 `const` 「重复声明」必须被禁止（基于这些技术原因），TC39 基本上认为 `let` 「重复声明」也应被禁止，以保持一致性。这是否是最好的选择还有待商榷，但至少我们知道了决定背后的理由。
 
-### Loops
+### 循环
 
-So it's clear from our previous discussion that JS doesn't really want us to "re-declare" our variables within the same scope. That probably seems like a straightforward admonition, until you consider what it means for repeated execution of declaration statements in loops. Consider:
+因此，从我们之前的讨论中可以清楚地看出，JS 并不希望我们在同一作用域内「重复声明」变量。这似乎是一个简单明了的告诫，直到你考虑到它对重复执行循环中的声明语句意味着什么。思考一下：
 
 ```js
 var keepGoing = true;
@@ -312,11 +313,11 @@ while (keepGoing) {
 }
 ```
 
-Is `value` being "re-declared" repeatedly in this program? Will we get errors thrown? No.
+在这个程序中，`value`是否被反复「重复声明」？会不会报错？不会。
 
-All the rules of scope (including "re-declaration" of `let`-created variables) are applied *per scope instance*. In other words, each time a scope is entered during execution, everything resets.
+作用域的所有规则（包括对 `let` 创建的变量的「重复声明」）都是按*每个作用域实例*应用的。换句话说，每次在执行过程中进入作用域，一切都会重置。
 
-Each loop iteration is its own new scope instance, and within each scope instance, `value` is only being declared once. So there's no attempted "re-declaration," and thus no error. Before we consider other loop forms, what if the `value` declaration in the previous snippet were changed to a `var`?
+每个循环迭代都是它自己的新作用域实例，而在每个作用域实例中，`value` 只被声明一次。因此不存在试图「重复声明」的情况，也就不会出错。在我们考虑其他循环形式之前，如果把前面代码段中的 `value` 声明改为 `var` 会怎样？
 
 ```js
 var keepGoing = true;
@@ -328,39 +329,39 @@ while (keepGoing) {
 }
 ```
 
-Is `value` being "re-declared" here, especially since we know `var` allows it? No. Because `var` is not treated as a block-scoping declaration (see Chapter 6), it attaches itself to the global scope. So there's just one `value` variable, in the same scope as `keepGoing` (global scope, in this case). No "re-declaration" here, either!
+我们知道 `var` 允许这样做，那么 `value` 在这里是否被「重复声明」了呢？不是的。因为 `var` 不被视为块作用域声明（参见第 6 章），它将自己附加到全局作用域中。因此只有一个 `value` 变量，与 `keepGoing` 处于同一作用域（本例中为全局作用域）。这里也没有「重复声明」！
 
-One way to keep this all straight is to remember that `var`, `let`, and `const` keywords are effectively *removed* from the code by the time it starts to execute. They're handled entirely by the compiler.
+有一种方法可以让我们记住，当代码开始执行时，`var`、`let` 和 `const` 关键字实际上已从代码中删除。它们完全由编译器处理。
 
-If you mentally erase the declarator keywords and then try to process the code, it should help you decide if and when (re-)declarations might occur.
+如果你在头脑中抹去声明器关键字，然后尝试处理代码，应该可以帮助你判断是否以及何时可能出现（重复）声明。
 
-What about "re-declaration" with other loop forms, like `for`-loops?
+其他循环形式（如 `for` 循环）的「重复声明」又是怎么回事？
 
 ```js
 for (let i = 0; i < 3; i++) {
     let value = i * 10;
-    console.log(`${ i }: ${ value }`);
+    console.log(`${i}: ${value}`);
 }
 // 0: 0
 // 1: 10
 // 2: 20
 ```
 
-It should be clear that there's only one `value` declared per scope instance. But what about `i`? Is it being "re-declared"?
+很明显，每个作用域实例只能声明一个 `value`。那么 `i` 呢？它被「重复声明」了吗？
 
-To answer that, consider what scope `i` is in. It might seem like it would be in the outer (in this case, global) scope, but it's not. It's in the scope of `for`-loop body, just like `value` is. In fact, you could sorta think about that loop in this more verbose equivalent form:
+要回答这个问题，请考虑一下 `i` 所处的作用域。它看起来像是在外层（在本例中是全局）作用域，但其实不是。它在 `for` 循环体的作用域中，就像 `value` 一样。事实上，你可以用这种更简洁的等价形式来考虑这个循环：
 
 ```js
 {
-    // a fictional variable for illustration
+    // 用于说明的虚构变量
     let $$i = 0;
 
-    for ( /* nothing */; $$i < 3; $$i++) {
-        // here's our actual loop `i`!
+    for (; /* nothing */ $$i < 3; $$i++) {
+        // 这是我们实际循环的 `i`!
         let i = $$i;
 
         let value = i * 10;
-        console.log(`${ i }: ${ value }`);
+        console.log(`${i}: ${value}`);
     }
     // 0: 0
     // 1: 10
@@ -368,28 +369,28 @@ To answer that, consider what scope `i` is in. It might seem like it would be in
 }
 ```
 
-Now it should be clear: the `i` and `value` variables are both declared exactly once **per scope instance**. No "re-declaration" here.
+现在应该清楚了： `i` 和 `value` 变量都是在**每个作用域实例**中声明一次。这里没有「重复声明」。
 
-What about other `for`-loop forms?
+其他 `for` 循环形式呢？
 
 ```js
 for (let index in students) {
-    // this is fine
+    // 这么做没问题
 }
 
 for (let student of students) {
-    // so is this
+    // 俺也一样
 }
 ```
 
-Same thing with `for..in` and `for..of` loops: the declared variable is treated as *inside* the loop body, and thus is handled per iteration (aka, per scope instance). No "re-declaration."
+`for..in` 和 `for..of` 循环也是如此：声明的变量被视为循环体的*内部*变量，因此每次迭代（又称每个作用域实例）都会被处理。没有「重复声明」。
 
-OK, I know you're thinking that I sound like a broken record at this point. But let's explore how `const` impacts these looping constructs. Consider:
+好吧，我知道你在想我现在的语气就像个坏掉的唱片。但让我们来探讨一下 `const` 如何影响这些循环结构。思考一下：
 
 ```js
 var keepGoing = true;
 while (keepGoing) {
-    // ooo, a shiny constant!
+    // 哦，一个闪亮的常数！
     const value = Math.random();
     if (value > 0.5) {
         keepGoing = false;
@@ -397,92 +398,92 @@ while (keepGoing) {
 }
 ```
 
-Just like the `let` variant of this program we saw earlier, `const` is being run exactly once within each loop iteration, so it's safe from "re-declaration" troubles. But things get more complicated when we talk about `for`-loops.
+就像我们之前看到的这个程序的 `let` 变体一样，`const` 在每个循环迭代中都会被运行一次，所以它不会有「重复声明」的问题。但当我们谈到 `for` 循环时，情况就变得复杂了。
 
-`for..in` and `for..of` are fine to use with `const`:
+`for..in` 和 `for..of` 可以与 `const` 一起使用：
 
 ```js
 for (const index in students) {
-    // this is fine
+    // 这么做没问题
 }
 
 for (const student of students) {
-    // this is also fine
+    // 同样没问题
 }
 ```
 
-But not the general `for`-loop:
+但是传统的 `for` 循环不行：
 
 ```js
 for (const i = 0; i < 3; i++) {
-    // oops, this is going to fail with
-    // a Type Error after the first iteration
+    // 哎呀，这样做会失败的
+    // 第一次迭代后出现类型错误
 }
 ```
 
-What's wrong here? We could use `let` just fine in this construct, and we asserted that it creates a new `i` for each loop iteration scope, so it doesn't even seem to be a "re-declaration."
+这里有什么问题吗？我们可以在这个结构中很好地使用 `let` ，而且我们断言它为每个循环迭代作用域创建了一个新的 `i`，所以它看起来甚至不是一个「重复声明」。
 
-Let's mentally "expand" that loop like we did earlier:
+让我们像刚才那样在头脑中「扩展」这个循环：
 
 ```js
 {
-    // a fictional variable for illustration
+    // 用于说明的虚构变量
     const $$i = 0;
 
-    for ( ; $$i < 3; $$i++) {
-        // here's our actual loop `i`!
+    for (; $$i < 3; $$i++) {
+        //  这是我们实际循环的 `i`！
         const i = $$i;
         // ..
     }
 }
 ```
 
-Do you spot the problem? Our `i` is indeed just created once inside the loop. That's not the problem. The problem is the conceptual `$$i` that must be incremented each time with the `$$i++` expression. That's **re-assignment** (not "re-declaration"), which isn't allowed for constants.
+您发现问题了吗？我们的 `i` 的确只是在循环中创建了一次。这不是问题所在。问题在于概念中的 `$$i` 每次都必须用 `$$i++` 表达式递增。这是**重新赋值**（而不是「重复声明」），常量不允许这样做。
 
-Remember, this "expanded" form is only a conceptual model to help you intuit the source of the problem. You might wonder if JS could have effectively made the `const $$i = 0` instead into `let $ii = 0`, which would then allow `const` to work with our classic `for`-loop? It's possible, but then it could have introduced potentially surprising exceptions to `for`-loop semantics.
+请记住，这种「扩展」形式只是一种概念模型，可以帮助您直观地了解问题的根源。您可能会想，JS 是否可以有效地将 `const $$i = 0` 变成 `let $ii = 0`，从而使 `const` 与我们经典的 `for` 循环一起工作？这是可能的，但这样可能会给 `for` 循环语义带来令人惊讶的异常。
 
-For example, it would have been a rather arbitrary (and likely confusing) nuanced exception to allow `i++` in the `for`-loop header to skirt strictness of the `const` assignment, but not allow other re-assignments of `i` inside the loop iteration, as is sometimes useful.
+例如，如果允许 `for` 循环头中的 `i++` 避开 `const` 赋值的严格性，但不允许在循环迭代中对 `i` 进行其他重新赋值，这将是一个相当武断（而且很可能引起混淆）的细微例外。
 
-The straightforward answer is: `const` can't be used with the classic `for`-loop form because of the required re-assignment.
+直接的答案是：`const` 不能与传统的 `for` 循环形式一起使用，因为需要重新赋值。
 
-Interestingly, if you don't do re-assignment, then it's valid:
+有趣的是，如果你不重新分配，那么它就是有效的：
 
 ```js
 var keepGoing = true;
 
-for (const i = 0; keepGoing; /* nothing here */ ) {
-    keepGoing = (Math.random() > 0.5);
+for (const i = 0; keepGoing /* 这什么也没有 */; ) {
+    keepGoing = Math.random() > 0.5;
     // ..
 }
 ```
 
-That works, but it's pointless. There's no reason to declare `i` in that position with a `const`, since the whole point of such a variable in that position is **to be used for counting iterations**. Just use a different loop form, like a `while` loop, or use a `let`!
+这样做是可行的，但毫无意义。没有理由在该位置用 `const` 声明 `i`，因为在该位置声明这样一个变量的目的就是**用来计算迭代次数**。只需使用不同的循环形式，如 `while` 循环，或使用 `let` 循环！
 
-## Uninitialized Variables (aka, TDZ)
+## 未初始化变量警告（又称 TDZ 暂时性死区）
 
-With `var` declarations, the variable is "hoisted" to the top of its scope. But it's also automatically initialized to the `undefined` value, so that the variable can be used throughout the entire scope.
+通过 `var` 声明，变量会被「提升」到其作用域的顶部。但它也会被自动初始化为 `undefined` 值，这样变量就可以在整个作用域中使用。
 
-However, `let` and `const` declarations are not quite the same in this respect.
+然而，`let` 和`const` 声明在这方面并不完全相同。
 
-Consider:
+思考一下：
 
 ```js
 console.log(studentName);
-// ReferenceError
+// ReferenceError 引用错误
 
 let studentName = "Suzy";
 ```
 
-The result of this program is that a `ReferenceError` is thrown on the first line. Depending on your JS environment, the error message may say something like: "Cannot access studentName before initialization."
+该程序的结果是在第一行抛出了一个 `ReferenceError`（引用错误）。根据您的 JS 环境，错误信息可能会如下所示 "Cannot access studentName before initialization"。
 
-| NOTE: |
-| :--- |
-| The error message as seen here used to be much more vague or misleading. Thankfully, several of us in the community were successfully able to lobby for JS engines to improve this error message so it more accurately tells you what's wrong! |
+| 注意：                                                                                                                                                 |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 这里看到的错误信息过去更含糊不清或具有误导性。值得庆幸的是，我们社区中的一些人成功地游说 JS 引擎改进了这条错误信息，使它能更准确地告诉你出了什么问题！ |
 
-That error message is quite indicative of what's wrong: `studentName` exists on line 1, but it's not been initialized, so it cannot be used yet. Let's try this:
+这条错误信息很好地说明了问题所在：`studentName` 存在于第 1 行，但尚未初始化，因此还不能使用。让我们试试这个：
 
 ```js
-studentName = "Suzy";   // let's try to initialize it!
+studentName = "Suzy"; // 让我们试着初始化它！
 // ReferenceError
 
 console.log(studentName);
@@ -490,24 +491,24 @@ console.log(studentName);
 let studentName;
 ```
 
-Oops. We still get the `ReferenceError`, but now on the first line where we're trying to assign to (aka, initialize!) this so-called "uninitialized" variable `studentName`. What's the deal!?
+哎呀。我们仍然收到了 `ReferenceError`，但现在我们正试图在第一行赋值给（也就是初始化！）这个所谓的「未初始化」变量 `studentName`。这是怎么回事？
 
-The real question is, how do we initialize an uninitialized variable? For `let`/`const`, the **only way** to do so is with an assignment attached to a declaration statement. An assignment by itself is insufficient! Consider:
+真正的问题是，我们如何初始化一个未初始化的变量？对于 `let`/`const` 来说，**唯一的方法**是在声明语句中附加赋值。赋值本身是不够的！思考一下：
 
 ```js
 let studentName = "Suzy";
-console.log(studentName);   // Suzy
+console.log(studentName); // Suzy
 ```
 
-Here, we are initializing the `studentName` (in this case, to `"Suzy"` instead of `undefined`) by way of the `let` declaration statement form that's coupled with an assignment.
+在这里，我们通过带有赋值的 `let` 声明语句形式来初始化 `studentName` （在本例中，初始化为 `"Suzy"` 而不是 `undefined`）。
 
-Alternatively:
+或者：
 
 ```js
 // ..
 
 let studentName;
-// or:
+// 或：
 // let studentName = undefined;
 
 // ..
@@ -518,40 +519,40 @@ console.log(studentName);
 // Suzy
 ```
 
-| NOTE: |
-| :--- |
-| That's interesting! Recall from earlier, we said that `var studentName;` is *not* the same as `var studentName = undefined;`, but here with `let`, they behave the same. The difference comes down to the fact that `var studentName` automatically initializes at the top of the scope, where `let studentName` does not. |
+| 注意：                                                                                                                                                                                                                  |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 这很有趣！回想一下，我们在前面说过 `var studentName;` 与 `var studentName = undefined;` 并不相同，但在 `let` 中，它们的行为是一样的。区别在于 `var studentName` 会在作用域的顶层自动初始化，而 `let studentName` 不会。 |
 
-Remember that we've asserted a few times so far that *Compiler* ends up removing any `var`/`let`/`const` declarators, replacing them with the instructions at the top of each scope to register the appropriate identifiers.
+请记住，到目前为止我们已经多次断言*编译器*最终会删除任何 `var`/`let`/`const` 声明符，取而代之的是在每个作用域的顶部注册相应标识符的指令。
 
-So if we analyze what's going on here, we see that an additional nuance is that *Compiler* is also adding an instruction in the middle of the program, at the point where the variable `studentName` was declared, to handle that declaration's auto-initialization. We cannot use the variable at any point prior to that initialization occurring. The same goes for `const` as it does for `let`.
+因此，如果我们分析一下这里发生的事情，就会发现一个额外的细微差别，那就是*编译器*在程序中间，也就是在声明变量 `studentName` 的地方添加了一条指令，以处理声明的自动初始化。在初始化之前，我们不能使用该变量。对于 `const` 和 `let` 也是一样。
 
-The term coined by TC39 to refer to this *period of time* from the entering of a scope to where the auto-initialization of the variable occurs is: Temporal Dead Zone (TDZ).
+TC39 创造了一个术语来指从进入作用域到变量发生自动初始化的*这段时间*： 暂时性死区（TDZ）。
 
-The TDZ is the time window where a variable exists but is still uninitialized, and therefore cannot be accessed in any way. Only the execution of the instructions left by *Compiler* at the point of the original declaration can do that initialization. After that moment, the TDZ is done, and the variable is free to be used for the rest of the scope.
+TDZ 是变量存在但仍未初始化的时间窗口，因此无法以任何方式访问。只有执行*编译器*在最初声明时留下的指令才能完成初始化。之后，TDZ 就完成了，变量就可以在其余的作用域中自由使用了。
 
-A `var` also technically has a TDZ, but it's zero in length and thus unobservable to our programs! Only `let` and `const` have an observable TDZ.
+从技术上讲，`var` 也有一个 TDZ，但它的长度为零，因此我们的程序无法观察到！只有 `let` 和 `const` 才有可观测的 TDZ。
 
-By the way, "temporal" in TDZ does indeed refer to *time* not *position in code*. Consider:
+顺便说一句，TDZ (Temporal Dead Zone) 中的 "temporal" 指的确实是*时间*，而不是*代码中的位置*。思考一下：
 
 ```js
 askQuestion();
-// ReferenceError
+// ReferenceError 引用错误
 
 let studentName = "Suzy";
 
 function askQuestion() {
-    console.log(`${ studentName }, do you know?`);
+    console.log(`${studentName}, do you know?`);
 }
 ```
 
-Even though positionally the `console.log(..)` referencing `studentName` comes *after* the `let studentName` declaration, timing wise the `askQuestion()` function is invoked *before* the `let` statement is encountered, while `studentName` is still in its TDZ! Hence the error.
+尽管从位置上看，引用 `studentName` 的 `console.log(..)` 在 `let studentName` 声明之后，但从时间上看，`askQuestion()` 函数是在遇到 `let` 语句之前调用的，而 `studentName` 仍在其 TDZ 中！因此出现错误。
 
-There's a common misconception that TDZ means `let` and `const` do not hoist. This is an inaccurate, or at least slightly misleading, claim. They definitely hoist.
+有一种常见的误解，认为 TDZ 意味着 `let` 和 `const` 没有提升。这种说法是不准确的，至少有一点误导。它们肯定会提升。
 
-The actual difference is that `let`/`const` declarations do not automatically initialize at the beginning of the scope, the way `var` does. The *debate* then is if the auto-initialization is *part of* hoisting, or not? I think auto-registration of a variable at the top of the scope (i.e., what I call "hoisting") and auto-initialization at the top of the scope (to `undefined`) are distinct operations and shouldn't be lumped together under the single term "hoisting."
+实际区别在于 `let`/`const` 声明不会像 `var` 那样在作用域的开头自动初始化。那么*争论*的问题是，自动初始化是否是*提升的*一部分？我认为在作用域的顶端自动注册变量（即我所说的「提升」）和在作用域的顶端自动初始化（到 `undefined`）是不同的操作，不应该混为一谈，统称为「提升」。
 
-We've already seen that `let` and `const` don't auto-initialize at the top of the scope. But let's prove that `let` and `const` *do* hoist (auto-register at the top of the scope), courtesy of our friend shadowing (see "Shadowing" in Chapter 3):
+我们已经看到 `let` 和 `const` 不会在作用域的顶层自动初始化。但让我们来证明 `let` 和 `const` *可以*提升（在作用域顶端自动注册），这要归功于我们的朋友 shadowing（参见第 3 章中的「遮蔽 (Shadowing)」）：
 
 ```js
 var studentName = "Kyle";
@@ -569,26 +570,26 @@ var studentName = "Kyle";
 }
 ```
 
-What's going to happen with the first `console.log(..)` statement? If `let studentName` didn't hoist to the top of the scope, then the first `console.log(..)` *should* print `"Kyle"`, right? At that moment, it would seem, only the outer `studentName` exists, so that's the variable `console.log(..)` should access and print.
+第一条 `console.log(..)` 语句会发生什么？如果 `let studentName` 没有提升到作用域的顶部，那么第一条 `console.log(..)` 应该打印 `"Kyle"` ，对吗？此时，似乎只有外层的 `studentName` 存在，所以 `console.log(..)` 应该访问并打印这个变量。
 
-But instead, the first `console.log(..)` throws a TDZ error, because in fact, the inner scope's `studentName` **was** hoisted (auto-registered at the top of the scope). What **didn't** happen (yet!) was the auto-initialization of that inner `studentName`; it's still uninitialized at that moment, hence the TDZ violation!
+但是，第一个 `console.log(..)` 却抛出了 TDZ 错误，因为事实上，内部作用域的 `studentName` **已经**提升了（自动注册到了作用域的顶部）。但内部的 `studentName` 还没有自动初始化；此时它仍未初始化，因此违反了 TDZ！
 
-So to summarize, TDZ errors occur because `let`/`const` declarations *do* hoist their declarations to the top of their scopes, but unlike `var`, they defer the auto-initialization of their variables until the moment in the code's sequencing where the original declaration appeared. This window of time (hint: temporal), whatever its length, is the TDZ.
+因此，概括地说，TDZ 错误的发生是因为 `let`/`const` 声明把它们的声明提升到了作用域的顶端，但与 `var` 不同的是，它们把变量的自动初始化推迟到了代码排序中原始声明出现的时刻。这个时间窗口（提示：时间性），无论其长度如何，就是 TDZ。
 
-How can you avoid TDZ errors?
+如何避免 TDZ 错误？
 
-My advice: always put your `let` and `const` declarations at the top of any scope. Shrink the TDZ window to zero (or near zero) length, and then it'll be moot.
+我的建议是：始终将 `let` 和 `const` 声明放在任何作用域的顶部。将 TDZ 窗口缩小到零（或接近零）长度，这样就没可以避免了。
 
-But why is TDZ even a thing? Why didn't TC39 dictate that `let`/`const` auto-initialize the way `var` does? Just be patient, we'll come back to explore the *why* of TDZ in Appendix A.
+但为什么还要有 TDZ 呢？为什么 TC39 没有规定 `let`/`const` 像 `var` 那样自动初始化？请耐心等待，我们会在附录 A 中再来探讨 TDZ 的*为什么*。
 
-## Finally Initialized
+## 终于初始化
 
-Working with variables has much more nuance than it seems at first glance. *Hoisting*, *(re)declaration*, and the *TDZ* are common sources of confusion for developers, especially those who have worked in other languages before coming to JS. Before moving on, make sure your mental model is fully grounded on these aspects of JS scope and variables.
+变量的使用远比乍看起来要细微得多。_提升_、_（重复）声明_ 和 _TDZ_ 是开发人员常见的困惑来源，尤其是那些在学习 JS 之前使用过其他语言的开发人员。在继续学习之前，请确保您的心智模型已完全建立在 JS 作用域和变量的这些方面之上。
 
-Hoisting is generally cited as an explicit mechanism of the JS engine, but it's really more a metaphor to describe the various ways JS handles variable declarations during compilation. But even as a metaphor, hoisting offers useful structure for thinking about the life-cycle of a variable—when it's created, when it's available to use, when it goes away.
+提升通常被认为是 JS 引擎的一种显式机制，但实际上它更像是一种隐喻，用来描述 JS 在编译过程中处理变量声明的各种方式。但即使作为一种隐喻，提升也为思考变量的生命周期（何时创建、何时可用、何时消失）提供了有用的架构。
 
-Declaration and re-declaration of variables tend to cause confusion when thought of as runtime operations. But if you shift to compile-time thinking for these operations, the quirks and *shadows* diminish.
+如果将变量的声明和重复声明视为运行时操作，往往会造成混乱。但如果将这些操作转换为编译时思维，这些怪异现象和*遮蔽*就会减少。
 
-The TDZ (temporal dead zone) error is strange and frustrating when encountered. Fortunately, TDZ is relatively straightforward to avoid if you're always careful to place `let`/`const` declarations at the top of any scope.
+TDZ（temporal dead zone，暂时性死区）错误既奇怪又令人沮丧。幸运的是，如果您总是小心地将 `let`/`const` 声明放在任何作用域的顶部，TDZ 是可以相对直接地避免的。
 
-As you successfully navigate these twists and turns of variable scope, the next chapter will lay out the factors that guide our decisions to place our declarations in various scopes, especially nested blocks.
+当您成功地驾驭这些变量作用域时，下一章将介绍指导我们决定将声明置于不同作用域（尤其是嵌套块）的因素。
