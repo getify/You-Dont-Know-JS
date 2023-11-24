@@ -40,7 +40,7 @@
 
 当然，我们**非常感谢**你对这项工作的任何贡献。
 
-但**请在**提交 PR 之前仔细阅读[贡献指南](CONTRIBUTING.md)。
+但**请在**提交 PR 之前仔细阅读[贡献指南](https://github.com/liunnn1994/You-Dont-Know-JS-zh-CN/blob/main/CONTRIBUTING.md)。
 
 ## 感谢这些出色的赞助商
 
