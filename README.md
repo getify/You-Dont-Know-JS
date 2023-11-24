@@ -1,4 +1,4 @@
-# 你不知道的 JavaScript (丛书) - 第二版
+# 你并不了解 JavaScript (丛书) - 第二版
 
 这是一个深入研究 JavaScript 语言核心机制的系列图书。这是该系列图书的**第二版**：
 
@@ -13,12 +13,12 @@
 
 我建议按照这个顺序阅读**第二版**书籍：
 
-* [入门](get-started/README.md) | [在 Leanpub 上购买](https://leanpub.com/ydkjsy-get-started) | [在亚马逊上购买](https://www.amazon.com/dp/B084BNMN7T)
-* [作用域与闭包](scope-closures/README.md) | [在 Leanpub 上购买](https://leanpub.com/ydkjsy-scope-closures) | [在亚马逊上购买](https://www.amazon.com/dp/B08634PZ3N)
-* [对象与类](objects-classes/README.md) （稳定版草稿）
-* [类型与语法](types-grammar/README.md) （正在起草）
-* 同步与异步 （尚未开始）
-* ES.Next 和未来 （尚未开始）
+-   [入门](get-started/README.md) | [在 Leanpub 上购买](https://leanpub.com/ydkjsy-get-started) | [在亚马逊上购买](https://www.amazon.com/dp/B084BNMN7T)
+-   [作用域与闭包](scope-closures/README.md) | [在 Leanpub 上购买](https://leanpub.com/ydkjsy-scope-closures) | [在亚马逊上购买](https://www.amazon.com/dp/B08634PZ3N)
+-   [对象与类](objects-classes/README.md) （稳定版草稿）
+-   [类型与语法](types-grammar/README.md) （正在起草）
+-   同步与异步 （尚未开始）
+-   ES.Next 和未来 （尚未开始）
 
 如果你正在寻找以前的**第一版**书籍， [可以在这里找到](https://github.com/getify/You-Dont-Know-JS/blob/1ed-zh-CN/README.md)。
 
@@ -30,9 +30,9 @@
 
 如果你想为这项工作（或我的其他开源软件工作）提供资金支持，除了购买已出版的书籍外，请考虑这些选项：
 
-* [Github 赞助](https://github.com/users/getify/sponsorship)
-* [Patreon](https://www.patreon.com/getify)
-* [Paypal 贝宝](https://www.paypal.me/getify)
+-   [Github 赞助](https://github.com/users/getify/sponsorship)
+-   [Patreon](https://www.patreon.com/getify)
+-   [Paypal 贝宝](https://www.paypal.me/getify)
 
 ## 贡献
 
@@ -54,9 +54,9 @@ Frontend Masters 是面向前端软件开发的顶级专家培训材料的黄金
 
 **注意：** 我的所有[课程](https://frontendmasters.com/kyle-simpson)都是通过 Frontend Masters 独家授课。如果你喜欢这本书的内容，请查看我的视频培训课程。
 
-我想对 Marc Grabanski 和整个 Frontend Masters 团队表示热烈而深切的感谢，不仅因为他们在视频培训平台上的出色工作，还因为他们对我和《你不知道的 JavaScript》这本书的坚定支持!
+我想对 Marc Grabanski 和整个 Frontend Masters 团队表示热烈而深切的感谢，不仅因为他们在视频培训平台上的出色工作，还因为他们对我和《你并不了解 JavaScript》这本书的坚定支持!
 
-----
+---
 
 ## 许可 & 版权
 
