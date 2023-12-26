@@ -398,7 +398,7 @@ At least now we've answered the age old question of *which comes first*?!
 
 #### Numeric Comparison
 
-For numeric comparisons, `IsLessThan()` defers to either the `Number:lessThan()` or `BigInt.lessThan()` operation[^NumericAbstractOps], respectively:
+For numeric comparisons, `IsLessThan()` defers to either the `Number:lessThan()` or `BigInt:lessThan()` operation[^NumericAbstractOps], respectively:
 
 ```
 IsLessThan(41,42, /*LeftFirst=*/ true );         // true
