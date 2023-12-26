@@ -102,6 +102,8 @@ Since arrays are iterables, we can shallow-copy an array using iterator consumpt
 
 ```js
 var arrCopy = [ ...arr ];
+arrCopy;
+// [ 10, 20, 30 ]
 ```
 
 We can also iterate the characters in a string one at a time:
