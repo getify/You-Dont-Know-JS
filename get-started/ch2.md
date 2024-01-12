@@ -123,7 +123,7 @@ You won't encounter direct usage of symbols very often in typical JS programs. T
 
 Besides primitives, the other value type in JS is an object value.
 
-As mentioned earlier, arrays are a special type of object that's comprised of an ordered and numerically indexed list of data:
+It is worth mentioning that JS arrays are a special type of object that's comprised of an ordered and numerically indexed list of data:
 
 ```js
 var names = [ "Frank", "Kyle", "Peter", "Susan" ];
