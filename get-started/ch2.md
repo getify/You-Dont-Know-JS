@@ -607,7 +607,7 @@ class Book extends Publication {
         super(
             bookDetails.title,
             bookDetails.author,
-            bookDetails.publishedOn
+            bookDetails.pubDate
         );
         this.publisher = bookDetails.publisher;
         this.ISBN = bookDetails.ISBN;
@@ -643,7 +643,7 @@ Now consider using these child classes:
 var YDKJS = new Book({
     title: "You Don't Know JS",
     author: "Kyle Simpson",
-    publishedOn: "June 2014",
+    pubDate: "June 2014",
     publisher: "O'Reilly",
     ISBN: "123456-789"
 });
