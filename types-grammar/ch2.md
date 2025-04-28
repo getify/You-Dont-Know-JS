@@ -284,11 +284,11 @@ That also means that if you access `hebrewHello[0]` (or `hebrewHello.charAt(0)`)
 Here's the same example in another RTL language, Arabic:
 
 ```js
-arabicHello = "\u{631}\u{62d}\u{628}\u{627}";
+arabicHello = "\u{645}\u{631}\u{62d}\u{628}\u{627}";
 
-console.log(arabicHello);                       // رحبا
+console.log(arabicHello);                       // مرحبا
 
-console.log(arabicHello[0]);                    // ر
+console.log(arabicHello[0]);                    // م
 ```
 
 JS programs can force a specific language/locale, using various `Intl` APIs such as `Intl.Collator`: [^INTLCollator]
@@ -330,7 +330,7 @@ for (
     }
 }
 // مرحبا
-//لعالم
+// بالعالم
 ```
 
 | NOTE: |
