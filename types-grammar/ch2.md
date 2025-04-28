@@ -79,7 +79,7 @@ greeting = "Hello.";
 greeting.length;            // 6
 ```
 
-`length` can not be set, but it can be accesses, and it exposes the number of code-units stored in the value (see "JS Character Encodings" in Chapter 1), which often means the number of characters in the string.
+`length` can not be set, but it can be accessed, and it exposes the number of code-units stored in the value (see "JS Character Encodings" in Chapter 1), which often means the number of characters in the string.
 
 | NOTE: |
 | :--- |
