@@ -31,7 +31,7 @@ It *is* true that each of these natives can be used as a native constructor. But
 ```js
 var a = new String( "abc" );
 
-typeof a; // "object" ... not "String"
+typeof a; // "object" ... not "string"
 
 a instanceof String; // true
 
