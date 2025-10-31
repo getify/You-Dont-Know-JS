@@ -1,5 +1,5 @@
 # You Don't Know JS Yet (book series) - 2nd Edition
-
+<!-- what a wonderful books :: Fahmy -->
 This is a series of books diving deep into the core mechanisms of the JavaScript language. This is the **second edition** of the book series:
 
 <a href="https://leanpub.com/ydkjsy-get-started"><img src="get-started/images/cover.png" width="75"></a>&nbsp;&nbsp;
@@ -17,10 +17,10 @@ I recommend reading the **second edition** books in this order:
 * [Get Started](get-started/README.md) | [Buy on Leanpub](https://leanpub.com/ydkjsy-get-started) | [Buy on Amazon](https://www.amazon.com/dp/B084BNMN7T)
 * [Scope & Closures](scope-closures/README.md) | [Buy on Leanpub](https://leanpub.com/ydkjsy-scope-closures) | [Buy on Amazon](https://www.amazon.com/dp/B08634PZ3N)
 * "The Unbooks" (ebook) | [Buy on Leanpub](https://leanpub.com/ydkjsy-unbooks) | [Buy on Amazon](https://www.amazon.com/dp/B0F7H1DN5S)
-    - [Objects & Classes](objects-classes/README.md) (draft stable)
-    - [Types & Grammar](types-grammar/README.md) (rough draft)
-    - ~~Sync & Async (canceled)~~
-    - ~~ES.Next & Beyond (canceled)~~
+  * [Objects & Classes](objects-classes/README.md) (draft stable)
+  * [Types & Grammar](types-grammar/README.md) (rough draft)
+  * ~~Sync & Async (canceled)~~
+  * ~~ES.Next & Beyond (canceled)~~
 
 If you're looking for the previous **first edition** books, [they can be found here](https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/README.md).
 
