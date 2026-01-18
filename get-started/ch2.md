@@ -807,7 +807,7 @@ function printDetails(title,author,pubDate) {
     `);
 }
 
-export function create(title,author,pubDate) {
+export function Publication(title,author,pubDate) {
     var publicAPI = {
         print() {
             printDetails(title,author,pubDate);
@@ -821,15 +821,15 @@ export function create(title,author,pubDate) {
 To import and use this module, from another ES module like `blogpost.js`:
 
 ```js
-import { create as createPub } from "publication.js";
+import { Publication } from "publication.js";
 
 function printDetails(pub,URL) {
     pub.print();
     console.log(URL);
 }
 
-export function create(title,author,pubDate,URL) {
-    var pub = createPub(title,author,pubDate);
+export function BlogPost(title,author,pubDate,URL) {
+    var pub = Publication(title,author,pubDate);
 
     var publicAPI = {
         print() {
@@ -844,9 +844,9 @@ export function create(title,author,pubDate,URL) {
 And finally, to use this module, we import into another ES module like `main.js`:
 
 ```js
-import { create as newBlogPost } from "blogpost.js";
+import { BlogPost } from "blogpost.js";
 
-var forAgainstLet = newBlogPost(
+var forAgainstLet = BlogPost(
     "For and against let",
     "Kyle Simpson",
     "October 27, 2014",
@@ -862,9 +862,9 @@ forAgainstLet.print();
 
 | NOTE: |
 | :--- |
-| The `as newBlogPost` clause in the `import` statement is optional; if omitted, a top-level function just named `create(..)` would be imported. In this case, I'm renaming it for readability's sake; its more generic factory name of `create(..)` becomes more semantically descriptive of its purpose as `newBlogPost(..)`. |
+| The `BlogPost` function name is capitalized to signal that it's a factory function intended for multiple instantiation, consistent with the earlier *classic modules* examples. |
 
-As shown, ES modules can use *classic modules* internally if they need to support multiple-instantiation. Alternatively, we could have exposed a `class` from our module instead of a `create(..)` factory function, with generally the same outcome. However, since you're already using ESM at that point, I'd recommend sticking with *classic modules* instead of `class`.
+As shown, ES modules can use *classic modules* internally if they need to support multiple-instantiation. Alternatively, we could have exposed a `class` from our module instead of a `BlogPost(..)` factory function, with generally the same outcome. However, since you're already using ESM at that point, I'd recommend sticking with *classic modules* instead of `class`.
 
 If your module only needs a single instance, you can skip the extra layers of complexity: `export` its public methods directly.
 
