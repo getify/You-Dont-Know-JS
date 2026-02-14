@@ -1,6 +1,6 @@
 # You Don't Know JS Yet: Types & Grammar - 2nd Edition
-# Foreword
+# 序
 
 | NOTE: |
 | :--- |
-| Work in progress |
+| 草稿 |

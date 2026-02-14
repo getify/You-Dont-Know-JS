@@ -1,95 +1,95 @@
-# You Don't Know JS Yet: Objects & Classes - 2nd Edition
-# Chapter 4: This Works
+# 你并不了解 JavaScript：对象与类 - 第二版
+# 第 4 章：this 的工作原理
 
-| NOTE: |
+| 注意: |
 | :--- |
-| Work in progress |
+| 草稿 |
 
-We've seen the `this` keyword used quite a bit so far, but haven't really dug in to understand exactly how it works in JS. It's time we do so.
+到目前为止，我们要经多次看到 `this` 关键字的使用，但还没有真正深入了解它在 JS 中究竟是如何工作的。现在是时候了。
 
-But to properly understand `this` in JS, you need to set aside any preconceptions you may have, especially assumptions from how `this` works in other programming languages you may have experience in.
+但是，要正确理解 JS 中的 `this`，你需要抛开你可能有的任何先入为主的观念，特别是来自于你可能熟悉的其他编程语言中 `this` 工作方式的假设。
 
-Here's the most important thing to understand about `this`: the determination of what value (usually, object) `this` points at is not made at author time, but rather determined at runtime. That means you cannot simply look at a `this`-aware function (even a method in a `class` definition) and know for sure what `this` will hold while that function runs.
+关于 `this` 最重要的一点是：`this` 指向什么值（通常是对象）不是在编写时确定的，而是在运行时确定的。这意味着你不能简单地看一个 `this`-aware（感知 `this`）的函数（即使是 `class` 定义中的方法），就能确定在函数运行时 `this` 会持有什值。
 
-Instead, you have to find each place the function is invoked, and look at *how* it's invoked (not even *where* matters). That's the only way to fully answer what `this` will point to.
+相反，你必须找到函数被调用的每一个位置，并查看它是*如何*被调用的（甚至*在哪*调用都不重要）。这是完全回答 `this` 指向何处的唯一方法。
 
-In fact, a single `this`-aware function can be invoked at least four different ways, and any of those approaches will end up assigning a different `this` for that particular function invocation.
+实际上，同一个 `this`-aware 函数至少可以有四种不同的调用方式，而这些方式中的任何一种最终都将为该特定的函数调用分配不同的 `this`。
 
-So the typical question we might ask when reading code -- "What does `this` point to the function?" -- is not actually a valid question. The question you really have to ask is, "When the function is invoked a certain way, what `this` will be assigned for that invocation?"
+因此，我们在阅读代码时可能会问的典型问题 —— “这个函数的 `this` 指向什么？” —— 实际上不是一个有效的问题。你真正应该问的问题是：“当以某种方式调用该函数时，通过这次调用会分配什么 `this` ？”
 
-If your brain is already twisting around just reading this chapter intro... good! Settle in for a rewiring of how you think about `this` in JS.
+如果仅仅阅读本章的介绍就已经让你的大脑开始打结……那很好！准备好重新构建你对 JS 中 `this` 的思考方式吧。
 
-## This Aware
+## 感知 This (This Aware)
 
-I used the phrase `this`-aware just a moment ago. But what exactly do I mean by that?
+刚才我使用了“`this`-aware”这个短语。但我究竟是什么意思呢？
 
-Any function that has a `this` keyword in it.
+任何包含 `this` 关键字的函数。
 
-If a function does not have `this` in it anywhere, then the rules of how `this` behaves don't affect that function in any way. But if it *does* have even a single `this` in it, then you absolutely cannot determine how the function will behave without figuring out, for each invocation of the function, what `this` will point to.
+如果一个函数中没有任何地方包含 `this`，那么 `this` 的行为规则就不会以任何方式影响该函数。但是，如果它哪怕只包含一个 `this`，那么如果不弄清楚对于函数的每次调用 `this` 指向什么，你就绝对无法确定该函数的行为。
 
-It's sort of like the `this` keyword is a placeholder in a template. That placeholder's value-replacement doesn't get determined when we author the code; it gets determined while the code is running.
+这有点像 `this` 关键字是模板中的一个占位符。那个占位符的值替换不是在我们编写代码时确定的；而是在代码运行时确定的。
 
-You might think I'm just playing word games here. Of course, when you write the program, you write out all the calls to each function, so you've already determined what the `this` is going to be when you authored the code, right? Right!?
+你可能认为我只是在这里玩文字游戏。当然，当你编写程序时，你写出了对每个函数的所有调用，所以你在编写代码时就已经确定了 `this` 将是什么，对吧？对吗！？
 
-Not so fast!
+别急！
 
-First of all, you don't always write all the code that invokes your function(s). Your `this`-aware function(s) might be passed as a callback(s) to some other code, either in your code base, or in a third-party framework/utility, or even inside a native built-in mechanism of the language or environment that's hosting your program.
+首先，你并不总是编写所有调用你函数的代码。你的 `this`-aware 函数可能会作为回调传递给其他代码，无论是在你的代码库中，还是在第三方框架/工具中，甚至是在宿主你程序的语言或环境的原生内置机制内部。
 
-But even aside from passing functions as callbacks, several mechanisms in JS allow for conditional runtime behaviors to determine which value (again, usually object) will be set for the `this` of a particular function invocation. So even though you may have written all that code, you *at best* will have to mentally execute the different conditions/paths that end up affecting the function invocation.
+即便不谈将函数作为回调传递，JS 中的几种机制也允许通过运行时的条件行为来决定特定的函数调用将设置哪个值（同样，通常是对象）作为 `this`。因此，即使你写了所有那些代码，你*充其量*也必须在脑海中执行最终影响函数调用的不同条件/路径。
 
-And why does all this matter?
+为什么所有这一切都很重要？
 
-Because it's not just you, the author of the code, that needs to figure this stuff out. It's *every single reader* of your code, forever. If anyone (even your future self) wants to read a piece of code that defines a `this`-aware function, that inevitably means that, to fully understand and predict its behavior, that person will have to find, read, and understand every single invocation of that function.
+因为不仅仅是你，代码的作者，需要弄清楚这些东西。是你代码的*每一个读者*，永远。如果任何人（即使是你未来的自己）想要阅读一段定义了 `this`-aware 函数的代码，那必然意味着，为了完全理解和预测其行为，那个人将不得不找到、阅读并理解该函数的每一次调用。
 
-### This Confuses Me
+### This 困扰着我 (This Confuses Me)
 
-Now, in fairness, that's already partially true if we consider a function's parameters. To understand how a function is going to work, we need to know what is being passed into it. So any function with at least one parameter is, in a similar sense, *argument*-aware -- meaning, what argument(s) is/are passed in and assigned to the parameter(s) of the function.
+公平地说，如果我们考虑函数的参数，这部分已经是事实了。要理解一个函数将如何工作，我们需要知道传入了什么。所以任何至少有一个参数的函数，在类似的意义上，都是*感知参数*的 —— 意思是，什么参数被传入并赋值给了函数的形参。
 
-But with parameters, we often have a bit more of a hint from the function itself what the parameters will do and hold.
+但是对于参数，我们通常可以从函数本身得到更多关于参数将做什么和持有什么的提示。
 
-We often see the names of the parameters declared right in the function header, which goes a long way to explaining their nature/purpose. And if there are defaults for the parameters, we often see them declared inline with `= whatever` clauses. Moreover, depending on the code style of the author, we may see in the first several lines of the function a set of logic that applies to these parameters; this could be assertions about the values (disallowed values, etc), or even modifications (type conversion, formatting, etc).
+我们经常看到参数名称直接在函数头中声明，这很大程度上解释了它们的性质/用途。如果参数有默认值，我们经常看到它们通过 `= whatever` 子句内联声明。此外，根据作者的代码风格，我们可能会在函数的前几行看到一组应用于这些参数的逻辑；这可能是关于值的断言（不允许的值等），甚至是修改（类型转换、格式化等）。
 
-Actually, `this` is very much like a parameter to a function, but it's an implicit parameter rather than an explicit one. You don't see any signal that `this` is going to be used, in the function header anywhere. You have to read the entire function body to see if `this` appears anywhere.
+实际上，`this` 非常像函数的参数，但它是一个隐式参数而不是显式参数。你在函数头的任何地方都看不到 `this` 将被使用的信号。你必须阅读整个函数体才能看到 `this` 是否出现在任何地方。
 
-The "parameter" name is always `this`, so we don't get much of a hint as to its nature/purpose from such a general name. In fact, there's historically a lot of confusion of what "this" even is supposed to mean. And we rarely see much if anything done to validate/convert/etc the `this` value applied to a function invocation. In fact, virtually all `this`-aware code I've seen just neatly assumes the `this` "parameter" is holding exactly what value is expected. Talk about **a trap for unexpected bugs!**
+“参数”名称永远是 `this`，所以我们无法从这样一个通用的名称中获得太多关于其性质/用途的提示。实际上，历史上关于“this”到底应该意味着什么，存在很多困惑。而且我们很少看到对应用于函数调用的 `this` 值进行验证/转换/等的任何操作。实际上，我见过的几乎所有 `this`-aware 代码都只是想当然地假设 `this` “参数”持有的正是预期的值。这就说是**意外 bug 的陷阱！**
 
-### So What Is This?
+### 那么 This 是什么？(So What Is This?)
 
-If `this` is an implicit parameter, what's its purpose? What's being passed in?
+如果 `this` 是一个隐式参数，它的目的是什么？传入了什么？
 
-Hopefully you have already read the "Scope & Closures" book of this series. If not, I strongly encourage you to circle back and read that one once you've finished this one. In that book, I explained at length how scopes (and closures!) work, an especially important characteristic of functions.
+希望你已经阅读了本系列的“作用域和闭包 (Scope & Closures)”一书。如果没有，我强烈建议你在读完本书后回过头去读那一本。在那本书中，我详细解释了作用域（以及闭包！）是如何工作的，这是函数的一个特别重要的特性。
 
-Lexical scope (including all the variables closed over) represents a *static* context for the function's lexical identifier references to be evaluated against. It's fixed/static because at author time, when you place functions and variable declarations in various (nested) scopes, those decisions are fixed, and unaffected by any runtime conditions.
+词法作用域（Lexical scope）（包括所有闭包变量）代表了函数词法标识符引用进行求值的*静态*上下文。它是固定/静态的，因为在编写时，当你将函数和变量声明放置在各种（嵌套）作用域中时，这些决定就已固定，不受任何运行时条件的影响。
 
-By contrast, a different programming language might offer *dynamic* scope, where the context for a function's variable references is not determined by author-time decisions but by runtime conditions. Such a system would be undoubtedly more flexible than static context -- though with flexibility often comes complexity.
+相比之下，另一种编程语言可能会提供*动态*作用域 (dynamic scope)，其中函数变量引用的上下文不是由编写时的决定确定的，而是由运行时条件确定的。这样的系统无疑会比静态上下文更灵活 —— 尽管灵活性通常伴随着复杂性。
 
-To be clear: JS scope is always and only lexical and *static* (if we ignore non-strict mode cheats like `eval(..)` and `with`). However, one of the truly powerful things about JS is that it offers another mechanism with similar flexibility and capabilities to *dynamic* scope.
+明确一点：JS 的作用域总是且仅是词法和*静态*的（如果我们忽略像 `eval(..)` 和 `with` 这样的非严格模式作弊手段）。然而，JS 真正强大的地方之一在于它提供了另一种机制，具有与*动态*作用域类似的灵活性和能力。
 
-The `this` mechanism is, effectively, *dynamic* context (not scope); it's how a `this`-aware function can be dynamically invoked against different contexts -- something that's impossible with closure and lexical scope identifiers!
+`this` 机制实际上是*动态*上下文（不是作用域）；它是 `this`-aware 函数可以针对不同上下文进行动态调用的方式 —— 这对于闭包和词法作用域标识符来说是不可能的！
 
-### Why Is This So Implicit?
+### 为什么 This 如此隐晦？(Why Is This So Implicit?)
 
-You might wonder why something as important as a *dynamic* context is handled as an implicit input to a function, rather than being an explicit argument passed in.
+你可能会想，为什么像*动态*上下文这样重要的东西会被处理为函数的隐式输入，而不是显式传递的参数。
 
-That's a very important question, but it's not one we can quite answer, yet. Hold onto that question though.
+这是一个非常重要的问题，但我们还不能完全回答。先保留这个问题。
 
-### Can We Get On With This?
+### 我们能继续讲 This 吗？(Can We Get On With This?)
 
-So why have I belabored *this* subject for a couple of pages now? You get it, right!? You're ready to move on.
+那我为什么要在这个话题上喋喋不休好几页呢？你懂的，对吧！？你准备好继续了。
 
-My point is, you the author of code, and all other readers of the code even years or decades in the future, need to be `this`-aware. That's the choice, the burden, you place on the reading of such code. And yes, that goes for the choice to use `class` (see Chapter 3), as most class methods will be `this`-aware out of necessity.
+我的观点是，作为代码作者的你，以及即使在几年或几十年后的所有其他代码读者，都需要是 `this`-aware 的。这就是通过编写此类代码所带来的选择和负担。是的，这也适用于使用 `class` 的选择（见第 3 章），因为大多数类方法常常都需要是 `this`-aware 的。
 
-Be aware of *this* `this` choice in code you write. Do it intentionally, and do it in such a way as to produce more outcome benefit than burden. Make sure `this` usage in your code *carries its own weight*.
+要在你编写的代码中意识到*这种* `this` 的选择。要有意识地做，并且要以产生比负担更多收益的方式去做。确保你代码中的 `this` 使用*物有所值*。
 
-Let me put it *this* way: don't use `this`-aware code unless you really can justify it, and you've carefully weighed the costs. Just because you've seen a lot of code examples slinging around `this` in others' code, doesn't mean that `this` belongs in *this* code you're writing.
+让我*这样*说：除非你真的能证明其合理性，并且你已经仔细权衡了成本，否则不要使用 `this`-aware 的代码。仅仅因为你看到很多示例代码在别人的代码中随意使用 `this`，并不意味着 `this` 属于你正在编写的*这段*代码。
 
-The `this` mechanism in JS, paired with `[[Prototype]]` delegation, is an extremely powerful pillar of the language. But as the cliche goes: "with great power comes great responsibility". Anecdotally, even though I really like and appreciate *this* pillar of JS, probably less than 5% of the JS code I ever write uses it. And when I do, it's with restraint. It's not my default, go-to JS capability.
+JS 中的 `this` 机制，配合 `[[Prototype]]` 委托，是该语言极其强大的支柱。但正如那句老话所说：“能力越大，责任越大”。有趣的是，尽管我真的喜欢并赞赏 JS 的*这个*支柱，但我编写的 JS 代码中可能只有不到 5% 使用了它。当我使用它时，我是有节制的。它不是我默认的、首选的 JS 能力。
 
-## This Is It!
+## 就这就是它！(This Is It!)
 
-OK, enough of the wordy lecture. You're ready to dive into `this` code, right?
+好了，啰嗦的说教够了。你已经准备好深入研究 `this` 代码了，对吧？
 
-Let's revisit (and extend) `Point2d` from Chapter 3, but just as an object with data properties and functions on it, instead of using `class`:
+让我们回顾（并扩展）第 3 章中的 `Point2d`，但只是作为一个具有数据属性和函数的对象，而不是使用 `class`：
 
 ```js
 var point = {
@@ -114,52 +114,52 @@ var point = {
 };
 ```
 
-As you can see, the `init(..)`, `rotate(..)`, and `toString()` functions are `this`-aware. You might be in the habit of assuming that the `this` reference will obviously always hold the `point` object. But that's not guaranteed in any way.
+如你所见，`init(..)`、`rotate(..)` 和 `toString()` 函数都是 `this`-aware 的。你可能习惯于假设 `this` 引用显然总是持有 `point` 对象。但这没有任何保证。
 
-Keep reminding yourself as you go through the rest of this chapter: the `this` value for a function is determined by *how* the function is invoked. That means you can't look at the function's definition, nor where the function is defined (not even the enclosing `class`!). In fact, it doesn't even matter where the function is called from.
+在阅读本章其余部分时，请不断提醒自己：函数的 `this` 值是由函数*如何*被调用决定的。这意味着你不能看函数的定义，也不能看函数定义在哪里（甚至包括外层的 `class`！）。实际上，函数从哪里被调用甚至都不重要。
 
-We only need to look at *how* the functions are called; that's the only factor that matters.
+我们需要看的仅仅是函数是*如何*被调用的；那是唯一重要的因素。
 
-### Implicit Context Invocation
+### 隐式上下文调用 (Implicit Context Invocation)
 
-Consider this call:
+考虑这个调用：
 
 ```js
 point.init(3,4);
 ```
 
-We're invoking the `init(..)` function, but notice the `point.` in front of it? This is an *implicit context* binding. It says to JS: invoke the `init(..)` function with `this` referencing `point`.
+我们正在调用 `init(..)` 函数，但注意前面的 `point.`？这是一个*隐式上下文* (implicit context) 绑定。它告诉 JS：调用 `init(..)` 函数，并将 `this` 引用指向 `point`。
 
-That is the *normal* way we'd expect a `this` to work, and that's also one of the most common ways we invoke functions. So the typical invocation gives us the intuitive outcome. That's a good thing!
+这是我们期望 `this` 工作的*正常*方式，这也是我们调用函数最常见的方式之一。所以典型的调用给了我们直观的结果。这是一件好事！
 
-### Default Context Invocation
+### 默认上下文调用 (Default Context Invocation)
 
-But what happens if we do this?
+但是如果我们这样做会发生什么？
 
 ```js
 const init = point.init;
 init(3,4);
 ```
 
-You might assume that we'd get the same outcome as the previous snippet. But that's not how JS `this` assignment works.
+你可能假设我们会得到与前一个片段相同的结果。但这不是 JS `this` 赋值的工作方式。
 
-The *call-site* for the function is `init(3,4)`, which is different than `point.init(3,4)`. When there's no *implicit context* (`point.`), nor any other kind of `this` assignment mechanism, the *default context* assignment occurs.
+函数的*调用位置* (call-site) 是 `init(3,4)`，这与 `point.init(3,4)` 不同。当没有*隐式上下文* (`point.`)，也没有任何其他 `this` 赋值机制时，就会发生*默认上下文* (default context) 赋值。
 
-What will `this` reference when `init(3,4)` is invoked like that?
+当像那样调用 `init(3,4)` 时，`this` 会引用什么？
 
-*It depends.*
+*视情况而定。*
 
-Uh oh. Depends? That sounds confusing.
+哦，糟糕。视情况而定？听起来很混乱。
 
-Don't worry, it's not as bad as it sounds. The *default context* assignment depends on whether the code is in strict-mode or not. But thankfully, virtually all JS code these days is running in strict-mode; for example, ESM (ES Modules) always run in strict-mode, as does code inside a `class` block. And virtually all transpiled JS code (via Babel, TypeScript, etc) is written to declare strict-mode.
+别担心，没听起来那么糟糕。*默认上下文*赋值取决于代码是否处于严格模式 (strict-mode)。但值得庆幸的是，如今几乎所有的 JS 代码都在严格模式下运行；例如，ESM (ES Modules) 总是运行在严格模式下，`class` 块内的代码也是如此。而且几乎所有转译后的 JS 代码（通过 Babel、TypeScript 等）都被编写为声明严格模式。
 
-So almost all of the time, modern JS code will be running in strict-mode, and thus the *default assignment* context won't "depend" on anything; it's pretty straightforward: `undefined`. That's it!
+所以绝大多数时候，现代 JS 代码将在严格模式下运行，因此*默认赋值*上下文不会“取决于”任何东西；它非常直接：`undefined`。就是这样！
 
-| NOTE: |
+| 注意: |
 | :--- |
-| Keep in mind: `undefined` does not mean "not defined"; it means, "defined with the special empty `undefined` value". I know, I know... the name and meaning are mismatched. That's language legacy baggage, for you. (shrugging shoulders) |
+| 请记住：`undefined` 并不意味着“未定义”；它的意思是，“定义为特殊的空 `undefined` 值”。我知道，我知道……名称和含义不匹配。那就是语言遗留的包袱。（耸肩） |
 
-That means `init(3,4)`, if run in strict-mode, would throw an exception. Why? Because the `this.x` reference in `init(..)` is a `.x` property access on `undefined` (i.e., `undefined.x`), which is not allowed:
+这意味着如果在严格模式下运行，`init(3,4)` 会抛出一个异常。为什么？因为 `init(..)` 中的 `this.x` 引用是对 `undefined` 的 `.x` 属性访问（即 `undefined.x`），这是不允许的：
 
 ```js
 "use strict";
@@ -172,14 +172,14 @@ init(3,4);
 // undefined (setting 'x')
 ```
 
-Stop for a moment and consider: why would JS choose to default the context to `undefined`, so that any *default context* invocation of a `this`-aware function will fail with such an exception?
+停下来思考一下：为什么 JS 会选择将上下文默认为 `undefined`，以便任何 `this`-aware 函数的*默认上下文*调用都会因这样的异常而失败？
 
-Because a `this`-aware function **always needs a `this`**. The invocation `init(3,4)` isn't providing a `this`, so that *is* a mistake, and *should* raise an exception so the mistake can be corrected. The lesson: never invoke a `this`-aware function without providing it a `this`!
+因为一个 `this`-aware 函数**总是需要一个 `this`**。`init(3,4)` 的调用没有提供 `this`，所以那*是*一个错误，并且*应该*引发异常以便可以纠正错误。教训是：永远不要在没有提供 `this` 的情况下调用一个 `this`-aware 函数！
 
-Just for completeness sake: in the less common non-strict mode, the *default context* is the global object -- JS defines it as `globalThis`, which in browser JS is essentially an alias to `window`, and in Node it's `global`. So, when `init(3,4)` runs in non-strict mode, the `this.x` expression is `globalThis.x` -- also known as `window.x` in the browser, or `global.x` in Node. Thus, `globalThis.x` gets set as `3` and `globalThis.y` gets set as `4`.
+仅为了完整性起见：在不太常见的非严格模式下，*默认上下文*是全局对象 —— JS将其定义为 `globalThis`，在浏览器 JS 中它本质上是 `window` 的别名，在 Node 中它是 `global`。所以，当 `init(3,4)` 在非严格模式下运行时，`this.x` 表达式就是 `globalThis.x` —— 在浏览器中也就是 `window.x`，或者在 Node 中的 `global.x`。因此，`globalThis.x` 被设置为 `3`，`globalThis.y` 被设置为 `4`。
 
 ```js
-// no strict-mode here, beware!
+// 这里没有严格模式，当心！
 
 var point = { /* .. */ };
 
@@ -192,15 +192,15 @@ point.x;        // null
 point.y;        // null
 ```
 
-That's unfortunate, because it's almost certainly *not* the intended outcome. Not only is it bad if it's a global variable, but it's also *not* changing the property on our `point` object, so program bugs are guaranteed.
+这很不幸，因为这几乎肯定*不是*预期的结果。这不仅如果是全局变量就很糟糕，而且它也*没有*改变我们要的 `point` 对象上的属性，所以程序 bug 是肯定会有的。
 
-| WARNING: |
+| 警告: |
 | :--- |
-| Ouch! Nobody wants accidental global variables implicitly created from all over the code. The lesson: always make sure your code is running in strict-mode! |
+| 哎哟！没人想要在代码各处意外隐式创建全局变量。教训：始终确保你的代码在严格模式下运行！|
 
-### Explicit Context Invocation
+### 显式上下文调用 (Explicit Context Invocation)
 
-Functions can alternately be invoked with *explicit context*, using the built-in `call(..)` or `apply(..)` utilities:
+函数也可以使用内置的 `call(..)` 或 `apply(..)` 工具以*显式上下文* (explicit context) 进行调用：
 
 ```js
 var point = { /* .. */ };
@@ -208,21 +208,21 @@ var point = { /* .. */ };
 const init = point.init;
 
 init.call( point, 3, 4 );
-// or: init.apply( point, [ 3, 4 ] )
+// 或: init.apply( point, [ 3, 4 ] )
 
 point.x;        // 3
 point.y;        // 4
 ```
 
-`init.call(point,3,4)` is effectively the same as `point.init(3,4)`, in that both of them assign `point` as the `this` context for the `init(..)` invocation.
+`init.call(point,3,4)` 实际上与 `point.init(3,4)` 相同，因为它们都将 `point` 作为 `this` 上下文分配给 `init(..)` 调用。
 
-| NOTE: |
+| 注意: |
 | :--- |
-| Both `call(..)` and `apply(..)` utilities take as their first argument a `this` context value; that's almost always an object, but can technically can be any value (number, string, etc). The `call(..)` utility takes subsequent arguments and passes them through to the invoked function, whereas `apply(..)` expects its second argument to be an array of values to pass as arguments. |
+| `call(..)` 和 `apply(..)` 工具都接受一个 `this` 上下文值作为它们的第一个参数；这几乎总是一个对象，但技术上可以是任何值（数字、字符串等）。`call(..)` 工具接受后续参数并将它们传递给被调用的函数，而 `apply(..)` 期望它的第二个参数是一个要作为参数传递的值数组。 |
 
-It might seem awkward to contemplate invoking a function with the *explicit context* assignment (`call(..)` / `apply(..)`) style in your program. But it's more useful than might be obvious at first glance.
+在你的程序中考虑使用*显式上下文*赋值（`call(..)` / `apply(..)`) 风格来调用函数可能看起来很笨拙。但它比乍看之下更有用。
 
-Let's recall the original snippet:
+让我们回顾一下最初的片段：
 
 ```js
 var point = {
@@ -250,17 +250,17 @@ anotherPoint.x;         // 5
 anotherPoint.y;         // 6
 ```
 
-Are you seeing what I did there?
+你看懂我做了什么吗？
 
-I wanted to define `anotherPoint`, but I didn't want to repeat the definitions of those `init(..)` / `rotate(..)` / `toString()` functions from `point`. So I "borrowed" a function reference, `point.init`, and explicitly set the empty object `anotherPoint` as the `this` context, via `call(..)`.
+我想定义 `anotherPoint`，但我不想重复 `point` 中那些 `init(..)` / `rotate(..)` / `toString()` 函数的定义。所以我“借用”了一个函数引用，`point.init`，并通过 `call(..)` 显式地将空对象 `anotherPoint` 设置为 `this` 上下文。
 
-When `init(..)` is running at that moment, `this` inside it will reference `anotherPoint`, and that's why the `x` / `y` properties (values `5` / `6`, respectively) get set there.
+当 `init(..)` 在那一刻运行时，其中的 `this` 将引用 `anotherPoint`，这就是为什么 `x` / `y` 属性（值分别为 `5` / `6`）在那里被设置的原因。
 
-Any `this`-aware functions can be borrowed like this: `point.rotate.call(anotherPoint, ..)`, `point.toString.call(anotherPoint)`.
+任何 `this`-aware 函数都可以像这样被借用：`point.rotate.call(anotherPoint, ..)`，`point.toString.call(anotherPoint)`。
 
-#### Revisiting Implicit Context Invocation
+#### 重访隐式上下文调用 (Revisiting Implicit Context Invocation)
 
-Another approach to share behavior between `point` and `anotherPoint` would have been:
+另一种在 `point` 和 `anotherPoint` 之间共享行为的方法是：
 
 ```js
 var point = { /* .. */ };
@@ -277,17 +277,17 @@ anotherPoint.x;         // 5
 anotherPoint.y;         // 6
 ```
 
-This is another way of "borrowing" the functions, by adding shared references to the functions on any target object (e.g., `anotherPoint`). The call-site invocation `anotherPoint.init(5,6)` is the more natural/ergonomic style that relies on *implicit context* assignment.
+这是另一种“借用”函数的方式，通过在任何目标对象（例如 `anotherPoint`）上添加共享的函数引用。调用位置的调用 `anotherPoint.init(5,6)` 是一种更自然/符合人体工程学的风格，它依赖于*隐式上下文*赋值。
 
-It may seem this approach is a little cleaner, comparing `anotherPoint.init(5,6)` to `point.init.call(anotherPoint,5,6)`.
+比较 `anotherPoint.init(5,6)` 和 `point.init.call(anotherPoint,5,6)`，这种方法似乎稍微简洁一些。
 
-But the main downside is having to modify any target object with such shared function references, which can be verbose, manual, and error-prone. Sometimes such an approach is acceptable, but many other times, *explicit context* assignment with `call(..)` / `apply(..)` is more preferable.
+但主要的缺点是必须修改任何目标对象以包含此类共享函数引用，这可能很繁琐、手动且容易出错。有时这种方法是可以接受的，但在许多其他情况下，使用 `call(..)` / `apply(..)` 的*显式上下文*赋值更可取。
 
-### New Context Invocation
+### New 上下文调用 (New Context Invocation)
 
-We've so far seen three different ways of context assignment at the function call-site: *default*, *implicit*, and *explicit*.
+到目前为止，我们已经看到了函数调用位置处上下文赋值的三种不同方式：*默认*、*隐式*和*显式*。
 
-A fourth way to call a function, and assign the `this` for that invocation, is with the `new` keyword:
+第四种调用函数并为该调用分配 `this` 的方式是使用 `new` 关键字：
 
 ```js
 var point = {
@@ -304,79 +304,78 @@ anotherPoint.x;     // 3
 anotherPoint.y;     // 4
 ```
 
-| TIP: |
+| 提示: |
 | :--- |
-| This example has a bit of nuance to be explained. The `init: function() { .. }` form shown here -- specifically, a function expression assigned to a property -- is required for the function to be validly called with the `new` keyword. From previous snippets, the concise method form of `init() { .. }` defines a function that *cannot* be called with `new`. |
+| 这个例子有一些需要解释的细微差别。这里显示的 `init: function() { .. }` 形式 —— 具体来说，是分配给属性的函数表达式 —— 是使用 `new` 关键字有效调用该函数所必需的。从之前的片段来看，`init() { .. }` 的简写方法形式定义了一个*不能*用 `new` 调用的函数。 |
 
-You've typically seen `new` used with `class` for creating instances. But as an underlying mechanism of the JS language, `new` is not inherently a `class` operation.
+你通常看到 `new` 与 `class` 一起用于创建实例。但作为 JS 语言的底层机制，`new` 本质上不是一个 `class` 操作。
 
-In a sense, the `new` keyword hijacks a function and forces its behavior into a different mode than a normal invocation. Here are the 4 special steps that JS performs when a function is invoked with `new`:
+在某种意义上，`new` 关键字劫持了一个函数，并强制其行为进入一种与普通调用不同的模式。以下是当使用 `new` 调用函数时 JS 执行的 4 个特殊步骤：
 
-1. create a brand new empty object, out of thin air.
+1. 凭空创建一个全新的空对象。
 
-2. link the `[[Prototype]]` of that new empty object to the function's `.prototype` object (see Chapter 2).
+2. 将该新空对象的 `[[Prototype]]` 链接到函数的 `.prototype` 对象（见第 2 章）。
 
-3. invoke the function with the `this` context set to that new empty object.
+3. 以该新空对象作为 `this` 上下文调用函数。
 
-4. if the function doesn't return its own object value explicitly (with a `return ..` statement), assume the function call should instead return the new object (from steps 1-3).
+4. 如果函数没有显式返回它自己的对象值（使用 `return ..` 语句），则假设函数调用应该返回新对象（来自步骤 1-3）。
 
-| WARNING: |
+| 警告: |
 | :--- |
-| Step 4 implies that if you `new` invoke a function that *does* return its own object -- like `return { .. }`, etc -- then the new object from steps 1-3 is *not* returned. That's a tricky gotcha to be aware of, in that it effectively discards that new object before the program has a chance to receive and store a reference to it. Essentially, `new` should never be used to invoke a function that has explicit `return ..` statement(s) in it. |
+| 步骤 4 意味着如果你使用 `new` 调用一个*确实*返回其自身对象的函数 —— 比如 `return { .. }` 等 —— 那么来自步骤 1-3 的新对象*不会*被返回。这是一个需要注意的棘手陷阱，因为它在程序有机会接收并存储对它的引用之前实际上丢弃了那个新对象。本质上，`new` 永远不应该用于调用其中包含显式 `return ..` 语句的函数。 |
 
-To understand these 4 `new` steps more concretely, I'm going to illustrate them in code, as an alternate to using the `new` keyword:
+为了更具体地理解这 4 个 `new` 步骤，我将用代码来说明它们，作为使用 `new` 关键字的替代方案：
 
 ```js
-// alternative to:
+// 替代:
 //   var anotherPoint = new point.init(3,4)
 
 var anotherPoint;
-// this is a bare block to hide local
-// `let` declarations
+// 这是一个用来隐藏局部 `let` 声明的裸块
 {
-    // (Step 1)
+    // (步骤 1)
     let tmpObj = {};
 
-    // (Step 2)
+    // (步骤 2)
     Object.setPrototypeOf(
         tmpObj, point.init.prototype
     );
-    // or: tmpObj.__proto__ = point.init.prototype
+    // 或者: tmpObj.__proto__ = point.init.prototype
 
-    // (Step 3)
+    // (步骤 3)
     let res = point.init.call(tmpObj,3,4);
 
-    // (Step 4)
+    // (步骤 4)
     anotherPoint = (
         typeof res !== "object" ? tmpObj : res
     );
 }
 ```
 
-Clearly, the `new` invocation streamlines that set of manual steps!
+显然，`new` 调用简化了那一组手动步骤！
 
-| TIP: |
+| 提示: |
 | :--- |
-| The `Object.setPrototypeOf(..)` in step 2 could also have been done via the `__proto__` property, such as `tmpObj.__proto__ = point.init.prototype`, or even as part of the object literal (step 1) with `tmpObj = { __proto__: point.init.prototype }`. |
+| 步骤 2 中的 `Object.setPrototypeOf(..)` 也可以通过 `__proto__` 属性完成，例如 `tmpObj.__proto__ = point.init.prototype`，甚至作为对象字面量（步骤 1）的一部分，如 `tmpObj = { __proto__: point.init.prototype }`。 |
 
-Skipping some of the formality of these steps, let's recall an earlier snippet and see how `new` approximates a similar outcome:
+略过这些步骤的一些形式，让我们回顾一个较早的片段，看看 `new` 如何近似类似的结果：
 
 ```js
 var point = { /* .. */ };
 
-// this approach:
+// 这种方法:
 var anotherPoint = {};
 point.init.call(anotherPoint,5,6);
 
-// can instead be approximated as:
+// 可以替代近似为:
 var yetAnotherPoint = new point.init(5,6);
 ```
 
-That's a bit nicer! But there's a caveat here.
+这好多了！但这里有一个注意事项。
 
-Using the other functions that `point` holds against `anotherPoint` / `yetAnotherPoint`, we won't want to do with `new`. Why? Because `new` is creating a *new* object, but that's not what we want if we intend to invoke a function against an existing object.
+对 `anotherPoint` / `yetAnotherPoint` 使用 `point` 持有的其他函数时，我们不想使用 `new`。为什么？因为 `new` 正在创建一个*新*对象，但如果我们打算针对现有对象调用函数，那不是我们想要的。
 
-Instead, we'll likely use *explicit context* assignment:
+相反，我们可能会使用*显式上下文*赋值：
 
 ```js
 point.rotate.call( anotherPoint, /*angleRadians=*/Math.PI );
@@ -385,37 +384,37 @@ point.toString.call( yetAnotherPoint );
 // (5,6)
 ```
 
-### Review This
+### 复习 This (Review This)
 
-We've seen four rules for `this` context assignment in function calls. Let's put them in order of precedence:
+我们已经看到了函数调用中 `this` 上下文赋值的四条规则。让我们按优先级顺序排列它们：
 
-1. Is the function invoked with `new`, creating and setting a *new* `this`?
+1. 函数是否是用 `new` 调用的，创建并设置一个新的 `this`？
 
-2. Is the function invoked with `call(..)` or `apply(..)`, *explicitly* setting `this`?
+2. 函数是否是用 `call(..)` 或 `apply(..)` 调用的，*显式*地设置 `this`？
 
-3. Is the function invoked with an object reference at the call-site (e.g., `point.init(..)`), *implicitly* setting `this`?
+3. 函数在其调用位置是否是通过对象引用调用的（例如，`point.init(..)`），*隐式*地设置 `this`？
 
-4. If none of the above... are we in non-strict mode? If so, *default* the `this` to `globalThis`. But if in strict-mode, *default* the `this` to `undefined`.
+4. 如果以上都不是……我们是否处于非严格模式？如果是，将 `this` *默认*为 `globalThis`。但如果在严格模式下，将 `this` *默认*为 `undefined`。
 
-These rules, *in this order*, are how JS determines the `this` for a function invocation. If multiple rules match a call-site (e.g., `new point.init.call(..)`), the first rule from the list to match wins.
+这些规则，*按照这个顺序*，是 JS 确定函数调用的 `this` 的方式。如果多个规则匹配一个调用位置（例如，`new point.init.call(..)`），列表中的第一个匹配规则获胜。
 
-That's it, you're now master over the `this` keyword. Well, not quite. There's a bunch more nuance to cover. But you're well on your way!
+就是这样，你现在是 `this` 关键字的主人了。嗯，不完全是。还有很多细微差别要涵盖。但你已经上路了！
 
-## An Arrow Points Somewhere
+## 箭头指向某处 (An Arrow Points Somewhere)
 
-Everything I've asserted so far about `this` in functions, and how its determined based on the call-site, makes one giant assumption: that you're dealing with a *regular* function (or method).
+到目前为止，我关于函数中的 `this` 以及它是如何根据调用位置确定的一切断言，都做了一个巨大的假设：你正在处理一个*常规*函数（或方法）。
 
-So what's an *irregular* function?!? It looks like this:
+那么什么是*非常规*函数呢？它看起来像这样：
 
 ```js
 const x = x => x <= x;
 ```
 
-| NOTE: |
+| 注意: |
 | :--- |
-| Yes, I'm being a tad sarcastic and unfair to call an arrow function "irregular" and to use such a contrived example. It's a joke, ok? |
+| 是的，我把箭头函数称为“非常规”并使用这样一个做作的例子有点讽刺和不公平。这是个玩笑，好吗？ |
 
-Here's a real example of an `=>` arrow function:
+这是一个 `=>` 箭头函数的真实示例：
 
 ```js
 const clickHandler = evt =>
@@ -424,7 +423,7 @@ const clickHandler = evt =>
         evt.stopPropagation();
 ```
 
-For comparison sake, let me also show the non-arrow equivalent:
+为了比较起见，让我同时也展示非箭头的等价物：
 
 ```js
 const clickHandler = function(evt) {
@@ -434,7 +433,7 @@ const clickHandler = function(evt) {
 };
 ```
 
-Or if we went a bit old-school about it -- this is my jam! -- we could try the standalone function declaration form:
+或者如果我们稍微老派一点 —— 这是我的菜！ —— 我们可以尝试独立的函数声明形式：
 
 ```js
 function clickHandler(evt) {
@@ -444,7 +443,7 @@ function clickHandler(evt) {
 }
 ```
 
-Or if the function appeared as a method in a `class` definition, or as a concise method in an object literal, it would look like this:
+或者如果函数作为方法出现在 `class` 定义中，或者作为对象字面量中的简写方法，它会看起来像这样：
 
 ```js
 // ..
@@ -455,17 +454,17 @@ clickHandler(evt) {
 }
 ```
 
-What I really want to focus on is how each of these forms of the function will behave with respect to their `this` reference, and whether the first `=>` form differs from the others (hint: it does!). But let's start with a little quiz to see if you've been paying attention.
+我真正想关注的是这些函数形式中的每一种在 `this` 引用方面会有什么表现，以及第一种 `=>` 形式是否与其他形式不同（提示：确实不同！）。但让我们从一个小测验开始，看看你是否一直在专心听讲。
 
-For each of those function forms just shown, how do we know what each `this` will reference?
+对于刚刚展示的那些函数形式，我们如何知道每个 `this` 将引用什么？
 
-### Where's The Call-site?
+### 调用位置在哪里？(Where's The Call-site?)
 
-Hopefully, you responded with something like: "first, we need to see how the functions are called."
+希望你回答了类似这样的话：“首先，我们需要看看函数是如何被调用的。”
 
-Fair enough.
+很公平。
 
-Let's say our program looks like this:
+假设我们的程序看起来像这样：
 
 ```js
 var infoForm = {
@@ -478,7 +477,7 @@ var infoForm = {
         this.theSubmitBtn =
             theFormElem.querySelector("button[type=submit]");
 
-        // is *this* the call-site?
+        // *这*是调用位置吗？
         this.theSubmitBtn.addEventListener(
             "click",
             this.clickHandler,
@@ -490,13 +489,13 @@ var infoForm = {
 }
 ```
 
-Ah, interesting. Half of you readers have never seen actual DOM API code like `getElementById(..)`, `querySelector(..)`, and `addEventListener(..)` before. I heard the confusion bells whistle just now!
+啊，有趣。你们读者中有一半人以前从未见过实际的 DOM API 代码，如 `getElementById(..)`、`querySelector(..)` 和 `addEventListener(..)`。我刚刚听到了困惑的哨声！
 
-| NOTE: |
+| 注意: |
 | :--- |
-| Sorry, I'm dating myself, here. I've been doing this stuff long enough that I remember when we did that kind of code long before we had utilities like jQuery cluttering up the code with `$` everywhere. And after many years of front-end evolution, we seem to have landed somewhere quite a bit more "modern" -- at least, that's the prevailing presumption. |
+| 抱歉，我暴露年龄了。我做这些东西已经很久了，记得在我们有像 jQuery 这样的工具用 `$` 搞乱代码之前，我们就是那样写代码的。经过多年的前端演变，我们似乎停在这个更“现代”的地方 —— 至少，那是普遍的假设。 |
 
-I'm guessing many of you these days are used to seeing component-framework code (React, etc) somewhat like this:
+我猜想目前的你们很多人习惯于看到组件框架代码（React 等），有点像这样：
 
 ```jsx
 // ..
@@ -514,35 +513,35 @@ infoForm(props) {
 // ..
 ```
 
-Of course, there's a bunch of other ways that code might be shaped, depending on if you're using one framework or another, etc.
+当然，代码的形状还有很多其他方式，取决于你使用的是哪种框架等。
 
-Or maybe you're not even using `class` / `this` style components anymore, because you've moved everything to hooks and closures. In any case, for our discussion purposes, *this* chapter is all about `this`, so we need to stick to a coding style like the above, to have code related to the discussion.
+或者也许你已经不再使用 `class` / `this` 风格的组件了，因为你已经把所有东西都移到了 Hooks 和闭包上。无论如何，为了我们讨论的目的，*本*章全是关于 `this` 的，所以我们需要坚持使用像上面那样的编码风格，以便代码与讨论相关。
 
-And neither of those two previous code snippets show the `clickHandler` function being defined. But I've said repeatedly so far, that doesn't matter; all that matters is ... what? say it with me... all that matters is *how* the function is invoked.
+前面的那两个代码片段都没有显示 `clickHandler` 函数的定义。但我已经反复说过，那不重要；唯一重要的是……什么？跟我一起说……唯一重要的是函数是*如何*被调用的。
 
-So how is `clickHandler` being invoked? What's the call-site, and which context assignment rule does it match?
+那么 `clickHandler` 是如何被调用的？调用位置是什么，它匹配哪条上下文赋值规则？
 
-### Hidden From Sight
+### 视线之外 (Hidden From Sight)
 
-If you're stuck, don't worry. I'm deliberately making this difficult, to point something very important out.
+如果你卡住了，别担心。我故意让它变得困难，为了指出非常重要的一点。
 
-When the `"click"` or `onClick=` event handler bindings happen, in both cases, we specified `this.clickHandler`, which implies that there is a `this` context object with a property on it called `clickHandler`, which is holding our function definition.
+当 `"click"` 或 `onClick=` 事件处理程序绑定发生时，在两种情况下，我们都指定了 `this.clickHandler`，这意味存在一个 `this` 上下文对象，上面有一个名为 `clickHandler` 的属性，该属性持有我们的函数定义。
 
-So, is `this.clickHandler` the call-site? If it was, what assignment rule applies? The *implicit context* rule (#3)?
+那么，`this.clickHandler` 是调用位置吗？如果是，应用什么赋值规则？*隐式上下文*规则 (#3)？
 
-Unfortunately, no.
+不幸的是，不。
 
-The problem is, **we cannot actually see the call-site** in this program. Uh oh.
+问题是，**我们实际上无法在这个程序中看到调用位置**。哦，糟糕。
 
-If we can't see the call-site, how do we know *how* the function is going to actually get called?
+如果我们看不到调用位置，我们怎么知道函数实际上将*如何*被调用？
 
-*That's* the exact point I'm making.
+*这*正是我要表达的观点。
 
-It doesn't matter that we passed in `this.clickHandler`. That is merely a reference to a function object value. It's not a call-site.
+我们传入了 `this.clickHandler` 并不重要。那仅仅是对一个函数对象值的引用。它不是一个调用位置。
 
-Under the covers, somewhere inside a framework, library, or even the JS environment itself, when a user clicks the button, a reference to the `clickHandler(..)` function is going to be invoked. And as we've implied, that call-site is even going to pass in the DOM event object as the `evt` argument.
+在幕后，在框架、库甚至是 JS 环境本身的某个地方，当用户点击按钮时，对 `clickHandler(..)` 函数的引用将被调用。正如我们暗示的那样，那个调用位置甚至会将 DOM 事件对象作为 `evt` 参数传入。
 
-Since we can't see the call-site, we have to *imagine* it. Might it look like...?
+既然我们看不到调用位置，我们必须*想象*它。它可能看起来像……？
 
 ```js
 // ..
@@ -550,36 +549,36 @@ eventCallback( domEventObj );
 // ..
 ```
 
-If it did, which `this` rule would apply? The *default context* rule (#4)?
+如果是这样，哪条 `this` 规则适用？*默认上下文*规则 (#4)？
 
-Or, what if the call-site looked like this...?
+或者，如果调用位置看起来像这样……？
 
 ```js
 // ..
 eventCallback.call( domElement, domEventObj );
 ```
 
-Now which `this` rule would apply? The *explicit context* rule (#2)?
+现在哪条 `this` 规则适用？*显式上下文*规则 (#2)？
 
-Unless you open and view the source code for the framework/library, or read the documentation/specification, you won't *know* what to expect of that call-site. Which means that predicting, ultimately, what `this` points to in the `clickHandler` function you write, is... to put it mildly... a bit convoluted.
+除非你打开并查看框架/库的源代码，或者阅读文档/规范，否则你不会*知道*那个调用位置会是什么样。这意味着，最终预测你编写的 `clickHandler` 函数中的 `this` 指向什么，是……委婉地说……有点复杂的。
 
-### *This* Is Wrong
+### *This* 是错的 (*This* Is Wrong)
 
-To spare you any more pain here, I'll cut to the chase.
+为了让你不再痛苦，我将直奔主题。
 
-Pretty much all implementations of a click-handler mechanism are going to do something like the `.call(..)`, and they're going to set the DOM element (e.g., button) the event listener is bound to, as the *explicit context* for the invocation.
+几乎所有点击处理程序的实现都会做类似 `.call(..)` 的事情，并且它们会将事件监听器绑定的 DOM 元素（例如，按钮）设置为调用的*显式上下文*。
 
-Hmmm... is that ok, or is that going to be a problem?
+嗯……这没问题吗，还是会是个问题？
 
-Recall that our `clickHandler(..)` function is `this`-aware, and that its `this.theFormElem` reference implies referencing an object with a `theFormElem` property, which in turn is pointing at the parent `<form>` element. DOM buttons do not, by default, have a `theFormElem` property on them.
+回想一下，我们的 `clickHandler(..)` 函数是 `this`-aware 的，并且它的 `this.theFormElem` 引用意味着引用一个具有 `theFormElem` 属性的对象，该属性反过来指向父 `<form>` 元素。DOM 按钮默认情况下并没有 `theFormElem` 属性。
 
-In other words, the `this` reference that our event handler will have set for it is almost certainly wrong. Oops.
+换句话说，我们的事件处理程序将设置的 `this` 引用几乎肯定是错误的。哎呀。
 
-Unless we want to rewrite the `clickHandler` function, we're going to need to fix that.
+除非我们想重写 `clickHandler` 函数，否则我们需要通过解决那个问题。
 
-### Fixing `this`
+### 修复 `this` (Fixing `this`)
 
-Let's consider some options to address the mis-assignment. To keep things focused, I'll stick to this style of event binding for the discussion:
+让我们考虑一些解决这种错误赋值的选项。为了保持专注，我在讨论中将坚持使用这种事件绑定风格：
 
 ```js
 this.submitBtnaddEventListener(
@@ -589,11 +588,10 @@ this.submitBtnaddEventListener(
 );
 ```
 
-Here's one way to address it:
+这是一种解决方法：
 
 ```js
-// store a fixed reference to the current
-// `this` context
+// 存储当前 `this` 上下文的固定引用
 var context = this;
 
 this.submitBtn.addEventListener(
@@ -605,52 +603,52 @@ this.submitBtn.addEventListener(
 );
 ```
 
-| TIP: |
+| 提示: |
 | :--- |
-| Most older JS code that uses this approach will say something like `var self = this` instead of the `context` name I'm giving it here. "Self" is a shorter word, and sounds cooler. But it's also entirely the wrong semantic meaning. The `this` keyword is not a "self" reference to the function, but rather the context for that current function invocation. Those may seem like the same thing at a glance, but they're completely different concepts, as different as apples and a Beatles song. So... to paraphrase them, "Hey developer, don't make it bad. Take a sad `self` and make it better `context`." |
+| 大多数使用这种方法的旧 JS 代码会说类似 `var self = this` 的话，而不是我这里给出的 `context` 名称。“Self”是一个更短的词，听起来更酷。但它的语义也完全错误。`this` 关键字不是对函数的“自身 (self)”引用，而是当前函数调用的上下文。乍一看它们可能看起来是一回事，但它们是完全不同的概念，就像苹果和披头士的歌一样不同。所以……借用他们的话，“嘿开发者，don't make it bad。把悲伤的 `self` 变成更好的 `context`。” |
 
-What's going on here? I recognized that the enclosing code, where the `addEventListener` call is going to run, has a current `this` context that is correct, and we need to ensure that same `this` context is applied when `clickHandler(..)` gets invoked.
+这里发生了什么？我意识到外层代码，即 `addEventListener` 调用将运行的地方，有一个正确的当前 `this` 上下文，我们需要确保当 `clickHandler(..)` 被调用时应用相同的 `this` 上下文。
 
-I defined a surrounding function (`handler(..)`) and then forced the call-site to look like:
+我定义了一个外围函数（`handler(..)`），然后强制调用位置看起来像：
 
 ```js
 context.clickHandler(evt);
 ```
 
-| TIP: |
+| 提示: |
 | :--- |
-| Which `this` context assignment rule is applied here? That's right, the *implicit context* rule (#3). |
+| 这里应用了哪条 `this` 上下文赋值规则？没错，是*隐式上下文*规则 (#3)。 |
 
-Now, it doesn't matter what the internal call-site of the library/framework/environment looks like. But, why?
+现在，库/框架/环境的内部调用位置是什么样子并不重要。但是，为什么？
 
-Because we're now *actually* in control of the call-site. It doesn't matter how `handler(..)` gets invoked, or what its `this` is assigned. It only matters than when `clickHandler(..)` is invoked, the `this` context is set to what we wanted.
+因为我们现在*实际上*控制了调用位置。`handler(..)` 如何被调用，或者它的 `this` 被分配了什么都不重要。重要的是当 `clickHandler(..)` 被调用时，`this` 上下文被设置为我们想要的。
 
-I pulled off that trick not only by defining a surrounding function (`handler(..)`) so I can control the call-site, but... and this is important, so don't miss it... I defined `handler(..)` as a NON-`this`-aware function! There's no `this` keyword inside of `handler(..)`, so whatever `this` gets set (or not) by the library/framework/environment, is completely irrelevant.
+我实现那个技巧不仅通过定义一个外围函数（`handler(..)`）以便我可以控制调用位置，而且……这很重要，所以别错过了……我将 `handler(..)` 定义为一个**非**-`this`-aware 函数！`handler(..)` 内部没有 `this` 关键字，所以无论库/框架/环境设置（或不设置）什么 `this`，都完全无关紧要。
 
-The `var context = this` line is critical to the trick. It defines a lexical variable `context`, which is not some special keyword, holding a snapshot of the value in the outer `this`. Then inside `clickHandler`, we merely reference a lexical variable (`context`), no relative/magic `this` keyword.
+`var context = this` 这一行对这个技巧至关重要。它定义了一个词法变量 `context`，它不是什么特殊的关键字，持有外部 `this` 值的快照。然后在 `clickHandler` 内部，我们仅仅引用一个词法变量（`context`），而不是相对的/魔法的 `this` 关键字。
 
-### Lexical This
+### 词法 This (Lexical This)
 
-The name for this pattern, by the way, is "lexical this", meaning a `this` that behaves like a lexical scope variable instead of like a dynamic context binding.
+顺便说一句，这种模式的名称是“词法 this (lexical this)”，意思是 `this` 的行为像一个词法作用域变量，而不是像一个动态上下文绑定。
 
-But it turns out JS has an easier way of performing the "lexical this" magic trick. Are you ready for the trick reveal!?
+但事实证明，JS 有一种更简单的方法来执行“词法 this”魔术。你准备好揭秘了吗！？
 
 ...
 
-The `=>` arrow function! Tada!
+`=>` 箭头函数！哒哒！
 
-That's right, the `=>` function is, unlike all other function forms, special, in that it's not special at all. Or, rather, that it doesn't define anything special for `this` behavior whatsoever.
+没错，与所有其他函数形式不同，`=>` 函数是特殊的，特殊在于它一点也不特殊。或者更确切地说，它根本没有为 `this` 行为定义任何特殊的东西。
 
-In an `=>` function, the `this` keyword... **is not a keyword**. It's absolutely no different from any other variable, like `context` or `happyFace` or `foobarbaz`.
+在 `=>` 函数中，`this` 关键字……**不是一个关键字**。它与任何其他变量绝对没有区别，就像 `context` 或 `happyFace` 或 `foobarbaz` 一样。
 
-Let me illustrate *this* point more directly:
+让我更直接地说明*这*一点：
 
 ```js
 function outer() {
     console.log(this.value);
 
-    // define a return an "inner"
-    // function
+    // 定义并返回一个“内部”
+    // 函数
     var inner = () => {
         console.log(this.value);
     };
@@ -669,28 +667,28 @@ var innerFn = outer.call(one);
 // 42
 
 innerFn.call(two);
-// 42   <-- not "sad face"
+// 42   <-- 不是 "sad face"
 ```
 
-The `innerFn.call(two)` would, for any *regular* function definition, have resulted in `"sad face"` here. But since the `inner` function we defined and returned (and assigned to `innerFn`) was an *irregular* `=>` arrow function, it has no special `this` behavior, but instead has "lexical this" behavior.
+对于任何*常规*函数定义，`innerFn.call(two)` 本应该导致 `"sad face"`。但由于我们定义并返回（并赋值给 `innerFn`）的 `inner` 函数是一个*非常规* `=>` 箭头函数，它没有特殊的 `this` 行为，而是具有“词法 this”行为。
 
-When the `innerFn(..)` (aka `inner(..)`) function is invoked, even with an *explicit context* assignment via `.call(..)`, that assignment is ignored.
+当 `innerFn(..)`（也就是 `inner(..)`) 函数被调用时，即使通过 `.call(..)` 进行了*显式上下文*赋值，该赋值也会被忽略。
 
-| NOTE: |
+| 注意: |
 | :--- |
-| I'm not sure why `=>` arrow functions even have a `call(..)` / `apply(..)` on them, since they are silent no-op functions. I guess it's for consistency with normal functions. But as we'll see later, there are other inconsistencies between *regular* functions and *irregular* `=>` arrow functions. |
+| 我不确定为什么 `=>` 箭头函数甚至有 `call(..)` / `apply(..)`，因为它们是静默的空操作函数。我猜这是为了与普通函数保持一致。但正如我们稍后将看到的，*常规*函数和*非常规* `=>` 箭头函数之间还有其他不一致之处。 |
 
-When a `this` is encountered (`this.value`) inside an `=>` arrow function, `this` is treated like a normal lexical variable, not a special keyword. And since there is no `this` variable in that function itself, JS does what it always does with lexical variables: it goes up one level of lexical scope -- in this case, to the surrounding `outer(..)` function, and it checks to see if there's any registered `this` in that scope.
+当在 `=>` 箭头函数内部遇到 `this` (`this.value`) 时，`this` 被视为普通词法变量，而不是特殊关键字。由于该函数本身没有 `this` 变量，JS 会做它对词法变量一贯做的事情：它向上查找一级词法作用域 —— 在这种情况下，是外围的 `outer(..)` 函数，并检查该作用域中是否有任何已注册的 `this`。
 
-Luckily, `outer(..)` is a *regular* function, which means it has a normal `this` keyword. And the `outer.call(one)` invocation assigned `one` to its `this`.
+幸运的是，`outer(..)` 是一个*常规*函数，这意味着它有一个正常的 `this` 关键字。而 `outer.call(one)` 调用将 `one` 分配给了它的 `this`。
 
-So, `innerFn.call(two)` is invoking `inner()`, but when `inner()` looks up a value for `this`, it gets... `one`, not `two`.
+所以，`innerFn.call(two)` 正在调用 `inner()`，但当 `inner()` 查找 `this` 的值时，它得到的是…… `one`，而不是 `two`。
 
-#### Back To The... Button
+#### 回到……按钮 (Back To The... Button)
 
-You thought I was going to make a pun joke and say "future" there, didn't you!?
+你以为如果你我要在那里讲个双关笑话然后说“未来 (future)”吗，是不是！？
 
-A more direct and appropriate way of solving our earlier issue, where we had done `var context = this` to get a sort of faked "lexical this" behavior, is to use the `=>` arrow function, since its primary design feature is... "lexical this".
+解决我们之前问题的更直接和合适的方法，即我们之前用 `var context = this` 来获得某种伪造的“词法 this”行为，现在是使用 `=>` 箭头函数，因为它的主要设计特性就是……“词法 this”。
 
 ```js
 this.submitBtn.addEventListener(
@@ -700,21 +698,21 @@ this.submitBtn.addEventListener(
 );
 ```
 
-Boom! Problem solved! Mic drop!
+Boom！问题解决了！扔麦克风！
 
-Hear me on *this*: the `=>` arrow function is *not* -- I repeat, *not* -- about typing fewer characters. The primary point of the `=>` function being added to JS was to give us "lexical this" behavior without having to resort to `var context = this` (or worse, `var self = this`) style hacks.
+听我说：`=>` 箭头函数*不是* —— 我重复一遍，*不是* —— 为了少打几个字。将 `=>` 函数添加到 JS 的主要目的是给我们“词法 this”行为，而无需诉诸 `var context = this`（或更糟糕的 `var self = this`）风格的黑客手段。
 
-| TIP: |
+| 提示: |
 | :--- |
-| If you need "lexical this", always prefer an `=>` arrow function. If you don't need "lexical this", well... the `=>` arrow function might not be the best tool for the job. |
+| 如果你需要“词法 this”，总是首选 `=>` 箭头函数。如果你不需要“词法 this”，那么…… `=>` 箭头函数可能不是这份工作的最佳工具。|
 
-#### Confession Time
+#### 坦白时间 (Confession Time)
 
-I've said all along in this chapter, that how you write a function, and where you write the function, has *nothing* to do with how its `this` will be assigned.
+我在本章中一直说，你如何编写一个函数，以及你在哪里编写该函数，与其 `this` 将被分配成什么*毫无关系*。
 
-For regular functions, that's true. But when we consider an irregular `=>` arrow function, it's not entirely accurate anymore.
+对于常规函数，那是真的。但是当我们考虑非常规 `=>` 箭头函数时，这就不完全准确了。
 
-Recall the original `=>` form of `clickHandler` from earlier in the chapter?
+还记得本章早些时候 `clickHandler` 的原始 `=>` 形式吗？
 
 ```js
 const clickHandler = evt =>
@@ -723,7 +721,7 @@ const clickHandler = evt =>
         evt.stopPropagation();
 ```
 
-If we use that form, in the same context as our event binding, it could look like this:
+如果我们使用这种形式，在该事件绑定的相同上下文中，它可能看起来像这样：
 
 ```js
 const clickHandler = evt =>
@@ -734,7 +732,7 @@ const clickHandler = evt =>
 this.submitBtn.addEventListener("click",clickHandler,false);
 ```
 
-A lot of developers prefer to even further reduce it, to an inline `=>` arrow function:
+许多开发者甚至更喜欢进一步简化它，变成内联 `=>` 箭头函数：
 
 ```js
 this.submitBtn.addEventListener(
@@ -746,19 +744,19 @@ this.submitBtn.addEventListener(
 );
 ```
 
-When we write an `=>` arrow function, we know for sure that its `this` binding will exactly be the current `this` binding of whatever surrounding function is running, regardless of what the call-site of the `=>` arrow function looks like. So in other words, *how* we wrote the `=>` arrow function, and *where* we wrote it, does matter.
+当我们编写一个 `=>` 箭头函数时，我们确切地知道它的 `this` 绑定将完全是任何正在运行的外围函数的当前 `this` 绑定，而不管 `=>` 箭头函数的调用位置是什么样子的。换句话说，我们*如何*编写 `=>` 箭头函数，以及我们在*哪里*编写它，确实很重要。
 
-That doesn't fully answer the `this` question, though. It just shifts the question to *how the enclosing function was invoked*. Actually, the focus on the call-site is still the only thing that matters.
+但这并没有完全回答 `this` 的问题。它只是将问题转移到了*外围函数是如何被调用的*。实际上，关注调用位置仍然是唯一重要的事情。
 
-But the nuance I'm confessing to having omitted until *this* moment is: it matters *which* call-site we consider, not just *any* call-site in the current call stack. The call-site that matters is, the nearest function-invocation in the current call stack ***that actually assigns a `this` context***.
+但我直到*现在*才坦白的细微差别是：重要的是我们考虑*哪个*调用位置，而不仅仅是当前调用栈中的*任何*调用位置。重要的调用位置是，当前调用栈中最近的***实际分配 `this` 上下文***的函数调用。
 
-Since an `=>` arrow function never has a `this`-assigning call-site (no matter what), that call-site isn't relevant to the question. We have to keep stepping up the call stack until we find a function invocation that *is* `this`-assigning -- even if such invoked function is not itself `this`-aware.
+由于 `=>` 箭头函数永远没有 `this` 分配调用位置（无论如何），该调用位置与问题无关。我们必须继续向上查找调用栈，直到找到一个*是* `this` 分配的函数调用 —— 即使该被调用的函数本身不是 `this`-aware 的。
 
-**THAT** is the only call-site that matters.
+**那**才是唯一重要的调用位置。
 
-#### Find The Right Call-Site
+#### 找到正确的调用位置 (Find The Right Call-Site)
 
-Let me illustrate, with a convoluted mess of a bunch of nested functions/calls:
+让我用一堆嵌套函数/调用的复杂混乱来举例说明：
 
 ```js
 globalThis.value = { result: "Sad face" };
@@ -783,25 +781,25 @@ function one() {
 new one();          // ???
 ```
 
-Can you run through that (nightmare) in your head and determine what will be returned from the `new one()` invocation?
+你能通过脑内模拟运行那个（噩梦）并确定 `new one()` 调用将返回什么吗？
 
-It could be any of these:
+它可能是以下任何一个：
 
 ```js
-// from `four.call(..)`:
+// 来自 `four.call(..)`:
 { result: "OK" }
 
-// or, from `three` object:
+// 或者, 来自 `three` 对象:
 { result: "Hmmm" }
 
-// or, from the `globalThis.value`:
+// 或者, 来自 `globalThis.value`:
 { result: "Sad face" }
 
-// or, empty object from the `new` call:
+// 或者, 来自 `new` 调用的空对象:
 {}
 ```
 
-The call-stack for that `new one()` invocation is:
+那个 `new one()` 调用的调用栈是：
 
 ```
 four         |
@@ -811,27 +809,27 @@ one          | (this = {})
 [ global ]   | (this = globalThis)
 ```
 
-Since `four()` and `fn()` are both `=>` arrow functions, the `three.fn()` and `four.call(..)` call-sites are not `this`-assigning; thus, they're irrelevant for our query. What's the next invocation to consider in the call-stack? `two()`. That's a regular function (it can accept `this`-assignment), and the call-site matches the *default context* assignment rule (#4). Since we're not in strict-mode, `this` is assigned `globalThis`.
+由于 `four()` 和 `fn()` 都是 `=>` 箭头函数，`three.fn()` 和 `four.call(..)` 调用位置不是 `this` 分配的；因此，它们与我们的查询无关。调用栈中下一个要考虑的调用是什么？`two()`。那是一个常规函数（它可以接受 `this` 分配），并且调用位置匹配*默认上下文*赋值规则 (#4)。由于我们不在严格模式下，`this` 被分配为 `globalThis`。
 
-When `four()` is running, `this` is just a normal variable. It looks then to its containing function (`three.fn()`), but it again finds a function with no `this`. So it goes up another level, and finds a `two()` *regular* function that has a `this` defined. And that `this` is `globalThis`. So the `this.value` expression resolves to `globalThis.value`, which returns us... `{ result: "Sad face" }`.
+当 `four()` 运行时，`this` 只是一个普通变量。然后它查找其包含函数 (`three.fn()`)，但再次发现一个没有 `this` 的函数。所以它再上一层，找到一个定义了 `this` 的 `two()` *常规*函数。那个 `this` 是 `globalThis`。所以 `this.value` 表达式解析为 `globalThis.value`，它返回给我们…… `{ result: "Sad face" }`。
 
 ...
 
-Take a deep breath. I know that's a lot to mentally process. And in fairness, that's a super contrived example. You'll almost never see all that complexity mixed in one call-stack.
+深呼吸。我知道这需要很多脑力来处理。公平地说，那是一个超级做作的例子。你几乎永远不会看到所有这些复杂性混合在一个调用栈中。
 
-But you absolutely will find mixed call-stacks in real programs. You need to get comfortable with the analysis I just illustrated, to be able to unwind the call-stack until you find the most recent `this`-assigning call-site.
+但你绝对会在实际程序中发现混合的调用栈。你需要适应我刚刚展示的分析，能够解开调用栈，直到找到最近的 `this` 分配调用位置。
 
-Remember the addage I quoted earlier: "with great power comes great responsibility". Choosing `this`-oriented code (even `class`es) means choosing both the flexibility it affords us, as well as needing to be comfortable navigating the call-stack to understand how it will behave.
+记住我早些时候引用的格言：“能力越大，责任越大”。选择面向 `this` 的代码（即使是 `class`）意味着既选择了它提供给我们的灵活性，也需要能够自如地浏览调用栈以了解它将如何行为。
 
-That's the only way to effectively write (and later read!) `this`-aware code.
+那是有效编写（以及后来阅读！）`this`-aware 代码的唯一方法。
 
-### This Is Bound To Come Up
+### 必然会发生 (This Is Bound To Come Up)
 
-Backing up a bit, there's another option if you don't want to use an `=>` arrow function's "lexical this" behavior to address the button event handler functionality.
+稍微倒回去一点，如果你不想使用 `=>` 箭头函数的“词法 this”行为来解决按钮事件处理程序功能，还有另一个选项。
 
-In addition to `call(..)` / `apply(..)` -- these invoke functions, remember! -- JS functions also have a third utility built in, called `bind(..)` -- which does *not* invoke the function, just to be clear.
+除了 `call(..)` / `apply(..)` —— 记住，这些会调用函数！ —— JS 函数还有内置的第三个工具，称为 `bind(..)` —— 明确地说，它*不*调用函数。
 
-The `bind(..)` utility defines a *new* wrapped/bound version of a function, where its `this` is preset and fixed, and cannot be overridden with a `call(..)` or `apply(..)`, or even an *implicit context* object at the call-site:
+`bind(..)` 工具定义了一个*新的*包装/绑定版本的函数，其中 `this` 被预设且固定，不能被 `call(..)` 或 `apply(..)`，甚至调用位置的*隐式上下文*对象覆盖：
 
 ```js
 this.submitBtn.addEventListener(
@@ -841,13 +839,13 @@ this.submitBtn.addEventListener(
 );
 ```
 
-Since I'm passing in a `this`-bound function as the event handler, it similarly doesn't matter how that utility tries to set a `this`, because I've already forced the `this` to be what I wanted: the value of `this` from the surrounding function invocation context.
+由于我传入了一个 `this` 绑定函数作为事件处理程序，同样地，该工具试图如何设置 `this` 并不重要，因为我已经强制 `this` 为我想要的：来自外围函数调用上下文的 `this` 值。
 
-#### Hardly New
+#### 并不新鲜 (Hardly New)
 
-This pattern is often referred to as "hard binding", since we're creating a function reference that is strongly bound to a particular `this`. A lot of JS writings have claimed that the `=>` arrow function is essentially just syntax for the `bind(this)` hard-binding. It's not. Let's dig in.
+这种模式通常被称为“硬绑定 (hard binding)”，因为我们创建了一个强绑定到特定 `this` 的函数引用。很多 JS 文章声称 `=>` 箭头函数本质上只是 `bind(this)` 硬绑定的语法。其实不是。让我们深入了解一下。
 
-If you were going to create a `bind(..)` utility, it might look kinda like *this*:
+如果你要创建一个 `bind(..)` 工具，它可能看起来有点像*这样*：
 
 ```js
 function bind(fn,context) {
@@ -857,13 +855,13 @@ function bind(fn,context) {
 }
 ```
 
-| NOTE: |
+| 注意: |
 | :--- |
-| This is not actually how `bind(..)` is implemented. The behavior is more sophisticated and nuanced. I'm only illustrating one portion of its behavior in this snippet. |
+| 这实际上不是 `bind(..)` 的实现方式。其行为更复杂且细微。我在这里只是说明其行为的一部分。 |
 
-Does that look familiar? It's using the good ol' fake "lexical this" hack. And under the covers, it's an *explicit context* assignment, in this case via `apply(..)`.
+那看起来眼熟吗？它使用的是老套的伪造“词法 this”黑客手段。在幕后，这是一个*显式上下文*赋值，在本例中通过 `apply(..)`。
 
-So wait... doesn't that mean we could just do it with an `=>` arrow function?
+等一下……这不就是意味着我们可以用 `=>` 箭头函数来做吗？
 
 ```js
 function bind(fn,context) {
@@ -871,25 +869,25 @@ function bind(fn,context) {
 }
 ```
 
-Eh... not quite. As with most things in JS, there's a bit of nuance. Let me illustrate:
+呃……不完全是。正如 JS 中的大多数事物一样，有一点细微差别。让我说明一下：
 
 ```js
-// candidate implementation, for comparison
+// 候选实现，用于比较
 function fakeBind(fn,context) {
     return (...args) => fn.apply(context,args);
 }
 
-// test subject
+// 测试对象
 function thisAwareFn() {
     console.log(`Value: ${this.value}`);
 }
 
-// control data
+// 控制数据
 var obj = {
     value: 42,
 };
 
-// experiment
+// 实验
 var f = thisAwareFn.bind(obj);
 var g = fakeBind(thisAwareFn,obj);
 
@@ -900,29 +898,29 @@ new f();        // Value: undefined
 new g();        // <--- ???
 ```
 
-First, look at the `new f()` call. That's admittedly a strange usage, to call `new` on a hard-bound function. It's probably quite rare that you'd ever do so. But it shows something kind of interesting. Even though `f()` was hard-bound to a `this` context of `obj`, the `new` operator was able to hijack the hard-bound function's `this` and re-bind it to the newly created and empty object. That object has no `value` property, which is why we see `"Value: undefined"` printed out.
+首先，看 `new f()` 调用。诚然，在硬绑定函数上调用 `new` 是一种奇怪的用法。你可能很少会这样做。但这展示了一些有点有趣的东西。即使 `f()` 被硬绑定到 `obj` 的 `this` 上下文，`new` 操作符也能够劫持硬绑定函数的 `this` 并将其重新绑定到新创建的空对象。该对象没有 `value` 属性，这就是为什么我们看到打印出 `"Value: undefined"` 的原因。
 
-If that feels strange, I agree. It's a weird corner nuance. It's not something you'd likely ever exploit. But I point it out not just for trivia. Refer back to the four rules presented earlier in this chapter. Remember how I asserted their order-of-precedence, and `new` was at the top (#1), ahead of *explicit* `call(..)` / `apply(..)` assignment rule (#2)?
+如果那感觉很奇怪，我同意。这是一个奇怪的角落细节。这可能不是你会利用的东西。但我指出这一点不仅仅是为了琐事。回顾本章前面提出的四条规则。还记得我如何断言它们的优先顺序吗？`new` 在顶部 (#1)，先于*显式* `call(..)` / `apply(..)` 赋值规则 (#2)？
 
-Since we can sort of think of `bind(..)` as a variation of that rule, we now see that order-of-precedence proven. `new` is more precedent than, and can override, even a hard-bound function. Sort of makes you think the hard-bound function is maybe not so "hard"-bound, huh?!
+既然我们可以某种程度上把 `bind(..)` 视为那条规则的变体，我们现在看到了优先顺序得到了证实。`new` 比硬绑定函数更优先，并且可以覆盖它。是不是有点让你觉得硬绑定函数也许没那么“硬”绑定，嗯？！
 
-But... what's going to happen with the `new g()` call, which is invoking `new` on the returned `=>` arrow function? Do you predict the same outcome as `new f()`?
+但是……`new g()` 调用会发生什么，它是在返回的 `=>` 箭头函数上调用 `new`？你预测结果和 `new f()` 一样吗？
 
-Sorry to disappoint.
+抱歉让你失望了。
 
-That line will actually throw an exception, because an `=>` function cannot be used with the `new` keyword.
+那一行实际上会抛出一个异常，因为 `=>` 函数不能与 `new` 关键字一起使用。
 
-But why? My best answer, not being authoritative on TC39 myself, is that conceptually and actually, an `=>` arrow function is not a function with a hard-bound `this`, it's a function that has no `this` at all. As such, `new` makes no sense against such a function, so JS just disallows it.
+但为什么？我最好的回答，毕竟我不是 TC39 权威，是概念上和实际上，`=>` 箭头函数不是具有硬绑定 `this` 的函数，它是一个根本没有 `this` 的函数。因此，针对这种函数使用 `new` 毫无意义，所以 JS 只是不允许它。
 
-| NOTE: |
+| 注意: |
 | :--- |
-| Recall earlier, when I pointed out that `=>` arrow functions have `call(..)`, `apply(..)`, and indeed even a `bind(..)`. But we've see that such functions basically ignore these utilities as no-ops. It's a bit strange, in my opinion, that `=>` arrow functions have all those utilities as pass-through no-ops, but for the `new` keyword, that's not just, again, a no-op pass-through, but rather disallowed with an exception. |
+| 回想一下之前，当时我指出 `=>` 箭头函数有 `call(..)`、`apply(..)`，甚至实际上有 `bind(..)`。但我们已经看到这些工具基本上作为无操作 (no-ops) 被忽略了。在我看来，这有点奇怪，`=>` 箭头函数拥有所有这些作为透传无操作的工具，但对于 `new` 关键字，那不仅仅是，再次，一个无操作透传，而是被异常禁止了。 |
 
-But the main point is: an `=>` arrow function is *not* a syntactic form of `bind(this)`.
+但要点是：`=>` 箭头函数*不是* `bind(this)` 的语法形式。
 
-### Losing This Battle
+### 输掉这场战斗 (Losing This Battle)
 
-Returning once again to our button event handler example:
+再次回到我们的按钮事件处理程序示例：
 
 ```js
 this.submitBtnaddEventListener(
@@ -932,33 +930,33 @@ this.submitBtnaddEventListener(
 );
 ```
 
-There's a deeper concern we haven't yet addressed.
+我们还有一个尚未解决的更深层次的担忧。
 
-We've seen several different approaches to construct a different callback function reference to pass in there, in place of `this.clickHandler`.
+我们已经看到了几种构建不同回调函数引用的不同方法，以代替 `this.clickHandler` 传入。
 
-But whichever of those ways we choose, they are producing literally a different function, not just an in-place modification to our existing `clickHandler` function.
+但无论我们选择哪种方式，它们实际上都在产生一个不同的函数，而不仅仅是我们现有 `clickHandler` 函数的原地修改。
 
-Why does that matter?
+为什么这很重要？
 
-Well, first of all, the more functions we create (and re-create), the more processing time (very slight) and the more memory (pretty small, usually) we're chewing up. And when we're re-creating a function reference, and throwing an old one away, that's also leaving un-reclaimed memory sitting around, which puts pressure on the garbage collector (GC) to more often, pause the universe of our program momentarily while it cleans up and reclaims that memory.
+嗯，首先，我们创建（及重新创建）的函数越多，我们消耗的处理时间（非常少）和内存（通常很小）就越多。当我们重新创建函数引用并丢弃旧引用时，这也会留下未回收的内存，这将给垃圾回收器 (GC) 施加压力，要求其更频繁地暂时暂停我们程序的世界，同时清理和回收该内存。
 
-If hooking up this event listening is a one-time operation, no big deal. But if it's happening over and over again, the system-level performance effects *can* start to add up. Ever had an otherwise smooth animation jitter? That was probably the GC kicking in, cleaning up a bunch of reclaimable memory.
+如果挂钩这个事件监听是一次性操作，那没什么大不了的。但如果这种情况一遍又一遍地发生，系统级性能影响*确实*会开始累加。有没有遇到过原本流畅的动画抖动？那可能是 GC 介入，清理一堆可回收内存。
 
-But another concern is, for things like event handlers, if we're going to remove an event listener at some later time, we need to keep a reference to the exact same function we attached originally. If we're using a library/framework, often (but not always!) they take care of that little dirty-work detail for you. But otherwise, it's on us to make sure that whatever function we plan to attach, we hold onto a reference just in case we need it later.
+但另一个担忧是，对于像事件处理程序这样的事情，如果我们以后要移除事件监听器，我们需要保留对最初附加的完全相同的函数的引用。如果我们使用的是库/框架，通常（但不总是！）它们会为你处理那个小的脏活细节。但在其他情况下，我们有责任确保无论我们要附加什么函数，我们都要保留引用以防以后需要它。
 
-So the point I'm making is: presetting a `this` assignment, no matter how you do it, so that it's predictable, comes with a cost. A system level cost and a program maintenance/complexity cost. It is *never* free.
+所以我要表达的观点是：预设 `this` 赋值，无论你如何做，以使其可预测，都是有代价的。系统级代价和程序维护/复杂性代价。它*绝不是*免费的。
 
-One way of reacting to that fact is to decide, OK, we're just going to manufacture all those `this`-assigned function references once, ahead of time, up-front. That way, we're sure to reduce both the system pressure, and the code pressure, to a minimum.
+一种应对事实的方法是决定，好吧，我们只是要提前一次性制造所有那些 `this` 赋值的函数引用。这样，我们肯定能将系统压力和代码压力都降到最低。
 
-Sounds reasonable, right? Not so fast.
+听起来很合理，对吧？别急。
 
-#### Pre-Binding Function Contexts
+#### 预绑定函数上下文 (Pre-Binding Function Contexts)
 
-If you have a one-off function reference that needs to be `this`-bound, and you use an `=>` arrow or a `bind(this)` call, I don't see any problems with that.
+如果你有一个一次性的需要 `this` 绑定的函数引用，并且你使用 `=>` 箭头或 `bind(this)` 调用，我觉得那没什么问题。
 
-But if most or all of the `this`-aware functions in a segment of your code invoked in ways where the `this` isn't the predictable context you expect, and so you decide you need to hard-bind them all... I think that's a big warning signal that you're going about things the wrong way.
+但是，如果你的代码片段中的大多数或所有 `this`-aware 函数以 `this` 不是你预期的可预测上下文的方式被调用，因此你决定你需要对其全部进行硬绑定……我认为这是一个很大的警告信号，表明你的做法是错误的。
 
-Please recall the discussion in the "Avoid This" section from Chapter 3, which started with this snippet of code:
+请回想第 3 章“避免 This (Avoid This)”部分中的讨论，该部分以这段代码开始：
 
 ```js
 class Point2d {
@@ -975,41 +973,41 @@ class Point2d {
 var point = new Point2d(3,4);
 ```
 
-Now imagine we did this with that code:
+现在想象我们对那段代码这样做了：
 
 ```js
 const getX = point.getDoubleX;
 
-// later, elsewhere
+// 稍后，在其他地方
 
 getX();         // 6
 ```
 
-As you can see, the problem we were trying to solve is the same as we've been dealing with here in this chapter. It's that we wanted to be able to invoke a function reference like `getX()`, and have that *mean* and *behave like* `point.getDoubleX()`. But `this` rules on *regular* functions don't work that way.
+如你所见，我们要解决的问题与我们在本章中一直处理的问题相同。那就是我们希望能够调用像 `getX()` 这样的函数引用，并让它*意味着*和*表现得像* `point.getDoubleX()`。但*常规*函数上的 `this` 规则不是那样工作的。
 
-So we used an `=>` arrow function. No big deal, right!?
+所以我们使用了 `=>` 箭头函数。没什么大不了的，对吧！？
 
-Wrong.
+错。
 
-The real root problem is that we *want* two conflicting things out of our code, and we're trying to use the same *hammer* for both *nails*.
+真正的根本问题是我们想从代码中得到两件相互冲突的东西，而我们试图用同一把*锤子*来敲这两颗*钉子*。
 
-We want to have a `this`-aware method stored on the `class` prototype, so that there's only one definition for the function, and all our subclasses and instances nicely share that same function. And the way they all share is through the power of the dynamic `this` binding.
+我们希望在 `class` 原型上存储一个 `this`-aware 方法，这样函数的定义就只有一个，并且我们所有的子类和实例都很好地共享同一个函数。它们共享的方式是通过动态 `this` 绑定的力量。
 
-But at the same time, we *also* want those function references to magically stay `this`-assinged to our instance when we pass those function references around and other code is in charge of the call-site.
+但与此同时，我们*也*希望当我们将这些函数引用传递给负责调用位置的其他代码时，这些函数引用能神奇地保持 `this` 赋值给我们的实例。
 
-In other words, sometimes we want something like `point.getDoubleX` to mean, "give me a reference that's `this`-assigned to `point`", and other times we want the same expression `point.getDoubleX` to mean, give me a dynamic `this`-assignable function reference so it can properly get the context I need it to at this moment.
+换句话说，有时我们希望像 `point.getDoubleX` 这样的东西意味着，“给我一个 `this` 赋值给 `point` 的引用”，而其他时候我们希望相同的表达式 `point.getDoubleX` 意味着，给我一个动态 `this` 可赋值的函数引用，以便它可以在此刻正确地获得我需要的上下文。
 
-Perhaps JS could offer a different operator besides `.`, like `::` or `->` or something like that, which would let you distinguish what kind of function reference you're after. In fact, there's a long-standing proposal for a `this`-binding operator (`::`), that picks up attention from time to time, and then seems to stall out. Who knows, maybe someday such an operator will finally land, and we'll have better options.
+也许 JS 可以提供一个除了 `.` 之外的不同的操作符，比如 `::` 或 `->` 或类似的东西，它可以让你区分你想要什么样的函数引用。实际上，有一个长期存在的 `this` 绑定操作符 (`::`) 的提案，它时不时会引起关注，然后似乎又停滞不前。谁知道呢，也许有一天这样的操作符终于落地，我们将有更好的选择。
 
-But I strongly suspect that even if it does land someday, it's going to vend a whole new function reference, exactly as the `=>` or `bind(this)` approaches we've already talked about. It won't come as a free and perfect solution. There will always be a tension between wanting the same function to sometimes be `this`-flexible and sometimes be `this`-predictable.
+但我强烈怀疑，即使有一天它落地了，它也会提供一个全新的函数引用，就像我们已经谈论过的 `=>` 或 `bind(this)` 方法一样。它不会作为一个免费且完美的解决方案出现。在希望同一个函数有时 `this` 灵活，有时 `this` 可预测之间总是会存在张力。
 
-What JS authors of `class`-oriented code often run up against, sooner or later, is this exact tension. And you know what they do?
+面向 `class` 代码的 JS 作者迟早会经常遇到这种确切的张力。你知道他们做什么吗？
 
-They don't consider the *costs* of simply pre-binding all the class's `this`-aware methods as instead `=>` arrow functions in member properties. They don't realize that it's completely defeated the entire purpose of the `[[Prototype]]` chain. And they don't realize that if fixed-context is what they *really need*, there's an entirely different mechanism in JS that is better suited for that purpose.
+他们不考虑简单地将类的所有 `this`-aware 方法预绑定为成员属性中的 `=>` 箭头函数的*成本*。他们没有意识到这完全挫败了 `[[Prototype]]` 链的整个目的。他们也没有意识到如果固定上下文是他们*真正需要*的，JS 中有一种完全不同的机制更适合该目的。
 
-#### Take A More Critical Look
+#### 采取更批判的眼光 (Take A More Critical Look)
 
-So when you do this sort of thing:
+所以当你做这种事情时：
 
 ```js
 class Point2d {
@@ -1034,7 +1032,7 @@ f();            // 6
 g();            // (5,6)
 ```
 
-I say, "ick!", to the hard-bound `this`-aware methods `getDoubleX()` and `toString()` there. To me, that's a code smell. But here's an even *worse* approach that has been favored by many developers in the past:
+我说，“呸！(ick!)”，对于那里硬绑定的 `this`-aware 方法 `getDoubleX()` 和 `toString()`。对我来说，那是一种代码异味 (code smell)。但这还有一种过去被许多开发者青睐的更*糟糕*的方法：
 
 ```js
 class Point2d {
@@ -1061,11 +1059,11 @@ f();            // 6
 g();            // (5,6)
 ```
 
-Double ick.
+双倍的呸。
 
-In both cases, you're using a `this` mechanism but completely betraying/neutering it, by taking away all the powerful dynamicism of `this`.
+在这两种情况下，你都在使用 `this` 机制，但通过剥夺 `this` 所有的强大动态性，完全背叛/阉割了它。
 
-You really should at least be contemplating this alternate approach, which skips the whole `this` mechanism altogether:
+你真的应该至少考虑这另一种方法，它完全跳过了整个 `this` 机制：
 
 ```js
 function Point2d(px,py) {
@@ -1088,27 +1086,27 @@ f();            // 6
 g();            // (5,6)
 ```
 
-You see? No ugly or complex `this` to clutter up that code or worry about corner cases for. Lexical scope is super straightforward and intuitive.
+你看到了吗？没有丑陋或复杂的 `this` 来搞乱代码或担心边缘情况。词法作用域超级直观和容易理解。
 
-When all we want is for most/all of our function behaviors to have a fixed and predictable context, the most appropriate solution, the most straightforward and even performant solution, is lexical variables and scope closure.
+当我们想要的只是让我们的大多数/所有函数行为具有固定和可预测的上下文时，最合适的解决方案，最直接甚至性能最好的解决方案，是词法变量和作用域闭包。
 
-When you go to all to the trouble of sprinkling `this` references all over a piece of code, and then you cut off the whole mechanism at the knees with `=>` "lexical this" or `bind(this)`, you chose to make the code more verbose, more complex, more overwrought. And you got nothing out of it that was more beneficial, except to follow the `this` (and `class`) bandwagon.
+当你费尽心思将 `this` 引用撒满一段代码，然后用 `=>` “词法 this”或 `bind(this)` 在膝盖处切断整个机制时，你选择使代码更冗长、更复杂、更矫揉造作。除了跟随 `this`（和 `class`）的潮流之外，你没有从中得到任何更有益的东西。
 
 ...
 
-Deep breath. Collect yourself.
+深呼吸。让自己冷静下来。
 
-I'm talking to myself, not you. But if what I just said bothers you, I'm talking to you, too!
+我在对自己说话，不是对你。但如果我刚才说的话让你感到不安，那我也是在对你说话！
 
-OK, listen. That's just my opinion. If you don't agree, that's fine. But apply the same level of rigor to thinking about how these mechanisms work, as I have, when you decide what conclusions you want to arrive at.
+好的，听着。那只是我的意见。如果你不同意，那很好。但在你决定想要得出什么结论时，请像我一样，运用同样严谨的程度去思考这些机制是如何工作的。
 
-## Variations
+## 变体 (Variations)
 
-Before we close out our lengthy discussion of `this`, there's a few irregular variations on function calls that we should discuss.
+在我们结束对 `this` 的冗长讨论之前，我们需要讨论关于函数调用的几个非常规变体。
 
-### Indirect Function Calls
+### 间接函数调用 (Indirect Function Calls)
 
-Recall this example from earlier in the chapter?
+还记得本章前面的这个例子吗？
 
 ```js
 var point = {
@@ -1124,58 +1122,58 @@ var point = {
 };
 
 var init = point.init;
-init(3,4);                  // broken!
+init(3,4);                  // 坏了!
 ```
 
-This is broken because the `init(3,4)` call-site doesn't provide the necessary `this`-assignment signal. But there's other ways to observe a similar breakage. For example:
+这是坏的，因为 `init(3,4)` 调用位置没有提供必要的 `this` 赋值信号。但还有其他方法可以观察到类似的破坏。例如：
 
 ```js
-(1,point.init)(3,4);        // broken!
+(1,point.init)(3,4);        // 坏了!
 ```
 
-This strange looking syntax is first evaluating an expression `(1,point.init)`, which is a comma series expression. The result of such an expression is the final evaluated value, which in this case is the function reference (held by `point.init`).
+这种看起来奇怪的语法首先计算表达式 `(1,point.init)`，这是一个逗号序列表达式。此类表达式的结果是最终的计算值，在本例中是函数引用（由 `point.init` 持有）。
 
-So the outcome puts that function reference onto the expression stack, and then invokes that value with `(3,4)`. That's an indirect invocation of the function. And what's the result? It actually matches the *default context* assignment rule (#4) we looked at earlier in the chapter.
+所以结果将该函数值放在表达式栈上，然后用 `(3,4)` 调用该值。那是对函数的间接调用。结果是什么？它实际上匹配了我们之前在本章中看到的*默认上下文*赋值规则 (#4)。
 
-Thus, in non-strict mode, the `this` for the `point.init(..)` call will be `globalThis`. Had we been in strict-mode, it would have been `undefined`, and the `this.x = x` operation would then have thrown an exception for invalidly accessing the `x` property on the `undefined` value.
+因此，在非严格模式下，`point.init(..)` 调用的 `this` 将是 `globalThis`。如果我们处于严格模式下，它将是 `undefined`，并且 `this.x = x` 操作随后会抛出异常，因为非法访问了 `undefined` 值上的 `x` 属性。
 
-There's several different ways to get an indirect function invocation. For example:
+有几种不同的方法可以进行间接函数调用。例如：
 
 ```js
-(()=>point.init)()(3,4);    // broken!
+(()=>point.init)()(3,4);    // 坏了!
 ```
 
-And another example of indirect function invocation is the Immediately Invoked Function Expression (IIFE) pattern:
+间接函数调用的另一个例子是立即调用函数表达式 (IIFE) 模式：
 
 ```js
 (function(){
-    // `this` assigned via "default" rule
+    // `this` 通过"默认"规则分配
 })();
 ```
 
-As you can see, the function expression value is put onto the expression stack, and then it's invoked with the `()` on the end.
+如你所见，函数表达式值被放在表达式栈上，然后在末尾用 `()` 调用。
 
-But what about this code:
+但是这段代码呢：
 
 ```js
 (point.init)(3,4);
 ```
 
-What will be the outcome of that code?
+那段代码的结果会是什么？
 
-By the same reasoning we've seen in the previous examples, it stands to reason that the `point.init` expression puts the function value onto the expression stack, and then invoked indirectly with `(3,4)`.
+根据我们在前面的例子中看到的相同推理，`point.init` 表达式将函数值放在表达式栈上，然后用 `(3,4)` 间接调用，这似乎是合理的。
 
-Not quite, though! JS grammar has a special rule to handle the invocation form `(someIdentifier)(..)` as if it had been `someIdentifier(..)` (without the `(..)` around the identifier name).
+但不完全是！JS 语法有一条特殊规则来处理调用形式 `(someIdentifier)(..)`，就像它是 `someIdentifier(..)` 一样（标识符名称周围没有 `(..)`）。
 
-Wondering why you might want to ever force the *default context* for `this` assignment via an indirect function invocation?
+想知道为什么你会想要通过间接函数调用强制 `this` 赋值为*默认上下文*吗？
 
-### Accessing `globalThis`
+### 访问 `globalThis` (Accessing `globalThis`)
 
-Before we answer that, let's introduce another way of performing indirect function `this` assignment. Thus far, the indirect function invocation patterns shown are sensitive to strict-mode. But what if we wanted an indirect function `this` assignment that doesn't respect strict-mode.
+在我们回答这个问题之前，让我们介绍另一种执行间接函数 `this` 赋值的方法。到目前为止，显示的间接函数调用模式对严格模式很敏感。但是如果我们想要一种不遵守严格模式的间接函数 `this` 赋值呢。
 
-The `Function(..)` constructor takes a string of code and dynamically defines the equivalent function. However, it always does so as if that function had been declared in the global scope. And furthermore, it ensures such function *does not* run in strict-mode, no matter the strict-mode status of the program. That's the same outcome as running an indirect
+`Function(..)` 构造函数接受一串代码并动态定义等效函数。然而，它总是像在全局作用域中声明该函数一样执行。此外，它确保此类函数*不*在严格模式下运行，无论程序的严格模式状态如何。这与运行间接调用结果相同。
 
-One niche usage of such strict-mode agnostic indirect function `this` assignment is for getting a reliable reference to the true global object prior to when the JS specification actually defined the `globalThis` identifier (for example, in a polyfill for it):
+这种严格模式无关的间接函数 `this` 赋值的一个小众用法是在 JS 规范实际定义 `globalThis` 标识符之前（例如，在它的 polyfill 中）获得对真实全局对象的可靠引用：
 
 ```js
 "use strict";
@@ -1184,7 +1182,7 @@ var gt = new Function("return this")();
 gt === globalThis;                      // true
 ```
 
-In fact, a similar outcome, using the comma operator trick (see previous section) and `eval(..)`:
+实际上，使用逗号操作符技巧（见上一节）和 `eval(..)` 也可以得到类似的结果：
 
 ```js
 "use strict";
@@ -1196,18 +1194,18 @@ function getGlobalThis() {
 getGlobalThis() === globalThis;      // true
 ```
 
-| NOTE: |
+| 注意: |
 | :--- |
-| `eval("this")` would be sensitive to strict-mode, but `(1,eval)("this")` is not, and therefor reliably gives us the `globalThis` in any program. |
+| `eval("this")` 会对严格模式敏感，但 `(1,eval)("this")` 不会，因此在任何程序中都能可靠地给我们 `globalThis`。 |
 
-Unfortunately, the `new Function(..)` and `(1,eval)(..)` approaches both have an important limitation: that code will be blocked in browser-based JS code if the app is served with certain Content-Security-Policy (CSP) restrictions, disallowing dynamic code evaluation (for security reasons).
+不幸的是，`new Function(..)` 和 `(1,eval)(..)` 方法都有一个重要的限制：如果应用程序是在某些内容安全策略 (CSP) 限制下服务的，禁止动态代码评估（出于安全原因），那么在基于浏览器的 JS 代码中，该代码将被阻止。
 
-Can we get around this? Yes, mostly. [^globalThisPolyfill]
+我们可以绕过这个吗？是的，基本上可以。[^globalThisPolyfill]
 
-The JS specification says that a getter function defined on the global object, or on any object that inherits from it (like `Object.prototype`), runs the getter function with `this` context assigned to `globalThis`, regardless of the program's strict-mode.
+JS 规范说，定义在全局对象或任何继承自它的对象（如 `Object.prototype`）上的 getter 函数，在运行 getter 函数时会将 `this` 上下文分配给 `globalThis`，无论程序的严格模式如何。
 
 ```js
-// Adapted from: https://mathiasbynens.be/notes/globalthis#robust-polyfill
+// 改编自: https://mathiasbynens.be/notes/globalthis#robust-polyfill
 function getGlobalThis() {
     Object.defineProperty(Object.prototype,"__get_globalthis__",{
         get() { return this; },
@@ -1221,13 +1219,13 @@ function getGlobalThis() {
 getGlobalThis() === globalThis;      // true
 ```
 
-Yeah, that's super gnarly. But that's JS `this` for you!
+是的，那真是太粗糙了。但这就是给你的 JS `this`！
 
-### Template Tag Functions
+### 模板标签函数 (Template Tag Functions)
 
-There's one more unusual variation of function invocation we should cover: tagged template functions.
+还有一种我们需要涵盖的函数调用的不寻常变体：带标签的模板函数。
 
-Template strings -- what I prefer to call interpolated literals -- can be "tagged" with a prefix function, which is invoked with the parsed contents of the template literal:
+模板字符串 —— 我更喜欢称之为插值字面量 —— 可以用前缀函数“标记”，该函数会用模板字面量的解析内容进行调用：
 
 ```js
 function tagFn(/* .. */) {
@@ -1237,13 +1235,13 @@ function tagFn(/* .. */) {
 tagFn`actually a function invocation!`;
 ```
 
-As you can see, there's no `(..)` invocation syntax, just the tag function (`tagFn`) appearing before the `` `template literal` ``; whitespace is allowed between them, but is very uncommon.
+如你所见，没有 `(..)` 调用语法，只是标签函数 (`tagFn`) 出现在 `` `template literal` `` 之前；它们之间允许有空格，但这很不常见。
 
-Despite the strange appearance, the function `tagFn(..)` will be invoked. It's passed the list of one or more string literals that were parsed from the template literal, along with any interpolated expression values that were encountered.
+尽管外观奇怪，函数 `tagFn(..)` 将被调用。它被传递了从模板字面量解析出的一个或多个字符串字面量列表，以及遇到的任何插值表达式值。
 
-We're not going to cover all the ins and outs of tagged template functions -- they're seriously one of the most powerful and interesting features ever added to JS -- but since we're talking about `this` assignment in function invocations, for completeness sake we need to talk about how `this` will be assigned.
+我们不打算涵盖带标签的模板函数的所有细节 —— 它们确实是 JS 添加的最强大和有趣的功能之一 —— 但既然我们在讨论函数调用中的 `this` 赋值，为了完整性起见，我们需要谈谈 `this` 将如何被赋值。
 
-The other form for tag functions you may encounter is:
+你可能遇到的标签函数的另一种形式是：
 
 ```js
 var someObj = {
@@ -1253,18 +1251,18 @@ var someObj = {
 someObj.tagFn`also a function invocation!`;
 ```
 
-Here's the easy explanation: `` tagFn`..` `` and `` someObj.tagFn`..` `` will each have `this`-assignment behavior corresponding to call-sites as `tagFn(..)` and `someObj.tagFn(..)`, respectively. In other words, `` tagFn`..` `` behaves by the *default context* assignment rule (#4), and `` someObj.tagFn`..` `` behaves by the *implicit context* assignment rule (#3).
+这是一个简单的解释：`` tagFn`..` `` 和 `` someObj.tagFn`..` `` 将分别具有对应于调用位置如 `tagFn(..)` 和 `someObj.tagFn(..)` 的 `this` 赋值行为。换句话说，`` tagFn`..` `` 遵循*默认上下文*赋值规则 (#4)，而 `` someObj.tagFn`..` `` 遵循*隐式上下文*赋值规则 (#3)。
 
-Luckily for us, we don't need to worry about the `new` or `call(..)` / `apply(..)` assignment rules, as those forms aren't possible with tag functions.
+通过我们很幸运，我们不需要担心 `new` 或 `call(..)` / `apply(..)` 赋值规则，因为这些形式对于标签函数是不可能的。
 
-It should be pointed out that it's pretty rare for a tagged template literal function to be defined as `this`-aware, so it's fairly unlikely you'll need to apply these rules. But just in case, now you're in the *know*.
+应该指出的是，将带标签的模板函数定义为 `this`-aware 是非常罕见的，所以你不太可能需要应用这些规则。但以防万一，现在你*知道*了。
 
-## Stay Aware
+## 保持感知 (Stay Aware)
 
-So, that's `this`. I'm willing to bet for many of you, it was a bit more... shall we say, involved... than you might have been expecting.
+所以，那是 `this`。我敢打赌，对于你们中的许多人来说，这比你们预期的要……我们可以说，更复杂一些……
 
-The good news, perhaps, is that in practice you don't often trip over all these different complexities. But the more you use `this`, the more it requires you, and the readers of your code, to understand how it actually works.
+好消息，也许，是在实践中你通常不会被所有这些不同的复杂性绊倒。但你使用 `this` 越多，就越需要你以及你的代码读者了解它实际上是如何工作的。
 
-The lesson here is that you should be intentional and aware of all aspects of `this` before you go sprinkling it about your code. Make sure you're using it most effectively and taking full advantage of this important pillar of JS.
+这里的教训是，在你把 `this` 撒遍代码之前，你应该有意识地了解 `this` 的所有方面。确保你最有效地使用它，并充分利用 JS 的这一重要支柱。
 
 [^globalThisPolyfill]: "A horrifying globalThis polyfill in universal JavaScript"; Mathias Bynens; April 18 2019; https://mathiasbynens.be/notes/globalthis#robust-polyfill ; Accessed July 2022

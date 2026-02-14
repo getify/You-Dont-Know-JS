@@ -1,16 +1,16 @@
-# You Don't Know JS Yet: Types & Grammar - 2nd Edition
+# 你并不了解 JavaScript：类型与语法 - 第二版
 
-| NOTE: |
+| 备注： |
 | :--- |
-| Work in progress |
+| 正在进行中 |
 
-[Table of Contents](toc.md)
+[目录](toc.md)
 
-* [Foreword](foreword.md) (by TBA)
-* [Preface](../preface.md)
-* [Chapter 1: Primitive Values](ch1.md)
-* [Chapter 2: Primitive Behaviors](ch2.md)
-* [Chapter 3: Object Values](ch3.md)
-* [Chapter 4: Coercing Values](ch4.md)
-* Chapter 5: TODO
-* [Thank You!](thanks.md)
+* [前言](foreword.md) (由 TBA 撰写)
+* [序言](../preface.md)
+* [第一章：原始值](ch1.md)
+* [第二章：原始类型的行为](ch2.md)
+* [第三章：对象值](ch3.md)
+* [第四章：强制类型转换](ch4.md)
+* 第五章：TODO
+* [感谢！](thanks.md)

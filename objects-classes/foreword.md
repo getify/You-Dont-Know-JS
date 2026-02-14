@@ -1,15 +1,15 @@
-# You Don't Know JS Yet: Objects & Classes - 2nd Edition
-# Foreword
+# 你不知道的 JavaScript：对象与类 - 第 2 版
+# 序
 
-Kyle Simpson has an unmatched brilliance in the art of explanation.
+Kyle Simpson 在阐述解释的艺术上拥有一种无与伦比的才华。
 
-In April of 2015 I was honored to author the foreword for Kyle's book [You Don't Know JS: ES6 & Beyond](https://www.oreilly.com/library/view/you-dont-know/9781491905241/), an exciting and detailed deep-dive into new JavaScript language features that hadn't even yet been ratified by Ecma (that wouldn't happen until June 2015), but had already made their way out into the world. At the time, there was gap in meaningful documentation and educational resources, and I declared that no better person had stepped up to fill it. I stand by everything I wrote in 2015, and I'm here in 2022 to double down for [You Don't Know JS Yet: Objects & Classes]().
+2015 年 4 月，我有幸为 Kyle 的著作 [你不知道的 JavaScript: ES6 & 展望](https://www.oreilly.com/library/view/you-dont-know/9781491905241/) 撰写序言。那是一次令人兴奋且详尽的深度探索，剖析了当时尚未被 Ecma 正式批准（直到 2015 年 6 月才发生），却已经开始在业界崭露头角的 JavaScript 新语言特性。在当时，针对这些内容的有价值文档和教育资源尚存在空白，我曾断言，没有人比他更适合来填补这一空白。我对自己 2015 年所写的一切深信不疑，而今 2022 年，我在这里要为 [你并不了解 JavaScript：对象与类]() 再次重申这一点。
 
-We are all better off for the time, effort and resources that Kyle pours into forming a better understanding of the JavaScript programming language for himself, and for the betterment of his peers: learning, honing and distilling complex semantics into easily digestable concepts that can be built upon in infinite, myriad ways. And that's exactly what we witness here: Kyle becomes an expert in programming subject matter by consuming it at every level. By probing the semantics of new language features, luring them out from the shadows, releasing them from arcane origins and freeing them for our consumption and growth.
+Kyle 倾注了大量的时间、精力和资源，致力于让自己以及同行们更好地理解 JavaScript 编程语言，我们都因此受益匪浅：他学习、打磨并将复杂的语义提炼为易于消化的概念，使我们能够在此基础上构建出无数种可能。这正是我们在此所见证的：Kyle 通过全方位的钻研成为了编程领域的专家。他探索新语言特性的语义，将其从阴影中引出，从晦涩的本源中释放，使其自由地供我们使用和成长。
 
-Even as a successful professional software engineer, I keep Kyle's works close at hand. At times these tomes are helpful in explaining deeply complex concepts to teammates and peers, while other times they serve as refreshers for myself, because there's always some interesting take-away or new perspective to gain.
+即便作为一名成功的专业软件工程师，我也常将 Kyle 的著作带在身边。有时，这些书籍有助于向队友和同行解释深奥复杂的概念；而其他时候，它们则是我自己的复习资料，因为总能从中获得一些有趣的收获或新的视角。
 
 Rick Waldron (@rwaldron)<br>
-Lead Software Engineer<br>
-Lightning Web Security<br>
+首席软件工程师<br>
+Lightning Web 安全性<br>
 Salesforce

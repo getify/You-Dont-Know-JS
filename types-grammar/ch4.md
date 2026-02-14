@@ -1,60 +1,60 @@
-# You Don't Know JS Yet: Types & Grammar - 2nd Edition
-# Chapter 4: Coercing Values
+# 你并不了解 JavaScript：类型与语法 - 第 2 版
+# 第 4 章：强制类型转换
 
-| NOTE: |
+| 注意： |
 | :--- |
-| Work in progress |
+| 草稿 |
 
-We've thoroughly covered all of the different *types* of values in JS. And along the way, more than a few times, we mentioned the notion of converting -- actually, coercing -- from one type of value to another.
+我们已经系统讲完了 JS 里各种不同的值*类型*。在这个过程中，我们也不止一次提到过：从一种值类型转换到另一种值类型——更准确地说，是发生*强制类型转换*（coercion）。
 
-In this chapter, we'll dive deep into coercion and uncover all its mysteries.
+本章我们就深入这个主题，把强制类型转换里的细节彻底拆开看清楚。
 
-## Coercion: Explicit vs Implicit
+## 强制类型转换：显式 vs 隐式
 
-Some developers assert that when you explicitly indicate a type change in an operation, this doesn't qualify as a *coercion* but just a type-cast or type-conversion. In other words, the claim is that coercion is only implicit.
+有些开发者主张：当你在操作中明确写出了类型变化，这不该算 *coercion*，只能叫 type-cast 或 type-conversion。换句话说，他们认为 coercion 只可能是隐式的。
 
-I disagree with this characterization. I use *coercion* to label any type conversion in a dynamically-typed language, whether it's plainly obvious in the code or not. Here's why: the line between *explicit* and *implicit* is not clear and objective, it's fairly subjective. If you think a type conversion is implicit (and thus *coercion*), but I think it's explicit (and thus not a *coercion*), the distinction becomes irrelevant.
+我不同意这种划分。在动态类型语言里，我会把任何类型转换都称作 *coercion*，不管它在代码里是否一眼可见。原因是：*显式* 与 *隐式* 的边界并不客观清晰，它高度主观。你觉得某次类型转换是隐式（因此是 *coercion*），而我觉得它是显式（于是你说它不算 *coercion*），这种区分本身就失去意义了。
 
-Keep that subjectivity in mind as we explore various *explicit* and *implicit* forms of coercion. In fact, here's a spoiler: most of the coercions could be argued as either, so we'll be looking at them with such balanced perspective.
+接下来我们会同时考察各种*显式*与*隐式*的强制类型转换。提前剧透一下：大多数场景都能被争论成两边之一，所以我们会尽量以平衡视角去看。
 
-### Implicit: Bad or ...?
+### 隐式：坏，还是……？
 
-An extremely common opinion among JS developers is that *coercion is bad*, specifically, that *implicit coercion is bad*; the rise in popularity of type-aware tooling like TypeScript speaks loudly to this sentiment.
+在 JS 开发者里有个非常常见的观点：*coercion 是坏的*，更具体地说，*隐式 coercion 是坏的*。TypeScript 这类“类型意识（type-aware）”工具的流行，也很能说明这种倾向。
 
-But that feeling is not new. 14+ years ago, Douglas Crockford's book "The Good Parts" also famously decried *implicit coercion* as one of the *bad parts*. Even Brendan Eich, creator of JS, regularly claims that *implicit coercion* was a mistake[^EichCoercion] in the early design of the language that he now regrets.
+但这不是新观点。14 年前，Douglas Crockford 的《The Good Parts》就把*隐式 coercion*列为 JS 的 *bad parts* 之一。甚至 JS 的创造者 Brendan Eich 也经常表示，早期语言设计里加入*隐式 coercion*是个失误[^EichCoercion]，如今他对此感到后悔。
 
-If you've been around JS for more than a few months, you've almost certainly heard these opinions voiced strongly and predominantly. And if you've been around JS for years or more, you probably have your mind already made up.
+只要你接触 JS 超过几个月，几乎一定听过这类强烈、主流的说法。如果你接触 JS 已有很多年，很可能你也早已有定见。
 
-In fact, I think you'd be hard pressed to name hardly any other well-known source of JS teaching that strongly endorses coercion (in virtually all its forms); I do -- and this book definitely does! -- but I feel mostly like a lone voice shouting futilely in the wilderness.
+事实上，你很难再找出另一个知名 JS 教学来源，会像我这样强力支持 coercion（几乎所有形式）；我支持——本书也支持！——但很多时候我都像是在荒野里徒劳呐喊的孤独声音。
 
-However, here's an observation I've made over the years: most of the folks who publicly condemn *implicit coercion*, actually use *implicit coercion* in their own code. Hmmmm...
+不过这些年我有个观察：许多公开谴责*隐式 coercion*的人，自己写代码时其实也在用*隐式 coercion*。嗯……
 
-Douglas Crockford says to avoid the mistake of *implicit coercion*[^CrockfordCoercion], but his code uses `if (..)` statements with non-boolean values evaluated. [^CrockfordIfs] Many have dismissed my pointing that out in the past, with the claim that conversion-to-boolean isn't *really* coercion. Ummm... ok?
+Douglas Crockford 说要避免*隐式 coercion*这个错误[^CrockfordCoercion]，但他的代码里也写 `if (..)`，并让非布尔值参与条件判断[^CrockfordIfs]。过去我指出这一点时，很多人会反驳说“转成布尔不算真正 coercion”。呃……好吧？
 
-Brendan Eich says he regrets *implicit coercion*, but yet he openly endorses[^BrendanToString] idioms like `x + ""` (and others!) to coerce the value in `x` to a string (we'll cover this later); and that's most definitely an *implicit coercion*.
+Brendan Eich 说他后悔*隐式 coercion*，但他又公开推荐[^BrendanToString] `x + ""` 这类习惯写法（还有别的！）把 `x` 强制成字符串（后面会讲）；而这显然就是*隐式 coercion*。
 
-So what do we make of this dissonance? Is it merely a, "do as I say, not as I do" minor self-contradiction? Or is there more to it?
+那我们该怎么看这种不一致？只是“嘴上这么说、手上那么做”的小矛盾？还是背后另有更深层含义？
 
-I am not going to pass a final judgement here yet, but I want you the reader to deeply ponder that question, as you continue throughout this chapter and book.
+我现在不急着下最终结论。我希望你在继续阅读本章与全书时，认真反复思考这个问题。
 
-## Abstracts
+## 抽象操作（Abstracts）
 
-Now that I've challenged you to examine coercion in more depth than you may have ever previously indulged, let's first look at the foundations of how coercion occurs, according to the JS specification.
+现在我已经“逼”你用比以往更深的层次审视 coercion，我们先从 JS 规范里 coercion 的基础机制讲起。
 
-The specification details a number of *abstract operations*[^AbstractOperations] that dictate internal conversion from one value-type to another. It's important to be aware of these operations, as coercive mechanics in the language mix and match them in various ways.
+规范定义了一组*抽象操作*（abstract operations）[^AbstractOperations]，它们描述了内部如何从一种值类型转换到另一种值类型。理解这些操作很重要，因为语言里具体 coercion 机制会以不同方式组合调用它们。
 
-These operations *look* as if they're real functions that could be called, such as `ToString(..)` or `ToNumber(..)`. But by *abstract*, we mean they only exist conceptually by these names; they aren't functions we can *directly* invoke in our programs. Instead, we activate them implicitly/indirectly depending on the statements/expressions in our programs.
+这些操作看起来像可以直接调用的真实函数，比如 `ToString(..)`、`ToNumber(..)`。但所谓 *abstract* 的意思是：这些名字只是概念层面的标识，并不是你能在程序里*直接调用*的函数。我们只能通过代码中的语句/表达式，间接触发它们。
 
 ### ToBoolean
 
-Decision making (conditional branching) always requires a boolean `true` or `false` value. But it's extremely common to want to make these decisions based on non-boolean value conditions, such as whether a string is empty or has anything in it.
+所有决策（条件分支）最终都要求一个布尔值 `true` 或 `false`。但在实际开发里，我们又经常希望依据非布尔值做判断，比如某个字符串是空还是非空。
 
-When non-boolean values are encountered in a context that requires a boolean -- such as the condition clause of an `if` statement or `for` loop -- the `ToBoolean(..)`[^ToBoolean] abstract operation is activated to facilitate the coercion.
+当非布尔值出现在需要布尔值的上下文（例如 `if` 条件、`for` 条件）时，就会触发抽象操作 `ToBoolean(..)`[^ToBoolean] 来完成 coercion。
 
-All values in JS are in one of two buckets: *truthy* or *falsy*. Truthy values coerce via the `ToBoolean()` operation to `true`, whereas falsy values coerce to `false`:
+JS 的所有值都落在两个桶之一：*truthy* 或 *falsy*。truthy 值经过 `ToBoolean()` 会变成 `true`，falsy 值会变成 `false`：
 
 ```
-// ToBoolean() is abstract
+// ToBoolean() 是抽象操作
 
 ToBoolean(undefined);               // false
 ToBoolean(null);                    // false
@@ -65,7 +65,7 @@ ToBoolean(0n);                      // false
 ToBoolean(NaN);                     // false
 ```
 
-Simple rule: *any other value* that's not in the above list is truthy and coerces via `ToBoolean()` to `true`:
+规则很简单：*除上面列表外的任何值*都属于 truthy，经 `ToBoolean()` 变成 `true`：
 
 ```
 ToBoolean("hello");                 // true
@@ -74,40 +74,40 @@ ToBoolean([ 1, 2, 3 ]);             // true
 ToBoolean({ a: 1 });                // true
 ```
 
-Even values like `"   "` (string with only whitespace), `[]` (empty array), and `{}` (empty object), which may seem intuitively like they're more "false" than "true", nevertheless coerce to `true`.
+就算是 `"   "`（只有空白字符的字符串）、`[]`（空数组）、`{}`（空对象）这类直觉上“更像 false”的值，也一样会 coercion 到 `true`。
 
-| WARNING: |
+| 警告： |
 | :--- |
-| There *are* narrow, tricky exceptions to this truthy rule. For example, the web platform has deprecated the long-standing `document.all` collection/array feature, though it cannot be removed entirely -- that would break too many sites. Even where `document.all` is still defined, it behaves as a "falsy object"[^ExoticFalsyObjects] -- `undefined` which then coerces to `false`; this means legacy conditional checks like `if (document.all) { .. }` no longer pass. |
+| 这个 truthy 规则确实存在极少数棘手例外。比如 Web 平台里长期存在但已废弃的 `document.all` 集合特性，虽然不能彻底移除（会破坏太多站点）。在仍定义 `document.all` 的环境里，它表现为一种“falsy object”[^ExoticFalsyObjects]——行为上像 `undefined` 并最终 coercion 到 `false`；因此老式检测 `if (document.all) { .. }` 已经不会成立。 |
 
-The `ToBoolean()` coercion operation is basically a lookup table rather than an algorithm of steps to use in coercions a non-boolean to a boolean. Thus, some developers assert that this isn't *really* coercion the way other abstract coercion operations are. I think that's bogus. `ToBoolean()` converts from non-boolean value-types to a boolean, and that's clear cut type coercion (even if it's a very simple lookup instead of an algorithm).
+`ToBoolean()` 更像一张查表，而不是“把非布尔值转布尔”的分步算法。于是有些人主张这不算“真正的 coercion”。我认为这说法不成立。`ToBoolean()` 的确在把非布尔值类型转换成布尔值，这就是清晰的类型强制转换（即便实现方式只是查表，不是复杂算法）。
 
-Keep in mind: these rules of boolean coercion only apply when `ToBoolean()` is actually activated. There are constructs/idioms in the JS language that may appear to involve boolean coercion but which don't actually do so. More on these later.
+要记住：这些布尔 coercion 规则只在 `ToBoolean()` 被触发时才适用。JS 里有些写法看起来“像是在做布尔 coercion”，但实际上并没有触发它。后面会讲。
 
 ### ToPrimitive
 
-Any value that's not already a primitive can be reduced to a primitive using the `ToPrimitive()` (specifically, `OrdinaryToPrimitive()`[^OrdinaryToPrimitive]) abstract operation.  Generally, the `ToPrimitive()` is given a *hint* to tell it whether a `number` or `string` is preferred.
+凡是不是原始值（primitive）的值，都可以借助 `ToPrimitive()`（具体是 `OrdinaryToPrimitive()`[^OrdinaryToPrimitive]）降到原始值。通常 `ToPrimitive()` 会收到一个 *hint*，告诉它更偏好 `number` 还是 `string`。
 
 ```
-// ToPrimitive() is abstract
+// ToPrimitive() 是抽象操作
 
 ToPrimitive({ a: 1 },"string");          // "[object Object]"
 
 ToPrimitive({ a: 1 },"number");          // NaN
 ```
 
-The `ToPrimitive()` operation will look on the object provided, for either a `toString()` method or a `valueOf()` method; the order it looks for those is controlled by the *hint*. `"string"` means check in `toString()` / `valueOf()` order, whereas `"number"` (or no *hint*) means check in `valueOf()` / `toString()` order.
+`ToPrimitive()` 会在对象上查找 `toString()` 或 `valueOf()`；查找顺序由 *hint* 决定。`"string"` 表示先 `toString()` 再 `valueOf()`；`"number"`（或没给 *hint*）表示先 `valueOf()` 再 `toString()`。
 
-If the method returns a value matching the *hinted* type, the operation is finished. But if the method doesn't return a value of the *hinted* type, `ToPrimitive()` will then look for and invoke the other method (if found).
+若方法返回值匹配 *hint* 期望类型，操作就结束。若不匹配，则会再尝试另一个方法（若存在）。
 
-If the attempts at method invocation fail to produce a value of the *hinted* type, the final return value is forcibly coerced via the corresponding abstract operation: `ToString()` or `ToNumber()`.
+如果这两个方法都没产出符合 *hint* 的值，最终返回值会再被强制走对应抽象操作：`ToString()` 或 `ToNumber()`。
 
 ### ToString
 
-Pretty much any value that's not already a string can be coerced to a string representation, via `ToString()`. [^ToString] This is usually quite intuitive, especially with primitive values:
+几乎所有非字符串值都可通过 `ToString()` coercion 成字符串表示[^ToString]。对原始值来说这通常很直观：
 
 ```
-// ToString() is abstract
+// ToString() 是抽象操作
 
 ToString(42.0);                 // "42"
 ToString(-3);                   // "-3"
@@ -122,34 +122,34 @@ ToString(null);                 // "null"
 ToString(undefined);            // "undefined"
 ```
 
-There are *some* results that may vary from common intuition. As mentioned in Chapter 2, very large or very small numbers will be represented using scientific notation:
+也有一些结果不太符合直觉。正如第 2 章提到的，非常大或非常小的数会用科学计数法表示：
 
 ```
 ToString(Number.MAX_VALUE);     // "1.7976931348623157e+308"
 ToString(Math.EPSILON);         // "2.220446049250313e-16"
 ```
 
-Another counter-intuitive result comes from `-0`:
+另一个反直觉点是 `-0`：
 
 ```
 ToString(-0);                   // "0" -- wtf?
 ```
 
-This isn't a bug, it's just an intentional behavior from the earliest days of JS, based on the assumption that developers generally wouldn't want to ever see a negative-zero output.
+这不是 bug，而是 JS 早期就故意设定的行为，假定开发者通常不希望看到负零输出。
 
-One primitive value-type that is *not allowed* to be coerced (implicitly, at least) to string is `symbol`:
+有一种原始值类型*不允许*（至少不允许隐式）coercion 到字符串：`symbol`。
 
 ```
-ToString(Symbol("ok"));         // TypeError exception thrown
+ToString(Symbol("ok"));         // 抛出 TypeError 异常
 ```
 
-| WARNING: |
+| 警告： |
 | :--- |
-| Calling the `String()`[^StringFunction] concrete function (without `new` operator) is generally thought of as *merely* invoking the `ToString()` abstract operation. While that's mostly true, it's not entirely so. `String(Symbol("ok"))` works, whereas the abstract `ToString(Symbol(..))` itself throws an exception. More on `String(..)` later in this chapter. |
+| 调用具体函数 `String()`[^StringFunction]（不带 `new`）通常被认为“只是”在触发 `ToString()`。这大体上没错，但并不完全正确。`String(Symbol("ok"))` 可以工作，而抽象的 `ToString(Symbol(..))` 本身会抛异常。本章稍后会继续讲 `String(..)`。 |
 
-#### Default `toString()`
+#### 默认 `toString()`
 
-When `ToString()` is activated with an object value-type, it delegates to the `ToPrimitive()` operation (as explained earlier), with `"string"` as its *hinted* type:
+当 `ToString()` 作用于对象类型值时，它会委托给 `ToPrimitive()`（前面解释过），并以 `"string"` 作为 *hint*：
 
 ```
 ToString(new String("abc"));        // "abc"
@@ -159,14 +159,14 @@ ToString({ a: 1 });                 // "[object Object]"
 ToString([ 1, 2, 3 ]);              // "1,2,3"
 ```
 
-By virtue of `ToPrimitive(..,"string")` delegation, these objects all have their default `toString()` method (inherited via `[[Prototype]]`) invoked.
+由于委托的是 `ToPrimitive(..,"string")`，这些对象都会调用其默认 `toString()` 方法（通过 `[[Prototype]]` 继承得到）。
 
 ### ToNumber
 
-Non-number values *that resemble* numbers, such as numeric strings, can generally be coerced to a numeric representation, using `ToNumber()`: [^ToNumber]
+像数字字符串这类“看起来像数字”的非数字值，通常能借助 `ToNumber()` coercion 成数值表示[^ToNumber]：
 
 ```
-// ToNumber() is abstract
+// ToNumber() 是抽象操作
 
 ToNumber("42");                     // 42
 ToNumber("-3");                     // -3
@@ -174,14 +174,14 @@ ToNumber("1.2300");                 // 1.23
 ToNumber("   8.0    ");             // 8
 ```
 
-If the full value doesn't *completely* (other than whitespace) resemble a valid number, the result will be `NaN`:
+如果整个值（除空白外）不能*完整*匹配合法数字，结果是 `NaN`：
 
 ```
 ToNumber("123px");                  // NaN
 ToNumber("hello");                  // NaN
 ```
 
-Other primitive values have certain designated numeric equivalents:
+其他原始值也有指定的数值映射：
 
 ```
 ToNumber(true);                     // 1
@@ -191,33 +191,33 @@ ToNumber(null);                     // 0
 ToNumber(undefined);                // NaN
 ```
 
-There are some rather surprising designations for `ToNumber()`:
+`ToNumber()` 里还有一些比较“意外”的映射：
 
 ```
 ToNumber("");                       // 0
 ToNumber("       ");                // 0
 ```
 
-| NOTE: |
+| 注意： |
 | :--- |
-| I call these "surprising" because I think it would have made much more sense for them to coerce to `NaN`, the way `undefined` does. |
+| 我说“意外”，是因为我认为它们 coercion 到 `NaN`（像 `undefined` 那样）会更合理。 |
 
-Some primitive values are *not allowed* to be coerced to numbers, and result in exceptions rather than `NaN`:
+有些原始值*不允许* coercion 到数字，这时不是 `NaN`，而是异常：
 
 ```
-ToNumber(42n);                      // TypeError exception thrown
-ToNumber(Symbol("42"));             // TypeError exception thrown
+ToNumber(42n);                      // 抛出 TypeError 异常
+ToNumber(Symbol("42"));             // 抛出 TypeError 异常
 ```
 
-| WARNING: |
+| 警告： |
 | :--- |
-| Calling the `Number()`[^NumberFunction] concrete function (without `new` operator) is generally thought of as *merely* invoking the `ToNumber()` abstract operation to coerce a value to a number. While that's mostly true, it's not entirely so. `Number(42n)` works, whereas the abstract `ToNumber(42n)` itself throws an exception. |
+| 调用具体函数 `Number()`[^NumberFunction]（不带 `new`）通常也被理解为“只是”触发 `ToNumber()` 把值转成 number。大体对，但不完全。`Number(42n)` 可以工作，而抽象 `ToNumber(42n)` 本身会抛异常。 |
 
-#### Other Abstract Numeric Conversions
+#### 其他抽象数值转换
 
-In addition to `ToNumber()`, the specification defines `ToNumeric()`, which activates `ToPrimitive()` on a value, then conditionally delegates to `ToNumber()` if the value is *not* already a `bigint` value-type.
+除了 `ToNumber()`，规范还定义了 `ToNumeric()`：先对值触发 `ToPrimitive()`，然后若该值还不是 `bigint` 类型，再有条件委托给 `ToNumber()`。
 
-There are also a wide variety of abstract operations related to converting values to very specific subsets of the general `number` type:
+规范里还定义了很多把值转换到 `number` 更窄子集的抽象操作：
 
 * `ToIntegerOrInfinity()`
 * `ToInt32()`
@@ -228,18 +228,18 @@ There are also a wide variety of abstract operations related to converting value
 * `ToUint8()`
 * `ToUint8Clamp()`
 
-Other operations related to `bigint`:
+与 `bigint` 相关的还有：
 
 * `ToBigInt()`
 * `StringToBigInt()`
 * `ToBigInt64()`
 * `ToBigUint64()`
 
-You can probably infer the purpose of these operations from their names, and/or from consulting their algorithms in the specification. For most JS operations, it's more likely that a higher-level operation like `ToNumber()` is activated, rather than these specific ones.
+这些操作从名字大概就能猜出用途，也可以去规范里直接看算法细节。大多数 JS 操作更常触发的是 `ToNumber()` 这类高层操作，而不是这些更具体的转换。
 
-#### Default `valueOf()`
+#### 默认 `valueOf()`
 
-When `ToNumber()` is activated on an object value-type, it instead delegates to the `ToPrimitive()` operation (as explained earlier), with `"number"` as its *hinted* type:
+当 `ToNumber()` 作用于对象值类型时，它会委托到 `ToPrimitive()`（前面解释过），并以 `"number"` 作为 *hint*：
 
 ```
 ToNumber(new String("abc"));        // NaN
@@ -250,16 +250,16 @@ ToNumber([ 1, 2, 3 ]);              // NaN
 ToNumber([]);                       // 0
 ```
 
-By virtue of `ToPrimitive(..,"number")` delegation, these objects all have their default `valueOf()` method (inherited via `[[Prototype]]`) invoked.
+由于委托的是 `ToPrimitive(..,"number")`，这些对象都会调用其默认 `valueOf()` 方法（通过 `[[Prototype]]` 继承得到）。
 
-### Equality Comparison
+### 相等比较（Equality Comparison）
 
-When JS needs to determine if two values are the *same value*, it activates the `SameValue()`[^SameValue] operation, which delegates to a variety of related sub-operations.
+当 JS 要判断两个值是否为“同一个值”时，会触发 `SameValue()`[^SameValue]，它再委托给一组相关子操作。
 
-This operation is very narrow and strict, and performs no coercion or any other special case exceptions. If two values are *exactly* the same, the result is `true`, otherwise it's `false`:
+这个操作非常窄且严格：不做 coercion，也没有额外特例。两个值*完全相同*就返回 `true`，否则 `false`：
 
 ```
-// SameValue() is abstract
+// SameValue() 是抽象操作
 
 SameValue("hello","\x68ello");          // true
 SameValue("\u{1F4F1}","\uD83D\uDCF1");  // true
@@ -271,158 +271,158 @@ SameValue(0,-0);                        // false
 SameValue([1,2,3],[1,2,3]);             // false
 ```
 
-A variation of these operations is `SameValueZero()` and its associated sub-operations. The main difference is that these operations treat `0` and `-0` as indistinguishable.
+它还有一个变体 `SameValueZero()` 及其相关子操作。核心区别是：`0` 与 `-0` 在这里不区分。
 
 ```
-// SameValueZero() is abstract
+// SameValueZero() 是抽象操作
 
 SameValueZero(0,-0);                    // true
 ```
 
-If the values are numeric (`number` or `bigint`), `SameValue()` and `SameValueZero()` both delegate to sub-operations of the same names, specialized for each `number` and `bigint` type, respectively.
+如果比较的是数值（`number` 或 `bigint`），`SameValue()` 与 `SameValueZero()` 会分别委托给同名的 number/bigint 专用子操作。
 
-Otherwise, `SameValueNonNumeric()` is the sub-operation delegated to if the values being compared are both non-numeric:
+否则，如果双方都是非数值，则委托给 `SameValueNonNumeric()`：
 
 ```
-// SameValueNonNumeric() is abstract
+// SameValueNonNumeric() 是抽象操作
 
 SameValueNonNumeric("hello","hello");   // true
 
 SameValueNonNumeric([1,2,3],[1,2,3]);   // false
 ```
 
-#### Higher-Abstracted Equality
+#### 更高层抽象的相等性
 
-Different from `SameValue()` and its variations, the specification also defines two important higher-abstraction abstract equality comparison operations:
+除了 `SameValue()` 及其变体，规范还定义了两个更高层的抽象相等比较操作：
 
 * `IsStrictlyEqual()`[^StrictEquality]
 * `IsLooselyEqual()`[^LooseEquality]
 
-The `IsStrictlyEqual()` operation immediately returns `false` if the value-types being compared are different.
+`IsStrictlyEqual()` 在两侧值类型不同的情况下会立刻返回 `false`。
 
-If the value-types are the same, `IsStrictlyEqual()` delegates to sub-operations for comparing `number` or `bigint` values. [^NumericAbstractOps] You might logically expect these delegated sub-operations to be the aforementioned numeric-specialized `SameValue()` / `SameValueZero()` operations. However, `IsStrictlyEqual()` instead delegates to `Number:equal()`[^NumberEqual] or `BigInt:equal()`[^BigIntEqual].
+若值类型相同，`IsStrictlyEqual()` 会委托到 number/bigint 的比较子操作[^NumericAbstractOps]。你可能以为它会委托到前面提过的数值版 `SameValue()` / `SameValueZero()`；但实际上它委托的是 `Number:equal()`[^NumberEqual] 或 `BigInt:equal()`[^BigIntEqual]。
 
-The difference between `Number:SameValue()` and `Number:equal()` is that the latter defines corner cases for `0` vs `-0` comparison:
+`Number:SameValue()` 与 `Number:equal()` 的区别之一在于，后者对 `0` 与 `-0` 这个边角情况的定义不同：
 
 ```
-// all of these are abstract operations
+// 下面这些都是抽象操作
 
 Number:SameValue(0,-0);             // false
 Number:SameValueZero(0,-0);         // true
 Number:equal(0,-0);                 // true
 ```
 
-These operations also differ in `NaN` vs `NaN` comparison:
+它们在 `NaN` 与 `NaN` 比较上也不同：
 
 ```
 Number:SameValue(NaN,NaN);          // true
 Number:equal(NaN,NaN);              // false
 ```
 
-| WARNING: |
+| 警告： |
 | :--- |
-| So in other words, despite its name, `IsStrictlyEqual()` is not quite as "strict" as `SameValue()`, in that it *lies* when comparisons of `-0` or `NaN` are involved. |
+| 换句话说，虽然叫 `IsStrictlyEqual()`，它在涉及 `-0` 或 `NaN` 时并没有 `SameValue()` 那么“严格”。 |
 
-The `IsLooselyEqual()` operation also inspects the value-types being compared; if they're the same, it immediately delegates to `IsStrictlyEqual()`.
+`IsLooselyEqual()` 同样先看两侧值类型；若类型相同，它会立刻委托到 `IsStrictlyEqual()`。
 
-But if the value-types being compared are different, `IsLooselyEqual()` performs a variety of *coercive equality* steps. It's important to note that this algorithm is always trying to reduce the comparison down to where both value-types are the same (and it tends to prefer `number` / `bigint`).
+但如果两侧类型不同，`IsLooselyEqual()` 会执行一系列*强制相等*（coercive equality）步骤。关键点是：这个算法总在努力把比较降解到“双方类型一致”，而且通常偏向 `number` / `bigint`。
 
-The steps of the *coercive equality* portion of the algorithm can roughly be summarized as follows:
+这个 *coercive equality* 过程可大致概括为：
 
-1. If either value is `null` and the other is `undefined`, `IsLooselyEqual()` returns `true`. In other words, this algorithm applies *nullish* equality, in that `null` and `undefined` are coercively equal to each other (and to no other values).
+1. 一侧是 `null`、另一侧是 `undefined` 时，`IsLooselyEqual()` 返回 `true`。也就是说它支持 *nullish* 相等：`null` 与 `undefined` 强制相等（且不与其他值相等）。
 
-2. If either value is a `number` and the other is a `string`, the `string` value is coerced to a `number` via `ToNumber()`.
+2. 一侧是 `number`、另一侧是 `string` 时，把 `string` 通过 `ToNumber()` coercion 成 `number`。
 
-3. If either value is a `bigint` and the other is a `string`, the `string` value is coerced to a `bigint` via `StringToBigInt()`.
+3. 一侧是 `bigint`、另一侧是 `string` 时，把 `string` 通过 `StringToBigInt()` coercion 成 `bigint`。
 
-4. If either value is a `boolean`, it's coerced to a `number`.
+4. 一侧是 `boolean` 时，把它 coercion 成 `number`。
 
-5. If either value is a non-primitive (object, etc), it's coerced to a primitive with `ToPrimitive()`; though a *hint* is not explicitly provided, the default behavior will be as if `"number"` was the hint.
+5. 一侧是非原始值（对象等）时，用 `ToPrimitive()` coercion 成原始值；虽然没显式给 *hint*，默认行为等价于 `"number"` *hint*。
 
-Each time a coercion is performed in the above steps, the algorithm is *recursively* reactivated with the new value(s). That process continues until the types are the same, and then the comparison is delegated to the `IsStrictlyEqual()` operation.
+上述步骤每执行一次 coercion，算法都会以新值*递归*重启。直到类型一致，再委托给 `IsStrictlyEqual()` 比较。
 
-What can we take from this algorithm? First, we see there is a bias toward `number` (or `bigint`) comparison; it never coerce values to `string` or `boolean` value-types.
+这个算法说明了什么？首先它确实偏向 `number`（或 `bigint`）比较；它不会把值 coercion 到 `string` 或 `boolean` 去比。
 
-Importantly, we see that both `IsLooselyEqual()` and `IsStrictlyEqual()` are type-sensitive. `IsStrictlyEqual()` immediately bails if the types mismatch, whereas `IsLooselyEqual()` performs the extra work to coerce mismatching value-types to be the same value-types (again, ideally, `number` or `bigint`).
+更重要的是，`IsLooselyEqual()` 与 `IsStrictlyEqual()` 都是类型敏感的（type-sensitive）。`IsStrictlyEqual()` 类型不匹配就直接退出；`IsLooselyEqual()` 则会多做一步，把类型不匹配的一侧（理想上转成 `number`/`bigint`）调成同类型再比。
 
-Moreover, if/once the types are the same, both operations are identical -- `IsLooselyEqual()` delegates to `IsStrictlyEqual()`.
+并且，一旦类型相同，两者行为就一致——`IsLooselyEqual()` 会委托给 `IsStrictlyEqual()`。
 
-### Relational Comparison
+### 关系比较（Relational Comparison）
 
-When values are compared relationally -- that is, is one value "less than" another? -- there's one specific abstract operation that is activated: `IsLessThan()`. [^LessThan]
+当 JS 做关系比较（例如一个值是否“小于”另一个值）时，会触发 `IsLessThan()`[^LessThan] 这个抽象操作：
 
 ```
-// IsLessThan() is abstract
+// IsLessThan() 是抽象操作
 
 IsLessThan(1,2, /*LeftFirst=*/ true );            // true
 ```
 
-There is no `IsGreaterThan()` operation; instead, the first two arguments to `IsLessThan()` can be reversed to accomplish a "greater than" comparison. To preserve left-to-right evaluation semantics (in the case of nuanced side-effects), `isLessThan()` also takes a third argument (`LeftFirst`); if `false`, this indicates a comparison was reversed and the second parameter should be evaluated before the first.
+规范里没有 `IsGreaterThan()`；“大于”比较是通过交换 `IsLessThan()` 前两个参数实现。为保持从左到右求值语义（避免副作用顺序变化），`IsLessThan()` 还有第三个参数 `LeftFirst`；若为 `false`，表示参数顺序是反转比较，需要先计算第二个参数。
 
 ```
 IsLessThan(1,2, /*LeftFirst=*/ true );            // true
 
-// equivalent of a fictional "IsGreaterThan()"
-IsLessThan(2,1, /*LeftFirst=*/ false );          // false
+// 等价于一个虚构的 "IsGreaterThan()"
+IsLessThan(2,1, /*LeftFirst=*/ false );           // false
 ```
 
-Similar to `IsLooselyEqual()`, the `IsLessThan()` operation is *coercive*, meaning that it first ensures that the value-types of its two values match, and prefers numeric comparisons. There is no `IsStrictLessThan()` for non-coercive relational comparison.
+和 `IsLooselyEqual()` 类似，`IsLessThan()` 也是*带 coercion 的*；它会先确保两边值类型匹配，且偏向数值比较。不存在一个不做 coercion 的 `IsStrictLessThan()`。
 
-As an example of coercive relational comparison, if the type of one value is `string` and the type of the other is `bigint`, the `string` is coerced to a `bigint` with the aforementioned `StringToBigInt()` operation. Once the types are the same, `IsLessThan()` proceeds as described in the following sections.
+例如一侧是 `string`、另一侧是 `bigint` 时，会先把 `string` 用 `StringToBigInt()` coercion 成 `bigint`。类型一致后，`IsLessThan()` 再按下面规则继续。
 
-#### String Comparison
+#### 字符串比较
 
-When both value are type `string`, `IsLessThan()` checks to see if the lefthand value is a prefix (the first *n* characters[^StringPrefix]) of the righthand; if so, `true` is returned.
+当两边都是 `string` 时，`IsLessThan()` 先看左侧是否是右侧的前缀（即前 *n* 个字符）[^StringPrefix]；若是，返回 `true`。
 
-If neither string is a prefix of the other, the first character position (start-to-end direction, not left-to-right) that's different between the two strings, is compared for their respective code-unit (numeric) values; the result is then returned.
+如果互不为前缀，就找出两字符串（按起点到终点方向）第一个不同字符位置，比较两侧该位置码元（数值）大小，并返回结果。
 
-Generally, code-units follow intuitive lexicographic (aka, dictionary) order:
+通常码元顺序与字典序直觉一致：
 
 ```
 IsLessThan("a","b", /*LeftFirst=*/ true );        // true
 ```
 
-Even digits are treated as characters (not numbers):
+数字字符也会按字符比较（不是按数值）：
 
 ```
 IsLessThan("101","12", /*LeftFirst=*/ true );     // true
 ```
 
-There's even a bit of embedded *humor* in the unicode code-unit ordering:
+Unicode 码元顺序里甚至有一点“幽默”：
 
 ```
 IsLessThan("🐔","🥚", /*LeftFirst=*/ true );      // true
 ```
 
-At least now we've answered the age old question of *which comes first*?!
+至少我们终于回答了“先有鸡还是先有蛋”！
 
-#### Numeric Comparison
+#### 数值比较
 
-For numeric comparisons, `IsLessThan()` defers to either the `Number:lessThan()` or `BigInt.lessThan()` operation[^NumericAbstractOps], respectively:
+数值比较时，`IsLessThan()` 分别委托给 `Number:lessThan()` 或 `BigInt:lessThan()`[^NumericAbstractOps]：
 
 ```
-IsLessThan(41,42, /*LeftFirst=*/ true );         // true
+IsLessThan(41,42, /*LeftFirst=*/ true );          // true
 
-IsLessThan(-0,0, /*LeftFirst=*/ true );          // false
+IsLessThan(-0,0, /*LeftFirst=*/ true );           // false
 
-IsLessThan(NaN,1 /*LeftFirst=*/ true );          // false
+IsLessThan(NaN,1, /*LeftFirst=*/ true );          // false
 
-IsLessThan(41n,42n, /*LeftFirst=*/ true );       // true
+IsLessThan(41n,42n, /*LeftFirst=*/ true );        // true
 ```
 
-## Concrete Coercions
+## 具体 coercion 形式（Concrete Coercions）
 
-Now that we've covered all the abstract operations JS defines for handling various coercions, it's time to turn our attention to the concrete statements/expressions we can use in our programs that activate these operations.
+前面我们已经把 JS 为 coercion 定义的抽象操作都过了一遍。现在转向程序里可写出的具体语句/表达式，它们会触发这些操作。
 
 ### To Boolean
 
-To coerce a value that's not of type `boolean` into that type, we need the abstract `ToBoolean()` operation, as described earlier in this chapter.
+要把一个非 `boolean` 值 coercion 到 `boolean`，就需要 `ToBoolean()`（本章前面讲过）。
 
-Before we explore *how* to activate it, let's discuss *why* you would want to force a `ToBoolean()` coercion.
+在讨论*怎么触发*之前，先说说你*为什么*要强制做 `ToBoolean()`。
 
-From a code readability perspective, being *explicit* about type coercions can be preferable (though not universally). But functionally, the most common reason to force a `boolean` is when you're passing data to an external source -- for example, submitting data as JSON to an API endpoint -- and that location expects `true` / `false` without needing to do coercions.
+从可读性看，显式标注类型 coercion 有时更好（但并非绝对）。从功能角度看，最常见原因是把数据传给外部系统——比如向 API 提交 JSON——而目标端希望拿到直接的 `true` / `false`，不再自己做 coercion。
 
-There's several ways that `ToBoolean()` can be activated. Perhaps the most *explicit* (obvious) is the `Boolean(..)` function:
+触发 `ToBoolean()` 的方式有很多。最*显式*（最直观）的一种是 `Boolean(..)` 函数：
 
 ```js
 Boolean("hello");               // true
@@ -432,9 +432,9 @@ Boolean("");                    // false
 Boolean(0);                     // false
 ```
 
-As mentioned in Chapter 3, keep in mind that `Boolean(..)` is being called without the `new` keyword, to activate the `ToBoolean()` abstract operation.
+如第 3 章所说，注意这里 `Boolean(..)` 没有 `new`，它是在触发抽象操作 `ToBoolean()`。
 
-It's not terribly common to see JS developers use the `Boolean(..)` function for such explicit coercions. More often, developers will use the double-`!` idiom:
+实际开发中，开发者并不总是用 `Boolean(..)` 做显式 coercion。更常见的是双 `!` 习惯写法：
 
 ```js
 !!"hello";                      // true
@@ -444,15 +444,15 @@ It's not terribly common to see JS developers use the `Boolean(..)` function for
 !!0;                            // false
 ```
 
-The `!!` is not its own operator, even though it seems that way. It's actually two usages of the unary `!` operator. This operator first coerces any non-`boolean`, then negates it. To undo the negation, the second `!` flips it back.
+`!!` 不是一个独立运算符。它其实是两个一元 `!`。第一个 `!` 会先把非布尔 coercion 成布尔再取反；第二个 `!` 再把结果反回来。
 
-So... which of the two, `Boolean(..)` or `!!`, do you consider to be more of an explicit coercion?
+那么，`Boolean(..)` 与 `!!`，你觉得哪个更“显式”？
 
-Given the flipping that `!` does, which must then be undone with another `!`, I'd say `Boolean(..)` is *more* explicit -- at the job of coercing a non-`boolean` to a `boolean` -- than `!!` is. But surveying open-source JS code, the `!!` is used far more often.
+考虑到 `!` 先翻转、再用第二个 `!` 翻回去，我会说 `Boolean(..)` 在“把非布尔转布尔”这件事上更显式。但看开源代码，`!!` 的使用频率明显更高。
 
-If we're defining *explicit* as, "most directly and obviously performing an action", `Boolean(..)` edges out `!!`. But if we're defining *explicit* as, "most recognizably performing an action", `!!` might have the edge. Is there a definitive answer here?
+如果把“显式”定义为“最直接、最明显地完成某动作”，`Boolean(..)` 更胜一筹；若定义为“最容易被识别成这个动作”，`!!` 可能更有优势。这里有标准答案吗？
 
-While you're pondering that question, let's look at another JS mechanism that activates `ToBoolean()` under the covers:
+你先带着这个问题，再看另一个会在底层触发 `ToBoolean()` 的机制：
 
 ```js
 specialNumber = 42;
@@ -462,11 +462,11 @@ if (specialNumber) {
 }
 ```
 
-The `if` statement requires a `boolean` for the conditional to make its control-flow decision. If you pass it a non-`boolean`, a `ToBoolean()` *coercion* is performed.
+`if` 的控制流决策必须基于 `boolean`。若给它的是非布尔值，就会执行 `ToBoolean()` *coercion*。
 
-Unlike previous `ToBoolean()` coercion expressions, like `Boolean(..)` or `!!`, this `if` coercion is ephemeral, in that our JS program never sees the result of the coercion; it's just used internally by the `if`. Some may feel it's not *really* coercion if the program doesn't preserve/use the value. But I strongly disagree, because the coercion most definitely affects the program's behavior.
+和 `Boolean(..)`/`!!` 不同，`if` 里的这次 coercion 是瞬时的：程序拿不到 coercion 后的值，它仅供 `if` 内部使用。有人会据此说“程序不持有这个值就不算 coercion”。我不同意，因为它确实改变了程序行为。
 
-Many other statement types also activate the `ToBoolean()` coercion, including the `? :` ternary conditional, and `for` / `while` loops. We also have `&&` (logical-AND) and `||` (logical-OR) operators. For example:
+很多其他语句也会触发 `ToBoolean()`，包括三元 `? :`、`for`/`while` 循环。还有逻辑运算符 `&&`（逻辑与）和 `||`（逻辑或）。例如：
 
 ```js
 isLoggedIn = user.sessionID || req.cookie["Session-ID"];
@@ -474,29 +474,29 @@ isLoggedIn = user.sessionID || req.cookie["Session-ID"];
 isAdmin = isLoggedIn && ("admin" in user.permissions);
 ```
 
-For both operators, the lefthand expression is first evaluated; if it's not already a `boolean`, a `ToBoolean()` coercion is activated to produce a value for the conditional decision.
+对这两个运算符，都会先求值左侧表达式；若它本身不是 `boolean`，就先触发 `ToBoolean()` 得到条件判断所需布尔值。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| To briefly explain these operators: for `||`, if the lefthand expression value (post-coercion, if necessary) is `true`, the pre-coercion value is returned; otherwise the righthand expression is evaluated and returned (no coercion). For `&&`, if the lefthand expression value (post-coercion, if necessary) is `false`, the pre-coercion value is returned; otherwise, the righthand expression is evaluated and returned (no coercion). In other words, both `&&` and `||` force a `ToBoolean()` coercion of the lefthand operand for making the decision, but neither operator's final result is actually coerced to a `boolean`. |
+| 简述这两个运算符：`||` 中，若左侧值（必要时先 coercion）为 `true`，返回左侧*coercion 前*原值；否则求值并返回右侧（不 coercion）。`&&` 中，若左侧值（必要时先 coercion）为 `false`，返回左侧*coercion 前*原值；否则求值并返回右侧（不 coercion）。也就是说，`&&` 和 `||` 都会对左侧操作数强制执行 `ToBoolean()` 以做决策，但两者最终结果都不会被强制转成 `boolean`。 |
 
-In the previous snippet, despite the naming implications, it's unlikely that `isLoggedIn` will actually be a `boolean`; and if it's truthy, `isAdmin` also won't be a `boolean`. That kind of code is quite common, but it's definitely dangerous that the assumed resultant `boolean` types aren't actually there. We'll revisit this example, and these operators, in the next chapter.
+在上例里，尽管变量名像布尔，`isLoggedIn` 很可能并不真是 `boolean`；若它是 truthy，`isAdmin` 也未必是 `boolean`。这种代码很常见，但“以为结果是布尔”其实很危险。下一章我们会回来看这组例子与这两个运算符。
 
-Are these kinds of statements/expressions (e.g., `if (..)`, `||`, `&&`, etc) illustrating *explicit* coercion or *implicit* coercion in their conditional decision making?
+这些语句/表达式（`if (..)`、`||`、`&&` 等）里的条件决策，究竟是*显式* coercion 还是*隐式* coercion？
 
-Again, I think it depends on your perspective. The specification dictates pretty explicitly that they only make their decisions with `boolean` conditional values, requiring coercion if a non-`boolean` is received. On the other hand, a strong argument can also be made that any internal coercion is a secondary (implicit) effect to the main job of `if` / `&&` / etc.
+我仍然认为取决于视角。规范非常明确地规定：它们只能用布尔条件值做决策，收到非布尔就必须 coercion。另一方面，也可以强有力地论证：这些内部 coercion 只是 `if`/`&&` 等机制的次要（隐式）效果。
 
-Further, as mentioned earlier in the `ToBoolean()` discussion, some folks don't consider *any* activation of `ToBoolean()` to be a coercion.
+而且正如前面 `ToBoolean()` 讨论提到的，有些人根本不认为触发 `ToBoolean()` 属于 coercion。
 
-I think that's too much of a stretch, though. My take: `Boolean(..)` is the most preferable *explicit* coercion form. I think `!!`, `if`, `for`, `while`, `&&`, and `||` are all *implicitly* coercing non-`boolean`s, but I'm OK with that.
+我觉得这个说法太牵强了。我的看法是：`Boolean(..)` 是最优先的*显式* coercion 形式。`!!`、`if`、`for`、`while`、`&&`、`||` 都是在*隐式* coercion 非布尔值，但我接受这种用法。
 
-Since most developers, including famous names like Doug Crockford, also in practice use implicit (`boolean`) coercions in their code[^CrockfordIfs], I think we can say that at least *some forms* of *implicit* coercion are widely acceptable, regardless of the ubiquitous rhetoric to the contrary.
+既然大多数开发者（包括 Doug Crockford 这样的知名人物）在实践中也会写隐式（布尔）coercion[^CrockfordIfs]，那至少可以说：*某些形式*的*隐式* coercion 是被广泛接受的——尽管口头上常常不是这么说。
 
 ### To String
 
-As with `ToBoolean()`, there are a number of ways to activate the `ToString()` coercion (as discussed earlier in the chapter). The decision of which approach is similarly subjective.
+和 `ToBoolean()` 类似，触发 `ToString()`（前文已讲）的方式也有多种。哪种更好，同样带有主观性。
 
-Like the `Boolean(..)` function, the `String(..)` function (no `new` keyword) is a primary way of activating *explicit* `ToString()` coercion:
+和 `Boolean(..)` 一样，`String(..)`（不带 `new`）是触发*显式* `ToString()` coercion 的主要方式：
 
 ```js
 String(true);                   // "true"
@@ -508,15 +508,15 @@ String(null);                   // "null"
 String(undefined);              // "undefined"
 ```
 
-However, `String(..)` is more than *just* an activation of `ToString()`. For example:
+但 `String(..)` 不只是“触发 `ToString()`”这么简单。例如：
 
 ```js
 String(Symbol("ok"));           // "Symbol(ok)"
 ```
 
-This works, because *explicit* coercion of `symbol` values is allowed. But in cases where a symbol is *implicitly* coerced to a string (e.g., `Symbol("ok") + ""`), the underlying `ToString()` operation throws an exception. That proves that `String(..)` is more than just an activation of `ToString()`. More on *implicit* string coercion of symbols in a bit.
+这能工作，是因为 `symbol` 的*显式*字符串 coercion 是允许的。但在符号值发生*隐式*字符串 coercion 的场景（如 `Symbol("ok") + ""`）里，底层 `ToString()` 会抛异常。说明 `String(..)` 不等同于纯粹 `ToString()`。稍后继续讲 symbol 的*隐式*字符串 coercion。
 
-If you call `String(..)` with an object value (e.g., array, etc), it activates the `ToPrimitive()` operation (via the `ToString()` operation), which then looks for an invokes that value's `toString()` method:
+如果你对对象值（数组等）调用 `String(..)`，会经由 `ToString()` 触发 `ToPrimitive()`，然后查找并调用该值的 `toString()`：
 
 ```js
 String([1,2,3]);                // "1,2,3"
@@ -524,7 +524,7 @@ String([1,2,3]);                // "1,2,3"
 String(x => x + 1);             // "x => x + 1"
 ```
 
-Aside from `String(..)`, any primitive, non-nullish value (neither `null` nor `undefined`) can be auto-boxed (see Chapter 3) in its respective object wrapper, providing a callable `toString()` method.
+除了 `String(..)`，任何非 nullish（既不是 `null` 也不是 `undefined`）的原始值，都可通过自动装箱（见第 3 章）拿到对应包装对象，并调用 `toString()`：
 
 ```js
 true.toString();                // "true"
@@ -534,11 +534,11 @@ Infinity.toString();            // "Infinity"
 Symbol("ok").toString();        // "Symbol(ok)"
 ```
 
-| NOTE: |
+| 注意： |
 | :--- |
-| Do keep in mind, these `toString()` methods do *not* necessarily activate the `ToString()` operation, they just define their own rules for how to represent the value as a string. |
+| 要注意，这些 `toString()` 方法不一定会触发抽象 `ToString()`；它们只是各自定义了“如何把该值表示成字符串”。 |
 
-As shown with `String(..)` just a moment ago, the various object sub-types -- such as arrays, functions, regular expressions, `Date` and `Error` instances, etc -- all define their own specific `toString()` methods, which can be invoked directly:
+刚才 `String(..)` 的例子也展示了：各类对象子类型——数组、函数、正则、`Date` 实例、`Error` 实例等——都定义了自己的 `toString()`，可以直接调用：
 
 ```js
 [1,2,3].toString();             // "1,2,3"
@@ -546,17 +546,17 @@ As shown with `String(..)` just a moment ago, the various object sub-types -- su
 (x => x + 1).toString();        // "x => x + 1"
 ```
 
-Moreover, any plain object that's (by default) `[[Prototype]]` linked to `Object.prototype` has a default `toString()` method available:
+并且，默认通过 `[[Prototype]]` 链接到 `Object.prototype` 的普通对象，也有默认 `toString()`：
 
 ```js
 ({ a : 1 }).toString();         // "[object Object]"
 ```
 
-Is the `toString()` approach to coercion *explicit* or *implicit*? Again, it depends. It's certainly a self-descriptive mechanism, which leans *explicit*. But it often relies on auto-boxing, which is itself a fairly *implicit* coercion.
+那么 `toString()` 这种 coercion 算显式还是隐式？还是那句话：看角度。它自描述性很强，偏显式；但它常依赖自动装箱，而自动装箱本身又相当隐式。
 
-Let's take a look at another common -- and famously endorsed! -- idiom for coercing a value to a string. Recall from "String Concatenation" in Chapter 2, the `+` operator is overloaded to prefer string concatenation if either operand is already a string, and thus coerces non-string operand to a string if necessary.
+再看一个很常见、且被“重量级人物”推荐过的字符串 coercion 习惯写法。回忆第 2 章“字符串拼接”：`+` 是重载运算符，只要任一操作数已是字符串，就优先做字符串拼接，并在必要时把非字符串 coercion 为字符串。
 
-Consider:
+看例子：
 
 ```js
 true + "";                      // "true"
@@ -565,31 +565,31 @@ null + "";                      // "null"
 undefined + "";                 // "undefined"
 ```
 
-The `+ ""` idiom for string coercion takes advantage of the `+` overloading, without altering the final coerced string value. By the way, all of these work the same with the operands reversed (i.e., `"" + ..`).
+`+ ""` 这个写法就是利用 `+` 的重载做字符串 coercion，同时不改变最终字符串结果。顺带一提，把操作数反过来（`"" + ..`）效果一样。
 
-| WARNING: |
+| 警告： |
 | :--- |
-| An extremely common misconception is that `String(x)` and `x + ""` are basically equivalent coercions, respectively just *explicit* vs *implicit* in form. But, that's not quite true! We'll revisit this in the "To Primitive" section later in this chapter. |
+| 有个极常见误解：`String(x)` 与 `x + ""` 基本等价，只是前者显式、后者隐式。其实并不完全对！本章后面的 “To Primitive” 会回到这个点。 |
 
-Some feel this is an *explicit* coercion, but I think it's clearly more *implicit*, in that it's taking advantage of the `+` overloading; further, the `""` is indirectly used to activate the coercion without modifying it. Moreover, consider what happens when this idiom is applied with a symbol value:
+有人认为这也算显式 coercion。但我认为它明显更隐式：它借用了 `+` 的重载行为；`""` 只是间接触发 coercion 且不改变结果。再看看对 symbol 用这个写法会怎样：
 
 ```js
-Symbol("ok") + "";              // TypeError exception thrown
+Symbol("ok") + "";              // 抛出 TypeError 异常
 ```
 
-| WARNING: |
+| 警告： |
 | :--- |
-| Allowing *explicit* coercion of symbols (`String(Symbol("ok"))`, but disallowing *implicit* coercion (`Symbol("ok") + ""`), is quite intentional by TC39. [^SymbolString] It was felt that symbols, as primitives often used in places where strings are otherwise used, could too easily be mistaken as strings. As such, they wanted to make sure developers expressed intent to coerce a symbol to a string, hopefully avoiding many of those anticipated confusions. This is one of the *extremely rare* cases where the language design asserts an opinion on, and actually discriminates between, *explicit* vs. *implicit* coercions. |
+| TC39 有意允许 symbol 的*显式* coercion（`String(Symbol("ok"))`），但禁止*隐式* coercion（`Symbol("ok") + ""`）[^SymbolString]。因为 symbol 作为原始值经常出现在字符串也会出现的位置，太容易被误当成字符串。设计者希望开发者必须明确表达“我要把 symbol 转成字符串”，以减少误解。这是语言里*极少数*明确表达并执行“显式 vs 隐式”立场差异的案例。 |
 
-Why the exception? JS treats `+ ""` as an *implicit* coercion, which is why when activated with a symbol, an exception is thrown. I think that's a pretty ironclad proof.
+为什么会这样？因为 JS 将 `+ ""` 视作*隐式* coercion，所以 symbol 触发时抛异常。我认为这几乎是铁证。
 
-Nevertheless, as I mentioned at the start of this chapter, Brendan Eich endorses `+ ""`[^BrendanToString] as the *best* way to coerce values to strings. I think that carries a lot of weight, in terms of him supporting at least a subset of *implicit* coercion practices. His views on *implicit* coercion must be a bit more nuanced than, "it's all bad."
+尽管如此，正如我在本章开头说的，Brendan Eich 依然推荐 `+ ""`[^BrendanToString] 作为把值转字符串的*最佳*方式。这至少说明他支持某一部分*隐式* coercion 实践。他对隐式 coercion 的看法，显然比“一刀切全都坏”更细腻。
 
 ### To Number
 
-Numeric coercions are a bit more complicated than string coercions, since we can be talking about either `number` or `bigint` as the target type. There's also a much smaller set of values that can be validly represented numerically (everything else becomes `NaN`).
+数值 coercion 比字符串 coercion 稍复杂，因为目标类型可能是 `number`，也可能是 `bigint`。同时，可被有效表示为数值的值集合更小（其他都会变 `NaN`）。
 
-Let's start with the `Number(..)` and `BigInt(..)` functions (no `new` keywords):
+先看 `Number(..)` 与 `BigInt(..)`（都不带 `new`）：
 
 ```js
 Number("42");                   // 42
@@ -600,7 +600,7 @@ BigInt("42");                   // 42n
 BigInt("-0");                   // 0n
 ```
 
-`Number` coercion which fails (not recognized) results in `NaN` (see "Invalid Number" in Chapter 1), whereas `BigInt` throws an exception:
+`Number` coercion 失败（无法识别）会得到 `NaN`（见第 1 章“无效数字”），而 `BigInt` 会抛异常：
 
 ```js
 Number("123px");                // NaN
@@ -609,7 +609,7 @@ BigInt("123px");
 // SyntaxError: Cannot convert 123px to a BigInt
 ```
 
-Moreover, even though `42n` is valid syntax as a literal `bigint`, the string `"42n"` is never a recognized string representation of a `bigint`, by either of the coercive function forms:
+另外，虽然 `42n` 是合法 `bigint` 字面量语法，但字符串 `"42n"` 不是任何 coercion 形式认可的 `bigint` 表示：
 
 ```js
 Number("42n");                  // NaN
@@ -618,7 +618,7 @@ BigInt("42n");
 // SyntaxError: Cannot convert 42n to a BigInt
 ```
 
-However, we *can* coerce numeric strings with other representations of the numbers than typical base-10 decimals (see Chapter 1 for more information):
+不过，我们可以 coercion 其他进制表示的数字字符串（第 1 章有更详细说明）：
 
 ```js
 Number("0b101010");             // 42
@@ -626,7 +626,7 @@ Number("0b101010");             // 42
 BigInt("0b101010");             // 42n
 ```
 
-Typically, `Number(..)` and `BigInt(..)` receive string values, but that's not actually required. For example, `true` and `false` coerce to their typical numeric equivalents:
+`Number(..)` 与 `BigInt(..)` 常接收字符串，但并不限于字符串。比如 `true` / `false` 也会 coercion 到常见数值等价物：
 
 ```js
 Number(true);                   // 1
@@ -636,7 +636,7 @@ BigInt(true);                   // 1n
 BigInt(false);                  // 0n
 ```
 
-You can also generally coerce between `number` and `bigint` types:
+`number` 与 `bigint` 之间也通常可互相 coercion：
 
 ```js
 Number(42n);                    // 42
@@ -645,14 +645,14 @@ Number(42n ** 1000n);           // Infinity
 BigInt(42);                     // 42n
 ```
 
-We can also use the `+` unary operator, which is commonly assumed to coerce the same as the `Number(..)` function:
+也可用一元 `+`，它通常被认为和 `Number(..)` coercion 一样：
 
 ```js
 +"42";                          // 42
 +"0b101010";                    // 42
 ```
 
-Be careful though. If the coercions are unsafe/invalid in certain ways, exceptions are thrown:
+但要小心：某些不安全/无效 coercion 会抛异常：
 
 ```js
 BigInt(3.141596);
@@ -662,45 +662,45 @@ BigInt(3.141596);
 // TypeError: Cannot convert a BigInt value to a number
 ```
 
-Clearly, `3.141596` does not safely coerce to an integer, let alone a `bigint`.
+显然，`3.141596` 不能安全 coercion 为整数，更别说 `bigint`。
 
-But `+42n` throwing an exception is an interesting case. By contrast, `Number(42n)` works fine, so it's a bit surprising that `+42n` fails.
+而 `+42n` 抛异常是个很有意思的点。对比之下，`Number(42n)` 却可以，因此 `+42n` 失败会让人意外。
 
-| WARNING: |
+| 警告： |
 | :--- |
-| That surprise is especially palpable since prepending a `+` in front of a number is typically assumed to just mean a "positive number", the same way `-` in front a number is assumed to mean a "negative number". As explained in Chapter 1, however, JS numeric syntax (`number` and `bigint`) recognize no syntax for "negative values". All numeric literals are parsed as "positive" by default. If a `+` or `-` is prepended, those are treated as unary operators applied against the parsed (positive) number. |
+| 这种意外感更强是因为很多人把前置 `+` 理解成“正数标记”，就像前置 `-` 理解成“负数标记”。但第 1 章解释过：JS 数值语法（`number` 和 `bigint`）没有“负值字面量”语法。所有数字字面量默认都按“正数”解析。前置 `+` / `-` 实际上是一元运算符，作用于解析完成后的（正）数字。 |
 
-OK, so `+42n` is parsed as `+(42n)`. But still... why is `+` throwing an exception here?
+所以 `+42n` 会被解析为 `+(42n)`。可为什么还是抛异常？
 
-You might recall earlier when we showed that JS allows *explicit* string coercion of symbol values, but disallows *implicit* string coercions? The same thing is going on here. JS language design interprets unary `+` in front of a `bigint` value as an *implicit* `ToNumber()` coercion (thus disallowed!), but `Number(..)` is interpreted as an *explicit* `ToNumber()` coercion (thus allowed!).
+还记得前面 symbol 的例子吗？显式字符串 coercion 允许，隐式不允许。这里同理：语言设计把 `bigint` 前的一元 `+` 视为*隐式* `ToNumber()` coercion（因此禁用），而 `Number(..)` 视为*显式* `ToNumber()` coercion（因此允许）。
 
-In other words, contrary to popular assumption/assertion, `Number(..)` and `+` are not interchangable. I think `Number(..)` is the safer/more reliable form.
+也就是说，和许多人的假设相反，`Number(..)` 与 `+` 不是可互换的。我认为 `Number(..)` 更安全、更可靠。
 
-#### Mathematical Operations
+#### 数学运算
 
-Mathematical operators (e.g., `+`, `-`, `*`, `/`, `%`, and `**`) expect their operands to be numeric. If you use a non-`number` with them, that value will be coerced to a `number` for the purposes of the mathematical computation.
+数学运算符（`+`、`-`、`*`、`/`、`%`、`**`）都期望操作数是数值。若传入非 `number`，该值会先 coercion 成 `number` 再计算。
 
-Similar to how `x + ""` is an idiom for coercing `x` to a string, an expression like `x - 0` safely coerces `x` to a number.
+类似 `x + ""` 用于字符串 coercion，`x - 0` 是一个安全把 `x` coercion 成 number 的习惯写法。
 
-| WARNING: |
+| 警告： |
 | :--- |
-| `x + 0` isn't quite as safe, since the `+` operator is overloaded to perform string concatenation if either operand is already a string. The `-` minus operator isn't overloaded like that, so the only coercion will be to `number`. Of course, `x * 1`, `x / 1`, and even `x ** 1` would also generally be equivalent mathematically, but those are much less common, and probably should be avoided as likely confusing to readers of your code. Even `x % 1` seems like it should be safe, but it can introduce floating-point skew (see "Floating Point Imprecision" in Chapter 2). |
+| `x + 0` 不那么安全，因为 `+` 可能走字符串拼接重载（只要一侧已是字符串）。`-` 没有这种重载，所以只会做 `number` coercion。当然 `x * 1`、`x / 1`、甚至 `x ** 1` 数学上通常也等价，但更少见，容易让读者困惑；应尽量避免。`x % 1` 看似也可行，但会引入浮点偏差风险（见第 2 章“浮点精度误差”）。 |
 
-Regardless of what mathematical operator is used, if the coercion fails, a `NaN` is the result, and all of these operators will propagate the `NaN` out as their result.
+无论使用哪种数学运算符，若 coercion 失败，结果就是 `NaN`，这些运算符都会把 `NaN` 继续传播出去。
 
-#### Bitwise Operations
+#### 位运算
 
-Bitwise operators (e.g., `|`, `&`, `^`, `>>`, `<<`, and `<<<`) all expect number operands, but specifically they clamp these values to 32-bit integers.
+位运算符（`|`、`&`、`^`、`>>`、`<<`、`<<<`）都要求 number 操作数，并且会把值钳制到 32 位整数。
 
-If you're sure the numbers you're dealing with are safely within the 32-bit integer range, `x | 0` is another common expression idiom that has the effect of coercing `x` to a `number` if necessary.
+如果你确定处理的数都安全落在 32 位整数范围内，`x | 0` 也是常见表达式习惯：必要时把 `x` coercion 到 `number`。
 
-Moreover, since JS engines know these values will be integers, there's potential for them to optimize for integer-only math if they see `x | 0`. This is one of several recommended "type annotations" from the ASM.js[^ASMjs] efforts from years ago.
+另外，JS 引擎知道这些值是整数后，有机会做整数数学优化。`x | 0` 就是多年以前 ASM.js[^ASMjs] 推荐的一种“类型注解”手法。
 
-#### Property Access
+#### 属性访问
 
-Property access of objects (and index access of arrays) is another place where implicit coercion can occur.
+对象属性访问（以及数组下标访问）也是隐式 coercion 的发生点。
 
-Consider:
+看例子：
 
 ```js
 myObj = {};
@@ -711,18 +711,18 @@ myObj["3"] = "world";
 console.log( myObj );
 ```
 
-What do you expect from the contents of this object? Do you expect two different properties, numeric `3` (holding `"hello"`) and string `"3"` (holding `"world"`)? Or do you think both properties are in the same location?
+你预期对象里有两个不同属性吗：数字 `3`（值 `"hello"`）和字符串 `"3"`（值 `"world"`）？还是觉得它们其实是同一个位置？
 
-If you try that code, you'll see that indeed we get an object with a single property, and it holds the `"world"` value. That means that JS is internally coercing either the `3` to `"3"`, or vice versa, when those properties accesses are made.
+你跑这段代码会看到：对象只有一个属性，且值是 `"world"`。说明 JS 内部在访问属性时要么把 `3` coercion 成 `"3"`，要么反过来。
 
-Interestingly, the developer console may very well represent the object sort of like this:
+有意思的是，控制台可能这样显示对象：
 
 ```js
 console.log( myObj );
 // {3: 'world'}
 ```
 
-Does that `3` there indicate the property is a numeric `3`? Not quite. Try adding another property to `myObj`:
+这里显示的 `3` 是数字属性名吗？不一定。再加个属性看看：
 
 ```js
 myObj.something = 42;
@@ -731,23 +731,23 @@ console.log( myObj )
 // {3: 'world', something: 42}
 ```
 
-We can see that this developer console doesn't quote string property keys, so we can't infer anything from `3` versus if the console had used `"3"` for the key name.
+这说明该控制台输出通常不给字符串属性名加引号，所以不能仅凭 `3`（而非 `"3"`）判断真实类型。
 
-Let's instead try consulting the specification for the object value[^ObjectValue], where we find:
+看规范里对象值定义[^ObjectValue]，有这样一句：
 
 > A property key value is either an ECMAScript String value or a Symbol value. All String and Symbol values, including the empty String, are valid as property keys. A property name is a property key that is a String value.
 
-OK! So, in JS, objects only hold string (or symbol) properties. That must mean that the numeric `3` is coerced to a string `"3"`, right?
+也就是说，JS 对象属性键只有字符串（或 symbol）。那数字 `3` 应该会被 coercion 成字符串 `"3"`，对吧？
 
-In the same section of the specification, we further read:
+同一节规范还说：
 
 > An integer index is a String-valued property key that is a canonical numeric String (see 7.1.21) and whose numeric value is either +0𝔽 or a positive integral Number ≤ 𝔽(253 - 1). An array index is an integer index whose numeric value i is in the range +0𝔽 ≤ i < 𝔽(232 - 1).
 
-If a property key (like `"3"`) *looks* like a number, it's treated as an integer index. Hmmm... that almost seems to suggest the opposite of what we just posited, right?
+如果属性键（如 `"3"`）长得像数字，它会被当作 integer index。嗯……这看起来又像是在暗示和刚才相反的方向？
 
-Nevertheless, we know from the previous quote that property keys are *only* strings (or symbols). So it must be that "integer index" here is not describing the actual location, but rather the intentional usage of `3` in JS code, as a developer-expressed "integer index"; JS must still then actually store it at the location of the "canonical numeric String".
+但根据前一个引用，属性键仍然*只能*是字符串（或 symbol）。所以这里的 “integer index” 描述的应是语义用途：开发者在代码里写了 `3` 这种“整数索引”意图；JS 实际存储仍是在“规范数字字符串”对应的位置。
 
-Consider attempts to use other value-types, like `true`, `null`, `undefined`, or even non-primitives (other objects):
+再看用其他值类型做属性键的情况：`true`、`null`、`undefined`、甚至对象：
 
 ```js
 myObj[true] = 100;
@@ -760,9 +760,9 @@ console.log(myObj);
 // undefined: 300, [object Object]: 400}
 ```
 
-As you can see, all of those other value-types were coerced to strings for the purposes of object property names.
+可以看到，这些值类型都被 coercion 成字符串后用作对象属性名。
 
-But before we convince ourselves of this interpretation that everything (even numbers) is coerced to strings, let's look at an array example:
+但先别急着下结论“所有东西（数字也一样）都会 coercion 到字符串”。再看数组：
 
 ```js
 myArr = [];
@@ -774,9 +774,9 @@ console.log( myArr );
 // [empty × 3, 'world']
 ```
 
-The developer console will likely represent an array a bit differently than a plain object. Nevertheless, we still see that this array only has the single `"world"` value in it, at the numeric index position corresponding to `3`.
+控制台显示数组通常与普通对象不同。但我们仍看到数组只有一个 `"world"`，放在与 `3` 对应的数值下标位置。
 
-That kind of output sort of implies the opposite of our previous interpretation: that the values of an array are being stored only at numeric positions. If we add another string property-name to `myArr`:
+这又像是在暗示另一种语义：数组值是按数字位置存储。如果再给数组加个字符串属性名：
 
 ```js
 myArr.something = 42;
@@ -784,25 +784,25 @@ console.log( myArr );
 // [empty × 3, 'world', something: 42]
 ```
 
-Now we see that this developer console represents the numerically indexed positions in the array *without* the property names (locations), but the `something` property is named in the output.
+你会看到控制台对数组的数值索引位置通常不显示属性名，而 `something` 这种普通属性会显示名字。
 
-It's also true that JS engines like v8 tend to, for performance optimization reasons, special-case object properties that are numeric-looking strings as actually being stored in numeric positions as if they were arrays. So even if the JS program acts as if the property name is `"3"`, in fact under the covers, v8 might be treating it as if coerced to `3`!
+另外，像 v8 这样的引擎出于性能优化，常会把“看起来像数字的字符串属性键”特殊处理为类似数组下标的内部存储。也就是说，程序层面你像是在访问 `"3"`，但引擎底层可能按 `3` 来存！
 
-What can take from all this?
+这些现象我们该怎么理解？
 
-The specification clearly tells us that the behavior of object properties is for them to be treated like strings (or symbols). That means we can assume that using `3` to access a location on an object will have the internal effect of coercing that property name to `"3"`.
+规范清楚指出：对象属性行为上应被当作字符串（或 symbol）。因此可以认为：在对象上用 `3` 访问属性，内部效果就是把属性名 coercion 成 `"3"`。
 
-But with arrays, we observe a sort of opposite semantic: using `"3"` as a property name has the effect of accessing the numerically indexed `3` position, as if the string was coerced to the number. But that's mostly just an offshot of the fact that arrays always tend to behave as numerically indexed, and/or perhaps a reflection of underlying implementation/optimization details in the JS engine.
+但对数组，我们观察到一种近似相反语义：用 `"3"` 访问属性会命中数值索引 `3`，仿佛字符串被 coercion 成数字。这更多是因为数组天然按数值索引工作，也可能反映了引擎实现/优化细节。
 
-The important part is, we need to recognize that objects cannot simply use any value as a property name. If it's anything other than a string or a number, we can expect that there *will be* a coercion of that value.
+重点在于：对象不能“直接拿任意值当属性名”。只要不是字符串或数字（以及 symbol 这类规范支持键），就几乎可以预期一定会发生 coercion。
 
-We need to expect and plan for that rather than allowing it to surprise us with bugs down the road!
+必须提前认知并设计它，而不是等它在将来变成 bug 才被动踩坑。
 
 ### To Primitive
 
-Most operators in JS, including those we've seen with coercions to `string` and `number`, are designed to run against primitive values. When any of these operators is used instead against an object value, the abstract `ToPrimitive` algorithm (as described earlier) is activated to coerce the object to a primitive.
+JS 里的大多数运算符，包括前面看过的字符串与数字 coercion，都设计为作用在原始值上。当这些运算符用于对象值时，会触发抽象算法 `ToPrimitive`（前面已讲）把对象 coercion 成原始值。
 
-Let's set up an object we can use to inspect how different operations behave:
+先定义一个用于观察行为的对象：
 
 ```js
 spyObject = {
@@ -817,9 +817,9 @@ spyObject = {
 };
 ```
 
-This object defines both the `toString()` and `valueOf()` methods, and each one returns a different type of value (`string` vs `number`).
+这个对象同时定义了 `toString()` 与 `valueOf()`，而且各自返回不同类型（`string` vs `number`）。
 
-Let's try some of the coercion operations we've already seen:
+试试前面见过的 coercion 操作：
 
 ```js
 String(spyObject);
@@ -831,11 +831,11 @@ spyObject + "";
 // "42"
 ```
 
-Whoa! I bet that surprised a few of you readers; it certainly did me. It's so common for people to assert that `String(..)` and `+ ""` are equivalent forms of activating the `ToString()` operation. But they're clearly not!
+是不是很多人会惊讶（我当年也很惊讶）？很多人断言 `String(..)` 与 `+ ""` 是同一类 `ToString()` 触发形式，但显然不是！
 
-The difference comes down to the *hint* that each operation provides to `ToPrimitive()`. `String(..)` clearly provides `"string"` as the *hint*, whereas the `+ ""` idiom provides no *hint* (similar to *hinting* `"number"`). But don't miss this detail: even though `+ ""` invokes `valueOf()`, when that returns a `number` primitive value of `42`, that value is then coerced to a string (via `ToString()`), so we get `"42"` instead of `42`.
+差别来自它们给 `ToPrimitive()` 的 *hint*。`String(..)` 显然给的是 `"string"`；`+ ""` 没有明确给 *hint*（效果近似 `"number"`）。但别漏掉细节：`+ ""` 虽先走 `valueOf()` 得到 `42` 这个 number 原始值，随后它又会被 `ToString()` 转成字符串，因此结果是 `"42"` 而不是 `42`。
 
-Let's keep going:
+继续看：
 
 ```js
 Number(spyObject);
@@ -847,9 +847,9 @@ Number(spyObject);
 // 42
 ```
 
-This example implies that `Number(..)` and the unary `+` operator both perform the same `ToPrimitive()` coercion (with *hint* of `"number"`), which in our case returns `42`. Since that's already a `number` as requested, the value comes out without further ado.
+这个例子说明 `Number(..)` 与一元 `+` 在这里走的是同一条 `ToPrimitive()` 路径（*hint* 为 `"number"`），返回 `42`。因为已经是目标类型 number，后续无需再处理。
 
-But what if a `valueOf()` returns a `bigint`?
+那如果 `valueOf()` 返回的是 `bigint` 呢？
 
 ```js
 spyObject2 = {
@@ -861,21 +861,21 @@ spyObject2 = {
 
 Number(spyObject2);
 // valueOf() invoked!
-// 42     <--- look, not a bigint!
+// 42     <--- 看，不是 bigint！
 
 +spyObject2;
 // valueOf() invoked!
 // TypeError: Cannot convert a BigInt value to a number
 ```
 
-We saw this difference earlier in the "To Number" section. JS allows an *explicit* coercion of the `42n` bigint value to the `42` number value, but it disallows what it considers to be an *implicit* coercion form.
+这和前面 “To Number” 里的差异一致：JS 允许把 `42n` *显式* coercion 成 `42`，但不允许它认为的*隐式* coercion 形式。
 
-What about the `BigInt(..)` (no `new` keyword) coercion function?
+再看 `BigInt(..)`（不带 `new`）：
 
 ```js
 BigInt(spyObject);
 // valueOf() invoked!
-// 42n    <--- look, a bigint!
+// 42n    <--- 看，是 bigint！
 
 BigInt(spyObject2);
 // valueOf() invoked!
@@ -895,13 +895,13 @@ BigInt(spyObject3);
 // RangeError: The number 42.3 cannot be converted to a BigInt
 ```
 
-Again, as we saw in the "To Number" section, `42` can safely be coerced to `42n`. On the other hand, `42.3` cannot safely be coerced to a `bigint`.
+如前所述，`42` 可安全 coercion 到 `42n`；但 `42.3` 不能安全 coercion 到 `bigint`。
 
-We've seen that `toString()` and `valueOf()` are invoked, variously, as certain `string` and `number` / `bigint` coercions are performed.
+我们已经看到：在字符串、number/bigint coercion 过程中，`toString()` 与 `valueOf()` 会按不同路径被调用。
 
-#### No Primitive Found?
+#### 没找到原始值？
 
-If `ToPrimitive()` fails to produce a primitive value, an exception will be thrown:
+如果 `ToPrimitive()` 最终产不出原始值，会抛异常：
 
 ```js
 spyObject4 = {
@@ -926,11 +926,11 @@ Number(spyObject4);
 // TypeError: Cannot convert object to primitive value
 ```
 
-If you're going to define custom to-primitive coercions via `toString()` / `valueOf()`, make sure to return a primitive from at least one of them!
+若你要通过自定义 `toString()` / `valueOf()` 来控制转原始值，至少要保证其中一个返回原始值！
 
-#### Object To Boolean
+#### 对象到布尔
 
-What about `boolean` coercions of objects?
+对象的 `boolean` coercion 呢？
 
 ```js
 Boolean(spyObject);
@@ -954,13 +954,13 @@ while (spyObject) {
 // while!
 ```
 
-Each of these are activating `ToBoolean()`. But if you recall from earlier, *that* algorithm never delegates to `ToPrimitive()`; thus, we don't see "valueOf() invoked!" being logged out.
+这些都在触发 `ToBoolean()`。但如前文所说，`ToBoolean()` 不会委托给 `ToPrimitive()`；因此你看不到 `"valueOf() invoked!"` 输出。
 
-#### Unboxing: Wrapper To Primitive
+#### 拆箱（Unboxing）：包装对象到原始值
 
-A special form of objects that are often `ToPrimitive()` coerced: boxed/wrapped primitives (as seen in Chapter 3). This particular object-to-primitive coercion is often referred to as *unboxing*.
+有一种常见且经常会走 `ToPrimitive()` 的对象：装箱/包装原始值（第 3 章讲过）。这种对象到原始值 coercion 常被称为 *unboxing*。
 
-Consider:
+例如：
 
 ```js
 hello = new String("hello");
@@ -972,25 +972,26 @@ Number(fortyOne);               // 41
 fortyOne + 1;                   // 42
 ```
 
-The object wrappers `hello` and `fortyOne` above have `toString()` and `valueOf()` methods configured on them, to behave similarly to the `spyObject` / etc objects from our previous examples.
+上面的包装对象 `hello`、`fortyOne` 都带有配置好的 `toString()` 与 `valueOf()`，行为与前面的 `spyObject` 等示例类似。
 
-A special case to be careful of with wrapped-object primitives is with `Boolean()`:
+包装对象原始值有个特别要小心的坑在 `Boolean()`：
 
 ```js
 nope = new Boolean(false);
+
 Boolean(nope);                  // true   <--- oops!
 !!nope;                         // true   <--- oops!
 ```
 
-Remember, this is because `ToBoolean()` does *not* reduce an object to its primitive form with `ToPrimitive`; it merely looks up the value in its internal table, and since normal (non-exotic[^ExoticFalsyObjects]) objects are always truthy, `true` comes out.
+记住，这是因为 `ToBoolean()` *不会*先通过 `ToPrimitive` 把对象还原成原始值；它只查内部表，而普通（非 exotic[^ExoticFalsyObjects]）对象总是 truthy，所以结果总是 `true`。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| It's a nasty little gotcha. A case could certainly be made that `new Boolean(false)` should configure itself internally as an exotic "falsy object". [^ExoticFalsyObjects] Unfortunately, that change now, 25 years into JS's history, could easily create breakage in programs. As such, JS has left this gotcha untouched. |
+| 这是个很阴险的小坑。你完全可以主张 `new Boolean(false)` 本应被内部标记成 exotic “falsy object”[^ExoticFalsyObjects]。但 JS 历史已经 25 年了，此时改动很容易破坏既有程序，所以这个坑一直被保留。 |
 
-#### Overriding Default `toString()`
+#### 覆盖默认 `toString()`
 
-As we've seen, you can always define a `toString()` on an object to have *it* invoked by the appropriate `ToPrimitive()` coercion. But another option is to override the `Symbol.toStringTag`:
+前面看过：你可以在对象上自定义 `toString()`，让相关 `ToPrimitive()` 路径调用它。另一个选项是覆盖 `Symbol.toStringTag`：
 
 ```js
 spyObject5a = {};
@@ -1019,13 +1020,13 @@ spyObject5c.toString();
 // "[object myValue:42]"
 ```
 
-`Symbol.toStringTag` is intended to define a custom string value to describe the object whenever its default `toString()` operation is invoked directly, or implicitly via coercion; in its absence, the value used is `"Object"` in the common `"[object Object]"` output.
+`Symbol.toStringTag` 的设计目的，是在对象默认 `toString()`（直接调用或 coercion 间接调用）时提供自定义描述字符串；若未定义，就使用常见输出 `"[object Object]"` 里的 `"Object"`。
 
-The `get ..` syntax in `spyObject5c` is defining a *getter*. That means when JS tries to access this `Symbol.toStringTag` as a property (as normal), this getter code instead causes the function we specify to be invoked to compute the result. We can run any arbitrary logic inside this getter to dynamically determine a string *tag* for use by the default `toString()` method.
+`spyObject5c` 里的 `get ..` 语法定义了一个 *getter*。即 JS 正常读取 `Symbol.toStringTag` 属性时，会改为调用这个函数计算结果。你可以在 getter 里写任意逻辑，动态决定默认 `toString()` 使用的字符串 *tag*。
 
-#### Overriding `ToPrimitive`
+#### 覆盖 `ToPrimitive`
 
-You can alternately override the whole default `ToPrimitive()` operation for any object, by setting the special symbol property `Symbol.toPrimitive` to hold a function:
+你也可以更进一步：通过设置特殊符号属性 `Symbol.toPrimitive` 为函数，直接覆盖对象默认 `ToPrimitive()` 行为：
 
 ```js
 spyObject6 = {
@@ -1045,36 +1046,36 @@ spyObject6 = {
 
 String(spyObject6);
 // toPrimitive(string) invoked!
-// "25"   <--- not "10"
+// "25"   <--- 不是 "10"
 
 spyObject6 + "";
 // toPrimitive(default) invoked!
-// "25"   <--- not "42"
+// "25"   <--- 不是 "42"
 
 Number(spyObject6);
 // toPrimitive(number) invoked!
-// 25     <--- not 42 or "25"
+// 25     <--- 不是 42 或 "25"
 
 +spyObject6;
 // toPrimitive(number) invoked!
 // 25
 ```
 
-As you can see, if you define this function on an object, it's used entirely in replacement of the default `ToPrimitive()` abstract operation. Since `hint` is still provided to this invoked function (`[Symbol.toPrimitive](..)`), you could in theory implement your own version of the algorithm, invoking a `toString()`, `valueOf()`, or any other method on the object (`this` context reference).
+可以看到，一旦对象定义了这个函数，它会完全替代默认 `ToPrimitive()` 抽象操作。由于调用时仍会传入 `hint`（即 `[Symbol.toPrimitive](..)` 的参数），理论上你可以自己实现一套算法，去手动调用 `toString()`、`valueOf()` 或对象上的任何方法（`this` 指向当前对象）。
 
-Or you can just manually define a return value as shown above. Regardless, JS will *not* automatically invoke either `toString()` or `valueOf()` methods.
+也可以像上面那样直接返回固定值。不管怎样，JS 都不会再自动调用 `toString()` 或 `valueOf()`。
 
-| WARNING: |
+| 警告： |
 | :--- |
-| As discussed prior in "No Primitive Found?", if the defined `Symbol.toPrimitive` function does not actually return a value that's a primitive, an exception will be thrown about being unable to "...convert object to primitive value". Make sure to always return an actual primitive value from such a function! |
+| 正如前面 “没找到原始值？” 所述，如果你定义的 `Symbol.toPrimitive` 函数没有返回真正的原始值，仍会抛出 “...convert object to primitive value” 之类异常。务必返回真实原始值！ |
 
 ### Equality
 
-Thus far, the coercions we've seen have been focused on single values. We turn out attention now to equality comparisons, which inherently involve two values, either or both of which may be subject to coercion.
+到目前为止，我们看的 coercion 主要作用于单个值。现在转到相等比较，它天然涉及两个值，且任一侧都可能发生 coercion。
 
-Earlier in this chapter, we talked about several abstract operations for value equality comparison.
+本章前面我们已讲过若干用于相等比较的抽象操作。
 
-For example, the `SameValue()` operation[^SameValue] is the strictest of the equality comparisons, with absolutely no coercion. The most obvious JS operation that relies on `SameValue()` is:
+例如，`SameValue()`[^SameValue] 是最严格的那一个，完全无 coercion。最直接依赖它的 JS 操作就是：
 
 ```js
 Object.is(42,42);                   // true
@@ -1084,13 +1085,13 @@ Object.is(NaN,NaN);                 // true
 Object.is(0,-0);                    // false
 ```
 
-The `SameValueZero()` operation -- recall, it only differs from `SameValue()` by treating `-0` and `0` as indistinguishable -- is used in quite a few more places, including:
+`SameValueZero()`（回忆下：它仅在 `-0` 与 `0` 上与 `SameValue()` 不同）被用在更多地方，包括：
 
 ```js
 [ 1, 2, NaN ].includes(NaN);        // true
 ```
 
-We can see the `0` / `-0` misdirection of `SameValueZero()` here:
+`SameValueZero()` 对 `0` / `-0` 的“模糊处理”也可在这看到：
 
 ```js
 [ 1, 2, -0 ].includes(0);           // true  <--- oops!
@@ -1100,15 +1101,15 @@ We can see the `0` / `-0` misdirection of `SameValueZero()` here:
 (new Map([[ 0, "ok" ]])).has(-0);   // true  <--- :(
 ```
 
-In these cases, there's a *coercion* (of sorts!) that treats `-0` and `0` as indistinguishable. No, that's not technically a "coercion" in that the type is not being changed, but I'm sort of fudging the definition to *include* this case in our broader discussion of coercion here.
+这些场景里存在一种“某种意义上的 coercion”：它把 `-0` 与 `0` 视作不可区分。严格说这不叫类型 coercion（类型没变），但我在本章更广义讨论里把它也纳入“coercive”范畴。
 
-Contrast the `includes()` / `has()` methods here, which activate `SameValueZero()`, with the good ol' `indexOf(..)` array utility, which instead activates `IsStrictlyEqual()` instead. This algorithm is slightly more "coercive" than `SameValueZero()`, in that it prevents `NaN` values from ever being treated as equal to each other:
+对比一下：这里 `includes()` / `has()` 触发 `SameValueZero()`；而老牌数组工具 `indexOf(..)` 触发的是 `IsStrictlyEqual()`。这个算法在某些点反而比 `SameValueZero()` 更“coercive”：它会让 `NaN` 永远不能和 `NaN` 相等：
 
 ```js
-[ 1, 2, NaN ].indexOf(NaN);         // -1  <--- not found
+[ 1, 2, NaN ].indexOf(NaN);         // -1  <--- 未找到
 ```
 
-If these nuanced quirks of `includes(..)` and `indexOf(..)` bother you, when searching -- looking for an equality match within -- for a value in an array, you can avoid any "coercive" quicks and *force* the strictest `SameValue()` equality matching, via `Object.is(..)`:
+如果你不喜欢 `includes(..)` 与 `indexOf(..)` 这些细微怪癖，在数组里做“找相等项”时，可以用 `Object.is(..)` 强制最严格的 `SameValue()` 匹配，绕开这类“coercive”怪异：
 
 ```js
 vals = [ 0, 1, 2, -0, NaN ];
@@ -1120,17 +1121,17 @@ vals.findIndex(v => Object.is(v,-0));       // 3
 vals.findIndex(v => Object.is(v,NaN));      // 4
 ```
 
-#### Equality Operators: `==` vs `===`
+#### 相等运算符：`==` vs `===`
 
-The most obvious place where *coercion* is involved in equality checks is with the `==` operator. Despite any pre-conceived notions you may have about `==`, it behaves extremely predictably, ensuring that both operands match types before performing its equality check.
+相等检查里最显眼的 coercion 位置就是 `==`。不管你对 `==` 有什么先入为主印象，它的行为其实非常可预测：先确保双方类型一致，再执行相等判断。
 
-To state something that may or may not be super obvious: the `==` (and `===`) operators always return a `boolean` (`true` or `false`), indicating the result of the equality check; they never return anything else, regardless of what coercion may happen.
+先强调一个也许显而易见但很重要的事实：`==`（以及 `===`）总是返回 `boolean`（`true` 或 `false`），从不会返回其他类型，无论过程中发生什么 coercion。
 
-Now, recall and review the steps discussed earlier in the chapter for the `IsLooselyEqual()` operation. [^LooseEquality] Its behavior, and thus how `==` acts, can be pragmatically intuited with just these two facts in mind:
+现在回忆本章前面 `IsLooselyEqual()`[^LooseEquality] 的步骤。它也就是 `==` 的底层逻辑。你可以用两条规则快速把握它：
 
-1. If the types of both operands are the same, `==` has the exact same behavior as `===` -- `IsLooselyEqual()` immediately delegates to `IsStrictlyEqual()`. [^StrictEquality]
+1. 若两侧类型相同，`==` 与 `===` 行为完全一致——`IsLooselyEqual()` 会立刻委托给 `IsStrictlyEqual()`[^StrictEquality]。
 
-    For example, when both operands are object references:
+    例如两侧都是对象引用：
 
     ```js
     myObj = { a: 1 };
@@ -1140,114 +1141,111 @@ Now, recall and review the steps discussed earlier in the chapter for the `IsLoo
     myObj === anotherObj;               // true
     ```
 
-    Here, `==` and `===` determine that both of their respective operands are of the `object` reference type, so both equality checks behave identically; they compare the object references for equality.
+    这里 `==` 与 `===` 都看到两侧是 `object` 引用类型，所以行为一致：比较的是对象引用相等性。
 
-2. But if the operand types differ, `==` allows coercion until they match, and prefers numeric comparison; it attempts to coerce both operands to numbers, if possible:
+2. 若两侧类型不同，`==` 会允许 coercion 直到类型匹配，并偏向数值比较；只要可行，它会尝试把双方都往数字方向 coercion：
 
     ```js
     42 == "42";                         // true
     ```
 
-    Here, the `"42"` string is coerced to a `42` number (not vice versa), and thus the comparison is then `42 == 42`, and must clearly return `true`.
+    这里 `"42"` 会被 coercion 成 `42`（不是反过来），于是比较变成 `42 == 42`，结果自然是 `true`。
 
+掌握这两点后，我们就能澄清一个常见神话：只有 `===` 比“类型+值”，`==` 只比值。错。
 
-Armed with this knowledge, we'll now dispel the common myth that only `===` checks the type and value, while `==` checks only the value. Not true!
+实际上，`==` 与 `===` 都是类型敏感的，都会先关注操作数类型。区别只在：`==` 允许类型不匹配时做 coercion；`===` 禁止 coercion。
 
-In fact, `==` and `===` are both type-sensitive, each checking the types of their operands. The `==` operator allows coercion of mismatched types, whereas `===` disallows any coercion.
+“应避免 `==`、一律用 `===`”几乎是业内共识。我可能是少数公开、认真且明确主张相反的人：很多人偏好 `===`，除了“从众”，还有一个原因是没花时间真正理解 `==`。
 
-It's a nearly universally held opinion that `==` should be avoided in favor of `===`. I may be one of the only developers who publicly advocates a clear and straight-faced case for the opposite. I think the main reason people instead prefer `===`, beyond simply conforming to the status quo, is a lack of taking the time to actually understand `==`.
+我会在本章后面的“类型意识相等”继续论证：在很多情形下应优先 `==` 而不是 `===`。只请求你一件事：就算你现在强烈不同意，也先保持开放心态。
 
-I'll be revisiting this topic to make the case for preferring `==` over `===`, later in this chapter, in "Type Aware Equality". All I ask is, no matter how strongly you currently disagree with me, try to keep an open mindset.
+#### Nullish coercion
 
-#### Nullish Coercion
+我们已经见过不少 nullish 语义的 JS 操作——即把 `null` 与 `undefined` 视为强制相等——比如 `?.` 可选链、`??` 空值合并（见第 1 章 “Null'ish”）。
 
-We've already seen a number of JS operations that are nullish -- treating `null` and `undefined` as coercively equal to each other, including the `?.` optional-chaining operator and the `??` nullish-coalescing operator (see "Null'ish" in Chapter 1).
-
-But `==` is the most obvious place that JS exposes nullish coercive equality:
+而 `==` 是 JS 暴露 nullish 强制相等最直观的地方：
 
 ```js
 null == undefined;              // true
 ```
 
-Neither `null` nor `undefined` will ever be coercively equal to any other value in the language, other than to each other. That means `==` makes it ergonomic to treat these two values as indistinguishable.
+`null` 与 `undefined` 不会与语言里任何其他值强制相等，只会彼此相等。这让 `==` 在“把两者视为不可区分”时非常顺手。
 
-You might take advantage of this capability as such:
+你可以这样利用：
 
 ```js
 if (someData == null) {
-    // `someData` is "unset" (either null or undefined),
-    // so set it to some default value
+    // `someData` 未设置（null 或 undefined），
+    // 给它设默认值
 }
 
-// OR:
+// 或者：
 
 if (someData != null) {
-    // `someData` is set (neither null nor undefined),
-    // so use it somehow
+    // `someData` 已设置（既非 null 也非 undefined），
+    // 使用它
 }
 ```
 
-Remember that `!=` is the negation of `==`, whereas `!==` is the negation of `===`. Don't match the count of `=`s unless you want to confuse yourself!
+记住：`!=` 是 `==` 的否定，`!==` 是 `===` 的否定。别只看 `=` 个数机械对应，否则很容易把自己绕晕。
 
-Compare these two approaches:
+比较这两种写法：
 
 ```js
 if (someData == null) {
     // ..
 }
 
-// vs:
+// 对比：
 
 if (someData === null || someData === undefined) {
     // ..
 }
 ```
 
-Both `if` statements will behave exactly identically. Which one would you rather write, and which one would you rather read later?
+两个 `if` 行为完全一致。你更愿意写哪个？以后更愿意读哪个？
 
-To be fair, some of you prefer the more verbose `===` equivalent. And that's OK. I disagree, I think the `==` version of this check is *much* better. And I also maintain that the `==` version is more consistent in stylistic spirit with how the other nullish operators like `?.` and `??` act.
+当然，有些人就偏好更冗长的 `===` 版本，这没问题。我不同意：我认为 `==` 版明显更好。而且从风格一致性上，`== null` 也更接近 `?.` / `??` 这些 nullish 运算符精神。
 
-But another minor fact you might consider: in performance benchmarks I've run many times, JS engines can perform the single `== null` check as shown *slightly faster* than the combination of two `===` checks. In other words, there's a tiny but measurable benefit to letting JS's `==` perform the *implicit* nullish coercion than in trying to *explicitly* list out both checks yourself.
+另一个小事实：我多次跑过性能基准，JS 引擎执行单个 `== null` 检查通常会比“两次 `===` 再 `||` 拼起来”略快一些。也就是让 `==` 做*隐式* nullish coercion，通常有一点点可测优势。
 
-I'd observe that even many diehard `===` fans tend to concede that `== null` is at least one such case where `==` is preferable.
+我观察到，连很多坚决 `===` 派也会承认：`== null` 至少是 `==` 更合适的一个例外场景。
 
-#### `==` Boolean Gotcha
+#### `==` 与布尔值的坑
 
-Aside from some coercive corner cases we'll address in the next section, probably the biggest gotcha to be aware of with `==` has to do with booleans.
+除了下一节会讲的其他 coercion 边角情况，`==` 最大的坑大概和布尔值有关。
 
-Pay very close attention here, as it's one of the biggest reasons people get bitten by, and then come to despise, `==`. If you take my simple advice (at the end of this section), you'll never be a victim!
+这里请务必仔细看，这是许多人被 `==`“咬”过并开始厌恶它的主要原因之一。只要遵循我最后给的简单建议，你就不会中招。
 
-Consider the following snippet, and let's assume for a minute that `isLoggedIn` is *not* holding a `boolean` value (`true` or `false`):
+看下面代码，先假设 `isLoggedIn` *不是*布尔值（`true` 或 `false`）：
 
 ```js
 if (isLoggedIn) {
     // ..
 }
 
-// vs:
+// 对比：
 
 if (isLoggedIn == true) {
     // ..
 }
 ```
 
-We've already covered the first `if` statement form. We know `if` expects a `boolean`, so in this case `isLoggedIn` will be coerced to a `boolean` using the lookup table in the `ToBoolean()` abstract operation. Pretty straightforward to predict, right?
+第一个 `if` 我们已讲过：`if` 需要布尔值，所以 `isLoggedIn` 会按 `ToBoolean()` 查表规则 coercion，行为很好预测。
 
-But take a look at the `isLoggedIn == true` expression. Do you think it's going to behave the same way?
+但 `isLoggedIn == true` 呢？你觉得会一样吗？
 
-If your instinct was *yes*, you've just fallen into a tricky little trap. Recall early in this chapter when I warned that the rules of `ToBoolean()` coercion only apply if the JS operation is actually activating that algorithm. Here, it seems like JS must be doing so, because `== true` seems so clearly a "boolean related" type of comparison.
+如果你的第一反应是“会”，你已经掉进一个很隐蔽的陷阱。回忆本章早些时候我强调过：`ToBoolean()` 规则只有在 JS 操作*真的触发该算法*时才适用。这里看起来像“布尔相关比较”，所以很多人以为会触发它。
 
-But nope. Go re-read the `IsLooselyEqual()` algorithm (for `==`) earlier in the chapter. Go on, I'll wait. If you don't like my summary, go read the specification algorithm[^LooseEquality] itself.
+但并不会。回去再看一遍前文 `IsLooselyEqual()`（`==`）算法，或直接读规范[^LooseEquality]。
 
-OK, do you see anything in there that mentions invoking `ToBoolean()` under any circumstance?
+你会发现其中任何地方都没有说在某种情况下调用 `ToBoolean()`。
 
-Nope!
+记住：`==` 两侧类型不一致时，优先往数字方向 coercion。
 
-Remember: when the types of the two `==` operands are not the same, it prefers to coerce them both to numbers.
+如果 `isLoggedIn` 不是布尔，会是什么？比如字符串 `"yes"`。在 `if ("yes") { .. }` 里它显然是 truthy，会进分支。
 
-What might be in `isLoggedIn`, if it's not a `boolean`? Well, it could be a string value like `"yes"`, for example. In that form, `if ("yes") { .. }` would clearly pass the conditional check and execute the block.
-
-But what's going to happen with the `==` form of the `if` conditional? It's going to act like this:
+但 `==` 形式会这样走：
 
 ```js
 // (1)
@@ -1263,9 +1261,9 @@ NaN == 1
 NaN === 1           // false
 ```
 
-So in other words, if `isLoggedIn` holds a value like `"yes"`, the `if (isLoggedIn) { .. }` block will pass the conditional check, but the `if (isLoggedIn == true)` check will not. Ugh!
+也就是说，若 `isLoggedIn` 是 `"yes"`，`if (isLoggedIn) { .. }` 会通过，`if (isLoggedIn == true)` 却不会。很糟。
 
-What if `isLoggedIn` held the string `"true"`?
+如果 `isLoggedIn` 是 `"true"` 呢？
 
 ```js
 // (1)
@@ -1281,19 +1279,19 @@ NaN == 1
 NaN === 1           // false
 ```
 
-Facepalm.
+再次捂脸。
 
-Here's a pop quiz: what value would `isLoggedIn` need to hold for both forms of the `if` statement conditional to pass?
+来个小测验：要让两种 `if` 条件都通过，`isLoggedIn` 该是什么值？
 
-...
+……
 
-...
+……
 
-...
+……
 
-...
+……
 
-What if `isLoggedIn` was holding the number `1`? `1` is truthy, so the `if (isLoggedIn)` form passes. And the other `==` form that involves coercion:
+如果 `isLoggedIn` 是数字 `1`：`1` 是 truthy，`if (isLoggedIn)` 会过。`==` 这边则是：
 
 ```js
 // (1)
@@ -1306,7 +1304,7 @@ What if `isLoggedIn` was holding the number `1`? `1` is truthy, so the `if (isLo
 1 === 1             // true
 ```
 
-But if `isLoggedIn` was instead holding the string `"1"`? Again, `"1"` is truthy, but what about the `==` coercion?
+若 `isLoggedIn` 是字符串 `"1"` 呢？`"1"` 同样 truthy，`==` 过程：
 
 ```js
 // (1)
@@ -1322,53 +1320,53 @@ But if `isLoggedIn` was instead holding the string `"1"`? Again, `"1"` is truthy
 1 === 1             // true
 ```
 
-OK, so `1` and `"1"` are two values that `isLoggedIn` can hold that are safe to coerce along with `true` in a `==` equality check. But basically almost no other values are safe for `isLoggedIn` to hold.
+所以 `1` 和 `"1"` 是两类相对“安全”能和 `true` 做 `==` 的值。但除这类外，几乎没什么值对 `isLoggedIn` 是安全的。
 
-We have a similar gotcha if the check is `== false`. What values are safe in such a comparison? `""` and `0` work. But:
+`== false` 同样有坑。哪些值“安全”？`""` 和 `0` 可以。但：
 
 ```js
 if ([] == false) {
-    // this will run!
+    // 这段会执行！
 }
 ```
 
-`[]` is a truthy value, but it's also coercively equal to `false`?! Ouch.
+`[]` 是 truthy，却又和 `false` 强制相等？！离谱。
 
-What are we to make of these gotchas with `== true` and `== false` checks? I have a plain and simple answer.
+面对 `== true` / `== false` 这些坑，该怎么办？我的建议非常简单。
 
-Never, ever, under any circumstances, perform a `==` check if either side of the comparison is a `true` or `false` value. It looks like it's going to behave as a nice `ToBoolean()` coercion, but it slyly won't, and will instead be ensnared in a variety of coercion corner cases (addressed in the next section). And avoid the `===` forms, too.
+无论任何情况，只要比较两侧有一边是 `true` 或 `false`，就不要用 `==`。它看起来像会做你想要的 `ToBoolean()` coercion，实际上不会，反而会卷入一堆 coercion 边角陷阱（下一节会讲）。`===` 的这类写法也尽量避免。
 
-When you're dealing with booleans, stick to the implicitly coercive forms that are genuinely activating `ToBoolean()`, such as `if (isLoggedIn)`, and stay away from the `==` / `===` forms.
+当你处理布尔语义时，优先使用那些*确实会触发* `ToBoolean()` 的隐式形式，比如 `if (isLoggedIn)`，远离 `==` / `===` 的布尔比较写法。
 
-## Coercion Corner Cases
+## coercion 的边角坑（Coercion Corner Cases）
 
-I've been clear in expressing my pro-coercion opinion thus far. And it *is* just an opinion, though it's based on interpreting facts gleaned from studying the language specification and observable JS behaviors.
+到目前为止我一直很明确地表达了“支持 coercion”的立场。它当然是观点，但这个观点基于对规范与 JS 实际行为的研究。
 
-That's not to say that coercion is perfect. There's several frustrating corner cases we need to be aware of, so we avoid tripping into those potholes. In case it's not clear, my following characterizations of these corner cases are just more of my opinions. Your mileage may vary.
+这不代表 coercion 完美无缺。确实有若干让人抓狂的边角情况需要认识并规避，避免踩坑。下面这些“坑点评价”同样是我的主观看法，你可以有不同意见。
 
 ### Strings
 
-We already saw that the string coercion of an array looks like this:
+我们已看到数组做字符串 coercion：
 
 ```js
 String([ 1, 2, 3 ]);                // "1,2,3"
 ```
 
-I personally find that super annoying, that it doesn't include the surrounding `[ ]`. In particular, that leads to this absurdity:
+我个人非常不爽它不带外围 `[ ]`。这会导致这种荒诞情况：
 
 ```js
 String([]);                         // ""
 ```
 
-So we can't tell that it's even an array, because all we get is an empty string? Great, JS. That's just stupid. Sorry, but it is. And it gets worse:
+结果连“这是数组”都看不出来，只剩空字符串。很好，JS。确实很蠢。抱歉，但就是这样。更离谱的是：
 
 ```js
 String([ null, undefined ]);        // ","
 ```
 
-WAT!? We know that `null` coerces to the string `"null"`, and `undefined` coerces to the string `"undefined"`. But if those values are in an array, they magically just *disappear* as empty strings in the array-to-string coercion. Only the `","` remains to even hint to us there was anything at all in the array! That's just silly town, right there.
+啥！？`null` 明明可 coercion 到 `"null"`，`undefined` 也可 coercion 到 `"undefined"`。可一旦它们在数组里，做数组转字符串时却“神秘消失”为两个空串，只留下一个 `","` 暗示“这里曾经有东西”。这太离谱了。
 
-What about objects? Almost as aggravating, though in the opposite direction:
+对象呢？也很恼人，只是方向相反：
 
 ```js
 String({});                         // "[object Object]"
@@ -1376,72 +1374,72 @@ String({});                         // "[object Object]"
 String({ a: 1 });                   // "[object Object]"
 ```
 
-Umm... OK. Sure, thanks JS for no help at all in understanding what the object value is.
+嗯……好的。谢谢 JS，完全看不出对象内部信息。
 
 ### Numbers
 
-I'm about to reveal what I think is *the* worst root of all coercion corner case evil. Are you ready for it?!?
+接下来我要揭示我认为是“几乎所有 coercion 邪恶边角”的根源。准备好了吗？
 
 ```js
 Number("");                         // 0
 Number("       ");                  // 0
 ```
 
-I'm still shaking my head at this one, and I've known about it for nearly 20 years. I still don't get what Brendan was thinking with this one.
+我知道这个点快 20 年了，至今仍想摇头。真的不理解 Brendan 当时怎么会这么设计。
 
-The empty string is devoid of any contents; it has nothing in it with which to determine a numeric representation. `0` is absolutely ***NOT*** the numeric equivalent of missing/invalid numeric value. You know what number value we have that is well-suited to communicate that? `NaN`. Don't even get me started on how whitespace is stripped from strings when coercing to a number, so the very-much-not-empty `"       "` string is still treated the same as `""` for numeric coercion purposes.
+空字符串没有任何内容，根本不足以决定数值表示。`0` 绝对***不是***“缺失/无效数值”的等价物。我们明明有一个非常适合表达这种含义的值：`NaN`。更别提字符串转数字时会先去掉空白，于是明明非空的 `"       "` 仍会按 `""` 一样处理。
 
-Even worse, recall how `[]` coerces to the string `""`? By extension:
+更糟的是，回忆一下 `[]` 会 coercion 到 `""`，于是自然有：
 
 ```js
 Number([]);                         // 0
 ```
 
-Doh! If `""` didn't coerce to `0` -- remember, this is the root of all coercion evil! --, then `[]` wouldn't coerce to `0` either.
+唉！如果 `""` 不会 coercion 成 `0`——记住，这就是“万恶之源”——那 `[]` 也不会变成 `0`。
 
-This is just absurd, upside-down universe territory.
+这简直是反常识宇宙。
 
-Much more tame, but still mildly annoying:
+再看一些温和点但也烦人的例子：
 
 ```js
-Number("NaN");                      // NaN  <--- accidental!
+Number("NaN");                      // NaN  <--- 意外得到！
 
 Number("Infinity");                 // Infinity
-Number("infinity");                 // NaN  <--- oops, watch case!
+Number("infinity");                 // NaN  <--- 注意大小写！
 ```
 
-The string `"NaN"` is not parsed as a recognizable numeric value, so the coercion fails, producing (accidentally!) the `NaN` value. `"Infinity"` is explicitly parseable for the coercion, but any other casing, including `"infinity"`, will fail, again producing `NaN`.
+字符串 `"NaN"` 并不是合法可识别数值，所以 coercion 失败，结果“意外地”得到 `NaN`。`"Infinity"` 可被显式解析，但其他大小写（包括 `"infinity"`）都失败，结果同样 `NaN`。
 
-This next example, you may not think is a corner case at all:
+下面这个你可能觉得不算坑：
 
 ```js
 Number(false);                      // 0
 Number(true);                       // 1
 ```
 
-It's merely programmer convention, legacy from languages that didn't originally have boolean `true` and `false` values, that we treat `0` as `false`, and `1` as `true`. But does it *really* make sense to go the other direction?
+把 `0` 当 `false`、`1` 当 `true`，更多是编程历史惯例（来自早期没布尔类型的语言）。但反向真的合理吗？
 
-Think about it this way:
+看这个：
 
 ```js
 false + true + false + false + true;        // 2
 ```
 
-Really? I don't think there's any case where treating a `boolean` as its `number` equivalent makes any rational sense in a program. I can understand the reverse, for historical reasons: `Boolean(0)` and `Boolean(1)`.
+真的合理吗？我认为几乎没有程序场景里，把 `boolean` 当等价 `number` 是理性的。反向（`Boolean(0)`、`Boolean(1)`）我能理解，历史原因摆在那里。
 
-But I genuniely feel that `Number(false)` and `Number(true)` (as well as any implicit coercion forms) should produce `NaN`, not `0` / `1`.
+但我真心觉得 `Number(false)`、`Number(true)`（以及对应隐式形式）都应该得到 `NaN`，而不是 `0`/`1`。
 
-### Coercion Absurdity
+### coercion 荒诞案例
 
-To prove my point, let's take the absurdity up to level 11:
+为了证明这一点，我们把荒诞指数拉满：
 
 ```js
 [] == ![];                          // true
 ```
 
-How!? That seems beyond credibility that a value could be coercively equal to its negation, right!?
+怎么可能！？一个值居然和它的否定强制相等？
 
-But follow down the coercion rabbit hole:
+沿着 coercion 兔子洞走一遍：
 
 1. `[] == ![]`
 2. `[] == false`
@@ -1450,115 +1448,117 @@ But follow down the coercion rabbit hole:
 5. `0 == 0`
 6. `0 === 0`  ->  `true`
 
-We've got three different absurdities conspiring against us: `String([])`, `Number("")`, and `Number(false)`; if any of these weren't true, this nonsense corner case outcome wouldn't occur.
+这里有三种荒诞行为串联：`String([])`、`Number("")`、`Number(false)`。只要其中任意一个不成立，这个离谱结果就不会出现。
 
-Let me make something absolutely clear, though: none of this is `==`'s fault. It gets the blame here, of course. But the real culprits are the underlying `string` and `number` corner cases.
+但我要非常明确：这并不是 `==` 的锅。表面上它会背锅，但真正问题源头是底层 `string` 与 `number` coercion 的边角规则。
 
-## Type Awareness
+## 类型意识（Type Awareness）
 
-We've now sliced and diced and examined coercion from every conceivable angle, starting from the abstract internals of the specification, then moving to the concrete expressions and statements that actually trigger the coercions.
+到这里，我们已经从几乎所有角度拆解过 coercion：先看规范抽象内部，再看触发 coercion 的具体语句与表达式。
 
-But what's the point of all this? Is the detail in this chapter, and indeed this whole book up to this point, mostly just trivia? Eh, I don't think so.
+那这一切意义何在？本章这些细节，乃至本书目前内容，难道只是冷知识吗？我不这么看。
 
-Let's return to the observations/questions I posed way back at the beginning of this long chapter.
+回到本章一开始我抛出的观察与问题。
 
-There's no shortage of opinions (especially negative) about coercion. The nearly universally held position is that coercion is mostly/entirely a *bad part* of JS's language design. But inspite of that reality, most every developer, in most every JS program ever written, faces the reality that coercion cannot be avoided.
+关于 coercion 的意见（尤其负面意见）从不缺。几乎普遍的立场是：coercion 基本/完全属于 JS 设计里的“坏部分”。但现实是：几乎每个开发者、几乎每个 JS 程序都绕不开 coercion。
 
-In other words, no matter what you do, you won't be able to get away from the need to be aware of, understand, and manage JS's value-types and the conversions them. Contrary to common assumptions, embracing a dynamically-typed (or even a weakly-typed) language, does *not* mean being careless or unaware of types.
+换句话说，不管你怎么写，你都躲不开“理解并管理 JS 值类型及其转换”。与常见误解相反，选择动态类型（甚至弱类型）语言，并不等于可以忽略类型、无视类型。
 
-Type-aware programming is always, always better than type ignorant/agnostic programming.
+有类型意识（type-aware）的编程，永远、永远优于无类型意识（type ignorant/agnostic）的编程。
 
-### Uhh... TypeScript?
+### 呃……那 TypeScript 呢？
 
-Surely you're thinking at this moment: "Why can't I just use TypeScript and declare all my types statically, avoiding all the confusion of dynamic typing and coercion?"
+你现在大概在想：“为什么不直接用 TypeScript，把类型都静态声明掉，避开动态类型和 coercion 的复杂性？”
 
-| NOTE: |
+| 注意： |
 | :--- |
-| I have many more detailed thoughts on TypeScript and the larger role it plays in our ecosystem; I'll save those opinions for the appendix ("Thoughts on TypeScript"). |
+| 我对 TypeScript 及其在生态中的角色还有更多细节观点；这里先不展开，放到附录（“Thoughts on TypeScript”）再说。 |
 
-Let's start by addressing head on the ways TypeScript does, and does not, aid in type-aware programming, as I'm advocating.
+先正面回答：TypeScript 在“类型意识编程”上到底帮了什么、又没帮什么。
 
-TypeScript is both **statically-typed** (meaning types are declared at author time and checked at compile-time) and **strongly-typed** (meaning variables/containers are typed, and these associations are enforced; strongly-typed systems also disallow *implicit* coercion). The greatest strength of TypeScript is that it typically forces both the author of the code, and the reader of the code, to confront the types comprising most (ideally, all!) of a program. That's definitely a good thing.
+TypeScript 既是 **静态类型**（类型在编写时声明、在编译时检查），也是 **强类型**（变量/容器带类型关联并强制执行；强类型系统也禁止*隐式* coercion）。TypeScript 最大优势在于：它通常迫使代码作者和代码读者都去面对程序里大部分（理想是全部）类型信息。这确实是好事。
 
-By contrast, JS is **dynamically-typed** (meaning types are discovered and managed purely at runtime) and **weakly-typed** (meaning variables/containers are not typed, so there's no associations to enforce, and variables can thus hold any value-types; weakly-typed systems allow any form of coercion).
+相比之下，JS 是 **动态类型**（类型只在运行时被发现与管理）且 **弱类型**（变量/容器本身不带类型关联，无法强制，因此变量可持有任意值类型；弱类型系统允许各种 coercion）。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| I'm hand-waving at a pretty high level here, and intentionally not diving deeply into lots of nuance on the static/dynamic and strong/weak typing spectrums. If you're feeling the urge to "Well, actually..." me at this moment, please just hold on a bit and let me lay out my arguments. |
+| 这里我是在较高层做概念说明，故意不深挖静态/动态、强/弱类型光谱里的细分争议。若你现在很想“严格说其实……”，先稍等，听我把论证讲完。 |
 
-### Type-Awareness *Without* TypeScript
+### 不依赖 TypeScript 也能有类型意识
 
-Does a dynamically-typed system automatically mean you're programming with less type-awareness? Many would argue that, but I disagree.
+动态类型系统是否天然意味着“类型意识更弱”？很多人会这么说，但我不同意。
 
-I do not at all think that declaring static types (annotations, as in TypeScript) is the only way to accomplish effective type-awareness. Clearly, though, proponents of static-typing believe that is the *best* way.
+我完全不认为“声明静态类型注解（TypeScript 那种）”是实现类型意识的唯一方式。静态类型支持者当然会认为那是*最好*的方式。
 
-Let me illustrate type-awareness without TypeScript's static typing. Consider this variable declaration:
+举个不靠 TypeScript 静态类型也体现类型意识的例子：
 
 ```js
 let API_BASE_URL = "https://some.tld/api/2";
 ```
 
-Is that statement in any way *type-aware*? Sure, there's no `: string` annotation after `API_BASE_URL`. But I definitely think it *is* still type-aware! We clearly see the value-type (`string`) of the value being assigned to `API_BASE_URL`.
+这句声明有类型意识吗？确实没有 `: string` 注解。但我认为它*仍然*有类型意识：我们清楚看到赋给 `API_BASE_URL` 的值类型是 `string`。
 
-| WARNING: |
+| 警告： |
 | :--- |
-| Don't get distracted by the `let` declaration being re-assignable (as opposed to a `const`). JS's `const` is *not* a first-class feature of its type system. We don't really gain additional type-awareness simply because we know that reassignment of a `const` variable is disallowed by the JS engine. If the code is structured well -- ahem, structured with type-awareness as a priority -- we can just read the code and see clearly that `API_BASE_URL` is *not* reassigned and is thus still the value-type it was previously assigned. From a type-awareness perspective, that's effectively the same thing as if it *couldn't* be reassigned. |
+| 别被这里用的是可重赋值的 `let`（而非 `const`）分散注意力。JS 的 `const` 并不是其类型系统的一等特性。仅仅“引擎禁止重赋值”并不会让你获得额外类型意识。若代码结构良好——咳，尤其是以类型意识为优先——你读代码本身就能看出 `API_BASE_URL` 没被重新赋值，因此它仍保持原先值类型。从类型意识角度，这和“语法上不能重赋值”基本等价。 |
 
-If I later want to do something like:
+如果后面我要写：
 
 ```js
-// are we using the secure API URL?
+// 我们用的是 https 安全 API 地址吗？
 isSecureAPI = /^https/.test(API_BASE_URL);
 ```
 
-I know the regular-expression `test(..)` method expects a string, and since I know `API_BASE_URL` is holding a string, I know that operation is type-safe.
+我知道正则 `test(..)` 期望字符串，也知道 `API_BASE_URL` 是字符串，所以这次操作类型安全。
 
-Similarly, since I know the simple rules of `ToBoolean()` coercion as it relates to string values, I know this kind of statement is also type-safe:
+同理，因为我理解字符串相关 `ToBoolean()` 规则，下面这种语句也类型安全：
 
 ```js
-// do we have an API URL determined yet?
+// 我们已经拿到 API URL 了吗？
 if (API_BASE_URL) {
     // ..
 }
 ```
 
-But if later, I start to type something like this:
+但若后面开始写：
 
 ```js
 APIVersion = Number(API_BASE_URL);
 ```
 
-A warning siren triggers in my head. Since I know there's some very specific rules about how string values coerce to numbers, I recognize that this operation is **not** type-safe. So I instead approach it differently:
+我脑子里会拉响警报。因为我知道字符串转数字有一套具体规则，这个操作并**不**类型安全。所以我会换做：
 
 ```js
-// pull out the version number from API URL
+// 从 API URL 中提取版本号
 versionDigit = API_BASE_URL.match(/\/api\/(\d+)$/)[1];
 
-// make sure the version is actually a number
+// 确保版本号确实是数字
 APIVersion = Number(versionDigit);
 ```
 
-I know that `API_BASE_URL` is a string, and I further know the format of its contents includes `".../api/{digits}"` at the end. That lets me know that the regular expression match will succeed, so the `[1]` array access is type-safe.
+我知道 `API_BASE_URL` 是字符串，也知道它末尾格式是 `".../api/{digits}"`。因此我知道这个正则匹配会成功，`[1]` 数组访问是类型安全的。
 
-I also know that `versionDigit` will hold a string, because that's what regular-expression matches return. Now, I know it's safe to coerce that numeric-digit string into a number with `Number(..)`.
+我也知道正则匹配结果返回的是字符串，所以 `versionDigit` 是字符串。此时再用 `Number(..)` 把这个“数字字符字符串”转成数值，就是安全的。
 
-By my definition, that kind of thinking, and that style of coding, is type-aware. Type-awareness in coding means thinking carefully about whether or not such things will be *clear* and *obvious* to the reader of the code.
+按我的定义，这种思考方式与编码方式就是有类型意识。所谓类型意识，不只是“能跑”，而是你会考虑这些语义对读者是否*清楚*、是否*显然*。
 
-### Type-Awareness *With* TypeScript
+### 借助 TypeScript 的类型意识
 
-TypeScript fans will point out that TypeScript can, via type inference, do static typing (enforcement) without ever needing a single type annotation in the program. So all the code examples I shared in the previous section, TypeScript can also handle, and provide its flavor of compile-time static type enforcement.
+TypeScript 支持者会指出：靠类型推断，TypeScript 即便没有任何注解，也能做静态类型检查。上一节那些代码，TypeScript 也能处理并提供它的编译期类型约束。
 
-In other words, TypeScript will give us the same kind of benefit in type checking, whichever of these two we write:
+也就是不管你写：
 
 ```ts
 let API_BASE_URL: string = "https://some.tld/api/2";
 
-// vs:
+// 或：
 
 let API_BASE_URL = "https://some.tld/api/2";
 ```
 
-But there's no free-lunch. We have some issues we need to confront. First of all, TypeScript does *not* trigger an error here:
+TypeScript 都能给出类似的类型收益。
+
+但没有免费午餐。我们得面对一些问题。首先，TypeScript 在这里并不会报错：
 
 ```js
 API_BASE_URL = "https://some.tld/api/2";
@@ -1567,7 +1567,7 @@ APIVersion = Number(API_BASE_URL);
 // NaN
 ```
 
-Intuitively, *I* want a type-aware system to understand why that's unsafe. But maybe that's just too much to ask. Or perhaps if we actually define a more narrow/specific type for that `API_BASE_URL` variable, than simply `string`, it might help? We can use a TypeScript trick called "Template Literal Types": [^TSLiteralTypes]
+直觉上，*我*希望一个有类型意识的系统能识别这不安全。但也许这要求太高？或者我们给 `API_BASE_URL` 定义更窄、更具体的类型（而不是泛泛 `string`）会不会有帮助？可以试试 TypeScript 的 “Template Literal Types”[^TSLiteralTypes]：
 
 ```ts
 type VersionedURL = `https://some.tld/api/${number}`;
@@ -1578,17 +1578,17 @@ APIVersion = Number(API_BASE_URL);
 // NaN
 ```
 
-Nope, TypeScript still doesn't see any problem with that. Yes, I know there's an explanation for why (how `Number(..)` itself is typed).
+还是不行，TypeScript 仍看不出问题。是的，我知道这背后有类型系统层面的解释（比如 `Number(..)` 本身的类型定义）。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| I imagine the really smart folks who *know* TypeScript well have creative ideas on how we can contort ourselves into raising an error there. Maybe there's even a dozen different ways to force TypeScript to trigger on that code. But that's not really the point. |
+| 我也相信真正精通 TypeScript 的高手，也许能想出很多“技巧”把这里拧成报错。甚至可能有十几种写法能逼出错误提示。但那不是重点。 |
 
-My point is, we cannot fully rely on TypeScript types to solve all our problems, letting us check out and remain blissfully unaware of the nuances of types and, in this case, coercion behaviors.
+重点是：我们不能把所有问题都寄托给 TypeScript 类型，让自己退出思考，保持对类型细节（尤其 coercion）“幸福无知”。
 
-But! You're surely objecting to this line of argument, desperate to assert that even if TypeScript can't understand some specific situation, surely using TypeScript doesn't make it *worse*! Right!?
+但你现在一定会反驳：就算 TypeScript 理解不了某些特例，也不至于让事情变*更糟*吧！？
 
-Let's look at what TypeScript has to say[^TSExample1] about this line:
+看看 TypeScript[^TSExample1] 对这行代码怎么说：
 
 ```ts
 type VersionedURL = `https://some.tld/api/${number}`;
@@ -1599,95 +1599,90 @@ let versionDigit = API_BASE_URL.match(/\/api\/(\d+)$/)[1];
 // Object is possibly 'null'.
 ```
 
-The error indicates that the `[1]` access isn't type-safe, because if the regular expression fails to find any match on the string, `match(..)` returns `null`.
+这条错误提示说 `[1]` 访问不类型安全，因为如果正则匹配失败，`match(..)` 会返回 `null`。
 
-You see, even though *I* can reason about the contents of the string compared to how the regular expression is written, and even if *I* went to the trouble to make it super clear to TypeScript exactly what those specific string contents are, it's not quite smart enough to line those two up to see that it's actually fully type-safe to assume the match happens.
+你看，即便*我*能基于字符串内容与正则表达式推导出“这里必定匹配成功”，即便*我*已经尽量把字符串形状描述得非常清楚，TypeScript 仍不够“聪明”把这两者对齐，进而得出“这里实际上是类型安全的”。
 
-| TIP: |
+| 提示： |
 | :--- |
-| Is it really the job of, and best use of, a type-aware tool to be contorted to express every single possible nuance of type-safety? We don't need perfect and universal tools to derive immense amounts of benefit from the stuff they *can* do. |
+| 一个类型工具真的应该、也真的值得，被我们扭成“表达每一种细枝末节类型安全”的形态吗？工具不必完美/全能，也能提供巨大价值。 |
 
-Moreover, comparing the code style in the previous section to the code in this section (with or without the annotations), is TypeScript actually making our coding more type-aware?
+再进一步比较上一节代码风格与本节代码风格（有无注解都算），TypeScript 真的让我们的编码“更有类型意识”了吗？
 
-Like, does that `type VersionedURL = ..` and `API_BASE_URL: VersionedURL` stuff *actually* make our code more clearly type-aware? I don't necessarily think so.
+比如 `type VersionedURL = ..` 与 `API_BASE_URL: VersionedURL` 这些写法，真的会让代码在“类型意识”上更清晰吗？我不认为必然如此。
 
-### TypeScript Intelligence
+### TypeScript 的“智能”
 
-Yes, I hear you screaming at me through the computer screen. Yes, I know that TypeScript provides what type information it discovers (or infers) to your code editor, which comes through in the form of intelligent autocompletes, helpful inline warning markers, etc.
+是的，我听到你在屏幕那头大喊。是的，我知道 TypeScript 会把它发现（或推断）的类型信息输送给编辑器，于是你获得智能补全、行内告警等体验。
 
-But I'm arguing that even *those* don't, in and of themselves, make you more type-aware as a developer
+但我想说：这些东西本身并不会自动让你成为更有类型意识的开发者。
 
-Why? Because type-awareness is *not* just about the authoring experience. It's also about the reading experience, maybe even more so. And not all places/mechanisms where code is read, have access to benefit from all the extra intelligence.
+为什么？因为类型意识*不只*是编写体验，也同样是阅读体验，甚至后者更重要。而代码阅读场景/媒介并不总能拿到这些智能增强。
 
-Look, the magic of a language-server pumping intelligence into your code editor is unquestionably amazing. It's cool and super helpful.
+我承认，语言服务把智能灌进编辑器，这很厉害，也非常有帮助。
 
-And I don't begrudge TypeScript as a tool inferring things about my **JS code** and giving me hints and suggestions through delightful code editor integrations. I just don't necessarily want to *have* to annotate type information in some extremely specific way just to silence the tool's complaints.
+而且我并不排斥 TypeScript 作为工具去分析我的 **JS 代码** 并提供提示建议。我只是未必愿意为了“让工具不报错”，就被迫按某种极度具体的类型注解方式写代码。
 
-### The Bar Above TypeScript
+### 高于 TypeScript 的门槛
 
-But even if I did/had all that, it's still not ***sufficient*** for me to be fully type-aware, both as a code-author and as a code-reader.
+但即便我都做了，也仍然对“成为完整的类型意识作者与读者”来说***不够***。
 
-These tools don't catch every type error that can happen, no matter how much we want to tell ourselves they can, and no matter how many hoops and contortions we endure to wish it so. All the efforts to coax and *coerce* a tool into catching those nuanced errors, through endlessly increasing complexity of type syntax tricks, is... at best, misplaced effort.
+这些工具抓不住所有可能的类型错误——无论我们多么希望它们能，无论我们为了“让它能”愿意做多少语法体操。把大量精力投入到“哄工具抓住那些细微错误”的类型技巧上，往往是错位投入。
 
-Moreover, no such tool is immune to false positives, complaining about things which aren't actually errors; these tools will never be as smart as we are as humans. You're really wasting your time in chasing down some quirky syntax trick to quite down the tool's complaints.
+而且工具也会有误报，抱怨并非错误的代码；它永远不可能和人类理解力完全一样。你花很多时间去追某种奇技淫巧，只为了安抚工具报错，通常并不划算。
 
-There's just no substitute, if you want to truly be a type-aware code-author and code-reader, from learning how the language's built-in type systems work. And yes, that means every single developer on your team needs to spend the efforts to learn it. You can't water this stuff down just to be more attainable for less experienced developers on the project/team.
+如果你想真正成为有类型意识的代码作者与读者，没有任何替代品能代替你亲自学会语言内建类型系统如何工作。是的，这意味着团队里每个开发者都得投入学习。不能为了“照顾经验较少的同学”就把这块稀释掉。
 
-Even if we granted that you could avoid 100% of all *implicit* coercions -- you can't -- you are absolutely going to face the need to *explicit* coercions -- all programs do!
+即便你声称能规避 100% 的*隐式* coercion——其实做不到——你也绝对绕不开*显式* coercion——所有程序都绕不开。
 
-And if your response to that fact is to suggest that you'll just offload the mental burden of understanding them to a tool like TypeScript... then I'm sorry to tell you, but you're plainly and painfully falling short of the *type-aware* bar that I'm challenging all developers to strive towards.
+如果你对这个事实的回应是：那我把理解负担都外包给 TypeScript……很遗憾，这就明显、痛苦地低于我希望开发者达到的“类型意识”标准。
 
-I'm not advocating, here, for you to ditch TypeScript. If you like it, fine. But I am very explicitly and passionately challenging you: stop using TypeScript as a crutch. Stop prostrating yourself to appease the TypeScript engine overlords. Stop foolishly chasing every type rabbit down every syntactic hole.
+我并不是在劝你放弃 TypeScript。你喜欢用，当然可以。但我非常明确且强烈地挑战你：不要把 TypeScript 当拐杖。不要为了取悦 TypeScript 引擎而过度屈从。不要盲目地把每个类型兔子都追进每个语法洞里。
 
-From my observation, there's a tragic, inverse relationship between usage of type-aware tooling (like TypeScript) and the desire/effort to pursue actual type-awareness as a code-author and code-reader. The more you rely on TypeScript, the more it seems you're tempted and encouraged to shift your attention away from JS's type system (and especially, from coercion) to the alternate TypeScript type system.
+按我的观察，使用类型工具（如 TypeScript）与追求真实类型意识（作为作者/读者）之间，常呈现一种令人遗憾的反向关系：你越依赖 TypeScript，越容易被诱导把注意力从 JS 类型系统（尤其 coercion）转移到 TypeScript 的另一套类型系统上。
 
-Unfortunately, TypeScript can never fully escape JS's type system, because TypeScript's types are *erased* by the compiler, and what's left is just JS that the JS engine has to contend with.
+但 TypeScript 永远无法彻底脱离 JS 类型系统，因为它的类型会在编译时被*擦除*，最终留下的仍是 JS，仍要由 JS 引擎来执行。
 
-| TIP: |
+| 提示： |
 | :--- |
-| Imagine if someone handed you a cup of filtered water to drink. And just before you took a sip, they said, "We extracted that water from the ground near a waste dump. But don't worry, we used a perfectly great filter, and that water is totally safe!" How much do you trust that filter? More to my overall point, wouldn't you feel more comfortable drinking that water if you understood everything about the source of the water, all the processes of filtration, and everything that was *in* the water of the glass in your hand!? Or is trusting that filter good enough? |
+| 想象有人递给你一杯过滤水，正要喝时他说：“这水来自垃圾场附近地下水，不过放心，过滤器很好，绝对安全！”你会多信任这个过滤器？更重要的是：如果你真正理解了水源、过滤流程，以及你手里这杯水里到底有什么，你是不是会更安心？还是说，“相信过滤器”就足够了？ |
 
-### Type Aware Equality
+### 类型意识相等（Type Aware Equality）
 
-I'll close this long, winding chapter with one final illustration, modeling how I think developers should -- armed with more critical thinking than bandwagon conformism -- approach type-aware coding, whether you use a tool like TypeScript or not.
+本章最后，我再给一个示例，说明我认为开发者应如何在“批判性思考”而非“从众习惯”下做类型意识编码——不论你是否使用 TypeScript。
 
-We'll yet again revisit equality comparisons (`==` vs `===`), from the perspective of type-awareness. Earlier in this chapter, I promised that I would make the case for `==` over `===`, so here it goes.
+我们再次回到相等比较（`==` vs `===`），这次从类型意识角度审视。前面我承诺过会论证“应优先 `==`”，现在来兑现。
 
-Let's restate/summarize what we know about `==` and `===` so far:
+先复述目前已知事实：
 
-1. If the types of the operands for `==` match, it behaves *exactly the same* as `===`.
+1. `==` 两侧类型相同，则行为*完全等同* `===`。
+2. `===` 两侧类型不同，则总是 `false`。
+3. `==` 两侧类型不同，则会允许对任一侧 coercion（通常偏向数值类型），直到类型一致；一致后回到（1）。
 
-2. If the types of the operands for `===` do not match, it will always return `false`.
-
-3. If the types of the operands for `==` do not match, it will allow coercion of either operand (generally preferring numeric type-values), until the types finally match; once they match, see (1).
-
-OK, so let's take those facts and analyze how they might interact in our program.
-
-If you are making an equality comparison of `x` and `y` like this:
+好，基于这些事实看程序中的比较：
 
 ```js
-if ( /* are x and y equal */ ) {
+if ( /* x 与 y 是否相等 */ ) {
     // ..
 }
 ```
 
-What are the possible conditions we may be in, with respect to the types of `x` and `y`?
+从 `x`、`y` 的类型认知角度，只有两种总体状态：
 
-1. We might know exactly what type(s) `x` and `y` could be, because we know how those variables are getting assigned.
+1. 我们清楚知道 `x`、`y` 可能是什么类型（因为我们知道它们如何赋值）。
+2. 我们无法判断它们可能是什么类型；可能是任意类型，或多个类型组合复杂到无法预测。
 
-2. Or we might not be able to tell what those types could be. It could be that `x` or `y` could be any type, or at least any of several different types, such that the possible combinations of types in the comparison are too complex to understand/predict.
+能否同意：状态（1）明显优于（2）？进一步同意：（1）代表类型意识编码，而（2）代表类型*无意识*编码？
 
-Can we agree that (1) is far preferable to (2)? Can we further agree that (1) represents having written our code in a type-aware fashion, whereas (2) represents code that is decidedly type-*unaware*?
+如果你用 TypeScript，通常你会较清楚 `x`、`y` 类型。即便不用 TypeScript，我们也已经展示过：只用 JS 也能通过有意识设计让 `x`、`y` 类型清楚可见。
 
-If you're using TypeScript, you're very likely to be aware of the types of `x` and `y`, right? Even if you're not using TypeScript, we've already shown that you can take intentional steps to write your code in such a way that the types of `x` and `y` are known and obvious.
+#### （2）未知类型
 
-#### (2) Unknown Types
+如果你处在（2），我会断言：代码已处于问题状态，不理想，需要重构。最佳做法就是修它！
 
-If you're in scenario (2), I'm going to assert that your code is in a problem state. Your code is less-than-ideal. Your code needs to be refactored. The best thing to do, if you find code in this state, is... fix it!
+把代码改成有类型意识。如果这意味着引入 TypeScript、加一些类型注解，就做；若你觉得只用 JS 也能达成，就那么做。总之尽量把它拉回（1）。
 
-Change the code so it's type-aware. If that means using TypeScript, and even inserting some type annotations, do so. Or if you feel you can get to the type-aware state with *just JS*, do that. Either way, do whatever you can to get to scenario (1).
-
-If you cannot ensure the code doing this equality comparison between `x` and `y` is type-aware, and you have no other options, then you absolutely *must* use the `===` strict-equality operator. Not doing so would be supremely irresponsible.
+如果你实在无法保证 `x` 与 `y` 的比较是类型可知、且别无他法，那你就*必须*使用 `===`。不用 `===` 就是不负责任。
 
 ```js
 if (x === y) {
@@ -1695,120 +1690,117 @@ if (x === y) {
 }
 ```
 
-If you don't know anything about the types, how could you (or any other future reader of your code) have any idea how the coercive steps in `==` are going to behave!? You can't.
+你连类型都不知道，怎么可能（让未来读代码的人也）预测 `==` 的 coercion 会怎么走？做不到。
 
-The only responsible thing to do is, avoid coercion and use `===`.
+唯一负责任的选择就是：避免 coercion，用 `===`。
 
-But don't lose sight of this fact: you're only picking `===` as a last resort, when your code is so type-unaware -- ahem, type-broken! -- as to have no other choice.
+但别忽视这个事实：你只是在“最后手段”才选 `===`——因为你的代码类型意识差到（说白了）近乎类型损坏，只剩这个选项。
 
-#### (1) Known Types
+#### （1）已知类型
 
-OK, let's instead assume you're in scenario (1). You know the types of `x` and `y`. It's very clear in the code what this narrow set of types participating in the equality check can be.
+现在假设你在（1）：你知道 `x`、`y` 类型，比较参与类型范围在代码里很清楚。
 
-Great!
+很好！
 
-But there's still two possible sub-conditions you may be in:
+但还有两个子状态：
 
-* (1a): `x` and `y` might already be of the same type, whether that be both are `string`s, `number`s, etc.
+* （1a）`x` 与 `y` 可能已是同类型（同为 `string`、同为 `number` 等）。
+* （1b）`x` 与 `y` 可能是不同类型。
 
-* (1b): `x` and `y` might be of different types.
+分别讨论。
 
-Let's consider each of these cases individually.
+##### （1a）已知且同类型
 
-##### (1a) Known Matching Types
+若比较双方类型一致（无论具体是什么），我们已确定 `==` 与 `===` 做的事情完全一样，没有任何差别。
 
-If the types in the equality comparison match (whatever they are), we already know for certain that `==` and `===` do exactly the same thing. There's absolutely no difference.
-
-Except, `==` *is* shorter by one character. Most developers feel instinctively that the most terse but equivalent version of something is often most preferable. That's not universal, of course, but it's a general preference at least.
+唯一差别是：`==` 少一个字符。多数开发者直觉上会偏好“更短但等价”的写法（不是绝对，但很常见）。
 
 ```js
-// this is best
+// 这里最佳
 if (x == y) {
     // ..
 }
 ```
 
-In this particular case, an extra `=` would do nothing for us to make the code more clear. In fact, it actually would make the comparison worse!
+在这种场景，多一个 `=` 对清晰度毫无增益。甚至会更糟：
 
 ```js
-// this is strictly worse here!
+// 在这里反而更差！
 if (x === y) {
     // ..
 }
 ```
 
-Why is it worse?
+为什么更差？
 
-Because in scenario (2), we already established that `===` is used for the last-resort when we don't know enough/anything about the types to be able to predict the outcome. We use `===` when we want to make sure we're avoiding coercion when we know coercion could occur.
+因为在（2）里我们已经定义：`===` 是“当你不知道类型细节、只能兜底避免 coercion”的最后手段。你用 `===` 是在防止潜在 coercion 发生。
 
-But that doesn't apply here! We already know that no coercion would occur. There's no reason to confuse the reader with a `===` here. If you use `===` in a place where you already *know* the types -- and moreover, they're matched! -- that actually might send a mixed signal to the reader. They might have assumed they knew what would happen in the equality check, but then they see the `===` and they second guess themselves!
+但这里根本不适用！我们已知道不会发生 coercion。此处写 `===` 反而会给读者混合信号：他本来知道比较会怎样，一看 `===` 又开始怀疑“是不是有我没看到的类型风险”。
 
-Again, to state it plainly, if you know the types of an equality comparison, and you know they match, there's only one right choice: `==`.
+再说一遍：若你知道比较双方类型，且知道它们匹配，唯一正确选择是 `==`。
 
 ```js
-// stick to this option
+// 坚持这个选项
 if (x == y) {
     // ..
 }
 ```
 
-##### (1b) Known Mismatched Types
+##### （1b）已知但类型不匹配
 
-OK, we're in our final scenario. We need to compare `x` and `y`, and we know their types, but we also know their types are **NOT** the same.
+来到最后场景：我们要比较 `x` 与 `y`，知道各自类型，而且确定它们**不相同**。
 
-Which operator should we use here?
+这时该选哪个运算符？
 
-If you pick `===`, you've made a huge mistake. Why!? Because `===` used with known-mismatched types will never, ever, ever return `true`. It will always fail.
+如果你选 `===`，那是大错。为什么？因为 `===` 面对“已知类型不匹配”永远不可能返回 `true`，只会失败。
 
 ```js
-// `x` and `y` have different types?
+// `x` 和 `y` 类型不同？
 if (x === y) {
-    // congratulations, this code in here will NEVER run
+    // 恭喜，这里的代码永远不会执行
 }
 ```
 
-OK. So, `===` is out when the types are known and mismatched. What's our only other choice?
+所以 `===` 在“已知不匹配”时出局。那只剩什么？
 
-Well, actually, we again have two options. We *could* decide:
+其实有两条路：
 
-* (1b-1): Let's change the code so we're not trying to do an equality check with known mismatched types; that could involve explicitly coercing one or both values so they types now match, in which case pop back up to scenario (1a).
-
-* (1b-2): If we're going to compare known mismatched types for equality, and we want any hope of that check ever passing, we *must* used `==`, because it's the only one of the equality operators which can coerce one or both operands until the types match.
+* （1b-1）改代码，避免做“已知类型不匹配”的直接相等比较；可显式 coercion 一侧或两侧，让类型先对齐，再回到（1a）。
+* （1b-2）若你就是要比较“已知不匹配类型”并希望有机会为真，那*必须*用 `==`，因为只有它会对操作数做 coercion 直到类型匹配。
 
 ```js
-// `x` and `y` have different types,
-// so let's allow JS to coerce them
-// for equality comparison
+// `x` 与 `y` 类型不同，
+// 那就允许 JS 对其做 coercion
+// 再比较相等
 if (x == y) {
-    // .. (so, you're saying there's a chance?)
+    // ..（也就是说，还是有机会的？）
 }
 ```
 
-That's it. We're done. We've looked at every possible type-sensitive equality comparison condition (between `x` and `y`).
+到此为止，我们已经覆盖了 `x` 与 `y` 类型敏感相等比较的所有可能状态。
 
-#### Summarizing Type-Sensitive Equality Comparison
+#### 类型敏感相等比较总结
 
-The case for always preferring `==` over `===` is as follows:
+“应始终优先 `==` 而不是 `===`”的论证如下：
 
-1. Whether you use TypeScript or not -- but especially if you *do* use TypeScript -- the goal should be to have every single part of the code, including all equality comparisons, be *type-aware*.
+1. 不论是否使用 TypeScript——尤其若你*在用* TypeScript——目标都应是让代码每一处（包括相等比较）都具备*类型意识*。
 
-2. If you know the types, you should always prefer `==`.
+2. 只要你知道类型，就应优先 `==`。
 
-    - In the case where the types match, `==` is both shorter and more proper for the check.
+    - 若类型匹配，`==` 更短且更符合语义。
+    - 若类型不匹配，只有 `==` 能 coercion 到匹配，比较才有可能成立。
 
-    - In the case where the types are not matched, `==` is the only operator that can coerce operand(s) until the types match, so it's the only way such a check could ever hope to pass
+3. 最后，只有在你*无法*知道/预测类型、又无其他办法时，才把 `===` 当兜底。最好还加注释说明为何使用 `===`，并提示未来应重构去掉这个“拐杖”。
 
-3. Finally, only if you *can't* know/predict the types, for some frustrating reason, and you have no other option, fall back to using `===` as a last resort. And probably add a code comment there admitting why `===` is being used, and maybe prompting some future developer to later change the code to fix that deficiency and remove the crutch of `===`.
+#### TypeScript 的不一致问题
 
-#### TypeScript's Inconsistency Problem
+我说得更直白些：如果你正确使用 TypeScript，并且知道某个相等比较的类型信息，那在该处坚持 `===` 本身就是*错误*的。句号。
 
-Let me be super clear: if you're using TypeScript properly, and you know the types of an equality comparison, using `===` for that comparison is just plain *wrong*! Period.
+问题在于，TypeScript 很奇怪也很令人沮丧：除非它已确定两侧类型一致，否则它仍要求你用 `===`。
 
-The problem is, TypeScript strangely and frustratingly still requires you to use `===`, unless it already knows that the types are matched.
+这是因为 TypeScript 要么并未真正理解“类型意识 + coercion”，要么——更让人恼火——它其实懂，但它如此不认同 JS 类型系统（尤其隐式 coercion），以至于连最基本的类型意识推理都不愿采用。
 
-That's because TypeScript either doesn't fully understand type-awareness and coercion, or -- and this is even more infuriating! -- it fully understands but it still despises JS's type system so much as to eschew even the most basic of type-aware reasoning.
-
-Don't believe me? Think I'm being too harsh? Try this in TypeScript: [^TSExample2]
+不信？觉得我太苛刻？试试这段 TypeScript[^TSExample2]：
 
 ```js
 let result = (42 == "42");
@@ -1816,21 +1808,21 @@ let result = (42 == "42");
 // the types 'number' and 'string' have no overlap.
 ```
 
-I am at a loss for words to describe how aggravating that is to me. If you've paid attention to this long, heavy chapter, you know that TypeScript is basically telling a lie here. Of course `42 == "42"` will produce `true` in JS.
+我很难形容这有多让我抓狂。你若认真读完本章，就知道这条提示在 JS 语义下几乎是错误引导。`42 == "42"` 在 JS 里当然是 `true`。
 
-Well, it's not a lie, but it's exposing a fundamental truth that so many still don't fully appreciate: TypeScript completely tosses out the normal rules of JS's type system, because TypeScript's position is that JS's type system -- and especially, implicit coercion -- are bad, and need to be replaced.
+这不算“谎言”，但它暴露了一个许多人仍未正视的事实：TypeScript 基本丢弃了 JS 类型系统（特别是隐式 coercion）的一整套规则，因为它的立场是这些东西“不好”，应被替换。
 
-In TypeScript's world, `42` and `"42"` can never be equal to each other. Hence the error message. But in JS land, `42` and `"42"` are absolutely coercively equal to each other. And I believe I've made a strong case here that they *should be* assumed to be safely coercively equivalent.
+在 TypeScript 的世界里，`42` 与 `"42"` 不可能相等，因此给出该错误信息。而在 JS 世界里，它们就是强制相等。并且我认为本章已经充分论证：这种 coercive equivalence 在很多场景下是安全且可取的。
 
-What bothers me even more is, TypeScript has a variety of inconsistencies in this respect. TypeScript is perfectly fine with the *implicit* coercion in this code:
+更让我不适的是，TypeScript 在这方面又有许多不一致。比如它完全接受这段代码里的*隐式* coercion：
 
 ```js
 irony = `The value '42' and ${42} are coercively equal.`;
 ```
 
-The `42` gets implicitly coerced to a string when interpolating it into the sentence. Why is TypeScript ok with this implicit coercion, but not the `42 == "42"` implicit coercion?
+这里 `42` 在插值中被隐式转成字符串。为什么这种隐式 coercion 可以，而 `42 == "42"` 的隐式 coercion 不可以？
 
-TypeScript has no complaints about this code, either:
+TypeScript 对下面代码也不报错：
 
 ```js
 API_BASE_URL = "https://some.tld/api/2";
@@ -1839,17 +1831,17 @@ if (API_BASE_URL) {
 }
 ```
 
-Why is `ToBoolean()` an OK implicit coercion, but `ToNumber()` in the `==` algorithm is not?
+为什么 `ToBoolean()` 的隐式 coercion 可以，`==` 算法里 `ToNumber()` 的隐式 coercion 就不可以？
 
-I will leave you to ponder this: do you really think it's a good idea to write code that will ultimately run in a JS engine, but use a tool and style of code that has intentionally ejected most of an entire pillar of the JS language? Moreover, is it fine that it's also flip-flopped with a variety of inconsistent exceptions, simply to cater to the old habits of JS developers?
+留给你思考：当你的代码最终要在 JS 引擎执行时，使用一种刻意剔除了 JS 语言一整根支柱（coercion）的工具与风格，真的是好主意吗？再者，它还带着一堆不一致例外，仅仅是为了迎合 JS 开发者既有习惯——这真的没问题吗？
 
-## What's Left?
+## 还剩什么？
 
-I hope by now you're feeling a lot more informed about how JS's type system works, from primitive value types to the object types, to how type coercions are performed by the engine.
+希望到这里，你已经更清楚地理解 JS 类型系统是如何工作的：从原始值类型到对象类型，再到引擎如何执行类型 coercion。
 
-More importantly, you also now have a much more complete picture of the pros/cons of the choices we make using JS's type system, such as choosing *implicit* or *explicit* coercions at different points.
+更重要的是，你现在也更完整地看到了：我们在 JS 类型系统里做的选择（例如某处用隐式还是显式 coercion）各自有什么利弊。
 
-But we haven't fully covered the context in which the type system operates. For the remainder of this book, we'll turn our attention to the syntax/grammar rules of JS that govern how operators and statements behave.
+不过我们还没把“类型系统运行的上下文”讲完。接下来本书剩余部分，我们会把注意力转向 JS 的语法/文法规则：它们如何支配运算符与语句的行为。
 
 [^EichCoercion]: "The State of JavaScript - Brendan Eich", comment thread, Hacker News; Oct 9 2012; https://news.ycombinator.com/item?id=4632704 ; Accessed August 2022
 

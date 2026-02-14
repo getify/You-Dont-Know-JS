@@ -1,57 +1,57 @@
-# You Don't Know JS Yet: Objects & Classes - 2nd Edition
+# 你并不了解 JavaScript：对象与类 - 第二版
 
-| NOTE: |
+| 注意： |
 | :--- |
-| Work in progress |
+| 草稿 |
 
-## Table of Contents
+## 目录
 
-* Foreword
-* Preface
-* Chapter 1: Object Foundations
-    * About This Book
-    * Objects As Containers
-    * Defining Properties
-    * Accessing Properties
-    * Assigning Properties
-    * Deleting Properties
-    * Determining Container Contents
-    * Temporary Containers
-    * Containers Are Collections Of Properties
-* Chapter 2: How Objects Work
-    * Property Descriptors
-    * Object Sub-Types
-    * Object Characteristics
-    * Extending the MOP
-    * `[[Prototype]]` Chain
-    * Objects Behavior
-* Chapter 3: Classy Objects
-    * When Should I Class-Orient My Code?
-    * Keep It `class`y
-    * Class Instance `this`
-    * Class Extension
-    * Static Class Behavior
-    * Private Class Behavior
-    * Class Example
-* Chapter 4: This Works
-    * This Aware
-    * This Is It!
-    * An Arrow Points Somewhere
-    * Variations
-    * Stay Aware
-* Chapter 5: Delegation
-    * Preamble
-    * What's A Constructor, Anyway?
-    * Ditching Class Thinking
-    * Delegation Illustrated
-    * Composing Peer Objects
-    * Why *This*?
-* Thank You!
-* TODO:
-    * object wrappers (String, Boolean, etc)
-    * object coercions (valueof, tostring, boxing)
-    * well-known symbols extension points on objects
-    * proxies
-    * old "prototypal class" style
-    * "inheritance" objections
-    * protected visibility
+* 推荐序
+* [前言](foreword.md)
+* [第 1 章：对象基础](ch1.md)
+    * 关于本书
+    * 作为容器的对象
+    * 定义属性
+    * 访问属性
+    * 赋值属性
+    * 删除属性
+    * 确定容器内容
+    * 临时容器
+    * 容器是属性的集合
+* [第 2 章：对象是如何工作的](ch2.md)
+    * 属性描述符
+    * 对象子类型
+    * 对象特性
+    * 扩展 MOP
+    * `[[Prototype]]` 链
+    * 对象行为
+* [第 3 章：类风格的对象](ch3.md)
+    * 何时应该将代码面向类？
+    * 保持 `class` 风格
+    * 类实例 `this`
+    * 类扩展
+    * 静态类行为
+    * 私有类行为
+    * 类示例
+* [第 4 章：this 的工作原理](ch4.md)
+    * this 感知
+    * 这就是 this！
+    * 箭头指向某处
+    * 变体
+    * 保持感知
+* [第 5 章：委托](ch5.md)
+    * 开场白
+    * 到底什么是构造函数？
+    * 摒弃类思维
+    * 委托图解
+    * 组合对等对象
+    * 为什么是 *This*？
+* [致谢！](thanks.md)
+* 待办：
+    * 对象包装器（String、Boolean 等）
+    * 对象强制转换（valueof、tostring、装箱）
+    * 对象上的常用符号扩展点
+    * 代理
+    * 旧的“原型类”风格
+    * “继承”异议
+    * 受保护的可见性

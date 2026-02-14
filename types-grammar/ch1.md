@@ -1,19 +1,19 @@
-# You Don't Know JS Yet: Types & Grammar - 2nd Edition
-# Chapter 1: Primitive Values
+# 你并不了解 JavaScript：类型与语法 - 第 2 版
+# 第 1 章：原始值
 
-| NOTE: |
+| 注意： |
 | :--- |
-| Work in progress |
+| 草稿 |
 
-In Chapter 1 of the "Objects & Classes" book of this series, we confronted the common misconception that "everything in JS is an object". We now circle back to that topic, and again dispel that myth.
+在这个系列的“对象与类”一书的第 1 章中，我们要面对一个普遍的误解，即“JS 中的一切都是对象”。现在我们回到这个话题，再次打破这个神话。
 
-Here, we'll look at the core value types of JS, specifically the non-object types called *primitives*.
+在这里，我们将着眼于 JS 的核心值类型，特别是被称为*原始类型*（primitives）的非对象类型。
 
-## Value Types
+## 值类型
 
-JS doesn't apply types to variables or properties -- what I call, "container types" -- but rather, values themselves have types -- what I call, "value types".
+JS 不会将类型应用于变量或属性——我称之为“容器类型”（container types）——相反，值本身具有类型——我称之为“值类型”（value types）。
 
-The language provides seven built-in, primitive (non-object) value types: [^PrimitiveValues]
+语言提供了七种内置的、原始（非对象）值类型：[^PrimitiveValues]
 
 * `undefined`
 * `null`
@@ -23,11 +23,11 @@ The language provides seven built-in, primitive (non-object) value types: [^Prim
 * `symbol`
 * `string`
 
-These value-types define collections of one or more concrete values, each with a set of shared behaviors for all values of each type.
+这些值类型定义了一个或多个具体值的集合，每种类型的所有值都有一组共享的行为。
 
 ### Type-Of
 
-Any value's value-type can be inspected via the `typeof` operator, which always returns a `string` value representing the underlying JS value-type:
+任何值的值类型都可以通过 `typeof` 运算符进行检查，该运算符总是返回一个表示底层 JS 值类型的 `string` 值：
 
 ```js
 typeof true;            // "boolean"
@@ -39,20 +39,20 @@ typeof 42n;             // "bigint"
 typeof Symbol("42");    // "symbol"
 ```
 
-The `typeof` operator, when used against a variable instead of a value, is reporting the value-type of *the value in the variable*:
+当 `typeof` 运算符用于变量而不是值时，报告的是*变量中值的*值类型：
 
 ```js
 greeting = "Hello";
 typeof greeting;        // "string"
 ```
 
-JS variables themselves don't have types. They hold any arbitrary value, which itself has a value-type.
+JS 变量本身没有类型。它们持有任意值，而值本身具有值类型。
 
-### Non-objects?
+### 非对象？
 
-What specifically makes the 7 primitive value types distinct from the object value types (and sub-types)? Why shouldn't we just consider them all as essentially *objects* under the covers?
+具体是什么让这 7 种原始值类型不同于对象值类型（及其子类型）？为什么我们在底层不把它们本质上都看作*对象*呢？
 
-Consider:
+试想：
 
 ```js
 myName = "Kyle";
@@ -62,13 +62,13 @@ myName.nickname = "getify";
 console.log(myName.nickname);           // undefined
 ```
 
-This snippet appears to silently fail to add a `nickname` property to a primitive string. Taken at face value, that might imply that primitives are really just objects under the covers, as many have (wrongly) asserted over the years.
+这段代码似乎在向原始字符串添加 `nickname` 属性时静默失败了。从表面上看，这可能意味着原始类型在底层实际上只是对象，正如多年来许多人（错误地）断言的那样。
 
-| WARNING: |
+| 警告： |
 | :--- |
-| One might explain that silent failure as an example of *auto-boxing* (see "Automatic Objects" in Chapter 3), where the primitive is implicitly converted to a `String` instance wrapper object while attempting to assign the property, and then this internal object is thrown away after the statement completes. In fact, I said exactly that in the first edition of this book. But I was wrong; oops! |
+| 有人可能会将这种静默失败解释为*自动装箱*（auto-boxing，参见第 3 章中的“自动对象”）的一个例子，即原始值在尝试分配属性时被隐式转换为 `String` 实例包装对象，然后在这个语句完成后，这个内部对象就被丢弃了。事实上，我在本书的第一版中正是这样说的。但我错了；哎呀！|
 
-Something deeper is at play, as we see in this version of the previous snippet:
+正如我们在之前代码片段的这个版本中看到的，更深层次的东西在起作用：
 
 ```js
 "use strict";
@@ -80,29 +80,29 @@ myName.nickname = "getify";
 // on string 'Kyle'
 ```
 
-Interesting! In strict-mode, JS enforces a restriction that disallows setting a new property on a primitive value, as if implicitly promoting it to a new object.
+有趣！在严格模式下，JS 强制执行限制，不允许在原始值上设置新属性，就好像隐式地将其提升为一个新对象一样。
 
-By contrast, in non-strict mode, JS allows the violation to go unmentioned. So why? Because strict-mode was added to the language in ES5.1 (2011), more than 15 years in, and such a change would have broken existing programs had it not been defined as sensitive to the new strict-mode declaration.
+相比之下，在非严格模式下，JS 允许这种违规行为不被提及。为什么呢？因为严格模式是在 ES5.1（2011年）中添加到语言中的，那时语言已经存在超过 15 年了，如果这类更改没有被定义为对新的严格模式声明敏感，那么它将破坏现有的程序。
 
-So what can we conclude about the distinction between primitives and objects? Primitives are values that *are not allowed to have properties*; only objects are allowed such.
+那么我们可以得出关于原始类型和对象之间区别的什么结论呢？原始类型是*不允许拥有属性*的值；只有对象才允许拥有属性。
 
-| TIP: |
+| 提示： |
 | :--- |
-| This particular distinction seems to be contradicted by expressions like `"hello".length`; even in strict-mode, it returns the expected value `5`. So it certainly *seems* like the string has a `length` property! But, as just previously mentioned, the correct explanation is *auto-boxing*; we'll cover the topic in "Automatic Objects" in Chapter 3. |
+| 这种特殊的区别似乎与 `"hello".length` 这样的表达式相矛盾；即使在严格模式下，它也返回预期的值 `5`。所以看起来字符串确实有一个 `length` 属性！但是，正如刚才提到的，正确的解释是*自动装箱*；我们将会在第 3 章的“自动对象”中涵盖这个话题。|
 
-## Empty Values
+## 空值 (Empty Values)
 
-The `null` and `undefined` types both typically represent an emptiness or absence of value.
+`null` 和 `undefined` 类型通常都表示值的空缺或缺失。
 
-Unfortunately, the `null` value-type has an unexpected `typeof` result. Instead of `"null"`, we see:
+不幸的是，`null` 值类型的 `typeof` 结果出人意料。我们看到的不是 `"null"`，而是：
 
 ```js
 typeof null;            // "object"
 ```
 
-No, that doesn't mean that `null` is somehow a special kind of object. It's just a legacy of early days of JS, which cannot be changed because of how much code out in the wild it would break.
+不，这并不意味着 `null` 在某种程度上是一种特殊的对象。这只是 JS 早期遗留下来的问题，由于这会破坏大量现有的代码，因此无法更改。
 
-The `undefined` type is reported both for explicit `undefined` values and any place where a seemingly missing value is encountered:
+`undefined` 类型用于报告显式的 `undefined` 值以及任何遇到看似缺失值的地方：
 
 ```js
 typeof undefined;               // "undefined"
@@ -119,44 +119,44 @@ whatever = [];
 typeof whatever[10];            // "undefined"
 ```
 
-| NOTE: |
+| 注意： |
 | :--- |
-| The `typeof nonExistent` expression is referring to an undeclared variable `nonExistent`. Normally, accessing an undeclared variable reference would cause an exception, but the `typeof` operator is afforded the special ability to safely access even non-existent identifiers and calmly return `"undefined"` instead of throwing an exception. |
+| `typeof nonExistent` 表达式引用了一个未声明的变量 `nonExistent`。通常，访问未声明的变量引用会导致异常，但 `typeof` 运算符被赋予了特殊的能力，可以安全地访问甚至不存在的标识符，并冷静地返回 `"undefined"` 而不是抛出异常。|
 
-However, each respective "empty" type has exactly one value, of the same name. So `null` is the only value in the `null` value-type, and `undefined` is the only value in the `undefined` value-type.
+然而，每种各自的“空”类型都正好有一个同名的值。所以 `null` 是 `null` 值类型中唯一的值，而 `undefined` 是 `undefined` 值类型中唯一的值。
 
 ### Null'ish
 
-Semantically, `null` and `undefined` types both represent general emptiness, or absence of another affirmative, meaningful value.
+从语义上讲，`null` 和 `undefined` 类型都表示一般的空虚，或者说是缺乏另一种肯定的、有意义的值。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| JS operations which behave the same whether `null` or `undefined` is encountered, are referred to as "null'ish" (or "nullish"). I guess "undefined'ish" would look/sound too weird! |
+| 无论遇到 `null` 还是 `undefined` 行为都相同的 JS 操作，被称为 "null'ish"（或 "nullish"）。我想 "undefined'ish" 看起来/听起来太奇怪了！|
 
-For a lot of JS, especially the code developers write, these two *nullish* values are interchangeable; the decision to intentionally use/assign `null` or `undefined` in any given scenario is situation dependent and left up to the developer.
+对于很多 JS 来说，尤其是开发人员编写的代码，这两个 *nullish* 值是可以互换的；在任何给定的场景中，有意使用/赋值 `null` 或 `undefined` 的决定都是取决于具体情况的，并留给开发人员来决定。
 
-JS provides a number of capabilities for helping treat the two nullish values as indistinguishable.
+JS 提供了一些功能来帮助将这两个 nullish 值视为不可区分。
 
-For example, the `==` (coercive-equality comparison) operator specifically treats `null` and `undefined` as coercively equal to each other, but to no other values in the language. As such, a `.. == null` check is safe to perform if you want to check if a value is specifically either `null` or `undefined`:
+例如，`==`（强制相等比较）运算符明确地将 `null` 和 `undefined` 视为彼此强制相等，但不等于语言中的任何其他值。因此，如果你想检查一个值是否具体为 `null` 或 `undefined`，`.. == null` 检查是安全的：
 
 ```js
 if (greeting == null) {
-    // greeting is nullish/empty
+    // greeting 是 nullish/空的
 }
 ```
 
-Another (recent) addition to JS is the `??` (nullish-coalescing) operator:
+JS 的另一个（最近）添加是 `??`（nullish-coalescing，空值合并）运算符：
 
 ```js
 who = myName ?? "User";
 
-// equivalent to:
+// 等同于：
 who = (myName != null) ? myName : "User";
 ```
 
-As the ternary equivalent illustrates, `??` checks to see if `myName` is non-nullish, and if so, returns its value. Otherwise, it returns the other operand (here, `"User"`).
+正如三元运算符等效代码所示，`??` 检查 `myName` 是否为非 nullish，如果是，则返回其值。否则，它返回另一个操作数（这里是 `"User"`）。
 
-Along with `??`, JS also added the `?.` (nullish conditional-chaining) operator:
+除了 `??`，JS 还添加了 `?.`（nullish conditional-chaining，空值可选链）运算符：
 
 ```js
 record = {
@@ -174,43 +174,43 @@ console.log( record?.billingAddress?.street );
 // undefined
 ```
 
-The `?.` operator checks the value immediately preceding (to the left) value, and if it's nullish, the operator stops and returns an `undefined` value. Otherwise, it performs the `.` property access against that value and continues with the expression.
+`?.` 运算符检查紧接其前（左侧）的值，虽然如果不为 nullish，该运算符就会停止并返回一个 `undefined` 值。否则，它会对该值执行 `.` 属性访问并继续表达式。
 
-Just to be clear: `record?.` is saying, "check `record` for nullish before `.` property access". Additionally, `billingAddress?.` is saying, "check `billingAddress` for nullish before `.` property access".
+为了清楚起见：`record?.` 是说，“在 `.` 属性访问之前检查 `record` 是否为 nullish”。此外，`billingAddress?.` 是说，“在 `.` 属性访问之前检查 `billingAddress` 是否为 nullish”。
 
-| WARNING: |
+| 警告： |
 | :--- |
-| Some JS developers believe that the newer `?.` is superior to `.`, and should thus almost always be used instead of `.`. I believe that's an unwise perspective. First of all, it's adding extra visual clutter, which should only be done if you're getting benefit from it. Secondly, you should be aware of, and planning for, the emptiness of some value, to justify using `?.`. If you always expect a non-nullish value to be present in some expression, using `?.` to access a property on it is not only unnecessary/wasteful, but also could potentially hide future bugs where your assumption of value-presence had failed but `?.` covered it up. As with most features in JS, use `.` where it's most appropriate, and use `?.` where it's most appropriate. Never substitute one when the other is more appropriate. |
+| 一些 JS 开发人员认为较新的 `?.` 优于 `.`，因此应该几乎总是代替 `.` 使用。我认为这是一种不明智的观点。首先，它增加了额外的视觉混乱，只有当你从中受益时才应该这样做。其次，你应该意识到并计划某些值的空缺，以证明使用 `?.` 的合理性。如果你总是期望在某些表达式中存在非 nullish 值，那么在它上面使用 `?.` 访问属性不仅是不必要/浪费的，而且还可能隐藏未来的错误，即你的值存在假设失败了，但 `?.` 掩盖了它。与 JS 中的大多数功能一样，在最合适的地方使用 `.`，在最合适的地方使用 `?.`。当另一个更合适时，切勿使用这一个。|
 
-There's also a somewhat strange `?.[` form of the operator, not `?[`, for when you need to use `[ .. ]` style access instead of `.` access:
+还有一种稍微奇怪的 `?.[` 形式的运算符，不是 `?[`, 用于当你需要使用 `[ .. ]` 风格的访问而不是 `.` 访问时：
 
 ```js
 record?.["shipping" + "Address"]?.state;    // XY
 ```
 
-Yet another variation, referred to as "optional-call", is `?.(`, and is used when conditionally calling a function if the value is non-nullish:
+还有另一种变体，称为“可选调用”（optional-call），是 `?.(`，用于当值非 nullish 时有条件地调用函数：
 
 ```js
-// instead of:
+// 代替：
 //   if (someFunc) someFunc(42);
 //
-// or:
+// 或者：
 //   someFunc && someFunc(42);
 
 someFunc?.(42);
 ```
 
-The `?.(` operator seems like it is checking to see if `someFunc(..)` is a valid function that can be called. But it's not! It's only checking to make sure the value is non-nullish before trying to invoke it. If it's some other non-nullish but also non-function value type, the execution attempt will still fail with a `TypeError` exception.
+`?.(` 运算符看起来像是在检查 `someFunc(..)` 是否是一个可以调用的有效函数。但它不是！它只是在尝试调用之前检查以确保该值为非 nullish。如果是其他非 nullish 但也是非函数的值类型，执行尝试仍将失败并抛出 `TypeError` 异常。
 
-| WARNING: |
+| 警告： |
 | :--- |
-| Because of that gotcha, I *strongly dislike* this operator form, and caution anyone against ever using it. I think it's a poorly conceived feature that does more harm (to JS itself, and to programs) than good. There's very few JS features I would go so far as to say, "never use it." But this is one of the truly *bad parts* of the language, in my opinion. |
+| 由于这个陷阱，我*强烈不喜欢*这种运算符形式，并告诫任何人永远不要使用它。我认为这是一个构思拙劣的功能，弊（对 JS 本身和对程序）大于利。很少有 JS 功能我会说，“永远不要使用它”。但在我看来，这是语言中真正的*糟糕部分*之一。|
 
-### Distinct'ish
+### 独特性 (Distinct'ish)
 
-It's important to keep in mind that `null` and `undefined` *are* actually distinct types, and thus `null` can be noticeably different from `undefined`. You can, carefully, construct programs that mostly treat them as indistinguishable. But that requires care and discipline by the developer. From JS's perspective, they're more often distinct.
+重要的是要记住，`null` 和 `undefined` 实际上*是*不同的类型，因此 `null` 可能与 `undefined` 明显不同。你可以小心地构建主要将它们视为不可区分的程序。但这需要开发人员的细心和自律。从 JS 的角度来看，它们通常是不同的。
 
-There are cases where `null` and `undefined` will trigger different behavior by the language, which is important to keep in mind. We won't cover all the cases exhaustively here, but here's on example:
+在某些情况下，`null` 和 `undefined` 会触发语言的不同行为，记住这一点很重要。我们不会在这里详尽地涵盖所有情况，但这里有一个例子：
 
 ```js
 function greet(msg = "Hello") {
@@ -224,15 +224,15 @@ greet("Hi");        // Hi
 greet(null);        // null
 ```
 
-The `= ..` clause on a parameter is referred to as the "parameter default". It only kicks in and assigns its default value to the parameter if the argument in that position is missing, or is exactly the `undefined` value. If you pass `null`, that clause doesn't trigger, and `null` is thus assigned to the parameter.
+参数上的 `= ..` 子句被称为“参数默认值”。只有当该位置的参数缺失，或者确切地是 `undefined` 值时，它才会生效并将其默认值分配给参数。如果你传递 `null`，该子句不会触发，因此 `null` 被分配给参数。
 
-There's no *right* or *wrong* way to use `null` or `undefined` in a program. So the takeaway is: be careful when choosing one value or the other. And if you're using them interchangeably, be extra careful.
+在程序中使用 `null` 或 `undefined` 没有*对*或*错*之分。所以结论是：在选择其中一个值时要小心。如果你可以互换使用它们，请格外小心。
 
-## Boolean Values
+## 布尔值 (Boolean Values)
 
-The `boolean` type contains two values: `false` and `true`.
+`boolean` 类型包含两个值：`false` 和 `true`。
 
-In the "old days", programming languages would, by convention, use `0` to mean `false` and `1` to mean `true`. So you can think of the `boolean` type, and the keywords `false` and `true`, as a semantic convenience sugar on top of the `0` and `1` values:
+在“旧时代”，编程语言按照惯例使用 `0` 表示 `false`，使用 `1` 表示 `true`。所以你可以把 `boolean` 类型，以及关键字 `false` 和 `true`，看作是 `0` 和 `1` 值之上的语义便利糖：
 
 ```js
 // isLoggedIn = 1;
@@ -242,33 +242,33 @@ isComplete = 0;
 // isComplete = false;
 ```
 
-Boolean values are how all decision making happens in a JS program:
+布尔值是 JS 程序中所有决策发生的方式：
 
 ```js
 if (isLoggedIn) {
-    // do something
+    // 做一些事情
 }
 
 while (!isComplete) {
-    // keep going
+    // 继续
 }
 ```
 
-The `!` operator negates/flips a boolean value to the other one: `false` becomes `true`, and `true` becomes `false`.
+`!` 运算符将布尔值否定/翻转为另一个值：`false` 变为 `true`，`true` 变为 `false`。
 
-## String Values
+## 字符串值 (String Values)
 
-The `string` type contains any value which is a collection of one or more characters, delimited (surrounding on either side) by quote characters:
+`string` 类型包含任何字符集合的值，这些字符由引号字符定界（两边包围）：
 
 ```js
 myName = "Kyle";
 ```
 
-JS does not distinguish a single character as a different type as some languages do; `"a"` is a string just like `"abc"` is.
+JS不像某些语言那样将单个字符区分为不同的类型；`"a"` 和 `"abc"` 一样都是字符串。
 
-Strings can be delimited by double-quotes (`"`), single-quotes (`'`), or back-ticks (`` ` ``). The ending delimiter must always match the starting delimiter.
+字符串可以用双引号（`"`）、单引号（`'`）或反引号（`` ` ``）定界。结束定界符必须始终与开始定界符匹配。
 
-Strings have an intrinsic length which corresponds to how many code-points -- actually, code-units, more on that in a bit -- they contain.
+字符串具有固有的长度，对应于它们包含多少个码点（code-points）——实际上是码元（code-units），稍后会详细介绍。
 
 ```js
 myName = "Kyle";
@@ -276,45 +276,45 @@ myName = "Kyle";
 myName.length;      // 4
 ```
 
-This does not necessarily correspond to the number of visible characters present between the start and end delimiters (aka, the string literal). It can sometimes be a little confusing to keep straight the difference between a string literal and the underlying string value, so pay close attention.
+这并不一定对应于开始和结束定界符之间存在的可见字符数（又称字符串字面量）。有时很难分清字符串字面量和底层字符串值之间的区别，所以请密切注意。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| We'll cover length computation of strings in detail, in Chapter 2. |
+| 我们将在第 2 章详细介绍字符串的长度计算。|
 
-### JS Character Encodings
+### JS 字符编码
 
-What type of character encoding does JS use for string characters?
+JS 为字符串字符使用什么类型的字符编码？
 
-You've probably heard of "Unicode" and perhaps even "UTF-8" (8-bit) or "UTF-16" (16-bit). If you're like me (before doing the research it took to write this text), you might have just hand-waved and decided that's all you need to know about character encodings in JS strings.
+你可能听说过“Unicode”，甚至可能听说过“UTF-8”（8 位）或“UTF-16”（16 位）。如果你像我一样（在进行编写本文所需的研究之前），你可能只是挥挥手，认为这就是你需要了解的关于 JS 字符串中字符编码的全部内容。
 
-But... it's not. Not even close.
+但是……并非如此。甚至差得很远。
 
-It turns out, you need to understand how a variety of aspects of Unicode work, and even to consider concepts from UCS-2 (2-byte Universal Character Set), which is similar to UTF-16, but not quite the same. [^UTFUCS]
+事实证明，你需要了解 Unicode 的各个方面是如何工作的，甚至还要考虑 UCS-2（2 字节通用字符集）的概念，它类似于 UTF-16，但不完全相同。[^UTFUCS]
 
-Unicode defines all the "characters" we can represent universally in computer programs, by assigning a specific number to each, called code-points. These numbers range from `0` all the way up to a maximum of `1114111` (`10FFFF` in hexadecimal).
+Unicode 定义了我们在计算机程序中可以普遍表示的所有“字符”，通过为每个字符分配一个特定的数字，称为码点。这些数字的范围从 `0` 一直到最大 `1114111`（十六进制 `10FFFF`）。
 
-The standard notation for Unicode characters is `U+` followed by 4-6 hexadecimal characters. For example, the `❤` (heart symbol) is code-point `10084` (`2764` in hexadecimal), and is thus notated with `U+2764`.
+Unicode 字符的标准表示法是 `U+` 后跟 4-6 个十六进制字符。例如，`❤` （心形符号）是码点 `10084`（十六进制 `2764`），因此用 `U+2764` 表示。
 
-The first group of 65,535 code points in Unicode is called the BMP (Basic Multilingual Plane). These can all be represented with 16 bits (2 bytes). When representing Unicode characters from the BMP, it's fairly straightforward, as they can *fit* neatly into single UTF-16 JS characters.
+Unicode 中的第一组 65,535 个码点称为 BMP（基本多文种平面）。这些都可以用 16 位（2 字节）表示。当表示来自 BMP 的 Unicode 字符时，这相当简单，因为它们可以整齐地*放入*单个 UTF-16 JS 字符中。
 
-All the rest of the code points are grouped into 16 so called "supplemental planes" or "astral planes". These code-points require more than 16 bits to represent -- 21 bits to be exact -- so when representing extended/supplemental characters above the BMP, JS actually stores these code-points as a pairing of two adjacent 16-bit code units, called *surrogate halves* (or *surrogate pairs*).
+其余所有的码点被分组到 16 个所谓的“补充平面”或“星际平面”中。这些码点需要超过 16 位来表示——确切地说是 21 位——因此当表示 BMP 之外的扩展/补充字符时，JS 实际上将这些码点存储为一对相邻的 16 位码元，称为*代理半项*（或*代理对*）。
 
-For example, the Unicode code point `127878` (hexadecimal `1F386`) is `🎆` (fireworks symbol). JS stores this in a string value as two surrogate-halve code units: `U+D83C` and `U+DF86`. Keep in mind that these two parts of the whole character do *not* standalone; they're only valid/meaningful when paired immediately adjacent to each other.
+例如，Unicode 码点 `127878`（十六进制 `1F386`）是 `🎆`（烟花符号）。JS 将其存储在一个字符串值中作为两个代理半项码元：`U+D83C` 和 `U+DF86`。请记住，整个字符的这两个部分*不*独立存在；它们只有在该相互紧邻配对时才有效/有意义。
 
-This has implications on the length of strings, because a single visible character like the `🎆` fireworks symbol, when in a JS string, is a counted as 2 characters for the purposes of the string length!
+这对字符串的长度有影响，因为像 `🎆` 烟花符号这样的单个可见字符，当在 JS 字符串中时，出于字符串长度的目的被计算为 2 个字符！
 
-We'll revisit Unicode characters in a bit, and then cover the challenges of computing string length in Chapter 2.
+我们要稍微回顾一下 Unicode 字符，然后在第 2 章中讨论计算字符串长度的挑战。
 
-### Escape Sequences
+### 转义序列
 
-If `"` or `'` are used to delimit a string literal, the contents are only parsed for *character-escape sequences*: `\` followed by one or more characters that JS recognizes and parses with special meaning. Any other characters in a string that don't parse as escape-sequences (single-character or multi-character), are inserted as-is into the string value.
+如果使用 `"` 或 `'` 来定界字符串字面量，内容仅针对*字符转义序列*进行解析：`\` 后跟一个或多个 JS 识别并具有特殊含义的解析字符。字符串中任何其他未解析为转义序列（单字符或多字符）的字符，都会按原样插入到字符串值中。
 
-For single-character escape sequences, the following characters are recognized after a `\`: `b`, `f`, `n`, `r`, `t`, `v`, `0`, `'`, `"`, and `\`. For example,  `\n` means new-line, `\t` means tab, etc.
+对于单字符转义序列，`\` 后识别以下字符：`b`、`f`、`n`、`r`、`t`、`v`、`0`、`'`、`"` 和 `\`。例如，`\n` 意味着换行，`\t` 意味着制表符等。
 
-If a `\` is followed by any other character (except `x` and `u` -- explained below), like for example `\k`, that sequence is interpreted as the `\` being an unnecessary escape, which is thus dropped, leaving just the literal character itself (`k`).
+如果 `\` 后跟任何其他字符（除了 `x` 和 `u`——解释见下文），例如 `\k`，该序列被解释为 `\` 是不必要的转义，因此被丢弃，只留下字面字符本身（`k`）。
 
-To include a `"` in the middle of a `"`-delimited string literal, use the `\"` escape sequence. Similarly, if you're including a `'` character in the middle of a `'`-delimited string literal, use the `\'` escape sequence. By contrast, a `'` does *not* need to be escaped inside a `"`-delimited string, nor vice versa.
+要在 `"` 定界的字符串字面量中间包含 `"`，请使用 `\"` 转义序列。同样，如果你在 `'` 定界的字符串字面量中间包含 `'` 字符，请使用 `\'` 转义序列。相比之下，`'` 在 `"` 定界的字符串内*不需要*转义，反之亦然。
 
 ```js
 myTitle = "Kyle Simpson (aka, \"getify\"), former O'Reilly author";
@@ -323,11 +323,11 @@ console.log(myTitle);
 // Kyle Simpson (aka, "getify"), former O'Reilly author
 ```
 
-In text, forward slash `/` is most common. But occasionally, you need a backward slash `\`. To include a literal `\` backslash character without it performing as the start of a character-escape sequence, use the `\\` (double backslashes).
+在文本中，正斜杠 `/` 最为常见。但偶尔，你需要反斜杠 `\`。要包含字面量 `\` 反斜杠字符而不使其作为字符转义序列的开始，请使用 `\\`（双反斜杠）。
 
-So, then... what would `\\\` (three backslashes) in a string parse as? The first two `\`'s would be a `\\` escape sequence, thereby inserting just a single `\` character in the string value, and the remaining `\` would just escape whatever character comes immediately after it.
+那么……字符串中的 `\\\`（三个反斜杠）会解析成什么？前两个 `\` 将是一个 `\\` 转义序列，从而在字符串值中只插入一个 `\` 字符，剩下的 `\` 将只是转义紧随其后的任何字符。
 
-One place backslashes show up commonly is in Windows file paths, which use the `\` separator instead of the `/` separator used in linux/unix style paths:
+反斜杠经常出现的一个地方是 Windows 文件路径，它使用 `\` 分隔符而不是 linux/unix 风格路径中使用的 `/` 分隔符：
 
 ```js
 windowsFontsPath =
@@ -337,13 +337,13 @@ console.log(windowsFontsPath);
 // C:\Windows\Fonts\"
 ```
 
-| TIP: |
+| 提示： |
 | :--- |
-| What about four backslashes `\\\\` in a string literal? Well, that's just two `\\` escape sequences next to each other, so it results in two adjacent backslashes (`\\`) in the underlying string value. You might recognize there's an odd/even rule pattern at play. You should thus be able to deciper any odd (`\\\\\`, `\\\\\\\\\`, etc) or even (`\\\\\\`, `\\\\\\\\\\`, etc) number of backslashes in a string literal. |
+| 字符串字面量中的四个反斜杠 `\\\\` 会怎样？嗯，那只是两个相邻的 `\\` 转义序列，所以在底层字符串值中结果是两个相邻的反斜杠（`\\`）。你可能会意识到这里有一种奇数/偶数规则模式在起作用。因此，你应该能够破译字符串字面量中任何奇数（`\\\\\`，`\\\\\\\\\` 等）或偶数（`\\\\\\`，`\\\\\\\\\\` 等）数量的反斜杠。|
 
-#### Line Continuation
+#### 行延续 (Line Continuation)
 
-The `\` character followed by an actual new-line character (not just literal `n`) is a special case, and it creates what's called a line-continuation:
+`\` 字符后跟一个实际的换行符（不仅仅是字面量 `n`）是一种特殊情况，它创建了所谓的行延续：
 
 ```js
 greeting = "Hello \
@@ -353,43 +353,43 @@ console.log(greeting);
 // Hello Friends!
 ```
 
-As you can see, the new-line at the end of the `greeting = ` line is immediately preceded by a `\`, which allows this string literal to continue onto the subsequent line. Without the escaping `\` before it, a new-line -- the actual new-line, not the `\n` character escape sequence -- appearing in a `"` or `'` delimited string literal would actually produce a JS syntax parsing error.
+正如你所看到的，`greeting = ` 行末尾的换行符紧接在 `\` 之后，这允许此字符串字面量延续到下一行。如果没有在它之前的转义 `\`，出现在 `"` 或 `'` 定界的字符串字面量中的换行符——实际的换行符，而不是 `\n` 字符转义序列——实际上会产生 JS 语法解析错误。
 
-Because the end-of-line `\` turns the new-line character into a line continuation, the new-line character is omitted from the string, as shown by the `console.log(..)` output.
+因为行尾的 `\` 将换行符变成了行延续，所以换行符从字符串中省略了，如 `console.log(..)` 输出所示。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| This line-continuation feature is often referred to as "multi-line strings", but I think that's a confusing label. As you can see, the string value itself doesn't have multiple lines, it only was defined across multiple lines via the line continuations. A multi-line string would actually have multiple lines in the underlying value. We'll revisit this topic later in this chapter when we cover Template Literals. |
+| 这种行延续功能通常被称为“多行字符串”，但我认为这是一个令人困惑的标签。正如你所看到的，字符串值本身并没有多行，它只是通过行延续跨多行定义。多行字符串实际上在底层值中会有多行。我们将在本章稍后讨论模板字面量时重新讨论这个话题。|
 
-### Multi-Character Escapes
+### 多字符转义
 
-Multi-character escape sequences may be hexadecimal or Unicode sequences.
+多字符转义序列可以是十六进制或 Unicode 序列。
 
-Hexadecimal escape sequences are used to encode any of the base ASCII characters (codes 0-255), and look like `\x` followed by exactly two hexadecimal characters (`0-9` and `a-f` / `A-F` -- case insensitive). For example, `A9` or `a9` are decimal value `169`, which corresponds to:
+十六进制转义序列用于编码任何基本 ASCII 字符（代码 0-255），看起来像 `\x` 后跟正好两个十六进制字符（`0-9` 和 `a-f` / `A-F`——不区分大小写）。例如，`A9` 或 `a9` 是十进制值 `169`，对应于：
 
 ```js
-copyright = "\xA9";  // or "\xa9"
+copyright = "\xA9";  // 或者 "\xa9"
 
 console.log(copyright);     // ©
 ```
 
-For any normal character that can be typed on a keyboard, such as `"a"`, it's usually most readable to just specify the literal character, as opposed to a more obfuscated hexadecimal representation:
+对于任何可以在键盘上输入的普通字符，如 `"a"`，通常最可读的方式是只指定字面字符，而不是更混淆的十六进制表示：
 
 ```js
 "a" === "\x61";             // true
 ```
 
-#### Unicode In Strings
+#### 字符串中的 Unicode
 
-Unicode escape sequences alone can encode any of the characters from the Unicode BMP. They look like `\u` followed by exactly four hexadecimal characters.
+单独的 Unicode 转义序列可以编码 Unicode BMP 中的任何字符。它们看起来像 `\u` 后跟正好四个十六进制字符。
 
-For example, the escape-sequence `\u00A9` (or `\u00a9`) corresponds to that same `©` symbol, while `\u263A` (or `\u263a`) corresponds to the Unicode character with code-point `9786`: `☺` (smiley face symbol).
+例如，转义序列 `\u00A9`（或 `\u00a9`）对应于同一个 `©` 符号，而 `\u263A`（或 `\u263a`）对应于码点为 `9786` 的 Unicode 字符：`☺`（笑脸符号）。
 
-When any character-escape sequence (regardless of length) is recognized, the single character it represents is inserted into the string, rather than the original separate characters. So, in the string `"\u263A"`, there's only one (smiley) character, not six individual characters.
+当识别出任何字符转义序列（无论长度如何）时，它所代表的单个字符将被插入到字符串中，而不是原始的分隔字符。因此，在字符串 `"\u263A"` 中，只有一个（笑脸）字符，而不是六个单独的字符。
 
-But as explained earlier, many Unicode code-points are well above `65535`. For example, `1F4A9` (or `1f4a9`) is decimal code-point `128169`, which corresponds to the funny `💩` (pile-of-poo) symbol.
+但在如前所述，许多 Unicode 码点远高于 `65535`。例如，`1F4A9`（或 `1f4a9`）是十进制码点 `128169`，对应于有趣的 `💩`（一坨屎）符号。
 
-But `\u1F4A9` wouldn't work to include this character in a string, since it would be parsed as the Unicode escape sequence `\u1F4A`, followed by a literal `9` character. To address this limitation, a variation of Unicode escape sequences was introduced to allow an arbitrary number of hexadecimal characters after the `\u`, by surrounding them with `{ .. }` curly braces:
+但是 `\u1F4A9` 无法在字符串中包含此字符，因为它会被解析为 Unicode 转义序列 `\u1F4A`，后跟一个字面量 `9` 字符。为了解决这个限制，引入了 Unicode 转义序列的一种变体，允许通过用 `{ .. }` 花括号包围它们，在 `\u` 之后使用任意数量的十六进制字符：
 
 ```js
 myReaction = "\u{1F4A9}";
@@ -398,7 +398,7 @@ console.log(myReaction);
 // 💩
 ```
 
-Recall the earlier discussion of extended (non-BMP) Unicode characters and *surrogate halves*? The same `💩` could also be defined with two explicit code-units, that form a surrogate pair:
+回想一下前面关于扩展（非 BMP）Unicode 字符和*代理半项*的讨论？同样的 `💩` 也可以用两个显式的码元定义，形成代理对：
 
 ```js
 myReaction = "\uD83D\uDCA9";
@@ -407,26 +407,26 @@ console.log(myReaction);
 // 💩
 ```
 
-All three representations of this same character are stored internally by JS identically, and are indistinguishable:
+同一个字符的所有三种表示形式在 JS 内部存储都是相同的，并且是不可区分的：
 
 ```js
 "💩" === "\u{1F4A9}";                // true
 "\u{1F4A9}" === "\uD83D\uDCA9";     // true
 ```
 
-Even though JS doesn't care which way such a character is represented in your program, consider the readability differences carefully when authoring your code.
+尽管 JS 不关心你的程序中如何表示这样的字符，但在编写代码时请仔细考虑可读性差异。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| Even though `💩` looks like a single character, its internal representation affects things like the length computation of a string with that character in it. We'll cover length computation of strings in Chapter 2. |
+| 即使 `💩` 看起来像一个字符，它的内部表示也会影响诸如其中包含该字符的字符串的长度计算之类的事情。我们将在第 2 章中讨论字符串的长度计算。|
 
-##### Unicode Normalization
+##### Unicode 规范化 (Normalization)
 
-Another wrinkle in Unicode string handling is that even certain single BMP characters can be represented in different ways.
+Unicode 字符串处理中的另一个麻烦是，即使某些单个 BMP 字符也可以用不同的方式表示。
 
-For example, the `"é"` character can either be represented as itself (code-point `233`, aka `\xe9` or `\u00e9` or `\u{e9}`), or as the combination of two code-points: the `"e"` character (code-point `101`, aka `\x65`, `\u0065`, `\u{65}`) and the *combining tilde* (code-point `769`, aka `\u0301`, `\u{301}`).
+例如，`"é"` 字符既可以表示为它自己（码点 `233`, 又名 `\xe9` 或 `\u00e9` 或 `\u{e9}`），也可以表示为两个码点的组合：`"e"` 字符（码点 `101`, 又名 `\x65`, `\u0065`, `\u{65}`）和*结合波浪号*（码点 `769`, 又名 `\u0301`, `\u{301}`）。
 
-Consider:
+试想：
 
 ```js
 eTilde1 = "é";
@@ -438,9 +438,9 @@ console.log(eTilde2);       // é
 console.log(eTilde3);       // é
 ```
 
-The string literal assigned to `eTilde3` in this snippet stores the accent mark as a separate *combining mark* symbol. Like surrogate pairs, a combining mark only makes sense in connection with the symbol it's adjacent to (usually after).
+在这个代码片段中分配给 `eTilde3` 的字符串字面量将重音符号存储为一个单独的*结合标记*符号。就像代理对一样，结合标记只有在与其相邻的符号（通常在之后）相关联时才有意义。
 
-The rendering of the Unicode symbol should be the same regardless, but how the `"é"` character is internally stored affects things like `length` computation of the containing string, as well as equality and relational comparison (more on these in Chapter 2):
+无论如何，Unicode 符号的渲染应该是相同的，但 `"é"` 字符如何在内部存储会影响诸如包含字符串的 `length` 计算以及相等和关系比较（更多内容见第 2 章）：
 
 ```js
 eTilde1.length;             // 2
@@ -451,13 +451,13 @@ eTilde1 === eTilde2;        // false
 eTilde1 === eTilde3;        // true
 ```
 
-One particular challenge is that you may copy-paste a string with an `"é"` character visible in it, and that character you copied may have been in the *composed* or *decomposed* form. But there's no visual way to tell, and yet the underlying string value in the literal will be different:
+一个特别的挑战是，你也可能复制粘贴一个其中可见 `"é"` 字符的字符串，而你复制的那个字符可能处于*组合*或*分解*形式。但是没有视觉方法可以分辨，然而字面量中的底层字符串值将是不同的：
 
 ```js
 "é" === "é";           // false!!
 ```
 
-This internal representation difference can be quite challenging if not carefully planned for. Fortunately, JS provides a `normalize(..)` utility method on strings to help:
+如果没有仔细计划，这种内部表示差异可能会非常具有挑战性。幸运的是，JS 在字符串上提供了一个 `normalize(..)` 实用方法来提供帮助：
 
 ```js
 eTilde1 = "é";
@@ -468,19 +468,19 @@ eTilde1.normalize("NFC") === eTilde2;
 eTilde2.normalize("NFD") === eTilde3;
 ```
 
-The `"NFC"` normalization mode combines adjacent code-points into the *composed* code-point (if possible), whereas the `"NFD"` normalization mode splits a single code-point into its *decomposed* code-points (if possible).
+`"NFC"` 规范化模式将相邻的码点组合成*组合*码点（如果可能），而 `"NFD"` 规范化模式将单个码点拆分为其*分解*码点（如果可能）。
 
-And there can actually be more than two individual *decomposed* code-points that make up a single *composed* code-point -- for example, a single character could have several diacritical marks applied to it.
+实际上，可能有超过两个单独的*分解*码点组成一个*组合*码点——例如，一个字符可能有多个变音符号应用于它。
 
-When dealing with Unicode strings that will be compared, sorted, or length analyzed, it's very important to keep Unicode normalization in mind, and use it where necessary.
+在处理将被比较、排序或长度分析的 Unicode 字符串时，牢记 Unicode 规范化非常重要，并在必要时使用它。
 
-##### Unicode Grapheme Clusters
+##### Unicode 字素簇 (Grapheme Clusters)
 
-A final complication of Unicode string handling is the support for clustering of multiple adjacent code-points into a single visually distinct symbol, referred to as a *grapheme* (or a *grapheme cluster*).
+Unicode 字符串处理的最后一个复杂之处是支持将多个相邻的码点聚类成单个视觉上不同的符号，称为*字素*（或*字素簇*）。
 
-An example would be a family emoji such as `"👩‍👩‍👦‍👦"`, which is actually made up of 7 code-points that all cluster/group together into a single visual symbol.
+例如，家庭表情符号如 `"👩‍👩‍👦‍👦"`，实际上由 7 个码点组成，所有这些码点都聚类/分组在一起成为一个单一的视觉符号。
 
-Consider:
+试想：
 
 ```js
 familyEmoji = "\u{1f469}\u{200d}\u{1f469}\u{200d}\u{1f466}\u{200d}\u{1f466}";
@@ -488,23 +488,23 @@ familyEmoji = "\u{1f469}\u{200d}\u{1f469}\u{200d}\u{1f466}\u{200d}\u{1f466}";
 familyEmoji;            // 👩‍👩‍👦‍👦
 ```
 
-This emoji is *not* a single registered Unicode code-point, and as such, there's no *normalization* that can be performed to compose these 7 separate code-points into a single entity. The visual rendering logic for such composite symbols is quite complex, well beyond what most of JS developers want to embed into our programs. Libraries do exist for handling some of this logic, but they're often large and still don't necessarily cover all of the nuances/variations.
+此表情符号*不是*单个注册的 Unicode 码点，因此，无法执行*规范化*以将这 7 个单独的码点组合成单个实体。这种复合符号的视觉渲染逻辑相当复杂，远远超出了大多数 JS 开发人员想要嵌入到我们程序中的内容。确实存在用于处理其中一些逻辑的库，但它们通常很大，而且不一定涵盖所有的细微差别/变体。
 
-Unlike surrogate pairs and combining marks, the symbols in grapheme clusters can in fact act as standalone characters, but have the special combining behavior when placed adjacent to each other.
+与代理对和结合标记不同，字素簇中的符号实际上可以作为独立字符，但在彼此相邻放置时具有特殊的组合行为。
 
-This kind of complexity significantly affects length computations, comparison, sorting, and many other common string-oriented operations.
+这种复杂性显着影响长度计算、比较、排序和许多其他常见的面向字符串的操作。
 
-### Template Literals
+### 模板字面量 (Template Literals)
 
-I mentioned earlier that strings can alternately be delimited with `` `..` `` back-ticks:
+我之前提到过，字符串也可以用 `` `..` `` 反引号定界：
 
 ```js
 myName = `Kyle`;
 ```
 
-All the same rules for character encodings, character escape sequences, and lengths apply to these types of strings.
+所有相同的字符编码、字符转义序列和长度规则都适用于这些类型的字符串。
 
-However, the contents of these template (string) literals are additionally parsed for a special delimiter sequence `${ .. }`, which marks an expression to evaluate and interpolate into the string value at that location:
+但是，这些模板（字符串）字面量的内容还会被解析以寻找特殊的定界序列 `${ .. }`，它标记了一个要评估并插入到该位置字符串值中的表达式：
 
 ```js
 myName = `Kyle`;
@@ -514,13 +514,13 @@ greeting = `Hello, ${myName}!`;
 console.log(greeting);      // Hello, Kyle!
 ```
 
-Everything between the `{ .. }` in such a template literal is an arbitrary JS expression. It can be simple variables like `myName`, or complex JS programs, or anything in between (even another template literal expression!).
+在这样的模板字面量中，`{ .. }` 之间的所有内容都是任意的 JS 表达式。它可以是简单的变量如 `myName`，或者是复杂的 JS 程序，或介于两者之间的任何内容（甚至另一个模板字面量表达式！）。
 
-| TIP: |
+| 提示： |
 | :--- |
-| This feature is commonly called "template literals" or "template strings", but I think that's confusing. "Template" usually means, in programming contexts, a reusable set of text that can be re-evaluated with different data. For example, *template engines* for pages, email templates for newsletter campaigns, etc. This JS feature is not re-usable. It's a literal, and it produces a single, immediate value (usually a string). You can put such a value in a function, and call the function multiple times. But then the function is acting as the template, not the the literal itself. I prefer instead to refer to this feature as *interpolated literals*, or the funny, short-hand: *interpoliterals*. I just think that name is more accurately descriptive. |
+| 此功能通常称为“模板字面量”或“模板字符串”，但我认为这令人困惑。“模板”在编程上下文中通常意味着一组可重用的文本，可以用不同的数据重新评估。例如，页面的*模板引擎*，时事通讯活动的电子邮件模板等。此 JS 功能不可重用。它是一个字面量，并且它产生单个立即值（通常是字符串）。你可以将这样的值放在函数中，并多次调用该函数。但是那样的话，函数充当模板，而不是字面量本身。我反而更喜欢将此功能称为*插值字面量*（interpolated literals），或者有趣的简写：*interpoliterals*。我只是认为这个名字更准确地描述了它。|
 
-Template literals also have an interesting different behavior with respect to new-lines, compared to classic `"` or `'` delimited strings. Recall that for those strings, a line-continuation required a `\` at the end of each line, right before a new-line. Not so, with template literals!
+与经典的 `"` 或 `'` 定界字符串相比，模板字面量在换行符方面也有有趣的不同行为。回想一下，对于那些字符串，行延续在每行末尾，即换行符之前，需要一个 `\`。在模板字面量中并非如此！
 
 ```js
 myPoem = `
@@ -537,35 +537,35 @@ console.log(myPoem);
 // and so R2.
 ```
 
-Line-continuations with template literals do *not require* escaping. However, that means the new-line is part of the string, even the first new-line above. In other words, `myPoem` above holds a truly *multi-line string*, as shown. However, if you `\` escape the end of any line in a template literal, the new-line will be omitted, just like with non-template literal strings.
+模板字面量的行延续*不需要*转义。但是，这意味着换行符是字符串的一部分，即使是上面的第一个换行符也是如此。换句话说，上面的 `myPoem` 拥有一个真正的*多行字符串*，如图所示。但是，如果你在模板字面量中的任何行末尾 `\` 转义，换行符将被省略，就像非模板字面量字符串一样。
 
-Template literals usually result in a string value, but not always. A form of template literal that may look kind of strange is called a *tagged template literal*:
+模板字面量通常产生字符串值，但并非总是如此。一种看起来有点奇怪的模板字面量形式称为*标签模板字面量*（tagged template literal）：
 
 ```js
 price = formatCurrency`The cost is: ${totalCost}`;
 ```
 
-Here, `formatCurrency` is a tag applied to the template literal value, which actually invokes `formatCurrency(..)` as a function, passing it the string literals and interpolated expressions parsed from the value. This function can then assemble those in any way it sees fit -- such as formatting a `number` value as currency in the current locale -- and return whatever value, string or otherwise, that it wants.
+在这里，`formatCurrency` 是应用于模板字面量值的标签，它实际上将 `formatCurrency(..)` 作为一个函数调用，传递给它字符串字面量和从值中解析出的插值表达式。然后，此函数可以以它认为合适的任何方式组装这些内容——例如将 `number` 值格式化为当前语言环境中的货币——并返回它想要的任何值，字符串或其他。
 
-So tagged template literals are not always strings; they can be any value. But untagged template literals *will always be* strings.
+所以标签模板字面量并不总是字符串；它们可以是任何值。但未加标签的模板字面量*将始终是*字符串。
 
-Some JS developers believe that untagged template literal strings are best to use for *all* strings, even if not using any expression interpolation or multiple lines. I disagree. I think they should only be used when interpolating (or multi-line'ing).
+一些 JS 开发人员认为，即使不使用任何表达式插值或多行，未加标签的模板字面量字符串最好也用于*所有*字符串。我不同意。我认为它们应该仅在插值（或多行化）时使用。
 
-| TIP: |
+| 提示： |
 | :--- |
-| The principle I always apply in making such determinations: use the closest-matched, and least capable, feature/tool, for any task. |
+| 我在做这种决定时总是应用这一原则：对于任何任务，使用最接近匹配且能力最少的功能/工具。|
 
-Moreover, there are a few places where `` `..` `` style strings are disallowed. For example, the `"use strict"` pragma cannot use back-ticks, or the pragma will be silently ignored (and thus the program accidentally runs in non-strict mode). Also, this style of strings cannot be used in quoted property names of object literals, destruturing patterns, or in the ES Module `import .. from ..` module-specifier clause.
+此外，有些地方不允许使用 `` `..` `` 风格的字符串。例如，`"use strict"` 编译指示不能使用反引号，否则编译指示将被静默忽略（因此程序意外地在非严格模式下运行）。此外，这种风格的字符串不能用于对象字面量的带引号属性名称、解构模式或 ES 模块 `import .. from ..` 模块说明符子句中。
 
-My take: use `` `..` `` delimited strings where allowed, but only when interpolation/multi-line is needed; and keep using `".."` or `'..'` delimited strings for everything else.
+我的看法是：在允许的地方使用 `` `..` `` 定界的字符串，但仅在需要插值/多行时使用；其他所有情况继续使用 `".."` 或 `'..'` 定界的字符串。
 
-## Number Values
+## 数字值 (Number Values)
 
-The `number` type contains any numeric value (whole number or decimal), such as `-42` or `3.1415926`. These values are represented by the JS engine as 64-bit, IEEE-754 double-precision binary floating-point values. [^IEEE754]
+`number` 类型包含任何数值（整数或小数），例如 `-42` 或 `3.1415926`。这些值由 JS 引擎表示为 64 位 IEEE-754 双精度二进制浮点值。[^IEEE754]
 
-JS `number`s are always decimals; whole numbers (aka "integers") are not stored in a different/special way. An "integer" stored as a `number` value merely has nothing non-zero as its fraction portion; `42` is thus indistinguishable in JS from `42.0` and `42.000000`.
+JS `number` 总是小数；整数（也称为“integers”）不以不同/特殊的方式存储。存储为 `number` 值的“整数”仅仅是其小数部分没有非零值；因此，`42` 在 JS 中与 `42.0` 和 `42.000000` 是无法区分的。
 
-We can use `Number.isInteger(..)` to determine if a `number` value has any non-zero fraction or not:
+我们可以使用 `Number.isInteger(..)` 来确定 `number` 值是否有任何非零分数部分：
 
 ```js
 Number.isInteger(42);           // true
@@ -575,13 +575,13 @@ Number.isInteger(42.000000);    // true
 Number.isInteger(42.0000001);   // false
 ```
 
-### Parsing vs Coercion
+### 解析与强制转换 (Parsing vs Coercion)
 
-If a string value holds numeric-looking contents, you may need to convert from that string value to a `number`, for mathematical operation purposes.
+如果字符串值包含看起来像数字的内容，你可能需要从该字符串值转换为 `number`，以进行数学运算。
 
-However, it's very important to distinguish between parsing-conversion and coercive-conversion.
+但是，非常重要的是要区分解析转换（parsing-conversion）和强制转换（coercive-conversion）。
 
-We can parse-convert with JS's built-in `parseInt(..)` or `parseFloat(..)` utilities:
+我们可以使用 JS 内置的 `parseInt(..)` 或 `parseFloat(..)` 实用程序进行解析转换：
 
 ```js
 someNumericText = "123.456";
@@ -594,27 +594,27 @@ parseInt("42",10) === parseFloat("42");     // true
 parseInt("512px");                          // 512
 ```
 
-| NOTE: |
+| 注意： |
 | :--- |
-| Parsing is only relevant for string values, as it's a character-by-character (left-to-right) operation. It doesn't make sense to parse the contents of a `boolean`, nor to parse the contents of a `number` or a `null`; there's nothing to parse. If you pass anything other than a string value to `parseInt(..)` / `parseFloat(..)`, those utilities first convert that value to a string and then try to parse it. That's almost certainly problematic (leading to bugs) or wasteful -- `parseInt(42)` is silly, and `parseInt(42.3)` is an abuse of `parseInt(..)` to do the job of `Math.floor(..)`. |
+| 解析仅与字符串值相关，因为它是逐字符（从左到右）的操作。解析 `boolean` 的内容没有意义，解析 `number` 或 `null` 的内容也没有意义；没有什么可解析的。如果你将字符串值以外的任何内容传递给 `parseInt(..)` / `parseFloat(..)`，这些实用程序首先将该值转换为字符串，然后尝试解析它。这几乎肯定是有问题的（导致错误）或浪费的——`parseInt(42)` 是愚蠢的，而 `parseInt(42.3)` 是滥用 `parseInt(..)` 来完成 `Math.floor(..)` 的工作。|
 
-Parsing pulls out numeric-looking characters from the string value, and puts them into a `number` value, stopping once it encounters a character that's non-numeric (e.g., not `-`, `.` or `0`-`9`). If parsing fails on the first character, both utilities return the special `NaN` value (see "Invalid Number" below), indicating the operation was invalid and failed.
+解析从字符串值中提取看起来像数字的字符，并将它们放入 `number` 值中，一旦遇到非数字字符（例如，不是 `-`、`.` 或 `0`-`9`）就会停止。如果在第一个字符上解析失败，这两个实用程序都会返回特殊的 `NaN` 值（见下文“无效数字”），表示操作无效且失败。
 
-When `parseInt(..)` encounters the `.` in `"123.456"`, it stops, using just the `123` in the resulting `number` value. `parseFloat(..)` by contrast accepts this `.` character, and keeps right on parsing a float with any decimal digits after the `.`.
+当 `parseInt(..)` 遇到 `"123.456"` 中的 `.` 时，它停止，在结果 `number` 值中只使用 `123`。相比之下，`parseFloat(..)` 接受这个 `.` 字符，并继续解析后面带有任何小数位的浮点数。
 
-The `parseInt(..)` utility specifically, takes as an optional -- but *actually*, rather necessary -- second argument, `radix`: the numeric base to assume for interpreting the string characters for the `number` (range `2` - `36`). `10` is for standard base-10 numbers, `2` is for binary, `8` is for octal, and `16` is for hexadecimal. Any other unusual `radix`, like `23`, assumes digits in order, `0` - `9` followed by the `a` - `z` (case insensitive) character ordination. If the specified radix is outside the `2` - `36` range, `parseInt(..)` fails as invalid and returns the `NaN` value.
+`parseInt(..)` 实用程序特别接受一个可选的——但*实际上*相当必要的——第二个参数 `radix`：用于解释 `number` 字符串字符的假定数字基数（范围 `2` - `36`）。`10` 用于标准十进制数字，`2` 用于二进制，`8` 用于八进制，`16` 用于十六进制。任何其他不寻常的 `radix`，如 `23`，假设数字顺序为 `0` - `9` 后跟 `a` - `z`（不区分大小写）字符排序。如果指定的基数超出 `2` - `36` 范围，`parseInt(..)` 将作为无效失败并返回 `NaN` 值。
 
-If `radix` is omitted, the behavior of `parseInt(..)` is rather nuanced and confusing, in that it attempts to make a best-guess for a radix, based on what it sees in the first character. This historically has lead to lots of subtle bugs, so never rely on the default auto-guessing; always specify an explicit radix (like `10` in the calls above).
+如果省略 `radix`，`parseInt(..)` 的行为相当微妙且令人困惑，因为它试图根据在第一个字符中看到的内容对基数进行最佳猜测。这在历史上导致了许多微妙的错误，所以永远不要依赖默认的自动猜测；始终指定显式基数（如上面调用中的 `10`）。
 
-`parseFloat(..)` always parses with a radix of `10`, so no second argument is accepted.
+`parseFloat(..)` 始终以基数 `10` 进行解析，因此不接受第二个参数。
 
-| WARNING: |
+| 警告： |
 | :--- |
-| One surprising difference between `parseInt(..)` and `parseFloat(..)` is that `parseInt(..)` will not fully parse scientific notation (e.g., `"1.23e+5"`), instead stopping at the `.` as it's not valid for integers; in fact, even `"1e+5"` stops at the `"e"`. `parseFloat(..)` on the other hand fully parses scientific notation as expected. |
+| `parseInt(..)` 和 `parseFloat(..)` 之间一个令人惊讶的区别是，`parseInt(..)` 不会完全解析科学计数法（例如 `"1.23e+5"`），而是停在 `.` 处，因为它对整数无效；事实上，即使 `"1e+5"` 也会停在 `"e"` 处。另一方面，`parseFloat(..)` 按预期完全解析科学计数法。|
 
-In contrast to parsing-conversion, coercive-conversion is an all-or-nothing sort of operation. Either the entire contents of the string are recognized as numeric (integer or floating-point), or the whole conversion fails (resulting in `NaN` -- again, see "Invalid Number" later in this chapter).
+与解析转换相反，强制转换是一种全有或全无的操作。要么整个字符串内容被识别为数字（整数或浮点数），要么整个转换失败（导致 `NaN`——同样，请参阅本章稍后的“无效数字”）。
 
-Coercive-conversion can be done explicitly with the `Number(..)` function (no `new` keyword) or with the unary `+` operator in front of the value:
+可以使用 `Number(..)` 函数（没有 `new` 关键字）或值前面的的一元 `+` 运算符进行强制转换：
 
 ```js
 someNumericText = "123.456";
@@ -626,33 +626,33 @@ Number("512px");                // NaN
 +"512px";                       // NaN
 ```
 
-### Other Numeric Representations
+### 其他数字表示
 
-In addition to defining numbers using traditional base-10 numerals (`0`-`9`), JS supports defining whole-number-only number literals in three other bases: binary (base-2), octal (base-8), and hexadecimal (base-16).
+除了使用传统的十进制数字（`0`-`9`）定义数字外，JS 还支持在其他三个基数中定义仅限整数的数字字面量：二进制（基数 2）、八进制（基数 8）和十六进制（基数 16）。
 
 ```js
-// binary
+// 二进制
 myAge = 0b101010;
 myAge;              // 42
 
-// octal
+// 八进制
 myAge = 0o52;
 myAge;              // 42
 
-// hexadecimal
+// 十六进制
 myAge = 0x2a;
 myAge;              // 42
 ```
 
-As you can see, the prefixes `0b` (binary), `0o` (octal), and `0x` (hexadecimal) signal defining numbers in the different bases, but decimals are not allowed on these numeric literals.
+如你所见，前缀 `0b`（二进制）、`0o`（八进制）和 `0x`（十六进制）表示在不同基数中定义数字，但这些数字字面量不允许小数。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| JS syntax allows `0B`, `0O`, and `0X` prefixes as well. However, please don't ever use those uppercase prefix forms. I think any sensible person would agree: `0O` is much easier to confuse at a glance than `0o` (which is, itself, a bit visually ambiguous at a glance). Always stick to the lowercase prefix forms! |
+| JS 语法也允许 `0B`、`0O` 和 `0X` 前缀。但是，请永远不要使用那些大写前缀形式。我认为任何明智的人都会同意：`0O` 乍一看比 `0o`（这本身乍一看也有点视觉模糊）更容易混淆。始终坚持使用小写前缀形式！|
 
-It's important to realize that you're not defining a *different number*, just using a different form to produce the same underlying numeric value.
+重要的是要意识到你不是在定义一个*不同的数字*，只是使用不同的形式来产生相同的底层数值。
 
-By default, JS represents the underlying numeric value in output/string fashion with standard base-10 form. However, `number` values have a built-in `toString(..)` method that produces a string representation in any specified base/radix (as with `parseInt(..)`, in the range `2` - `36`):
+默认情况下，JS 以标准十进制形式在输出/字符串方式中表示底层数值。但是，`number` 值有一个内置的 `toString(..)` 方法，可以生成任何指定基数/radix 的字符串表示形式（与 `parseInt(..)` 一样，范围在 `2` - `36`）：
 
 ```js
 myAge = 42;
@@ -664,7 +664,7 @@ myAge.toString(23);         // "1j"
 myAge.toString(36);         // "16"
 ```
 
-You can round-trip any arbitrary-radix string representation back into a `number` using `parseInt(..)`, with the appropriate radix:
+你可以使用带有适当基数的 `parseInt(..)` 将任何任意基数字符串表示形式往返转换回 `number`：
 
 ```js
 myAge = 42;
@@ -672,21 +672,21 @@ myAge = 42;
 parseInt(myAge.toString("23"),23);      // 42
 ```
 
-Another allowed form for specifying number literals is using scientific notation:
+指定数字字面量的另一种允许形式是使用科学计数法：
 
 ```js
-myAge = 4.2E1;      // or 4.2e1 or 4.2e+1
+myAge = 4.2E1;      // 或者 4.2e1 或 4.2e+1
 
 myAge;              // 42
 ```
 
-`4.2E1` (or `4.2e1`) means, `4.2 * (10 ** 1)` (`10` to the `1` power). The exponent can optionally have a sign `+` or `-`. If the sign is omitted, it's assumed to be `+`. A negative exponent makes the number smaller (moves the decimal leftward) rather than larger (moving the decimal rightward):
+`4.2E1`（或 `4.2e1`）意味着 `4.2 * (10 ** 1)`（`10` 的 `1` 次方）。指数可以选择带有符号 `+` 或 `-`。如果省略符号，则假定为 `+`。负指数使数字变小（向左移动小数点）而不是变大（向右移动小数点）：
 
 ```js
 4.2E-3;             // 0.0042
 ```
 
-This scientific notation form is especially useful for readability when specifying larger powers of `10`:
+这种科学计数法形式对于在指定较大的 `10` 的幂时提高可读性特别有用：
 
 ```js
 someBigPowerOf10 = 1000000000;
@@ -696,7 +696,7 @@ someBigPowerOf10 = 1000000000;
 someBigPowerOf10 = 1e9;
 ```
 
-By default, JS will represent (e.g., as string values, etc) either very large or very small numbers -- specifically, if the values require more than 21 digits of precision -- using this same scientific notation:
+默认情况下，JS 将使用这种相同的科学计数法表示（例如，作为字符串值等）非常大或非常小的数字——具体来说，如果值需要超过 21 位的精度：
 
 ```js
 ratherBigNumber = 123 ** 11;
@@ -706,7 +706,7 @@ prettySmallNumber = 123 ** -11;
 prettySmallNumber.toString();   // "1.0257553107587752e-23"
 ```
 
-Numbers with smaller absolute values (closer to `0`) than these thresholds can still be forced into scientific notation form (as strings):
+绝对值（接近 `0`）小于这些阈值的数字仍然可以强制为科学计数法形式（作为字符串）：
 
 ```js
 plainBoringNumber = 42;
@@ -716,38 +716,38 @@ plainBoringNumber.toExponential(0);     // "4e+1"
 plainBoringNumber.toExponential(4);     // "4.2000e+1"
 ```
 
-The optional argument to `toExponential(..)` specifies the number of decimal digits to include in the string representation.
+`toExponential(..)` 的可选参数指定要在字符串表示中包含的小数位数。
 
-Another readability affordance for specifying numeric literals in code is the ability to insert `_` as a digit separator wherever its convenient/meaningful to do so. For example:
+在代码中指定数字字面量的另一个可读性便利是能够在任何方便/有意义的地方插入 `_` 作为数字分隔符。例如：
 
 ```js
 someBigPowerOf10 = 1_000_000_000;
 
-totalCostInPennies = 123_45;  // vs 12_345
+totalCostInPennies = 123_45;  // 对比 12_345
 ```
 
-The decision to use `12345` (no separator), `12_345` (like "12,345"), or `123_45` (like "123.45") is entirely up to the author of the code; JS ignores the separators. But depending on the context, `123_45` could be more semantically meaningful (readability wise) than the more traditional three-digit-grouping-from-the-right-separated-with-commas style mimicked with `12_345`.
+决定使用 `12345`（无分隔符）、`12_345`（像“12,345”）还是 `123_45`（像“123.45”）完全取决于代码的作者；JS 会忽略分隔符。但是根据上下文，`123_45` 在语义上（可读性方面）可能比用 `12_345` 模仿的传统的三位一组用逗号分隔的风格更有意义。
 
-### IEEE-754 Bitwise Binary Representations
+### IEEE-754 按位二进制表示
 
-IEEE-754[^IEEE754] is a technical standard for binary representation of decimal numbers. It's widely used by most computer programming languages, including JS, Python, Ruby, etc.
+IEEE-754[^IEEE754] 是十进制数字二进制表示的技术标准。它被大多数计算机编程语言广泛使用，包括 JS、Python、Ruby 等。
 
-I'm not going to cover it exhaustively, but I think a brief primer on how numbers work in languages like JS is more than warranted, given how few programmers have *any* familiarity with it.
+我不打算详尽地介绍它，但我认为简要介绍一下数字在像 JS 这样的语言中是如何工作的非常有必要，因为很少有程序员对此有*任何*了解。
 
-In 64-bit IEEE-754 -- so called "double-precision", because originally IEEE-754 used to be 32-bit, and now it's double that! -- the 64 bits are divided into three sections: 52 bits for the number's base value (aka, "fraction", "mantissa", or "significand"), 11 bits for the exponent to raise `2` to before multiplying, and 1 bit for the sign of the ultimate value.
+在 64 位 IEEE-754 中——所谓的“双精度”，因为最初 IEEE-754 曾经是 32 位的，现在是它的两倍！——64 位分为三个部分：52 位用于数字的基数值（又名“分数”、“尾数”或“有效数字”），11 位用于指数以在乘法之前提升 `2`，以及 1 位用于最终值的符号。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| Since only 52 of the 64 bits are actually used to represent the base value, `number` doesn't actually have `2^64` values in it. According to the specification for the `number` type[^NumberType], the number of values is precisely `2^64 - 2^53 + 3`, or about 18 quintillion, split about evenly between positive and negative numbers. |
+| 由于 64 位中只有 52 位实际用于表示基数值，因此 `number` 实际上并没有 `2^64` 个值。根据 `number` 类型的规范[^NumberType]，值的数量正好是 `2^64 - 2^53 + 3`，即大约 1800 亿亿，在正数和负数之间大致平均分配。|
 
-These bits are arranged left-to-right, as so (S = Sign Bit, E = Exponent Bit, M = Mantissa Bit):
+这些位从左到右排列，如下所示（S = 符号位，E = 指数位，M = 尾数位）：
 
 ```js
 SEEEEEEEEEEEMMMMMMMMMMMMMMMMMMMM
 MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
 ```
 
-So, the number `42` (or `42.000000`) would be represented by these bits:
+所以，数字 `42`（或 `42.000000`）将由这些位表示：
 
 ```
 // 42:
@@ -755,19 +755,19 @@ So, the number `42` (or `42.000000`) would be represented by these bits:
 00000000000000000000000000000000
 ```
 
-The sign bit is `0`, meaning the number is positive (`1` means negative).
+符号位是 `0`，意味着数字是正数（`1` 意味着负数）。
 
-The 11-bit exponent is binary `10000000100`, which in base-10 is `1028`. But in IEEE-754, this value is interpreted as being stored unsigned with an "exponent bias" of `1023`, meaning that we're shifting up the exponent range from `-1022:1023` to `1:2046` (where `0` and `2047` are reserved for special representations). So, take `1028` and subtract the bias `1023`, which gives an effective exponent of `5`. We raise `2` to that value (`2^5`), giving `32`.
+11 位指数是二进制 `10000000100`，在十进制中是 `1028`。但在 IEEE-754 中，此值被解释为存储无符号并带有 `1023` 的“指数偏差”，这意味着我们将指数范围从 `-1022:1023` 上移到 `1:2046`（其中 `0` 和 `2047` 保留用于特殊表示）。所以，取 `1028` 并减去偏差 `1023`，得出有效指数 `5`。我们将 `2` 提升到该值（`2^5`），得到 `32`。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| If the subtracting `1023` from the exponent value gives a negative (e.g., `-3`), that's still interpreted as `2`'s exponent; raising `2` to negative numbers just produces smaller and smaller values. |
+| 如果从指数值减去 `1023` 给出负数（例如 `-3`），那仍然被解释为 `2` 的指数；将 `2` 提升为负数只会产生越来越小的值。|
 
-The remaining 52 bits give us the base value `01010000...`, interpreted as binary decimal `1.0101000...` (with all trailing zeros). Converting *that* to base-10, we get `1.3125000...`. Finally, then multiply that by `32` already computed from the exponent. The result: `42`.
+剩下的 52 位给我们基数值 `01010000...`，解释为二进制小数 `1.0101000...`（带有所有尾随零）。将其转换为十进制，咱们得到 `1.3125000...`。最后，将其乘以已经从指数计算出的 `32`。结果：`42`。
 
-As you might be able to tell now, this IEEE-754 number representation standard is called "floating point" because the decimal point "floats" back-and-forth along the bits, depending on the specified exponent value.
+这种 IEEE-754 数字表示标准之所以被称为“浮点”，是因为小数点根据指定的指数值在位上前后“浮动”。
 
-The number `42.0000001`, which is only different from `42.000000` by just `0.0000001`, would be represented by these bits:
+数字 `42.0000001`，仅与 `42.000000` 相差 `0.0000001`，将由这些位表示：
 
 ```
 // 42.0000001:
@@ -775,39 +775,39 @@ The number `42.0000001`, which is only different from `42.000000` by just `0.000
 00000000110101101011111110010101
 ```
 
-Notice how the previous bit pattern and this one differ by quite a few bits in the trailing positions! The binary decimal fraction containing all those extra `1` bits (`1.010100000000...01011111110010101`) converts to base-10 as `1.31250000312500003652`, which multiplied by `32` gives us exactly `42.0000001`.
+请注意，以前的位模式和这个在尾随位置有很多位不同！包含所有那些额外 `1` 位的二进制小数部分（`1.010100000000...01011111110010101`）转换为十进制为 `1.31250000312500003652`，乘以 `32` 正好给我们 `42.0000001`。
 
-We'll revisit more details about floating-point (im)precision in Chapter 2. But now you understand a *bit more* about how IEEE-754 works!
+我们将在第 2 章重新讨论有关浮点（不）精度的更多细节。但是现在你对 IEEE-754 的工作原理有了*更多一点*的了解！
 
-### Number Limits
+### 数字限制
 
-As might be evident now that you've seen how IEEE-754 works, the 52 bits of the number's base must be shared, representing both the whole number portion (if any) as well as the decimal portion (if any), of the intended `number` value. Essentially, the larger the whole number portion to be represented, the less bits are available for the decimal portion, and vice versa.
+既然正如你所看到的 IEEE-754 的工作原理，数字基数的 52 位必须共享，既表示整数部分（如果有），也表示预期 `number` 值的小数部分（如果有）。本质上，要表示的整数部分越大，可用于小数部分的位就越少，反之亦然。
 
-The largest value that can accurately be stored in the `number` type is exposed as `Number.MAX_VALUE`:
+`number` 类型中可以准确存储的最大值公开为 `Number.MAX_VALUE`：
 
 ```js
 Number.MAX_VALUE;           // 1.7976931348623157e+308
 ```
 
-You might expect that value to be a decimal value, given the representation. But on closer inspection, `1.79E308` is (approximately) `2^1024 - 1`. That seems much more like it should be an integer, right? We can verify:
+鉴于表示形式，你可能期望该值是一个小数值。但仔细观察，`1.79E308` 实际上（大约）是 `2^1024 - 1`。这看起来更像是一个整数，对吧？我们可以验证：
 
 ```js
 Number.isInteger(Number.MAX_VALUE);         // true
 ```
 
-But what happens if you go above the max value?
+但是如果你超过最大值会发生什么？
 
 ```js
 Number.MAX_VALUE === (Number.MAX_VALUE + 1);
-// true -- oops!
+// true -- 哎呀！
 
 Number.MAX_VALUE === (Number.MAX_VALUE + 10000000);
 // true
 ```
 
-So, is `Number.MAX_VALUE` actually the largest value representable in JS? It's certainly the largest *finite* `number` value.
+那么，`Number.MAX_VALUE` 实际上是 JS 中可表示的最大值吗？它肯定是最大的*有限* `number` 值。
 
-IEEE-754 defines a special infinite value, which JS exposes as `Infinity`; there's also a `-Infinity` at the far other end of the number line. Values can be tested to see if they are finite or infinite:
+IEEE-754 定义了一个特殊的无限值，JS 将其公开为 `Infinity`；在数轴的另一端也有一个 `-Infinity`。可以测试值以查看它们是有限的还是无限的：
 
 ```js
 Number.isFinite(Number.MAX_VALUE);  // true
@@ -816,9 +816,9 @@ Number.isFinite(Infinity);          // false
 Number.isFinite(-Infinity);         // false
 ```
 
-You can't ever count upwards (with `+ 1`) from `Number.MAX_VALUE` to `Infinity`, no matter how long you let the program run, because the `+ 1` operation isn't actually incrementing beyond the top `Number.MAX_VALUE` value.
+你永远无法从 `Number.MAX_VALUE` 向上计数（用 `+ 1`）到 `Infinity`，无论你让程序运行多久，因为 `+ 1` 操作实际上并没有增加超过顶部的 `Number.MAX_VALUE` 值。
 
-However, JS arithmetic operations (`+`, `*`, and even `/`) can definitely overflow the `number` type on the top-end, in which case `Infinity` is the result:
+但是，JS 算术运算（`+`、`*` 甚至 `/`）肯定可以在顶端溢出 `number` 类型，在这种情况下结果是 `Infinity`：
 
 ```js
 Number.MAX_VALUE + 1E291;           // 1.7976931348623157e+308
@@ -830,23 +830,23 @@ Number.MAX_VALUE * 1.0000000001;    // Infinity
 1 / 1E-309;                         // Infinity
 ```
 
-| TIP: |
+| 提示： |
 | :--- |
-| The reverse is not true: an arithmetic operation on an infinite value *will never* produce a finite value. |
+| 反之则不然：对无限值的算术运算*永远不会*产生有限值。|
 
-Going from the very large to the very, very small -- actually, closest to zero, which is not the same thing as going very, very negative! -- the smallest absolute decimal value you could theoretically store in the `number` type would be `2^-1022` (remember the IEEE-754 exponent range?), or around `2E-308`. However, JS engines are allowed by the specification to vary in their internal representations for this lower limit. Whatever the engine's effective lower limit is, it'll be exposed as `Number.MIN_VALUE`:
+从非常大到非常非常小——实际上，最接近零，这与变得非常非常负不是一回事！——理论上可以在 `number` 类型中存储的最小绝对小数值是 `2^-1022`（记得 IEEE-754 指数范围吗？），或大约 `2E-308`。但是，规范允许 JS 引擎在此下限的内部表示上有所不同。无论引擎的有效下限是多少，它都会公开为 `Number.MIN_VALUE`：
 
 ```js
-Number.MIN_VALUE;               // 5e-324 <-- usually!
+Number.MIN_VALUE;               // 5e-324 <-- 通常！
 ```
 
-Most JS engines seem to have a minimum representable value around `5E-324` (about `2^-1074`). Depending on the engine and/or platform, a different value may be exposed. Be careful about any program logic that relies on such implementation-dependent values.
+大多数 JS 引擎似乎具有大约 `5E-324`（大约 `2^-1074`）的最小可表示值。根据引擎和/或平台，可能会公开不同的值。小心任何依赖于此类实现相关值的程序逻辑。
 
-### Safe Integer Limits
+### 安全整数限制
 
-Since `Number.MAX_VALUE` is an integer, you might assume that it's the largest integer in the language. But that's not really accurate.
+由于 `Number.MAX_VALUE` 是一个整数，你可能认为它是该语言中最大的整数。但这并不完全准确。
 
-The largest integer you can accurately store in the `number` type is `2^53 - 1`, or `9007199254740991`, which is *way smaller* than `Number.MAX_VALUE` (about `2^1024 - 1`). This special safer value is exposed as `Number.MAX_SAFE_INTEGER`:
+你可以在 `number` 类型中准确存储的最大整数是 `2^53 - 1`，或 `9007199254740991`，这比 `Number.MAX_VALUE`（大约 `2^1024 - 1`）*小得多*。这个特殊的更安全的值公开为 `Number.MAX_SAFE_INTEGER`：
 
 ```js
 maxInt = Number.MAX_SAFE_INTEGER;
@@ -858,28 +858,28 @@ maxInt + 1;         // 9007199254740992
 maxInt + 2;         // 9007199254740992
 ```
 
-We've seen that integers larger than `9007199254740991` can show up. However, those larger integers are not "safe", in that the precision/accuracy start to break down when you do operations with them. As shown above, the `maxInt + 1` and `maxInt + 2` expressions both errantly give the same result, illustrating the hazard when exceeding the `Number.MAX_SAFE_INTEGER` limit.
+我们已经看到大于 `9007199254740991` 的整数可能会出现。但是，那些较大的整数并不“安全”，因为当你对它们进行操作时，精度/准确性开始崩溃。如上所示，`maxInt + 1` 和 `maxInt + 2` 表达式都错误地给出了相同的结果，说明了超出 `Number.MAX_SAFE_INTEGER` 限制时的危险。
 
-But what's the smallest safe integer?
+那个最小的安全整数是多少？
 
-Depending on how you interpret "smallest", you could either answer `0` or... `Number.MIN_SAFE_INTEGER`:
+取决于你如何解释“最小”，你可以回答 `0` 或…… `Number.MIN_SAFE_INTEGER`：
 
 ```js
 Number.MIN_SAFE_INTEGER;    // -9007199254740991
 ```
 
-And JS provides a utility to determine if a value is an integer in this safe range (`-2^53 + 1` - `2^53 - 1`):
+JS 提供了一个实用程序来确定值是否在这个安全范围内的整数（`-2^53 + 1` - `2^53 - 1`）：
 
 ```js
 Number.isSafeInteger(2 ** 53);      // false
 Number.isSafeInteger(2 ** 53 - 1);  // true
 ```
 
-### Double Zeros
+### 双零 (Double Zeros)
 
-It may surprise you to learn that JS has two zeros: `0`, and `-0` (negative zero). But what on earth is a "negative zero"? [^SignedZero] A mathematician would surely balk at such a notion.
+得知 JS 有两个零：`0` 和 `-0`（负零），可能会让你感到惊讶。但这到底什么是“负零”？[^SignedZero] 数学家肯定会对这个概念嗤之以鼻。
 
-This isn't just a funny JS quirk; it's mandated by the IEEE-754[^IEEE754] specification. All floating point numbers are signed, including zero. And though JS does kind of hide the existence of `-0`, it's entirely possible to produce it and to detect it:
+这不仅仅是一个有趣的 JS 怪癖；它是 IEEE-754[^IEEE754] 规范强制要求的。所有浮点数都是有符号的，包括零。虽然 JS 确实在某种程度上隐藏了 `-0` 的存在，但也完全有可能产生并检测到它：
 
 ```js
 function isNegZero(v) {
@@ -889,33 +889,33 @@ function isNegZero(v) {
 regZero = 0 / 1;
 negZero = 0 / -1;
 
-regZero === negZero;        // true -- oops!
-Object.is(-0,regZero);      // false -- phew!
+regZero === negZero;        // true -- 哎呀！
+Object.is(-0,regZero);      // false -- 呼！
 Object.is(-0,negZero);      // true
 
 isNegZero(regZero);         // false
 isNegZero(negZero);         // true
 ```
 
-You may wonder why we'd ever need such a thing as `-0`. It can be useful when using numbers to represent both the magnitude of movement (speed) of some item (like a game character or an animation) and also its direction (e.g., negative = left, positive = right).
+你可能想知道为什么我们需要像 `-0` 这样的东西。当使用数字既表示某个项目（如游戏角色或动画）的移动幅度（速度）又表示其方向（例如，负数 = 左，正数 = 右）时，它可能很有用。
 
-Without having a signed zero value, you couldn't tell which direction such an item was pointing at the moment it came to rest.
+如果没有有符号的零值，你就无法分辨这样一个项目在静止的那一刻是指向哪个方向的。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| While JS defines a signed zero in the `number` type, there is no corresponding signed zero in the `bigint` number type. As such, `-0n` is just interpreted as `0n`, and the two are indistinguishable. |
+| 虽然 JS 在 `number` 类型中定义了有符号的零，但在 `bigint` 数字类型中没有相应的有符号零。因此，`-0n` 仅解释为 `0n`，两者是不可区分的。|
 
-### Invalid Number
+### 无效数字 (Invalid Number)
 
-Mathematical operations can sometimes produce an invalid result. For example:
+数学运算有时会产生无效结果。例如：
 
 ```js
 42 / "Kyle";            // NaN
 ```
 
-It's probably obvious, but if you try to divide a number by a string, that's an invalid mathematical operation.
+这可能很明显，但是如果你尝试将数字除以字符串，那就是无效的数学运算。
 
-Another type of invalid numeric operation is trying to coercively-convert a non-numeric resembling value to a `number`. As discussed earlier, we can do so with either the `Number(..)` function or the unary `+` operator:
+另一种类型的无效数字运算是尝试将非数字相似的值强制转换为 `number`。如前所述，我们可以使用 `Number(..)` 函数或一元 `+` 运算符来这样做：
 
 ```js
 myAge = Number("just a number");
@@ -925,30 +925,30 @@ myAge;                  // NaN
 +undefined;             // NaN
 ```
 
-All such invalid operations (mathematical or coercive/numeric) produce the special `number` value called `NaN`.
+所有此类无效运算（数学或强制/数字）都会产生特殊的 `number` 值，称为 `NaN`。
 
-The historical root of "NaN" (from the IEEE-754[^IEEE754] specification) is as an acronym for "Not a Number". Technically, there are about 9 quadrillion values in the 64-bit IEEE-754 number space designated as "NaN", but JS treats all of them indistinguishably as the single `NaN` value.
+“NaN”（来自 IEEE-754[^IEEE754] 规范）的历史根源是作为“Not a Number”（不是数字）的首字母缩写。从技术上讲，在 64 位 IEEE-754 数字空间中，大约有 9 千万亿个值被指定为“NaN”，但 JS 将所有这些值视为单个 `NaN` 值，无法区分。
 
-Unfortunately, that *not a number* meaning produces confusion, since `NaN` is *absolutely* a `number`.
+不幸的是，这意味*不是数字*会产生混淆，因为 `NaN` *绝对*是一个 `number`。
 
-| TIP: |
+| 提示： |
 | :--- |
-| Why is `NaN` a `number`?!? Think of the opposite: what if a mathematical/numeric operation, like `+` or `/`, produced a non-`number` value (like `null`, `undefined`, etc)? Wouldn't that be really strange and unexpected? What if they threw exceptions, so that you had to `try..catch` all your math? The only sensible behavior is, numeric/mathematical operations should *always* produce a `number`, even if that value is invalid because it came from an invalid operation. |
+| 为什么 `NaN` 是一个 `number`?!? 想想相反的情况：如果数学/数字运算（如 `+` 或 `/`）产生非 `number` 值（如 `null`、`undefined` 等）会怎样？那难道不是很奇怪和意外吗？如果它们抛出异常，以至于你必须 `try..catch` 所有的数学运算怎么办？唯一合理的行为是，数字/数学运算应该*始终*产生 `number`，即使该值因为来自无效运算而是无效的。|
 
-To avoid such confusion, I strongly prefer to define "NaN" as any of the following instead:
+为了避免这种混淆，我强烈建议将“NaN”定义为以下任何一种：
 
-* "iNvalid Number"
-* "Not actual Number"
-* "Not available Number"
-* "Not applicable Number"
+* "iNvalid Number"（无效数字）
+* "Not actual Number"（非实际数字）
+* "Not available Number"（不可用数字）
+* "Not applicable Number"（不适用数字）
 
-`NaN` is a special value in JS, in that it's the only value in the language that lacks the *identity property* -- it's never equal to itself.
+`NaN` 在 JS 中是一个特殊值，因为它是语言中唯一缺乏*同一性*的值——它永远不等于它自己。
 
 ```js
 NaN === NaN;            // false
 ```
 
-So unfortunately, the `===` operator cannot check a value to see if it's `NaN`. But there are some ways to do so:
+所以不幸的是，`===` 运算符无法检查一个值是否为 `NaN`。但是有一些方法可以做到：
 
 ```js
 politicianIQ = "nothing" / Infinity;
@@ -959,49 +959,49 @@ Object.is(NaN,politicianIQ);        // true
 [ NaN ].includes(politicianIQ);     // true
 ```
 
-Here's a fact of virtually all JS programs, whether you realize it or not: `NaN` happens. Seriously, almost all programs that do any math or numeric conversions are subject to `NaN` showing up.
+这是几乎所有 JS 程序的一个事实，无论你是否意识到：`NaN` 会发生。说真的，几乎所有进行任何数学或数字转换的程序都受制于 `NaN` 的出现。
 
-If you're not properly checking for `NaN` in your programs where you do math or numeric conversions, I can say with some degree of certainty: you probably have a number bug in your program somewhere, and it just hasn't bitten you yet (that you know of!).
+如果你没有在数学或数字转换的地方正确检查程序中的 `NaN`，我可以肯定地说：你的程序中某处可能有一个数字错误，只是它还没有咬到你（据你所知！）。
 
-| WARNING: |
+| 警告： |
 | :--- |
-| JS originally provided a global function called `isNaN(..)` for `NaN` checking, but it unfortunately has a long-standing coercion bug. `isNaN("Kyle")` returns `true`, even though the string value `"Kyle"` is most definitely *not* the `NaN` value. This is because the global `isNaN(..)` function forces any non-`number` argument to coerce to a `number` first, before checking for `NaN`. Coercing `"Kyle"` to a `number` produces `NaN`, so now the function sees a `NaN` and returns `true`! This buggy global `isNaN(..)` still exists in JS, but should never be used. When `NaN` checking, always use `Number.isNaN(..)`, `Object.is(..)`, etc. |
+| JS 最初提供了一个名为 `isNaN(..)` 的全局函数用于 `NaN` 检查，但不幸的是它有一个长期存在的强制转换错误。`isNaN("Kyle")` 返回 `true`，即使字符串值 `"Kyle"` 绝对*不是* `NaN` 值。这是因为全局 `isNaN(..)` 函数在检查 `NaN` 之前首先强制任何非 `number` 参数转换为 `number`。将 `"Kyle"` 强制转换为 `number` 会产生 `NaN`，所以现在函数看到了一个 `NaN` 并返回 `true`！这个有错误的全局 `isNaN(..)` 仍然存在于 JS 中，但永远不应该被使用。当你检查 `NaN` 时，始终使用 `Number.isNaN(..)`、`Object.is(..)` 等。|
 
-## BigInteger Values
+## BigInteger 值
 
-As the maximum safe integer in JS `number`s is `9007199254740991` (see above), such a relatively low limit can present a problem if a JS program needs to perform larger integer math, or even just hold values like 64-bit integer IDs (e.g., Twitter Tweet IDs).
+由于 JS `number` 中的最大安全整数是 `9007199254740991`（参见上文），如果 JS 程序需要执行更大的整数数学运算，甚至只是持有像 64 位整数 ID（例如 Twitter Tweet ID）这样的值，那么相对较低的限制可能会带来问题。
 
-For that reason, JS provides the alternate `bigint` type (BigInteger), which can store arbitrarily large (theoretically not limited, except by finite machine memory and/or JS implementation) integers.
+出于这个原因，JS 提供了备用的 `bigint` 类型（BigInteger），它可以存储任意大的（理论上不受限制，除非受到有限机器内存和/或 JS 实现的限制）整数。
 
-To distinguish a `bigint` from a whole (integer) `number` value, which would otherwise both look the same (`42`), JS requires an `n` suffix on `bigint` values:
+为了区分 `bigint` 和原本看起来相同的（`42`）整数 `number` 值，JS 要求在 `bigint` 值上加一个 `n` 后缀：
 
 ```js
-myAge = 42n;        // this is a bigint, not a number
+myAge = 42n;        // 这是一个 bigint，不是 number
 
-myKidsAge = 11;     // this is a number, not a bigint
+myKidsAge = 11;     // 这是一个 number，不是 bigint
 ```
 
-Let's illustrate the upper un-boundedness of `bigint`:
+让我们说明 `bigint` 的上限无界性：
 
 ```js
 Number.MAX_SAFE_INTEGER;        // 9007199254740991
 
-Number.MAX_SAFE_INTEGER + 2;    // 9007199254740992 -- oops!
+Number.MAX_SAFE_INTEGER + 2;    // 9007199254740992 -- 哎呀！
 
 myBigInt = 9007199254740991n;
 
-myBigInt + 2n;                  // 9007199254740993n -- phew!
+myBigInt + 2n;                  // 9007199254740993n -- 呼！
 
 myBigInt ** 2n;                 // 81129638414606663681390495662081n
 ```
 
-As you can see, the `bigint` value-type is able to do precise arithmetic above the integer limit of the `number` value-type.
+正如你所看到的，`bigint` 值类型能够在 `number` 值类型的整数限制之上进行精确计算。
 
-| WARNING: |
+| 警告： |
 | :--- |
-| Notice that the `+` operator required `.. + 2n` instead of just `.. + 2`? You cannot mix `number` and `bigint` value-types in the same expression. This restriction is annoying, but it protects your program from invalid mathematical operations that would give non-obvious unexpected results. |
+| 注意 `+` 运算符需要 `.. + 2n` 而不仅仅是 `.. + 2`？你不能在同一个表达式中混合 `number` 和 `bigint` 值类型。这个限制很烦人，但它保护你的程序免受无效数学运算的影响，这些运算会产生不明显的意外结果。|
 
-A `bigint` value can also be created with the `BigInt(..)` function; for example, to convert a whole (integer) `number` value to a `bigint`:
+也可以使用 `BigInt(..)` 函数创建 `bigint` 值；例如，将整数 `number` 值转换为 `bigint`：
 
 ```js
 myAge = 42n;
@@ -1013,15 +1013,15 @@ myAge += BigInt(inc);
 myAge;              // 43n
 ```
 
-| WARNING: |
+| 警告： |
 | :--- |
-| Though it may seem counter-intuitive to some readers, `BigInt(..)` is *always* called without the `new` keyword. If `new` is used, an exception will be thrown. |
+| 虽然对一些读者来说可能看起来违反直觉，但 `BigInt(..)` *总是*在没有 `new` 关键字的情况下调用。如果使用了 `new`，将抛出异常。|
 
-That's definitely one of the most common usages of the `BigInt(..)` function: to convert `number`s to `bigint`s, for mathematical operation purposes.
+这绝对是 `BigInt(..)` 函数最常见的用法之一：将 `number` 转换为 `bigint`，以用于数学运算目的。
 
-But it's not that uncommon to represent large integer values as strings, especially if those values are coming to the JS environment from other language environments, or via certain exchange formats, which themselves do not support `bigint`-style values.
+但是将大整数值表示为字符串并不罕见，尤其是当这些值从其他语言环境或通过某些本身不支持 `bigint` 风格值的交换格式来到 JS 环境时。
 
-As such, `BigInt(..)` is useful to coerce those string values to `bigint`s:
+因此，`BigInt(..)` 可用于将这些字符串值强制转换为 `bigint`：
 
 ```js
 myBigInt = BigInt("12345678901234567890");
@@ -1029,52 +1029,52 @@ myBigInt = BigInt("12345678901234567890");
 myBigInt;                       // 12345678901234567890n
 ```
 
-Unlike `parseInt(..)`, if any character in the string is non-numeric (`0-9` digits or `-`), including `.` or even a trailing `n` suffix character, an exception will be thrown. In other words, `BigInt(..)` is an all-or-nothing coercion-conversion, not a parsing-conversion.
+与 `parseInt(..)` 不同，如果字符串中的任何字符是非数字（`0-9` 数字或 `-`），包括 `.` 甚至尾随的 `n` 后缀字符，都会抛出异常。换句话说，`BigInt(..)` 是全有或全无的强制转换，而不是解析转换。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| I think it's absurd that `BigInt(..)` won't accept the trailing `n` character while string coercing (and thus effectively ignore it). I lobbied vehemently for that behavior, in the TC39 process, but was ultimately denied. In my opinion, it's now a tiny little gotcha wart on JS, but a wart nonetheless. |
+| 我认为 `BigInt(..)` 在字符串强制转换时不接受尾随 `n` 字符（从而有效地忽略它）是荒谬的。我在 TC39 过程中强烈游说这种行为，但最终被拒绝了。在我看来，这现在是 JS 上的一点小缺陷，但仍然是缺陷。|
 
-## Symbol Values
+## Symbol 值
 
-The `symbol` type contains special opaque values called "symbols". These values can only be created by the `Symbol(..)` function:
+`symbol` 类型包含称为“symbols”的特殊不透明值。这些值只能由 `Symbol(..)` 函数创建：
 
 ```js
 secret = Symbol("my secret");
 ```
 
-| WARNING: |
+| 警告： |
 | :--- |
-| Just as with `BigInt(..)`, the `Symbol(..)` function must be called without the `new` keyword. |
+| 就像 `BigInt(..)` 一样，`Symbol(..)` 函数必须在没有 `new` 关键字的情况下调用。|
 
-The `"my secret"` string passed into the `Symbol(..)` function call is *not* the symbol value itself, even though it seems that way. It's merely an optional descriptive label, used only for debugging purposes for the benefit of the developer.
+传入 `Symbol(..)` 函数调用的 `"my secret"` 字符串*不是* symbol 值本身，即使看起来是那样。它仅仅是一个可选的描述性标签，仅用于调试目的，以方便开发人员。
 
-The underlying value returned from `Symbol(..)` is a special kind of value that resists the program/developer inspecting anything about its underlying representation. That's what I mean by "opaque".
+从 `Symbol(..)` 返回的底层值是一种特殊类型的值，它阻止程序/开发人员检查有关其底层表示的任何内容。这就是我所说的“不透明”的意思。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| You could think of symbols as if they are monotonically incrementing integer numbers -- indeed, that's similar to how at least some JS engines implement them. But the JS engine will never expose any representation of a symbol's underlying value in any way that you or the program can see. |
+| 你可以将 symbol 想象为单调递增的整数——实际上，这类似于至少某些 JS 引擎实现它们的方式。但是 JS 引擎永远不会以任何你或程序可以看到的方式公开 symbol 底层值的任何表示。|
 
-Symbols are guaranteed by the JS engine to be unique (only within the program itself), and are unguessable. In other words, a duplicate symbol value can never be created in a program.
+JS 引擎保证 Symbols 是唯一的（仅在程序本身内），并且是不可猜测的。换句话说，在程序中永远无法创建重复的 symbol 值。
 
-You might be wondering at this point what symbols are used for?
+你此时可能想知道 symbol 是用来做什么的？
 
-One typical usage is as "special" values that the developer distinguishes from any other values that could accidentally collide. For example:
+一种典型的用法是作为“特殊”值，开发人员将其与任何可能意外冲突的其他值区分开来。例如：
 
 ```js
 EMPTY = Symbol("not set yet");
 myNickname = EMPTY;
 
-// later:
+// 稍后：
 
 if (myNickname == EMPTY) {
     // ..
 }
 ```
 
-Here, I've defined a special `EMPTY` value and initialized `myNickname` to it. Later, I check to see if it's still that special value, and then perform some action if so. I might not want to have used `null` or `undefined` for such purposes, as another developer might be able to pass in one of those common built-in values. `EMPTY` by contrast here is a unique, unguessable value that only I've defined and have control over and access to.
+在这里，我定义了一个特殊的 `EMPTY` 值并将 `myNickname` 初始化为它。稍后，我检查它是否仍然是那个特殊值，如果是，则执行某些操作。我可能不想为此目的使用 `null` or `undefined`，因为另一个开发人员可能会传入这些常见的内置值之一。相比之下，这里的 `EMPTY` 是一个唯一的、不可猜测的值，只有我定义并拥有控制权和访问权。
 
-Perhaps even more commonly, symbols are often used as special (meta-) properties on objects:
+也许更常见的是，symbol 经常用作对象上的特殊（元）属性：
 
 ```js
 myInfo = {
@@ -1083,13 +1083,13 @@ myInfo = {
     age: 42
 };
 
-// later:
+// 稍后：
 PRIVATE_ID = Symbol("private unique ID, don't touch!");
 
 myInfo[PRIVATE_ID] = generateID();
 ```
 
-It's important to note that symbol properties are still publicly visible on any object; they're not *actually* private. But they're treated as special and set-apart from the normal collection of object properties. It's similar to if I had done instead:
+值得注意的是，symbol 属性在任何对象上仍然是公开可见的；它们并不*真正*私有。但它们被视为特殊的，并与正常的属性集合分开。这类似于如果我这样做：
 
 ```js
 Object.defineProperty(myInfo,"__private_id_dont_touch",{
@@ -1098,13 +1098,13 @@ Object.defineProperty(myInfo,"__private_id_dont_touch",{
 });
 ```
 
-By convention only, most developers know that if a property name is prefixed with `_` (or even more so, `__`!), that means it's "pseudo-private" and to leave it alone unless they're really supposed to access it.
+仅按照惯例，大多数开发人员都知道，如果属性名称以 `_` 前缀（甚至更多，`__`！），那意味着它是“伪私有”的，除非他们真的应该访问它，否则不要理会它。
 
-Symbols basically serve the same use-case, but a bit more ergonomically than the prefixing approach.
+Symbols 基本上服务于相同的用例，但比前缀方法更符合人体工程学。
 
-### Well-Known Symbols (WKS)
+### 常用 Symbol (Well-Known Symbols - WKS)
 
-JS pre-defines a set of symbols, referred to as *well-known symbols* (WKS), that represent certain special meta-programming hooks on objects. These symbols are stored as static properties on the `Symbol` function object. For example:
+JS 预定义了一组 symbol，称为*常用 Symbol*（WKS），它们代表对象上的某些特殊元编程钩子。这些 symbol 存储为 `Symbol` 函数对象的静态属性。例如：
 
 ```js
 myInfo = {
@@ -1117,58 +1117,57 @@ myInfo[Symbol.toStringTag] = "my-info";
 String(myInfo);         // [object my-info]
 ```
 
-`Symbol.toStringTag` is a well-known symbol for accessing and overriding the default string representation of a plain object (`"[object Object]"`), replacing the `"Object"` part with a different value (e.g., `"my-info"`).
+`Symbol.toStringTag` 是一个常用 symbol，用于访问和覆盖普通对的默认字符串表示形式（`"[object Object]"`），将 `"Object"` 部分替换为不同的值（例如 `"my-info"`）。
 
-See the "Objects & Classes" book of this series for more information about Well-Known Symbols and metaprogramming.
+有关常用 Symbol 和元编程的更多信息，请参阅本系列的“对象与类”一书。
 
-### Global Symbol Registry
+### 全局 Symbol 注册表
 
-Often, you want to keep symbol values private, such as inside a module scope. But occasionally, you want to expose them so they're accessible globally throughout all the files in a JS program.
+通常，你想保持 symbol 值私有，例如在模块范围内。但偶尔，你想公开它们，以便它们在 JS 程序的所有文件中全局可访问。
 
-Instead of just attaching them as global variables (i.e., properties on the `globalThis` object), JS provides an alternate *global namespace* to register symbols in:
+JS 提供了一个替代的*全局命名空间*来注册 symbol，而不是将它们作为全局变量（即 `globalThis` 对象上的属性）附加：
 
 ```js
-// retrieve if already registered,
-// otherwise register
+// 如果已注册则检索，
+// 否则注册
 PRIVATE_ID = Symbol.for("private-id");
 
-// elsewhere:
+// 其他地方：
 
 privateIDKey = Symbol.keyFor(PRIVATE_ID);
 privateIDKey;           // "private-id"
 
-// elsewhere:
+// 其他地方：
 
-// retrieve symbol from registry undeer
-// specified key
+// 从注册表中检索指定键下的 symbol
 privateIDSymbol = Symbol.for(privateIDKey);
 ```
 
-The value passed to `Symbol.for(..)` is *not* the same as passed to `Symbol(..)`. `Symbol.for(..)` expects a unique *key* for the symbol to be registered under in the global registry, whereas `Symbol(..)` optionally accepts a descriptive label (not necessarily unique).
+传递给 `Symbol.for(..)` 的值与传递给 `Symbol(..)` 的值*不同*。`Symbol.for(..)` 期望一个唯一的*键*以便 symbol 在全局注册表中注册，而 `Symbol(..)` 可选地接受一个描述性标签（不一定是唯一的）。
 
-If the registry doesn't have a symbol under that specified *key*, a new symbol (with no descriptive label) is created and automatically registered there. Otherwise, `Symbol.for(..)` returns whatever previously registered symbol is under that *key*.
+如果注册表在该指定的*键*下没有 symbol，则会创建一个新的 symbol（没有描述性标签）并自动注册在那里。否则，`Symbol.for(..)` 返回该*键*下之前注册的任何 symbol。
 
-Going in the opposite direction, if you have the symbol value itself, and want to retrieve the *key* it's registered under, `Symbol.keyFor(..)` takes the symbol itself as input, and returns the *key* (if any). That's useful in case it's more convenient to pass around the *key* string value than the symbol itself.
+反过来，如果你有 symbol 值本身，并且想检索它注册的*键*，`Symbol.keyFor(..)` 接受 symbol 本身作为输入，并返回*键*（如果有）。这很有用，因为传递*键*字符串值比 symbol 本身更方便。
 
-### Object or Primitive?
+### 对象还是原始类型？
 
-Unlike other primitives like `42`, where you can create multiple copies of the same value, symbols *do* act more like specific object references in that they're always completely unique (for purposes of value assignment and equality comparison). The specification also categorizes the `Symbol()` function under the "Fundamental Objects" section, calling the function a "constructor", and even defining its `prototype` property.
+与其他像 `42` 这样的原始类型不同，你可以创建相同值的多个副本，symbol *确实*表现得更像特定的对象引用，因为它们总是完全唯一的（出于值赋值和相等比较的目的）。规范还将 `Symbol()` 函数归类在“基础对象”部分下，称该函数为“构造函数”，甚至定义了其 `prototype` 属性。
 
-However, as mentioned earlier, `new` cannot be used with `Symbol(..)`; this is similar to the `BigInt()` "constructor". We clearly know `bigint` values are primitives, so `symbol` values seem to be of the same *kind*.
+然而，如前所述，`new` 不能与 `Symbol(..)` 一起使用；这类似于 `BigInt()` “构造函数”。我们清楚地知道 `bigint` 值是原始类型，所以 `symbol` 值似乎属于同一*类*。
 
-And in the specification's "Terms and Definitions", it lists symbol as a primitive value. [^PrimitiveValues] Moreover, the values themselves are used in JS programs as primitives rather than objects. For example, symbols are primarily used as keys in objects -- we know objects cannot use other object values as keys! -- along with strings, which are also primitives.
+在规范的“术语和定义”中，它将 symbol 列为原始值。[^PrimitiveValues] 此外，值本身在 JS 程序中被用作原始类型而不是对象。例如，symbol 主要用作对象中的键——我们知道对象不能使用其他对象值作为键！——以及字符串，这也是原始类型。
 
-As mentioned earlier, some JS engines even internally implement symbols as unique, monotonically incrementing integers (primitives!).
+如前所述，一些 JS 引擎甚至在内部将 symbol 实现为唯一的、单调递增的整数（原始类型！）。
 
-Finally, as explained at the top of this chapter, we know primitive values are *not allowed* to have properties set on them, but are *auto-boxed* (see "Automatic Objects" in Chapter 3) internally to the corresponding object-wrapper type to facilitate property/method access. Symbols follow all these exact behaviors, the same as all the other primitives.
+最后，正如本章开头所解释的，我们知道原始值*不允许*在其上设置属性，而是在内部*自动装箱*（参见第 3 章中的“自动对象”）到相应的对象包装类型以方便属性/方法访问。symbols 遵循所有这些确切的行为，就像所有其他原始类型一样。
 
-All this considered, I think symbols are *much more* like primitives than objects, so that's how I present them in this book.
+考虑到所有这些，我认为 symbols *更像* 原始类型而不是对象，这就是我在本书中介绍它们的方式。
 
-## Primitives Are Built-In Types
+## 原始类型是内置类型
 
-We've now dug deeply into the seven primitive (non-object) value types that JS provides automatically built-in.
+我们现在已经深入挖掘了 JS 自动内置提供的七种原始（非对象）值类型。
 
-Before we move on to discussing JS's built-in object value type, we want to take a closer look at the kinds of behaviors we can expect from JS values. We'll do so in-depth, in the next chapter.
+在我们继续讨论 JS 的内置对象值类型之前，我们要仔细看看我们可以从 JS 值中期待什么样的行为。我们将在下一章深入探讨。
 
 [^PrimitiveValues]: "4.4.5 primitive value", ECMAScript 2022 Language Specification; https://tc39.es/ecma262/#sec-primitive-value ; Accessed August 2022
 

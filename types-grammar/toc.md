@@ -1,43 +1,43 @@
-# You Don't Know JS Yet: Types & Grammar - 2nd Edition
+# 你并不了解 JavaScript：类型与语法 - 第二版
 
-| NOTE: |
+| 备注： |
 | :--- |
-| Work in progress |
+| 草稿 |
 
-## Table of Contents
+## 目录
 
-* Foreword
-* Preface
-* Chapter 1: Primitive Values
-	* Value Types
-    * Empty Values
-    * Boolean Values
-    * String Values
-    * Number Values
-    * BigInteger Values
-    * Symbol Values
-    * Primitives Are Built-In Types
-* Chapter 2: Primitive Behaviors
-    * Primitive Immutability
-    * Primitive Assignments
-    * String Behaviors
-    * Number Behaviors
-    * Primitives Are Foundational
-* Chapter 3: Object Values
-    * Types of Objects
-    * Plain Objects
-    * Fundamental Objects
-    * Other Built-in Objects
-    * Arrays
-    * Regular Expressions
-    * Functions
-    * Proposed: Records/Tuples
+* 前言
+* 序言
+* 第一章：原始值
+	* 值类型
+    * 空值
+    * 布尔值
+    * 字符串值
+    * 数字值
+    * 大整数值
+    * 符号值
+    * 原始类型是内置类型
+* 第二章：原始类型的行为
+    * 原始类型的不可变性
+    * 原始类型的赋值
+    * 字符串行为
+    * 数字行为
+    * 原始类型是基础
+* 第三章：对象值
+    * 对象类型
+    * 普通对象
+    * 基础对象
+    * 其他内置对象
+    * 数组
+    * 正则表达式
+    * 函数
+    * 提案：Record 和 Tuple
     * TODO
-* Chapter 4: Coercing Values
-    * Coercion: Explicit vs Implicit
-    * Abstracts
-    * Concrete Coercions
-    * Coercion Corner Cases
-    * Type Awareness
-    * What's Left?
-* Thank You!
+* 第四章：强制类型转换
+    * 强制转换：显式与隐式
+    * 抽象操作
+    * 具体强制转换
+    * 强制转换的边界情况
+    * 类型意识
+    * 还有什么？
+* 感谢！

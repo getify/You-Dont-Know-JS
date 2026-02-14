@@ -1,21 +1,21 @@
-# You Don't Know JS Yet: Objects & Classes - 2nd Edition
-# Chapter 2: How Objects Work
+# 你并不了解 JavaScript：对象与类 - 第二版
+# 第 2 章：对象是如何工作的
 
-| NOTE: |
+| 注意： |
 | :--- |
-| Work in progress |
+| 草稿 |
 
-Objects are not just containers for multiple values, though clearly that's the context for most interactions with objects.
+对象不仅仅是多个值的容器，尽管这显然是大多数对象交互的场景。
 
-To fully understand the object mechanism in JS, and get the most out of using objects in our programs, we need to look more closely at a number of characteristics of objects (and their properties) which can affect their behavior when interacting with them.
+为了完全理解 JS 中的对象机制，并最大限度地利用对象，我们需要更仔细地研究对象（及其属性）的一系列特性，这些特性会影响我们在与对象交互时的行为。
 
-These characteristics that define the underlying behavior of objects are collectively referred to in formal terms as the "metaobject protocol" (MOP)[^mop]. The MOP is useful not only for understanding how objects will behave, but also for overriding the default behaviors of objects to bend the language to fit our program's needs more fully.
+这些定义对象底层行为的特性，在形式上统称为“元对象协议”（Metaobject Protocol，简称 MOP）[^mop]。MOP 不仅对于理解对象将如何表现很有用，而且还可以用于覆盖对象的默认行为，从而使语言更充分地适应我们程序的需求。
 
-## Property Descriptors
+## 属性描述符（Property Descriptors）
 
-Each property on an object is internally described by what's known as a "property descriptor". This is, itself, an object (aka, "metaobject") with several properties (aka "attributes") on it, dictating how the target property behaves.
+对象上的每个属性在内部都由所谓的“属性描述符”来描述。它本身也是一个对象（即“元对象”），具有若干属性（即“特性”），决定了目标属性的行为方式。
 
-We can retrieve a property descriptor for any existing property using `Object.getOwnPropertyDescriptor(..)` (ES5):
+我们可以使用 `Object.getOwnPropertyDescriptor(..)` (ES5) 来获取任何现有属性的属性描述符：
 
 ```js
 myObj = {
@@ -33,59 +33,59 @@ Object.getOwnPropertyDescriptor(myObj,"favoriteNumber");
 // }
 ```
 
-We can even use such a descriptor to define a new property on an object, using `Object.defineProperty(..)` (ES5):
+我们甚至可以使用这样的描述符，通过 `Object.defineProperty(..)` (ES5) 在对象上定义一个新属性：
 
 ```js
 anotherObj = {};
 
 Object.defineProperty(anotherObj,"fave",{
     value: 42,
-    enumerable: true,     // default if omitted
-    writable: true,       // default if omitted
-    configurable: true    // default if omitted
+    enumerable: true,     // 如果省略，默认为 false
+    writable: true,       // 如果省略，默认为 false
+    configurable: true    // 如果省略，默认为 false
 });
 
 anotherObj.fave;          // 42
 ```
 
-If an existing property has not already been marked as non-configurable (with `configurable: false` in its descriptor), it can always be re-defined/overwritten using `Object.defineProperty(..)`.
+如果一个现有属性尚未被标记为不可配置（即在其描述符中 `configurable: false`），则始终可以使用 `Object.defineProperty(..)` 重新定义或覆盖它。
 
-| WARNING: |
+| 警告： |
 | :--- |
-| A number of earlier sections in this chapter refer to "copying" or "duplicating" properties. One might assume such copying/duplication would be at the property descriptor level. However, none of those operations actually work that way; they all do simple `=` style access and assignment, which has the effect of ignoring any nuances in how the underlying descriptor for a property is defined. |
+| 本章前面的许多章节都提到了“复制”或“重复”属性。人们可能会认为这种复制/重复是在属性描述符级别进行的。然而，这些操作实际上都不是那样工作的；它们都执行简单的 `=` 风格的访问和赋值，其效果是忽略了属性底层描述符定义的任何细微差别。 |
 
-Though it seems far less common out in the wild, we can even define multiple properties at once, each with their own descriptor:
+尽管在实际开发中似乎不太常见，但我们甚至可以一次定义多个属性，每个属性都有自己的描述符：
 
 ```js
 anotherObj = {};
 
 Object.defineProperties(anotherObj,{
     "fave": {
-        // a property descriptor
+        // 属性描述符
     },
     "superFave": {
-        // another property descriptor
+        // 另一个属性描述符
     }
 });
 ```
 
-It's not very common to see this usage, because it's rarer that you need to specifically control the definition of multiple properties. But it may be useful in some cases.
+这种用法不是很常见，因为你需要专门控制多个属性定义的场景比较少见。但在某些情况下它可能会很有用。
 
-### Accessor Properties
+### 访问器属性（Accessor Properties）
 
-A property descriptor usually defines a `value` property, as shown above. However, a special kind of property, known as an "accessor property" (aka, a getter/setter), can be defined. For these a property like this, its descriptor does not define a fixed `value` property, but would instead look something like this:
+通常，属性描述符定义了一个 `value` 属性，如上所示。然而，还可以定义一种特殊的属性，称为“访问器属性”（即 getter/setter）。对于这种属性，其描述符不定义固定的 `value` 属性，而是像这样：
 
 ```js
 {
-    get() { .. },    // function to invoke when retrieving the value
-    set(v) { .. },   // function to invoke when assigning the value
-    // .. enumerable, etc
+    get() { .. },    // 获取值时调用的函数
+    set(v) { .. },   // 赋值时调用的函数
+    // .. enumerable 等
 }
 ```
 
-A getter looks like a property access (`obj.prop`), but under the covers it invokes the `get()` method as defined; it's sort of like if you had called `obj.prop()`. A setter looks like a property assignment (`obj.prop = value`), but it invokes the `set(..)` method as defined; it's sort of like if you had called `obj.prop(value)`.
+Getter 看起来像属性访问（`obj.prop`），但在底层它调用了定义的 `get()` 方法；这有点像你调用了 `obj.prop()`。Setter 看起来像属性赋值（`obj.prop = value`），但它调用了定义的 `set(..)` 方法；这有点像你调用了 `obj.prop(value)`。
 
-Let's illustrate a getter/setter accessor property:
+让我们演示一下 getter/setter 访问器属性：
 
 ```js
 anotherObj = {};
@@ -107,39 +107,39 @@ anotherObj.fave;
 // 123
 ```
 
-### Enumerable, Writable, Configurable
+### 可枚举（Enumerable）、可写（Writable）、可配置（Configurable）
 
-Besides `value` or `get()` / `set(..)`, the other 3 attributes of a property descriptor are (as shown above):
+除了 `value` 或 `get()` / `set(..)` 之外，属性描述符的其他 3 个特性是（如上所示）：
 
 * `enumerable`
 * `writable`
 * `configurable`
 
-The `enumerable` attribute controls whether the property will appear in various enumerations of object properties, such as `Object.keys(..)`, `Object.entries(..)`, `for..in` loops, and the copying that occurs with the `...` object spread and `Object.assign(..)`. Most properties should be left enumerable, but you can mark certain special properties on an object as non-enumerable if they shouldn't be iterated/copied.
+`enumerable` 特性控制属性是否出现在对象的各种属性枚举中，例如 `Object.keys(..)`、`Object.entries(..)`、`for..in` 循环，以及使用 `...` 对象展开和 `Object.assign(..)` 进行的复制。大多数属性应保持可枚举，但如果某些特殊属性不应被迭代/复制，你可以将其标记为不可枚举。
 
-The `writable` attribute controls whether a `value` assignment (via `=`) is allowed. To make a property "read only", define it with `writable: false`. However, as long as the property is still configurable, `Object.defineProperty(..)` can still change the value by setting `value` differently.
+`writable` 特性控制是否允许 `value` 赋值（通过 `=`）。要使属性“只读”，请将其定义为 `writable: false`。但是，只要该属性仍然是可配置的，`Object.defineProperty(..)` 仍然可以通过设置不同的 `value` 来更改值。
 
-The `configurable` attribute controls whether a property's **descriptor** can be re-defined/overwritten. A property that's `configurable: false` is locked to its definition, and any further attempts to change it with `Object.defineProperty(..)` will fail. A non-configurable property can still be assigned new values (via `=`), as long as `writable: true` is still set on the property's descriptor.
+`configurable` 特性控制是否可以重新定义/覆盖属性的 **描述符**。`configurable: false` 的属性被锁定在其定义中，任何使用 `Object.defineProperty(..)` 更改它的尝试都会失败。只要属性描述符上仍设置了 `writable: true`，不可配置的属性仍然可以被分配新值（通过 `=`）。
 
-## Object Sub-Types
+## 对象子类型（Object Sub-Types）
 
-There are a variety of specialized sub-types of objects in JS. But by far, the two most common ones you'll interact with are arrays and `function`s.
+JS 中有各种专门的对象子类型。但目前为止，你最常接触的两个是数组（Arrays）和函数（Functions）。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| By "sub-type", we mean the notion of a derived type that has inherited the behaviors from a parent type but then specialized or extended those behaviors. In other words, values of these sub-types are fully objects, but are also *more than just* objects. |
+| 我们所说的“子类型”，是指一种派生类型的概念，它继承了父类型的行为，但随后专门化或扩展了这些行为。换句话说，这些子类型的值完全是对象，但也 *不仅仅是* 对象。 |
 
-### Arrays
+### 数组（Arrays）
 
-Arrays are objects that are specifically intended to be **numerically indexed**, rather than using string named property locations. They are still objects, so a named property like `favoriteNumber` is legal. But it's greatly frowned upon to mix named properties into numerically indexed arrays.
+数组是专门设计为 **数字索引** 的对象，而不是使用字符串命名的属性位置。它们仍然是对象，因此像 `favoriteNumber` 这样的命名属性是合法的。但是，强烈不建议将命名属性混合到数字索引的数组中。
 
-Arrays are preferably defined with literal syntax (similar to objects), but with the `[ .. ]` square brackets rather than `{ .. }` curly brackets:
+数组最好使用字面量语法（类似于对象）定义，但使用 `[ .. ]` 方括号而不是 `{ .. }` 花括号：
 
 ```js
 myList = [ 23, 42, 109 ];
 ```
 
-JS allows any mixture of value types in arrays, including objects, other arrays, functions, etc. As you're likely already aware, arrays are "zero-indexed", meaning the first element in the array is at the index `0`, not `1`:
+JS 允许数组中混合任何值类型，包括对象、其他数组、函数等。正如你可能已经知道的那样，数组是“零索引”的，这意味着数组中的第一个元素位于索引 `0`，而不是 `1`：
 
 ```js
 myList = [ 23, 42, 109 ];
@@ -148,33 +148,33 @@ myList[0];      // 23
 myList[1];      // 42
 ```
 
-Recall that any string property name on an object that "looks like" an integer -- is able to be validly coerced to a numeric integer -- will actually be treated like an integer property (aka, integer index). The same goes for arrays. You should always use `42` as an integer index (aka, property name), but if you use the string `"42"`, JS will assume you meant that as an integer and do that for you.
+回想一下，对象上任何“看起来像”整数的字符串属性名——即能够有效地强制转换为数字整数——实际上都会被视为整数属性（即整数索引）。数组也是如此。你应该始终使用 `42` 作为整数索引（即属性名），但如果你使用字符串 `"42"`，JS 会假设你的意思是整数并为你进行处理。
 
 ```js
-// "2" works as an integer index here, but it's not advised
+// "2" 在这里作为整数索引工作，但不建议这样做
 myList["2"];    // 109
 ```
 
-One exception to the "no named properties on arrays" *rule* is that all arrays automatically expose a `length` property, which is automatically kept updated with the "length" of the array.
+“不在数组上使用命名属性” *规则* 的一个例外是，所有数组都会自动暴露一个 `length` 属性，该属性会自动保持更新为数组的“长度”。
 
 ```js
 myList = [ 23, 42, 109 ];
 
 myList.length;   // 3
 
-// "push" another value onto the end of the list
+// 将另一个值 "push" 到列表末尾
 myList.push("Hello");
 
 myList.length;   // 4
 ```
 
-| WARNING: |
+| 警告： |
 | :--- |
-| Many JS developers incorrectly believe that array `length` is basically a *getter* (see "Accessor Properties" earlier in this chapter), but it's not. The offshoot is that these developers feel like it's "expensive" to access this property -- as if JS has to on-the-fly recompute the length -- and will thus do things like capture/store the length of an array before doing a non-mutating loop over it. This used to be "best practice" from a performance perspective. But for at least 10 years now, that's actually been an anti-pattern, because the JS engine is more efficient at managing the `length` property than our JS code is at trying to "outsmart" the engine to avoid invoking something we think is a *getter*. It's more efficient to let the JS engine do its job, and just access the property whenever and however often it's needed. |
+| 许多 JS 开发人员错误地认为数组的 `length` 基本上是一个 *getter*（参见本章前面的“访问器属性”），但它不是。其后果是，这些开发人员觉得访问此属性很“昂贵”——好像 JS 必须即时重新计算长度——因此会做一些事情，比如在对数组进行非变异循环之前捕获/存储数组的长度。从性能角度来看，这曾经是“最佳实践”。但至少在过去 10 年里，这实际上一直是一种反模式，因为 JS 引擎在管理 `length` 属性方面比我们的 JS 代码试图“智胜”引擎以避免调用我们认为的 *getter* 更有效率。让 JS 引擎做它的工作，并在需要时随时随地访问该属性，效率更高。 |
 
-#### Empty Slots
+#### 空槽（Empty Slots）
 
-JS arrays also have a really unfortunate "flaw" in their design, referred to as "empty slots". If you assign an index of an array more than one position beyond the current end of the array, JS will leave the in between slots "empty" rather than auto-assigning them to `undefined` as you might expect:
+JS 数组在其设计中也有一个非常不幸的“缺陷”，被称为“空槽”（empty slots）。如果你为数组分配的索引超出了数组当前末尾一个位置以上，JS 会让中间的槽保持“空”，而不是像你预期的那样自动将它们赋值为 `undefined`：
 
 ```js
 myList = [ 23, 42, 109 ];
@@ -185,19 +185,19 @@ myList.length;              // 15
 
 myList;                     // [ 23, 42, 109, empty x 11, "Hello" ]
 
-// looks like a real slot with a
-// real `undefined` value in it,
-// but beware, it's a trick!
+// 看起来像一个真正的槽，
+// 里面有一个真正的 `undefined` 值，
+// 但是要小心，这是一个陷阱！
 myList[9];                  // undefined
 ```
 
-You might wonder why empty slots are so bad? One reason: there are APIs in JS, like array's `map(..)`, where empty slots are surprisingly skipped over! Never, ever intentionally create empty slots in your arrays. This in undebateably one of JS's "bad parts".
+你可能会想，为什么空槽这么糟糕？一个原因是：在 JS 的某些 API 中，比如数组的 `map(..)`，空槽会被出人意料地跳过！永远不要有意在你的数组中创建空槽。这无可争议地是 JS 的“糟粕”之一。
 
-### Functions
+### 函数（Functions）
 
-I don't have much specifically to say about functions here, other than to point out that they are also sub-object-types. This means that in addition to being executable, they can also have named properties added to or accessed from them.
+关于函数，我这里没有什么特别要说的，只是指出它们也是对象子类型。这意味着除了可执行之外，它们还可以拥有被添加或访问的命名属性。
 
-Functions have two pre-defined properties you may find yourself interacting with, specifially for meta-programming purposes:
+函数有两个预定义的属性，你可能会发现自己会为了元编程目的而与其交互：
 
 ```js
 function help(opt1,opt2,...remainingOpts) {
@@ -208,11 +208,11 @@ help.name;          // "help"
 help.length;        // 2
 ```
 
-The `length` of a function is the count of its explicitly defined parameters, up to but not including a parameter that either has a default value defined (e.g., `param = 42`) or a "rest parameter" (e.g., `...remainingOpts`).
+函数的 `length` 是其显式定义的参数的计数，直到（但不包括）定义了默认值的参数（例如 `param = 42`）或“剩余参数”（例如 `...remainingOpts`）。
 
-#### Avoid Setting Function-Object Properties
+#### 避免设置函数对象属性
 
-You should avoid assigning properties on function objects. If you're looking to store extra information associated with a function, use a separate `Map(..)` (or `WeakMap(..)`) with the function object as the key, and the extra information as the value.
+你应该避免在函数对象上分配属性。如果你想存储与函数关联的额外信息，请使用单独的 `Map(..)`（或 `WeakMap(..)`），以函数对象作为键，额外信息作为值。
 
 ```js
 extraInfo = new Map();
@@ -223,60 +223,60 @@ extraInfo.set(help,"this is some important information");
 extraInfo.get(help);   // "this is some important information"
 ```
 
-## Object Characteristics
+## 对象特性（Object Characteristics）
 
-In addition to defining behaviors for specific properties, certain behaviors are configurable across the whole object:
+除了为特定属性定义行为外，某些行为在整个对象范围内也是可配置的：
 
-* extensible
-* sealed
-* frozen
+* 可扩展（extensible）
+* 密封（sealed）
+* 冻结（frozen）
 
-### Extensible
+### 可扩展（Extensible）
 
-Extensibility refers to whether an object can have new properties defined/added to it. By default, all objects are extensible, but you can change shut off extensibility for an object:
+可扩展性是指是否可以在对象上定义/添加新属性。默认情况下，所有对象都是可扩展的，但你可以关闭对象的可扩展性：
 
 ```js
 myObj = {
     favoriteNumber: 42
 };
 
-myObj.firstName = "Kyle";                  // works fine
+myObj.firstName = "Kyle";                  // 正常工作
 
 Object.preventExtensions(myObj);
 
-myObj.nicknames = [ "getify", "ydkjs" ];   // fails
-myObj.favoriteNumber = 123;                // works fine
+myObj.nicknames = [ "getify", "ydkjs" ];   // 失败
+myObj.favoriteNumber = 123;                // 正常工作
 ```
 
-In non-strict-mode, an assignment that creates a new property will silently fail, whereas in strict mode an exception will be thrown.
+在非严格模式下，创建新属性的赋值将静默失败，而在严格模式下会抛出异常。
 
-### Sealed
-
-// TODO
-
-### Frozen
+### 密封（Sealed）
 
 // TODO
 
-## Extending The MOP
-
-As mentioned at the start of this chapter, objects in JS behave according to a set of rules referred to as the Metaobject Protocol (MOP)[^mop]. Now that we understand more fully how objects work by default, we want to turn our attention to how we can hook into some of these default behaviors and override/customize them.
+### 冻结（Frozen）
 
 // TODO
 
-## `[[Prototype]]` Chain
+## 扩展 MOP
 
-One of the most important, but least obvious, characteristics of an object (part of the MOP) is referred to as its "prototype chain"; the official JS specification notation is `[[Prototype]]`. Make sure not to confuse this `[[Prototype]]` with a public property named `prototype`. Despite the naming, these are distinct concepts.
+正如本章开头提到的，JS 中的对象行为遵循一套称为元对象协议（MOP）[^mop] 的规则。既然我们已经更充分地了解了对象默认是如何工作的，我们想把注意力转向我们要如何钩入（hook into）这些默认行为中的一部分并覆盖/自定义它们。
 
-The `[[Prototype]]` is an internal linkage that an object gets by default when its created, pointing to another object. This linkage is a hidden, often subtle characteristic of an object, but it has profound impacts on how interactions with the object will play out. It's referred to as a "chain" because one object links to another, which in turn links to another, ... and so on. There is an *end* or *top* to this chain, where the linkage stops and there's no further to go. More on that shortly.
+// TODO
 
-We already saw several implications of `[[Prototype]]` linkage in Chapter 1. For example, by default, all objects are `[[Prototype]]`-linked to the built-in object named `Object.prototype`.
+## `[[Prototype]]` 链
 
-| WARNING: |
+对象最重要的但最不明显的特征之一（MOP 的一部分）被称为其“原型链”；官方 JS 规范符号是 `[[Prototype]]`。确切注意不要将此 `[[Prototype]]` 与名为 `prototype` 的公共属性混淆。尽管命名相似，但它们是不同的概念。
+
+`[[Prototype]]` 是对象在创建时默认获得的内部链接，指向另一个对象。这种链接是对象的一个隐藏的、通常很微妙的特征，但它对与对象的交互方式有着深远的影响。它被称为“链”，因为一个对象链接到另一个对象，后者又链接到另一个对象，……依此类推。这个链有一个 *终点* 或 *顶端*，链接在那里停止，没有更远的地方可去。稍后会详细介绍。
+
+我们在第 1 章中已经看到了 `[[Prototype]]` 链接的几个含意。例如，默认情况下，所有对象都 `[[Prototype]]` 链接到名为 `Object.prototype` 的内置对象。
+
+| 警告： |
 | :--- |
-| That `Object.prototype` name itself can be confusing, since it uses a property called `prototype`. How are `[[Prototype]]` and `prototype` related!? Put such questions/confusion on pause for a bit, as we'll come back an explain the differences between `[[Prototype]]` and `prototype` later in this chapter. For the moment, just assume the presence of this important but weirdly named built-in object, `Object.prototype`. |
+| `Object.prototype` 这个名字本身可能会令人困惑，因为它使用了一个名为 `prototype` 的属性。`[[Prototype]]` 和 `prototype` 是如何关联的！？先把这些问题/困惑放一放，稍后我们将在本章中回来解释 `[[Prototype]]` 和 `prototype` 之间的区别。目前，只需假设存在这个重要但命名奇怪的内置对象 `Object.prototype`。 |
 
-Let's consider some code:
+让我们看一些代码：
 
 ```js
 myObj = {
@@ -284,9 +284,9 @@ myObj = {
 };
 ```
 
-That should look familiar from Chapter 1. But what you *don't see* in this code is that the object there was automatically linked (via its internal `[[Prototype]]`) to that automatically built-in, but weirdly named, `Object.prototype` object.
+这看起来应该很像第 1 章的内容。但你在代码中 *看不到* 的是，该对象被自动链接（通过其内部 `[[Prototype]]`）到了那个自动内置的、但命名奇怪的 `Object.prototype` 对象。
 
-When we do things like:
+当我们做这样的事情时：
 
 ```js
 myObj.toString();                             // "[object Object]"
@@ -294,19 +294,19 @@ myObj.toString();                             // "[object Object]"
 myObj.hasOwnProperty("favoriteNumber");   // true
 ```
 
-We're taking advantage of this internal `[[Prototype]]` linkage, without really realizing it. Since `myObj` does not have `toString` or `hasOwnProperty` properties defined on it, those property accesses actually end up **DELEGATING** the access to continue its lookup along the `[[Prototype]]` chain.
+我们利用了这个内部 `[[Prototype]]` 链接，却没有真正意识到这一点。由于 `myObj` 上没有定义 `toString` 或 `hasOwnProperty` 属性，这些属性访问实际上最终 **委托（DELEGATING）** 了访问权，以便沿着 `[[Prototype]]` 链继续查找。
 
-Since `myObj` is `[[Prototype]]`-linked to the object named `Object.prototype`, the lookup for `toString` and `hasOwnProperty` properties continues on that object; and indeed, these methods are found there!
+由于 `myObj` 是 `[[Prototype]]` 链接到名为 `Object.prototype` 的对象的，因此 `toString` 和 `hasOwnProperty` 属性的查找会在该对象上继续；实际上，这些方法就是在那里找到的！
 
-The ability for `myObj.toString` to access the `toString` property even though it doesn't actually have it, is commonly referred to as "inheritance", or more specifically, "prototypal inheritance". The `toString` and `hasOwnProperty` properties, along with many others, are said to be "inherited properties" on `myObj`.
+`myObj.toString` 能够访问 `toString` 属性，即使它实际上并没有该属性，这种能力通常被称为“继承”，或者更具体地说，“原型继承”。`toString` 和 `hasOwnProperty` 属性以及许多其他属性被称为 `myObj` 上的“继承属性”。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| I have a lot of frustrations with the usage of the word "inheritance" here -- it should be called "delegation"! --  but that's what most people refer to it as, so we'll begrudgingly comply and use that same terminology for now (albeit under protest, with " quotes). I'll save my objections for an appendix of this book. |
+| 我对这里使用“继承”这个词有很多不满——它应该被称为“委托”！——但这却是大多数人对它的称呼，所以我们将勉强遵守并暂时使用相同的术语（尽管是在抗议下，加上 " 引号）。我将把我的反对意见留到本书的附录中。 |
 
-`Object.prototype` has several built-in properties and methods, all of which are "inherited" by any object that is `[[Prototype]]`-linked, either directly or indirectly through another object's linkage, to `Object.prototype`.
+`Object.prototype` 有几个内置的属性和方法，所有 `[[Prototype]]` 链接（直接或通过另一个对象的链接间接）到 `Object.prototype` 的对象都会“继承”这些属性和方法。
 
-Some common "inherited" properties from `Object.prototype` include:
+来自 `Object.prototype` 的一些常见的“继承”属性包括：
 
 * `constructor`
 * `__proto__`
@@ -315,7 +315,7 @@ Some common "inherited" properties from `Object.prototype` include:
 * `hasOwnProperty(..)`
 * `isPrototypeOf(..)`
 
-Recall `hasOwnProperty(..)`, which we saw earlier gives us a boolean check for whether a certain property (by string name) is owned by an object:
+回想一下 `hasOwnProperty(..)`，即使我们之前看到它为咱们提供了一个布尔检查，用于检查某个属性（通过字符串名称）是否为对象所拥有：
 
 ```js
 myObj = {
@@ -325,9 +325,9 @@ myObj = {
 myObj.hasOwnProperty("favoriteNumber");   // true
 ```
 
-It's always been considered somewhat unfortunate (semantic organization, naming conflicts, etc) that such an important utility as `hasOwnProperty(..)` was included on the Object `[[Prototype]]` chain as an instance method, instead of being defined as a static utility.
+一直以来，像 `hasOwnProperty(..)` 这样重要的实用程序被包含在 Object `[[Prototype]]` 链上作为实例方法，而不是被定义为静态实用程序，这被认为有些不幸（语义组织、命名冲突等）。
 
-As of ES2022, JS has finally added the static version of this utility: `Object.hasOwn(..)`.
+从 ES2022 开始，JS 终于添加了这个实用程序的静态版本：`Object.hasOwn(..)`。
 
 ```js
 myObj = {
@@ -337,94 +337,95 @@ myObj = {
 Object.hasOwn(myObj,"favoriteNumber");   // true
 ```
 
-This form is now considered the more preferable and robust option, and the instance method (`hasOwnProperty(..)`) form should now generally be avoided.
+这种形式现在被认为是更可取和更稳健的选择，现在通常应避免使用实例方法 (`hasOwnProperty(..)`) 形式。
 
-Somewhat unfortunately and inconsistently, there's not (yet, as of time of writing) corresponding static utilities, like `Object.isPrototype(..)` (instead of the instance method `isPrototypeOf(..)`). But at least `Object.hasOwn(..)` exists, so that's progress.
+有些遗憾和不一致的是，（截至撰写本文时）还没有对应的静态实用程序，比如 `Object.isPrototype(..)`（代替实例方法 `isPrototypeOf(..)`）。但至少 `Object.hasOwn(..)` 存在了，这是一种进步。
 
-### Creating An Object With A Different `[[Prototype]]`
+### 创建具有不同 `[[Prototype]]` 的对象
 
-By default, any object you create in your programs will be `[[Prototype]]`-linked to that `Object.prototype` object. However, you can create an object with a different linkage like this:
+默认情况下，你在程序中创建的任何对象都将 `[[Prototype]]` 链接到该 `Object.prototype` 对象。但是，你可以像这样创建一个具有不同链接的对象：
 
 ```js
 myObj = Object.create(differentObj);
 ```
 
-The `Object.create(..)` method takes its first argument as the value to set for the newly created object's `[[Prototype]]`.
+`Object.create(..)` 方法接受其第一个参数作为要在新创建对象的 `[[Prototype]]` 上设置的值。
 
-One downside to this approach is that you aren't using the `{ .. }` literal syntax, so you don't initially define any contents for `myObj`. You typically then have to define properties one-by-one, using `=`.
+这种方法的一个缺点是你没有使用 `{ .. }` 字面量语法，因此你最初没有为 `myObj` 定义任何内容。通常你必须随后使用 `=` 逐个定义属性。
 
-| NOTE: |
+| 注意： |
 | :--- |
-| The second, optional argument to `Object.create(..)` is -- like the second argument to `Object.defineProperties(..)` as discussed earlier -- an object with properties that hold descriptors to initially define the new object with. In practice out in the wild, this form is rarely used, likely because it's more awkward to specify full descriptors instead of just name/value pairs. But it may come in handy in some limited cases. |
+| `Object.create(..)` 的第二个可选参数是——就像前面讨论的 `Object.defineProperties(..)` 的第二个参数一样——一个带有持有描述符的属性的对象，用于初始定义新对象。在实际环境中，这种形式很少使用，可能是因为指定完整的描述符而不是仅仅指定名/值对比较笨拙。但在某些有限的情况下，它可能会派上用场。 |
 
-Alternately, but less preferably, you can use the `{ .. }` literal syntax along with a special (and strange looking!) property:
+或者，虽然不太推荐，你可以使用 `{ .. }` 字面量语法以及一个特殊的（且看起来很奇怪的！）属性：
 
 ```js
 myObj = {
     __proto__: differentObj,
 
-    // .. the rest of the object definition
+    // .. 对象定义的其余部分
 };
 ```
 
-| WARNING: |
+| 警告： |
 | :--- |
-| The strange looking `__proto__` property has been in some JS engines for more than 20 years, but was only standardized in JS as of ES6 (in 2015). Even still, it was added in Appendix B of the specification[^specApB], which lists features that TC39 begrudgingly includes because they exist popularly in various browser-based JS engines and therefore are a de-facto reality even if they didn't originate with TC39. This feature is thus "guaranteed" by the spec to exist in all conforming browser-based JS engines, but is not necessarily guaranteed to work in other independent JS engines. Node.js uses the JS engine (v8) from the Chrome browser, so Node.js gets `__proto__` by default/accident. Be careful when using `__proto__` to be aware of all the JS engine environments your code will run in. |
+| 看起来很奇怪的 `__proto__` 属性在某些 JS 引擎中已经存在了 20 多年，但直到 ES6 (2015) 才在 JS 中标准化。即使如此，它也被添加在规范的附录 B 中[^specApB]，其中列出了 TC39 勉强包含的功能，因为它们在各种基于浏览器的 JS 引擎中广泛存在，因此即使它们并非起源于 TC39，也是事实上的现实。因此，规范“保证”此功能存在于所有符合标准的基于浏览器的 JS 引擎中，但不一定保证在其他独立的 JS 引擎中工作。Node.js 使用来自 Chrome 浏览器的 JS 引擎 (v8)，因此 Node.js 默认/意外地获得了 `__proto__`。在使用 `__proto__` 时要小心，了解你的代码将运行的所有 JS 引擎环境。 |
 
-Whether you use `Object.create(..)` or `__proto__`, the created object in question will usually be `[[Prototype]]`-linked to a different object than the default `Object.prototype`.
+无论你使用 `Object.create(..)` 还是 `__proto__`，所讨论的创建对象通常都会 `[[Prototype]]` 链接到与默认 `Object.prototype` 不同的对象。
 
-#### Empty `[[Prototype]]` Linkage
+#### 空 `[[Prototype]]` 链接
 
-We mentioned above that the `[[Prototype]]` chain has to stop somewhere, so as to have lookups not continue forever. `Object.prototype` is typically the top/end of every `[[Prototype]]` chain, as its own `[[Prototype]]` is `null`, and therefore there's nowhere else to continue looking.
+我们上面提到，`[[Prototype]]` 链必须在某处停止，以便查找不会永远继续下去。`Object.prototype` 通常是每个 `[[Prototype]]` 链的顶端/终点，因为它自己的 `[[Prototype]]` 是 `null`，因此没有其他地方可以继续查找。
 
-However, you can also define objects with their own `null` value for `[[Prototype]]`, such as:
+但是，你也可以定义具有自己的 `null` 值的 `[[Prototype]]` 的对象，例如：
 
 ```js
 emptyObj = Object.create(null);
-// or: emptyObj = { __proto__: null }
+// 或者: emptyObj = { __proto__: null }
 
 emptyObj.toString;   // undefined
 ```
 
-It can be quite useful to create an object with no `[[Prototype]]` linkage to `Object.prototype`. For example, as mentioned in Chapter 1, the `in` and `for..in` constructs will consult the `[[Prototype]]` chain for inherited properties. But this may be undesirable, as you may not want something like `"toString" in myObj` to resolve successfully.
+创建一个没有 `[[Prototype]]` 链接到 `Object.prototype` 的对象非常有用。例如，正如在第 1 章中提到的，`in` 和 `for..in` 结构将查询 `[[Prototype]]` 链以获取继承的属性。但这可能是不受欢迎的，因为你可能不希望像 `"toString" in myObj` 这样的东西成功解析。
 
-Moreover, an object with an empty `[[Prototype]]` is safe from any accidental "inheritance" collision between its own property names and the ones it "inherits" from elsewhere. These types of (useful!) objects are sometimes referred to in popular parlance as "dictionary objects".
+此外，具有空 `[[Prototype]]` 的对象可以免受其自身属性名称与其他地方“继承”的属性名称之间任何意外的“继承”冲突的影响。这些类型的（有用的！）对象有时在流行说法中被称为“字典对象”。
 
 ### `[[Prototype]]` vs `prototype`
 
-Notice that public property name `prototype` in the name/location of this special object, `Object.prototype`? What's that all about?
+注意到了这个特殊对象 `Object.prototype` 的名称/位置中的公共属性名 `prototype` 了吗？这是怎么回事？
 
-`Object` is the `Object(..)` function; by default, all functions (which are themselves objects!) have such a `prototype` property on them, pointing at an object.
+`Object` 是 `Object(..)` 函数；默认情况下，所有函数（它们本身也是对象！）都在其上有一个 `prototype` 属性，指向一个对象。
 
-Any here's where the name conflict between `[[Prototype]]` and `prototype` really bites us. The `prototype` property on a function doesn't define any linkage that the function itself experiences. Indeed, functions (as objects) have their own internal `[[Prototype]]` linkage somewhere else -- more on that in a second.
+这就是 `[[Prototype]]` 和 `prototype` 之间名称冲突真正刺痛我们的地方。函数上的 `prototype` 属性并不定义函数本身所经历的任何链接。实际上，函数（作为对象）在其他地方有自己的内部 `[[Prototype]]` 链接——稍后会详细介绍。
 
-Rather, the `prototype` property on a function refers to an object that should be *linked TO* by any other object that is created when calling that function with the `new` keyword:
+相反，函数上的 `prototype` 属性指的是一个对象，当使用 `new` 关键字调用该函数创建任何其他对象时，这些对象应该 **链接到** 该对象：
 
 ```js
 myObj = {};
 
-// is basically the same as:
+// 基本上等同于：
 myObj = new Object();
 ```
 
-Since the `{ .. }` object literal syntax is essentially the same as a `new Object()` call, the built-in object named/located at `Object.prototype` is used as the internal `[[Prototype]]` value for the new object we create and name `myObj`.
+由于 `{ .. }` 对象字面量语法本质上与 `new Object()` 调用相同，因此位于 `Object.prototype` 的内置对象被用作我们创建并命名为 `myObj` 的新对象的内部 `[[Prototype]]` 值。
 
-Phew! Talk about a topic made significantly more confusing just because of the name overlap between `[[Prototype]]` and `prototype`!
+呼！仅仅因为 `[[Prototype]]` 和 `prototype` 之间的名称重叠，这就成了一个令人更加困惑的话题！
 
 ----
 
-But where do functions themselves (as objects!) link to, `[[Prototype]]` wise? They link to `Function.prototype`, yet another built-in object, located at the `prototype` property on the `Function(..)` function.
+但是函数本身（作为对象！）在 `[[Prototype]]` 方面链接到哪里呢？它们链接到 `Function.prototype`，这是另一个内置对象，位于 `Function(..)` 函数的 `prototype` 属性上。
 
-In other words, you can think of functions themselves as having been "created" by a `new Function(..)` call, and then `[[Prototype]]`-linked to the `Function.prototype` object. This object contains properties/methods all functions "inherit" by default, such as `toString()` (to string serialize the source code of a function) and `call(..)` / `apply(..)` / `bind(..)` (we'll explain these later in this book).
+换句话说，你可以将函数本身视为是通过 `new Function(..)` 调用“创建”的，然后 `[[Prototype]]` 链接到 `Function.prototype` 对象。该对象包含所有函数默认“继承”的属性/方法，例如 `toString()`（用于字符串序列化函数的源代码）和 `call(..)` / `apply(..)` / `bind(..)`（我们将在本书后面解释这些）。
 
-## Objects Behavior
+## 对象行为
 
-Properties on objects are internally defined and controlled by a "descriptor" metaobject, which includes attributes such as `value` (the property's present value) and `enumerable` (a boolean controlling whether the property is included in enumerable-only listings of properties/property names).
+对象上的属性由“描述符”元对象内部定义和控制，其中包括诸如 `value`（属性的当前值）和 `enumerable`（控制属性是否包含在仅限可枚举的属性/属性名称列表中的布尔值）等特性。
 
-The way object and their properties work in JS is referred to as the "metaobject protocol" (MOP)[^mop]. We can control the precise behavior of properties via `Object.defineProperty(..)`, as well as object-wide behaviors with `Object.freeze(..)`. But even more powerfully, we can hook into and override certain default behaviors on objects using special pre-defined Symbols.
+JS 中对象及其属性的工作方式被称为“元对象协议”（MOP）[^mop]。我们可以通过 `Object.defineProperty(..)` 控制属性的精确行为，以及通过 `Object.freeze(..)` 控制对象范围的行为。但更强大的是，我们可以使用特殊的预定义 Symbol 钩入并覆盖对象上的某些默认行为。
 
-Prototypes are internal linkages between objects that allow property or method access against one object -- if the property/method requested is absent -- to be handled by "delegating" that access lookup to another object. When the delegation involves a method, the context for the method to run in is shared from the initial object to the target object via the `this` keyword.
+原型是对象之间的内部链接，允许针对一个对象的属性或方法访问——如果请求的属性/方法不存在——通过将该访问查找“委托”给另一个对象来处理。当委托涉及方法时，方法的运行上下文通过 `this` 关键字从初始对象共享到目标对象。
 
 [^mop]: "Metaobject", Wikipedia; https://en.wikipedia.org/wiki/Metaobject ; Accessed July 2022.
 
 [^specApB]: "Appendix B: Additional ECMAScript Features for Web Browsers", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-additional-ecmascript-features-for-web-browsers ; Accessed July 2022
+```

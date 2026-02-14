@@ -608,7 +608,11 @@ class Publication {
 ```js
 class Book extends Publication {
     constructor(bookDetails) {
-        super(bookDetails.title, bookDetails.author, bookDetails.publishedOn);
+        super(
+            bookDetails.title,
+            bookDetails.author,
+            bookDetails.publishedOn
+        );
         this.publisher = bookDetails.publisher;
         this.ISBN = bookDetails.ISBN;
     }
@@ -643,7 +647,7 @@ class BlogPost extends Publication {
 var YDKJS = new Book({
     title: "You Don't Know JS",
     author: "Kyle Simpson",
-    publishedOn: "June 2014",
+    pubDate: "June 2014",
     publisher: "O'Reilly",
     ISBN: "123456-789",
 });

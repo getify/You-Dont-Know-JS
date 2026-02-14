@@ -5,7 +5,7 @@ labels:
 
 ---
 
-Foreign translations are appreciated. However, any such requests should wait until the 2nd edition is complete.
+Foreign translations are appreciated, but only for the 3 second edition books.
 
 **I will not be accepting any new foreign translations for previous editions.**
 
