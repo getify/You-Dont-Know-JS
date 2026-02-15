@@ -1,4 +1,4 @@
-# 你不知道的 JavaScript：对象与类 - 第 2 版
+# 你并不了解 JavaScript：对象与类 - 第二版
 # 序
 
 Kyle Simpson 在阐述解释的艺术上拥有一种无与伦比的才华。

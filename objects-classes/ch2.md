@@ -266,7 +266,7 @@ myObj.favoriteNumber = 123;                // 正常工作
 
 ## `[[Prototype]]` 链
 
-对象最重要的但最不明显的特征之一（MOP 的一部分）被称为其“原型链”；官方 JS 规范符号是 `[[Prototype]]`。确切注意不要将此 `[[Prototype]]` 与名为 `prototype` 的公共属性混淆。尽管命名相似，但它们是不同的概念。
+对象最重要的但最不明显的特征之一（MOP 的一部分）被称为其“原型链”；官方 JS 规范符号是 `[[Prototype]]`。务必注意不要将此 `[[Prototype]]` 与名为 `prototype` 的公共属性混淆。尽管命名相似，但它们是不同的概念。
 
 `[[Prototype]]` 是对象在创建时默认获得的内部链接，指向另一个对象。这种链接是对象的一个隐藏的、通常很微妙的特征，但它对与对象的交互方式有着深远的影响。它被称为“链”，因为一个对象链接到另一个对象，后者又链接到另一个对象，……依此类推。这个链有一个 *终点* 或 *顶端*，链接在那里停止，没有更远的地方可去。稍后会详细介绍。
 
@@ -428,4 +428,3 @@ JS 中对象及其属性的工作方式被称为“元对象协议”（MOP）[^
 [^mop]: "Metaobject", Wikipedia; https://en.wikipedia.org/wiki/Metaobject ; Accessed July 2022.
 
 [^specApB]: "Appendix B: Additional ECMAScript Features for Web Browsers", ECMAScript 2022 Language Specification; https://262.ecma-international.org/13.0/#sec-additional-ecmascript-features-for-web-browsers ; Accessed July 2022
-```

@@ -1040,7 +1040,7 @@ class Point3d extends Point2d {
 但有一种更清晰的方法，即所谓的“人体工程学品牌检查”，使用 `in` 关键字：The user wants to translate the file `objects-classes/ch3.md` into Chinese. I have read the file content. I will now perform the translation and return the full content.
 
 ```markdown
-# You Don't Know JS Yet: Objects & Classes - 第 2 版
+# 你并不了解 JavaScript：对象与类 - 第二版
 # 第 3 章：类风格的对象 (Classy Objects)
 
 | 注意： |
