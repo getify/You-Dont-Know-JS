@@ -42,19 +42,23 @@ This book series is now complete, and is **not open to further contributions**.
 
 Thank you to those who've been part of the 11 years journey of this book series.
 
-## Thank You To These Wonderful Sponsors
+## Thank You To These [Wonderful Sponsors](https://github.com/sponsors/getify)
+
+[![Coddy Logo](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/external-logos/coddy_logo.png)](https://coddy.tech/?utm_source=github&utm_medium=sponsorship&utm_campaign=ydkjs)
+
+A big thanks to [Coddy](https://coddy.tech/?utm_source=github&utm_medium=sponsorship&utm_campaign=ydkjs), our latest [Project Champion](https://github.com/sponsors/getify) sponsor!
+
+[Coddy is a fantastic resource](https://github.com/coddytech) to learn coding for free in a fun an interactive way. Go check them out!
+
+----
 
 [![Frontend Masters Logo (dark)](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/external-logos/fem_logo-light.svg)](https://frontendmasters.com#gh-light-mode-only)
 
 [![Frontend Masters Logo (light)](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/external-logos/fem_logo.svg)](https://frontendmasters.com#gh-dark-mode-only)
 
-**The first two books of the second edition** are exclusively sponsored by **[Frontend Masters](https://frontendmasters.com/?code=simpson)**.
+**The first two books of the second edition** were generously sponsored by **[Frontend Masters](https://frontendmasters.com/?code=simpson)**, which is now **[Master.dev](https://master.dev/?code=simpson).
 
-Frontend Masters is the gold standard for top-of-the-line expert training material in frontend-oriented software development. With over 150 courses on all things frontend, this should be your first and only stop for quality video training on HTML, CSS, JS, and related technologies.
-
-**Note:** I teach [all my workshops](https://frontendmasters.com/teachers/kyle-simpson?code=simpson) exclusively through Frontend Masters. If you like this book content, please check out my video training courses.
-
-I want to extend a warm and deep thanks to Marc Grabanski and the entire Frontend Masters team, not only for their excellent work with the video training platform, but for their unwavering support of me and of the "You Don't Know JS" books!
+**Note:** I previously taught [all my workshops](https://master.dev/teachers/kyle-simpson?code=simpson) exclusively through Frontend Masters (now Master.dev). If you like this book content, please check out my video training courses.
 
 ----
 
